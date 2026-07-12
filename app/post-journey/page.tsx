@@ -1,7 +1,6 @@
-import JourneyGlobe from "../components/JourneyGlobe";
 import LeftSidebar from "../components/LeftSidebar";
 import TopNavbar from "../components/TopNavbar";
-import JourneyHandoffArrival from "../components/journey-transition/JourneyHandoffArrival";
+import PostJourneyGlobeSection from "./PostJourneyGlobeSection";
 
 const journeyStats = [
   {
@@ -62,8 +61,6 @@ export default function PostJourneyPage() {
         <LeftSidebar />
 
         <section className="min-w-0">
-          <JourneyHandoffArrival />
-
           <div className="overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#17112f] via-[#0e1024] to-[#071d20] p-7">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
@@ -108,25 +105,8 @@ export default function PostJourneyPage() {
             ))}
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-[32px] border border-white/10 bg-[#0b0b18]">
-            <div className="flex flex-col gap-3 border-b border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-2xl font-black">
-                  Global Journey Globe
-                </h2>
-
-                <p className="mt-1 text-sm text-white/50">
-                  Watch content travel around the world in real time.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-sm font-bold text-emerald-200">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
-                Live Journey
-              </div>
-            </div>
-
-            <JourneyGlobe />
+          <div className="mt-6">
+            <PostJourneyGlobeSection />
           </div>
 
           <div className="mt-6 rounded-[32px] border border-white/10 bg-white/[0.03] p-6">

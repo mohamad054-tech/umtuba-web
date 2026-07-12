@@ -21,7 +21,7 @@ export default function VideoOverlay({
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
 
-      <div className="watch-overlay-enter pointer-events-auto relative z-10 flex items-end justify-between gap-3 p-5 pb-7 md:gap-4 md:p-6 md:pb-8">
+      <div className="watch-overlay-enter relative z-10 flex items-end justify-between gap-3 p-5 pb-7 md:gap-4 md:p-6 md:pb-8">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white font-black text-black shadow-[0_0_24px_rgba(255,255,255,0.18)]">
@@ -55,7 +55,7 @@ export default function VideoOverlay({
               type="button"
               onClick={() => onOpenPanel("explore-city")}
               disabled={transitionLocked}
-              className="watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              className="pointer-events-auto watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Explore this city
             </button>
@@ -75,7 +75,7 @@ export default function VideoOverlay({
               type="button"
               onClick={() => onOpenPanel("ai")}
               disabled={transitionLocked}
-              className="watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+              className="pointer-events-auto watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
             >
               {video.translation} · Open AI panel
             </button>
@@ -86,20 +86,22 @@ export default function VideoOverlay({
             onClick={() => onPostJourney(video)}
             disabled={transitionLocked}
             aria-busy={transitionLocked}
-            className="watch-focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_40px_rgba(255,255,255,0.18)] transition hover:scale-[1.015] hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 md:w-auto md:min-w-[220px]"
+            className="pointer-events-auto watch-focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_40px_rgba(255,255,255,0.18)] transition hover:scale-[1.015] hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 md:w-auto md:min-w-[220px]"
           >
             <span aria-hidden>🌍</span>
             {transitionLocked ? "Opening journey..." : "Post Journey"}
           </button>
         </div>
 
-        <VideoActionRail
-          likes={video.demoStats.likes}
-          comments={video.demoStats.comments}
-          shares={video.demoStats.shares}
-          saves={video.demoStats.saves}
-          onOpenPanel={onOpenPanel}
-        />
+        <div className="pointer-events-auto">
+          <VideoActionRail
+            likes={video.demoStats.likes}
+            comments={video.demoStats.comments}
+            shares={video.demoStats.shares}
+            saves={video.demoStats.saves}
+            onOpenPanel={onOpenPanel}
+          />
+        </div>
       </div>
     </div>
   );

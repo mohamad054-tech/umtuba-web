@@ -125,12 +125,12 @@ export default function VideoPlayer({
     showFlash("pause");
   }
 
-  function handleSurfaceClick(event: MouseEvent<HTMLButtonElement>) {
+  function handleSurfaceClick(event: MouseEvent<HTMLVideoElement>) {
     event.preventDefault();
     togglePlayback();
   }
 
-  function handleSurfaceKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+  function handleSurfaceKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       togglePlayback();
@@ -141,13 +141,14 @@ export default function VideoPlayer({
     <div className="relative h-full w-full bg-black">
       <video
         ref={videoRef}
-        className="h-full w-full object-cover"
+        className="h-full w-full cursor-pointer object-cover"
         src={src}
         poster={poster}
         playsInline
         loop
         muted={muted}
         preload={active ? "auto" : "metadata"}
+        onClick={handleSurfaceClick}
         onLoadedData={() => setIsReady(true)}
         onWaiting={() => setIsReady(false)}
         onCanPlay={() => setIsReady(true)}
@@ -155,12 +156,13 @@ export default function VideoPlayer({
         onPause={() => setIsPaused(true)}
       />
 
-      <button
-        type="button"
-        className="watch-focus-ring absolute inset-0 z-10 cursor-pointer bg-transparent"
+      <div
+        role="button"
+        tabIndex={0}
+        className="sr-only"
         aria-label={isPaused ? "Play video" : "Pause video"}
-        onClick={handleSurfaceClick}
         onKeyDown={handleSurfaceKeyDown}
+        onClick={() => togglePlayback()}
       />
 
       {flashIcon ? (
