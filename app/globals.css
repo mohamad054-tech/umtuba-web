@@ -24,3 +24,131 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Vertical watch feed — scroll snap helpers */
+.video-snap-scroller {
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.video-snap-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.video-watch-stage {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 60px rgba(59, 130, 246, 0.18),
+    0 0 120px rgba(147, 51, 234, 0.12);
+}
+
+.video-watch-stage:fullscreen {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.watch-focus-ring:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+
+.watch-page-enter {
+  animation: watch-fade-rise 520ms ease-out both;
+}
+
+.watch-overlay-enter {
+  animation: watch-fade-rise 640ms ease-out both;
+}
+
+.watch-playback-flash {
+  animation: watch-playback-flash 520ms ease-out both;
+}
+
+.watch-rail-btn {
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.watch-rail-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.22);
+}
+
+.watch-rail-btn:active {
+  transform: scale(0.96);
+}
+
+.watch-rail-btn.is-active {
+  background: rgba(255, 255, 255, 0.95);
+  color: #050510;
+  border-color: transparent;
+}
+
+.watch-panel-enter {
+  animation: watch-panel-in 280ms ease-out both;
+}
+
+@keyframes watch-fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes watch-playback-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes watch-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .watch-page-enter,
+  .watch-overlay-enter,
+  .watch-playback-flash,
+  .watch-panel-enter {
+    animation: none !important;
+  }
+
+  .watch-rail-btn,
+  .watch-rail-btn:hover,
+  .watch-rail-btn:active {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .video-snap-scroller * {
+    scroll-behavior: auto !important;
+  }
+}
