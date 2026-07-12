@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import JourneyGlobe from "../components/JourneyGlobe";
 import { useJourneyHandoffArrival } from "../components/journey-transition/useJourneyHandoff";
 import DestinationArrivalCard from "../components/journey/DestinationArrivalCard";
@@ -9,22 +9,75 @@ import {
   resolveGlobeDestination,
   type PostJourneyArrivalPhase,
 } from "../components/journey/handoffArrival";
+import GlobeToCityDirector from "../components/globe-to-city/GlobeToCityDirector";
+import {
+  buildGlobeToCityHandoff,
+  resolveGlobeToCityProfile,
+  type GlobeToCityPhase,
+} from "../components/globe-to-city/globeToCityMotion";
+import type { CityHandoffPayload } from "../lib/city/handoff";
 
-function PostJourneyGlobeSectionInner() {
+export default function PostJourneyGlobeSection() {
   const { ready, fromWatch, handoff } = useJourneyHandoffArrival();
   const [arrivalPhase, setArrivalPhase] =
     useState<PostJourneyArrivalPhase>("idle");
-  const [exploreOpen, setExploreOpen] = useState(false);
+  const [cityEntryActive, setCityEntryActive] = useState(false);
+  const [cityEntryPhase, setCityEntryPhase] =
+    useState<GlobeToCityPhase>("idle");
+  const [cityEntryHandoff, setCityEntryHandoff] =
+    useState<CityHandoffPayload | null>(null);
+  const [cardHidden, setCardHidden] = useState(false);
+  const [entryError, setEntryError] = useState<string | null>(null);
 
   const cinematicHandoff = fromWatch ? handoff : null;
   const destination = resolveGlobeDestination(cinematicHandoff);
+  const cityEntryReducedMotion = useMemo(
+    () => resolveGlobeToCityProfile() === "reduced",
+    []
+  );
 
   const handlePhaseChange = useCallback((phase: PostJourneyArrivalPhase) => {
     setArrivalPhase(phase);
   }, []);
 
   const showCard =
-    Boolean(cinematicHandoff) && isArrivalCardPhase(arrivalPhase);
+    Boolean(cinematicHandoff) &&
+    isArrivalCardPhase(arrivalPhase) &&
+    (!cardHidden || cityEntryActive);
+
+  const handleExplore = useCallback(() => {
+    if (!handoff || cityEntryActive) {
+      return;
+    }
+
+    setEntryError(null);
+    setCardHidden(true);
+
+    const nextHandoff = buildGlobeToCityHandoff({
+      city: destination.city.name,
+      country: destination.city.country,
+      lat: destination.city.lat,
+      lng: destination.city.lng,
+      videoId: handoff.videoId,
+      title: handoff.title,
+      authorName: handoff.authorName,
+    });
+
+    setCityEntryHandoff(nextHandoff);
+    setCityEntryActive(true);
+  }, [handoff, cityEntryActive, destination.city]);
+
+  const handleCityPhaseChange = useCallback((phase: GlobeToCityPhase) => {
+    setCityEntryPhase(phase);
+  }, []);
+
+  const handleRecover = useCallback((message: string) => {
+    setCityEntryActive(false);
+    setCityEntryPhase("idle");
+    setCityEntryHandoff(null);
+    setCardHidden(false);
+    setEntryError(message);
+  }, []);
 
   if (!ready) {
     return (
@@ -61,6 +114,15 @@ function PostJourneyGlobeSectionInner() {
         </div>
       ) : null}
 
+      {entryError ? (
+        <div
+          role="status"
+          className="rounded-[24px] border border-amber-300/25 bg-amber-300/10 px-5 py-4 text-sm text-amber-50/90"
+        >
+          {entryError}
+        </div>
+      ) : null}
+
       <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#0b0b18]">
         <div className="flex flex-col gap-3 border-b border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -80,6 +142,8 @@ function PostJourneyGlobeSectionInner() {
           <JourneyGlobe
             handoff={cinematicHandoff}
             onArrivalPhaseChange={handlePhaseChange}
+            cityEntryPhase={cityEntryPhase}
+            cityEntryReducedMotion={cityEntryReducedMotion}
           />
 
           {showCard && handoff ? (
@@ -89,70 +153,22 @@ function PostJourneyGlobeSectionInner() {
               videoTitle={handoff.title}
               creator={handoff.authorName}
               usedFallback={destination.usedFallback}
-              onExplore={() => setExploreOpen(true)}
+              onExplore={handleExplore}
+              exploreDisabled={cityEntryActive}
+              fadingOut={cardHidden}
+            />
+          ) : null}
+
+          {cityEntryActive && cityEntryHandoff ? (
+            <GlobeToCityDirector
+              active={cityEntryActive}
+              handoff={cityEntryHandoff}
+              onPhaseChange={handleCityPhaseChange}
+              onRecover={handleRecover}
             />
           ) : null}
         </div>
       </div>
-
-      {exploreOpen && handoff ? (
-        <section
-          id="destination-explore"
-          className="rounded-[32px] border border-white/10 bg-white/[0.04] p-6"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-blue-300">
-                Explore destination
-              </p>
-              <h3 className="mt-2 text-2xl font-black">
-                {destination.city.name}
-              </h3>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/60">
-                Placeholder discovery surface for creators, places, and
-                opportunities in {destination.city.name}. Backend connections
-                come later — this panel stays on Post Journey for now.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setExploreOpen(false)}
-              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:bg-white/10"
-            >
-              Close
-            </button>
-          </div>
-
-          <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {["Creators nearby", "Local ideas", "Open opportunities"].map(
-              (label) => (
-                <div
-                  key={label}
-                  className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-4 py-8 text-center text-sm text-white/40"
-                >
-                  {label}
-                </div>
-              )
-            )}
-          </div>
-        </section>
-      ) : null}
     </div>
-  );
-}
-
-export default function PostJourneyGlobeSection() {
-  return (
-    <Suspense
-      fallback={
-        <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#0b0b18]">
-          <div className="flex h-[620px] items-center justify-center text-sm text-white/50">
-            Loading globe...
-          </div>
-        </div>
-      }
-    >
-      <PostJourneyGlobeSectionInner />
-    </Suspense>
   );
 }

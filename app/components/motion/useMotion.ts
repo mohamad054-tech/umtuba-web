@@ -1,3 +1,8 @@
 "use client";
 
-export { MotionProvider, useMotion } from "./MotionProvider";
+export {
+  MotionProvider,
+  useMotion,
+  useMotionApi,
+  useMotionState,
+} from "./MotionProvider";

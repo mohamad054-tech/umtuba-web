@@ -24,7 +24,7 @@ import {
 } from "../../lib/motion";
 import { registerDefaultMotionTransitions } from "../../motion/transitions";
 
-type MotionContextValue = {
+type MotionApiValue = {
   startTransition: <TPayload = unknown>(
     options: StartTransitionOptions<TPayload>
   ) => Promise<MotionTransitionResult>;
@@ -32,14 +32,20 @@ type MotionContextValue = {
   complete: () => MotionTransitionResult | null;
   fail: (error?: MotionEngineError) => MotionTransitionResult | null;
   subscribe: (subscriber: MotionSubscriber) => () => void;
-  status: MotionEngineStatus;
-  active: MotionActiveRun | null;
   registry: MotionRegistry;
   runner: MotionRunner;
+};
+
+type MotionStateValue = {
+  status: MotionEngineStatus;
+  active: MotionActiveRun | null;
   lastEvent: MotionEngineEvent | null;
 };
 
-const MotionContext = createContext<MotionContextValue | null>(null);
+type MotionContextValue = MotionApiValue & MotionStateValue;
+
+const MotionApiContext = createContext<MotionApiValue | null>(null);
+const MotionStateContext = createContext<MotionStateValue | null>(null);
 
 type MotionProviderProps = {
   children: ReactNode;
@@ -125,18 +131,17 @@ export function MotionProvider({
     [runner]
   );
 
-  const value = useMemo<MotionContextValue>(
+  // Stable — must NOT depend on status/active/lastEvent or Canvas hosts re-render
+  // on every motion phase and can lose the WebGL context.
+  const api = useMemo<MotionApiValue>(
     () => ({
       startTransition,
       cancel,
       complete,
       fail,
       subscribe,
-      status,
-      active,
       registry,
       runner,
-      lastEvent,
     }),
     [
       startTransition,
@@ -144,25 +149,58 @@ export function MotionProvider({
       complete,
       fail,
       subscribe,
-      status,
-      active,
       registry,
       runner,
-      lastEvent,
     ]
   );
 
+  const state = useMemo<MotionStateValue>(
+    () => ({
+      status,
+      active,
+      lastEvent,
+    }),
+    [status, active, lastEvent]
+  );
+
   return (
-    <MotionContext.Provider value={value}>{children}</MotionContext.Provider>
+    <MotionApiContext.Provider value={api}>
+      <MotionStateContext.Provider value={state}>
+        {children}
+      </MotionStateContext.Provider>
+    </MotionApiContext.Provider>
   );
 }
 
-export function useMotion() {
-  const context = useContext(MotionContext);
+/** Stable motion API — safe for R3F / Canvas hosts. */
+export function useMotionApi() {
+  const api = useContext(MotionApiContext);
 
-  if (!context) {
-    throw new Error("useMotion must be used within a MotionProvider.");
+  if (!api) {
+    throw new Error("useMotionApi must be used within a MotionProvider.");
   }
 
-  return context;
+  return api;
+}
+
+/** Reactive motion status — for overlays/debug only. */
+export function useMotionState() {
+  const state = useContext(MotionStateContext);
+
+  if (!state) {
+    throw new Error("useMotionState must be used within a MotionProvider.");
+  }
+
+  return state;
+}
+
+/** Combined hook — re-renders on status changes. Prefer useMotionApi in Canvas hosts. */
+export function useMotion(): MotionContextValue {
+  const api = useMotionApi();
+  const state = useMotionState();
+
+  return {
+    ...api,
+    ...state,
+  };
 }

@@ -132,14 +132,14 @@ export function isArrivalCardPhase(phase: PostJourneyArrivalPhase) {
 
 export function mapArrivalEnginePhase(
   phaseId: string
-): PostJourneyArrivalPhase {
+): PostJourneyArrivalPhase | null {
   if (
     (POST_JOURNEY_ARRIVAL_PHASES as readonly string[]).includes(phaseId)
   ) {
     return phaseId as PostJourneyArrivalPhase;
   }
 
-  return "fade";
+  return null;
 }
 
 /** Expected engine phase ids for arrival (after profile resolution). */

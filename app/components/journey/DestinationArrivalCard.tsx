@@ -7,6 +7,8 @@ type DestinationArrivalCardProps = {
   creator: string;
   usedFallback?: boolean;
   onExplore: () => void;
+  exploreDisabled?: boolean;
+  fadingOut?: boolean;
 };
 
 export default function DestinationArrivalCard({
@@ -16,9 +18,15 @@ export default function DestinationArrivalCard({
   creator,
   usedFallback = false,
   onExplore,
+  exploreDisabled = false,
+  fadingOut = false,
 }: DestinationArrivalCardProps) {
   return (
-    <div className="pointer-events-auto absolute bottom-5 left-5 right-5 z-20 md:left-auto md:right-6 md:w-[320px]">
+    <div
+      className={`pointer-events-auto absolute bottom-5 left-5 right-5 z-20 transition-opacity duration-300 md:left-auto md:right-6 md:w-[320px] ${
+        fadingOut ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
+    >
       <div className="rounded-[28px] border border-white/10 bg-[#0b0b18]/92 p-5 text-white shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur-xl">
         <p className="text-xs font-bold uppercase tracking-[0.28em] text-cyan-300">
           Destination
@@ -37,9 +45,11 @@ export default function DestinationArrivalCard({
         <button
           type="button"
           onClick={onExplore}
-          className="mt-5 w-full rounded-full bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-white/90"
+          disabled={exploreDisabled}
+          aria-busy={exploreDisabled}
+          className="mt-5 w-full rounded-full bg-white px-5 py-3 text-sm font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-55"
         >
-          Explore
+          {exploreDisabled ? "Entering city..." : "Explore"}
         </button>
       </div>
     </div>

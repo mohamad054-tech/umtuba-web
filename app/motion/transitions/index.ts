@@ -1,5 +1,6 @@
 import type { MotionRegistry } from "../../lib/motion/registry";
 import { createMotionRegistry } from "../../lib/motion/registry";
+import { registerGlobeToCityTransition } from "./globe-to-city";
 import { registerPostJourneyArrivalTransition } from "./post-journey-arrival";
 import { registerWatchToJourneyTransition } from "./watch-to-journey";
 
@@ -12,6 +13,7 @@ export function registerDefaultMotionTransitions(
 ): MotionRegistry {
   registerWatchToJourneyTransition(registry);
   registerPostJourneyArrivalTransition(registry);
+  registerGlobeToCityTransition(registry);
   return registry;
 }
 
@@ -29,3 +31,9 @@ export {
   resolvePostJourneyArrivalTransitionId,
   registerPostJourneyArrivalTransition,
 } from "./post-journey-arrival";
+
+export {
+  globeToCityTransition,
+  GLOBE_TO_CITY_TRANSITION_ID,
+  registerGlobeToCityTransition,
+} from "./globe-to-city";

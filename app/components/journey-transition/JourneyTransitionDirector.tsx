@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { DemoVideo } from "../../data/videos";
 import { writeJourneyHandoff } from "../../lib/journey/handoff";
 import type { JourneyTransitionPhase } from "../../lib/journey/transitionPhases";
-import { useMotion } from "../motion/useMotion";
+import { useMotionApi } from "../motion/useMotion";
 import WatchToJourneyOverlay from "./WatchToJourneyOverlay";
 import {
   buildWatchToJourneyHandoff,
@@ -40,7 +40,7 @@ export default function JourneyTransitionDirector({
   onNavigateFailed,
 }: JourneyTransitionDirectorProps) {
   const router = useRouter();
-  const { startTransition, subscribe, cancel: cancelMotion } = useMotion();
+  const { startTransition, subscribe, cancel: cancelMotion } = useMotionApi();
   const [phase, setPhase] = useState<JourneyTransitionPhase>("idle");
   const [reducedMotion, setReducedMotion] = useState(false);
   const [cityLabel, setCityLabel] = useState(video.location.city);
