@@ -14,8 +14,11 @@ import VideoSlide from "./VideoSlide";
 type VerticalVideoFeedProps = {
   videos: DemoVideo[];
   initialIndex?: number;
+  forcePause?: boolean;
+  transitionLocked?: boolean;
   onActiveChange?: (video: DemoVideo, index: number) => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
+  onPostJourney: (video: DemoVideo) => void;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -23,8 +26,11 @@ const NEIGHBOR_WINDOW = 1;
 export default function VerticalVideoFeed({
   videos,
   initialIndex = 0,
+  forcePause = false,
+  transitionLocked = false,
   onActiveChange,
   onOpenPanel,
+  onPostJourney,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -205,8 +211,11 @@ export default function VerticalVideoFeed({
                 video={video}
                 active={index === activeIndex}
                 muted={muted}
+                forcePause={forcePause}
+                transitionLocked={transitionLocked}
                 onToggleMute={handleToggleMute}
                 onOpenPanel={onOpenPanel}
+                onPostJourney={onPostJourney}
                 slideRef={(node) => setSlideNode(video.id, node)}
               />
             ) : (

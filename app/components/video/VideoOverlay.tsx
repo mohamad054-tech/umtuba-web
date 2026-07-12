@@ -1,18 +1,21 @@
 "use client";
 
-import Link from "next/link";
 import type { DemoVideo } from "../../data/videos";
 import type { WatchPanelId } from "./watchTypes";
 import VideoActionRail from "./VideoActionRail";
 
 type VideoOverlayProps = {
   video: DemoVideo;
+  transitionLocked?: boolean;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
+  onPostJourney: (video: DemoVideo) => void;
 };
 
 export default function VideoOverlay({
   video,
+  transitionLocked = false,
   onOpenPanel,
+  onPostJourney,
 }: VideoOverlayProps) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
@@ -51,7 +54,8 @@ export default function VideoOverlay({
             <button
               type="button"
               onClick={() => onOpenPanel("explore-city")}
-              className="watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20"
+              disabled={transitionLocked}
+              className="watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Explore this city
             </button>
@@ -70,19 +74,23 @@ export default function VideoOverlay({
             <button
               type="button"
               onClick={() => onOpenPanel("ai")}
-              className="watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline"
+              disabled={transitionLocked}
+              className="watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
             >
               {video.translation} · Open AI panel
             </button>
           </div>
 
-          <Link
-            href="/post-journey"
-            className="watch-focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_40px_rgba(255,255,255,0.18)] transition hover:scale-[1.015] hover:bg-white/95 md:w-auto md:min-w-[220px]"
+          <button
+            type="button"
+            onClick={() => onPostJourney(video)}
+            disabled={transitionLocked}
+            aria-busy={transitionLocked}
+            className="watch-focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_40px_rgba(255,255,255,0.18)] transition hover:scale-[1.015] hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 md:w-auto md:min-w-[220px]"
           >
             <span aria-hidden>🌍</span>
-            Post Journey
-          </Link>
+            {transitionLocked ? "Opening journey..." : "Post Journey"}
+          </button>
         </div>
 
         <VideoActionRail

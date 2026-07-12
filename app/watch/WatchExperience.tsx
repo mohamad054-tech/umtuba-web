@@ -12,6 +12,7 @@ import VerticalVideoFeed from "../components/video/VerticalVideoFeed";
 import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
 import type { WatchPanelId } from "../components/video/watchTypes";
+import JourneyTransitionDirector from "../components/journey-transition/JourneyTransitionDirector";
 
 const panelCopy: Record<
   Exclude<WatchPanelId, null>,
@@ -53,6 +54,9 @@ export default function WatchExperience() {
     () => demoVideos[initialIndex] ?? demoVideos[0]
   );
   const [activePanel, setActivePanel] = useState<WatchPanelId>(null);
+  const [journeyTransitionActive, setJourneyTransitionActive] = useState(false);
+  const [forcePause, setForcePause] = useState(false);
+  const [journeyVideo, setJourneyVideo] = useState<DemoVideo | null>(null);
 
   const handleActiveChange = useCallback((video: DemoVideo) => {
     setActiveVideo(video);
@@ -64,6 +68,34 @@ export default function WatchExperience() {
 
   const handleClosePanel = useCallback(() => {
     setActivePanel(null);
+  }, []);
+
+  const handlePauseVideo = useCallback(() => {
+    setForcePause(true);
+  }, []);
+
+  const handlePostJourney = useCallback(
+    (video: DemoVideo) => {
+      if (journeyTransitionActive) {
+        return;
+      }
+
+      setActivePanel(null);
+      setJourneyVideo(video);
+      setForcePause(true);
+      setJourneyTransitionActive(true);
+    },
+    [journeyTransitionActive]
+  );
+
+  const handleTransitionSettled = useCallback(() => {
+    // Navigation is in progress; keep lock until unmount.
+  }, []);
+
+  const handleNavigateFailed = useCallback(() => {
+    setJourneyTransitionActive(false);
+    setForcePause(false);
+    setJourneyVideo(null);
   }, []);
 
   useEffect(() => {
@@ -80,7 +112,7 @@ export default function WatchExperience() {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && activePanel) {
+      if (event.key === "Escape" && activePanel && !journeyTransitionActive) {
         setActivePanel(null);
       }
     }
@@ -90,7 +122,7 @@ export default function WatchExperience() {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [activePanel]);
+  }, [activePanel, journeyTransitionActive]);
 
   async function handleToggleFullscreen() {
     const stage = stageRef.current;
@@ -119,6 +151,8 @@ export default function WatchExperience() {
     return panelCopy[activePanel];
   }, [activePanel]);
 
+  const transitionVideo = journeyVideo ?? activeVideo;
+
   return (
     <main className="watch-page-enter relative min-h-screen overflow-hidden bg-[#050510] text-white md:min-h-screen">
       <WatchAmbientBackground video={activeVideo} />
@@ -141,7 +175,8 @@ export default function WatchExperience() {
           <button
             type="button"
             onClick={() => handleOpenPanel("related")}
-            className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 md:inline-flex"
+            disabled={journeyTransitionActive}
+            className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
           >
             Related
           </button>
@@ -156,7 +191,8 @@ export default function WatchExperience() {
           <button
             type="button"
             onClick={handleToggleFullscreen}
-            className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 md:inline-flex"
+            disabled={journeyTransitionActive}
+            className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
           >
             {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           </button>
@@ -171,11 +207,14 @@ export default function WatchExperience() {
           <VerticalVideoFeed
             videos={demoVideos}
             initialIndex={initialIndex}
+            forcePause={forcePause}
+            transitionLocked={journeyTransitionActive}
             onActiveChange={handleActiveChange}
             onOpenPanel={handleOpenPanel}
+            onPostJourney={handlePostJourney}
           />
 
-          {panelMeta ? (
+          {panelMeta && !journeyTransitionActive ? (
             <WatchPanel
               open={Boolean(activePanel)}
               title={panelMeta.title}
@@ -185,6 +224,17 @@ export default function WatchExperience() {
           ) : null}
         </div>
       </div>
+
+      {journeyTransitionActive && transitionVideo ? (
+        <JourneyTransitionDirector
+          active={journeyTransitionActive}
+          video={transitionVideo}
+          stageRef={stageRef}
+          onPauseVideo={handlePauseVideo}
+          onSettled={handleTransitionSettled}
+          onNavigateFailed={handleNavigateFailed}
+        />
+      ) : null}
     </main>
   );
 }

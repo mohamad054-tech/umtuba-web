@@ -14,6 +14,7 @@ type VideoPlayerProps = {
   poster?: string;
   active: boolean;
   muted: boolean;
+  forcePause?: boolean;
   onToggleMute: () => void;
 };
 
@@ -22,6 +23,7 @@ export default function VideoPlayer({
   poster,
   active,
   muted,
+  forcePause = false,
   onToggleMute,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -50,6 +52,26 @@ export default function VideoPlayer({
     video.muted = muted;
     void video.play().catch(() => undefined);
   }, [active, muted, pausedByUser, src]);
+
+  useEffect(() => {
+    if (!forcePause || !active) {
+      return;
+    }
+
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    video.pause();
+
+    const frame = requestAnimationFrame(() => {
+      setPausedByUser(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [forcePause, active]);
 
   useEffect(() => {
     if (active) {

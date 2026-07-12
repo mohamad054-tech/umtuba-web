@@ -9,8 +9,11 @@ type VideoSlideProps = {
   video: DemoVideo;
   active: boolean;
   muted: boolean;
+  forcePause?: boolean;
+  transitionLocked?: boolean;
   onToggleMute: () => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
+  onPostJourney: (video: DemoVideo) => void;
   slideRef?: (node: HTMLElement | null) => void;
 };
 
@@ -18,8 +21,11 @@ export default function VideoSlide({
   video,
   active,
   muted,
+  forcePause = false,
+  transitionLocked = false,
   onToggleMute,
   onOpenPanel,
+  onPostJourney,
   slideRef,
 }: VideoSlideProps) {
   return (
@@ -35,9 +41,15 @@ export default function VideoSlide({
         poster={video.poster}
         active={active}
         muted={muted}
+        forcePause={forcePause && active}
         onToggleMute={onToggleMute}
       />
-      <VideoOverlay video={video} onOpenPanel={onOpenPanel} />
+      <VideoOverlay
+        video={video}
+        transitionLocked={transitionLocked}
+        onOpenPanel={onOpenPanel}
+        onPostJourney={onPostJourney}
+      />
     </article>
   );
 }

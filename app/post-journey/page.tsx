@@ -1,6 +1,7 @@
 import JourneyGlobe from "../components/JourneyGlobe";
 import LeftSidebar from "../components/LeftSidebar";
 import TopNavbar from "../components/TopNavbar";
+import JourneyHandoffArrival from "../components/journey-transition/JourneyHandoffArrival";
 
 const journeyStats = [
   {
@@ -61,6 +62,8 @@ export default function PostJourneyPage() {
         <LeftSidebar />
 
         <section className="min-w-0">
+          <JourneyHandoffArrival />
+
           <div className="overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#17112f] via-[#0e1024] to-[#071d20] p-7">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
               <div>
