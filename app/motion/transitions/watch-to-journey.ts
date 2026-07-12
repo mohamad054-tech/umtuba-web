@@ -2,46 +2,51 @@ import { createPrimitive } from "../../lib/motion/primitives";
 import type { MotionTransitionDefinition } from "../../lib/motion/types";
 
 /**
- * First registered consumer definition for the Motion Engine.
- * This does NOT drive the live Watch → Journey UI yet.
- * JourneyTransitionDirector remains the production path until migration.
+ * Live Watch → Post Journey motion definition.
+ * Phase IDs/durations match the existing overlay for visual parity.
+ * Production UI is driven by JourneyTransitionDirector as a Motion Engine adapter.
  */
 export const WATCH_TO_JOURNEY_TRANSITION_ID = "watch-to-journey";
 
 export const watchToJourneyTransition: MotionTransitionDefinition = {
   id: WATCH_TO_JOURNEY_TRANSITION_ID,
   description:
-    "Cinematic handoff from Watch into Post Journey (definition only in this slice).",
+    "Cinematic handoff from Watch into Post Journey (engine-timed).",
   phases: [
     {
-      id: "pause",
+      id: "pause_video",
       durationMs: 80,
+      reducedDurationMs: 40,
       primitives: [],
     },
     {
-      id: "fade-ui",
+      id: "fade_ui",
       durationMs: 320,
+      reducedDurationMs: 180,
       primitives: [createPrimitive("fade", { intensity: 0.85 })],
     },
     {
-      id: "zoom-out",
+      id: "zoom_out_stage",
       durationMs: 520,
+      skipInReduced: true,
       primitives: [
         createPrimitive("zoom", { intensity: 0.7 }),
         createPrimitive("blur", { intensity: 0.6 }),
       ],
     },
     {
-      id: "morph",
+      id: "morph_to_globe",
       durationMs: 480,
+      skipInReduced: true,
       primitives: [
         createPrimitive("morph", { intensity: 0.8 }),
         createPrimitive("portal", { intensity: 0.75 }),
       ],
     },
     {
-      id: "handoff",
+      id: "navigate_handoff",
       durationMs: 40,
+      reducedDurationMs: 40,
       primitives: [],
     },
   ],

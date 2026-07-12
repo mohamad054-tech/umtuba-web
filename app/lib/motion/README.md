@@ -88,17 +88,11 @@ concurrency?: "reject" | "replace" // default "reject"
 4. **Treat `startTransition` as async** — always handle `completed | cancelled | failed`.
 5. **Subscribers must be safe** — exceptions are caught; do not assume they abort the engine.
 6. **Unknown ids fail typed** — `MotionEngineError` with code `UNKNOWN_TRANSITION`.
-7. Keep product directors (e.g. `JourneyTransitionDirector`) until a deliberate migration slice.
+7. Prefer thin feature adapters (e.g. `JourneyTransitionDirector`) over embedding product logic in the engine.
 
 ## First registered transition
 
-`watch-to-journey` is registered as a **definition only**. Production Watch → Journey still uses `JourneyTransitionDirector` until the migration plan below is executed.
+`watch-to-journey` is registered and **driven live** through `JourneyTransitionDirector` as a thin Motion Engine adapter:
 
-## Next migration plan (watch-to-journey → engine)
-
-1. Keep `JourneyTransitionDirector` behavior as source of truth for UX.
-2. From Watch, call `motion.startTransition({ type: "watch-to-journey", ... })` in parallel or instead of the local phase machine.
-3. Drive pause / overlay / handoff write from engine events (`phase:start`, `primitive`, `transition:complete`).
-4. Move navigation into `onComplete` using existing handoff helpers.
-5. Delete duplicated local phase timing once parity is verified.
-6. Do not redesign Globe; only feed camera/path later via `camera` primitives if needed.
+- Engine = single timing source (`phase:start` / complete)
+- Adapter = pause, sessionStorage handoff, overlay mapping, `router.push` + hard fallback

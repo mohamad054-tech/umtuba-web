@@ -23,6 +23,10 @@ export type MotionPhaseDefinition = {
   id: string;
   /** Base duration before profile scaling. */
   durationMs: number;
+  /** Absolute duration used when profile is "reduced" (skips durationScale). */
+  reducedDurationMs?: number;
+  /** Drop this phase entirely under the reduced profile. */
+  skipInReduced?: boolean;
   primitives?: MotionPrimitiveIntent[];
 };
 
