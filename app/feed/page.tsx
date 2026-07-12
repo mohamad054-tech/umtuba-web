@@ -1,72 +1,99 @@
-import VideoCard from "../components/VideoCard";
+import Link from "next/link";
+import AuthStatus from "../components/AuthStatus";
+import CreatePostButton from "../components/CreatePostButton";
+import FeedContent from "../components/FeedContent";
 
 export default function FeedPage() {
-  const videos = [
-    { id: 1, user: "Ahmed", title: "Amazing Sunset", views: "24K" },
-    { id: 2, user: "Sarah", title: "Street Food", views: "82K" },
-    { id: 3, user: "John", title: "AI Challenge", views: "120K" },
-    { id: 4, user: "Lina", title: "New Talent", views: "51K" },
-    { id: 5, user: "Omar", title: "Live Moment", views: "98K" },
-    { id: 6, user: "Maya", title: "Idea Spark", views: "33K" },
-  ];
-
   return (
-    <main className="min-h-screen bg-black text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-black/90 backdrop-blur">
+    <main className="min-h-screen bg-[#050510] text-white">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <h1 className="text-3xl font-black">UMTUBA</h1>
+          <Link href="/" className="text-3xl font-black">
+            UMTUBA
+          </Link>
 
           <input
-            placeholder="Search UMTUBA..."
+            placeholder="Search videos, people, ideas, opportunities..."
             className="hidden w-96 rounded-full border border-white/10 bg-white/5 px-5 py-3 outline-none md:block"
           />
 
           <div className="flex items-center gap-3">
-            <button className="rounded-full bg-white px-5 py-2 font-bold text-black">
-              Upload
-            </button>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black font-black">
-              M
-            </div>
+            <CreatePostButton />
+            <AuthStatus />
           </div>
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 md:grid-cols-[220px_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 md:grid-cols-[230px_1fr_300px]">
         <aside className="hidden md:block">
           <div className="sticky top-28 space-y-3">
-            {["For You", "Following", "Live", "AI", "Ideas", "Trending"].map(
-              (item) => (
-                <button
-                  key={item}
-                  className="w-full rounded-2xl bg-white/5 px-5 py-4 text-left font-bold hover:bg-white/10"
-                >
-                  {item}
-                </button>
-              )
-            )}
+            {[
+              "🔥 For You",
+              "👥 Following",
+              "🔴 Live",
+              "🤖 AI",
+              "💡 Ideas",
+              "🚀 Opportunities",
+              "🌍 Post Journey",
+              "🤝 UConnect",
+            ].map((item) => (
+              <button
+                key={item}
+                type="button"
+                className="w-full rounded-2xl bg-white/5 px-5 py-4 text-left font-bold hover:bg-white/10"
+              >
+                {item}
+              </button>
+            ))}
           </div>
         </aside>
 
         <section>
-          <div className="mb-8">
+          <div className="mb-8 rounded-[32px] border border-white/10 bg-gradient-to-br from-blue-900/30 via-purple-900/20 to-emerald-900/20 p-8">
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-blue-300">
-              Feed
+              Discovery Engine
             </p>
-            <h2 className="mt-3 text-5xl font-black">Discover</h2>
+
+            <h1 className="mt-3 text-5xl font-black">
+              Discover, connect, and grow globally
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-white/60">
+              UMTUBA is where posts travel, languages disappear, and creators
+              connect directly with people around the world.
+            </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {videos.map((video) => (
-              <VideoCard
-                key={video.id}
-                title={video.title}
-                creator={video.user}
-                views={video.views}
-              />
-            ))}
-          </div>
+          <FeedContent />
         </section>
+
+        <aside className="hidden xl:block">
+          <div className="sticky top-28 space-y-5">
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+              <h3 className="text-xl font-black">🌍 Global Reach</h3>
+              <p className="mt-3 text-white/60">
+                Posts can travel across countries, cities, languages, and
+                communities.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+              <h3 className="text-xl font-black">🤝 UConnect</h3>
+              <p className="mt-3 text-white/60">
+                Viewers can request video greetings, share ideas, collaborate,
+                or connect when creators allow it.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
+              <h3 className="text-xl font-black">🌐 AI Translation</h3>
+              <p className="mt-3 text-white/60">
+                Posts, voice, comments, and future live streams adapt to the
+                viewer’s language.
+              </p>
+            </div>
+          </div>
+        </aside>
       </div>
     </main>
   );
