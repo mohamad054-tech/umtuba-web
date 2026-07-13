@@ -1,26 +1,45 @@
 import { createClient } from "./client";
+import type { ProfileRow } from "./database.types";
+import {
+  getErrorMessage,
+  isValidUsername,
+  normalizeUsername,
+  USERNAME_HINT,
+} from "./validation";
 
 export type UserProfile = {
   id: string;
-  full_name: string;
   username: string;
+  display_name: string;
+  full_name: string;
+  bio: string | null;
+  city: string | null;
+  country: string | null;
+  avatar_url: string | null;
   avatar_initial: string;
 };
 
-function getAuthErrorMessage(error: unknown, fallback: string) {
-  if (error && typeof error === "object" && "message" in error) {
-    const message = String((error as { message: unknown }).message).trim();
+const PROFILE_COLUMNS =
+  "id, username, display_name, full_name, bio, city, country, avatar_url, avatar_initial, created_at, updated_at";
 
-    if (message) {
-      return message;
-    }
-  }
+function mapProfileRow(row: ProfileRow): UserProfile {
+  const displayName =
+    (row.display_name && row.display_name.trim()) ||
+    (row.full_name && row.full_name.trim()) ||
+    row.username;
 
-  if (error instanceof Error && error.message.trim()) {
-    return error.message;
-  }
-
-  return fallback;
+  return {
+    id: row.id,
+    username: row.username,
+    display_name: displayName,
+    full_name: row.full_name || displayName,
+    bio: row.bio,
+    city: row.city,
+    country: row.country,
+    avatar_url: row.avatar_url,
+    avatar_initial:
+      row.avatar_initial || displayName.charAt(0).toUpperCase() || "U",
+  };
 }
 
 export async function signInWithEmail(email: string, password: string) {
@@ -32,10 +51,9 @@ export async function signInWithEmail(email: string, password: string) {
   });
 
   if (error) {
-    throw new Error(getAuthErrorMessage(error, "Unable to sign in."));
+    throw new Error(getErrorMessage(error, "Unable to sign in."));
   }
 
-  // Prefer getUser() over trusting the sign-in payload alone for identity checks.
   const {
     data: { user },
     error: userError,
@@ -43,7 +61,7 @@ export async function signInWithEmail(email: string, password: string) {
 
   if (userError || !user) {
     throw new Error(
-      getAuthErrorMessage(userError, "Signed in, but the session could not be verified.")
+      getErrorMessage(userError, "Signed in, but the session could not be verified.")
     );
   }
 
@@ -59,7 +77,7 @@ export async function signUpWithEmail(input: {
   const supabase = createClient();
   const email = input.email.trim();
   const fullName = input.fullName.trim();
-  const username = input.username.trim().replace(/^@/, "").toLowerCase();
+  const username = normalizeUsername(input.username);
 
   if (!fullName) {
     throw new Error("Please enter your full name.");
@@ -69,10 +87,8 @@ export async function signUpWithEmail(input: {
     throw new Error("Please choose a username.");
   }
 
-  if (!/^[a-z0-9_]{3,24}$/.test(username)) {
-    throw new Error(
-      "Username must be 3–24 characters and use only letters, numbers, or underscores."
-    );
+  if (!isValidUsername(username)) {
+    throw new Error(USERNAME_HINT);
   }
 
   const { data: existingUsername, error: usernameLookupError } = await supabase
@@ -83,7 +99,6 @@ export async function signUpWithEmail(input: {
 
   if (usernameLookupError) {
     // Profiles table may not exist until the SQL migration is applied.
-    // Continue and let signup/trigger surface a clearer error if needed.
     console.error("Username lookup failed:", usernameLookupError);
   } else if (existingUsername) {
     throw new Error("That username is already taken.");
@@ -95,13 +110,14 @@ export async function signUpWithEmail(input: {
     options: {
       data: {
         full_name: fullName,
+        display_name: fullName,
         username,
       },
     },
   });
 
   if (error) {
-    throw new Error(getAuthErrorMessage(error, "Unable to create your account."));
+    throw new Error(getErrorMessage(error, "Unable to create your account."));
   }
 
   if (data.user && !data.session) {
@@ -117,7 +133,7 @@ export async function signUpWithEmail(input: {
 
   if (userError || !user) {
     throw new Error(
-      getAuthErrorMessage(
+      getErrorMessage(
         userError,
         "Account created, but the session could not be verified. Please sign in."
       )
@@ -132,7 +148,7 @@ export async function signOut() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw new Error(getAuthErrorMessage(error, "Unable to sign out."));
+    throw new Error(getErrorMessage(error, "Unable to sign out."));
   }
 }
 
@@ -144,7 +160,7 @@ export async function getAuthenticatedUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(getAuthErrorMessage(error, "Unable to verify your session."));
+    throw new Error(getErrorMessage(error, "Unable to verify your session."));
   }
 
   return user;
@@ -158,7 +174,7 @@ export async function getCurrentProfile(): Promise<UserProfile | null> {
   } = await supabase.auth.getUser();
 
   if (userError) {
-    throw new Error(getAuthErrorMessage(userError, "Unable to verify your session."));
+    throw new Error(getErrorMessage(userError, "Unable to verify your session."));
   }
 
   if (!user) {
@@ -167,34 +183,41 @@ export async function getCurrentProfile(): Promise<UserProfile | null> {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id, full_name, username, avatar_initial")
+    .select(PROFILE_COLUMNS)
     .eq("id", user.id)
     .maybeSingle();
 
   if (profileError) {
     throw new Error(
-      getAuthErrorMessage(profileError, "Unable to load your profile.")
+      getErrorMessage(profileError, "Unable to load your profile.")
     );
   }
 
   if (profile) {
-    return profile as UserProfile;
+    return mapProfileRow(profile as ProfileRow);
   }
 
   const fullName =
     typeof user.user_metadata?.full_name === "string"
       ? user.user_metadata.full_name
-      : user.email?.split("@")[0] || "UMTUBA User";
+      : typeof user.user_metadata?.display_name === "string"
+        ? user.user_metadata.display_name
+        : user.email?.split("@")[0] || "UMTUBA User";
 
   const username =
     typeof user.user_metadata?.username === "string"
-      ? user.user_metadata.username
+      ? normalizeUsername(user.user_metadata.username)
       : `user_${user.id.slice(0, 8)}`;
 
   return {
     id: user.id,
-    full_name: fullName,
     username,
+    display_name: fullName,
+    full_name: fullName,
+    bio: null,
+    city: null,
+    country: null,
+    avatar_url: null,
     avatar_initial: fullName.charAt(0).toUpperCase() || "U",
   };
 }

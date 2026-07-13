@@ -24,6 +24,10 @@ export type Post = {
   likes: number;
   comments: number;
   shares: number;
+  saves: number;
+  views: number;
+  likedByMe: boolean;
+  savedByMe: boolean;
   createdAt: string;
 };
 
@@ -36,9 +40,16 @@ export type DatabasePost = {
   author_username: string;
   author_avatar: string;
   image_url: string | null;
+  /** Signed or legacy playback URL resolved at read time. */
   video_url: string | null;
+  /** Private storage object path in the post-videos bucket. */
+  video_path?: string | null;
+  video_mime_type?: string | null;
+  video_byte_size?: number | null;
   likes: number;
   comments: number;
   shares: number;
+  saves?: number;
+  views?: number;
   created_at: string;
 };

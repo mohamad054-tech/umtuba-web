@@ -1,6 +1,17 @@
+import { Suspense } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import TopNavbar from "../components/TopNavbar";
 import PostJourneyGlobeSection from "./PostJourneyGlobeSection";
+
+function PostJourneyGlobeFallback() {
+  return (
+    <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#0b0b18]">
+      <div className="flex h-[620px] items-center justify-center text-sm text-white/50">
+        Loading globe...
+      </div>
+    </div>
+  );
+}
 
 const journeyStats = [
   {
@@ -106,7 +117,9 @@ export default function PostJourneyPage() {
           </div>
 
           <div className="mt-6">
-            <PostJourneyGlobeSection />
+            <Suspense fallback={<PostJourneyGlobeFallback />}>
+              <PostJourneyGlobeSection />
+            </Suspense>
           </div>
 
           <div className="mt-6 rounded-[32px] border border-white/10 bg-white/[0.03] p-6">

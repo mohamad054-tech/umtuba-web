@@ -1,0 +1,218 @@
+"use client";
+
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import CommentsPanel from "../components/social/CommentsPanel";
+import {
+  APP_ROUTES,
+  buildCreatorProfileHref,
+  buildHomeCityFocusHref,
+  findIndexByCity,
+} from "../lib/nav";
+import DiscoverFeed from "./components/DiscoverFeed";
+import DiscoverShell from "./components/DiscoverShell";
+import type { DiscoverStats, DiscoverVideo } from "./types";
+
+type DiscoverExperienceProps = {
+  videos: DiscoverVideo[];
+  loadError?: string | null;
+};
+
+export default function DiscoverExperience({
+  videos: initialVideos,
+  loadError = null,
+}: DiscoverExperienceProps) {
+  const searchParams = useSearchParams();
+  const cityParam = searchParams.get("city");
+
+  const [videos, setVideos] = useState(initialVideos);
+
+  const initialIndex = useMemo(
+    () => findIndexByCity(videos, cityParam),
+    [cityParam, videos]
+  );
+
+  const [activeVideo, setActiveVideo] = useState<DiscoverVideo | null>(
+    () => videos[initialIndex] ?? videos[0] ?? null
+  );
+  const [commentsOpen, setCommentsOpen] = useState(false);
+
+  const handleActiveChange = useCallback((video: DiscoverVideo) => {
+    setActiveVideo(video);
+    setCommentsOpen(false);
+  }, []);
+
+  const handleComment = useCallback((video: DiscoverVideo) => {
+    setActiveVideo(video);
+    setCommentsOpen(true);
+  }, []);
+
+  const handleStatsChange = useCallback(
+    (videoId: string, stats: Partial<DiscoverStats>) => {
+      setVideos((current) =>
+        current.map((video) =>
+          video.id === videoId
+            ? { ...video, stats: { ...video.stats, ...stats } }
+            : video
+        )
+      );
+      setActiveVideo((current) =>
+        current && current.id === videoId
+          ? { ...current, stats: { ...current.stats, ...stats } }
+          : current
+      );
+    },
+    []
+  );
+
+  const handleFlagsChange = useCallback(
+    (videoId: string, flags: { likedByMe?: boolean; savedByMe?: boolean }) => {
+      setVideos((current) =>
+        current.map((video) =>
+          video.id === videoId ? { ...video, ...flags } : video
+        )
+      );
+      setActiveVideo((current) =>
+        current && current.id === videoId ? { ...current, ...flags } : current
+      );
+    },
+    []
+  );
+
+  if (loadError) {
+    return (
+      <DiscoverShell>
+        <div className="flex flex-1 items-center justify-center px-6 py-16">
+          <div
+            className="max-w-md rounded-[28px] border border-red-400/20 bg-red-400/5 p-8 text-center"
+            role="alert"
+          >
+            <p className="text-xl font-black text-red-200">Could not load videos</p>
+            <p className="mt-3 text-sm text-white/60">{loadError}</p>
+            <Link
+              href={APP_ROUTES.discover}
+              className="mt-6 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white/80"
+            >
+              Try again
+            </Link>
+          </div>
+        </div>
+      </DiscoverShell>
+    );
+  }
+
+  if (videos.length === 0 || !activeVideo) {
+    return (
+      <DiscoverShell>
+        <div className="flex flex-1 items-center justify-center px-6 py-16">
+          <div className="max-w-md rounded-[28px] border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
+            <p className="text-2xl font-black">No video posts yet</p>
+            <p className="mt-3 text-sm text-white/55">
+              Be the first to publish a clip. Uploads appear here after they are
+              saved securely to storage.
+            </p>
+            <Link
+              href={APP_ROUTES.createVideo}
+              className="mt-6 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            >
+              Upload a video
+            </Link>
+          </div>
+        </div>
+      </DiscoverShell>
+    );
+  }
+
+  const exploreHref = buildHomeCityFocusHref(activeVideo.location.city);
+  const profileHref = buildCreatorProfileHref({
+    username: activeVideo.creator.username,
+  });
+  const activePostId = Number(activeVideo.id);
+
+  return (
+    <DiscoverShell>
+      <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
+        <div className="relative mx-auto flex w-full max-w-[510px] flex-1">
+          <div className="video-watch-stage relative h-[calc(100dvh-4rem)] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem)] md:rounded-[36px] md:border md:border-white/10">
+            <DiscoverFeed
+              videos={videos}
+              initialIndex={initialIndex}
+              onActiveChange={handleActiveChange}
+              onComment={handleComment}
+              onStatsChange={handleStatsChange}
+              onFlagsChange={handleFlagsChange}
+            />
+
+            {commentsOpen && Number.isInteger(activePostId) && activePostId > 0 ? (
+              <CommentsPanel
+                key={activePostId}
+                open={commentsOpen}
+                postId={activePostId}
+                commentCount={activeVideo.stats.comments}
+                onClose={() => setCommentsOpen(false)}
+                onCountChange={(count) =>
+                  handleStatsChange(activeVideo.id, { comments: count })
+                }
+              />
+            ) : null}
+          </div>
+        </div>
+
+        <aside className="hidden w-[280px] shrink-0 flex-col justify-center gap-4 xl:flex">
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
+              Now playing
+            </p>
+            <h2 className="mt-2 text-xl font-black tracking-tight">
+              {activeVideo.location.city}
+            </h2>
+            <p className="mt-1 text-sm text-white/55">
+              {activeVideo.location.country}
+            </p>
+            <p className="mt-4 text-sm leading-6 text-white/70">
+              Swipe, scroll, or use ↑ ↓ to explore creators around the world.
+            </p>
+            <Link
+              href={exploreHref}
+              className="watch-focus-ring mt-5 inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
+            >
+              Explore this city
+            </Link>
+          </div>
+
+          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-300/80">
+              Creator
+            </p>
+            <Link
+              href={profileHref}
+              className="mt-2 flex items-center gap-3 rounded-2xl transition hover:bg-white/[0.03]"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-blue-400/40 to-indigo-600/50 text-sm font-black">
+                {activeVideo.creator.avatar}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-lg font-black">
+                  {activeVideo.creator.username}
+                </span>
+                <span className="mt-0.5 block truncate text-sm text-white/55">
+                  {activeVideo.creator.name}
+                </span>
+              </span>
+            </Link>
+          </div>
+        </aside>
+
+        <div className="flex justify-center px-4 pb-4 xl:hidden">
+          <Link
+            href={exploreHref}
+            className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
+          >
+            Explore this city
+          </Link>
+        </div>
+      </div>
+    </DiscoverShell>
+  );
+}

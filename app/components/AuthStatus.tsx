@@ -9,6 +9,7 @@ import {
   signOut,
   type UserProfile,
 } from "../../lib/supabase/auth";
+import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 
 export default function AuthStatus() {
   const router = useRouter();
@@ -96,7 +97,7 @@ export default function AuthStatus() {
         ) : null}
 
         <Link
-          href="/login"
+          href={APP_ROUTES.login}
           className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10"
         >
           Sign In
@@ -105,6 +106,8 @@ export default function AuthStatus() {
     );
   }
 
+  const profileHref = buildCreatorProfileHref({ username: profile.username });
+
   return (
     <div className="flex items-center gap-3">
       {errorMessage ? (
@@ -112,6 +115,13 @@ export default function AuthStatus() {
           {errorMessage}
         </p>
       ) : null}
+
+      <Link
+        href={APP_ROUTES.settings}
+        className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10"
+      >
+        Settings
+      </Link>
 
       <button
         type="button"
@@ -122,12 +132,22 @@ export default function AuthStatus() {
         {isSigningOut ? "Signing out..." : "Sign out"}
       </button>
 
-      <div
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-black text-black"
-        title={profile.full_name}
+      <Link
+        href={profileHref}
+        className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-white font-black text-black"
+        title={profile.display_name}
       >
-        {profile.avatar_initial}
-      </div>
+        {profile.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={profile.avatar_url}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          profile.avatar_initial
+        )}
+      </Link>
     </div>
   );
 }

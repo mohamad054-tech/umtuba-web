@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import ContentCard from "./ContentCard";
-import { getPosts } from "../../lib/supabase/posts";
-import type {
-  DatabasePost,
-  Post,
-  PostType,
-} from "../data/types/post";
+import { loadFeedPostsAction } from "../actions/loadPosts";
+import type { PublicPostDTO } from "../../lib/supabase/videoPosts";
+import type { Post, PostType } from "../data/types/post";
 
 type FilterOption = {
   label: string;
@@ -60,15 +57,11 @@ function formatCreatedAt(createdAt: string) {
 
   const differenceInDays = Math.floor(differenceInHours / 24);
 
-  return `${differenceInDays} day${
-    differenceInDays === 1 ? "" : "s"
-  } ago`;
+  return `${differenceInDays} day${differenceInDays === 1 ? "" : "s"} ago`;
 }
 
-function convertDatabasePost(databasePost: DatabasePost): Post {
-  const postType = validPostTypes.includes(
-    databasePost.post_type as PostType
-  )
+function convertFeedPost(databasePost: PublicPostDTO): Post {
+  const postType = validPostTypes.includes(databasePost.post_type as PostType)
     ? (databasePost.post_type as PostType)
     : "text";
 
@@ -86,14 +79,16 @@ function convertDatabasePost(databasePost: DatabasePost): Post {
     likes: databasePost.likes,
     comments: databasePost.comments,
     shares: databasePost.shares,
+    saves: databasePost.saves,
+    views: databasePost.views,
+    likedByMe: databasePost.likedByMe,
+    savedByMe: databasePost.savedByMe,
     createdAt: formatCreatedAt(databasePost.created_at),
   };
 }
 
 export default function FeedContent() {
-  const [activeFilter, setActiveFilter] =
-    useState<PostType | "all">("all");
-
+  const [activeFilter, setActiveFilter] = useState<PostType | "all">("all");
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -103,10 +98,15 @@ export default function FeedContent() {
       setIsLoading(true);
       setErrorMessage("");
 
-      const databasePosts = await getPosts();
-      const convertedPosts = databasePosts.map(convertDatabasePost);
+      const result = await loadFeedPostsAction();
 
-      setPosts(convertedPosts);
+      if (!result.ok) {
+        setErrorMessage(result.message);
+        setPosts([]);
+        return;
+      }
+
+      setPosts(result.posts.map(convertFeedPost));
     } catch (error) {
       console.error(error);
       setErrorMessage("Posts could not be loaded. Please try again.");
@@ -132,17 +132,11 @@ export default function FeedContent() {
       void loadPosts();
     }
 
-    window.addEventListener(
-      "umtuba:post-created",
-      handlePostCreated
-    );
+    window.addEventListener("umtuba:post-created", handlePostCreated);
 
     return () => {
       cancelled = true;
-      window.removeEventListener(
-        "umtuba:post-created",
-        handlePostCreated
-      );
+      window.removeEventListener("umtuba:post-created", handlePostCreated);
     };
   }, [loadPosts]);
 
@@ -150,6 +144,12 @@ export default function FeedContent() {
     activeFilter === "all"
       ? posts
       : posts.filter((post) => post.type === activeFilter);
+
+  function handlePostChange(postId: number, patch: Partial<Post>) {
+    setPosts((current) =>
+      current.map((post) => (post.id === postId ? { ...post, ...patch } : post))
+    );
+  }
 
   return (
     <>
@@ -180,14 +180,16 @@ export default function FeedContent() {
         </div>
       ) : errorMessage ? (
         <div className="rounded-[30px] border border-red-400/20 bg-red-400/5 px-6 py-16 text-center">
-          <p className="text-xl font-black text-red-300">
-            {errorMessage}
-          </p>
+          <p className="text-xl font-black text-red-300">{errorMessage}</p>
         </div>
       ) : filteredPosts.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2">
           {filteredPosts.map((post) => (
-            <ContentCard key={post.id} post={post} />
+            <ContentCard
+              key={post.id}
+              post={post}
+              onPostChange={handlePostChange}
+            />
           ))}
         </div>
       ) : (

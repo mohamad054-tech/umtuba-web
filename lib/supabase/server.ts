@@ -35,6 +35,7 @@ export async function createClient() {
 /**
  * Server-side identity check. Always use getUser() (validates JWT with Auth).
  * Do not authorize with getSession() alone.
+ * Returns null when there is no session (including AuthSessionMissingError).
  */
 export async function getServerUser() {
   const supabase = await createClient();
@@ -44,6 +45,16 @@ export async function getServerUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
+    const message = (error.message || "").toLowerCase();
+
+    if (
+      message.includes("auth session missing") ||
+      message.includes("session missing") ||
+      error.name === "AuthSessionMissingError"
+    ) {
+      return null;
+    }
+
     throw new Error(error.message || "Unable to verify your session.");
   }
 

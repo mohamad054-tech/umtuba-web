@@ -33,6 +33,10 @@ const items = [
     href: "/post-journey",
   },
   {
+    label: "💬 Messages",
+    href: "/messages",
+  },
+  {
     label: "🤝 UConnect",
     href: "/uconnect",
   },

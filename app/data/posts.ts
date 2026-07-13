@@ -16,6 +16,10 @@ export const posts: Post[] = [
     likes: 248,
     comments: 39,
     shares: 18,
+    saves: 12,
+    views: 1400,
+    likedByMe: false,
+    savedByMe: false,
     createdAt: "12 min ago",
   },
   {
@@ -33,6 +37,10 @@ export const posts: Post[] = [
     likes: 581,
     comments: 74,
     shares: 42,
+    saves: 88,
+    views: 4200,
+    likedByMe: false,
+    savedByMe: false,
     createdAt: "34 min ago",
   },
   {
@@ -48,6 +56,10 @@ export const posts: Post[] = [
     likes: 392,
     comments: 91,
     shares: 57,
+    saves: 64,
+    views: 3100,
+    likedByMe: false,
+    savedByMe: false,
     createdAt: "1 hr ago",
   },
 ];

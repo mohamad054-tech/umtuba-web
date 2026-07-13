@@ -1,6 +1,13 @@
 import { createClient } from "./client";
 import type { DatabasePost } from "../../app/data/types/post";
 import { getAuthenticatedUser, getCurrentProfile } from "./auth";
+import { getErrorMessage } from "./validation";
+import {
+  isOwnedVideoPath,
+  POST_VIDEOS_BUCKET,
+  validateVideoFile,
+  videoExtensionForMime,
+} from "./videoPostsShared";
 
 const POST_IMAGES_BUCKET = "post-images";
 
@@ -14,43 +21,22 @@ const postColumns = `
   author_avatar,
   image_url,
   video_url,
+  video_path,
+  video_mime_type,
+  video_byte_size,
   likes,
   comments,
   shares,
+  saves,
+  views,
   created_at
 `;
 
-function getErrorMessage(error: unknown, fallback: string) {
-  if (error && typeof error === "object" && "message" in error) {
-    const message = String((error as { message: unknown }).message).trim();
-
-    if (message) {
-      return message;
-    }
-  }
-
-  if (error instanceof Error && error.message.trim()) {
-    return error.message;
-  }
-
-  return fallback;
-}
-
-export async function getPosts(): Promise<DatabasePost[]> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("posts")
-    .select(postColumns)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Unable to load posts:", error);
-    throw new Error(getErrorMessage(error, "Unable to load posts."));
-  }
-
-  return (data ?? []) as DatabasePost[];
-}
+export type UploadPostVideoResult = {
+  path: string;
+  mimeType: string;
+  byteSize: number;
+};
 
 export async function uploadPostImage(file: File): Promise<string> {
   const supabase = createClient();
@@ -98,6 +84,77 @@ export async function uploadPostImage(file: File): Promise<string> {
   return data.publicUrl;
 }
 
+/**
+ * Client-side upload into the private post-videos bucket (owner folder only).
+ * Client validation is convenience only — the server action re-validates.
+ * Does not mint signed URLs.
+ */
+export async function uploadPostVideo(file: File): Promise<UploadPostVideoResult> {
+  const supabase = createClient();
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    throw new Error("Please sign in to upload a video.");
+  }
+
+  const fileCheck = validateVideoFile({
+    mimeType: file.type,
+    byteSize: file.size,
+  });
+
+  if (!fileCheck.ok) {
+    throw new Error(fileCheck.message);
+  }
+
+  const extension = videoExtensionForMime(file.type);
+  const uniqueFileName = `${crypto.randomUUID()}.${extension}`;
+  const filePath = `${user.id}/${uniqueFileName}`;
+
+  if (!isOwnedVideoPath(user.id, filePath)) {
+    throw new Error("Invalid video upload path.");
+  }
+
+  const { error: uploadError } = await supabase.storage
+    .from(POST_VIDEOS_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error("Unable to upload video:", uploadError);
+    throw new Error(getErrorMessage(uploadError, "Unable to upload video."));
+  }
+
+  return {
+    path: filePath,
+    mimeType: file.type,
+    byteSize: file.size,
+  };
+}
+
+/**
+ * Client-side orphan cleanup when publish fails after a successful upload.
+ * Server action also deletes; this is a best-effort complement.
+ */
+export async function deleteUploadedPostVideo(path: string): Promise<void> {
+  const supabase = createClient();
+  const user = await getAuthenticatedUser();
+
+  if (!user || !isOwnedVideoPath(user.id, path)) {
+    return;
+  }
+
+  const { error } = await supabase.storage
+    .from(POST_VIDEOS_BUCKET)
+    .remove([path]);
+
+  if (error) {
+    console.error("Unable to delete uploaded video after publish failure:", error);
+  }
+}
+
 export async function createPost(
   content: string,
   imageUrl: string | null = null
@@ -136,9 +193,14 @@ export async function createPost(
       author_avatar: profile.avatar_initial,
       image_url: imageUrl,
       video_url: null,
+      video_path: null,
+      video_mime_type: null,
+      video_byte_size: null,
       likes: 0,
       comments: 0,
       shares: 0,
+      saves: 0,
+      views: 0,
     })
     .select(postColumns)
     .single();

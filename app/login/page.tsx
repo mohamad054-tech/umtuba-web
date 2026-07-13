@@ -1,103 +1,206 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  AuthAlert,
+  AuthCheckbox,
+  AuthField,
+  AuthShell,
+} from "../components/auth";
+import { APP_ROUTES } from "../lib/nav";
 import { signInWithEmail } from "../../lib/supabase/auth";
+import { getSafeRedirectPath } from "../../lib/supabase/redirect";
+import {
+  getErrorMessage,
+  isValidEmail,
+  validatePassword,
+} from "../../lib/supabase/validation";
 
-export default function LoginPage() {
+type FieldErrors = {
+  email?: string;
+  password?: string;
+};
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
+  const [forgotHint, setForgotHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState("");
+
+  function validate(): FieldErrors {
+    const next: FieldErrors = {};
+
+    if (!email.trim()) {
+      next.email = "Email is required.";
+    } else if (!isValidEmail(email.trim())) {
+      next.email = "Enter a valid email address.";
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      next.password = passwordError;
+    }
+
+    return next;
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setForgotHint(false);
 
-    if (!email.trim() || !password) {
-      setErrorMessage("Please enter your email and password.");
+    const nextErrors = validate();
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFormError("Please fix the highlighted fields.");
       return;
     }
 
+    setIsSubmitting(true);
+    setFormError("");
+
     try {
-      setIsSubmitting(true);
-      setErrorMessage("");
       await signInWithEmail(email, password);
-      router.push("/feed");
+
+      // Remember-me is informational for V1; Supabase SSR cookies manage the session.
+      void rememberMe;
+
+      const nextPath = getSafeRedirectPath(
+        searchParams.get("next"),
+        APP_ROUTES.discover
+      );
+      router.push(nextPath);
       router.refresh();
     } catch (error) {
-      console.error(error);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Unable to sign in."
-      );
+      setFormError(getErrorMessage(error, "Invalid email or password. Try again."));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#050510] px-6 text-white">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.05] p-8 backdrop-blur">
-        <h1 className="text-4xl font-black">Welcome Back</h1>
-
-        <p className="mt-3 text-white/60">Sign in to continue to UMTUBA</p>
-
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-              setErrorMessage("");
-            }}
-            placeholder="Email"
-            disabled={isSubmitting}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none disabled:opacity-60"
-          />
-
-          <input
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-              setErrorMessage("");
-            }}
-            placeholder="Password"
-            disabled={isSubmitting}
-            className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none disabled:opacity-60"
-          />
-
-          {errorMessage ? (
-            <p className="text-sm text-red-300">{errorMessage}</p>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-2xl bg-white py-4 font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to continue to UMTUBA."
+      panelTitle="Your world is waiting."
+      panelBody="Pick up Discover, Live, and Messages where you left off."
+      footer={
+        <p className="text-center text-sm text-white/50">
+          Don&apos;t have an account?{" "}
+          <Link
+            href={APP_ROUTES.signup}
+            className="font-bold text-blue-200 transition hover:text-blue-100"
           >
-            {isSubmitting ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <p className="mt-8 text-center text-white/50">
-          Don&apos;t have an account?
+            Create one
+          </Link>
         </p>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+        <AuthField
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          disabled={isSubmitting}
+          placeholder="you@email.com"
+          error={fieldErrors.email}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            setFieldErrors((prev) => ({ ...prev, email: undefined }));
+            setFormError("");
+          }}
+        />
 
-        <Link href="/register">
+        <AuthField
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          disabled={isSubmitting}
+          placeholder="Enter your password"
+          error={fieldErrors.password}
+          onChange={(event) => {
+            setPassword(event.target.value);
+            setFieldErrors((prev) => ({ ...prev, password: undefined }));
+            setFormError("");
+          }}
+        />
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <AuthCheckbox
+            name="rememberMe"
+            checked={rememberMe}
+            disabled={isSubmitting}
+            label="Remember me"
+            onChange={(event) => setRememberMe(event.target.checked)}
+          />
+
           <button
             type="button"
-            className="mt-4 w-full rounded-2xl border border-white/10 py-4"
+            disabled={isSubmitting}
+            onClick={() => {
+              setForgotHint(true);
+              setFormError("");
+            }}
+            className="text-sm font-bold text-blue-200 transition hover:text-blue-100 disabled:opacity-50"
           >
-            Create Account
+            Forgot password?
           </button>
-        </Link>
-      </div>
-    </main>
+        </div>
+
+        {forgotHint ? (
+          <AuthAlert tone="info">
+            Password reset is not available in Backend Foundation V1 yet. Contact
+            support if you need help recovering access.
+          </AuthAlert>
+        ) : null}
+
+        {formError ? (
+          <AuthAlert tone="error">
+            <span role="alert">{formError}</span>
+          </AuthAlert>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          aria-busy={isSubmitting}
+          className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isSubmitting ? "Signing in..." : "Sign in"}
+        </button>
+      </form>
+    </AuthShell>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to continue to UMTUBA."
+      panelTitle="Your world is waiting."
+      panelBody="Pick up Discover, Live, and Messages where you left off."
+    >
+      <p className="text-sm text-white/55">Loading sign-in...</p>
+    </AuthShell>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }
