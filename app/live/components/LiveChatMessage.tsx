@@ -1,4 +1,4 @@
-import type { LiveChatMessage as LiveChatMessageType } from "../data/mockStreams";
+import type { LiveChatMessage as LiveChatMessageType } from "../types";
 
 type LiveChatMessageProps = {
   message: LiveChatMessageType;
@@ -29,7 +29,13 @@ export default function LiveChatMessage({ message }: LiveChatMessageProps) {
           ) : null}
           <span className="text-[10px] text-white/30">{message.sentAt}</span>
         </div>
-        <p className="mt-0.5 text-sm leading-5 text-white/70">{message.text}</p>
+        <p
+          className={`mt-0.5 text-sm leading-5 ${
+            message.deleted ? "italic text-white/40" : "text-white/70"
+          }`}
+        >
+          {message.text}
+        </p>
       </div>
     </div>
   );

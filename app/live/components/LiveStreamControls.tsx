@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  LIVE_QUALITY_OPTIONS,
-  type LiveQuality,
-} from "../data/mockStreams";
+import { LIVE_QUALITY_OPTIONS, type LiveQuality } from "../types";
 
 type LiveStreamControlsProps = {
   muted: boolean;
@@ -12,12 +9,17 @@ type LiveStreamControlsProps = {
   isFullscreen: boolean;
   shareCopied: boolean;
   reportSent: boolean;
+  isHost?: boolean;
+  roomStatus?: string;
   onToggleMute: () => void;
   onToggleCaptions: () => void;
   onQualityChange: (quality: LiveQuality) => void;
   onToggleFullscreen: () => void;
   onShare: () => void;
   onReport: () => void;
+  onGoLive?: () => void;
+  onEndLive?: () => void;
+  onLeave?: () => void;
 };
 
 const controlBtn =
@@ -30,15 +32,46 @@ export default function LiveStreamControls({
   isFullscreen,
   shareCopied,
   reportSent,
+  isHost = false,
+  roomStatus,
   onToggleMute,
   onToggleCaptions,
   onQualityChange,
   onToggleFullscreen,
   onShare,
   onReport,
+  onGoLive,
+  onEndLive,
+  onLeave,
 }: LiveStreamControlsProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
+      {isHost && roomStatus === "idle" && onGoLive ? (
+        <button
+          type="button"
+          onClick={onGoLive}
+          className="inline-flex items-center gap-2 rounded-full bg-red-500 px-3.5 py-2 text-xs font-black text-white transition hover:bg-red-400"
+        >
+          Go live
+        </button>
+      ) : null}
+
+      {isHost && roomStatus === "live" && onEndLive ? (
+        <button
+          type="button"
+          onClick={onEndLive}
+          className="inline-flex items-center gap-2 rounded-full border border-red-400/40 bg-red-500/20 px-3.5 py-2 text-xs font-black text-red-100 transition hover:bg-red-500/30"
+        >
+          End live
+        </button>
+      ) : null}
+
+      {!isHost && onLeave ? (
+        <button type="button" onClick={onLeave} className={controlBtn}>
+          Leave
+        </button>
+      ) : null}
+
       <button type="button" onClick={onToggleMute} className={controlBtn}>
         {muted ? "Unmute" : "Mute"}
       </button>

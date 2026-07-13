@@ -1,4 +1,4 @@
-import { formatViewerCount } from "../data/mockStreams";
+import { formatViewerCount } from "../types";
 
 type LiveViewerCountProps = {
   count: number;

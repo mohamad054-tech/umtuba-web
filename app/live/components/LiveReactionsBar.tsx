@@ -1,6 +1,6 @@
 "use client";
 
-import { LIVE_REACTIONS } from "../data/mockStreams";
+import { LIVE_REACTIONS } from "../types";
 
 type LiveReactionsBarProps = {
   onReact: (emoji: string) => void;

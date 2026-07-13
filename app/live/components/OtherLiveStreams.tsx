@@ -1,14 +1,14 @@
-import type { LiveStream } from "../data/mockStreams";
+import type { LiveRoom } from "../types";
 import LiveStreamCard from "./LiveStreamCard";
 
 type OtherLiveStreamsProps = {
-  streams: LiveStream[];
+  rooms: LiveRoom[];
   activeId: string;
   onSelect: (id: string) => void;
 };
 
 export default function OtherLiveStreams({
-  streams,
+  rooms,
   activeId,
   onSelect,
 }: OtherLiveStreamsProps) {
@@ -20,7 +20,7 @@ export default function OtherLiveStreams({
             Live now
           </p>
           <h3 className="mt-1 text-xl font-black text-white md:text-2xl">
-            Other active live streams
+            Other active live rooms
           </h3>
           <p className="mt-1 text-sm text-white/45">
             Jump between cities lighting up the UMTUBA globe.
@@ -28,16 +28,16 @@ export default function OtherLiveStreams({
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-200">
           <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-          {streams.length} live
+          {rooms.length} live
         </span>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {streams.map((stream) => (
+        {rooms.map((room) => (
           <LiveStreamCard
-            key={stream.id}
-            stream={stream}
-            isActive={stream.id === activeId}
+            key={room.id}
+            room={room}
+            isActive={room.id === activeId}
             onSelect={onSelect}
           />
         ))}

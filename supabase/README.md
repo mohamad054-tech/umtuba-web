@@ -33,7 +33,11 @@ Never put the **service role** key in the Next.js app or commit it.
 
    `supabase/migrations/20260713_messenger_v1_foundation.sql`
 
-8. Click **Run**.
+8. Optionally run Live Streaming V1 Foundation (**manual apply only — not auto-applied**):
+
+   `supabase/migrations/20260713_live_streaming_v1_foundation.sql`
+
+9. Click **Run**.
 
 ### What `20260713_profiles_foundation_v1.sql` adds
 
@@ -124,6 +128,18 @@ After Messenger V1 Foundation:
 4. Confirm unread badge clears after opening the thread (`mark_conversation_read`).
 5. Confirm anon / signed-out users cannot SELECT messaging tables.
 6. Optionally enable Realtime for `messages` later (not required for V1).
+
+## Live Streaming V1 (optional, additive)
+
+Do **not** auto-apply from the app. When ready, paste:
+
+`supabase/migrations/20260713_live_streaming_v1_foundation.sql`
+
+into the SQL Editor and run it. This adds live rooms, participants, chat, and foundation tables (reports, bans, gifts, reactions, recordings, replays, precise location, moderation events) with RLS + RPCs. Until applied, `/live` runs in demo mode.
+
+**Location privacy:** exact lat/long are stored only in `live_room_precise_location` (host/staff). Public clients receive city/country only.
+
+**Realtime:** enable Realtime for `live_chat_messages` and `live_rooms` if the publication block did not attach (Dashboard → Database → Publications). RLS still filters events per subscriber.
 
 ## Auth settings
 

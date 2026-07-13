@@ -1,30 +1,61 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { LiveChatMessage as LiveChatMessageType } from "../data/mockStreams";
+import {
+  LIVE_CHAT_MAX_LENGTH,
+  type LiveChatMessage as LiveChatMessageType,
+} from "../types";
 import LiveChatMessage from "./LiveChatMessage";
 
 type LiveChatPanelProps = {
   messages: LiveChatMessageType[];
   onSend: (text: string) => void;
+  canSend?: boolean;
+  authHint?: string | null;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  loadingMore?: boolean;
+  sending?: boolean;
 };
 
-export default function LiveChatPanel({ messages, onSend }: LiveChatPanelProps) {
+export default function LiveChatPanel({
+  messages,
+  onSend,
+  canSend = true,
+  authHint = null,
+  hasMore = false,
+  onLoadMore,
+  loadingMore = false,
+  sending = false,
+}: LiveChatPanelProps) {
   const [draft, setDraft] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
+  const stickToBottomRef = useRef(true);
 
   useEffect(() => {
     const el = listRef.current;
-    if (!el) return;
+    if (!el || !stickToBottomRef.current) return;
     el.scrollTop = el.scrollHeight;
   }, [messages]);
+
+  function handleScroll() {
+    const el = listRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    stickToBottomRef.current = distanceFromBottom < 80;
+
+    if (el.scrollTop < 48 && hasMore && onLoadMore && !loadingMore) {
+      onLoadMore();
+    }
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const text = draft.trim();
-    if (!text) return;
+    if (!text || !canSend || sending) return;
     onSend(text);
     setDraft("");
+    stickToBottomRef.current = true;
   }
 
   return (
@@ -46,8 +77,20 @@ export default function LiveChatPanel({ messages, onSend }: LiveChatPanelProps) 
 
       <div
         ref={listRef}
+        onScroll={handleScroll}
         className="flex-1 space-y-4 overflow-y-auto px-4 py-4"
       >
+        {hasMore ? (
+          <button
+            type="button"
+            onClick={onLoadMore}
+            disabled={loadingMore}
+            className="mx-auto block rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/55 transition hover:bg-white/10 disabled:opacity-50"
+          >
+            {loadingMore ? "Loading…" : "Load earlier messages"}
+          </button>
+        ) : null}
+
         {messages.map((message) => (
           <LiveChatMessage key={message.id} message={message} />
         ))}
@@ -57,18 +100,22 @@ export default function LiveChatPanel({ messages, onSend }: LiveChatPanelProps) 
         onSubmit={handleSubmit}
         className="border-t border-white/10 p-3"
       >
+        {authHint ? (
+          <p className="mb-2 text-xs text-amber-200/80">{authHint}</p>
+        ) : null}
         <div className="flex gap-2">
           <input
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
-            placeholder="Say something..."
-            className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25"
-            maxLength={240}
+            placeholder={canSend ? "Say something..." : "Sign in to chat"}
+            className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-white/25 disabled:opacity-50"
+            maxLength={LIVE_CHAT_MAX_LENGTH}
+            disabled={!canSend || sending}
           />
           <button
             type="submit"
             className="shrink-0 rounded-2xl bg-white px-4 py-3 text-sm font-black text-black transition hover:bg-white/90 disabled:opacity-40"
-            disabled={!draft.trim()}
+            disabled={!canSend || sending || !draft.trim()}
           >
             Send
           </button>

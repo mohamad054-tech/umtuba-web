@@ -1,10 +1,10 @@
 import type { RefObject } from "react";
 import LiveBadge from "./LiveBadge";
 import LiveViewerCount from "./LiveViewerCount";
-import type { LiveStream } from "../data/mockStreams";
+import type { LiveRoom } from "../types";
 
 type LiveStreamStageProps = {
-  stream: LiveStream;
+  room: LiveRoom;
   muted: boolean;
   captionsOn: boolean;
   quality: string;
@@ -13,7 +13,7 @@ type LiveStreamStageProps = {
 };
 
 export default function LiveStreamStage({
-  stream,
+  room,
   muted,
   captionsOn,
   quality,
@@ -30,12 +30,12 @@ export default function LiveStreamStage({
       }`}
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${stream.previewGradient}`}
+        className={`absolute inset-0 bg-gradient-to-br ${room.previewGradient}`}
       />
 
       <div className="pointer-events-none absolute inset-0">
         <div
-          className={`absolute -left-16 top-1/4 h-56 w-56 rounded-full blur-3xl ${stream.previewAccent}`}
+          className={`absolute -left-16 top-1/4 h-56 w-56 rounded-full blur-3xl ${room.previewAccent}`}
         />
         <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(5,5,16,0.55)_100%)]" />
@@ -51,10 +51,19 @@ export default function LiveStreamStage({
 
       <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2 md:left-5 md:top-5">
         <LiveBadge size="md" />
-        <LiveViewerCount count={stream.viewerCount} />
+        <LiveViewerCount count={room.viewerCount} />
         <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55 backdrop-blur-md">
           {quality}
         </span>
+        {room.status === "live" ? (
+          <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
+            Stage ready
+          </span>
+        ) : (
+          <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
+            {room.status}
+          </span>
+        )}
       </div>
 
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
@@ -67,11 +76,11 @@ export default function LiveStreamStage({
           UMTUBA Live Stage
         </p>
         <h2 className="mt-3 max-w-xl text-2xl font-black tracking-tight text-white md:text-4xl">
-          {stream.previewLabel}
+          {room.previewLabel}
         </h2>
         <p className="mt-3 max-w-md text-sm leading-6 text-white/55 md:text-base">
-          Premium preview placeholder — real broadcast infrastructure arrives
-          in a later release.
+          Media plane reserved for WebRTC / SFU ingest — rooms, chat, and host
+          controls are live in V1.
         </p>
       </div>
 
@@ -83,7 +92,7 @@ export default function LiveStreamStage({
 
       {captionsOn ? (
         <div className="absolute bottom-6 left-1/2 z-10 w-[min(90%,36rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-center text-sm font-medium leading-6 text-white/90 backdrop-blur-md">
-          [CC] Welcome to {stream.city} — you&apos;re watching a live moment from
+          [CC] Welcome to {room.city} — you&apos;re watching a live moment from
           the UMTUBA globe.
         </div>
       ) : null}

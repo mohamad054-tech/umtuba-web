@@ -3,9 +3,15 @@ import AppTopNav from "../../components/AppTopNav";
 
 type LiveShellProps = {
   children: ReactNode;
+  subtitle?: string;
+  actions?: ReactNode;
 };
 
-export default function LiveShell({ children }: LiveShellProps) {
+export default function LiveShell({
+  children,
+  subtitle = "Global live rooms · chat · host controls",
+  actions,
+}: LiveShellProps) {
   return (
     <main className="relative flex min-h-screen flex-col overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -23,7 +29,8 @@ export default function LiveShell({ children }: LiveShellProps) {
             On air
           </span>
         }
-        subtitle="Premium live streaming prototype"
+        subtitle={subtitle}
+        actions={actions}
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-3 py-3 md:px-6 md:py-5">

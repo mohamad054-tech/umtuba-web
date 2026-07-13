@@ -1,305 +1,200 @@
-export type LiveChatMessage = {
-  id: string;
-  userId: string;
-  userName: string;
-  userInitials: string;
-  avatarGradient: string;
-  text: string;
-  sentAt: string;
-  isCreator?: boolean;
-};
+﻿/**
+ * Demo live rooms for UI when Supabase live tables are not applied yet.
+ * Production path uses lib/supabase/live.ts + app/actions/live.ts.
+ * Exact coordinates are never exposed on client DTOs.
+ */
 
-export type LiveStream = {
-  id: string;
-  title: string;
-  category: string;
-  city: string;
-  country: string;
-  viewerCount: number;
-  startedAtLabel: string;
-  previewGradient: string;
-  previewAccent: string;
-  previewLabel: string;
-  creator: {
-    id: string;
-    name: string;
-    handle: string;
-    initials: string;
-    avatarGradient: string;
-    followersLabel: string;
+import type { LiveChatMessage, LiveRoom } from "../types";
+import {
+  avatarGradientFromId,
+  initialsFromName,
+  previewAccentFromId,
+  previewGradientFromId,
+} from "../types";
+
+function mockHost(
+  id: string,
+  name: string,
+  handle: string,
+  followersLabel: string
+) {
+  return {
+    id,
+    name,
+    handle,
+    initials: initialsFromName(name),
+    avatarGradient: avatarGradientFromId(id),
+    followersLabel,
   };
-  chat: LiveChatMessage[];
-};
+}
 
-export const LIVE_REACTIONS = ["🔥", "❤️", "👏", "🌍", "✨", "🙌"] as const;
+function mockChat(
+  roomId: string,
+  items: Array<{
+    id: string;
+    userId: string;
+    userName: string;
+    text: string;
+    sentAt: string;
+    isCreator?: boolean;
+  }>
+): LiveChatMessage[] {
+  return items.map((item) => ({
+    id: item.id,
+    roomId,
+    userId: item.userId,
+    userName: item.userName,
+    userInitials: initialsFromName(item.userName),
+    avatarGradient: avatarGradientFromId(item.userId),
+    text: item.text,
+    sentAt: item.sentAt,
+    createdAt: new Date().toISOString(),
+    isCreator: item.isCreator,
+  }));
+}
 
-export const LIVE_QUALITY_OPTIONS = [
-  "Auto",
-  "1080p",
-  "720p",
-  "480p",
-  "360p",
-] as const;
-
-export type LiveQuality = (typeof LIVE_QUALITY_OPTIONS)[number];
-
-export const MOCK_LIVE_STREAMS: LiveStream[] = [
+export const MOCK_LIVE_ROOMS: LiveRoom[] = [
   {
-    id: "live-lagos-sunrise",
+    id: "00000000-0000-4000-8000-000000000001",
     title: "Sunrise over Lagos Island — live from the waterfront",
+    description: null,
     category: "Travel",
+    visibility: "public",
+    status: "live",
     city: "Lagos",
     country: "Nigeria",
+    latitude: null,
+    longitude: null,
     viewerCount: 18420,
+    peakViewerCount: 18420,
+    chatMessageCount: 6,
+    recordingStatus: "none",
+    startedAt: new Date(Date.now() - 42 * 60_000).toISOString(),
+    endedAt: null,
+    createdAt: new Date().toISOString(),
     startedAtLabel: "Started 42 min ago",
-    previewGradient: "from-[#1a1040] via-[#0c1a3a] to-[#061820]",
-    previewAccent: "bg-amber-400/40",
+    previewGradient: previewGradientFromId("lagos"),
+    previewAccent: previewAccentFromId("lagos"),
     previewLabel: "Lagos waterfront · golden hour",
-    creator: {
-      id: "creator-amara",
-      name: "Amara Okonkwo",
-      handle: "@amara.ok",
-      initials: "AO",
-      avatarGradient: "from-amber-400 to-rose-500",
-      followersLabel: "128K",
-    },
-    chat: [
-      {
-        id: "lc1",
-        userId: "u1",
-        userName: "Kai Nakamura",
-        userInitials: "KN",
-        avatarGradient: "from-cyan-400 to-blue-600",
-        text: "That skyline glow is unreal 🔥",
-        sentAt: "2m ago",
-      },
-      {
-        id: "lc2",
-        userId: "u2",
-        userName: "Sofia Reyes",
-        userInitials: "SR",
-        avatarGradient: "from-fuchsia-400 to-violet-600",
-        text: "Watching from Mexico City — good morning Lagos!",
-        sentAt: "1m ago",
-      },
-      {
-        id: "lc3",
-        userId: "creator-amara",
-        userName: "Amara Okonkwo",
-        userInitials: "AO",
-        avatarGradient: "from-amber-400 to-rose-500",
-        text: "Welcome everyone — pan left in a sec for the ferry.",
-        sentAt: "1m ago",
-        isCreator: true,
-      },
-      {
-        id: "lc4",
-        userId: "u3",
-        userName: "Youssef Haddad",
-        userInitials: "YH",
-        avatarGradient: "from-emerald-400 to-teal-600",
-        text: "UMTUBA globe pulse brought me here 🌍",
-        sentAt: "48s ago",
-      },
-      {
-        id: "lc5",
-        userId: "u4",
-        userName: "Elena Voss",
-        userInitials: "EV",
-        avatarGradient: "from-sky-400 to-indigo-500",
-        text: "Can you show the bridge again?",
-        sentAt: "32s ago",
-      },
-      {
-        id: "lc6",
-        userId: "u5",
-        userName: "Tariq Mensah",
-        userInitials: "TM",
-        avatarGradient: "from-orange-400 to-red-500",
-        text: "Best live on the network tonight.",
-        sentAt: "18s ago",
-      },
-    ],
+    host: mockHost("creator-amara", "Amara Okonkwo", "@amara.ok", "128K"),
   },
   {
-    id: "live-tokyo-night",
+    id: "00000000-0000-4000-8000-000000000002",
     title: "Shibuya crossing after rain",
+    description: null,
     category: "City Life",
+    visibility: "public",
+    status: "live",
     city: "Tokyo",
     country: "Japan",
+    latitude: null,
+    longitude: null,
     viewerCount: 22105,
+    peakViewerCount: 22105,
+    chatMessageCount: 2,
+    recordingStatus: "none",
+    startedAt: new Date(Date.now() - 60 * 60_000).toISOString(),
+    endedAt: null,
+    createdAt: new Date().toISOString(),
     startedAtLabel: "Started 1h ago",
-    previewGradient: "from-[#1a0a28] via-[#0a1228] to-[#041018]",
-    previewAccent: "bg-pink-400/35",
+    previewGradient: previewGradientFromId("tokyo"),
+    previewAccent: previewAccentFromId("tokyo"),
     previewLabel: "Shibuya · neon rain",
-    creator: {
-      id: "creator-yuki",
-      name: "Yuki Tanaka",
-      handle: "@yuki.live",
-      initials: "YT",
-      avatarGradient: "from-pink-400 to-violet-600",
-      followersLabel: "96K",
-    },
-    chat: [
-      {
-        id: "tc1",
-        userId: "u6",
-        userName: "Maya Chen",
-        userInitials: "MC",
-        avatarGradient: "from-blue-400 to-indigo-600",
-        text: "Neon reflections are perfect tonight",
-        sentAt: "3m ago",
-      },
-      {
-        id: "tc2",
-        userId: "creator-yuki",
-        userName: "Yuki Tanaka",
-        userInitials: "YT",
-        avatarGradient: "from-pink-400 to-violet-600",
-        text: "Crossing clears in 20 seconds — stay with me.",
-        sentAt: "1m ago",
-        isCreator: true,
-      },
-    ],
+    host: mockHost("creator-yuki", "Yuki Tanaka", "@yuki.live", "96K"),
   },
   {
-    id: "live-rio-samba",
+    id: "00000000-0000-4000-8000-000000000003",
     title: "Street samba rehearsal — Lapa",
+    description: null,
     category: "Music",
+    visibility: "public",
+    status: "live",
     city: "Rio de Janeiro",
     country: "Brazil",
+    latitude: null,
+    longitude: null,
     viewerCount: 9734,
+    peakViewerCount: 9734,
+    chatMessageCount: 1,
+    recordingStatus: "none",
+    startedAt: new Date(Date.now() - 18 * 60_000).toISOString(),
+    endedAt: null,
+    createdAt: new Date().toISOString(),
     startedAtLabel: "Started 18 min ago",
-    previewGradient: "from-[#2a1010] via-[#1a1420] to-[#0a1820]",
-    previewAccent: "bg-lime-400/30",
+    previewGradient: previewGradientFromId("rio"),
+    previewAccent: previewAccentFromId("rio"),
     previewLabel: "Lapa · rehearsal energy",
-    creator: {
-      id: "creator-rafa",
-      name: "Rafael Costa",
-      handle: "@rafa.beats",
-      initials: "RC",
-      avatarGradient: "from-lime-400 to-emerald-600",
-      followersLabel: "54K",
-    },
-    chat: [
-      {
-        id: "rc1",
-        userId: "u7",
-        userName: "Aisha Diallo",
-        userInitials: "AD",
-        avatarGradient: "from-yellow-400 to-orange-500",
-        text: "That rhythm hits from across the ocean 🙌",
-        sentAt: "2m ago",
-      },
-    ],
+    host: mockHost("creator-rafa", "Rafael Costa", "@rafa.beats", "54K"),
   },
   {
-    id: "live-paris-atelier",
+    id: "00000000-0000-4000-8000-000000000004",
     title: "Midnight atelier — sketching the Seine",
+    description: null,
     category: "Art",
+    visibility: "public",
+    status: "live",
     city: "Paris",
     country: "France",
+    latitude: null,
+    longitude: null,
     viewerCount: 6120,
+    peakViewerCount: 6120,
+    chatMessageCount: 1,
+    recordingStatus: "none",
+    startedAt: new Date(Date.now() - 55 * 60_000).toISOString(),
+    endedAt: null,
+    createdAt: new Date().toISOString(),
     startedAtLabel: "Started 55 min ago",
-    previewGradient: "from-[#101828] via-[#12101f] to-[#081018]",
-    previewAccent: "bg-sky-400/30",
+    previewGradient: previewGradientFromId("paris"),
+    previewAccent: previewAccentFromId("paris"),
     previewLabel: "Seine · soft floodlights",
-    creator: {
-      id: "creator-camille",
-      name: "Camille Dupont",
-      handle: "@camille.ink",
-      initials: "CD",
-      avatarGradient: "from-sky-400 to-blue-700",
-      followersLabel: "41K",
-    },
-    chat: [
-      {
-        id: "pc1",
-        userId: "u8",
-        userName: "Noah Berg",
-        userInitials: "NB",
-        avatarGradient: "from-slate-300 to-slate-600",
-        text: "Love the quiet pace of this stream",
-        sentAt: "4m ago",
-      },
-    ],
-  },
-  {
-    id: "live-dubai-skyline",
-    title: "Marina skyline drone pass",
-    category: "Aerial",
-    city: "Dubai",
-    country: "UAE",
-    viewerCount: 14302,
-    startedAtLabel: "Started 27 min ago",
-    previewGradient: "from-[#0a1828] via-[#0c1020] to-[#180a18]",
-    previewAccent: "bg-cyan-300/35",
-    previewLabel: "Marina · golden glass",
-    creator: {
-      id: "creator-layla",
-      name: "Layla Al-Hassan",
-      handle: "@layla.air",
-      initials: "LA",
-      avatarGradient: "from-cyan-300 to-blue-600",
-      followersLabel: "210K",
-    },
-    chat: [
-      {
-        id: "dc1",
-        userId: "u9",
-        userName: "Omar Farouk",
-        userInitials: "OF",
-        avatarGradient: "from-teal-400 to-cyan-700",
-        text: "Altitude looks buttery smooth",
-        sentAt: "1m ago",
-      },
-    ],
-  },
-  {
-    id: "live-nairobi-market",
-    title: "Maasai Market morning walk",
-    category: "Culture",
-    city: "Nairobi",
-    country: "Kenya",
-    viewerCount: 4888,
-    startedAtLabel: "Started 12 min ago",
-    previewGradient: "from-[#1a1808] via-[#14120f] to-[#081410]",
-    previewAccent: "bg-yellow-400/30",
-    previewLabel: "Market · morning color",
-    creator: {
-      id: "creator-wambui",
-      name: "Wambui Njoroge",
-      handle: "@wambui.walks",
-      initials: "WN",
-      avatarGradient: "from-yellow-400 to-orange-600",
-      followersLabel: "33K",
-    },
-    chat: [
-      {
-        id: "nc1",
-        userId: "u10",
-        userName: "Priya Sharma",
-        userInitials: "PS",
-        avatarGradient: "from-rose-400 to-red-600",
-        text: "Those textiles are stunning",
-        sentAt: "50s ago",
-      },
-    ],
+    host: mockHost("creator-camille", "Camille Dupont", "@camille.ink", "41K"),
   },
 ];
 
-export const FEATURED_STREAM_ID = MOCK_LIVE_STREAMS[0].id;
+export const MOCK_LIVE_CHAT: Record<string, LiveChatMessage[]> = {
+  [MOCK_LIVE_ROOMS[0].id]: mockChat(MOCK_LIVE_ROOMS[0].id, [
+    {
+      id: "lc1",
+      userId: "u1",
+      userName: "Kai Nakamura",
+      text: "That skyline glow is unreal",
+      sentAt: "2m ago",
+    },
+    {
+      id: "lc2",
+      userId: "u2",
+      userName: "Sofia Reyes",
+      text: "Watching from Mexico City — good morning Lagos!",
+      sentAt: "1m ago",
+    },
+    {
+      id: "lc3",
+      userId: "creator-amara",
+      userName: "Amara Okonkwo",
+      text: "Welcome everyone — pan left in a sec for the ferry.",
+      sentAt: "1m ago",
+      isCreator: true,
+    },
+  ]),
+  [MOCK_LIVE_ROOMS[1].id]: mockChat(MOCK_LIVE_ROOMS[1].id, [
+    {
+      id: "tc1",
+      userId: "u6",
+      userName: "Maya Chen",
+      text: "Neon reflections are perfect tonight",
+      sentAt: "3m ago",
+    },
+  ]),
+};
 
-export function formatViewerCount(count: number): string {
-  if (count >= 1_000_000) {
-    return `${(count / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
-  }
-  if (count >= 1_000) {
-    return `${(count / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
-  }
-  return String(count);
+export const FEATURED_ROOM_ID = MOCK_LIVE_ROOMS[0].id;
+
+export function getMockRoomById(id: string): LiveRoom | undefined {
+  return MOCK_LIVE_ROOMS.find((room) => room.id === id);
 }
 
-export function getStreamById(id: string): LiveStream | undefined {
-  return MOCK_LIVE_STREAMS.find((stream) => stream.id === id);
-}
+/** @deprecated use MOCK_LIVE_ROOMS */
+export const MOCK_LIVE_STREAMS = MOCK_LIVE_ROOMS;
+export const FEATURED_STREAM_ID = FEATURED_ROOM_ID;
+export const getStreamById = getMockRoomById;
