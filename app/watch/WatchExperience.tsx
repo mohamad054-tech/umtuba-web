@@ -13,6 +13,8 @@ import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
 import type { WatchPanelId } from "../components/video/watchTypes";
 import JourneyTransitionDirector from "../components/journey-transition/JourneyTransitionDirector";
+import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
+import NotificationBell from "../components/NotificationBell";
 
 const panelCopy: Record<
   Exclude<WatchPanelId, null>,
@@ -171,7 +173,9 @@ export default function WatchExperience() {
             : "Discover the world"}
         </p>
 
-        <div className="pointer-events-auto flex items-center gap-3">
+        <div className="pointer-events-auto flex items-center gap-2 md:gap-3">
+          <WalletBalanceIndicator compact />
+          <NotificationBell />
           <button
             type="button"
             onClick={() => handleOpenPanel("related")}

@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
+import WalletBalanceIndicator from "./wallet/WalletBalanceIndicator";
 
 type AppTopNavProps = {
   title: string;
@@ -69,13 +70,14 @@ export default function AppTopNav({
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {actions}
           {subtitle ? (
             <p className="hidden text-xs font-medium text-white/40 xl:block">
               {subtitle}
             </p>
           ) : null}
+          <WalletBalanceIndicator />
           <NotificationBell />
           <UserMenu />
         </div>

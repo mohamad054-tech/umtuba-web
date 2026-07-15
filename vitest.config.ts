@@ -13,6 +13,7 @@ export default defineConfig({
       "app/notifications/**/*.test.ts",
       "lib/rewards/**/*.test.ts",
       "lib/geo/**/*.test.ts",
+      "lib/wallet/**/*.test.ts",
     ],
   },
 });
