@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
+import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
 import WalletBalanceIndicator from "./wallet/WalletBalanceIndicator";
@@ -77,6 +78,7 @@ export default function AppTopNav({
               {subtitle}
             </p>
           ) : null}
+          <ActivityTierIndicator />
           <WalletBalanceIndicator />
           <NotificationBell />
           <UserMenu />

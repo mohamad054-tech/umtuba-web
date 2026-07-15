@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { loadProfileActivityTier } from "../../actions/activityTiers";
+import { buildActivityTierProgress } from "../../../lib/activity-tiers";
 import { getServerUser } from "../../../lib/supabase/server";
 import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
 import { normalizeUsername } from "../../../lib/supabase/validation";
@@ -43,8 +45,9 @@ async function resolveProfile(username: string): Promise<{
     const row = await getProfileByUsernameFromDb(key);
 
     if (row) {
+      const activityTier = await loadProfileActivityTier(row.id);
       return {
-        profile: profileRowToView(row),
+        profile: { ...profileRowToView(row), activityTier },
         isOwner: Boolean(viewerId && viewerId === row.id),
       };
     }
@@ -58,7 +61,10 @@ async function resolveProfile(username: string): Promise<{
 
     if (mock) {
       return {
-        profile: mockProfileToView(mock),
+        profile: {
+          ...mockProfileToView(mock),
+          activityTier: buildActivityTierProgress({ score: 420 }),
+        },
         isOwner: false,
       };
     }

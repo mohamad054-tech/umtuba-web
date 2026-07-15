@@ -13,6 +13,7 @@ import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
 import type { WatchPanelId } from "../components/video/watchTypes";
 import JourneyTransitionDirector from "../components/journey-transition/JourneyTransitionDirector";
+import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndicator";
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
 
@@ -174,6 +175,7 @@ export default function WatchExperience() {
         </p>
 
         <div className="pointer-events-auto flex items-center gap-2 md:gap-3">
+          <ActivityTierIndicator compact />
           <WalletBalanceIndicator compact />
           <NotificationBell />
           <button

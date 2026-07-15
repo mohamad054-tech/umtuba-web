@@ -1,3 +1,5 @@
+import type { ActivityTierProgress } from "../../lib/activity-tiers";
+
 export type ProfileVideo = {
   id: string;
   title: string;
@@ -64,4 +66,6 @@ export type ProfileView = {
   videos: ProfileVideo[];
   liveSessions: ProfileLivePreview[];
   about: ProfileAbout;
+  /** Authentic activity tier — separate from UM Points wallet. */
+  activityTier?: ActivityTierProgress | null;
 };

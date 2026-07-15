@@ -14,6 +14,7 @@ export default defineConfig({
       "lib/rewards/**/*.test.ts",
       "lib/geo/**/*.test.ts",
       "lib/wallet/**/*.test.ts",
+      "lib/activity-tiers/**/*.test.ts",
     ],
   },
 });
