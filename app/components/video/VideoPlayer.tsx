@@ -16,6 +16,10 @@ type VideoPlayerProps = {
   muted: boolean;
   forcePause?: boolean;
   onToggleMute: () => void;
+  /** Remint signed URL when playback fails (expired / deleted). */
+  onPlaybackError?: () => void;
+  playbackStatus?: "ok" | "expired" | "deleted" | "error";
+  onRetryPlayback?: () => void;
 };
 
 export default function VideoPlayer({
@@ -25,6 +29,9 @@ export default function VideoPlayer({
   muted,
   forcePause = false,
   onToggleMute,
+  onPlaybackError,
+  playbackStatus = "ok",
+  onRetryPlayback,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [pausedByUser, setPausedByUser] = useState(false);
@@ -40,7 +47,7 @@ export default function VideoPlayer({
       return;
     }
 
-    if (!active) {
+    if (!active || playbackStatus !== "ok") {
       video.pause();
       return;
     }
@@ -51,7 +58,7 @@ export default function VideoPlayer({
 
     video.muted = muted;
     void video.play().catch(() => undefined);
-  }, [active, muted, pausedByUser, src]);
+  }, [active, muted, pausedByUser, src, playbackStatus]);
 
   useEffect(() => {
     if (!forcePause || !active) {
@@ -107,6 +114,10 @@ export default function VideoPlayer({
   }
 
   function togglePlayback() {
+    if (playbackStatus !== "ok") {
+      return;
+    }
+
     const video = videoRef.current;
 
     if (!video) {
@@ -137,24 +148,49 @@ export default function VideoPlayer({
     }
   }
 
+  const statusMessage =
+    playbackStatus === "deleted"
+      ? "This video was deleted."
+      : playbackStatus === "expired"
+        ? "Playback link expired."
+        : playbackStatus === "error"
+          ? "Unable to play this video."
+          : null;
+
   return (
     <div className="relative h-full w-full bg-black">
-      <video
-        ref={videoRef}
-        className="h-full w-full cursor-pointer object-cover"
-        src={src}
-        poster={poster}
-        playsInline
-        loop
-        muted={muted}
-        preload={active ? "auto" : "metadata"}
-        onClick={handleSurfaceClick}
-        onLoadedData={() => setIsReady(true)}
-        onWaiting={() => setIsReady(false)}
-        onCanPlay={() => setIsReady(true)}
-        onPlay={() => setIsPaused(false)}
-        onPause={() => setIsPaused(true)}
-      />
+      {playbackStatus === "ok" ? (
+        <video
+          ref={videoRef}
+          className="h-full w-full cursor-pointer object-cover"
+          src={src}
+          poster={poster}
+          playsInline
+          loop
+          muted={muted}
+          preload={active ? "auto" : "metadata"}
+          onClick={handleSurfaceClick}
+          onLoadedData={() => setIsReady(true)}
+          onWaiting={() => setIsReady(false)}
+          onCanPlay={() => setIsReady(true)}
+          onPlay={() => setIsPaused(false)}
+          onPause={() => setIsPaused(true)}
+          onError={() => onPlaybackError?.()}
+        />
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#050510] px-6 text-center">
+          <p className="text-sm font-bold text-white/70">{statusMessage}</p>
+          {playbackStatus !== "deleted" && onRetryPlayback ? (
+            <button
+              type="button"
+              onClick={onRetryPlayback}
+              className="watch-focus-ring rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white hover:bg-white/15"
+            >
+              Retry playback
+            </button>
+          ) : null}
+        </div>
+      )}
 
       <div
         role="button"
@@ -181,7 +217,7 @@ export default function VideoPlayer({
         </div>
       ) : null}
 
-      {!isReady && active ? (
+      {!isReady && active && playbackStatus === "ok" ? (
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/35">
           <p className="rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-bold text-white/70 backdrop-blur">
             Loading...

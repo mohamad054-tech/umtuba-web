@@ -207,6 +207,10 @@ export function buildJourneyHandoffQuery(payload: JourneyHandoffPayload) {
     city: slugifyCity(payload.location.city),
   });
 
+  if (/^\d+$/.test(payload.videoId)) {
+    params.set("postId", payload.videoId);
+  }
+
   return params.toString();
 }
 

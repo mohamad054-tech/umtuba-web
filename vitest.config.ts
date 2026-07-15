@@ -15,6 +15,7 @@ export default defineConfig({
       "lib/geo/**/*.test.ts",
       "lib/wallet/**/*.test.ts",
       "lib/activity-tiers/**/*.test.ts",
+      "app/watch/**/*.test.ts",
     ],
   },
 });

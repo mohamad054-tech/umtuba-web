@@ -1,5 +1,13 @@
 import { Suspense } from "react";
+import {
+  encodeWatchPageCursor,
+  getWatchVideosPageServer,
+} from "../../lib/supabase/videoPostsServer";
+import { demoVideos } from "../data/videos";
+import { demoVideoToWatchVideo } from "./lib/mapWatchVideo";
 import WatchExperience from "./WatchExperience";
+
+export const dynamic = "force-dynamic";
 
 function WatchFallback() {
   return (
@@ -15,10 +23,53 @@ function WatchFallback() {
   );
 }
 
-export default function WatchPage() {
+type WatchPageProps = {
+  searchParams?: Promise<{ post?: string; id?: string }> | { post?: string; id?: string };
+};
+
+async function WatchLoader({ searchParams }: WatchPageProps) {
+  const params = await Promise.resolve(searchParams ?? {});
+  const focusRaw = params.post ?? params.id ?? null;
+  const focusPostId = focusRaw ? Number(focusRaw) : NaN;
+  const focus =
+    Number.isInteger(focusPostId) && focusPostId > 0 ? focusPostId : null;
+
+  const result = await getWatchVideosPageServer({ focusPostId: focus });
+
+  if (!result.ok) {
+    return (
+      <WatchExperience
+        initialVideos={demoVideos.map(demoVideoToWatchVideo)}
+        initialCursor={null}
+        loadError={result.message}
+        usedDemoFallback
+      />
+    );
+  }
+
+  if (result.page.videos.length === 0) {
+    return (
+      <WatchExperience
+        initialVideos={demoVideos.map(demoVideoToWatchVideo)}
+        initialCursor={null}
+        usedDemoFallback
+      />
+    );
+  }
+
+  return (
+    <WatchExperience
+      initialVideos={result.page.videos}
+      initialCursor={encodeWatchPageCursor(result.page.nextCursor)}
+      usedDemoFallback={false}
+    />
+  );
+}
+
+export default function WatchPage(props: WatchPageProps) {
   return (
     <Suspense fallback={<WatchFallback />}>
-      <WatchExperience />
+      <WatchLoader searchParams={props.searchParams} />
     </Suspense>
   );
 }

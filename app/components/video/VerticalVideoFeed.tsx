@@ -7,18 +7,25 @@ import {
   useRef,
   useState,
 } from "react";
-import type { DemoVideo } from "../../data/videos";
+import type { DiscoverStats } from "../../discover/types";
+import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoSlide from "./VideoSlide";
 
 type VerticalVideoFeedProps = {
-  videos: DemoVideo[];
+  videos: WatchVideo[];
   initialIndex?: number;
   forcePause?: boolean;
   transitionLocked?: boolean;
-  onActiveChange?: (video: DemoVideo, index: number) => void;
+  emptyMessage?: string;
+  onActiveChange?: (video: WatchVideo, index: number) => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
-  onPostJourney: (video: DemoVideo) => void;
+  onPostJourney: (video: WatchVideo) => void;
+  onNearEnd?: () => void;
+  onVideoPatch?: (
+    videoId: string,
+    patch: Partial<WatchVideo>
+  ) => void;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -28,9 +35,12 @@ export default function VerticalVideoFeed({
   initialIndex = 0,
   forcePause = false,
   transitionLocked = false,
+  emptyMessage = "No videos available.",
   onActiveChange,
   onOpenPanel,
   onPostJourney,
+  onNearEnd,
+  onVideoPatch,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -38,6 +48,7 @@ export default function VerticalVideoFeed({
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
   const [muted, setMuted] = useState(true);
+  const nearEndRequestedRef = useRef(false);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -125,6 +136,19 @@ export default function VerticalVideoFeed({
   }, [activeIndex, activeVideo, onActiveChange]);
 
   useEffect(() => {
+    nearEndRequestedRef.current = false;
+  }, [videos.length]);
+
+  useEffect(() => {
+    if (activeIndex >= videos.length - 3) {
+      if (!nearEndRequestedRef.current) {
+        nearEndRequestedRef.current = true;
+        onNearEnd?.();
+      }
+    }
+  }, [activeIndex, videos.length, onNearEnd]);
+
+  useEffect(() => {
     const target = videos[initialIndex];
 
     if (!target) {
@@ -141,7 +165,12 @@ export default function VerticalVideoFeed({
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") {
+      if (
+        event.key !== "ArrowDown" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "j" &&
+        event.key !== "k"
+      ) {
         return;
       }
 
@@ -156,7 +185,8 @@ export default function VerticalVideoFeed({
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      const delta = event.key === "ArrowDown" ? 1 : -1;
+      const delta =
+        event.key === "ArrowDown" || event.key === "j" ? 1 : -1;
       const nextIndex = Math.min(
         Math.max(activeIndex + delta, 0),
         videos.length - 1
@@ -186,8 +216,11 @@ export default function VerticalVideoFeed({
 
   if (videos.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-white/60">
-        No demo videos available.
+      <div
+        className="flex h-full items-center justify-center px-6 text-center text-white/60"
+        role="status"
+      >
+        {emptyMessage}
       </div>
     );
   }
@@ -216,6 +249,13 @@ export default function VerticalVideoFeed({
                 onToggleMute={handleToggleMute}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
+                onStatsChange={(stats) =>
+                  onVideoPatch?.(video.id, {
+                    stats: { ...video.stats, ...stats } as DiscoverStats,
+                  })
+                }
+                onFlagsChange={(flags) => onVideoPatch?.(video.id, flags)}
+                onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
                 slideRef={(node) => setSlideNode(video.id, node)}
               />
             ) : (

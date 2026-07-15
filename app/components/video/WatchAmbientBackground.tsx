@@ -1,9 +1,9 @@
 "use client";
 
-import type { DemoVideo } from "../../data/videos";
+import type { WatchVideo } from "../../watch/types";
 
 type WatchAmbientBackgroundProps = {
-  video: DemoVideo | null;
+  video: WatchVideo | null;
 };
 
 export default function WatchAmbientBackground({

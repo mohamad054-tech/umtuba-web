@@ -3,11 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  demoVideos,
-  getDemoVideoIndex,
-  type DemoVideo,
-} from "../data/videos";
+import { demoVideos } from "../data/videos";
 import VerticalVideoFeed from "../components/video/VerticalVideoFeed";
 import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
@@ -16,6 +12,17 @@ import JourneyTransitionDirector from "../components/journey-transition/JourneyT
 import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndicator";
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
+import CommentsPanel from "../components/social/CommentsPanel";
+import { recordViewAction } from "../actions/socialInteractions";
+import {
+  loadWatchFeedPageAction,
+} from "../actions/loadWatchFeed";
+import { getOrCreateViewerKey } from "../lib/social/shareAndViews";
+import {
+  demoVideoToWatchVideo,
+  findWatchVideoIndex,
+} from "./lib/mapWatchVideo";
+import type { WatchVideo } from "./types";
 
 const panelCopy: Record<
   Exclude<WatchPanelId, null>,
@@ -24,7 +31,7 @@ const panelCopy: Record<
   comments: {
     title: "Comments",
     description:
-      "Conversation around this moment will live here — replies, translations, and creator notes.",
+      "Conversation around this moment — replies and creator notes.",
   },
   related: {
     title: "Related videos",
@@ -48,22 +55,79 @@ const panelCopy: Record<
   },
 };
 
-export default function WatchExperience() {
+type WatchExperienceProps = {
+  initialVideos: WatchVideo[];
+  initialCursor: string | null;
+  loadError?: string | null;
+  usedDemoFallback?: boolean;
+};
+
+export default function WatchExperience({
+  initialVideos,
+  initialCursor,
+  loadError = null,
+  usedDemoFallback = false,
+}: WatchExperienceProps) {
   const searchParams = useSearchParams();
   const stageRef = useRef<HTMLDivElement>(null);
-  const initialIndex = getDemoVideoIndex(searchParams.get("id"));
+  const recordedViewsRef = useRef<Set<number>>(new Set());
+  const loadingMoreRef = useRef(false);
+
+  const focusKey = searchParams.get("post") ?? searchParams.get("id");
+  const seedVideos =
+    initialVideos.length > 0
+      ? initialVideos
+      : demoVideos.map(demoVideoToWatchVideo);
+  const initialIndex = findWatchVideoIndex(seedVideos, focusKey);
+
+  const [videos, setVideos] = useState<WatchVideo[]>(seedVideos);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeVideo, setActiveVideo] = useState<DemoVideo>(
-    () => demoVideos[initialIndex] ?? demoVideos[0]
+  const [activeVideo, setActiveVideo] = useState<WatchVideo | null>(
+    () => seedVideos[initialIndex] ?? seedVideos[0] ?? null
   );
   const [activePanel, setActivePanel] = useState<WatchPanelId>(null);
   const [journeyTransitionActive, setJourneyTransitionActive] = useState(false);
   const [forcePause, setForcePause] = useState(false);
-  const [journeyVideo, setJourneyVideo] = useState<DemoVideo | null>(null);
+  const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
+  const [demoFallback] = useState(
+    usedDemoFallback || initialVideos.length === 0
+  );
 
-  const handleActiveChange = useCallback((video: DemoVideo) => {
-    setActiveVideo(video);
-  }, []);
+  const handleActiveChange = useCallback(
+    (video: WatchVideo) => {
+      setActiveVideo(video);
+
+      if (
+        video.source !== "supabase" ||
+        !video.postId ||
+        recordedViewsRef.current.has(video.postId)
+      ) {
+        return;
+      }
+
+      recordedViewsRef.current.add(video.postId);
+      void (async () => {
+        const result = await recordViewAction(
+          video.postId!,
+          getOrCreateViewerKey()
+        );
+        if (result.ok) {
+          setVideos((current) =>
+            current.map((item) =>
+              item.id === video.id
+                ? {
+                    ...item,
+                    stats: { ...item.stats, views: result.views },
+                  }
+                : item
+            )
+          );
+        }
+      })();
+    },
+    []
+  );
 
   const handleOpenPanel = useCallback((panel: Exclude<WatchPanelId, null>) => {
     setActivePanel(panel);
@@ -78,7 +142,7 @@ export default function WatchExperience() {
   }, []);
 
   const handlePostJourney = useCallback(
-    (video: DemoVideo) => {
+    (video: WatchVideo) => {
       if (journeyTransitionActive) {
         return;
       }
@@ -100,6 +164,41 @@ export default function WatchExperience() {
     setForcePause(false);
     setJourneyVideo(null);
   }, []);
+
+  const handleVideoPatch = useCallback(
+    (videoId: string, patch: Partial<WatchVideo>) => {
+      setVideos((current) =>
+        current.map((video) =>
+          video.id === videoId ? { ...video, ...patch } : video
+        )
+      );
+      setActiveVideo((current) =>
+        current?.id === videoId ? { ...current, ...patch } : current
+      );
+    },
+    []
+  );
+
+  const handleNearEnd = useCallback(() => {
+    if (!nextCursor || loadingMoreRef.current || demoFallback) {
+      return;
+    }
+
+    loadingMoreRef.current = true;
+    void (async () => {
+      const result = await loadWatchFeedPageAction({ cursor: nextCursor });
+      loadingMoreRef.current = false;
+      if (!result.ok) {
+        return;
+      }
+      setVideos((current) => {
+        const seen = new Set(current.map((v) => v.id));
+        const appended = result.videos.filter((v) => !seen.has(v.id));
+        return [...current, ...appended];
+      });
+      setNextCursor(result.nextCursor);
+    })();
+  }, [nextCursor, demoFallback]);
 
   useEffect(() => {
     function onFullscreenChange() {
@@ -155,6 +254,9 @@ export default function WatchExperience() {
   }, [activePanel]);
 
   const transitionVideo = journeyVideo ?? activeVideo;
+  const emptyMessage = loadError
+    ? loadError
+    : "No published videos yet. Create one to start the Watch feed.";
 
   return (
     <main className="watch-page-enter relative min-h-screen overflow-hidden bg-[#050510] text-white md:min-h-screen">
@@ -205,22 +307,54 @@ export default function WatchExperience() {
         </div>
       </header>
 
+      {demoFallback ? (
+        <p
+          role="status"
+          className="relative z-20 mx-auto max-w-7xl px-4 pt-2 text-center text-[11px] font-bold text-amber-100/80 md:px-8"
+        >
+          Showing demo videos — publish a video post to replace this fallback.
+        </p>
+      ) : null}
+
       <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-0 md:px-8 md:pb-8 md:pt-0">
         <div
           ref={stageRef}
           className="video-watch-stage relative h-[100dvh] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
         >
           <VerticalVideoFeed
-            videos={demoVideos}
+            videos={videos}
             initialIndex={initialIndex}
             forcePause={forcePause}
             transitionLocked={journeyTransitionActive}
+            emptyMessage={emptyMessage}
             onActiveChange={handleActiveChange}
             onOpenPanel={handleOpenPanel}
             onPostJourney={handlePostJourney}
+            onNearEnd={handleNearEnd}
+            onVideoPatch={handleVideoPatch}
           />
 
-          {panelMeta && !journeyTransitionActive ? (
+          {activePanel === "comments" &&
+          activeVideo?.postId &&
+          !journeyTransitionActive ? (
+            <div className="absolute inset-x-0 bottom-0 z-40 max-h-[70%] overflow-hidden rounded-t-[28px] border border-white/10 bg-[#080816]/95 backdrop-blur-xl md:inset-x-3 md:bottom-3 md:rounded-[28px]">
+              <CommentsPanel
+                open
+                postId={activeVideo.postId}
+                commentCount={activeVideo.stats.comments}
+                onClose={handleClosePanel}
+                onCountChange={(count) =>
+                  handleVideoPatch(activeVideo.id, {
+                    stats: { ...activeVideo.stats, comments: count },
+                  })
+                }
+              />
+            </div>
+          ) : null}
+
+          {panelMeta &&
+          activePanel !== "comments" &&
+          !journeyTransitionActive ? (
             <WatchPanel
               open={Boolean(activePanel)}
               title={panelMeta.title}

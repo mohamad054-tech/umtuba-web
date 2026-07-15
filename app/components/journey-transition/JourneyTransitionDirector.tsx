@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { useRouter } from "next/navigation";
-import type { DemoVideo } from "../../data/videos";
+import type { WatchVideo } from "../../watch/types";
 import { writeJourneyHandoff } from "../../lib/journey/handoff";
 import type { JourneyTransitionPhase } from "../../lib/journey/transitionPhases";
 import { useMotionApi } from "../motion/useMotion";
@@ -20,7 +20,7 @@ import { WATCH_TO_JOURNEY_TRANSITION_ID } from "../../motion/transitions/watch-t
 
 type JourneyTransitionDirectorProps = {
   active: boolean;
-  video: DemoVideo;
+  video: WatchVideo;
   stageRef: RefObject<HTMLElement | null>;
   onPauseVideo: () => void;
   onSettled?: () => void;

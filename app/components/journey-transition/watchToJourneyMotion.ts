@@ -1,4 +1,4 @@
-import type { DemoVideo } from "../../data/videos";
+import type { WatchVideo } from "../../watch/types";
 import {
   buildPostJourneyHref,
   captureElementOriginRect,
@@ -50,7 +50,7 @@ export function resolveWatchToJourneyProfile(
 }
 
 export function buildWatchToJourneyHandoff(
-  video: DemoVideo,
+  video: Pick<WatchVideo, "id" | "title" | "author" | "location" | "postId">,
   stageElement: HTMLElement | null
 ): JourneyHandoffPayload {
   const location = resolveJourneyLocation(video.location);
@@ -58,7 +58,7 @@ export function buildWatchToJourneyHandoff(
     captureElementOriginRect(stageElement);
 
   return createJourneyHandoff({
-    videoId: video.id,
+    videoId: video.postId ? String(video.postId) : video.id,
     title: video.title,
     authorName: video.author.name,
     location,

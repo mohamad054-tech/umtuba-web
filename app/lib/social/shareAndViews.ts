@@ -42,6 +42,8 @@ export type SharePostInput = {
   postId: number;
   title?: string;
   text?: string;
+  /** Canonical player surface for shared links. */
+  surface?: "discover" | "watch";
 };
 
 export type SharePostOutcome =
@@ -60,17 +62,22 @@ function buildShareCaption(input: SharePostInput): {
   return {
     title: input.title?.trim() || "UMTUBA",
     text: input.text?.trim() || "Check out this post on UMTUBA",
-    url: buildPostShareUrl(input.postId),
+    url: buildPostShareUrl(input.postId, input.surface ?? "discover"),
   };
 }
 
-export function buildPostShareUrl(postId: number): string {
+export function buildPostShareUrl(
+  postId: number,
+  surface: "discover" | "watch" = "discover"
+): string {
+  const path = surface === "watch" ? "/watch" : "/discover";
+
   if (typeof window === "undefined") {
-    return `/discover?post=${postId}`;
+    return `${path}?post=${postId}`;
   }
 
   const url = new URL(window.location.href);
-  url.pathname = "/discover";
+  url.pathname = path;
   url.search = "";
   url.searchParams.set("post", String(postId));
   return url.toString();
@@ -126,8 +133,11 @@ function openExternalUrl(url: string): boolean {
   }
 }
 
-export async function copyPostLink(postId: number): Promise<SharePostOutcome> {
-  const url = buildPostShareUrl(postId);
+export async function copyPostLink(
+  postId: number,
+  surface: "discover" | "watch" = "discover"
+): Promise<SharePostOutcome> {
+  const url = buildPostShareUrl(postId, surface);
 
   try {
     if (navigator.clipboard?.writeText) {

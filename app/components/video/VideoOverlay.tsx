@@ -1,14 +1,17 @@
 "use client";
 
-import type { DemoVideo } from "../../data/videos";
+import type { DiscoverStats } from "../../discover/types";
+import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoActionRail from "./VideoActionRail";
 
 type VideoOverlayProps = {
-  video: DemoVideo;
+  video: WatchVideo;
   transitionLocked?: boolean;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
-  onPostJourney: (video: DemoVideo) => void;
+  onPostJourney: (video: WatchVideo) => void;
+  onStatsChange?: (stats: Partial<DiscoverStats>) => void;
+  onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
 };
 
 export default function VideoOverlay({
@@ -16,6 +19,8 @@ export default function VideoOverlay({
   transitionLocked = false,
   onOpenPanel,
   onPostJourney,
+  onStatsChange,
+  onFlagsChange,
 }: VideoOverlayProps) {
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
@@ -95,11 +100,15 @@ export default function VideoOverlay({
 
         <div className="pointer-events-auto">
           <VideoActionRail
-            likes={video.demoStats.likes}
-            comments={video.demoStats.comments}
-            shares={video.demoStats.shares}
-            saves={video.demoStats.saves}
+            postId={video.postId}
+            stats={video.stats}
+            likedByMe={video.likedByMe}
+            savedByMe={video.savedByMe}
+            caption={video.caption}
+            persist={video.source === "supabase"}
             onOpenPanel={onOpenPanel}
+            onStatsChange={onStatsChange}
+            onFlagsChange={onFlagsChange}
           />
         </div>
       </div>
