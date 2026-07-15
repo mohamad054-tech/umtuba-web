@@ -69,11 +69,21 @@ Never put the **service role** key in the Next.js app or commit it.
 
    `supabase/migrations/20260718_notifications_v2_event_wiring.sql`
 
-14. Click **Run**.
+14. Then Activity Tier foundation (score ledger + badges, separate from UM Points):
+
+   `supabase/migrations/20260720_activity_tiers_foundation.sql`
+
+15. Then Activity Tier event wiring (posts/comments/likes/saves/shares/live/follows/referrals):
+
+   `supabase/migrations/20260721_activity_tiers_event_wiring.sql`
+
+16. Click **Run**.
 
 Verify automation objects (optional):
 
 `scripts/verify-notifications-v2-automation.sql`
+
+`scripts/verify-activity-tiers.sql`
 
 ### Live Media V2 (LiveKit)
 

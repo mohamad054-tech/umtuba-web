@@ -109,6 +109,22 @@ export const ACTIVITY_SCORE_CAPS: ActivityScoreCaps = {
   screenTimeRequiresPrimaryPoints: 10,
 };
 
+/** Default per-event scores — mirror of activity_tier_config keys. */
+export const ACTIVITY_SCORE_EVENT_POINTS = {
+  qualityPost: 40,
+  helpfulComment: 8,
+  likeReceived: 3,
+  saveReceived: 5,
+  shareReceived: 8,
+  liveJoin: 10,
+  liveHost: 25,
+  verifiedReferral: 75,
+  communityFollow: 5,
+  consistencyDay: 15,
+  tenureMilestone: 20,
+  screenTimeUnit: 1,
+} as const;
+
 const TIER_BY_ID = Object.fromEntries(
   ACTIVITY_TIERS.map((tier) => [tier.id, tier])
 ) as Record<ActivityTierId, ActivityTierDefinition>;

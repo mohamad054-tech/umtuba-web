@@ -136,4 +136,10 @@ describe("category weights", () => {
       suggestedPointsForCategory("screen_time_secondary") * 10
     );
   });
+
+  it("mirrors configured event points for quality posts", async () => {
+    const { ACTIVITY_SCORE_EVENT_POINTS } = await import("./tiers");
+    expect(ACTIVITY_SCORE_EVENT_POINTS.qualityPost).toBe(40);
+    expect(ACTIVITY_SCORE_EVENT_POINTS.screenTimeUnit).toBe(1);
+  });
 });
