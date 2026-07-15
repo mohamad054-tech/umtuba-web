@@ -74,11 +74,17 @@ export async function signUpWithEmail(input: {
   password: string;
   fullName: string;
   username: string;
+  /** Optional referral code (first-touch attribution). */
+  referralCode?: string | null;
 }) {
   const supabase = createClient();
   const email = input.email.trim();
   const fullName = input.fullName.trim();
   const username = normalizeUsername(input.username);
+  const referralCode =
+    typeof input.referralCode === "string"
+      ? input.referralCode.trim().toUpperCase()
+      : "";
 
   if (!fullName) {
     throw new Error("Please enter your full name.");
@@ -113,6 +119,9 @@ export async function signUpWithEmail(input: {
         full_name: fullName,
         display_name: fullName,
         username,
+        ...(referralCode && /^[A-Z0-9]{6,16}$/.test(referralCode)
+          ? { referral_code: referralCode }
+          : {}),
       },
     },
   });

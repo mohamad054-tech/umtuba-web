@@ -1,30 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { createServiceUnavailableResponse } from "../env/serviceUnavailableResponse";
+import {
+  decideAuthGate,
+  isAuthEntryPath,
+  isAuthPath,
+  isProtectedPath,
+} from "../env/supabaseAuthGate";
+import { getSupabasePublicEnvResult } from "../env/supabasePublic";
 import { getSafeRedirectPath } from "./redirect";
-
-const PROTECTED_PREFIXES = [
-  "/messages",
-  "/notifications",
-  "/settings",
-  "/create",
-  "/saved",
-  "/rewards",
-  "/creator",
-] as const;
-
-function isProtectedPath(pathname: string): boolean {
-  return PROTECTED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-  );
-}
-
-function isAuthPath(pathname: string): boolean {
-  return (
-    pathname === "/login" ||
-    pathname === "/signup" ||
-    pathname === "/register"
-  );
-}
+import {
+  REFERRAL_ATTRIBUTION_TTL_SECONDS,
+  REFERRAL_COOKIE_NAME,
+  REFERRAL_VISITOR_COOKIE,
+  normalizeReferralCode,
+} from "../referral/config";
 
 function copyCookies(
   from: NextResponse,
@@ -36,17 +26,104 @@ function copyCookies(
   return to;
 }
 
+function referralCookieOpts(maxAge = REFERRAL_ATTRIBUTION_TTL_SECONDS) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge,
+  };
+}
+
+/**
+ * First-touch referral attribution:
+ * - /invite/CODE or ?ref=CODE / ?invite=CODE
+ * - Do not overwrite an existing valid referral cookie
+ */
+function applyReferralAttribution(
+  request: NextRequest,
+  response: NextResponse
+): NextResponse {
+  const { pathname } = request.nextUrl;
+  let candidate: string | null = null;
+
+  const inviteMatch = pathname.match(/^\/invite\/([A-Za-z0-9]{6,16})\/?$/);
+  if (inviteMatch) {
+    candidate = normalizeReferralCode(inviteMatch[1]);
+  }
+
+  if (!candidate) {
+    candidate = normalizeReferralCode(
+      request.nextUrl.searchParams.get("ref") ||
+        request.nextUrl.searchParams.get("invite")
+    );
+  }
+
+  if (!candidate) {
+    return response;
+  }
+
+  const existing = normalizeReferralCode(
+    request.cookies.get(REFERRAL_COOKIE_NAME)?.value
+  );
+  if (!existing) {
+    response.cookies.set(
+      REFERRAL_COOKIE_NAME,
+      candidate,
+      referralCookieOpts()
+    );
+  }
+
+  if (!request.cookies.get(REFERRAL_VISITOR_COOKIE)?.value) {
+    const visitorId = crypto.randomUUID().replace(/-/g, "");
+    response.cookies.set(
+      REFERRAL_VISITOR_COOKIE,
+      visitorId,
+      referralCookieOpts(365 * 24 * 60 * 60)
+    );
+  }
+
+  return response;
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const { pathname, search } = request.nextUrl;
+  const publicEnv = getSupabasePublicEnvResult();
+  const gate = decideAuthGate(pathname, publicEnv);
 
-  if (!supabaseUrl || !supabaseKey) {
-    return supabaseResponse;
+  if (gate.action === "service_unavailable") {
+    return applyReferralAttribution(
+      request,
+      createServiceUnavailableResponse(gate.forPath)
+    );
   }
+
+  if (gate.action === "continue_without_session") {
+    // Config missing/invalid: never invent a session; public pages only.
+    return applyReferralAttribution(request, supabaseResponse);
+  }
+
+  // gate.action === "check_session"
+  if (!publicEnv.ok) {
+    // Defensive: never proceed with an unusable client.
+    return applyReferralAttribution(
+      request,
+      createServiceUnavailableResponse(
+        isProtectedPath(pathname)
+          ? "protected"
+          : isAuthPath(pathname)
+            ? "auth"
+            : "public"
+      )
+    );
+  }
+
+  const { url: supabaseUrl, publishableKey: supabaseKey } = publicEnv.env;
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -74,17 +151,30 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname, search } = request.nextUrl;
-
   if (isProtectedPath(pathname) && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.search = "";
     loginUrl.searchParams.set("next", `${pathname}${search}`);
-    return copyCookies(supabaseResponse, NextResponse.redirect(loginUrl));
+    return applyReferralAttribution(
+      request,
+      copyCookies(supabaseResponse, NextResponse.redirect(loginUrl))
+    );
   }
 
-  if (user && isAuthPath(pathname)) {
+  // Logged-in users leave entry auth pages. Password update stays available
+  // so recovery sessions (and signed-in password changes) can complete.
+  if (user && isAuthEntryPath(pathname)) {
+    if (pathname === "/forgot-password") {
+      const updateUrl = request.nextUrl.clone();
+      updateUrl.pathname = "/auth/update-password";
+      updateUrl.search = "";
+      return applyReferralAttribution(
+        request,
+        copyCookies(supabaseResponse, NextResponse.redirect(updateUrl))
+      );
+    }
+
     const nextParam = request.nextUrl.searchParams.get("next");
     const destination = getSafeRedirectPath(nextParam, "/discover");
     // Parse path + query explicitly so ?creatorId= / ?conversation= survive.
@@ -92,8 +182,11 @@ export async function updateSession(request: NextRequest) {
     const [destPath, destQuery = ""] = destination.split("?");
     redirectUrl.pathname = destPath || "/discover";
     redirectUrl.search = destQuery ? `?${destQuery}` : "";
-    return copyCookies(supabaseResponse, NextResponse.redirect(redirectUrl));
+    return applyReferralAttribution(
+      request,
+      copyCookies(supabaseResponse, NextResponse.redirect(redirectUrl))
+    );
   }
 
-  return supabaseResponse;
+  return applyReferralAttribution(request, supabaseResponse);
 }

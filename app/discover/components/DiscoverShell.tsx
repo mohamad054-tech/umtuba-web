@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
-import { APP_ROUTES } from "../../lib/nav";
+import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 
 type DiscoverShellProps = {
   children: ReactNode;
@@ -9,7 +9,9 @@ type DiscoverShellProps = {
 
 export default function DiscoverShell({ children }: DiscoverShellProps) {
   return (
-    <main className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white">
+    <main
+      className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-sky-500/12 blur-3xl" />

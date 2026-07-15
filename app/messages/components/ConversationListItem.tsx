@@ -1,7 +1,5 @@
-import {
-  formatMessageTime,
-  type Conversation,
-} from "../types";
+import { allowMessengerPreviewChrome } from "../../lib/product/surfaceGates";
+import { formatMessageTime, type Conversation } from "../types";
 import OnlineStatusDot from "./OnlineStatusDot";
 import UnreadBadge from "./UnreadBadge";
 
@@ -16,6 +14,7 @@ export default function ConversationListItem({
   selected,
   onSelect,
 }: ConversationListItemProps) {
+  const showPresenceChrome = allowMessengerPreviewChrome();
   const preview = conversation.isTyping
     ? "Typing…"
     : conversation.lastMessagePreview || "No messages yet";
@@ -24,7 +23,8 @@ export default function ConversationListItem({
     <button
       type="button"
       onClick={() => onSelect(conversation.id)}
-      className={`flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition ${
+      aria-current={selected ? "true" : undefined}
+      className={`flex w-full items-start gap-3 rounded-2xl border px-3 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40 ${
         selected
           ? "border-white/20 bg-white/[0.08]"
           : "border-transparent bg-transparent hover:border-white/10 hover:bg-white/[0.04]"
@@ -45,10 +45,12 @@ export default function ConversationListItem({
             {conversation.peerInitials}
           </div>
         )}
-        <OnlineStatusDot
-          status={conversation.status}
-          className="absolute bottom-0 right-0"
-        />
+        {showPresenceChrome ? (
+          <OnlineStatusDot
+            status={conversation.status}
+            className="absolute bottom-0 right-0"
+          />
+        ) : null}
       </div>
 
       <div className="min-w-0 flex-1">

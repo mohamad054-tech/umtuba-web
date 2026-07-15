@@ -76,6 +76,7 @@ export function preferenceAllowsType(
       return prefs.journeyEnabled;
     case "um_points_earned":
     case "reward_milestone":
+    case "referral_reward":
       return prefs.rewardsEnabled;
     case "nearby_live_started":
       return prefs.nearbyLiveEnabled;

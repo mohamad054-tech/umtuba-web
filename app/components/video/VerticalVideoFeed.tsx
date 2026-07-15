@@ -15,6 +15,7 @@ import VideoSlide from "./VideoSlide";
 type VerticalVideoFeedProps = {
   videos: WatchVideo[];
   initialIndex?: number;
+  viewerId?: string | null;
   forcePause?: boolean;
   transitionLocked?: boolean;
   emptyMessage?: string;
@@ -33,6 +34,7 @@ const NEIGHBOR_WINDOW = 1;
 export default function VerticalVideoFeed({
   videos,
   initialIndex = 0,
+  viewerId = null,
   forcePause = false,
   transitionLocked = false,
   emptyMessage = "No videos available.",
@@ -244,6 +246,7 @@ export default function VerticalVideoFeed({
                 video={video}
                 active={index === activeIndex}
                 muted={muted}
+                viewerId={viewerId}
                 forcePause={forcePause}
                 transitionLocked={transitionLocked}
                 onToggleMute={handleToggleMute}

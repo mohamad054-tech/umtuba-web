@@ -28,6 +28,7 @@ describe("notificationCategories", () => {
     );
     expect(categoryForNotificationType("um_points_earned")).toBe("rewards");
     expect(categoryForNotificationType("reward_milestone")).toBe("rewards");
+    expect(categoryForNotificationType("referral_reward")).toBe("rewards");
     expect(categoryForNotificationType("nearby_live_started")).toBe("live");
     expect(categoryForNotificationType("ai_creator_insight")).toBe("ai");
   });

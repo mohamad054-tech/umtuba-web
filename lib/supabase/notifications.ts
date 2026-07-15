@@ -47,7 +47,8 @@ export type NotificationType =
   | "nearby_live_started"
   | "ai_creator_insight"
   | "post_save"
-  | "post_share";
+  | "post_share"
+  | "referral_reward";
 
 export type NotificationActor = {
   id: string;
@@ -92,6 +93,7 @@ const NOTIFICATION_TYPES = new Set<NotificationType>([
   "ai_creator_insight",
   "post_save",
   "post_share",
+  "referral_reward",
 ]);
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -321,27 +323,6 @@ export async function markAllNotificationsRead(
   return { ok: true, count: Number.isFinite(count) ? count : 0 };
 }
 
-export async function toggleProfileFollow(
-  supabase: SupabaseClient,
-  followingId: string
-): Promise<ActionResult<{ following: boolean }>> {
-  const { data, error } = await supabase.rpc("toggle_profile_follow", {
-    p_following_id: followingId,
-  });
-
-  if (error) {
-    return {
-      ok: false,
-      message: getErrorMessage(error, "Unable to update follow."),
-    };
-  }
-
-  const row = asRecord(data);
-  return {
-    ok: true,
-    following: Boolean(row?.following),
-  };
-}
 
 export async function getNotificationPreferences(
   supabase: SupabaseClient
@@ -487,46 +468,6 @@ export async function notifyPostJourneySummary(
   return {
     ok: true,
     created: Boolean(row?.created),
-    notificationId:
-      typeof row?.notificationId === "string" ? row.notificationId : null,
-  };
-}
-
-export async function awardUmPoints(
-  supabase: SupabaseClient,
-  input: {
-    points: number;
-    reason: string;
-    dedupeKey: string;
-    metadata?: Record<string, unknown>;
-  }
-): Promise<
-  ActionResult<{
-    created: boolean;
-    balance: number;
-    notificationId: string | null;
-  }>
-> {
-  const { data, error } = await supabase.rpc("award_um_points", {
-    p_points: input.points,
-    p_reason: input.reason,
-    p_dedupe_key: input.dedupeKey,
-    p_metadata: input.metadata ?? {},
-  });
-
-  if (error) {
-    return {
-      ok: false,
-      message: getErrorMessage(error, "Unable to award UM Points."),
-    };
-  }
-
-  const row = asRecord(data);
-  const balance = Number(row?.balance ?? 0);
-  return {
-    ok: true,
-    created: Boolean(row?.created),
-    balance: Number.isFinite(balance) ? balance : 0,
     notificationId:
       typeof row?.notificationId === "string" ? row.notificationId : null,
   };

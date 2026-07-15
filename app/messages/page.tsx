@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { messagesMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import { APP_ROUTES } from "../lib/nav";
 import MessagesExperience from "./MessagesExperience";
 
+export const metadata = messagesMetadata;
 export const dynamic = "force-dynamic";
 
 function MessagesFallback() {

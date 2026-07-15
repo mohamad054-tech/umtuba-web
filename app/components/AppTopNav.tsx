@@ -49,7 +49,7 @@ export default function AppTopNav({
 
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-1 sm:flex sm:gap-2 md:gap-2"
+          className="hidden items-center gap-1 sm:flex sm:gap-2"
         >
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);

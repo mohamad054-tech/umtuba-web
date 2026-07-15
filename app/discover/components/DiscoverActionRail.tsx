@@ -27,6 +27,8 @@ type DiscoverActionRailProps = {
   likedByMe: boolean;
   savedByMe: boolean;
   caption?: string;
+  /** Safe path for login `?next=` (defaults to Discover). */
+  returnPath?: string;
   onComment?: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
@@ -42,6 +44,7 @@ export default function DiscoverActionRail({
   likedByMe,
   savedByMe,
   caption,
+  returnPath = APP_ROUTES.discover,
   onComment,
   onStatsChange,
   onFlagsChange,
@@ -149,7 +152,9 @@ export default function DiscoverActionRail({
   }
 
   function redirectToLogin() {
-    router.push(`${APP_ROUTES.login}?next=${encodeURIComponent("/discover")}`);
+    router.push(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(returnPath || APP_ROUTES.discover)}`
+    );
   }
 
   function shareInput() {

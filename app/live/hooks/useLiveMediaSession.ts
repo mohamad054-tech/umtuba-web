@@ -19,6 +19,12 @@ import type {
   LiveStageLayoutMode,
 } from "../types";
 import {
+  LIVE_MEDIA_MAX_RECONNECT_ATTEMPTS,
+  liveMediaConnectionLabel,
+  liveMediaReconnectDelayMs,
+  liveMediaTokenRefreshDelayMs,
+} from "./liveSessionPolicy";
+import {
   classifyMediaCaptureError,
   isRoomMediaConnected,
 } from "./mediaDeviceErrors";
@@ -111,6 +117,20 @@ function isBenignDisconnectMessage(message: string): boolean {
   );
 }
 
+async function safeDisconnectRoom(room: Room | null) {
+  if (!room) return;
+  try {
+    room.removeAllListeners();
+  } catch {
+    // EventEmitter may already be torn down.
+  }
+  try {
+    await room.disconnect();
+  } catch {
+    // Ignore disconnect races during teardown.
+  }
+}
+
 export function useLiveMediaSession(
   options: UseLiveMediaSessionOptions
 ): UseLiveMediaSessionResult {
@@ -120,13 +140,18 @@ export function useLiveMediaSession(
     mediaReady,
     onStageParticipants,
     anonIdentity,
-    displayName,
     forcePublish = false,
   } = options;
 
   const roomRef = useRef<Room | null>(null);
   const grantsRef = useRef<LiveMediaTokenPayload["grants"] | null>(null);
   const optionsRef = useRef(options);
+  const intentionalTeardownRef = useRef(false);
+  const reconnectAttemptRef = useRef(0);
+  const reconnectTimerRef = useRef<number | null>(null);
+  const tokenRefreshTimerRef = useRef<number | null>(null);
+  const desiredDevicesRef = useRef({ mic: false, camera: false });
+  const restoringDevicesRef = useRef(false);
 
   useEffect(() => {
     optionsRef.current = options;
@@ -157,6 +182,73 @@ export function useLiveMediaSession(
   const deviceBusyRef = useRef(false);
 
   const onStageIds = onStageParticipants.map((p) => p.userId).join(",");
+
+  const clearReconnectTimer = useCallback(() => {
+    if (reconnectTimerRef.current != null) {
+      window.clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
+  }, []);
+
+  const clearTokenRefreshTimer = useCallback(() => {
+    if (tokenRefreshTimerRef.current != null) {
+      window.clearTimeout(tokenRefreshTimerRef.current);
+      tokenRefreshTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleTokenRefresh = useCallback(
+    (expiresAt: number, generation: number) => {
+      clearTokenRefreshTimer();
+      const delay = liveMediaTokenRefreshDelayMs(expiresAt);
+      if (delay == null) return;
+
+      tokenRefreshTimerRef.current = window.setTimeout(() => {
+        if (generation !== sessionGenRef.current) return;
+        if (!optionsRef.current.enabled || !optionsRef.current.mediaReady) {
+          return;
+        }
+        setTokenEpoch((n) => n + 1);
+      }, delay);
+    },
+    [clearTokenRefreshTimer]
+  );
+
+  const scheduleUnexpectedReconnect = useCallback(
+    (generation: number) => {
+      if (intentionalTeardownRef.current) return;
+      if (generation !== sessionGenRef.current) return;
+      if (!optionsRef.current.enabled || !optionsRef.current.mediaReady) {
+        return;
+      }
+
+      if (reconnectAttemptRef.current >= LIVE_MEDIA_MAX_RECONNECT_ATTEMPTS) {
+        setConnectionState("error");
+        setError(
+          "Network interrupted. Check your connection, then tap Reconnect."
+        );
+        return;
+      }
+
+      clearReconnectTimer();
+      setConnectionState("reconnecting");
+      setError("Network interrupted. Reconnecting…");
+
+      const attempt = reconnectAttemptRef.current;
+      const delay = liveMediaReconnectDelayMs(attempt);
+      reconnectAttemptRef.current = attempt + 1;
+
+      reconnectTimerRef.current = window.setTimeout(() => {
+        if (intentionalTeardownRef.current) return;
+        if (generation !== sessionGenRef.current) return;
+        if (!optionsRef.current.enabled || !optionsRef.current.mediaReady) {
+          return;
+        }
+        setTokenEpoch((n) => n + 1);
+      }, delay);
+    },
+    [clearReconnectTimer]
+  );
 
   const rebuildTiles = useCallback(() => {
     const room = roomRef.current;
@@ -271,15 +363,47 @@ export function useLiveMediaSession(
     setScreenSharing(lp.isScreenShareEnabled);
   }, []);
 
+  const restoreDesiredDevices = useCallback(async () => {
+    const room = roomRef.current;
+    const grants = grantsRef.current;
+    if (!room || !grants || restoringDevicesRef.current) {
+      return;
+    }
+
+    const wantMic = desiredDevicesRef.current.mic && grants.canPublishAudio;
+    const wantCam = desiredDevicesRef.current.camera && grants.canPublishVideo;
+    if (!wantMic && !wantCam) {
+      return;
+    }
+
+    restoringDevicesRef.current = true;
+    try {
+      if (wantMic && !room.localParticipant.isMicrophoneEnabled) {
+        await room.localParticipant.setMicrophoneEnabled(true);
+      }
+      if (wantCam && !room.localParticipant.isCameraEnabled) {
+        await room.localParticipant.setCameraEnabled(true);
+      }
+      rebuildTiles();
+    } catch (err) {
+      setError(classifyMediaCaptureError(err, wantCam ? "camera" : "microphone"));
+      rebuildTiles();
+    } finally {
+      restoringDevicesRef.current = false;
+      setMicEnabled(room.localParticipant.isMicrophoneEnabled);
+      setCameraEnabled(room.localParticipant.isCameraEnabled);
+    }
+  }, [rebuildTiles]);
+
   useEffect(() => {
     if (!enabled || !mediaReady) {
+      intentionalTeardownRef.current = true;
+      clearReconnectTimer();
+      clearTokenRefreshTimer();
       sessionGenRef.current += 1;
       const room = roomRef.current;
       roomRef.current = null;
-      if (room) {
-        void room.disconnect();
-      }
-      // Defer state resets so teardown does not cascade synchronously in-effect.
+      void safeDisconnectRoom(room);
       queueMicrotask(() => {
         setConnectionState("idle");
         setTiles([]);
@@ -288,25 +412,37 @@ export function useLiveMediaSession(
         setScreenSharing(false);
         setDeviceBusy(false);
         deviceBusyRef.current = false;
+        desiredDevicesRef.current = { mic: false, camera: false };
       });
       return;
     }
 
+    intentionalTeardownRef.current = false;
     const generation = ++sessionGenRef.current;
     let disposed = false;
 
     const isCurrent = () =>
       !disposed && generation === sessionGenRef.current;
 
-    async function runConnect() {
-      setConnectionState("connecting");
-      setError(null);
+    const guardedRebuild = () => {
+      if (!isCurrent()) return;
+      rebuildTiles();
+    };
 
+    async function runConnect() {
+      setConnectionState(
+        reconnectAttemptRef.current > 0 ? "reconnecting" : "connecting"
+      );
+      if (reconnectAttemptRef.current === 0) {
+        setError(null);
+      }
+
+      const opts = optionsRef.current;
       const tokenResult = await getLiveMediaTokenAction({
         roomId,
-        anonIdentity,
-        displayName,
-        forcePublish,
+        anonIdentity: opts.anonIdentity,
+        displayName: opts.displayName,
+        forcePublish: opts.forcePublish,
       });
 
       if (!isCurrent()) {
@@ -316,6 +452,7 @@ export function useLiveMediaSession(
       if (!tokenResult.ok) {
         setError(tokenResult.message);
         setConnectionState("error");
+        scheduleUnexpectedReconnect(generation);
         return;
       }
 
@@ -324,9 +461,9 @@ export function useLiveMediaSession(
       setLocalGrants(media.grants);
 
       const previous = roomRef.current;
+      roomRef.current = null;
       if (previous) {
-        roomRef.current = null;
-        await previous.disconnect();
+        await safeDisconnectRoom(previous);
       }
 
       if (!isCurrent()) {
@@ -342,61 +479,80 @@ export function useLiveMediaSession(
       room
         .on(RoomEvent.ConnectionStateChanged, (state) => {
           if (!isCurrent()) return;
+          if (state === ConnectionState.Disconnected) {
+            return;
+          }
           setConnectionState(mapConnectionState(state));
         })
         .on(RoomEvent.Reconnecting, () => {
           if (!isCurrent()) return;
           setConnectionState("reconnecting");
+          setError("Network interrupted. Reconnecting…");
         })
         .on(RoomEvent.Connected, () => {
           if (!isCurrent()) return;
+          reconnectAttemptRef.current = 0;
           setConnectionState("connected");
-          rebuildTiles();
+          setError(null);
+          guardedRebuild();
         })
         .on(RoomEvent.Disconnected, () => {
           if (!isCurrent()) return;
-          // Intentional teardown uses generation bump; ignore here.
+          if (intentionalTeardownRef.current) return;
           if (generation !== sessionGenRef.current) return;
-          setConnectionState("idle");
           setTiles([]);
+          setConnectionState("reconnecting");
+          scheduleUnexpectedReconnect(generation);
         })
-        .on(RoomEvent.ParticipantConnected, rebuildTiles)
-        .on(RoomEvent.ParticipantDisconnected, rebuildTiles)
-        .on(RoomEvent.TrackSubscribed, rebuildTiles)
-        .on(RoomEvent.TrackUnsubscribed, rebuildTiles)
-        .on(RoomEvent.LocalTrackPublished, rebuildTiles)
-        .on(RoomEvent.LocalTrackUnpublished, rebuildTiles)
+        .on(RoomEvent.ParticipantConnected, guardedRebuild)
+        .on(RoomEvent.ParticipantDisconnected, guardedRebuild)
+        .on(RoomEvent.TrackSubscribed, guardedRebuild)
+        .on(RoomEvent.TrackUnsubscribed, guardedRebuild)
+        .on(RoomEvent.LocalTrackPublished, guardedRebuild)
+        .on(RoomEvent.LocalTrackUnpublished, guardedRebuild)
         .on(RoomEvent.ActiveSpeakersChanged, () => {
           if (!isCurrent()) return;
           const top = room.activeSpeakers[0]?.identity ?? null;
           setActiveSpeakerId(top);
-          rebuildTiles();
         })
-        .on(RoomEvent.ConnectionQualityChanged, rebuildTiles);
+        .on(RoomEvent.ConnectionQualityChanged, () => {
+          if (!isCurrent()) return;
+          setTiles((prev) => {
+            if (prev.length === 0) return prev;
+            let changed = false;
+            const next = prev.map((tile) => {
+              const baseId = tile.identity.replace(/:screen$/, "");
+              const participant =
+                room.localParticipant.identity === baseId
+                  ? room.localParticipant
+                  : room.remoteParticipants.get(baseId);
+              if (!participant) return tile;
+              const q = mapQuality(participant.connectionQuality);
+              if (q === tile.connectionQuality) return tile;
+              changed = true;
+              return { ...tile, connectionQuality: q };
+            });
+            return changed ? next : prev;
+          });
+        });
 
       try {
         await room.connect(media.livekitUrl, media.token);
 
         if (!isCurrent()) {
-          // Stale session — disconnect without surfacing as an error.
           roomRef.current = null;
-          await room.disconnect();
+          await safeDisconnectRoom(room);
           return;
         }
 
-        // Do not auto-enable mic/camera on connect. Requesting devices here races
-        // with token reconnects (participant hydration) and previously leaked
-        // deviceBusy=true when the effect aborted mid-getUserMedia — leaving Mic/
-        // Camera permanently disabled. Host/guest enable via explicit toggles.
-        if (!isCurrent()) {
-          return;
-        }
-
-        rebuildTiles();
+        reconnectAttemptRef.current = 0;
+        scheduleTokenRefresh(media.expiresAt, generation);
+        guardedRebuild();
         setConnectionState("connected");
         setError(null);
         setDeviceBusy(false);
         deviceBusyRef.current = false;
+        void restoreDesiredDevices();
       } catch (err) {
         deviceBusyRef.current = false;
         if (!isCurrent()) {
@@ -407,12 +563,12 @@ export function useLiveMediaSession(
           err instanceof Error
             ? err.message
             : "Unable to connect to live media.";
-        // Cleanup/reconnect intentionally aborts in-flight connects.
         if (isBenignDisconnectMessage(message)) {
           return;
         }
         setError(message);
         setConnectionState("error");
+        scheduleUnexpectedReconnect(generation);
       }
     }
 
@@ -420,12 +576,13 @@ export function useLiveMediaSession(
 
     return () => {
       disposed = true;
+      intentionalTeardownRef.current = true;
+      clearReconnectTimer();
+      clearTokenRefreshTimer();
       sessionGenRef.current += 1;
       const room = roomRef.current;
       roomRef.current = null;
-      if (room) {
-        void room.disconnect();
-      }
+      void safeDisconnectRoom(room);
     };
   }, [
     enabled,
@@ -433,9 +590,13 @@ export function useLiveMediaSession(
     roomId,
     tokenEpoch,
     anonIdentity,
-    displayName,
     forcePublish,
     rebuildTiles,
+    restoreDesiredDevices,
+    scheduleTokenRefresh,
+    scheduleUnexpectedReconnect,
+    clearReconnectTimer,
+    clearTokenRefreshTimer,
   ]);
 
   useEffect(() => {
@@ -476,15 +637,15 @@ export function useLiveMediaSession(
     }
 
     void (async () => {
-      // Host moderation flags only — do not fight token grants with stale
-      // canPublish* participant fields (those caused silent toggle no-ops).
       let changed = false;
       if (me.mutedByHost && room.localParticipant.isMicrophoneEnabled) {
         await room.localParticipant.setMicrophoneEnabled(false);
+        desiredDevicesRef.current.mic = false;
         changed = true;
       }
       if (me.cameraDisabledByHost && room.localParticipant.isCameraEnabled) {
         await room.localParticipant.setCameraEnabled(false);
+        desiredDevicesRef.current.camera = false;
         changed = true;
       }
       if (!me.canShareScreen && room.localParticipant.isScreenShareEnabled) {
@@ -497,7 +658,28 @@ export function useLiveMediaSession(
     })();
   }, [onStageParticipants, connectionState, rebuildTiles]);
 
+  // Apply playback mute without forcing a full tile rebuild.
+  useEffect(() => {
+    const room = roomRef.current;
+    if (!room || connectionState !== "connected") {
+      return;
+    }
+    const muted = Boolean(options.playbackMuted);
+    room.remoteParticipants.forEach((rp) => {
+      const audioPub = rp.getTrackPublication(Track.Source.Microphone);
+      const els = audioPub?.track?.attachedElements ?? [];
+      for (const el of els) {
+        if (el instanceof HTMLAudioElement) {
+          el.muted = muted;
+        }
+      }
+    });
+  }, [options.playbackMuted, connectionState]);
+
   const refreshTokenAndReconnect = useCallback(async () => {
+    reconnectAttemptRef.current = 0;
+    setError(null);
+    setConnectionState("reconnecting");
     setTokenEpoch((n) => n + 1);
   }, []);
 
@@ -552,20 +734,23 @@ export function useLiveMediaSession(
 
     const next = !room.localParticipant.isMicrophoneEnabled;
     setMicEnabled(next);
+    desiredDevicesRef.current.mic = next;
     setError(null);
     setPermissionState("prompt");
 
-    // Invoke LiveKit in this synchronous click turn so the browser keeps
-    // user-activation for getUserMedia (awaiting first loses the gesture).
     const op = room.localParticipant.setMicrophoneEnabled(next);
     void op
       .then(() => {
         setPermissionState("granted");
-        setMicEnabled(room.localParticipant.isMicrophoneEnabled);
+        const enabledNow = room.localParticipant.isMicrophoneEnabled;
+        setMicEnabled(enabledNow);
+        desiredDevicesRef.current.mic = enabledNow;
         rebuildTiles();
       })
       .catch((err: unknown) => {
         setMicEnabled(room.localParticipant.isMicrophoneEnabled);
+        desiredDevicesRef.current.mic =
+          room.localParticipant.isMicrophoneEnabled;
         setPermissionState("denied");
         setError(classifyMediaCaptureError(err, "microphone"));
         rebuildTiles();
@@ -607,6 +792,7 @@ export function useLiveMediaSession(
 
     const next = !room.localParticipant.isCameraEnabled;
     setCameraEnabled(next);
+    desiredDevicesRef.current.camera = next;
     setError(null);
     setPermissionState("prompt");
 
@@ -614,11 +800,15 @@ export function useLiveMediaSession(
     void op
       .then(() => {
         setPermissionState("granted");
-        setCameraEnabled(room.localParticipant.isCameraEnabled);
+        const enabledNow = room.localParticipant.isCameraEnabled;
+        setCameraEnabled(enabledNow);
+        desiredDevicesRef.current.camera = enabledNow;
         rebuildTiles();
       })
       .catch((err: unknown) => {
         setCameraEnabled(room.localParticipant.isCameraEnabled);
+        desiredDevicesRef.current.camera =
+          room.localParticipant.isCameraEnabled;
         setPermissionState("denied");
         setError(classifyMediaCaptureError(err, "camera"));
         rebuildTiles();
@@ -722,20 +912,16 @@ export function useLiveMediaSession(
     }
   }, [beginDeviceOp, endDeviceOp, rebuildTiles, requireConnectedRoom]);
 
-  const connectionLabel =
-    connectionState === "connected"
-      ? tiles.some((t) => t.connectionQuality === "poor")
-        ? "Poor"
-        : tiles.some((t) => t.connectionQuality === "good")
-          ? "Good"
-          : "Excellent"
-      : connectionState === "reconnecting"
-        ? "Reconnecting"
-        : connectionState === "connecting"
-          ? "Connecting"
-          : connectionState === "error"
-            ? "Error"
-            : "Offline";
+  const qualityHint: "excellent" | "good" | "poor" | "unknown" =
+    tiles.some((t) => t.connectionQuality === "poor")
+      ? "poor"
+      : tiles.some((t) => t.connectionQuality === "good")
+        ? "good"
+        : tiles.some((t) => t.connectionQuality === "excellent")
+          ? "excellent"
+          : "unknown";
+
+  const connectionLabel = liveMediaConnectionLabel(connectionState, qualityHint);
 
   useEffect(() => {
     if (typeof window === "undefined") {

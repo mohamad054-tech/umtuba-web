@@ -54,6 +54,17 @@ export function dedupeAiInsight(userId: string, insightKey: string): string {
   return `ai_creator_insight:${userId}:${insightKey.trim()}`;
 }
 
+export function dedupeReferralReward(referredUserId: string): string {
+  return `referral_signup:${referredUserId.trim()}`;
+}
+
+export function dedupeReferralRewardBatch(
+  inviterId: string,
+  utcHourKey: string
+): string {
+  return `referral_reward_batch:${inviterId.trim()}:${utcHourKey.trim()}`;
+}
+
 /** View milestones that should fire once per post. */
 export const VIEW_MILESTONES = [500, 1000, 10_000, 100_000] as const;
 

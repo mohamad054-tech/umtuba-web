@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { APP_ROUTES } from "../../lib/nav";
+import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 
 type AuthShellProps = {
   title: string;
@@ -20,7 +20,9 @@ export default function AuthShell({
   panelBody = "Join UMTUBA for videos, live discovery, and creators around the world.",
 }: AuthShellProps) {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050510] px-4 py-10 text-white sm:px-6">
+    <main
+      className={`relative min-h-screen overflow-hidden bg-[#050510] px-4 py-10 text-white sm:px-6 ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-indigo-600/20 blur-3xl" />

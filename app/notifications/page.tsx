@@ -1,7 +1,10 @@
+import { notificationsMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { claimVerifiedWelcomeBonus } from "../../lib/supabase/rewards";
 import NotificationsExperience from "./NotificationsExperience";
 import NotificationsShell from "./components/NotificationsShell";
+
+export const metadata = notificationsMetadata;
 
 export default async function NotificationsPage() {
   try {

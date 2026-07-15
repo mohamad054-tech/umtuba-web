@@ -1,0 +1,51 @@
+# Ops: prune ghost live participants every 5 minutes.
+# Requires GitHub repository secret DATABASE_URL (Postgres connection string).
+# Never commit DATABASE_URL. Never echo the secret in steps.
+#
+# Status: workflow file prepared — scheduling is active only after this file
+# is on the default/deployed branch AND DATABASE_URL is set in repo Secrets.
+
+name: Prune stale live participants
+
+on:
+  schedule:
+    # Every 5 minutes (UTC). GitHub may delay under load.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prune-stale-live-participants
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require DATABASE_URL secret
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "DATABASE_URL secret is not set. Add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+
+      - name: Run prune RPC
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # Do not print DATABASE_URL or query results that could leak connection info.
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -qAtc \
+            "select public.prune_stale_live_participants(120);" > /tmp/prune_result.txt
+          # Print only the integer return (number of rows marked left).
+          echo "prune_stale_live_participants returned: $(cat /tmp/prune_result.txt)"
+          rm -f /tmp/prune_result.txt

@@ -30,6 +30,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local diagnostics / probe artifacts (never commit)
+tmp-*
+/tmp-*.json
+/tmp-*.png
+/tmp-*.jpg
+/tmp-*.webp
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example

@@ -20,6 +20,7 @@ const discoverSample: DiscoverVideo = {
     name: "Ada",
     username: "@ada",
     avatar: "A",
+    isFollowing: true,
   },
   stats: { likes: 10, comments: 2, shares: 1, saves: 3, views: 100 },
   likedByMe: true,
@@ -40,13 +41,14 @@ const demoSample: DemoVideo = {
 };
 
 describe("mapWatchVideo", () => {
-  it("maps discover videos with numeric post ids", () => {
+  it("maps discover videos with numeric post ids and follow state", () => {
     const watch = discoverVideoToWatchVideo(discoverSample);
     expect(watch.source).toBe("supabase");
     expect(watch.postId).toBe(42);
     expect(watch.title).toBe("First line");
     expect(watch.likedByMe).toBe(true);
     expect(watch.stats.views).toBe(100);
+    expect(watch.author.isFollowing).toBe(true);
   });
 
   it("maps demo videos as fallback without post ids", () => {

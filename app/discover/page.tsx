@@ -1,8 +1,13 @@
 import { Suspense } from "react";
+import { discoverMetadata } from "../../lib/site/routeMetadata";
 import { getServerUser } from "../../lib/supabase/server";
-import { getDiscoverVideosServer } from "../../lib/supabase/videoPostsServer";
+import {
+  encodeWatchPageCursor,
+  getDiscoverVideosServer,
+} from "../../lib/supabase/videoPostsServer";
 import DiscoverExperience from "./DiscoverExperience";
 
+export const metadata = discoverMetadata;
 export const dynamic = "force-dynamic";
 
 function DiscoverFallback() {
@@ -22,11 +27,22 @@ function DiscoverFallback() {
   );
 }
 
-async function DiscoverLoader() {
-  // Same request as the feed — keeps viewer identity tied to this session's cookies.
+type DiscoverPageProps = {
+  searchParams?:
+    | Promise<{ post?: string; city?: string; comment?: string }>
+    | { post?: string; city?: string; comment?: string };
+};
+
+async function DiscoverLoader({ searchParams }: DiscoverPageProps) {
+  const params = await Promise.resolve(searchParams ?? {});
+  const focusRaw = params.post ?? null;
+  const focusPostId = focusRaw ? Number(focusRaw) : NaN;
+  const focus =
+    Number.isInteger(focusPostId) && focusPostId > 0 ? focusPostId : null;
+
   const [user, result] = await Promise.all([
     getServerUser().catch(() => null),
-    getDiscoverVideosServer(),
+    getDiscoverVideosServer({ focusPostId: focus }),
   ]);
   const initialViewerId = user?.id ?? null;
 
@@ -34,6 +50,7 @@ async function DiscoverLoader() {
     return (
       <DiscoverExperience
         videos={[]}
+        initialCursor={null}
         loadError={result.message}
         initialViewerId={initialViewerId}
       />
@@ -43,15 +60,16 @@ async function DiscoverLoader() {
   return (
     <DiscoverExperience
       videos={result.videos}
+      initialCursor={encodeWatchPageCursor(result.nextCursor)}
       initialViewerId={initialViewerId}
     />
   );
 }
 
-export default function DiscoverPage() {
+export default function DiscoverPage(props: DiscoverPageProps) {
   return (
     <Suspense fallback={<DiscoverFallback />}>
-      <DiscoverLoader />
+      <DiscoverLoader searchParams={props.searchParams} />
     </Suspense>
   );
 }

@@ -12,6 +12,7 @@ type VideoSlideProps = {
   video: WatchVideo;
   active: boolean;
   muted: boolean;
+  viewerId?: string | null;
   forcePause?: boolean;
   transitionLocked?: boolean;
   onToggleMute: () => void;
@@ -27,6 +28,7 @@ export default function VideoSlide({
   video,
   active,
   muted,
+  viewerId = null,
   forcePause = false,
   transitionLocked = false,
   onToggleMute,
@@ -83,6 +85,7 @@ export default function VideoSlide({
       />
       <VideoOverlay
         video={video}
+        viewerId={viewerId}
         transitionLocked={transitionLocked}
         onOpenPanel={onOpenPanel}
         onPostJourney={onPostJourney}

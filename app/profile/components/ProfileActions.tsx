@@ -2,27 +2,33 @@
 
 import Link from "next/link";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
+import FollowButton from "../../components/social/FollowButton";
 import { APP_ROUTES, buildLiveStreamHref, isUuid } from "../../lib/nav";
+import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
 
 type ProfileActionsProps = {
   profile: ProfileView;
   isOwner: boolean;
+  viewerId?: string | null;
   isFollowing: boolean;
-  onToggleFollow: () => void;
+  onFollowChange?: (snapshot: FollowSnapshot) => void;
 };
 
 export default function ProfileActions({
   profile,
   isOwner,
+  viewerId = null,
   isFollowing,
-  onToggleFollow,
+  onFollowChange,
 }: ProfileActionsProps) {
   const liveHref = profile.liveStreamId
     ? buildLiveStreamHref(profile.liveStreamId)
     : null;
   // Real Supabase auth UUID only — mock / missing ids stay hidden.
   const canMessage =
+    !isOwner && profile.source === "supabase" && isUuid(profile.id);
+  const canFollow =
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
 
   if (isOwner) {
@@ -40,17 +46,15 @@ export default function ProfileActions({
 
   return (
     <div className="flex flex-wrap items-start gap-2">
-      <button
-        type="button"
-        onClick={onToggleFollow}
-        className={`watch-focus-ring rounded-full px-5 py-2.5 text-sm font-black transition ${
-          isFollowing
-            ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
-            : "bg-white text-black hover:bg-white/90"
-        }`}
-      >
-        {isFollowing ? "Following" : "Follow"}
-      </button>
+      {canFollow ? (
+        <FollowButton
+          targetUserId={profile.id}
+          viewerId={viewerId}
+          initialFollowing={isFollowing}
+          returnPath={`${APP_ROUTES.profile}/${profile.username}`}
+          onFollowChange={onFollowChange}
+        />
+      ) : null}
 
       <StartDirectMessageButton
         peerUserId={profile.id}

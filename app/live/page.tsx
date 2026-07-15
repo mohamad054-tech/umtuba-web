@@ -1,5 +1,8 @@
 import { Suspense } from "react";
+import { liveMetadata } from "../../lib/site/routeMetadata";
 import LiveExperience from "./LiveExperience";
+
+export const metadata = liveMetadata;
 
 function LiveFallback() {
   return (

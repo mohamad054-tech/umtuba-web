@@ -18,10 +18,12 @@ export default function TopNavbar() {
             Create
           </button>
 
-          <Link href="/profile">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-black text-black">
-              M
-            </div>
+          <Link
+            href="/settings"
+            aria-label="Account settings"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-black text-black"
+          >
+            A
           </Link>
         </div>
       </div>

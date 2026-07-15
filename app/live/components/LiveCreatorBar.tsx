@@ -1,4 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import FollowButton from "../../components/social/FollowButton";
+import { APP_ROUTES, buildDiscoverCityHref, isUuid } from "../../lib/nav";
+import { isExperimentalRouteAvailable } from "../../lib/product/surfaceGates";
+import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { LiveRoom } from "../types";
 import { citySlugFromName } from "../types";
 
@@ -7,8 +13,10 @@ type LiveCreatorBarProps = {
   city: string;
   country: string;
   startedAtLabel: string;
+  roomId: string;
+  viewerId?: string | null;
   isFollowing: boolean;
-  onToggleFollow: () => void;
+  onFollowChange?: (snapshot: FollowSnapshot) => void;
 };
 
 export default function LiveCreatorBar({
@@ -16,12 +24,22 @@ export default function LiveCreatorBar({
   city,
   country,
   startedAtLabel,
+  roomId,
+  viewerId = null,
   isFollowing,
-  onToggleFollow,
+  onFollowChange,
 }: LiveCreatorBarProps) {
   const locationLabel = `${city}, ${country}`;
   const citySlug = citySlugFromName(city);
-  const exploreHref = citySlug ? `/city/${citySlug}` : "/";
+  const exploreHref = isExperimentalRouteAvailable()
+    ? citySlug
+      ? `/city/${citySlug}`
+      : "/"
+    : buildDiscoverCityHref(city, country);
+
+  const hostId = host.id;
+  const isSelf = Boolean(viewerId && hostId && viewerId === hostId);
+  const canFollow = isUuid(hostId) && !isSelf;
 
   return (
     <div className="space-y-4">
@@ -50,17 +68,15 @@ export default function LiveCreatorBar({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onToggleFollow}
-          className={`rounded-full px-5 py-2.5 text-sm font-black transition ${
-            isFollowing
-              ? "border border-white/15 bg-white/10 text-white hover:bg-white/15"
-              : "bg-white text-black hover:bg-white/90"
-          }`}
-        >
-          {isFollowing ? "Following" : "Follow"}
-        </button>
+        {canFollow ? (
+          <FollowButton
+            targetUserId={hostId}
+            viewerId={viewerId}
+            initialFollowing={isFollowing}
+            returnPath={`${APP_ROUTES.live}/${roomId}`}
+            onFollowChange={onFollowChange}
+          />
+        ) : null}
       </div>
 
       <div className="flex flex-wrap gap-2">

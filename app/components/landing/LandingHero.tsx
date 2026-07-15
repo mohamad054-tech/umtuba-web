@@ -47,7 +47,7 @@ export default function LandingHero() {
           UMTUBA
         </Link>
 
-        <div className="landing-nav-links hidden items-center gap-9 text-[15px] font-medium tracking-wide text-white/55 md:flex">
+        <div className="landing-nav-links hidden items-center gap-9 text-[15px] font-medium tracking-wide text-white/55 sm:flex">
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
 

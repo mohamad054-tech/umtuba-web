@@ -3,11 +3,14 @@ import { Suspense } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import TopNavbar from "../components/TopNavbar";
 import PostJourneyGlobeSection from "./PostJourneyGlobeSection";
+import { postJourneyMetadata } from "../../lib/site/routeMetadata";
 import { createClient } from "../../lib/supabase/server";
 import { getPostJourney } from "../../lib/supabase/rewards";
 import { APP_ROUTES, buildPostNotificationHref } from "../lib/nav";
 import { countryCodeToFlag } from "../notifications/lib/notificationMeta";
 import { formatInteractionCount } from "../lib/social/shareAndViews";
+
+export const metadata = postJourneyMetadata;
 
 function PostJourneyGlobeFallback() {
   return (
@@ -60,7 +63,7 @@ export default async function PostJourneyPage({
   ];
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main className="min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
       <TopNavbar />
 
       <div className="mx-auto grid max-w-[1420px] grid-cols-1 gap-7 px-5 py-8 md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)_300px]">

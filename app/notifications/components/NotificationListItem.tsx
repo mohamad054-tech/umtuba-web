@@ -27,6 +27,7 @@ const TYPE_LABEL: Record<NotificationType, string> = {
   post_journey_summary: "Journey",
   um_points_earned: "UM Points",
   reward_milestone: "Reward",
+  referral_reward: "Referral",
   nearby_live_started: "Nearby",
   ai_creator_insight: "AI Insight",
   post_save: "Save",
@@ -47,6 +48,7 @@ const TYPE_ICON: Record<NotificationType, string> = {
   post_journey_summary: "◉",
   um_points_earned: "◆",
   reward_milestone: "◆",
+  referral_reward: "🎉",
   nearby_live_started: "◎",
   ai_creator_insight: "✦",
   post_save: "☆",
@@ -69,7 +71,9 @@ export default function NotificationListItem({
   const countryName = readMetaString(meta, "countryName");
   const city = readMetaString(meta, "city");
   const flag = countryCodeToFlag(countryCode);
-  const points = readMetaNumber(meta, "points");
+  const points =
+    readMetaNumber(meta, "points") ??
+    readMetaNumber(meta, "pointsAwarded");
   const milestoneValue = formatMilestoneValue(
     meta.milestoneValue ?? meta.countryCount
   );
@@ -155,7 +159,8 @@ export default function NotificationListItem({
           ) : null}
           {points != null &&
           (notification.type === "um_points_earned" ||
-            notification.type === "reward_milestone") ? (
+            notification.type === "reward_milestone" ||
+            notification.type === "referral_reward") ? (
             <span className="rounded-full border border-violet-400/25 bg-violet-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-100">
               +{points.toLocaleString()} UM
             </span>

@@ -1,4 +1,5 @@
 import type { DiscoverStats } from "../discover/types";
+import { VIDEO_FEED_PAGE_SIZE } from "../lib/video/feedPolicy";
 
 export type WatchVideoSource = "supabase" | "demo";
 
@@ -7,6 +8,8 @@ export type WatchVideoAuthor = {
   name: string;
   username: string;
   avatar: string;
+  /** Authoritative follow state for the current viewer (hydrated server-side). */
+  isFollowing?: boolean;
 };
 
 export type WatchVideo = {
@@ -39,4 +42,4 @@ export type WatchFeedPage = {
   usedDemoFallback: boolean;
 };
 
-export const WATCH_FEED_PAGE_SIZE = 12;
+export const WATCH_FEED_PAGE_SIZE = VIDEO_FEED_PAGE_SIZE;

@@ -26,6 +26,7 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
       name: video.creator.name,
       username: video.creator.username,
       avatar: video.creator.avatar,
+      isFollowing: Boolean(video.creator.isFollowing),
     },
     stats: { ...video.stats },
     likedByMe: video.likedByMe,

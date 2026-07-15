@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES } from "../../lib/nav";
+import { createVideoMetadata } from "../../../lib/site/routeMetadata";
 import { getServerUser } from "../../../lib/supabase/server";
 import CreateVideoForm from "./CreateVideoForm";
 
+export const metadata = createVideoMetadata;
 export const dynamic = "force-dynamic";
 
 export default async function CreateVideoPage() {
@@ -17,7 +19,7 @@ export default async function CreateVideoPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050510] text-white">
+    <main className="relative min-h-screen overflow-hidden bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-sky-500/12 blur-3xl" />

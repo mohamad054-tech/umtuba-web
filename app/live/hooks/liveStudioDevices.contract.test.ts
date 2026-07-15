@@ -55,7 +55,13 @@ describe("Live Studio media device contracts", () => {
     expect(source).toContain("setMicrophoneEnabled");
     expect(source).toContain("setCameraEnabled");
     expect(source).toContain("permissionState");
-    expect(source).toContain("void room.disconnect()");
+    expect(source).toContain("safeDisconnectRoom");
+    expect(source).toContain("removeAllListeners");
     expect(source).toContain("sessionGenRef.current += 1");
+    expect(source).toContain("scheduleUnexpectedReconnect");
+    expect(source).toContain("scheduleTokenRefresh");
+    expect(source).toContain("desiredDevicesRef");
+    expect(source).toContain("optionsRef.current");
   });
 });
+

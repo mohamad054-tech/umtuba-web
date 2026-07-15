@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { loadProfileActivityTier } from "../../actions/activityTiers";
 import { buildActivityTierProgress } from "../../../lib/activity-tiers";
-import { getServerUser } from "../../../lib/supabase/server";
+import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
+import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
+import {
+  getProfileContentStats,
+  listProfileActiveLiveRooms,
+  listProfileVideos,
+  PROFILE_VIDEO_PAGE_SIZE,
+} from "../../../lib/supabase/profileContent";
+import { getServerUser, createClient } from "../../../lib/supabase/server";
 import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
 import { normalizeUsername } from "../../../lib/supabase/validation";
 import ProfileExperience, { ProfileNotFound } from "../ProfileExperience";
@@ -12,6 +21,42 @@ import type { ProfileView } from "../types";
 type ProfilePageProps = {
   params: Promise<{ username: string }>;
 };
+
+/**
+ * Public sharing metadata only: display name, username, bio, optional public avatar.
+ * Never includes email, UM Points, location, or other private fields.
+ */
+export async function generateMetadata({
+  params,
+}: ProfilePageProps): Promise<Metadata> {
+  const { username: rawUsername } = await params;
+  const username = normalizeUsername(decodeURIComponent(rawUsername || ""));
+
+  if (!username) {
+    return buildPublicProfileMetadata(null);
+  }
+
+  try {
+    const row = await getProfileByUsernameFromDb(username);
+    if (!row) {
+      return buildPublicProfileMetadata(null);
+    }
+
+    const displayName =
+      (row.display_name && row.display_name.trim()) ||
+      (row.full_name && row.full_name.trim()) ||
+      null;
+
+    return buildPublicProfileMetadata({
+      username: row.username || username,
+      displayName,
+      bio: row.bio,
+      avatarUrl: row.avatar_url,
+    });
+  } catch {
+    return buildPublicProfileMetadata(null);
+  }
+}
 
 function ProfileFallback() {
   return (
@@ -30,6 +75,7 @@ function ProfileFallback() {
 async function resolveProfile(username: string): Promise<{
   profile: ProfileView | null;
   isOwner: boolean;
+  viewerId: string | null;
 }> {
   const key = normalizeUsername(username);
   let viewerId: string | null = null;
@@ -45,10 +91,37 @@ async function resolveProfile(username: string): Promise<{
     const row = await getProfileByUsernameFromDb(key);
 
     if (row) {
-      const activityTier = await loadProfileActivityTier(row.id);
+      const supabase = await createClient();
+      const [activityTier, followResult, stats, videoPage, liveRooms] =
+        await Promise.all([
+          loadProfileActivityTier(row.id),
+          getProfileFollowSnapshot(supabase, row.id),
+          getProfileContentStats(supabase, row.id),
+          listProfileVideos(supabase, row.id, {
+            limit: PROFILE_VIDEO_PAGE_SIZE,
+          }),
+          listProfileActiveLiveRooms(supabase, row.id),
+        ]);
+
+      if (followResult.ok && followResult.missingProfile) {
+        return { profile: null, isOwner: false, viewerId };
+      }
+
+      const follow = followResult.ok ? followResult : null;
+
       return {
-        profile: { ...profileRowToView(row), activityTier },
+        profile: {
+          ...profileRowToView(row, {
+            follow,
+            stats,
+            videos: videoPage.videos,
+            hasMoreVideos: videoPage.hasMore,
+            liveRooms,
+          }),
+          activityTier,
+        },
         isOwner: Boolean(viewerId && viewerId === row.id),
+        viewerId,
       };
     }
   } catch (error) {
@@ -66,24 +139,27 @@ async function resolveProfile(username: string): Promise<{
           activityTier: buildActivityTierProgress({ score: 420 }),
         },
         isOwner: false,
+        viewerId,
       };
     }
   }
 
-  return { profile: null, isOwner: false };
+  return { profile: null, isOwner: false, viewerId };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username: rawUsername } = await params;
-  const username = normalizeUsername(
-    decodeURIComponent(rawUsername || "")
-  );
-  const { profile, isOwner } = await resolveProfile(username);
+  const username = normalizeUsername(decodeURIComponent(rawUsername || ""));
+  const { profile, isOwner, viewerId } = await resolveProfile(username);
 
   return (
     <Suspense fallback={<ProfileFallback />}>
       {profile ? (
-        <ProfileExperience profile={profile} isOwner={isOwner} />
+        <ProfileExperience
+          profile={profile}
+          isOwner={isOwner}
+          viewerId={viewerId}
+        />
       ) : (
         <ProfileNotFound username={username || "unknown"} />
       )}

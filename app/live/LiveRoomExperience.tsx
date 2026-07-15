@@ -16,8 +16,6 @@ import {
   endLiveRoomAction,
   getLiveRoomAction,
   goLiveRoomAction,
-  heartbeatLiveParticipantAction,
-  joinLiveRoomAction,
   leaveLiveRoomAction,
   listLiveChatAction,
   listLiveParticipantsAction,
@@ -39,7 +37,12 @@ import {
   setLiveStageMediaFlagsAction,
   startLiveSessionAction,
 } from "../actions/liveMedia";
+import { getProfileFollowSnapshotAction } from "../actions/follows";
 import { getAuthenticatedUser } from "../../lib/supabase/auth";
+import {
+  formatFollowCountLabel,
+  type FollowSnapshot,
+} from "../../lib/supabase/follows";
 import { getOrCreateViewerKey } from "../lib/social/shareAndViews";
 import { APP_ROUTES } from "../lib/nav/routes";
 import LiveBackstagePanel from "./components/LiveBackstagePanel";
@@ -53,9 +56,11 @@ import LiveShell from "./components/LiveShell";
 import LiveStreamControls from "./components/LiveStreamControls";
 import LiveStreamMeta from "./components/LiveStreamMeta";
 import LiveStreamStage from "./components/LiveStreamStage";
+import { allowLiveCollabEntry, allowLiveCollabMocks } from "../lib/product/surfaceGates";
 import { MOCK_COLLAB_ITEMS } from "./data/mockCollaboration";
 import { useFloatingReactions } from "./hooks/useFloatingReactions";
 import { useLiveMediaSession } from "./hooks/useLiveMediaSession";
+import { useLiveRoomMembership } from "./hooks/useLiveRoomMembership";
 import { useLiveRoomPresence } from "./hooks/useLiveRoomPresence";
 import { useLiveRoomRealtime } from "./hooks/useLiveRoomRealtime";
 import type {
@@ -104,13 +109,13 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const [loadingMoreChat, setLoadingMoreChat] = useState(false);
   const [sendingChat, setSendingChat] = useState(false);
   const [reacting, setReacting] = useState(false);
-  const [joined, setJoined] = useState(false);
   const [bootLoading, setBootLoading] = useState(true);
   const [participantsLoading, setParticipantsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [permissionError, setPermissionError] = useState<string | null>(null);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [hostFollowersLabel, setHostFollowersLabel] = useState("—");
+  const [followHostKey, setFollowHostKey] = useState<string | null>(null);
   const [muted, setMuted] = useState(false);
   const [captionsOn, setCaptionsOn] = useState(false);
   const [quality, setQuality] = useState<LiveQuality>("Auto");
@@ -119,8 +124,10 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const [reportSent, setReportSent] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [collaborationOpen, setCollaborationOpen] = useState(false);
-  const [collabItems, setCollabItems] =
-    useState<LiveCollabSharedItem[]>(MOCK_COLLAB_ITEMS);
+  const [collabItems, setCollabItems] = useState<LiveCollabSharedItem[]>(() =>
+    allowLiveCollabMocks() ? MOCK_COLLAB_ITEMS : []
+  );
+  const liveCollabEntryAllowed = allowLiveCollabEntry();
   const [participantUploadsAllowed, setParticipantUploadsAllowed] =
     useState(false);
   const [mobilePanel, setMobilePanel] = useState<"chat" | "room">("chat");
@@ -141,8 +148,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const roomIdRef = useRef(roomId);
   const hostIdRef = useRef<string | null>(null);
   const authUserIdRef = useRef<string | null>(null);
-  const isHostRef = useRef(false);
-  const joinedRef = useRef(false);
   const participantsRef = useRef<LiveParticipant[]>([]);
   const participantsRefreshTimerRef = useRef<number | null>(null);
   const prevOnStageCountRef = useRef(0);
@@ -284,10 +289,8 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     roomIdRef.current = roomId;
     hostIdRef.current = room?.host.id ?? null;
     authUserIdRef.current = authUserId;
-    isHostRef.current = Boolean(room?.isHost);
-    joinedRef.current = joined;
     participantsRef.current = participants;
-  }, [roomId, room?.host.id, room?.isHost, authUserId, joined, participants]);
+  }, [roomId, room?.host.id, authUserId, participants]);
 
   const refreshParticipants = useCallback(async (id: string) => {
     setParticipantsLoading(true);
@@ -310,6 +313,27 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     [refreshParticipants]
   );
 
+  const {
+    joined,
+    permissionError,
+    setPermissionError,
+    ensureJoined,
+    markLeft,
+  } = useLiveRoomMembership({
+    roomId,
+    roomIdValid,
+    authUserId,
+    isHost: Boolean(room?.isHost),
+    roomStatus: room?.status,
+    bootLoading,
+    onViewerCount: (count) => {
+      setRoom((prev) => (prev ? { ...prev, viewerCount: count } : prev));
+    },
+    onJoinedChange: () => {
+      scheduleParticipantsRefresh(roomId);
+    },
+  });
+
   useEffect(() => {
     return () => {
       if (participantsRefreshTimerRef.current != null) {
@@ -329,6 +353,47 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     setLoadError(null);
     return result.room;
   }, []);
+
+  const applyHostFollowSnapshot = useCallback((snapshot: FollowSnapshot) => {
+    setIsFollowing(snapshot.following);
+    if (!snapshot.missingProfile) {
+      setHostFollowersLabel(formatFollowCountLabel(snapshot.followersCount));
+    }
+  }, []);
+
+  const handleHostFollowChange = useCallback(
+    (snapshot: FollowSnapshot) => {
+      applyHostFollowSnapshot(snapshot);
+    },
+    [applyHostFollowSnapshot]
+  );
+
+  const hostFollowTargetId =
+    room?.host.id && isUuid(room.host.id) ? room.host.id : null;
+  const nextFollowHostKey = hostFollowTargetId
+    ? `${room?.id ?? ""}:${hostFollowTargetId}:${authUserId ?? ""}`
+    : null;
+  if (nextFollowHostKey !== followHostKey) {
+    setFollowHostKey(nextFollowHostKey);
+    setIsFollowing(false);
+    setHostFollowersLabel("—");
+  }
+
+  useEffect(() => {
+    if (!hostFollowTargetId) {
+      return;
+    }
+
+    let cancelled = false;
+    void getProfileFollowSnapshotAction(hostFollowTargetId).then((result) => {
+      if (cancelled || !result.ok) return;
+      applyHostFollowSnapshot(result);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hostFollowTargetId, followHostKey, applyHostFollowSnapshot]);
 
   const loadChat = useCallback(
     async (id: string, opts?: { append?: boolean; cursor?: string | null }) => {
@@ -468,69 +533,14 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     return () => {
       cancelled = true;
     };
-  }, [roomId, roomIdValid, refreshRoom, loadChat, refreshParticipants]);
-
-  // Join on mount when authenticated
-  useEffect(() => {
-    if (!authUserId || !roomIdValid || bootLoading) {
-      return;
-    }
-
-    if (room?.status === "ended") {
-      return;
-    }
-
-    let cancelled = false;
-    const id = roomId;
-
-    async function join() {
-      const result = await joinLiveRoomAction(id);
-      if (cancelled) return;
-
-      if (result.ok) {
-        setJoined(true);
-        setPermissionError(null);
-        setRoom((prev) =>
-          prev ? { ...prev, viewerCount: result.viewerCount } : prev
-        );
-        scheduleParticipantsRefresh(id);
-      } else if (result.requiresAuth) {
-        setPermissionError("Please sign in to join this live room.");
-        setJoined(false);
-      } else {
-        setPermissionError(result.message);
-        setJoined(false);
-      }
-    }
-
-    void join();
-
-    return () => {
-      cancelled = true;
-      // Viewers leave on unmount; hosts keep the room (End Live ends it).
-      if (!isHostRef.current && joinedRef.current) {
-        void leaveLiveRoomAction(id);
-      }
-    };
   }, [
-    authUserId,
     roomId,
     roomIdValid,
-    bootLoading,
-    room?.status,
-    scheduleParticipantsRefresh,
+    refreshRoom,
+    loadChat,
+    refreshParticipants,
+    setPermissionError,
   ]);
-
-  // Heartbeat
-  useEffect(() => {
-    if (!joined || !roomIdValid) return;
-
-    const timer = window.setInterval(() => {
-      void heartbeatLiveParticipantAction(roomId);
-    }, 25_000);
-
-    return () => window.clearInterval(timer);
-  }, [joined, roomId, roomIdValid]);
 
   useEffect(() => {
     function handleFullscreenChange() {
@@ -552,13 +562,13 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
         setLoadError(result.message);
         return;
       }
-      setJoined(false);
+      markLeft();
       router.push(APP_ROUTES.live);
       return;
     }
 
     const result = await leaveLiveRoomAction(room.id);
-    setJoined(false);
+    markLeft();
     if (!result.ok && !result.requiresAuth) {
       setLoadError(result.message);
     }
@@ -569,7 +579,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     if (!room || !authUserId) return;
 
     if (!joined) {
-      const joinResult = await joinLiveRoomAction(room.id);
+      const joinResult = await ensureJoined();
       if (!joinResult.ok) {
         if (joinResult.requiresAuth) {
           router.push(
@@ -580,7 +590,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
         setPermissionError(joinResult.message);
         return;
       }
-      setJoined(true);
     }
 
     const clientId =
@@ -631,7 +640,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     }
 
     if (!joined) {
-      const joinResult = await joinLiveRoomAction(room.id);
+      const joinResult = await ensureJoined();
       if (!joinResult.ok) {
         if (joinResult.requiresAuth) {
           router.push(
@@ -642,7 +651,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
         setPermissionError(joinResult.message);
         return;
       }
-      setJoined(true);
     }
 
     const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -698,7 +706,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
   if (!roomIdValid) {
     return (
-      <LiveShell>
+      <LiveShell immersive>
         <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-2xl font-black text-white">Room unavailable</p>
           <p className="max-w-md text-sm text-white/50">
@@ -717,7 +725,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
   if (bootLoading) {
     return (
-      <LiveShell subtitle="Joining live room…">
+      <LiveShell immersive subtitle="Joining live room…">
         <LiveRoomLoadingSkeleton />
       </LiveShell>
     );
@@ -725,7 +733,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
   if (!room) {
     return (
-      <LiveShell>
+      <LiveShell immersive>
         <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-2xl font-black text-white">Room unavailable</p>
           <p className="max-w-md text-sm text-white/50">
@@ -756,6 +764,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
   return (
     <LiveShell
+      immersive
       subtitle={`${room.city || "Live"} · ${room.category || "Room"}`}
       actions={
         <Link
@@ -789,6 +798,47 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
         </div>
       ) : null}
 
+      {room.status === "live" &&
+      (media.connectionState === "connecting" ||
+        media.connectionState === "reconnecting" ||
+        media.connectionState === "error") ? (
+        <div
+          role="status"
+          className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-sky-400/20 bg-sky-500/10 px-4 py-3 text-xs text-sky-50/90"
+        >
+          <span>
+            {media.connectionState === "connecting"
+              ? "Connecting to live media…"
+              : media.connectionState === "reconnecting"
+                ? "Network interrupted. Reconnecting…"
+                : media.error || "Network interrupted."}
+          </span>
+          {media.connectionState === "error" ? (
+            <button
+              type="button"
+              onClick={() => {
+                void media.refreshTokenAndReconnect();
+              }}
+              className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] text-white"
+            >
+              Reconnect
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {room.status === "ended" ? (
+        <div
+          role="status"
+          className="mb-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-white/70"
+        >
+          Live ended.{" "}
+          <Link href={APP_ROUTES.live} className="font-bold underline">
+            Browse live rooms
+          </Link>
+        </div>
+      ) : null}
+
       {permissionError ? (
         <div className="mb-4 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-xs text-red-100/90">
           {permissionError}{" "}
@@ -800,15 +850,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
               Sign in
             </Link>
           ) : null}
-        </div>
-      ) : null}
-
-      {loadError && room.status === "ended" ? (
-        <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-white/70">
-          {loadError}{" "}
-          <Link href={APP_ROUTES.live} className="font-bold underline">
-            Browse live rooms
-          </Link>
         </div>
       ) : null}
 
@@ -873,12 +914,14 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
           <div className="space-y-4 rounded-[24px] border border-white/10 bg-[#080816]/70 p-4 backdrop-blur-xl sm:rounded-[28px] md:rounded-[32px] md:p-5">
             <LiveCreatorBar
-              host={room.host}
+              host={{ ...room.host, followersLabel: hostFollowersLabel }}
               city={room.city}
               country={room.country}
               startedAtLabel={room.startedAtLabel}
+              roomId={room.id}
+              viewerId={authUserId}
               isFollowing={isFollowing}
-              onToggleFollow={() => setIsFollowing((prev) => !prev)}
+              onFollowChange={handleHostFollowChange}
             />
 
             <LiveStreamMeta room={room} />
@@ -1167,7 +1210,11 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                       }
                     : undefined
                 }
-                onOpenCollaboration={() => setCollaborationOpen(true)}
+                onOpenCollaboration={
+                  liveCollabEntryAllowed
+                    ? () => setCollaborationOpen(true)
+                    : undefined
+                }
                 onToggleMute={() => setMuted((prev) => !prev)}
                 onToggleCaptions={() => setCaptionsOn((prev) => !prev)}
                 onQualityChange={setQuality}
@@ -1214,8 +1261,9 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                   });
                 }}
                 onLeave={() => {
+                  // Leave never ends the room — End Live is explicit.
                   startTransition(() => {
-                    void leaveRoom({ endIfHost: Boolean(room.isHost) });
+                    void leaveRoom({ endIfHost: false });
                   });
                 }}
               />
@@ -1225,7 +1273,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
             ) : null}
           </section>
 
-          {collaborationOpen ? (
+          {liveCollabEntryAllowed && collaborationOpen ? (
             <LiveCollaborationPanel
               open={collaborationOpen}
               onClose={() => setCollaborationOpen(false)}

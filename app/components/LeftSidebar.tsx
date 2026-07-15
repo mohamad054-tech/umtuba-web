@@ -2,45 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { APP_ROUTES } from "../lib/nav";
 
+/** Only routes that exist today — no future product placeholders. */
 const items = [
   {
-    label: "🔥 For You",
-    href: "/feed",
+    label: "For You",
+    href: APP_ROUTES.discover,
   },
   {
-    label: "👥 Following",
-    href: "/feed?tab=following",
+    label: "Live",
+    href: APP_ROUTES.live,
   },
   {
-    label: "🔴 Live",
-    href: "/live",
+    label: "Post Journey",
+    href: APP_ROUTES.postJourney,
   },
   {
-    label: "🤖 AI",
-    href: "/ai",
+    label: "Messages",
+    href: APP_ROUTES.messages,
   },
-  {
-    label: "💡 Ideas",
-    href: "/ideas",
-  },
-  {
-    label: "🚀 Opportunities",
-    href: "/opportunities",
-  },
-  {
-    label: "🌍 Post Journey",
-    href: "/post-journey",
-  },
-  {
-    label: "💬 Messages",
-    href: "/messages",
-  },
-  {
-    label: "🤝 UConnect",
-    href: "/uconnect",
-  },
-];
+] as const;
+
+function isSidebarActive(pathname: string, href: string): boolean {
+  if (href === APP_ROUTES.discover) {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+  if (href === APP_ROUTES.live) {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function LeftSidebar() {
   const pathname = usePathname();
@@ -49,12 +41,13 @@ export default function LeftSidebar() {
     <aside className="hidden md:block">
       <div className="sticky top-28 space-y-3">
         {items.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = isSidebarActive(pathname, item.href);
 
           return (
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               className={`block w-full rounded-2xl px-5 py-4 font-bold transition ${
                 isActive
                   ? "bg-white text-black"

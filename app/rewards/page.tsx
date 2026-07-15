@@ -1,14 +1,20 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../components/AppTopNav";
-import { APP_ROUTES } from "../lib/nav";
+import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
+import { rewardsMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
   claimVerifiedWelcomeBonus,
   getMyUmPointsSummary,
 } from "../../lib/supabase/rewards";
+import { getMyReferralStats } from "../../lib/supabase/referral";
 import { nextUmPointsMilestone } from "../../lib/rewards/umPointsConfig";
 import { formatRelativeTime } from "../notifications/lib/formatRelativeTime";
+import InviteShareCard from "./components/InviteShareCard";
+import { headers } from "next/headers";
+
+export const metadata = rewardsMetadata;
 
 export default async function RewardsPage() {
   const user = await getServerUser();
@@ -19,6 +25,12 @@ export default async function RewardsPage() {
   const supabase = await createClient();
   await claimVerifiedWelcomeBonus(supabase);
   const summary = await getMyUmPointsSummary(supabase);
+
+  const hdrs = await headers();
+  const host = hdrs.get("x-forwarded-host") || hdrs.get("host");
+  const proto = hdrs.get("x-forwarded-proto") || "https";
+  const origin = host ? `${proto}://${host}` : null;
+  const referral = await getMyReferralStats(supabase, origin);
 
   const balance = summary?.balance ?? 0;
   const earnedToday = summary?.earnedToday ?? 0;
@@ -31,7 +43,9 @@ export default async function RewardsPage() {
       : 100;
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main
+      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+    >
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <AppTopNav title="UM Points" subtitle="Rewards" />
         <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
@@ -91,6 +105,8 @@ export default async function RewardsPage() {
               </div>
             </div>
           ) : null}
+
+          {referral ? <InviteShareCard stats={referral} /> : null}
 
           <div className="mt-8">
             <h2 className="text-sm font-black tracking-tight">Recent activity</h2>

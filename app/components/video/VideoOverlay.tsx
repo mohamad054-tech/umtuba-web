@@ -1,12 +1,17 @@
 "use client";
 
+import Link from "next/link";
+import FollowButton from "../social/FollowButton";
 import type { DiscoverStats } from "../../discover/types";
+import { APP_ROUTES, buildCreatorProfileHref } from "../../lib/nav";
+import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
 import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoActionRail from "./VideoActionRail";
 
 type VideoOverlayProps = {
   video: WatchVideo;
+  viewerId?: string | null;
   transitionLocked?: boolean;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onPostJourney: (video: WatchVideo) => void;
@@ -16,12 +21,23 @@ type VideoOverlayProps = {
 
 export default function VideoOverlay({
   video,
+  viewerId = null,
   transitionLocked = false,
   onOpenPanel,
   onPostJourney,
   onStatsChange,
   onFlagsChange,
 }: VideoOverlayProps) {
+  const prototypePanelsAllowed = allowWatchPrototypePanels();
+  const peerUserId = video.author.id;
+  const profileHref = buildCreatorProfileHref({
+    username: video.author.username,
+  });
+  const returnPath =
+    video.postId != null
+      ? `${APP_ROUTES.watch}?post=${video.postId}`
+      : APP_ROUTES.watch;
+
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
@@ -29,13 +45,35 @@ export default function VideoOverlay({
       <div className="watch-overlay-enter relative z-10 flex items-end justify-between gap-3 p-5 pb-7 md:gap-4 md:p-6 md:pb-8">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white font-black text-black shadow-[0_0_24px_rgba(255,255,255,0.18)]">
+            <Link
+              href={profileHref}
+              className="pointer-events-auto watch-focus-ring flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white font-black text-black shadow-[0_0_24px_rgba(255,255,255,0.18)]"
+              aria-label={`Open ${video.author.name}'s profile`}
+            >
               {video.author.avatar}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-base font-black tracking-tight">
-                {video.author.name}
-              </p>
+            </Link>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={profileHref}
+                  className="pointer-events-auto truncate text-base font-black tracking-tight transition hover:text-white/85"
+                >
+                  {video.author.name}
+                </Link>
+                {peerUserId ? (
+                  <div className="pointer-events-auto">
+                    <FollowButton
+                      targetUserId={peerUserId}
+                      viewerId={viewerId}
+                      initialFollowing={Boolean(video.author.isFollowing)}
+                      returnPath={returnPath}
+                      size="sm"
+                      followingClassName="border border-white/20 bg-white/10 text-white/80"
+                      idleClassName="border border-sky-300/35 bg-sky-500/20 text-sky-50 hover:bg-sky-500/30"
+                    />
+                  </div>
+                ) : null}
+              </div>
               <p className="truncate text-sm text-white/55">
                 {video.author.username}
               </p>
@@ -56,14 +94,16 @@ export default function VideoOverlay({
               <span aria-hidden>📍</span>
               {video.location.city}, {video.location.country}
             </span>
-            <button
-              type="button"
-              onClick={() => onOpenPanel("explore-city")}
-              disabled={transitionLocked}
-              className="pointer-events-auto watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Explore this city
-            </button>
+            {prototypePanelsAllowed ? (
+              <button
+                type="button"
+                onClick={() => onOpenPanel("explore-city")}
+                disabled={transitionLocked}
+                className="pointer-events-auto watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Explore this city
+              </button>
+            ) : null}
           </div>
 
           <p className="flex items-center gap-2 text-xs text-white/55">
@@ -71,20 +111,22 @@ export default function VideoOverlay({
             <span className="truncate">{video.music}</span>
           </p>
 
-          <div className="space-y-2 rounded-2xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-md">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-purple-200/80">
-              AI summary
-            </p>
-            <p className="text-sm leading-6 text-white/75">{video.aiSummary}</p>
-            <button
-              type="button"
-              onClick={() => onOpenPanel("ai")}
-              disabled={transitionLocked}
-              className="pointer-events-auto watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
-            >
-              {video.translation} · Open AI panel
-            </button>
-          </div>
+          {prototypePanelsAllowed ? (
+            <div className="space-y-2 rounded-2xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-md">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-purple-200/80">
+                AI summary
+              </p>
+              <p className="text-sm leading-6 text-white/75">{video.aiSummary}</p>
+              <button
+                type="button"
+                onClick={() => onOpenPanel("ai")}
+                disabled={transitionLocked}
+                className="pointer-events-auto watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+              >
+                {video.translation} · Open AI panel
+              </button>
+            </div>
+          ) : null}
 
           <button
             type="button"
@@ -106,6 +148,7 @@ export default function VideoOverlay({
             savedByMe={video.savedByMe}
             caption={video.caption}
             persist={video.source === "supabase"}
+            returnPath={returnPath}
             onOpenPanel={onOpenPanel}
             onStatsChange={onStatsChange}
             onFlagsChange={onFlagsChange}

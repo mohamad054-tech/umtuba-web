@@ -36,6 +36,11 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
                 ? "text-white/70"
                 : "text-white/40"
           }`}
+          aria-live={
+            message.status === "sending" || message.status === "failed"
+              ? "polite"
+              : undefined
+          }
         >
           {statusLabel}
         </p>

@@ -3,10 +3,16 @@ import {
   encodeWatchPageCursor,
   getWatchVideosPageServer,
 } from "../../lib/supabase/videoPostsServer";
+import { getServerUser } from "../../lib/supabase/server";
+import { watchMetadata } from "../../lib/site/routeMetadata";
+import ProductEmptyState from "../components/product/ProductEmptyState";
 import { demoVideos } from "../data/videos";
+import { APP_ROUTES } from "../lib/nav";
+import { allowWatchDemoFallback } from "../lib/product/surfaceGates";
 import { demoVideoToWatchVideo } from "./lib/mapWatchVideo";
 import WatchExperience from "./WatchExperience";
 
+export const metadata = watchMetadata;
 export const dynamic = "force-dynamic";
 
 function WatchFallback() {
@@ -34,25 +40,60 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
   const focus =
     Number.isInteger(focusPostId) && focusPostId > 0 ? focusPostId : null;
 
-  const result = await getWatchVideosPageServer({ focusPostId: focus });
+  const [result, user] = await Promise.all([
+    getWatchVideosPageServer({ focusPostId: focus }),
+    getServerUser().catch(() => null),
+  ]);
+  const initialViewerId = user?.id ?? null;
+  const demoAllowed = allowWatchDemoFallback();
 
   if (!result.ok) {
+    if (demoAllowed) {
+      return (
+        <WatchExperience
+          initialVideos={demoVideos.map(demoVideoToWatchVideo)}
+          initialCursor={null}
+          loadError={result.message}
+          usedDemoFallback
+          initialViewerId={initialViewerId}
+        />
+      );
+    }
+
     return (
-      <WatchExperience
-        initialVideos={demoVideos.map(demoVideoToWatchVideo)}
-        initialCursor={null}
-        loadError={result.message}
-        usedDemoFallback
+      <ProductEmptyState
+        eyebrow="Watch"
+        title="Watch is unavailable right now"
+        description="We couldn’t load videos. Try Discover, or come back in a moment."
+        primaryHref={APP_ROUTES.discover}
+        primaryLabel="Open Discover"
+        secondaryHref={APP_ROUTES.createVideo}
+        secondaryLabel="Upload a video"
       />
     );
   }
 
   if (result.page.videos.length === 0) {
+    if (demoAllowed) {
+      return (
+        <WatchExperience
+          initialVideos={demoVideos.map(demoVideoToWatchVideo)}
+          initialCursor={null}
+          usedDemoFallback
+          initialViewerId={initialViewerId}
+        />
+      );
+    }
+
     return (
-      <WatchExperience
-        initialVideos={demoVideos.map(demoVideoToWatchVideo)}
-        initialCursor={null}
-        usedDemoFallback
+      <ProductEmptyState
+        eyebrow="Watch"
+        title="No videos to watch yet"
+        description="When creators publish videos, they’ll appear here. Explore Discover or upload your first clip."
+        primaryHref={APP_ROUTES.discover}
+        primaryLabel="Open Discover"
+        secondaryHref={APP_ROUTES.createVideo}
+        secondaryLabel="Upload a video"
       />
     );
   }
@@ -62,6 +103,7 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
       initialVideos={result.page.videos}
       initialCursor={encodeWatchPageCursor(result.page.nextCursor)}
       usedDemoFallback={false}
+      initialViewerId={initialViewerId}
     />
   );
 }

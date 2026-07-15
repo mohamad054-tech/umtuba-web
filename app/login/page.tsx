@@ -10,7 +10,9 @@ import {
   AuthShell,
 } from "../components/auth";
 import { APP_ROUTES } from "../lib/nav";
+import { claimPendingReferralAction } from "../actions/referral";
 import { signInWithEmail } from "../../lib/supabase/auth";
+import { FORGOT_PASSWORD_PATH } from "../../lib/supabase/passwordReset";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import {
   getErrorMessage,
@@ -26,10 +28,10 @@ type FieldErrors = {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get("reset") === "success";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
-  const [forgotHint, setForgotHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
@@ -53,7 +55,6 @@ function LoginForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setForgotHint(false);
 
     const nextErrors = validate();
     setFieldErrors(nextErrors);
@@ -71,6 +72,16 @@ function LoginForm() {
 
       // Remember-me is informational for V1; Supabase SSR cookies manage the session.
       void rememberMe;
+
+      // Idempotent referral claim — never blocks login on failure.
+      try {
+        await claimPendingReferralAction();
+      } catch (claimError) {
+        console.error(
+          "[referral-claim] login",
+          claimError instanceof Error ? claimError.name : "Error"
+        );
+      }
 
       const nextPath = getSafeRedirectPath(
         searchParams.get("next"),
@@ -145,23 +156,19 @@ function LoginForm() {
             onChange={(event) => setRememberMe(event.target.checked)}
           />
 
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={() => {
-              setForgotHint(true);
-              setFormError("");
-            }}
-            className="text-sm font-bold text-blue-200 transition hover:text-blue-100 disabled:opacity-50"
+          <Link
+            href={FORGOT_PASSWORD_PATH}
+            className="text-sm font-bold text-blue-200 transition hover:text-blue-100"
           >
             Forgot password?
-          </button>
+          </Link>
         </div>
 
-        {forgotHint ? (
+        {resetSuccess ? (
           <AuthAlert tone="info">
-            Password reset is not available in Backend Foundation V1 yet. Contact
-            support if you need help recovering access.
+            <span role="status">
+              Password updated. Sign in with your new password.
+            </span>
           </AuthAlert>
         ) : null}
 

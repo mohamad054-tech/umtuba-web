@@ -2,21 +2,24 @@ type ProfileStatsProps = {
   followersLabel: string;
   followingLabel: string;
   likesLabel: string;
+  viewsLabel: string;
 };
 
 export default function ProfileStats({
   followersLabel,
   followingLabel,
   likesLabel,
+  viewsLabel,
 }: ProfileStatsProps) {
   const items = [
     { label: "Followers", value: followersLabel },
     { label: "Following", value: followingLabel },
     { label: "Likes", value: likesLabel },
+    { label: "Views", value: viewsLabel },
   ];
 
   return (
-    <dl className="grid grid-cols-3 gap-3 sm:max-w-md">
+    <dl className="grid grid-cols-2 gap-3 sm:max-w-lg sm:grid-cols-4">
       {items.map((item) => (
         <div
           key={item.label}

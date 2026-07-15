@@ -178,6 +178,10 @@ export function useLiveRoomPresence({
 
       subscribeTimeout = window.setTimeout(() => {
         if (disposedRef.current || generation !== activeGeneration) return;
+        // Avoid stacking reconnects when subscribe already succeeded.
+        if (channelRef.current?.state === "joined") {
+          return;
+        }
         setPresenceState((prev) => (prev === "connected" ? prev : "error"));
         setPresenceError("Viewer presence is taking too long to connect.");
         scheduleReconnect(generation);

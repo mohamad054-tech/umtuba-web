@@ -356,18 +356,23 @@ export default function MessagesExperience({
     setLoadingOlder(false);
   }
 
-  async function handleSend(text: string) {
+  async function handleSend(text: string): Promise<boolean> {
     if (!selectedId || !currentUserId || sendingRef.current) {
-      return;
+      return false;
     }
 
     const conversationId = selectedId;
     const clientId = createClientId();
+    const body = text.trim();
+    if (!body) {
+      return false;
+    }
+
     const optimistic: Message = {
       id: `local-${clientId}`,
       conversationId,
       senderId: currentUserId,
-      text: text.trim(),
+      text: body,
       sentAt: new Date().toISOString(),
       isMine: true,
       status: "sending",
@@ -401,11 +406,13 @@ export default function MessagesExperience({
 
     const result = await sendMessageAction({
       conversationId,
-      body: text,
+      body,
       clientId,
     });
 
     if (!result.ok) {
+      // Preserve composer draft (composer keeps text when we return false).
+      // Drop optimistic bubble so retry does not duplicate the thread.
       setSendError(result.message);
       setConversations((prev) =>
         prev.map((conversation) => {
@@ -415,17 +422,15 @@ export default function MessagesExperience({
 
           return {
             ...conversation,
-            messages: conversation.messages.map((message) =>
-              message.clientId === clientId
-                ? { ...message, status: "failed" as const }
-                : message
+            messages: conversation.messages.filter(
+              (message) => message.clientId !== clientId
             ),
           };
         })
       );
       sendingRef.current = false;
       setSending(false);
-      return;
+      return false;
     }
 
     setConversations((prev) =>
@@ -454,6 +459,7 @@ export default function MessagesExperience({
     );
     sendingRef.current = false;
     setSending(false);
+    return true;
   }
 
   function handleComposerTyping() {
@@ -506,11 +512,12 @@ export default function MessagesExperience({
         >
           <ChatWindow
             conversation={selected}
-            onSend={(text) => void handleSend(text)}
+            onSend={handleSend}
             onBack={handleBack}
             showBack={mobileShowChat}
             loading={threadLoading}
-            error={threadError || sendError}
+            error={threadError}
+            sendError={sendError}
             onLoadOlder={
               selected?.hasMoreMessages
                 ? () => void handleLoadOlder()

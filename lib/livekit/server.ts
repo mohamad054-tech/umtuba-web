@@ -35,6 +35,7 @@ export type LiveMediaTokenResult = {
   expiresAt: number;
 };
 
+/** Keep in sync with app/live/hooks/liveSessionPolicy.ts */
 const TOKEN_TTL_SECONDS = 60 * 12;
 
 export function sfuRoomNameForLiveRoom(roomId: string): string {
@@ -79,9 +80,13 @@ export async function mintLiveMediaToken(input: {
   }
 
   const identity =
-    input.grants.identity?.trim() ||
-    input.anonIdentity?.trim() ||
-    `anon-${Math.random().toString(36).slice(2, 10)}`;
+    input.grants.identity?.trim() || input.anonIdentity?.trim() || "";
+
+  if (!identity) {
+    return {
+      error: "Missing media identity. Refresh the page and try again.",
+    };
+  }
 
   const sources: TrackSource[] = [];
   if (input.grants.canPublishVideo) {

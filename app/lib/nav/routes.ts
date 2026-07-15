@@ -3,6 +3,7 @@ import { slugifyCity } from "../journey/handoff";
 export const APP_ROUTES = {
   home: "/",
   discover: "/discover",
+  watch: "/watch",
   live: "/live",
   messages: "/messages",
   notifications: "/notifications",
@@ -10,6 +11,9 @@ export const APP_ROUTES = {
   saved: "/saved",
   login: "/login",
   signup: "/signup",
+  forgotPassword: "/forgot-password",
+  updatePassword: "/auth/update-password",
+  authCallback: "/auth/callback",
   profile: "/profile",
   createVideo: "/create/video",
   postJourney: "/post-journey",

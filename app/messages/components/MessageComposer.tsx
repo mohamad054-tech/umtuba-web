@@ -1,64 +1,90 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import {
+  canSendComposerText,
+  clampComposerDraft,
+  MESSAGE_MAX_LENGTH,
+  normalizeComposerDraft,
+  shouldClearDraftAfterSend,
+} from "../lib/composerPolicy";
 
 const EMOJI_SET = ["😀", "🔥", "✨", "💙", "🌍", "🙌", "😂", "❤️", "🚀", "👍"];
 
-const MESSAGE_MAX_LENGTH = 4000;
-
 type MessageComposerProps = {
-  onSend: (text: string) => void;
+  /** Return true when the server accepted the send (clears draft). */
+  onSend: (text: string) => boolean | Promise<boolean>;
   onTyping?: () => void;
   disabled?: boolean;
+  /** Sanitized send/status error from the parent (aria-live). */
+  statusMessage?: string | null;
 };
 
+/**
+ * Production composer: text field + emoji helper + Send only.
+ * Attachment / voice controls are not rendered (no unfinished affordances).
+ *
+ * Keyboard: Enter sends; Shift+Enter inserts a newline.
+ */
 export default function MessageComposer({
   onSend,
   onTyping,
   disabled = false,
+  statusMessage = null,
 }: MessageComposerProps) {
   const [draft, setDraft] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
-  const [hint, setHint] = useState<string | null>(null);
-  const hintTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [pending, setPending] = useState(false);
 
-  useEffect(() => {
-    return () => {
-      if (hintTimeout.current) clearTimeout(hintTimeout.current);
-    };
-  }, []);
+  const sendEnabled = canSendComposerText(draft, { disabled, pending });
 
-  function showCue(message: string) {
-    setHint(message);
-    if (hintTimeout.current) clearTimeout(hintTimeout.current);
-    hintTimeout.current = setTimeout(() => setHint(null), 2200);
-  }
+  async function handleSend() {
+    if (!canSendComposerText(draft, { disabled, pending })) return;
 
-  function handleSend() {
-    const text = draft.trim();
-    if (!text || disabled) return;
-    onSend(text);
-    setDraft("");
+    const text = normalizeComposerDraft(draft);
+    setPending(true);
     setShowEmoji(false);
+
+    try {
+      const ok = await Promise.resolve(onSend(text));
+      if (shouldClearDraftAfterSend(Boolean(ok))) {
+        setDraft("");
+      }
+    } catch {
+      // Keep draft on unexpected throw; parent owns sanitized status.
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
-    <div className="relative border-t border-white/10 p-3 md:p-4">
-      {hint ? (
-        <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/10 bg-[#0b0b18]/95 px-3 py-1.5 text-[11px] font-medium text-white/70 backdrop-blur">
-          {hint}
-        </div>
+    <div className="relative border-t border-white/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:p-4 md:pb-4">
+      {statusMessage ? (
+        <p
+          className="mb-2 text-center text-xs font-bold text-red-300"
+          role="alert"
+          aria-live="assertive"
+        >
+          {statusMessage}
+        </p>
       ) : null}
 
       {showEmoji ? (
-        <div className="mb-3 flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-black/40 p-2">
+        <div
+          className="mb-3 flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-black/40 p-2"
+          role="group"
+          aria-label="Insert emoji"
+        >
           {EMOJI_SET.map((emoji) => (
             <button
               key={emoji}
               type="button"
-              onClick={() => setDraft((prev) => `${prev}${emoji}`)}
-              className="rounded-xl px-2 py-1 text-lg transition hover:bg-white/10"
+              onClick={() =>
+                setDraft((prev) => clampComposerDraft(`${prev}${emoji}`))
+              }
+              className="rounded-xl px-2 py-1 text-lg transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50"
               aria-label={`Insert ${emoji}`}
+              disabled={disabled || pending}
             >
               {emoji}
             </button>
@@ -69,34 +95,12 @@ export default function MessageComposer({
       <div className="flex items-end gap-2">
         <button
           type="button"
-          onClick={() => showCue("Attachments coming soon in Messenger V2")}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
-          aria-label="Attach file"
-          title="Attach"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            aria-hidden
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.5 7.5 8.4 14.6a2.5 2.5 0 1 0 3.5 3.5l8.2-8.2a4 4 0 1 0-5.7-5.7l-8.5 8.5"
-            />
-          </svg>
-        </button>
-
-        <button
-          type="button"
           onClick={() => setShowEmoji((open) => !open)}
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 text-lg transition hover:bg-white/10 ${
+          disabled={disabled || pending}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 text-lg transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:opacity-50 ${
             showEmoji ? "bg-white/15 text-white" : "bg-white/5 text-white/70"
           }`}
-          aria-label="Emoji"
+          aria-label={showEmoji ? "Hide emoji picker" : "Show emoji picker"}
           aria-pressed={showEmoji}
           title="Emoji"
         >
@@ -104,63 +108,49 @@ export default function MessageComposer({
         </button>
 
         <div className="min-w-0 flex-1">
+          <label htmlFor="messenger-composer-input" className="sr-only">
+            Message
+          </label>
           <textarea
+            id="messenger-composer-input"
             value={draft}
             onChange={(event) => {
-              setDraft(event.target.value.slice(0, MESSAGE_MAX_LENGTH));
+              setDraft(clampComposerDraft(event.target.value));
               onTyping?.();
             }}
             onKeyDown={(event) => {
+              // Enter sends; Shift+Enter keeps the default newline.
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                handleSend();
+                void handleSend();
               }
             }}
             rows={1}
             maxLength={MESSAGE_MAX_LENGTH}
             placeholder="Write a message…"
             aria-label="Message"
-            disabled={disabled}
-            className="max-h-28 min-h-11 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-white/30 disabled:opacity-50"
+            aria-describedby={
+              statusMessage ? "messenger-composer-status" : undefined
+            }
+            disabled={disabled || pending}
+            className="max-h-28 min-h-11 w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-white/30 focus-visible:ring-2 focus-visible:ring-white/30 disabled:opacity-50"
           />
+          {statusMessage ? (
+            <span id="messenger-composer-status" className="sr-only">
+              {statusMessage}
+            </span>
+          ) : null}
         </div>
 
         <button
           type="button"
-          onClick={() => showCue("Voice messages coming soon in Messenger V2")}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white/70 transition hover:bg-white/10 hover:text-white"
-          aria-label="Voice message"
-          title="Voice"
+          onClick={() => void handleSend()}
+          disabled={!sendEnabled}
+          aria-busy={pending}
+          className="flex h-11 shrink-0 items-center justify-center rounded-2xl bg-white px-4 text-sm font-black text-black transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label={pending ? "Sending message" : "Send message"}
         >
-          <svg
-            viewBox="0 0 24 24"
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            aria-hidden
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 11a7 7 0 0 0 14 0M12 18v3"
-            />
-          </svg>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={disabled || !draft.trim()}
-          className="flex h-11 shrink-0 items-center justify-center rounded-2xl bg-white px-4 text-sm font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label="Send message"
-        >
-          Send
+          {pending ? "Sending…" : "Send"}
         </button>
       </div>
     </div>

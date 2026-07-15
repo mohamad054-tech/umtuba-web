@@ -1,19 +1,30 @@
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
+import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 
 type LiveShellProps = {
   children: ReactNode;
   subtitle?: string;
   actions?: ReactNode;
+  /**
+   * Live rooms hide the mobile bottom nav (cinematic + chat composer).
+   * Lobby keeps default padding for the bottom bar.
+   */
+  immersive?: boolean;
 };
 
 export default function LiveShell({
   children,
   subtitle = "Global live rooms · chat · host controls",
   actions,
+  immersive = false,
 }: LiveShellProps) {
   return (
-    <main className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white">
+    <main
+      className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${
+        immersive ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS
+      }`}
+    >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-red-500/12 blur-3xl" />

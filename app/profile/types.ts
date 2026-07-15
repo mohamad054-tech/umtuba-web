@@ -2,9 +2,15 @@ import type { ActivityTierProgress } from "../../lib/activity-tiers";
 
 export type ProfileVideo = {
   id: string;
+  /** Numeric posts.id for Watch deep-link. */
+  postId?: number;
   title: string;
   viewsLabel: string;
-  durationLabel: string;
+  likesLabel?: string;
+  /** Null when duration is unknown — UI must not invent one. */
+  durationLabel: string | null;
+  href?: string;
+  previewUrl?: string | null;
   gradient: string;
   accent: string;
 };
@@ -16,6 +22,7 @@ export type ProfileLivePreview = {
   city: string;
   country: string;
   previewGradient: string;
+  isLiveNow?: boolean;
 };
 
 export type ProfileAbout = {
@@ -37,6 +44,7 @@ export type MockProfile = {
   followersLabel: string;
   followingLabel: string;
   likesLabel: string;
+  viewsLabel?: string;
   isLive: boolean;
   liveStreamId?: string;
   isFollowing?: boolean;
@@ -60,6 +68,9 @@ export type ProfileView = {
   followersLabel: string;
   followingLabel: string;
   likesLabel: string;
+  viewsLabel: string;
+  /** Total published videos (may exceed videos[] page length). */
+  videoTotalCount: number;
   isLive: boolean;
   liveStreamId?: string;
   isFollowing?: boolean;
@@ -68,4 +79,6 @@ export type ProfileView = {
   about: ProfileAbout;
   /** Authentic activity tier — separate from UM Points wallet. */
   activityTier?: ActivityTierProgress | null;
+  /** True when more videos exist beyond the initial page. */
+  hasMoreVideos?: boolean;
 };

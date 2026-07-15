@@ -9,6 +9,8 @@ export const UM_POINTS_REWARDS = {
   creatorQualifiedSave: 3,
   creatorQualifiedShare: 5,
   inviteActive: 50,
+  /** Growth Mode: inviter credit on referred account creation. */
+  referralSignup: 20,
   dailyEarnCap: 200,
   commentMinLength: 20,
   commentDailyCapPoints: 25,

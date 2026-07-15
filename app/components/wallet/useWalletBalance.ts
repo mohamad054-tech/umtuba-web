@@ -168,7 +168,8 @@ export function useWalletBalance(): UseWalletBalanceResult {
             const type = (payload.new as { type?: string } | null)?.type;
             if (
               type === "um_points_earned" ||
-              type === "reward_milestone"
+              type === "reward_milestone" ||
+              type === "referral_reward"
             ) {
               void refresh();
             }

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { demoVideos } from "../data/videos";
 import VerticalVideoFeed from "../components/video/VerticalVideoFeed";
 import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
@@ -13,15 +12,13 @@ import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndi
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
 import CommentsPanel from "../components/social/CommentsPanel";
-import { recordViewAction } from "../actions/socialInteractions";
 import {
   loadWatchFeedPageAction,
 } from "../actions/loadWatchFeed";
-import { getOrCreateViewerKey } from "../lib/social/shareAndViews";
-import {
-  demoVideoToWatchVideo,
-  findWatchVideoIndex,
-} from "./lib/mapWatchVideo";
+import { recordFeedViewOnce } from "../lib/video/recordFeedView";
+import { APP_ROUTES } from "../lib/nav";
+import { allowWatchPrototypePanels } from "../lib/product/surfaceGates";
+import { findWatchVideoIndex } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 
 const panelCopy: Record<
@@ -60,6 +57,8 @@ type WatchExperienceProps = {
   initialCursor: string | null;
   loadError?: string | null;
   usedDemoFallback?: boolean;
+  /** Auth user id from the Watch page server render (null if signed out). */
+  initialViewerId?: string | null;
 };
 
 export default function WatchExperience({
@@ -67,6 +66,7 @@ export default function WatchExperience({
   initialCursor,
   loadError = null,
   usedDemoFallback = false,
+  initialViewerId = null,
 }: WatchExperienceProps) {
   const searchParams = useSearchParams();
   const stageRef = useRef<HTMLDivElement>(null);
@@ -74,11 +74,9 @@ export default function WatchExperience({
   const loadingMoreRef = useRef(false);
 
   const focusKey = searchParams.get("post") ?? searchParams.get("id");
-  const seedVideos =
-    initialVideos.length > 0
-      ? initialVideos
-      : demoVideos.map(demoVideoToWatchVideo);
+  const seedVideos = initialVideos;
   const initialIndex = findWatchVideoIndex(seedVideos, focusKey);
+  const prototypePanelsAllowed = allowWatchPrototypePanels();
 
   const [videos, setVideos] = useState<WatchVideo[]>(seedVideos);
   const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
@@ -90,48 +88,44 @@ export default function WatchExperience({
   const [journeyTransitionActive, setJourneyTransitionActive] = useState(false);
   const [forcePause, setForcePause] = useState(false);
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
-  const [demoFallback] = useState(
-    usedDemoFallback || initialVideos.length === 0
-  );
+  const [demoFallback] = useState(usedDemoFallback);
 
-  const handleActiveChange = useCallback(
-    (video: WatchVideo) => {
-      setActiveVideo(video);
+  const handleActiveChange = useCallback((video: WatchVideo) => {
+    setActiveVideo(video);
 
+    if (video.source !== "supabase" || !video.postId) {
+      return;
+    }
+
+    void recordFeedViewOnce(video.postId, recordedViewsRef.current).then(
+      (result) => {
+        if (!result.ok) return;
+        setVideos((current) =>
+          current.map((item) =>
+            item.id === video.id
+              ? {
+                  ...item,
+                  stats: { ...item.stats, views: result.views },
+                }
+              : item
+          )
+        );
+      }
+    );
+  }, []);
+
+  const handleOpenPanel = useCallback(
+    (panel: Exclude<WatchPanelId, null>) => {
       if (
-        video.source !== "supabase" ||
-        !video.postId ||
-        recordedViewsRef.current.has(video.postId)
+        panel !== "comments" &&
+        !allowWatchPrototypePanels()
       ) {
         return;
       }
-
-      recordedViewsRef.current.add(video.postId);
-      void (async () => {
-        const result = await recordViewAction(
-          video.postId!,
-          getOrCreateViewerKey()
-        );
-        if (result.ok) {
-          setVideos((current) =>
-            current.map((item) =>
-              item.id === video.id
-                ? {
-                    ...item,
-                    stats: { ...item.stats, views: result.views },
-                  }
-                : item
-            )
-          );
-        }
-      })();
+      setActivePanel(panel);
     },
     []
   );
-
-  const handleOpenPanel = useCallback((panel: Exclude<WatchPanelId, null>) => {
-    setActivePanel(panel);
-  }, []);
 
   const handleClosePanel = useCallback(() => {
     setActivePanel(null);
@@ -280,20 +274,22 @@ export default function WatchExperience({
           <ActivityTierIndicator compact />
           <WalletBalanceIndicator compact />
           <NotificationBell />
-          <button
-            type="button"
-            onClick={() => handleOpenPanel("related")}
-            disabled={journeyTransitionActive}
-            className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
-          >
-            Related
-          </button>
+          {prototypePanelsAllowed ? (
+            <button
+              type="button"
+              onClick={() => handleOpenPanel("related")}
+              disabled={journeyTransitionActive}
+              className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
+            >
+              Related
+            </button>
+          ) : null}
 
           <Link
-            href="/feed"
+            href={APP_ROUTES.discover}
             className="watch-focus-ring rounded-full border border-white/15 bg-black/35 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 md:bg-white/5"
           >
-            Feed
+            Discover
           </Link>
 
           <button
@@ -324,6 +320,7 @@ export default function WatchExperience({
           <VerticalVideoFeed
             videos={videos}
             initialIndex={initialIndex}
+            viewerId={initialViewerId}
             forcePause={forcePause}
             transitionLocked={journeyTransitionActive}
             emptyMessage={emptyMessage}
@@ -352,7 +349,8 @@ export default function WatchExperience({
             </div>
           ) : null}
 
-          {panelMeta &&
+          {prototypePanelsAllowed &&
+          panelMeta &&
           activePanel !== "comments" &&
           !journeyTransitionActive ? (
             <WatchPanel

@@ -96,7 +96,9 @@ export default function ContentCard({ post, onPostChange }: ContentCardProps) {
   }
 
   function redirectToLogin() {
-    router.push(`${APP_ROUTES.login}?next=${encodeURIComponent("/feed")}`);
+    router.push(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.discover)}`
+    );
   }
 
   function shareInput() {

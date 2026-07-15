@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
 import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
 import {
@@ -19,6 +20,7 @@ import type { DiscoverStats, DiscoverVideo } from "./types";
 
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
+  initialCursor?: string | null;
   loadError?: string | null;
   /** Auth user id from the Discover page server render (null if signed out). */
   initialViewerId?: string | null;
@@ -26,6 +28,7 @@ type DiscoverExperienceProps = {
 
 export default function DiscoverExperience({
   videos: initialVideos,
+  initialCursor = null,
   loadError = null,
   initialViewerId = null,
 }: DiscoverExperienceProps) {
@@ -35,6 +38,8 @@ export default function DiscoverExperience({
   const commentParam = searchParams.get("comment");
 
   const [videos, setVideos] = useState(initialVideos);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
+  const loadingMoreRef = useRef(false);
   // Fixed from the page session — do not re-fetch (avoids flash + identity skew).
   const viewerId = initialViewerId;
 
@@ -92,6 +97,27 @@ export default function DiscoverExperience({
     },
     []
   );
+
+  const handleNearEnd = useCallback(() => {
+    if (!nextCursor || loadingMoreRef.current) {
+      return;
+    }
+
+    loadingMoreRef.current = true;
+    void (async () => {
+      const result = await loadDiscoverFeedPageAction({ cursor: nextCursor });
+      loadingMoreRef.current = false;
+      if (!result.ok) {
+        return;
+      }
+      setVideos((current) => {
+        const seen = new Set(current.map((v) => v.id));
+        const appended = result.videos.filter((v) => !seen.has(v.id));
+        return [...current, ...appended];
+      });
+      setNextCursor(result.nextCursor);
+    })();
+  }, [nextCursor]);
 
   if (loadError) {
     return (
@@ -151,7 +177,7 @@ export default function DiscoverExperience({
     <DiscoverShell>
       <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
         <div className="relative mx-auto flex w-full max-w-[510px] flex-1">
-          <div className="video-watch-stage relative h-[calc(100dvh-4rem)] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem)] md:rounded-[36px] md:border md:border-white/10">
+          <div className="video-watch-stage relative h-[calc(100dvh-4rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem)] md:rounded-[36px] md:border md:border-white/10">
             <DiscoverFeed
               videos={videos}
               initialIndex={initialIndex}
@@ -160,6 +186,7 @@ export default function DiscoverExperience({
               onComment={handleComment}
               onStatsChange={handleStatsChange}
               onFlagsChange={handleFlagsChange}
+              onNearEnd={handleNearEnd}
             />
 
             {commentsOpen && Number.isInteger(activePostId) && activePostId > 0 ? (

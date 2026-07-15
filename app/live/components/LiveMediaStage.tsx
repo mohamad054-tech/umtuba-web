@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { LiveStageLayoutMode } from "../types";
 import type { LiveStageTile } from "../hooks/useLiveMediaSession";
 
@@ -16,22 +16,41 @@ type LiveMediaStageProps = {
   placeholderSubtitle: string;
 };
 
-function TileVideo({ tile }: { tile: LiveStageTile }) {
+function TileVideo({
+  tile,
+  isSpeaking,
+}: {
+  tile: LiveStageTile;
+  isSpeaking: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const attachVideoRef = useRef(tile.attachVideo);
+  const attachAudioRef = useRef(tile.attachAudio);
 
+  // Keep attach fns current without depending on them in the attach effect.
   useEffect(() => {
-    tile.attachVideo(videoRef.current);
+    attachVideoRef.current = tile.attachVideo;
+    attachAudioRef.current = tile.attachAudio;
+  });
+
+  // Depend on track presence / identity only — not the whole tile object.
+  // rebuildTiles used to recreate attach closures on every quality/speaker
+  // event, which detached+reattached media and made adaptiveStream flap.
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const audioEl = audioRef.current;
+    attachVideoRef.current(videoEl);
     if (!tile.isLocal) {
-      tile.attachAudio(audioRef.current);
+      attachAudioRef.current(audioEl);
     }
     return () => {
-      tile.attachVideo(null);
+      attachVideoRef.current(null);
       if (!tile.isLocal) {
-        tile.attachAudio(null);
+        attachAudioRef.current(null);
       }
     };
-  }, [tile]);
+  }, [tile.identity, tile.hasVideo, tile.isScreenShare, tile.isLocal]);
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-black/60">
@@ -56,7 +75,7 @@ function TileVideo({ tile }: { tile: LiveStageTile }) {
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5">
         <p className="truncate text-[10px] font-bold text-white/85">
           {tile.name}
-          {tile.isSpeaking ? " · speaking" : ""}
+          {isSpeaking ? " · speaking" : ""}
           {tile.isLocal ? " · you" : ""}
         </p>
       </div>
@@ -75,9 +94,23 @@ function layoutClass(count: number): string {
     return "grid-cols-2 grid-rows-2";
   }
   if (count <= 6) {
-    return "grid-cols-2 grid-rows-3 sm:grid with-cols-3 sm:grid-rows-2";
+    return "grid-cols-2 grid-rows-3 sm:grid-cols-3 sm:grid-rows-2";
   }
   return "grid-cols-2 grid-rows-4 sm:grid-cols-4 sm:grid-rows-2";
+}
+
+function useIsMdUp(): boolean {
+  const [isMdUp, setIsMdUp] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const sync = () => setIsMdUp(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  return isMdUp;
 }
 
 function LiveMediaStageComponent({
@@ -91,6 +124,7 @@ function LiveMediaStageComponent({
   placeholderTitle,
   placeholderSubtitle,
 }: LiveMediaStageProps) {
+  const isMdUp = useIsMdUp();
   const faceTiles = tiles.filter((t) => !t.isScreenShare);
   const screenTiles = tiles.filter((t) => t.isScreenShare);
 
@@ -106,8 +140,10 @@ function LiveMediaStageComponent({
       if (a.identity === focusId) return -1;
       if (b.identity === focusId) return 1;
     }
-    if (a.isSpeaking !== b.isSpeaking) {
-      return a.isSpeaking ? -1 : 1;
+    const aSpeak = a.identity === activeSpeakerId;
+    const bSpeak = b.identity === activeSpeakerId;
+    if (aSpeak !== bSpeak) {
+      return aSpeak ? -1 : 1;
     }
     return 0;
   });
@@ -127,7 +163,7 @@ function LiveMediaStageComponent({
         <p className="mt-2 max-w-md text-xs leading-5 text-white/55 sm:text-sm">
           {connectionState === "connecting" ||
           connectionState === "reconnecting"
-            ? `${connectionLabel}…`
+            ? connectionLabel
             : mediaError
               ? mediaError
               : placeholderSubtitle}
@@ -151,59 +187,81 @@ function LiveMediaStageComponent({
     <div className="absolute inset-0 z-[5] flex flex-col gap-1 p-1 sm:p-2">
       {screenTiles[0] ? (
         <div className="min-h-0 flex-[1.4] overflow-hidden rounded-xl border border-white/10">
-          <TileVideo tile={screenTiles[0]} />
+          <TileVideo
+            tile={screenTiles[0]}
+            isSpeaking={false}
+          />
         </div>
       ) : null}
 
-      <div
-        className={`hidden min-h-0 flex-1 md:grid md:gap-1 ${
-          screenTiles[0] ? "md:max-h-[38%]" : ""
-        } ${gridLayout}`}
-      >
-        {ordered.map((tile) => (
-          <div
-            key={tile.identity}
-            className={`overflow-hidden rounded-xl border ${
-              tile.identity === focusId || tile.isSpeaking
-                ? "border-sky-400/50 ring-1 ring-sky-400/30"
-                : "border-white/10"
-            }`}
-          >
-            <TileVideo tile={tile} />
-          </div>
-        ))}
-      </div>
-
-      <div className="flex min-h-0 flex-1 flex-col gap-1 md:hidden">
-        {useMobileStrip ? (
-          <>
-            <div className="min-h-0 flex-[1.6] overflow-hidden rounded-xl border border-sky-400/40">
-              <TileVideo tile={ordered[0]} />
+      {/*
+        Mount only the active breakpoint tree. Previously both desktop and
+        mobile grids attached the same LiveKit track (display:none still mounts).
+        With adaptiveStream that caused dimension/visibility thrash and stutter.
+      */}
+      {isMdUp ? (
+        <div
+          className={`grid min-h-0 flex-1 gap-1 ${
+            screenTiles[0] ? "max-h-[38%]" : ""
+          } ${gridLayout}`}
+        >
+          {ordered.map((tile) => (
+            <div
+              key={tile.identity}
+              className={`overflow-hidden rounded-xl border ${
+                tile.identity === focusId || tile.identity === activeSpeakerId
+                  ? "border-sky-400/50 ring-1 ring-sky-400/30"
+                  : "border-white/10"
+              }`}
+            >
+              <TileVideo
+                tile={tile}
+                isSpeaking={tile.identity === activeSpeakerId}
+              />
             </div>
-            <div className="flex gap-1 overflow-x-auto pb-1">
-              {ordered.slice(1).map((tile) => (
+          ))}
+        </div>
+      ) : (
+        <div className="flex min-h-0 flex-1 flex-col gap-1">
+          {useMobileStrip ? (
+            <>
+              <div className="min-h-0 flex-[1.6] overflow-hidden rounded-xl border border-sky-400/40">
+                <TileVideo
+                  tile={ordered[0]}
+                  isSpeaking={ordered[0]?.identity === activeSpeakerId}
+                />
+              </div>
+              <div className="flex gap-1 overflow-x-auto pb-1">
+                {ordered.slice(1).map((tile) => (
+                  <div
+                    key={tile.identity}
+                    className="h-24 w-20 shrink-0 overflow-hidden rounded-lg border border-white/10"
+                  >
+                    <TileVideo
+                      tile={tile}
+                      isSpeaking={tile.identity === activeSpeakerId}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className={`grid min-h-0 flex-1 gap-1 ${layoutClass(count)}`}>
+              {ordered.map((tile) => (
                 <div
                   key={tile.identity}
-                  className="h-24 w-20 shrink-0 overflow-hidden rounded-lg border border-white/10"
+                  className="overflow-hidden rounded-xl border border-white/10"
                 >
-                  <TileVideo tile={tile} />
+                  <TileVideo
+                    tile={tile}
+                    isSpeaking={tile.identity === activeSpeakerId}
+                  />
                 </div>
               ))}
             </div>
-          </>
-        ) : (
-          <div className={`grid min-h-0 flex-1 gap-1 ${layoutClass(count)}`}>
-            {ordered.map((tile) => (
-              <div
-                key={tile.identity}
-                className="overflow-hidden rounded-xl border border-white/10"
-              >
-                <TileVideo tile={tile} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       <div className="pointer-events-none absolute right-3 top-14 rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/55 backdrop-blur-md sm:right-4">
         {connectionLabel}

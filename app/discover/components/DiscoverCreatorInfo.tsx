@@ -1,11 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { toggleProfileFollowAction } from "../../actions/notifications";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
-import { buildCreatorProfileHref, isUuid } from "../../lib/nav";
+import FollowButton from "../../components/social/FollowButton";
+import { APP_ROUTES, buildCreatorProfileHref, isUuid } from "../../lib/nav";
 import type { DiscoverCreator, DiscoverLocation } from "../types";
 
 type DiscoverCreatorInfoProps = {
@@ -13,24 +11,26 @@ type DiscoverCreatorInfoProps = {
   location: DiscoverLocation;
   /** Session viewer id from the Discover page (null if signed out). */
   viewerId?: string | null;
+  /** Post id for auth return deep-link (`/discover?post=`). */
+  postId?: string | number | null;
 };
 
 export default function DiscoverCreatorInfo({
   creator,
   location,
   viewerId = null,
+  postId = null,
 }: DiscoverCreatorInfoProps) {
-  const router = useRouter();
-  const [following, setFollowing] = useState(Boolean(creator.isFollowing));
-  const [followError, setFollowError] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
   const profileHref = buildCreatorProfileHref({
     username: creator.username,
   });
   const peerUserId = creator.id;
   const isSelf = Boolean(peerUserId && viewerId && viewerId === peerUserId);
   const canMessage = isUuid(peerUserId) && !isSelf;
-  const canFollow = isUuid(peerUserId) && !isSelf;
+  const returnPath =
+    postId != null && String(postId).length > 0
+      ? `${APP_ROUTES.discover}?post=${postId}`
+      : APP_ROUTES.discover;
 
   return (
     <div className="flex items-center gap-3">
@@ -50,43 +50,16 @@ export default function DiscoverCreatorInfo({
           >
             {creator.username}
           </Link>
-          {canFollow ? (
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => {
-                if (!viewerId) {
-                  router.push(`/login?next=${encodeURIComponent("/discover")}`);
-                  return;
-                }
-                const previous = following;
-                setFollowing(!previous);
-                setFollowError(null);
-                startTransition(() => {
-                  void toggleProfileFollowAction(peerUserId!).then((result) => {
-                    if (!result.ok) {
-                      setFollowing(previous);
-                      setFollowError(result.message);
-                      if (result.requiresAuth) {
-                        router.push(
-                          `/login?next=${encodeURIComponent("/discover")}`
-                        );
-                      }
-                      return;
-                    }
-                    setFollowing(result.following);
-                  });
-                });
-              }}
-              aria-pressed={following}
-              className={`watch-focus-ring pointer-events-auto shrink-0 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] transition disabled:opacity-60 ${
-                following
-                  ? "border-white/20 bg-white/10 text-white/80"
-                  : "border-sky-300/35 bg-sky-500/20 text-sky-50 hover:bg-sky-500/30"
-              }`}
-            >
-              {following ? "Following" : "Follow"}
-            </button>
+          {peerUserId ? (
+            <FollowButton
+              targetUserId={peerUserId}
+              viewerId={viewerId}
+              initialFollowing={Boolean(creator.isFollowing)}
+              returnPath={returnPath}
+              size="sm"
+              followingClassName="border border-white/20 bg-white/10 text-white/80"
+              idleClassName="border border-sky-300/35 bg-sky-500/20 text-sky-50 hover:bg-sky-500/30"
+            />
           ) : null}
           <StartDirectMessageButton
             peerUserId={peerUserId ?? ""}
@@ -98,11 +71,6 @@ export default function DiscoverCreatorInfo({
         <p className="truncate text-sm text-white/55">
           {location.city}, {location.country}
         </p>
-        {followError ? (
-          <p className="mt-1 text-[11px] font-medium text-red-200/90">
-            {followError}
-          </p>
-        ) : null}
       </div>
     </div>
   );

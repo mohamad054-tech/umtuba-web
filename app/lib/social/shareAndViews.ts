@@ -2,6 +2,9 @@ const VIEWER_KEY_STORAGE = "umtuba_viewer_key";
 const DEVICE_VIEWER_KEY_RE =
   /^d:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
+/** Session fallback when localStorage is blocked (avoids identity churn). */
+let memoryViewerKey: string | null = null;
+
 /**
  * Stable anonymous/device viewer key for deduped view/share counting.
  * Authenticated identity is resolved server-side from auth.uid() — never trust
@@ -20,9 +23,13 @@ export function getOrCreateViewerKey(): string {
 
     const next = `d:${crypto.randomUUID()}`;
     window.localStorage.setItem(VIEWER_KEY_STORAGE, next);
+    memoryViewerKey = next;
     return next;
   } catch {
-    return `d:${crypto.randomUUID()}`;
+    if (!memoryViewerKey) {
+      memoryViewerKey = `d:${crypto.randomUUID()}`;
+    }
+    return memoryViewerKey;
   }
 }
 

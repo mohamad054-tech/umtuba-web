@@ -22,6 +22,7 @@ type DiscoverFeedProps = {
     videoId: string,
     flags: { likedByMe?: boolean; savedByMe?: boolean }
   ) => void;
+  onNearEnd?: () => void;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -51,10 +52,14 @@ export default function DiscoverFeed({
   onComment,
   onStatsChange,
   onFlagsChange,
+  onNearEnd,
 }: DiscoverFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
   const activeIndexRef = useRef(0);
+  const nearEndRequestedRef = useRef(false);
+  /** Stable Set mutated for session view dedupe (does not trigger re-render). */
+  const [sessionViews] = useState(() => new Set<number>());
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
@@ -64,6 +69,19 @@ export default function DiscoverFeed({
   useEffect(() => {
     activeIndexRef.current = activeIndex;
   }, [activeIndex]);
+
+  useEffect(() => {
+    nearEndRequestedRef.current = false;
+  }, [videos.length]);
+
+  useEffect(() => {
+    if (activeIndex >= videos.length - 3) {
+      if (!nearEndRequestedRef.current) {
+        nearEndRequestedRef.current = true;
+        onNearEnd?.();
+      }
+    }
+  }, [activeIndex, videos.length, onNearEnd]);
 
   useEffect(() => {
     if (initialIndex <= 0 || videos.length === 0) {
@@ -263,6 +281,7 @@ export default function DiscoverFeed({
                 video={video}
                 active={index === activeIndex}
                 viewerId={viewerId}
+                sessionViews={sessionViews}
                 onComment={() => onComment?.(video)}
                 onStatsChange={(stats) => onStatsChange?.(video.id, stats)}
                 onFlagsChange={(flags) => onFlagsChange?.(video.id, flags)}

@@ -1,19 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { requireSupabasePublicEnv } from "../env/supabasePublic";
 
 export async function createClient() {
   const cookieStore = await cookies();
+  const { url, publishableKey } = requireSupabasePublicEnv();
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY."
-    );
-  }
-
-  return createServerClient(supabaseUrl, supabaseKey, {
+  return createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -36,6 +29,7 @@ export async function createClient() {
  * Server-side identity check. Always use getUser() (validates JWT with Auth).
  * Do not authorize with getSession() alone.
  * Returns null when there is no session (including AuthSessionMissingError).
+ * Throws a sanitized error when Supabase public config is missing/invalid.
  */
 export async function getServerUser() {
   const supabase = await createClient();

@@ -34,7 +34,7 @@ const JOURNEY = new Set([
 
 const LIVE = new Set(["live_started", "nearby_live_started"]);
 
-const REWARDS = new Set(["um_points_earned", "reward_milestone"]);
+const REWARDS = new Set(["um_points_earned", "reward_milestone", "referral_reward"]);
 
 const AI = new Set(["ai_creator_insight"]);
 

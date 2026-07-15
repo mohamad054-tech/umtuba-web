@@ -1,11 +1,19 @@
 import type { DiscoverVideo } from "../../app/discover/types";
 import {
+  VIDEO_FEED_PAGE_MAX,
+  VIDEO_FEED_PAGE_SIZE,
+} from "../../app/lib/video/feedPolicy";
+import {
   decodeWatchFeedCursor,
   discoverVideoToWatchVideo,
   encodeWatchFeedCursor,
 } from "../../app/watch/lib/mapWatchVideo";
-import type { WatchFeedPage, WatchVideo } from "../../app/watch/types";
+import type { WatchFeedPage } from "../../app/watch/types";
 import { WATCH_FEED_PAGE_SIZE } from "../../app/watch/types";
+import {
+  applyFollowingToDiscoverVideos,
+  loadViewerFollowingSet,
+} from "./follows";
 import { createClient, getServerUser } from "./server";
 import { loadViewerInteractionState } from "./socialInteractions";
 import {
@@ -20,7 +28,11 @@ import {
 } from "./videoPosts";
 
 export type DiscoverVideosResult =
-  | { ok: true; videos: DiscoverVideo[] }
+  | {
+      ok: true;
+      videos: DiscoverVideo[];
+      nextCursor: { createdAt: string; id: number } | null;
+    }
   | { ok: false; message: string };
 
 export type FeedPostsResult =
@@ -35,71 +47,30 @@ export type WatchPlaybackUrlResult =
   | { ok: true; src: string }
   | { ok: false; message: string; deleted?: boolean };
 
-/**
- * Server-side Discover feed: posts RLS + short-lived signed playback URLs.
- * Storage paths are never returned to the client.
- */
-export async function getDiscoverVideosServer(): Promise<DiscoverVideosResult> {
-  try {
-    const supabase = await createClient();
-    const user = await getServerUser();
-
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .eq("post_type", "video")
-      .not("video_path", "is", null)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Unable to load discover videos:", error);
-      return {
-        ok: false,
-        message: "Unable to load discover videos. Please try again.",
-      };
-    }
-
-    const rows = (data ?? []) as VideoPostRow[];
-    const withUrls = await attachPlaybackUrls(supabase, rows);
-    const withAuthors = await enrichAuthorUserIdsFromProfiles(
-      supabase,
-      withUrls
-    );
-    const viewerState = await loadViewerInteractionState(
-      supabase,
-      user?.id,
-      withAuthors.map((post) => post.id)
-    );
-    const posts = applyViewerStateToPosts(withAuthors, viewerState);
-    const videos = posts
-      .map(mapVideoPostToDiscover)
-      .filter((video): video is DiscoverVideo => video !== null);
-
-    return { ok: true, videos };
-  } catch (error) {
-    console.error("getDiscoverVideosServer failed:", error);
-    return {
-      ok: false,
-      message: "Unable to load discover videos. Please try again.",
-    };
-  }
-}
+export type CanonicalVideoFeedPage = {
+  videos: DiscoverVideo[];
+  nextCursor: { createdAt: string; id: number } | null;
+};
 
 /**
- * Paginated Watch feed of published video posts with signed playback URLs.
- * Never exposes storage paths. Cursor is opaque (created_at + id).
+ * Canonical video feed page used by Discover and Watch.
+ * - Same RLS filters, signed URLs, viewer like/save state, and follow hydration.
+ * - Never exposes storage paths.
  */
-export async function getWatchVideosPageServer(input?: {
+export async function loadCanonicalVideoFeedPage(input?: {
   cursor?: string | null;
   limit?: number;
   focusPostId?: number | null;
-}): Promise<WatchVideosPageResult> {
+}): Promise<
+  | { ok: true; page: CanonicalVideoFeedPage }
+  | { ok: false; message: string }
+> {
   try {
     const supabase = await createClient();
     const user = await getServerUser();
     const limit = Math.min(
-      Math.max(input?.limit ?? WATCH_FEED_PAGE_SIZE, 1),
-      30
+      Math.max(input?.limit ?? VIDEO_FEED_PAGE_SIZE, 1),
+      VIDEO_FEED_PAGE_MAX
     );
     const cursor = decodeWatchFeedCursor(input?.cursor ?? null);
 
@@ -121,10 +92,10 @@ export async function getWatchVideosPageServer(input?: {
     const { data, error } = await query;
 
     if (error) {
-      console.error("Unable to load watch videos:", error);
+      console.error("Unable to load video feed:", error);
       return {
         ok: false,
-        message: "Unable to load the Watch feed. Please try again.",
+        message: "Unable to load videos. Please try again.",
       };
     }
 
@@ -159,10 +130,18 @@ export async function getWatchVideosPageServer(input?: {
       withAuthors.map((post) => post.id)
     );
     const posts = applyViewerStateToPosts(withAuthors, viewerState);
-    const videos: WatchVideo[] = posts
+    let videos = posts
       .map(mapVideoPostToDiscover)
-      .filter((video): video is DiscoverVideo => video !== null)
-      .map(discoverVideoToWatchVideo);
+      .filter((video): video is DiscoverVideo => video !== null);
+
+    const followingSet = await loadViewerFollowingSet(
+      supabase,
+      user?.id,
+      videos
+        .map((video) => video.creator.id)
+        .filter((id): id is string => Boolean(id))
+    );
+    videos = applyFollowingToDiscoverVideos(videos, followingSet);
 
     const lastRow = pageRows[pageRows.length - 1];
     const nextCursor =
@@ -172,19 +151,72 @@ export async function getWatchVideosPageServer(input?: {
 
     return {
       ok: true,
-      page: {
-        videos,
-        nextCursor,
-        usedDemoFallback: false,
-      },
+      page: { videos, nextCursor },
     };
   } catch (error) {
-    console.error("getWatchVideosPageServer failed:", error);
+    console.error("loadCanonicalVideoFeedPage failed:", error);
+    return {
+      ok: false,
+      message: "Unable to load videos. Please try again.",
+    };
+  }
+}
+
+/**
+ * Discover first page (bounded). Same interaction/follow truth as Watch.
+ */
+export async function getDiscoverVideosServer(input?: {
+  focusPostId?: number | null;
+  limit?: number;
+}): Promise<DiscoverVideosResult> {
+  const result = await loadCanonicalVideoFeedPage({
+    focusPostId: input?.focusPostId,
+    limit: input?.limit ?? VIDEO_FEED_PAGE_SIZE,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false,
+      message: "Unable to load discover videos. Please try again.",
+    };
+  }
+
+  return {
+    ok: true,
+    videos: result.page.videos,
+    nextCursor: result.page.nextCursor,
+  };
+}
+
+/**
+ * Paginated Watch feed — maps canonical DiscoverVideo → WatchVideo.
+ */
+export async function getWatchVideosPageServer(input?: {
+  cursor?: string | null;
+  limit?: number;
+  focusPostId?: number | null;
+}): Promise<WatchVideosPageResult> {
+  const result = await loadCanonicalVideoFeedPage({
+    cursor: input?.cursor,
+    limit: input?.limit ?? WATCH_FEED_PAGE_SIZE,
+    focusPostId: input?.focusPostId,
+  });
+
+  if (!result.ok) {
     return {
       ok: false,
       message: "Unable to load the Watch feed. Please try again.",
     };
   }
+
+  return {
+    ok: true,
+    page: {
+      videos: result.page.videos.map(discoverVideoToWatchVideo),
+      nextCursor: result.page.nextCursor,
+      usedDemoFallback: false,
+    },
+  };
 }
 
 /** Remint a short-lived signed URL for an existing published video post. */
@@ -239,6 +271,7 @@ export function encodeWatchPageCursor(
 
 /**
  * Server-side feed posts with signed video URLs (no storage paths exposed).
+ * Legacy /feed surface — not the Discover/Watch canonical path.
  */
 export async function getFeedPostsServer(): Promise<FeedPostsResult> {
   try {

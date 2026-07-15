@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {
+  formatFollowCountLabel,
+  type FollowSnapshot,
+} from "../../lib/supabase/follows";
 import { APP_ROUTES } from "../lib/nav";
 import {
   ProfileAbout,
@@ -19,16 +23,26 @@ import type { ProfileView } from "./types";
 type ProfileExperienceProps = {
   profile: ProfileView;
   isOwner: boolean;
+  viewerId?: string | null;
 };
 
 export default function ProfileExperience({
   profile,
   isOwner,
+  viewerId = null,
 }: ProfileExperienceProps) {
   const [activeTab, setActiveTab] = useState<ProfileTabId>("videos");
   const [isFollowing, setIsFollowing] = useState(
     Boolean(profile.isFollowing)
   );
+  const [followersLabel, setFollowersLabel] = useState(profile.followersLabel);
+  const [followingLabel, setFollowingLabel] = useState(profile.followingLabel);
+
+  function handleFollowChange(snapshot: FollowSnapshot) {
+    setIsFollowing(snapshot.following);
+    setFollowersLabel(formatFollowCountLabel(snapshot.followersCount));
+    setFollowingLabel(formatFollowCountLabel(snapshot.followingCount));
+  }
 
   return (
     <ProfileShell>
@@ -45,22 +59,24 @@ export default function ProfileExperience({
         <section className="space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7">
           <ProfileHeader profile={profile} />
           <ProfileStats
-            followersLabel={profile.followersLabel}
-            followingLabel={profile.followingLabel}
+            followersLabel={followersLabel}
+            followingLabel={followingLabel}
             likesLabel={profile.likesLabel}
+            viewsLabel={profile.viewsLabel}
           />
           <ProfileActions
             profile={profile}
             isOwner={isOwner}
+            viewerId={viewerId}
             isFollowing={isFollowing}
-            onToggleFollow={() => setIsFollowing((value) => !value)}
+            onFollowChange={handleFollowChange}
           />
         </section>
 
         <ProfileTabs
           activeTab={activeTab}
           onChange={setActiveTab}
-          videoCount={profile.videos.length}
+          videoCount={profile.videoTotalCount}
           liveCount={profile.liveSessions.length}
         />
 
@@ -75,7 +91,10 @@ export default function ProfileExperience({
           }
         >
           {activeTab === "videos" ? (
-            <ProfileVideoGrid videos={profile.videos} />
+            <ProfileVideoGrid
+              videos={profile.videos}
+              hasMore={Boolean(profile.hasMoreVideos)}
+            />
           ) : null}
           {activeTab === "live" ? (
             <ProfileLivePanel

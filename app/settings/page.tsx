@@ -1,9 +1,12 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { settingsMetadata } from "../../lib/site/routeMetadata";
 import { getServerUser } from "../../lib/supabase/server";
 import { getProfileByIdFromDb } from "../../lib/supabase/profiles";
 import { APP_ROUTES } from "../lib/nav";
 import SettingsExperience from "./SettingsExperience";
+
+export const metadata = settingsMetadata;
 
 export default async function SettingsPage() {
   let userId: string | null = null;

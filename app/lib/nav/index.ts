@@ -21,3 +21,15 @@ export {
   type AppNavItem,
   type AppRouteHref,
 } from "./routes";
+
+export {
+  MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
+  MOBILE_BOTTOM_NAV_MAX_CLASS,
+  MOBILE_BOTTOM_NAV_OFFSET_VAR,
+  MOBILE_PRIMARY_NAV_ITEMS,
+  isMobilePrimaryNavActive,
+  resolveMobileProfileHref,
+  shouldShowMobileBottomNav,
+  type MobilePrimaryNavId,
+  type MobilePrimaryNavItem,
+} from "./mobileNav";

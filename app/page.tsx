@@ -1,6 +1,9 @@
 import { Suspense } from "react";
+import { landingMetadata } from "../lib/site/routeMetadata";
 import JoinBetaLink from "./components/landing/JoinBetaLink";
 import LandingHero from "./components/landing/LandingHero";
+
+export const metadata = landingMetadata;
 
 function LandingHeroFallback() {
   return (
@@ -19,7 +22,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#050510] font-sans text-white">
+    <main className="min-h-screen overflow-hidden bg-[#050510] font-sans text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
       <Suspense fallback={<LandingHeroFallback />}>
         <LandingHero />
       </Suspense>

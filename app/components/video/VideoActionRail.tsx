@@ -26,6 +26,7 @@ import {
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
 import type { DiscoverStats } from "../../discover/types";
+import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
 import type { WatchPanelId } from "./watchTypes";
 
 type VideoActionRailProps = {
@@ -36,6 +37,8 @@ type VideoActionRailProps = {
   caption?: string;
   /** When false, interactions stay local (demo fallback). */
   persist?: boolean;
+  /** Safe path for login `?next=` (defaults to Watch). */
+  returnPath?: string;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
@@ -48,6 +51,7 @@ export default function VideoActionRail({
   savedByMe,
   caption,
   persist = Boolean(postId),
+  returnPath = APP_ROUTES.watch,
   onOpenPanel,
   onStatsChange,
   onFlagsChange,
@@ -127,7 +131,9 @@ export default function VideoActionRail({
   }
 
   function redirectToLogin() {
-    router.push(`${APP_ROUTES.login}?next=${encodeURIComponent("/watch")}`);
+    router.push(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(returnPath || APP_ROUTES.watch)}`
+    );
   }
 
   function shareInput() {
@@ -343,20 +349,22 @@ export default function VideoActionRail({
         }
       />
 
-      <ActionButton
-        label="UConnect"
-        onClick={() => onOpenPanel("uconnect")}
-        icon={
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path
-              d="M8 12a3 3 0 100-6 3 3 0 000 6zM16 12a3 3 0 100-6 3 3 0 000 6zM4.5 19a3.5 3.5 0 017 0M12.5 19a3.5 3.5 0 017 0"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-            />
-          </svg>
-        }
-      />
+      {allowWatchPrototypePanels() ? (
+        <ActionButton
+          label="UConnect"
+          onClick={() => onOpenPanel("uconnect")}
+          icon={
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M8 12a3 3 0 100-6 3 3 0 000 6zM16 12a3 3 0 100-6 3 3 0 000 6zM4.5 19a3.5 3.5 0 017 0M12.5 19a3.5 3.5 0 017 0"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+              />
+            </svg>
+          }
+        />
+      ) : null}
     </div>
   );
 }

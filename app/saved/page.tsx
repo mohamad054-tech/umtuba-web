@@ -2,11 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../components/AppTopNav";
 import { loadSavedPostsAction } from "../actions/socialInteractions";
+import { savedMetadata } from "../../lib/site/routeMetadata";
 import { getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
 import type { Post, PostType } from "../data/types/post";
 import SavedExperience from "./SavedExperience";
 
+export const metadata = savedMetadata;
 export const dynamic = "force-dynamic";
 
 const validPostTypes: PostType[] = [
@@ -96,7 +98,7 @@ export default async function SavedPage() {
   const loadError = result.ok ? null : result.message;
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main className="min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
       <AppTopNav
         title="Saved"
         subtitle="Your bookmarks"

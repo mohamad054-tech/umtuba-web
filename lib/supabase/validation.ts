@@ -26,6 +26,21 @@ export function validatePassword(password: string): string | null {
   return null;
 }
 
+export function validatePasswordConfirmation(
+  password: string,
+  confirmPassword: string
+): string | null {
+  if (!confirmPassword) {
+    return "Confirm your password.";
+  }
+
+  if (password !== confirmPassword) {
+    return "Passwords do not match.";
+  }
+
+  return null;
+}
+
 export function getErrorMessage(error: unknown, fallback: string): string {
   if (error && typeof error === "object" && "message" in error) {
     const message = String((error as { message: unknown }).message).trim();

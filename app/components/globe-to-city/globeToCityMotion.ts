@@ -11,6 +11,8 @@ import {
   type MotionTransitionResult,
   type StartTransitionOptions,
 } from "../../lib/motion";
+import { buildDiscoverCityHref } from "../../lib/nav";
+import { isExperimentalRouteAvailable } from "../../lib/product/surfaceGates";
 import { globeToCityTransition, GLOBE_TO_CITY_TRANSITION_ID } from "../../motion/transitions/globe-to-city";
 
 export const GLOBE_TO_CITY_PHASES = [
@@ -83,6 +85,10 @@ export function buildGlobeToCityHandoff(input: {
 }
 
 export function buildGlobeToCityHref(handoff: CityHandoffPayload) {
+  // Production: Discover city filter — City prototype is gated.
+  if (!isExperimentalRouteAvailable()) {
+    return buildDiscoverCityHref(handoff.city, handoff.country);
+  }
   return buildCityHref(handoff);
 }
 

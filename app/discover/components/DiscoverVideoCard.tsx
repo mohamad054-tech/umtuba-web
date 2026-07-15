@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { recordViewAction } from "../../actions/socialInteractions";
-import { getOrCreateViewerKey } from "../../lib/social/shareAndViews";
+import { useEffect, useState } from "react";
+import { APP_ROUTES } from "../../lib/nav";
+import { recordFeedViewOnce } from "../../lib/video/recordFeedView";
 import type { DiscoverStats, DiscoverVideo } from "../types";
 import DiscoverActionRail from "./DiscoverActionRail";
 import DiscoverCaption from "./DiscoverCaption";
@@ -14,6 +14,8 @@ type DiscoverVideoCardProps = {
   video: DiscoverVideo;
   active: boolean;
   viewerId?: string | null;
+  /** Shared session dedupe for view recording (feed-owned). */
+  sessionViews?: Set<number>;
   onComment: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
@@ -24,28 +26,27 @@ export default function DiscoverVideoCard({
   video,
   active,
   viewerId = null,
+  sessionViews,
   onComment,
   onStatsChange,
   onFlagsChange,
   slideRef,
 }: DiscoverVideoCardProps) {
-  const viewedRef = useRef(false);
+  const [localViews] = useState(() => new Set<number>());
+  const viewsSet = sessionViews ?? localViews;
   const postId = Number(video.id);
 
   useEffect(() => {
-    if (!active || viewedRef.current || !Number.isInteger(postId) || postId <= 0) {
+    if (!active || !Number.isInteger(postId) || postId <= 0) {
       return;
     }
 
-    viewedRef.current = true;
-    const viewerKey = getOrCreateViewerKey();
-
-    void recordViewAction(postId, viewerKey).then((result) => {
+    void recordFeedViewOnce(postId, viewsSet).then((result) => {
       if (result.ok) {
         onStatsChange?.({ views: result.views });
       }
     });
-  }, [active, onStatsChange, postId]);
+  }, [active, onStatsChange, postId, viewsSet]);
 
   return (
     <article
@@ -79,6 +80,7 @@ export default function DiscoverVideoCard({
                 creator={video.creator}
                 location={video.location}
                 viewerId={viewerId}
+                postId={video.id}
               />
             </div>
             <DiscoverCaption
@@ -94,6 +96,7 @@ export default function DiscoverVideoCard({
               likedByMe={video.likedByMe}
               savedByMe={video.savedByMe}
               caption={video.caption}
+              returnPath={`${APP_ROUTES.discover}?post=${video.id}`}
               onComment={onComment}
               onStatsChange={onStatsChange}
               onFlagsChange={onFlagsChange}

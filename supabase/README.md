@@ -4,10 +4,53 @@
 
 Copy `.env.example` to `.env.local` and set:
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable / anon key only)
+### Required (browser + server + middleware)
 
-Never put the **service role** key in the Next.js app or commit it.
+| Variable | Runtime | Purpose |
+|----------|---------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Browser, server, middleware (`proxy.ts`) | Supabase project URL (`https://…supabase.co`) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser, server, middleware | Publishable / anon key only |
+
+Optional alias: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (same key) if `PUBLISHABLE_KEY` is unset.
+
+Validated by `lib/env/supabasePublic.ts`. Clients are never created with empty placeholders.
+
+### Optional (LiveKit — only when using live media)
+
+| Variable | Runtime | Purpose |
+|----------|---------|---------|
+| `LIVEKIT_API_KEY` | Server only | Token minting |
+| `LIVEKIT_API_SECRET` | Server only | Token minting |
+| `LIVEKIT_URL` | Server only | LiveKit API / WS URL |
+| `NEXT_PUBLIC_LIVEKIT_URL` | Browser | Public `wss://` URL (no secrets) |
+
+### Forbidden in this app
+
+- `SUPABASE_SERVICE_ROLE_KEY` — do **not** add to `.env.local` for the Next.js app and never use `NEXT_PUBLIC_*` for it. Privileged work stays in Postgres SECURITY DEFINER functions.
+
+### Unfinished surface gating (Phase A4)
+
+| Surface | Production | Development |
+|---------|------------|-------------|
+| `/feed` | `notFound()` | Legacy feed (banner: use Discover) |
+| `/city/[slug]` | “City experience is being prepared” empty state | Placeholder prototype |
+| `/journey-pro` | `notFound()` | Experimental lab |
+| `/live/media-lab` | `notFound()` | Media lab |
+| `/watch` demo videos | Never | Allowed unless `NEXT_PUBLIC_ALLOW_SURFACE_PREVIEWS=0` |
+| Watch Related/AI/UConnect panels | Hidden | Shown unless previews disabled |
+| Live collab mock files / entry | Hidden | Shown unless previews disabled |
+| Messenger attach/voice controls | Removed (text + send only) | Same — not previewed |
+| Messenger fake presence dots | Hidden | Opt-in only (`NEXT_PUBLIC_ALLOW_SURFACE_PREVIEWS=1`) |
+
+Logic: `app/lib/product/surfaceGates.ts`.
+
+### Fail-closed behavior (missing / invalid Supabase public config)
+
+- Protected prefixes (`/messages`, `/notifications`, `/settings`, `/create`, `/saved`, `/rewards`, `/creator`) → **HTTP 503** (never treated as anonymous-allowed).
+- Auth pages (`/login`, `/signup`, `/register`) → **HTTP 503** (no redirect loops to a broken login).
+- Other public routes may continue without a session; browser/server Supabase helpers throw sanitized errors (no key material in messages).
+
+Safe local setup: copy `.env.example` → `.env.local`, paste URL + publishable key from the Supabase Dashboard → **Settings → API**. Never commit `.env.local`.
 
 ## Apply SQL migrations (in order)
 
@@ -69,21 +112,74 @@ Never put the **service role** key in the Next.js app or commit it.
 
    `supabase/migrations/20260718_notifications_v2_event_wiring.sql`
 
-14. Then Activity Tier foundation (score ledger + badges, separate from UM Points):
+14. Then Wallet balance Realtime (header live updates on `um_point_balances`):
+
+   `supabase/migrations/20260719_wallet_balance_realtime.sql`
+
+15. Then Activity Tier foundation (score ledger + badges, separate from UM Points):
 
    `supabase/migrations/20260720_activity_tiers_foundation.sql`
 
-15. Then Activity Tier event wiring (posts/comments/likes/saves/shares/live/follows/referrals):
+16. Then Activity Tier event wiring (posts/comments/likes/saves/shares/live/follows/referrals):
 
    `supabase/migrations/20260721_activity_tiers_event_wiring.sql`
 
-16. Click **Run**.
+17. Then Referral Rewards V1 (Growth Mode — immediate signup credit, invite links, attribution cookies):
+
+   `supabase/migrations/20260722_referral_rewards_v1.sql`
+
+18. Then UM Points award security (revoke client generic awards; trusted writers only):
+
+   `supabase/migrations/20260723_um_points_award_security.sql`
+
+19. Then Profile follow integrity (snapshot RPC + idempotent toggle with counts):
+
+   `supabase/migrations/20260724_profile_follow_integrity.sql`
+
+
+20. Then Profile content stats (video/like/view totals for public profiles):
+
+   `supabase/migrations/20260725_profile_content_stats.sql`
+
+21. Then Referral claim reliability (visitor resolution + existing-account guard for claim RPC):
+
+   `supabase/migrations/20260726_referral_claim_reliability.sql`
+   (**Prepared — apply only after review; required for cookie-loss / login-later claim paths.**)
+
+22. Then Live stale participant prune (ops/cron ghost-viewer cleanup):
+
+   `supabase/migrations/20260727_live_stale_participant_prune.sql`
+   (**Prepared — apply only after review; not client-callable.**)
+
+23. Click **Run**.
 
 Verify automation objects (optional):
 
 `scripts/verify-notifications-v2-automation.sql`
 
 `scripts/verify-activity-tiers.sql`
+
+`scripts/verify-um-points-award-security.sql`
+
+`scripts/verify-profile-follow-integrity.sql`
+
+### Trusted UM Points reward flow
+
+Reward **amounts**, **reasons**, **recipients**, and **dedupe keys** are owned by the
+**database layer** (SECURITY DEFINER triggers / fixed-rule claim RPCs +
+`um_points_config`). The Next.js app must never expose a generic
+“award N points for reason X” API to browsers.
+
+| Layer | Role |
+|-------|------|
+| DB `um_points_config` + event triggers | Decide when points are earned and how many |
+| DB `award_um_points_to_user` | Internal append-only ledger writer + balance update (not granted to `anon` / `authenticated`) |
+| DB `claim_verified_welcome_bonus` / `claim_my_referral_signup` | Client-callable only with **fixed** server rules (no client-chosen points/reason) |
+| DB `award_um_points` | **Retired** — always raises; execute revoked from clients (`20260723_um_points_award_security.sql`) |
+| App server actions / UI | Trigger eligible product events (post, comment, signup claim); never pass arbitrary award payloads |
+| RLS on `um_point_balances` / `um_points_ledger` | Users **SELECT** own rows only; direct INSERT/UPDATE/DELETE revoked |
+
+`lib/rewards/umPointsConfig.ts` mirrors SQL defaults for UI copy and unit tests only — it is not an award authority.
 
 ### Live Media V2 (LiveKit)
 
@@ -212,6 +308,22 @@ For Live V3 (idempotent — ensures chat, rooms, participants, and reactions are
 In **Authentication → Providers**, ensure **Email** is enabled.
 
 If **Confirm email** is enabled, new users must confirm before they get a session. The app shows a clear message in that case. For local testing you can temporarily disable email confirmation.
+
+### Password reset
+
+App routes:
+
+- `/forgot-password` — request reset email
+- `/auth/callback` — PKCE code exchange (server-side; no tokens in the page URL)
+- `/auth/update-password` — set a new password, then redirect to `/login?reset=success`
+
+In **Authentication → URL Configuration**, add redirect allow-list entries for:
+
+- `http://localhost:3000/auth/callback`
+- `https://YOUR_PRODUCTION_DOMAIN/auth/callback`
+
+Site URL should match your deployed origin. Recovery emails use
+`redirectTo = {origin}/auth/callback?next=/auth/update-password`.
 
 ## Verify quickly
 

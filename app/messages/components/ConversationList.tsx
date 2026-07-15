@@ -23,7 +23,7 @@ export default function ConversationList({
   loading = false,
   error = null,
   onRetry,
-  emptyHint = "No conversations yet.",
+  emptyHint = "Message a creator from their profile or Discover to begin.",
 }: ConversationListProps) {
   return (
     <aside className="flex h-full min-h-0 flex-col rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
@@ -36,7 +36,7 @@ export default function ConversationList({
 
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
         {loading ? (
-          <p className="px-3 py-8 text-center text-sm text-white/40">
+          <p className="px-3 py-8 text-center text-sm text-white/40" role="status">
             Loading conversations…
           </p>
         ) : error ? (
@@ -48,18 +48,25 @@ export default function ConversationList({
               <button
                 type="button"
                 onClick={onRetry}
-                className="mt-4 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold text-white/80"
+                className="mt-4 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
               >
                 Try again
               </button>
             ) : null}
           </div>
         ) : conversations.length === 0 ? (
-          <p className="px-3 py-8 text-center text-sm text-white/40">
-            {searchQuery.trim()
-              ? "No conversations match your search."
-              : emptyHint}
-          </p>
+          <div className="px-3 py-8 text-center">
+            <p className="text-sm text-white/50">
+              {searchQuery.trim()
+                ? "No conversations match your search."
+                : emptyHint}
+            </p>
+            {!searchQuery.trim() ? (
+              <p className="mt-2 text-xs text-white/35">
+                Text text messaging only — no attachments or voice yet.
+              </p>
+            ) : null}
+          </div>
         ) : (
           conversations.map((conversation) => (
             <ConversationListItem

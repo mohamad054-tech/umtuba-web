@@ -2,7 +2,6 @@
 
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
-  awardUmPoints,
   getNotificationPreferences,
   getUnreadNotificationCount,
   listNotifications,
@@ -13,7 +12,6 @@ import {
   notifyPostReachedCountry,
   notifyPostTrendingCountry,
   notifyPostViewMilestone,
-  toggleProfileFollow,
   updateNotificationPreferences,
   type ActionResult,
   type AppNotification,
@@ -106,25 +104,6 @@ export async function markAllNotificationsReadAction(): Promise<
 
   const supabase = await createClient();
   return markAllNotificationsRead(supabase);
-}
-
-export async function toggleProfileFollowAction(
-  followingId: string
-): Promise<ActionResult<{ following: boolean }>> {
-  const parsed = parseUuid(followingId, "user");
-  if (!parsed.ok) return parsed;
-
-  const user = await getServerUser();
-  if (!user) {
-    return {
-      ok: false,
-      message: "Please sign in to follow creators.",
-      requiresAuth: true,
-    };
-  }
-
-  const supabase = await createClient();
-  return toggleProfileFollow(supabase, parsed.id);
 }
 
 export async function getNotificationPreferencesAction(): Promise<
@@ -229,39 +208,6 @@ export async function notifyPostJourneySummaryAction(
 
   const supabase = await createClient();
   return notifyPostJourneySummary(supabase, post.postId);
-}
-
-export async function awardUmPointsAction(input: {
-  points: number;
-  reason: string;
-  dedupeKey: string;
-  metadata?: Record<string, unknown>;
-}): Promise<
-  ActionResult<{
-    created: boolean;
-    balance: number;
-    notificationId: string | null;
-  }>
-> {
-  const user = await getServerUser();
-  if (!user) {
-    return { ok: false, message: "Please sign in.", requiresAuth: true };
-  }
-
-  if (!Number.isFinite(input.points) || input.points <= 0) {
-    return { ok: false, message: "Invalid points amount." };
-  }
-  if (!input.reason.trim() || !input.dedupeKey.trim()) {
-    return { ok: false, message: "Reason and dedupe key are required." };
-  }
-
-  const supabase = await createClient();
-  return awardUmPoints(supabase, {
-    points: Math.floor(input.points),
-    reason: input.reason.trim(),
-    dedupeKey: input.dedupeKey.trim(),
-    metadata: input.metadata,
-  });
 }
 
 export async function notifyAiCreatorInsightAction(input: {
