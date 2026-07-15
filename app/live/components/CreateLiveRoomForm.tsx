@@ -12,13 +12,16 @@ type CreateLiveRoomFormProps = {
     country: string;
   }) => Promise<void>;
   busy?: boolean;
+  /** When true, show the full create form immediately (content-flow panels). */
+  defaultOpen?: boolean;
 };
 
 export default function CreateLiveRoomForm({
   onCreate,
   busy = false,
+  defaultOpen = false,
 }: CreateLiveRoomFormProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Travel");
   const [city, setCity] = useState("");
@@ -30,19 +33,35 @@ export default function CreateLiveRoomForm({
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
-    const trimmed = title.trim();
-    if (!trimmed) {
+    const trimmedTitle = title.trim();
+    const trimmedCategory = category.trim();
+    const trimmedCity = city.trim();
+    const trimmedCountry = country.trim();
+
+    if (!trimmedTitle) {
       setError("Add a title for your live room.");
+      return;
+    }
+    if (!trimmedCategory) {
+      setError("Choose a category.");
+      return;
+    }
+    if (!trimmedCity) {
+      setError("Add a city.");
+      return;
+    }
+    if (!trimmedCountry) {
+      setError("Add a country.");
       return;
     }
 
     try {
       await onCreate({
-        title: trimmed,
+        title: trimmedTitle,
         visibility,
-        category: category.trim() || "Live",
-        city: city.trim(),
-        country: country.trim(),
+        category: trimmedCategory,
+        city: trimmedCity,
+        country: trimmedCountry,
       });
       setTitle("");
       setCity("");
@@ -72,7 +91,7 @@ export default function CreateLiveRoomForm({
       onSubmit={(event) => {
         void handleSubmit(event);
       }}
-      className="w-full max-w-md space-y-3 rounded-[24px] border border-white/10 bg-[#080816]/90 p-4 backdrop-blur-xl"
+      className="w-full space-y-3 rounded-[24px] border border-white/10 bg-[#080816]/90 p-4 backdrop-blur-xl"
     >
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-black text-white">Create live room</p>

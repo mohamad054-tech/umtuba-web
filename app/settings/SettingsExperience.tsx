@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useRef, useState, type ChangeEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AuthAlert,
   AuthField,
@@ -21,6 +21,7 @@ import {
   normalizeUsername,
   USERNAME_HINT,
 } from "../../lib/supabase/validation";
+import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
 
 export type SettingsProfile = {
   id: string;
@@ -47,6 +48,9 @@ export default function SettingsExperience({
   profile,
 }: SettingsExperienceProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const highlightNotifications =
+    searchParams.get("section") === "notifications";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [username, setUsername] = useState(profile.username);
@@ -150,7 +154,7 @@ export default function SettingsExperience({
     try {
       setIsSigningOut(true);
       await signOut();
-      router.push(APP_ROUTES.login);
+      router.push(APP_ROUTES.home);
       router.refresh();
     } catch (error) {
       setFormError(getErrorMessage(error, "Unable to sign out."));
@@ -304,6 +308,8 @@ export default function SettingsExperience({
             }}
           />
         </div>
+
+        <NotificationPreferencesPanel highlighted={highlightNotifications} />
 
         {formError ? (
           <AuthAlert tone="error">

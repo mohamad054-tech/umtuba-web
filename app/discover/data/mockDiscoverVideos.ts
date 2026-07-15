@@ -3,6 +3,7 @@ import type { DiscoverVideo } from "../types";
 /**
  * Legacy local mock cards — Discover now loads real Supabase video posts.
  * Kept only for reference / local demos; not used by the Discover page.
+ * creator.id is null: mocks are not real auth users (Message stays hidden).
  */
 export const mockDiscoverVideos: DiscoverVideo[] = [
   {
@@ -13,7 +14,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Jerusalem", "#TravelShorts", "#UMTUBA", "#MorningVibes"],
     location: { city: "Jerusalem", country: "Palestine" },
     creator: {
-      id: "c-lina",
+      id: null,
       name: "Lina Haddad",
       username: "@lina.creates",
       avatar: "L",
@@ -30,7 +31,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Amman", "#NightOut", "#CreatorLife", "#Discover"],
     location: { city: "Amman", country: "Jordan" },
     creator: {
-      id: "c-omar",
+      id: null,
       name: "Omar Khalil",
       username: "@omar.travels",
       avatar: "O",
@@ -47,7 +48,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Istanbul", "#Bosphorus", "#UrbanPulse", "#Shorts"],
     location: { city: "Istanbul", country: "Türkiye" },
     creator: {
-      id: "c-maya",
+      id: null,
       name: "Maya Chen",
       username: "@maya.labs",
       avatar: "M",
@@ -64,7 +65,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Berlin", "#Nightlife", "#GlassCity", "#UMTUBA"],
     location: { city: "Berlin", country: "Germany" },
     creator: {
-      id: "c-samir",
+      id: null,
       name: "Samir Nasser",
       username: "@samir.builds",
       avatar: "S",
@@ -82,7 +83,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Cairo", "#Nile", "#GlobalCreators", "#Explore"],
     location: { city: "Cairo", country: "Egypt" },
     creator: {
-      id: "c-noor",
+      id: null,
       name: "Noor Ali",
       username: "@noor.world",
       avatar: "N",
@@ -99,7 +100,7 @@ export const mockDiscoverVideos: DiscoverVideo[] = [
     hashtags: ["#Tokyo", "#MorningRitual", "#Japan", "#DiscoverFeed"],
     location: { city: "Tokyo", country: "Japan" },
     creator: {
-      id: "c-yuki",
+      id: null,
       name: "Yuki Tanaka",
       username: "@yuki.frames",
       avatar: "Y",

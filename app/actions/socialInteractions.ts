@@ -112,7 +112,12 @@ export async function recordShareAction(
 
 export async function recordViewAction(
   postId: number,
-  viewerKey?: string | null
+  viewerKey?: string | null,
+  geo?: {
+    countryCode?: string | null;
+    countryName?: string | null;
+    city?: string | null;
+  } | null
 ): Promise<ActionResult<ViewResult>> {
   const parsed = parsePostId(postId);
   if (!parsed.ok) {
@@ -136,7 +141,50 @@ export async function recordViewAction(
     }
   }
 
-  return recordPostView(supabase, parsed.postId, resolvedKey);
+  const { headers } = await import("next/headers");
+  const headerStore = await headers();
+  const headerCountry =
+    headerStore.get("cf-ipcountry") ||
+    headerStore.get("x-vercel-ip-country") ||
+    headerStore.get("x-country-code");
+
+  let profileCity: string | null = null;
+  let profileCountry: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("city, country")
+      .eq("id", user.id)
+      .maybeSingle();
+    profileCity =
+      typeof profile?.city === "string" ? profile.city : null;
+    profileCountry =
+      typeof profile?.country === "string" ? profile.country : null;
+  }
+
+  const { buildApproximateGeo, normalizeCountryCode, countryNameFromCode } =
+    await import("../../lib/geo/approximateLocation");
+
+  // Prefer explicit client geo (still approximate), then CDN country, then profile.
+  const fromClient = buildApproximateGeo({
+    countryCode: geo?.countryCode ?? null,
+    countryName: geo?.countryName ?? null,
+    city: geo?.city ?? profileCity,
+  });
+  const fromHeader = normalizeCountryCode(headerCountry);
+  const countryCode = fromClient.countryCode ?? fromHeader;
+  const countryName =
+    fromClient.countryName ??
+    countryNameFromCode(countryCode) ??
+    (profileCountry && profileCountry.trim() ? profileCountry.trim() : null);
+  const city = fromClient.city;
+
+  return recordPostView(supabase, parsed.postId, resolvedKey, {
+    countryCode,
+    countryName,
+    city,
+    qualified: true,
+  });
 }
 
 export async function listCommentsAction(

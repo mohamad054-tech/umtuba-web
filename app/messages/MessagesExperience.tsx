@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   listConversationsAction,
   listMessagesAction,
@@ -10,11 +10,14 @@ import {
   sendMessageAction,
   setTypingAction,
 } from "../actions/messenger";
+import { buildConversationHref, isUuid } from "../lib/nav";
 import ConversationList from "./components/ConversationList";
 import ChatWindow from "./components/ChatWindow";
 import MessagesShell from "./components/MessagesShell";
 import {
   formatMessageTime,
+  peerGradientFromId,
+  initialsFromName,
   type Conversation,
   type Message,
 } from "./types";
@@ -38,15 +41,20 @@ export default function MessagesExperience({
   initialConversations,
   initialError = null,
 }: MessagesExperienceProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const conversationParam = searchParams.get("conversation");
   const creatorId = searchParams.get("creatorId");
   const creatorName = searchParams.get("creatorName");
-  const intent = searchParams.get("intent");
 
   const [conversations, setConversations] =
     useState<Conversation[]>(initialConversations);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(() =>
+    conversationParam && isUuid(conversationParam) ? conversationParam : null
+  );
+  const [mobileShowChat, setMobileShowChat] = useState(() =>
+    Boolean(conversationParam && isUuid(conversationParam))
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [currentUserId] = useState(initialUserId);
   const [listLoading, setListLoading] = useState(false);
@@ -59,14 +67,10 @@ export default function MessagesExperience({
   const typingTimerRef = useRef<number | null>(null);
   const typingActiveRef = useRef(false);
   const openedPeerRef = useRef<string | null>(null);
+  const openedConversationRef = useRef<string | null>(null);
   const threadRequestRef = useRef(0);
   const sendingRef = useRef(false);
   const selectedIdRef = useRef<string | null>(null);
-
-  const profileHint =
-    intent === "profile" && (creatorName || creatorId)
-      ? `Creator profile · ${creatorName?.trim() || "Creator"}`
-      : null;
 
   function clearTypingTimer() {
     if (typingTimerRef.current != null) {
@@ -82,6 +86,14 @@ export default function MessagesExperience({
       void setTypingAction(conversationId, false);
     } else {
       typingActiveRef.current = false;
+    }
+  }
+
+  function syncConversationUrl(conversationId: string) {
+    const href = buildConversationHref(conversationId);
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current !== href) {
+      router.replace(href, { scroll: false });
     }
   }
 
@@ -113,14 +125,15 @@ export default function MessagesExperience({
       setListError(listResult.message);
       setConversations([]);
       setListLoading(false);
-      return;
+      return [] as Conversation[];
     }
 
     setConversations(listResult.conversations);
     setListLoading(false);
+    return listResult.conversations;
   }
 
-  async function loadThread(conversationId: string) {
+  async function loadThread(conversationId: string, peerHint?: string) {
     const requestId = ++threadRequestRef.current;
     setThreadLoading(true);
     setThreadError(null);
@@ -137,8 +150,32 @@ export default function MessagesExperience({
       return;
     }
 
-    setConversations((prev) =>
-      prev.map((conversation) =>
+    setConversations((prev) => {
+      const existing = prev.find((c) => c.id === conversationId);
+      const peerName = peerHint?.trim() || existing?.peerName || "Conversation";
+
+      if (!existing) {
+        const stub: Conversation = {
+          id: conversationId,
+          peerId: "",
+          peerName,
+          peerInitials: initialsFromName(peerName),
+          peerAvatarGradient: peerGradientFromId(conversationId),
+          peerAvatarUrl: null,
+          status: "offline",
+          lastSeenLabel: "Just opened",
+          unreadCount: 0,
+          isTyping: false,
+          lastMessagePreview: result.messages.at(-1)?.text ?? "",
+          lastMessageAt: result.messages.at(-1)?.sentAt ?? null,
+          messages: result.messages,
+          hasMoreMessages: result.hasMore,
+          nextMessagesCursor: result.nextCursor,
+        };
+        return [stub, ...prev];
+      }
+
+      return prev.map((conversation) =>
         conversation.id === conversationId
           ? {
               ...conversation,
@@ -148,37 +185,100 @@ export default function MessagesExperience({
               unreadCount: 0,
             }
           : conversation
-      )
-    );
+      );
+    });
 
     const latest = result.messages[result.messages.length - 1];
     void markConversationReadAction(conversationId, latest?.id ?? null);
     setThreadLoading(false);
   }
 
+  const openConversationFromQuery = useEffectEvent(
+    async (conversationId: string) => {
+      if (!isUuid(conversationId)) {
+        setListError("Invalid conversation link.");
+        return;
+      }
+
+      setListError(null);
+      setSendError(null);
+      setThreadError(null);
+      setSelectedId(conversationId);
+      setMobileShowChat(true);
+
+      let inbox = conversations;
+      if (!inbox.some((c) => c.id === conversationId)) {
+        inbox = await loadInbox();
+      }
+
+      if (!inbox.some((c) => c.id === conversationId)) {
+        console.warn(
+          "[Messages] conversation not in inbox yet; opening thread directly",
+          conversationId
+        );
+      }
+
+      await loadThread(conversationId, creatorName ?? undefined);
+    }
+  );
+
   const openPeerFromQuery = useEffectEvent(async (peerId: string) => {
+    if (!isUuid(peerId)) {
+      setListError("Invalid user link.");
+      return;
+    }
+
+    setListError(null);
+    setThreadError(null);
+
     const openResult = await openDirectConversationAction(peerId);
 
     if (!openResult.ok) {
+      console.error("[Messages] openDirectConversationAction failed:", openResult);
       setListError(openResult.message);
       return;
     }
 
+    console.info(
+      "[Messages] created/reused conversation",
+      openResult.conversationId
+    );
+
+    openedConversationRef.current = openResult.conversationId;
     await loadInbox();
     setSelectedId(openResult.conversationId);
     setMobileShowChat(true);
-    await loadThread(openResult.conversationId);
+    syncConversationUrl(openResult.conversationId);
+    await loadThread(openResult.conversationId, creatorName ?? undefined);
   });
 
-  // Deep-link: open/create DM with verified creatorId only (name is display hint).
+  // Deep-link: open existing conversation by id (refresh-safe).
   useEffect(() => {
-    if (!creatorId || openedPeerRef.current === creatorId) {
+    if (!conversationParam) {
+      return;
+    }
+
+    if (openedConversationRef.current === conversationParam) {
+      return;
+    }
+
+    openedConversationRef.current = conversationParam;
+    void openConversationFromQuery(conversationParam);
+  }, [conversationParam]);
+
+  // Deep-link: create/reuse DM from peer id, then normalize URL to ?conversation=.
+  useEffect(() => {
+    if (conversationParam || !creatorId) {
+      return;
+    }
+
+    if (openedPeerRef.current === creatorId) {
       return;
     }
 
     openedPeerRef.current = creatorId;
     void openPeerFromQuery(creatorId);
-  }, [creatorId]);
+  }, [conversationParam, creatorId]);
 
   const filtered = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -203,6 +303,8 @@ export default function MessagesExperience({
     setSelectedId(id);
     setMobileShowChat(true);
     setSendError(null);
+    openedConversationRef.current = id;
+    syncConversationUrl(id);
     await loadThread(id);
   }
 
@@ -374,14 +476,6 @@ export default function MessagesExperience({
 
   return (
     <MessagesShell>
-      {profileHint ? (
-        <div className="mb-3 flex justify-center">
-          <p className="rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-blue-100">
-            {profileHint}
-          </p>
-        </div>
-      ) : null}
-
       <div className="grid min-h-[calc(100vh-7.5rem)] flex-1 gap-3 md:grid-cols-[340px_1fr] md:gap-4">
         <div
           className={`min-h-0 ${
@@ -400,7 +494,7 @@ export default function MessagesExperience({
             emptyHint={
               creatorName
                 ? `Start chatting with ${creatorName}`
-                : "Message a creator from their profile to begin."
+                : "Message a creator from their profile or Discover to begin."
             }
           />
         </div>

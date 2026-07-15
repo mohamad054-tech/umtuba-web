@@ -5,12 +5,16 @@ export const APP_ROUTES = {
   discover: "/discover",
   live: "/live",
   messages: "/messages",
+  notifications: "/notifications",
   settings: "/settings",
   saved: "/saved",
   login: "/login",
   signup: "/signup",
   profile: "/profile",
   createVideo: "/create/video",
+  postJourney: "/post-journey",
+  rewards: "/rewards",
+  creatorInsights: "/creator/insights",
 } as const;
 
 export type AppRouteHref =
@@ -81,7 +85,28 @@ export function buildCreatorProfileHref(input: {
   return `${APP_ROUTES.profile}/${normalizeProfileUsername(input.username)}`;
 }
 
-/** Profile / Live → open (or start) a message thread with the creator. */
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** True when `value` is a UUID suitable for messaging peers / conversations. */
+export function isUuid(value: string | null | undefined): boolean {
+  return Boolean(value && UUID_RE.test(value.trim()));
+}
+
+/** Open an existing DM by conversation id (survives refresh). */
+export function buildConversationHref(conversationId: string): string {
+  const params = new URLSearchParams({
+    conversation: conversationId.trim(),
+  });
+
+  return `${APP_ROUTES.messages}?${params.toString()}`;
+}
+
+/**
+ * Profile / Discover → start (or reopen) a DM with a peer user id.
+ * Prefer `StartDirectMessageButton`, which creates/reuses then navigates to
+ * `buildConversationHref`. This href is used for login `?next=` handoff.
+ */
 export function buildMessageCreatorHref(input: {
   id: string;
   name: string;
@@ -96,8 +121,52 @@ export function buildMessageCreatorHref(input: {
 }
 
 export function buildLiveStreamHref(streamId: string): string {
-  const params = new URLSearchParams({ stream: streamId });
-  return `${APP_ROUTES.live}?${params.toString()}`;
+  return `${APP_ROUTES.live}/${streamId.trim()}`;
+}
+
+/** Deep-link into Discover focused on a post (and optional comment). */
+export function buildPostNotificationHref(input: {
+  postId: string | number;
+  commentId?: string | number | null;
+}): string {
+  const params = new URLSearchParams({
+    post: String(input.postId),
+  });
+  if (input.commentId != null && String(input.commentId).trim()) {
+    params.set("comment", String(input.commentId));
+  }
+  return `${APP_ROUTES.discover}?${params.toString()}`;
+}
+
+/** Journey notifications → Post Journey focused on a post. */
+export function buildPostJourneyHref(postId: string | number): string {
+  const params = new URLSearchParams({
+    postId: String(postId),
+  });
+  return `${APP_ROUTES.postJourney}?${params.toString()}`;
+}
+
+/** Rewards / UM Points. */
+export function buildRewardsHref(): string {
+  return APP_ROUTES.rewards;
+}
+
+/** AI / creator insights. */
+export function buildAiInsightHref(): string {
+  return APP_ROUTES.creatorInsights;
+}
+
+export function findIndexByPostId<T extends { id: string | number }>(
+  items: T[],
+  postParam: string | null | undefined
+): number {
+  if (!postParam?.trim()) {
+    return -1;
+  }
+
+  const needle = postParam.trim();
+  const index = items.findIndex((item) => String(item.id) === needle);
+  return index;
 }
 
 export function findIndexByCity<T extends { location: { city: string } }>(

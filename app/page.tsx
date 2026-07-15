@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import JoinBetaLink from "./components/landing/JoinBetaLink";
 import LandingHero from "./components/landing/LandingHero";
 
 function LandingHeroFallback() {
@@ -61,9 +62,9 @@ export default function Home() {
             UMTUBA starts with fun, discovery, and social energy — then gradually
             helps users discover ideas, collaborators, learning paths, and real opportunities.
           </p>
-          <button className="mt-10 rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]">
+          <JoinBetaLink className="mt-10 inline-flex rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]">
             Join the Beta
-          </button>
+          </JoinBetaLink>
         </div>
       </section>
     </main>

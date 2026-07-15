@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "../../lib/supabase/client";
 import {
-  getCurrentProfile,
+  getProfileForUser,
   signOut,
   type UserProfile,
 } from "../../lib/supabase/auth";
@@ -22,25 +23,29 @@ export default function AuthStatus() {
     let isActive = true;
     const supabase = createClient();
 
-    async function loadProfile() {
-      try {
-        const currentProfile = await getCurrentProfile();
+    async function applyUser(user: User | null) {
+      if (!isActive) return;
 
-        if (isActive) {
-          setProfile(currentProfile);
-          setErrorMessage("");
-        }
+      if (!user) {
+        setProfile(null);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const currentProfile = await getProfileForUser(user);
+        if (!isActive) return;
+        setProfile(currentProfile);
+        setErrorMessage("");
       } catch (error) {
         console.error(error);
-
-        if (isActive) {
-          setProfile(null);
-          setErrorMessage(
-            error instanceof Error
-              ? error.message
-              : "Unable to load your session."
-          );
-        }
+        if (!isActive) return;
+        setProfile(null);
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "Unable to load your session."
+        );
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -48,12 +53,14 @@ export default function AuthStatus() {
       }
     }
 
-    loadProfile();
+    void supabase.auth.getUser().then(({ data }) => {
+      void applyUser(data.user ?? null);
+    });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void loadProfile();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void applyUser(session?.user ?? null);
     });
 
     return () => {
@@ -68,6 +75,7 @@ export default function AuthStatus() {
       setErrorMessage("");
       await signOut();
       setProfile(null);
+      router.push(APP_ROUTES.home);
       router.refresh();
     } catch (error) {
       console.error(error);

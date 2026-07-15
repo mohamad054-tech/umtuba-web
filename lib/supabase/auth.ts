@@ -6,6 +6,7 @@ import {
   normalizeUsername,
   USERNAME_HINT,
 } from "./validation";
+import type { User } from "@supabase/supabase-js";
 
 export type UserProfile = {
   id: string;
@@ -166,20 +167,9 @@ export async function getAuthenticatedUser() {
   return user;
 }
 
-export async function getCurrentProfile(): Promise<UserProfile | null> {
+/** Map auth user → profile. Does not call getUser() — safe inside onAuthStateChange. */
+export async function getProfileForUser(user: User): Promise<UserProfile> {
   const supabase = createClient();
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw new Error(getErrorMessage(userError, "Unable to verify your session."));
-  }
-
-  if (!user) {
-    return null;
-  }
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
@@ -188,12 +178,10 @@ export async function getCurrentProfile(): Promise<UserProfile | null> {
     .maybeSingle();
 
   if (profileError) {
-    throw new Error(
-      getErrorMessage(profileError, "Unable to load your profile.")
-    );
-  }
-
-  if (profile) {
+    console.error("Unable to load profile row:", profileError);
+    // Fall back to auth metadata so the account menu still works when
+    // the profiles query fails (RLS / migration), instead of looking signed out.
+  } else if (profile) {
     return mapProfileRow(profile as ProfileRow);
   }
 
@@ -220,4 +208,14 @@ export async function getCurrentProfile(): Promise<UserProfile | null> {
     avatar_url: null,
     avatar_initial: fullName.charAt(0).toUpperCase() || "U",
   };
+}
+
+export async function getCurrentProfile(): Promise<UserProfile | null> {
+  const user = await getAuthenticatedUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return getProfileForUser(user);
 }

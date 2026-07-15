@@ -1,9 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import {
-  APP_ROUTES,
-  buildLiveStreamHref,
-  buildMessageCreatorHref,
-} from "../../lib/nav";
+import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
+import { APP_ROUTES, buildLiveStreamHref, isUuid } from "../../lib/nav";
 import type { ProfileView } from "../types";
 
 type ProfileActionsProps = {
@@ -19,13 +18,12 @@ export default function ProfileActions({
   isFollowing,
   onToggleFollow,
 }: ProfileActionsProps) {
-  const messageHref = buildMessageCreatorHref({
-    id: profile.id,
-    name: profile.displayName,
-  });
   const liveHref = profile.liveStreamId
     ? buildLiveStreamHref(profile.liveStreamId)
     : null;
+  // Real Supabase auth UUID only — mock / missing ids stay hidden.
+  const canMessage =
+    !isOwner && profile.source === "supabase" && isUuid(profile.id);
 
   if (isOwner) {
     return (
@@ -41,7 +39,7 @@ export default function ProfileActions({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-start gap-2">
       <button
         type="button"
         onClick={onToggleFollow}
@@ -54,12 +52,11 @@ export default function ProfileActions({
         {isFollowing ? "Following" : "Follow"}
       </button>
 
-      <Link
-        href={messageHref}
-        className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10 hover:text-white"
-      >
-        Message
-      </Link>
+      <StartDirectMessageButton
+        peerUserId={profile.id}
+        peerName={profile.displayName}
+        hidden={!canMessage}
+      />
 
       {liveHref ? (
         <Link

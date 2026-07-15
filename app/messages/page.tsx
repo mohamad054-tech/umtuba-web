@@ -2,8 +2,11 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
+import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import { APP_ROUTES } from "../lib/nav";
 import MessagesExperience from "./MessagesExperience";
+
+export const dynamic = "force-dynamic";
 
 function MessagesFallback() {
   return (
@@ -19,7 +22,53 @@ function MessagesFallback() {
   );
 }
 
-export default async function MessagesPage() {
+type MessagesPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function firstParam(
+  value: string | string[] | undefined
+): string | undefined {
+  if (Array.isArray(value)) {
+    return value[0];
+  }
+
+  return value;
+}
+
+function buildMessagesNextPath(
+  params: Record<string, string | string[] | undefined>
+): string {
+  const query = new URLSearchParams();
+  const conversation = firstParam(params.conversation);
+  const creatorId = firstParam(params.creatorId);
+  const creatorName = firstParam(params.creatorName);
+  const intent = firstParam(params.intent);
+
+  if (conversation) {
+    query.set("conversation", conversation);
+  }
+
+  if (creatorId) {
+    query.set("creatorId", creatorId);
+  }
+
+  if (creatorName) {
+    query.set("creatorName", creatorName);
+  }
+
+  if (intent) {
+    query.set("intent", intent);
+  }
+
+  const qs = query.toString();
+  return qs ? `${APP_ROUTES.messages}?${qs}` : APP_ROUTES.messages;
+}
+
+export default async function MessagesPage({
+  searchParams,
+}: MessagesPageProps) {
+  const params = await searchParams;
   let userId: string | null = null;
 
   try {
@@ -30,8 +79,12 @@ export default async function MessagesPage() {
   }
 
   if (!userId) {
+    const nextPath = getSafeRedirectPath(
+      buildMessagesNextPath(params),
+      APP_ROUTES.messages
+    );
     redirect(
-      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.messages)}`
+      `${APP_ROUTES.login}?next=${encodeURIComponent(nextPath)}`
     );
   }
 

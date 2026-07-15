@@ -1,13 +1,19 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 type AtmosphericParticlesProps = {
   reducedMotion: boolean;
   count?: number;
 };
+
+/** Deterministic 0–1 value for particle seeding (eslint purity-safe). */
+function seededUnit(seed: number): number {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 export default function AtmosphericParticles({
   reducedMotion,
@@ -16,33 +22,37 @@ export default function AtmosphericParticles({
   const pointsRef = useRef<THREE.Points>(null);
   const velocities = useRef<Float32Array | null>(null);
 
-  const { positions, colors } = useMemo(() => {
+  const { positions, colors, velocityData } = useMemo(() => {
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const vel = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i += 1) {
-      const radius = 2.18 + Math.random() * 0.42;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
+      const s = i + 1;
+      const radius = 2.18 + seededUnit(s * 1.7) * 0.42;
+      const phi = Math.acos(2 * seededUnit(s * 2.3) - 1);
+      const theta = seededUnit(s * 3.1) * Math.PI * 2;
 
       pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       pos[i * 3 + 1] = radius * Math.cos(phi);
       pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
 
-      vel[i * 3] = (Math.random() - 0.5) * 0.012;
-      vel[i * 3 + 1] = (Math.random() - 0.5) * 0.008;
-      vel[i * 3 + 2] = (Math.random() - 0.5) * 0.012;
+      vel[i * 3] = (seededUnit(s * 4.1) - 0.5) * 0.012;
+      vel[i * 3 + 1] = (seededUnit(s * 5.2) - 0.5) * 0.008;
+      vel[i * 3 + 2] = (seededUnit(s * 6.3) - 0.5) * 0.012;
 
-      const tint = 0.72 + Math.random() * 0.28;
+      const tint = 0.72 + seededUnit(s * 7.4) * 0.28;
       col[i * 3] = 0.55 * tint;
       col[i * 3 + 1] = 0.72 * tint;
       col[i * 3 + 2] = 1.0 * tint;
     }
 
-    velocities.current = vel;
-    return { positions: pos, colors: col };
+    return { positions: pos, colors: col, velocityData: vel };
   }, [count]);
+
+  useEffect(() => {
+    velocities.current = velocityData;
+  }, [velocityData]);
 
   useFrame((_, delta) => {
     const points = pointsRef.current;

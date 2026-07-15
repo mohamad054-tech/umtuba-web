@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { APP_NAV_ITEMS, APP_ROUTES, citiesMatch, isNavActive } from "../../lib/nav";
 import { LIVING_CITIES } from "./living-earth/livingEarthData";
 import HeroCTAButton from "./HeroCTAButton";
+import JoinBetaLink from "./JoinBetaLink";
 
 const LandingHeroGlobe = dynamic(() => import("./LandingHeroGlobe"), {
   ssr: false,
@@ -65,9 +66,9 @@ export default function LandingHero() {
           })}
         </div>
 
-        <button className="landing-nav-chip rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm font-medium text-white/90 backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/[0.12] hover:text-white">
+        <JoinBetaLink className="landing-nav-chip rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm font-medium text-white/90 backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/[0.12] hover:text-white">
           Join Beta
-        </button>
+        </JoinBetaLink>
       </nav>
 
       {focusParam ? (

@@ -10,15 +10,18 @@ import {
   joinLiveRoom,
   leaveLiveRoom,
   listLiveChatMessages,
+  listLiveParticipants,
   listLiveRooms,
   moderateLiveChatMessage,
   sendLiveChatMessage,
+  sendLiveReaction,
   setLiveParticipantRole,
   type ActionResult,
 } from "../../lib/supabase/live";
 import type {
   LiveChatMessage,
   LiveChatPage,
+  LiveParticipant,
   LiveParticipantRole,
   LiveRoom,
   LiveRoomVisibility,
@@ -55,6 +58,33 @@ export async function getLiveRoomAction(
   const user = await getServerUser();
   const supabase = await createClient();
   return getLiveRoomById(supabase, parsed.id, user?.id ?? null);
+}
+
+export async function listLiveParticipantsAction(
+  roomId: string
+): Promise<ActionResult<{ participants: LiveParticipant[] }>> {
+  const parsed = parseUuid(roomId, "room");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+  const supabase = await createClient();
+  const roomResult = await getLiveRoomById(
+    supabase,
+    parsed.id,
+    user?.id ?? null
+  );
+
+  if (!roomResult.ok) {
+    return roomResult;
+  }
+
+  return listLiveParticipants(
+    supabase,
+    parsed.id,
+    roomResult.room.host.id
+  );
 }
 
 export async function createLiveRoomAction(input: {
@@ -314,6 +344,29 @@ export async function setLiveParticipantRoleAction(input: {
     userParsed.id,
     input.role
   );
+}
+
+export async function sendLiveReactionAction(input: {
+  roomId: string;
+  emoji: string;
+}): Promise<ActionResult<{ reactionId: string }>> {
+  const parsed = parseUuid(input.roomId, "room");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Please sign in to react.",
+      requiresAuth: true,
+    };
+  }
+
+  const supabase = await createClient();
+  return sendLiveReaction(supabase, parsed.id, input.emoji);
 }
 
 export async function createLiveReportAction(input: {

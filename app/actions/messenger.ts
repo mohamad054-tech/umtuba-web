@@ -15,8 +15,9 @@ import type { Conversation, Message } from "../messages/types";
 
 function parseUuid(value: string, label: string): ActionResult<{ id: string }> {
   const trimmed = value.trim();
+  // Accept any RFC-like UUID (v1–v8+). Strict variant checks reject valid Supabase ids.
   const uuidRe =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
   if (!uuidRe.test(trimmed)) {
     return { ok: false, message: `Invalid ${label}.` };

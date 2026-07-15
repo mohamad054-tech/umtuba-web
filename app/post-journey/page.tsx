@@ -1,7 +1,13 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import TopNavbar from "../components/TopNavbar";
 import PostJourneyGlobeSection from "./PostJourneyGlobeSection";
+import { createClient } from "../../lib/supabase/server";
+import { getPostJourney } from "../../lib/supabase/rewards";
+import { APP_ROUTES, buildPostNotificationHref } from "../lib/nav";
+import { countryCodeToFlag } from "../notifications/lib/notificationMeta";
+import { formatInteractionCount } from "../lib/social/shareAndViews";
 
 function PostJourneyGlobeFallback() {
   return (
@@ -13,57 +19,46 @@ function PostJourneyGlobeFallback() {
   );
 }
 
-const journeyStats = [
-  {
-    label: "Countries reached",
-    value: "18",
-    icon: "🌍",
-  },
-  {
-    label: "Cities reached",
-    value: "47",
-    icon: "🏙️",
-  },
-  {
-    label: "Translations",
-    value: "9",
-    icon: "🌐",
-  },
-  {
-    label: "Total interactions",
-    value: "12.8K",
-    icon: "✨",
-  },
-];
+type PostJourneyPageProps = {
+  searchParams?: Promise<{ postId?: string }> | { postId?: string };
+};
 
-const journeyStops = [
-  {
-    city: "Jerusalem",
-    country: "Palestine",
-    time: "Journey started",
-    views: "1.2K",
-  },
-  {
-    city: "Amman",
-    country: "Jordan",
-    time: "12 minutes later",
-    views: "2.6K",
-  },
-  {
-    city: "Istanbul",
-    country: "Türkiye",
-    time: "31 minutes later",
-    views: "4.1K",
-  },
-  {
-    city: "Berlin",
-    country: "Germany",
-    time: "1 hour later",
-    views: "3.7K",
-  },
-];
+export default async function PostJourneyPage({
+  searchParams,
+}: PostJourneyPageProps) {
+  const params = await Promise.resolve(searchParams ?? {});
+  const postIdRaw = params.postId;
+  const postId = postIdRaw ? Number(postIdRaw) : NaN;
+  const hasPost = Number.isInteger(postId) && postId > 0;
 
-export default function PostJourneyPage() {
+  const supabase = await createClient();
+  const journey = hasPost ? await getPostJourney(supabase, postId) : null;
+
+  const stats = [
+    {
+      label: "Countries reached",
+      value: journey ? String(journey.countryCount) : "—",
+      icon: "🌍",
+    },
+    {
+      label: "Total views",
+      value: journey ? formatInteractionCount(journey.views) : "—",
+      icon: "▶",
+    },
+    {
+      label: "Trending countries",
+      value: journey
+        ? String(journey.countries.filter((c) => c.isTrending).length)
+        : "—",
+      icon: "↗",
+    },
+    {
+      label: "Tracked stops",
+      value: journey ? String(journey.countries.length) : "—",
+      icon: "◉",
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-[#050510] text-white">
       <TopNavbar />
@@ -84,34 +79,40 @@ export default function PostJourneyPage() {
                 </h1>
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-white/60">
-                  Follow how a post travels between countries, cities,
-                  languages, and communities around the world.
+                  {hasPost && journey
+                    ? `Live country reach for post #${postId} — approximate regions only, never exact coordinates.`
+                    : "Open a journey notification or add ?postId= to see real country reach for a post."}
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="rounded-2xl bg-white px-5 py-3 font-black text-black transition hover:bg-white/90"
-              >
-                Select a post
-              </button>
+              {hasPost ? (
+                <Link
+                  href={buildPostNotificationHref({ postId })}
+                  className="rounded-2xl bg-white px-5 py-3 text-center font-black text-black transition hover:bg-white/90"
+                >
+                  Open post
+                </Link>
+              ) : (
+                <Link
+                  href={APP_ROUTES.discover}
+                  className="rounded-2xl bg-white px-5 py-3 text-center font-black text-black transition hover:bg-white/90"
+                >
+                  Explore Discover
+                </Link>
+              )}
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {journeyStats.map((stat) => (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-3xl border border-white/10 bg-white/[0.04] p-5"
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{stat.icon}</span>
-                  <span className="text-3xl font-black">{stat.value}</span>
-                </div>
-
-                <p className="mt-4 text-sm font-bold text-white/50">
-                  {stat.label}
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+                  {stat.icon} {stat.label}
                 </p>
+                <p className="mt-1 text-2xl font-black">{stat.value}</p>
               </div>
             ))}
           </div>
@@ -122,109 +123,74 @@ export default function PostJourneyPage() {
             </Suspense>
           </div>
 
-          <div className="mt-6 rounded-[32px] border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-2xl font-black">Journey timeline</h2>
-
-            <p className="mt-2 text-white/50">
-              See where the post reached and how engagement grew.
-            </p>
-
-            <div className="mt-6 space-y-4">
-              {journeyStops.map((stop, index) => (
-                <div
-                  key={`${stop.city}-${stop.country}`}
-                  className="flex gap-4 rounded-3xl border border-white/10 bg-[#0d0d1c] p-5"
-                >
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white font-black text-black">
-                      {index + 1}
-                    </div>
-
-                    {index < journeyStops.length - 1 ? (
-                      <div className="mt-2 h-full min-h-10 w-px bg-white/10" />
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5">
+            <h2 className="text-lg font-black tracking-tight">
+              Countries reached
+            </h2>
+            {!hasPost ? (
+              <p className="mt-3 text-sm text-white/45">
+                No post selected. Journey notifications deep-link here with{" "}
+                <code className="text-cyan-200/80">?postId=</code>.
+              </p>
+            ) : !journey || journey.countries.length === 0 ? (
+              <p className="mt-3 text-sm text-white/45">
+                No country reach recorded yet. Qualified views with approximate
+                country data will appear here.
+              </p>
+            ) : (
+              <ul className="mt-4 space-y-2">
+                {journey.countries.map((country) => (
+                  <li
+                    key={country.countryCode}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3"
+                  >
                     <div>
-                      <h3 className="text-lg font-black">
-                        {stop.city}, {stop.country}
-                      </h3>
-
-                      <p className="mt-1 text-sm text-white/45">
-                        {stop.time}
+                      <p className="text-sm font-semibold">
+                        {countryCodeToFlag(country.countryCode) ?? ""}{" "}
+                        {country.countryName}
+                        {country.isTrending ? (
+                          <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-200">
+                            Trending
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-white/35">
+                        {country.countryCode}
                       </p>
                     </div>
-
-                    <div className="rounded-full bg-white/5 px-4 py-2 text-sm font-bold">
-                      {stop.views} views
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    <span className="text-sm font-black text-cyan-100">
+                      {formatInteractionCount(country.viewCount)} views
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </section>
 
-        <aside className="hidden lg:block">
-          <div className="sticky top-28 space-y-4">
-            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-              <h3 className="text-xl font-black">🌐 Languages</h3>
-
-              <div className="mt-5 space-y-4">
-                <LanguageRow language="Arabic" percentage="46%" />
-                <LanguageRow language="English" percentage="31%" />
-                <LanguageRow language="Turkish" percentage="14%" />
-                <LanguageRow language="German" percentage="9%" />
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-              <h3 className="text-xl font-black">✨ Journey insight</h3>
-
-              <p className="mt-4 leading-7 text-white/55">
-                The post gained its fastest growth after being translated
-                into Turkish and shared by users in Istanbul.
-              </p>
-            </div>
-
-            <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
-              <h3 className="text-xl font-black text-cyan-100">
-                AI recommendation
-              </h3>
-
-              <p className="mt-4 leading-7 text-cyan-50/65">
-                Add an English summary to help this post reach more
-                communities in Europe.
-              </p>
-
-              <button
-                type="button"
-                className="mt-5 w-full rounded-2xl bg-cyan-100 px-4 py-3 font-black text-black"
-              >
-                Improve post
-              </button>
-            </div>
+        <aside className="hidden space-y-4 lg:block">
+          <div className="rounded-[28px] border border-white/10 bg-[#080816]/70 p-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
+              Privacy
+            </p>
+            <p className="mt-2 text-sm leading-6 text-white/55">
+              Journey tracking uses approximate country and city only. Exact
+              coordinates are never stored or shown.
+            </p>
           </div>
+          <Link
+            href={APP_ROUTES.creatorInsights}
+            className="block rounded-[28px] border border-cyan-400/20 bg-cyan-500/10 p-5 transition hover:bg-cyan-500/15"
+          >
+            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/70">
+              AI Insights
+            </p>
+            <p className="mt-2 text-sm font-semibold text-white/90">
+              Open your creator insights
+            </p>
+          </Link>
         </aside>
       </div>
     </main>
-  );
-}
-
-type LanguageRowProps = {
-  language: string;
-  percentage: string;
-};
-
-function LanguageRow({
-  language,
-  percentage,
-}: LanguageRowProps) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="font-bold text-white/65">{language}</span>
-      <span className="font-black">{percentage}</span>
-    </div>
   );
 }

@@ -1,15 +1,21 @@
 "use client";
 
-import { LIVE_REACTIONS } from "../types";
+import { memo } from "react";
+import { LIVE_REACTIONS, type FloatingLiveReaction } from "../types";
+import LiveFloatingReactions from "./LiveFloatingReactions";
 
 type LiveReactionsBarProps = {
   onReact: (emoji: string) => void;
-  floatingReactions: { id: string; emoji: string }[];
+  floatingReactions: FloatingLiveReaction[];
+  disabled?: boolean;
+  busy?: boolean;
 };
 
-export default function LiveReactionsBar({
+function LiveReactionsBarComponent({
   onReact,
   floatingReactions,
+  disabled = false,
+  busy = false,
 }: LiveReactionsBarProps) {
   return (
     <div className="relative">
@@ -22,7 +28,8 @@ export default function LiveReactionsBar({
             key={emoji}
             type="button"
             onClick={() => onReact(emoji)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg transition hover:scale-110 hover:border-white/25 hover:bg-white/10"
+            disabled={disabled || busy}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg transition hover:scale-110 hover:border-white/25 hover:bg-white/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 md:h-10 md:w-10"
             aria-label={`React with ${emoji}`}
           >
             {emoji}
@@ -30,16 +37,10 @@ export default function LiveReactionsBar({
         ))}
       </div>
 
-      <div className="pointer-events-none absolute -top-16 right-0 flex h-16 w-40 items-end justify-end gap-1 overflow-hidden">
-        {floatingReactions.map((reaction) => (
-          <span
-            key={reaction.id}
-            className="animate-[liveFloat_1.1s_ease-out_forwards] text-2xl opacity-90"
-          >
-            {reaction.emoji}
-          </span>
-        ))}
-      </div>
+      <LiveFloatingReactions reactions={floatingReactions} variant="bar" />
     </div>
   );
 }
+
+const LiveReactionsBar = memo(LiveReactionsBarComponent);
+export default LiveReactionsBar;

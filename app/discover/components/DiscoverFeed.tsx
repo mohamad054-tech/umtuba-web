@@ -13,6 +13,8 @@ import DiscoverVideoCard from "./DiscoverVideoCard";
 type DiscoverFeedProps = {
   videos: DiscoverVideo[];
   initialIndex?: number;
+  /** Session viewer id from the Discover page (null if signed out). */
+  viewerId?: string | null;
   onActiveChange?: (video: DiscoverVideo, index: number) => void;
   onComment?: (video: DiscoverVideo) => void;
   onStatsChange?: (videoId: string, stats: Partial<DiscoverStats>) => void;
@@ -23,12 +25,28 @@ type DiscoverFeedProps = {
 };
 
 const NEIGHBOR_WINDOW = 1;
-const WHEEL_COOLDOWN_MS = 520;
-const TOUCH_SWIPE_THRESHOLD = 56;
+
+/**
+ * Scroll a slide into view inside the feed scroller only.
+ * Never use Element.scrollIntoView — it can scroll window/ancestors and
+ * push the Discover top nav off-screen, trapping wheel input in the feed.
+ */
+function scrollScrollerToSlide(
+  scroller: HTMLElement,
+  slide: HTMLElement,
+  behavior: ScrollBehavior
+) {
+  const top =
+    slide.getBoundingClientRect().top -
+    scroller.getBoundingClientRect().top +
+    scroller.scrollTop;
+  scroller.scrollTo({ top, behavior });
+}
 
 export default function DiscoverFeed({
   videos,
   initialIndex = 0,
+  viewerId = null,
   onActiveChange,
   onComment,
   onStatsChange,
@@ -37,8 +55,6 @@ export default function DiscoverFeed({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
   const activeIndexRef = useRef(0);
-  const wheelLockRef = useRef(false);
-  const touchStartYRef = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
@@ -54,12 +70,14 @@ export default function DiscoverFeed({
       return;
     }
 
+    const scroller = scrollerRef.current;
     const frame = window.requestAnimationFrame(() => {
       const video = videos[initialIndex];
       const node = video ? slideNodesRef.current.get(video.id) : null;
 
-      if (node) {
-        node.scrollIntoView({ behavior: "auto", block: "start" });
+      if (scroller && node) {
+        scrollScrollerToSlide(scroller, node, "auto");
+        setActiveIndex(initialIndex);
       }
     });
 
@@ -93,13 +111,14 @@ export default function DiscoverFeed({
 
   const scrollToIndex = useCallback(
     (nextIndex: number) => {
+      const scroller = scrollerRef.current;
       const clamped = Math.min(Math.max(nextIndex, 0), videos.length - 1);
       const nextVideo = videos[clamped];
       const node = nextVideo
         ? slideNodesRef.current.get(nextVideo.id)
         : null;
 
-      if (!node) {
+      if (!scroller || !node) {
         return;
       }
 
@@ -107,10 +126,11 @@ export default function DiscoverFeed({
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      node.scrollIntoView({
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-        block: "start",
-      });
+      scrollScrollerToSlide(
+        scroller,
+        node,
+        prefersReducedMotion ? "auto" : "smooth"
+      );
       setActiveIndex(clamped);
     },
     [videos]
@@ -190,11 +210,18 @@ export default function DiscoverFeed({
         return;
       }
 
-      event.preventDefault();
-
       const delta =
         event.key === "ArrowDown" || event.key === "j" ? 1 : -1;
-      scrollToIndex(activeIndexRef.current + delta);
+      const current = activeIndexRef.current;
+      const next = current + delta;
+
+      if (next < 0 || next >= videos.length) {
+        // At feed edge — do not trap keys so page/chrome remain usable.
+        return;
+      }
+
+      event.preventDefault();
+      scrollToIndex(next);
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -202,67 +229,7 @@ export default function DiscoverFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [scrollToIndex]);
-
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-
-    if (!scroller) {
-      return;
-    }
-
-    function onWheel(event: WheelEvent) {
-      if (Math.abs(event.deltaY) < 18) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (wheelLockRef.current) {
-        return;
-      }
-
-      wheelLockRef.current = true;
-      scrollToIndex(activeIndexRef.current + (event.deltaY > 0 ? 1 : -1));
-
-      window.setTimeout(() => {
-        wheelLockRef.current = false;
-      }, WHEEL_COOLDOWN_MS);
-    }
-
-    function onTouchStart(event: TouchEvent) {
-      touchStartYRef.current = event.touches[0]?.clientY ?? null;
-    }
-
-    function onTouchEnd(event: TouchEvent) {
-      const startY = touchStartYRef.current;
-      const endY = event.changedTouches[0]?.clientY;
-
-      touchStartYRef.current = null;
-
-      if (startY == null || endY == null) {
-        return;
-      }
-
-      const delta = startY - endY;
-
-      if (Math.abs(delta) < TOUCH_SWIPE_THRESHOLD) {
-        return;
-      }
-
-      scrollToIndex(activeIndexRef.current + (delta > 0 ? 1 : -1));
-    }
-
-    scroller.addEventListener("wheel", onWheel, { passive: false });
-    scroller.addEventListener("touchstart", onTouchStart, { passive: true });
-    scroller.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
-      scroller.removeEventListener("wheel", onWheel);
-      scroller.removeEventListener("touchstart", onTouchStart);
-      scroller.removeEventListener("touchend", onTouchEnd);
-    };
-  }, [scrollToIndex]);
+  }, [scrollToIndex, videos.length]);
 
   if (videos.length === 0) {
     return (
@@ -278,7 +245,7 @@ export default function DiscoverFeed({
   return (
     <div
       ref={scrollerRef}
-      className="video-snap-scroller h-full w-full snap-y snap-mandatory overflow-y-auto overscroll-y-contain"
+      className="video-snap-scroller h-full w-full snap-y snap-mandatory overflow-y-auto"
       aria-label="Discover vertical video feed"
     >
       {videos.map((video, index) => {
@@ -287,23 +254,21 @@ export default function DiscoverFeed({
         return (
           <div
             key={video.id}
+            ref={(node) => setSlideNode(video.id, node)}
+            data-video-id={video.id}
             className="h-full w-full shrink-0 snap-start snap-always"
           >
             {shouldMountPlayer ? (
               <DiscoverVideoCard
                 video={video}
                 active={index === activeIndex}
+                viewerId={viewerId}
                 onComment={() => onComment?.(video)}
                 onStatsChange={(stats) => onStatsChange?.(video.id, stats)}
                 onFlagsChange={(flags) => onFlagsChange?.(video.id, flags)}
-                slideRef={(node) => setSlideNode(video.id, node)}
               />
             ) : (
-              <div
-                ref={(node) => setSlideNode(video.id, node)}
-                data-video-id={video.id}
-                className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40"
-              >
+              <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">
                 <p className="text-sm font-bold">
                   {video.location.city}, {video.location.country}
                 </p>

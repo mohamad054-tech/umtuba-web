@@ -4,6 +4,7 @@ import { loadViewerInteractionState } from "./socialInteractions";
 import {
   applyViewerStateToPosts,
   attachPlaybackUrls,
+  enrichAuthorUserIdsFromProfiles,
   mapVideoPostToDiscover,
   postColumns,
   type PublicPostDTO,
@@ -44,12 +45,16 @@ export async function getDiscoverVideosServer(): Promise<DiscoverVideosResult> {
 
     const rows = (data ?? []) as VideoPostRow[];
     const withUrls = await attachPlaybackUrls(supabase, rows);
+    const withAuthors = await enrichAuthorUserIdsFromProfiles(
+      supabase,
+      withUrls
+    );
     const viewerState = await loadViewerInteractionState(
       supabase,
       user?.id,
-      withUrls.map((post) => post.id)
+      withAuthors.map((post) => post.id)
     );
-    const posts = applyViewerStateToPosts(withUrls, viewerState);
+    const posts = applyViewerStateToPosts(withAuthors, viewerState);
     const videos = posts
       .map(mapVideoPostToDiscover)
       .filter((video): video is DiscoverVideo => video !== null);
@@ -87,12 +92,16 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
 
     const rows = (data ?? []) as VideoPostRow[];
     const withUrls = await attachPlaybackUrls(supabase, rows);
+    const withAuthors = await enrichAuthorUserIdsFromProfiles(
+      supabase,
+      withUrls
+    );
     const viewerState = await loadViewerInteractionState(
       supabase,
       user?.id,
-      withUrls.map((post) => post.id)
+      withAuthors.map((post) => post.id)
     );
-    const posts = applyViewerStateToPosts(withUrls, viewerState);
+    const posts = applyViewerStateToPosts(withAuthors, viewerState);
 
     return { ok: true, posts };
   } catch (error) {

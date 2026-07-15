@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getServerUser } from "../../lib/supabase/server";
 import { getDiscoverVideosServer } from "../../lib/supabase/videoPostsServer";
 import DiscoverExperience from "./DiscoverExperience";
 
@@ -22,13 +23,29 @@ function DiscoverFallback() {
 }
 
 async function DiscoverLoader() {
-  const result = await getDiscoverVideosServer();
+  // Same request as the feed — keeps viewer identity tied to this session's cookies.
+  const [user, result] = await Promise.all([
+    getServerUser().catch(() => null),
+    getDiscoverVideosServer(),
+  ]);
+  const initialViewerId = user?.id ?? null;
 
   if (!result.ok) {
-    return <DiscoverExperience videos={[]} loadError={result.message} />;
+    return (
+      <DiscoverExperience
+        videos={[]}
+        loadError={result.message}
+        initialViewerId={initialViewerId}
+      />
+    );
   }
 
-  return <DiscoverExperience videos={result.videos} />;
+  return (
+    <DiscoverExperience
+      videos={result.videos}
+      initialViewerId={initialViewerId}
+    />
+  );
 }
 
 export default function DiscoverPage() {

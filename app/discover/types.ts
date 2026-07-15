@@ -1,5 +1,6 @@
 export type DiscoverCreator = {
-  id: string;
+  /** Auth user UUID for messaging; null when the peer has no real user id. */
+  id: string | null;
   name: string;
   username: string;
   avatar: string;

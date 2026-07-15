@@ -15,26 +15,21 @@ export default function ActivityLabel({
   reducedMotion,
 }: ActivityLabelProps) {
   const { activeEvent } = useGlobalPulse();
+  const matching =
+    !reducedMotion && activeEvent && activeEvent.cityName === cityName
+      ? activeEvent
+      : null;
+
   const [visible, setVisible] = useState(false);
-  const [label, setLabel] = useState<string | null>(null);
-  const [eventId, setEventId] = useState<string | null>(null);
+  const label = matching?.label ?? null;
+  const eventId = matching?.id ?? null;
 
   useEffect(() => {
-    if (reducedMotion) {
-      setVisible(false);
-      setLabel(null);
-      setEventId(null);
-      return;
+    if (!matching) {
+      const clearId = window.requestAnimationFrame(() => setVisible(false));
+      return () => window.cancelAnimationFrame(clearId);
     }
 
-    if (!activeEvent || activeEvent.cityName !== cityName) {
-      setVisible(false);
-      return;
-    }
-
-    setLabel(activeEvent.label);
-    setEventId(activeEvent.id);
-    // Next frame so CSS transition can fade in from opacity 0.
     const showId = window.requestAnimationFrame(() => setVisible(true));
     const hideId = window.setTimeout(() => setVisible(false), ACTIVITY_LABEL_MS);
 
@@ -42,7 +37,7 @@ export default function ActivityLabel({
       window.cancelAnimationFrame(showId);
       window.clearTimeout(hideId);
     };
-  }, [activeEvent, cityName, reducedMotion]);
+  }, [matching]);
 
   if (!label || !eventId) return null;
 

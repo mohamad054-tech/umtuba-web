@@ -13,6 +13,7 @@ import DiscoverNativeVideo from "./DiscoverNativeVideo";
 type DiscoverVideoCardProps = {
   video: DiscoverVideo;
   active: boolean;
+  viewerId?: string | null;
   onComment: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
@@ -22,6 +23,7 @@ type DiscoverVideoCardProps = {
 export default function DiscoverVideoCard({
   video,
   active,
+  viewerId = null,
   onComment,
   onStatsChange,
   onFlagsChange,
@@ -76,6 +78,7 @@ export default function DiscoverVideoCard({
               <DiscoverCreatorInfo
                 creator={video.creator}
                 location={video.location}
+                viewerId={viewerId}
               />
             </div>
             <DiscoverCaption

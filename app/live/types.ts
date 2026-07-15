@@ -2,7 +2,43 @@
 
 export type LiveRoomVisibility = "public" | "private" | "group";
 export type LiveRoomStatus = "idle" | "live" | "ended";
-export type LiveParticipantRole = "host" | "co_host" | "moderator" | "viewer";
+export type LiveParticipantRole =
+  | "host"
+  | "co_host"
+  | "guest"
+  | "moderator"
+  | "viewer";
+
+export type LiveStageStatus =
+  | "off_stage"
+  | "queued"
+  | "invited"
+  | "on_stage";
+
+export type LiveStageLayoutMode =
+  | "auto"
+  | "active_speaker"
+  | "pinned"
+  | "grid";
+
+export type LiveStageRequestStatus =
+  | "pending"
+  | "queued"
+  | "accepted"
+  | "rejected"
+  | "cancelled"
+  | "expired";
+
+export type LiveMediaConnectionState =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "error";
+
+/** Default simultaneous publishers (host + guests). DB allows up to 16. */
+export const LIVE_DEFAULT_MAX_ON_STAGE = 8;
+export const LIVE_MAX_ON_STAGE_CEILING = 16;
 export type LiveChatMessageType =
   | "text"
   | "system"
@@ -31,10 +67,62 @@ export const LIVE_QUALITY_OPTIONS: LiveQuality[] = [
   "360p",
 ];
 
-export const LIVE_REACTIONS = ["🔥", "❤️", "👏", "🌍", "✨", "🙌"] as const;
+export const LIVE_REACTIONS = ["❤️", "👍", "🔥", "👏"] as const;
+
+export type LiveReactionEmoji = (typeof LIVE_REACTIONS)[number];
+
+export type FloatingLiveReaction = {
+  id: string;
+  emoji: string;
+  /** Horizontal drift seed 0–1 for floating animation variety */
+  drift?: number;
+};
+
+export type LiveRealtimeState =
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "error";
 
 export const LIVE_CHAT_MAX_LENGTH = 500;
 export const LIVE_ROOM_TITLE_MAX = 120;
+
+/** Live Studio collaboration (UI foundation — backend upload later). */
+export type LiveCollabItemKind =
+  | "image"
+  | "pdf"
+  | "document"
+  | "presentation"
+  | "link"
+  | "file";
+
+export type LiveCollabSharedItem = {
+  id: string;
+  kind: LiveCollabItemKind;
+  fileName: string;
+  typeLabel: string;
+  sizeLabel: string;
+  senderId: string;
+  senderName: string;
+  senderInitials: string;
+  sentAtLabel: string;
+  /** Preview hint only — never a public storage URL in V1 UI. */
+  previewLabel?: string;
+  canPreview?: boolean;
+};
+
+export const LIVE_COLLAB_ALLOWED_TYPES = [
+  "PNG",
+  "JPG",
+  "WEBP",
+  "GIF",
+  "PDF",
+  "DOCX",
+  "PPTX",
+  "TXT",
+] as const;
+
+export const LIVE_COLLAB_MAX_SIZE_LABEL = "25 MB";
 
 export type LiveHostProfile = {
   id: string;
@@ -88,10 +176,72 @@ export type LiveRoom = {
   host: LiveHostProfile;
   isHost?: boolean;
   myRole?: LiveParticipantRole | null;
-  /** Media plane fields intentionally omitted from public DTOs in V1. */
-  ingestProtocol?: null;
-  sfuRoomId?: null;
-  mediaMetadata?: Record<string, never>;
+  ingestProtocol?: string | null;
+  sfuRoomId?: string | null;
+  mediaMetadata?: Record<string, unknown>;
+  maxOnStage?: number;
+  pinnedParticipantId?: string | null;
+  stageLayoutMode?: LiveStageLayoutMode;
+  currentSessionId?: string | null;
+  autoAdmitFromQueue?: boolean;
+};
+
+export type LiveParticipant = {
+  userId: string;
+  roomId: string;
+  role: LiveParticipantRole;
+  displayName: string;
+  handle: string;
+  initials: string;
+  avatarGradient: string;
+  joinedAt: string;
+  lastSeenAt: string;
+  isHost: boolean;
+  stageStatus?: LiveStageStatus;
+  canPublishAudio?: boolean;
+  canPublishVideo?: boolean;
+  canShareScreen?: boolean;
+  mutedByHost?: boolean;
+  cameraDisabledByHost?: boolean;
+  queuePosition?: number | null;
+  stageJoinedAt?: string | null;
+};
+
+export type LiveStageRequest = {
+  id: string;
+  roomId: string;
+  requesterId: string;
+  status: LiveStageRequestStatus;
+  queuePosition: number | null;
+  message: string | null;
+  createdAt: string;
+  displayName?: string;
+  handle?: string;
+  initials?: string;
+  avatarGradient?: string;
+};
+
+export type LiveStageInvitation = {
+  id: string;
+  roomId: string;
+  inviteeId: string;
+  invitedBy: string;
+  status: "pending" | "accepted" | "declined" | "revoked" | "expired";
+  createdAt: string;
+};
+
+export type LiveMediaTokenPayload = {
+  token: string;
+  livekitUrl: string;
+  identity: string;
+  roomName: string;
+  grants: {
+    canSubscribe: boolean;
+    canPublishAudio: boolean;
+    canPublishVideo: boolean;
+    canShareScreen: boolean;
+  };
+  expiresAt: number;
 };
 
 /** @deprecated Prefer LiveRoom — kept for gradual UI migration from mock */

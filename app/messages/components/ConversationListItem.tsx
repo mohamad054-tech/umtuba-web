@@ -31,11 +31,20 @@ export default function ConversationListItem({
       }`}
     >
       <div className="relative shrink-0">
-        <div
-          className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-sm font-black text-white ${conversation.peerAvatarGradient}`}
-        >
-          {conversation.peerInitials}
-        </div>
+        {conversation.peerAvatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- remote avatar URLs from Supabase storage
+          <img
+            src={conversation.peerAvatarUrl}
+            alt=""
+            className="h-12 w-12 rounded-full object-cover"
+          />
+        ) : (
+          <div
+            className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br text-sm font-black text-white ${conversation.peerAvatarGradient}`}
+          >
+            {conversation.peerInitials}
+          </div>
+        )}
         <OnlineStatusDot
           status={conversation.status}
           className="absolute bottom-0 right-0"

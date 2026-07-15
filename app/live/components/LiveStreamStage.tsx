@@ -1,7 +1,16 @@
-import type { RefObject } from "react";
+"use client";
+
+import { memo, type RefObject } from "react";
+import type {
+  FloatingLiveReaction,
+  LiveRoom,
+  LiveStageLayoutMode,
+} from "../types";
+import type { LiveStageTile } from "../hooks/useLiveMediaSession";
 import LiveBadge from "./LiveBadge";
+import LiveFloatingReactions from "./LiveFloatingReactions";
+import LiveMediaStage from "./LiveMediaStage";
 import LiveViewerCount from "./LiveViewerCount";
-import type { LiveRoom } from "../types";
 
 type LiveStreamStageProps = {
   room: LiveRoom;
@@ -10,79 +19,90 @@ type LiveStreamStageProps = {
   quality: string;
   isFullscreen: boolean;
   stageRef: RefObject<HTMLDivElement | null>;
+  floatingReactions?: FloatingLiveReaction[];
+  viewerCount?: number | null;
+  watchingSource?: "presence" | "pending" | "error";
+  mediaTiles?: LiveStageTile[];
+  activeSpeakerId?: string | null;
+  mediaConnectionLabel?: string;
+  mediaConnectionState?: string;
+  mediaError?: string | null;
+  layoutMode?: LiveStageLayoutMode;
 };
 
-export default function LiveStreamStage({
+function LiveStreamStageComponent({
   room,
   muted,
   captionsOn,
   quality,
   isFullscreen,
   stageRef,
+  floatingReactions = [],
+  viewerCount = null,
+  watchingSource = "pending",
+  mediaTiles = [],
+  activeSpeakerId = null,
+  mediaConnectionLabel = "Offline",
+  mediaConnectionState = "idle",
+  mediaError = null,
+  layoutMode = "auto",
 }: LiveStreamStageProps) {
+  const hasMedia = mediaTiles.length > 0;
+
   return (
     <div
       ref={stageRef}
-      className={`relative overflow-hidden border border-white/10 bg-[#080816]/80 shadow-[0_0_60px_rgba(37,99,235,0.12)] backdrop-blur-xl ${
+      className={`relative overflow-hidden border border-white/10 bg-[#080816]/80 shadow-[0_0_60px_rgba(37,99,238,0.12)] backdrop-blur-xl ${
         isFullscreen
           ? "fixed inset-0 z-50 rounded-none border-0"
-          : "aspect-video w-full rounded-[28px] md:rounded-[32px]"
+          : "aspect-video w-full rounded-[24px] sm:rounded-[28px] md:rounded-[32px]"
       }`}
     >
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${room.previewGradient}`}
+      {!hasMedia ? (
+        <>
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${room.previewGradient}`}
+          />
+          <div className="pointer-events-none absolute inset-0">
+            <div
+              className={`absolute -left-16 top-1/4 h-56 w-56 rounded-full blur-3xl ${room.previewAccent}`}
+            />
+            <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(5,5,16,0.55)_100%)]" />
+          </div>
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-black" />
+      )}
+
+      <LiveMediaStage
+        tiles={mediaTiles}
+        activeSpeakerId={activeSpeakerId}
+        pinnedParticipantId={room.pinnedParticipantId}
+        layoutMode={layoutMode}
+        connectionLabel={mediaConnectionLabel}
+        connectionState={mediaConnectionState}
+        mediaError={mediaError}
+        placeholderTitle={room.previewLabel}
+        placeholderSubtitle={
+          room.status === "live"
+            ? "Waiting for on-stage video — chat and presence stay live."
+            : "Go live to start the media stage."
+        }
       />
 
-      <div className="pointer-events-none absolute inset-0">
-        <div
-          className={`absolute -left-16 top-1/4 h-56 w-56 rounded-full blur-3xl ${room.previewAccent}`}
-        />
-        <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(5,5,16,0.55)_100%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-          }}
-        />
-      </div>
-
-      <div className="absolute left-4 top-4 z-10 flex flex-wrap items-center gap-2 md:left-5 md:top-5">
+      <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-2 sm:left-4 sm:top-4 md:left-5 md:top-5">
         <LiveBadge size="md" />
-        <LiveViewerCount count={room.viewerCount} />
+        <LiveViewerCount count={viewerCount} source={watchingSource} />
         <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55 backdrop-blur-md">
           {quality}
         </span>
-        {room.status === "live" ? (
-          <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
-            Stage ready
-          </span>
-        ) : (
-          <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
-            {room.status}
-          </span>
-        )}
+        <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
+          {room.status === "live" ? "Live media" : room.status}
+        </span>
       </div>
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-white/15 bg-white/10 shadow-[0_0_40px_rgba(239,68,68,0.35)] backdrop-blur-md md:h-20 md:w-20">
-          <span className="ml-1 text-2xl text-white md:text-3xl" aria-hidden>
-            ▶
-          </span>
-        </div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-red-300/90">
-          UMTUBA Live Stage
-        </p>
-        <h2 className="mt-3 max-w-xl text-2xl font-black tracking-tight text-white md:text-4xl">
-          {room.previewLabel}
-        </h2>
-        <p className="mt-3 max-w-md text-sm leading-6 text-white/55 md:text-base">
-          Media plane reserved for WebRTC / SFU ingest — rooms, chat, and host
-          controls are live in V1.
-        </p>
-      </div>
+      <LiveFloatingReactions reactions={floatingReactions} variant="stage" />
 
       {muted ? (
         <div className="absolute bottom-4 left-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1.5 text-xs font-bold text-white/70 backdrop-blur-md md:bottom-5 md:left-5">
@@ -92,8 +112,7 @@ export default function LiveStreamStage({
 
       {captionsOn ? (
         <div className="absolute bottom-6 left-1/2 z-10 w-[min(90%,36rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-center text-sm font-medium leading-6 text-white/90 backdrop-blur-md">
-          [CC] Welcome to {room.city} — you&apos;re watching a live moment from
-          the UMTUBA globe.
+          [CC] Captions will connect to live translation later.
         </div>
       ) : null}
 
@@ -101,3 +120,6 @@ export default function LiveStreamStage({
     </div>
   );
 }
+
+const LiveStreamStage = memo(LiveStreamStageComponent);
+export default LiveStreamStage;

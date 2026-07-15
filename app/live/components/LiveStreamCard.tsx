@@ -7,6 +7,12 @@ type LiveStreamCardProps = {
   onSelect: (id: string) => void;
 };
 
+function visibilityLabel(visibility: LiveRoom["visibility"]) {
+  if (visibility === "private") return "Private";
+  if (visibility === "group") return "Group";
+  return "Public";
+}
+
 export default function LiveStreamCard({
   room,
   isActive = false,
@@ -28,8 +34,11 @@ export default function LiveStreamCard({
         <div
           className={`absolute -right-6 top-4 h-24 w-24 rounded-full blur-2xl ${room.previewAccent}`}
         />
-        <div className="absolute left-3 top-3">
+        <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
           <LiveBadge size="sm" />
+          <span className="rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white/75 backdrop-blur-md">
+            {visibilityLabel(room.visibility)}
+          </span>
         </div>
         <div className="absolute bottom-3 right-3 rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[10px] font-bold tabular-nums text-white/80 backdrop-blur-md">
           {formatViewerCount(room.viewerCount)}
@@ -56,7 +65,13 @@ export default function LiveStreamCard({
               {room.host.name}
             </p>
             <p className="truncate text-[10px] text-white/40">
-              {room.city}, {room.country} · {room.category}
+              {room.category}
+              {room.city || room.country
+                ? ` · ${[room.city, room.country].filter(Boolean).join(", ")}`
+                : ""}
+            </p>
+            <p className="truncate text-[10px] text-white/35">
+              Started {room.startedAtLabel}
             </p>
           </div>
         </div>

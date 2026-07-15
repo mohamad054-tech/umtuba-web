@@ -275,11 +275,21 @@ export async function recordPostShare(
 export async function recordPostView(
   supabase: SupabaseClient,
   postId: number,
-  viewerKey: string | null
+  viewerKey: string | null,
+  geo?: {
+    countryCode?: string | null;
+    countryName?: string | null;
+    city?: string | null;
+    qualified?: boolean;
+  }
 ): Promise<ActionResult<ViewResult>> {
   const { data, error } = await supabase.rpc("record_post_view", {
     p_post_id: postId,
     p_viewer_key: viewerKey,
+    p_country_code: geo?.countryCode ?? null,
+    p_country_name: geo?.countryName ?? null,
+    p_city: geo?.city ?? null,
+    p_qualified: geo?.qualified ?? true,
   });
 
   if (error) {

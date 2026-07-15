@@ -1,10 +1,13 @@
+"use client";
+
+import { memo } from "react";
 import type { LiveChatMessage as LiveChatMessageType } from "../types";
 
 type LiveChatMessageProps = {
   message: LiveChatMessageType;
 };
 
-export default function LiveChatMessage({ message }: LiveChatMessageProps) {
+function LiveChatMessageComponent({ message }: LiveChatMessageProps) {
   return (
     <div className="flex gap-2.5">
       <div
@@ -40,3 +43,6 @@ export default function LiveChatMessage({ message }: LiveChatMessageProps) {
     </div>
   );
 }
+
+const LiveChatMessage = memo(LiveChatMessageComponent);
+export default LiveChatMessage;

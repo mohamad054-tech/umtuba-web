@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame, useLoader } from "@react-three/fiber";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import ArrivalPulse from "./ArrivalPulse";
 import CityMarker from "./CityMarker";
@@ -17,8 +17,14 @@ export default function Earth() {
     "/textures/earth-blue-marble.jpg"
   );
 
-  earthTexture.colorSpace = THREE.SRGBColorSpace;
-  earthTexture.anisotropy = 8;
+  // Three.js loader textures are configured after load; clone so we don't mutate the hook value.
+  const map = useMemo(() => {
+    const tex = earthTexture.clone();
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 8;
+    tex.needsUpdate = true;
+    return tex;
+  }, [earthTexture]);
 
   useFrame((_, delta) => {
     if (!earthGroupRef.current) return;
@@ -36,7 +42,7 @@ export default function Earth() {
         <sphereGeometry args={[2, 128, 128]} />
 
         <meshStandardMaterial
-          map={earthTexture}
+          map={map}
           roughness={0.72}
           metalness={0.03}
         />

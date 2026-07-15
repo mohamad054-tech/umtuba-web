@@ -37,7 +37,55 @@ Never put the **service role** key in the Next.js app or commit it.
 
    `supabase/migrations/20260713_live_streaming_v1_foundation.sql`
 
-9. Click **Run**.
+   Then optionally Live Streaming V2 Realtime (participants channel):
+
+   `supabase/migrations/20260714_live_streaming_v2_realtime.sql`
+
+   Then optionally Live Streaming V3 Realtime hardening (idempotent publication check for chat/rooms/participants/reactions):
+
+   `supabase/migrations/20260714_live_streaming_v3_realtime_hardening.sql`
+
+   Then Live Media V2 multi-guest (stage queue, sessions, interactive + AI foundations):
+
+   `supabase/migrations/20260714_live_media_v2_multi_guest.sql`
+
+   Then Live Media V2 host stage fix (create_live_room on-stage + ensure_live_host_on_stage):
+
+   `supabase/migrations/20260714_live_media_v2_host_stage_fix.sql`
+
+10. Then Notifications V1 (follows + notifications inbox + realtime):
+
+   `supabase/migrations/20260715_notifications_v1.sql`
+
+11. Then Notifications V2 (Journey / rewards / nearby live / AI + preferences):
+
+   `supabase/migrations/20260716_notifications_v2.sql`
+
+12. Then Notifications V2 Automation (qualified views, journey auto, UM Points):
+
+   `supabase/migrations/20260717_notifications_v2_automation.sql`
+
+13. Then Notifications V2 event wiring (save/share notifications + AI milestone insights):
+
+   `supabase/migrations/20260718_notifications_v2_event_wiring.sql`
+
+14. Click **Run**.
+
+Verify automation objects (optional):
+
+`scripts/verify-notifications-v2-automation.sql`
+
+### Live Media V2 (LiveKit)
+
+Add to `.env.local` (never commit secrets):
+
+- `LIVEKIT_API_KEY` — server only
+- `LIVEKIT_API_SECRET` — server only
+- `LIVEKIT_URL` — e.g. `wss://your-project.livekit.cloud`
+- `NEXT_PUBLIC_LIVEKIT_URL` — same WS URL for the browser (no secrets)
+
+Apply `20260714_live_media_v2_multi_guest.sql` and
+`20260714_live_media_v2_host_stage_fix.sql` before testing Go live media.
 
 ### What `20260713_profiles_foundation_v1.sql` adds
 
@@ -135,11 +183,19 @@ Do **not** auto-apply from the app. When ready, paste:
 
 `supabase/migrations/20260713_live_streaming_v1_foundation.sql`
 
-into the SQL Editor and run it. This adds live rooms, participants, chat, and foundation tables (reports, bans, gifts, reactions, recordings, replays, precise location, moderation events) with RLS + RPCs. Until applied, `/live` runs in demo mode.
+into the SQL Editor and run it. This adds live rooms, participants, chat, and foundation tables (reports, bans, gifts, reactions, recordings, replays, precise location, moderation events) with RLS + RPCs. Until applied, `/live` shows an empty/migration-needed state.
+
+For Live V2 participant list realtime, also apply:
+
+`supabase/migrations/20260714_live_streaming_v2_realtime.sql`
+
+For Live V3 (idempotent — ensures chat, rooms, participants, and reactions are published to Realtime):
+
+`supabase/migrations/20260714_live_streaming_v3_realtime_hardening.sql`
 
 **Location privacy:** exact lat/long are stored only in `live_room_precise_location` (host/staff). Public clients receive city/country only.
 
-**Realtime:** enable Realtime for `live_chat_messages` and `live_rooms` if the publication block did not attach (Dashboard → Database → Publications). RLS still filters events per subscriber.
+**Realtime:** enable Realtime for `live_chat_messages`, `live_rooms`, `live_participants`, and `live_reactions` if the publication blocks did not attach (Dashboard → Database → Publications). RLS still filters events per subscriber.
 
 ## Auth settings
 

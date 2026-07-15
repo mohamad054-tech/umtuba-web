@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DatabasePost } from "../../app/data/types/post";
 import type { DiscoverVideo } from "../../app/discover/types";
+import { isUuid } from "../../app/lib/nav";
 import {
   isOwnedVideoPath,
   POST_VIDEOS_BUCKET,
@@ -8,6 +9,28 @@ import {
   validateVideoFile,
   VIDEO_SIGNED_URL_TTL_SECONDS,
 } from "./videoPostsShared";
+import { normalizeUsername } from "./validation";
+
+/**
+ * Auth user id for messaging. Never use post id / username as a stand-in.
+ * When posts.user_id is null, recover from owned video path `{user_id}/…`.
+ */
+export function resolvePostAuthorUserId(post: {
+  user_id: string | null;
+  video_path?: string | null;
+}): string | null {
+  if (isUuid(post.user_id)) {
+    return post.user_id!.trim();
+  }
+
+  const path = post.video_path?.replace(/^\/+/, "").trim() ?? "";
+  if (!path || path.includes("..") || path.includes("\\")) {
+    return null;
+  }
+
+  const folder = path.split("/")[0]?.trim() ?? "";
+  return isUuid(folder) ? folder : null;
+}
 
 const postColumns = `
   id,
@@ -151,7 +174,7 @@ export async function attachPlaybackUrls(
 
       return {
         id: post.id,
-        user_id: post.user_id,
+        user_id: resolvePostAuthorUserId(post),
         content: post.content,
         post_type: post.post_type,
         author_name: post.author_name,
@@ -170,6 +193,59 @@ export async function attachPlaybackUrls(
       };
     })
   );
+}
+
+/**
+ * Fill missing PublicPostDTO.user_id via profiles.username when the post row
+ * has no user_id and the storage path did not yield one.
+ */
+export async function enrichAuthorUserIdsFromProfiles(
+  supabase: SupabaseClient,
+  posts: PublicPostDTO[]
+): Promise<PublicPostDTO[]> {
+  const missing = posts.filter((post) => !isUuid(post.user_id));
+
+  if (missing.length === 0) {
+    return posts;
+  }
+
+  const usernames = Array.from(
+    new Set(
+      missing
+        .map((post) => normalizeUsername(post.author_username))
+        .filter(Boolean)
+    )
+  );
+
+  if (usernames.length === 0) {
+    return posts;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username")
+    .in("username", usernames);
+
+  if (error) {
+    console.error("Unable to resolve post authors by username:", error);
+    return posts;
+  }
+
+  const idByUsername = new Map<string, string>();
+  for (const row of data ?? []) {
+    if (isUuid(row.id) && row.username) {
+      idByUsername.set(normalizeUsername(row.username), row.id);
+    }
+  }
+
+  return posts.map((post) => {
+    if (isUuid(post.user_id)) {
+      return post;
+    }
+
+    const resolved = idByUsername.get(normalizeUsername(post.author_username));
+    return resolved ? { ...post, user_id: resolved } : post;
+  });
 }
 
 export function applyViewerStateToPosts(
@@ -205,7 +281,8 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
       country: "Worldwide",
     },
     creator: {
-      id: post.user_id ?? String(post.id),
+      // Auth UUID only — never post.id / username stand-ins.
+      id: isUuid(post.user_id) ? post.user_id!.trim() : null,
       name: post.author_name,
       username,
       avatar: post.author_avatar || "U",

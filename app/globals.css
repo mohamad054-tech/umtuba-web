@@ -348,6 +348,8 @@ body {
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  /* Allow scroll chaining at edges so page/nav remain reachable */
+  overscroll-behavior-y: auto;
 }
 
 .video-snap-scroller::-webkit-scrollbar {
@@ -497,19 +499,39 @@ body {
 @keyframes liveFloat {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.85);
+    transform: translateY(10px) scale(0.8);
   }
-  20% {
+  15% {
     opacity: 1;
   }
   100% {
     opacity: 0;
-    transform: translateY(-48px) scale(1.15);
+    transform: translateY(-56px) scale(1.2);
+  }
+}
+
+@keyframes liveFloatStage {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.7) rotate(-8deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -140px, 0) scale(1.25) rotate(8deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-\[liveFloat_1\.1s_ease-out_forwards\] {
+  .animate-\[liveFloat_1\.1s_ease-out_forwards\],
+  .animate-\[liveFloat_1\.6s_ease-out_forwards\],
+  .animate-\[liveFloatStage_1\.6s_cubic-bezier\(0\.22\,1\,0\.36\,1\)_forwards\] {
     animation: none !important;
+    opacity: 0.85;
   }
 }

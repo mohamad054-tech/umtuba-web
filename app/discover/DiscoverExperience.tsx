@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
 import {
   APP_ROUTES,
   buildCreatorProfileHref,
   buildHomeCityFocusHref,
   findIndexByCity,
+  findIndexByPostId,
+  isUuid,
 } from "../lib/nav";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
@@ -17,26 +20,36 @@ import type { DiscoverStats, DiscoverVideo } from "./types";
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
   loadError?: string | null;
+  /** Auth user id from the Discover page server render (null if signed out). */
+  initialViewerId?: string | null;
 };
 
 export default function DiscoverExperience({
   videos: initialVideos,
   loadError = null,
+  initialViewerId = null,
 }: DiscoverExperienceProps) {
   const searchParams = useSearchParams();
   const cityParam = searchParams.get("city");
+  const postParam = searchParams.get("post");
+  const commentParam = searchParams.get("comment");
 
   const [videos, setVideos] = useState(initialVideos);
+  // Fixed from the page session — do not re-fetch (avoids flash + identity skew).
+  const viewerId = initialViewerId;
 
-  const initialIndex = useMemo(
-    () => findIndexByCity(videos, cityParam),
-    [cityParam, videos]
-  );
+  const initialIndex = useMemo(() => {
+    const byPost = findIndexByPostId(videos, postParam);
+    if (byPost >= 0) {
+      return byPost;
+    }
+    return findIndexByCity(videos, cityParam);
+  }, [cityParam, postParam, videos]);
 
   const [activeVideo, setActiveVideo] = useState<DiscoverVideo | null>(
     () => videos[initialIndex] ?? videos[0] ?? null
   );
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(() => Boolean(commentParam));
 
   const handleActiveChange = useCallback((video: DiscoverVideo) => {
     setActiveVideo(video);
@@ -129,6 +142,10 @@ export default function DiscoverExperience({
     username: activeVideo.creator.username,
   });
   const activePostId = Number(activeVideo.id);
+  const peerUserId = activeVideo.creator.id;
+  // Hide only for missing/non-UUID peer or self. Signed-out (viewerId null) may message.
+  const canMessageAside =
+    isUuid(peerUserId) && viewerId !== peerUserId;
 
   return (
     <DiscoverShell>
@@ -138,6 +155,7 @@ export default function DiscoverExperience({
             <DiscoverFeed
               videos={videos}
               initialIndex={initialIndex}
+              viewerId={viewerId}
               onActiveChange={handleActiveChange}
               onComment={handleComment}
               onStatsChange={handleStatsChange}
@@ -201,6 +219,14 @@ export default function DiscoverExperience({
                 </span>
               </span>
             </Link>
+            <div className="mt-4 empty:mt-0 empty:hidden">
+              <StartDirectMessageButton
+                peerUserId={peerUserId ?? ""}
+                peerName={activeVideo.creator.name}
+                hidden={!canMessageAside}
+                className="watch-focus-ring w-full rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
+              />
+            </div>
           </div>
         </aside>
 

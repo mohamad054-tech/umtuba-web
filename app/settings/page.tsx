@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getServerUser } from "../../lib/supabase/server";
 import { getProfileByIdFromDb } from "../../lib/supabase/profiles";
@@ -30,17 +31,20 @@ export default async function SettingsPage() {
     row.username;
 
   return (
-    <SettingsExperience
-      profile={{
-        id: row.id,
-        username: row.username,
-        displayName,
-        bio: row.bio || "",
-        city: row.city || "",
-        country: row.country || "",
-        avatarUrl: row.avatar_url,
-        avatarInitial: row.avatar_initial || displayName.charAt(0).toUpperCase() || "U",
-      }}
-    />
+    <Suspense fallback={null}>
+      <SettingsExperience
+        profile={{
+          id: row.id,
+          username: row.username,
+          displayName,
+          bio: row.bio || "",
+          city: row.city || "",
+          country: row.country || "",
+          avatarUrl: row.avatar_url,
+          avatarInitial:
+            row.avatar_initial || displayName.charAt(0).toUpperCase() || "U",
+        }}
+      />
+    </Suspense>
   );
 }

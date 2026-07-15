@@ -183,8 +183,7 @@ export async function listConversationsForUser(
     `
     )
     .eq("user_id", currentUserId)
-    .eq("is_archived", false)
-    .eq("conversations.kind", "direct");
+    .eq("is_archived", false);
 
   if (error) {
     console.error("listConversationsForUser failed:", error);
@@ -194,7 +193,9 @@ export async function listConversationsForUser(
     };
   }
 
-  const rows = (data ?? []) as unknown as ParticipantJoinRow[];
+  const rows = ((data ?? []) as unknown as ParticipantJoinRow[]).filter(
+    (row) => row.conversations?.kind === "direct"
+  );
 
   if (rows.length === 0) {
     return { ok: true, conversations: [] };
@@ -347,6 +348,7 @@ export async function getOrCreateDirectConversation(
   if (error) {
     console.error("get_or_create_direct_conversation failed:", error);
     const message = (error.message || "").toLowerCase();
+    const code = (error as { code?: string }).code ?? "";
 
     if (message.includes("authentication required")) {
       return {
@@ -360,20 +362,45 @@ export async function getOrCreateDirectConversation(
       return { ok: false, message: "That user could not be found." };
     }
 
+    if (message.includes("invalid conversation peer")) {
+      return { ok: false, message: "You cannot message this account." };
+    }
+
+    if (
+      code === "PGRST202" ||
+      message.includes("could not find the function") ||
+      message.includes("schema cache")
+    ) {
+      return {
+        ok: false,
+        message:
+          "Messenger is not set up on this project yet. Apply 20260713_messenger_v1_foundation.sql in Supabase.",
+      };
+    }
+
+    return {
+      ok: false,
+      message: error.message || "Unable to open conversation. Please try again.",
+    };
+  }
+
+  // PostgREST may return uuid as string; normalize other shapes.
+  const conversationId =
+    typeof data === "string"
+      ? data
+      : data != null
+        ? String(data)
+        : "";
+
+  if (!conversationId) {
+    console.error("get_or_create_direct_conversation returned empty:", data);
     return {
       ok: false,
       message: "Unable to open conversation. Please try again.",
     };
   }
 
-  if (typeof data !== "string" || !data) {
-    return {
-      ok: false,
-      message: "Unable to open conversation. Please try again.",
-    };
-  }
-
-  return { ok: true, conversationId: data };
+  return { ok: true, conversationId };
 }
 
 export function validateMessageBody(

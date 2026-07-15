@@ -60,7 +60,6 @@ export function GlobalPulseProvider({
 
   useEffect(() => {
     if (reducedMotion) {
-      setActiveEvent(null);
       return;
     }
 
@@ -124,11 +123,11 @@ export function GlobalPulseProvider({
 
   const value = useMemo(
     () => ({
-      activeEvent,
+      activeEvent: reducedMotion ? null : activeEvent,
       getCityIntensity,
       isCityActive,
     }),
-    [activeEvent, getCityIntensity, isCityActive]
+    [activeEvent, getCityIntensity, isCityActive, reducedMotion]
   );
 
   return (

@@ -2,7 +2,15 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSafeRedirectPath } from "./redirect";
 
-const PROTECTED_PREFIXES = ["/messages", "/settings", "/create", "/saved"] as const;
+const PROTECTED_PREFIXES = [
+  "/messages",
+  "/notifications",
+  "/settings",
+  "/create",
+  "/saved",
+  "/rewards",
+  "/creator",
+] as const;
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
@@ -79,7 +87,11 @@ export async function updateSession(request: NextRequest) {
   if (user && isAuthPath(pathname)) {
     const nextParam = request.nextUrl.searchParams.get("next");
     const destination = getSafeRedirectPath(nextParam, "/discover");
-    const redirectUrl = new URL(destination, request.url);
+    // Parse path + query explicitly so ?creatorId= / ?conversation= survive.
+    const redirectUrl = request.nextUrl.clone();
+    const [destPath, destQuery = ""] = destination.split("?");
+    redirectUrl.pathname = destPath || "/discover";
+    redirectUrl.search = destQuery ? `?${destQuery}` : "";
     return copyCookies(supabaseResponse, NextResponse.redirect(redirectUrl));
   }
 

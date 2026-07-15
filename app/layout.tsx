@@ -24,11 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // suppressHydrationWarning: browser translation / extensions often mutate
+    // <html lang> (e.g. en → ar) before React hydrates. Our lang is always "en".
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppMotionRoot>{children}</AppMotionRoot>
       </body>
     </html>
