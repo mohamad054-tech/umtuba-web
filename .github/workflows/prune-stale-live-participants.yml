@@ -2,8 +2,8 @@
 # Requires GitHub repository secret DATABASE_URL (Postgres connection string).
 # Never commit DATABASE_URL. Never echo the secret in steps.
 #
-# Status: workflow file prepared — scheduling is active only after this file
-# is on the default/deployed branch AND DATABASE_URL is set in repo Secrets.
+# Activation: scheduling runs only after this file is on the default/deployed
+# branch AND DATABASE_URL is set in repo Secrets. Until then, dispatch fails closed.
 
 name: Prune stale live participants
 
@@ -43,9 +43,27 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          # Do not print DATABASE_URL or query results that could leak connection info.
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -qAtc \
-            "select public.prune_stale_live_participants(120);" > /tmp/prune_result.txt
+          # libpq/psql do NOT auto-read DATABASE_URL from the environment.
+          # Without an explicit -d URI, psql falls back to the local Unix socket
+          # (/var/run/postgresql/.s.PGSQL.5432). Never print the secret.
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "DATABASE_URL secret is not set. Add it in GitHub → Settings → Secrets."
+            exit 1
+          fi
+          case "$DATABASE_URL" in
+            postgres://*|postgresql://*) ;;
+            *)
+              echo "DATABASE_URL must be a postgres:// or postgresql:// URI (Transaction Pooler)."
+              echo "A bare database name such as postgres causes a local socket connection."
+              exit 1
+              ;;
+          esac
+          psql \
+            -v ON_ERROR_STOP=1 \
+            -qAt \
+            -d "$DATABASE_URL" \
+            -c "select public.prune_stale_live_participants(120);" \
+            > /tmp/prune_result.txt
           # Print only the integer return (number of rows marked left).
           echo "prune_stale_live_participants returned: $(cat /tmp/prune_result.txt)"
           rm -f /tmp/prune_result.txt
