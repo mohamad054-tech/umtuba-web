@@ -1,5 +1,6 @@
 export type WatchPanelId =
   | "comments"
+  | "shop"
   | "related"
   | "explore-city"
   | "ai"

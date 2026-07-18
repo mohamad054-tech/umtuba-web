@@ -25,6 +25,8 @@ type VideoSlideProps = {
   viewerId?: string | null;
   forcePause?: boolean;
   transitionLocked?: boolean;
+  shopProductCount?: number;
+  shopShelfOpen?: boolean;
   onToggleMute: () => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onPostJourney: (video: WatchVideo) => void;
@@ -32,6 +34,7 @@ type VideoSlideProps = {
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
   onSrcChange?: (src: string) => void;
+  onPlaybackTime?: (currentTimeMs: number) => void;
   slideRef?: (node: HTMLElement | null) => void;
 };
 
@@ -42,6 +45,8 @@ export default function VideoSlide({
   viewerId = null,
   forcePause = false,
   transitionLocked = false,
+  shopProductCount = 0,
+  shopShelfOpen = false,
   onToggleMute,
   onOpenPanel,
   onPostJourney,
@@ -49,6 +54,7 @@ export default function VideoSlide({
   onFlagsChange,
   onFollowChange,
   onSrcChange,
+  onPlaybackTime,
   slideRef,
 }: VideoSlideProps) {
   const [playbackStatus, setPlaybackStatus] = useState<
@@ -58,6 +64,9 @@ export default function VideoSlide({
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
   const autoRemintAttemptedRef = useRef(false);
+  const lastReportedTimeRef = useRef(-1);
+  const onPlaybackTimeRef = useRef(onPlaybackTime);
+  onPlaybackTimeRef.current = onPlaybackTime;
 
   useEffect(() => {
     autoRemintAttemptedRef.current = false;
@@ -127,8 +136,20 @@ export default function VideoSlide({
   }, []);
 
   function handleWatchProgress(event: WatchProgressEvent) {
-    if (!sessionRef.current) return;
-    sessionRef.current = mergeWatchProgress(sessionRef.current, event);
+    if (sessionRef.current) {
+      sessionRef.current = mergeWatchProgress(sessionRef.current, event);
+    }
+
+    if (!active || !onPlaybackTimeRef.current) {
+      return;
+    }
+
+    // Throttle parent updates (~4/s) to avoid layout work during playback.
+    if (Math.abs(event.currentTimeMs - lastReportedTimeRef.current) < 250) {
+      return;
+    }
+    lastReportedTimeRef.current = event.currentTimeMs;
+    onPlaybackTimeRef.current(event.currentTimeMs);
   }
 
   function handleFlagsChange(flags: {
@@ -168,7 +189,7 @@ export default function VideoSlide({
           video.postId ? () => void handleRetryPlayback() : undefined
         }
         onWatchProgress={
-          video.source === "supabase" && video.postId
+          (video.source === "supabase" && video.postId) || onPlaybackTime
             ? handleWatchProgress
             : undefined
         }
@@ -177,6 +198,8 @@ export default function VideoSlide({
         video={video}
         viewerId={viewerId}
         transitionLocked={transitionLocked}
+        shopProductCount={active ? shopProductCount : 0}
+        shopShelfOpen={active ? shopShelfOpen : false}
         onOpenPanel={onOpenPanel}
         onPostJourney={onPostJourney}
         onStatsChange={onStatsChange}

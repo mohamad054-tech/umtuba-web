@@ -12,10 +12,13 @@ import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndi
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
 import CommentsPanel from "../components/social/CommentsPanel";
+import VideoShopShelf from "../components/video/commerce/VideoShopShelf";
+import { useVideoShopShelf } from "../components/video/commerce/useVideoShopShelf";
 import UserMenu from "../components/UserMenu";
 import {
   loadWatchFeedPageAction,
 } from "../actions/loadWatchFeed";
+import { recordVideoCommerceEventAction } from "../actions/videoCommerce";
 import { recordFeedViewOnce } from "../lib/video/recordFeedView";
 import {
   appendUniqueById,
@@ -28,6 +31,11 @@ import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { findWatchVideoIndex } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 
+const PRODUCTION_WATCH_PANELS = new Set<Exclude<WatchPanelId, null>>([
+  "comments",
+  "shop",
+]);
+
 const panelCopy: Record<
   Exclude<WatchPanelId, null>,
   { title: string; description: string }
@@ -36,6 +44,10 @@ const panelCopy: Record<
     title: "Comments",
     description:
       "Conversation around this moment — replies and creator notes.",
+  },
+  shop: {
+    title: "Shop",
+    description: "Products linked to this video moment.",
   },
   related: {
     title: "Related videos",
@@ -100,10 +112,18 @@ export default function WatchExperience({
   const [forcePause, setForcePause] = useState(false);
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
   const [demoFallback] = useState(usedDemoFallback);
+  const [playbackTimeMs, setPlaybackTimeMs] = useState(0);
   nextCursorRef.current = nextCursor;
+
+  const shopPostId =
+    activeVideo?.source === "supabase" ? activeVideo.postId : null;
+  const { activeItems: shopItems, activeCount: shopProductCount } =
+    useVideoShopShelf(shopPostId, playbackTimeMs);
 
   const handleActiveChange = useCallback((video: WatchVideo) => {
     setActiveVideo(video);
+    setActivePanel(null);
+    setPlaybackTimeMs(0);
 
     if (video.source !== "supabase" || !video.postId) {
       return;
@@ -129,14 +149,24 @@ export default function WatchExperience({
   const handleOpenPanel = useCallback(
     (panel: Exclude<WatchPanelId, null>) => {
       if (
-        panel !== "comments" &&
+        !PRODUCTION_WATCH_PANELS.has(panel) &&
         !allowWatchPrototypePanels()
       ) {
         return;
       }
+
+      if (panel === "shop" && shopPostId) {
+        void recordVideoCommerceEventAction({
+          eventType: "badge_opened",
+          postId: shopPostId,
+          clientEventId: `bo-${shopPostId}-${Date.now()}`,
+          metadata: { count: shopProductCount },
+        });
+      }
+
       setActivePanel(panel);
     },
-    []
+    [shopPostId, shopProductCount]
   );
 
   const handleClosePanel = useCallback(() => {
@@ -370,6 +400,8 @@ export default function WatchExperience({
             viewerId={initialViewerId}
             forcePause={forcePause}
             transitionLocked={journeyTransitionActive}
+            shopProductCount={shopProductCount}
+            shopShelfOpen={activePanel === "shop"}
             emptyMessage={emptyMessage}
             onActiveChange={handleActiveChange}
             onOpenPanel={handleOpenPanel}
@@ -377,6 +409,7 @@ export default function WatchExperience({
             onNearEnd={handleNearEnd}
             onVideoPatch={handleVideoPatch}
             onFollowChange={handleFollowChange}
+            onPlaybackTime={setPlaybackTimeMs}
             loadMoreEpoch={loadMoreEpoch}
           />
 
@@ -420,9 +453,21 @@ export default function WatchExperience({
             </div>
           ) : null}
 
+          {activePanel === "shop" &&
+          shopPostId &&
+          !journeyTransitionActive ? (
+            <VideoShopShelf
+              open
+              postId={shopPostId}
+              items={shopItems}
+              onClose={handleClosePanel}
+            />
+          ) : null}
+
           {prototypePanelsAllowed &&
           panelMeta &&
           activePanel !== "comments" &&
+          activePanel !== "shop" &&
           !journeyTransitionActive ? (
             <WatchPanel
               open={Boolean(activePanel)}

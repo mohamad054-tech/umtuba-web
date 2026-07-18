@@ -18,6 +18,8 @@ type VerticalVideoFeedProps = {
   viewerId?: string | null;
   forcePause?: boolean;
   transitionLocked?: boolean;
+  shopProductCount?: number;
+  shopShelfOpen?: boolean;
   emptyMessage?: string;
   onActiveChange?: (video: WatchVideo, index: number) => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
@@ -28,6 +30,7 @@ type VerticalVideoFeedProps = {
     patch: Partial<WatchVideo>
   ) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
+  onPlaybackTime?: (currentTimeMs: number) => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
 };
@@ -40,6 +43,8 @@ export default function VerticalVideoFeed({
   viewerId = null,
   forcePause = false,
   transitionLocked = false,
+  shopProductCount = 0,
+  shopShelfOpen = false,
   emptyMessage = "No videos available.",
   onActiveChange,
   onOpenPanel,
@@ -47,6 +52,7 @@ export default function VerticalVideoFeed({
   onNearEnd,
   onVideoPatch,
   onFollowChange,
+  onPlaybackTime,
   loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -254,6 +260,8 @@ export default function VerticalVideoFeed({
                 viewerId={viewerId}
                 forcePause={forcePause}
                 transitionLocked={transitionLocked}
+                shopProductCount={shopProductCount}
+                shopShelfOpen={shopShelfOpen}
                 onToggleMute={handleToggleMute}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
@@ -265,6 +273,9 @@ export default function VerticalVideoFeed({
                 onFlagsChange={(flags) => onVideoPatch?.(video.id, flags)}
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
+                onPlaybackTime={
+                  index === activeIndex ? onPlaybackTime : undefined
+                }
                 slideRef={(node) => setSlideNode(video.id, node)}
               />
             ) : (

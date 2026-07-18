@@ -8,11 +8,14 @@ import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
 import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoActionRail from "./VideoActionRail";
+import ShopBadge from "./commerce/ShopBadge";
 
 type VideoOverlayProps = {
   video: WatchVideo;
   viewerId?: string | null;
   transitionLocked?: boolean;
+  shopProductCount?: number;
+  shopShelfOpen?: boolean;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onPostJourney: (video: WatchVideo) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
@@ -24,6 +27,8 @@ export default function VideoOverlay({
   video,
   viewerId = null,
   transitionLocked = false,
+  shopProductCount = 0,
+  shopShelfOpen = false,
   onOpenPanel,
   onPostJourney,
   onStatsChange,
@@ -132,6 +137,13 @@ export default function VideoOverlay({
               </button>
             </div>
           ) : null}
+
+          <ShopBadge
+            count={shopProductCount}
+            disabled={transitionLocked}
+            expanded={shopShelfOpen}
+            onOpen={() => onOpenPanel("shop")}
+          />
 
           <button
             type="button"
