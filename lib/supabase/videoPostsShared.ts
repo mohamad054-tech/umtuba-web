@@ -20,10 +20,15 @@ export type AllowedVideoMimeType = (typeof ALLOWED_VIDEO_MIME_TYPES)[number];
 
 const ALLOWED_VIDEO_MIME_SET = new Set<string>(ALLOWED_VIDEO_MIME_TYPES);
 
-export const VIDEO_ACCEPT_ATTR = ALLOWED_VIDEO_MIME_TYPES.join(",");
+export const VIDEO_ACCEPT_ATTR = [
+  ...ALLOWED_VIDEO_MIME_TYPES,
+  ".mp4",
+  ".m4v",
+  ".webm",
+  ".mov",
+].join(",");
 
-export const VIDEO_FILE_HINT =
-  "MP4, WebM, or MOV — maximum 50 MB";
+export const VIDEO_FILE_HINT = "MP4, WebM, or MOV — maximum 50 MB";
 
 export function isAllowedVideoMimeType(
   mimeType: string
@@ -31,19 +36,52 @@ export function isAllowedVideoMimeType(
   return ALLOWED_VIDEO_MIME_SET.has(mimeType);
 }
 
+/**
+ * Prefer browser MIME; when empty (common on mobile), infer from extension.
+ */
+export function resolveVideoMimeType(
+  mimeType: string | null | undefined,
+  fileName?: string | null
+): string {
+  const trimmed = (mimeType || "").trim().toLowerCase();
+  if (isAllowedVideoMimeType(trimmed)) {
+    return trimmed;
+  }
+
+  const name = (fileName || "").trim().toLowerCase();
+  if (name.endsWith(".webm")) {
+    return "video/webm";
+  }
+  if (name.endsWith(".mov")) {
+    return "video/quicktime";
+  }
+  if (name.endsWith(".mp4") || name.endsWith(".m4v")) {
+    return "video/mp4";
+  }
+
+  return trimmed;
+}
+
 export function formatMaxVideoSizeLabel(): string {
   return "50 MB";
 }
 
 export type VideoFileValidationResult =
+  | { ok: true; mimeType: AllowedVideoMimeType }
+  | { ok: false; message: string };
+
+export type CaptionValidationResult =
   | { ok: true }
   | { ok: false; message: string };
 
 export function validateVideoFile(input: {
   mimeType: string;
   byteSize: number;
+  fileName?: string | null;
 }): VideoFileValidationResult {
-  if (!isAllowedVideoMimeType(input.mimeType)) {
+  const mimeType = resolveVideoMimeType(input.mimeType, input.fileName);
+
+  if (!isAllowedVideoMimeType(mimeType)) {
     return {
       ok: false,
       message: "Please select an MP4, WebM, or MOV video.",
@@ -64,10 +102,10 @@ export function validateVideoFile(input: {
     };
   }
 
-  return { ok: true };
+  return { ok: true, mimeType };
 }
 
-export function validateCaption(caption: string): VideoFileValidationResult {
+export function validateCaption(caption: string): CaptionValidationResult {
   if (caption.length > MAX_CAPTION_LENGTH) {
     return {
       ok: false,

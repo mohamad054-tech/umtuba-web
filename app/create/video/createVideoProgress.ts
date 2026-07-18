@@ -19,6 +19,9 @@ export const CREATE_PROCESSING_MESSAGE = "Publishing your video…";
 export const CREATE_SUCCESS_MESSAGE = "Video ready. Opening Discover…";
 export const CREATE_PUBLISH_FAILED_MESSAGE =
   "The video could not be published. Please try again.";
+export const CREATE_UPLOAD_CANCELLED_MESSAGE = "Upload cancelled.";
+export const CREATE_UPLOAD_FAILED_MESSAGE =
+  "The video could not be uploaded. Please try again.";
 
 /**
  * After storage upload finishes, processing is indeterminate until the

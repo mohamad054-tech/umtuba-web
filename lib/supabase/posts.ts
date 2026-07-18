@@ -91,6 +91,10 @@ export type UploadPostVideoProgress = {
   total: number;
 };
 
+export type UploadPostVideoOptions = {
+  signal?: AbortSignal;
+};
+
 /**
  * Client-side upload into the private post-videos bucket (owner folder only).
  * Client validation is convenience only — the server action re-validates.
@@ -99,7 +103,8 @@ export type UploadPostVideoProgress = {
  */
 export async function uploadPostVideo(
   file: File,
-  onProgress?: (progress: UploadPostVideoProgress) => void
+  onProgress?: (progress: UploadPostVideoProgress) => void,
+  options?: UploadPostVideoOptions
 ): Promise<UploadPostVideoResult> {
   const supabase = createClient();
   const user = await getAuthenticatedUser();
@@ -111,13 +116,15 @@ export async function uploadPostVideo(
   const fileCheck = validateVideoFile({
     mimeType: file.type,
     byteSize: file.size,
+    fileName: file.name,
   });
 
   if (!fileCheck.ok) {
     throw new Error(fileCheck.message);
   }
 
-  const extension = videoExtensionForMime(file.type);
+  const mimeType = fileCheck.mimeType;
+  const extension = videoExtensionForMime(mimeType);
   const uniqueFileName = `${crypto.randomUUID()}.${extension}`;
   const filePath = `${user.id}/${uniqueFileName}`;
 
@@ -126,13 +133,22 @@ export async function uploadPostVideo(
   }
 
   if (onProgress) {
-    await uploadPostVideoWithProgressXhr(supabase, file, filePath, onProgress);
+    await uploadPostVideoWithProgressXhr(
+      file,
+      filePath,
+      mimeType,
+      onProgress,
+      options?.signal
+    );
   } else {
+    if (options?.signal?.aborted) {
+      throw new DOMException("Upload cancelled.", "AbortError");
+    }
     const { error: uploadError } = await supabase.storage
       .from(POST_VIDEOS_BUCKET)
       .upload(filePath, file, {
         cacheControl: "3600",
-        contentType: file.type,
+        contentType: mimeType,
         upsert: false,
       });
 
@@ -144,18 +160,22 @@ export async function uploadPostVideo(
 
   return {
     path: filePath,
-    mimeType: file.type,
+    mimeType,
     byteSize: file.size,
   };
 }
 
+const VIDEO_UPLOAD_TIMEOUT_MS = 10 * 60 * 1000;
+
 async function uploadPostVideoWithProgressXhr(
-  supabase: ReturnType<typeof createClient>,
   file: File,
   filePath: string,
-  onProgress: (progress: UploadPostVideoProgress) => void
+  mimeType: string,
+  onProgress: (progress: UploadPostVideoProgress) => void,
+  signal?: AbortSignal
 ): Promise<void> {
   const { url, publishableKey } = requireSupabasePublicEnv();
+  const supabase = createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -165,16 +185,32 @@ async function uploadPostVideoWithProgressXhr(
     throw new Error("Please sign in to upload a video.");
   }
 
+  if (signal?.aborted) {
+    throw new DOMException("Upload cancelled.", "AbortError");
+  }
+
   const endpoint = `${url.replace(/\/$/, "")}/storage/v1/object/${POST_VIDEOS_BUCKET}/${filePath}`;
 
   await new Promise<void>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", endpoint);
+    xhr.timeout = VIDEO_UPLOAD_TIMEOUT_MS;
     xhr.setRequestHeader("apikey", publishableKey);
     xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
     xhr.setRequestHeader("x-upsert", "false");
     xhr.setRequestHeader("cache-control", "3600");
-    xhr.setRequestHeader("content-type", file.type);
+    xhr.setRequestHeader("content-type", mimeType);
+
+    const onAbort = () => {
+      xhr.abort();
+    };
+
+    signal?.addEventListener("abort", onAbort);
+
+    const settle = (fn: () => void) => {
+      signal?.removeEventListener("abort", onAbort);
+      fn();
+    };
 
     xhr.upload.onprogress = (event) => {
       if (!event.lengthComputable || event.total <= 0) {
@@ -192,15 +228,43 @@ async function uploadPostVideoWithProgressXhr(
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         onProgress({ percent: 100, loaded: file.size, total: file.size });
-        resolve();
+        settle(() => resolve());
         return;
       }
       console.error("Unable to upload video:", xhr.status, xhr.responseText);
-      reject(new Error("Unable to upload video."));
+      const message =
+        xhr.status === 413
+          ? "The video is too large to upload."
+          : xhr.status === 401 || xhr.status === 403
+            ? "Please sign in to upload a video."
+            : "Unable to upload video. Please try again.";
+      settle(() => reject(new Error(message)));
     };
 
     xhr.onerror = () => {
-      reject(new Error("Unable to upload video."));
+      settle(() =>
+        reject(
+          new Error(
+            "Network issue during upload. Check your connection and try again."
+          )
+        )
+      );
+    };
+
+    xhr.ontimeout = () => {
+      settle(() =>
+        reject(
+          new Error(
+            "Upload timed out. Please try again on a stronger connection."
+          )
+        )
+      );
+    };
+
+    xhr.onabort = () => {
+      settle(() =>
+        reject(new DOMException("Upload cancelled.", "AbortError"))
+      );
     };
 
     xhr.send(file);

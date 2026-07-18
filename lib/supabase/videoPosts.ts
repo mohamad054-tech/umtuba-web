@@ -434,11 +434,16 @@ export async function insertVideoPostForUser(
   const fileCheck = validateVideoFile({
     mimeType: input.mimeType,
     byteSize: input.byteSize,
+    fileName: videoPath.split("/").pop() ?? null,
   });
 
   if (!fileCheck.ok) {
     await failAndCleanup(fileCheck.message);
   }
+
+  const resolvedMimeType = fileCheck.ok
+    ? fileCheck.mimeType
+    : input.mimeType;
 
   // Owner SELECT policy allows verifying the object before the post row exists.
   const signedUrl = await createVideoSignedUrl(supabase, videoPath);
@@ -471,7 +476,7 @@ export async function insertVideoPostForUser(
       image_url: null,
       video_url: null,
       video_path: videoPath,
-      video_mime_type: input.mimeType,
+      video_mime_type: resolvedMimeType,
       video_byte_size: input.byteSize,
       media_status: "queued",
       upload_started_at: uploadStartedAt,
@@ -550,11 +555,7 @@ export async function insertVideoPostForUser(
     console.error("Unable to finalize video ready state:", readyError);
     await supabase
       .from("posts")
-      .update({
-        media_status: "failed",
-        processing_error: "Processing failed. Please try again.",
-        processing_progress: clampProcessingProgress(0),
-      })
+      .delete()
       .eq("id", queuedRow.id)
       .eq("user_id", userId);
     await failAndCleanup(

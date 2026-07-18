@@ -14,6 +14,8 @@ import { createVideoPostAction } from "../../actions/createVideoPost";
 import MediaPipelineStatusBadge from "../../components/media/MediaPipelineStatusBadge";
 import MediaProcessingProgress from "../../components/media/MediaProcessingProgress";
 import MediaUploadProgress from "../../components/media/MediaUploadProgress";
+import ProductLoadingState from "../../components/product/ProductLoadingState";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { getAuthenticatedUser } from "../../../lib/supabase/auth";
 import {
   deleteUploadedPostVideo,
@@ -36,7 +38,9 @@ import {
   CREATE_PROCESSING_MESSAGE,
   CREATE_PUBLISH_FAILED_MESSAGE,
   CREATE_SUCCESS_MESSAGE,
+  CREATE_UPLOAD_CANCELLED_MESSAGE,
   CREATE_UPLOAD_COMPLETE_MESSAGE,
+  CREATE_UPLOAD_FAILED_MESSAGE,
   processingProgressAfterUpload,
   processingProgressOnReady,
   processingProgressWhilePublishing,
@@ -51,6 +55,54 @@ type UploadPhase =
   | "processing"
   | "success"
   | "error";
+
+const PENDING_ORPHAN_KEY = "umtuba_pending_video_uploads";
+
+function readPendingOrphans(): string[] {
+  try {
+    if (typeof sessionStorage === "undefined") return [];
+    const raw = sessionStorage.getItem(PENDING_ORPHAN_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed)
+      ? parsed.filter((p): p is string => typeof p === "string" && p.length > 0)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePendingOrphans(paths: string[]) {
+  try {
+    if (typeof sessionStorage === "undefined") return;
+    const unique = Array.from(new Set(paths)).slice(0, 20);
+    if (unique.length === 0) {
+      sessionStorage.removeItem(PENDING_ORPHAN_KEY);
+      return;
+    }
+    sessionStorage.setItem(PENDING_ORPHAN_KEY, JSON.stringify(unique));
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function queuePendingOrphan(path: string) {
+  writePendingOrphans([...readPendingOrphans(), path]);
+}
+
+async function cleanupPendingOrphans() {
+  const paths = readPendingOrphans();
+  if (paths.length === 0) return;
+  const remaining: string[] = [];
+  for (const path of paths) {
+    try {
+      await deleteUploadedPostVideo(path);
+    } catch {
+      remaining.push(path);
+    }
+  }
+  writePendingOrphans(remaining);
+}
 
 function phaseToPipelineStatus(phase: UploadPhase): MediaPipelineStatus | null {
   switch (phase) {
@@ -69,12 +121,23 @@ function phaseToPipelineStatus(phase: UploadPhase): MediaPipelineStatus | null {
   }
 }
 
+function isAbortError(error: unknown): boolean {
+  return (
+    (error instanceof DOMException && error.name === "AbortError") ||
+    (error instanceof Error &&
+      (error.name === "AbortError" ||
+        /upload cancelled/i.test(error.message)))
+  );
+}
+
 export default function CreateVideoForm() {
   const router = useRouter();
   const captionId = useId();
   const fileId = useId();
+  const errorId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
+  const uploadAbortRef = useRef<AbortController | null>(null);
 
   const [phase, setPhase] = useState<UploadPhase>("checking-auth");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -112,6 +175,7 @@ export default function CreateVideoForm() {
         setIsAuthenticated(true);
         setPhase("ready");
         setErrorMessage("");
+        void cleanupPendingOrphans();
       } catch (error) {
         console.error(error);
 
@@ -119,9 +183,10 @@ export default function CreateVideoForm() {
           setIsAuthenticated(false);
           setPhase("error");
           setErrorMessage(
-            error instanceof Error
-              ? error.message
-              : "Please sign in to upload a video."
+            sanitizeUserFacingMessage(
+              error instanceof Error ? error.message : null,
+              "Please sign in to upload a video."
+            )
           );
         }
       }
@@ -131,6 +196,7 @@ export default function CreateVideoForm() {
 
     return () => {
       active = false;
+      uploadAbortRef.current?.abort();
     };
   }, []);
 
@@ -158,10 +224,15 @@ export default function CreateVideoForm() {
 
   function resetToRetryableReady() {
     submitLockRef.current = false;
+    uploadAbortRef.current = null;
     setPhase("ready");
     setStatusMessage("");
     setUploadPercent(0);
     setProcessingPercent(null);
+  }
+
+  function handleCancelUpload() {
+    uploadAbortRef.current?.abort();
   }
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -177,6 +248,7 @@ export default function CreateVideoForm() {
     const check = validateVideoFile({
       mimeType: file.type,
       byteSize: file.size,
+      fileName: file.name,
     });
 
     if (!check.ok) {
@@ -240,6 +312,7 @@ export default function CreateVideoForm() {
     const fileCheck = validateVideoFile({
       mimeType: selectedFile.type,
       byteSize: selectedFile.size,
+      fileName: selectedFile.name,
     });
 
     if (!fileCheck.ok) {
@@ -251,6 +324,8 @@ export default function CreateVideoForm() {
     submitLockRef.current = true;
     let uploadedPath: string | null = null;
     const uploadStartedAt = new Date().toISOString();
+    const abortController = new AbortController();
+    uploadAbortRef.current = abortController;
 
     try {
       setErrorMessage("");
@@ -259,9 +334,13 @@ export default function CreateVideoForm() {
       setProcessingPercent(null);
       setStatusMessage("Uploading video to secure storage...");
 
-      const uploaded = await uploadPostVideo(selectedFile, (progress) => {
-        setUploadPercent(progress.percent);
-      });
+      const uploaded = await uploadPostVideo(
+        selectedFile,
+        (progress) => {
+          setUploadPercent(progress.percent);
+        },
+        { signal: abortController.signal }
+      );
       uploadedPath = uploaded.path;
       const afterUpload = processingProgressAfterUpload();
       setUploadPercent(afterUpload.uploadPercent);
@@ -284,9 +363,29 @@ export default function CreateVideoForm() {
       });
 
       if (!result.ok) {
+        if (result.code === "auth_required") {
+          queuePendingOrphan(uploaded.path);
+          setPhase("error");
+          setErrorMessage(
+            sanitizeUserFacingMessage(
+              result.message,
+              "Please sign in to publish a video."
+            )
+          );
+          setStatusMessage("");
+          setProcessingPercent(null);
+          submitLockRef.current = false;
+          return;
+        }
+
         await deleteUploadedPostVideo(uploaded.path);
         setPhase("error");
-        setErrorMessage(result.message || CREATE_PUBLISH_FAILED_MESSAGE);
+        setErrorMessage(
+          sanitizeUserFacingMessage(
+            result.message,
+            CREATE_PUBLISH_FAILED_MESSAGE
+          )
+        );
         setStatusMessage("");
         setProcessingPercent(null);
         submitLockRef.current = false;
@@ -311,6 +410,16 @@ export default function CreateVideoForm() {
     } catch (error) {
       console.error(error);
 
+      if (isAbortError(error)) {
+        setPhase("error");
+        setStatusMessage("");
+        setProcessingPercent(null);
+        setUploadPercent(0);
+        setErrorMessage(CREATE_UPLOAD_CANCELLED_MESSAGE);
+        submitLockRef.current = false;
+        return;
+      }
+
       if (uploadedPath) {
         await deleteUploadedPostVideo(uploadedPath);
       }
@@ -318,8 +427,15 @@ export default function CreateVideoForm() {
       setPhase("error");
       setStatusMessage("");
       setProcessingPercent(null);
-      setErrorMessage(CREATE_PUBLISH_FAILED_MESSAGE);
+      setErrorMessage(
+        sanitizeUserFacingMessage(
+          error instanceof Error ? error.message : null,
+          CREATE_UPLOAD_FAILED_MESSAGE
+        )
+      );
       submitLockRef.current = false;
+    } finally {
+      uploadAbortRef.current = null;
     }
   }
 
@@ -334,12 +450,17 @@ export default function CreateVideoForm() {
     phase !== "checking-auth" &&
     !busy;
   const pipelineStatus = phaseToPipelineStatus(phase);
+  const fileInvalid = Boolean(errorMessage && !selectedFile);
+  const captionInvalid = Boolean(
+    errorMessage && errorMessage.toLowerCase().includes("caption")
+  );
 
   return (
     <form
       onSubmit={(event) => void handleSubmit(event)}
       className="mx-auto w-full max-w-xl rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl md:p-8"
       noValidate
+      aria-busy={busy || undefined}
     >
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
@@ -357,9 +478,9 @@ export default function CreateVideoForm() {
       </div>
 
       {phase === "checking-auth" ? (
-        <p className="mt-6 text-sm text-white/50" role="status">
-          Checking your session...
-        </p>
+        <div className="mt-6">
+          <ProductLoadingState label="Checking your session…" />
+        </div>
       ) : null}
 
       {!isAuthenticated && phase !== "checking-auth" ? (
@@ -377,7 +498,7 @@ export default function CreateVideoForm() {
             </Link>{" "}
             or{" "}
             <Link
-              href={APP_ROUTES.signup}
+              href={`${APP_ROUTES.signup}?next=${encodeURIComponent(APP_ROUTES.createVideo)}`}
               className="font-bold text-white underline"
             >
               create an account
@@ -399,7 +520,9 @@ export default function CreateVideoForm() {
           accept={VIDEO_ACCEPT_ATTR}
           onChange={(event) => void handleFileChange(event)}
           disabled={!isAuthenticated || busy || phase === "checking-auth"}
-          className="block w-full text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-black hover:file:bg-white/90 disabled:opacity-50"
+          aria-invalid={fileInvalid || undefined}
+          aria-describedby={errorMessage ? errorId : undefined}
+          className="watch-focus-ring block w-full text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-black hover:file:bg-white/90 disabled:opacity-50"
         />
         <p className="text-xs text-white/40">{VIDEO_FILE_HINT}</p>
       </div>
@@ -431,7 +554,7 @@ export default function CreateVideoForm() {
               type="button"
               onClick={clearSelectedFile}
               disabled={busy}
-              className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 font-bold text-white/80 hover:bg-white/10 disabled:opacity-50"
+              className="watch-focus-ring shrink-0 rounded-full border border-white/15 px-3 py-1.5 font-bold text-white/80 hover:bg-white/10 disabled:opacity-50"
             >
               Remove
             </button>
@@ -458,7 +581,9 @@ export default function CreateVideoForm() {
           disabled={!isAuthenticated || busy || phase === "checking-auth"}
           rows={4}
           placeholder="Say something about this clip..."
-          className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-base text-white outline-none focus:border-white/30 disabled:opacity-60"
+          aria-invalid={captionInvalid || undefined}
+          aria-describedby={errorMessage ? errorId : undefined}
+          className="watch-focus-ring w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-base text-white outline-none focus:border-white/30 disabled:opacity-60"
         />
         <p className="text-right text-xs text-white/40">
           {caption.length}/{MAX_CAPTION_LENGTH}
@@ -504,7 +629,7 @@ export default function CreateVideoForm() {
       ) : null}
 
       {errorMessage ? (
-        <div className="mt-4 space-y-3" role="alert">
+        <div className="mt-4 space-y-3" role="alert" id={errorId}>
           <p className="text-sm text-red-300">{errorMessage}</p>
           {phase === "error" && isAuthenticated ? (
             <button
@@ -513,27 +638,46 @@ export default function CreateVideoForm() {
                 setErrorMessage("");
                 resetToRetryableReady();
               }}
-              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/85 hover:bg-white/10"
+              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/85 hover:bg-white/10"
             >
               Try again
             </button>
+          ) : null}
+          {phase === "error" && !isAuthenticated ? (
+            <Link
+              href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.createVideo)}`}
+              className="watch-focus-ring inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/85 hover:bg-white/10"
+            >
+              Sign in to continue
+            </Link>
           ) : null}
         </div>
       ) : null}
 
       <div className="mt-8 flex flex-wrap justify-end gap-3">
-        <Link
-          href={APP_ROUTES.discover}
-          className={`rounded-2xl border border-white/10 px-5 py-3 font-bold text-white/80 hover:bg-white/10 ${
-            busy ? "pointer-events-none opacity-50" : ""
-          }`}
-        >
-          Cancel
-        </Link>
+        {phase === "uploading" ? (
+          <button
+            type="button"
+            onClick={handleCancelUpload}
+            className="watch-focus-ring rounded-2xl border border-white/10 px-5 py-3 font-bold text-white/80 hover:bg-white/10"
+          >
+            Cancel upload
+          </button>
+        ) : (
+          <Link
+            href={APP_ROUTES.discover}
+            className={`watch-focus-ring rounded-2xl border border-white/10 px-5 py-3 font-bold text-white/80 hover:bg-white/10 ${
+              busy ? "pointer-events-none opacity-50" : ""
+            }`}
+          >
+            Cancel
+          </Link>
+        )}
         <button
           type="submit"
           disabled={!canSubmit}
-          className="rounded-2xl bg-white px-5 py-3 font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
+          aria-busy={busy || undefined}
+          className="watch-focus-ring rounded-2xl bg-white px-5 py-3 font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
         >
           {phase === "uploading"
             ? "Uploading..."

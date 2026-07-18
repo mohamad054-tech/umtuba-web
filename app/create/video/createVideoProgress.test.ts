@@ -35,6 +35,8 @@ describe("createVideoProgress", () => {
     );
     expect(form).toMatch(/indeterminate/);
     expect(form).toMatch(/CREATE_UPLOAD_COMPLETE_MESSAGE|Upload complete/);
+    expect(form).toMatch(/Cancel upload/);
+    expect(form).toMatch(/AbortController/);
   });
 
   it("exposes friendly failure copy", () => {

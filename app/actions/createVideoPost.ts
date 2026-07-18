@@ -1,5 +1,6 @@
 "use server";
 
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { getServerUser, createClient } from "../../lib/supabase/server";
 import {
   deleteOwnedVideoObject,
@@ -10,7 +11,12 @@ import type { MediaMetadata } from "../../lib/media/pipelineTypes";
 
 export type CreateVideoPostActionResult =
   | { ok: true; postId: number }
-  | { ok: false; message: string };
+  | {
+      ok: false;
+      message: string;
+      code?: "auth_required" | "publish_failed";
+      videoPath?: string;
+    };
 
 export type CreateVideoPostActionInput = {
   caption: string;
@@ -29,14 +35,20 @@ export type CreateVideoPostActionInput = {
 export async function createVideoPostAction(
   input: CreateVideoPostActionInput
 ): Promise<CreateVideoPostActionResult> {
+  const videoPath =
+    typeof input.videoPath === "string" ? input.videoPath.trim() : "";
   const user = await getServerUser();
 
   if (!user) {
-    return { ok: false, message: "Please sign in to publish a video." };
+    return {
+      ok: false,
+      code: "auth_required",
+      videoPath: videoPath || undefined,
+      message: "Please sign in to publish a video.",
+    };
   }
 
   const supabase = await createClient();
-  const videoPath = typeof input.videoPath === "string" ? input.videoPath.trim() : "";
 
   try {
     const { data: profile, error: profileError } = await supabase
@@ -50,13 +62,18 @@ export async function createVideoPostAction(
       await deleteOwnedVideoObject(supabase, user.id, videoPath);
       return {
         ok: false,
+        code: "publish_failed",
         message: "Unable to load your profile. Please try again.",
       };
     }
 
     if (!profile) {
       await deleteOwnedVideoObject(supabase, user.id, videoPath);
-      return { ok: false, message: "Please sign in to publish a video." };
+      return {
+        ok: false,
+        code: "publish_failed",
+        message: "Unable to load your profile. Please try again.",
+      };
     }
 
     const payload: CreateVideoPostInput = {
@@ -88,11 +105,11 @@ export async function createVideoPostAction(
 
     await deleteOwnedVideoObject(supabase, user.id, videoPath);
 
-    const message =
-      error instanceof Error && error.message.trim()
-        ? error.message
-        : "Unable to create the video post. Please try again.";
+    const message = sanitizeUserFacingMessage(
+      error instanceof Error ? error.message : null,
+      "Unable to create the video post. Please try again."
+    );
 
-    return { ok: false, message };
+    return { ok: false, code: "publish_failed", message };
   }
 }
