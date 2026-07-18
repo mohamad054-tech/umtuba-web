@@ -7,7 +7,7 @@ import {
   type ActivityTierProgress,
 } from "../../../lib/activity-tiers";
 import { mapActivityBalanceRow } from "../../../lib/supabase/activityTiers";
-import { createClient } from "../../../lib/supabase/client";
+import { createClient, tryCreateClient } from "../../../lib/supabase/client";
 import { getMyActivityTierAction } from "../../actions/activityTiers";
 
 export type UseActivityTierResult = {
@@ -53,7 +53,14 @@ export function useActivityTier(): UseActivityTierResult {
 
   useEffect(() => {
     let disposed = false;
-    const supabase = createClient();
+    const maybeClient = tryCreateClient();
+    if (!maybeClient) {
+      setUserId(null);
+      setStatus("signed_out");
+      setProgress(emptyActivityTierProgress());
+      return;
+    }
+    const supabase = maybeClient;
 
     async function boot() {
       const {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createClient } from "../../../lib/supabase/client";
+import { createClient, tryCreateClient } from "../../../lib/supabase/client";
 import { getPrimaryWalletBalanceAction } from "../../actions/wallet";
 import {
   mapUmPointsBalanceRow,
@@ -51,7 +51,14 @@ export function useWalletBalance(): UseWalletBalanceResult {
 
   useEffect(() => {
     let disposed = false;
-    const supabase = createClient();
+    const maybeClient = tryCreateClient();
+    if (!maybeClient) {
+      setStatus("signed_out");
+      setBalance(null);
+      setUserId(null);
+      return;
+    }
+    const supabase = maybeClient;
 
     async function boot() {
       const {

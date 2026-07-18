@@ -1,0 +1,25 @@
+import { describe, expect, it } from "vitest";
+import { getSafeRedirectPath } from "./redirect";
+
+describe("getSafeRedirectPath", () => {
+  it("allows same-origin relative paths and preserves query", () => {
+    expect(getSafeRedirectPath("/discover")).toBe("/discover");
+    expect(getSafeRedirectPath("/messages?conversation=1")).toBe(
+      "/messages?conversation=1"
+    );
+    expect(getSafeRedirectPath("/live/abc-123")).toBe("/live/abc-123");
+  });
+
+  it("rejects open-redirect patterns", () => {
+    expect(getSafeRedirectPath("//evil.example", "/discover")).toBe("/discover");
+    expect(getSafeRedirectPath("https://evil.example", "/discover")).toBe(
+      "/discover"
+    );
+    expect(getSafeRedirectPath("/\\evil", "/discover")).toBe("/discover");
+    expect(getSafeRedirectPath("/%2f%2fevil.example", "/discover")).toBe(
+      "/discover"
+    );
+    expect(getSafeRedirectPath("/@evil", "/discover")).toBe("/discover");
+    expect(getSafeRedirectPath(null, "/login")).toBe("/login");
+  });
+});

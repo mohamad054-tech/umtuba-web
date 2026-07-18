@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { claimPendingReferralAction } from "../actions/referral";
-import { createClient } from "../../lib/supabase/client";
+import { tryCreateClient } from "../../lib/supabase/client";
 
 const SESSION_FLAG = "umtuba_referral_claim_attempted";
 
@@ -22,7 +22,8 @@ export default function ReferralClaimBootstrap() {
           if (sessionStorage.getItem(SESSION_FLAG) === "1") return;
         }
 
-        const supabase = createClient();
+        const supabase = tryCreateClient();
+        if (!supabase) return;
         const {
           data: { user },
         } = await supabase.auth.getUser();

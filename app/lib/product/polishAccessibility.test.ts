@@ -80,10 +80,12 @@ describe("polish & accessibility contracts", () => {
     expect(read("app/lib/product/useDialogA11y.ts")).toMatch(/Escape/);
   });
 
-  it("AuthAlert errors use role=alert", () => {
+  it("AuthAlert errors use role=alert and AuthCheckbox describes errors", () => {
     const alert = read("app/components/auth/AuthAlert.tsx");
     expect(alert).toMatch(/tone === "error"/);
     expect(alert).toMatch(/role=\{tone === "error" \? "alert" : "status"\}/);
+    const checkbox = read("app/components/auth/AuthCheckbox.tsx");
+    expect(checkbox).toMatch(/aria-describedby=\{errorId\}/);
   });
 
   it("surface pages use branded loading fallbacks", () => {

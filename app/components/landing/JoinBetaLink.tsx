@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
-import { createClient } from "../../../lib/supabase/client";
+import { tryCreateClient } from "../../../lib/supabase/client";
 import { APP_ROUTES } from "../../lib/nav";
 
 type JoinBetaLinkProps = {
@@ -24,7 +24,10 @@ export default function JoinBetaLink({
 
   useEffect(() => {
     let cancelled = false;
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      return;
+    }
 
     void supabase.auth.getUser().then(({ data }) => {
       if (cancelled) {

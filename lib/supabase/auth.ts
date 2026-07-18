@@ -1,11 +1,12 @@
 import { createClient } from "./client";
 import type { ProfileRow } from "./database.types";
+import { getSafeRedirectPath } from "./redirect";
 import {
-  getErrorMessage,
   isValidUsername,
   normalizeUsername,
   USERNAME_HINT,
 } from "./validation";
+import { toAuthUserFacingMessage } from "./authMessages";
 import type { User } from "@supabase/supabase-js";
 
 export type UserProfile = {
@@ -22,6 +23,16 @@ export type UserProfile = {
 
 const PROFILE_COLUMNS =
   "id, username, display_name, full_name, bio, city, country, avatar_url, avatar_initial, created_at, updated_at";
+
+/** PKCE email-confirm redirect — mirrors password-reset callback pattern. */
+export function buildEmailConfirmRedirectTo(
+  origin: string,
+  nextPath = "/discover"
+): string {
+  const base = origin.replace(/\/$/, "");
+  const next = encodeURIComponent(getSafeRedirectPath(nextPath, "/discover"));
+  return `${base}/auth/callback?next=${next}`;
+}
 
 function mapProfileRow(row: ProfileRow): UserProfile {
   const displayName =
@@ -52,7 +63,7 @@ export async function signInWithEmail(email: string, password: string) {
   });
 
   if (error) {
-    throw new Error(getErrorMessage(error, "Unable to sign in."));
+    throw new Error(toAuthUserFacingMessage(error, "Unable to sign in."));
   }
 
   const {
@@ -62,7 +73,10 @@ export async function signInWithEmail(email: string, password: string) {
 
   if (userError || !user) {
     throw new Error(
-      getErrorMessage(userError, "Signed in, but the session could not be verified.")
+      toAuthUserFacingMessage(
+        userError,
+        "Signed in, but the session could not be verified."
+      )
     );
   }
 
@@ -76,6 +90,8 @@ export async function signUpWithEmail(input: {
   username: string;
   /** Optional referral code (first-touch attribution). */
   referralCode?: string | null;
+  /** Safe post-confirm deep link (honored via emailRedirectTo). */
+  nextPath?: string | null;
 }) {
   const supabase = createClient();
   const email = input.email.trim();
@@ -85,6 +101,7 @@ export async function signUpWithEmail(input: {
     typeof input.referralCode === "string"
       ? input.referralCode.trim().toUpperCase()
       : "";
+  const nextPath = getSafeRedirectPath(input.nextPath, "/discover");
 
   if (!fullName) {
     throw new Error("Please enter your full name.");
@@ -111,10 +128,16 @@ export async function signUpWithEmail(input: {
     throw new Error("That username is already taken.");
   }
 
+  const emailRedirectTo =
+    typeof window !== "undefined"
+      ? buildEmailConfirmRedirectTo(window.location.origin, nextPath)
+      : undefined;
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password: input.password,
     options: {
+      ...(emailRedirectTo ? { emailRedirectTo } : {}),
       data: {
         full_name: fullName,
         display_name: fullName,
@@ -127,7 +150,9 @@ export async function signUpWithEmail(input: {
   });
 
   if (error) {
-    throw new Error(getErrorMessage(error, "Unable to create your account."));
+    throw new Error(
+      toAuthUserFacingMessage(error, "Unable to create your account.")
+    );
   }
 
   if (data.user && !data.session) {
@@ -143,7 +168,7 @@ export async function signUpWithEmail(input: {
 
   if (userError || !user) {
     throw new Error(
-      getErrorMessage(
+      toAuthUserFacingMessage(
         userError,
         "Account created, but the session could not be verified. Please sign in."
       )
@@ -158,7 +183,7 @@ export async function signOut() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw new Error(getErrorMessage(error, "Unable to sign out."));
+    throw new Error(toAuthUserFacingMessage(error, "Unable to sign out."));
   }
 }
 
@@ -170,7 +195,9 @@ export async function getAuthenticatedUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(getErrorMessage(error, "Unable to verify your session."));
+    throw new Error(
+      toAuthUserFacingMessage(error, "Unable to verify your session.")
+    );
   }
 
   return user;

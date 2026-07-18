@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { requireSupabasePublicEnv } from "../env/supabasePublic";
+import { toAuthUserFacingMessage } from "./authMessages";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -49,7 +50,9 @@ export async function getServerUser() {
       return null;
     }
 
-    throw new Error(error.message || "Unable to verify your session.");
+    throw new Error(
+      toAuthUserFacingMessage(error, "Unable to verify your session.")
+    );
   }
 
   return user;

@@ -11,6 +11,7 @@ import {
   uploadAvatar,
 } from "../../lib/supabase/avatars";
 import { signOut } from "../../lib/supabase/auth";
+import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import {
   getErrorMessage,
   isValidUsername,
@@ -155,7 +156,9 @@ export default function SettingsExperience({
       setSuccessMessage("Profile saved.");
       router.refresh();
     } catch (error) {
-      setFormError(getErrorMessage(error, "Unable to save your profile."));
+      setFormError(
+        toAuthUserFacingMessage(error, "Unable to save your profile.")
+      );
     } finally {
       setIsSaving(false);
     }
@@ -195,7 +198,7 @@ export default function SettingsExperience({
       router.push(APP_ROUTES.home);
       router.refresh();
     } catch (error) {
-      setFormError(getErrorMessage(error, "Unable to sign out."));
+      setFormError(toAuthUserFacingMessage(error, "Unable to sign out."));
     } finally {
       setIsSigningOut(false);
     }

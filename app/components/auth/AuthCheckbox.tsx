@@ -16,6 +16,7 @@ export default function AuthCheckbox({
   ...props
 }: AuthCheckboxProps) {
   const fieldId = id ?? props.name;
+  const errorId = error && fieldId ? `${fieldId}-error` : undefined;
 
   return (
     <div className="space-y-2">
@@ -27,12 +28,17 @@ export default function AuthCheckbox({
           id={fieldId}
           type="checkbox"
           aria-invalid={Boolean(error) || undefined}
+          aria-describedby={errorId}
           className={`mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-black/40 accent-blue-400 ${className}`}
           {...props}
         />
         <span>{label}</span>
       </label>
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      {error ? (
+        <p id={errorId} className="text-sm text-red-300" role="alert">
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

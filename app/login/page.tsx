@@ -5,17 +5,17 @@ import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AuthAlert,
-  AuthCheckbox,
   AuthField,
   AuthShell,
 } from "../components/auth";
 import { APP_ROUTES } from "../lib/nav";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { claimPendingReferralAction } from "../actions/referral";
+import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signInWithEmail } from "../../lib/supabase/auth";
 import { FORGOT_PASSWORD_PATH } from "../../lib/supabase/passwordReset";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import {
-  getErrorMessage,
   isValidEmail,
   validatePassword,
 } from "../../lib/supabase/validation";
@@ -29,12 +29,15 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
+  const linkError = sanitizeUserFacingMessage(
+    searchParams.get("error"),
+    ""
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [formError, setFormError] = useState("");
+  const [formError, setFormError] = useState(linkError);
 
   function validate(): FieldErrors {
     const next: FieldErrors = {};
@@ -70,9 +73,6 @@ function LoginForm() {
     try {
       await signInWithEmail(email, password);
 
-      // Remember-me is informational for V1; Supabase SSR cookies manage the session.
-      void rememberMe;
-
       // Idempotent referral claim — never blocks login on failure.
       try {
         await claimPendingReferralAction();
@@ -90,7 +90,12 @@ function LoginForm() {
       router.push(nextPath);
       router.refresh();
     } catch (error) {
-      setFormError(getErrorMessage(error, "Invalid email or password. Try again."));
+      setFormError(
+        toAuthUserFacingMessage(
+          error,
+          "Invalid email or password. Try again."
+        )
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -106,7 +111,13 @@ function LoginForm() {
         <p className="text-center text-sm text-white/50">
           Don&apos;t have an account?{" "}
           <Link
-            href={APP_ROUTES.signup}
+            href={
+              searchParams.get("next")
+                ? `${APP_ROUTES.signup}?next=${encodeURIComponent(
+                    searchParams.get("next") || ""
+                  )}`
+                : APP_ROUTES.signup
+            }
             className="font-bold text-blue-200 transition hover:text-blue-100"
           >
             Create one
@@ -147,15 +158,7 @@ function LoginForm() {
           }}
         />
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <AuthCheckbox
-            name="rememberMe"
-            checked={rememberMe}
-            disabled={isSubmitting}
-            label="Remember me"
-            onChange={(event) => setRememberMe(event.target.checked)}
-          />
-
+        <div className="flex flex-wrap items-center justify-end gap-3">
           <Link
             href={FORGOT_PASSWORD_PATH}
             className="text-sm font-bold text-blue-200 transition hover:text-blue-100"
@@ -166,17 +169,11 @@ function LoginForm() {
 
         {resetSuccess ? (
           <AuthAlert tone="info">
-            <span role="status">
-              Password updated. Sign in with your new password.
-            </span>
+            Password updated. Sign in with your new password.
           </AuthAlert>
         ) : null}
 
-        {formError ? (
-          <AuthAlert tone="error">
-            <span role="alert">{formError}</span>
-          </AuthAlert>
-        ) : null}
+        {formError ? <AuthAlert tone="error">{formError}</AuthAlert> : null}
 
         <button
           type="submit"
@@ -199,7 +196,9 @@ function LoginFallback() {
       panelTitle="Your world is waiting."
       panelBody="Pick up Discover, Live, and Messages where you left off."
     >
-      <p className="text-sm text-white/55">Loading sign-in...</p>
+      <p className="text-sm text-white/55" role="status">
+        Loading sign-in...
+      </p>
     </AuthShell>
   );
 }

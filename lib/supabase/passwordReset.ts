@@ -1,3 +1,4 @@
+import { sanitizeUserFacingMessage } from "../../app/lib/product/userFacingMessage";
 import { createClient } from "./client";
 import { getErrorMessage, isValidEmail, validatePassword } from "./validation";
 
@@ -46,7 +47,10 @@ export function mapPasswordResetError(
     return "Too many attempts. Please wait a moment and try again.";
   }
 
-  return getErrorMessage(error, fallback);
+  return sanitizeUserFacingMessage(
+    getErrorMessage(error, fallback),
+    fallback
+  );
 }
 
 export function mapPasswordResetLinkError(
@@ -133,5 +137,13 @@ export async function updatePasswordWithSession(password: string): Promise<void>
 /** End the recovery/session after a successful password change. */
 export async function signOutAfterPasswordReset(): Promise<void> {
   const supabase = createClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(
+      mapPasswordResetError(
+        error,
+        "Password updated, but we could not end the reset session. Please sign out, then sign in again."
+      )
+    );
+  }
 }

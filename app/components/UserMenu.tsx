@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "../../lib/supabase/client";
+import { tryCreateClient } from "../../lib/supabase/client";
 import {
   getProfileForUser,
   signOut,
@@ -38,7 +38,12 @@ export default function UserMenu() {
 
   useEffect(() => {
     let isActive = true;
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setProfile(null);
+      setIsLoading(false);
+      return;
+    }
 
     async function applyUser(user: User | null) {
       if (!isActive) return;

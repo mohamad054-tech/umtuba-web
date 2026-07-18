@@ -5,14 +5,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthAlert, AuthField, AuthShell } from "../../components/auth";
 import { APP_ROUTES } from "../../lib/nav";
-import { createClient } from "../../../lib/supabase/client";
+import { toAuthUserFacingMessage } from "../../../lib/supabase/authMessages";
+import { tryCreateClient } from "../../../lib/supabase/client";
 import {
   FORGOT_PASSWORD_PATH,
   signOutAfterPasswordReset,
   updatePasswordWithSession,
 } from "../../../lib/supabase/passwordReset";
 import {
-  getErrorMessage,
   validatePassword,
   validatePasswordConfirmation,
 } from "../../../lib/supabase/validation";
@@ -37,7 +37,14 @@ export default function UpdatePasswordPage() {
 
     void (async () => {
       try {
-        const supabase = createClient();
+        const supabase = tryCreateClient();
+        if (!supabase) {
+          if (!cancelled) {
+            setHasSession(false);
+            setSessionChecked(true);
+          }
+          return;
+        }
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -94,7 +101,7 @@ export default function UpdatePasswordPage() {
       router.refresh();
     } catch (error) {
       setFormError(
-        getErrorMessage(
+        toAuthUserFacingMessage(
           error,
           "Unable to update your password. Request a new reset link."
         )
@@ -143,9 +150,7 @@ export default function UpdatePasswordPage() {
         }
       >
         <AuthAlert tone="error">
-          <span role="alert">
-            This reset link is invalid or has expired. Request a new one.
-          </span>
+          This reset link is invalid or has expired. Request a new one.
         </AuthAlert>
       </AuthShell>
     );
@@ -204,11 +209,7 @@ export default function UpdatePasswordPage() {
           }}
         />
 
-        {formError ? (
-          <AuthAlert tone="error">
-            <span role="alert">{formError}</span>
-          </AuthAlert>
-        ) : null}
+        {formError ? <AuthAlert tone="error">{formError}</AuthAlert> : null}
 
         <button
           type="submit"

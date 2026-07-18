@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { getUnreadNotificationCountAction } from "../actions/notifications";
-import { createClient } from "../../lib/supabase/client";
+import { tryCreateClient } from "../../lib/supabase/client";
 import { APP_ROUTES } from "../lib/nav";
 import UnreadBadge from "../messages/components/UnreadBadge";
 
@@ -16,7 +16,13 @@ export default function NotificationBell() {
 
   useEffect(() => {
     let disposed = false;
-    const supabase = createClient();
+    const maybeClient = tryCreateClient();
+    if (!maybeClient) {
+      setAuthed(false);
+      setCount(0);
+      return;
+    }
+    const supabase = maybeClient;
 
     async function boot() {
       const {
@@ -63,7 +69,10 @@ export default function NotificationBell() {
     if (!authed) return;
 
     let disposed = false;
-    const supabase = createClient();
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      return;
+    }
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
     void (async () => {

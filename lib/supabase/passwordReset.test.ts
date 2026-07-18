@@ -82,6 +82,11 @@ describe("password reset architecture", () => {
     expect(callback).toMatch(/exchangeCodeForSession/);
     expect(callback).not.toMatch(/console\.(log|info|debug).*code/);
     expect(callback).toMatch(/PASSWORD_RESET_UPDATE_PATH/);
+    expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/discover["']/);
+    expect(callback).toMatch(/isPasswordResetNext/);
+    expect(callback).not.toMatch(
+      /getSafeRedirectPath\(\s*searchParams\.get\("next"\),\s*PASSWORD_RESET_UPDATE_PATH/
+    );
   });
 
   it("update-password page requires session and confirms password", () => {

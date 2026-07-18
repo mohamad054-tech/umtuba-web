@@ -10,11 +10,12 @@ import {
   AuthShell,
 } from "../components/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
+import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signUpWithEmail } from "../../lib/supabase/auth";
 import { claimPendingReferralAction } from "../actions/referral";
 import { normalizeReferralCode } from "../../lib/referral/config";
+import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import {
-  getErrorMessage,
   isUsernameTakenError,
   isValidEmail,
   isValidUsername,
@@ -46,6 +47,10 @@ export default function SignupForm({
     normalizeReferralCode(
       searchParams.get("ref") || searchParams.get("invite")
     ) || normalizeReferralCode(initialReferralCode);
+  const nextPath = getSafeRedirectPath(
+    searchParams.get("next"),
+    APP_ROUTES.discover
+  );
 
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
@@ -124,6 +129,7 @@ export default function SignupForm({
         fullName,
         username: cleanedUsername,
         referralCode,
+        nextPath,
       });
 
       // Immediate-session claim (idempotent with DB trigger + later login/callback).
@@ -139,7 +145,10 @@ export default function SignupForm({
       setSuccessUsername(cleanedUsername);
       router.refresh();
     } catch (error) {
-      const message = getErrorMessage(error, "Unable to create your account.");
+      const message = toAuthUserFacingMessage(
+        error,
+        "Unable to create your account."
+      );
 
       if (message.toLowerCase().includes("check your email")) {
         // Cookie + auth metadata keep attribution for confirm → callback/login claim.
@@ -162,13 +171,18 @@ export default function SignupForm({
 
   if (successUsername) {
     const profileHref = buildCreatorProfileHref({ username: successUsername });
+    const continueHref = nextPath;
+    const continueLabel =
+      nextPath === APP_ROUTES.discover
+        ? "Continue to Discover"
+        : "Continue where you left off";
 
     return (
       <AuthShell
         title="You're in"
         subtitle="Your UMTUBA account is ready."
         panelTitle="Welcome to UMTUBA."
-        panelBody="Your profile was created. Explore Discover or open your public profile."
+        panelBody="Your profile was created. Continue to your destination or open Discover."
         footer={
           <p className="text-center text-sm text-white/50">
             Already exploring?{" "}
@@ -183,15 +197,15 @@ export default function SignupForm({
       >
         <div className="space-y-4">
           <AuthAlert tone="success">
-            Account created for @{successUsername}. Jump into Discover or open
-            your public profile.
+            Account created for @{successUsername}. Jump in or open your public
+            profile.
           </AuthAlert>
 
           <Link
-            href={APP_ROUTES.discover}
+            href={continueHref}
             className="watch-focus-ring flex w-full items-center justify-center rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90"
           >
-            Continue to Discover
+            {continueLabel}
           </Link>
 
           <Link
@@ -212,12 +226,16 @@ export default function SignupForm({
       footer={
         <p className="text-center text-sm text-white/50">
           Already have an account?{" "}
-          <Link
-            href={APP_ROUTES.login}
-            className="font-bold text-blue-200 transition hover:text-blue-100"
-          >
-            Sign in
-          </Link>
+            <Link
+              href={
+                nextPath !== APP_ROUTES.discover
+                  ? `${APP_ROUTES.login}?next=${encodeURIComponent(nextPath)}`
+                  : APP_ROUTES.login
+              }
+              className="font-bold text-blue-200 transition hover:text-blue-100"
+            >
+              Sign in
+            </Link>
         </p>
       }
     >
@@ -325,11 +343,7 @@ export default function SignupForm({
           }}
         />
 
-        {formError ? (
-          <AuthAlert tone="error">
-            <span role="alert">{formError}</span>
-          </AuthAlert>
-        ) : null}
+        {formError ? <AuthAlert tone="error">{formError}</AuthAlert> : null}
 
         {infoMessage ? <AuthAlert tone="info">{infoMessage}</AuthAlert> : null}
 

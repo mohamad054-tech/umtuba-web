@@ -5,18 +5,20 @@ import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AuthAlert, AuthField, AuthShell } from "../components/auth";
 import { APP_ROUTES } from "../lib/nav";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import {
   PASSWORD_RESET_REQUEST_SUCCESS,
   requestPasswordReset,
 } from "../../lib/supabase/passwordReset";
-import {
-  getErrorMessage,
-  isValidEmail,
-} from "../../lib/supabase/validation";
+import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
+import { isValidEmail } from "../../lib/supabase/validation";
 
 function ForgotPasswordForm() {
   const searchParams = useSearchParams();
-  const linkError = searchParams.get("error")?.trim() || "";
+  const linkError = sanitizeUserFacingMessage(
+    searchParams.get("error"),
+    ""
+  );
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -47,7 +49,10 @@ function ForgotPasswordForm() {
       setSuccessMessage(result.message || PASSWORD_RESET_REQUEST_SUCCESS);
     } catch (error) {
       setFormError(
-        getErrorMessage(error, "Unable to send reset email. Please try again.")
+        toAuthUserFacingMessage(
+          error,
+          "Unable to send reset email. Please try again."
+        )
       );
     } finally {
       setIsSubmitting(false);
@@ -89,16 +94,10 @@ function ForgotPasswordForm() {
           }}
         />
 
-        {formError ? (
-          <AuthAlert tone="error">
-            <span role="alert">{formError}</span>
-          </AuthAlert>
-        ) : null}
+        {formError ? <AuthAlert tone="error">{formError}</AuthAlert> : null}
 
         {successMessage ? (
-          <AuthAlert tone="info">
-            <span role="status">{successMessage}</span>
-          </AuthAlert>
+          <AuthAlert tone="info">{successMessage}</AuthAlert>
         ) : null}
 
         <button
