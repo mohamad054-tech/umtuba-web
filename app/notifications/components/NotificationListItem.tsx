@@ -65,7 +65,7 @@ export default function NotificationListItem({
   onOpen,
 }: NotificationListItemProps) {
   const actor = notification.actor;
-  const href = notification.href || "#";
+  const href = notification.href?.trim() || null;
   const meta = notification.metadata;
   const countryCode = readMetaString(meta, "countryCode");
   const countryName = readMetaString(meta, "countryName");
@@ -84,16 +84,14 @@ export default function NotificationListItem({
     notification.title.charAt(0).toUpperCase() ||
     "U";
 
-  return (
-    <Link
-      href={href}
-      onClick={() => onOpen(notification)}
-      className={`watch-focus-ring flex gap-3 rounded-2xl border px-3.5 py-3 transition ${
-        notification.unread
-          ? "border-blue-400/25 bg-blue-500/10 hover:bg-blue-500/15"
-          : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]"
-      }`}
-    >
+  const className = `watch-focus-ring flex gap-3 rounded-2xl border px-3.5 py-3 transition ${
+    notification.unread
+      ? "border-blue-400/25 bg-blue-500/10 hover:bg-blue-500/15"
+      : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]"
+  }`;
+
+  const body = (
+    <>
       <div className="relative shrink-0">
         {actor?.avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -170,6 +168,24 @@ export default function NotificationListItem({
           </span>
         </div>
       </div>
+    </>
+  );
+
+  if (!href) {
+    return (
+      <button
+        type="button"
+        onClick={() => onOpen(notification)}
+        className={`${className} w-full text-left`}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={href} onClick={() => onOpen(notification)} className={className}>
+      {body}
     </Link>
   );
 }

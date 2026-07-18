@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { toggleProfileFollowAction } from "../../actions/follows";
 import { APP_ROUTES, isUuid } from "../../lib/nav";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
@@ -95,7 +96,12 @@ export default function FollowButton({
             void toggleProfileFollowAction(targetUserId).then((result) => {
               if (!result.ok) {
                 setFollowing(previous);
-                setErrorMessage(result.message);
+                setErrorMessage(
+                  sanitizeUserFacingMessage(
+                    result.message,
+                    "Unable to update follow. Please try again."
+                  )
+                );
                 if (result.requiresAuth) {
                   router.push(loginHref);
                 }

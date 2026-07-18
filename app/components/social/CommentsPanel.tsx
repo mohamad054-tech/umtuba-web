@@ -26,6 +26,8 @@ type CommentsPanelProps = {
   commentCount: number;
   /** Surface path to return to after sign-in (defaults to Discover). */
   returnPath?: string;
+  /** Scroll/highlight this comment after load (notification deep link). */
+  focusCommentId?: number | null;
   onClose: () => void;
   onCountChange?: (count: number) => void;
 };
@@ -58,11 +60,13 @@ export default function CommentsPanel({
   postId,
   commentCount,
   returnPath = APP_ROUTES.discover,
+  focusCommentId = null,
   onClose,
   onCountChange,
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<PostCommentDTO[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadEpoch, setLoadEpoch] = useState(0);
   const [draft, setDraft] = useState(() => readCommentDraft(postId));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -94,6 +98,8 @@ export default function CommentsPanel({
     }
 
     let cancelled = false;
+    setComments(null);
+    setLoadError(null);
 
     void (async () => {
       const result = await listCommentsAction(postId);
@@ -103,7 +109,12 @@ export default function CommentsPanel({
       }
 
       if (!result.ok) {
-        setLoadError("Couldn't load comments. Please try again.");
+        setLoadError(
+          sanitizeUserFacingMessage(
+            result.message,
+            "Couldn't load comments. Please try again."
+          )
+        );
         setComments([]);
         return;
       }
@@ -115,7 +126,19 @@ export default function CommentsPanel({
     return () => {
       cancelled = true;
     };
-  }, [open, postId]);
+  }, [open, postId, loadEpoch]);
+
+  useEffect(() => {
+    if (!open || !focusCommentId || !comments?.length) {
+      return;
+    }
+    const node = document.getElementById(`comment-${focusCommentId}`);
+    if (!node) {
+      return;
+    }
+    node.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    node.setAttribute("data-focused", "true");
+  }, [open, focusCommentId, comments]);
 
   if (!open) {
     return null;
@@ -228,11 +251,20 @@ export default function CommentsPanel({
 
         <div className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
           {isLoading ? (
-            <p className="text-sm text-white/50">Loading comments…</p>
-          ) : loadError ? (
-            <p className="text-sm text-red-300" role="alert">
-              {loadError}
+            <p className="text-sm text-white/50" role="status">
+              Loading comments…
             </p>
+          ) : loadError ? (
+            <div className="space-y-3" role="alert">
+              <p className="text-sm text-red-300">{loadError}</p>
+              <button
+                type="button"
+                onClick={() => setLoadEpoch((epoch) => epoch + 1)}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/85 hover:bg-white/10"
+              >
+                Try again
+              </button>
+            </div>
           ) : (comments ?? []).length === 0 ? (
             <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-white/45">
               Be the first to comment.
@@ -241,7 +273,15 @@ export default function CommentsPanel({
             (comments ?? []).map((comment) => (
               <article
                 key={comment.id}
-                className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3"
+                id={`comment-${comment.id}`}
+                aria-current={
+                  focusCommentId === comment.id ? "true" : undefined
+                }
+                className={`rounded-2xl border px-4 py-3 ${
+                  focusCommentId === comment.id
+                    ? "border-sky-400/40 bg-sky-500/10"
+                    : "border-white/10 bg-white/[0.04]"
+                }`}
               >
                 <div className="flex items-start gap-3">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-blue-400/40 to-indigo-600/50 text-xs font-black">

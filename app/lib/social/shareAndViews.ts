@@ -215,7 +215,7 @@ export async function sharePostLink(
     return shareWithNative(input);
   }
 
-  return copyPostLink(input.postId);
+  return copyPostLink(input.postId, input.surface ?? "discover");
 }
 
 export async function shareViaTarget(
@@ -226,7 +226,7 @@ export async function shareViaTarget(
     case "whatsapp":
       return shareToWhatsApp(input);
     case "clipboard":
-      return copyPostLink(input.postId);
+      return copyPostLink(input.postId, input.surface ?? "discover");
     case "native":
       return shareWithNative(input);
     default:

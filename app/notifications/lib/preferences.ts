@@ -17,7 +17,7 @@ export const NOTIFICATION_PREFERENCE_FIELDS: {
   {
     key: "socialEnabled",
     label: "Social",
-    description: "Follows, likes, comments, replies, mentions, and messages.",
+    description: "Follows, likes, comments, mentions, and messages.",
   },
   {
     key: "journeyEnabled",

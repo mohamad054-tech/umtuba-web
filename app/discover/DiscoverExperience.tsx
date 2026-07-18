@@ -64,10 +64,32 @@ export default function DiscoverExperience({
     return findIndexByCity(videos, cityParam);
   }, [cityParam, postParam, videos]);
 
+  const postDeepLinkMatched = useMemo(() => {
+    if (!postParam) {
+      return true;
+    }
+    return findIndexByPostId(videos, postParam) >= 0;
+  }, [postParam, videos]);
+
+  const focusCommentId = useMemo(() => {
+    if (!commentParam || !postDeepLinkMatched) {
+      return null;
+    }
+    const id = Number(commentParam);
+    return Number.isInteger(id) && id > 0 ? id : null;
+  }, [commentParam, postDeepLinkMatched]);
+
   const [activeVideo, setActiveVideo] = useState<DiscoverVideo | null>(
     () => videos[initialIndex] ?? videos[0] ?? null
   );
-  const [commentsOpen, setCommentsOpen] = useState(() => Boolean(commentParam));
+  const [commentsOpen, setCommentsOpen] = useState(
+    () =>
+      Boolean(commentParam) &&
+      findIndexByPostId(initialVideos, postParam) >= 0
+  );
+  const [deepLinkNoticeDismissed, setDeepLinkNoticeDismissed] = useState(false);
+  const showDeepLinkMiss =
+    Boolean(postParam) && !postDeepLinkMatched && !deepLinkNoticeDismissed;
 
   const handleActiveChange = useCallback((video: DiscoverVideo) => {
     setActiveVideo(video);
@@ -106,6 +128,30 @@ export default function DiscoverExperience({
       );
       setActiveVideo((current) =>
         current && current.id === videoId ? { ...current, ...flags } : current
+      );
+    },
+    []
+  );
+
+  const handleFollowChange = useCallback(
+    (creatorId: string, following: boolean) => {
+      setVideos((current) =>
+        current.map((video) =>
+          video.creator.id === creatorId
+            ? {
+                ...video,
+                creator: { ...video.creator, isFollowing: following },
+              }
+            : video
+        )
+      );
+      setActiveVideo((current) =>
+        current && current.creator.id === creatorId
+          ? {
+              ...current,
+              creator: { ...current.creator, isFollowing: following },
+            }
+          : current
       );
     },
     []
@@ -220,10 +266,31 @@ export default function DiscoverExperience({
               onComment={handleComment}
               onStatsChange={handleStatsChange}
               onFlagsChange={handleFlagsChange}
+              onFollowChange={handleFollowChange}
               onSrcChange={handleSrcChange}
               onNearEnd={handleNearEnd}
               loadMoreEpoch={loadMoreEpoch}
             />
+
+            {showDeepLinkMiss ? (
+              <div className="pointer-events-none absolute inset-x-0 top-4 z-30 flex justify-center px-4">
+                <div
+                  className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-full border border-amber-300/25 bg-black/80 px-4 py-2.5 text-sm text-amber-50 shadow-lg backdrop-blur-md"
+                  role="status"
+                >
+                  <p className="min-w-0 flex-1 text-xs font-bold sm:text-sm">
+                    That post is unavailable or not in your current feed.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDeepLinkNoticeDismissed(true)}
+                    className="shrink-0 rounded-full bg-white/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-white"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             {loadMoreError ? (
               <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center px-4 md:bottom-8">
@@ -253,6 +320,7 @@ export default function DiscoverExperience({
                 postId={activePostId}
                 commentCount={activeVideo.stats.comments}
                 returnPath={commentsReturnPath}
+                focusCommentId={focusCommentId}
                 onClose={() => setCommentsOpen(false)}
                 onCountChange={(count) =>
                   handleStatsChange(activeVideo.id, { comments: count })

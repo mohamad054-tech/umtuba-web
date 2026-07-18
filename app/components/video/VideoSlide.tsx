@@ -30,6 +30,7 @@ type VideoSlideProps = {
   onPostJourney: (video: WatchVideo) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onFollowChange?: (authorId: string, following: boolean) => void;
   onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
 };
@@ -46,6 +47,7 @@ export default function VideoSlide({
   onPostJourney,
   onStatsChange,
   onFlagsChange,
+  onFollowChange,
   onSrcChange,
   slideRef,
 }: VideoSlideProps) {
@@ -179,6 +181,7 @@ export default function VideoSlide({
         onPostJourney={onPostJourney}
         onStatsChange={onStatsChange}
         onFlagsChange={handleFlagsChange}
+        onFollowChange={onFollowChange}
       />
     </article>
   );

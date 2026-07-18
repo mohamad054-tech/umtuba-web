@@ -16,6 +16,8 @@ describe("CommentsPanel auth behavior", () => {
     expect(source).toMatch(/buildCommentSignInHref/);
     expect(source).toMatch(/writeCommentDraft/);
     expect(source).toMatch(/COMMENT_AUTH_PROMPT/);
+    expect(source).toMatch(/loadEpoch/);
+    expect(source).toMatch(/focusCommentId/);
     expect(source).not.toMatch(/next=\/discover"/);
   });
 

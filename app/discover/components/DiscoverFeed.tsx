@@ -22,6 +22,7 @@ type DiscoverFeedProps = {
     videoId: string,
     flags: { likedByMe?: boolean; savedByMe?: boolean }
   ) => void;
+  onFollowChange?: (creatorId: string, following: boolean) => void;
   onSrcChange?: (videoId: string, src: string) => void;
   onNearEnd?: () => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
@@ -55,6 +56,7 @@ export default function DiscoverFeed({
   onComment,
   onStatsChange,
   onFlagsChange,
+  onFollowChange,
   onSrcChange,
   onNearEnd,
   loadMoreEpoch = 0,
@@ -290,6 +292,7 @@ export default function DiscoverFeed({
                 onComment={() => onComment?.(video)}
                 onStatsChange={(stats) => onStatsChange?.(video.id, stats)}
                 onFlagsChange={(flags) => onFlagsChange?.(video.id, flags)}
+                onFollowChange={onFollowChange}
                 onSrcChange={(src) => onSrcChange?.(video.id, src)}
               />
             ) : (

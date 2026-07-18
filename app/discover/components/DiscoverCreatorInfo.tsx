@@ -13,6 +13,7 @@ type DiscoverCreatorInfoProps = {
   viewerId?: string | null;
   /** Post id for auth return deep-link (`/discover?post=`). */
   postId?: string | number | null;
+  onFollowChange?: (creatorId: string, following: boolean) => void;
 };
 
 export default function DiscoverCreatorInfo({
@@ -20,6 +21,7 @@ export default function DiscoverCreatorInfo({
   location,
   viewerId = null,
   postId = null,
+  onFollowChange,
 }: DiscoverCreatorInfoProps) {
   const profileHref = buildCreatorProfileHref({
     username: creator.username,
@@ -59,6 +61,9 @@ export default function DiscoverCreatorInfo({
               size="sm"
               followingClassName="border border-white/20 bg-white/10 text-white/80"
               idleClassName="border border-sky-300/35 bg-sky-500/20 text-sky-50 hover:bg-sky-500/30"
+              onFollowChange={(snapshot) => {
+                onFollowChange?.(peerUserId, snapshot.following);
+              }}
             />
           ) : null}
           <StartDirectMessageButton

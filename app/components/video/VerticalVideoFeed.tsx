@@ -27,6 +27,7 @@ type VerticalVideoFeedProps = {
     videoId: string,
     patch: Partial<WatchVideo>
   ) => void;
+  onFollowChange?: (authorId: string, following: boolean) => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
 };
@@ -45,6 +46,7 @@ export default function VerticalVideoFeed({
   onPostJourney,
   onNearEnd,
   onVideoPatch,
+  onFollowChange,
   loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -261,6 +263,7 @@ export default function VerticalVideoFeed({
                   })
                 }
                 onFlagsChange={(flags) => onVideoPatch?.(video.id, flags)}
+                onFollowChange={onFollowChange}
                 onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
                 slideRef={(node) => setSlideNode(video.id, node)}
               />

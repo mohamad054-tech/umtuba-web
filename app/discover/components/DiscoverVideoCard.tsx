@@ -26,6 +26,7 @@ type DiscoverVideoCardProps = {
   onComment: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onFollowChange?: (creatorId: string, following: boolean) => void;
   onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
 };
@@ -38,6 +39,7 @@ export default function DiscoverVideoCard({
   onComment,
   onStatsChange,
   onFlagsChange,
+  onFollowChange,
   onSrcChange,
   slideRef,
 }: DiscoverVideoCardProps) {
@@ -158,6 +160,7 @@ export default function DiscoverVideoCard({
                 location={video.location}
                 viewerId={viewerId}
                 postId={video.id}
+                onFollowChange={onFollowChange}
               />
             </div>
             <DiscoverCaption

@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import {
   canUseNativeShare,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
 
 type ShareMenuProps = {
   open: boolean;
@@ -22,25 +23,16 @@ export default function ShareMenu({
   align = "right",
 }: ShareMenuProps) {
   const titleId = useId();
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const firstButtonRef = useRef<HTMLButtonElement | null>(null);
   const nativeAvailable = canUseNativeShare();
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    firstButtonRef.current?.focus();
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+  useDialogA11y({
+    open,
+    onClose,
+    containerRef: menuRef,
+    initialFocusRef: firstButtonRef,
+  });
 
   if (!open) {
     return null;
@@ -63,6 +55,7 @@ export default function ShareMenu({
       />
 
       <div
+        ref={menuRef}
         role="menu"
         aria-labelledby={titleId}
         className={`absolute bottom-[calc(100%+0.75rem)] z-50 w-52 overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${alignClass}`}

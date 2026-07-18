@@ -17,6 +17,7 @@ type VideoOverlayProps = {
   onPostJourney: (video: WatchVideo) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onFollowChange?: (authorId: string, following: boolean) => void;
 };
 
 export default function VideoOverlay({
@@ -27,6 +28,7 @@ export default function VideoOverlay({
   onPostJourney,
   onStatsChange,
   onFlagsChange,
+  onFollowChange,
 }: VideoOverlayProps) {
   const prototypePanelsAllowed = allowWatchPrototypePanels();
   const peerUserId = video.author.id;
@@ -70,6 +72,9 @@ export default function VideoOverlay({
                       size="sm"
                       followingClassName="border border-white/20 bg-white/10 text-white/80"
                       idleClassName="border border-sky-300/35 bg-sky-500/20 text-sky-50 hover:bg-sky-500/30"
+                      onFollowChange={(snapshot) => {
+                        onFollowChange?.(peerUserId, snapshot.following);
+                      }}
                     />
                   </div>
                 ) : null}

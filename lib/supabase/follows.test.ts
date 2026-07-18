@@ -122,7 +122,8 @@ describe("profile follow integrity — architecture", () => {
     expect(button).toMatch(/disabled=\{pending\}/);
     expect(button).toMatch(/startTransition/);
     expect(button).toMatch(/setFollowing\(previous\)/);
-    expect(button).toMatch(/setErrorMessage\(result\.message\)/);
+    expect(button).toMatch(/sanitizeUserFacingMessage/);
+    expect(button).toMatch(/setErrorMessage\(/);
   });
 
   it("Discover, Watch, Profile, and Live share FollowButton + persistent state path", () => {

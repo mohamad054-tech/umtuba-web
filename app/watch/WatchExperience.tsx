@@ -185,6 +185,30 @@ export default function WatchExperience({
     []
   );
 
+  const handleFollowChange = useCallback(
+    (authorId: string, following: boolean) => {
+      setVideos((current) =>
+        current.map((video) =>
+          video.author.id === authorId
+            ? {
+                ...video,
+                author: { ...video.author, isFollowing: following },
+              }
+            : video
+        )
+      );
+      setActiveVideo((current) =>
+        current && current.author.id === authorId
+          ? {
+              ...current,
+              author: { ...current.author, isFollowing: following },
+            }
+          : current
+      );
+    },
+    []
+  );
+
   const loadMore = useCallback(async () => {
     const cursor = nextCursorRef.current;
     if (
@@ -352,6 +376,7 @@ export default function WatchExperience({
             onPostJourney={handlePostJourney}
             onNearEnd={handleNearEnd}
             onVideoPatch={handleVideoPatch}
+            onFollowChange={handleFollowChange}
             loadMoreEpoch={loadMoreEpoch}
           />
 

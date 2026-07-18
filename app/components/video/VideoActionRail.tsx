@@ -25,6 +25,7 @@ import {
   type SharePostOutcome,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { DiscoverStats } from "../../discover/types";
 import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
 import type { WatchPanelId } from "./watchTypes";
@@ -116,7 +117,7 @@ export default function VideoActionRail({
   }, []);
 
   function showHint(message: string) {
-    setHint(message);
+    setHint(sanitizeUserFacingMessage(message, "Something went wrong."));
     if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
     hintTimerRef.current = window.setTimeout(() => setHint(null), 2200);
   }
@@ -284,6 +285,8 @@ export default function VideoActionRail({
         label="Like"
         count={formatInteractionCount(displayStats.likes)}
         active={displayLiked}
+        busy={likePending}
+        disabled={likePending}
         onClick={() => void handleLike()}
         icon={
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -341,6 +344,8 @@ export default function VideoActionRail({
         label="Save"
         count={formatInteractionCount(displayStats.saves)}
         active={displaySaved}
+        busy={savePending}
+        disabled={savePending}
         onClick={() => void handleSave()}
         icon={
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -373,6 +378,8 @@ type ActionButtonProps = {
   label: string;
   count?: string;
   active?: boolean;
+  busy?: boolean;
+  disabled?: boolean;
   onClick: () => void;
   icon: ReactNode;
 };
@@ -381,6 +388,8 @@ function ActionButton({
   label,
   count,
   active = false,
+  busy = false,
+  disabled = false,
   onClick,
   icon,
 }: ActionButtonProps) {
@@ -388,9 +397,11 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className="watch-focus-ring flex flex-col items-center gap-1"
+      disabled={disabled}
+      className="watch-focus-ring flex flex-col items-center gap-1 disabled:cursor-wait disabled:opacity-60"
       aria-label={label}
       aria-pressed={active || undefined}
+      aria-busy={busy || undefined}
     >
       <span
         className={`watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur-md ${

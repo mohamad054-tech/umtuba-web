@@ -69,11 +69,12 @@ describe("polish & accessibility contracts", () => {
     expect(watch).toMatch(/--app-mobile-bottom-nav-offset/);
   });
 
-  it("CommentsPanel, WatchPanel, and LiveCollaborationPanel use dialog a11y helper", () => {
+  it("CommentsPanel, WatchPanel, ShareMenu, and LiveCollaborationPanel use dialog a11y helper", () => {
     expect(read("app/components/social/CommentsPanel.tsx")).toMatch(
       /useDialogA11y/
     );
     expect(read("app/components/video/WatchPanel.tsx")).toMatch(/useDialogA11y/);
+    expect(read("app/components/social/ShareMenu.tsx")).toMatch(/useDialogA11y/);
     expect(read("app/live/components/LiveCollaborationPanel.tsx")).toMatch(
       /useDialogA11y/
     );
