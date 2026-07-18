@@ -27,6 +27,10 @@ import {
   previewGradientFromId,
 } from "../../app/live/types";
 import type { LiveMediaGrants } from "../livekit/server";
+import {
+  LIVE_DATABASE_UNAVAILABLE_MESSAGE,
+  toLiveUserFacingMessage,
+} from "../live/liveUserFacingCopy";
 
 export const LIVE_CHAT_PAGE_SIZE = 40;
 export { LIVE_CHAT_MAX_LENGTH, LIVE_ROOM_TITLE_MAX };
@@ -146,6 +150,15 @@ function isMissingSchemaColumnError(error: unknown): boolean {
     message.includes("schema cache") ||
     message.includes("could not find") ||
     /column .* of relation/i.test(message)
+  );
+}
+
+function isLiveDatabaseUnavailableError(error: unknown): boolean {
+  const message = getErrorMessage(error, "").toLowerCase();
+  return (
+    isMissingSchemaColumnError(error) ||
+    message.includes("could not find the table") ||
+    (message.includes("relation") && message.includes("does not exist"))
   );
 }
 
@@ -376,7 +389,12 @@ export async function listLiveRooms(
         console.error("Unable to list live rooms:", fallback.error);
         return {
           ok: false,
-          message: getErrorMessage(fallback.error, "Unable to load live rooms."),
+          message: isLiveDatabaseUnavailableError(fallback.error)
+            ? LIVE_DATABASE_UNAVAILABLE_MESSAGE
+            : toLiveUserFacingMessage(
+                getErrorMessage(fallback.error, ""),
+                "Unable to load live rooms."
+              ),
         };
       }
       rows = (fallback.data ?? []) as LiveRoomRow[];
@@ -384,7 +402,12 @@ export async function listLiveRooms(
       console.error("Unable to list live rooms:", first.error);
       return {
         ok: false,
-        message: getErrorMessage(first.error, "Unable to load live rooms."),
+        message: isLiveDatabaseUnavailableError(first.error)
+          ? LIVE_DATABASE_UNAVAILABLE_MESSAGE
+          : toLiveUserFacingMessage(
+              getErrorMessage(first.error, ""),
+              "Unable to load live rooms."
+            ),
       };
     } else {
       rows = (first.data ?? []) as LiveRoomRow[];

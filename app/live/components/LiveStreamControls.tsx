@@ -1,11 +1,11 @@
 "use client";
 
-import { LIVE_QUALITY_OPTIONS, type LiveQuality } from "../types";
-
 type LiveStreamControlsProps = {
   muted: boolean;
-  captionsOn: boolean;
-  quality: LiveQuality;
+  /** @deprecated Captions are Coming soon — kept for call-site compatibility. */
+  captionsOn?: boolean;
+  /** @deprecated Quality select is Coming soon — kept for call-site compatibility. */
+  quality?: string;
   isFullscreen: boolean;
   shareCopied: boolean;
   reportSent: boolean;
@@ -30,8 +30,10 @@ type LiveStreamControlsProps = {
   onSwitchCamera?: () => void;
   onStartSession?: () => void;
   onToggleMute: () => void;
-  onToggleCaptions: () => void;
-  onQualityChange: (quality: LiveQuality) => void;
+  /** Ignored — captions are Coming soon. */
+  onToggleCaptions?: () => void;
+  /** Ignored — quality select is Coming soon. */
+  onQualityChange?: (quality: string) => void;
   onToggleFullscreen: () => void;
   onShare: () => void;
   onReport: () => void;
@@ -46,8 +48,6 @@ const controlBtn =
 
 export default function LiveStreamControls({
   muted,
-  captionsOn,
-  quality,
   isFullscreen,
   shareCopied,
   reportSent,
@@ -69,8 +69,6 @@ export default function LiveStreamControls({
   onSwitchCamera,
   onStartSession,
   onToggleMute,
-  onToggleCaptions,
-  onQualityChange,
   onToggleFullscreen,
   onShare,
   onReport,
@@ -221,27 +219,23 @@ export default function LiveStreamControls({
           {muted ? "Unmute playback" : "Mute playback"}
         </button>
 
-        <button type="button" onClick={onToggleCaptions} className={controlBtn}>
-          {captionsOn ? "Captions on" : "Captions"}
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          title="Captions coming soon"
+          className={`${controlBtn} opacity-55`}
+        >
+          Captions · Coming soon
         </button>
 
-        <label className={`${controlBtn} cursor-pointer`}>
-          <span className="text-white/45">Quality</span>
-          <select
-            value={quality}
-            onChange={(event) =>
-              onQualityChange(event.target.value as LiveQuality)
-            }
-            className="bg-transparent text-white outline-none"
-            aria-label="Stream quality"
-          >
-            {LIVE_QUALITY_OPTIONS.map((option) => (
-              <option key={option} value={option} className="bg-[#0b0b18]">
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+        <span
+          className={`${controlBtn} cursor-default opacity-55`}
+          title="Quality controls coming soon"
+          aria-disabled="true"
+        >
+          Quality · Coming soon
+        </span>
 
         <button type="button" onClick={onToggleFullscreen} className={controlBtn}>
           {isFullscreen ? "Exit full" : "Fullscreen"}

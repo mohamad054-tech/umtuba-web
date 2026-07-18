@@ -15,8 +15,8 @@ import LiveViewerCount from "./LiveViewerCount";
 type LiveStreamStageProps = {
   room: LiveRoom;
   muted: boolean;
-  captionsOn: boolean;
-  quality: string;
+  /** LiveKit connection quality / status label when media is connected. */
+  quality: string | null;
   isFullscreen: boolean;
   stageRef: RefObject<HTMLDivElement | null>;
   floatingReactions?: FloatingLiveReaction[];
@@ -33,7 +33,6 @@ type LiveStreamStageProps = {
 function LiveStreamStageComponent({
   room,
   muted,
-  captionsOn,
   quality,
   isFullscreen,
   stageRef,
@@ -94,9 +93,11 @@ function LiveStreamStageComponent({
       <div className="absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-2 sm:left-4 sm:top-4 md:left-5 md:top-5">
         <LiveBadge size="md" />
         <LiveViewerCount count={viewerCount} source={watchingSource} />
-        <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55 backdrop-blur-md">
-          {quality}
-        </span>
+        {quality ? (
+          <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55 backdrop-blur-md">
+            {quality}
+          </span>
+        ) : null}
         <span className="rounded-full border border-white/10 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45 backdrop-blur-md">
           {room.status === "live" ? "Live media" : room.status}
         </span>
@@ -107,12 +108,6 @@ function LiveStreamStageComponent({
       {muted ? (
         <div className="absolute bottom-4 left-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1.5 text-xs font-bold text-white/70 backdrop-blur-md md:bottom-5 md:left-5">
           Muted
-        </div>
-      ) : null}
-
-      {captionsOn ? (
-        <div className="absolute bottom-6 left-1/2 z-10 w-[min(90%,36rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/65 px-4 py-3 text-center text-sm font-medium leading-6 text-white/90 backdrop-blur-md">
-          [CC] Captions will connect to live translation later.
         </div>
       ) : null}
 

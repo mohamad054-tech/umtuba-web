@@ -52,16 +52,20 @@ export async function mintLiveMediaToken(input: {
   const publicUrl = getPublicLiveKitUrl();
 
   if (!env) {
+    console.error(
+      "[livekit] mint aborted: server LiveKit env incomplete (keys/url)."
+    );
     return {
-      error:
-        "Live media is not configured. Set LIVEKIT_API_KEY, LIVEKIT_API_SECRET, and LIVEKIT_URL on the server.",
+      error: "Live video is temporarily unavailable. Please try again later.",
     };
   }
 
   if (!publicUrl) {
+    console.error(
+      "[livekit] mint aborted: NEXT_PUBLIC_LIVEKIT_URL is not set."
+    );
     return {
-      error:
-        "Live media public URL missing. Set NEXT_PUBLIC_LIVEKIT_URL to your LiveKit wss:// URL.",
+      error: "Live video is temporarily unavailable. Please try again later.",
     };
   }
 

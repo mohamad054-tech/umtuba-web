@@ -115,7 +115,7 @@ export default function LandingHero() {
               variant="secondary"
               onClick={() => router.push(APP_ROUTES.live)}
             >
-              Watch Demo
+              Go Live
             </HeroCTAButton>
           </div>
         </div>

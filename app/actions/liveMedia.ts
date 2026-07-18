@@ -141,7 +141,15 @@ export async function getLiveMediaTokenAction(input: {
   });
 
   if ("error" in minted) {
-    return { ok: false, message: minted.error };
+    const { toLiveUserFacingMessage, LIVE_MEDIA_NOT_CONFIGURED_MESSAGE } =
+      await import("../../lib/live/liveUserFacingCopy");
+    return {
+      ok: false,
+      message: toLiveUserFacingMessage(
+        minted.error,
+        LIVE_MEDIA_NOT_CONFIGURED_MESSAGE
+      ),
+    };
   }
 
   return { ok: true, media: minted };

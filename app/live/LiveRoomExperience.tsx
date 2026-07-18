@@ -67,12 +67,12 @@ import type {
   LiveChatMessage,
   LiveCollabSharedItem,
   LiveParticipant,
-  LiveQuality,
   LiveRoom,
   LiveStageInvitation,
   LiveStageRequest,
 } from "./types";
 import { LIVE_DEFAULT_MAX_ON_STAGE } from "./types";
+import { toLiveUserFacingMessage } from "../../lib/live/liveUserFacingCopy";
 
 const LiveCollaborationPanel = dynamic(
   () => import("./components/LiveCollaborationPanel"),
@@ -117,8 +117,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const [hostFollowersLabel, setHostFollowersLabel] = useState("—");
   const [followHostKey, setFollowHostKey] = useState<string | null>(null);
   const [muted, setMuted] = useState(false);
-  const [captionsOn, setCaptionsOn] = useState(false);
-  const [quality, setQuality] = useState<LiveQuality>("Auto");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [reportSent, setReportSent] = useState(false);
@@ -345,7 +343,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const refreshRoom = useCallback(async (id: string) => {
     const result = await getLiveRoomAction(id);
     if (!result.ok) {
-      setLoadError(result.message);
+      setLoadError(toLiveUserFacingMessage(result.message));
       setRoom(null);
       return null;
     }
@@ -559,7 +557,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     if (endIfHost && room.isHost) {
       const result = await endLiveRoomAction(room.id);
       if (!result.ok) {
-        setLoadError(result.message);
+        setLoadError(toLiveUserFacingMessage(result.message));
         return;
       }
       markLeft();
@@ -570,7 +568,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     const result = await leaveLiveRoomAction(room.id);
     markLeft();
     if (!result.ok && !result.requiresAuth) {
-      setLoadError(result.message);
+      setLoadError(toLiveUserFacingMessage(result.message));
     }
     router.push(APP_ROUTES.live);
   }
@@ -624,7 +622,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
 
     if (!result.ok) {
       setMessages((prev) => prev.filter((m) => m.id !== optimistic.id));
-      setLoadError(result.message);
+      setLoadError(toLiveUserFacingMessage(result.message));
       return;
     }
 
@@ -668,7 +666,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
       if (result.requiresAuth) {
         router.push(`/login?next=${encodeURIComponent(`/live/${room.id}`)}`);
       } else {
-        setLoadError(result.message);
+        setLoadError(toLiveUserFacingMessage(result.message));
       }
     }
   }
@@ -811,7 +809,10 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
               ? "Connecting to live media…"
               : media.connectionState === "reconnecting"
                 ? "Network interrupted. Reconnecting…"
-                : media.error || "Network interrupted."}
+                : toLiveUserFacingMessage(
+                    media.error,
+                    "Network interrupted."
+                  )}
           </span>
           {media.connectionState === "error" ? (
             <button
@@ -888,16 +889,15 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.95fr)] xl:grid-cols-[minmax(0,1.15fr)_minmax(260px,0.9fr)_minmax(260px,300px)]">
-        {/* LEFT — video / WebRTC placeholder */}
+        {/* LEFT — live media stage */}
         <section className="min-w-0 space-y-4">
           <LiveStreamStage
             room={room}
             muted={muted}
-            captionsOn={captionsOn}
             quality={
               media.connectionState === "connected"
                 ? media.connectionLabel
-                : quality
+                : null
             }
             isFullscreen={isFullscreen}
             stageRef={stageRef}
@@ -997,7 +997,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
               void requestLiveStageAction({ roomId: room.id }).then((r) => {
                 setStageBusy(false);
                 if (!r.ok) {
-                  setLoadError(r.message);
+                  setLoadError(toLiveUserFacingMessage(r.message));
                   return;
                 }
                 void refreshParticipants(room.id);
@@ -1015,7 +1015,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                     void media.refreshTokenAndReconnect();
                     return;
                   }
-                  setLoadError(r.message);
+                  setLoadError(toLiveUserFacingMessage(r.message));
                   return;
                 }
                 void refreshParticipants(room.id);
@@ -1026,7 +1026,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
               setStageBusy(true);
               void cancelLiveStageRequestAction(room.id).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
                 void refreshStageRequests(room.id);
               });
@@ -1039,7 +1039,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 accept: true,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
                 void refreshStageRequests(room.id);
               });
@@ -1051,7 +1051,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 accept: false,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
                 void refreshStageRequests(room.id);
               });
@@ -1063,7 +1063,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 accept: true,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
                 void refreshMyInvites(room.id);
               });
@@ -1075,7 +1075,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 accept: false,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshMyInvites(room.id);
               });
             }}
@@ -1086,7 +1086,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 inviteeId: userId,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
               });
             }}
@@ -1097,7 +1097,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 userId,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
                 void refreshRoom(room.id);
               });
@@ -1110,7 +1110,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 mutedByHost,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
               });
             }}
@@ -1122,7 +1122,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 cameraDisabledByHost,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshParticipants(room.id);
               });
             }}
@@ -1133,7 +1133,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 userId,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshRoom(room.id);
               });
             }}
@@ -1145,7 +1145,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                 mode,
               }).then((r) => {
                 setStageBusy(false);
-                if (!r.ok) setLoadError(r.message);
+                if (!r.ok) setLoadError(toLiveUserFacingMessage(r.message));
                 void refreshRoom(room.id);
               });
             }}
@@ -1158,8 +1158,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
             <div className="mt-3">
               <LiveStreamControls
                 muted={muted}
-                captionsOn={captionsOn}
-                quality={quality}
                 isFullscreen={isFullscreen}
                 shareCopied={shareCopied}
                 reportSent={reportSent}
@@ -1203,7 +1201,9 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                             if (result.ok) {
                               void refreshRoom(room.id);
                             } else {
-                              setLoadError(result.message);
+                              setLoadError(
+                                toLiveUserFacingMessage(result.message)
+                              );
                             }
                           });
                         });
@@ -1216,8 +1216,6 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                     : undefined
                 }
                 onToggleMute={() => setMuted((prev) => !prev)}
-                onToggleCaptions={() => setCaptionsOn((prev) => !prev)}
-                onQualityChange={setQuality}
                 onToggleFullscreen={() => {
                   void handleToggleFullscreen();
                 }}
@@ -1238,7 +1236,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                           `/login?next=${encodeURIComponent(`/live/${room.id}`)}`
                         );
                       } else {
-                        setLoadError(result.message);
+                        setLoadError(toLiveUserFacingMessage(result.message));
                       }
                     });
                   });
@@ -1250,7 +1248,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
                         void refreshRoom(room.id);
                         void media.refreshTokenAndReconnect();
                       } else {
-                        setLoadError(result.message);
+                        setLoadError(toLiveUserFacingMessage(result.message));
                       }
                     });
                   });

@@ -47,6 +47,18 @@ export async function listLiveRoomsAction(): Promise<
   return listLiveRooms(supabase, user?.id ?? null, { status: "live" });
 }
 
+export async function getLiveBetaReadinessAction(): Promise<{
+  ok: boolean;
+  databaseReady: boolean;
+  mediaReady: boolean;
+  reason: "ready" | "database_unavailable" | "media_unavailable" | "unavailable";
+  userMessage: string;
+}> {
+  const supabase = await createClient();
+  const { assessLiveBetaReadiness } = await import("../../lib/live");
+  return assessLiveBetaReadiness(supabase);
+}
+
 export async function getLiveRoomAction(
   roomId: string
 ): Promise<ActionResult<{ room: LiveRoom }>> {
