@@ -107,13 +107,150 @@ describe("live reliability contracts", () => {
     expect(viewerKey).toMatch(/memoryViewerKey/);
   });
 
-  it("prepares stale participant prune migration without client grants", () => {
+  it("ships B7 prune migration without client execute grants", () => {
     const sql = read(
       "supabase/migrations/20260727_live_stale_participant_prune.sql"
     );
     expect(sql).toMatch(/prune_stale_live_participants/);
-    expect(sql).toMatch(/do not apply remotely until approved/i);
-    expect(sql).toMatch(/revoke all[\s\S]*authenticated/i);
+    expect(sql).toMatch(/last_seen_at/);
+    expect(sql).toMatch(/refresh_live_room_viewer_count/);
+    expect(sql).toMatch(/is distinct from 'host'/);
+    expect(sql).toMatch(
+      /revoke all on function public\.prune_stale_live_participants\(integer\) from public;/i
+    );
+    expect(sql).toMatch(
+      /revoke all on function public\.prune_stale_live_participants\(integer\) from anon, authenticated;/i
+    );
+    expect(sql).not.toMatch(
+      /grant execute on function public\.prune_stale_live_participants/i
+    );
+    expect(sql).not.toMatch(/do not apply remotely until approved/i);
+  });
+
+  it("ships B7 verify script covering grants and stale rules", () => {
+    const verify = read("scripts/verify-live-stale-participant-prune.sql");
+    expect(verify).toMatch(/prune_rpc_exists/);
+    expect(verify).toMatch(/prune_rpc_no_anon_execute/);
+    expect(verify).toMatch(/prune_rpc_no_authenticated_execute/);
+    expect(verify).toMatch(/prune_body_marks_stale_non_hosts/);
+    expect(verify).toMatch(/prune_body_refreshes_viewer_counts/);
+    expect(verify).toMatch(/prune_enforces_minimum_stale_window/);
+    expect(verify).toMatch(/refresh_viewer_count_still_not_client_callable/);
+    expect(verify).toMatch(/20260727_live_stale_participant_prune\.sql/);
+  });
+
+  it("enforces minimum stale window and host exclusion in prune body", () => {
+    const sql = read(
+      "supabase/migrations/20260727_live_stale_participant_prune.sql"
+    );
+    expect(sql).toMatch(/p_stale_seconds < 60/);
+    expect(sql).toMatch(/p_stale_seconds := 120/);
+    expect(sql).toMatch(/is distinct from 'host'/);
+    expect(LIVE_PARTICIPANT_STALE_SECONDS).toBe(120);
+  });
+
+  it("prevents duplicate participant rows and keeps join reconnect idempotent", () => {
+    const foundation = read(
+      "supabase/migrations/20260713_live_streaming_v1_foundation.sql"
+    );
+    expect(foundation).toMatch(/create table if not exists public\.live_participants/);
+    expect(foundation).toMatch(/primary key \(room_id, user_id\)/);
+    expect(foundation).toMatch(/on conflict \(room_id, user_id\) do update/);
+    expect(foundation).toMatch(/left_at = null/);
+    expect(foundation).toMatch(/last_seen_at = now\(\)/);
+  });
+
+  it("keeps leave idempotent, protects host, and cleans up on end", () => {
+    const foundation = read(
+      "supabase/migrations/20260713_live_streaming_v1_foundation.sql"
+    );
+    const mediaV2 = read(
+      "supabase/migrations/20260714_live_media_v2_multi_guest.sql"
+    );
+
+    expect(foundation).toMatch(/create or replace function public\.leave_live_room/);
+    expect(foundation).toMatch(/Host must remain a participant/);
+    expect(foundation).toMatch(/and left_at is null/);
+    expect(mediaV2).toMatch(/create or replace function public\.end_live_room/);
+    expect(mediaV2).toMatch(/left_at = coalesce\(left_at, v_now\)/);
+    expect(mediaV2).toMatch(/refresh_live_room_viewer_count/);
+  });
+
+  it("keeps viewer_count refresh non-client and based on active participants", () => {
+    const foundation = read(
+      "supabase/migrations/20260713_live_streaming_v1_foundation.sql"
+    );
+    expect(foundation).toMatch(
+      /create or replace function public\.refresh_live_room_viewer_count/
+    );
+    expect(foundation).toMatch(/left_at is null/);
+    expect(foundation).toMatch(
+      /revoke all on function public\.refresh_live_room_viewer_count\(uuid\) from public;/i
+    );
+    expect(foundation).not.toMatch(
+      /grant execute on function public\.refresh_live_room_viewer_count/i
+    );
+  });
+
+  it("separates Realtime watching presence from DB viewer_count", () => {
+    const presence = read("app/live/hooks/useLiveRoomPresence.ts");
+    const membership = read("app/live/hooks/useLiveRoomMembership.ts");
+    expect(presence).toMatch(/live-presence:/);
+    expect(presence).toMatch(/track\(/);
+    expect(membership).toMatch(/onViewerCount/);
+    expect(membership).toMatch(/joinLiveRoomAction|leaveLiveRoomAction/);
+  });
+
+  it("locks live_participants writes behind RPCs (RLS grants)", () => {
+    const foundation = read(
+      "supabase/migrations/20260713_live_streaming_v1_foundation.sql"
+    );
+    expect(foundation).toMatch(
+      /alter table public\.live_participants enable row level security;/
+    );
+    expect(foundation).toMatch(
+      /revoke insert, delete on table public\.live_participants from authenticated, anon;/i
+    );
+    expect(foundation).toMatch(
+      /revoke update on table public\.live_participants from authenticated;/i
+    );
+    expect(foundation).toMatch(
+      /grant execute on function public\.join_live_room\(uuid\) to authenticated;/i
+    );
+    expect(foundation).toMatch(
+      /grant execute on function public\.leave_live_room\(uuid\) to authenticated;/i
+    );
+    expect(foundation).toMatch(
+      /grant execute on function public\.heartbeat_live_participant\(uuid\) to authenticated;/i
+    );
+  });
+
+  it("documents GitHub cron schedule and DATABASE_URL secret requirement", () => {
+    const workflow = read(
+      ".github/workflows/prune-stale-live-participants.yml"
+    );
+    expect(workflow).toMatch(/cron:\s*"\*\/5 \* \* \* \*"/);
+    expect(workflow).toMatch(/workflow_dispatch:/);
+    expect(workflow).toMatch(/secrets\.DATABASE_URL/);
+    expect(workflow).toMatch(/DATABASE_URL secret is not set/);
+    expect(workflow).toMatch(
+      /select public\.prune_stale_live_participants\(120\);/
+    );
+    expect(workflow).toMatch(/Never commit DATABASE_URL|Do not print DATABASE_URL/i);
+    expect(workflow).not.toMatch(/echo "\$\{?DATABASE_URL\}?"/);
+  });
+
+  it("documents B7 as a required migration with verify + cron ops", () => {
+    const readme = read("supabase/README.md");
+    expect(readme).toMatch(/20260727_live_stale_participant_prune\.sql/);
+    expect(readme).toMatch(/verify-live-stale-participant-prune\.sql/);
+    expect(readme).toMatch(/DATABASE_URL/);
+    expect(readme).toMatch(/prune-stale-live-participants\.yml/);
+    const b7Section = readme.slice(
+      readme.indexOf("20260727_live_stale_participant_prune.sql"),
+      readme.indexOf("24. Click **Run**")
+    );
+    expect(b7Section).not.toMatch(/Prepared — apply only after review/i);
   });
 
   it("classifies camera and microphone denial for UI feedback", () => {

@@ -1,8 +1,11 @@
 -- Phase B7: prune ghost live participants after missed leave/heartbeat.
--- Prepared for review — do not apply remotely until approved.
+-- Reviewed for invite-alpha. Apply manually in Supabase SQL Editor after live
+-- foundation migrations. Do not auto-apply from the Next.js app.
 --
 -- Marks stale non-host viewers as left, then refreshes lobby viewer_count.
 -- Intended for periodic ops/cron (not client-callable).
+-- After apply, run scripts/verify-live-stale-participant-prune.sql.
+-- Cron: .github/workflows/prune-stale-live-participants.yml (needs DATABASE_URL).
 
 create or replace function public.prune_stale_live_participants(
   p_stale_seconds integer default 120
