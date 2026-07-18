@@ -102,10 +102,18 @@ export function isUuid(value: string | null | undefined): boolean {
 }
 
 /** Open an existing DM by conversation id (survives refresh). */
-export function buildConversationHref(conversationId: string): string {
+export function buildConversationHref(
+  conversationId: string,
+  options?: { messageId?: string | null }
+): string {
   const params = new URLSearchParams({
     conversation: conversationId.trim(),
   });
+
+  const messageId = options?.messageId?.trim();
+  if (messageId && isUuid(messageId)) {
+    params.set("message", messageId);
+  }
 
   return `${APP_ROUTES.messages}?${params.toString()}`;
 }

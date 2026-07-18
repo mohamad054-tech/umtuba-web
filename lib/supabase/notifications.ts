@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { enrichDirectMessageHref } from "../../app/messages/lib/threadState";
 
 export type NotificationFilterCategory =
   | "all"
@@ -184,7 +185,11 @@ function parseNotification(value: unknown): AppNotification | null {
         : typeof row.entity_id === "string"
           ? row.entity_id
           : null,
-    href: typeof row.href === "string" ? row.href : null,
+    href: enrichDirectMessageHref(
+      typeof row.href === "string" ? row.href : null,
+      type,
+      asRecord(row.metadata) ?? {}
+    ),
     metadata: asRecord(row.metadata) ?? {},
     dedupeKey,
     readAt,

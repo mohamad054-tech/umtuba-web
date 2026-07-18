@@ -16,6 +16,8 @@ type ChatWindowProps = {
   loading?: boolean;
   error?: string | null;
   sendError?: string | null;
+  onRetryThread?: () => void;
+  focusMessageId?: string | null;
   onLoadOlder?: () => void;
   loadingOlder?: boolean;
   onComposerTyping?: () => void;
@@ -45,6 +47,8 @@ export default function ChatWindow({
   loading = false,
   error = null,
   sendError = null,
+  onRetryThread,
+  focusMessageId = null,
   onLoadOlder,
   loadingOlder = false,
   onComposerTyping,
@@ -66,10 +70,38 @@ export default function ChatWindow({
 }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const focusedDeepLinkRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (focusMessageId) {
+      return;
+    }
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [conversation?.id, conversation?.messages.length, conversation?.isTyping]);
+  }, [conversation?.id, conversation?.messages.length, conversation?.isTyping, focusMessageId]);
+
+  useEffect(() => {
+    if (!focusMessageId || loading || !conversation) {
+      return;
+    }
+    if (!conversation.messages.some((message) => message.id === focusMessageId)) {
+      return;
+    }
+    const key = `${conversation.id}:${focusMessageId}`;
+    if (focusedDeepLinkRef.current === key) {
+      return;
+    }
+    focusedDeepLinkRef.current = key;
+
+    const el = document.getElementById(`message-${focusMessageId}`);
+    if (!el) {
+      return;
+    }
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightId(focusMessageId);
+    window.setTimeout(() => {
+      setHighlightId((current) => (current === focusMessageId ? null : current));
+    }, 1600);
+  }, [focusMessageId, loading, conversation]);
 
   function scrollToMessage(messageId: string) {
     const el = document.getElementById(`message-${messageId}`);
@@ -163,9 +195,20 @@ export default function ChatWindow({
         ) : null}
 
         {threadError ? (
-          <p className="text-center text-xs font-bold text-red-300" role="alert">
-            {threadError}
-          </p>
+          <div className="flex flex-col items-center gap-2" role="alert">
+            <p className="text-center text-xs font-bold text-red-300">
+              {threadError}
+            </p>
+            {onRetryThread ? (
+              <button
+                type="button"
+                onClick={onRetryThread}
+                className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
+              >
+                Retry
+              </button>
+            ) : null}
+          </div>
         ) : null}
 
         <div ref={bottomRef} />

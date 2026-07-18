@@ -5,6 +5,7 @@ import {
   deleteMessageForEveryone,
   deleteMessageForMe,
   editTextMessage,
+  getConversationPeerState,
   getOrCreateDirectConversation,
   listConversationsForUser,
   listMessagesForConversation,
@@ -317,6 +318,30 @@ export async function setTypingAction(
 
   const supabase = await createClient();
   return setConversationTyping(supabase, parsed.id, isTyping);
+}
+
+export async function getConversationPeerStateAction(
+  conversationId: string
+): Promise<
+  ActionResult<{ isTyping: boolean; peerLastReadAt: string | null }>
+> {
+  const parsed = parseUuid(conversationId, "conversation");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+
+  if (!user) {
+    return {
+      ok: false,
+      message: "Please sign in.",
+      requiresAuth: true,
+    };
+  }
+
+  const supabase = await createClient();
+  return getConversationPeerState(supabase, parsed.id);
 }
 
 export async function getCurrentUserIdAction(): Promise<

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import {
   formatBubbleTime,
   MESSAGE_REACTION_EMOJIS,
@@ -48,6 +49,24 @@ export default function MessageBubble({
 }: MessageBubbleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [reactOpen, setReactOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuFirstRef = useRef<HTMLButtonElement | null>(null);
+  const reactRef = useRef<HTMLDivElement | null>(null);
+  const reactFirstRef = useRef<HTMLButtonElement | null>(null);
+
+  useDialogA11y({
+    open: menuOpen,
+    onClose: () => setMenuOpen(false),
+    containerRef: menuRef,
+    initialFocusRef: menuFirstRef,
+  });
+
+  useDialogA11y({
+    open: reactOpen,
+    onClose: () => setReactOpen(false),
+    containerRef: reactRef,
+    initialFocusRef: reactFirstRef,
+  });
 
   const timeLabel =
     message.status === "sending"
@@ -104,7 +123,7 @@ export default function MessageBubble({
             </button>
           ) : null}
 
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed [overflow-wrap:anywhere]">
             {message.text}
           </p>
 
@@ -176,33 +195,44 @@ export default function MessageBubble({
                   }}
                   className="rounded-lg px-1.5 py-0.5 text-[11px] font-bold text-white/45 transition hover:bg-white/10 hover:text-white/80"
                   aria-expanded={reactOpen}
+                  aria-haspopup="true"
                   aria-label="Add reaction"
                 >
                   ☺
                 </button>
                 {reactOpen ? (
-                  <div
-                    className={`absolute z-20 mt-1 flex gap-1 rounded-xl border border-white/10 bg-[#0c0c1a] p-1 shadow-xl ${
-                      message.isMine ? "right-0" : "left-0"
-                    }`}
-                    role="group"
-                    aria-label="Choose reaction"
-                  >
-                    {MESSAGE_REACTION_EMOJIS.map((emoji) => (
-                      <button
-                        key={emoji}
-                        type="button"
-                        onClick={() => {
-                          onToggleReaction(message, emoji);
-                          setReactOpen(false);
-                        }}
-                        className="rounded-lg px-1.5 py-1 text-sm hover:bg-white/10"
-                        aria-label={`React with ${emoji}`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <button
+                      type="button"
+                      className="fixed inset-0 z-10 cursor-default bg-transparent"
+                      aria-label="Close reaction picker"
+                      onClick={() => setReactOpen(false)}
+                    />
+                    <div
+                      ref={reactRef}
+                      className={`absolute z-20 mt-1 flex gap-1 rounded-xl border border-white/10 bg-[#0c0c1a] p-1 shadow-xl ${
+                        message.isMine ? "right-0" : "left-0"
+                      }`}
+                      role="group"
+                      aria-label="Choose reaction"
+                    >
+                      {MESSAGE_REACTION_EMOJIS.map((emoji, index) => (
+                        <button
+                          key={emoji}
+                          ref={index === 0 ? reactFirstRef : undefined}
+                          type="button"
+                          onClick={() => {
+                            onToggleReaction(message, emoji);
+                            setReactOpen(false);
+                          }}
+                          className="rounded-lg px-1.5 py-1 text-sm hover:bg-white/10"
+                          aria-label={`React with ${emoji}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </>
                 ) : null}
               </div>
             ) : null}
@@ -226,58 +256,82 @@ export default function MessageBubble({
                 }}
                 className="rounded-lg px-1.5 py-0.5 text-[11px] font-bold text-white/45 transition hover:bg-white/10 hover:text-white/80"
                 aria-expanded={menuOpen}
+                aria-haspopup="menu"
                 aria-label="Message actions"
               >
                 ···
               </button>
               {menuOpen ? (
-                <div
-                  className={`absolute z-20 mt-1 min-w-[10rem] rounded-xl border border-white/10 bg-[#0c0c1a] py-1 shadow-xl ${
-                    message.isMine ? "right-0" : "left-0"
-                  }`}
-                  role="menu"
-                >
-                  {canEditMessage(message, currentUserId) && onEdit ? (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        onEdit(message);
-                        setMenuOpen(false);
-                      }}
-                      className="block w-full px-3 py-2 text-left text-xs font-medium text-white/80 hover:bg-white/10"
-                    >
-                      Edit
-                    </button>
-                  ) : null}
-                  {canDeleteForMe(message) && onDeleteForMe ? (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        onDeleteForMe(message);
-                        setMenuOpen(false);
-                      }}
-                      className="block w-full px-3 py-2 text-left text-xs font-medium text-white/80 hover:bg-white/10"
-                    >
-                      Delete for me
-                    </button>
-                  ) : null}
-                  {canDeleteForEveryone(message, currentUserId) &&
-                  onDeleteForEveryone ? (
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={() => {
-                        onDeleteForEveryone(message);
-                        setMenuOpen(false);
-                      }}
-                      className="block w-full px-3 py-2 text-left text-xs font-medium text-red-300 hover:bg-white/10"
-                    >
-                      Delete for everyone
-                    </button>
-                  ) : null}
-                </div>
+                <>
+                  <button
+                    type="button"
+                    className="fixed inset-0 z-10 cursor-default bg-transparent"
+                    aria-label="Close message actions"
+                    onClick={() => setMenuOpen(false)}
+                  />
+                  <div
+                    ref={menuRef}
+                    className={`absolute z-20 mt-1 min-w-[10rem] rounded-xl border border-white/10 bg-[#0c0c1a] py-1 shadow-xl ${
+                      message.isMine ? "right-0" : "left-0"
+                    }`}
+                    role="menu"
+                  >
+                    {canEditMessage(message, currentUserId) && onEdit ? (
+                      <button
+                        ref={menuFirstRef}
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          onEdit(message);
+                          setMenuOpen(false);
+                        }}
+                        className="block w-full px-3 py-2 text-left text-xs font-medium text-white/80 hover:bg-white/10"
+                      >
+                        Edit
+                      </button>
+                    ) : null}
+                    {canDeleteForMe(message) && onDeleteForMe ? (
+                      <button
+                        ref={
+                          !(canEditMessage(message, currentUserId) && onEdit)
+                            ? menuFirstRef
+                            : undefined
+                        }
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          onDeleteForMe(message);
+                          setMenuOpen(false);
+                        }}
+                        className="block w-full px-3 py-2 text-left text-xs font-medium text-white/80 hover:bg-white/10"
+                      >
+                        Delete for me
+                      </button>
+                    ) : null}
+                    {canDeleteForEveryone(message, currentUserId) &&
+                    onDeleteForEveryone ? (
+                      <button
+                        ref={
+                          !(
+                            (canEditMessage(message, currentUserId) && onEdit) ||
+                            (canDeleteForMe(message) && onDeleteForMe)
+                          )
+                            ? menuFirstRef
+                            : undefined
+                        }
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          onDeleteForEveryone(message);
+                          setMenuOpen(false);
+                        }}
+                        className="block w-full px-3 py-2 text-left text-xs font-medium text-red-300 hover:bg-white/10"
+                      >
+                        Delete for everyone
+                      </button>
+                    ) : null}
+                  </div>
+                </>
               ) : null}
             </div>
           </div>

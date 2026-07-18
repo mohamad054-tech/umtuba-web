@@ -113,6 +113,7 @@ describe("messenger production UI contracts", () => {
     const composer = read("app/messages/components/MessageComposer.tsx");
     const header = read("app/messages/components/ChatHeader.tsx");
     const experience = read("app/messages/MessagesExperience.tsx");
+    const realtime = read("app/messages/hooks/useMessengerRealtime.ts");
     const migration = read(
       "supabase/migrations/20260729_messenger_production_phase2.sql"
     );
@@ -122,12 +123,21 @@ describe("messenger production UI contracts", () => {
     expect(bubble).toMatch(/Delete for everyone/);
     expect(bubble).toMatch(/Edited/);
     expect(bubble).toMatch(/MESSAGE_REACTION_EMOJIS/);
+    expect(bubble).toMatch(/useDialogA11y/);
     expect(composer).toMatch(/replyTo/);
     expect(composer).toMatch(/editingMessage/);
     expect(header).toMatch(/Mute for 1 hour|MUTE_OPTION_LABELS/);
+    expect(header).toMatch(/useDialogA11y/);
     expect(experience).toMatch(/useMessengerRealtime/);
     expect(experience).toMatch(/toggleReactionAction/);
     expect(experience).toMatch(/setConversationMuteAction/);
+    expect(experience).toMatch(/getConversationPeerStateAction/);
+    expect(experience).toMatch(/onResync/);
+    expect(experience).toMatch(/sanitizeUserFacingMessage/);
+    expect(experience).toMatch(/rollbackOptimisticSend/);
+    expect(realtime).toMatch(/scheduleReconnect|RECONNECT_BASE_MS/);
+    expect(realtime).toMatch(/onResync/);
+    expect(realtime).toMatch(/messenger-inbox/);
 
     expect(migration).toMatch(/message_reactions/);
     expect(migration).toMatch(/message_hides/);
@@ -138,6 +148,20 @@ describe("messenger production UI contracts", () => {
     expect(migration).toMatch(/is_muted = true/);
     expect(migration).toMatch(/supabase_realtime add table public.message_reactions/);
     expect(migration).not.toMatch(/drop table/i);
+  });
+
+  it("supports notification deep-link message highlight wiring", () => {
+    const experience = read("app/messages/MessagesExperience.tsx");
+    const chat = read("app/messages/components/ChatWindow.tsx");
+    const routes = read("app/lib/nav/routes.ts");
+    const notifications = read("lib/supabase/notifications.ts");
+
+    expect(routes).toMatch(/params\.set\("message"/);
+    expect(experience).toMatch(/messageParam/);
+    expect(experience).toMatch(/focusMessageId/);
+    expect(chat).toMatch(/focusMessageId/);
+    expect(chat).toMatch(/onRetryThread/);
+    expect(notifications).toMatch(/enrichDirectMessageHref/);
   });
 
   it("keeps Sent / Delivered / Seen receipt labels in the bubble", () => {

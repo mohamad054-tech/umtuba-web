@@ -945,6 +945,50 @@ export async function setConversationTyping(
   return { ok: true, done: true };
 }
 
+/**
+ * Peer typing + last_read via security-definer RPC (peer participant rows are
+ * not SELECT-visible under RLS — do not use postgres_changes for peers).
+ */
+export async function getConversationPeerState(
+  supabase: SupabaseClient,
+  conversationId: string
+): Promise<
+  ActionResult<{ isTyping: boolean; peerLastReadAt: string | null }>
+> {
+  const { data, error } = await supabase.rpc("list_conversation_peers", {
+    p_conversation_ids: [conversationId],
+  });
+
+  if (error) {
+    console.error("getConversationPeerState failed:", error);
+    return { ok: false, message: "Unable to refresh conversation status." };
+  }
+
+  const peers = (data ?? []) as Array<{
+    conversation_id: string;
+    typing_at: string | null;
+    last_read_at?: string | null;
+  }>;
+
+  const peer = peers.find((row) => row.conversation_id === conversationId);
+  if (!peer) {
+    return { ok: true, isTyping: false, peerLastReadAt: null };
+  }
+
+  const typingCutoff = Date.now() - 8000;
+  let isTyping = false;
+  if (peer.typing_at) {
+    const typedAt = new Date(peer.typing_at).getTime();
+    isTyping = !Number.isNaN(typedAt) && typedAt >= typingCutoff;
+  }
+
+  return {
+    ok: true,
+    isTyping,
+    peerLastReadAt: peer.last_read_at ?? null,
+  };
+}
+
 /** Map a realtime message row into the client DTO (best-effort). */
 export function mapRealtimeMessageRow(
   row: MessageRow,

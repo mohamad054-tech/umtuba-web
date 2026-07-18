@@ -6,6 +6,7 @@ import {
   deleteMessageForEveryoneAction,
   deleteMessageForMeAction,
   editMessageAction,
+  getConversationPeerStateAction,
   listConversationsAction,
   listMessagesAction,
   markConversationReadAction,
@@ -16,11 +17,18 @@ import {
   toggleReactionAction,
 } from "../actions/messenger";
 import { buildConversationHref, isUuid } from "../lib/nav";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import ConversationList from "./components/ConversationList";
 import ChatWindow from "./components/ChatWindow";
 import MessagesShell from "./components/MessagesShell";
 import { useMessengerRealtime } from "./hooks/useMessengerRealtime";
 import { applyReactionToggle } from "./lib/reactionState";
+import {
+  applyInboxParticipantPatch,
+  applyPeerState,
+  nextUnreadOnPeerMessage,
+  rollbackOptimisticSend,
+} from "./lib/threadState";
 import { isConversationCurrentlyMuted } from "./types";
 import {
   formatMessageTime,
@@ -54,6 +62,7 @@ export default function MessagesExperience({
   const router = useRouter();
   const searchParams = useSearchParams();
   const conversationParam = searchParams.get("conversation");
+  const messageParam = searchParams.get("message");
   const creatorId = searchParams.get("creatorId");
   const creatorName = searchParams.get("creatorName");
 
@@ -136,7 +145,7 @@ export default function MessagesExperience({
     const listResult = await listConversationsAction();
 
     if (!listResult.ok) {
-      setListError(listResult.message);
+      setListError(sanitizeUserFacingMessage(listResult.message));
       setConversations([]);
       setListLoading(false);
       return [] as Conversation[];
@@ -155,6 +164,9 @@ export default function MessagesExperience({
           messages: existing.messages,
           hasMoreMessages: existing.hasMoreMessages,
           nextMessagesCursor: existing.nextMessagesCursor,
+          // Keep live peer typing / receipts until the next peer poll.
+          isTyping: existing.isTyping,
+          peerLastReadAt: existing.peerLastReadAt ?? conversation.peerLastReadAt,
         };
       });
     });
@@ -162,7 +174,10 @@ export default function MessagesExperience({
     return listResult.conversations;
   }
 
-  async function loadThread(conversationId: string, peerHint?: string) {
+  async function loadThread(
+    conversationId: string,
+    peerHint?: string
+  ): Promise<boolean> {
     const requestId = ++threadRequestRef.current;
     setThreadLoading(true);
     setThreadError(null);
@@ -175,13 +190,13 @@ export default function MessagesExperience({
     );
 
     if (requestId !== threadRequestRef.current) {
-      return;
+      return false;
     }
 
     if (!result.ok) {
-      setThreadError(result.message);
+      setThreadError(sanitizeUserFacingMessage(result.message));
       setThreadLoading(false);
-      return;
+      return false;
     }
 
     setConversations((prev) => {
@@ -225,13 +240,14 @@ export default function MessagesExperience({
     const latest = result.messages[result.messages.length - 1];
     void markConversationReadAction(conversationId, latest?.id ?? null);
     setThreadLoading(false);
+    return true;
   }
 
   const openConversationFromQuery = useEffectEvent(
-    async (conversationId: string) => {
+    async (conversationId: string): Promise<boolean> => {
       if (!isUuid(conversationId)) {
         setListError("Invalid conversation link.");
-        return;
+        return false;
       }
 
       setListError(null);
@@ -254,7 +270,7 @@ export default function MessagesExperience({
         );
       }
 
-      await loadThread(conversationId, creatorName ?? undefined);
+      return loadThread(conversationId, creatorName ?? undefined);
     }
   );
 
@@ -271,7 +287,7 @@ export default function MessagesExperience({
 
     if (!openResult.ok) {
       console.error("[Messages] openDirectConversationAction failed:", openResult);
-      setListError(openResult.message);
+      setListError(sanitizeUserFacingMessage(openResult.message));
       return;
     }
 
@@ -297,8 +313,11 @@ export default function MessagesExperience({
       return;
     }
 
-    openedConversationRef.current = conversationParam;
-    void openConversationFromQuery(conversationParam);
+    void openConversationFromQuery(conversationParam).then((ok) => {
+      if (ok) {
+        openedConversationRef.current = conversationParam;
+      }
+    });
   }, [conversationParam]);
 
   useEffect(() => {
@@ -314,10 +333,43 @@ export default function MessagesExperience({
     void openPeerFromQuery(creatorId);
   }, [conversationParam, creatorId]);
 
+  const resyncMessenger = useEffectEvent(() => {
+    void loadInbox();
+    const conversationId = selectedIdRef.current;
+    if (conversationId) {
+      void loadThread(conversationId);
+    }
+  });
+
   useMessengerRealtime({
     conversationId: selectedId,
     currentUserId,
     enabled: Boolean(selectedId),
+    onResync: resyncMessenger,
+    onInboxParticipantChange: (row) => {
+      const conversationId = row.conversation_id;
+      if (!conversationId) {
+        return;
+      }
+      setConversations((prev) =>
+        prev.map((conversation) => {
+          if (conversation.id !== conversationId) {
+            return conversation;
+          }
+          return applyInboxParticipantPatch(
+            conversation,
+            {
+              unreadCount: row.unread_count,
+              isMuted: row.is_muted,
+              mutedUntil: row.muted_until,
+            },
+            {
+              forceUnreadZero: selectedIdRef.current === conversationId,
+            }
+          );
+        })
+      );
+    },
     onMessageInsert: (message) => {
       setConversations((prev) =>
         prev.map((conversation) => {
@@ -340,12 +392,18 @@ export default function MessagesExperience({
               lastMessageAt: message.sentAt,
             };
           }
+          const isSelected =
+            selectedIdRef.current === message.conversationId;
           return {
             ...conversation,
             messages: [...conversation.messages, message],
             lastMessagePreview: message.text,
             lastMessageAt: message.sentAt,
-            unreadCount: message.isMine ? conversation.unreadCount : conversation.unreadCount,
+            unreadCount: nextUnreadOnPeerMessage(
+              conversation,
+              message,
+              isSelected
+            ),
           };
         })
       );
@@ -393,6 +451,46 @@ export default function MessagesExperience({
       );
     },
   });
+
+  // Peer typing + last_read via RPC poll (peer participant rows blocked by RLS).
+  useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function pollPeers() {
+      const conversationId = selectedId;
+      if (!conversationId) {
+        return;
+      }
+      const result = await getConversationPeerStateAction(conversationId);
+      if (cancelled || !result.ok) {
+        return;
+      }
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation.id === conversationId
+            ? applyPeerState(conversation, {
+                isTyping: result.isTyping,
+                peerLastReadAt: result.peerLastReadAt,
+              })
+            : conversation
+        )
+      );
+    }
+
+    void pollPeers();
+    const timer = window.setInterval(() => {
+      void pollPeers();
+    }, 2500);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [selectedId]);
 
   const filtered = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -449,7 +547,7 @@ export default function MessagesExperience({
     }
 
     if (!result.ok) {
-      setThreadError(result.message);
+      setThreadError(sanitizeUserFacingMessage(result.message));
       setLoadingOlder(false);
       return;
     }
@@ -514,6 +612,13 @@ export default function MessagesExperience({
     sendingRef.current = true;
     setSending(true);
     setSendError(null);
+
+    const existingConversation = conversations.find(
+      (conversation) => conversation.id === conversationId
+    );
+    const previousPreview = existingConversation?.lastMessagePreview ?? "";
+    const previousAt = existingConversation?.lastMessageAt ?? null;
+
     setConversations((prev) =>
       prev.map((conversation) => {
         if (conversation.id !== conversationId) {
@@ -545,19 +650,19 @@ export default function MessagesExperience({
 
     if (!result.ok) {
       // Preserve composer draft (composer keeps text when we return false).
-      setSendError(result.message);
+      setSendError(sanitizeUserFacingMessage(result.message));
       setConversations((prev) =>
         prev.map((conversation) => {
           if (conversation.id !== conversationId) {
             return conversation;
           }
 
-          return {
-            ...conversation,
-            messages: conversation.messages.filter(
-              (message) => message.clientId !== clientId
-            ),
-          };
+          return rollbackOptimisticSend(
+            conversation,
+            clientId,
+            previousPreview,
+            previousAt
+          );
         })
       );
       sendingRef.current = false;
@@ -606,7 +711,7 @@ export default function MessagesExperience({
 
     const result = await editMessageAction({ messageId, body: text });
     if (!result.ok) {
-      setSendError(result.message);
+      setSendError(sanitizeUserFacingMessage(result.message));
       return false;
     }
 
@@ -634,7 +739,7 @@ export default function MessagesExperience({
   async function handleDeleteForMe(message: Message) {
     const result = await deleteMessageForMeAction(message.id);
     if (!result.ok) {
-      setSendError(result.message);
+      setSendError(sanitizeUserFacingMessage(result.message));
       return;
     }
     setConversations((prev) =>
@@ -659,7 +764,7 @@ export default function MessagesExperience({
   async function handleDeleteForEveryone(message: Message) {
     const result = await deleteMessageForEveryoneAction(message.id);
     if (!result.ok) {
-      setSendError(result.message);
+      setSendError(sanitizeUserFacingMessage(result.message));
       return;
     }
     setConversations((prev) =>
@@ -717,7 +822,7 @@ export default function MessagesExperience({
     });
 
     if (!result.ok) {
-      setSendError(result.message);
+      setSendError(sanitizeUserFacingMessage(result.message));
       // Reload thread reactions on failure
       if (selectedId) {
         void loadThread(selectedId);
@@ -736,7 +841,7 @@ export default function MessagesExperience({
     setMutePending(false);
 
     if (!result.ok) {
-      setMuteError(result.message);
+      setMuteError(sanitizeUserFacingMessage(result.message));
       return;
     }
 
@@ -825,6 +930,20 @@ export default function MessagesExperience({
             loading={threadLoading}
             error={threadError}
             sendError={sendError}
+            onRetryThread={
+              selectedId
+                ? () => {
+                    void loadThread(selectedId).then((ok) => {
+                      if (ok && conversationParam === selectedId) {
+                        openedConversationRef.current = selectedId;
+                      }
+                    });
+                  }
+                : undefined
+            }
+            focusMessageId={
+              messageParam && isUuid(messageParam) ? messageParam : null
+            }
             onLoadOlder={
               selected?.hasMoreMessages
                 ? () => void handleLoadOlder()
