@@ -1,5 +1,6 @@
 -- Referral claim reliability (Phase B4)
--- Prepared for review — do not apply remotely until approved.
+-- Reviewed and approved for invite-alpha. Apply manually in Supabase SQL Editor
+-- after 20260722–20260725. Do not auto-apply from the Next.js app.
 --
 -- Changes:
 -- 1) claim_my_referral_signup resolves pending attribution by visitor when
@@ -94,6 +95,7 @@ end;
 $$;
 
 revoke all on function public.claim_my_referral_signup(text, text, text, text) from public;
+revoke all on function public.claim_my_referral_signup(text, text, text, text) from anon;
 grant execute on function public.claim_my_referral_signup(text, text, text, text) to authenticated;
 
 comment on function public.claim_my_referral_signup(text, text, text, text) is
