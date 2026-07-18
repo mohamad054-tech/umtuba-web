@@ -22,6 +22,7 @@ export default defineConfig({
       "lib/activity-tiers/**/*.test.ts",
       "lib/media/**/*.test.ts",
       "lib/supabase/**/*.test.ts",
+      "lib/store/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",
       "app/lib/video/**/*.test.ts",

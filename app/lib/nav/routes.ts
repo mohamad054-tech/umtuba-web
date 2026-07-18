@@ -19,6 +19,10 @@ export const APP_ROUTES = {
   postJourney: "/post-journey",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
+  store: "/store",
+  storeSearch: "/store/search",
+  storeCart: "/store/cart",
+  sellerStore: "/seller/store",
 } as const;
 
 export type AppRouteHref =

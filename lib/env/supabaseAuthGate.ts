@@ -13,6 +13,8 @@ export const PROTECTED_PREFIXES = [
   "/saved",
   "/rewards",
   "/creator",
+  "/seller",
+  "/store/cart",
 ] as const;
 
 export function isProtectedPath(pathname: string): boolean {

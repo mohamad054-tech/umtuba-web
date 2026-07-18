@@ -160,6 +160,30 @@ describe("decideAuthGate fail-closed behavior", () => {
     expect(decideAuthGate("/discover", invalid)).toEqual({
       action: "continue_without_session",
     });
+    expect(isProtectedPath("/store")).toBe(false);
+    expect(decideAuthGate("/store", invalid)).toEqual({
+      action: "continue_without_session",
+    });
+  });
+
+  it("protects seller routes and requires session when config is valid", () => {
+    expect(isProtectedPath("/seller")).toBe(true);
+    expect(isProtectedPath("/seller/store/products")).toBe(true);
+    expect(decideAuthGate("/seller/store", invalid)).toEqual({
+      action: "service_unavailable",
+      forPath: "protected",
+    });
+    expect(decideAuthGate("/seller/store", valid)).toEqual({
+      action: "check_session",
+    });
+  });
+
+  it("protects buyer cart while keeping public store browsable", () => {
+    expect(isProtectedPath("/store")).toBe(false);
+    expect(isProtectedPath("/store/cart")).toBe(true);
+    expect(decideAuthGate("/store/cart", valid)).toEqual({
+      action: "check_session",
+    });
   });
 
   it("checks session when configuration is valid", () => {
