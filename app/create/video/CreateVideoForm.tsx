@@ -11,6 +11,9 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { createVideoPostAction } from "../../actions/createVideoPost";
+import MediaPipelineStatusBadge from "../../components/media/MediaPipelineStatusBadge";
+import MediaProcessingProgress from "../../components/media/MediaProcessingProgress";
+import MediaUploadProgress from "../../components/media/MediaUploadProgress";
 import { getAuthenticatedUser } from "../../../lib/supabase/auth";
 import {
   deleteUploadedPostVideo,
@@ -23,6 +26,11 @@ import {
   validateCaption,
   validateVideoFile,
 } from "../../../lib/supabase/videoPostsShared";
+import { probeVideoFileMetadata } from "../../../lib/media/probeVideoMetadata";
+import type {
+  MediaMetadata,
+  MediaPipelineStatus,
+} from "../../../lib/media/pipelineTypes";
 import { APP_ROUTES } from "../../lib/nav";
 
 type UploadPhase =
@@ -30,9 +38,27 @@ type UploadPhase =
   | "checking-auth"
   | "ready"
   | "uploading"
-  | "publishing"
+  | "queued"
+  | "processing"
   | "success"
   | "error";
+
+function phaseToPipelineStatus(phase: UploadPhase): MediaPipelineStatus | null {
+  switch (phase) {
+    case "uploading":
+      return "uploading";
+    case "queued":
+      return "queued";
+    case "processing":
+      return "processing";
+    case "success":
+      return "ready";
+    case "error":
+      return "failed";
+    default:
+      return null;
+  }
+}
 
 export default function CreateVideoForm() {
   const router = useRouter();
@@ -48,6 +74,9 @@ export default function CreateVideoForm() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [processingPercent, setProcessingPercent] = useState(0);
+  const [probedMeta, setProbedMeta] = useState<MediaMetadata | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -108,6 +137,7 @@ export default function CreateVideoForm() {
 
     setSelectedFile(null);
     setPreviewUrl("");
+    setProbedMeta(null);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -118,10 +148,12 @@ export default function CreateVideoForm() {
     setCaption("");
     setErrorMessage("");
     setStatusMessage("");
+    setUploadPercent(0);
+    setProcessingPercent(0);
     clearSelectedFile();
   }
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -149,6 +181,22 @@ export default function CreateVideoForm() {
 
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+
+    try {
+      const meta = await probeVideoFileMetadata(file);
+      setProbedMeta(meta);
+    } catch {
+      setProbedMeta({
+        durationMs: null,
+        width: null,
+        height: null,
+        fps: null,
+        codec: null,
+        bitrate: null,
+        fileSize: file.size,
+        aspectRatio: null,
+      });
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -191,23 +239,38 @@ export default function CreateVideoForm() {
 
     submitLockRef.current = true;
     let uploadedPath: string | null = null;
+    const uploadStartedAt = new Date().toISOString();
 
     try {
       setErrorMessage("");
       setPhase("uploading");
+      setUploadPercent(0);
+      setProcessingPercent(0);
       setStatusMessage("Uploading video to secure storage...");
 
-      const uploaded = await uploadPostVideo(selectedFile);
+      const uploaded = await uploadPostVideo(selectedFile, (progress) => {
+        setUploadPercent(progress.percent);
+      });
       uploadedPath = uploaded.path;
+      setUploadPercent(100);
 
-      setPhase("publishing");
-      setStatusMessage("Saving your post...");
+      setPhase("queued");
+      setStatusMessage("Upload complete. Queued for processing...");
+      setProcessingPercent(10);
+
+      await new Promise((r) => window.setTimeout(r, 280));
+
+      setPhase("processing");
+      setStatusMessage("Processing video...");
+      setProcessingPercent(40);
 
       const result = await createVideoPostAction({
         caption,
         videoPath: uploaded.path,
         mimeType: uploaded.mimeType,
         byteSize: uploaded.byteSize,
+        metadata: probedMeta,
+        uploadStartedAt,
       });
 
       if (!result.ok) {
@@ -219,8 +282,9 @@ export default function CreateVideoForm() {
         return;
       }
 
+      setProcessingPercent(100);
       setPhase("success");
-      setStatusMessage("Video published. Opening Discover...");
+      setStatusMessage("Video ready. Opening Discover...");
       resetFormFields();
 
       window.dispatchEvent(new Event("umtuba:post-created"));
@@ -248,25 +312,35 @@ export default function CreateVideoForm() {
   }
 
   const busy =
-    phase === "uploading" || phase === "publishing" || phase === "success";
+    phase === "uploading" ||
+    phase === "queued" ||
+    phase === "processing" ||
+    phase === "success";
   const canSubmit =
     isAuthenticated &&
     Boolean(selectedFile) &&
     phase !== "checking-auth" &&
     !busy;
+  const pipelineStatus = phaseToPipelineStatus(phase);
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(event) => void handleSubmit(event)}
       className="mx-auto w-full max-w-xl rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-2xl backdrop-blur-xl md:p-8"
       noValidate
     >
       <div className="space-y-1">
-        <h1 className="text-2xl font-black tracking-tight text-white">
-          Upload a video
-        </h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-black tracking-tight text-white">
+            Upload a video
+          </h1>
+          {pipelineStatus ? (
+            <MediaPipelineStatusBadge status={pipelineStatus} />
+          ) : null}
+        </div>
         <p className="text-sm text-white/55">
-          One video file, optional caption. Published clips appear on Discover.
+          One video file, optional caption. Only ready clips appear on Discover,
+          Watch, and Profile.
         </p>
       </div>
 
@@ -311,7 +385,7 @@ export default function CreateVideoForm() {
           name="video"
           type="file"
           accept={VIDEO_ACCEPT_ATTR}
-          onChange={handleFileChange}
+          onChange={(event) => void handleFileChange(event)}
           disabled={!isAuthenticated || busy || phase === "checking-auth"}
           className="block w-full text-sm text-white/70 file:mr-4 file:rounded-full file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-bold file:text-black hover:file:bg-white/90 disabled:opacity-50"
         />
@@ -329,7 +403,18 @@ export default function CreateVideoForm() {
             aria-label={`Preview of ${selectedFile.name}`}
           />
           <div className="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-sm">
-            <p className="min-w-0 truncate text-white/60">{selectedFile.name}</p>
+            <div className="min-w-0">
+              <p className="truncate text-white/60">{selectedFile.name}</p>
+              {probedMeta?.width && probedMeta?.height ? (
+                <p className="text-xs text-white/35">
+                  {probedMeta.width}×{probedMeta.height}
+                  {probedMeta.aspectRatio ? ` · ${probedMeta.aspectRatio}` : ""}
+                  {probedMeta.durationMs
+                    ? ` · ${Math.round(probedMeta.durationMs / 1000)}s`
+                    : ""}
+                </p>
+              ) : null}
+            </div>
             <button
               type="button"
               onClick={clearSelectedFile}
@@ -368,6 +453,26 @@ export default function CreateVideoForm() {
         </p>
       </div>
 
+      {phase === "uploading" ? (
+        <div className="mt-4">
+          <MediaUploadProgress percent={uploadPercent} label="Uploading" />
+        </div>
+      ) : null}
+
+      {phase === "queued" || phase === "processing" ? (
+        <div className="mt-4">
+          <MediaProcessingProgress
+            percent={processingPercent}
+            label={phase === "queued" ? "Queued" : "Processing"}
+            detail={
+              phase === "processing"
+                ? "Preparing playback metadata and thumbnail path…"
+                : "Waiting for the media pipeline…"
+            }
+          />
+        </div>
+      ) : null}
+
       {statusMessage ? (
         <p className="mt-4 text-sm font-medium text-sky-200/90" role="status">
           {statusMessage}
@@ -396,11 +501,13 @@ export default function CreateVideoForm() {
         >
           {phase === "uploading"
             ? "Uploading..."
-            : phase === "publishing"
-              ? "Publishing..."
-              : phase === "success"
-                ? "Published"
-                : "Publish video"}
+            : phase === "queued"
+              ? "Queued..."
+              : phase === "processing"
+                ? "Processing..."
+                : phase === "success"
+                  ? "Ready"
+                  : "Publish video"}
         </button>
       </div>
     </form>

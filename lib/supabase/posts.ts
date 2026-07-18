@@ -1,6 +1,7 @@
 import { createClient } from "./client";
 import type { DatabasePost } from "../../app/data/types/post";
 import { getAuthenticatedUser, getCurrentProfile } from "./auth";
+import { requireSupabasePublicEnv } from "../env/supabasePublic";
 import { getErrorMessage } from "./validation";
 import {
   isOwnedVideoPath,
@@ -84,12 +85,22 @@ export async function uploadPostImage(file: File): Promise<string> {
   return data.publicUrl;
 }
 
+export type UploadPostVideoProgress = {
+  percent: number;
+  loaded: number;
+  total: number;
+};
+
 /**
  * Client-side upload into the private post-videos bucket (owner folder only).
  * Client validation is convenience only — the server action re-validates.
  * Does not mint signed URLs.
+ * Optional onProgress uses XHR for byte-level upload progress.
  */
-export async function uploadPostVideo(file: File): Promise<UploadPostVideoResult> {
+export async function uploadPostVideo(
+  file: File,
+  onProgress?: (progress: UploadPostVideoProgress) => void
+): Promise<UploadPostVideoResult> {
   const supabase = createClient();
   const user = await getAuthenticatedUser();
 
@@ -114,17 +125,21 @@ export async function uploadPostVideo(file: File): Promise<UploadPostVideoResult
     throw new Error("Invalid video upload path.");
   }
 
-  const { error: uploadError } = await supabase.storage
-    .from(POST_VIDEOS_BUCKET)
-    .upload(filePath, file, {
-      cacheControl: "3600",
-      contentType: file.type,
-      upsert: false,
-    });
+  if (onProgress) {
+    await uploadPostVideoWithProgressXhr(supabase, file, filePath, onProgress);
+  } else {
+    const { error: uploadError } = await supabase.storage
+      .from(POST_VIDEOS_BUCKET)
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        contentType: file.type,
+        upsert: false,
+      });
 
-  if (uploadError) {
-    console.error("Unable to upload video:", uploadError);
-    throw new Error(getErrorMessage(uploadError, "Unable to upload video."));
+    if (uploadError) {
+      console.error("Unable to upload video:", uploadError);
+      throw new Error(getErrorMessage(uploadError, "Unable to upload video."));
+    }
   }
 
   return {
@@ -132,6 +147,64 @@ export async function uploadPostVideo(file: File): Promise<UploadPostVideoResult
     mimeType: file.type,
     byteSize: file.size,
   };
+}
+
+async function uploadPostVideoWithProgressXhr(
+  supabase: ReturnType<typeof createClient>,
+  file: File,
+  filePath: string,
+  onProgress: (progress: UploadPostVideoProgress) => void
+): Promise<void> {
+  const { url, publishableKey } = requireSupabasePublicEnv();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+
+  if (!accessToken) {
+    throw new Error("Please sign in to upload a video.");
+  }
+
+  const endpoint = `${url.replace(/\/$/, "")}/storage/v1/object/${POST_VIDEOS_BUCKET}/${filePath}`;
+
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", endpoint);
+    xhr.setRequestHeader("apikey", publishableKey);
+    xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.setRequestHeader("cache-control", "3600");
+    xhr.setRequestHeader("content-type", file.type);
+
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable || event.total <= 0) {
+        onProgress({ percent: 0, loaded: event.loaded, total: file.size });
+        return;
+      }
+      const percent = Math.round((event.loaded / event.total) * 100);
+      onProgress({
+        percent: Math.max(0, Math.min(100, percent)),
+        loaded: event.loaded,
+        total: event.total,
+      });
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress({ percent: 100, loaded: file.size, total: file.size });
+        resolve();
+        return;
+      }
+      console.error("Unable to upload video:", xhr.status, xhr.responseText);
+      reject(new Error("Unable to upload video."));
+    };
+
+    xhr.onerror = () => {
+      reject(new Error("Unable to upload video."));
+    };
+
+    xhr.send(file);
+  });
 }
 
 /**

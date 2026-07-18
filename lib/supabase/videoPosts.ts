@@ -3,6 +3,13 @@ import type { DatabasePost } from "../../app/data/types/post";
 import type { DiscoverVideo } from "../../app/discover/types";
 import { isUuid } from "../../app/lib/nav";
 import {
+  buildMockThumbnailPath,
+  clampProcessingProgress,
+  computeAspectRatioLabel,
+  EMPTY_MEDIA_PIPELINE_EXTENSIONS,
+  type MediaMetadata,
+} from "../media/pipelineTypes";
+import {
   isOwnedVideoPath,
   POST_VIDEOS_BUCKET,
   validateCaption,
@@ -45,6 +52,23 @@ const postColumns = `
   video_path,
   video_mime_type,
   video_byte_size,
+  media_status,
+  upload_started_at,
+  upload_completed_at,
+  processing_started_at,
+  processing_completed_at,
+  processing_error,
+  processing_progress,
+  media_duration_ms,
+  media_width,
+  media_height,
+  media_fps,
+  media_codec,
+  media_bitrate,
+  media_file_size,
+  media_aspect_ratio,
+  thumbnail_path,
+  media_pipeline,
   likes,
   comments,
   shares,
@@ -53,10 +77,33 @@ const postColumns = `
   created_at
 `;
 
+/** Ready-only filter shared by Discover / Watch / Profile queries. */
+export const READY_VIDEO_FILTER = {
+  postType: "video" as const,
+  mediaStatus: "ready" as const,
+};
+
 export type VideoPostRow = DatabasePost & {
   video_path: string | null;
   video_mime_type: string | null;
   video_byte_size: number | null;
+  media_status?: string | null;
+  upload_started_at?: string | null;
+  upload_completed_at?: string | null;
+  processing_started_at?: string | null;
+  processing_completed_at?: string | null;
+  processing_error?: string | null;
+  processing_progress?: number | null;
+  media_duration_ms?: number | null;
+  media_width?: number | null;
+  media_height?: number | null;
+  media_fps?: number | null;
+  media_codec?: string | null;
+  media_bitrate?: number | null;
+  media_file_size?: number | null;
+  media_aspect_ratio?: string | null;
+  thumbnail_path?: string | null;
+  media_pipeline?: Record<string, unknown> | null;
 };
 
 /** Client-safe post: playback URL only — never includes storage paths. */
@@ -85,7 +132,52 @@ export type CreateVideoPostInput = {
   videoPath: string;
   mimeType: string;
   byteSize: number;
+  /** Client-probed metadata (optional; server clamps / ignores invalid). */
+  metadata?: Partial<MediaMetadata> | null;
+  uploadStartedAt?: string | null;
 };
+
+function sanitizeMetadata(
+  input: Partial<MediaMetadata> | null | undefined,
+  byteSize: number
+): MediaMetadata {
+  const width =
+    typeof input?.width === "number" && input.width > 0
+      ? Math.round(input.width)
+      : null;
+  const height =
+    typeof input?.height === "number" && input.height > 0
+      ? Math.round(input.height)
+      : null;
+  const durationMs =
+    typeof input?.durationMs === "number" && input.durationMs >= 0
+      ? Math.round(input.durationMs)
+      : null;
+  const fps =
+    typeof input?.fps === "number" && input.fps > 0 ? input.fps : null;
+  const bitrate =
+    typeof input?.bitrate === "number" && input.bitrate > 0
+      ? Math.round(input.bitrate)
+      : null;
+  const codec =
+    typeof input?.codec === "string" && input.codec.trim()
+      ? input.codec.trim().slice(0, 64)
+      : null;
+
+  return {
+    durationMs,
+    width,
+    height,
+    fps,
+    codec,
+    bitrate,
+    fileSize: byteSize > 0 ? byteSize : null,
+    aspectRatio:
+      (typeof input?.aspectRatio === "string" && input.aspectRatio.trim()
+        ? input.aspectRatio.trim().slice(0, 32)
+        : null) || computeAspectRatioLabel(width, height),
+  };
+}
 
 function extractHashtags(caption: string): string[] {
   const matches = caption.match(/#[\p{L}\p{N}_]+/gu);
@@ -301,8 +393,8 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
 
 /**
  * Verifies the uploaded object exists under the caller's folder, then inserts
- * a video post row. On validation or insert failure, deletes the uploaded object.
- * Intended for server-side use with the user's session.
+ * a video post through Media Pipeline V1: queued → processing → ready.
+ * On validation or insert failure, deletes the uploaded object.
  * Never persists signed URLs — only the storage path.
  */
 export async function insertVideoPostForUser(
@@ -317,6 +409,12 @@ export async function insertVideoPostForUser(
 ): Promise<VideoPostRow> {
   const caption = input.caption.trim();
   const videoPath = input.videoPath.trim();
+  const now = new Date().toISOString();
+  const uploadStartedAt =
+    typeof input.uploadStartedAt === "string" && input.uploadStartedAt.trim()
+      ? input.uploadStartedAt.trim()
+      : now;
+  const meta = sanitizeMetadata(input.metadata, input.byteSize);
 
   async function failAndCleanup(message: string): Promise<never> {
     await deleteOwnedVideoObject(supabase, userId, videoPath);
@@ -355,6 +453,136 @@ export async function insertVideoPostForUser(
     ? profile.username
     : `@${profile.username}`;
 
+  const thumbAssetId =
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `t-${Date.now()}`;
+  const thumbnailPath = buildMockThumbnailPath(userId, thumbAssetId);
+
+  const { data: queued, error: insertError } = await supabase
+    .from("posts")
+    .insert({
+      user_id: userId,
+      content: caption,
+      post_type: "video",
+      author_name: profile.full_name,
+      author_username: authorUsername,
+      author_avatar: profile.avatar_initial,
+      image_url: null,
+      video_url: null,
+      video_path: videoPath,
+      video_mime_type: input.mimeType,
+      video_byte_size: input.byteSize,
+      media_status: "queued",
+      upload_started_at: uploadStartedAt,
+      upload_completed_at: now,
+      processing_started_at: null,
+      processing_completed_at: null,
+      processing_error: null,
+      processing_progress: 0,
+      media_duration_ms: meta.durationMs,
+      media_width: meta.width,
+      media_height: meta.height,
+      media_fps: meta.fps,
+      media_codec: meta.codec,
+      media_bitrate: meta.bitrate,
+      media_file_size: meta.fileSize,
+      media_aspect_ratio: meta.aspectRatio,
+      thumbnail_path: thumbnailPath,
+      media_pipeline: EMPTY_MEDIA_PIPELINE_EXTENSIONS,
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      saves: 0,
+      views: 0,
+    })
+    .select(postColumns)
+    .single();
+
+  if (insertError || !queued) {
+    console.error("Unable to create video post row:", insertError);
+    const message = (insertError?.message || "").toLowerCase();
+    if (
+      message.includes("media_status") ||
+      message.includes("schema cache") ||
+      (insertError as { code?: string } | null)?.code === "PGRST204"
+    ) {
+      return insertVideoPostLegacy(
+        supabase,
+        userId,
+        profile,
+        input,
+        failAndCleanup
+      );
+    }
+    await failAndCleanup("Unable to create the video post. Please try again.");
+  }
+
+  const queuedRow = queued as VideoPostRow;
+
+  const processingStarted = new Date().toISOString();
+  await supabase
+    .from("posts")
+    .update({
+      media_status: "processing",
+      processing_started_at: processingStarted,
+      processing_progress: clampProcessingProgress(35),
+    })
+    .eq("id", queuedRow.id)
+    .eq("user_id", userId);
+
+  const processingCompleted = new Date().toISOString();
+  const { data: ready, error: readyError } = await supabase
+    .from("posts")
+    .update({
+      media_status: "ready",
+      processing_progress: 100,
+      processing_completed_at: processingCompleted,
+      processing_error: null,
+      thumbnail_path: thumbnailPath,
+    })
+    .eq("id", queuedRow.id)
+    .eq("user_id", userId)
+    .select(postColumns)
+    .single();
+
+  if (readyError || !ready) {
+    console.error("Unable to finalize video ready state:", readyError);
+    await supabase
+      .from("posts")
+      .update({
+        media_status: "failed",
+        processing_error: "Processing failed. Please try again.",
+        processing_progress: clampProcessingProgress(0),
+      })
+      .eq("id", queuedRow.id)
+      .eq("user_id", userId);
+    await failAndCleanup(
+      "Unable to finish processing the video. Please try again."
+    );
+  }
+
+  return ready as VideoPostRow;
+}
+
+/** Pre-migration insert path (video_path only). */
+async function insertVideoPostLegacy(
+  supabase: SupabaseClient,
+  userId: string,
+  profile: {
+    full_name: string;
+    username: string;
+    avatar_initial: string;
+  },
+  input: CreateVideoPostInput,
+  failAndCleanup: (message: string) => Promise<never>
+): Promise<VideoPostRow> {
+  const caption = input.caption.trim();
+  const videoPath = input.videoPath.trim();
+  const authorUsername = profile.username.startsWith("@")
+    ? profile.username
+    : `@${profile.username}`;
+
   const { data, error } = await supabase
     .from("posts")
     .insert({
@@ -375,11 +603,32 @@ export async function insertVideoPostForUser(
       saves: 0,
       views: 0,
     })
-    .select(postColumns)
+    .select(
+      `
+      id,
+      user_id,
+      content,
+      post_type,
+      author_name,
+      author_username,
+      author_avatar,
+      image_url,
+      video_url,
+      video_path,
+      video_mime_type,
+      video_byte_size,
+      likes,
+      comments,
+      shares,
+      saves,
+      views,
+      created_at
+    `
+    )
     .single();
 
-  if (error) {
-    console.error("Unable to create video post row:", error);
+  if (error || !data) {
+    console.error("Unable to create video post row (legacy):", error);
     await failAndCleanup("Unable to create the video post. Please try again.");
   }
 

@@ -139,6 +139,7 @@ describe("profile content architecture", () => {
   it("scopes video query to user_id and live query to host_id + live/public", () => {
     const lib = readRepoFile("lib/supabase/profileContent.ts");
     expect(lib).toMatch(/\.eq\("user_id", userId\)/);
+    expect(lib).toMatch(/\.eq\("media_status", "ready"\)/);
     expect(lib).toMatch(/\.eq\("host_id", hostId\)/);
     expect(lib).toMatch(/\.eq\("status", "live"\)/);
     expect(lib).toMatch(/\.eq\("visibility", "public"\)/);

@@ -6,17 +6,28 @@ import {
   insertVideoPostForUser,
   type CreateVideoPostInput,
 } from "../../lib/supabase/videoPosts";
+import type { MediaMetadata } from "../../lib/media/pipelineTypes";
 
 export type CreateVideoPostActionResult =
   | { ok: true; postId: number }
   | { ok: false; message: string };
 
+export type CreateVideoPostActionInput = {
+  caption: string;
+  videoPath: string;
+  mimeType: string;
+  byteSize: number;
+  metadata?: Partial<MediaMetadata> | null;
+  uploadStartedAt?: string | null;
+};
+
 /**
  * Authoritative create path: re-validates metadata, verifies the owned object,
- * inserts the post, and deletes the storage object on any failure.
+ * runs Media Pipeline V1 (queued → processing → ready), and deletes the
+ * storage object on any failure.
  */
 export async function createVideoPostAction(
-  input: CreateVideoPostInput
+  input: CreateVideoPostActionInput
 ): Promise<CreateVideoPostActionResult> {
   const user = await getServerUser();
 
@@ -48,6 +59,18 @@ export async function createVideoPostAction(
       return { ok: false, message: "Please sign in to publish a video." };
     }
 
+    const payload: CreateVideoPostInput = {
+      caption: typeof input.caption === "string" ? input.caption : "",
+      videoPath,
+      mimeType: typeof input.mimeType === "string" ? input.mimeType : "",
+      byteSize:
+        typeof input.byteSize === "number" && Number.isFinite(input.byteSize)
+          ? input.byteSize
+          : 0,
+      metadata: input.metadata ?? null,
+      uploadStartedAt: input.uploadStartedAt ?? null,
+    };
+
     const post = await insertVideoPostForUser(
       supabase,
       user.id,
@@ -56,23 +79,13 @@ export async function createVideoPostAction(
         username: profile.username,
         avatar_initial: profile.avatar_initial,
       },
-      {
-        caption: typeof input.caption === "string" ? input.caption : "",
-        videoPath,
-        mimeType: typeof input.mimeType === "string" ? input.mimeType : "",
-        byteSize:
-          typeof input.byteSize === "number" && Number.isFinite(input.byteSize)
-            ? input.byteSize
-            : 0,
-      }
+      payload
     );
 
     return { ok: true, postId: post.id };
   } catch (error) {
     console.error("createVideoPostAction failed:", error);
 
-    // Controlled failures inside insertVideoPostForUser already delete the
-    // object; this covers unexpected errors (remove is idempotent).
     await deleteOwnedVideoObject(supabase, user.id, videoPath);
 
     const message =

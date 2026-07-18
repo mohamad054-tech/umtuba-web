@@ -26,6 +26,7 @@ import {
   type PublicPostDTO,
   type VideoPostRow,
 } from "./videoPosts";
+import { isPubliclyVisibleMedia } from "../media/pipelineTypes";
 
 export type DiscoverVideosResult =
   | {
@@ -78,6 +79,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
       .from("posts")
       .select(postColumns)
       .eq("post_type", "video")
+      .eq("media_status", "ready")
       .not("video_path", "is", null)
       .order("created_at", { ascending: false })
       .order("id", { ascending: false })
@@ -109,6 +111,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
           .select(postColumns)
           .eq("id", input.focusPostId)
           .eq("post_type", "video")
+          .eq("media_status", "ready")
           .not("video_path", "is", null)
           .maybeSingle();
         if (focused) {
@@ -227,7 +230,7 @@ export async function refreshWatchPlaybackUrlServer(
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("posts")
-      .select("id, video_path, video_url, post_type")
+      .select("id, video_path, video_url, post_type, media_status")
       .eq("id", postId)
       .maybeSingle();
 
@@ -237,6 +240,10 @@ export async function refreshWatchPlaybackUrlServer(
 
     if (!data) {
       return { ok: false, message: "This video was deleted.", deleted: true };
+    }
+
+    if (data.post_type === "video" && data.media_status && data.media_status !== "ready") {
+      return { ok: false, message: "This video is still processing.", deleted: false };
     }
 
     const path =
@@ -291,7 +298,16 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
       };
     }
 
-    const rows = (data ?? []) as VideoPostRow[];
+    const rows = ((data ?? []) as VideoPostRow[]).filter((row) => {
+      if (row.post_type !== "video") {
+        return true;
+      }
+      return isPubliclyVisibleMedia({
+        postType: row.post_type,
+        mediaStatus: row.media_status,
+        videoPath: row.video_path,
+      });
+    });
     const withUrls = await attachPlaybackUrls(supabase, rows);
     const withAuthors = await enrichAuthorUserIdsFromProfiles(
       supabase,

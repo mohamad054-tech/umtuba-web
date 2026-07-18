@@ -20,6 +20,7 @@ describe("canonical video feed architecture", () => {
     expect(server).toMatch(/getWatchVideosPageServer/);
     expect(server).toMatch(/loadViewerFollowingSet/);
     expect(server).toMatch(/applyFollowingToDiscoverVideos/);
+    expect(server).toMatch(/eq\("media_status", "ready"\)/);
     // Both routes go through the canonical page helper.
     expect(server).toMatch(
       /getDiscoverVideosServer[\s\S]*loadCanonicalVideoFeedPage/

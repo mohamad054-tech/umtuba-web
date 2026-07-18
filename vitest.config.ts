@@ -18,6 +18,7 @@ export default defineConfig({
       "lib/geo/**/*.test.ts",
       "lib/wallet/**/*.test.ts",
       "lib/activity-tiers/**/*.test.ts",
+      "lib/media/**/*.test.ts",
       "lib/supabase/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",

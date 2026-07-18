@@ -71,12 +71,27 @@ async function loadProfileContentStatsFromTable(
   supabase: SupabaseClient,
   userId: string
 ): Promise<ProfileContentStats> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("posts")
     .select("likes, views")
     .eq("user_id", userId)
     .eq("post_type", "video")
+    .eq("media_status", "ready")
     .not("video_path", "is", null);
+
+  let { data, error } = await query;
+
+  // Pre-migration fallback: column may not exist yet.
+  if (error && (error.message || "").toLowerCase().includes("media_status")) {
+    const legacy = await supabase
+      .from("posts")
+      .select("likes, views")
+      .eq("user_id", userId)
+      .eq("post_type", "video")
+      .not("video_path", "is", null);
+    data = legacy.data;
+    error = legacy.error;
+  }
 
   if (error) {
     console.error("loadProfileContentStatsFromTable failed:", error);
@@ -156,6 +171,7 @@ export async function listProfileVideos(
     .select(postColumns)
     .eq("user_id", userId)
     .eq("post_type", "video")
+    .eq("media_status", "ready")
     .not("video_path", "is", null)
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
