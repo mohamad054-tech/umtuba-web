@@ -3,11 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useRef, useState, type ChangeEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  AuthAlert,
-  AuthField,
-  AuthShell,
-} from "../components/auth";
+import { AuthAlert, AuthField } from "../components/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import {
   updateOwnAvatarUrl,
@@ -22,6 +18,7 @@ import {
   USERNAME_HINT,
 } from "../../lib/supabase/validation";
 import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
+import SettingsShell from "./SettingsShell";
 
 export type SettingsProfile = {
   id: string;
@@ -40,17 +37,44 @@ type FieldErrors = {
   avatar?: string;
 };
 
+type SettingsSection = "profile" | "notifications" | "account";
+
 type SettingsExperienceProps = {
   profile: SettingsProfile;
 };
+
+const SECTIONS: { id: SettingsSection; label: string; description: string }[] =
+  [
+    {
+      id: "profile",
+      label: "Profile",
+      description: "Name, username, bio, and location",
+    },
+    {
+      id: "notifications",
+      label: "Notifications",
+      description: "Email and in-app preferences",
+    },
+    {
+      id: "account",
+      label: "Account",
+      description: "Saved, rewards, and sign out",
+    },
+  ];
+
+function resolveSection(raw: string | null): SettingsSection {
+  if (raw === "notifications" || raw === "account" || raw === "profile") {
+    return raw;
+  }
+  return "profile";
+}
 
 export default function SettingsExperience({
   profile,
 }: SettingsExperienceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const highlightNotifications =
-    searchParams.get("section") === "notifications";
+  const activeSection = resolveSection(searchParams.get("section"));
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [username, setUsername] = useState(profile.username);
@@ -65,6 +89,20 @@ export default function SettingsExperience({
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  function setSection(section: SettingsSection) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (section === "profile") {
+      params.delete("section");
+    } else {
+      params.set("section", section);
+    }
+    const query = params.toString();
+    router.replace(
+      query ? `${APP_ROUTES.settings}?${query}` : APP_ROUTES.settings,
+      { scroll: false }
+    );
+  }
 
   function validate(): FieldErrors {
     const next: FieldErrors = {};
@@ -166,179 +204,275 @@ export default function SettingsExperience({
   const profileHref = buildCreatorProfileHref({ username });
 
   return (
-    <AuthShell
-      title="Edit profile"
-      subtitle="Update how you appear across UMTUBA."
-      panelTitle="Your public face."
-      panelBody="Display name, bio, and location are visible on your profile. Avatar uploads stay in your folder."
-      footer={
-        <p className="text-center text-sm text-white/50">
-          <Link
-            href={profileHref}
-            className="font-bold text-blue-200 transition hover:text-blue-100"
-          >
-            View public profile
-          </Link>
-        </p>
+    <SettingsShell
+      actions={
+        <Link
+          href={profileHref}
+          className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
+        >
+          View profile
+        </Link>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/30 p-4">
-          {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={avatarUrl}
-              alt="Your avatar"
-              className="h-16 w-16 rounded-full object-cover ring-2 ring-white/15"
-            />
-          ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white font-black text-black">
-              {avatarInitial}
+      <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+        <nav
+          aria-label="Settings sections"
+          className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
+        >
+          {SECTIONS.map((section) => {
+            const active = activeSection === section.id;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => setSection(section.id)}
+                aria-current={active ? "page" : undefined}
+                className={`watch-focus-ring shrink-0 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
+                  active
+                    ? "border-blue-400/30 bg-blue-500/15 text-blue-50"
+                    : "border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <span className="block text-sm font-black">{section.label}</span>
+                <span className="mt-0.5 hidden text-[11px] text-white/45 lg:block">
+                  {section.description}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="min-w-0 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
+          {activeSection === "profile" ? (
+            <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">Profile</h2>
+                <p className="mt-1 text-sm text-white/55">
+                  Update how you appear across UMTUBA.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/30 p-4">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt="Your avatar"
+                    className="h-16 w-16 rounded-full object-cover ring-2 ring-white/15"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white font-black text-black">
+                    {avatarInitial}
+                  </div>
+                )}
+
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                    Avatar
+                  </p>
+                  <button
+                    type="button"
+                    disabled={isUploadingAvatar || isSaving}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold transition hover:bg-white/10 disabled:opacity-50"
+                  >
+                    {isUploadingAvatar ? "Uploading..." : "Upload image"}
+                  </button>
+                  <p className="text-xs text-white/45">
+                    JPEG, PNG, WebP, or GIF. Max 2 MB.
+                  </p>
+                  {fieldErrors.avatar ? (
+                    <p role="alert" className="text-sm text-red-300">
+                      {fieldErrors.avatar}
+                    </p>
+                  ) : null}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="sr-only"
+                    onChange={handleAvatarChange}
+                  />
+                </div>
+              </div>
+
+              <AuthField
+                label="Display name"
+                name="displayName"
+                type="text"
+                autoComplete="name"
+                value={displayName}
+                disabled={isSaving}
+                error={fieldErrors.displayName}
+                onChange={(event) => {
+                  setDisplayName(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, displayName: undefined }));
+                  setFormError("");
+                  setSuccessMessage("");
+                }}
+              />
+
+              <AuthField
+                label="Username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                value={username}
+                disabled={isSaving}
+                error={fieldErrors.username}
+                hint={USERNAME_HINT}
+                onChange={(event) => {
+                  setUsername(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, username: undefined }));
+                  setFormError("");
+                  setSuccessMessage("");
+                }}
+              />
+
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                  Bio
+                </span>
+                <textarea
+                  name="bio"
+                  value={bio}
+                  disabled={isSaving}
+                  rows={4}
+                  maxLength={280}
+                  placeholder="A short intro"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60"
+                  onChange={(event) => {
+                    setBio(event.target.value);
+                    setFormError("");
+                    setSuccessMessage("");
+                  }}
+                />
+              </label>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <AuthField
+                  label="City"
+                  name="city"
+                  type="text"
+                  autoComplete="address-level2"
+                  value={city}
+                  disabled={isSaving}
+                  onChange={(event) => {
+                    setCity(event.target.value);
+                    setFormError("");
+                    setSuccessMessage("");
+                  }}
+                />
+                <AuthField
+                  label="Country"
+                  name="country"
+                  type="text"
+                  autoComplete="country-name"
+                  value={country}
+                  disabled={isSaving}
+                  onChange={(event) => {
+                    setCountry(event.target.value);
+                    setFormError("");
+                    setSuccessMessage("");
+                  }}
+                />
+              </div>
+
+              {formError ? (
+                <AuthAlert tone="error">
+                  <span role="alert">{formError}</span>
+                </AuthAlert>
+              ) : null}
+
+              {successMessage ? (
+                <AuthAlert tone="success">{successMessage}</AuthAlert>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={isSaving || isUploadingAvatar}
+                aria-busy={isSaving}
+                className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSaving ? "Saving..." : "Save profile"}
+              </button>
+            </form>
+          ) : null}
+
+          {activeSection === "notifications" ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">
+                  Notifications
+                </h2>
+                <p className="mt-1 text-sm text-white/55">
+                  Choose what you hear about across UMTUBA.
+                </p>
+              </div>
+              <NotificationPreferencesPanel highlighted />
             </div>
-          )}
+          ) : null}
 
-          <div className="min-w-0 flex-1 space-y-2">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-              Avatar
-            </p>
-            <button
-              type="button"
-              disabled={isUploadingAvatar || isSaving}
-              onClick={() => fileInputRef.current?.click()}
-              className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold transition hover:bg-white/10 disabled:opacity-50"
-            >
-              {isUploadingAvatar ? "Uploading..." : "Upload image"}
-            </button>
-            <p className="text-xs text-white/45">
-              JPEG, PNG, WebP, or GIF. Max 2 MB.
-            </p>
-            {fieldErrors.avatar ? (
-              <p role="alert" className="text-sm text-red-300">
-                {fieldErrors.avatar}
-              </p>
-            ) : null}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              className="sr-only"
-              onChange={handleAvatarChange}
-            />
-          </div>
+          {activeSection === "account" ? (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">Account</h2>
+                <p className="mt-1 text-sm text-white/55">
+                  Shortcuts and session controls.
+                </p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link
+                  href={APP_ROUTES.saved}
+                  className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
+                >
+                  <p className="text-sm font-black">Saved</p>
+                  <p className="mt-1 text-xs text-white/45">Your bookmarks</p>
+                </Link>
+                <Link
+                  href={APP_ROUTES.rewards}
+                  className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
+                >
+                  <p className="text-sm font-black">Rewards</p>
+                  <p className="mt-1 text-xs text-white/45">UM Points & invites</p>
+                </Link>
+                <Link
+                  href={profileHref}
+                  className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
+                >
+                  <p className="text-sm font-black">Public profile</p>
+                  <p className="mt-1 text-xs text-white/45">See how others view you</p>
+                </Link>
+                <Link
+                  href={APP_ROUTES.createVideo}
+                  className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
+                >
+                  <p className="text-sm font-black">Upload video</p>
+                  <p className="mt-1 text-xs text-white/45">Publish to Discover</p>
+                </Link>
+              </div>
+
+              {formError ? (
+                <AuthAlert tone="error">
+                  <span role="alert">{formError}</span>
+                </AuthAlert>
+              ) : null}
+
+              <button
+                type="button"
+                disabled={isSigningOut}
+                onClick={() => {
+                  void handleSignOut();
+                }}
+                className="watch-focus-ring w-full rounded-2xl border border-red-400/25 bg-red-500/10 py-4 font-bold text-red-100 transition hover:bg-red-500/15 disabled:opacity-50"
+              >
+                {isSigningOut ? "Signing out..." : "Sign out"}
+              </button>
+            </div>
+          ) : null}
         </div>
-
-        <AuthField
-          label="Display name"
-          name="displayName"
-          type="text"
-          autoComplete="name"
-          value={displayName}
-          disabled={isSaving}
-          error={fieldErrors.displayName}
-          onChange={(event) => {
-            setDisplayName(event.target.value);
-            setFieldErrors((prev) => ({ ...prev, displayName: undefined }));
-            setFormError("");
-            setSuccessMessage("");
-          }}
-        />
-
-        <AuthField
-          label="Username"
-          name="username"
-          type="text"
-          autoComplete="username"
-          value={username}
-          disabled={isSaving}
-          error={fieldErrors.username}
-          hint={USERNAME_HINT}
-          onChange={(event) => {
-            setUsername(event.target.value);
-            setFieldErrors((prev) => ({ ...prev, username: undefined }));
-            setFormError("");
-            setSuccessMessage("");
-          }}
-        />
-
-        <label className="block space-y-2">
-          <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-            Bio
-          </span>
-          <textarea
-            name="bio"
-            value={bio}
-            disabled={isSaving}
-            rows={4}
-            maxLength={280}
-            placeholder="A short intro"
-            className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60"
-            onChange={(event) => {
-              setBio(event.target.value);
-              setFormError("");
-              setSuccessMessage("");
-            }}
-          />
-        </label>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <AuthField
-            label="City"
-            name="city"
-            type="text"
-            autoComplete="address-level2"
-            value={city}
-            disabled={isSaving}
-            onChange={(event) => {
-              setCity(event.target.value);
-              setFormError("");
-              setSuccessMessage("");
-            }}
-          />
-          <AuthField
-            label="Country"
-            name="country"
-            type="text"
-            autoComplete="country-name"
-            value={country}
-            disabled={isSaving}
-            onChange={(event) => {
-              setCountry(event.target.value);
-              setFormError("");
-              setSuccessMessage("");
-            }}
-          />
-        </div>
-
-        <NotificationPreferencesPanel highlighted={highlightNotifications} />
-
-        {formError ? (
-          <AuthAlert tone="error">
-            <span role="alert">{formError}</span>
-          </AuthAlert>
-        ) : null}
-
-        {successMessage ? (
-          <AuthAlert tone="success">{successMessage}</AuthAlert>
-        ) : null}
-
-        <button
-          type="submit"
-          disabled={isSaving || isUploadingAvatar}
-          aria-busy={isSaving}
-          className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isSaving ? "Saving..." : "Save profile"}
-        </button>
-
-        <button
-          type="button"
-          disabled={isSigningOut}
-          onClick={handleSignOut}
-          className="watch-focus-ring w-full rounded-2xl border border-white/10 py-4 font-bold transition hover:bg-white/10 disabled:opacity-50"
-        >
-          {isSigningOut ? "Signing out..." : "Sign out"}
-        </button>
-      </form>
-    </AuthShell>
+      </div>
+    </SettingsShell>
   );
 }

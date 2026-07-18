@@ -18,10 +18,10 @@ export default async function CreatorInsightsPage() {
   const insights = await getMyCreatorInsights(supabase);
 
   return (
-    <main className="min-h-screen bg-[#050510] text-white">
+    <main className="min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
+      <AppTopNav title="AI Insights" subtitle="Creator" />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="AI Insights" subtitle="Creator" />
-        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
+        <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Creator
           </p>

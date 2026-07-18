@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "../../lib/supabase/client";
@@ -11,9 +11,10 @@ import {
   type UserProfile,
 } from "../../lib/supabase/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
+import { buildUserMenuGroups } from "../lib/nav/userMenuItems";
 
 /**
- * Account menu for AppTopNav (including /live).
+ * Account menu for AppTopNav (including /live and Watch).
  *
  * Auth source of truth: Supabase browser client session via
  * `onAuthStateChange(event, session)` + initial `getUser()`.
@@ -24,6 +25,7 @@ export default function UserMenu() {
   const router = useRouter();
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -55,7 +57,6 @@ export default function UserMenu() {
       } catch (error) {
         console.error(error);
         if (!isActive) return;
-        // Still authenticated — show a minimal menu identity instead of Sign in.
         const fallbackName =
           (typeof user.user_metadata?.display_name === "string" &&
             user.user_metadata.display_name) ||
@@ -72,9 +73,7 @@ export default function UserMenu() {
           avatar_url: null,
           avatar_initial: fallbackName.charAt(0).toUpperCase() || "U",
         });
-        setErrorMessage(
-          error instanceof Error ? error.message : "Unable to load profile."
-        );
+        setErrorMessage("Unable to load profile.");
       } finally {
         if (isActive) {
           setIsLoading(false);
@@ -82,7 +81,6 @@ export default function UserMenu() {
       }
     }
 
-    // Initial hydrate from validated JWT (same source Live pages use).
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!isActive) return;
       if (error) {
@@ -94,7 +92,6 @@ export default function UserMenu() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Use session from the callback — do not call getUser() here.
       void applyUser(session?.user ?? null);
     });
 
@@ -138,9 +135,7 @@ export default function UserMenu() {
       router.refresh();
     } catch (error) {
       console.error(error);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Unable to sign out."
-      );
+      setErrorMessage("Unable to sign out.");
     } finally {
       setIsSigningOut(false);
     }
@@ -157,9 +152,7 @@ export default function UserMenu() {
       router.refresh();
     } catch (error) {
       console.error(error);
-      setErrorMessage(
-        error instanceof Error ? error.message : "Unable to switch account."
-      );
+      setErrorMessage("Unable to switch account.");
     } finally {
       setIsSigningOut(false);
     }
@@ -178,7 +171,7 @@ export default function UserMenu() {
     return (
       <Link
         href={loginHref}
-        className="relative z-[60] shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
+        className="watch-focus-ring relative z-[60] shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
       >
         Sign in
       </Link>
@@ -186,15 +179,19 @@ export default function UserMenu() {
   }
 
   const profileHref = buildCreatorProfileHref({ username: profile.username });
+  const menuGroups = buildUserMenuGroups(profileHref);
 
   return (
     <div ref={rootRef} className="relative z-[60] shrink-0">
       <button
         type="button"
+        id={`${menuId}-trigger`}
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1 pl-1 pr-2.5 text-left transition hover:bg-white/10 sm:max-w-[14rem]"
+        aria-controls={open ? `${menuId}-menu` : undefined}
+        aria-label="Account menu"
+        className="watch-focus-ring flex max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1 pl-1 pr-2.5 text-left transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 sm:max-w-[14rem]"
         title={profile.display_name || profile.username}
       >
         <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-[11px] font-black text-black">
@@ -221,7 +218,9 @@ export default function UserMenu() {
 
       {open ? (
         <div
+          id={`${menuId}-menu`}
           role="menu"
+          aria-labelledby={`${menuId}-trigger`}
           className="absolute right-0 top-[calc(100%+0.5rem)] z-[80] w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a18] shadow-[0_16px_48px_rgba(0,0,0,0.55)]"
         >
           <div className="border-b border-white/10 px-3.5 py-3">
@@ -231,23 +230,31 @@ export default function UserMenu() {
             <p className="truncate text-xs text-white/45">@{profile.username}</p>
           </div>
 
-          <div className="p-1.5">
-            <Link
-              role="menuitem"
-              href={profileHref}
-              onClick={() => setOpen(false)}
-              className="block rounded-xl px-3 py-2 text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white"
+          {menuGroups.map((group) => (
+            <div
+              key={group.id}
+              role="group"
+              aria-label={group.label}
+              className="border-b border-white/10 p-1.5 last:border-b-0"
             >
-              Profile
-            </Link>
-            <Link
-              role="menuitem"
-              href={APP_ROUTES.settings}
-              onClick={() => setOpen(false)}
-              className="block rounded-xl px-3 py-2 text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white"
-            >
-              Settings
-            </Link>
+              <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+                {group.label}
+              </p>
+              {group.items.map((item) => (
+                <Link
+                  key={item.id}
+                  role="menuitem"
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="watch-focus-ring block rounded-xl px-3 py-2 text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white focus-visible:bg-white/5 focus-visible:outline-none"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+
+          <div role="group" aria-label="Session" className="p-1.5">
             <button
               type="button"
               role="menuitem"
@@ -255,7 +262,7 @@ export default function UserMenu() {
                 void handleSwitchAccount();
               }}
               disabled={isSigningOut}
-              className="w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="watch-focus-ring w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white focus-visible:bg-white/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSigningOut ? "Switching…" : "Switch account"}
             </button>
@@ -266,14 +273,14 @@ export default function UserMenu() {
                 void handleSignOut();
               }}
               disabled={isSigningOut}
-              className="w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-red-200/90 transition hover:bg-red-500/10 hover:text-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+              className="watch-focus-ring w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-red-200/90 transition hover:bg-red-500/10 hover:text-red-100 focus-visible:bg-red-500/10 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSigningOut ? "Signing out…" : "Sign out"}
             </button>
           </div>
 
           {errorMessage ? (
-            <p className="border-t border-white/10 px-3.5 py-2 text-[11px] text-red-300">
+            <p className="border-t border-white/10 px-3.5 py-2 text-[11px] text-red-300" role="alert">
               {errorMessage}
             </p>
           ) : null}

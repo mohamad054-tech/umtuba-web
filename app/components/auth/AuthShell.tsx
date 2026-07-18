@@ -40,9 +40,6 @@ export default function AuthShell({
             </Link>
 
             <div className="mt-24">
-              <p className="mb-4 inline-flex rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-blue-100">
-                Accounts V1
-              </p>
               <h1 className="text-5xl font-black leading-none tracking-tight">
                 {panelTitle}
               </h1>

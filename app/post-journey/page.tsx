@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import LeftSidebar from "../components/LeftSidebar";
-import TopNavbar from "../components/TopNavbar";
+import AppTopNav from "../components/AppTopNav";
 import PostJourneyGlobeSection from "./PostJourneyGlobeSection";
 import { postJourneyMetadata } from "../../lib/site/routeMetadata";
 import { createClient } from "../../lib/supabase/server";
@@ -64,11 +63,29 @@ export default async function PostJourneyPage({
 
   return (
     <main className="min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
-      <TopNavbar />
+      <AppTopNav
+        title="Post Journey"
+        subtitle="Global reach"
+        actions={
+          hasPost ? (
+            <Link
+              href={buildPostNotificationHref({ postId })}
+              className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90"
+            >
+              Open post
+            </Link>
+          ) : (
+            <Link
+              href={APP_ROUTES.discover}
+              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10"
+            >
+              Discover
+            </Link>
+          )
+        }
+      />
 
-      <div className="mx-auto grid max-w-[1420px] grid-cols-1 gap-7 px-5 py-8 md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)_300px]">
-        <LeftSidebar />
-
+      <div className="mx-auto grid max-w-[1420px] grid-cols-1 gap-7 px-5 py-8 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section className="min-w-0">
           <div className="overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#17112f] via-[#0e1024] to-[#071d20] p-7">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -87,22 +104,6 @@ export default async function PostJourneyPage({
                     : "Open a journey notification or add ?postId= to see real country reach for a post."}
                 </p>
               </div>
-
-              {hasPost ? (
-                <Link
-                  href={buildPostNotificationHref({ postId })}
-                  className="rounded-2xl bg-white px-5 py-3 text-center font-black text-black transition hover:bg-white/90"
-                >
-                  Open post
-                </Link>
-              ) : (
-                <Link
-                  href={APP_ROUTES.discover}
-                  className="rounded-2xl bg-white px-5 py-3 text-center font-black text-black transition hover:bg-white/90"
-                >
-                  Explore Discover
-                </Link>
-              )}
             </div>
           </div>
 

@@ -46,9 +46,9 @@ export default async function RewardsPage() {
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      <AppTopNav title="UM Points" subtitle="Rewards" />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="UM Points" subtitle="Rewards" />
-        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
+        <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Rewards
           </p>

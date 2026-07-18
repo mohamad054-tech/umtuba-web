@@ -12,6 +12,7 @@ import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndi
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
 import CommentsPanel from "../components/social/CommentsPanel";
+import UserMenu from "../components/UserMenu";
 import {
   loadWatchFeedPageAction,
 } from "../actions/loadWatchFeed";
@@ -303,16 +304,7 @@ export default function WatchExperience({
           <ActivityTierIndicator compact />
           <WalletBalanceIndicator compact />
           <NotificationBell />
-          {prototypePanelsAllowed ? (
-            <button
-              type="button"
-              onClick={() => handleOpenPanel("related")}
-              disabled={journeyTransitionActive}
-              className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
-            >
-              Related
-            </button>
-          ) : null}
+          <UserMenu />
 
           <Link
             href={APP_ROUTES.discover}
@@ -325,6 +317,7 @@ export default function WatchExperience({
             type="button"
             onClick={handleToggleFullscreen}
             disabled={journeyTransitionActive}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
           >
             {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}

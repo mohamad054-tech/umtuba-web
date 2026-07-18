@@ -27,11 +27,6 @@ export default async function CreateVideoPage() {
 
       <AppTopNav
         title="Create"
-        badge={
-          <span className="hidden rounded-full border border-blue-400/30 bg-blue-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-blue-100 sm:inline-flex">
-            Video V1
-          </span>
-        }
         subtitle="Upload to Discover"
         actions={
           <Link

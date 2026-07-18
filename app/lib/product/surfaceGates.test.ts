@@ -126,13 +126,13 @@ describe("production source contracts", () => {
   it("does not point normal nav at gated labs", () => {
     const mobile = readFileSync(join(ROOT, "app/lib/nav/mobileNav.ts"), "utf8");
     const routes = readFileSync(join(ROOT, "app/lib/nav/routes.ts"), "utf8");
-    const sidebar = readFileSync(
-      join(ROOT, "app/components/LeftSidebar.tsx"),
+    const userMenu = readFileSync(
+      join(ROOT, "app/lib/nav/userMenuItems.ts"),
       "utf8"
     );
     const watch = readFileSync(join(ROOT, "app/watch/WatchExperience.tsx"), "utf8");
 
-    for (const src of [mobile, routes, sidebar, watch]) {
+    for (const src of [mobile, routes, userMenu, watch]) {
       expect(src).not.toMatch(/["']\/feed["']/);
       expect(src).not.toMatch(/["']\/journey-pro["']/);
       expect(src).not.toMatch(/href:\s*["']\/city/);

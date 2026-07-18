@@ -33,3 +33,10 @@ export {
   type MobilePrimaryNavId,
   type MobilePrimaryNavItem,
 } from "./mobileNav";
+
+export {
+  buildUserMenuGroups,
+  listUserMenuHrefs,
+  type UserMenuGroup,
+  type UserMenuLinkItem,
+} from "./userMenuItems";

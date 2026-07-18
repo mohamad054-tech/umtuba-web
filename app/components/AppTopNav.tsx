@@ -14,6 +14,8 @@ type AppTopNavProps = {
   badge?: ReactNode;
   subtitle?: string;
   actions?: ReactNode;
+  /** Sticky chrome (default). Pass false for surfaces that manage their own sticky wrapper. */
+  sticky?: boolean;
 };
 
 export default function AppTopNav({
@@ -21,16 +23,22 @@ export default function AppTopNav({
   badge,
   subtitle,
   actions,
+  sticky = true,
 }: AppTopNavProps) {
   const pathname = usePathname();
 
   return (
-    <header className="relative z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur-xl">
+    <header
+      className={`relative z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur-xl ${
+        sticky ? "sticky top-0" : ""
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-2 px-3 md:gap-4 md:px-6">
         <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <Link
             href={APP_ROUTES.home}
-            className="watch-focus-ring shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
+            aria-label="UMTUBA home"
+            className="watch-focus-ring shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
           >
             UMTUBA
           </Link>
@@ -59,7 +67,7 @@ export default function AppTopNav({
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs ${
+                className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
                   active
                     ? "border border-blue-400/30 bg-blue-500/15 text-blue-100"
                     : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
@@ -87,4 +95,3 @@ export default function AppTopNav({
     </header>
   );
 }
-

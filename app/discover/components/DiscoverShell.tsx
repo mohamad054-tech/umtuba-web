@@ -22,23 +22,19 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
       <div className="sticky top-0 z-40">
         <AppTopNav
           title="Discover"
-          badge={
-            <span className="hidden rounded-full border border-blue-400/30 bg-blue-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-blue-100 sm:inline-flex">
-              Feed V1
-            </span>
-          }
+          sticky={false}
           subtitle="Vertical short-video discovery"
           actions={
             <div className="flex items-center gap-2">
               <Link
                 href={APP_ROUTES.saved}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10"
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
               >
                 Saved
               </Link>
               <Link
                 href={APP_ROUTES.createVideo}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90"
+                className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
               >
                 Upload
               </Link>

@@ -35,6 +35,7 @@ export default function LiveShell({
       <div className="sticky top-0 z-50 overflow-visible">
         <AppTopNav
           title="Live"
+          sticky={false}
           badge={
             <span className="inline-flex items-center gap-1.5 rounded-full border border-red-400/35 bg-red-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.2em] text-red-200">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />

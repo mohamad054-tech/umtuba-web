@@ -35,7 +35,7 @@ export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] = [
   { id: "discover", label: "Discover", href: APP_ROUTES.discover },
   { id: "live", label: "Live", href: APP_ROUTES.live },
   { id: "messages", label: "Messages", href: APP_ROUTES.messages },
-  { id: "profile", label: "Profile", href: APP_ROUTES.settings },
+  { id: "profile", label: "Profile", href: APP_ROUTES.profile },
 ];
 
 const LIVE_ROOM_PATH_RE = /^\/live\/(?!media-lab(?:\/|$))[^/]+/;
@@ -102,7 +102,7 @@ export function resolveMobileProfileHref(username: string | null | undefined): s
   if (normalized) {
     return buildCreatorProfileHref({ username: normalized });
   }
-  return `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.settings)}`;
+  return `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.profile)}`;
 }
 
 /** Tailwind-friendly padding utility for shells that sit above the bottom nav. */

@@ -95,17 +95,13 @@ describe("resolveMobileProfileHref", () => {
     expect(resolveMobileProfileHref("Creator_One")).toBe("/profile/creator_one");
     expect(resolveMobileProfileHref(null)).toContain("/login?");
     expect(resolveMobileProfileHref(null)).toContain(
-      encodeURIComponent(APP_ROUTES.settings)
+      encodeURIComponent(APP_ROUTES.profile)
     );
   });
 });
 
 describe("dead future routes", () => {
-  it("does not link LeftSidebar or mobile nav to missing product routes", () => {
-    const sidebar = readFileSync(
-      join(process.cwd(), "app/components/LeftSidebar.tsx"),
-      "utf8"
-    );
+  it("does not link mobile or top nav to missing product routes", () => {
     const mobileNav = readFileSync(
       join(process.cwd(), "app/lib/nav/mobileNav.ts"),
       "utf8"
@@ -114,12 +110,23 @@ describe("dead future routes", () => {
       join(process.cwd(), "app/components/AppTopNav.tsx"),
       "utf8"
     );
+    const userMenu = readFileSync(
+      join(process.cwd(), "app/lib/nav/userMenuItems.ts"),
+      "utf8"
+    );
 
-    for (const src of [sidebar, mobileNav, topNav]) {
+    for (const src of [mobileNav, topNav, userMenu]) {
       expect(src).not.toMatch(/href:\s*["']\/ai["']/);
       expect(src).not.toMatch(/["']\/ideas["']/);
       expect(src).not.toMatch(/["']\/opportunities["']/);
       expect(src).not.toMatch(/["']\/uconnect["']/);
     }
+  });
+
+  it("uses profile route for the Profile tab config href", () => {
+    const profileItem = MOBILE_PRIMARY_NAV_ITEMS.find(
+      (item) => item.id === "profile"
+    );
+    expect(profileItem?.href).toBe(APP_ROUTES.profile);
   });
 });
