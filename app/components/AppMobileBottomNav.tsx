@@ -73,6 +73,7 @@ export default function AppMobileBottomNav() {
   const pathname = usePathname() || "/";
   const visible = shouldShowMobileBottomNav(pathname);
   const [profileUsername, setProfileUsername] = useState<string | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
     if (!visible) {
@@ -100,9 +101,11 @@ export default function AppMobileBottomNav() {
     async function applyUser(user: User | null) {
       if (!active) return;
       if (!user) {
+        setSignedIn(false);
         setProfileUsername(null);
         return;
       }
+      setSignedIn(true);
       try {
         const profile = await getProfileForUser(user);
         if (!active) return;
@@ -145,7 +148,7 @@ export default function AppMobileBottomNav() {
         {MOBILE_PRIMARY_NAV_ITEMS.map((item) => {
           const href =
             item.id === "profile"
-              ? resolveMobileProfileHref(profileUsername)
+              ? resolveMobileProfileHref(profileUsername, { signedIn })
               : item.href;
           const active = isMobilePrimaryNavActive(pathname, item.id);
 

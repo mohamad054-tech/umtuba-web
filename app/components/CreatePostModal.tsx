@@ -14,6 +14,7 @@ import {
   createPost,
   uploadPostImage,
 } from "../../lib/supabase/posts";
+import { APP_ROUTES } from "../lib/nav";
 
 type CreatePostModalProps = {
   open: boolean;
@@ -269,12 +270,15 @@ export default function CreatePostModal({
           <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
             <p>
               You need an account to publish.{" "}
-              <Link href="/login" className="font-bold text-white underline">
+              <Link
+                href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.discover)}`}
+                className="font-bold text-white underline"
+              >
                 Sign in
               </Link>{" "}
               or{" "}
               <Link
-                href="/register"
+                href={`${APP_ROUTES.signup}?next=${encodeURIComponent(APP_ROUTES.discover)}`}
                 className="font-bold text-white underline"
               >
                 create an account

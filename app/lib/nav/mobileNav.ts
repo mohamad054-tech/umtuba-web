@@ -97,10 +97,18 @@ export function isMobilePrimaryNavActive(
   }
 }
 
-export function resolveMobileProfileHref(username: string | null | undefined): string {
+export function resolveMobileProfileHref(
+  username: string | null | undefined,
+  options?: { signedIn?: boolean }
+): string {
   const normalized = username?.trim().replace(/^@+/, "");
   if (normalized) {
     return buildCreatorProfileHref({ username: normalized });
+  }
+  // Signed-in users without a resolved username hit `/profile`, which redirects
+  // to their username (or Settings) — never a dead page.
+  if (options?.signedIn) {
+    return APP_ROUTES.profile;
   }
   return `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.profile)}`;
 }

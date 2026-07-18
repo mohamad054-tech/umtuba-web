@@ -46,11 +46,8 @@ export default function ActivityTierIndicator({
       setProfileHref(href);
       return href;
     } catch {
-      const fallback = buildCreatorProfileHref({
-        username: `user_${user.id.slice(0, 8)}`,
-      });
-      setProfileHref(fallback);
-      return fallback;
+      setProfileHref(APP_ROUTES.settings);
+      return APP_ROUTES.settings;
     }
   }, []);
 

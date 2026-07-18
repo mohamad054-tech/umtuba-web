@@ -67,7 +67,7 @@ export default function CommentsPanel({
   const [comments, setComments] = useState<PostCommentDTO[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loadEpoch, setLoadEpoch] = useState(0);
-  const [draft, setDraft] = useState(() => readCommentDraft(postId));
+  const [draft, setDraft] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [requiresAuth, setRequiresAuth] = useState(false);

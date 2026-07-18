@@ -63,7 +63,7 @@ describe("rewards & profile journey hardening", () => {
 
   it("does not invent zero UM Points when rewards summary fails", () => {
     const page = read("app/rewards/page.tsx");
-    expect(page).toMatch(/ProductErrorState/);
+    expect(page).toMatch(/RewardsLoadError|ProductErrorState/);
     expect(page).toMatch(/if \(!summary\)/);
     expect(page).not.toMatch(/summary\?\.balance \?\? 0/);
   });

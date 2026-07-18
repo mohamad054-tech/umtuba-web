@@ -4,7 +4,7 @@ import { messagesMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
-import { APP_ROUTES } from "../lib/nav";
+import { APP_ROUTES, isUuid } from "../lib/nav";
 import MessagesExperience from "./MessagesExperience";
 
 export const metadata = messagesMetadata;
@@ -46,6 +46,7 @@ function buildMessagesNextPath(
   const creatorId = firstParam(params.creatorId);
   const creatorName = firstParam(params.creatorName);
   const intent = firstParam(params.intent);
+  const message = firstParam(params.message);
 
   if (conversation) {
     query.set("conversation", conversation);
@@ -61,6 +62,10 @@ function buildMessagesNextPath(
 
   if (intent) {
     query.set("intent", intent);
+  }
+
+  if (message && isUuid(message)) {
+    query.set("message", message.trim());
   }
 
   const qs = query.toString();

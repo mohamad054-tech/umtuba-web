@@ -2,9 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import AppTopNav from "../components/AppTopNav";
-import ProductErrorState from "../components/product/ProductErrorState";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
-import { FRIENDLY_LOAD_ERROR } from "../lib/product/userFacingMessage";
 import { rewardsMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
@@ -15,6 +13,7 @@ import { getMyReferralStats } from "../../lib/supabase/referral";
 import { nextUmPointsMilestone } from "../../lib/rewards/umPointsConfig";
 import { formatRelativeTime } from "../notifications/lib/formatRelativeTime";
 import InviteShareCard from "./components/InviteShareCard";
+import RewardsLoadError from "./components/RewardsLoadError";
 
 export const metadata = rewardsMetadata;
 
@@ -41,19 +40,8 @@ export default async function RewardsPage() {
       >
         <AppTopNav title="UM Points" subtitle="Rewards" />
         <div className="mx-auto flex max-w-3xl justify-center px-4 py-10 md:px-6">
-          <ProductErrorState
-            title="Couldn't load UM Points"
-            message={FRIENDLY_LOAD_ERROR}
-          />
+          <RewardsLoadError />
         </div>
-        <p className="pb-10 text-center text-xs text-white/40">
-          <Link
-            href={APP_ROUTES.rewards}
-            className="watch-focus-ring font-bold text-blue-200 hover:text-blue-100"
-          >
-            Try again
-          </Link>
-        </p>
       </main>
     );
   }

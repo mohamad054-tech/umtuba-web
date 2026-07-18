@@ -93,6 +93,9 @@ describe("desktop vs mobile nav contracts", () => {
 describe("resolveMobileProfileHref", () => {
   it("links signed-in users to their profile and others to login", () => {
     expect(resolveMobileProfileHref("Creator_One")).toBe("/profile/creator_one");
+    expect(resolveMobileProfileHref(null, { signedIn: true })).toBe(
+      APP_ROUTES.profile
+    );
     expect(resolveMobileProfileHref(null)).toContain("/login?");
     expect(resolveMobileProfileHref(null)).toContain(
       encodeURIComponent(APP_ROUTES.profile)
