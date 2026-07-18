@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   buildLiveBetaReadiness,
   isTechnicalLiveMessage,
+  LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE,
+  LIVE_MEDIA_CONNECT_FAILED_MESSAGE,
   LIVE_MEDIA_NOT_CONFIGURED_MESSAGE,
+  LIVE_MUTED_BY_HOST_MESSAGE,
+  LIVE_REMOVED_FROM_STAGE_MESSAGE,
   LIVE_TEMPORARILY_UNAVAILABLE_MESSAGE,
   toLiveUserFacingMessage,
 } from "./index";
@@ -23,6 +27,12 @@ describe("live user-facing copy", () => {
       true
     );
     expect(isTechnicalLiveMessage("Unable to load live rooms.")).toBe(false);
+    expect(
+      isTechnicalLiveMessage("could not establish websocket connection")
+    ).toBe(true);
+    expect(isTechnicalLiveMessage("Connection refused to media server")).toBe(
+      true
+    );
   });
 
   it("replaces technical messages with human fallback", () => {
@@ -36,8 +46,29 @@ describe("live user-facing copy", () => {
         "Set NEXT_PUBLIC_LIVEKIT_URL to your LiveKit wss:// URL."
       )
     ).toBe(LIVE_TEMPORARILY_UNAVAILABLE_MESSAGE);
+    expect(
+      toLiveUserFacingMessage(
+        "could not establish websocket connection",
+        LIVE_MEDIA_CONNECT_FAILED_MESSAGE
+      )
+    ).toBe(LIVE_MEDIA_CONNECT_FAILED_MESSAGE);
     expect(toLiveUserFacingMessage("This live room has ended.")).toBe(
       "This live room has ended."
+    );
+  });
+
+  it("keeps host moderation and stage-status product copy", () => {
+    expect(toLiveUserFacingMessage(LIVE_MUTED_BY_HOST_MESSAGE)).toBe(
+      LIVE_MUTED_BY_HOST_MESSAGE
+    );
+    expect(toLiveUserFacingMessage(LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE)).toBe(
+      LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE
+    );
+    expect(toLiveUserFacingMessage(LIVE_REMOVED_FROM_STAGE_MESSAGE)).toBe(
+      LIVE_REMOVED_FROM_STAGE_MESSAGE
+    );
+    expect(toLiveUserFacingMessage(LIVE_MEDIA_CONNECT_FAILED_MESSAGE)).toBe(
+      LIVE_MEDIA_CONNECT_FAILED_MESSAGE
     );
   });
 });

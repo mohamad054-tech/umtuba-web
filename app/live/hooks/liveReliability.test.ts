@@ -273,3 +273,43 @@ describe("live reliability contracts", () => {
     expect(presence).toMatch(/channelRef\.current\?\.state === ["']joined["']/);
   });
 });
+
+describe("live harden (beta readiness)", () => {
+  it("sanitizes connect/token failures and surfaces host device enforcement", () => {
+    const session = read("app/live/hooks/useLiveMediaSession.ts");
+    expect(session).toMatch(/toLiveUserFacingMessage/);
+    expect(session).toMatch(/LIVE_MEDIA_CONNECT_FAILED_MESSAGE/);
+    expect(session).toMatch(/LIVE_MUTED_BY_HOST_MESSAGE/);
+    expect(session).toMatch(/LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE/);
+    expect(session).toMatch(/statusMessage = LIVE_MUTED_BY_HOST_MESSAGE/);
+    expect(session).toMatch(
+      /statusMessage = LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE/
+    );
+  });
+
+  it("notifies when removed from stage and offers room load retry", () => {
+    const experience = read("app/live/LiveRoomExperience.tsx");
+    expect(experience).toMatch(/LIVE_REMOVED_FROM_STAGE_MESSAGE/);
+    expect(experience).toMatch(/prevMyStageStatusRef/);
+    expect(experience).toMatch(/stageStatusNotice/);
+    expect(experience).toMatch(/Try again/);
+    expect(experience).toMatch(/toLiveUserFacingMessage\(\s*loadError/);
+  });
+
+  it("sanitizes control media errors and labels device buttons", () => {
+    const controls = read("app/live/components/LiveStreamControls.tsx");
+    expect(controls).toMatch(/toLiveUserFacingMessage/);
+    expect(controls).toMatch(/safeMediaError/);
+    expect(controls).toMatch(/aria-label=\{micEnabled/);
+    expect(controls).toMatch(/aria-label=\{cameraEnabled/);
+    expect(controls).toMatch(/aria-label=\{\s*screenSharing/);
+    expect(controls).toMatch(/aria-label="Switch camera"/);
+  });
+
+  it("collaboration panel uses shared dialog a11y helper", () => {
+    const panel = read("app/live/components/LiveCollaborationPanel.tsx");
+    expect(panel).toMatch(/useDialogA11y/);
+    expect(panel).toMatch(/initialFocusRef:\s*closeRef/);
+    expect(panel).not.toMatch(/document\.addEventListener\("keydown"/);
+  });
+});

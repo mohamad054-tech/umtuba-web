@@ -1,5 +1,7 @@
 "use client";
 
+import { toLiveUserFacingMessage } from "../../../lib/live";
+
 type LiveStreamControlsProps = {
   muted: boolean;
   /** @deprecated Captions are Coming soon — kept for call-site compatibility. */
@@ -80,6 +82,9 @@ export default function LiveStreamControls({
   // Prefer aria-disabled so clicks still fire and can surface status/errors
   // instead of silently ignoring input when media is connecting/busy.
   const deviceControlsBlocked = !mediaConnected || mediaDeviceBusy;
+  const safeMediaError = mediaError
+    ? toLiveUserFacingMessage(mediaError)
+    : null;
 
   return (
     <div
@@ -125,6 +130,7 @@ export default function LiveStreamControls({
             type="button"
             data-testid="live-toggle-mic"
             onClick={onToggleMic}
+            aria-label={micEnabled ? "Mute microphone" : "Unmute microphone"}
             aria-disabled={deviceControlsBlocked}
             aria-busy={mediaDeviceBusy}
             aria-pressed={micEnabled}
@@ -150,6 +156,7 @@ export default function LiveStreamControls({
             type="button"
             data-testid="live-toggle-camera"
             onClick={onToggleCamera}
+            aria-label={cameraEnabled ? "Turn camera off" : "Turn camera on"}
             aria-disabled={deviceControlsBlocked}
             aria-busy={mediaBusyKind === "camera"}
             aria-pressed={cameraEnabled}
@@ -174,6 +181,7 @@ export default function LiveStreamControls({
           <button
             type="button"
             onClick={onSwitchCamera}
+            aria-label="Switch camera"
             aria-disabled={deviceControlsBlocked || !cameraEnabled}
             className={controlBtn}
           >
@@ -186,6 +194,9 @@ export default function LiveStreamControls({
             type="button"
             data-testid="live-toggle-screen"
             onClick={onToggleScreenShare}
+            aria-label={
+              screenSharing ? "Stop screen share" : "Share screen"
+            }
             aria-disabled={deviceControlsBlocked}
             aria-busy={mediaBusyKind === "screen"}
             aria-pressed={screenSharing}
@@ -266,13 +277,13 @@ export default function LiveStreamControls({
         </p>
       ) : null}
 
-      {mediaError ? (
+      {safeMediaError ? (
         <p
           className="text-xs font-medium text-red-200/95"
           role="alert"
           data-testid="live-media-error"
         >
-          {mediaError}
+          {safeMediaError}
         </p>
       ) : null}
     </div>

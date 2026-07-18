@@ -15,6 +15,17 @@ export const LIVE_MEDIA_UNAVAILABLE_MESSAGE =
 export const LIVE_MEDIA_NOT_CONFIGURED_MESSAGE =
   "Live video is temporarily unavailable. Please try again later.";
 
+export const LIVE_MUTED_BY_HOST_MESSAGE = "You are muted by the host.";
+
+export const LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE =
+  "Your camera was disabled by the host.";
+
+export const LIVE_REMOVED_FROM_STAGE_MESSAGE =
+  "You were removed from the stage.";
+
+export const LIVE_MEDIA_CONNECT_FAILED_MESSAGE =
+  "Unable to connect to live media. Please try again.";
+
 const TECHNICAL_PATTERNS: RegExp[] = [
   /\.sql\b/i,
   /supabase\/migrations/i,
@@ -34,6 +45,8 @@ const TECHNICAL_PATTERNS: RegExp[] = [
   /wss:\/\//i,
   /api[_-]?key/i,
   /api[_-]?secret/i,
+  /websocket/i,
+  /connection refused/i,
 ];
 
 const ALLOWED_PREFIXES = [
@@ -45,15 +58,23 @@ const ALLOWED_PREFIXES = [
   "live room",
   "live is",
   "live video",
+  "live media",
   "network",
   "reconnecting",
   "realtime",
   "you cannot",
+  "you are",
+  "you were",
+  "your camera",
   "media room",
   "title must",
   "message must",
   "invalid",
   "reported",
+  "camera",
+  "microphone",
+  "screen",
+  "no alternate",
 ];
 
 export function isTechnicalLiveMessage(message: string): boolean {

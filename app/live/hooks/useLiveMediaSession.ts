@@ -28,6 +28,12 @@ import {
   classifyMediaCaptureError,
   isRoomMediaConnected,
 } from "./mediaDeviceErrors";
+import {
+  LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE,
+  LIVE_MEDIA_CONNECT_FAILED_MESSAGE,
+  LIVE_MUTED_BY_HOST_MESSAGE,
+  toLiveUserFacingMessage,
+} from "../../../lib/live";
 
 export type LiveStageTile = {
   identity: string;
@@ -450,7 +456,12 @@ export function useLiveMediaSession(
       }
 
       if (!tokenResult.ok) {
-        setError(tokenResult.message);
+        setError(
+          toLiveUserFacingMessage(
+            tokenResult.message,
+            LIVE_MEDIA_CONNECT_FAILED_MESSAGE
+          )
+        );
         setConnectionState("error");
         scheduleUnexpectedReconnect(generation);
         return;
@@ -562,11 +573,13 @@ export function useLiveMediaSession(
         const message =
           err instanceof Error
             ? err.message
-            : "Unable to connect to live media.";
+            : LIVE_MEDIA_CONNECT_FAILED_MESSAGE;
         if (isBenignDisconnectMessage(message)) {
           return;
         }
-        setError(message);
+        setError(
+          toLiveUserFacingMessage(message, LIVE_MEDIA_CONNECT_FAILED_MESSAGE)
+        );
         setConnectionState("error");
         scheduleUnexpectedReconnect(generation);
       }
@@ -638,21 +651,27 @@ export function useLiveMediaSession(
 
     void (async () => {
       let changed = false;
+      let statusMessage: string | null = null;
       if (me.mutedByHost && room.localParticipant.isMicrophoneEnabled) {
         await room.localParticipant.setMicrophoneEnabled(false);
         desiredDevicesRef.current.mic = false;
         changed = true;
+        statusMessage = LIVE_MUTED_BY_HOST_MESSAGE;
       }
       if (me.cameraDisabledByHost && room.localParticipant.isCameraEnabled) {
         await room.localParticipant.setCameraEnabled(false);
         desiredDevicesRef.current.camera = false;
         changed = true;
+        statusMessage = LIVE_CAMERA_DISABLED_BY_HOST_MESSAGE;
       }
       if (!me.canShareScreen && room.localParticipant.isScreenShareEnabled) {
         await room.localParticipant.setScreenShareEnabled(false);
         changed = true;
       }
       if (changed) {
+        if (statusMessage) {
+          setError(statusMessage);
+        }
         rebuildTiles();
       }
     })();

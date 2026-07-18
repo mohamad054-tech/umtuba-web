@@ -72,7 +72,10 @@ import type {
   LiveStageRequest,
 } from "./types";
 import { LIVE_DEFAULT_MAX_ON_STAGE } from "./types";
-import { toLiveUserFacingMessage } from "../../lib/live/liveUserFacingCopy";
+import {
+  LIVE_REMOVED_FROM_STAGE_MESSAGE,
+  toLiveUserFacingMessage,
+} from "../../lib/live";
 
 const LiveCollaborationPanel = dynamic(
   () => import("./components/LiveCollaborationPanel"),
@@ -133,6 +136,9 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const [myInvites, setMyInvites] = useState<LiveStageInvitation[]>([]);
   const [stageBusy, setStageBusy] = useState(false);
   const [seatAvailableNotify, setSeatAvailableNotify] = useState(false);
+  const [stageStatusNotice, setStageStatusNotice] = useState<string | null>(
+    null
+  );
   const anonPresenceKey = useAnonPresenceKey();
   const presenceKey = authUserId
     ? `u-${authUserId}`
@@ -149,6 +155,7 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
   const participantsRef = useRef<LiveParticipant[]>([]);
   const participantsRefreshTimerRef = useRef<number | null>(null);
   const prevOnStageCountRef = useRef(0);
+  const prevMyStageStatusRef = useRef<string | null | undefined>(undefined);
 
   const roomIdValid = isUuid(roomId);
 
@@ -160,6 +167,19 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
     Boolean(room?.isHost) ||
     room?.myRole === "co_host" ||
     myParticipant?.role === "co_host";
+
+  useEffect(() => {
+    const nextStatus = myParticipant?.stageStatus ?? null;
+    const prev = prevMyStageStatusRef.current;
+    // Only after a known prior status — skip first hydration.
+    if (prev === "on_stage" && nextStatus !== "on_stage") {
+      setStageStatusNotice(LIVE_REMOVED_FROM_STAGE_MESSAGE);
+    }
+    if (nextStatus === "on_stage") {
+      setStageStatusNotice(null);
+    }
+    prevMyStageStatusRef.current = nextStatus;
+  }, [myParticipant?.stageStatus]);
 
   const publishProbe = useSyncExternalStore(
     () => () => {},
@@ -735,14 +755,41 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
         <div className="flex flex-1 flex-col items-center justify-center gap-4 py-24 text-center">
           <p className="text-2xl font-black text-white">Room unavailable</p>
           <p className="max-w-md text-sm text-white/50">
-            {loadError ?? "This live room could not be loaded."}
+            {toLiveUserFacingMessage(
+              loadError,
+              "This live room could not be loaded."
+            )}
           </p>
-          <Link
-            href={APP_ROUTES.live}
-            className="rounded-full bg-white px-4 py-2 text-xs font-black text-black"
-          >
-            Back to Live
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                void (async () => {
+                  setBootLoading(true);
+                  setLoadError(null);
+                  const loaded = await refreshRoom(roomId);
+                  setBootLoading(false);
+                  if (!loaded) {
+                    setLoadError(
+                      toLiveUserFacingMessage(
+                        null,
+                        "This live room could not be loaded."
+                      )
+                    );
+                  }
+                })();
+              }}
+              className="watch-focus-ring rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white transition hover:bg-white/15"
+            >
+              Try again
+            </button>
+            <Link
+              href={APP_ROUTES.live}
+              className="watch-focus-ring rounded-full bg-white px-4 py-2 text-xs font-black text-black"
+            >
+              Back to Live
+            </Link>
+          </div>
         </div>
       </LiveShell>
     );
@@ -837,6 +884,15 @@ export default function LiveRoomExperience({ roomId }: LiveRoomExperienceProps) 
           <Link href={APP_ROUTES.live} className="font-bold underline">
             Browse live rooms
           </Link>
+        </div>
+      ) : null}
+
+      {stageStatusNotice ? (
+        <div
+          role="status"
+          className="mb-4 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-50/90"
+        >
+          {stageStatusNotice}
         </div>
       ) : null}
 

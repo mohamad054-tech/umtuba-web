@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useId, useRef } from "react";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import type { LiveCollabSharedItem, LiveParticipantRole } from "../types";
 import {
   LIVE_COLLAB_ALLOWED_TYPES,
@@ -163,29 +164,16 @@ export default function LiveCollaborationPanel({
 }: LiveCollaborationPanelProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const canModerate =
     isHost || myRole === "moderator" || myRole === "co_host";
 
-  useEffect(() => {
-    if (!open) return;
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open) return;
-    const first = panelRef.current?.querySelector<HTMLElement>(
-      "button:not([disabled])"
-    );
-    first?.focus();
-  }, [open]);
+  useDialogA11y({
+    open,
+    onClose,
+    containerRef: panelRef,
+    initialFocusRef: closeRef,
+  });
 
   if (!open) {
     return null;
@@ -224,6 +212,7 @@ export default function LiveCollaborationPanel({
             </p>
           </div>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
