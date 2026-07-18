@@ -16,6 +16,11 @@ import {
   loadWatchFeedPageAction,
 } from "../actions/loadWatchFeed";
 import { recordFeedViewOnce } from "../lib/video/recordFeedView";
+import {
+  appendUniqueById,
+  FEED_LOAD_MORE_ERROR_MESSAGE,
+  shouldStartFeedLoadMore,
+} from "../lib/video/feedPagination";
 import { APP_ROUTES } from "../lib/nav";
 import { allowWatchPrototypePanels } from "../lib/product/surfaceGates";
 import { findWatchVideoIndex } from "./lib/mapWatchVideo";
@@ -72,6 +77,7 @@ export default function WatchExperience({
   const stageRef = useRef<HTMLDivElement>(null);
   const recordedViewsRef = useRef<Set<number>>(new Set());
   const loadingMoreRef = useRef(false);
+  const nextCursorRef = useRef<string | null>(initialCursor);
 
   const focusKey = searchParams.get("post") ?? searchParams.get("id");
   const seedVideos = initialVideos;
@@ -80,6 +86,9 @@ export default function WatchExperience({
 
   const [videos, setVideos] = useState<WatchVideo[]>(seedVideos);
   const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [loadMoreEpoch, setLoadMoreEpoch] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<WatchVideo | null>(
     () => seedVideos[initialIndex] ?? seedVideos[0] ?? null
@@ -89,6 +98,7 @@ export default function WatchExperience({
   const [forcePause, setForcePause] = useState(false);
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
   const [demoFallback] = useState(usedDemoFallback);
+  nextCursorRef.current = nextCursor;
 
   const handleActiveChange = useCallback((video: WatchVideo) => {
     setActiveVideo(video);
@@ -173,26 +183,45 @@ export default function WatchExperience({
     []
   );
 
-  const handleNearEnd = useCallback(() => {
-    if (!nextCursor || loadingMoreRef.current || demoFallback) {
+  const loadMore = useCallback(async () => {
+    const cursor = nextCursorRef.current;
+    if (
+      !shouldStartFeedLoadMore({
+        nextCursor: cursor,
+        loadingMore: loadingMoreRef.current,
+        disabled: demoFallback,
+      })
+    ) {
       return;
     }
 
     loadingMoreRef.current = true;
-    void (async () => {
-      const result = await loadWatchFeedPageAction({ cursor: nextCursor });
-      loadingMoreRef.current = false;
+    setIsLoadingMore(true);
+    setLoadMoreError(null);
+
+    try {
+      const result = await loadWatchFeedPageAction({ cursor });
       if (!result.ok) {
+        setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
+        setLoadMoreEpoch((epoch) => epoch + 1);
         return;
       }
-      setVideos((current) => {
-        const seen = new Set(current.map((v) => v.id));
-        const appended = result.videos.filter((v) => !seen.has(v.id));
-        return [...current, ...appended];
-      });
+
+      setVideos((current) => appendUniqueById(current, result.videos));
       setNextCursor(result.nextCursor);
-    })();
-  }, [nextCursor, demoFallback]);
+      setLoadMoreError(null);
+    } catch {
+      setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
+      setLoadMoreEpoch((epoch) => epoch + 1);
+    } finally {
+      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, [demoFallback]);
+
+  const handleNearEnd = useCallback(() => {
+    void loadMore();
+  }, [loadMore]);
 
   useEffect(() => {
     function onFullscreenChange() {
@@ -329,7 +358,29 @@ export default function WatchExperience({
             onPostJourney={handlePostJourney}
             onNearEnd={handleNearEnd}
             onVideoPatch={handleVideoPatch}
+            loadMoreEpoch={loadMoreEpoch}
           />
+
+          {loadMoreError ? (
+            <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center px-4 md:bottom-8">
+              <div
+                className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-full border border-white/15 bg-black/75 px-4 py-2.5 text-sm text-white/85 shadow-lg backdrop-blur-md"
+                role="alert"
+              >
+                <p className="min-w-0 flex-1 text-xs font-bold sm:text-sm">
+                  {loadMoreError}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void loadMore()}
+                  disabled={isLoadingMore}
+                  className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-black disabled:opacity-50"
+                >
+                  {isLoadingMore ? "Loading…" : "Retry"}
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {activePanel === "comments" &&
           activeVideo?.postId &&
@@ -339,6 +390,7 @@ export default function WatchExperience({
                 open
                 postId={activeVideo.postId}
                 commentCount={activeVideo.stats.comments}
+                returnPath={`${APP_ROUTES.watch}?post=${activeVideo.postId}`}
                 onClose={handleClosePanel}
                 onCountChange={(count) =>
                   handleVideoPatch(activeVideo.id, {

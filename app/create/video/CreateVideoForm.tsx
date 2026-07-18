@@ -32,6 +32,15 @@ import type {
   MediaPipelineStatus,
 } from "../../../lib/media/pipelineTypes";
 import { APP_ROUTES } from "../../lib/nav";
+import {
+  CREATE_PROCESSING_MESSAGE,
+  CREATE_PUBLISH_FAILED_MESSAGE,
+  CREATE_SUCCESS_MESSAGE,
+  CREATE_UPLOAD_COMPLETE_MESSAGE,
+  processingProgressAfterUpload,
+  processingProgressOnReady,
+  processingProgressWhilePublishing,
+} from "./createVideoProgress";
 
 type UploadPhase =
   | "idle"
@@ -75,7 +84,10 @@ export default function CreateVideoForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [uploadPercent, setUploadPercent] = useState(0);
-  const [processingPercent, setProcessingPercent] = useState(0);
+  /** null = indeterminate publishing progress (never invent mid-flight %). */
+  const [processingPercent, setProcessingPercent] = useState<number | null>(
+    null
+  );
   const [probedMeta, setProbedMeta] = useState<MediaMetadata | null>(null);
 
   useEffect(() => {
@@ -144,13 +156,12 @@ export default function CreateVideoForm() {
     }
   }
 
-  function resetFormFields() {
-    setCaption("");
-    setErrorMessage("");
+  function resetToRetryableReady() {
+    submitLockRef.current = false;
+    setPhase("ready");
     setStatusMessage("");
     setUploadPercent(0);
-    setProcessingPercent(0);
-    clearSelectedFile();
+    setProcessingPercent(null);
   }
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
@@ -245,24 +256,23 @@ export default function CreateVideoForm() {
       setErrorMessage("");
       setPhase("uploading");
       setUploadPercent(0);
-      setProcessingPercent(0);
+      setProcessingPercent(null);
       setStatusMessage("Uploading video to secure storage...");
 
       const uploaded = await uploadPostVideo(selectedFile, (progress) => {
         setUploadPercent(progress.percent);
       });
       uploadedPath = uploaded.path;
-      setUploadPercent(100);
+      const afterUpload = processingProgressAfterUpload();
+      setUploadPercent(afterUpload.uploadPercent);
+      setProcessingPercent(afterUpload.processingPercent);
+      setPhase(afterUpload.phase);
+      setStatusMessage(CREATE_UPLOAD_COMPLETE_MESSAGE);
 
-      setPhase("queued");
-      setStatusMessage("Upload complete. Queued for processing...");
-      setProcessingPercent(10);
-
-      await new Promise((r) => window.setTimeout(r, 280));
-
-      setPhase("processing");
-      setStatusMessage("Processing video...");
-      setProcessingPercent(40);
+      const whilePublishing = processingProgressWhilePublishing();
+      setPhase(whilePublishing.phase);
+      setProcessingPercent(whilePublishing.processingPercent);
+      setStatusMessage(CREATE_PROCESSING_MESSAGE);
 
       const result = await createVideoPostAction({
         caption,
@@ -276,16 +286,21 @@ export default function CreateVideoForm() {
       if (!result.ok) {
         await deleteUploadedPostVideo(uploaded.path);
         setPhase("error");
-        setErrorMessage(result.message);
+        setErrorMessage(result.message || CREATE_PUBLISH_FAILED_MESSAGE);
         setStatusMessage("");
+        setProcessingPercent(null);
         submitLockRef.current = false;
         return;
       }
 
-      setProcessingPercent(100);
-      setPhase("success");
-      setStatusMessage("Video ready. Opening Discover...");
-      resetFormFields();
+      const ready = processingProgressOnReady();
+      setProcessingPercent(ready.processingPercent);
+      setPhase(ready.phase);
+      setStatusMessage(CREATE_SUCCESS_MESSAGE);
+      setCaption("");
+      clearSelectedFile();
+      setErrorMessage("");
+      setUploadPercent(0);
 
       window.dispatchEvent(new Event("umtuba:post-created"));
 
@@ -302,11 +317,8 @@ export default function CreateVideoForm() {
 
       setPhase("error");
       setStatusMessage("");
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "The video could not be published. Please try again."
-      );
+      setProcessingPercent(null);
+      setErrorMessage(CREATE_PUBLISH_FAILED_MESSAGE);
       submitLockRef.current = false;
     }
   }
@@ -460,15 +472,27 @@ export default function CreateVideoForm() {
       ) : null}
 
       {phase === "queued" || phase === "processing" ? (
-        <div className="mt-4">
+        <div className="mt-4 space-y-3">
+          <MediaUploadProgress percent={100} label="Upload complete" />
           <MediaProcessingProgress
             percent={processingPercent}
-            label={phase === "queued" ? "Queued" : "Processing"}
+            indeterminate={processingPercent == null}
+            label={phase === "queued" ? "Queued" : "Publishing"}
             detail={
               phase === "processing"
-                ? "Preparing playback metadata and thumbnail path…"
-                : "Waiting for the media pipeline…"
+                ? "Saving your post and preparing playback…"
+                : "Upload finished. Starting the media pipeline…"
             }
+          />
+        </div>
+      ) : null}
+
+      {phase === "success" && processingPercent === 100 ? (
+        <div className="mt-4">
+          <MediaProcessingProgress
+            percent={100}
+            label="Ready"
+            detail="Your video is published."
           />
         </div>
       ) : null}
@@ -480,9 +504,21 @@ export default function CreateVideoForm() {
       ) : null}
 
       {errorMessage ? (
-        <p className="mt-4 text-sm text-red-300" role="alert">
-          {errorMessage}
-        </p>
+        <div className="mt-4 space-y-3" role="alert">
+          <p className="text-sm text-red-300">{errorMessage}</p>
+          {phase === "error" && isAuthenticated ? (
+            <button
+              type="button"
+              onClick={() => {
+                setErrorMessage("");
+                resetToRetryableReady();
+              }}
+              className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-white/85 hover:bg-white/10"
+            >
+              Try again
+            </button>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="mt-8 flex flex-wrap justify-end gap-3">

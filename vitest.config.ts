@@ -25,8 +25,11 @@ export default defineConfig({
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",
       "app/lib/video/**/*.test.ts",
+      "app/lib/social/**/*.test.ts",
       "app/lib/nav/**/*.test.ts",
       "app/lib/product/**/*.test.ts",
+      "app/create/video/**/*.test.ts",
+      "app/components/social/**/*.test.ts",
     ],
   },
 });

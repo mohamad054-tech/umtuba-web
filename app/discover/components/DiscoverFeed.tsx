@@ -22,7 +22,10 @@ type DiscoverFeedProps = {
     videoId: string,
     flags: { likedByMe?: boolean; savedByMe?: boolean }
   ) => void;
+  onSrcChange?: (videoId: string, src: string) => void;
   onNearEnd?: () => void;
+  /** Bump when a load-more attempt fails so near-end can fire again. */
+  loadMoreEpoch?: number;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -52,7 +55,9 @@ export default function DiscoverFeed({
   onComment,
   onStatsChange,
   onFlagsChange,
+  onSrcChange,
   onNearEnd,
+  loadMoreEpoch = 0,
 }: DiscoverFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -72,7 +77,7 @@ export default function DiscoverFeed({
 
   useEffect(() => {
     nearEndRequestedRef.current = false;
-  }, [videos.length]);
+  }, [videos.length, loadMoreEpoch]);
 
   useEffect(() => {
     if (activeIndex >= videos.length - 3) {
@@ -285,6 +290,7 @@ export default function DiscoverFeed({
                 onComment={() => onComment?.(video)}
                 onStatsChange={(stats) => onStatsChange?.(video.id, stats)}
                 onFlagsChange={(flags) => onFlagsChange?.(video.id, flags)}
+                onSrcChange={(src) => onSrcChange?.(video.id, src)}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">

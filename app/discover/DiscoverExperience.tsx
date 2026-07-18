@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
 import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
@@ -14,6 +14,11 @@ import {
   findIndexByPostId,
   isUuid,
 } from "../lib/nav";
+import {
+  appendUniqueById,
+  FEED_LOAD_MORE_ERROR_MESSAGE,
+  shouldStartFeedLoadMore,
+} from "../lib/video/feedPagination";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
@@ -39,7 +44,12 @@ export default function DiscoverExperience({
 
   const [videos, setVideos] = useState(initialVideos);
   const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
+  const [loadMoreError, setLoadMoreError] = useState<string | null>(null);
+  const [loadMoreEpoch, setLoadMoreEpoch] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadingMoreRef = useRef(false);
+  const nextCursorRef = useRef<string | null>(initialCursor);
+  nextCursorRef.current = nextCursor;
   // Fixed from the page session — do not re-fetch (avoids flash + identity skew).
   const viewerId = initialViewerId;
 
@@ -98,26 +108,55 @@ export default function DiscoverExperience({
     []
   );
 
-  const handleNearEnd = useCallback(() => {
-    if (!nextCursor || loadingMoreRef.current) {
+  const handleSrcChange = useCallback((videoId: string, src: string) => {
+    setVideos((current) =>
+      current.map((video) =>
+        video.id === videoId ? { ...video, src } : video
+      )
+    );
+    setActiveVideo((current) =>
+      current && current.id === videoId ? { ...current, src } : current
+    );
+  }, []);
+
+  const loadMore = useCallback(async () => {
+    const cursor = nextCursorRef.current;
+    if (
+      !shouldStartFeedLoadMore({
+        nextCursor: cursor,
+        loadingMore: loadingMoreRef.current,
+      })
+    ) {
       return;
     }
 
     loadingMoreRef.current = true;
-    void (async () => {
-      const result = await loadDiscoverFeedPageAction({ cursor: nextCursor });
-      loadingMoreRef.current = false;
+    setIsLoadingMore(true);
+    setLoadMoreError(null);
+
+    try {
+      const result = await loadDiscoverFeedPageAction({ cursor });
       if (!result.ok) {
+        setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
+        setLoadMoreEpoch((epoch) => epoch + 1);
         return;
       }
-      setVideos((current) => {
-        const seen = new Set(current.map((v) => v.id));
-        const appended = result.videos.filter((v) => !seen.has(v.id));
-        return [...current, ...appended];
-      });
+
+      setVideos((current) => appendUniqueById(current, result.videos));
       setNextCursor(result.nextCursor);
-    })();
-  }, [nextCursor]);
+      setLoadMoreError(null);
+    } catch {
+      setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
+      setLoadMoreEpoch((epoch) => epoch + 1);
+    } finally {
+      loadingMoreRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, []);
+
+  const handleNearEnd = useCallback(() => {
+    void loadMore();
+  }, [loadMore]);
 
   if (loadError) {
     return (
@@ -172,6 +211,7 @@ export default function DiscoverExperience({
   // Hide only for missing/non-UUID peer or self. Signed-out (viewerId null) may message.
   const canMessageAside =
     isUuid(peerUserId) && viewerId !== peerUserId;
+  const commentsReturnPath = `${APP_ROUTES.discover}?post=${activeVideo.id}`;
 
   return (
     <DiscoverShell>
@@ -186,8 +226,31 @@ export default function DiscoverExperience({
               onComment={handleComment}
               onStatsChange={handleStatsChange}
               onFlagsChange={handleFlagsChange}
+              onSrcChange={handleSrcChange}
               onNearEnd={handleNearEnd}
+              loadMoreEpoch={loadMoreEpoch}
             />
+
+            {loadMoreError ? (
+              <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center px-4 md:bottom-8">
+                <div
+                  className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-full border border-white/15 bg-black/75 px-4 py-2.5 text-sm text-white/85 shadow-lg backdrop-blur-md"
+                  role="alert"
+                >
+                  <p className="min-w-0 flex-1 text-xs font-bold sm:text-sm">
+                    {loadMoreError}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void loadMore()}
+                    disabled={isLoadingMore}
+                    className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-black disabled:opacity-50"
+                  >
+                    {isLoadingMore ? "Loading…" : "Retry"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
 
             {commentsOpen && Number.isInteger(activePostId) && activePostId > 0 ? (
               <CommentsPanel
@@ -195,6 +258,7 @@ export default function DiscoverExperience({
                 open={commentsOpen}
                 postId={activePostId}
                 commentCount={activeVideo.stats.comments}
+                returnPath={commentsReturnPath}
                 onClose={() => setCommentsOpen(false)}
                 onCountChange={(count) =>
                   handleStatsChange(activeVideo.id, { comments: count })

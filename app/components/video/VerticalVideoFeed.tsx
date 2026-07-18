@@ -27,6 +27,8 @@ type VerticalVideoFeedProps = {
     videoId: string,
     patch: Partial<WatchVideo>
   ) => void;
+  /** Bump when a load-more attempt fails so near-end can fire again. */
+  loadMoreEpoch?: number;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -43,6 +45,7 @@ export default function VerticalVideoFeed({
   onPostJourney,
   onNearEnd,
   onVideoPatch,
+  loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -139,7 +142,7 @@ export default function VerticalVideoFeed({
 
   useEffect(() => {
     nearEndRequestedRef.current = false;
-  }, [videos.length]);
+  }, [videos.length, loadMoreEpoch]);
 
   useEffect(() => {
     if (activeIndex >= videos.length - 3) {

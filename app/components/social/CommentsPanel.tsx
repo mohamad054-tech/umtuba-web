@@ -10,11 +10,20 @@ import {
 import type { PostCommentDTO } from "../../../lib/supabase/socialInteractions";
 import { APP_ROUTES } from "../../lib/nav";
 import { COMMENT_MAX_LENGTH } from "../../../lib/supabase/socialInteractions";
+import {
+  COMMENT_AUTH_PROMPT,
+  buildCommentSignInHref,
+  clearCommentDraft,
+  readCommentDraft,
+  writeCommentDraft,
+} from "../../lib/social/commentDraft";
 
 type CommentsPanelProps = {
   open: boolean;
   postId: number;
   commentCount: number;
+  /** Surface path to return to after sign-in (defaults to Discover). */
+  returnPath?: string;
   onClose: () => void;
   onCountChange?: (count: number) => void;
 };
@@ -46,16 +55,27 @@ export default function CommentsPanel({
   open,
   postId,
   commentCount,
+  returnPath = APP_ROUTES.discover,
   onClose,
   onCountChange,
 }: CommentsPanelProps) {
   const [comments, setComments] = useState<PostCommentDTO[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState(() => readCommentDraft(postId));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [requiresAuth, setRequiresAuth] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setDraft(readCommentDraft(postId));
+    setRequiresAuth(false);
+    setErrorMessage(null);
+  }, [postId]);
+
+  useEffect(() => {
+    writeCommentDraft(postId, draft);
+  }, [draft, postId]);
 
   useEffect(() => {
     if (!open) {
@@ -72,7 +92,7 @@ export default function CommentsPanel({
       }
 
       if (!result.ok) {
-        setLoadError(result.message);
+        setLoadError("Couldn't load comments. Please try again.");
         setComments([]);
         return;
       }
@@ -119,13 +139,19 @@ export default function CommentsPanel({
     const result = await createCommentAction(postId, draft);
 
     if (!result.ok) {
-      setErrorMessage(result.message);
+      // Keep draft text — never discard on auth or other failures.
+      setErrorMessage(
+        result.requiresAuth
+          ? COMMENT_AUTH_PROMPT
+          : result.message || "Couldn't post your comment. Please try again."
+      );
       setRequiresAuth(Boolean(result.requiresAuth));
       setIsSubmitting(false);
       return;
     }
 
     setDraft("");
+    clearCommentDraft(postId);
     setComments((current) => [result.comment, ...(current ?? [])]);
     onCountChange?.(result.comments);
     setIsSubmitting(false);
@@ -142,7 +168,11 @@ export default function CommentsPanel({
     const result = await deleteCommentAction(commentId);
 
     if (!result.ok) {
-      setErrorMessage(result.message);
+      setErrorMessage(
+        result.requiresAuth
+          ? COMMENT_AUTH_PROMPT
+          : result.message || "Couldn't delete that comment. Please try again."
+      );
       setRequiresAuth(Boolean(result.requiresAuth));
       setDeletingId(null);
       return;
@@ -156,6 +186,7 @@ export default function CommentsPanel({
   }
 
   const isLoading = comments === null && !loadError;
+  const signInHref = buildCommentSignInHref(returnPath);
 
   return (
     <div className="absolute inset-0 z-40 flex justify-end">
@@ -242,20 +273,24 @@ export default function CommentsPanel({
         </div>
 
         <div className="border-t border-white/10 p-5">
-          {errorMessage ? (
+          {requiresAuth ? (
+            <div
+              className="mb-3 rounded-2xl border border-amber-300/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-50"
+              role="status"
+            >
+              <p>{COMMENT_AUTH_PROMPT}</p>
+              <Link
+                href={signInHref}
+                className="mt-3 inline-flex rounded-full bg-white px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-black"
+              >
+                Sign in to comment
+              </Link>
+            </div>
+          ) : null}
+
+          {errorMessage && !requiresAuth ? (
             <p className="mb-3 text-sm text-red-300" role="alert">
               {errorMessage}
-              {requiresAuth ? (
-                <>
-                  {" "}
-                  <Link
-                    href={`${APP_ROUTES.login}?next=/discover`}
-                    className="font-bold underline"
-                  >
-                    Sign in
-                  </Link>
-                </>
-              ) : null}
             </p>
           ) : null}
 
@@ -266,7 +301,12 @@ export default function CommentsPanel({
             <textarea
               id={`comment-draft-${postId}`}
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={(event) => {
+                setDraft(event.target.value);
+                if (requiresAuth) {
+                  // Keep auth prompt visible; draft is preserved.
+                }
+              }}
               maxLength={COMMENT_MAX_LENGTH}
               rows={3}
               placeholder="Add a comment…"

@@ -26,6 +26,7 @@ type DiscoverVideoCardProps = {
   onComment: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
 };
 
@@ -37,6 +38,7 @@ export default function DiscoverVideoCard({
   onComment,
   onStatsChange,
   onFlagsChange,
+  onSrcChange,
   slideRef,
 }: DiscoverVideoCardProps) {
   const [localViews] = useState(() => new Set<number>());
@@ -129,6 +131,8 @@ export default function DiscoverVideoCard({
         poster={video.poster}
         active={active}
         label={video.caption}
+        postId={Number.isInteger(postId) && postId > 0 ? postId : null}
+        onSrcChange={onSrcChange}
         onWatchProgress={
           Number.isInteger(postId) && postId > 0
             ? handleWatchProgress

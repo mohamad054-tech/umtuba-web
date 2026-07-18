@@ -10,6 +10,10 @@ import {
   mergeWatchProgress,
   type WatchSessionSnapshot,
 } from "../../lib/video/recordWatchSignal";
+import {
+  playbackStatusAfterRemintFailure,
+  shouldAutoRemintPlayback,
+} from "../../lib/video/signedPlaybackRetry";
 import type { WatchPanelId } from "./watchTypes";
 import VideoOverlay from "./VideoOverlay";
 import VideoPlayer, { type WatchProgressEvent } from "./VideoPlayer";
@@ -51,6 +55,12 @@ export default function VideoSlide({
   const [retrying, setRetrying] = useState(false);
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
+  const autoRemintAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    autoRemintAttemptedRef.current = false;
+    setPlaybackStatus("ok");
+  }, [video.id]);
 
   async function handleRetryPlayback() {
     if (!video.postId || retrying) return;
@@ -59,12 +69,27 @@ export default function VideoSlide({
     setRetrying(false);
 
     if (!result.ok) {
-      setPlaybackStatus(result.deleted ? "deleted" : "expired");
+      setPlaybackStatus(playbackStatusAfterRemintFailure(result.deleted));
       return;
     }
 
     onSrcChange?.(result.src);
     setPlaybackStatus("ok");
+  }
+
+  function handlePlaybackError() {
+    if (
+      shouldAutoRemintPlayback({
+        hasPostId: Boolean(video.postId),
+        autoRemintAttempted: autoRemintAttemptedRef.current,
+      })
+    ) {
+      autoRemintAttemptedRef.current = true;
+      void handleRetryPlayback();
+      return;
+    }
+
+    setPlaybackStatus(video.postId ? "expired" : "error");
   }
 
   useEffect(() => {
@@ -136,9 +161,7 @@ export default function VideoSlide({
         forcePause={forcePause && active}
         onToggleMute={onToggleMute}
         playbackStatus={playbackStatus}
-        onPlaybackError={() =>
-          setPlaybackStatus(video.postId ? "expired" : "error")
-        }
+        onPlaybackError={handlePlaybackError}
         onRetryPlayback={
           video.postId ? () => void handleRetryPlayback() : undefined
         }
