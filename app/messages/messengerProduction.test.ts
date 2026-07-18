@@ -107,4 +107,44 @@ describe("messenger production UI contracts", () => {
       expect(src).not.toMatch(/fakeVoice/i);
     }
   });
+
+  it("wires Phase 2 reply, reaction, edit, delete, and mute surfaces", () => {
+    const bubble = read("app/messages/components/MessageBubble.tsx");
+    const composer = read("app/messages/components/MessageComposer.tsx");
+    const header = read("app/messages/components/ChatHeader.tsx");
+    const experience = read("app/messages/MessagesExperience.tsx");
+    const migration = read(
+      "supabase/migrations/20260729_messenger_production_phase2.sql"
+    );
+
+    expect(bubble).toMatch(/replyPreview/);
+    expect(bubble).toMatch(/Delete for me/);
+    expect(bubble).toMatch(/Delete for everyone/);
+    expect(bubble).toMatch(/Edited/);
+    expect(bubble).toMatch(/MESSAGE_REACTION_EMOJIS/);
+    expect(composer).toMatch(/replyTo/);
+    expect(composer).toMatch(/editingMessage/);
+    expect(header).toMatch(/Mute for 1 hour|MUTE_OPTION_LABELS/);
+    expect(experience).toMatch(/useMessengerRealtime/);
+    expect(experience).toMatch(/toggleReactionAction/);
+    expect(experience).toMatch(/setConversationMuteAction/);
+
+    expect(migration).toMatch(/message_reactions/);
+    expect(migration).toMatch(/message_hides/);
+    expect(migration).toMatch(/edit_own_text_message/);
+    expect(migration).toMatch(/soft_delete_message_for_everyone/);
+    expect(migration).toMatch(/hide_message_for_me/);
+    expect(migration).toMatch(/set_conversation_mute/);
+    expect(migration).toMatch(/is_muted = true/);
+    expect(migration).toMatch(/supabase_realtime add table public.message_reactions/);
+    expect(migration).not.toMatch(/drop table/i);
+  });
+
+  it("keeps Sent / Delivered / Seen receipt labels in the bubble", () => {
+    const bubble = read("app/messages/components/MessageBubble.tsx");
+    expect(bubble).toMatch(/Seen/);
+    expect(bubble).toMatch(/Delivered/);
+    expect(bubble).toMatch(/Sent/);
+    expect(bubble).toMatch(/receiptStatus/);
+  });
 });

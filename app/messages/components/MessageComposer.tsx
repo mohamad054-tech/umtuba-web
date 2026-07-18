@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   canSendComposerText,
   clampComposerDraft,
@@ -8,6 +8,7 @@ import {
   normalizeComposerDraft,
   shouldClearDraftAfterSend,
 } from "../lib/composerPolicy";
+import type { Message } from "../types";
 
 const EMOJI_SET = ["😀", "🔥", "✨", "💙", "🌍", "🙌", "😂", "❤️", "🚀", "👍"];
 
@@ -18,6 +19,11 @@ type MessageComposerProps = {
   disabled?: boolean;
   /** Sanitized send/status error from the parent (aria-live). */
   statusMessage?: string | null;
+  replyTo?: Message | null;
+  onCancelReply?: () => void;
+  editingMessage?: Message | null;
+  onCancelEdit?: () => void;
+  onSaveEdit?: (text: string) => boolean | Promise<boolean>;
 };
 
 /**
@@ -31,14 +37,26 @@ export default function MessageComposer({
   onTyping,
   disabled = false,
   statusMessage = null,
+  replyTo = null,
+  onCancelReply,
+  editingMessage = null,
+  onCancelEdit,
+  onSaveEdit,
 }: MessageComposerProps) {
   const [draft, setDraft] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [pending, setPending] = useState(false);
 
+  const isEditing = Boolean(editingMessage);
   const sendEnabled = canSendComposerText(draft, { disabled, pending });
 
-  async function handleSend() {
+  useEffect(() => {
+    if (editingMessage) {
+      setDraft(editingMessage.text);
+    }
+  }, [editingMessage?.id]);
+
+  async function handleSubmit() {
     if (!canSendComposerText(draft, { disabled, pending })) return;
 
     const text = normalizeComposerDraft(draft);
@@ -46,7 +64,9 @@ export default function MessageComposer({
     setShowEmoji(false);
 
     try {
-      const ok = await Promise.resolve(onSend(text));
+      const ok = isEditing
+        ? await Promise.resolve(onSaveEdit?.(text) ?? false)
+        : await Promise.resolve(onSend(text));
       if (shouldClearDraftAfterSend(Boolean(ok))) {
         setDraft("");
       }
@@ -67,6 +87,49 @@ export default function MessageComposer({
         >
           {statusMessage}
         </p>
+      ) : null}
+
+      {isEditing && editingMessage ? (
+        <div className="mb-2 flex items-start gap-2 rounded-2xl border border-amber-300/20 bg-amber-400/10 px-3 py-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-amber-200/80">
+              Editing message
+            </p>
+            <p className="truncate text-xs text-white/70">{editingMessage.text}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              onCancelEdit?.();
+              setDraft("");
+            }}
+            className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white"
+            aria-label="Cancel edit"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : null}
+
+      {!isEditing && replyTo ? (
+        <div className="mb-2 flex items-start gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2">
+          <div className="min-w-0 flex-1 border-l-2 border-blue-400/70 pl-2">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-white/45">
+              Replying
+            </p>
+            <p className="truncate text-xs text-white/70">
+              {replyTo.isDeleted ? "Message deleted" : replyTo.text}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onCancelReply}
+            className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold text-white/60 hover:bg-white/10 hover:text-white"
+            aria-label="Cancel reply"
+          >
+            Cancel
+          </button>
+        </div>
       ) : null}
 
       {showEmoji ? (
@@ -116,19 +179,21 @@ export default function MessageComposer({
             value={draft}
             onChange={(event) => {
               setDraft(clampComposerDraft(event.target.value));
-              onTyping?.();
+              if (!isEditing) {
+                onTyping?.();
+              }
             }}
             onKeyDown={(event) => {
               // Enter sends; Shift+Enter keeps the default newline.
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                void handleSend();
+                void handleSubmit();
               }
             }}
             rows={1}
             maxLength={MESSAGE_MAX_LENGTH}
-            placeholder="Write a message…"
-            aria-label="Message"
+            placeholder={isEditing ? "Edit message…" : "Write a message…"}
+            aria-label={isEditing ? "Edit message" : "Message"}
             aria-describedby={
               statusMessage ? "messenger-composer-status" : undefined
             }
@@ -144,15 +209,24 @@ export default function MessageComposer({
 
         <button
           type="button"
-          onClick={() => void handleSend()}
+          onClick={() => void handleSubmit()}
           disabled={!sendEnabled}
           aria-busy={pending}
           className="flex h-11 shrink-0 items-center justify-center rounded-2xl bg-white px-4 text-sm font-black text-black transition hover:bg-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
-          aria-label={pending ? "Sending message" : "Send message"}
+          aria-label={
+            pending
+              ? isEditing
+                ? "Saving edit"
+                : "Sending message"
+              : isEditing
+                ? "Save edit"
+                : "Send message"
+          }
         >
-          {pending ? "Sending…" : "Send"}
+          {pending ? (isEditing ? "Saving…" : "Sending…") : isEditing ? "Save" : "Send"}
         </button>
       </div>
+      <p className="sr-only">Enter sends. Shift+Enter inserts a new line.</p>
     </div>
   );
 }

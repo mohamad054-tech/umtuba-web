@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import { allowMessengerPreviewChrome } from "../../lib/product/surfaceGates";
-import type { Conversation } from "../types";
+import type { Conversation, MuteOption } from "../types";
+import { MUTE_OPTION_LABELS, MUTE_OPTIONS } from "../lib/muteOptions";
 import OnlineStatusDot from "./OnlineStatusDot";
 
 type ChatHeaderProps = {
@@ -7,6 +11,9 @@ type ChatHeaderProps = {
   onBack?: () => void;
   showBack?: boolean;
   activityLabel?: string;
+  onMute?: (option: MuteOption) => void;
+  mutePending?: boolean;
+  muteError?: string | null;
 };
 
 export default function ChatHeader({
@@ -14,8 +21,12 @@ export default function ChatHeader({
   onBack,
   showBack = false,
   activityLabel,
+  onMute,
+  mutePending = false,
+  muteError = null,
 }: ChatHeaderProps) {
   const showPresenceChrome = allowMessengerPreviewChrome();
+  const [muteOpen, setMuteOpen] = useState(false);
 
   let subtitle: string | null = null;
   if (conversation.isTyping) {
@@ -28,6 +39,10 @@ export default function ChatHeader({
   } else if (activityLabel) {
     // Honest activity from last message time — not presence.
     subtitle = activityLabel;
+  }
+
+  if (conversation.isMuted) {
+    subtitle = subtitle ? `${subtitle} · Muted` : "Muted";
   }
 
   return (
@@ -75,7 +90,51 @@ export default function ChatHeader({
             {subtitle}
           </p>
         ) : null}
+        {muteError ? (
+          <p className="truncate text-xs text-red-300" role="alert">
+            {muteError}
+          </p>
+        ) : null}
       </div>
+
+      {onMute ? (
+        <div className="relative shrink-0">
+          <button
+            type="button"
+            onClick={() => setMuteOpen((open) => !open)}
+            disabled={mutePending}
+            className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:opacity-50"
+            aria-expanded={muteOpen}
+            aria-label={conversation.isMuted ? "Mute options" : "Mute conversation"}
+          >
+            {conversation.isMuted ? "Muted" : "Mute"}
+          </button>
+          {muteOpen ? (
+            <div
+              className="absolute right-0 z-30 mt-2 min-w-[13rem] rounded-xl border border-white/10 bg-[#0c0c1a] py-1 shadow-xl"
+              role="menu"
+            >
+              {MUTE_OPTIONS.filter((option) =>
+                conversation.isMuted ? true : option !== "off"
+              ).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  role="menuitem"
+                  disabled={mutePending}
+                  onClick={() => {
+                    onMute(option);
+                    setMuteOpen(false);
+                  }}
+                  className="block w-full px-3 py-2 text-left text-xs font-medium text-white/80 hover:bg-white/10 disabled:opacity-50"
+                >
+                  {MUTE_OPTION_LABELS[option]}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

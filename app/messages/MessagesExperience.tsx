@@ -3,23 +3,33 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  deleteMessageForEveryoneAction,
+  deleteMessageForMeAction,
+  editMessageAction,
   listConversationsAction,
   listMessagesAction,
   markConversationReadAction,
   openDirectConversationAction,
   sendMessageAction,
+  setConversationMuteAction,
   setTypingAction,
+  toggleReactionAction,
 } from "../actions/messenger";
 import { buildConversationHref, isUuid } from "../lib/nav";
 import ConversationList from "./components/ConversationList";
 import ChatWindow from "./components/ChatWindow";
 import MessagesShell from "./components/MessagesShell";
+import { useMessengerRealtime } from "./hooks/useMessengerRealtime";
+import { applyReactionToggle } from "./lib/reactionState";
+import { isConversationCurrentlyMuted } from "./types";
 import {
   formatMessageTime,
   peerGradientFromId,
   initialsFromName,
   type Conversation,
   type Message,
+  type MessageReactionEmoji,
+  type MuteOption,
 } from "./types";
 
 function createClientId() {
@@ -64,6 +74,10 @@ export default function MessagesExperience({
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [mutePending, setMutePending] = useState(false);
+  const [muteError, setMuteError] = useState<string | null>(null);
   const typingTimerRef = useRef<number | null>(null);
   const typingActiveRef = useRef(false);
   const openedPeerRef = useRef<string | null>(null);
@@ -128,7 +142,22 @@ export default function MessagesExperience({
       return [] as Conversation[];
     }
 
-    setConversations(listResult.conversations);
+    setConversations((prev) => {
+      // Preserve in-memory thread messages while refreshing inbox metadata.
+      const prevById = new Map(prev.map((c) => [c.id, c]));
+      return listResult.conversations.map((conversation) => {
+        const existing = prevById.get(conversation.id);
+        if (!existing || existing.messages.length === 0) {
+          return conversation;
+        }
+        return {
+          ...conversation,
+          messages: existing.messages,
+          hasMoreMessages: existing.hasMoreMessages,
+          nextMessagesCursor: existing.nextMessagesCursor,
+        };
+      });
+    });
     setListLoading(false);
     return listResult.conversations;
   }
@@ -138,7 +167,12 @@ export default function MessagesExperience({
     setThreadLoading(true);
     setThreadError(null);
 
-    const result = await listMessagesAction(conversationId);
+    const inboxConversation = conversations.find((c) => c.id === conversationId);
+    const result = await listMessagesAction(
+      conversationId,
+      null,
+      inboxConversation?.peerLastReadAt ?? null
+    );
 
     if (requestId !== threadRequestRef.current) {
       return;
@@ -203,6 +237,8 @@ export default function MessagesExperience({
       setListError(null);
       setSendError(null);
       setThreadError(null);
+      setReplyTo(null);
+      setEditingMessage(null);
       setSelectedId(conversationId);
       setMobileShowChat(true);
 
@@ -252,7 +288,6 @@ export default function MessagesExperience({
     await loadThread(openResult.conversationId, creatorName ?? undefined);
   });
 
-  // Deep-link: open existing conversation by id (refresh-safe).
   useEffect(() => {
     if (!conversationParam) {
       return;
@@ -266,7 +301,6 @@ export default function MessagesExperience({
     void openConversationFromQuery(conversationParam);
   }, [conversationParam]);
 
-  // Deep-link: create/reuse DM from peer id, then normalize URL to ?conversation=.
   useEffect(() => {
     if (conversationParam || !creatorId) {
       return;
@@ -279,6 +313,86 @@ export default function MessagesExperience({
     openedPeerRef.current = creatorId;
     void openPeerFromQuery(creatorId);
   }, [conversationParam, creatorId]);
+
+  useMessengerRealtime({
+    conversationId: selectedId,
+    currentUserId,
+    enabled: Boolean(selectedId),
+    onMessageInsert: (message) => {
+      setConversations((prev) =>
+        prev.map((conversation) => {
+          if (conversation.id !== message.conversationId) {
+            return conversation;
+          }
+          if (conversation.messages.some((m) => m.id === message.id)) {
+            return conversation;
+          }
+          if (
+            message.clientId &&
+            conversation.messages.some((m) => m.clientId === message.clientId)
+          ) {
+            return {
+              ...conversation,
+              messages: conversation.messages.map((m) =>
+                m.clientId === message.clientId ? message : m
+              ),
+              lastMessagePreview: message.text,
+              lastMessageAt: message.sentAt,
+            };
+          }
+          return {
+            ...conversation,
+            messages: [...conversation.messages, message],
+            lastMessagePreview: message.text,
+            lastMessageAt: message.sentAt,
+            unreadCount: message.isMine ? conversation.unreadCount : conversation.unreadCount,
+          };
+        })
+      );
+      if (!message.isMine && selectedIdRef.current === message.conversationId) {
+        void markConversationReadAction(message.conversationId, message.id);
+      }
+    },
+    onMessageUpdate: (message) => {
+      setConversations((prev) =>
+        prev.map((conversation) => {
+          if (conversation.id !== message.conversationId) {
+            return conversation;
+          }
+          return {
+            ...conversation,
+            messages: conversation.messages.map((m) =>
+              m.id === message.id
+                ? {
+                    ...m,
+                    ...message,
+                    reactions: message.reactions ?? m.reactions,
+                    replyPreview: message.replyPreview ?? m.replyPreview,
+                  }
+                : m
+            ),
+          };
+        })
+      );
+    },
+    onReactionsChange: (messageId, updater) => {
+      setConversations((prev) =>
+        prev.map((conversation) => {
+          if (conversation.id !== selectedIdRef.current) {
+            return conversation;
+          }
+          return {
+            ...conversation,
+            messages: conversation.messages.map((m) =>
+              m.id === messageId
+                ? { ...m, reactions: updater(m.reactions) }
+                : m
+            ),
+          };
+        })
+      );
+    },
+  });
 
   const filtered = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -299,6 +413,9 @@ export default function MessagesExperience({
   async function handleSelect(id: string) {
     if (id !== selectedId) {
       clearTypingState(selectedId);
+      setReplyTo(null);
+      setEditingMessage(null);
+      setMuteError(null);
     }
     setSelectedId(id);
     setMobileShowChat(true);
@@ -322,7 +439,8 @@ export default function MessagesExperience({
     setLoadingOlder(true);
     const result = await listMessagesAction(
       conversationId,
-      selected.nextMessagesCursor
+      selected.nextMessagesCursor,
+      selected.peerLastReadAt ?? null
     );
 
     if (requestId !== threadRequestRef.current) {
@@ -368,6 +486,7 @@ export default function MessagesExperience({
       return false;
     }
 
+    const replyTarget = replyTo;
     const optimistic: Message = {
       id: `local-${clientId}`,
       conversationId,
@@ -377,6 +496,19 @@ export default function MessagesExperience({
       isMine: true,
       status: "sending",
       clientId,
+      messageType: "text",
+      replyToMessageId: replyTarget?.id ?? null,
+      replyPreview: replyTarget
+        ? {
+            messageId: replyTarget.id,
+            text: replyTarget.isDeleted
+              ? "Message deleted"
+              : replyTarget.text.slice(0, 120),
+            senderId: replyTarget.senderId,
+            unavailable: Boolean(replyTarget.isDeleted),
+          }
+        : null,
+      receiptStatus: "sent",
     };
 
     sendingRef.current = true;
@@ -408,11 +540,11 @@ export default function MessagesExperience({
       conversationId,
       body,
       clientId,
+      replyToMessageId: replyTarget?.id ?? null,
     });
 
     if (!result.ok) {
       // Preserve composer draft (composer keeps text when we return false).
-      // Drop optimistic bubble so retry does not duplicate the thread.
       setSendError(result.message);
       setConversations((prev) =>
         prev.map((conversation) => {
@@ -433,6 +565,7 @@ export default function MessagesExperience({
       return false;
     }
 
+    setReplyTo(null);
     setConversations((prev) =>
       prev
         .map((conversation) => {
@@ -462,8 +595,181 @@ export default function MessagesExperience({
     return true;
   }
 
+  async function handleSaveEdit(text: string): Promise<boolean> {
+    if (!editingMessage) {
+      return false;
+    }
+
+    const messageId = editingMessage.id;
+    const conversationId = editingMessage.conversationId;
+    setSendError(null);
+
+    const result = await editMessageAction({ messageId, body: text });
+    if (!result.ok) {
+      setSendError(result.message);
+      return false;
+    }
+
+    setEditingMessage(null);
+    setConversations((prev) =>
+      prev.map((conversation) => {
+        if (conversation.id !== conversationId) {
+          return conversation;
+        }
+        return {
+          ...conversation,
+          messages: conversation.messages.map((m) =>
+            m.id === messageId ? { ...m, ...result.message, reactions: m.reactions } : m
+          ),
+          lastMessagePreview:
+            conversation.messages.at(-1)?.id === messageId
+              ? result.message.text
+              : conversation.lastMessagePreview,
+        };
+      })
+    );
+    return true;
+  }
+
+  async function handleDeleteForMe(message: Message) {
+    const result = await deleteMessageForMeAction(message.id);
+    if (!result.ok) {
+      setSendError(result.message);
+      return;
+    }
+    setConversations((prev) =>
+      prev.map((conversation) => {
+        if (conversation.id !== message.conversationId) {
+          return conversation;
+        }
+        return {
+          ...conversation,
+          messages: conversation.messages.filter((m) => m.id !== message.id),
+        };
+      })
+    );
+    if (replyTo?.id === message.id) {
+      setReplyTo(null);
+    }
+    if (editingMessage?.id === message.id) {
+      setEditingMessage(null);
+    }
+  }
+
+  async function handleDeleteForEveryone(message: Message) {
+    const result = await deleteMessageForEveryoneAction(message.id);
+    if (!result.ok) {
+      setSendError(result.message);
+      return;
+    }
+    setConversations((prev) =>
+      prev.map((conversation) => {
+        if (conversation.id !== message.conversationId) {
+          return conversation;
+        }
+        return {
+          ...conversation,
+          messages: conversation.messages.map((m) =>
+            m.id === message.id
+              ? { ...m, ...result.message, reactions: undefined }
+              : m
+          ),
+          lastMessagePreview:
+            conversation.messages.at(-1)?.id === message.id
+              ? result.message.text
+              : conversation.lastMessagePreview,
+        };
+      })
+    );
+  }
+
+  async function handleToggleReaction(
+    message: Message,
+    emoji: MessageReactionEmoji
+  ) {
+    setConversations((prev) =>
+      prev.map((conversation) => {
+        if (conversation.id !== message.conversationId) {
+          return conversation;
+        }
+        return {
+          ...conversation,
+          messages: conversation.messages.map((m) => {
+            if (m.id !== message.id) return m;
+            const existing = m.reactions?.find((r) => r.emoji === emoji);
+            const removed = Boolean(existing?.reactedByMe);
+            return {
+              ...m,
+              reactions: applyReactionToggle({
+                reactions: m.reactions,
+                emoji,
+                removed,
+              }),
+            };
+          }),
+        };
+      })
+    );
+
+    const result = await toggleReactionAction({
+      messageId: message.id,
+      emoji,
+    });
+
+    if (!result.ok) {
+      setSendError(result.message);
+      // Reload thread reactions on failure
+      if (selectedId) {
+        void loadThread(selectedId);
+      }
+    }
+  }
+
+  async function handleMute(option: MuteOption) {
+    if (!selectedId) return;
+    setMutePending(true);
+    setMuteError(null);
+    const result = await setConversationMuteAction({
+      conversationId: selectedId,
+      option,
+    });
+    setMutePending(false);
+
+    if (!result.ok) {
+      setMuteError(result.message);
+      return;
+    }
+
+    setConversations((prev) =>
+      prev.map((conversation) => {
+        if (conversation.id !== selectedId) {
+          return conversation;
+        }
+        if (option === "off") {
+          return { ...conversation, isMuted: false, mutedUntil: null };
+        }
+        const mutedUntil =
+          option === "forever"
+            ? null
+            : option === "1h"
+              ? new Date(Date.now() + 60 * 60 * 1000).toISOString()
+              : option === "8h"
+                ? new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString()
+                : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        return {
+          ...conversation,
+          isMuted: isConversationCurrentlyMuted({
+            isMuted: true,
+            mutedUntil,
+          }),
+          mutedUntil,
+        };
+      })
+    );
+  }
+
   function handleComposerTyping() {
-    if (!selectedId || sending) {
+    if (!selectedId || sending || editingMessage) {
       return;
     }
 
@@ -512,6 +818,7 @@ export default function MessagesExperience({
         >
           <ChatWindow
             conversation={selected}
+            currentUserId={currentUserId}
             onSend={handleSend}
             onBack={handleBack}
             showBack={mobileShowChat}
@@ -531,6 +838,29 @@ export default function MessagesExperience({
                 ? `Updated ${formatMessageTime(selected.lastMessageAt)}`
                 : undefined
             }
+            replyTo={replyTo}
+            onReply={(message) => {
+              setEditingMessage(null);
+              setReplyTo(message);
+            }}
+            onCancelReply={() => setReplyTo(null)}
+            editingMessage={editingMessage}
+            onEdit={(message) => {
+              setReplyTo(null);
+              setEditingMessage(message);
+            }}
+            onCancelEdit={() => setEditingMessage(null)}
+            onSaveEdit={handleSaveEdit}
+            onDeleteForMe={(message) => void handleDeleteForMe(message)}
+            onDeleteForEveryone={(message) =>
+              void handleDeleteForEveryone(message)
+            }
+            onToggleReaction={(message, emoji) =>
+              void handleToggleReaction(message, emoji)
+            }
+            onMute={(option) => void handleMute(option)}
+            mutePending={mutePending}
+            muteError={muteError}
           />
         </div>
       </div>

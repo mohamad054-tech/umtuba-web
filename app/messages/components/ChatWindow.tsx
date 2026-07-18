@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import type { Conversation } from "../types";
+import { useEffect, useRef, useState } from "react";
+import type { Conversation, Message, MessageReactionEmoji, MuteOption } from "../types";
 import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import MessageComposer from "./MessageComposer";
@@ -9,6 +9,7 @@ import TypingIndicator from "./TypingIndicator";
 
 type ChatWindowProps = {
   conversation: Conversation | null;
+  currentUserId: string;
   onSend: (text: string) => boolean | Promise<boolean>;
   onBack?: () => void;
   showBack?: boolean;
@@ -20,10 +21,24 @@ type ChatWindowProps = {
   onComposerTyping?: () => void;
   composerDisabled?: boolean;
   activityLabel?: string;
+  replyTo?: Message | null;
+  onReply?: (message: Message) => void;
+  onCancelReply?: () => void;
+  editingMessage?: Message | null;
+  onEdit?: (message: Message) => void;
+  onCancelEdit?: () => void;
+  onSaveEdit?: (text: string) => boolean | Promise<boolean>;
+  onDeleteForMe?: (message: Message) => void;
+  onDeleteForEveryone?: (message: Message) => void;
+  onToggleReaction?: (message: Message, emoji: MessageReactionEmoji) => void;
+  onMute?: (option: MuteOption) => void;
+  mutePending?: boolean;
+  muteError?: string | null;
 };
 
 export default function ChatWindow({
   conversation,
+  currentUserId,
   onSend,
   onBack,
   showBack = false,
@@ -35,12 +50,38 @@ export default function ChatWindow({
   onComposerTyping,
   composerDisabled = false,
   activityLabel,
+  replyTo = null,
+  onReply,
+  onCancelReply,
+  editingMessage = null,
+  onEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onDeleteForMe,
+  onDeleteForEveryone,
+  onToggleReaction,
+  onMute,
+  mutePending,
+  muteError,
 }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation?.id, conversation?.messages.length, conversation?.isTyping]);
+
+  function scrollToMessage(messageId: string) {
+    const el = document.getElementById(`message-${messageId}`);
+    if (!el) {
+      return;
+    }
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightId(messageId);
+    window.setTimeout(() => {
+      setHighlightId((current) => (current === messageId ? null : current));
+    }, 1600);
+  }
 
   if (!conversation) {
     return (
@@ -68,6 +109,9 @@ export default function ChatWindow({
         onBack={onBack}
         showBack={showBack}
         activityLabel={activityLabel}
+        onMute={onMute}
+        mutePending={mutePending}
+        muteError={muteError}
       />
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4 md:px-5">
@@ -97,7 +141,18 @@ export default function ChatWindow({
           </div>
         ) : (
           conversation.messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
+            <MessageBubble
+              key={message.id}
+              message={message}
+              currentUserId={currentUserId}
+              highlighted={highlightId === message.id}
+              onReply={onReply}
+              onEdit={onEdit}
+              onDeleteForMe={onDeleteForMe}
+              onDeleteForEveryone={onDeleteForEveryone}
+              onToggleReaction={onToggleReaction}
+              onReplyPreviewClick={scrollToMessage}
+            />
           ))
         )}
 
@@ -121,6 +176,11 @@ export default function ChatWindow({
         onTyping={onComposerTyping}
         disabled={composerDisabled || loading}
         statusMessage={sendError}
+        replyTo={replyTo}
+        onCancelReply={onCancelReply}
+        editingMessage={editingMessage}
+        onCancelEdit={onCancelEdit}
+        onSaveEdit={onSaveEdit}
       />
     </section>
   );

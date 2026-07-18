@@ -57,6 +57,11 @@ export default function ConversationListItem({
         <div className="flex items-center justify-between gap-2">
           <p className="truncate text-sm font-bold text-white">
             {conversation.peerName}
+            {conversation.isMuted ? (
+              <span className="ml-1 text-[10px] font-bold uppercase tracking-wide text-white/35">
+                Muted
+              </span>
+            ) : null}
           </p>
           {conversation.lastMessageAt ? (
             <span className="shrink-0 text-[11px] font-medium text-white/40">

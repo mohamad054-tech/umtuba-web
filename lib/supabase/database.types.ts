@@ -87,8 +87,22 @@ export type ConversationParticipantRow = {
   last_read_message_id: string | null;
   unread_count: number;
   is_muted: boolean;
+  muted_until: string | null;
   is_archived: boolean;
   typing_at: string | null;
+};
+
+export type MessageReactionRow = {
+  message_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+};
+
+export type MessageHideRow = {
+  message_id: string;
+  user_id: string;
+  hidden_at: string;
 };
 
 export type DirectConversationPairRow = {
@@ -302,6 +316,7 @@ export type Database = {
           last_read_message_id?: string | null;
           unread_count?: number;
           is_muted?: boolean;
+          muted_until?: string | null;
           is_archived?: boolean;
           typing_at?: string | null;
         };
@@ -311,9 +326,31 @@ export type Database = {
           last_read_message_id?: string | null;
           unread_count?: number;
           is_muted?: boolean;
+          muted_until?: string | null;
           is_archived?: boolean;
           typing_at?: string | null;
         };
+        Relationships: [];
+      };
+      message_reactions: {
+        Row: MessageReactionRow;
+        Insert: {
+          message_id: string;
+          user_id: string;
+          emoji: string;
+          created_at?: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      message_hides: {
+        Row: MessageHideRow;
+        Insert: {
+          message_id: string;
+          user_id: string;
+          hidden_at?: string;
+        };
+        Update: never;
         Relationships: [];
       };
       direct_conversation_pairs: {
@@ -433,10 +470,55 @@ export type Database = {
           user_id: string;
           role: string;
           typing_at: string | null;
+          last_read_at: string | null;
         }>;
       };
       is_conversation_participant: {
         Args: { p_conversation_id: string };
+        Returns: boolean;
+      };
+      set_conversation_mute: {
+        Args: { p_conversation_id: string; p_mute_option: string };
+        Returns: undefined;
+      };
+      hide_message_for_me: {
+        Args: { p_message_id: string };
+        Returns: undefined;
+      };
+      edit_own_text_message: {
+        Args: { p_message_id: string; p_body: string };
+        Returns: MessageRow;
+      };
+      soft_delete_message_for_everyone: {
+        Args: { p_message_id: string };
+        Returns: MessageRow;
+      };
+      toggle_message_reaction: {
+        Args: { p_message_id: string; p_emoji: string };
+        Returns: {
+          messageId: string;
+          emoji: string;
+          removed: boolean;
+          userId: string;
+        };
+      };
+      list_message_reactions: {
+        Args: {
+          p_conversation_id: string;
+          p_message_ids?: string[] | null;
+        };
+        Returns: Array<{
+          message_id: string;
+          emoji: string;
+          count: number;
+          reacted_by_me: boolean;
+        }>;
+      };
+      is_conversation_muted_for_user: {
+        Args: {
+          p_conversation_id: string;
+          p_user_id?: string;
+        };
         Returns: boolean;
       };
     };

@@ -2,6 +2,25 @@ export type OnlineStatus = "online" | "away" | "offline";
 
 export type MessageStatus = "sending" | "sent" | "failed";
 
+/** Delivery / read ticks for own messages (peer last_read cursor). */
+export type ReceiptStatus = "sent" | "delivered" | "seen";
+
+export const MESSAGE_REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢"] as const;
+export type MessageReactionEmoji = (typeof MESSAGE_REACTION_EMOJIS)[number];
+
+export type MessageReactionSummary = {
+  emoji: MessageReactionEmoji;
+  count: number;
+  reactedByMe: boolean;
+};
+
+export type MessageReplyPreview = {
+  messageId: string;
+  text: string;
+  senderId: string | null;
+  unavailable: boolean;
+};
+
 export type Message = {
   id: string;
   conversationId: string;
@@ -13,7 +32,18 @@ export type Message = {
   clientId?: string;
   /** Prepared for read-receipt UI later */
   readAt?: string | null;
+  /** Sent / Delivered / Seen for own outbound messages */
+  receiptStatus?: ReceiptStatus;
+  messageType?: string;
+  replyToMessageId?: string | null;
+  replyPreview?: MessageReplyPreview | null;
+  editedAt?: string | null;
+  deletedAt?: string | null;
+  isDeleted?: boolean;
+  reactions?: MessageReactionSummary[];
 };
+
+export type MuteOption = "1h" | "8h" | "1w" | "forever" | "off";
 
 export type Conversation = {
   id: string;
@@ -31,6 +61,10 @@ export type Conversation = {
   messages: Message[];
   hasMoreMessages: boolean;
   nextMessagesCursor: string | null;
+  isMuted?: boolean;
+  mutedUntil?: string | null;
+  /** Peer's last_read_at — used for Delivered/Seen on own messages */
+  peerLastReadAt?: string | null;
 };
 
 export function initialsFromName(name: string) {
@@ -104,4 +138,58 @@ export function formatBubbleTime(iso: string) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+export function isMessageReactionEmoji(
+  value: string
+): value is MessageReactionEmoji {
+  return (MESSAGE_REACTION_EMOJIS as readonly string[]).includes(value);
+}
+
+export function computeReceiptStatus(input: {
+  isMine: boolean;
+  sentAt: string;
+  peerLastReadAt?: string | null;
+  status?: MessageStatus;
+}): ReceiptStatus | undefined {
+  if (!input.isMine) {
+    return undefined;
+  }
+
+  if (input.status === "sending" || input.status === "failed") {
+    return undefined;
+  }
+
+  if (!input.peerLastReadAt) {
+    return "sent";
+  }
+
+  const sent = Date.parse(input.sentAt);
+  const read = Date.parse(input.peerLastReadAt);
+  if (Number.isNaN(sent) || Number.isNaN(read)) {
+    return "sent";
+  }
+
+  return read >= sent ? "seen" : "delivered";
+}
+
+export function isConversationCurrentlyMuted(input: {
+  isMuted?: boolean;
+  mutedUntil?: string | null;
+  nowMs?: number;
+}): boolean {
+  if (!input.isMuted) {
+    return false;
+  }
+
+  if (!input.mutedUntil) {
+    return true;
+  }
+
+  const until = Date.parse(input.mutedUntil);
+  if (Number.isNaN(until)) {
+    return true;
+  }
+
+  return until > (input.nowMs ?? Date.now());
 }
