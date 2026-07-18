@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import AppTopNav from "../components/AppTopNav";
+import ProductErrorState from "../components/product/ProductErrorState";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
+import { FRIENDLY_LOAD_ERROR } from "../lib/product/userFacingMessage";
 import { rewardsMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
@@ -12,7 +15,6 @@ import { getMyReferralStats } from "../../lib/supabase/referral";
 import { nextUmPointsMilestone } from "../../lib/rewards/umPointsConfig";
 import { formatRelativeTime } from "../notifications/lib/formatRelativeTime";
 import InviteShareCard from "./components/InviteShareCard";
-import { headers } from "next/headers";
 
 export const metadata = rewardsMetadata;
 
@@ -32,11 +34,35 @@ export default async function RewardsPage() {
   const origin = host ? `${proto}://${host}` : null;
   const referral = await getMyReferralStats(supabase, origin);
 
-  const balance = summary?.balance ?? 0;
-  const earnedToday = summary?.earnedToday ?? 0;
-  const dailyCap = summary?.dailyCap ?? 200;
+  if (!summary) {
+    return (
+      <main
+        className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      >
+        <AppTopNav title="UM Points" subtitle="Rewards" />
+        <div className="mx-auto flex max-w-3xl justify-center px-4 py-10 md:px-6">
+          <ProductErrorState
+            title="Couldn't load UM Points"
+            message={FRIENDLY_LOAD_ERROR}
+          />
+        </div>
+        <p className="pb-10 text-center text-xs text-white/40">
+          <Link
+            href={APP_ROUTES.rewards}
+            className="watch-focus-ring font-bold text-blue-200 hover:text-blue-100"
+          >
+            Try again
+          </Link>
+        </p>
+      </main>
+    );
+  }
+
+  const balance = summary.balance;
+  const earnedToday = summary.earnedToday;
+  const dailyCap = summary.dailyCap;
   const nextMilestone =
-    summary?.nextMilestone ?? nextUmPointsMilestone(balance);
+    summary.nextMilestone ?? nextUmPointsMilestone(balance);
   const progress =
     nextMilestone != null
       ? Math.min(100, Math.round((balance / nextMilestone) * 100))
@@ -110,14 +136,14 @@ export default async function RewardsPage() {
 
           <div className="mt-8">
             <h2 className="text-sm font-black tracking-tight">Recent activity</h2>
-            {(summary?.ledger.length ?? 0) === 0 ? (
+            {summary.ledger.length === 0 ? (
               <p className="mt-3 rounded-2xl border border-dashed border-white/15 px-4 py-8 text-center text-sm text-white/45">
                 No UM Points yet. Publish, comment thoughtfully, or earn saves
                 and shares.
               </p>
             ) : (
               <ul className="mt-3 space-y-2">
-                {summary!.ledger.map((item) => (
+                {summary.ledger.map((item) => (
                   <li
                     key={item.id}
                     className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3"

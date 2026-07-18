@@ -81,4 +81,10 @@ export type ProfileView = {
   activityTier?: ActivityTierProgress | null;
   /** True when more videos exist beyond the initial page. */
   hasMoreVideos?: boolean;
+  /** True when video list fetch failed (not an empty catalog). */
+  videosLoadFailed?: boolean;
+  /** True when follow/stats aggregates failed. */
+  statsLoadFailed?: boolean;
+  /** True when live rooms fetch failed. */
+  liveLoadFailed?: boolean;
 };

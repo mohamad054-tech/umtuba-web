@@ -210,6 +210,24 @@ export function useWalletBalance(): UseWalletBalanceResult {
     };
   }, [userId, refresh]);
 
+  useEffect(() => {
+    if (!userId) return;
+
+    function onVisibleOrOnline() {
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        return;
+      }
+      void refresh();
+    }
+
+    document.addEventListener("visibilitychange", onVisibleOrOnline);
+    window.addEventListener("online", onVisibleOrOnline);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibleOrOnline);
+      window.removeEventListener("online", onVisibleOrOnline);
+    };
+  }, [userId, refresh]);
+
   return {
     status,
     balance:

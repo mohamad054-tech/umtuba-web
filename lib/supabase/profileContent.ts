@@ -70,7 +70,7 @@ function liveGradientForRoomId(roomId: string): string {
 async function loadProfileContentStatsFromTable(
   supabase: SupabaseClient,
   userId: string
-): Promise<ProfileContentStats> {
+): Promise<ProfileContentStats | null> {
   let query = supabase
     .from("posts")
     .select("likes, views")
@@ -95,7 +95,7 @@ async function loadProfileContentStatsFromTable(
 
   if (error) {
     console.error("loadProfileContentStatsFromTable failed:", error);
-    return { videoCount: 0, likesTotal: 0, viewsTotal: 0 };
+    return null;
   }
 
   let likesTotal = 0;
@@ -128,7 +128,7 @@ function isMissingRpcError(error: { message?: string; code?: string }): boolean 
 export async function getProfileContentStats(
   supabase: SupabaseClient,
   userId: string
-): Promise<ProfileContentStats> {
+): Promise<ProfileContentStats | null> {
   const { data, error } = await supabase.rpc("get_profile_content_stats", {
     p_user_id: userId,
   });
@@ -160,6 +160,7 @@ export async function listProfileVideos(
 ): Promise<{
   videos: ProfileContentVideo[];
   hasMore: boolean;
+  failed?: boolean;
 }> {
   const limit = Math.min(
     Math.max(options?.limit ?? PROFILE_VIDEO_PAGE_SIZE, 1),
@@ -179,7 +180,7 @@ export async function listProfileVideos(
 
   if (error) {
     console.error("listProfileVideos failed:", error);
-    return { videos: [], hasMore: false };
+    return { videos: [], hasMore: false, failed: true };
   }
 
   const rows = (data ?? []) as VideoPostRow[];
@@ -207,7 +208,7 @@ export async function listProfileVideos(
 export async function listProfileActiveLiveRooms(
   supabase: SupabaseClient,
   hostId: string
-): Promise<ProfileContentLiveRoom[]> {
+): Promise<{ rooms: ProfileContentLiveRoom[]; failed?: boolean }> {
   const { data, error } = await supabase
     .from("live_rooms")
     .select("id, title, viewer_count, city, country, status, visibility, host_id")
@@ -219,19 +220,21 @@ export async function listProfileActiveLiveRooms(
 
   if (error) {
     console.error("listProfileActiveLiveRooms failed:", error);
-    return [];
+    return { rooms: [], failed: true };
   }
 
-  return (data ?? [])
-    .filter((row) => typeof row.id === "string" && row.status === "live")
-    .map((row) => ({
-      roomId: row.id as string,
-      title: (row.title as string)?.trim() || "Live now",
-      viewerCount: parseNonNegInt(row.viewer_count),
-      city: (row.city as string)?.trim() || "",
-      country: (row.country as string)?.trim() || "",
-      status: "live" as const,
-    }));
+  return {
+    rooms: (data ?? [])
+      .filter((row) => typeof row.id === "string" && row.status === "live")
+      .map((row) => ({
+        roomId: row.id as string,
+        title: (row.title as string)?.trim() || "Live now",
+        viewerCount: parseNonNegInt(row.viewer_count),
+        city: (row.city as string)?.trim() || "",
+        country: (row.country as string)?.trim() || "",
+        status: "live" as const,
+      })),
+  };
 }
 
 export function mapContentVideosToProfileVideos(

@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { APP_ROUTES } from "../../lib/nav";
+import { getProfileForUser } from "../../../lib/supabase/auth";
+import { tryCreateClient } from "../../../lib/supabase/client";
+import { APP_ROUTES, buildCreatorProfileHref } from "../../lib/nav";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import ActivityTierBadge from "./ActivityTierBadge";
 import { useActivityTier } from "./useActivityTier";
 
@@ -21,6 +25,41 @@ export default function ActivityTierIndicator({
 }: ActivityTierIndicatorProps) {
   const router = useRouter();
   const { status, progress, errorMessage, refresh } = useActivityTier();
+  const [profileHref, setProfileHref] = useState<string | null>(null);
+
+  const resolveProfileHref = useCallback(async () => {
+    const supabase = tryCreateClient();
+    if (!supabase) {
+      setProfileHref(null);
+      return null;
+    }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      setProfileHref(null);
+      return null;
+    }
+    try {
+      const profile = await getProfileForUser(user);
+      const href = buildCreatorProfileHref({ username: profile.username });
+      setProfileHref(href);
+      return href;
+    } catch {
+      const fallback = buildCreatorProfileHref({
+        username: `user_${user.id.slice(0, 8)}`,
+      });
+      setProfileHref(fallback);
+      return fallback;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status !== "ready" && status !== "error") {
+      return;
+    }
+    void resolveProfileHref();
+  }, [status, resolveProfileHref]);
 
   const baseClass = compact
     ? "watch-focus-ring inline-flex h-8 max-w-[6.5rem] items-center rounded-full border px-2 text-[11px] font-bold transition"
@@ -42,7 +81,7 @@ export default function ActivityTierIndicator({
   if (status === "signed_out") {
     return (
       <Link
-        href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.profile)}`}
+        href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.rewards)}`}
         className={`${baseClass} border-white/10 bg-white/5 text-white/45 hover:bg-white/10 hover:text-white/70 ${className}`}
         aria-label="Sign in to view your activity tier"
       >
@@ -59,7 +98,10 @@ export default function ActivityTierIndicator({
         onClick={() => void refresh()}
         className={`${baseClass} border-red-400/30 bg-red-500/10 text-red-100 hover:bg-red-500/15 ${className}`}
         aria-label="Activity tier unavailable. Retry."
-        title={errorMessage || "Unable to load activity tier"}
+        title={sanitizeUserFacingMessage(
+          errorMessage,
+          "Unable to load activity tier"
+        )}
       >
         <span className="truncate">Retry</span>
       </button>
@@ -71,8 +113,15 @@ export default function ActivityTierIndicator({
   return (
     <button
       type="button"
-      onClick={() => router.push(APP_ROUTES.profile)}
-      className={`${className}`.trim()}
+      onClick={() => {
+        void (async () => {
+          const href = profileHref ?? (await resolveProfileHref());
+          if (href) {
+            router.push(href);
+          }
+        })();
+      }}
+      className={`${baseClass} border-sky-400/25 bg-sky-500/10 text-sky-50 hover:border-sky-400/40 hover:bg-sky-500/20 ${className}`}
       aria-label={`${tier.displayTitle} tier${
         nextTier ? `, ${progressPercent}% to ${nextTier.displayTitle}` : ""
       }. Open profile.`}

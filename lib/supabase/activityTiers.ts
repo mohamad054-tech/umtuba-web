@@ -43,9 +43,8 @@ export async function getMyActivityTierProgress(
 ): Promise<ActivityTierProgress> {
   const { data, error } = await supabase.rpc("get_my_activity_tier_summary");
   if (error) {
-    // Table/RPC may not be applied yet — fall back gracefully.
     console.error("get_my_activity_tier_summary failed:", error.message);
-    return emptyActivityTierProgress();
+    throw new Error("Unable to load activity tier.");
   }
   return parseSnapshot(data);
 }

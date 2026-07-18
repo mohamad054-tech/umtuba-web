@@ -10,6 +10,10 @@ import {
   getMyActivityTierProgress,
 } from "../../lib/supabase/activityTiers";
 import { createClient, getServerUser } from "../../lib/supabase/server";
+import {
+  FRIENDLY_LOAD_ERROR,
+  sanitizeUserFacingMessage,
+} from "../lib/product/userFacingMessage";
 
 export type ActivityTierActionResult<T> =
   | ({ ok: true } & T)
@@ -36,7 +40,10 @@ export async function getMyActivityTierAction(): Promise<
       error instanceof Error
         ? error.message
         : "Unable to load activity tier.";
-    return { ok: false, message };
+    return {
+      ok: false,
+      message: sanitizeUserFacingMessage(message, FRIENDLY_LOAD_ERROR),
+    };
   }
 }
 

@@ -80,26 +80,32 @@ export default function ProfileExperience({
           liveCount={profile.liveSessions.length}
         />
 
+        {profile.statsLoadFailed ? (
+          <p
+            role="status"
+            className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+          >
+            Some profile stats couldn&apos;t be loaded. Counts may be incomplete.
+          </p>
+        ) : null}
+
         <section
+          id={`profile-panel-${activeTab}`}
           role="tabpanel"
-          aria-label={
-            activeTab === "videos"
-              ? "Videos"
-              : activeTab === "live"
-                ? "Live"
-                : "About"
-          }
+          aria-labelledby={`profile-tab-${activeTab}`}
         >
           {activeTab === "videos" ? (
             <ProfileVideoGrid
               videos={profile.videos}
               hasMore={Boolean(profile.hasMoreVideos)}
+              loadFailed={Boolean(profile.videosLoadFailed)}
             />
           ) : null}
           {activeTab === "live" ? (
             <ProfileLivePanel
               sessions={profile.liveSessions}
               isLive={profile.isLive}
+              loadFailed={Boolean(profile.liveLoadFailed)}
             />
           ) : null}
           {activeTab === "about" ? <ProfileAbout profile={profile} /> : null}

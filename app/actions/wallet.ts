@@ -7,6 +7,10 @@ import {
   type AssetId,
   type WalletBalance,
 } from "../../lib/wallet";
+import {
+  FRIENDLY_LOAD_ERROR,
+  sanitizeUserFacingMessage,
+} from "../lib/product/userFacingMessage";
 
 export type WalletActionResult<T> =
   | ({ ok: true } & T)
@@ -31,7 +35,10 @@ export async function getPrimaryWalletBalanceAction(): Promise<
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unable to load wallet balance.";
-    return { ok: false, message };
+    return {
+      ok: false,
+      message: sanitizeUserFacingMessage(message, FRIENDLY_LOAD_ERROR),
+    };
   }
 }
 

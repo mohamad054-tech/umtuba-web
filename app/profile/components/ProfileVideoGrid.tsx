@@ -6,12 +6,27 @@ import ProductEmptyState from "../../components/product/ProductEmptyState";
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
   hasMore?: boolean;
+  loadFailed?: boolean;
 };
 
 export default function ProfileVideoGrid({
   videos,
   hasMore = false,
+  loadFailed = false,
 }: ProfileVideoGridProps) {
+  if (loadFailed) {
+    return (
+      <ProductEmptyState
+        compact
+        eyebrow="Videos"
+        title="Couldn't load videos"
+        description="Something went wrong loading this creator's videos. Please try again."
+        primaryHref={APP_ROUTES.discover}
+        primaryLabel="Open Discover"
+      />
+    );
+  }
+
   if (videos.length === 0) {
     return (
       <ProductEmptyState

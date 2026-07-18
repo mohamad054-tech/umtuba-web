@@ -1,9 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
 import FollowButton from "../../components/social/FollowButton";
-import { APP_ROUTES, buildLiveStreamHref, isUuid } from "../../lib/nav";
+import {
+  APP_ROUTES,
+  buildCreatorProfileHref,
+  buildLiveStreamHref,
+  isUuid,
+} from "../../lib/nav";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
 
@@ -30,6 +37,49 @@ export default function ProfileActions({
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
   const canFollow =
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">(
+    "idle"
+  );
+
+  async function shareProfile() {
+    const path = buildCreatorProfileHref({ username: profile.username });
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}${path}`
+        : path;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareStatus("copied");
+      window.setTimeout(() => setShareStatus("idle"), 2000);
+    } catch {
+      setShareStatus("error");
+    }
+  }
+
+  const shareButton = (
+    <button
+      type="button"
+      onClick={() => void shareProfile()}
+      className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
+      aria-label="Copy profile link"
+    >
+      {shareStatus === "copied" ? "Copied" : "Share"}
+    </button>
+  );
+
+  const shareFeedback =
+    shareStatus === "error" ? (
+      <p className="basis-full text-xs text-red-300" role="alert">
+        {sanitizeUserFacingMessage(
+          "Couldn't copy the profile link.",
+          "Couldn't copy the profile link."
+        )}
+      </p>
+    ) : (
+      <span className="sr-only" aria-live="polite">
+        {shareStatus === "copied" ? "Profile link copied" : ""}
+      </span>
+    );
 
   if (isOwner) {
     return (
@@ -40,6 +90,8 @@ export default function ProfileActions({
         >
           Edit profile
         </Link>
+        {shareButton}
+        {shareFeedback}
       </div>
     );
   }
@@ -70,6 +122,9 @@ export default function ProfileActions({
           Watch live
         </Link>
       ) : null}
+
+      {shareButton}
+      {shareFeedback}
     </div>
   );
 }

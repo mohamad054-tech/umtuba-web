@@ -92,7 +92,7 @@ async function resolveProfile(username: string): Promise<{
 
     if (row) {
       const supabase = await createClient();
-      const [activityTier, followResult, stats, videoPage, liveRooms] =
+      const [activityTier, followResult, stats, videoPage, liveResult] =
         await Promise.all([
           loadProfileActivityTier(row.id),
           getProfileFollowSnapshot(supabase, row.id),
@@ -113,10 +113,14 @@ async function resolveProfile(username: string): Promise<{
         profile: {
           ...profileRowToView(row, {
             follow,
+            followFailed: !followResult.ok,
             stats,
+            statsFailed: stats == null,
             videos: videoPage.videos,
+            videosFailed: Boolean(videoPage.failed),
             hasMoreVideos: videoPage.hasMore,
-            liveRooms,
+            liveRooms: liveResult.rooms,
+            liveFailed: Boolean(liveResult.failed),
           }),
           activityTier,
         },

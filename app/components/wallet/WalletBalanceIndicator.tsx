@@ -67,7 +67,12 @@ export default function WalletBalanceIndicator({
         onClick={() => void refresh()}
         className={`${baseClass} border-red-400/30 bg-red-500/10 text-red-100 hover:bg-red-500/15 ${className}`}
         aria-label={`${asset.displayName} unavailable. Retry.`}
-        title={errorMessage || `Unable to load ${asset.displayName}`}
+        title={
+          errorMessage
+            ? // Sanitized upstream in getPrimaryWalletBalanceAction
+              errorMessage
+            : `Unable to load ${asset.displayName}`
+        }
       >
         <DiamondIcon />
         <span className="truncate">Retry</span>

@@ -1,3 +1,5 @@
+"use client";
+
 export type ProfileTabId = "videos" | "live" | "about";
 
 type ProfileTabsProps = {
@@ -24,6 +26,21 @@ export default function ProfileTabs({
       role="tablist"
       aria-label="Profile sections"
       className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03] p-1 backdrop-blur-sm"
+      onKeyDown={(event) => {
+        const currentIndex = TABS.findIndex((tab) => tab.id === activeTab);
+        if (currentIndex < 0) {
+          return;
+        }
+        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+          event.preventDefault();
+          const delta = event.key === "ArrowRight" ? 1 : -1;
+          const next =
+            TABS[(currentIndex + delta + TABS.length) % TABS.length];
+          if (next) {
+            onChange(next.id);
+          }
+        }
+      }}
     >
       {TABS.map((tab) => {
         const active = activeTab === tab.id;
@@ -33,13 +50,18 @@ export default function ProfileTabs({
             : tab.id === "live"
               ? liveCount
               : null;
+        const tabId = `profile-tab-${tab.id}`;
+        const panelId = `profile-panel-${tab.id}`;
 
         return (
           <button
             key={tab.id}
+            id={tabId}
             type="button"
             role="tab"
             aria-selected={active}
+            aria-controls={panelId}
+            tabIndex={active ? 0 : -1}
             onClick={() => onChange(tab.id)}
             className={`watch-focus-ring flex-1 rounded-xl px-3 py-2.5 text-sm font-bold transition sm:px-4 ${
               active

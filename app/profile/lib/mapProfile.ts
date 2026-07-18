@@ -34,10 +34,14 @@ function formatJoinedLabel(isoDate: string | null | undefined): string {
 
 export type ProfileContentBundle = {
   follow?: FollowSnapshot | null;
+  followFailed?: boolean;
   stats?: ProfileContentStats | null;
+  statsFailed?: boolean;
   videos?: ProfileContentVideo[];
+  videosFailed?: boolean;
   hasMoreVideos?: boolean;
   liveRooms?: ProfileContentLiveRoom[];
+  liveFailed?: boolean;
 };
 
 export function profileRowToView(
@@ -55,6 +59,8 @@ export function profileRowToView(
   const videos = mapContentVideosToProfileVideos(content?.videos ?? []);
   const liveSessions = mapContentLiveToProfileSessions(liveRooms);
   const activeLive = liveRooms[0];
+  const statsFailed = Boolean(content?.statsFailed);
+  const followFailed = Boolean(content?.followFailed);
 
   const videoTotalCount = stats
     ? stats.videoCount
@@ -74,12 +80,24 @@ export function profileRowToView(
     avatarGradient: DEFAULT_AVATAR_GRADIENT,
     followersLabel: follow
       ? formatFollowCountLabel(follow.followersCount)
-      : "0",
+      : followFailed
+        ? "—"
+        : "0",
     followingLabel: follow
       ? formatFollowCountLabel(follow.followingCount)
-      : "0",
-    likesLabel: stats ? formatProfileStatLabel(stats.likesTotal) : "0",
-    viewsLabel: stats ? formatProfileStatLabel(stats.viewsTotal) : "0",
+      : followFailed
+        ? "—"
+        : "0",
+    likesLabel: stats
+      ? formatProfileStatLabel(stats.likesTotal)
+      : statsFailed
+        ? "—"
+        : "0",
+    viewsLabel: stats
+      ? formatProfileStatLabel(stats.viewsTotal)
+      : statsFailed
+        ? "—"
+        : "0",
     videoTotalCount,
     isFollowing: Boolean(follow?.following),
     isLive: Boolean(activeLive),
@@ -87,6 +105,9 @@ export function profileRowToView(
     videos,
     liveSessions,
     hasMoreVideos: Boolean(content?.hasMoreVideos),
+    videosLoadFailed: Boolean(content?.videosFailed),
+    statsLoadFailed: statsFailed || followFailed,
+    liveLoadFailed: Boolean(content?.liveFailed),
     about: {
       joinedLabel: formatJoinedLabel(row.created_at),
       interests: [],

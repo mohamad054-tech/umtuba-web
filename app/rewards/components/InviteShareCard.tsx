@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ReferralStats } from "../../../lib/supabase/referral";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 
 type InviteShareCardProps = {
   stats: ReferralStats;
@@ -9,14 +10,22 @@ type InviteShareCardProps = {
 
 export default function InviteShareCard({ stats }: InviteShareCardProps) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   async function copyLink() {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(stats.inviteUrl);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      setCopyError(
+        sanitizeUserFacingMessage(
+          "Couldn't copy the invite link. Please copy it manually.",
+          "Couldn't copy the invite link. Please copy it manually."
+        )
+      );
     }
   }
 
@@ -41,11 +50,20 @@ export default function InviteShareCard({ stats }: InviteShareCardProps) {
         <button
           type="button"
           onClick={() => void copyLink()}
-          className="shrink-0 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2.5 text-xs font-bold text-cyan-50 transition hover:bg-cyan-400/25"
+          className="watch-focus-ring shrink-0 rounded-xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-2.5 text-xs font-bold text-cyan-50 transition hover:bg-cyan-400/25"
         >
           {copied ? "Copied" : "Copy link"}
         </button>
       </div>
+
+      <p className="sr-only" aria-live="polite">
+        {copied ? "Invite link copied" : copyError ?? ""}
+      </p>
+      {copyError ? (
+        <p className="mt-2 text-xs font-medium text-red-300" role="alert">
+          {copyError}
+        </p>
+      ) : null}
 
       <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3">

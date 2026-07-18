@@ -6,12 +6,28 @@ import type { ProfileLivePreview } from "../types";
 type ProfileLivePanelProps = {
   sessions: ProfileLivePreview[];
   isLive: boolean;
+  loadFailed?: boolean;
 };
 
 export default function ProfileLivePanel({
   sessions,
   isLive,
+  loadFailed = false,
 }: ProfileLivePanelProps) {
+  if (loadFailed) {
+    return (
+      <div
+        role="alert"
+        className="space-y-2 rounded-[24px] border border-red-400/20 bg-red-500/5 px-5 py-10 text-center"
+      >
+        <p className="text-sm font-bold text-red-200">Couldn&apos;t load live status</p>
+        <p className="text-xs text-white/45">
+          Please refresh the page to try again.
+        </p>
+      </div>
+    );
+  }
+
   if (sessions.length === 0) {
     return (
       <div className="space-y-2 rounded-[24px] border border-white/10 bg-white/[0.03] px-5 py-10 text-center">
