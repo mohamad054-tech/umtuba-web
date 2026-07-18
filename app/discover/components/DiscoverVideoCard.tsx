@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { APP_ROUTES } from "../../lib/nav";
 import { recordFeedViewOnce } from "../../lib/video/recordFeedView";
+import {
+  createEmptyWatchSession,
+  flushWatchSession,
+  mergeWatchProgress,
+  type WatchSessionSnapshot,
+} from "../../lib/video/recordWatchSignal";
 import type { DiscoverStats, DiscoverVideo } from "../types";
 import DiscoverActionRail from "./DiscoverActionRail";
 import DiscoverCaption from "./DiscoverCaption";
@@ -35,6 +42,8 @@ export default function DiscoverVideoCard({
   const [localViews] = useState(() => new Set<number>());
   const viewsSet = sessionViews ?? localViews;
   const postId = Number(video.id);
+  const sessionRef = useRef<WatchSessionSnapshot | null>(null);
+  const wasActiveRef = useRef(false);
 
   useEffect(() => {
     if (!active || !Number.isInteger(postId) || postId <= 0) {
@@ -47,6 +56,65 @@ export default function DiscoverVideoCard({
       }
     });
   }, [active, onStatsChange, postId, viewsSet]);
+
+  useEffect(() => {
+    if (!Number.isInteger(postId) || postId <= 0) {
+      return;
+    }
+
+    if (active && !wasActiveRef.current) {
+      sessionRef.current = createEmptyWatchSession(postId, "discover");
+      if (video.likedByMe) {
+        sessionRef.current.engagement.liked = true;
+      }
+      if (video.savedByMe) {
+        sessionRef.current.engagement.saved = true;
+      }
+    }
+
+    if (!active && wasActiveRef.current) {
+      const session = sessionRef.current;
+      sessionRef.current = null;
+      void flushWatchSession(session);
+    }
+
+    wasActiveRef.current = active;
+  }, [active, postId, video.likedByMe, video.savedByMe]);
+
+  useEffect(() => {
+    return () => {
+      const session = sessionRef.current;
+      sessionRef.current = null;
+      void flushWatchSession(session);
+    };
+  }, []);
+
+  function handleWatchProgress(event: WatchProgressEvent) {
+    if (!sessionRef.current) return;
+    sessionRef.current = mergeWatchProgress(sessionRef.current, event);
+  }
+
+  function handleFlagsChange(flags: {
+    likedByMe?: boolean;
+    savedByMe?: boolean;
+  }) {
+    if (sessionRef.current) {
+      if (flags.likedByMe) {
+        sessionRef.current.engagement.liked = true;
+      }
+      if (flags.savedByMe) {
+        sessionRef.current.engagement.saved = true;
+      }
+    }
+    onFlagsChange?.(flags);
+  }
+
+  function handleComment() {
+    if (sessionRef.current) {
+      sessionRef.current.engagement.commented = true;
+    }
+    onComment();
+  }
 
   return (
     <article
@@ -61,6 +129,11 @@ export default function DiscoverVideoCard({
         poster={video.poster}
         active={active}
         label={video.caption}
+        onWatchProgress={
+          Number.isInteger(postId) && postId > 0
+            ? handleWatchProgress
+            : undefined
+        }
       />
 
       {active ? (
@@ -97,9 +170,9 @@ export default function DiscoverVideoCard({
               savedByMe={video.savedByMe}
               caption={video.caption}
               returnPath={`${APP_ROUTES.discover}?post=${video.id}`}
-              onComment={onComment}
+              onComment={handleComment}
               onStatsChange={onStatsChange}
-              onFlagsChange={onFlagsChange}
+              onFlagsChange={handleFlagsChange}
             />
           </div>
         </div>

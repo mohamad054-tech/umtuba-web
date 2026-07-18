@@ -9,6 +9,13 @@ import {
 } from "react";
 import WatchFloatingControls from "./WatchFloatingControls";
 
+export type WatchProgressEvent = {
+  currentTimeMs: number;
+  durationMs: number;
+  completed: boolean;
+  loopCount: number;
+};
+
 type VideoPlayerProps = {
   src: string;
   poster?: string;
@@ -20,6 +27,8 @@ type VideoPlayerProps = {
   onPlaybackError?: () => void;
   playbackStatus?: "ok" | "expired" | "deleted" | "error";
   onRetryPlayback?: () => void;
+  /** Optional watch-signal telemetry (Discover/Watch recommendation V1). */
+  onWatchProgress?: (event: WatchProgressEvent) => void;
 };
 
 export default function VideoPlayer({
@@ -32,6 +41,7 @@ export default function VideoPlayer({
   onPlaybackError,
   playbackStatus = "ok",
   onRetryPlayback,
+  onWatchProgress,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [pausedByUser, setPausedByUser] = useState(false);
@@ -39,6 +49,9 @@ export default function VideoPlayer({
   const [isReady, setIsReady] = useState(false);
   const [flashIcon, setFlashIcon] = useState<"play" | "pause" | null>(null);
   const flashTimerRef = useRef<number | null>(null);
+  const loopCountRef = useRef(0);
+  const onWatchProgressRef = useRef(onWatchProgress);
+  onWatchProgressRef.current = onWatchProgress;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -100,6 +113,52 @@ export default function VideoPlayer({
       }
     };
   }, []);
+
+  useEffect(() => {
+    loopCountRef.current = 0;
+  }, [src]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const report = onWatchProgressRef.current;
+    if (!video || !report || !active || playbackStatus !== "ok") {
+      return;
+    }
+
+    const emit = (completed = false) => {
+      const durationMs = Number.isFinite(video.duration)
+        ? Math.max(0, video.duration * 1000)
+        : 0;
+      const currentTimeMs = Number.isFinite(video.currentTime)
+        ? Math.max(0, video.currentTime * 1000)
+        : 0;
+      report({
+        currentTimeMs,
+        durationMs,
+        completed:
+          completed ||
+          (durationMs > 0 && currentTimeMs / durationMs >= 0.92),
+        loopCount: loopCountRef.current,
+      });
+    };
+
+    const onTimeUpdate = () => emit(false);
+    const onEnded = () => {
+      loopCountRef.current += 1;
+      emit(true);
+    };
+
+    video.addEventListener("timeupdate", onTimeUpdate);
+    video.addEventListener("ended", onEnded);
+    const interval = window.setInterval(() => emit(false), 2000);
+
+    return () => {
+      emit(false);
+      video.removeEventListener("timeupdate", onTimeUpdate);
+      video.removeEventListener("ended", onEnded);
+      window.clearInterval(interval);
+    };
+  }, [active, playbackStatus, src]);
 
   function showFlash(icon: "play" | "pause") {
     setFlashIcon(icon);

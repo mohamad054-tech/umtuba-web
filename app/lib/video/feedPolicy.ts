@@ -10,6 +10,13 @@
  *   only when counted.
  * - Demo / non-supabase items never call the RPC.
  *
+ * Watch-signal telemetry (Recommendation Infrastructure V1):
+ * - Separate from view counting. Records watch_duration_ms, watch_percent,
+ *   completed, rewatch_count, like/save/share/comment/follow_after_watch,
+ *   and skipped_early via `record_watch_signal`.
+ * - Does not change chronological feed ordering (Discover/Watch stay
+ *   created_at DESC). Ranking helpers live in `lib/recommendations`.
+ *
  * Interactions (likes, comments, saves, shares) use the same social actions
  * on both routes; auth redirects use the route returnPath (/discover|/watch).
  */

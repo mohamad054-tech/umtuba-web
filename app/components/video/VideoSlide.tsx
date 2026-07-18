@@ -1,12 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DiscoverStats } from "../../discover/types";
 import type { WatchVideo } from "../../watch/types";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import {
+  createEmptyWatchSession,
+  flushWatchSession,
+  mergeWatchProgress,
+  type WatchSessionSnapshot,
+} from "../../lib/video/recordWatchSignal";
 import type { WatchPanelId } from "./watchTypes";
 import VideoOverlay from "./VideoOverlay";
-import VideoPlayer from "./VideoPlayer";
+import VideoPlayer, { type WatchProgressEvent } from "./VideoPlayer";
 
 type VideoSlideProps = {
   video: WatchVideo;
@@ -43,6 +49,8 @@ export default function VideoSlide({
     "ok" | "expired" | "deleted" | "error"
   >("ok");
   const [retrying, setRetrying] = useState(false);
+  const sessionRef = useRef<WatchSessionSnapshot | null>(null);
+  const wasActiveRef = useRef(false);
 
   async function handleRetryPlayback() {
     if (!video.postId || retrying) return;
@@ -57,6 +65,58 @@ export default function VideoSlide({
 
     onSrcChange?.(result.src);
     setPlaybackStatus("ok");
+  }
+
+  useEffect(() => {
+    if (video.source !== "supabase" || !video.postId) {
+      return;
+    }
+
+    if (active && !wasActiveRef.current) {
+      sessionRef.current = createEmptyWatchSession(video.postId, "watch");
+      if (video.likedByMe) {
+        sessionRef.current.engagement.liked = true;
+      }
+      if (video.savedByMe) {
+        sessionRef.current.engagement.saved = true;
+      }
+    }
+
+    if (!active && wasActiveRef.current) {
+      const session = sessionRef.current;
+      sessionRef.current = null;
+      void flushWatchSession(session);
+    }
+
+    wasActiveRef.current = active;
+  }, [active, video.likedByMe, video.postId, video.savedByMe, video.source]);
+
+  useEffect(() => {
+    return () => {
+      const session = sessionRef.current;
+      sessionRef.current = null;
+      void flushWatchSession(session);
+    };
+  }, []);
+
+  function handleWatchProgress(event: WatchProgressEvent) {
+    if (!sessionRef.current) return;
+    sessionRef.current = mergeWatchProgress(sessionRef.current, event);
+  }
+
+  function handleFlagsChange(flags: {
+    likedByMe?: boolean;
+    savedByMe?: boolean;
+  }) {
+    if (sessionRef.current) {
+      if (flags.likedByMe) {
+        sessionRef.current.engagement.liked = true;
+      }
+      if (flags.savedByMe) {
+        sessionRef.current.engagement.saved = true;
+      }
+    }
+    onFlagsChange?.(flags);
   }
 
   return (
@@ -82,6 +142,11 @@ export default function VideoSlide({
         onRetryPlayback={
           video.postId ? () => void handleRetryPlayback() : undefined
         }
+        onWatchProgress={
+          video.source === "supabase" && video.postId
+            ? handleWatchProgress
+            : undefined
+        }
       />
       <VideoOverlay
         video={video}
@@ -90,7 +155,7 @@ export default function VideoSlide({
         onOpenPanel={onOpenPanel}
         onPostJourney={onPostJourney}
         onStatsChange={onStatsChange}
-        onFlagsChange={onFlagsChange}
+        onFlagsChange={handleFlagsChange}
       />
     </article>
   );

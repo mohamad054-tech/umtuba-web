@@ -168,6 +168,91 @@ export type MessageAttachmentRow = {
   created_at: string;
 };
 
+export type WatchSignalRow = {
+  id: number;
+  post_id: number;
+  creator_id: string | null;
+  user_id: string | null;
+  viewer_key: string;
+  session_id: string;
+  surface: "discover" | "watch";
+  watch_duration_ms: number;
+  watch_percent: number;
+  completed: boolean;
+  rewatch_count: number;
+  liked: boolean;
+  saved: boolean;
+  shared: boolean;
+  commented: boolean;
+  follow_after_watch: boolean;
+  skipped_early: boolean;
+  ml_features: Record<string, unknown>;
+  model_version: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserInterestProfileRow = {
+  user_id: string;
+  tag_weights: Record<string, unknown>;
+  creator_affinity: Record<string, unknown>;
+  signal_counts: Record<string, unknown>;
+  avg_watch_percent: number;
+  completion_rate: number;
+  skip_rate: number;
+  positive_engagement_rate: number;
+  total_signals: number;
+  freshness_score: number;
+  ml_features: Record<string, unknown>;
+  model_version: string;
+  last_computed_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CreatorQualitySignalRow = {
+  creator_id: string;
+  video_count: number;
+  total_watches: number;
+  avg_watch_percent: number;
+  completion_rate: number;
+  rewatch_rate: number;
+  like_rate: number;
+  save_rate: number;
+  share_rate: number;
+  comment_rate: number;
+  follow_rate: number;
+  skip_rate: number;
+  quality_score: number;
+  ml_features: Record<string, unknown>;
+  model_version: string;
+  last_computed_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type VideoQualitySignalRow = {
+  post_id: number;
+  creator_id: string | null;
+  total_watches: number;
+  avg_watch_percent: number;
+  avg_watch_duration_ms: number;
+  completion_rate: number;
+  rewatch_rate: number;
+  like_rate: number;
+  save_rate: number;
+  share_rate: number;
+  comment_rate: number;
+  follow_rate: number;
+  skip_rate: number;
+  quality_score: number;
+  ml_features: Record<string, unknown>;
+  model_version: string;
+  last_computed_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -464,6 +549,157 @@ export type Database = {
         };
         Relationships: [];
       };
+      watch_signals: {
+        Row: WatchSignalRow;
+        Insert: {
+          post_id: number;
+          creator_id?: string | null;
+          user_id?: string | null;
+          viewer_key: string;
+          session_id: string;
+          surface?: WatchSignalRow["surface"];
+          watch_duration_ms?: number;
+          watch_percent?: number;
+          completed?: boolean;
+          rewatch_count?: number;
+          liked?: boolean;
+          saved?: boolean;
+          shared?: boolean;
+          commented?: boolean;
+          follow_after_watch?: boolean;
+          skipped_early?: boolean;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+        };
+        Update: {
+          watch_duration_ms?: number;
+          watch_percent?: number;
+          completed?: boolean;
+          rewatch_count?: number;
+          liked?: boolean;
+          saved?: boolean;
+          shared?: boolean;
+          commented?: boolean;
+          follow_after_watch?: boolean;
+          skipped_early?: boolean;
+          ml_features?: Record<string, unknown>;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      user_interest_profiles: {
+        Row: UserInterestProfileRow;
+        Insert: {
+          user_id: string;
+          tag_weights?: Record<string, unknown>;
+          creator_affinity?: Record<string, unknown>;
+          signal_counts?: Record<string, unknown>;
+          avg_watch_percent?: number;
+          completion_rate?: number;
+          skip_rate?: number;
+          positive_engagement_rate?: number;
+          total_signals?: number;
+          freshness_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+        };
+        Update: {
+          tag_weights?: Record<string, unknown>;
+          creator_affinity?: Record<string, unknown>;
+          signal_counts?: Record<string, unknown>;
+          avg_watch_percent?: number;
+          completion_rate?: number;
+          skip_rate?: number;
+          positive_engagement_rate?: number;
+          total_signals?: number;
+          freshness_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+          last_computed_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      creator_quality_signals: {
+        Row: CreatorQualitySignalRow;
+        Insert: {
+          creator_id: string;
+          video_count?: number;
+          total_watches?: number;
+          avg_watch_percent?: number;
+          completion_rate?: number;
+          rewatch_rate?: number;
+          like_rate?: number;
+          save_rate?: number;
+          share_rate?: number;
+          comment_rate?: number;
+          follow_rate?: number;
+          skip_rate?: number;
+          quality_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+        };
+        Update: {
+          video_count?: number;
+          total_watches?: number;
+          avg_watch_percent?: number;
+          completion_rate?: number;
+          rewatch_rate?: number;
+          like_rate?: number;
+          save_rate?: number;
+          share_rate?: number;
+          comment_rate?: number;
+          follow_rate?: number;
+          skip_rate?: number;
+          quality_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+          last_computed_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      video_quality_signals: {
+        Row: VideoQualitySignalRow;
+        Insert: {
+          post_id: number;
+          creator_id?: string | null;
+          total_watches?: number;
+          avg_watch_percent?: number;
+          avg_watch_duration_ms?: number;
+          completion_rate?: number;
+          rewatch_rate?: number;
+          like_rate?: number;
+          save_rate?: number;
+          share_rate?: number;
+          comment_rate?: number;
+          follow_rate?: number;
+          skip_rate?: number;
+          quality_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+        };
+        Update: {
+          creator_id?: string | null;
+          total_watches?: number;
+          avg_watch_percent?: number;
+          avg_watch_duration_ms?: number;
+          completion_rate?: number;
+          rewatch_rate?: number;
+          like_rate?: number;
+          save_rate?: number;
+          share_rate?: number;
+          comment_rate?: number;
+          follow_rate?: number;
+          skip_rate?: number;
+          quality_score?: number;
+          ml_features?: Record<string, unknown>;
+          model_version?: string;
+          last_computed_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -482,6 +718,25 @@ export type Database = {
       record_post_view: {
         Args: { p_post_id: number; p_viewer_key?: string | null };
         Returns: { counted: boolean; views: number };
+      };
+      record_watch_signal: {
+        Args: {
+          p_post_id: number;
+          p_session_id: string;
+          p_viewer_key?: string | null;
+          p_surface?: string;
+          p_watch_duration_ms?: number;
+          p_watch_percent?: number;
+          p_completed?: boolean;
+          p_rewatch_count?: number;
+          p_liked?: boolean;
+          p_saved?: boolean;
+          p_shared?: boolean;
+          p_commented?: boolean;
+          p_follow_after_watch?: boolean;
+          p_skipped_early?: boolean | null;
+        };
+        Returns: Record<string, unknown>;
       };
       resolve_interaction_viewer_key: {
         Args: { p_viewer_key: string };
