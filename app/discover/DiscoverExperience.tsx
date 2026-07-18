@@ -6,6 +6,8 @@ import { useCallback, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
 import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
+import ProductEmptyState from "../components/product/ProductEmptyState";
+import ProductErrorState from "../components/product/ProductErrorState";
 import {
   APP_ROUTES,
   buildCreatorProfileHref,
@@ -19,6 +21,7 @@ import {
   FEED_LOAD_MORE_ERROR_MESSAGE,
   shouldStartFeedLoadMore,
 } from "../lib/video/feedPagination";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
@@ -162,19 +165,13 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 items-center justify-center px-6 py-16">
-          <div
-            className="max-w-md rounded-[28px] border border-red-400/20 bg-red-400/5 p-8 text-center"
-            role="alert"
-          >
-            <p className="text-xl font-black text-red-200">Could not load videos</p>
-            <p className="mt-3 text-sm text-white/60">{loadError}</p>
-            <Link
-              href={APP_ROUTES.discover}
-              className="mt-6 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white/80"
-            >
-              Try again
-            </Link>
-          </div>
+          <ProductErrorState
+            title="Could not load videos"
+            message={sanitizeUserFacingMessage(loadError)}
+            onRetry={() => {
+              window.location.assign(APP_ROUTES.discover);
+            }}
+          />
         </div>
       </DiscoverShell>
     );
@@ -184,19 +181,16 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 items-center justify-center px-6 py-16">
-          <div className="max-w-md rounded-[28px] border border-dashed border-white/15 bg-white/[0.03] p-8 text-center">
-            <p className="text-2xl font-black">No video posts yet</p>
-            <p className="mt-3 text-sm text-white/55">
-              Be the first to publish a clip. Uploads appear here after they are
-              saved securely to storage.
-            </p>
-            <Link
-              href={APP_ROUTES.createVideo}
-              className="mt-6 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-            >
-              Upload a video
-            </Link>
-          </div>
+          <ProductEmptyState
+            compact
+            eyebrow="Discover"
+            title="No video posts yet"
+            description="Be the first to publish a clip. Uploads appear here after they are saved securely."
+            primaryHref={APP_ROUTES.createVideo}
+            primaryLabel="Upload a video"
+            secondaryHref={APP_ROUTES.live}
+            secondaryLabel="Browse Live"
+          />
         </div>
       </DiscoverShell>
     );

@@ -278,8 +278,12 @@ export default function VideoPlayer({
 
       {!isReady && active && playbackStatus === "ok" ? (
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/35">
-          <p className="rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-bold text-white/70 backdrop-blur">
-            Loading...
+          <p
+            className="rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-bold text-white/70 backdrop-blur"
+            role="status"
+            aria-live="polite"
+          >
+            Loading video…
           </p>
         </div>
       ) : null}

@@ -24,6 +24,7 @@ import {
 } from "../lib/video/feedPagination";
 import { APP_ROUTES } from "../lib/nav";
 import { allowWatchPrototypePanels } from "../lib/product/surfaceGates";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { findWatchVideoIndex } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 
@@ -279,7 +280,7 @@ export default function WatchExperience({
 
   const transitionVideo = journeyVideo ?? activeVideo;
   const emptyMessage = loadError
-    ? loadError
+    ? sanitizeUserFacingMessage(loadError)
     : "No published videos yet. Create one to start the Watch feed.";
 
   return (
@@ -337,7 +338,7 @@ export default function WatchExperience({
       <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-0 md:px-8 md:pb-8 md:pt-0">
         <div
           ref={stageRef}
-          className="video-watch-stage relative h-[100dvh] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
+          className="video-watch-stage relative h-[calc(100dvh-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
         >
           <VerticalVideoFeed
             videos={videos}
@@ -361,7 +362,7 @@ export default function WatchExperience({
                 role="alert"
               >
                 <p className="min-w-0 flex-1 text-xs font-bold sm:text-sm">
-                  {loadMoreError}
+                  {sanitizeUserFacingMessage(loadMoreError)}
                 </p>
                 <button
                   type="button"

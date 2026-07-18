@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import ProductLoadingState from "../components/product/ProductLoadingState";
 import { settingsMetadata } from "../../lib/site/routeMetadata";
 import { getServerUser } from "../../lib/supabase/server";
 import { getProfileByIdFromDb } from "../../lib/supabase/profiles";
@@ -34,7 +35,9 @@ export default async function SettingsPage() {
     row.username;
 
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={<ProductLoadingState fullPage label="Opening Settings…" />}
+    >
       <SettingsExperience
         profile={{
           id: row.id,

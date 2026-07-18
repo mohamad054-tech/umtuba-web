@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef } from "react";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
+
 type WatchPanelProps = {
   open: boolean;
   title: string;
@@ -13,6 +16,16 @@ export default function WatchPanel({
   description,
   onClose,
 }: WatchPanelProps) {
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useDialogA11y({
+    open,
+    onClose,
+    containerRef: panelRef,
+    initialFocusRef: closeRef,
+  });
+
   if (!open) {
     return null;
   }
@@ -27,6 +40,7 @@ export default function WatchPanel({
       />
 
       <aside
+        ref={panelRef}
         className="watch-panel-enter relative z-10 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-[#080816]/95 p-6 text-white shadow-2xl backdrop-blur-xl"
         role="dialog"
         aria-modal="true"
@@ -35,7 +49,7 @@ export default function WatchPanel({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-blue-300/80">
-              Coming soon
+              Watch
             </p>
             <h2 id="watch-panel-title" className="mt-2 text-2xl font-black">
               {title}
@@ -43,6 +57,7 @@ export default function WatchPanel({
           </div>
 
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-2 text-sm font-bold hover:bg-white/10"
@@ -53,13 +68,9 @@ export default function WatchPanel({
 
         <p className="mt-5 text-sm leading-7 text-white/65">{description}</p>
 
-        <div className="mt-8 space-y-3">
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-4 text-sm text-white/50">
-            Placeholder surface for future content.
-          </div>
-          <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-white/35">
-            Backend not connected yet
-          </div>
+        <div className="mt-8 rounded-2xl border border-dashed border-white/10 bg-white/[0.03] px-4 py-10 text-center text-sm text-white/45">
+          This panel isn’t available yet. Keep watching — more tools will appear
+          here when ready.
         </div>
       </aside>
     </div>

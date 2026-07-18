@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import ContentCard from "../components/ContentCard";
+import ProductEmptyState from "../components/product/ProductEmptyState";
+import ProductErrorState from "../components/product/ProductErrorState";
 import type { Post } from "../data/types/post";
 import { APP_ROUTES } from "../lib/nav";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 
 type SavedExperienceProps = {
   initialPosts: Post[];
@@ -44,8 +46,14 @@ export default function SavedExperience({
       </div>
 
       {loadError ? (
-        <div className="rounded-[30px] border border-red-400/20 bg-red-400/5 px-6 py-16 text-center">
-          <p className="text-xl font-black text-red-300">{loadError}</p>
+        <div className="flex justify-center">
+          <ProductErrorState
+            title="Couldn’t load saved posts"
+            message={sanitizeUserFacingMessage(loadError)}
+            onRetry={() => {
+              window.location.assign(APP_ROUTES.saved);
+            }}
+          />
         </div>
       ) : posts.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2">
@@ -58,17 +66,17 @@ export default function SavedExperience({
           ))}
         </div>
       ) : (
-        <div className="rounded-[30px] border border-dashed border-white/15 bg-white/[0.03] px-6 py-16 text-center">
-          <p className="text-2xl font-black">No saved posts yet</p>
-          <p className="mt-3 text-white/50">
-            Tap Save on Discover or Feed posts to build your collection.
-          </p>
-          <Link
-            href={APP_ROUTES.discover}
-            className="mt-6 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-          >
-            Go to Discover
-          </Link>
+        <div className="flex justify-center">
+          <ProductEmptyState
+            compact
+            eyebrow="Saved"
+            title="No saved posts yet"
+            description="Tap Save on Discover or Watch posts to build your collection."
+            primaryHref={APP_ROUTES.discover}
+            primaryLabel="Go to Discover"
+            secondaryHref={null}
+            secondaryLabel={null}
+          />
         </div>
       )}
     </div>

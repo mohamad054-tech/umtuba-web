@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { ProfileVideo } from "../types";
+import { APP_ROUTES } from "../../lib/nav";
+import ProductEmptyState from "../../components/product/ProductEmptyState";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
@@ -12,9 +14,16 @@ export default function ProfileVideoGrid({
 }: ProfileVideoGridProps) {
   if (videos.length === 0) {
     return (
-      <p className="rounded-[24px] border border-white/10 bg-white/[0.03] px-5 py-10 text-center text-sm text-white/50">
-        No published videos yet.
-      </p>
+      <ProductEmptyState
+        compact
+        eyebrow="Videos"
+        title="No published videos yet"
+        description="Upload a clip to show it on this profile and on Discover."
+        primaryHref={APP_ROUTES.createVideo}
+        primaryLabel="Upload a video"
+        secondaryHref={APP_ROUTES.discover}
+        secondaryLabel="Open Discover"
+      />
     );
   }
 

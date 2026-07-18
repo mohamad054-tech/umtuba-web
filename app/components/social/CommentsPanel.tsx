@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import {
   createCommentAction,
@@ -17,6 +17,8 @@ import {
   readCommentDraft,
   writeCommentDraft,
 } from "../../lib/social/commentDraft";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
+import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 
 type CommentsPanelProps = {
   open: boolean;
@@ -66,6 +68,15 @@ export default function CommentsPanel({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [requiresAuth, setRequiresAuth] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useDialogA11y({
+    open,
+    onClose,
+    containerRef: panelRef,
+    initialFocusRef: closeRef,
+  });
 
   useEffect(() => {
     setDraft(readCommentDraft(postId));
@@ -106,21 +117,6 @@ export default function CommentsPanel({
     };
   }, [open, postId]);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
-
   if (!open) {
     return null;
   }
@@ -143,7 +139,10 @@ export default function CommentsPanel({
       setErrorMessage(
         result.requiresAuth
           ? COMMENT_AUTH_PROMPT
-          : result.message || "Couldn't post your comment. Please try again."
+          : sanitizeUserFacingMessage(
+              result.message,
+              "Couldn't post your comment. Please try again."
+            )
       );
       setRequiresAuth(Boolean(result.requiresAuth));
       setIsSubmitting(false);
@@ -171,7 +170,10 @@ export default function CommentsPanel({
       setErrorMessage(
         result.requiresAuth
           ? COMMENT_AUTH_PROMPT
-          : result.message || "Couldn't delete that comment. Please try again."
+          : sanitizeUserFacingMessage(
+              result.message,
+              "Couldn't delete that comment. Please try again."
+            )
       );
       setRequiresAuth(Boolean(result.requiresAuth));
       setDeletingId(null);
@@ -198,6 +200,7 @@ export default function CommentsPanel({
       />
 
       <aside
+        ref={panelRef}
         className="watch-panel-enter relative z-10 flex h-full w-full max-w-sm flex-col border-l border-white/10 bg-[#080816]/95 text-white shadow-2xl backdrop-blur-xl"
         role="dialog"
         aria-modal="true"
@@ -214,6 +217,7 @@ export default function CommentsPanel({
           </div>
 
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-2 text-sm font-bold hover:bg-white/10"

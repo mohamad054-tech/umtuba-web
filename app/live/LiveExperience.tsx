@@ -19,6 +19,7 @@ import CreateLiveRoomForm from "./components/CreateLiveRoomForm";
 import LiveRoomsSkeleton from "./components/LiveRoomsSkeleton";
 import LiveShell from "./components/LiveShell";
 import LiveStreamCard from "./components/LiveStreamCard";
+import ProductEmptyState from "../components/product/ProductEmptyState";
 import {
   applyLobbyRoomPatch,
   useLiveLobbyRealtime,
@@ -271,13 +272,21 @@ export default function LiveExperience() {
                 </button>
               </div>
             ) : rooms.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-                <p className="text-lg font-black text-white">No live rooms yet</p>
-                <p className="max-w-md text-sm text-white/45">
-                  {liveFullyReady
-                    ? "Be the first to start a public live room."
-                    : "Live video is temporarily unavailable. Please try again later."}
-                </p>
+              <div className="flex justify-center py-8">
+                <ProductEmptyState
+                  compact
+                  eyebrow="Live"
+                  title="No live rooms yet"
+                  description={
+                    liveFullyReady
+                      ? "Be the first to start a public live room from the host panel."
+                      : "Live video is temporarily unavailable. Please try again later."
+                  }
+                  primaryHref={APP_ROUTES.discover}
+                  primaryLabel="Explore Discover"
+                  secondaryHref={null}
+                  secondaryLabel={null}
+                />
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

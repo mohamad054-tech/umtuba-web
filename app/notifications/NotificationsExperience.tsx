@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import type { AppNotification } from "../../lib/supabase/notifications";
+import ProductEmptyState from "../components/product/ProductEmptyState";
+import ProductErrorState from "../components/product/ProductErrorState";
 import { APP_ROUTES } from "../lib/nav";
+import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { useNotifications } from "./hooks/useNotifications";
 import NotificationListItem from "./components/NotificationListItem";
 import NotificationsSkeleton from "./components/NotificationsSkeleton";
 import { NOTIFICATION_FILTERS } from "./lib/notificationCategories";
 
 export default function NotificationsExperience() {
-  const router = useRouter();
   const {
     notifications,
     unreadCount,
@@ -111,35 +112,32 @@ export default function NotificationsExperience() {
         {loading ? <NotificationsSkeleton /> : null}
 
         {!loading && error ? (
-          <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-6 text-center">
-            <p className="text-sm font-semibold text-red-100">{error}</p>
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              className="watch-focus-ring mt-3 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10"
-            >
-              Try again
-            </button>
+          <div className="flex justify-center py-4">
+            <ProductErrorState
+              compact
+              title="Couldn’t load notifications"
+              message={sanitizeUserFacingMessage(error)}
+              onRetry={() => void refresh()}
+            />
           </div>
         ) : null}
 
         {!loading && !error && notifications.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-4 py-14 text-center">
-            <p className="text-base font-black tracking-tight">
-              {category === "all"
-                ? "No notifications yet"
-                : `No ${category} notifications`}
-            </p>
-            <p className="mt-2 text-sm text-white/45">
-              Social, Journey, Live, Rewards, and AI insights show up here.
-            </p>
-            <button
-              type="button"
-              onClick={() => router.push("/discover")}
-              className="watch-focus-ring mt-5 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-xs font-bold text-blue-100 transition hover:bg-blue-500/25"
-            >
-              Explore Discover
-            </button>
+          <div className="flex justify-center py-2">
+            <ProductEmptyState
+              compact
+              eyebrow="Inbox"
+              title={
+                category === "all"
+                  ? "No notifications yet"
+                  : `No ${category} notifications`
+              }
+              description="Social, Journey, Live, Rewards, and AI insights show up here."
+              primaryHref={APP_ROUTES.discover}
+              primaryLabel="Explore Discover"
+              secondaryHref={`${APP_ROUTES.settings}?section=notifications`}
+              secondaryLabel="Notification settings"
+            />
           </div>
         ) : null}
 
