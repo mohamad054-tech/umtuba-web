@@ -1,6 +1,7 @@
 export {
   APP_NAV_ITEMS,
   APP_ROUTES,
+  advertiseCampaignDetail,
   buildAiInsightHref,
   buildConversationHref,
   buildCreatorProfileHref,

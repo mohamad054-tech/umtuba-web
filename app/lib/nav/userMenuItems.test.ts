@@ -15,16 +15,18 @@ describe("userMenuItems", () => {
       "Rewards",
       "Notifications",
       "Settings",
+      "Advertise",
     ]);
     expect(new Set(labels).size).toBe(labels.length);
   });
 
-  it("exposes Saved, Rewards, and Settings entry points", () => {
+  it("exposes Saved, Rewards, Settings, and Advertise entry points", () => {
     const hrefs = listUserMenuHrefs("/profile/demo_user");
     expect(hrefs).toContain(APP_ROUTES.saved);
     expect(hrefs).toContain(APP_ROUTES.rewards);
     expect(hrefs).toContain(APP_ROUTES.notifications);
     expect(hrefs).toContain(APP_ROUTES.settings);
+    expect(hrefs).toContain(APP_ROUTES.advertise);
     expect(hrefs).not.toContain("/feed");
     expect(hrefs).not.toContain("/ai");
     expect(hrefs).not.toContain("/uconnect");

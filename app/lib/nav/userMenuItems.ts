@@ -38,6 +38,7 @@ export function buildUserMenuGroups(profileHref: string): UserMenuGroup[] {
       label: "Account",
       items: [
         { id: "settings", label: "Settings", href: APP_ROUTES.settings },
+        { id: "advertise", label: "Advertise", href: APP_ROUTES.advertise },
       ],
     },
   ];

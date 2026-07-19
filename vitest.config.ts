@@ -25,6 +25,7 @@ export default defineConfig({
       "lib/store/**/*.test.ts",
       "lib/stories/**/*.test.ts",
       "lib/search/**/*.test.ts",
+      "lib/ads/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",
       "app/lib/video/**/*.test.ts",

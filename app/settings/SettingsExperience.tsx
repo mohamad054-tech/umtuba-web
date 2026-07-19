@@ -454,6 +454,15 @@ export default function SettingsExperience({
                   <p className="text-sm font-black">Upload video</p>
                   <p className="mt-1 text-xs text-white/45">Publish to Discover</p>
                 </Link>
+                <Link
+                  href={APP_ROUTES.advertise}
+                  className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
+                >
+                  <p className="text-sm font-black">Advertise</p>
+                  <p className="mt-1 text-xs text-white/45">
+                    Reach audiences on UMTUBA
+                  </p>
+                </Link>
               </div>
 
               {formError ? (

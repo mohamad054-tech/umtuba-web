@@ -28,7 +28,19 @@ export const APP_ROUTES = {
   sellerApply: "/seller/apply",
   sellerStore: "/seller/store",
   sellerProducts: "/seller/products",
+  advertise: "/advertise",
+  advertiseApply: "/advertise/apply",
+  advertiseDashboard: "/advertise/dashboard",
+  advertiseCampaigns: "/advertise/campaigns",
+  advertiseCampaignsNew: "/advertise/campaigns/new",
+  advertiseCreativesNew: "/advertise/creatives/new",
+  advertiseSettings: "/advertise/settings",
 } as const;
+
+/** Campaign detail workspace under Advertise. */
+export function advertiseCampaignDetail(campaignId: string): string {
+  return `${APP_ROUTES.advertiseCampaigns}/${campaignId.trim()}`;
+}
 
 export type AppRouteHref =
   | (typeof APP_ROUTES)["home"]
