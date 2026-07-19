@@ -90,6 +90,12 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
                 Manage products
               </Link>
               <Link
+                href={APP_ROUTES.sellerOrders}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+              >
+                Orders
+              </Link>
+              <Link
                 href={`/store/${membership.store.slug}`}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
               >

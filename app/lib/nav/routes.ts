@@ -26,12 +26,14 @@ export const APP_ROUTES = {
   storeSearch: "/store/search",
   storeCart: "/store/cart",
   storeCheckout: "/store/checkout",
+  storeOrders: "/store/orders",
   storeWishlist: "/store/wishlist",
   seller: "/seller",
   sellerApply: "/seller/apply",
   sellerSetup: "/seller/setup",
   sellerStore: "/seller/store",
   sellerProducts: "/seller/products",
+  sellerOrders: "/seller/store/orders",
   advertise: "/advertise",
   advertiseApply: "/advertise/apply",
   advertiseDashboard: "/advertise/dashboard",
@@ -229,6 +231,16 @@ export function buildStoreShopIdHref(shopId: string): string {
 /** Seller-side deep link to edit a specific product draft/listing. */
 export function buildSellerProductHref(productId: string): string {
   return `${APP_ROUTES.sellerStore}/products/${sanitizeIdSegment(productId)}/edit`;
+}
+
+/** Buyer order detail. */
+export function buildStoreOrderHref(orderId: string): string {
+  return `${APP_ROUTES.storeOrders}/${sanitizeIdSegment(orderId)}`;
+}
+
+/** Seller order detail. */
+export function buildSellerOrderHref(orderId: string): string {
+  return `${APP_ROUTES.sellerOrders}/${sanitizeIdSegment(orderId)}`;
 }
 
 export function findIndexByPostId<T extends { id: string | number }>(

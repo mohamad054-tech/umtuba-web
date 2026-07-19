@@ -19,7 +19,7 @@ import {
   type StoreOrderItemSnapshotInput,
   type StoreOrderMoneyInput,
 } from "./types";
-import { canViewStore } from "./permissions";
+import { canManageStoreSettings, canViewStore } from "./permissions";
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   pending: "Pending",
@@ -48,8 +48,7 @@ export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
 
 /**
  * Allowed order.status transitions (foundation; payment/fulfillment stay separate).
- * DB does not expose authenticated status-update RPCs yet — this is the
- * application contract for future trusted transitions.
+ * Mirrored by store_order_status_transition_allowed() in Order Management V1.
  */
 export const ORDER_STATUS_TRANSITIONS: Record<
   OrderStatus,
@@ -64,6 +63,56 @@ export const ORDER_STATUS_TRANSITIONS: Record<
   cancelled: [],
   refunded: [],
 };
+
+/**
+ * Seller-callable subset — excludes refunded (admin/payment-system only).
+ * Terminal cancelled/refunded allow no further seller transitions.
+ */
+export const SELLER_ORDER_STATUS_TRANSITIONS: Record<
+  OrderStatus,
+  readonly OrderStatus[]
+> = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["processing", "cancelled"],
+  processing: ["packed", "cancelled"],
+  packed: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: [],
+  cancelled: [],
+  refunded: [],
+};
+
+export const FULFILLMENT_STATUS_TRANSITIONS: Record<
+  FulfillmentStatus,
+  readonly FulfillmentStatus[]
+> = {
+  unfulfilled: ["partial", "fulfilled"],
+  partial: ["unfulfilled", "fulfilled"],
+  // fulfilled → partial allowed only while order is still pre-ship (RPC enforces).
+  fulfilled: ["partial"],
+};
+
+/** Order statuses where fulfilled→partial corrections are still allowed. */
+export const FULFILLMENT_REOPEN_ALLOWED_ORDER_STATUSES: readonly OrderStatus[] = [
+  "pending",
+  "confirmed",
+  "processing",
+  "packed",
+] as const;
+
+/** Buyer-facing contact fields sellers may see for fulfillment only. */
+export const SELLER_FULFILLMENT_CONTACT_KEYS = [
+  "full_name",
+  "phone",
+  "email",
+  "country_code",
+  "region",
+  "city",
+  "postal_code",
+  "address_line1",
+  "address_line2",
+  "delivery_instructions",
+] as const;
 
 /** Line payload keys that create_store_order_foundation must reject. */
 export const ORDER_CREATE_FORBIDDEN_ITEM_KEYS = [
@@ -126,6 +175,22 @@ export function canTransitionOrderStatus(
   return ORDER_STATUS_TRANSITIONS[from].includes(to);
 }
 
+export function canSellerTransitionOrderStatus(
+  from: OrderStatus,
+  to: OrderStatus
+): boolean {
+  if (from === to) return true;
+  return SELLER_ORDER_STATUS_TRANSITIONS[from].includes(to);
+}
+
+export function canTransitionFulfillmentStatus(
+  from: FulfillmentStatus,
+  to: FulfillmentStatus
+): boolean {
+  if (from === to) return true;
+  return FULFILLMENT_STATUS_TRANSITIONS[from].includes(to);
+}
+
 export function assertOrderStatusTransition(
   from: OrderStatus,
   to: OrderStatus
@@ -140,6 +205,240 @@ export function assertOrderStatusTransition(
     };
   }
   return { ok: true };
+}
+
+export function assertSellerOrderStatusTransition(
+  from: OrderStatus,
+  to: OrderStatus
+): { ok: true } | { ok: false; message: string } {
+  if (!isOrderStatus(from) || !isOrderStatus(to)) {
+    return { ok: false, message: "Invalid order status." };
+  }
+  if (!canSellerTransitionOrderStatus(from, to)) {
+    return {
+      ok: false,
+      message: `Cannot transition order from ${from} to ${to}.`,
+    };
+  }
+  return { ok: true };
+}
+
+export function assertFulfillmentStatusTransition(
+  from: FulfillmentStatus,
+  to: FulfillmentStatus
+): { ok: true } | { ok: false; message: string } {
+  if (!isFulfillmentStatus(from) || !isFulfillmentStatus(to)) {
+    return { ok: false, message: "Invalid fulfillment status." };
+  }
+  if (!canTransitionFulfillmentStatus(from, to)) {
+    return {
+      ok: false,
+      message: `Cannot transition fulfillment from ${from} to ${to}.`,
+    };
+  }
+  return { ok: true };
+}
+
+/**
+ * Combined order+fulfillment consistency for seller updates.
+ * Mirrors update_store_order_status rules in Order Management V1.
+ */
+export function assertSellerFulfillmentConsistentWithOrder(input: {
+  orderStatus: OrderStatus;
+  fromFulfillment: FulfillmentStatus;
+  toFulfillment: FulfillmentStatus;
+}): { ok: true } | { ok: false; message: string } {
+  const base = assertFulfillmentStatusTransition(
+    input.fromFulfillment,
+    input.toFulfillment
+  );
+  if (!base.ok) return base;
+
+  const preShip = (
+    FULFILLMENT_REOPEN_ALLOWED_ORDER_STATUSES as readonly string[]
+  ).includes(input.orderStatus);
+
+  if (input.orderStatus === "delivered" && input.toFulfillment !== "fulfilled") {
+    return {
+      ok: false,
+      message: "Delivered orders must be fulfilled.",
+    };
+  }
+
+  if (!preShip) {
+    if (
+      input.toFulfillment === "unfulfilled" &&
+      input.fromFulfillment !== "unfulfilled"
+    ) {
+      return {
+        ok: false,
+        message: "Cannot mark shipped/delivered/cancelled orders unfulfilled.",
+      };
+    }
+    if (
+      input.fromFulfillment === "fulfilled" &&
+      input.toFulfillment === "partial"
+    ) {
+      return {
+        ok: false,
+        message: "Cannot reopen fulfillment after ship/deliver/cancel.",
+      };
+    }
+  }
+
+  return { ok: true };
+}
+
+export function isTerminalOrderStatus(status: OrderStatus): boolean {
+  return status === "cancelled" || status === "refunded";
+}
+
+/** Seller-facing terminal: delivered is also frozen for seller edits. */
+export function isSellerTerminalOrderStatus(status: OrderStatus): boolean {
+  return (
+    status === "cancelled" ||
+    status === "refunded" ||
+    status === "delivered"
+  );
+}
+
+export function nextSellerOrderStatuses(
+  from: OrderStatus
+): readonly OrderStatus[] {
+  return SELLER_ORDER_STATUS_TRANSITIONS[from];
+}
+
+export function nextFulfillmentStatuses(
+  from: FulfillmentStatus
+): readonly FulfillmentStatus[] {
+  return FULFILLMENT_STATUS_TRANSITIONS[from];
+}
+
+/**
+ * Strip address/contact snapshots to fulfillment-safe fields only.
+ * Never pass through unrelated profile or payment data.
+ */
+export function sellerSafeFulfillmentContact(
+  snapshot: Record<string, unknown> | null | undefined
+): Record<string, string | null> | null {
+  if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot)) {
+    return null;
+  }
+  const out: Record<string, string | null> = {};
+  for (const key of SELLER_FULFILLMENT_CONTACT_KEYS) {
+    const value = snapshot[key];
+    if (typeof value === "string" && value.trim()) {
+      out[key] = value.trim();
+    } else {
+      out[key] = null;
+    }
+  }
+  return out;
+}
+
+export function buyerDisplayNameFromSnapshot(
+  snapshot: Record<string, unknown> | null | undefined
+): string {
+  const safe = sellerSafeFulfillmentContact(snapshot);
+  const name = safe?.full_name?.trim();
+  return name && name.length > 0 ? name : "Customer";
+}
+
+export function mapOrderRpcError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("authentication required")) return "Sign in required.";
+  if (m.includes("not authorized")) return "You cannot update this order.";
+  if (m.includes("order not found")) return "Order not found.";
+  if (m.includes("terminal state")) return "This order can no longer be updated.";
+  if (m.includes("invalid order status transition")) {
+    return "That order status change is not allowed.";
+  }
+  if (m.includes("invalid fulfillment status transition")) {
+    return "That fulfillment status change is not allowed.";
+  }
+  if (m.includes("cannot set refunded")) {
+    return "Sellers cannot mark orders as refunded.";
+  }
+  if (m.includes("payment")) return "Payment status cannot be changed here.";
+  return message || "Could not update order.";
+}
+
+export function buildOrderTimeline(input: {
+  createdAt: string;
+  status: OrderStatus;
+  confirmedAt?: string | null;
+  processingAt?: string | null;
+  packedAt?: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
+  cancelledAt?: string | null;
+}): Array<{ key: string; label: string; at: string | null; done: boolean }> {
+  const cancelled = input.status === "cancelled";
+  return [
+    {
+      key: "placed",
+      label: "Order placed",
+      at: input.createdAt,
+      done: true,
+    },
+    {
+      key: "confirmed",
+      label: "Confirmed",
+      at: input.confirmedAt ?? null,
+      done:
+        Boolean(input.confirmedAt) ||
+        ["confirmed", "processing", "packed", "shipped", "delivered"].includes(
+          input.status
+        ),
+    },
+    {
+      key: "processing",
+      label: "Processing",
+      at: input.processingAt ?? null,
+      done:
+        Boolean(input.processingAt) ||
+        ["processing", "packed", "shipped", "delivered"].includes(input.status),
+    },
+    {
+      key: "packed",
+      label: "Packed",
+      at: input.packedAt ?? null,
+      done:
+        Boolean(input.packedAt) ||
+        ["packed", "shipped", "delivered"].includes(input.status),
+    },
+    {
+      key: "shipped",
+      label: "Shipped",
+      at: input.shippedAt ?? null,
+      done:
+        Boolean(input.shippedAt) ||
+        ["shipped", "delivered"].includes(input.status),
+    },
+    {
+      key: "delivered",
+      label: "Delivered",
+      at: input.deliveredAt ?? null,
+      done: Boolean(input.deliveredAt) || input.status === "delivered",
+    },
+    ...(cancelled
+      ? [
+          {
+            key: "cancelled",
+            label: "Cancelled",
+            at: input.cancelledAt ?? null,
+            done: true,
+          },
+        ]
+      : []),
+  ];
+}
+
+/** Roles allowed to mutate order status (mirrors RPC). */
+export function canSellerManageOrders(
+  role: StoreMemberRole | null | undefined
+): boolean {
+  return canManageStoreSettings(role);
 }
 
 export function validateOrderQuantity(

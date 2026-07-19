@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import CartView from "../../components/store/CartView";
 import StoreErrorState from "../../components/store/StoreErrorState";
@@ -31,7 +32,13 @@ export default async function StoreCartPage() {
         <h1 className="mt-1 text-3xl font-black tracking-tight">Your cart</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/50">
           Prices are snapshotted server-side when items are added. Checkout
-          validates live catalog data before creating pending-payment orders.
+          validates live catalog data before creating pending-payment orders.{" "}
+          <Link
+            href={APP_ROUTES.storeOrders}
+            className="font-bold text-violet-200/80 underline-offset-2 hover:underline"
+          >
+            View my orders
+          </Link>
         </p>
       </header>
 

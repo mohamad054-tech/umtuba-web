@@ -16,6 +16,7 @@ export const PROTECTED_PREFIXES = [
   "/seller",
   "/store/cart",
   "/store/checkout",
+  "/store/orders",
   "/store/wishlist",
   "/admin",
   // Advertise account surfaces (public landing `/advertise` stays open via isProtectedPath).

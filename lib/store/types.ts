@@ -214,6 +214,38 @@ export type StoreOrderRow = {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  /** Checkout Foundation snapshots (immutable once set). */
+  shipping_address_snapshot?: Record<string, unknown> | null;
+  billing_contact_snapshot?: Record<string, unknown> | null;
+  shipping_method_code?: string | null;
+  shipping_method_name?: string | null;
+  shipping_estimate_text?: string | null;
+  coupon_code_snapshot?: string | null;
+  checkout_quote_id?: string | null;
+  tax_snapshot?: Record<string, unknown> | null;
+  discount_snapshot?: Record<string, unknown> | null;
+  /** Order Management V1 lifecycle stamps (set-once on transition). */
+  confirmed_at?: string | null;
+  processing_at?: string | null;
+  packed_at?: string | null;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
+  cancelled_at?: string | null;
+};
+
+export type StoreOrderStatusHistoryRow = {
+  id: string;
+  order_id: string;
+  actor_user_id: string | null;
+  from_status: OrderStatus | null;
+  to_status: OrderStatus | null;
+  from_fulfillment_status: FulfillmentStatus | null;
+  to_fulfillment_status: FulfillmentStatus | null;
+  from_payment_status: PaymentStatus | null;
+  to_payment_status: PaymentStatus | null;
+  note: string | null;
+  source: "seller" | "system" | "admin" | "buyer";
+  created_at: string;
 };
 
 export type StoreOrderItemRow = {
