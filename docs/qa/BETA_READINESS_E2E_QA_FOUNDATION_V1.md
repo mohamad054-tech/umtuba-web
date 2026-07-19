@@ -2,12 +2,12 @@
 
 Local integration QA pass on `alpha-0.2`.
 
-**Scope constraints for this foundation:** no new Supabase migrations, no remote DB apply, no seed/demo data, no ads delivery enablement.
+**Scope constraints for this foundation:** no seed/demo data, no ads delivery enablement.
 
 ## Problems found (summary)
 
-### Critical (remaining after this pass)
-- **Live `live_started` notifications on create-and-go-live:** follower notifications fire on status UPDATE only; the primary host path INSERTs rooms already as `live`, so followers get nothing. Requires a **separate migration** in a later phase (not included here).
+### Critical
+- **Live `live_started` notifications on create-and-go-live:** **Fixed and applied remotely.** Migration `supabase/migrations/20260808_live_started_insert_notification_fix.sql` extends `notify_on_live_started` + `live_rooms_notify_started` to fire on INSERT-as-live as well as non-live → live UPDATE. History row `20260808` recorded as applied on linked `umtuba`.
 
 ### High (remaining)
 - Product media upload incomplete (path metadata / placeholders; not real catalog images)
@@ -52,7 +52,13 @@ Local integration QA pass on `alpha-0.2`.
 
 ## Out of scope for this commit
 
-- Any Supabase migration (including `live_started` INSERT fix)
-- Remote `db push` / `db reset` / targeted apply
 - Seed users, demo catalogs, or Platform Admin grants
 - Enabling ads delivery or payments
+- Migration history recovery for `20260805` / `20260807` (reported only; not repaired here)
+
+## Beta Critical Fix V1
+
+- Migration: `20260808_live_started_insert_notification_fix.sql`
+- Helper + tests: `lib/live/liveStartedNotification.ts`, `lib/live/liveStartedInsertNotification.test.ts`
+- Status: **Fixed, applied remotely, history repaired for 20260808**
+- No demo Live created on production during apply
