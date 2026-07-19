@@ -2,7 +2,7 @@
  * Route indexing policy for robots.txt and page-level robots metadata.
  *
  * Index (public marketing / discovery / profiles):
- * - /, /discover, /live, /watch, /post-journey, /profile/*, /invite/*
+ * - /, /discover, /live, /watch, /post-journey, /terms, /privacy, /profile/*, /invite/*
  *
  * Noindex (auth, account, private, gated labs):
  * - login, signup, register, password reset, auth callbacks
@@ -43,4 +43,6 @@ export const SITEMAP_STATIC_ROUTES = [
   "/live",
   "/watch",
   "/post-journey",
+  "/terms",
+  "/privacy",
 ] as const;

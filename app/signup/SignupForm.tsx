@@ -329,7 +329,25 @@ export default function SignupForm({
           checked={acceptTerms}
           disabled={isSubmitting}
           error={fieldErrors.acceptTerms}
-          label="I accept UMTUBA's terms of use and privacy practices."
+          label={
+            <>
+              I accept UMTUBA&apos;s{" "}
+              <Link
+                href={APP_ROUTES.terms}
+                className="watch-focus-ring rounded text-white underline decoration-white/35 underline-offset-2 transition hover:decoration-white"
+              >
+                Terms of Use
+              </Link>{" "}
+              and{" "}
+              <Link
+                href={APP_ROUTES.privacy}
+                className="watch-focus-ring rounded text-white underline decoration-white/35 underline-offset-2 transition hover:decoration-white"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </>
+          }
           onChange={(event) => {
             setAcceptTerms(event.target.checked);
             setFieldErrors((prev) => ({ ...prev, acceptTerms: undefined }));

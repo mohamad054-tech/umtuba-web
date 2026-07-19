@@ -128,6 +128,8 @@ describe("route robots / sitemap policy", () => {
       "/live",
       "/watch",
       "/post-journey",
+      "/terms",
+      "/privacy",
     ]);
     const blocked = [
       "/login",

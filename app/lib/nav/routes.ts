@@ -15,6 +15,8 @@ export const APP_ROUTES = {
   forgotPassword: "/forgot-password",
   updatePassword: "/auth/update-password",
   authCallback: "/auth/callback",
+  terms: "/terms",
+  privacy: "/privacy",
   profile: "/profile",
   createVideo: "/create/video",
   postJourney: "/post-journey",

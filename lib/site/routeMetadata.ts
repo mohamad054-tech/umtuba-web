@@ -127,6 +127,20 @@ export const updatePasswordMetadata = buildPageMetadata({
   index: "noindex",
 });
 
+export const termsMetadata = buildPageMetadata({
+  title: "Terms of Use",
+  description: `${BRAND.name} Terms of Use for the Beta soft launch — accounts, content, community rules, and service limits.`,
+  path: "/terms",
+  index: "index",
+});
+
+export const privacyMetadata = buildPageMetadata({
+  title: "Privacy Policy",
+  description: `${BRAND.name} Privacy Policy for the Beta soft launch — how we process account, content, and usage information.`,
+  path: "/privacy",
+  index: "index",
+});
+
 export const inviteMetadataBase = {
   titlePrefix: `Join ${BRAND.name}`,
   description: `Create your ${BRAND.name} account with an invite. ${BRAND.tagline}. ${BRAND.mission}`,

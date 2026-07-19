@@ -1,5 +1,7 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { landingMetadata } from "../lib/site/routeMetadata";
+import { APP_ROUTES } from "./lib/nav";
 import JoinBetaLink from "./components/landing/JoinBetaLink";
 import LandingHero from "./components/landing/LandingHero";
 
@@ -70,6 +72,24 @@ export default function Home() {
           </JoinBetaLink>
         </div>
       </section>
+
+      <footer className="relative z-10 border-t border-white/10 px-6 py-10 text-center text-sm text-white/45 md:px-12">
+        <p className="font-black tracking-tight text-white/70">UMTUBA</p>
+        <p className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <Link
+            href={APP_ROUTES.terms}
+            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Terms of Use
+          </Link>
+          <Link
+            href={APP_ROUTES.privacy}
+            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Privacy Policy
+          </Link>
+        </p>
+      </footer>
     </main>
   );
 }
