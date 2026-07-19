@@ -11,13 +11,17 @@ export const metadata = {
 };
 
 const STATUS_COPY: Record<string, { title: string; body: string }> = {
+  draft: {
+    title: "Store setup in progress",
+    body: "Your store setup draft is saved. Resume the wizard whenever you are ready, then submit for operator approval.",
+  },
   pending: {
-    title: "Application under review",
-    body: "An operator is reviewing your seller application. This usually takes a short while — check back soon.",
+    title: "Store setup under review",
+    body: "An operator is reviewing your store setup. This usually takes a short while — check back soon.",
   },
   rejected: {
-    title: "Application not approved",
-    body: "Your last application was not approved. You can submit a new application with updated details.",
+    title: "Store setup not approved",
+    body: "Your last store setup was not approved. You can revise the details and submit again.",
   },
   suspended: {
     title: "Seller account suspended",
@@ -25,12 +29,19 @@ const STATUS_COPY: Record<string, { title: string; body: string }> = {
   },
 };
 
-export default async function SellerHubPage() {
+type SellerHubPageProps = {
+  searchParams?:
+    | Promise<{ submitted?: string; applied?: string }>
+    | { submitted?: string; applied?: string };
+};
+
+export default async function SellerHubPage({ searchParams }: SellerHubPageProps) {
   const user = await getServerUser();
   if (!user) {
     redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.seller)}`);
   }
 
+  const params = await Promise.resolve(searchParams ?? {});
   const supabase = await createClient();
   const [membership, application] = await Promise.all([
     getOwnedOrMemberStore(supabase, user.id),
@@ -43,6 +54,15 @@ export default async function SellerHubPage() {
     >
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
         <AppTopNav title="Seller" subtitle="UMTUBA Marketplace" />
+
+        {params.submitted === "1" || params.applied === "1" ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+          >
+            Store setup submitted for operator review.
+          </p>
+        ) : null}
 
         {membership ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
@@ -93,12 +113,20 @@ export default async function SellerHubPage() {
                 Reviewer note: {application.review_note}
               </p>
             ) : null}
-            {application.status === "rejected" ? (
+            {application.status === "draft" ? (
               <Link
-                href={APP_ROUTES.sellerApply}
+                href={APP_ROUTES.sellerSetup}
                 className="watch-focus-ring mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
               >
-                Apply again
+                Resume store setup
+              </Link>
+            ) : null}
+            {application.status === "rejected" ? (
+              <Link
+                href={APP_ROUTES.sellerSetup}
+                className="watch-focus-ring mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              >
+                Revise store setup
               </Link>
             ) : null}
           </section>
@@ -108,17 +136,18 @@ export default async function SellerHubPage() {
               Sell on UMTUBA
             </p>
             <h1 className="mt-1 text-3xl font-black tracking-tight">
-              Become a seller
+              Set up your store
             </h1>
             <p className="mt-2 text-sm text-white/50">
-              Apply for a storefront. An operator reviews every application
-              before your store is verified and catalog management unlocks.
+              Complete the store setup wizard, save a draft anytime, then submit
+              for operator approval. Catalog management unlocks after
+              verification.
             </p>
             <Link
-              href={APP_ROUTES.sellerApply}
+              href={APP_ROUTES.sellerSetup}
               className="watch-focus-ring mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
-              Apply to become a seller
+              Start store setup
             </Link>
           </section>
         )}

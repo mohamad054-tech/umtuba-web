@@ -120,6 +120,7 @@ describe("marketplace foundation routes", () => {
   it("adds seller and wishlist routes", () => {
     expect(APP_ROUTES.seller).toBe("/seller");
     expect(APP_ROUTES.sellerApply).toBe("/seller/apply");
+    expect(APP_ROUTES.sellerSetup).toBe("/seller/setup");
     expect(APP_ROUTES.sellerProducts).toBe("/seller/products");
     expect(APP_ROUTES.storeWishlist).toBe("/store/wishlist");
   });
@@ -145,24 +146,25 @@ describe("marketplace foundation auth gate", () => {
     expect(PROTECTED_PREFIXES).toContain("/store/wishlist");
     expect(isProtectedPath("/seller")).toBe(true);
     expect(isProtectedPath("/seller/apply")).toBe(true);
+    expect(isProtectedPath("/seller/setup")).toBe(true);
     expect(isProtectedPath("/store/wishlist")).toBe(true);
     expect(isProtectedPath("/store")).toBe(false);
     expect(isProtectedPath(`/store/${"acme"}`)).toBe(false);
   });
 });
 
-describe("store creation redirects to the seller application", () => {
-  it("sellerStore.createStoreForUser fails closed and points at /seller/apply", () => {
+describe("store creation redirects to the seller setup wizard", () => {
+  it("sellerStore.createStoreForUser fails closed and points at /seller/setup", () => {
     const src = readRepoFile("lib/store/sellerStore.ts");
     expect(src).toMatch(/export async function createStoreForUser/);
     expect(src).toMatch(/ok: false/);
-    expect(src).toMatch(/\/seller\/apply/);
+    expect(src).toMatch(/\/seller\/setup/);
   });
 
-  it("storeCatalog.createStoreAction redirects to /seller/apply and drops the direct-create import", () => {
+  it("storeCatalog.createStoreAction redirects to /seller/setup and drops the direct-create import", () => {
     const src = readRepoFile("app/actions/storeCatalog.ts");
     expect(src).toMatch(/export async function createStoreAction/);
-    expect(src).toMatch(/redirect\(APP_ROUTES\.sellerApply\)/);
+    expect(src).toMatch(/redirect\(APP_ROUTES\.sellerSetup\)/);
     expect(src).not.toMatch(/createStoreForUser/);
   });
 

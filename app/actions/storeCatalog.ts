@@ -25,13 +25,13 @@ async function requireUser() {
 }
 
 /**
- * Store creation now happens through the seller application review flow
- * (see `app/actions/storeSeller.ts`). This action only exists so any
- * lingering callers land on the correct next step instead of a dead end.
+ * Store creation now happens through the Seller Self-Service setup wizard
+ * (`/seller/setup`). This action only exists so any lingering callers land
+ * on the correct next step instead of a dead end.
  */
 export async function createStoreAction(): Promise<void> {
   await requireUser();
-  redirect(APP_ROUTES.sellerApply);
+  redirect(APP_ROUTES.sellerSetup);
 }
 
 export async function updateStoreAction(formData: FormData): Promise<void> {
