@@ -21,7 +21,7 @@ Advertiser UI (/advertise/*)
 
 ## Schema
 
-Migration: `supabase/migrations/20260805_ads_platform_foundation_v1.sql`
+Migration: `supabase/migrations/20260807_ads_platform_foundation_v1.sql`
 
 | Table | Purpose |
 | --- | --- |

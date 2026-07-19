@@ -39,7 +39,7 @@ import {
 import { APP_ROUTES, advertiseCampaignDetail } from "../../app/lib/nav/routes";
 
 const ROOT = process.cwd();
-const MIGRATION = "supabase/migrations/20260805_ads_platform_foundation_v1.sql";
+const MIGRATION = "supabase/migrations/20260807_ads_platform_foundation_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
