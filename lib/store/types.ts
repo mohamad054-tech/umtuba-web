@@ -166,3 +166,91 @@ export type PublicProductDetail = {
   media: ProductMediaRow[];
   category: ProductCategoryRow | null;
 };
+
+/** Orders Foundation V1 — lifecycle status (DB lowercase; labels elsewhere). */
+export const ORDER_STATUSES = [
+  "pending",
+  "confirmed",
+  "processing",
+  "packed",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded",
+] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const PAYMENT_STATUSES = [
+  "pending",
+  "authorized",
+  "paid",
+  "failed",
+  "refunded",
+] as const;
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+
+export const FULFILLMENT_STATUSES = [
+  "unfulfilled",
+  "partial",
+  "fulfilled",
+] as const;
+export type FulfillmentStatus = (typeof FULFILLMENT_STATUSES)[number];
+
+export type StoreOrderRow = {
+  id: string;
+  buyer_id: string;
+  store_id: string;
+  order_number: string;
+  idempotency_key: string | null;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  fulfillment_status: FulfillmentStatus;
+  subtotal_minor: number;
+  discount_total_minor: number;
+  tax_total_minor: number;
+  shipping_total_minor: number;
+  grand_total_minor: number;
+  currency: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type StoreOrderItemRow = {
+  id: string;
+  order_id: string;
+  product_id: string;
+  /** Required in Orders Foundation V1 (authoritative price is variant-scoped). */
+  variant_id: string;
+  seller_user_id: string;
+  quantity: number;
+  unit_price_minor: number;
+  total_price_minor: number;
+  product_snapshot: Record<string, unknown>;
+  sku_snapshot: string;
+  title_snapshot: string;
+  variant_title_snapshot: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type StoreOrderMoneyInput = {
+  currency: string;
+  subtotalMinor: number;
+  discountTotalMinor: number;
+  taxTotalMinor: number;
+  shippingTotalMinor: number;
+  /** Optional; when set must equal computed grand total. */
+  grandTotalMinor?: number;
+};
+
+export type StoreOrderItemSnapshotInput = {
+  currency: string;
+  quantity: unknown;
+  unitPriceMinor: unknown;
+  totalPriceMinor?: number;
+  skuSnapshot: string;
+  titleSnapshot: string;
+  variantTitleSnapshot?: string | null;
+  productSnapshot: Record<string, unknown>;
+};

@@ -1,0 +1,569 @@
+/**
+ * Store Orders Foundation V1 — pure domain rules.
+ * No payment gateway integration. UI behavior unchanged.
+ */
+
+import {
+  formatMinorUnits,
+  normalizeCurrencyCode,
+  validateAmountMinor,
+} from "./money";
+import type { StoreMemberRole } from "./types";
+import {
+  FULFILLMENT_STATUSES,
+  ORDER_STATUSES,
+  PAYMENT_STATUSES,
+  type FulfillmentStatus,
+  type OrderStatus,
+  type PaymentStatus,
+  type StoreOrderItemSnapshotInput,
+  type StoreOrderMoneyInput,
+} from "./types";
+import { canViewStore } from "./permissions";
+
+export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  processing: "Processing",
+  packed: "Packed",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+  refunded: "Refunded",
+};
+
+export const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
+  pending: "Pending",
+  authorized: "Authorized",
+  paid: "Paid",
+  failed: "Failed",
+  refunded: "Refunded",
+};
+
+export const FULFILLMENT_STATUS_LABELS: Record<FulfillmentStatus, string> = {
+  unfulfilled: "Unfulfilled",
+  partial: "Partial",
+  fulfilled: "Fulfilled",
+};
+
+/**
+ * Allowed order.status transitions (foundation; payment/fulfillment stay separate).
+ * DB does not expose authenticated status-update RPCs yet — this is the
+ * application contract for future trusted transitions.
+ */
+export const ORDER_STATUS_TRANSITIONS: Record<
+  OrderStatus,
+  readonly OrderStatus[]
+> = {
+  pending: ["confirmed", "cancelled"],
+  confirmed: ["processing", "cancelled"],
+  processing: ["packed", "cancelled"],
+  packed: ["shipped", "cancelled"],
+  shipped: ["delivered"],
+  delivered: ["refunded"],
+  cancelled: [],
+  refunded: [],
+};
+
+/** Line payload keys that create_store_order_foundation must reject. */
+export const ORDER_CREATE_FORBIDDEN_ITEM_KEYS = [
+  "unit_price_minor",
+  "total_price_minor",
+  "sku_snapshot",
+  "title_snapshot",
+  "variant_title_snapshot",
+  "product_snapshot",
+  "seller_user_id",
+  "subtotal_minor",
+  "grand_total_minor",
+] as const;
+
+export function isOrderStatus(value: unknown): value is OrderStatus {
+  return (
+    typeof value === "string" &&
+    (ORDER_STATUSES as readonly string[]).includes(value)
+  );
+}
+
+export function isPaymentStatus(value: unknown): value is PaymentStatus {
+  return (
+    typeof value === "string" &&
+    (PAYMENT_STATUSES as readonly string[]).includes(value)
+  );
+}
+
+export function isFulfillmentStatus(value: unknown): value is FulfillmentStatus {
+  return (
+    typeof value === "string" &&
+    (FULFILLMENT_STATUSES as readonly string[]).includes(value)
+  );
+}
+
+export function formatOrderStatus(status: OrderStatus): string {
+  return ORDER_STATUS_LABELS[status];
+}
+
+export function formatPaymentStatus(status: PaymentStatus): string {
+  return PAYMENT_STATUS_LABELS[status];
+}
+
+export function formatFulfillmentStatus(status: FulfillmentStatus): string {
+  return FULFILLMENT_STATUS_LABELS[status];
+}
+
+export function formatOrderMoney(
+  amountMinor: number,
+  currency: string
+): string {
+  return formatMinorUnits(amountMinor, currency);
+}
+
+export function canTransitionOrderStatus(
+  from: OrderStatus,
+  to: OrderStatus
+): boolean {
+  if (from === to) return true;
+  return ORDER_STATUS_TRANSITIONS[from].includes(to);
+}
+
+export function assertOrderStatusTransition(
+  from: OrderStatus,
+  to: OrderStatus
+): { ok: true } | { ok: false; message: string } {
+  if (!isOrderStatus(from) || !isOrderStatus(to)) {
+    return { ok: false, message: "Invalid order status." };
+  }
+  if (!canTransitionOrderStatus(from, to)) {
+    return {
+      ok: false,
+      message: `Cannot transition order from ${from} to ${to}.`,
+    };
+  }
+  return { ok: true };
+}
+
+export function validateOrderQuantity(
+  value: unknown
+): { ok: true; quantity: number } | { ok: false; message: string } {
+  if (typeof value === "string" && value.trim() !== "") {
+    if (!/^\d+$/.test(value.trim())) {
+      return { ok: false, message: "Quantity must be a whole number." };
+    }
+    value = Number(value.trim());
+  }
+  if (
+    typeof value !== "number" ||
+    !Number.isFinite(value) ||
+    !Number.isInteger(value)
+  ) {
+    return { ok: false, message: "Quantity must be a whole number." };
+  }
+  if (value < 1) {
+    return { ok: false, message: "Quantity must be at least 1." };
+  }
+  if (value > 9999) {
+    return { ok: false, message: "Quantity is too large." };
+  }
+  return { ok: true, quantity: value };
+}
+
+export function computeOrderLineTotalMinor(
+  unitPriceMinor: number,
+  quantity: number
+): number {
+  return unitPriceMinor * quantity;
+}
+
+export function computeOrderGrandTotalMinor(input: {
+  subtotalMinor: number;
+  discountTotalMinor: number;
+  taxTotalMinor: number;
+  shippingTotalMinor: number;
+}): number {
+  return (
+    input.subtotalMinor -
+    input.discountTotalMinor +
+    input.taxTotalMinor +
+    input.shippingTotalMinor
+  );
+}
+
+export function validateOrderMoneyTotals(
+  input: StoreOrderMoneyInput
+):
+  | {
+      ok: true;
+      currency: string;
+      subtotalMinor: number;
+      discountTotalMinor: number;
+      taxTotalMinor: number;
+      shippingTotalMinor: number;
+      grandTotalMinor: number;
+    }
+  | { ok: false; message: string } {
+  const currency = normalizeCurrencyCode(input.currency);
+  const subtotal = validateAmountMinor(input.subtotalMinor, currency);
+  if (!subtotal.ok) return subtotal;
+  const discount = validateAmountMinor(input.discountTotalMinor, currency);
+  if (!discount.ok) return discount;
+  const tax = validateAmountMinor(input.taxTotalMinor, currency);
+  if (!tax.ok) return tax;
+  const shipping = validateAmountMinor(input.shippingTotalMinor, currency);
+  if (!shipping.ok) return shipping;
+
+  if (discount.amountMinor > subtotal.amountMinor) {
+    return { ok: false, message: "Discount cannot exceed subtotal." };
+  }
+
+  const grandTotalMinor = computeOrderGrandTotalMinor({
+    subtotalMinor: subtotal.amountMinor,
+    discountTotalMinor: discount.amountMinor,
+    taxTotalMinor: tax.amountMinor,
+    shippingTotalMinor: shipping.amountMinor,
+  });
+
+  if (grandTotalMinor < 0) {
+    return { ok: false, message: "Grand total cannot be negative." };
+  }
+
+  if (
+    input.grandTotalMinor !== undefined &&
+    input.grandTotalMinor !== grandTotalMinor
+  ) {
+    return { ok: false, message: "Grand total does not match money breakdown." };
+  }
+
+  return {
+    ok: true,
+    currency,
+    subtotalMinor: subtotal.amountMinor,
+    discountTotalMinor: discount.amountMinor,
+    taxTotalMinor: tax.amountMinor,
+    shippingTotalMinor: shipping.amountMinor,
+    grandTotalMinor,
+  };
+}
+
+/**
+ * Build an immutable product snapshot for order_items.
+ * Callers must persist this blob; later catalog edits must not rewrite it.
+ */
+export function buildOrderItemProductSnapshot(input: {
+  productId: string;
+  storeId: string;
+  slug: string;
+  title: string;
+  productType: string;
+  sku: string;
+  variantId?: string | null;
+  variantTitle?: string | null;
+  unitPriceMinor: number;
+  currency: string;
+}): Record<string, unknown> {
+  return {
+    product_id: input.productId,
+    store_id: input.storeId,
+    slug: input.slug,
+    title: input.title,
+    product_type: input.productType,
+    sku: input.sku,
+    variant_id: input.variantId ?? null,
+    variant_title: input.variantTitle ?? null,
+    unit_price_minor: input.unitPriceMinor,
+    currency: normalizeCurrencyCode(input.currency),
+    snapshotted_at: "order_create",
+  };
+}
+
+export function validateOrderItemSnapshot(
+  input: StoreOrderItemSnapshotInput
+):
+  | {
+      ok: true;
+      quantity: number;
+      unitPriceMinor: number;
+      totalPriceMinor: number;
+      skuSnapshot: string;
+      titleSnapshot: string;
+      variantTitleSnapshot: string | null;
+      productSnapshot: Record<string, unknown>;
+    }
+  | { ok: false; message: string } {
+  const qty = validateOrderQuantity(input.quantity);
+  if (!qty.ok) return qty;
+
+  const price = validateAmountMinor(input.unitPriceMinor, input.currency);
+  if (!price.ok) return price;
+
+  const sku = input.skuSnapshot.trim();
+  const title = input.titleSnapshot.trim();
+  if (!sku || sku.length > 64) {
+    return { ok: false, message: "SKU snapshot is required." };
+  }
+  if (!title || title.length > 200) {
+    return { ok: false, message: "Title snapshot is required." };
+  }
+
+  let variantTitle: string | null = null;
+  if (input.variantTitleSnapshot != null) {
+    const vt = input.variantTitleSnapshot.trim();
+    if (!vt || vt.length > 120) {
+      return { ok: false, message: "Variant title snapshot is invalid." };
+    }
+    variantTitle = vt;
+  }
+
+  const snapshot =
+    input.productSnapshot &&
+    typeof input.productSnapshot === "object" &&
+    !Array.isArray(input.productSnapshot)
+      ? { ...input.productSnapshot }
+      : null;
+
+  if (!snapshot) {
+    return { ok: false, message: "Product snapshot must be an object." };
+  }
+
+  const totalPriceMinor = computeOrderLineTotalMinor(
+    price.amountMinor,
+    qty.quantity
+  );
+
+  if (
+    input.totalPriceMinor !== undefined &&
+    input.totalPriceMinor !== totalPriceMinor
+  ) {
+    return { ok: false, message: "Line total does not match unit price × qty." };
+  }
+
+  return {
+    ok: true,
+    quantity: qty.quantity,
+    unitPriceMinor: price.amountMinor,
+    totalPriceMinor,
+    skuSnapshot: sku,
+    titleSnapshot: title,
+    variantTitleSnapshot: variantTitle,
+    productSnapshot: snapshot,
+  };
+}
+
+/** Pure RLS mirror: buyer may read only own orders. */
+export function canBuyerReadOrder(input: {
+  buyerId: string;
+  requesterUserId: string | null | undefined;
+}): boolean {
+  if (!input.requesterUserId) return false;
+  return input.buyerId === input.requesterUserId;
+}
+
+/**
+ * Pure RLS mirror: sellers read only orders for stores they belong to.
+ * Membership role must be at least viewer; no cross-store access.
+ */
+export function canSellerReadOrder(input: {
+  orderStoreId: string;
+  memberStoreId: string | null | undefined;
+  memberRole: StoreMemberRole | null | undefined;
+  memberStatus?: string | null;
+}): boolean {
+  if (!input.memberStoreId || input.memberStoreId !== input.orderStoreId) {
+    return false;
+  }
+  if (input.memberStatus != null && input.memberStatus !== "active") {
+    return false;
+  }
+  return canViewStore(input.memberRole);
+}
+
+/** Combined read gate used by app-layer checks (mirrors DB policy intent). */
+export function canReadStoreOrder(input: {
+  buyerId: string;
+  storeId: string;
+  requesterUserId: string | null | undefined;
+  memberStoreId?: string | null;
+  memberRole?: StoreMemberRole | null;
+  memberStatus?: string | null;
+  isPlatformAdmin?: boolean;
+}): boolean {
+  if (!input.requesterUserId) return false;
+  if (input.isPlatformAdmin) return true;
+  if (canBuyerReadOrder(input)) return true;
+  return canSellerReadOrder({
+    orderStoreId: input.storeId,
+    memberStoreId: input.memberStoreId,
+    memberRole: input.memberRole,
+    memberStatus: input.memberStatus,
+  });
+}
+
+/**
+ * Create RPC trust boundary: line payloads may only identify catalog rows + qty.
+ * Prices/titles/SKUs/snapshots must be derived server-side from DB rows.
+ */
+export function assertOrderCreateItemPayloadTrusted(item: Record<string, unknown>):
+  | { ok: true; productId: string; variantId: string; quantity: number }
+  | { ok: false; message: string } {
+  for (const key of ORDER_CREATE_FORBIDDEN_ITEM_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(item, key)) {
+      return {
+        ok: false,
+        message: `Order item must not include client-priced field ${key}.`,
+      };
+    }
+  }
+
+  const productId =
+    typeof item.product_id === "string" ? item.product_id.trim() : "";
+  const variantId =
+    typeof item.variant_id === "string" ? item.variant_id.trim() : "";
+  if (!productId || !variantId) {
+    return {
+      ok: false,
+      message: "Order item product_id and variant_id are required.",
+    };
+  }
+
+  const qty = validateOrderQuantity(item.quantity);
+  if (!qty.ok) return qty;
+
+  return {
+    ok: true,
+    productId,
+    variantId,
+    quantity: qty.quantity,
+  };
+}
+
+/** Header identity fields that must remain immutable after create. */
+export function assertOrderHeaderIdentityPreserved(input: {
+  before: {
+    buyerId: string;
+    storeId: string;
+    orderNumber: string;
+    currency: string;
+    subtotalMinor: number;
+    discountTotalMinor: number;
+    taxTotalMinor: number;
+    shippingTotalMinor: number;
+    grandTotalMinor: number;
+  };
+  after: {
+    buyerId: string;
+    storeId: string;
+    orderNumber: string;
+    currency: string;
+    subtotalMinor: number;
+    discountTotalMinor: number;
+    taxTotalMinor: number;
+    shippingTotalMinor: number;
+    grandTotalMinor: number;
+  };
+}): { ok: true } | { ok: false; message: string } {
+  const keys = [
+    "buyerId",
+    "storeId",
+    "orderNumber",
+    "currency",
+    "subtotalMinor",
+    "discountTotalMinor",
+    "taxTotalMinor",
+    "shippingTotalMinor",
+    "grandTotalMinor",
+  ] as const;
+
+  for (const key of keys) {
+    if (input.before[key] !== input.after[key]) {
+      return {
+        ok: false,
+        message: `Order field ${key} must remain immutable after create.`,
+      };
+    }
+  }
+  return { ok: true };
+}
+
+/** Store mismatch contract mirrored by enforce_order_item_store_alignment. */
+export function assertOrderItemBelongsToOrderStore(input: {
+  orderStoreId: string;
+  productStoreId: string;
+}): { ok: true } | { ok: false; message: string } {
+  if (input.orderStoreId !== input.productStoreId) {
+    return {
+      ok: false,
+      message: "Order item product must belong to the order store.",
+    };
+  }
+  return { ok: true };
+}
+
+/**
+ * Snapshot preservation contract: after create, catalog mutations must not
+ * rewrite frozen order_item fields.
+ */
+export function assertOrderItemSnapshotsPreserved(input: {
+  before: {
+    productId: string;
+    variantId: string | null;
+    sellerUserId: string;
+    quantity: number;
+    unitPriceMinor: number;
+    totalPriceMinor: number;
+    productSnapshot: Record<string, unknown>;
+    skuSnapshot: string;
+    titleSnapshot: string;
+    variantTitleSnapshot: string | null;
+  };
+  after: {
+    productId: string;
+    variantId: string | null;
+    sellerUserId: string;
+    quantity: number;
+    unitPriceMinor: number;
+    totalPriceMinor: number;
+    productSnapshot: Record<string, unknown>;
+    skuSnapshot: string;
+    titleSnapshot: string;
+    variantTitleSnapshot: string | null;
+  };
+}): { ok: true } | { ok: false; message: string } {
+  const keys = [
+    "productId",
+    "variantId",
+    "sellerUserId",
+    "quantity",
+    "unitPriceMinor",
+    "totalPriceMinor",
+    "skuSnapshot",
+    "titleSnapshot",
+    "variantTitleSnapshot",
+  ] as const;
+
+  for (const key of keys) {
+    if (input.before[key] !== input.after[key]) {
+      return {
+        ok: false,
+        message: `Order item field ${key} must remain immutable.`,
+      };
+    }
+  }
+
+  if (
+    JSON.stringify(input.before.productSnapshot) !==
+    JSON.stringify(input.after.productSnapshot)
+  ) {
+    return {
+      ok: false,
+      message: "Order item product_snapshot must remain immutable.",
+    };
+  }
+
+  return { ok: true };
+}
+
+/** Human-friendly order number format used by next_store_order_number(). */
+export const STORE_ORDER_NUMBER_RE = /^UMT-[0-9]{8}-[A-Z0-9]{6}$/;
+
+export function isValidStoreOrderNumber(value: string): boolean {
+  return STORE_ORDER_NUMBER_RE.test(value);
+}
