@@ -22,6 +22,7 @@ import {
   shouldStartFeedLoadMore,
 } from "../lib/video/feedPagination";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
+import StoryRail from "../stories/components/StoryRail";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
@@ -210,14 +211,17 @@ export default function DiscoverExperience({
   if (loadError) {
     return (
       <DiscoverShell>
-        <div className="flex flex-1 items-center justify-center px-6 py-16">
-          <ProductErrorState
-            title="Could not load videos"
-            message={sanitizeUserFacingMessage(loadError)}
-            onRetry={() => {
-              window.location.assign(APP_ROUTES.discover);
-            }}
-          />
+        <div className="flex flex-1 flex-col gap-3">
+          <StoryRail viewerId={viewerId} />
+          <div className="flex flex-1 items-center justify-center px-6 py-16">
+            <ProductErrorState
+              title="Could not load videos"
+              message={sanitizeUserFacingMessage(loadError)}
+              onRetry={() => {
+                window.location.assign(APP_ROUTES.discover);
+              }}
+            />
+          </div>
         </div>
       </DiscoverShell>
     );
@@ -226,17 +230,20 @@ export default function DiscoverExperience({
   if (videos.length === 0 || !activeVideo) {
     return (
       <DiscoverShell>
-        <div className="flex flex-1 items-center justify-center px-6 py-16">
-          <ProductEmptyState
-            compact
-            eyebrow="Discover"
-            title="No video posts yet"
-            description="Be the first to publish a clip. Uploads appear here after they are saved securely."
-            primaryHref={APP_ROUTES.createVideo}
-            primaryLabel="Upload a video"
-            secondaryHref={APP_ROUTES.live}
-            secondaryLabel="Browse Live"
-          />
+        <div className="flex flex-1 flex-col gap-3">
+          <StoryRail viewerId={viewerId} />
+          <div className="flex flex-1 items-center justify-center px-6 py-16">
+            <ProductEmptyState
+              compact
+              eyebrow="Discover"
+              title="No video posts yet"
+              description="Be the first to publish a clip. Uploads appear here after they are saved securely."
+              primaryHref={APP_ROUTES.createVideo}
+              primaryLabel="Upload a video"
+              secondaryHref={APP_ROUTES.live}
+              secondaryLabel="Browse Live"
+            />
+          </div>
         </div>
       </DiscoverShell>
     );
@@ -255,9 +262,11 @@ export default function DiscoverExperience({
 
   return (
     <DiscoverShell>
-      <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
+      <div className="flex flex-1 flex-col gap-3">
+        <StoryRail viewerId={viewerId} />
+        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
         <div className="relative mx-auto flex w-full max-w-[510px] flex-1">
-          <div className="video-watch-stage relative h-[calc(100dvh-4rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem)] md:rounded-[36px] md:border md:border-white/10">
+          <div className="video-watch-stage relative h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
             <DiscoverFeed
               videos={videos}
               initialIndex={initialIndex}
@@ -390,6 +399,7 @@ export default function DiscoverExperience({
           >
             Explore this city
           </Link>
+        </div>
         </div>
       </div>
     </DiscoverShell>
