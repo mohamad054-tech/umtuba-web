@@ -30,8 +30,8 @@ export default async function StoreCartPage() {
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">Your cart</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/50">
-          Prices are snapshotted server-side when items are added. Checkout ships
-          in a later phase.
+          Prices are snapshotted server-side when items are added. Checkout
+          validates live catalog data before creating pending-payment orders.
         </p>
       </header>
 

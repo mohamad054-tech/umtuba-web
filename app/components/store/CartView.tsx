@@ -219,14 +219,16 @@ export default function CartView({ initialSummary }: CartViewProps) {
             </dd>
           </div>
         </dl>
-        <button
-          type="button"
-          disabled
-          aria-disabled="true"
-          className="mt-5 w-full cursor-not-allowed rounded-full bg-violet-500/30 px-5 py-3 text-sm font-black text-violet-100/70"
+        <Link
+          href={APP_ROUTES.storeCheckout}
+          className="mt-5 flex w-full items-center justify-center rounded-full bg-violet-500 px-5 py-3 text-sm font-black text-white hover:bg-violet-400"
         >
-          Checkout coming next
-        </button>
+          Proceed to checkout
+        </Link>
+        <p className="mt-2 text-center text-[11px] text-white/40">
+          Payment collection is not enabled yet. Checkout creates pending-payment
+          orders only.
+        </p>
         <Link
           href={APP_ROUTES.store}
           className="mt-3 block text-center text-sm font-bold text-violet-300 hover:text-violet-200"

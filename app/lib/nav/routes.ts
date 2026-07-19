@@ -25,6 +25,7 @@ export const APP_ROUTES = {
   store: "/store",
   storeSearch: "/store/search",
   storeCart: "/store/cart",
+  storeCheckout: "/store/checkout",
   storeWishlist: "/store/wishlist",
   seller: "/seller",
   sellerApply: "/seller/apply",
