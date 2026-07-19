@@ -106,6 +106,22 @@ export const signupMetadata = buildPageMetadata({
   index: "noindex",
 });
 
+export const termsMetadata = buildPageMetadata({
+  title: "Terms of Service",
+  description: `${BRAND.name} Terms of Service (draft for legal review). Read eligibility, content rules, safety, and account terms.`,
+  path: "/terms",
+  // Draft + placeholders: keep noindex until legal approval.
+  index: "noindex",
+});
+
+export const privacyMetadata = buildPageMetadata({
+  title: "Privacy Policy",
+  description: `${BRAND.name} Privacy Policy (draft for legal review). Learn how we collect, use, and protect your data.`,
+  path: "/privacy",
+  // Draft + placeholders: keep noindex until legal approval.
+  index: "noindex",
+});
+
 export const registerMetadata = buildPageMetadata({
   title: "Register",
   description: `Create your ${BRAND.name} account. ${BRAND.tagline}.`,

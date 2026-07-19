@@ -138,6 +138,8 @@ describe("route robots / sitemap policy", () => {
       "/city",
       "/rewards",
       "/live/media-lab",
+      "/terms",
+      "/privacy",
     ];
     for (const path of blocked) {
       expect(SITEMAP_STATIC_ROUTES).not.toContain(path);

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { landingMetadata } from "../lib/site/routeMetadata";
 import JoinBetaLink from "./components/landing/JoinBetaLink";
 import LandingHero from "./components/landing/LandingHero";
+import SiteLegalLinks from "./components/legal/SiteLegalLinks";
 
 export const metadata = landingMetadata;
 
@@ -70,6 +71,13 @@ export default function Home() {
           </JoinBetaLink>
         </div>
       </section>
+
+      <footer className="relative z-10 border-t border-white/10 px-6 py-8 md:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-white/40">© UMTUBA</p>
+          <SiteLegalLinks />
+        </div>
+      </footer>
     </main>
   );
 }

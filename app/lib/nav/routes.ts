@@ -12,6 +12,8 @@ export const APP_ROUTES = {
   search: "/search",
   login: "/login",
   signup: "/signup",
+  terms: "/terms",
+  privacy: "/privacy",
   forgotPassword: "/forgot-password",
   updatePassword: "/auth/update-password",
   authCallback: "/auth/callback",

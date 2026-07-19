@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SiteLegalLinks from "../components/legal/SiteLegalLinks";
 import { APP_ROUTES } from "../lib/nav";
 import AdvertiseShell from "./AdvertiseShell";
 
@@ -64,6 +65,10 @@ export default function AdvertiseLandingPage() {
           </div>
         ))}
       </section>
+
+      <div className="mt-8 border-t border-white/10 pt-5">
+        <SiteLegalLinks />
+      </div>
     </AdvertiseShell>
   );
 }

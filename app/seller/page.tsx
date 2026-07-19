@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../components/AppTopNav";
+import SiteLegalLinks from "../components/legal/SiteLegalLinks";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { getOwnedOrMemberStore } from "../../lib/store/sellerStore";
@@ -122,6 +123,10 @@ export default async function SellerHubPage() {
             </Link>
           </section>
         )}
+
+        <div className="mt-8 border-t border-white/10 pt-5">
+          <SiteLegalLinks />
+        </div>
       </div>
     </main>
   );

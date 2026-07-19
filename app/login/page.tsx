@@ -8,6 +8,7 @@ import {
   AuthField,
   AuthShell,
 } from "../components/auth";
+import SiteLegalLinks from "../components/legal/SiteLegalLinks";
 import { APP_ROUTES } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { claimPendingReferralAction } from "../actions/referral";
@@ -105,21 +106,24 @@ function LoginForm() {
       panelTitle="Your world is waiting."
       panelBody="Pick up Discover, Live, and Messages where you left off."
       footer={
-        <p className="text-center text-sm text-white/50">
-          Don&apos;t have an account?{" "}
-          <Link
-            href={
-              searchParams.get("next")
-                ? `${APP_ROUTES.signup}?next=${encodeURIComponent(
-                    searchParams.get("next") || ""
-                  )}`
-                : APP_ROUTES.signup
-            }
-            className="font-bold text-blue-200 transition hover:text-blue-100"
-          >
-            Create one
-          </Link>
-        </p>
+        <div className="space-y-4 text-center text-sm text-white/50">
+          <p>
+            Don&apos;t have an account?{" "}
+            <Link
+              href={
+                searchParams.get("next")
+                  ? `${APP_ROUTES.signup}?next=${encodeURIComponent(
+                      searchParams.get("next") || ""
+                    )}`
+                  : APP_ROUTES.signup
+              }
+              className="font-bold text-blue-200 transition hover:text-blue-100"
+            >
+              Create one
+            </Link>
+          </p>
+          <SiteLegalLinks tone="auth" className="justify-center" />
+        </div>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>

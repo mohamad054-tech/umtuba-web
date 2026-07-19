@@ -4,6 +4,9 @@
  * Index (public marketing / discovery / profiles):
  * - /, /discover, /live, /watch, /post-journey, /profile/*, /invite/*
  *
+ * Draft legal pages (/terms, /privacy) are linked in-product but stay noindex
+ * and out of the sitemap until counsel/owner approval.
+ *
  * Noindex (auth, account, private, gated labs):
  * - login, signup, register, password reset, auth callbacks
  * - settings, messages, notifications, create, saved, rewards, creator

@@ -9,6 +9,7 @@ import {
   AuthField,
   AuthShell,
 } from "../components/auth";
+import SiteLegalLinks from "../components/legal/SiteLegalLinks";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signUpWithEmail } from "../../lib/supabase/auth";
@@ -224,8 +225,9 @@ export default function SignupForm({
       title="Create account"
       subtitle="Start your UMTUBA journey in less than a minute."
       footer={
-        <p className="text-center text-sm text-white/50">
-          Already have an account?{" "}
+        <div className="space-y-4 text-center text-sm text-white/50">
+          <p>
+            Already have an account?{" "}
             <Link
               href={
                 nextPath !== APP_ROUTES.discover
@@ -236,7 +238,9 @@ export default function SignupForm({
             >
               Sign in
             </Link>
-        </p>
+          </p>
+          <SiteLegalLinks tone="auth" className="justify-center" />
+        </div>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
@@ -329,7 +333,29 @@ export default function SignupForm({
           checked={acceptTerms}
           disabled={isSubmitting}
           error={fieldErrors.acceptTerms}
-          label="I accept UMTUBA's terms of use and privacy practices."
+          label={
+            <>
+              I accept UMTUBA&apos;s{" "}
+              <Link
+                href={APP_ROUTES.terms}
+                className="font-bold text-blue-200 underline-offset-2 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href={APP_ROUTES.privacy}
+                className="font-bold text-blue-200 underline-offset-2 hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </>
+          }
           onChange={(event) => {
             setAcceptTerms(event.target.checked);
             setFieldErrors((prev) => ({ ...prev, acceptTerms: undefined }));

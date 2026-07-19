@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AuthAlert, AuthField, AuthShell } from "../components/auth";
+import SiteLegalLinks from "../components/legal/SiteLegalLinks";
 import { APP_ROUTES } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import {
@@ -66,15 +67,18 @@ function ForgotPasswordForm() {
       panelTitle="Recover access."
       panelBody="We’ll email you a one-time link to choose a new password. The link expires for your security."
       footer={
-        <p className="text-center text-sm text-white/50">
-          Remembered it?{" "}
-          <Link
-            href={APP_ROUTES.login}
-            className="font-bold text-blue-200 transition hover:text-blue-100"
-          >
-            Back to sign in
-          </Link>
-        </p>
+        <div className="space-y-4 text-center text-sm text-white/50">
+          <p>
+            Remembered it?{" "}
+            <Link
+              href={APP_ROUTES.login}
+              className="font-bold text-blue-200 transition hover:text-blue-100"
+            >
+              Back to sign in
+            </Link>
+          </p>
+          <SiteLegalLinks tone="auth" className="justify-center" />
+        </div>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
