@@ -12,13 +12,17 @@ export const PRODUCT_TYPES = [
   "service",
   "subscription",
   "bundle",
+  "booking",
 ] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
 
 export const PRODUCT_STATUSES = [
   "draft",
   "in_review",
+  "pending_review",
   "active",
+  "rejected",
+  "paused",
   "hidden",
   "blocked",
   "archived",
@@ -45,6 +49,11 @@ export type StoreRow = {
   verification_status: string;
   default_currency: string;
   country_code: string | null;
+  /** Marketplace Foundation V1 — public store profile fields. */
+  city?: string | null;
+  public_contact_email?: string | null;
+  public_contact_phone?: string | null;
+  public_contact_url?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -65,6 +74,14 @@ export type StoreProductRow = {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  /** Marketplace Foundation V1 — kept in sync with `product_type` by DB trigger. */
+  item_type?: ProductType;
+  /** Marketplace Foundation V1 — optional logistics fields (physical goods). */
+  weight_grams?: number | null;
+  length_mm?: number | null;
+  width_mm?: number | null;
+  height_mm?: number | null;
+  origin_country_code?: string | null;
 };
 
 export type ProductVariantRow = {
@@ -118,6 +135,8 @@ export type ProductCategoryRow = {
   slug: string;
   name: string;
   status: string;
+  /** Marketplace Foundation V1 — manual display ordering (lower first). */
+  sort_order?: number;
 };
 
 export type PublicCatalogItem = {

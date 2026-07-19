@@ -22,7 +22,11 @@ export const APP_ROUTES = {
   store: "/store",
   storeSearch: "/store/search",
   storeCart: "/store/cart",
+  storeWishlist: "/store/wishlist",
+  seller: "/seller",
+  sellerApply: "/seller/apply",
   sellerStore: "/seller/store",
+  sellerProducts: "/seller/products",
 } as const;
 
 export type AppRouteHref =
@@ -170,6 +174,36 @@ export function buildRewardsHref(): string {
 /** AI / creator insights. */
 export function buildAiInsightHref(): string {
   return APP_ROUTES.creatorInsights;
+}
+
+const PRODUCT_ID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Sanitize an id segment for use in a URL path (UUID-shaped only, else empty). */
+function sanitizeIdSegment(id: string): string {
+  const trimmed = id.trim();
+  return PRODUCT_ID_RE.test(trimmed) ? trimmed : "";
+}
+
+/**
+ * Id-based product link (e.g. from a wishlist row or a shoppable video
+ * attachment) — resolves server-side to the canonical slug PDP.
+ */
+export function buildStoreProductIdHref(productId: string): string {
+  return `${APP_ROUTES.store}/products/${sanitizeIdSegment(productId)}`;
+}
+
+/**
+ * Id-based store link — resolves server-side to the canonical slug store
+ * profile page.
+ */
+export function buildStoreShopIdHref(shopId: string): string {
+  return `${APP_ROUTES.store}/shops/${sanitizeIdSegment(shopId)}`;
+}
+
+/** Seller-side deep link to edit a specific product draft/listing. */
+export function buildSellerProductHref(productId: string): string {
+  return `${APP_ROUTES.sellerStore}/products/${sanitizeIdSegment(productId)}/edit`;
 }
 
 export function findIndexByPostId<T extends { id: string | number }>(

@@ -7,8 +7,10 @@ import { addToCartAction } from "../../../../actions/storeCart";
 import ProductCard from "../../../../components/store/ProductCard";
 import PlaceholderPanel from "../../../../components/store/PlaceholderPanel";
 import StoreSection from "../../../../components/store/StoreSection";
+import WishlistButton from "../../../../components/store/WishlistButton";
 import { APP_ROUTES } from "../../../../lib/nav";
 import { formatMinorUnits } from "../../../../../lib/store/money";
+import type { PublicProductVideoItem } from "../../../../../lib/store/videoCommerceQueries";
 import type {
   PublicCatalogItem,
   PublicProductDetail,
@@ -18,12 +20,16 @@ type ProductDetailClientProps = {
   detail: PublicProductDetail;
   related: PublicCatalogItem[];
   recommended: PublicCatalogItem[];
+  videos: PublicProductVideoItem[];
+  initialWishlisted: boolean;
 };
 
 export default function ProductDetailClient({
   detail,
   related,
   recommended,
+  videos,
+  initialWishlisted,
 }: ProductDetailClientProps) {
   const router = useRouter();
   const [variantId, setVariantId] = useState(
@@ -73,6 +79,26 @@ export default function ProductDetailClient({
             status: "active",
           },
         ];
+
+  const logisticsRows = useMemo(() => {
+    const rows: Array<{ label: string; value: string }> = [];
+    const { weight_grams, length_mm, width_mm, height_mm, origin_country_code } =
+      detail.product;
+
+    if (weight_grams != null) {
+      rows.push({ label: "Weight", value: `${weight_grams} g` });
+    }
+    if (length_mm != null && width_mm != null && height_mm != null) {
+      rows.push({
+        label: "Dimensions",
+        value: `${length_mm} × ${width_mm} × ${height_mm} mm`,
+      });
+    }
+    if (origin_country_code) {
+      rows.push({ label: "Ships from", value: origin_country_code });
+    }
+    return rows;
+  }, [detail.product]);
 
   const activeMedia = media[mediaIndex] ?? media[0];
   const inStock =
@@ -217,43 +243,51 @@ export default function ProductDetailClient({
             </dl>
           ) : null}
 
-          <button
-            type="button"
-            disabled={!selected || !inStock || pending}
-            aria-disabled={!selected || !inStock || pending}
-            onClick={() => {
-              if (!selected) return;
-              setCartError(null);
-              setCartMessage(null);
-              startTransition(async () => {
-                const result = await addToCartAction({
-                  variantId: selected.variant.id,
-                  quantity: 1,
-                });
-                if (!result.ok) {
-                  if (result.requiresAuth) {
-                    router.push(
-                      `${APP_ROUTES.login}?next=${encodeURIComponent(
-                        `/store/${detail.store.slug}/product/${detail.product.slug}`
-                      )}`
-                    );
+          <div className="mt-6 flex items-stretch gap-3">
+            <button
+              type="button"
+              disabled={!selected || !inStock || pending}
+              aria-disabled={!selected || !inStock || pending}
+              onClick={() => {
+                if (!selected) return;
+                setCartError(null);
+                setCartMessage(null);
+                startTransition(async () => {
+                  const result = await addToCartAction({
+                    variantId: selected.variant.id,
+                    quantity: 1,
+                  });
+                  if (!result.ok) {
+                    if (result.requiresAuth) {
+                      router.push(
+                        `${APP_ROUTES.login}?next=${encodeURIComponent(
+                          `/store/${detail.store.slug}/product/${detail.product.slug}`
+                        )}`
+                      );
+                      return;
+                    }
+                    setCartError(result.message);
                     return;
                   }
-                  setCartError(result.message);
-                  return;
-                }
-                setCartMessage("Added to cart");
-                window.dispatchEvent(
-                  new CustomEvent("umtuba:cart-updated", {
-                    detail: { count: result.itemCount },
-                  })
-                );
-              });
-            }}
-            className="watch-focus-ring mt-6 w-full rounded-full bg-violet-500 px-5 py-3.5 text-sm font-black text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-violet-500/30 disabled:text-violet-100/70"
-          >
-            {pending ? "Adding…" : !inStock ? "Out of stock" : "Add to Cart"}
-          </button>
+                  setCartMessage("Added to cart");
+                  window.dispatchEvent(
+                    new CustomEvent("umtuba:cart-updated", {
+                      detail: { count: result.itemCount },
+                    })
+                  );
+                });
+              }}
+              className="watch-focus-ring flex-1 rounded-full bg-violet-500 px-5 py-3.5 text-sm font-black text-white transition hover:bg-violet-400 disabled:cursor-not-allowed disabled:bg-violet-500/30 disabled:text-violet-100/70"
+            >
+              {pending ? "Adding…" : !inStock ? "Out of stock" : "Add to Cart"}
+            </button>
+            <WishlistButton
+              productId={detail.product.id}
+              initialWishlisted={initialWishlisted}
+              nextHref={`/store/${detail.store.slug}/product/${detail.product.slug}`}
+              className="watch-focus-ring flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-xl text-white transition hover:bg-white/10"
+            />
+          </div>
           {cartError ? (
             <p role="alert" className="mt-3 text-sm text-red-300">
               {cartError}
@@ -291,16 +325,44 @@ export default function ProductDetailClient({
             <SpecRow label="Category" value={detail.category?.name ?? "—"} />
             <SpecRow label="SKU" value={selected?.variant.sku ?? "—"} />
             <SpecRow label="Store" value={detail.store.name} />
+            {logisticsRows.map((row) => (
+              <SpecRow key={row.label} label={row.label} value={row.value} />
+            ))}
           </dl>
         </section>
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <PlaceholderPanel
-          title="Videos featuring this product"
-          description="Shoppable video attachments arrive in a later phase."
-          tone="fuchsia"
-        />
+        {videos.length > 0 ? (
+          <section className="rounded-[24px] border border-white/10 bg-[#080816]/80 p-5">
+            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-fuchsia-300/70">
+              Videos featuring this product
+            </h2>
+            <ul className="mt-3 space-y-2">
+              {videos.map((video) => (
+                <li key={video.postId}>
+                  <Link
+                    href={video.href}
+                    className="watch-focus-ring flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm transition hover:border-fuchsia-400/30 hover:bg-white/[0.06]"
+                  >
+                    <span className="truncate text-white/75">
+                      {video.caption || `@${video.authorUsername ?? "creator"}`}
+                    </span>
+                    <span className="shrink-0 text-xs font-bold text-fuchsia-200">
+                      Watch →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : (
+          <PlaceholderPanel
+            title="Videos featuring this product"
+            description="No shoppable videos have attached this product yet."
+            tone="fuchsia"
+          />
+        )}
         <PlaceholderPanel
           title="Reviews & questions"
           description="Reviews and Q&A placeholders — social proof ships later."

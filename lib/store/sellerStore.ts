@@ -4,11 +4,11 @@ import {
   validateMediaMetadata,
   validatePriceInput,
   validateProductDraftInput,
-  validateStoreCreateInput,
   validateVariantInput,
 } from "./validators";
 import { validateInventoryInput } from "./inventory";
 import { canManageCatalog, canManageStoreSettings } from "./permissions";
+import { canManageSellerCatalog } from "./sellerApplications";
 import { majorToMinorUnits } from "./money";
 
 type AnyClient = SupabaseClient;
@@ -58,43 +58,23 @@ export async function getOwnedOrMemberStore(
   return { store: store as StoreRow, role: membership.role as StoreMemberRole };
 }
 
+/**
+ * Marketplace Foundation V1: stores are no longer created directly by the
+ * app. They are provisioned by the service-role `approve_seller_application`
+ * RPC once an operator approves a `/seller/apply` submission. Kept as a
+ * stub (rather than deleted) so any lingering callers fail closed with a
+ * helpful redirect instead of a broken insert.
+ */
 export async function createStoreForUser(
-  supabase: AnyClient,
-  userId: string,
-  raw: Record<string, unknown>
+  _supabase: AnyClient,
+  _userId: string,
+  _raw: Record<string, unknown>
 ): Promise<ActionResult<StoreRow>> {
-  const existing = await getOwnedOrMemberStore(supabase, userId);
-  if (existing) {
-    return { ok: false, message: "You already belong to a store in this phase." };
-  }
-
-  const parsed = validateStoreCreateInput(raw);
-  if (!parsed.ok) return parsed;
-
-  const { data, error } = await supabase
-    .from("stores")
-    .insert({
-      owner_user_id: userId,
-      slug: parsed.value.slug,
-      name: parsed.value.name,
-      description: parsed.value.description,
-      status: "active",
-      verification_status: "unverified",
-      default_currency: parsed.value.defaultCurrency,
-      country_code: parsed.value.countryCode,
-    })
-    .select("*")
-    .single();
-
-  if (error || !data) {
-    console.error("createStoreForUser", error);
-    if (error?.code === "23505") {
-      return { ok: false, message: "That store slug is already taken." };
-    }
-    return { ok: false, message: "Unable to create store." };
-  }
-
-  return { ok: true, data: data as StoreRow };
+  return {
+    ok: false,
+    message:
+      "Store creation now happens through the seller application. Apply at /seller/apply.",
+  };
 }
 
 export async function updateStoreBasics(
@@ -117,9 +97,42 @@ export async function updateStoreBasics(
       ? raw.description.trim().slice(0, 2000)
       : null;
 
+  const city =
+    typeof raw.city === "string" && raw.city.trim()
+      ? raw.city.trim().slice(0, 80)
+      : null;
+
+  const publicContactEmail =
+    typeof raw.publicContactEmail === "string" && raw.publicContactEmail.trim()
+      ? raw.publicContactEmail.trim().slice(0, 160)
+      : null;
+  if (publicContactEmail && !/^\S+@\S+\.\S+$/.test(publicContactEmail)) {
+    return { ok: false, message: "Contact email is invalid." };
+  }
+
+  const publicContactPhone =
+    typeof raw.publicContactPhone === "string" && raw.publicContactPhone.trim()
+      ? raw.publicContactPhone.trim().slice(0, 40)
+      : null;
+
+  const publicContactUrl =
+    typeof raw.publicContactUrl === "string" && raw.publicContactUrl.trim()
+      ? raw.publicContactUrl.trim().slice(0, 300)
+      : null;
+  if (publicContactUrl && /\s/.test(publicContactUrl)) {
+    return { ok: false, message: "Contact link must not contain spaces." };
+  }
+
   const { data, error } = await supabase
     .from("stores")
-    .update({ name, description })
+    .update({
+      name,
+      description,
+      city,
+      public_contact_email: publicContactEmail,
+      public_contact_phone: publicContactPhone,
+      public_contact_url: publicContactUrl,
+    })
     .eq("id", storeId)
     .select("*")
     .single();
@@ -139,8 +152,26 @@ export async function createDraftProduct(
   raw: Record<string, unknown>
 ): Promise<ActionResult<StoreProductRow>> {
   const role = await getMembership(supabase, storeId, userId);
-  if (!canManageCatalog(role)) {
-    return { ok: false, message: "You do not have permission to create products." };
+  const { data: store } = await supabase
+    .from("stores")
+    .select("verification_status")
+    .eq("id", storeId)
+    .maybeSingle();
+
+  if (
+    !canManageSellerCatalog({
+      role,
+      storeVerificationStatus: store?.verification_status ?? null,
+    })
+  ) {
+    if (!canManageCatalog(role)) {
+      return { ok: false, message: "You do not have permission to create products." };
+    }
+    return {
+      ok: false,
+      message:
+        "Your store must be verified before you can create products. Apply at /seller/apply.",
+    };
   }
 
   const parsed = validateProductDraftInput(raw);
@@ -201,6 +232,7 @@ export async function createDraftProduct(
       short_description: parsed.value.shortDescription,
       description: parsed.value.description,
       product_type: parsed.value.productType,
+      item_type: parsed.value.productType,
       status: "draft",
       moderation_status: "pending",
       primary_category_id: categoryId,

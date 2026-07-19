@@ -7,7 +7,7 @@ import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../lib/store/sellerStore";
-import { createStoreAction, updateStoreAction } from "../../actions/storeCatalog";
+import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
   title: "Seller Store | UMTUBA",
@@ -25,98 +25,16 @@ export default async function SellerStorePage() {
   const membership = await getOwnedOrMemberStore(supabase, user.id);
 
   if (!membership) {
-    return (
-      <main
-        className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
-      >
-        <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
-          <AppTopNav title="Seller" subtitle="Create store" />
-          <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Seller
-            </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight">
-              Create your store
-            </h1>
-            <p className="mt-2 text-sm text-white/50">
-              Set up a storefront to draft products. Checkout is not available
-              in this phase.
-            </p>
-            <form action={createStoreAction} className="mt-6 space-y-4">
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Store name
-                </span>
-                <input
-                  name="name"
-                  required
-                  minLength={2}
-                  maxLength={80}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Slug
-                </span>
-                <input
-                  name="slug"
-                  placeholder="my-store"
-                  pattern="[a-z0-9][a-z0-9-]{1,62}[a-z0-9]"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Description
-                </span>
-                <textarea
-                  name="description"
-                  rows={4}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                    Currency
-                  </span>
-                  <input
-                    name="defaultCurrency"
-                    defaultValue="USD"
-                    maxLength={3}
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                  />
-                </label>
-                <label className="block space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                    Country
-                  </span>
-                  <input
-                    name="countryCode"
-                    placeholder="US"
-                    maxLength={2}
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                  />
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="watch-focus-ring rounded-full bg-white px-5 py-3 text-sm font-black text-black"
-              >
-                Create store
-              </button>
-            </form>
-          </section>
-        </div>
-      </main>
-    );
+    redirect(APP_ROUTES.sellerApply);
   }
 
   const products = await listSellerProducts(supabase, membership.store.id);
   const draftCount = products.filter((p) => p.status === "draft").length;
-  const reviewCount = products.filter((p) => p.status === "in_review").length;
+  const reviewCount = products.filter(
+    (p) => p.status === "in_review" || p.status === "pending_review"
+  ).length;
   const activeCount = products.filter((p) => p.status === "active").length;
+  const verified = membership.store.verification_status === "verified";
 
   return (
     <main
@@ -136,6 +54,13 @@ export default async function SellerStorePage() {
             Verification: {membership.store.verification_status} · Status:{" "}
             {membership.store.status}
           </p>
+
+          {!verified ? (
+            <p className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              Your store is not verified yet — an operator reviews new
+              applications before catalog management unlocks.
+            </p>
+          ) : null}
 
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -175,7 +100,11 @@ export default async function SellerStorePage() {
         </section>
 
         <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-          <h2 className="text-xl font-black tracking-tight">Store basics</h2>
+          <h2 className="text-xl font-black tracking-tight">Store settings</h2>
+          <p className="mt-2 text-sm text-white/45">
+            City and public contact details show on your storefront&apos;s
+            About tab.
+          </p>
           <form action={updateStoreAction} className="mt-4 space-y-4">
             <input type="hidden" name="storeId" value={membership.store.id} />
             <label className="block space-y-2">
@@ -197,6 +126,54 @@ export default async function SellerStorePage() {
                 name="description"
                 rows={4}
                 defaultValue={membership.store.description ?? ""}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                City
+              </span>
+              <input
+                name="city"
+                defaultValue={membership.store.city ?? ""}
+                maxLength={80}
+                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
+              />
+            </label>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                  Contact email
+                </span>
+                <input
+                  name="publicContactEmail"
+                  type="email"
+                  defaultValue={membership.store.public_contact_email ?? ""}
+                  maxLength={160}
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                  Contact phone
+                </span>
+                <input
+                  name="publicContactPhone"
+                  defaultValue={membership.store.public_contact_phone ?? ""}
+                  maxLength={40}
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
+                />
+              </label>
+            </div>
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Contact link
+              </span>
+              <input
+                name="publicContactUrl"
+                placeholder="https://…"
+                defaultValue={membership.store.public_contact_url ?? ""}
+                maxLength={300}
                 className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
               />
             </label>

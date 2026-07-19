@@ -159,3 +159,105 @@ export async function listPublicVideoShopShelf(
 
   return { items, error: null };
 }
+
+export type PublicProductVideoItem = {
+  postId: number;
+  href: string;
+  caption: string | null;
+  authorUsername: string | null;
+  authorName: string | null;
+  thumbnailPath: string | null;
+};
+
+/**
+ * Load publicly visible Watch videos that shop this product — the reverse of
+ * `listPublicVideoShopShelf` (product → videos rather than video → products).
+ * Fail-closed: empty list unless the product itself is publicly visible.
+ */
+export async function listPublicVideosForProduct(
+  supabase: AnyClient,
+  productId: string,
+  options?: { limit?: number }
+): Promise<{ items: PublicProductVideoItem[]; error: string | null }> {
+  const limit = Math.min(Math.max(options?.limit ?? 6, 1), 24);
+
+  const { data: product, error: productError } = await supabase
+    .from("store_products")
+    .select(
+      `
+      id,
+      status,
+      moderation_status,
+      stores!inner ( status )
+    `
+    )
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (productError || !product) {
+    return { items: [], error: null };
+  }
+
+  const store = product.stores as unknown as { status: string };
+  if (
+    !isPubliclyVisibleProduct({
+      productStatus: product.status as string,
+      moderationStatus: product.moderation_status as string,
+      storeStatus: store.status,
+    })
+  ) {
+    return { items: [], error: null };
+  }
+
+  const { data: attachments, error: attachError } = await supabase
+    .from("video_product_attachments")
+    .select("post_id, sort_order")
+    .eq("product_id", productId)
+    .eq("status", "active")
+    .order("sort_order", { ascending: true })
+    .limit(limit);
+
+  if (attachError) {
+    console.error("listPublicVideosForProduct attachments", attachError);
+    return { items: [], error: "Unable to load videos." };
+  }
+
+  const postIds = [...new Set((attachments ?? []).map((a) => a.post_id as number))];
+  if (postIds.length === 0) {
+    return { items: [], error: null };
+  }
+
+  const { data: posts, error: postsError } = await supabase
+    .from("posts")
+    .select("id, content, author_name, author_username, thumbnail_path, video_path, media_status")
+    .in("id", postIds)
+    .eq("post_type", "video")
+    .eq("media_status", "ready")
+    .not("video_path", "is", null);
+
+  if (postsError) {
+    console.error("listPublicVideosForProduct posts", postsError);
+    return { items: [], error: "Unable to load videos." };
+  }
+
+  const postById = new Map<number, (typeof posts)[number]>();
+  for (const post of posts ?? []) {
+    postById.set(post.id as number, post);
+  }
+
+  const items: PublicProductVideoItem[] = [];
+  for (const attachment of attachments ?? []) {
+    const post = postById.get(attachment.post_id as number);
+    if (!post) continue;
+    items.push({
+      postId: post.id as number,
+      href: `/watch?post=${post.id}`,
+      caption: (post.content as string | null) ?? null,
+      authorUsername: (post.author_username as string | null) ?? null,
+      authorName: (post.author_name as string | null) ?? null,
+      thumbnailPath: (post.thumbnail_path as string | null) ?? null,
+    });
+  }
+
+  return { items, error: null };
+}

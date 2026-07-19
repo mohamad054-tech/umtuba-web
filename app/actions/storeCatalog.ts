@@ -7,12 +7,12 @@ import {
   archiveProduct,
   attachProductMediaMetadata,
   createDraftProduct,
-  createStoreForUser,
   submitProductForReview,
   updateDraftProduct,
   updateStoreBasics,
   upsertVariantPriceInventory,
 } from "../../lib/store/sellerStore";
+import { APP_ROUTES } from "../lib/nav";
 
 async function requireUser() {
   const user = await getServerUser();
@@ -22,23 +22,14 @@ async function requireUser() {
   return user;
 }
 
-export async function createStoreAction(formData: FormData): Promise<void> {
-  const user = await requireUser();
-  const supabase = await createClient();
-  const result = await createStoreForUser(supabase, user.id, {
-    name: formData.get("name"),
-    slug: formData.get("slug"),
-    description: formData.get("description"),
-    defaultCurrency: formData.get("defaultCurrency") || "USD",
-    countryCode: formData.get("countryCode"),
-  });
-
-  if (!result.ok) {
-    redirect(`/seller/store?error=${encodeURIComponent(result.message)}`);
-  }
-  revalidatePath("/seller/store");
-  revalidatePath("/store");
-  redirect("/seller/store");
+/**
+ * Store creation now happens through the seller application review flow
+ * (see `app/actions/storeSeller.ts`). This action only exists so any
+ * lingering callers land on the correct next step instead of a dead end.
+ */
+export async function createStoreAction(): Promise<void> {
+  await requireUser();
+  redirect(APP_ROUTES.sellerApply);
 }
 
 export async function updateStoreAction(formData: FormData): Promise<void> {
@@ -52,6 +43,10 @@ export async function updateStoreAction(formData: FormData): Promise<void> {
   const result = await updateStoreBasics(supabase, user.id, storeId, {
     name: formData.get("name"),
     description: formData.get("description"),
+    city: formData.get("city"),
+    publicContactEmail: formData.get("publicContactEmail"),
+    publicContactPhone: formData.get("publicContactPhone"),
+    publicContactUrl: formData.get("publicContactUrl"),
   });
 
   if (!result.ok) {

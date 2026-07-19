@@ -69,6 +69,31 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
           </dt>
           <dd className="mt-1 font-bold">{store.country_code ?? "—"}</dd>
         </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+            City
+          </dt>
+          <dd className="mt-1 font-bold">{store.city ?? "—"}</dd>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+            Contact
+          </dt>
+          <dd className="mt-1 space-y-0.5 font-bold">
+            {store.public_contact_email || store.public_contact_phone ? (
+              <>
+                {store.public_contact_email ? (
+                  <p className="truncate">{store.public_contact_email}</p>
+                ) : null}
+                {store.public_contact_phone ? (
+                  <p className="truncate">{store.public_contact_phone}</p>
+                ) : null}
+              </>
+            ) : (
+              "—"
+            )}
+          </dd>
+        </div>
       </dl>
     </div>
   );

@@ -20,10 +20,89 @@ export async function listActiveCategories(
 ): Promise<ProductCategoryRow[]> {
   const { data } = await supabase
     .from("product_categories")
-    .select("id, parent_id, slug, name, status")
+    .select("id, parent_id, slug, name, status, sort_order")
     .eq("status", "active")
+    .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
   return (data ?? []) as ProductCategoryRow[];
+}
+
+/**
+ * Enrich a public product row (with its joined store) into a `PublicCatalogItem`
+ * — cover media, active price, and available stock. Shared by catalog listing
+ * and wishlist queries so visibility/price/inventory logic stays in one place.
+ */
+export async function enrichPublicCatalogRow(
+  supabase: AnyClient,
+  row: StoreProductRow & {
+    stores: Pick<StoreRow, "id" | "slug" | "name" | "logo_path" | "status">;
+  }
+): Promise<PublicCatalogItem> {
+  const store = row.stores;
+
+  const { data: media } = await supabase
+    .from("product_media")
+    .select("storage_path, role, status, sort_order")
+    .eq("product_id", row.id)
+    .eq("status", "active")
+    .order("sort_order", { ascending: true })
+    .limit(8);
+
+  const cover =
+    (media ?? []).find((m) => m.role === "cover")?.storage_path ??
+    (media ?? [])[0]?.storage_path ??
+    null;
+
+  const { data: variants } = await supabase
+    .from("product_variants")
+    .select("id")
+    .eq("product_id", row.id)
+    .eq("status", "active")
+    .limit(1);
+
+  let priceMinor: number | null = null;
+  let currency: string | null = null;
+  let available: number | null = null;
+
+  const variantId = variants?.[0]?.id;
+  if (variantId) {
+    const { data: price } = await supabase
+      .from("product_prices")
+      .select("amount_minor, currency")
+      .eq("variant_id", variantId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (price) {
+      priceMinor = Number(price.amount_minor);
+      currency = price.currency;
+    }
+
+    const { data: inv } = await supabase
+      .from("product_inventory")
+      .select("on_hand, reserved, safety_stock")
+      .eq("variant_id", variantId)
+      .eq("warehouse_key", "default")
+      .maybeSingle();
+    if (inv) {
+      available = availableUnits({
+        onHand: inv.on_hand,
+        reserved: inv.reserved,
+        safetyStock: inv.safety_stock,
+      });
+    }
+  }
+
+  const { stores: _stores, ...product } = row;
+  return {
+    product: product as StoreProductRow,
+    store,
+    coverPath: cover,
+    priceMinor,
+    currency,
+    available,
+  };
 }
 
 export async function listPublicCatalog(
@@ -78,80 +157,17 @@ export async function listPublicCatalog(
 
   const items: PublicCatalogItem[] = [];
   for (const row of rows) {
-    const store = row.stores;
     if (
       !isPubliclyVisibleProduct({
         productStatus: row.status,
         moderationStatus: row.moderation_status,
-        storeStatus: store.status,
+        storeStatus: row.stores.status,
       })
     ) {
       continue;
     }
 
-    const { data: media } = await supabase
-      .from("product_media")
-      .select("storage_path, role, status, sort_order")
-      .eq("product_id", row.id)
-      .eq("status", "active")
-      .order("sort_order", { ascending: true })
-      .limit(8);
-
-    const cover =
-      (media ?? []).find((m) => m.role === "cover")?.storage_path ??
-      (media ?? [])[0]?.storage_path ??
-      null;
-
-    const { data: variants } = await supabase
-      .from("product_variants")
-      .select("id")
-      .eq("product_id", row.id)
-      .eq("status", "active")
-      .limit(1);
-
-    let priceMinor: number | null = null;
-    let currency: string | null = null;
-    let available: number | null = null;
-
-    const variantId = variants?.[0]?.id;
-    if (variantId) {
-      const { data: price } = await supabase
-        .from("product_prices")
-        .select("amount_minor, currency")
-        .eq("variant_id", variantId)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (price) {
-        priceMinor = Number(price.amount_minor);
-        currency = price.currency;
-      }
-
-      const { data: inv } = await supabase
-        .from("product_inventory")
-        .select("on_hand, reserved, safety_stock")
-        .eq("variant_id", variantId)
-        .eq("warehouse_key", "default")
-        .maybeSingle();
-      if (inv) {
-        available = availableUnits({
-          onHand: inv.on_hand,
-          reserved: inv.reserved,
-          safetyStock: inv.safety_stock,
-        });
-      }
-    }
-
-    const { stores: _stores, ...product } = row;
-    items.push({
-      product: product as StoreProductRow,
-      store,
-      coverPath: cover,
-      priceMinor,
-      currency,
-      available,
-    });
+    items.push(await enrichPublicCatalogRow(supabase, row));
   }
 
   return { items, error: null };
@@ -281,4 +297,62 @@ export async function getPublicProductDetail(
     },
     error: null,
   };
+}
+
+/**
+ * Resolve a product by id to its canonical slug PDP location.
+ * Used by the `/store/products/[productId]` id-based redirect route
+ * (e.g. links shared from Watch/wishlist that only carry a UUID).
+ */
+export async function getPublicProductById(
+  supabase: AnyClient,
+  productId: string
+): Promise<{ storeSlug: string; productSlug: string } | null> {
+  const { data, error } = await supabase
+    .from("store_products")
+    .select(
+      `
+      id,
+      slug,
+      status,
+      moderation_status,
+      stores!inner ( slug, status )
+    `
+    )
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const store = data.stores as unknown as { slug: string; status: string };
+  if (
+    !isPubliclyVisibleProduct({
+      productStatus: data.status as string,
+      moderationStatus: data.moderation_status as string,
+      storeStatus: store.status,
+    })
+  ) {
+    return null;
+  }
+
+  return { storeSlug: store.slug, productSlug: data.slug as string };
+}
+
+/**
+ * Resolve a store by id to its canonical slug profile location.
+ * Used by the `/store/shops/[shopId]` id-based redirect route.
+ */
+export async function getPublicStoreById(
+  supabase: AnyClient,
+  storeId: string
+): Promise<{ storeSlug: string } | null> {
+  const { data } = await supabase
+    .from("stores")
+    .select("slug, status")
+    .eq("id", storeId)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (!data) return null;
+  return { storeSlug: data.slug as string };
 }

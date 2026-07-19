@@ -187,12 +187,20 @@ export default async function StoreHomePage() {
         >
           Open full search →
         </Link>
-        <Link
-          href={APP_ROUTES.sellerStore}
-          className="text-sm font-bold text-white/45 hover:text-white/70"
-        >
-          Sell on UMTUBA
-        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href={APP_ROUTES.storeWishlist}
+            className="text-sm font-bold text-white/45 hover:text-white/70"
+          >
+            Favorites
+          </Link>
+          <Link
+            href={APP_ROUTES.seller}
+            className="text-sm font-bold text-white/45 hover:text-white/70"
+          >
+            Sell on UMTUBA
+          </Link>
+        </div>
       </div>
     </StoreShell>
   );

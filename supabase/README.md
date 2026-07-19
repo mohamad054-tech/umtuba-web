@@ -144,14 +144,23 @@ Safe local setup: copy `.env.example` → `.env.local`, paste URL + publishable 
 21. Then Referral claim reliability (visitor resolution + existing-account guard for claim RPC):
 
    `supabase/migrations/20260726_referral_claim_reliability.sql`
-   (**Prepared — apply only after review; required for cookie-loss / login-later claim paths.**)
+   (**Required for invite-alpha** — enables cookie-loss / login-later claim paths. Verify with `scripts/verify-referral-claim-reliability.sql`.)
 
-22. Then Live stale participant prune (ops/cron ghost-viewer cleanup):
+22. Then complete referral signup client-revoke follow-up (locks `complete_referral_signup` execute down to server-only):
+
+   `supabase/migrations/20260728_complete_referral_signup_client_revoke.sql`
+
+23. Then Live stale participant prune (ops/cron ghost-viewer cleanup):
 
    `supabase/migrations/20260727_live_stale_participant_prune.sql`
-   (**Prepared — apply only after review; not client-callable.**)
+   (**Required for live reliability** — prunes ghost viewers left behind by dropped connections. Verify with `scripts/verify-live-stale-participant-prune.sql`. Runs on a schedule via `.github/workflows/prune-stale-live-participants.yml`, which needs the `DATABASE_URL` secret set in the repo.)
 
-23. Click **Run**.
+24. Click **Run**.
+
+25. Then Recommendation infrastructure V1 (watch signals + user interest / creator / video quality tables, deterministic-v1 feature snapshotting — additive, no ranking rewrite of the chronological feed):
+
+   `supabase/migrations/20260731_recommendation_infrastructure_v1.sql`
+   (Verify with `scripts/verify-recommendation-infrastructure.sql`.)
 
 Verify automation objects (optional):
 
@@ -162,6 +171,12 @@ Verify automation objects (optional):
 `scripts/verify-um-points-award-security.sql`
 
 `scripts/verify-profile-follow-integrity.sql`
+
+`scripts/verify-referral-claim-reliability.sql`
+
+`scripts/verify-live-stale-participant-prune.sql`
+
+`scripts/verify-recommendation-infrastructure.sql`
 
 ### Trusted UM Points reward flow
 

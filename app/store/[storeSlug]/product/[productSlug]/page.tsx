@@ -7,11 +7,13 @@ import {
   pickRecommended,
   pickTrending,
 } from "../../../../lib/storefront/deriveSections";
-import { createClient } from "../../../../../lib/supabase/server";
+import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import {
   getPublicProductDetail,
   listPublicCatalog,
 } from "../../../../../lib/store/catalogQueries";
+import { listPublicVideosForProduct } from "../../../../../lib/store/videoCommerceQueries";
+import { isProductWishlisted } from "../../../../../lib/store/wishlist";
 import type { PublicCatalogItem } from "../../../../../lib/store/types";
 import ProductDetailClient from "./ProductDetailClient";
 
@@ -45,7 +47,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   if (!detail) notFound();
 
-  const catalog = await listPublicCatalog(supabase, { limit: 24 });
+  const [user, catalog, videos] = await Promise.all([
+    getServerUser(),
+    listPublicCatalog(supabase, { limit: 24 }),
+    listPublicVideosForProduct(supabase, detail.product.id),
+  ]);
   const related = pickTrending(
     catalog.items.filter(
       (i: PublicCatalogItem) =>
@@ -56,6 +62,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     4
   );
   const recommended = pickRecommended(catalog.items, detail.product.id, 4);
+  const wishlisted = await isProductWishlisted(
+    supabase,
+    user?.id,
+    detail.product.id
+  );
 
   return (
     <StoreShell
@@ -89,6 +100,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         detail={detail}
         related={related}
         recommended={recommended}
+        videos={videos.items}
+        initialWishlisted={wishlisted}
       />
     </StoreShell>
   );
