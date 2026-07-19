@@ -23,7 +23,8 @@ export function canReadMetrics(role: AdvertiserRole | null | undefined): boolean
 }
 
 export function canApproveAds(role: AdvertiserRole | null | undefined): boolean {
-  // Advertiser roles never self-approve. Admin RPCs are service_role only.
+  // Advertiser roles never self-approve. Platform admin uses admin_* RPCs;
+  // legacy approve_* RPCs remain service_role-only for automation.
   void role;
   return false;
 }

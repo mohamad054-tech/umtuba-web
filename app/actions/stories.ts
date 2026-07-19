@@ -6,9 +6,11 @@ import {
   getStoryViewersForOwner,
   insertStoryForUser,
   listActiveStoryGroups,
+  refreshStorySignedUrlForViewer,
   type CreateStoryResult,
   type DeleteStoryResult,
   type ListActiveStoriesResult,
+  type RefreshStorySignedUrlResult,
   type StoryViewersResult,
 } from "../../lib/stories/queries";
 import { recordStoryViewForUser, type RecordStoryViewResult } from "../../lib/stories/views";
@@ -116,4 +118,25 @@ export async function getMyStoryViewersAction(
 
   const supabase = await createClient();
   return getStoryViewersForOwner(supabase, user.id, id);
+}
+
+export async function refreshStoryPlaybackAction(
+  storyId: string
+): Promise<RefreshStorySignedUrlResult> {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: STORY_ERRORS.authRequired,
+      code: "refresh_failed",
+    };
+  }
+
+  const id = typeof storyId === "string" ? storyId.trim() : "";
+  if (!id) {
+    return { ok: false, message: STORY_ERRORS.notFound, code: "not_found" };
+  }
+
+  const supabase = await createClient();
+  return refreshStorySignedUrlForViewer(supabase, id);
 }

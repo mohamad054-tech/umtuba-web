@@ -15,6 +15,9 @@ describe("userMenuItems", () => {
       "Rewards",
       "Notifications",
       "Settings",
+      "Store",
+      "Seller hub",
+      "Wishlist",
       "Advertise",
     ]);
     expect(new Set(labels).size).toBe(labels.length);
@@ -26,6 +29,9 @@ describe("userMenuItems", () => {
     expect(hrefs).toContain(APP_ROUTES.rewards);
     expect(hrefs).toContain(APP_ROUTES.notifications);
     expect(hrefs).toContain(APP_ROUTES.settings);
+    expect(hrefs).toContain(APP_ROUTES.store);
+    expect(hrefs).toContain(APP_ROUTES.seller);
+    expect(hrefs).toContain(APP_ROUTES.storeWishlist);
     expect(hrefs).toContain(APP_ROUTES.advertise);
     expect(hrefs).not.toContain("/feed");
     expect(hrefs).not.toContain("/ai");

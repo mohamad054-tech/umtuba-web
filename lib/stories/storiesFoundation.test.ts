@@ -236,6 +236,16 @@ describe("stories application layer contracts", () => {
     expect(queries).toMatch(/deleteOwnedStoryStorageObject/);
   });
 
+  it("remints story playback by story id without exposing media_path", () => {
+    const queries = readRepoFile("lib/stories/queries.ts");
+    const actions = readRepoFile("app/actions/stories.ts");
+    const viewer = readRepoFile("app/stories/components/StoryViewer.tsx");
+    expect(queries).toMatch(/refreshStorySignedUrlForViewer/);
+    expect(actions).toMatch(/refreshStoryPlaybackAction/);
+    expect(viewer).toMatch(/refreshStoryPlaybackAction/);
+    expect(viewer).toMatch(/remintPlayback/);
+  });
+
   it("documents followers-only privacy with no profile-block graph in V1", () => {
     const docs = readRepoFile("docs/stories/STORY_FOUNDATION_V1.md");
     expect(docs).toMatch(/followers \+ owner/i);

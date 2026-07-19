@@ -6,6 +6,7 @@ import {
   FORGOT_PASSWORD_PATH,
   mapPasswordResetError,
   mapPasswordResetLinkError,
+  mapSignInLinkError,
   PASSWORD_RESET_CALLBACK_PATH,
   PASSWORD_RESET_REQUEST_SUCCESS,
   PASSWORD_RESET_UPDATE_PATH,
@@ -84,9 +85,15 @@ describe("password reset architecture", () => {
     expect(callback).toMatch(/PASSWORD_RESET_UPDATE_PATH/);
     expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/discover["']/);
     expect(callback).toMatch(/isPasswordResetNext/);
+    expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);
     expect(callback).not.toMatch(
       /getSafeRedirectPath\(\s*searchParams\.get\("next"\),\s*PASSWORD_RESET_UPDATE_PATH/
     );
+  });
+
+  it("maps sign-in link errors without password-reset wording", () => {
+    expect(mapSignInLinkError("otp_expired", "expired")).toMatch(/sign-in link/i);
+    expect(mapSignInLinkError("otp_expired", "expired")).not.toMatch(/reset/i);
   });
 
   it("update-password page requires session and confirms password", () => {

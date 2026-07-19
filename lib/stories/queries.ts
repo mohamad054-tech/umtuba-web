@@ -427,3 +427,55 @@ export async function getStoryViewersForOwner(
 
   return { ok: true, viewers, viewCount: viewers.length };
 }
+
+export type RefreshStorySignedUrlResult =
+  | { ok: true; mediaUrl: string }
+  | { ok: false; message: string; code: "not_found" | "refresh_failed" };
+
+/**
+ * Remint a short-lived signed URL for an active story the caller can read (RLS).
+ * Clients never receive raw media_path — only the new signed URL.
+ */
+export async function refreshStorySignedUrlForViewer(
+  supabase: SupabaseClient,
+  storyId: string
+): Promise<RefreshStorySignedUrlResult> {
+  const id = storyId.trim();
+  if (!id) {
+    return { ok: false, message: STORY_ERRORS.notFound, code: "not_found" };
+  }
+
+  const { data, error } = await supabase
+    .from("stories")
+    .select("id, media_path, expires_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("refreshStorySignedUrlForViewer", error);
+    return {
+      ok: false,
+      message: STORY_ERRORS.loadFailed,
+      code: "refresh_failed",
+    };
+  }
+  if (!data?.media_path) {
+    return { ok: false, message: STORY_ERRORS.notFound, code: "not_found" };
+  }
+  if (!isStoryActive(String(data.expires_at))) {
+    return { ok: false, message: STORY_ERRORS.notFound, code: "not_found" };
+  }
+
+  const mediaUrl = await createStorySignedUrl(
+    supabase,
+    String(data.media_path)
+  );
+  if (!mediaUrl) {
+    return {
+      ok: false,
+      message: STORY_ERRORS.loadFailed,
+      code: "refresh_failed",
+    };
+  }
+  return { ok: true, mediaUrl };
+}

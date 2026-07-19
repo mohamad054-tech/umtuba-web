@@ -1,4 +1,7 @@
 import { Suspense } from "react";
+import {
+  AuthShell,
+} from "../components/auth";
 import { readReferralAttributionCookie } from "../../lib/referral/cookies";
 import SignupForm from "./SignupForm";
 
@@ -10,9 +13,14 @@ export default async function SignupPage() {
   return (
     <Suspense
       fallback={
-        <main className="flex min-h-screen items-center justify-center bg-[#050510] text-white/50">
-          Loading...
-        </main>
+        <AuthShell
+          title="Create your account"
+          subtitle="Loading sign-up…"
+          panelTitle="Create. Discover. Grow."
+          panelBody="Join UMTUBA for videos, live discovery, and creators around the world."
+        >
+          <p className="text-sm text-white/50">Preparing the form…</p>
+        </AuthShell>
       }
     >
       <SignupForm initialReferralCode={cookieReferralCode} />

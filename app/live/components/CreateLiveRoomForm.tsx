@@ -125,18 +125,17 @@ export default function CreateLiveRoomForm({
             setVisibility(event.target.value as LiveRoomVisibility)
           }
           className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none"
+          aria-describedby="live-visibility-help"
         >
+          {/* Private/Group need an invite path before shipping; public only for beta. */}
           <option value="public" className="bg-[#0b0b18]">
             Public
           </option>
-          <option value="private" className="bg-[#0b0b18]">
-            Private
-          </option>
-          <option value="group" className="bg-[#0b0b18]">
-            Group
-          </option>
         </select>
       </div>
+      <p id="live-visibility-help" className="text-[11px] text-white/40">
+        Private and group rooms are temporarily unavailable until invites ship.
+      </p>
 
       <div className="grid grid-cols-2 gap-2">
         <input

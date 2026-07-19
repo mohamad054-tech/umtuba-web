@@ -15,10 +15,7 @@ import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signInWithEmail } from "../../lib/supabase/auth";
 import { FORGOT_PASSWORD_PATH } from "../../lib/supabase/passwordReset";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
-import {
-  isValidEmail,
-  validatePassword,
-} from "../../lib/supabase/validation";
+import { isValidEmail } from "../../lib/supabase/validation";
 
 type FieldErrors = {
   email?: string;
@@ -48,9 +45,9 @@ function LoginForm() {
       next.email = "Enter a valid email address.";
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      next.password = passwordError;
+    // Login must not enforce signup password policy (legacy short passwords).
+    if (!password) {
+      next.password = "Password is required.";
     }
 
     return next;

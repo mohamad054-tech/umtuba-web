@@ -22,4 +22,16 @@ describe("getSafeRedirectPath", () => {
     expect(getSafeRedirectPath("/@evil", "/discover")).toBe("/discover");
     expect(getSafeRedirectPath(null, "/login")).toBe("/login");
   });
+
+  it("allows @ inside query values used by DM deep links", () => {
+    expect(
+      getSafeRedirectPath(
+        "/messages?creatorId=abc&creatorName=%40handle",
+        "/discover"
+      )
+    ).toBe("/messages?creatorId=abc&creatorName=@handle");
+    expect(
+      getSafeRedirectPath("/messages?creatorName=@handle", "/discover")
+    ).toBe("/messages?creatorName=@handle");
+  });
 });

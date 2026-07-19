@@ -102,7 +102,7 @@ export default function ProfileVideoGrid({
       </ul>
       {hasMore ? (
         <p className="text-center text-xs text-white/40">
-          Showing the latest videos. Open Watch for the full feed.
+          Showing the latest videos on this profile. Open any clip to watch it.
         </p>
       ) : null}
     </div>

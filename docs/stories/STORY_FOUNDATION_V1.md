@@ -131,7 +131,7 @@ Hardening notes:
 - No demo seed data
 - No archive / highlights
 - Caption update is allowed by RLS but not exposed in the UI yet
-- Signed URL remint-on-expiry inside the viewer is not yet continuous (15‑minute TTL is enough for a single viewing session)
+- Viewer remints signed URLs on media error via `refreshStoryPlaybackAction` (bounded retries; raw `media_path` never sent to the client)
 
 ## Test strategy
 

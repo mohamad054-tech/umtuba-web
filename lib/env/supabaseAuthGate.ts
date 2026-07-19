@@ -17,9 +17,19 @@ export const PROTECTED_PREFIXES = [
   "/store/cart",
   "/store/wishlist",
   "/admin",
+  // Advertise account surfaces (public landing `/advertise` stays open via isProtectedPath).
+  "/advertise/apply",
+  "/advertise/dashboard",
+  "/advertise/campaigns",
+  "/advertise/creatives",
+  "/advertise/settings",
 ] as const;
 
 export function isProtectedPath(pathname: string): boolean {
+  // Keep the public advertise marketing page open; protect nested account routes.
+  if (pathname === "/advertise") {
+    return false;
+  }
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );

@@ -1,20 +1,25 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { APP_ROUTES } from "../lib/nav";
 
-/** Legacy route — redirects to the designed /signup flow. */
-export default function RegisterPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace(APP_ROUTES.signup);
-  }, [router]);
-
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#050510] px-6 text-white">
-      <p className="text-sm text-white/60">Redirecting to sign up...</p>
-    </main>
+/** Legacy route — permanent server redirect to /signup, preserving query. */
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === "string") {
+      qs.set(key, value);
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        qs.append(key, item);
+      }
+    }
+  }
+  const suffix = qs.toString();
+  redirect(
+    suffix ? `${APP_ROUTES.signup}?${suffix}` : APP_ROUTES.signup
   );
 }

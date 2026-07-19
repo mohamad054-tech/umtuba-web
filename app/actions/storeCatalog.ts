@@ -17,7 +17,9 @@ import { APP_ROUTES } from "../lib/nav";
 async function requireUser() {
   const user = await getServerUser();
   if (!user) {
-    redirect("/login?next=/seller/store");
+    redirect(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.sellerStore)}`
+    );
   }
   return user;
 }

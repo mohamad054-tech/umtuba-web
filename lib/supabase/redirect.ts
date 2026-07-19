@@ -1,5 +1,6 @@
 /**
  * Prevent open redirects: only same-origin relative paths are allowed.
+ * Query/hash may contain `@` (e.g. creator handles); `@` is only rejected in the path.
  */
 export function getSafeRedirectPath(
   candidate: string | null | undefined,
@@ -27,9 +28,13 @@ export function getSafeRedirectPath(
     !value.startsWith("/") ||
     value.startsWith("//") ||
     value.includes("\\") ||
-    value.includes("://") ||
-    value.includes("@")
+    value.includes("://")
   ) {
+    return fallback;
+  }
+
+  const pathOnly = value.split(/[?#]/, 1)[0] ?? value;
+  if (pathOnly.includes("@")) {
     return fallback;
   }
 

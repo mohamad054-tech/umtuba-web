@@ -75,6 +75,29 @@ export function mapPasswordResetLinkError(
   return "This reset link is invalid or has expired. Request a new one.";
 }
 
+/** Auth callback failures that are not password-reset recovery. */
+export function mapSignInLinkError(
+  errorCode: string | null | undefined,
+  errorDescription: string | null | undefined
+): string {
+  const code = (errorCode || "").toLowerCase();
+  const description = (errorDescription || "").toLowerCase();
+
+  if (
+    code.includes("otp_expired") ||
+    description.includes("expired") ||
+    code === "access_denied"
+  ) {
+    return "This sign-in link is invalid or has expired. Please try again.";
+  }
+
+  if (code || description) {
+    return "This sign-in link could not be verified. Please try again.";
+  }
+
+  return "This sign-in link is invalid or has expired. Please try again.";
+}
+
 /**
  * Request a password-reset email. Always resolves with the same success message
  * when the request is accepted (or when Supabase hides existence).

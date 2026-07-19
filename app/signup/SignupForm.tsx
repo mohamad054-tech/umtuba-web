@@ -329,13 +329,7 @@ export default function SignupForm({
           checked={acceptTerms}
           disabled={isSubmitting}
           error={fieldErrors.acceptTerms}
-          label={
-            <>
-              I accept the{" "}
-              <span className="font-bold text-white/85">Terms</span> and{" "}
-              <span className="font-bold text-white/85">Privacy Policy</span>
-            </>
-          }
+          label="I accept UMTUBA's terms of use and privacy practices."
           onChange={(event) => {
             setAcceptTerms(event.target.checked);
             setFieldErrors((prev) => ({ ...prev, acceptTerms: undefined }));

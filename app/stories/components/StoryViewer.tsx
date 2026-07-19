@@ -11,6 +11,7 @@ import {
   deleteStoryAction,
   getMyStoryViewersAction,
   recordStoryViewAction,
+  refreshStoryPlaybackAction,
 } from "../../actions/stories";
 import { STORY_IMAGE_DURATION_MS } from "../../../lib/stories/constants";
 import { STORY_ERRORS, storyUserMessage } from "../../../lib/stories/errors";
@@ -62,6 +63,9 @@ export default function StoryViewer({
   const [restartNonce, setRestartNonce] = useState(0);
   const [mediaError, setMediaError] = useState(false);
   const [mediaLoading, setMediaLoading] = useState(true);
+  const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+  const [reminting, setReminting] = useState(false);
+  const remintAttemptsRef = useRef(0);
   const [viewersOpen, setViewersOpen] = useState(false);
   const [viewers, setViewers] = useState<StoryViewerRow[]>([]);
   const [viewersLoading, setViewersLoading] = useState(false);
@@ -76,6 +80,43 @@ export default function StoryViewer({
   const elapsedRef = useRef(0);
 
   const current = flat[index] ?? null;
+
+  useEffect(() => {
+    setPlaybackUrl(current?.story.mediaUrl ?? null);
+    setMediaError(false);
+    setMediaLoading(true);
+    remintAttemptsRef.current = 0;
+  }, [current?.story.id, current?.story.mediaUrl]);
+
+  const remintPlayback = useCallback(async () => {
+    if (!current?.story.id || reminting) return;
+    if (remintAttemptsRef.current >= 2) {
+      setMediaError(true);
+      return;
+    }
+    remintAttemptsRef.current += 1;
+    setReminting(true);
+    setActionError(null);
+    try {
+      const result = await refreshStoryPlaybackAction(current.story.id);
+      if (!result.ok) {
+        setMediaError(true);
+        setActionError(
+          storyUserMessage(result.message, STORY_ERRORS.loadFailed)
+        );
+        return;
+      }
+      setPlaybackUrl(result.mediaUrl);
+      setMediaError(false);
+      setMediaLoading(true);
+      setRestartNonce((n) => n + 1);
+    } catch {
+      setMediaError(true);
+      setActionError(STORY_ERRORS.loadFailed);
+    } finally {
+      setReminting(false);
+    }
+  }, [current?.story.id, reminting]);
 
   const stopVideo = useCallback(() => {
     const video = videoRef.current;
@@ -266,19 +307,32 @@ export default function StoryViewer({
             <p className="text-sm font-bold text-white/80">
               Unable to load this story media.
             </p>
-            <button
-              type="button"
-              onClick={goNext}
-              className="rounded-full bg-white px-4 py-2 text-xs font-black text-black"
-            >
-              Next
-            </button>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                type="button"
+                disabled={reminting}
+                onClick={() => {
+                  remintAttemptsRef.current = 0;
+                  void remintPlayback();
+                }}
+                className="rounded-full bg-white px-4 py-2 text-xs font-black text-black disabled:opacity-50"
+              >
+                {reminting ? "Retrying…" : "Retry"}
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black text-white"
+              >
+                Next
+              </button>
+            </div>
           </div>
         ) : story.mediaType === "video" ? (
           <video
-            key={story.id}
+            key={`${story.id}-${restartNonce}`}
             ref={videoRef}
-            src={story.mediaUrl ?? undefined}
+            src={playbackUrl ?? undefined}
             className="h-full w-full object-contain"
             playsInline
             autoPlay
@@ -295,6 +349,7 @@ export default function StoryViewer({
             onError={() => {
               setMediaLoading(false);
               setMediaError(true);
+              void remintPlayback();
             }}
             onPlay={() => setPaused(false)}
             onPause={() => setPaused(true)}
@@ -302,14 +357,15 @@ export default function StoryViewer({
         ) : (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            key={story.id}
-            src={story.mediaUrl ?? undefined}
+            key={`${story.id}-${restartNonce}`}
+            src={playbackUrl ?? undefined}
             alt=""
             className="h-full w-full object-contain"
             onLoad={() => setMediaLoading(false)}
             onError={() => {
               setMediaLoading(false);
               setMediaError(true);
+              void remintPlayback();
             }}
           />
         )}

@@ -1,15 +1,16 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { APP_ROUTES } from "../../lib/nav";
 import { runReferralClaimCoordinator } from "../../../lib/referral/claimCoordinator";
 import {
   FORGOT_PASSWORD_PATH,
   mapPasswordResetLinkError,
+  mapSignInLinkError,
   PASSWORD_RESET_UPDATE_PATH,
 } from "../../../lib/supabase/passwordReset";
 import { getSafeRedirectPath } from "../../../lib/supabase/redirect";
 import { createClient } from "../../../lib/supabase/server";
 
 const DEFAULT_POST_AUTH_PATH = "/discover";
-const LOGIN_PATH = "/login";
 
 function isPasswordResetNext(path: string): boolean {
   return (
@@ -18,12 +19,24 @@ function isPasswordResetNext(path: string): boolean {
   );
 }
 
+function mapCallbackLinkError(
+  next: string,
+  errorCode: string | null | undefined,
+  errorDescription: string | null | undefined
+): string {
+  return isPasswordResetNext(next)
+    ? mapPasswordResetLinkError(errorCode, errorDescription)
+    : mapSignInLinkError(errorCode, errorDescription);
+}
+
 function failureRedirect(
   origin: string,
   next: string,
   message: string
 ): NextResponse {
-  const path = isPasswordResetNext(next) ? FORGOT_PASSWORD_PATH : LOGIN_PATH;
+  const path = isPasswordResetNext(next)
+    ? FORGOT_PASSWORD_PATH
+    : APP_ROUTES.login;
   const failure = new URL(path, origin);
   failure.searchParams.set("error", message);
   return NextResponse.redirect(failure);
@@ -49,7 +62,7 @@ export async function GET(request: NextRequest) {
   const errorDescription = searchParams.get("error_description");
 
   if (oauthError || errorCode) {
-    const message = mapPasswordResetLinkError(errorCode, errorDescription);
+    const message = mapCallbackLinkError(next, errorCode, errorDescription);
     return failureRedirect(origin, next, message);
   }
 
@@ -71,7 +84,7 @@ export async function GET(request: NextRequest) {
       return failureRedirect(
         origin,
         next,
-        mapPasswordResetLinkError(error.code, error.message)
+        mapCallbackLinkError(next, error.code, error.message)
       );
     }
   } catch {

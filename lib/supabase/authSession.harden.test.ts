@@ -59,8 +59,9 @@ describe("auth session harden contracts", () => {
   it("callback defaults to discover and routes failures by intent", () => {
     const callback = read("app/auth/callback/route.ts");
     expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/discover["']/);
-    expect(callback).toMatch(/LOGIN_PATH/);
+    expect(callback).toMatch(/APP_ROUTES\.login/);
     expect(callback).toMatch(/isPasswordResetNext/);
+    expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);
   });
 
   it("chrome uses soft client factory when env may be missing", () => {
