@@ -25,7 +25,7 @@ export default async function SellerStorePage() {
   const membership = await getOwnedOrMemberStore(supabase, user.id);
 
   if (!membership) {
-    redirect(APP_ROUTES.sellerApply);
+    redirect(APP_ROUTES.sellerSetup);
   }
 
   const products = await listSellerProducts(supabase, membership.store.id);

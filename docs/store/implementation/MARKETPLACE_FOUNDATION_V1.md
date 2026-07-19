@@ -168,5 +168,9 @@ product count, in addition to the existing 🛍 icon, `aria-expanded`, and
 
 ## Next phase
 
-Checkout + orders, operator admin UI for seller/product moderation, Storage
-upload, ratings/reviews, search ranking.
+Seller Self-Service Store Setup Wizard: see `SELLER_SELF_SERVICE_V1.md`.
+
+Checkout + orders, Storage upload, ratings/reviews, search ranking.
+
+Operator admin UI for seller/product moderation: see
+`STORE_ADMIN_MODERATION_V1.md`.

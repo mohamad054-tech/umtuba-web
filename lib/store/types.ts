@@ -54,6 +54,12 @@ export type StoreRow = {
   public_contact_email?: string | null;
   public_contact_phone?: string | null;
   public_contact_url?: string | null;
+  /** Seller Self-Service V1 — storefront template + policies. */
+  store_template?: string | null;
+  tagline?: string | null;
+  return_policy?: string | null;
+  shipping_policy?: string | null;
+  privacy_policy?: string | null;
   created_at: string;
   updated_at: string;
 };

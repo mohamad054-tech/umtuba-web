@@ -1,11 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { StoreMemberRole } from "./types";
 import { canManageCatalog } from "./permissions";
-import { isValidSlug, slugify } from "./validators";
 
 type AnyClient = SupabaseClient;
 
 export const SELLER_APPLICATION_STATUSES = [
+  "draft",
   "pending",
   "approved",
   "rejected",
@@ -15,6 +15,7 @@ export type SellerApplicationStatus = (typeof SELLER_APPLICATION_STATUSES)[numbe
 
 /** Statuses that block a user from submitting another application (mirrors DB unique index). */
 export const OPEN_SELLER_APPLICATION_STATUSES: SellerApplicationStatus[] = [
+  "draft",
   "pending",
   "approved",
   "suspended",
@@ -27,11 +28,22 @@ export type SellerApplicationRow = {
   proposed_store_name: string;
   proposed_store_slug: string;
   proposed_description: string | null;
+  /** Seller Self-Service V1 — short store tagline. */
+  proposed_tagline?: string | null;
   country_code: string | null;
   city: string | null;
   public_contact_email: string | null;
   public_contact_phone: string | null;
+  /** Seller Self-Service V1 — public website / social link. */
+  public_contact_url?: string | null;
   default_currency: string;
+  /** Seller Self-Service V1 — chosen storefront template. */
+  store_template?: string | null;
+  return_policy?: string | null;
+  shipping_policy?: string | null;
+  privacy_policy?: string | null;
+  /** Seller Self-Service V1 — wizard resume step (1–6). */
+  wizard_step?: number | null;
   store_id: string | null;
   review_note: string | null;
   reviewed_at: string | null;
@@ -43,157 +55,22 @@ export type SellerApplicationResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; message: string };
 
-function normalizeOptionalString(
-  value: unknown,
-  maxLength: number
-): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed ? trimmed.slice(0, maxLength) : null;
-}
-
-function validateSellerApplicationInput(input: {
-  storeName?: unknown;
-  slug?: unknown;
-  description?: unknown;
-  countryCode?: unknown;
-  city?: unknown;
-  publicContactEmail?: unknown;
-  publicContactPhone?: unknown;
-  defaultCurrency?: unknown;
-}):
-  | {
-      ok: true;
-      value: {
-        storeName: string;
-        slug: string;
-        description: string | null;
-        countryCode: string | null;
-        city: string | null;
-        publicContactEmail: string | null;
-        publicContactPhone: string | null;
-        defaultCurrency: string;
-      };
-    }
-  | { ok: false; message: string } {
-  const storeName =
-    typeof input.storeName === "string" ? input.storeName.trim() : "";
-  if (storeName.length < 2 || storeName.length > 80) {
-    return { ok: false, message: "Store name must be 2–80 characters." };
-  }
-
-  const slugRaw =
-    typeof input.slug === "string" && input.slug.trim()
-      ? slugify(input.slug)
-      : slugify(storeName);
-  if (!isValidSlug(slugRaw)) {
-    return { ok: false, message: "Store slug is invalid." };
-  }
-
-  const description = normalizeOptionalString(input.description, 2000);
-
-  let countryCode: string | null = null;
-  if (typeof input.countryCode === "string" && input.countryCode.trim()) {
-    countryCode = input.countryCode.trim().toUpperCase();
-    if (!/^[A-Z]{2}$/.test(countryCode)) {
-      return { ok: false, message: "Country code must be 2 letters." };
-    }
-  }
-
-  const city = normalizeOptionalString(input.city, 80);
-
-  const publicContactEmail = normalizeOptionalString(
-    input.publicContactEmail,
-    160
-  );
-  if (publicContactEmail && !/^\S+@\S+\.\S+$/.test(publicContactEmail)) {
-    return { ok: false, message: "Contact email is invalid." };
-  }
-
-  const publicContactPhone = normalizeOptionalString(
-    input.publicContactPhone,
-    40
-  );
-
-  const defaultCurrency =
-    typeof input.defaultCurrency === "string"
-      ? input.defaultCurrency.trim().toUpperCase()
-      : "USD";
-  if (!/^[A-Z]{3}$/.test(defaultCurrency)) {
-    return { ok: false, message: "Default currency must be a 3-letter code." };
-  }
-
-  return {
-    ok: true,
-    value: {
-      storeName,
-      slug: slugRaw,
-      description,
-      countryCode,
-      city,
-      publicContactEmail,
-      publicContactPhone,
-      defaultCurrency,
-    },
-  };
-}
-
 /**
- * Submit a seller application. Store creation happens only via the
- * service-role `approve_seller_application` RPC — never directly from the app.
+ * Legacy one-shot apply path — disabled.
+ * Seller Self-Service V1 requires the Store Setup Wizard +
+ * `submit_my_seller_application` RPC so incomplete pending rows cannot be
+ * created from the app. Callers should redirect to `/seller/setup`.
  */
 export async function applyToBecomeSeller(
-  supabase: AnyClient,
-  userId: string,
-  raw: Record<string, unknown>
+  _supabase: AnyClient,
+  _userId: string,
+  _raw: Record<string, unknown>
 ): Promise<SellerApplicationResult<SellerApplicationRow>> {
-  const existing = await getLatestSellerApplication(supabase, userId);
-  if (existing && OPEN_SELLER_APPLICATION_STATUSES.includes(existing.status)) {
-    if (existing.status === "approved") {
-      return {
-        ok: false,
-        message: "You already have an approved seller account.",
-      };
-    }
-    return {
-      ok: false,
-      message: "You already have an open seller application.",
-    };
-  }
-
-  const parsed = validateSellerApplicationInput(raw);
-  if (!parsed.ok) return parsed;
-
-  const { data, error } = await supabase
-    .from("seller_applications")
-    .insert({
-      user_id: userId,
-      status: "pending",
-      proposed_store_name: parsed.value.storeName,
-      proposed_store_slug: parsed.value.slug,
-      proposed_description: parsed.value.description,
-      country_code: parsed.value.countryCode,
-      city: parsed.value.city,
-      public_contact_email: parsed.value.publicContactEmail,
-      public_contact_phone: parsed.value.publicContactPhone,
-      default_currency: parsed.value.defaultCurrency,
-    })
-    .select("*")
-    .single();
-
-  if (error || !data) {
-    console.error("applyToBecomeSeller", error);
-    if (error?.code === "23505") {
-      return {
-        ok: false,
-        message:
-          "That store slug is already pending review, or you already have an open application.",
-      };
-    }
-    return { ok: false, message: "Unable to submit seller application." };
-  }
-
-  return { ok: true, data: data as SellerApplicationRow };
+  return {
+    ok: false,
+    message:
+      "Store setup now uses the wizard. Complete and submit at /seller/setup.",
+  };
 }
 
 /** Most recent application for a user, or null when they have never applied. */

@@ -28,6 +28,7 @@ export const APP_ROUTES = {
   storeWishlist: "/store/wishlist",
   seller: "/seller",
   sellerApply: "/seller/apply",
+  sellerSetup: "/seller/setup",
   sellerStore: "/seller/store",
   sellerProducts: "/seller/products",
   advertise: "/advertise",
@@ -42,6 +43,9 @@ export const APP_ROUTES = {
   adminAdsCampaigns: "/admin/ads/campaigns",
   adminAdsCreatives: "/admin/ads/creatives",
   adminAdsReviews: "/admin/ads/reviews",
+  adminStore: "/admin/store",
+  adminStoreSellers: "/admin/store/sellers",
+  adminStoreProducts: "/admin/store/products",
 } as const;
 
 /** Campaign detail workspace under Advertise. */

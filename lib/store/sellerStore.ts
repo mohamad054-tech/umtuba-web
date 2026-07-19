@@ -59,11 +59,10 @@ export async function getOwnedOrMemberStore(
 }
 
 /**
- * Marketplace Foundation V1: stores are no longer created directly by the
- * app. They are provisioned by the service-role `approve_seller_application`
- * RPC once an operator approves a `/seller/apply` submission. Kept as a
- * stub (rather than deleted) so any lingering callers fail closed with a
- * helpful redirect instead of a broken insert.
+ * Marketplace Foundation V1 / Seller Self-Service V1: stores are not created
+ * directly by the app. Sellers complete `/seller/setup`; operators approve
+ * via `approve_seller_application` / `admin_approve_seller_application`.
+ * Kept as a stub so lingering callers fail closed.
  */
 export async function createStoreForUser(
   _supabase: AnyClient,
@@ -73,7 +72,7 @@ export async function createStoreForUser(
   return {
     ok: false,
     message:
-      "Store creation now happens through the seller application. Apply at /seller/apply.",
+      "Store creation now happens through the store setup wizard. Start at /seller/setup.",
   };
 }
 
@@ -170,7 +169,7 @@ export async function createDraftProduct(
     return {
       ok: false,
       message:
-        "Your store must be verified before you can create products. Apply at /seller/apply.",
+        "Your store must be verified before you can create products. Complete setup at /seller/setup.",
     };
   }
 
