@@ -86,6 +86,24 @@ export default function AppTopNav({
               {subtitle}
             </p>
           ) : null}
+          <Link
+            href={APP_ROUTES.search}
+            aria-label="Search"
+            aria-current={
+              pathname === APP_ROUTES.search ||
+              pathname.startsWith(`${APP_ROUTES.search}/`)
+                ? "page"
+                : undefined
+            }
+            className={`watch-focus-ring rounded-full border px-2.5 py-1.5 text-xs font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
+              pathname === APP_ROUTES.search ||
+              pathname.startsWith(`${APP_ROUTES.search}/`)
+                ? "border-sky-400/35 bg-sky-500/15 text-sky-50"
+                : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            Search
+          </Link>
           <ActivityTierIndicator />
           <WalletBalanceIndicator />
           <NotificationBell />

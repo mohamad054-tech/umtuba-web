@@ -25,6 +25,8 @@ describe("shell coherence", () => {
     expect(top).toMatch(/UserMenu/);
     expect(top).toMatch(/WalletBalanceIndicator/);
     expect(top).toMatch(/NotificationBell/);
+    expect(top).toMatch(/APP_ROUTES\.search/);
+    expect(top).toMatch(/aria-label="Search"/);
     expect(top).toMatch(/watch-focus-ring/);
   });
 

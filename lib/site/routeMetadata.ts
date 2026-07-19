@@ -22,6 +22,13 @@ export const discoverMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const searchMetadata = buildPageMetadata({
+  title: "Search",
+  description: `Search people, videos, stories, stores, and products on ${BRAND.name}.`,
+  path: "/search",
+  index: "index",
+});
+
 export const liveMetadata = buildPageMetadata({
   title: "Live",
   description: `Watch and join live moments on ${BRAND.name}. ${BRAND.tagline}.`,

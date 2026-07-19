@@ -9,6 +9,7 @@ export const APP_ROUTES = {
   notifications: "/notifications",
   settings: "/settings",
   saved: "/saved",
+  search: "/search",
   login: "/login",
   signup: "/signup",
   forgotPassword: "/forgot-password",

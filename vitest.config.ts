@@ -24,6 +24,7 @@ export default defineConfig({
       "lib/supabase/**/*.test.ts",
       "lib/store/**/*.test.ts",
       "lib/stories/**/*.test.ts",
+      "lib/search/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",
       "app/lib/video/**/*.test.ts",
