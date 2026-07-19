@@ -6,8 +6,8 @@ Local integration QA pass on `alpha-0.2`.
 
 ## Problems found (summary)
 
-### Critical (remaining after this pass)
-- **Live `live_started` notifications on create-and-go-live:** follower notifications fire on status UPDATE only; the primary host path INSERTs rooms already as `live`, so followers get nothing. Requires a **separate migration** in a later phase (not included here).
+### Critical
+- **Live `live_started` notifications on create-and-go-live:** **Fixed locally (pending remote apply)** via `supabase/migrations/20260808_live_started_insert_notification_fix.sql`. Trigger now fires on `INSERT` with `status=live` as well as `UPDATE` non-live → live; dedupe / prefs / no self-notify preserved. Do not mark production-complete until the migration is applied on the linked Supabase project.
 
 ### High (remaining)
 - Product media upload incomplete (path metadata / placeholders; not real catalog images)
@@ -50,9 +50,14 @@ Local integration QA pass on `alpha-0.2`.
 - Ads permission comment clarified (legacy `approve_*` vs `admin_*`)
 - Profile videos “has more” copy clarified
 
-## Out of scope for this commit
+## Live started INSERT fix (local)
 
-- Any Supabase migration (including `live_started` INSERT fix)
-- Remote `db push` / `db reset` / targeted apply
+- Migration: `20260808_live_started_insert_notification_fix.sql`
+- Status: **Fixed locally (pending remote apply)**
+- Remote apply / `db push` / `db reset` / migration repair: **not done in this phase**
+
+## Out of scope for the original beta QA commit
+
+- Remote `db push` / `db reset` / targeted apply (still required separately for `20260808`)
 - Seed users, demo catalogs, or Platform Admin grants
 - Enabling ads delivery or payments
