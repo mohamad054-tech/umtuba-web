@@ -35,6 +35,11 @@ export const APP_ROUTES = {
   advertiseCampaignsNew: "/advertise/campaigns/new",
   advertiseCreativesNew: "/advertise/creatives/new",
   advertiseSettings: "/advertise/settings",
+  adminAds: "/admin/ads",
+  adminAdsAdvertisers: "/admin/ads/advertisers",
+  adminAdsCampaigns: "/admin/ads/campaigns",
+  adminAdsCreatives: "/admin/ads/creatives",
+  adminAdsReviews: "/admin/ads/reviews",
 } as const;
 
 /** Campaign detail workspace under Advertise. */

@@ -78,6 +78,7 @@ export function assertSubmitTransition(
  * Backend-only contract names (service_role). Documented for admin tooling.
  * Do not call from advertiser client code.
  */
+/** Legacy automation RPCs (service_role only). Prefer PLATFORM_ADMIN_REVIEW_RPCS for UI. */
 export const ADMIN_REVIEW_RPCS = [
   "approve_advertiser_account",
   "reject_advertiser_account",
@@ -87,3 +88,20 @@ export const ADMIN_REVIEW_RPCS = [
   "approve_ad_creative",
   "reject_ad_creative",
 ] as const;
+
+export {
+  PLATFORM_ADMIN_REVIEW_RPCS,
+  approveAdvertiser,
+  rejectAdvertiser,
+  suspendAdvertiser,
+  restoreAdvertiser,
+  approveCampaign,
+  rejectCampaign,
+  pauseCampaignAdmin,
+  restoreCampaign,
+  approveCreative,
+  rejectCreative,
+  suspendCreative,
+  restoreCreative,
+  resolveReviewerIdFromAuth,
+} from "./adminReview";

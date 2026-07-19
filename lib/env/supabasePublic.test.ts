@@ -166,14 +166,23 @@ describe("decideAuthGate fail-closed behavior", () => {
     });
   });
 
-  it("protects seller routes and requires session when config is valid", () => {
+  it("protects seller and admin routes and requires session when config is valid", () => {
     expect(isProtectedPath("/seller")).toBe(true);
     expect(isProtectedPath("/seller/store/products")).toBe(true);
+    expect(isProtectedPath("/admin")).toBe(true);
+    expect(isProtectedPath("/admin/ads")).toBe(true);
     expect(decideAuthGate("/seller/store", invalid)).toEqual({
       action: "service_unavailable",
       forPath: "protected",
     });
+    expect(decideAuthGate("/admin/ads", invalid)).toEqual({
+      action: "service_unavailable",
+      forPath: "protected",
+    });
     expect(decideAuthGate("/seller/store", valid)).toEqual({
+      action: "check_session",
+    });
+    expect(decideAuthGate("/admin/ads", valid)).toEqual({
       action: "check_session",
     });
   });
