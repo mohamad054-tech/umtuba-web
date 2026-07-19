@@ -39,7 +39,7 @@ Validated by `lib/env/supabasePublic.ts`. Clients are never created with empty p
 | `/watch` demo videos | Never | Allowed unless `NEXT_PUBLIC_ALLOW_SURFACE_PREVIEWS=0` |
 | Watch Related/AI/UConnect panels | Hidden | Shown unless previews disabled |
 | Live collab mock files / entry | Hidden | Shown unless previews disabled |
-| Messenger attach/voice controls | Removed (text + send only) | Same — not previewed |
+| Messenger attach/voice controls | Removed (text / reactions / edit / mute only; no attach or voice) | Same — not previewed |
 | Messenger fake presence dots | Hidden | Opt-in only (`NEXT_PUBLIC_ALLOW_SURFACE_PREVIEWS=1`) |
 
 Logic: `app/lib/product/surfaceGates.ts`.
@@ -51,6 +51,16 @@ Logic: `app/lib/product/surfaceGates.ts`.
 - Other public routes may continue without a session; browser/server Supabase helpers throw sanitized errors (no key material in messages).
 
 Safe local setup: copy `.env.example` → `.env.local`, paste URL + publishable key from the Supabase Dashboard → **Settings → API**. Never commit `.env.local`.
+
+## Migration governance (read before applying)
+
+Production migration **history** and the local `supabase/migrations/` folder are **not** a safe 1:1 pushable chronology. Many objects exist remotely without matching `schema_migrations` rows; some local files (for example Push Tokens `20260805`) are **not** present as objects until a targeted apply.
+
+- Do **not** run `supabase db push` or `supabase db push --include-all` against the linked production project.
+- Do **not** mass-`migration repair` without an approved cutover window.
+- Operating plan: [`docs/operations/MIGRATION_BASELINE_CUTOVER_PLAN_V1.md`](../docs/operations/MIGRATION_BASELINE_CUTOVER_PLAN_V1.md).
+
+The numbered list below remains a **manual SQL Editor** guide for greenfield / lab apply. Prefer targeted apply of a single reviewed file when working on an already-live project.
 
 ## Apply SQL migrations (in order)
 
@@ -145,15 +155,21 @@ Safe local setup: copy `.env.example` → `.env.local`, paste URL + publishable 
 
    `supabase/migrations/20260726_referral_claim_reliability.sql`
    (**Required for invite-alpha** — enables cookie-loss / login-later claim paths. Verify with `scripts/verify-referral-claim-reliability.sql`.)
+   Also blocks existing-account signup rewards. Apply manually after steps 17–20.
 
 22. Then complete referral signup client-revoke follow-up (locks `complete_referral_signup` execute down to server-only):
 
    `supabase/migrations/20260728_complete_referral_signup_client_revoke.sql`
 
+   Required so `complete_referral_signup` cannot bypass B4 (SECURITY DEFINER +
+   client-chosen `p_referred_user_id`). Idempotent REVOKEs only — no client GRANT.
+
 23. Then Live stale participant prune (ops/cron ghost-viewer cleanup):
 
    `supabase/migrations/20260727_live_stale_participant_prune.sql`
    (**Required for live reliability** — prunes ghost viewers left behind by dropped connections. Verify with `scripts/verify-live-stale-participant-prune.sql`. Runs on a schedule via `.github/workflows/prune-stale-live-participants.yml`, which needs the `DATABASE_URL` secret set in the repo.)
+   Not client-callable (`anon` / `authenticated` execute revoked). Ops workflow calls
+   `prune_stale_live_participants(120)` every 5 minutes once on the default branch.
 
 24. Click **Run**.
 
@@ -161,6 +177,9 @@ Safe local setup: copy `.env.example` → `.env.local`, paste URL + publishable 
 
    `supabase/migrations/20260731_recommendation_infrastructure_v1.sql`
    (Verify with `scripts/verify-recommendation-infrastructure.sql`.)
+   **No AI.** Does **not** change chronological Discover/Watch feed APIs,
+   Media Pipeline, Messenger, or Rewards award paths. Client-callable
+   `record_watch_signal` only; aggregate refresh helpers are not granted to clients.
 
 Verify automation objects (optional):
 
@@ -172,11 +191,20 @@ Verify automation objects (optional):
 
 `scripts/verify-profile-follow-integrity.sql`
 
+`scripts/verify-profile-content-stats.sql`
+
 `scripts/verify-referral-claim-reliability.sql`
 
 `scripts/verify-live-stale-participant-prune.sql`
 
 `scripts/verify-recommendation-infrastructure.sql`
+
+`scripts/verify-messenger-production-phase2.sql`
+
+`supabase/verify/20260808_live_started_insert_notification_fix.verify.sql`
+
+`supabase/verify/20260805_push_tokens_foundation_v1.verify.sql`  
+(Use after a **targeted** Push Tokens apply only — do not treat a green verify as proof that a full `db push` is safe.)
 
 ### Trusted UM Points reward flow
 
@@ -189,7 +217,8 @@ Reward **amounts**, **reasons**, **recipients**, and **dedupe keys** are owned b
 |-------|------|
 | DB `um_points_config` + event triggers | Decide when points are earned and how many |
 | DB `award_um_points_to_user` | Internal append-only ledger writer + balance update (not granted to `anon` / `authenticated`) |
-| DB `claim_verified_welcome_bonus` / `claim_my_referral_signup` | Client-callable only with **fixed** server rules (no client-chosen points/reason) |
+| DB `claim_verified_welcome_bonus` / `claim_my_referral_signup` | Client-callable only with **fixed** server rules (no client-chosen points/reason). B4 also resolves pending visitor attribution when the invite cookie is missing and rejects accounts older than `referral_attribution_ttl_days`. |
+| DB `complete_referral_signup` | Internal award helper only — execute revoked from `anon` / `authenticated` (`20260728_complete_referral_signup_client_revoke.sql`). |
 | DB `award_um_points` | **Retired** — always raises; execute revoked from clients (`20260723_um_points_award_security.sql`) |
 | App server actions / UI | Trigger eligible product events (post, comment, signup claim); never pass arbitrary award payloads |
 | RLS on `um_point_balances` / `um_points_ledger` | Users **SELECT** own rows only; direct INSERT/UPDATE/DELETE revoked |
@@ -298,6 +327,19 @@ After Messenger V1 Foundation:
 5. Confirm anon / signed-out users cannot SELECT messaging tables.
 6. Optionally enable Realtime for `messages` later (not required for V1).
 
+### What `20260729_messenger_production_phase2.sql` adds
+
+- `message_reactions` (👍 ❤️ 😂 😮 😢) with toggle RPC + RLS
+- `message_hides` for delete-for-me (keeps rows for replies/receipts)
+- `muted_until` + `set_conversation_mute` (1h / 8h / 1w / forever / off)
+- SECURITY DEFINER RPCs: `edit_own_text_message`, `soft_delete_message_for_everyone`
+- Mute-aware `notify_on_direct_message` (skips muted participants; unread still increments)
+- Realtime publication for `messages`, `message_reactions`, `conversation_participants`
+- Peer `last_read_at` exposed via `list_conversation_peers` for Sent/Delivered/Seen
+
+Apply manually after V1 foundation. Do **not** auto-apply from the app.  
+Verify (read-only): `scripts/verify-messenger-production-phase2.sql`.
+
 ## Live Streaming V1 (optional, additive)
 
 Do **not** auto-apply from the app. When ready, paste:
@@ -318,11 +360,28 @@ For Live V3 (idempotent — ensures chat, rooms, participants, and reactions are
 
 **Realtime:** enable Realtime for `live_chat_messages`, `live_rooms`, `live_participants`, and `live_reactions` if the publication blocks did not attach (Dashboard → Database → Publications). RLS still filters events per subscriber.
 
+### Live started notifications (`20260808`)
+
+`create_live_room` often **INSERT**s a room already in `status = live`. Follower / nearby notifications must fire on that path as well as on idle → live **UPDATE**.
+
+- Migration: `supabase/migrations/20260808_live_started_insert_notification_fix.sql`
+- Replaces `notify_on_live_started` + trigger `live_rooms_notify_started` to run `AFTER INSERT OR UPDATE OF status`
+- Verify (read-only): `supabase/verify/20260808_live_started_insert_notification_fix.verify.sql`
+
+Do **not** auto-apply from the app. Prefer a targeted SQL Editor / linked query apply after review.
+
 ## Auth settings
 
 In **Authentication → Providers**, ensure **Email** is enabled.
 
 If **Confirm email** is enabled, new users must confirm before they get a session. The app shows a clear message in that case. For local testing you can temporarily disable email confirmation.
+
+Public legal pages (app routes, not SQL migrations):
+
+- `/terms` — Terms of Use (Beta soft-launch text; counsel review before wider commercial launch)
+- `/privacy` — Privacy Policy
+
+`/signup` requires accepting both; the checkbox links to those routes.
 
 ### Password reset
 
