@@ -105,6 +105,12 @@ export default async function SellerStorePage() {
                 >
                   Shipping
                 </Link>
+                <Link
+                  href={APP_ROUTES.sellerAnalytics}
+                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+                >
+                  Analytics
+                </Link>
               </>
             ) : null}
             <Link
