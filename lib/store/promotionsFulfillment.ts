@@ -211,3 +211,156 @@ export async function upsertShippingRateAdmin(
   const row = (data ?? {}) as Record<string, unknown>;
   return { ok: true, rateId: String(row.rate_id ?? "") };
 }
+
+export type ShippingProviderRow = {
+  id: string;
+  store_id: string;
+  provider_key: string;
+  display_name: string;
+  enabled: boolean;
+  supports_tracking: boolean;
+  supports_pickup: boolean;
+  supports_international: boolean;
+  sort_priority: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ShippingZoneRow = {
+  id: string;
+  store_id: string;
+  name: string;
+  country_codes: string[];
+  region_codes: string[];
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ShippingRateRow = {
+  id: string;
+  zone_id: string;
+  provider_id: string | null;
+  service_type: string;
+  fee_minor: number;
+  currency: string;
+  min_subtotal_minor: number | null;
+  max_subtotal_minor: number | null;
+  free_above_subtotal_minor: number | null;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CouponTargetingSummaryRow = {
+  coupon_id: string;
+  product_count: number;
+  category_count: number;
+  region_count: number;
+  store_wide: boolean;
+};
+
+export async function listShippingProvidersForAdmin(
+  supabase: AnyClient,
+  storeId: string
+): Promise<
+  | { ok: true; rows: ShippingProviderRow[] }
+  | { ok: false; message: string }
+> {
+  const { data, error } = await supabase.rpc("admin_list_shipping_providers", {
+    p_store_id: storeId,
+  });
+  if (error) {
+    return { ok: false, message: mapShippingAdminRpcError(error.message) };
+  }
+  return { ok: true, rows: (data ?? []) as ShippingProviderRow[] };
+}
+
+export async function listShippingZonesForAdmin(
+  supabase: AnyClient,
+  storeId: string
+): Promise<{ ok: true; rows: ShippingZoneRow[] } | { ok: false; message: string }> {
+  const { data, error } = await supabase.rpc("admin_list_shipping_zones", {
+    p_store_id: storeId,
+  });
+  if (error) {
+    return { ok: false, message: mapShippingAdminRpcError(error.message) };
+  }
+  return { ok: true, rows: (data ?? []) as ShippingZoneRow[] };
+}
+
+export async function listShippingRatesForAdmin(
+  supabase: AnyClient,
+  zoneId: string
+): Promise<{ ok: true; rows: ShippingRateRow[] } | { ok: false; message: string }> {
+  const { data, error } = await supabase.rpc("admin_list_shipping_rates", {
+    p_zone_id: zoneId,
+  });
+  if (error) {
+    return { ok: false, message: mapShippingAdminRpcError(error.message) };
+  }
+  return { ok: true, rows: (data ?? []) as ShippingRateRow[] };
+}
+
+export async function getCouponTargetingSummary(
+  supabase: AnyClient,
+  couponId: string
+): Promise<
+  | { ok: true; summary: CouponTargetingSummaryRow }
+  | { ok: false; message: string }
+> {
+  const { data, error } = await supabase.rpc("admin_coupon_targeting_summary", {
+    p_coupon_id: couponId,
+  });
+  if (error) {
+    return { ok: false, message: mapPromotionRpcError(error.message) };
+  }
+  const row = (data ?? {}) as Record<string, unknown>;
+  return {
+    ok: true,
+    summary: {
+      coupon_id: String(row.coupon_id ?? couponId),
+      product_count: Number(row.product_count ?? 0),
+      category_count: Number(row.category_count ?? 0),
+      region_count: Number(row.region_count ?? 0),
+      store_wide: Boolean(row.store_wide),
+    },
+  };
+}
+
+export async function getSellerFulfillmentDashboardCounts(
+  supabase: AnyClient,
+  storeId: string
+): Promise<
+  | { ok: true; counts: Record<string, unknown> }
+  | { ok: false; message: string }
+> {
+  const { data, error } = await supabase.rpc(
+    "seller_fulfillment_dashboard_counts",
+    { p_store_id: storeId }
+  );
+  if (error) {
+    return { ok: false, message: mapFulfillmentRpcError(error.message) };
+  }
+  return { ok: true, counts: (data ?? {}) as Record<string, unknown> };
+}
+
+export async function listOrderShipments(
+  supabase: AnyClient,
+  orderId: string
+): Promise<
+  | { ok: true; rows: OrderShipmentRow[] }
+  | { ok: false; message: string }
+> {
+  const { data, error } = await supabase
+    .from("order_shipments")
+    .select(
+      "id, order_id, fulfillment_id, provider_key, tracking_number, tracking_status, estimated_delivery_at, last_update_at, delivered_at, delivery_confirmed_by, created_at, updated_at"
+    )
+    .eq("order_id", orderId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    return { ok: false, message: mapTrackingRpcError(error.message) };
+  }
+  return { ok: true, rows: (data ?? []) as OrderShipmentRow[] };
+}

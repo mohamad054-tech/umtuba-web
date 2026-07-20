@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../../../../components/AppTopNav";
+import FulfillmentAdminPanel from "../../../../components/store/FulfillmentAdminPanel";
 import OrderDetailView from "../../../../components/store/OrderDetailView";
 import StoreErrorState from "../../../../components/store/StoreErrorState";
 import {
@@ -9,6 +10,11 @@ import {
 } from "../../../../lib/nav";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import { getSellerOrderDetail } from "../../../../../lib/store/orders";
+import { canManageStoreSettings } from "../../../../../lib/store/permissions";
+import {
+  getOrderFulfillment,
+  listOrderShipments,
+} from "../../../../../lib/store/promotionsFulfillment";
 import { getOwnedOrMemberStore } from "../../../../../lib/store/sellerStore";
 
 export const metadata = {
@@ -45,6 +51,14 @@ export default async function SellerStoreOrderDetailPage({
     orderId
   );
 
+  const canManage = canManageStoreSettings(membership.role);
+  const fulfillmentResult = result.ok
+    ? await getOrderFulfillment(supabase, orderId)
+    : null;
+  const shipmentsResult = result.ok
+    ? await listOrderShipments(supabase, orderId)
+    : null;
+
   return (
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -64,7 +78,26 @@ export default async function SellerStoreOrderDetailPage({
             <StoreErrorState message={result.message} />
           </div>
         ) : (
-          <OrderDetailView bundle={result.data} mode="seller" />
+          <>
+            <OrderDetailView bundle={result.data} mode="seller" />
+            <div className="mt-6">
+              <FulfillmentAdminPanel
+                orderId={orderId}
+                canManage={canManage && result.data.canUpdate}
+                fulfillment={
+                  fulfillmentResult?.ok
+                    ? fulfillmentResult.fulfillment
+                    : null
+                }
+                events={
+                  fulfillmentResult?.ok ? fulfillmentResult.events : []
+                }
+                shipments={
+                  shipmentsResult?.ok ? shipmentsResult.rows : []
+                }
+              />
+            </div>
+          </>
         )}
       </div>
     </main>

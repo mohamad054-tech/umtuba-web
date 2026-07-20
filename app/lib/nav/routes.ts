@@ -34,6 +34,8 @@ export const APP_ROUTES = {
   sellerStore: "/seller/store",
   sellerProducts: "/seller/products",
   sellerOrders: "/seller/store/orders",
+  sellerPromotions: "/seller/store/promotions",
+  sellerShipping: "/seller/store/shipping",
   advertise: "/advertise",
   advertiseApply: "/advertise/apply",
   advertiseDashboard: "/advertise/dashboard",

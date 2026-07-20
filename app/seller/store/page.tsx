@@ -4,6 +4,14 @@ import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
+  EMPTY_FULFILLMENT_DASHBOARD_COUNTS,
+  SELLER_DASHBOARD_FULFILLMENT_CARDS,
+  parseFulfillmentDashboardCounts,
+  sellerOrdersHrefForDashboardCard,
+} from "../../../lib/store/adminUiHelpers";
+import { canManageStoreSettings } from "../../../lib/store/permissions";
+import { getSellerFulfillmentDashboardCounts } from "../../../lib/store/promotionsFulfillment";
+import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../lib/store/sellerStore";
@@ -35,6 +43,14 @@ export default async function SellerStorePage() {
   ).length;
   const activeCount = products.filter((p) => p.status === "active").length;
   const verified = membership.store.verification_status === "verified";
+  const canManage = canManageStoreSettings(membership.role);
+  const fulfillmentCountsResult = await getSellerFulfillmentDashboardCounts(
+    supabase,
+    membership.store.id
+  );
+  const fulfillmentCounts = fulfillmentCountsResult.ok
+    ? parseFulfillmentDashboardCounts(fulfillmentCountsResult.counts)
+    : EMPTY_FULFILLMENT_DASHBOARD_COUNTS;
 
   return (
     <main
@@ -75,6 +91,22 @@ export default async function SellerStorePage() {
             >
               Orders
             </Link>
+            {canManage ? (
+              <>
+                <Link
+                  href={APP_ROUTES.sellerPromotions}
+                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+                >
+                  Promotions
+                </Link>
+                <Link
+                  href={APP_ROUTES.sellerShipping}
+                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+                >
+                  Shipping
+                </Link>
+              </>
+            ) : null}
             <Link
               href={`/store/${membership.store.slug}`}
               className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
@@ -102,6 +134,39 @@ export default async function SellerStorePage() {
               </dt>
               <dd className="mt-1 text-2xl font-black">{activeCount}</dd>
             </div>
+          </dl>
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
+          <h2 className="text-xl font-black tracking-tight">Fulfillment</h2>
+          <p className="mt-2 text-sm text-white/45">
+            Lifecycle counts for this store. Cards open the orders list.
+          </p>
+          {!fulfillmentCountsResult.ok ? (
+            <p className="mt-4 text-sm text-amber-100/90" role="status">
+              Fulfillment counts unavailable until Admin UI migration is
+              applied.
+            </p>
+          ) : null}
+          <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {SELLER_DASHBOARD_FULFILLMENT_CARDS.map((card) => (
+              <div key={card.key}>
+                <Link
+                  href={sellerOrdersHrefForDashboardCard(
+                    card,
+                    APP_ROUTES.sellerOrders
+                  )}
+                  className="watch-focus-ring block rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 transition hover:border-white/25 hover:bg-white/[0.05]"
+                >
+                  <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+                    {card.label}
+                  </dt>
+                  <dd className="mt-1 text-2xl font-black">
+                    {fulfillmentCounts[card.key]}
+                  </dd>
+                </Link>
+              </div>
+            ))}
           </dl>
         </section>
 
