@@ -10,6 +10,7 @@ import {
   upsertBuyerAddress,
 } from "../../lib/store/checkout";
 import { getCartSummary } from "../../lib/store/cart";
+import { ensureDeferredPaymentAttempts } from "../../lib/store/paymentAttempts";
 import { APP_ROUTES } from "../lib/nav";
 
 function formString(formData: FormData, key: string): string {
@@ -78,6 +79,24 @@ export async function createCheckoutQuoteAction(formData: FormData) {
   if (!user) {
     return { ok: false as const, message: "Sign in required.", requiresAuth: true };
   }
+  // Reject any client-supplied money fields (totals are server-derived).
+  for (const key of [
+    "subtotal_minor",
+    "grand_total_minor",
+    "tax_total_minor",
+    "shipping_total_minor",
+    "discount_total_minor",
+    "unit_price_minor",
+    "amount_minor",
+  ]) {
+    if (formData.has(key)) {
+      return {
+        ok: false as const,
+        message: "Client must not supply money fields.",
+      };
+    }
+  }
+
   const supabase = await createClient();
   const shippingRaw = formString(formData, "shipping_selections_json");
   let shippingSelections: Record<string, string> = {};
@@ -112,10 +131,101 @@ export async function confirmCheckoutQuoteAction(formData: FormData) {
   }
   const supabase = await createClient();
   const result = await confirmCheckoutQuote(supabase, quoteId);
-  if (result.ok) {
-    revalidatePath(APP_ROUTES.storeCart);
-    revalidatePath(APP_ROUTES.storeCheckout);
-    revalidatePath(APP_ROUTES.store);
+  if (!result.ok) {
+    return result;
   }
-  return result;
+
+  // Best-effort deferred payment attempt rows (no charge). Failures do not
+  // roll back the confirmed order — payment gateways are not live yet.
+  const orders =
+    (result.data.orders as Array<{ order_id?: string }> | undefined) ?? [];
+  const orderIds = orders
+    .map((o) => (typeof o.order_id === "string" ? o.order_id : ""))
+    .filter(Boolean);
+
+  const { attempts, failures } = await ensureDeferredPaymentAttempts(
+    supabase,
+    orderIds
+  );
+
+  revalidatePath(APP_ROUTES.storeCart);
+  revalidatePath(APP_ROUTES.storeCheckout);
+  revalidatePath(APP_ROUTES.store);
+  revalidatePath(APP_ROUTES.storeOrders);
+
+  return {
+    ok: true as const,
+    data: {
+      ...result.data,
+      payment_attempts: attempts,
+      payment_attempt_failures: failures,
+      payment_recording_incomplete: failures.length > 0,
+    },
+  };
+}
+
+/**
+ * Recovery: create missing deferred payment attempts for buyer-owned orders.
+ * Does not charge; amount comes from each order row via SECURITY DEFINER RPC.
+ */
+export async function ensureDeferredPaymentAttemptAction(formData: FormData) {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false as const,
+      message: "Sign in required.",
+      requiresAuth: true,
+    };
+  }
+
+  const single = formString(formData, "order_id").trim();
+  const rawList = formString(formData, "order_ids_json").trim();
+  let orderIds: string[] = [];
+  if (single) {
+    orderIds = [single];
+  } else if (rawList) {
+    try {
+      const parsed = JSON.parse(rawList) as unknown;
+      if (!Array.isArray(parsed)) {
+        return { ok: false as const, message: "order_ids_json must be an array." };
+      }
+      orderIds = parsed.filter((v): v is string => typeof v === "string");
+    } catch {
+      return { ok: false as const, message: "order_ids_json is invalid." };
+    }
+  }
+
+  if (orderIds.length === 0) {
+    return { ok: false as const, message: "At least one order id is required." };
+  }
+  if (orderIds.length > 20) {
+    return { ok: false as const, message: "Too many order ids." };
+  }
+
+  // Reject client money fields on recovery path too.
+  if (formData.has("amount_minor") || formData.has("grand_total_minor")) {
+    return {
+      ok: false as const,
+      message: "Client must not supply money fields.",
+    };
+  }
+
+  const supabase = await createClient();
+  const { attempts, failures } = await ensureDeferredPaymentAttempts(
+    supabase,
+    orderIds
+  );
+
+  if (attempts.length > 0) {
+    revalidatePath(APP_ROUTES.storeOrders);
+  }
+
+  return {
+    ok: true as const,
+    data: {
+      payment_attempts: attempts,
+      payment_attempt_failures: failures,
+      payment_recording_incomplete: failures.length > 0,
+    },
+  };
 }

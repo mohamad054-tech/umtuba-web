@@ -1,11 +1,19 @@
 /**
  * Checkout Foundation V1 — pure domain rules (no payment gateways).
  * Money uses integer minor units only.
+ * Pricing math lives in ./pricing (canonical engine).
  */
 
 import { availableUnits } from "./inventory";
 import { normalizeCurrencyCode, validateAmountMinor } from "./money";
 import { isPubliclyVisibleProduct } from "./permissions";
+import {
+  assertPricingGrandNonNegative,
+  computeCouponDiscountMinor as pricingComputeCouponDiscountMinor,
+  computeShippingFeeMinor as pricingComputeShippingFeeMinor,
+  computeStoreCheckoutGrandTotalMinor as pricingComputeStoreCheckoutGrandTotalMinor,
+  computeTaxMinor as pricingComputeTaxMinor,
+} from "./pricing";
 
 export const CHECKOUT_QUOTE_TTL_MINUTES = 15;
 
@@ -95,39 +103,16 @@ export function computeShippingFeeMinor(input: {
   freeAboveSubtotalMinor: number | null;
   subtotalMinor: number;
 }): number {
-  if (
-    input.freeAboveSubtotalMinor != null &&
-    input.subtotalMinor >= input.freeAboveSubtotalMinor
-  ) {
-    return 0;
-  }
-  return Math.max(0, input.feeMinor);
+  return pricingComputeShippingFeeMinor(input);
 }
 
-/** Exclusive: add tax on top. Inclusive: extract embedded tax portion. */
 export function computeTaxMinor(input: {
   taxableMinor: number;
   rateBps: number;
   inclusive: boolean;
   enabled: boolean;
 }): { taxMinor: number; grandMerchandiseMinor: number } {
-  if (!input.enabled || input.rateBps <= 0 || input.taxableMinor <= 0) {
-    return { taxMinor: 0, grandMerchandiseMinor: input.taxableMinor };
-  }
-  if (input.inclusive) {
-    const taxMinor =
-      input.taxableMinor -
-      Math.floor((input.taxableMinor * 10000) / (10000 + input.rateBps));
-    return {
-      taxMinor: Math.max(0, taxMinor),
-      grandMerchandiseMinor: input.taxableMinor,
-    };
-  }
-  const taxMinor = Math.floor((input.taxableMinor * input.rateBps) / 10000);
-  return {
-    taxMinor: Math.max(0, taxMinor),
-    grandMerchandiseMinor: input.taxableMinor + taxMinor,
-  };
+  return pricingComputeTaxMinor(input);
 }
 
 export function computeCouponDiscountMinor(input: {
@@ -137,19 +122,7 @@ export function computeCouponDiscountMinor(input: {
   subtotalMinor: number;
   maxDiscountMinor?: number | null;
 }): number {
-  let discount = 0;
-  if (input.discountType === "percent") {
-    discount = Math.floor(
-      (input.subtotalMinor * (input.percentBps ?? 0)) / 10000
-    );
-  } else {
-    discount = input.fixedAmountMinor ?? 0;
-  }
-  if (input.maxDiscountMinor != null) {
-    discount = Math.min(discount, input.maxDiscountMinor);
-  }
-  discount = Math.min(discount, input.subtotalMinor);
-  return Math.max(0, discount);
+  return pricingComputeCouponDiscountMinor(input);
 }
 
 export function computeStoreCheckoutGrandTotalMinor(input: {
@@ -159,20 +132,13 @@ export function computeStoreCheckoutGrandTotalMinor(input: {
   shippingTotalMinor: number;
   taxInclusive: boolean;
 }): number {
-  const afterDiscount = input.subtotalMinor - input.discountTotalMinor;
-  if (input.taxInclusive) {
-    return afterDiscount + input.shippingTotalMinor;
-  }
-  return afterDiscount + input.taxTotalMinor + input.shippingTotalMinor;
+  return pricingComputeStoreCheckoutGrandTotalMinor(input);
 }
 
 export function assertCheckoutGrandNonNegative(
   grandTotalMinor: number
 ): { ok: true } | { ok: false; message: string } {
-  if (grandTotalMinor < 0) {
-    return { ok: false, message: "Grand total cannot be negative." };
-  }
-  return { ok: true };
+  return assertPricingGrandNonNegative(grandTotalMinor);
 }
 
 export function groupCartItemsByStore<T extends { storeId: string }>(
