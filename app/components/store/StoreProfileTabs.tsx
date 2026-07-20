@@ -1,17 +1,33 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { STOREFRONT_FLAGS } from "../../../lib/store/storefrontFlags";
 
-const TABS = [
+const BASE_TABS = [
   { id: "products", label: "Products" },
   { id: "about", label: "About" },
-  { id: "videos", label: "Videos" },
-  { id: "live", label: "Live" },
-  { id: "ratings", label: "Ratings" },
 ] as const;
 
-type TabId = (typeof TABS)[number]["id"];
+const OPTIONAL_TABS = [
+  {
+    id: "videos",
+    label: "Videos",
+    enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_VIDEOS_TAB,
+  },
+  {
+    id: "live",
+    label: "Live",
+    enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_LIVE_TAB,
+  },
+  {
+    id: "ratings",
+    label: "Ratings",
+    enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB,
+  },
+] as const;
+
+type TabId = (typeof BASE_TABS)[number]["id"] | (typeof OPTIONAL_TABS)[number]["id"];
 
 type StoreProfileTabsProps = {
   products: ReactNode;
@@ -19,8 +35,19 @@ type StoreProfileTabsProps = {
 };
 
 export default function StoreProfileTabs({ products, about }: StoreProfileTabsProps) {
+  const tabs = useMemo(
+    () => [
+      ...BASE_TABS,
+      ...OPTIONAL_TABS.filter((tab) => tab.enabled).map(({ id, label }) => ({
+        id,
+        label,
+      })),
+    ],
+    []
+  );
   const [active, setActive] = useState<TabId>("products");
   const baseId = useId();
+  const activeTab = tabs.some((tab) => tab.id === active) ? active : "products";
 
   return (
     <div className="mt-8">
@@ -29,8 +56,8 @@ export default function StoreProfileTabs({ products, about }: StoreProfileTabsPr
         aria-label="Store sections"
         className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2"
       >
-        {TABS.map((tab) => {
-          const selected = active === tab.id;
+        {tabs.map((tab) => {
+          const selected = activeTab === tab.id;
           return (
             <button
               key={tab.id}
@@ -55,25 +82,25 @@ export default function StoreProfileTabs({ products, about }: StoreProfileTabsPr
 
       <div
         role="tabpanel"
-        id={`${baseId}-panel-${active}`}
-        aria-labelledby={`${baseId}-${active}`}
+        id={`${baseId}-panel-${activeTab}`}
+        aria-labelledby={`${baseId}-${activeTab}`}
         className="mt-5"
       >
-        {active === "products" ? products : null}
-        {active === "about" ? about : null}
-        {active === "videos" ? (
+        {activeTab === "products" ? products : null}
+        {activeTab === "about" ? about : null}
+        {activeTab === "videos" ? (
           <PlaceholderCopy
             title="Store videos"
             body="Shoppable videos for this storefront arrive in a later phase."
           />
         ) : null}
-        {active === "live" ? (
+        {activeTab === "live" ? (
           <PlaceholderCopy
             title="Live shopping"
             body="Live sessions from this store will appear here when Live Shopping ships."
           />
         ) : null}
-        {active === "ratings" ? (
+        {activeTab === "ratings" ? (
           <PlaceholderCopy
             title="Ratings"
             body="Store ratings and reviews are placeholders until the ratings system launches."

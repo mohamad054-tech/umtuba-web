@@ -102,10 +102,10 @@ pending queue.
 
 ## Known limitations
 
-1. **Product reject / return-for-revision** is not shipped — no existing
-   operator reject RPC and no product review-note column. Documented follow-up.
-2. **Media preview** shows a safe placeholder (path text only); Storage upload
-   is outside this slice.
+1. **Product reject / return-for-revision** shipped in
+   `STORE_HARDENING_V1.md` (`20260818_store_hardening_v1.sql`).
+2. **Media preview / Storage upload** shipped in Store Hardening V1
+   (`store-product-media` bucket).
 3. Migration must be applied to the target database before the console can load
    queues (local/remote apply is an ops step — not done by this implementation).
 4. **Store review audit events** (append-only reviewer log, Ads-style) remain a

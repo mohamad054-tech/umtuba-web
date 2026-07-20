@@ -7,6 +7,8 @@ export const STORE_ADMIN_REVIEW_RPCS = [
   "admin_reject_seller_application",
   "admin_suspend_seller_application",
   "admin_approve_store_product",
+  "admin_reject_store_product",
+  "admin_return_store_product_for_revision",
   "admin_store_moderation_queue_counts",
   "admin_list_seller_applications",
   "admin_list_store_products_for_moderation",
@@ -30,6 +32,19 @@ export function validateRejectionReason(
   }
   if (trimmed.length > 1000) {
     return { ok: false, message: "Rejection reason is too long." };
+  }
+  return { ok: true, note: trimmed };
+}
+
+export function validateRevisionReason(
+  note: string
+): { ok: true; note: string } | { ok: false; message: string } {
+  const trimmed = note.trim();
+  if (trimmed.length < 3) {
+    return { ok: false, message: "Revision reason is required." };
+  }
+  if (trimmed.length > 1000) {
+    return { ok: false, message: "Revision reason is too long." };
   }
   return { ok: true, note: trimmed };
 }
@@ -59,9 +74,9 @@ export function assertSellerApplicationAction(
 export function assertProductModerationAction(
   status: string,
   moderationStatus: string,
-  action: "approve"
+  action: "approve" | "reject" | "return"
 ): { ok: true } | { ok: false; message: string } {
-  if (action !== "approve") {
+  if (action !== "approve" && action !== "reject" && action !== "return") {
     return { ok: false, message: "Unsupported product moderation action." };
   }
   if (
@@ -100,6 +115,9 @@ export function mapStoreAdminRpcError(
   }
   if (raw.includes("rejection reason")) {
     return "Rejection reason is required.";
+  }
+  if (raw.includes("revision reason")) {
+    return "Revision reason is required.";
   }
   if (raw.includes("already suspended")) {
     return "This application is already suspended.";
@@ -196,5 +214,47 @@ export async function approveStoreProductAdmin(
     "admin_approve_store_product",
     { p_product_id: productId.trim() },
     "Unable to approve product."
+  );
+}
+
+export async function rejectStoreProductAdmin(
+  supabase: AnyClient,
+  productId: string,
+  note: string
+) {
+  if (!isStoreAdminUuid(productId)) {
+    return { ok: false as const, message: "Invalid product id." };
+  }
+  const reason = validateRejectionReason(note);
+  if (!reason.ok) return reason;
+  return callAdminRpc(
+    supabase,
+    "admin_reject_store_product",
+    {
+      p_product_id: productId.trim(),
+      p_note: reason.note,
+    },
+    "Unable to reject product."
+  );
+}
+
+export async function returnStoreProductForRevisionAdmin(
+  supabase: AnyClient,
+  productId: string,
+  note: string
+) {
+  if (!isStoreAdminUuid(productId)) {
+    return { ok: false as const, message: "Invalid product id." };
+  }
+  const reason = validateRevisionReason(note);
+  if (!reason.ok) return reason;
+  return callAdminRpc(
+    supabase,
+    "admin_return_store_product_for_revision",
+    {
+      p_product_id: productId.trim(),
+      p_note: reason.note,
+    },
+    "Unable to return product for revision."
   );
 }

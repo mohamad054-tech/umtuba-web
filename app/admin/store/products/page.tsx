@@ -2,6 +2,7 @@ import Link from "next/link";
 import { availableUnits } from "../../../../lib/store/inventory";
 import { formatMinorUnits } from "../../../../lib/store/money";
 import { adminListStoreProductsForModeration } from "../../../../lib/store/adminQueries";
+import { createAuthorizedProductMediaSignedUrl } from "../../../../lib/store/productMediaUrl";
 import { APP_ROUTES } from "../../../lib/nav";
 import AdminStoreShell, { FlashMessages, StatusChip } from "../AdminStoreShell";
 import ProductReviewActions from "../ProductReviewActions";
@@ -18,12 +19,16 @@ type PageProps = {
         id?: string;
         error?: string;
         approved?: string;
+        rejected?: string;
+        returned?: string;
       }>
     | {
         status?: string;
         id?: string;
         error?: string;
         approved?: string;
+        rejected?: string;
+        returned?: string;
       };
 };
 
@@ -40,7 +45,7 @@ function formatWhen(value: string | null | undefined) {
 }
 
 export default async function AdminStoreProductsPage({ searchParams }: PageProps) {
-  const { supabase } = await requireAdminStoreSession();
+  const { supabase, user } = await requireAdminStoreSession();
   const params = await Promise.resolve(searchParams ?? {});
   const status = params.status || "pending";
   const list = await adminListStoreProductsForModeration(supabase, {
@@ -55,10 +60,25 @@ export default async function AdminStoreProductsPage({ searchParams }: PageProps
         ? list.rows[0] ?? null
         : null;
 
-  const okMsg = params.approved ? "Product approved and published." : undefined;
+  const okMsg = params.approved
+    ? "Product approved and published."
+    : params.rejected
+      ? "Product rejected."
+      : params.returned
+        ? "Product returned for revision."
+        : undefined;
   const returnTo = `${APP_ROUTES.adminStoreProducts}?status=${encodeURIComponent(status)}${
     selected ? `&id=${selected.id}` : ""
   }`;
+  const selectedMediaUrl =
+    selected?.media_path
+      ? await createAuthorizedProductMediaSignedUrl(supabase, {
+          storagePath: selected.media_path,
+          productId: selected.id,
+          storeId: selected.store_id,
+          userId: user.id,
+        })
+      : null;
 
   return (
     <AdminStoreShell title="Product review">
@@ -77,6 +97,7 @@ export default async function AdminStoreProductsPage({ searchParams }: PageProps
             <option value="pending">Awaiting review</option>
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
+            <option value="needs_changes">Needs changes</option>
             <option value="all">All recent</option>
           </select>
         </label>
@@ -141,18 +162,30 @@ export default async function AdminStoreProductsPage({ searchParams }: PageProps
                 </div>
               </div>
 
-              <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-black/30 px-4 py-6 text-center text-sm text-white/45">
-                Media preview unavailable — Storage upload is not in this slice.
-                {selected.media_path ? (
-                  <span className="mt-2 block break-all text-xs text-white/35">
-                    Path on record: {selected.media_path}
-                  </span>
+              <div className="mt-4 overflow-hidden rounded-2xl border border-white/15 bg-black/30">
+                {selectedMediaUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={selectedMediaUrl}
+                    alt={selected.title}
+                    className="aspect-[4/3] w-full object-cover"
+                  />
                 ) : (
-                  <span className="mt-2 block text-xs text-white/35">
-                    No media path attached.
-                  </span>
+                  <div className="px-4 py-6 text-center text-sm text-white/45">
+                    No previewable product image attached.
+                  </div>
                 )}
               </div>
+
+              {selected.review_note ? (
+                <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-50">
+                  <p className="font-bold">Review note</p>
+                  <p className="mt-1 text-amber-50/85">{selected.review_note}</p>
+                  <p className="mt-2 text-xs text-amber-100/50">
+                    Reviewed {formatWhen(selected.reviewed_at)}
+                  </p>
+                </div>
+              ) : null}
 
               <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <div>

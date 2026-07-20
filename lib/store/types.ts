@@ -80,6 +80,9 @@ export type StoreProductRow = {
   created_at: string;
   updated_at: string;
   published_at: string | null;
+  /** Store Hardening V1 — operator moderation note. */
+  review_note?: string | null;
+  reviewed_at?: string | null;
   /** Marketplace Foundation V1 — kept in sync with `product_type` by DB trigger. */
   item_type?: ProductType;
   /** Marketplace Foundation V1 — optional logistics fields (physical goods). */
@@ -149,6 +152,8 @@ export type PublicCatalogItem = {
   product: StoreProductRow;
   store: Pick<StoreRow, "id" | "slug" | "name" | "logo_path" | "status">;
   coverPath: string | null;
+  /** Short-lived signed Storage URL (server-authorized). */
+  coverUrl?: string | null;
   priceMinor: number | null;
   currency: string | null;
   available: number | null;
@@ -163,7 +168,7 @@ export type PublicProductDetail = {
     inventory: ProductInventoryRow | null;
     available: number;
   }>;
-  media: ProductMediaRow[];
+  media: Array<ProductMediaRow & { mediaUrl?: string | null }>;
   category: ProductCategoryRow | null;
 };
 

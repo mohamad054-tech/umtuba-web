@@ -101,6 +101,10 @@ export default function ProductDetailClient({
   }, [detail.product]);
 
   const activeMedia = media[mediaIndex] ?? media[0];
+  const activeMediaUrl =
+    activeMedia.id === "placeholder"
+      ? null
+      : (activeMedia as { mediaUrl?: string | null }).mediaUrl ?? null;
   const inStock =
     !!selected &&
     (selected.available > 0 || Boolean(selected.inventory?.allow_backorder));
@@ -111,21 +115,32 @@ export default function ProductDetailClient({
         <section aria-label="Product gallery">
           <div className="overflow-hidden rounded-[28px] border border-violet-400/20 bg-[#080816]/85">
             <div className="relative aspect-[4/3] bg-gradient-to-br from-violet-900/50 via-[#0a0a18] to-fuchsia-950/40">
-              <div
-                className="absolute inset-0 opacity-50"
-                aria-hidden
-                style={{
-                  backgroundImage:
-                    "radial-gradient(circle at 25% 20%, rgba(167,139,250,0.45), transparent 50%), radial-gradient(circle at 80% 70%, rgba(217,70,239,0.25), transparent 45%)",
-                }}
-              />
-              <div className="absolute inset-0 flex flex-col justify-end p-5">
+              {activeMediaUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={activeMediaUrl}
+                  alt={activeMedia.alt_text || detail.product.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <div
+                  className="absolute inset-0 opacity-50"
+                  aria-hidden
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle at 25% 20%, rgba(167,139,250,0.45), transparent 50%), radial-gradient(circle at 80% 70%, rgba(217,70,239,0.25), transparent 45%)",
+                  }}
+                />
+              )}
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/55 via-transparent to-transparent p-5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-200/70">
                   {activeMedia.role} · {activeMedia.media_type}
                 </p>
-                <p className="mt-2 break-all text-sm font-bold text-white/85">
-                  {activeMedia.storage_path}
-                </p>
+                {!activeMediaUrl ? (
+                  <p className="mt-2 text-sm font-bold text-white/85">
+                    Product image coming soon
+                  </p>
+                ) : null}
                 {activeMedia.alt_text ? (
                   <p className="mt-1 text-xs text-white/45">{activeMedia.alt_text}</p>
                 ) : null}

@@ -41,6 +41,8 @@ export type AdminStoreProductModerationRow = {
   safety_stock: number | null;
   allow_backorder: boolean | null;
   media_path: string | null;
+  review_note: string | null;
+  reviewed_at: string | null;
   created_at: string;
   updated_at: string;
 };

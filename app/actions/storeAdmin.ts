@@ -10,8 +10,11 @@ import {
   approveSellerApplicationAdmin,
   approveStoreProductAdmin,
   rejectSellerApplicationAdmin,
+  rejectStoreProductAdmin,
+  returnStoreProductForRevisionAdmin,
   suspendSellerApplicationAdmin,
   validateRejectionReason,
+  validateRevisionReason,
 } from "../../lib/store/adminReview";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
@@ -116,4 +119,46 @@ export async function approveStoreProductAction(
   }
   revalidateStoreAdmin();
   redirect(`${back}?approved=1`);
+}
+
+export async function rejectStoreProductAction(
+  formData: FormData
+): Promise<void> {
+  const { supabase } = await requirePlatformAdmin();
+  const id = formString(formData, "productId");
+  const note = formString(formData, "note");
+  const reason = validateRejectionReason(note);
+  const back = backPath(formData, APP_ROUTES.adminStoreProducts);
+  if (!reason.ok) {
+    redirect(`${back}?error=${encodeURIComponent(reason.message)}`);
+  }
+  const result = await rejectStoreProductAdmin(supabase, id, reason.note);
+  if (!result.ok) {
+    redirect(`${back}?error=${encodeURIComponent(result.message)}`);
+  }
+  revalidateStoreAdmin();
+  redirect(`${back}?rejected=1`);
+}
+
+export async function returnStoreProductForRevisionAction(
+  formData: FormData
+): Promise<void> {
+  const { supabase } = await requirePlatformAdmin();
+  const id = formString(formData, "productId");
+  const note = formString(formData, "note");
+  const reason = validateRevisionReason(note);
+  const back = backPath(formData, APP_ROUTES.adminStoreProducts);
+  if (!reason.ok) {
+    redirect(`${back}?error=${encodeURIComponent(reason.message)}`);
+  }
+  const result = await returnStoreProductForRevisionAdmin(
+    supabase,
+    id,
+    reason.note
+  );
+  if (!result.ok) {
+    redirect(`${back}?error=${encodeURIComponent(result.message)}`);
+  }
+  revalidateStoreAdmin();
+  redirect(`${back}?returned=1`);
 }

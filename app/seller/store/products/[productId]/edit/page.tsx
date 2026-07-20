@@ -8,9 +8,10 @@ import { canManageCatalog } from "../../../../../../lib/store/permissions";
 import { getSellerProductBundle } from "../../../../../../lib/store/sellerStore";
 import { PRODUCT_TYPES } from "../../../../../../lib/store/types";
 import { formatMinorUnits } from "../../../../../../lib/store/money";
+import ProductMediaUploader from "../../../../../components/store/ProductMediaUploader";
+import { createAuthorizedProductMediaSignedUrl } from "../../../../../../lib/store/productMediaUrl";
 import {
   archiveProductAction,
-  attachMediaMetadataAction,
   submitProductReviewAction,
   updateDraftProductAction,
   upsertVariantAction,
@@ -43,6 +44,17 @@ export default async function EditSellerProductPage({ params }: EditPageProps) {
   const categories = await listActiveCategories(supabase);
   const canEdit = canManageCatalog(bundle.role);
   const primary = bundle.variants[0];
+  const mediaPreviews = await Promise.all(
+    bundle.media.map(async (m) => ({
+      ...m,
+      mediaUrl: await createAuthorizedProductMediaSignedUrl(supabase, {
+        storagePath: m.storage_path,
+        productId: bundle.product.id,
+        storeId: bundle.product.store_id,
+        userId: user.id,
+      }),
+    }))
+  );
 
   return (
     <main
@@ -62,6 +74,16 @@ export default async function EditSellerProductPage({ params }: EditPageProps) {
             {bundle.product.moderation_status}
           </span>
         </div>
+
+        {bundle.product.review_note ? (
+          <div
+            role="status"
+            className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"
+          >
+            <p className="font-bold">Operator note</p>
+            <p className="mt-1 text-amber-50/85">{bundle.product.review_note}</p>
+          </div>
+        ) : null}
 
         {!canEdit ? (
           <p className="mt-6 rounded-2xl border border-white/15 px-4 py-6 text-sm text-white/50">
@@ -269,80 +291,37 @@ export default async function EditSellerProductPage({ params }: EditPageProps) {
 
         {canEdit ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-            <h2 className="text-xl font-black tracking-tight">Media metadata</h2>
+            <h2 className="text-xl font-black tracking-tight">Product media</h2>
             <p className="mt-2 text-sm text-white/45">
-              Binary upload is deferred. Store a relative storage path for now
-              (TODO: owned-folder Storage upload).
+              Upload images into the secured store-product-media bucket. Paths
+              are owned by this store and product.
             </p>
-            {bundle.media.length > 0 ? (
-              <ul className="mt-4 space-y-2 text-sm text-white/60">
-                {bundle.media.map((m) => (
-                  <li key={m.id}>
-                    {m.role}: {m.storage_path}
+            {mediaPreviews.length > 0 ? (
+              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                {mediaPreviews.map((m) => (
+                  <li
+                    key={m.id}
+                    className="overflow-hidden rounded-2xl border border-white/10 bg-black/30"
+                  >
+                    {m.mediaUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.mediaUrl}
+                        alt={m.alt_text || m.role}
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="aspect-[4/3] bg-white/5" />
+                    )}
+                    <p className="px-3 py-2 text-xs text-white/55">{m.role}</p>
                   </li>
                 ))}
               </ul>
             ) : null}
-            <form action={attachMediaMetadataAction} className="mt-4 space-y-4">
-              <input type="hidden" name="productId" value={bundle.product.id} />
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Storage path
-                </span>
-                <input
-                  name="storagePath"
-                  required
-                  placeholder="store/products/cover.jpg"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                    Type
-                  </span>
-                  <select
-                    name="mediaType"
-                    defaultValue="image"
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                  >
-                    <option value="image">image</option>
-                    <option value="video">video</option>
-                    <option value="document">document</option>
-                  </select>
-                </label>
-                <label className="block space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                    Role
-                  </span>
-                  <select
-                    name="role"
-                    defaultValue="cover"
-                    className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                  >
-                    <option value="cover">cover</option>
-                    <option value="gallery">gallery</option>
-                    <option value="detail">detail</option>
-                    <option value="swatch">swatch</option>
-                  </select>
-                </label>
-              </div>
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Alt text
-                </span>
-                <input
-                  name="altText"
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <button
-                type="submit"
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white"
-              >
-                Attach metadata
-              </button>
-            </form>
+            <ProductMediaUploader
+              productId={bundle.product.id}
+              storeId={bundle.product.store_id}
+            />
           </section>
         ) : null}
 

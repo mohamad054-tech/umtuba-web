@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
+import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
 import type {
   ProductCategoryRow,
   ProductInventoryRow,
@@ -95,10 +96,20 @@ export async function enrichPublicCatalogRow(
   }
 
   const { stores: _stores, ...product } = row;
+  const coverUrl = cover
+    ? await createAuthorizedProductMediaSignedUrl(supabase, {
+        storagePath: cover,
+        productId: row.id,
+        storeId: store.id,
+        userId: null,
+      })
+    : null;
+
   return {
     product: product as StoreProductRow,
     store,
     coverPath: cover,
+    coverUrl,
     priceMinor,
     currency,
     available,
@@ -287,12 +298,25 @@ export async function getPublicProductDetail(
     });
   }
 
+  const mediaRows = (media ?? []) as ProductMediaRow[];
+  const mediaWithUrls = await Promise.all(
+    mediaRows.map(async (row) => ({
+      ...row,
+      mediaUrl: await createAuthorizedProductMediaSignedUrl(supabase, {
+        storagePath: row.storage_path,
+        productId: productRow.id,
+        storeId: store.id,
+        userId: null,
+      }),
+    }))
+  );
+
   return {
     detail: {
       product: productRow,
       store,
       variants: enriched,
-      media: (media ?? []) as ProductMediaRow[],
+      media: mediaWithUrls,
       category: (category as ProductCategoryRow | null) ?? null,
     },
     error: null,

@@ -10,6 +10,7 @@ import { validateInventoryInput } from "./inventory";
 import { canManageCatalog, canManageStoreSettings } from "./permissions";
 import { canManageSellerCatalog } from "./sellerApplications";
 import { majorToMinorUnits } from "./money";
+import { isOwnedStoreProductMediaPath } from "./mediaConstants";
 
 type AnyClient = SupabaseClient;
 
@@ -316,10 +317,11 @@ export async function updateDraftProduct(
     return { ok: false, message: "You do not have permission to edit this product." };
   }
 
-  if (!["draft", "in_review"].includes(existing.status)) {
+  if (!["draft", "in_review", "rejected"].includes(existing.status)) {
     return {
       ok: false,
-      message: "Only draft or in-review products can be edited in this phase.",
+      message:
+        "Only draft, in-review, or rejected products can be edited in this phase.",
     };
   }
 
@@ -561,6 +563,20 @@ export async function attachProductMediaMetadata(
   const parsed = validateMediaMetadata(raw);
   if (!parsed.ok) return parsed;
 
+  if (
+    !isOwnedStoreProductMediaPath(
+      product.store_id,
+      productId,
+      parsed.value.storagePath
+    )
+  ) {
+    return {
+      ok: false,
+      message:
+        "Storage path must be an owned store product media object under this product.",
+    };
+  }
+
   const variantId =
     typeof raw.variantId === "string" && raw.variantId.trim()
       ? raw.variantId.trim()
@@ -607,8 +623,11 @@ export async function submitProductForReview(
     return { ok: false, message: "You do not have permission to submit this product." };
   }
 
-  if (product.status !== "draft" && product.status !== "in_review") {
-    return { ok: false, message: "Only draft products can be submitted for review." };
+  if (!["draft", "in_review", "rejected"].includes(product.status)) {
+    return {
+      ok: false,
+      message: "Only draft, in-review, or rejected products can be submitted for review.",
+    };
   }
 
   if (!product.primary_category_id) {

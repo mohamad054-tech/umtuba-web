@@ -23,6 +23,7 @@ import {
   listActiveCategories,
   listPublicCatalog,
 } from "../../lib/store/catalogQueries";
+import { STOREFRONT_FLAGS } from "../../lib/store/storefrontFlags";
 
 export const metadata = {
   title: "Store | UMTUBA",
@@ -94,42 +95,46 @@ export default async function StoreHomePage() {
         )}
       </StoreSection>
 
-      <StoreSection
-        id="live"
-        eyebrow="Live"
-        title="Live shopping now"
-        description="Realtime shoppable streams arrive in a later phase."
-      >
-        <div className="grid gap-3 md:grid-cols-3">
+      {STOREFRONT_FLAGS.SHOW_LIVE_SHOPPING ? (
+        <StoreSection
+          id="live"
+          eyebrow="Live"
+          title="Live shopping now"
+          description="Realtime shoppable streams arrive in a later phase."
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            <PlaceholderPanel
+              title="Live stage"
+              description="Hosts will go live with products from their store."
+              tone="fuchsia"
+            />
+            <PlaceholderPanel
+              title="Join room"
+              description="Watch-and-buy rooms connect here later."
+              tone="violet"
+            />
+            <PlaceholderPanel
+              title="Upcoming"
+              description="Scheduled live shopping sessions placeholder."
+              tone="indigo"
+            />
+          </div>
+        </StoreSection>
+      ) : null}
+
+      {STOREFRONT_FLAGS.SHOW_SHOPPABLE_VIDEO_RAIL ? (
+        <StoreSection
+          id="shoppable-video"
+          eyebrow="Watch"
+          title="Videos you can shop"
+        >
           <PlaceholderPanel
-            title="Live stage"
-            description="Hosts will go live with products from their store."
-            tone="fuchsia"
-          />
-          <PlaceholderPanel
-            title="Join room"
-            description="Watch-and-buy rooms connect here later."
+            title="Shoppable video rail"
+            description="Product-tagged videos will surface here — browsing only for now."
             tone="violet"
           />
-          <PlaceholderPanel
-            title="Upcoming"
-            description="Scheduled live shopping sessions placeholder."
-            tone="indigo"
-          />
-        </div>
-      </StoreSection>
-
-      <StoreSection
-        id="shoppable-video"
-        eyebrow="Watch"
-        title="Videos you can shop"
-      >
-        <PlaceholderPanel
-          title="Shoppable video rail"
-          description="Product-tagged videos will surface here — browsing only for now."
-          tone="violet"
-        />
-      </StoreSection>
+        </StoreSection>
+      ) : null}
 
       <StoreSection
         id="categories"
@@ -149,13 +154,15 @@ export default async function StoreHomePage() {
         <ProductRail items={arrivals} />
       </StoreSection>
 
-      <StoreSection id="flash" eyebrow="Limited" title="Flash deals">
-        <PlaceholderPanel
-          title="Flash deals"
-          description="Timed promotions and deal pricing ship with the commerce phase."
-          tone="fuchsia"
-        />
-      </StoreSection>
+      {STOREFRONT_FLAGS.SHOW_FLASH_DEALS ? (
+        <StoreSection id="flash" eyebrow="Limited" title="Flash deals">
+          <PlaceholderPanel
+            title="Flash deals"
+            description="Timed promotions and deal pricing ship with the commerce phase."
+            tone="fuchsia"
+          />
+        </StoreSection>
+      ) : null}
 
       <StoreSection
         id="recommended"
@@ -176,9 +183,11 @@ export default async function StoreHomePage() {
         )}
       </StoreSection>
 
-      <StoreSection id="brands" eyebrow="Labels" title="Popular brands">
-        <BrandRail />
-      </StoreSection>
+      {STOREFRONT_FLAGS.SHOW_BRAND_RAIL ? (
+        <StoreSection id="brands" eyebrow="Labels" title="Popular brands">
+          <BrandRail />
+        </StoreSection>
+      ) : null}
 
       <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6">
         <Link

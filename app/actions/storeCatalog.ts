@@ -154,11 +154,13 @@ export async function upsertVariantAction(formData: FormData): Promise<void> {
   redirect(`/seller/store/products/${productId}/edit`);
 }
 
-export async function attachMediaMetadataAction(formData: FormData): Promise<void> {
+export async function attachMediaMetadataResultAction(
+  formData: FormData
+): Promise<{ ok: true } | { ok: false; message: string }> {
   const user = await requireUser();
   const productId = String(formData.get("productId") || "");
   if (!productId) {
-    redirect(`/seller/store/products?error=${encodeURIComponent("Missing product id.")}`);
+    return { ok: false, message: "Missing product id." };
   }
 
   const supabase = await createClient();
@@ -177,11 +179,23 @@ export async function attachMediaMetadataAction(formData: FormData): Promise<voi
   );
 
   if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+  revalidatePath(`/seller/store/products/${productId}/edit`);
+  return { ok: true };
+}
+
+export async function attachMediaMetadataAction(formData: FormData): Promise<void> {
+  const productId = String(formData.get("productId") || "");
+  const result = await attachMediaMetadataResultAction(formData);
+  if (!productId) {
+    redirect(`/seller/store/products?error=${encodeURIComponent("Missing product id.")}`);
+  }
+  if (!result.ok) {
     redirect(
       `/seller/store/products/${productId}/edit?error=${encodeURIComponent(result.message)}`
     );
   }
-  revalidatePath(`/seller/store/products/${productId}/edit`);
   redirect(`/seller/store/products/${productId}/edit`);
 }
 

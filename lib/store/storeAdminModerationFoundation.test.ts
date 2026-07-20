@@ -17,6 +17,8 @@ import type { User } from "@supabase/supabase-js";
 const ROOT = process.cwd();
 const MIGRATION =
   "supabase/migrations/20260809_store_admin_moderation_foundation_v1.sql";
+const HARDENING =
+  "supabase/migrations/20260818_store_hardening_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
@@ -81,9 +83,15 @@ describe("store admin workflow contracts", () => {
     );
   });
 
-  it("allows product approve only when awaiting moderation", () => {
+  it("allows product approve/reject/return only when awaiting moderation", () => {
     expect(
       assertProductModerationAction("in_review", "pending", "approve").ok
+    ).toBe(true);
+    expect(
+      assertProductModerationAction("in_review", "pending", "reject").ok
+    ).toBe(true);
+    expect(
+      assertProductModerationAction("pending_review", "pending", "return").ok
     ).toBe(true);
     expect(
       assertProductModerationAction("active", "approved", "approve").ok
@@ -141,11 +149,14 @@ describe("store admin workflow contracts", () => {
 describe("store admin migration + route protection", () => {
   it("ships admin moderation migration with platform-admin RPCs", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
+    expect(existsSync(join(ROOT, HARDENING))).toBe(true);
     const sql = read(MIGRATION);
+    const hardening = read(HARDENING);
     expect(sql).toMatch(/require_platform_admin/);
     expect(sql).toMatch(/is_platform_admin/);
+    const combined = `${sql}\n${hardening}`;
     for (const rpc of STORE_ADMIN_REVIEW_RPCS) {
-      expect(sql).toContain(rpc);
+      expect(combined).toContain(rpc);
     }
     expect(sql).toMatch(
       /grant execute on function public\.admin_approve_seller_application\(uuid\) to authenticated, service_role;/
@@ -223,10 +234,14 @@ describe("store admin migration + route protection", () => {
     expect(actions).toMatch(/approveSellerApplicationAction/);
     expect(actions).toMatch(/rejectSellerApplicationAction/);
     expect(actions).toMatch(/approveStoreProductAction/);
+    expect(actions).toMatch(/rejectStoreProductAction/);
+    expect(actions).toMatch(/returnStoreProductForRevisionAction/);
     expect(actions).not.toMatch(/formData\.get\(["']reviewer/);
     expect(review).toMatch(/admin_approve_seller_application/);
     expect(review).toMatch(/admin_reject_seller_application/);
     expect(review).toMatch(/admin_approve_store_product/);
+    expect(review).toMatch(/admin_reject_store_product/);
+    expect(review).toMatch(/admin_return_store_product_for_revision/);
     expect(queries).toMatch(/admin_store_moderation_queue_counts/);
     expect(actions).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
     expect(review).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
