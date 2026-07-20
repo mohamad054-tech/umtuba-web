@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  COMMERCE_CHECKOUT_DISABLED_MESSAGE,
+  isStoreCommerceCheckoutEnabled,
+} from "./commerceFlags";
+import {
   mapCheckoutRpcError,
   validateCheckoutAddress,
   type CheckoutAddress,
@@ -131,6 +135,8 @@ export async function createCheckoutQuote(
     idempotencyKey: string;
   }
 ): Promise<CheckoutActionResult<Record<string, unknown>>> {
+  // Quotes remain available when the commerce gate is off; only confirm / order
+  // create is blocked (DB assert + confirmCheckoutQuote below).
   const address = validateCheckoutAddress(input.address);
   if (!address.ok) return address;
   const billing = validateCheckoutAddress(input.billing ?? input.address);
@@ -154,6 +160,10 @@ export async function confirmCheckoutQuote(
   supabase: AnyClient,
   quoteId: string
 ): Promise<CheckoutActionResult<Record<string, unknown>>> {
+  if (!(await isStoreCommerceCheckoutEnabled(supabase))) {
+    return { ok: false, message: COMMERCE_CHECKOUT_DISABLED_MESSAGE };
+  }
+
   const { data, error } = await supabase.rpc("confirm_store_checkout_quote", {
     p_quote_id: quoteId,
   });

@@ -31,6 +31,8 @@ type Props = {
   cart: CartSummary;
   addresses: BuyerAddressRow[];
   shippingMethods: ShippingMethod[];
+  /** Effective commerce gate (DB + emergency env override). */
+  commerceEnabled: boolean;
 };
 
 type ConfirmResult = {
@@ -46,6 +48,7 @@ export default function CheckoutClient({
   cart,
   addresses,
   shippingMethods,
+  commerceEnabled,
 }: Props) {
   const [pending, startTransition] = useTransition();
   const submitLockRef = useRef(false);
@@ -260,6 +263,11 @@ export default function CheckoutClient({
 
   function onConfirm() {
     withSubmitLock(() => {
+      if (!commerceEnabled) {
+        submitLockRef.current = false;
+        setError("Store checkout confirmation is disabled.");
+        return;
+      }
       const quoteId = quote?.quote_id;
       if (typeof quoteId !== "string") {
         submitLockRef.current = false;
@@ -312,6 +320,16 @@ export default function CheckoutClient({
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
       <div className="space-y-5" aria-busy={busy || undefined}>
+        {!commerceEnabled ? (
+          <div
+            className="rounded-[20px] border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90"
+            role="status"
+          >
+            Order placement is disabled. You can still review your cart and
+            calculate a quote. Confirm will stay blocked until platform operators
+            enable commerce checkout.
+          </div>
+        ) : null}
         <div aria-live="assertive">
           {error ? <StoreErrorState message={error} /> : null}
         </div>
@@ -538,16 +556,21 @@ export default function CheckoutClient({
         </button>
         <button
           type="button"
-          disabled={busy || !quote}
+          disabled={busy || !quote || !commerceEnabled}
           onClick={onConfirm}
-          aria-disabled={busy || !quote}
+          aria-disabled={busy || !quote || !commerceEnabled}
           className="watch-focus-ring mt-3 w-full rounded-full bg-violet-500 px-5 py-3 text-sm font-black text-white disabled:opacity-40"
         >
-          {pending ? "Placing order…" : "Place order"}
+          {pending
+            ? "Placing order…"
+            : !commerceEnabled
+              ? "Place order (disabled)"
+              : "Place order"}
         </button>
         <p className="mt-3 text-[11px] leading-relaxed text-white/40">
           Multi-store carts create one order per store in a single atomic
-          confirm. This foundation does not collect live payments.
+          confirm. This foundation does not collect live payments — confirmed
+          orders remain pending payment.
         </p>
         <Link
           href={APP_ROUTES.storeCart}

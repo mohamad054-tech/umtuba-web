@@ -9,6 +9,7 @@ import {
   listBuyerAddresses,
   listShippingMethodsForStores,
 } from "../../../lib/store/checkout";
+import { isStoreCommerceCheckoutEnabled } from "../../../lib/store/commerceFlags";
 
 export const metadata = {
   title: "Checkout | UMTUBA Store",
@@ -38,6 +39,7 @@ export default async function StoreCheckoutPage() {
   const addresses = await listBuyerAddresses(supabase, user.id);
   const storeIds = cart.data.groups.map((g) => g.storeId);
   const shipping = await listShippingMethodsForStores(supabase, storeIds);
+  const commerceEnabled = await isStoreCommerceCheckoutEnabled(supabase);
 
   return (
     <StoreShell title="Checkout" subtitle="Store" wide>
@@ -49,6 +51,7 @@ export default async function StoreCheckoutPage() {
         <p className="mt-2 max-w-2xl text-sm text-white/50">
           Totals are calculated server-side. Payment collection is not enabled
           yet — placing an order creates a pending-payment order only.
+          Inventory is reserved while the order awaits payment.
         </p>
       </header>
 
@@ -67,6 +70,7 @@ export default async function StoreCheckoutPage() {
           cart={cart.data}
           addresses={addresses.data}
           shippingMethods={shipping.data}
+          commerceEnabled={commerceEnabled}
         />
       )}
     </StoreShell>

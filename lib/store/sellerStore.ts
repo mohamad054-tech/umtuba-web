@@ -215,6 +215,7 @@ export async function createDraftProduct(
     amountMinor = 0;
   }
 
+  // Initial reserved is always zero; reservation lifecycle owns the counter.
   const inventory = validateInventoryInput({
     onHand: raw.onHand ?? 0,
     reserved: 0,
@@ -287,7 +288,7 @@ export async function createDraftProduct(
       variant_id: variant.id,
       warehouse_key: inventory.warehouseKey,
       on_hand: inventory.onHand,
-      reserved: inventory.reserved,
+      reserved: 0,
       safety_stock: inventory.safetyStock,
       allow_backorder: inventory.allowBackorder,
     }),
@@ -434,15 +435,7 @@ export async function upsertVariantPriceInventory(
     amountMinor = price.value.amountMinor;
   }
 
-  const inventory = validateInventoryInput({
-    onHand: raw.onHand,
-    reserved: raw.reserved ?? 0,
-    safetyStock: raw.safetyStock ?? 0,
-    allowBackorder: raw.allowBackorder === true || raw.allowBackorder === "on",
-    warehouseKey: raw.warehouseKey,
-  });
-  if (!inventory.ok) return inventory;
-
+  // reserved is system-managed (reservation lifecycle). Ignore any client value.
   let variantId =
     typeof raw.variantId === "string" && raw.variantId.trim()
       ? raw.variantId.trim()
@@ -485,6 +478,28 @@ export async function upsertVariantPriceInventory(
     return { ok: false, message: "Unable to resolve variant." };
   }
 
+  const warehouseKeyRaw =
+    typeof raw.warehouseKey === "string" && raw.warehouseKey.trim()
+      ? raw.warehouseKey.trim().toLowerCase()
+      : "default";
+
+  const { data: existingInv } = await supabase
+    .from("product_inventory")
+    .select("id, reserved")
+    .eq("variant_id", variantId)
+    .eq("warehouse_key", warehouseKeyRaw)
+    .maybeSingle();
+
+  const inventory = validateInventoryInput({
+    onHand: raw.onHand,
+    // Preserve authoritative reserved for on_hand validation only.
+    reserved: (existingInv?.reserved as number | undefined) ?? 0,
+    safetyStock: raw.safetyStock ?? 0,
+    allowBackorder: raw.allowBackorder === true || raw.allowBackorder === "on",
+    warehouseKey: warehouseKeyRaw,
+  });
+  if (!inventory.ok) return inventory;
+
   const { data: existingPrice } = await supabase
     .from("product_prices")
     .select("id")
@@ -510,19 +525,12 @@ export async function upsertVariantPriceInventory(
     });
   }
 
-  const { data: existingInv } = await supabase
-    .from("product_inventory")
-    .select("id")
-    .eq("variant_id", variantId)
-    .eq("warehouse_key", inventory.warehouseKey)
-    .maybeSingle();
-
   if (existingInv) {
+    // Do not send reserved — trigger rejects client mutation of reserved.
     await supabase
       .from("product_inventory")
       .update({
         on_hand: inventory.onHand,
-        reserved: inventory.reserved,
         safety_stock: inventory.safetyStock,
         allow_backorder: inventory.allowBackorder,
       })
@@ -532,7 +540,7 @@ export async function upsertVariantPriceInventory(
       variant_id: variantId,
       warehouse_key: inventory.warehouseKey,
       on_hand: inventory.onHand,
-      reserved: inventory.reserved,
+      reserved: 0,
       safety_stock: inventory.safetyStock,
       allow_backorder: inventory.allowBackorder,
     });
