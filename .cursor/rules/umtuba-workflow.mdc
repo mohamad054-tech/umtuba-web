@@ -1,0 +1,54 @@
+---
+description: UMTUBA AI handoff workflow — read task/state docs, respect scope, no commit/push/remote migrate without approval, write CURSOR_REPORT.
+alwaysApply: true
+---
+
+# UMTUBA AI handoff workflow
+
+Before starting any implementation or review task:
+
+1. Read `docs/ai/PROJECT_STATE.md`.
+2. Read `docs/ai/CURRENT_TASK.md`.
+3. Strictly respect **Allowed scope** and **Forbidden scope** in `CURRENT_TASK.md`.
+4. Follow `docs/DEVELOPMENT_WORKFLOW.md` for Git and migrations when it applies.
+
+## Hard prohibitions (unless the user explicitly requests otherwise)
+
+- Never create a git commit.
+- Never push to remote.
+- Never apply Supabase migrations to the remote project.
+- Never force push, hard reset, or other destructive Git actions.
+- Never expose secrets, API keys, service-role keys, or `.env` contents.
+- Never modify modules outside the allowed scope of the current task.
+- Never let undocumented process rules override `docs/DEVELOPMENT_WORKFLOW.md`.
+
+## Sync before work
+
+When starting a task that may touch the repo:
+
+- Prefer `git fetch --prune` then fast-forward only if behind (`git pull --ff-only`).
+- If divergence/conflict: stop and report; do not merge/rebase/reset/stash/force.
+
+## Quality bar
+
+- Production-quality TypeScript (strict, match existing patterns).
+- Reuse existing Store/architecture patterns when in Store scope.
+- Run relevant tests for changed areas.
+- Run `npx tsc --noEmit` when TypeScript is affected.
+- Run `npm run build` when required by the task or when app UI/entry points change.
+- Run `git diff --check`.
+
+## Handoff completion
+
+When the task ends (success or blocked), write the full report into `docs/ai/CURSOR_REPORT.md` using its existing sections:
+
+- Summary
+- Exact files changed
+- Migrations created
+- Security review
+- Tests
+- TypeScript
+- Build
+- git diff --check
+- git status --short
+- Open issues
