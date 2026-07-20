@@ -31,6 +31,8 @@ type Props = {
   cart: CartSummary;
   addresses: BuyerAddressRow[];
   shippingMethods: ShippingMethod[];
+  purchasesAvailable?: boolean;
+  purchasesUnavailableMessage?: string | null;
 };
 
 type ConfirmResult = {
@@ -46,6 +48,8 @@ export default function CheckoutClient({
   cart,
   addresses,
   shippingMethods,
+  purchasesAvailable = true,
+  purchasesUnavailableMessage = null,
 }: Props) {
   const [pending, startTransition] = useTransition();
   const submitLockRef = useRef(false);
@@ -538,13 +542,19 @@ export default function CheckoutClient({
         </button>
         <button
           type="button"
-          disabled={busy || !quote}
+          disabled={busy || !quote || !purchasesAvailable}
           onClick={onConfirm}
-          aria-disabled={busy || !quote}
+          aria-disabled={busy || !quote || !purchasesAvailable}
           className="watch-focus-ring mt-3 w-full rounded-full bg-violet-500 px-5 py-3 text-sm font-black text-white disabled:opacity-40"
         >
           {pending ? "Placing order…" : "Place order"}
         </button>
+        {!purchasesAvailable ? (
+          <p role="status" className="mt-3 text-xs leading-relaxed text-amber-100/90">
+            {purchasesUnavailableMessage ||
+              "Purchases are not currently available. Quote preview remains available."}
+          </p>
+        ) : null}
         <p className="mt-3 text-[11px] leading-relaxed text-white/40">
           Multi-store carts create one order per store in a single atomic
           confirm. This foundation does not collect live payments.

@@ -10,6 +10,7 @@ const LINKS = [
   { href: APP_ROUTES.adminStore, label: "Overview" },
   { href: APP_ROUTES.adminStoreSellers, label: "Seller applications" },
   { href: APP_ROUTES.adminStoreProducts, label: "Product review" },
+  { href: APP_ROUTES.adminStoreReservations, label: "Reservations" },
 ] as const;
 
 type Props = {

@@ -41,6 +41,11 @@ export default async function AdminStoreOverviewPage() {
               value: counts.counts.products_pending,
               href: `${APP_ROUTES.adminStoreProducts}?status=pending`,
             },
+            {
+              label: "Inventory reservations",
+              value: "Ops",
+              href: APP_ROUTES.adminStoreReservations,
+            },
           ].map((card) => (
             <Link
               key={card.label}

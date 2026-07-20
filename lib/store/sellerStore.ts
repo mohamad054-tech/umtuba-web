@@ -436,7 +436,8 @@ export async function upsertVariantPriceInventory(
 
   const inventory = validateInventoryInput({
     onHand: raw.onHand,
-    reserved: raw.reserved ?? 0,
+    // Client must never authoritatively set reserved holds.
+    reserved: 0,
     safetyStock: raw.safetyStock ?? 0,
     allowBackorder: raw.allowBackorder === true || raw.allowBackorder === "on",
     warehouseKey: raw.warehouseKey,
@@ -512,17 +513,27 @@ export async function upsertVariantPriceInventory(
 
   const { data: existingInv } = await supabase
     .from("product_inventory")
-    .select("id")
+    .select("id, reserved")
     .eq("variant_id", variantId)
     .eq("warehouse_key", inventory.warehouseKey)
     .maybeSingle();
 
+  const preservedReserved =
+    typeof existingInv?.reserved === "number" ? existingInv.reserved : 0;
+
   if (existingInv) {
+    if (inventory.onHand < preservedReserved) {
+      return {
+        ok: false,
+        message: "On hand cannot be lower than currently reserved quantity.",
+      };
+    }
     await supabase
       .from("product_inventory")
       .update({
         on_hand: inventory.onHand,
-        reserved: inventory.reserved,
+        // Preserve active reservation holds — never overwrite from client.
+        reserved: preservedReserved,
         safety_stock: inventory.safetyStock,
         allow_backorder: inventory.allowBackorder,
       })
@@ -532,7 +543,7 @@ export async function upsertVariantPriceInventory(
       variant_id: variantId,
       warehouse_key: inventory.warehouseKey,
       on_hand: inventory.onHand,
-      reserved: inventory.reserved,
+      reserved: 0,
       safety_stock: inventory.safetyStock,
       allow_backorder: inventory.allowBackorder,
     });

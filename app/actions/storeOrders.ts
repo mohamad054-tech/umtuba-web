@@ -8,8 +8,9 @@ import {
   isOrderStatus,
 } from "../../lib/store/orderRules";
 import { updateSellerOrderStatus } from "../../lib/store/orders";
+import { buyerCancelStoreOrder } from "../../lib/store/commerceSafetyQueries";
 import { getMembership } from "../../lib/store/sellerStore";
-import { APP_ROUTES, buildSellerOrderHref } from "../lib/nav";
+import { APP_ROUTES, buildSellerOrderHref, buildStoreOrderHref } from "../lib/nav";
 import type { FulfillmentStatus, OrderStatus } from "../../lib/store/types";
 
 function formString(formData: FormData, key: string): string {
@@ -107,6 +108,29 @@ export async function updateSellerOrderStatusAction(formData: FormData) {
   if (result.ok) {
     revalidatePath(APP_ROUTES.sellerOrders);
     revalidatePath(buildSellerOrderHref(orderId));
+  }
+  return result;
+}
+
+export async function buyerCancelOrderAction(orderId: string) {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false as const,
+      message: "Sign in required.",
+      requiresAuth: true,
+    };
+  }
+  const id = typeof orderId === "string" ? orderId.trim() : "";
+  if (!id) {
+    return { ok: false as const, message: "Order id is required." };
+  }
+
+  const supabase = await createClient();
+  const result = await buyerCancelStoreOrder(supabase, id);
+  if (result.ok) {
+    revalidatePath(APP_ROUTES.storeOrders);
+    revalidatePath(buildStoreOrderHref(id));
   }
   return result;
 }

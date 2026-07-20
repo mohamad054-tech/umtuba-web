@@ -246,9 +246,12 @@ export function assertNoClientMoneyFields(
 
 export function mapCheckoutRpcError(message: string | undefined): string {
   const raw = (message || "").toLowerCase();
+  if (raw.includes("commerce confirmation is disabled")) {
+    return "Checkout confirmation is temporarily unavailable. Your cart and quote preview still work — try again later.";
+  }
   if (raw.includes("empty")) return "Your cart is empty.";
   if (raw.includes("expired")) return "Your checkout quote expired. Please review again.";
-  if (raw.includes("inventory")) return "An item is out of stock.";
+  if (raw.includes("inventory")) return "An item is out of stock. Refresh and try again.";
   if (raw.includes("coupon")) return "That coupon cannot be applied.";
   if (raw.includes("shipping")) return "Please choose a valid shipping method.";
   if (raw.includes("authentication")) return "Please sign in to checkout.";

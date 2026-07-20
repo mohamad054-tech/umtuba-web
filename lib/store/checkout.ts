@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  assertCommerceConfirmNotKilledByEnv,
+  mapCommerceSafetyRpcError,
+} from "./commerceSafety";
+import {
   mapCheckoutRpcError,
   validateCheckoutAddress,
   type CheckoutAddress,
@@ -154,10 +158,17 @@ export async function confirmCheckoutQuote(
   supabase: AnyClient,
   quoteId: string
 ): Promise<CheckoutActionResult<Record<string, unknown>>> {
+  const kill = assertCommerceConfirmNotKilledByEnv();
+  if (!kill.ok) return kill;
+
   const { data, error } = await supabase.rpc("confirm_store_checkout_quote", {
     p_quote_id: quoteId,
   });
   if (error) {
+    const commerce = mapCommerceSafetyRpcError(error.message);
+    if (commerce !== (error.message?.trim() || "Request failed.")) {
+      return { ok: false, message: commerce };
+    }
     return { ok: false, message: mapCheckoutRpcError(error.message) };
   }
   return { ok: true, data: (data ?? {}) as Record<string, unknown> };

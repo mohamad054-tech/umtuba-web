@@ -258,6 +258,17 @@ export default async function EditSellerProductPage({ params }: EditPageProps) {
                     className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
                   />
                 </label>
+                <div className="block space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                    Reserved (holds)
+                  </span>
+                  <p className="rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-white/70">
+                    {primary.inventory?.reserved ?? 0}
+                    <span className="mt-1 block text-xs text-white/40">
+                      Active checkout holds. Not editable here.
+                    </span>
+                  </p>
+                </div>
                 <label className="block space-y-2">
                   <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
                     Safety stock

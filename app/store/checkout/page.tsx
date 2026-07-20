@@ -9,6 +9,7 @@ import {
   listBuyerAddresses,
   listShippingMethodsForStores,
 } from "../../../lib/store/checkout";
+import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
 
 export const metadata = {
   title: "Checkout | UMTUBA Store",
@@ -38,6 +39,7 @@ export default async function StoreCheckoutPage() {
   const addresses = await listBuyerAddresses(supabase, user.id);
   const storeIds = cart.data.groups.map((g) => g.storeId);
   const shipping = await listShippingMethodsForStores(supabase, storeIds);
+  const commerceGate = await loadCommerceConfirmGate(supabase);
 
   return (
     <StoreShell title="Checkout" subtitle="Store" wide>
@@ -50,6 +52,14 @@ export default async function StoreCheckoutPage() {
           Totals are calculated server-side. Payment collection is not enabled
           yet — placing an order creates a pending-payment order only.
         </p>
+        {!commerceGate.purchasesAvailable ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+          >
+            {commerceGate.message}
+          </p>
+        ) : null}
       </header>
 
       {!addresses.ok || !shipping.ok ? (
@@ -67,6 +77,8 @@ export default async function StoreCheckoutPage() {
           cart={cart.data}
           addresses={addresses.data}
           shippingMethods={shipping.data}
+          purchasesAvailable={commerceGate.purchasesAvailable}
+          purchasesUnavailableMessage={commerceGate.message}
         />
       )}
     </StoreShell>

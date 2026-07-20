@@ -139,7 +139,6 @@ export async function upsertVariantAction(formData: FormData): Promise<void> {
       priceMajor: formData.get("priceMajor"),
       currency: formData.get("currency") || "USD",
       onHand: formData.get("onHand"),
-      reserved: formData.get("reserved"),
       safetyStock: formData.get("safetyStock"),
       allowBackorder: formData.get("allowBackorder"),
     }

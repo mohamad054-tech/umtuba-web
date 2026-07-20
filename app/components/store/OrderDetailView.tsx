@@ -1,5 +1,6 @@
 import { formatOrderMoney } from "../../../lib/store/orderRules";
 import type { OrderDetailBundle } from "../../../lib/store/orders";
+import BuyerCancelOrderButton from "./BuyerCancelOrderButton";
 import { OrderStatusCluster } from "./OrderStatusBadges";
 import OrderTimeline from "./OrderTimeline";
 import SellerOrderStatusForm from "./SellerOrderStatusForm";
@@ -35,6 +36,14 @@ export default function OrderDetailView({
   const { order, items } = bundle;
   const addressLines = formatAddress(bundle.shippingContact);
   const pendingPayment = order.payment_status === "pending";
+  const buyerCanCancel =
+    mode === "buyer" &&
+    pendingPayment &&
+    order.status !== "cancelled" &&
+    order.status !== "refunded" &&
+    order.status !== "shipped" &&
+    order.status !== "delivered" &&
+    ["pending", "confirmed", "processing", "packed"].includes(order.status);
 
   return (
     <div className="mt-6 space-y-6">
@@ -67,8 +76,12 @@ export default function OrderDetailView({
             className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
             Payment collection is not enabled yet. This order is recorded as
-            pending payment.
+            pending payment. Inventory is held until payment, cancellation, or
+            hold expiry.
           </p>
+        ) : null}
+        {buyerCanCancel ? (
+          <BuyerCancelOrderButton orderId={order.id} canCancel />
         ) : null}
       </section>
 
