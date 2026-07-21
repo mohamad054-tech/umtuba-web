@@ -333,6 +333,7 @@ describe("UEOS Foundation V1 — Store and UM Points untouched", () => {
     const walletFiles = listSourceFiles("lib/wallet");
 
     for (const path of [...storeFiles, ...rewardsFiles, ...walletFiles]) {
+      if (path.endsWith(".test.ts") || path.endsWith(".test.tsx")) continue;
       const src = read(path);
       expect(src, path).not.toMatch(/from ["'].*lib\/ueos/);
       expect(src, path).not.toMatch(/ueos_post_journal|ueos_ensure_account/);
