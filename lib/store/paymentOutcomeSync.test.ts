@@ -187,3 +187,26 @@ describe("Payment Outcome Sync V1 — UEOS dependency", () => {
     );
   });
 });
+
+describe("Payment Outcome Sync V1 — settlement refund guard lives in 20260824", () => {
+  const SETTLEMENT_MIGRATION =
+    "supabase/migrations/20260824_store_merchant_settlement_foundation_v1.sql";
+
+  it("20260824 replaces apply_store_payment_outcome with settlement assert; 20260823 stays free of it", () => {
+    const syncSql = read(MIGRATION);
+    const settlementSql = read(SETTLEMENT_MIGRATION);
+
+    expect(syncSql).not.toMatch(/store_settlement_assert_refund_allowed/);
+    expect(syncSql).toMatch(
+      /refund requires a prior trusted capture outcome event for this attempt/
+    );
+
+    expect(settlementSql).toMatch(/store_settlement_assert_refund_allowed/);
+    expect(settlementSql).toMatch(
+      /create or replace function public\.apply_store_payment_outcome/i
+    );
+    expect(settlementSql).toMatch(
+      /perform public\.store_settlement_assert_refund_allowed\(\s*v_attempt\.id,\s*v_correlation_id\s*\)/
+    );
+  });
+});

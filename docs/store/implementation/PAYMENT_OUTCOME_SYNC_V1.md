@@ -58,6 +58,8 @@ Refund requires:
 - capture journal present when amount > 0
 - no prior refund event on the attempt
 
+Settlement allocation guard (added in `20260824_store_merchant_settlement_foundation_v1.sql` via `CREATE OR REPLACE` of this RPC — **not** by editing this Sync migration file): refunds are blocked while settlement state is `ALLOCATED`, `HELD`, or `RELEASED`. See `SETTLEMENT_FOUNDATION_V1.md`.
+
 ## Policies
 
 `store.payment.authorized` (mode=none), `store.payment.captured`, `store.payment.refunded` — exact template match; unknown metadata keys rejected; exactly one effective policy version.
@@ -70,8 +72,8 @@ Canonical request object → opaque `request_fingerprint` + `fingerprint_alg` (`
 
 Sync V1 intentionally does **not** include:
 
-- settlement engine
-- seller balances
+- settlement engine (foundation starts in `20260824` / `SETTLEMENT_FOUNDATION_V1.md`)
+- seller balances UI
 - commission allocation
 - payout engine
 - chargeback workflow
@@ -80,4 +82,4 @@ Sync V1 intentionally does **not** include:
 - multi-attempt payment routing
 - accounting recognition of platform revenue
 
-Captured buyer funds are recorded as **platform liability** (via clearing → liability) until future settlement/accounting phases allocate seller payables, UMTUBA commission, fees, taxes, and reserves.
+Captured buyer funds are recorded as **platform liability** (via clearing → liability) until settlement allocate moves funds into store escrow / payable (see Settlement Foundation V1).
