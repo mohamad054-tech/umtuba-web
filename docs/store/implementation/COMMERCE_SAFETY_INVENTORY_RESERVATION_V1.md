@@ -2,7 +2,8 @@
 
 Status: implemented in `umtuba-web` (local; **do not apply remotely** without explicit approval)
 Migration: `supabase/migrations/20260819_store_commerce_safety_inventory_reservation_v1.sql`
-Base: `origin/office/store-hardening-v1` @ `bd6ebcbb9bcef12a11b19e1a7cfd8458febca234`
+Integrity fix (B1): `supabase/migrations/20260820_store_commerce_safety_integrity_fix_b1.sql`
+Base: `origin/alpha-0.2` @ `8665b723b6833f8ac2bb532bbb588556ce381a6f` (includes Hardening + Reservation V1)
 Branch: `office/store-commerce-safety-inventory-reservation-v1`
 
 ## Goal
@@ -45,6 +46,16 @@ V1 confirm always creates **`active`** holds.
 Every status transition updates the pointer and inserts an event **in the same transaction** via `transition_inventory_reservation`.
 
 Required identity fields include **`checkout_session_id`** (server UUID per confirm attempt; client cannot choose/override). Persisted on `checkout_quotes.checkout_session_id` and reused for idempotent confirmed retries.
+
+### Direct order create — Integrity Fix B1
+
+`create_store_order_foundation` (service_role) previously minted a fresh `gen_random_uuid()` session on every call and keyed reservations as `direct:{session}:{variant}`. After an idempotent order replay, that created a **second active reservation set** (double `reserved`).
+
+Fix (`20260820_…_b1`):
+
+- `checkout_session_id` for the direct path = **`order_id`** (stable across retries)
+- Reservation idempotency key = **`direct:{order_id}:{variant_id}`**
+- Dedup authority remains `inventory_reservations.idempotency_key` UNIQUE + `create_active_inventory_reservation` `FOR UPDATE` replay (no second `reserved` bump)
 
 ## Inventory behavior
 

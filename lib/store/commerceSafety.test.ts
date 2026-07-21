@@ -182,6 +182,21 @@ describe("commerce safety migration contracts", () => {
     expect(direct).toMatch(/service_role required/);
   });
 
+  it("B1 integrity fix migration replaces random session minting", () => {
+    const fixPath =
+      "supabase/migrations/20260820_store_commerce_safety_integrity_fix_b1.sql";
+    expect(existsSync(join(ROOT, fixPath))).toBe(true);
+    const fix = read(fixPath);
+    const direct = fix.slice(
+      fix.indexOf("create or replace function public.create_store_order_foundation(")
+    );
+    expect(direct).not.toMatch(/session_id\s+uuid\s*:=\s*gen_random_uuid\s*\(\s*\)/);
+    expect(direct).toMatch(/session_id\s*:=\s*order_id/);
+    expect(direct).toMatch(/'direct:'\s*\|\|\s*order_id::text/);
+    expect(direct).toMatch(/assert_store_commerce_confirm_allowed/);
+    expect(direct).toMatch(/service_role required/);
+  });
+
   it("wires release on seller/admin cancel and buyer cancel", () => {
     const sql = read(MIGRATION);
     expect(sql).toMatch(/release_inventory_reservations_for_order/);
