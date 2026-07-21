@@ -47,3 +47,8 @@ tmp-*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# store remote E2E local Auth UUID config (never commit real user ids)
+scripts/store-e2e/config.local.sql
+scripts/store-e2e/_tmp*
+scripts/store-e2e/*.local.*
