@@ -495,7 +495,7 @@ immutable
 set search_path = public
 as $$
 begin
-  elsif p_outcome = 'authorized' then
+  if p_outcome = 'authorized' then
     if p_current = 'pending' then
       return 'authorized';
     end if;
