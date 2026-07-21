@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import VerticalVideoFeed from "../components/video/VerticalVideoFeed";
 import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
@@ -14,6 +21,12 @@ import NotificationBell from "../components/NotificationBell";
 import CommentsPanel from "../components/social/CommentsPanel";
 import VideoShopShelf from "../components/video/commerce/VideoShopShelf";
 import { useVideoShopShelf } from "../components/video/commerce/useVideoShopShelf";
+import LivingVideoNavigation from "../components/video/living-navigation/LivingVideoNavigation";
+import type { LivingNavigationId } from "../components/video/living-navigation/livingNavigationConfig";
+import {
+  INITIAL_LIVING_NAVIGATION_STATE,
+  reduceLivingNavigation,
+} from "../components/video/living-navigation/livingNavigationModel";
 import UserMenu from "../components/UserMenu";
 import {
   loadWatchFeedPageAction,
@@ -114,6 +127,10 @@ export default function WatchExperience({
     () => seedVideos[initialIndex] ?? seedVideos[0] ?? null
   );
   const [activePanel, setActivePanel] = useState<WatchPanelId>(null);
+  const [livingNavigation, dispatchLivingNavigation] = useReducer(
+    reduceLivingNavigation,
+    INITIAL_LIVING_NAVIGATION_STATE
+  );
   const [journeyTransitionActive, setJourneyTransitionActive] = useState(false);
   const [forcePause, setForcePause] = useState(false);
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
@@ -260,6 +277,7 @@ export default function WatchExperience({
         });
       }
 
+      dispatchLivingNavigation({ type: "close" });
       setActivePanel(panel);
     },
     [shopPostId, shopProductCount]
@@ -267,6 +285,18 @@ export default function WatchExperience({
 
   const handleClosePanel = useCallback(() => {
     setActivePanel(null);
+  }, []);
+
+  const handleOpenLivingNavigation = useCallback(
+    (id: LivingNavigationId) => {
+      setActivePanel(null);
+      dispatchLivingNavigation({ type: "open", id });
+    },
+    []
+  );
+
+  const handleCloseLivingNavigation = useCallback(() => {
+    dispatchLivingNavigation({ type: "close" });
   }, []);
 
   const handlePauseVideo = useCallback(() => {
@@ -280,6 +310,7 @@ export default function WatchExperience({
       }
 
       setActivePanel(null);
+      dispatchLivingNavigation({ type: "close" });
       setJourneyVideo(video);
       setForcePause(true);
       setJourneyTransitionActive(true);
@@ -509,6 +540,14 @@ export default function WatchExperience({
             restoreState={restoreVideoState}
             loadMoreEpoch={loadMoreEpoch}
           />
+
+          {prototypePanelsAllowed ? (
+            <LivingVideoNavigation
+              selectedId={livingNavigation.selectedId}
+              onSelect={handleOpenLivingNavigation}
+              onClose={handleCloseLivingNavigation}
+            />
+          ) : null}
 
           {loadMoreError ? (
             <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center px-4 md:bottom-8">
