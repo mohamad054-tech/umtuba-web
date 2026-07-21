@@ -16,3 +16,4 @@ export * from "./membership";
 export * from "./adminAuth";
 export * from "./adminReview";
 export * from "./adminQueries";
+export * from "./platform";

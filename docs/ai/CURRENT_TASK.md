@@ -2,45 +2,44 @@
 
 ## Task title
 
-UMTUBA Living Video Navigation Prototype V1
+UMTUBA Ads Platform Phase 1 — Contracts & Platform Foundation
 
 ## Goal
 
-Validate the overlay-first interaction model on the existing Watch surface:
-compact capability circles open one reusable prototype overlay while the active
-video/feed tree remains mounted and exact-context departure behavior is
-unchanged.
+Implement reusable, typed Ads Platform contracts for placements, creatives,
+campaign objects, and product-facing placement resolution. All placements stay
+disabled and hidden by default. This phase contains no delivery, serving,
+targeting execution, ranking, billing, measurement, or UI behavior.
 
 ## Allowed scope
 
-- `app/watch/WatchExperience.tsx`
-- `app/components/video/living-navigation/**`
-- Focused Living Navigation tests and the Vitest include needed to run them
-- Existing Watch styling only where required for the prototype
+- `lib/ads/platform/**`
+- `lib/ads/index.ts` only to export the new platform contracts
+- Focused Ads Platform contract tests under `lib/ads/platform/**`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Real World, Store, Journey, AI, Wallet, or Hello City product behavior
-- New routes, APIs, server actions, database access, migrations, GPS, Supabase,
-  LiveKit, or an Attention Engine
-- Changes to accepted World implementation/migrations or unrelated product code
-- Pull, rebase, merge, push, commit, or remote migration apply without explicit
-  approval
+- Billing, UEOS calls, auctions, bidding, fraud, AI, reporting, measurement
+- Delivery/serving engines, targeting execution, ranking, pacing, or selection
+- Supabase, migrations, database access, APIs, server actions, routes, or UI
+- Existing advertiser pages and existing Ads business behavior
+- Commit, push, or remote migration apply
 
-## Design inputs (read-only and excluded from commit unless later approved)
+## Design inputs (read-only)
 
-- `docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md`
-- `docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md`
+- `docs/ads/platform/**`
+- `docs/ads/ADS_PLATFORM_FOUNDATION_V1.md`
+- `docs/ads/ADS_ADMIN_REVIEW_FOUNDATION_V1.md`
 
 ## Branch
 
-`office/living-video-navigation-prototype-v1`
+`alpha-0.2`
 
-Base: `6c9d560f56a558755f28626f9f80f8e93bd90d96`
+Base: `721d4ce636082a60bcfd36491009e653d275eef7`
 
 ## Status
 
-`in progress — implementation authorized; no commit, push, or remote migration
-apply authorized.`
+`implemented locally — Phase 1 contracts saved in a local commit for handoff.
+Awaiting review before push. No migration or remote apply authorized.`
