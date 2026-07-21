@@ -17,6 +17,8 @@ export {
   buildStoreOrderHref,
   buildStoreProductIdHref,
   buildStoreShopIdHref,
+  buildWorldCityHref,
+  buildWorldPlaceHref,
   citiesMatch,
   findIndexByCity,
   findIndexByPostId,

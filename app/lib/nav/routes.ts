@@ -20,6 +20,8 @@ export const APP_ROUTES = {
   profile: "/profile",
   createVideo: "/create/video",
   postJourney: "/post-journey",
+  worldDiscovery: "/world",
+  worldSearch: "/world/search",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
   store: "/store",
@@ -64,7 +66,8 @@ export type AppRouteHref =
   | (typeof APP_ROUTES)["home"]
   | (typeof APP_ROUTES)["discover"]
   | (typeof APP_ROUTES)["live"]
-  | (typeof APP_ROUTES)["messages"];
+  | (typeof APP_ROUTES)["messages"]
+  | (typeof APP_ROUTES)["worldDiscovery"];
 
 export type AppNavItem = {
   label: string;
@@ -74,6 +77,7 @@ export type AppNavItem = {
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Home", href: APP_ROUTES.home },
   { label: "Discover", href: APP_ROUTES.discover },
+  { label: "World", href: APP_ROUTES.worldDiscovery },
   { label: "Live", href: APP_ROUTES.live },
   { label: "Messages", href: APP_ROUTES.messages },
 ];
@@ -200,6 +204,21 @@ export function buildPostJourneyHref(postId: string | number): string {
 /** Rewards / UM Points. */
 export function buildRewardsHref(): string {
   return APP_ROUTES.rewards;
+}
+
+function sanitizeWorldSlugSegment(slug: string): string {
+  const normalized = slug.trim().toLowerCase();
+  return /^[a-z0-9][a-z0-9-]{1,126}[a-z0-9]$/.test(normalized)
+    ? normalized
+    : "";
+}
+
+export function buildWorldPlaceHref(slug: string): string {
+  return `${APP_ROUTES.worldDiscovery}/place/${sanitizeWorldSlugSegment(slug)}`;
+}
+
+export function buildWorldCityHref(slug: string): string {
+  return `${APP_ROUTES.worldDiscovery}/city/${sanitizeWorldSlugSegment(slug)}`;
 }
 
 /** AI / creator insights. */

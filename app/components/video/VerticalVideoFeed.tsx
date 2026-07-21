@@ -31,6 +31,11 @@ type VerticalVideoFeedProps = {
   ) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
   onPlaybackTime?: (currentTimeMs: number) => void;
+  restoreState?: {
+    videoId: string;
+    playbackTimeSeconds: number;
+    token: number;
+  } | null;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
 };
@@ -53,6 +58,7 @@ export default function VerticalVideoFeed({
   onVideoPatch,
   onFollowChange,
   onPlaybackTime,
+  restoreState = null,
   loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -62,6 +68,7 @@ export default function VerticalVideoFeed({
   );
   const [muted, setMuted] = useState(true);
   const nearEndRequestedRef = useRef(false);
+  const lastRestoreTokenRef = useRef<number | null>(null);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -177,6 +184,19 @@ export default function VerticalVideoFeed({
   }, [initialIndex, videos]);
 
   useEffect(() => {
+    if (!restoreState || lastRestoreTokenRef.current === restoreState.token) return;
+    const index = videos.findIndex((video) => video.id === restoreState.videoId);
+    if (index < 0) return;
+    lastRestoreTokenRef.current = restoreState.token;
+    setActiveIndex(index);
+    requestAnimationFrame(() => {
+      slideNodesRef.current
+        .get(restoreState.videoId)
+        ?.scrollIntoView({ block: "start" });
+    });
+  }, [restoreState, videos]);
+
+  useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (
         event.key !== "ArrowDown" &&
@@ -275,6 +295,16 @@ export default function VerticalVideoFeed({
                 onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
                 onPlaybackTime={
                   index === activeIndex ? onPlaybackTime : undefined
+                }
+                restorePlaybackTimeSeconds={
+                  restoreState?.videoId === video.id
+                    ? restoreState.playbackTimeSeconds
+                    : null
+                }
+                restorePlaybackToken={
+                  restoreState?.videoId === video.id
+                    ? restoreState.token
+                    : undefined
                 }
                 slideRef={(node) => setSlideNode(video.id, node)}
               />

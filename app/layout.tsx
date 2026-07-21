@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { buildRootMetadata } from "../lib/site/metadata";
 import AppChrome from "./components/AppChrome";
 import AppMotionRoot from "./components/motion/AppMotionRoot";
+import ExactContextResume from "./components/world/ExactContextResume";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,6 +33,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppMotionRoot>
+          <ExactContextResume />
           <AppChrome>{children}</AppChrome>
         </AppMotionRoot>
       </body>

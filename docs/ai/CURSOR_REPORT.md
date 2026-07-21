@@ -1,78 +1,124 @@
-# Cursor Report
-
-> Cursor overwrites this file at the end of each handoff task. Keep sections intact.
-
-## Report status
-
-`PASS`
+# Cursor Report — World Discovery renumber / amend / rebase
 
 ## Summary
 
-Final security and architecture review of Checkout & Payments Foundation V1 completed within allowed scope. Hardened deferred payment attempt ownership/idempotency/concurrency in the migration RPC path, rejected client money fields on quote and recovery actions, made post-confirm payment recording best-effort with an explicit recovery action and UI retry, fail-closed shipping/payment adapters, integer-truncated grand totals, accessible loading/error/success states with double-submit guards, and clarified non-live payment wording. All required verification commands passed. No commit, push, or remote migration.
+Renumbered World migrations to avoid clashing with UEOS `20260822`, amended
+the local World commit, and rebased cleanly onto `origin/alpha-0.2`.
+
+- Branch: `office/world-discovery-hello-city-foundation-v1`
+- Rebase base: `origin/alpha-0.2` at
+  `7631368f138794855dcaeea4a41835918edfd621`
+- Pre-closure-amend HEAD: `ce8899ab48b463218cefbb7e15dca0c4276f3e34`
+- Message unchanged: `feat(world): add World Discovery and Hello City foundation`
+- No push. No remote migration apply. No merge.
+- Living Video Navigation docs remain untracked and were never staged.
+
+Note: during `git fetch`, `origin/alpha-0.2` advanced past the previously
+audited tip `38ec7ac` to `7631368` (`feat(store): add trusted payment outcome
+sync`). Rebase landed on that tip with **no conflicts**.
 
 ## Exact files changed
 
-- `app/actions/storeCheckout.ts`
-- `app/components/store/CheckoutClient.tsx`
-- `lib/store/checkoutRules.ts`
-- `lib/store/paymentAttempts.ts`
-- `lib/store/payments.ts`
-- `lib/store/pricing.ts`
-- `lib/store/pricingFoundation.test.ts`
-- `lib/store/shipping.ts`
-- `supabase/migrations/20260814_store_checkout_payments_foundation_v1.sql`
-- `docs/store/implementation/CHECKOUT_PAYMENTS_FOUNDATION_V1.md`
+### Migration renames (this operation)
+- `20260822_world_…` → `20260825_world_discovery_hello_city_foundation_v1.sql`
+- `20260823_world_…` → `20260826_world_discovery_domain_phase2.sql`
+- `20260824_world_…` → `20260827_world_discovery_security_hardening_v1.sql`
+
+### Reference updates for renames
+- `supabase/migrations/20260826_…` / `20260827_…` header dependency comments
+- `lib/world/worldFoundation.test.ts`
+- `lib/world/worldPhase2.test.ts`
+- `lib/world/worldHardening.test.ts`
+- `docs/world/WORLD_DISCOVERY_HELLO_CITY_FOUNDATION_V1.md`
+- `docs/world/WORLD_DISCOVERY_PHASE2_ARCHITECTURE.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
+### Present but excluded (still untracked)
+- `docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md`
+- `docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md`
+
 ## Migrations created
 
-- `supabase/migrations/20260814_store_checkout_payments_foundation_v1.sql` (local only; not applied remotely)
+Local only (not applied remotely). Final set after renumber:
+
+1. `20260822_ueos_foundation_v1.sql` (upstream UEOS — untouched)
+2. `20260825_world_discovery_hello_city_foundation_v1.sql`
+3. `20260826_world_discovery_domain_phase2.sql`
+4. `20260827_world_discovery_security_hardening_v1.sql`
+
+No duplicate versions for `20260825` / `20260826` / `20260827`.
 
 ## Security review
 
-- Pricing: integer minor units only; grand-total inputs truncated/capped; checkout rules re-export canonical engine.
-- Client money fields rejected on quote and deferred-attempt recovery actions.
-- `create_deferred_payment_attempt`: SECURITY DEFINER + `search_path=public`; amount/currency/buyer from locked order row; buyer ownership enforced; idempotency reuse requires matching order+buyer; unique deferred attempt per order; `unique_violation` race recovery.
-- RLS: `FORCE RLS`; authenticated SELECT only; INSERT/UPDATE/DELETE revoked; EXECUTE revoked from PUBLIC/anon.
-- Post-confirm deferred attempts are best-effort; failures do not roll back confirmed orders; recovery via `ensureDeferredPaymentAttemptAction`.
-- Shipping quotes fail closed on invalid currency/service/provider; deferred payment adapter rejects live providers and bad money.
-- UI copy does not imply live charging; double-submit lock + `aria-live` for errors/status; success UI surfaces incomplete payment recording with retry.
+- No new security surface from renumber/rebase.
+- World hardening contracts unchanged aside from migration filenames.
+- UEOS migration name preserved.
 
 ## Tests
 
-- `npx vitest run lib/store/pricingFoundation.test.ts lib/store/checkoutFoundation.test.ts` — **PASS** (43 tests)
-- `npx vitest run lib/store app/actions` — **PASS** (168 tests in `lib/store`; no `app/actions` test files present)
+- Pre-amend World Vitest: **PASS** (3 files / 48 tests)
+- Post-rebase World Vitest: **PASS** (3 files / 48 tests)
+- Nav + exact-context related Vitest: **PASS** (4 files / 50 tests)
+- Full `npm test`: **FAIL** — **3 inherited upstream failures / 854 passes**.
+  Exact cause: CRLF-sensitive Store assertions / comment stripping on Windows.
+  - `lib/store/paymentOutcomeSync.test.ts`: `locks event then order then
+    attempt` expects an LF-only SQL substring; the Windows checkout contains
+    CRLF, so `orderForUpdate` is `-1`.
+  - `lib/store/storeRemoteE2eSandboxScripts.test.ts`: `seed aborts with
+    ACCOUNT_BLOCKER and never inserts auth.users` and `cleanup targets fixed
+    UUIDs / marker and avoids truncate` fail because the comment stripper is
+    CRLF-sensitive and leaves prohibition text (`INSERT INTO auth.users` /
+    `truncate`) in the inspected string.
+- Exact-upstream reproduction on `origin/alpha-0.2` @
+  `7631368f138794855dcaeea4a41835918edfd621`: **3 failed / 20 passed** with
+  identical assertion signatures (detached worktree).
+- Classification: **A — inherited upstream failure, identical and unrelated
+  to World**. Store test/input files are unchanged from upstream; World
+  files, migrations, imports, and the added Vitest include pattern do not
+  participate in these direct test runs.
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **PASS**
+- Pre-amend `npx tsc --noEmit`: **PASS**
+- Post-rebase `npx tsc --noEmit`: **PASS**
 
 ## Build
 
-- `npm run build` — **PASS**
+- Post-rebase `npm run build`: **PASS**
 
 ## git diff --check
 
-- **PASS**
+- Pre-amend: **PASS**
+- Post-rebase: **PASS**
 
 ## git status --short
 
 ```
- M app/actions/storeCheckout.ts
- M app/components/store/CheckoutClient.tsx
- M lib/store/checkoutRules.ts
-?? .cursor/
-?? docs/ai/
-?? docs/store/implementation/CHECKOUT_PAYMENTS_FOUNDATION_V1.md
-?? lib/store/paymentAttempts.ts
-?? lib/store/payments.ts
-?? lib/store/pricing.ts
-?? lib/store/pricingFoundation.test.ts
-?? lib/store/shipping.ts
-?? supabase/migrations/20260814_store_checkout_payments_foundation_v1.sql
+## office/world-discovery-hello-city-foundation-v1
+?? docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md
+?? docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md
 ```
 
-## Open issues
+Ahead/behind vs `origin/alpha-0.2`: **1 ahead / 0 behind**
 
-- none (migration remains local-only until explicitly applied; foundation still has no live payment gateways by design)
+## Open issues / remaining risks
+
+1. Migrations remain local only — do not apply remotely until explicit approval.
+2. Full `npm test` has the three documented, deterministic upstream Store
+   assertion failures; these are not World regressions.
+3. Living Video Navigation design docs must stay untracked / out of any push.
+4. Waiting for explicit push approval.
+
+## Rebase / amend trail
+
+| Step | Hash |
+|------|------|
+| Pre-renumber World commit | `76ad9593224a9988b80cf6c7e46958a448a41076` |
+| Post-amend (renumber) | `939ea0a04cf279755fc865d84e7a956bfc7fac00` |
+| Post-rebase onto `origin/alpha-0.2` | `ce8899ab48b463218cefbb7e15dca0c4276f3e34` |
+
+Conflicts: **none**. `vitest.config.ts` retained `lib/world`, `lib/wallet`,
+and `lib/ueos` include patterns.
+
+Do not push. Do not apply migrations remotely. Wait for approval.

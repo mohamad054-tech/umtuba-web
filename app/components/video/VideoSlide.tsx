@@ -35,6 +35,8 @@ type VideoSlideProps = {
   onFollowChange?: (authorId: string, following: boolean) => void;
   onSrcChange?: (src: string) => void;
   onPlaybackTime?: (currentTimeMs: number) => void;
+  restorePlaybackTimeSeconds?: number | null;
+  restorePlaybackToken?: number;
   slideRef?: (node: HTMLElement | null) => void;
 };
 
@@ -55,6 +57,8 @@ export default function VideoSlide({
   onFollowChange,
   onSrcChange,
   onPlaybackTime,
+  restorePlaybackTimeSeconds,
+  restorePlaybackToken,
   slideRef,
 }: VideoSlideProps) {
   const [playbackStatus, setPlaybackStatus] = useState<
@@ -193,6 +197,8 @@ export default function VideoSlide({
             ? handleWatchProgress
             : undefined
         }
+        restorePlaybackTimeSeconds={restorePlaybackTimeSeconds}
+        restorePlaybackToken={restorePlaybackToken}
       />
       <VideoOverlay
         video={video}

@@ -28,6 +28,12 @@ import {
 import { APP_ROUTES } from "../lib/nav";
 import { allowWatchPrototypePanels } from "../lib/product/surfaceGates";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
+import {
+  consumeWatchVideoRestore,
+  EXACT_CONTEXT_RESTORE_EVENT,
+  saveWatchExactContextDeparture,
+  type ExactReturnContext,
+} from "../../lib/world/exactContext";
 import { findWatchVideoIndex } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 
@@ -113,7 +119,97 @@ export default function WatchExperience({
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
   const [demoFallback] = useState(usedDemoFallback);
   const [playbackTimeMs, setPlaybackTimeMs] = useState(0);
+  const [restoreVideoState, setRestoreVideoState] = useState<{
+    videoId: string;
+    playbackTimeSeconds: number;
+    token: number;
+  } | null>(null);
   nextCursorRef.current = nextCursor;
+  const activeVideoRef = useRef(activeVideo);
+  const playbackTimeMsRef = useRef(playbackTimeMs);
+  const videosRef = useRef(videos);
+  activeVideoRef.current = activeVideo;
+  playbackTimeMsRef.current = playbackTimeMs;
+  videosRef.current = videos;
+
+  const captureWatchDeparture = useCallback((departure: string) => {
+    const video = activeVideoRef.current;
+    const feedIndex = video
+      ? videosRef.current.findIndex((item) => item.id === video.id)
+      : -1;
+    saveWatchExactContextDeparture({
+      videoId: video?.id ?? null,
+      playbackTimeSeconds: playbackTimeMsRef.current / 1000,
+      feedIndex: feedIndex >= 0 ? feedIndex : null,
+      routeParams: new URLSearchParams(window.location.search),
+      scrollY: window.scrollY,
+      departure,
+    });
+  }, []);
+
+  useEffect(() => {
+    function restoreVideo(event: Event) {
+      const context = (event as CustomEvent<ExactReturnContext>).detail;
+      if (!context?.video) return;
+      setRestoreVideoState({
+        ...context.video,
+        token: Date.now(),
+      });
+    }
+    window.addEventListener(EXACT_CONTEXT_RESTORE_EVENT, restoreVideo);
+    return () =>
+      window.removeEventListener(EXACT_CONTEXT_RESTORE_EVENT, restoreVideo);
+  }, []);
+
+  useEffect(() => {
+    const pending = consumeWatchVideoRestore();
+    if (!pending) return;
+    const exists = videosRef.current.some(
+      (video) => video.id === pending.videoId
+    );
+    if (!exists) return;
+    setRestoreVideoState({
+      videoId: pending.videoId,
+      playbackTimeSeconds: pending.playbackTimeSeconds,
+      token: Date.now(),
+    });
+  }, []);
+
+  useEffect(() => {
+    function isWorldDepartureHref(href: string | null): boolean {
+      if (!href) return false;
+      try {
+        const url = new URL(href, window.location.origin);
+        return (
+          url.origin === window.location.origin &&
+          (url.pathname === APP_ROUTES.worldDiscovery ||
+            url.pathname.startsWith(`${APP_ROUTES.worldDiscovery}/`))
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function onDocumentClick(event: MouseEvent) {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (!isWorldDepartureHref(anchor.getAttribute("href"))) return;
+      captureWatchDeparture("world");
+    }
+
+    function onPageHide() {
+      captureWatchDeparture("watch-leave");
+    }
+
+    document.addEventListener("click", onDocumentClick, true);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      document.removeEventListener("click", onDocumentClick, true);
+      window.removeEventListener("pagehide", onPageHide);
+    };
+  }, [captureWatchDeparture]);
 
   const shopPostId =
     activeVideo?.source === "supabase" ? activeVideo.postId : null;
@@ -410,6 +506,7 @@ export default function WatchExperience({
             onVideoPatch={handleVideoPatch}
             onFollowChange={handleFollowChange}
             onPlaybackTime={setPlaybackTimeMs}
+            restoreState={restoreVideoState}
             loadMoreEpoch={loadMoreEpoch}
           />
 
