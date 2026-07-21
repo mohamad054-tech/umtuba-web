@@ -77,6 +77,7 @@ describe("desktop vs mobile nav contracts", () => {
     expect(APP_NAV_ITEMS.map((item) => item.href)).toEqual([
       APP_ROUTES.home,
       APP_ROUTES.discover,
+      APP_ROUTES.worldDiscovery,
       APP_ROUTES.live,
       APP_ROUTES.messages,
     ]);

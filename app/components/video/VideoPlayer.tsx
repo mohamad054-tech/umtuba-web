@@ -29,6 +29,8 @@ type VideoPlayerProps = {
   onRetryPlayback?: () => void;
   /** Optional watch-signal telemetry (Discover/Watch recommendation V1). */
   onWatchProgress?: (event: WatchProgressEvent) => void;
+  restorePlaybackTimeSeconds?: number | null;
+  restorePlaybackToken?: number;
 };
 
 export default function VideoPlayer({
@@ -42,6 +44,8 @@ export default function VideoPlayer({
   playbackStatus = "ok",
   onRetryPlayback,
   onWatchProgress,
+  restorePlaybackTimeSeconds = null,
+  restorePlaybackToken = 0,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [pausedByUser, setPausedByUser] = useState(false);
@@ -117,6 +121,36 @@ export default function VideoPlayer({
   useEffect(() => {
     loopCountRef.current = 0;
   }, [src]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (
+      !video ||
+      !active ||
+      restorePlaybackTimeSeconds === null ||
+      !Number.isFinite(restorePlaybackTimeSeconds) ||
+      restorePlaybackTimeSeconds < 0
+    ) {
+      return;
+    }
+    const seek = () => {
+      const max = Number.isFinite(video.duration)
+        ? Math.max(0, video.duration - 0.1)
+        : restorePlaybackTimeSeconds;
+      video.currentTime = Math.min(restorePlaybackTimeSeconds, max);
+    };
+    if (video.readyState >= 1) {
+      seek();
+      return;
+    }
+    video.addEventListener("loadedmetadata", seek, { once: true });
+    return () => video.removeEventListener("loadedmetadata", seek);
+  }, [
+    active,
+    restorePlaybackTimeSeconds,
+    restorePlaybackToken,
+    src,
+  ]);
 
   useEffect(() => {
     const video = videoRef.current;

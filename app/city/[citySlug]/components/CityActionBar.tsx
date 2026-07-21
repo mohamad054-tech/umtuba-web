@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { CityHandoffPayload } from "../../../lib/city/handoff";
 import { shouldUseRouterBackForCity } from "../../../lib/city/handoff";
+import { APP_ROUTES } from "../../../lib/nav";
 
 type CityActionBarProps = {
   handoff: CityHandoffPayload | null;
@@ -47,6 +48,13 @@ export default function CityActionBar({
           Continue watching
         </Link>
       ) : null}
+
+      <Link
+        href={APP_ROUTES.worldDiscovery}
+        className="rounded-full border border-cyan-400/25 bg-cyan-500/10 px-5 py-3 text-center text-sm font-bold text-cyan-100 hover:bg-cyan-500/15"
+      >
+        Explore places
+      </Link>
 
       <button
         type="button"

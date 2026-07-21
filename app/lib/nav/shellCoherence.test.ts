@@ -14,6 +14,7 @@ describe("shell coherence", () => {
     expect(APP_NAV_ITEMS.map((i) => i.label)).toEqual([
       "Home",
       "Discover",
+      "World",
       "Live",
       "Messages",
     ]);
