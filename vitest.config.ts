@@ -9,6 +9,7 @@ export default defineConfig({
       "app/components/journey-transition/**/*.test.ts",
       "app/components/journey/**/*.test.ts",
       "app/components/globe-to-city/**/*.test.ts",
+      "app/components/video/living-navigation/**/*.test.ts",
       "app/live/hooks/**/*.test.ts",
       "app/notifications/**/*.test.ts",
       "lib/rewards/**/*.test.ts",

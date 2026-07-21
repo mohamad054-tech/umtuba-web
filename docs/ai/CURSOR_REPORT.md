@@ -1,124 +1,159 @@
-# Cursor Report — World Discovery renumber / amend / rebase
+# Cursor Report — Living Video Navigation Prototype V1
 
 ## Summary
 
-Renumbered World migrations to avoid clashing with UEOS `20260822`, amended
-the local World commit, and rebased cleanly onto `origin/alpha-0.2`.
+Implemented the first visible Living Video Navigation prototype on Watch.
+Capability circles open one reusable overlay above a persistently mounted feed.
+No route change, no remount of `VerticalVideoFeed` / active `VideoPlayer`, no
+exact-context departure writes from overlay open/close, and no backend /
+migration / product-domain work.
 
-- Branch: `office/world-discovery-hello-city-foundation-v1`
-- Rebase base: `origin/alpha-0.2` at
-  `7631368f138794855dcaeea4a41835918edfd621`
-- Pre-closure-amend HEAD: `ce8899ab48b463218cefbb7e15dca0c4276f3e34`
-- Message unchanged: `feat(world): add World Discovery and Hello City foundation`
-- No push. No remote migration apply. No merge.
-- Living Video Navigation docs remain untracked and were never staged.
+Branch: `office/living-video-navigation-prototype-v1`
+Base: `6c9d560f56a558755f28626f9f80f8e93bd90d96`
 
-Note: during `git fetch`, `origin/alpha-0.2` advanced past the previously
-audited tip `38ec7ac` to `7631368` (`feat(store): add trusted payment outcome
-sync`). Rebase landed on that tip with **no conflicts**.
+No commit. No push. No remote migration apply.
+
+## Working plan (executed)
+
+1. Own overlay state in `WatchExperience` and keep `VerticalVideoFeed` as a
+   stable sibling of one Living Navigation controller.
+2. Keep all six capability items in typed configuration; Hello City stays
+   disabled behind `hello_city_enabled`.
+3. Use one rail + one portal dialog/sheet with `useDialogA11y`, Escape,
+   backdrop close, focus restore, and no route navigation.
+4. Gate the prototype behind existing `allowWatchPrototypePanels()`.
+5. Verify with focused Living tests, Watch/World/nav regressions, TypeScript,
+   full suite, build, and `git diff --check`.
 
 ## Exact files changed
 
-### Migration renames (this operation)
-- `20260822_world_…` → `20260825_world_discovery_hello_city_foundation_v1.sql`
-- `20260823_world_…` → `20260826_world_discovery_domain_phase2.sql`
-- `20260824_world_…` → `20260827_world_discovery_security_hardening_v1.sql`
+### New
+- `app/components/video/living-navigation/livingNavigationConfig.ts`
+- `app/components/video/living-navigation/livingNavigationModel.ts`
+- `app/components/video/living-navigation/LivingNavigationIcon.tsx`
+- `app/components/video/living-navigation/LivingNavigationAction.tsx`
+- `app/components/video/living-navigation/LivingNavigationOverlay.tsx`
+- `app/components/video/living-navigation/LivingVideoNavigation.tsx`
+- `app/components/video/living-navigation/livingNavigation.test.ts`
 
-### Reference updates for renames
-- `supabase/migrations/20260826_…` / `20260827_…` header dependency comments
-- `lib/world/worldFoundation.test.ts`
-- `lib/world/worldPhase2.test.ts`
-- `lib/world/worldHardening.test.ts`
-- `docs/world/WORLD_DISCOVERY_HELLO_CITY_FOUNDATION_V1.md`
-- `docs/world/WORLD_DISCOVERY_PHASE2_ARCHITECTURE.md`
+### Modified
+- `app/watch/WatchExperience.tsx`
+- `vitest.config.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-### Present but excluded (still untracked)
-- `docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md`
+### Present but excluded (still untracked, untouched)
 - `docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md`
+- `docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md`
 
-## Migrations created
+## Components and configuration introduced
 
-Local only (not applied remotely). Final set after renumber:
+- Typed config for World, Store, Journey, AI, Wallet, Hello City
+- Pure reducer for open / switch / close / Escape / disabled rejection
+- Circular action buttons with accessible labels and disabled state
+- One reusable overlay (mobile bottom sheet / desktop side panel)
+- Watch integration sibling to `VerticalVideoFeed`
 
-1. `20260822_ueos_foundation_v1.sql` (upstream UEOS — untouched)
-2. `20260825_world_discovery_hello_city_foundation_v1.sql`
-3. `20260826_world_discovery_domain_phase2.sql`
-4. `20260827_world_discovery_security_hardening_v1.sql`
+## Where state is owned
 
-No duplicate versions for `20260825` / `20260826` / `20260827`.
+`WatchExperience` owns `livingNavigation.selectedId` via
+`reduceLivingNavigation`. Opening a Living item clears `activePanel`; opening
+a Watch panel / Journey clears Living selection. The feed tree is never
+conditionally replaced by the overlay.
 
-## Security review
+## Proof that the video is not remounted
 
-- No new security surface from renumber/rebase.
-- World hardening contracts unchanged aside from migration filenames.
-- UEOS migration name preserved.
+1. Source contract: `VerticalVideoFeed` remains mounted; Living Navigation is a
+   sibling, not an alternate return path.
+2. Overlay switching only changes `selectedId`; no route, no `key` change on
+   feed/player, no `forcePause` for Living overlays.
+3. Browser verification: active feed `<video>` DOM node identity remained the
+   same across World open, Store switch, Escape, and backdrop close.
+4. Second `<video>` observed on `/watch` is the pre-existing
+   `WatchAmbientBackground` blur layer (`pointer-events-none fixed inset-0`),
+   not a Living Navigation remount. That ambient player already existed before
+   this prototype and is out of this sprint’s change set.
+
+## Overlay accessibility behavior
+
+- `role="dialog"` + `aria-modal="true"`
+- Title / description ids
+- `useDialogA11y`: Escape, Tab cycle, initial focus, restore focus
+- Close button and backdrop dismissal
+- Body scroll lock while open
+- Disabled Hello City uses `aria-disabled` and never opens
+
+## Mobile and desktop behavior
+
+- Mobile: bottom sheet (`max-h-[76dvh]`, rounded top)
+- Desktop/sm+: right side panel (`sm:max-w-md`)
+- Capability rail: compact 2×3 grid at trailing edge of the Watch stage
+- Prototype gated by `allowWatchPrototypePanels()` (never in production)
+
+## Feature-flag / disabled behavior
+
+Hello City is `featureStatus: "disabled"` with
+`featureFlagKey: "hello_city_enabled"`. It remains visible but inaccessible for
+this prototype and does not open an overlay.
+
+## Exact-context compatibility
+
+Living Navigation components do not call `saveWatchExactContextDeparture` and
+do not use routers/links. Existing Watch World-link / pagehide producers remain
+intact and covered by World tests.
 
 ## Tests
 
-- Pre-amend World Vitest: **PASS** (3 files / 48 tests)
-- Post-rebase World Vitest: **PASS** (3 files / 48 tests)
-- Nav + exact-context related Vitest: **PASS** (4 files / 50 tests)
-- Full `npm test`: **FAIL** — **3 inherited upstream failures / 854 passes**.
-  Exact cause: CRLF-sensitive Store assertions / comment stripping on Windows.
-  - `lib/store/paymentOutcomeSync.test.ts`: `locks event then order then
-    attempt` expects an LF-only SQL substring; the Windows checkout contains
-    CRLF, so `orderForUpdate` is `-1`.
-  - `lib/store/storeRemoteE2eSandboxScripts.test.ts`: `seed aborts with
-    ACCOUNT_BLOCKER and never inserts auth.users` and `cleanup targets fixed
-    UUIDs / marker and avoids truncate` fail because the comment stripper is
-    CRLF-sensitive and leaves prohibition text (`INSERT INTO auth.users` /
-    `truncate`) in the inspected string.
-- Exact-upstream reproduction on `origin/alpha-0.2` @
-  `7631368f138794855dcaeea4a41835918edfd621`: **3 failed / 20 passed** with
-  identical assertion signatures (detached worktree).
-- Classification: **A — inherited upstream failure, identical and unrelated
-  to World**. Store test/input files are unchanged from upstream; World
-  files, migrations, imports, and the added Vitest include pattern do not
-  participate in these direct test runs.
+- Focused Living Navigation: **PASS** (10)
+- Watch + video + World + nav cluster: **PASS** (12 files / 95)
+- TypeScript `npx tsc --noEmit`: **PASS**
+- Full `npm test`: **3 FAIL / 864 PASS**
+  - Inherited upstream Store CRLF-sensitive failures only:
+    - `lib/store/paymentOutcomeSync.test.ts`
+    - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
+  - Classification: **A — unrelated to Living Video**
+- `npm run build`: **PASS**
+- `git diff --check`: **PASS**
+- Living Navigation ESLint: **PASS**
 
-## TypeScript
+## Architecture / browser review notes
 
-- Pre-amend `npx tsc --noEmit`: **PASS**
-- Post-rebase `npx tsc --noEmit`: **PASS**
+- Ownership map and dialog-reuse guidance matched the implemented approach.
+- Browser pass confirmed open/switch/close, Escape, backdrop, focus return,
+  Hello City disabled, no route change, and stable active video node.
+- The ambient-background second `<video>` is pre-existing and not a prototype
+  regression.
+- Follow-up from architecture review: overlay is now **stage-scoped**
+  (`absolute inset-0` inside the Watch stage) instead of a `document.body`
+  portal, so fullscreen and desktop docking stay tied to the living video.
+  Capability rail is a single trailing column; all targets remain 44×44.
 
-## Build
+## Remaining UX / architecture risks
 
-- Post-rebase `npm run build`: **PASS**
+1. Capability rail can still visually compete with mute / action-rail on dense
+   layouts; future polish should refine placement without remounting video.
+2. Hello City is shown disabled rather than omitted; Phase 3 blueprint prefers
+   omission when gated — acceptable for this prototype sprint, revisit later.
+3. No Attention Engine / nested place state / full-destination escalation yet
+   (explicitly out of scope).
+4. Ambient background still mounts a second blurred `<video>` for atmosphere;
+   separate from Living Navigation and unchanged here.
 
-## git diff --check
+## Recommended exact commit scope
 
-- Pre-amend: **PASS**
-- Post-rebase: **PASS**
+Include:
+- `app/components/video/living-navigation/**`
+- `app/watch/WatchExperience.tsx`
+- `vitest.config.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
-## git status --short
+Exclude:
+- `docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md`
+- `docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md`
 
-```
-## office/world-discovery-hello-city-foundation-v1
-?? docs/world/WORLD_OS_LIVING_VIDEO_NAVIGATION_PROTOTYPE_SPEC.md
-?? docs/world/WORLD_OS_UX_PHASE3_VIDEO_FIRST_NAVIGATION.md
-```
+Suggested message:
 
-Ahead/behind vs `origin/alpha-0.2`: **1 ahead / 0 behind**
+`feat(watch): add Living Video Navigation prototype overlays`
 
-## Open issues / remaining risks
-
-1. Migrations remain local only — do not apply remotely until explicit approval.
-2. Full `npm test` has the three documented, deterministic upstream Store
-   assertion failures; these are not World regressions.
-3. Living Video Navigation design docs must stay untracked / out of any push.
-4. Waiting for explicit push approval.
-
-## Rebase / amend trail
-
-| Step | Hash |
-|------|------|
-| Pre-renumber World commit | `76ad9593224a9988b80cf6c7e46958a448a41076` |
-| Post-amend (renumber) | `939ea0a04cf279755fc865d84e7a956bfc7fac00` |
-| Post-rebase onto `origin/alpha-0.2` | `ce8899ab48b463218cefbb7e15dca0c4276f3e34` |
-
-Conflicts: **none**. `vitest.config.ts` retained `lib/world`, `lib/wallet`,
-and `lib/ueos` include patterns.
-
-Do not push. Do not apply migrations remotely. Wait for approval.
+Do not commit. Do not push. Do not apply migrations remotely. Wait for approval.
