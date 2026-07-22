@@ -2,32 +2,34 @@
 
 ## Task title
 
-UM Learning OS — Programs Foundation V1 (security & lifecycle hardening)
+UM Learning OS — Courses Foundation V1
 
 ## Goal
 
-Fix Programs Foundation review findings: active space membership revalidation,
-program lifecycle mutation gates, JSON metadata limits, timestamp normalization,
-and expanded contract tests.
+DB-authoritative Courses foundation under Programs: tables, helpers, RLS, RPCs,
+ordering, staff authority with space-membership revalidation, lifecycle gates,
+metadata validators, contract tests, and implementation doc.
 
 ## Allowed scope
 
-- `supabase/migrations/20260829_learning_programs_foundation_v1.sql`
-- `lib/learning/programsFoundation.ts`
-- `lib/learning/programsFoundation.test.ts`
-- `docs/learning/implementation/PROGRAMS_FOUNDATION_V1.md`
+- `supabase/migrations/20260830_learning_courses_foundation_v1.sql`
+- `lib/learning/coursesFoundation.ts`
+- `lib/learning/coursesFoundation.test.ts`
+- `docs/learning/implementation/COURSES_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Courses / enrollments / UI / payments / booking
+- Sections / Lessons / Activities / Enrollments / UI / payments / marketplace /
+  booking / calendar / live / AI tutor / search / notifications
 - Commit, push, merge, remote migration apply without approval
+- Modifying Programs/Spaces migrations or modules outside Courses handoff
 
 ## Branch
 
-`office/learning-programs-foundation-v1`
+`office/learning-courses-foundation-v1` (from `alpha-0.2`)
 
 ## Status
 
-`hardening implemented locally — awaiting final review; no commit/push.`
+`implemented locally — awaiting final review; no commit/push/migration apply.`
