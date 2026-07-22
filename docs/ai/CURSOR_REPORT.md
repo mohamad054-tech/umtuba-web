@@ -1,124 +1,155 @@
-﻿# Cursor Report
+﻿# Cursor Execution Report
+
+## Task
+
+UM Learning OS — Questions Foundation V1 (feature branch
+`office/learning-questions-foundation-v1`, **not** merged into `alpha-0.2`, **no**
+remote Supabase migration applied).
 
 ## Summary
 
-Implemented **UM Learning OS — Lesson Content Blocks Foundation V1** on
-`office/learning-lesson-content-blocks-foundation-v1` (branched from
-`alpha-0.2` @ `ad0a1e18a9ff727a269024f08cf9974605d84c1c`):
+Implemented a DB-authoritative Questions foundation as an additive slice after
+`20260836` (Lesson Content Blocks). A Question is an authored assessment
+definition belonging to **exactly one Activity** (Activity → Question only — no
+banks, joins, shared/reused questions, cross-activity reuse, or pools). Two new
+tables were added:
 
-- New migration `20260836` adds a single table `learning_lesson_content_blocks`
-  (display content body under exactly one Lesson) plus helpers, validators, RLS
-  policies, and RPC-only write functions.
-- Immutable typed `block_type` allowlist of **12** (10 creatable + 2 reserved);
-  reserved (`ai_block`, `interactive_block`) are rejected at create; fully
-  deferred types (`gallery`, `pdf`, `downloadable_file`, `table`, `embed`,
-  `html`) are not in the allowlist and fail closed.
-- Block-level draft/published lifecycle; explicit **idempotent** publish/unpublish;
-  archive + platform moderation; two-phase per-lesson reorder (no
-  `UNIQUE(lesson_id, position)`; reserved `learning_lesson_items`).
-- Bounded per-type payload validation (object-only ≤ 16384 bytes; per-type key
-  allowlist; safe-text rejects raw HTML/JS/iframe; media = opaque http(s)
-  reference strings only — no upload/storage buckets/signed URLs).
-- **Learner reads** gate on `has_learning_course_access(course_id)` + published
-  lesson + published block (NOT plain space membership); managers/course staff
-  read drafts in scope; platform admins read all; **no anon SELECT**.
-- TypeScript contracts, contract tests (53), and an implementation doc.
-- No prior migration modified; no remote Supabase apply.
+- `learning_questions` — immutable `activity_id`/`question_type`/`created_by`,
+  `draft|published|suspended|archived` lifecycle, non-negative per-activity
+  `position` with **no** `UNIQUE(activity_id, position)` (Plan-B compatible),
+  per-type validated **LEARNER-VISIBLE** `content` (prompt + options/blanks, **no
+  correctness flags**), and an optional **inert** `points` weight.
+- `learning_question_answer_keys` — 1:1 (`question_id` PK FK `ON DELETE CASCADE`),
+  secret `answer_key` jsonb holding correct answers/criteria only (never learner
+  results).
+
+Six creatable types (`multiple_choice_single`, `multiple_choice_multiple`,
+`true_false`, `short_answer`, `fill_blank`, `numeric`); two reserved
+(`long_answer`, `essay`) enum-only with create rejected; all other types
+(matching, ordering, file_upload, code_execution, audio/video_response,
+composite, adaptive, AI) fully deferred and fail closed (not in the allowlist).
+No matching/ordering validators were implemented.
+
+Writes are RPC-only (`SECURITY DEFINER` + `SET search_path = public`), authority
+inherits from the Activity → Lesson → Section → Course → Space chain (no question
+staff table; course staff revalidated for active space membership), and every
+mutation revalidates the full parent chain with the parent activity locked
+`FOR UPDATE` on create/reorder. **Reads are STAFF-ONLY**: no learner SELECT
+policy on either table, no learner-facing read RPC, and answer keys are never
+returned from non-key RPCs and never exposed to learners. No anon SELECT, no anon
+grants; FORCE + ENABLE RLS on both tables.
 
 ## Exact files changed
 
-- `supabase/migrations/20260836_learning_lesson_content_blocks_foundation_v1.sql` (added)
-- `lib/learning/lessonContentBlocksFoundation.ts` (added)
-- `lib/learning/lessonContentBlocksFoundation.test.ts` (added)
-- `docs/learning/implementation/LESSON_CONTENT_BLOCKS_FOUNDATION_V1.md` (added)
+- `supabase/migrations/20260837_learning_questions_foundation_v1.sql` (added)
+- `lib/learning/questionsFoundation.ts` (added)
+- `lib/learning/questionsFoundation.test.ts` (added)
+- `docs/learning/implementation/QUESTIONS_FOUNDATION_V1.md` (added)
 - `docs/ai/CURRENT_TASK.md` (updated)
-- `docs/ai/CURSOR_REPORT.md` (updated)
+- `docs/ai/CURSOR_REPORT.md` (updated — this file)
 
 ## Migrations created
 
-- `20260836_learning_lesson_content_blocks_foundation_v1.sql` (Git-only; **not**
-  applied to remote Supabase). Migrations `20260828`–`20260835` untouched.
-
-### Table + RPCs
-
-- Table: `public.learning_lesson_content_blocks` (id, lesson_id [FK RESTRICT,
-  immutable], block_type [immutable, 12-allowlist], status, position [≥ 0],
-  content jsonb [object], created_by [immutable], updated_by, timestamps).
-- Helpers: `can_manage_learning_lesson_content_block`,
-  `can_create_learning_lesson_content_block`.
-- Validators (internal): `..._validate_type`, `..._validate_content`,
-  `..._assert_safe_text`, `..._assert_safe_url`, `..._require_mutable_status`,
-  `..._require_parent_{program,course,section,lesson}_status`, plus immutability
-  guard trigger.
-- RPCs: `create_learning_lesson_content_block`,
-  `update_learning_lesson_content_block`,
-  `publish_learning_lesson_content_block`,
-  `unpublish_learning_lesson_content_block`,
-  `archive_learning_lesson_content_block`,
-  `moderate_learning_lesson_content_block`,
-  `reorder_learning_lesson_content_blocks`.
+- `supabase/migrations/20260837_learning_questions_foundation_v1.sql`
+  - Tables: `learning_questions`, `learning_question_answer_keys`
+  - Helpers: `can_manage_learning_question`, `can_create_learning_question`
+  - Guard trigger: `learning_question_guard_immutable`
+    (activity_id/question_type/created_by/created_at immutable)
+  - Internal validators (revoked from public/anon/authenticated):
+    `learning_question_assert_safe_text`, `learning_question_validate_type`,
+    `learning_question_validate_options`, `learning_question_validate_content`,
+    `learning_question_validate_answer_key`,
+    `learning_question_require_mutable_status`,
+    `learning_question_require_parent_{program,course,section,lesson,activity}_status`
+  - RPCs (authenticated + service_role): `create_learning_question`,
+    `update_learning_question`, `set_learning_question_answer_key`,
+    `publish_learning_question`, `unpublish_learning_question`,
+    `archive_learning_question`, `moderate_learning_question`,
+    `reorder_learning_questions`
+  - **Not applied to remote Supabase.** No prior migration (20260828–20260836)
+    modified.
 
 ## Security review
 
-- FORCE + ENABLE RLS on `learning_lesson_content_blocks`; client I/U/D revoked
-  (RPC-only writes).
-- **No anon SELECT policy and no anon table grant.** `is_platform_admin()` only
-  ever evaluated on authenticated policies (no anon path).
-- SECURITY DEFINER + `search_path = public` on all functions; RPC EXECUTE revoked
-  from `public`/`anon`, granted to `authenticated`/`service_role`; internal
-  validators revoked from all clients.
-- Server-authoritative identity (`auth.uid()`); `created_by`/`updated_by` never
-  client-supplied; `lesson_id`/`block_type`/`created_by`/`created_at` immutable
-  (guard trigger + no RPC assignment).
-- Course/space scope derived from the parent chain (only `lesson_id` stored); no
-  client `course_id`/`space_id`.
-- Learner content-body reads require `has_learning_course_access` (incl. active
-  parent-program enrollment inheritance) + published lesson + published block;
-  space-member draft access is **not** widened; no illegal status transitions
-  (suspended/archived → platform moderation only).
-- Fail-closed validation: block_type allowlist (reserved rejected, deferred
-  absent), per-type content bounds, safe-text (no raw HTML/JS/iframe/event
-  handlers), safe-url (http(s) only, ≤ 2048 chars, no js/vbscript/data schemes).
-- Append-only audit via `learning_audit_write` (content payload not audited).
+- FORCE + ENABLE RLS on `learning_questions` and
+  `learning_question_answer_keys`; client `INSERT/UPDATE/DELETE` revoked
+  (RPC-only writes); `SELECT` granted to `authenticated` only; `service_role`
+  full.
+- **Staff-only reads**: question and answer-key SELECT policies are limited to
+  space/program/course managers, course staff, and platform admins. No learner
+  policy, no `is_learning_space_member`, no `has_learning_course_access`, no anon
+  policy/grant. `is_platform_admin()` is only reached from authenticated
+  policies. Activities M1 draft surface is not widened.
+- **Answer-key secrecy**: written only via `set_learning_question_answer_key`
+  (single INSERT path, upsert), validated against the immutable type + current
+  content; never returned from any non-key RPC (create/update/publish/unpublish/
+  archive/moderate) and never exposed to learners; no learner-facing read RPC.
+- SECURITY DEFINER + `search_path = public` on all functions; EXECUTE revoked
+  from public/anon and granted to authenticated/service_role; internal
+  validators revoked from authenticated too.
+- Server-authoritative identity via `auth.uid()`; `created_by`/`updated_by` and
+  all scope ids (`course_id`/`space_id`/`lesson_id`) are never client-supplied;
+  scope derived from the locked parent chain.
+- Immutability enforced by guard trigger + no RPC assigning identity columns; a
+  question can never be moved to another activity; reorder requires the full
+  unique per-activity id set and is two-phase (no `UNIQUE(activity_id,
+  position)`).
+- Fail-closed validation: type allowlist (reserved rejected on create; deferred
+  absent), per-type `content` (object-only ≤ 16384 bytes, key allowlist, bounded
+  prompt/options/blanks, safe-text rejecting HTML/JS/iframe), per-type
+  `answer_key` (object-only ≤ 16384 bytes, key allowlist, cross-checked against
+  content; boolean-only true/false; non-negative numeric tolerance; **no client
+  regex; no equation/expression evaluator**).
+- Append-only audit via `learning_audit_write` for all lifecycle actions
+  (payloads not copied into the trail).
 
 ## Tests
 
-- `lib/learning/lessonContentBlocksFoundation.test.ts`: **53 passed**.
-- All learning tests (`npx vitest run lib/learning`): **9 files, 315 passed**.
-- Full suite (`npx vitest run`): **1564 passed, 3 failed** — the 3 failures are
-  **pre-existing and unrelated** (`lib/store/paymentOutcomeSync.test.ts`,
-  `lib/store/storeRemoteE2eSandboxScripts.test.ts`); no learning/content-block
-  files touch the store domain, and `git diff` vs base shows no tracked-file
-  changes outside this slice.
+- New: `lib/learning/questionsFoundation.test.ts` — **67 passed**.
+- Full learning suite (`npx vitest run lib/learning`): **10 files, 382 tests,
+  all passed** (prior learning tests still pass).
+- Coverage includes: both tables schema; Activity→Question only; no
+  move/banks/pools; V1 types only; reserved rejected; deferred fail-closed
+  (no matching/ordering validators); per-type payload; duplicate option keys;
+  single one-correct; multiple existing keys; true_false boolean;
+  short_answer limits + normalization allowlist; fill_blank completeness;
+  numeric tolerance; staff-only visibility; ordinary space member gets nothing;
+  no learner SELECT; answer keys never in non-key RPCs; publish/unpublish
+  idempotent lifecycle; safe two-phase reorder; RPC-only writes; FORCE RLS;
+  SECURITY DEFINER grants; no attempts/grades/banks tables; documentation.
 
 ## TypeScript
 
-- `npx tsc --noEmit`: **pass** (exit 0).
+- `npx tsc --noEmit` — **passed** (no errors).
 
 ## Build
 
-- `npm run build` (Next.js 16.2.10): **pass** (exit 0; 59 static pages generated).
+- `npm run build` — **passed** (compiled successfully; 59/59 static pages
+  generated).
 
 ## git diff --check
 
-- `git diff --cached --check`: **clean** (no whitespace errors).
+- `git diff --cached --check` — **clean** (no whitespace/conflict errors).
 
 ## git status --short
+
+Staged for the single feature commit:
 
 ```
 M  docs/ai/CURRENT_TASK.md
 M  docs/ai/CURSOR_REPORT.md
-A  docs/learning/implementation/LESSON_CONTENT_BLOCKS_FOUNDATION_V1.md
-A  lib/learning/lessonContentBlocksFoundation.test.ts
-A  lib/learning/lessonContentBlocksFoundation.ts
-A  supabase/migrations/20260836_learning_lesson_content_blocks_foundation_v1.sql
+A  docs/learning/implementation/QUESTIONS_FOUNDATION_V1.md
+A  lib/learning/questionsFoundation.test.ts
+A  lib/learning/questionsFoundation.ts
+A  supabase/migrations/20260837_learning_questions_foundation_v1.sql
 ```
+
+(Untracked `.next/` build artifacts are gitignored and not part of the commit.)
 
 ## Open issues
 
-- Remote apply of `20260828`–`20260836` remains pending explicit approval.
-- Pre-existing `lib/store` test failures (payment outcome sync + store remote E2E
-  sandbox scripts) are outside this slice's scope and were not modified.
-- Deferred by design: `learning_lesson_items` unified lesson spine, reserved
-  `ai_block`/`interactive_block` behavior, block-level progress, media
-  upload/storage, and UI.
+- None blocking. Learner delivery (Attempts: responses + grading), and enabling
+  the reserved `long_answer`/`essay` types, are the intended next slices.
+- Migration `20260837` is committed but **not applied to remote Supabase** (per
+  task constraints); apply via targeted migration later per
+  `docs/DEVELOPMENT_WORKFLOW.md`.
