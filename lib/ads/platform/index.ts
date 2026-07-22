@@ -3,6 +3,7 @@ export * from "./placementRegistry";
 export * from "./placementCompatibility";
 export * from "./campaignContracts";
 export * from "./placementResolutionContracts";
+export * from "./reportingHandle";
 export * from "./eventReportContracts";
 export * from "./deliveryContracts";
 export * from "./deliveryEligibilityContracts";

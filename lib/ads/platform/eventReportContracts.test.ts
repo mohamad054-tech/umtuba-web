@@ -15,6 +15,7 @@ import {
   ADS_PLACEMENT_REGISTRY,
   validateAdsPlacementRegistry,
 } from "./placementRegistry";
+import { ADS_REPORTING_HANDLE_VERSION } from "./reportingHandle";
 
 const FIXED_NOW_MS = Date.parse("2026-07-22T09:00:00.000Z");
 
@@ -24,12 +25,11 @@ function baseRequest(
   return {
     contractVersion: ADS_EVENT_REPORT_CONTRACT_VERSION,
     eventType: "impression",
-    placementId: "WATCH_FEED",
-    adId: "ad-1",
-    campaignId: "campaign-1",
-    adSetId: "ad-set-1",
-    creativeId: "creative-1",
-    dedupeKey: "dedupe:impression:ad-1:client-1",
+    reportingHandle: {
+      version: ADS_REPORTING_HANDLE_VERSION,
+      token: "arh_v1_opaque_token_report_1",
+    },
+    dedupeKey: "dedupe:impression:handle:client-1",
     occurredAt: "2026-07-22T08:59:30.000Z",
     clientEventId: "client-event-1",
     sessionId: "session-1",
@@ -49,19 +49,23 @@ function baseRequest(
 }
 
 describe("Ads Event Report Contracts V1", () => {
-  it("accepts a valid impression contract shape", () => {
+  it("accepts a valid impression contract shape with opaque reporting handle", () => {
     const result = validateEventReportRequest(baseRequest(), {
       nowMs: FIXED_NOW_MS,
     });
     expect(result).toEqual({ valid: true });
   });
 
-  it("accepts a valid click contract shape", () => {
+  it("accepts a valid click contract shape with opaque reporting handle", () => {
     const result = validateEventReportRequest(
       baseRequest({
         eventType: "click",
-        dedupeKey: "dedupe:click:ad-1:client-2",
+        dedupeKey: "dedupe:click:handle:client-2",
         clientEventId: "client-event-2",
+        reportingHandle: {
+          version: ADS_REPORTING_HANDLE_VERSION,
+          token: "arh_v1_opaque_token_report_2",
+        },
       }),
       { nowMs: FIXED_NOW_MS }
     );
@@ -100,23 +104,55 @@ describe("Ads Event Report Contracts V1", () => {
     }
   });
 
-  it("rejects invalid placement IDs using the platform registry", () => {
+  it("rejects client-authoritative entity and placement fields", () => {
     expect(validateAdsPlacementRegistry()).toEqual([]);
     expect(ADS_PLACEMENT_REGISTRY.WATCH_FEED.id).toBe("WATCH_FEED");
 
-    const result = validateEventReportRequest(
+    const withPlacement = validateEventReportRequest(
       {
         ...baseRequest(),
-        placementId: "stories",
+        placementId: "WATCH_FEED",
       } as unknown,
       { nowMs: FIXED_NOW_MS }
     );
-    expect(result).toMatchObject({ valid: false });
-    if (!result.valid) {
-      expect(result.issues.some((issue) => issue.includes("placementId"))).toBe(
-        true
-      );
+    expect(withPlacement).toMatchObject({ valid: false });
+    if (!withPlacement.valid) {
+      expect(
+        withPlacement.issues.some((issue) => issue.includes("placementId"))
+      ).toBe(true);
     }
+
+    const withCampaign = validateEventReportRequest(
+      {
+        ...baseRequest(),
+        campaignId: "campaign-1",
+        adId: "ad-1",
+      } as unknown,
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(withCampaign).toMatchObject({ valid: false });
+  });
+
+  it("rejects missing or invalid opaque reporting handles", () => {
+    const missing = validateEventReportRequest(
+      {
+        ...baseRequest(),
+        reportingHandle: undefined,
+      } as unknown,
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(missing).toMatchObject({ valid: false });
+
+    const leaking = validateEventReportRequest(
+      baseRequest({
+        reportingHandle: {
+          version: ADS_REPORTING_HANDLE_VERSION,
+          token: JSON.stringify({ campaignId: "campaign-1" }),
+        },
+      }),
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(leaking).toMatchObject({ valid: false });
   });
 
   it("rejects missing dedupe keys", () => {
@@ -135,32 +171,30 @@ describe("Ads Event Report Contracts V1", () => {
     }
   });
 
-  it("rejects empty IDs", () => {
+  it("rejects empty client event ids", () => {
     const result = validateEventReportRequest(
       baseRequest({
-        adId: "   ",
-        campaignId: "",
+        clientEventId: "   ",
       }),
       { nowMs: FIXED_NOW_MS }
     );
     expect(result).toMatchObject({ valid: false });
     if (!result.valid) {
-      expect(result.issues.some((issue) => issue.includes("adId"))).toBe(true);
-      expect(result.issues.some((issue) => issue.includes("campaignId"))).toBe(
+      expect(result.issues.some((issue) => issue.includes("clientEventId"))).toBe(
         true
       );
     }
   });
 
-  it("rejects oversized IDs", () => {
+  it("rejects oversized ids", () => {
     const oversized = "x".repeat(ADS_EVENT_REPORT_MAX_ID_LENGTH + 1);
     const result = validateEventReportRequest(
-      baseRequest({ creativeId: oversized }),
+      baseRequest({ clientEventId: oversized }),
       { nowMs: FIXED_NOW_MS }
     );
     expect(result).toMatchObject({ valid: false });
     if (!result.valid) {
-      expect(result.issues.some((issue) => issue.includes("creativeId"))).toBe(
+      expect(result.issues.some((issue) => issue.includes("clientEventId"))).toBe(
         true
       );
     }
@@ -301,7 +335,8 @@ describe("Ads Event Report Contracts V1", () => {
     expect(ack.productionEnabled).toBe(false);
     expect(ack.validationErrors).toEqual([]);
     expect(ack.eventType).toBe("impression");
-    expect(ack.placementId).toBe("WATCH_FEED");
+    expect(ack.placementId).toBeNull();
+    expect(ack.reportingHandleVersion).toBe(ADS_REPORTING_HANDLE_VERSION);
     expect(ack.contractVersion).toBe(ADS_EVENT_REPORT_CONTRACT_VERSION);
   });
 

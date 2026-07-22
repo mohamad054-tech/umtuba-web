@@ -8,6 +8,10 @@ import {
   isCreativeTypeSupportedByPlacement,
   type AdsPlatformPlacementId,
 } from "./placementRegistry";
+import {
+  validateAdsReportingHandleOpaqueToken,
+  type AdsReportingHandleOpaqueToken,
+} from "./reportingHandle";
 
 /**
  * Ads Render Descriptor Contracts V1 — product-facing serve metadata only.
@@ -100,11 +104,12 @@ export type AdsRenderDisclosureMetadata = Readonly<{
 
 /**
  * Reporting handles for future impression / click event binding.
- * Opaque tokens only — never URLs.
+ * Client-facing opaque reporting-handle tokens only — never URLs or entity ids.
+ * Internal reporting-handle payloads are never product-visible here.
  */
 export type AdsRenderReportingHandles = Readonly<{
-  impressionHandle: string;
-  clickHandle: string;
+  impressionHandle: AdsReportingHandleOpaqueToken;
+  clickHandle: AdsReportingHandleOpaqueToken;
 }>;
 
 /**
@@ -324,20 +329,24 @@ function validateReportingHandles(
     issues
   );
 
-  validateOpaqueReference(
+  const impressionToken = validateAdsReportingHandleOpaqueToken(
     value.impressionHandle,
-    "reportingHandles.impressionHandle",
-    issues
+    "reportingHandles.impressionHandle"
   );
-  validateOpaqueReference(
+  if (!impressionToken.valid) {
+    issues.push(...impressionToken.issues);
+  }
+  const clickToken = validateAdsReportingHandleOpaqueToken(
     value.clickHandle,
-    "reportingHandles.clickHandle",
-    issues
+    "reportingHandles.clickHandle"
   );
+  if (!clickToken.valid) {
+    issues.push(...clickToken.issues);
+  }
 
   if (
     isNonEmptyString(value.impressionHandle) &&
-    !looksLikeAdsRenderUrl(value.impressionHandle)
+    impressionToken.valid
   ) {
     const existing = seenHandles.get(value.impressionHandle);
     if (existing) {
@@ -352,10 +361,7 @@ function validateReportingHandles(
     }
   }
 
-  if (
-    isNonEmptyString(value.clickHandle) &&
-    !looksLikeAdsRenderUrl(value.clickHandle)
-  ) {
+  if (isNonEmptyString(value.clickHandle) && clickToken.valid) {
     const existing = seenHandles.get(value.clickHandle);
     if (existing) {
       issues.push(

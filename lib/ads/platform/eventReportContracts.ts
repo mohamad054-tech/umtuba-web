@@ -1,8 +1,10 @@
 import type { ContractValidationResult } from "./creativeContracts";
+import type { AdsPlatformPlacementId } from "./placementRegistry";
 import {
-  isAdsPlacementId,
-  type AdsPlatformPlacementId,
-} from "./placementRegistry";
+  ADS_REPORTING_HANDLE_VERSION,
+  validateAdsReportingHandleClientReference,
+  type AdsReportingHandleClientReference,
+} from "./reportingHandle";
 
 /**
  * Ads Event Report Contracts V1 — product-facing measurement report shapes only.
@@ -13,6 +15,9 @@ import {
  * - No sensitive targeting attributes (health, politics, religion, etc.).
  * - No arbitrary unbounded metadata.
  * - No teen profiling fields (age, school, guardian, minor cohort labels).
+ * - Clients are never authoritative for advertiser / campaign / ad-set / ad /
+ *   creative / placement / trust / billing identity — only an opaque
+ *   reporting-handle reference is accepted.
  *
  * This module never accepts reports for production ingestion and never verifies
  * or issues cryptographic signatures. Reusable later by server-side ingest.
@@ -60,6 +65,25 @@ export const ADS_EVENT_REPORT_MAX_METADATA_BYTES = 2048;
 export const ADS_EVENT_REPORT_MAX_METADATA_KEYS = 16;
 
 /**
+ * Client-authoritative entity / trust / billing fields — forbidden on V1 reports.
+ * Identity must come from the opaque reporting handle, not the client.
+ */
+export const ADS_EVENT_REPORT_FORBIDDEN_CLIENT_AUTHORITY_FIELDS = [
+  "adId",
+  "campaignId",
+  "adSetId",
+  "creativeId",
+  "placementId",
+  "advertiserAccountId",
+  "advertiserId",
+  "accountId",
+  "trustLevel",
+  "billable",
+  "countable",
+  "billing",
+] as const;
+
+/**
  * Field names that must never appear on a V1 event report (fail-closed).
  * Covers contact info, precise location, fingerprints, and teen profiling.
  */
@@ -93,6 +117,7 @@ export const ADS_EVENT_REPORT_PROHIBITED_FIELDS = [
   "healthCondition",
   "sexualOrientation",
   "racialEthnicity",
+  ...ADS_EVENT_REPORT_FORBIDDEN_CLIENT_AUTHORITY_FIELDS,
 ] as const;
 
 export type AdsEventTrustContext = Readonly<{
@@ -119,11 +144,11 @@ export type AdsEventViewerReference = Readonly<{
 export type AdsEventReportRequest = Readonly<{
   contractVersion: typeof ADS_EVENT_REPORT_CONTRACT_VERSION;
   eventType: AdsEventReportEventType;
-  placementId: AdsPlatformPlacementId;
-  adId: string;
-  campaignId: string;
-  adSetId: string;
-  creativeId: string;
+  /**
+   * Opaque server-issued reporting-handle reference.
+   * Entity / placement / trust / billing identity is never client-authoritative.
+   */
+  reportingHandle: AdsReportingHandleClientReference;
   dedupeKey: string;
   /** ISO-8601 timestamp when the event occurred. */
   occurredAt: string;
@@ -152,7 +177,13 @@ export type AdsEventReportAcknowledgement = Readonly<{
   productionEnabled: false;
   validationErrors: readonly string[];
   eventType: AdsEventReportEventType | null;
+  /**
+   * Always null in V1 — placement is resolved from the opaque handle later,
+   * never trusted from the client report.
+   */
   placementId: AdsPlatformPlacementId | null;
+  /** Echo of the opaque handle version when structurally present. */
+  reportingHandleVersion: typeof ADS_REPORTING_HANDLE_VERSION | null;
 }>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -366,37 +397,15 @@ export function validateEventReportRequest(
     issues.push("eventType is not supported.");
   }
 
-  if (
-    typeof input.placementId !== "string" ||
-    !isAdsPlacementId(input.placementId)
-  ) {
-    issues.push("placementId is not a registered Ads Platform placement.");
+  const handleValidation = validateAdsReportingHandleClientReference(
+    input.reportingHandle
+  );
+  if (!handleValidation.valid) {
+    for (const issue of handleValidation.issues) {
+      issues.push(`reportingHandle: ${issue}`);
+    }
   }
 
-  validateIdField(
-    input.adId,
-    "adId",
-    ADS_EVENT_REPORT_MAX_ID_LENGTH,
-    issues
-  );
-  validateIdField(
-    input.campaignId,
-    "campaignId",
-    ADS_EVENT_REPORT_MAX_ID_LENGTH,
-    issues
-  );
-  validateIdField(
-    input.adSetId,
-    "adSetId",
-    ADS_EVENT_REPORT_MAX_ID_LENGTH,
-    issues
-  );
-  validateIdField(
-    input.creativeId,
-    "creativeId",
-    ADS_EVENT_REPORT_MAX_ID_LENGTH,
-    issues
-  );
   validateIdField(
     input.clientEventId,
     "clientEventId",
@@ -456,6 +465,7 @@ export function validateEventReportRequest(
 /**
  * Evaluates a report request into an acknowledgement.
  * Structurally valid requests are still never accepted for ingestion in V1.
+ * Placement is never trusted from the client — always null until handle resolve.
  */
 export function acknowledgeEventReportRequest(
   input: unknown,
@@ -473,11 +483,11 @@ export function acknowledgeEventReportRequest(
       ? (record.eventType as AdsEventReportEventType)
       : null;
 
-  const placementId =
+  const reportingHandleVersion =
     record &&
-    typeof record.placementId === "string" &&
-    isAdsPlacementId(record.placementId)
-      ? record.placementId
+    isRecord(record.reportingHandle) &&
+    record.reportingHandle.version === ADS_REPORTING_HANDLE_VERSION
+      ? ADS_REPORTING_HANDLE_VERSION
       : null;
 
   if (validation.valid) {
@@ -488,7 +498,8 @@ export function acknowledgeEventReportRequest(
       productionEnabled: false,
       validationErrors: [],
       eventType,
-      placementId,
+      placementId: null,
+      reportingHandleVersion,
     };
   }
 
@@ -499,6 +510,7 @@ export function acknowledgeEventReportRequest(
     productionEnabled: false,
     validationErrors: validation.issues,
     eventType,
-    placementId,
+    placementId: null,
+    reportingHandleVersion,
   };
 }
