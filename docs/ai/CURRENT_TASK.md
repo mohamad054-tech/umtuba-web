@@ -2,61 +2,63 @@
 
 ## Task title
 
-UM Learning OS — Activities Foundation V1
+UM Learning OS — Enrollments Foundation V1
 
 ## Goal
 
-DB-authoritative Activities foundation under Lessons: an Activity as a generic
-educational **interaction container** (table + 1:1 reserved/inert settings
-sidecar), permission helpers (authority inherited from Lesson → Section → Course,
-no activity staff table), FORCE RLS on the activity table, SECURITY DEFINER RPCs,
-deterministic ordering within a Lesson, full **6-level** parent-chain lifecycle
-gates (space active; program + course + section + lesson draft|published), an
-**immutable 16-type allowlist**, a lean `ai_metadata` surface, a bounded shallow
-`config` JSON, audit integration, TypeScript contracts, contract tests, and an
-implementation doc.
+DB-authoritative Enrollments foundation: an enrollment is an **ENTITLEMENT to
+participate** in a Program **XOR** a Course. It is **NOT** payment, progress,
+completion percentage, certificate, attempt, submission, grade, seat/capacity,
+or space membership. Its lifecycle
+(`pending | active | suspended | expired | cancelled | completed`) is **distinct
+from content lifecycle** and **independent of space membership**.
 
-Hierarchy: Space → Program → Course → Section → Lesson → Activity. An Activity is
-an interaction container under exactly one Lesson — it is NOT a question,
-attempt, submission, answer, grade, progress record, certificate, live session,
-or AI execution. `lesson_id` and `type` are immutable.
+Delivered: the `learning_enrollments` table (Program XOR Course via nullable hard
+FKs + `target_type` + denormalized `space_id`), an append-only
+`learning_enrollment_events` log + `learning_audit_write` summary, immutable
+provenance (10-source allowlist; `self_enrollment` reserved for learner RPCs),
+soft references for payments/UEOS (no cross-product FKs), one live enrollment per
+learner per target (partial unique on `pending|active|suspended`), **no anon
+SELECT**, entitlement helpers evaluated **live**
+(`has_learning_program_access` / `has_learning_course_access`), manage/enroll
+helpers (`can_manage_learning_enrollment`, `can_enroll_in_learning_program` /
+`_course`) that reuse the existing settings flags (`allow_self_enroll`,
+`require_space_membership`, `require_program_enrollment`), SECURITY DEFINER RPCs,
+FORCE RLS, TypeScript contracts, contract tests, and an implementation doc.
 
-**CRITICAL divergence from Lessons:** there is **NO anonymous/public SELECT
-policy** in V1 (privacy-safe for assessments). `visibility` is retained for
-forward compatibility only and has no anon effect.
+Target model: Space → Program (`target_type='program'`) or
+Space → Program → Course (`target_type='course'`). Membership and enrollment stay
+independent; `require_*` gate only the act of enrolling.
 
 ## Allowed scope
 
-- `supabase/migrations/20260833_learning_activities_foundation_v1.sql`
-- `lib/learning/activitiesFoundation.ts`
-- `lib/learning/activitiesFoundation.test.ts`
-- `docs/learning/implementation/ACTIVITIES_FOUNDATION_V1.md`
+- `supabase/migrations/20260834_learning_enrollments_foundation_v1.sql`
+- `lib/learning/enrollmentsFoundation.ts`
+- `lib/learning/enrollmentsFoundation.test.ts`
+- `docs/learning/implementation/ENROLLMENTS_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Questions / question banks / answers / attempts / submissions / grades /
-  rubrics / auto-evaluation engines / teacher workflows / coding execution /
-  file storage / AI execution / progress / completion / certificates /
-  enrollments / payments / marketplace / booking / calendar / live-session
-  behavior / AI-tutor behavior / comments / UI / search / notifications
-- Any `learning_lesson_items` table (reserved contract only — not implemented)
-- Any type-specific engines or type-specific columns on the activity row
-- Any `learning_activity_staff` table or staff-assignment RPCs (authority
-  inherits from Lesson/Section/Course)
-- `category` / `target_audience` / `marketplace_ready` / `certification_ready` /
-  descriptive `content_type` on activities (stay on their owning entities)
-- Changing `lesson_id` or `type` after creation (both immutable)
-- Making `type` activate any behavior (immutable typed slot only)
-- Adding an anonymous/public SELECT policy or `anon` table grant
-- Modifying Spaces/Programs/Courses/Sections/Lessons migrations or modules
-  outside the Activities handoff
+- Payments / pricing / checkout / refunds / marketplace
+- Progress / completion tracking / certificates
+- Attempts / submissions / grades / rubrics / auto-evaluation engines
+- Seats / capacity / waitlists / booking / calendar / live-session behavior
+- Auto-creating space membership from an enrollment (membership stays independent)
+- Any cross-product foreign keys into Store/UEOS/payments (soft refs only)
+- Any anonymous/public SELECT policy or `anon` table grant
+- Reviving terminal enrollment rows (re-enroll creates a NEW row)
+- Making `complete` read/write progress/grade/certificate data (it is inert)
+- Changing `space_id`/`target_type`/`program_id`/`course_id`/`user_id`/`source`
+  after creation (all immutable)
+- Modifying Spaces/Programs/Courses/Sections/Lessons/Activities migrations or
+  modules outside the Enrollments handoff
 - Commit, push, merge, remote migration apply without approval
 
 ## Branch
 
-`office/learning-activities-foundation-v1`
+`office/learning-enrollments-foundation-v1`
 
 ## Status
 
