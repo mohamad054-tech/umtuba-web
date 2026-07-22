@@ -1,119 +1,79 @@
-# Cursor Report — Ads Platform Phase 1 Contracts
+# Cursor Report — Learning Spaces Membership Foundation V1 (review fixes)
 
 ## Summary
 
-Implemented the first executable, reusable Ads Platform contract foundation.
-The change adds a typed placement registry, creative contracts, campaign object
-references, and placement request/response contracts. It contains no delivery,
-serving, targeting execution, ranking, billing, UEOS, database, Supabase, route,
-API, measurement, reporting, or UI behavior.
+Rebased `office/learning-spaces-membership-foundation-v1` onto latest
+`origin/alpha-0.2` (`b99d1b8`) and implemented pre-merge review fixes in the
+existing `20260828` migration (numbering preserved). Membership RPCs now require
+an **active** space; `allow_member_invites` and `public_member_directory` are
+enforced; peer-admin mutations require the target's current rank strictly below
+the actor; invite email validation matches the store pattern `^\S+@\S+\.\S+$`.
+Contract tests expanded for the review cases. Not merged into `alpha-0.2`.
 
-All 12 placements are disabled and hidden by default. Placeholder responses are
-explicitly non-production-visible and mark eligibility as `not_evaluated`.
-
-Branch: `alpha-0.2`
-Base: `721d4ce636082a60bcfd36491009e653d275eef7`
-
-No commit. No push. No remote migration apply.
+Branch: `office/learning-spaces-membership-foundation-v1`
 
 ## Exact files changed
 
-### New
-
-- `lib/ads/platform/creativeContracts.ts`
-- `lib/ads/platform/placementRegistry.ts`
-- `lib/ads/platform/campaignContracts.ts`
-- `lib/ads/platform/placementResolutionContracts.ts`
-- `lib/ads/platform/index.ts`
-- `lib/ads/platform/adsPlatformContracts.test.ts`
-
 ### Modified
 
-- `lib/ads/index.ts`
+- `supabase/migrations/20260828_learning_spaces_membership_foundation_v1.sql`
+- `lib/learning/spacesFoundation.ts`
+- `lib/learning/spacesFoundation.test.ts`
+- `docs/learning/implementation/SPACES_MEMBERSHIP_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Contracts introduced
-
-- Creative discriminated union for Video, Image, Carousel, Text, Live
-  Promotion, Store Promotion, Learning Promotion, Game Promotion, and Brand
-- Campaign, Ad Set, and Ad models composed from Creative, Placement, Targeting,
-  Budget, Policy, and Lifecycle references
-- Versioned placement-resolution request/response contracts
-- Structural validation for creative and placement-resolution contracts
-- Compatibility lookup between registered placements and creative types
-
-## Placement registry
-
-Stable placement ids:
-
-- `WATCH_FEED`
-- `DISCOVER_FEED`
-- `WORLD_FEED`
-- `WORLD_PLACE`
-- `WORLD_NEARBY`
-- `LIVE_FEED`
-- `LIVE_ROOM`
-- `STORE_HOME`
-- `STORE_PRODUCT`
-- `SEARCH`
-- `LEARNING`
-- `GAMES`
-
-Every definition includes display name, owning product, supported creative
-types, feature flag, typed capabilities, and visibility. Registry validation
-checks ids, feature flags, creative coverage, and default-off/hidden safety.
-
 ## Migrations created
 
-None.
+None (existing `20260828_learning_spaces_membership_foundation_v1.sql` updated
+in place on the feature branch before remote apply).
 
 ## Security review
 
-- No database or remote access
-- No Supabase client or RPC
-- No UEOS calls or financial logic
-- No routes, API handlers, server actions, or UI
-- No production feature enabled
-- All placement feature flags default to `false`
-- All placement visibility defaults to `hidden`
-- Placeholder responses set `productionVisible: false`
+- Membership invite/accept/role/suspend/remove/transfer refuse when space is not
+  `active` (covers archived and suspended).
+- Peer-admin demotion/suspend/remove blocked unless target rank &lt; actor rank
+  (platform admin may still manage).
+- `allow_member_invites=false` blocks non-manager invites; owners/admins retain
+  invite management.
+- `public_member_directory=false` limits member SELECT to own row (managers /
+  platform admin still see directory).
+- Invite email constraint + RPC validation use store-consistent pattern; weak
+  length-only check removed.
+- No secrets exposed; no remote migration apply; no merge to `alpha-0.2`.
 
 ## Tests
 
-- Focused Ads contracts + existing Ads foundation/admin suites:
-  **PASS — 46/46**
-- New contract suite: **PASS — 11/11**
-- Full `npm test`: **903 passed / 3 failed**
-  - Existing Windows CRLF-sensitive Store baseline only:
-    - `lib/store/paymentOutcomeSync.test.ts` (1)
-    - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
-  - No Ads Platform contract failure
+```
+npx vitest run lib/learning/spacesFoundation.test.ts
+```
+
+Result: **35 passed** (1 file).
 
 ## TypeScript
 
-`npx tsc --noEmit`: **PASS**
+```
+npx tsc --noEmit
+```
+
+Result: **pass** (exit 0).
 
 ## Build
 
-`npm run build`: **PASS**
+Not required (no app UI / entry-point changes).
 
 ## git diff --check
 
-**PASS**
+**pass** (exit 0).
 
 ## git status --short
 
-Expected uncommitted Phase 1 files only:
-
-- modified: `docs/ai/CURRENT_TASK.md`
-- modified: `docs/ai/CURSOR_REPORT.md`
-- modified: `lib/ads/index.ts`
-- untracked: `lib/ads/platform/**`
+See post-commit/push status in the handoff response.
 
 ## Open issues
 
-- Three inherited CRLF-sensitive Store tests remain outside Ads scope.
-- Placement definitions are contracts only; no resolver/delivery implementation
-  exists or is authorized.
-- Feature flags are metadata contracts only and remain disabled by default.
+- Migration still not applied to remote Supabase (by design for this phase).
+- Feature branch ready for final merge review into `alpha-0.2`; do not merge
+  until that review is complete.
+- After rebase, push may require `--force-with-lease` to update the remote
+  feature branch tip.

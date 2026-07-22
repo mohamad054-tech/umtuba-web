@@ -176,10 +176,11 @@ describe("Spaces Membership Foundation V1 — 20 user scenarios (SQL contracts)"
   });
 
   // 5
-  it("scenario: owner/admin invite member; instructors cannot invite in V1", () => {
-    expect(sql).toMatch(/Only owner or admin can invite members/);
-    expect(sql).toMatch(/Instructors cannot invite in V1/);
-    expect(sql).toMatch(/learning_space_role_at_least\(v_caller_role, 'admin'\)/);
+  it("scenario: managers always invite; members only when allow_member_invites", () => {
+    expect(sql).toMatch(/Member invites are disabled for this space/);
+    expect(sql).toMatch(/Only owner or admin can invite administrators/);
+    expect(sql).toMatch(/allow_member_invites/);
+    expect(sql).toMatch(/can_manage_learning_space\(p_space_id, v_uid\)/);
   });
 
   // 6
@@ -372,5 +373,118 @@ describe("Spaces Membership Foundation V1 — documentation", () => {
     expect(doc).toMatch(/is_platform_admin/);
     expect(doc).toMatch(/Programs/);
     expect(doc).toMatch(/Does not include|exclusions|out of scope/i);
+  });
+});
+
+describe("Spaces Membership Foundation V1 — review fixes", () => {
+  const sql = read(MIGRATION);
+
+  it("rejects invites on archived spaces", () => {
+    expect(sql).toMatch(
+      /invite_learning_space_member[\s\S]*?Learning space must be active for membership changes/
+    );
+    expect(sql).toMatch(/v_space_status is distinct from 'active'/);
+  });
+
+  it("rejects invites on suspended spaces", () => {
+    // Same ACTIVE gate covers suspended and archived (status ≠ active).
+    const inviteStart = sql.indexOf(
+      "create or replace function public.invite_learning_space_member"
+    );
+    const inviteEnd = sql.indexOf(
+      "create or replace function public.accept_learning_space_invite",
+      inviteStart
+    );
+    const inviteFn = sql.slice(inviteStart, inviteEnd);
+    expect(inviteFn).toContain(
+      "Learning space must be active for membership changes"
+    );
+    expect(inviteFn).toMatch(/v_space_status is distinct from 'active'/);
+  });
+
+  it("rejects accept when space is not active (archived/suspended)", () => {
+    const acceptStart = sql.indexOf(
+      "create or replace function public.accept_learning_space_invite"
+    );
+    const acceptEnd = sql.indexOf(
+      "create or replace function public.update_learning_space_member_role",
+      acceptStart
+    );
+    const acceptFn = sql.slice(acceptStart, acceptEnd);
+    expect(acceptFn).toContain(
+      "Learning space must be active for membership changes"
+    );
+  });
+
+  it("rejects peer-admin demotion (current target rank must be strictly below actor)", () => {
+    const updateStart = sql.indexOf(
+      "create or replace function public.update_learning_space_member_role"
+    );
+    const updateEnd = sql.indexOf(
+      "create or replace function public.suspend_learning_space_member",
+      updateStart
+    );
+    const updateFn = sql.slice(updateStart, updateEnd);
+    expect(updateFn).toContain("Cannot manage a peer or higher-ranked member");
+    expect(updateFn).toMatch(/v_target_rank < v_caller_rank/);
+  });
+
+  it("rejects peer-admin suspension", () => {
+    const suspendStart = sql.indexOf(
+      "create or replace function public.suspend_learning_space_member"
+    );
+    const suspendEnd = sql.indexOf(
+      "create or replace function public.remove_learning_space_member",
+      suspendStart
+    );
+    const suspendFn = sql.slice(suspendStart, suspendEnd);
+    expect(suspendFn).toContain("Cannot manage a peer or higher-ranked member");
+    expect(suspendFn).toMatch(/v_target_rank < v_caller_rank/);
+  });
+
+  it("rejects peer-admin removal", () => {
+    const removeStart = sql.indexOf(
+      "create or replace function public.remove_learning_space_member"
+    );
+    const removeEnd = sql.indexOf(
+      "create or replace function public.transfer_learning_space_ownership",
+      removeStart
+    );
+    const removeFn = sql.slice(removeStart, removeEnd);
+    expect(removeFn).toContain("Cannot manage a peer or higher-ranked member");
+    expect(removeFn).toMatch(/v_target_rank < v_caller_rank/);
+  });
+
+  it("enforces allow_member_invites for non-managers", () => {
+    expect(sql).toMatch(/Member invites are disabled for this space/);
+    expect(sql).toMatch(/s\.allow_member_invites/);
+    expect(sql).toMatch(
+      /Owners\/admins \(and platform admins\) retain invite management/
+    );
+  });
+
+  it("gates full member directory on public_member_directory", () => {
+    const policyStart = sql.indexOf(
+      'create policy "Members read space memberships"'
+    );
+    const policyEnd = sql.indexOf(
+      'create policy "Managers and invitees read invites"',
+      policyStart
+    );
+    const policy = sql.slice(policyStart, policyEnd);
+    expect(policy).toMatch(/user_id = \(select auth\.uid\(\)\)/);
+    expect(policy).toMatch(/public_member_directory is true/);
+    expect(policy).toMatch(/can_manage_learning_space\(space_id\)/);
+    // Must not grant blanket member enumeration without the setting.
+    expect(policy).not.toMatch(
+      /user_id = \(select auth\.uid\(\)\)\s+or public\.is_learning_space_member\(space_id\)\s+or/
+    );
+  });
+
+  it("validates invite email with store-consistent pattern", () => {
+    expect(sql).toMatch(/learning_space_invites_email_check/);
+    expect(sql).toMatch(/btrim\(invited_email\) ~ '\^\\S\+@\\S\+\\.\\S\+\$'/);
+    expect(sql).toMatch(/Invite email is invalid/);
+    expect(sql).toMatch(/v_email !~ '\^\\S\+@\\S\+\\.\\S\+\$'/);
   });
 });

@@ -62,8 +62,30 @@ active --suspend--> suspended
 active|* --remove--> removed
 ```
 
-Instructors cannot invite in V1 — only active owner/admin (or platform admin via `can_manage_learning_space`).
+Membership mutations (invite, accept, role update, suspend, remove, ownership
+transfer) require the space status to be **`active`**. Archived and suspended
+spaces reject new members and membership changes.
 
+### Invites (`allow_member_invites`)
+
+- Owners/admins (and platform admins via `can_manage_learning_space`) always
+  retain invite management.
+- Non-manager members may invite only when `learning_space_settings.allow_member_invites`
+  is true; otherwise invite raises `Member invites are disabled for this space`.
+- Non-managers cannot invite `admin`. Invite role cannot exceed the caller's rank.
+- Invite email uses the store-consistent pattern `^\S+@\S+\.\S+$` (length 3–320).
+
+### Peer-admin protection
+
+Role update, suspend, and remove require the target's **current** role rank to be
+**strictly below** the actor's rank. Equal-rank admins cannot demote, suspend, or
+remove each other (platform admin may bypass).
+
+### Member directory (`public_member_directory`)
+
+When `public_member_directory` is false (default), members may SELECT only their
+own membership row. Full membership enumeration requires the setting to be true,
+or manager / platform-admin privilege.
 ## Ownership transfer
 
 `transfer_learning_space_ownership`:
@@ -96,7 +118,7 @@ Partial unique index enforces **exactly one active owner** per space:
 | Table | RLS | SELECT |
 | --- | --- | --- |
 | `learning_spaces` | ENABLE | anon+auth: active+public; auth members; auth platform admins (separate policy) |
-| `learning_space_members` | FORCE | own row / active members / managers / platform admin |
+| `learning_space_members` | FORCE | own row always; full directory only if `public_member_directory`; managers; platform admin |
 | `learning_space_invites` | FORCE | managers / platform admin / invitee pending |
 | `learning_space_settings` | ENABLE | members / platform admin |
 | `learning_audit_events` | FORCE | managers / platform admin |
@@ -108,12 +130,12 @@ No client INSERT/UPDATE/DELETE on these tables — RPCs only.
 | RPC | Who |
 | --- | --- |
 | `create_learning_space` | authenticated |
-| `invite_learning_space_member` | owner/admin (manage) |
-| `accept_learning_space_invite` | invitee |
-| `update_learning_space_member_role` | manage; cannot set/change owner |
-| `suspend_learning_space_member` | manage; cannot suspend active owner |
-| `remove_learning_space_member` | manage; cannot remove active owner |
-| `transfer_learning_space_ownership` | current owner or platform admin |
+| `invite_learning_space_member` | owner/admin always; members if `allow_member_invites`; space must be active |
+| `accept_learning_space_invite` | invitee; space must be active |
+| `update_learning_space_member_role` | manage; peer-rank protected; space must be active |
+| `suspend_learning_space_member` | manage; peer-rank protected; cannot suspend active owner |
+| `remove_learning_space_member` | manage; peer-rank protected; cannot remove active owner |
+| `transfer_learning_space_ownership` | current owner or platform admin; space must be active |
 | `publish_learning_space` | owner (draft→active) |
 | `archive_learning_space` | owner |
 | `moderate_learning_space` | platform admin only |

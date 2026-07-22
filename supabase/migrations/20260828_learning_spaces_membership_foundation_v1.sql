@@ -182,9 +182,12 @@ create table if not exists public.learning_space_invites (
     references public.learning_spaces (id) on delete cascade,
   invited_user_id uuid references public.profiles (id) on delete cascade,
   invited_email text
-    constraint learning_space_invites_email_len check (
+    constraint learning_space_invites_email_check check (
       invited_email is null
-      or char_length(btrim(invited_email)) between 3 and 320
+      or (
+        char_length(btrim(invited_email)) between 3 and 320
+        and btrim(invited_email) ~ '^\S+@\S+\.\S+$'
+      )
     ),
   role text not null
     constraint learning_space_invites_role_check check (
@@ -561,10 +564,20 @@ create policy "Members read space memberships"
   on public.learning_space_members for select
   to authenticated
   using (
+    -- Always: own row (minimum membership self-visibility).
     user_id = (select auth.uid())
-    or public.is_learning_space_member(space_id)
     or public.can_manage_learning_space(space_id)
     or public.is_platform_admin()
+    or (
+      -- Full directory only when settings.public_member_directory is true.
+      public.is_learning_space_member(space_id)
+      and exists (
+        select 1
+        from public.learning_space_settings s
+        where s.space_id = learning_space_members.space_id
+          and s.public_member_directory is true
+      )
+    )
   );
 
 drop policy if exists "Managers and invitees read invites"
@@ -738,6 +751,11 @@ as $$
 declare
   v_uid uuid := auth.uid();
   v_caller_role text;
+  v_caller_rank integer;
+  v_invite_rank integer;
+  v_space_status text;
+  v_allow_member_invites boolean;
+  v_is_manager boolean;
   v_email text;
   v_token text;
   v_hash text;
@@ -751,16 +769,35 @@ begin
     raise exception 'space_id is required';
   end if;
 
-  if not public.can_manage_learning_space(p_space_id, v_uid) then
-    raise exception 'Not allowed to invite members for this space';
+  select status into v_space_status
+  from public.learning_spaces
+  where id = p_space_id;
+
+  if not found then
+    raise exception 'Learning space not found';
   end if;
 
+  if v_space_status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
+  end if;
+
+  v_is_manager := public.can_manage_learning_space(p_space_id, v_uid);
   v_caller_role := public.learning_space_member_role(p_space_id, v_uid);
-  if not public.is_platform_admin(v_uid)
-     and not public.learning_space_role_at_least(v_caller_role, 'admin')
-  then
-    -- Instructors cannot invite in V1; owner/admin (or platform admin) only.
-    raise exception 'Only owner or admin can invite members';
+
+  if v_is_manager then
+    -- Owners/admins (and platform admins) retain invite management.
+    null;
+  elsif public.is_learning_space_member(p_space_id, v_uid) then
+    select s.allow_member_invites
+    into v_allow_member_invites
+    from public.learning_space_settings s
+    where s.space_id = p_space_id;
+
+    if not coalesce(v_allow_member_invites, false) then
+      raise exception 'Member invites are disabled for this space';
+    end if;
+  else
+    raise exception 'Not allowed to invite members for this space';
   end if;
 
   if p_role is null or p_role = 'owner' then
@@ -778,9 +815,35 @@ begin
     raise exception 'Invalid invite role';
   end if;
 
+  -- Non-managers cannot invite admin (management-only privilege).
+  if not v_is_manager and p_role = 'admin' then
+    raise exception 'Only owner or admin can invite administrators';
+  end if;
+
+  v_caller_rank := public.learning_space_role_rank(v_caller_role);
+  v_invite_rank := public.learning_space_role_rank(p_role);
+
+  if not public.is_platform_admin(v_uid) then
+    if v_caller_rank is null or v_invite_rank is null then
+      raise exception 'Role escalation check failed';
+    end if;
+    if v_invite_rank > v_caller_rank then
+      raise exception 'Cannot assign a role above your own';
+    end if;
+  end if;
+
   v_email := nullif(lower(btrim(coalesce(p_invited_email, ''))), '');
   if p_invited_user_id is null and v_email is null then
     raise exception 'invited_user_id or invited_email is required';
+  end if;
+
+  if v_email is not null
+     and (
+       char_length(v_email) not between 3 and 320
+       or v_email !~ '^\S+@\S+\.\S+$'
+     )
+  then
+    raise exception 'Invite email is invalid';
   end if;
 
   if p_invited_user_id is not null then
@@ -860,6 +923,7 @@ declare
   v_invite public.learning_space_invites%rowtype;
   v_jwt_email text;
   v_member_id uuid;
+  v_space_status text;
 begin
   if v_uid is null then
     raise exception 'Authentication required';
@@ -897,6 +961,18 @@ begin
     set status = 'expired'
     where id = v_invite.id;
     raise exception 'Invite expired';
+  end if;
+
+  select status into v_space_status
+  from public.learning_spaces
+  where id = v_invite.space_id;
+
+  if not found then
+    raise exception 'Learning space not found';
+  end if;
+
+  if v_space_status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
   end if;
 
   v_jwt_email := lower(coalesce(auth.jwt() ->> 'email', ''));
@@ -994,10 +1070,24 @@ declare
   v_caller_role text;
   v_target public.learning_space_members%rowtype;
   v_caller_rank integer;
+  v_target_rank integer;
   v_new_rank integer;
+  v_space_status text;
 begin
   if v_uid is null then
     raise exception 'Authentication required';
+  end if;
+
+  select status into v_space_status
+  from public.learning_spaces
+  where id = p_space_id;
+
+  if not found then
+    raise exception 'Learning space not found';
+  end if;
+
+  if v_space_status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
   end if;
 
   if not public.can_manage_learning_space(p_space_id, v_uid) then
@@ -1034,11 +1124,16 @@ begin
 
   v_caller_role := public.learning_space_member_role(p_space_id, v_uid);
   v_caller_rank := public.learning_space_role_rank(v_caller_role);
+  v_target_rank := public.learning_space_role_rank(v_target.role);
   v_new_rank := public.learning_space_role_rank(p_new_role);
 
   if not public.is_platform_admin(v_uid) then
-    if v_caller_rank is null or v_new_rank is null then
+    if v_caller_rank is null or v_target_rank is null or v_new_rank is null then
       raise exception 'Role escalation check failed';
+    end if;
+    -- Peer-admin protection: target's CURRENT privilege must be strictly below actor.
+    if not (v_target_rank < v_caller_rank) then
+      raise exception 'Cannot manage a peer or higher-ranked member';
     end if;
     -- Cannot escalate target (or self) above caller's own rank.
     if v_new_rank > v_caller_rank then
@@ -1087,9 +1182,25 @@ as $$
 declare
   v_uid uuid := auth.uid();
   v_target public.learning_space_members%rowtype;
+  v_caller_role text;
+  v_caller_rank integer;
+  v_target_rank integer;
+  v_space_status text;
 begin
   if v_uid is null then
     raise exception 'Authentication required';
+  end if;
+
+  select status into v_space_status
+  from public.learning_spaces
+  where id = p_space_id;
+
+  if not found then
+    raise exception 'Learning space not found';
+  end if;
+
+  if v_space_status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
   end if;
 
   if not public.can_manage_learning_space(p_space_id, v_uid) then
@@ -1108,6 +1219,19 @@ begin
 
   if v_target.role = 'owner' and v_target.status = 'active' then
     raise exception 'Cannot suspend the active owner';
+  end if;
+
+  v_caller_role := public.learning_space_member_role(p_space_id, v_uid);
+  v_caller_rank := public.learning_space_role_rank(v_caller_role);
+  v_target_rank := public.learning_space_role_rank(v_target.role);
+
+  if not public.is_platform_admin(v_uid) then
+    if v_caller_rank is null or v_target_rank is null then
+      raise exception 'Role escalation check failed';
+    end if;
+    if not (v_target_rank < v_caller_rank) then
+      raise exception 'Cannot manage a peer or higher-ranked member';
+    end if;
   end if;
 
   update public.learning_space_members
@@ -1144,9 +1268,25 @@ as $$
 declare
   v_uid uuid := auth.uid();
   v_target public.learning_space_members%rowtype;
+  v_caller_role text;
+  v_caller_rank integer;
+  v_target_rank integer;
+  v_space_status text;
 begin
   if v_uid is null then
     raise exception 'Authentication required';
+  end if;
+
+  select status into v_space_status
+  from public.learning_spaces
+  where id = p_space_id;
+
+  if not found then
+    raise exception 'Learning space not found';
+  end if;
+
+  if v_space_status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
   end if;
 
   if not public.can_manage_learning_space(p_space_id, v_uid) then
@@ -1165,6 +1305,19 @@ begin
 
   if v_target.role = 'owner' and v_target.status = 'active' then
     raise exception 'Cannot remove the active owner';
+  end if;
+
+  v_caller_role := public.learning_space_member_role(p_space_id, v_uid);
+  v_caller_rank := public.learning_space_role_rank(v_caller_role);
+  v_target_rank := public.learning_space_role_rank(v_target.role);
+
+  if not public.is_platform_admin(v_uid) then
+    if v_caller_rank is null or v_target_rank is null then
+      raise exception 'Role escalation check failed';
+    end if;
+    if not (v_target_rank < v_caller_rank) then
+      raise exception 'Cannot manage a peer or higher-ranked member';
+    end if;
   end if;
 
   update public.learning_space_members
@@ -1218,6 +1371,10 @@ begin
 
   if not found then
     raise exception 'Learning space not found';
+  end if;
+
+  if v_space.status is distinct from 'active' then
+    raise exception 'Learning space must be active for membership changes';
   end if;
 
   v_prev_owner := v_space.owner_user_id;

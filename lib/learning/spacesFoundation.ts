@@ -109,6 +109,9 @@ export const LEARNING_SPACE_HELPERS = {
   auditWrite: "learning_audit_write",
 } as const;
 
+/** Matches store SQL/TS invite & contact email checks (`^\S+@\S+\.\S+$`). */
+export const LEARNING_SPACE_INVITE_EMAIL_RE = /^\S+@\S+\.\S+$/;
+
 /** Mirrors SQL learning_space_role_rank — unknown → null (fail-closed). */
 export function learningSpaceRoleRank(role: string): number | null {
   if ((LEARNING_SPACE_ROLES as readonly string[]).includes(role)) {
