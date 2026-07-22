@@ -16,4 +16,5 @@ export * from "./renderDescriptor";
 export * from "./candidateInventory";
 export * from "./creativePlacementCompatibility";
 export * from "./selectableSet";
+export * from "./pilotSelector";
 export * from "./executionLayer";

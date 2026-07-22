@@ -290,6 +290,8 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result.productionEnabled).toBe(false);
     expect(outcome.result.traces[0].diagnosticSummary).toEqual({
       compatible: false,
+      selectionStrategy: "first_selectable",
+      selectionOutcome: "not_selectable_earlier_gate",
     });
   });
 
@@ -438,11 +440,13 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(enabled.result.selectionSummary.eligibleCandidates).toEqual([
       { candidateId: "candidate-1" },
     ]);
-    expect(enabled.result.selectedCandidateId).toBeNull();
+    expect(enabled.result.selectedCandidateId).toBe("candidate-1");
     expect(enabled.result.selectionSummary.selectedCandidate).toBeNull();
     expect(enabled.result.renderDescriptorPlaceholder).toBeNull();
     expect(enabled.result.traces[0].diagnosticSummary).toEqual({
       compatible: true,
+      selectionStrategy: "first_selectable",
+      selectionOutcome: "selected_first_selectable",
     });
   });
 
@@ -491,7 +495,45 @@ describe("Ads Execution Layer Foundation V1", () => {
         (c) => c.candidateId === "bad-creative"
       )
     ).toBe(false);
-    expect(outcome.result.selectedCandidateId).toBeNull();
+    expect(outcome.result.selectedCandidateId).toBe("ok");
+    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
+      "selected_first_selectable"
+    );
+    expect(outcome.result.traces[1].diagnosticSummary?.selectionOutcome).toBe(
+      "not_selectable_earlier_gate"
+    );
+  });
+
+  it("selects the first selectable candidate in inventory order (pilot)", () => {
+    const outcome = runAdsExecutionLayer({
+      inventory: baseInventory([
+        inventoryCandidate({ candidateId: "first" }),
+        inventoryCandidate({ candidateId: "second" }),
+      ]),
+      request: baseRequest(["first", "second"], {
+        featureFlags: enabledFlagsFor("WATCH_FEED"),
+      }),
+      eligibilityStates: [
+        eligibilityState({ candidateId: "first" }),
+        eligibilityState({ candidateId: "second" }),
+      ],
+    });
+
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) return;
+    expect(outcome.result.selectableCandidates.map((c) => c.candidateId)).toEqual(
+      ["first", "second"]
+    );
+    expect(outcome.result.selectedCandidateId).toBe("first");
+    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
+      "selected_first_selectable"
+    );
+    expect(outcome.result.traces[1].diagnosticSummary?.selectionOutcome).toBe(
+      "not_selected_earlier_selectable"
+    );
+    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.productionEnabled).toBe(false);
   });
 
   it("rejects via eligibility when delivery flags are off (no delivery)", () => {
@@ -508,6 +550,11 @@ describe("Ads Execution Layer Foundation V1", () => {
       stage: "eligibility",
       reason: "delivery_disabled",
     });
+    expect(outcome.result.selectableCandidates).toEqual([]);
+    expect(outcome.result.selectedCandidateId).toBeNull();
+    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
+      "not_selectable_earlier_gate"
+    );
     expect(ADS_DELIVERY_ENABLED).toBe(false);
   });
 
@@ -526,6 +573,12 @@ describe("Ads Execution Layer Foundation V1", () => {
       validateAdsExecutionResult({
         ...createEmptyAdsExecutionResult(),
         selectedCandidate: { candidateId: "x" },
+      }).valid
+    ).toBe(false);
+    expect(
+      validateAdsExecutionResult({
+        ...createEmptyAdsExecutionResult(),
+        selectedCandidateId: "outside",
       }).valid
     ).toBe(false);
   });
@@ -547,8 +600,8 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(SOURCE).toMatch(/validateCreativePlacementCompatibility/);
     expect(SOURCE).toMatch(/buildAdsDeliveryDecisionTrace/);
     expect(SOURCE).toMatch(/buildAdsSelectableSet/);
+    expect(SOURCE).toMatch(/runAdsPilotSelector/);
     expect(SOURCE).toMatch(/buildAdsSelectionResult/);
-    expect(SOURCE).toMatch(/selectedCandidateId: null/);
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/executionCompleted: true/);
     expect(SOURCE).toMatch(/renderDescriptorPlaceholder: null/);
