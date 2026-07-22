@@ -12,3 +12,4 @@ export * from "./selectionResult";
 export * from "./deliveryDecisionTrace";
 export * from "./taxonomy";
 export * from "./taxonomyMapper";
+export * from "./renderDescriptor";
