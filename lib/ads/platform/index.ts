@@ -7,3 +7,4 @@ export * from "./deliveryContracts";
 export * from "./deliveryEligibilityContracts";
 export * from "./deliverySelectionContracts";
 export * from "./eligibilityRules";
+export * from "./selectionResult";
