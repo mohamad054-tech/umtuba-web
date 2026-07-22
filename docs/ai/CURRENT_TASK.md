@@ -2,52 +2,61 @@
 
 ## Task title
 
-UM Learning OS — Lessons Foundation V1
+UM Learning OS — Activities Foundation V1
 
 ## Goal
 
-DB-authoritative Lessons foundation under Sections: Lesson as an educational
-**container** (table + 1:1 reserved settings), permission helpers (authority
-inherited from Section → Course, no lesson staff table), FORCE RLS, SECURITY
-DEFINER RPCs, deterministic ordering within a Section, full 5-level parent-chain
-lifecycle gates (space active; program + course + section draft|published),
-lesson-appropriate metadata validators (`ai_ready` / `live_ready` only) plus a
-descriptive-only `content_type` allowlist, audit integration, TypeScript
-contracts, contract tests, and implementation doc.
+DB-authoritative Activities foundation under Lessons: an Activity as a generic
+educational **interaction container** (table + 1:1 reserved/inert settings
+sidecar), permission helpers (authority inherited from Lesson → Section → Course,
+no activity staff table), FORCE RLS on the activity table, SECURITY DEFINER RPCs,
+deterministic ordering within a Lesson, full **6-level** parent-chain lifecycle
+gates (space active; program + course + section + lesson draft|published), an
+**immutable 16-type allowlist**, a lean `ai_metadata` surface, a bounded shallow
+`config` JSON, audit integration, TypeScript contracts, contract tests, and an
+implementation doc.
 
-Hierarchy: Space → Program → Course → Section → Lesson. A Lesson is an
-educational container under exactly one Section — it is NOT content body, an
-Activity, Progress, or a Live Session. `section_id` is immutable.
+Hierarchy: Space → Program → Course → Section → Lesson → Activity. An Activity is
+an interaction container under exactly one Lesson — it is NOT a question,
+attempt, submission, answer, grade, progress record, certificate, live session,
+or AI execution. `lesson_id` and `type` are immutable.
+
+**CRITICAL divergence from Lessons:** there is **NO anonymous/public SELECT
+policy** in V1 (privacy-safe for assessments). `visibility` is retained for
+forward compatibility only and has no anon effect.
 
 ## Allowed scope
 
-- `supabase/migrations/20260832_learning_lessons_foundation_v1.sql`
-- `lib/learning/lessonsFoundation.ts`
-- `lib/learning/lessonsFoundation.test.ts`
-- `docs/learning/implementation/LESSONS_FOUNDATION_V1.md`
+- `supabase/migrations/20260833_learning_activities_foundation_v1.sql`
+- `lib/learning/activitiesFoundation.ts`
+- `lib/learning/activitiesFoundation.test.ts`
+- `docs/learning/implementation/ACTIVITIES_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Lesson content blocks / media / video processing / rich text / audio / docs /
-  Activities / Assessments / Assignments / Quizzes / Homework / Progress /
-  Completion / Certificates / Enrollments / Payments / Marketplace / Booking /
-  Calendar / Live-session behavior / AI-tutor behavior / Comments / UI / Search /
-  Notifications
-- Any `learning_lesson_content_blocks` table (reserved contract only — not implemented)
-- Any `learning_lesson_staff` table or staff-assignment RPCs (authority inherits
-  from Section/Course)
-- `category` / `target_audience` on lessons (stay on Section);
-  `marketplace_ready` / `certification_ready` (stay on Course)
-- Changing `section_id` after creation (immutable)
-- Making `content_type` activate any behavior (descriptive only)
-- Modifying Spaces/Programs/Courses/Sections migrations or modules outside the Lessons handoff
+- Questions / question banks / answers / attempts / submissions / grades /
+  rubrics / auto-evaluation engines / teacher workflows / coding execution /
+  file storage / AI execution / progress / completion / certificates /
+  enrollments / payments / marketplace / booking / calendar / live-session
+  behavior / AI-tutor behavior / comments / UI / search / notifications
+- Any `learning_lesson_items` table (reserved contract only — not implemented)
+- Any type-specific engines or type-specific columns on the activity row
+- Any `learning_activity_staff` table or staff-assignment RPCs (authority
+  inherits from Lesson/Section/Course)
+- `category` / `target_audience` / `marketplace_ready` / `certification_ready` /
+  descriptive `content_type` on activities (stay on their owning entities)
+- Changing `lesson_id` or `type` after creation (both immutable)
+- Making `type` activate any behavior (immutable typed slot only)
+- Adding an anonymous/public SELECT policy or `anon` table grant
+- Modifying Spaces/Programs/Courses/Sections/Lessons migrations or modules
+  outside the Activities handoff
 - Commit, push, merge, remote migration apply without approval
 
 ## Branch
 
-`office/learning-lessons-foundation-v1` (from `alpha-0.2`)
+`office/learning-activities-foundation-v1`
 
 ## Status
 
