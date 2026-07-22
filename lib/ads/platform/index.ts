@@ -10,3 +10,5 @@ export * from "./deliverySelectionContracts";
 export * from "./eligibilityRules";
 export * from "./selectionResult";
 export * from "./deliveryDecisionTrace";
+export * from "./taxonomy";
+export * from "./taxonomyMapper";
