@@ -14,3 +14,4 @@ export * from "./taxonomy";
 export * from "./taxonomyMapper";
 export * from "./renderDescriptor";
 export * from "./candidateInventory";
+export * from "./creativePlacementCompatibility";
