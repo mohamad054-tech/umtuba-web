@@ -17,4 +17,5 @@ export * from "./candidateInventory";
 export * from "./creativePlacementCompatibility";
 export * from "./selectableSet";
 export * from "./pilotSelector";
+export * from "./serveBoundary";
 export * from "./executionLayer";

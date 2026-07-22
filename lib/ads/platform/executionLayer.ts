@@ -47,6 +47,16 @@ import {
   validateAdsPilotSelectorResult,
 } from "./pilotSelector";
 import {
+  validateAdsRenderDescriptor,
+  type AdsRenderDescriptor,
+} from "./renderDescriptor";
+import {
+  emitAdsRenderDescriptor,
+  validateAdsRenderMaterial,
+  validateAdsServeBoundaryResult,
+  type AdsRenderMaterial,
+} from "./serveBoundary";
+import {
   buildAdsSelectionResult,
   createEmptyAdsSelectionResult,
   validateAdsSelectionResult,
@@ -60,7 +70,7 @@ import {
  *   inventory → eligibility → creative↔placement compatibility →
  *   decision trace → selectable set (eligibility ∩ compatibility) →
  *   selection result → deterministic pilot selector →
- *   render descriptor placeholder → execution result
+ *   serve-boundary render descriptor emission → execution result
  *
  * This is NOT a delivery engine. It never:
  * - ranks / auctions / paces ads (pilot may pick first selectable only)
@@ -71,9 +81,11 @@ import {
  * - enables ADS_DELIVERY_ENABLED or placement flags
  * - renders creatives or serves an advertisement
  *
- * productionEnabled is always false. renderDescriptorPlaceholder is always null.
+ * productionEnabled is always false. delivery remains disabled.
+ * renderDescriptor is metadata emission only (null when unselected or when
+ * explicit render material is absent/invalid) — never a served/rendered ad.
  * selectedCandidateId may be set internally for pilot evaluation only when it
- * belongs to selectableCandidates — never a served/rendered ad.
+ * belongs to selectableCandidates.
  * The only authoritative selectable input is selectableCandidates.
  */
 
@@ -87,6 +99,7 @@ export const ADS_EXECUTION_LAYER_ALLOWED_FIELDS = [
   "inventory",
   "request",
   "eligibilityStates",
+  "renderMaterial",
 ] as const;
 
 /**
@@ -103,7 +116,7 @@ export const ADS_EXECUTION_RESULT_ALLOWED_FIELDS = [
   "selectableCandidates",
   "selectionSummary",
   "selectedCandidateId",
-  "renderDescriptorPlaceholder",
+  "renderDescriptor",
   "productionEnabled",
   "executionCompleted",
 ] as const;
@@ -144,7 +157,9 @@ export type AdsExecutionCompatibilityResult = Readonly<{
  * selectableCandidates is the only authoritative selectable set
  * (eligibility ∩ compatibility).
  * selectedCandidateId is an internal pilot choice only (null or a member of
- * selectableCandidates). renderDescriptorPlaceholder remains null.
+ * selectableCandidates). renderDescriptor is emitted metadata only when a
+ * selectable + compatible candidate is selected AND explicit render material
+ * validates; otherwise null.
  */
 export type AdsExecutionResult = Readonly<{
   contractVersion: typeof ADS_EXECUTION_LAYER_CONTRACT_VERSION;
@@ -162,20 +177,26 @@ export type AdsExecutionResult = Readonly<{
    * Never implies serve/render/delivery.
    */
   selectedCandidateId: string | null;
-  /** Always null in V1 — no ad is selected to render. */
-  renderDescriptorPlaceholder: null;
+  /**
+   * Serve-boundary emission only — validated render metadata or null.
+   * Never URLs, storage paths, or a rendered creative.
+   */
+  renderDescriptor: AdsRenderDescriptor | null;
   productionEnabled: false;
   executionCompleted: true;
 }>;
 
 /**
- * Execution input — in-memory inventory + delivery request + eligibility states.
+ * Execution input — in-memory inventory + delivery request + eligibility states
+ * + optional explicit render material for serve-boundary emission.
  * eligibilityStates must align 1:1 (same candidateIds, same order) with inventory.
+ * renderMaterial is metadata-only; null/absent yields a null renderDescriptor.
  */
 export type AdsExecutionLayerInput = Readonly<{
   inventory: unknown;
   request: unknown;
   eligibilityStates: unknown;
+  renderMaterial?: unknown;
 }>;
 
 export type AdsExecutionLayerOutcome =
@@ -244,7 +265,7 @@ function freezeExecutionResult(result: AdsExecutionResult): AdsExecutionResult {
     ),
     selectionSummary: result.selectionSummary,
     selectedCandidateId: result.selectedCandidateId,
-    renderDescriptorPlaceholder: null,
+    renderDescriptor: result.renderDescriptor,
     productionEnabled: false as const,
     executionCompleted: true as const,
   });
@@ -494,9 +515,11 @@ function classifyRejection(
  * Pure shape validator for Execution Result V1 outputs.
  * Fail-closed — does not execute the pipeline or deliver ads.
  * Enforces selectable-set / selection-summary / pilot-boundary consistency.
+ * Optional nowMs keeps render-descriptor expiry checks deterministic.
  */
 export function validateAdsExecutionResult(
-  input: unknown
+  input: unknown,
+  options: { nowMs?: number } = {}
 ): ContractValidationResult {
   if (!isRecord(input)) {
     return {
@@ -524,12 +547,13 @@ export function validateAdsExecutionResult(
   if (input.executionCompleted !== true) {
     issues.push("executionCompleted must be true.");
   }
-  if (input.renderDescriptorPlaceholder !== null) {
-    issues.push("renderDescriptorPlaceholder must be null.");
-  }
 
   if (input.selectedCandidateId === null) {
-    // Empty selectable set → null is required below after selectable list parse.
+    if (input.renderDescriptor !== null) {
+      issues.push(
+        "renderDescriptor must be null when selectedCandidateId is null."
+      );
+    }
   } else if (!isNonEmptyString(input.selectedCandidateId)) {
     issues.push("selectedCandidateId must be a non-empty string or null.");
   } else if (input.selectedCandidateId.length > ADS_DELIVERY_MAX_ID_LENGTH) {
@@ -659,6 +683,17 @@ export function validateAdsExecutionResult(
       issues.push(
         `selectedCandidateId "${input.selectedCandidateId}" is inconsistent with first selectable candidate.`
       );
+    }
+    if (input.renderDescriptor !== null && input.renderDescriptor !== undefined) {
+      const descriptorValidation = validateAdsRenderDescriptor(
+        input.renderDescriptor,
+        options.nowMs !== undefined ? { nowMs: options.nowMs } : {}
+      );
+      if (!descriptorValidation.valid) {
+        for (const issue of descriptorValidation.issues) {
+          issues.push(`renderDescriptor: ${issue}`);
+        }
+      }
     }
   }
 
@@ -815,7 +850,7 @@ export function createEmptyAdsExecutionResult(): AdsExecutionResult {
     selectableCandidates: Object.freeze([]),
     selectionSummary: createEmptyAdsSelectionResult(0),
     selectedCandidateId: null,
-    renderDescriptorPlaceholder: null,
+    renderDescriptor: null,
     productionEnabled: false,
     executionCompleted: true,
   });
@@ -901,6 +936,25 @@ export function runAdsExecutionLayer(
     }
   }
   const request = freezeDeliveryRequest(input.request as AdsDeliveryRequest);
+
+  let renderMaterial: AdsRenderMaterial | null = null;
+  if ("renderMaterial" in input) {
+    const materialValidation = validateAdsRenderMaterial(input.renderMaterial);
+    if (!materialValidation.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...materialValidation.issues.map(
+            (issue) => `Malformed render material: ${issue}`
+          ),
+        ]),
+      };
+    }
+    renderMaterial =
+      input.renderMaterial === null
+        ? null
+        : (input.renderMaterial as AdsRenderMaterial);
+  }
 
   const eligibilityValidation = validateEligibilityStatesArray(
     input.eligibilityStates
@@ -1185,7 +1239,51 @@ export function runAdsExecutionLayer(
     }
   }
 
-  // 8) Render Descriptor placeholder — always null (pilot select ≠ serve/render)
+  // 8) Serve-boundary render descriptor emission (metadata only — not serve/render)
+  const emissionOutcome = emitAdsRenderDescriptor({
+    selectedCandidateId: pilotOutcome.result.selectedCandidateId,
+    inventory,
+    selectableCandidates: selectableSet.selectableCandidates,
+    renderMaterial,
+    currentTimestamp: request.currentTimestamp,
+  });
+  if (!emissionOutcome.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...emissionOutcome.issues.map(
+          (issue) => `Invalid render descriptor emission: ${issue}`
+        ),
+      ]),
+    };
+  }
+  const emissionValidation = validateAdsServeBoundaryResult(
+    emissionOutcome.result,
+    { nowMs: Date.parse(request.currentTimestamp) }
+  );
+  if (!emissionValidation.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...emissionValidation.issues.map(
+          (issue) => `Invalid render descriptor emission: ${issue}`
+        ),
+      ]),
+    };
+  }
+
+  if (
+    pilotOutcome.result.selectedCandidateId === null &&
+    emissionOutcome.result.renderDescriptor !== null
+  ) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "renderDescriptor must be null when selectedCandidateId is null.",
+      ]),
+    };
+  }
+
   const result = freezeExecutionResult({
     contractVersion: ADS_EXECUTION_LAYER_CONTRACT_VERSION,
     evaluatedCandidates: Object.freeze(evaluatedCandidates),
@@ -1198,12 +1296,14 @@ export function runAdsExecutionLayer(
     ]),
     selectionSummary: selectionOutcome.result,
     selectedCandidateId: pilotOutcome.result.selectedCandidateId,
-    renderDescriptorPlaceholder: null,
+    renderDescriptor: emissionOutcome.result.renderDescriptor,
     productionEnabled: false,
     executionCompleted: true,
   });
 
-  const resultValidation = validateAdsExecutionResult(result);
+  const resultValidation = validateAdsExecutionResult(result, {
+    nowMs: Date.parse(request.currentTimestamp),
+  });
   if (!resultValidation.valid) {
     return {
       valid: false,

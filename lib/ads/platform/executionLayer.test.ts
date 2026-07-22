@@ -25,11 +25,13 @@ import {
   validateAdsExecutionResult,
 } from "./executionLayer";
 import { ADS_PLACEMENT_REGISTRY } from "./placementRegistry";
+import type { AdsRenderMaterial } from "./serveBoundary";
 
 const SOURCE_PATH = path.join(__dirname, "executionLayer.ts");
 const SOURCE = readFileSync(SOURCE_PATH, "utf8");
 
 const NOW = "2026-07-22T12:00:00.000Z";
+const EXPIRES = "2026-07-22T13:00:00.000Z";
 const GENERATED_AT = "2026-07-22T11:00:00.000Z";
 
 function inventoryCandidate(
@@ -146,13 +148,46 @@ function enabledFlagsFor(placementId: string): Record<string, boolean> {
   };
 }
 
+function renderMaterialFor(
+  candidateId: string,
+  overrides: Partial<AdsRenderMaterial> = {}
+): AdsRenderMaterial {
+  return Object.freeze({
+    candidateId,
+    creativeReference:
+      overrides.creativeReference ?? `creative-ref-${candidateId}`,
+    mediaReference: overrides.mediaReference ?? `media-ref-${candidateId}`,
+    thumbnailReference:
+      overrides.thumbnailReference === undefined
+        ? null
+        : overrides.thumbnailReference,
+    clickDestinationReference:
+      overrides.clickDestinationReference ?? `destination-ref-${candidateId}`,
+    impressionHandle: overrides.impressionHandle ?? `imp-${candidateId}`,
+    clickHandle: overrides.clickHandle ?? `clk-${candidateId}`,
+    ...(overrides.trackingReferences !== undefined
+      ? { trackingReferences: overrides.trackingReferences }
+      : {}),
+    disclosureLabel: overrides.disclosureLabel ?? "Sponsored",
+    cacheHints: overrides.cacheHints ?? {
+      cacheable: false,
+      maxAgeSeconds: null,
+      cacheKey: null,
+    },
+    expiresAt: overrides.expiresAt ?? EXPIRES,
+  });
+}
+
 function runBase(options: {
   inventory?: Record<string, unknown>;
   request?: AdsDeliveryRequest;
   eligibilityStates?: AdsEligibilityCandidateState[];
   candidateIds?: readonly string[];
+  renderMaterial?: AdsRenderMaterial | null;
+  includeRenderMaterial?: boolean;
 } = {}) {
   const candidateIds = options.candidateIds ?? ["candidate-1"];
+  const includeMaterial = options.includeRenderMaterial !== false;
   return runAdsExecutionLayer({
     inventory:
       options.inventory ??
@@ -163,6 +198,14 @@ function runBase(options: {
     eligibilityStates:
       options.eligibilityStates ??
       candidateIds.map((id) => eligibilityState({ candidateId: id })),
+    ...(includeMaterial
+      ? {
+          renderMaterial:
+            options.renderMaterial === undefined
+              ? renderMaterialFor(candidateIds[0] ?? "candidate-1")
+              : options.renderMaterial,
+        }
+      : {}),
   });
 }
 
@@ -173,15 +216,19 @@ describe("Ads Execution Layer Foundation V1", () => {
       "inventory",
       "request",
       "eligibilityStates",
+      "renderMaterial",
     ]);
     expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
-      "renderDescriptorPlaceholder"
+      "renderDescriptor"
     );
     expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
       "selectableCandidates"
     );
     expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
       "selectedCandidateId"
+    );
+    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).not.toContain(
+      "renderDescriptorPlaceholder"
     );
   });
 
@@ -203,7 +250,7 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result).toEqual(createEmptyAdsExecutionResult());
     expect(outcome.result.executionCompleted).toBe(true);
     expect(outcome.result.productionEnabled).toBe(false);
-    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.renderDescriptor).toBeNull();
     expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
     expect(outcome.result.selectedCandidateId).toBeNull();
     expect(outcome.result.selectableCandidates).toEqual([]);
@@ -226,7 +273,7 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(first.result.traces).toHaveLength(1);
     expect(first.result.executionCompleted).toBe(true);
     expect(first.result.productionEnabled).toBe(false);
-    expect(first.result.renderDescriptorPlaceholder).toBeNull();
+    expect(first.result.renderDescriptor).toBeNull();
     expect(first.result.selectionSummary.selectedCandidate).toBeNull();
     expect(first.result.selectedCandidateId).toBeNull();
     expect(Array.isArray(first.result.selectableCandidates)).toBe(true);
@@ -286,7 +333,7 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result.selectionSummary.eligibleCandidateCount).toBe(0);
     expect(outcome.result.selectedCandidateId).toBeNull();
     expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.renderDescriptor).toBeNull();
     expect(outcome.result.productionEnabled).toBe(false);
     expect(outcome.result.traces[0].diagnosticSummary).toEqual({
       compatible: false,
@@ -427,6 +474,7 @@ describe("Ads Execution Layer Foundation V1", () => {
       request: baseRequest(["candidate-1"], {
         featureFlags: enabledFlagsFor("WATCH_FEED"),
       }),
+      renderMaterial: renderMaterialFor("candidate-1"),
     });
     expect(enabled.valid).toBe(true);
     if (!enabled.valid) return;
@@ -442,12 +490,58 @@ describe("Ads Execution Layer Foundation V1", () => {
     ]);
     expect(enabled.result.selectedCandidateId).toBe("candidate-1");
     expect(enabled.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(enabled.result.renderDescriptorPlaceholder).toBeNull();
+    expect(enabled.result.renderDescriptor).not.toBeNull();
+    expect(enabled.result.renderDescriptor?.creativeReference).toBe(
+      "creative-ref-candidate-1"
+    );
+    expect(enabled.result.renderDescriptor?.mediaReference).toBe(
+      "media-ref-candidate-1"
+    );
+    expect(enabled.result.renderDescriptor?.placementId).toBe("WATCH_FEED");
+    expect(enabled.result.renderDescriptor?.creativeType).toBe("video");
+    expect(enabled.result.renderDescriptor?.productionEnabled).toBe(false);
+    expect(Object.isFrozen(enabled.result.renderDescriptor)).toBe(true);
     expect(enabled.result.traces[0].diagnosticSummary).toEqual({
       compatible: true,
       selectionStrategy: "first_selectable",
       selectionOutcome: "selected_first_selectable",
     });
+  });
+
+  it("keeps renderDescriptor null when selected without render material", () => {
+    const outcome = runBase({
+      request: baseRequest(["candidate-1"], {
+        featureFlags: enabledFlagsFor("WATCH_FEED"),
+      }),
+      renderMaterial: null,
+    });
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) return;
+    expect(outcome.result.selectedCandidateId).toBe("candidate-1");
+    expect(outcome.result.renderDescriptor).toBeNull();
+    expect(outcome.result.productionEnabled).toBe(false);
+  });
+
+  it("fails closed when render material belongs to a different candidate", () => {
+    const outcome = runAdsExecutionLayer({
+      inventory: baseInventory([
+        inventoryCandidate({ candidateId: "first" }),
+        inventoryCandidate({ candidateId: "second" }),
+      ]),
+      request: baseRequest(["first", "second"], {
+        featureFlags: enabledFlagsFor("WATCH_FEED"),
+      }),
+      eligibilityStates: [
+        eligibilityState({ candidateId: "first" }),
+        eligibilityState({ candidateId: "second" }),
+      ],
+      renderMaterial: renderMaterialFor("second"),
+    });
+    expect(outcome.valid).toBe(false);
+    if (outcome.valid) return;
+    expect(
+      outcome.issues.some((issue) => issue.includes("no fallback"))
+    ).toBe(true);
   });
 
   it("keeps selection summary aligned with selectable set (eligibility ∩ compatibility)", () => {
@@ -474,6 +568,7 @@ describe("Ads Execution Layer Foundation V1", () => {
           placementId: "WATCH_FEED",
         }),
       ],
+      renderMaterial: renderMaterialFor("ok"),
     });
 
     expect(outcome.valid).toBe(true);
@@ -496,7 +591,13 @@ describe("Ads Execution Layer Foundation V1", () => {
       )
     ).toBe(false);
     expect(outcome.result.selectedCandidateId).toBe("ok");
-    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.renderDescriptor).not.toBeNull();
+    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
+      "creative-ref-ok"
+    );
+    expect(outcome.result.renderDescriptor?.mediaReference).toBe(
+      "media-ref-ok"
+    );
     expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
       "selected_first_selectable"
     );
@@ -518,6 +619,7 @@ describe("Ads Execution Layer Foundation V1", () => {
         eligibilityState({ candidateId: "first" }),
         eligibilityState({ candidateId: "second" }),
       ],
+      renderMaterial: renderMaterialFor("first"),
     });
 
     expect(outcome.valid).toBe(true);
@@ -532,7 +634,10 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result.traces[1].diagnosticSummary?.selectionOutcome).toBe(
       "not_selected_earlier_selectable"
     );
-    expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
+    expect(outcome.result.renderDescriptor).not.toBeNull();
+    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
+      "creative-ref-first"
+    );
     expect(outcome.result.productionEnabled).toBe(false);
   });
 
@@ -604,6 +709,9 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(SOURCE).toMatch(/buildAdsSelectionResult/);
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/executionCompleted: true/);
-    expect(SOURCE).toMatch(/renderDescriptorPlaceholder: null/);
+    expect(SOURCE).toMatch(/emitAdsRenderDescriptor/);
+    expect(SOURCE).toMatch(/renderDescriptor:/);
+    expect(SOURCE).not.toMatch(/renderDescriptorPlaceholder/);
+    expect(SOURCE).toMatch(/renderMaterial/);
   });
 });
