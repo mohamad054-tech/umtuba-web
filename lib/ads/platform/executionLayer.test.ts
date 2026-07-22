@@ -177,6 +177,12 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
       "renderDescriptorPlaceholder"
     );
+    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
+      "selectableCandidates"
+    );
+    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
+      "selectedCandidateId"
+    );
   });
 
   it("executes an empty inventory successfully", () => {
@@ -199,6 +205,8 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result.productionEnabled).toBe(false);
     expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
     expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
+    expect(outcome.result.selectedCandidateId).toBeNull();
+    expect(outcome.result.selectableCandidates).toEqual([]);
     expect(outcome.result.evaluatedCandidates).toEqual([]);
   });
 
@@ -220,6 +228,8 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(first.result.productionEnabled).toBe(false);
     expect(first.result.renderDescriptorPlaceholder).toBeNull();
     expect(first.result.selectionSummary.selectedCandidate).toBeNull();
+    expect(first.result.selectedCandidateId).toBeNull();
+    expect(Array.isArray(first.result.selectableCandidates)).toBe(true);
   });
 
   it("executes multiple candidates in inventory order", () => {
@@ -271,9 +281,16 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(outcome.result.rejectedCandidates.some((r) => r.stage === "compatibility")).toBe(
       true
     );
+    expect(outcome.result.selectableCandidates).toEqual([]);
+    expect(outcome.result.selectionSummary.eligibleCandidates).toEqual([]);
+    expect(outcome.result.selectionSummary.eligibleCandidateCount).toBe(0);
+    expect(outcome.result.selectedCandidateId).toBeNull();
     expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
     expect(outcome.result.renderDescriptorPlaceholder).toBeNull();
     expect(outcome.result.productionEnabled).toBe(false);
+    expect(outcome.result.traces[0].diagnosticSummary).toEqual({
+      compatible: false,
+    });
   });
 
   it("rejects invalid placement in inventory (fail closed)", () => {
@@ -415,8 +432,66 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(enabled.result.executionCompleted).toBe(true);
     expect(enabled.result.eligibilityResults[0].eligible).toBe(true);
     expect(enabled.result.compatibilityResults[0].compatible).toBe(true);
+    expect(enabled.result.selectableCandidates).toEqual([
+      { candidateId: "candidate-1" },
+    ]);
+    expect(enabled.result.selectionSummary.eligibleCandidates).toEqual([
+      { candidateId: "candidate-1" },
+    ]);
+    expect(enabled.result.selectedCandidateId).toBeNull();
     expect(enabled.result.selectionSummary.selectedCandidate).toBeNull();
     expect(enabled.result.renderDescriptorPlaceholder).toBeNull();
+    expect(enabled.result.traces[0].diagnosticSummary).toEqual({
+      compatible: true,
+    });
+  });
+
+  it("keeps selection summary aligned with selectable set (eligibility ∩ compatibility)", () => {
+    const outcome = runAdsExecutionLayer({
+      inventory: baseInventory([
+        inventoryCandidate({
+          candidateId: "ok",
+          placement: "WATCH_FEED",
+          creativeType: "video",
+        }),
+        inventoryCandidate({
+          candidateId: "bad-creative",
+          placement: "WATCH_FEED",
+          creativeType: "game_promotion",
+        }),
+      ]),
+      request: baseRequest(["ok", "bad-creative"], {
+        featureFlags: enabledFlagsFor("WATCH_FEED"),
+      }),
+      eligibilityStates: [
+        eligibilityState({ candidateId: "ok", placementId: "WATCH_FEED" }),
+        eligibilityState({
+          candidateId: "bad-creative",
+          placementId: "WATCH_FEED",
+        }),
+      ],
+    });
+
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) return;
+
+    expect(outcome.result.eligibilityResults.every((r) => r.eligible)).toBe(
+      true
+    );
+    expect(outcome.result.compatibilityResults[0].compatible).toBe(true);
+    expect(outcome.result.compatibilityResults[1].compatible).toBe(false);
+    expect(outcome.result.selectableCandidates).toEqual([
+      { candidateId: "ok" },
+    ]);
+    expect(outcome.result.selectionSummary.eligibleCandidates).toEqual([
+      { candidateId: "ok" },
+    ]);
+    expect(
+      outcome.result.selectionSummary.eligibleCandidates.some(
+        (c) => c.candidateId === "bad-creative"
+      )
+    ).toBe(false);
+    expect(outcome.result.selectedCandidateId).toBeNull();
   });
 
   it("rejects via eligibility when delivery flags are off (no delivery)", () => {
@@ -471,7 +546,9 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(SOURCE).toMatch(/evaluateAdsCandidateEligibility/);
     expect(SOURCE).toMatch(/validateCreativePlacementCompatibility/);
     expect(SOURCE).toMatch(/buildAdsDeliveryDecisionTrace/);
+    expect(SOURCE).toMatch(/buildAdsSelectableSet/);
     expect(SOURCE).toMatch(/buildAdsSelectionResult/);
+    expect(SOURCE).toMatch(/selectedCandidateId: null/);
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/executionCompleted: true/);
     expect(SOURCE).toMatch(/renderDescriptorPlaceholder: null/);

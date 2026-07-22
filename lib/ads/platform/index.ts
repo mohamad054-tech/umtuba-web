@@ -15,4 +15,5 @@ export * from "./taxonomyMapper";
 export * from "./renderDescriptor";
 export * from "./candidateInventory";
 export * from "./creativePlacementCompatibility";
+export * from "./selectableSet";
 export * from "./executionLayer";

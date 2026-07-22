@@ -24,12 +24,20 @@ import {
   validateAdsDeliveryDecisionTrace,
   type AdsDeliveryDecisionTrace,
 } from "./deliveryDecisionTrace";
+import type { AdsDeliveryCandidateReference } from "./deliveryEligibilityContracts";
 import {
   evaluateAdsCandidateEligibility,
   type AdsCandidateEligibilityDecision,
   type AdsEligibilityCandidateState,
 } from "./eligibilityRules";
 import type { AdsPlatformPlacementId } from "./placementRegistry";
+import {
+  buildAdsSelectableSet,
+  validateAdsSelectableSet,
+  validatePilotSelectionBoundary,
+  validateSelectableSetSelectionConsistency,
+  type AdsSelectableSet,
+} from "./selectableSet";
 import {
   buildAdsSelectionResult,
   createEmptyAdsSelectionResult,
@@ -42,8 +50,9 @@ import {
  *
  * Coordinates existing foundations in a fixed order:
  *   inventory → eligibility → creative↔placement compatibility →
- *   decision trace → selection result → render descriptor placeholder →
- *   execution result
+ *   decision trace → selectable set (eligibility ∩ compatibility) →
+ *   selection result → pilot selection boundary →
+ *   render descriptor placeholder → execution result
  *
  * This is NOT a delivery engine. It never:
  * - chooses / ranks / auctions / paces ads
@@ -54,8 +63,10 @@ import {
  * - enables ADS_DELIVERY_ENABLED or placement flags
  * - renders creatives or returns a selected advertisement
  *
- * productionEnabled is always false. executionCompleted is true only when
- * the in-memory pipeline finishes successfully.
+ * productionEnabled is always false. selectedCandidateId is always null.
+ * executionCompleted is true only when the in-memory pipeline finishes
+ * successfully. The only authoritative selectable input for a future
+ * selector is selectableCandidates.
  */
 
 export const ADS_EXECUTION_LAYER_CONTRACT_VERSION = "v1" as const;
@@ -81,7 +92,9 @@ export const ADS_EXECUTION_RESULT_ALLOWED_FIELDS = [
   "eligibilityResults",
   "compatibilityResults",
   "traces",
+  "selectableCandidates",
   "selectionSummary",
+  "selectedCandidateId",
   "renderDescriptorPlaceholder",
   "productionEnabled",
   "executionCompleted",
@@ -120,6 +133,8 @@ export type AdsExecutionCompatibilityResult = Readonly<{
 /**
  * Canonical Execution Result V1.
  * No selected advertisement. No delivery. No rendering.
+ * selectableCandidates is the only authoritative selectable set
+ * (eligibility ∩ compatibility). selectedCandidateId is always null.
  */
 export type AdsExecutionResult = Readonly<{
   contractVersion: typeof ADS_EXECUTION_LAYER_CONTRACT_VERSION;
@@ -128,7 +143,11 @@ export type AdsExecutionResult = Readonly<{
   eligibilityResults: readonly AdsCandidateEligibilityDecision[];
   compatibilityResults: readonly AdsExecutionCompatibilityResult[];
   traces: readonly AdsDeliveryDecisionTrace[];
+  /** Authoritative post-gate set — eligibility ∩ compatibility only. */
+  selectableCandidates: readonly AdsDeliveryCandidateReference[];
   selectionSummary: AdsSelectionResult;
+  /** Pilot selection boundary — always null in V1 (no selector yet). */
+  selectedCandidateId: null;
   /** Always null in V1 — no ad is selected to render. */
   renderDescriptorPlaceholder: null;
   productionEnabled: false;
@@ -206,7 +225,11 @@ function freezeExecutionResult(result: AdsExecutionResult): AdsExecutionResult {
       result.compatibilityResults.map((entry) => Object.freeze({ ...entry }))
     ),
     traces: Object.freeze([...result.traces]),
+    selectableCandidates: Object.freeze(
+      result.selectableCandidates.map((entry) => Object.freeze({ ...entry }))
+    ),
     selectionSummary: result.selectionSummary,
+    selectedCandidateId: null,
     renderDescriptorPlaceholder: null,
     productionEnabled: false as const,
     executionCompleted: true as const,
@@ -418,6 +441,7 @@ function classifyRejection(
 /**
  * Pure shape validator for Execution Result V1 outputs.
  * Fail-closed — does not execute the pipeline or deliver ads.
+ * Enforces selectable-set / selection-summary / pilot-boundary consistency.
  */
 export function validateAdsExecutionResult(
   input: unknown
@@ -451,6 +475,9 @@ export function validateAdsExecutionResult(
   if (input.renderDescriptorPlaceholder !== null) {
     issues.push("renderDescriptorPlaceholder must be null.");
   }
+  if (input.selectedCandidateId !== null) {
+    issues.push("selectedCandidateId must be null.");
+  }
 
   if (!Array.isArray(input.evaluatedCandidates)) {
     issues.push("evaluatedCandidates must be an array.");
@@ -466,6 +493,9 @@ export function validateAdsExecutionResult(
   }
   if (!Array.isArray(input.traces)) {
     issues.push("traces must be an array.");
+  }
+  if (!Array.isArray(input.selectableCandidates)) {
+    issues.push("selectableCandidates must be an array.");
   }
 
   if (
@@ -496,6 +526,110 @@ export function validateAdsExecutionResult(
     );
   }
 
+  if (
+    Array.isArray(input.evaluatedCandidates) &&
+    Array.isArray(input.selectableCandidates) &&
+    input.selectableCandidates.length > input.evaluatedCandidates.length
+  ) {
+    issues.push(
+      "selectableCandidates length cannot exceed evaluatedCandidates length."
+    );
+  }
+
+  const selectableSeen = new Set<string>();
+  if (Array.isArray(input.selectableCandidates)) {
+    input.selectableCandidates.forEach((entry, index) => {
+      if (!isRecord(entry) || !isNonEmptyString(entry.candidateId)) {
+        issues.push(
+          `selectableCandidates[${index}].candidateId is required and must be a non-empty string.`
+        );
+        return;
+      }
+      if (selectableSeen.has(entry.candidateId)) {
+        issues.push(
+          `selectableCandidates contain duplicate candidateId "${entry.candidateId}".`
+        );
+      } else {
+        selectableSeen.add(entry.candidateId);
+      }
+    });
+  }
+
+  const evaluatedIdSet = new Set<string>();
+  if (Array.isArray(input.evaluatedCandidates)) {
+    input.evaluatedCandidates.forEach((entry) => {
+      if (isRecord(entry) && isNonEmptyString(entry.candidateId)) {
+        evaluatedIdSet.add(entry.candidateId);
+      }
+    });
+  }
+
+  for (const id of selectableSeen) {
+    if (!evaluatedIdSet.has(id)) {
+      issues.push(
+        `selectableCandidates include candidateId "${id}" outside evaluatedCandidates.`
+      );
+    }
+  }
+
+  // Compatibility-rejected candidates must never appear in the selectable set.
+  if (
+    Array.isArray(input.compatibilityResults) &&
+    Array.isArray(input.selectableCandidates)
+  ) {
+    const selectableIds = new Set(
+      input.selectableCandidates
+        .filter(
+          (entry): entry is { candidateId: string } =>
+            isRecord(entry) && isNonEmptyString(entry.candidateId)
+        )
+        .map((entry) => entry.candidateId)
+    );
+    input.compatibilityResults.forEach((entry, index) => {
+      if (!isRecord(entry) || typeof entry.compatible !== "boolean") {
+        return;
+      }
+      if (
+        entry.compatible === false &&
+        isNonEmptyString(entry.candidateId) &&
+        selectableIds.has(entry.candidateId)
+      ) {
+        issues.push(
+          `compatibility-rejected candidate "${entry.candidateId}" must not appear in selectableCandidates (compatibilityResults[${index}]).`
+        );
+      }
+    });
+  }
+
+  // Eligibility-rejected candidates must never appear in the selectable set.
+  if (
+    Array.isArray(input.eligibilityResults) &&
+    Array.isArray(input.selectableCandidates)
+  ) {
+    const selectableIds = new Set(
+      input.selectableCandidates
+        .filter(
+          (entry): entry is { candidateId: string } =>
+            isRecord(entry) && isNonEmptyString(entry.candidateId)
+        )
+        .map((entry) => entry.candidateId)
+    );
+    input.eligibilityResults.forEach((entry, index) => {
+      if (!isRecord(entry) || typeof entry.eligible !== "boolean") {
+        return;
+      }
+      if (
+        entry.eligible === false &&
+        isNonEmptyString(entry.candidateId) &&
+        selectableIds.has(entry.candidateId)
+      ) {
+        issues.push(
+          `ineligible candidate "${entry.candidateId}" must not appear in selectableCandidates (eligibilityResults[${index}]).`
+        );
+      }
+    });
+  }
+
   if (Array.isArray(input.traces)) {
     input.traces.forEach((trace, index) => {
       const traceResult = validateAdsDeliveryDecisionTrace(trace);
@@ -511,6 +645,33 @@ export function validateAdsExecutionResult(
   if (!selectionResult.valid) {
     for (const issue of selectionResult.issues) {
       issues.push(`selectionSummary: ${issue}`);
+    }
+  }
+
+  if (
+    selectionResult.valid &&
+    isRecord(input.selectionSummary) &&
+    Array.isArray(input.selectionSummary.eligibleCandidates) &&
+    Array.isArray(input.selectableCandidates)
+  ) {
+    const eligibleIds = input.selectionSummary.eligibleCandidates.map(
+      (entry) =>
+        isRecord(entry) && isNonEmptyString(entry.candidateId)
+          ? entry.candidateId
+          : ""
+    );
+    const selectableIds = input.selectableCandidates.map((entry) =>
+      isRecord(entry) && isNonEmptyString(entry.candidateId)
+        ? entry.candidateId
+        : ""
+    );
+    if (
+      eligibleIds.length !== selectableIds.length ||
+      eligibleIds.some((id, index) => id !== selectableIds[index])
+    ) {
+      issues.push(
+        "selectionSummary.eligibleCandidates must match selectableCandidates (eligibility ∩ compatibility)."
+      );
     }
   }
 
@@ -535,7 +696,9 @@ export function createEmptyAdsExecutionResult(): AdsExecutionResult {
     eligibilityResults: Object.freeze([]),
     compatibilityResults: Object.freeze([]),
     traces: Object.freeze([]),
+    selectableCandidates: Object.freeze([]),
     selectionSummary: createEmptyAdsSelectionResult(0),
+    selectedCandidateId: null,
     renderDescriptorPlaceholder: null,
     productionEnabled: false,
     executionCompleted: true,
@@ -706,11 +869,12 @@ export function runAdsExecutionLayer(
       })
     );
 
-    // 3) Decision Trace (from eligibility only)
+    // 3) Decision Trace (eligibility + optional compatibility metadata)
     const traceOutcome = buildAdsDeliveryDecisionTrace(
       request,
       state,
-      eligibility
+      eligibility,
+      { compatible: compatibility.compatible }
     );
     if (!traceOutcome.valid) {
       return {
@@ -741,7 +905,53 @@ export function runAdsExecutionLayer(
     }
   }
 
-  // 4) Selection Result — summary only; never selects an ad
+  // 4) Authoritative selectable set = eligibility ∩ compatibility
+  const selectableOutcome = buildAdsSelectableSet({
+    eligibilityResults,
+    compatibilityResults,
+  });
+  if (!selectableOutcome.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...selectableOutcome.issues.map(
+          (issue) => `Invalid selectable set: ${issue}`
+        ),
+      ]),
+    };
+  }
+  const selectableValidation = validateAdsSelectableSet(
+    selectableOutcome.selectableSet
+  );
+  if (!selectableValidation.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...selectableValidation.issues.map(
+          (issue) => `Invalid selectable set: ${issue}`
+        ),
+      ]),
+    };
+  }
+  const selectableSet: AdsSelectableSet = selectableOutcome.selectableSet;
+
+  // 5) Pilot selection boundary — always null (no selector yet)
+  const boundaryValidation = validatePilotSelectionBoundary(
+    selectableSet,
+    null
+  );
+  if (!boundaryValidation.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...boundaryValidation.issues.map(
+          (issue) => `Malformed pilot selection boundary: ${issue}`
+        ),
+      ]),
+    };
+  }
+
+  // 6) Selection Result — must match selectable set; never selects an ad
   const selectionRequest: AdsDeliveryRequest = freezeDeliveryRequest({
     ...request,
     candidates: Object.freeze(deliveryCandidates),
@@ -750,6 +960,7 @@ export function runAdsExecutionLayer(
     request: selectionRequest,
     evaluatedCandidates: deliveryCandidates,
     eligibilityResults,
+    compatibilityResults,
   });
   if (!selectionOutcome.valid) {
     return {
@@ -775,7 +986,22 @@ export function runAdsExecutionLayer(
     };
   }
 
-  // 5) Render Descriptor placeholder — always null (no selected ad)
+  const selectionConsistency = validateSelectableSetSelectionConsistency(
+    selectableSet,
+    selectionOutcome.result.eligibleCandidates.map((c) => c.candidateId)
+  );
+  if (!selectionConsistency.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...selectionConsistency.issues.map(
+          (issue) => `Inconsistent execution result: ${issue}`
+        ),
+      ]),
+    };
+  }
+
+  // 7) Render Descriptor placeholder — always null (no selected ad)
   const result = freezeExecutionResult({
     contractVersion: ADS_EXECUTION_LAYER_CONTRACT_VERSION,
     evaluatedCandidates: Object.freeze(evaluatedCandidates),
@@ -783,7 +1009,11 @@ export function runAdsExecutionLayer(
     eligibilityResults: Object.freeze(eligibilityResults),
     compatibilityResults: Object.freeze(compatibilityResults),
     traces: Object.freeze(traces),
+    selectableCandidates: Object.freeze([
+      ...selectableSet.selectableCandidates,
+    ]),
     selectionSummary: selectionOutcome.result,
+    selectedCandidateId: null,
     renderDescriptorPlaceholder: null,
     productionEnabled: false,
     executionCompleted: true,

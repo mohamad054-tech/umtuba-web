@@ -17,8 +17,11 @@ import type { AdsCandidateEligibilityDecision } from "./eligibilityRules";
 /**
  * Ads Selection Result Foundation V1 — deterministic selection summary only.
  *
- * Receives already-evaluated eligibility decisions and produces an immutable
- * summary. Never ranks, scores, randomizes, auctions, paces, or chooses an
+ * Receives already-evaluated eligibility decisions (and optionally creative
+ * placement compatibility) and produces an immutable summary.
+ * When compatibilityResults are supplied, eligibleCandidates are the
+ * intersection: eligibility AND compatibility — never eligibility alone.
+ * Never ranks, scores, randomizes, auctions, paces, or chooses an
  * advertisement for production. selectedCandidate is always null in V1.
  */
 
@@ -45,14 +48,22 @@ export type AdsSelectionResult = Readonly<{
   readyForFutureSelection: true;
 }>;
 
+/** Minimal compatibility row for selection intersection (optional input). */
+export type AdsSelectionCompatibilityDecision = Readonly<{
+  candidateId: string;
+  compatible: boolean;
+}>;
+
 /**
  * Build input: delivery request + evaluated candidate set + eligibility
  * decisions already produced by the eligibility layer.
+ * When compatibilityResults are provided, eligible = eligible ∧ compatible.
  */
 export type AdsSelectionResultInput = Readonly<{
   request: AdsDeliveryRequest;
   evaluatedCandidates: readonly AdsDeliveryCandidateAd[];
   eligibilityResults: readonly AdsCandidateEligibilityDecision[];
+  compatibilityResults?: readonly AdsSelectionCompatibilityDecision[];
 }>;
 
 export type AdsSelectionResultBuildOutcome =
@@ -475,6 +486,57 @@ function validateBuildInput(input: AdsSelectionResultInput): string[] {
     }
   }
 
+  if (input.compatibilityResults !== undefined) {
+    if (!Array.isArray(input.compatibilityResults)) {
+      issues.push("compatibilityResults must be an array when provided.");
+    } else {
+      if (
+        input.compatibilityResults.length !== input.evaluatedCandidates.length
+      ) {
+        issues.push(
+          "compatibilityResults length is inconsistent with evaluatedCandidates length."
+        );
+      }
+
+      const compatibilityIds: string[] = [];
+      for (let i = 0; i < input.compatibilityResults.length; i++) {
+        const decision = input.compatibilityResults[i];
+        const prefix = `compatibilityResults[${i}]`;
+        if (!isRecord(decision)) {
+          issues.push(`${prefix} must be an object.`);
+          continue;
+        }
+        if (!isNonEmptyString(decision.candidateId)) {
+          issues.push(
+            `${prefix}.candidateId is required and must be a non-empty string.`
+          );
+        } else {
+          compatibilityIds.push(decision.candidateId);
+        }
+        if (typeof decision.compatible !== "boolean") {
+          issues.push(`${prefix}.compatible must be a boolean.`);
+        }
+      }
+
+      collectDuplicateIds(compatibilityIds, "compatibilityResults", issues);
+
+      if (
+        compatibilityIds.length === evaluatedIds.length &&
+        evaluatedIds.length > 0 &&
+        new Set(compatibilityIds).size === compatibilityIds.length
+      ) {
+        for (let i = 0; i < evaluatedIds.length; i++) {
+          if (compatibilityIds[i] !== evaluatedIds[i]) {
+            issues.push(
+              "compatibilityResults order is inconsistent with evaluatedCandidates."
+            );
+            break;
+          }
+        }
+      }
+    }
+  }
+
   return issues;
 }
 
@@ -493,6 +555,9 @@ function freezeSelectionResult(result: AdsSelectionResult): AdsSelectionResult {
 
 /**
  * Builds a deterministic Selection Result summary from eligibility decisions.
+ * When compatibilityResults are supplied, eligibleCandidates are the
+ * intersection of eligibility AND creative↔placement compatibility.
+ * Compatibility-only rejections use exclusion reason "unknown".
  * Fail-closed on invalid input. Never selects a production advertisement.
  */
 export function buildAdsSelectionResult(
@@ -509,16 +574,33 @@ export function buildAdsSelectionResult(
     Record<AdsDeliveryExclusionReason, number>
   > = {};
 
+  const compatibilityById =
+    input.compatibilityResults === undefined
+      ? null
+      : new Map(
+          input.compatibilityResults.map((entry) => [
+            entry.candidateId,
+            entry.compatible,
+          ])
+        );
+
   // Preserve evaluated-candidate / eligibility-result input order.
   for (const decision of input.eligibilityResults) {
-    if (decision.eligible) {
+    const compatible =
+      compatibilityById === null
+        ? true
+        : compatibilityById.get(decision.candidateId) === true;
+
+    if (decision.eligible && compatible) {
       eligibleCandidates.push(
         Object.freeze({ candidateId: decision.candidateId })
       );
       continue;
     }
 
-    const reason = decision.exclusionReason as AdsDeliveryExclusionReason;
+    const reason: AdsDeliveryExclusionReason = decision.eligible
+      ? "unknown"
+      : (decision.exclusionReason as AdsDeliveryExclusionReason);
     rejectedCandidates.push(
       Object.freeze({
         candidateId: decision.candidateId,

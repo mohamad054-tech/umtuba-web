@@ -623,14 +623,27 @@ function buildRuleSteps(
 }
 
 /**
+ * Optional post-eligibility gate metadata for the decision trace.
+ * When provided, recorded under diagnosticSummary.compatible only.
+ * Does not change eligibility outcomes or select an advertisement.
+ */
+export type AdsDeliveryDecisionTraceCompatibilityMeta = Readonly<{
+  compatible: boolean;
+}>;
+
+/**
  * Builds an immutable privacy-safe decision trace from an eligibility result.
  * Does not re-decide eligibility, mutate inputs, use the system clock, persist,
  * log, or select an advertisement.
+ *
+ * Optional compatibilityMeta records compatible=true/false in diagnosticSummary
+ * for selector-boundary debugging — never adds selector logic.
  */
 export function buildAdsDeliveryDecisionTrace(
   request: AdsDeliveryRequest,
   candidate: AdsEligibilityCandidateState,
-  eligibilityResult: AdsCandidateEligibilityDecision
+  eligibilityResult: AdsCandidateEligibilityDecision,
+  compatibilityMeta?: AdsDeliveryDecisionTraceCompatibilityMeta | null
 ): AdsDeliveryDecisionTraceBuildOutcome {
   const issues: string[] = [];
 
@@ -642,6 +655,16 @@ export function buildAdsDeliveryDecisionTrace(
   }
   if (!isRecord(eligibilityResult)) {
     issues.push("eligibilityResult must be an object.");
+  }
+  if (
+    compatibilityMeta !== undefined &&
+    compatibilityMeta !== null &&
+    (!isRecord(compatibilityMeta) ||
+      typeof compatibilityMeta.compatible !== "boolean")
+  ) {
+    issues.push(
+      "compatibilityMeta.compatible must be a boolean when compatibilityMeta is provided."
+    );
   }
   if (issues.length > 0) {
     return { valid: false, issues };
@@ -709,6 +732,11 @@ export function buildAdsDeliveryDecisionTrace(
     };
   }
 
+  const diagnosticSummary =
+    compatibilityMeta !== undefined && compatibilityMeta !== null
+      ? Object.freeze({ compatible: compatibilityMeta.compatible })
+      : undefined;
+
   const trace = freezeTrace({
     traceVersion: ADS_DELIVERY_DECISION_TRACE_VERSION,
     requestReference: Object.freeze({
@@ -723,6 +751,7 @@ export function buildAdsDeliveryDecisionTrace(
     productionEnabled: false,
     evaluatedAt: request.currentTimestamp,
     ruleSteps: Object.freeze(ruleSteps),
+    ...(diagnosticSummary !== undefined ? { diagnosticSummary } : {}),
   });
 
   const validation = validateAdsDeliveryDecisionTrace(trace);
