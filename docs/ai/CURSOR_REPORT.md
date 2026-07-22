@@ -1,79 +1,56 @@
-# Cursor Report — Learning Spaces Membership Foundation V1 (review fixes)
+# Cursor Report — Learning Programs Foundation V1 (hardening)
 
 ## Summary
 
-Rebased `office/learning-spaces-membership-foundation-v1` onto latest
-`origin/alpha-0.2` (`b99d1b8`) and implemented pre-merge review fixes in the
-existing `20260828` migration (numbering preserved). Membership RPCs now require
-an **active** space; `allow_member_invites` and `public_member_directory` are
-enforced; peer-admin mutations require the target's current rank strictly below
-the actor; invite email validation matches the store pattern `^\S+@\S+\.\S+$`.
-Contract tests expanded for the review cases. Not merged into `alpha-0.2`.
+Applied security & lifecycle hardening to Programs Foundation V1 on
+`office/learning-programs-foundation-v1`:
 
-Branch: `office/learning-spaces-membership-foundation-v1`
+1. Staff authority revalidates active parent-space membership
+2. Suspended/archived programs reject normal mutations
+3. JSON metadata size + key allowlists
+4. Lifecycle timestamp normalization
+5. Expanded contract tests (25 Programs + 35 Spaces = 60)
+
+No commit. No push. No remote migration apply.
 
 ## Exact files changed
 
-### Modified
-
-- `supabase/migrations/20260828_learning_spaces_membership_foundation_v1.sql`
-- `lib/learning/spacesFoundation.ts`
-- `lib/learning/spacesFoundation.test.ts`
-- `docs/learning/implementation/SPACES_MEMBERSHIP_FOUNDATION_V1.md`
+- `supabase/migrations/20260829_learning_programs_foundation_v1.sql`
+- `lib/learning/programsFoundation.ts`
+- `lib/learning/programsFoundation.test.ts`
+- `docs/learning/implementation/PROGRAMS_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None (existing `20260828_learning_spaces_membership_foundation_v1.sql` updated
-in place on the feature branch before remote apply).
+None new (`20260829` updated in place before first commit/apply).
 
 ## Security review
 
-- Membership invite/accept/role/suspend/remove/transfer refuse when space is not
-  `active` (covers archived and suspended).
-- Peer-admin demotion/suspend/remove blocked unless target rank &lt; actor rank
-  (platform admin may still manage).
-- `allow_member_invites=false` blocks non-manager invites; owners/admins retain
-  invite management.
-- `public_member_directory=false` limits member SELECT to own row (managers /
-  platform admin still see directory).
-- Invite email constraint + RPC validation use store-consistent pattern; weak
-  length-only check removed.
-- No secrets exposed; no remote migration apply; no merge to `alpha-0.2`.
+- Active space membership required for staff helpers and lead manage path
+- Suspended/archived → platform moderate only for mutations
+- JSON metadata fail-closed (8192 bytes, allowlists, shallow shapes)
+- Timestamps normalized on publish/suspend/archive/recover
 
 ## Tests
 
-```
-npx vitest run lib/learning/spacesFoundation.test.ts
-```
-
-Result: **35 passed** (1 file).
+`npx vitest run lib/learning/spacesFoundation.test.ts lib/learning/programsFoundation.test.ts`
+**60 passed**
 
 ## TypeScript
 
-```
-npx tsc --noEmit
-```
-
-Result: **pass** (exit 0).
+`npx tsc --noEmit`: **PASS**
 
 ## Build
 
-Not required (no app UI / entry-point changes).
+`npm run build`: **PASS**
 
 ## git diff --check
 
-**pass** (exit 0).
-
-## git status --short
-
-See post-commit/push status in the handoff response.
+**PASS**
 
 ## Open issues
 
-- Migration still not applied to remote Supabase (by design for this phase).
-- Feature branch ready for final merge review into `alpha-0.2`; do not merge
-  until that review is complete.
-- After rebase, push may require `--force-with-lease` to update the remote
-  feature branch tip.
+- Awaiting final review / commit approval
+- Remote apply still deferred (`20260828` then `20260829`)
