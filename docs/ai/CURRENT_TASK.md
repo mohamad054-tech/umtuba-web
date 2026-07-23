@@ -2,23 +2,24 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Placement Compatibility Database Authority Fix
+UMTUBA Ads Platform — Diagnostic Runner Authorization Boundary Hardening V1
 
 ## Goal
 
-Close the final database-authority gap in
-`20260842_ads_deliverable_binding_database_authority_v1.sql` by enforcing
-placement and creative-format compatibility inside `bind_ad_deliverable`
-(PostgreSQL), aligned with the application fail-closed matrix — without
-enabling delivery/billing or applying the migration remotely.
+Close the Diagnostic Runner library-level authorization gap: require
+DB-backed `assertPlatformAdminDb` at the execution boundary, quarantine unsafe
+exports/gate constructors, and harden request UUID/correlation validation —
+without enabling delivery/billing or committing.
 
 ## Allowed scope
 
-- `lib/ads/deliverableBindings.ts`
-- `lib/ads/deliverableBindings.test.ts`
-- `supabase/migrations/20260842_ads_deliverable_binding_database_authority_v1.sql`
-  (local update only; do not apply remotely)
-- `docs/ads/ADS_DELIVERABLE_BINDING_INVENTORY_BRIDGE_V1.md`
+- `lib/ads/diagnosticRunner.ts`
+- `lib/ads/diagnosticRunnerServer.ts`
+- `lib/ads/diagnosticRunner.test.ts`
+- `lib/ads/index.ts`
+- `lib/ads/adsAdminReviewFoundation.test.ts`
+- `app/admin/ads/diagnostics/**`
+- `docs/ads/ADS_DIAGNOSTIC_RUNNER_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -26,11 +27,8 @@ enabling delivery/billing or applying the migration remotely.
 
 - Games / Learning / Store / World product surfaces
 - Merging into `alpha-0.2`
-- Pushing directly to `alpha-0.2`
-- Applying Supabase migrations to remote
+- Pushing / applying migrations
 - Enabling live delivery or live billing
-- Event ingestion / UEOS charging
-- Second authoritative decision pipeline
 - Commit / push unless explicitly requested
 
 ## Branch
@@ -39,5 +37,4 @@ enabling delivery/billing or applying the migration remotely.
 
 ## Status
 
-`implemented — verified (745/745 lib/ads, tsc, build, git diff --check);
-not committed; migration NOT APPLIED remotely.`
+`implemented — validation complete in this handoff; not committed.`

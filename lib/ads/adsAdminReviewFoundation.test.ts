@@ -149,12 +149,28 @@ describe("ads admin migration + route protection", () => {
     expect(APP_ROUTES.adminAdsCampaigns).toBe("/admin/ads/campaigns");
     expect(APP_ROUTES.adminAdsCreatives).toBe("/admin/ads/creatives");
     expect(APP_ROUTES.adminAdsReviews).toBe("/admin/ads/reviews");
+    expect(APP_ROUTES.adminAdsDiagnostics).toBe("/admin/ads/diagnostics");
     expect(PROTECTED_PREFIXES).toContain("/admin");
     expect(ADS_DELIVERY_ENABLED).toBe(false);
     expect(existsSync(join(ROOT, "app/admin/ads/page.tsx"))).toBe(true);
     expect(
+      existsSync(join(ROOT, "app/admin/ads/diagnostics/page.tsx"))
+    ).toBe(true);
+    expect(
       existsSync(join(ROOT, "docs/ads/ADS_ADMIN_REVIEW_FOUNDATION_V1.md"))
     ).toBe(true);
+    const diagnosticsPage = read("app/admin/ads/diagnostics/page.tsx");
+    expect(diagnosticsPage).toMatch(/requireAdminAdsSession/);
+    expect(diagnosticsPage).toMatch(/executeAdsDiagnosticRunnerV1/);
+    expect(diagnosticsPage).toMatch(/diagnosticRunnerServer/);
+    expect(diagnosticsPage).not.toMatch(/createAdsDiagnosticAdminGate/);
+    expect(diagnosticsPage).not.toMatch(/runAdsDiagnosticRunnerV1\b/);
+    expect(diagnosticsPage).not.toMatch(/advertiseDashboard|requireAccountManager/);
+    const index = read("lib/ads/index.ts");
+    expect(index).not.toMatch(/from ["'].*diagnosticRunnerServer["']/);
+    expect(index).not.toMatch(
+      /export\s*\{[^}]*executeAdsDiagnosticRunnerV1/
+    );
   });
 
   it("gates admin pages and actions via DB RPC; advertisers cannot use admin actions", () => {

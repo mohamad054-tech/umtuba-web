@@ -51,6 +51,7 @@ export const APP_ROUTES = {
   adminAdsCampaigns: "/admin/ads/campaigns",
   adminAdsCreatives: "/admin/ads/creatives",
   adminAdsReviews: "/admin/ads/reviews",
+  adminAdsDiagnostics: "/admin/ads/diagnostics",
   adminStore: "/admin/store",
   adminStoreSellers: "/admin/store/sellers",
   adminStoreProducts: "/admin/store/products",

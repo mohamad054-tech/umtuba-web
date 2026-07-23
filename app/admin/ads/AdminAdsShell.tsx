@@ -12,6 +12,7 @@ const LINKS = [
   { href: APP_ROUTES.adminAdsCampaigns, label: "Campaigns" },
   { href: APP_ROUTES.adminAdsCreatives, label: "Creatives" },
   { href: APP_ROUTES.adminAdsReviews, label: "Reviews" },
+  { href: APP_ROUTES.adminAdsDiagnostics, label: "Diagnostics" },
 ] as const;
 
 type Props = {
