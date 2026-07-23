@@ -61,23 +61,23 @@ const NOW = "2026-07-23T12:00:00.000Z";
 const ADMIN_UUID = "11111111-1111-4111-8111-111111111111";
 const ADVERTISER_UUID = "22222222-2222-4222-8222-222222222222";
 const CAMPAIGN_UUID = "33333333-3333-4333-8333-333333333333";
-/** Short opaque inventory refs keep provenance bindingToken ≤ 128 (platform limit). */
-const CAMPAIGN_REF = "campaign-1";
-const ADVERTISER_REF = "advertiser-1";
+const AD_SET_UUID = "44444444-4444-4444-8444-444444444444";
+const AD_UUID = "55555555-5555-4555-8555-555555555555";
+const CREATIVE_UUID = "66666666-6666-4666-8666-666666666666";
 
 function bridgeRow(
   overrides: Partial<AdsDeliverableBridgeRow> = {}
 ): AdsDeliverableBridgeRow {
   return {
-    adId: "ad-1",
+    adId: AD_UUID,
     adStatus: "approved",
-    adSetId: "adset-1",
+    adSetId: AD_SET_UUID,
     adSetStatus: "approved",
-    campaignId: CAMPAIGN_REF,
+    campaignId: CAMPAIGN_UUID,
     campaignStatus: "approved",
-    advertiserAccountId: ADVERTISER_REF,
+    advertiserAccountId: ADVERTISER_UUID,
     advertiserStatus: "approved",
-    creativeId: "creative-1",
+    creativeId: CREATIVE_UUID,
     creativeStatus: "approved",
     creativeType: "video",
     placements: ["watch_feed"],
@@ -263,6 +263,14 @@ describe("Ads Diagnostic Runner authorization boundary", () => {
     expect(outcome.report.canonicalOutcomeValid).toBe(true);
     expect(outcome.report.deliveryGate).not.toBeNull();
     expect(outcome.report.deliveryGate?.passed).toBe(false);
+    expect(outcome.report.provenance?.bindingTokenAuthoritative).toBe(false);
+    expect(
+      outcome.report.provenance?.bindingToken.length ?? 999
+    ).toBeLessThanOrEqual(128);
+    expect(outcome.report.provenance?.bindingToken.includes("|")).toBe(false);
+    expect(outcome.report.loadedCandidates[0]?.provenanceFingerprint).toMatch(
+      /^ap1:/
+    );
     expect(supabase.from).not.toHaveBeenCalled();
     expect(supabase.rpc).not.toHaveBeenCalled();
   });
@@ -274,10 +282,10 @@ describe("Ads Diagnostic Runner contracts", () => {
       rows: [
         bridgeRow(),
         bridgeRow({
-          adId: "ad-2",
+          adId: "77777777-7777-4777-8777-777777777777",
           placements: ["search_results"],
           creativeType: "image",
-          creativeId: "creative-2",
+          creativeId: "88888888-8888-4888-8888-888888888888",
         }),
       ],
       sourceId: "src-1",
@@ -286,11 +294,15 @@ describe("Ads Diagnostic Runner contracts", () => {
     });
     expect(mapped.valid).toBe(true);
     if (!mapped.valid) return;
+    expect(
+      mapped.result.selectionInventory.candidates[0]?.provenanceIdentity
+        ?.provenanceFingerprint
+    ).toMatch(/^ap1:/);
 
     const scoped = scopeDiagnosticSelectionInventory({
       bridge: mapped.result,
       placementId: "WATCH_FEED",
-      campaignId: CAMPAIGN_REF,
+      campaignId: CAMPAIGN_UUID,
       adSetId: null,
       candidateLimit: 10,
       sourceId: "diag-src",
@@ -313,6 +325,10 @@ describe("Ads Diagnostic Runner contracts", () => {
     expect(outcome.result.productionAccepted).toBe(false);
     expect(outcome.result.deliveryEnabled).toBe(false);
     expect(outcome.result.billingEnabled).toBe(false);
+    expect(outcome.result.provenance?.bindingToken.length).toBeLessThanOrEqual(
+      128
+    );
+    expect(outcome.result.provenance?.domainPlacement).toBe("watch_feed");
   });
 
   it("keeps authority flags closed and source exclusivity intact", () => {

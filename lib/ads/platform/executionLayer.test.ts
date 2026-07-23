@@ -108,11 +108,13 @@ function issuedProvenance(
     advertiserRef: overrides.advertiserRef ?? "advertiser-1",
     creativeRef: overrides.creativeRef ?? "creative-ref-1",
     placementId: "WATCH_FEED",
+    domainPlacement: "watch_feed",
     adSetRef: overrides.adSetRef ?? "ad-set-1",
     adRef: overrides.adRef ?? "ad-1",
     selectionRequestId: "selection-req-1",
     inventorySourceId: "inv-1",
     inventoryRevision: 1,
+    moderationSnapshotRef: "mod-snap-1",
   });
   if (!outcome.valid) {
     throw new Error(outcome.issues.join("; "));

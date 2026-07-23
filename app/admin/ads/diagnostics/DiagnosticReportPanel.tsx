@@ -10,6 +10,7 @@ type Props = {
 export default function DiagnosticReportPanel({ report }: Props) {
   const [candidateFilter, setCandidateFilter] = useState("");
   const [reasonFilter, setReasonFilter] = useState("");
+  const [provenanceFilter, setProvenanceFilter] = useState("");
 
   const filteredCandidates = useMemo(() => {
     const q = candidateFilter.trim().toLowerCase();
@@ -22,7 +23,11 @@ export default function DiagnosticReportPanel({ report }: Props) {
         candidate.adRef,
         candidate.creativeRef,
         candidate.placementId,
+        candidate.domainPlacement,
+        candidate.provenanceFingerprint,
+        candidate.moderationSnapshotRef,
       ]
+        .filter(Boolean)
         .join(" ")
         .toLowerCase()
         .includes(q)
@@ -36,6 +41,40 @@ export default function DiagnosticReportPanel({ report }: Props) {
       reason.toLowerCase().includes(q)
     );
   }, [reasonFilter, report.rejectionReasons]);
+
+  const provenanceMatches = useMemo(() => {
+    const q = provenanceFilter.trim().toLowerCase();
+    const structured = report.provenance;
+    const fromCandidates = report.loadedCandidates.map((c) => ({
+      candidateId: c.candidateId,
+      domainPlacement: c.domainPlacement,
+      placementId: c.placementId,
+      provenanceFingerprint: c.provenanceFingerprint,
+      moderationSnapshotRef: c.moderationSnapshotRef,
+      inventorySource: c.inventorySource,
+      advertiserRef: c.advertiserRef,
+      campaignRef: c.campaignRef,
+      adSetRef: c.adSetRef,
+      adRef: c.adRef,
+      creativeRef: c.creativeRef,
+    }));
+    const haystack = JSON.stringify({
+      issued: structured,
+      bridgeIdentities: fromCandidates,
+    }).toLowerCase();
+    if (!q) {
+      return { issued: structured, bridgeIdentities: fromCandidates };
+    }
+    if (!haystack.includes(q)) {
+      return { issued: null, bridgeIdentities: [] as typeof fromCandidates };
+    }
+    return {
+      issued: structured,
+      bridgeIdentities: fromCandidates.filter((row) =>
+        JSON.stringify(row).toLowerCase().includes(q)
+      ),
+    };
+  }, [provenanceFilter, report.loadedCandidates, report.provenance]);
 
   return (
     <div className="mt-6 space-y-4">
@@ -115,10 +154,18 @@ export default function DiagnosticReportPanel({ report }: Props) {
             >
               <div>{candidate.candidateId}</div>
               <div className="mt-1 text-white/50">
-                {candidate.placementId} · campaign {candidate.campaignRef} · ad{" "}
-                {candidate.adRef} · creative {candidate.creativeRef} (
-                {candidate.creativeType})
+                {candidate.placementId}
+                {candidate.domainPlacement
+                  ? ` (${candidate.domainPlacement})`
+                  : ""}{" "}
+                · campaign {candidate.campaignRef} · ad {candidate.adRef} ·
+                creative {candidate.creativeRef} ({candidate.creativeType})
               </div>
+              {candidate.provenanceFingerprint ? (
+                <div className="mt-1 text-white/40">
+                  fp {candidate.provenanceFingerprint}
+                </div>
+              ) : null}
             </li>
           ))}
           {filteredCandidates.length === 0 ? (
@@ -167,6 +214,26 @@ export default function DiagnosticReportPanel({ report }: Props) {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-sm font-black uppercase tracking-[0.16em] text-white/50">
+            Structured provenance
+          </h2>
+          <label className="block text-xs text-white/50">
+            Filter provenance
+            <input
+              value={provenanceFilter}
+              onChange={(event) => setProvenanceFilter(event.target.value)}
+              className="mt-1 block w-56 rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+              placeholder="fingerprint / uuid / placement"
+            />
+          </label>
+        </div>
+        <pre className="mt-3 max-h-72 overflow-auto rounded-xl bg-black/40 p-3 text-[11px] leading-relaxed text-white/70">
+          {JSON.stringify(provenanceMatches, null, 2)}
+        </pre>
       </section>
 
       <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">

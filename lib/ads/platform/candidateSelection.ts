@@ -1,5 +1,10 @@
 import type { ContractValidationResult } from "./creativeContracts";
 import {
+  assertBridgeProvenanceMatchesCandidate,
+  validateAdsBridgeCandidateProvenance,
+  type AdsBridgeCandidateProvenanceV1,
+} from "./candidateProvenance";
+import {
   ADS_DELIVERY_DEVICE_CLASSES,
   ADS_DELIVERY_MAX_ID_LENGTH,
   type AdsDeliveryDeviceClass,
@@ -128,6 +133,7 @@ export const ADS_SELECTION_CANDIDATE_ALLOWED_FIELDS = [
   "adRef",
   "eligibility",
   "diagnostics",
+  "provenanceIdentity",
 ] as const;
 
 /**
@@ -186,6 +192,12 @@ export type AdsSelectionCandidate = Readonly<{
   adRef: string;
   eligibility: AdsCandidateEligibilityState;
   diagnostics?: AdsCandidateSelectionDiagnosticsNote;
+  /**
+   * Optional Inventory Bridge structured provenance identity.
+   * When present, must validate and match candidate identity fields.
+   * Not WeakSet-issued — stack issuance happens in the selection→render adapter.
+   */
+  provenanceIdentity?: AdsBridgeCandidateProvenanceV1;
 }>;
 
 /**
@@ -481,16 +493,23 @@ function freezeCandidate(
     adRef: candidate.adRef,
     eligibility: freezeEligibility(candidate.eligibility),
   };
+  let withOptional: AdsSelectionCandidate = frozen;
   if (candidate.diagnostics) {
-    return Object.freeze({
-      ...frozen,
+    withOptional = Object.freeze({
+      ...withOptional,
       diagnostics: Object.freeze({
         noteRef: candidate.diagnostics.noteRef,
         revision: candidate.diagnostics.revision,
       }),
     });
   }
-  return Object.freeze(frozen);
+  if (candidate.provenanceIdentity) {
+    withOptional = Object.freeze({
+      ...withOptional,
+      provenanceIdentity: candidate.provenanceIdentity,
+    });
+  }
+  return Object.freeze(withOptional);
 }
 
 function parseEligibilityState(
@@ -728,6 +747,49 @@ export function parseAdsSelectionCandidate(
   const eligibility = parseEligibilityState(input.eligibility, prefix, issues);
   const diagnostics = parseDiagnosticsNote(input.diagnostics, prefix, issues);
 
+  let provenanceIdentity: AdsBridgeCandidateProvenanceV1 | undefined;
+  if (input.provenanceIdentity !== undefined) {
+    const provenanceCheck = validateAdsBridgeCandidateProvenance(
+      input.provenanceIdentity
+    );
+    if (!provenanceCheck.valid) {
+      issues.push(
+        ...provenanceCheck.issues.map(
+          (issue) => `${prefix}provenanceIdentity: ${issue}`
+        )
+      );
+    } else if (
+      placementId !== null &&
+      isNonEmptyString(input.candidateId) &&
+      isNonEmptyString(input.campaignRef) &&
+      isNonEmptyString(input.advertiserRef) &&
+      isNonEmptyString(input.creativeRef) &&
+      isNonEmptyString(input.adSetRef) &&
+      isNonEmptyString(input.adRef)
+    ) {
+      const match = assertBridgeProvenanceMatchesCandidate(
+        input.provenanceIdentity as AdsBridgeCandidateProvenanceV1,
+        {
+          candidateId: input.candidateId,
+          campaignRef: input.campaignRef,
+          advertiserRef: input.advertiserRef,
+          creativeRef: input.creativeRef,
+          adSetRef: input.adSetRef,
+          adRef: input.adRef,
+          placementId,
+        }
+      );
+      if (!match.valid) {
+        issues.push(
+          ...match.issues.map((issue) => `${prefix}provenanceIdentity: ${issue}`)
+        );
+      } else {
+        provenanceIdentity =
+          input.provenanceIdentity as AdsBridgeCandidateProvenanceV1;
+      }
+    }
+  }
+
   if (
     issues.length > 0 ||
     !candidateIdOk ||
@@ -763,6 +825,7 @@ export function parseAdsSelectionCandidate(
       adRef: input.adRef,
       eligibility,
       diagnostics,
+      provenanceIdentity,
     }),
   };
 }

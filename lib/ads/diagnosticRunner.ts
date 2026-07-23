@@ -94,6 +94,10 @@ export type AdsDiagnosticLoadedCandidateV1 = Readonly<{
   adRef: string;
   creativeRef: string;
   creativeType: string;
+  domainPlacement: string | null;
+  moderationSnapshotRef: string | null;
+  provenanceFingerprint: string | null;
+  inventorySource: string | null;
 }>;
 
 export type AdsDiagnosticReportV1 = Readonly<{
@@ -332,6 +336,7 @@ export function parseAdsDiagnosticRequestV1(
 function mapLoadedCandidate(
   candidate: AdsSelectionCandidate
 ): AdsDiagnosticLoadedCandidateV1 {
+  const identity = candidate.provenanceIdentity;
   return Object.freeze({
     candidateId: candidate.candidateId,
     placementId: candidate.placementId,
@@ -341,6 +346,10 @@ function mapLoadedCandidate(
     adRef: candidate.adRef,
     creativeRef: candidate.creativeRef,
     creativeType: candidate.creativeType,
+    domainPlacement: identity?.domainPlacement ?? null,
+    moderationSnapshotRef: identity?.moderationSnapshotRef ?? null,
+    provenanceFingerprint: identity?.provenanceFingerprint ?? null,
+    inventorySource: identity?.inventorySource ?? null,
   });
 }
 

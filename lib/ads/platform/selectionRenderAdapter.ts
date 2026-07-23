@@ -342,17 +342,54 @@ export function adaptAdsSelectionToRenderEligible(
     },
   });
 
+  const bridgeIdentity = inventoryCandidate.provenanceIdentity;
+  if (bridgeIdentity) {
+    if (bridgeIdentity.placementId !== inventoryCandidate.placementId) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          "bridge provenance placementId disagrees with inventory candidate.",
+        ]),
+      };
+    }
+    if (
+      bridgeIdentity.advertiserAccountId !== inventoryCandidate.advertiserRef ||
+      bridgeIdentity.campaignId !== inventoryCandidate.campaignRef ||
+      bridgeIdentity.adSetId !== inventoryCandidate.adSetRef ||
+      bridgeIdentity.creativeId !== inventoryCandidate.creativeRef ||
+      bridgeIdentity.adId !== inventoryCandidate.adRef ||
+      bridgeIdentity.candidateId !== inventoryCandidate.candidateId
+    ) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          "bridge provenance identity conflicts with inventory candidate.",
+        ]),
+      };
+    }
+  }
+
+  const domainPlacement =
+    bridgeIdentity?.domainPlacement ??
+    inventoryCandidate.placementId.toLowerCase();
+  const moderationSnapshotRef =
+    bridgeIdentity?.moderationSnapshotRef ??
+    inventoryCandidate.diagnostics?.noteRef ??
+    `mod:${inventoryCandidate.adRef}:1`;
+
   const provenanceOutcome = buildAdsCandidateProvenanceBinding({
     candidateId: eligibleCandidate.candidateId,
     campaignRef: eligibleCandidate.campaignRef,
     advertiserRef: eligibleCandidate.advertiserRef,
     creativeRef: eligibleCandidate.creativeRef,
     placementId: eligibleCandidate.placementId,
+    domainPlacement,
     adSetRef: eligibleCandidate.adSetRef,
     adRef: eligibleCandidate.adRef,
     selectionRequestId: selectionResult.selectionMetadata.selectionRequestId,
     inventorySourceId: inventory.sourceId,
     inventoryRevision: inventory.revision,
+    moderationSnapshotRef,
   });
   if (!provenanceOutcome.valid) {
     return {

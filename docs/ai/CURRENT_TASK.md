@@ -2,26 +2,29 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Diagnostic Runner Authorization Boundary Hardening V1
+UMTUBA Ads Platform — Candidate Provenance Foundation V1
 
 ## Goal
 
-Close the Diagnostic Runner library-level authorization gap: require
-DB-backed `assertPlatformAdminDb` at the execution boundary, quarantine unsafe
-exports/gate constructors, and harden request UUID/correlation validation —
-without enabling delivery/billing or committing.
+Replace the fragile pipe-joined candidate `bindingToken` with a structured,
+bounded, deterministic Candidate Provenance contract that works across Inventory
+Bridge, Diagnostic Runner, and Canonical Stack — without enabling
+delivery/billing or weakening `runAdsCanonicalStackV1`.
 
 ## Allowed scope
 
-- `lib/ads/diagnosticRunner.ts`
-- `lib/ads/diagnosticRunnerServer.ts`
-- `lib/ads/diagnosticRunner.test.ts`
-- `lib/ads/index.ts`
-- `lib/ads/adsAdminReviewFoundation.test.ts`
-- `app/admin/ads/diagnostics/**`
+- `lib/ads/platform/candidateProvenance.ts`
+- `lib/ads/platform/candidateProvenance.test.ts`
+- `lib/ads/platform/candidateSelection.ts` (provenance identity on candidates)
+- `lib/ads/platform/selectionRenderAdapter.ts` (+ related fixtures/tests)
+- `lib/ads/inventoryBridge.ts` (+ related bridge tests)
+- `lib/ads/diagnosticRunner.ts` / `diagnosticRunnerServer.ts` / tests
+- `app/admin/ads/diagnostics/**` (provenance display)
+- `docs/ads/ADS_CANDIDATE_PROVENANCE_FOUNDATION_V1.md`
 - `docs/ads/ADS_DIAGNOSTIC_RUNNER_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- Related Ads platform tests that assert token format
 
 ## Forbidden scope
 
@@ -29,6 +32,7 @@ without enabling delivery/billing or committing.
 - Merging into `alpha-0.2`
 - Pushing / applying migrations
 - Enabling live delivery or live billing
+- Alternate decision pipelines
 - Commit / push unless explicitly requested
 
 ## Branch

@@ -108,9 +108,14 @@ imports that module directly.
 - No database mutations from the runner
 - No event ingestion / UEOS charging
 
-## Known platform constraint
+## Provenance
 
-Provenance `bindingToken` is a pipe-joined identity string capped at 128 chars.
-UUID-dense inventory rows can exceed that platform limit independently of this
-runner. Diagnostics remain inspection-only; a hashed binding-token follow-up
-belongs to Candidate Provenance, not this authorization hardening.
+Diagnostics consume Candidate Provenance Foundation V1:
+
+- Bridge candidates carry structured `provenanceIdentity`
+- Canonical stack issues WeakSet provenance with a bounded fingerprint
+- `bindingToken` is a non-authoritative digest alias (`ap1:` + sha256)
+- UUID-dense inventory is supported
+- Admin UI can filter/search structured provenance fields
+
+See `docs/ads/ADS_CANDIDATE_PROVENANCE_FOUNDATION_V1.md`.

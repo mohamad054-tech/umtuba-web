@@ -19,6 +19,7 @@ import {
   type AdsCandidateSelectionInventory,
   type AdsSelectionCandidate,
 } from "./platform/candidateSelection";
+import { buildAdsBridgeCandidateProvenance } from "./platform/candidateProvenance";
 import { isCreativeCompatible } from "./platform/creativePlacementCompatibility";
 import {
   getCanonicalPlacement,
@@ -251,6 +252,27 @@ export function mapDeliverableRowsToInventoryBridge(input: {
         exclusionReasons.push(`${candidateId}:duplicate_candidate`);
         continue;
       }
+
+      const moderationSnapshotRef = `mod:${row.adId}:${Math.max(1, row.revision)}:${row.adStatus}:${row.creativeStatus}:${row.campaignStatus}`;
+      const provenanceOutcome = buildAdsBridgeCandidateProvenance({
+        advertiserAccountId: row.advertiserAccountId,
+        campaignId: row.campaignId,
+        adSetId: row.adSetId,
+        creativeId: row.creativeId,
+        adId: row.adId,
+        domainPlacement,
+        placementId,
+        candidateId,
+        inventorySource: "catalog",
+        moderationSnapshotRef,
+      });
+      if (!provenanceOutcome.valid) {
+        exclusionReasons.push(
+          `${candidateId}:provenance_invalid:${provenanceOutcome.issues[0] ?? "unknown"}`
+        );
+        continue;
+      }
+
       seenCandidateIds.add(candidateId);
 
       const requiresAgeGate = row.ageMin < 18;
@@ -290,6 +312,7 @@ export function mapDeliverableRowsToInventoryBridge(input: {
                 : (["mobile", "tablet", "desktop"] as const)
             ),
           }),
+          provenanceIdentity: provenanceOutcome.provenance,
         })
       );
 

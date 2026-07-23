@@ -607,11 +607,13 @@ describe("Ads Measurement Foundation V1", () => {
       advertiserRef: "advertiser-1",
       creativeRef: "creative-ref-1",
       placementId: "WATCH_FEED",
+      domainPlacement: "watch_feed",
       adSetRef: "ad-set-1",
       adRef: "ad-1",
       selectionRequestId: "selection-req-1",
       inventorySourceId: "inv-1",
       inventoryRevision: 1,
+      moderationSnapshotRef: "mod-snap-1",
     });
     expect(provenanceOutcome.valid).toBe(true);
     if (!provenanceOutcome.valid) {
