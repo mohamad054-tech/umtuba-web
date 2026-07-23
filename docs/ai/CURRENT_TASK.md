@@ -2,34 +2,40 @@
 
 ## Task title
 
-UMTUBA Ads Platform Γאפ Critical Architecture Closure
+UMTUBA Ads Platform — Production Serving Foundation V1
 
 ## Goal
 
-Resolve final-certification critical blockers only:
-canonical authority for delivery/measurement/billing, delivery-gate
-production-acceptance semantics (Option B), billing authority, and
-production decision-path exclusivity.
+Implement the next Ads foundation layer after canonical production authority
+hardening: serving lifecycle contracts, ordered state transitions, correlation /
+provenance, idempotency for delivery/measurement/billing handoffs, deterministic
+rejection reasons, structured diagnostics, and fail-closed kill-switch /
+environment gates — while keeping production delivery and billing disabled.
 
 ## Allowed scope
 
 - `lib/ads/platform/*`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ads/ADS_PRODUCTION_SERVING_FOUNDATION_V1.md`
 
 ## Forbidden scope
 
+- Games / Learning / Store / World / Messages / Live / product surfaces
 - `app/discover/components/DiscoverShell.tsx`
-- Learning / Store / World / Messages / Live / product surfaces
+- Merging into `alpha-0.2`
+- Pushing directly to `alpha-0.2`
 - Migrations / remote Supabase apply
-- Medium/minor recommendations unless required for a critical blocker
+- Enabling live billing or live delivery
+- Weakening canonical authority guarantees
+- Creating a second authoritative pipeline
 - Commit / push unless explicitly requested
 
 ## Branch
 
-`alpha-0.2`
+`office/ads-canonical-authority-hardening-v1`
 
 ## Status
 
-`implemented Γאפ verified (676/676 platform tests, tsc, build, git diff --check);
-critical blockers closed; DiscoverShell untouched; no commit.`
+`implemented — verified (688/688 platform tests, tsc, build, git diff --check);
+not committed.`

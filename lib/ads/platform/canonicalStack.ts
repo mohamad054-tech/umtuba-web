@@ -76,6 +76,20 @@ import {
   adaptAdsSelectionToRenderEligible,
   type AdsSelectionRenderAdapterResult,
 } from "./selectionRenderAdapter";
+import {
+  ADS_SERVING_AUTHORITATIVE_ENTRYPOINT,
+  applyAdsServingIdempotencyClaimV1,
+  assertAdsServingKillSwitchesClosedV1,
+  buildAdsServingCorrelationV1,
+  buildAdsServingIdempotencyKeysV1,
+  claimAdsServingIdempotencyV1,
+  createAdsServingLifecycleV1,
+  transitionAdsServingStageV1,
+  validateAdsServingLifecycleV1,
+  type AdsServingLifecycleV1,
+  type AdsServingLifecycleStage,
+  type AdsServingRejectionReason,
+} from "./servingFoundation";
 
 /**
  * Ads Canonical Stack V1 — sole authoritative production-disabled decision path.
@@ -192,6 +206,8 @@ export const ADS_CANONICAL_STACK_V1_INPUT_ALLOWED_FIELDS = [
   "currentTimestamp",
   "eventType",
   "seenDedupeKeys",
+  "seenDeliveryAttemptKeys",
+  "seenBillingHandoffKeys",
 ] as const;
 
 /**
@@ -234,6 +250,10 @@ export type AdsCanonicalStackV1Input = Readonly<{
   currentTimestamp: string;
   eventType: AdsMeasurementFoundationEventType;
   seenDedupeKeys?: readonly string[];
+  /** Idempotency ledger for diagnostic delivery attempts (fail-closed). */
+  seenDeliveryAttemptKeys?: readonly string[];
+  /** Idempotency ledger for diagnostic billing handoffs (fail-closed). */
+  seenBillingHandoffKeys?: readonly string[];
 }>;
 
 export type AdsCanonicalDecisionTraceStage = Readonly<{
@@ -302,6 +322,12 @@ export type AdsCanonicalStackV1Result = Readonly<{
   billingEligible: boolean;
   billingResult: AdsBillingEvaluationResult | null;
   chargeResult: AdsBillingEvaluationResult["chargeResult"];
+  /**
+   * Production-serving foundation lifecycle (ordering, correlation,
+   * idempotency, kill switches). Attached by the canonical path only —
+   * never an alternate authority surface.
+   */
+  servingLifecycle: AdsServingLifecycleV1;
   /** Marks this result as the sole authoritative decision artifact. */
   authoritativeDecisionPath: true;
   productionEnabled: false;
@@ -460,6 +486,7 @@ function freezeCanonicalResult(
     billingEligible: result.billingEligible,
     billingResult: result.billingResult,
     chargeResult: result.chargeResult,
+    servingLifecycle: result.servingLifecycle,
     authoritativeDecisionPath: true as const,
     productionEnabled: false as const,
     deliveryEnabled: false as const,
@@ -495,6 +522,7 @@ function rejectedResult(params: {
   rejectionReason: AdsCanonicalStackV1RejectionReason;
   deliveryGate: AdsCanonicalDeliveryGateV1;
   decisionTrace: AdsCanonicalDecisionTraceV1;
+  servingLifecycle: AdsServingLifecycleV1;
   partial?: Partial<AdsCanonicalStackV1Result>;
 }): AdsCanonicalStackV1Result {
   const partial = params.partial ?? emptyPartial();
@@ -523,6 +551,7 @@ function rejectedResult(params: {
     billingEligible: false,
     billingResult: partial.billingResult ?? null,
     chargeResult: null,
+    servingLifecycle: params.servingLifecycle,
     authoritativeDecisionPath: true,
     productionEnabled: false,
     deliveryEnabled: false,
@@ -530,6 +559,49 @@ function rejectedResult(params: {
     measurementEnabled: false,
     billingEnabled: false,
   });
+}
+
+function resolveSelectionRequestId(selectionContext: unknown): string | null {
+  if (!isRecord(selectionContext)) {
+    return null;
+  }
+  return typeof selectionContext.selectionRequestId === "string"
+    ? selectionContext.selectionRequestId
+    : null;
+}
+
+function advanceServingStage(
+  lifecycle: AdsServingLifecycleV1,
+  stage: AdsServingLifecycleStage,
+  status: "accepted" | "rejected" | "skipped",
+  rejectionReason: AdsServingRejectionReason | null = null,
+  extras: {
+    provenance?: Parameters<typeof transitionAdsServingStageV1>[0]["provenance"];
+    idempotency?: Parameters<
+      typeof transitionAdsServingStageV1
+    >[0]["idempotency"];
+    deliveryAccepted?: boolean;
+    measurementAccepted?: boolean;
+    billingHandoffAccepted?: boolean;
+  } = {}
+):
+  | { valid: true; lifecycle: AdsServingLifecycleV1 }
+  | { valid: false; issues: readonly string[]; lifecycle: AdsServingLifecycleV1 } {
+  const outcome = transitionAdsServingStageV1({
+    lifecycle,
+    stage,
+    status,
+    rejectionReason,
+    ...extras,
+  });
+  if (!outcome.valid) {
+    return {
+      valid: false,
+      issues: outcome.issues,
+      lifecycle: outcome.lifecycle,
+    };
+  }
+  return { valid: true, lifecycle: outcome.lifecycle };
 }
 
 function indexByCandidateId<T extends { candidateId: string }>(
@@ -664,6 +736,36 @@ export function validateAdsCanonicalStackV1Result(
     }
     if (input.deliveryGate.placementDeliveryEnabled !== false) {
       issues.push("deliveryGate.placementDeliveryEnabled must be false.");
+    }
+  }
+  if (!("servingLifecycle" in input)) {
+    issues.push("servingLifecycle is required on canonical stack results.");
+  } else {
+    const servingValidation = validateAdsServingLifecycleV1(
+      input.servingLifecycle
+    );
+    if (!servingValidation.valid) {
+      issues.push(
+        ...servingValidation.issues.map((issue) => `servingLifecycle: ${issue}`)
+      );
+    }
+    if (isRecord(input.servingLifecycle)) {
+      if (input.servingLifecycle.productionAccepted !== false) {
+        issues.push("servingLifecycle.productionAccepted must be false.");
+      }
+      if (input.servingLifecycle.authoritativeProductionServing !== false) {
+        issues.push(
+          "servingLifecycle.authoritativeProductionServing must be false."
+        );
+      }
+      const gateCheck = assertAdsServingKillSwitchesClosedV1(
+        input.servingLifecycle.environmentGate
+      );
+      if (!gateCheck.valid) {
+        issues.push(
+          ...gateCheck.issues.map((issue) => `servingLifecycle: ${issue}`)
+        );
+      }
     }
   }
 
@@ -813,11 +915,49 @@ export function runAdsCanonicalStackV1(
     return { valid: false, issues: Object.freeze([...parseIssues]) };
   }
 
+  // Structural lock: serving foundation cannot redefine the authority path.
+  if (ADS_SERVING_AUTHORITATIVE_ENTRYPOINT !== "runAdsCanonicalStackV1") {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "Serving authoritative entrypoint mismatch — canonical stack only.",
+      ]),
+    };
+  }
+
   const eventType = input.eventType as AdsMeasurementFoundationEventType;
   const ivtSignals = (
     ivtParse as { valid: true; signals: AdsCanonicalStackInvalidTrafficSignals }
   ).signals;
   const placementId = resolvePlacementId(input.selectionContext);
+  const selectionRequestId = resolveSelectionRequestId(input.selectionContext);
+  const servingRequestId = selectionRequestId ?? `serving:${placementId ?? "unknown"}`;
+  const correlationOutcome = buildAdsServingCorrelationV1({
+    servingRequestId,
+    selectionRequestId,
+    placementId,
+  });
+  if (!correlationOutcome.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...correlationOutcome.issues.map((issue) => `serving: ${issue}`),
+      ]),
+    };
+  }
+  const lifecycleCreate = createAdsServingLifecycleV1({
+    correlation: correlationOutcome.correlation,
+  });
+  if (!lifecycleCreate.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...lifecycleCreate.issues.map((issue) => `serving: ${issue}`),
+      ]),
+    };
+  }
+  let servingLifecycle = lifecycleCreate.lifecycle;
+
   const deliveryGate = evaluateDeliveryGate(placementId);
   const trace = createTraceBuilder();
 
@@ -836,6 +976,25 @@ export function runAdsCanonicalStackV1(
     );
   }
 
+  // Serving lifecycle: request intake (diagnostics may continue; production closed).
+  {
+    const advance = advanceServingStage(
+      servingLifecycle,
+      "request_intake",
+      "accepted",
+      null
+    );
+    if (!advance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...advance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = advance.lifecycle;
+  }
+
   // --- select ---
   const selectionOutcome = runAdsCandidateSelection(
     input.inventory,
@@ -851,6 +1010,15 @@ export function runAdsCanonicalStackV1(
   }
 
   if (selectionOutcome.result.eligibleCandidates.length === 0) {
+    const eligibilityAdvance = advanceServingStage(
+      servingLifecycle,
+      "eligibility",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (eligibilityAdvance.valid) {
+      servingLifecycle = eligibilityAdvance.lifecycle;
+    }
     trace.push("select", "rejected", "no_eligible_candidates", null);
     const decisionTrace = trace.freeze(
       "select",
@@ -863,6 +1031,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "no_eligible_candidates",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: { selectionResult: selectionOutcome.result },
     });
     const validation = validateAdsCanonicalStackV1Result(result);
@@ -870,6 +1039,39 @@ export function runAdsCanonicalStackV1(
       return { valid: false, issues: Object.freeze([...validation.issues]) };
     }
     return { valid: true, result };
+  }
+
+  {
+    const eligibilityAdvance = advanceServingStage(
+      servingLifecycle,
+      "eligibility",
+      "accepted",
+      null
+    );
+    if (!eligibilityAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...eligibilityAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = eligibilityAdvance.lifecycle;
+    const selectionAdvance = advanceServingStage(
+      servingLifecycle,
+      "candidate_selection",
+      "accepted",
+      null
+    );
+    if (!selectionAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...selectionAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = selectionAdvance.lifecycle;
   }
 
   trace.push("select", "accepted", null, null);
@@ -884,6 +1086,15 @@ export function runAdsCanonicalStackV1(
   ).filter((signal) => eligibleIds.has(signal.candidateId));
 
   if (rankingSignals.length === 0) {
+    const rankingAdvance = advanceServingStage(
+      servingLifecycle,
+      "ranking",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (rankingAdvance.valid) {
+      servingLifecycle = rankingAdvance.lifecycle;
+    }
     trace.push("score_rank", "rejected", "no_rankable_candidates", null);
     const decisionTrace = trace.freeze(
       "score_rank",
@@ -896,6 +1107,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "no_rankable_candidates",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: { selectionResult: selectionOutcome.result },
     });
     const validation = validateAdsCanonicalStackV1Result(result);
@@ -917,6 +1129,15 @@ export function runAdsCanonicalStackV1(
   }
 
   if (rankingOutcome.result.rankedCandidates.length === 0) {
+    const rankingAdvance = advanceServingStage(
+      servingLifecycle,
+      "ranking",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (rankingAdvance.valid) {
+      servingLifecycle = rankingAdvance.lifecycle;
+    }
     trace.push("score_rank", "rejected", "no_rankable_candidates", null);
     const decisionTrace = trace.freeze(
       "score_rank",
@@ -929,6 +1150,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "no_rankable_candidates",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -943,6 +1165,23 @@ export function runAdsCanonicalStackV1(
 
   const topRankedId = rankingOutcome.result.rankedCandidates[0]?.candidateId ?? null;
   trace.push("score_rank", "accepted", null, topRankedId);
+  {
+    const rankingAdvance = advanceServingStage(
+      servingLifecycle,
+      "ranking",
+      "accepted",
+      null
+    );
+    if (!rankingAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...rankingAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = rankingAdvance.lifecycle;
+  }
 
   const budgetById = indexByCandidateId(
     input.budgetSnapshots as readonly AdsBudgetSnapshot[]
@@ -1051,6 +1290,15 @@ export function runAdsCanonicalStackV1(
     return budget?.budgetEligible === true;
   });
   if (!anyBudgetEligible) {
+    const auctionAdvance = advanceServingStage(
+      servingLifecycle,
+      "auction",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (auctionAdvance.valid) {
+      servingLifecycle = auctionAdvance.lifecycle;
+    }
     trace.push("budget", "rejected", "budget_ineligible", budgetRejectId);
     const decisionTrace = trace.freeze(
       "budget",
@@ -1063,6 +1311,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "budget_ineligible",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1087,6 +1336,15 @@ export function runAdsCanonicalStackV1(
     );
   });
   if (!anyPacingEligible) {
+    const auctionAdvance = advanceServingStage(
+      servingLifecycle,
+      "auction",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (auctionAdvance.valid) {
+      servingLifecycle = auctionAdvance.lifecycle;
+    }
     trace.push("pacing", "rejected", "pacing_ineligible", pacingRejectId);
     const decisionTrace = trace.freeze(
       "pacing",
@@ -1099,6 +1357,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "pacing_ineligible",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1117,6 +1376,15 @@ export function runAdsCanonicalStackV1(
 
   const anyFrequencyEligible = eligibilityState.some((entry) => entry.eligible);
   if (!anyFrequencyEligible) {
+    const auctionAdvance = advanceServingStage(
+      servingLifecycle,
+      "auction",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (auctionAdvance.valid) {
+      servingLifecycle = auctionAdvance.lifecycle;
+    }
     trace.push(
       "frequency",
       "rejected",
@@ -1134,6 +1402,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "frequency_ineligible",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1174,6 +1443,15 @@ export function runAdsCanonicalStackV1(
   }
 
   if (auctionOutcome.result.auctionWinner === null) {
+    const auctionAdvance = advanceServingStage(
+      servingLifecycle,
+      "auction",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (auctionAdvance.valid) {
+      servingLifecycle = auctionAdvance.lifecycle;
+    }
     trace.push("auction", "rejected", "no_auction_winner", null);
     const decisionTrace = trace.freeze(
       "auction",
@@ -1186,6 +1464,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "no_auction_winner",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1204,6 +1483,28 @@ export function runAdsCanonicalStackV1(
 
   const winnerId = auctionOutcome.result.auctionWinner.candidateId;
   trace.push("auction", "accepted", null, winnerId);
+  {
+    const auctionAdvance = advanceServingStage(
+      servingLifecycle,
+      "auction",
+      "accepted",
+      null,
+      {
+        provenance: {
+          candidateId: winnerId,
+        },
+      }
+    );
+    if (!auctionAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...auctionAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = auctionAdvance.lifecycle;
+  }
 
   const winnerEligible = selectionOutcome.result.eligibleCandidates.find(
     (c) => c.candidateId === winnerId
@@ -1257,6 +1558,21 @@ export function runAdsCanonicalStackV1(
 
     fraudResult = fraudOutcome.result;
     if (!fraudOutcome.result.fraudEligible) {
+      const fraudAdvance = advanceServingStage(
+        servingLifecycle,
+        "fraud_ivt_decision",
+        "rejected",
+        "environment_gate_closed",
+        {
+          provenance: {
+            candidateId: winnerId,
+            campaignRef: winnerEligible.campaignRef,
+          },
+        }
+      );
+      if (fraudAdvance.valid) {
+        servingLifecycle = fraudAdvance.lifecycle;
+      }
       trace.push("fraud", "rejected", "fraud_rejected", winnerId);
       const decisionTrace = trace.freeze(
         "fraud",
@@ -1269,6 +1585,7 @@ export function runAdsCanonicalStackV1(
         rejectionReason: "fraud_rejected",
         deliveryGate,
         decisionTrace,
+        servingLifecycle,
         partial: {
           selectionResult: selectionOutcome.result,
           rankingResult: rankingOutcome.result,
@@ -1286,8 +1603,58 @@ export function runAdsCanonicalStackV1(
       return { valid: true, result };
     }
     trace.push("fraud", "accepted", null, winnerId);
+    {
+      const fraudAdvance = advanceServingStage(
+        servingLifecycle,
+        "fraud_ivt_decision",
+        "accepted",
+        null,
+        {
+          provenance: {
+            candidateId: winnerId,
+            campaignRef: winnerEligible.campaignRef,
+            advertiserRef: winnerEligible.advertiserRef,
+            adSetRef: winnerEligible.adSetRef,
+            adRef: winnerEligible.adRef,
+            creativeRef: winnerEligible.creativeRef,
+          },
+        }
+      );
+      if (!fraudAdvance.valid) {
+        return {
+          valid: false,
+          issues: Object.freeze([
+            ...fraudAdvance.issues.map((issue) => `serving: ${issue}`),
+          ]),
+        };
+      }
+      servingLifecycle = fraudAdvance.lifecycle;
+    }
   } else {
     trace.push("fraud", "skipped", null, winnerId);
+    {
+      const fraudAdvance = advanceServingStage(
+        servingLifecycle,
+        "fraud_ivt_decision",
+        "skipped",
+        null,
+        {
+          provenance: {
+            candidateId: winnerId,
+            campaignRef: winnerEligible.campaignRef,
+          },
+        }
+      );
+      if (!fraudAdvance.valid) {
+        return {
+          valid: false,
+          issues: Object.freeze([
+            ...fraudAdvance.issues.map((issue) => `serving: ${issue}`),
+          ]),
+        };
+      }
+      servingLifecycle = fraudAdvance.lifecycle;
+    }
   }
 
   // --- adapt (auction winner only — never caller candidateId) ---
@@ -1351,6 +1718,15 @@ export function runAdsCanonicalStackV1(
     !renderOutcome.result.renderAccepted ||
     renderOutcome.result.renderDescriptor === null
   ) {
+    const renderAdvance = advanceServingStage(
+      servingLifecycle,
+      "render_eligibility",
+      "rejected",
+      "environment_gate_closed"
+    );
+    if (renderAdvance.valid) {
+      servingLifecycle = renderAdvance.lifecycle;
+    }
     trace.push("render", "rejected", "render_rejected", winnerId);
     const decisionTrace = trace.freeze(
       "render",
@@ -1363,6 +1739,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "render_rejected",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1395,6 +1772,23 @@ export function runAdsCanonicalStackV1(
     };
   }
   trace.push("render", "accepted", null, winnerId);
+  {
+    const renderAdvance = advanceServingStage(
+      servingLifecycle,
+      "render_eligibility",
+      "accepted",
+      null
+    );
+    if (!renderAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...renderAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = renderAdvance.lifecycle;
+  }
 
   // --- execute ---
   const executionOutcome = runAdsExecutionLayerV1({
@@ -1425,6 +1819,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "execution_rejected",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1485,6 +1880,7 @@ export function runAdsCanonicalStackV1(
       rejectionReason: "delivery_rejected",
       deliveryGate,
       decisionTrace,
+      servingLifecycle,
       partial: {
         selectionResult: selectionOutcome.result,
         rankingResult: rankingOutcome.result,
@@ -1517,6 +1913,103 @@ export function runAdsCanonicalStackV1(
       issues: Object.freeze([...provenanceDelivery.issues]),
     };
   }
+
+  const idempotencyKeysOutcome = buildAdsServingIdempotencyKeysV1({
+    correlationId: servingLifecycle.correlation.correlationId,
+    candidateId: winnerId,
+    eventType,
+    reportingHandle,
+  });
+  if (!idempotencyKeysOutcome.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...idempotencyKeysOutcome.issues.map((issue) => `serving: ${issue}`),
+      ]),
+    };
+  }
+
+  const seenDeliveryAttemptKeys = Array.isArray(input.seenDeliveryAttemptKeys)
+    ? (input.seenDeliveryAttemptKeys as readonly string[])
+    : [];
+  const deliveryClaim = claimAdsServingIdempotencyV1({
+    kind: "delivery_attempt",
+    key: idempotencyKeysOutcome.keys.deliveryAttemptKey as string,
+    seenKeys: seenDeliveryAttemptKeys,
+    lifecycle: servingLifecycle,
+  });
+  if (!deliveryClaim.valid) {
+    const deliveryAdvance = advanceServingStage(
+      servingLifecycle,
+      "delivery_attempt",
+      "rejected",
+      deliveryClaim.rejectionReason
+    );
+    if (deliveryAdvance.valid) {
+      servingLifecycle = deliveryAdvance.lifecycle;
+    }
+    trace.push("deliver", "rejected", "delivery_rejected", winnerId);
+    const decisionTrace = trace.freeze(
+      "deliver",
+      false,
+      "delivery_rejected",
+      winnerId
+    );
+    const result = rejectedResult({
+      pipelineStage: "deliver",
+      rejectionReason: "delivery_rejected",
+      deliveryGate,
+      decisionTrace,
+      servingLifecycle,
+      partial: {
+        selectionResult: selectionOutcome.result,
+        rankingResult: rankingOutcome.result,
+        budgetResults: frozenBudgetResults,
+        pacingResults: frozenPacingResults,
+        frequencyResults: frozenFrequencyResults,
+        auctionResult: auctionOutcome.result,
+        fraudResult,
+        selectionRenderAdapter: adapterResult,
+        provenance,
+        renderResult: renderOutcome.result,
+        executionResult: executionOutcome.result,
+        deliveryResult: deliveryOutcome.result,
+      },
+    });
+    const validation = validateAdsCanonicalStackV1Result(result);
+    if (!validation.valid) {
+      return { valid: false, issues: Object.freeze([...validation.issues]) };
+    }
+    return { valid: true, result };
+  }
+
+  servingLifecycle = applyAdsServingIdempotencyClaimV1({
+    lifecycle: servingLifecycle,
+    claim: deliveryClaim,
+  });
+  {
+    const deliveryAdvance = advanceServingStage(
+      servingLifecycle,
+      "delivery_attempt",
+      "accepted",
+      null,
+      {
+        idempotency: {
+          deliveryAttemptKey: deliveryClaim.key,
+        },
+        deliveryAccepted: true,
+      }
+    );
+    if (!deliveryAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...deliveryAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = deliveryAdvance.lifecycle;
+  }
   trace.push("deliver", "accepted", null, winnerId);
 
   // --- measure ---
@@ -1529,6 +2022,15 @@ export function runAdsCanonicalStackV1(
       : {}),
   });
   if (!measurementOutcome.valid) {
+    const measureAdvance = advanceServingStage(
+      servingLifecycle,
+      "measurement_handoff",
+      "rejected",
+      "duplicate_measurement_event"
+    );
+    if (measureAdvance.valid) {
+      servingLifecycle = measureAdvance.lifecycle;
+    }
     trace.push("measure", "rejected", "measurement_rejected", winnerId);
     return {
       valid: false,
@@ -1536,6 +2038,60 @@ export function runAdsCanonicalStackV1(
         ...measurementOutcome.issues.map((issue) => `measurement: ${issue}`),
       ]),
     };
+  }
+
+  // Serving measurement idempotency key may be supplied via seenDedupeKeys as
+  // a shared fail-closed ledger (in addition to foundation package dedupe).
+  const measurementClaim = claimAdsServingIdempotencyV1({
+    kind: "measurement_event",
+    key: idempotencyKeysOutcome.keys.measurementEventKey as string,
+    seenKeys: Array.isArray(input.seenDedupeKeys)
+      ? (input.seenDedupeKeys as readonly string[])
+      : [],
+    lifecycle: servingLifecycle,
+  });
+  if (!measurementClaim.valid) {
+    const measureAdvance = advanceServingStage(
+      servingLifecycle,
+      "measurement_handoff",
+      "rejected",
+      measurementClaim.rejectionReason
+    );
+    if (measureAdvance.valid) {
+      servingLifecycle = measureAdvance.lifecycle;
+    }
+    trace.push("measure", "rejected", "measurement_rejected", winnerId);
+    return {
+      valid: false,
+      issues: Object.freeze([...measurementClaim.issues]),
+    };
+  }
+  servingLifecycle = applyAdsServingIdempotencyClaimV1({
+    lifecycle: servingLifecycle,
+    claim: measurementClaim,
+  });
+  {
+    const measureAdvance = advanceServingStage(
+      servingLifecycle,
+      "measurement_handoff",
+      "accepted",
+      null,
+      {
+        idempotency: {
+          measurementEventKey: measurementClaim.key,
+        },
+        measurementAccepted: true,
+      }
+    );
+    if (!measureAdvance.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...measureAdvance.issues.map((issue) => `serving: ${issue}`),
+        ]),
+      };
+    }
+    servingLifecycle = measureAdvance.lifecycle;
   }
   trace.push("measure", "accepted", null, winnerId);
 
@@ -1545,7 +2101,39 @@ export function runAdsCanonicalStackV1(
   let chargeResult: AdsBillingEvaluationResult["chargeResult"] = null;
 
   const fraudPassed = fraudResult?.fraudEligible === true;
-  if (!isChargeableEventType(eventType) || !fraudPassed) {
+  const seenBillingHandoffKeys = Array.isArray(input.seenBillingHandoffKeys)
+    ? (input.seenBillingHandoffKeys as readonly string[])
+    : [];
+  const billingClaim = claimAdsServingIdempotencyV1({
+    kind: "billing_handoff",
+    key: idempotencyKeysOutcome.keys.billingHandoffKey as string,
+    seenKeys: seenBillingHandoffKeys,
+    lifecycle: servingLifecycle,
+  });
+
+  if (!billingClaim.valid) {
+    const billAdvance = advanceServingStage(
+      servingLifecycle,
+      "billing_handoff",
+      "rejected",
+      billingClaim.rejectionReason
+    );
+    if (billAdvance.valid) {
+      servingLifecycle = billAdvance.lifecycle;
+    }
+    trace.push("bill", "rejected", "billing_ineligible", winnerId);
+    billingEligible = false;
+    chargeResult = null;
+  } else if (!isChargeableEventType(eventType) || !fraudPassed) {
+    const billAdvance = advanceServingStage(
+      servingLifecycle,
+      "billing_handoff",
+      "rejected",
+      "production_billing_disabled"
+    );
+    if (billAdvance.valid) {
+      servingLifecycle = billAdvance.lifecycle;
+    }
     trace.push("bill", "rejected", "billing_ineligible", winnerId);
     billingEligible = false;
     chargeResult = null;
@@ -1573,9 +2161,43 @@ export function runAdsCanonicalStackV1(
     billingEligible = billingOutcome.result.billingEligible;
     chargeResult = billingOutcome.result.chargeResult;
     if (!billingEligible) {
+      const billAdvance = advanceServingStage(
+        servingLifecycle,
+        "billing_handoff",
+        "rejected",
+        "production_billing_disabled"
+      );
+      if (billAdvance.valid) {
+        servingLifecycle = billAdvance.lifecycle;
+      }
       trace.push("bill", "rejected", "billing_ineligible", winnerId);
       chargeResult = null;
     } else {
+      servingLifecycle = applyAdsServingIdempotencyClaimV1({
+        lifecycle: servingLifecycle,
+        claim: billingClaim,
+      });
+      const billAdvance = advanceServingStage(
+        servingLifecycle,
+        "billing_handoff",
+        "accepted",
+        null,
+        {
+          idempotency: {
+            billingHandoffKey: billingClaim.key,
+          },
+          billingHandoffAccepted: true,
+        }
+      );
+      if (!billAdvance.valid) {
+        return {
+          valid: false,
+          issues: Object.freeze([
+            ...billAdvance.issues.map((issue) => `serving: ${issue}`),
+          ]),
+        };
+      }
+      servingLifecycle = billAdvance.lifecycle;
       trace.push("bill", "accepted", null, winnerId);
     }
   }
@@ -1621,6 +2243,7 @@ export function runAdsCanonicalStackV1(
     billingEligible,
     billingResult,
     chargeResult: billingEligible ? chargeResult : null,
+    servingLifecycle,
     authoritativeDecisionPath: true,
     productionEnabled: false,
     deliveryEnabled: false,

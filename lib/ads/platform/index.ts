@@ -72,6 +72,11 @@ export {
   type AdsMeasurementFoundationOutcome,
   type AdsMeasurementFoundationOptions,
 } from "./measurementFoundation";
+/**
+ * Production Serving Foundation V1 — lifecycle / idempotency / kill-switch
+ * contracts only. Not a second pipeline; cannot authorize production serving.
+ */
+export * from "./servingFoundation";
 /** Sole authoritative Ads V1 production decision entry (kill switches off). */
 export * from "./canonicalStack";
 /** Quarantined legacy / foundation / non-authoritative helpers. */

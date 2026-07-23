@@ -2,28 +2,26 @@
 
 ## Task
 
-UMTUBA Ads Platform Γאפ Critical Architecture Closure
-(`alpha-0.2`).
+UMTUBA Ads Platform — Production Serving Foundation V1
+(`office/ads-canonical-authority-hardening-v1`).
 
 ## Summary
 
-Closed the four final-certification critical blockers: quarantined
-delivery/measurement/billing/execution stage APIs off the flat barrel into
-`adsPlatformCompatibility` (non-authoritative); applied Option B delivery-gate
-semantics with always-false `productionAccepted`; marked standalone billing
-`authoritativeProductionBilling: false`; kept `runAdsCanonicalStackV1` as the
-sole authoritative decision path. Kill switches remain false. No commit/push.
+Implemented Production Serving Foundation V1 as fail-closed contracts composed
+into `runAdsCanonicalStackV1` (sole authoritative public decision entrypoint).
+Added ordered serving lifecycle transitions, correlation/provenance,
+idempotency claims for delivery/measurement/billing handoffs, deterministic
+rejection reasons, structured diagnostics, and environment/kill-switch gates.
+Production delivery and billing remain disabled; no second pipeline; no
+production acceptance claims. Not committed.
 
 ## Exact files changed
 
-- `lib/ads/platform/index.ts`
-- `lib/ads/platform/compatibility.ts`
+- `lib/ads/platform/servingFoundation.ts` (new)
+- `lib/ads/platform/servingFoundation.test.ts` (new)
 - `lib/ads/platform/canonicalStack.ts`
-- `lib/ads/platform/canonicalStack.test.ts`
-- `lib/ads/platform/billing.ts`
-- `lib/ads/platform/billing.test.ts`
-- `lib/ads/platform/exportQuarantine.test.ts`
-- `lib/ads/platform/measurementEventFlow.ts`
+- `lib/ads/platform/index.ts`
+- `docs/ads/ADS_PRODUCTION_SERVING_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -33,23 +31,27 @@ sole authoritative decision path. Kill switches remain false. No commit/push.
 
 ## Security review
 
-- Flat public barrel no longer exposes delivery/measurement/billing/execution
-  entrypoints as peers of the canonical stack
-- Standalone billing cannot claim production authority
-- `productionAccepted` forced false; gate failure cannot qualify production
-- Kill switches remain false; DiscoverShell untouched
+- Kill switches remain closed (`productionDeliveryEnabled` /
+  `productionBillingEnabled` / `productionAccepted` always false)
+- Serving foundation cannot claim `authoritativeProductionServing`
+- Deep imports cannot manufacture production authority
+- Duplicate delivery/measurement/billing handoffs fail closed
+- Billing handoff requires accepted delivery + measurement
+- `runAdsCanonicalStackV1` remains the sole authoritative decision entrypoint
+- No live delivery, live billing, DB writes, network, or money movement
 
 ## Tests
 
-- Affected + full Ads Platform (`lib/ads/platform`): **676/676** passed (40 files)
+- Targeted: servingFoundation + canonicalStack + exportQuarantine — **44/44**
+- Full Ads Platform (`lib/ads/platform`): **688/688** passed (41 files)
 
 ## TypeScript
 
-- `npx tsc --noEmit` Γאפ **pass** (exit 0)
+- `npx tsc --noEmit` — **pass** (exit 0)
 
 ## Build
 
-- `npm run build` Γאפ **pass** (exit 0)
+- `npm run build` — **pass** (exit 0)
 
 ## git diff --check
 
@@ -57,10 +59,10 @@ sole authoritative decision path. Kill switches remain false. No commit/push.
 
 ## git status --short
 
-- Ads platform critical-closure files + AI handoff docs in scope
+- Ads serving-foundation files + Ads/AI docs in scope (uncommitted)
 
 ## Open issues
 
-- Medium items from prior certification remain (dual inventory under
-  compatibility, `qualified_view` fraud skip, further API narrowing of
-  decision foundations) Γאפ out of this critical-only scope
+- Production serving still intentionally disabled (foundation readiness only)
+- Live delivery / live billing enablement remains out of scope
+- Medium items from prior certification remain out of this scope
