@@ -2,20 +2,39 @@ import {
   attemptStatusMessage,
   type LearningLearnerAttemptView,
 } from "../../../lib/learning/learnerDelivery";
+import {
+  learnerResultStatusMessage,
+  type LearningLearnerAttemptResultView,
+} from "../../../lib/learning/learnerResultDelivery";
+import LearnerResultSummary from "./LearnerResultSummary";
 
 type AttemptStatusBannerProps = {
   status: LearningLearnerAttemptView["status"];
   remainingSeconds?: number | null;
+  /** When present for submitted attempts, drives result messaging. */
+  resultView?: LearningLearnerAttemptResultView | null;
 };
 
 export default function AttemptStatusBanner({
   status,
   remainingSeconds = null,
+  resultView = null,
 }: AttemptStatusBannerProps) {
-  const message = attemptStatusMessage(status);
+  const message =
+    status === "submitted" && resultView
+      ? learnerResultStatusMessage(
+          resultView.visibility,
+          attemptStatusMessage("submitted")
+        )
+      : attemptStatusMessage(status);
+
   const tone =
     status === "submitted"
-      ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
+      ? resultView?.visibility === "available"
+        ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
+        : resultView?.visibility === "pending_score"
+          ? "border-sky-400/25 bg-sky-500/10 text-sky-100"
+          : "border-emerald-400/25 bg-emerald-500/10 text-emerald-100"
       : status === "active"
         ? "border-sky-400/25 bg-sky-500/10 text-sky-100"
         : "border-amber-400/25 bg-amber-500/10 text-amber-100";
@@ -27,6 +46,9 @@ export default function AttemptStatusBanner({
         <p className="mt-1 text-xs opacity-80">
           Time remaining: {formatSeconds(remainingSeconds)}
         </p>
+      ) : null}
+      {status === "submitted" && resultView ? (
+        <LearnerResultSummary view={resultView} />
       ) : null}
     </div>
   );

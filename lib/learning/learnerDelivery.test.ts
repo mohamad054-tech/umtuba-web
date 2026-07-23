@@ -118,15 +118,26 @@ describe("Learner Delivery V1 — security denylist", () => {
       "app/components/learning/AttemptPlayer.tsx",
       "app/components/learning/AttemptQuestion.tsx",
       "app/components/learning/AttemptStatusBanner.tsx",
+      "app/components/learning/LearnerResultSummary.tsx",
     ];
     for (const rel of files) {
       const src = read(rel);
       expect(src).not.toMatch(/score_learning_attempt/);
-      expect(src).not.toMatch(/learning_attempt_results/);
+      expect(src).not.toMatch(/\.from\(\s*["']learning_attempt_results["']/);
+      expect(src).not.toMatch(/\.from\(\s*["']learning_attempt_answer_results["']/);
       expect(src).not.toMatch(/answer_keys/);
-      expect(src).not.toMatch(/is_correct|points_earned|passed/);
+      expect(src).not.toMatch(/is_correct|points_earned/);
       expect(src).not.toMatch(/show_result_policy/);
     }
+  });
+
+  it("attempt result UI may show aggregate passed label but never per-question fields", () => {
+    const summary = read("app/components/learning/LearnerResultSummary.tsx");
+    expect(summary).toMatch(/Passed|Not passed/);
+    expect(summary).not.toMatch(/is_correct/);
+    expect(summary).not.toMatch(/points_earned/);
+    expect(summary).not.toMatch(/answer_key/);
+    expect(summary).not.toMatch(/dangerouslySetInnerHTML/);
   });
 
   it("reuses attempt + progress RPCs only", () => {

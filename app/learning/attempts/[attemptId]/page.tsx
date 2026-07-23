@@ -6,6 +6,7 @@ import {
   LEARNING_LEARNER_ROUTES,
   getMyLearningAttemptView,
 } from "../../../../lib/learning/learnerDelivery";
+import { getMyLearningAttemptResultView } from "../../../../lib/learning/learnerResultDelivery";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,11 @@ export default async function LearningAttemptPage({ params }: PageProps) {
     notFound();
   }
 
+  const result =
+    attempt.data.status === "submitted"
+      ? await getMyLearningAttemptResultView(supabase, attemptId)
+      : null;
+
   const { data: activity } = await supabase
     .from("learning_activities")
     .select("name")
@@ -52,6 +58,7 @@ export default async function LearningAttemptPage({ params }: PageProps) {
       <AttemptPlayer
         initial={attempt.data}
         activityName={activity?.name ?? undefined}
+        initialResult={result?.ok ? result.data : null}
       />
     </LearningShell>
   );

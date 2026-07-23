@@ -12,12 +12,17 @@ import {
   submitLearningAttempt,
   type LearningLearnerAttemptView,
 } from "../../../lib/learning/learnerDelivery";
+import {
+  getMyLearningAttemptResultView,
+  type LearningLearnerAttemptResultView,
+} from "../../../lib/learning/learnerResultDelivery";
 import AttemptQuestion from "./AttemptQuestion";
 import AttemptStatusBanner from "./AttemptStatusBanner";
 
 type AttemptPlayerProps = {
   initial: LearningLearnerAttemptView;
   activityName?: string;
+  initialResult?: LearningLearnerAttemptResultView | null;
 };
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -28,9 +33,12 @@ const SAVE_FAIL_MESSAGE =
 export default function AttemptPlayer({
   initial,
   activityName,
+  initialResult = null,
 }: AttemptPlayerProps) {
   const router = useRouter();
   const [view, setView] = useState(initial);
+  const [resultView, setResultView] =
+    useState<LearningLearnerAttemptResultView | null>(initialResult);
   const [answers, setAnswers] = useState<Record<string, Record<string, unknown>>>(
     () => Object.fromEntries(initial.answers.map((a) => [a.question_id, a.answer_payload]))
   );
@@ -65,6 +73,15 @@ export default function AttemptPlayer({
     );
     if (result.data.status !== "active") {
       terminalRef.current = true;
+    }
+    if (result.data.status === "submitted") {
+      const scored = await getMyLearningAttemptResultView(
+        supabase,
+        view.attempt_id
+      );
+      setResultView(scored.ok ? scored.data : null);
+    } else {
+      setResultView(null);
     }
   });
 
@@ -259,6 +276,7 @@ export default function AttemptPlayer({
           <AttemptStatusBanner
             status={view.status}
             remainingSeconds={remaining}
+            resultView={resultView}
           />
         </div>
         <p className="mt-3 text-xs text-white/40" aria-live="polite">
