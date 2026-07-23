@@ -2,24 +2,26 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Final Quarantine Fix
+UMTUBA Ads Platform — Ranking & Scoring Foundation V1 Test Hardening
 
 ## Goal
 
-Remove flat public export of `prepareAdsMeasurementFoundation` so it is
-reachable only via `adsPlatformCompatibility`. Fix stale executionLayer
-provenance header. Add focused export quarantine tests.
+Close Final Review gaps: explicit edge-case tests, input immutability,
+reachable tie-break sequence only, and reduced trust-narrowing casts.
 
 ## Allowed scope
 
-- `lib/ads/platform/*`
+- `lib/ads/platform/ranking*`
+- `lib/ads/platform/scoring*`
+- `lib/ads/platform/index.ts` (only if export surface must stay consistent)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
 - `app/discover/components/DiscoverShell.tsx`
-- Unrelated modules
+- Unrelated Ads modules
+- Learning / Store / World / Messages / Live
 - Commit / push without explicit approval
 
 ## Branch

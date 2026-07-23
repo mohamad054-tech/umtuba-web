@@ -39,6 +39,9 @@ export * from "./creativePlacementCompatibility";
 export * from "./selectableSet";
 export * from "./pilotSelector";
 export * from "./serveBoundary";
+/** Ranking & Scoring Foundation V1 — deterministic, non-auction, kill switches off. */
+export * from "./scoring";
+export * from "./ranking";
 /** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
 export * from "./executionLayer";
 /** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */

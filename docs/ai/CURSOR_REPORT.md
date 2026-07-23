@@ -2,24 +2,22 @@
 
 ## Task
 
-UMTUBA Ads Platform — Final Quarantine Fix
+UMTUBA Ads Platform — Ranking & Scoring Foundation V1 Test Hardening
 (`alpha-0.2`)
 
 ## Summary
 
-Closed the final Stack Unification V1 gate:
+Closed Final Review gaps for Ranking & Scoring Foundation V1:
 
-1. **Export quarantine** — `prepareAdsMeasurementFoundation` is no longer
-   flat-exported from `lib/ads/platform/index.ts`. It remains available only
-   via `adsPlatformCompatibility`. Canonical V1 measurement exports
-   (`prepareAdsMeasurementFromDeliveryV1` and package contracts) stay flat.
-2. **executionLayer header** — documents that issued provenance is **required**,
-   not optional (caller-reconstructed / spread provenance fails closed).
-3. **Export quarantine tests** — new `exportQuarantine.test.ts` locks the
-   barrel contract.
-
-`runAdsStackPipelineV1` remains the preferred canonical public entrypoint.
-Kill switches remain false. No render/delivery/network/DB/billing/auction.
+1. Explicit fail-closed tests for Infinity / NaN / negative / above-max on
+   quality, relevance, and freshness (scoring + ranking paths).
+2. Ranking path coverage for empty, single, all-rejected, creative gate, and
+   delivery gate cases; kill switches asserted false.
+3. Input immutability test with frozen candidates array / objects.
+4. Removed unreachable `freshness_score_desc` from public tie-break sequence;
+   freshness remains in weighted total only.
+5. Replaced trust-narrowing casts with `parseAdsRankingCandidateSignals` /
+   `parseAdsRankingInput` and explicit exclusion-reason narrowing.
 
 **`app/discover/components/DiscoverShell.tsx` was not modified.**
 
@@ -29,10 +27,11 @@ Kill switches remain false. No render/delivery/network/DB/billing/auction.
 
 | Path | Action |
 | --- | --- |
-| `lib/ads/platform/index.ts` | Selective measurement exports; no flat `prepareAdsMeasurementFoundation` |
-| `lib/ads/platform/executionLayer.ts` | Header: issued provenance required |
-| `lib/ads/platform/measurementFoundation.ts` | Quarantine comments on foundation path |
-| `lib/ads/platform/exportQuarantine.test.ts` | Added — barrel quarantine tests |
+| `lib/ads/platform/scoring.ts` | Parse helpers; cast reduction |
+| `lib/ads/platform/scoring.test.ts` | Edge-case validation coverage |
+| `lib/ads/platform/ranking.ts` | Reachable tie-breaks; parse helper; cast reduction |
+| `lib/ads/platform/ranking.test.ts` | Hardening coverage |
+| `lib/ads/platform/index.ts` | Scoring/ranking exports (from foundation) |
 | `docs/ai/CURRENT_TASK.md` | this handoff |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
@@ -42,15 +41,15 @@ Kill switches remain false. No render/delivery/network/DB/billing/auction.
 
 ## Security review
 
-- No new runtime surfaces; export surface only.
-- Issued provenance requirement documentation aligned with code.
-- No network/DB/Supabase/product-surface/billing/auction/ranking wiring.
+- Fail-closed on malformed / non-finite / out-of-range scores.
+- No auction/billing/pacing/AI/ML/network/DB/Supabase/render/delivery.
+- Kill switches remain false.
 - DiscoverShell untouched.
 
 ## Tests
 
-`npx vitest run lib/ads/platform` — **29 files, 494 tests, all passed**
-(was 489; +5 export quarantine tests).
+`npx vitest run lib/ads/platform` — **31 files, 521 tests, all passed**
+(+10 vs prior 511).
 
 ## TypeScript
 
@@ -62,14 +61,13 @@ Kill switches remain false. No render/delivery/network/DB/billing/auction.
 
 ## git diff --check
 
-`git diff --check` — **clean** (CRLF warnings only).
+`git diff --check` — **clean**.
 
 ## git status --short
 
-Includes prior Stack Unification work plus this quarantine fix; DiscoverShell
-remains a separate unrelated local modification — do not stage it.
+Ranking/scoring foundation + docs/ai handoff files dirty.
+`app/discover/components/DiscoverShell.tsx` remains unrelated — do not stage.
 
 ## Open issues
 
-- None for the Stack Unification V1 final quarantine gate.
-- Stage only ads platform + docs/ai handoff files for commit (exclude DiscoverShell).
+- None for Ranking & Scoring Foundation V1 test hardening.
