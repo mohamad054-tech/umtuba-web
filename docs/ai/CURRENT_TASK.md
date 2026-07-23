@@ -2,19 +2,17 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Budget & Pacing Foundation V1 Hardening
+UMTUBA Ads Platform — Frequency Capping Foundation V1 Test Hardening
 
 ## Goal
 
-Close Final Review findings: rejection-order alignment, budget consistency,
-exhaustion clarity, pacing boundaries, elapsedFraction resolution, and missing
-combined/budget tests.
+Close Final Review test gaps: count-above-cap, invalid counters/caps
+(NaN/Infinity/negative/fractional), and input immutability. Preserve
+existing frequency semantics and scope.
 
 ## Allowed scope
 
-- `lib/ads/platform/budget*`
-- `lib/ads/platform/pacing*`
-- `lib/ads/platform/index.ts` (only if export surface must stay consistent)
+- `lib/ads/platform/frequency*`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -23,7 +21,8 @@ combined/budget tests.
 - `app/discover/components/DiscoverShell.tsx`
 - Unrelated Ads modules
 - Learning / Store / World / Messages / Live
-- Billing / payments / ledger / persistence / spend mutation
+- Budget / pacing / billing / auction / ranking / AI / ML / rendering
+- Persistence / production delivery
 - Commit / push without explicit approval
 
 ## Branch

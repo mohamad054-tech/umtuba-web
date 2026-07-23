@@ -2,22 +2,23 @@
 
 ## Task
 
-UMTUBA Ads Platform — Budget & Pacing Foundation V1 Hardening
+UMTUBA Ads Platform — Frequency Capping Foundation V1 Test Hardening
 (`alpha-0.2`)
 
 ## Summary
 
-Closed Final Review findings for Budget & Pacing Foundation V1:
+Closed Final Review test gaps for Frequency Capping Foundation V1:
 
-1. Aligned `ADS_BUDGET_REJECTION_REASONS` with runtime first-match order.
-2. Added fail-closed consistency: when both daily and lifetime are set,
-   `lifetimeBudgetMinor >= dailyBudgetMinor`.
-3. Documented single canonical exhaustion reason `remaining_budget_exhausted`
-   (snapshot cannot distinguish daily vs lifetime depletion).
-4. Removed inert `elapsedFraction` from pacing window eligibility contract.
-5. Added boundary, consistency, combined-decision, and malformed-input tests.
+1. Explicit `count > cap` rejection tests for daily, lifetime, and campaign.
+2. Explicit invalid counter coverage (NaN / Infinity / negative / fractional /
+   out-of-range) across all three counters.
+3. Explicit invalid cap coverage (NaN / Infinity / negative / zero / fractional)
+   across all three caps.
+4. Input immutability coverage with `Object.freeze` + `structuredClone`.
 
-**`app/discover/components/DiscoverShell.tsx` was not modified.**
+Semantics and kill switches unchanged. No production module changes.
+
+**`app/discover/components/DiscoverShell.tsx` was not modified by this task.**
 
 **No commit, push, merge, or remote Supabase migration apply.**
 
@@ -25,11 +26,7 @@ Closed Final Review findings for Budget & Pacing Foundation V1:
 
 | Path | Action |
 | --- | --- |
-| `lib/ads/platform/budget.ts` | rejection order; consistency; exhaustion docs |
-| `lib/ads/platform/budget.test.ts` | expanded coverage |
-| `lib/ads/platform/pacing.ts` | remove elapsedFraction; combined reason order |
-| `lib/ads/platform/pacing.test.ts` | boundaries + combined matrix |
-| `lib/ads/platform/index.ts` | unchanged this pass (exports already present) |
+| `lib/ads/platform/frequency.test.ts` | test hardening only |
 | `docs/ai/CURRENT_TASK.md` | this handoff |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
@@ -39,15 +36,14 @@ Closed Final Review findings for Budget & Pacing Foundation V1:
 
 ## Security review
 
-- Integer minor units only; fail-closed on malformed/inconsistent budgets.
-- No billing/spend/ledger/network/DB/Supabase/Stripe/PayPal/auction.
+- Tests only; no runtime semantic changes.
 - Kill switches remain false.
-- DiscoverShell untouched.
+- DiscoverShell untouched by this task.
 
 ## Tests
 
-`npx vitest run lib/ads/platform` — **33 files, 555 tests, all passed**
-(+11 vs prior 544).
+`npx vitest run lib/ads/platform` — **34 files, 576 tests, all passed**
+(frequency: 21; +4 vs prior 572 platform total).
 
 ## TypeScript
 
@@ -63,9 +59,17 @@ Closed Final Review findings for Budget & Pacing Foundation V1:
 
 ## git status --short
 
-Budget/pacing hardening + docs/ai handoff files dirty.
-`app/discover/components/DiscoverShell.tsx` remains unrelated — do not stage.
+```
+ M app/discover/components/DiscoverShell.tsx
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M lib/ads/platform/index.ts
+?? lib/ads/platform/frequency.test.ts
+?? lib/ads/platform/frequency.ts
+```
+
+(`DiscoverShell.tsx` is pre-existing unrelated dirty — do not stage.)
 
 ## Open issues
 
-- None for Budget & Pacing Foundation V1 hardening.
+- None for Frequency Capping Foundation V1 test hardening.
