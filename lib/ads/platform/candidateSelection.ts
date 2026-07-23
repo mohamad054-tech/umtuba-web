@@ -124,6 +124,8 @@ export const ADS_SELECTION_CANDIDATE_ALLOWED_FIELDS = [
   "placementId",
   "campaignRef",
   "advertiserRef",
+  "adSetRef",
+  "adRef",
   "eligibility",
   "diagnostics",
 ] as const;
@@ -178,6 +180,10 @@ export type AdsSelectionCandidate = Readonly<{
   campaignRef: string;
   /** Opaque advertiser reference — never a DB row. */
   advertiserRef: string;
+  /** Opaque ad-set reference — never a DB row; authoritative inventory field. */
+  adSetRef: string;
+  /** Opaque ad reference — never a DB row; authoritative inventory field. */
+  adRef: string;
   eligibility: AdsCandidateEligibilityState;
   diagnostics?: AdsCandidateSelectionDiagnosticsNote;
 }>;
@@ -230,6 +236,8 @@ export type AdsCandidateSelectionEligibleReference = Readonly<{
   campaignRef: string;
   advertiserRef: string;
   creativeRef: string;
+  adSetRef: string;
+  adRef: string;
 }>;
 
 /** Rejected candidate with stable rejection reason. */
@@ -469,6 +477,8 @@ function freezeCandidate(
     placementId: candidate.placementId,
     campaignRef: candidate.campaignRef,
     advertiserRef: candidate.advertiserRef,
+    adSetRef: candidate.adSetRef,
+    adRef: candidate.adRef,
     eligibility: freezeEligibility(candidate.eligibility),
   };
   if (candidate.diagnostics) {
@@ -684,6 +694,12 @@ export function parseAdsSelectionCandidate(
     `${prefix}advertiserRef`,
     issues
   );
+  const adSetRefOk = validateOpaqueId(
+    input.adSetRef,
+    `${prefix}adSetRef`,
+    issues
+  );
+  const adRefOk = validateOpaqueId(input.adRef, `${prefix}adRef`, issues);
 
   let creativeType: AdsCandidateSelectionCreativeType | null = null;
   if (
@@ -718,10 +734,14 @@ export function parseAdsSelectionCandidate(
     !creativeRefOk ||
     !campaignRefOk ||
     !advertiserRefOk ||
+    !adSetRefOk ||
+    !adRefOk ||
     !isNonEmptyString(input.candidateId) ||
     !isNonEmptyString(input.creativeRef) ||
     !isNonEmptyString(input.campaignRef) ||
     !isNonEmptyString(input.advertiserRef) ||
+    !isNonEmptyString(input.adSetRef) ||
+    !isNonEmptyString(input.adRef) ||
     creativeType === null ||
     placementId === null ||
     eligibility === null ||
@@ -739,6 +759,8 @@ export function parseAdsSelectionCandidate(
       placementId,
       campaignRef: input.campaignRef,
       advertiserRef: input.advertiserRef,
+      adSetRef: input.adSetRef,
+      adRef: input.adRef,
       eligibility,
       diagnostics,
     }),
@@ -1495,6 +1517,8 @@ export function runAdsCandidateSelection(
           campaignRef: candidate.campaignRef,
           advertiserRef: candidate.advertiserRef,
           creativeRef: candidate.creativeRef,
+          adSetRef: candidate.adSetRef,
+          adRef: candidate.adRef,
         })
       );
       continue;

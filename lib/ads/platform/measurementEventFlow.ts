@@ -30,9 +30,20 @@ import type {
 } from "./reportingHandle";
 
 /**
- * Ads Measurement Event Flow V1 — internal end-to-end measurement orchestration.
+ * Ads Measurement Event Flow V1 — separate event-reporting track.
  *
- * Flow:
+ * IMPORTANT — track separation:
+ * - This module is a reporting-handle → package → pipeline orchestration
+ *   track for client/opaque-token event flows.
+ * - It is NOT the delivery-decision pipeline.
+ * - It does NOT replace canonical Delivery → Measurement integration on
+ *   `runAdsStackPipelineV1` / `prepareAdsMeasurementFromDeliveryV1`.
+ *
+ * Canonical delivery-decision + measurement path:
+ *   Candidate Selection → Adapter → Render → Execution V1 →
+ *   Internal Delivery Pilot V1 → Measurement V1
+ *
+ * Flow (this track only):
  *   Resolve reporting handle → Validate event → Build package →
  *   Run typed measurement pipeline → Flow Result
  *

@@ -12,6 +12,7 @@ import {
   validateAdsExecutionInternalResult,
   type AdsExecutionInternalResult,
 } from "./executionLayer";
+import { buildAdsCandidateProvenanceBinding } from "./candidateProvenance";
 import {
   ADS_INTERNAL_DELIVERY_PILOT_V1_CONTRACT_VERSION,
   ADS_INTERNAL_DELIVERY_PILOT_V1_INPUT_ALLOWED_FIELDS,
@@ -98,6 +99,25 @@ function buildDescriptor(
   return outcome.descriptor;
 }
 
+function issuedProvenance() {
+  const outcome = buildAdsCandidateProvenanceBinding({
+    candidateId: "candidate-1",
+    campaignRef: "campaign-1",
+    advertiserRef: "advertiser-1",
+    creativeRef: "creative-ref-1",
+    placementId: "WATCH_FEED",
+    adSetRef: "ad-set-1",
+    adRef: "ad-1",
+    selectionRequestId: "selection-req-1",
+    inventorySourceId: "inv-1",
+    inventoryRevision: 1,
+  });
+  if (!outcome.valid) {
+    throw new Error(outcome.issues.join("; "));
+  }
+  return outcome.provenance;
+}
+
 function acceptedExecutionResult(
   overrides: Record<string, unknown> = {}
 ): AdsExecutionInternalResult {
@@ -105,6 +125,7 @@ function acceptedExecutionResult(
     candidateId: "candidate-1",
     renderDescriptor: buildDescriptor(),
     currentTimestamp: NOW,
+    provenance: issuedProvenance(),
     ...overrides,
   });
   expect(outcome.valid).toBe(true);
@@ -122,6 +143,7 @@ function rejectedExecutionResult(
     candidateId: "candidate-1",
     renderDescriptor: baseDescriptorDraft(descriptorOverrides),
     currentTimestamp: NOW,
+    provenance: issuedProvenance(),
   });
   expect(outcome.valid).toBe(true);
   if (!outcome.valid) {
@@ -457,7 +479,7 @@ describe("Ads Internal Delivery Pilot V1", () => {
     expectKillSwitchesDisabled(outcome.result);
   });
 
-  it("treats candidateId as opaque selection binding and never rewrites descriptor tracking identity", () => {
+  it("preserves candidateId binding from issued provenance through delivery", () => {
     const descriptor = buildDescriptor();
     const trackingSnapshot = {
       campaignId: descriptor.trackingReferences.campaignId,
@@ -466,10 +488,28 @@ describe("Ads Internal Delivery Pilot V1", () => {
       creativeId: descriptor.trackingReferences.creativeId,
     };
 
+    const provenance = buildAdsCandidateProvenanceBinding({
+      candidateId: "selection-binding-999",
+      campaignRef: "campaign-1",
+      advertiserRef: "advertiser-1",
+      creativeRef: "creative-ref-1",
+      placementId: "WATCH_FEED",
+      adSetRef: "ad-set-1",
+      adRef: "ad-1",
+      selectionRequestId: "selection-req-1",
+      inventorySourceId: "inv-1",
+      inventoryRevision: 1,
+    });
+    expect(provenance.valid).toBe(true);
+    if (!provenance.valid) {
+      return;
+    }
+
     const execution = runAdsExecutionLayerV1({
-      candidateId: "opaque-selection-binding-999",
+      candidateId: "selection-binding-999",
       renderDescriptor: descriptor,
       currentTimestamp: NOW,
+      provenance: provenance.provenance,
     });
     expect(execution.valid).toBe(true);
     if (!execution.valid) {
@@ -485,7 +525,7 @@ describe("Ads Internal Delivery Pilot V1", () => {
       return;
     }
 
-    expect(outcome.result.candidateId).toBe("opaque-selection-binding-999");
+    expect(outcome.result.candidateId).toBe("selection-binding-999");
     expect(outcome.result.renderDescriptor?.trackingReferences).toEqual(
       trackingSnapshot
     );

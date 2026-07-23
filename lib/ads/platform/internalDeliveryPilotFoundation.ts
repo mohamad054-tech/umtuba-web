@@ -2,7 +2,7 @@ import type { ContractValidationResult } from "./creativeContracts";
 import {
   validateAdsExecutionResult,
   type AdsExecutionResult,
-} from "./executionLayer";
+} from "./executionLayerFoundation";
 import {
   validateAdsRenderDescriptor,
   type AdsRenderDescriptor,

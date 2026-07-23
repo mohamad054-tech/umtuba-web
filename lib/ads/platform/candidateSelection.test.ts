@@ -55,6 +55,8 @@ function baseCandidate(
     placementId: "WATCH_FEED",
     campaignRef: "campaign-ref-1",
     advertiserRef: "advertiser-ref-1",
+    adSetRef: "ad-set-ref-1",
+    adRef: "ad-ref-1",
     eligibility: baseEligibility(),
     ...overrides,
   };
@@ -984,6 +986,8 @@ describe("Ads Candidate Selection Foundation V1", () => {
         campaignRef: "campaign-ref-1",
         advertiserRef: "advertiser-ref-1",
         creativeRef: "creative-ref-1",
+        adSetRef: "ad-set-ref-1",
+        adRef: "ad-ref-1",
       });
     });
 

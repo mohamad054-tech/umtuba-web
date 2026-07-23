@@ -1,3 +1,18 @@
+/**
+ * UMTUBA Ads Platform — public V1 surface.
+ *
+ * Preferred canonical orchestration entry:
+ *   `runAdsStackPipelineV1` (exported from `./stackPipeline`)
+ *
+ * Legacy foundation APIs are quarantined under the `adsPlatformCompatibility`
+ * namespace — they are not flat peers of the canonical stack.
+ *
+ * Quarantined (compatibility only — not flat-exported):
+ *   - runAdsExecutionLayer
+ *   - runInternalDeliveryPilot
+ *   - prepareAdsMeasurementFoundation
+ */
+
 export * from "./creativeContracts";
 export * from "./placementRegistry";
 export * from "./placementCompatibility";
@@ -18,12 +33,41 @@ export * from "./renderDescriptor";
 export * from "./renderDescriptorPipeline";
 export * from "./candidateInventory";
 export * from "./candidateSelection";
+export * from "./candidateProvenance";
+export * from "./selectionRenderAdapter";
 export * from "./creativePlacementCompatibility";
 export * from "./selectableSet";
 export * from "./pilotSelector";
 export * from "./serveBoundary";
+/** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
 export * from "./executionLayer";
+/** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */
 export * from "./internalDeliveryPilot";
-export * from "./measurementFoundation";
+/**
+ * Canonical Measurement V1 contracts + prepareAdsMeasurementFromDeliveryV1.
+ * Legacy prepareAdsMeasurementFoundation is NOT flat-exported — import it from
+ * adsPlatformCompatibility only.
+ */
+export {
+  ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION,
+  ADS_MEASUREMENT_FOUNDATION_EVENT_TYPES,
+  ADS_MEASUREMENT_FOUNDATION_TRUST_LEVEL,
+  ADS_MEASUREMENT_FOUNDATION_SIGNATURE_PLACEHOLDER,
+  ADS_MEASUREMENT_DELIVERY_V1_INPUT_ALLOWED_FIELDS,
+  ADS_MEASUREMENT_FOUNDATION_PACKAGE_ALLOWED_FIELDS,
+  buildAdsMeasurementDedupeKey,
+  validateAdsMeasurementFoundationPackage,
+  prepareAdsMeasurementFromDeliveryV1,
+  type AdsMeasurementFoundationEventType,
+  type AdsMeasurementFoundationTrustLevel,
+  type AdsMeasurementFoundationPackage,
+  type AdsMeasurementDeliveryV1Input,
+  type AdsMeasurementFoundationOutcome,
+  type AdsMeasurementFoundationOptions,
+} from "./measurementFoundation";
 export * from "./measurementPipeline";
 export * from "./measurementEventFlow";
+/** Preferred canonical Ads V1 orchestration entry. */
+export * from "./stackPipeline";
+/** Quarantined legacy / foundation APIs — not the preferred path. */
+export * as adsPlatformCompatibility from "./compatibility";

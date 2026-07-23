@@ -19,7 +19,7 @@ import {
   createEmptyAdsExecutionResult,
   runAdsExecutionLayer,
   type AdsExecutionResult,
-} from "./executionLayer";
+} from "./compatibility";
 import {
   ADS_INTERNAL_DELIVERY_PILOT_CONTRACT_VERSION,
   ADS_INTERNAL_DELIVERY_PILOT_FAILURE_REASONS,

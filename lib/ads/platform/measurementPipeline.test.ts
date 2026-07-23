@@ -14,11 +14,11 @@ import {
   ADS_ELIGIBILITY_DELIVERY_FLAG_KEY,
   type AdsEligibilityCandidateState,
 } from "./eligibilityRules";
-import { runAdsExecutionLayer } from "./executionLayer";
 import {
+  runAdsExecutionLayer,
   runInternalDeliveryPilot,
   type AdsInternalDeliveryPilotResult,
-} from "./internalDeliveryPilot";
+} from "./compatibility";
 import {
   ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION,
   ADS_MEASUREMENT_FOUNDATION_SIGNATURE_PLACEHOLDER,

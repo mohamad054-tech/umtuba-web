@@ -18,6 +18,7 @@ import {
   validateAdsExecutionInternalResult,
   type AdsExecutionInternalResult,
 } from "./executionLayer";
+import { buildAdsCandidateProvenanceBinding } from "./candidateProvenance";
 
 const SOURCE_PATH = path.join(__dirname, "executionLayer.ts");
 const SOURCE = readFileSync(SOURCE_PATH, "utf8");
@@ -91,6 +92,34 @@ function buildDescriptor(
   return outcome.descriptor;
 }
 
+function issuedProvenance(
+  overrides: {
+    candidateId?: string;
+    campaignRef?: string;
+    advertiserRef?: string;
+    creativeRef?: string;
+    adSetRef?: string;
+    adRef?: string;
+  } = {}
+) {
+  const outcome = buildAdsCandidateProvenanceBinding({
+    candidateId: overrides.candidateId ?? "candidate-1",
+    campaignRef: overrides.campaignRef ?? "campaign-1",
+    advertiserRef: overrides.advertiserRef ?? "advertiser-1",
+    creativeRef: overrides.creativeRef ?? "creative-ref-1",
+    placementId: "WATCH_FEED",
+    adSetRef: overrides.adSetRef ?? "ad-set-1",
+    adRef: overrides.adRef ?? "ad-1",
+    selectionRequestId: "selection-req-1",
+    inventorySourceId: "inv-1",
+    inventoryRevision: 1,
+  });
+  if (!outcome.valid) {
+    throw new Error(outcome.issues.join("; "));
+  }
+  return outcome.provenance;
+}
+
 function baseInput(
   overrides: Record<string, unknown> = {}
 ): Record<string, unknown> {
@@ -98,6 +127,7 @@ function baseInput(
     candidateId: "candidate-1",
     renderDescriptor: buildDescriptor(),
     currentTimestamp: NOW,
+    provenance: issuedProvenance(),
     ...overrides,
   };
 }
@@ -127,6 +157,7 @@ describe("Ads Execution Layer V1", () => {
       "candidateId",
       "renderDescriptor",
       "currentTimestamp",
+      "provenance",
     ]);
   });
 
@@ -179,16 +210,15 @@ describe("Ads Execution Layer V1", () => {
   });
 
   it("does not mutate inputs", () => {
-    const descriptor = buildDescriptor();
-    const input = {
-      candidateId: "candidate-1",
-      renderDescriptor: descriptor,
-      currentTimestamp: NOW,
-    };
-    const snapshot = structuredClone(input);
+    const input = baseInput();
+    const snapshotDescriptor = structuredClone(input.renderDescriptor);
+    const provenanceRef = input.provenance;
     const outcome = runAdsExecutionLayerV1(input);
     expect(outcome.valid).toBe(true);
-    expect(input).toEqual(snapshot);
+    expect(input.candidateId).toBe("candidate-1");
+    expect(input.currentTimestamp).toBe(NOW);
+    expect(input.renderDescriptor).toEqual(snapshotDescriptor);
+    expect(input.provenance).toBe(provenanceRef);
   });
 
   it("keeps kill switches false even when execution is accepted", () => {
@@ -357,46 +387,56 @@ describe("Ads Execution Layer V1", () => {
     }
   });
 
-  it("treats candidateId as opaque selection binding and never rewrites descriptor tracking identity", () => {
-    // V1 design: candidateId is an opaque upstream selection binding only.
-    // It is intentionally not cross-checked against trackingReferences;
-    // creative/campaign/ad-set/ad identity remains descriptor-authoritative.
-    const descriptor = buildDescriptor();
-    const trackingSnapshot = {
-      campaignId: descriptor.trackingReferences.campaignId,
-      adSetId: descriptor.trackingReferences.adSetId,
-      adId: descriptor.trackingReferences.adId,
-      creativeId: descriptor.trackingReferences.creativeId,
-    };
+  it("requires issued provenance and rejects caller-reconstructed provenance", () => {
+    const without = runAdsExecutionLayerV1({
+      candidateId: "candidate-1",
+      renderDescriptor: buildDescriptor(),
+      currentTimestamp: NOW,
+    });
+    expect(without.valid).toBe(false);
 
-    const outcome = runAdsExecutionLayerV1(
-      baseInput({
-        candidateId: "opaque-selection-binding-999",
-        renderDescriptor: descriptor,
-      })
-    );
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) {
+    const reconstructed = runAdsExecutionLayerV1({
+      candidateId: "candidate-1",
+      renderDescriptor: buildDescriptor(),
+      currentTimestamp: NOW,
+      provenance: {
+        ...issuedProvenance(),
+      },
+    });
+    expect(reconstructed.valid).toBe(false);
+    if (reconstructed.valid) {
       return;
     }
+    expect(
+      reconstructed.issues.some((issue) => issue.includes("issued binding"))
+    ).toBe(true);
+  });
 
-    expect(outcome.result.candidateId).toBe("opaque-selection-binding-999");
-    expect(outcome.result.renderDescriptor?.trackingReferences).toEqual(
-      trackingSnapshot
+  it("soft-rejects when issued provenance mismatches descriptor identity", () => {
+    const provenance = issuedProvenance();
+    const mismatched = runAdsExecutionLayerV1(
+      baseInput({
+        provenance,
+        renderDescriptor: buildDescriptor({
+          creativeReference: "other-creative",
+          trackingReferences: {
+            campaignId: "campaign-1",
+            adSetId: "ad-set-1",
+            adId: "ad-1",
+            creativeId: "other-creative",
+          },
+        }),
+      })
     );
-    expect(outcome.result.renderDescriptor?.trackingReferences.campaignId).toBe(
-      "campaign-1"
+    expect(mismatched.valid).toBe(true);
+    if (!mismatched.valid) {
+      return;
+    }
+    expect(mismatched.result.executionAccepted).toBe(false);
+    expect(mismatched.result.diagnostics.rejectionReason).toBe(
+      "identity_incomplete"
     );
-    expect(outcome.result.renderDescriptor?.trackingReferences.adSetId).toBe(
-      "ad-set-1"
-    );
-    expect(outcome.result.renderDescriptor?.trackingReferences.adId).toBe(
-      "ad-1"
-    );
-    expect(outcome.result.renderDescriptor?.trackingReferences.creativeId).toBe(
-      "creative-ref-1"
-    );
-    expectKillSwitchesDisabled(outcome.result);
+    expectKillSwitchesDisabled(mismatched.result);
   });
 
   it("fails closed on unknown input fields and missing candidateId", () => {

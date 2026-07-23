@@ -2,83 +2,74 @@
 
 ## Task
 
-UM Learning OS — Read Model Hardening V1
-(`office/learning-read-model-hardening-v1` from `origin/alpha-0.2` @
-`23f272832faab629bc11b49e0176fe539486f2fd`).
+UMTUBA Ads Platform — Final Quarantine Fix
+(`alpha-0.2`)
 
 ## Summary
 
-Additive RLS hardening so learner-facing course-tree and settings SELECT use
-`has_learning_course_access` / `has_learning_program_access` with a full
-published parent chain. Plain space-membership learner policies dropped.
-Program catalog browse for space members retained. Staff-scoped SELECT policies
-added so instructors retain draft-in-scope reads. No schema/RPC/UI changes. No
-edits to `20260828`–`20260839`. No remote Supabase apply. No merge to
-`alpha-0.2`.
+Closed the final Stack Unification V1 gate:
+
+1. **Export quarantine** — `prepareAdsMeasurementFoundation` is no longer
+   flat-exported from `lib/ads/platform/index.ts`. It remains available only
+   via `adsPlatformCompatibility`. Canonical V1 measurement exports
+   (`prepareAdsMeasurementFromDeliveryV1` and package contracts) stay flat.
+2. **executionLayer header** — documents that issued provenance is **required**,
+   not optional (caller-reconstructed / spread provenance fails closed).
+3. **Export quarantine tests** — new `exportQuarantine.test.ts` locks the
+   barrel contract.
+
+`runAdsStackPipelineV1` remains the preferred canonical public entrypoint.
+Kill switches remain false. No render/delivery/network/DB/billing/auction.
+
+**`app/discover/components/DiscoverShell.tsx` was not modified.**
+
+**No commit, push, merge, or remote Supabase migration apply.**
 
 ## Exact files changed
 
-- `supabase/migrations/20260840_learning_read_model_hardening_v1.sql` (created)
-- `lib/learning/readModelHardening.ts` (created)
-- `lib/learning/readModelHardening.test.ts` (created)
-- `docs/learning/implementation/READ_MODEL_HARDENING_V1.md` (created)
-- `docs/ai/CURRENT_TASK.md` (updated)
-- `docs/ai/CURSOR_REPORT.md` (updated)
+| Path | Action |
+| --- | --- |
+| `lib/ads/platform/index.ts` | Selective measurement exports; no flat `prepareAdsMeasurementFoundation` |
+| `lib/ads/platform/executionLayer.ts` | Header: issued provenance required |
+| `lib/ads/platform/measurementFoundation.ts` | Quarantine comments on foundation path |
+| `lib/ads/platform/exportQuarantine.test.ts` | Added — barrel quarantine tests |
+| `docs/ai/CURRENT_TASK.md` | this handoff |
+| `docs/ai/CURSOR_REPORT.md` | this report |
 
 ## Migrations created
 
-- `20260840_learning_read_model_hardening_v1.sql` — policy DROP/CREATE only
-  (not applied remotely)
-
-## Policies dropped
-
-- `Space members read accessible courses|sections|lessons|activities`
-- `Members read course|section|lesson|activity|program settings`
-
-## Policies added
-
-- Entitled learners read published courses/sections/lessons/activities (+ settings)
-- Entitled learners read published program settings (`has_learning_program_access`)
-- Course staff read scoped courses/sections/lessons/activities
-- Staff read * settings
-
-## Policies retained (unchanged)
-
-- Public discovery (programs/courses/sections/lessons)
-- `Space members read accessible programs` (catalog)
-- Manager / platform-admin tree policies
-- Activities: no anon SELECT
+- None.
 
 ## Security review
 
-- Auth remains DB RLS only; no TypeScript authorization substitute
-- Learner path does not use `is_learning_space_member` as entitlement
-- Settings no longer readable by plain space members
-- Prior Questions / content blocks / attempts / scoring / progress untouched
+- No new runtime surfaces; export surface only.
+- Issued provenance requirement documentation aligned with code.
+- No network/DB/Supabase/product-surface/billing/auction/ranking wiring.
+- DiscoverShell untouched.
 
 ## Tests
 
-- Read Model Hardening: **24/24** passed
-- All Learning (`lib/learning`): **522/522** passed (13 files)
+`npx vitest run lib/ads/platform` — **29 files, 494 tests, all passed**
+(was 489; +5 export quarantine tests).
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **pass** (exit 0)
+`npx tsc --noEmit` — **pass**.
 
 ## Build
 
-- `npm run build` — **pass** (exit 0)
+`npm run build` — **passed**.
 
 ## git diff --check
 
-- clean (verified at close)
+`git diff --check` — **clean** (CRLF warnings only).
 
 ## git status --short
 
-- clean after commit (feature branch pushed; not merged)
+Includes prior Stack Unification work plus this quarantine fix; DiscoverShell
+remains a separate unrelated local modification — do not stage it.
 
 ## Open issues
 
-- Migration `20260840` (and Learning `20260828`–`20260839`) not applied to remote
-  Supabase — requires explicit human approval
-- Feature branch not merged into `alpha-0.2`
+- None for the Stack Unification V1 final quarantine gate.
+- Stage only ads platform + docs/ai handoff files for commit (exclude DiscoverShell).

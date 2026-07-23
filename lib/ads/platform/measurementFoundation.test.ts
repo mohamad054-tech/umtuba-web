@@ -14,12 +14,15 @@ import {
   ADS_ELIGIBILITY_DELIVERY_FLAG_KEY,
   type AdsEligibilityCandidateState,
 } from "./eligibilityRules";
-import { runAdsExecutionLayer } from "./executionLayer";
 import {
   createEmptyAdsInternalDeliveryPilotResult,
+  runAdsExecutionLayer,
   runInternalDeliveryPilot,
   type AdsInternalDeliveryPilotResult,
-} from "./internalDeliveryPilot";
+} from "./compatibility";
+import { runAdsExecutionLayerV1 } from "./executionLayer";
+import { runInternalDeliveryPilotV1 } from "./internalDeliveryPilot";
+import { buildAdsCandidateProvenanceBinding } from "./candidateProvenance";
 import {
   ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION,
   ADS_MEASUREMENT_FOUNDATION_EVENT_TYPES,
@@ -29,8 +32,13 @@ import {
   ADS_MEASUREMENT_FOUNDATION_TRUST_LEVEL,
   buildAdsMeasurementDedupeKey,
   prepareAdsMeasurementFoundation,
+  prepareAdsMeasurementFromDeliveryV1,
   validateAdsMeasurementFoundationPackage,
 } from "./measurementFoundation";
+import {
+  ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
+  buildAdsRenderDescriptor,
+} from "./renderDescriptor";
 import { ADS_PLACEMENT_REGISTRY } from "./placementRegistry";
 import type { AdsRenderMaterial } from "./serveBoundary";
 
@@ -557,6 +565,101 @@ describe("Ads Measurement Foundation V1", () => {
     ).toBe(false);
   });
 
+  it("preferred path prepares packages from Internal Delivery Pilot V1 results", () => {
+    const descriptorOutcome = buildAdsRenderDescriptor(
+      {
+        descriptorVersion: ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
+        placementId: "WATCH_FEED",
+        creativeReference: "creative-ref-1",
+        creativeType: "video",
+        mediaReference: "media-ref-1",
+        thumbnailReference: "thumb-ref-1",
+        clickDestinationReference: "destination-ref-1",
+        disclosure: { label: "Sponsored", mustDisplay: true },
+        reportingHandles: {
+          impressionHandle: "imp-handle-v1",
+          clickHandle: "clk-handle-v1",
+        },
+        trackingReferences: {
+          campaignId: "campaign-1",
+          adSetId: "ad-set-1",
+          adId: "ad-1",
+          creativeId: "creative-ref-1",
+        },
+        cacheHints: {
+          cacheable: false,
+          maxAgeSeconds: null,
+          cacheKey: null,
+        },
+        expiresAt: EXPIRES,
+        productionEnabled: false,
+      },
+      { nowMs: NOW_MS }
+    );
+    expect(descriptorOutcome.valid).toBe(true);
+    if (!descriptorOutcome.valid) {
+      return;
+    }
+
+    const provenanceOutcome = buildAdsCandidateProvenanceBinding({
+      candidateId: "candidate-1",
+      campaignRef: "campaign-1",
+      advertiserRef: "advertiser-1",
+      creativeRef: "creative-ref-1",
+      placementId: "WATCH_FEED",
+      adSetRef: "ad-set-1",
+      adRef: "ad-1",
+      selectionRequestId: "selection-req-1",
+      inventorySourceId: "inv-1",
+      inventoryRevision: 1,
+    });
+    expect(provenanceOutcome.valid).toBe(true);
+    if (!provenanceOutcome.valid) {
+      return;
+    }
+
+    const execution = runAdsExecutionLayerV1({
+      candidateId: "candidate-1",
+      renderDescriptor: descriptorOutcome.descriptor,
+      currentTimestamp: NOW,
+      provenance: provenanceOutcome.provenance,
+    });
+    expect(execution.valid).toBe(true);
+    if (!execution.valid) {
+      return;
+    }
+
+    const delivery = runInternalDeliveryPilotV1({
+      executionResult: execution.result,
+      currentTimestamp: NOW,
+    });
+    expect(delivery.valid).toBe(true);
+    if (!delivery.valid) {
+      return;
+    }
+    expect(delivery.result.deliveryAccepted).toBe(true);
+
+    const outcome = prepareAdsMeasurementFromDeliveryV1({
+      deliveryResult: delivery.result,
+      eventType: "click",
+      provenance: provenanceOutcome.provenance,
+    });
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.package.eventType).toBe("click");
+    expect(outcome.package.measurementEnabled).toBe(false);
+    expect(outcome.package.productionEnabled).toBe(false);
+    expect(outcome.package.dedupeKey).toBe(
+      buildAdsMeasurementDedupeKey({
+        eventType: "click",
+        selectedCandidateId: "candidate-1",
+        reportingHandle: "clk-handle-v1",
+      })
+    );
+  });
+
   it("has no storage, network, database, reporting, or product wiring", () => {
     expect(SOURCE).not.toMatch(/from ["']@\//);
     expect(SOURCE).not.toMatch(/from ["']\.\.\//);
@@ -576,6 +679,8 @@ describe("Ads Measurement Foundation V1", () => {
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/measurementEnabled: false/);
     expect(SOURCE).toMatch(/prepareAdsMeasurementFoundation/);
+    expect(SOURCE).toMatch(/prepareAdsMeasurementFromDeliveryV1/);
     expect(SOURCE).toMatch(/validateAdsInternalDeliveryPilotResult/);
+    expect(SOURCE).toMatch(/validateAdsInternalDeliveryInternalResult/);
   });
 });

@@ -3,6 +3,12 @@ import type {
   ContractValidationResult,
 } from "./creativeContracts";
 import {
+  assertProvenanceMatchesRenderDescriptor,
+  isAdsIssuedProvenanceBinding,
+  validateAdsCandidateProvenanceBinding,
+  type AdsCandidateProvenanceBinding,
+} from "./candidateProvenance";
+import {
   isAdsPlacementId,
   isCreativeTypeSupportedByPlacement,
   type AdsPlatformPlacementId,
@@ -19,14 +25,19 @@ import {
 /**
  * Ads Execution Layer V1 — validated render descriptor → internal result.
  *
- * Pipeline position:
+ * Preferred pipeline position (canonical stack):
  *   Candidate Selection
+ *   → Selection→Render Adapter (+ issued provenance)
  *   → Render Descriptor Pipeline
- *   → Execution Layer
- *   → Internal Result
+ *   → Execution Layer V1
+ *   → Internal Delivery Pilot V1
+ *   → Measurement V1
  *
  * Responsibilities:
  * - accept a validated render descriptor
+ * - require issued provenance from buildAdsCandidateProvenanceBinding
+ *   (caller-reconstructed / spread provenance fails closed)
+ * - validate provenance against descriptor identity before accept
  * - perform execution validation
  * - execute a deterministic internal pipeline
  * - emit a typed internal execution result + diagnostics
@@ -86,6 +97,7 @@ export const ADS_EXECUTION_LAYER_V1_INPUT_ALLOWED_FIELDS = [
   "candidateId",
   "renderDescriptor",
   "currentTimestamp",
+  "provenance",
 ] as const;
 
 /**
@@ -154,6 +166,9 @@ export type AdsExecutionInternalResult = Readonly<{
  * Identity authority:
  * - candidateId is the upstream selection binding (Candidate Selection).
  * - Creative / placement / tracking identity comes only from renderDescriptor.
+ * - provenance is REQUIRED and must be an issued binding from
+ *   buildAdsCandidateProvenanceBinding / Selection→Render adapter.
+ *   Caller-reconstructed provenance objects fail closed.
  * - No client-supplied identity override fields are accepted.
  */
 export type AdsExecutionLayerV1Input = Readonly<{
@@ -161,6 +176,11 @@ export type AdsExecutionLayerV1Input = Readonly<{
   renderDescriptor: AdsRenderDescriptor;
   /** ISO-8601 timestamp used for deterministic expiry checks. */
   currentTimestamp: string;
+  /**
+   * Issued provenance from Selection→Render adapter
+   * (buildAdsCandidateProvenanceBinding). Required.
+   */
+  provenance: AdsCandidateProvenanceBinding;
 }>;
 
 export type AdsExecutionLayerV1Outcome =
@@ -555,6 +575,45 @@ export function runAdsExecutionLayerV1(
 
   const candidateId = input.candidateId;
 
+  if (!("provenance" in input) || input.provenance === undefined) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "provenance is required and must be an issued AdsCandidateProvenanceBinding.",
+      ]),
+    };
+  }
+
+  if (!isAdsIssuedProvenanceBinding(input.provenance)) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "provenance must be an issued binding from buildAdsCandidateProvenanceBinding (caller reconstruction is not allowed).",
+      ]),
+    };
+  }
+
+  const provenanceValidation = validateAdsCandidateProvenanceBinding(
+    input.provenance
+  );
+  if (!provenanceValidation.valid) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        ...provenanceValidation.issues.map((issue) => `provenance: ${issue}`),
+      ]),
+    };
+  }
+  const provenance = input.provenance;
+  if (provenance.candidateId !== candidateId) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "provenance.candidateId must match candidateId.",
+      ]),
+    };
+  }
+
   // --- Validate (descriptor contract) ---
   const descriptorValidation = validateAdsRenderDescriptor(
     input.renderDescriptor,
@@ -693,6 +752,28 @@ export function runAdsExecutionLayerV1(
     return { valid: true, result };
   }
 
+  // Provenance binding — required issued token must match descriptor identity.
+  const provenanceMatch = assertProvenanceMatchesRenderDescriptor(
+    provenance,
+    descriptor
+  );
+  if (!provenanceMatch.valid) {
+    const result = rejectedResult("validate_execution", "identity_incomplete", {
+      ...baseDiagnostics,
+    });
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
+      return {
+        valid: false,
+        issues: Object.freeze([
+          ...provenanceMatch.issues,
+          ...validation.issues,
+        ]),
+      };
+    }
+    return { valid: true, result };
+  }
+
   // --- Execute (deterministic internal snapshot; executionEnabled stays false) ---
   // No side effects: freeze the accepted internal result only.
   const result = acceptedResult(candidateId, descriptor);
@@ -721,9 +802,7 @@ export function listAdsExecutionLayerV1RejectionReasons(): readonly AdsExecution
 }
 
 // ---------------------------------------------------------------------------
-// Foundation orchestrator (inventory → eligibility → … → execution result).
-// Kept for existing measurement / internal-delivery-pilot consumers.
-// Prefer runAdsExecutionLayerV1 for the Candidate Selection → Render Descriptor
-// Pipeline → Execution Layer path.
+// Foundation orchestrator lives in executionLayerFoundation.ts and is exported
+// only via adsPlatformCompatibility (see compatibility.ts). Do not re-export
+// here — keeps runAdsExecutionLayerV1 the unambiguous V1 entry on this module.
 // ---------------------------------------------------------------------------
-export * from "./executionLayerFoundation";

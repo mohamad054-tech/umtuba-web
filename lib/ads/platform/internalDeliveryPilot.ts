@@ -803,9 +803,8 @@ export function listAdsInternalDeliveryPilotV1RejectionReasons(): readonly AdsIn
 }
 
 // ---------------------------------------------------------------------------
-// Foundation orchestrator (inventory execution result → pilotSuccess result).
-// Kept for existing measurement consumers.
-// Prefer runInternalDeliveryPilotV1 for the Candidate Selection → Render
-// Descriptor Pipeline → Execution Layer → Internal Delivery Pilot path.
+// Foundation pilot lives in internalDeliveryPilotFoundation.ts and is exported
+// only via adsPlatformCompatibility (see compatibility.ts). Do not re-export
+// here — keeps runInternalDeliveryPilotV1 the unambiguous V1 entry on this
+// module.
 // ---------------------------------------------------------------------------
-export * from "./internalDeliveryPilotFoundation";
