@@ -1,7 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { CAMPAIGN_OBJECTIVES, type CampaignObjective } from "./constants";
+import {
+  evaluateCampaignActivationReadiness,
+  listDeliverablesForCampaign,
+} from "./deliverableBindings";
+import { listCreativesForCampaign } from "./creatives";
 import { ADS_ERRORS, adsUserMessage } from "./errors";
-import type { AdCampaign } from "./types";
+import { listAdSetsForCampaign } from "./targeting";
+import type { AdCampaign, AdvertiserAccountStatus } from "./types";
 import {
   validateCampaignBudget,
   validateCampaignDates,
@@ -290,4 +296,56 @@ export async function getCampaign(
   if (!data) return { ok: false, message: ADS_ERRORS.campaignNotFound };
 
   return { ok: true, campaign: mapCampaign(data as Record<string, unknown>) };
+}
+
+/**
+ * Activates an approved/paused campaign via SECURITY DEFINER RPC.
+ * Domain prechecks require a valid deliverable binding. Does not enable
+ * production delivery or billing (`ADS_DELIVERY_ENABLED` remains false).
+ */
+export async function activateCampaign(
+  supabase: AnyClient,
+  campaignId: string
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const campaign = await getCampaign(supabase, campaignId);
+  if (!campaign.ok) return campaign;
+
+  const { data: advertiser, error: advertiserErr } = await supabase
+    .from("advertiser_accounts")
+    .select("status")
+    .eq("id", campaign.campaign.advertiserAccountId)
+    .maybeSingle();
+  if (advertiserErr || !advertiser) {
+    return { ok: false, message: ADS_ERRORS.accountNotFound };
+  }
+
+  const [adSets, creatives, bindings] = await Promise.all([
+    listAdSetsForCampaign(supabase, campaignId),
+    listCreativesForCampaign(supabase, campaignId),
+    listDeliverablesForCampaign(supabase, campaignId),
+  ]);
+  if (!adSets.ok) return adSets;
+  if (!creatives.ok) return creatives;
+  if (!bindings.ok) return bindings;
+
+  const readiness = evaluateCampaignActivationReadiness({
+    advertiserStatus: advertiser.status as AdvertiserAccountStatus,
+    campaign: campaign.campaign,
+    adSets: adSets.adSets,
+    creatives: creatives.creatives,
+    bindings: bindings.bindings,
+  });
+  if (!readiness.ok) return readiness;
+
+  const { error } = await supabase.rpc("activate_ad_campaign", {
+    p_campaign_id: campaignId,
+  });
+  if (error) {
+    console.error("activateCampaign", error);
+    return {
+      ok: false,
+      message: adsUserMessage(error.message, ADS_ERRORS.activationFailed),
+    };
+  }
+  return { ok: true };
 }

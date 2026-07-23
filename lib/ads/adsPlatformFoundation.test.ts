@@ -247,6 +247,8 @@ describe("ads status transitions", () => {
         advertiserStatus: "draft",
         campaignStatus: "approved",
         hasApprovedCreative: true,
+        hasValidDeliverableBinding: true,
+        hasEligibleAdSet: true,
         hasValidBudget: true,
         hasValidDates: true,
       }).ok
@@ -256,6 +258,8 @@ describe("ads status transitions", () => {
         advertiserStatus: "approved",
         campaignStatus: "draft",
         hasApprovedCreative: true,
+        hasValidDeliverableBinding: true,
+        hasEligibleAdSet: true,
         hasValidBudget: true,
         hasValidDates: true,
       }).ok
@@ -265,6 +269,8 @@ describe("ads status transitions", () => {
         advertiserStatus: "approved",
         campaignStatus: "approved",
         hasApprovedCreative: false,
+        hasValidDeliverableBinding: true,
+        hasEligibleAdSet: true,
         hasValidBudget: true,
         hasValidDates: true,
       }).ok
@@ -274,6 +280,19 @@ describe("ads status transitions", () => {
         advertiserStatus: "approved",
         campaignStatus: "approved",
         hasApprovedCreative: true,
+        hasValidDeliverableBinding: false,
+        hasEligibleAdSet: true,
+        hasValidBudget: true,
+        hasValidDates: true,
+      }).ok
+    ).toBe(false);
+    expect(
+      canActivateCampaign({
+        advertiserStatus: "approved",
+        campaignStatus: "approved",
+        hasApprovedCreative: true,
+        hasValidDeliverableBinding: true,
+        hasEligibleAdSet: true,
         hasValidBudget: true,
         hasValidDates: true,
       }).ok

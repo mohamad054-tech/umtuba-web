@@ -2,33 +2,35 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Production Serving Foundation V1
+UMTUBA Ads Platform — Placement Compatibility Database Authority Fix
 
 ## Goal
 
-Implement the next Ads foundation layer after canonical production authority
-hardening: serving lifecycle contracts, ordered state transitions, correlation /
-provenance, idempotency for delivery/measurement/billing handoffs, deterministic
-rejection reasons, structured diagnostics, and fail-closed kill-switch /
-environment gates — while keeping production delivery and billing disabled.
+Close the final database-authority gap in
+`20260842_ads_deliverable_binding_database_authority_v1.sql` by enforcing
+placement and creative-format compatibility inside `bind_ad_deliverable`
+(PostgreSQL), aligned with the application fail-closed matrix — without
+enabling delivery/billing or applying the migration remotely.
 
 ## Allowed scope
 
-- `lib/ads/platform/*`
+- `lib/ads/deliverableBindings.ts`
+- `lib/ads/deliverableBindings.test.ts`
+- `supabase/migrations/20260842_ads_deliverable_binding_database_authority_v1.sql`
+  (local update only; do not apply remotely)
+- `docs/ads/ADS_DELIVERABLE_BINDING_INVENTORY_BRIDGE_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/ads/ADS_PRODUCTION_SERVING_FOUNDATION_V1.md`
 
 ## Forbidden scope
 
-- Games / Learning / Store / World / Messages / Live / product surfaces
-- `app/discover/components/DiscoverShell.tsx`
+- Games / Learning / Store / World product surfaces
 - Merging into `alpha-0.2`
 - Pushing directly to `alpha-0.2`
-- Migrations / remote Supabase apply
-- Enabling live billing or live delivery
-- Weakening canonical authority guarantees
-- Creating a second authoritative pipeline
+- Applying Supabase migrations to remote
+- Enabling live delivery or live billing
+- Event ingestion / UEOS charging
+- Second authoritative decision pipeline
 - Commit / push unless explicitly requested
 
 ## Branch
@@ -37,5 +39,5 @@ environment gates — while keeping production delivery and billing disabled.
 
 ## Status
 
-`implemented — verified (688/688 platform tests, tsc, build, git diff --check);
-not committed.`
+`implemented — verified (745/745 lib/ads, tsc, build, git diff --check);
+not committed; migration NOT APPLIED remotely.`

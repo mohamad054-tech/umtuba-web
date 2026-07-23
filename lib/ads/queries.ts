@@ -2,12 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { listMyAdvertiserAccounts } from "./advertiserAccounts";
 import { getCampaign, listCampaigns } from "./campaigns";
 import { listCreativesForCampaign } from "./creatives";
+import { listDeliverablesForCampaign } from "./deliverableBindings";
 import { ADS_ERRORS } from "./errors";
 import { getAdvertiserOverviewMetrics, getCampaignMetrics } from "./metrics";
 import { listAdSetsForCampaign } from "./targeting";
 import type {
   AdCampaign,
   AdCreative,
+  AdDeliverable,
   AdSet,
   AdvertiserAccount,
   AdvertiserOverviewMetrics,
@@ -85,6 +87,7 @@ export async function loadCampaignWorkspace(
       campaign: AdCampaign;
       adSets: AdSet[];
       creatives: AdCreative[];
+      bindings: AdDeliverable[];
       metrics: AdvertiserOverviewMetrics;
     }
   | { ok: false; message: string }
@@ -92,14 +95,16 @@ export async function loadCampaignWorkspace(
   const campaign = await getCampaign(supabase, campaignId);
   if (!campaign.ok) return campaign;
 
-  const [adSets, creatives, metrics] = await Promise.all([
+  const [adSets, creatives, bindings, metrics] = await Promise.all([
     listAdSetsForCampaign(supabase, campaignId),
     listCreativesForCampaign(supabase, campaignId),
+    listDeliverablesForCampaign(supabase, campaignId),
     getCampaignMetrics(supabase, campaignId),
   ]);
 
   if (!adSets.ok) return adSets;
   if (!creatives.ok) return creatives;
+  if (!bindings.ok) return bindings;
   if (!metrics.ok) return metrics;
 
   return {
@@ -107,6 +112,7 @@ export async function loadCampaignWorkspace(
     campaign: campaign.campaign,
     adSets: adSets.adSets,
     creatives: creatives.creatives,
+    bindings: bindings.bindings,
     metrics: metrics.metrics,
   };
 }

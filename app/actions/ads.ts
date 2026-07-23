@@ -16,6 +16,7 @@ import {
 } from "../../lib/ads/membership";
 import {
   archiveCampaign,
+  activateCampaign,
   createCampaign,
   getCampaign,
   listCampaigns,
@@ -23,6 +24,7 @@ import {
   submitCampaignForReview,
   updateCampaign,
 } from "../../lib/ads/campaigns";
+import { bindDeliverable } from "../../lib/ads/deliverableBindings";
 import {
   createCreative,
   deleteDraftCreative,
@@ -30,6 +32,7 @@ import {
   updateCreative,
   buildCreativeObjectPath,
 } from "../../lib/ads/creatives";
+import { ADS_DELIVERY_ENABLED } from "../../lib/ads/constants";
 import { ADS_ERRORS } from "../../lib/ads/errors";
 import {
   getAdvertiserOverviewMetrics,
@@ -404,6 +407,87 @@ export async function pauseCampaignAction(formData: FormData): Promise<void> {
 
   revalidateAdvertise();
   redirect(`${advertiseCampaignDetail(campaignId)}?paused=1`);
+}
+
+export async function activateCampaignAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  if (!user) {
+    redirect(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.advertiseCampaigns)}`
+    );
+  }
+
+  const campaignId = formString(formData, "campaignId");
+  const supabase = await createClient();
+  const authz = await requireManagerForCampaign(supabase, campaignId, user.id);
+  if (!authz.ok) {
+    redirect(
+      `${advertiseCampaignDetail(campaignId)}?error=${encodeURIComponent(
+        authz.message
+      )}`
+    );
+  }
+
+  // Structural: activation never flips the delivery kill switch.
+  if (ADS_DELIVERY_ENABLED) {
+    redirect(
+      `${advertiseCampaignDetail(campaignId)}?error=${encodeURIComponent(
+        ADS_ERRORS.deliveryDisabled
+      )}`
+    );
+  }
+
+  const result = await activateCampaign(supabase, campaignId);
+  if (!result.ok) {
+    redirect(
+      `${advertiseCampaignDetail(campaignId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  revalidateAdvertise();
+  redirect(`${advertiseCampaignDetail(campaignId)}?activated=1`);
+}
+
+export async function bindDeliverableAction(formData: FormData): Promise<void> {
+  const user = await requireUser();
+  if (!user) {
+    redirect(
+      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.advertiseCampaigns)}`
+    );
+  }
+
+  const campaignId = formString(formData, "campaignId");
+  const adSetId = formString(formData, "adSetId");
+  const creativeId = formString(formData, "creativeId");
+  const supabase = await createClient();
+  const authz = await requireManagerForCampaign(supabase, campaignId, user.id);
+  if (!authz.ok) {
+    redirect(
+      `${advertiseCampaignDetail(campaignId)}?error=${encodeURIComponent(
+        authz.message
+      )}`
+    );
+  }
+
+  const result = await bindDeliverable(supabase, {
+    campaignId,
+    adSetId,
+    creativeId,
+  });
+  if (!result.ok) {
+    redirect(
+      `${advertiseCampaignDetail(campaignId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  revalidateAdvertise();
+  redirect(
+    `${advertiseCampaignDetail(campaignId)}?bound=${result.created ? "1" : "existing"}`
+  );
 }
 
 export async function archiveCampaignAction(formData: FormData): Promise<void> {

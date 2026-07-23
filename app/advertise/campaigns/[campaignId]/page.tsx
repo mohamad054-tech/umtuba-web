@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
+  activateCampaignAction,
   archiveCampaignAction,
+  bindDeliverableAction,
   pauseCampaignAction,
   saveCampaignTargetingAction,
   submitCampaignForReviewAction,
   submitCreativeForReviewAction,
   deleteDraftCreativeAction,
 } from "../../../actions/ads";
-import { AD_PLACEMENTS, SAFE_INTERESTS } from "../../../../lib/ads/constants";
+import { ADS_DELIVERY_ENABLED, AD_PLACEMENTS, SAFE_INTERESTS } from "../../../../lib/ads/constants";
 import { loadCampaignWorkspace } from "../../../../lib/ads/queries";
 import { formatMinorUnits } from "../../../../lib/store/money";
 import {
@@ -25,8 +27,24 @@ export const metadata = {
 type PageProps = {
   params: Promise<{ campaignId: string }> | { campaignId: string };
   searchParams?:
-    | Promise<{ error?: string; created?: string; submitted?: string; targeting?: string }>
-    | { error?: string; created?: string; submitted?: string; targeting?: string };
+    | Promise<{
+        error?: string;
+        created?: string;
+        submitted?: string;
+        targeting?: string;
+        activated?: string;
+        bound?: string;
+        paused?: string;
+      }>
+    | {
+        error?: string;
+        created?: string;
+        submitted?: string;
+        targeting?: string;
+        activated?: string;
+        bound?: string;
+        paused?: string;
+      };
 };
 
 export default async function CampaignDetailPage({
@@ -61,8 +79,12 @@ export default async function CampaignDetailPage({
     );
   }
 
-  const { campaign, adSets, creatives, metrics } = workspace;
+  const { campaign, adSets, creatives, bindings, metrics } = workspace;
   const adSet = adSets[0] ?? null;
+  const approvedCreatives = creatives.filter((c) => c.status === "approved");
+  const canActivate =
+    (campaign.status === "approved" || campaign.status === "paused") &&
+    !ADS_DELIVERY_ENABLED;
 
   return (
     <AdvertiseShell title={campaign.name}>
@@ -71,13 +93,26 @@ export default async function CampaignDetailPage({
           {query.error}
         </p>
       ) : null}
-      {query.created || query.submitted || query.targeting ? (
+      {query.created ||
+      query.submitted ||
+      query.targeting ||
+      query.activated ||
+      query.bound ||
+      query.paused ? (
         <p className="mb-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
           {query.submitted
             ? "Campaign submitted for review."
             : query.targeting
               ? "Targeting saved."
-              : "Campaign saved."}
+              : query.activated
+                ? "Campaign activated for diagnostics only — delivery and billing remain off."
+                : query.bound === "existing"
+                  ? "Deliverable binding already existed (idempotent)."
+                  : query.bound
+                    ? "Creative bound to ad set."
+                    : query.paused
+                      ? "Campaign paused."
+                      : "Campaign saved."}
         </p>
       ) : null}
 
@@ -103,6 +138,17 @@ export default async function CampaignDetailPage({
                   className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
                 >
                   Submit for review
+                </button>
+              </form>
+            )}
+            {canActivate && (
+              <form action={activateCampaignAction}>
+                <input type="hidden" name="campaignId" value={campaign.id} />
+                <button
+                  type="submit"
+                  className="watch-focus-ring rounded-full bg-emerald-300 px-4 py-2 text-sm font-black text-black"
+                >
+                  Activate (diagnostics only)
                 </button>
               </form>
             )}
@@ -176,11 +222,67 @@ export default async function CampaignDetailPage({
           <li>Campaign status: {campaign.status}</li>
           <li>Ad sets: {adSets.length}</li>
           <li>
-            Creatives: {creatives.length} (
-            {creatives.filter((c) => c.status === "approved").length} approved)
+            Creatives: {creatives.length} ({approvedCreatives.length} approved)
           </li>
-          <li>Placements selected: contracts only — no live delivery in V1</li>
+          <li>
+            Deliverable bindings: {bindings.length} (
+            {
+              bindings.filter(
+                (binding) =>
+                  binding.status === "approved" || binding.status === "active"
+              ).length
+            }{" "}
+            eligible)
+          </li>
+          <li>
+            Delivery kill switch: {ADS_DELIVERY_ENABLED ? "on" : "off"} — no live
+            serving or billing
+          </li>
         </ul>
+      </section>
+
+      <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-6">
+        <h2 className="text-lg font-black">Deliverable bindings</h2>
+        <p className="mt-1 text-sm text-white/50">
+          Bind an approved creative to an ad set for diagnostic inventory only.
+        </p>
+        {adSet && approvedCreatives.length > 0 ? (
+          <form action={bindDeliverableAction} className="mt-4 flex flex-wrap gap-2">
+            <input type="hidden" name="campaignId" value={campaign.id} />
+            <input type="hidden" name="adSetId" value={adSet.id} />
+            <select
+              name="creativeId"
+              required
+              className="watch-focus-ring min-w-[220px] rounded-2xl border border-white/10 bg-black/40 px-3 py-2 text-sm"
+              defaultValue={approvedCreatives[0]?.id}
+            >
+              {approvedCreatives.map((creative) => (
+                <option key={creative.id} value={creative.id}>
+                  {creative.headline} ({creative.creativeType})
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+            >
+              Bind creative
+            </button>
+          </form>
+        ) : (
+          <p className="mt-3 text-sm text-white/50">
+            Need an ad set and at least one approved creative to create a binding.
+          </p>
+        )}
+        {bindings.length > 0 ? (
+          <ul className="mt-4 space-y-2 text-sm text-white/70">
+            {bindings.map((binding) => (
+              <li key={binding.id}>
+                {binding.name} · {binding.status} · creative {binding.creativeId}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-6">

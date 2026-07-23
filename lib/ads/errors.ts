@@ -9,6 +9,10 @@ export const ADS_ERRORS = {
   accountNotFound: "Advertiser account not found.",
   campaignNotFound: "Campaign not found.",
   creativeNotFound: "Creative not found.",
+  adSetNotFound: "Ad set not found.",
+  bindingNotFound: "Ad deliverable binding not found.",
+  bindingInvalid: "Ad deliverable binding is invalid.",
+  activationFailed: "Couldn't activate campaign. Please try again.",
   deliveryDisabled: "Ad delivery is not enabled in this foundation release.",
 } as const;
 

@@ -57,13 +57,16 @@ export function canTransitionCreative(
 }
 
 /**
- * Campaign may become active only when advertiser + campaign + creative
- * are approved and budgets/dates are present. Delivery remains off in V1.
+ * Campaign may become active only when advertiser + campaign are approved,
+ * at least one approved creative is bound to an eligible ad set, and
+ * budgets/dates are present. Delivery and billing remain off in V1.
  */
 export function canActivateCampaign(input: {
   advertiserStatus: AdvertiserAccountStatus;
   campaignStatus: CampaignStatus;
   hasApprovedCreative: boolean;
+  hasValidDeliverableBinding: boolean;
+  hasEligibleAdSet: boolean;
   hasValidBudget: boolean;
   hasValidDates: boolean;
 }): { ok: true } | { ok: false; message: string } {
@@ -73,8 +76,17 @@ export function canActivateCampaign(input: {
   if (input.campaignStatus !== "approved" && input.campaignStatus !== "paused") {
     return { ok: false, message: "Campaign must be approved before activation." };
   }
+  if (!input.hasEligibleAdSet) {
+    return { ok: false, message: "At least one eligible ad set is required." };
+  }
   if (!input.hasApprovedCreative) {
     return { ok: false, message: "At least one approved creative is required." };
+  }
+  if (!input.hasValidDeliverableBinding) {
+    return {
+      ok: false,
+      message: "At least one valid approved creative binding is required.",
+    };
   }
   if (!input.hasValidBudget) {
     return { ok: false, message: "Campaign budget is incomplete." };

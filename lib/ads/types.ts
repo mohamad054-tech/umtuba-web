@@ -114,6 +114,20 @@ export type AdCreative = {
   updatedAt: string;
 };
 
+/** Deliverable row binding creative ↔ ad set (`public.ads`). Not served live in V1. */
+export type AdDeliverableStatus = CampaignStatus;
+
+export type AdDeliverable = {
+  id: string;
+  adSetId: string;
+  creativeId: string;
+  name: string;
+  status: AdDeliverableStatus;
+  deliveryPriority: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdvertiserOverviewMetrics = {
   impressions: number;
   clicks: number;
