@@ -47,6 +47,8 @@ export * from "./budget";
 export * from "./pacing";
 /** Frequency Capping Foundation V1 — deterministic eligibility only, kill switches off. */
 export * from "./frequency";
+/** Auction Foundation V1 — deterministic winner selection only, kill switches off. */
+export * from "./auction";
 /** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
 export * from "./executionLayer";
 /** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */

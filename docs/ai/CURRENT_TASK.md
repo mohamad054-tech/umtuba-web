@@ -2,27 +2,30 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Frequency Capping Foundation V1 Test Hardening
+UMTUBA Ads Platform — Auction Foundation V1 Test Hardening
 
 ## Goal
 
-Close Final Review test gaps: count-above-cap, invalid counters/caps
-(NaN/Infinity/negative/fractional), and input immutability. Preserve
-existing frequency semantics and scope.
+Close Final Review gaps for Auction Foundation V1: explicit invalid-number,
+duplicate-rank, and auctionWinner-injection tests; clarify defensive
+same-rank comparator coverage; remove latent inputIndex sort fallback.
 
 ## Allowed scope
 
-- `lib/ads/platform/frequency*`
+- `lib/ads/platform/auction*`
+- `lib/ads/platform/index.ts`
+- Direct supporting contracts only if strictly required
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
 - `app/discover/components/DiscoverShell.tsx`
-- Unrelated Ads modules
 - Learning / Store / World / Messages / Live
-- Budget / pacing / billing / auction / ranking / AI / ML / rendering
-- Persistence / production delivery
+- Unrelated Ads modules
+- Budget / pacing / billing mutation
+- Bidding engine / payments / ledger / production delivery
+- Learning / AI / ML / randomness / wall-clock
 - Commit / push without explicit approval
 
 ## Branch
