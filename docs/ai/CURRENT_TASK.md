@@ -2,17 +2,18 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Ranking & Scoring Foundation V1 Test Hardening
+UMTUBA Ads Platform — Budget & Pacing Foundation V1 Hardening
 
 ## Goal
 
-Close Final Review gaps: explicit edge-case tests, input immutability,
-reachable tie-break sequence only, and reduced trust-narrowing casts.
+Close Final Review findings: rejection-order alignment, budget consistency,
+exhaustion clarity, pacing boundaries, elapsedFraction resolution, and missing
+combined/budget tests.
 
 ## Allowed scope
 
-- `lib/ads/platform/ranking*`
-- `lib/ads/platform/scoring*`
+- `lib/ads/platform/budget*`
+- `lib/ads/platform/pacing*`
 - `lib/ads/platform/index.ts` (only if export surface must stay consistent)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -22,6 +23,7 @@ reachable tie-break sequence only, and reduced trust-narrowing casts.
 - `app/discover/components/DiscoverShell.tsx`
 - Unrelated Ads modules
 - Learning / Store / World / Messages / Live
+- Billing / payments / ledger / persistence / spend mutation
 - Commit / push without explicit approval
 
 ## Branch
