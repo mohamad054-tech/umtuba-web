@@ -1,694 +1,504 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { ADS_DELIVERY_ENABLED } from "../constants";
 import {
-  ADS_CANDIDATE_INVENTORY_CONTRACT_VERSION,
-  createEmptyInventory,
-  type AdsCandidateMetadata,
-} from "./candidateInventory";
+  ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
+  ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS,
+  buildAdsRenderDescriptor,
+  type AdsRenderDescriptor,
+} from "./renderDescriptor";
 import {
-  ADS_DELIVERY_ENGINE_CONTRACT_VERSION,
-  type AdsDeliveryRequest,
-} from "./deliveryContracts";
-import {
-  ADS_ELIGIBILITY_ACTIVE_STATUS,
-  ADS_ELIGIBILITY_DELIVERY_FLAG_KEY,
-  type AdsEligibilityCandidateState,
-} from "./eligibilityRules";
-import {
-  ADS_EXECUTION_LAYER_ALLOWED_FIELDS,
-  ADS_EXECUTION_LAYER_CONTRACT_VERSION,
-  ADS_EXECUTION_RESULT_ALLOWED_FIELDS,
-  createEmptyAdsExecutionResult,
-  runAdsExecutionLayer,
-  validateAdsExecutionResult,
+  ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION,
+  ADS_EXECUTION_LAYER_V1_INPUT_ALLOWED_FIELDS,
+  ADS_EXECUTION_LAYER_V1_REJECTION_REASONS,
+  ADS_EXECUTION_LAYER_V1_STAGES,
+  listAdsExecutionLayerV1RejectionReasons,
+  listAdsExecutionLayerV1Stages,
+  runAdsExecutionLayerV1,
+  validateAdsExecutionInternalResult,
+  type AdsExecutionInternalResult,
 } from "./executionLayer";
-import { ADS_PLACEMENT_REGISTRY } from "./placementRegistry";
-import type { AdsRenderMaterial } from "./serveBoundary";
 
 const SOURCE_PATH = path.join(__dirname, "executionLayer.ts");
 const SOURCE = readFileSync(SOURCE_PATH, "utf8");
 
-const NOW = "2026-07-22T12:00:00.000Z";
-const EXPIRES = "2026-07-22T13:00:00.000Z";
-const GENERATED_AT = "2026-07-22T11:00:00.000Z";
+const NOW = "2026-07-23T12:00:00.000Z";
+const NOW_MS = Date.parse(NOW);
+const EXPIRES = "2026-07-23T13:00:00.000Z";
+const EXPIRED = "2026-07-23T11:00:00.000Z";
 
-function inventoryCandidate(
-  overrides: Partial<AdsCandidateMetadata> &
-    Pick<AdsCandidateMetadata, "candidateId"> & {
-      campaignRef?: string;
-      adSetRef?: string;
-      adRef?: string;
-      creativeRef?: string;
-    }
-): Record<string, unknown> {
-  const id = overrides.candidateId;
-  return {
-    candidateId: id,
-    campaignRef: overrides.campaignRef ?? `campaign-ref-${id}`,
-    adSetRef: overrides.adSetRef ?? `ad-set-ref-${id}`,
-    adRef: overrides.adRef ?? `ad-ref-${id}`,
-    creativeRef: overrides.creativeRef ?? `creative-ref-${id}`,
-    placement: overrides.placement ?? "WATCH_FEED",
-    creativeType: overrides.creativeType ?? "video",
-    eligibilitySnapshot: overrides.eligibilitySnapshot ?? {
-      snapshotRef: `eligibility-snapshot-${id}`,
-      revision: 1,
-    },
-    inventorySource: overrides.inventorySource ?? "catalog",
-    revision: overrides.revision ?? 1,
-    timestamps: overrides.timestamps ?? {
-      createdAt: "2026-07-22T10:00:00.000Z",
-      updatedAt: "2026-07-22T10:30:00.000Z",
-    },
-  };
+/** Contract: expired iff expiresAtMs + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS < nowMs. */
+const BOUNDARY_EXPIRES_AT = "2026-07-23T12:00:00.000Z";
+const BOUNDARY_EXPIRES_AT_MS = Date.parse(BOUNDARY_EXPIRES_AT);
+
+function isoFromMs(ms: number): string {
+  return new Date(ms).toISOString();
 }
 
-function baseInventory(
-  candidates: Record<string, unknown>[] = [inventoryCandidate({ candidateId: "candidate-1" })]
+function expectKillSwitchesDisabled(result: AdsExecutionInternalResult): void {
+  expect(result.productionEnabled).toBe(false);
+  expect(result.deliveryEnabled).toBe(false);
+  expect(result.executionEnabled).toBe(false);
+}
+
+function baseDescriptorDraft(
+  overrides: Record<string, unknown> = {}
 ): Record<string, unknown> {
   return {
-    contractVersion: ADS_CANDIDATE_INVENTORY_CONTRACT_VERSION,
-    inventoryId: "inventory-1",
-    revision: 1,
-    generatedAt: GENERATED_AT,
-    candidates,
-  };
-}
-
-function eligibilityState(
-  overrides: Partial<AdsEligibilityCandidateState> & { candidateId: string }
-): AdsEligibilityCandidateState {
-  const id = overrides.candidateId;
-  return {
-    candidateId: id,
-    campaignId: overrides.campaignId ?? `campaign-${id}`,
-    adSetId: overrides.adSetId ?? `ad-set-${id}`,
-    adId: overrides.adId ?? `ad-${id}`,
-    creativeId: overrides.creativeId ?? `creative-${id}`,
-    placementId: overrides.placementId ?? "WATCH_FEED",
-    campaignStatus: overrides.campaignStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    adSetStatus: overrides.adSetStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    adStatus: overrides.adStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    campaignStartsAt: overrides.campaignStartsAt ?? "2026-07-01T00:00:00.000Z",
-    campaignEndsAt:
-      overrides.campaignEndsAt === undefined
-        ? "2026-08-01T00:00:00.000Z"
-        : overrides.campaignEndsAt,
-    adSetStartsAt: overrides.adSetStartsAt ?? "2026-07-01T00:00:00.000Z",
-    adSetEndsAt:
-      overrides.adSetEndsAt === undefined
-        ? "2026-08-01T00:00:00.000Z"
-        : overrides.adSetEndsAt,
-    budgetExhausted: overrides.budgetExhausted ?? false,
-    creativePresent: overrides.creativePresent ?? true,
-    creativeApproved: overrides.creativeApproved ?? true,
-    policyBlocked: overrides.policyBlocked ?? false,
-    targetedCountryCodes: overrides.targetedCountryCodes ?? ["US"],
-    targetedLanguageCodes: overrides.targetedLanguageCodes ?? ["en"],
-    audienceMatched: overrides.audienceMatched ?? true,
-  };
-}
-
-function baseRequest(
-  candidateIds: readonly string[],
-  overrides: Partial<AdsDeliveryRequest> = {}
-): AdsDeliveryRequest {
-  return {
-    contractVersion: ADS_DELIVERY_ENGINE_CONTRACT_VERSION,
+    descriptorVersion: ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
     placementId: "WATCH_FEED",
-    candidates: candidateIds.map((id) => ({
-      candidateId: id,
-      campaignId: `campaign-${id}`,
-      adSetId: `ad-set-${id}`,
-      adId: `ad-${id}`,
-      creativeId: `creative-${id}`,
-    })),
-    viewer: { opaqueViewerId: "viewer-opaque-1" },
-    geo: { countryCode: "US" },
-    languageCode: "en-US",
-    deviceClass: "mobile",
-    featureFlags: {
-      [ADS_ELIGIBILITY_DELIVERY_FLAG_KEY]: false,
-      ADS_PLACEMENT_WATCH_FEED_ENABLED: false,
+    creativeReference: "creative-ref-1",
+    creativeType: "video",
+    mediaReference: "media-ref-1",
+    thumbnailReference: "thumb-ref-1",
+    clickDestinationReference: "destination-ref-1",
+    disclosure: {
+      label: "Sponsored",
+      mustDisplay: true,
     },
+    reportingHandles: {
+      impressionHandle: "imp-handle-1",
+      clickHandle: "clk-handle-1",
+    },
+    trackingReferences: {
+      campaignId: "campaign-1",
+      adSetId: "ad-set-1",
+      adId: "ad-1",
+      creativeId: "creative-ref-1",
+    },
+    cacheHints: {
+      cacheable: false,
+      maxAgeSeconds: null,
+      cacheKey: null,
+    },
+    expiresAt: EXPIRES,
+    productionEnabled: false,
+    ...overrides,
+  };
+}
+
+function buildDescriptor(
+  overrides: Record<string, unknown> = {}
+): AdsRenderDescriptor {
+  const outcome = buildAdsRenderDescriptor(baseDescriptorDraft(overrides), {
+    nowMs: NOW_MS,
+  });
+  if (!outcome.valid) {
+    throw new Error(
+      `test fixture descriptor invalid: ${outcome.issues.join("; ")}`
+    );
+  }
+  return outcome.descriptor;
+}
+
+function baseInput(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    candidateId: "candidate-1",
+    renderDescriptor: buildDescriptor(),
     currentTimestamp: NOW,
     ...overrides,
   };
 }
 
-function enabledFlagsFor(placementId: string): Record<string, boolean> {
-  const flagKey = ADS_PLACEMENT_REGISTRY[
-    placementId as keyof typeof ADS_PLACEMENT_REGISTRY
-  ].featureFlag.key;
-  return {
-    [ADS_ELIGIBILITY_DELIVERY_FLAG_KEY]: true,
-    [flagKey]: true,
-  };
-}
-
-function renderMaterialFor(
-  candidateId: string,
-  overrides: Partial<AdsRenderMaterial> = {}
-): AdsRenderMaterial {
-  return Object.freeze({
-    candidateId,
-    creativeReference:
-      overrides.creativeReference ?? `creative-ref-${candidateId}`,
-    mediaReference: overrides.mediaReference ?? `media-ref-${candidateId}`,
-    thumbnailReference:
-      overrides.thumbnailReference === undefined
-        ? null
-        : overrides.thumbnailReference,
-    clickDestinationReference:
-      overrides.clickDestinationReference ?? `destination-ref-${candidateId}`,
-    impressionHandle: overrides.impressionHandle ?? `imp-${candidateId}`,
-    clickHandle: overrides.clickHandle ?? `clk-${candidateId}`,
-    ...(overrides.trackingReferences !== undefined
-      ? { trackingReferences: overrides.trackingReferences }
-      : {}),
-    disclosureLabel: overrides.disclosureLabel ?? "Sponsored",
-    cacheHints: overrides.cacheHints ?? {
-      cacheable: false,
-      maxAgeSeconds: null,
-      cacheKey: null,
-    },
-    expiresAt: overrides.expiresAt ?? EXPIRES,
-  });
-}
-
-function runBase(options: {
-  inventory?: Record<string, unknown>;
-  request?: AdsDeliveryRequest;
-  eligibilityStates?: AdsEligibilityCandidateState[];
-  candidateIds?: readonly string[];
-  renderMaterial?: AdsRenderMaterial | null;
-  includeRenderMaterial?: boolean;
-} = {}) {
-  const candidateIds = options.candidateIds ?? ["candidate-1"];
-  const includeMaterial = options.includeRenderMaterial !== false;
-  return runAdsExecutionLayer({
-    inventory:
-      options.inventory ??
-      baseInventory(
-        candidateIds.map((id) => inventoryCandidate({ candidateId: id }))
-      ),
-    request: options.request ?? baseRequest(candidateIds),
-    eligibilityStates:
-      options.eligibilityStates ??
-      candidateIds.map((id) => eligibilityState({ candidateId: id })),
-    ...(includeMaterial
-      ? {
-          renderMaterial:
-            options.renderMaterial === undefined
-              ? renderMaterialFor(candidateIds[0] ?? "candidate-1")
-              : options.renderMaterial,
-        }
-      : {}),
-  });
-}
-
-describe("Ads Execution Layer Foundation V1", () => {
-  it("exposes contract version and allowed fields", () => {
-    expect(ADS_EXECUTION_LAYER_CONTRACT_VERSION).toBe("v1");
-    expect([...ADS_EXECUTION_LAYER_ALLOWED_FIELDS]).toEqual([
-      "inventory",
-      "request",
-      "eligibilityStates",
-      "renderMaterial",
+describe("Ads Execution Layer V1", () => {
+  it("exposes stable contract stages and rejection reasons", () => {
+    expect(ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION).toBe("v1");
+    expect(listAdsExecutionLayerV1Stages()).toEqual([
+      "validate",
+      "validate_execution",
+      "execute",
+      "result",
     ]);
-    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
-      "renderDescriptor"
+    expect(ADS_EXECUTION_LAYER_V1_STAGES).toEqual(
+      listAdsExecutionLayerV1Stages()
     );
-    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
-      "selectableCandidates"
+    expect(listAdsExecutionLayerV1RejectionReasons()).toEqual([
+      "invalid_descriptor",
+      "descriptor_expired",
+      "placement_incompatible",
+      "identity_incomplete",
+    ]);
+    expect(ADS_EXECUTION_LAYER_V1_REJECTION_REASONS).toEqual(
+      listAdsExecutionLayerV1RejectionReasons()
     );
-    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).toContain(
-      "selectedCandidateId"
-    );
-    expect(ADS_EXECUTION_RESULT_ALLOWED_FIELDS).not.toContain(
-      "renderDescriptorPlaceholder"
-    );
+    expect([...ADS_EXECUTION_LAYER_V1_INPUT_ALLOWED_FIELDS]).toEqual([
+      "candidateId",
+      "renderDescriptor",
+      "currentTimestamp",
+    ]);
   });
 
-  it("executes an empty inventory successfully", () => {
-    const empty = createEmptyInventory({
-      inventoryId: "inventory-empty",
-      revision: 1,
-      generatedAt: GENERATED_AT,
-    });
-    const outcome = runAdsExecutionLayer({
-      inventory: empty,
-      request: baseRequest([]),
-      eligibilityStates: [],
-    });
-
+  it("accepts a validated render descriptor into an internal result", () => {
+    const outcome = runAdsExecutionLayerV1(baseInput());
     expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
+    if (!outcome.valid) {
+      return;
+    }
 
-    expect(outcome.result).toEqual(createEmptyAdsExecutionResult());
-    expect(outcome.result.executionCompleted).toBe(true);
+    expect(outcome.result.contractVersion).toBe(
+      ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION
+    );
+    expect(outcome.result.executionAccepted).toBe(true);
+    expect(outcome.result.executionRejected).toBe(false);
+    expect(outcome.result.candidateId).toBe("candidate-1");
+    expect(outcome.result.pipelineStage).toBe("result");
     expect(outcome.result.productionEnabled).toBe(false);
-    expect(outcome.result.renderDescriptor).toBeNull();
-    expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(outcome.result.selectedCandidateId).toBeNull();
-    expect(outcome.result.selectableCandidates).toEqual([]);
-    expect(outcome.result.evaluatedCandidates).toEqual([]);
+    expect(outcome.result.deliveryEnabled).toBe(false);
+    expect(outcome.result.executionEnabled).toBe(false);
+    expect(outcome.result.renderDescriptor).not.toBeNull();
+    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
+      "creative-ref-1"
+    );
+    expect(outcome.result.diagnostics).toEqual({
+      candidateId: "candidate-1",
+      placementId: "WATCH_FEED",
+      creativeReference: "creative-ref-1",
+      creativeType: "video",
+      executionAccepted: true,
+      rejectionReason: null,
+    });
+    expect(Object.isFrozen(outcome.result)).toBe(true);
+    expect(Object.isFrozen(outcome.result.diagnostics)).toBe(true);
+    expect(Object.isFrozen(outcome.result.renderDescriptor)).toBe(true);
+    expect(
+      validateAdsExecutionInternalResult(outcome.result, { nowMs: NOW_MS })
+    ).toEqual({ valid: true });
   });
 
-  it("executes a single candidate deterministically", () => {
-    const first = runBase();
-    const second = runBase();
-
+  it("is deterministic for identical inputs", () => {
+    const first = runAdsExecutionLayerV1(baseInput());
+    const second = runAdsExecutionLayerV1(baseInput());
     expect(first.valid).toBe(true);
     expect(second.valid).toBe(true);
-    if (!first.valid || !second.valid) return;
-
+    if (!first.valid || !second.valid) {
+      return;
+    }
     expect(first.result).toEqual(second.result);
-    expect(Object.isFrozen(first.result)).toBe(true);
-    expect(first.result.evaluatedCandidates).toHaveLength(1);
-    expect(first.result.eligibilityResults).toHaveLength(1);
-    expect(first.result.compatibilityResults).toHaveLength(1);
-    expect(first.result.traces).toHaveLength(1);
-    expect(first.result.executionCompleted).toBe(true);
-    expect(first.result.productionEnabled).toBe(false);
-    expect(first.result.renderDescriptor).toBeNull();
-    expect(first.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(first.result.selectedCandidateId).toBeNull();
-    expect(Array.isArray(first.result.selectableCandidates)).toBe(true);
   });
 
-  it("executes multiple candidates in inventory order", () => {
-    const outcome = runBase({
-      candidateIds: ["candidate-a", "candidate-b", "candidate-c"],
-    });
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-
-    expect(
-      outcome.result.evaluatedCandidates.map((c) => c.candidateId)
-    ).toEqual(["candidate-a", "candidate-b", "candidate-c"]);
-    expect(
-      outcome.result.eligibilityResults.map((c) => c.candidateId)
-    ).toEqual(["candidate-a", "candidate-b", "candidate-c"]);
-    expect(
-      outcome.result.compatibilityResults.map((c) => c.candidateId)
-    ).toEqual(["candidate-a", "candidate-b", "candidate-c"]);
-    expect(
-      outcome.result.traces.map((t) => t.candidateReference.candidateId)
-    ).toEqual(["candidate-a", "candidate-b", "candidate-c"]);
-    expect(outcome.result.selectionSummary.evaluatedCandidateCount).toBe(3);
-  });
-
-  it("records incompatible creatives without selecting an ad", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({
-          candidateId: "candidate-1",
-          placement: "WATCH_FEED",
-          creativeType: "game_promotion",
-        }),
-      ]),
-      request: baseRequest(["candidate-1"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      eligibilityStates: [
-        eligibilityState({ candidateId: "candidate-1", placementId: "WATCH_FEED" }),
-      ],
-    });
-
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-
-    expect(outcome.result.compatibilityResults[0].compatible).toBe(false);
-    expect(outcome.result.compatibilityResults[0].reason).toContain(
-      "not supported by placement"
-    );
-    expect(outcome.result.rejectedCandidates.some((r) => r.stage === "compatibility")).toBe(
-      true
-    );
-    expect(outcome.result.selectableCandidates).toEqual([]);
-    expect(outcome.result.selectionSummary.eligibleCandidates).toEqual([]);
-    expect(outcome.result.selectionSummary.eligibleCandidateCount).toBe(0);
-    expect(outcome.result.selectedCandidateId).toBeNull();
-    expect(outcome.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(outcome.result.renderDescriptor).toBeNull();
-    expect(outcome.result.productionEnabled).toBe(false);
-    expect(outcome.result.traces[0].diagnosticSummary).toEqual({
-      compatible: false,
-      selectionStrategy: "first_selectable",
-      selectionOutcome: "not_selectable_earlier_gate",
-    });
-  });
-
-  it("rejects invalid placement in inventory (fail closed)", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        {
-          ...inventoryCandidate({ candidateId: "candidate-1" }),
-          placement: "NOT_A_PLACEMENT",
-        },
-      ]),
-      request: baseRequest(["candidate-1"]),
-      eligibilityStates: [eligibilityState({ candidateId: "candidate-1" })],
-    });
-
-    expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
-    expect(
-      outcome.issues.some((issue) => issue.includes("Malformed inventory"))
-    ).toBe(true);
-  });
-
-  it("rejects invalid taxonomy / malformed request", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory(),
-      request: {
-        ...baseRequest(["candidate-1"]),
-        placementId: "NOT_REAL" as AdsDeliveryRequest["placementId"],
-      },
-      eligibilityStates: [eligibilityState({ candidateId: "candidate-1" })],
-    });
-
-    expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
-    expect(
-      outcome.issues.some((issue) => issue.includes("Malformed request"))
-    ).toBe(true);
-  });
-
-  it("rejects inconsistent candidate references", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({ candidateId: "candidate-1" }),
-      ]),
-      request: baseRequest(["candidate-2"]),
-      eligibilityStates: [eligibilityState({ candidateId: "candidate-1" })],
-    });
-
-    expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
-    expect(
-      outcome.issues.some((issue) =>
-        issue.includes("Inconsistent candidate references")
-      )
-    ).toBe(true);
-  });
-
-  it("rejects malformed inventory and eligibility states", () => {
-    expect(
-      runAdsExecutionLayer({
-        inventory: null,
-        request: baseRequest([]),
-        eligibilityStates: [],
-      }).valid
-    ).toBe(false);
-
-    expect(
-      runAdsExecutionLayer({
-        inventory: baseInventory(),
-        request: baseRequest(["candidate-1"]),
-        eligibilityStates: [{ candidateId: "candidate-1" }],
-      }).valid
-    ).toBe(false);
-
-    expect(
-      runAdsExecutionLayer({
-        inventory: baseInventory(),
-        request: baseRequest(["candidate-1"]),
-        eligibilityStates: "nope",
-      }).valid
-    ).toBe(false);
-  });
-
-  it("rejects unknown input fields", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: createEmptyInventory({ generatedAt: GENERATED_AT }),
-      request: baseRequest([]),
-      eligibilityStates: [],
-      selectedAd: "ad-1",
-    });
-    expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
-    expect(outcome.issues[0]).toContain('unknown field "selectedAd"');
-  });
-
-  it("does not mutate inputs (immutability)", () => {
-    const inventory = baseInventory([
-      inventoryCandidate({ candidateId: "candidate-1" }),
-    ]);
-    const request = baseRequest(["candidate-1"]);
-    const eligibilityStates = [
-      eligibilityState({ candidateId: "candidate-1" }),
-    ];
-    const snapshot = structuredClone({
-      inventory,
-      request,
-      eligibilityStates,
-    });
-
-    const outcome = runAdsExecutionLayer({
-      inventory,
-      request,
-      eligibilityStates,
-    });
-    expect(outcome.valid).toBe(true);
-    expect({ inventory, request, eligibilityStates }).toEqual(snapshot);
-  });
-
-  it("keeps productionEnabled false and executionCompleted true", () => {
-    const disabled = runBase();
-    expect(disabled.valid).toBe(true);
-    if (!disabled.valid) return;
-    expect(disabled.result.productionEnabled).toBe(false);
-    expect(disabled.result.executionCompleted).toBe(true);
-    expect(disabled.result.eligibilityResults[0].productionEnabled).toBe(false);
-    expect(disabled.result.compatibilityResults[0].productionEnabled).toBe(
-      false
-    );
-    expect(disabled.result.traces[0].productionEnabled).toBe(false);
-    expect(disabled.result.selectionSummary.productionEnabled).toBe(false);
-
-    const enabled = runBase({
-      request: baseRequest(["candidate-1"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      renderMaterial: renderMaterialFor("candidate-1"),
-    });
-    expect(enabled.valid).toBe(true);
-    if (!enabled.valid) return;
-    expect(enabled.result.productionEnabled).toBe(false);
-    expect(enabled.result.executionCompleted).toBe(true);
-    expect(enabled.result.eligibilityResults[0].eligible).toBe(true);
-    expect(enabled.result.compatibilityResults[0].compatible).toBe(true);
-    expect(enabled.result.selectableCandidates).toEqual([
-      { candidateId: "candidate-1" },
-    ]);
-    expect(enabled.result.selectionSummary.eligibleCandidates).toEqual([
-      { candidateId: "candidate-1" },
-    ]);
-    expect(enabled.result.selectedCandidateId).toBe("candidate-1");
-    expect(enabled.result.selectionSummary.selectedCandidate).toBeNull();
-    expect(enabled.result.renderDescriptor).not.toBeNull();
-    expect(enabled.result.renderDescriptor?.creativeReference).toBe(
-      "creative-ref-candidate-1"
-    );
-    expect(enabled.result.renderDescriptor?.mediaReference).toBe(
-      "media-ref-candidate-1"
-    );
-    expect(enabled.result.renderDescriptor?.placementId).toBe("WATCH_FEED");
-    expect(enabled.result.renderDescriptor?.creativeType).toBe("video");
-    expect(enabled.result.renderDescriptor?.productionEnabled).toBe(false);
-    expect(Object.isFrozen(enabled.result.renderDescriptor)).toBe(true);
-    expect(enabled.result.traces[0].diagnosticSummary).toEqual({
-      compatible: true,
-      selectionStrategy: "first_selectable",
-      selectionOutcome: "selected_first_selectable",
-    });
-  });
-
-  it("keeps renderDescriptor null when selected without render material", () => {
-    const outcome = runBase({
-      request: baseRequest(["candidate-1"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      renderMaterial: null,
-    });
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-    expect(outcome.result.selectedCandidateId).toBe("candidate-1");
-    expect(outcome.result.renderDescriptor).toBeNull();
-    expect(outcome.result.productionEnabled).toBe(false);
-  });
-
-  it("fails closed when render material belongs to a different candidate", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({ candidateId: "first" }),
-        inventoryCandidate({ candidateId: "second" }),
-      ]),
-      request: baseRequest(["first", "second"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      eligibilityStates: [
-        eligibilityState({ candidateId: "first" }),
-        eligibilityState({ candidateId: "second" }),
-      ],
-      renderMaterial: renderMaterialFor("second"),
-    });
-    expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
-    expect(
-      outcome.issues.some((issue) => issue.includes("no fallback"))
-    ).toBe(true);
-  });
-
-  it("keeps selection summary aligned with selectable set (eligibility ∩ compatibility)", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({
-          candidateId: "ok",
-          placement: "WATCH_FEED",
-          creativeType: "video",
-        }),
-        inventoryCandidate({
-          candidateId: "bad-creative",
-          placement: "WATCH_FEED",
-          creativeType: "game_promotion",
-        }),
-      ]),
-      request: baseRequest(["ok", "bad-creative"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      eligibilityStates: [
-        eligibilityState({ candidateId: "ok", placementId: "WATCH_FEED" }),
-        eligibilityState({
-          candidateId: "bad-creative",
-          placementId: "WATCH_FEED",
-        }),
-      ],
-      renderMaterial: renderMaterialFor("ok"),
-    });
-
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-
-    expect(outcome.result.eligibilityResults.every((r) => r.eligible)).toBe(
-      true
-    );
-    expect(outcome.result.compatibilityResults[0].compatible).toBe(true);
-    expect(outcome.result.compatibilityResults[1].compatible).toBe(false);
-    expect(outcome.result.selectableCandidates).toEqual([
-      { candidateId: "ok" },
-    ]);
-    expect(outcome.result.selectionSummary.eligibleCandidates).toEqual([
-      { candidateId: "ok" },
-    ]);
-    expect(
-      outcome.result.selectionSummary.eligibleCandidates.some(
-        (c) => c.candidateId === "bad-creative"
-      )
-    ).toBe(false);
-    expect(outcome.result.selectedCandidateId).toBe("ok");
-    expect(outcome.result.renderDescriptor).not.toBeNull();
-    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
-      "creative-ref-ok"
-    );
-    expect(outcome.result.renderDescriptor?.mediaReference).toBe(
-      "media-ref-ok"
-    );
-    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
-      "selected_first_selectable"
-    );
-    expect(outcome.result.traces[1].diagnosticSummary?.selectionOutcome).toBe(
-      "not_selectable_earlier_gate"
-    );
-  });
-
-  it("selects the first selectable candidate in inventory order (pilot)", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({ candidateId: "first" }),
-        inventoryCandidate({ candidateId: "second" }),
-      ]),
-      request: baseRequest(["first", "second"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      eligibilityStates: [
-        eligibilityState({ candidateId: "first" }),
-        eligibilityState({ candidateId: "second" }),
-      ],
-      renderMaterial: renderMaterialFor("first"),
-    });
-
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-    expect(outcome.result.selectableCandidates.map((c) => c.candidateId)).toEqual(
-      ["first", "second"]
-    );
-    expect(outcome.result.selectedCandidateId).toBe("first");
-    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
-      "selected_first_selectable"
-    );
-    expect(outcome.result.traces[1].diagnosticSummary?.selectionOutcome).toBe(
-      "not_selected_earlier_selectable"
-    );
-    expect(outcome.result.renderDescriptor).not.toBeNull();
-    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
-      "creative-ref-first"
-    );
-    expect(outcome.result.productionEnabled).toBe(false);
-  });
-
-  it("rejects via eligibility when delivery flags are off (no delivery)", () => {
-    const outcome = runBase();
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-
-    expect(outcome.result.eligibilityResults[0].eligible).toBe(false);
-    expect(outcome.result.eligibilityResults[0].exclusionReason).toBe(
-      "delivery_disabled"
-    );
-    expect(outcome.result.rejectedCandidates[0]).toMatchObject({
+  it("does not mutate inputs", () => {
+    const descriptor = buildDescriptor();
+    const input = {
       candidateId: "candidate-1",
-      stage: "eligibility",
-      reason: "delivery_disabled",
-    });
-    expect(outcome.result.selectableCandidates).toEqual([]);
-    expect(outcome.result.selectedCandidateId).toBeNull();
-    expect(outcome.result.traces[0].diagnosticSummary?.selectionOutcome).toBe(
-      "not_selectable_earlier_gate"
-    );
-    expect(ADS_DELIVERY_ENABLED).toBe(false);
+      renderDescriptor: descriptor,
+      currentTimestamp: NOW,
+    };
+    const snapshot = structuredClone(input);
+    const outcome = runAdsExecutionLayerV1(input);
+    expect(outcome.valid).toBe(true);
+    expect(input).toEqual(snapshot);
   });
 
-  it("validateAdsExecutionResult accepts empty and rejects malformed", () => {
-    expect(validateAdsExecutionResult(createEmptyAdsExecutionResult())).toEqual(
-      { valid: true }
+  it("keeps kill switches false even when execution is accepted", () => {
+    const outcome = runAdsExecutionLayerV1(baseInput());
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.productionEnabled).toBe(false);
+    expect(outcome.result.deliveryEnabled).toBe(false);
+    expect(outcome.result.executionEnabled).toBe(false);
+    expect(outcome.result.renderDescriptor?.productionEnabled).toBe(false);
+  });
+
+  it("soft-rejects expired descriptors", () => {
+    const outcome = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: baseDescriptorDraft({ expiresAt: EXPIRED }),
+      })
     );
-    expect(validateAdsExecutionResult(null).valid).toBe(false);
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.executionAccepted).toBe(false);
+    expect(outcome.result.executionRejected).toBe(true);
+    expect(outcome.result.renderDescriptor).toBeNull();
+    expect(outcome.result.pipelineStage).toBe("validate_execution");
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "descriptor_expired"
+    );
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("soft-rejects placement-incompatible descriptors", () => {
+    const outcome = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: baseDescriptorDraft({
+          placementId: "WATCH_FEED",
+          creativeType: "game_promotion",
+        }),
+      })
+    );
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.executionAccepted).toBe(false);
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "placement_incompatible"
+    );
+    expect(outcome.result.pipelineStage).toBe("validate_execution");
+    expect(outcome.result.renderDescriptor).toBeNull();
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("soft-rejects incomplete tracking identity", () => {
+    const outcome = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: baseDescriptorDraft({
+          trackingReferences: {
+            campaignId: "campaign-1",
+            adSetId: "ad-set-1",
+            adId: "ad-1",
+            creativeId: "",
+          },
+        }),
+      })
+    );
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.executionAccepted).toBe(false);
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "identity_incomplete"
+    );
+    expect(outcome.result.pipelineStage).toBe("validate_execution");
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("soft-rejects malformed descriptors as invalid_descriptor", () => {
+    const outcome = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: baseDescriptorDraft({
+          mediaReference: "https://evil.example/media.mp4",
+        }),
+      })
+    );
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.executionAccepted).toBe(false);
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "invalid_descriptor"
+    );
+    expect(outcome.result.pipelineStage).toBe("validate");
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("honors exact ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS expiry boundaries", () => {
+    // Contract (unchanged): expired iff expiresAtMs + SKEW < nowMs.
+    // Post-expiry acceptance window for currentTimestamp is [expiresAt, expiresAt+SKEW].
+    expect(ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS).toBe(5_000);
+
+    const descriptor = buildDescriptor({
+      expiresAt: BOUNDARY_EXPIRES_AT,
+    });
+    const lowerBoundaryMs = BOUNDARY_EXPIRES_AT_MS;
+    const upperBoundaryMs =
+      BOUNDARY_EXPIRES_AT_MS + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS;
+
+    const atLower = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: descriptor,
+        currentTimestamp: isoFromMs(lowerBoundaryMs),
+      })
+    );
+    expect(atLower.valid).toBe(true);
+    if (atLower.valid) {
+      expect(atLower.result.executionAccepted).toBe(true);
+      expectKillSwitchesDisabled(atLower.result);
+    }
+
+    const beforeLower = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: descriptor,
+        currentTimestamp: isoFromMs(lowerBoundaryMs - 1),
+      })
+    );
+    expect(beforeLower.valid).toBe(true);
+    if (beforeLower.valid) {
+      expect(beforeLower.result.executionAccepted).toBe(true);
+      expectKillSwitchesDisabled(beforeLower.result);
+    }
+
+    const atUpper = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: descriptor,
+        currentTimestamp: isoFromMs(upperBoundaryMs),
+      })
+    );
+    expect(atUpper.valid).toBe(true);
+    if (atUpper.valid) {
+      expect(atUpper.result.executionAccepted).toBe(true);
+      expectKillSwitchesDisabled(atUpper.result);
+    }
+
+    const afterUpper = runAdsExecutionLayerV1(
+      baseInput({
+        renderDescriptor: descriptor,
+        currentTimestamp: isoFromMs(upperBoundaryMs + 1),
+      })
+    );
+    expect(afterUpper.valid).toBe(true);
+    if (afterUpper.valid) {
+      expect(afterUpper.result.executionAccepted).toBe(false);
+      expect(afterUpper.result.executionRejected).toBe(true);
+      expect(afterUpper.result.diagnostics.rejectionReason).toBe(
+        "descriptor_expired"
+      );
+      expect(afterUpper.result.pipelineStage).toBe("validate_execution");
+      expect(afterUpper.result.renderDescriptor).toBeNull();
+      expectKillSwitchesDisabled(afterUpper.result);
+    }
+  });
+
+  it("treats candidateId as opaque selection binding and never rewrites descriptor tracking identity", () => {
+    // V1 design: candidateId is an opaque upstream selection binding only.
+    // It is intentionally not cross-checked against trackingReferences;
+    // creative/campaign/ad-set/ad identity remains descriptor-authoritative.
+    const descriptor = buildDescriptor();
+    const trackingSnapshot = {
+      campaignId: descriptor.trackingReferences.campaignId,
+      adSetId: descriptor.trackingReferences.adSetId,
+      adId: descriptor.trackingReferences.adId,
+      creativeId: descriptor.trackingReferences.creativeId,
+    };
+
+    const outcome = runAdsExecutionLayerV1(
+      baseInput({
+        candidateId: "opaque-selection-binding-999",
+        renderDescriptor: descriptor,
+      })
+    );
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+
+    expect(outcome.result.candidateId).toBe("opaque-selection-binding-999");
+    expect(outcome.result.renderDescriptor?.trackingReferences).toEqual(
+      trackingSnapshot
+    );
+    expect(outcome.result.renderDescriptor?.trackingReferences.campaignId).toBe(
+      "campaign-1"
+    );
+    expect(outcome.result.renderDescriptor?.trackingReferences.adSetId).toBe(
+      "ad-set-1"
+    );
+    expect(outcome.result.renderDescriptor?.trackingReferences.adId).toBe(
+      "ad-1"
+    );
+    expect(outcome.result.renderDescriptor?.trackingReferences.creativeId).toBe(
+      "creative-ref-1"
+    );
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("fails closed on unknown input fields and missing candidateId", () => {
     expect(
-      validateAdsExecutionResult({
-        ...createEmptyAdsExecutionResult(),
+      runAdsExecutionLayerV1({
+        ...baseInput(),
+        selectedAd: "nope",
+      }).valid
+    ).toBe(false);
+
+    expect(
+      runAdsExecutionLayerV1({
+        renderDescriptor: buildDescriptor(),
+        currentTimestamp: NOW,
+      }).valid
+    ).toBe(false);
+
+    expect(runAdsExecutionLayerV1(null).valid).toBe(false);
+  });
+
+  it("rejects client-authoritative identity override fields with no fallback", () => {
+    const outcome = runAdsExecutionLayerV1({
+      ...baseInput(),
+      campaignId: "client-override",
+      adSetId: "client-override",
+      adId: "client-override",
+      creativeId: "client-override",
+      trackingReferences: {
+        campaignId: "hijack",
+        adSetId: "hijack",
+        adId: "hijack",
+        creativeId: "hijack",
+      },
+    });
+    expect(outcome.valid).toBe(false);
+    if (outcome.valid) {
+      return;
+    }
+    expect(
+      outcome.issues.some((issue) => issue.includes("unknown field"))
+    ).toBe(true);
+    expect(outcome).not.toHaveProperty("result");
+  });
+
+  it("hard-fails on prohibited top-level URL/storage fields", () => {
+    const outcome = runAdsExecutionLayerV1({
+      ...baseInput(),
+      mediaUrl: "https://evil.example/ad.mp4",
+    });
+    expect(outcome.valid).toBe(false);
+    if (outcome.valid) {
+      return;
+    }
+    expect(
+      outcome.issues.some(
+        (issue) =>
+          issue.includes('prohibited field "mediaUrl"') ||
+          issue.includes("not allowed on execution layer input")
+      )
+    ).toBe(true);
+    expect(outcome).not.toHaveProperty("result");
+  });
+
+  it("validateAdsExecutionInternalResult accepts valid and rejects malformed", () => {
+    const accepted = runAdsExecutionLayerV1(baseInput());
+    expect(accepted.valid).toBe(true);
+    if (!accepted.valid) {
+      return;
+    }
+    expect(
+      validateAdsExecutionInternalResult(accepted.result, { nowMs: NOW_MS })
+    ).toEqual({ valid: true });
+
+    expect(validateAdsExecutionInternalResult(null).valid).toBe(false);
+    expect(
+      validateAdsExecutionInternalResult({
+        ...accepted.result,
         productionEnabled: true,
       }).valid
     ).toBe(false);
     expect(
-      validateAdsExecutionResult({
-        ...createEmptyAdsExecutionResult(),
-        selectedCandidate: { candidateId: "x" },
+      validateAdsExecutionInternalResult({
+        ...accepted.result,
+        executionEnabled: true,
       }).valid
     ).toBe(false);
     expect(
-      validateAdsExecutionResult({
-        ...createEmptyAdsExecutionResult(),
-        selectedCandidateId: "outside",
+      validateAdsExecutionInternalResult({
+        ...accepted.result,
+        deliveryEnabled: true,
+      }).valid
+    ).toBe(false);
+    expect(
+      validateAdsExecutionInternalResult({
+        ...accepted.result,
+        executionAccepted: true,
+        executionRejected: true,
       }).valid
     ).toBe(false);
   });
 
-  it("has no ranking, delivery engine, DB, or product imports", () => {
+  it("has no ranking, delivery, DB, network, or product imports", () => {
     expect(SOURCE).not.toMatch(/from ["']@\//);
     expect(SOURCE).not.toMatch(/from ["']\.\.\//);
     expect(SOURCE).not.toMatch(
@@ -700,18 +510,13 @@ describe("Ads Execution Layer Foundation V1", () => {
     expect(SOURCE).not.toMatch(/\bfetch\s*\(|\baxios\b/);
     expect(SOURCE).not.toMatch(/Math\.random|Date\.now|performance\.now/);
     expect(SOURCE).not.toMatch(/ADS_DELIVERY_ENABLED\s*=\s*true/);
-    expect(SOURCE).not.toMatch(/\brankCandidates\b|\brunAuction\b|\bpacing\b|\bbilling\b/i);
-    expect(SOURCE).toMatch(/evaluateAdsCandidateEligibility/);
-    expect(SOURCE).toMatch(/validateCreativePlacementCompatibility/);
-    expect(SOURCE).toMatch(/buildAdsDeliveryDecisionTrace/);
-    expect(SOURCE).toMatch(/buildAdsSelectableSet/);
-    expect(SOURCE).toMatch(/runAdsPilotSelector/);
-    expect(SOURCE).toMatch(/buildAdsSelectionResult/);
+    expect(SOURCE).not.toMatch(
+      /\brankCandidates\b|\brunAuction\b|\bpacing\b|\bbilling\b/i
+    );
     expect(SOURCE).toMatch(/productionEnabled: false/);
-    expect(SOURCE).toMatch(/executionCompleted: true/);
-    expect(SOURCE).toMatch(/emitAdsRenderDescriptor/);
-    expect(SOURCE).toMatch(/renderDescriptor:/);
-    expect(SOURCE).not.toMatch(/renderDescriptorPlaceholder/);
-    expect(SOURCE).toMatch(/renderMaterial/);
+    expect(SOURCE).toMatch(/deliveryEnabled: false/);
+    expect(SOURCE).toMatch(/executionEnabled: false/);
+    expect(SOURCE).toMatch(/validateAdsRenderDescriptor/);
+    expect(SOURCE).toMatch(/runAdsExecutionLayerV1/);
   });
 });

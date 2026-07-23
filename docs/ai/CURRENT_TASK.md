@@ -2,19 +2,22 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Render Descriptor Pipeline V1 Hardening
+UMTUBA Ads Platform — Execution Layer V1
 
 ## Goal
 
-Close Final Review findings for Render Descriptor Pipeline V1: remove
-caller-authoritative tracking identity overrides, enforce candidate
-eligibility, clarify placement-mismatch diagnostics, remove dead rejection
-taxonomy, and add missing fail-closed / immutability / determinism tests.
-Internal / contract-only — no production delivery or rendering.
+Implement Execution Layer V1 as an internal orchestration layer that sits
+after the Render Descriptor Pipeline:
+
+Candidate Selection → Render Descriptor Pipeline → Execution Layer → Internal Result
+
+Accept a validated render descriptor, perform execution validation, run a
+deterministic internal pipeline, emit a typed internal result with diagnostics,
+fail closed, and freeze immutable outputs. No production ad delivery.
 
 ## Allowed scope
 
-- `lib/ads/platform/renderDescriptor*`
+- `lib/ads/platform/executionLayer*`
 - `lib/ads/platform/index.ts`
 - Direct supporting contracts only if strictly required (imports only)
 - `docs/ai/CURRENT_TASK.md`
@@ -36,5 +39,5 @@ Internal / contract-only — no production delivery or rendering.
 
 ## Status
 
-`hardened — verified (pipeline+contract tests 36/36, platform tests 432/432,
-tsc, build, git diff --check clean); no commit/push.`
+`complete — final hardening verified (V1+foundation tests 35/35, platform tests
+passed, tsc, build, staged full executionLayer.ts); no commit/push.`

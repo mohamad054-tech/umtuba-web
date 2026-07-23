@@ -2,33 +2,25 @@
 
 ## Task
 
-UMTUBA Ads Platform — Render Descriptor Pipeline V1 Hardening (`alpha-0.2`)
+UMTUBA Ads Platform — Execution Layer V1 Final Hardening (`alpha-0.2`)
 
 ## Summary
 
-Closed Final Review findings for Render Descriptor Pipeline V1:
+Closed Final Review findings for Execution Layer V1 without changing expiry
+semantics:
 
-1. **Authority** — tracking identity (`campaignId` / `adSetId` / `adId` /
-   `creativeId`) is derived only from the eligible candidate via
-   `deriveAdsRenderTrackingReferences`. Optional `trackingReferences` may only
-   echo those values; mismatch hard-fails; matching cannot change output.
-2. **Eligibility** — candidates must carry boolean eligibility markers;
-   `evaluateAdsRenderCandidateEligibility` rejects inactive campaign/creative,
-   policy-blocked, and failed age-gate cases at stage `validate` with
-   `candidate_ineligible`.
-3. **Diagnostics** — placement mismatch reports distinct
-   `candidatePlacementId` and `bindingPlacementId` (removed ambiguous
-   `placementId`).
-4. **Taxonomy** — removed dead public reason `invalid_contract`; added
-   reachable `candidate_ineligible`.
-5. **Tests** — authority, eligibility, unknown placement, missing bindings,
-   input immutability, determinism coverage added/updated.
+- Exact `ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS` boundary coverage
+  (lower / before-lower / upper / after-upper)
+- Dedicated opaque `candidateId` binding authority tests (no false
+  candidate↔tracking cross-check)
+- Kill switches asserted on every representative soft-reject path
+- Explicit prohibited top-level `mediaUrl` hard-fail test
+- Restaged complete `executionLayer.ts` (not the re-export stub)
 
-`productionEnabled` / `deliveryEnabled` remain false. No rendering, delivery,
-network, DB, Supabase, storage, auction, ranking, billing, or payments.
+Kill switches remain always false: `productionEnabled`, `deliveryEnabled`,
+`executionEnabled`.
 
-**`app/discover/components/DiscoverShell.tsx` was not modified** (pre-existing
-local dirty state left untouched).
+**`app/discover/components/DiscoverShell.tsx` was not modified.**
 
 **No commit, push, merge, or remote Supabase migration apply.**
 
@@ -36,10 +28,11 @@ local dirty state left untouched).
 
 | Path | Action |
 | --- | --- |
-| `lib/ads/platform/renderDescriptorPipeline.ts` | updated — hardening |
-| `lib/ads/platform/renderDescriptorPipeline.test.ts` | updated — review-gap tests |
-| `lib/ads/platform/index.ts` | updated — export pipeline module |
-| `docs/ai/CURRENT_TASK.md` | updated — hardening handoff |
+| `lib/ads/platform/executionLayer.ts` | Execution Layer V1 + foundation re-export (full file staged) |
+| `lib/ads/platform/executionLayer.test.ts` | hardened — boundary / authority / kill-switch / prohibited tests |
+| `lib/ads/platform/executionLayerFoundation.ts` | prior inventory orchestrator (moved) |
+| `lib/ads/platform/executionLayerFoundation.test.ts` | prior foundation tests (moved) |
+| `docs/ai/CURRENT_TASK.md` | updated — this handoff |
 | `docs/ai/CURSOR_REPORT.md` | updated — this report |
 
 ## Migrations created
@@ -48,17 +41,18 @@ local dirty state left untouched).
 
 ## Security review
 
-- No caller-authoritative identity override path remains for tracking refs.
-- Eligibility markers required; arbitrary candidates are not trusted.
-- Opaque refs / prohibited URL fields / distinct reporting handles fail closed.
+- No client-authoritative identity override fields accepted on input.
+- Descriptor tracking identity is authoritative; `candidateId` is opaque.
+- Prohibited URL/storage fields fail closed on input.
+- Kill switches forced false on every accepted and soft-rejected result.
 - No network, storage, Supabase, or product-surface imports.
-- Clock injected via `currentTimestamp`.
+- Clock injected via `currentTimestamp` (no `Date.now` / entropy).
 
 ## Tests
 
-- Affected: `renderDescriptorPipeline.test.ts` + `renderDescriptor.test.ts` —
-  **36/36 passed**.
-- Platform suite: `npx vitest run lib/ads/platform` — **23 files, 432 tests,
+- Affected: `executionLayer.test.ts` + `executionLayerFoundation.test.ts` —
+  **35/35 passed** (16 V1 + 19 foundation).
+- Platform suite: `npx vitest run lib/ads/platform` — **24 files, 448 tests,
   all passed**.
 
 ## TypeScript
@@ -67,26 +61,28 @@ local dirty state left untouched).
 
 ## Build
 
-`npm run build` — **passed** (59/59 static pages).
+`npm run build` — **passed**.
 
 ## git diff --check
 
-`git diff --check` — **clean**.
+`git diff --cached --check` — **clean**.
 
 ## git status --short
 
 ```
  M app/discover/components/DiscoverShell.tsx
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/ads/platform/index.ts
-?? lib/ads/platform/renderDescriptorPipeline.test.ts
-?? lib/ads/platform/renderDescriptorPipeline.ts
+M  docs/ai/CURRENT_TASK.md
+M  docs/ai/CURSOR_REPORT.md
+M  lib/ads/platform/executionLayer.test.ts
+M  lib/ads/platform/executionLayer.ts
+A  lib/ads/platform/executionLayerFoundation.test.ts
+A  lib/ads/platform/executionLayerFoundation.ts
 ```
 
-(`DiscoverShell.tsx` is pre-existing unrelated dirty state — not part of this
-task.)
+(`DiscoverShell.tsx` remains unstaged / unrelated.)
 
 ## Open issues
 
-- None blocking for this hardened contract layer.
+- None blocking for Execution Layer V1 commit readiness after hardening.
+- Foundation orchestrator remains available for legacy consumers; new path
+  should prefer `runAdsExecutionLayerV1`.

@@ -1,213 +1,184 @@
-import {
-  buildCandidateInventory,
-  listCandidates,
-  validateCandidateInventory,
-  type AdsCandidateInventory,
-  type AdsCandidateMetadata,
-} from "./candidateInventory";
 import type {
   AdsPlatformCreativeType,
   ContractValidationResult,
 } from "./creativeContracts";
 import {
-  validateCreativePlacementCompatibility,
-  type AdsCreativePlacementCompatibilityResult,
-} from "./creativePlacementCompatibility";
+  isAdsPlacementId,
+  isCreativeTypeSupportedByPlacement,
+  type AdsPlatformPlacementId,
+} from "./placementRegistry";
 import {
-  ADS_DELIVERY_MAX_ID_LENGTH,
-  freezeDeliveryRequest,
-  validateDeliveryRequest,
-  type AdsDeliveryCandidateAd,
-  type AdsDeliveryRequest,
-} from "./deliveryContracts";
-import {
-  buildAdsDeliveryDecisionTrace,
-  validateAdsDeliveryDecisionTrace,
-  type AdsDeliveryDecisionTrace,
-} from "./deliveryDecisionTrace";
-import type { AdsDeliveryCandidateReference } from "./deliveryEligibilityContracts";
-import {
-  evaluateAdsCandidateEligibility,
-  type AdsCandidateEligibilityDecision,
-  type AdsEligibilityCandidateState,
-} from "./eligibilityRules";
-import type { AdsPlatformPlacementId } from "./placementRegistry";
-import {
-  buildAdsSelectableSet,
-  validateAdsSelectableSet,
-  validatePilotSelectionBoundary,
-  validateSelectableSetSelectionConsistency,
-  type AdsSelectableSet,
-} from "./selectableSet";
-import {
-  ADS_PILOT_SELECTOR_STRATEGY,
-  resolvePilotSelectionTraceOutcome,
-  runAdsPilotSelector,
-  validateAdsPilotSelectionConsistency,
-  validateAdsPilotSelectorResult,
-} from "./pilotSelector";
-import {
+  ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS,
+  ADS_RENDER_DESCRIPTOR_MAX_ID_LENGTH,
+  ADS_RENDER_DESCRIPTOR_PROHIBITED_FIELDS,
+  freezeAdsRenderDescriptor,
   validateAdsRenderDescriptor,
   type AdsRenderDescriptor,
 } from "./renderDescriptor";
-import {
-  emitAdsRenderDescriptor,
-  validateAdsRenderMaterial,
-  validateAdsServeBoundaryResult,
-  type AdsRenderMaterial,
-} from "./serveBoundary";
-import {
-  buildAdsSelectionResult,
-  createEmptyAdsSelectionResult,
-  validateAdsSelectionResult,
-  type AdsSelectionResult,
-} from "./selectionResult";
 
 /**
- * Ads Execution Layer Foundation V1 — in-memory pipeline orchestrator only.
+ * Ads Execution Layer V1 — validated render descriptor → internal result.
  *
- * Coordinates existing foundations in a fixed order:
- *   inventory → eligibility → creative↔placement compatibility →
- *   decision trace → selectable set (eligibility ∩ compatibility) →
- *   selection result → deterministic pilot selector →
- *   serve-boundary render descriptor emission → execution result
+ * Pipeline position:
+ *   Candidate Selection
+ *   → Render Descriptor Pipeline
+ *   → Execution Layer
+ *   → Internal Result
  *
- * This is NOT a delivery engine. It never:
- * - ranks / auctions / paces ads (pilot may pick first selectable only)
- * - queries a database or imports Supabase
- * - loads inventory from storage
- * - mutates inputs
- * - writes events or reports
- * - enables ADS_DELIVERY_ENABLED or placement flags
- * - renders creatives or serves an advertisement
+ * Responsibilities:
+ * - accept a validated render descriptor
+ * - perform execution validation
+ * - execute a deterministic internal pipeline
+ * - emit a typed internal execution result + diagnostics
+ * - fail closed on malformed / inconsistent input
+ * - freeze immutable outputs
  *
- * productionEnabled is always false. delivery remains disabled.
- * renderDescriptor is metadata emission only (null when unselected or when
- * explicit render material is absent/invalid) — never a served/rendered ad.
- * selectedCandidateId may be set internally for pilot evaluation only when it
- * belongs to selectableCandidates.
- * The only authoritative selectable input is selectableCandidates.
+ * This is an internal orchestration layer ONLY. It NEVER:
+ * - renders creatives or serves advertisements
+ * - delivers to product surfaces
+ * - ranks, auctions, paces, bills, or takes payments
+ * - queries a database, imports Supabase, or uses the network
+ * - consults wall-clock entropy (callers inject currentTimestamp)
+ * - enables feature flags or analytics ingestion
+ * - trusts client-authoritative identity overrides
+ *
+ * Kill switches are always false:
+ *   productionEnabled = false
+ *   deliveryEnabled = false
+ *   executionEnabled = false
+ *
+ * executionAccepted means the internal pipeline completed with a validated
+ * descriptor snapshot — never that production execution or delivery ran.
  */
 
-export const ADS_EXECUTION_LAYER_CONTRACT_VERSION = "v1" as const;
+export const ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION = "v1" as const;
 
-/**
- * Top-level keys allowed on the execution-layer input.
- * Unknown fields fail closed.
- */
-export const ADS_EXECUTION_LAYER_ALLOWED_FIELDS = [
-  "inventory",
-  "request",
-  "eligibilityStates",
-  "renderMaterial",
+/** Fixed pipeline stages in evaluation order. */
+export const ADS_EXECUTION_LAYER_V1_STAGES = [
+  "validate",
+  "validate_execution",
+  "execute",
+  "result",
 ] as const;
 
+export type AdsExecutionLayerV1Stage =
+  (typeof ADS_EXECUTION_LAYER_V1_STAGES)[number];
+
 /**
- * Top-level keys allowed on a successful AdsExecutionResult.
+ * Stable rejection reasons when the layer completes without accepting execution.
+ * Hard malformed input returns valid:false with issues instead.
+ */
+export const ADS_EXECUTION_LAYER_V1_REJECTION_REASONS = [
+  "invalid_descriptor",
+  "descriptor_expired",
+  "placement_incompatible",
+  "identity_incomplete",
+] as const;
+
+export type AdsExecutionLayerV1RejectionReason =
+  (typeof ADS_EXECUTION_LAYER_V1_REJECTION_REASONS)[number];
+
+/**
+ * Top-level keys allowed on Execution Layer V1 input.
  * Unknown fields fail closed.
  */
-export const ADS_EXECUTION_RESULT_ALLOWED_FIELDS = [
-  "contractVersion",
-  "evaluatedCandidates",
-  "rejectedCandidates",
-  "eligibilityResults",
-  "compatibilityResults",
-  "traces",
-  "selectableCandidates",
-  "selectionSummary",
-  "selectedCandidateId",
+export const ADS_EXECUTION_LAYER_V1_INPUT_ALLOWED_FIELDS = [
+  "candidateId",
   "renderDescriptor",
-  "productionEnabled",
-  "executionCompleted",
+  "currentTimestamp",
 ] as const;
 
-export type AdsExecutionRejectionStage = "eligibility" | "compatibility";
+/**
+ * Top-level keys allowed on AdsExecutionInternalResult.
+ * Unknown fields fail closed.
+ */
+export const ADS_EXECUTION_LAYER_V1_RESULT_ALLOWED_FIELDS = [
+  "contractVersion",
+  "executionAccepted",
+  "executionRejected",
+  "candidateId",
+  "renderDescriptor",
+  "diagnostics",
+  "pipelineStage",
+  "productionEnabled",
+  "deliveryEnabled",
+  "executionEnabled",
+] as const;
 
-/** Inventory-derived evaluated candidate reference (metadata only). */
-export type AdsExecutionEvaluatedCandidate = Readonly<{
-  candidateId: string;
-  campaignRef: string;
-  adSetRef: string;
-  adRef: string;
-  creativeRef: string;
-  placement: AdsPlatformPlacementId;
-  creativeType: AdsPlatformCreativeType;
-}>;
+/**
+ * Top-level keys allowed on execution diagnostics.
+ */
+export const ADS_EXECUTION_LAYER_V1_DIAGNOSTICS_ALLOWED_FIELDS = [
+  "candidateId",
+  "placementId",
+  "creativeReference",
+  "creativeType",
+  "executionAccepted",
+  "rejectionReason",
+] as const;
 
-/** Deterministic rejection record — never a selected ad. */
-export type AdsExecutionRejectedCandidate = Readonly<{
-  candidateId: string;
-  stage: AdsExecutionRejectionStage;
-  reason: string;
-}>;
-
-/** Per-candidate compatibility outcome bound to inventory metadata. */
-export type AdsExecutionCompatibilityResult = Readonly<{
-  candidateId: string;
-  placement: AdsPlatformPlacementId;
-  creativeType: AdsPlatformCreativeType;
-  compatible: boolean;
-  reason: string | null;
-  productionEnabled: false;
+/**
+ * Aggregate execution diagnostics — binding / gate outcomes only.
+ * Never includes ranking scores, URLs, media bytes, or PII.
+ */
+export type AdsExecutionLayerV1Diagnostics = Readonly<{
+  candidateId: string | null;
+  placementId: AdsPlatformPlacementId | null;
+  creativeReference: string | null;
+  creativeType: AdsPlatformCreativeType | null;
+  executionAccepted: boolean;
+  rejectionReason: AdsExecutionLayerV1RejectionReason | null;
 }>;
 
 /**
- * Canonical Execution Result V1.
- * No delivery. No rendering.
- * selectableCandidates is the only authoritative selectable set
- * (eligibility ∩ compatibility).
- * selectedCandidateId is an internal pilot choice only (null or a member of
- * selectableCandidates). renderDescriptor is emitted metadata only when a
- * selectable + compatible candidate is selected AND explicit render material
- * validates; otherwise null.
+ * Canonical Internal Execution Result V1.
+ * Metadata / orchestration snapshot only — never a served or rendered ad.
  */
-export type AdsExecutionResult = Readonly<{
-  contractVersion: typeof ADS_EXECUTION_LAYER_CONTRACT_VERSION;
-  evaluatedCandidates: readonly AdsExecutionEvaluatedCandidate[];
-  rejectedCandidates: readonly AdsExecutionRejectedCandidate[];
-  eligibilityResults: readonly AdsCandidateEligibilityDecision[];
-  compatibilityResults: readonly AdsExecutionCompatibilityResult[];
-  traces: readonly AdsDeliveryDecisionTrace[];
-  /** Authoritative post-gate set — eligibility ∩ compatibility only. */
-  selectableCandidates: readonly AdsDeliveryCandidateReference[];
-  selectionSummary: AdsSelectionResult;
-  /**
-   * Internal pilot selection only.
-   * Null when selectable set is empty; otherwise first selectable id.
-   * Never implies serve/render/delivery.
-   */
-  selectedCandidateId: string | null;
-  /**
-   * Serve-boundary emission only — validated render metadata or null.
-   * Never URLs, storage paths, or a rendered creative.
-   */
+export type AdsExecutionInternalResult = Readonly<{
+  contractVersion: typeof ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION;
+  executionAccepted: boolean;
+  executionRejected: boolean;
+  candidateId: string | null;
   renderDescriptor: AdsRenderDescriptor | null;
+  diagnostics: AdsExecutionLayerV1Diagnostics;
+  pipelineStage: AdsExecutionLayerV1Stage;
   productionEnabled: false;
-  executionCompleted: true;
+  deliveryEnabled: false;
+  executionEnabled: false;
 }>;
 
 /**
- * Execution input — in-memory inventory + delivery request + eligibility states
- * + optional explicit render material for serve-boundary emission.
- * eligibilityStates must align 1:1 (same candidateIds, same order) with inventory.
- * renderMaterial is metadata-only; null/absent yields a null renderDescriptor.
+ * Execution Layer V1 input — selected candidate binding + validated descriptor.
+ * Caller injects currentTimestamp for deterministic expiry checks.
+ *
+ * Identity authority:
+ * - candidateId is the upstream selection binding (Candidate Selection).
+ * - Creative / placement / tracking identity comes only from renderDescriptor.
+ * - No client-supplied identity override fields are accepted.
  */
-export type AdsExecutionLayerInput = Readonly<{
-  inventory: unknown;
-  request: unknown;
-  eligibilityStates: unknown;
-  renderMaterial?: unknown;
+export type AdsExecutionLayerV1Input = Readonly<{
+  candidateId: string;
+  renderDescriptor: AdsRenderDescriptor;
+  /** ISO-8601 timestamp used for deterministic expiry checks. */
+  currentTimestamp: string;
 }>;
 
-export type AdsExecutionLayerOutcome =
-  | Readonly<{ valid: true; result: AdsExecutionResult }>
+export type AdsExecutionLayerV1Outcome =
+  | Readonly<{ valid: true; result: AdsExecutionInternalResult }>
   | Readonly<{ valid: false; issues: readonly string[] }>;
 
-const INPUT_ALLOWED_FIELD_SET = new Set<string>(
-  ADS_EXECUTION_LAYER_ALLOWED_FIELDS
+const STAGE_SET = new Set<string>(ADS_EXECUTION_LAYER_V1_STAGES);
+const REJECTION_REASON_SET = new Set<string>(
+  ADS_EXECUTION_LAYER_V1_REJECTION_REASONS
 );
-const RESULT_ALLOWED_FIELD_SET = new Set<string>(
-  ADS_EXECUTION_RESULT_ALLOWED_FIELDS
+const INPUT_ALLOWED = new Set<string>(
+  ADS_EXECUTION_LAYER_V1_INPUT_ALLOWED_FIELDS
+);
+const RESULT_ALLOWED = new Set<string>(
+  ADS_EXECUTION_LAYER_V1_RESULT_ALLOWED_FIELDS
+);
+const DIAGNOSTICS_ALLOWED = new Set<string>(
+  ADS_EXECUTION_LAYER_V1_DIAGNOSTICS_ALLOWED_FIELDS
 );
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -218,616 +189,319 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function freezeEvaluatedCandidate(
-  candidate: AdsCandidateMetadata
-): AdsExecutionEvaluatedCandidate {
+function parseIsoTimestampMs(value: unknown): number | null {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    return null;
+  }
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) {
+    return null;
+  }
+  return parsed;
+}
+
+function rejectUnknownFields(
+  value: Record<string, unknown>,
+  allowed: ReadonlySet<string>,
+  prefix: string,
+  issues: string[]
+): void {
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key)) {
+      issues.push(`${prefix}unknown field "${key}" is not allowed.`);
+    }
+  }
+}
+
+function rejectProhibitedFields(
+  value: Record<string, unknown>,
+  prefix: string,
+  issues: string[]
+): void {
+  for (const field of ADS_RENDER_DESCRIPTOR_PROHIBITED_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(value, field)) {
+      issues.push(
+        `${prefix}prohibited field "${field}" is not allowed on execution layer input.`
+      );
+    }
+  }
+}
+
+function freezeDiagnostics(
+  diagnostics: AdsExecutionLayerV1Diagnostics
+): AdsExecutionLayerV1Diagnostics {
   return Object.freeze({
-    candidateId: candidate.candidateId,
-    campaignRef: candidate.campaignRef,
-    adSetRef: candidate.adSetRef,
-    adRef: candidate.adRef,
-    creativeRef: candidate.creativeRef,
-    placement: candidate.placement,
-    creativeType: candidate.creativeType,
+    candidateId: diagnostics.candidateId,
+    placementId: diagnostics.placementId,
+    creativeReference: diagnostics.creativeReference,
+    creativeType: diagnostics.creativeType,
+    executionAccepted: diagnostics.executionAccepted,
+    rejectionReason: diagnostics.rejectionReason,
   });
 }
 
-function freezeCompatibilityResult(
-  entry: AdsExecutionCompatibilityResult
-): AdsExecutionCompatibilityResult {
-  return Object.freeze({ ...entry });
-}
-
-function freezeRejectedCandidate(
-  entry: AdsExecutionRejectedCandidate
-): AdsExecutionRejectedCandidate {
-  return Object.freeze({ ...entry });
-}
-
-function freezeExecutionResult(result: AdsExecutionResult): AdsExecutionResult {
+function freezeInternalResult(
+  result: AdsExecutionInternalResult
+): AdsExecutionInternalResult {
   return Object.freeze({
-    contractVersion: result.contractVersion,
-    evaluatedCandidates: Object.freeze(
-      result.evaluatedCandidates.map((entry) => Object.freeze({ ...entry }))
-    ),
-    rejectedCandidates: Object.freeze(
-      result.rejectedCandidates.map((entry) => Object.freeze({ ...entry }))
-    ),
-    eligibilityResults: Object.freeze(
-      result.eligibilityResults.map((entry) => Object.freeze({ ...entry }))
-    ),
-    compatibilityResults: Object.freeze(
-      result.compatibilityResults.map((entry) => Object.freeze({ ...entry }))
-    ),
-    traces: Object.freeze([...result.traces]),
-    selectableCandidates: Object.freeze(
-      result.selectableCandidates.map((entry) => Object.freeze({ ...entry }))
-    ),
-    selectionSummary: result.selectionSummary,
-    selectedCandidateId: result.selectedCandidateId,
+    contractVersion: ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION,
+    executionAccepted: result.executionAccepted,
+    executionRejected: result.executionRejected,
+    candidateId: result.candidateId,
     renderDescriptor: result.renderDescriptor,
+    diagnostics: freezeDiagnostics(result.diagnostics),
+    pipelineStage: result.pipelineStage,
     productionEnabled: false as const,
-    executionCompleted: true as const,
+    deliveryEnabled: false as const,
+    executionEnabled: false as const,
   });
 }
 
-function annotateTracesWithPilotSelection(
-  traces: readonly AdsDeliveryDecisionTrace[],
-  selectedCandidateId: string | null,
-  selectableCandidateIds: readonly string[]
-): readonly AdsDeliveryDecisionTrace[] {
-  return Object.freeze(
-    traces.map((trace) => {
-      const candidateId = trace.candidateReference.candidateId;
-      const selectionOutcome = resolvePilotSelectionTraceOutcome({
-        candidateId,
-        selectedCandidateId,
-        selectableCandidateIds,
-      });
-      const diagnosticSummary = Object.freeze({
-        ...(trace.diagnosticSummary ?? {}),
-        selectionStrategy: ADS_PILOT_SELECTOR_STRATEGY,
-        selectionOutcome,
-      });
-      return Object.freeze({
-        ...trace,
-        requestReference: Object.freeze({ ...trace.requestReference }),
-        candidateReference: Object.freeze({ ...trace.candidateReference }),
-        ruleSteps: Object.freeze(
-          trace.ruleSteps.map((step) =>
-            Object.freeze({
-              ...step,
-              ...(step.details !== undefined
-                ? { details: Object.freeze({ ...step.details }) }
-                : {}),
-            })
-          )
-        ),
-        diagnosticSummary,
-      });
-    })
-  );
-}
-
-function collectCandidateIdConsistencyIssues(
-  inventoryCandidates: readonly AdsCandidateMetadata[],
-  requestCandidates: readonly AdsDeliveryCandidateAd[],
-  eligibilityStates: readonly AdsEligibilityCandidateState[]
-): string[] {
-  const issues: string[] = [];
-
-  if (requestCandidates.length !== inventoryCandidates.length) {
-    issues.push(
-      "request.candidates length is inconsistent with inventory.candidates length."
-    );
-  }
-  if (eligibilityStates.length !== inventoryCandidates.length) {
-    issues.push(
-      "eligibilityStates length is inconsistent with inventory.candidates length."
-    );
-  }
-
-  const inventoryIds = inventoryCandidates.map((c) => c.candidateId);
-  const requestIds = requestCandidates.map((c) => c.candidateId);
-  const eligibilityIds = eligibilityStates.map((c) => c.candidateId);
-
-  const seenInventory = new Set<string>();
-  for (const id of inventoryIds) {
-    if (seenInventory.has(id)) {
-      issues.push(`inventory contains duplicate candidateId "${id}".`);
-    }
-    seenInventory.add(id);
-  }
-
-  const seenRequest = new Set<string>();
-  for (const id of requestIds) {
-    if (seenRequest.has(id)) {
-      issues.push(`request.candidates contain duplicate candidateId "${id}".`);
-    }
-    seenRequest.add(id);
-  }
-
-  const seenEligibility = new Set<string>();
-  for (const id of eligibilityIds) {
-    if (seenEligibility.has(id)) {
-      issues.push(`eligibilityStates contain duplicate candidateId "${id}".`);
-    }
-    seenEligibility.add(id);
-  }
-
-  const maxLen = Math.max(
-    inventoryIds.length,
-    requestIds.length,
-    eligibilityIds.length
-  );
-  for (let i = 0; i < maxLen; i++) {
-    const inventoryId = inventoryIds[i];
-    const requestId = requestIds[i];
-    const eligibilityId = eligibilityIds[i];
-
-    if (
-      inventoryId !== undefined &&
-      requestId !== undefined &&
-      inventoryId !== requestId
-    ) {
-      issues.push(
-        `request.candidates[${i}].candidateId "${requestId}" is inconsistent with inventory.candidates[${i}].candidateId "${inventoryId}".`
-      );
-    }
-    if (
-      inventoryId !== undefined &&
-      eligibilityId !== undefined &&
-      inventoryId !== eligibilityId
-    ) {
-      issues.push(
-        `eligibilityStates[${i}].candidateId "${eligibilityId}" is inconsistent with inventory.candidates[${i}].candidateId "${inventoryId}".`
-      );
-    }
-  }
-
-  for (let i = 0; i < inventoryCandidates.length; i++) {
-    const meta = inventoryCandidates[i];
-    const state = eligibilityStates[i];
-    if (!state) {
-      continue;
-    }
-    if (
-      isNonEmptyString(state.placementId) &&
-      state.placementId !== meta.placement
-    ) {
-      issues.push(
-        `eligibilityStates[${i}].placementId "${state.placementId}" is inconsistent with inventory placement "${meta.placement}".`
-      );
-    }
-  }
-
-  return issues;
-}
-
-function isEligibilityStateShape(
-  value: unknown
-): value is AdsEligibilityCandidateState {
-  if (!isRecord(value)) {
-    return false;
-  }
-  const requiredStrings = [
-    "candidateId",
-    "campaignId",
-    "adSetId",
-    "adId",
-    "creativeId",
-    "placementId",
-    "campaignStatus",
-    "adSetStatus",
-    "adStatus",
-    "campaignStartsAt",
-    "adSetStartsAt",
-  ] as const;
-  for (const key of requiredStrings) {
-    if (!isNonEmptyString(value[key])) {
-      return false;
-    }
-  }
-  if (
-    value.campaignEndsAt !== null &&
-    !isNonEmptyString(value.campaignEndsAt)
-  ) {
-    return false;
-  }
-  if (value.adSetEndsAt !== null && !isNonEmptyString(value.adSetEndsAt)) {
-    return false;
-  }
-  if (typeof value.budgetExhausted !== "boolean") return false;
-  if (typeof value.creativePresent !== "boolean") return false;
-  if (typeof value.creativeApproved !== "boolean") return false;
-  if (typeof value.policyBlocked !== "boolean") return false;
-  if (typeof value.audienceMatched !== "boolean") return false;
-  if (!Array.isArray(value.targetedCountryCodes)) return false;
-  if (!Array.isArray(value.targetedLanguageCodes)) return false;
-  return true;
-}
-
-function validateEligibilityStatesArray(
-  value: unknown
-):
-  | Readonly<{ valid: true; states: readonly AdsEligibilityCandidateState[] }>
-  | Readonly<{ valid: false; issues: readonly string[] }> {
-  if (!Array.isArray(value)) {
-    return {
-      valid: false,
-      issues: Object.freeze(["eligibilityStates must be an array."]),
-    };
-  }
-
-  const issues: string[] = [];
-  const states: AdsEligibilityCandidateState[] = [];
-
-  value.forEach((entry, index) => {
-    if (!isEligibilityStateShape(entry)) {
-      issues.push(
-        `eligibilityStates[${index}] is malformed or missing required fields.`
-      );
-      return;
-    }
-    states.push(entry);
-  });
-
-  return issues.length === 0
-    ? { valid: true, states: Object.freeze([...states]) }
-    : { valid: false, issues: Object.freeze([...issues]) };
-}
-
-function toDeliveryCandidate(
-  meta: AdsCandidateMetadata,
-  state: AdsEligibilityCandidateState
-): AdsDeliveryCandidateAd {
-  return Object.freeze({
-    candidateId: meta.candidateId,
-    campaignId: state.campaignId,
-    adSetId: state.adSetId,
-    adId: state.adId,
-    creativeId: state.creativeId,
+function rejectedResult(
+  pipelineStage: AdsExecutionLayerV1Stage,
+  rejectionReason: AdsExecutionLayerV1RejectionReason,
+  diagnostics: Partial<AdsExecutionLayerV1Diagnostics> = {}
+): AdsExecutionInternalResult {
+  return freezeInternalResult({
+    contractVersion: ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION,
+    executionAccepted: false,
+    executionRejected: true,
+    candidateId: diagnostics.candidateId ?? null,
+    renderDescriptor: null,
+    diagnostics: freezeDiagnostics({
+      candidateId: diagnostics.candidateId ?? null,
+      placementId: diagnostics.placementId ?? null,
+      creativeReference: diagnostics.creativeReference ?? null,
+      creativeType: diagnostics.creativeType ?? null,
+      executionAccepted: false,
+      rejectionReason,
+    }),
+    pipelineStage,
+    productionEnabled: false,
+    deliveryEnabled: false,
+    executionEnabled: false,
   });
 }
 
-function classifyRejection(
-  eligibility: AdsCandidateEligibilityDecision,
-  compatibility: AdsCreativePlacementCompatibilityResult
-): AdsExecutionRejectedCandidate | null {
-  if (!eligibility.eligible) {
-    return freezeRejectedCandidate({
-      candidateId: eligibility.candidateId,
-      stage: "eligibility",
-      reason: String(eligibility.exclusionReason ?? "unknown"),
-    });
-  }
-  if (!compatibility.compatible) {
-    return freezeRejectedCandidate({
-      candidateId: eligibility.candidateId,
-      stage: "compatibility",
-      reason: compatibility.reason ?? "incompatible",
-    });
-  }
-  return null;
+function acceptedResult(
+  candidateId: string,
+  descriptor: AdsRenderDescriptor
+): AdsExecutionInternalResult {
+  const frozenDescriptor = freezeAdsRenderDescriptor(descriptor);
+  return freezeInternalResult({
+    contractVersion: ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION,
+    executionAccepted: true,
+    executionRejected: false,
+    candidateId,
+    renderDescriptor: frozenDescriptor,
+    diagnostics: freezeDiagnostics({
+      candidateId,
+      placementId: frozenDescriptor.placementId,
+      creativeReference: frozenDescriptor.creativeReference,
+      creativeType: frozenDescriptor.creativeType,
+      executionAccepted: true,
+      rejectionReason: null,
+    }),
+    pipelineStage: "result",
+    productionEnabled: false,
+    deliveryEnabled: false,
+    executionEnabled: false,
+  });
 }
 
 /**
- * Pure shape validator for Execution Result V1 outputs.
- * Fail-closed — does not execute the pipeline or deliver ads.
- * Enforces selectable-set / selection-summary / pilot-boundary consistency.
- * Optional nowMs keeps render-descriptor expiry checks deterministic.
+ * Pure shape validator for Execution Layer V1 internal results.
+ * Fail-closed — does not execute, render, or deliver ads.
  */
-export function validateAdsExecutionResult(
+export function validateAdsExecutionInternalResult(
   input: unknown,
   options: { nowMs?: number } = {}
 ): ContractValidationResult {
   if (!isRecord(input)) {
     return {
       valid: false,
-      issues: Object.freeze(["Execution result must be an object."]),
+      issues: Object.freeze([
+        "Execution internal result must be an object.",
+      ]),
     };
   }
 
   const issues: string[] = [];
+  rejectUnknownFields(input, RESULT_ALLOWED, "", issues);
 
-  for (const key of Object.keys(input)) {
-    if (!RESULT_ALLOWED_FIELD_SET.has(key)) {
-      issues.push(`Execution result contains unknown field "${key}".`);
-    }
-  }
-
-  if (input.contractVersion !== ADS_EXECUTION_LAYER_CONTRACT_VERSION) {
+  if (input.contractVersion !== ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION) {
     issues.push(
-      `contractVersion must be "${ADS_EXECUTION_LAYER_CONTRACT_VERSION}".`
+      `contractVersion must be "${ADS_EXECUTION_LAYER_V1_CONTRACT_VERSION}".`
     );
   }
+
+  if (typeof input.executionAccepted !== "boolean") {
+    issues.push("executionAccepted must be a boolean.");
+  }
+  if (typeof input.executionRejected !== "boolean") {
+    issues.push("executionRejected must be a boolean.");
+  }
+  if (
+    typeof input.executionAccepted === "boolean" &&
+    typeof input.executionRejected === "boolean" &&
+    input.executionAccepted === input.executionRejected
+  ) {
+    issues.push("executionAccepted and executionRejected must be opposites.");
+  }
+
   if (input.productionEnabled !== false) {
     issues.push("productionEnabled must be false.");
   }
-  if (input.executionCompleted !== true) {
-    issues.push("executionCompleted must be true.");
+  if (input.deliveryEnabled !== false) {
+    issues.push("deliveryEnabled must be false.");
   }
-
-  if (input.selectedCandidateId === null) {
-    if (input.renderDescriptor !== null) {
-      issues.push(
-        "renderDescriptor must be null when selectedCandidateId is null."
-      );
-    }
-  } else if (!isNonEmptyString(input.selectedCandidateId)) {
-    issues.push("selectedCandidateId must be a non-empty string or null.");
-  } else if (input.selectedCandidateId.length > ADS_DELIVERY_MAX_ID_LENGTH) {
-    issues.push(
-      `selectedCandidateId exceeds max length of ${ADS_DELIVERY_MAX_ID_LENGTH}.`
-    );
-  }
-
-  if (!Array.isArray(input.evaluatedCandidates)) {
-    issues.push("evaluatedCandidates must be an array.");
-  }
-  if (!Array.isArray(input.rejectedCandidates)) {
-    issues.push("rejectedCandidates must be an array.");
-  }
-  if (!Array.isArray(input.eligibilityResults)) {
-    issues.push("eligibilityResults must be an array.");
-  }
-  if (!Array.isArray(input.compatibilityResults)) {
-    issues.push("compatibilityResults must be an array.");
-  }
-  if (!Array.isArray(input.traces)) {
-    issues.push("traces must be an array.");
-  }
-  if (!Array.isArray(input.selectableCandidates)) {
-    issues.push("selectableCandidates must be an array.");
+  if (input.executionEnabled !== false) {
+    issues.push("executionEnabled must be false.");
   }
 
   if (
-    Array.isArray(input.evaluatedCandidates) &&
-    Array.isArray(input.eligibilityResults) &&
-    input.evaluatedCandidates.length !== input.eligibilityResults.length
+    typeof input.pipelineStage !== "string" ||
+    !STAGE_SET.has(input.pipelineStage)
   ) {
     issues.push(
-      "eligibilityResults length is inconsistent with evaluatedCandidates length."
-    );
-  }
-  if (
-    Array.isArray(input.evaluatedCandidates) &&
-    Array.isArray(input.compatibilityResults) &&
-    input.evaluatedCandidates.length !== input.compatibilityResults.length
-  ) {
-    issues.push(
-      "compatibilityResults length is inconsistent with evaluatedCandidates length."
-    );
-  }
-  if (
-    Array.isArray(input.evaluatedCandidates) &&
-    Array.isArray(input.traces) &&
-    input.evaluatedCandidates.length !== input.traces.length
-  ) {
-    issues.push(
-      "traces length is inconsistent with evaluatedCandidates length."
+      `pipelineStage must be one of: ${ADS_EXECUTION_LAYER_V1_STAGES.join(", ")}.`
     );
   }
 
-  if (
-    Array.isArray(input.evaluatedCandidates) &&
-    Array.isArray(input.selectableCandidates) &&
-    input.selectableCandidates.length > input.evaluatedCandidates.length
-  ) {
-    issues.push(
-      "selectableCandidates length cannot exceed evaluatedCandidates length."
+  if (input.candidateId !== null && !isNonEmptyString(input.candidateId)) {
+    issues.push("candidateId must be a non-empty string or null.");
+  }
+
+  if (!isRecord(input.diagnostics)) {
+    issues.push("diagnostics is required and must be an object.");
+  } else {
+    rejectUnknownFields(
+      input.diagnostics,
+      DIAGNOSTICS_ALLOWED,
+      "diagnostics.",
+      issues
     );
-  }
-
-  const selectableSeen = new Set<string>();
-  if (Array.isArray(input.selectableCandidates)) {
-    input.selectableCandidates.forEach((entry, index) => {
-      if (!isRecord(entry) || !isNonEmptyString(entry.candidateId)) {
-        issues.push(
-          `selectableCandidates[${index}].candidateId is required and must be a non-empty string.`
-        );
-        return;
-      }
-      if (selectableSeen.has(entry.candidateId)) {
-        issues.push(
-          `selectableCandidates contain duplicate candidateId "${entry.candidateId}".`
-        );
-      } else {
-        selectableSeen.add(entry.candidateId);
-      }
-    });
-  }
-
-  const evaluatedIdSet = new Set<string>();
-  if (Array.isArray(input.evaluatedCandidates)) {
-    input.evaluatedCandidates.forEach((entry) => {
-      if (isRecord(entry) && isNonEmptyString(entry.candidateId)) {
-        evaluatedIdSet.add(entry.candidateId);
-      }
-    });
-  }
-
-  for (const id of selectableSeen) {
-    if (!evaluatedIdSet.has(id)) {
+    if (
+      input.diagnostics.candidateId !== null &&
+      !isNonEmptyString(input.diagnostics.candidateId)
+    ) {
       issues.push(
-        `selectableCandidates include candidateId "${id}" outside evaluatedCandidates.`
-      );
-    }
-  }
-
-  const selectableIdList: string[] = [];
-  if (Array.isArray(input.selectableCandidates)) {
-    for (const entry of input.selectableCandidates) {
-      if (isRecord(entry) && isNonEmptyString(entry.candidateId)) {
-        selectableIdList.push(entry.candidateId);
-      }
-    }
-  }
-
-  if (input.selectedCandidateId === null) {
-    if (selectableIdList.length > 0) {
-      issues.push(
-        "selectedCandidateId is null despite a non-empty selectableCandidates list."
-      );
-    }
-  } else if (isNonEmptyString(input.selectedCandidateId)) {
-    if (!selectableSeen.has(input.selectedCandidateId)) {
-      issues.push(
-        `selectedCandidateId "${input.selectedCandidateId}" is outside selectableCandidates.`
+        "diagnostics.candidateId must be a non-empty string or null."
       );
     }
     if (
-      selectableIdList.length > 0 &&
-      selectableIdList[0] !== input.selectedCandidateId
+      input.diagnostics.placementId !== null &&
+      (typeof input.diagnostics.placementId !== "string" ||
+        !isAdsPlacementId(input.diagnostics.placementId))
     ) {
       issues.push(
-        `selectedCandidateId "${input.selectedCandidateId}" is inconsistent with first selectable candidate.`
+        "diagnostics.placementId must be a registered placement or null."
       );
     }
-    if (input.renderDescriptor !== null && input.renderDescriptor !== undefined) {
+    if (
+      input.diagnostics.creativeReference !== null &&
+      !isNonEmptyString(input.diagnostics.creativeReference)
+    ) {
+      issues.push(
+        "diagnostics.creativeReference must be a non-empty string or null."
+      );
+    }
+    if (
+      input.diagnostics.creativeType !== null &&
+      typeof input.diagnostics.creativeType !== "string"
+    ) {
+      issues.push(
+        "diagnostics.creativeType must be a string or null."
+      );
+    }
+    if (typeof input.diagnostics.executionAccepted !== "boolean") {
+      issues.push("diagnostics.executionAccepted must be a boolean.");
+    }
+    if (
+      input.diagnostics.rejectionReason !== null &&
+      (typeof input.diagnostics.rejectionReason !== "string" ||
+        !REJECTION_REASON_SET.has(input.diagnostics.rejectionReason))
+    ) {
+      issues.push(
+        "diagnostics.rejectionReason must be a known rejection reason or null."
+      );
+    }
+  }
+
+  if (input.executionAccepted === true) {
+    if (input.pipelineStage !== "result") {
+      issues.push(
+        'pipelineStage must be "result" when executionAccepted is true.'
+      );
+    }
+    if (!isNonEmptyString(input.candidateId)) {
+      issues.push("candidateId is required when executionAccepted is true.");
+    }
+    if (input.renderDescriptor === null || input.renderDescriptor === undefined) {
+      issues.push(
+        "renderDescriptor is required when executionAccepted is true."
+      );
+    } else {
       const descriptorValidation = validateAdsRenderDescriptor(
         input.renderDescriptor,
-        options.nowMs !== undefined ? { nowMs: options.nowMs } : {}
+        { nowMs: options.nowMs }
       );
       if (!descriptorValidation.valid) {
-        for (const issue of descriptorValidation.issues) {
-          issues.push(`renderDescriptor: ${issue}`);
-        }
-      }
-    }
-  }
-
-  // Compatibility-rejected candidates must never appear in the selectable set.
-  if (
-    Array.isArray(input.compatibilityResults) &&
-    Array.isArray(input.selectableCandidates)
-  ) {
-    const selectableIds = new Set(
-      input.selectableCandidates
-        .filter(
-          (entry): entry is { candidateId: string } =>
-            isRecord(entry) && isNonEmptyString(entry.candidateId)
-        )
-        .map((entry) => entry.candidateId)
-    );
-    input.compatibilityResults.forEach((entry, index) => {
-      if (!isRecord(entry) || typeof entry.compatible !== "boolean") {
-        return;
-      }
-      if (
-        entry.compatible === false &&
-        isNonEmptyString(entry.candidateId) &&
-        selectableIds.has(entry.candidateId)
-      ) {
         issues.push(
-          `compatibility-rejected candidate "${entry.candidateId}" must not appear in selectableCandidates (compatibilityResults[${index}]).`
+          ...descriptorValidation.issues.map(
+            (issue) => `renderDescriptor: ${issue}`
+          )
         );
       }
-    });
-  }
-
-  // Eligibility-rejected candidates must never appear in the selectable set.
-  if (
-    Array.isArray(input.eligibilityResults) &&
-    Array.isArray(input.selectableCandidates)
-  ) {
-    const selectableIds = new Set(
-      input.selectableCandidates
-        .filter(
-          (entry): entry is { candidateId: string } =>
-            isRecord(entry) && isNonEmptyString(entry.candidateId)
-        )
-        .map((entry) => entry.candidateId)
-    );
-    input.eligibilityResults.forEach((entry, index) => {
-      if (!isRecord(entry) || typeof entry.eligible !== "boolean") {
-        return;
-      }
-      if (
-        entry.eligible === false &&
-        isNonEmptyString(entry.candidateId) &&
-        selectableIds.has(entry.candidateId)
-      ) {
+    }
+    if (isRecord(input.diagnostics)) {
+      if (input.diagnostics.executionAccepted !== true) {
         issues.push(
-          `ineligible candidate "${entry.candidateId}" must not appear in selectableCandidates (eligibilityResults[${index}]).`
+          "diagnostics.executionAccepted must be true when executionAccepted is true."
         );
       }
-    });
-  }
-
-  if (Array.isArray(input.traces)) {
-    input.traces.forEach((trace, index) => {
-      const traceResult = validateAdsDeliveryDecisionTrace(trace);
-      if (!traceResult.valid) {
-        for (const issue of traceResult.issues) {
-          issues.push(`traces[${index}]: ${issue}`);
-        }
+      if (input.diagnostics.rejectionReason !== null) {
+        issues.push(
+          "diagnostics.rejectionReason must be null when executionAccepted is true."
+        );
       }
-    });
-  }
-
-  const selectionResult = validateAdsSelectionResult(input.selectionSummary);
-  if (!selectionResult.valid) {
-    for (const issue of selectionResult.issues) {
-      issues.push(`selectionSummary: ${issue}`);
+      if (
+        isNonEmptyString(input.candidateId) &&
+        input.diagnostics.candidateId !== input.candidateId
+      ) {
+        issues.push(
+          "diagnostics.candidateId must match candidateId when executionAccepted is true."
+        );
+      }
     }
   }
 
-  if (
-    selectionResult.valid &&
-    isRecord(input.selectionSummary) &&
-    Array.isArray(input.selectionSummary.eligibleCandidates) &&
-    Array.isArray(input.selectableCandidates)
-  ) {
-    const eligibleIds = input.selectionSummary.eligibleCandidates.map(
-      (entry) =>
-        isRecord(entry) && isNonEmptyString(entry.candidateId)
-          ? entry.candidateId
-          : ""
-    );
-    const selectableIds = input.selectableCandidates.map((entry) =>
-      isRecord(entry) && isNonEmptyString(entry.candidateId)
-        ? entry.candidateId
-        : ""
-    );
-    if (
-      eligibleIds.length !== selectableIds.length ||
-      eligibleIds.some((id, index) => id !== selectableIds[index])
-    ) {
+  if (input.executionRejected === true) {
+    if (input.renderDescriptor !== null) {
       issues.push(
-        "selectionSummary.eligibleCandidates must match selectableCandidates (eligibility ∩ compatibility)."
+        "renderDescriptor must be null when executionRejected is true."
       );
     }
-
-    if (
-      isNonEmptyString(input.selectedCandidateId) &&
-      !eligibleIds.includes(input.selectedCandidateId)
-    ) {
+    if (input.pipelineStage === "result") {
       issues.push(
-        `selectedCandidateId "${input.selectedCandidateId}" is missing from selectionSummary.eligibleCandidates.`
+        'pipelineStage must not be "result" when executionRejected is true.'
       );
     }
-  }
-
-  if (
-    isNonEmptyString(input.selectedCandidateId) &&
-    Array.isArray(input.rejectedCandidates)
-  ) {
-    const rejectedMatch = input.rejectedCandidates.some(
-      (entry) =>
-        isRecord(entry) &&
-        isNonEmptyString(entry.candidateId) &&
-        entry.candidateId === input.selectedCandidateId
-    );
-    if (rejectedMatch) {
-      issues.push(
-        `selectedCandidateId "${input.selectedCandidateId}" must not appear in rejectedCandidates.`
-      );
+    if (isRecord(input.diagnostics)) {
+      if (input.diagnostics.executionAccepted !== false) {
+        issues.push(
+          "diagnostics.executionAccepted must be false when executionRejected is true."
+        );
+      }
+      if (
+        typeof input.diagnostics.rejectionReason !== "string" ||
+        !REJECTION_REASON_SET.has(input.diagnostics.rejectionReason)
+      ) {
+        issues.push(
+          "diagnostics.rejectionReason is required when executionRejected is true."
+        );
+      }
     }
-  }
-
-  if ("selectedCandidate" in input) {
-    issues.push("Execution result must not include selectedCandidate.");
   }
 
   return issues.length === 0
@@ -836,480 +510,220 @@ export function validateAdsExecutionResult(
 }
 
 /**
- * Empty successful execution result — no candidates evaluated.
- * Does not query databases or enable delivery.
+ * Runs Execution Layer V1 on a selected candidate + validated render descriptor.
+ * Stages: Validate → Validate Execution → Execute → Result.
+ * Deterministic: identical inputs → identical outputs.
+ * Never mutates inputs. Never renders or delivers.
  */
-export function createEmptyAdsExecutionResult(): AdsExecutionResult {
-  return freezeExecutionResult({
-    contractVersion: ADS_EXECUTION_LAYER_CONTRACT_VERSION,
-    evaluatedCandidates: Object.freeze([]),
-    rejectedCandidates: Object.freeze([]),
-    eligibilityResults: Object.freeze([]),
-    compatibilityResults: Object.freeze([]),
-    traces: Object.freeze([]),
-    selectableCandidates: Object.freeze([]),
-    selectionSummary: createEmptyAdsSelectionResult(0),
-    selectedCandidateId: null,
-    renderDescriptor: null,
-    productionEnabled: false,
-    executionCompleted: true,
-  });
-}
-
-/**
- * In-memory Execution Layer orchestrator V1.
- * Fail-closed on malformed inventory/request/states or inconsistent references.
- * Never selects an advertisement or enables production delivery.
- */
-export function runAdsExecutionLayer(
+export function runAdsExecutionLayerV1(
   input: unknown
-): AdsExecutionLayerOutcome {
+): AdsExecutionLayerV1Outcome {
   if (!isRecord(input)) {
     return {
       valid: false,
-      issues: Object.freeze(["Execution input must be an object."]),
+      issues: Object.freeze(["Execution layer input must be an object."]),
     };
   }
 
-  const issues: string[] = [];
-  for (const key of Object.keys(input)) {
-    if (!INPUT_ALLOWED_FIELD_SET.has(key)) {
-      issues.push(`Execution input contains unknown field "${key}".`);
-    }
-  }
-  if (issues.length > 0) {
-    return { valid: false, issues: Object.freeze([...issues]) };
-  }
+  const parseIssues: string[] = [];
+  rejectProhibitedFields(input, "", parseIssues);
+  rejectUnknownFields(input, INPUT_ALLOWED, "", parseIssues);
 
-  const inventoryValidation = validateCandidateInventory(input.inventory);
-  if (!inventoryValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...inventoryValidation.issues.map(
-          (issue) => `Malformed inventory: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  const inventoryBuild = buildCandidateInventory(input.inventory);
-  if (!inventoryBuild.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...inventoryBuild.issues.map(
-          (issue) => `Malformed inventory: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const inventory: AdsCandidateInventory = inventoryBuild.inventory;
-
-  const inventoryCandidates = listCandidates(inventory);
-
-  const requestValidation = validateDeliveryRequest(input.request);
-  if (!requestValidation.valid) {
-    // Delivery request contracts forbid empty candidates, but an empty
-    // inventory execution is a valid no-op for this orchestrator. Accept the
-    // request only when the sole issue is empty candidates and inventory is empty.
-    const remainingIssues = requestValidation.issues.filter(
-      (issue) => issue !== "candidates must not be empty."
+  if (!isNonEmptyString(input.candidateId)) {
+    parseIssues.push("candidateId is required and must be a non-empty string.");
+  } else if (input.candidateId.length > ADS_RENDER_DESCRIPTOR_MAX_ID_LENGTH) {
+    parseIssues.push(
+      `candidateId exceeds max length of ${ADS_RENDER_DESCRIPTOR_MAX_ID_LENGTH}.`
     );
-    const allowEmptyRequest =
-      inventoryCandidates.length === 0 &&
-      remainingIssues.length === 0 &&
-      isRecord(input.request) &&
-      Array.isArray(input.request.candidates) &&
-      input.request.candidates.length === 0;
-
-    if (!allowEmptyRequest) {
-      return {
-        valid: false,
-        issues: Object.freeze([
-          ...(remainingIssues.length > 0
-            ? remainingIssues
-            : requestValidation.issues
-          ).map((issue) => `Malformed request: ${issue}`),
-        ]),
-      };
-    }
-  }
-  const request = freezeDeliveryRequest(input.request as AdsDeliveryRequest);
-
-  let renderMaterial: AdsRenderMaterial | null = null;
-  if ("renderMaterial" in input) {
-    const materialValidation = validateAdsRenderMaterial(input.renderMaterial);
-    if (!materialValidation.valid) {
-      return {
-        valid: false,
-        issues: Object.freeze([
-          ...materialValidation.issues.map(
-            (issue) => `Malformed render material: ${issue}`
-          ),
-        ]),
-      };
-    }
-    renderMaterial =
-      input.renderMaterial === null
-        ? null
-        : (input.renderMaterial as AdsRenderMaterial);
   }
 
-  const eligibilityValidation = validateEligibilityStatesArray(
-    input.eligibilityStates
-  );
-  if (!eligibilityValidation.valid) {
+  const nowMs = parseIsoTimestampMs(input.currentTimestamp);
+  if (nowMs === null) {
+    parseIssues.push("currentTimestamp must be a valid ISO-8601 timestamp.");
+  }
+
+  if (parseIssues.length > 0 || nowMs === null || !isNonEmptyString(input.candidateId)) {
     return {
       valid: false,
-      issues: Object.freeze([...eligibilityValidation.issues]),
-    };
-  }
-  const eligibilityStates = eligibilityValidation.states;
-
-  const consistencyIssues = collectCandidateIdConsistencyIssues(
-    inventoryCandidates,
-    request.candidates,
-    eligibilityStates
-  );
-  if (consistencyIssues.length > 0) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...consistencyIssues.map(
-          (issue) => `Inconsistent candidate references: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  if (inventoryCandidates.length === 0) {
-    const empty = createEmptyAdsExecutionResult();
-    const emptyValidation = validateAdsExecutionResult(empty);
-    if (!emptyValidation.valid) {
-      return {
-        valid: false,
-        issues: Object.freeze([...emptyValidation.issues]),
-      };
-    }
-    return { valid: true, result: empty };
-  }
-
-  const evaluatedCandidates: AdsExecutionEvaluatedCandidate[] = [];
-  const rejectedCandidates: AdsExecutionRejectedCandidate[] = [];
-  const eligibilityResults: AdsCandidateEligibilityDecision[] = [];
-  const compatibilityResults: AdsExecutionCompatibilityResult[] = [];
-  const traces: AdsDeliveryDecisionTrace[] = [];
-  const deliveryCandidates: AdsDeliveryCandidateAd[] = [];
-
-  for (let i = 0; i < inventoryCandidates.length; i++) {
-    const meta = inventoryCandidates[i];
-    const state = eligibilityStates[i];
-    const requestCandidate = request.candidates[i];
-
-    if (!state || !requestCandidate) {
-      return {
-        valid: false,
-        issues: Object.freeze([
-          `Inconsistent candidate references: missing aligned state for candidates[${i}].`,
-        ]),
-      };
-    }
-
-    evaluatedCandidates.push(freezeEvaluatedCandidate(meta));
-    deliveryCandidates.push(toDeliveryCandidate(meta, state));
-
-    // 1) Eligibility Rules
-    const eligibility = evaluateAdsCandidateEligibility(request, state);
-    eligibilityResults.push(Object.freeze({ ...eligibility }));
-
-    // 2) Creative ↔ Placement Compatibility
-    const compatibility = validateCreativePlacementCompatibility({
-      placement: meta.placement,
-      creativeType: meta.creativeType,
-    });
-    compatibilityResults.push(
-      freezeCompatibilityResult({
-        candidateId: meta.candidateId,
-        placement: meta.placement,
-        creativeType: meta.creativeType,
-        compatible: compatibility.compatible,
-        reason: compatibility.reason,
-        productionEnabled: false,
-      })
-    );
-
-    // 3) Decision Trace (eligibility + optional compatibility metadata)
-    const traceOutcome = buildAdsDeliveryDecisionTrace(
-      request,
-      state,
-      eligibility,
-      { compatible: compatibility.compatible }
-    );
-    if (!traceOutcome.valid) {
-      return {
-        valid: false,
-        issues: Object.freeze([
-          ...traceOutcome.issues.map(
-            (issue) => `Invalid trace for "${meta.candidateId}": ${issue}`
-          ),
-        ]),
-      };
-    }
-    const traceValidation = validateAdsDeliveryDecisionTrace(traceOutcome.trace);
-    if (!traceValidation.valid) {
-      return {
-        valid: false,
-        issues: Object.freeze([
-          ...traceValidation.issues.map(
-            (issue) => `Invalid trace for "${meta.candidateId}": ${issue}`
-          ),
-        ]),
-      };
-    }
-    traces.push(traceOutcome.trace);
-
-    const rejection = classifyRejection(eligibility, compatibility);
-    if (rejection) {
-      rejectedCandidates.push(rejection);
-    }
-  }
-
-  // 4) Authoritative selectable set = eligibility ∩ compatibility
-  const selectableOutcome = buildAdsSelectableSet({
-    eligibilityResults,
-    compatibilityResults,
-  });
-  if (!selectableOutcome.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...selectableOutcome.issues.map(
-          (issue) => `Invalid selectable set: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const selectableValidation = validateAdsSelectableSet(
-    selectableOutcome.selectableSet
-  );
-  if (!selectableValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...selectableValidation.issues.map(
-          (issue) => `Invalid selectable set: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const selectableSet: AdsSelectableSet = selectableOutcome.selectableSet;
-
-  // 5) Selectable-set boundary remains unselected (selection lives on execution result)
-  const boundaryValidation = validatePilotSelectionBoundary(
-    selectableSet,
-    null
-  );
-  if (!boundaryValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...boundaryValidation.issues.map(
-          (issue) => `Malformed pilot selection boundary: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  // 6) Selection Result — must match selectable set; never serves an ad
-  const selectionRequest: AdsDeliveryRequest = freezeDeliveryRequest({
-    ...request,
-    candidates: Object.freeze(deliveryCandidates),
-  });
-  const selectionOutcome = buildAdsSelectionResult({
-    request: selectionRequest,
-    evaluatedCandidates: deliveryCandidates,
-    eligibilityResults,
-    compatibilityResults,
-  });
-  if (!selectionOutcome.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...selectionOutcome.issues.map(
-          (issue) => `Invalid selection result: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const selectionValidation = validateAdsSelectionResult(
-    selectionOutcome.result
-  );
-  if (!selectionValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...selectionValidation.issues.map(
-          (issue) => `Invalid selection result: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  const selectionConsistency = validateSelectableSetSelectionConsistency(
-    selectableSet,
-    selectionOutcome.result.eligibleCandidates.map((c) => c.candidateId)
-  );
-  if (!selectionConsistency.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...selectionConsistency.issues.map(
-          (issue) => `Inconsistent execution result: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  // 7) Deterministic pilot selector — selectable set only
-  const pilotOutcome = runAdsPilotSelector({ selectableSet });
-  if (!pilotOutcome.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...pilotOutcome.issues.map(
-          (issue) => `Invalid pilot selection: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const pilotValidation = validateAdsPilotSelectorResult(pilotOutcome.result);
-  if (!pilotValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...pilotValidation.issues.map(
-          (issue) => `Invalid pilot selection: ${issue}`
-        ),
-      ]),
-    };
-  }
-
-  const pilotConsistency = validateAdsPilotSelectionConsistency(
-    pilotOutcome.result,
-    selectableSet,
-    {
-      eligibleCandidateIds: selectionOutcome.result.eligibleCandidates.map(
-        (c) => c.candidateId
+      issues: Object.freeze(
+        parseIssues.length > 0
+          ? [...parseIssues]
+          : ["Execution layer input is malformed."]
       ),
-      rejectedCandidateIds: rejectedCandidates.map((c) => c.candidateId),
-    }
-  );
-  if (!pilotConsistency.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...pilotConsistency.issues.map(
-          (issue) => `Inconsistent pilot selection: ${issue}`
-        ),
-      ]),
     };
   }
 
-  const selectableCandidateIds = selectableSet.selectableCandidates.map(
-    (c) => c.candidateId
+  const candidateId = input.candidateId;
+
+  // --- Validate (descriptor contract) ---
+  const descriptorValidation = validateAdsRenderDescriptor(
+    input.renderDescriptor,
+    { nowMs }
   );
-  const annotatedTraces = annotateTracesWithPilotSelection(
-    traces,
-    pilotOutcome.result.selectedCandidateId,
-    selectableCandidateIds
-  );
-  for (let i = 0; i < annotatedTraces.length; i++) {
-    const traceValidation = validateAdsDeliveryDecisionTrace(annotatedTraces[i]);
-    if (!traceValidation.valid) {
+  if (!descriptorValidation.valid) {
+    const expired = descriptorValidation.issues.some((issue) =>
+      issue.includes("expired")
+    );
+    const placementIncompatible = descriptorValidation.issues.some((issue) =>
+      /not supported by placement/i.test(issue)
+    );
+    const identityIncomplete = descriptorValidation.issues.some((issue) =>
+      /trackingReferences\./i.test(issue)
+    );
+
+    let rejectionReason: AdsExecutionLayerV1RejectionReason = "invalid_descriptor";
+    let pipelineStage: AdsExecutionLayerV1Stage = "validate";
+    if (expired) {
+      rejectionReason = "descriptor_expired";
+      pipelineStage = "validate_execution";
+    } else if (placementIncompatible) {
+      rejectionReason = "placement_incompatible";
+      pipelineStage = "validate_execution";
+    } else if (identityIncomplete) {
+      rejectionReason = "identity_incomplete";
+      pipelineStage = "validate_execution";
+    }
+
+    let placementId: AdsPlatformPlacementId | null = null;
+    let creativeReference: string | null = null;
+    let creativeType: AdsPlatformCreativeType | null = null;
+    if (isRecord(input.renderDescriptor)) {
+      if (
+        typeof input.renderDescriptor.placementId === "string" &&
+        isAdsPlacementId(input.renderDescriptor.placementId)
+      ) {
+        placementId = input.renderDescriptor.placementId;
+      }
+      if (isNonEmptyString(input.renderDescriptor.creativeReference)) {
+        creativeReference = input.renderDescriptor.creativeReference;
+      }
+      if (typeof input.renderDescriptor.creativeType === "string") {
+        creativeType =
+          input.renderDescriptor.creativeType as AdsPlatformCreativeType;
+      }
+    }
+    const result = rejectedResult(pipelineStage, rejectionReason, {
+      candidateId,
+      placementId,
+      creativeReference,
+      creativeType,
+    });
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
       return {
         valid: false,
         issues: Object.freeze([
-          ...traceValidation.issues.map(
-            (issue) =>
-              `Invalid selection trace for candidates[${i}]: ${issue}`
+          ...descriptorValidation.issues.map(
+            (issue) => `Invalid descriptor: ${issue}`
           ),
+          ...validation.issues,
         ]),
       };
     }
+    return { valid: true, result };
   }
 
-  // 8) Serve-boundary render descriptor emission (metadata only — not serve/render)
-  const emissionOutcome = emitAdsRenderDescriptor({
-    selectedCandidateId: pilotOutcome.result.selectedCandidateId,
-    inventory,
-    selectableCandidates: selectableSet.selectableCandidates,
-    renderMaterial,
-    currentTimestamp: request.currentTimestamp,
-  });
-  if (!emissionOutcome.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...emissionOutcome.issues.map(
-          (issue) => `Invalid render descriptor emission: ${issue}`
-        ),
-      ]),
-    };
-  }
-  const emissionValidation = validateAdsServeBoundaryResult(
-    emissionOutcome.result,
-    { nowMs: Date.parse(request.currentTimestamp) }
-  );
-  if (!emissionValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        ...emissionValidation.issues.map(
-          (issue) => `Invalid render descriptor emission: ${issue}`
-        ),
-      ]),
-    };
+  const descriptor = input.renderDescriptor as AdsRenderDescriptor;
+
+  const baseDiagnostics = {
+    candidateId,
+    placementId: descriptor.placementId,
+    creativeReference: descriptor.creativeReference,
+    creativeType: descriptor.creativeType,
+  } as const;
+
+  // --- Validate Execution (re-assert gates after contract validation) ---
+  if (descriptor.productionEnabled !== false) {
+    const result = rejectedResult("validate_execution", "invalid_descriptor", {
+      ...baseDiagnostics,
+    });
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
+      return { valid: false, issues: Object.freeze([...validation.issues]) };
+    }
+    return { valid: true, result };
   }
 
   if (
-    pilotOutcome.result.selectedCandidateId === null &&
-    emissionOutcome.result.renderDescriptor !== null
+    !isNonEmptyString(descriptor.trackingReferences.campaignId) ||
+    !isNonEmptyString(descriptor.trackingReferences.adSetId) ||
+    !isNonEmptyString(descriptor.trackingReferences.adId) ||
+    !isNonEmptyString(descriptor.trackingReferences.creativeId)
   ) {
-    return {
-      valid: false,
-      issues: Object.freeze([
-        "renderDescriptor must be null when selectedCandidateId is null.",
-      ]),
-    };
+    const result = rejectedResult("validate_execution", "identity_incomplete", {
+      ...baseDiagnostics,
+    });
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
+      return { valid: false, issues: Object.freeze([...validation.issues]) };
+    }
+    return { valid: true, result };
   }
 
-  const result = freezeExecutionResult({
-    contractVersion: ADS_EXECUTION_LAYER_CONTRACT_VERSION,
-    evaluatedCandidates: Object.freeze(evaluatedCandidates),
-    rejectedCandidates: Object.freeze(rejectedCandidates),
-    eligibilityResults: Object.freeze(eligibilityResults),
-    compatibilityResults: Object.freeze(compatibilityResults),
-    traces: annotatedTraces,
-    selectableCandidates: Object.freeze([
-      ...selectableSet.selectableCandidates,
-    ]),
-    selectionSummary: selectionOutcome.result,
-    selectedCandidateId: pilotOutcome.result.selectedCandidateId,
-    renderDescriptor: emissionOutcome.result.renderDescriptor,
-    productionEnabled: false,
-    executionCompleted: true,
-  });
+  if (
+    !isCreativeTypeSupportedByPlacement(
+      descriptor.placementId,
+      descriptor.creativeType
+    )
+  ) {
+    const result = rejectedResult(
+      "validate_execution",
+      "placement_incompatible",
+      baseDiagnostics
+    );
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
+      return { valid: false, issues: Object.freeze([...validation.issues]) };
+    }
+    return { valid: true, result };
+  }
 
-  const resultValidation = validateAdsExecutionResult(result, {
-    nowMs: Date.parse(request.currentTimestamp),
-  });
-  if (!resultValidation.valid) {
-    return {
-      valid: false,
-      issues: Object.freeze([...resultValidation.issues]),
-    };
+  const expiresAtMs = parseIsoTimestampMs(descriptor.expiresAt);
+  if (
+    expiresAtMs === null ||
+    expiresAtMs + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS < nowMs
+  ) {
+    const result = rejectedResult("validate_execution", "descriptor_expired", {
+      ...baseDiagnostics,
+    });
+    const validation = validateAdsExecutionInternalResult(result, { nowMs });
+    if (!validation.valid) {
+      return { valid: false, issues: Object.freeze([...validation.issues]) };
+    }
+    return { valid: true, result };
+  }
+
+  // --- Execute (deterministic internal snapshot; executionEnabled stays false) ---
+  // No side effects: freeze the accepted internal result only.
+  const result = acceptedResult(candidateId, descriptor);
+
+  // --- Result ---
+  const validation = validateAdsExecutionInternalResult(result, { nowMs });
+  if (!validation.valid) {
+    return { valid: false, issues: Object.freeze([...validation.issues]) };
   }
 
   return { valid: true, result };
 }
+
+/**
+ * Lists fixed Execution Layer V1 stages.
+ */
+export function listAdsExecutionLayerV1Stages(): readonly AdsExecutionLayerV1Stage[] {
+  return Object.freeze([...ADS_EXECUTION_LAYER_V1_STAGES]);
+}
+
+/**
+ * Lists stable Execution Layer V1 rejection reasons.
+ */
+export function listAdsExecutionLayerV1RejectionReasons(): readonly AdsExecutionLayerV1RejectionReason[] {
+  return Object.freeze([...ADS_EXECUTION_LAYER_V1_REJECTION_REASONS]);
+}
+
+// ---------------------------------------------------------------------------
+// Foundation orchestrator (inventory → eligibility → … → execution result).
+// Kept for existing measurement / internal-delivery-pilot consumers.
+// Prefer runAdsExecutionLayerV1 for the Candidate Selection → Render Descriptor
+// Pipeline → Execution Layer path.
+// ---------------------------------------------------------------------------
+export * from "./executionLayerFoundation";
