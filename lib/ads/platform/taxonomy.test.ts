@@ -18,22 +18,29 @@ import {
   ADS_CANONICAL_CREATIVE_TYPES,
   ADS_CANONICAL_EVENT_TYPES,
   ADS_CANONICAL_PLACEMENT_IDS,
+  ADS_CANONICAL_PLATFORM_IDS,
   ADS_TAXONOMY_CAPABILITY_IDS,
   ADS_TAXONOMY_CONTRACT_VERSION,
   ADS_TAXONOMY_CREATIVE_TYPES,
   ADS_TAXONOMY_EVENT_TYPES,
   ADS_TAXONOMY_PLACEMENT_IDS,
+  ADS_TAXONOMY_PLATFORM_IDS,
   isCanonicalCapabilityId,
   isCanonicalCreativeType,
   isCanonicalEventType,
   isCanonicalPlacementId,
+  isCanonicalPlatformId,
   listCanonicalCapabilityIds,
   listCanonicalCreativeTypes,
   listCanonicalEventTypes,
   listCanonicalPlacementIds,
+  listCanonicalPlatformIds,
   validateCanonicalCapabilityIds,
   validateCanonicalTaxonomy,
 } from "./taxonomy";
+import {
+  ADS_CANDIDATE_SELECTION_PLATFORMS,
+} from "./candidateSelection";
 import {
   ADS_CAPABILITY_TAXONOMY_MAP,
   ADS_CREATIVE_TYPE_TAXONOMY_MAP,
@@ -93,6 +100,7 @@ describe("Ads Taxonomy Unification Foundation V1", () => {
     expect(Object.isFrozen(ADS_TAXONOMY_CREATIVE_TYPES)).toBe(true);
     expect(Object.isFrozen(ADS_TAXONOMY_EVENT_TYPES)).toBe(true);
     expect(Object.isFrozen(ADS_TAXONOMY_CAPABILITY_IDS)).toBe(true);
+    expect(Object.isFrozen(ADS_TAXONOMY_PLATFORM_IDS)).toBe(true);
     expect(Object.isFrozen(ADS_PLACEMENT_TAXONOMY_MAP)).toBe(true);
     expect(Object.isFrozen(ADS_CREATIVE_TYPE_TAXONOMY_MAP)).toBe(true);
     expect(Object.isFrozen(ADS_EVENT_TYPE_TAXONOMY_MAP)).toBe(true);
@@ -182,6 +190,21 @@ describe("Ads Taxonomy Unification Foundation V1", () => {
       expect(getCanonicalEventType("purchase")).toBe("PURCHASE");
       expect(getCanonicalCapability("full_bleed")).toBe("FULL_BLEED");
     }
+  });
+
+  it("exposes canonical platform ids reused by candidate selection", () => {
+    expect([...ADS_CANONICAL_PLATFORM_IDS]).toEqual([
+      "web",
+      "ios",
+      "android",
+      "unknown",
+    ]);
+    expect(listCanonicalPlatformIds()).toEqual(ADS_CANONICAL_PLATFORM_IDS);
+    expect(ADS_CANDIDATE_SELECTION_PLATFORMS).toBe(ADS_CANONICAL_PLATFORM_IDS);
+    for (const platform of ADS_CANONICAL_PLATFORM_IDS) {
+      expect(isCanonicalPlatformId(platform)).toBe(true);
+    }
+    expect(isCanonicalPlatformId("windows")).toBe(false);
   });
 
   it("exposes helper list APIs", () => {

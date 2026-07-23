@@ -18,6 +18,7 @@ export const ADS_TAXONOMY_KINDS = [
   "creative_type",
   "event_type",
   "capability",
+  "platform",
 ] as const;
 
 export type AdsTaxonomyKind = (typeof ADS_TAXONOMY_KINDS)[number];
@@ -114,11 +115,26 @@ export const ADS_CANONICAL_CAPABILITY_IDS = [
 export type AdsCanonicalCapabilityId =
   (typeof ADS_CANONICAL_CAPABILITY_IDS)[number];
 
+/**
+ * Canonical coarse platform classes for selection / delivery context.
+ * Lowercase wire form — no device fingerprints or OS build strings.
+ */
+export const ADS_CANONICAL_PLATFORM_IDS = [
+  "web",
+  "ios",
+  "android",
+  "unknown",
+] as const;
+
+export type AdsCanonicalPlatformId =
+  (typeof ADS_CANONICAL_PLATFORM_IDS)[number];
+
 export type AdsCanonicalTaxonomyId =
   | AdsCanonicalPlacementId
   | AdsCanonicalCreativeType
   | AdsCanonicalEventType
-  | AdsCanonicalCapabilityId;
+  | AdsCanonicalCapabilityId
+  | AdsCanonicalPlatformId;
 
 function freezeIdList<T extends string>(
   ids: readonly T[]
@@ -144,10 +160,16 @@ export const ADS_TAXONOMY_CAPABILITY_IDS = freezeIdList(
   ADS_CANONICAL_CAPABILITY_IDS
 );
 
+/** Frozen canonical platform id list. */
+export const ADS_TAXONOMY_PLATFORM_IDS = freezeIdList(
+  ADS_CANONICAL_PLATFORM_IDS
+);
+
 const PLACEMENT_SET = new Set<string>(ADS_CANONICAL_PLACEMENT_IDS);
 const CREATIVE_SET = new Set<string>(ADS_CANONICAL_CREATIVE_TYPES);
 const EVENT_SET = new Set<string>(ADS_CANONICAL_EVENT_TYPES);
 const CAPABILITY_SET = new Set<string>(ADS_CANONICAL_CAPABILITY_IDS);
+const PLATFORM_SET = new Set<string>(ADS_CANONICAL_PLATFORM_IDS);
 
 export function isCanonicalPlacementId(
   value: string
@@ -173,6 +195,12 @@ export function isCanonicalCapabilityId(
   return CAPABILITY_SET.has(value);
 }
 
+export function isCanonicalPlatformId(
+  value: string
+): value is AdsCanonicalPlatformId {
+  return PLATFORM_SET.has(value);
+}
+
 export function listCanonicalPlacementIds(): readonly AdsCanonicalPlacementId[] {
   return ADS_TAXONOMY_PLACEMENT_IDS;
 }
@@ -187,6 +215,10 @@ export function listCanonicalEventTypes(): readonly AdsCanonicalEventType[] {
 
 export function listCanonicalCapabilityIds(): readonly AdsCanonicalCapabilityId[] {
   return ADS_TAXONOMY_CAPABILITY_IDS;
+}
+
+export function listCanonicalPlatformIds(): readonly AdsCanonicalPlatformId[] {
+  return ADS_TAXONOMY_PLATFORM_IDS;
 }
 
 function collectDuplicateIssues(
@@ -233,6 +265,9 @@ function collectCrossKindCollisionIssues(issues: string[]): void {
   for (const id of ADS_CANONICAL_CAPABILITY_IDS) {
     register(id, "capability");
   }
+  for (const id of ADS_CANONICAL_PLATFORM_IDS) {
+    register(id, "platform");
+  }
 }
 
 /**
@@ -261,6 +296,7 @@ export function validateCanonicalTaxonomy(): ContractValidationResult {
     "capability",
     issues
   );
+  collectDuplicateIssues(ADS_CANONICAL_PLATFORM_IDS, "platform", issues);
   collectCrossKindCollisionIssues(issues);
 
   return issues.length === 0

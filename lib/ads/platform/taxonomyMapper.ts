@@ -419,7 +419,8 @@ export function validateTaxonomyMappingTable<TCanonical extends string>(
     table.kind !== "placement" &&
     table.kind !== "creative_type" &&
     table.kind !== "event_type" &&
-    table.kind !== "capability"
+    table.kind !== "capability" &&
+    table.kind !== "platform"
   ) {
     issues.push(`Unknown taxonomy kind: ${String(table.kind)}`);
   }

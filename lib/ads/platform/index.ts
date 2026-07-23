@@ -16,6 +16,7 @@ export * from "./taxonomy";
 export * from "./taxonomyMapper";
 export * from "./renderDescriptor";
 export * from "./candidateInventory";
+export * from "./candidateSelection";
 export * from "./creativePlacementCompatibility";
 export * from "./selectableSet";
 export * from "./pilotSelector";
