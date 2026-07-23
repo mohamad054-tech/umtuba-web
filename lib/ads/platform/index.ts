@@ -1,16 +1,23 @@
 /**
  * UMTUBA Ads Platform — public V1 surface.
  *
- * Preferred canonical orchestration entry:
- *   `runAdsStackPipelineV1` (exported from `./stackPipeline`)
+ * Sole authoritative production decision entrypoint:
+ *   `runAdsCanonicalStackV1` (from `./canonicalStack`)
  *
- * Legacy foundation APIs are quarantined under the `adsPlatformCompatibility`
- * namespace — they are not flat peers of the canonical stack.
+ * Delivery, measurement-from-delivery, execution, billing, charging, and the
+ * separate measurement-event-flow track are NOT flat-exported as authoritative
+ * production entry points. Import them only via `adsPlatformCompatibility`
+ * as non-authoritative foundation / migration helpers.
  *
  * Quarantined (compatibility only — not flat-exported):
- *   - runAdsExecutionLayer
- *   - runInternalDeliveryPilot
- *   - prepareAdsMeasurementFoundation
+ *   - runAdsExecutionLayer / runAdsExecutionLayerV1
+ *   - runInternalDeliveryPilot / runInternalDeliveryPilotV1
+ *   - prepareAdsMeasurementFoundation / prepareAdsMeasurementFromDeliveryV1
+ *   - evaluateAdsBilling / charging helpers
+ *   - measurementEventFlow / measurementPipeline
+ *   - runAdsStackPipelineV1 (shorter legacy select→measure path)
+ *   - eligibilityRules / selectionResult / deliveryDecisionTrace
+ *   - candidateInventory / selectableSet / pilotSelector / serveBoundary
  */
 
 export * from "./creativeContracts";
@@ -24,21 +31,14 @@ export * from "./eventReportContracts";
 export * from "./deliveryContracts";
 export * from "./deliveryEligibilityContracts";
 export * from "./deliverySelectionContracts";
-export * from "./eligibilityRules";
-export * from "./selectionResult";
-export * from "./deliveryDecisionTrace";
 export * from "./taxonomy";
 export * from "./taxonomyMapper";
 export * from "./renderDescriptor";
 export * from "./renderDescriptorPipeline";
-export * from "./candidateInventory";
 export * from "./candidateSelection";
 export * from "./candidateProvenance";
 export * from "./selectionRenderAdapter";
 export * from "./creativePlacementCompatibility";
-export * from "./selectableSet";
-export * from "./pilotSelector";
-export * from "./serveBoundary";
 /** Ranking & Scoring Foundation V1 — deterministic, non-auction, kill switches off. */
 export * from "./scoring";
 export * from "./ranking";
@@ -49,20 +49,12 @@ export * from "./pacing";
 export * from "./frequency";
 /** Auction Foundation V1 — deterministic winner selection only, kill switches off. */
 export * from "./auction";
-/** Billing & Charging Foundation V1 — eligibility + charge contracts only, kill switches off. */
-export * from "./charging";
-export * from "./billing";
 /** Fraud & Invalid Traffic Foundation V1 — deterministic diagnostics only, kill switches off. */
 export * from "./invalidTraffic";
 export * from "./fraud";
-/** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
-export * from "./executionLayer";
-/** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */
-export * from "./internalDeliveryPilot";
 /**
- * Canonical Measurement V1 contracts + prepareAdsMeasurementFromDeliveryV1.
- * Legacy prepareAdsMeasurementFoundation is NOT flat-exported — import it from
- * adsPlatformCompatibility only.
+ * Measurement contract helpers only. Preparation from delivery / event-flow
+ * orchestration is compatibility-quarantined (non-authoritative).
  */
 export {
   ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION,
@@ -73,7 +65,6 @@ export {
   ADS_MEASUREMENT_FOUNDATION_PACKAGE_ALLOWED_FIELDS,
   buildAdsMeasurementDedupeKey,
   validateAdsMeasurementFoundationPackage,
-  prepareAdsMeasurementFromDeliveryV1,
   type AdsMeasurementFoundationEventType,
   type AdsMeasurementFoundationTrustLevel,
   type AdsMeasurementFoundationPackage,
@@ -81,9 +72,7 @@ export {
   type AdsMeasurementFoundationOutcome,
   type AdsMeasurementFoundationOptions,
 } from "./measurementFoundation";
-export * from "./measurementPipeline";
-export * from "./measurementEventFlow";
-/** Preferred canonical Ads V1 orchestration entry. */
-export * from "./stackPipeline";
-/** Quarantined legacy / foundation APIs — not the preferred path. */
+/** Sole authoritative Ads V1 production decision entry (kill switches off). */
+export * from "./canonicalStack";
+/** Quarantined legacy / foundation / non-authoritative helpers. */
 export * as adsPlatformCompatibility from "./compatibility";

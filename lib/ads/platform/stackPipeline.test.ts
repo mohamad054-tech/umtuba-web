@@ -434,7 +434,7 @@ describe("Ads Stack Pipeline V1 (canonical unification)", () => {
     ).toBe(false);
   });
 
-  it("has no network, DB, ranking, billing, or product imports", () => {
+  it("has no network, DB, or product imports", () => {
     expect(SOURCE).not.toMatch(/from ["']@\//);
     expect(SOURCE).not.toMatch(/from ["']\.\.\//);
     expect(SOURCE).not.toMatch(
@@ -447,7 +447,7 @@ describe("Ads Stack Pipeline V1 (canonical unification)", () => {
     expect(SOURCE).not.toMatch(/Math\.random|Date\.now|performance\.now/);
     expect(SOURCE).not.toMatch(/ADS_DELIVERY_ENABLED\s*=\s*true/);
     expect(SOURCE).not.toMatch(
-      /\brankCandidates\b|\brunAuction\b|\bpacing\b|\bbilling\b/i
+      /from ["']\.\/(ranking|scoring|auction|budget|pacing|frequency|billing|charging|fraud|invalidTraffic)["']/
     );
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/deliveryEnabled: false/);

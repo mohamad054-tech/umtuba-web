@@ -38,8 +38,14 @@ import {
 } from "./selectionRenderAdapter";
 
 /**
- * Ads Stack Pipeline V1 — single canonical execution path.
+ * Ads Stack Pipeline V1 — shorter select→measure path (compatibility).
  *
+ * Prefer `runAdsCanonicalStackV1` for the full decision stack:
+ *   Candidate Selection → Scoring/Ranking → Budget/Pacing → Frequency →
+ *   Auction → Fraud/IVT → Adapter → Render → Execution → Delivery →
+ *   Measurement → Billing
+ *
+ * This module remains the shorter legacy composition:
  *   Candidate Selection
  *   → Selection→Render Adapter (+ issued provenance)
  *   → Render Descriptor Pipeline
@@ -47,9 +53,8 @@ import {
  *   → Internal Delivery Pilot V1
  *   → Measurement V1 (mandatory)
  *
- * This is the preferred public orchestration entry for Ads V1
- * (`runAdsStackPipelineV1`). Legacy foundation APIs are quarantined under
- * `adsPlatformCompatibility` — they are not peers of this entrypoint.
+ * Quarantined under `adsPlatformCompatibility` — not the preferred public
+ * orchestration entry. Legacy foundation APIs are also quarantined there.
  *
  * Measurement is mandatory: stackAccepted=true always implies a non-null
  * measurementPackage. Missing eventType fails closed.

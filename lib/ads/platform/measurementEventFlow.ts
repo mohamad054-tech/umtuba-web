@@ -35,13 +35,16 @@ import type {
  * IMPORTANT — track separation:
  * - This module is a reporting-handle → package → pipeline orchestration
  *   track for client/opaque-token event flows.
- * - It is NOT the delivery-decision pipeline.
+ * - It is NOT the delivery-decision pipeline and is NOT an authoritative
+ *   production decision entrypoint.
+ * - Import via `adsPlatformCompatibility` only (not the flat platform barrel).
  * - It does NOT replace canonical Delivery → Measurement integration on
- *   `runAdsStackPipelineV1` / `prepareAdsMeasurementFromDeliveryV1`.
+ *   `runAdsCanonicalStackV1`.
  *
  * Canonical delivery-decision + measurement path:
- *   Candidate Selection → Adapter → Render → Execution V1 →
- *   Internal Delivery Pilot V1 → Measurement V1
+ *   Candidate Selection → Scoring/Ranking → Budget/Pacing → Frequency →
+ *   Auction → Fraud/IVT → Adapter → Render → Execution V1 →
+ *   Internal Delivery Pilot V1 → Measurement V1 → Billing
  *
  * Flow (this track only):
  *   Resolve reporting handle → Validate event → Build package →

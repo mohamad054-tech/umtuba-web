@@ -76,6 +76,7 @@ function expectKillSwitchesOff(result: AdsBillingEvaluationResult): void {
   expect(result.productionEnabled).toBe(false);
   expect(result.deliveryEnabled).toBe(false);
   expect(result.executionEnabled).toBe(false);
+  expect(result.authoritativeProductionBilling).toBe(false);
 }
 
 describe("Ads Billing Foundation V1", () => {

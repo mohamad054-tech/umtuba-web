@@ -28,6 +28,11 @@ import {
  * processing, PSP integration, accounting persistence, statements, tax
  * computation, balance-store updates, spend mutation, or production charging.
  *
+ * Standalone `evaluateAdsBilling` is a non-authoritative foundation helper.
+ * Authoritative production billing decisions are emitted only by
+ * `runAdsCanonicalStackV1` (and remain production-disabled in V1 via
+ * `productionAccepted: false` / `billingEnabled: false`).
+ *
  * Never mutates balances, posts journals, randomizes, or consults wall-clock /
  * network / database / AI / ML / product modules.
  *
@@ -127,6 +132,7 @@ export const ADS_BILLING_RESULT_ALLOWED_FIELDS = [
   "chargeResult",
   "diagnostics",
   "metadata",
+  "authoritativeProductionBilling",
   "productionEnabled",
   "deliveryEnabled",
   "executionEnabled",
@@ -185,6 +191,10 @@ export type AdsBillingMetadata = Readonly<{
  * Never posts money, mutates balance stores, or writes accounting rows.
  *
  * On any rejection, chargeResult is always null.
+ *
+ * `authoritativeProductionBilling` is always false for standalone foundation
+ * evaluation. Authoritative production billing decisions exist only on
+ * `runAdsCanonicalStackV1` results (and remain production-disabled in V1).
  */
 export type AdsBillingEvaluationResult = Readonly<{
   contractVersion: typeof ADS_BILLING_CONTRACT_VERSION;
@@ -197,6 +207,8 @@ export type AdsBillingEvaluationResult = Readonly<{
   chargeResult: AdsChargeCalculationResult | null;
   diagnostics: AdsBillingDiagnostics;
   metadata: AdsBillingMetadata;
+  /** Standalone foundation calls are never production-authoritative. */
+  authoritativeProductionBilling: false;
   productionEnabled: false;
   deliveryEnabled: false;
   executionEnabled: false;
@@ -346,6 +358,7 @@ function freezeResult(
         : freezeChargeResult(result.chargeResult),
     diagnostics: freezeDiagnostics(result.diagnostics),
     metadata: freezeMetadata(),
+    authoritativeProductionBilling: false as const,
     productionEnabled: false as const,
     deliveryEnabled: false as const,
     executionEnabled: false as const,
@@ -596,6 +609,7 @@ export function evaluateAdsBilling(
         chargeCalculated,
       },
       metadata: freezeMetadata(),
+      authoritativeProductionBilling: false,
       productionEnabled: false,
       deliveryEnabled: false,
       executionEnabled: false,
@@ -686,6 +700,11 @@ export function validateAdsBillingEvaluationResult(
     }
   }
 
+  if (input.authoritativeProductionBilling !== false) {
+    issues.push(
+      `${fieldPrefix}.authoritativeProductionBilling must be false (standalone billing is never production-authoritative).`
+    );
+  }
   if (input.productionEnabled !== false) {
     issues.push(`${fieldPrefix}.productionEnabled must be false.`);
   }
