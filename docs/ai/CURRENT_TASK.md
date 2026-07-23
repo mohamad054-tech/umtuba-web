@@ -2,34 +2,34 @@
 
 ## Task title
 
-UMTUBA — UM Games Hub / Runtime Foundation V1
+UMTUBA — UM Games Hub Experience Foundation V1
 
 ## Goal
 
-Implement Games Hub / Runtime Foundation V1 contracts only (eligibility,
-lifecycle, start/resume/completion/abandon) on branch
-`office/games-hub-runtime-foundation-v1`, without playable games, multiplayer,
-economy, UI, public APIs, merge, or migration apply.
+Implement Games Hub Experience Foundation V1 (route, adapter, cards, play
+action foundation, UI states) on
+`office/games-hub-experience-foundation-v1`.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntime.ts`
-- `lib/games/gamesHubRuntime.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md`
+- `app/games/**`
+- `app/components/games/**`
+- `lib/games/gamesHubExperience.ts`
+- `lib/games/gamesHubExperience.test.ts`
+- `docs/games/implementation/GAMES_HUB_EXPERIENCE_FOUNDATION_V1.md`
+- `app/lib/nav/routes.ts` (games route constant only)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
 - Learning / Ads / Store / World / Financial / Social
-- Modifying Platform or Catalog foundations / migrations
-- Games Hub UI, public APIs, production runtime endpoints
-- Kick Blast or other playable games
-- Commit / push / merge / migration apply unless explicitly requested
+- Migrations, merge, playable games, multiplayer, matchmaking
+- Commit / push unless explicitly requested
 
 ## Branch
 
-`office/games-hub-runtime-foundation-v1`
+`office/games-hub-experience-foundation-v1`
 
 ## Status
 

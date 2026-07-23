@@ -2,23 +2,27 @@
 
 ## Summary
 
-UM Games Hub / Runtime Foundation V1 **PASS** on
-`office/games-hub-runtime-foundation-v1`.
+UM Games Hub Experience Foundation V1 **PASS** on
+`office/games-hub-experience-foundation-v1`.
 
-- Hub domain contracts from trusted Catalog entries
-- Fail-closed runtime eligibility
-- Runtime lifecycle: created/active/paused/completed/abandoned/expired
-- Start / resume / completion handoff / abandon / expiry (idempotent)
-- Authority closed: no game server, rewards, client authority, multiplayer,
-  matchmaking, migrations, public API, production endpoints
-- Did not modify Platform/Catalog foundations, Learning, Ads, Store, World
+- Route `/games` (auth-gated, Learning-style shell)
+- Catalog → Hub card adapter (hides draft/archived; ignores client forgeries)
+- Reusable GameCard with disabled Play for non-eligible states
+- Play action foundation bound to Runtime eligibility (`startedServer: false`)
+- UI states: loading, empty, ready, maintenance, unavailable, eligibility_blocked, internal_error
+- No migrations, no multiplayer, no rewards, Runtime authority unchanged
 - Not committed
 
 ## Exact files changed
 
-- `lib/games/gamesHubRuntime.ts` (new)
-- `lib/games/gamesHubRuntime.test.ts` (new)
-- `docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md` (new)
+- `lib/games/gamesHubExperience.ts` (new)
+- `lib/games/gamesHubExperience.test.ts` (new)
+- `app/games/page.tsx` (new)
+- `app/components/games/GamesHubShell.tsx` (new)
+- `app/components/games/GamesHub.tsx` (new)
+- `app/components/games/GameCard.tsx` (new)
+- `app/lib/nav/routes.ts` (`games: "/games"`)
+- `docs/games/implementation/GAMES_HUB_EXPERIENCE_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -28,16 +32,17 @@ None — **NO MIGRATION REQUIRED**
 
 ## Security review
 
-- Catalog is sole authority for status/availability
-- Client forged authoritative claim fields rejected
-- Completion handoff `grantsRewards: false`, `applied: false`
-- Owner mismatch / terminal / unavailable reconnect rejected
-- Double active session rejected
-- No UI / public API / production runtime endpoint
+- Auth required for Hub page
+- Adapter ignores client eligibility/score/reward overlays
+- Draft/archived never listed
+- Play never starts a server or grants rewards
+- No stack traces / internal details in user messages
+- Runtime authority remains closed
 
 ## Tests
 
-- `npx vitest run lib/games` — 60/60 pass (Foundation 27 + Catalog 18 + Hub 15)
+- `npx vitest run lib/games` — 68/68 pass
+- `npx vitest run app/lib/nav` — 19/19 pass
 
 ## TypeScript
 
@@ -45,7 +50,7 @@ None — **NO MIGRATION REQUIRED**
 
 ## Build
 
-- `npm run build` — pass
+- `npm run build` — pass (`/games` listed)
 
 ## git diff --check
 
@@ -53,15 +58,10 @@ None — **NO MIGRATION REQUIRED**
 
 ## git status --short
 
-```
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
-?? docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md
-?? lib/games/gamesHubRuntime.ts
-?? lib/games/gamesHubRuntime.test.ts
-```
+(see final report)
 
 ## Open issues
 
+- Catalog loader returns empty until a later data-wiring slice
 - Commit / push pending explicit user request
-- No DB wiring / UI / playable games in this slice
+- Games not added to primary/mobile nav (route constant only)

@@ -40,6 +40,8 @@ export const APP_ROUTES = {
   sellerShipping: "/seller/store/shipping",
   sellerAnalytics: "/seller/store/analytics",
   advertise: "/advertise",
+  /** UM Games Hub — experience foundation route. */
+  games: "/games",
   advertiseApply: "/advertise/apply",
   advertiseDashboard: "/advertise/dashboard",
   advertiseCampaigns: "/advertise/campaigns",
