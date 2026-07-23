@@ -54,7 +54,7 @@ Reserved nullable columns (no FKs, non-authoritative): `city_id`,
 
 ## Session statuses
 
-`active` → `submitted` | `expired` | `cancelled`  
+`active` → `submitted` | `expired` | `cancelled`
 Submit path may atomically decide `accepted` | `rejected`.
 
 TTL: lazy expiry via `game_session_expire_if_due` (no background job).
@@ -99,8 +99,8 @@ Does **not** prove fair play, detect bots, or certify scores for economy.
 
 ## Privacy model
 
-Defaults: all share flags `false`.  
-Opt-in fields only: achievements, best score, level/progress, activity.  
+Defaults: all share flags `false`.
+Opt-in fields only: achievements, best score, level/progress, activity.
 V1 does **not** implement public reads based on these flags.
 
 ## UM Points firewall
