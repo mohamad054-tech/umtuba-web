@@ -2,334 +2,572 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  ADS_CANDIDATE_INVENTORY_CONTRACT_VERSION,
-  createEmptyInventory,
-  type AdsCandidateMetadata,
-} from "./candidateInventory";
+  ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
+  ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS,
+  buildAdsRenderDescriptor,
+  type AdsRenderDescriptor,
+} from "./renderDescriptor";
 import {
-  ADS_DELIVERY_ENGINE_CONTRACT_VERSION,
-  type AdsDeliveryRequest,
-} from "./deliveryContracts";
-import {
-  ADS_ELIGIBILITY_ACTIVE_STATUS,
-  ADS_ELIGIBILITY_DELIVERY_FLAG_KEY,
-  type AdsEligibilityCandidateState,
-} from "./eligibilityRules";
-import {
-  createEmptyAdsExecutionResult,
-  runAdsExecutionLayer,
-  type AdsExecutionResult,
+  runAdsExecutionLayerV1,
+  validateAdsExecutionInternalResult,
+  type AdsExecutionInternalResult,
 } from "./executionLayer";
 import {
-  ADS_INTERNAL_DELIVERY_PILOT_CONTRACT_VERSION,
-  ADS_INTERNAL_DELIVERY_PILOT_FAILURE_REASONS,
-  ADS_INTERNAL_DELIVERY_PILOT_INPUT_ALLOWED_FIELDS,
-  ADS_INTERNAL_DELIVERY_PILOT_RESULT_ALLOWED_FIELDS,
-  createEmptyAdsInternalDeliveryPilotResult,
-  runInternalDeliveryPilot,
-  validateAdsInternalDeliveryPilotResult,
+  ADS_INTERNAL_DELIVERY_PILOT_V1_CONTRACT_VERSION,
+  ADS_INTERNAL_DELIVERY_PILOT_V1_INPUT_ALLOWED_FIELDS,
+  ADS_INTERNAL_DELIVERY_PILOT_V1_REJECTION_REASONS,
+  ADS_INTERNAL_DELIVERY_PILOT_V1_STAGES,
+  listAdsInternalDeliveryPilotV1RejectionReasons,
+  listAdsInternalDeliveryPilotV1Stages,
+  runInternalDeliveryPilotV1,
+  validateAdsInternalDeliveryInternalResult,
+  type AdsInternalDeliveryInternalResult,
 } from "./internalDeliveryPilot";
-import { ADS_PLACEMENT_REGISTRY } from "./placementRegistry";
-import type { AdsRenderDescriptor } from "./renderDescriptor";
-import type { AdsRenderMaterial } from "./serveBoundary";
 
 const SOURCE_PATH = path.join(__dirname, "internalDeliveryPilot.ts");
 const SOURCE = readFileSync(SOURCE_PATH, "utf8");
 
-const NOW = "2026-07-22T12:00:00.000Z";
+const NOW = "2026-07-23T12:00:00.000Z";
 const NOW_MS = Date.parse(NOW);
-const EXPIRES = "2026-07-22T13:00:00.000Z";
-const GENERATED_AT = "2026-07-22T11:00:00.000Z";
+const EXPIRES = "2026-07-23T13:00:00.000Z";
+const EXPIRED = "2026-07-23T11:00:00.000Z";
 
-function inventoryCandidate(
-  overrides: Partial<AdsCandidateMetadata> &
-    Pick<AdsCandidateMetadata, "candidateId">
-): Record<string, unknown> {
-  const id = overrides.candidateId;
-  return {
-    candidateId: id,
-    campaignRef: overrides.campaignRef ?? `campaign-ref-${id}`,
-    adSetRef: overrides.adSetRef ?? `ad-set-ref-${id}`,
-    adRef: overrides.adRef ?? `ad-ref-${id}`,
-    creativeRef: overrides.creativeRef ?? `creative-ref-${id}`,
-    placement: overrides.placement ?? "WATCH_FEED",
-    creativeType: overrides.creativeType ?? "video",
-    eligibilitySnapshot: overrides.eligibilitySnapshot ?? {
-      snapshotRef: `eligibility-snapshot-${id}`,
-      revision: 1,
-    },
-    inventorySource: overrides.inventorySource ?? "catalog",
-    revision: overrides.revision ?? 1,
-    timestamps: overrides.timestamps ?? {
-      createdAt: "2026-07-22T10:00:00.000Z",
-      updatedAt: "2026-07-22T10:30:00.000Z",
-    },
-  };
+/** Contract: expired iff expiresAtMs + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS < nowMs. */
+const BOUNDARY_EXPIRES_AT = "2026-07-23T12:00:00.000Z";
+const BOUNDARY_EXPIRES_AT_MS = Date.parse(BOUNDARY_EXPIRES_AT);
+
+function isoFromMs(ms: number): string {
+  return new Date(ms).toISOString();
 }
 
-function baseInventory(
-  candidates: Record<string, unknown>[] = [
-    inventoryCandidate({ candidateId: "candidate-1" }),
-  ]
+function expectKillSwitchesDisabled(
+  result: AdsInternalDeliveryInternalResult
+): void {
+  expect(result.productionEnabled).toBe(false);
+  expect(result.deliveryEnabled).toBe(false);
+  expect(result.executionEnabled).toBe(false);
+}
+
+function baseDescriptorDraft(
+  overrides: Record<string, unknown> = {}
 ): Record<string, unknown> {
   return {
-    contractVersion: ADS_CANDIDATE_INVENTORY_CONTRACT_VERSION,
-    inventoryId: "inventory-1",
-    revision: 1,
-    generatedAt: GENERATED_AT,
-    candidates,
-  };
-}
-
-function eligibilityState(
-  overrides: Partial<AdsEligibilityCandidateState> & { candidateId: string }
-): AdsEligibilityCandidateState {
-  const id = overrides.candidateId;
-  return {
-    candidateId: id,
-    campaignId: overrides.campaignId ?? `campaign-${id}`,
-    adSetId: overrides.adSetId ?? `ad-set-${id}`,
-    adId: overrides.adId ?? `ad-${id}`,
-    creativeId: overrides.creativeId ?? `creative-${id}`,
-    placementId: overrides.placementId ?? "WATCH_FEED",
-    campaignStatus: overrides.campaignStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    adSetStatus: overrides.adSetStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    adStatus: overrides.adStatus ?? ADS_ELIGIBILITY_ACTIVE_STATUS,
-    campaignStartsAt: overrides.campaignStartsAt ?? "2026-07-01T00:00:00.000Z",
-    campaignEndsAt:
-      overrides.campaignEndsAt === undefined
-        ? "2026-08-01T00:00:00.000Z"
-        : overrides.campaignEndsAt,
-    adSetStartsAt: overrides.adSetStartsAt ?? "2026-07-01T00:00:00.000Z",
-    adSetEndsAt:
-      overrides.adSetEndsAt === undefined
-        ? "2026-08-01T00:00:00.000Z"
-        : overrides.adSetEndsAt,
-    budgetExhausted: overrides.budgetExhausted ?? false,
-    creativePresent: overrides.creativePresent ?? true,
-    creativeApproved: overrides.creativeApproved ?? true,
-    policyBlocked: overrides.policyBlocked ?? false,
-    targetedCountryCodes: overrides.targetedCountryCodes ?? ["US"],
-    targetedLanguageCodes: overrides.targetedLanguageCodes ?? ["en"],
-    audienceMatched: overrides.audienceMatched ?? true,
-  };
-}
-
-function enabledFlagsFor(placementId: string): Record<string, boolean> {
-  const flagKey =
-    ADS_PLACEMENT_REGISTRY[placementId as keyof typeof ADS_PLACEMENT_REGISTRY]
-      .featureFlag.key;
-  return {
-    [ADS_ELIGIBILITY_DELIVERY_FLAG_KEY]: true,
-    [flagKey]: true,
-  };
-}
-
-function baseRequest(
-  candidateIds: readonly string[],
-  overrides: Partial<AdsDeliveryRequest> = {}
-): AdsDeliveryRequest {
-  return {
-    contractVersion: ADS_DELIVERY_ENGINE_CONTRACT_VERSION,
+    descriptorVersion: ADS_RENDER_DESCRIPTOR_CONTRACT_VERSION,
     placementId: "WATCH_FEED",
-    candidates: candidateIds.map((id) => ({
-      candidateId: id,
-      campaignId: `campaign-${id}`,
-      adSetId: `ad-set-${id}`,
-      adId: `ad-${id}`,
-      creativeId: `creative-${id}`,
-    })),
-    viewer: { opaqueViewerId: "viewer-opaque-1" },
-    geo: { countryCode: "US" },
-    languageCode: "en-US",
-    deviceClass: "mobile",
-    featureFlags: {
-      [ADS_ELIGIBILITY_DELIVERY_FLAG_KEY]: false,
-      ADS_PLACEMENT_WATCH_FEED_ENABLED: false,
+    creativeReference: "creative-ref-1",
+    creativeType: "video",
+    mediaReference: "media-ref-1",
+    thumbnailReference: "thumb-ref-1",
+    clickDestinationReference: "destination-ref-1",
+    disclosure: {
+      label: "Sponsored",
+      mustDisplay: true,
     },
+    reportingHandles: {
+      impressionHandle: "imp-handle-1",
+      clickHandle: "clk-handle-1",
+    },
+    trackingReferences: {
+      campaignId: "campaign-1",
+      adSetId: "ad-set-1",
+      adId: "ad-1",
+      creativeId: "creative-ref-1",
+    },
+    cacheHints: {
+      cacheable: false,
+      maxAgeSeconds: null,
+      cacheKey: null,
+    },
+    expiresAt: EXPIRES,
+    productionEnabled: false,
+    ...overrides,
+  };
+}
+
+function buildDescriptor(
+  overrides: Record<string, unknown> = {}
+): AdsRenderDescriptor {
+  const outcome = buildAdsRenderDescriptor(baseDescriptorDraft(overrides), {
+    nowMs: NOW_MS,
+  });
+  if (!outcome.valid) {
+    throw new Error(
+      `test fixture descriptor invalid: ${outcome.issues.join("; ")}`
+    );
+  }
+  return outcome.descriptor;
+}
+
+function acceptedExecutionResult(
+  overrides: Record<string, unknown> = {}
+): AdsExecutionInternalResult {
+  const outcome = runAdsExecutionLayerV1({
+    candidateId: "candidate-1",
+    renderDescriptor: buildDescriptor(),
+    currentTimestamp: NOW,
+    ...overrides,
+  });
+  expect(outcome.valid).toBe(true);
+  if (!outcome.valid) {
+    throw new Error("expected accepted execution result");
+  }
+  expect(outcome.result.executionAccepted).toBe(true);
+  return outcome.result;
+}
+
+function rejectedExecutionResult(
+  descriptorOverrides: Record<string, unknown>
+): AdsExecutionInternalResult {
+  const outcome = runAdsExecutionLayerV1({
+    candidateId: "candidate-1",
+    renderDescriptor: baseDescriptorDraft(descriptorOverrides),
+    currentTimestamp: NOW,
+  });
+  expect(outcome.valid).toBe(true);
+  if (!outcome.valid) {
+    throw new Error("expected soft-rejected execution result");
+  }
+  expect(outcome.result.executionAccepted).toBe(false);
+  return outcome.result;
+}
+
+function baseInput(
+  overrides: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    executionResult: acceptedExecutionResult(),
     currentTimestamp: NOW,
     ...overrides,
   };
 }
 
-function renderMaterialFor(
-  candidateId: string,
-  overrides: Partial<AdsRenderMaterial> = {}
-): AdsRenderMaterial {
-  return Object.freeze({
-    candidateId,
-    creativeReference:
-      overrides.creativeReference ?? `creative-ref-${candidateId}`,
-    mediaReference: overrides.mediaReference ?? `media-ref-${candidateId}`,
-    thumbnailReference:
-      overrides.thumbnailReference === undefined
-        ? null
-        : overrides.thumbnailReference,
-    clickDestinationReference:
-      overrides.clickDestinationReference ?? `destination-ref-${candidateId}`,
-    impressionHandle: overrides.impressionHandle ?? `imp-${candidateId}`,
-    clickHandle: overrides.clickHandle ?? `clk-${candidateId}`,
-    ...(overrides.trackingReferences !== undefined
-      ? { trackingReferences: overrides.trackingReferences }
-      : {}),
-    disclosureLabel: overrides.disclosureLabel ?? "Sponsored",
-    cacheHints: overrides.cacheHints ?? {
-      cacheable: false,
-      maxAgeSeconds: null,
-      cacheKey: null,
-    },
-    expiresAt: overrides.expiresAt ?? EXPIRES,
-  });
-}
-
-function successfulExecutionResult(): AdsExecutionResult {
-  const outcome = runAdsExecutionLayer({
-    inventory: baseInventory([
-      inventoryCandidate({ candidateId: "candidate-1" }),
-    ]),
-    request: baseRequest(["candidate-1"], {
-      featureFlags: enabledFlagsFor("WATCH_FEED"),
-    }),
-    eligibilityStates: [eligibilityState({ candidateId: "candidate-1" })],
-    renderMaterial: renderMaterialFor("candidate-1"),
-  });
-  expect(outcome.valid).toBe(true);
-  if (!outcome.valid) {
-    throw new Error("expected successful execution");
+/**
+ * Builds an accepted execution snapshot that passes structural validation, then
+ * exposes a defective descriptor on later reads so validate_delivery soft-rejects.
+ * Mirrors the expiry pin pattern: structural check sees a valid snapshot;
+ * delivery re-assertion sees the gate failure under test.
+ */
+function acceptedExecutionWithDeliveryDescriptorDefect(
+  defect: (descriptor: AdsRenderDescriptor) => AdsRenderDescriptor
+): AdsExecutionInternalResult {
+  const accepted = acceptedExecutionResult();
+  const good = accepted.renderDescriptor;
+  if (good === null) {
+    throw new Error("expected accepted execution to include renderDescriptor");
   }
-  return outcome.result;
+  const defective = defect(good);
+
+  let structuralReads = 0;
+  const structuralProbe = {
+    ...accepted,
+    get renderDescriptor() {
+      structuralReads += 1;
+      return good;
+    },
+  };
+  // Pilot pins structural clock via expiresAt before calling the validator.
+  const structuralNowMs = Date.parse(good.expiresAt);
+  expect(
+    validateAdsExecutionInternalResult(structuralProbe, {
+      nowMs: structuralNowMs,
+    })
+  ).toEqual({ valid: true });
+
+  // Pilot reads renderDescriptor twice for the expiry pin, then the validator
+  // performs structuralReads accesses; subsequent reads serve the defect.
+  const serveGoodThrough = 2 + structuralReads;
+  let reads = 0;
+  return {
+    ...accepted,
+    get renderDescriptor() {
+      reads += 1;
+      return reads <= serveGoodThrough ? good : defective;
+    },
+  } as AdsExecutionInternalResult;
 }
 
 describe("Ads Internal Delivery Pilot V1", () => {
-  it("exposes contract version and allowed fields", () => {
-    expect(ADS_INTERNAL_DELIVERY_PILOT_CONTRACT_VERSION).toBe("v1");
-    expect([...ADS_INTERNAL_DELIVERY_PILOT_INPUT_ALLOWED_FIELDS]).toEqual([
-      "executionResult",
+  it("exposes stable contract stages and rejection reasons", () => {
+    expect(ADS_INTERNAL_DELIVERY_PILOT_V1_CONTRACT_VERSION).toBe("v1");
+    expect(listAdsInternalDeliveryPilotV1Stages()).toEqual([
+      "validate",
+      "validate_delivery",
+      "deliver",
+      "result",
     ]);
-    expect(ADS_INTERNAL_DELIVERY_PILOT_RESULT_ALLOWED_FIELDS).toContain(
-      "pilotSuccess"
+    expect(ADS_INTERNAL_DELIVERY_PILOT_V1_STAGES).toEqual(
+      listAdsInternalDeliveryPilotV1Stages()
     );
-    expect(ADS_INTERNAL_DELIVERY_PILOT_RESULT_ALLOWED_FIELDS).toContain(
-      "served"
+    expect(listAdsInternalDeliveryPilotV1RejectionReasons()).toEqual([
+      "execution_not_accepted",
+      "invalid_descriptor",
+      "descriptor_expired",
+      "placement_incompatible",
+      "identity_incomplete",
+    ]);
+    expect(ADS_INTERNAL_DELIVERY_PILOT_V1_REJECTION_REASONS).toEqual(
+      listAdsInternalDeliveryPilotV1RejectionReasons()
     );
-    expect(ADS_INTERNAL_DELIVERY_PILOT_FAILURE_REASONS).toContain(
-      "empty_pipeline"
-    );
+    expect([...ADS_INTERNAL_DELIVERY_PILOT_V1_INPUT_ALLOWED_FIELDS]).toEqual([
+      "executionResult",
+      "currentTimestamp",
+    ]);
   });
 
-  it("completes a successful internal pilot without serving", () => {
-    const executionResult = successfulExecutionResult();
-    expect(executionResult.selectedCandidateId).toBe("candidate-1");
-    expect(executionResult.renderDescriptor).not.toBeNull();
-
-    const outcome = runInternalDeliveryPilot(
-      { executionResult },
-      { nowMs: NOW_MS }
-    );
+  it("accepts a validated execution result into an internal delivery result", () => {
+    const outcome = runInternalDeliveryPilotV1(baseInput());
     expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
+    if (!outcome.valid) {
+      return;
+    }
 
-    expect(outcome.result.pilotSuccess).toBe(true);
-    expect(outcome.result.selectedCandidateId).toBe("candidate-1");
-    expect(outcome.result.renderDescriptor).toEqual(
-      executionResult.renderDescriptor
+    expect(outcome.result.contractVersion).toBe(
+      ADS_INTERNAL_DELIVERY_PILOT_V1_CONTRACT_VERSION
     );
-    expect(outcome.result.reason).toBeNull();
-    expect(outcome.result.deliveryEnabled).toBe(false);
+    expect(outcome.result.deliveryAccepted).toBe(true);
+    expect(outcome.result.deliveryRejected).toBe(false);
+    expect(outcome.result.candidateId).toBe("candidate-1");
+    expect(outcome.result.pipelineStage).toBe("result");
     expect(outcome.result.productionEnabled).toBe(false);
-    expect(outcome.result.served).toBe(false);
+    expect(outcome.result.deliveryEnabled).toBe(false);
+    expect(outcome.result.executionEnabled).toBe(false);
+    expect(outcome.result.renderDescriptor).not.toBeNull();
+    expect(outcome.result.renderDescriptor?.creativeReference).toBe(
+      "creative-ref-1"
+    );
+    expect(outcome.result.diagnostics).toEqual({
+      candidateId: "candidate-1",
+      placementId: "WATCH_FEED",
+      creativeReference: "creative-ref-1",
+      creativeType: "video",
+      deliveryAccepted: true,
+      rejectionReason: null,
+    });
+    expect(Object.isFrozen(outcome.result)).toBe(true);
+    expect(Object.isFrozen(outcome.result.diagnostics)).toBe(true);
+    expect(Object.isFrozen(outcome.result.renderDescriptor)).toBe(true);
+    expect(
+      validateAdsInternalDeliveryInternalResult(outcome.result, {
+        nowMs: NOW_MS,
+      })
+    ).toEqual({ valid: true });
   });
 
-  it("soft-fails an empty pipeline", () => {
-    const empty = createEmptyAdsExecutionResult();
-    const outcome = runInternalDeliveryPilot({ executionResult: empty });
+  it("is deterministic for identical inputs", () => {
+    const executionResult = acceptedExecutionResult();
+    const input = { executionResult, currentTimestamp: NOW };
+    const first = runInternalDeliveryPilotV1(input);
+    const second = runInternalDeliveryPilotV1(input);
+    expect(first.valid).toBe(true);
+    expect(second.valid).toBe(true);
+    if (!first.valid || !second.valid) {
+      return;
+    }
+    expect(first.result).toEqual(second.result);
+  });
+
+  it("does not mutate inputs", () => {
+    const executionResult = acceptedExecutionResult();
+    const input = { executionResult, currentTimestamp: NOW };
+    const snapshot = structuredClone(input);
+    const outcome = runInternalDeliveryPilotV1(input);
     expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-
-    expect(outcome.result).toEqual(createEmptyAdsInternalDeliveryPilotResult());
-    expect(outcome.result.pilotSuccess).toBe(false);
-    expect(outcome.result.reason).toBe("empty_pipeline");
-    expect(outcome.result.renderDescriptor).toBeNull();
-    expect(outcome.result.selectedCandidateId).toBeNull();
-    expect(outcome.result.served).toBe(false);
-    expect(outcome.result.deliveryEnabled).toBe(false);
-    expect(outcome.result.productionEnabled).toBe(false);
+    expect(input).toEqual(snapshot);
   });
 
-  it("soft-fails when selected without render descriptor", () => {
-    const outcome = runAdsExecutionLayer({
-      inventory: baseInventory([
-        inventoryCandidate({ candidateId: "candidate-1" }),
-      ]),
-      request: baseRequest(["candidate-1"], {
-        featureFlags: enabledFlagsFor("WATCH_FEED"),
-      }),
-      eligibilityStates: [eligibilityState({ candidateId: "candidate-1" })],
-      renderMaterial: null,
+  it("keeps kill switches false even when delivery is accepted", () => {
+    const outcome = runInternalDeliveryPilotV1(baseInput());
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+    expectKillSwitchesDisabled(outcome.result);
+    expect(outcome.result.renderDescriptor?.productionEnabled).toBe(false);
+  });
+
+  it("soft-rejects when upstream execution was not accepted", () => {
+    const executionResult = rejectedExecutionResult({ expiresAt: EXPIRED });
+    const outcome = runInternalDeliveryPilotV1({
+      executionResult,
+      currentTimestamp: NOW,
     });
     expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-    expect(outcome.result.selectedCandidateId).toBe("candidate-1");
+    if (!outcome.valid) {
+      return;
+    }
+    expect(outcome.result.deliveryAccepted).toBe(false);
+    expect(outcome.result.deliveryRejected).toBe(true);
     expect(outcome.result.renderDescriptor).toBeNull();
-
-    const pilot = runInternalDeliveryPilot(
-      { executionResult: outcome.result },
-      { nowMs: NOW_MS }
+    expect(outcome.result.pipelineStage).toBe("validate");
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "execution_not_accepted"
     );
-    expect(pilot.valid).toBe(true);
-    if (!pilot.valid) return;
-    expect(pilot.result.pilotSuccess).toBe(false);
-    expect(pilot.result.reason).toBe("missing_render_descriptor");
-    expect(pilot.result.renderDescriptor).toBeNull();
-    expect(pilot.result.selectedCandidateId).toBe("candidate-1");
-    expect(pilot.result.served).toBe(false);
+    expectKillSwitchesDisabled(outcome.result);
   });
 
-  it("rejects an invalid render descriptor", () => {
-    const executionResult = successfulExecutionResult();
-    const descriptor = executionResult.renderDescriptor;
-    expect(descriptor).not.toBeNull();
-    if (!descriptor) return;
+  it("soft-rejects expired descriptors at validate_delivery", () => {
+    // Accept execution at expiry boundary, then advance the pilot clock past skew.
+    const accepted = acceptedExecutionResult({
+      renderDescriptor: buildDescriptor({
+        expiresAt: BOUNDARY_EXPIRES_AT,
+      }),
+      currentTimestamp: BOUNDARY_EXPIRES_AT,
+    });
+    expect(accepted.executionAccepted).toBe(true);
 
-    const invalidDescriptor = {
-      ...descriptor,
-      mediaReference: "https://cdn.example.com/video.mp4",
-    } as AdsRenderDescriptor;
+    const afterSkew = runInternalDeliveryPilotV1({
+      executionResult: accepted,
+      currentTimestamp: isoFromMs(
+        BOUNDARY_EXPIRES_AT_MS + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS + 1
+      ),
+    });
+    expect(afterSkew.valid).toBe(true);
+    if (!afterSkew.valid) {
+      return;
+    }
+    expect(afterSkew.result.deliveryAccepted).toBe(false);
+    expect(afterSkew.result.diagnostics.rejectionReason).toBe(
+      "descriptor_expired"
+    );
+    expect(afterSkew.result.pipelineStage).toBe("validate_delivery");
+    expect(afterSkew.result.renderDescriptor).toBeNull();
+    expectKillSwitchesDisabled(afterSkew.result);
+  });
 
-    const tampered = {
-      ...executionResult,
-      renderDescriptor: invalidDescriptor,
+  it("honors exact ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS expiry boundaries", () => {
+    expect(ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS).toBe(5_000);
+
+    const accepted = acceptedExecutionResult({
+      renderDescriptor: buildDescriptor({
+        expiresAt: BOUNDARY_EXPIRES_AT,
+      }),
+      currentTimestamp: BOUNDARY_EXPIRES_AT,
+    });
+
+    const lowerBoundaryMs = BOUNDARY_EXPIRES_AT_MS;
+    const upperBoundaryMs =
+      BOUNDARY_EXPIRES_AT_MS + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS;
+
+    const atLower = runInternalDeliveryPilotV1({
+      executionResult: accepted,
+      currentTimestamp: isoFromMs(lowerBoundaryMs),
+    });
+    expect(atLower.valid).toBe(true);
+    if (atLower.valid) {
+      expect(atLower.result.deliveryAccepted).toBe(true);
+      expectKillSwitchesDisabled(atLower.result);
+    }
+
+    const beforeLower = runInternalDeliveryPilotV1({
+      executionResult: accepted,
+      currentTimestamp: isoFromMs(lowerBoundaryMs - 1),
+    });
+    expect(beforeLower.valid).toBe(true);
+    if (beforeLower.valid) {
+      expect(beforeLower.result.deliveryAccepted).toBe(true);
+      expectKillSwitchesDisabled(beforeLower.result);
+    }
+
+    const atUpper = runInternalDeliveryPilotV1({
+      executionResult: accepted,
+      currentTimestamp: isoFromMs(upperBoundaryMs),
+    });
+    expect(atUpper.valid).toBe(true);
+    if (atUpper.valid) {
+      expect(atUpper.result.deliveryAccepted).toBe(true);
+      expectKillSwitchesDisabled(atUpper.result);
+    }
+
+    const afterUpper = runInternalDeliveryPilotV1({
+      executionResult: accepted,
+      currentTimestamp: isoFromMs(upperBoundaryMs + 1),
+    });
+    expect(afterUpper.valid).toBe(true);
+    if (afterUpper.valid) {
+      expect(afterUpper.result.deliveryAccepted).toBe(false);
+      expect(afterUpper.result.deliveryRejected).toBe(true);
+      expect(afterUpper.result.diagnostics.rejectionReason).toBe(
+        "descriptor_expired"
+      );
+      expect(afterUpper.result.pipelineStage).toBe("validate_delivery");
+      expect(afterUpper.result.renderDescriptor).toBeNull();
+      expectKillSwitchesDisabled(afterUpper.result);
+    }
+  });
+
+  it("soft-rejects incomplete tracking identity at validate_delivery", () => {
+    const executionResult = acceptedExecutionWithDeliveryDescriptorDefect(
+      (descriptor) =>
+        ({
+          ...descriptor,
+          trackingReferences: {
+            ...descriptor.trackingReferences,
+            creativeId: "",
+          },
+        }) as AdsRenderDescriptor
+    );
+
+    const outcome = runInternalDeliveryPilotV1({
+      executionResult,
+      currentTimestamp: NOW,
+    });
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+
+    expect(outcome.result.deliveryAccepted).toBe(false);
+    expect(outcome.result.deliveryRejected).toBe(true);
+    expect(outcome.result.renderDescriptor).toBeNull();
+    expect(outcome.result.pipelineStage).toBe("validate_delivery");
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "identity_incomplete"
+    );
+    expect(outcome.result.diagnostics.deliveryAccepted).toBe(false);
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("soft-rejects placement-incompatible descriptors at validate_delivery", () => {
+    const executionResult = acceptedExecutionWithDeliveryDescriptorDefect(
+      (descriptor) =>
+        ({
+          ...descriptor,
+          placementId: "WATCH_FEED",
+          creativeType: "game_promotion",
+        }) as AdsRenderDescriptor
+    );
+
+    const outcome = runInternalDeliveryPilotV1({
+      executionResult,
+      currentTimestamp: NOW,
+    });
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+
+    expect(outcome.result.deliveryAccepted).toBe(false);
+    expect(outcome.result.deliveryRejected).toBe(true);
+    expect(outcome.result.renderDescriptor).toBeNull();
+    expect(outcome.result.pipelineStage).toBe("validate_delivery");
+    expect(outcome.result.diagnostics.rejectionReason).toBe(
+      "placement_incompatible"
+    );
+    expect(outcome.result.diagnostics.deliveryAccepted).toBe(false);
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("treats candidateId as opaque selection binding and never rewrites descriptor tracking identity", () => {
+    const descriptor = buildDescriptor();
+    const trackingSnapshot = {
+      campaignId: descriptor.trackingReferences.campaignId,
+      adSetId: descriptor.trackingReferences.adSetId,
+      adId: descriptor.trackingReferences.adId,
+      creativeId: descriptor.trackingReferences.creativeId,
     };
 
-    const outcome = runInternalDeliveryPilot(
-      { executionResult: tampered },
-      { nowMs: NOW_MS }
+    const execution = runAdsExecutionLayerV1({
+      candidateId: "opaque-selection-binding-999",
+      renderDescriptor: descriptor,
+      currentTimestamp: NOW,
+    });
+    expect(execution.valid).toBe(true);
+    if (!execution.valid) {
+      return;
+    }
+
+    const outcome = runInternalDeliveryPilotV1({
+      executionResult: execution.result,
+      currentTimestamp: NOW,
+    });
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) {
+      return;
+    }
+
+    expect(outcome.result.candidateId).toBe("opaque-selection-binding-999");
+    expect(outcome.result.renderDescriptor?.trackingReferences).toEqual(
+      trackingSnapshot
     );
+    expectKillSwitchesDisabled(outcome.result);
+  });
+
+  it("fails closed on unknown input fields and missing executionResult", () => {
+    expect(
+      runInternalDeliveryPilotV1({
+        ...baseInput(),
+        selectedAd: "nope",
+      }).valid
+    ).toBe(false);
+
+    expect(
+      runInternalDeliveryPilotV1({
+        currentTimestamp: NOW,
+      }).valid
+    ).toBe(false);
+
+    expect(runInternalDeliveryPilotV1(null).valid).toBe(false);
+  });
+
+  it("rejects client-authoritative identity override fields with no fallback", () => {
+    const outcome = runInternalDeliveryPilotV1({
+      ...baseInput(),
+      campaignId: "client-override",
+      adSetId: "client-override",
+      adId: "client-override",
+      creativeId: "client-override",
+      trackingReferences: {
+        campaignId: "hijack",
+        adSetId: "hijack",
+        adId: "hijack",
+        creativeId: "hijack",
+      },
+    });
     expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
+    if (outcome.valid) {
+      return;
+    }
+    expect(
+      outcome.issues.some((issue) => issue.includes("unknown field"))
+    ).toBe(true);
+    expect(outcome).not.toHaveProperty("result");
+  });
+
+  it("hard-fails on prohibited top-level URL/storage fields", () => {
+    const outcome = runInternalDeliveryPilotV1({
+      ...baseInput(),
+      mediaUrl: "https://evil.example/ad.mp4",
+    });
+    expect(outcome.valid).toBe(false);
+    if (outcome.valid) {
+      return;
+    }
     expect(
       outcome.issues.some(
         (issue) =>
-          issue.includes("Invalid render descriptor") ||
-          issue.includes("Inconsistent execution result") ||
-          issue.includes("not a URL")
+          issue.includes('prohibited field "mediaUrl"') ||
+          issue.includes("not allowed on internal delivery pilot input")
       )
     ).toBe(true);
+    expect(outcome).not.toHaveProperty("result");
   });
 
-  it("rejects an invalid selected candidate id", () => {
-    const executionResult = successfulExecutionResult();
+  it("hard-fails on inconsistent execution results", () => {
+    const executionResult = acceptedExecutionResult();
     const tampered = {
       ...executionResult,
-      selectedCandidateId: "not-in-selectable-set",
+      selectedCandidateId: "not-a-field",
+      executionAccepted: true,
+      executionRejected: true,
     };
-
-    const outcome = runInternalDeliveryPilot(
-      { executionResult: tampered },
-      { nowMs: NOW_MS }
-    );
+    const outcome = runInternalDeliveryPilotV1({
+      executionResult: tampered,
+      currentTimestamp: NOW,
+    });
     expect(outcome.valid).toBe(false);
-    if (outcome.valid) return;
+    if (outcome.valid) {
+      return;
+    }
     expect(
       outcome.issues.some((issue) =>
         issue.includes("Inconsistent execution result")
@@ -337,89 +575,101 @@ describe("Ads Internal Delivery Pilot V1", () => {
     ).toBe(true);
   });
 
-  it("rejects unknown fields and non-execution inputs", () => {
-    expect(runInternalDeliveryPilot(null).valid).toBe(false);
+  it("validateAdsInternalDeliveryInternalResult accepts valid and rejects malformed", () => {
+    const accepted = runInternalDeliveryPilotV1(baseInput());
+    expect(accepted.valid).toBe(true);
+    if (!accepted.valid) {
+      return;
+    }
     expect(
-      runInternalDeliveryPilot({
-        executionResult: createEmptyAdsExecutionResult(),
-        inventory: createEmptyInventory({ generatedAt: GENERATED_AT }),
-      }).valid
-    ).toBe(false);
-    expect(
-      runInternalDeliveryPilot({
-        candidates: [{ candidateId: "raw" }],
-      }).valid
-    ).toBe(false);
-  });
+      validateAdsInternalDeliveryInternalResult(accepted.result, {
+        nowMs: NOW_MS,
+      })
+    ).toEqual({ valid: true });
 
-  it("rejects productionEnabled, deliveryEnabled, or served being true", () => {
+    expect(validateAdsInternalDeliveryInternalResult(null).valid).toBe(false);
     expect(
-      validateAdsInternalDeliveryPilotResult({
-        ...createEmptyAdsInternalDeliveryPilotResult(),
+      validateAdsInternalDeliveryInternalResult({
+        ...accepted.result,
         productionEnabled: true,
       }).valid
     ).toBe(false);
     expect(
-      validateAdsInternalDeliveryPilotResult({
-        ...createEmptyAdsInternalDeliveryPilotResult(),
+      validateAdsInternalDeliveryInternalResult({
+        ...accepted.result,
+        executionEnabled: true,
+      }).valid
+    ).toBe(false);
+    expect(
+      validateAdsInternalDeliveryInternalResult({
+        ...accepted.result,
         deliveryEnabled: true,
       }).valid
     ).toBe(false);
     expect(
-      validateAdsInternalDeliveryPilotResult({
-        ...createEmptyAdsInternalDeliveryPilotResult(),
-        served: true,
+      validateAdsInternalDeliveryInternalResult({
+        ...accepted.result,
+        deliveryAccepted: true,
+        deliveryRejected: true,
       }).valid
     ).toBe(false);
   });
 
-  it("produces deterministic frozen output without mutating inputs", () => {
-    const executionResult = successfulExecutionResult();
-    const input = { executionResult };
-    const snapshot = structuredClone(input);
+  it("asserts kill switches on every representative soft-reject path", () => {
+    const paths = [
+      runInternalDeliveryPilotV1({
+        executionResult: rejectedExecutionResult({ expiresAt: EXPIRED }),
+        currentTimestamp: NOW,
+      }),
+      runInternalDeliveryPilotV1({
+        executionResult: acceptedExecutionResult({
+          renderDescriptor: buildDescriptor({
+            expiresAt: BOUNDARY_EXPIRES_AT,
+          }),
+          currentTimestamp: BOUNDARY_EXPIRES_AT,
+        }),
+        currentTimestamp: isoFromMs(
+          BOUNDARY_EXPIRES_AT_MS + ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS + 1
+        ),
+      }),
+      runInternalDeliveryPilotV1({
+        executionResult: acceptedExecutionWithDeliveryDescriptorDefect(
+          (descriptor) =>
+            ({
+              ...descriptor,
+              trackingReferences: {
+                ...descriptor.trackingReferences,
+                creativeId: "",
+              },
+            }) as AdsRenderDescriptor
+        ),
+        currentTimestamp: NOW,
+      }),
+      runInternalDeliveryPilotV1({
+        executionResult: acceptedExecutionWithDeliveryDescriptorDefect(
+          (descriptor) =>
+            ({
+              ...descriptor,
+              placementId: "WATCH_FEED",
+              creativeType: "game_promotion",
+            }) as AdsRenderDescriptor
+        ),
+        currentTimestamp: NOW,
+      }),
+    ];
 
-    const first = runInternalDeliveryPilot(input, { nowMs: NOW_MS });
-    const second = runInternalDeliveryPilot(input, { nowMs: NOW_MS });
-    expect(first.valid && second.valid).toBe(true);
-    if (!first.valid || !second.valid) return;
-
-    expect(first.result).toEqual(second.result);
-    expect(Object.isFrozen(first.result)).toBe(true);
-    expect(first.result.served).toBe(false);
-    expect(first.result.deliveryEnabled).toBe(false);
-    expect(first.result.productionEnabled).toBe(false);
-    expect(input).toEqual(snapshot);
+    for (const outcome of paths) {
+      expect(outcome.valid).toBe(true);
+      if (!outcome.valid) {
+        continue;
+      }
+      expect(outcome.result.deliveryAccepted).toBe(false);
+      expect(outcome.result.renderDescriptor).toBeNull();
+      expectKillSwitchesDisabled(outcome.result);
+    }
   });
 
-  it("keeps served, deliveryEnabled, and productionEnabled false on success", () => {
-    const outcome = runInternalDeliveryPilot(
-      { executionResult: successfulExecutionResult() },
-      { nowMs: NOW_MS }
-    );
-    expect(outcome.valid).toBe(true);
-    if (!outcome.valid) return;
-    expect(outcome.result.served).toBe(false);
-    expect(outcome.result.deliveryEnabled).toBe(false);
-    expect(outcome.result.productionEnabled).toBe(false);
-    expect(outcome.result.renderDescriptor?.productionEnabled).toBe(false);
-  });
-
-  it("validateAdsInternalDeliveryPilotResult accepts empty and rejects malformed", () => {
-    expect(
-      validateAdsInternalDeliveryPilotResult(
-        createEmptyAdsInternalDeliveryPilotResult()
-      )
-    ).toEqual({ valid: true });
-    expect(validateAdsInternalDeliveryPilotResult(null).valid).toBe(false);
-    expect(
-      validateAdsInternalDeliveryPilotResult({
-        ...createEmptyAdsInternalDeliveryPilotResult(),
-        extra: true,
-      }).valid
-    ).toBe(false);
-  });
-
-  it("has no product wiring, database, network, or rendering", () => {
+  it("has no ranking, delivery, DB, network, or product imports", () => {
     expect(SOURCE).not.toMatch(/from ["']@\//);
     expect(SOURCE).not.toMatch(/from ["']\.\.\//);
     expect(SOURCE).not.toMatch(
@@ -432,12 +682,12 @@ describe("Ads Internal Delivery Pilot V1", () => {
     expect(SOURCE).not.toMatch(/Math\.random|Date\.now|performance\.now/);
     expect(SOURCE).not.toMatch(/ADS_DELIVERY_ENABLED\s*=\s*true/);
     expect(SOURCE).not.toMatch(
-      /\brankCandidates\b|\brunAuction\b|\bpacing\b|\bbilling\b|renderCreative|serveAd\b/i
+      /\brankCandidates\b|\brunAuction\b|\bpacing\b|\bbilling\b/i
     );
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/deliveryEnabled: false/);
-    expect(SOURCE).toMatch(/served: false/);
-    expect(SOURCE).toMatch(/runInternalDeliveryPilot/);
-    expect(SOURCE).toMatch(/validateAdsExecutionResult/);
+    expect(SOURCE).toMatch(/executionEnabled: false/);
+    expect(SOURCE).toMatch(/validateAdsExecutionInternalResult/);
+    expect(SOURCE).toMatch(/runInternalDeliveryPilotV1/);
   });
 });

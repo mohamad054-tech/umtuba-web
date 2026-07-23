@@ -2,23 +2,25 @@
 
 ## Task
 
-UMTUBA Ads Platform — Execution Layer V1 Final Hardening (`alpha-0.2`)
+UMTUBA Ads Platform — Internal Delivery Pilot V1 Final Test Gap Closure
+(`alpha-0.2`)
 
 ## Summary
 
-Closed Final Review findings for Execution Layer V1 without changing expiry
-semantics:
+Closed remaining behavioral soft-reject test gaps for Internal Delivery Pilot
+V1 without changing production behavior:
 
-- Exact `ADS_RENDER_DESCRIPTOR_EXPIRY_SKEW_MS` boundary coverage
-  (lower / before-lower / upper / after-upper)
-- Dedicated opaque `candidateId` binding authority tests (no false
-  candidate↔tracking cross-check)
-- Kill switches asserted on every representative soft-reject path
-- Explicit prohibited top-level `mediaUrl` hard-fail test
-- Restaged complete `executionLayer.ts` (not the re-export stub)
+- Explicit `identity_incomplete` soft-reject at `validate_delivery`
+- Explicit `placement_incompatible` soft-reject at `validate_delivery`
 
-Kill switches remain always false: `productionEnabled`, `deliveryEnabled`,
-`executionEnabled`.
+Both assert: rejection reason, pipeline stops before `deliver`, kill switches
+false, and `renderDescriptor` null (no delivery result emitted).
+
+Fixtures use an accepted execution snapshot that passes structural validation,
+then exposes a defective descriptor on later reads — same pattern as the
+expiry soft-reject coverage (structural pin vs delivery re-assertion).
+
+**Production code (`internalDeliveryPilot.ts`) was not modified.**
 
 **`app/discover/components/DiscoverShell.tsx` was not modified.**
 
@@ -28,10 +30,7 @@ Kill switches remain always false: `productionEnabled`, `deliveryEnabled`,
 
 | Path | Action |
 | --- | --- |
-| `lib/ads/platform/executionLayer.ts` | Execution Layer V1 + foundation re-export (full file staged) |
-| `lib/ads/platform/executionLayer.test.ts` | hardened — boundary / authority / kill-switch / prohibited tests |
-| `lib/ads/platform/executionLayerFoundation.ts` | prior inventory orchestrator (moved) |
-| `lib/ads/platform/executionLayerFoundation.test.ts` | prior foundation tests (moved) |
+| `lib/ads/platform/internalDeliveryPilot.test.ts` | added identity_incomplete + placement_incompatible soft-reject tests |
 | `docs/ai/CURRENT_TASK.md` | updated — this handoff |
 | `docs/ai/CURSOR_REPORT.md` | updated — this report |
 
@@ -41,19 +40,16 @@ Kill switches remain always false: `productionEnabled`, `deliveryEnabled`,
 
 ## Security review
 
-- No client-authoritative identity override fields accepted on input.
-- Descriptor tracking identity is authoritative; `candidateId` is opaque.
-- Prohibited URL/storage fields fail closed on input.
-- Kill switches forced false on every accepted and soft-rejected result.
-- No network, storage, Supabase, or product-surface imports.
-- Clock injected via `currentTimestamp` (no `Date.now` / entropy).
+- No production behavior change.
+- Tests only; kill switches remain asserted false on new soft-reject paths.
+- No network, storage, Supabase, or product-surface imports introduced.
 
 ## Tests
 
-- Affected: `executionLayer.test.ts` + `executionLayerFoundation.test.ts` —
-  **35/35 passed** (16 V1 + 19 foundation).
-- Platform suite: `npx vitest run lib/ads/platform` — **24 files, 448 tests,
-  all passed**.
+- Affected: `internalDeliveryPilot.test.ts` — **18/18 passed** (was 16; +2).
+- Foundation: `internalDeliveryPilotFoundation.test.ts` — **12/12 passed**.
+- Platform suite: `npx vitest run lib/ads/platform` — **25 files, 466 tests,
+  all passed** (was 464).
 
 ## TypeScript
 
@@ -65,24 +61,23 @@ Kill switches remain always false: `productionEnabled`, `deliveryEnabled`,
 
 ## git diff --check
 
-`git diff --cached --check` — **clean**.
+`git diff --check` — **clean**.
 
 ## git status --short
 
 ```
  M app/discover/components/DiscoverShell.tsx
-M  docs/ai/CURRENT_TASK.md
-M  docs/ai/CURSOR_REPORT.md
-M  lib/ads/platform/executionLayer.test.ts
-M  lib/ads/platform/executionLayer.ts
-A  lib/ads/platform/executionLayerFoundation.test.ts
-A  lib/ads/platform/executionLayerFoundation.ts
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+RM lib/ads/platform/internalDeliveryPilot.test.ts -> lib/ads/platform/internalDeliveryPilotFoundation.test.ts
+RM lib/ads/platform/internalDeliveryPilot.ts -> lib/ads/platform/internalDeliveryPilotFoundation.ts
+?? lib/ads/platform/internalDeliveryPilot.test.ts
+?? lib/ads/platform/internalDeliveryPilot.ts
 ```
-
-(`DiscoverShell.tsx` remains unstaged / unrelated.)
 
 ## Open issues
 
-- None blocking for Execution Layer V1 commit readiness after hardening.
-- Foundation orchestrator remains available for legacy consumers; new path
-  should prefer `runAdsExecutionLayerV1`.
+- None for Internal Delivery Pilot V1 test gap closure.
+- Unrelated local change remains in `DiscoverShell.tsx` (out of scope; not
+  touched).
+- No commit/push (per instructions).
