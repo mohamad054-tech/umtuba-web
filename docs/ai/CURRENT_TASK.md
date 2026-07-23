@@ -2,32 +2,30 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Ads Operations & Activation Foundation V1
+UMTUBA Ads Platform — Campaign Management Foundation V1
 
 ## Goal
 
-Implement the operational foundation required to safely operate the Ads Platform:
-centralized operational state, feature flags, kill switches, readiness evaluation,
-health checks, immutable ops audit records, and admin operations contracts —
-without enabling production serving, billing, payments, or real campaign delivery.
+Implement the complete internal campaign management foundation: campaign/ad-set/
+creative contracts, budget, scheduling, targeting, approval workflow, centralized
+validation, and admin contracts — without enabling production serving, billing,
+real delivery, payments, UI, or public endpoints.
 
 ## Allowed scope
 
-- `lib/ads/operations/**`
-- `lib/ads/operationsFoundation.ts` (if used as facade)
+- `lib/ads/campaignManagement/**`
 - `lib/ads/index.ts` (safe exports only)
-- `lib/ads/operationsFoundation.test.ts` / `lib/ads/operations/**/*.test.ts`
-- `docs/ads/ADS_OPERATIONS_ACTIVATION_FOUNDATION_V1.md`
+- `docs/ads/ADS_CAMPAIGN_MANAGEMENT_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Games / Learning / Store / World product surfaces
-- Enabling live delivery or live billing
-- Payment providers / production endpoints / production UI
-- Migrations that activate production
-- Weakening kill switches or bypassing `runAdsCanonicalStackV1`
+- Modifying Canonical Stack / Provenance / Billing / Measurement / Kill switches
+- Enabling productionEnabled / deliveryEnabled / billingEnabled /
+  productionAccepted / authoritativeProductionServing
+- Production APIs, public endpoints, UI, payment providers
+- Games / Learning / Store / World
 - Commit / push unless explicitly requested
 
 ## Branch

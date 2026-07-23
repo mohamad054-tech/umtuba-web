@@ -42,4 +42,9 @@ export type {
  * Never enables production serving, billing, or payments.
  */
 export * from "./operations";
+/**
+ * Ads Campaign Management Foundation V1 — contracts only.
+ * Never enables production serving, billing, or real delivery.
+ */
+export * from "./campaignManagement";
 export * from "./platform";

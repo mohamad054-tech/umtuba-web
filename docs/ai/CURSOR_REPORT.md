@@ -2,31 +2,33 @@
 
 ## Summary
 
-Ads Operations & Activation Foundation V1 **PASS** on `alpha-0.2`.
+Ads Campaign Management Foundation V1 **PASS** on `alpha-0.2`.
 
-- Centralized operational state (frozen `development`; production transitions fail closed)
-- Centralized feature flags (delivery/billing hard-closed)
-- Centralized kill switches (serving/billing/measurement permanently engaged)
-- Readiness evaluation with `productionEligible: false`
-- Read-only health reporting for foundations
-- Immutable in-process ops audit (`applied: false`)
-- Internal admin ops contracts (no UI / no production endpoints)
-- Validation: ops tests 8/8, `lib/ads` 765/765, `tsc --noEmit` pass, `npm run build` pass
+- Canonical campaign / ad-set / creative contracts
+- Budget, schedule, targeting foundations (validation only)
+- Approval lifecycle state machine (never enables serving)
+- Centralized fail-closed validation + internal admin contracts
+- All production/delivery/billing authority flags remain false
+- Did not modify Canonical Stack, Provenance, Billing, Measurement, or Kill switches
+- Validation: CM tests 6/6, `lib/ads` 771/771, `tsc --noEmit` pass, `npm run build` pass
 - Not committed
 
 ## Exact files changed
 
-- `lib/ads/operations/operationsState.ts` (new)
-- `lib/ads/operations/featureFlags.ts` (new)
-- `lib/ads/operations/killSwitches.ts` (new)
-- `lib/ads/operations/readiness.ts` (new)
-- `lib/ads/operations/health.ts` (new)
-- `lib/ads/operations/audit.ts` (new)
-- `lib/ads/operations/adminContracts.ts` (new)
-- `lib/ads/operations/index.ts` (new)
-- `lib/ads/operations/operationsFoundation.test.ts` (new)
+- `lib/ads/campaignManagement/authority.ts` (new)
+- `lib/ads/campaignManagement/lifecycle.ts` (new)
+- `lib/ads/campaignManagement/budget.ts` (new)
+- `lib/ads/campaignManagement/schedule.ts` (new)
+- `lib/ads/campaignManagement/targeting.ts` (new)
+- `lib/ads/campaignManagement/creative.ts` (new)
+- `lib/ads/campaignManagement/adSet.ts` (new)
+- `lib/ads/campaignManagement/campaign.ts` (new)
+- `lib/ads/campaignManagement/validation.ts` (new)
+- `lib/ads/campaignManagement/adminContracts.ts` (new)
+- `lib/ads/campaignManagement/index.ts` (new)
+- `lib/ads/campaignManagement/campaignManagementFoundation.test.ts` (new)
 - `lib/ads/index.ts`
-- `docs/ads/ADS_OPERATIONS_ACTIVATION_FOUNDATION_V1.md` (new)
+- `docs/ads/ADS_CAMPAIGN_MANAGEMENT_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -36,17 +38,16 @@ None — **NO MIGRATION REQUIRED**
 
 ## Security review
 
-- Production/serving/billing authority flags forced false
-- Permanent kill switches cannot be disengaged
-- Feature-flag enablement of delivery/billing rejected
-- Audit records never claim `applied: true` or production effects
-- No payment providers, production endpoints, or UI added
-- Canonical stack authority untouched
+- Serving eligibility permanently false in every lifecycle state
+- Budget billing execution refused; schedule activation refused
+- Admin transitions return `applied: false` / `enablesServing: false`
+- No UI, public endpoints, or payment providers
+- Authority flags forced false on all foundation objects
 
 ## Tests
 
-- Targeted: `lib/ads/operations/operationsFoundation.test.ts` — 8/8 pass
-- Full: `npx vitest run lib/ads` — 765/765 pass
+- Targeted: campaignManagementFoundation — 6/6 pass
+- Full: `npx vitest run lib/ads` — 771/771 pass
 
 ## TypeScript
 
@@ -66,12 +67,11 @@ None — **NO MIGRATION REQUIRED**
  M docs/ai/CURRENT_TASK.md
  M docs/ai/CURSOR_REPORT.md
  M lib/ads/index.ts
-?? docs/ads/ADS_OPERATIONS_ACTIVATION_FOUNDATION_V1.md
-?? lib/ads/operations/
+?? docs/ads/ADS_CAMPAIGN_MANAGEMENT_FOUNDATION_V1.md
+?? lib/ads/campaignManagement/
 ```
 
 ## Open issues
 
 - Commit pending explicit user request
-- Ops audit is in-process only (no durable DB store) — intentional for V1 foundation
-- Flags/switches are frozen tables; proposals audit-only until a later activation slice
+- Foundation contracts are in-memory/validation-only; not wired to DB mutations
