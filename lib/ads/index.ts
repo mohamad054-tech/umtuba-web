@@ -47,4 +47,9 @@ export * from "./operations";
  * Never enables production serving, billing, or real delivery.
  */
 export * from "./campaignManagement";
+/**
+ * Ads Reporting & Analytics Foundation V1 — contracts only.
+ * Never enables production serving, billing, ingestion, or live metrics.
+ */
+export * from "./reporting";
 export * from "./platform";

@@ -2,29 +2,30 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Campaign Management Foundation V1
+UMTUBA Ads Platform — Reporting & Analytics Foundation V1
 
 ## Goal
 
-Implement the complete internal campaign management foundation: campaign/ad-set/
-creative contracts, budget, scheduling, targeting, approval workflow, centralized
-validation, and admin contracts — without enabling production serving, billing,
-real delivery, payments, UI, or public endpoints.
+Implement the complete internal reporting foundation: reporting domain, analytics
+models, aggregation, filtering/dimensions, export contracts, centralized
+validation, and internal inspection contracts — without enabling production
+serving, billing, real event ingestion, production dashboards, or public APIs.
 
 ## Allowed scope
 
-- `lib/ads/campaignManagement/**`
+- `lib/ads/reporting/**`
 - `lib/ads/index.ts` (safe exports only)
-- `docs/ads/ADS_CAMPAIGN_MANAGEMENT_FOUNDATION_V1.md`
+- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Modifying Canonical Stack / Provenance / Billing / Measurement / Kill switches
+- Modifying Canonical Stack, Provenance, Operations, Campaign Management,
+  Billing, or Measurement foundations
 - Enabling productionEnabled / deliveryEnabled / billingEnabled /
   productionAccepted / authoritativeProductionServing
-- Production APIs, public endpoints, UI, payment providers
+- Public APIs, admin UI, production endpoints, live ingestion
 - Games / Learning / Store / World
 - Commit / push unless explicitly requested
 
@@ -34,4 +35,4 @@ real delivery, payments, UI, or public endpoints.
 
 ## Status
 
-`implemented — validation complete in this handoff; not committed.`
+`complete` — PASS (not committed)
