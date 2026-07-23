@@ -52,6 +52,9 @@ export * from "./auction";
 /** Billing & Charging Foundation V1 — eligibility + charge contracts only, kill switches off. */
 export * from "./charging";
 export * from "./billing";
+/** Fraud & Invalid Traffic Foundation V1 — deterministic diagnostics only, kill switches off. */
+export * from "./invalidTraffic";
+export * from "./fraud";
 /** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
 export * from "./executionLayer";
 /** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */
