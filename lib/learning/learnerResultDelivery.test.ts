@@ -152,15 +152,15 @@ describe("Learner Result Delivery V1 — visibility matrix", () => {
     expect(fn).toMatch(/v_visibility := 'hidden'/);
   });
 
-  it("never / after_close / manual fail-closed; immediately/after_submit active", () => {
+  it("never fail-closed; after_close/manual unlockable; immediately/after_submit active", () => {
     expect([...LEARNING_LEARNER_RESULT_ACTIVE_POLICIES]).toEqual([
       "immediately",
       "after_submit",
+      "after_close",
+      "manual",
     ]);
     expect([...LEARNING_LEARNER_RESULT_FAIL_CLOSED_POLICIES]).toEqual([
       "never",
-      "after_close",
-      "manual",
     ]);
     expect(fn).toMatch(/'immediately'/);
     expect(fn).toMatch(/'after_submit'/);
