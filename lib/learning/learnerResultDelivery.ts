@@ -28,18 +28,16 @@ export const LEARNING_LEARNER_RESULT_VISIBILITIES = [
 export type LearningLearnerResultVisibility =
   (typeof LEARNING_LEARNER_RESULT_VISIBILITIES)[number];
 
-/** Policies that can surface aggregate results in V1. */
+/** Policies that can surface aggregate results when their gates pass. */
 export const LEARNING_LEARNER_RESULT_ACTIVE_POLICIES = [
   "immediately",
   "after_submit",
-] as const;
-
-/** Policies that remain fail-closed in V1. */
-export const LEARNING_LEARNER_RESULT_FAIL_CLOSED_POLICIES = [
-  "never",
   "after_close",
   "manual",
 ] as const;
+
+/** Policies that remain fail-closed with no unlock path. */
+export const LEARNING_LEARNER_RESULT_FAIL_CLOSED_POLICIES = ["never"] as const;
 
 export const LEARNING_LEARNER_RESULT_MESSAGES = {
   hidden: "Results are not available.",
