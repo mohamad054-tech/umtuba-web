@@ -2,32 +2,23 @@
 
 ## Summary
 
-Ads Reporting & Analytics Foundation V1 **PASS** on `alpha-0.2`.
+UM Games Hub / Runtime Foundation V1 **PASS** on
+`office/games-hub-runtime-foundation-v1`.
 
-- Canonical reporting domain (campaign / ad_set / creative / placement / advertiser / platform)
-- Analytics model with placeholder metrics (spend/conversions explicit placeholders; never live-sourced)
-- Aggregation contracts (hourly / daily / weekly / monthly / custom_range)
-- Dimension filter validation; CSV/JSON export contracts (`generatesFile: false`)
-- Centralized fail-closed validation + internal inspect/propose-export contracts
-- All production/delivery/billing/ingestion authority flags remain false
-- Did not modify Canonical Stack, Provenance, Operations, Campaign Management, Billing, or Measurement
-- Validation: reporting tests 5/5, `lib/ads` 776/776, `tsc --noEmit` pass, `npm run build` pass
+- Hub domain contracts from trusted Catalog entries
+- Fail-closed runtime eligibility
+- Runtime lifecycle: created/active/paused/completed/abandoned/expired
+- Start / resume / completion handoff / abandon / expiry (idempotent)
+- Authority closed: no game server, rewards, client authority, multiplayer,
+  matchmaking, migrations, public API, production endpoints
+- Did not modify Platform/Catalog foundations, Learning, Ads, Store, World
 - Not committed
 
 ## Exact files changed
 
-- `lib/ads/reporting/authority.ts` (new)
-- `lib/ads/reporting/domain.ts` (new)
-- `lib/ads/reporting/analytics.ts` (new)
-- `lib/ads/reporting/aggregation.ts` (new)
-- `lib/ads/reporting/filters.ts` (new)
-- `lib/ads/reporting/export.ts` (new)
-- `lib/ads/reporting/validation.ts` (new)
-- `lib/ads/reporting/adminContracts.ts` (new)
-- `lib/ads/reporting/index.ts` (new)
-- `lib/ads/reporting/reportingFoundation.test.ts` (new)
-- `lib/ads/index.ts`
-- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md` (new)
+- `lib/games/gamesHubRuntime.ts` (new)
+- `lib/games/gamesHubRuntime.test.ts` (new)
+- `docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -37,16 +28,16 @@ None — **NO MIGRATION REQUIRED**
 
 ## Security review
 
-- Authority flags forced false on all foundation objects
-- Analytics rebuilds as placeholders; rejects `sourcedFromLiveDelivery: true`
-- Export proposals return `applied: false` / `generatesFile: false`
-- No UI, public endpoints, ingestion, or live dashboards
-- Forbidden foundations untouched (source self-check in tests)
+- Catalog is sole authority for status/availability
+- Client forged authoritative claim fields rejected
+- Completion handoff `grantsRewards: false`, `applied: false`
+- Owner mismatch / terminal / unavailable reconnect rejected
+- Double active session rejected
+- No UI / public API / production runtime endpoint
 
 ## Tests
 
-- Targeted: reportingFoundation — 5/5 pass
-- Full: `npx vitest run lib/ads` — 776/776 pass
+- `npx vitest run lib/games` — 60/60 pass (Foundation 27 + Catalog 18 + Hub 15)
 
 ## TypeScript
 
@@ -65,12 +56,12 @@ None — **NO MIGRATION REQUIRED**
 ```
  M docs/ai/CURRENT_TASK.md
  M docs/ai/CURSOR_REPORT.md
- M lib/ads/index.ts
-?? docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md
-?? lib/ads/reporting/
+?? docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md
+?? lib/games/gamesHubRuntime.ts
+?? lib/games/gamesHubRuntime.test.ts
 ```
 
 ## Open issues
 
-- Commit pending explicit user request
-- Foundation contracts are validation-only; no live aggregation or file generation
+- Commit / push pending explicit user request
+- No DB wiring / UI / playable games in this slice
