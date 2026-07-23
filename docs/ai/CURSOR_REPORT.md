@@ -1,83 +1,76 @@
-# Cursor Report
+﻿# CURSOR_REPORT
 
 ## Summary
 
-Implemented **UM Games Catalog Foundation V1** on
-`office/games-platform-foundation-v1` (continues Platform Foundation
-`043257b`).
+Ads Reporting & Analytics Foundation V1 **PASS** on `alpha-0.2`.
 
-Additive migration `20260843` extends `public.games` with catalog metadata
-(availability, visibility, category, difficulty, players, platforms, feature
-flags, versioning, featured), player list/get RPCs, admin upsert/lifecycle
-RPCs, and replaces `start_game_session` to require `availability=available`
-plus `feature_flags.sessions_enabled` (20260842 file untouched). TypeScript
-contracts in `gamesCatalog.ts` validate allowlists and session_ttl_seconds as
-`number`. No gameplay, economy, UM Points, Ads, matchmaking, leaderboards, or
-anti-cheat.
-
-**Verdict: PASS** (games tests 45/45, tsc, build, diff --check). Migration
-Git-only; not applied. Committed and pushed on feature branch only.
+- Canonical reporting domain (campaign / ad_set / creative / placement / advertiser / platform)
+- Analytics model with placeholder metrics (spend/conversions explicit placeholders; never live-sourced)
+- Aggregation contracts (hourly / daily / weekly / monthly / custom_range)
+- Dimension filter validation; CSV/JSON export contracts (`generatesFile: false`)
+- Centralized fail-closed validation + internal inspect/propose-export contracts
+- All production/delivery/billing/ingestion authority flags remain false
+- Did not modify Canonical Stack, Provenance, Operations, Campaign Management, Billing, or Measurement
+- Validation: reporting tests 5/5, `lib/ads` 776/776, `tsc --noEmit` pass, `npm run build` pass
+- Not committed
 
 ## Exact files changed
 
-- `supabase/migrations/20260843_games_catalog_foundation_v1.sql` (new)
-- `docs/games/implementation/GAMES_CATALOG_FOUNDATION_V1.md` (new)
-- `lib/games/gamesCatalog.ts` (new)
-- `lib/games/gamesCatalog.test.ts` (new)
-- `docs/ai/CURRENT_TASK.md` (updated)
-- `docs/ai/CURSOR_REPORT.md` (updated)
+- `lib/ads/reporting/authority.ts` (new)
+- `lib/ads/reporting/domain.ts` (new)
+- `lib/ads/reporting/analytics.ts` (new)
+- `lib/ads/reporting/aggregation.ts` (new)
+- `lib/ads/reporting/filters.ts` (new)
+- `lib/ads/reporting/export.ts` (new)
+- `lib/ads/reporting/validation.ts` (new)
+- `lib/ads/reporting/adminContracts.ts` (new)
+- `lib/ads/reporting/index.ts` (new)
+- `lib/ads/reporting/reportingFoundation.test.ts` (new)
+- `lib/ads/index.ts`
+- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-- `20260843_games_catalog_foundation_v1.sql` — **Git-only; NOT APPLIED** to
-  remote Supabase.
+None — **NO MIGRATION REQUIRED**
 
 ## Security review
 
-- Catalog defaults fail-closed: `availability=unavailable`, `visibility=hidden`.
-- Player RPCs (`list_games_catalog`, `get_game_catalog_by_*`) expose only
-  visible/active catalog rows per visibility rules; revoke from `anon`.
-- Admin upsert/lifecycle gated by `is_platform_admin`; revoke from `anon`.
-- Internal validators (`game_catalog_validate_definition`,
-  `game_catalog_row_to_json`) restricted appropriately.
-- `start_game_session` REPLACE (new migration only) gates on status +
-  availability + `sessions_enabled` feature flag; 20260842 file not edited.
-- Feature flags allowlisted booleans only; no free-form injection surface.
-- No UM Points award/ledger/balance mutation paths.
-- No public leaderboards / cross-player ranking reads.
-- No Ads placement activation; catalog `game_key` ≠ Ads placement id.
-- Authenticated SELECT policy updated for visible catalog entries; FORCE RLS
-  retained from Platform Foundation.
+- Authority flags forced false on all foundation objects
+- Analytics rebuilds as placeholders; rejects `sourcedFromLiveDelivery: true`
+- Export proposals return `applied: false` / `generatesFile: false`
+- No UI, public endpoints, ingestion, or live dashboards
+- Forbidden foundations untouched (source self-check in tests)
 
 ## Tests
 
-- `npx vitest run lib/games` — **45/45 passed** (catalog 18 + foundation 27)
+- Targeted: reportingFoundation — 5/5 pass
+- Full: `npx vitest run lib/ads` — 776/776 pass
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **pass**
-- Fix applied: `session_ttl_seconds` typed as `number` in `gamesCatalog.ts`
+- `npx tsc --noEmit` — pass
 
 ## Build
 
-- `npm run build` — **pass**
+- `npm run build` — pass
 
 ## git diff --check
 
-- **clean**
+- clean
 
 ## git status --short
 
-- Staged/committed on `office/games-platform-foundation-v1` only; pushed to
-  `origin/office/games-platform-foundation-v1`. No merge. Migration not applied.
+```
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M lib/ads/index.ts
+?? docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md
+?? lib/ads/reporting/
+```
 
 ## Open issues
 
-- Migration not applied remotely (intentional).
-- No catalog seed game — operators must upsert via admin RPCs and set
-  lifecycle before sessions can start.
-- Session start now requires catalog availability + `sessions_enabled`;
-  existing Platform-only active rows need catalog fields updated after apply.
-- Privacy / achievements / progress flags stored but V1 does not expose public
-  reads from them.
-- Full anti-cheat not claimed — trust boundaries only.
+- Commit pending explicit user request
+- Foundation contracts are validation-only; no live aggregation or file generation

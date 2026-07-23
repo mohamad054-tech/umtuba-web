@@ -22,9 +22,9 @@ import { GAMES_UM_POINTS_DENYLIST } from "./gamesFoundation";
 
 const ROOT = process.cwd();
 const MIGRATION =
-  "supabase/migrations/20260843_games_catalog_foundation_v1.sql";
+  "supabase/migrations/20260847_games_catalog_foundation_v1.sql";
 const PLATFORM_MIGRATION =
-  "supabase/migrations/20260842_games_platform_foundation_v1.sql";
+  "supabase/migrations/20260846_games_platform_foundation_v1.sql";
 const DOC = "docs/games/implementation/GAMES_CATALOG_FOUNDATION_V1.md";
 const MODULE = "lib/games/gamesCatalog.ts";
 
@@ -77,11 +77,11 @@ describe("Games Catalog Foundation V1 — files", () => {
     expect(platform).not.toMatch(/upsert_game_catalog_entry/);
   });
 
-  it("uses unique 20260843 version", () => {
+  it("uses unique 20260847 version", () => {
     const hits = readdirSync(join(ROOT, "supabase/migrations")).filter((f) =>
-      f.startsWith("20260843")
+      f.startsWith("20260847")
     );
-    expect(hits).toEqual(["20260843_games_catalog_foundation_v1.sql"]);
+    expect(hits).toEqual(["20260847_games_catalog_foundation_v1.sql"]);
   });
 });
 

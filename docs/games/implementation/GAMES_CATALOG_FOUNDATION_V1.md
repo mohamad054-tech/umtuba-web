@@ -2,11 +2,11 @@
 
 Status: **implemented locally** (migration **NOT APPLIED** remotely)
 
-Migration: `supabase/migrations/20260843_games_catalog_foundation_v1.sql`
+Migration: `supabase/migrations/20260847_games_catalog_foundation_v1.sql`
 
 Constants: `lib/games/gamesCatalog.ts`
 
-Depends on: Games Platform Foundation V1 (`20260842`) — **file untouched**.
+Depends on: Games Platform Foundation V1 (`20260846`) — **file untouched**.
 
 ---
 
@@ -76,4 +76,4 @@ anti-cheat engines, playable seeds (Kick Blast etc. register later via upsert).
 ## Rollback
 
 Drop catalog RPCs/helpers; optionally drop added columns in a future down
-migration. Do not edit `20260842`.
+migration. Do not edit `20260846`.

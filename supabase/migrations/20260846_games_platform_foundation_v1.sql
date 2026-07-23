@@ -1,5 +1,7 @@
 -- UM Games Platform Foundation V1
--- Additive only. Next free version after 20260841 (Learning Result Delivery).
+-- Additive only. Version 20260846 (renumbered from 20260842 to avoid
+-- collision with Ads 20260842 on alpha). After Learning 20260841 and after
+-- reserved Learning 20260844–20260845 on other branches.
 --
 -- Provides shared, server-authoritative foundation for ALL UMTUBA games:
 --   games, game_player_profiles, game_sessions, game_session_results,

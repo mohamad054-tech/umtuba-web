@@ -1,5 +1,6 @@
 -- UM Games Catalog Foundation V1
--- Additive only. Does NOT edit 20260842 (Platform Foundation).
+-- Additive only. Does NOT edit 20260846 (Platform Foundation).
+-- Version 20260847 (renumbered from 20260843 after Ads claimed 20260842).
 --
 -- Extends public.games with authoritative catalog metadata so future games
 -- (Kick Blast, Cards, Sudoku, …) register via catalog RPCs — not app code.
@@ -766,7 +767,7 @@ grant execute on function public.set_game_catalog_lifecycle(text, jsonb)
 
 -- ---------------------------------------------------------------------------
 -- 5) Gate session start on catalog availability + feature flag
---     (REPLACE Platform RPC; body extended — 20260842 file untouched)
+--     (REPLACE Platform RPC; body extended — 20260846 file untouched)
 -- ---------------------------------------------------------------------------
 
 create or replace function public.start_game_session(p_game_id uuid)

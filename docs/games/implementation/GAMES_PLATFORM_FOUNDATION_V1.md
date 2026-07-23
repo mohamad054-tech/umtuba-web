@@ -2,7 +2,7 @@
 
 Status: **implemented locally** (migration **NOT APPLIED** remotely)
 
-Migration: `supabase/migrations/20260842_games_platform_foundation_v1.sql`
+Migration: `supabase/migrations/20260846_games_platform_foundation_v1.sql`
 
 Constants / contracts: `lib/games/gamesFoundation.ts`
 

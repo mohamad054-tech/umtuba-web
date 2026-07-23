@@ -2,7 +2,7 @@
  * UM Games Catalog Foundation V1 — pure contracts & validators.
  *
  * Authoritative registry metadata for all UMTUBA games. Extends Platform
- * Foundation (`games` table) additively via migration 20260843.
+ * Foundation (`games` table) additively via migration 20260847.
  *
  * No gameplay, economy, UM Points, Ads, matchmaking, public leaderboards,
  * anti-cheat, or game logic. Future games register via catalog only.

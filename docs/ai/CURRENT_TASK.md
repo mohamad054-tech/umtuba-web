@@ -1,48 +1,38 @@
-# Current Task
+﻿# Current Task
 
 ## Task title
 
-UM Games — Catalog Foundation V1
+UMTUBA Ads Platform — Reporting & Analytics Foundation V1
 
 ## Goal
 
-Authoritative games catalog registry (definitions, lifecycle, availability,
-visibility, feature flags, platforms, player counts, categories, difficulty,
-versioning) so future games register without app-code changes. No gameplay,
-economy, UM Points, Ads, matchmaking, leaderboards, or anti-cheat.
+Implement the complete internal reporting foundation: reporting domain, analytics
+models, aggregation, filtering/dimensions, export contracts, centralized
+validation, and internal inspection contracts — without enabling production
+serving, billing, real event ingestion, production dashboards, or public APIs.
 
 ## Allowed scope
 
-- `supabase/migrations/20260843_games_catalog_foundation_v1.sql`
-- `docs/games/implementation/GAMES_CATALOG_FOUNDATION_V1.md`
-- `lib/games/gamesCatalog.ts`
-- `lib/games/gamesCatalog.test.ts`
+- `lib/ads/reporting/**`
+- `lib/ads/index.ts` (safe exports only)
+- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Editing `20260842` / Platform Foundation files (except REPLACE of
-  `start_game_session` inside **new** migration only)
-- Gameplay / canvases / matchmaking / anti-cheat engines
-- UM Points awarding / Ads activation / public leaderboards
-- Ads, Store, Learning, World, Financial modules
-- Remote Supabase apply
-- Merge into `alpha-0.2` unless explicitly requested
+- Modifying Canonical Stack, Provenance, Operations, Campaign Management,
+  Billing, or Measurement foundations
+- Enabling productionEnabled / deliveryEnabled / billingEnabled /
+  productionAccepted / authoritativeProductionServing
+- Public APIs, admin UI, production endpoints, live ingestion
+- Games / Learning / Store / World
+- Commit / push unless explicitly requested
 
 ## Branch
 
-`office/games-platform-foundation-v1` (continues after Platform Foundation
-commit `043257b`)
+`alpha-0.2`
 
 ## Status
 
-`implemented — verified (games 45/45, tsc, build, git diff --check clean); migration 20260843 Git-only; not applied; committed/pushed on feature branch only when push done.`
-
----
-
-## Prior completed on this branch
-
-### UM Games — Platform Foundation V1
-
-`complete @ 043257b; migration 20260842 Git-only.`
+`complete` — PASS (not committed)

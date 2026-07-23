@@ -24,7 +24,7 @@ import {
 
 const ROOT = process.cwd();
 const MIGRATION =
-  "supabase/migrations/20260842_games_platform_foundation_v1.sql";
+  "supabase/migrations/20260846_games_platform_foundation_v1.sql";
 const DOC = "docs/games/implementation/GAMES_PLATFORM_FOUNDATION_V1.md";
 const MODULE = "lib/games/gamesFoundation.ts";
 
@@ -51,7 +51,7 @@ function fnBody(sql: string, name: string) {
 }
 
 describe("Games Platform Foundation V1 — files & ordering", () => {
-  it("ships migration, module, docs; 20260842 after 20260841", () => {
+  it("ships migration, module, docs; 20260846 after 20260841", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
     expect(existsSync(join(ROOT, DOC))).toBe(true);
     expect(existsSync(join(ROOT, MODULE))).toBe(true);
@@ -62,8 +62,8 @@ describe("Games Platform Foundation V1 — files & ordering", () => {
 
   it("does not reuse prior migration versions", () => {
     const migrations = readdirSync(join(ROOT, "supabase/migrations"));
-    const hits = migrations.filter((f) => f.startsWith("20260842"));
-    expect(hits).toEqual(["20260842_games_platform_foundation_v1.sql"]);
+    const hits = migrations.filter((f) => f.startsWith("20260846"));
+    expect(hits).toEqual(["20260846_games_platform_foundation_v1.sql"]);
   });
 });
 

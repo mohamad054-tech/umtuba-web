@@ -1,7 +1,7 @@
 /**
  * UM Games Platform Foundation V1 — pure contracts & validators.
  *
- * Mirrors `supabase/migrations/20260842_games_platform_foundation_v1.sql`.
+ * Mirrors `supabase/migrations/20260846_games_platform_foundation_v1.sql`.
  * No service role. No UM Points awarding. No Ads activation. No public
  * leaderboards. Client results are claims only.
  */
