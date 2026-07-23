@@ -49,6 +49,9 @@ export * from "./pacing";
 export * from "./frequency";
 /** Auction Foundation V1 — deterministic winner selection only, kill switches off. */
 export * from "./auction";
+/** Billing & Charging Foundation V1 — eligibility + charge contracts only, kill switches off. */
+export * from "./charging";
+export * from "./billing";
 /** Execution Layer V1 only (foundation via adsPlatformCompatibility). */
 export * from "./executionLayer";
 /** Internal Delivery Pilot V1 only (foundation via adsPlatformCompatibility). */
