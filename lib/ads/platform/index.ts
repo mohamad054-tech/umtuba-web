@@ -15,6 +15,7 @@ export * from "./deliveryDecisionTrace";
 export * from "./taxonomy";
 export * from "./taxonomyMapper";
 export * from "./renderDescriptor";
+export * from "./renderDescriptorPipeline";
 export * from "./candidateInventory";
 export * from "./candidateSelection";
 export * from "./creativePlacementCompatibility";
