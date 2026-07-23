@@ -37,4 +37,9 @@ export type {
   AdsDiagnosticRequestV1,
   AdsDiagnosticRunnerOutcome,
 } from "./diagnosticRunner";
+/**
+ * Ads Operations & Activation Foundation V1 — contracts only.
+ * Never enables production serving, billing, or payments.
+ */
+export * from "./operations";
 export * from "./platform";

@@ -2,42 +2,37 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Candidate Provenance Foundation V1
+UMTUBA Ads Platform — Ads Operations & Activation Foundation V1
 
 ## Goal
 
-Replace the fragile pipe-joined candidate `bindingToken` with a structured,
-bounded, deterministic Candidate Provenance contract that works across Inventory
-Bridge, Diagnostic Runner, and Canonical Stack — without enabling
-delivery/billing or weakening `runAdsCanonicalStackV1`.
+Implement the operational foundation required to safely operate the Ads Platform:
+centralized operational state, feature flags, kill switches, readiness evaluation,
+health checks, immutable ops audit records, and admin operations contracts —
+without enabling production serving, billing, payments, or real campaign delivery.
 
 ## Allowed scope
 
-- `lib/ads/platform/candidateProvenance.ts`
-- `lib/ads/platform/candidateProvenance.test.ts`
-- `lib/ads/platform/candidateSelection.ts` (provenance identity on candidates)
-- `lib/ads/platform/selectionRenderAdapter.ts` (+ related fixtures/tests)
-- `lib/ads/inventoryBridge.ts` (+ related bridge tests)
-- `lib/ads/diagnosticRunner.ts` / `diagnosticRunnerServer.ts` / tests
-- `app/admin/ads/diagnostics/**` (provenance display)
-- `docs/ads/ADS_CANDIDATE_PROVENANCE_FOUNDATION_V1.md`
-- `docs/ads/ADS_DIAGNOSTIC_RUNNER_V1.md`
+- `lib/ads/operations/**`
+- `lib/ads/operationsFoundation.ts` (if used as facade)
+- `lib/ads/index.ts` (safe exports only)
+- `lib/ads/operationsFoundation.test.ts` / `lib/ads/operations/**/*.test.ts`
+- `docs/ads/ADS_OPERATIONS_ACTIVATION_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- Related Ads platform tests that assert token format
 
 ## Forbidden scope
 
 - Games / Learning / Store / World product surfaces
-- Merging into `alpha-0.2`
-- Pushing / applying migrations
 - Enabling live delivery or live billing
-- Alternate decision pipelines
+- Payment providers / production endpoints / production UI
+- Migrations that activate production
+- Weakening kill switches or bypassing `runAdsCanonicalStackV1`
 - Commit / push unless explicitly requested
 
 ## Branch
 
-`office/ads-canonical-authority-hardening-v1`
+`alpha-0.2`
 
 ## Status
 
