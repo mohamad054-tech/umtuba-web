@@ -46,6 +46,7 @@ Under `app/components/learning/`:
 | Attempt start | `start_learning_attempt` (resume-safe) |
 | Attempt load | `get_my_learning_attempt` (learner-safe snapshot) |
 | Save / submit / cancel | `save_learning_attempt_answer` / `submit_learning_attempt` / `cancel_learning_attempt` |
+| Autosave flush | Submit clears debounce timers and flushes pending answers first; failed flush blocks submit. Cancel discards pending autosave so no delayed save runs after terminal. |
 | Settings to UI | Only `is_required`, `max_attempts`, `time_limit_seconds` |
 
 ## Security rules

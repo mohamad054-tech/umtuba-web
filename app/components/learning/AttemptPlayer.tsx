@@ -22,6 +22,9 @@ type AttemptPlayerProps = {
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
+const SAVE_FAIL_MESSAGE =
+  "Could not save your latest answers. Please try again.";
+
 export default function AttemptPlayer({
   initial,
   activityName,
@@ -39,6 +42,13 @@ export default function AttemptPlayer({
     initial.remaining_seconds
   );
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  /** Latest unsaved payloads waiting on debounce timers. */
+  const pendingPayloads = useRef<Map<string, Record<string, unknown>>>(
+    new Map()
+  );
+  /** In-flight save promises keyed by question id. */
+  const inFlightSaves = useRef<Map<string, Promise<boolean>>>(new Map());
+  const terminalRef = useRef(false);
 
   const locked = isAttemptInputLocked(view.status, remaining);
 
@@ -53,6 +63,9 @@ export default function AttemptPlayer({
         result.data.answers.map((a) => [a.question_id, a.answer_payload])
       )
     );
+    if (result.data.status !== "active") {
+      terminalRef.current = true;
+    }
   });
 
   useEffect(() => {
@@ -90,21 +103,22 @@ export default function AttemptPlayer({
     };
   }, []);
 
-  function queueSave(questionId: string, payload: Record<string, unknown>) {
-    setAnswers((prev) => ({ ...prev, [questionId]: payload }));
-    if (locked) return;
-    const existing = timers.current.get(questionId);
-    if (existing) clearTimeout(existing);
-    const t = setTimeout(() => {
-      void persistAnswer(questionId, payload);
-    }, 500);
-    timers.current.set(questionId, t);
+  function clearPendingTimers() {
+    for (const t of timers.current.values()) clearTimeout(t);
+    timers.current.clear();
+  }
+
+  /** Cancel policy: drop pending autosave so nothing fires after a terminal action. */
+  function discardPendingAutosave() {
+    clearPendingTimers();
+    pendingPayloads.current.clear();
   }
 
   async function persistAnswer(
     questionId: string,
     payload: Record<string, unknown>
-  ) {
+  ): Promise<boolean> {
+    if (terminalRef.current) return false;
     setSaveState("saving");
     setSaveError(null);
     const supabase = createClient();
@@ -116,39 +130,115 @@ export default function AttemptPlayer({
     );
     if (!result.ok) {
       setSaveState("error");
-      setSaveError(result.message);
-      return;
+      setSaveError(SAVE_FAIL_MESSAGE);
+      return false;
     }
+    pendingPayloads.current.delete(questionId);
     setSaveState("saved");
+    return true;
+  }
+
+  function trackPersist(
+    questionId: string,
+    payload: Record<string, unknown>
+  ): Promise<boolean> {
+    const existing = inFlightSaves.current.get(questionId);
+    const run = (async () => {
+      if (existing) await existing;
+      return persistAnswer(questionId, payload);
+    })();
+    inFlightSaves.current.set(questionId, run);
+    void run.finally(() => {
+      if (inFlightSaves.current.get(questionId) === run) {
+        inFlightSaves.current.delete(questionId);
+      }
+    });
+    return run;
+  }
+
+  /**
+   * Clear debounce timers, wait for in-flight saves, then save any still-pending
+   * payloads. Used before submit so the last edit is not lost.
+   */
+  async function flushPendingAnswers(): Promise<boolean> {
+    clearPendingTimers();
+
+    const inFlight = [...inFlightSaves.current.values()];
+    for (const p of inFlight) {
+      const ok = await p;
+      if (!ok) return false;
+    }
+
+    const pending = [...pendingPayloads.current.entries()];
+    for (const [questionId, payload] of pending) {
+      const ok = await trackPersist(questionId, payload);
+      if (!ok) return false;
+    }
+
+    return pendingPayloads.current.size === 0;
+  }
+
+  function queueSave(questionId: string, payload: Record<string, unknown>) {
+    setAnswers((prev) => ({ ...prev, [questionId]: payload }));
+    if (locked || busy || terminalRef.current) return;
+    pendingPayloads.current.set(questionId, payload);
+    const existing = timers.current.get(questionId);
+    if (existing) clearTimeout(existing);
+    const t = setTimeout(() => {
+      timers.current.delete(questionId);
+      const latest = pendingPayloads.current.get(questionId);
+      if (!latest || terminalRef.current) return;
+      void trackPersist(questionId, latest);
+    }, 500);
+    timers.current.set(questionId, t);
   }
 
   async function onSubmit() {
-    if (locked || busy) return;
+    if (locked || busy || terminalRef.current) return;
     setBusy(true);
     setActionError(null);
+
+    const flushed = await flushPendingAnswers();
+    if (!flushed) {
+      setBusy(false);
+      setActionError(SAVE_FAIL_MESSAGE);
+      setSaveState("error");
+      setSaveError(SAVE_FAIL_MESSAGE);
+      return;
+    }
+
     const supabase = createClient();
     const result = await submitLearningAttempt(supabase, view.attempt_id);
-    setBusy(false);
     if (!result.ok) {
+      setBusy(false);
       setActionError(result.message);
       return;
     }
+    terminalRef.current = true;
+    discardPendingAutosave();
+    setBusy(false);
     await refreshAttempt();
     router.refresh();
   }
 
   async function onCancel() {
-    if (locked || busy) return;
+    if (locked || busy || terminalRef.current) return;
     const confirmed = window.confirm(
       "Cancel this attempt? It will count toward your attempt limit."
     );
     if (!confirmed) return;
     setBusy(true);
     setActionError(null);
+    // Cancel discards pending autosave so no delayed save runs after terminal.
+    discardPendingAutosave();
+    terminalRef.current = true;
+
     const supabase = createClient();
     const result = await cancelLearningAttempt(supabase, view.attempt_id);
     setBusy(false);
     if (!result.ok) {
+      // Allow retry if cancel RPC failed; keep terminal guard until refresh.
+      terminalRef.current = false;
       setActionError(result.message);
       return;
     }
