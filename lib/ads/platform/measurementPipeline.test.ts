@@ -31,9 +31,16 @@ import {
   ADS_MEASUREMENT_PIPELINE_INPUT_ALLOWED_FIELDS,
   ADS_MEASUREMENT_PIPELINE_RESULT_ALLOWED_FIELDS,
   ADS_MEASUREMENT_PIPELINE_STAGES,
+  ADS_VIEWABILITY_MIN_IN_VIEW_RATIO,
+  ADS_VIEWABILITY_MIN_VISIBLE_MS,
+  meetsAdsViewabilityThreshold,
   normalizeAdsMeasurementPackage,
+  runAdsClickMeasurementPipeline,
+  runAdsImpressionMeasurementPipeline,
   runAdsMeasurementPipeline,
+  runAdsViewabilityMeasurementPipeline,
   validateAdsMeasurementPipelineResult,
+  validateAdsViewabilitySignal,
 } from "./measurementPipeline";
 import { ADS_PLACEMENT_REGISTRY } from "./placementRegistry";
 import type { AdsRenderMaterial } from "./serveBoundary";
@@ -217,7 +224,7 @@ function successfulPilotResult(): AdsInternalDeliveryPilotResult {
 }
 
 function validFoundationPackage(
-  eventType: "impression" | "click" = "impression"
+  eventType: AdsMeasurementFoundationPackage["eventType"] = "impression"
 ): AdsMeasurementFoundationPackage {
   const pilotResult = successfulPilotResult();
   const outcome = prepareAdsMeasurementFoundation(
@@ -426,6 +433,157 @@ describe("Ads Measurement Pipeline V1", () => {
     expect(runAdsMeasurementPipeline({}).valid).toBe(false);
   });
 
+  it("runs typed impression and click measurement paths", () => {
+    const impression = validFoundationPackage("impression");
+    const click = validFoundationPackage("click");
+
+    const impressionOk = runAdsImpressionMeasurementPipeline({
+      measurementPackage: impression,
+    });
+    expect(impressionOk.valid).toBe(true);
+    if (!impressionOk.valid) return;
+    expect(impressionOk.result.measurementAccepted).toBe(true);
+
+    const impressionRejected = runAdsImpressionMeasurementPipeline({
+      measurementPackage: click,
+    });
+    expect(impressionRejected.valid).toBe(true);
+    if (!impressionRejected.valid) return;
+    expect(impressionRejected.result.measurementRejected).toBe(true);
+    expect(impressionRejected.result.pipelineStage).toBe("validate");
+
+    const clickOk = runAdsClickMeasurementPipeline({
+      measurementPackage: click,
+    });
+    expect(clickOk.valid).toBe(true);
+    if (!clickOk.valid) return;
+    expect(clickOk.result.measurementAccepted).toBe(true);
+  });
+
+  it("runs the viewability measurement path for qualified_view packages", () => {
+    const viewPackage = validFoundationPackage("qualified_view");
+    const signal = {
+      inViewRatio: ADS_VIEWABILITY_MIN_IN_VIEW_RATIO,
+      visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS,
+    };
+    expect(validateAdsViewabilitySignal(signal)).toEqual({ valid: true });
+    expect(meetsAdsViewabilityThreshold(signal)).toBe(true);
+
+    const accepted = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: viewPackage,
+      viewabilitySignal: signal,
+    });
+    expect(accepted.valid).toBe(true);
+    if (!accepted.valid) return;
+    expect(accepted.result.measurementAccepted).toBe(true);
+    expect(accepted.result.normalizedPackage?.eventType).toBe("qualified_view");
+
+    const belowThreshold = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: viewPackage,
+      viewabilitySignal: { inViewRatio: 0.2, visibleMs: 100 },
+    });
+    expect(belowThreshold.valid).toBe(true);
+    if (!belowThreshold.valid) return;
+    expect(belowThreshold.result.measurementRejected).toBe(true);
+    expect(belowThreshold.result.pipelineStage).toBe("validate");
+
+    const wrongType = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: validFoundationPackage("impression"),
+      viewabilitySignal: signal,
+    });
+    expect(wrongType.valid).toBe(true);
+    if (!wrongType.valid) return;
+    expect(wrongType.result.measurementRejected).toBe(true);
+  });
+
+  it("rejects malformed and out-of-range qualified_view signals fail-closed", () => {
+    const viewPackage = validFoundationPackage("qualified_view");
+
+    const malformedSignals = [
+      { inViewRatio: Number.NaN, visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS },
+      {
+        inViewRatio: Number.POSITIVE_INFINITY,
+        visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS,
+      },
+      { inViewRatio: 1.01, visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS },
+      { inViewRatio: -0.1, visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS },
+      { inViewRatio: ADS_VIEWABILITY_MIN_IN_VIEW_RATIO, visibleMs: -1 },
+      { inViewRatio: ADS_VIEWABILITY_MIN_IN_VIEW_RATIO, visibleMs: 1000.5 },
+    ] as const;
+
+    for (const signal of malformedSignals) {
+      expect(validateAdsViewabilitySignal(signal).valid).toBe(false);
+      const outcome = runAdsViewabilityMeasurementPipeline({
+        measurementPackage: viewPackage,
+        viewabilitySignal: signal,
+      });
+      expect(outcome.valid).toBe(true);
+      if (!outcome.valid) return;
+      expect(outcome.result.measurementRejected).toBe(true);
+      expect(outcome.result.pipelineStage).toBe("validate");
+      expect(outcome.result.normalizedPackage).toBeNull();
+      expect(outcome.result.productionEnabled).toBe(false);
+      expect(outcome.result.measurementEnabled).toBe(false);
+    }
+  });
+
+  it("rejects insufficient qualified_view thresholds while accepting exact boundaries", () => {
+    const viewPackage = validFoundationPackage("qualified_view");
+
+    const insufficientPercentage = {
+      inViewRatio: 0.49,
+      visibleMs: ADS_VIEWABILITY_MIN_VISIBLE_MS,
+    };
+    expect(validateAdsViewabilitySignal(insufficientPercentage)).toEqual({
+      valid: true,
+    });
+    expect(meetsAdsViewabilityThreshold(insufficientPercentage)).toBe(false);
+    const lowRatio = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: viewPackage,
+      viewabilitySignal: insufficientPercentage,
+    });
+    expect(lowRatio.valid).toBe(true);
+    if (!lowRatio.valid) return;
+    expect(lowRatio.result.measurementRejected).toBe(true);
+    expect(lowRatio.result.pipelineStage).toBe("validate");
+
+    const insufficientDuration = {
+      inViewRatio: ADS_VIEWABILITY_MIN_IN_VIEW_RATIO,
+      visibleMs: 999,
+    };
+    expect(validateAdsViewabilitySignal(insufficientDuration)).toEqual({
+      valid: true,
+    });
+    expect(meetsAdsViewabilityThreshold(insufficientDuration)).toBe(false);
+    const lowDuration = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: viewPackage,
+      viewabilitySignal: insufficientDuration,
+    });
+    expect(lowDuration.valid).toBe(true);
+    if (!lowDuration.valid) return;
+    expect(lowDuration.result.measurementRejected).toBe(true);
+    expect(lowDuration.result.pipelineStage).toBe("validate");
+
+    const exactBoundary = {
+      inViewRatio: 0.5,
+      visibleMs: 1000,
+    };
+    expect(exactBoundary.inViewRatio).toBe(ADS_VIEWABILITY_MIN_IN_VIEW_RATIO);
+    expect(exactBoundary.visibleMs).toBe(ADS_VIEWABILITY_MIN_VISIBLE_MS);
+    expect(validateAdsViewabilitySignal(exactBoundary)).toEqual({ valid: true });
+    expect(meetsAdsViewabilityThreshold(exactBoundary)).toBe(true);
+    const atBoundary = runAdsViewabilityMeasurementPipeline({
+      measurementPackage: viewPackage,
+      viewabilitySignal: exactBoundary,
+    });
+    expect(atBoundary.valid).toBe(true);
+    if (!atBoundary.valid) return;
+    expect(atBoundary.result.measurementAccepted).toBe(true);
+    expect(atBoundary.result.pipelineStage).toBe("result");
+    expect(atBoundary.result.productionEnabled).toBe(false);
+    expect(atBoundary.result.measurementEnabled).toBe(false);
+  });
+
   it("has no storage, network, database, reporting, or product wiring", () => {
     expect(SOURCE).not.toMatch(/from ["']@\//);
     expect(SOURCE).not.toMatch(/from ["']\.\.\//);
@@ -445,6 +603,7 @@ describe("Ads Measurement Pipeline V1", () => {
     expect(SOURCE).toMatch(/productionEnabled: false/);
     expect(SOURCE).toMatch(/measurementEnabled: false/);
     expect(SOURCE).toMatch(/runAdsMeasurementPipeline/);
+    expect(SOURCE).toMatch(/runAdsViewabilityMeasurementPipeline/);
     expect(SOURCE).toMatch(/validateAdsMeasurementFoundationPackage/);
   });
 });

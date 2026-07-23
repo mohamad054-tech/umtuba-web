@@ -23,9 +23,13 @@ import {
 
 export const ADS_REPORTING_HANDLE_VERSION = "v1" as const;
 
-/** Sole supported event permissions in V1 — no conversions. */
+/**
+ * Sole supported event permissions in V1 — no conversions.
+ * `qualified_view` covers the viewability measurement path.
+ */
 export const ADS_REPORTING_HANDLE_EVENT_PERMISSIONS = [
   "impression",
+  "qualified_view",
   "click",
 ] as const;
 

@@ -217,6 +217,7 @@ describe("Ads Measurement Foundation V1", () => {
     expect(ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION).toBe("v1");
     expect([...ADS_MEASUREMENT_FOUNDATION_EVENT_TYPES]).toEqual([
       "impression",
+      "qualified_view",
       "click",
     ]);
     expect([...ADS_MEASUREMENT_FOUNDATION_INPUT_ALLOWED_FIELDS]).toEqual([
@@ -282,6 +283,87 @@ describe("Ads Measurement Foundation V1", () => {
     expect(outcome.package.measurementEnabled).toBe(false);
   });
 
+  it("prepares a valid qualified_view (viewability) package bound to the impression handle", () => {
+    const pilotResult = successfulPilotResult();
+    const outcome = prepareAdsMeasurementFoundation(
+      { pilotResult, eventType: "qualified_view" },
+      { nowMs: NOW_MS }
+    );
+
+    expect(outcome.valid).toBe(true);
+    if (!outcome.valid) return;
+
+    expect(outcome.package.measurementReady).toBe(true);
+    expect(outcome.package.eventType).toBe("qualified_view");
+    expect(outcome.package.dedupeKey).toBe(
+      buildAdsMeasurementDedupeKey({
+        eventType: "qualified_view",
+        selectedCandidateId: "candidate-1",
+        reportingHandle: "imp-candidate-1",
+      })
+    );
+    expect(outcome.package.productionEnabled).toBe(false);
+    expect(outcome.package.measurementEnabled).toBe(false);
+  });
+
+  it("separates dedupe namespaces by event type and keeps same-type keys stable", () => {
+    const selectedCandidateId = "candidate-shared-1";
+    const reportingHandle = "arh_v1_shared_handle_1";
+
+    const impressionKey = buildAdsMeasurementDedupeKey({
+      eventType: "impression",
+      selectedCandidateId,
+      reportingHandle,
+    });
+    const qualifiedViewKey = buildAdsMeasurementDedupeKey({
+      eventType: "qualified_view",
+      selectedCandidateId,
+      reportingHandle,
+    });
+    const clickKey = buildAdsMeasurementDedupeKey({
+      eventType: "click",
+      selectedCandidateId,
+      reportingHandle,
+    });
+
+    expect(impressionKey).toBe(
+      `v1:impression:${selectedCandidateId}:${reportingHandle}`
+    );
+    expect(qualifiedViewKey).toBe(
+      `v1:qualified_view:${selectedCandidateId}:${reportingHandle}`
+    );
+    expect(clickKey).toBe(
+      `v1:click:${selectedCandidateId}:${reportingHandle}`
+    );
+
+    expect(impressionKey).not.toBe(qualifiedViewKey);
+    expect(impressionKey).not.toBe(clickKey);
+    expect(qualifiedViewKey).not.toBe(clickKey);
+    expect(new Set([impressionKey, qualifiedViewKey, clickKey]).size).toBe(3);
+
+    expect(
+      buildAdsMeasurementDedupeKey({
+        eventType: "impression",
+        selectedCandidateId,
+        reportingHandle,
+      })
+    ).toBe(impressionKey);
+    expect(
+      buildAdsMeasurementDedupeKey({
+        eventType: "qualified_view",
+        selectedCandidateId,
+        reportingHandle,
+      })
+    ).toBe(qualifiedViewKey);
+    expect(
+      buildAdsMeasurementDedupeKey({
+        eventType: "click",
+        selectedCandidateId,
+        reportingHandle,
+      })
+    ).toBe(clickKey);
+  });
+
   it("rejects an invalid pilot result", () => {
     expect(
       prepareAdsMeasurementFoundation({
@@ -339,7 +421,7 @@ describe("Ads Measurement Foundation V1", () => {
     expect(
       prepareAdsMeasurementFoundation({
         pilotResult,
-        eventType: "qualified_view",
+        eventType: "viewability",
       }).valid
     ).toBe(false);
     expect(

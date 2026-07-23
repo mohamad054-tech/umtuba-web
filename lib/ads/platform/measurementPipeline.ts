@@ -4,6 +4,7 @@ import {
   ADS_MEASUREMENT_FOUNDATION_SIGNATURE_PLACEHOLDER,
   ADS_MEASUREMENT_FOUNDATION_TRUST_LEVEL,
   validateAdsMeasurementFoundationPackage,
+  type AdsMeasurementFoundationEventType,
   type AdsMeasurementFoundationPackage,
 } from "./measurementFoundation";
 
@@ -13,6 +14,10 @@ import {
  * Accepts ONLY a validated Measurement Foundation package. Runs a fixed
  * in-memory pipeline:
  *   Validate → Normalize → Deduplicate → Pipeline Result
+ *
+ * Typed entry points cover impression, viewability (`qualified_view`), and
+ * click measurement. Viewability uses placeholder IAB-style thresholds and
+ * never enables production counting.
  *
  * Prepares a normalized package for a future sink. This layer NEVER:
  * - stores, appends, writes, or transmits events
@@ -36,6 +41,33 @@ export const ADS_MEASUREMENT_PIPELINE_STAGES = [
   "deduplicate",
   "result",
 ] as const;
+
+/**
+ * Placeholder viewability thresholds for V1 (display-style).
+ * Not a production billing / MRC certification gate.
+ */
+export const ADS_VIEWABILITY_MIN_IN_VIEW_RATIO = 0.5 as const;
+export const ADS_VIEWABILITY_MIN_VISIBLE_MS = 1000 as const;
+
+/**
+ * Top-level keys allowed on a viewability signal.
+ * Unknown fields fail closed.
+ */
+export const ADS_VIEWABILITY_SIGNAL_ALLOWED_FIELDS = [
+  "inViewRatio",
+  "visibleMs",
+] as const;
+
+/**
+ * Internal viewability evidence for the qualified_view measurement path.
+ * Never includes PII, URLs, or product-surface identifiers.
+ */
+export type AdsViewabilitySignal = Readonly<{
+  /** Fraction of ad pixels in view in [0, 1]. */
+  inViewRatio: number;
+  /** Contiguous visible duration in milliseconds. */
+  visibleMs: number;
+}>;
 
 export type AdsMeasurementPipelineStage =
   (typeof ADS_MEASUREMENT_PIPELINE_STAGES)[number];
@@ -87,6 +119,15 @@ export type AdsMeasurementPipelineInput = Readonly<{
   seenDedupeKeys?: readonly string[];
 }>;
 
+/**
+ * Viewability measurement input — foundation package plus viewability evidence.
+ */
+export type AdsViewabilityMeasurementPipelineInput = Readonly<{
+  measurementPackage: AdsMeasurementFoundationPackage;
+  viewabilitySignal: AdsViewabilitySignal;
+  seenDedupeKeys?: readonly string[];
+}>;
+
 export type AdsMeasurementPipelineOutcome =
   | Readonly<{ valid: true; result: AdsMeasurementPipelineResult }>
   | Readonly<{ valid: false; issues: readonly string[] }>;
@@ -98,6 +139,17 @@ const RESULT_ALLOWED_FIELD_SET = new Set<string>(
   ADS_MEASUREMENT_PIPELINE_RESULT_ALLOWED_FIELDS
 );
 const STAGE_SET = new Set<string>(ADS_MEASUREMENT_PIPELINE_STAGES);
+const VIEWABILITY_SIGNAL_ALLOWED_FIELD_SET = new Set<string>(
+  ADS_VIEWABILITY_SIGNAL_ALLOWED_FIELDS
+);
+const VIEWABILITY_PIPELINE_INPUT_ALLOWED_FIELDS = [
+  "measurementPackage",
+  "viewabilitySignal",
+  "seenDedupeKeys",
+] as const;
+const VIEWABILITY_PIPELINE_INPUT_ALLOWED_FIELD_SET = new Set<string>(
+  VIEWABILITY_PIPELINE_INPUT_ALLOWED_FIELDS
+);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -166,6 +218,76 @@ export function normalizeAdsMeasurementPackage(
     productionEnabled: false as const,
     measurementEnabled: false as const,
   });
+}
+
+/**
+ * Pure shape validator for viewability signals.
+ * Fail-closed — does not measure, store, or enable production counting.
+ */
+export function validateAdsViewabilitySignal(
+  input: unknown
+): ContractValidationResult {
+  if (!isRecord(input)) {
+    return {
+      valid: false,
+      issues: Object.freeze(["viewabilitySignal must be an object."]),
+    };
+  }
+
+  const issues: string[] = [];
+  for (const key of Object.keys(input)) {
+    if (!VIEWABILITY_SIGNAL_ALLOWED_FIELD_SET.has(key)) {
+      issues.push(`viewabilitySignal contains unknown field "${key}".`);
+    }
+  }
+
+  if (
+    typeof input.inViewRatio !== "number" ||
+    !Number.isFinite(input.inViewRatio) ||
+    input.inViewRatio < 0 ||
+    input.inViewRatio > 1
+  ) {
+    issues.push("viewabilitySignal.inViewRatio must be a finite number in [0, 1].");
+  }
+
+  if (
+    typeof input.visibleMs !== "number" ||
+    !Number.isFinite(input.visibleMs) ||
+    !Number.isInteger(input.visibleMs) ||
+    input.visibleMs < 0
+  ) {
+    issues.push(
+      "viewabilitySignal.visibleMs must be a non-negative finite integer."
+    );
+  }
+
+  return issues.length === 0
+    ? { valid: true }
+    : { valid: false, issues: Object.freeze([...issues]) };
+}
+
+/**
+ * Returns true when the signal meets V1 placeholder viewability thresholds.
+ */
+export function meetsAdsViewabilityThreshold(
+  signal: AdsViewabilitySignal
+): boolean {
+  return (
+    signal.inViewRatio >= ADS_VIEWABILITY_MIN_IN_VIEW_RATIO &&
+    signal.visibleMs >= ADS_VIEWABILITY_MIN_VISIBLE_MS
+  );
+}
+
+function requireEventType(
+  measurementPackage: AdsMeasurementFoundationPackage,
+  expected: AdsMeasurementFoundationEventType
+): readonly string[] {
+  if (measurementPackage.eventType !== expected) {
+    return Object.freeze([
+      `measurementPackage.eventType must be "${expected}".`,
+    ]);
+  }
+  return Object.freeze([]);
 }
 
 /**
@@ -444,4 +566,121 @@ export function runAdsMeasurementPipeline(
   }
 
   return { valid: true, result };
+}
+
+/**
+ * Impression measurement path — accepts only impression foundation packages.
+ */
+export function runAdsImpressionMeasurementPipeline(
+  input: unknown
+): AdsMeasurementPipelineOutcome {
+  if (!isRecord(input) || !("measurementPackage" in input)) {
+    return runAdsMeasurementPipeline(input);
+  }
+  if (
+    isRecord(input.measurementPackage) &&
+    typeof input.measurementPackage.eventType === "string" &&
+    input.measurementPackage.eventType !== "impression"
+  ) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+  return runAdsMeasurementPipeline(input);
+}
+
+/**
+ * Click measurement path — accepts only click foundation packages.
+ */
+export function runAdsClickMeasurementPipeline(
+  input: unknown
+): AdsMeasurementPipelineOutcome {
+  if (!isRecord(input) || !("measurementPackage" in input)) {
+    return runAdsMeasurementPipeline(input);
+  }
+  if (
+    isRecord(input.measurementPackage) &&
+    typeof input.measurementPackage.eventType === "string" &&
+    input.measurementPackage.eventType !== "click"
+  ) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+  return runAdsMeasurementPipeline(input);
+}
+
+/**
+ * Viewability measurement path — requires a qualified_view package plus a
+ * threshold-passing viewability signal. Fail-closed; never stores or bills.
+ */
+export function runAdsViewabilityMeasurementPipeline(
+  input: unknown
+): AdsMeasurementPipelineOutcome {
+  if (!isRecord(input)) {
+    return {
+      valid: false,
+      issues: Object.freeze([
+        "Viewability measurement pipeline input must be an object.",
+      ]),
+    };
+  }
+
+  const issues: string[] = [];
+  for (const key of Object.keys(input)) {
+    if (!VIEWABILITY_PIPELINE_INPUT_ALLOWED_FIELD_SET.has(key)) {
+      issues.push(
+        `Viewability measurement pipeline input contains unknown field "${key}".`
+      );
+    }
+  }
+  if (!("measurementPackage" in input)) {
+    issues.push(
+      "Viewability measurement pipeline input must include measurementPackage."
+    );
+  }
+  if (!("viewabilitySignal" in input)) {
+    issues.push(
+      "Viewability measurement pipeline input must include viewabilitySignal."
+    );
+  }
+  if (issues.length > 0) {
+    return { valid: false, issues: Object.freeze([...issues]) };
+  }
+
+  const packageValidation = validateAdsMeasurementFoundationPackage(
+    input.measurementPackage
+  );
+  if (!packageValidation.valid) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+
+  const measurementPackage =
+    input.measurementPackage as AdsMeasurementFoundationPackage;
+  const eventTypeIssues = requireEventType(
+    measurementPackage,
+    "qualified_view"
+  );
+  if (eventTypeIssues.length > 0) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+
+  const signalValidation = validateAdsViewabilitySignal(input.viewabilitySignal);
+  if (!signalValidation.valid) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+
+  const signal = input.viewabilitySignal as AdsViewabilitySignal;
+  if (!meetsAdsViewabilityThreshold(signal)) {
+    const result = rejectedResult("validate");
+    return { valid: true, result };
+  }
+
+  return runAdsMeasurementPipeline({
+    measurementPackage,
+    ...(input.seenDedupeKeys !== undefined
+      ? { seenDedupeKeys: input.seenDedupeKeys }
+      : {}),
+  });
 }

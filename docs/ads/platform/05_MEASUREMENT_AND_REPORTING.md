@@ -1,5 +1,56 @@
 # 05 — Delivery Measurement & Reporting
 
+## Internal Measurement Pipeline V1 — Current Implementation
+
+> **Implemented now (contract / in-memory only).** Distinguishes from the
+> future design sections below. Nothing here enables production ingest.
+
+V1 ships an internal Ads measurement stack under `lib/ads/platform/`:
+
+| Layer | Module | Role |
+| --- | --- | --- |
+| Foundation package | `measurementFoundation.ts` | Prepare an in-memory package from a pilot result |
+| Pipeline | `measurementPipeline.ts` | Validate → Normalize → Deduplicate → Result |
+| Handle resolution | `reportingHandleResolution.ts` | Opaque token → injected registry payload |
+| Event flow | `measurementEventFlow.ts` | Resolve → validate → prepare → typed pipeline |
+| Product report shapes | `eventReportContracts.ts` | Client report contract only (never ingested) |
+
+**Supported event types:** `impression`, `qualified_view`, `click`.
+
+**Opaque reporting-handle resolution:** clients supply only an opaque token /
+client reference. Campaign, creative, placement, advertiser, and related entity
+ids are never client-authoritative. Resolution looks up an **injected
+in-memory registry** for the current evaluation. Unresolved, expired, revoked,
+rotated, invalid, or permission-mismatched handles fail closed with no client
+fallback.
+
+**Pipeline ordering:** Validate → Normalize → Deduplicate → Result.
+
+**Deterministic dedupe key:**
+`v1:{eventType}:{selectedCandidateId}:{reportingHandle}`.
+Event type is part of the key, so impression / `qualified_view` / click do not
+share a dedupe namespace. Callers may inject a `seenDedupeKeys` set for the
+current evaluation; there is no global or persisted dedupe store.
+
+**Qualified-view placeholder threshold (not MRC / billing certified):**
+`inViewRatio ≥ 0.5` **and** `visibleMs ≥ 1000`. Malformed signals (NaN,
+Infinity, out-of-range ratios, negative / non-integer durations) fail closed.
+`qualified_view` packages bind to the impression reporting handle in the
+foundation path.
+
+**Always disabled in V1 results:**
+
+- `productionEnabled: false`
+- `measurementEnabled: false`
+- (`resolutionEnabled: false` on resolution results)
+
+**Explicitly not implemented here:** event storage or transmission, network /
+Supabase access, billing, auction / bidding, fraud systems, or product-surface
+wiring. `measurementAccepted` / `flowAccepted` mean the internal contract path
+succeeded — not that measurement is live.
+
+---
+
 ## 1. Goals
 
 - Count what happened **accurately and defensibly** — no invented numbers.
@@ -45,6 +96,9 @@ Events never carry PII or precise location.
 
 ## 3. Ingestion pipeline (design)
 
+> **Future design** — not implemented by Measurement Pipeline V1. V1 does not
+> store, transmit, or ingest events.
+
 ```
 Product reports event via Placement Contract.report(event)
   → signed, server-side ingestion endpoint (no anonymous client writes to tables)
@@ -68,6 +122,8 @@ Design rules:
 
 ## 4. Aggregation
 
+> **Future design** — not implemented by Measurement Pipeline V1.
+
 - **Daily metrics** per (campaign, ad set, ad, placement, coarse-geo, device
   class): impressions, qualified views, clicks, engagements (incl. save/follow),
   conversions (incl. install/purchase), spend (references to UEOS), derived
@@ -77,6 +133,8 @@ Design rules:
   fabricates or estimates delivered counts.
 
 ## 5. Attribution
+
+> **Future design** — not implemented by Measurement Pipeline V1.
 
 - **Windows:** click-through and view-through windows are explicit, per-objective
   defaults, and documented in reporting.
@@ -90,6 +148,8 @@ Design rules:
   handles as delivery; there is no persistent cross-product user profile.
 
 ## 6. Reporting
+
+> **Future design** — not implemented by Measurement Pipeline V1.
 
 ### 6.1 Advertiser reporting
 
@@ -115,6 +175,8 @@ Design rules:
 
 ## 7. Data quality & trust
 
+> **Future design** — V1 prepares untrusted / unsigned packages only.
+
 - Every displayed number traces to raw, signed, deduped events or to a UEOS
   posting.
 - Discrepancy handling: raw truth + compensating records + documented window
@@ -123,6 +185,8 @@ Design rules:
   for billable counts.
 
 ## 8. Scale considerations
+
+> **Future design** — not implemented by Measurement Pipeline V1.
 
 - High-volume ingestion via append-only writes and async rollups.
 - Dedupe keys and rate limits protect hot paths.

@@ -8,7 +8,8 @@ import {
  * Ads Measurement Foundation V1 — internal package preparation only.
  *
  * Accepts ONLY a validated Internal Delivery Pilot Result plus an event type
- * (impression | click). Builds a deterministic internal measurement package.
+ * (impression | qualified_view | click). Builds a deterministic internal
+ * measurement package.
  *
  * This layer NEVER:
  * - stores or appends events
@@ -26,9 +27,13 @@ import {
 
 export const ADS_MEASUREMENT_FOUNDATION_CONTRACT_VERSION = "v1" as const;
 
-/** Sole supported measurement event types in V1. */
+/**
+ * Sole supported measurement event types in V1.
+ * `qualified_view` is the viewability measurement event (taxonomy-aligned).
+ */
 export const ADS_MEASUREMENT_FOUNDATION_EVENT_TYPES = [
   "impression",
+  "qualified_view",
   "click",
 ] as const;
 
@@ -199,7 +204,9 @@ export function validateAdsMeasurementFoundationPackage(
     typeof input.eventType !== "string" ||
     !EVENT_TYPE_SET.has(input.eventType)
   ) {
-    issues.push('eventType must be "impression" or "click".');
+    issues.push(
+      'eventType must be "impression", "qualified_view", or "click".'
+    );
   }
 
   if (!isNonEmptyString(input.dedupeKey)) {
@@ -277,7 +284,7 @@ export function prepareAdsMeasurementFoundation(
     return {
       valid: false,
       issues: Object.freeze([
-        'eventType must be "impression" or "click".',
+        'eventType must be "impression", "qualified_view", or "click".',
       ]),
     };
   }
@@ -374,16 +381,22 @@ export function prepareAdsMeasurementFoundation(
   }
 
   const reportingHandles = pilotResult.renderDescriptor.reportingHandles;
+  // Viewability (qualified_view) binds to the impression handle — same rendered
+  // unit; there is no separate product-facing viewability handle in V1.
   const reportingHandle =
-    eventType === "impression"
-      ? reportingHandles.impressionHandle
-      : reportingHandles.clickHandle;
+    eventType === "click"
+      ? reportingHandles.clickHandle
+      : reportingHandles.impressionHandle;
+  const reportingHandleField =
+    eventType === "click"
+      ? "reportingHandles.clickHandle"
+      : "reportingHandles.impressionHandle";
 
   if (!isNonEmptyString(reportingHandle)) {
     return {
       valid: false,
       issues: Object.freeze([
-        `reportingHandles.${eventType}Handle is required for ${eventType} events.`,
+        `${reportingHandleField} is required for ${eventType} events.`,
       ]),
     };
   }

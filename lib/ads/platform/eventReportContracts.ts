@@ -25,7 +25,15 @@ import {
 
 export const ADS_EVENT_REPORT_CONTRACT_VERSION = "v1" as const;
 
-export const ADS_EVENT_REPORT_EVENT_TYPES = ["impression", "click"] as const;
+/**
+ * Supported product-facing report event types in V1.
+ * `qualified_view` is the viewability measurement event.
+ */
+export const ADS_EVENT_REPORT_EVENT_TYPES = [
+  "impression",
+  "qualified_view",
+  "click",
+] as const;
 export type AdsEventReportEventType =
   (typeof ADS_EVENT_REPORT_EVENT_TYPES)[number];
 

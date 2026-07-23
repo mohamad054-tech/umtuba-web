@@ -72,6 +72,104 @@ describe("Ads Event Report Contracts V1", () => {
     expect(result).toEqual({ valid: true });
   });
 
+  it("accepts a valid qualified_view contract shape with opaque reporting handle", () => {
+    const request = baseRequest({
+      eventType: "qualified_view",
+      dedupeKey: "dedupe:qualified_view:handle:client-3",
+      clientEventId: "client-event-3",
+      reportingHandle: {
+        version: ADS_REPORTING_HANDLE_VERSION,
+        token: "arh_v1_opaque_token_report_3",
+      },
+    });
+    const result = validateEventReportRequest(request, {
+      nowMs: FIXED_NOW_MS,
+    });
+    expect(result).toEqual({ valid: true });
+
+    const ack = acknowledgeEventReportRequest(request, {
+      nowMs: FIXED_NOW_MS,
+    });
+    expect(ack.contractValid).toBe(true);
+    expect(ack.eventType).toBe("qualified_view");
+    expect(ack.acceptedForIngestion).toBe(false);
+    expect(ack.productionEnabled).toBe(false);
+    expect(ack.placementId).toBeNull();
+  });
+
+  it("rejects malformed qualified_view reports fail-closed", () => {
+    const missingHandle = validateEventReportRequest(
+      {
+        ...baseRequest({ eventType: "qualified_view" }),
+        reportingHandle: undefined,
+      } as unknown,
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(missingHandle).toMatchObject({ valid: false });
+
+    const emptyDedupe = validateEventReportRequest(
+      baseRequest({
+        eventType: "qualified_view",
+        dedupeKey: "",
+      }),
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(emptyDedupe).toMatchObject({ valid: false });
+    if (!emptyDedupe.valid) {
+      expect(emptyDedupe.issues.some((issue) => issue.includes("dedupeKey"))).toBe(
+        true
+      );
+    }
+
+    const incompleteSignature = validateEventReportRequest(
+      baseRequest({
+        eventType: "qualified_view",
+        signatureContext: {
+          algorithm: "none",
+          keyId: "key-1",
+          signature: "sig-placeholder-value",
+          signedAt: "2026-07-22T08:59:30.000Z",
+        },
+      }),
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(incompleteSignature).toMatchObject({ valid: false });
+  });
+
+  it("rejects client-authoritative identifiers on qualified_view reports", () => {
+    const withCampaign = validateEventReportRequest(
+      {
+        ...baseRequest({ eventType: "qualified_view" }),
+        campaignId: "campaign-1",
+        creativeId: "creative-1",
+        placementId: "WATCH_FEED",
+        advertiserAccountId: "advertiser-1",
+      } as unknown,
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(withCampaign).toMatchObject({ valid: false });
+    if (!withCampaign.valid) {
+      expect(
+        withCampaign.issues.some((issue) => issue.includes("campaignId"))
+      ).toBe(true);
+      expect(
+        withCampaign.issues.some((issue) => issue.includes("placementId"))
+      ).toBe(true);
+    }
+
+    const ack = acknowledgeEventReportRequest(
+      {
+        ...baseRequest({ eventType: "qualified_view" }),
+        campaignId: "campaign-1",
+      } as unknown,
+      { nowMs: FIXED_NOW_MS }
+    );
+    expect(ack.contractValid).toBe(false);
+    expect(ack.acceptedForIngestion).toBe(false);
+    expect(ack.productionEnabled).toBe(false);
+    expect(ack.placementId).toBeNull();
+  });
+
   it("rejects unsupported contract versions", () => {
     const result = validateEventReportRequest(
       {

@@ -71,6 +71,24 @@ function basePayload(
 }
 
 describe("Ads Reporting Handle Architecture V1", () => {
+  it("accepts a valid qualified_view (viewability) permission", () => {
+    const result = validateAdsReportingHandlePayload(
+      basePayload({ eventPermissions: ["qualified_view"] })
+    );
+    expect(result).toEqual({ valid: true });
+
+    const reportable = validateAdsReportingHandleForReporting(
+      basePayload({ eventPermissions: ["qualified_view"] }),
+      { currentTimestamp: CURRENT_TIMESTAMP, eventType: "qualified_view" }
+    );
+    expect(reportable).toEqual({ valid: true });
+    expect([...ADS_REPORTING_HANDLE_EVENT_PERMISSIONS]).toEqual([
+      "impression",
+      "qualified_view",
+      "click",
+    ]);
+  });
+
   it("accepts a valid impression-capable handle", () => {
     const result = validateAdsReportingHandlePayload(
       basePayload({ eventPermissions: ["impression"] })
