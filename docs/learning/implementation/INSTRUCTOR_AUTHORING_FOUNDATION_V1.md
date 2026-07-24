@@ -1,19 +1,19 @@
 # UM Learning — Instructor Authoring Foundation V1
 
-Status: **Phase 0–3 implemented** (space shell + create/publish).  
+Status: **Phase 0–3 + 4A implemented** (space + program authoring).
 No migrations. No RPC redesign. Uses existing Learning RPCs (`20260828+`).
 
 ## Goal
 
-Ship the first instructor-facing surface under `/learning/instructor` so staff
-can create and publish Learning spaces via user JWT + existing
-`create_learning_space` / `publish_learning_space` / `archive_learning_space`
-RPCs. Curriculum tree CRUD (program → activity) is deferred to later phases.
+Ship instructor-facing surface under `/learning/instructor` so staff can create
+and publish Learning spaces and programs via user JWT + existing RPCs.
+Course → activity curriculum UI is deferred.
 
 ## Architecture
 
 - Server Components + user JWT Supabase client (`createClient` / `getServerUser`)
-- Mutations only via existing `LEARNING_SPACE_RPCS`
+- Mutations only via existing `LEARNING_SPACE_RPCS` / `LEARNING_PROGRAM_RPCS`
+- Program create requires parent space `status = active`
 - Reads via RLS (`Members read own spaces` / admin policies)
 - **No service role**
 - **No TypeScript authorization substitute**
@@ -25,11 +25,13 @@ RPCs. Curriculum tree CRUD (program → activity) is deferred to later phases.
 | --- | --- |
 | `/learning/instructor` | Dashboard — spaces the member can read |
 | `/learning/instructor/spaces/new` | Create space form |
-| `/learning/instructor/spaces/[spaceId]` | Space detail + publish/archive |
+| `/learning/instructor/spaces/[spaceId]` | Space detail + programs list + publish/archive |
+| `/learning/instructor/spaces/[spaceId]/programs/new` | Create program (active space only) |
+| `/learning/instructor/programs/[programId]` | Program detail + publish/archive |
 
 ## Out of scope (later phases)
 
-- Program / course / section / lesson / activity UI
+- Course / section / lesson / activity UI
 - Content blocks / questions editors
 - Staff assign, invites, enrollments
 - Moderation UI, learner nav entry in `APP_ROUTES`

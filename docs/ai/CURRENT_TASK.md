@@ -2,12 +2,12 @@
 
 ## Task title
 
-UM Learning — Instructor Authoring Foundation V1 (Phase 0–3)
+UM Learning — Instructor Authoring Foundation V1 (Phase 4A)
 
 ## Goal
 
-Ship instructor surface under `/learning/instructor` for Learning space
-create/publish/archive using existing RPCs. No migrations. No RPC redesign.
+Program authoring under an existing active Space via existing RPCs.
+No migrations. No Course/Section/Lesson/Activity UI yet.
 
 ## Allowed scope
 
@@ -22,11 +22,9 @@ create/publish/archive using existing RPCs. No migrations. No RPC redesign.
 ## Forbidden scope
 
 - Migrations / Supabase schema / RPC redesign
-- Learner route changes under `/learning` (non-instructor)
+- Course → Activity UI
+- Learner route changes
 - Service role
-- Program → activity curriculum UI (later phases)
-- Content blocks / questions / enrollments UI
-- Commit/push outside current branch without approval
 
 ## Branch
 
@@ -34,4 +32,4 @@ create/publish/archive using existing RPCs. No migrations. No RPC redesign.
 
 ## Status
 
-`complete` — Phase 0–3 PASS (commit/push pending)
+`complete` — Phase 4A PASS

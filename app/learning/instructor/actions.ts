@@ -4,10 +4,19 @@ import { redirect } from "next/navigation";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
+  archiveLearningProgram,
   archiveLearningSpace,
+  createLearningProgram,
   createLearningSpace,
+  publishLearningProgram,
   publishLearningSpace,
 } from "../../../lib/learning/instructorAuthoring";
+import {
+  LEARNING_PROGRAM_FORMATS,
+  LEARNING_PROGRAM_VISIBILITIES,
+  type LearningProgramFormat,
+  type LearningProgramVisibility,
+} from "../../../lib/learning/programsFoundation";
 import {
   LEARNING_SPACE_MODES,
   LEARNING_SPACE_VISIBILITIES,
@@ -21,6 +30,16 @@ function isMode(value: string): value is LearningSpaceMode {
 
 function isVisibility(value: string): value is LearningSpaceVisibility {
   return (LEARNING_SPACE_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isProgramFormat(value: string): value is LearningProgramFormat {
+  return (LEARNING_PROGRAM_FORMATS as readonly string[]).includes(value);
+}
+
+function isProgramVisibility(
+  value: string
+): value is LearningProgramVisibility {
+  return (LEARNING_PROGRAM_VISIBILITIES as readonly string[]).includes(value);
 }
 
 export async function createLearningSpaceAction(
@@ -150,6 +169,151 @@ export async function archiveLearningSpaceAction(
   redirect(
     `${LEARNING_INSTRUCTOR_ROUTES.space(spaceId)}?notice=${encodeURIComponent(
       "Space archived"
+    )}`
+  );
+}
+
+export async function createLearningProgramAction(
+  formData: FormData
+): Promise<void> {
+  const spaceId = String(formData.get("spaceId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        spaceId
+          ? LEARNING_INSTRUCTOR_ROUTES.programNew(spaceId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!spaceId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Space is required"
+      )}`
+    );
+  }
+
+  const name = String(formData.get("name") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const formatRaw = String(formData.get("format") ?? "");
+  const visibilityRaw = String(formData.get("visibility") ?? "private");
+
+  if (!isProgramFormat(formatRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.programNew(spaceId)}?error=${encodeURIComponent(
+        "Invalid learning program format"
+      )}`
+    );
+  }
+  if (!isProgramVisibility(visibilityRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.programNew(spaceId)}?error=${encodeURIComponent(
+        "Invalid learning program visibility"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await createLearningProgram(supabase, {
+    space_id: spaceId,
+    name,
+    slug,
+    format: formatRaw,
+    description: description.trim() ? description : null,
+    visibility: visibilityRaw,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.programNew(spaceId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(LEARNING_INSTRUCTOR_ROUTES.program(result.data.program_id));
+}
+
+export async function publishLearningProgramAction(
+  formData: FormData
+): Promise<void> {
+  const programId = String(formData.get("programId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        programId
+          ? LEARNING_INSTRUCTOR_ROUTES.program(programId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!programId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Program is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await publishLearningProgram(supabase, programId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.program(programId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.program(programId)}?notice=${encodeURIComponent(
+      "Program published"
+    )}`
+  );
+}
+
+export async function archiveLearningProgramAction(
+  formData: FormData
+): Promise<void> {
+  const programId = String(formData.get("programId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        programId
+          ? LEARNING_INSTRUCTOR_ROUTES.program(programId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!programId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Program is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveLearningProgram(supabase, programId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.program(programId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.program(programId)}?notice=${encodeURIComponent(
+      "Program archived"
     )}`
   );
 }
