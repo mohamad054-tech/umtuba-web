@@ -1,0 +1,39 @@
+[1mdiff --git a/app/components/learning/CourseOutline.tsx b/app/components/learning/CourseOutline.tsx[m
+[1mindex bf366dc..c97c91c 100644[m
+[1m--- a/app/components/learning/CourseOutline.tsx[m
+[1m+++ b/app/components/learning/CourseOutline.tsx[m
+[36m@@ -4,6 +4,7 @@[m [mimport {[m
+   type LearningLearnerCourseOutline,[m
+ } from "../../../lib/learning/learnerDelivery";[m
+ import { LEARNING_COMMUNITY_ROUTES } from "../../../lib/learning/communityFoundation";[m
+[32m+[m[32mimport { LEARNING_LIVE_ROUTES } from "../../../lib/learning/liveCalendarFoundation";[m
+ import ProgressSummary from "./ProgressSummary";[m
+ [m
+ type CourseOutlineProps = {[m
+[36m@@ -32,13 +33,25 @@[m [mexport default function CourseOutline({ outline }: CourseOutlineProps) {[m
+         <div className="mt-4">[m
+           <ProgressSummary progress={outline.progress} />[m
+         </div>[m
+[31m-        <p className="mt-4">[m
+[32m+[m[32m        <p className="mt-4 flex flex-wrap gap-4">[m
+           <Link[m
+             href={LEARNING_COMMUNITY_ROUTES.hub(outline.course.id)}[m
+             className="text-sm font-bold text-white underline underline-offset-2"[m
+           >[m
+             Course community[m
+           </Link>[m
+[32m+[m[32m          <Link[m
+[32m+[m[32m            href={LEARNING_LIVE_ROUTES.learnerSchedule(outline.course.id)}[m
+[32m+[m[32m            className="text-sm font-bold text-white underline underline-offset-2"[m
+[32m+[m[32m          >[m
+[32m+[m[32m            Live classes[m
+[32m+[m[32m          </Link>[m
+[32m+[m[32m          <Link[m
+[32m+[m[32m            href={LEARNING_LIVE_ROUTES.learnerCalendar(outline.course.id)}[m
+[32m+[m[32m            className="text-sm font-bold text-white underline underline-offset-2"[m
+[32m+[m[32m          >[m
+[32m+[m[32m            Calendar[m
+[32m+[m[32m          </Link>[m
+         </p>[m
+       </section>[m
+ [m

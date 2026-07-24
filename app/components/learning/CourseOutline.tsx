@@ -4,6 +4,7 @@ import {
   type LearningLearnerCourseOutline,
 } from "../../../lib/learning/learnerDelivery";
 import { LEARNING_COMMUNITY_ROUTES } from "../../../lib/learning/communityFoundation";
+import { LEARNING_LIVE_ROUTES } from "../../../lib/learning/liveCalendarFoundation";
 import ProgressSummary from "./ProgressSummary";
 
 type CourseOutlineProps = {
@@ -32,12 +33,24 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
         <div className="mt-4">
           <ProgressSummary progress={outline.progress} />
         </div>
-        <p className="mt-4">
+        <p className="mt-4 flex flex-wrap gap-4">
           <Link
             href={LEARNING_COMMUNITY_ROUTES.hub(outline.course.id)}
             className="text-sm font-bold text-white underline underline-offset-2"
           >
             Course community
+          </Link>
+          <Link
+            href={LEARNING_LIVE_ROUTES.learnerSchedule(outline.course.id)}
+            className="text-sm font-bold text-white underline underline-offset-2"
+          >
+            Live classes
+          </Link>
+          <Link
+            href={LEARNING_LIVE_ROUTES.learnerCalendar(outline.course.id)}
+            className="text-sm font-bold text-white underline underline-offset-2"
+          >
+            Calendar
           </Link>
         </p>
       </section>
