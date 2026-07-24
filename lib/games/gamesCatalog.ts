@@ -719,6 +719,37 @@ export async function listGamesCatalogTrusted(
   }
 }
 
+/**
+ * Trusted admin upsert via `upsert_game_catalog_entry`.
+ *
+ * Sole Catalog mutation abstraction in application code — no service-role and
+ * no direct table writes. Database `is_platform_admin` remains authoritative;
+ * callers must still gate with the platform-admin auth path before invoking.
+ */
+export async function upsertGamesCatalogEntryTrusted(
+  client: GamesCatalogRpcClient,
+  definition: unknown
+): Promise<GamesValidationResult<GamesCatalogEntryView>> {
+  const validated = validateGamesCatalogDefinition(definition);
+  if (!validated.ok) return validated;
+
+  try {
+    const { data, error } = await client.rpc(GAMES_CATALOG_ADMIN_RPCS.upsert, {
+      p_def: validated.value,
+    });
+    if (error) {
+      return fail("catalog_upsert_rpc_failed");
+    }
+    const parsed = parseGamesCatalogEntryView(data);
+    if (!parsed.ok) {
+      return fail("catalog_upsert_response_invalid");
+    }
+    return parsed;
+  } catch {
+    return fail("catalog_upsert_rpc_failed");
+  }
+}
+
 export function validateLifecyclePatch(raw: unknown): GamesValidationResult<{
   status?: GamesCatalogStatus;
   availability?: GamesCatalogAvailability;

@@ -2,45 +2,42 @@
 
 ## Summary
 
-UM Games Hub Catalog Data Wiring V1 **PASS** on
-`office/games-hub-catalog-data-wiring-v1`.
+UM Games Catalog Title Seed V1 **PASS** on
+`office/games-catalog-title-seed-v1`.
 
-- Trusted `list_games_catalog` read via `listGamesCatalogTrusted`
-- Allowlisted EntryView parsing; malformed/hidden rows rejected
-- Hub loader is async + injectable; page wires authenticated Supabase client
-- `empty_catalog` only on trusted success with zero displayable cards
-- RPC/load failures → `internal_error` (fail closed)
-- Runtime launch remains disabled (`startedServer: false`)
-- No migrations created or applied
+- Canonical allowlisted UM Kick Blast seed (metadata-only, non-playable)
+- `upsertGamesCatalogEntryTrusted` — sole Catalog write abstraction
+- `registerGamesCatalogTitleSeed` — admin-gated, fail-closed registration
+- `sessions_enabled` forced/validated `false`; no sessions/runtime/play
+- No migrations created or applied; no remote seed executed
 
 ## Exact files changed
 
-- `lib/games/gamesCatalog.ts`
-- `lib/games/gamesCatalog.test.ts`
-- `lib/games/gamesHubExperience.ts`
-- `lib/games/gamesHubExperience.test.ts`
-- `app/games/page.tsx`
-- `docs/games/implementation/GAMES_HUB_CATALOG_DATA_WIRING_V1.md` (new)
+- `lib/games/gamesCatalog.ts` — added `upsertGamesCatalogEntryTrusted`
+- `lib/games/gamesCatalog.test.ts` — upsert helper coverage
+- `lib/games/gamesCatalogTitleSeed.ts` — **new** seed constants + registration
+- `lib/games/gamesCatalogTitleSeed.test.ts` — **new** focused seed tests
+- `docs/games/implementation/GAMES_CATALOG_TITLE_SEED_V1.md` — **new**
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None — **NO MIGRATION REQUIRED** (do not apply `20260847`)
+None — **NO MIGRATION REQUIRED** (do not apply `20260846` / `20260847`)
 
 ## Security review
 
-- Authenticated server client only; no service role
-- RPC authorization remains authoritative
-- Allowlisted field parse; unknown fields rejected
-- Hidden / draft / archived / malformed entries not rendered
-- UI receives Hub presentation model only (no raw DB rows)
-- Client overlays still ignored by Experience adapter
-- Play / runtime launch remains closed
+- App-layer platform-admin gate required before upsert
+- Database `is_platform_admin` remains authoritative on RPC
+- Allowlisted seed ids only; unknown/malformed seeds rejected
+- No service-role path; no direct `games` table writes
+- Unexpected upsert responses rejected (`catalog_upsert_response_invalid`)
+- RPC failures fail closed (`catalog_upsert_rpc_failed`)
+- Seed definitions are immutable app inputs, not client payloads
 
 ## Tests
 
-- `npx vitest run lib/games` — 81/81 pass
+- `npx vitest run lib/games` — 94/94 pass
 
 ## TypeScript
 
@@ -48,7 +45,7 @@ None — **NO MIGRATION REQUIRED** (do not apply `20260847`)
 
 ## Build
 
-- `npm run build` — pass (`ƒ /games`)
+- `npm run build` — pass
 
 ## git diff --check
 
@@ -56,10 +53,13 @@ None — **NO MIGRATION REQUIRED** (do not apply `20260847`)
 
 ## git status --short
 
-(see final report after commit)
+(see final report after commit/push)
 
 ## Open issues
 
-- Until Catalog Foundation migration `20260847` is applied remotely, Hub
-  fails closed to `internal_error` (expected; no seeds in this slice)
-- Playable runtime / session creation deferred
+- Remote prerequisites `20260846` + `20260847` not applied — registration
+  will fail closed until ops applies them
+- One-time admin registration under a real platform-admin session is
+  intentionally deferred (no remote seed in this slice)
+- `category: "action"` remains a provisional repository convention, not final
+  product classification

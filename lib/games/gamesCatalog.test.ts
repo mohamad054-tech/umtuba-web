@@ -16,6 +16,7 @@ import {
   listGamesCatalogTrusted,
   parseGamesCatalogEntryView,
   parseGamesCatalogListResponse,
+  upsertGamesCatalogEntryTrusted,
   validateCatalogFeatureFlags,
   validateCatalogPlatforms,
   validateGamesCatalogDefinition,
@@ -317,6 +318,49 @@ describe("Games Catalog Foundation V1 — trusted list parsing", () => {
     expect(r.ok).toBe(false);
     if (r.ok) return;
     expect(r.reason).toBe("catalog_rpc_failed");
+  });
+
+  it("upsertGamesCatalogEntryTrusted calls admin upsert and parses EntryView", async () => {
+    const r = await upsertGamesCatalogEntryTrusted(
+      {
+        rpc: async (fn, args) => {
+          expect(fn).toBe(GAMES_CATALOG_ADMIN_RPCS.upsert);
+          expect(args).toEqual(
+            expect.objectContaining({
+              p_def: expect.objectContaining({ game_key: "kick_blast" }),
+            })
+          );
+          return { data: sampleRpcEntry(), error: null };
+        },
+      },
+      { ...validDef, status: "active", visibility: "authenticated" }
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.game_key).toBe("kick_blast");
+  });
+
+  it("upsertGamesCatalogEntryTrusted fails closed on RPC error and bad response", async () => {
+    const failed = await upsertGamesCatalogEntryTrusted(
+      { rpc: async () => ({ data: null, error: { message: "boom" } }) },
+      validDef
+    );
+    expect(failed.ok).toBe(false);
+    if (failed.ok) return;
+    expect(failed.reason).toBe("catalog_upsert_rpc_failed");
+
+    const badShape = await upsertGamesCatalogEntryTrusted(
+      {
+        rpc: async () => ({
+          data: { game_key: "kick_blast", extra: true },
+          error: null,
+        }),
+      },
+      validDef
+    );
+    expect(badShape.ok).toBe(false);
+    if (badShape.ok) return;
+    expect(badShape.reason).toBe("catalog_upsert_response_invalid");
   });
 });
 
