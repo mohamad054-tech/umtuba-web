@@ -13,6 +13,7 @@ import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../lib/lea
 import { LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES } from "../../../../../lib/learning/instructorExperience";
 import { LEARNING_ASSIGNMENT_ROUTES } from "../../../../../lib/learning/assignmentsCoursework";
 import { LEARNING_COMMUNITY_ROUTES } from "../../../../../lib/learning/communityFoundation";
+import { LEARNING_LIVE_ROUTES } from "../../../../../lib/learning/liveCalendarFoundation";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -118,6 +119,18 @@ export default async function InstructorCourseAuthoringPage({
           className="font-bold text-white underline underline-offset-2"
         >
           Community
+        </Link>
+        <Link
+          href={LEARNING_LIVE_ROUTES.instructorSessions(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Live sessions
+        </Link>
+        <Link
+          href={LEARNING_LIVE_ROUTES.instructorCalendar(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Calendar
         </Link>
       </nav>
 

@@ -53,7 +53,10 @@ export type NotificationType =
   | "learning_course_completed"
   | "learning_announcement_posted"
   | "learning_discussion_reply"
-  | "learning_qa_answered";
+  | "learning_qa_answered"
+  | "learning_live_session_scheduled"
+  | "learning_live_session_updated"
+  | "learning_live_session_cancelled";
 
 export type NotificationActor = {
   id: string;
@@ -103,6 +106,9 @@ const NOTIFICATION_TYPES = new Set<NotificationType>([
   "learning_announcement_posted",
   "learning_discussion_reply",
   "learning_qa_answered",
+  "learning_live_session_scheduled",
+  "learning_live_session_updated",
+  "learning_live_session_cancelled",
 ]);
 
 function getErrorMessage(error: unknown, fallback: string): string {
