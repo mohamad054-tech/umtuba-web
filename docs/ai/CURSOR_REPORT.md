@@ -54,7 +54,8 @@ None — **NO MIGRATION REQUIRED** (do not apply `20260846` / `20260847`)
 
 ## git status --short
 
-- see post-commit status below (written before commit; expect clean after)
+- clean after commit `d3c1489` on
+  `office/games-catalog-entry-lookup-trusted-v1`
 
 ## Open issues
 
