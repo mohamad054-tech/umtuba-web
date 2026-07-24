@@ -8,11 +8,15 @@ import {
   loadAssessmentDelivery,
 } from "../../../../../lib/learning/assessmentDelivery";
 import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import { startAssessmentAttemptAction } from "../../../assessmentAttemptActions";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ activityId: string }> | { activityId: string };
+  searchParams?:
+    | Promise<{ error?: string; cancelled?: string }>
+    | { error?: string; cancelled?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -23,8 +27,10 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function LearningAssessmentDeliveryPage({
   params,
+  searchParams,
 }: PageProps) {
   const { activityId } = await Promise.resolve(params);
+  const query = await Promise.resolve(searchParams ?? {});
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -73,7 +79,7 @@ export default async function LearningAssessmentDeliveryPage({
     >
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          {view.type} · read-only
+          {view.type} · read-only preview
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">{view.name}</h1>
         {view.description ? (
@@ -92,9 +98,40 @@ export default async function LearningAssessmentDeliveryPage({
           }`}
         </p>
         <p className="mt-4 text-sm text-white/55">
-          This is a read-only preview of the published assessment. Answering,
-          timing, and scoring happen only when you start an attempt.
+          Preview is read-only. Starting an attempt creates a session record
+          (one active attempt) with expiration metadata — answering and scoring
+          are not part of this foundation.
         </p>
+
+        {query.cancelled ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+          >
+            Attempt cancelled.
+          </p>
+        ) : null}
+
+        {query.error ? (
+          <p
+            role="alert"
+            className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+          >
+            {query.error}
+          </p>
+        ) : null}
+
+        {view.question_count > 0 ? (
+          <form action={startAssessmentAttemptAction} className="mt-6">
+            <input type="hidden" name="activityId" value={view.activity_id} />
+            <button
+              type="submit"
+              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            >
+              Start assessment attempt
+            </button>
+          </form>
+        ) : null}
       </section>
 
       <section className="mt-6 space-y-4" aria-label="Published questions">
