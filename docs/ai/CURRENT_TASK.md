@@ -2,20 +2,20 @@
 
 ## Task title
 
-UMTUBA — Games Hub Runtime Submit Outcome Apply Eligibility Contract Trusted V1
+UMTUBA — Games Hub Runtime Submit Outcome Local Apply Plan Contract Trusted V1
 
 ## Goal
 
-Add a pure fail-closed eligibility classifier that determines whether an
-already-trusted submit acknowledgment is eligible for a future local apply
-step, without performing that apply, mutating Runtime or handoff, setting
-`applied=true`, permitting reapply, or opening Hub authority.
+Add a pure fail-closed local-apply plan/intent contract for an already-trusted
+apply-eligibility result. This feature may describe a future local apply only;
+it must not execute apply, mutate Runtime or handoff, set `applied=true`,
+permit reapply, change lifecycle, or open Hub authority.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.ts`
-- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_APPLY_ELIGIBILITY_CONTRACT_TRUSTED_V1.md`
+- `lib/games/gamesHubRuntimeSubmitOutcomeLocalApplyPlan.ts`
+- `lib/games/gamesHubRuntimeSubmitOutcomeLocalApplyPlan.test.ts`
+- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_LOCAL_APPLY_PLAN_CONTRACT_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -25,6 +25,7 @@ step, without performing that apply, mutating Runtime or handoff, setting
 - New Supabase migrations; apply of `20260846` or `20260847`
 - Remote RPC execution / Start / Submit call
 - `handoff.applied=true` / runtime lifecycle activation
+- Local apply consumer / executor / callback in plan
 - Hub authority flag changes
 - `/games` UI or gameplay launch
 - Progress / achievement mutation
@@ -34,10 +35,10 @@ step, without performing that apply, mutating Runtime or handoff, setting
 
 ## Branch
 
-`office/games-hub-runtime-submit-outcome-apply-eligibility-contract-v1`
+`office/games-hub-runtime-submit-outcome-local-apply-plan-contract-v1`
 
-Required parent: `office/games-hub-runtime-submit-outcome-acknowledgment-contract-v1` at
-`04d8b3c650e43a41a78abac53e9a69cbae77e3e5`
+Required parent: `office/games-hub-runtime-submit-outcome-apply-eligibility-contract-v1` at
+`223abd86270d73e56deea78b5577d9496cd5b935`
 
 ## Status
 

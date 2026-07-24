@@ -1,53 +1,47 @@
-﻿# Cursor Report
+﻿# CURSOR_REPORT
 
 ## Summary
 
-PASS — Added pure fail-closed
-`evaluateGamesRuntimeSubmitOutcomeApplyEligibilityTrusted` that classifies an
-already-trusted Runtime submit outcome acknowledgment into a bounded
-eligibility status after continuity and consistency checks. Classification
-only: no apply, no Runtime/handoff mutation, no `applied=true`, no reapply,
-no RPC, Hub authority remains closed.
+PASS — Added a pure fail-closed local-apply plan/intent contract
+(`buildGamesRuntimeSubmitOutcomeLocalApplyPlanTrusted`) that accepts only a
+trusted `eligible_accepted_fresh` apply-eligibility view after exact continuity
+and accepted-fresh consistency checks, returning a frozen future-intent plan
+with `preparesRuntimeApply` / `preparesHandoffApply` as planning metadata only
+and all apply/authority flags literal `false`. No apply execution, lifecycle
+transition, handoff mutation, RPC, Hub authority opening, or replay permission.
 
 ## Exact files changed
 
-- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.ts` (created)
-- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts` (created)
-- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_APPLY_ELIGIBILITY_CONTRACT_TRUSTED_V1.md` (created)
-- `docs/ai/CURRENT_TASK.md` (updated to this task)
-- `docs/ai/CURSOR_REPORT.md` (this report)
+- `lib/games/gamesHubRuntimeSubmitOutcomeLocalApplyPlan.ts` (created)
+- `lib/games/gamesHubRuntimeSubmitOutcomeLocalApplyPlan.test.ts` (created)
+- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_LOCAL_APPLY_PLAN_CONTRACT_TRUSTED_V1.md` (created)
+- `docs/ai/CURRENT_TASK.md` (updated)
+- `docs/ai/CURSOR_REPORT.md` (updated)
 
 ## Migrations created
 
-None.
+None. No Supabase migrations created or applied. `20260846` / `20260847` not
+applied.
 
 ## Security review
 
-- Fail-closed on malformed session/handoff/acknowledgment, invalid
-  `platformSessionId`, runtime/handoff mismatch, acknowledgment/runtime
-  mismatch, unsupported `acknowledgmentStatus`, and inconsistent
-  `decisionStatus` / `idempotentReplay`.
-- No secrets exposed; no Supabase/RPC/Start/Submit calls.
-- Authority flags on output always literal `false`
-  (`applied` / `mutatesRuntime` / `mutatesHandoff` / `permitsReapply`).
-- Does not re-parse Platform submit responses; acknowledgment is sole
-  trusted classification input.
+- Fail-closed on malformed session / handoff / eligibility, identity mismatch,
+  ineligible statuses, inconsistent accepted-fresh metadata, and non-false
+  authority flags.
+- Plan contains only bounded metadata; no callback, executor, RPC client,
+  mutation function, writable object, or authority token.
+- Does not mutate inputs; does not set `handoff.applied`; does not open
+  `GAMES_HUB_RUNTIME_AUTHORITY`.
+- Does not call Supabase / Start / Submit / RPC.
+- SQL remains sole submit decision and mutation authority.
 
 ## Tests
 
 ```
-npx vitest run lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts
+npx vitest run lib/games/gamesHubRuntimeSubmitOutcomeLocalApplyPlan.test.ts
 ```
 
-Result: **16 passed** (1 file).
-
-Coverage includes: rejected / accepted fresh / idempotent replay
-classification; exact continuity success; runtime/handoff/game/player/
-platformSessionId/acknowledgment identity mismatches; malformed inputs;
-unsupported/inconsistent acknowledgment state; frozen output; input
-immutability; `applied` / `mutatesRuntime` / `mutatesHandoff` /
-`permitsReapply` remain false; no RPC/side effects; Hub authority flags
-unchanged and false.
+Result: 17 passed (17).
 
 ## TypeScript
 
@@ -55,29 +49,32 @@ unchanged and false.
 npx tsc --noEmit
 ```
 
-Result: **PASS** (exit 0).
+Result: PASS (exit 0).
 
 ## Build
 
-Skipped — shared app exports / UI entry points were not affected.
+Skipped — dedicated Games lib module only; no shared app export / UI entry
+point changes.
 
 ## git diff --check
 
-PASS (no whitespace errors; Windows CRLF warnings only on `CURRENT_TASK.md`).
+PASS (exit 0; CRLF normalization warnings only on `docs/ai/CURRENT_TASK.md`).
 
 ## git status --short
 
-(pre-commit working tree included the five files listed above; see final
-status after commit/push in the agent response.)
+(populated after commit)
 
 ## Open issues
 
-None for this slice. Deferred (intentionally out of scope):
+None for this bounded slice.
 
-- Local apply step that consumes `eligible_accepted_fresh`
-- Runtime lifecycle transition after apply
-- `handoff.applied = true` adaptation
-- Hub synchronization / progress / achievements / rewards / economy
-- Wiring into `gamesHubRuntime.ts` or UI
-- Migrations `20260846` / `20260847` apply
-- Merge to `alpha-0.2`
+Deferred / out of scope:
+
+- local apply consumer / executor
+- `handoff.applied = true`
+- Runtime lifecycle activation
+- Hub sync / progress / achievements / rewards / economy
+- Start / Submit / remote RPC
+- migrations / apply of `20260846` / `20260847`
+- UI / gameplay
+- merge / push to `alpha-0.2`
