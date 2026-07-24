@@ -2,20 +2,20 @@
 
 ## Task title
 
-UMTUBA — Games Hub Runtime Completion Submit Request Assembly Trusted V1
+UMTUBA — Games Hub Runtime Completion Submit Composition Trusted V1
 
 ## Goal
 
-Add a pure fail-closed assembler that maps a bound Hub Runtime session, an
-existing completion handoff, and an idempotency key into the already-defined
-`GamesSessionResultSubmitRequest` shape, without calling Submit or adding
-mutation authority.
+Add the thinnest possible Hub Runtime composition helper that assembles a
+validated submit request and invokes the existing trusted submit client.
+Do not adapt local Hub state, do not mutate completion handoff, and do not
+introduce any runtime authority.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntime.ts`
-- `lib/games/gamesHubRuntimeCompletionSubmitRequestAssembly.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_COMPLETION_SUBMIT_REQUEST_ASSEMBLY_TRUSTED_V1.md`
+- `lib/games/gamesHubRuntimeCompletionSubmitComposition.ts`
+- `lib/games/gamesHubRuntimeCompletionSubmitComposition.test.ts`
+- `docs/games/implementation/GAMES_HUB_RUNTIME_COMPLETION_SUBMIT_COMPOSITION_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -23,20 +23,21 @@ mutation authority.
 
 - Learning / Ads / Store / World / Financial / Social
 - New Supabase migrations; apply of `20260846` or `20260847`
-- Remote execution / Session Start / Submit client calls
-- Completion apply (`handoff.applied` must remain false)
+- Remote RPC execution in tests
+- Session Start composition
+- Hub state updates / `handoff.applied` mutation
 - Hub authority flag changes
 - `/games` UI or gameplay launch
 - Rewards / wallet / points / economy
 - Merge / push to `alpha-0.2`
-- Unrelated files
+- Unrelated files (including modifying `gamesHubRuntime.ts` for RPC wiring)
 
 ## Branch
 
-`office/games-hub-runtime-completion-submit-request-assembly-v1`
+`office/games-hub-runtime-completion-submit-composition-v1`
 
-Required parent: `office/games-hub-runtime-platform-session-bind-trusted-v1` at
-`5e5cef11b16280ee6ce496ba095353cebed919a1`
+Required parent: `office/games-hub-runtime-completion-submit-request-assembly-v1` at
+`f5a143ce107d89158c81d9a068cbb44d82bef132`
 
 ## Status
 
