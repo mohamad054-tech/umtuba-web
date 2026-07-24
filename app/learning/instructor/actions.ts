@@ -5,14 +5,17 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
   archiveLearningCourse,
+  archiveLearningLesson,
   archiveLearningProgram,
   archiveLearningSection,
   archiveLearningSpace,
   createLearningCourse,
+  createLearningLesson,
   createLearningProgram,
   createLearningSection,
   createLearningSpace,
   publishLearningCourse,
+  publishLearningLesson,
   publishLearningProgram,
   publishLearningSection,
   publishLearningSpace,
@@ -21,6 +24,10 @@ import {
   LEARNING_COURSE_VISIBILITIES,
   type LearningCourseVisibility,
 } from "../../../lib/learning/coursesFoundation";
+import {
+  LEARNING_LESSON_VISIBILITIES,
+  type LearningLessonVisibility,
+} from "../../../lib/learning/lessonsFoundation";
 import {
   LEARNING_PROGRAM_FORMATS,
   LEARNING_PROGRAM_VISIBILITIES,
@@ -66,6 +73,12 @@ function isSectionVisibility(
   value: string
 ): value is LearningSectionVisibility {
   return (LEARNING_SECTION_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isLessonVisibility(
+  value: string
+): value is LearningLessonVisibility {
+  return (LEARNING_LESSON_VISIBILITIES as readonly string[]).includes(value);
 }
 
 export async function createLearningSpaceAction(
@@ -612,6 +625,142 @@ export async function archiveLearningSectionAction(
   redirect(
     `${LEARNING_INSTRUCTOR_ROUTES.section(sectionId)}?notice=${encodeURIComponent(
       "Section archived"
+    )}`
+  );
+}
+
+export async function createLearningLessonAction(
+  formData: FormData
+): Promise<void> {
+  const sectionId = String(formData.get("sectionId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        sectionId
+          ? LEARNING_INSTRUCTOR_ROUTES.lessonNew(sectionId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!sectionId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Section is required"
+      )}`
+    );
+  }
+
+  const name = String(formData.get("name") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const visibilityRaw = String(formData.get("visibility") ?? "private");
+
+  if (!isLessonVisibility(visibilityRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.lessonNew(sectionId)}?error=${encodeURIComponent(
+        "Invalid learning lesson visibility"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await createLearningLesson(supabase, {
+    section_id: sectionId,
+    name,
+    slug,
+    description: description.trim() ? description : null,
+    visibility: visibilityRaw,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.lessonNew(sectionId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(LEARNING_INSTRUCTOR_ROUTES.lesson(result.data.lesson_id));
+}
+
+export async function publishLearningLessonAction(
+  formData: FormData
+): Promise<void> {
+  const lessonId = String(formData.get("lessonId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        lessonId
+          ? LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Lesson is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await publishLearningLesson(supabase, lessonId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?notice=${encodeURIComponent(
+      "Lesson published"
+    )}`
+  );
+}
+
+export async function archiveLearningLessonAction(
+  formData: FormData
+): Promise<void> {
+  const lessonId = String(formData.get("lessonId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        lessonId
+          ? LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Lesson is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveLearningLesson(supabase, lessonId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?notice=${encodeURIComponent(
+      "Lesson archived"
     )}`
   );
 }

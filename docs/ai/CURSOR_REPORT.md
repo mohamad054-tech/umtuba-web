@@ -2,24 +2,24 @@
 
 ## Summary
 
-Phase 4C (Section authoring under Course) implemented on
-`office/learning-progress-mutations-v1`. Typed wrappers, section server actions,
-course section list + create/detail UI, parent gates matching SQL error strings,
+Phase 4D (Lesson authoring under Section) implemented on
+`office/learning-progress-mutations-v1`. Typed wrappers, lesson server actions,
+section lesson list + create/detail UI, parent gates matching SQL error strings,
 and focused vitest coverage. No migrations, no Supabase changes, no learner
-route changes. JWT + RLS only.
+route changes. JWT + RLS only. Activity UI deferred.
 
 ## Exact files changed
 
-- `lib/learning/instructorAuthoring.ts` — section list/get/create/publish/archive
-- `lib/learning/instructorAuthoring.test.ts` — Phase 4C wrapper + gate tests
-- `app/learning/instructor/actions.ts` — section create/publish/archive actions
-- `app/learning/instructor/courses/[courseId]/page.tsx` — section list
-- `app/learning/instructor/courses/[courseId]/sections/new/page.tsx` — create
-- `app/learning/instructor/sections/[sectionId]/page.tsx` — status + lifecycle
-- `app/components/learning/instructor/InstructorSectionList.tsx` (new)
-- `app/components/learning/instructor/CreateSectionForm.tsx` (new)
-- `app/components/learning/instructor/SectionLifecycleActions.tsx` (new)
-- `app/components/learning/instructor/SectionStatusChip.tsx` (new)
+- `lib/learning/instructorAuthoring.ts` — lesson list/get/create/publish/archive
+- `lib/learning/instructorAuthoring.test.ts` — Phase 4D wrapper + gate tests
+- `app/learning/instructor/actions.ts` — lesson create/publish/archive actions
+- `app/learning/instructor/sections/[sectionId]/page.tsx` — lesson list
+- `app/learning/instructor/sections/[sectionId]/lessons/new/page.tsx` — create
+- `app/learning/instructor/lessons/[lessonId]/page.tsx` — status + lifecycle
+- `app/components/learning/instructor/InstructorLessonList.tsx` (new)
+- `app/components/learning/instructor/CreateLessonForm.tsx` (new)
+- `app/components/learning/instructor/LessonLifecycleActions.tsx` (new)
+- `app/components/learning/instructor/LessonStatusChip.tsx` (new)
 - `docs/learning/implementation/INSTRUCTOR_AUTHORING_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -31,27 +31,27 @@ None.
 ## Security review
 
 - User JWT client only (`createClient` / `getServerUser`); no service role.
-- Mutations via existing `LEARNING_SECTION_RPCS` only.
-- Reads via RLS `from("learning_sections")`.
-- Parent gates mirror SQL: course draft|published, program draft|published,
-  space active. RPC errors passed through to UI query params.
+- Mutations via existing `LEARNING_LESSON_RPCS` only.
+- Reads via RLS `from("learning_lessons")`.
+- Parent gates mirror SQL: section/course/program draft|published, space active.
+- RPC errors passed through to UI query params.
 
 ## Tests
 
-`npx vitest run lib/learning/instructorAuthoring.test.ts` — **23 passed**.
+`npx vitest run lib/learning/instructorAuthoring.test.ts` — **30 passed**.
 
 Coverage: routes/files, RPC name contracts, create/publish success, parent-gate
-failures (course/program/space), RPC error passthrough.
+failures (section/course/program/space), RPC error passthrough.
 
 ## TypeScript
 
 `npx tsc --noEmit` — fails only on pre-existing unrelated
-`.next/types/validator.ts` missing `app/games/page.js`. No instructor/section
+`.next/types/validator.ts` missing `app/games/page.js`. No instructor/lesson
 errors.
 
 ## Build
 
-Not required for this slice (same bar as Phase 4B).
+Not required for this slice (same bar as Phase 4C).
 
 ## git diff --check
 
@@ -59,18 +59,13 @@ PASS (exit 0).
 
 ## git status --short
 
-Clean on `office/learning-progress-mutations-v1` (in sync with origin after push).
+(see post-commit/push below)
 
 ## Commit / push
 
-- Commit: `e34bb2dc32b535b21cbd840afee70b3f7a440376`
-  (`feat(learning): add instructor section authoring`)
-- Push: `826811e..e34bb2d` → `origin/office/learning-progress-mutations-v1`
-- Merge: none
+(pending — filled after commit)
 
 ## Open issues
 
-- Lesson / Activity authoring still deferred (Phase 4D+).
+- Activity authoring still deferred (Phase 4E+).
 - Pre-existing `tsc` noise from `.next/types/validator.ts` / missing games page.
-- `CURSOR_REPORT.md` post-push fields updated locally after the Phase 4C commit
-  (uncommitted docs-only tweak unless folded later).

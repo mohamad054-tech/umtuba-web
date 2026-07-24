@@ -2,12 +2,12 @@
 
 ## Task title
 
-UM Learning — Instructor Authoring Foundation V1 (Phase 4C)
+UM Learning — Instructor Authoring Foundation V1 (Phase 4D)
 
 ## Goal
 
-Section authoring under an existing Course via existing RPCs.
-No migrations. No Lesson/Activity UI yet.
+Lesson authoring under an existing Section via existing RPCs.
+No migrations. No Activity UI yet.
 
 ## Allowed scope
 
@@ -22,7 +22,7 @@ No migrations. No Lesson/Activity UI yet.
 ## Forbidden scope
 
 - Migrations / Supabase schema / RPC redesign
-- Lesson → Activity UI
+- Activity UI
 - Learner route changes
 - Service role
 
@@ -32,4 +32,4 @@ No migrations. No Lesson/Activity UI yet.
 
 ## Status
 
-`complete` — Phase 4C PASS
+`complete` — Phase 4D PASS

@@ -1,9 +1,9 @@
 /**
  * UM Learning OS — Instructor Authoring Foundation V1
- * (Phase 0–3 + 4A + 4B + 4C).
+ * (Phase 0–3 + 4A + 4B + 4C + 4D).
  *
- * Space + Program + Course + Section create / publish / archive via existing
- * RPCs. User JWT only. No service role. No TS authorization substitute.
+ * Space + Program + Course + Section + Lesson create / publish / archive via
+ * existing RPCs. User JWT only. No service role. No TS authorization substitute.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -14,6 +14,13 @@ import {
   type LearningCourseStatus,
   type LearningCourseVisibility,
 } from "./coursesFoundation";
+import {
+  LEARNING_LESSON_RPCS,
+  LEARNING_LESSON_STATUSES,
+  LEARNING_LESSON_VISIBILITIES,
+  type LearningLessonStatus,
+  type LearningLessonVisibility,
+} from "./lessonsFoundation";
 import {
   LEARNING_PROGRAM_FORMATS,
   LEARNING_PROGRAM_RPCS,
@@ -58,6 +65,9 @@ export const LEARNING_INSTRUCTOR_ROUTES = {
     `/learning/instructor/courses/${courseId}/sections/new`,
   section: (sectionId: string) =>
     `/learning/instructor/sections/${sectionId}`,
+  lessonNew: (sectionId: string) =>
+    `/learning/instructor/sections/${sectionId}/lessons/new`,
+  lesson: (lessonId: string) => `/learning/instructor/lessons/${lessonId}`,
 } as const;
 
 /** Surfaced when creating a program under a non-active space (matches SQL). */
@@ -83,6 +93,22 @@ export const LEARNING_SECTION_REQUIRES_VALID_COURSE =
 /** Surfaced when parent program is not draft|published for sections (matches SQL). */
 export const LEARNING_SECTION_REQUIRES_VALID_PROGRAM =
   "Parent program must be draft or published for section changes" as const;
+
+/** Surfaced when creating a lesson under a non-active space (matches SQL). */
+export const LEARNING_LESSON_REQUIRES_ACTIVE_SPACE =
+  "Learning space must be active for lesson changes" as const;
+
+/** Surfaced when parent section is not draft|published (matches SQL). */
+export const LEARNING_LESSON_REQUIRES_VALID_SECTION =
+  "Parent section must be draft or published for lesson changes" as const;
+
+/** Surfaced when parent course is not draft|published for lessons (matches SQL). */
+export const LEARNING_LESSON_REQUIRES_VALID_COURSE =
+  "Parent course must be draft or published for lesson changes" as const;
+
+/** Surfaced when parent program is not draft|published for lessons (matches SQL). */
+export const LEARNING_LESSON_REQUIRES_VALID_PROGRAM =
+  "Parent program must be draft or published for lesson changes" as const;
 
 export type InstructorAuthoringResult<T> =
   | { ok: true; data: T }
@@ -184,6 +210,30 @@ export type CreateLearningSectionInput = {
   default_language?: string;
 };
 
+export type InstructorLessonSummary = {
+  id: string;
+  section_id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  status: LearningLessonStatus;
+  visibility: LearningLessonVisibility;
+  position: number;
+  default_language: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type CreateLearningLessonInput = {
+  section_id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  visibility?: LearningLessonVisibility;
+  default_language?: string;
+};
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
@@ -244,6 +294,16 @@ function isSectionVisibility(
   value: string
 ): value is LearningSectionVisibility {
   return (LEARNING_SECTION_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isLessonStatus(value: string): value is LearningLessonStatus {
+  return (LEARNING_LESSON_STATUSES as readonly string[]).includes(value);
+}
+
+function isLessonVisibility(
+  value: string
+): value is LearningLessonVisibility {
+  return (LEARNING_LESSON_VISIBILITIES as readonly string[]).includes(value);
 }
 
 function parsePosition(value: unknown): number {
@@ -323,6 +383,48 @@ function mapSectionRow(
   return {
     id,
     course_id,
+    slug,
+    name,
+    description: asString(row.description),
+    status,
+    visibility,
+    position,
+    default_language,
+    created_at,
+    updated_at,
+    published_at: asString(row.published_at),
+  };
+}
+
+function mapLessonRow(
+  row: Record<string, unknown>
+): InstructorLessonSummary | null {
+  const id = asString(row.id);
+  const section_id = asString(row.section_id);
+  const slug = asString(row.slug);
+  const name = asString(row.name);
+  const status = asString(row.status);
+  const visibility = asString(row.visibility);
+  const default_language = asString(row.default_language) ?? "en";
+  const created_at = asString(row.created_at) ?? "";
+  const updated_at = asString(row.updated_at) ?? "";
+  const position = parsePosition(row.position);
+  if (
+    !id ||
+    !section_id ||
+    !slug ||
+    !name ||
+    !status ||
+    !visibility ||
+    !Number.isFinite(position) ||
+    !isLessonStatus(status) ||
+    !isLessonVisibility(visibility)
+  ) {
+    return null;
+  }
+  return {
+    id,
+    section_id,
     slug,
     name,
     description: asString(row.description),
@@ -466,11 +568,23 @@ export function validateLearningSectionName(name: string): string | null {
   return validateLearningProgramName(name);
 }
 
+export function validateLearningLessonSlug(slug: string): string | null {
+  return validateLearningSpaceSlug(slug);
+}
+
+export function validateLearningLessonName(name: string): string | null {
+  return validateLearningProgramName(name);
+}
+
 function programAllowsCourseCreate(status: LearningProgramStatus): boolean {
   return status === "draft" || status === "published";
 }
 
 function courseAllowsSectionCreate(status: LearningCourseStatus): boolean {
+  return status === "draft" || status === "published";
+}
+
+function sectionAllowsLessonCreate(status: LearningSectionStatus): boolean {
   return status === "draft" || status === "published";
 }
 
@@ -1197,6 +1311,208 @@ export async function archiveLearningSection(
     ok: true,
     data: {
       section_id: asString(record?.section_id) ?? id,
+      status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+/**
+ * Lessons in a section visible via RLS (managers / staff / published paths).
+ */
+export async function listInstructorLessons(
+  supabase: AnyClient,
+  sectionId: string
+): Promise<InstructorAuthoringResult<InstructorLessonSummary[]>> {
+  const id = sectionId.trim();
+  if (!id) return { ok: false, message: "Section id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_lessons")
+    .select(
+      "id, section_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("section_id", id)
+    .order("position", { ascending: true });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning lessons"),
+    };
+  }
+
+  const lessons: InstructorLessonSummary[] = [];
+  for (const row of data ?? []) {
+    const mapped = mapLessonRow(row as Record<string, unknown>);
+    if (mapped) lessons.push(mapped);
+  }
+  return { ok: true, data: lessons };
+}
+
+export async function getInstructorLesson(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<InstructorLessonSummary>> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_lessons")
+    .select(
+      "id, section_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning lesson"),
+    };
+  }
+  if (!data) {
+    return { ok: false, message: "Learning lesson not found" };
+  }
+
+  const mapped = mapLessonRow(data as Record<string, unknown>);
+  if (!mapped) {
+    return { ok: false, message: "Learning lesson row is invalid" };
+  }
+  return { ok: true, data: mapped };
+}
+
+export async function createLearningLesson(
+  supabase: AnyClient,
+  input: CreateLearningLessonInput
+): Promise<
+  InstructorAuthoringResult<{
+    lesson_id: string;
+    section_id: string;
+    status: string;
+    position: number;
+  }>
+> {
+  const sectionId = input.section_id.trim();
+  if (!sectionId) return { ok: false, message: "Section id is required" };
+
+  const slugErr = validateLearningLessonSlug(input.slug);
+  if (slugErr) return { ok: false, message: slugErr };
+  const nameErr = validateLearningLessonName(input.name);
+  if (nameErr) return { ok: false, message: nameErr };
+  const visibility = input.visibility ?? "private";
+  if (!isLessonVisibility(visibility)) {
+    return { ok: false, message: "Invalid learning lesson visibility" };
+  }
+
+  const section = await getInstructorSection(supabase, sectionId);
+  if (!section.ok) return section;
+  if (!sectionAllowsLessonCreate(section.data.status)) {
+    return { ok: false, message: LEARNING_LESSON_REQUIRES_VALID_SECTION };
+  }
+
+  const course = await getInstructorCourse(supabase, section.data.course_id);
+  if (!course.ok) return course;
+  if (!courseAllowsSectionCreate(course.data.status)) {
+    return { ok: false, message: LEARNING_LESSON_REQUIRES_VALID_COURSE };
+  }
+
+  const program = await getInstructorProgram(supabase, course.data.program_id);
+  if (!program.ok) return program;
+  if (!programAllowsCourseCreate(program.data.status)) {
+    return { ok: false, message: LEARNING_LESSON_REQUIRES_VALID_PROGRAM };
+  }
+
+  const space = await getInstructorSpace(supabase, program.data.space_id);
+  if (!space.ok) return space;
+  if (space.data.status !== "active") {
+    return { ok: false, message: LEARNING_LESSON_REQUIRES_ACTIVE_SPACE };
+  }
+
+  const { data, error } = await supabase.rpc(LEARNING_LESSON_RPCS.create, {
+    p_section_id: sectionId,
+    p_slug: input.slug.trim().toLowerCase(),
+    p_name: input.name.trim(),
+    p_description: input.description?.trim() ? input.description.trim() : null,
+    p_visibility: visibility,
+    p_default_language: input.default_language?.trim() || "en",
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to create learning lesson"),
+    };
+  }
+
+  const record = asRecord(data);
+  const lesson_id = asString(record?.lesson_id);
+  if (!lesson_id) {
+    return { ok: false, message: "Create lesson returned no lesson_id" };
+  }
+  const position = parsePosition(record?.position);
+
+  return {
+    ok: true,
+    data: {
+      lesson_id,
+      section_id: asString(record?.section_id) ?? sectionId,
+      status: asString(record?.status) ?? "draft",
+      position: Number.isFinite(position) ? position : 0,
+    },
+  };
+}
+
+export async function publishLearningLesson(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<{ lesson_id: string; status: string }>> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_LESSON_RPCS.publish, {
+    p_lesson_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to publish learning lesson"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      lesson_id: asString(record?.lesson_id) ?? id,
+      status: asString(record?.status) ?? "published",
+    },
+  };
+}
+
+export async function archiveLearningLesson(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<{ lesson_id: string; status: string }>> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_LESSON_RPCS.archive, {
+    p_lesson_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to archive learning lesson"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      lesson_id: asString(record?.lesson_id) ?? id,
       status: asString(record?.status) ?? "archived",
     },
   };
