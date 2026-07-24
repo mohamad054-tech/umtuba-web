@@ -2,75 +2,65 @@
 
 ## Summary
 
-Ads Reporting & Analytics Foundation V1 **PASS** on `alpha-0.2`.
+UM Learning continuation review on `office/learning-progress-mutations-v1`
+(synced with origin: 0 ahead / 0 behind). **No code changes.** Review-only.
 
-- Canonical reporting domain (campaign / ad_set / creative / placement / advertiser / platform)
-- Analytics model with placeholder metrics (spend/conversions explicit placeholders; never live-sourced)
-- Aggregation contracts (hourly / daily / weekly / monthly / custom_range)
-- Dimension filter validation; CSV/JSON export contracts (`generatesFile: false`)
-- Centralized fail-closed validation + internal inspect/propose-export contracts
-- All production/delivery/billing/ingestion authority flags remain false
-- Did not modify Canonical Stack, Provenance, Operations, Campaign Management, Billing, or Measurement
-- Validation: reporting tests 5/5, `lib/ads` 776/776, `tsc --noEmit` pass, `npm run build` pass
-- Not committed
+Learning foundations through **Progress Mutations V1 (`20260845`)** are
+implemented in Git as a dependency-ordered stack (Spaces → … → score-gated
+lesson progress). Entire migration chain remains **not applied** to remote
+Supabase. Learner delivery UI exists for catalog → lesson → attempt → aggregate
+results; staff authoring / result-policy tools and non-`score` completion modes
+are still open.
+
+**Next dependency-correct feature (proposed, not implemented):**
+**Completion-mode progress V1** — wire `completion_mode` `view` / `submit`
+(and clarify `manual`) into DB-authoritative lesson progress, continuing the
+contract Progress Mutations V1 explicitly deferred.
 
 ## Exact files changed
 
-- `lib/ads/reporting/authority.ts` (new)
-- `lib/ads/reporting/domain.ts` (new)
-- `lib/ads/reporting/analytics.ts` (new)
-- `lib/ads/reporting/aggregation.ts` (new)
-- `lib/ads/reporting/filters.ts` (new)
-- `lib/ads/reporting/export.ts` (new)
-- `lib/ads/reporting/validation.ts` (new)
-- `lib/ads/reporting/adminContracts.ts` (new)
-- `lib/ads/reporting/index.ts` (new)
-- `lib/ads/reporting/reportingFoundation.test.ts` (new)
-- `lib/ads/index.ts`
-- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md` (new)
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+None (review only). This report file updated.
 
 ## Migrations created
 
-None — **NO MIGRATION REQUIRED**
+None
 
 ## Security review
 
-- Authority flags forced false on all foundation objects
-- Analytics rebuilds as placeholders; rejects `sourcedFromLiveDelivery: true`
-- Export proposals return `applied: false` / `generatesFile: false`
-- No UI, public endpoints, ingestion, or live dashboards
-- Forbidden foundations untouched (source self-check in tests)
+N/A — no implementation. Observed architecture remains DB-authoritative:
+RPC/DEFINER writes, FORCE RLS, answer-key firewall, learner aggregate-only
+results, no client authority over progress percent / identity columns.
 
 ## Tests
 
-- Targeted: reportingFoundation — 5/5 pass
-- Full: `npx vitest run lib/ads` — 776/776 pass
+Not run (review only)
 
 ## TypeScript
 
-- `npx tsc --noEmit` — pass
+Not run (review only)
 
 ## Build
 
-- `npm run build` — pass
+Not run (review only)
 
 ## git diff --check
 
-- clean
+Not applicable (no implementation diff)
 
 ## git status --short
 
-```
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/ads/index.ts
-?? docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md
-?? lib/ads/reporting/
-```
+Review branch reported clean and even with
+`origin/office/learning-progress-mutations-v1` at review time.
 
 ## Open issues
 
-- Commit pending explicit user request
-- Foundation contracts are validation-only; no live aggregation or file generation
+- Learning migrations `20260828`–`20260845` Git-only until explicit apply approval
+- `completion_mode` `view` / `submit` / `manual` still do not auto-mutate progress
+- Staff RPCs for result policy (`set_learning_activity_results_available_at`,
+  `release_learning_attempt_result`) have no instructor UI
+- No instructor/authoring UI; content creation is RPC/SQL only
+- Deferred product domains: certificates, assignments engines, manual/AI grading,
+  `learning_lesson_items`, activity-level progress, media storage, analytics,
+  UM Points
+- `docs/ai/CURRENT_TASK.md` still points at Ads Reporting on `alpha-0.2` (stale
+  relative to this Learning review request)
