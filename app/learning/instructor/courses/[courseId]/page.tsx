@@ -12,6 +12,7 @@ import { LEARNING_ASSESSMENT_ROUTES } from "../../../../../lib/learning/assessme
 import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../lib/learning/assessmentManualReview";
 import { LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES } from "../../../../../lib/learning/instructorExperience";
 import { LEARNING_ASSIGNMENT_ROUTES } from "../../../../../lib/learning/assignmentsCoursework";
+import { LEARNING_COMMUNITY_ROUTES } from "../../../../../lib/learning/communityFoundation";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -111,6 +112,12 @@ export default async function InstructorCourseAuthoringPage({
           className="font-bold text-white underline underline-offset-2"
         >
           Assignment queue
+        </Link>
+        <Link
+          href={LEARNING_COMMUNITY_ROUTES.hub(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Community
         </Link>
       </nav>
 

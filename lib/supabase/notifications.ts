@@ -50,7 +50,10 @@ export type NotificationType =
   | "post_save"
   | "post_share"
   | "referral_reward"
-  | "learning_course_completed";
+  | "learning_course_completed"
+  | "learning_announcement_posted"
+  | "learning_discussion_reply"
+  | "learning_qa_answered";
 
 export type NotificationActor = {
   id: string;
@@ -97,6 +100,9 @@ const NOTIFICATION_TYPES = new Set<NotificationType>([
   "post_share",
   "referral_reward",
   "learning_course_completed",
+  "learning_announcement_posted",
+  "learning_discussion_reply",
+  "learning_qa_answered",
 ]);
 
 function getErrorMessage(error: unknown, fallback: string): string {

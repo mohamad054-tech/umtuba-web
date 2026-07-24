@@ -3,6 +3,7 @@ import {
   LEARNING_LEARNER_ROUTES,
   type LearningLearnerCourseOutline,
 } from "../../../lib/learning/learnerDelivery";
+import { LEARNING_COMMUNITY_ROUTES } from "../../../lib/learning/communityFoundation";
 import ProgressSummary from "./ProgressSummary";
 
 type CourseOutlineProps = {
@@ -31,6 +32,14 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
         <div className="mt-4">
           <ProgressSummary progress={outline.progress} />
         </div>
+        <p className="mt-4">
+          <Link
+            href={LEARNING_COMMUNITY_ROUTES.hub(outline.course.id)}
+            className="text-sm font-bold text-white underline underline-offset-2"
+          >
+            Course community
+          </Link>
+        </p>
       </section>
 
       {outline.sections.length === 0 ? (
