@@ -13,8 +13,10 @@ import {
   loadAssessmentAnswers,
 } from "../../../../../../lib/learning/assessmentAnswerPersistence";
 import { loadAssessmentSubmission } from "../../../../../../lib/learning/assessmentSubmissionFoundation";
+import { loadAssessmentGrade } from "../../../../../../lib/learning/assessmentObjectiveGrading";
 import { cancelAssessmentAttemptAction } from "../../../../assessmentAttemptActions";
 import AssessmentSubmitForm from "../../../../../components/learning/AssessmentSubmitForm";
+import AssessmentGradePanel from "../../../../../components/learning/AssessmentGradePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +25,8 @@ type PageProps = {
     | Promise<{ activityId: string; attemptId: string }>
     | { activityId: string; attemptId: string };
   searchParams?:
-    | Promise<{ error?: string; submitted?: string }>
-    | { error?: string; submitted?: string };
+    | Promise<{ error?: string; submitted?: string; graded?: string }>
+    | { error?: string; submitted?: string; graded?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -88,6 +90,9 @@ export default async function AssessmentAttemptFoundationPage({
   const submittedAt =
     (submissionLoaded.ok ? submissionLoaded.data.submitted_at : null) ??
     view.submitted_at;
+  const gradeLoaded = isSubmitted
+    ? await loadAssessmentGrade(supabase, attemptId)
+    : null;
 
   return (
     <LearningShell
@@ -164,6 +169,15 @@ export default async function AssessmentAttemptFoundationPage({
           </p>
         ) : null}
 
+        {query.graded === "1" ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
+          >
+            Objective grading updated.
+          </p>
+        ) : null}
+
         {query.error ? (
           <p
             role="alert"
@@ -203,6 +217,15 @@ export default async function AssessmentAttemptFoundationPage({
             .
           </p>
         )}
+
+        {isSubmitted ? (
+          <AssessmentGradePanel
+            activityId={view.activity_id}
+            attemptId={view.attempt_id}
+            grade={gradeLoaded?.ok ? gradeLoaded.data : null}
+            canGrade={view.status === "submitted"}
+          />
+        ) : null}
       </section>
 
       <section className="mt-6 space-y-6" aria-label="Assessment answers">
