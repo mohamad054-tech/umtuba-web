@@ -1,118 +1,83 @@
 # UM Learning — Assessment Delivery Minimal V1
 
-Status: **BLOCKED — schema gap (no migration created)**
+Status: **implemented** (migration created, **not applied**)
 
-Branch: `office/learning-assessment-delivery-minimal-v1`  
-Parent: `office/learning-assessment-authoring-minimal-v1` @ `cf9011a`
+Branch: `office/learning-assessment-delivery-minimal-v1`
+Parent blocker: `6563fe4`
+
+Migration: `supabase/migrations/20260848_learning_assessment_delivery_minimal_v1.sql`
+Adapter: `lib/learning/assessmentDelivery.ts`
+Route: `/learning/activities/[activityId]/assessment`
 
 ---
 
-## Goal (requested)
+## Scope
 
-Deliver an authored assessment (published activity questions) to an entitled
-learner as a **read-only** surface:
+| In | Out |
+| --- | --- |
+| Read-only published assessment delivery | Attempts / submissions / answer save |
+| Ordered published questions + learner content | Scoring / grading / results |
+| Entitlement + published-chain gates | Progress mutation |
+| Activity gate link to preview | Answer keys / correctness |
+| JWT `rpc` only | Direct question-table SELECT from UI |
 
-- Resolve assessment + questions through existing server-side services only
-- Respect authentication / entitlement
-- No grading, scoring, submissions, attempts, timing, analytics, certificates,
-  progress mutation, or answer persistence
-- No direct Learning table access from UI
-- No Supabase migrations in this slice
+## Architecture
 
-## Verdict
-
-**Cannot implement product delivery without a new authenticated learner-safe
-RPC (or equivalent grant).** Implementing via workarounds would violate the
-stated security or scope constraints.
-
-## Exact evidence (no guessing)
-
-### 1) Questions table is staff-only for SELECT
-
-From `20260837_learning_questions_foundation_v1.sql` and
-`lib/learning/questionsFoundation.ts`:
-
-- RLS policies exist for course staff / question managers / platform admins
-- **No learner SELECT policy** on `learning_questions`
-- **No learner SELECT policy** on `learning_question_answer_keys`
-- Ordinary space membership grants nothing
-
-Therefore JWT `supabase.from("learning_questions").select(...)` cannot be the
-learner delivery path.
-
-### 2) Snapshot builder exists but is not callable by learners
-
-`learning_attempt_build_questions_snapshot(activity_id)` builds the
-learner-safe published-question payload (prompt + options/blanks; never keys).
-
-From `20260838_learning_attempts_foundation_v1.sql`:
-
-```sql
-revoke all on function public.learning_attempt_build_questions_snapshot(uuid)
-  from public, anon, authenticated;
+```
+Learner UI (RSC)
+  → getServerUser + createClient (JWT)
+  → loadAssessmentDelivery
+  → supabase.rpc('get_my_learning_activity_assessment')
+  → SECURITY DEFINER SQL
+       → has_learning_course_access
+       → published/active chain checks
+       → learning_attempt_build_questions_snapshot (internal)
 ```
 
-It is an **internal** helper invoked inside `start_learning_attempt`, not a
-client-facing delivery RPC.
+No service role. Snapshot builder remains revoked from clients.
 
-### 3) Existing learner-callable paths create or require attempts
+## Routes
 
-| Existing surface | Why it fails this scope |
+| Path | Role |
 | --- | --- |
-| `start_learning_attempt` | Creates / resumes an **attempt** (forbidden) |
-| `get_my_learning_attempt` | Requires an attempt; returns answers / session state |
-| `save_learning_attempt_answer` / `submit_learning_attempt` | Persistence / submission (forbidden) |
-| Activity gate (`loadPublishedActivityGate`) | Metadata + hints only; **no questions** |
+| `/learning/activities/[activityId]` | Gate + link to preview + start attempt |
+| `/learning/activities/[activityId]/assessment` | Read-only published questions |
 
-### 4) No later migration added a delivery RPC
-
-Searched Learning migrations through Progress / Result Policy slices: no
-`get_learning_*question*`, no grant of the snapshot builder to
-`authenticated`, and no learner SELECT widening on question tables.
-
-## What would unblock (migration required — not created here)
-
-Add a **new** SECURITY DEFINER RPC, for example:
+## RPC
 
 `get_my_learning_activity_assessment(p_activity_id uuid) → jsonb`
 
-Required behavior (mirrors snapshot firewall + attempt start gates):
+Returned learner-safe fields:
+
+- `activity_id`, `lesson_id`, `course_id`
+- `name`, `slug`, `type`, `description`
+- `hints`: `{ is_required, max_attempts, time_limit_seconds }` only
+- `questions`: ordered array from snapshot builder (`question_id`, `question_type`, `position`, `content`, `points`)
+- `question_count`
+
+Never returned: answer keys, correct_*, accepted answers, grading rules,
+scoring internals, staff notes, unpublished questions, full activity settings.
+
+## Authorization
 
 1. `auth.uid()` required
-2. Lock/resolve activity → lesson → section → course → program → space
-3. Require active space + **published** program/course/section/lesson/activity
-4. Require `has_learning_course_access(course_id, auth.uid())` (or equivalent)
-5. Return learner-safe published questions only (same field set as
-   `learning_attempt_build_questions_snapshot`, including optional `points`)
-6. **Never** read/join/return `learning_question_answer_keys`
-7. **Never** create attempts, answers, scores, or progress rows
-8. `GRANT EXECUTE` to `authenticated`; revoke from `anon`/`public` as usual
-9. Safe audit optional (`assessment.view` without question payloads)
+2. `has_learning_course_access(course_id, uid)`
+3. Space `active`
+4. Program / course / section / lesson / activity all `published`
+5. Fail closed otherwise (sanitized UI errors)
 
-After that migration lands, Assessment Delivery Minimal V1 can be a thin
-TypeScript wrapper + read-only UI on top of the RPC (same pattern as
-`learnerDelivery.ts`).
+## Lifecycle / writes
 
-## Explicit non-actions taken
+**None.** Function is `stable`, performs no INSERT/UPDATE/DELETE, creates no
+attempts, answers, scores, or progress rows.
 
-- No new migration file created
-- No remote migration apply
-- No learner SELECT against `learning_questions` / answer keys
-- No service-role bypass
-- No attempt start / save / submit / score / progress mutation
-- No Games / Ads / Store / World changes
-- Assessment Authoring Minimal V1 left unmodified
-- `alpha-0.2` not checked out or merged
+## No remote apply
 
-## Files in this blocker handoff
+Migration is Git-only until explicitly applied by humans. This slice does not
+run `supabase db push` / remote migrate.
 
-- `docs/learning/implementation/ASSESSMENT_DELIVERY_MINIMAL_V1.md` (this file)
-- `lib/learning/assessmentDelivery.ts` — fail-closed constants / loader stub
-- `lib/learning/assessmentDelivery.test.ts` — contract proofs of the gap
+## Validation
 
-## Next Learning slice (when migration is approved)
-
-1. Ship the RPC migration above
-2. Wire `loadAssessmentDelivery` to the RPC
-3. Add `/learning/activities/[activityId]/assessment` read-only UI
-4. Link from the activity gate without starting an attempt
+- SQL contract tests + adapter tests in `assessmentDelivery.test.ts`
+- Full `lib/learning` suite
+- `tsc --noEmit`, scoped eslint, build when required

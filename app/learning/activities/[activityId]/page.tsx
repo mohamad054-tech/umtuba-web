@@ -1,10 +1,12 @@
 import { redirect, notFound } from "next/navigation";
+import Link from "next/link";
 import LearningShell from "../../../components/learning/LearningShell";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
   loadPublishedActivityGate,
 } from "../../../../lib/learning/learnerDelivery";
+import { LEARNING_ASSESSMENT_DELIVERY_ROUTES } from "../../../../lib/learning/assessmentDelivery";
 import { startOrResumeAttemptAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +90,16 @@ export default async function LearningActivityPage({
             {active_attempt_id ? "Resume attempt" : "Start attempt"}
           </button>
         </form>
+
+        <p className="mt-4 text-sm text-white/50">
+          <Link
+            href={LEARNING_ASSESSMENT_DELIVERY_ROUTES.assessment(activity.id)}
+            className="underline underline-offset-2 text-sky-300"
+          >
+            Preview published assessment
+          </Link>
+          <span className="text-white/35"> (read-only · no answering)</span>
+        </p>
       </section>
     </LearningShell>
   );
