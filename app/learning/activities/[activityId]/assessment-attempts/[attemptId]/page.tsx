@@ -14,6 +14,7 @@ import {
 } from "../../../../../../lib/learning/assessmentAnswerPersistence";
 import { loadAssessmentSubmission } from "../../../../../../lib/learning/assessmentSubmissionFoundation";
 import { loadAssessmentGrade } from "../../../../../../lib/learning/assessmentObjectiveGrading";
+import { loadAssessmentProgressStatus } from "../../../../../../lib/learning/assessmentProgressIntegration";
 import { cancelAssessmentAttemptAction } from "../../../../assessmentAttemptActions";
 import AssessmentSubmitForm from "../../../../../components/learning/AssessmentSubmitForm";
 import AssessmentGradePanel from "../../../../../components/learning/AssessmentGradePanel";
@@ -25,8 +26,18 @@ type PageProps = {
     | Promise<{ activityId: string; attemptId: string }>
     | { activityId: string; attemptId: string };
   searchParams?:
-    | Promise<{ error?: string; submitted?: string; graded?: string }>
-    | { error?: string; submitted?: string; graded?: string };
+    | Promise<{
+        error?: string;
+        submitted?: string;
+        graded?: string;
+        progress?: string;
+      }>
+    | {
+        error?: string;
+        submitted?: string;
+        graded?: string;
+        progress?: string;
+      };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -92,6 +103,9 @@ export default async function AssessmentAttemptFoundationPage({
     view.submitted_at;
   const gradeLoaded = isSubmitted
     ? await loadAssessmentGrade(supabase, attemptId)
+    : null;
+  const progressLoaded = isSubmitted
+    ? await loadAssessmentProgressStatus(supabase, attemptId)
     : null;
 
   return (
@@ -178,6 +192,15 @@ export default async function AssessmentAttemptFoundationPage({
           </p>
         ) : null}
 
+        {query.progress === "1" ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
+          >
+            Lesson completion recorded.
+          </p>
+        ) : null}
+
         {query.error ? (
           <p
             role="alert"
@@ -224,6 +247,7 @@ export default async function AssessmentAttemptFoundationPage({
             attemptId={view.attempt_id}
             grade={gradeLoaded?.ok ? gradeLoaded.data : null}
             canGrade={view.status === "submitted"}
+            progress={progressLoaded?.ok ? progressLoaded.data : null}
           />
         ) : null}
       </section>
