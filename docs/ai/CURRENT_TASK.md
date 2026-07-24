@@ -2,20 +2,19 @@
 
 ## Task title
 
-UMTUBA — Games Catalog Lifecycle Trusted V1
+UMTUBA — Games Session Lookup Trusted V1
 
 ## Goal
 
-Complete the final declared Games Catalog trusted contract by implementing a
-fail-closed lifecycle mutation wrapper for the existing
-`set_game_catalog_lifecycle` RPC. Metadata only — no runtime eligibility,
-sessions, or playability.
+Add the first fail-closed trusted application client for the existing
+owner-only Games Platform session lookup RPC (`get_my_game_session`), without
+opening Hub Runtime authority or playable runtime.
 
 ## Allowed scope
 
-- `lib/games/gamesCatalog.ts`
-- `lib/games/gamesCatalog.test.ts`
-- `docs/games/implementation/GAMES_CATALOG_LIFECYCLE_TRUSTED_V1.md`
+- `lib/games/gamesSessions.ts`
+- `lib/games/gamesSessions.test.ts`
+- `docs/games/implementation/GAMES_SESSION_LOOKUP_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -23,19 +22,21 @@ sessions, or playability.
 
 - Learning / Ads / Store / World / Financial / Social
 - New Supabase migrations; apply of `20260846` or `20260847`
-- Remote catalog seed execution / remote lifecycle write / direct SQL /
-  service-role bypass
-- Admin UI / Hub UI expansion / game detail route
-- Game sessions, playable runtime, Kick Blast gameplay
+- Remote session lookup / start / submit execution
+- `start_game_session` / `submit_game_session_result` clients
+- Session creation / resume wiring
+- Hub or detail-page UI / playable runtime / Kick Blast gameplay
 - Matchmaking / multiplayer
+- Connecting platform sessions to Hub `runtime.*` / `platformSessionId`
 - Merge / push to `alpha-0.2`
 - Unrelated files
 
 ## Branch
 
-`office/games-catalog-lifecycle-trusted-v1`
+`office/games-session-lookup-trusted-v1`
 
-Required parent: `office/games-catalog-entry-lookup-trusted-v1` at `e3d2eb1`
+Required parent: `office/games-catalog-lifecycle-trusted-v1` at
+`47d4ada73f071875a63fc74c7d84f2cd62f086af`
 
 ## Status
 
