@@ -1,12 +1,15 @@
 import { assessmentGradeStatusMessage } from "../../../lib/learning/assessmentObjectiveGrading";
 import type { AssessmentGradeView } from "../../../lib/learning/assessmentObjectiveGrading";
+import type { AssessmentProgressStatusView } from "../../../lib/learning/assessmentProgressIntegration";
 import { gradeAssessmentAttemptAction } from "../../learning/assessmentGradingActions";
+import { applyAssessmentProgressAction } from "../../learning/assessmentProgressActions";
 
 type Props = {
   activityId: string;
   attemptId: string;
   grade: AssessmentGradeView | null;
   canGrade: boolean;
+  progress: AssessmentProgressStatusView | null;
 };
 
 export default function AssessmentGradePanel({
@@ -14,6 +17,7 @@ export default function AssessmentGradePanel({
   attemptId,
   grade,
   canGrade,
+  progress,
 }: Props) {
   const status = grade?.grading_status ?? "not_graded";
   const statusMessage = assessmentGradeStatusMessage(status);
@@ -69,6 +73,14 @@ export default function AssessmentGradePanel({
             <dt className="text-white/35">Graded at</dt>
             <dd>{grade.graded_at ?? "—"}</dd>
           </div>
+          <div>
+            <dt className="text-white/35">Lesson completion</dt>
+            <dd>
+              {progress?.completion_recorded
+                ? `Recorded${progress.applied_at ? ` (${progress.applied_at})` : ""}`
+                : "Not recorded"}
+            </dd>
+          </div>
         </dl>
       ) : null}
 
@@ -114,6 +126,19 @@ export default function AssessmentGradePanel({
             className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
             Grade objective questions
+          </button>
+        </form>
+      ) : null}
+
+      {progress?.can_apply ? (
+        <form action={applyAssessmentProgressAction} className="mt-3">
+          <input type="hidden" name="activityId" value={activityId} />
+          <input type="hidden" name="attemptId" value={attemptId} />
+          <button
+            type="submit"
+            className="watch-focus-ring rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
+          >
+            Record lesson completion
           </button>
         </form>
       ) : null}
