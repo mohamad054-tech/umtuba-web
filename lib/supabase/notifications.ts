@@ -49,7 +49,8 @@ export type NotificationType =
   | "ai_creator_insight"
   | "post_save"
   | "post_share"
-  | "referral_reward";
+  | "referral_reward"
+  | "learning_course_completed";
 
 export type NotificationActor = {
   id: string;
@@ -95,6 +96,7 @@ const NOTIFICATION_TYPES = new Set<NotificationType>([
   "post_save",
   "post_share",
   "referral_reward",
+  "learning_course_completed",
 ]);
 
 function getErrorMessage(error: unknown, fallback: string): string {

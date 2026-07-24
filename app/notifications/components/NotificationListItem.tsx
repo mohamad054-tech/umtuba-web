@@ -32,6 +32,7 @@ const TYPE_LABEL: Record<NotificationType, string> = {
   ai_creator_insight: "AI Insight",
   post_save: "Save",
   post_share: "Share",
+  learning_course_completed: "Learning",
 };
 
 const TYPE_ICON: Record<NotificationType, string> = {
@@ -53,6 +54,7 @@ const TYPE_ICON: Record<NotificationType, string> = {
   ai_creator_insight: "✦",
   post_save: "☆",
   post_share: "↗",
+  learning_course_completed: "✓",
 };
 
 type NotificationListItemProps = {
