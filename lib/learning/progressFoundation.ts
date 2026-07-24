@@ -33,6 +33,8 @@ export const LEARNING_PROGRESS_EVENT_TYPES = [
   "lesson_reopened",
   "lesson_touched",
   "course_rollup_updated",
+  "course_completed",
+  "certificate_issued",
 ] as const;
 export type LearningProgressEventType =
   (typeof LEARNING_PROGRESS_EVENT_TYPES)[number];
