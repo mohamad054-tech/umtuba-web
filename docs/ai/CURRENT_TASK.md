@@ -2,21 +2,21 @@
 
 ## Task title
 
-UMTUBA — Games Privacy Settings Lookup Trusted V1
+UMTUBA — Games Privacy Settings Update Trusted V1
 
 ## Goal
 
-Add a fail-closed authenticated client for the existing
-`get_my_game_privacy_settings` RPC while explicitly preserving and documenting
-its ensure-on-read database side effects. Return owner privacy preference
-metadata only — no public-sharing, Hub, reward, economy, or playability
-authority.
+Add a fail-closed authenticated owner-only client for the existing
+`update_my_game_privacy_settings` RPC while explicitly preserving and
+documenting its ensure-on-write database side effects. Return owner privacy
+preference metadata only — no public-sharing, Hub, reward, economy, or
+playability authority.
 
 ## Allowed scope
 
 - `lib/games/gamesPrivacySettings.ts`
 - `lib/games/gamesPrivacySettings.test.ts`
-- `docs/games/implementation/GAMES_PRIVACY_SETTINGS_LOOKUP_TRUSTED_V1.md`
+- `docs/games/implementation/GAMES_PRIVACY_SETTINGS_UPDATE_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -24,8 +24,7 @@ authority.
 
 - Learning / Ads / Store / World / Financial / Social
 - New Supabase migrations; apply of `20260846` or `20260847`
-- Remote privacy lookup execution
-- `update_my_game_privacy_settings` client
+- Remote privacy lookup or update execution
 - Public privacy / sharing read surface
 - Hub Runtime / achievements UI / progress UI / profiles / feeds / leaderboards wiring
 - Rewards / wallet / points / economy
@@ -37,10 +36,10 @@ authority.
 
 ## Branch
 
-`office/games-privacy-settings-lookup-trusted-v1`
+`office/games-privacy-settings-update-trusted-v1`
 
-Required parent: `office/games-achievements-lookup-trusted-v1` at
-`22a778201e54bb0b2f8ceee816e0f131d8a440b0`
+Required parent: `office/games-privacy-settings-lookup-trusted-v1` at
+`85c0cd6428dc73e8140d3052f6be2b84ea972f53`
 
 ## Status
 
