@@ -2,19 +2,20 @@
 
 ## Task title
 
-UMTUBA — Games Hub Runtime Platform Session Bind Trusted V1
+UMTUBA — Games Hub Runtime Completion Submit Request Assembly Trusted V1
 
 ## Goal
 
-Add a pure fail-closed binder that attaches a validated Platform
-`session_id` to an existing Hub Runtime session contract. Metadata only —
-does not open Hub authority, gameplay, submit, ownership, or playability.
+Add a pure fail-closed assembler that maps a bound Hub Runtime session, an
+existing completion handoff, and an idempotency key into the already-defined
+`GamesSessionResultSubmitRequest` shape, without calling Submit or adding
+mutation authority.
 
 ## Allowed scope
 
 - `lib/games/gamesHubRuntime.ts`
-- `lib/games/gamesHubRuntimePlatformSessionBind.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_PLATFORM_SESSION_BIND_TRUSTED_V1.md`
+- `lib/games/gamesHubRuntimeCompletionSubmitRequestAssembly.test.ts`
+- `docs/games/implementation/GAMES_HUB_RUNTIME_COMPLETION_SUBMIT_REQUEST_ASSEMBLY_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -22,9 +23,8 @@ does not open Hub authority, gameplay, submit, ownership, or playability.
 
 - Learning / Ads / Store / World / Financial / Social
 - New Supabase migrations; apply of `20260846` or `20260847`
-- Remote execution
-- Session Start / Submit client changes
-- Completion → submit wiring
+- Remote execution / Session Start / Submit client calls
+- Completion apply (`handoff.applied` must remain false)
 - Hub authority flag changes
 - `/games` UI or gameplay launch
 - Rewards / wallet / points / economy
@@ -33,10 +33,10 @@ does not open Hub authority, gameplay, submit, ownership, or playability.
 
 ## Branch
 
-`office/games-hub-runtime-platform-session-bind-trusted-v1`
+`office/games-hub-runtime-completion-submit-request-assembly-v1`
 
-Required parent: `office/games-session-result-submit-trusted-v1` at
-`4a52818fb52527621c6f55053c70d847fcbe5762`
+Required parent: `office/games-hub-runtime-platform-session-bind-trusted-v1` at
+`5e5cef11b16280ee6ce496ba095353cebed919a1`
 
 ## Status
 

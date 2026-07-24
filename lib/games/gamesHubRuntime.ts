@@ -20,6 +20,10 @@ import {
   validateClientResultClaim,
   validateIdempotencyKey,
 } from "./gamesFoundation";
+import {
+  validateGamesSessionResultSubmitRequest,
+  type GamesSessionResultSubmitRequest,
+} from "./gamesSessionResultSubmitRequest";
 import { validateGameSessionId } from "./gamesSessions";
 
 export const GAMES_HUB_RUNTIME_CONTRACT_VERSION = "v1" as const;
@@ -626,6 +630,81 @@ export function bindGamesRuntimePlatformSessionId(
       finalized: runtime.finalized,
     }),
   };
+}
+
+/**
+ * Pure fail-closed assembler: map a bound Hub Runtime session, an existing
+ * completion handoff, and an idempotency key into a validated
+ * GamesSessionResultSubmitRequest.
+ *
+ * Mapping:
+ * - runtimeSession.platformSessionId → session_id
+ * - idempotencyKey → idempotency_key
+ * - completionHandoff.claim → claim
+ *
+ * Continuity uses only shared stable identity fields already guaranteed by
+ * current contracts: runtimeSessionId, gameId, playerId.
+ *
+ * Final request validation and bounded output are delegated entirely to
+ * validateGamesSessionResultSubmitRequest (sole claim / idempotency /
+ * session_id input boundary). Does not duplicate those validators.
+ *
+ * Does not call Submit, Session Start, any RPC, or Supabase.
+ * Does not mutate inputs or set handoff.applied to true.
+ * Successful assembly must not be treated as ownership, submit permission,
+ * session active/unexpired status, claim acceptance, gameplay validity,
+ * persistence, progress/achievement updates, or reward/economy entitlement.
+ * Hub Runtime authority remains closed. platformSessionId remains metadata.
+ */
+export function assembleGamesRuntimeCompletionSubmitRequest(
+  runtimeSession: unknown,
+  completionHandoff: unknown,
+  idempotencyKey: unknown
+): GamesValidationResult<GamesSessionResultSubmitRequest> {
+  if (
+    runtimeSession === null ||
+    runtimeSession === undefined ||
+    typeof runtimeSession !== "object"
+  ) {
+    return fail("session_required");
+  }
+
+  if (
+    completionHandoff === null ||
+    completionHandoff === undefined ||
+    typeof completionHandoff !== "object"
+  ) {
+    return fail("handoff_required");
+  }
+
+  const runtime = runtimeSession as GamesRuntimeSessionContract;
+  const handoff = completionHandoff as GamesRuntimeCompletionHandoff;
+
+  if (
+    runtime.platformSessionId === null ||
+    runtime.platformSessionId === undefined
+  ) {
+    return fail("platform_session_id_required");
+  }
+
+  // Continuity: completion must belong to the supplied runtime session.
+  if (runtime.runtimeSessionId !== handoff.runtimeSessionId) {
+    return fail("runtime_session_id_mismatch");
+  }
+
+  if (runtime.gameId !== handoff.gameId) {
+    return fail("session_game_mismatch");
+  }
+
+  if (runtime.playerId !== handoff.playerId) {
+    return fail("session_owner_mismatch");
+  }
+
+  return validateGamesSessionResultSubmitRequest({
+    session_id: runtime.platformSessionId,
+    idempotency_key: idempotencyKey,
+    claim: handoff.claim,
+  });
 }
 
 export type GamesRuntimeResumeInput = {
