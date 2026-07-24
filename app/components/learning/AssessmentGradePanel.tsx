@@ -21,9 +21,9 @@ export default function AssessmentGradePanel({
   return (
     <section
       className="mt-6 rounded-2xl border border-white/15 bg-white/[0.03] p-4"
-      aria-label="Objective grading"
+      aria-label="Assessment grading"
     >
-      <h2 className="text-sm font-bold text-white/80">Objective grading</h2>
+      <h2 className="text-sm font-bold text-white/80">Assessment grading</h2>
       <p className="mt-2 text-sm text-white/55">{statusMessage}</p>
 
       {grade && grade.grading_status !== "not_graded" ? (
@@ -40,16 +40,30 @@ export default function AssessmentGradePanel({
             </dd>
           </div>
           <div>
-            <dt className="text-white/35">Pending manual review</dt>
+            <dt className="text-white/35">Manual review</dt>
             <dd>
               {grade.has_pending_manual_review
-                ? `${grade.pending_manual_points ?? 0} pts (not final)`
-                : "None"}
+                ? `${grade.pending_manual_points ?? 0} pts pending (not final)`
+                : `${grade.manual_points_earned ?? 0} pts earned`}
             </dd>
           </div>
           <div>
-            <dt className="text-white/35">Total points possible</dt>
-            <dd>{grade.total_points_possible ?? "—"}</dd>
+            <dt className="text-white/35">Total</dt>
+            <dd>
+              {grade.is_final
+                ? `${grade.total_points_earned ?? "—"} / ${grade.total_points_possible ?? "—"}`
+                : `${grade.total_points_possible ?? "—"} possible (awaiting review)`}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-white/35">Final result</dt>
+            <dd>
+              {grade.is_final
+                ? `${grade.final_percentage != null ? `${grade.final_percentage}%` : "—"} · passed: ${
+                    grade.passed == null ? "not set" : String(grade.passed)
+                  }`
+                : "Not final yet"}
+            </dd>
           </div>
           <div>
             <dt className="text-white/35">Graded at</dt>
@@ -60,8 +74,9 @@ export default function AssessmentGradePanel({
 
       {grade?.has_pending_manual_review ? (
         <p className="mt-3 text-sm text-amber-100/90">
-          Result is not final while manual-review questions remain pending.
-          Pass/fail is not calculated in this foundation.
+          Some answers are pending instructor review. Pass/fail is calculated
+          only after all pending reviews are complete (when a passing score is
+          configured).
         </p>
       ) : null}
 
@@ -75,6 +90,11 @@ export default function AssessmentGradePanel({
               {q.points_earned != null
                 ? ` · ${q.points_earned}/${q.points_possible}`
                 : ` · ${q.points_possible} pts`}
+              {q.learner_feedback ? (
+                <span className="block text-white/45">
+                  Feedback: {q.learner_feedback}
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>
@@ -82,7 +102,7 @@ export default function AssessmentGradePanel({
 
       <p className="mt-3 text-xs text-white/40">
         Answer keys are never shown. Short-answer and fill-blank stay pending
-        manual review.
+        manual review until an instructor grades them.
       </p>
 
       {canGrade ? (
