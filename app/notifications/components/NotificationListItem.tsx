@@ -36,6 +36,9 @@ const TYPE_LABEL: Record<NotificationType, string> = {
   learning_announcement_posted: "Learning",
   learning_discussion_reply: "Learning",
   learning_qa_answered: "Learning",
+  learning_live_session_scheduled: "Learning",
+  learning_live_session_updated: "Learning",
+  learning_live_session_cancelled: "Learning",
 };
 
 const TYPE_ICON: Record<NotificationType, string> = {
@@ -61,6 +64,9 @@ const TYPE_ICON: Record<NotificationType, string> = {
   learning_announcement_posted: "📢",
   learning_discussion_reply: "💬",
   learning_qa_answered: "❓",
+  learning_live_session_scheduled: "📅",
+  learning_live_session_updated: "📅",
+  learning_live_session_cancelled: "📅",
 };
 
 type NotificationListItemProps = {
