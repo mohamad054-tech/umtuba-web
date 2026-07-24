@@ -3,13 +3,14 @@
 ## Summary
 
 UM Games Catalog Title Seed V1 **PASS** on
-`office/games-catalog-title-seed-v1`.
+`office/games-catalog-title-seed-v1` at `40c1d8c`.
 
 - Canonical allowlisted UM Kick Blast seed (metadata-only, non-playable)
 - `upsertGamesCatalogEntryTrusted` — sole Catalog write abstraction
 - `registerGamesCatalogTitleSeed` — admin-gated, fail-closed registration
 - `sessions_enabled` forced/validated `false`; no sessions/runtime/play
 - No migrations created or applied; no remote seed executed
+- Pushed to `origin/office/games-catalog-title-seed-v1` only
 
 ## Exact files changed
 
@@ -53,7 +54,7 @@ None — **NO MIGRATION REQUIRED** (do not apply `20260846` / `20260847`)
 
 ## git status --short
 
-(see final report after commit/push)
+- clean (`office/games-catalog-title-seed-v1` synced with origin, 0 ahead / 0 behind)
 
 ## Open issues
 
