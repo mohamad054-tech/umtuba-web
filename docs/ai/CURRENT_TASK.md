@@ -2,19 +2,19 @@
 
 ## Task title
 
-UMTUBA — Games Session Lookup Trusted V1
+UMTUBA — Games Progress Lookup Trusted V1
 
 ## Goal
 
-Add the first fail-closed trusted application client for the existing
-owner-only Games Platform session lookup RPC (`get_my_game_session`), without
-opening Hub Runtime authority or playable runtime.
+Add a fail-closed trusted application client for the existing owner-only
+Games Platform progress lookup RPC (`get_my_game_progress`), without opening
+Hub Runtime, playable authority, rewards, or economy authority.
 
 ## Allowed scope
 
-- `lib/games/gamesSessions.ts`
-- `lib/games/gamesSessions.test.ts`
-- `docs/games/implementation/GAMES_SESSION_LOOKUP_TRUSTED_V1.md`
+- `lib/games/gamesProgress.ts`
+- `lib/games/gamesProgress.test.ts`
+- `docs/games/implementation/GAMES_PROGRESS_LOOKUP_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -22,22 +22,24 @@ opening Hub Runtime authority or playable runtime.
 
 - Learning / Ads / Store / World / Financial / Social
 - New Supabase migrations; apply of `20260846` or `20260847`
-- Remote session lookup / start / submit execution
+- Remote progress lookup execution
+- Progress mutation
 - `start_game_session` / `submit_game_session_result` clients
-- Session creation / resume wiring
 - Hub or detail-page UI / playable runtime / Kick Blast gameplay
 - Matchmaking / multiplayer
-- Connecting platform sessions to Hub `runtime.*` / `platformSessionId`
+- Connecting progress to Hub `runtime.*` / `platformSessionId`
+- Rewards / wallet / points / economy
+- Catalog pre-read for existence proof
 - Merge / push to `alpha-0.2`
 - Unrelated files
 
 ## Branch
 
-`office/games-session-lookup-trusted-v1`
+`office/games-progress-lookup-trusted-v1`
 
-Required parent: `office/games-catalog-lifecycle-trusted-v1` at
-`47d4ada73f071875a63fc74c7d84f2cd62f086af`
+Required parent: `office/games-session-lookup-trusted-v1` at
+`da458c7898f873ac12cf7456a488a2d41e04d2ac`
 
 ## Status
 
-`complete` — PASS
+complete — PASS
