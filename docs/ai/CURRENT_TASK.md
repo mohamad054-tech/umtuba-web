@@ -2,20 +2,20 @@
 
 ## Task title
 
-UMTUBA — Games Hub Runtime Submit Outcome Acknowledgment Contract Trusted V1
+UMTUBA — Games Hub Runtime Submit Outcome Apply Eligibility Contract Trusted V1
 
 ## Goal
 
-Add a pure fail-closed acknowledgment classifier for an already-trusted
-Runtime submit outcome observation. The helper may classify the observation
-only; it must not mutate Runtime, mutate the completion handoff, set
-`applied=true`, permit reapply, or open Hub authority.
+Add a pure fail-closed eligibility classifier that determines whether an
+already-trusted submit acknowledgment is eligible for a future local apply
+step, without performing that apply, mutating Runtime or handoff, setting
+`applied=true`, permitting reapply, or opening Hub authority.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.ts`
-- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_ACKNOWLEDGMENT_CONTRACT_TRUSTED_V1.md`
+- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.ts`
+- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts`
+- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_APPLY_ELIGIBILITY_CONTRACT_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -34,10 +34,10 @@ only; it must not mutate Runtime, mutate the completion handoff, set
 
 ## Branch
 
-`office/games-hub-runtime-submit-outcome-acknowledgment-contract-v1`
+`office/games-hub-runtime-submit-outcome-apply-eligibility-contract-v1`
 
-Required parent: `office/games-hub-runtime-submit-outcome-adaptation-trusted-v1` at
-`3985f00c077668534fc67bd46783abe70885b62d`
+Required parent: `office/games-hub-runtime-submit-outcome-acknowledgment-contract-v1` at
+`04d8b3c650e43a41a78abac53e9a69cbae77e3e5`
 
 ## Status
 

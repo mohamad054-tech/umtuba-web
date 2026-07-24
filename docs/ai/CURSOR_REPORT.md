@@ -3,18 +3,17 @@
 ## Summary
 
 PASS — Added pure fail-closed
-`evaluateGamesRuntimeSubmitOutcomeAcknowledgmentTrusted` that classifies an
-already-trusted `GamesRuntimeSubmitOutcomeObservation` into a frozen
-acknowledgment view after exact continuity checks. Classification only:
-`applied`, `mutatesRuntime`, `mutatesHandoff`, and `permitsReapply` remain
-literal `false`. No Runtime/handoff mutation, lifecycle transition, Hub
-authority, RPC, progress/achievement/reward/economy, or reapply authority.
+`evaluateGamesRuntimeSubmitOutcomeApplyEligibilityTrusted` that classifies an
+already-trusted Runtime submit outcome acknowledgment into a bounded
+eligibility status after continuity and consistency checks. Classification
+only: no apply, no Runtime/handoff mutation, no `applied=true`, no reapply,
+no RPC, Hub authority remains closed.
 
 ## Exact files changed
 
-- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.ts` (created)
-- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.test.ts` (created)
-- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_ACKNOWLEDGMENT_CONTRACT_TRUSTED_V1.md` (created)
+- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.ts` (created)
+- `lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts` (created)
+- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_APPLY_ELIGIBILITY_CONTRACT_TRUSTED_V1.md` (created)
 - `docs/ai/CURRENT_TASK.md` (updated to this task)
 - `docs/ai/CURSOR_REPORT.md` (this report)
 
@@ -24,43 +23,61 @@ None.
 
 ## Security review
 
-- Fail-closed on malformed session/handoff/observation, invalid
-  `platformSessionId`, continuity mismatches, unsupported decision status,
-  and invalid `idempotentReplay`.
-- No secrets, env, service-role, or remote DB access.
-- No RPC / Start / Submit calls; no Platform response re-parse.
-- Authority flags frozen literal `false`; Hub Runtime authority unchanged.
+- Fail-closed on malformed session/handoff/acknowledgment, invalid
+  `platformSessionId`, runtime/handoff mismatch, acknowledgment/runtime
+  mismatch, unsupported `acknowledgmentStatus`, and inconsistent
+  `decisionStatus` / `idempotentReplay`.
+- No secrets exposed; no Supabase/RPC/Start/Submit calls.
+- Authority flags on output always literal `false`
+  (`applied` / `mutatesRuntime` / `mutatesHandoff` / `permitsReapply`).
+- Does not re-parse Platform submit responses; acknowledgment is sole
+  trusted classification input.
 
 ## Tests
 
 ```
-npx vitest run lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.test.ts
-→ 15 passed (15)
+npx vitest run lib/games/gamesHubRuntimeSubmitOutcomeApplyEligibility.test.ts
 ```
+
+Result: **16 passed** (1 file).
+
+Coverage includes: rejected / accepted fresh / idempotent replay
+classification; exact continuity success; runtime/handoff/game/player/
+platformSessionId/acknowledgment identity mismatches; malformed inputs;
+unsupported/inconsistent acknowledgment state; frozen output; input
+immutability; `applied` / `mutatesRuntime` / `mutatesHandoff` /
+`permitsReapply` remain false; no RPC/side effects; Hub authority flags
+unchanged and false.
 
 ## TypeScript
 
 ```
 npx tsc --noEmit
-→ exit 0
 ```
+
+Result: **PASS** (exit 0).
 
 ## Build
 
-Skipped — shared app exports / UI entry points not affected.
+Skipped — shared app exports / UI entry points were not affected.
 
 ## git diff --check
 
-```
-exit 0
-```
+PASS (no whitespace errors; Windows CRLF warnings only on `CURRENT_TASK.md`).
 
 ## git status --short
 
-(see final section after commit/push)
+(pre-commit working tree included the five files listed above; see final
+status after commit/push in the agent response.)
 
 ## Open issues
 
-None for this slice. Deferred: wiring acknowledgment into a Runtime apply /
-Hub sync pipeline (out of scope); apply of `20260846` / `20260847`; merge to
-`alpha-0.2`.
+None for this slice. Deferred (intentionally out of scope):
+
+- Local apply step that consumes `eligible_accepted_fresh`
+- Runtime lifecycle transition after apply
+- `handoff.applied = true` adaptation
+- Hub synchronization / progress / achievements / rewards / economy
+- Wiring into `gamesHubRuntime.ts` or UI
+- Migrations `20260846` / `20260847` apply
+- Merge to `alpha-0.2`
