@@ -1,12 +1,25 @@
 /**
  * UM Learning OS — Instructor Authoring Foundation V1
- * (Phase 0–3 + 4A + 4B + 4C + 4D).
+ * (Phase 0–3 + 4A–4E).
  *
- * Space + Program + Course + Section + Lesson create / publish / archive via
- * existing RPCs. User JWT only. No service role. No TS authorization substitute.
+ * Space → Program → Course → Section → Lesson → Activity create / update /
+ * publish / archive via existing RPCs. User JWT only. No service role.
+ * No TS authorization substitute.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  LEARNING_ACTIVITY_COMPLETION_MODES,
+  LEARNING_ACTIVITY_CONFIG_LIMITS,
+  LEARNING_ACTIVITY_RPCS,
+  LEARNING_ACTIVITY_STATUSES,
+  LEARNING_ACTIVITY_TYPES,
+  LEARNING_ACTIVITY_VISIBILITIES,
+  type LearningActivityCompletionMode,
+  type LearningActivityStatus,
+  type LearningActivityType,
+  type LearningActivityVisibility,
+} from "./activitiesFoundation";
 import {
   LEARNING_COURSE_RPCS,
   LEARNING_COURSE_STATUSES,
@@ -68,6 +81,10 @@ export const LEARNING_INSTRUCTOR_ROUTES = {
   lessonNew: (sectionId: string) =>
     `/learning/instructor/sections/${sectionId}/lessons/new`,
   lesson: (lessonId: string) => `/learning/instructor/lessons/${lessonId}`,
+  activityNew: (lessonId: string) =>
+    `/learning/instructor/lessons/${lessonId}/activities/new`,
+  activity: (activityId: string) =>
+    `/learning/instructor/activities/${activityId}`,
 } as const;
 
 /** Surfaced when creating a program under a non-active space (matches SQL). */
@@ -109,6 +126,26 @@ export const LEARNING_LESSON_REQUIRES_VALID_COURSE =
 /** Surfaced when parent program is not draft|published for lessons (matches SQL). */
 export const LEARNING_LESSON_REQUIRES_VALID_PROGRAM =
   "Parent program must be draft or published for lesson changes" as const;
+
+/** Surfaced when creating an activity under a non-active space (matches SQL). */
+export const LEARNING_ACTIVITY_REQUIRES_ACTIVE_SPACE =
+  "Learning space must be active for activity changes" as const;
+
+/** Surfaced when parent lesson is not draft|published (matches SQL). */
+export const LEARNING_ACTIVITY_REQUIRES_VALID_LESSON =
+  "Parent lesson must be draft or published for activity changes" as const;
+
+/** Surfaced when parent section is not draft|published for activities (matches SQL). */
+export const LEARNING_ACTIVITY_REQUIRES_VALID_SECTION =
+  "Parent section must be draft or published for activity changes" as const;
+
+/** Surfaced when parent course is not draft|published for activities (matches SQL). */
+export const LEARNING_ACTIVITY_REQUIRES_VALID_COURSE =
+  "Parent course must be draft or published for activity changes" as const;
+
+/** Surfaced when parent program is not draft|published for activities (matches SQL). */
+export const LEARNING_ACTIVITY_REQUIRES_VALID_PROGRAM =
+  "Parent program must be draft or published for activity changes" as const;
 
 export type InstructorAuthoringResult<T> =
   | { ok: true; data: T }
@@ -234,6 +271,48 @@ export type CreateLearningLessonInput = {
   default_language?: string;
 };
 
+export type InstructorActivitySummary = {
+  id: string;
+  lesson_id: string;
+  type: LearningActivityType;
+  slug: string;
+  name: string;
+  description: string | null;
+  status: LearningActivityStatus;
+  visibility: LearningActivityVisibility;
+  position: number;
+  completion_mode: LearningActivityCompletionMode;
+  config: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type CreateLearningActivityInput = {
+  lesson_id: string;
+  type: LearningActivityType;
+  slug: string;
+  name: string;
+  description?: string | null;
+  visibility?: LearningActivityVisibility;
+  completion_mode?: LearningActivityCompletionMode;
+  config?: Record<string, unknown>;
+};
+
+export type UpdateLearningActivityInput = {
+  activity_id: string;
+  name?: string;
+  description?: string | null;
+  visibility?: LearningActivityVisibility;
+  clear_description?: boolean;
+};
+
+export type UpdateLearningActivitySettingsInput = {
+  activity_id: string;
+  completion_mode?: LearningActivityCompletionMode;
+  config?: Record<string, unknown>;
+};
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
@@ -304,6 +383,28 @@ function isLessonVisibility(
   value: string
 ): value is LearningLessonVisibility {
   return (LEARNING_LESSON_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isActivityStatus(value: string): value is LearningActivityStatus {
+  return (LEARNING_ACTIVITY_STATUSES as readonly string[]).includes(value);
+}
+
+function isActivityVisibility(
+  value: string
+): value is LearningActivityVisibility {
+  return (LEARNING_ACTIVITY_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isActivityType(value: string): value is LearningActivityType {
+  return (LEARNING_ACTIVITY_TYPES as readonly string[]).includes(value);
+}
+
+function isActivityCompletionMode(
+  value: string
+): value is LearningActivityCompletionMode {
+  return (LEARNING_ACTIVITY_COMPLETION_MODES as readonly string[]).includes(
+    value
+  );
 }
 
 function parsePosition(value: unknown): number {
@@ -432,6 +533,71 @@ function mapLessonRow(
     visibility,
     position,
     default_language,
+    created_at,
+    updated_at,
+    published_at: asString(row.published_at),
+  };
+}
+
+function extractActivitySettings(row: Record<string, unknown>): {
+  completion_mode: LearningActivityCompletionMode;
+  config: Record<string, unknown>;
+} {
+  const nested = row.learning_activity_settings;
+  const settings = Array.isArray(nested)
+    ? asRecord(nested[0])
+    : asRecord(nested);
+  const modeRaw = asString(settings?.completion_mode) ?? "view";
+  const completion_mode = isActivityCompletionMode(modeRaw) ? modeRaw : "view";
+  const configRaw = settings?.config;
+  const config =
+    configRaw && typeof configRaw === "object" && !Array.isArray(configRaw)
+      ? (configRaw as Record<string, unknown>)
+      : {};
+  return { completion_mode, config };
+}
+
+function mapActivityRow(
+  row: Record<string, unknown>
+): InstructorActivitySummary | null {
+  const id = asString(row.id);
+  const lesson_id = asString(row.lesson_id);
+  const type = asString(row.type);
+  const slug = asString(row.slug);
+  const name = asString(row.name);
+  const status = asString(row.status);
+  const visibility = asString(row.visibility);
+  const created_at = asString(row.created_at) ?? "";
+  const updated_at = asString(row.updated_at) ?? "";
+  const position = parsePosition(row.position);
+  if (
+    !id ||
+    !lesson_id ||
+    !type ||
+    !slug ||
+    !name ||
+    !status ||
+    !visibility ||
+    !Number.isFinite(position) ||
+    !isActivityType(type) ||
+    !isActivityStatus(status) ||
+    !isActivityVisibility(visibility)
+  ) {
+    return null;
+  }
+  const settings = extractActivitySettings(row);
+  return {
+    id,
+    lesson_id,
+    type,
+    slug,
+    name,
+    description: asString(row.description),
+    status,
+    visibility,
+    position,
+    completion_mode: settings.completion_mode,
+    config: settings.config,
     created_at,
     updated_at,
     published_at: asString(row.published_at),
@@ -576,6 +742,84 @@ export function validateLearningLessonName(name: string): string | null {
   return validateLearningProgramName(name);
 }
 
+export function validateLearningActivitySlug(slug: string): string | null {
+  return validateLearningSpaceSlug(slug);
+}
+
+export function validateLearningActivityName(name: string): string | null {
+  return validateLearningProgramName(name);
+}
+
+/** Client-side gate mirroring SQL completion_mode allowlist. */
+export function validateLearningActivityCompletionMode(
+  mode: string
+): string | null {
+  if (!isActivityCompletionMode(mode.trim())) {
+    return "Invalid completion_mode";
+  }
+  return null;
+}
+
+/**
+ * Lightweight client-side config gate mirroring SQL bounds
+ * (`learning_activity_validate_config`). DB remains authoritative.
+ */
+export function validateLearningActivityConfig(
+  config: unknown
+): string | null {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    return "Activity config must be a JSON object";
+  }
+  const record = config as Record<string, unknown>;
+  const keys = Object.keys(record);
+  if (keys.length > LEARNING_ACTIVITY_CONFIG_LIMITS.maxTopLevelKeys) {
+    return `Activity config may have at most ${LEARNING_ACTIVITY_CONFIG_LIMITS.maxTopLevelKeys} keys`;
+  }
+  try {
+    const bytes = new TextEncoder().encode(JSON.stringify(record)).length;
+    if (bytes > LEARNING_ACTIVITY_CONFIG_LIMITS.maxBytes) {
+      return `Activity config exceeds ${LEARNING_ACTIVITY_CONFIG_LIMITS.maxBytes} bytes`;
+    }
+  } catch {
+    return "Activity config is not serializable JSON";
+  }
+  for (const [key, value] of Object.entries(record)) {
+    if (value === null || typeof value === "boolean" || typeof value === "number") {
+      continue;
+    }
+    if (typeof value === "string") {
+      if (value.length > LEARNING_ACTIVITY_CONFIG_LIMITS.maxStringChars) {
+        return `Activity config.${key} string exceeds ${LEARNING_ACTIVITY_CONFIG_LIMITS.maxStringChars} chars`;
+      }
+      continue;
+    }
+    if (Array.isArray(value)) {
+      if (value.length > LEARNING_ACTIVITY_CONFIG_LIMITS.maxArrayItems) {
+        return `Activity config.${key} array exceeds ${LEARNING_ACTIVITY_CONFIG_LIMITS.maxArrayItems} items`;
+      }
+      for (const item of value) {
+        if (
+          item !== null &&
+          typeof item !== "boolean" &&
+          typeof item !== "number" &&
+          typeof item !== "string"
+        ) {
+          return `Activity config.${key} array items must be scalars`;
+        }
+        if (
+          typeof item === "string" &&
+          item.length > LEARNING_ACTIVITY_CONFIG_LIMITS.maxStringChars
+        ) {
+          return `Activity config.${key} array string exceeds ${LEARNING_ACTIVITY_CONFIG_LIMITS.maxStringChars} chars`;
+        }
+      }
+      continue;
+    }
+    return `Activity config.${key} must be a scalar or short array`;
+  }
+  return null;
+}
+
 function programAllowsCourseCreate(status: LearningProgramStatus): boolean {
   return status === "draft" || status === "published";
 }
@@ -585,6 +829,10 @@ function courseAllowsSectionCreate(status: LearningCourseStatus): boolean {
 }
 
 function sectionAllowsLessonCreate(status: LearningSectionStatus): boolean {
+  return status === "draft" || status === "published";
+}
+
+function lessonAllowsActivityCreate(status: LearningLessonStatus): boolean {
   return status === "draft" || status === "published";
 }
 
@@ -1513,6 +1761,361 @@ export async function archiveLearningLesson(
     ok: true,
     data: {
       lesson_id: asString(record?.lesson_id) ?? id,
+      status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+const ACTIVITY_SELECT =
+  "id, lesson_id, type, slug, name, description, status, visibility, position, created_at, updated_at, published_at, learning_activity_settings(completion_mode, config)";
+
+async function assertActivityCreateParents(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<{ lesson_id: string }>> {
+  const lesson = await getInstructorLesson(supabase, lessonId);
+  if (!lesson.ok) return lesson;
+  if (!lessonAllowsActivityCreate(lesson.data.status)) {
+    return { ok: false, message: LEARNING_ACTIVITY_REQUIRES_VALID_LESSON };
+  }
+
+  const section = await getInstructorSection(supabase, lesson.data.section_id);
+  if (!section.ok) return section;
+  if (!sectionAllowsLessonCreate(section.data.status)) {
+    return { ok: false, message: LEARNING_ACTIVITY_REQUIRES_VALID_SECTION };
+  }
+
+  const course = await getInstructorCourse(supabase, section.data.course_id);
+  if (!course.ok) return course;
+  if (!courseAllowsSectionCreate(course.data.status)) {
+    return { ok: false, message: LEARNING_ACTIVITY_REQUIRES_VALID_COURSE };
+  }
+
+  const program = await getInstructorProgram(supabase, course.data.program_id);
+  if (!program.ok) return program;
+  if (!programAllowsCourseCreate(program.data.status)) {
+    return { ok: false, message: LEARNING_ACTIVITY_REQUIRES_VALID_PROGRAM };
+  }
+
+  const space = await getInstructorSpace(supabase, program.data.space_id);
+  if (!space.ok) return space;
+  if (space.data.status !== "active") {
+    return { ok: false, message: LEARNING_ACTIVITY_REQUIRES_ACTIVE_SPACE };
+  }
+
+  return { ok: true, data: { lesson_id: lessonId } };
+}
+
+/**
+ * Activities in a lesson visible via RLS (managers / staff paths).
+ * Note: activities have no anonymous/public SELECT policy in V1.
+ */
+export async function listInstructorActivities(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<InstructorActivitySummary[]>> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_activities")
+    .select(ACTIVITY_SELECT)
+    .eq("lesson_id", id)
+    .order("position", { ascending: true });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning activities"),
+    };
+  }
+
+  const activities: InstructorActivitySummary[] = [];
+  for (const row of data ?? []) {
+    const mapped = mapActivityRow(row as Record<string, unknown>);
+    if (mapped) activities.push(mapped);
+  }
+  return { ok: true, data: activities };
+}
+
+export async function getInstructorActivity(
+  supabase: AnyClient,
+  activityId: string
+): Promise<InstructorAuthoringResult<InstructorActivitySummary>> {
+  const id = activityId.trim();
+  if (!id) return { ok: false, message: "Activity id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_activities")
+    .select(ACTIVITY_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning activity"),
+    };
+  }
+  if (!data) {
+    return { ok: false, message: "Learning activity not found" };
+  }
+
+  const mapped = mapActivityRow(data as Record<string, unknown>);
+  if (!mapped) {
+    return { ok: false, message: "Learning activity row is invalid" };
+  }
+  return { ok: true, data: mapped };
+}
+
+export async function createLearningActivity(
+  supabase: AnyClient,
+  input: CreateLearningActivityInput
+): Promise<
+  InstructorAuthoringResult<{
+    activity_id: string;
+    lesson_id: string;
+    type: string;
+    status: string;
+    position: number;
+  }>
+> {
+  const lessonId = input.lesson_id.trim();
+  if (!lessonId) return { ok: false, message: "Lesson id is required" };
+
+  if (!isActivityType(input.type)) {
+    return { ok: false, message: "Invalid learning activity type" };
+  }
+  const slugErr = validateLearningActivitySlug(input.slug);
+  if (slugErr) return { ok: false, message: slugErr };
+  const nameErr = validateLearningActivityName(input.name);
+  if (nameErr) return { ok: false, message: nameErr };
+  const visibility = input.visibility ?? "private";
+  if (!isActivityVisibility(visibility)) {
+    return { ok: false, message: "Invalid learning activity visibility" };
+  }
+
+  if (input.completion_mode !== undefined) {
+    const modeErr = validateLearningActivityCompletionMode(
+      input.completion_mode
+    );
+    if (modeErr) return { ok: false, message: modeErr };
+  }
+  if (input.config !== undefined) {
+    const configErr = validateLearningActivityConfig(input.config);
+    if (configErr) return { ok: false, message: configErr };
+  }
+
+  const parents = await assertActivityCreateParents(supabase, lessonId);
+  if (!parents.ok) return parents;
+
+  const { data, error } = await supabase.rpc(LEARNING_ACTIVITY_RPCS.create, {
+    p_lesson_id: lessonId,
+    p_type: input.type,
+    p_slug: input.slug.trim().toLowerCase(),
+    p_name: input.name.trim(),
+    p_description: input.description?.trim() ? input.description.trim() : null,
+    p_visibility: visibility,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to create learning activity"),
+    };
+  }
+
+  const record = asRecord(data);
+  const activity_id = asString(record?.activity_id);
+  if (!activity_id) {
+    return { ok: false, message: "Create activity returned no activity_id" };
+  }
+  const position = parsePosition(record?.position);
+
+  if (input.completion_mode !== undefined || input.config !== undefined) {
+    const settings = await updateLearningActivitySettings(supabase, {
+      activity_id,
+      completion_mode: input.completion_mode,
+      config: input.config,
+    });
+    if (!settings.ok) return settings;
+  }
+
+  return {
+    ok: true,
+    data: {
+      activity_id,
+      lesson_id: asString(record?.lesson_id) ?? lessonId,
+      type: asString(record?.type) ?? input.type,
+      status: asString(record?.status) ?? "draft",
+      position: Number.isFinite(position) ? position : 0,
+    },
+  };
+}
+
+export async function updateLearningActivity(
+  supabase: AnyClient,
+  input: UpdateLearningActivityInput
+): Promise<
+  InstructorAuthoringResult<{ activity_id: string; updated: boolean }>
+> {
+  const id = input.activity_id.trim();
+  if (!id) return { ok: false, message: "Activity id is required" };
+
+  if (input.name !== undefined) {
+    const nameErr = validateLearningActivityName(input.name);
+    if (nameErr) return { ok: false, message: nameErr };
+  }
+  if (input.visibility !== undefined && !isActivityVisibility(input.visibility)) {
+    return { ok: false, message: "Invalid learning activity visibility" };
+  }
+
+  const args: Record<string, unknown> = { p_activity_id: id };
+  if (input.name !== undefined) args.p_name = input.name.trim();
+  if (input.description !== undefined) {
+    args.p_description = input.description?.trim()
+      ? input.description.trim()
+      : null;
+  }
+  if (input.visibility !== undefined) args.p_visibility = input.visibility;
+  if (input.clear_description) args.p_clear_description = true;
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_ACTIVITY_RPCS.update,
+    args
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to update learning activity"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      activity_id: asString(record?.activity_id) ?? id,
+      updated: record?.updated === true || record?.updated === undefined,
+    },
+  };
+}
+
+export async function updateLearningActivitySettings(
+  supabase: AnyClient,
+  input: UpdateLearningActivitySettingsInput
+): Promise<
+  InstructorAuthoringResult<{ activity_id: string; settings_updated: boolean }>
+> {
+  const id = input.activity_id.trim();
+  if (!id) return { ok: false, message: "Activity id is required" };
+
+  if (
+    input.completion_mode === undefined &&
+    input.config === undefined
+  ) {
+    return { ok: false, message: "No activity settings changes provided" };
+  }
+
+  if (input.completion_mode !== undefined) {
+    const modeErr = validateLearningActivityCompletionMode(
+      input.completion_mode
+    );
+    if (modeErr) return { ok: false, message: modeErr };
+  }
+  if (input.config !== undefined) {
+    const configErr = validateLearningActivityConfig(input.config);
+    if (configErr) return { ok: false, message: configErr };
+  }
+
+  const args: Record<string, unknown> = { p_activity_id: id };
+  if (input.completion_mode !== undefined) {
+    args.p_completion_mode = input.completion_mode;
+  }
+  if (input.config !== undefined) {
+    args.p_config = input.config;
+  }
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_ACTIVITY_RPCS.updateSettings,
+    args
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to update learning activity settings"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      activity_id: asString(record?.activity_id) ?? id,
+      settings_updated:
+        record?.settings_updated === true ||
+        record?.settings_updated === undefined,
+    },
+  };
+}
+
+export async function publishLearningActivity(
+  supabase: AnyClient,
+  activityId: string
+): Promise<
+  InstructorAuthoringResult<{ activity_id: string; status: string }>
+> {
+  const id = activityId.trim();
+  if (!id) return { ok: false, message: "Activity id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_ACTIVITY_RPCS.publish, {
+    p_activity_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to publish learning activity"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      activity_id: asString(record?.activity_id) ?? id,
+      status: asString(record?.status) ?? "published",
+    },
+  };
+}
+
+export async function archiveLearningActivity(
+  supabase: AnyClient,
+  activityId: string
+): Promise<
+  InstructorAuthoringResult<{ activity_id: string; status: string }>
+> {
+  const id = activityId.trim();
+  if (!id) return { ok: false, message: "Activity id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_ACTIVITY_RPCS.archive, {
+    p_activity_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to archive learning activity"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      activity_id: asString(record?.activity_id) ?? id,
       status: asString(record?.status) ?? "archived",
     },
   };

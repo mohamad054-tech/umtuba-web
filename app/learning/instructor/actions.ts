@@ -4,22 +4,35 @@ import { redirect } from "next/navigation";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
+  archiveLearningActivity,
   archiveLearningCourse,
   archiveLearningLesson,
   archiveLearningProgram,
   archiveLearningSection,
   archiveLearningSpace,
+  createLearningActivity,
   createLearningCourse,
   createLearningLesson,
   createLearningProgram,
   createLearningSection,
   createLearningSpace,
+  publishLearningActivity,
   publishLearningCourse,
   publishLearningLesson,
   publishLearningProgram,
   publishLearningSection,
   publishLearningSpace,
+  updateLearningActivity,
+  updateLearningActivitySettings,
 } from "../../../lib/learning/instructorAuthoring";
+import {
+  LEARNING_ACTIVITY_COMPLETION_MODES,
+  LEARNING_ACTIVITY_TYPES,
+  LEARNING_ACTIVITY_VISIBILITIES,
+  type LearningActivityCompletionMode,
+  type LearningActivityType,
+  type LearningActivityVisibility,
+} from "../../../lib/learning/activitiesFoundation";
 import {
   LEARNING_COURSE_VISIBILITIES,
   type LearningCourseVisibility,
@@ -79,6 +92,24 @@ function isLessonVisibility(
   value: string
 ): value is LearningLessonVisibility {
   return (LEARNING_LESSON_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isActivityType(value: string): value is LearningActivityType {
+  return (LEARNING_ACTIVITY_TYPES as readonly string[]).includes(value);
+}
+
+function isActivityVisibility(
+  value: string
+): value is LearningActivityVisibility {
+  return (LEARNING_ACTIVITY_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isActivityCompletionMode(
+  value: string
+): value is LearningActivityCompletionMode {
+  return (LEARNING_ACTIVITY_COMPLETION_MODES as readonly string[]).includes(
+    value
+  );
 }
 
 export async function createLearningSpaceAction(
@@ -761,6 +792,296 @@ export async function archiveLearningLessonAction(
   redirect(
     `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?notice=${encodeURIComponent(
       "Lesson archived"
+    )}`
+  );
+}
+
+export async function createLearningActivityAction(
+  formData: FormData
+): Promise<void> {
+  const lessonId = String(formData.get("lessonId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        lessonId
+          ? LEARNING_INSTRUCTOR_ROUTES.activityNew(lessonId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Lesson is required"
+      )}`
+    );
+  }
+
+  const typeRaw = String(formData.get("type") ?? "");
+  const name = String(formData.get("name") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const visibilityRaw = String(formData.get("visibility") ?? "private");
+  const completionModeRaw = String(formData.get("completionMode") ?? "view");
+
+  if (!isActivityType(typeRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activityNew(lessonId)}?error=${encodeURIComponent(
+        "Invalid learning activity type"
+      )}`
+    );
+  }
+  if (!isActivityVisibility(visibilityRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activityNew(lessonId)}?error=${encodeURIComponent(
+        "Invalid learning activity visibility"
+      )}`
+    );
+  }
+  if (!isActivityCompletionMode(completionModeRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activityNew(lessonId)}?error=${encodeURIComponent(
+        "Invalid completion_mode"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await createLearningActivity(supabase, {
+    lesson_id: lessonId,
+    type: typeRaw,
+    name,
+    slug,
+    description: description.trim() ? description : null,
+    visibility: visibilityRaw,
+    completion_mode: completionModeRaw,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activityNew(lessonId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(LEARNING_INSTRUCTOR_ROUTES.activity(result.data.activity_id));
+}
+
+export async function updateLearningActivityAction(
+  formData: FormData
+): Promise<void> {
+  const activityId = String(formData.get("activityId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        activityId
+          ? LEARNING_INSTRUCTOR_ROUTES.activity(activityId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!activityId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Activity is required"
+      )}`
+    );
+  }
+
+  const name = String(formData.get("name") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const visibilityRaw = String(formData.get("visibility") ?? "private");
+
+  if (!isActivityVisibility(visibilityRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        "Invalid learning activity visibility"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await updateLearningActivity(supabase, {
+    activity_id: activityId,
+    name,
+    description: description.trim() ? description : null,
+    visibility: visibilityRaw,
+    clear_description: !description.trim(),
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?notice=${encodeURIComponent(
+      "Activity updated"
+    )}`
+  );
+}
+
+export async function updateLearningActivitySettingsAction(
+  formData: FormData
+): Promise<void> {
+  const activityId = String(formData.get("activityId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        activityId
+          ? LEARNING_INSTRUCTOR_ROUTES.activity(activityId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!activityId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Activity is required"
+      )}`
+    );
+  }
+
+  const completionModeRaw = String(formData.get("completionMode") ?? "");
+  const configRaw = String(formData.get("config") ?? "").trim();
+
+  if (!isActivityCompletionMode(completionModeRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        "Invalid completion_mode"
+      )}`
+    );
+  }
+
+  let config: Record<string, unknown> = {};
+  if (configRaw) {
+    try {
+      const parsed: unknown = JSON.parse(configRaw);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        redirect(
+          `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+            "Activity config must be a JSON object"
+          )}`
+        );
+      }
+      config = parsed as Record<string, unknown>;
+    } catch {
+      redirect(
+        `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+          "Activity config must be valid JSON"
+        )}`
+      );
+    }
+  }
+
+  const supabase = await createClient();
+  const result = await updateLearningActivitySettings(supabase, {
+    activity_id: activityId,
+    completion_mode: completionModeRaw,
+    config,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?notice=${encodeURIComponent(
+      "Activity settings updated"
+    )}`
+  );
+}
+
+export async function publishLearningActivityAction(
+  formData: FormData
+): Promise<void> {
+  const activityId = String(formData.get("activityId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        activityId
+          ? LEARNING_INSTRUCTOR_ROUTES.activity(activityId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!activityId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Activity is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await publishLearningActivity(supabase, activityId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?notice=${encodeURIComponent(
+      "Activity published"
+    )}`
+  );
+}
+
+export async function archiveLearningActivityAction(
+  formData: FormData
+): Promise<void> {
+  const activityId = String(formData.get("activityId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        activityId
+          ? LEARNING_INSTRUCTOR_ROUTES.activity(activityId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!activityId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Activity is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveLearningActivity(supabase, activityId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?notice=${encodeURIComponent(
+      "Activity archived"
     )}`
   );
 }

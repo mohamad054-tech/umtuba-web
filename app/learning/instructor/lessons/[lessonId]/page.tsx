@@ -1,12 +1,17 @@
 import { notFound, redirect } from "next/navigation";
 import InstructorShell from "../../../../components/learning/instructor/InstructorShell";
+import InstructorActivityList from "../../../../components/learning/instructor/InstructorActivityList";
 import LessonLifecycleActions from "../../../../components/learning/instructor/LessonLifecycleActions";
 import LessonStatusChip from "../../../../components/learning/instructor/LessonStatusChip";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
+  getInstructorCourse,
   getInstructorLesson,
+  getInstructorProgram,
   getInstructorSection,
+  getInstructorSpace,
+  listInstructorActivities,
 } from "../../../../../lib/learning/instructorAuthoring";
 
 export const dynamic = "force-dynamic";
@@ -63,10 +68,30 @@ export default async function InstructorLessonPage({
     supabase,
     lesson.data.section_id
   );
+  const course = section.ok
+    ? await getInstructorCourse(supabase, section.data.course_id)
+    : null;
+  const program = course?.ok
+    ? await getInstructorProgram(supabase, course.data.program_id)
+    : null;
+  const space = program?.ok
+    ? await getInstructorSpace(supabase, program.data.space_id)
+    : null;
+  const activities = await listInstructorActivities(supabase, lessonId);
   const backHref = section.ok
     ? LEARNING_INSTRUCTOR_ROUTES.section(section.data.id)
     : LEARNING_INSTRUCTOR_ROUTES.hub;
   const backLabel = section.ok ? section.data.name : "Sections";
+  const canCreateActivities =
+    (lesson.data.status === "draft" || lesson.data.status === "published") &&
+    section.ok &&
+    (section.data.status === "draft" || section.data.status === "published") &&
+    !!course?.ok &&
+    (course.data.status === "draft" || course.data.status === "published") &&
+    !!program?.ok &&
+    (program.data.status === "draft" || program.data.status === "published") &&
+    !!space?.ok &&
+    space.data.status === "active";
 
   return (
     <InstructorShell
@@ -128,6 +153,21 @@ export default async function InstructorLessonPage({
           errorMessage={query.error?.trim() || null}
         />
       </div>
+
+      {activities.ok ? (
+        <InstructorActivityList
+          lessonId={lesson.data.id}
+          canCreate={canCreateActivities}
+          activities={activities.data}
+        />
+      ) : (
+        <p
+          role="alert"
+          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+        >
+          {activities.message}
+        </p>
+      )}
     </InstructorShell>
   );
 }

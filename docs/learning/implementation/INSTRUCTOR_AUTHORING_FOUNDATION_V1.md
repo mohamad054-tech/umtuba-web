@@ -1,27 +1,24 @@
 # UM Learning — Instructor Authoring Foundation V1
 
-Status: **Phase 0–3 + 4A + 4B + 4C + 4D implemented**
-(space + program + course + section + lesson).
+Status: **Phase 0–3 + 4A–4E implemented**
+(space + program + course + section + lesson + activity).
 No migrations. No RPC redesign. Uses existing Learning RPCs (`20260828+`).
 
 ## Goal
 
 Ship instructor-facing surface under `/learning/instructor` so staff can create
-and publish Learning spaces, programs, courses, sections, and lessons via user
-JWT + existing RPCs. Activity UI is deferred.
+and publish Learning spaces through activities via user JWT + existing RPCs.
+Content-block / question / grading / attempts UI is deferred.
 
 ## Architecture
 
 - Server Components + user JWT Supabase client (`createClient` / `getServerUser`)
-- Mutations only via existing `LEARNING_SPACE_RPCS` / `LEARNING_PROGRAM_RPCS` /
-  `LEARNING_COURSE_RPCS` / `LEARNING_SECTION_RPCS` / `LEARNING_LESSON_RPCS`
-- Program create requires parent space `status = active`
-- Course create requires parent program `draft|published` and space `active`
-- Section create requires parent course `draft|published`, program
-  `draft|published`, and space `active`
-- Lesson create requires parent section `draft|published`, course
-  `draft|published`, program `draft|published`, and space `active`
-- Reads via RLS (`Members read own spaces` / admin policies)
+- Mutations only via existing Learning RPCs through Activity
+- Activity create requires parent lesson/section/course `draft|published`,
+  program `draft|published`, and space `active`
+- Activity settings (`completion_mode`, `config`) via
+  `update_learning_activity_settings`
+- Reads via RLS (activities have no anonymous SELECT in V1)
 - **No service role**
 - **No TypeScript authorization substitute**
 - Learner routes under `/learning` (non-instructor) are untouched
@@ -40,12 +37,14 @@ JWT + existing RPCs. Activity UI is deferred.
 | `/learning/instructor/courses/[courseId]/sections/new` | Create section |
 | `/learning/instructor/sections/[sectionId]` | Section detail + lessons list + publish/archive |
 | `/learning/instructor/sections/[sectionId]/lessons/new` | Create lesson |
-| `/learning/instructor/lessons/[lessonId]` | Lesson detail + publish/archive |
+| `/learning/instructor/lessons/[lessonId]` | Lesson detail + activities list + publish/archive |
+| `/learning/instructor/lessons/[lessonId]/activities/new` | Create activity |
+| `/learning/instructor/activities/[activityId]` | Activity detail + settings + publish/archive |
 
 ## Out of scope (later phases)
 
-- Activity UI
 - Content blocks / questions editors
+- Grading UI / attempts UI
 - Staff assign, invites, enrollments
 - Moderation UI, learner nav entry in `APP_ROUTES`
 - New migrations / RPC changes
