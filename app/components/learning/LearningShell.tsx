@@ -8,6 +8,8 @@ type LearningShellProps = {
   children: React.ReactNode;
   backHref?: string;
   backLabel?: string;
+  /** Entitled staff only — never show to learners without access. */
+  instructorHref?: string;
 };
 
 export default function LearningShell({
@@ -16,6 +18,7 @@ export default function LearningShell({
   children,
   backHref,
   backLabel = "Back",
+  instructorHref,
 }: LearningShellProps) {
   return (
     <main
@@ -23,16 +26,24 @@ export default function LearningShell({
     >
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
         <AppTopNav title={title} subtitle={subtitle ?? "UM Learning"} />
-        {backHref ? (
-          <p className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          {backHref ? (
             <Link
               href={backHref}
               className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
             >
               ← {backLabel}
             </Link>
-          </p>
-        ) : null}
+          ) : null}
+          {instructorHref ? (
+            <Link
+              href={instructorHref}
+              className="watch-focus-ring text-sm font-bold text-sky-300 hover:text-sky-200"
+            >
+              Instructor workspace
+            </Link>
+          ) : null}
+        </div>
         {children}
       </div>
     </main>

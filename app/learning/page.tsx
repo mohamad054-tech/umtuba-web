@@ -6,6 +6,11 @@ import {
   LEARNING_LEARNER_ROUTES,
   loadMyLearningHub,
 } from "../../lib/learning/learnerDelivery";
+import {
+  LEARNING_INSTRUCTOR_ROUTES,
+  listInstructorAuthorableCourses,
+  type InstructorAuthorableCourse,
+} from "../../lib/learning/instructorAuthoring";
 
 export const metadata = {
   title: "My Learning | UMTUBA",
@@ -23,9 +28,19 @@ export default async function LearningHubPage() {
 
   const supabase = await createClient();
   const hub = await loadMyLearningHub(supabase, user.id);
+  const authorable = await listInstructorAuthorableCourses(supabase);
+  const showInstructor =
+    authorable.ok &&
+    (authorable.data as InstructorAuthorableCourse[]).length > 0;
 
   return (
-    <LearningShell title="Learning" subtitle="My Learning">
+    <LearningShell
+      title="Learning"
+      subtitle="My Learning"
+      instructorHref={
+        showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
+      }
+    >
       {hub.ok ? (
         <LearningHub hub={hub.data} />
       ) : (
