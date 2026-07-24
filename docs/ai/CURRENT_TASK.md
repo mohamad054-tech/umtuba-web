@@ -1,4 +1,4 @@
-﻿# Current Task
+# Current Task
 
 ## Task title
 

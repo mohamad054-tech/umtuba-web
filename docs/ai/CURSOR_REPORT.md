@@ -1,4 +1,4 @@
-﻿# CURSOR_REPORT
+# CURSOR_REPORT
 
 ## Summary
 UM Games Progress Lookup Trusted V1 PASS on office/games-progress-lookup-trusted-v1.
@@ -46,7 +46,7 @@ None — NO MIGRATION REQUIRED (do not apply 20260846 / 20260847)
 - clean
 
 ## git status --short
-- (filled after commit)
+- (updated after docs finalize commit)
 
 ## Open issues
 - Remote progress lookup requires 20260846 applied before live RPC succeeds
