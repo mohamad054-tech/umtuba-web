@@ -5,25 +5,32 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
   archiveLearningActivity,
+  archiveLearningContentBlock,
   archiveLearningCourse,
   archiveLearningLesson,
   archiveLearningProgram,
   archiveLearningSection,
   archiveLearningSpace,
+  buildLearningContentBlockContent,
   createLearningActivity,
+  createLearningContentBlock,
   createLearningCourse,
   createLearningLesson,
   createLearningProgram,
   createLearningSection,
   createLearningSpace,
   publishLearningActivity,
+  publishLearningContentBlock,
   publishLearningCourse,
   publishLearningLesson,
   publishLearningProgram,
   publishLearningSection,
   publishLearningSpace,
+  reorderLearningContentBlocks,
+  unpublishLearningContentBlock,
   updateLearningActivity,
   updateLearningActivitySettings,
+  updateLearningContentBlock,
 } from "../../../lib/learning/instructorAuthoring";
 import {
   LEARNING_ACTIVITY_COMPLETION_MODES,
@@ -33,6 +40,10 @@ import {
   type LearningActivityType,
   type LearningActivityVisibility,
 } from "../../../lib/learning/activitiesFoundation";
+import {
+  LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES,
+  type LearningLessonContentBlockCreatableType,
+} from "../../../lib/learning/lessonContentBlocksFoundation";
 import {
   LEARNING_COURSE_VISIBILITIES,
   type LearningCourseVisibility,
@@ -1082,6 +1093,323 @@ export async function archiveLearningActivityAction(
   redirect(
     `${LEARNING_INSTRUCTOR_ROUTES.activity(activityId)}?notice=${encodeURIComponent(
       "Activity archived"
+    )}`
+  );
+}
+
+function contentFieldsFromForm(formData: FormData): Record<string, string> {
+  const keys = [
+    "text",
+    "format",
+    "level",
+    "url",
+    "alt",
+    "caption",
+    "provider",
+    "attribution",
+    "style",
+    "variant",
+    "label",
+    "description",
+    "code",
+    "language",
+  ] as const;
+  const fields: Record<string, string> = {};
+  for (const key of keys) {
+    fields[key] = String(formData.get(key) ?? "");
+  }
+  return fields;
+}
+
+export async function createLearningContentBlockAction(
+  formData: FormData
+): Promise<void> {
+  const lessonId = String(formData.get("lessonId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        lessonId
+          ? LEARNING_INSTRUCTOR_ROUTES.contentBlockNew(lessonId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Lesson is required"
+      )}`
+    );
+  }
+
+  const blockTypeRaw = String(formData.get("blockType") ?? "").trim();
+  if (
+    !(
+      LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES as readonly string[]
+    ).includes(blockTypeRaw)
+  ) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlockNew(lessonId)}?error=${encodeURIComponent(
+        "Invalid content block type"
+      )}`
+    );
+  }
+  const blockType = blockTypeRaw as LearningLessonContentBlockCreatableType;
+  const built = buildLearningContentBlockContent(
+    blockType,
+    contentFieldsFromForm(formData)
+  );
+  if (!built.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlockNew(lessonId)}?error=${encodeURIComponent(
+        built.message
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await createLearningContentBlock(supabase, {
+    lesson_id: lessonId,
+    block_type: blockType,
+    content: built.data,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlockNew(lessonId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(LEARNING_INSTRUCTOR_ROUTES.contentBlock(result.data.block_id));
+}
+
+export async function updateLearningContentBlockAction(
+  formData: FormData
+): Promise<void> {
+  const blockId = String(formData.get("blockId") ?? "").trim();
+  const blockType = String(formData.get("blockType") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        blockId
+          ? LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!blockId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Content block is required"
+      )}`
+    );
+  }
+
+  const built = buildLearningContentBlockContent(
+    blockType,
+    contentFieldsFromForm(formData)
+  );
+  if (!built.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?error=${encodeURIComponent(
+        built.message
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await updateLearningContentBlock(supabase, {
+    block_id: blockId,
+    content: built.data,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?notice=${encodeURIComponent(
+      "Content block updated"
+    )}`
+  );
+}
+
+export async function publishLearningContentBlockAction(
+  formData: FormData
+): Promise<void> {
+  const blockId = String(formData.get("blockId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        blockId
+          ? LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!blockId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Content block is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await publishLearningContentBlock(supabase, blockId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?notice=${encodeURIComponent(
+      "Content block published"
+    )}`
+  );
+}
+
+export async function unpublishLearningContentBlockAction(
+  formData: FormData
+): Promise<void> {
+  const blockId = String(formData.get("blockId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        blockId
+          ? LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!blockId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Content block is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await unpublishLearningContentBlock(supabase, blockId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?notice=${encodeURIComponent(
+      "Content block unpublished"
+    )}`
+  );
+}
+
+export async function archiveLearningContentBlockAction(
+  formData: FormData
+): Promise<void> {
+  const blockId = String(formData.get("blockId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        blockId
+          ? LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!blockId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Content block is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveLearningContentBlock(supabase, blockId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.contentBlock(blockId)}?notice=${encodeURIComponent(
+      "Content block archived"
+    )}`
+  );
+}
+
+export async function reorderLearningContentBlocksAction(
+  formData: FormData
+): Promise<void> {
+  const lessonId = String(formData.get("lessonId") ?? "").trim();
+  const blockIdsRaw = String(formData.get("blockIds") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        lessonId
+          ? LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Lesson is required"
+      )}`
+    );
+  }
+
+  const blockIds = blockIdsRaw
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+  const supabase = await createClient();
+  const result = await reorderLearningContentBlocks(
+    supabase,
+    lessonId,
+    blockIds
+  );
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.lesson(lessonId)}?notice=${encodeURIComponent(
+      "Content blocks reordered"
     )}`
   );
 }

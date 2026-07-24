@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import InstructorShell from "../../../../components/learning/instructor/InstructorShell";
 import InstructorActivityList from "../../../../components/learning/instructor/InstructorActivityList";
+import InstructorContentBlockList from "../../../../components/learning/instructor/InstructorContentBlockList";
 import LessonLifecycleActions from "../../../../components/learning/instructor/LessonLifecycleActions";
 import LessonStatusChip from "../../../../components/learning/instructor/LessonStatusChip";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
@@ -12,6 +13,7 @@ import {
   getInstructorSection,
   getInstructorSpace,
   listInstructorActivities,
+  listInstructorContentBlocks,
 } from "../../../../../lib/learning/instructorAuthoring";
 
 export const dynamic = "force-dynamic";
@@ -78,11 +80,12 @@ export default async function InstructorLessonPage({
     ? await getInstructorSpace(supabase, program.data.space_id)
     : null;
   const activities = await listInstructorActivities(supabase, lessonId);
+  const contentBlocks = await listInstructorContentBlocks(supabase, lessonId);
   const backHref = section.ok
     ? LEARNING_INSTRUCTOR_ROUTES.section(section.data.id)
     : LEARNING_INSTRUCTOR_ROUTES.hub;
   const backLabel = section.ok ? section.data.name : "Sections";
-  const canCreateActivities =
+  const canCreateChildren =
     (lesson.data.status === "draft" || lesson.data.status === "published") &&
     section.ok &&
     (section.data.status === "draft" || section.data.status === "published") &&
@@ -154,10 +157,25 @@ export default async function InstructorLessonPage({
         />
       </div>
 
+      {contentBlocks.ok ? (
+        <InstructorContentBlockList
+          lessonId={lesson.data.id}
+          canCreate={canCreateChildren}
+          blocks={contentBlocks.data}
+        />
+      ) : (
+        <p
+          role="alert"
+          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+        >
+          {contentBlocks.message}
+        </p>
+      )}
+
       {activities.ok ? (
         <InstructorActivityList
           lessonId={lesson.data.id}
-          canCreate={canCreateActivities}
+          canCreate={canCreateChildren}
           activities={activities.data}
         />
       ) : (

@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { LEARNING_ACTIVITY_RPCS } from "./activitiesFoundation";
 import { LEARNING_COURSE_RPCS } from "./coursesFoundation";
+import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "./lessonContentBlocksFoundation";
 import { LEARNING_LESSON_RPCS } from "./lessonsFoundation";
 import { LEARNING_PROGRAM_RPCS } from "./programsFoundation";
 import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
@@ -13,6 +14,8 @@ import {
   LEARNING_ACTIVITY_REQUIRES_VALID_LESSON,
   LEARNING_ACTIVITY_REQUIRES_VALID_PROGRAM,
   LEARNING_ACTIVITY_REQUIRES_VALID_SECTION,
+  LEARNING_CONTENT_BLOCK_REQUIRES_ACTIVE_SPACE,
+  LEARNING_CONTENT_BLOCK_REQUIRES_VALID_LESSON,
   LEARNING_COURSE_REQUIRES_ACTIVE_SPACE,
   LEARNING_COURSE_REQUIRES_VALID_PROGRAM,
   LEARNING_INSTRUCTOR_ROUTES,
@@ -25,19 +28,24 @@ import {
   LEARNING_SECTION_REQUIRES_VALID_COURSE,
   LEARNING_SECTION_REQUIRES_VALID_PROGRAM,
   createLearningActivity,
+  createLearningContentBlock,
   createLearningCourse,
   createLearningLesson,
   createLearningProgram,
   createLearningSection,
   publishLearningActivity,
+  publishLearningContentBlock,
   publishLearningCourse,
   publishLearningLesson,
   publishLearningProgram,
   publishLearningSection,
   updateLearningActivity,
   updateLearningActivitySettings,
+  updateLearningContentBlock,
   validateLearningActivityCompletionMode,
   validateLearningActivityConfig,
+  validateLearningContentBlockContent,
+  validateLearningContentBlockType,
   validateLearningProgramName,
   validateLearningProgramSlug,
   validateLearningSpaceName,
@@ -557,6 +565,19 @@ describe("Instructor Authoring Foundation V1 — files & routes", () => {
         join(ROOT, "app/learning/instructor/activities/[activityId]/page.tsx")
       )
     ).toBe(true);
+    expect(
+      existsSync(
+        join(
+          ROOT,
+          "app/learning/instructor/lessons/[lessonId]/content/new/page.tsx"
+        )
+      )
+    ).toBe(true);
+    expect(
+      existsSync(
+        join(ROOT, "app/learning/instructor/content-blocks/[blockId]/page.tsx")
+      )
+    ).toBe(true);
     expect(existsSync(join(ROOT, "app/learning/instructor/actions.ts"))).toBe(
       true
     );
@@ -600,6 +621,12 @@ describe("Instructor Authoring Foundation V1 — files & routes", () => {
     expect(LEARNING_INSTRUCTOR_ROUTES.activity("act1")).toBe(
       "/learning/instructor/activities/act1"
     );
+    expect(LEARNING_INSTRUCTOR_ROUTES.contentBlockNew("les1")).toBe(
+      "/learning/instructor/lessons/les1/content/new"
+    );
+    expect(LEARNING_INSTRUCTOR_ROUTES.contentBlock("blk1")).toBe(
+      "/learning/instructor/content-blocks/blk1"
+    );
   });
 
   it("does not create a migration for this UI slice", () => {
@@ -635,9 +662,23 @@ describe("Instructor Authoring Foundation V1 — RPC contracts", () => {
     );
     expect(LEARNING_ACTIVITY_RPCS.publish).toBe("publish_learning_activity");
     expect(LEARNING_ACTIVITY_RPCS.archive).toBe("archive_learning_activity");
-    expect(src).not.toMatch(
-      /create_learning_lesson_content_block|create_learning_question/
+    expect(src).toContain("LEARNING_LESSON_CONTENT_BLOCK_RPCS");
+    expect(LEARNING_LESSON_CONTENT_BLOCK_RPCS.create).toBe(
+      "create_learning_lesson_content_block"
     );
+    expect(LEARNING_LESSON_CONTENT_BLOCK_RPCS.update).toBe(
+      "update_learning_lesson_content_block"
+    );
+    expect(LEARNING_LESSON_CONTENT_BLOCK_RPCS.publish).toBe(
+      "publish_learning_lesson_content_block"
+    );
+    expect(LEARNING_LESSON_CONTENT_BLOCK_RPCS.archive).toBe(
+      "archive_learning_lesson_content_block"
+    );
+    expect(LEARNING_LESSON_CONTENT_BLOCK_RPCS.reorder).toBe(
+      "reorder_learning_lesson_content_blocks"
+    );
+    expect(src).not.toMatch(/create_learning_question/);
   });
 
   it("forbids service role and does not redesign RPCs", () => {
@@ -1574,6 +1615,284 @@ describe("Instructor Authoring Foundation V1 — Phase 4E activity wrappers", ()
     expect(failed).toEqual({
       ok: false,
       message: "Only draft activities can be published",
+    });
+  });
+});
+
+describe("Instructor Authoring — Phase 5A content block wrappers", () => {
+  it("validates creatable types and content", () => {
+    expect(validateLearningContentBlockType("rich_text")).toBeNull();
+    expect(validateLearningContentBlockType("ai_block")).toBe(
+      "Invalid content block type"
+    );
+    expect(
+      validateLearningContentBlockContent("heading", {
+        text: "Intro",
+        level: 2,
+      })
+    ).toBeNull();
+    expect(
+      validateLearningContentBlockContent("heading", { text: "Intro" })
+    ).toBe("heading.level must be a number");
+    expect(
+      validateLearningContentBlockContent("image", {
+        url: "javascript:alert(1)",
+      })
+    ).toBe("image.url must be a valid http(s) URL");
+    expect(
+      validateLearningContentBlockContent("rich_text", {
+        text: "ok",
+        unexpected: true,
+      })
+    ).toBe("content contains unexpected key unexpected for type rich_text");
+  });
+
+  it("create content block succeeds under valid lesson chain", async () => {
+    const client = mockActivityCreateClient({
+      lessonStatus: "draft",
+      sectionStatus: "published",
+      courseStatus: "draft",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn(async (name: string, args: Record<string, unknown>) => {
+      expect(name).toBe(LEARNING_LESSON_CONTENT_BLOCK_RPCS.create);
+      expect(args.p_lesson_id).toBe("les-1");
+      expect(args.p_block_type).toBe("rich_text");
+      expect(args.p_content).toEqual({ text: "Hello", format: "plain" });
+      return {
+        data: {
+          block_id: "blk-1",
+          lesson_id: "les-1",
+          block_type: "rich_text",
+          status: "draft",
+          position: 0,
+        },
+        error: null,
+      };
+    });
+
+    const result = await createLearningContentBlock(client as never, {
+      lesson_id: "les-1",
+      block_type: "rich_text",
+      content: { text: "Hello", format: "plain" },
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        block_id: "blk-1",
+        lesson_id: "les-1",
+        block_type: "rich_text",
+        status: "draft",
+        position: 0,
+      },
+    });
+  });
+
+  it("create content block blocks when lesson is archived", async () => {
+    const client = mockActivityCreateClient({
+      lessonStatus: "archived",
+      sectionStatus: "published",
+      courseStatus: "published",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningContentBlock(client as never, {
+      lesson_id: "les-1",
+      block_type: "divider",
+      content: { style: "solid" },
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: LEARNING_CONTENT_BLOCK_REQUIRES_VALID_LESSON,
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create content block blocks when space is not active", async () => {
+    const client = mockActivityCreateClient({
+      lessonStatus: "published",
+      sectionStatus: "published",
+      courseStatus: "published",
+      programStatus: "draft",
+      spaceStatus: "draft",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningContentBlock(client as never, {
+      lesson_id: "les-1",
+      block_type: "divider",
+      content: {},
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: LEARNING_CONTENT_BLOCK_REQUIRES_ACTIVE_SPACE,
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create content block rejects invalid content before RPC", async () => {
+    const client = mockActivityCreateClient({
+      lessonStatus: "draft",
+      sectionStatus: "draft",
+      courseStatus: "draft",
+      programStatus: "draft",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningContentBlock(client as never, {
+      lesson_id: "les-1",
+      block_type: "callout",
+      content: { text: "Hi" },
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: "callout.variant must be info|note|tip|success|warning|danger",
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create content block passes through RPC errors", async () => {
+    const client = mockActivityCreateClient({
+      lessonStatus: "published",
+      sectionStatus: "published",
+      courseStatus: "published",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn(async () => ({
+      data: null,
+      error: { message: "Not allowed to create content blocks in this lesson" },
+    }));
+
+    const result = await createLearningContentBlock(client as never, {
+      lesson_id: "les-1",
+      block_type: "rich_text",
+      content: { text: "Hello", format: "plain" },
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: "Not allowed to create content blocks in this lesson",
+    });
+  });
+
+  it("update content block succeeds and passes through errors", async () => {
+    const okClient = {
+      from: vi.fn((table: string) => {
+        expect(table).toBe("learning_lesson_content_blocks");
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: "blk-1",
+                  lesson_id: "les-1",
+                  block_type: "heading",
+                  status: "draft",
+                  position: 0,
+                  content: { text: "Old", level: 2 },
+                  created_at: "2026-01-01T00:00:00Z",
+                  updated_at: "2026-01-01T00:00:00Z",
+                  published_at: null,
+                },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }),
+      rpc: vi.fn(async (name: string, args: Record<string, unknown>) => {
+        expect(name).toBe(LEARNING_LESSON_CONTENT_BLOCK_RPCS.update);
+        expect(args.p_block_id).toBe("blk-1");
+        expect(args.p_content).toEqual({ text: "New", level: 3 });
+        return {
+          data: { block_id: "blk-1", updated: true },
+          error: null,
+        };
+      }),
+    };
+
+    const ok = await updateLearningContentBlock(okClient as never, {
+      block_id: "blk-1",
+      content: { text: "New", level: 3 },
+    });
+    expect(ok).toEqual({
+      ok: true,
+      data: { block_id: "blk-1", updated: true },
+    });
+
+    const errClient = {
+      from: vi.fn(() => ({
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () => ({
+              data: {
+                id: "blk-1",
+                lesson_id: "les-1",
+                block_type: "heading",
+                status: "draft",
+                position: 0,
+                content: { text: "Old", level: 2 },
+                created_at: "2026-01-01T00:00:00Z",
+                updated_at: "2026-01-01T00:00:00Z",
+                published_at: null,
+              },
+              error: null,
+            }),
+          }),
+        }),
+      })),
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Not allowed to update this content block" },
+      })),
+    };
+    const failed = await updateLearningContentBlock(errClient as never, {
+      block_id: "blk-1",
+      content: { text: "New", level: 3 },
+    });
+    expect(failed).toEqual({
+      ok: false,
+      message: "Not allowed to update this content block",
+    });
+  });
+
+  it("publish content block succeeds and passes through errors", async () => {
+    const okClient = {
+      rpc: vi.fn(async (name: string, args: Record<string, unknown>) => {
+        expect(name).toBe(LEARNING_LESSON_CONTENT_BLOCK_RPCS.publish);
+        expect(args.p_block_id).toBe("blk-1");
+        return {
+          data: { block_id: "blk-1", status: "published" },
+          error: null,
+        };
+      }),
+    };
+
+    const ok = await publishLearningContentBlock(okClient as never, "blk-1");
+    expect(ok).toEqual({
+      ok: true,
+      data: { block_id: "blk-1", status: "published" },
+    });
+
+    const errClient = {
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Only draft content blocks can be published" },
+      })),
+    };
+    const failed = await publishLearningContentBlock(errClient as never, "blk-1");
+    expect(failed).toEqual({
+      ok: false,
+      message: "Only draft content blocks can be published",
     });
   });
 });

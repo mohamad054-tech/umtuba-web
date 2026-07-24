@@ -2,26 +2,24 @@
 
 ## Summary
 
-Phase 4E (Activity authoring under Lesson) implemented on
+Phase 5A (Lesson Content Blocks Editor) implemented on
 `office/learning-progress-mutations-v1`. Typed wrappers for list/get/create/
-update/settings/publish/archive, activity server actions, lesson activity list +
-create/detail UI with completion_mode display and settings editing. Parent gates
-match SQL. No migrations, no content-block/question/grading/attempts UI.
-JWT + RLS only.
+update/publish/unpublish/archive/reorder, content-block actions, lesson list +
+create/edit UI for creatable block types only. Parent gates match SQL.
+No migrations. No question/grading/attempts UI. JWT + RLS only.
 
 ## Exact files changed
 
-- `lib/learning/instructorAuthoring.ts` — activity wrappers + settings
-- `lib/learning/instructorAuthoring.test.ts` — Phase 4E tests
-- `app/learning/instructor/actions.ts` — activity create/update/settings/publish/archive
-- `app/learning/instructor/lessons/[lessonId]/page.tsx` — activity list
-- `app/learning/instructor/lessons/[lessonId]/activities/new/page.tsx` — create
-- `app/learning/instructor/activities/[activityId]/page.tsx` — detail + edit
-- `app/components/learning/instructor/InstructorActivityList.tsx` (new)
-- `app/components/learning/instructor/CreateActivityForm.tsx` (new)
-- `app/components/learning/instructor/UpdateActivityForm.tsx` (new)
-- `app/components/learning/instructor/ActivityLifecycleActions.tsx` (new)
-- `app/components/learning/instructor/ActivityStatusChip.tsx` (new)
+- `lib/learning/instructorAuthoring.ts` — content-block wrappers + validation
+- `lib/learning/instructorAuthoring.test.ts` — Phase 5A tests
+- `app/learning/instructor/actions.ts` — content-block actions
+- `app/learning/instructor/lessons/[lessonId]/page.tsx` — content-block list
+- `app/learning/instructor/lessons/[lessonId]/content/new/page.tsx` — create
+- `app/learning/instructor/content-blocks/[blockId]/page.tsx` — editor
+- `app/components/learning/instructor/InstructorContentBlockList.tsx` (new)
+- `app/components/learning/instructor/ContentBlockFields.tsx` (new)
+- `app/components/learning/instructor/ContentBlockLifecycleActions.tsx` (new)
+- `app/components/learning/instructor/ContentBlockStatusChip.tsx` (new)
 - `docs/learning/implementation/INSTRUCTOR_AUTHORING_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -33,17 +31,17 @@ None.
 ## Security review
 
 - User JWT client only; no service role.
-- Mutations via existing `LEARNING_ACTIVITY_RPCS` only.
-- Reads via RLS `from("learning_activities")` (+ settings embed).
+- Mutations via existing `LEARNING_LESSON_CONTENT_BLOCK_RPCS` only.
+- Reads via RLS `from("learning_lesson_content_blocks")`.
 - Parent gates: lesson/section/course/program draft|published, space active.
-- RPC errors passed through to UI query params.
+- Creatable types only; reserved/deferred rejected client-side + DB.
 
 ## Tests
 
-`npx vitest run lib/learning/instructorAuthoring.test.ts` — **41 passed**.
+`npx vitest run lib/learning/instructorAuthoring.test.ts` — **49 passed**.
 
 Coverage: routes/files, RPC contracts, create/update/publish success,
-completion_mode + config validation, parent-gate failures, RPC error passthrough.
+validation errors, parent-gate failures, RPC error passthrough.
 
 ## TypeScript
 
@@ -52,7 +50,7 @@ completion_mode + config validation, parent-gate failures, RPC error passthrough
 
 ## Build
 
-Not required for this slice (same bar as Phase 4D).
+Not required for this slice.
 
 ## git diff --check
 
@@ -60,16 +58,13 @@ PASS (exit 0).
 
 ## git status --short
 
-Clean on `office/learning-progress-mutations-v1` (in sync with origin after push).
+(see post-commit/push below)
 
 ## Commit / push
 
-- Commit: `bc4c4b9289eab0de1187d66d779114b5f1cbed16`
-  (`feat(learning): add instructor activity authoring`)
-- Push: `b0d420b..bc4c4b9` → `origin/office/learning-progress-mutations-v1`
-- Merge: none
+(pending — filled after commit)
 
 ## Open issues
 
-- Content-block / question / grading / attempts UI deferred.
+- Question editor / answer keys / grading / attempts UI deferred.
 - Pre-existing `tsc` noise from `.next/types/validator.ts` / missing games page.

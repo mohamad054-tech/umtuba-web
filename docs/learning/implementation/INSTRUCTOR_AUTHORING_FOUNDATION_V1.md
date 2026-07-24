@@ -1,14 +1,14 @@
 # UM Learning — Instructor Authoring Foundation V1
 
-Status: **Phase 0–3 + 4A–4E implemented**
-(space + program + course + section + lesson + activity).
+Status: **Phase 0–3 + 4A–4E + Content Authoring 5A implemented**
+(space → activity tree + lesson content blocks).
 No migrations. No RPC redesign. Uses existing Learning RPCs (`20260828+`).
 
 ## Goal
 
 Ship instructor-facing surface under `/learning/instructor` so staff can create
-and publish Learning spaces through activities via user JWT + existing RPCs.
-Content-block / question / grading / attempts UI is deferred.
+and publish Learning spaces through activities, and author lesson content blocks,
+via user JWT + existing RPCs. Question / grading / attempts UI is deferred.
 
 ## Architecture
 
@@ -18,7 +18,9 @@ Content-block / question / grading / attempts UI is deferred.
   program `draft|published`, and space `active`
 - Activity settings (`completion_mode`, `config`) via
   `update_learning_activity_settings`
-- Reads via RLS (activities have no anonymous SELECT in V1)
+- Content blocks via `LEARNING_LESSON_CONTENT_BLOCK_RPCS` (create/update/
+  publish/unpublish/archive/reorder); creatable types only
+- Reads via RLS (activities/content blocks have no anonymous SELECT in V1)
 - **No service role**
 - **No TypeScript authorization substitute**
 - Learner routes under `/learning` (non-instructor) are untouched
@@ -37,13 +39,15 @@ Content-block / question / grading / attempts UI is deferred.
 | `/learning/instructor/courses/[courseId]/sections/new` | Create section |
 | `/learning/instructor/sections/[sectionId]` | Section detail + lessons list + publish/archive |
 | `/learning/instructor/sections/[sectionId]/lessons/new` | Create lesson |
-| `/learning/instructor/lessons/[lessonId]` | Lesson detail + activities list + publish/archive |
+| `/learning/instructor/lessons/[lessonId]` | Lesson detail + content blocks + activities |
+| `/learning/instructor/lessons/[lessonId]/content/new` | Create content block |
+| `/learning/instructor/content-blocks/[blockId]` | Content block editor + publish/archive |
 | `/learning/instructor/lessons/[lessonId]/activities/new` | Create activity |
 | `/learning/instructor/activities/[activityId]` | Activity detail + settings + publish/archive |
 
 ## Out of scope (later phases)
 
-- Content blocks / questions editors
+- Question editor / answer keys
 - Grading UI / attempts UI
 - Staff assign, invites, enrollments
 - Moderation UI, learner nav entry in `APP_ROUTES`

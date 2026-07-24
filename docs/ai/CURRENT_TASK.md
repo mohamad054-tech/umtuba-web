@@ -2,13 +2,12 @@
 
 ## Task title
 
-UM Learning — Instructor Authoring Foundation V1 (Phase 4E)
+UM Learning — Content Authoring V1 (Phase 5A)
 
 ## Goal
 
-Activity authoring under an existing Lesson via existing RPCs.
-Supports completion_mode + config via settings RPC.
-No migrations. No content-block / question / grading / attempts UI.
+Lesson Content Blocks editor via existing RPCs.
+No question/answer-key/grading/attempts UI. No migrations.
 
 ## Allowed scope
 
@@ -23,7 +22,7 @@ No migrations. No content-block / question / grading / attempts UI.
 ## Forbidden scope
 
 - Migrations / Supabase schema / RPC redesign
-- Content block / question / grading / attempts UI
+- Question editor / answer keys / grading / attempts UI
 - Learner route changes
 - Service role
 
@@ -33,4 +32,4 @@ No migrations. No content-block / question / grading / attempts UI.
 
 ## Status
 
-`complete` — Phase 4E PASS
+`complete` — Phase 5A PASS

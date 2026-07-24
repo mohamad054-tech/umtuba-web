@@ -1,10 +1,9 @@
 /**
  * UM Learning OS — Instructor Authoring Foundation V1
- * (Phase 0–3 + 4A–4E).
+ * (Phase 0–3 + 4A–4E + Content Authoring 5A).
  *
- * Space → Program → Course → Section → Lesson → Activity create / update /
- * publish / archive via existing RPCs. User JWT only. No service role.
- * No TS authorization substitute.
+ * Space → … → Activity authoring, plus Lesson Content Blocks via existing RPCs.
+ * User JWT only. No service role. No TS authorization substitute.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -27,6 +26,21 @@ import {
   type LearningCourseStatus,
   type LearningCourseVisibility,
 } from "./coursesFoundation";
+import {
+  LEARNING_LESSON_CONTENT_BLOCK_CALLOUT_VARIANTS,
+  LEARNING_LESSON_CONTENT_BLOCK_CODE_LANGUAGE_PATTERN,
+  LEARNING_LESSON_CONTENT_BLOCK_CONTENT_KEYS,
+  LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES,
+  LEARNING_LESSON_CONTENT_BLOCK_DIVIDER_STYLES,
+  LEARNING_LESSON_CONTENT_BLOCK_HEADING_LEVELS,
+  LEARNING_LESSON_CONTENT_BLOCK_LIMITS,
+  LEARNING_LESSON_CONTENT_BLOCK_RICH_TEXT_FORMATS,
+  LEARNING_LESSON_CONTENT_BLOCK_RPCS,
+  LEARNING_LESSON_CONTENT_BLOCK_STATUSES,
+  LEARNING_LESSON_CONTENT_BLOCK_VIDEO_PROVIDERS,
+  type LearningLessonContentBlockCreatableType,
+  type LearningLessonContentBlockStatus,
+} from "./lessonContentBlocksFoundation";
 import {
   LEARNING_LESSON_RPCS,
   LEARNING_LESSON_STATUSES,
@@ -85,6 +99,10 @@ export const LEARNING_INSTRUCTOR_ROUTES = {
     `/learning/instructor/lessons/${lessonId}/activities/new`,
   activity: (activityId: string) =>
     `/learning/instructor/activities/${activityId}`,
+  contentBlockNew: (lessonId: string) =>
+    `/learning/instructor/lessons/${lessonId}/content/new`,
+  contentBlock: (blockId: string) =>
+    `/learning/instructor/content-blocks/${blockId}`,
 } as const;
 
 /** Surfaced when creating a program under a non-active space (matches SQL). */
@@ -146,6 +164,26 @@ export const LEARNING_ACTIVITY_REQUIRES_VALID_COURSE =
 /** Surfaced when parent program is not draft|published for activities (matches SQL). */
 export const LEARNING_ACTIVITY_REQUIRES_VALID_PROGRAM =
   "Parent program must be draft or published for activity changes" as const;
+
+/** Surfaced when creating a content block under a non-active space (matches SQL). */
+export const LEARNING_CONTENT_BLOCK_REQUIRES_ACTIVE_SPACE =
+  "Learning space must be active for content block changes" as const;
+
+/** Surfaced when parent lesson is not draft|published for content blocks (matches SQL). */
+export const LEARNING_CONTENT_BLOCK_REQUIRES_VALID_LESSON =
+  "Parent lesson must be draft or published for content block changes" as const;
+
+/** Surfaced when parent section is not draft|published for content blocks (matches SQL). */
+export const LEARNING_CONTENT_BLOCK_REQUIRES_VALID_SECTION =
+  "Parent section must be draft or published for content block changes" as const;
+
+/** Surfaced when parent course is not draft|published for content blocks (matches SQL). */
+export const LEARNING_CONTENT_BLOCK_REQUIRES_VALID_COURSE =
+  "Parent course must be draft or published for content block changes" as const;
+
+/** Surfaced when parent program is not draft|published for content blocks (matches SQL). */
+export const LEARNING_CONTENT_BLOCK_REQUIRES_VALID_PROGRAM =
+  "Parent program must be draft or published for content block changes" as const;
 
 export type InstructorAuthoringResult<T> =
   | { ok: true; data: T }
@@ -313,6 +351,29 @@ export type UpdateLearningActivitySettingsInput = {
   config?: Record<string, unknown>;
 };
 
+export type InstructorContentBlockSummary = {
+  id: string;
+  lesson_id: string;
+  block_type: LearningLessonContentBlockCreatableType | string;
+  status: LearningLessonContentBlockStatus;
+  position: number;
+  content: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type CreateLearningContentBlockInput = {
+  lesson_id: string;
+  block_type: LearningLessonContentBlockCreatableType;
+  content?: Record<string, unknown>;
+};
+
+export type UpdateLearningContentBlockInput = {
+  block_id: string;
+  content: Record<string, unknown>;
+};
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
@@ -405,6 +466,35 @@ function isActivityCompletionMode(
   return (LEARNING_ACTIVITY_COMPLETION_MODES as readonly string[]).includes(
     value
   );
+}
+
+function isContentBlockStatus(
+  value: string
+): value is LearningLessonContentBlockStatus {
+  return (LEARNING_LESSON_CONTENT_BLOCK_STATUSES as readonly string[]).includes(
+    value
+  );
+}
+
+function isCreatableContentBlockType(
+  value: string
+): value is LearningLessonContentBlockCreatableType {
+  return (
+    LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES as readonly string[]
+  ).includes(value);
+}
+
+function isSafeHttpUrl(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.urlMaxChars) {
+    return false;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function parsePosition(value: unknown): number {
@@ -834,6 +924,274 @@ function sectionAllowsLessonCreate(status: LearningSectionStatus): boolean {
 
 function lessonAllowsActivityCreate(status: LearningLessonStatus): boolean {
   return status === "draft" || status === "published";
+}
+
+function mapContentBlockRow(
+  row: Record<string, unknown>
+): InstructorContentBlockSummary | null {
+  const id = asString(row.id);
+  const lesson_id = asString(row.lesson_id);
+  const block_type = asString(row.block_type);
+  const status = asString(row.status);
+  const created_at = asString(row.created_at) ?? "";
+  const updated_at = asString(row.updated_at) ?? "";
+  const position = parsePosition(row.position);
+  const contentRaw = row.content;
+  const content =
+    contentRaw && typeof contentRaw === "object" && !Array.isArray(contentRaw)
+      ? (contentRaw as Record<string, unknown>)
+      : {};
+  if (
+    !id ||
+    !lesson_id ||
+    !block_type ||
+    !status ||
+    !Number.isFinite(position) ||
+    !isContentBlockStatus(status)
+  ) {
+    return null;
+  }
+  return {
+    id,
+    lesson_id,
+    block_type,
+    status,
+    position,
+    content,
+    created_at,
+    updated_at,
+    published_at: asString(row.published_at),
+  };
+}
+
+/** Client-side gate: creatable types only (reserved/deferred rejected). */
+export function validateLearningContentBlockType(
+  blockType: string
+): string | null {
+  if (!isCreatableContentBlockType(blockType.trim())) {
+    return "Invalid content block type";
+  }
+  return null;
+}
+
+/**
+ * Lightweight content gate mirroring SQL key allowlists / required fields.
+ * DB remains authoritative.
+ */
+export function validateLearningContentBlockContent(
+  blockType: string,
+  content: unknown
+): string | null {
+  const typeErr = validateLearningContentBlockType(blockType);
+  if (typeErr) return typeErr;
+  const type = blockType.trim() as LearningLessonContentBlockCreatableType;
+  if (!content || typeof content !== "object" || Array.isArray(content)) {
+    return "content must be a JSON object";
+  }
+  const record = content as Record<string, unknown>;
+  try {
+    const bytes = new TextEncoder().encode(JSON.stringify(record)).length;
+    if (bytes > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.contentMaxBytes) {
+      return `content exceeds maximum size of ${LEARNING_LESSON_CONTENT_BLOCK_LIMITS.contentMaxBytes} bytes`;
+    }
+  } catch {
+    return "content is not serializable JSON";
+  }
+
+  const allowed = new Set<string>(LEARNING_LESSON_CONTENT_BLOCK_CONTENT_KEYS[type]);
+  for (const key of Object.keys(record)) {
+    if (!allowed.has(key)) {
+      return `content contains unexpected key ${key} for type ${type}`;
+    }
+  }
+
+  const str = (key: string): string | null => {
+    const value = record[key];
+    if (value === undefined) return null;
+    if (typeof value !== "string") return `${type}.${key} must be a string`;
+    return null;
+  };
+
+  switch (type) {
+    case "rich_text": {
+      if (typeof record.text !== "string") return "rich_text.text must be a string";
+      if (record.text.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.richTextMaxChars) {
+        return "rich_text.text exceeds maximum length";
+      }
+      if (
+        record.format !== undefined &&
+        !(LEARNING_LESSON_CONTENT_BLOCK_RICH_TEXT_FORMATS as readonly string[]).includes(
+          String(record.format)
+        )
+      ) {
+        return "rich_text.format must be plain or markdown";
+      }
+      return null;
+    }
+    case "heading": {
+      if (typeof record.text !== "string") return "heading.text must be a string";
+      if (
+        record.text.length < 1 ||
+        record.text.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.headingMaxChars
+      ) {
+        return "heading.text must be between 1 and 300 chars";
+      }
+      if (typeof record.level !== "number" || !Number.isInteger(record.level)) {
+        return "heading.level must be a number";
+      }
+      if (
+        !(LEARNING_LESSON_CONTENT_BLOCK_HEADING_LEVELS as readonly number[]).includes(
+          record.level
+        )
+      ) {
+        return "heading.level must be an integer between 1 and 6";
+      }
+      return null;
+    }
+    case "image":
+    case "video":
+    case "audio":
+    case "external_link": {
+      const urlKey = "url";
+      if (typeof record[urlKey] !== "string" || !isSafeHttpUrl(record[urlKey])) {
+        return `${type}.url must be a valid http(s) URL`;
+      }
+      if (type === "video" && record.provider !== undefined) {
+        if (
+          !(LEARNING_LESSON_CONTENT_BLOCK_VIDEO_PROVIDERS as readonly string[]).includes(
+            String(record.provider)
+          )
+        ) {
+          return "video.provider must be file|url|youtube|vimeo";
+        }
+      }
+      for (const key of ["alt", "caption", "label", "description"] as const) {
+        const err = str(key);
+        if (err) return err;
+      }
+      return null;
+    }
+    case "quote": {
+      if (typeof record.text !== "string") return "quote.text must be a string";
+      if (
+        record.text.length < 1 ||
+        record.text.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.quoteMaxChars
+      ) {
+        return "quote.text must be between 1 and 2000 chars";
+      }
+      return str("attribution");
+    }
+    case "divider": {
+      if (
+        record.style !== undefined &&
+        !(LEARNING_LESSON_CONTENT_BLOCK_DIVIDER_STYLES as readonly string[]).includes(
+          String(record.style)
+        )
+      ) {
+        return "divider.style must be solid|dashed|dotted";
+      }
+      return null;
+    }
+    case "callout": {
+      if (typeof record.text !== "string") return "callout.text must be a string";
+      if (
+        record.text.length < 1 ||
+        record.text.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.calloutMaxChars
+      ) {
+        return "callout.text must be between 1 and 4000 chars";
+      }
+      if (
+        typeof record.variant !== "string" ||
+        !(LEARNING_LESSON_CONTENT_BLOCK_CALLOUT_VARIANTS as readonly string[]).includes(
+          record.variant
+        )
+      ) {
+        return "callout.variant must be info|note|tip|success|warning|danger";
+      }
+      return null;
+    }
+    case "code_block": {
+      if (typeof record.code !== "string") return "code_block.code must be a string";
+      if (record.code.length > LEARNING_LESSON_CONTENT_BLOCK_LIMITS.codeMaxChars) {
+        return "code_block.code exceeds maximum length";
+      }
+      if (
+        record.language !== undefined &&
+        (typeof record.language !== "string" ||
+          !LEARNING_LESSON_CONTENT_BLOCK_CODE_LANGUAGE_PATTERN.test(
+            record.language
+          ))
+      ) {
+        return "code_block.language must be a short identifier";
+      }
+      return null;
+    }
+    default:
+      return "Unsupported content block type for content validation";
+  }
+}
+
+/**
+ * Build typed content object from instructor form fields for a creatable type.
+ */
+export function buildLearningContentBlockContent(
+  blockType: string,
+  fields: Record<string, string>
+): InstructorAuthoringResult<Record<string, unknown>> {
+  const typeErr = validateLearningContentBlockType(blockType);
+  if (typeErr) return { ok: false, message: typeErr };
+  const type = blockType.trim() as LearningLessonContentBlockCreatableType;
+  const content: Record<string, unknown> = {};
+  const get = (key: string) => fields[key]?.trim() ?? "";
+
+  switch (type) {
+    case "rich_text":
+      content.text = fields.text ?? "";
+      content.format = get("format") || "plain";
+      break;
+    case "heading":
+      content.text = get("text");
+      content.level = Number(get("level") || "2");
+      break;
+    case "image":
+      content.url = get("url");
+      if (get("alt")) content.alt = get("alt");
+      if (get("caption")) content.caption = get("caption");
+      break;
+    case "video":
+      content.url = get("url");
+      if (get("provider")) content.provider = get("provider");
+      if (get("caption")) content.caption = get("caption");
+      break;
+    case "audio":
+      content.url = get("url");
+      if (get("caption")) content.caption = get("caption");
+      break;
+    case "quote":
+      content.text = get("text");
+      if (get("attribution")) content.attribution = get("attribution");
+      break;
+    case "divider":
+      if (get("style")) content.style = get("style");
+      break;
+    case "callout":
+      content.text = get("text");
+      content.variant = get("variant") || "info";
+      break;
+    case "external_link":
+      content.url = get("url");
+      if (get("label")) content.label = get("label");
+      if (get("description")) content.description = get("description");
+      break;
+    case "code_block":
+      content.code = fields.code ?? "";
+      if (get("language")) content.language = get("language");
+      break;
+  }
+
+  const contentErr = validateLearningContentBlockContent(type, content);
+  if (contentErr) return { ok: false, message: contentErr };
+  return { ok: true, data: content };
 }
 
 /**
@@ -2117,6 +2475,337 @@ export async function archiveLearningActivity(
     data: {
       activity_id: asString(record?.activity_id) ?? id,
       status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+async function assertContentBlockCreateParents(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<{ lesson_id: string }>> {
+  const lesson = await getInstructorLesson(supabase, lessonId);
+  if (!lesson.ok) return lesson;
+  if (!lessonAllowsActivityCreate(lesson.data.status)) {
+    return { ok: false, message: LEARNING_CONTENT_BLOCK_REQUIRES_VALID_LESSON };
+  }
+
+  const section = await getInstructorSection(supabase, lesson.data.section_id);
+  if (!section.ok) return section;
+  if (!sectionAllowsLessonCreate(section.data.status)) {
+    return { ok: false, message: LEARNING_CONTENT_BLOCK_REQUIRES_VALID_SECTION };
+  }
+
+  const course = await getInstructorCourse(supabase, section.data.course_id);
+  if (!course.ok) return course;
+  if (!courseAllowsSectionCreate(course.data.status)) {
+    return { ok: false, message: LEARNING_CONTENT_BLOCK_REQUIRES_VALID_COURSE };
+  }
+
+  const program = await getInstructorProgram(supabase, course.data.program_id);
+  if (!program.ok) return program;
+  if (!programAllowsCourseCreate(program.data.status)) {
+    return { ok: false, message: LEARNING_CONTENT_BLOCK_REQUIRES_VALID_PROGRAM };
+  }
+
+  const space = await getInstructorSpace(supabase, program.data.space_id);
+  if (!space.ok) return space;
+  if (space.data.status !== "active") {
+    return { ok: false, message: LEARNING_CONTENT_BLOCK_REQUIRES_ACTIVE_SPACE };
+  }
+
+  return { ok: true, data: { lesson_id: lessonId } };
+}
+
+const CONTENT_BLOCK_SELECT =
+  "id, lesson_id, block_type, status, position, content, created_at, updated_at, published_at";
+
+export async function listInstructorContentBlocks(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<InstructorAuthoringResult<InstructorContentBlockSummary[]>> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_lesson_content_blocks")
+    .select(CONTENT_BLOCK_SELECT)
+    .eq("lesson_id", id)
+    .order("position", { ascending: true });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning content blocks"),
+    };
+  }
+
+  const blocks: InstructorContentBlockSummary[] = [];
+  for (const row of data ?? []) {
+    const mapped = mapContentBlockRow(row as Record<string, unknown>);
+    if (mapped) blocks.push(mapped);
+  }
+  return { ok: true, data: blocks };
+}
+
+export async function getInstructorContentBlock(
+  supabase: AnyClient,
+  blockId: string
+): Promise<InstructorAuthoringResult<InstructorContentBlockSummary>> {
+  const id = blockId.trim();
+  if (!id) return { ok: false, message: "Content block id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_lesson_content_blocks")
+    .select(CONTENT_BLOCK_SELECT)
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning content block"),
+    };
+  }
+  if (!data) {
+    return { ok: false, message: "Learning lesson content block not found" };
+  }
+
+  const mapped = mapContentBlockRow(data as Record<string, unknown>);
+  if (!mapped) {
+    return { ok: false, message: "Learning content block row is invalid" };
+  }
+  return { ok: true, data: mapped };
+}
+
+export async function createLearningContentBlock(
+  supabase: AnyClient,
+  input: CreateLearningContentBlockInput
+): Promise<
+  InstructorAuthoringResult<{
+    block_id: string;
+    lesson_id: string;
+    block_type: string;
+    status: string;
+    position: number;
+  }>
+> {
+  const lessonId = input.lesson_id.trim();
+  if (!lessonId) return { ok: false, message: "Lesson id is required" };
+
+  const typeErr = validateLearningContentBlockType(input.block_type);
+  if (typeErr) return { ok: false, message: typeErr };
+
+  const content = input.content ?? {};
+  const contentErr = validateLearningContentBlockContent(
+    input.block_type,
+    content
+  );
+  if (contentErr) return { ok: false, message: contentErr };
+
+  const parents = await assertContentBlockCreateParents(supabase, lessonId);
+  if (!parents.ok) return parents;
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.create,
+    {
+      p_lesson_id: lessonId,
+      p_block_type: input.block_type,
+      p_content: content,
+    }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to create learning content block"),
+    };
+  }
+
+  const record = asRecord(data);
+  const block_id = asString(record?.block_id);
+  if (!block_id) {
+    return { ok: false, message: "Create content block returned no block_id" };
+  }
+  const position = parsePosition(record?.position);
+
+  return {
+    ok: true,
+    data: {
+      block_id,
+      lesson_id: asString(record?.lesson_id) ?? lessonId,
+      block_type: asString(record?.block_type) ?? input.block_type,
+      status: asString(record?.status) ?? "draft",
+      position: Number.isFinite(position) ? position : 0,
+    },
+  };
+}
+
+export async function updateLearningContentBlock(
+  supabase: AnyClient,
+  input: UpdateLearningContentBlockInput
+): Promise<InstructorAuthoringResult<{ block_id: string; updated: boolean }>> {
+  const id = input.block_id.trim();
+  if (!id) return { ok: false, message: "Content block id is required" };
+
+  const existing = await getInstructorContentBlock(supabase, id);
+  if (!existing.ok) return existing;
+
+  const contentErr = validateLearningContentBlockContent(
+    existing.data.block_type,
+    input.content
+  );
+  if (contentErr) return { ok: false, message: contentErr };
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.update,
+    {
+      p_block_id: id,
+      p_content: input.content,
+    }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to update learning content block"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      block_id: asString(record?.block_id) ?? id,
+      updated: record?.updated === true || record?.updated === undefined,
+    },
+  };
+}
+
+export async function publishLearningContentBlock(
+  supabase: AnyClient,
+  blockId: string
+): Promise<InstructorAuthoringResult<{ block_id: string; status: string }>> {
+  const id = blockId.trim();
+  if (!id) return { ok: false, message: "Content block id is required" };
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.publish,
+    { p_block_id: id }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to publish learning content block"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      block_id: asString(record?.block_id) ?? id,
+      status: asString(record?.status) ?? "published",
+    },
+  };
+}
+
+export async function unpublishLearningContentBlock(
+  supabase: AnyClient,
+  blockId: string
+): Promise<InstructorAuthoringResult<{ block_id: string; status: string }>> {
+  const id = blockId.trim();
+  if (!id) return { ok: false, message: "Content block id is required" };
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.unpublish,
+    { p_block_id: id }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to unpublish learning content block"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      block_id: asString(record?.block_id) ?? id,
+      status: asString(record?.status) ?? "draft",
+    },
+  };
+}
+
+export async function archiveLearningContentBlock(
+  supabase: AnyClient,
+  blockId: string
+): Promise<InstructorAuthoringResult<{ block_id: string; status: string }>> {
+  const id = blockId.trim();
+  if (!id) return { ok: false, message: "Content block id is required" };
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.archive,
+    { p_block_id: id }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to archive learning content block"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      block_id: asString(record?.block_id) ?? id,
+      status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+export async function reorderLearningContentBlocks(
+  supabase: AnyClient,
+  lessonId: string,
+  blockIds: string[]
+): Promise<
+  InstructorAuthoringResult<{ lesson_id: string; reordered: boolean }>
+> {
+  const id = lessonId.trim();
+  if (!id) return { ok: false, message: "Lesson id is required" };
+  if (!Array.isArray(blockIds) || blockIds.length === 0) {
+    return { ok: false, message: "block_ids is required" };
+  }
+  const ids = blockIds.map((b) => b.trim()).filter(Boolean);
+  if (ids.length !== blockIds.length) {
+    return { ok: false, message: "block_ids must be non-empty uuids" };
+  }
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_LESSON_CONTENT_BLOCK_RPCS.reorder,
+    {
+      p_lesson_id: id,
+      p_block_ids: ids,
+    }
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to reorder learning content blocks"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      lesson_id: asString(record?.lesson_id) ?? id,
+      reordered: record?.reordered === true || record?.reordered === undefined,
     },
   };
 }
