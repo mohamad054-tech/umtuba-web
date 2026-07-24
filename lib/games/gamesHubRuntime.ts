@@ -20,6 +20,7 @@ import {
   validateClientResultClaim,
   validateIdempotencyKey,
 } from "./gamesFoundation";
+import { validateGameSessionId } from "./gamesSessions";
 
 export const GAMES_HUB_RUNTIME_CONTRACT_VERSION = "v1" as const;
 
@@ -571,6 +572,58 @@ export function startGamesRuntimeSession(
       expiresAt,
       platformSessionId: null,
       finalized: false,
+    }),
+  };
+}
+
+/**
+ * Pure fail-closed binder: attach a validated Platform `session_id` to an
+ * existing Hub Runtime session contract.
+ *
+ * Sets only `platformSessionId`. Preserves every other runtime field.
+ * Metadata only — a non-null `platformSessionId` must never be treated as
+ * ownership, gameplay permission, submit permission, runtime authority, or
+ * playability. Does not call Session Start, Submit, any RPC, or Supabase.
+ * Does not connect completion handoff or change Hub Runtime authority.
+ *
+ * Idempotent: rebinding the same Platform session id returns an equivalent
+ * frozen contract. Conflicting rebind fails closed.
+ */
+export function bindGamesRuntimePlatformSessionId(
+  session: unknown,
+  platformSessionId: unknown
+): GamesValidationResult<GamesRuntimeSessionContract> {
+  if (session === null || session === undefined || typeof session !== "object") {
+    return fail("session_required");
+  }
+
+  const runtime = session as GamesRuntimeSessionContract;
+
+  const idResult = validateGameSessionId(platformSessionId);
+  if (!idResult.ok) return idResult;
+
+  if (
+    runtime.platformSessionId !== null &&
+    runtime.platformSessionId !== undefined &&
+    runtime.platformSessionId !== idResult.value
+  ) {
+    return fail("platform_session_id_conflict");
+  }
+
+  return {
+    ok: true,
+    value: freezeAuthority({
+      contractVersion: runtime.contractVersion,
+      runtimeSessionId: runtime.runtimeSessionId,
+      gameId: runtime.gameId,
+      playerId: runtime.playerId,
+      mode: runtime.mode,
+      lifecycleState: runtime.lifecycleState,
+      createdAt: runtime.createdAt,
+      updatedAt: runtime.updatedAt,
+      expiresAt: runtime.expiresAt,
+      platformSessionId: idResult.value,
+      finalized: runtime.finalized,
     }),
   };
 }

@@ -2,49 +2,41 @@
 
 ## Summary
 
-PASS — Added thin authenticated trusted client
-`submitMyGameSessionResultTrusted` composing existing request validator,
-`submit_game_session_result` RPC, and existing response parser. SQL remains
-sole ownership / expiry / idempotency / claim-decision / progress /
-achievement / mutation authority. No service-role, no direct table path, no
-Hub Runtime wiring, no UI, no remote submit execution.
+PASS — Added pure fail-closed `bindGamesRuntimePlatformSessionId` that
+attaches a validated Platform `session_id` to an existing Hub Runtime
+session contract. Metadata only; Hub authority remains closed. No RPC,
+Session Start, Submit, completion handoff, UI, or migrations.
 
 ## Exact files changed
 
-- `lib/games/gamesSessionResultSubmit.ts` (created)
-- `lib/games/gamesSessionResultSubmit.test.ts` (created)
-- `docs/games/implementation/GAMES_SESSION_RESULT_SUBMIT_TRUSTED_V1.md` (created)
+- `lib/games/gamesHubRuntime.ts` (added binder + `validateGameSessionId` import)
+- `lib/games/gamesHubRuntimePlatformSessionBind.test.ts` (created)
+- `docs/games/implementation/GAMES_HUB_RUNTIME_PLATFORM_SESSION_BIND_TRUSTED_V1.md` (created)
 - `docs/ai/CURRENT_TASK.md` (updated)
 - `docs/ai/CURSOR_REPORT.md` (this report)
 
 ## Migrations created
 
-None. No Supabase migration. Did not apply `20260846` or `20260847`.
+None. Did not apply `20260846` or `20260847`.
 
 ## Security review
 
-- Authenticated user-JWT / server-side RPC client interface only
-- No service-role client
-- No direct table reads or writes
-- Fail-closed on request validation, RPC error/throw, null/malformed
-  response, and parser failure
-- Request validation reasons preserved; RPC failures map to
-  `session_result_submit_rpc_failed`; invalid responses map to
-  `session_result_submit_response_invalid`
-- No Hub Runtime / `platformSessionId` wiring
-- No reward / wallet / points / economy inference
-- No app-side ownership, expiry, replay, acceptance, progress, or
-  achievement authority
+- Pure function; no side effects; no Supabase / RPC
+- Reuses `validateGameSessionId` for UUID fail-closed validation
+- Conflicting rebind rejected (`platform_session_id_conflict`)
+- Same-id rebind idempotent
+- `GAMES_HUB_RUNTIME_AUTHORITY` flags remain false via `freezeAuthority`
+- Non-null `platformSessionId` documented as metadata only (not ownership,
+  gameplay, submit, authority, or playability)
 
 ## Tests
 
 ```
-npx vitest run lib/games/gamesSessionResultSubmit.test.ts \
-  lib/games/gamesSessionResultSubmitRequest.test.ts \
-  lib/games/gamesSessionResultSubmitResponse.test.ts
+npx vitest run lib/games/gamesHubRuntimePlatformSessionBind.test.ts \
+  lib/games/gamesHubRuntime.test.ts
 ```
 
-Result: 3 files, 41 tests passed.
+Result: 2 files, 24 tests passed.
 
 ## TypeScript
 
@@ -56,8 +48,7 @@ Skipped — no shared application entry/export UI changes.
 
 ## git diff --check
 
-Pass (CRLF normalization warnings only on `docs/ai/CURRENT_TASK.md`; no
-whitespace errors).
+Pass (CRLF normalization warnings only; no whitespace errors).
 
 ## git status --short
 
@@ -65,6 +56,6 @@ whitespace errors).
 
 ## Open issues
 
-None for this slice. Deferred: Hub / `platformSessionId` wiring, UI,
-gameplay launch, remote submit execution, apply of foundation migrations,
-anti-abuse, rewards/economy, merge to `alpha-0.2`.
+None for this slice. Deferred: completion→submit wiring, Session Start
+composition into Hub start, UI, gameplay, migration apply, rewards/economy,
+merge to `alpha-0.2`.
