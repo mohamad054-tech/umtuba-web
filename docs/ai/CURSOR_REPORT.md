@@ -59,9 +59,18 @@ PASS (exit 0).
 
 ## git status --short
 
-(see post-commit status below)
+Clean on `office/learning-progress-mutations-v1` (in sync with origin after push).
+
+## Commit / push
+
+- Commit: `e34bb2dc32b535b21cbd840afee70b3f7a440376`
+  (`feat(learning): add instructor section authoring`)
+- Push: `826811e..e34bb2d` → `origin/office/learning-progress-mutations-v1`
+- Merge: none
 
 ## Open issues
 
 - Lesson / Activity authoring still deferred (Phase 4D+).
 - Pre-existing `tsc` noise from `.next/types/validator.ts` / missing games page.
+- `CURSOR_REPORT.md` post-push fields updated locally after the Phase 4C commit
+  (uncommitted docs-only tweak unless folded later).
