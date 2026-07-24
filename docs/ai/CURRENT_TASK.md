@@ -2,37 +2,36 @@
 
 ## Task title
 
-UMTUBA Ads Platform — Reporting & Analytics Foundation V1
+UM Learning — Instructor Authoring Foundation V1 (Phase 0–3)
 
 ## Goal
 
-Implement the complete internal reporting foundation: reporting domain, analytics
-models, aggregation, filtering/dimensions, export contracts, centralized
-validation, and internal inspection contracts — without enabling production
-serving, billing, real event ingestion, production dashboards, or public APIs.
+Ship instructor surface under `/learning/instructor` for Learning space
+create/publish/archive using existing RPCs. No migrations. No RPC redesign.
 
 ## Allowed scope
 
-- `lib/ads/reporting/**`
-- `lib/ads/index.ts` (safe exports only)
-- `docs/ads/ADS_REPORTING_ANALYTICS_FOUNDATION_V1.md`
+- `lib/learning/instructorAuthoring.ts`
+- `lib/learning/instructorAuthoring.test.ts`
+- `app/learning/instructor/**`
+- `app/components/learning/instructor/**`
+- `docs/learning/implementation/INSTRUCTOR_AUTHORING_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Modifying Canonical Stack, Provenance, Operations, Campaign Management,
-  Billing, or Measurement foundations
-- Enabling productionEnabled / deliveryEnabled / billingEnabled /
-  productionAccepted / authoritativeProductionServing
-- Public APIs, admin UI, production endpoints, live ingestion
-- Games / Learning / Store / World
-- Commit / push unless explicitly requested
+- Migrations / Supabase schema / RPC redesign
+- Learner route changes under `/learning` (non-instructor)
+- Service role
+- Program → activity curriculum UI (later phases)
+- Content blocks / questions / enrollments UI
+- Commit/push outside current branch without approval
 
 ## Branch
 
-`alpha-0.2`
+`office/learning-progress-mutations-v1`
 
 ## Status
 
-`complete` — PASS (not committed)
+`complete` — Phase 0–3 PASS (commit/push pending)

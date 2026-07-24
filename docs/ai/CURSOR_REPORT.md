@@ -2,24 +2,28 @@
 
 ## Summary
 
-UM Learning continuation review on `office/learning-progress-mutations-v1`
-(synced with origin: 0 ahead / 0 behind). **No code changes.** Review-only.
-
-Learning foundations through **Progress Mutations V1 (`20260845`)** are
-implemented in Git as a dependency-ordered stack (Spaces → … → score-gated
-lesson progress). Entire migration chain remains **not applied** to remote
-Supabase. Learner delivery UI exists for catalog → lesson → attempt → aggregate
-results; staff authoring / result-policy tools and non-`score` completion modes
-are still open.
-
-**Next dependency-correct feature (proposed, not implemented):**
-**Completion-mode progress V1** — wire `completion_mode` `view` / `submit`
-(and clarify `manual`) into DB-authoritative lesson progress, continuing the
-contract Progress Mutations V1 explicitly deferred.
+Implemented **UM Learning Instructor Authoring Foundation V1 — Phase 0–3**
+on `office/learning-progress-mutations-v1`. Instructor surface under
+`/learning/instructor` with space list, create, publish, and archive via
+existing `LEARNING_SPACE_RPCS`. No migrations. No learner route changes.
+No service role.
 
 ## Exact files changed
 
-None (review only). This report file updated.
+- `docs/learning/implementation/INSTRUCTOR_AUTHORING_FOUNDATION_V1.md` (new)
+- `lib/learning/instructorAuthoring.ts` (new)
+- `lib/learning/instructorAuthoring.test.ts` (new)
+- `app/learning/instructor/page.tsx` (new)
+- `app/learning/instructor/actions.ts` (new)
+- `app/learning/instructor/spaces/new/page.tsx` (new)
+- `app/learning/instructor/spaces/[spaceId]/page.tsx` (new)
+- `app/components/learning/instructor/InstructorShell.tsx` (new)
+- `app/components/learning/instructor/InstructorSpaceList.tsx` (new)
+- `app/components/learning/instructor/CreateSpaceForm.tsx` (new)
+- `app/components/learning/instructor/SpaceLifecycleActions.tsx` (new)
+- `app/components/learning/instructor/SpaceStatusChip.tsx` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
@@ -27,40 +31,35 @@ None
 
 ## Security review
 
-N/A — no implementation. Observed architecture remains DB-authoritative:
-RPC/DEFINER writes, FORCE RLS, answer-key firewall, learner aggregate-only
-results, no client authority over progress percent / identity columns.
+- User JWT `createClient` / `getServerUser` only
+- Mutations via existing security-definer RPCs
+- Reads via RLS (`Members read own spaces`)
+- No service role; no TS auth substitute
+- Learner `/learning` pages untouched
 
 ## Tests
 
-Not run (review only)
+`npx vitest run lib/learning/instructorAuthoring.test.ts` — **8 passed**
 
 ## TypeScript
 
-Not run (review only)
+`npx tsc --noEmit` — no errors in instructor files.
+Pre-existing unrelated: `.next/types/validator.ts` missing `app/games/page.js`.
 
 ## Build
 
-Not run (review only)
+Not run (UI slice; tsc + focused tests)
 
 ## git diff --check
 
-Not applicable (no implementation diff)
+Pending at commit time
 
 ## git status --short
 
-Review branch reported clean and even with
-`origin/office/learning-progress-mutations-v1` at review time.
+See post-commit status
 
 ## Open issues
 
-- Learning migrations `20260828`–`20260845` Git-only until explicit apply approval
-- `completion_mode` `view` / `submit` / `manual` still do not auto-mutate progress
-- Staff RPCs for result policy (`set_learning_activity_results_available_at`,
-  `release_learning_attempt_result`) have no instructor UI
-- No instructor/authoring UI; content creation is RPC/SQL only
-- Deferred product domains: certificates, assignments engines, manual/AI grading,
-  `learning_lesson_items`, activity-level progress, media storage, analytics,
-  UM Points
-- `docs/ai/CURRENT_TASK.md` still points at Ads Reporting on `alpha-0.2` (stale
-  relative to this Learning review request)
+- Phase 4+ still open: program → activity curriculum tree UI
+- No `update_learning_space` RPC (create-time metadata only)
+- Optional instructor link from learner hub / global nav deferred
