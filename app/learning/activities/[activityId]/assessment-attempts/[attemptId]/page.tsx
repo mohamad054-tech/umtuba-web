@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import LearningShell from "../../../../../components/learning/LearningShell";
-import AssessmentQuestionPreview from "../../../../../components/learning/AssessmentQuestionPreview";
+import AssessmentAnswerSaveForm from "../../../../../components/learning/AssessmentAnswerSaveForm";
 import { createClient, getServerUser } from "../../../../../../lib/supabase/server";
 import {
   LEARNING_ASSESSMENT_ATTEMPT_ROUTES,
   loadAssessmentAttempt,
 } from "../../../../../../lib/learning/assessmentAttemptFoundation";
 import { LEARNING_ASSESSMENT_DELIVERY_ROUTES } from "../../../../../../lib/learning/assessmentDelivery";
+import {
+  answersByQuestionId,
+  loadAssessmentAnswers,
+} from "../../../../../../lib/learning/assessmentAnswerPersistence";
 import { cancelAssessmentAttemptAction } from "../../../../assessmentAttemptActions";
 
 export const dynamic = "force-dynamic";
@@ -69,6 +73,11 @@ export default async function AssessmentAttemptFoundationPage({
     notFound();
   }
 
+  const answersLoaded = await loadAssessmentAnswers(supabase, attemptId);
+  const savedByQuestion =
+    answersLoaded.ok ? answersByQuestionId(answersLoaded.data) : {};
+  const canAnswer = view.status === "active";
+
   return (
     <LearningShell
       title="Assessment attempt"
@@ -78,7 +87,7 @@ export default async function AssessmentAttemptFoundationPage({
     >
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Lifecycle · no answering in this foundation
+          Answer persistence · no grading in this foundation
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
           Status: {view.status}
@@ -101,10 +110,25 @@ export default async function AssessmentAttemptFoundationPage({
             </dd>
           </div>
           <div>
-            <dt className="text-white/35">Questions</dt>
-            <dd>{view.question_count}</dd>
+            <dt className="text-white/35">Saved answers</dt>
+            <dd>
+              {answersLoaded.ok
+                ? String(answersLoaded.data.answer_count)
+                : "—"}
+              {" / "}
+              {view.question_count}
+            </dd>
           </div>
         </dl>
+
+        {!answersLoaded.ok ? (
+          <p
+            role="alert"
+            className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"
+          >
+            Could not restore saved answers: {answersLoaded.message}
+          </p>
+        ) : null}
 
         {query.error ? (
           <p
@@ -126,18 +150,26 @@ export default async function AssessmentAttemptFoundationPage({
               Cancel attempt
             </button>
           </form>
-        ) : null}
+        ) : (
+          <p className="mt-4 text-sm text-white/50">
+            This attempt is {view.status}. Answers are view-only.
+          </p>
+        )}
       </section>
 
-      <section className="mt-6 space-y-4" aria-label="Snapshotted questions">
+      <section className="mt-6 space-y-6" aria-label="Assessment answers">
         <h2 className="text-sm font-bold text-white/70">
-          Questions snapshot (read-only)
+          Questions {canAnswer ? "(save individually)" : "(locked)"}
         </h2>
         {view.questions.map((question, index) => (
-          <AssessmentQuestionPreview
+          <AssessmentAnswerSaveForm
             key={question.question_id}
+            activityId={view.activity_id}
+            attemptId={view.attempt_id}
             question={question}
             index={index}
+            initialAnswer={savedByQuestion[question.question_id]}
+            disabled={!canAnswer}
           />
         ))}
       </section>
