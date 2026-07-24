@@ -10,6 +10,7 @@ import {
 } from "../../../../../lib/learning/instructorAuthoring";
 import { LEARNING_ASSESSMENT_ROUTES } from "../../../../../lib/learning/assessmentAuthoring";
 import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../lib/learning/assessmentManualReview";
+import { LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES } from "../../../../../lib/learning/instructorExperience";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -79,14 +80,32 @@ export default async function InstructorCourseAuthoringPage({
         non-draft items fails closed. Open an activity to manage its questions.
       </p>
 
-      <p className="mt-3 text-sm">
+      <nav className="mt-3 flex flex-wrap gap-3 text-sm">
+        <Link
+          href={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.courseOverview(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Overview
+        </Link>
+        <Link
+          href={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.learners(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Learners
+        </Link>
+        <Link
+          href={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.completion(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Completion
+        </Link>
         <Link
           href={LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES.queue(courseId)}
           className="font-bold text-white underline underline-offset-2"
         >
           Manual review queue
         </Link>
-      </p>
+      </nav>
 
       <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
         <h2 className="text-base font-bold">Add section</h2>
