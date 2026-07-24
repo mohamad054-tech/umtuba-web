@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   GAMES_CATALOG_ADMIN_RPCS,
   GAMES_CATALOG_AVAILABILITIES,
@@ -18,6 +18,7 @@ import {
   listGamesCatalogTrusted,
   parseGamesCatalogEntryView,
   parseGamesCatalogListResponse,
+  setGamesCatalogLifecycleTrusted,
   upsertGamesCatalogEntryTrusted,
   validateCatalogEntryId,
   validateCatalogFeatureFlags,
@@ -573,6 +574,252 @@ describe("Games Catalog Entry Lookup Trusted V1", () => {
     expect(src).toMatch(/parseGamesCatalogEntryView/);
     expect(src).not.toMatch(/createServiceRole|service_role|serviceRole/i);
     expect(src).not.toMatch(/\.from\(\s*['"]games['"]\s*\)/);
+  });
+});
+
+describe("Games Catalog Lifecycle Trusted V1", () => {
+  it("succeeds with authorized lifecycle update and parsed EntryView", async () => {
+    const assertPlatformAdmin = vi.fn(async () => true);
+    const rpc = vi.fn(async (fn: string, args?: Record<string, unknown>) => {
+      expect(fn).toBe(GAMES_CATALOG_ADMIN_RPCS.setLifecycle);
+      expect(args).toEqual({
+        p_game_key: "kick_blast",
+        p_patch: {
+          status: "active",
+          availability: "coming_soon",
+          visibility: "authenticated",
+        },
+      });
+      return {
+        data: sampleRpcEntry({
+          status: "active",
+          availability: "coming_soon",
+          visibility: "authenticated",
+        }),
+        error: null,
+      };
+    });
+
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin },
+      "kick_blast",
+      {
+        status: "active",
+        availability: "coming_soon",
+        visibility: "authenticated",
+      }
+    );
+
+    expect(assertPlatformAdmin).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.game_key).toBe("kick_blast");
+    expect(r.value.status).toBe("active");
+    expect(r.value.availability).toBe("coming_soon");
+    expect(r.value.visibility).toBe("authenticated");
+    // Metadata only — success must not imply playability.
+    expect(isCatalogPlayable(r.value)).toBe(false);
+  });
+
+  it("rejects invalid game key before RPC", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "Kick",
+      { status: "active" }
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("game_key_invalid");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects unauthorized invocation before mutation RPC", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => false },
+      "kick_blast",
+      { status: "active" }
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("lifecycle_unauthorized");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when admin assertion throws", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      {
+        assertPlatformAdmin: async () => {
+          throw new Error("auth boom");
+        },
+      },
+      "kick_blast",
+      { status: "active" }
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("lifecycle_auth_failed");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects empty lifecycle patch before RPC", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      {}
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("lifecycle_empty");
+    expect(validateLifecyclePatch({}).ok).toBe(false);
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects unknown lifecycle field before RPC", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+    const r = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { status: "active", catalog_version: 2 }
+    );
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("lifecycle_unknown_field");
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid status / availability / visibility enums before RPC", async () => {
+    const rpc = vi.fn(async () => ({ data: sampleRpcEntry(), error: null }));
+
+    const badStatus = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { status: "published" }
+    );
+    expect(badStatus.ok).toBe(false);
+    if (badStatus.ok) return;
+    expect(badStatus.reason).toBe("status_invalid");
+
+    const badAvailability = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { availability: "online" }
+    );
+    expect(badAvailability.ok).toBe(false);
+    if (badAvailability.ok) return;
+    expect(badAvailability.reason).toBe("availability_invalid");
+
+    const badVisibility = await setGamesCatalogLifecycleTrusted(
+      { rpc },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { visibility: "public" }
+    );
+    expect(badVisibility.ok).toBe(false);
+    if (badVisibility.ok) return;
+    expect(badVisibility.reason).toBe("visibility_invalid");
+
+    expect(rpc).not.toHaveBeenCalled();
+  });
+
+  it("documents that local transition enforcement is omitted (SQL sole authority)", () => {
+    // canTransitionCatalogStatus is advisory only — SQL has no from→to matrix.
+    // Trusted wrapper must not invent a parallel state machine.
+    const src = read(MODULE);
+    expect(src).toMatch(/setGamesCatalogLifecycleTrusted/);
+    expect(src).toMatch(/SQL is the sole transition authority/);
+    // Wrapper body must not call canTransitionCatalogStatus.
+    const fnStart = src.indexOf(
+      "export async function setGamesCatalogLifecycleTrusted"
+    );
+    expect(fnStart).toBeGreaterThan(-1);
+    const fnSlice = src.slice(fnStart, fnStart + 1800);
+    expect(fnSlice).not.toMatch(/canTransitionCatalogStatus\s*\(/);
+    // Advisory helper still exists for UI / docs consumers.
+    expect(canTransitionCatalogStatus("draft", "active")).toBe(true);
+    expect(canTransitionCatalogStatus("archived", "active")).toBe(true);
+  });
+
+  it("fails closed on RPC error and thrown client exceptions", async () => {
+    const failed = await setGamesCatalogLifecycleTrusted(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Not allowed to manage game catalog" },
+        }),
+      },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { status: "archived" }
+    );
+    expect(failed.ok).toBe(false);
+    if (failed.ok) return;
+    expect(failed.reason).toBe("catalog_lifecycle_rpc_failed");
+
+    const thrown = await setGamesCatalogLifecycleTrusted(
+      {
+        rpc: async () => {
+          throw new Error("network");
+        },
+      },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { availability: "maintenance" }
+    );
+    expect(thrown.ok).toBe(false);
+    if (thrown.ok) return;
+    expect(thrown.reason).toBe("catalog_lifecycle_rpc_failed");
+  });
+
+  it("rejects null and malformed lifecycle responses", async () => {
+    const nullData = await setGamesCatalogLifecycleTrusted(
+      { rpc: async () => ({ data: null, error: null }) },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { status: "active" }
+    );
+    expect(nullData.ok).toBe(false);
+    if (nullData.ok) return;
+    expect(nullData.reason).toBe("catalog_lifecycle_response_invalid");
+
+    const malformed = await setGamesCatalogLifecycleTrusted(
+      {
+        rpc: async () => ({
+          data: sampleRpcEntry({ economy_hook: true }),
+          error: null,
+        }),
+      },
+      { assertPlatformAdmin: async () => true },
+      "kick_blast",
+      { visibility: "listed" }
+    );
+    expect(malformed.ok).toBe(false);
+    if (malformed.ok) return;
+    expect(malformed.reason).toBe("catalog_lifecycle_response_invalid");
+  });
+
+  it("has no service-role or direct table-write path", () => {
+    const src = read(MODULE);
+    expect(src).toMatch(/setGamesCatalogLifecycleTrusted/);
+    expect(src).toMatch(/GAMES_CATALOG_ADMIN_RPCS\.setLifecycle/);
+    expect(src).toMatch(/assertPlatformAdmin/);
+    expect(src).toMatch(/parseGamesCatalogEntryView/);
+    expect(src).not.toMatch(/createServiceRole|service_role|serviceRole/i);
+    expect(src).not.toMatch(/SERVICE_ROLE/);
+    expect(src).not.toMatch(/\.from\(\s*['"]games['"]\s*\)/);
+    expect(src).not.toMatch(/insert\s+into\s+public\.games/i);
   });
 });
 

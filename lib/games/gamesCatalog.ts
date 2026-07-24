@@ -811,7 +811,7 @@ export async function getGamesCatalogByIdTrusted(
 /**
  * Trusted admin upsert via `upsert_game_catalog_entry`.
  *
- * Sole Catalog mutation abstraction in application code — no service-role and
+ * Catalog mutation abstraction in application code — no service-role and
  * no direct table writes. Database `is_platform_admin` remains authoritative;
  * callers must still gate with the platform-admin auth path before invoking.
  */
@@ -839,21 +839,30 @@ export async function upsertGamesCatalogEntryTrusted(
   }
 }
 
-export function validateLifecyclePatch(raw: unknown): GamesValidationResult<{
+/** Bounded lifecycle fields accepted by `set_game_catalog_lifecycle`. */
+export type GamesCatalogLifecyclePatch = {
   status?: GamesCatalogStatus;
   availability?: GamesCatalogAvailability;
   visibility?: GamesCatalogVisibility;
-}> {
+};
+
+/**
+ * Injected platform-admin assertion (same pattern as Title Seed V1).
+ * DB `is_platform_admin` inside the lifecycle RPC remains authoritative.
+ */
+export type GamesCatalogLifecycleAuth = {
+  assertPlatformAdmin(): Promise<boolean>;
+};
+
+export function validateLifecyclePatch(
+  raw: unknown
+): GamesValidationResult<GamesCatalogLifecyclePatch> {
   if (!isPlainObject(raw)) return fail("lifecycle_not_object");
   const allowed = new Set(["status", "availability", "visibility"]);
   for (const key of Object.keys(raw)) {
     if (!allowed.has(key)) return fail("lifecycle_unknown_field");
   }
-  const out: {
-    status?: GamesCatalogStatus;
-    availability?: GamesCatalogAvailability;
-    visibility?: GamesCatalogVisibility;
-  } = {};
+  const out: GamesCatalogLifecyclePatch = {};
   if (raw.status !== undefined) {
     if (
       typeof raw.status !== "string" ||
@@ -883,4 +892,63 @@ export function validateLifecyclePatch(raw: unknown): GamesValidationResult<{
     return fail("lifecycle_empty");
   }
   return { ok: true, value: out };
+}
+
+/**
+ * Trusted admin lifecycle mutation via `set_game_catalog_lifecycle`.
+ *
+ * Metadata only — does not imply runtime eligibility, session authority,
+ * playability, or matchmaking. App asserts platform-admin before RPC; SQL
+ * `is_platform_admin` remains authoritative.
+ *
+ * Local `canTransitionCatalogStatus` is intentionally NOT enforced here:
+ * SQL accepts any valid status/availability/visibility enum without a
+ * from→to matrix. Enforcing the advisory helper would invent a parallel
+ * state machine (and would require a current-status pre-read outside this
+ * RPC contract). SQL is the sole transition authority.
+ */
+export async function setGamesCatalogLifecycleTrusted(
+  client: GamesCatalogRpcClient,
+  auth: GamesCatalogLifecycleAuth,
+  gameKey: unknown,
+  patch: unknown
+): Promise<GamesValidationResult<GamesCatalogEntryView>> {
+  let isAdmin = false;
+  try {
+    isAdmin = await auth.assertPlatformAdmin();
+  } catch {
+    return fail("lifecycle_auth_failed");
+  }
+  if (isAdmin !== true) {
+    return fail("lifecycle_unauthorized");
+  }
+
+  const keyResult = validateGameKey(gameKey);
+  if (!keyResult.ok) return keyResult;
+
+  const patchResult = validateLifecyclePatch(patch);
+  if (!patchResult.ok) return patchResult;
+
+  try {
+    const { data, error } = await client.rpc(
+      GAMES_CATALOG_ADMIN_RPCS.setLifecycle,
+      {
+        p_game_key: keyResult.value,
+        p_patch: patchResult.value,
+      }
+    );
+    if (error) {
+      return fail("catalog_lifecycle_rpc_failed");
+    }
+    if (data === null || data === undefined) {
+      return fail("catalog_lifecycle_response_invalid");
+    }
+    const parsed = parseGamesCatalogEntryView(data);
+    if (!parsed.ok) {
+      return fail("catalog_lifecycle_response_invalid");
+    }
+    return parsed;
+  } catch {
+    return fail("catalog_lifecycle_rpc_failed");
+  }
 }
