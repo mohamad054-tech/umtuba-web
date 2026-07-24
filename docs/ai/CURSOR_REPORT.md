@@ -59,11 +59,14 @@ PASS (exit 0).
 
 ## git status --short
 
-(see post-commit/push below)
+Clean on `office/learning-progress-mutations-v1` (in sync with origin after push).
 
 ## Commit / push
 
-(pending — filled after commit)
+- Commit: `a9c01144656d7298df69b2e55d34bec43e61f7b4`
+  (`feat(learning): add instructor lesson authoring`)
+- Push: `6364450..a9c0114` → `origin/office/learning-progress-mutations-v1`
+- Merge: none
 
 ## Open issues
 
