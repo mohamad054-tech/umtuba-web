@@ -1,11 +1,18 @@
 /**
- * UM Learning OS — Instructor Authoring Foundation V1 (Phase 0–3 + 4A).
+ * UM Learning OS — Instructor Authoring Foundation V1 (Phase 0–3 + 4A + 4B).
  *
- * Space + Program create / publish / archive via existing RPCs.
+ * Space + Program + Course create / publish / archive via existing RPCs.
  * User JWT only. No service role. No TS authorization substitute.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  LEARNING_COURSE_RPCS,
+  LEARNING_COURSE_STATUSES,
+  LEARNING_COURSE_VISIBILITIES,
+  type LearningCourseStatus,
+  type LearningCourseVisibility,
+} from "./coursesFoundation";
 import {
   LEARNING_PROGRAM_FORMATS,
   LEARNING_PROGRAM_RPCS,
@@ -36,11 +43,22 @@ export const LEARNING_INSTRUCTOR_ROUTES = {
     `/learning/instructor/spaces/${spaceId}/programs/new`,
   program: (programId: string) =>
     `/learning/instructor/programs/${programId}`,
+  courseNew: (programId: string) =>
+    `/learning/instructor/programs/${programId}/courses/new`,
+  course: (courseId: string) => `/learning/instructor/courses/${courseId}`,
 } as const;
 
 /** Surfaced when creating a program under a non-active space (matches SQL). */
 export const LEARNING_PROGRAM_REQUIRES_ACTIVE_SPACE =
   "Learning space must be active for program changes" as const;
+
+/** Surfaced when creating a course under a non-active space (matches SQL). */
+export const LEARNING_COURSE_REQUIRES_ACTIVE_SPACE =
+  "Learning space must be active for course changes" as const;
+
+/** Surfaced when parent program is not draft|published (matches SQL). */
+export const LEARNING_COURSE_REQUIRES_VALID_PROGRAM =
+  "Parent program must be draft or published for course changes" as const;
 
 export type InstructorAuthoringResult<T> =
   | { ok: true; data: T }
@@ -94,6 +112,30 @@ export type CreateLearningProgramInput = {
   default_language?: string;
 };
 
+export type InstructorCourseSummary = {
+  id: string;
+  program_id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  status: LearningCourseStatus;
+  visibility: LearningCourseVisibility;
+  position: number;
+  default_language: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type CreateLearningCourseInput = {
+  program_id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  visibility?: LearningCourseVisibility;
+  default_language?: string;
+};
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
@@ -134,6 +176,64 @@ function isProgramVisibility(
   value: string
 ): value is LearningProgramVisibility {
   return (LEARNING_PROGRAM_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isCourseStatus(value: string): value is LearningCourseStatus {
+  return (LEARNING_COURSE_STATUSES as readonly string[]).includes(value);
+}
+
+function isCourseVisibility(
+  value: string
+): value is LearningCourseVisibility {
+  return (LEARNING_COURSE_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function mapCourseRow(
+  row: Record<string, unknown>
+): InstructorCourseSummary | null {
+  const id = asString(row.id);
+  const program_id = asString(row.program_id);
+  const slug = asString(row.slug);
+  const name = asString(row.name);
+  const status = asString(row.status);
+  const visibility = asString(row.visibility);
+  const default_language = asString(row.default_language) ?? "en";
+  const created_at = asString(row.created_at) ?? "";
+  const updated_at = asString(row.updated_at) ?? "";
+  const positionRaw = row.position;
+  const position =
+    typeof positionRaw === "number"
+      ? positionRaw
+      : typeof positionRaw === "string"
+        ? Number(positionRaw)
+        : NaN;
+  if (
+    !id ||
+    !program_id ||
+    !slug ||
+    !name ||
+    !status ||
+    !visibility ||
+    !Number.isFinite(position) ||
+    !isCourseStatus(status) ||
+    !isCourseVisibility(visibility)
+  ) {
+    return null;
+  }
+  return {
+    id,
+    program_id,
+    slug,
+    name,
+    description: asString(row.description),
+    status,
+    visibility,
+    position,
+    default_language,
+    created_at,
+    updated_at,
+    published_at: asString(row.published_at),
+  };
 }
 
 function mapProgramRow(
@@ -248,6 +348,18 @@ export function validateLearningProgramName(name: string): string | null {
     return "Name must be 1–160 characters";
   }
   return null;
+}
+
+export function validateLearningCourseSlug(slug: string): string | null {
+  return validateLearningSpaceSlug(slug);
+}
+
+export function validateLearningCourseName(name: string): string | null {
+  return validateLearningProgramName(name);
+}
+
+function programAllowsCourseCreate(status: LearningProgramStatus): boolean {
+  return status === "draft" || status === "published";
 }
 
 /**
@@ -581,6 +693,202 @@ export async function archiveLearningProgram(
     ok: true,
     data: {
       program_id: asString(record?.program_id) ?? id,
+      status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+/**
+ * Courses in a program visible via RLS (managers / staff / published paths).
+ */
+export async function listInstructorCourses(
+  supabase: AnyClient,
+  programId: string
+): Promise<InstructorAuthoringResult<InstructorCourseSummary[]>> {
+  const id = programId.trim();
+  if (!id) return { ok: false, message: "Program id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_courses")
+    .select(
+      "id, program_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("program_id", id)
+    .order("position", { ascending: true });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning courses"),
+    };
+  }
+
+  const courses: InstructorCourseSummary[] = [];
+  for (const row of data ?? []) {
+    const mapped = mapCourseRow(row as Record<string, unknown>);
+    if (mapped) courses.push(mapped);
+  }
+  return { ok: true, data: courses };
+}
+
+export async function getInstructorCourse(
+  supabase: AnyClient,
+  courseId: string
+): Promise<InstructorAuthoringResult<InstructorCourseSummary>> {
+  const id = courseId.trim();
+  if (!id) return { ok: false, message: "Course id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_courses")
+    .select(
+      "id, program_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning course"),
+    };
+  }
+  if (!data) {
+    return { ok: false, message: "Learning course not found" };
+  }
+
+  const mapped = mapCourseRow(data as Record<string, unknown>);
+  if (!mapped) {
+    return { ok: false, message: "Learning course row is invalid" };
+  }
+  return { ok: true, data: mapped };
+}
+
+export async function createLearningCourse(
+  supabase: AnyClient,
+  input: CreateLearningCourseInput
+): Promise<
+  InstructorAuthoringResult<{
+    course_id: string;
+    program_id: string;
+    status: string;
+    position: number;
+  }>
+> {
+  const programId = input.program_id.trim();
+  if (!programId) return { ok: false, message: "Program id is required" };
+
+  const slugErr = validateLearningCourseSlug(input.slug);
+  if (slugErr) return { ok: false, message: slugErr };
+  const nameErr = validateLearningCourseName(input.name);
+  if (nameErr) return { ok: false, message: nameErr };
+  const visibility = input.visibility ?? "private";
+  if (!isCourseVisibility(visibility)) {
+    return { ok: false, message: "Invalid learning course visibility" };
+  }
+
+  // Parent gates (DB authoritative; preflight for clearer UX).
+  const program = await getInstructorProgram(supabase, programId);
+  if (!program.ok) return program;
+  if (!programAllowsCourseCreate(program.data.status)) {
+    return { ok: false, message: LEARNING_COURSE_REQUIRES_VALID_PROGRAM };
+  }
+  const space = await getInstructorSpace(supabase, program.data.space_id);
+  if (!space.ok) return space;
+  if (space.data.status !== "active") {
+    return { ok: false, message: LEARNING_COURSE_REQUIRES_ACTIVE_SPACE };
+  }
+
+  const { data, error } = await supabase.rpc(LEARNING_COURSE_RPCS.create, {
+    p_program_id: programId,
+    p_slug: input.slug.trim().toLowerCase(),
+    p_name: input.name.trim(),
+    p_description: input.description?.trim() ? input.description.trim() : null,
+    p_visibility: visibility,
+    p_default_language: input.default_language?.trim() || "en",
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to create learning course"),
+    };
+  }
+
+  const record = asRecord(data);
+  const course_id = asString(record?.course_id);
+  if (!course_id) {
+    return { ok: false, message: "Create course returned no course_id" };
+  }
+  const positionRaw = record?.position;
+  const position =
+    typeof positionRaw === "number"
+      ? positionRaw
+      : typeof positionRaw === "string"
+        ? Number(positionRaw)
+        : 0;
+
+  return {
+    ok: true,
+    data: {
+      course_id,
+      program_id: asString(record?.program_id) ?? programId,
+      status: asString(record?.status) ?? "draft",
+      position: Number.isFinite(position) ? position : 0,
+    },
+  };
+}
+
+export async function publishLearningCourse(
+  supabase: AnyClient,
+  courseId: string
+): Promise<InstructorAuthoringResult<{ course_id: string; status: string }>> {
+  const id = courseId.trim();
+  if (!id) return { ok: false, message: "Course id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_COURSE_RPCS.publish, {
+    p_course_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to publish learning course"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      course_id: asString(record?.course_id) ?? id,
+      status: asString(record?.status) ?? "published",
+    },
+  };
+}
+
+export async function archiveLearningCourse(
+  supabase: AnyClient,
+  courseId: string
+): Promise<InstructorAuthoringResult<{ course_id: string; status: string }>> {
+  const id = courseId.trim();
+  if (!id) return { ok: false, message: "Course id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_COURSE_RPCS.archive, {
+    p_course_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to archive learning course"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      course_id: asString(record?.course_id) ?? id,
       status: asString(record?.status) ?? "archived",
     },
   };

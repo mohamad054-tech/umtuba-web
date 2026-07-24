@@ -2,22 +2,22 @@
 
 ## Summary
 
-Implemented **Instructor Authoring Foundation V1 — Phase 4A** (Program
-authoring under active Space) on `office/learning-progress-mutations-v1`.
-No migrations. No Course/Section/Lesson/Activity UI.
+Implemented **Instructor Authoring Foundation V1 — Phase 4B** (Course
+authoring under Program) on `office/learning-progress-mutations-v1`.
+No migrations. No Section/Lesson/Activity UI.
 
 ## Exact files changed
 
 - `lib/learning/instructorAuthoring.ts`
 - `lib/learning/instructorAuthoring.test.ts`
 - `app/learning/instructor/actions.ts`
-- `app/learning/instructor/spaces/[spaceId]/page.tsx`
-- `app/learning/instructor/spaces/[spaceId]/programs/new/page.tsx` (new)
-- `app/learning/instructor/programs/[programId]/page.tsx` (new)
-- `app/components/learning/instructor/InstructorProgramList.tsx` (new)
-- `app/components/learning/instructor/CreateProgramForm.tsx` (new)
-- `app/components/learning/instructor/ProgramLifecycleActions.tsx` (new)
-- `app/components/learning/instructor/ProgramStatusChip.tsx` (new)
+- `app/learning/instructor/programs/[programId]/page.tsx`
+- `app/learning/instructor/programs/[programId]/courses/new/page.tsx` (new)
+- `app/learning/instructor/courses/[courseId]/page.tsx` (new)
+- `app/components/learning/instructor/InstructorCourseList.tsx` (new)
+- `app/components/learning/instructor/CreateCourseForm.tsx` (new)
+- `app/components/learning/instructor/CourseLifecycleActions.tsx` (new)
+- `app/components/learning/instructor/CourseStatusChip.tsx` (new)
 - `docs/learning/implementation/INSTRUCTOR_AUTHORING_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -28,17 +28,17 @@ None
 
 ## Security review
 
-- JWT client only; existing `LEARNING_PROGRAM_RPCS`
-- Parent gate: space must be `active` before program create
-- RLS list/get for programs; RPC errors surfaced to UI
+- JWT + existing `LEARNING_COURSE_RPCS`
+- Parent gates: program draft|published; space active
+- RLS list/get; RPC errors surfaced
 
 ## Tests
 
-`npx vitest run lib/learning/instructorAuthoring.test.ts` — **12 passed**
+`npx vitest run lib/learning/instructorAuthoring.test.ts` — see run output
 
 ## TypeScript
 
-Instructor files clean. Pre-existing unrelated `.next/types` games page error.
+Instructor files clean (pre-existing unrelated `.next` games noise may remain)
 
 ## Build
 
@@ -46,7 +46,7 @@ Not run
 
 ## git diff --check
 
-Pass (after trailing-whitespace fix)
+See run output
 
 ## git status --short
 
@@ -54,4 +54,4 @@ See post-commit
 
 ## Open issues
 
-- Phase 4B+: Course → Section → Lesson → Activity
+- Phase 4C+: Section → Lesson → Activity
