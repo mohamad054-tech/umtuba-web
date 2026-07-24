@@ -2,20 +2,20 @@
 
 ## Task title
 
-UMTUBA — Games Hub Runtime Submit Outcome Adaptation Trusted V1
+UMTUBA — Games Hub Runtime Submit Outcome Acknowledgment Contract Trusted V1
 
 ## Goal
 
-Add a pure fail-closed adapter that converts a trusted Platform submit
-response into an immutable Hub Runtime observation after strict continuity
-checks, without mutating runtime state, completion handoff, or Hub
-authority.
+Add a pure fail-closed acknowledgment classifier for an already-trusted
+Runtime submit outcome observation. The helper may classify the observation
+only; it must not mutate Runtime, mutate the completion handoff, set
+`applied=true`, permit reapply, or open Hub authority.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntimeSubmitOutcomeAdaptation.ts`
-- `lib/games/gamesHubRuntimeSubmitOutcomeAdaptation.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_ADAPTATION_TRUSTED_V1.md`
+- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.ts`
+- `lib/games/gamesHubRuntimeSubmitOutcomeAcknowledgment.test.ts`
+- `docs/games/implementation/GAMES_HUB_RUNTIME_SUBMIT_OUTCOME_ACKNOWLEDGMENT_CONTRACT_TRUSTED_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -34,10 +34,10 @@ authority.
 
 ## Branch
 
-`office/games-hub-runtime-submit-outcome-adaptation-trusted-v1`
+`office/games-hub-runtime-submit-outcome-acknowledgment-contract-v1`
 
-Required parent: `office/games-hub-runtime-session-start-composition-v1` at
-`acad1312a6525db50c023dbac7d6dd3103adbc12`
+Required parent: `office/games-hub-runtime-submit-outcome-adaptation-trusted-v1` at
+`3985f00c077668534fc67bd46783abe70885b62d`
 
 ## Status
 
