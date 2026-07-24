@@ -259,6 +259,7 @@ describe("Progress Foundation V1 — TS contract parity", () => {
     expect(LEARNING_LESSON_COMPLETION_SOURCES).toEqual([
       "manual",
       "scored_attempt",
+      "submitted_attempt",
     ]);
     expect(LEARNING_PROGRESS_EVENT_TYPES).toContain("course_rollup_updated");
     expect(LEARNING_PROGRESS_RPCS.completeLesson).toBe(

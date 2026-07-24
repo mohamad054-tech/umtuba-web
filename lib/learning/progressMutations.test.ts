@@ -2,6 +2,14 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  LEARNING_COMPLETION_MODE_PROGRESS_AUDIT_ACTIONS,
+  LEARNING_COMPLETION_MODE_PROGRESS_BLOCKED_MODES,
+  LEARNING_COMPLETION_MODE_PROGRESS_ENABLED_MODES,
+  LEARNING_COMPLETION_MODE_PROGRESS_HOOK_HOST,
+  LEARNING_COMPLETION_MODE_PROGRESS_INTERNAL_HELPERS,
+  LEARNING_COMPLETION_MODE_PROGRESS_MIGRATION,
+  LEARNING_COMPLETION_MODE_PROGRESS_SKIP_REASONS,
+  LEARNING_COMPLETION_MODE_PROGRESS_SUBMIT_MODE,
   LEARNING_PROGRESS_MUTATIONS_APPLICATION_TABLE,
   LEARNING_PROGRESS_MUTATIONS_APPLY_STATUSES,
   LEARNING_PROGRESS_MUTATIONS_AUDIT_ACTIONS,
@@ -13,6 +21,7 @@ import {
   LEARNING_PROGRESS_MUTATIONS_SKIP_REASONS,
   LEARNING_PROGRESS_MUTATIONS_UNCHANGED_COMPLETION_MODES,
   learningProgressScoreCompletes,
+  learningProgressSubmitCompletes,
 } from "./progressMutations";
 import { LEARNING_LESSON_COMPLETION_SOURCES } from "./progressFoundation";
 
@@ -23,23 +32,40 @@ const sqlPath = resolve(
 );
 const sql = readFileSync(sqlPath, "utf8");
 
-const scoringApplyStart = sql.indexOf(
-  "create or replace function public.learning_scoring_apply_attempt_result"
+const completionSqlPath = resolve(
+  process.cwd(),
+  "supabase/migrations",
+  LEARNING_COMPLETION_MODE_PROGRESS_MIGRATION
 );
-const scoringApplyEnd = sql.indexOf("$$;", scoringApplyStart);
-const scoringApplyFn = sql.slice(scoringApplyStart, scoringApplyEnd);
+const completionSql = readFileSync(completionSqlPath, "utf8");
 
-const tryApplyStart = sql.indexOf(
-  "create or replace function public.learning_progress_try_apply_from_scored_attempt"
-);
-const tryApplyEnd = sql.indexOf("$$;", tryApplyStart);
-const tryApplyFn = sql.slice(tryApplyStart, tryApplyEnd);
+function fnBody(source: string, name: string): string {
+  const start = source.indexOf(`create or replace function public.${name}`);
+  expect(start).toBeGreaterThan(-1);
+  const end = source.indexOf("$$;", start);
+  expect(end).toBeGreaterThan(start);
+  return source.slice(start, end);
+}
 
-const completeStart = sql.indexOf(
-  "create or replace function public.learning_progress_complete_lesson_from_scored_attempt"
+const scoringApplyFn = fnBody(sql, "learning_scoring_apply_attempt_result");
+const tryApplyFn = fnBody(
+  sql,
+  "learning_progress_try_apply_from_scored_attempt"
 );
-const completeEnd = sql.indexOf("$$;", completeStart);
-const completeFn = sql.slice(completeStart, completeEnd);
+const completeFn = fnBody(
+  sql,
+  "learning_progress_complete_lesson_from_scored_attempt"
+);
+
+const submitTryApplyFn = fnBody(
+  completionSql,
+  "learning_progress_try_apply_from_submitted_attempt"
+);
+const submitCompleteFn = fnBody(
+  completionSql,
+  "learning_progress_complete_lesson_from_submitted_attempt"
+);
+const submitRpcFn = fnBody(completionSql, "submit_learning_attempt");
 
 describe("Progress Mutations V1 — migration identity", () => {
   it("uses locked migration 20260845 (after Games 42–43 and Result Policy 44)", () => {
@@ -60,15 +86,17 @@ describe("Progress Mutations V1 — migration identity", () => {
 });
 
 describe("Progress Mutations V1 — completion_source expand", () => {
-  it("allows scored_attempt alongside manual", () => {
+  it("allows scored_attempt alongside manual in 20260845", () => {
     expect(sql).toMatch(
       /completion_source in \('manual', 'scored_attempt'\)/
     );
     expect(LEARNING_PROGRESS_MUTATIONS_COMPLETION_SOURCES).toEqual([
       "manual",
       "scored_attempt",
+      "submitted_attempt",
     ]);
     expect(LEARNING_LESSON_COMPLETION_SOURCES).toContain("scored_attempt");
+    expect(LEARNING_LESSON_COMPLETION_SOURCES).toContain("submitted_attempt");
   });
 });
 
@@ -115,7 +143,7 @@ describe("Progress Mutations V1 — try apply gates", () => {
     );
   });
 
-  it("requires completion_mode score and leaves other modes unchanged", () => {
+  it("requires completion_mode score and leaves other modes unchanged in 20260845", () => {
     expect(tryApplyFn).toMatch(/completion_mode is distinct from 'score'/);
     expect(LEARNING_PROGRESS_MUTATIONS_COMPLETION_MODE).toBe("score");
     expect(LEARNING_PROGRESS_MUTATIONS_UNCHANGED_COMPLETION_MODES).toEqual([
@@ -162,9 +190,10 @@ describe("Progress Mutations V1 — lesson then course same txn", () => {
   it("completes lesson with scored_attempt then recomputes course", () => {
     expect(completeFn).toMatch(/completion_source = 'scored_attempt'/);
     expect(completeFn).toMatch(/learning_progress_recompute_course/);
-    // Order: lesson write paths before recompute
     const recomputeAt = completeFn.indexOf("learning_progress_recompute_course");
-    const insertAt = completeFn.indexOf("insert into public.learning_lesson_progress");
+    const insertAt = completeFn.indexOf(
+      "insert into public.learning_lesson_progress"
+    );
     expect(insertAt).toBeGreaterThan(-1);
     expect(recomputeAt).toBeGreaterThan(insertAt);
   });
@@ -184,9 +213,7 @@ describe("Progress Mutations V1 — lesson then course same txn", () => {
 describe("Progress Mutations V1 — scoring hook", () => {
   it("hooks progress apply inside scoring apply after score write", () => {
     expect(scoringApplyFn).toMatch(
-      new RegExp(
-        `learning_progress_try_apply_from_scored_attempt`
-      )
+      /learning_progress_try_apply_from_scored_attempt/
     );
     expect(LEARNING_PROGRESS_MUTATIONS_HOOK_HOST).toBe(
       "learning_scoring_apply_attempt_result"
@@ -265,6 +292,246 @@ describe("Progress Mutations V1 — pass gate helper", () => {
         passingScore: null,
         resultStatus: "pending",
         passed: null,
+      })
+    ).toBe(false);
+  });
+});
+
+describe("Completion-mode Progress V1 — migration identity", () => {
+  it("uses additive migration 20260848 and does not edit 20260845 file", () => {
+    expect(LEARNING_COMPLETION_MODE_PROGRESS_MIGRATION).toBe(
+      "20260848_learning_completion_mode_progress_v1.sql"
+    );
+    expect(completionSql).toMatch(/Completion-mode Progress V1/i);
+    expect(completionSql).toMatch(/20260848/);
+    expect(completionSql).toMatch(/Does NOT edit migration 20260845/);
+    expect(completionSql).not.toMatch(
+      /create or replace function public\.learning_progress_try_apply_from_scored_attempt/
+    );
+    expect(completionSql).not.toMatch(
+      /create or replace function public\.learning_scoring_apply_attempt_result/
+    );
+  });
+
+  it("expands completion_source with submitted_attempt", () => {
+    expect(completionSql).toMatch(
+      /completion_source in \('manual', 'scored_attempt', 'submitted_attempt'\)/
+    );
+  });
+});
+
+describe("Completion-mode Progress V1 — submit try apply gates", () => {
+  it("is security definer with search_path and revoked from clients", () => {
+    expect(submitTryApplyFn).toMatch(/security definer/i);
+    expect(submitTryApplyFn).toMatch(/set search_path = public/);
+    expect(completionSql).toMatch(
+      new RegExp(
+        `revoke all on function public\\.${LEARNING_COMPLETION_MODE_PROGRESS_INTERNAL_HELPERS.tryApplyFromSubmittedAttempt}`
+      )
+    );
+    expect(completionSql).toMatch(
+      new RegExp(
+        `grant execute on function public\\.${LEARNING_COMPLETION_MODE_PROGRESS_INTERNAL_HELPERS.tryApplyFromSubmittedAttempt}[\\s\\S]*?to service_role`
+      )
+    );
+  });
+
+  it("requires completion_mode submit only; blocks score/manual/view", () => {
+    expect(submitTryApplyFn).toMatch(
+      /completion_mode is distinct from 'submit'/
+    );
+    expect(submitTryApplyFn).toMatch(/completion_mode_not_submit/);
+    expect(LEARNING_COMPLETION_MODE_PROGRESS_SUBMIT_MODE).toBe("submit");
+    expect(LEARNING_COMPLETION_MODE_PROGRESS_ENABLED_MODES).toEqual([
+      "score",
+      "submit",
+    ]);
+    expect(LEARNING_COMPLETION_MODE_PROGRESS_BLOCKED_MODES).toEqual([
+      "view",
+      "manual",
+    ]);
+  });
+
+  it("uses submitted status gate and does not require scoring", () => {
+    expect(submitTryApplyFn).toMatch(/attempt_not_submitted/);
+    expect(submitTryApplyFn).not.toMatch(/attempt_not_scored/);
+    expect(submitTryApplyFn).not.toMatch(/passing_score_not_met/);
+    expect(submitTryApplyFn).not.toMatch(/learning_attempt_results/);
+  });
+
+  it("reuses ledger first-winner and idempotency", () => {
+    expect(submitTryApplyFn).toMatch(
+      /learning_attempt_progress_applications/
+    );
+    expect(submitTryApplyFn).toMatch(/activity_already_applied/);
+    expect(submitTryApplyFn).toMatch(/unique_violation/);
+    expect(submitTryApplyFn).toMatch(/activity_already_applied_concurrent/);
+    expect(submitTryApplyFn).toMatch(/'idempotent'/);
+    expect(submitTryApplyFn).toMatch(/'applied'/);
+  });
+
+  it("loads relationships from attempt row only", () => {
+    expect(submitTryApplyFn).toMatch(/v_attempt\.lesson_id/);
+    expect(submitTryApplyFn).toMatch(/v_attempt\.user_id/);
+    expect(submitTryApplyFn).toMatch(/v_attempt\.activity_id/);
+    expect(submitTryApplyFn).not.toMatch(/p_lesson_id/);
+    expect(submitTryApplyFn).not.toMatch(/p_user_id/);
+    expect(submitTryApplyFn).not.toMatch(/p_activity_id/);
+  });
+
+  it("exposes submit skip reasons in TS contract", () => {
+    for (const reason of LEARNING_COMPLETION_MODE_PROGRESS_SKIP_REASONS) {
+      expect(submitTryApplyFn).toMatch(new RegExp(reason));
+    }
+  });
+});
+
+describe("Completion-mode Progress V1 — lesson then course same txn", () => {
+  it("completes lesson with submitted_attempt then recomputes course", () => {
+    expect(submitCompleteFn).toMatch(/completion_source = 'submitted_attempt'/);
+    expect(submitCompleteFn).toMatch(/learning_progress_recompute_course/);
+    const recomputeAt = submitCompleteFn.indexOf(
+      "learning_progress_recompute_course"
+    );
+    const insertAt = submitCompleteFn.indexOf(
+      "insert into public.learning_lesson_progress"
+    );
+    expect(insertAt).toBeGreaterThan(-1);
+    expect(recomputeAt).toBeGreaterThan(insertAt);
+  });
+
+  it("calls complete only after application insert in try_apply", () => {
+    const insertAt = submitTryApplyFn.indexOf(
+      "insert into public.learning_attempt_progress_applications"
+    );
+    const completeAt = submitTryApplyFn.indexOf(
+      "learning_progress_complete_lesson_from_submitted_attempt"
+    );
+    expect(insertAt).toBeGreaterThan(-1);
+    expect(completeAt).toBeGreaterThan(insertAt);
+  });
+
+  it("revokes complete helper from authenticated", () => {
+    expect(completionSql).toMatch(
+      new RegExp(
+        `revoke all on function public\\.${LEARNING_COMPLETION_MODE_PROGRESS_INTERNAL_HELPERS.completeLessonFromSubmittedAttempt}`
+      )
+    );
+  });
+});
+
+describe("Completion-mode Progress V1 — submit hook", () => {
+  it("hooks submit progress apply after trusted submit and before auto-score", () => {
+    expect(LEARNING_COMPLETION_MODE_PROGRESS_HOOK_HOST).toBe(
+      "submit_learning_attempt"
+    );
+    expect(submitRpcFn).toMatch(
+      /learning_progress_try_apply_from_submitted_attempt/
+    );
+
+    const firstSubmitAudit = submitRpcFn.indexOf("'attempt.submit'");
+    const firstProgress = submitRpcFn.indexOf(
+      "learning_progress_try_apply_from_submitted_attempt",
+      firstSubmitAudit
+    );
+    const firstAutoScore = submitRpcFn.indexOf(
+      "learning_scoring_try_auto_score_submitted_attempt",
+      firstProgress
+    );
+    expect(firstSubmitAudit).toBeGreaterThan(-1);
+    expect(firstProgress).toBeGreaterThan(firstSubmitAudit);
+    expect(firstAutoScore).toBeGreaterThan(firstProgress);
+  });
+
+  it("also recovers progress apply on idempotent already-submitted path", () => {
+    const alreadySubmitted = submitRpcFn.indexOf(
+      "if v_attempt.status = 'submitted' then"
+    );
+    const recoveryProgress = submitRpcFn.indexOf(
+      "learning_progress_try_apply_from_submitted_attempt",
+      alreadySubmitted
+    );
+    const recoveryAutoScore = submitRpcFn.indexOf(
+      "learning_scoring_try_auto_score_submitted_attempt",
+      recoveryProgress
+    );
+    expect(alreadySubmitted).toBeGreaterThan(-1);
+    expect(recoveryProgress).toBeGreaterThan(alreadySubmitted);
+    expect(recoveryAutoScore).toBeGreaterThan(recoveryProgress);
+  });
+
+  it("keeps learner-safe submit grants (authenticated + service_role)", () => {
+    expect(completionSql).toMatch(
+      /revoke all on function public\.submit_learning_attempt\(uuid\)\s+from public, anon/
+    );
+    expect(completionSql).toMatch(
+      /grant execute on function public\.submit_learning_attempt\(uuid\)\s+to authenticated, service_role/
+    );
+  });
+});
+
+describe("Completion-mode Progress V1 — audit", () => {
+  it("writes submitted-attempt progress audit actions", () => {
+    expect(completionSql).toMatch(
+      new RegExp(
+        LEARNING_COMPLETION_MODE_PROGRESS_AUDIT_ACTIONS.lessonCompleteSubmittedAttempt
+      )
+    );
+    expect(completionSql).toMatch(
+      new RegExp(
+        LEARNING_COMPLETION_MODE_PROGRESS_AUDIT_ACTIONS.attemptSubmittedApply
+      )
+    );
+  });
+});
+
+describe("Completion-mode Progress V1 — submit vs score helpers", () => {
+  it("submit helper accepts submitted status for submit mode only", () => {
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "submit",
+        attemptStatus: "submitted",
+      })
+    ).toBe(true);
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "submit",
+        attemptStatus: "active",
+      })
+    ).toBe(false);
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "score",
+        attemptStatus: "submitted",
+      })
+    ).toBe(false);
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "view",
+        attemptStatus: "submitted",
+      })
+    ).toBe(false);
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "manual",
+        attemptStatus: "submitted",
+      })
+    ).toBe(false);
+  });
+
+  it("score and submit helpers remain mutually exclusive", () => {
+    expect(
+      learningProgressScoreCompletes({
+        completionMode: "submit",
+        passingScore: null,
+        resultStatus: "scored",
+        passed: true,
+      })
+    ).toBe(false);
+    expect(
+      learningProgressSubmitCompletes({
+        completionMode: "score",
+        attemptStatus: "submitted",
       })
     ).toBe(false);
   });

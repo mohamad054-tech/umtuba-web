@@ -18,10 +18,15 @@ export const LEARNING_PROGRESS_STATUSES = [
 export type LearningProgressStatus =
   (typeof LEARNING_PROGRESS_STATUSES)[number];
 
-/** Foundation V1: manual. Progress Mutations V1 (20260845): scored_attempt. */
+/**
+ * Foundation V1: manual.
+ * Progress Mutations V1 (20260845): scored_attempt.
+ * Completion-mode Progress V1 (20260848): submitted_attempt.
+ */
 export const LEARNING_LESSON_COMPLETION_SOURCES = [
   "manual",
   "scored_attempt",
+  "submitted_attempt",
 ] as const;
 export type LearningLessonCompletionSource =
   (typeof LEARNING_LESSON_COMPLETION_SOURCES)[number];
@@ -69,8 +74,9 @@ export type LearningCourseProgress = {
   percent_complete: number;
   last_lesson_id: string | null;
   /**
-   * Optional last activity pointer. Progress Mutations V1 may set this when
-   * completing from a scored attempt. Still no activity_progress table.
+   * Optional last activity pointer. Progress Mutations / Completion-mode
+   * Progress may set this when completing from a scored or submitted attempt.
+   * Still no activity_progress table.
    */
   last_activity_id: string | null;
   started_at: string | null;
