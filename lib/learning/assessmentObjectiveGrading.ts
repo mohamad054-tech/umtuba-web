@@ -53,6 +53,7 @@ export const LEARNING_ASSESSMENT_QUESTION_RESULT_STATES = [
   "not_answered",
   "unsupported",
   "grading_error",
+  "manually_reviewed",
 ] as const;
 
 export type LearningAssessmentGradingStatus =
@@ -91,6 +92,7 @@ export type AssessmentQuestionGradeResult = {
   points_possible: number;
   points_earned: number | null;
   feedback_code: string;
+  learner_feedback: string | null;
 };
 
 export type AssessmentGradeView = {
@@ -100,9 +102,13 @@ export type AssessmentGradeView = {
   graded_at: string | null;
   objective_points_earned: number | null;
   objective_points_possible: number | null;
+  manual_points_earned: number | null;
   pending_manual_points: number | null;
+  total_points_earned: number | null;
   total_points_possible: number | null;
   objective_percentage: number | null;
+  final_percentage: number | null;
+  passed: boolean | null;
   has_pending_manual_review: boolean;
   is_final: boolean;
   question_results: AssessmentQuestionGradeResult[];
@@ -276,6 +282,8 @@ export function parseAssessmentGradeView(
       points_possible,
       points_earned: asNumberOrNull(q.points_earned),
       feedback_code,
+      learner_feedback:
+        typeof q.learner_feedback === "string" ? q.learner_feedback : null,
     });
   }
 
@@ -286,9 +294,13 @@ export function parseAssessmentGradeView(
     graded_at: asString(row.graded_at),
     objective_points_earned: asNumberOrNull(row.objective_points_earned),
     objective_points_possible: asNumberOrNull(row.objective_points_possible),
+    manual_points_earned: asNumberOrNull(row.manual_points_earned),
     pending_manual_points: asNumberOrNull(row.pending_manual_points),
+    total_points_earned: asNumberOrNull(row.total_points_earned),
     total_points_possible: asNumberOrNull(row.total_points_possible),
     objective_percentage: asNumberOrNull(row.objective_percentage),
+    final_percentage: asNumberOrNull(row.final_percentage),
+    passed: typeof row.passed === "boolean" ? row.passed : null,
     has_pending_manual_review: asBool(row.has_pending_manual_review, false),
     is_final: asBool(row.is_final, false),
     question_results,

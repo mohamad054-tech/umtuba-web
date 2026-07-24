@@ -9,6 +9,7 @@ import {
   type InstructorCourseTree,
 } from "../../../../../lib/learning/instructorAuthoring";
 import { LEARNING_ASSESSMENT_ROUTES } from "../../../../../lib/learning/assessmentAuthoring";
+import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../lib/learning/assessmentManualReview";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -76,6 +77,15 @@ export default async function InstructorCourseAuthoringPage({
       <p className="mt-3 text-sm text-white/60">
         Lifecycle controls call existing publish/archive RPCs. Double-publish of
         non-draft items fails closed. Open an activity to manage its questions.
+      </p>
+
+      <p className="mt-3 text-sm">
+        <Link
+          href={LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES.queue(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Manual review queue
+        </Link>
       </p>
 
       <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
