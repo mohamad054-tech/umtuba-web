@@ -2,35 +2,39 @@
 
 ## Task title
 
-UMTUBA — UM Games Hub Experience Foundation V1
+UMTUBA — UM Games Hub Catalog Data Wiring V1
 
 ## Goal
 
-Implement Games Hub Experience Foundation V1 (route, adapter, cards, play
-action foundation, UI states) on
-`office/games-hub-experience-foundation-v1`.
+Replace the empty Games Hub catalog loader with a fail-closed, trusted read
+of visible Games Catalog entries via Catalog Foundation contracts /
+`list_games_catalog`, so `/games` can render real catalog cards.
 
 ## Allowed scope
 
-- `app/games/**`
-- `app/components/games/**`
+- `lib/games/gamesCatalog.ts`
+- `lib/games/gamesCatalog.test.ts`
 - `lib/games/gamesHubExperience.ts`
 - `lib/games/gamesHubExperience.test.ts`
-- `docs/games/implementation/GAMES_HUB_EXPERIENCE_FOUNDATION_V1.md`
-- `app/lib/nav/routes.ts` (games route constant only)
+- `app/games/page.tsx`
+- `docs/games/implementation/GAMES_HUB_CATALOG_DATA_WIRING_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
 - Learning / Ads / Store / World / Financial / Social
-- Migrations, merge, playable games, multiplayer, matchmaking
-- Commit / push unless explicitly requested
+- Migrations (do not create or apply `20260847`)
+- Title seeds / sample production data
+- Playable runtime, multiplayer, matchmaking, session creation
+- Navigation redesign
+- Merge / push to `alpha-0.2`
+- Unrelated files
 
 ## Branch
 
-`office/games-hub-experience-foundation-v1`
+`office/games-hub-catalog-data-wiring-v1`
 
 ## Status
 
-`complete` — PASS (not committed)
+`complete` — PASS

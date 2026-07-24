@@ -11,6 +11,7 @@ import {
   type GamesCatalogCategory,
   type GamesCatalogEntryView,
 } from "./gamesCatalog";
+import type { GamesValidationResult } from "./gamesFoundation";
 import {
   buildGamesHubDomainContract,
   evaluateGamesRuntimeEligibility,
@@ -315,16 +316,41 @@ export function evaluateGamesHubPlayAction(input: {
   };
 }
 
+export type GamesHubCatalogLoadResult =
+  | {
+      ok: true;
+      entries: readonly GamesCatalogEntryView[];
+    }
+  | {
+      ok: false;
+      reason: string;
+    };
+
+export type GamesHubCatalogListDependency = () => Promise<
+  GamesValidationResult<GamesCatalogEntryView[]>
+>;
+
 /**
- * Foundation catalog loader — no production DB wiring in this slice.
- * Returns an empty trusted list so the Hub can render empty/ready states
- * without inventing playable catalog rows.
+ * Trusted Hub catalog loader.
+ * Requires an injected Catalog list dependency (typically
+ * `listGamesCatalogTrusted` over authenticated `list_games_catalog`).
+ * Fail-closed on dependency failure; never invents catalog rows.
  */
-export function loadGamesHubExperienceCatalogFoundation(): {
-  ok: true;
-  entries: readonly GamesCatalogEntryView[];
-} {
-  return { ok: true, entries: Object.freeze([]) };
+export async function loadGamesHubExperienceCatalogFoundation(deps: {
+  listCatalog: GamesHubCatalogListDependency;
+}): Promise<GamesHubCatalogLoadResult> {
+  try {
+    const listed = await deps.listCatalog();
+    if (!listed.ok) {
+      return { ok: false, reason: listed.reason };
+    }
+    return {
+      ok: true,
+      entries: Object.freeze([...listed.value]),
+    };
+  } catch {
+    return { ok: false, reason: "catalog_load_failed" };
+  }
 }
 
 /** Assert experience slice does not reopen Runtime authority. */

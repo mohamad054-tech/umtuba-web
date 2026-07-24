@@ -542,6 +542,183 @@ export function validateGamesCatalogDefinition(
   };
 }
 
+/** UUID shape for trusted catalog row ids (matches Hub Runtime foundation). */
+const CATALOG_ENTRY_ID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/** Allowlisted keys from `game_catalog_row_to_json` / list RPC payloads. */
+const GAMES_CATALOG_ENTRY_VIEW_KEYS = [
+  "id",
+  "game_key",
+  "slug",
+  "name",
+  "description",
+  "short_blurb",
+  "status",
+  "availability",
+  "visibility",
+  "category",
+  "difficulty",
+  "min_players",
+  "max_players",
+  "platforms",
+  "feature_flags",
+  "catalog_version",
+  "content_version",
+  "sort_order",
+  "is_featured",
+  "result_validation_mode",
+  "session_ttl_seconds",
+  "created_at",
+  "updated_at",
+] as const;
+
+/**
+ * Minimal authenticated RPC client for trusted catalog reads.
+ * Intentionally narrow — no service-role, no direct table access.
+ */
+export type GamesCatalogRpcClient = {
+  rpc(
+    fn: string,
+    args?: Record<string, unknown>
+  ): PromiseLike<{
+    data: unknown;
+    error: { message?: string } | null;
+  }>;
+};
+
+/**
+ * Parse one trusted catalog RPC row into an allowlisted EntryView.
+ * Rejects unknown fields and invalid shapes (fail-closed).
+ */
+export function parseGamesCatalogEntryView(
+  raw: unknown
+): GamesValidationResult<GamesCatalogEntryView> {
+  if (!isPlainObject(raw)) return fail("entry_not_object");
+
+  const allowed = new Set<string>(GAMES_CATALOG_ENTRY_VIEW_KEYS);
+  for (const key of Object.keys(raw)) {
+    if (!allowed.has(key)) return fail("entry_unknown_field");
+  }
+
+  if (typeof raw.id !== "string" || !CATALOG_ENTRY_ID_RE.test(raw.id.trim())) {
+    return fail("entry_id_invalid");
+  }
+  const id = raw.id.trim();
+
+  const {
+    id: _id,
+    created_at: rawCreatedAt,
+    updated_at: rawUpdatedAt,
+    ...definitionRaw
+  } = raw;
+  void _id;
+
+  const defResult = validateGamesCatalogDefinition(definitionRaw);
+  if (!defResult.ok) return defResult;
+
+  let created_at: string | undefined;
+  if (rawCreatedAt !== undefined && rawCreatedAt !== null) {
+    if (typeof rawCreatedAt !== "string" || rawCreatedAt.trim().length < 1) {
+      return fail("created_at_invalid");
+    }
+    created_at = rawCreatedAt;
+  }
+
+  let updated_at: string | undefined;
+  if (rawUpdatedAt !== undefined && rawUpdatedAt !== null) {
+    if (typeof rawUpdatedAt !== "string" || rawUpdatedAt.trim().length < 1) {
+      return fail("updated_at_invalid");
+    }
+    updated_at = rawUpdatedAt;
+  }
+
+  const def = defResult.value;
+  // Re-normalize flags to the required full Record (definition input is Partial).
+  const flags = validateCatalogFeatureFlags(def.feature_flags);
+  if (!flags.ok) return flags;
+
+  const value: GamesCatalogEntryView = {
+    id,
+    game_key: def.game_key,
+    slug: def.slug,
+    name: def.name,
+    description: def.description,
+    short_blurb: def.short_blurb,
+    status: def.status,
+    availability: def.availability,
+    visibility: def.visibility,
+    category: def.category,
+    difficulty: def.difficulty,
+    min_players: def.min_players,
+    max_players: def.max_players,
+    platforms: def.platforms,
+    feature_flags: flags.value,
+    catalog_version: def.catalog_version,
+    content_version: def.content_version,
+    sort_order: def.sort_order ?? 0,
+    is_featured: def.is_featured ?? false,
+    result_validation_mode: def.result_validation_mode ?? "fail_closed",
+    session_ttl_seconds:
+      def.session_ttl_seconds ?? GAMES_LIMITS.defaultSessionTtlSeconds,
+    ...(created_at !== undefined ? { created_at } : {}),
+    ...(updated_at !== undefined ? { updated_at } : {}),
+  };
+
+  return { ok: true, value };
+}
+
+/**
+ * Parse `list_games_catalog` envelope `{ games: [...] }`.
+ * Malformed envelope → fail. Malformed/hidden entries are rejected per-row.
+ */
+export function parseGamesCatalogListResponse(
+  raw: unknown
+): GamesValidationResult<GamesCatalogEntryView[]> {
+  if (!isPlainObject(raw)) return fail("list_not_object");
+
+  for (const key of Object.keys(raw)) {
+    if (key !== "games") return fail("list_unknown_field");
+  }
+
+  if (!Array.isArray(raw.games)) return fail("games_not_array");
+
+  const entries: GamesCatalogEntryView[] = [];
+  for (const item of raw.games) {
+    const parsed = parseGamesCatalogEntryView(item);
+    if (!parsed.ok) {
+      // Reject untrusted rows; do not surface them.
+      continue;
+    }
+    if (!isCatalogVisibleToAuthenticated(parsed.value)) {
+      continue;
+    }
+    entries.push(parsed.value);
+  }
+
+  return { ok: true, value: entries };
+}
+
+/**
+ * Trusted authenticated read of visible catalog entries via `list_games_catalog`.
+ * Database/RPC authorization remains authoritative; this only validates shape.
+ */
+export async function listGamesCatalogTrusted(
+  client: GamesCatalogRpcClient
+): Promise<GamesValidationResult<GamesCatalogEntryView[]>> {
+  try {
+    const { data, error } = await client.rpc(
+      GAMES_CATALOG_PUBLIC_RPCS.listCatalog
+    );
+    if (error) {
+      return fail("catalog_rpc_failed");
+    }
+    return parseGamesCatalogListResponse(data);
+  } catch {
+    return fail("catalog_rpc_failed");
+  }
+}
+
 export function validateLifecyclePatch(raw: unknown): GamesValidationResult<{
   status?: GamesCatalogStatus;
   availability?: GamesCatalogAvailability;

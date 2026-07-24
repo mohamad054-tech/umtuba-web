@@ -13,6 +13,9 @@ import {
   canTransitionCatalogStatus,
   isCatalogPlayable,
   isCatalogVisibleToAuthenticated,
+  listGamesCatalogTrusted,
+  parseGamesCatalogEntryView,
+  parseGamesCatalogListResponse,
   validateCatalogFeatureFlags,
   validateCatalogPlatforms,
   validateGamesCatalogDefinition,
@@ -192,6 +195,128 @@ describe("Games Catalog Foundation V1 — lifecycle & visibility", () => {
         availability: "available",
       })
     ).toBe(true);
+  });
+});
+
+const SAMPLE_ENTRY_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+
+function sampleRpcEntry(overrides: Record<string, unknown> = {}) {
+  return {
+    id: SAMPLE_ENTRY_ID,
+    game_key: "kick_blast",
+    slug: "kick-blast",
+    name: "Kick Blast",
+    description: "Catalog sample",
+    short_blurb: "Short",
+    status: "active",
+    availability: "available",
+    visibility: "listed",
+    category: "action",
+    difficulty: "medium",
+    min_players: 1,
+    max_players: 1,
+    platforms: ["web"],
+    feature_flags: { ...GAMES_CATALOG_FEATURE_FLAG_DEFAULTS },
+    catalog_version: 1,
+    content_version: "1.0.0",
+    sort_order: 10,
+    is_featured: false,
+    result_validation_mode: "fail_closed",
+    session_ttl_seconds: 3600,
+    created_at: "2026-01-01T00:00:00.000Z",
+    updated_at: "2026-01-02T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+describe("Games Catalog Foundation V1 — trusted list parsing", () => {
+  it("parses a valid RPC entry view", () => {
+    const r = parseGamesCatalogEntryView(sampleRpcEntry());
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.id).toBe(SAMPLE_ENTRY_ID);
+    expect(r.value.game_key).toBe("kick_blast");
+    expect(r.value.visibility).toBe("listed");
+  });
+
+  it("rejects malformed and unknown-field entries", () => {
+    expect(parseGamesCatalogEntryView(null).ok).toBe(false);
+    expect(parseGamesCatalogEntryView("x").ok).toBe(false);
+    expect(
+      parseGamesCatalogEntryView(sampleRpcEntry({ id: "not-a-uuid" })).ok
+    ).toBe(false);
+    expect(
+      parseGamesCatalogEntryView(
+        sampleRpcEntry({ economy_hook: true })
+      ).ok
+    ).toBe(false);
+    expect(
+      parseGamesCatalogEntryView(sampleRpcEntry({ category: "fps" })).ok
+    ).toBe(false);
+  });
+
+  it("parses list envelope and drops hidden / malformed rows", () => {
+    const r = parseGamesCatalogListResponse({
+      games: [
+        sampleRpcEntry(),
+        sampleRpcEntry({
+          id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+          game_key: "hidden_game",
+          slug: "hidden-game",
+          visibility: "hidden",
+        }),
+        sampleRpcEntry({
+          id: "bad",
+          game_key: "broken",
+        }),
+        { not: "an entry" },
+      ],
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value).toHaveLength(1);
+    expect(r.value[0]?.game_key).toBe("kick_blast");
+  });
+
+  it("fails closed on malformed list envelopes", () => {
+    expect(parseGamesCatalogListResponse(null).ok).toBe(false);
+    expect(parseGamesCatalogListResponse([]).ok).toBe(false);
+    expect(parseGamesCatalogListResponse({ games: {} }).ok).toBe(false);
+    expect(
+      parseGamesCatalogListResponse({ games: [], extra: true }).ok
+    ).toBe(false);
+  });
+
+  it("returns empty success for trusted empty games array", () => {
+    const r = parseGamesCatalogListResponse({ games: [] });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value).toEqual([]);
+  });
+
+  it("listGamesCatalogTrusted calls list_games_catalog and maps payload", async () => {
+    const client = {
+      rpc: async (fn: string) => {
+        expect(fn).toBe(GAMES_CATALOG_PUBLIC_RPCS.listCatalog);
+        return {
+          data: { games: [sampleRpcEntry()] },
+          error: null,
+        };
+      },
+    };
+    const r = await listGamesCatalogTrusted(client);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value).toHaveLength(1);
+  });
+
+  it("listGamesCatalogTrusted fails closed on RPC error", async () => {
+    const r = await listGamesCatalogTrusted({
+      rpc: async () => ({ data: null, error: { message: "boom" } }),
+    });
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("catalog_rpc_failed");
   });
 });
 

@@ -9,6 +9,7 @@ import {
   assertGamesHubExperienceAuthorityClosed,
   evaluateGamesHubPlayAction,
   isGamesHubDisplayableEntry,
+  loadGamesHubExperienceCatalogFoundation,
 } from "./gamesHubExperience";
 import { GAMES_HUB_RUNTIME_AUTHORITY } from "./gamesHubRuntime";
 
@@ -150,5 +151,109 @@ describe("Games Hub Experience Foundation V1 — adapter", () => {
     expect(assertGamesHubExperienceAuthorityClosed()).toBe(true);
     expect(GAMES_HUB_RUNTIME_AUTHORITY.runsActualGameServer).toBe(false);
     expect(GAMES_HUB_RUNTIME_AUTHORITY.grantsRewards).toBe(false);
+  });
+});
+
+describe("Games Hub Catalog Data Wiring V1 — loader", () => {
+  it("maps successful visible catalog entries into ready hub cards", async () => {
+    const loaded = await loadGamesHubExperienceCatalogFoundation({
+      listCatalog: async () => ({ ok: true, value: [entry()] }),
+    });
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const hub = adaptGamesCatalogToHubExperience(loaded.entries);
+    expect(hub.uiState).toBe("ready");
+    expect(hub.games).toHaveLength(1);
+    expect(hub.games[0]?.title).toBe("Hub Sample");
+    expect(hub.games[0]?.canPlay).toBe(true);
+    const play = evaluateGamesHubPlayAction({ card: hub.games[0]! });
+    expect(play.startedServer).toBe(false);
+  });
+
+  it("returns empty_catalog only on trusted empty success", async () => {
+    const loaded = await loadGamesHubExperienceCatalogFoundation({
+      listCatalog: async () => ({ ok: true, value: [] }),
+    });
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const hub = adaptGamesCatalogToHubExperience(loaded.entries);
+    expect(hub.uiState).toBe("empty_catalog");
+    expect(hub.games).toHaveLength(0);
+  });
+
+  it("fails closed to internal_error on RPC/read failure", async () => {
+    const loaded = await loadGamesHubExperienceCatalogFoundation({
+      listCatalog: async () => ({ ok: false, reason: "catalog_rpc_failed" }),
+    });
+    expect(loaded.ok).toBe(false);
+    if (loaded.ok) return;
+    const hub = adaptGamesCatalogToHubExperience([], {
+      errorMessage: loaded.reason,
+    });
+    expect(hub.uiState).toBe("internal_error");
+    expect(hub.games).toHaveLength(0);
+    expect(hub.userMessage).toMatch(/Something went wrong/i);
+  });
+
+  it("fails closed when listCatalog throws", async () => {
+    const loaded = await loadGamesHubExperienceCatalogFoundation({
+      listCatalog: async () => {
+        throw new Error("network");
+      },
+    });
+    expect(loaded.ok).toBe(false);
+    if (loaded.ok) return;
+    expect(loaded.reason).toBe("catalog_load_failed");
+  });
+
+  it("does not render hidden or non-displayable entries", async () => {
+    const loaded = await loadGamesHubExperienceCatalogFoundation({
+      listCatalog: async () => ({
+        ok: true,
+        value: [
+          entry({ visibility: "hidden" }),
+          entry({
+            id: "33333333-3333-4333-8333-333333333333",
+            game_key: "draft_game",
+            slug: "draft-game",
+            status: "draft",
+          }),
+          entry({
+            id: "44444444-4444-4444-8444-444444444444",
+            game_key: "visible_game",
+            slug: "visible-game",
+            name: "Visible",
+          }),
+        ],
+      }),
+    });
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    const hub = adaptGamesCatalogToHubExperience(loaded.entries);
+    expect(hub.games).toHaveLength(1);
+    expect(hub.games[0]?.title).toBe("Visible");
+  });
+
+  it("preserves fail-closed maintenance / unavailable / blocked aggregates", () => {
+    const maintenance = adaptGamesCatalogToHubExperience([
+      entry({ availability: "maintenance" }),
+    ]);
+    expect(maintenance.uiState).toBe("maintenance");
+
+    const unavailable = adaptGamesCatalogToHubExperience([
+      entry({ availability: "unavailable" }),
+    ]);
+    expect(unavailable.uiState).toBe("unavailable");
+
+    const blocked = adaptGamesCatalogToHubExperience([
+      entry({
+        feature_flags: {
+          ...GAMES_CATALOG_FEATURE_FLAG_DEFAULTS,
+          sessions_enabled: false,
+        },
+      }),
+    ]);
+    expect(blocked.uiState).toBe("eligibility_blocked");
+    expect(blocked.games.every((g) => !g.canPlay)).toBe(true);
   });
 });
