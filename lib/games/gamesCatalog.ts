@@ -720,6 +720,95 @@ export async function listGamesCatalogTrusted(
 }
 
 /**
+ * Validate a catalog entry UUID before calling get-by-id RPC.
+ * Matches `CATALOG_ENTRY_ID_RE` / Hub Runtime foundation shape.
+ */
+export function validateCatalogEntryId(
+  value: unknown
+): GamesValidationResult<string> {
+  if (typeof value !== "string" || !CATALOG_ENTRY_ID_RE.test(value.trim())) {
+    return fail("entry_id_invalid");
+  }
+  return { ok: true, value: value.trim() };
+}
+
+/**
+ * Map a single-entry get RPC payload through `parseGamesCatalogEntryView`.
+ * SQL get RPCs never return null for absence (they raise); null/malformed
+ * payloads therefore fail closed — no trusted-null success union.
+ */
+function parseGamesCatalogGetResponse(
+  data: unknown
+): GamesValidationResult<GamesCatalogEntryView> {
+  if (data === null || data === undefined) {
+    return fail("catalog_get_response_invalid");
+  }
+  const parsed = parseGamesCatalogEntryView(data);
+  if (!parsed.ok) {
+    return fail("catalog_get_response_invalid");
+  }
+  return parsed;
+}
+
+/**
+ * Trusted authenticated lookup via `get_game_catalog_by_key`.
+ *
+ * Metadata only — does not imply runtime eligibility, session authority,
+ * playability, or matchmaking. DB auth/visibility remain authoritative.
+ *
+ * Not-found / hidden / draft / archived (for non-admin) surface as RPC errors
+ * (`Game not available`); this client maps them to fail-closed
+ * `catalog_rpc_failed` and never invents a success-null.
+ */
+export async function getGamesCatalogByKeyTrusted(
+  client: GamesCatalogRpcClient,
+  gameKey: unknown
+): Promise<GamesValidationResult<GamesCatalogEntryView>> {
+  const keyResult = validateGameKey(gameKey);
+  if (!keyResult.ok) return keyResult;
+
+  try {
+    const { data, error } = await client.rpc(
+      GAMES_CATALOG_PUBLIC_RPCS.getByKey,
+      { p_game_key: keyResult.value }
+    );
+    if (error) {
+      return fail("catalog_rpc_failed");
+    }
+    return parseGamesCatalogGetResponse(data);
+  } catch {
+    return fail("catalog_rpc_failed");
+  }
+}
+
+/**
+ * Trusted authenticated lookup via `get_game_catalog_by_id`.
+ *
+ * Same contracts as `getGamesCatalogByKeyTrusted`: metadata-only,
+ * fail-closed, no service-role / direct table path, RPC visibility authoritative.
+ */
+export async function getGamesCatalogByIdTrusted(
+  client: GamesCatalogRpcClient,
+  gameId: unknown
+): Promise<GamesValidationResult<GamesCatalogEntryView>> {
+  const idResult = validateCatalogEntryId(gameId);
+  if (!idResult.ok) return idResult;
+
+  try {
+    const { data, error } = await client.rpc(
+      GAMES_CATALOG_PUBLIC_RPCS.getById,
+      { p_game_id: idResult.value }
+    );
+    if (error) {
+      return fail("catalog_rpc_failed");
+    }
+    return parseGamesCatalogGetResponse(data);
+  } catch {
+    return fail("catalog_rpc_failed");
+  }
+}
+
+/**
  * Trusted admin upsert via `upsert_game_catalog_entry`.
  *
  * Sole Catalog mutation abstraction in application code — no service-role and

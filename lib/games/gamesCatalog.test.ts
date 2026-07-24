@@ -11,14 +11,18 @@ import {
   GAMES_CATALOG_PUBLIC_RPCS,
   GAMES_CATALOG_VISIBILITIES,
   canTransitionCatalogStatus,
+  getGamesCatalogByIdTrusted,
+  getGamesCatalogByKeyTrusted,
   isCatalogPlayable,
   isCatalogVisibleToAuthenticated,
   listGamesCatalogTrusted,
   parseGamesCatalogEntryView,
   parseGamesCatalogListResponse,
   upsertGamesCatalogEntryTrusted,
+  validateCatalogEntryId,
   validateCatalogFeatureFlags,
   validateCatalogPlatforms,
+  validateGameKey,
   validateGamesCatalogDefinition,
   validateLifecyclePatch,
 } from "./gamesCatalog";
@@ -361,6 +365,214 @@ describe("Games Catalog Foundation V1 — trusted list parsing", () => {
     expect(badShape.ok).toBe(false);
     if (badShape.ok) return;
     expect(badShape.reason).toBe("catalog_upsert_response_invalid");
+  });
+});
+
+describe("Games Catalog Entry Lookup Trusted V1", () => {
+  it("getGamesCatalogByKeyTrusted succeeds with parsed EntryView", async () => {
+    const r = await getGamesCatalogByKeyTrusted(
+      {
+        rpc: async (fn, args) => {
+          expect(fn).toBe(GAMES_CATALOG_PUBLIC_RPCS.getByKey);
+          expect(args).toEqual({ p_game_key: "kick_blast" });
+          return { data: sampleRpcEntry(), error: null };
+        },
+      },
+      "kick_blast"
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.game_key).toBe("kick_blast");
+    expect(r.value.id).toBe(SAMPLE_ENTRY_ID);
+  });
+
+  it("getGamesCatalogByIdTrusted succeeds with parsed EntryView", async () => {
+    const r = await getGamesCatalogByIdTrusted(
+      {
+        rpc: async (fn, args) => {
+          expect(fn).toBe(GAMES_CATALOG_PUBLIC_RPCS.getById);
+          expect(args).toEqual({ p_game_id: SAMPLE_ENTRY_ID });
+          return { data: sampleRpcEntry(), error: null };
+        },
+      },
+      SAMPLE_ENTRY_ID
+    );
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.value.id).toBe(SAMPLE_ENTRY_ID);
+  });
+
+  it("rejects invalid key before RPC", async () => {
+    let called = false;
+    const r = await getGamesCatalogByKeyTrusted(
+      {
+        rpc: async () => {
+          called = true;
+          return { data: null, error: null };
+        },
+      },
+      "Kick"
+    );
+    expect(called).toBe(false);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("game_key_invalid");
+    expect(validateGameKey("Kick").ok).toBe(false);
+  });
+
+  it("rejects invalid UUID before RPC", async () => {
+    let called = false;
+    const r = await getGamesCatalogByIdTrusted(
+      {
+        rpc: async () => {
+          called = true;
+          return { data: null, error: null };
+        },
+      },
+      "not-a-uuid"
+    );
+    expect(called).toBe(false);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.reason).toBe("entry_id_invalid");
+    expect(validateCatalogEntryId("not-a-uuid").ok).toBe(false);
+  });
+
+  it("maps RPC not-found / Game not available to catalog_rpc_failed (no trusted null)", async () => {
+    // SQL raise exception 'Game not available' for absence and non-visible rows —
+    // never returns SQL NULL. Client must fail closed, not invent success-null.
+    const byKey = await getGamesCatalogByKeyTrusted(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Game not available" },
+        }),
+      },
+      "kick_blast"
+    );
+    expect(byKey.ok).toBe(false);
+    if (byKey.ok) return;
+    expect(byKey.reason).toBe("catalog_rpc_failed");
+
+    const byId = await getGamesCatalogByIdTrusted(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Game not available" },
+        }),
+      },
+      SAMPLE_ENTRY_ID
+    );
+    expect(byId.ok).toBe(false);
+    if (byId.ok) return;
+    expect(byId.reason).toBe("catalog_rpc_failed");
+  });
+
+  it("fails closed on RPC failure and thrown client errors", async () => {
+    const failed = await getGamesCatalogByKeyTrusted(
+      { rpc: async () => ({ data: null, error: { message: "boom" } }) },
+      "kick_blast"
+    );
+    expect(failed.ok).toBe(false);
+    if (failed.ok) return;
+    expect(failed.reason).toBe("catalog_rpc_failed");
+
+    const thrown = await getGamesCatalogByIdTrusted(
+      {
+        rpc: async () => {
+          throw new Error("network");
+        },
+      },
+      SAMPLE_ENTRY_ID
+    );
+    expect(thrown.ok).toBe(false);
+    if (thrown.ok) return;
+    expect(thrown.reason).toBe("catalog_rpc_failed");
+  });
+
+  it("rejects null and malformed get responses", async () => {
+    const nullData = await getGamesCatalogByKeyTrusted(
+      { rpc: async () => ({ data: null, error: null }) },
+      "kick_blast"
+    );
+    expect(nullData.ok).toBe(false);
+    if (nullData.ok) return;
+    expect(nullData.reason).toBe("catalog_get_response_invalid");
+
+    const malformed = await getGamesCatalogByIdTrusted(
+      {
+        rpc: async () => ({
+          data: sampleRpcEntry({ economy_hook: true }),
+          error: null,
+        }),
+      },
+      SAMPLE_ENTRY_ID
+    );
+    expect(malformed.ok).toBe(false);
+    if (malformed.ok) return;
+    expect(malformed.reason).toBe("catalog_get_response_invalid");
+
+    const badStatus = await getGamesCatalogByKeyTrusted(
+      {
+        rpc: async () => ({
+          data: sampleRpcEntry({ status: "published" }),
+          error: null,
+        }),
+      },
+      "kick_blast"
+    );
+    expect(badStatus.ok).toBe(false);
+    if (badStatus.ok) return;
+    expect(badStatus.reason).toBe("catalog_get_response_invalid");
+  });
+
+  it("hidden/draft/archived visibility remains RPC-governed (client does not invent null)", async () => {
+    // Non-admin deny paths raise in SQL; trusted client only maps the error.
+    for (const message of [
+      "Game not available",
+      "Authentication required",
+    ]) {
+      const r = await getGamesCatalogByKeyTrusted(
+        {
+          rpc: async () => ({ data: null, error: { message } }),
+        },
+        "kick_blast"
+      );
+      expect(r.ok).toBe(false);
+      if (r.ok) return;
+      expect(r.reason).toBe("catalog_rpc_failed");
+    }
+
+    // If an admin-visible draft/hidden row is returned, parser accepts metadata
+    // without implying playability.
+    const adminDraft = await getGamesCatalogByKeyTrusted(
+      {
+        rpc: async () => ({
+          data: sampleRpcEntry({
+            status: "draft",
+            visibility: "hidden",
+            availability: "unavailable",
+          }),
+          error: null,
+        }),
+      },
+      "kick_blast"
+    );
+    expect(adminDraft.ok).toBe(true);
+    if (!adminDraft.ok) return;
+    expect(isCatalogPlayable(adminDraft.value)).toBe(false);
+    expect(isCatalogVisibleToAuthenticated(adminDraft.value)).toBe(false);
+  });
+
+  it("lookup module path uses only authenticated RPC registry (no service-role / table)", () => {
+    const src = read(MODULE);
+    expect(src).toMatch(/getGamesCatalogByKeyTrusted/);
+    expect(src).toMatch(/getGamesCatalogByIdTrusted/);
+    expect(src).toMatch(/GAMES_CATALOG_PUBLIC_RPCS\.getByKey/);
+    expect(src).toMatch(/GAMES_CATALOG_PUBLIC_RPCS\.getById/);
+    expect(src).toMatch(/parseGamesCatalogEntryView/);
+    expect(src).not.toMatch(/createServiceRole|service_role|serviceRole/i);
+    expect(src).not.toMatch(/\.from\(\s*['"]games['"]\s*\)/);
   });
 });
 
