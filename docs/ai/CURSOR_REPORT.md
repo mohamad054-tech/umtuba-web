@@ -1,22 +1,22 @@
-# CURSOR_REPORT
+﻿# CURSOR_REPORT
 
 ## Summary
-UM Games Progress Lookup Trusted V1 PASS on office/games-progress-lookup-trusted-v1.
-- Added getMyGameProgressTrusted for existing get_my_game_progress
-- Uses GAMES_PUBLIC_RPCS.getMyProgress only
-- Bounded parser parseGamesMyProgressResponse is the sole response boundary
-- game_id UUID validated before RPC (validateGameProgressGameId)
-- Preserves SQL empty-default success shape (zeros/nulls) when no progress row
-- Fail-closed on malformed ID, RPC error/throw, auth deny, null/malformed payload, unknown fields, bad value shapes
-- Metadata only — no Catalog/playability/runtime/session/reward/economy/achievement authority
+UM Games Achievements Lookup Trusted V1 PASS on office/games-achievements-lookup-trusted-v1.
+- Added getMyGameAchievementsTrusted for existing get_my_game_achievements
+- Uses GAMES_PUBLIC_RPCS.getMyAchievements only
+- Bounded parser parseGamesMyAchievementsResponse is the sole response boundary
+- game_id UUID validated before RPC (validateGameAchievementsGameId)
+- Preserves SQL empty-list success shape (`achievements: []`) when no unlocks
+- Fail-closed on malformed ID, RPC error/throw, auth deny, null/malformed payload, unknown fields, bad entry shapes, invalid UUID/timestamp
+- Unlock metadata only — no Catalog/playability/runtime/session/reward/economy authority
 - Hub Runtime untouched; no platformSessionId wiring
-- No migrations; no remote progress lookup/mutation executed
+- No migrations; no remote achievements lookup/mutation executed
 - No service-role; no direct table reads; no Catalog pre-read
 
 ## Exact files changed
-- lib/games/gamesProgress.ts — new
-- lib/games/gamesProgress.test.ts — new
-- docs/games/implementation/GAMES_PROGRESS_LOOKUP_TRUSTED_V1.md — new
+- lib/games/gamesAchievements.ts — new
+- lib/games/gamesAchievements.test.ts — new
+- docs/games/implementation/GAMES_ACHIEVEMENTS_LOOKUP_TRUSTED_V1.md — new
 - docs/ai/CURRENT_TASK.md
 - docs/ai/CURSOR_REPORT.md
 
@@ -24,20 +24,20 @@ UM Games Progress Lookup Trusted V1 PASS on office/games-progress-lookup-trusted
 None — NO MIGRATION REQUIRED (do not apply 20260846 / 20260847)
 
 ## Security review
-- Authenticated GamesProgressRpcClient only
-- No service-role; no direct game_player_progress / games table reads
+- Authenticated GamesAchievementsRpcClient only
+- No service-role; no direct game_player_achievements / game_achievements / games table reads
 - Invalid game UUID rejected before RPC
 - SQL auth remains authoritative
-- RPC errors/throws → progress_rpc_failed
-- Null/malformed/unknown/bad values → progress_response_invalid
-- Empty-default success does not imply Catalog existence
+- RPC errors/throws → achievements_rpc_failed
+- Null/malformed/unknown/bad values → achievements_response_invalid
+- Empty-list success does not imply Catalog existence
 - Results never imply playability, rewards, or economy
 
 ## Tests
-- npx vitest run lib/games/gamesProgress.test.ts — 13 passed (13)
+- npx vitest run lib/games/gamesAchievements.test.ts — 16 passed (16)
 
 ## TypeScript
-- npx tsc --noEmit — pass
+- npx tsc --noEmit — pass (also covered by next build TypeScript step)
 
 ## Build
 - npm run build — pass
@@ -46,9 +46,9 @@ None — NO MIGRATION REQUIRED (do not apply 20260846 / 20260847)
 - clean
 
 ## git status --short
-- (updated after docs finalize commit)
+- (updated after commit)
 
 ## Open issues
-- Remote progress lookup requires 20260846 applied before live RPC succeeds
-- No progress mutation, start/submit clients, Hub wiring, or UI in this slice (intentionally deferred)
+- Remote achievements lookup requires 20260846 applied before live RPC succeeds
+- No unlock mutation, start/submit clients, Hub wiring, or UI in this slice (intentionally deferred)
 - Hub Runtime platformSessionId remains always null / unconnected
