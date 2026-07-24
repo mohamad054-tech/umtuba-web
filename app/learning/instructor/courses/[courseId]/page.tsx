@@ -11,6 +11,7 @@ import {
 import { LEARNING_ASSESSMENT_ROUTES } from "../../../../../lib/learning/assessmentAuthoring";
 import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../lib/learning/assessmentManualReview";
 import { LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES } from "../../../../../lib/learning/instructorExperience";
+import { LEARNING_ASSIGNMENT_ROUTES } from "../../../../../lib/learning/assignmentsCoursework";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -104,6 +105,12 @@ export default async function InstructorCourseAuthoringPage({
           className="font-bold text-white underline underline-offset-2"
         >
           Manual review queue
+        </Link>
+        <Link
+          href={LEARNING_ASSIGNMENT_ROUTES.queue(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Assignment queue
         </Link>
       </nav>
 
@@ -431,15 +438,27 @@ export default async function InstructorCourseAuthoringPage({
                                   </span>
                                 </span>
                                 <span className="flex items-center gap-3 text-xs uppercase text-white/50">
-                                  <Link
-                                    href={LEARNING_ASSESSMENT_ROUTES.activityQuestions(
-                                      courseId,
-                                      activity.id
-                                    )}
-                                    className="normal-case text-sky-300 underline underline-offset-2"
-                                  >
-                                    Questions
-                                  </Link>
+                                  {activity.type === "assignment" ? (
+                                    <Link
+                                      href={LEARNING_ASSIGNMENT_ROUTES.author(
+                                        courseId,
+                                        activity.id
+                                      )}
+                                      className="normal-case text-sky-300 underline underline-offset-2"
+                                    >
+                                      Assignment
+                                    </Link>
+                                  ) : (
+                                    <Link
+                                      href={LEARNING_ASSESSMENT_ROUTES.activityQuestions(
+                                        courseId,
+                                        activity.id
+                                      )}
+                                      className="normal-case text-sky-300 underline underline-offset-2"
+                                    >
+                                      Questions
+                                    </Link>
+                                  )}
                                   <span>{activity.status}</span>
                                 </span>
                               </div>
