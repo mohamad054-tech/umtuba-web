@@ -12,7 +12,9 @@ import {
   answersByQuestionId,
   loadAssessmentAnswers,
 } from "../../../../../../lib/learning/assessmentAnswerPersistence";
+import { loadAssessmentSubmission } from "../../../../../../lib/learning/assessmentSubmissionFoundation";
 import { cancelAssessmentAttemptAction } from "../../../../assessmentAttemptActions";
+import AssessmentSubmitForm from "../../../../../components/learning/AssessmentSubmitForm";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,9 @@ type PageProps = {
   params:
     | Promise<{ activityId: string; attemptId: string }>
     | { activityId: string; attemptId: string };
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?:
+    | Promise<{ error?: string; submitted?: string }>
+    | { error?: string; submitted?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -74,9 +78,16 @@ export default async function AssessmentAttemptFoundationPage({
   }
 
   const answersLoaded = await loadAssessmentAnswers(supabase, attemptId);
+  const submissionLoaded = await loadAssessmentSubmission(supabase, attemptId);
   const savedByQuestion =
     answersLoaded.ok ? answersByQuestionId(answersLoaded.data) : {};
   const canAnswer = view.status === "active";
+  const isSubmitted =
+    view.status === "submitted" ||
+    (submissionLoaded.ok && submissionLoaded.data.is_submitted);
+  const submittedAt =
+    (submissionLoaded.ok ? submissionLoaded.data.submitted_at : null) ??
+    view.submitted_at;
 
   return (
     <LearningShell
@@ -87,7 +98,7 @@ export default async function AssessmentAttemptFoundationPage({
     >
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Answer persistence · no grading in this foundation
+          Submission foundation · no grading in this foundation
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
           Status: {view.status}
@@ -96,6 +107,10 @@ export default async function AssessmentAttemptFoundationPage({
           <div>
             <dt className="text-white/35">Started</dt>
             <dd>{view.started_at}</dd>
+          </div>
+          <div>
+            <dt className="text-white/35">Submitted</dt>
+            <dd>{submittedAt ?? "—"}</dd>
           </div>
           <div>
             <dt className="text-white/35">Expires (metadata)</dt>
@@ -119,6 +134,16 @@ export default async function AssessmentAttemptFoundationPage({
               {view.question_count}
             </dd>
           </div>
+          <div>
+            <dt className="text-white/35">Lifecycle</dt>
+            <dd>
+              {isSubmitted
+                ? "Submitted (read-only)"
+                : view.status === "active"
+                  ? "Active"
+                  : view.status}
+            </dd>
+          </div>
         </dl>
 
         {!answersLoaded.ok ? (
@@ -127,6 +152,15 @@ export default async function AssessmentAttemptFoundationPage({
             className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-50"
           >
             Could not restore saved answers: {answersLoaded.message}
+          </p>
+        ) : null}
+
+        {query.submitted === "1" && isSubmitted ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
+          >
+            Submitted. Answers are locked and cannot be changed.
           </p>
         ) : null}
 
@@ -140,19 +174,33 @@ export default async function AssessmentAttemptFoundationPage({
         ) : null}
 
         {view.status === "active" ? (
-          <form action={cancelAssessmentAttemptAction} className="mt-6">
-            <input type="hidden" name="activityId" value={view.activity_id} />
-            <input type="hidden" name="attemptId" value={view.attempt_id} />
-            <button
-              type="submit"
-              className="watch-focus-ring rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
-            >
-              Cancel attempt
-            </button>
-          </form>
+          <>
+            <AssessmentSubmitForm
+              activityId={view.activity_id}
+              attemptId={view.attempt_id}
+              answeredCount={
+                answersLoaded.ok ? answersLoaded.data.answer_count : 0
+              }
+              questionCount={view.question_count}
+            />
+            <form action={cancelAssessmentAttemptAction} className="mt-4">
+              <input type="hidden" name="activityId" value={view.activity_id} />
+              <input type="hidden" name="attemptId" value={view.attempt_id} />
+              <button
+                type="submit"
+                className="watch-focus-ring rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
+              >
+                Cancel attempt
+              </button>
+            </form>
+          </>
         ) : (
           <p className="mt-4 text-sm text-white/50">
-            This attempt is {view.status}. Answers are view-only.
+            This attempt is {view.status}. Answers are view-only
+            {isSubmitted && submittedAt
+              ? ` (submitted at ${submittedAt})`
+              : ""}
+            .
           </p>
         )}
       </section>
