@@ -6,12 +6,15 @@ import {
   LEARNING_INSTRUCTOR_ROUTES,
   archiveLearningCourse,
   archiveLearningProgram,
+  archiveLearningSection,
   archiveLearningSpace,
   createLearningCourse,
   createLearningProgram,
+  createLearningSection,
   createLearningSpace,
   publishLearningCourse,
   publishLearningProgram,
+  publishLearningSection,
   publishLearningSpace,
 } from "../../../lib/learning/instructorAuthoring";
 import {
@@ -24,6 +27,10 @@ import {
   type LearningProgramFormat,
   type LearningProgramVisibility,
 } from "../../../lib/learning/programsFoundation";
+import {
+  LEARNING_SECTION_VISIBILITIES,
+  type LearningSectionVisibility,
+} from "../../../lib/learning/sectionsFoundation";
 import {
   LEARNING_SPACE_MODES,
   LEARNING_SPACE_VISIBILITIES,
@@ -53,6 +60,12 @@ function isCourseVisibility(
   value: string
 ): value is LearningCourseVisibility {
   return (LEARNING_COURSE_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function isSectionVisibility(
+  value: string
+): value is LearningSectionVisibility {
+  return (LEARNING_SECTION_VISIBILITIES as readonly string[]).includes(value);
 }
 
 export async function createLearningSpaceAction(
@@ -463,6 +476,142 @@ export async function archiveLearningCourseAction(
   redirect(
     `${LEARNING_INSTRUCTOR_ROUTES.course(courseId)}?notice=${encodeURIComponent(
       "Course archived"
+    )}`
+  );
+}
+
+export async function createLearningSectionAction(
+  formData: FormData
+): Promise<void> {
+  const courseId = String(formData.get("courseId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        courseId
+          ? LEARNING_INSTRUCTOR_ROUTES.sectionNew(courseId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!courseId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Course is required"
+      )}`
+    );
+  }
+
+  const name = String(formData.get("name") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const visibilityRaw = String(formData.get("visibility") ?? "private");
+
+  if (!isSectionVisibility(visibilityRaw)) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.sectionNew(courseId)}?error=${encodeURIComponent(
+        "Invalid learning section visibility"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await createLearningSection(supabase, {
+    course_id: courseId,
+    name,
+    slug,
+    description: description.trim() ? description : null,
+    visibility: visibilityRaw,
+  });
+
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.sectionNew(courseId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(LEARNING_INSTRUCTOR_ROUTES.section(result.data.section_id));
+}
+
+export async function publishLearningSectionAction(
+  formData: FormData
+): Promise<void> {
+  const sectionId = String(formData.get("sectionId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        sectionId
+          ? LEARNING_INSTRUCTOR_ROUTES.section(sectionId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!sectionId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Section is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await publishLearningSection(supabase, sectionId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.section(sectionId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.section(sectionId)}?notice=${encodeURIComponent(
+      "Section published"
+    )}`
+  );
+}
+
+export async function archiveLearningSectionAction(
+  formData: FormData
+): Promise<void> {
+  const sectionId = String(formData.get("sectionId") ?? "").trim();
+  const user = await getServerUser();
+  if (!user) {
+    redirect(
+      `/login?next=${encodeURIComponent(
+        sectionId
+          ? LEARNING_INSTRUCTOR_ROUTES.section(sectionId)
+          : LEARNING_INSTRUCTOR_ROUTES.hub
+      )}`
+    );
+  }
+
+  if (!sectionId) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.hub}?error=${encodeURIComponent(
+        "Section is required"
+      )}`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveLearningSection(supabase, sectionId);
+  if (!result.ok) {
+    redirect(
+      `${LEARNING_INSTRUCTOR_ROUTES.section(sectionId)}?error=${encodeURIComponent(
+        result.message
+      )}`
+    );
+  }
+
+  redirect(
+    `${LEARNING_INSTRUCTOR_ROUTES.section(sectionId)}?notice=${encodeURIComponent(
+      "Section archived"
     )}`
   );
 }

@@ -1,8 +1,9 @@
 /**
- * UM Learning OS — Instructor Authoring Foundation V1 (Phase 0–3 + 4A + 4B).
+ * UM Learning OS — Instructor Authoring Foundation V1
+ * (Phase 0–3 + 4A + 4B + 4C).
  *
- * Space + Program + Course create / publish / archive via existing RPCs.
- * User JWT only. No service role. No TS authorization substitute.
+ * Space + Program + Course + Section create / publish / archive via existing
+ * RPCs. User JWT only. No service role. No TS authorization substitute.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -22,6 +23,13 @@ import {
   type LearningProgramStatus,
   type LearningProgramVisibility,
 } from "./programsFoundation";
+import {
+  LEARNING_SECTION_RPCS,
+  LEARNING_SECTION_STATUSES,
+  LEARNING_SECTION_VISIBILITIES,
+  type LearningSectionStatus,
+  type LearningSectionVisibility,
+} from "./sectionsFoundation";
 import {
   LEARNING_SPACE_MODES,
   LEARNING_SPACE_RPCS,
@@ -46,6 +54,10 @@ export const LEARNING_INSTRUCTOR_ROUTES = {
   courseNew: (programId: string) =>
     `/learning/instructor/programs/${programId}/courses/new`,
   course: (courseId: string) => `/learning/instructor/courses/${courseId}`,
+  sectionNew: (courseId: string) =>
+    `/learning/instructor/courses/${courseId}/sections/new`,
+  section: (sectionId: string) =>
+    `/learning/instructor/sections/${sectionId}`,
 } as const;
 
 /** Surfaced when creating a program under a non-active space (matches SQL). */
@@ -59,6 +71,18 @@ export const LEARNING_COURSE_REQUIRES_ACTIVE_SPACE =
 /** Surfaced when parent program is not draft|published (matches SQL). */
 export const LEARNING_COURSE_REQUIRES_VALID_PROGRAM =
   "Parent program must be draft or published for course changes" as const;
+
+/** Surfaced when creating a section under a non-active space (matches SQL). */
+export const LEARNING_SECTION_REQUIRES_ACTIVE_SPACE =
+  "Learning space must be active for section changes" as const;
+
+/** Surfaced when parent course is not draft|published (matches SQL). */
+export const LEARNING_SECTION_REQUIRES_VALID_COURSE =
+  "Parent course must be draft or published for section changes" as const;
+
+/** Surfaced when parent program is not draft|published for sections (matches SQL). */
+export const LEARNING_SECTION_REQUIRES_VALID_PROGRAM =
+  "Parent program must be draft or published for section changes" as const;
 
 export type InstructorAuthoringResult<T> =
   | { ok: true; data: T }
@@ -136,6 +160,30 @@ export type CreateLearningCourseInput = {
   default_language?: string;
 };
 
+export type InstructorSectionSummary = {
+  id: string;
+  course_id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  status: LearningSectionStatus;
+  visibility: LearningSectionVisibility;
+  position: number;
+  default_language: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type CreateLearningSectionInput = {
+  course_id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  visibility?: LearningSectionVisibility;
+  default_language?: string;
+};
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
@@ -188,6 +236,22 @@ function isCourseVisibility(
   return (LEARNING_COURSE_VISIBILITIES as readonly string[]).includes(value);
 }
 
+function isSectionStatus(value: string): value is LearningSectionStatus {
+  return (LEARNING_SECTION_STATUSES as readonly string[]).includes(value);
+}
+
+function isSectionVisibility(
+  value: string
+): value is LearningSectionVisibility {
+  return (LEARNING_SECTION_VISIBILITIES as readonly string[]).includes(value);
+}
+
+function parsePosition(value: unknown): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") return Number(value);
+  return NaN;
+}
+
 function mapCourseRow(
   row: Record<string, unknown>
 ): InstructorCourseSummary | null {
@@ -200,13 +264,7 @@ function mapCourseRow(
   const default_language = asString(row.default_language) ?? "en";
   const created_at = asString(row.created_at) ?? "";
   const updated_at = asString(row.updated_at) ?? "";
-  const positionRaw = row.position;
-  const position =
-    typeof positionRaw === "number"
-      ? positionRaw
-      : typeof positionRaw === "string"
-        ? Number(positionRaw)
-        : NaN;
+  const position = parsePosition(row.position);
   if (
     !id ||
     !program_id ||
@@ -223,6 +281,48 @@ function mapCourseRow(
   return {
     id,
     program_id,
+    slug,
+    name,
+    description: asString(row.description),
+    status,
+    visibility,
+    position,
+    default_language,
+    created_at,
+    updated_at,
+    published_at: asString(row.published_at),
+  };
+}
+
+function mapSectionRow(
+  row: Record<string, unknown>
+): InstructorSectionSummary | null {
+  const id = asString(row.id);
+  const course_id = asString(row.course_id);
+  const slug = asString(row.slug);
+  const name = asString(row.name);
+  const status = asString(row.status);
+  const visibility = asString(row.visibility);
+  const default_language = asString(row.default_language) ?? "en";
+  const created_at = asString(row.created_at) ?? "";
+  const updated_at = asString(row.updated_at) ?? "";
+  const position = parsePosition(row.position);
+  if (
+    !id ||
+    !course_id ||
+    !slug ||
+    !name ||
+    !status ||
+    !visibility ||
+    !Number.isFinite(position) ||
+    !isSectionStatus(status) ||
+    !isSectionVisibility(visibility)
+  ) {
+    return null;
+  }
+  return {
+    id,
+    course_id,
     slug,
     name,
     description: asString(row.description),
@@ -358,7 +458,19 @@ export function validateLearningCourseName(name: string): string | null {
   return validateLearningProgramName(name);
 }
 
+export function validateLearningSectionSlug(slug: string): string | null {
+  return validateLearningSpaceSlug(slug);
+}
+
+export function validateLearningSectionName(name: string): string | null {
+  return validateLearningProgramName(name);
+}
+
 function programAllowsCourseCreate(status: LearningProgramStatus): boolean {
+  return status === "draft" || status === "published";
+}
+
+function courseAllowsSectionCreate(status: LearningCourseStatus): boolean {
   return status === "draft" || status === "published";
 }
 
@@ -889,6 +1001,202 @@ export async function archiveLearningCourse(
     ok: true,
     data: {
       course_id: asString(record?.course_id) ?? id,
+      status: asString(record?.status) ?? "archived",
+    },
+  };
+}
+
+/**
+ * Sections in a course visible via RLS (managers / staff / published paths).
+ */
+export async function listInstructorSections(
+  supabase: AnyClient,
+  courseId: string
+): Promise<InstructorAuthoringResult<InstructorSectionSummary[]>> {
+  const id = courseId.trim();
+  if (!id) return { ok: false, message: "Course id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_sections")
+    .select(
+      "id, course_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("course_id", id)
+    .order("position", { ascending: true });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning sections"),
+    };
+  }
+
+  const sections: InstructorSectionSummary[] = [];
+  for (const row of data ?? []) {
+    const mapped = mapSectionRow(row as Record<string, unknown>);
+    if (mapped) sections.push(mapped);
+  }
+  return { ok: true, data: sections };
+}
+
+export async function getInstructorSection(
+  supabase: AnyClient,
+  sectionId: string
+): Promise<InstructorAuthoringResult<InstructorSectionSummary>> {
+  const id = sectionId.trim();
+  if (!id) return { ok: false, message: "Section id is required" };
+
+  const { data, error } = await supabase
+    .from("learning_sections")
+    .select(
+      "id, course_id, slug, name, description, status, visibility, position, default_language, created_at, updated_at, published_at"
+    )
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to load learning section"),
+    };
+  }
+  if (!data) {
+    return { ok: false, message: "Learning section not found" };
+  }
+
+  const mapped = mapSectionRow(data as Record<string, unknown>);
+  if (!mapped) {
+    return { ok: false, message: "Learning section row is invalid" };
+  }
+  return { ok: true, data: mapped };
+}
+
+export async function createLearningSection(
+  supabase: AnyClient,
+  input: CreateLearningSectionInput
+): Promise<
+  InstructorAuthoringResult<{
+    section_id: string;
+    course_id: string;
+    status: string;
+    position: number;
+  }>
+> {
+  const courseId = input.course_id.trim();
+  if (!courseId) return { ok: false, message: "Course id is required" };
+
+  const slugErr = validateLearningSectionSlug(input.slug);
+  if (slugErr) return { ok: false, message: slugErr };
+  const nameErr = validateLearningSectionName(input.name);
+  if (nameErr) return { ok: false, message: nameErr };
+  const visibility = input.visibility ?? "private";
+  if (!isSectionVisibility(visibility)) {
+    return { ok: false, message: "Invalid learning section visibility" };
+  }
+
+  const course = await getInstructorCourse(supabase, courseId);
+  if (!course.ok) return course;
+  if (!courseAllowsSectionCreate(course.data.status)) {
+    return { ok: false, message: LEARNING_SECTION_REQUIRES_VALID_COURSE };
+  }
+
+  const program = await getInstructorProgram(supabase, course.data.program_id);
+  if (!program.ok) return program;
+  if (!programAllowsCourseCreate(program.data.status)) {
+    return { ok: false, message: LEARNING_SECTION_REQUIRES_VALID_PROGRAM };
+  }
+
+  const space = await getInstructorSpace(supabase, program.data.space_id);
+  if (!space.ok) return space;
+  if (space.data.status !== "active") {
+    return { ok: false, message: LEARNING_SECTION_REQUIRES_ACTIVE_SPACE };
+  }
+
+  const { data, error } = await supabase.rpc(LEARNING_SECTION_RPCS.create, {
+    p_course_id: courseId,
+    p_slug: input.slug.trim().toLowerCase(),
+    p_name: input.name.trim(),
+    p_description: input.description?.trim() ? input.description.trim() : null,
+    p_visibility: visibility,
+    p_default_language: input.default_language?.trim() || "en",
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to create learning section"),
+    };
+  }
+
+  const record = asRecord(data);
+  const section_id = asString(record?.section_id);
+  if (!section_id) {
+    return { ok: false, message: "Create section returned no section_id" };
+  }
+  const position = parsePosition(record?.position);
+
+  return {
+    ok: true,
+    data: {
+      section_id,
+      course_id: asString(record?.course_id) ?? courseId,
+      status: asString(record?.status) ?? "draft",
+      position: Number.isFinite(position) ? position : 0,
+    },
+  };
+}
+
+export async function publishLearningSection(
+  supabase: AnyClient,
+  sectionId: string
+): Promise<InstructorAuthoringResult<{ section_id: string; status: string }>> {
+  const id = sectionId.trim();
+  if (!id) return { ok: false, message: "Section id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_SECTION_RPCS.publish, {
+    p_section_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to publish learning section"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      section_id: asString(record?.section_id) ?? id,
+      status: asString(record?.status) ?? "published",
+    },
+  };
+}
+
+export async function archiveLearningSection(
+  supabase: AnyClient,
+  sectionId: string
+): Promise<InstructorAuthoringResult<{ section_id: string; status: string }>> {
+  const id = sectionId.trim();
+  if (!id) return { ok: false, message: "Section id is required" };
+
+  const { data, error } = await supabase.rpc(LEARNING_SECTION_RPCS.archive, {
+    p_section_id: id,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      message: errMessage(error, "Failed to archive learning section"),
+    };
+  }
+
+  const record = asRecord(data);
+  return {
+    ok: true,
+    data: {
+      section_id: asString(record?.section_id) ?? id,
       status: asString(record?.status) ?? "archived",
     },
   };

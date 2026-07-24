@@ -3,16 +3,22 @@ import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { LEARNING_COURSE_RPCS } from "./coursesFoundation";
 import { LEARNING_PROGRAM_RPCS } from "./programsFoundation";
+import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
 import { LEARNING_SPACE_RPCS } from "./spacesFoundation";
 import {
   LEARNING_COURSE_REQUIRES_ACTIVE_SPACE,
   LEARNING_COURSE_REQUIRES_VALID_PROGRAM,
   LEARNING_INSTRUCTOR_ROUTES,
   LEARNING_PROGRAM_REQUIRES_ACTIVE_SPACE,
+  LEARNING_SECTION_REQUIRES_ACTIVE_SPACE,
+  LEARNING_SECTION_REQUIRES_VALID_COURSE,
+  LEARNING_SECTION_REQUIRES_VALID_PROGRAM,
   createLearningCourse,
   createLearningProgram,
+  createLearningSection,
   publishLearningCourse,
   publishLearningProgram,
+  publishLearningSection,
   validateLearningProgramName,
   validateLearningProgramSlug,
   validateLearningSpaceName,
@@ -117,6 +123,91 @@ function mockProgramCreateClient(opts: {
   };
 }
 
+function mockSectionCreateClient(opts: {
+  courseStatus: "draft" | "published" | "archived" | "suspended";
+  programStatus: "draft" | "published" | "archived" | "suspended";
+  spaceStatus: "draft" | "active" | "archived";
+}) {
+  return {
+    from: vi.fn((table: string) => {
+      if (table === "learning_courses") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: "course-1",
+                  program_id: "prog-1",
+                  slug: "intro-ts",
+                  name: "Intro TypeScript",
+                  description: null,
+                  status: opts.courseStatus,
+                  visibility: "private",
+                  position: 0,
+                  default_language: "en",
+                  created_at: "2026-01-01T00:00:00Z",
+                  updated_at: "2026-01-01T00:00:00Z",
+                  published_at: null,
+                },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }
+      if (table === "learning_programs") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({
+                data: {
+                  id: "prog-1",
+                  space_id: "space-1",
+                  slug: "bootcamp",
+                  name: "Bootcamp",
+                  description: null,
+                  format: "self_paced",
+                  status: opts.programStatus,
+                  visibility: "private",
+                  default_language: "en",
+                  created_at: "2026-01-01T00:00:00Z",
+                  updated_at: "2026-01-01T00:00:00Z",
+                  published_at: null,
+                },
+                error: null,
+              }),
+            }),
+          }),
+        };
+      }
+      expect(table).toBe("learning_spaces");
+      return {
+        select: () => ({
+          eq: () => ({
+            maybeSingle: async () => ({
+              data: {
+                id: "space-1",
+                slug: "academy",
+                name: "Academy",
+                description: null,
+                mode: "general_academy",
+                status: opts.spaceStatus,
+                visibility: "private",
+                default_language: "en",
+                owner_user_id: "user-1",
+                created_at: "2026-01-01T00:00:00Z",
+                updated_at: "2026-01-01T00:00:00Z",
+              },
+              error: null,
+            }),
+          }),
+        }),
+      };
+    }),
+    rpc: vi.fn(),
+  };
+}
+
 describe("Instructor Authoring Foundation V1 — files & routes", () => {
   it("ships module, tests, docs, and instructor routes", () => {
     expect(existsSync(join(ROOT, "lib/learning/instructorAuthoring.ts"))).toBe(
@@ -160,6 +251,19 @@ describe("Instructor Authoring Foundation V1 — files & routes", () => {
         join(ROOT, "app/learning/instructor/courses/[courseId]/page.tsx")
       )
     ).toBe(true);
+    expect(
+      existsSync(
+        join(
+          ROOT,
+          "app/learning/instructor/courses/[courseId]/sections/new/page.tsx"
+        )
+      )
+    ).toBe(true);
+    expect(
+      existsSync(
+        join(ROOT, "app/learning/instructor/sections/[sectionId]/page.tsx")
+      )
+    ).toBe(true);
     expect(existsSync(join(ROOT, "app/learning/instructor/actions.ts"))).toBe(
       true
     );
@@ -185,6 +289,12 @@ describe("Instructor Authoring Foundation V1 — files & routes", () => {
     expect(LEARNING_INSTRUCTOR_ROUTES.course("c1")).toBe(
       "/learning/instructor/courses/c1"
     );
+    expect(LEARNING_INSTRUCTOR_ROUTES.sectionNew("c1")).toBe(
+      "/learning/instructor/courses/c1/sections/new"
+    );
+    expect(LEARNING_INSTRUCTOR_ROUTES.section("sec1")).toBe(
+      "/learning/instructor/sections/sec1"
+    );
   });
 
   it("does not create a migration for this UI slice", () => {
@@ -194,17 +304,21 @@ describe("Instructor Authoring Foundation V1 — files & routes", () => {
 });
 
 describe("Instructor Authoring Foundation V1 — RPC contracts", () => {
-  it("uses existing space, program, and course RPC names only", () => {
+  it("uses existing space, program, course, and section RPC names only", () => {
     const src = read("lib/learning/instructorAuthoring.ts");
     expect(src).toContain("LEARNING_SPACE_RPCS");
     expect(src).toContain("LEARNING_PROGRAM_RPCS");
     expect(src).toContain("LEARNING_COURSE_RPCS");
+    expect(src).toContain("LEARNING_SECTION_RPCS");
     expect(LEARNING_SPACE_RPCS.create).toBe("create_learning_space");
     expect(LEARNING_PROGRAM_RPCS.create).toBe("create_learning_program");
     expect(LEARNING_COURSE_RPCS.create).toBe("create_learning_course");
     expect(LEARNING_COURSE_RPCS.publish).toBe("publish_learning_course");
     expect(LEARNING_COURSE_RPCS.archive).toBe("archive_learning_course");
-    expect(src).not.toMatch(/create_learning_section|create_learning_lesson/);
+    expect(LEARNING_SECTION_RPCS.create).toBe("create_learning_section");
+    expect(LEARNING_SECTION_RPCS.publish).toBe("publish_learning_section");
+    expect(LEARNING_SECTION_RPCS.archive).toBe("archive_learning_section");
+    expect(src).not.toMatch(/create_learning_lesson|create_learning_activity/);
   });
 
   it("forbids service role and does not redesign RPCs", () => {
@@ -469,6 +583,163 @@ describe("Instructor Authoring Foundation V1 — Phase 4B course wrappers", () =
     expect(failed).toEqual({
       ok: false,
       message: "Only draft courses can be published",
+    });
+  });
+});
+
+describe("Instructor Authoring Foundation V1 — Phase 4C section wrappers", () => {
+  it("create section succeeds under valid course, program, and active space", async () => {
+    const client = mockSectionCreateClient({
+      courseStatus: "draft",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn(async (name: string, args: Record<string, unknown>) => {
+      expect(name).toBe(LEARNING_SECTION_RPCS.create);
+      expect(args.p_course_id).toBe("course-1");
+      expect(args.p_slug).toBe("getting-started");
+      return {
+        data: {
+          section_id: "sec-1",
+          course_id: "course-1",
+          status: "draft",
+          position: 0,
+        },
+        error: null,
+      };
+    });
+
+    const result = await createLearningSection(client as never, {
+      course_id: "course-1",
+      slug: "getting-started",
+      name: "Getting Started",
+    });
+
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        section_id: "sec-1",
+        course_id: "course-1",
+        status: "draft",
+        position: 0,
+      },
+    });
+  });
+
+  it("create section blocks when course is archived", async () => {
+    const client = mockSectionCreateClient({
+      courseStatus: "archived",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningSection(client as never, {
+      course_id: "course-1",
+      slug: "getting-started",
+      name: "Getting Started",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: LEARNING_SECTION_REQUIRES_VALID_COURSE,
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create section blocks when program is archived", async () => {
+    const client = mockSectionCreateClient({
+      courseStatus: "draft",
+      programStatus: "archived",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningSection(client as never, {
+      course_id: "course-1",
+      slug: "getting-started",
+      name: "Getting Started",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: LEARNING_SECTION_REQUIRES_VALID_PROGRAM,
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create section blocks when space is not active", async () => {
+    const client = mockSectionCreateClient({
+      courseStatus: "published",
+      programStatus: "draft",
+      spaceStatus: "draft",
+    });
+    client.rpc = vi.fn();
+
+    const result = await createLearningSection(client as never, {
+      course_id: "course-1",
+      slug: "getting-started",
+      name: "Getting Started",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: LEARNING_SECTION_REQUIRES_ACTIVE_SPACE,
+    });
+    expect(client.rpc).not.toHaveBeenCalled();
+  });
+
+  it("create section passes through RPC errors", async () => {
+    const client = mockSectionCreateClient({
+      courseStatus: "published",
+      programStatus: "published",
+      spaceStatus: "active",
+    });
+    client.rpc = vi.fn(async () => ({
+      data: null,
+      error: { message: "Not allowed to create sections in this course" },
+    }));
+
+    const result = await createLearningSection(client as never, {
+      course_id: "course-1",
+      slug: "getting-started",
+      name: "Getting Started",
+    });
+
+    expect(result).toEqual({
+      ok: false,
+      message: "Not allowed to create sections in this course",
+    });
+  });
+
+  it("publish section succeeds and passes through errors", async () => {
+    const okClient = {
+      rpc: vi.fn(async (name: string, args: Record<string, unknown>) => {
+        expect(name).toBe(LEARNING_SECTION_RPCS.publish);
+        expect(args.p_section_id).toBe("sec-1");
+        return {
+          data: { section_id: "sec-1", status: "published" },
+          error: null,
+        };
+      }),
+    };
+
+    const ok = await publishLearningSection(okClient as never, "sec-1");
+    expect(ok).toEqual({
+      ok: true,
+      data: { section_id: "sec-1", status: "published" },
+    });
+
+    const errClient = {
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Only draft sections can be published" },
+      })),
+    };
+    const failed = await publishLearningSection(errClient as never, "sec-1");
+    expect(failed).toEqual({
+      ok: false,
+      message: "Only draft sections can be published",
     });
   });
 });
