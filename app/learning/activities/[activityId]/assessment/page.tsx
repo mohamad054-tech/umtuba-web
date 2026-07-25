@@ -79,7 +79,7 @@ export default async function LearningAssessmentDeliveryPage({
     >
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          {view.type} · read-only preview
+          {view.type} · assessment
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">{view.name}</h1>
         {view.description ? (
@@ -98,9 +98,9 @@ export default async function LearningAssessmentDeliveryPage({
           }`}
         </p>
         <p className="mt-4 text-sm text-white/55">
-          Preview is read-only. Starting an attempt creates a session record
-          (one active attempt) with expiration metadata — answering and scoring
-          are not part of this foundation.
+          Review the published questions below, then start or resume an attempt
+          to answer, submit, and view graded results when your course policy
+          releases them. Answer keys stay hidden on this page.
         </p>
 
         {query.cancelled ? (

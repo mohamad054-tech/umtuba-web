@@ -12,6 +12,7 @@ describe("userMenuItems", () => {
     expect(labels).toEqual([
       "Profile",
       "Saved",
+      "Learning",
       "Rewards",
       "Notifications",
       "Settings",
@@ -26,6 +27,7 @@ describe("userMenuItems", () => {
   it("exposes Saved, Rewards, Settings, and Advertise entry points", () => {
     const hrefs = listUserMenuHrefs("/profile/demo_user");
     expect(hrefs).toContain(APP_ROUTES.saved);
+    expect(hrefs).toContain(APP_ROUTES.learning);
     expect(hrefs).toContain(APP_ROUTES.rewards);
     expect(hrefs).toContain(APP_ROUTES.notifications);
     expect(hrefs).toContain(APP_ROUTES.settings);

@@ -78,6 +78,7 @@ describe("desktop vs mobile nav contracts", () => {
       APP_ROUTES.home,
       APP_ROUTES.discover,
       APP_ROUTES.worldDiscovery,
+      APP_ROUTES.learning,
       APP_ROUTES.live,
       APP_ROUTES.messages,
     ]);

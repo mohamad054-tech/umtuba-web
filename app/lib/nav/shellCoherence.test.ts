@@ -15,6 +15,7 @@ describe("shell coherence", () => {
       "Home",
       "Discover",
       "World",
+      "Learning",
       "Live",
       "Messages",
     ]);

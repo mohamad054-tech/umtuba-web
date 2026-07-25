@@ -24,6 +24,7 @@ export const APP_ROUTES = {
   worldSearch: "/world/search",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
+  learning: "/learning",
   store: "/store",
   storeSearch: "/store/search",
   storeCart: "/store/cart",
@@ -68,7 +69,8 @@ export type AppRouteHref =
   | (typeof APP_ROUTES)["discover"]
   | (typeof APP_ROUTES)["live"]
   | (typeof APP_ROUTES)["messages"]
-  | (typeof APP_ROUTES)["worldDiscovery"];
+  | (typeof APP_ROUTES)["worldDiscovery"]
+  | (typeof APP_ROUTES)["learning"];
 
 export type AppNavItem = {
   label: string;
@@ -79,6 +81,7 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Home", href: APP_ROUTES.home },
   { label: "Discover", href: APP_ROUTES.discover },
   { label: "World", href: APP_ROUTES.worldDiscovery },
+  { label: "Learning", href: APP_ROUTES.learning },
   { label: "Live", href: APP_ROUTES.live },
   { label: "Messages", href: APP_ROUTES.messages },
 ];

@@ -25,6 +25,7 @@ export function buildUserMenuGroups(profileHref: string): UserMenuGroup[] {
       items: [
         { id: "profile", label: "Profile", href: profileHref },
         { id: "saved", label: "Saved", href: APP_ROUTES.saved },
+        { id: "learning", label: "Learning", href: APP_ROUTES.learning },
         { id: "rewards", label: "Rewards", href: APP_ROUTES.rewards },
         {
           id: "notifications",
