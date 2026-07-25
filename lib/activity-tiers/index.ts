@@ -37,3 +37,8 @@ export {
   isPrimaryActivityCategory,
   suggestedPointsForCategory,
 } from "./scoring";
+
+export {
+  buildActivityTierRealtimeTopic,
+  createActivityTierRealtimeInstanceId,
+} from "./realtimeTopic";

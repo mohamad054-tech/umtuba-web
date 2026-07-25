@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import {
   ACTIVITY_TIERS,
   buildActivityTierProgress,
+  buildActivityTierRealtimeTopic,
   computeReversalDelta,
   computeTierProgressPercent,
+  createActivityTierRealtimeInstanceId,
   evaluateActivityScoreAward,
   getNextActivityTier,
   resolveTierFromScore,
@@ -141,5 +143,24 @@ describe("category weights", () => {
     const { ACTIVITY_SCORE_EVENT_POINTS } = await import("./tiers");
     expect(ACTIVITY_SCORE_EVENT_POINTS.qualityPost).toBe(40);
     expect(ACTIVITY_SCORE_EVENT_POINTS.screenTimeUnit).toBe(1);
+  });
+});
+
+describe("activity-tier realtime topics", () => {
+  it("builds unique topics per subscription instance", () => {
+    const a = createActivityTierRealtimeInstanceId();
+    const b = createActivityTierRealtimeInstanceId();
+    expect(a).not.toBe(b);
+    expect(buildActivityTierRealtimeTopic("user-1", a)).toBe(
+      `activity-tier:user-1:${a}`
+    );
+    expect(buildActivityTierRealtimeTopic("user-1", a)).not.toBe(
+      buildActivityTierRealtimeTopic("user-1", b)
+    );
+  });
+
+  it("rejects empty ids", () => {
+    expect(() => buildActivityTierRealtimeTopic("", "x")).toThrow(/required/i);
+    expect(() => buildActivityTierRealtimeTopic("u", "  ")).toThrow(/required/i);
   });
 });

@@ -52,6 +52,8 @@ describe("rewards & profile journey hardening", () => {
     expect(walletHook).toMatch(/online/);
     expect(tierHook).toMatch(/visibilitychange/);
     expect(tierHook).toMatch(/online/);
+    expect(tierHook).toMatch(/buildActivityTierRealtimeTopic/);
+    expect(tierHook).toMatch(/createActivityTierRealtimeInstanceId/);
   });
 
   it("retries referral claims with backoff and visibility re-entry", () => {

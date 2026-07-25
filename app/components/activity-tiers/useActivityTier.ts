@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  buildActivityTierRealtimeTopic,
+  createActivityTierRealtimeInstanceId,
   emptyActivityTierProgress,
   type ActivityProgressStatus,
   type ActivityTierProgress,
@@ -109,6 +111,9 @@ export function useActivityTier(): UseActivityTierResult {
     let reconnectAttempt = 0;
     let reconnectTimer: number | null = null;
     const supabase = createClient();
+    // Unique topic per mount so concurrent indicators never share a subscribed channel.
+    const instanceId = createActivityTierRealtimeInstanceId();
+    const topic = buildActivityTierRealtimeTopic(userId, instanceId);
 
     const clearReconnect = () => {
       if (reconnectTimer != null) {
@@ -140,7 +145,7 @@ export function useActivityTier(): UseActivityTierResult {
       }
 
       channel = supabase
-        .channel(`activity-tier:${userId}`)
+        .channel(topic)
         .on(
           "postgres_changes",
           {
