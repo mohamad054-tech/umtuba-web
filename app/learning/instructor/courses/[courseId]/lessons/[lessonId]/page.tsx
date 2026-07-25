@@ -5,6 +5,7 @@ import { createClient, getServerUser } from "../../../../../../../lib/supabase/s
 import {
   LEARNING_INSTRUCTOR_ROUTES,
   loadInstructorLessonBlocks,
+  type InstructorLessonBlocksPayload,
 } from "../../../../../../../lib/learning/instructorAuthoring";
 import {
   archiveContentBlockAction,
@@ -19,14 +20,6 @@ type PageProps = {
   params: Promise<{ courseId: string; lessonId: string }>;
 };
 
-type BlockRow = {
-  id: string;
-  block_type: string;
-  status: string;
-  position: number;
-  content: Record<string, unknown> | null;
-};
-
 export default async function InstructorLessonBlocksPage({ params }: PageProps) {
   const { courseId, lessonId } = await params;
   const user = await getServerUser();
@@ -39,14 +32,8 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
   }
 
   const supabase = await createClient();
-  const { data: lesson } = await supabase
-    .from("learning_lessons")
-    .select("id, name, status, section_id")
-    .eq("id", lessonId)
-    .maybeSingle();
-
   const blocksResult = await loadInstructorLessonBlocks(supabase, lessonId);
-  if (!lesson || !blocksResult.ok) {
+  if (!blocksResult.ok) {
     return (
       <LearningShell
         title="Lesson unavailable"
@@ -54,17 +41,29 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
         backLabel="Back to course"
       >
         <p className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100">
-          {!lesson
-            ? "Lesson not found or unavailable."
-            : blocksResult.ok
-              ? "Unavailable."
-              : blocksResult.message}
+          {blocksResult.message}
         </p>
       </LearningShell>
     );
   }
 
-  const blocks = blocksResult.data as BlockRow[];
+  const payload = blocksResult.data as InstructorLessonBlocksPayload;
+  const lesson = payload.lesson;
+  const blocks = payload.blocks;
+  if (lesson.course_id !== courseId) {
+    return (
+      <LearningShell
+        title="Lesson unavailable"
+        backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
+        backLabel="Back to course"
+      >
+        <p className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100">
+          Lesson not found or unavailable.
+        </p>
+      </LearningShell>
+    );
+  }
+
   const blockIdsOrdered = blocks.map((b) => b.id).join(",");
 
   return (

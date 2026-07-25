@@ -998,6 +998,120 @@ export async function loadInstructorCourseTree(
   };
 }
 
+/** SECURITY DEFINER lesson blocks read — avoids nested FORCE RLS SELECTs. */
+export const LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC =
+  "get_instructor_learning_lesson_blocks" as const;
+
+export type InstructorLessonBlockRow = {
+  id: string;
+  lesson_id: string;
+  block_type: string;
+  status: string;
+  position: number;
+  content: Record<string, unknown> | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type InstructorLessonBlocksLesson = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+  section_id: string;
+  course_id: string;
+  description: string | null;
+  position: number;
+};
+
+export type InstructorLessonBlocksPayload = {
+  lesson: InstructorLessonBlocksLesson;
+  blocks: InstructorLessonBlockRow[];
+  canManage: boolean;
+};
+
+function parseLessonBlockRow(raw: unknown): InstructorLessonBlockRow | null {
+  if (!isPlainObject(raw)) return null;
+  if (
+    typeof raw.id !== "string" ||
+    typeof raw.lesson_id !== "string" ||
+    typeof raw.block_type !== "string" ||
+    typeof raw.status !== "string" ||
+    typeof raw.position !== "number"
+  ) {
+    return null;
+  }
+  const content =
+    raw.content === null
+      ? null
+      : isPlainObject(raw.content)
+        ? raw.content
+        : null;
+  return {
+    id: raw.id,
+    lesson_id: raw.lesson_id,
+    block_type: raw.block_type,
+    status: raw.status,
+    position: raw.position,
+    content,
+    created_at: typeof raw.created_at === "string" ? raw.created_at : undefined,
+    updated_at: typeof raw.updated_at === "string" ? raw.updated_at : undefined,
+  };
+}
+
+/** Parse RPC payload from get_instructor_learning_lesson_blocks. */
+export function parseInstructorLessonBlocksPayload(
+  raw: unknown
+): InstructorLessonBlocksPayload | null {
+  if (!isPlainObject(raw)) return null;
+  const lessonRaw = raw.lesson;
+  if (!isPlainObject(lessonRaw)) return null;
+  if (
+    typeof lessonRaw.id !== "string" ||
+    typeof lessonRaw.name !== "string" ||
+    typeof lessonRaw.slug !== "string" ||
+    typeof lessonRaw.status !== "string" ||
+    typeof lessonRaw.section_id !== "string" ||
+    typeof lessonRaw.course_id !== "string" ||
+    typeof lessonRaw.position !== "number"
+  ) {
+    return null;
+  }
+  const blocksRaw = Array.isArray(raw.blocks) ? raw.blocks : null;
+  if (!blocksRaw) return null;
+  const blocks: InstructorLessonBlockRow[] = [];
+  for (const item of blocksRaw) {
+    const parsed = parseLessonBlockRow(item);
+    if (!parsed) return null;
+    blocks.push(parsed);
+  }
+  const canManage =
+    typeof raw.can_manage === "boolean"
+      ? raw.can_manage
+      : typeof raw.canManage === "boolean"
+        ? raw.canManage
+        : null;
+  if (canManage === null) return null;
+  return {
+    canManage,
+    lesson: {
+      id: lessonRaw.id,
+      name: lessonRaw.name,
+      slug: lessonRaw.slug,
+      status: lessonRaw.status,
+      section_id: lessonRaw.section_id,
+      course_id: lessonRaw.course_id,
+      position: lessonRaw.position,
+      description:
+        lessonRaw.description === null ||
+        typeof lessonRaw.description === "string"
+          ? (lessonRaw.description as string | null)
+          : null,
+    },
+    blocks,
+  };
+}
+
 export async function loadInstructorLessonBlocks(
   supabase: AnyClient,
   lessonId: string
@@ -1005,15 +1119,19 @@ export async function loadInstructorLessonBlocks(
   if (!isUuid(lessonId)) {
     return { ok: false, message: "lesson_id must be a valid UUID" };
   }
-  const { data, error } = await supabase
-    .from("learning_lesson_content_blocks")
-    .select(
-      "id, lesson_id, block_type, status, position, content, created_at, updated_at"
-    )
-    .eq("lesson_id", lessonId)
-    .order("position", { ascending: true });
+
+  const { data, error } = await supabase.rpc(
+    LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC,
+    { p_lesson_id: lessonId }
+  );
   if (error) {
     return { ok: false, message: sanitizeRpcError(error.message) };
   }
-  return { ok: true, data: data ?? [] };
+
+  const parsed = parseInstructorLessonBlocksPayload(data);
+  if (!parsed) {
+    return { ok: false, message: "Lesson blocks payload is malformed." };
+  }
+
+  return { ok: true, data: parsed };
 }

@@ -6,9 +6,12 @@ import {
   INSTRUCTOR_AUTHORING_OPERATIONS,
   INSTRUCTOR_AUTHORING_RPC_BY_OPERATION,
   LEARNING_INSTRUCTOR_COURSE_TREE_RPC,
+  LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC,
   buildInstructorAuthoringRpcCall,
   loadInstructorCourseTree,
+  loadInstructorLessonBlocks,
   parseInstructorCourseTreePayload,
+  parseInstructorLessonBlocksPayload,
 } from "./instructorAuthoring";
 import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
 import { LEARNING_LESSON_RPCS } from "./lessonsFoundation";
@@ -18,6 +21,8 @@ import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "./lessonContentBlocksFoundat
 const ROOT = join(__dirname, "../..");
 const TREE_MIGRATION =
   "supabase/migrations/20260861_learning_instructor_course_tree_read_v1.sql";
+const LESSON_BLOCKS_MIGRATION =
+  "supabase/migrations/20260862_learning_instructor_lesson_blocks_read_v1.sql";
 const AUTHORING_SRC = readFileSync(
   join(ROOT, "lib/learning/instructorAuthoring.ts"),
   "utf8"
@@ -361,5 +366,131 @@ describe("Instructor Course Tree Read RPC optimization V1", () => {
 
     const badId = await loadInstructorCourseTree(fake as never, "not-uuid");
     expect(badId.ok).toBe(false);
+  });
+});
+
+describe("Instructor Lesson Blocks Read RPC optimization V1", () => {
+  const sql = read(LESSON_BLOCKS_MIGRATION);
+  const fn = stripSqlComments(
+    fnBody(sql, "get_instructor_learning_lesson_blocks")
+  );
+
+  it("defines SECURITY DEFINER blocks RPC with single course auth gate", () => {
+    expect(LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC).toBe(
+      "get_instructor_learning_lesson_blocks"
+    );
+    expect(sql).toMatch(
+      /create or replace function public\.get_instructor_learning_lesson_blocks/
+    );
+    expect(fn).toMatch(/security definer/i);
+    expect(fn).toMatch(/learning_sections/);
+    expect(fn).toMatch(/can_manage_learning_course\(v_course_id, v_uid\)/);
+    expect(fn).toMatch(/is_learning_course_staff\(v_course_id, v_uid\)/);
+    expect(fn).toMatch(/learning_lesson_content_blocks/);
+    expect(fn).toMatch(/order by b\.position asc/);
+    expect(fn).not.toMatch(/learning_question_answer_keys/);
+    expect(fn).not.toMatch(/insert into/i);
+    expect(fn).not.toMatch(/update public\./i);
+    expect(fn).not.toMatch(/delete from/i);
+  });
+
+  it("revokes anon/public and grants authenticated + service_role", () => {
+    expect(sql).toMatch(
+      /revoke all on function public\.get_instructor_learning_lesson_blocks\(uuid\)\s+from public, anon/i
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.get_instructor_learning_lesson_blocks\(uuid\)\s+to authenticated/i
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.get_instructor_learning_lesson_blocks\(uuid\)\s+to service_role/i
+    );
+  });
+
+  it("loadInstructorLessonBlocks uses the RPC and not table selects", () => {
+    const loadBody = AUTHORING_SRC.slice(
+      AUTHORING_SRC.indexOf("export async function loadInstructorLessonBlocks")
+    );
+    expect(loadBody).toContain("LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC");
+    expect(loadBody).toContain("p_lesson_id");
+    expect(loadBody).not.toMatch(
+      /\.from\(\s*["']learning_lesson_content_blocks["']/
+    );
+    expect(loadBody).not.toMatch(/\.from\(\s*["']learning_lessons["']/);
+  });
+
+  it("parses lesson + blocks payload", () => {
+    const parsed = parseInstructorLessonBlocksPayload({
+      can_manage: true,
+      lesson: {
+        id: LESSON_ID,
+        name: "Lesson",
+        slug: "lesson",
+        status: "draft",
+        section_id: SECTION_ID,
+        course_id: COURSE_ID,
+        description: null,
+        position: 0,
+      },
+      blocks: [
+        {
+          id: BLOCK_ID,
+          lesson_id: LESSON_ID,
+          block_type: "rich_text",
+          status: "draft",
+          position: 0,
+          content: { text: "Hello" },
+          created_at: "2026-01-01T00:00:00Z",
+          updated_at: "2026-01-01T00:00:00Z",
+        },
+      ],
+    });
+    expect(parsed).not.toBeNull();
+    expect(parsed?.canManage).toBe(true);
+    expect(parsed?.lesson.course_id).toBe(COURSE_ID);
+    expect(parsed?.blocks[0]?.content).toEqual({ text: "Hello" });
+  });
+
+  it("loadInstructorLessonBlocks calls RPC once", async () => {
+    const calls: string[] = [];
+    const fake = {
+      rpc: async (name: string, args: Record<string, unknown>) => {
+        calls.push(name);
+        expect(args).toEqual({ p_lesson_id: LESSON_ID });
+        return {
+          data: {
+            can_manage: true,
+            lesson: {
+              id: LESSON_ID,
+              name: "Lesson",
+              slug: "lesson",
+              status: "draft",
+              section_id: SECTION_ID,
+              course_id: COURSE_ID,
+              description: null,
+              position: 0,
+            },
+            blocks: [],
+          },
+          error: null,
+        };
+      },
+      from: () => {
+        throw new Error("table select must not be used for lesson blocks");
+      },
+    };
+
+    const loaded = await loadInstructorLessonBlocks(fake as never, LESSON_ID);
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      const data = loaded.data as {
+        lesson: { id: string };
+        blocks: unknown[];
+        canManage: boolean;
+      };
+      expect(data.lesson.id).toBe(LESSON_ID);
+      expect(data.blocks).toEqual([]);
+      expect(data.canManage).toBe(true);
+    }
+    expect(calls).toEqual(["get_instructor_learning_lesson_blocks"]);
   });
 });
