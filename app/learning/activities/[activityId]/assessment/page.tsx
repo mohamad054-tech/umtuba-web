@@ -55,8 +55,8 @@ export default async function LearningAssessmentDeliveryPage({
       <LearningShell
         title="Assessment"
         subtitle="Read-only preview"
-        backHref={LEARNING_LEARNER_ROUTES.activity(activityId)}
-        backLabel="Back to activity"
+        backHref={LEARNING_LEARNER_ROUTES.hub}
+        backLabel="Learning"
       >
         <div
           className="mt-6 rounded-[28px] border border-rose-400/25 bg-rose-500/10 p-5 text-sm text-rose-100"
@@ -74,8 +74,8 @@ export default async function LearningAssessmentDeliveryPage({
     <LearningShell
       title="Assessment"
       subtitle={view.name}
-      backHref={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-      backLabel="Back to activity"
+      backHref={LEARNING_LEARNER_ROUTES.lesson(view.lesson_id)}
+      backLabel="Back to lesson"
     >
       <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
@@ -151,13 +151,6 @@ export default async function LearningAssessmentDeliveryPage({
       </section>
 
       <p className="mt-8 text-xs text-white/40">
-        <Link
-          href={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-          className="underline underline-offset-2"
-        >
-          Return to activity
-        </Link>
-        {" · "}
         <Link
           href={LEARNING_LEARNER_ROUTES.lesson(view.lesson_id)}
           className="underline underline-offset-2"

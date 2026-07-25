@@ -1,12 +1,11 @@
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
 import LearningShell from "../../../components/learning/LearningShell";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
   loadPublishedActivityGate,
+  resolveLearnerActivityTarget,
 } from "../../../../lib/learning/learnerDelivery";
-import { LEARNING_ASSESSMENT_DELIVERY_ROUTES } from "../../../../lib/learning/assessmentDelivery";
 import { startOrResumeAttemptAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +45,16 @@ export default async function LearningActivityPage({
   }
 
   const { activity, lesson_id, active_attempt_id } = gate.data;
+
+  // Route type-specific experiences away from the generic gate (no loops:
+  // assessment/assignment pages do not redirect back here).
+  const target = resolveLearnerActivityTarget({
+    activity_id: activity.id,
+    type: activity.type,
+  });
+  if (target && target.experience !== "generic") {
+    redirect(target.href);
+  }
 
   return (
     <LearningShell
@@ -90,16 +99,6 @@ export default async function LearningActivityPage({
             {active_attempt_id ? "Resume attempt" : "Start attempt"}
           </button>
         </form>
-
-        <p className="mt-4 text-sm text-white/50">
-          <Link
-            href={LEARNING_ASSESSMENT_DELIVERY_ROUTES.assessment(activity.id)}
-            className="underline underline-offset-2 text-sky-300"
-          >
-            Preview published assessment
-          </Link>
-          <span className="text-white/35"> (read-only · no answering)</span>
-        </p>
       </section>
     </LearningShell>
   );

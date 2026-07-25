@@ -27,6 +27,7 @@ import {
   loadMyLearningHub,
   resolveAdjacentLessonTargets,
   resolveContinueLearningTarget,
+  resolveLearnerActivityTarget,
   toLearnerActivityHints,
 } from "./learnerDelivery";
 import type { LearningLessonContentBlock } from "./lessonContentBlocksFoundation";
@@ -671,5 +672,122 @@ describe("Learner Experience V1 — adjacent lesson navigation", () => {
     expect(ui).toMatch(/Previous/);
     expect(ui).toMatch(/Next/);
     expect(ui).not.toMatch(/complete_learning_lesson/);
+  });
+});
+
+describe("Learner Experience V1 — activity type routing", () => {
+  const ACTIVITY_ID = "11111111-1111-4111-8111-111111111111";
+
+  it("routes quiz to assessment experience", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "quiz",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "assessment",
+      href: LEARNING_LEARNER_ROUTES.assessment(ACTIVITY_ID),
+    });
+    expect(LEARNING_LEARNER_ROUTES.assessment(ACTIVITY_ID)).toBe(
+      `/learning/activities/${ACTIVITY_ID}/assessment`
+    );
+  });
+
+  it("routes assignment to assignment experience", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "assignment",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "assignment",
+      href: LEARNING_LEARNER_ROUTES.assignment(ACTIVITY_ID),
+    });
+    expect(LEARNING_LEARNER_ROUTES.assignment(ACTIVITY_ID)).toBe(
+      `/learning/activities/${ACTIVITY_ID}/assignment`
+    );
+  });
+
+  it("routes practice and other types to generic activity gate", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "practice",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "generic",
+      href: LEARNING_LEARNER_ROUTES.activity(ACTIVITY_ID),
+    });
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "discussion",
+      })?.experience
+    ).toBe("generic");
+  });
+
+  it("unknown type fails closed to generic", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "not_a_real_type",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "generic",
+      href: LEARNING_LEARNER_ROUTES.activity(ACTIVITY_ID),
+    });
+  });
+
+  it("empty type fails closed to generic", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "generic",
+      href: LEARNING_LEARNER_ROUTES.activity(ACTIVITY_ID),
+    });
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: null,
+      })?.experience
+    ).toBe("generic");
+  });
+
+  it("missing activity id fails closed to null", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: "",
+        type: "quiz",
+      })
+    ).toBeNull();
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: null,
+        type: "assignment",
+      })
+    ).toBeNull();
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: undefined,
+        type: "practice",
+      })
+    ).toBeNull();
+  });
+
+  it("ActivityList and activity gate use the resolver", () => {
+    const listUi = read("app/components/learning/ActivityList.tsx");
+    expect(listUi).toMatch(/resolveLearnerActivityTarget/);
+    const gateUi = read("app/learning/activities/[activityId]/page.tsx");
+    expect(gateUi).toMatch(/resolveLearnerActivityTarget/);
+    expect(gateUi).toMatch(/redirect\(target\.href\)/);
+    expect(gateUi).not.toMatch(/Preview published assessment/);
   });
 });

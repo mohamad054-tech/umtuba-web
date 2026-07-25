@@ -2,22 +2,26 @@
 
 ## Task title
 
-UMTUBA Learning — Learner Experience Foundation V1 — Slice 2
+UMTUBA Learning — Learner Experience Foundation V1 — Slice 3
 
 ## Goal
 
-Implement Next/Previous Lesson Navigation on branch
+Implement Learner Activity Routing on branch
 `office/learning-learner-experience-foundation-v1`: add
-`resolveAdjacentLessonTargets()`, load ordered published lesson ids for a
-course, enrich `loadLessonDelivery` with `previous_lesson` / `next_lesson`,
-and surface Previous/Next links in `LessonViewer`. No migrations, no schema
-changes, no instructor changes, no completion mutation on navigate.
+`resolveLearnerActivityTarget()`, wire `ActivityList` and the generic activity
+gate so `quiz` opens assessment, `assignment` opens assignment, and other
+types keep the generic gate. Fix assessment/assignment back links to the
+lesson to avoid redirect loops. No migrations, no instructor changes, no
+engine changes, no completion mutations.
 
 ## Allowed scope
 
 - `lib/learning/learnerDelivery.ts`
 - `lib/learning/learnerDelivery.test.ts`
-- `app/components/learning/LessonViewer.tsx`
+- `app/components/learning/ActivityList.tsx`
+- `app/learning/activities/[activityId]/page.tsx`
+- `app/learning/activities/[activityId]/assessment/page.tsx` (back links only)
+- `app/learning/activities/[activityId]/assignment/page.tsx` (back links only)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md`
@@ -25,10 +29,10 @@ changes, no instructor changes, no completion mutation on navigate.
 ## Forbidden scope
 
 - Migrations / Supabase schema
-- Unrelated Learning foundations
+- Assessment / assignment engine modules (RPCs, adapters, attempt logic)
 - Instructor flows
-- Activity type routing / learner dashboard extras (later slices)
-- Completion mutation on next/prev click
+- Completion mutation changes
+- Unrelated Learning foundations / learner dashboard extras
 - Commit / push / merge / migration apply unless explicitly requested
 
 ## Branch

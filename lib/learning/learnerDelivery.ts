@@ -36,6 +36,12 @@ export const LEARNING_LEARNER_ROUTES = {
   course: (courseId: string) => `/learning/courses/${courseId}`,
   lesson: (lessonId: string) => `/learning/lessons/${lessonId}`,
   activity: (activityId: string) => `/learning/activities/${activityId}`,
+  /** Matches assessment delivery route; kept here to avoid circular imports. */
+  assessment: (activityId: string) =>
+    `/learning/activities/${activityId}/assessment`,
+  /** Matches assignment learner route; kept here to avoid circular imports. */
+  assignment: (activityId: string) =>
+    `/learning/activities/${activityId}/assignment`,
   attempt: (attemptId: string) => `/learning/attempts/${attemptId}`,
 } as const;
 
@@ -118,6 +124,18 @@ export type LearningAdjacentLessonTargets = {
   next: LearningLessonNavTarget | null;
 };
 
+/** Learner activity experience vertical resolved from activity type. */
+export type LearningLearnerActivityExperience =
+  | "assessment"
+  | "assignment"
+  | "generic";
+
+export type LearningLearnerActivityTarget = {
+  activity_id: string;
+  experience: LearningLearnerActivityExperience;
+  href: string;
+};
+
 /**
  * Resolve a Continue Learning resume target.
  * Prefers last_lesson_id; otherwise the first available published lesson.
@@ -133,6 +151,40 @@ export function resolveContinueLearningTarget(input: {
   return {
     lesson_id: lessonId,
     href: LEARNING_LEARNER_ROUTES.lesson(lessonId),
+  };
+}
+
+/**
+ * Resolve the learner experience route for an activity by type.
+ * quiz → assessment; assignment → assignment; else → generic gate.
+ * Fail closed: missing activity id → null; unknown/empty type → generic.
+ */
+export function resolveLearnerActivityTarget(input: {
+  activity_id: string | null | undefined;
+  type: string | null | undefined;
+}): LearningLearnerActivityTarget | null {
+  const activityId = asString(input.activity_id);
+  if (!activityId) return null;
+
+  const type = asString(input.type);
+  if (type === "quiz") {
+    return {
+      activity_id: activityId,
+      experience: "assessment",
+      href: LEARNING_LEARNER_ROUTES.assessment(activityId),
+    };
+  }
+  if (type === "assignment") {
+    return {
+      activity_id: activityId,
+      experience: "assignment",
+      href: LEARNING_LEARNER_ROUTES.assignment(activityId),
+    };
+  }
+  return {
+    activity_id: activityId,
+    experience: "generic",
+    href: LEARNING_LEARNER_ROUTES.activity(activityId),
   };
 }
 

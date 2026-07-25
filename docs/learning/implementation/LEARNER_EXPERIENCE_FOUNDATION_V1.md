@@ -1,6 +1,6 @@
 # UM Learning — Learner Experience Foundation V1
 
-Status: **Slice 2 implemented** (Next/Previous Lesson Navigation)
+Status: **Slice 3 implemented** (Learner Activity Routing)
 
 Branch: `office/learning-learner-experience-foundation-v1`
 
@@ -52,7 +52,36 @@ No migrations. No completion mutation on navigate.
 - `lib/learning/learnerDelivery.test.ts`
 - `app/components/learning/LessonViewer.tsx`
 
-### Out of scope (later slices)
+## Slice 3 — Learner Activity Routing
 
-Activity type routing, learner dashboard extras, migrations, instructor
-changes, complete-on-next mutations.
+### Goal
+
+Open the correct learner experience from activity links and deep links.
+No migrations. No instructor or engine changes.
+
+### Behavior
+
+| Concern | Strategy |
+| --- | --- |
+| Resolver | `resolveLearnerActivityTarget({ activity_id, type })` |
+| quiz | → `/learning/activities/{id}/assessment` (`experience: assessment`) |
+| assignment | → `/learning/activities/{id}/assignment` (`experience: assignment`) |
+| other / unknown / empty type | → `/learning/activities/{id}` (`experience: generic`) |
+| Missing id | → `null` (fail closed) |
+| List links | `ActivityList` uses resolver href |
+| Deep links | Generic activity gate redirects quiz/assignment away |
+| Back links | Assessment / assignment return to lesson (not gate) to avoid loops |
+
+### Files
+
+- `lib/learning/learnerDelivery.ts`
+- `lib/learning/learnerDelivery.test.ts`
+- `app/components/learning/ActivityList.tsx`
+- `app/learning/activities/[activityId]/page.tsx`
+- `app/learning/activities/[activityId]/assessment/page.tsx` (back links)
+- `app/learning/activities/[activityId]/assignment/page.tsx` (back links)
+
+### Out of scope (later)
+
+Learner dashboard extras, migrations, instructor changes, completion
+mutations, assessment/assignment engine changes.

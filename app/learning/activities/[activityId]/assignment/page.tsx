@@ -6,6 +6,7 @@ import {
   LEARNING_ASSIGNMENT_ROUTES,
   loadMyAssignment,
 } from "../../../../../lib/learning/assignmentsCoursework";
+import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
 import {
   saveAndSubmitAssignmentAction,
   startAssignmentSubmissionAction,
@@ -46,6 +47,14 @@ export default async function LearnerAssignmentPage({
     loaded.ok && loaded.data.result && typeof loaded.data.result === "object"
       ? (loaded.data.result as Record<string, unknown>)
       : null;
+  const lessonId =
+    loaded.ok && typeof loaded.data.lesson_id === "string"
+      ? loaded.data.lesson_id
+      : null;
+  const backHref = lessonId
+    ? LEARNING_LEARNER_ROUTES.lesson(lessonId)
+    : LEARNING_LEARNER_ROUTES.hub;
+  const backLabel = lessonId ? "Back to lesson" : "Learning";
 
   return (
     <LearningShell
@@ -55,8 +64,8 @@ export default async function LearnerAssignmentPage({
           : "Assignment"
       }
       subtitle="Coursework submission"
-      backHref="/learning"
-      backLabel="Learning"
+      backHref={backHref}
+      backLabel={backLabel}
     >
       {query.error ? (
         <p role="alert" className="mt-4 text-sm text-rose-100">
@@ -208,8 +217,8 @@ export default async function LearnerAssignmentPage({
           ) : null}
 
           <p className="text-xs text-white/40">
-            <Link href="/learning" className="underline underline-offset-2">
-              Back to learning
+            <Link href={backHref} className="underline underline-offset-2">
+              {backLabel}
             </Link>
           </p>
         </div>
