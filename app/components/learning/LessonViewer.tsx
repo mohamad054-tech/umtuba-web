@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 import ActivityList from "./ActivityList";
 import type { LearningLearnerLessonDelivery } from "../../../lib/learning/learnerDelivery";
@@ -7,6 +8,8 @@ type LessonViewerProps = {
 };
 
 export default function LessonViewer({ delivery }: LessonViewerProps) {
+  const hasNav = Boolean(delivery.previous_lesson || delivery.next_lesson);
+
   return (
     <div className="mt-6 space-y-6">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
@@ -45,6 +48,32 @@ export default function LessonViewer({ delivery }: LessonViewerProps) {
         </h2>
         <ActivityList activities={delivery.activities} />
       </section>
+
+      {hasNav ? (
+        <nav
+          aria-label="Lesson navigation"
+          className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4"
+        >
+          {delivery.previous_lesson ? (
+            <Link
+              href={delivery.previous_lesson.href}
+              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+            >
+              ← Previous
+            </Link>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+          {delivery.next_lesson ? (
+            <Link
+              href={delivery.next_lesson.href}
+              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+            >
+              Next →
+            </Link>
+          ) : null}
+        </nav>
+      ) : null}
     </div>
   );
 }

@@ -2,21 +2,21 @@
 
 ## Summary
 
-Learner Experience Foundation V1 — Slice 1 (Hub Progress + Continue Learning)
+Learner Experience Foundation V1 — Slice 2 (Next/Previous Lesson Navigation)
 implemented on `office/learning-learner-experience-foundation-v1`.
 
-`LearningLearnerHubCourse` now carries `progress` from
-`get_learning_course_progress` and a fail-closed `continue_href` from
-`resolveContinueLearningTarget()` (prefer `last_lesson_id`, else first
-published lesson). `LearningHub` shows a Continue Learning card, per-course
-percent, and Resume buttons. No migrations; no instructor changes.
+Added `resolveAdjacentLessonTargets()` and
+`loadOrderedPublishedLessonIdsForCourse()` (published sections → lessons by
+position). `loadLessonDelivery` now attaches fail-closed `previous_lesson` /
+`next_lesson`. `LessonViewer` shows Previous/Next links (hides unavailable;
+no completion mutation). No migrations; no instructor changes.
 
 ## Exact files changed
 
 - `lib/learning/learnerDelivery.ts`
 - `lib/learning/learnerDelivery.test.ts`
-- `app/components/learning/LearningHub.tsx`
-- `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md` (new)
+- `app/components/learning/LessonViewer.tsx`
+- `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -26,31 +26,32 @@ None.
 
 ## Security review
 
-- Reuses existing JWT client + entitlement RLS + `get_learning_course_progress`.
+- Reuses existing JWT client + entitlement RLS published-tree SELECTs.
 - No service role; no scoring / answer-key / result-table access added.
-- Continue target fail-closed when no lesson id is available.
-- Hub still only surfaces published enrollments/courses/lessons.
+- Navigation fails closed (null neighbors) without breaking lesson delivery.
+- Links only target `LEARNING_LEARNER_ROUTES.lesson` for published neighbors.
+- No complete-on-next mutation.
 
 ## Tests
 
 ```text
 npx vitest run lib/learning/learnerDelivery.test.ts
-✓ 22 passed (22)
+✓ 30 passed (30)
 ```
 
-New coverage: continue target resolution + hub progress enrichment (mock RPC).
+New coverage: middle / first / last / single / cross-section / unknown /
+no-wrap adjacent resolution + LessonViewer Previous/Next smoke check.
 
 ## TypeScript
 
-`npx tsc --noEmit` reports pre-existing errors under
-`app/learning/instructor/lessons/...` (missing instructorAuthoring exports /
-component paths). No new errors attributed to Slice 1 learner hub files;
-lints clean on changed files.
+`npx tsc --noEmit` reports pre-existing errors under instructor lesson /
+content-block paths and `.next` validators. No errors attributed to Slice 2
+learner delivery / LessonViewer files; lints clean on changed files.
 
 ## Build
 
-Not run (UI change limited to existing Learning hub component; task did not
-require full build).
+Not run (UI change limited to existing LessonViewer; task did not require
+full build).
 
 ## git diff --check
 
@@ -59,17 +60,17 @@ PASS (exit 0).
 ## git status --short
 
 ```text
- M app/components/learning/LearningHub.tsx
+ M app/components/learning/LessonViewer.tsx
  M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md
  M lib/learning/learnerDelivery.test.ts
  M lib/learning/learnerDelivery.ts
-?? docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md
- M docs/ai/CURSOR_REPORT.md
 ```
 
 ## Open issues
 
 - Not committed / not pushed (awaiting explicit approval).
 - Do not merge to `alpha-0.2` until requested.
-- Later slices: next/prev lesson navigation, activity type routing.
-- Full-project `tsc` still fails on pre-existing instructor lesson page issues.
+- Later slices: activity type routing, learner dashboard extras.
+- Full-project `tsc` still fails on pre-existing instructor issues.

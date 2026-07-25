@@ -25,6 +25,7 @@ import {
   filterPublishedCreatableBlocks,
   isAttemptInputLocked,
   loadMyLearningHub,
+  resolveAdjacentLessonTargets,
   resolveContinueLearningTarget,
   toLearnerActivityHints,
 } from "./learnerDelivery";
@@ -544,5 +545,131 @@ describe("Learner Experience V1 — hub progress enrichment", () => {
     expect(hubUi).toMatch(/percent_complete/);
     expect(hubUi).toMatch(/Resume/);
     expect(hubUi).toMatch(/continue_href/);
+  });
+});
+
+describe("Learner Experience V1 — adjacent lesson navigation", () => {
+  const ORDERED = ["lesson-a", "lesson-b", "lesson-c"] as const;
+
+  it("resolves previous and next for a middle lesson", () => {
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "lesson-b",
+        ordered_lesson_ids: ORDERED,
+      })
+    ).toEqual({
+      previous: {
+        lesson_id: "lesson-a",
+        href: LEARNING_LEARNER_ROUTES.lesson("lesson-a"),
+      },
+      next: {
+        lesson_id: "lesson-c",
+        href: LEARNING_LEARNER_ROUTES.lesson("lesson-c"),
+      },
+    });
+  });
+
+  it("first lesson has null previous and a next target", () => {
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "lesson-a",
+        ordered_lesson_ids: ORDERED,
+      })
+    ).toEqual({
+      previous: null,
+      next: {
+        lesson_id: "lesson-b",
+        href: LEARNING_LEARNER_ROUTES.lesson("lesson-b"),
+      },
+    });
+  });
+
+  it("last lesson has a previous target and null next", () => {
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "lesson-c",
+        ordered_lesson_ids: ORDERED,
+      })
+    ).toEqual({
+      previous: {
+        lesson_id: "lesson-b",
+        href: LEARNING_LEARNER_ROUTES.lesson("lesson-b"),
+      },
+      next: null,
+    });
+  });
+
+  it("single lesson has null previous and null next", () => {
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "only-lesson",
+        ordered_lesson_ids: ["only-lesson"],
+      })
+    ).toEqual({ previous: null, next: null });
+  });
+
+  it("cross-section ordering uses flattened section then lesson order", () => {
+    // Section 1: s1-l1, s1-l2 · Section 2: s2-l1
+    const crossSectionOrdered = ["s1-l1", "s1-l2", "s2-l1"];
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "s1-l2",
+        ordered_lesson_ids: crossSectionOrdered,
+      })
+    ).toEqual({
+      previous: {
+        lesson_id: "s1-l1",
+        href: LEARNING_LEARNER_ROUTES.lesson("s1-l1"),
+      },
+      next: {
+        lesson_id: "s2-l1",
+        href: LEARNING_LEARNER_ROUTES.lesson("s2-l1"),
+      },
+    });
+  });
+
+  it("unknown lesson fails closed with both neighbors null", () => {
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "missing",
+        ordered_lesson_ids: ORDERED,
+      })
+    ).toEqual({ previous: null, next: null });
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "",
+        ordered_lesson_ids: ORDERED,
+      })
+    ).toEqual({ previous: null, next: null });
+    expect(
+      resolveAdjacentLessonTargets({
+        current_lesson_id: "lesson-a",
+        ordered_lesson_ids: [],
+      })
+    ).toEqual({ previous: null, next: null });
+  });
+
+  it("does not wrap from last to first or first to last", () => {
+    const first = resolveAdjacentLessonTargets({
+      current_lesson_id: "lesson-a",
+      ordered_lesson_ids: ORDERED,
+    });
+    const last = resolveAdjacentLessonTargets({
+      current_lesson_id: "lesson-c",
+      ordered_lesson_ids: ORDERED,
+    });
+    expect(first.previous).toBeNull();
+    expect(first.next?.lesson_id).toBe("lesson-b");
+    expect(last.next).toBeNull();
+    expect(last.previous?.lesson_id).toBe("lesson-b");
+  });
+
+  it("LessonViewer surfaces Previous/Next from delivery neighbors", () => {
+    const ui = read("app/components/learning/LessonViewer.tsx");
+    expect(ui).toMatch(/previous_lesson/);
+    expect(ui).toMatch(/next_lesson/);
+    expect(ui).toMatch(/Previous/);
+    expect(ui).toMatch(/Next/);
+    expect(ui).not.toMatch(/complete_learning_lesson/);
   });
 });

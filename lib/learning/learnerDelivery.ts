@@ -107,6 +107,17 @@ export type LearningContinueLearningTarget = {
   href: string;
 };
 
+/** Adjacent lesson link target (Previous / Next). */
+export type LearningLessonNavTarget = {
+  lesson_id: string;
+  href: string;
+};
+
+export type LearningAdjacentLessonTargets = {
+  previous: LearningLessonNavTarget | null;
+  next: LearningLessonNavTarget | null;
+};
+
 /**
  * Resolve a Continue Learning resume target.
  * Prefers last_lesson_id; otherwise the first available published lesson.
@@ -122,6 +133,43 @@ export function resolveContinueLearningTarget(input: {
   return {
     lesson_id: lessonId,
     href: LEARNING_LEARNER_ROUTES.lesson(lessonId),
+  };
+}
+
+/**
+ * Resolve previous/next lesson targets from an ordered published lesson list.
+ * No wrapping. Fail closed when the current lesson is missing or empty.
+ */
+export function resolveAdjacentLessonTargets(input: {
+  current_lesson_id: string | null | undefined;
+  ordered_lesson_ids: readonly string[];
+}): LearningAdjacentLessonTargets {
+  const currentId = asString(input.current_lesson_id);
+  if (!currentId) {
+    return { previous: null, next: null };
+  }
+  const index = input.ordered_lesson_ids.findIndex((id) => id === currentId);
+  if (index < 0) {
+    return { previous: null, next: null };
+  }
+  const prevId = index > 0 ? input.ordered_lesson_ids[index - 1] : undefined;
+  const nextId =
+    index < input.ordered_lesson_ids.length - 1
+      ? input.ordered_lesson_ids[index + 1]
+      : undefined;
+  return {
+    previous: prevId
+      ? {
+          lesson_id: prevId,
+          href: LEARNING_LEARNER_ROUTES.lesson(prevId),
+        }
+      : null,
+    next: nextId
+      ? {
+          lesson_id: nextId,
+          href: LEARNING_LEARNER_ROUTES.lesson(nextId),
+        }
+      : null,
   };
 }
 
@@ -182,6 +230,10 @@ export type LearningLearnerLessonDelivery = {
   blocks: LearningLessonContentBlock[];
   activities: LearningLearnerActivitySummary[];
   progress_status: LearningProgressStatus;
+  /** Null at first lesson or when navigation cannot be resolved. */
+  previous_lesson: LearningLessonNavTarget | null;
+  /** Null at last lesson or when navigation cannot be resolved. */
+  next_lesson: LearningLessonNavTarget | null;
 };
 
 export type LearningLearnerSnapshotQuestion = {
@@ -587,6 +639,67 @@ function parseHubCourseProgress(
   };
 }
 
+/**
+ * Ordered published lesson ids for one course.
+ * Published sections only, section position ascending, then lesson position.
+ * Fail closed to [] on query errors / empty tree.
+ */
+async function loadOrderedPublishedLessonIdsForCourse(
+  supabase: AnyClient,
+  courseId: string
+): Promise<string[]> {
+  if (!courseId) return [];
+
+  const { data: sections, error: sectionError } = await supabase
+    .from("learning_sections")
+    .select("id, position, status")
+    .eq("course_id", courseId)
+    .eq("status", "published")
+    .order("position", { ascending: true });
+  if (sectionError || !sections?.length) return [];
+
+  const sectionIds: string[] = [];
+  for (const s of sections) {
+    const sid = asString(s.id);
+    if (sid) sectionIds.push(sid);
+  }
+  if (sectionIds.length === 0) return [];
+
+  const { data: lessons, error: lessonError } = await supabase
+    .from("learning_lessons")
+    .select("id, section_id, position, status")
+    .in("section_id", sectionIds)
+    .eq("status", "published")
+    .order("position", { ascending: true });
+  if (lessonError || !lessons?.length) return [];
+
+  const lessonsBySection = new Map<
+    string,
+    Array<{ id: string; position: number }>
+  >();
+  for (const lesson of lessons) {
+    const lid = asString(lesson.id);
+    const sectionId = asString(lesson.section_id);
+    if (!lid || !sectionId) continue;
+    const list = lessonsBySection.get(sectionId) ?? [];
+    list.push({ id: lid, position: asNumberOrNull(lesson.position) ?? 0 });
+    lessonsBySection.set(sectionId, list);
+  }
+  for (const list of lessonsBySection.values()) {
+    list.sort((a, b) => a.position - b.position);
+  }
+
+  const ordered: string[] = [];
+  for (const s of sections) {
+    const sid = asString(s.id);
+    if (!sid) continue;
+    for (const lesson of lessonsBySection.get(sid) ?? []) {
+      ordered.push(lesson.id);
+    }
+  }
+  return ordered;
+}
+
 /** First published lesson per course (section position, then lesson position). */
 async function loadFirstPublishedLessonIdsByCourse(
   supabase: AnyClient,
@@ -922,6 +1035,25 @@ export async function loadLessonDelivery(
   const st = asString(progressRow?.status) as LearningProgressStatus | null;
   if (st) progress_status = st;
 
+  // Adjacent nav is best-effort — never fail lesson delivery for nav errors.
+  let previous_lesson: LearningLessonNavTarget | null = null;
+  let next_lesson: LearningLessonNavTarget | null = null;
+  try {
+    const orderedIds = await loadOrderedPublishedLessonIdsForCourse(
+      supabase,
+      courseId
+    );
+    const adjacent = resolveAdjacentLessonTargets({
+      current_lesson_id: asString(lesson.id) ?? lessonId,
+      ordered_lesson_ids: orderedIds,
+    });
+    previous_lesson = adjacent.previous;
+    next_lesson = adjacent.next;
+  } catch {
+    previous_lesson = null;
+    next_lesson = null;
+  }
+
   return {
     ok: true,
     data: {
@@ -937,6 +1069,8 @@ export async function loadLessonDelivery(
       blocks,
       activities,
       progress_status,
+      previous_lesson,
+      next_lesson,
     },
   };
 }
