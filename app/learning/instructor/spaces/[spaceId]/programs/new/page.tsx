@@ -113,14 +113,6 @@ export default async function NewInstructorProgramPage({
             placeholder="Product Design Track"
           />
         </BootstrapField>
-        <BootstrapField label="Slug" hint="Optional — derived from name if empty.">
-          <input
-            name="slug"
-            maxLength={64}
-            className={bootstrapInputClass}
-            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-          />
-        </BootstrapField>
         <BootstrapField label="Format" required>
           <select
             name="format"

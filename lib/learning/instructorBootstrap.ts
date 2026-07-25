@@ -26,6 +26,10 @@ import {
   type LearningSpaceVisibility,
 } from "./spacesFoundation";
 import { LEARNING_INSTRUCTOR_ROUTES } from "./instructorAuthoring";
+import {
+  createWithUniqueInstructorSlug,
+  slugifyInstructorName,
+} from "./instructorSlug";
 
 type AnyClient = SupabaseClient;
 
@@ -75,15 +79,34 @@ export function isBootstrapUuid(value: string): boolean {
 
 /** Derive a SQL-safe slug from a display name (3–64 chars). */
 export function slugifyBootstrapName(name: string): string {
-  const base = name
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 64);
-  if (base.length >= 3 && SLUG_RE.test(base)) return base;
-  const padded = (base || "item").padEnd(3, "x").slice(0, 64);
-  return SLUG_RE.test(padded) ? padded : "item-x";
+  return slugifyInstructorName(name);
+}
+
+async function listExistingSlugs(
+  supabase: AnyClient,
+  table: string,
+  filters?: Record<string, string>
+): Promise<string[]> {
+  if (typeof supabase.from !== "function") return [];
+  try {
+    let query = supabase.from(table).select("slug");
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        query = query.eq(key, value);
+      }
+    }
+    const { data, error } = await query;
+    if (error || !data) return [];
+    return data
+      .map((row) =>
+        typeof (row as { slug?: unknown }).slug === "string"
+          ? (row as { slug: string }).slug
+          : ""
+      )
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 export function sanitizeBootstrapRpcError(
@@ -106,10 +129,10 @@ export function sanitizeBootstrapRpcError(
     return "Activate the learning space before creating programs or courses.";
   }
   if (lower.includes("duplicate") || lower.includes("unique")) {
-    return "That slug is already in use. Choose another.";
+    return "A catalog item with a similar name already exists. Try a different name.";
   }
   if (lower.includes("invalid learning space slug") || lower.includes("invalid learning program slug") || lower.includes("invalid learning course slug")) {
-    return "Slug must be 3–64 characters: lowercase letters, numbers, hyphens.";
+    return "Could not derive a valid URL name from that title. Try a different name.";
   }
   if (lower.includes("invalid") && lower.includes("name")) {
     return "Name is required and must be within length limits.";
@@ -211,29 +234,40 @@ export async function createInstructorSpace(
   const validated = validateCreateSpaceInput(raw);
   if (!validated.ok) return validated;
 
-  const created = await callRpc(supabase, LEARNING_SPACE_RPCS.create, {
-    p_slug: validated.data.slug,
-    p_name: validated.data.name,
-    p_description: validated.data.description,
-    p_mode: validated.data.mode,
-    p_visibility: validated.data.visibility,
-    p_default_language: validated.data.default_language,
-  });
+  const taken = await listExistingSlugs(supabase, "learning_spaces");
+  const created = await createWithUniqueInstructorSlug(
+    validated.data.slug ?? validated.data.name,
+    async (slug) => {
+      const result = await callRpc(supabase, LEARNING_SPACE_RPCS.create, {
+        p_slug: slug,
+        p_name: validated.data.name,
+        p_description: validated.data.description,
+        p_mode: validated.data.mode,
+        p_visibility: validated.data.visibility,
+        p_default_language: validated.data.default_language,
+      });
+      if (!result.ok) return result;
+      const spaceId = parseIdFromRpc(result.data, "space_id");
+      if (!spaceId) {
+        return {
+          ok: false,
+          message: "Space was created but no id was returned.",
+        };
+      }
+      return { ok: true, data: { space_id: spaceId } };
+    },
+    { taken }
+  );
   if (!created.ok) return created;
-
-  const spaceId = parseIdFromRpc(created.data, "space_id");
-  if (!spaceId) {
-    return { ok: false, message: "Space was created but no id was returned." };
-  }
 
   if (validated.data.publish !== false) {
     const published = await callRpc(supabase, LEARNING_SPACE_RPCS.publish, {
-      p_space_id: spaceId,
+      p_space_id: created.data.space_id,
     });
     if (!published.ok) return published;
   }
 
-  return { ok: true, data: { space_id: spaceId } };
+  return created;
 }
 
 export type CreateProgramInput = {
@@ -304,22 +338,33 @@ export async function createInstructorProgram(
   const validated = validateCreateProgramInput(raw);
   if (!validated.ok) return validated;
 
-  const created = await callRpc(supabase, LEARNING_PROGRAM_RPCS.create, {
-    p_space_id: validated.data.space_id,
-    p_slug: validated.data.slug,
-    p_name: validated.data.name,
-    p_format: validated.data.format,
-    p_description: validated.data.description,
-    p_visibility: validated.data.visibility,
-    p_default_language: validated.data.default_language,
+  const taken = await listExistingSlugs(supabase, "learning_programs", {
+    space_id: validated.data.space_id,
   });
-  if (!created.ok) return created;
-
-  const programId = parseIdFromRpc(created.data, "program_id");
-  if (!programId) {
-    return { ok: false, message: "Program was created but no id was returned." };
-  }
-  return { ok: true, data: { program_id: programId } };
+  return createWithUniqueInstructorSlug(
+    validated.data.slug ?? validated.data.name,
+    async (slug) => {
+      const result = await callRpc(supabase, LEARNING_PROGRAM_RPCS.create, {
+        p_space_id: validated.data.space_id,
+        p_slug: slug,
+        p_name: validated.data.name,
+        p_format: validated.data.format,
+        p_description: validated.data.description,
+        p_visibility: validated.data.visibility,
+        p_default_language: validated.data.default_language,
+      });
+      if (!result.ok) return result;
+      const programId = parseIdFromRpc(result.data, "program_id");
+      if (!programId) {
+        return {
+          ok: false,
+          message: "Program was created but no id was returned.",
+        };
+      }
+      return { ok: true, data: { program_id: programId } };
+    },
+    { taken }
+  );
 }
 
 export type CreateCourseInput = {
@@ -383,21 +428,32 @@ export async function createInstructorCourse(
   const validated = validateCreateCourseInput(raw);
   if (!validated.ok) return validated;
 
-  const created = await callRpc(supabase, LEARNING_COURSE_RPCS.create, {
-    p_program_id: validated.data.program_id,
-    p_slug: validated.data.slug,
-    p_name: validated.data.name,
-    p_description: validated.data.description,
-    p_visibility: validated.data.visibility,
-    p_default_language: validated.data.default_language,
+  const taken = await listExistingSlugs(supabase, "learning_courses", {
+    program_id: validated.data.program_id,
   });
-  if (!created.ok) return created;
-
-  const courseId = parseIdFromRpc(created.data, "course_id");
-  if (!courseId) {
-    return { ok: false, message: "Course was created but no id was returned." };
-  }
-  return { ok: true, data: { course_id: courseId } };
+  return createWithUniqueInstructorSlug(
+    validated.data.slug ?? validated.data.name,
+    async (slug) => {
+      const result = await callRpc(supabase, LEARNING_COURSE_RPCS.create, {
+        p_program_id: validated.data.program_id,
+        p_slug: slug,
+        p_name: validated.data.name,
+        p_description: validated.data.description,
+        p_visibility: validated.data.visibility,
+        p_default_language: validated.data.default_language,
+      });
+      if (!result.ok) return result;
+      const courseId = parseIdFromRpc(result.data, "course_id");
+      if (!courseId) {
+        return {
+          ok: false,
+          message: "Course was created but no id was returned.",
+        };
+      }
+      return { ok: true, data: { course_id: courseId } };
+    },
+    { taken }
+  );
 }
 
 /** Spaces the user can read via RLS (member / owner). */

@@ -81,14 +81,6 @@ export default async function NewInstructorCoursePage({
             placeholder="Foundations of UX"
           />
         </BootstrapField>
-        <BootstrapField label="Slug" hint="Optional — derived from name if empty.">
-          <input
-            name="slug"
-            maxLength={64}
-            className={bootstrapInputClass}
-            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-          />
-        </BootstrapField>
         <BootstrapField label="Visibility">
           <select
             name="visibility"

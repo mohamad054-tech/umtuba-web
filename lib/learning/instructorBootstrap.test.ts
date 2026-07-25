@@ -95,7 +95,9 @@ describe("Instructor Bootstrap — error sanitizer", () => {
     expect(
       sanitizeBootstrapRpcError("Learning space must be active for program changes")
     ).toMatch(/Activate/i);
-    expect(sanitizeBootstrapRpcError("duplicate key unique")).toMatch(/slug/i);
+    expect(sanitizeBootstrapRpcError("duplicate key unique")).toMatch(
+      /similar name|already exists/i
+    );
   });
 });
 

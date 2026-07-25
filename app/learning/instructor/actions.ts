@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
   runInstructorAuthoringOperation,
   type InstructorAuthoringResult,
 } from "../../../lib/learning/instructorAuthoring";
+import { createWithUniqueInstructorSlug } from "../../../lib/learning/instructorSlug";
 
 function formString(formData: FormData, key: string): string {
   return String(formData.get(key) ?? "").trim();
@@ -37,6 +39,30 @@ function revalidateAuthoring(courseId?: string, lessonId?: string) {
   }
 }
 
+async function listSiblingSlugs(
+  supabase: SupabaseClient,
+  table: string,
+  filters: Record<string, string>
+): Promise<string[]> {
+  try {
+    let query = supabase.from(table).select("slug");
+    for (const [key, value] of Object.entries(filters)) {
+      query = query.eq(key, value);
+    }
+    const { data, error } = await query;
+    if (error || !data) return [];
+    return data
+      .map((row) =>
+        typeof (row as { slug?: unknown }).slug === "string"
+          ? (row as { slug: string }).slug
+          : ""
+      )
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 export async function instructorAuthoringAction(
   operation: string,
   input: Record<string, unknown>,
@@ -60,18 +86,30 @@ export async function instructorAuthoringAction(
 export async function createSectionAction(
   formData: FormData
 ): Promise<InstructorAuthoringResult> {
+  const authErr = await requireUser();
+  if (authErr) return authErr;
+
   const courseId = formString(formData, "courseId");
-  return instructorAuthoringAction(
-    "create_section",
-    {
-      course_id: courseId,
-      slug: formString(formData, "slug"),
-      name: formString(formData, "name"),
-      description: formString(formData, "description") || null,
-      visibility: formString(formData, "visibility") || "private",
-    },
-    { courseId }
+  const name = formString(formData, "name");
+  const supabase = await createClient();
+  const taken = await listSiblingSlugs(supabase, "learning_sections", {
+    course_id: courseId,
+  });
+
+  const result = await createWithUniqueInstructorSlug(
+    name,
+    async (slug) =>
+      runInstructorAuthoringOperation(supabase, "create_section", {
+        course_id: courseId,
+        slug,
+        name,
+        description: formString(formData, "description") || null,
+        visibility: formString(formData, "visibility") || "private",
+      }),
+    { taken }
   );
+  if (result.ok) revalidateAuthoring(courseId);
+  return result;
 }
 
 export async function updateSectionAction(
@@ -129,18 +167,31 @@ export async function reorderSectionsAction(
 export async function createLessonAction(
   formData: FormData
 ): Promise<InstructorAuthoringResult> {
+  const authErr = await requireUser();
+  if (authErr) return authErr;
+
   const courseId = formString(formData, "courseId");
-  return instructorAuthoringAction(
-    "create_lesson",
-    {
-      section_id: formString(formData, "sectionId"),
-      slug: formString(formData, "slug"),
-      name: formString(formData, "name"),
-      description: formString(formData, "description") || null,
-      visibility: formString(formData, "visibility") || "private",
-    },
-    { courseId }
+  const sectionId = formString(formData, "sectionId");
+  const name = formString(formData, "name");
+  const supabase = await createClient();
+  const taken = await listSiblingSlugs(supabase, "learning_lessons", {
+    section_id: sectionId,
+  });
+
+  const result = await createWithUniqueInstructorSlug(
+    name,
+    async (slug) =>
+      runInstructorAuthoringOperation(supabase, "create_lesson", {
+        section_id: sectionId,
+        slug,
+        name,
+        description: formString(formData, "description") || null,
+        visibility: formString(formData, "visibility") || "private",
+      }),
+    { taken }
   );
+  if (result.ok) revalidateAuthoring(courseId);
+  return result;
 }
 
 export async function updateLessonAction(
@@ -198,19 +249,32 @@ export async function reorderLessonsAction(
 export async function createActivityAction(
   formData: FormData
 ): Promise<InstructorAuthoringResult> {
+  const authErr = await requireUser();
+  if (authErr) return authErr;
+
   const courseId = formString(formData, "courseId");
-  return instructorAuthoringAction(
-    "create_activity",
-    {
-      lesson_id: formString(formData, "lessonId"),
-      type: formString(formData, "type"),
-      slug: formString(formData, "slug"),
-      name: formString(formData, "name"),
-      description: formString(formData, "description") || null,
-      visibility: formString(formData, "visibility") || "private",
-    },
-    { courseId }
+  const lessonId = formString(formData, "lessonId");
+  const name = formString(formData, "name");
+  const supabase = await createClient();
+  const taken = await listSiblingSlugs(supabase, "learning_activities", {
+    lesson_id: lessonId,
+  });
+
+  const result = await createWithUniqueInstructorSlug(
+    name,
+    async (slug) =>
+      runInstructorAuthoringOperation(supabase, "create_activity", {
+        lesson_id: lessonId,
+        type: formString(formData, "type"),
+        slug,
+        name,
+        description: formString(formData, "description") || null,
+        visibility: formString(formData, "visibility") || "private",
+      }),
+    { taken }
   );
+  if (result.ok) revalidateAuthoring(courseId);
+  return result;
 }
 
 export async function updateActivityAction(

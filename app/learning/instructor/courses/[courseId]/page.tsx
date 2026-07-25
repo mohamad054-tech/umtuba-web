@@ -148,12 +148,6 @@ export default async function InstructorCourseAuthoringPage({
             placeholder="Section name"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
           />
-          <input
-            name="slug"
-            required
-            placeholder="section-slug"
-            className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
-          />
           <textarea
             name="description"
             placeholder="Description (optional)"
@@ -269,12 +263,6 @@ export default async function InstructorCourseAuthoringPage({
                       name="name"
                       required
                       placeholder="Lesson name"
-                      className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
-                    />
-                    <input
-                      name="slug"
-                      required
-                      placeholder="lesson-slug"
                       className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                     />
                   </InstructorActionForm>
@@ -406,12 +394,6 @@ export default async function InstructorCourseAuthoringPage({
                               name="name"
                               required
                               placeholder="Activity name"
-                              className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
-                            />
-                            <input
-                              name="slug"
-                              required
-                              placeholder="activity-slug"
                               className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                             />
                           </InstructorActionForm>

@@ -64,18 +64,6 @@ export default async function NewInstructorSpacePage({
             placeholder="Acme Academy"
           />
         </BootstrapField>
-        <BootstrapField
-          label="Slug"
-          hint="Optional — derived from name if empty (lowercase, hyphens)."
-        >
-          <input
-            name="slug"
-            maxLength={64}
-            className={bootstrapInputClass}
-            placeholder="acme-academy"
-            pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
-          />
-        </BootstrapField>
         <BootstrapField label="Mode" required>
           <select
             name="mode"

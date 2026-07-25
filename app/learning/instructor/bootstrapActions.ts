@@ -36,7 +36,6 @@ export async function createSpaceBootstrapAction(
   const supabase = await createClient();
   const result = await createInstructorSpace(supabase, {
     name: formString(formData, "name"),
-    slug: formString(formData, "slug") || undefined,
     description: formString(formData, "description") || null,
     mode: formString(formData, "mode") as LearningSpaceMode,
     visibility: (formString(formData, "visibility") ||
@@ -73,7 +72,6 @@ export async function createProgramBootstrapAction(
   const result = await createInstructorProgram(supabase, {
     space_id: spaceId,
     name: formString(formData, "name"),
-    slug: formString(formData, "slug") || undefined,
     format: formString(formData, "format") as LearningProgramFormat,
     description: formString(formData, "description") || null,
     visibility: (formString(formData, "visibility") ||
@@ -109,7 +107,6 @@ export async function createCourseBootstrapAction(
   const result = await createInstructorCourse(supabase, {
     program_id: programId,
     name: formString(formData, "name"),
-    slug: formString(formData, "slug") || undefined,
     description: formString(formData, "description") || null,
     visibility: (formString(formData, "visibility") ||
       "private") as "private" | "unlisted" | "public",
