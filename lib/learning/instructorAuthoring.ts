@@ -818,6 +818,159 @@ export type InstructorCourseTree = {
   }>;
 };
 
+/** SECURITY DEFINER authoring tree read — avoids nested FORCE RLS SELECTs. */
+export const LEARNING_INSTRUCTOR_COURSE_TREE_RPC =
+  "get_instructor_learning_course_tree" as const;
+
+export type InstructorCourseTreePayload = {
+  tree: InstructorCourseTree;
+  canManage: boolean;
+};
+
+function parseActivity(raw: unknown): InstructorCourseTree["sections"][number]["lessons"][number]["activities"][number] | null {
+  if (!isPlainObject(raw)) return null;
+  if (
+    typeof raw.id !== "string" ||
+    typeof raw.name !== "string" ||
+    typeof raw.slug !== "string" ||
+    typeof raw.status !== "string" ||
+    typeof raw.position !== "number" ||
+    typeof raw.type !== "string"
+  ) {
+    return null;
+  }
+  return {
+    id: raw.id,
+    name: raw.name,
+    slug: raw.slug,
+    status: raw.status,
+    position: raw.position,
+    type: raw.type,
+    description:
+      raw.description === null || typeof raw.description === "string"
+        ? (raw.description as string | null)
+        : null,
+  };
+}
+
+function parseLesson(raw: unknown): InstructorCourseTree["sections"][number]["lessons"][number] | null {
+  if (!isPlainObject(raw)) return null;
+  if (
+    typeof raw.id !== "string" ||
+    typeof raw.name !== "string" ||
+    typeof raw.slug !== "string" ||
+    typeof raw.status !== "string" ||
+    typeof raw.position !== "number"
+  ) {
+    return null;
+  }
+  const activitiesRaw = Array.isArray(raw.activities) ? raw.activities : [];
+  const activities: InstructorCourseTree["sections"][number]["lessons"][number]["activities"] =
+    [];
+  for (const item of activitiesRaw) {
+    const parsed = parseActivity(item);
+    if (!parsed) return null;
+    activities.push(parsed);
+  }
+  return {
+    id: raw.id,
+    name: raw.name,
+    slug: raw.slug,
+    status: raw.status,
+    position: raw.position,
+    description:
+      raw.description === null || typeof raw.description === "string"
+        ? (raw.description as string | null)
+        : null,
+    activities,
+  };
+}
+
+function parseSection(raw: unknown): InstructorCourseTree["sections"][number] | null {
+  if (!isPlainObject(raw)) return null;
+  if (
+    typeof raw.id !== "string" ||
+    typeof raw.name !== "string" ||
+    typeof raw.slug !== "string" ||
+    typeof raw.status !== "string" ||
+    typeof raw.position !== "number"
+  ) {
+    return null;
+  }
+  const lessonsRaw = Array.isArray(raw.lessons) ? raw.lessons : [];
+  const lessons: InstructorCourseTree["sections"][number]["lessons"] = [];
+  for (const item of lessonsRaw) {
+    const parsed = parseLesson(item);
+    if (!parsed) return null;
+    lessons.push(parsed);
+  }
+  return {
+    id: raw.id,
+    name: raw.name,
+    slug: raw.slug,
+    status: raw.status,
+    position: raw.position,
+    description:
+      raw.description === null || typeof raw.description === "string"
+        ? (raw.description as string | null)
+        : null,
+    lessons,
+  };
+}
+
+/** Parse RPC payload from get_instructor_learning_course_tree. */
+export function parseInstructorCourseTreePayload(
+  raw: unknown
+): InstructorCourseTreePayload | null {
+  if (!isPlainObject(raw)) return null;
+  const treeRaw = raw.tree;
+  if (!isPlainObject(treeRaw)) return null;
+  const courseRaw = treeRaw.course;
+  if (!isPlainObject(courseRaw)) return null;
+  if (
+    typeof courseRaw.id !== "string" ||
+    typeof courseRaw.name !== "string" ||
+    typeof courseRaw.slug !== "string" ||
+    typeof courseRaw.status !== "string" ||
+    typeof courseRaw.program_id !== "string"
+  ) {
+    return null;
+  }
+  const sectionsRaw = Array.isArray(treeRaw.sections) ? treeRaw.sections : null;
+  if (!sectionsRaw) return null;
+  const sections: InstructorCourseTree["sections"] = [];
+  for (const item of sectionsRaw) {
+    const parsed = parseSection(item);
+    if (!parsed) return null;
+    sections.push(parsed);
+  }
+  const canManage =
+    typeof raw.can_manage === "boolean"
+      ? raw.can_manage
+      : typeof raw.canManage === "boolean"
+        ? raw.canManage
+        : null;
+  if (canManage === null) return null;
+  return {
+    canManage,
+    tree: {
+      course: {
+        id: courseRaw.id,
+        name: courseRaw.name,
+        slug: courseRaw.slug,
+        status: courseRaw.status as InstructorAuthorableCourse["status"],
+        program_id: courseRaw.program_id,
+        description:
+          courseRaw.description === null ||
+          typeof courseRaw.description === "string"
+            ? (courseRaw.description as string | null)
+            : null,
+      },
+      sections,
+    },
+  };
+}
+
 export async function loadInstructorCourseTree(
   supabase: AnyClient,
   courseId: string
@@ -826,100 +979,22 @@ export async function loadInstructorCourseTree(
     return { ok: false, message: "course_id must be a valid UUID" };
   }
 
-  const { data: course, error: courseError } = await supabase
-    .from("learning_courses")
-    .select("id, name, slug, status, program_id, description")
-    .eq("id", courseId)
-    .maybeSingle();
-  if (courseError) {
-    return { ok: false, message: sanitizeRpcError(courseError.message) };
-  }
-  if (!course) {
-    return { ok: false, message: "Course not found or unavailable." };
+  const { data, error } = await supabase.rpc(
+    LEARNING_INSTRUCTOR_COURSE_TREE_RPC,
+    { p_course_id: courseId }
+  );
+  if (error) {
+    return { ok: false, message: sanitizeRpcError(error.message) };
   }
 
-  const canManage = await canManageLearningCourseUx(supabase, courseId);
-  // Staff with update (not manage) may still read via RLS; keep tree readable
-  // when SELECT succeeds. Manage gate is for control visibility in UI.
-
-  const { data: sections, error: sectionsError } = await supabase
-    .from("learning_sections")
-    .select("id, name, slug, status, position, description")
-    .eq("course_id", courseId)
-    .order("position", { ascending: true });
-  if (sectionsError) {
-    return { ok: false, message: sanitizeRpcError(sectionsError.message) };
+  const parsed = parseInstructorCourseTreePayload(data);
+  if (!parsed) {
+    return { ok: false, message: "Course tree payload is malformed." };
   }
-
-  const sectionRows = sections ?? [];
-  const sectionIds = sectionRows.map((s) => s.id as string);
-
-  let lessonRows: Array<Record<string, unknown>> = [];
-  if (sectionIds.length > 0) {
-    const { data: lessons, error: lessonsError } = await supabase
-      .from("learning_lessons")
-      .select("id, section_id, name, slug, status, position, description")
-      .in("section_id", sectionIds)
-      .order("position", { ascending: true });
-    if (lessonsError) {
-      return { ok: false, message: sanitizeRpcError(lessonsError.message) };
-    }
-    lessonRows = (lessons ?? []) as Array<Record<string, unknown>>;
-  }
-
-  const lessonIds = lessonRows.map((l) => l.id as string);
-  let activityRows: Array<Record<string, unknown>> = [];
-  if (lessonIds.length > 0) {
-    const { data: activities, error: activitiesError } = await supabase
-      .from("learning_activities")
-      .select("id, lesson_id, name, slug, status, position, type, description")
-      .in("lesson_id", lessonIds)
-      .order("position", { ascending: true });
-    if (activitiesError) {
-      return { ok: false, message: sanitizeRpcError(activitiesError.message) };
-    }
-    activityRows = (activities ?? []) as Array<Record<string, unknown>>;
-  }
-
-  const tree: InstructorCourseTree = {
-    course: course as InstructorAuthorableCourse,
-    sections: sectionRows.map((section) => {
-      const lessons = lessonRows
-        .filter((l) => l.section_id === section.id)
-        .map((lesson) => ({
-          id: lesson.id as string,
-          name: lesson.name as string,
-          slug: lesson.slug as string,
-          status: lesson.status as string,
-          position: lesson.position as number,
-          description: (lesson.description as string | null) ?? null,
-          activities: activityRows
-            .filter((a) => a.lesson_id === lesson.id)
-            .map((activity) => ({
-              id: activity.id as string,
-              name: activity.name as string,
-              slug: activity.slug as string,
-              status: activity.status as string,
-              position: activity.position as number,
-              type: activity.type as string,
-              description: (activity.description as string | null) ?? null,
-            })),
-        }));
-      return {
-        id: section.id as string,
-        name: section.name as string,
-        slug: section.slug as string,
-        status: section.status as string,
-        position: section.position as number,
-        description: (section.description as string | null) ?? null,
-        lessons,
-      };
-    }),
-  };
 
   return {
     ok: true,
-    data: { tree, canManage },
+    data: { tree: parsed.tree, canManage: parsed.canManage },
   };
 }
 

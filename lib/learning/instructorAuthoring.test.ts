@@ -1,14 +1,49 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   INSTRUCTOR_AUTHORING_EXCLUDED_OPERATIONS,
   INSTRUCTOR_AUTHORING_OPERATIONS,
   INSTRUCTOR_AUTHORING_RPC_BY_OPERATION,
+  LEARNING_INSTRUCTOR_COURSE_TREE_RPC,
   buildInstructorAuthoringRpcCall,
+  loadInstructorCourseTree,
+  parseInstructorCourseTreePayload,
 } from "./instructorAuthoring";
 import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
 import { LEARNING_LESSON_RPCS } from "./lessonsFoundation";
 import { LEARNING_ACTIVITY_RPCS } from "./activitiesFoundation";
 import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "./lessonContentBlocksFoundation";
+
+const ROOT = join(__dirname, "../..");
+const TREE_MIGRATION =
+  "supabase/migrations/20260861_learning_instructor_course_tree_read_v1.sql";
+const AUTHORING_SRC = readFileSync(
+  join(ROOT, "lib/learning/instructorAuthoring.ts"),
+  "utf8"
+);
+
+function read(rel: string) {
+  return readFileSync(join(ROOT, rel), "utf8");
+}
+
+function stripSqlComments(s: string) {
+  return s.replace(/--[^\n]*/g, "");
+}
+
+function fnBody(sql: string, name: string) {
+  const fnStarts = [
+    ...sql.matchAll(/create or replace function public\.(\w+)/g),
+  ];
+  const idx = fnStarts.findIndex((m) => m[1] === name);
+  if (idx < 0) throw new Error(`function ${name} not found`);
+  const start = fnStarts[idx].index ?? 0;
+  const end =
+    idx + 1 < fnStarts.length
+      ? (fnStarts[idx + 1].index ?? sql.length)
+      : sql.length;
+  return sql.slice(start, end);
+}
 
 const COURSE_ID = "11111111-1111-4111-8111-111111111111";
 const SECTION_ID = "22222222-2222-4222-8222-222222222222";
@@ -174,5 +209,157 @@ describe("Instructor Authoring Minimal V1 — input validation", () => {
       position: 99,
     });
     expect(r.ok).toBe(false);
+  });
+});
+
+describe("Instructor Course Tree Read RPC optimization V1", () => {
+  const sql = read(TREE_MIGRATION);
+  const fn = stripSqlComments(
+    fnBody(sql, "get_instructor_learning_course_tree")
+  );
+
+  it("defines SECURITY DEFINER tree RPC with single auth gate", () => {
+    expect(LEARNING_INSTRUCTOR_COURSE_TREE_RPC).toBe(
+      "get_instructor_learning_course_tree"
+    );
+    expect(sql).toMatch(
+      /create or replace function public\.get_instructor_learning_course_tree/
+    );
+    expect(fn).toMatch(/security definer/i);
+    expect(fn).toMatch(/can_manage_learning_course\(p_course_id, v_uid\)/);
+    expect(fn).toMatch(/is_learning_course_staff\(p_course_id, v_uid\)/);
+    expect(fn).toMatch(/learning_sections/);
+    expect(fn).toMatch(/learning_lessons/);
+    expect(fn).toMatch(/learning_activities/);
+    expect(fn).toMatch(/can_manage/);
+    expect(fn).not.toMatch(/learning_question_answer_keys/);
+    expect(fn).not.toMatch(/insert into/i);
+    expect(fn).not.toMatch(/update public\./i);
+    expect(fn).not.toMatch(/delete from/i);
+  });
+
+  it("revokes anon/public and grants authenticated + service_role", () => {
+    expect(sql).toMatch(
+      /revoke all on function public\.get_instructor_learning_course_tree\(uuid\)\s+from public, anon/i
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.get_instructor_learning_course_tree\(uuid\)\s+to authenticated/i
+    );
+    expect(sql).toMatch(
+      /grant execute on function public\.get_instructor_learning_course_tree\(uuid\)\s+to service_role/i
+    );
+  });
+
+  it("loadInstructorCourseTree uses the RPC and not chained table selects", () => {
+    const loadBody = AUTHORING_SRC.slice(
+      AUTHORING_SRC.indexOf("export async function loadInstructorCourseTree")
+    );
+    const nextExport = loadBody.indexOf("\nexport async function ", 1);
+    const body =
+      nextExport >= 0 ? loadBody.slice(0, nextExport) : loadBody;
+    expect(body).toContain("LEARNING_INSTRUCTOR_COURSE_TREE_RPC");
+    expect(body).toContain("p_course_id");
+    expect(body).not.toMatch(/\.from\(\s*["']learning_courses["']/);
+    expect(body).not.toMatch(/\.from\(\s*["']learning_sections["']/);
+    expect(body).not.toMatch(/\.from\(\s*["']learning_lessons["']/);
+    expect(body).not.toMatch(/\.from\(\s*["']learning_activities["']/);
+  });
+
+  it("parses nested tree payload and maps can_manage", () => {
+    const parsed = parseInstructorCourseTreePayload({
+      can_manage: true,
+      tree: {
+        course: {
+          id: COURSE_ID,
+          name: "Course",
+          slug: "course",
+          status: "draft",
+          program_id: SECTION_ID,
+          description: null,
+        },
+        sections: [
+          {
+            id: SECTION_ID,
+            name: "Section",
+            slug: "section",
+            status: "draft",
+            position: 0,
+            description: null,
+            lessons: [
+              {
+                id: LESSON_ID,
+                name: "Lesson",
+                slug: "lesson",
+                status: "draft",
+                position: 0,
+                description: null,
+                activities: [
+                  {
+                    id: ACTIVITY_ID,
+                    name: "Quiz",
+                    slug: "quiz",
+                    status: "draft",
+                    position: 0,
+                    type: "quiz",
+                    description: null,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    });
+    expect(parsed).not.toBeNull();
+    expect(parsed?.canManage).toBe(true);
+    expect(parsed?.tree.sections[0]?.lessons[0]?.activities[0]?.type).toBe(
+      "quiz"
+    );
+  });
+
+  it("loadInstructorCourseTree calls RPC once and returns tree", async () => {
+    const calls: string[] = [];
+    const fake = {
+      rpc: async (name: string, args: Record<string, unknown>) => {
+        calls.push(name);
+        expect(args).toEqual({ p_course_id: COURSE_ID });
+        return {
+          data: {
+            can_manage: false,
+            tree: {
+              course: {
+                id: COURSE_ID,
+                name: "Course",
+                slug: "course",
+                status: "draft",
+                program_id: SECTION_ID,
+                description: null,
+              },
+              sections: [],
+            },
+          },
+          error: null,
+        };
+      },
+      from: () => {
+        throw new Error("table select must not be used for course tree");
+      },
+    };
+
+    const loaded = await loadInstructorCourseTree(fake as never, COURSE_ID);
+    expect(loaded.ok).toBe(true);
+    if (loaded.ok) {
+      const data = loaded.data as {
+        tree: { course: { id: string }; sections: unknown[] };
+        canManage: boolean;
+      };
+      expect(data.canManage).toBe(false);
+      expect(data.tree.course.id).toBe(COURSE_ID);
+      expect(data.tree.sections).toEqual([]);
+    }
+    expect(calls).toEqual(["get_instructor_learning_course_tree"]);
+
+    const badId = await loadInstructorCourseTree(fake as never, "not-uuid");
+    expect(badId.ok).toBe(false);
   });
 });
