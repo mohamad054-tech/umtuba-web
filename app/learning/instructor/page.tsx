@@ -8,6 +8,7 @@ import {
   loadInstructorDashboard,
 } from "../../../lib/learning/instructorExperience";
 import { LEARNING_INSTRUCTOR_ROUTES } from "../../../lib/learning/instructorAuthoring";
+import { LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES } from "../../../lib/learning/instructorBootstrap";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +31,12 @@ export default async function InstructorDashboardPage() {
       backLabel="Learner hub"
     >
       <nav className="mt-4 flex flex-wrap gap-3 text-sm">
+        <Link
+          href={LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES.hub}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Create catalog
+        </Link>
         <Link
           href={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.reviewQueue}
           className="font-bold text-white underline underline-offset-2"
@@ -71,9 +78,18 @@ export default async function InstructorDashboardPage() {
           <section className="mt-10">
             <h2 className="text-lg font-bold text-white">Active courses</h2>
             {loaded.data.courses.length === 0 ? (
-              <p className="mt-3 text-sm text-white/55">
-                No manageable courses yet.
-              </p>
+              <div className="mt-3 space-y-3">
+                <p className="text-sm text-white/55">
+                  No manageable courses yet. Create a Space → Program → Course
+                  to start authoring.
+                </p>
+                <Link
+                  href={LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES.spaceNew}
+                  className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+                >
+                  Create Space
+                </Link>
+              </div>
             ) : (
               <ul className="mt-4 space-y-3">
                 {loaded.data.courses.map((course) => (
