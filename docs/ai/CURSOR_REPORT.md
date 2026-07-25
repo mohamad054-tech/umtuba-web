@@ -2,66 +2,74 @@
 
 ## Summary
 
-UM Games Hub / Runtime Foundation V1 **PASS** on
-`office/games-hub-runtime-foundation-v1`.
+Learner Experience Foundation V1 — Slice 1 (Hub Progress + Continue Learning)
+implemented on `office/learning-learner-experience-foundation-v1`.
 
-- Hub domain contracts from trusted Catalog entries
-- Fail-closed runtime eligibility
-- Runtime lifecycle: created/active/paused/completed/abandoned/expired
-- Start / resume / completion handoff / abandon / expiry (idempotent)
-- Authority closed: no game server, rewards, client authority, multiplayer,
-  matchmaking, migrations, public API, production endpoints
-- Did not modify Platform/Catalog foundations, Learning, Ads, Store, World
-- Not committed
+`LearningLearnerHubCourse` now carries `progress` from
+`get_learning_course_progress` and a fail-closed `continue_href` from
+`resolveContinueLearningTarget()` (prefer `last_lesson_id`, else first
+published lesson). `LearningHub` shows a Continue Learning card, per-course
+percent, and Resume buttons. No migrations; no instructor changes.
 
 ## Exact files changed
 
-- `lib/games/gamesHubRuntime.ts` (new)
-- `lib/games/gamesHubRuntime.test.ts` (new)
-- `docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md` (new)
+- `lib/learning/learnerDelivery.ts`
+- `lib/learning/learnerDelivery.test.ts`
+- `app/components/learning/LearningHub.tsx`
+- `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None — **NO MIGRATION REQUIRED**
+None.
 
 ## Security review
 
-- Catalog is sole authority for status/availability
-- Client forged authoritative claim fields rejected
-- Completion handoff `grantsRewards: false`, `applied: false`
-- Owner mismatch / terminal / unavailable reconnect rejected
-- Double active session rejected
-- No UI / public API / production runtime endpoint
+- Reuses existing JWT client + entitlement RLS + `get_learning_course_progress`.
+- No service role; no scoring / answer-key / result-table access added.
+- Continue target fail-closed when no lesson id is available.
+- Hub still only surfaces published enrollments/courses/lessons.
 
 ## Tests
 
-- `npx vitest run lib/games` — 60/60 pass (Foundation 27 + Catalog 18 + Hub 15)
+```text
+npx vitest run lib/learning/learnerDelivery.test.ts
+✓ 22 passed (22)
+```
+
+New coverage: continue target resolution + hub progress enrichment (mock RPC).
 
 ## TypeScript
 
-- `npx tsc --noEmit` — pass
+`npx tsc --noEmit` reports pre-existing errors under
+`app/learning/instructor/lessons/...` (missing instructorAuthoring exports /
+component paths). No new errors attributed to Slice 1 learner hub files;
+lints clean on changed files.
 
 ## Build
 
-- `npm run build` — pass
+Not run (UI change limited to existing Learning hub component; task did not
+require full build).
 
 ## git diff --check
 
-- clean
+PASS (exit 0).
 
 ## git status --short
 
-```
+```text
+ M app/components/learning/LearningHub.tsx
  M docs/ai/CURRENT_TASK.md
+ M lib/learning/learnerDelivery.test.ts
+ M lib/learning/learnerDelivery.ts
+?? docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md
  M docs/ai/CURSOR_REPORT.md
-?? docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md
-?? lib/games/gamesHubRuntime.ts
-?? lib/games/gamesHubRuntime.test.ts
 ```
 
 ## Open issues
 
-- Commit / push pending explicit user request
-- No DB wiring / UI / playable games in this slice
+- Not committed / not pushed (awaiting explicit approval).
+- Do not merge to `alpha-0.2` until requested.
+- Later slices: next/prev lesson navigation, activity type routing.
+- Full-project `tsc` still fails on pre-existing instructor lesson page issues.

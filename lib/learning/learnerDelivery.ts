@@ -70,6 +70,15 @@ export type LearningLearnerHubProgram = {
   enrollment_id: string;
 };
 
+/** Course-level progress attached on the My Learning hub. */
+export type LearningLearnerHubCourseProgress = {
+  status: LearningProgressStatus;
+  completed_lessons_count: number;
+  total_lessons_count: number;
+  percent_complete: number;
+  last_lesson_id: string | null;
+};
+
 export type LearningLearnerHubCourse = {
   id: string;
   name: string;
@@ -79,12 +88,42 @@ export type LearningLearnerHubCourse = {
   program_name: string | null;
   enrollment_id: string | null;
   via: "course_enrollment" | "program_enrollment";
+  /** Null when the progress RPC is unavailable for this course. */
+  progress: LearningLearnerHubCourseProgress | null;
+  /**
+   * Resume target from {@link resolveContinueLearningTarget}.
+   * Null when no last lesson and no published lesson exists (fail closed).
+   */
+  continue_href: string | null;
 };
 
 export type LearningLearnerHub = {
   programs: LearningLearnerHubProgram[];
   courses: LearningLearnerHubCourse[];
 };
+
+export type LearningContinueLearningTarget = {
+  lesson_id: string;
+  href: string;
+};
+
+/**
+ * Resolve a Continue Learning resume target.
+ * Prefers last_lesson_id; otherwise the first available published lesson.
+ * Fail closed when neither exists.
+ */
+export function resolveContinueLearningTarget(input: {
+  last_lesson_id: string | null | undefined;
+  first_lesson_id: string | null | undefined;
+}): LearningContinueLearningTarget | null {
+  const lessonId =
+    asString(input.last_lesson_id) ?? asString(input.first_lesson_id);
+  if (!lessonId) return null;
+  return {
+    lesson_id: lessonId,
+    href: LEARNING_LEARNER_ROUTES.lesson(lessonId),
+  };
+}
 
 export type LearningLearnerOutlineLesson = {
   id: string;
@@ -437,6 +476,8 @@ export async function loadMyLearningHub(
         program_name: programNameById.get(programId) ?? null,
         enrollment_id: programEnrollmentIds.get(programId) ?? null,
         via: "program_enrollment",
+        progress: null,
+        continue_href: null,
       });
     }
   }
@@ -488,6 +529,8 @@ export async function loadMyLearningHub(
         program_name: programNameById.get(programId) ?? null,
         enrollment_id: courseEnrollmentIds.get(cid) ?? null,
         via: "course_enrollment",
+        progress: null,
+        continue_href: null,
       });
     }
   }
@@ -496,7 +539,112 @@ export async function loadMyLearningHub(
   programs.sort((a, b) => a.name.localeCompare(b.name));
 
   void courseIds;
+
+  const hubCourseIds = courses.map((c) => c.id);
+  const firstLessonByCourse = await loadFirstPublishedLessonIdsByCourse(
+    supabase,
+    hubCourseIds
+  );
+
+  for (const course of courses) {
+    const { data: courseProgressRaw, error: progressError } =
+      await supabase.rpc(LEARNING_PROGRESS_RPCS.getCourseProgress, {
+        p_course_id: course.id,
+      });
+    if (!progressError && courseProgressRaw) {
+      course.progress = parseHubCourseProgress(courseProgressRaw);
+    }
+
+    const target = resolveContinueLearningTarget({
+      last_lesson_id: course.progress?.last_lesson_id ?? null,
+      first_lesson_id: firstLessonByCourse.get(course.id) ?? null,
+    });
+    course.continue_href = target?.href ?? null;
+  }
+
   return { ok: true, data: { programs, courses } };
+}
+
+function parseHubCourseProgress(
+  raw: unknown
+): LearningLearnerHubCourseProgress | null {
+  const p = asRecord(raw);
+  if (!p) return null;
+  const status = asString(p.status) as LearningProgressStatus | null;
+  if (
+    status !== "not_started" &&
+    status !== "in_progress" &&
+    status !== "completed"
+  ) {
+    return null;
+  }
+  return {
+    status,
+    completed_lessons_count: asNumberOrNull(p.completed_lessons_count) ?? 0,
+    total_lessons_count: asNumberOrNull(p.total_lessons_count) ?? 0,
+    percent_complete: asNumberOrNull(p.percent_complete) ?? 0,
+    last_lesson_id: asString(p.last_lesson_id),
+  };
+}
+
+/** First published lesson per course (section position, then lesson position). */
+async function loadFirstPublishedLessonIdsByCourse(
+  supabase: AnyClient,
+  courseIds: string[]
+): Promise<Map<string, string>> {
+  const firstByCourse = new Map<string, string>();
+  if (courseIds.length === 0) return firstByCourse;
+
+  const { data: sections, error: sectionError } = await supabase
+    .from("learning_sections")
+    .select("id, course_id, position, status")
+    .in("course_id", courseIds)
+    .eq("status", "published")
+    .order("position", { ascending: true });
+  if (sectionError || !sections?.length) return firstByCourse;
+
+  const sectionCourse = new Map<string, string>();
+  const sectionIds: string[] = [];
+  for (const s of sections) {
+    const sid = asString(s.id);
+    const courseId = asString(s.course_id);
+    if (!sid || !courseId) continue;
+    sectionCourse.set(sid, courseId);
+    sectionIds.push(sid);
+  }
+  if (sectionIds.length === 0) return firstByCourse;
+
+  const { data: lessons, error: lessonError } = await supabase
+    .from("learning_lessons")
+    .select("id, section_id, position, status")
+    .in("section_id", sectionIds)
+    .eq("status", "published")
+    .order("position", { ascending: true });
+  if (lessonError || !lessons?.length) return firstByCourse;
+
+  // Sections were ordered by position; keep that order when picking first lesson.
+  const lessonsBySection = new Map<string, Array<{ id: string; position: number }>>();
+  for (const lesson of lessons) {
+    const lid = asString(lesson.id);
+    const sectionId = asString(lesson.section_id);
+    if (!lid || !sectionId) continue;
+    const list = lessonsBySection.get(sectionId) ?? [];
+    list.push({ id: lid, position: asNumberOrNull(lesson.position) ?? 0 });
+    lessonsBySection.set(sectionId, list);
+  }
+  for (const list of lessonsBySection.values()) {
+    list.sort((a, b) => a.position - b.position);
+  }
+
+  for (const s of sections) {
+    const sid = asString(s.id);
+    const courseId = sid ? sectionCourse.get(sid) : null;
+    if (!sid || !courseId || firstByCourse.has(courseId)) continue;
+    const firstLesson = lessonsBySection.get(sid)?.[0];
+    if (firstLesson) firstByCourse.set(courseId, firstLesson.id);
+  }
+
+  return firstByCourse;
 }
 
 export async function loadCourseOutline(

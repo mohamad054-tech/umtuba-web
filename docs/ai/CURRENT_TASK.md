@@ -2,34 +2,36 @@
 
 ## Task title
 
-UMTUBA — UM Games Hub / Runtime Foundation V1
+UMTUBA Learning — Learner Experience Foundation V1 — Slice 1
 
 ## Goal
 
-Implement Games Hub / Runtime Foundation V1 contracts only (eligibility,
-lifecycle, start/resume/completion/abandon) on branch
-`office/games-hub-runtime-foundation-v1`, without playable games, multiplayer,
-economy, UI, public APIs, merge, or migration apply.
+Implement Hub Progress + Continue Learning on branch
+`office/learning-learner-experience-foundation-v1`: enrich
+`loadMyLearningHub` with `get_learning_course_progress`, add
+`resolveContinueLearningTarget()`, and surface Continue Learning + resume
+in `LearningHub`. No migrations, no schema changes, no instructor changes.
 
 ## Allowed scope
 
-- `lib/games/gamesHubRuntime.ts`
-- `lib/games/gamesHubRuntime.test.ts`
-- `docs/games/implementation/GAMES_HUB_RUNTIME_FOUNDATION_V1.md`
+- `lib/learning/learnerDelivery.ts`
+- `lib/learning/learnerDelivery.test.ts`
+- `app/components/learning/LearningHub.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md` (optional)
 
 ## Forbidden scope
 
-- Learning / Ads / Store / World / Financial / Social
-- Modifying Platform or Catalog foundations / migrations
-- Games Hub UI, public APIs, production runtime endpoints
-- Kick Blast or other playable games
+- Migrations / Supabase schema
+- Unrelated Learning foundations
+- Instructor flows
+- Next-lesson navigation / activity type routing (later slices)
 - Commit / push / merge / migration apply unless explicitly requested
 
 ## Branch
 
-`office/games-hub-runtime-foundation-v1`
+`office/learning-learner-experience-foundation-v1`
 
 ## Status
 
