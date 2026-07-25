@@ -11,6 +11,9 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ lessonId: string }> | { lessonId: string };
+  searchParams?:
+    | Promise<{ error?: string; completed?: string }>
+    | { error?: string; completed?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -19,8 +22,12 @@ export async function generateMetadata({ params }: PageProps) {
   return { title: `Lesson · Learning | UMTUBA` };
 }
 
-export default async function LearningLessonPage({ params }: PageProps) {
+export default async function LearningLessonPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { lessonId } = await Promise.resolve(params);
+  const query = await Promise.resolve(searchParams ?? {});
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -41,6 +48,24 @@ export default async function LearningLessonPage({ params }: PageProps) {
       backHref={LEARNING_LEARNER_ROUTES.course(delivery.data.lesson.course_id)}
       backLabel="Course outline"
     >
+      {query.completed === "1" ? (
+        <p
+          role="status"
+          className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
+        >
+          Lesson marked complete.
+        </p>
+      ) : null}
+
+      {query.error ? (
+        <p
+          role="alert"
+          className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+        >
+          {query.error}
+        </p>
+      ) : null}
+
       <LessonViewer delivery={delivery.data} />
     </LearningShell>
   );

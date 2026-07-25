@@ -1,7 +1,11 @@
 import Link from "next/link";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 import ActivityList from "./ActivityList";
-import type { LearningLearnerLessonDelivery } from "../../../lib/learning/learnerDelivery";
+import {
+  resolveLessonCompletionHandoff,
+  type LearningLearnerLessonDelivery,
+} from "../../../lib/learning/learnerDelivery";
+import { completeLearningLessonAction } from "../../learning/progressActions";
 
 type LessonViewerProps = {
   delivery: LearningLearnerLessonDelivery;
@@ -9,6 +13,11 @@ type LessonViewerProps = {
 
 export default function LessonViewer({ delivery }: LessonViewerProps) {
   const hasNav = Boolean(delivery.previous_lesson || delivery.next_lesson);
+  const handoff = resolveLessonCompletionHandoff({
+    progress_status: delivery.progress_status,
+    next_lesson: delivery.next_lesson,
+    course_id: delivery.lesson.course_id,
+  });
 
   return (
     <div className="mt-6 space-y-6">
@@ -48,6 +57,46 @@ export default function LessonViewer({ delivery }: LessonViewerProps) {
         </h2>
         <ActivityList activities={delivery.activities} />
       </section>
+
+      {handoff?.kind === "mark_complete" ? (
+        <form action={completeLearningLessonAction} className="pt-2">
+          <input type="hidden" name="lessonId" value={delivery.lesson.id} />
+          <button
+            type="submit"
+            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+          >
+            Mark lesson complete
+          </button>
+        </form>
+      ) : null}
+
+      {handoff?.kind === "continue_next" ? (
+        <div className="pt-2">
+          <Link
+            href={handoff.next_lesson.href}
+            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+          >
+            Continue
+          </Link>
+        </div>
+      ) : null}
+
+      {handoff?.kind === "course_complete" ? (
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <Link
+            href={handoff.course_href}
+            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+          >
+            Back to course
+          </Link>
+          <Link
+            href={handoff.transcript_href}
+            className="watch-focus-ring inline-flex rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
+          >
+            Transcript
+          </Link>
+        </div>
+      ) : null}
 
       {hasNav ? (
         <nav

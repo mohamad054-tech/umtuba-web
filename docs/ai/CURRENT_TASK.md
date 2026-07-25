@@ -2,26 +2,25 @@
 
 ## Task title
 
-UMTUBA Learning — Learner Experience Foundation V1 — Slice 3
+UMTUBA Learning — Learner Experience Foundation V1 — Slice 4
 
 ## Goal
 
-Implement Learner Activity Routing on branch
+Implement Lesson Completion Experience V1 on branch
 `office/learning-learner-experience-foundation-v1`: add
-`resolveLearnerActivityTarget()`, wire `ActivityList` and the generic activity
-gate so `quiz` opens assessment, `assignment` opens assignment, and other
-types keep the generic gate. Fix assessment/assignment back links to the
-lesson to avoid redirect loops. No migrations, no instructor changes, no
-engine changes, no completion mutations.
+`completeMyLearningLesson()` over existing `complete_learning_lesson`,
+`resolveLessonCompletionHandoff()`, wire `LessonViewer` mark-complete /
+continue / end-of-course CTAs, and a server action with auth + redirect.
+No migrations, no instructor changes, no assessment engine changes, no
+reopen flow, no direct DB writes.
 
 ## Allowed scope
 
 - `lib/learning/learnerDelivery.ts`
 - `lib/learning/learnerDelivery.test.ts`
-- `app/components/learning/ActivityList.tsx`
-- `app/learning/activities/[activityId]/page.tsx`
-- `app/learning/activities/[activityId]/assessment/page.tsx` (back links only)
-- `app/learning/activities/[activityId]/assignment/page.tsx` (back links only)
+- `app/learning/progressActions.ts` (new)
+- `app/components/learning/LessonViewer.tsx`
+- `app/learning/lessons/[lessonId]/page.tsx` (query status only)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md`
@@ -31,7 +30,8 @@ engine changes, no completion mutations.
 - Migrations / Supabase schema
 - Assessment / assignment engine modules (RPCs, adapters, attempt logic)
 - Instructor flows
-- Completion mutation changes
+- Direct writes to progress tables
+- `reopen_learning_lesson` / reopen UI
 - Unrelated Learning foundations / learner dashboard extras
 - Commit / push / merge / migration apply unless explicitly requested
 

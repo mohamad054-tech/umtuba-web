@@ -20,6 +20,7 @@ import {
   LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES,
   type LearningLessonContentBlock,
 } from "./lessonContentBlocksFoundation";
+import { LEARNING_COMPLETION_ROUTES } from "./completionFoundation";
 import { LEARNING_PROGRESS_RPCS } from "./progressFoundation";
 import type { LearningProgressStatus } from "./progressFoundation";
 import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
@@ -124,6 +125,25 @@ export type LearningAdjacentLessonTargets = {
   next: LearningLessonNavTarget | null;
 };
 
+/** Post-lesson-completion CTA target for the learner lesson viewer. */
+export type LearningLessonCompletionHandoff =
+  | { kind: "mark_complete" }
+  | { kind: "continue_next"; next_lesson: LearningLessonNavTarget }
+  | {
+      kind: "course_complete";
+      course_href: string;
+      transcript_href: string;
+    };
+
+/** Parsed view from `complete_learning_lesson`. */
+export type LearningLessonCompleteView = {
+  lesson_id: string;
+  lesson_status: LearningProgressStatus;
+  course_id: string | null;
+  course_status: LearningProgressStatus | null;
+  percent_complete: number | null;
+};
+
 /** Learner activity experience vertical resolved from activity type. */
 export type LearningLearnerActivityExperience =
   | "assessment"
@@ -222,6 +242,41 @@ export function resolveAdjacentLessonTargets(input: {
           href: LEARNING_LEARNER_ROUTES.lesson(nextId),
         }
       : null,
+  };
+}
+
+/**
+ * Resolve the learner CTA after (or before) lesson completion.
+ * Incomplete → mark_complete; completed + next → continue_next;
+ * completed + no next → course_complete. Fail closed when completed
+ * but course_id is missing.
+ */
+export function resolveLessonCompletionHandoff(input: {
+  progress_status: LearningProgressStatus | string | null | undefined;
+  next_lesson: LearningLessonNavTarget | null | undefined;
+  course_id: string | null | undefined;
+}): LearningLessonCompletionHandoff | null {
+  const status = asString(input.progress_status);
+  if (status !== "completed") {
+    return { kind: "mark_complete" };
+  }
+
+  const nextId = asString(input.next_lesson?.lesson_id);
+  const nextHref = asString(input.next_lesson?.href);
+  if (nextId && nextHref) {
+    return {
+      kind: "continue_next",
+      next_lesson: { lesson_id: nextId, href: nextHref },
+    };
+  }
+
+  const courseId = asString(input.course_id);
+  if (!courseId) return null;
+
+  return {
+    kind: "course_complete",
+    course_href: LEARNING_LEARNER_ROUTES.course(courseId),
+    transcript_href: LEARNING_COMPLETION_ROUTES.transcript,
   };
 }
 
@@ -339,9 +394,73 @@ const CREATABLE_BLOCK_TYPES = new Set<string>(
   LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES
 );
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const LEARNING_PROGRESS_STATUS_SET = new Set<string>([
+  "not_started",
+  "in_progress",
+  "completed",
+]);
+
 function errMessage(error: { message?: string } | null, fallback: string) {
   const msg = error?.message?.trim();
   return msg && msg.length > 0 ? msg : fallback;
+}
+
+export function isLearningLessonDeliveryUuid(value: string): boolean {
+  return UUID_RE.test(value);
+}
+
+export function sanitizeLearningLessonCompletionError(
+  message: string | undefined
+): string {
+  const raw = (message ?? "").trim();
+  if (!raw) return "Lesson could not be marked complete.";
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("authentication required") ||
+    lower.includes("not entitled") ||
+    lower.includes("not allowed")
+  ) {
+    return "You are not allowed to complete this lesson.";
+  }
+  if (lower.includes("min_completion_seconds")) {
+    return "This lesson cannot be completed yet. Please spend a bit more time on it.";
+  }
+  if (lower.includes("malformed") || lower.includes("not found")) {
+    return "Lesson completion is unavailable or invalid.";
+  }
+  if (raw.length > 180) return "Lesson could not be marked complete.";
+  return raw;
+}
+
+function asProgressStatus(value: unknown): LearningProgressStatus | null {
+  const status = asString(value);
+  if (!status || !LEARNING_PROGRESS_STATUS_SET.has(status)) return null;
+  return status as LearningProgressStatus;
+}
+
+export function parseLearningLessonCompleteView(
+  raw: unknown,
+  expectedLessonId?: string
+): LearningLessonCompleteView | null {
+  const row = asRecord(raw);
+  if (!row) return null;
+  const lesson = asRecord(row.lesson_progress);
+  const course = asRecord(row.course_progress);
+  if (!lesson) return null;
+  const lesson_id = asString(lesson.lesson_id);
+  const lesson_status = asProgressStatus(lesson.status);
+  if (!lesson_id || !lesson_status) return null;
+  if (expectedLessonId && lesson_id !== expectedLessonId) return null;
+  return {
+    lesson_id,
+    lesson_status,
+    course_id: asString(course?.course_id),
+    course_status: asProgressStatus(course?.status),
+    percent_complete: asNumberOrNull(course?.percent_complete),
+  };
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -1307,12 +1426,41 @@ export async function cancelLearningAttempt(
   };
 }
 
+/**
+ * Mark the current learner's lesson complete via existing progress RPC.
+ * Idempotent. Does not reopen; does not write progress tables directly.
+ */
+export async function completeMyLearningLesson(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<LearningDeliveryResult<LearningLessonCompleteView>> {
+  if (!isLearningLessonDeliveryUuid(lessonId)) {
+    return { ok: false, message: "lesson_id must be a valid UUID" };
+  }
+  const { data, error } = await supabase.rpc(
+    LEARNING_PROGRESS_RPCS.completeLesson,
+    { p_lesson_id: lessonId }
+  );
+  if (error) {
+    return {
+      ok: false,
+      message: sanitizeLearningLessonCompletionError(error.message),
+    };
+  }
+  const parsed = parseLearningLessonCompleteView(data, lessonId);
+  if (!parsed) {
+    return { ok: false, message: "Lesson completion payload is malformed." };
+  }
+  return { ok: true, data: parsed };
+}
+
 /** Documented RPC surface this slice may call. */
 export const LEARNING_LEARNER_DELIVERY_RPCS = {
   attempts: LEARNING_ATTEMPT_RPCS,
   progress: {
     startLesson: LEARNING_PROGRESS_RPCS.startLesson,
     touchLesson: LEARNING_PROGRESS_RPCS.touchLesson,
+    completeLesson: LEARNING_PROGRESS_RPCS.completeLesson,
     getCourseProgress: LEARNING_PROGRESS_RPCS.getCourseProgress,
   },
   enrollments: {

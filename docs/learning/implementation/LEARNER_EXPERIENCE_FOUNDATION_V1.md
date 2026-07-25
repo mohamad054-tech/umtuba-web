@@ -1,6 +1,6 @@
 # UM Learning — Learner Experience Foundation V1
 
-Status: **Slice 3 implemented** (Learner Activity Routing)
+Status: **Slice 4 implemented** (Lesson Completion Experience)
 
 Branch: `office/learning-learner-experience-foundation-v1`
 
@@ -85,3 +85,38 @@ No migrations. No instructor or engine changes.
 
 Learner dashboard extras, migrations, instructor changes, completion
 mutations, assessment/assignment engine changes.
+
+## Slice 4 — Lesson Completion Experience
+
+### Goal
+
+Let learners mark a lesson complete, continue to the next lesson, or
+hand off at end-of-course. Reuse existing `complete_learning_lesson`.
+No migrations. No reopen. No assessment-engine completion path changes.
+
+### Behavior
+
+| Concern | Strategy |
+| --- | --- |
+| Adapter | `completeMyLearningLesson()` → `complete_learning_lesson` |
+| Handoff | `resolveLessonCompletionHandoff({ progress_status, next_lesson, course_id })` |
+| Incomplete | → `mark_complete` |
+| Completed + next | → `continue_next` with next lesson href |
+| Completed + no next | → `course_complete` with course + transcript hrefs |
+| Fail closed | Missing course_id when completed + no next → null |
+| Action | `completeLearningLessonAction` — auth, empty id → hub, redirect `?completed=1` / `?error=` |
+| UI | Mark complete / Continue / Back to course + Transcript; keep Previous/Next |
+
+### Files
+
+- `lib/learning/learnerDelivery.ts`
+- `lib/learning/learnerDelivery.test.ts`
+- `app/learning/progressActions.ts`
+- `app/components/learning/LessonViewer.tsx`
+- `app/learning/lessons/[lessonId]/page.tsx` (query status)
+
+### Out of scope
+
+Migrations, instructor changes, assessment engine / scored_attempt path,
+`reopen_learning_lesson`, direct progress table writes, auto-finalize
+certificate from the lesson CTA.

@@ -16,18 +16,23 @@ import {
 import { LEARNING_ATTEMPT_RPCS } from "./attemptsFoundation";
 import { LEARNING_PROGRESS_RPCS } from "./progressFoundation";
 import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
+import { LEARNING_COMPLETION_ROUTES } from "./completionFoundation";
 import {
   LEARNING_LEARNER_DELIVERY_RPCS,
   LEARNING_LEARNER_FORBIDDEN,
   LEARNING_LEARNER_ROUTES,
   LEARNING_LEARNER_SUBMITTED_MESSAGE,
   attemptStatusMessage,
+  completeMyLearningLesson,
   filterPublishedCreatableBlocks,
   isAttemptInputLocked,
   loadMyLearningHub,
+  parseLearningLessonCompleteView,
   resolveAdjacentLessonTargets,
   resolveContinueLearningTarget,
   resolveLearnerActivityTarget,
+  resolveLessonCompletionHandoff,
+  sanitizeLearningLessonCompletionError,
   toLearnerActivityHints,
 } from "./learnerDelivery";
 import type { LearningLessonContentBlock } from "./lessonContentBlocksFoundation";
@@ -153,6 +158,9 @@ describe("Learner Delivery V1 — security denylist", () => {
     );
     expect(LEARNING_LEARNER_DELIVERY_RPCS.progress.touchLesson).toBe(
       LEARNING_PROGRESS_RPCS.touchLesson
+    );
+    expect(LEARNING_LEARNER_DELIVERY_RPCS.progress.completeLesson).toBe(
+      LEARNING_PROGRESS_RPCS.completeLesson
     );
     expect(LEARNING_LEARNER_DELIVERY_RPCS.progress.getCourseProgress).toBe(
       LEARNING_PROGRESS_RPCS.getCourseProgress
@@ -671,7 +679,195 @@ describe("Learner Experience V1 — adjacent lesson navigation", () => {
     expect(ui).toMatch(/next_lesson/);
     expect(ui).toMatch(/Previous/);
     expect(ui).toMatch(/Next/);
+  });
+});
+
+describe("Learner Experience V1 — lesson completion handoff", () => {
+  const COURSE_ID = "22222222-2222-4222-8222-222222222222";
+  const LESSON_ID = "11111111-1111-4111-8111-111111111111";
+  const NEXT = {
+    lesson_id: "lesson-b",
+    href: LEARNING_LEARNER_ROUTES.lesson("lesson-b"),
+  };
+
+  it("incomplete status resolves to mark_complete", () => {
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "not_started",
+        next_lesson: NEXT,
+        course_id: COURSE_ID,
+      })
+    ).toEqual({ kind: "mark_complete" });
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "in_progress",
+        next_lesson: null,
+        course_id: COURSE_ID,
+      })
+    ).toEqual({ kind: "mark_complete" });
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: null,
+        next_lesson: NEXT,
+        course_id: COURSE_ID,
+      })
+    ).toEqual({ kind: "mark_complete" });
+  });
+
+  it("completed with next lesson resolves to continue_next", () => {
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "completed",
+        next_lesson: NEXT,
+        course_id: COURSE_ID,
+      })
+    ).toEqual({ kind: "continue_next", next_lesson: NEXT });
+  });
+
+  it("completed with no next lesson resolves to course_complete", () => {
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "completed",
+        next_lesson: null,
+        course_id: COURSE_ID,
+      })
+    ).toEqual({
+      kind: "course_complete",
+      course_href: LEARNING_LEARNER_ROUTES.course(COURSE_ID),
+      transcript_href: LEARNING_COMPLETION_ROUTES.transcript,
+    });
+  });
+
+  it("completed without course_id fails closed to null", () => {
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "completed",
+        next_lesson: null,
+        course_id: "",
+      })
+    ).toBeNull();
+    expect(
+      resolveLessonCompletionHandoff({
+        progress_status: "completed",
+        next_lesson: { lesson_id: "", href: "" },
+        course_id: null,
+      })
+    ).toBeNull();
+  });
+
+  it("allowlist includes completeLesson RPC", () => {
+    expect(LEARNING_LEARNER_DELIVERY_RPCS.progress.completeLesson).toBe(
+      "complete_learning_lesson"
+    );
+    expect(LEARNING_LEARNER_DELIVERY_RPCS.progress.completeLesson).toBe(
+      LEARNING_PROGRESS_RPCS.completeLesson
+    );
+  });
+
+  it("sanitizes completion errors", () => {
+    expect(sanitizeLearningLessonCompletionError(undefined)).toBe(
+      "Lesson could not be marked complete."
+    );
+    expect(
+      sanitizeLearningLessonCompletionError("Authentication required")
+    ).toBe("You are not allowed to complete this lesson.");
+    expect(
+      sanitizeLearningLessonCompletionError("Not entitled to this course")
+    ).toBe("You are not allowed to complete this lesson.");
+    expect(
+      sanitizeLearningLessonCompletionError(
+        "Lesson cannot be completed before min_completion_seconds (30)"
+      )
+    ).toMatch(/spend a bit more time/i);
+    expect(
+      sanitizeLearningLessonCompletionError("x".repeat(200))
+    ).toBe("Lesson could not be marked complete.");
+  });
+
+  it("parses complete payload and rejects malformed / mismatched ids", () => {
+    const ok = parseLearningLessonCompleteView(
+      {
+        lesson_progress: {
+          lesson_id: LESSON_ID,
+          status: "completed",
+        },
+        course_progress: {
+          course_id: COURSE_ID,
+          status: "in_progress",
+          percent_complete: 50,
+        },
+      },
+      LESSON_ID
+    );
+    expect(ok).toEqual({
+      lesson_id: LESSON_ID,
+      lesson_status: "completed",
+      course_id: COURSE_ID,
+      course_status: "in_progress",
+      percent_complete: 50,
+    });
+    expect(parseLearningLessonCompleteView(null)).toBeNull();
+    expect(
+      parseLearningLessonCompleteView(
+        {
+          lesson_progress: { lesson_id: LESSON_ID, status: "completed" },
+          course_progress: {},
+        },
+        "99999999-9999-4999-8999-999999999999"
+      )
+    ).toBeNull();
+  });
+
+  it("completeMyLearningLesson rejects invalid UUID without RPC", async () => {
+    const result = await completeMyLearningLesson(
+      { rpc: async () => ({ data: null, error: null }) } as never,
+      "not-a-uuid"
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/valid UUID/i);
+    }
+  });
+
+  it("completeMyLearningLesson maps RPC errors through sanitizer", async () => {
+    const result = await completeMyLearningLesson(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Not entitled to this course" },
+        }),
+      } as never,
+      LESSON_ID
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe(
+        "You are not allowed to complete this lesson."
+      );
+    }
+  });
+
+  it("LessonViewer and progress action wire completion CTA", () => {
+    const ui = read("app/components/learning/LessonViewer.tsx");
+    expect(ui).toMatch(/resolveLessonCompletionHandoff/);
+    expect(ui).toMatch(/completeLearningLessonAction/);
+    expect(ui).toMatch(/Mark lesson complete/);
+    expect(ui).toMatch(/Continue/);
+    expect(ui).toMatch(/Back to course/);
+    expect(ui).toMatch(/Transcript/);
+    expect(ui).toMatch(/Previous/);
+    expect(ui).toMatch(/Next/);
     expect(ui).not.toMatch(/complete_learning_lesson/);
+    expect(ui).not.toMatch(/reopen_learning_lesson/);
+
+    const actions = read("app/learning/progressActions.ts");
+    expect(actions).toMatch(/completeMyLearningLesson/);
+    expect(actions).toMatch(/getServerUser/);
+    expect(actions).toMatch(/completed=1/);
+    expect(actions).toMatch(/\?error=/);
+    expect(existsSync(join(ROOT, "app/learning/progressActions.ts"))).toBe(
+      true
+    );
   });
 });
 
