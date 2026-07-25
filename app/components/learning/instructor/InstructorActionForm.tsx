@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { InstructorAuthoringResult } from "../../../../lib/learning/instructorAuthoring";
+import { resetInstructorActionForm } from "../../../../lib/learning/instructorActionForm";
 
 type Props = {
   action: (formData: FormData) => Promise<InstructorAuthoringResult>;
@@ -27,14 +28,15 @@ export default function InstructorActionForm({
       className={className}
       onSubmit={(event) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
+        const form = event.currentTarget;
+        const formData = new FormData(form);
         setMessage(null);
         startTransition(async () => {
           const result = await action(formData);
           if (result.ok) {
             setIsError(false);
             setMessage(successMessage);
-            event.currentTarget.reset();
+            resetInstructorActionForm(form);
           } else {
             setIsError(true);
             setMessage(result.message);
