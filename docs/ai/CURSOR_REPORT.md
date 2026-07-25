@@ -57,3 +57,17 @@ Expect after push: only untracked `scripts/learning/` junk (`.tmp-*`, logs, IMPO
 2. Video Preview streaming — out of scope for V1.
 3. Catalog diagnosis (optional context): published course returns HTTP 200 locally; earlier not-found was likely pre-publish data eligibility. Soft 404 for unknown slugs is Next 16 behavior (HTTP 200 + not-found UI).
 
+---
+
+## Preserved appendix — Watch Controls V2 (from local `93a1144`)
+
+Watch Controls V2 real-device bugfix **PASS** on `umtuba-mobile` (not committed, APK not rebuilt).
+
+- Scrub uses `pageX` − `measureInWindow` track x; grant/move/release apply
+- Responder capture + FlatList `scrollEnabled` disabled while scrubbing
+- Seek ignored when `duration <= 0`; local scrub ratio held until catch-up
+- Auto-next uses measured list height + `scrollToOffset` + viewability lock
+- Volume wider/taller, 5% quantization, mute/volume still persisted
+- Prefs still store mute/volume/auto-next only; inactive cards remain forced silent
+
+Validation: `npm test` **127/127** · `tsc` **PASS** · APK rebuild out of scope.

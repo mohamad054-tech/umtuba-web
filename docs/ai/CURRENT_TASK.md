@@ -43,3 +43,17 @@ Untracked under `scripts/learning/`: `.tmp-*.sql`, `*.log`, `IMPORT_*.json`, ad-
 
 No active implementation scope. Next session: sync `alpha-0.2` from origin before new work.
 
+---
+
+## Preserved handoff (from local `93a1144`)
+
+**UMTUBA Mobile — Fix Watch Controls V2 Real Device Bugs** (`complete` — PASS, not committed, APK not rebuilt)
+
+Scope on `umtuba-mobile` / `master`:
+
+- `components/WatchVideoCard.tsx`
+- `app/(tabs)/watch.tsx`
+- `src/lib/watch/playerSession.ts` + tests
+- `src/lib/watch/playbackPolicy.ts` + tests
+
+Validation at that handoff: `npm test` 127/127 PASS · `tsc` PASS · no APK rebuild.
