@@ -78,9 +78,14 @@ export function isMobilePrimaryNavActive(
 
   switch (id) {
     case "home":
-      return path === APP_ROUTES.home;
+      return (
+        path === APP_ROUTES.home ||
+        path === APP_ROUTES.discover ||
+        path.startsWith(`${APP_ROUTES.discover}/`)
+      );
     case "discover":
-      return path === APP_ROUTES.discover || path.startsWith(`${APP_ROUTES.discover}/`);
+      // `/discover` aliases Home — avoid double-highlight with Home.
+      return false;
     case "live":
       return path === APP_ROUTES.live || path.startsWith(`${APP_ROUTES.live}/`);
     case "messages":

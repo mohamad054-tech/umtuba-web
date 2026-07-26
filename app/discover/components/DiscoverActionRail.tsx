@@ -45,7 +45,7 @@ export default function DiscoverActionRail({
   likedByMe,
   savedByMe,
   caption,
-  returnPath = APP_ROUTES.discover,
+  returnPath = APP_ROUTES.home,
   onComment,
   onStatsChange,
   onFlagsChange,
@@ -154,7 +154,7 @@ export default function DiscoverActionRail({
 
   function redirectToLogin() {
     router.push(
-      `${APP_ROUTES.login}?next=${encodeURIComponent(returnPath || APP_ROUTES.discover)}`
+      `${APP_ROUTES.login}?next=${encodeURIComponent(returnPath || APP_ROUTES.home)}`
     );
   }
 

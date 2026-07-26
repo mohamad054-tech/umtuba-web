@@ -4,22 +4,47 @@ import { BRAND, DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "./brand";
 
 /** Shared route metadata objects for pages and thin layouts. */
 
-export const landingMetadata: Metadata = {
+/** Marketing welcome page (former `/` landing). */
+export const welcomeMetadata: Metadata = {
   ...buildPageMetadata({
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
-    path: "/",
+    path: "/welcome",
     index: "index",
   }),
-  // Home uses the absolute default title (no `%s | UMTUBA` suffix).
   title: { absolute: DEFAULT_TITLE },
 };
+
+/** @deprecated Prefer welcomeMetadata — landing moved to `/welcome`. */
+export const landingMetadata = welcomeMetadata;
+
+/** Video-First Home Feed at `/`. */
+export const homeFeedMetadata = buildPageMetadata({
+  title: "Home",
+  description: `Watch short videos from creators on ${BRAND.name}. ${BRAND.tagline}.`,
+  path: "/",
+  index: "index",
+});
 
 export const discoverMetadata = buildPageMetadata({
   title: "Discover",
   description: `Discover creators and videos on ${BRAND.name}. ${BRAND.tagline}.`,
   path: "/discover",
   index: "index",
+});
+
+export const gamesMetadata = buildPageMetadata({
+  title: "Games",
+  description: `UMTUBA Games hub on ${BRAND.name}.`,
+  path: "/games",
+  index: "index",
+});
+
+export const createArticleMetadata = buildPageMetadata({
+  title: "Create article",
+  description: `Write an article and optional teaser video on ${BRAND.name}.`,
+  path: "/create/article",
+  index: "noindex",
 });
 
 export const searchMetadata = buildPageMetadata({

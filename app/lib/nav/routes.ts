@@ -2,6 +2,7 @@ import { slugifyCity } from "../journey/handoff";
 
 export const APP_ROUTES = {
   home: "/",
+  welcome: "/welcome",
   discover: "/discover",
   watch: "/watch",
   live: "/live",
@@ -19,12 +20,14 @@ export const APP_ROUTES = {
   privacy: "/privacy",
   profile: "/profile",
   createVideo: "/create/video",
+  createArticle: "/create/article",
   postJourney: "/post-journey",
   worldDiscovery: "/world",
   worldSearch: "/world/search",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
   learning: "/learning",
+  games: "/games",
   store: "/store",
   storeSearch: "/store/search",
   storeCart: "/store/cart",
@@ -88,7 +91,16 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
 
 export function isNavActive(pathname: string, href: AppRouteHref): boolean {
   if (href === APP_ROUTES.home) {
-    return pathname === APP_ROUTES.home;
+    // `/discover` aliases Home feed — keep Home highlighted after redirect targets.
+    return (
+      pathname === APP_ROUTES.home ||
+      pathname === APP_ROUTES.discover ||
+      pathname.startsWith(`${APP_ROUTES.discover}/`)
+    );
+  }
+
+  if (href === APP_ROUTES.discover) {
+    return false;
   }
 
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -134,6 +146,16 @@ export function buildCreatorProfileHref(input: {
   username: string;
 }): string {
   return `${APP_ROUTES.profile}/${normalizeProfileUsername(input.username)}`;
+}
+
+/** Full article page (public). */
+export function buildArticleHref(articleId: string): string {
+  return `/articles/${sanitizeIdSegment(articleId)}`;
+}
+
+/** Profile articles tab deep link. */
+export function buildProfileArticlesHref(username: string): string {
+  return `${APP_ROUTES.profile}/${normalizeProfileUsername(username)}?tab=articles`;
 }
 
 const UUID_RE =

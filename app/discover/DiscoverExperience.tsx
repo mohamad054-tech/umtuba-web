@@ -218,7 +218,7 @@ export default function DiscoverExperience({
               title="Could not load videos"
               message={sanitizeUserFacingMessage(loadError)}
               onRetry={() => {
-                window.location.assign(APP_ROUTES.discover);
+                window.location.assign(APP_ROUTES.home);
               }}
             />
           </div>
@@ -258,7 +258,7 @@ export default function DiscoverExperience({
   // Hide only for missing/non-UUID peer or self. Signed-out (viewerId null) may message.
   const canMessageAside =
     isUuid(peerUserId) && viewerId !== peerUserId;
-  const commentsReturnPath = `${APP_ROUTES.discover}?post=${activeVideo.id}`;
+  const commentsReturnPath = `${APP_ROUTES.home}?post=${activeVideo.id}`;
 
   return (
     <DiscoverShell>

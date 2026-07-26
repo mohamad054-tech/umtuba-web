@@ -52,6 +52,7 @@ const postColumns = `
   video_path,
   video_mime_type,
   video_byte_size,
+  article_id,
   media_status,
   upload_started_at,
   upload_completed_at,
@@ -77,6 +78,23 @@ const postColumns = `
   created_at
 `;
 
+/** Pre-migration select when `posts.article_id` is not applied yet. */
+const postColumnsWithoutArticle = postColumns.replace(/\n\s*article_id,/, "");
+
+export function isMissingArticleIdColumnError(
+  error: { message?: string; code?: string } | null | undefined
+): boolean {
+  const msg = (error?.message ?? "").toLowerCase();
+  return (
+    msg.includes("article_id") &&
+    (msg.includes("does not exist") ||
+      msg.includes("schema cache") ||
+      msg.includes("could not find") ||
+      error?.code === "42703" ||
+      error?.code === "PGRST204")
+  );
+}
+
 /** Ready-only filter shared by Discover / Watch / Profile queries. */
 export const READY_VIDEO_FILTER = {
   postType: "video" as const,
@@ -87,6 +105,7 @@ export type VideoPostRow = DatabasePost & {
   video_path: string | null;
   video_mime_type: string | null;
   video_byte_size: number | null;
+  article_id?: string | null;
   media_status?: string | null;
   upload_started_at?: string | null;
   upload_completed_at?: string | null;
@@ -117,6 +136,9 @@ export type PublicPostDTO = {
   author_avatar: string;
   image_url: string | null;
   video_url: string | null;
+  /** When set, this ready video is an Article Teaser. */
+  article_id: string | null;
+  article_title?: string | null;
   likes: number;
   comments: number;
   shares: number;
@@ -274,6 +296,11 @@ export async function attachPlaybackUrls(
         author_avatar: post.author_avatar,
         image_url: post.image_url,
         video_url: playbackUrl,
+        article_id:
+          typeof post.article_id === "string" && post.article_id.trim()
+            ? post.article_id.trim()
+            : null,
+        article_title: null,
         likes: post.likes,
         comments: post.comments,
         shares: post.shares,
@@ -362,11 +389,20 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
   const username = post.author_username.startsWith("@")
     ? post.author_username
     : `@${post.author_username}`;
+  const articleId =
+    typeof post.article_id === "string" && post.article_id.trim()
+      ? post.article_id.trim()
+      : null;
+  const articleTitle =
+    typeof post.article_title === "string" && post.article_title.trim()
+      ? post.article_title.trim()
+      : null;
 
   return {
     id: String(post.id),
     src: post.video_url,
     caption: post.content || "Untitled video",
+    title: articleTitle ?? (post.content || "Untitled video"),
     hashtags: extractHashtags(post.content),
     location: {
       city: "UMTUBA",
@@ -379,6 +415,9 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
       username,
       avatar: post.author_avatar || "U",
     },
+    articleId,
+    articleTitle,
+    articleHref: articleId ? `/articles/${articleId}` : null,
     stats: {
       likes: post.likes,
       comments: post.comments,
@@ -636,4 +675,4 @@ async function insertVideoPostLegacy(
   return data as VideoPostRow;
 }
 
-export { postColumns };
+export { postColumns, postColumnsWithoutArticle };

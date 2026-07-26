@@ -90,7 +90,9 @@ describe("polish & accessibility contracts", () => {
   });
 
   it("surface pages use branded loading fallbacks", () => {
-    expect(read("app/discover/page.tsx")).toMatch(/ProductLoadingState/);
+    // Home hosts the video feed; `/discover` is a redirect alias.
+    expect(read("app/page.tsx")).toMatch(/ProductLoadingState/);
+    expect(read("app/discover/page.tsx")).toMatch(/redirect/);
     expect(read("app/settings/page.tsx")).toMatch(/ProductLoadingState/);
   });
 });

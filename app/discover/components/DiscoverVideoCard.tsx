@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { APP_ROUTES } from "../../lib/nav";
@@ -43,6 +44,7 @@ export default function DiscoverVideoCard({
   onSrcChange,
   slideRef,
 }: DiscoverVideoCardProps) {
+  const router = useRouter();
   const [localViews] = useState(() => new Set<number>());
   const viewsSet = sessionViews ?? localViews;
   const postId = Number(video.id);
@@ -120,6 +122,12 @@ export default function DiscoverVideoCard({
     onComment();
   }
 
+  function handleTeaserOpen() {
+    if (video.articleHref) {
+      router.push(video.articleHref);
+    }
+  }
+
   return (
     <article
       ref={slideRef}
@@ -127,6 +135,7 @@ export default function DiscoverVideoCard({
       className={`video-snap-slide relative h-full w-full shrink-0 snap-start snap-always overflow-hidden bg-black ${
         active ? "watch-overlay-enter" : ""
       }`}
+      onDoubleClick={video.articleHref ? handleTeaserOpen : undefined}
     >
       <DiscoverNativeVideo
         src={video.src}
@@ -164,9 +173,21 @@ export default function DiscoverVideoCard({
               />
             </div>
             <DiscoverCaption
+              title={video.title || video.caption}
               caption={video.caption}
               hashtags={video.hashtags}
+              articleHref={video.articleHref}
+              articleTitle={video.articleTitle}
             />
+            {video.articleHref ? (
+              <button
+                type="button"
+                onClick={handleTeaserOpen}
+                className="pointer-events-auto rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/90 transition hover:bg-white/15"
+              >
+                Read article
+              </button>
+            ) : null}
           </div>
 
           <div className="pointer-events-auto">
@@ -176,7 +197,7 @@ export default function DiscoverVideoCard({
               likedByMe={video.likedByMe}
               savedByMe={video.savedByMe}
               caption={video.caption}
-              returnPath={`${APP_ROUTES.discover}?post=${video.id}`}
+              returnPath={`${APP_ROUTES.home}?post=${video.id}`}
               onComment={handleComment}
               onStatsChange={onStatsChange}
               onFlagsChange={handleFlagsChange}

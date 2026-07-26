@@ -16,13 +16,16 @@ import {
 } from "./follows";
 import { createClient, getServerUser } from "./server";
 import { loadViewerInteractionState } from "./socialInteractions";
+import { listArticleTitlesByIds } from "../articles/articlesFoundation";
 import {
   applyViewerStateToPosts,
   attachPlaybackUrls,
   createVideoSignedUrl,
   enrichAuthorUserIdsFromProfiles,
+  isMissingArticleIdColumnError,
   mapVideoPostToDiscover,
   postColumns,
+  postColumnsWithoutArticle,
   type PublicPostDTO,
   type VideoPostRow,
 } from "./videoPosts";
@@ -75,23 +78,32 @@ export async function loadCanonicalVideoFeedPage(input?: {
     );
     const cursor = decodeWatchFeedCursor(input?.cursor ?? null);
 
-    let query = supabase
-      .from("posts")
-      .select(postColumns)
-      .eq("post_type", "video")
-      .eq("media_status", "ready")
-      .not("video_path", "is", null)
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .limit(limit + 1);
+    const buildFeedQuery = (columns: string) => {
+      let query = supabase
+        .from("posts")
+        .select(columns)
+        .eq("post_type", "video")
+        .eq("media_status", "ready")
+        .not("video_path", "is", null)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(limit + 1);
+      if (cursor) {
+        query = query.or(
+          `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id}),created_at.lt.${cursor.createdAt}`
+        );
+      }
+      return query;
+    };
 
-    if (cursor) {
-      query = query.or(
-        `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id}),created_at.lt.${cursor.createdAt}`
-      );
+    let { data, error } = await buildFeedQuery(postColumns);
+    let useArticleColumn = true;
+
+    // Home feed stays up before articles migration is applied (Git-only until GO).
+    if (error && isMissingArticleIdColumnError(error)) {
+      useArticleColumn = false;
+      ({ data, error } = await buildFeedQuery(postColumnsWithoutArticle));
     }
-
-    const { data, error } = await query;
 
     if (error) {
       console.error("Unable to load video feed:", error);
@@ -101,21 +113,24 @@ export async function loadCanonicalVideoFeedPage(input?: {
       };
     }
 
-    let rows = (data ?? []) as VideoPostRow[];
+    let rows = (data ?? []) as unknown as VideoPostRow[];
 
     if (!cursor && input?.focusPostId && input.focusPostId > 0) {
       const focusedInPage = rows.some((row) => row.id === input.focusPostId);
       if (!focusedInPage) {
+        const focusSelect = useArticleColumn
+          ? postColumns
+          : postColumnsWithoutArticle;
         const { data: focused } = await supabase
           .from("posts")
-          .select(postColumns)
+          .select(focusSelect)
           .eq("id", input.focusPostId)
           .eq("post_type", "video")
           .eq("media_status", "ready")
           .not("video_path", "is", null)
           .maybeSingle();
         if (focused) {
-          rows = [focused as VideoPostRow, ...rows];
+          rows = [focused as unknown as VideoPostRow, ...rows];
         }
       }
     }
@@ -132,7 +147,18 @@ export async function loadCanonicalVideoFeedPage(input?: {
       user?.id,
       withAuthors.map((post) => post.id)
     );
-    const posts = applyViewerStateToPosts(withAuthors, viewerState);
+    let posts = applyViewerStateToPosts(withAuthors, viewerState);
+    const articleIds = posts
+      .map((post) => post.article_id)
+      .filter((id): id is string => Boolean(id));
+    if (articleIds.length > 0) {
+      const titles = await listArticleTitlesByIds(supabase, articleIds);
+      posts = posts.map((post) =>
+        post.article_id && titles.has(post.article_id)
+          ? { ...post, article_title: titles.get(post.article_id) ?? null }
+          : post
+      );
+    }
     let videos = posts
       .map(mapVideoPostToDiscover)
       .filter((video): video is DiscoverVideo => video !== null);

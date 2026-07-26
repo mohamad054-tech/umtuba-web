@@ -12,6 +12,7 @@ import type { DemoVideo } from "../../data/videos";
 const discoverSample: DiscoverVideo = {
   id: "42",
   src: "https://example.com/signed.mp4",
+  title: "First line",
   caption: "First line\nSecond line",
   hashtags: ["#umtuba"],
   location: { city: "UMTUBA", country: "Worldwide" },

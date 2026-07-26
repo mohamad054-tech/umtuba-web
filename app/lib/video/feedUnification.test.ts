@@ -58,7 +58,7 @@ describe("canonical video feed architecture", () => {
     expect(page).toMatch(/ProductEmptyState/);
   });
 
-  it("preserves auth return routes for Discover and Watch", () => {
+  it("preserves auth return routes for Home feed and Watch", () => {
     const discoverRail = read("app/discover/components/DiscoverActionRail.tsx");
     const watchRail = read("app/components/video/VideoActionRail.tsx");
     const discoverCreator = read(
@@ -67,8 +67,8 @@ describe("canonical video feed architecture", () => {
     const routes = read("app/lib/nav/routes.ts");
     expect(routes).toMatch(/watch:\s*["']\/watch["']/);
     expect(discoverRail).toMatch(/returnPath/);
-    expect(discoverRail).toMatch(/APP_ROUTES\.discover/);
-    expect(discoverCreator).toMatch(/APP_ROUTES\.discover/);
+    expect(discoverRail).toMatch(/APP_ROUTES\.home/);
+    expect(discoverCreator).toMatch(/APP_ROUTES\.home/);
     expect(discoverCreator).toMatch(/\?post=/);
     expect(watchRail).toMatch(/returnPath/);
     expect(watchRail).toMatch(/APP_ROUTES\.watch/);
@@ -80,11 +80,16 @@ describe("canonical video feed architecture", () => {
     expect(overlay).not.toMatch(/UConnect/);
   });
 
-  it("keeps Discover and Watch as separate routes (no forced redirect)", () => {
+  it("hosts video feed on Home; Discover aliases; Watch stays separate", () => {
+    const homePage = read("app/page.tsx");
+    const homeLoader = read("app/components/home/HomeFeedLoader.tsx");
     const watchPage = read("app/watch/page.tsx");
     const discoverPage = read("app/discover/page.tsx");
-    expect(watchPage).not.toMatch(/redirect\(APP_ROUTES\.discover\)/);
-    expect(discoverPage).toMatch(/getDiscoverVideosServer/);
+    expect(homePage).toMatch(/HomeFeedLoader/);
+    expect(homeLoader).toMatch(/getDiscoverVideosServer/);
+    expect(discoverPage).toMatch(/redirect/);
+    expect(discoverPage).toMatch(/APP_ROUTES\.home/);
+    expect(watchPage).not.toMatch(/redirect\(APP_ROUTES\.home\)/);
     expect(watchPage).toMatch(/getWatchVideosPageServer/);
   });
 });

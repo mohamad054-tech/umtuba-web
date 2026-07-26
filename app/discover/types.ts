@@ -24,10 +24,16 @@ export type DiscoverVideo = {
   id: string;
   src: string;
   poster?: string;
+  /** Short title shown on the card (article title when teaser). */
+  title: string;
   caption: string;
   hashtags: string[];
   location: DiscoverLocation;
   creator: DiscoverCreator;
+  /** Set when this clip is an Article Teaser. */
+  articleId?: string | null;
+  articleTitle?: string | null;
+  articleHref?: string | null;
   stats: DiscoverStats;
   likedByMe: boolean;
   savedByMe: boolean;

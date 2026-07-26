@@ -45,9 +45,9 @@ describe("isMobilePrimaryNavActive", () => {
     );
     expect(isMobilePrimaryNavActive("/settings", "profile")).toBe(true);
     expect(isMobilePrimaryNavActive("/messages", "messages")).toBe(true);
-    expect(isMobilePrimaryNavActive("/discover", "discover")).toBe(true);
+    expect(isMobilePrimaryNavActive("/discover", "discover")).toBe(false);
     expect(isMobilePrimaryNavActive("/", "home")).toBe(true);
-    expect(isMobilePrimaryNavActive("/discover", "home")).toBe(false);
+    expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
   });
 });
 

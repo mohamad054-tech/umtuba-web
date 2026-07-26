@@ -15,7 +15,7 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
     postId: Number.isInteger(postId) && postId > 0 ? postId : null,
     src: video.src,
     poster: video.poster,
-    title: titleFromCaption(video.caption),
+    title: video.title || titleFromCaption(video.caption),
     caption: video.caption,
     location: video.location,
     music: "Original sound · UMTUBA",

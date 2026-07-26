@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   formatFollowCountLabel,
   type FollowSnapshot,
@@ -18,6 +19,8 @@ import {
   ProfileVideoGrid,
   type ProfileTabId,
 } from "./components";
+import ProfileArticlesPanel from "./components/ProfileArticlesPanel";
+import ProfilePostsPanel from "./components/ProfilePostsPanel";
 import type { ProfileView } from "./types";
 
 type ProfileExperienceProps = {
@@ -26,23 +29,49 @@ type ProfileExperienceProps = {
   viewerId?: string | null;
 };
 
+const TAB_IDS: ProfileTabId[] = [
+  "all",
+  "posts",
+  "videos",
+  "articles",
+  "about",
+  "live",
+];
+
+function parseTab(raw: string | null): ProfileTabId {
+  if (raw && (TAB_IDS as string[]).includes(raw)) {
+    return raw as ProfileTabId;
+  }
+  return "all";
+}
+
 export default function ProfileExperience({
   profile,
   isOwner,
   viewerId = null,
 }: ProfileExperienceProps) {
-  const [activeTab, setActiveTab] = useState<ProfileTabId>("videos");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<ProfileTabId>(() =>
+    parseTab(searchParams.get("tab"))
+  );
   const [isFollowing, setIsFollowing] = useState(
     Boolean(profile.isFollowing)
   );
   const [followersLabel, setFollowersLabel] = useState(profile.followersLabel);
   const [followingLabel, setFollowingLabel] = useState(profile.followingLabel);
 
+  useEffect(() => {
+    setActiveTab(parseTab(searchParams.get("tab")));
+  }, [searchParams]);
+
   function handleFollowChange(snapshot: FollowSnapshot) {
     setIsFollowing(snapshot.following);
     setFollowersLabel(formatFollowCountLabel(snapshot.followersCount));
     setFollowingLabel(formatFollowCountLabel(snapshot.followingCount));
   }
+
+  const showLiveTab =
+    profile.liveSessions.length > 0 || Boolean(profile.isLive);
 
   return (
     <ProfileShell>
@@ -71,13 +100,32 @@ export default function ProfileExperience({
             isFollowing={isFollowing}
             onFollowChange={handleFollowChange}
           />
+          {isOwner ? (
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={APP_ROUTES.createArticle}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
+              >
+                Write article
+              </Link>
+              <Link
+                href={APP_ROUTES.createVideo}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
+              >
+                Upload video
+              </Link>
+            </div>
+          ) : null}
         </section>
 
         <ProfileTabs
           activeTab={activeTab}
           onChange={setActiveTab}
           videoCount={profile.videoTotalCount}
+          postCount={profile.posts.length}
+          articleCount={profile.articles.length}
           liveCount={profile.liveSessions.length}
+          showLiveTab={showLiveTab}
         />
 
         {profile.statsLoadFailed ? (
@@ -93,7 +141,39 @@ export default function ProfileExperience({
           id={`profile-panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`profile-tab-${activeTab}`}
+          className="space-y-6"
         >
+          {activeTab === "all" ? (
+            <>
+              <ProfilePostsPanel
+                posts={profile.posts}
+                loadFailed={Boolean(profile.postsLoadFailed)}
+              />
+              <ProfileVideoGrid
+                videos={profile.videos}
+                hasMore={Boolean(profile.hasMoreVideos)}
+                loadFailed={Boolean(profile.videosLoadFailed)}
+              />
+              <ProfileArticlesPanel
+                articles={profile.articles}
+                loadFailed={Boolean(profile.articlesLoadFailed)}
+                isOwner={isOwner}
+              />
+              {showLiveTab ? (
+                <ProfileLivePanel
+                  sessions={profile.liveSessions}
+                  isLive={profile.isLive}
+                  loadFailed={Boolean(profile.liveLoadFailed)}
+                />
+              ) : null}
+            </>
+          ) : null}
+          {activeTab === "posts" ? (
+            <ProfilePostsPanel
+              posts={profile.posts}
+              loadFailed={Boolean(profile.postsLoadFailed)}
+            />
+          ) : null}
           {activeTab === "videos" ? (
             <ProfileVideoGrid
               videos={profile.videos}
@@ -101,7 +181,14 @@ export default function ProfileExperience({
               loadFailed={Boolean(profile.videosLoadFailed)}
             />
           ) : null}
-          {activeTab === "live" ? (
+          {activeTab === "articles" ? (
+            <ProfileArticlesPanel
+              articles={profile.articles}
+              loadFailed={Boolean(profile.articlesLoadFailed)}
+              isOwner={isOwner}
+            />
+          ) : null}
+          {activeTab === "live" && showLiveTab ? (
             <ProfileLivePanel
               sessions={profile.liveSessions}
               isLive={profile.isLive}
@@ -126,15 +213,15 @@ export function ProfileNotFound({ username }: { username: string }) {
           @{username} not found
         </h2>
         <p className="mt-3 max-w-md text-sm text-white/55">
-          This profile is not in UMTUBA yet. Try Discover or Live, or create an
+          This profile is not in UMTUBA yet. Try Home or Live, or create an
           account to claim your username.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           <Link
-            href={APP_ROUTES.discover}
+            href={APP_ROUTES.home}
             className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
           >
-            Open Discover
+            Open Home
           </Link>
           <Link
             href={APP_ROUTES.live}

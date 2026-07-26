@@ -40,6 +40,10 @@ export type ProfileContentBundle = {
   videos?: ProfileContentVideo[];
   videosFailed?: boolean;
   hasMoreVideos?: boolean;
+  posts?: import("../types").ProfilePost[];
+  postsFailed?: boolean;
+  articles?: import("../types").ProfileArticle[];
+  articlesFailed?: boolean;
   liveRooms?: ProfileContentLiveRoom[];
   liveFailed?: boolean;
 };
@@ -103,9 +107,13 @@ export function profileRowToView(
     isLive: Boolean(activeLive),
     liveStreamId: activeLive?.roomId,
     videos,
+    posts: content?.posts ?? [],
+    articles: content?.articles ?? [],
     liveSessions,
     hasMoreVideos: Boolean(content?.hasMoreVideos),
     videosLoadFailed: Boolean(content?.videosFailed),
+    postsLoadFailed: Boolean(content?.postsFailed),
+    articlesLoadFailed: Boolean(content?.articlesFailed),
     statsLoadFailed: statsFailed || followFailed,
     liveLoadFailed: Boolean(content?.liveFailed),
     about: {
@@ -140,6 +148,8 @@ export function mockProfileToView(profile: MockProfile): ProfileView {
       durationLabel: video.durationLabel ?? null,
       href: video.href,
     })),
+    posts: [],
+    articles: [],
     liveSessions: profile.liveSessions,
     about: profile.about,
   };

@@ -34,6 +34,14 @@ export type ProfileContentLiveRoom = {
   status: "live";
 };
 
+export type ProfileContentPost = {
+  id: number;
+  postType: string;
+  content: string;
+  imageUrl: string | null;
+  createdAt: string;
+};
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
@@ -199,6 +207,43 @@ export async function listProfileVideos(
   }));
 
   return { videos, hasMore };
+}
+
+/**
+ * Text / image posts owned by the profile (not videos).
+ * Honest empty when none — never invents rows.
+ */
+export async function listProfilePosts(
+  supabase: SupabaseClient,
+  userId: string,
+  options?: { limit?: number }
+): Promise<{ posts: ProfileContentPost[]; failed?: boolean }> {
+  const limit = Math.min(Math.max(options?.limit ?? 24, 1), 48);
+  const { data, error } = await supabase
+    .from("posts")
+    .select("id, post_type, content, image_url, created_at")
+    .eq("user_id", userId)
+    .in("post_type", ["text", "image"])
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("listProfilePosts failed:", error);
+    return { posts: [], failed: true };
+  }
+
+  return {
+    posts: (data ?? []).map((row) => ({
+      id: Number(row.id),
+      postType: String(row.post_type ?? "text"),
+      content: String(row.content ?? "").trim(),
+      imageUrl:
+        typeof row.image_url === "string" && row.image_url.trim()
+          ? row.image_url.trim()
+          : null,
+      createdAt: String(row.created_at ?? ""),
+    })),
+  };
 }
 
 /**

@@ -1,8 +1,10 @@
 export { default as ProfileAbout } from "./ProfileAbout";
 export { default as ProfileActions } from "./ProfileActions";
+export { default as ProfileArticlesPanel } from "./ProfileArticlesPanel";
 export { default as ProfileHeader } from "./ProfileHeader";
 export { default as ProfileLiveBadge } from "./ProfileLiveBadge";
 export { default as ProfileLivePanel } from "./ProfileLivePanel";
+export { default as ProfilePostsPanel } from "./ProfilePostsPanel";
 export { default as ProfileShell } from "./ProfileShell";
 export { default as ProfileStats } from "./ProfileStats";
 export { default as ProfileTabs } from "./ProfileTabs";

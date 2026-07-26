@@ -31,8 +31,8 @@ export default function DiscoverCreatorInfo({
   const canMessage = isUuid(peerUserId) && !isSelf;
   const returnPath =
     postId != null && String(postId).length > 0
-      ? `${APP_ROUTES.discover}?post=${postId}`
-      : APP_ROUTES.discover;
+      ? `${APP_ROUTES.home}?post=${postId}`
+      : APP_ROUTES.home;
 
   return (
     <div className="flex items-center gap-3">

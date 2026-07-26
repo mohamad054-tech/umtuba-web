@@ -28,6 +28,8 @@ export {
   normalizeProfileUsername,
   type AppNavItem,
   type AppRouteHref,
+  buildArticleHref,
+  buildProfileArticlesHref,
 } from "./routes";
 
 export {

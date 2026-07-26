@@ -31,6 +31,22 @@ export type ProfileAbout = {
   interests: string[];
 };
 
+export type ProfileArticle = {
+  id: string;
+  title: string;
+  excerpt: string;
+  href: string;
+  publishedAt: string | null;
+};
+
+export type ProfilePost = {
+  id: number;
+  postType: string;
+  content: string;
+  imageUrl: string | null;
+  createdAt: string;
+};
+
 /** Local mock profile shape used only as a development fallback. */
 export type MockProfile = {
   id: string;
@@ -75,6 +91,8 @@ export type ProfileView = {
   liveStreamId?: string;
   isFollowing?: boolean;
   videos: ProfileVideo[];
+  posts: ProfilePost[];
+  articles: ProfileArticle[];
   liveSessions: ProfileLivePreview[];
   about: ProfileAbout;
   /** Authentic activity tier — separate from UM Points wallet. */
@@ -83,6 +101,8 @@ export type ProfileView = {
   hasMoreVideos?: boolean;
   /** True when video list fetch failed (not an empty catalog). */
   videosLoadFailed?: boolean;
+  postsLoadFailed?: boolean;
+  articlesLoadFailed?: boolean;
   /** True when follow/stats aggregates failed. */
   statsLoadFailed?: boolean;
   /** True when live rooms fetch failed. */

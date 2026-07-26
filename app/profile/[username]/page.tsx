@@ -4,9 +4,11 @@ import { loadProfileActivityTier } from "../../actions/activityTiers";
 import { buildActivityTierProgress } from "../../../lib/activity-tiers";
 import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
 import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
+import { listPublishedArticlesForUser } from "../../../lib/articles/articlesFoundation";
 import {
   getProfileContentStats,
   listProfileActiveLiveRooms,
+  listProfilePosts,
   listProfileVideos,
   PROFILE_VIDEO_PAGE_SIZE,
 } from "../../../lib/supabase/profileContent";
@@ -92,16 +94,25 @@ async function resolveProfile(username: string): Promise<{
 
     if (row) {
       const supabase = await createClient();
-      const [activityTier, followResult, stats, videoPage, liveResult] =
-        await Promise.all([
-          loadProfileActivityTier(row.id),
-          getProfileFollowSnapshot(supabase, row.id),
-          getProfileContentStats(supabase, row.id),
-          listProfileVideos(supabase, row.id, {
-            limit: PROFILE_VIDEO_PAGE_SIZE,
-          }),
-          listProfileActiveLiveRooms(supabase, row.id),
-        ]);
+      const [
+        activityTier,
+        followResult,
+        stats,
+        videoPage,
+        postsPage,
+        articlesPage,
+        liveResult,
+      ] = await Promise.all([
+        loadProfileActivityTier(row.id),
+        getProfileFollowSnapshot(supabase, row.id),
+        getProfileContentStats(supabase, row.id),
+        listProfileVideos(supabase, row.id, {
+          limit: PROFILE_VIDEO_PAGE_SIZE,
+        }),
+        listProfilePosts(supabase, row.id),
+        listPublishedArticlesForUser(supabase, row.id),
+        listProfileActiveLiveRooms(supabase, row.id),
+      ]);
 
       if (followResult.ok && followResult.missingProfile) {
         return { profile: null, isOwner: false, viewerId };
@@ -119,6 +130,10 @@ async function resolveProfile(username: string): Promise<{
             videos: videoPage.videos,
             videosFailed: Boolean(videoPage.failed),
             hasMoreVideos: videoPage.hasMore,
+            posts: postsPage.posts,
+            postsFailed: Boolean(postsPage.failed),
+            articles: articlesPage.items,
+            articlesFailed: Boolean(articlesPage.failed),
             liveRooms: liveResult.rooms,
             liveFailed: Boolean(liveResult.failed),
           }),
