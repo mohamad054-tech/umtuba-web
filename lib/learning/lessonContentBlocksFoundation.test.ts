@@ -137,7 +137,7 @@ describe("Lesson Content Blocks Foundation V1 — schema & identity", () => {
 describe("Lesson Content Blocks Foundation V1 — block type allowlist", () => {
   const sql = read(MIGRATION);
 
-  it("exposes the 12-value immutable allowlist (10 creatable + 2 reserved)", () => {
+  it("exposes the 15-value immutable allowlist (13 creatable + 2 reserved)", () => {
     expect([...LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES]).toEqual([
       "rich_text",
       "heading",
@@ -149,16 +149,24 @@ describe("Lesson Content Blocks Foundation V1 — block type allowlist", () => {
       "callout",
       "external_link",
       "code_block",
+      "transcript",
+      "pdf",
+      "downloadable_file",
     ]);
     expect([...LEARNING_LESSON_CONTENT_BLOCK_RESERVED_TYPES]).toEqual([
       "ai_block",
       "interactive_block",
     ]);
-    expect(LEARNING_LESSON_CONTENT_BLOCK_TYPES).toHaveLength(12);
+    expect(LEARNING_LESSON_CONTENT_BLOCK_TYPES).toHaveLength(15);
     expect(sql).toMatch(/learning_lesson_content_blocks_type_check/);
-    // Each allowlisted type appears in the check constraint.
+    // Original V1 types appear in 20260836; readiness expansion is in 20260863.
+    const readiness = read(
+      "supabase/migrations/20260863_learning_first_course_readiness_v1.sql"
+    );
     for (const t of LEARNING_LESSON_CONTENT_BLOCK_TYPES) {
-      expect(sql).toMatch(new RegExp(`'${t}'`));
+      const inFoundation = sql.match(new RegExp(`'${t}'`));
+      const inReadiness = readiness.match(new RegExp(`'${t}'`));
+      expect(Boolean(inFoundation || inReadiness)).toBe(true);
     }
   });
 
@@ -185,7 +193,13 @@ describe("Lesson Content Blocks Foundation V1 — block type allowlist", () => {
     );
   });
 
-  it("fails closed on fully deferred types (gallery/pdf/table/embed/html/downloadable_file)", () => {
+  it("fails closed on fully deferred types (gallery/table/embed/html)", () => {
+    expect([...LEARNING_LESSON_CONTENT_BLOCK_DEFERRED_TYPES]).toEqual([
+      "gallery",
+      "table",
+      "embed",
+      "html",
+    ]);
     for (const t of LEARNING_LESSON_CONTENT_BLOCK_DEFERRED_TYPES) {
       // Deferred types are NOT part of the DB allowlist / check constraint.
       const checkStart = sql.indexOf(

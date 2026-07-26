@@ -52,6 +52,10 @@ export type LearningLessonProgress = {
   last_activity_at: string | null;
   completed_at: string | null;
   first_completed_at: string | null;
+  /** Continue-watching media offset (20260863). */
+  last_media_position_seconds: number | null;
+  /** Last content block pointer for resume (20260863). */
+  last_content_block_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -104,6 +108,17 @@ export const LEARNING_PROGRESS_RPCS = {
   reopenLesson: "reopen_learning_lesson",
   getCourseProgress: "get_learning_course_progress",
   recomputeCourseProgress: "recompute_learning_course_progress",
+} as const;
+
+/**
+ * Progress-adjacent RPCs from First Course Readiness (20260863). Kept separate
+ * so V1 progress tests continue to assert only against 20260835.
+ */
+export const LEARNING_PROGRESS_READINESS_RPCS = {
+  upsertMediaPosition: "upsert_my_learning_lesson_media_position",
+  recomputeSectionProgress: "recompute_learning_section_progress",
+  getMySectionProgress: "get_my_learning_section_progress",
+  getCourseProgressBundle: "get_my_learning_course_progress_bundle",
 } as const;
 
 export const LEARNING_PROGRESS_HELPERS = {

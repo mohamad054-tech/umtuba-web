@@ -52,6 +52,18 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
           >
             Calendar
           </Link>
+          <Link
+            href={LEARNING_LEARNER_ROUTES.resources(outline.course.id)}
+            className="text-sm font-bold text-white underline underline-offset-2"
+          >
+            Resources
+          </Link>
+          <Link
+            href={LEARNING_LEARNER_ROUTES.progress(outline.course.id)}
+            className="text-sm font-bold text-white underline underline-offset-2"
+          >
+            Progress
+          </Link>
         </p>
       </section>
 

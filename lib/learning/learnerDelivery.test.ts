@@ -209,7 +209,7 @@ describe("Learner Delivery V1 — submitted / attempt state", () => {
 });
 
 describe("Learner Delivery V1 — content blocks", () => {
-  it("accepts all 10 creatable types and rejects reserved/deferred", () => {
+  it("accepts all creatable types and rejects reserved/deferred", () => {
     for (const t of LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES) {
       expect(isCreatableContentBlockType(t)).toBe(true);
       expect(isReservedOrDeferredContentBlockType(t)).toBe(false);
@@ -904,6 +904,32 @@ describe("Learner Experience V1 — activity type routing", () => {
     expect(LEARNING_LEARNER_ROUTES.assignment(ACTIVITY_ID)).toBe(
       `/learning/activities/${ACTIVITY_ID}/assignment`
     );
+  });
+
+  it("routes project to project experience", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "project",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "project",
+      href: LEARNING_LEARNER_ROUTES.project(ACTIVITY_ID),
+    });
+  });
+
+  it("routes lab to lab experience", () => {
+    expect(
+      resolveLearnerActivityTarget({
+        activity_id: ACTIVITY_ID,
+        type: "lab",
+      })
+    ).toEqual({
+      activity_id: ACTIVITY_ID,
+      experience: "lab",
+      href: LEARNING_LEARNER_ROUTES.lab(ACTIVITY_ID),
+    });
   });
 
   it("routes practice and other types to generic activity gate", () => {

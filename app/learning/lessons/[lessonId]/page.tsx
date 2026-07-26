@@ -6,14 +6,15 @@ import {
   LEARNING_LEARNER_ROUTES,
   loadLessonDelivery,
 } from "../../../../lib/learning/learnerDelivery";
+import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ lessonId: string }> | { lessonId: string };
   searchParams?:
-    | Promise<{ error?: string; completed?: string }>
-    | { error?: string; completed?: string };
+    | Promise<{ error?: string; completed?: string; unlocked?: string }>
+    | { error?: string; completed?: string; unlocked?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -36,7 +37,10 @@ export default async function LearningLessonPage({
   }
 
   const supabase = await createClient();
-  const delivery = await loadLessonDelivery(supabase, lessonId);
+  const [delivery, engineResult] = await Promise.all([
+    loadLessonDelivery(supabase, lessonId),
+    loadMyLearningLessonEngine(supabase, lessonId),
+  ]);
   if (!delivery.ok) {
     notFound();
   }
@@ -57,6 +61,15 @@ export default async function LearningLessonPage({
         </p>
       ) : null}
 
+      {query.unlocked === "1" ? (
+        <p
+          role="status"
+          className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
+        >
+          Lesson unlocked with UM Points.
+        </p>
+      ) : null}
+
       {query.error ? (
         <p
           role="alert"
@@ -66,7 +79,10 @@ export default async function LearningLessonPage({
         </p>
       ) : null}
 
-      <LessonViewer delivery={delivery.data} />
+      <LessonViewer
+        delivery={delivery.data}
+        engine={engineResult.ok ? engineResult.data : null}
+      />
     </LearningShell>
   );
 }

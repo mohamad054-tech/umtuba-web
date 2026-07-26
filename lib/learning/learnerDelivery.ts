@@ -43,7 +43,17 @@ export const LEARNING_LEARNER_ROUTES = {
   /** Matches assignment learner route; kept here to avoid circular imports. */
   assignment: (activityId: string) =>
     `/learning/activities/${activityId}/assignment`,
+  /** Matches project learner route; kept here to avoid circular imports. */
+  project: (activityId: string) => `/learning/activities/${activityId}/project`,
+  /** Matches lab learner route; kept here to avoid circular imports. */
+  lab: (activityId: string) => `/learning/activities/${activityId}/lab`,
   attempt: (attemptId: string) => `/learning/attempts/${attemptId}`,
+  /** Matches course resources learner route; kept here to avoid circular imports. */
+  resources: (courseId: string) => `/learning/courses/${courseId}/resources`,
+  /** Matches course progress bundle learner route; kept here to avoid circular imports. */
+  progress: (courseId: string) => `/learning/courses/${courseId}/progress`,
+  /** Matches AI Tutor learner route; kept here to avoid circular imports. */
+  aiTutor: (lessonId: string) => `/learning/lessons/${lessonId}/ai-tutor`,
 } as const;
 
 export const LEARNING_LEARNER_LOGIN_NEXT = LEARNING_LEARNER_ROUTES.hub;
@@ -148,6 +158,8 @@ export type LearningLessonCompleteView = {
 export type LearningLearnerActivityExperience =
   | "assessment"
   | "assignment"
+  | "project"
+  | "lab"
   | "generic";
 
 export type LearningLearnerActivityTarget = {
@@ -176,7 +188,8 @@ export function resolveContinueLearningTarget(input: {
 
 /**
  * Resolve the learner experience route for an activity by type.
- * quiz → assessment; assignment → assignment; else → generic gate.
+ * quiz → assessment; assignment → assignment; project → project; lab → lab;
+ * else → generic gate.
  * Fail closed: missing activity id → null; unknown/empty type → generic.
  */
 export function resolveLearnerActivityTarget(input: {
@@ -199,6 +212,20 @@ export function resolveLearnerActivityTarget(input: {
       activity_id: activityId,
       experience: "assignment",
       href: LEARNING_LEARNER_ROUTES.assignment(activityId),
+    };
+  }
+  if (type === "project") {
+    return {
+      activity_id: activityId,
+      experience: "project",
+      href: LEARNING_LEARNER_ROUTES.project(activityId),
+    };
+  }
+  if (type === "lab") {
+    return {
+      activity_id: activityId,
+      experience: "lab",
+      href: LEARNING_LEARNER_ROUTES.lab(activityId),
     };
   }
   return {

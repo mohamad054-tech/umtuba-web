@@ -2,43 +2,39 @@
 
 ## Task title
 
-UMTUBA Learning — Learner Experience Foundation V1 — Slice 4
+UM Learning Platform — Continue Implementation (first-course readiness)
 
 ## Goal
 
-Implement Lesson Completion Experience V1 on branch
-`office/learning-learner-experience-foundation-v1`: add
-`completeMyLearningLesson()` over existing `complete_learning_lesson`,
-`resolveLessonCompletionHandoff()`, wire `LessonViewer` mark-complete /
-continue / end-of-course CTAs, and a server action with auth + redirect.
-No migrations, no instructor changes, no assessment engine changes, no
-reopen flow, no direct DB writes.
-
-## Allowed scope
-
-- `lib/learning/learnerDelivery.ts`
-- `lib/learning/learnerDelivery.test.ts`
-- `app/learning/progressActions.ts` (new)
-- `app/components/learning/LessonViewer.tsx`
-- `app/learning/lessons/[lessonId]/page.tsx` (query status only)
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/learning/implementation/LEARNER_EXPERIENCE_FOUNDATION_V1.md`
-
-## Forbidden scope
-
-- Migrations / Supabase schema
-- Assessment / assignment engine modules (RPCs, adapters, attempt logic)
-- Instructor flows
-- Direct writes to progress tables
-- `reopen_learning_lesson` / reopen UI
-- Unrelated Learning foundations / learner dashboard extras
-- Commit / push / merge / migration apply unless explicitly requested
+Complete Learning platform gaps so UM Learning can receive the first course.
+No course content authoring. No work outside Learning. No temporary TODOs.
+Match existing SECURITY DEFINER / FORCE RLS foundations.
 
 ## Branch
 
-`office/learning-learner-experience-foundation-v1`
+`alpha-0.2`
+
+## Priority order
+
+1. Lesson Engine
+2. Course Progress
+3. Projects
+4. Labs
+5. Assignments (complete gaps only)
+6. Course Resources
+7. UM Points lesson unlock (existing points system)
+8. AI Tutor integration layer (no provider)
+9. Tests after each phase
+
+## Forbidden
+
+- Discover / Ads / Games / non-Learning
+- Course content production
+- Breaking architecture
+- Incomplete merges
+- Remote migration apply without GO
+- Push without GO
 
 ## Status
 
-`complete` — PASS (not committed)
+`in_progress`

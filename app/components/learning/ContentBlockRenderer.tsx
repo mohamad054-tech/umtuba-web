@@ -185,6 +185,63 @@ export default function ContentBlockRenderer({
         </pre>
       );
     }
+    case "transcript": {
+      const text = asPlainString(content.text, 100000);
+      const language = asPlainString(content.language, 32);
+      return (
+        <section className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+            Transcript{language ? ` · ${language}` : ""}
+          </p>
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-white/75">
+            {text}
+          </p>
+        </section>
+      );
+    }
+    case "pdf": {
+      const url = content.url;
+      if (!isSafeHttpUrl(url)) return null;
+      const title = asPlainString(content.title, 300) || "PDF resource";
+      return (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="watch-focus-ring font-bold text-sky-300 hover:text-sky-200"
+          >
+            {title}
+          </a>
+          <p className="mt-1 text-xs text-white/40">PDF</p>
+        </div>
+      );
+    }
+    case "downloadable_file": {
+      const url = content.url;
+      if (!isSafeHttpUrl(url)) return null;
+      const title =
+        asPlainString(content.title, 300) ||
+        asPlainString(content.filename, 255) ||
+        "Download";
+      const filename = asPlainString(content.filename, 255);
+      return (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            download={filename || undefined}
+            className="watch-focus-ring font-bold text-sky-300 hover:text-sky-200"
+          >
+            {title}
+          </a>
+          {filename ? (
+            <p className="mt-1 text-xs text-white/40">{filename}</p>
+          ) : null}
+        </div>
+      );
+    }
     default:
       return null;
   }

@@ -29,7 +29,8 @@ export type LearningLessonContentBlockStatus =
   (typeof LEARNING_LESSON_CONTENT_BLOCK_STATUSES)[number];
 
 /**
- * V1 creatable content block types (10). Immutable after create; unknown values
+ * Creatable content block types (13). Expanded in 20260863 with
+ * transcript|pdf|downloadable_file. Immutable after create; unknown values
  * fail closed. Media types hold opaque validated http(s) reference strings only.
  */
 export const LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES = [
@@ -43,6 +44,9 @@ export const LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES = [
   "callout",
   "external_link",
   "code_block",
+  "transcript",
+  "pdf",
+  "downloadable_file",
 ] as const;
 export type LearningLessonContentBlockCreatableType =
   (typeof LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES)[number];
@@ -62,11 +66,10 @@ export type LearningLessonContentBlockReservedType =
  * Fully deferred types — intentionally NOT in the DB allowlist, so they fail
  * closed at both the CHECK constraint and the validator. Listed here for
  * documentation/testing only; they must never be accepted in V1.
+ * (pdf|downloadable_file moved to creatable in 20260863.)
  */
 export const LEARNING_LESSON_CONTENT_BLOCK_DEFERRED_TYPES = [
   "gallery",
-  "pdf",
-  "downloadable_file",
   "table",
   "embed",
   "html",
@@ -75,9 +78,9 @@ export type LearningLessonContentBlockDeferredType =
   (typeof LEARNING_LESSON_CONTENT_BLOCK_DEFERRED_TYPES)[number];
 
 /**
- * Full immutable DB allowlist = creatable (10) + reserved (2) = 12. This mirrors
- * the `learning_lesson_content_blocks_type_check` constraint exactly. Deferred
- * types are deliberately excluded.
+ * Full immutable DB allowlist = creatable (13) + reserved (2) = 15. This mirrors
+ * the `learning_lesson_content_blocks_type_check` constraint (post-20260863).
+ * Deferred types are deliberately excluded.
  */
 export const LEARNING_LESSON_CONTENT_BLOCK_TYPES = [
   ...LEARNING_LESSON_CONTENT_BLOCK_CREATABLE_TYPES,
@@ -162,6 +165,9 @@ export const LEARNING_LESSON_CONTENT_BLOCK_CONTENT_KEYS: Record<
   callout: ["text", "variant"],
   external_link: ["url", "label", "description"],
   code_block: ["code", "language"],
+  transcript: ["text", "language", "video_block_id"],
+  pdf: ["url", "title", "page_count"],
+  downloadable_file: ["url", "title", "filename", "mime_type", "size_bytes"],
 } as const;
 
 export type LearningLessonContentBlock = {
