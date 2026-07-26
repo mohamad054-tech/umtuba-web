@@ -21,16 +21,14 @@ export default function SearchFilters({
   const q = params.get("q") ?? "";
   const category = params.get("category") ?? "";
   const sort = params.get("sort") ?? "newest";
-  const brand = params.get("brand") ?? "";
 
   const queryString = useMemo(() => {
     const next = new URLSearchParams();
     if (q.trim()) next.set("q", q.trim());
     if (category) next.set("category", category);
     if (sort && sort !== "newest") next.set("sort", sort);
-    if (brand) next.set("brand", brand);
     return next.toString();
-  }, [q, category, sort, brand]);
+  }, [q, category, sort]);
 
   function push(updates: Record<string, string>) {
     const next = new URLSearchParams(queryString);
@@ -47,7 +45,10 @@ export default function SearchFilters({
   const filters = (
     <div className="space-y-5">
       <div>
-        <label htmlFor="store-search-q" className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+        <label
+          htmlFor="store-search-q"
+          className="text-xs font-bold uppercase tracking-[0.16em] text-white/45"
+        >
           Search
         </label>
         <input
@@ -62,9 +63,6 @@ export default function SearchFilters({
           }}
           className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 p-3.5 text-sm outline-none transition focus:border-violet-400/50"
         />
-        <p className="mt-2 text-[11px] text-white/35">
-          Suggestions coming soon
-        </p>
       </div>
 
       <fieldset>
@@ -87,47 +85,6 @@ export default function SearchFilters({
           ))}
         </div>
       </fieldset>
-
-      <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-          Brand
-        </legend>
-        <p className="mt-2 text-xs text-white/40">
-          Brand filters unlock when brands are published.
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2 opacity-50" aria-disabled>
-          {["Aura", "Nova", "Pulse"].map((name) => (
-            <span
-              key={name}
-              className="rounded-full border border-white/10 px-3 py-1 text-xs text-white/50"
-            >
-              {name}
-            </span>
-          ))}
-        </div>
-      </fieldset>
-
-      <div>
-        <label
-          htmlFor="price-slider"
-          className="text-xs font-bold uppercase tracking-[0.16em] text-white/45"
-        >
-          Price
-        </label>
-        <input
-          id="price-slider"
-          type="range"
-          min={0}
-          max={100}
-          defaultValue={100}
-          disabled
-          aria-disabled="true"
-          className="mt-3 w-full accent-violet-500 opacity-50"
-        />
-        <p className="mt-1 text-[11px] text-white/35">
-          Price slider coming in a later phase
-        </p>
-      </div>
 
       <div>
         <label

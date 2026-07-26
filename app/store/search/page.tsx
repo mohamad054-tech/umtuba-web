@@ -19,7 +19,6 @@ type SearchPageProps = {
     q?: string;
     category?: string;
     sort?: string;
-    brand?: string;
   }>;
 };
 
@@ -66,8 +65,7 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">Search</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/50">
-          Filter active products. Brand and price controls are preview placeholders
-          until commerce filters expand.
+          Search active products by keyword, category, and sort order.
         </p>
       </header>
 

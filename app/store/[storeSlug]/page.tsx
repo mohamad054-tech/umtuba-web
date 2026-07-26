@@ -11,6 +11,8 @@ import {
   getPublicStoreBySlug,
   listPublicCatalog,
 } from "../../../lib/store/catalogQueries";
+import { isSafeStoreBrandingUrl } from "../../../lib/store/storeBranding";
+import { STOREFRONT_FLAGS } from "../../../lib/store/storefrontFlags";
 
 type StoreProfilePageProps = {
   params: Promise<{ storeSlug: string }>;
@@ -34,6 +36,12 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
   });
 
   const verified = store.verification_status === "verified";
+  const coverUrl = isSafeStoreBrandingUrl(store.cover_path)
+    ? store.cover_path.trim()
+    : null;
+  const logoUrl = isSafeStoreBrandingUrl(store.logo_path)
+    ? store.logo_path.trim()
+    : null;
 
   const productsPanel = catalog.error ? (
     <StoreErrorState message={catalog.error} />
@@ -112,23 +120,22 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
       }
     >
       <section className="relative mt-6 overflow-hidden rounded-[28px] border border-violet-400/20 bg-[#080816]/85">
-        <div className="relative h-40 bg-gradient-to-r from-violet-800/50 via-[#0a0a18] to-fuchsia-900/40 md:h-56">
-          <div
-            className="absolute inset-0 opacity-40"
-            aria-hidden
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 20% 30%, rgba(167,139,250,0.45), transparent 45%), radial-gradient(circle at 80% 60%, rgba(217,70,239,0.25), transparent 40%)",
-            }}
-          />
-          {store.cover_path ? (
-            <p className="absolute bottom-3 left-4 text-xs text-white/50">
-              Cover: {store.cover_path}
-            </p>
+        <div className="relative h-40 overflow-hidden bg-gradient-to-r from-violet-800/50 via-[#0a0a18] to-fuchsia-900/40 md:h-56">
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
           ) : (
-            <p className="absolute bottom-3 left-4 text-xs uppercase tracking-[0.2em] text-white/35">
-              Cover imagery
-            </p>
+            <div
+              className="absolute inset-0 opacity-40"
+              aria-hidden
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 20% 30%, rgba(167,139,250,0.45), transparent 45%), radial-gradient(circle at 80% 60%, rgba(217,70,239,0.25), transparent 40%)",
+              }}
+            />
           )}
         </div>
 
@@ -136,13 +143,18 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
           <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
             <div className="flex items-end gap-4">
               <div
-                className="flex h-20 w-20 items-center justify-center rounded-[22px] border border-violet-300/40 bg-gradient-to-br from-violet-600 to-fuchsia-700 text-2xl font-black shadow-lg shadow-violet-900/40"
+                className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[22px] border border-violet-300/40 bg-gradient-to-br from-violet-600 to-fuchsia-700 text-2xl font-black shadow-lg shadow-violet-900/40"
                 aria-label={`Logo for ${store.name}`}
               >
-                {store.logo_path ? (
-                  <span className="sr-only">{store.logo_path}</span>
-                ) : null}
-                {(store.name[0] ?? "U").toUpperCase()}
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  (store.name[0] ?? "U").toUpperCase()
+                )}
               </div>
               <div className="pb-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -160,21 +172,23 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-white/45">@{store.slug}</p>
-                <p className="mt-2 text-xs text-white/40">
-                  Followers placeholder · Ratings placeholder
-                </p>
+                {STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB ? (
+                  <p className="mt-2 text-xs text-white/40">Ratings coming soon</p>
+                ) : null}
               </div>
             </div>
 
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              title="Follow coming next"
-              className="cursor-not-allowed rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/40"
-            >
-              Follow
-            </button>
+            {STOREFRONT_FLAGS.SHOW_STORE_FOLLOW_UI ? (
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                title="Follow coming next"
+                className="cursor-not-allowed rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/40"
+              >
+                Follow
+              </button>
+            ) : null}
           </div>
         </div>
       </section>

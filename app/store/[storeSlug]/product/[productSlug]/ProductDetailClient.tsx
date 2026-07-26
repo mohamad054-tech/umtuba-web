@@ -10,6 +10,7 @@ import StoreSection from "../../../../components/store/StoreSection";
 import WishlistButton from "../../../../components/store/WishlistButton";
 import { APP_ROUTES } from "../../../../lib/nav";
 import { formatMinorUnits } from "../../../../../lib/store/money";
+import { STOREFRONT_FLAGS } from "../../../../../lib/store/storefrontFlags";
 import type { PublicProductVideoItem } from "../../../../../lib/store/videoCommerceQueries";
 import type {
   PublicCatalogItem,
@@ -378,11 +379,13 @@ export default function ProductDetailClient({
             tone="fuchsia"
           />
         )}
-        <PlaceholderPanel
-          title="Reviews & questions"
-          description="Reviews and Q&A placeholders — social proof ships later."
-          tone="indigo"
-        />
+        {STOREFRONT_FLAGS.SHOW_PDP_REVIEWS_PLACEHOLDER ? (
+          <PlaceholderPanel
+            title="Reviews & questions"
+            description="Reviews and Q&A placeholders — social proof ships later."
+            tone="indigo"
+          />
+        ) : null}
       </div>
 
       {related.length > 0 ? (

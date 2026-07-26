@@ -19,4 +19,10 @@ export const STOREFRONT_FLAGS = {
   SHOW_STORE_PROFILE_RATINGS_TAB: envFlag(
     "NEXT_PUBLIC_STORE_SHOW_PROFILE_RATINGS_TAB"
   ),
+  /** Reviews/Q&A product is out of stage — keep PDP placeholder off by default. */
+  SHOW_PDP_REVIEWS_PLACEHOLDER: envFlag(
+    "NEXT_PUBLIC_STORE_SHOW_PDP_REVIEWS_PLACEHOLDER"
+  ),
+  /** Follow / follower social chrome — unfinished for this stage. */
+  SHOW_STORE_FOLLOW_UI: envFlag("NEXT_PUBLIC_STORE_SHOW_FOLLOW_UI"),
 } as const;

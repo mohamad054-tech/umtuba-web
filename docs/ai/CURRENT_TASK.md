@@ -2,13 +2,12 @@
 
 ## Task title
 
-UM Learning Platform — Continue Implementation (first-course readiness)
+UMTUBA Store Completion
 
 ## Goal
 
-Complete Learning platform gaps so UM Learning can receive the first course.
-No course content authoring. No work outside Learning. No temporary TODOs.
-Match existing SECURITY DEFINER / FORCE RLS foundations.
+Close all remaining in-scope gaps so UMTUBA Store can be considered complete for this stage.
+No new future features. Match existing Store architecture, SECURITY DEFINER / FORCE RLS patterns, and storefront UX.
 
 ## Branch
 
@@ -16,25 +15,30 @@ Match existing SECURITY DEFINER / FORCE RLS foundations.
 
 ## Priority order
 
-1. Lesson Engine
-2. Course Progress
-3. Projects
-4. Labs
-5. Assignments (complete gaps only)
-6. Course Resources
-7. UM Points lesson unlock (existing points system)
-8. AI Tutor integration layer (no provider)
-9. Tests after each phase
+1. Store Runtime
+2. Product Details
+3. Categories / Search / Filters
+4. Wishlist / Cart / Checkout
+5. Orders
+6. Digital + Physical products / Inventory
+7. Seller Experience
+8. Reviews / Ratings
+9. Coupons (only if already in current scope)
+10. Admin Management
+11. Error / Empty / Loading states
+12. Permission checks / Security
+13. Tests
 
 ## Forbidden
 
-- Discover / Ads / Games / non-Learning
-- Course content production
-- Breaking architecture
-- Incomplete merges
+- Learning (do not modify)
+- Games
+- Discover / Ads
+- Course Authoring Studio
+- Features outside the Store
 - Remote migration apply without GO
-- Push without GO
+- Incomplete merges / breaking architecture
 
 ## Status
 
-`in_progress`
+`completed`
