@@ -17,11 +17,21 @@ export const LEARNING_PROJECT_RPCS = {
   submitSubmission: "submit_my_learning_project_submission",
   getMine: "get_my_learning_project",
   review: "review_learning_project_submission",
+  queue: "get_learning_project_submission_queue",
+  getForReview: "get_learning_project_submission_for_review",
 } as const;
+
+export const LEARNING_PROJECT_QUEUE_STATUSES = [
+  "pending",
+  "reviewed",
+  "all",
+] as const;
 
 export const LEARNING_PROJECT_ROUTES = {
   learner: (activityId: string) =>
     `/learning/activities/${activityId}/project`,
+  queue: (courseId: string) =>
+    `/learning/instructor/courses/${courseId}/projects`,
   review: (courseId: string, submissionId: string) =>
     `/learning/instructor/courses/${courseId}/projects/${submissionId}`,
   author: (courseId: string, activityId: string) =>
@@ -185,4 +195,56 @@ export async function reviewProjectSubmission(
   });
   if (!result.ok) return result;
   return { ok: true, data: asRecord(result.data) ?? {} };
+}
+
+export async function loadProjectQueue(
+  supabase: AnyClient,
+  courseId: string,
+  input?: { status?: string; search?: string | null }
+): Promise<ProjectResult<{ items: unknown[]; course_id: string; status: string }>> {
+  if (!isProjectUuid(courseId)) {
+    return { ok: false, message: "course_id must be a valid UUID" };
+  }
+  const status = input?.status?.trim() || "pending";
+  if (
+    !(LEARNING_PROJECT_QUEUE_STATUSES as readonly string[]).includes(status)
+  ) {
+    return { ok: false, message: "Invalid status filter" };
+  }
+  const result = await callRpc(supabase, LEARNING_PROJECT_RPCS.queue, {
+    p_course_id: courseId,
+    p_status: status,
+    p_search: input?.search ?? null,
+  });
+  if (!result.ok) return result;
+  const row = asRecord(result.data);
+  if (!row || asString(row.course_id) !== courseId) {
+    return { ok: false, message: "Project queue payload is malformed." };
+  }
+  return {
+    ok: true,
+    data: {
+      course_id: courseId,
+      status: asString(row.status) ?? status,
+      items: Array.isArray(row.items) ? row.items : [],
+    },
+  };
+}
+
+export async function loadProjectSubmissionForReview(
+  supabase: AnyClient,
+  submissionId: string
+): Promise<ProjectResult<Record<string, unknown>>> {
+  if (!isProjectUuid(submissionId)) {
+    return { ok: false, message: "submission_id must be a valid UUID" };
+  }
+  const result = await callRpc(supabase, LEARNING_PROJECT_RPCS.getForReview, {
+    p_submission_id: submissionId,
+  });
+  if (!result.ok) return result;
+  const row = asRecord(result.data);
+  if (!row || asString(row.submission_id) !== submissionId) {
+    return { ok: false, message: "Project review payload is malformed." };
+  }
+  return { ok: true, data: row };
 }

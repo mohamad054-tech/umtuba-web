@@ -165,3 +165,22 @@ export async function unlockMyLessonWithUmPoints(
   if (!result.ok) return result;
   return { ok: true, data: asRecord(result.data) ?? {} };
 }
+
+/**
+ * Fail-closed content gate for point-locked lessons.
+ * Managers/admins receive unlocked=true from the RPC and pass.
+ */
+export async function requireLessonUnlockedForLearner(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<LessonUnlockResult<LearningLessonUnlockState>> {
+  const state = await loadMyLessonUnlockState(supabase, lessonId);
+  if (!state.ok) return state;
+  if (state.data.locked) {
+    return {
+      ok: false,
+      message: "This lesson is locked. Unlock with UM Points to continue.",
+    };
+  }
+  return state;
+}

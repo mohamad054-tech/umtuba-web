@@ -11,6 +11,8 @@ import { LEARNING_AI_TUTOR_RPCS } from "./aiTutorFoundation";
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
+const PROJECT_REVIEW_MIGRATION =
+  "supabase/migrations/20260864_learning_project_instructor_review_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
@@ -21,16 +23,20 @@ function stripSqlComments(s: string) {
 }
 
 describe("First Course Readiness V1 — migration presence", () => {
-  it("ships 20260863 migration", () => {
+  it("ships 20260863 + project instructor review migration", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
+    expect(existsSync(join(ROOT, PROJECT_REVIEW_MIGRATION))).toBe(true);
     expect(
       readdirSync(join(ROOT, "supabase/migrations"))
     ).toContain("20260863_learning_first_course_readiness_v1.sql");
+    expect(
+      readdirSync(join(ROOT, "supabase/migrations"))
+    ).toContain("20260864_learning_project_instructor_review_v1.sql");
   });
 });
 
 describe("First Course Readiness V1 — tables & functions", () => {
-  const sql = read(MIGRATION);
+  const sql = `${read(MIGRATION)}\n${read(PROJECT_REVIEW_MIGRATION)}`;
   const body = stripSqlComments(sql);
 
   it("creates major domain tables", () => {

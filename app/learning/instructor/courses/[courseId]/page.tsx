@@ -14,6 +14,9 @@ import { LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES } from "../../../../../lib/learni
 import { LEARNING_ASSIGNMENT_ROUTES } from "../../../../../lib/learning/assignmentsCoursework";
 import { LEARNING_COMMUNITY_ROUTES } from "../../../../../lib/learning/communityFoundation";
 import { LEARNING_LIVE_ROUTES } from "../../../../../lib/learning/liveCalendarFoundation";
+import { LEARNING_PROJECT_ROUTES } from "../../../../../lib/learning/projectsFoundation";
+import { LEARNING_LAB_ROUTES } from "../../../../../lib/learning/labsFoundation";
+import { LEARNING_COURSE_RESOURCE_ROUTES } from "../../../../../lib/learning/courseResourcesFoundation";
 import {
   archiveActivityAction,
   archiveLessonAction,
@@ -113,6 +116,18 @@ export default async function InstructorCourseAuthoringPage({
           className="font-bold text-white underline underline-offset-2"
         >
           Assignment queue
+        </Link>
+        <Link
+          href={LEARNING_PROJECT_ROUTES.queue(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Project queue
+        </Link>
+        <Link
+          href={LEARNING_COURSE_RESOURCE_ROUTES.author(courseId)}
+          className="font-bold text-white underline underline-offset-2"
+        >
+          Resources
         </Link>
         <Link
           href={LEARNING_COMMUNITY_ROUTES.hub(courseId)}
@@ -387,6 +402,8 @@ export default async function InstructorCourseAuthoringPage({
                             >
                               <option value="quiz">quiz</option>
                               <option value="assignment">assignment</option>
+                              <option value="project">project</option>
+                              <option value="lab">lab</option>
                               <option value="practice">practice</option>
                               <option value="discussion">discussion</option>
                             </select>
@@ -449,6 +466,26 @@ export default async function InstructorCourseAuthoringPage({
                                       className="normal-case text-sky-300 underline underline-offset-2"
                                     >
                                       Assignment
+                                    </Link>
+                                  ) : activity.type === "project" ? (
+                                    <Link
+                                      href={LEARNING_PROJECT_ROUTES.author(
+                                        courseId,
+                                        activity.id
+                                      )}
+                                      className="normal-case text-sky-300 underline underline-offset-2"
+                                    >
+                                      Project
+                                    </Link>
+                                  ) : activity.type === "lab" ? (
+                                    <Link
+                                      href={LEARNING_LAB_ROUTES.author(
+                                        courseId,
+                                        activity.id
+                                      )}
+                                      className="normal-case text-sky-300 underline underline-offset-2"
+                                    >
+                                      Lab
                                     </Link>
                                   ) : (
                                     <Link

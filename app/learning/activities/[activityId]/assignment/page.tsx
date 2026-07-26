@@ -7,6 +7,7 @@ import {
   loadMyAssignment,
 } from "../../../../../lib/learning/assignmentsCoursework";
 import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import {
   saveAndSubmitAssignmentAction,
   startAssignmentSubmissionAction,
@@ -51,6 +52,14 @@ export default async function LearnerAssignmentPage({
     loaded.ok && typeof loaded.data.lesson_id === "string"
       ? loaded.data.lesson_id
       : null;
+  if (lessonId) {
+    const unlock = await requireLessonUnlockedForLearner(supabase, lessonId);
+    if (!unlock.ok) {
+      redirect(
+        `${LEARNING_LEARNER_ROUTES.lesson(lessonId)}?error=${encodeURIComponent(unlock.message)}`
+      );
+    }
+  }
   const backHref = lessonId
     ? LEARNING_LEARNER_ROUTES.lesson(lessonId)
     : LEARNING_LEARNER_ROUTES.hub;

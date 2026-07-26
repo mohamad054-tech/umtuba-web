@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   LEARNING_LESSON_UNLOCK_RPCS,
   loadMyLessonUnlockState,
+  requireLessonUnlockedForLearner,
   sanitizeLessonUnlockError,
 } from "./lessonUnlockFoundation";
 
@@ -121,5 +122,46 @@ describe("Lesson Unlock Foundation — adapter", () => {
     expect(
       sanitizeLessonUnlockError("Not entitled to this course")
     ).toMatch(/not allowed/i);
+  });
+
+  it("requireLessonUnlockedForLearner fails closed when locked", async () => {
+    const lockedClient = {
+      rpc: async () => ({
+        data: {
+          lesson_id: LESSON_ID,
+          locked: true,
+          cost: 50,
+          balance: 10,
+          unlocked: false,
+        },
+        error: null,
+      }),
+    };
+    const locked = await requireLessonUnlockedForLearner(
+      lockedClient as never,
+      LESSON_ID
+    );
+    expect(locked.ok).toBe(false);
+    if (!locked.ok) {
+      expect(locked.message).toMatch(/locked/i);
+    }
+
+    const openClient = {
+      rpc: async () => ({
+        data: {
+          lesson_id: LESSON_ID,
+          locked: false,
+          cost: null,
+          balance: 10,
+          unlocked: true,
+        },
+        error: null,
+      }),
+    };
+    const open = await requireLessonUnlockedForLearner(
+      openClient as never,
+      LESSON_ID
+    );
+    expect(open.ok).toBe(true);
   });
 });

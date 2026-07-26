@@ -10,9 +10,15 @@ import {
 import {
   resolveLessonCompletionHandoff,
   LEARNING_LEARNER_ROUTES,
+  type LearningLearnerActivitySummary,
   type LearningLearnerLessonDelivery,
 } from "../../../lib/learning/learnerDelivery";
-import type { LearningLessonEnginePayload } from "../../../lib/learning/lessonEngineFoundation";
+import type { LearningLessonContentBlock } from "../../../lib/learning/lessonContentBlocksFoundation";
+import type {
+  LearningLessonEngineActivity,
+  LearningLessonEngineBlock,
+  LearningLessonEnginePayload,
+} from "../../../lib/learning/lessonEngineFoundation";
 import { completeLearningLessonAction } from "../../learning/progressActions";
 import { unlockLessonWithUmPointsAction } from "../../learning/firstCourseActions";
 
@@ -21,16 +27,69 @@ type LessonViewerProps = {
   engine?: LearningLessonEnginePayload | null;
 };
 
+function isLessonPointLocked(
+  engine: LearningLessonEnginePayload | null
+): boolean {
+  if (!engine) return false;
+  const unlock = engine.unlock;
+  if (!unlock || typeof unlock !== "object" || !("locked" in unlock)) {
+    return false;
+  }
+  return (unlock as { locked?: boolean }).locked === true;
+}
+
+function toRenderableBlocks(
+  lessonId: string,
+  blocks: LearningLessonEngineBlock[]
+): LearningLessonContentBlock[] {
+  return blocks.map((block) => ({
+    id: block.id,
+    lesson_id: lessonId,
+    block_type: block.block_type as LearningLessonContentBlock["block_type"],
+    status: block.status as LearningLessonContentBlock["status"],
+    position: block.position,
+    content: block.content ?? {},
+    created_by: "",
+    updated_by: null,
+    created_at: "",
+    updated_at: "",
+    published_at: null,
+    suspended_at: null,
+    archived_at: null,
+  }));
+}
+
+function toActivitySummaries(
+  activities: LearningLessonEngineActivity[]
+): LearningLearnerActivitySummary[] {
+  return activities.map((activity, index) => ({
+    id: activity.id,
+    name: activity.name,
+    slug: activity.id,
+    type: activity.type,
+    description: null,
+    position: index,
+    hints: {
+      is_required: true,
+      max_attempts: null,
+      time_limit_seconds: null,
+    },
+  }));
+}
+
 export default function LessonViewer({
   delivery,
   engine = null,
 }: LessonViewerProps) {
   const hasNav = Boolean(delivery.previous_lesson || delivery.next_lesson);
-  const handoff = resolveLessonCompletionHandoff({
-    progress_status: delivery.progress_status,
-    next_lesson: delivery.next_lesson,
-    course_id: delivery.lesson.course_id,
-  });
+  const locked = isLessonPointLocked(engine);
+  const handoff = locked
+    ? null
+    : resolveLessonCompletionHandoff({
+        progress_status: delivery.progress_status,
+        next_lesson: delivery.next_lesson,
+        course_id: delivery.lesson.course_id,
+      });
 
   const unlock =
     engine &&
@@ -48,6 +107,19 @@ export default function LessonViewer({
   const resumeSeconds =
     engine?.media_position?.last_media_position_seconds ?? null;
   const resumeBlockId = engine?.media_position?.last_content_block_id ?? null;
+
+  // Prefer engine payload (authoritative unlock redaction). When locked, never
+  // fall back to delivery SELECT which bypasses point gates.
+  const blocks: LearningLessonContentBlock[] = locked
+    ? []
+    : engine
+      ? toRenderableBlocks(delivery.lesson.id, engine.blocks)
+      : delivery.blocks;
+  const activities: LearningLearnerActivitySummary[] = locked
+    ? []
+    : engine
+      ? toActivitySummaries(engine.activities)
+      : delivery.activities;
 
   return (
     <div className="mt-6 space-y-6">
@@ -70,7 +142,7 @@ export default function LessonViewer({
             ? ` · ~${engine.lesson.estimated_duration_minutes} min`
             : ""}
         </p>
-        {engine?.ai_tutor_enabled ? (
+        {engine?.ai_tutor_enabled && !locked ? (
           <p className="mt-3">
             <Link
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
@@ -110,7 +182,7 @@ export default function LessonViewer({
         </section>
       ) : null}
 
-      {unlock && unlock.locked && !unlock.unlocked ? (
+      {unlock && unlock.locked ? (
         <section className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-4">
           <h2 className="text-sm font-bold text-amber-50">Unlock with UM Points</h2>
           <p className="mt-1 text-sm text-amber-50/80">
@@ -128,51 +200,59 @@ export default function LessonViewer({
         </section>
       ) : null}
 
-      <section className="space-y-4">
-        <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Content
-        </h2>
-        {delivery.blocks.length === 0 ? (
-          <p className="text-sm text-white/45">No published content blocks.</p>
-        ) : (
-          delivery.blocks.map((block) => {
-            if (block.block_type === "video" && block.status === "published") {
-              const url = block.content?.url;
-              if (isSafeHttpUrl(url)) {
-                const useResume =
-                  resumeBlockId === block.id ||
-                  (!resumeBlockId &&
-                    delivery.blocks.find((b) => b.block_type === "video")?.id ===
-                      block.id);
+      {!locked ? (
+        <>
+          <section className="space-y-4">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Content
+            </h2>
+            {blocks.length === 0 ? (
+              <p className="text-sm text-white/45">No published content blocks.</p>
+            ) : (
+              blocks.map((block) => {
+                if (block.block_type === "video" && block.status === "published") {
+                  const url = block.content?.url;
+                  if (isSafeHttpUrl(url)) {
+                    const useResume =
+                      resumeBlockId === block.id ||
+                      (!resumeBlockId &&
+                        blocks.find((b) => b.block_type === "video")?.id ===
+                          block.id);
+                    return (
+                      <div key={block.id}>
+                        <ContinueWatchingVideo
+                          src={url}
+                          lessonId={delivery.lesson.id}
+                          contentBlockId={block.id}
+                          initialSeconds={useResume ? resumeSeconds : null}
+                          caption={asPlainString(block.content?.caption, 1000)}
+                          provider={asVideoProvider(block.content?.provider)}
+                        />
+                      </div>
+                    );
+                  }
+                }
                 return (
                   <div key={block.id}>
-                    <ContinueWatchingVideo
-                      src={url}
-                      lessonId={delivery.lesson.id}
-                      contentBlockId={block.id}
-                      initialSeconds={useResume ? resumeSeconds : null}
-                      caption={asPlainString(block.content?.caption, 1000)}
-                      provider={asVideoProvider(block.content?.provider)}
-                    />
+                    <ContentBlockRenderer block={block} />
                   </div>
                 );
-              }
-            }
-            return (
-              <div key={block.id}>
-                <ContentBlockRenderer block={block} />
-              </div>
-            );
-          })
-        )}
-      </section>
+              })
+            )}
+          </section>
 
-      <section className="space-y-3">
-        <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Activities
-        </h2>
-        <ActivityList activities={delivery.activities} />
-      </section>
+          <section className="space-y-3">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Activities
+            </h2>
+            <ActivityList activities={activities} />
+          </section>
+        </>
+      ) : (
+        <p className="text-sm text-white/55">
+          Content and activities stay hidden until this lesson is unlocked.
+        </p>
+      )}
 
       {handoff?.kind === "mark_complete" ? (
         <form action={completeLearningLessonAction} className="pt-2">

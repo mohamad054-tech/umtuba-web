@@ -11,6 +11,7 @@ import {
   LEARNING_LEARNER_ROUTES,
   loadLessonDelivery,
 } from "../../../../../lib/learning/learnerDelivery";
+import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import {
   appendAiTutorMessageAction,
   createAiTutorThreadAction,
@@ -36,6 +37,12 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
   }
 
   const supabase = await createClient();
+  const unlock = await requireLessonUnlockedForLearner(supabase, lessonId);
+  if (!unlock.ok) {
+    redirect(
+      `${LEARNING_LEARNER_ROUTES.lesson(lessonId)}?error=${encodeURIComponent(unlock.message)}`
+    );
+  }
   const delivery = await loadLessonDelivery(supabase, lessonId);
   if (!delivery.ok) {
     redirect(LEARNING_LEARNER_ROUTES.hub);

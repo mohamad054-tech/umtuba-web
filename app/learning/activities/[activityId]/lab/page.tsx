@@ -6,7 +6,11 @@ import {
   LEARNING_LAB_ROUTES,
   loadMyLab,
 } from "../../../../../lib/learning/labsFoundation";
-import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import {
+  LEARNING_LEARNER_ROUTES,
+  loadPublishedActivityGate,
+} from "../../../../../lib/learning/learnerDelivery";
+import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import {
   completeLabAction,
   startLabAction,
@@ -32,6 +36,18 @@ export default async function LearnerLabPage({ params, searchParams }: PageProps
   }
 
   const supabase = await createClient();
+  const gate = await loadPublishedActivityGate(supabase, activityId);
+  if (gate.ok) {
+    const unlock = await requireLessonUnlockedForLearner(
+      supabase,
+      gate.data.lesson_id
+    );
+    if (!unlock.ok) {
+      redirect(
+        `${LEARNING_LEARNER_ROUTES.lesson(gate.data.lesson_id)}?error=${encodeURIComponent(unlock.message)}`
+      );
+    }
+  }
   const loaded = await loadMyLab(supabase, activityId);
   const starterFiles =
     loaded.ok && Array.isArray(loaded.data.starter_files)

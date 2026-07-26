@@ -6,7 +6,11 @@ import {
   LEARNING_PROJECT_ROUTES,
   loadMyProject,
 } from "../../../../../lib/learning/projectsFoundation";
-import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import {
+  LEARNING_LEARNER_ROUTES,
+  loadPublishedActivityGate,
+} from "../../../../../lib/learning/learnerDelivery";
+import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import {
   saveAndSubmitProjectAction,
   startProjectSubmissionAction,
@@ -35,6 +39,18 @@ export default async function LearnerProjectPage({
   }
 
   const supabase = await createClient();
+  const gate = await loadPublishedActivityGate(supabase, activityId);
+  if (gate.ok) {
+    const unlock = await requireLessonUnlockedForLearner(
+      supabase,
+      gate.data.lesson_id
+    );
+    if (!unlock.ok) {
+      redirect(
+        `${LEARNING_LEARNER_ROUTES.lesson(gate.data.lesson_id)}?error=${encodeURIComponent(unlock.message)}`
+      );
+    }
+  }
   const loaded = await loadMyProject(supabase, activityId);
   const submission =
     loaded.ok && loaded.data.submission && typeof loaded.data.submission === "object"

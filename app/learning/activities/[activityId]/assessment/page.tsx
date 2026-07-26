@@ -8,6 +8,7 @@ import {
   loadAssessmentDelivery,
 } from "../../../../../lib/learning/assessmentDelivery";
 import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import { startAssessmentAttemptAction } from "../../../assessmentAttemptActions";
 
 export const dynamic = "force-dynamic";
@@ -42,6 +43,17 @@ export default async function LearningAssessmentDeliveryPage({
 
   const supabase = await createClient();
   const loaded = await loadAssessmentDelivery(supabase, activityId);
+  if (loaded.ok) {
+    const unlock = await requireLessonUnlockedForLearner(
+      supabase,
+      loaded.data.lesson_id
+    );
+    if (!unlock.ok) {
+      redirect(
+        `${LEARNING_LEARNER_ROUTES.lesson(loaded.data.lesson_id)}?error=${encodeURIComponent(unlock.message)}`
+      );
+    }
+  }
   if (!loaded.ok) {
     const lower = loaded.message.toLowerCase();
     if (

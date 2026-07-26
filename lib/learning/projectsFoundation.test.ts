@@ -11,6 +11,8 @@ import {
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
+const REVIEW_MIGRATION =
+  "supabase/migrations/20260864_learning_project_instructor_review_v1.sql";
 const SRC = readFileSync(
   join(ROOT, "lib/learning/projectsFoundation.ts"),
   "utf8"
@@ -43,11 +45,15 @@ const COURSE_ID = "11111111-1111-4111-8111-111111111111";
 const SUBMISSION_ID = "44444444-4444-4444-8444-444444444444";
 
 describe("Projects Foundation — files", () => {
-  it("ships readiness migration and adapter", () => {
+  it("ships readiness + instructor review migrations and adapter", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
+    expect(existsSync(join(ROOT, REVIEW_MIGRATION))).toBe(true);
     expect(
       readdirSync(join(ROOT, "supabase/migrations"))
     ).toContain("20260863_learning_first_course_readiness_v1.sql");
+    expect(
+      readdirSync(join(ROOT, "supabase/migrations"))
+    ).toContain("20260864_learning_project_instructor_review_v1.sql");
     expect(existsSync(join(ROOT, "lib/learning/projectsFoundation.ts"))).toBe(
       true
     );
@@ -55,7 +61,7 @@ describe("Projects Foundation — files", () => {
 });
 
 describe("Projects Foundation — SQL", () => {
-  const sql = read(MIGRATION);
+  const sql = `${read(MIGRATION)}\n${read(REVIEW_MIGRATION)}`;
 
   it("creates project tables", () => {
     expect(sql).toMatch(
@@ -85,12 +91,32 @@ describe("Projects Foundation — SQL", () => {
       /revoke all on function public\.get_my_learning_project\(uuid\)\s+from public, anon/
     );
   });
+
+  it("instructor queue + review-get revoke anon and require manage", () => {
+    const queue = stripSqlComments(
+      fnBody(sql, "get_learning_project_submission_queue")
+    );
+    const forReview = stripSqlComments(
+      fnBody(sql, "get_learning_project_submission_for_review")
+    );
+    expect(queue).toMatch(/can_manage_learning_course/);
+    expect(forReview).toMatch(/can_manage_learning_course/);
+    expect(sql).toMatch(
+      /revoke all on function public\.get_learning_project_submission_queue/
+    );
+    expect(sql).toMatch(
+      /revoke all on function public\.get_learning_project_submission_for_review/
+    );
+  });
 });
 
 describe("Projects Foundation — adapter", () => {
-  it("builds learner and instructor review routes", () => {
+  it("builds learner, queue, and instructor review routes", () => {
     expect(LEARNING_PROJECT_ROUTES.learner(ACTIVITY_ID)).toBe(
       `/learning/activities/${ACTIVITY_ID}/project`
+    );
+    expect(LEARNING_PROJECT_ROUTES.queue(COURSE_ID)).toBe(
+      `/learning/instructor/courses/${COURSE_ID}/projects`
     );
     expect(LEARNING_PROJECT_ROUTES.review(COURSE_ID, SUBMISSION_ID)).toBe(
       `/learning/instructor/courses/${COURSE_ID}/projects/${SUBMISSION_ID}`
