@@ -10,7 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
-    "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once"
+    "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once",
+    "media:worker": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser",
+    "media:worker:once": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser --once"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

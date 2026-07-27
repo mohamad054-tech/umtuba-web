@@ -2,28 +2,28 @@
 
 ## Task title
 
-Unified Content Foundation V2 — Content Services
+Media Processing Foundation V1
 
 ## Status
 
-`complete` — committed and pushed on `office/unified-content-services-v2` only
+`complete` — implemented, live-validated, committed and pushed on `alpha-0.2`
 
 ## Branch / sync
 
-- Branch: `office/unified-content-services-v2`
-- Parent: `c72e0d2` (`office/unified-content-foundation-v1`)
-- Chain: `45f315e` → `f9807f2` → `c72e0d2` → **V2 commit**
-- Do **not** merge to `alpha-0.2`
-- No new migration; `20260867` / `20260868` remain Git-only (not applied remotely)
+- Branch: `alpha-0.2`
+- Parent tip before feature: `32fb362` (Unified Content Services V2)
+- No new migration (reuses `article_teaser_jobs` / `20260867` + registry `20260868`)
 
-## Scope delivered
+## Delivered
 
-Lifecycle, Visibility, Canonical Link, Discovery Binding, Profile Projection, Adapter Runtime, Hook contracts; Article/Video adapters refactored onto services.
+- Domain-agnostic Media Processing Runtime (dispatcher, registry, retry, progress, logging, metrics, shutdown)
+- FFmpeg + Storage adapters
+- Article Teaser Processor as first processor
+- Worker entries: `media:worker` / compat `teaser:worker`
+- Live validation: one internal test article → ready teaser on Home → Profile → Read Article Now → article
 
-## Forbidden
+## Forbidden going forward without GO
 
-- Merge to `alpha-0.2` without explicit GO
-- Remote migration apply
-- Extra domain adapters
-- Home redesign
-- Co-authored-by / trailers
+- New feature work in this handoff
+- Trailers on commits
+- Remote migration apply without explicit approval

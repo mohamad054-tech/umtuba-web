@@ -108,8 +108,12 @@ describe("Unified Content Foundation V1", () => {
     expect(actions).toMatch(/enqueueArticleTeaserJob/);
     expect(actions).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
     const worker = read("scripts/media/articleTeaserWorker.ts");
-    expect(worker).toMatch(/syncArticleDiscoveryPost/);
-    expect(worker).toMatch(/buildTeaserFfmpegArgs/);
+    expect(worker).toMatch(/createMediaWorkerRuntime|createArticleTeaserProcessor/);
+    const processor = read(
+      "lib/media/processing/processors/articleTeaserProcessor.ts"
+    );
+    expect(processor).toMatch(/syncArticleDiscoveryPost/);
+    expect(processor).toMatch(/buildTeaserFfmpegArgs/);
     const videos = read("lib/supabase/videoPosts.ts");
     expect(videos).toMatch(/videoContentAdapter/);
   });

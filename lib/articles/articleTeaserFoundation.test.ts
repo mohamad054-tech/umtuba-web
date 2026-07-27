@@ -83,10 +83,14 @@ describe("Article Auto-Teaser Video V1", () => {
     expect(existsSync(join(ROOT, WORKER))).toBe(true);
     const worker = read(WORKER);
     expect(worker).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
-    expect(worker).toMatch(/buildTeaserFfmpegArgs/);
-    expect(worker).toMatch(/claim_article_teaser_job|ARTICLE_TEASER_RPCS\.claim/);
-    expect(worker).toMatch(/media_status: "ready"/);
-    expect(worker).toMatch(/markJobFailed/);
+    expect(worker).toMatch(/createMediaWorkerRuntime|createArticleTeaserProcessor/);
+    const processor = read(
+      "lib/media/processing/processors/articleTeaserProcessor.ts"
+    );
+    expect(processor).toMatch(/buildTeaserFfmpegArgs/);
+    expect(processor).toMatch(/claim_article_teaser_job|ARTICLE_TEASER_RPCS\.claim/);
+    expect(processor).toMatch(/media_status: "ready"/);
+    expect(processor).toMatch(/markJobFailed/);
 
     const args = buildTeaserFfmpegArgs({
       title: "مرحبا بالعالم",
@@ -183,9 +187,11 @@ describe("Article Auto-Teaser Video V1", () => {
   it("idempotency: unique article_id and worker reuses generated_post_id", () => {
     const sql = read(MIGRATION);
     expect(sql).toMatch(/unique index if not exists article_teaser_jobs_article_id_uidx/);
-    const worker = read(WORKER);
-    expect(worker).toMatch(/generated_post_id/);
-    expect(worker).toMatch(/Reuse existing ready post|idempotency/i);
+    const processor = read(
+      "lib/media/processing/processors/articleTeaserProcessor.ts"
+    );
+    expect(processor).toMatch(/generated_post_id/);
+    expect(processor).toMatch(/existing\?\.id|alreadyReady|idempotent/i);
   });
 
   it("resolves gradient templates safely", () => {

@@ -223,7 +223,11 @@ describe("Unified Content Services V2", () => {
 
   it("worker still syncs article discovery through binding service", () => {
     const worker = read("scripts/media/articleTeaserWorker.ts");
-    expect(worker).toMatch(/syncArticleDiscoveryPost/);
+    expect(worker).toMatch(/createMediaWorkerRuntime|createArticleTeaserProcessor/);
+    const processor = read(
+      "lib/media/processing/processors/articleTeaserProcessor.ts"
+    );
+    expect(processor).toMatch(/syncArticleDiscoveryPost/);
     const article = read("lib/content/adapters/articleAdapter.ts");
     expect(article).toMatch(/bindDiscoveryPost/);
   });

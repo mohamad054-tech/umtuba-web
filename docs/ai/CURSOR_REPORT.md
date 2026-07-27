@@ -2,83 +2,60 @@
 
 ## Summary
 
-**Unified Content Services V2 closed** on `office/unified-content-services-v2` from parent `c72e0d2`. Shared Lifecycle / Visibility / Canonical Link / Discovery Binding / Profile Projection / Adapter Runtime / Hook contracts. Article + Video adapters refactored onto services. **No new migration. No merge to `alpha-0.2`.**
+**Media Processing Foundation V1 complete** on `alpha-0.2`. Runtime + Processor Registry + FFmpeg/Storage adapters + Article Teaser Processor. Live path validated (data + UI). Committed and pushed. **No new migration. No new feature started after close-out.**
 
 ## Branch / parent
 
-- Branch: `office/unified-content-services-v2`
-- Parent: `c72e0d285d47d5c87092c960625f80a8b51e18b5`
-- Chain: `45f315e` → `f9807f2` → `c72e0d2` → V2 commit
+- Branch: `alpha-0.2`
+- Base: `32fb362` (Unified Content Services V2)
+- Live test article: `3dbb7b90-514c-4307-b8e1-219e8150690b`
+- Live job: `8d70ac18-8653-4b68-8321-d2c3aa450e5e` → `ready`
+- Generated post: `10`
+- Registry: `4408f12c-062f-4663-a4f9-89bae6e49b64` with `discovery_post_id=10`
 
 ## Exact files created and modified
 
 ### Created
-- `lib/content/services/lifecycleService.ts`
-- `lib/content/services/visibilityService.ts`
-- `lib/content/services/canonicalLinkService.ts`
-- `lib/content/services/discoveryBindingService.ts`
-- `lib/content/services/profileProjectionService.ts`
-- `lib/content/services/hookContracts.ts`
-- `lib/content/runtime/adapterRuntime.ts`
-- `lib/content/runtime/registerBuiltinAdapters.ts`
-- `lib/content/contentServices.v2.test.ts`
-- `docs/architecture/UNIFIED_CONTENT_SERVICES_V2.md`
+- `lib/media/processing/**` (runtime, registry, adapters, article processor, tests)
+- `scripts/media/mediaWorker.ts`
+- `docs/architecture/MEDIA_PROCESSING_FOUNDATION_V1.md`
 
 ### Modified
-- `lib/content/adapters/articleAdapter.ts`
-- `lib/content/adapters/videoAdapter.ts`
-- `lib/content/contentRegistry.ts` (Profile All delegates to projection)
-- `app/profile/[username]/page.tsx`
+- `scripts/media/articleTeaserWorker.ts`
+- `package.json`
+- related foundation tests (worker path assertions)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Database / migration
+## Migrations
 
-**None.** Reuses `20260868` RPCs. No `20260869`. Migrations `20260867` and `20260868` remain in Git only (not applied remotely).
+**None.**
+
+## Visual verification (localhost)
+
+1. Home `/?post=10` shows teaser `[INTERNAL TEST] Media Processing V1` — PASS
+2. Creator profile surface (`@mohamad`) — PASS
+3. Profile page opens — PASS
+4. **Read article now** + Browse profile — PASS
+5. Article `/articles/3dbb7b90-514c-4307-b8e1-219e8150690b` opens correct title/body — PASS
 
 ## Security review
 
-1. Domains remain authoritative — services orchestrate registry index only (no direct domain writes from Content Services).
-2. No direct client write to `content_registry`.
-3. Unknown content kind fails (no random fallback).
-4. Adapter runtime rejects duplicate registration.
-5. Unknown visibility fail-closed → `private`.
-6. Canonical links built only from allowlisted builders.
-7. Raw client hrefs rejected (`assertTrustedCanonicalHref`).
-8. Discovery binding checks owner, ready post, source linkage, and blocks article-teaser as independent video.
-9. Profile projection soft-fails missing sources (page does not crash).
-10. Profile All order: `published_at` desc then `id`.
-11. Sync/republish idempotent via upsert RPC (no duplicates).
-12. Hooks are bounded metadata only (no article body / private blobs).
-13. Default hooks no-op (no side effects without subscribers).
-14. Auto-Teaser still binds discovery via `bindDiscoveryPost` on article adapter.
-15. Home / Discover / Watch design and feed gate unchanged.
-16. No new migration in V2.
-17. `20260867` / `20260868` not applied remotely.
+- No secrets committed (`.env.local` untouched by commit)
+- Worker uses service role only in scripts
+- Logging redacts secrets
+- Domains remain authoritative; registry thin index
 
 ## Tests
 
-- vitest: content V1 + V2 + articles + teaser + videoPosts + profile + deeplink + pageAssembly — **66/66 PASS**
-- `npx tsc --noEmit` — **PASS**
-- `npm run build` — **PASS**
-- `git diff --check` — **PASS**
+- Media Processing + teaser + content + profile/deeplink suites — PASS (prior run 78/78)
+- Live worker once — PASS
+- UI path — PASS
 
-## TypeScript
+## TypeScript / Build
 
-PASS (`npx tsc --noEmit`)
-
-## Build
-
-PASS (`npm run build`)
-
-## git diff --check
-
-PASS
-
-## git status --short
-
-See post-commit / post-push output.
+PASS (validated during implementation)
 
 ## Open issues
 
-Do not merge to `alpha-0.2`. Do not apply remote migrations. Do not open a PR unless requested.
+None for V1 close-out. Optional later: install FFmpeg on other machines; register migration history 67/68 if still unmarked in `schema_migrations`.
