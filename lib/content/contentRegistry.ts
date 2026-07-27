@@ -227,48 +227,22 @@ export async function setContentRegistryDiscoveryPost(
 
 /**
  * Profile All list — chronological published items for a profile owner.
- * Visitor sessions only see public+published (enforced by RLS).
+ * Delegates to Profile Projection Service (Content Services V2).
+ * Visitor sessions only see public+published (enforced by RLS + service).
  */
 export async function listProfileContentRegistry(
   supabase: SupabaseClient,
   ownerUserId: string,
-  options?: { limit?: number }
+  options?: { limit?: number; viewerId?: string | null }
 ): Promise<{ items: ProfileContentCard[]; failed: boolean }> {
-  const limit = Math.min(Math.max(options?.limit ?? 40, 1), 80);
-  const { data, error } = await supabase
-    .from("content_registry")
-    .select(
-      "id, content_kind, source_entity_id, owner_user_id, visibility, publish_state, canonical_href, discovery_post_id, title, published_at, created_at, updated_at"
-    )
-    .eq("owner_user_id", ownerUserId)
-    .eq("publish_state", "published")
-    .order("published_at", { ascending: false, nullsFirst: false })
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    // Table may not exist yet pre-migration — fail soft for profile.
-    console.error("listProfileContentRegistry", error);
-    return { items: [], failed: true };
-  }
-
-  const items: ProfileContentCard[] = [];
-  for (const raw of data ?? []) {
-    const row = mapContentRegistryRow(raw as Record<string, unknown>);
-    if (!row) continue;
-    // Dedup safety: never list kind=video when it is only a teaser of an article
-    // (independent videos only are registered as video).
-    items.push({
-      registryId: row.id,
-      kind: row.content_kind,
-      sourceEntityId: row.source_entity_id,
-      title: row.title || (row.content_kind === "article" ? "Article" : "Video"),
-      href: row.canonical_href,
-      publishedAt: row.published_at,
-      discoveryPostId: row.discovery_post_id,
-    });
-  }
-  return { items, failed: false };
+  const { ensureBuiltinContentAdaptersRegistered } = await import(
+    "./runtime/registerBuiltinAdapters"
+  );
+  const { listProfileContentCards } = await import(
+    "./services/profileProjectionService"
+  );
+  ensureBuiltinContentAdaptersRegistered();
+  return listProfileContentCards(supabase, ownerUserId, options);
 }
 
 /** Pure helper: independent video posts are those without article_id. */

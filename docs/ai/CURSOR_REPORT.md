@@ -2,87 +2,83 @@
 
 ## Summary
 
-**Unified Content Foundation V1 implemented** on `office/unified-content-foundation-v1` (from `f9807f2`). Thin registry + article/video adapters + Profile All + shared teaser template engine. Home unchanged. Migration `20260868` Git-only. **No commit / no push.**
+**Unified Content Services V2 closed** on `office/unified-content-services-v2` from parent `c72e0d2`. Shared Lifecycle / Visibility / Canonical Link / Discovery Binding / Profile Projection / Adapter Runtime / Hook contracts. Article + Video adapters refactored onto services. **No new migration. No merge to `alpha-0.2`.**
 
-## Architecture summary
+## Branch / parent
 
-Domains remain authoritative. `content_registry` is a thin index (`article` | `video`). Adapters sync via SECURITY DEFINER RPCs (no direct client writes). Article teasers stay discovery posts for articles; independent ready videos register as `video`. Profile All reads registry chronologically without duplicating article+teaser. Teaser rendering extracted to `lib/content/teaser/teaserTemplateEngine.ts`; article modules wrap it.
+- Branch: `office/unified-content-services-v2`
+- Parent: `c72e0d285d47d5c87092c960625f80a8b51e18b5`
+- Chain: `45f315e` → `f9807f2` → `c72e0d2` → V2 commit
 
 ## Exact files created and modified
 
 ### Created
-- `supabase/migrations/20260868_unified_content_foundation_v1.sql`
-- `lib/content/contentRegistry.ts`
-- `lib/content/contentFoundation.test.ts`
-- `lib/content/adapters/articleAdapter.ts`
-- `lib/content/adapters/videoAdapter.ts`
-- `lib/content/teaser/teaserTemplateEngine.ts`
-- `app/profile/components/ProfileAllPanel.tsx`
-- `docs/architecture/UNIFIED_CONTENT_FOUNDATION_V1.md` (approved design)
+- `lib/content/services/lifecycleService.ts`
+- `lib/content/services/visibilityService.ts`
+- `lib/content/services/canonicalLinkService.ts`
+- `lib/content/services/discoveryBindingService.ts`
+- `lib/content/services/profileProjectionService.ts`
+- `lib/content/services/hookContracts.ts`
+- `lib/content/runtime/adapterRuntime.ts`
+- `lib/content/runtime/registerBuiltinAdapters.ts`
+- `lib/content/contentServices.v2.test.ts`
+- `docs/architecture/UNIFIED_CONTENT_SERVICES_V2.md`
 
 ### Modified
-- `app/actions/articles.ts`
-- `app/profile/ProfileExperience.tsx`
+- `lib/content/adapters/articleAdapter.ts`
+- `lib/content/adapters/videoAdapter.ts`
+- `lib/content/contentRegistry.ts` (Profile All delegates to projection)
 - `app/profile/[username]/page.tsx`
-- `app/profile/types.ts`
-- `app/profile/lib/mapProfile.ts`
-- `app/profile/components/index.ts`
-- `lib/articles/articleTeaserFfmpeg.ts`
-- `lib/articles/articleTeaserTitleLayout.ts`
-- `lib/articles/articleTeaserFoundation.ts`
-- `lib/supabase/videoPosts.ts`
-- `scripts/media/articleTeaserWorker.ts`
-- `vitest.config.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Migrations / RLS
+## Database / migration
 
-`20260868_unified_content_foundation_v1.sql` — **not applied remotely**
+**None.** Reuses `20260868` RPCs. No `20260869`. Migrations `20260867` and `20260868` remain in Git only (not applied remotely).
 
-- Table `content_registry` + unique `(content_kind, source_entity_id)`
-- RLS force: public reads only `visibility=public AND publish_state=published`; owners read own
-- No INSERT/UPDATE grants to authenticated
-- RPCs: `upsert_content_registry_item`, `deactivate_content_registry_item`, `set_content_registry_discovery_post`, `backfill_content_registry_v1` (service_role only for backfill)
+## Security review
 
-## Registry data model
+1. Domains remain authoritative — services orchestrate registry index only (no direct domain writes from Content Services).
+2. No direct client write to `content_registry`.
+3. Unknown content kind fails (no random fallback).
+4. Adapter runtime rejects duplicate registration.
+5. Unknown visibility fail-closed → `private`.
+6. Canonical links built only from allowlisted builders.
+7. Raw client hrefs rejected (`assertTrustedCanonicalHref`).
+8. Discovery binding checks owner, ready post, source linkage, and blocks article-teaser as independent video.
+9. Profile projection soft-fails missing sources (page does not crash).
+10. Profile All order: `published_at` desc then `id`.
+11. Sync/republish idempotent via upsert RPC (no duplicates).
+12. Hooks are bounded metadata only (no article body / private blobs).
+13. Default hooks no-op (no side effects without subscribers).
+14. Auto-Teaser still binds discovery via `bindDiscoveryPost` on article adapter.
+15. Home / Discover / Watch design and feed gate unchanged.
+16. No new migration in V2.
+17. `20260867` / `20260868` not applied remotely.
 
-`id, content_kind, source_entity_id, owner_user_id, visibility, publish_state, canonical_href, discovery_post_id, title, published_at, created_at, updated_at`
+## Tests
 
-## Adapter contracts
+- vitest: content V1 + V2 + articles + teaser + videoPosts + profile + deeplink + pageAssembly — **66/66 PASS**
+- `npx tsc --noEmit` — **PASS**
+- `npm run build` — **PASS**
+- `git diff --check` — **PASS**
 
-`register/sync/resolveProfileCard/resolveCanonicalHref/resolveDiscoveryPost/resolveVisibility/unpublish`
+## TypeScript
 
-## Profile All behavior
+PASS (`npx tsc --noEmit`)
 
-Tab `all` → `ProfileAllPanel` from registry; Articles/Videos tabs unchanged; deeplink prompt unchanged.
+## Build
 
-## Teaser Template Engine
+PASS (`npm run build`)
 
-Shared contract + layout + FFmpeg builder; article kind; 5s / 9:16 / silent; wrappers keep article worker working.
+## git diff --check
 
-## Backfill strategy
+PASS
 
-`backfill_content_registry_v1()`: published articles (+ discovery post if ready) and independent ready videos (`article_id is null`). Idempotent upsert. Service_role only.
+## git status --short
 
-## Compatibility
-
-Home/feed gate/articles/teasers/deeplink/worker paths preserved.
-
-## Tests and validation
-
-- vitest content + articles + deeplink — PASS
-- `tsc --noEmit` — PASS
-- `npm run build` — (see final shell)
-- `git diff --check` — (see final shell)
-
-## Risks / deferred
-
-- Registry empty until migration applied + backfill/sync
-- Learning/Store/Live/Games adapters deferred
-- Soft-fail if registry table missing (profile All shows failed/empty)
-- Title on registry is index-only (not full body)
+See post-commit / post-push output.
 
 ## Open issues
 
-Await commit/push GO. Do not merge to `alpha-0.2`. Do not apply remote migration.
+Do not merge to `alpha-0.2`. Do not apply remote migrations. Do not open a PR unless requested.

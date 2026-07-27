@@ -1,20 +1,22 @@
 /**
- * Video/Post adapter — independent ready videos only (no article_id).
- * Article teasers are discovery surfaces for articles, not separate video items.
+ * Video adapter — independent ready videos only; uses Content Services V2.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { APP_ROUTES } from "../../../app/lib/nav/routes";
 import {
-  deactivateContentRegistryItem,
   isIndependentVideoPost,
+  parsePostIdFromSource,
   sourceEntityIdFromPostId,
-  upsertContentRegistryItem,
-  type ContentAdapter,
   type ContentAdapterResult,
   type ContentRegistryRow,
   type ProfileContentCard,
 } from "../contentRegistry";
+import type { DomainContentAdapter } from "../runtime/adapterRuntime";
+import { buildCanonicalHref } from "../services/canonicalLinkService";
+import {
+  deactivateContentLifecycle,
+  syncContentLifecycle,
+} from "../services/lifecycleService";
 
 async function loadVideoPost(
   supabase: SupabaseClient,
@@ -29,6 +31,7 @@ async function loadVideoPost(
   post_type: string | null;
   created_at: string;
 } | null> {
+  if (!Number.isInteger(postId) || postId <= 0) return null;
   const { data, error } = await supabase
     .from("posts")
     .select(
@@ -49,69 +52,91 @@ async function loadVideoPost(
   };
 }
 
-function watchHref(postId: number): string {
-  return `${APP_ROUTES.watch}?post=${postId}`;
+async function validateVideoSource(
+  supabase: SupabaseClient,
+  sourceEntityId: string
+) {
+  const postId = parsePostIdFromSource(sourceEntityId);
+  if (postId == null) {
+    return { ok: false as const, message: "Invalid video id." };
+  }
+  const post = await loadVideoPost(supabase, postId);
+  if (!post) {
+    return { ok: false as const, message: "Video not found." };
+  }
+  if (post.post_type !== "video") {
+    return { ok: false as const, message: "Not a video post." };
+  }
+  if (!isIndependentVideoPost(post)) {
+    await deactivateContentLifecycle(
+      supabase,
+      "video",
+      sourceEntityIdFromPostId(post.id),
+      post.user_id
+    );
+    return {
+      ok: false as const,
+      message: "Video is bound to an article teaser.",
+    };
+  }
+  const ready =
+    post.media_status === "ready" &&
+    typeof post.video_path === "string" &&
+    post.video_path.trim().length > 0;
+  if (!ready) {
+    await deactivateContentLifecycle(
+      supabase,
+      "video",
+      sourceEntityIdFromPostId(post.id),
+      post.user_id
+    );
+    return { ok: false as const, message: "Video not ready for registry." };
+  }
+  return {
+    ok: true as const,
+    data: {
+      ownerUserId: post.user_id,
+      publishState: "published" as const,
+      visibilityHint: "public",
+      title: (post.content || "Video").slice(0, 300),
+      publishedAt: post.created_at,
+      discoveryPostId: post.id,
+    },
+  };
 }
 
 async function syncVideo(
   supabase: SupabaseClient,
   sourceEntityId: string
 ): Promise<ContentAdapterResult<ContentRegistryRow>> {
-  const postId = Number(sourceEntityId);
-  if (!Number.isInteger(postId) || postId <= 0) {
-    return { ok: false, message: "Invalid video id." };
-  }
-  const post = await loadVideoPost(supabase, postId);
-  if (!post) {
-    return { ok: false, message: "Video not found." };
-  }
-  if (post.post_type !== "video") {
-    return { ok: false, message: "Not a video post." };
-  }
-  // Teaser of an article → do not register as independent video content.
-  if (!isIndependentVideoPost(post)) {
-    await deactivateContentRegistryItem(
-      supabase,
-      "video",
-      sourceEntityIdFromPostId(post.id)
-    );
-    return { ok: false, message: "Video is bound to an article teaser." };
-  }
+  const validated = await validateVideoSource(supabase, sourceEntityId);
+  if (!validated.ok) return validated;
 
-  const ready =
-    post.media_status === "ready" &&
-    typeof post.video_path === "string" &&
-    post.video_path.trim().length > 0;
+  const href = buildCanonicalHref("video", sourceEntityId);
+  if (!href.ok) return href;
 
-  if (!ready) {
-    await deactivateContentRegistryItem(
-      supabase,
-      "video",
-      sourceEntityIdFromPostId(post.id)
-    );
-    return { ok: false, message: "Video not ready for registry." };
-  }
-
-  return upsertContentRegistryItem(supabase, {
+  return syncContentLifecycle(supabase, {
     contentKind: "video",
-    sourceEntityId: sourceEntityIdFromPostId(post.id),
-    ownerUserId: post.user_id,
-    visibility: "public",
-    publishState: "published",
-    canonicalHref: watchHref(post.id),
-    discoveryPostId: post.id,
-    title: (post.content || "Video").slice(0, 300),
-    publishedAt: post.created_at,
+    sourceEntityId: sourceEntityIdFromPostId(Number(sourceEntityId)),
+    ownerUserId: validated.data.ownerUserId,
+    publishState: validated.data.publishState,
+    visibilityHint: validated.data.visibilityHint,
+    title: validated.data.title,
+    publishedAt: validated.data.publishedAt,
+    discoveryPostId: validated.data.discoveryPostId,
+    canonicalHref: href.href,
   });
 }
 
-export const videoContentAdapter: ContentAdapter = {
+export const videoContentAdapter: DomainContentAdapter = {
   kind: "video",
-
+  validateSource: validateVideoSource,
+  resolveOwner: (snapshot) => snapshot.ownerUserId,
+  resolvePublishState: (snapshot) => snapshot.publishState,
+  resolveVisibilityHint: (snapshot) => snapshot.visibilityHint,
   register: syncVideo,
   sync: syncVideo,
-
-  resolveProfileCard(row: ContentRegistryRow): ProfileContentCard {
+  resolveProfileCard(row): ProfileContentCard {
     return {
       registryId: row.id,
       kind: "video",
@@ -122,26 +147,26 @@ export const videoContentAdapter: ContentAdapter = {
       discoveryPostId: row.discovery_post_id,
     };
   },
-
   resolveCanonicalHref(sourceEntityId: string): string {
-    const id = Number(sourceEntityId);
-    return Number.isInteger(id) && id > 0
-      ? watchHref(id)
-      : APP_ROUTES.watch;
+    const href = buildCanonicalHref("video", sourceEntityId);
+    return href.ok ? href.href : "/watch";
   },
-
   async resolveDiscoveryPost(supabase, sourceEntityId) {
     const post = await loadVideoPost(supabase, Number(sourceEntityId));
     if (!post || !isIndependentVideoPost(post)) return null;
     if (post.media_status !== "ready" || !post.video_path) return null;
     return post.id;
   },
-
   resolveVisibility() {
     return "public";
   },
-
   async unpublish(supabase, sourceEntityId) {
-    return deactivateContentRegistryItem(supabase, "video", sourceEntityId);
+    const post = await loadVideoPost(supabase, Number(sourceEntityId));
+    return deactivateContentLifecycle(
+      supabase,
+      "video",
+      sourceEntityId,
+      post?.user_id ?? null
+    );
   },
 };

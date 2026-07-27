@@ -1,19 +1,23 @@
 /**
- * Article adapter — Unified Content Foundation V1.
+ * Article adapter — uses Content Services V2.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { buildArticleHref } from "../../../app/lib/nav/routes";
+import { isArticleUuid } from "../../articles/articlesFoundation";
 import {
-  deactivateContentRegistryItem,
-  setContentRegistryDiscoveryPost,
   sourceEntityIdFromUuid,
-  upsertContentRegistryItem,
-  type ContentAdapter,
   type ContentAdapterResult,
   type ContentRegistryRow,
   type ProfileContentCard,
 } from "../contentRegistry";
+import type { DomainContentAdapter } from "../runtime/adapterRuntime";
+import { buildCanonicalHref } from "../services/canonicalLinkService";
+import { bindDiscoveryPost } from "../services/discoveryBindingService";
+import {
+  deactivateContentLifecycle,
+  syncContentLifecycle,
+} from "../services/lifecycleService";
+import { visibilityFromPublishState } from "../services/visibilityService";
 
 async function loadArticle(
   supabase: SupabaseClient,
@@ -25,6 +29,7 @@ async function loadArticle(
   status: string;
   published_at: string | null;
 } | null> {
+  if (!isArticleUuid(articleId)) return null;
   const { data, error } = await supabase
     .from("articles")
     .select("id, user_id, title, status, published_at")
@@ -57,38 +62,63 @@ async function findDiscoveryPostId(
   return data?.id != null ? Number(data.id) : null;
 }
 
+async function validateArticleSource(
+  supabase: SupabaseClient,
+  sourceEntityId: string
+) {
+  const article = await loadArticle(supabase, sourceEntityId);
+  if (!article) {
+    return { ok: false as const, message: "Article not found." };
+  }
+  const published = article.status === "published";
+  const discoveryPostId = await findDiscoveryPostId(supabase, article.id);
+  return {
+    ok: true as const,
+    data: {
+      ownerUserId: article.user_id,
+      publishState: published
+        ? ("published" as const)
+        : ("unpublished" as const),
+      visibilityHint: published ? "public" : "private",
+      title: article.title,
+      publishedAt: article.published_at,
+      discoveryPostId,
+    },
+  };
+}
+
 async function syncArticle(
   supabase: SupabaseClient,
   sourceEntityId: string
 ): Promise<ContentAdapterResult<ContentRegistryRow>> {
-  const article = await loadArticle(supabase, sourceEntityId);
-  if (!article) {
-    return { ok: false, message: "Article not found." };
-  }
+  const validated = await validateArticleSource(supabase, sourceEntityId);
+  if (!validated.ok) return validated;
 
-  const published = article.status === "published";
-  const discoveryPostId = await findDiscoveryPostId(supabase, article.id);
+  const href = buildCanonicalHref("article", sourceEntityId);
+  if (!href.ok) return href;
 
-  return upsertContentRegistryItem(supabase, {
+  return syncContentLifecycle(supabase, {
     contentKind: "article",
-    sourceEntityId: sourceEntityIdFromUuid(article.id),
-    ownerUserId: article.user_id,
-    visibility: published ? "public" : "private",
-    publishState: published ? "published" : "unpublished",
-    canonicalHref: buildArticleHref(article.id),
-    discoveryPostId,
-    title: article.title,
-    publishedAt: article.published_at,
+    sourceEntityId: sourceEntityIdFromUuid(sourceEntityId),
+    ownerUserId: validated.data.ownerUserId,
+    publishState: validated.data.publishState,
+    visibilityHint: validated.data.visibilityHint,
+    title: validated.data.title,
+    publishedAt: validated.data.publishedAt,
+    discoveryPostId: validated.data.discoveryPostId,
+    canonicalHref: href.href,
   });
 }
 
-export const articleContentAdapter: ContentAdapter = {
+export const articleContentAdapter: DomainContentAdapter = {
   kind: "article",
-
+  validateSource: validateArticleSource,
+  resolveOwner: (snapshot) => snapshot.ownerUserId,
+  resolvePublishState: (snapshot) => snapshot.publishState,
+  resolveVisibilityHint: (snapshot) => snapshot.visibilityHint,
   register: syncArticle,
   sync: syncArticle,
-
-  resolveProfileCard(row: ContentRegistryRow): ProfileContentCard {
+  resolveProfileCard(row): ProfileContentCard {
     return {
       registryId: row.id,
       kind: "article",
@@ -99,19 +129,22 @@ export const articleContentAdapter: ContentAdapter = {
       discoveryPostId: row.discovery_post_id,
     };
   },
-
   resolveCanonicalHref(sourceEntityId: string): string {
-    return buildArticleHref(sourceEntityId);
+    const href = buildCanonicalHref("article", sourceEntityId);
+    return href.ok ? href.href : "/articles/invalid";
   },
-
   resolveDiscoveryPost: findDiscoveryPostId,
-
   resolveVisibility({ publishState }) {
-    return publishState === "published" ? "public" : "private";
+    return visibilityFromPublishState(publishState);
   },
-
   async unpublish(supabase, sourceEntityId) {
-    return deactivateContentRegistryItem(supabase, "article", sourceEntityId);
+    const article = await loadArticle(supabase, sourceEntityId);
+    return deactivateContentLifecycle(
+      supabase,
+      "article",
+      sourceEntityId,
+      article?.user_id ?? null
+    );
   },
 };
 
@@ -120,13 +153,12 @@ export async function syncArticleDiscoveryPost(
   articleId: string,
   discoveryPostId: number
 ): Promise<ContentAdapterResult<{ discoveryPostId: number }>> {
-  // Ensure registry row exists, then set discovery link.
   const synced = await articleContentAdapter.sync(supabase, articleId);
   if (!synced.ok) return synced;
-  return setContentRegistryDiscoveryPost(
-    supabase,
-    "article",
-    sourceEntityIdFromUuid(articleId),
-    discoveryPostId
-  );
+  return bindDiscoveryPost(supabase, {
+    contentKind: "article",
+    sourceEntityId: sourceEntityIdFromUuid(articleId),
+    ownerUserId: synced.data.owner_user_id,
+    discoveryPostId,
+  });
 }

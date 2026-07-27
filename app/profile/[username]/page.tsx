@@ -6,6 +6,7 @@ import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
 import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
 import { listPublishedArticlesForUser } from "../../../lib/articles/articlesFoundation";
 import { listProfileContentRegistry } from "../../../lib/content/contentRegistry";
+import { ensureBuiltinContentAdaptersRegistered } from "../../../lib/content/runtime/registerBuiltinAdapters";
 import {
   getProfileContentStats,
   listProfileActiveLiveRooms,
@@ -95,6 +96,7 @@ async function resolveProfile(username: string): Promise<{
 
     if (row) {
       const supabase = await createClient();
+      ensureBuiltinContentAdaptersRegistered();
       const [
         activityTier,
         followResult,
@@ -114,7 +116,7 @@ async function resolveProfile(username: string): Promise<{
         listProfilePosts(supabase, row.id),
         listPublishedArticlesForUser(supabase, row.id),
         listProfileActiveLiveRooms(supabase, row.id),
-        listProfileContentRegistry(supabase, row.id),
+        listProfileContentRegistry(supabase, row.id, { viewerId }),
       ]);
 
       if (followResult.ok && followResult.missingProfile) {
