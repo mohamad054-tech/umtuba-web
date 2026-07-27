@@ -169,6 +169,7 @@ export default function DiscoverVideoCard({
                 location={video.location}
                 viewerId={viewerId}
                 postId={video.id}
+                articleId={video.articleId}
                 onFollowChange={onFollowChange}
               />
             </div>

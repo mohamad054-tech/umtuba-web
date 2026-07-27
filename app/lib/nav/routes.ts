@@ -141,11 +141,23 @@ export function normalizeProfileUsername(username: string): string {
   return username.trim().replace(/^@+/, "").toLowerCase();
 }
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Discover / Live → public creator profile. */
 export function buildCreatorProfileHref(input: {
   username: string;
+  /** When set, profile shows an optional “open linked article” prompt. */
+  articleId?: string | null;
 }): string {
-  return `${APP_ROUTES.profile}/${normalizeProfileUsername(input.username)}`;
+  const base = `${APP_ROUTES.profile}/${normalizeProfileUsername(input.username)}`;
+  const articleId =
+    typeof input.articleId === "string" ? input.articleId.trim() : "";
+  if (!articleId || !UUID_RE.test(articleId)) {
+    return base;
+  }
+  const params = new URLSearchParams({ article: articleId });
+  return `${base}?${params.toString()}`;
 }
 
 /** Full article page (public). */
@@ -157,9 +169,6 @@ export function buildArticleHref(articleId: string): string {
 export function buildProfileArticlesHref(username: string): string {
   return `${APP_ROUTES.profile}/${normalizeProfileUsername(username)}?tab=articles`;
 }
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** True when `value` is a UUID suitable for messaging peers / conversations. */
 export function isUuid(value: string | null | undefined): boolean {

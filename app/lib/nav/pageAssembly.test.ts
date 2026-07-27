@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { APP_ROUTES, buildArticleHref, isNavActive } from "./routes";
+import { APP_ROUTES, buildArticleHref, buildCreatorProfileHref, isNavActive } from "./routes";
 import { isMobilePrimaryNavActive } from "./mobileNav";
 
 const ROOT = process.cwd();
@@ -19,6 +19,15 @@ describe("Page Assembly V1 — routes", () => {
     expect(buildArticleHref("11111111-1111-4111-8111-111111111111")).toBe(
       "/articles/11111111-1111-4111-8111-111111111111"
     );
+  });
+
+  it("profile href can carry linked article id for deeplink prompt", () => {
+    expect(
+      buildCreatorProfileHref({
+        username: "maya",
+        articleId: "11111111-1111-4111-8111-111111111111",
+      })
+    ).toBe("/profile/maya?article=11111111-1111-4111-8111-111111111111");
   });
 
   it("treats /discover as Home alias for nav active state", () => {

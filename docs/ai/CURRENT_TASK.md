@@ -2,58 +2,52 @@
 
 ## Task title
 
-Safe-to-shutdown handoff (Public Learning Catalog V1)
+Creator Profile + Article Deeplink V1 (gaps on `a2063fb`)
 
 ## Status
 
-`complete` — **safe to shutdown: yes**
+`complete` — implementation done locally; **not committed / not pushed** (awaiting human command)
 
 ## Branch / sync
 
-- Branch: `alpha-0.2`
-- Tracking: `origin/alpha-0.2` (synced at handoff)
+- Branch: `office/creator-profile-article-deeplink-v1`
+- Base: rebased local docs commit onto latest `origin/alpha-0.2`
+- Backup: `backup/alpha-before-rich-profile-sync`
+- Tracking sync at feature start: ahead of origin by rebased docs commit only (`1a05ea8`); behind 0
 
-## Last feature commit
+## Goal
 
-- Message: `feat(learning): add public catalog and course preview foundation v1`
-- Hash: `d7c66690fdfefb4efea6a51393a5b992c16dfc9b`
-- Follow-up docs: `fbf8c30` — `docs(ai): record public catalog V1 close-out commit hash`
+Complete only the gaps after `a2063fb feat(platform): add video-first home and rich profiles`:
 
-## Runtime / data state
+1. Avatar/name on article-linked video → profile with `?article=`
+2. Prompt on profile: Read article now / Browse profile
+3. Read → `/articles/{id}` (exact article)
+4. Browse → clear query, stay at profile top
+5. Normal profile visit → no prompt
+6. Keep video-first home layout; light linked-article cue only
+7. Professional profile header/tabs (no TikTok grid / FB clone)
 
-- Migration `20260866_learning_public_course_preview_foundation_v1.sql` — **applied remotely**
-- L01 preview — **enabled**
-- Public catalog course slug: `ai-applications-master-course` (`status=published`, `visibility=public`)
+## Allowed scope
 
-## Catalog routes
+- `app/lib/nav/routes.ts` (+ tests)
+- `app/discover/**` (additive articleId / light cue only)
+- `app/components/video/VideoOverlay.tsx`
+- `app/watch/types.ts`, `app/watch/lib/mapWatchVideo.ts`
+- `app/profile/**` (prompt + header polish)
+- `docs/ai/*` handoff
 
-- `/learning/catalog`
-- `/learning/catalog/[courseSlug]` (e.g. `/learning/catalog/ai-applications-master-course`)
+## Forbidden scope
 
-## Desktop package paths (do not commit)
+- Redesign home / player / engagement chrome
+- New Feed stack / return to LandingHero
+- Duplicate `articles` tables or RPCs
+- Remote migration apply
+- Commit / push / force push / hard reset
+- Broad refactor
 
-- Jinn zip: `C:\Users\1\Desktop\AI-Applications-Bootcamp\dist\Jinn-Education-AI-Applications-Course-V1.zip`
-- UMTUBA zip: `C:\Users\1\Desktop\AI-Applications-Bootcamp\dist\UMTUBA-AI-Applications-Course-V1.zip`
+## Reuse (do not recreate)
 
-## Local junk (do not commit)
-
-Untracked under `scripts/learning/`: `.tmp-*.sql`, `*.log`, `IMPORT_*.json`, ad-hoc `.mjs` / `_patch-fast.js` — safe to delete locally.
-
-## Allowed scope (closed)
-
-No active implementation scope. Next session: sync `alpha-0.2` from origin before new work.
-
----
-
-## Preserved handoff (from local `93a1144`)
-
-**UMTUBA Mobile — Fix Watch Controls V2 Real Device Bugs** (`complete` — PASS, not committed, APK not rebuilt)
-
-Scope on `umtuba-mobile` / `master`:
-
-- `components/WatchVideoCard.tsx`
-- `app/(tabs)/watch.tsx`
-- `src/lib/watch/playerSession.ts` + tests
-- `src/lib/watch/playbackPolicy.ts` + tests
-
-Validation at that handoff: `npm test` 127/127 PASS · `tsc` PASS · no APK rebuild.
+- Migration `20260865_articles_teaser_foundation_v1.sql`
+- `articles` + `posts.article_id` + `publish_my_article`
+- `lib/articles/articlesFoundation.ts`
+- Profile Articles tab + `/articles/[articleId]` + create article flow from `a2063fb`

@@ -39,11 +39,13 @@ export default function VideoOverlay({
   const peerUserId = video.author.id;
   const profileHref = buildCreatorProfileHref({
     username: video.author.username,
+    articleId: video.articleId,
   });
   const returnPath =
     video.postId != null
       ? `${APP_ROUTES.watch}?post=${video.postId}`
       : APP_ROUTES.watch;
+  const hasLinkedArticle = Boolean(video.articleId && video.articleHref);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
@@ -94,9 +96,15 @@ export default function VideoOverlay({
             <p className="text-sm font-black text-white md:text-[15px]">
               {video.title}
             </p>
-            <p className="mt-1 line-clamp-3 text-sm leading-6 text-white/80">
-              {video.caption}
-            </p>
+            {hasLinkedArticle ? (
+              <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                Linked article
+              </p>
+            ) : (
+              <p className="mt-1 line-clamp-3 text-sm leading-6 text-white/80">
+                {video.caption}
+              </p>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">

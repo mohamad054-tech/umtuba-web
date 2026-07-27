@@ -252,6 +252,7 @@ export default function DiscoverExperience({
   const exploreHref = buildHomeCityFocusHref(activeVideo.location.city);
   const profileHref = buildCreatorProfileHref({
     username: activeVideo.creator.username,
+    articleId: activeVideo.articleId,
   });
   const activePostId = Number(activeVideo.id);
   const peerUserId = activeVideo.creator.id;

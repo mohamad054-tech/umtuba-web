@@ -29,6 +29,10 @@ export type WatchVideo = {
   likedByMe: boolean;
   savedByMe: boolean;
   source: WatchVideoSource;
+  /** Linked published article (teaser video). */
+  articleId?: string | null;
+  articleTitle?: string | null;
+  articleHref?: string | null;
 };
 
 export type WatchFeedCursor = {

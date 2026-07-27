@@ -32,6 +32,9 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
     likedByMe: video.likedByMe,
     savedByMe: video.savedByMe,
     source: "supabase",
+    articleId: video.articleId ?? null,
+    articleTitle: video.articleTitle ?? null,
+    articleHref: video.articleHref ?? null,
   };
 }
 

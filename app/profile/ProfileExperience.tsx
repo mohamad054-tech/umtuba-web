@@ -21,7 +21,9 @@ import {
 } from "./components";
 import ProfileArticlesPanel from "./components/ProfileArticlesPanel";
 import ProfilePostsPanel from "./components/ProfilePostsPanel";
+import ProfileLinkedArticlePrompt from "./components/ProfileLinkedArticlePrompt";
 import type { ProfileView } from "./types";
+import { isUuid } from "../lib/nav";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -59,6 +61,18 @@ export default function ProfileExperience({
   );
   const [followersLabel, setFollowersLabel] = useState(profile.followersLabel);
   const [followingLabel, setFollowingLabel] = useState(profile.followingLabel);
+  const linkedArticleIdRaw = searchParams.get("article");
+  const linkedArticleId =
+    linkedArticleIdRaw && isUuid(linkedArticleIdRaw)
+      ? linkedArticleIdRaw.trim()
+      : null;
+  const linkedArticle =
+    linkedArticleId != null
+      ? profile.articles.find((article) => article.id === linkedArticleId) ??
+        null
+      : null;
+  /** Prompt only when arriving with a valid ?article= UUID (from a linked video). */
+  const showLinkedArticlePrompt = Boolean(linkedArticleId);
 
   useEffect(() => {
     setActiveTab(parseTab(searchParams.get("tab")));
@@ -83,6 +97,14 @@ export default function ProfileExperience({
           >
             Development mock profile — not a production Supabase record.
           </p>
+        ) : null}
+
+        {showLinkedArticlePrompt && linkedArticleId ? (
+          <ProfileLinkedArticlePrompt
+            articleId={linkedArticleId}
+            articleTitle={linkedArticle?.title ?? null}
+            username={profile.username}
+          />
         ) : null}
 
         <section className="space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7">

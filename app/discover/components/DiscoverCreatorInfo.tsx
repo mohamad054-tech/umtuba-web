@@ -13,6 +13,8 @@ type DiscoverCreatorInfoProps = {
   viewerId?: string | null;
   /** Post id for auth return deep-link (`/discover?post=`). */
   postId?: string | number | null;
+  /** Linked published article — opens profile with article prompt. */
+  articleId?: string | null;
   onFollowChange?: (creatorId: string, following: boolean) => void;
 };
 
@@ -21,10 +23,12 @@ export default function DiscoverCreatorInfo({
   location,
   viewerId = null,
   postId = null,
+  articleId = null,
   onFollowChange,
 }: DiscoverCreatorInfoProps) {
   const profileHref = buildCreatorProfileHref({
     username: creator.username,
+    articleId,
   });
   const peerUserId = creator.id;
   const isSelf = Boolean(peerUserId && viewerId && viewerId === peerUserId);
