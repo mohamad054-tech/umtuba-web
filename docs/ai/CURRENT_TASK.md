@@ -2,28 +2,34 @@
 
 ## Task title
 
-Media Processing Foundation V1
+Content Card System V1
 
 ## Status
 
-`complete` — implemented, live-validated, committed and pushed on `alpha-0.2`
+`architecture-complete` — design only; **no implementation**
 
 ## Branch / sync
 
 - Branch: `alpha-0.2`
-- Parent tip before feature: `32fb362` (Unified Content Services V2)
-- No new migration (reuses `article_teaser_jobs` / `20260867` + registry `20260868`)
+- HEAD base: `f053709`
+- Prior: Creator Space Experience V1 + Unified Experience consolidation (architecture)
+
+## Allowed scope
+
+- Architecture doc for unified Content Cards
+- Create `docs/architecture/CONTENT_CARD_SYSTEM_V1.md`
+- Update `docs/ai/CURRENT_TASK.md` and `docs/ai/CURSOR_REPORT.md`
+
+## Forbidden scope
+
+- React / components / UI implementation
+- Home redesign
+- Migrations / Commit / Push
 
 ## Delivered
 
-- Domain-agnostic Media Processing Runtime (dispatcher, registry, retry, progress, logging, metrics, shutdown)
-- FFmpeg + Storage adapters
-- Article Teaser Processor as first processor
-- Worker entries: `media:worker` / compat `teaser:worker`
-- Live validation: one internal test article → ready teaser on Home → Profile → Read Article Now → article
+- Card anatomy, shared metadata, variants, preview/CTA recipes, status, motion, responsive, a11y, future kinds, integration with Creator Space / Home / Registry
 
-## Forbidden going forward without GO
+## Next (requires explicit GO)
 
-- New feature work in this handoff
-- Trailers on commits
-- Remote migration apply without explicit approval
+- Implementation of Card View Model / UI — **not started**
