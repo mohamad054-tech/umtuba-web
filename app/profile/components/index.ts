@@ -1,5 +1,6 @@
 export { default as ProfileAbout } from "./ProfileAbout";
 export { default as ProfileActions } from "./ProfileActions";
+export { default as ProfileAllPanel } from "./ProfileAllPanel";
 export { default as ProfileArticlesPanel } from "./ProfileArticlesPanel";
 export { default as ProfileHeader } from "./ProfileHeader";
 export { default as ProfileLinkedArticlePrompt } from "./ProfileLinkedArticlePrompt";

@@ -2,103 +2,87 @@
 
 ## Summary
 
-**Article Auto-Teaser Video V1 implemented** on `office/article-auto-teaser-video-v1` (from `45f315e`). Real MP4 teasers via Node+FFmpeg worker; publish request only enqueues jobs. Silent audio only. Migration `20260867` Git-only (not applied remotely). **No commit / no push.**
+**Unified Content Foundation V1 implemented** on `office/unified-content-foundation-v1` (from `f9807f2`). Thin registry + article/video adapters + Profile All + shared teaser template engine. Home unchanged. Migration `20260868` Git-only. **No commit / no push.**
 
 ## Architecture summary
 
-1. Publish article (existing `publish_my_article`).
-2. If uploaded teaser selected → `mark_my_article_teaser_uploaded` → job `not_required` + link `posts.article_id`.
-3. If no video → `enqueue_my_article_teaser_job` → one `pending` job (unique per article). **No feed post yet.**
-4. Worker (`scripts/media/articleTeaserWorker.ts`) claims via service-role RPC → FFmpeg 5s silent H.264 → upload `post-videos` → insert/update one ready video post with `article_id` → job `ready`.
-5. Home feed unchanged; existing gates (`ready` + `video_path` + signed URL) surface the teaser; deeplink flow from prior commit still applies.
+Domains remain authoritative. `content_registry` is a thin index (`article` | `video`). Adapters sync via SECURITY DEFINER RPCs (no direct client writes). Article teasers stay discovery posts for articles; independent ready videos register as `video`. Profile All reads registry chronologically without duplicating article+teaser. Teaser rendering extracted to `lib/content/teaser/teaserTemplateEngine.ts`; article modules wrap it.
 
 ## Exact files created and modified
 
 ### Created
-- `supabase/migrations/20260867_article_auto_teaser_video_v1.sql`
-- `lib/articles/articleTeaserFoundation.ts`
-- `lib/articles/articleTeaserFoundation.test.ts`
-- `lib/articles/articleTeaserTitleLayout.ts`
-- `lib/articles/articleTeaserFfmpeg.ts`
-- `scripts/media/articleTeaserWorker.ts`
-- `app/create/article/CreateArticleForm.tsx`
-- `app/articles/[articleId]/ArticleTeaserOwnerPanel.tsx`
+- `supabase/migrations/20260868_unified_content_foundation_v1.sql`
+- `lib/content/contentRegistry.ts`
+- `lib/content/contentFoundation.test.ts`
+- `lib/content/adapters/articleAdapter.ts`
+- `lib/content/adapters/videoAdapter.ts`
+- `lib/content/teaser/teaserTemplateEngine.ts`
+- `app/profile/components/ProfileAllPanel.tsx`
+- `docs/architecture/UNIFIED_CONTENT_FOUNDATION_V1.md` (approved design)
 
 ### Modified
 - `app/actions/articles.ts`
-- `app/create/article/page.tsx`
-- `app/articles/[articleId]/page.tsx`
-- `package.json` (`teaser:worker`, `teaser:worker:once`)
+- `app/profile/ProfileExperience.tsx`
+- `app/profile/[username]/page.tsx`
+- `app/profile/types.ts`
+- `app/profile/lib/mapProfile.ts`
+- `app/profile/components/index.ts`
+- `lib/articles/articleTeaserFfmpeg.ts`
+- `lib/articles/articleTeaserTitleLayout.ts`
+- `lib/articles/articleTeaserFoundation.ts`
+- `lib/supabase/videoPosts.ts`
+- `scripts/media/articleTeaserWorker.ts`
+- `vitest.config.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Migrations created
+## Migrations / RLS
 
-**`20260867_article_auto_teaser_video_v1.sql`** (not applied remotely)
+`20260868_unified_content_foundation_v1.sql` — **not applied remotely**
 
-- Table `article_teaser_jobs` with status/source/background/audio/generated paths/post id/attempts/error
-- Unique index on `article_id`
-- Pending index; owner read RLS; mutations via SECURITY DEFINER RPCs
-- RPCs: `enqueue_my_article_teaser_job`, `mark_my_article_teaser_uploaded`, `retry_my_article_teaser_job`, `claim_article_teaser_job` (service_role only)
+- Table `content_registry` + unique `(content_kind, source_entity_id)`
+- RLS force: public reads only `visibility=public AND publish_state=published`; owners read own
+- No INSERT/UPDATE grants to authenticated
+- RPCs: `upsert_content_registry_item`, `deactivate_content_registry_item`, `set_content_registry_discovery_post`, `backfill_content_registry_v1` (service_role only for backfill)
 
-## Worker execution model
+## Registry data model
 
-```bash
-npx tsx scripts/media/articleTeaserWorker.ts          # loop
-npx tsx scripts/media/articleTeaserWorker.ts --once   # single claim
-# or npm run teaser:worker / teaser:worker:once
-```
+`id, content_kind, source_entity_id, owner_user_id, visibility, publish_state, canonical_href, discovery_post_id, title, published_at, created_at, updated_at`
 
-Env: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, optional `UMTUBA_TEASER_FONT`. Requires `ffmpeg` on PATH.
+## Adapter contracts
 
-## FFmpeg rendering approach
+`register/sync/resolveProfileCard/resolveCanonicalHref/resolveDiscoveryPost/resolveVisibility/unpublish`
 
-`buildTeaserFfmpegArgs` → lavfi color (or looped background image) + soft crop motion + drawtext (title lines, @author, CTA) → `-t 5 -c:v libx264 -pix_fmt yuv420p -an` (no audio track). Fonts: Windows Arial/Segoe/Tahoma, Linux DejaVu/Noto Arabic, macOS Arial Unicode, or `UMTUBA_TEASER_FONT`.
+## Profile All behavior
 
-## User flow
+Tab `all` → `ProfileAllPanel` from registry; Articles/Videos tabs unchanged; deeplink prompt unchanged.
 
-1. Create article → optional existing video OR auto-teaser settings (9:16 preview, gradients/plain/upload bg).
-2. Publish → article always succeeds; job enqueued if generating.
-3. Worker produces MP4 → Home shows teaser when `ready`.
-4. Owner article page: status; on failure → Retry or attach ready uploaded video.
+## Teaser Template Engine
 
-## Failure and retry
+Shared contract + layout + FFmpeg builder; article kind; 5s / 9:16 / silent; wrappers keep article worker working.
 
-- Fail → job `failed` + safe `error_code`; article kept; no broken feed post.
-- Retry RPC → `pending` (max attempts 8); reuses `generated_post_id` / video path when possible (no duplicate posts).
-- Manual attach → `not_required` + link uploaded ready video.
+## Backfill strategy
+
+`backfill_content_registry_v1()`: published articles (+ discovery post if ready) and independent ready videos (`article_id is null`). Idempotent upsert. Service_role only.
+
+## Compatibility
+
+Home/feed gate/articles/teasers/deeplink/worker paths preserved.
 
 ## Tests and validation
 
-- `npx vitest run lib/articles/articleTeaserFoundation.test.ts lib/articles/articlesFoundation.test.ts app/lib/nav/creatorProfileArticleDeeplink.test.ts` — **22/22 PASS**
-- `npx tsc --noEmit` — **PASS**
-- `npm run build` — **PASS**
-- `git diff --check` — **PASS**
-- No remote migration run
+- vitest content + articles + deeplink — PASS
+- `tsc --noEmit` — PASS
+- `npm run build` — (see final shell)
+- `git diff --check` — (see final shell)
 
-## Constraints / follow-ups
+## Risks / deferred
 
-1. **Arabic fonts:** rely on system fonts; set `UMTUBA_TEASER_FONT` to a known Arabic-capable TTF in production workers.
-2. **Audio:** silent only; user upload + platform library deferred.
-3. **Article image background:** UI option disabled (no article cover column yet) → falls back to gradient.
-4. **Migration must be applied** (local/remote GO) before worker can claim jobs.
-5. Worker is not auto-scheduled (no cron in repo) — run manually or wire host cron later.
-
-## Security review
-
-- Claim RPC service_role only
-- Owners SELECT jobs only; mutations via definer RPCs
-- Publish path does not use service role / FFmpeg
-- Error codes sanitized; no stack traces in UI
-- Feed still requires ready + real `video_path`
+- Registry empty until migration applied + backfill/sync
+- Learning/Store/Live/Games adapters deferred
+- Soft-fail if registry table missing (profile All shows failed/empty)
+- Title on registry is index-only (not full body)
 
 ## Open issues
 
-1. Apply `20260867` when approved (not done).
-2. Host FFmpeg worker process / cron.
-3. Optional: Noto Arabic font packaging for Linux workers.
-4. Await commit/push GO.
-
-## git status / diff
-
-See live shell output in final user report (`git diff --stat`, `git status -sb`).
+Await commit/push GO. Do not merge to `alpha-0.2`. Do not apply remote migration.

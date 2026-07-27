@@ -602,6 +602,19 @@ export async function insertVideoPostForUser(
     );
   }
 
+  // Independent videos only — article teasers sync via article adapter.
+  try {
+    const row = ready as VideoPostRow & { article_id?: string | null };
+    if (!row.article_id) {
+      const { videoContentAdapter } = await import(
+        "../content/adapters/videoAdapter"
+      );
+      await videoContentAdapter.sync(supabase, String(row.id));
+    }
+  } catch (error) {
+    console.error("content registry video sync", error);
+  }
+
   return ready as VideoPostRow;
 }
 

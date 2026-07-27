@@ -405,6 +405,16 @@ export async function processClaimedJob(
       await markJobFailed(supabase, job.id, "post_finalize_failed");
       return "failed";
     }
+
+    try {
+      const { syncArticleDiscoveryPost } = await import(
+        "../../lib/content/adapters/articleAdapter"
+      );
+      await syncArticleDiscoveryPost(supabase, job.article_id, postId);
+    } catch (error) {
+      console.error("content registry discovery sync", error);
+    }
+
     return "ready";
   } finally {
     await fs.rm(workDir, { recursive: true, force: true }).catch(() => undefined);

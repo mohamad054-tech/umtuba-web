@@ -31,22 +31,20 @@ export const TEASER_STATUSES = [
 
 export type TeaserJobStatus = (typeof TEASER_STATUSES)[number];
 
-export const TEASER_BACKGROUND_MODES = [
-  "gradient",
-  "article_image",
-  "uploaded_image",
-  "plain",
-] as const;
+export {
+  gradientBaseColor,
+  gradientTemplatePath,
+  resolveGradientTemplate,
+  TEASER_BACKGROUND_MODES,
+  TEASER_GRADIENT_TEMPLATES,
+  type TeaserBackgroundMode,
+  type TeaserGradientTemplate,
+} from "../content/teaser/teaserTemplateEngine";
 
-export type TeaserBackgroundMode = (typeof TEASER_BACKGROUND_MODES)[number];
-
-export const TEASER_GRADIENT_TEMPLATES = [
-  "midnight",
-  "aurora",
-  "ember",
-] as const;
-
-export type TeaserGradientTemplate = (typeof TEASER_GRADIENT_TEMPLATES)[number];
+import {
+  gradientTemplatePath,
+  type TeaserBackgroundMode,
+} from "../content/teaser/teaserTemplateEngine";
 
 export type ArticleTeaserJobRow = {
   id: string;
@@ -113,37 +111,12 @@ export function teaserStatusUserMessage(
 export function isTeaserBackgroundMode(
   value: string
 ): value is TeaserBackgroundMode {
-  return (TEASER_BACKGROUND_MODES as readonly string[]).includes(value);
-}
-
-export function resolveGradientTemplate(
-  path: string | null | undefined
-): TeaserGradientTemplate {
-  const raw = (path ?? "").trim();
-  const key = raw.startsWith("template:") ? raw.slice("template:".length) : raw;
-  if ((TEASER_GRADIENT_TEMPLATES as readonly string[]).includes(key)) {
-    return key as TeaserGradientTemplate;
-  }
-  return "midnight";
-}
-
-export function gradientTemplatePath(
-  template: TeaserGradientTemplate = "midnight"
-): string {
-  return `template:${template}`;
-}
-
-/** Hex colors used by FFmpeg solid/gradient base (V1). */
-export function gradientBaseColor(template: TeaserGradientTemplate): string {
-  switch (template) {
-    case "aurora":
-      return "0x071A2A";
-    case "ember":
-      return "0x1A0B0B";
-    case "midnight":
-    default:
-      return "0x050510";
-  }
+  return (
+    value === "gradient" ||
+    value === "article_image" ||
+    value === "uploaded_image" ||
+    value === "plain"
+  );
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

@@ -31,6 +31,7 @@ export default defineConfig({
       "lib/ads/**/*.test.ts",
       "lib/learning/**/*.test.ts",
       "lib/articles/**/*.test.ts",
+      "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",

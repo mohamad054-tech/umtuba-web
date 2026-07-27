@@ -11,6 +11,7 @@ import { APP_ROUTES } from "../lib/nav";
 import {
   ProfileAbout,
   ProfileActions,
+  ProfileAllPanel,
   ProfileHeader,
   ProfileLivePanel,
   ProfileShell,
@@ -166,29 +167,10 @@ export default function ProfileExperience({
           className="space-y-6"
         >
           {activeTab === "all" ? (
-            <>
-              <ProfilePostsPanel
-                posts={profile.posts}
-                loadFailed={Boolean(profile.postsLoadFailed)}
-              />
-              <ProfileVideoGrid
-                videos={profile.videos}
-                hasMore={Boolean(profile.hasMoreVideos)}
-                loadFailed={Boolean(profile.videosLoadFailed)}
-              />
-              <ProfileArticlesPanel
-                articles={profile.articles}
-                loadFailed={Boolean(profile.articlesLoadFailed)}
-                isOwner={isOwner}
-              />
-              {showLiveTab ? (
-                <ProfileLivePanel
-                  sessions={profile.liveSessions}
-                  isLive={profile.isLive}
-                  loadFailed={Boolean(profile.liveLoadFailed)}
-                />
-              ) : null}
-            </>
+            <ProfileAllPanel
+              items={profile.registryItems ?? []}
+              loadFailed={Boolean(profile.registryLoadFailed)}
+            />
           ) : null}
           {activeTab === "posts" ? (
             <ProfilePostsPanel

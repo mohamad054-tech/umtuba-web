@@ -103,6 +103,9 @@ export type ProfileView = {
   videosLoadFailed?: boolean;
   postsLoadFailed?: boolean;
   articlesLoadFailed?: boolean;
+  /** Unified Content Foundation — Profile All feed from registry. */
+  registryItems?: import("../../lib/content/contentRegistry").ProfileContentCard[];
+  registryLoadFailed?: boolean;
   /** True when follow/stats aggregates failed. */
   statsLoadFailed?: boolean;
   /** True when live rooms fetch failed. */

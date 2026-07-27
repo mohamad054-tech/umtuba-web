@@ -106,6 +106,16 @@ export async function publishArticleAction(formData: FormData): Promise<void> {
     console.error("article teaser job after publish", error);
   }
 
+  // Registry sync must never fail article publish.
+  try {
+    const { articleContentAdapter } = await import(
+      "../../lib/content/adapters/articleAdapter"
+    );
+    await articleContentAdapter.sync(supabase, result.data.articleId);
+  } catch (error) {
+    console.error("content registry article sync", error);
+  }
+
   revalidatePath(APP_ROUTES.home);
   revalidatePath(APP_ROUTES.profile);
   redirect(buildArticleHref(result.data.articleId));
@@ -150,6 +160,14 @@ export async function attachManualTeaserAction(
   });
   if (!result.ok) {
     redirect(`${href}?teaserError=${encodeURIComponent(result.message)}`);
+  }
+  try {
+    const { syncArticleDiscoveryPost } = await import(
+      "../../lib/content/adapters/articleAdapter"
+    );
+    await syncArticleDiscoveryPost(supabase, articleId, teaserPostId);
+  } catch (error) {
+    console.error("content registry manual teaser sync", error);
   }
   revalidatePath(APP_ROUTES.home);
   revalidatePath(href);

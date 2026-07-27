@@ -5,6 +5,7 @@ import { buildActivityTierProgress } from "../../../lib/activity-tiers";
 import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
 import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
 import { listPublishedArticlesForUser } from "../../../lib/articles/articlesFoundation";
+import { listProfileContentRegistry } from "../../../lib/content/contentRegistry";
 import {
   getProfileContentStats,
   listProfileActiveLiveRooms,
@@ -102,6 +103,7 @@ async function resolveProfile(username: string): Promise<{
         postsPage,
         articlesPage,
         liveResult,
+        registryPage,
       ] = await Promise.all([
         loadProfileActivityTier(row.id),
         getProfileFollowSnapshot(supabase, row.id),
@@ -112,6 +114,7 @@ async function resolveProfile(username: string): Promise<{
         listProfilePosts(supabase, row.id),
         listPublishedArticlesForUser(supabase, row.id),
         listProfileActiveLiveRooms(supabase, row.id),
+        listProfileContentRegistry(supabase, row.id),
       ]);
 
       if (followResult.ok && followResult.missingProfile) {
@@ -134,6 +137,8 @@ async function resolveProfile(username: string): Promise<{
             postsFailed: Boolean(postsPage.failed),
             articles: articlesPage.items,
             articlesFailed: Boolean(articlesPage.failed),
+            registryItems: registryPage.items,
+            registryFailed: Boolean(registryPage.failed),
             liveRooms: liveResult.rooms,
             liveFailed: Boolean(liveResult.failed),
           }),
