@@ -7,6 +7,7 @@ import {
   loadLessonDelivery,
 } from "../../../../lib/learning/learnerDelivery";
 import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
+import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +32,10 @@ export default async function LearningLessonPage({
   const query = await Promise.resolve(searchParams ?? {});
   const user = await getServerUser();
   if (!user) {
+    // Guests: send to public catalog (not login with lesson deep-link).
+    // Do NOT load content blocks for guests.
     redirect(
-      `/login?next=${encodeURIComponent(LEARNING_LEARNER_ROUTES.lesson(lessonId))}`
+      `${LEARNING_PUBLIC_ROUTES.catalog}?lesson=${encodeURIComponent(lessonId)}`
     );
   }
 

@@ -1,157 +1,97 @@
-﻿# CURSOR_REPORT
+# CURSOR_REPORT
 
 ## Summary
 
-**Page Assembly V1** implemented end-to-end (phases A + B + C). No commit/push. No remote migration apply.
+Public Learning Catalog & Course Preview Foundation V1 — **PASS** / **COMPLETE**.
 
-- `/` = Video-First Home Feed (reuses Discover feed + `DiscoverExperience`)
-- Marketing landing moved to `/welcome`
-- `/discover` = compatible redirect alias to Home (query preserved)
-- Games section circle → `/games` (honest hub shell; no gameplay)
-- Rich Profile tabs: All / Posts / Videos / Articles / About (+ Live when content exists)
-- Article Teaser Video: schema migration in Git, publish/create/read paths, Home teaser UI, profile Articles tab
-- Home feed degrades gracefully if `posts.article_id` is not yet applied
+Committed and pushed on `alpha-0.2` as `feat(learning): add public catalog and course preview foundation v1` `643cae9baab30152abbfb709fde669ee25d9d16f`. Migration `20260866` applied remotely; L01 preview enabled. Guest catalog/course pages use sanitized public DTOs; full lesson route redirects guests to catalog.
 
 ## Exact files changed
 
-### Routes / Home shell
-- `app/page.tsx` — Home feed
-- `app/welcome/page.tsx` — marketing landing (new)
-- `app/discover/page.tsx` — redirect alias → `/`
-- `app/components/home/HomeFeedLoader.tsx` — new shared loader
-- `app/discover/components/DiscoverShell.tsx` — Home chrome
-- `app/discover/components/HomeSectionCircles.tsx` — section shortcuts (new)
-- `app/games/page.tsx` — Games hub shell (new)
-- `app/discover/DiscoverExperience.tsx`
-- `app/discover/components/DiscoverCaption.tsx`
-- `app/discover/components/DiscoverCreatorInfo.tsx`
-- `app/discover/components/DiscoverVideoCard.tsx`
-- `app/discover/components/DiscoverActionRail.tsx`
-- `app/discover/types.ts`
+- `supabase/migrations/20260866_learning_public_course_preview_foundation_v1.sql` (new)
+- `lib/learning/publicCatalog.ts` (new)
+- `lib/learning/publicCatalog.test.ts` (new)
+- `app/learning/catalog/page.tsx` (new)
+- `app/learning/catalog/[courseSlug]/page.tsx` (new)
+- `app/learning/catalog/actions.ts` (new)
+- `app/learning/lessons/[lessonId]/page.tsx` (guest redirect → `/learning/catalog?lesson=`)
+- `scripts/learning/public-catalog-course-data-v1.sql` (new; data fix script)
+- `docs/ai/CURSOR_REPORT.md` (this report)
+- `docs/ai/CURRENT_TASK.md` (task status)
 
-### Nav / metadata / tests
-- `app/lib/nav/routes.ts`
-- `app/lib/nav/index.ts`
-- `app/lib/nav/mobileNav.ts`
-- `app/lib/nav/mobileNav.test.ts`
-- `app/lib/nav/pageAssembly.test.ts` (new)
-- `app/lib/video/feedUnification.test.ts`
-- `app/lib/product/polishAccessibility.test.ts`
-- `lib/site/routeMetadata.ts`
-- `vitest.config.ts` — include `lib/articles/**/*.test.ts`
-- `app/watch/lib/mapWatchVideo.ts`
-- `app/watch/lib/mapWatchVideo.test.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-### Rich Profile
-- `app/profile/ProfileExperience.tsx`
-- `app/profile/[username]/page.tsx`
-- `app/profile/types.ts`
-- `app/profile/lib/mapProfile.ts`
-- `app/profile/components/ProfileTabs.tsx`
-- `app/profile/components/ProfileArticlesPanel.tsx` (new)
-- `app/profile/components/ProfilePostsPanel.tsx` (new)
-- `app/profile/components/index.ts`
-- `lib/supabase/profileContent.ts` — `listProfilePosts`
-
-### Articles / teaser
-- `supabase/migrations/20260865_articles_teaser_foundation_v1.sql` (new, Git-only)
-- `lib/articles/articlesFoundation.ts` (new)
-- `lib/articles/articlesFoundation.test.ts` (new)
-- `app/actions/articles.ts` (new)
-- `app/create/article/page.tsx` (new)
-- `app/articles/[articleId]/page.tsx` (new)
-- `lib/supabase/videoPosts.ts` — `article_id` mapping + pre-migration fallback helpers
-- `lib/supabase/videoPostsServer.ts` — title hydration + legacy select fallback
+Not committed (left untracked junk): `scripts/learning/.tmp-*.sql`, `*.log`, `IMPORT_*.json`, ad-hoc import `.mjs` / `_patch-fast.js`.
 
 ## Migrations created
 
 | File | Applied remotely? |
 | --- | --- |
-| `supabase/migrations/20260865_articles_teaser_foundation_v1.sql` | **No** — Git only; needs separate GO |
-
-Contents: `public.articles` (+ RLS), `posts.article_id`, RPC `publish_my_article`.
-
-Prior unapplied migration still pending from earlier work: `20260864_*` (Learning) — not part of this task’s apply scope.
-
-## Behavior implemented
-
-### Home (`/`)
-- Short video feed as primary surface
-- Short title + creator identity
-- Creator avatar/name → profile
-- Light section circles: Learning, Store, Games (`/games`), Live, World, Search, Messages, Create
-- Article teasers show article title; “Read article” / teaser open → `/articles/[id]`
-
-### Compatibility
-- `/discover` → `/` (preserves `post`, `city`, `comment`, `country`)
-- Auth return paths on Home feed use `APP_ROUTES.home`
-- `/welcome` hosts previous marketing landing
-
-### Profile
-- Tabs All / Posts / Videos / Articles / About; Live when sessions/live exist
-- Honest empty / load-failed states; no fake content
-- Owner shortcuts: Write article, Upload video
-
-### Article Teaser
-- Create at `/create/article` (optional teaser = owner ready video without article)
-- Full article at `/articles/[id]`
-- Listed under profile Articles
-- Without migration applied: Home still loads (legacy columns); articles/create/teaser need migrate
+| `20260866_learning_public_course_preview_foundation_v1.sql` | **Yes** (per close-out task state; L01 preview enabled) |
 
 ## Security review
 
-- Articles RLS: published readable; owners mutate own rows
-- `publish_my_article` SECURITY DEFINER, `search_path = public`, execute granted to authenticated/service_role only; revoke from public/anon
-- Teaser link restricted to caller’s own ready video posts
-- No Learning / Store / Games internals, payments, or UM Points ledger changes
-- No secrets exposed
+| Check | Result |
+| --- | --- |
+| No service role / live `sk-` secrets in catalog UI | PASS (spot-check) |
+| `umtuba-package://` not rendered in catalog UI strings | PASS (stripped via `sanitizePublicText`; hits only in tests + SQL cleanup) |
+| `service_role` only in migration grants / RPC grants | PASS (expected) |
+| No public SELECT on content blocks / resources | PASS |
+| Guest full lesson blocked (redirect before load) | PASS |
+| `/learning` still requires login (My Learning) | PASS |
+| Preview fail-closed until enabled + public chain | PASS |
+| Enroll uses JWT client + `enroll_in_learning_course` RPC | PASS |
 
 ## Tests
 
-- Focused: pageAssembly, articlesFoundation, feedUnification, polishAccessibility, mapWatchVideo — **PASS**
-- Related nav/profile/shell — **PASS** (earlier run)
-- Full suite: **`npm test` — 183 files, 2587 passed**
-- `git diff --check` — **PASS**
+```
+npx vitest run lib/learning/publicCatalog.test.ts
+```
+
+**PASS** — 16/16.
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **PASS**
+```
+npx tsc --noEmit
+```
+
+**PASS** (exit 0).
 
 ## Build
 
-- Not run (`tsc` + full vitest used). Recommend local smoke with `npm run dev` after optional local migrate of `20260865`.
+Not required for this foundation slice. Not run.
 
 ## git diff --check
 
-- **PASS**
+**PASS** on scoped committed files.
 
 ## git status --short
 
-Uncommitted Page Assembly V1 work (modified + untracked). Awaiting explicit commit/push GO.
+```
+## alpha-0.2...origin/alpha-0.2
+(ahead then pushed; overnight scripts/learning junk left untracked)
+```
 
-## Open issues / blockers
+## Open issues
 
-1. **Remote (and typically local) DB:** `20260865` not applied — Article create/list/teaser link need migrate. Home feed works without it via legacy select fallback.
-2. **Games:** `/games` is a navigation hub only (no catalog/gameplay) — intentional.
-3. **No commit/push** until you approve after this report.
+1. Overnight import/tmp artifacts remain untracked under `scripts/learning/` — safe to delete locally; do not commit.
+2. Video Preview streaming — OUT OF SCOPE for V1.
 
-## Local URLs for inspection
+## Final checklist - Public Learning Catalog V1
 
-After `npm run dev` (and optionally applying `20260865` locally):
-
-| URL | Expectation |
+| Item | Result |
 | --- | --- |
-| `/` | Video-First Home + section circles |
-| `/welcome` | Marketing landing |
-| `/discover` | Redirects to `/` |
-| `/discover?post=123` | Redirects to `/?post=123` |
-| `/games` | Honest Games hub |
-| `/create/article` | Publish article ± teaser (auth; needs migrate) |
-| `/articles/[id]` | Full article (needs migrate + data) |
-| `/profile/[username]` | Rich tabs; `?tab=articles` |
-
-## Verdict
-
-Page Assembly V1 implementation complete against GO decisions. Ready for your review; **waiting for commit/push GO** (and separate migrate GO for `20260865`).
+| **Overall** | **PASS / COMPLETE** |
+| Public Catalog | PASS |
+| Public Course Page | PASS |
+| Guest Curriculum | PASS |
+| Preview | PASS (migration applied; L01 preview enabled) |
+| Full Lesson Protection | PASS |
+| Enrollment Flow | PASS |
+| Course appears publicly | Yes |
+| Routes | `/learning/catalog`, `/learning/catalog/[courseSlug]` |
+| Migration required | Yes |
+| Migration applied | Yes |
+| Tests | 16/16 |
+| tsc | PASS |
+| Commit created | Yes — `643cae9baab30152abbfb709fde669ee25d9d16f` |
+| Push | Yes |
