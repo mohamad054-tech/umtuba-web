@@ -6,13 +6,23 @@ import {
   MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
   buildCreatorProfileHref,
 } from "../../lib/nav";
-import { getPublishedArticle } from "../../../lib/articles/articlesFoundation";
-import { createClient } from "../../../lib/supabase/server";
+import {
+  getArticleTeaserJobForOwner,
+} from "../../../lib/articles/articleTeaserFoundation";
+import {
+  getPublishedArticle,
+  listEligibleTeaserVideos,
+} from "../../../lib/articles/articlesFoundation";
+import { createClient, getServerUser } from "../../../lib/supabase/server";
+import ArticleTeaserOwnerPanel from "./ArticleTeaserOwnerPanel";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ articleId: string }> | { articleId: string };
+  searchParams?:
+    | Promise<{ teaserError?: string }>
+    | { teaserError?: string };
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -25,8 +35,9 @@ export async function generateMetadata({ params }: PageProps) {
   return { title: `${loaded.data.title} · UMTUBA` };
 }
 
-export default async function ArticlePage({ params }: PageProps) {
+export default async function ArticlePage({ params, searchParams }: PageProps) {
   const { articleId } = await Promise.resolve(params);
+  const query = await Promise.resolve(searchParams ?? {});
   const supabase = await createClient();
   const loaded = await getPublishedArticle(supabase, articleId);
   if (!loaded.ok) {
@@ -37,6 +48,16 @@ export default async function ArticlePage({ params }: PageProps) {
   const profileHref = article.authorUsername
     ? buildCreatorProfileHref({ username: article.authorUsername })
     : APP_ROUTES.home;
+
+  const viewer = await getServerUser().catch(() => null);
+  const isOwner = Boolean(viewer && viewer.id === article.user_id);
+  const ownerJob = isOwner
+    ? await getArticleTeaserJobForOwner(supabase, articleId)
+    : null;
+  const eligibleVideos =
+    isOwner && ownerJob && ownerJob.status !== "ready" && ownerJob.status !== "not_required"
+      ? await listEligibleTeaserVideos(supabase, article.user_id)
+      : [];
 
   return (
     <main
@@ -65,6 +86,18 @@ export default async function ArticlePage({ params }: PageProps) {
             </time>
           ) : null}
         </div>
+
+        {ownerJob ? (
+          <div className="mt-6">
+            <ArticleTeaserOwnerPanel
+              articleId={articleId}
+              job={ownerJob}
+              eligibleVideos={eligibleVideos}
+              teaserError={query.teaserError ?? null}
+            />
+          </div>
+        ) : null}
+
         <div className="mt-8 whitespace-pre-wrap text-base leading-8 text-white/80">
           {article.body}
         </div>

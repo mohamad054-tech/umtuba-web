@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
+    "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

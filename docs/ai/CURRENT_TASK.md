@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Profile + Article Deeplink V1 (gaps on `a2063fb`)
+Article Auto-Teaser Video V1
 
 ## Status
 
@@ -10,44 +10,36 @@ Creator Profile + Article Deeplink V1 (gaps on `a2063fb`)
 
 ## Branch / sync
 
-- Branch: `office/creator-profile-article-deeplink-v1`
-- Base: rebased local docs commit onto latest `origin/alpha-0.2`
-- Backup: `backup/alpha-before-rich-profile-sync`
-- Tracking sync at feature start: ahead of origin by rebased docs commit only (`1a05ea8`); behind 0
+- Branch: `office/article-auto-teaser-video-v1`
+- Base: `45f315e` (`feat(platform): add creator profile article deeplink v1`)
+- Do **not** merge to `alpha-0.2` yet
+- Migration `20260867` is **Git-only** — not applied remotely
 
 ## Goal
 
-Complete only the gaps after `a2063fb feat(platform): add video-first home and rich profiles`:
+Every article gets a home-feed teaser:
+- Uploaded video → use it (`not_required`)
+- No video → enqueue `pending` job → Node+FFmpeg worker renders silent 5s MP4 → upload `post-videos` → create/update ready post with `article_id`
 
-1. Avatar/name on article-linked video → profile with `?article=`
-2. Prompt on profile: Read article now / Browse profile
-3. Read → `/articles/{id}` (exact article)
-4. Browse → clear query, stay at profile top
-5. Normal profile visit → no prompt
-6. Keep video-first home layout; light linked-article cue only
-7. Professional profile header/tabs (no TikTok grid / FB clone)
+## Allowed scope (this task)
 
-## Allowed scope
+- `supabase/migrations/20260867_article_auto_teaser_video_v1.sql`
+- `lib/articles/articleTeaser*`
+- `app/actions/articles.ts`, `app/create/article/*`, `app/articles/[articleId]/*`
+- `scripts/media/articleTeaserWorker.ts`
+- `package.json` scripts
+- `docs/ai/*`
 
-- `app/lib/nav/routes.ts` (+ tests)
-- `app/discover/**` (additive articleId / light cue only)
-- `app/components/video/VideoOverlay.tsx`
-- `app/watch/types.ts`, `app/watch/lib/mapWatchVideo.ts`
-- `app/profile/**` (prompt + header polish)
-- `docs/ai/*` handoff
+## Forbidden
 
-## Forbidden scope
-
-- Redesign home / player / engagement chrome
-- New Feed stack / return to LandingHero
-- Duplicate `articles` tables or RPCs
 - Remote migration apply
-- Commit / push / force push / hard reset
-- Broad refactor
+- Commit / push without GO
+- Merge to `alpha-0.2`
+- FFmpeg inside publish request
+- Platform music library / unlicensed audio
+- Co-authored-by / Signed-off-by / trailers
+- Home feed redesign
 
-## Reuse (do not recreate)
+## Audio V1 decision
 
-- Migration `20260865_articles_teaser_foundation_v1.sql`
-- `articles` + `posts.article_id` + `publish_my_article`
-- `lib/articles/articlesFoundation.ts`
-- Profile Articles tab + `/articles/[articleId]` + create article flow from `a2063fb`
+Silent-only. User audio upload deferred (would expand storage/validation). No platform music library.
