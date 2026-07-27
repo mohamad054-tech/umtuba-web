@@ -1,35 +1,45 @@
-# Current Task
+﻿# Current Task
 
 ## Task title
 
-Public Learning Catalog & Course Preview Foundation V1
+Safe-to-shutdown handoff (Public Learning Catalog V1)
 
 ## Status
 
-`complete`
+`complete` — **safe to shutdown: yes**
 
-## Close-out
+## Branch / sync
 
-- Commit message: `feat(learning): add public catalog and course preview foundation v1`
-- Commit hash: `d7c66690fdfefb4efea6a51393a5b992c16dfc9b`
 - Branch: `alpha-0.2`
-- Push: pushed to `origin/alpha-0.2`
+- Tracking: `origin/alpha-0.2` (synced at handoff)
 
-## Outcome
+## Last feature commit
 
-- Public catalog + course preview foundation shipped in repo
-- Migration `20260866_learning_public_course_preview_foundation_v1.sql` applied on remote; L01 preview enabled
-- Tests: `npx vitest run lib/learning/publicCatalog.test.ts` — 16/16 PASS
-- TypeScript: `npx tsc --noEmit` — PASS
-- Overnight junk (`.tmp-*.sql`, `*.log`, `IMPORT_*.json`, ad-hoc import scripts) left untracked — not committed
+- Message: `feat(learning): add public catalog and course preview foundation v1`
+- Hash: `d7c66690fdfefb4efea6a51393a5b992c16dfc9b`
+- Follow-up docs: `fbf8c30` — `docs(ai): record public catalog V1 close-out commit hash`
+
+## Runtime / data state
+
+- Migration `20260866_learning_public_course_preview_foundation_v1.sql` — **applied remotely**
+- L01 preview — **enabled**
+- Public catalog course slug: `ai-applications-master-course` (`status=published`, `visibility=public`)
+
+## Catalog routes
+
+- `/learning/catalog`
+- `/learning/catalog/[courseSlug]` (e.g. `/learning/catalog/ai-applications-master-course`)
+
+## Desktop package paths (do not commit)
+
+- Jinn zip: `C:\Users\1\Desktop\AI-Applications-Bootcamp\dist\Jinn-Education-AI-Applications-Course-V1.zip`
+- UMTUBA zip: `C:\Users\1\Desktop\AI-Applications-Bootcamp\dist\UMTUBA-AI-Applications-Course-V1.zip`
+
+## Local junk (do not commit)
+
+Untracked under `scripts/learning/`: `.tmp-*.sql`, `*.log`, `IMPORT_*.json`, ad-hoc `.mjs` / `_patch-fast.js` — safe to delete locally.
 
 ## Allowed scope (closed)
 
-- `app/learning/catalog/**`
-- `app/learning/lessons/[lessonId]/page.tsx`
-- `lib/learning/publicCatalog.ts`
-- `lib/learning/publicCatalog.test.ts`
-- `scripts/learning/public-catalog-course-data-v1.sql`
-- `supabase/migrations/20260866_learning_public_course_preview_foundation_v1.sql`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+No active implementation scope. Next session: sync `alpha-0.2` from origin before new work.
+
