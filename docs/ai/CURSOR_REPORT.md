@@ -4,7 +4,7 @@
 
 Public Learning Catalog & Course Preview Foundation V1 — **PASS** / **COMPLETE**.
 
-Committed and pushed on `alpha-0.2` as `feat(learning): add public catalog and course preview foundation v1` `643cae9baab30152abbfb709fde669ee25d9d16f`. Migration `20260866` applied remotely; L01 preview enabled. Guest catalog/course pages use sanitized public DTOs; full lesson route redirects guests to catalog.
+Committed and pushed on `alpha-0.2` as `feat(learning): add public catalog and course preview foundation v1` `d7c66690fdfefb4efea6a51393a5b992c16dfc9b`. Migration `20260866` applied remotely; L01 preview enabled. Guest catalog/course pages use sanitized public DTOs; full lesson route redirects guests to catalog.
 
 ## Exact files changed
 
@@ -93,5 +93,5 @@ Not required for this foundation slice. Not run.
 | Migration applied | Yes |
 | Tests | 16/16 |
 | tsc | PASS |
-| Commit created | Yes — `643cae9baab30152abbfb709fde669ee25d9d16f` |
+| Commit created | Yes — `d7c66690fdfefb4efea6a51393a5b992c16dfc9b` |
 | Push | Yes |

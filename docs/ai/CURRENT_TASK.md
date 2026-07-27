@@ -11,7 +11,7 @@ Public Learning Catalog & Course Preview Foundation V1
 ## Close-out
 
 - Commit message: `feat(learning): add public catalog and course preview foundation v1`
-- Commit hash: `643cae9baab30152abbfb709fde669ee25d9d16f`
+- Commit hash: `d7c66690fdfefb4efea6a51393a5b992c16dfc9b`
 - Branch: `alpha-0.2`
 - Push: pushed to `origin/alpha-0.2`
 
