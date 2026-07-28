@@ -2,23 +2,24 @@
 
 ## Summary
 
-**Platform Navigation Content-flow Policy Decision V1** — Preferred Flow Home → Creator Space → Content frozen as architecture; Allowed Shortcuts remain temporarily; no Home/CTA/route changes; no redirects; `buildPostNotificationHref` unchanged. **Verification PASS** (in-scope). Commit / Push / Merge **not** performed.
+**Home Readiness Guardrails V1** — Verification **PASS**. **Home Lock Active** (`HOME_LOCK_ACTIVE = true`). Locked surfaces: feed · swipe · ranking · player · circles-layout · engagement · home-shell. Preferred Flow `Home → Creator Space → Content` frozen as **documentation only**. **No actual Home behavior/visual changes.** Contracts + Vitest + architecture docs only. Commit / Push / Merge **not** performed; files **staged** for manual commit.
 
 ## Exact files changed
 
-- `app/lib/nav/contentFlowPolicyContract.ts` (new)
-- `app/lib/nav/contentFlowPolicyContract.test.ts` (new)
-- `app/lib/nav/index.ts`
-- `docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md` (§2.8 / §6 / §7)
+- `app/lib/nav/homeReadinessGuardrails.ts` (new)
+- `app/lib/nav/homeReadinessGuardrails.test.ts` (new)
+- `app/lib/nav/index.ts` (exports)
+- `docs/architecture/HOME_READINESS_GUARDRAILS_V1.md` (new)
+- `docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md` (§2.9 + verification list)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Decision frozen
+## Guardrails / contracts
 
-- Preferred Flow: `Home → Creator Space → Content`
-- Allowed Shortcuts: temporary (Home direct article, notification `/discover?post=`, `/watch?post=`)
-- Architectural guidance only until Product GO + Home unlock
-- No new redirects; `buildPostNotificationHref` unchanged
+- `HOME_LOCK_ACTIVE = true`
+- Locked surfaces inventory + owned/related path lists
+- Invariants: Video-First `/`, `/discover` alias, circles href contract, Preferred Flow docs-only
+- `assertHomeReadinessGuardrails()` + Vitest protection
 
 ## Migrations created
 
@@ -26,13 +27,14 @@ None.
 
 ## Security review
 
-- No Home or Store Domain file edits.
-- No route/CTA behavior changes.
+- No edits under `app/page.tsx`, `app/components/home/**`, or `app/discover/**` (tests read only).
+- No Store Domain, Watch redesign, Creator Space UI, mobile primary, CTA/funnel, or route/redirect changes.
+- Home lock not lifted.
 
 ## Tests
 
 - In-scope Vitest: **PASS**
-- Full Vitest: **2725 passed**, **3 failed** — pre-existing Store Domain only:
+- Full Vitest: **2730 passed**, **3 failed** — pre-existing Store Domain only (out of scope):
   - `lib/store/paymentOutcomeSync.test.ts` (1)
   - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
 
@@ -51,10 +53,10 @@ None.
 
 ## git status --short
 
-Pending stage for manual commit.
+Staged for manual commit (Home Readiness Guardrails V1 only).
 
 ## Open issues
 
-- Await explicit commit GO (manual Terminal; no Git trailers).
+- Await manual commit (no Git trailers), then push / Merge Readiness when approved.
 - Pre-existing Store Vitest failures and pinned-content `tsc` import remain out of scope.
-- **Proposed next (not started):** Content-flow Home Implementation after Home unlock GO, or Advertise Hide Policy Decision V1.
+- **Proposed next (not started):** Content-flow Home Implementation V1 after Product GO + Home unlock; or Advertise Hide Policy Decision V1.

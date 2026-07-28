@@ -141,6 +141,17 @@ Code: `app/lib/nav/contentFlowPolicyContract.ts`
 
 ---
 
+## 2.9 Home Readiness Guardrails V1
+
+After Platform Navigation Architecture V1 completion, Home stays locked. Guardrails live in:
+
+- `docs/architecture/HOME_READINESS_GUARDRAILS_V1.md`
+- `app/lib/nav/homeReadinessGuardrails.ts`
+
+`HOME_LOCK_ACTIVE` must remain `true` until Product GO + explicit Home unlock. Preferred Flow remains documented only.
+
+---
+
 ## 3. Role journeys (chrome reality)
 
 Chrome labels are **the same** for visitor and signed-in users. Capabilities unlock via middleware/page gates, not morphing primary tabs.
@@ -187,12 +198,13 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 7. Verification
 
-Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 + Mobile World Affordance Decision V1 + Content-flow Policy Decision V1 verified by:
+Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 + Mobile World Affordance Decision V1 + Content-flow Policy Decision V1 + Home Readiness Guardrails V1 verified by:
 
 - `app/lib/nav/platformNavContract.test.ts`
 - `app/lib/nav/deepLinkAliasContract.test.ts`
 - `app/lib/nav/secondarySurfaceContract.test.ts`
 - `app/lib/nav/mobileWorldAffordanceContract.test.ts`
 - `app/lib/nav/contentFlowPolicyContract.test.ts`
+- `app/lib/nav/homeReadinessGuardrails.test.ts`
 - Existing `shellCoherence`, `mobileNav`, `userMenuItems`, `pageAssembly` tests
 - `lib/supabase/redirect.test.ts` for `?next=` safety + Discover default

@@ -2,43 +2,50 @@
 
 ## Task title
 
-Platform Navigation Content-flow Policy Decision V1
+Home Readiness Guardrails V1
 
 ## Status
 
-`verification-pass` — **UNCOMMITTED** — awaiting explicit commit GO.
+`verification-pass` — **STAGED** — ready for manual commit (Agent stopped before commit).
 
 ## Branch / sync
 
-- **Branch:** `office/platform-navigation-content-flow-policy-decision-v1`
-- **Base:** `f72c35e72a374e8b7b71a287ce11e5f3de060504` (`alpha-0.2`)
+- **Branch:** `office/home-readiness-guardrails-v1`
+- **Base:** `424897530272e8f81504497bbee54ad3b11f6d9b` (`origin/alpha-0.2`)
 - **Checkout:** feature branch (not merged)
+- **Commit / Push / Merge:** not performed
 
 ## Product decision (frozen)
 
-- **Preferred Flow:** Home → Creator Space → Content
-- **Allowed Shortcuts:** current direct Home→content (and related deep links) remain temporarily — not a policy breach
-- Policy is **architectural guidance only** — no Home/CTA/route behavior changes this phase
-- Any real Home funnel change needs **Product GO** + **explicit Home unlock**
-- No new redirects; `buildPostNotificationHref` unchanged
+- **Home Lock Active:** `HOME_LOCK_ACTIVE = true`
+- **Locked surfaces:** feed · swipe · ranking · player · circles-layout · engagement · home-shell
+- Path inventory + contracts + Vitest guard accidental Home edits
+- **Preferred Flow** `Home → Creator Space → Content` remains **documentation only** (not implemented on Home)
+- Later Home changes need **Product GO** + **explicit Home unlock**
+- **No actual Home behavior/visual changes** in this phase
+- No new redirects; no route changes
 
 ## Verification
 
 - **PASS** (in-scope)
-- In-scope Vitest: PASS
-- Full Vitest: 2725 passed; **3 Store failures pre-existing / out of scope**
+- In-scope Vitest: **PASS**
+- Full Vitest: **2730 passed**; **3 Store failures pre-existing / out of scope**
+  - `lib/store/paymentOutcomeSync.test.ts` (1)
+  - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
 - `npx tsc --noEmit`: **FAIL pre-existing / out of scope** — `lib/content/profilePinnedContentStructure.v1.test.ts` (`../cards`)
-- `npm run build`: PASS
-- `git diff --check`: PASS
+- `npm run build`: **PASS**
+- `git diff --check`: **PASS**
 
 ## Forbidden scope
 
-- Home feed / swipe / ranking / player / circles / CTA changes
-- Creator Space UI / Store Domain / Mobile primary / Advertise-Admin Store
+- Any Home visual/behavioral change
+- feed / swipe / ranking / player / circles / engagement / CTA / funnel
+- Watch redesign / Creator Space UI / Store Domain / Mobile primary
+- New redirects / route changes / unlocking Home
 - Commit / Push / Merge without explicit GO
 
 ## Next step
 
-Await explicit **commit GO** (manual Terminal commit if Agent trailers apply).
+Manual Terminal commit (no Git trailers), then Merge Readiness / FF merge when approved.
 
-**Proposed next (not started):** Platform Navigation track decisions under Home lock are complete. Next product pick among: (1) Content-flow Home Implementation V1 after Home unlock GO, or (2) Advertise Hide Policy Decision V1 (no Home changes). No execution started.
+**Proposed next (not started):** Content-flow Home Implementation V1 only after Product GO + Home unlock; or Advertise Hide Policy Decision V1 (no Home changes).

@@ -97,6 +97,16 @@ export {
 } from "./contentFlowPolicyContract";
 
 export {
+  HOME_LOCK_ACTIVE,
+  HOME_LOCK_INVARIANTS,
+  HOME_LOCK_OWNED_PATHS,
+  HOME_LOCK_RELATED_SHARED_PATHS,
+  HOME_LOCKED_SURFACES,
+  assertHomeReadinessGuardrails,
+  type HomeLockedSurface,
+} from "./homeReadinessGuardrails";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,
