@@ -4,10 +4,10 @@
  */
 
 import {
-  formatMinorUnits,
   normalizeCurrencyCode,
   validateAmountMinor,
 } from "./money";
+import { computeExclusiveTaxOrderGrandTotalMinor, formatTrustedMoney } from "./tradingContracts";
 import type { StoreMemberRole } from "./types";
 import {
   FULFILLMENT_STATUSES,
@@ -161,10 +161,10 @@ export function formatFulfillmentStatus(status: FulfillmentStatus): string {
 }
 
 export function formatOrderMoney(
-  amountMinor: number,
-  currency: string
+  amountMinor: number | null | undefined,
+  currency: string | null | undefined
 ): string {
-  return formatMinorUnits(amountMinor, currency);
+  return formatTrustedMoney(amountMinor, currency);
 }
 
 export function canTransitionOrderStatus(
@@ -479,12 +479,8 @@ export function computeOrderGrandTotalMinor(input: {
   taxTotalMinor: number;
   shippingTotalMinor: number;
 }): number {
-  return (
-    input.subtotalMinor -
-    input.discountTotalMinor +
-    input.taxTotalMinor +
-    input.shippingTotalMinor
-  );
+  // Align with checkout pricing (exclusive tax) — do not fork grand-total math.
+  return computeExclusiveTaxOrderGrandTotalMinor(input);
 }
 
 export function validateOrderMoneyTotals(
@@ -558,6 +554,12 @@ export function buildOrderItemProductSnapshot(input: {
   variantTitle?: string | null;
   unitPriceMinor: number;
   currency: string;
+  /** Marketplace provenance — optional, immutable once snapshotted. */
+  marketplaceSourceType?: "owned" | "supplier_listing" | null;
+  supplierStoreId?: string | null;
+  sellerListingId?: string | null;
+  fulfillmentPartyStoreId?: string | null;
+  inventoryOwnerStoreId?: string | null;
 }): Record<string, unknown> {
   return {
     product_id: input.productId,
@@ -570,6 +572,11 @@ export function buildOrderItemProductSnapshot(input: {
     variant_title: input.variantTitle ?? null,
     unit_price_minor: input.unitPriceMinor,
     currency: normalizeCurrencyCode(input.currency),
+    marketplace_source_type: input.marketplaceSourceType ?? null,
+    supplier_store_id: input.supplierStoreId ?? null,
+    seller_listing_id: input.sellerListingId ?? null,
+    fulfillment_party_store_id: input.fulfillmentPartyStoreId ?? null,
+    inventory_owner_store_id: input.inventoryOwnerStoreId ?? null,
     snapshotted_at: "order_create",
   };
 }

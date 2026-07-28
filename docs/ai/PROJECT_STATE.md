@@ -6,49 +6,52 @@
 
 ## Primary working branch
 
-`alpha-0.2` @ `769039d796e37d3e27c4b8bdc2bb49aff57b53c7` (pre-merge tip; update after FF-merge)
+`alpha-0.2` — Wave 3.5 platform integration (Revenue + Commerce + AI, flags OFF)
 
-## Active feature (this machine)
+## Active feature (this machine — Desktop)
 
-- **Branch:** `office/profile-all-timeline-contract-v1`
-- **Task:** Creator Space All Timeline Contract V1 — Final Verification → Commit / Push / FF-merge
-- **See:** `docs/ai/CURRENT_TASK.md`
+- **Branch:** `integration/w3-alpha-final`
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w3-alpha-final`
+- **Task:** Integration Program V1 — Wave 3.5 Alpha Integration (closing)
+- **See:** `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
 
-- Home Circular Arc Navigation Foundation V1
-- Home Circular Arc Preview & Polish V1
-- Home Left Action Rail Arc Alignment V1
-- Home Assembly V1
+- Home Circular Arc / Assembly V1 (`6fac440`)
 - Creator Space Photos Lightbox V1 (`769039d`)
-- Arc design locked: 7 circles, arc `[0,-6,-11,-14,-11,-6,0]`, host `left-[5px]`
-- Creator Space All Timeline Contract V1 (closing via this branch)
+- Creator All Timeline Contract V1 (`4fdbf30`)
+- Integration W1 Revenue / W2 Commerce / W3 AI via Wave 3.5
 
 ## Gates (unchanged)
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
 - `HOME_LOCK_ACTIVE = true`
-- Preview via existing `shouldMountHomeCircularArc()` only
-- Store Domain off-limits on laptop
+- AI product flags default OFF (`UMTUBA_AI_HUB`, `UMTUBA_AI_ASSISTANT_RUNTIME`, `UMTUBA_AI_VIDEO_PERSONALIZATION`)
+
+## Learning chapter status
+
+**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
+
+Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
+Session continuity: `docs/ai/SESSION_HANDOFF.md`
+
+## Integration status
+
+| Track | Status |
+| --- | --- |
+| Unified Revenue Platform Foundation | On alpha via W3.5 |
+| Commerce E2E Beta Readiness | On alpha via W3.5 |
+| Shared AI Core / Hub / Assistant | On alpha via W3.5 (flags OFF) |
+
+Default: Do not modify frozen Commerce architecture documents.
 
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.
 - Always synchronize with origin before starting work.
 
-## Machines
-
-| Machine | Role |
-| --- | --- |
-| **Laptop** | Primary development and integration machine |
-| **Desktop** | May perform isolated review / testing tasks only |
-
 ## Safety defaults
 
-- **No commit** without explicit approval in the user request.
-- **No push** without explicit approval in the user request.
-- **No remote Supabase migration apply** without explicit approval.
-- **No destructive Git actions** without explicit approval.
 - Follow `docs/DEVELOPMENT_WORKFLOW.md`.
-- Follow `docs/ai/CURRENT_TASK.md` for active handoff scope.
-- Write execution results to `docs/ai/CURSOR_REPORT.md`.
+- No remote Supabase migration apply without explicit approval.
+- No destructive Git actions without explicit approval.

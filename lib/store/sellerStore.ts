@@ -123,16 +123,27 @@ export async function updateStoreBasics(
     return { ok: false, message: "Contact link must not contain spaces." };
   }
 
+  const patch: Record<string, unknown> = {
+    name,
+    description,
+    city,
+    public_contact_email: publicContactEmail,
+    public_contact_phone: publicContactPhone,
+    public_contact_url: publicContactUrl,
+  };
+
+  if (Object.prototype.hasOwnProperty.call(raw, "marketplaceSupplierEnabled")) {
+    const enabled =
+      raw.marketplaceSupplierEnabled === true ||
+      raw.marketplaceSupplierEnabled === "true" ||
+      raw.marketplaceSupplierEnabled === "on" ||
+      raw.marketplaceSupplierEnabled === "1";
+    patch.marketplace_supplier_enabled = enabled;
+  }
+
   const { data, error } = await supabase
     .from("stores")
-    .update({
-      name,
-      description,
-      city,
-      public_contact_email: publicContactEmail,
-      public_contact_phone: publicContactPhone,
-      public_contact_url: publicContactUrl,
-    })
+    .update(patch)
     .eq("id", storeId)
     .select("*")
     .single();
@@ -373,6 +384,58 @@ export async function updateDraftProduct(
   return { ok: true, data: data as StoreProductRow };
 }
 
+/**
+ * Toggle marketplace eligibility on a supplier-owned product.
+ * Allowed for catalog managers on any non-archived product they own.
+ * Sellers listing this product cannot call this for another store's product.
+ */
+export async function updateProductMarketplaceEligibility(
+  supabase: AnyClient,
+  userId: string,
+  productId: string,
+  marketplaceEligible: boolean
+): Promise<ActionResult<StoreProductRow>> {
+  const { data: existing } = await supabase
+    .from("store_products")
+    .select("*")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (!existing) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  const role = await getMembership(supabase, existing.store_id, userId);
+  if (!canManageCatalog(role)) {
+    return {
+      ok: false,
+      message: "You do not have permission to change marketplace eligibility.",
+    };
+  }
+
+  if (existing.status === "archived" || existing.status === "blocked") {
+    return {
+      ok: false,
+      message: "Archived or blocked products cannot be marketplace-eligible.",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("store_products")
+    .update({ marketplace_eligible: Boolean(marketplaceEligible) })
+    .eq("id", productId)
+    .eq("store_id", existing.store_id)
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    console.error("updateProductMarketplaceEligibility", error);
+    return { ok: false, message: "Unable to update marketplace eligibility." };
+  }
+
+  return { ok: true, data: data as StoreProductRow };
+}
+
 export async function upsertVariantPriceInventory(
   supabase: AnyClient,
   userId: string,
@@ -411,27 +474,52 @@ export async function upsertVariantPriceInventory(
 
   const currency =
     typeof raw.currency === "string" ? raw.currency : "USD";
+
+  const compareAtFromForm =
+    raw.compareAtMajor !== undefined &&
+    raw.compareAtMajor !== null &&
+    String(raw.compareAtMajor).trim() !== ""
+      ? majorToMinorUnits(raw.compareAtMajor)
+      : raw.compareAtMinor !== undefined &&
+          raw.compareAtMinor !== null &&
+          raw.compareAtMinor !== ""
+        ? typeof raw.compareAtMinor === "number" ||
+          (typeof raw.compareAtMinor === "string" &&
+            /^\d+$/.test(raw.compareAtMinor.trim()))
+          ? Number(raw.compareAtMinor)
+          : majorToMinorUnits(raw.compareAtMinor)
+        : undefined;
+
+  if (
+    compareAtFromForm === null ||
+    (compareAtFromForm !== undefined &&
+      (!Number.isFinite(compareAtFromForm) || compareAtFromForm < 0))
+  ) {
+    return { ok: false, message: "Compare-at price is invalid." };
+  }
+
   let amountMinor: number;
+  let compareAtMinor: number | null | undefined;
   if (raw.amountMinor !== undefined && raw.amountMinor !== null && raw.amountMinor !== "") {
     const price = validatePriceInput({
       amountMinor: raw.amountMinor,
-      compareAtMinor: raw.compareAtMinor,
+      compareAtMinor: compareAtFromForm,
       currency,
     });
     if (!price.ok) return price;
     amountMinor = price.value.amountMinor;
+    compareAtMinor = price.value.compareAtMinor;
   } else {
     const minor = majorToMinorUnits(raw.priceMajor);
     if (minor === null) return { ok: false, message: "Price is required." };
     const price = validatePriceInput({
       amountMinor: minor,
-      compareAtMinor: raw.compareAtMinor
-        ? majorToMinorUnits(raw.compareAtMinor)
-        : undefined,
+      compareAtMinor: compareAtFromForm,
       currency,
     });
     if (!price.ok) return price;
     amountMinor = price.value.amountMinor;
+    compareAtMinor = price.value.compareAtMinor;
   }
 
   const inventory = validateInventoryInput({
@@ -495,17 +583,22 @@ export async function upsertVariantPriceInventory(
     .maybeSingle();
 
   if (existingPrice) {
+    const priceUpdate: Record<string, unknown> = {
+      amount_minor: amountMinor,
+      currency: currency.toUpperCase(),
+    };
+    if (compareAtFromForm !== undefined) {
+      priceUpdate.compare_at_amount_minor = compareAtMinor ?? null;
+    }
     await supabase
       .from("product_prices")
-      .update({
-        amount_minor: amountMinor,
-        currency: currency.toUpperCase(),
-      })
+      .update(priceUpdate)
       .eq("id", existingPrice.id);
   } else {
     await supabase.from("product_prices").insert({
       variant_id: variantId,
       amount_minor: amountMinor,
+      compare_at_amount_minor: compareAtMinor ?? null,
       currency: currency.toUpperCase(),
       status: "active",
     });
@@ -616,6 +709,120 @@ export async function attachProductMediaMetadata(
   return { ok: true, data: { mediaId: data.id } };
 }
 
+export async function updateProductMediaLayout(
+  supabase: AnyClient,
+  userId: string,
+  productId: string,
+  input: {
+    orderedMediaIds: string[];
+    coverMediaId?: string | null;
+  }
+): Promise<ActionResult<{ updated: number }>> {
+  const { data: product } = await supabase
+    .from("store_products")
+    .select("store_id")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (!product) return { ok: false, message: "Product not found." };
+
+  const role = await getMembership(supabase, product.store_id, userId);
+  if (!canManageCatalog(role)) {
+    return { ok: false, message: "You do not have permission to edit this product." };
+  }
+
+  const ordered = input.orderedMediaIds
+    .map((id) => (typeof id === "string" ? id.trim() : ""))
+    .filter(Boolean);
+  if (ordered.length === 0) {
+    return { ok: false, message: "No media items to update." };
+  }
+
+  const { data: existing } = await supabase
+    .from("product_media")
+    .select("id, role")
+    .eq("product_id", productId)
+    .neq("status", "archived");
+
+  const owned = new Set((existing ?? []).map((row) => row.id as string));
+  for (const id of ordered) {
+    if (!owned.has(id)) {
+      return { ok: false, message: "Media item does not belong to this product." };
+    }
+  }
+
+  const coverId =
+    typeof input.coverMediaId === "string" && input.coverMediaId.trim()
+      ? input.coverMediaId.trim()
+      : null;
+  if (coverId && !owned.has(coverId)) {
+    return { ok: false, message: "Cover media does not belong to this product." };
+  }
+
+  let updated = 0;
+  for (let index = 0; index < ordered.length; index += 1) {
+    const id = ordered[index]!;
+    const roleValue =
+      coverId && id === coverId
+        ? "cover"
+        : coverId
+          ? "gallery"
+          : undefined;
+    const patch: Record<string, unknown> = { sort_order: index };
+    if (roleValue) patch.role = roleValue;
+    const { error } = await supabase
+      .from("product_media")
+      .update(patch)
+      .eq("id", id)
+      .eq("product_id", productId);
+    if (error) {
+      console.error("updateProductMediaLayout", error);
+      return { ok: false, message: "Unable to update media layout." };
+    }
+    updated += 1;
+  }
+
+  return { ok: true, data: { updated } };
+}
+
+export async function archiveProductMedia(
+  supabase: AnyClient,
+  userId: string,
+  productId: string,
+  mediaId: string
+): Promise<ActionResult<{ mediaId: string }>> {
+  const { data: product } = await supabase
+    .from("store_products")
+    .select("store_id")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (!product) return { ok: false, message: "Product not found." };
+
+  const role = await getMembership(supabase, product.store_id, userId);
+  if (!canManageCatalog(role)) {
+    return { ok: false, message: "You do not have permission to edit this product." };
+  }
+
+  const id = mediaId.trim();
+  if (!id) return { ok: false, message: "Media id is required." };
+
+  const { data, error } = await supabase
+    .from("product_media")
+    .update({ status: "archived" })
+    .eq("id", id)
+    .eq("product_id", productId)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    console.error("archiveProductMedia", error);
+    return { ok: false, message: "Unable to remove media." };
+  }
+
+  return { ok: true, data: { mediaId: data.id as string } };
+}
+
 export async function submitProductForReview(
   supabase: AnyClient,
   userId: string,
@@ -699,13 +906,19 @@ export async function archiveProduct(
 export async function listSellerProducts(
   supabase: AnyClient,
   storeId: string
-): Promise<StoreProductRow[]> {
-  const { data } = await supabase
+): Promise<
+  { ok: true; data: StoreProductRow[] } | { ok: false; message: string }
+> {
+  const { data, error } = await supabase
     .from("store_products")
     .select("*")
     .eq("store_id", storeId)
     .order("updated_at", { ascending: false });
-  return (data ?? []) as StoreProductRow[];
+  if (error) {
+    console.error("listSellerProducts", error);
+    return { ok: false, message: "Unable to load seller products." };
+  }
+  return { ok: true, data: (data ?? []) as StoreProductRow[] };
 }
 
 export async function getSellerProductBundle(
@@ -721,8 +934,13 @@ export async function getSellerProductBundle(
         id: string;
         sku: string;
         title: string;
+        status: string;
         option_values: Record<string, string>;
-        price: { amount_minor: number; currency: string } | null;
+        price: {
+          amount_minor: number;
+          compare_at_amount_minor: number | null;
+          currency: string;
+        } | null;
         inventory: {
           on_hand: number;
           reserved: number;
@@ -736,6 +954,7 @@ export async function getSellerProductBundle(
         alt_text: string | null;
         role: string;
         media_type: string;
+        sort_order: number;
       }>;
     }
   | { ok: false; message: string }
@@ -765,7 +984,7 @@ export async function getSellerProductBundle(
     const [{ data: price }, { data: inv }] = await Promise.all([
       supabase
         .from("product_prices")
-        .select("amount_minor, currency")
+        .select("amount_minor, compare_at_amount_minor, currency")
         .eq("variant_id", v.id)
         .eq("status", "active")
         .limit(1)
@@ -781,10 +1000,15 @@ export async function getSellerProductBundle(
       id: v.id as string,
       sku: v.sku as string,
       title: v.title as string,
+      status: (v.status as string) ?? "active",
       option_values: (v.option_values as Record<string, string>) ?? {},
       price: price
         ? {
             amount_minor: Number(price.amount_minor),
+            compare_at_amount_minor:
+              price.compare_at_amount_minor == null
+                ? null
+                : Number(price.compare_at_amount_minor),
             currency: price.currency as string,
           }
         : null,
@@ -801,7 +1025,7 @@ export async function getSellerProductBundle(
 
   const { data: media } = await supabase
     .from("product_media")
-    .select("id, storage_path, alt_text, role, media_type")
+    .select("id, storage_path, alt_text, role, media_type, sort_order")
     .eq("product_id", productId)
     .neq("status", "archived")
     .order("sort_order", { ascending: true });
@@ -811,13 +1035,14 @@ export async function getSellerProductBundle(
     product: product as StoreProductRow,
     role,
     variants: enriched,
-    media: (media ?? []) as Array<{
-      id: string;
-      storage_path: string;
-      alt_text: string | null;
-      role: string;
-      media_type: string;
-    }>,
+    media: (media ?? []).map((m) => ({
+      id: m.id as string,
+      storage_path: m.storage_path as string,
+      alt_text: (m.alt_text as string | null) ?? null,
+      role: m.role as string,
+      media_type: m.media_type as string,
+      sort_order: Number(m.sort_order ?? 0),
+    })),
   };
 }
 

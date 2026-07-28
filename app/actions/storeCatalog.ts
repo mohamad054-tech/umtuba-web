@@ -5,13 +5,17 @@ import { redirect } from "next/navigation";
 import { getServerUser, createClient } from "../../lib/supabase/server";
 import {
   archiveProduct,
+  archiveProductMedia,
   attachProductMediaMetadata,
   createDraftProduct,
   submitProductForReview,
   updateDraftProduct,
+  updateProductMarketplaceEligibility,
+  updateProductMediaLayout,
   updateStoreBasics,
   upsertVariantPriceInventory,
 } from "../../lib/store/sellerStore";
+import { buildOptionValuesPayload } from "../../lib/store/sellerCatalogPresentation";
 import { APP_ROUTES } from "../lib/nav";
 
 async function requireUser() {
@@ -49,6 +53,7 @@ export async function updateStoreAction(formData: FormData): Promise<void> {
     publicContactEmail: formData.get("publicContactEmail"),
     publicContactPhone: formData.get("publicContactPhone"),
     publicContactUrl: formData.get("publicContactUrl"),
+    marketplaceSupplierEnabled: formData.has("marketplaceSupplierEnabled"),
   });
 
   if (!result.ok) {
@@ -119,6 +124,34 @@ export async function updateDraftProductAction(formData: FormData): Promise<void
   redirect(`/seller/store/products/${productId}/edit`);
 }
 
+export async function updateProductMarketplaceEligibilityAction(
+  formData: FormData
+): Promise<void> {
+  const user = await requireUser();
+  const productId = String(formData.get("productId") || "");
+  if (!productId) {
+    redirect(`/seller/store/products?error=${encodeURIComponent("Missing product id.")}`);
+  }
+
+  const supabase = await createClient();
+  const result = await updateProductMarketplaceEligibility(
+    supabase,
+    user.id,
+    productId,
+    formData.has("marketplaceEligible")
+  );
+
+  if (!result.ok) {
+    redirect(
+      `/seller/store/products/${productId}/edit?error=${encodeURIComponent(result.message)}`
+    );
+  }
+  revalidatePath(`/seller/store/products/${productId}/edit`);
+  revalidatePath("/seller/store/products");
+  revalidatePath(APP_ROUTES.sellerMarketplace);
+  redirect(`/seller/store/products/${productId}/edit`);
+}
+
 export async function upsertVariantAction(formData: FormData): Promise<void> {
   const user = await requireUser();
   const productId = String(formData.get("productId") || "");
@@ -127,6 +160,12 @@ export async function upsertVariantAction(formData: FormData): Promise<void> {
   }
 
   const supabase = await createClient();
+  const optionValues = buildOptionValuesPayload({
+    color: String(formData.get("optionColor") || ""),
+    size: String(formData.get("optionSize") || ""),
+    capacity: String(formData.get("optionCapacity") || ""),
+  });
+  const optionValuesJson = String(formData.get("optionValues") || "").trim();
   const result = await upsertVariantPriceInventory(
     supabase,
     user.id,
@@ -135,8 +174,13 @@ export async function upsertVariantAction(formData: FormData): Promise<void> {
       variantId: formData.get("variantId"),
       sku: formData.get("sku"),
       variantTitle: formData.get("variantTitle"),
-      optionValues: formData.get("optionValues"),
+      optionValues:
+        optionValuesJson ||
+        (Object.keys(optionValues).length > 0
+          ? JSON.stringify(optionValues)
+          : "{}"),
       priceMajor: formData.get("priceMajor"),
+      compareAtMajor: formData.get("compareAtMajor"),
       currency: formData.get("currency") || "USD",
       onHand: formData.get("onHand"),
       safetyStock: formData.get("safetyStock"),
@@ -235,4 +279,98 @@ export async function archiveProductAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/seller/store/products");
   redirect("/seller/store/products");
+}
+
+export async function bulkArchiveProductsAction(
+  formData: FormData
+): Promise<{ ok: true; archived: number; failed: number } | { ok: false; message: string }> {
+  const user = await requireUser();
+  const ids = formData
+    .getAll("productId")
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  if (ids.length === 0) {
+    return { ok: false, message: "Select at least one product." };
+  }
+
+  const supabase = await createClient();
+  let archived = 0;
+  let failed = 0;
+  for (const productId of ids) {
+    const result = await archiveProduct(supabase, user.id, productId);
+    if (result.ok) archived += 1;
+    else failed += 1;
+  }
+  revalidatePath("/seller/store/products");
+  return { ok: true, archived, failed };
+}
+
+export async function bulkSubmitProductsAction(
+  formData: FormData
+): Promise<{ ok: true; submitted: number; failed: number } | { ok: false; message: string }> {
+  const user = await requireUser();
+  const ids = formData
+    .getAll("productId")
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  if (ids.length === 0) {
+    return { ok: false, message: "Select at least one product." };
+  }
+
+  const supabase = await createClient();
+  let submitted = 0;
+  let failed = 0;
+  for (const productId of ids) {
+    const result = await submitProductForReview(supabase, user.id, productId);
+    if (result.ok) submitted += 1;
+    else failed += 1;
+  }
+  revalidatePath("/seller/store/products");
+  return { ok: true, submitted, failed };
+}
+
+export async function updateProductMediaLayoutAction(
+  formData: FormData
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const user = await requireUser();
+  const productId = String(formData.get("productId") || "").trim();
+  if (!productId) return { ok: false, message: "Missing product id." };
+
+  const orderedRaw = String(formData.get("orderedMediaIds") || "").trim();
+  let orderedMediaIds: string[] = [];
+  try {
+    const parsed = JSON.parse(orderedRaw) as unknown;
+    if (Array.isArray(parsed)) {
+      orderedMediaIds = parsed.map((id) => String(id));
+    }
+  } catch {
+    return { ok: false, message: "Invalid media order payload." };
+  }
+
+  const coverMediaId = String(formData.get("coverMediaId") || "").trim() || null;
+  const supabase = await createClient();
+  const result = await updateProductMediaLayout(supabase, user.id, productId, {
+    orderedMediaIds,
+    coverMediaId,
+  });
+  if (!result.ok) return { ok: false, message: result.message };
+  revalidatePath(`/seller/store/products/${productId}/edit`);
+  return { ok: true };
+}
+
+export async function archiveProductMediaAction(
+  formData: FormData
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const user = await requireUser();
+  const productId = String(formData.get("productId") || "").trim();
+  const mediaId = String(formData.get("mediaId") || "").trim();
+  if (!productId || !mediaId) {
+    return { ok: false, message: "Product and media ids are required." };
+  }
+
+  const supabase = await createClient();
+  const result = await archiveProductMedia(supabase, user.id, productId, mediaId);
+  if (!result.ok) return { ok: false, message: result.message };
+  revalidatePath(`/seller/store/products/${productId}/edit`);
+  return { ok: true };
 }
