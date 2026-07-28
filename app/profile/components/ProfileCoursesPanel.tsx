@@ -54,7 +54,7 @@ export default function ProfileCoursesPanel({
           <li key={course.id}>
             <Link
               href={course.href}
-              className="watch-focus-ring group flex h-full flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[#080816]/70 transition hover:border-white/20"
+              className="watch-focus-ring group flex h-full flex-col overflow-hidden rounded-[24px] border border-white/10 bg-[#080816]/70 transition hover:border-white/20 hover:brightness-[1.03] motion-reduce:transition-none motion-reduce:hover:brightness-100"
             >
               <div
                 className={`relative aspect-[16/10] bg-gradient-to-br ${course.coverGradient}`}

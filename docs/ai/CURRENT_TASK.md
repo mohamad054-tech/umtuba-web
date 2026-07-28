@@ -2,7 +2,7 @@
 
 ## Task title
 
-Courses / Products Panel Structure V1
+Creator Space Motion / A11y Pass V1
 
 ## Status
 
@@ -10,41 +10,25 @@ Courses / Products Panel Structure V1
 
 ## Branch / sync
 
-- **Branch:** `office/profile-courses-products-structure-v1`
-- **Base:** `faf5a0954ff10055aa90644b516019588d2a32d3` (`feat(web): add profile pinned content structure v1`)
+- **Branch:** `office/profile-motion-a11y-pass-v1`
+- **Base:** `230b1b4f3a63b55d1e4401d3d8846ce328517078`
 - **Checkout:** feature branch (not merged)
 
 ## What was implemented
 
-- Courses panel structured cards (§11): cover, title, level, CTA → Learning catalog href.
-- Products panel structured cards (§12): cover, title, price, CTA → store product href.
-- View-model `courses` / `products` + normalize/count helpers for tab visibility.
-- Production defaults empty arrays (no catalog backend); mock data on `lina.creates`.
+- Page enter fade/rise on Profile hero shell.
+- Hero collapse at 96px scroll + compressed cover/avatar; sticky compact header retained.
+- Tab panel cross-fade on tab change; sticky tablist with Home/End + focus move; ≥44px targets.
+- Live badge polite `aria-live` + pulse disabled under reduced motion.
+- Light card hover brightness on Courses/Products with reduced-motion guards.
+- Keyframes in `globals.css` scoped to Profile motion names.
 
-## Exact files changed
+## Forbidden scope
 
-- `app/profile/lib/profileCoursesProductsStructure.ts` (new)
-- `app/profile/components/ProfileCoursesPanel.tsx`
-- `app/profile/components/ProfileProductsPanel.tsx`
-- `app/profile/ProfileExperience.tsx`
-- `app/profile/types.ts`
-- `app/profile/lib/mapProfile.ts`
-- `app/profile/data/mockProfiles.ts`
-- `lib/content/profileCoursesProductsStructure.v1.test.ts` (new)
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-## Forbidden scope (unchanged)
-
-- Migrations / catalog domain / LMS embed / checkout
-- Instructor / Seller dashboards
-- Home / Watch / Photos lightbox / Motion·a11y
+- Home / Watch / swipe / Store domain
+- Migrations / catalog persistence / content-flow policy
 - Commit / Push without explicit GO
-
-## Hard lock
-
-Home remains official Discovery Layer — do not touch feed/player behavior.
 
 ## Next step
 
-Await explicit **commit GO** (then push/merge only on separate GO).
+Await explicit **commit GO** (manual Terminal commit if Agent trailers apply).

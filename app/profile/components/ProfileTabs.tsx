@@ -19,6 +19,17 @@ type ProfileTabsProps = {
   photoCount?: number;
 };
 
+function focusTabButton(tabId: ProfileTabId) {
+  const el = document.getElementById(`profile-tab-${tabId}`);
+  if (el instanceof HTMLButtonElement) {
+    el.focus();
+  }
+}
+
+/**
+ * Profile tablist — arrow / Home / End navigation, aria wiring (§21).
+ * Touch targets ≥ 44px. Subtle active transition; respects reduced motion.
+ */
 export default function ProfileTabs({
   activeTab,
   onChange,
@@ -34,15 +45,31 @@ export default function ProfileTabs({
     <div
       role="tablist"
       aria-label="Profile sections"
-      className="sticky top-0 z-20 flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur"
+      aria-orientation="horizontal"
+      className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur"
       onKeyDown={(event) => {
         const currentIndex = tabs.findIndex((tab) => tab === activeTab);
-        if (currentIndex < 0) return;
+        if (currentIndex < 0 || tabs.length === 0) return;
+
+        let next: ProfileTabId | undefined;
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
           event.preventDefault();
           const delta = event.key === "ArrowRight" ? 1 : -1;
-          const next = tabs[(currentIndex + delta + tabs.length) % tabs.length];
-          if (next) onChange(next);
+          next = tabs[(currentIndex + delta + tabs.length) % tabs.length];
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          next = tabs[0];
+        } else if (event.key === "End") {
+          event.preventDefault();
+          next = tabs[tabs.length - 1];
+        }
+
+        if (next && next !== activeTab) {
+          onChange(next);
+          // Focus after React commits the selected tab.
+          queueMicrotask(() => focusTabButton(next!));
+        } else if (next) {
+          focusTabButton(next);
         }
       }}
     >
@@ -81,7 +108,7 @@ export default function ProfileTabs({
             aria-controls={panelId}
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(tabId)}
-            className={`watch-focus-ring shrink-0 rounded-xl px-3 py-2.5 text-sm font-bold transition sm:flex-1 sm:px-4 ${
+            className={`watch-focus-ring min-h-[44px] shrink-0 rounded-xl px-3 py-2.5 text-sm font-bold transition motion-reduce:transition-none sm:flex-1 sm:px-4 ${
               active
                 ? "bg-blue-500/20 text-blue-100"
                 : "text-white/50 hover:bg-white/5 hover:text-white/80"

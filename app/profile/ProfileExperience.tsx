@@ -37,6 +37,11 @@ import {
   countProfileCourses,
   countProfileProducts,
 } from "./lib/profileCoursesProductsStructure";
+import {
+  PROFILE_HERO_COLLAPSE_SCROLL_PX,
+  PROFILE_PAGE_ENTER_CLASS,
+  PROFILE_TAB_PANEL_FADE_CLASS,
+} from "./lib/profileMotionA11y";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -111,7 +116,8 @@ export default function ProfileExperience({
   }, [searchParams, visibleTabs]);
 
   useEffect(() => {
-    const updateHeroCollapse = () => setIsHeroCollapsed(window.scrollY >= 100);
+    const updateHeroCollapse = () =>
+      setIsHeroCollapsed(window.scrollY >= PROFILE_HERO_COLLAPSE_SCROLL_PX);
     updateHeroCollapse();
     window.addEventListener("scroll", updateHeroCollapse, { passive: true });
     return () => window.removeEventListener("scroll", updateHeroCollapse);
@@ -146,8 +152,10 @@ export default function ProfileExperience({
           />
         ) : null}
 
-        <section className="space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7">
-          <ProfileHeader profile={profile} />
+        <section
+          className={`space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7 ${PROFILE_PAGE_ENTER_CLASS}`}
+        >
+          <ProfileHeader profile={profile} isCollapsed={isHeroCollapsed} />
           <ProfileStats
             followersLabel={followersLabel}
             followingLabel={followingLabel}
@@ -241,10 +249,12 @@ export default function ProfileExperience({
         ) : null}
 
         <section
+          key={activeTab}
           id={`profile-panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`profile-tab-${activeTab}`}
-          className="space-y-6"
+          tabIndex={0}
+          className={`space-y-6 outline-none ${PROFILE_TAB_PANEL_FADE_CLASS}`}
         >
           {activeTab === "all" ? (
             <ProfileAllPanel
