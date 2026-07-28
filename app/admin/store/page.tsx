@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { adminStoreQueueCounts } from "../../../lib/store/adminQueries";
+import { buildAdminCommerceBridgeStatus } from "../../../lib/store/commerceRevenueBridge";
 import { APP_ROUTES } from "../../lib/nav";
 import AdminStoreShell from "./AdminStoreShell";
 import { requireAdminStoreSession } from "./requireAdminStore";
@@ -11,6 +12,7 @@ export const metadata = {
 export default async function AdminStoreOverviewPage() {
   const { supabase } = await requireAdminStoreSession();
   const counts = await adminStoreQueueCounts(supabase);
+  const bridgeStatus = buildAdminCommerceBridgeStatus();
 
   return (
     <AdminStoreShell title="Store admin">
@@ -60,6 +62,29 @@ export default async function AdminStoreOverviewPage() {
           ))}
         </div>
       )}
+
+      <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
+        <h2 className="text-lg font-black tracking-tight">
+          Commerce revenue bridge
+        </h2>
+        <p className="mt-2 text-sm text-white/50">
+          Bounded operational visibility for the shared financial ledger bridge.
+          No payout balances, secrets, or provider credentials are shown.
+        </p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          {bridgeStatus.map((row) => (
+            <div
+              key={row.label}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+            >
+              <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                {row.label}
+              </dt>
+              <dd className="mt-1 text-sm text-white/80">{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </AdminStoreShell>
   );
 }

@@ -14,7 +14,7 @@ import {
   type SellerDashboardStoreReadiness,
 } from "../../../lib/store/sellerDashboardInsights";
 import type { AnalyticsSalesSeriesPoint, AnalyticsTopProductRow } from "../../../lib/store/analyticsFinance";
-import { FINANCE_FOUNDATION_PLACEHOLDER } from "../../../lib/store/analyticsFinance";
+import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/commerceRevenueBridge";
 import { APP_ROUTES } from "../../lib/nav";
 
 type Props = {
@@ -37,6 +37,7 @@ type Props = {
   analyticsUnavailable: boolean;
   canManage: boolean;
   periodKey: "7d" | "30d";
+  revenueBridge: CommerceRevenueBridgeSellerVisibility;
 };
 
 export default function SellerDashboardInsightsView(props: Props) {
@@ -60,6 +61,7 @@ export default function SellerDashboardInsightsView(props: Props) {
     analyticsUnavailable,
     canManage,
     periodKey,
+    revenueBridge,
   } = props;
 
   return (
@@ -517,13 +519,25 @@ export default function SellerDashboardInsightsView(props: Props) {
           Settlement & payouts
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
-          Settlement and payout visibility will appear when the trusted
-          financial ledger is connected. Platform commission, seller net
-          proceeds, reserves, and payout status remain{" "}
-          <code className="text-[var(--sf-faint)]">
-            {FINANCE_FOUNDATION_PLACEHOLDER.sellerNetProceeds.status}
-          </code>
-          .
+          {revenueBridge.financialLedgerConnected
+            ? "Trusted financial ledger foundations are connected."
+            : "Financial ledger is not connected."}{" "}
+          {revenueBridge.paidOrderValueRecordedHint}
+        </p>
+        <ul className="mt-3 space-y-2 text-sm text-[var(--sf-muted)]">
+          {revenueBridge.summaryLines.map((line) => (
+            <li key={line} className="flex gap-2">
+              <span className="text-[var(--sf-faint)]" aria-hidden>
+                ·
+              </span>
+              <span>{line}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-[var(--sf-faint)]">
+          Withheld until backed by the shared ledger:{" "}
+          {revenueBridge.withheldUnsupportedValues.join(", ")}. Payouts{" "}
+          {revenueBridge.payoutsEnabled ? "enabled" : "not yet enabled"}.
         </p>
       </section>
     </div>

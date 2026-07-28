@@ -63,8 +63,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Premium Seller Inventory & Reservation Visibility V1 | **COMPLETE** (branch `office/commerce-premium-seller-inventory-reservation-visibility-v1`) |
 | Commerce Premium Seller Dashboard & Operational Insights V1 | **COMPLETE** (branch `office/commerce-premium-seller-dashboard-insights-v1`) |
 | Commerce Trading Domain Alignment & Integrity V1 | **COMPLETE** (branch `office/commerce-trading-domain-alignment-integrity-v1`) |
+| Commerce Revenue Ledger Bridge Foundation V1 | **COMPLETE** (branch `office/commerce-revenue-ledger-bridge-foundation-v1`) |
 
-Default: Consolidation complete. Program is in **implementation**. Storefront through Trading Domain Alignment landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Program is in **implementation**. Storefront through Revenue Ledger Bridge landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

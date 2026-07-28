@@ -15,17 +15,17 @@ Consolidation complete. Implementation track active.
 5. Seller Catalog & Product Management
 6. Seller Inventory & Reservation Visibility
 7. Seller Dashboard & Operational Insights
-8. Trading Domain Alignment & Integrity V1 (current) — `office/commerce-trading-domain-alignment-integrity-v1`
+8. Trading Domain Alignment & Integrity V1
+9. Revenue Ledger Bridge Foundation V1 (current) — `office/commerce-revenue-ledger-bridge-foundation-v1`
 
-## Canonical trading path (code)
+## Canonical trading → finance path
 
-1. **Catalog Offer** — active `product_prices` (`amount_minor`, compare-at only when strictly greater)
-2. **Cart Snapshot** — server `cart_items.unit_price_minor_snapshot` + currency (client prices rejected)
-3. **Checkout Quote** — `create_store_checkout_quote` (TTL recreate; no client money)
-4. **Order Snapshot** — `confirm_store_checkout_quote` freezes order / order_item money
-5. **Payment State** — `orders.payment_status` (order existence ≠ paid)
+Catalog → Cart → Quote → Order snapshots → Payment state
+→ **Commerce financial event** (`lib/store/commerceRevenueBridge.ts`)
+→ `apply_store_payment_outcome` / `apply_store_settlement_event` → UEOS
 
-Shared map: `lib/store/tradingContracts.ts` (`TRADING_PATH_SUMMARY`).
+Commission policy: **not_configured** (gross facts only; merchant share not assumed).
+Payouts: **not enabled**. Historical backfill: **dry-run only**.
 
 ## Frozen architecture
 
@@ -33,4 +33,4 @@ Do not modify `docs/commerce/**` frozen foundations / Physical SAs / Manifesto.
 
 ## Next
 
-Settlement/payout visibility when ledger is connected, or real payment-provider integration **only if explicitly requested**. No Warehouse / Shipping Network unless asked.
+Commission policy when trusted, or controlled Sync backfill for paid orders without capture events. No payment provider / Warehouse / Shipping Network unless asked.

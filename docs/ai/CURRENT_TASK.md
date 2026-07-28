@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Trading Domain Alignment & Integrity V1
+Commerce Revenue Ledger Bridge Foundation V1
 
 ## Status
 
@@ -10,21 +10,17 @@ Commerce Trading Domain Alignment & Integrity V1
 
 ## Branch
 
-`office/commerce-trading-domain-alignment-integrity-v1`
+`office/commerce-revenue-ledger-bridge-foundation-v1`
 
 ## Base
 
-Trusted dashboard commit `fa2aedfe5aa0a401c04c8ac3712727de5bc16ef4`
-Parent branch: `office/commerce-premium-seller-dashboard-insights-v1`
+Trusted trading-alignment commit `28d2e90dad474e560ee346bb082f7c3b47faa5af`
+Parent branch: `office/commerce-trading-domain-alignment-integrity-v1`
 
 ## Deliverable
 
-Code-level alignment of the Commerce trading path:
-
-Catalog Price → Cart Snapshot → Checkout Quote → Order Confirmation → Order Money Snapshots → Payment State
-
-Shared contract helpers in `lib/store/tradingContracts.ts`; consumers hardened for compare-at integrity, client money rejection, mixed-currency fail-closed, quote money without cart fallback, single exclusive-tax grand-total path, and unified payment-state classification. No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits. No migrations.
+Trusted app-layer bridge from confirmed Commerce order/payment facts into the existing shared financial foundation (UEOS + Payment Outcome Sync + Merchant Settlement). Canonical Commerce financial events, eligibility matrix, idempotent Sync/Settlement posting plans (service_role execute), commission decomposition marked unavailable (no fabrication), reconciliation dry-run diagnostics, honest seller/admin visibility. No Commerce-only ledger. No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits. No migrations (reuses existing Sync/Settlement/UEOS).
 
 ## Next after this task
 
-Settlement/payout visibility when trusted financial ledger is connected — still no payment provider / Shipping Network / Warehouse execution unless requested. Optional: payment-provider integration only if explicitly authorized.
+Trusted commission policy + settlement allocate/release automation when authorized — or controlled historical backfill of paid orders into Sync. Still no payouts UI balances / payment provider unless explicitly requested.

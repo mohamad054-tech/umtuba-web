@@ -27,6 +27,7 @@ import {
   deriveSellerDashboardAttention,
   deriveStoreReadiness,
 } from "../../../lib/store/sellerDashboardInsights";
+import { buildSellerRevenueBridgeVisibility } from "../../../lib/store/commerceRevenueBridge";
 import {
   listSellerInventoryRows,
   listSellerStoreReservations,
@@ -165,6 +166,10 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     ? parseFulfillmentDashboardCounts(fulfillmentCountsResult.counts)
     : null;
 
+  const revenueBridge = buildSellerRevenueBridgeVisibility({
+    hasPaidOrdersInWindow: (orderSnapshot?.paidOrderValueMinor ?? 0) > 0,
+  });
+
   return (
     <SellerOpsShell title="Store dashboard" subtitle={membership.role} wide>
       <div className="mt-6">
@@ -194,6 +199,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           analyticsUnavailable={analyticsUnavailable}
           canManage={canManage}
           periodKey={uiPeriod}
+          revenueBridge={revenueBridge}
         />
       </div>
 
