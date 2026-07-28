@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Storefront Experience Foundation V1
+Commerce Premium Cart and Checkout Experience V1
 
 ## Status
 
@@ -10,26 +10,25 @@ Commerce Premium Storefront Experience Foundation V1
 
 ## Branch
 
-`office/commerce-premium-storefront-experience-foundation-v1`
+`office/commerce-premium-cart-checkout-experience-v1`
+
+## Base
+
+Trusted storefront commit `5e786e52a495e82255aa00230d940e6045575b73`  
+Parent branch: `office/commerce-premium-storefront-experience-foundation-v1`
 
 ## Deliverable
 
-Production-quality customer-facing Store experience foundation on canonical routes (`/store`, search, PDP, seller storefront), reusing existing Commerce/Store adapters and components.
-
-## Program note
-
-Commerce consolidation is complete. The program has moved from documentation-only architecture into real implementation.
+Premium customer Cart (`/store/cart`) and Checkout (`/store/checkout`) experience reusing existing cart/checkout/pricing/order foundations. No payment provider. No Shipping Network. No frozen Commerce architecture edits.
 
 ## Constraints
 
-- Do not modify frozen Commerce architecture documents under `docs/commerce/**`
-- Do not delete previous Store work
-- No payment-provider integration
-- No Shipping Network architecture
-- No broad database redesign
-- Fail closed on missing commerce data; no fabricated prices/stock/claims
-- Home remains Discovery — do not convert Home into Store
+- Do not create a second cart/checkout source of truth
+- Server-authoritative totals only
+- Fail closed on stale price / availability
+- Multi-seller: group by seller; atomic multi-order policy preserved
+- No fabricated discounts/tax/shipping
 
-## Next (after this task)
+## Next after this task
 
-Continue storefront depth (seller policies UX, media polish) or Trading alignment in code; Shipping Network SA remains the recommended next architecture document when returning to docs.
+Orders experience polish, deferred payment UX depth, or Trading-domain alignment — not another architecture document unless requested.

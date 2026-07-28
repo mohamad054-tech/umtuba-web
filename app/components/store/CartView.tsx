@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   clearCartAction,
   removeCartItemAction,
@@ -10,6 +10,11 @@ import {
 } from "../../actions/storeCart";
 import { formatMinorUnits } from "../../../lib/store/money";
 import type { CartSummary } from "../../../lib/store/cartRules";
+import {
+  canProceedFromCart,
+  cartMediaDisplayUrl,
+  multiSellerCheckoutNotice,
+} from "../../../lib/store/cartCheckoutPresentation";
 import { APP_ROUTES } from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
@@ -22,12 +27,18 @@ export default function CartView({ initialSummary }: CartViewProps) {
   const router = useRouter();
   const [summary, setSummary] = useState(initialSummary);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  function refreshAfter(count?: number) {
+  useEffect(() => {
+    setSummary(initialSummary);
+  }, [initialSummary]);
+
+  function applySummary(next: CartSummary | undefined, count?: number) {
+    if (next) setSummary(next);
     window.dispatchEvent(
       new CustomEvent("umtuba:cart-updated", {
-        detail: { count },
+        detail: { count: count ?? next?.itemCount },
       })
     );
     router.refresh();
@@ -35,56 +46,69 @@ export default function CartView({ initialSummary }: CartViewProps) {
 
   function onQuantity(itemId: string, quantity: number) {
     setError(null);
+    setStatus(null);
     startTransition(async () => {
       const result = await updateCartQuantityAction({ itemId, quantity });
       if (!result.ok) {
         setError(result.message);
         return;
       }
-      refreshAfter();
+      if (result.summary) {
+        applySummary(result.summary, result.itemCount);
+        if (result.summary.hasBlockingIssues) {
+          setStatus("Cart updated. Review availability or price changes before checkout.");
+        } else {
+          setStatus("Quantity updated.");
+        }
+        return;
+      }
+      applySummary(undefined, result.itemCount);
     });
   }
 
   function onRemove(itemId: string) {
     setError(null);
+    setStatus(null);
     startTransition(async () => {
       const result = await removeCartItemAction({ itemId });
       if (!result.ok) {
         setError(result.message);
         return;
       }
-      setSummary((prev) => {
-        const lines = prev.groups.flatMap((g) => g.items).filter((i) => i.id !== itemId);
-        const nextCount = lines.reduce((s, i) => s + i.quantity, 0);
-        refreshAfter(nextCount);
-        return {
-          ...prev,
-          itemCount: nextCount,
-          groups: prev.groups
-            .map((g) => ({
-              ...g,
-              items: g.items.filter((i) => i.id !== itemId),
-              storeSubtotalMinor: g.items
-                .filter((i) => i.id !== itemId)
-                .reduce((s, i) => s + i.lineTotalMinor, 0),
-            }))
-            .filter((g) => g.items.length > 0),
-          subtotalMinor: lines.reduce((s, i) => s + i.lineTotalMinor, 0),
-        };
-      });
+      applySummary(
+        result.summary ?? {
+          currency: summary.currency,
+          itemCount: 0,
+          subtotalMinor: 0,
+          groups: [],
+          hasBlockingIssues: false,
+        },
+        result.itemCount
+      );
+      setStatus("Item removed.");
     });
   }
 
   function onClear() {
     setError(null);
+    setStatus(null);
     startTransition(async () => {
       const result = await clearCartAction();
       if (!result.ok) {
         setError(result.message);
         return;
       }
-      setSummary({ currency: null, itemCount: 0, subtotalMinor: 0, groups: [] });
-      refreshAfter(0);
+      applySummary(
+        result.summary ?? {
+          currency: null,
+          itemCount: 0,
+          subtotalMinor: 0,
+          groups: [],
+          hasBlockingIssues: false,
+        },
+        0
+      );
+      setStatus("Cart cleared.");
     });
   }
 
@@ -94,101 +118,201 @@ export default function CartView({ initialSummary }: CartViewProps) {
         {error ? <StoreErrorState message={error} /> : null}
         <StoreEmptyState
           title="Your cart is empty"
-          description="Browse the store and add active products when you are ready."
+          description="Browse the Store and add active products when you are ready. Snapshotted prices appear here after items are added."
+          actionHref={APP_ROUTES.store}
+          actionLabel="Continue shopping"
         />
-        <Link
-          href={APP_ROUTES.store}
-          className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-        >
-          Continue shopping
-        </Link>
       </div>
     );
   }
 
   const currency = summary.currency ?? "USD";
+  const proceed = canProceedFromCart(summary);
+  const multiNotice = multiSellerCheckoutNotice(summary.groups.length);
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="space-y-4" aria-busy={pending || undefined}>
         {error ? <StoreErrorState message={error} /> : null}
+        {status && !error ? (
+          <p role="status" className="text-sm text-[var(--sf-muted)]">
+            {status}
+          </p>
+        ) : null}
+        {multiNotice ? (
+          <p
+            role="note"
+            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[rgba(214,196,161,0.06)] px-4 py-3 text-sm leading-relaxed text-[var(--sf-muted)]"
+          >
+            {multiNotice}
+          </p>
+        ) : null}
 
         {summary.groups.map((group) => (
           <section
             key={group.storeId}
-            className="rounded-[24px] border border-white/10 bg-[#080816]/85 p-4 md:p-5"
+            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5"
             aria-label={`Items from ${group.storeName}`}
           >
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-black tracking-tight">{group.storeName}</h2>
+              <div>
+                <p className="sf-eyebrow">Seller</p>
+                <h2 className="sf-display mt-1 text-lg font-semibold tracking-tight">
+                  {group.storeName}
+                </h2>
+              </div>
               <Link
-                href={`/store`}
-                className="text-xs font-bold text-violet-300 hover:text-violet-200"
+                href={
+                  group.storeSlug
+                    ? `/store/${group.storeSlug}`
+                    : APP_ROUTES.store
+                }
+                className="text-xs font-semibold text-[var(--sf-accent-strong)] hover:text-[var(--sf-accent)]"
               >
-                Store
+                View store
               </Link>
             </div>
+            <p className="mt-1 text-xs text-[var(--sf-faint)]">
+              Seller subtotal{" "}
+              {formatMinorUnits(group.storeSubtotalMinor, currency)} · fulfilled
+              separately
+            </p>
 
             <ul className="mt-4 space-y-3">
-              {group.items.map((item) => (
-                <li
-                  key={item.id}
-                  className="rounded-2xl border border-white/10 bg-black/30 p-3 md:p-4"
-                >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="font-black tracking-tight">{item.productTitle}</p>
-                      <p className="mt-1 text-xs text-white/45">{item.variantTitle}</p>
-                      {item.mediaSnapshot ? (
-                        <p className="mt-2 truncate text-[10px] uppercase tracking-wider text-white/30">
-                          {item.mediaSnapshot}
-                        </p>
-                      ) : null}
-                      <p className="mt-2 text-sm font-bold text-violet-100">
-                        {formatMinorUnits(item.unitPriceMinor, item.currency)}
-                      </p>
-                    </div>
+              {group.items.map((item) => {
+                const mediaUrl = cartMediaDisplayUrl(item.mediaSnapshot);
+                return (
+                  <li
+                    key={item.id}
+                    className="rounded-2xl border border-[var(--sf-line)] bg-black/25 p-3 md:p-4"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)]">
+                        {mediaUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={mediaUrl}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-full items-center justify-center text-xs font-semibold text-[var(--sf-faint)]">
+                            {(item.productTitle[0] ?? "U").toUpperCase()}
+                          </span>
+                        )}
+                      </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                      <label className="sr-only" htmlFor={`qty-${item.id}`}>
-                        Quantity for {item.productTitle}
-                      </label>
-                      <input
-                        id={`qty-${item.id}`}
-                        type="number"
-                        min={1}
-                        max={9999}
-                        defaultValue={item.quantity}
-                        disabled={pending}
-                        onBlur={(e) => {
-                          const next = Number(e.target.value);
-                          if (Number.isInteger(next) && next !== item.quantity) {
-                            onQuantity(item.id, next);
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            (e.target as HTMLInputElement).blur();
-                          }
-                        }}
-                        className="watch-focus-ring w-20 rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm outline-none focus:border-violet-400/50"
-                      />
-                      <button
-                        type="button"
-                        disabled={pending}
-                        onClick={() => onRemove(item.id)}
-                        className="watch-focus-ring rounded-full border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs font-bold text-red-100"
-                      >
-                        Remove
-                      </button>
+                      <div className="min-w-0 flex-1">
+                        <p className="sf-display font-semibold tracking-tight">
+                          {item.productTitle}
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--sf-faint)]">
+                          {item.variantTitle}
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-baseline gap-2">
+                          <p className="text-sm font-semibold text-[var(--sf-accent-strong)]">
+                            {formatMinorUnits(item.unitPriceMinor, item.currency)}
+                          </p>
+                          {item.priceChanged && item.liveUnitPriceMinor != null ? (
+                            <p className="text-xs text-[var(--sf-danger)]">
+                              Live price now{" "}
+                              {formatMinorUnits(
+                                item.liveUnitPriceMinor,
+                                item.currency
+                              )}
+                            </p>
+                          ) : null}
+                        </div>
+                        {item.available != null ? (
+                          <p className="mt-1 text-xs text-[var(--sf-muted)]">
+                            {item.available > 0
+                              ? `${item.available} available`
+                              : "Unavailable"}
+                          </p>
+                        ) : null}
+                        {item.blockingIssue ? (
+                          <p
+                            role="alert"
+                            className="mt-2 text-xs font-semibold text-[var(--sf-danger)]"
+                          >
+                            {item.blockingIssue}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
+                        <div className="flex items-center gap-1 rounded-full border border-[var(--sf-line)] bg-black/30 p-1">
+                          <button
+                            type="button"
+                            aria-label={`Decrease quantity for ${item.productTitle}`}
+                            disabled={pending || item.quantity <= 1}
+                            onClick={() =>
+                              onQuantity(item.id, Math.max(1, item.quantity - 1))
+                            }
+                            className="watch-focus-ring flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold disabled:opacity-40"
+                          >
+                            −
+                          </button>
+                          <label className="sr-only" htmlFor={`qty-${item.id}`}>
+                            Quantity for {item.productTitle}
+                          </label>
+                          <input
+                            id={`qty-${item.id}`}
+                            key={`${item.id}-${item.quantity}`}
+                            type="number"
+                            min={1}
+                            max={
+                              item.available != null && item.available > 0
+                                ? item.available
+                                : 9999
+                            }
+                            defaultValue={item.quantity}
+                            disabled={pending}
+                            onBlur={(e) => {
+                              const next = Number(e.target.value);
+                              if (!Number.isInteger(next)) {
+                                setError("Quantity must be a whole number.");
+                                e.target.value = String(item.quantity);
+                                return;
+                              }
+                              if (next !== item.quantity) {
+                                onQuantity(item.id, next);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                (e.target as HTMLInputElement).blur();
+                              }
+                            }}
+                            className="watch-focus-ring w-14 bg-transparent text-center text-sm outline-none"
+                          />
+                          <button
+                            type="button"
+                            aria-label={`Increase quantity for ${item.productTitle}`}
+                            disabled={pending}
+                            onClick={() => onQuantity(item.id, item.quantity + 1)}
+                            className="watch-focus-ring flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold disabled:opacity-40"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          type="button"
+                          disabled={pending}
+                          onClick={() => onRemove(item.id)}
+                          className="watch-focus-ring rounded-full border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-3 py-2 text-xs font-semibold text-[var(--sf-danger)]"
+                        >
+                          Remove
+                        </button>
+                        <p className="text-xs text-[var(--sf-faint)]">
+                          Line{" "}
+                          {formatMinorUnits(item.lineTotalMinor, item.currency)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <p className="mt-2 text-right text-xs text-white/40">
-                    Line{" "}
-                    {formatMinorUnits(item.lineTotalMinor, item.currency)}
-                  </p>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         ))}
@@ -197,41 +321,73 @@ export default function CartView({ initialSummary }: CartViewProps) {
           type="button"
           disabled={pending}
           onClick={onClear}
-          className="watch-focus-ring text-sm font-bold text-white/45 hover:text-white/70"
+          className="watch-focus-ring text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-ink)]"
         >
           Clear cart
         </button>
       </div>
 
-      <aside className="h-fit rounded-[24px] border border-violet-400/25 bg-[#080816]/90 p-5 lg:sticky lg:top-20">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300/70">
-          Summary
-        </p>
+      <aside className="h-fit rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 lg:sticky lg:top-20">
+        <p className="sf-eyebrow">Summary</p>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-3">
-            <dt className="text-white/45">Items</dt>
-            <dd className="font-bold">{summary.itemCount}</dd>
+            <dt className="text-[var(--sf-faint)]">Items</dt>
+            <dd className="font-semibold">{summary.itemCount}</dd>
           </div>
-          <div className="flex justify-between gap-3 border-t border-white/10 pt-3">
-            <dt className="text-white/45">Subtotal</dt>
-            <dd className="text-lg font-black text-violet-100">
+          <div className="flex justify-between gap-3">
+            <dt className="text-[var(--sf-faint)]">Sellers</dt>
+            <dd className="font-semibold">{summary.groups.length}</dd>
+          </div>
+          <div className="flex justify-between gap-3 border-t border-[var(--sf-line)] pt-3">
+            <dt className="text-[var(--sf-faint)]">Item subtotal</dt>
+            <dd className="text-lg font-semibold text-[var(--sf-accent-strong)]">
               {formatMinorUnits(summary.subtotalMinor, currency)}
             </dd>
           </div>
+          <div className="flex justify-between gap-3 text-xs">
+            <dt className="text-[var(--sf-faint)]">Discount</dt>
+            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+          </div>
+          <div className="flex justify-between gap-3 text-xs">
+            <dt className="text-[var(--sf-faint)]">Tax</dt>
+            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+          </div>
+          <div className="flex justify-between gap-3 text-xs">
+            <dt className="text-[var(--sf-faint)]">Delivery</dt>
+            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+          </div>
         </dl>
-        <Link
-          href={APP_ROUTES.storeCheckout}
-          className="mt-5 flex w-full items-center justify-center rounded-full bg-violet-500 px-5 py-3 text-sm font-black text-white hover:bg-violet-400"
-        >
-          Proceed to checkout
-        </Link>
-        <p className="mt-2 text-center text-[11px] text-white/40">
-          Payment collection is not enabled yet. Checkout creates pending-payment
-          orders only.
+
+        {!proceed.ok ? (
+          <p role="alert" className="mt-4 text-xs leading-relaxed text-[var(--sf-danger)]">
+            {proceed.message}
+          </p>
+        ) : null}
+
+        {proceed.ok ? (
+          <Link
+            href={APP_ROUTES.storeCheckout}
+            className="mt-5 flex w-full items-center justify-center rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] transition hover:bg-[var(--sf-accent-strong)]"
+          >
+            Proceed to checkout
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="mt-5 flex w-full cursor-not-allowed items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-bold text-white/35"
+          >
+            Checkout unavailable
+          </button>
+        )}
+        <p className="mt-2 text-center text-[11px] leading-relaxed text-[var(--sf-faint)]">
+          Payment collection is not enabled. Checkout creates pending-payment
+          orders only — no live charge.
         </p>
         <Link
           href={APP_ROUTES.store}
-          className="mt-3 block text-center text-sm font-bold text-violet-300 hover:text-violet-200"
+          className="mt-3 block text-center text-sm font-semibold text-[var(--sf-accent-strong)] hover:text-[var(--sf-accent)]"
         >
           Continue shopping
         </Link>

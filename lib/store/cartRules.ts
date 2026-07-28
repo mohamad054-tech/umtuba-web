@@ -32,6 +32,9 @@ export type CartSummaryLine = {
   id: string;
   storeId: string;
   storeName?: string;
+  /** Present when cart summary enrichment includes store slug. */
+  storeSlug?: string | null;
+  variantId?: string | null;
   quantity: number;
   unitPriceMinor: number;
   currency: string;
@@ -39,6 +42,14 @@ export type CartSummaryLine = {
   variantTitle: string;
   mediaSnapshot: string | null;
   lineTotalMinor: number;
+  /** Live active unit price when enrichment ran; null if unavailable. */
+  liveUnitPriceMinor?: number | null;
+  /** Live available units when enrichment ran; null if unknown. */
+  available?: number | null;
+  /** True when live price differs from cart snapshot. */
+  priceChanged?: boolean;
+  /** Buyer-facing issue that should block silent checkout progression. */
+  blockingIssue?: string | null;
 };
 
 export type CartSummary = {
@@ -48,9 +59,12 @@ export type CartSummary = {
   groups: Array<{
     storeId: string;
     storeName: string;
+    storeSlug?: string | null;
     items: CartSummaryLine[];
     storeSubtotalMinor: number;
   }>;
+  /** True when any line has a blockingIssue (stale price, unavailable, etc.). */
+  hasBlockingIssues?: boolean;
 };
 
 export function validateCartQuantity(
@@ -226,7 +240,13 @@ export function computeCartSummary(
   >
 ): CartSummary {
   if (lines.length === 0) {
-    return { currency: null, itemCount: 0, subtotalMinor: 0, groups: [] };
+    return {
+      currency: null,
+      itemCount: 0,
+      subtotalMinor: 0,
+      groups: [],
+      hasBlockingIssues: false,
+    };
   }
 
   const currency = normalizeCurrencyCode(lines[0]!.currency);
@@ -255,11 +275,14 @@ export function computeCartSummary(
   const groups = Array.from(byStore.entries()).map(([storeId, items]) => ({
     storeId,
     storeName: items[0]?.storeName || "Store",
+    storeSlug: items[0]?.storeSlug ?? null,
     items,
     storeSubtotalMinor: items.reduce((sum, i) => sum + i.lineTotalMinor, 0),
   }));
 
-  return { currency, itemCount, subtotalMinor, groups };
+  const hasBlockingIssues = enriched.some((line) => Boolean(line.blockingIssue));
+
+  return { currency, itemCount, subtotalMinor, groups, hasBlockingIssues };
 }
 
 /** Reject client-provided price snapshots — server must supply. */

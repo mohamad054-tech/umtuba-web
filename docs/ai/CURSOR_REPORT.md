@@ -2,33 +2,22 @@
 
 ## Summary
 
-Implemented **Commerce Premium Storefront Experience Foundation V1** on branch `office/commerce-premium-storefront-experience-foundation-v1`. Hardened the existing `/store` customer surfaces into a premium editorial experience: landing discovery, product cards, PDP (quantity, fail-closed pricing, policies, gallery), search/category browsing, seller storefront polish. Reused existing catalog adapters, cart/wishlist actions, and Store components. No frozen Commerce architecture docs modified. No migrations. Commerce program recorded as moved from consolidation into implementation.
+Implemented **Commerce Premium Cart and Checkout Experience V1** on branch `office/commerce-premium-cart-checkout-experience-v1` from trusted storefront commit `5e786e52a495e82255aa00230d940e6045575b73`. Hardened `/store/cart` and `/store/checkout` with premium editorial UX continuous with storefront tokens, live price/availability integrity, multi-seller grouping, server-authoritative quote totals, deliberate checkout steps, and fail-closed submission. No payment provider. No Shipping Network. No frozen Commerce architecture document changes. No migrations. No duplicate cart/checkout system.
 
 ## Exact files changed
 
 ### Created
-- `app/components/store/storefront.css`
-- `lib/store/storefrontDeriveSections.test.ts`
+- `lib/store/cartCheckoutPresentation.ts`
+- `lib/store/cartCheckoutExperience.test.ts`
 
-### Modified (storefront / handoff)
-- `app/components/store/CategoryRail.tsx`
-- `app/components/store/HeroCarousel.tsx`
-- `app/components/store/ProductCard.tsx`
-- `app/components/store/SearchFilters.tsx`
-- `app/components/store/StoreCard.tsx`
-- `app/components/store/StoreEmptyState.tsx`
-- `app/components/store/StoreErrorState.tsx`
-- `app/components/store/StoreSection.tsx`
-- `app/components/store/StoreShell.tsx`
-- `app/components/store/StoreSkeleton.tsx`
-- `app/lib/storefront/deriveSections.ts`
-- `app/store/page.tsx`
-- `app/store/search/page.tsx`
-- `app/store/[storeSlug]/page.tsx`
-- `app/store/[storeSlug]/product/[productSlug]/page.tsx`
-- `app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx`
-- `lib/store/catalogQueries.ts`
-- `lib/store/types.ts`
+### Modified
+- `lib/store/cartRules.ts`
+- `lib/store/cart.ts`
+- `app/actions/storeCart.ts`
+- `app/components/store/CartView.tsx`
+- `app/components/store/CheckoutClient.tsx`
+- `app/store/cart/page.tsx`
+- `app/store/checkout/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -40,17 +29,18 @@ None.
 
 ## Security review
 
-- Public catalog still server-enriched via existing adapters; signed media URLs unchanged.
-- Add-to-cart remains server action; closed when price/stock missing.
-- No secrets exposed. No payment-provider work. No inventory quantity edits.
-- Compare-at only when legitimate higher active price exists.
+- Cart/checkout mutations remain server actions with buyer ownership checks.
+- Client money fields still rejected on quote/confirm.
+- Live price/availability enrichment is server-side; checkout blocked when blocking issues exist.
+- Payment remains deferred placeholder only — no gateway integration.
+- No secrets exposed.
 
 ## Tests
 
-- `lib/store/storefrontDeriveSections.test.ts` — 9 passed
+- `lib/store/cartCheckoutExperience.test.ts` — passed
+- `lib/store/cartFoundation.test.ts` — passed
+- `lib/store/checkoutFoundation.test.ts` — passed
 - `lib/store/commerceSafety.test.ts` — passed
-- `lib/store/wishlist.test.ts` — passed
-- `lib/store/storeFoundation.test.ts` — passed
 
 ## TypeScript
 
@@ -58,19 +48,19 @@ None.
 
 ## Build
 
-`npm run build` — passed (includes `/store`, `/store/search`, `/store/[storeSlug]`, `/store/[storeSlug]/product/[productSlug]`)
+`npm run build` — passed (`/store/cart`, `/store/checkout` present)
 
 ## git diff --check
 
-Clean on storefront-scoped paths.
+Clean on task-scoped paths at commit time.
 
 ## git status --short
 
-See final report after commit/push (working tree still contains unrelated local learning/docs noise not included in this commit).
+See final report after commit/push (unrelated local learning noise excluded from commit).
 
 ## Open issues
 
-- Live shopping / flash deals / brand rail remain flag-gated placeholders (honest unavailable).
-- Recommendations are catalog heuristics, not personalized ML.
-- Wishlist on listing cards starts unwishlisted (existing capability; no server batch wishlist state on rails).
-- Shipping Network and payment providers intentionally out of scope.
+- Cart media shows public http(s) snapshots only; opaque storage keys use letter placeholders (signed media for cart lines not wired yet).
+- Separate billing address UI is honest/unavailable (billing mirrors delivery in foundation).
+- Live payment providers still deferred.
+- Quote enrichment N+1 per variant is acceptable for small carts; batch later if needed.

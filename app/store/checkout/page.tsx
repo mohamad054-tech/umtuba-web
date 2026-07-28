@@ -43,14 +43,15 @@ export default async function StoreCheckoutPage() {
 
   return (
     <StoreShell title="Checkout" subtitle="Store" wide>
-      <header className="mt-6 rounded-[28px] border border-violet-400/20 bg-[#080816]/80 p-5 md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300/70">
-          Checkout
-        </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Review & place order</h1>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">
-          Totals are calculated server-side. Payment collection is not enabled
-          yet — placing an order creates a pending-payment order only.
+      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <p className="sf-eyebrow">Checkout</p>
+        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Review & place order
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
+          Totals are calculated server-side. Payment collection is not enabled —
+          placing an order creates a pending-payment order only. Multi-seller
+          carts create one order per seller atomically.
         </p>
         {!commerceGate.purchasesAvailable ? (
           <p
@@ -58,6 +59,15 @@ export default async function StoreCheckoutPage() {
             className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
             {commerceGate.message}
+          </p>
+        ) : null}
+        {cart.data.hasBlockingIssues ? (
+          <p
+            role="alert"
+            className="mt-4 rounded-2xl border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-4 py-3 text-sm text-[var(--sf-danger)]"
+          >
+            Some cart items have price or availability issues. Return to the cart
+            and resolve them before placing an order.
           </p>
         ) : null}
       </header>
@@ -77,8 +87,14 @@ export default async function StoreCheckoutPage() {
           cart={cart.data}
           addresses={addresses.data}
           shippingMethods={shipping.data}
-          purchasesAvailable={commerceGate.purchasesAvailable}
-          purchasesUnavailableMessage={commerceGate.message}
+          purchasesAvailable={
+            commerceGate.purchasesAvailable && !cart.data.hasBlockingIssues
+          }
+          purchasesUnavailableMessage={
+            cart.data.hasBlockingIssues
+              ? "Resolve cart price or availability issues before placing an order."
+              : commerceGate.message
+          }
         />
       )}
     </StoreShell>

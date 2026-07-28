@@ -9,6 +9,9 @@ import {
   type CartSummary,
   validateCartQuantity,
 } from "./cartRules";
+import { deriveCartLineBlockingIssue } from "./cartCheckoutPresentation";
+import { availableUnits } from "./inventory";
+import { isPubliclyVisibleProduct } from "./permissions";
 
 type AnyClient = SupabaseClient;
 
@@ -276,13 +279,14 @@ export async function getCartSummary(
       `
       id,
       store_id,
+      variant_id,
       quantity,
       unit_price_minor_snapshot,
       currency,
       product_title_snapshot,
       variant_title_snapshot,
       media_snapshot,
-      stores ( name )
+      stores ( name, slug, status )
     `
     )
     .eq("cart_id", cartResult.data.id)
@@ -293,18 +297,128 @@ export async function getCartSummary(
     return { ok: false, message: "Unable to load cart." };
   }
 
-  const lines = (items ?? []).map((row) => {
-    const store = row.stores as unknown as { name: string } | null;
+  const rows = items ?? [];
+  const variantIds = Array.from(
+    new Set(
+      rows
+        .map((row) => row.variant_id as string | null)
+        .filter((id): id is string => Boolean(id))
+    )
+  );
+
+  const liveByVariant = new Map<
+    string,
+    {
+      unitPriceMinor: number | null;
+      available: number | null;
+      allowBackorder: boolean;
+      productAvailable: boolean;
+      variantAvailable: boolean;
+    }
+  >();
+
+  if (variantIds.length > 0) {
+    const { data: variants } = await supabase
+      .from("product_variants")
+      .select(
+        "id, status, product_id, store_products!inner(status, moderation_status, store_id)"
+      )
+      .in("id", variantIds);
+
+    for (const variant of variants ?? []) {
+      const product = variant.store_products as unknown as {
+        status: string;
+        moderation_status: string;
+        store_id: string;
+      };
+      const { data: price } = await supabase
+        .from("product_prices")
+        .select("amount_minor, status")
+        .eq("variant_id", variant.id)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const { data: inv } = await supabase
+        .from("product_inventory")
+        .select("on_hand, reserved, safety_stock, allow_backorder")
+        .eq("variant_id", variant.id)
+        .eq("warehouse_key", "default")
+        .maybeSingle();
+
+      const storeRow = rows.find((r) => r.variant_id === variant.id);
+      const storeMeta = storeRow?.stores as unknown as
+        | { status?: string }
+        | null;
+      const storeActive = (storeMeta?.status ?? "active") === "active";
+
+      liveByVariant.set(variant.id as string, {
+        unitPriceMinor:
+          price && price.status === "active"
+            ? Number(price.amount_minor)
+            : null,
+        available: inv
+          ? availableUnits({
+              onHand: inv.on_hand,
+              reserved: inv.reserved,
+              safetyStock: inv.safety_stock,
+            })
+          : null,
+        allowBackorder: Boolean(inv?.allow_backorder),
+        productAvailable: isPubliclyVisibleProduct({
+          productStatus: product.status,
+          moderationStatus: product.moderation_status,
+          storeStatus: storeActive ? "active" : "inactive",
+        }),
+        variantAvailable: (variant.status as string) === "active",
+      });
+    }
+  }
+
+  const lines = rows.map((row) => {
+    const store = row.stores as unknown as {
+      name: string;
+      slug?: string;
+      status?: string;
+    } | null;
+    const variantId = (row.variant_id as string | null) ?? null;
+    const live = variantId ? liveByVariant.get(variantId) : undefined;
+    const snapshotUnitPriceMinor = Number(row.unit_price_minor_snapshot);
+    const liveUnitPriceMinor = live?.unitPriceMinor ?? null;
+    const available = live?.available ?? null;
+    const priceChanged =
+      liveUnitPriceMinor != null && liveUnitPriceMinor !== snapshotUnitPriceMinor;
+    const blockingIssue = live
+      ? deriveCartLineBlockingIssue({
+          liveUnitPriceMinor,
+          snapshotUnitPriceMinor,
+          available,
+          quantity: row.quantity as number,
+          allowBackorder: live.allowBackorder,
+          productAvailable: live.productAvailable,
+          variantAvailable: live.variantAvailable,
+          storeActive: (store?.status ?? "active") === "active",
+        })
+      : variantId
+        ? "Unable to verify live availability for this item."
+        : "Variant is missing from this cart line.";
+
     return {
       id: row.id as string,
       storeId: row.store_id as string,
       storeName: store?.name ?? "Store",
+      storeSlug: store?.slug ?? null,
+      variantId,
       quantity: row.quantity as number,
-      unitPriceMinor: Number(row.unit_price_minor_snapshot),
+      unitPriceMinor: snapshotUnitPriceMinor,
       currency: row.currency as string,
       productTitle: row.product_title_snapshot as string,
       variantTitle: row.variant_title_snapshot as string,
       mediaSnapshot: (row.media_snapshot as string | null) ?? null,
+      liveUnitPriceMinor,
+      available,
+      priceChanged,
+      blockingIssue,
     };
   });
 

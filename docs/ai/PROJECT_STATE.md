@@ -56,8 +56,9 @@ Frozen baselines (extend, do not replace):
 | Physical Commerce Order Fulfillment Solution Architecture V1 | **FROZEN** |
 | Commerce Consolidation Report V1 | **COMPLETE** |
 | Commerce Premium Storefront Experience Foundation V1 | **COMPLETE** (branch `office/commerce-premium-storefront-experience-foundation-v1`) |
+| Commerce Premium Cart and Checkout Experience V1 | **COMPLETE** (branch `office/commerce-premium-cart-checkout-experience-v1`) |
 
-Default: Consolidation complete. Program has moved from docs-only into **implementation**. Storefront foundation V1 landed on dedicated branch. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Program is in **implementation**. Storefront + Cart/Checkout foundations landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

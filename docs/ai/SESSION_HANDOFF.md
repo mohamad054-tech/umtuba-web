@@ -4,31 +4,23 @@
 
 ## Commerce program status
 
-**Consolidation complete.** The Commerce program has moved from documentation-only architecture into **real implementation**.
+Consolidation complete. Implementation track active.
 
-Active implementation branch:
+### Completed implementation
 
-`office/commerce-premium-storefront-experience-foundation-v1`
+1. **Commerce Premium Storefront Experience Foundation V1**  
+   Branch: `office/commerce-premium-storefront-experience-foundation-v1`  
+   Commit: `5e786e52a495e82255aa00230d940e6045575b73`  
+   Status: approved, pushed, not merged
 
-Task: **Commerce Premium Storefront Experience Foundation V1**
+2. **Commerce Premium Cart and Checkout Experience V1** (current)  
+   Branch: `office/commerce-premium-cart-checkout-experience-v1`  
+   Base: storefront trusted commit above
 
-## Physical Solution Architectures (frozen — do not modify)
+## Frozen architecture
 
-| Doc | Status |
-| --- | --- |
-| Inventory SA V1 | **FROZEN** |
-| Warehouse & Fulfillment SA V1 | **FROZEN** |
-| Order Fulfillment SA V1 | **FROZEN** |
+Do not modify `docs/commerce/**` frozen foundations / Physical SAs / Manifesto.
 
-## Architecture Program
+## Next after cart/checkout
 
-Manifesto + Foundations **COMPLETE / FROZEN** — do not rewrite.
-
-## Store implementation docs
-
-Preserved under `docs/store/**` — absorb into future SAs; do not delete.
-
-## Next after storefront foundation
-
-1. Continue customer Store depth (checkout UX polish, seller storefront policies, media) **or** Trading domain alignment in code  
-2. When returning to architecture docs: Shipping Network SA V1 (recommended), Trading SA (parallel)
+Buyer orders experience polish, or Trading-domain code alignment. Shipping Network SA remains recommended when returning to architecture docs — do not start unless asked.
