@@ -2,95 +2,37 @@
 
 ## Task title
 
-Profile Creator Hub Readiness V1 -- RESTART HANDOFF (Cursor Pro to Ultra)
+Next feature after Profile Creator Hub Readiness V1 — determined, **not started**
 
 ## Status
 
-`verification-pass` -- **UNCOMMITTED** -- awaiting explicit **commit GO** after Cursor restart.
+`awaiting-go` — no implementation performed. Branch created only.
 
-| Field | Value |
-| --- | --- |
-| Verification | PASS (vitest, `tsc --noEmit`, `npm run build`, `git diff --check`) |
-| Commit | **NOT done** -- work is local working tree only |
-| Push / merge | **NOT done** -- do not push until after commit GO |
-| Safe to restart Cursor | **YES** -- keep folder `C:\Users\Admin\Desktop\umtuba\umtuba-web` intact |
+## Prior task closed
 
-## Branch / sync
+- **Profile Creator Hub Readiness V1** — closed and fast-forward merged into `alpha-0.2` @ `6e886644ba23dfb55c123cb5e35ac30dbf4c1e25` (`docs(ai): record profile creator hub readiness v1`).
+- Local and remote `alpha-0.2` confirmed in sync at that commit.
 
-- **Branch:** `office/profile-creator-hub-readiness-v1`
-- **HEAD (committed tip):** `fbbb273951f894df76a1c26daed885f75a906f71` -- `feat(web): add nav chrome hygiene v1`
-- **Base:** same as HEAD (`fbbb273`) -- all readiness work is **uncommitted** on top of this tip
-- **Parent / primary line:** `alpha-0.2` (nav chrome hygiene commit)
-- **Remote:** do not assume branch is on origin until after commit + push GO
+## Determined next feature
 
-## Critical: do NOT destroy local work
+- **Name:** About / Live Structure V1
+- **Source:** `docs/architecture/CREATOR_SPACE_EXPERIENCE_V1.md` §23 phased execution, step 5 (after step 4 "Tab visibility", which Profile Creator Hub Readiness V1 satisfied) — cross-checked against `docs/architecture/UNIFIED_EXPERIENCE_PAGE_CONSOLIDATION_V1.md` §12.
+- **Scope (expected, not yet implemented):**
+  - About tab: add structured sections per CREATOR_SPACE_EXPERIENCE_V1 §9 (Experience, Education, Specialties/interests distinct from current flat interests list, Achievements/badges, Links, Joined date) — currently only bio/location/website/interests.
+  - Live tab: restructure into Now / Upcoming / Past buckets per CREATOR_SPACE_EXPERIENCE_V1 §13 — currently a single flat session list.
+- **Excluded (explicit non-goals for this next feature):**
+  - Pinned content (§8) — requires data-model GO + migration, not authorized.
+  - Courses / Products full catalog UI (P3) — requires domain GO, not authorized.
+  - Any Home / DiscoverExperience / Watch player changes — hard-locked.
+  - Content-flow policy decision (UNIFIED §12.4, Profile-mediated vs Home direct article CTA) — separate policy track, deferred.
 
-Until the user says **GO** for commit:
+## Branch
 
-- **Do NOT** `git commit --trailer "Co-authored-by: Cursor <cursoragent@cursor.com>"`
-- **Do NOT** `git push`
-- **Do NOT** `git reset` / `git checkout --` / discard
-- **Do NOT** `git clean`
-- **Do NOT** `git stash`
-- Work remains **local only** until commit
+- **New branch created (not checked out, no commits):** `office/profile-about-live-structure-v1`
+- **Parent commit:** `6e886644ba23dfb55c123cb5e35ac30dbf4c1e25` (`alpha-0.2` tip)
+- Current checkout remains `alpha-0.2` at the same commit; no files modified.
 
-## Exact file list (must still be present after restart)
-
-### Modified (tracked)
-
-- `app/profile/ProfileExperience.tsx`
-- `app/profile/components/ProfileTabs.tsx`
-- `app/profile/components/index.ts`
-- `lib/content/cards/contentCardSystem.v1.test.ts`
-- `docs/ai/CURRENT_TASK.md` (this handoff)
-- `docs/ai/CURSOR_REPORT.md` (restart report)
-
-### Untracked (new)
-
-- `app/profile/components/ProfileCoursesPanel.tsx`
-- `app/profile/components/ProfilePhotosPanel.tsx`
-- `app/profile/components/ProfileProductsPanel.tsx`
-- `app/profile/lib/profileTabs.ts`
-- `lib/content/profileCreatorHubReadiness.v1.test.ts`
-
-## What was implemented (already verified PASS)
-
-- Tab model / visibility: Courses, Products, Photos on `/profile/[username]`
-- Order: All / Articles / Videos / Courses / Products / Photos / Live / About
-- Stub empty panels for Courses / Products; Photos = image posts grid
-- Deep links: `?tab=` accepts new ids; unknown -> All; legacy `posts` -> `photos`
-- Content Cards All, `?article=` prompt, Articles/Videos/About/Live preserved
-- Live visibility unchanged
-
-## Resume steps (after Cursor restart)
-
-1. Open workspace: `C:\Users\Admin\Desktop\umtuba\umtuba-web`
-2. Confirm branch:
-   `
-   git checkout office/profile-creator-hub-readiness-v1
-   git branch --show-current
-   git rev-parse HEAD
-   `
-   Expect: branch name above, HEAD = `fbbb273951f894df76a1c26daed885f75a906f71`
-3. Confirm uncommitted work still present:
-   `
-   git status -sb
-   git status --porcelain
-   `
-   Expect the modified + untracked list above (plus possibly this handoff doc refresh).
-4. **Stop.** Do not commit/push/reset/clean/stash.
-5. Wait for user **GO** before any commit (then push only on separate GO).
-
-## After user says GO for commit (not yet)
-
-Typical sequence (only when explicitly authorized):
-
-1. Re-check `git status` / `git diff`
-2. Stage readiness + test + handoff files (not `.next`, not secrets)
-3. Commit with message aligned to repo style
-4. Stop again unless user also says push GO
-
-## Forbidden scope (still locked)
+## Forbidden scope (unchanged)
 
 - Home feed / DiscoverExperience / swipe / ranking
 - Watch player redesign
@@ -103,8 +45,8 @@ Typical sequence (only when explicitly authorized):
 
 ## Hard lock
 
-Home remains official Discovery Layer -- do not touch feed/player behavior.
+Home remains official Discovery Layer — do not touch feed/player behavior.
 
-## User phrase after restart
+## Next step
 
-Say something like: resume Creator Hub Readiness; commit when I say GO
+**لم يبدأ التنفيذ — بانتظار GO.** Await explicit GO before any implementation on `office/profile-about-live-structure-v1`.
