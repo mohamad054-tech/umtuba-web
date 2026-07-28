@@ -1,4 +1,8 @@
+"use client";
+
+import { useCallback, useState } from "react";
 import type { ProfilePost } from "../types";
+import ProfilePhotosLightbox from "./ProfilePhotosLightbox";
 
 type ProfilePhotosPanelProps = {
   posts: ProfilePost[];
@@ -13,12 +17,19 @@ function isPhotoPost(post: ProfilePost): boolean {
 /**
  * Photos replaces Posts for image-first browsing (Creator Space §5 / §10).
  * Text-only posts are excluded from this grid.
+ * Tap opens Photos Lightbox V1 (wrap prev/next, dialog a11y).
  */
 export default function ProfilePhotosPanel({
   posts,
   loadFailed = false,
   isOwner = false,
 }: ProfilePhotosPanelProps) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const closeLightbox = useCallback(() => {
+    setOpenIndex(null);
+  }, []);
+
   if (loadFailed) {
     return (
       <p
@@ -46,26 +57,44 @@ export default function ProfilePhotosPanel({
   }
 
   return (
-    <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:gap-3">
-      {photos.map((post) => (
-        <li
-          key={post.id}
-          className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
-        >
-          {post.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- public post image
-            <img
-              src={post.imageUrl}
-              alt=""
-              className="aspect-square w-full object-cover"
-            />
-          ) : (
-            <div className="flex aspect-square items-center justify-center px-2 text-center text-[10px] font-bold uppercase tracking-wider text-white/35">
-              Photo
-            </div>
-          )}
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:gap-3">
+        {photos.map((post, index) => (
+          <li
+            key={post.id}
+            className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
+          >
+            <button
+              type="button"
+              className="watch-focus-ring block w-full overflow-hidden rounded-xl text-left"
+              aria-label={`Open photo ${index + 1} of ${photos.length}`}
+              onClick={() => setOpenIndex(index)}
+            >
+              {post.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- public post image
+                <img
+                  src={post.imageUrl}
+                  alt=""
+                  className="aspect-square w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-square items-center justify-center px-2 text-center text-[10px] font-bold uppercase tracking-wider text-white/35">
+                  Photo
+                </div>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {openIndex !== null ? (
+        <ProfilePhotosLightbox
+          photos={photos}
+          openIndex={openIndex}
+          onClose={closeLightbox}
+          onIndexChange={setOpenIndex}
+        />
+      ) : null}
+    </>
   );
 }
