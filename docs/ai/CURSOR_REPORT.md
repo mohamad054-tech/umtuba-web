@@ -2,23 +2,23 @@
 
 ## Summary
 
-Implemented **Commerce Premium Seller Orders Operations Experience V1** on branch `office/commerce-premium-seller-orders-operations-v1` from trusted buyer-orders commit `cce1e5708fecf38b86bdb4239145de7a55332eba`. Hardened `/seller/store/orders` and detail with premium SellerOpsShell, attention indicators, minimized buyer list identity, payment-blocked ship/deliver/fulfilled transitions (UI + server action), stale-transition rejection, duplicate-submit lock, and honest fulfillment workspace boundaries. No payment provider. No Shipping Network. No frozen Commerce architecture edits. No migrations. No duplicate order system.
+Implemented **Commerce Premium Seller Catalog & Product Management V1** on branch `office/commerce-premium-seller-catalog-product-management-v1` from trusted commit `fa61ffa9acefefe02dc0d4e899d90dbfc96e0bbc`. Premium product dashboard (search/filter/sort/bulk submit+archive) and product workspace editor (details, variants with options/compare-at, media studio with reorder/cover/remove, publishing rail, category honesty, SEO preview). Reused trusted `sellerStore` / `storeCatalog` contracts. No payment provider. No Shipping Network. No AI publish. No frozen Commerce architecture edits. No migrations.
 
 ## Exact files changed
 
 ### Created
-- `lib/store/sellerOrdersPresentation.ts`
-- `lib/store/sellerOrdersOperations.test.ts`
-- `app/components/store/SellerOpsShell.tsx`
+- `lib/store/sellerCatalogPresentation.ts`
+- `lib/store/sellerCatalogPresentation.test.ts`
+- `app/components/store/SellerProductDashboard.tsx`
+- `app/components/store/SellerProductMediaStudio.tsx`
 
 ### Modified
-- `lib/store/orders.ts`
-- `app/actions/storeOrders.ts`
-- `app/components/store/SellerOrderList.tsx`
-- `app/components/store/SellerOrderStatusForm.tsx`
-- `app/components/store/OrderDetailView.tsx`
-- `app/seller/store/orders/page.tsx`
-- `app/seller/store/orders/[orderId]/page.tsx`
+- `lib/store/sellerStore.ts`
+- `app/actions/storeCatalog.ts`
+- `app/components/store/SellerOpsShell.tsx`
+- `app/seller/store/products/page.tsx`
+- `app/seller/store/products/new/page.tsx`
+- `app/seller/store/products/[productId]/edit/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -30,26 +30,25 @@ None.
 
 ## Security review
 
-- Seller list/detail remain store-scoped via `getOwnedOrMemberStore` + `listSellerOrders`/`getSellerOrderDetail`.
-- Unauthorized/other-store access returns uniform not-found.
-- Client cannot supply store_id/payment_status/role.
-- Payment-blocked ship/deliver/fulfilled enforced in action + UI.
-- Buyer list identity minimized to first name.
+- Auth fail-closed on list/new/edit.
+- Catalog mutations remain role-gated via existing helpers.
+- Media layout/archive scoped to product ownership.
+- Bulk actions iterate trusted per-product server functions.
+- No client-authored reserved inventory.
 - No secrets exposed.
 
 ## Tests
 
-- `lib/store/sellerOrdersOperations.test.ts` — passed
-- `lib/store/orderManagement.test.ts` — passed
-- Combined: 26 tests passed
+- `lib/store/sellerCatalogPresentation.test.ts`
+- Existing store foundation / marketplace / hardening tests
 
 ## TypeScript
 
-`npx tsc --noEmit` — passed
+`npx tsc --noEmit`
 
 ## Build
 
-`npm run build` — passed; routes `/seller/store/orders` and `/seller/store/orders/[orderId]` present
+`npm run build` — seller product routes present
 
 ## git diff --check
 
@@ -57,10 +56,12 @@ Clean on task-scoped paths at commit time.
 
 ## git status --short
 
-Clean for committed task paths after push; local learning/unrelated dirty files remain unstaged.
+See final report after commit/push.
 
 ## Open issues
 
-- FulfillmentAdminPanel still exposes deferred shipment/tracking placeholders from prior foundation; gated when unpaid.
-- No live payment provider; unpaid ship remains blocked by policy.
-- Warehouse/Shipping Network not implemented (by design).
+- No seller-managed collections table (category-only honesty).
+- No separate SEO columns (preview only).
+- No AI assistant (infrastructure absent).
+- Video upload not in storage allow-list.
+- Sellers still cannot self-activate / set hidden (operator + DB policy).

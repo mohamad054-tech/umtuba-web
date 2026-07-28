@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Seller Orders Operations Experience V1
+Commerce Premium Seller Catalog & Product Management V1
 
 ## Status
 
@@ -10,25 +10,24 @@ Commerce Premium Seller Orders Operations Experience V1
 
 ## Branch
 
-`office/commerce-premium-seller-orders-operations-v1`
+`office/commerce-premium-seller-catalog-product-management-v1`
 
 ## Base
 
-Trusted buyer-orders commit `cce1e5708fecf38b86bdb4239145de7a55332eba`
-Parent branch: `office/commerce-premium-buyer-orders-experience-v1`
+Trusted seller-orders commit `fa61ffa9acefefe02dc0d4e899d90dbfc96e0bbc`
+Parent branch: `office/commerce-premium-seller-orders-operations-v1`
 
 ## Deliverable
 
-Premium seller `/seller/store/orders` list and detail with separated states, payment-blocked ship/deliver guards (UI + server action), stale-transition rejection, minimized buyer list identity, and SellerOpsShell visual continuity. No payment provider. No Shipping Network.
+Premium seller product dashboard + editor workspace on trusted catalog contracts: search/filter/sort/bulk (submit/archive), multi-variant options + compare-at, media studio (reorder/cover/remove/upload progress), honest publishing rail (no seller self-activate), category assignment (no invented collections), SEO preview only. No payment provider. No Shipping Network. No AI publish. No frozen Commerce architecture edits.
 
 ## Constraints
 
-- Store-scoped authorization fail-closed
-- Do not create a second order system
-- Do not manually mark payment successful
-- Do not edit inventory quantities directly
-- Do not modify frozen Commerce architecture docs
+- Reuse existing product/variant/price/inventory/media actions
+- Do not invent ready/published product status enums
+- Do not duplicate catalog or pricing logic
+- Fail closed on auth / catalog permissions
 
 ## Next after this task
 
-Seller catalog/product ops polish, inventory reservation visibility, or Trading-domain alignment — not another architecture document unless requested.
+Seller inventory/reservation visibility, or Trading-domain alignment — still no payment provider / Shipping Network unless requested.
