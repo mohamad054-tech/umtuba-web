@@ -1,5 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import ActivityTierBadge from "../../components/activity-tiers/ActivityTierBadge";
 import ActivityTierProgressBar from "../../components/activity-tiers/ActivityTierProgressBar";
+import {
+  bioNeedsExpandToggle,
+  normalizeSpecialtyChips,
+} from "../lib/profileHeroCompleteness";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import type { ProfileView } from "../types";
 
@@ -13,7 +20,8 @@ type ProfileHeaderProps = {
 
 /**
  * Professional creator header (UMTUBA identity — not FB/TikTok clone).
- * Cover uses brand gradient until a stored cover_url exists (no new migration).
+ * Hero Completeness V1: bio clamp/more + conditional specialty chips only.
+ * Gradient background only; Stats/Actions stay outside this component.
  */
 export default function ProfileHeader({
   profile,
@@ -21,6 +29,10 @@ export default function ProfileHeader({
   isCollapsed = false,
 }: ProfileHeaderProps) {
   const tierProgress = profile.activityTier ?? null;
+  const specialtyChips = normalizeSpecialtyChips(profile.about.specialties);
+  const bioText = profile.bio.trim();
+  const canExpandBio = bioNeedsExpandToggle(bioText);
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   return (
     <div className="space-y-5">
@@ -84,6 +96,22 @@ export default function ProfileHeader({
             </p>
           </div>
 
+          {specialtyChips.length > 0 ? (
+            <ul
+              className="flex flex-wrap gap-2"
+              aria-label="Creator specialties"
+            >
+              {specialtyChips.map((label) => (
+                <li
+                  key={label.toLowerCase()}
+                  className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-xs font-bold text-white/75"
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
           {tierProgress && showTierProgress ? (
             <div className="max-w-md space-y-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
@@ -104,10 +132,26 @@ export default function ProfileHeader({
             </div>
           ) : null}
 
-          {profile.bio ? (
-            <p className="max-w-2xl text-sm leading-6 text-white/70 sm:text-base">
-              {profile.bio}
-            </p>
+          {bioText ? (
+            <div className="max-w-2xl space-y-1.5">
+              <p
+                className={`text-sm leading-6 text-white/70 sm:text-base ${
+                  canExpandBio && !bioExpanded ? "line-clamp-3" : ""
+                }`}
+              >
+                {bioText}
+              </p>
+              {canExpandBio ? (
+                <button
+                  type="button"
+                  className="watch-focus-ring text-sm font-bold text-sky-300 underline-offset-2 hover:underline"
+                  aria-expanded={bioExpanded}
+                  onClick={() => setBioExpanded((open) => !open)}
+                >
+                  {bioExpanded ? "less" : "more"}
+                </button>
+              ) : null}
+            </div>
           ) : null}
 
           {profile.city || profile.country ? (

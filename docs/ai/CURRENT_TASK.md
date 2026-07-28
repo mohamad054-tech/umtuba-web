@@ -2,29 +2,26 @@
 
 ## Task title
 
-Creator Space All Timeline Contract V1
+Creator Space Hero Completeness V1
 
 ## Status
 
-`closed` — Final Verification → Commit / Push / FF-merge to alpha-0.2
+`blocked-ff-merge` — Feature ready; alpha-0.2 advanced (cannot FF-only)
 
 ## Branch
 
-`office/profile-all-timeline-contract-v1` from `alpha-0.2` @ `769039d796e37d3e27c4b8bdc2bb49aff57b53c7`
+`office/profile-hero-completeness-v1` from `alpha-0.2` @ `4fdbf301c0d32cb196a10089fe3dc5223c51121b`
 
-## Done
+## Blocker
 
-- Pure All timeline contract helpers (dedupe, fail-closed teaser filter, partition)
-- ProfileAllPanel applies contract + §6 single-column density
-- Tests for contract + Creator Space wiring
-- Pinned structure wiring test updated for contract helper
+- `origin/alpha-0.2` is at `6061a6a` (36 commits ahead of feature base `4fdbf30`)
+- Fast-forward merge into alpha-0.2 is **impossible** without rebase/merge onto new tip
+- Awaiting explicit instruction: rebase onto `origin/alpha-0.2` vs other sync path
 
-## Forbidden (do not reopen unless real bug)
+## Done (local feature)
 
-- ContentCard anatomy redesign
-- Home / Arc / Unlock
-- CONTENT_KINDS expansion / migrations
-- Fixing baseline `../cards` tsc import in pinned test
+- Bio clamp/more + specialty chips (max 3, conditional)
+- Helpers + tests; mock `lina.creates` long bio for preview
 
 ## Gates (unchanged)
 

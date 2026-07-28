@@ -48,7 +48,7 @@ export const MOCK_PROFILES: MockProfile[] = [
     id: "c-lina",
     username: "lina.creates",
     displayName: "Lina Haddad",
-    bio: "Quiet streets, soft light, and the stories between them. Filming the world one morning at a time.",
+    bio: "Quiet streets, soft light, and the stories between them. Filming the world one morning at a time — alleys after rain, market steam at dawn, and the hush on rooftops before the city wakes. I chase soft light and honest faces across Jerusalem and beyond.",
     city: "Jerusalem",
     country: "Palestine",
     avatarInitial: "L",
