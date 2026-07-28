@@ -42,12 +42,26 @@ export default async function SellerMarketplacePage() {
       subtitle={membership.store.name}
       wide
       actions={
-        <Link
-          href={`${APP_ROUTES.sellerStore}/products`}
-          className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold"
-        >
-          My products
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={APP_ROUTES.sellerStore}
+            className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold"
+          >
+            Dashboard
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerStoreProducts}
+            className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold"
+          >
+            My products
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerOrders}
+            className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold"
+          >
+            Orders
+          </Link>
+        </div>
       }
     >
       <div className="mt-6">

@@ -14,7 +14,7 @@ import {
   type MarketplaceDiscoveryItem,
   type SellerListingRow,
 } from "../../../lib/store/marketplaceSupplierSeller";
-import { APP_ROUTES, buildSellerProductHref } from "../../lib/nav";
+import { APP_ROUTES } from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
 
@@ -75,7 +75,7 @@ export default function SellerMarketplaceClient({
       }
       setMessage(
         result.data.reused
-          ? "Listing already in your store ג€” activated."
+          ? "Listing already in your store — activated."
           : "Added to My Store."
       );
     });
@@ -334,14 +334,6 @@ export default function SellerMarketplaceClient({
                           className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)]"
                         >
                           Live PDP
-                        </Link>
-                      ) : null}
-                      {listing.sourceProductId ? (
-                        <Link
-                          href={buildSellerProductHref(listing.sourceProductId)}
-                          className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold"
-                        >
-                          Source product
                         </Link>
                       ) : null}
                     </div>

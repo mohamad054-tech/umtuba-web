@@ -86,7 +86,7 @@ export default async function SellerStoreInventoryPage({
             ← Store dashboard
           </Link>
           <Link
-            href="/seller/store/products"
+            href={APP_ROUTES.sellerStoreProducts}
             className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
           >
             Products
@@ -96,6 +96,12 @@ export default async function SellerStoreInventoryPage({
             className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
           >
             Orders
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerMarketplace}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Marketplace
           </Link>
         </div>
       </header>

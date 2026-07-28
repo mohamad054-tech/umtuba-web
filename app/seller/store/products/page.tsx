@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import SellerOpsShell from "../../../components/store/SellerOpsShell";
 import SellerProductDashboard from "../../../components/store/SellerProductDashboard";
+import StoreErrorState from "../../../components/store/StoreErrorState";
 import { APP_ROUTES } from "../../../lib/nav";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { canManageCatalog } from "../../../../lib/store/permissions";
@@ -39,18 +40,23 @@ export default async function SellerProductsPage() {
     );
   }
 
-  const products = await listSellerProducts(supabase, membership.store.id);
-  const items: SellerCatalogListItem[] = products.map((p) => ({
-    id: p.id,
-    title: p.title,
-    slug: p.slug,
-    status: p.status,
-    moderationStatus: p.moderation_status,
-    productType: p.product_type,
-    updatedAt: p.updated_at,
-    createdAt: p.created_at,
-    shortDescription: p.short_description,
-  }));
+  const productsResult = await listSellerProducts(
+    supabase,
+    membership.store.id
+  );
+  const items: SellerCatalogListItem[] = productsResult.ok
+    ? productsResult.data.map((p) => ({
+        id: p.id,
+        title: p.title,
+        slug: p.slug,
+        status: p.status,
+        moderationStatus: p.moderation_status,
+        productType: p.product_type,
+        updatedAt: p.updated_at,
+        createdAt: p.created_at,
+        shortDescription: p.short_description,
+      }))
+    : [];
   const canManage = canManageCatalog(membership.role);
 
   return (
@@ -96,15 +102,25 @@ export default async function SellerProductsPage() {
           >
             Orders
           </Link>
+          <Link
+            href={APP_ROUTES.sellerMarketplace}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Marketplace
+          </Link>
         </div>
       </header>
 
       <div className="mt-6">
-        <SellerProductDashboard
-          products={items}
-          canManage={canManage}
-          storeName={membership.store.name}
-        />
+        {!productsResult.ok ? (
+          <StoreErrorState message={productsResult.message} />
+        ) : (
+          <SellerProductDashboard
+            products={items}
+            canManage={canManage}
+            storeName={membership.store.name}
+          />
+        )}
       </div>
     </SellerOpsShell>
   );

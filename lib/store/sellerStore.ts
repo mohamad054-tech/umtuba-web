@@ -906,13 +906,19 @@ export async function archiveProduct(
 export async function listSellerProducts(
   supabase: AnyClient,
   storeId: string
-): Promise<StoreProductRow[]> {
-  const { data } = await supabase
+): Promise<
+  { ok: true; data: StoreProductRow[] } | { ok: false; message: string }
+> {
+  const { data, error } = await supabase
     .from("store_products")
     .select("*")
     .eq("store_id", storeId)
     .order("updated_at", { ascending: false });
-  return (data ?? []) as StoreProductRow[];
+  if (error) {
+    console.error("listSellerProducts", error);
+    return { ok: false, message: "Unable to load seller products." };
+  }
+  return { ok: true, data: (data ?? []) as StoreProductRow[] };
 }
 
 export async function getSellerProductBundle(

@@ -27,6 +27,7 @@ type Props = {
   orderSnapshot: SellerDashboardOrderSnapshot | null;
   orderError: string | null;
   productSnapshot: SellerDashboardProductSnapshot | null;
+  productError: string | null;
   inventorySnapshot: SellerDashboardInventorySnapshot | null;
   inventoryError: string | null;
   fulfillmentCounts: FulfillmentDashboardCounts | null;
@@ -51,6 +52,7 @@ export default function SellerDashboardInsightsView(props: Props) {
     orderSnapshot,
     orderError,
     productSnapshot,
+    productError,
     inventorySnapshot,
     inventoryError,
     fulfillmentCounts,
@@ -344,7 +346,11 @@ export default function SellerDashboardInsightsView(props: Props) {
         <h2 className="sf-display text-xl font-semibold tracking-tight">
           Product readiness
         </h2>
-        {productSnapshot ? (
+        {productError ? (
+          <p role="status" className="mt-3 text-sm text-[var(--sf-danger)]">
+            {productError}
+          </p>
+        ) : productSnapshot ? (
           <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {(
               [

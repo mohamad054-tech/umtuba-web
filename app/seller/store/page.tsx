@@ -81,7 +81,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
   const uiPeriod: "7d" | "30d" = periodKey === "7d" ? "7d" : "30d";
 
   const [
-    products,
+    productsResult,
     ordersResult,
     inventoryResult,
     reservationResult,
@@ -119,11 +119,14 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     countListingsReferencingSupplier(supabase, membership.store.id),
   ]);
 
-  const productSnapshot = deriveProductSnapshot(products);
+  const products = productsResult.ok ? productsResult.data : [];
+  const productSnapshot = productsResult.ok
+    ? deriveProductSnapshot(products)
+    : null;
   const readiness = deriveStoreReadiness({
     storeStatus: membership.store.status,
     verificationStatus: membership.store.verification_status,
-    productSnapshot,
+    productSnapshot: productSnapshot ?? deriveProductSnapshot([]),
   });
 
   const orderSnapshot = ordersResult.ok
@@ -206,6 +209,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           orderSnapshot={orderSnapshot}
           orderError={ordersResult.ok ? null : ordersResult.message}
           productSnapshot={productSnapshot}
+          productError={productsResult.ok ? null : productsResult.message}
           inventorySnapshot={inventorySnapshot}
           inventoryError={
             inventoryResult.ok ? null : inventoryResult.message

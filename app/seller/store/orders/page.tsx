@@ -118,10 +118,22 @@ export default async function SellerStoreOrdersPage({
             ← Store dashboard
           </Link>
           <Link
-            href={`${APP_ROUTES.sellerStore}/products`}
+            href={APP_ROUTES.sellerStoreProducts}
             className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
           >
             Products
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerInventory}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Inventory
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerMarketplace}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Marketplace
           </Link>
         </div>
       </header>

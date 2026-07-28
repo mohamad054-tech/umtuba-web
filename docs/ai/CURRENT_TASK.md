@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Marketplace Eligibility & Listing Storefront Resolution V1
+Commerce End-to-End Beta Readiness V1
 
 ## Status
 
@@ -10,17 +10,21 @@ Commerce Marketplace Eligibility & Listing Storefront Resolution V1
 
 ## Branch
 
-`office/commerce-marketplace-eligibility-listing-storefront-v1`
+`office/commerce-end-to-end-beta-readiness-v1`
 
 ## Base
 
-Trusted marketplace foundation commit `3b7e1eaeede08059715507744cab978bf3c37c0c`
-Parent branch: `office/commerce-marketplace-supplier-seller-foundation-v1`
+Trusted marketplace eligibility commit `6ed5eb611f044571ad8b6f32b8a10201c56f9df0`
+Parent branch: `office/commerce-marketplace-eligibility-listing-storefront-v1`
 
 ## Deliverable
 
-Supplier/product marketplace eligibility controls, listing-backed PDP resolution on `/store/[storeSlug]/product/[productSlug]` (owned-first collision rule), cart/wishlist/checkout provenance for `seller_listing_id`, supplier/seller visibility, admin diagnostics. Migrations `20260869`/`20260870` validated locally; not remote-applied. No payment provider / Warehouse / Shipping Network. No frozen Commerce architecture edits.
+Stabilize implemented Commerce only: verify customer + seller end-to-end paths, fix small defects (routes, nav, states, auth/RLS usage, money/trading/marketplace/inventory/provenance/UI), run Commerce test suites + tsc + production build, deliver Beta Readiness Report. No Shipping Network, Payment Provider, Warehouse Runtime, Payouts, Settlement UI, or Analytics Warehouse. No frozen Commerce architecture edits. No new product domains.
 
-## Next after this task
+## Out of scope
 
-Apply marketplace migrations remotely when authorized, then commission/settlement only if a trusted policy exists. Still no fabricated earnings.
+New major Commerce features; architecture redesign; payment/warehouse/shipping/payouts.
+
+## Result
+
+**Ready for Beta** at **90%** (implemented scope). Report: `docs/ai/CURSOR_REPORT.md`. Residual: wishlist/id-PDP listing provenance; payment/shipping deferred.
