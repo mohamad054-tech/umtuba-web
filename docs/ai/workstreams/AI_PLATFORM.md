@@ -1,5 +1,36 @@
 # AI Platform Workstream (Desktop-owned)
 
+## SAVE POINT — 2026-07-28 (Desktop)
+
+**Machine:** Desktop  
+**Stop here for tonight. Resume tomorrow from this section.**
+
+| Item | Value |
+| --- | --- |
+| Active branch | `office/learning-ai-tutor-backend-foundation-v1` |
+| HEAD commit | `e4cce6e` — `feat(ai): add learning tutor backend foundation v1` |
+| Parent Shared AI Core | `196d774` on `office/ai-core-platform-foundation-v1` (closed/approved) |
+| Remote | Pushed to origin (in sync) |
+| Do not merge / no PR unless asked | Yes |
+
+**Done today (Desktop):**
+1. Shared AI Core Foundation V1 — approved/closed
+2. Learning AI Tutor Backend Foundation V1 — 4 capabilities via `aiService.runCapability` (no UI)
+
+**NOT done / do not touch tomorrow by mistake:**
+- Learning UI / Home / Navigation / Creator / App Shell / Shared UI (Laptop)
+- Unrelated local dirty Learning/Nexus/`globals.css` files — leave unstaged
+- Do not remote-apply `20260871` without explicit approval
+
+**Resume tomorrow (recommended next Desktop task):**
+1. `git fetch --prune`
+2. `git checkout office/learning-ai-tutor-backend-foundation-v1`
+3. `git pull --ff-only`
+4. Confirm `HEAD == e4cce6e` (or newer if continued)
+5. Next backend capability: learner-safe **wrong-answer** contract, then `learning.tutor.explain_wrong_answer` — still **no UI**
+
+---
+
 **Branch:** `office/learning-ai-tutor-backend-foundation-v1` (from Shared AI Core `196d774`)
 
 **Ownership:** Desktop owns Shared AI Core, service boundary, providers, persistence, domain capabilities without UI.
