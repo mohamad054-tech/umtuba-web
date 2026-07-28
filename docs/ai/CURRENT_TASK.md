@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Seller Catalog & Product Management V1
+Commerce Premium Seller Inventory & Reservation Visibility V1
 
 ## Status
 
@@ -10,24 +10,24 @@ Commerce Premium Seller Catalog & Product Management V1
 
 ## Branch
 
-`office/commerce-premium-seller-catalog-product-management-v1`
+`office/commerce-premium-seller-inventory-reservation-visibility-v1`
 
 ## Base
 
-Trusted seller-orders commit `fa61ffa9acefefe02dc0d4e899d90dbfc96e0bbc`
-Parent branch: `office/commerce-premium-seller-orders-operations-v1`
+Trusted catalog commit `65ec1b8459147d9dadd3e9a544ad856b331850d6`
+Parent branch: `office/commerce-premium-seller-catalog-product-management-v1`
 
 ## Deliverable
 
-Premium seller product dashboard + editor workspace on trusted catalog contracts: search/filter/sort/bulk (submit/archive), multi-variant options + compare-at, media studio (reorder/cover/remove/upload progress), honest publishing rail (no seller self-activate), category assignment (no invented collections), SEO preview only. No payment provider. No Shipping Network. No AI publish. No frozen Commerce architecture edits.
+Seller `/seller/store/inventory` visibility workspace: on-hand / reserved / safety / available-to-sell separation via trusted `availableUnits`, low-stock/out/fully-reserved/missing attention, owner-manager reservation holds (buyer PII excluded), product-editor stock labeled as draft seed with inventory links. Read-only for movements (none exist). No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits.
 
 ## Constraints
 
-- Reuse existing product/variant/price/inventory/media actions
-- Do not invent ready/published product status enums
-- Do not duplicate catalog or pricing logic
-- Fail closed on auth / catalog permissions
+- Inventory remains source of truth
+- Never treat unknown quantity as zero
+- Do not invent allocated/damaged/quarantine
+- Fail closed on auth / store scope
 
 ## Next after this task
 
-Seller inventory/reservation visibility, or Trading-domain alignment — still no payment provider / Shipping Network unless requested.
+Trading-domain alignment, or seller analytics polish — still no payment provider / Shipping Network unless requested.

@@ -8,16 +8,17 @@ Consolidation complete. Implementation track active.
 
 ### Completed implementation
 
-1. Storefront foundation — `office/commerce-premium-storefront-experience-foundation-v1`
-2. Cart & Checkout — `office/commerce-premium-cart-checkout-experience-v1`
-3. Buyer Orders — `office/commerce-premium-buyer-orders-experience-v1`
-4. Seller Orders Operations — `office/commerce-premium-seller-orders-operations-v1`
-5. Seller Catalog & Product Management (current) — `office/commerce-premium-seller-catalog-product-management-v1`
+1. Storefront foundation
+2. Cart & Checkout
+3. Buyer Orders
+4. Seller Orders Operations
+5. Seller Catalog & Product Management
+6. Seller Inventory & Reservation Visibility (current) — `office/commerce-premium-seller-inventory-reservation-visibility-v1`
 
 ## Frozen architecture
 
 Do not modify `docs/commerce/**` frozen foundations / Physical SAs / Manifesto.
 
-## Next after seller catalog
+## Next after seller inventory visibility
 
-Seller inventory/reservation visibility for operators, or Trading-domain alignment. No payment provider / Shipping Network unless asked.
+Trading-domain alignment or merchant settlement visibility — no payment provider / Shipping Network / Warehouse execution unless asked.

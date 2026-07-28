@@ -40,6 +40,7 @@ export const APP_ROUTES = {
   sellerStore: "/seller/store",
   sellerProducts: "/seller/products",
   sellerOrders: "/seller/store/orders",
+  sellerInventory: "/seller/store/inventory",
   sellerPromotions: "/seller/store/promotions",
   sellerShipping: "/seller/store/shipping",
   sellerAnalytics: "/seller/store/analytics",

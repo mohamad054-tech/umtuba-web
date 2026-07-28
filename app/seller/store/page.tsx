@@ -86,6 +86,12 @@ export default async function SellerStorePage() {
               Manage products
             </Link>
             <Link
+              href={APP_ROUTES.sellerInventory}
+              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+            >
+              Inventory
+            </Link>
+            <Link
               href={APP_ROUTES.sellerOrders}
               className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
             >

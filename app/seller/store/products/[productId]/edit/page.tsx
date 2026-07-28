@@ -17,6 +17,7 @@ import {
   sellerPublishingWorkflowSteps,
   sellerSeoPreview,
 } from "../../../../../../lib/store/sellerCatalogPresentation";
+import { productEditorInventoryAlignmentCopy } from "../../../../../../lib/store/sellerInventoryPresentation";
 import { getSellerProductBundle } from "../../../../../../lib/store/sellerStore";
 import { PRODUCT_TYPES } from "../../../../../../lib/store/types";
 import { formatMinorUnits } from "../../../../../../lib/store/money";
@@ -87,6 +88,7 @@ export default async function EditSellerProductPage({
     shortDescription: bundle.product.short_description,
     slug: bundle.product.slug,
   });
+  const inventoryAlignment = productEditorInventoryAlignmentCopy();
   const query = await Promise.resolve(searchParams ?? {});
   const error =
     typeof query.error === "string" && query.error.trim()
@@ -114,6 +116,12 @@ export default async function EditSellerProductPage({
           className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
         >
           Dashboard
+        </Link>
+        <Link
+          href={APP_ROUTES.sellerInventory}
+          className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+        >
+          Inventory
         </Link>
         <Link
           href={APP_ROUTES.sellerOrders}
@@ -324,10 +332,24 @@ export default async function EditSellerProductPage({
           Variants
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
-          Uses trusted variant / price / inventory contracts. Reserved quantity
-          is read-only. Color, size, and capacity map to option values. Barcode
-          is not in the trusted schema.
+          Uses trusted variant / price / inventory contracts. Color, size, and
+          capacity map to option values. Barcode is not in the trusted schema.
         </p>
+        <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-50">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-100/80">
+            {inventoryAlignment.eyebrow}
+          </p>
+          <p className="mt-1 text-amber-50/90">{inventoryAlignment.body}</p>
+          <p className="mt-2 text-xs text-amber-100/75">
+            {inventoryAlignment.reservedNote}
+          </p>
+          <Link
+            href={`${APP_ROUTES.sellerInventory}?variant=${bundle.variants[0]?.id ?? ""}`}
+            className="mt-3 inline-block text-sm font-semibold text-[var(--sf-accent-strong)]"
+          >
+            Open inventory workspace →
+          </Link>
+        </div>
 
         <ul className="mt-4 space-y-3">
           {bundle.variants.map((variant) => (
@@ -345,6 +367,15 @@ export default async function EditSellerProductPage({
                           .map(([k, v]) => `${k}: ${v}`)
                           .join(" · ")}`
                       : ""}
+                  </p>
+                  <p className="mt-2 text-xs text-[var(--sf-muted)]">
+                    Reserved (system): {variant.inventory?.reserved ?? "—"} ·{" "}
+                    <Link
+                      href={`${APP_ROUTES.sellerInventory}?variant=${variant.id}`}
+                      className="font-semibold text-[var(--sf-accent)]"
+                    >
+                      Inventory detail
+                    </Link>
                   </p>
                 </div>
                 <p className="text-sm font-semibold text-[var(--sf-accent-strong)]">
@@ -460,7 +491,7 @@ export default async function EditSellerProductPage({
                     </label>
                     <label className="block space-y-1">
                       <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                        On hand
+                        On hand (seed)
                       </span>
                       <input
                         name="onHand"
@@ -472,7 +503,7 @@ export default async function EditSellerProductPage({
                     </label>
                     <div className="block space-y-1">
                       <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                        Reserved
+                        Reserved (system)
                       </span>
                       <p className="rounded-xl border border-[var(--sf-line)] bg-black/20 p-3 text-sm text-[var(--sf-muted)]">
                         {variant.inventory?.reserved ?? 0}
@@ -506,7 +537,19 @@ export default async function EditSellerProductPage({
                     Save variant
                   </button>
                 </form>
-              ) : null}
+              ) : (
+                <p className="mt-3 text-sm text-[var(--sf-faint)]">
+                  Variant stock seed edits are locked for this product status.
+                  Use{" "}
+                  <Link
+                    href={`${APP_ROUTES.sellerInventory}?variant=${variant.id}`}
+                    className="font-semibold text-[var(--sf-accent)]"
+                  >
+                    Inventory
+                  </Link>{" "}
+                  for visibility. No movement ledger is available to sellers.
+                </p>
+              )}
             </li>
           ))}
         </ul>

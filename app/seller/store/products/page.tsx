@@ -85,6 +85,12 @@ export default async function SellerProductsPage() {
             ← Store dashboard
           </Link>
           <Link
+            href={APP_ROUTES.sellerInventory}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Inventory
+          </Link>
+          <Link
             href={APP_ROUTES.sellerOrders}
             className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
           >
