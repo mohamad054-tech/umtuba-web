@@ -13,6 +13,11 @@ import {
 import { failResult } from "../contracts/errors";
 import { executeAiGateway } from "../gateway/execute";
 import { runProductDraftAssistant } from "../capabilities/commerce/productDraftAssistant";
+import {
+  LEARNING_TUTOR_CAPABILITIES,
+  runLearningTutorCapability,
+  type LearningTutorCapabilityId,
+} from "../capabilities/learning/tutorRunner";
 import { loadAiPlatformConfig } from "../config";
 
 export type AiServiceDeps = {
@@ -85,6 +90,56 @@ export async function runCapability(
         runId: result.data.runId,
         capabilityId: request.capabilityId,
         result: payload,
+        retryable: false,
+      },
+    };
+  }
+
+  if (request.capabilityId === "learning.tutor.explain_wrong_answer") {
+    return asFailure(
+      "invalid_input",
+      "explain_wrong_answer is deferred until a learner-safe wrong-answer contract exists."
+    );
+  }
+
+  if (
+    (LEARNING_TUTOR_CAPABILITIES as readonly string[]).includes(
+      request.capabilityId
+    )
+  ) {
+    const lessonId =
+      request.input.lessonId ?? request.context.lessonId ?? "";
+    if (!lessonId) {
+      return asFailure("invalid_input", "lessonId is required.");
+    }
+    const result = await runLearningTutorCapability({
+      supabase: deps.supabase,
+      userId: deps.userId,
+      lessonId,
+      capabilityId: request.capabilityId as LearningTutorCapabilityId,
+      question: request.input.question ?? request.input.text,
+      locale: request.context.locale,
+      forceStub: deps.forceStub,
+    });
+    if (!result.ok) {
+      return asFailure(result.code, result.message);
+    }
+    return {
+      ok: true,
+      data: {
+        runId: result.data.runId,
+        capabilityId: request.capabilityId,
+        result: {
+          ...result.data.result,
+          groundingStatus: result.data.groundingStatus,
+          sourceReferences: result.data.sourceReferences,
+          labeledAiGenerated: true,
+          officialCourseContent: false,
+          mutatesProgress: false,
+          mutatesGrades: false,
+          promptVersion: result.data.promptVersion,
+          modelId: result.data.modelId,
+        },
         retryable: false,
       },
     };

@@ -1,6 +1,6 @@
 # AI Platform Workstream (Desktop-owned)
 
-**Branch:** `office/ai-core-platform-foundation-v1`
+**Branch:** `office/learning-ai-tutor-backend-foundation-v1` (from Shared AI Core `196d774`)
 
 **Ownership:** Desktop owns Shared AI Core, service boundary, providers, persistence, domain capabilities without UI.
 
@@ -8,66 +8,59 @@
 
 ## Status
 
-Shared AI Core Foundation V1 implemented and aligned to cross-device ownership boundaries.
+Shared AI Core Foundation V1 closed.
+
+Learning AI Tutor Backend Foundation V1 implemented (server-side only, no Learning UI wiring).
 
 ## Public service boundary
 
 ```
-UI → typed contract (lib/ai/contracts/public.ts)
+UI → typed contract (lib/ai/contracts/public.ts + learningTutor.ts)
   → aiService.runCapability (lib/ai/services/aiService.ts)
   → Shared AI Core gateway
   → Provider adapter
 ```
 
-UI may receive only: capability id, validated input, bounded context refs, typed result, stable error codes, run id, retryability.
+## Learning capabilities implemented
 
-UI must not receive: provider secrets, raw prompts, routing internals, tool executors, private traces, raw provider responses.
+| Capability | Status |
+| --- | --- |
+| `learning.tutor.explain_lesson@1.0.0` | Implemented |
+| `learning.tutor.summarize_lesson@1.0.0` | Implemented |
+| `learning.tutor.answer_question@1.0.0` | Implemented |
+| `learning.tutor.generate_practice@1.0.0` | Implemented (non-graded, AI-labeled) |
+| `learning.tutor.explain_wrong_answer` | Deferred — no learner-safe wrong-answer contract |
 
-## Shared AI Core layout
+## Trusted context sources
 
-```
-lib/ai/
-  contracts/     public + internal types/errors
-  services/      aiService.runCapability
-  gateway/       executeAiGateway
-  providers/     OpenAI-compatible + stub adapters
-  models/        provider/model registry
-  routing/       deterministic router
-  prompts/       versioned prompt registry
-  context/       trusted context envelope
-  tools/         permission-aware tool registry
-  runs/          run lifecycle
-  usage/         usage/cost accounting
-  tracing/       redacted trace events
-  safety/        pre/post policy hooks
-  sessions/      session boundary
-  memory/        memory policy/interface
-  evaluations/   evaluation hooks
-  capabilities/  domain AI (commerce, admin) — no React/UI
-```
+- `has_learning_course_access` (enrollment/manager/admin)
+- `requireLessonUnlockedForLearner`
+- Published course → section → lesson → published creatable blocks only
+- Activity titles only (no answer keys)
+- Does **not** call `loadLessonDelivery` (avoids progress mutation)
 
-Empty domain folders are intentionally omitted until needed.
+## Read-only tools
 
-## Reference capability
+- `learning.read_lesson_outline`
+- `learning.read_published_lesson_blocks`
+- `learning.read_enrollment_state`
 
-`commerce.product_draft_assistant` — server-side only, read-oriented suggestions, never mutates price/inventory/publish, never auto-saves. No seller editor UI in this Desktop task.
+## Safety rules
 
-## Diagnostics
+Teen-safe refusals; no graded cheating; no answer keys; practice must be AI-labeled; AI is not official course content; no automatic memory persistence.
 
-Isolated privileged route `/admin/ai` (platform admin DB gate). Does not modify Navigation, App Shell, or global styles. Admin Store shell left untouched.
+## Contracts for Laptop
 
-## Persistence
+`aiService.runCapability` with `lessonId` / `question` inputs; results include `groundingStatus`, `sourceReferences`, `labeledAiGenerated`, `officialCourseContent: false`, `mutatesProgress/Grades: false`.
 
-Migration `20260871_ai_core_platform_foundation_v1.sql` — local only, not remote-applied.
+## Migration status
 
-## Config (variable names only)
-
-`UMTUBA_AI_MODE`, `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `OPENAI_MODEL`, `UMTUBA_AI_ALLOW_STUB`, `UMTUBA_AI_TIMEOUT_MS`, `UMTUBA_AI_MAX_INPUT_CHARS`, `UMTUBA_AI_MAX_CONTEXT_CHARS`, `UMTUBA_AI_RATE_LIMIT_PER_MINUTE`
+Uses existing Shared AI Core migration `20260871` (local only, not remote-applied). No new Learning-specific AI tables.
 
 ## Architecture enforcement
 
-Domain AI modules do not import other Domain AI trees. Architecture tests enforce this.
+Domain AI must not import other Domain AI or React. Learning UI must not import gateway/provider/prompt internals.
 
 ## Next backend AI capability
 
-Wire Learning AI Tutor stubs to `aiService.runCapability` with a versioned Learning prompt (still no UI work on Desktop).
+Learner-safe wrong-answer explanation contract (released results + stems without keys), then `learning.tutor.explain_wrong_answer`. Still no Desktop UI.

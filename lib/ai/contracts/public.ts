@@ -9,12 +9,18 @@ import type { AiErrorCode } from "./types";
 export type AiServiceCapabilityId =
   | "commerce.product_draft_assistant"
   | "platform.diagnostics_probe"
+  | "learning.tutor.explain_lesson"
+  | "learning.tutor.summarize_lesson"
+  | "learning.tutor.answer_question"
+  | "learning.tutor.generate_practice"
+  | "learning.tutor.explain_wrong_answer"
   | (string & {});
 
 export type AiServiceContextRefs = {
   storeId?: string;
   productId?: string;
   courseId?: string;
+  lessonId?: string;
   projectId?: string;
   workspaceId?: string;
   locale?: string;
@@ -28,6 +34,8 @@ export type AiServiceRunRequest = {
     text?: string;
     notes?: string;
     productId?: string;
+    lessonId?: string;
+    question?: string;
   };
   context: AiServiceContextRefs;
   /** Optional allowlisted preference only — never an arbitrary model. */

@@ -102,6 +102,16 @@ const PROMPTS: AiPromptDefinition[] = [
   DIAGNOSTICS_PROBE_V1,
 ];
 
+export function registerPrompts(definitions: AiPromptDefinition[]): void {
+  for (const def of definitions) {
+    const idx = PROMPTS.findIndex(
+      (p) => p.promptId === def.promptId && p.version === def.version
+    );
+    if (idx >= 0) PROMPTS[idx] = def;
+    else PROMPTS.push(def);
+  }
+}
+
 export function listPromptDefinitions(): AiPromptDefinition[] {
   return [...PROMPTS];
 }
@@ -171,6 +181,18 @@ export function validateStructuredAgainstPrompt(
     }
     if (typeof data.seoTitle !== "string" || typeof data.seoDescription !== "string") {
       return { ok: false, message: "seo fields must be strings." };
+    }
+  }
+  if (String(prompt.promptId).startsWith("learning.tutor.")) {
+    if ("groundingStatus" in data) {
+      const g = String(data.groundingStatus);
+      if (!["grounded", "partial", "outside_material"].includes(g)) {
+        return {
+          ok: false,
+          message:
+            "groundingStatus must be grounded|partial|outside_material.",
+        };
+      }
     }
   }
   return { ok: true, data };

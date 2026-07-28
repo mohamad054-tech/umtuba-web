@@ -67,6 +67,80 @@ export function createStubAdapter(): AiProviderAdapter {
           },
         };
       }
+      if (String(input.capabilityId).startsWith("learning.tutor.")) {
+        const lessonMatch = user.match(/Lesson:\s*([^\n]+)/i);
+        const lessonName = lessonMatch?.[1]?.trim() || "this lesson";
+        const outside = /outside the (course|lesson|material)/i.test(user);
+        const commonRefs = [
+          { type: "lesson", id: "lesson-stub", label: lessonName },
+        ];
+        let structured: Record<string, unknown>;
+        if (input.capabilityId === "learning.tutor.summarize_lesson") {
+          structured = {
+            keyIdeas: [`Core ideas from ${lessonName}`],
+            definitions: ["Key term (stub)"],
+            mainExamples: ["Example from authorized material (stub)"],
+            reviewPoints: ["Review the published blocks"],
+            suggestedNextStep: "Re-read the lesson activities, then try practice.",
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: ["Stub provider — not live model output."],
+          };
+        } else if (input.capabilityId === "learning.tutor.answer_question") {
+          structured = {
+            answer: outside
+              ? "That question is outside the authorized lesson material provided."
+              : `Based on ${lessonName}, here is a teaching-oriented explanation (stub).`,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            sourceReferences: commonRefs,
+            limitations: ["Stub provider — not live model output."],
+            confidence: outside ? "low" : "medium",
+          };
+        } else if (input.capabilityId === "learning.tutor.generate_practice") {
+          structured = {
+            items: [
+              {
+                type: "concept_check",
+                prompt: `What is one key idea from ${lessonName}?`,
+                hint: "Look at the first published block.",
+                selfCheck: "Compare with the lesson summary.",
+              },
+            ],
+            labeledAiGenerated: true,
+            sourceReferences: commonRefs,
+            groundingStatus: "grounded",
+            limitations: [
+              "AI-generated practice only — not an official assessment.",
+            ],
+          };
+        } else {
+          structured = {
+            title: `Explaining ${lessonName}`,
+            explanation: `Stub explanation for ${lessonName} using only authorized published material.`,
+            keyPoints: ["Point A", "Point B"],
+            examples: ["Example (stub)"],
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: ["Stub provider — not live model output."],
+          };
+        }
+        return {
+          text: null,
+          structured,
+          usage: {
+            inputTokens: estimateTokens(user),
+            outputTokens: estimateTokens(JSON.stringify(structured)),
+            cachedTokens: 0,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: 0,
+            costCurrency: "USD",
+            costStatus: "provider_reported",
+            modelId: input.modelId,
+            providerId: "stub",
+          },
+        };
+      }
       const structured = {
         title: titleSeed.slice(0, 120),
         description:

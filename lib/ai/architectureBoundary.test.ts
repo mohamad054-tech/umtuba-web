@@ -96,4 +96,35 @@ describe("AI architecture boundary", () => {
       expect(line).not.toMatch(/components\//);
     }
   });
+
+  it("Learning UI pages do not import Shared AI internals", () => {
+    const offenders: string[] = [];
+    const roots = [
+      join(process.cwd(), "app/learning"),
+      join(process.cwd(), "app/components/learning"),
+    ];
+    for (const root of roots) {
+      if (!statSync(root, { throwIfNoEntry: false })?.isDirectory()) continue;
+      const walk = (dir: string) => {
+        for (const name of readdirSync(dir)) {
+          const full = join(dir, name);
+          const st = statSync(full);
+          if (st.isDirectory()) walk(full);
+          else if (/\.(tsx?|jsx?)$/.test(name)) {
+            const src = readFileSync(full, "utf8");
+            const rel = relative(process.cwd(), full).replace(/\\/g, "/");
+            if (
+              /from\s+["'][^"']*lib\/ai\/(gateway|providers|prompts|routing|models)\//.test(
+                src
+              )
+            ) {
+              offenders.push(rel);
+            }
+          }
+        }
+      };
+      walk(root);
+    }
+    expect(offenders).toEqual([]);
+  });
 });
