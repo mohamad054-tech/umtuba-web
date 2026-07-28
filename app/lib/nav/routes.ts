@@ -38,6 +38,8 @@ export const APP_ROUTES = {
   sellerApply: "/seller/apply",
   sellerSetup: "/seller/setup",
   sellerStore: "/seller/store",
+  sellerStoreProducts: "/seller/store/products",
+  sellerMarketplace: "/seller/store/marketplace",
   sellerProducts: "/seller/products",
   sellerOrders: "/seller/store/orders",
   sellerInventory: "/seller/store/inventory",

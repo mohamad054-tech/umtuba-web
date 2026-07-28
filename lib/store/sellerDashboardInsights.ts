@@ -29,6 +29,7 @@ const HREF = {
   setup: "/seller/setup",
   orders: "/seller/store/orders",
   products: "/seller/store/products",
+  marketplace: "/seller/store/marketplace",
   inventory: "/seller/store/inventory",
   analytics: "/seller/store/analytics",
 } as const;
@@ -315,6 +316,12 @@ export function deriveSellerDashboardAttention(input: {
   inventory: SellerInventoryRow[];
   reservations: SellerReservationRow[];
   reservationsVisible: boolean;
+  marketplaceListingSummary?: {
+    active: number;
+    hidden: number;
+    unavailableStock: number;
+    supplierIssues: number;
+  } | null;
 }): SellerDashboardAttentionItem[] {
   const items: SellerDashboardAttentionItem[] = [];
 
@@ -375,6 +382,40 @@ export function deriveSellerDashboardAttention(input: {
         reason: `"${product.title}" was rejected and needs revision.`,
         href: `${HREF.products}/${product.id}/edit`,
         actionLabel: "Revise product",
+      });
+    }
+  }
+
+  const market = input.marketplaceListingSummary;
+  if (market) {
+    if (market.unavailableStock > 0) {
+      items.push({
+        id: "marketplace-stock",
+        severity: "warn",
+        title: "Marketplace listing stock unavailable",
+        reason: `${market.unavailableStock} active supplier-sourced listing(s) report zero available units from trusted inventory.`,
+        href: HREF.marketplace,
+        actionLabel: "Open marketplace",
+      });
+    }
+    if (market.supplierIssues > 0) {
+      items.push({
+        id: "marketplace-supplier",
+        severity: "warn",
+        title: "Supplier relationship issue",
+        reason: `${market.supplierIssues} listing(s) reference a supplier that is not active.`,
+        href: HREF.marketplace,
+        actionLabel: "Review listings",
+      });
+    }
+    if (market.hidden > 0) {
+      items.push({
+        id: "marketplace-hidden",
+        severity: "info",
+        title: "Hidden marketplace listings",
+        reason: `${market.hidden} supplier-sourced listing(s) are hidden from your storefront.`,
+        href: HREF.marketplace,
+        actionLabel: "Manage listings",
       });
     }
   }

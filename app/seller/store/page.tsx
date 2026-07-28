@@ -33,6 +33,10 @@ import {
   listSellerStoreReservations,
 } from "../../../lib/store/sellerInventoryQueries";
 import {
+  listSellerStoreListings,
+  summarizeSellerListingsForDashboard,
+} from "../../../lib/store/marketplaceSupplierSellerQueries";
+import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../lib/store/sellerStore";
@@ -79,6 +83,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     reservationResult,
     fulfillmentCountsResult,
     analyticsResult,
+    listingsResult,
   ] = await Promise.all([
     listSellerProducts(supabase, membership.store.id),
     listSellerOrders(supabase, membership.store.id, membership.role, {
@@ -105,6 +110,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           message: "Analytics requires owner or manager.",
           unavailable: true,
         }),
+    listSellerStoreListings(supabase, membership.store.id),
   ]);
 
   const productSnapshot = deriveProductSnapshot(products);
@@ -141,6 +147,9 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     reservationsVisible: Boolean(
       reservationResult.ok && reservationResult.canViewReservations
     ),
+    marketplaceListingSummary: listingsResult.ok
+      ? summarizeSellerListingsForDashboard(listingsResult.data)
+      : null,
   });
 
   const analyticsBundle: SellerAnalyticsBundle | null = analyticsResult.ok

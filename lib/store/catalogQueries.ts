@@ -105,11 +105,12 @@ export async function enrichPublicCatalogRow(
   }
 
   const { stores: _stores, ...product } = row;
+  const mediaStoreId = (product as StoreProductRow).store_id || store.id;
   const coverUrl = cover
     ? await createAuthorizedProductMediaSignedUrl(supabase, {
         storagePath: cover,
         productId: row.id,
-        storeId: store.id,
+        storeId: mediaStoreId,
         userId: null,
       })
     : null;
@@ -189,6 +190,53 @@ export async function listPublicCatalog(
     }
 
     items.push(await enrichPublicCatalogRow(supabase, row));
+  }
+
+  // Supplier-sourced active listings appear on the seller storefront without
+  // cloning products. Catalog card identity is the seller store; product truth
+  // remains the supplier-owned row.
+  if (options?.storeSlug) {
+    const sellerStore = await getPublicStoreBySlug(supabase, options.storeSlug);
+    if (sellerStore) {
+      const { data: listings } = await supabase
+        .from("store_seller_listings")
+        .select("id, source_product_id, display_title_override, supplier_store_id")
+        .eq("seller_store_id", sellerStore.id)
+        .eq("status", "active")
+        .limit(limit);
+
+      const ownedIds = new Set(items.map((i) => i.product.id));
+      for (const listing of listings ?? []) {
+        const sourceId = String(listing.source_product_id);
+        if (ownedIds.has(sourceId)) continue;
+        const { data: product } = await supabase
+          .from("store_products")
+          .select("*")
+          .eq("id", sourceId)
+          .eq("status", "active")
+          .eq("moderation_status", "approved")
+          .maybeSingle();
+        if (!product) continue;
+        const enriched = await enrichPublicCatalogRow(supabase, {
+          ...(product as StoreProductRow),
+          stores: {
+            id: sellerStore.id,
+            slug: sellerStore.slug,
+            name: sellerStore.name,
+            logo_path: sellerStore.logo_path,
+            status: sellerStore.status,
+          },
+        });
+        if (listing.display_title_override) {
+          enriched.product = {
+            ...enriched.product,
+            title: String(listing.display_title_override),
+          };
+        }
+        items.push(enriched);
+        ownedIds.add(sourceId);
+      }
+    }
   }
 
   return { items, error: null };

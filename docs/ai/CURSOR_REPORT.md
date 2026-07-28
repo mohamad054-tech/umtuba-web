@@ -1,20 +1,31 @@
-﻿# CURSOR_REPORT
+# CURSOR_REPORT
 
 ## Summary
 
-Implemented **Commerce Revenue Ledger Bridge Foundation V1** on branch `office/commerce-revenue-ledger-bridge-foundation-v1` from trusted commit `28d2e90dad474e560ee346bb082f7c3b47faa5af`. Outcome A: bridged Commerce into existing UEOS + Payment Outcome Sync + Merchant Settlement — no Commerce-only ledger. Canonical financial events, eligibility, idempotent posting plans, commission unavailable honesty, reconciliation dry-run, seller/admin visibility. No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits. No migrations.
+Implemented **Commerce Marketplace Supplier-to-Seller Foundation V1** on branch `office/commerce-marketplace-supplier-seller-foundation-v1`. Added seller-listing relationship (no product duplication), marketplace discovery + Add to My Store, listing management UI, buyer catalog inclusion of active listings, order/revenue-bridge provenance, and local migrations for listings + checkout alignment. Pricing Outcome B. No payment provider / Warehouse / Shipping Network. No frozen Commerce architecture edits.
+
+Minimal TS fixes before commit: listing status narrowing in `storeMarketplace.ts`, `StoreErrorState` props alignment, form action void wrapper on marketplace product page.
 
 ## Exact files changed
 
 ### Created
-- `lib/store/commerceRevenueBridge.ts`
-- `lib/store/commerceRevenueBridgeQueries.ts`
-- `lib/store/commerceRevenueBridge.test.ts`
+- `supabase/migrations/20260869_store_marketplace_supplier_seller_foundation_v1.sql`
+- `supabase/migrations/20260870_store_marketplace_listing_checkout_alignment_v1.sql`
+- `lib/store/marketplaceSupplierSeller.ts`
+- `lib/store/marketplaceSupplierSellerQueries.ts`
+- `lib/store/marketplaceSupplierSeller.test.ts`
+- `app/actions/storeMarketplace.ts`
+- `app/components/store/SellerMarketplaceClient.tsx`
+- `app/seller/store/marketplace/page.tsx`
+- `app/seller/store/marketplace/[productId]/page.tsx`
 
 ### Modified
-- `app/components/store/SellerDashboardInsights.tsx`
+- `app/lib/nav/routes.ts`
 - `app/seller/store/page.tsx`
-- `app/admin/store/page.tsx`
+- `lib/store/catalogQueries.ts`
+- `lib/store/commerceRevenueBridge.ts`
+- `lib/store/orderRules.ts`
+- `lib/store/sellerDashboardInsights.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -22,37 +33,41 @@ Implemented **Commerce Revenue Ledger Bridge Foundation V1** on branch `office/c
 
 ## Migrations created
 
-None. Reuses `20260822` UEOS, `20260823` Payment Outcome Sync, `20260824` Settlement (local; remote apply not performed).
+- `20260869` — listings table, flags, RLS, add_store_seller_listing, order alignment helper
+- `20260870` — checkout quote/confirm/order-core listing alignment
+- Created locally only; not applied remotely
 
 ## Security review
 
-- Bridge rejects client money fields.
-- Order money reloaded server-side.
-- Sync/Settlement EXECUTE remains service_role; default bridge path is plan-only.
-- Seller UI withholds payout/net/balance/commission/reserve/payout_date.
-- Admin bridge panel shows no secrets/credentials.
-- Outcome event tables remain FORCE RLS / revoked from authenticated.
+- Server-resolved seller store; client money/supplier identity rejected on add action
+- Listing RLS FORCE; seller write roles limited; supplier read-only of own product listings
+- Cross-store order lines require `store_listing_allows_seller_sale`
+- No fabricated margins/commissions/earnings
 
 ## Tests
 
-- `lib/store/commerceRevenueBridge.test.ts`
-- Related UEOS / Sync / Settlement / trading / dashboard suites (run in validation)
+- Command: `npx vitest run` on marketplaceSupplierSeller, commerceRevenueBridge, tradingAlignment, sellerDashboardInsights, ordersFoundation, marketplaceFoundation, storefrontDeriveSections
+- Result: **7 files passed, 105 tests passed**
 
 ## TypeScript
 
-`npx tsc --noEmit`
+- `npx tsc --noEmit`: **pass** (after minimal marketplace TS fixes)
 
 ## Build
 
-`npm run build`
+- `npm run build`: **pass** (Next.js 16.2.10 Turbopack)
 
 ## git diff --check
 
-Clean on task-scoped paths at commit time.
+- Checked on staged marketplace paths at commit time
+
+## git status --short
+
+- Marketplace paths committed; Learning / docs/commerce / scripts / assets left unstaged
 
 ## Open issues
 
-- Automatic Sync posting not wired into checkout (requires service_role worker/hook).
-- Commission policy not configured.
-- Settlement allocate optional; release/payout not enabled.
-- Historical backfill disabled (dry-run only).
+- Migrations not applied remotely
+- Seller PDP for listing-backed product slug under seller store may still need dedicated resolver
+- Supplier portal not built (data foundation only)
+- Commission still unavailable

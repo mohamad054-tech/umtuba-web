@@ -28,6 +28,7 @@ import {
   computeExclusiveTaxOrderGrandTotalMinor,
 } from "./tradingContracts";
 import { isValidCurrencyCode, normalizeCurrencyCode } from "./money";
+import { buildMarketplaceRevenueBridgeProvenance } from "./marketplaceSupplierSeller";
 import type { OrderStatus, PaymentStatus } from "./types";
 
 export const COMMERCE_REVENUE_BRIDGE_VERSION = 1 as const;
@@ -115,6 +116,14 @@ export type CommerceFinancialEvent = {
   occurredAt: string;
   paymentAttemptId: string | null;
   commission: CommerceCommissionDecomposition;
+  /** Marketplace provenance — never invents commission or earnings. */
+  marketplace: {
+    sellerStoreId: string;
+    supplierStoreId: string | null;
+    listingId: string | null;
+    marketplaceSourceType: "owned" | "supplier_listing" | null;
+    settlementDecomposition: "unavailable";
+  };
 };
 
 export type CommerceOrderMoneySnapshot = {
@@ -131,6 +140,9 @@ export type CommerceOrderMoneySnapshot = {
   orderStatus: OrderStatus | string;
   occurredAt: string;
   paymentAttemptId?: string | null;
+  supplierStoreId?: string | null;
+  sellerListingId?: string | null;
+  marketplaceSourceType?: "owned" | "supplier_listing" | null;
 };
 
 export type CommerceRevenueBridgePostingPlan = {
@@ -507,6 +519,12 @@ export function buildCommerceFinancialEvent(
     occurredAt: snapshot.occurredAt,
     paymentAttemptId: snapshot.paymentAttemptId ?? null,
     commission: COMMISSION_DECOMPOSITION_UNAVAILABLE,
+    marketplace: buildMarketplaceRevenueBridgeProvenance({
+      sellerStoreId: snapshot.storeId,
+      supplierStoreId: snapshot.supplierStoreId,
+      listingId: snapshot.sellerListingId,
+      marketplaceSourceType: snapshot.marketplaceSourceType,
+    }),
   };
 
   return { ok: true, event };

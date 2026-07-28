@@ -554,6 +554,12 @@ export function buildOrderItemProductSnapshot(input: {
   variantTitle?: string | null;
   unitPriceMinor: number;
   currency: string;
+  /** Marketplace provenance — optional, immutable once snapshotted. */
+  marketplaceSourceType?: "owned" | "supplier_listing" | null;
+  supplierStoreId?: string | null;
+  sellerListingId?: string | null;
+  fulfillmentPartyStoreId?: string | null;
+  inventoryOwnerStoreId?: string | null;
 }): Record<string, unknown> {
   return {
     product_id: input.productId,
@@ -566,6 +572,11 @@ export function buildOrderItemProductSnapshot(input: {
     variant_title: input.variantTitle ?? null,
     unit_price_minor: input.unitPriceMinor,
     currency: normalizeCurrencyCode(input.currency),
+    marketplace_source_type: input.marketplaceSourceType ?? null,
+    supplier_store_id: input.supplierStoreId ?? null,
+    seller_listing_id: input.sellerListingId ?? null,
+    fulfillment_party_store_id: input.fulfillmentPartyStoreId ?? null,
+    inventory_owner_store_id: input.inventoryOwnerStoreId ?? null,
     snapshotted_at: "order_create",
   };
 }
