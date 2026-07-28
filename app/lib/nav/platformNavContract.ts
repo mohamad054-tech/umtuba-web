@@ -1,16 +1,10 @@
-/**
- * Platform Navigation Contract Sync V1 — frozen chrome contracts.
- *
- * Source of truth for docs/tests. Must match live exports in routes.ts,
- * mobileNav.ts, and userMenuItems.ts. Do not use this module to drive UI
- * destination changes without an explicit product GO.
- *
- * @see docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md
- */
-
 import { APP_NAV_ITEMS, APP_ROUTES } from "./routes";
 import { MOBILE_PRIMARY_NAV_ITEMS } from "./mobileNav";
 import { buildUserMenuGroups } from "./userMenuItems";
+import {
+  USER_MENU_CAPABILITIES_SIGNED_IN_BASE,
+  type UserMenuCapabilities,
+} from "./userMenuCapabilities";
 
 /** Desktop primary labels (Discover is intentionally absent). */
 export const DESKTOP_PRIMARY_NAV_LABELS = [
@@ -64,19 +58,25 @@ export const HOME_CIRCLE_ENTRY_HREFS = [
 /** User menu group ids. */
 export const USER_MENU_GROUP_IDS = ["you", "account"] as const;
 
-/** User menu item labels in render order. */
-export const USER_MENU_ITEM_LABELS = [
+/**
+ * Signed-in baseline labels (Create + Advertise on; Instructor/Seller/Admin off).
+ * Capability Links V1 — optional labels appear only when capabilities allow.
+ */
+export const USER_MENU_BASE_ITEM_LABELS = [
   "Profile",
+  "Create",
   "Saved",
   "Learning",
   "Rewards",
   "Notifications",
   "Settings",
   "Store",
-  "Seller hub",
   "Wishlist",
   "Advertise",
 ] as const;
+
+/** @deprecated Use USER_MENU_BASE_ITEM_LABELS + capability expectations. */
+export const USER_MENU_ITEM_LABELS = USER_MENU_BASE_ITEM_LABELS;
 
 /** Forever Home alias path (not a primary chrome label). */
 export const DISCOVER_HOME_ALIAS = APP_ROUTES.discover;
@@ -86,6 +86,14 @@ export const AUTH_DEFAULT_NEXT_PATH = APP_ROUTES.discover;
 
 /** Bare profile resolver path. */
 export const PROFILE_INDEX_PATH = APP_ROUTES.profile;
+
+export function expectedUserMenuLabels(
+  capabilities: UserMenuCapabilities = USER_MENU_CAPABILITIES_SIGNED_IN_BASE
+): string[] {
+  return buildUserMenuGroups("/profile/contract_user", capabilities).flatMap(
+    (group) => group.items.map((item) => item.label)
+  );
+}
 
 /** Assert live desktop nav matches the frozen contract. */
 export function assertDesktopPrimaryNavContract(): void {
@@ -117,15 +125,19 @@ export function assertMobilePrimaryNavContract(): void {
   }
 }
 
-/** Assert live user menu matches the frozen contract. */
-export function assertUserMenuContract(profileHref = "/profile/contract_user"): void {
-  const groups = buildUserMenuGroups(profileHref);
+/** Assert live user menu baseline matches Capability Links V1 base contract. */
+export function assertUserMenuContract(
+  profileHref = "/profile/contract_user",
+  capabilities: UserMenuCapabilities = USER_MENU_CAPABILITIES_SIGNED_IN_BASE
+): void {
+  const groups = buildUserMenuGroups(profileHref, capabilities);
   const groupIds = groups.map((group) => group.id);
   const labels = groups.flatMap((group) => group.items.map((item) => item.label));
   if (groupIds.join("|") !== USER_MENU_GROUP_IDS.join("|")) {
     throw new Error("User menu groups drifted from contract");
   }
-  if (labels.join("|") !== USER_MENU_ITEM_LABELS.join("|")) {
+  const expected = expectedUserMenuLabels(capabilities);
+  if (labels.join("|") !== expected.join("|")) {
     throw new Error("User menu item labels drifted from contract");
   }
 }

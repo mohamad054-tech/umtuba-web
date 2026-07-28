@@ -52,6 +52,13 @@ export {
 } from "./userMenuItems";
 
 export {
+  USER_MENU_CAPABILITIES_NONE,
+  USER_MENU_CAPABILITIES_SIGNED_IN_BASE,
+  resolveUserMenuCapabilities,
+  type UserMenuCapabilities,
+} from "./userMenuCapabilities";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,
@@ -60,9 +67,11 @@ export {
   MOBILE_PRIMARY_NAV_IDS,
   MOBILE_PRIMARY_NAV_LABELS,
   PROFILE_INDEX_PATH,
+  USER_MENU_BASE_ITEM_LABELS,
   USER_MENU_GROUP_IDS,
   USER_MENU_ITEM_LABELS,
   assertDesktopPrimaryNavContract,
   assertMobilePrimaryNavContract,
   assertUserMenuContract,
+  expectedUserMenuLabels,
 } from "./platformNavContract";

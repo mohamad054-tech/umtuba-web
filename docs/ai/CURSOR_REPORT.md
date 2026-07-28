@@ -2,34 +2,36 @@
 
 ## Summary
 
-**Platform Navigation Contract Sync V1** — official chrome contracts frozen (desktop, mobile, circles entry ramps, user menu, Discover→Home alias, profile resolver, auth `?next=` via `getSafeRedirectPath`). UNIFIED §14 drift fixed (Discover is not a primary label). No Home UI or Store Domain changes. **Verification PASS** (in-scope). Commit / Push / Merge **not** performed.
+**UserMenu Capability Links V1** — UserMenu shows Create for signed-in users; Instructor / Admin / Seller hub only when existing helpers report eligibility; Advertise stays visible (public landing). No new role system, migrations, Home, primary nav, or Store Domain page edits. **Verification PASS** (in-scope). Commit / Push / Merge **not** performed.
 
 ## Exact files changed
 
-- `docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md` (new)
-- `docs/architecture/UNIFIED_EXPERIENCE_PAGE_CONSOLIDATION_V1.md` (§14 drift fix)
-- `app/lib/nav/platformNavContract.ts` (new)
-- `app/lib/nav/platformNavContract.test.ts` (new)
+- `app/components/UserMenu.tsx`
+- `app/lib/nav/userMenuItems.ts`
+- `app/lib/nav/userMenuCapabilities.ts` (new)
+- `app/lib/nav/userMenuCapabilities.test.ts` (new)
+- `app/lib/nav/userMenuItems.test.ts`
+- `app/lib/nav/platformNavContract.ts`
+- `app/lib/nav/platformNavContract.test.ts`
 - `app/lib/nav/index.ts`
-- `app/lib/nav/routes.ts` (contract comment)
-- `app/lib/nav/mobileNav.ts` (contract comment)
-- `app/lib/nav/shellCoherence.test.ts`
+- `lib/ads/adsAdminReviewFoundation.test.ts` (Admin allowed only behind `showAdmin`; TopNav still has no Admin)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Contracts frozen
+## Capability links
 
-- Desktop primary: Home · World · Learning · Live · Messages (no Discover label)
-- Mobile primary: Home · Live · Messages · Profile
-- Home circles entry ramps order (layout unchanged)
-- User menu You + Account structure (no capability gating)
-- `/discover` forever alias to `/` with Home active highlight
-- `/profile` resolver contract
-- Auth `?next=` default `/discover` via `getSafeRedirectPath`
+| Link | Behavior | Eligibility source |
+| --- | --- | --- |
+| Create | Signed-in | Session profile → `/create/video` |
+| Instructor | Conditional | `listInstructorAuthorableCourses` |
+| Admin | Conditional → `/admin/ads` | `assertPlatformAdminDb` |
+| Seller hub | Conditional | `getOwnedOrMemberStore` or `getLatestSellerApplication` |
+| Advertise | Always for signed-in | No hide SoT (landing / apply entry) |
 
-## Drift corrected
+## Gaps remaining
 
-- UNIFIED §14 previously listed Discover in desktop/mobile primary nav; corrected to match code (alias only).
+- Advertise not gated on advertiser accounts.
+- Admin Store URL-only (not in menu).
 
 ## Migrations created
 
@@ -37,21 +39,20 @@ None.
 
 ## Security review
 
-- No Store Domain edits.
-- No Home feed/player/swipe/circles layout edits.
-- Admin/Store absent from primary chrome contracts.
-- Open-redirect protections on `getSafeRedirectPath` unchanged.
+- Admin menu link is UX-only; pages still require `assertPlatformAdminDb`.
+- No Store Domain page/catalog/cart edits.
+- No Home / primary chrome destination changes.
 
 ## Tests
 
 - In-scope Vitest: **PASS**
-- Full Vitest: **2699 passed**, **3 failed** — pre-existing Store Domain only:
+- Full Vitest: **2703 passed**, **3 failed** — pre-existing Store Domain only:
   - `lib/store/paymentOutcomeSync.test.ts` (1)
   - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
 
 ## TypeScript
 
-- `npx tsc --noEmit`: **FAIL** pre-existing / out of scope — `lib/content/profilePinnedContentStructure.v1.test.ts` cannot resolve `../cards` (same without this branch’s changes).
+- `npx tsc --noEmit`: **FAIL** pre-existing / out of scope — `profilePinnedContentStructure.v1.test.ts` → `../cards`
 - `npm run build` TypeScript phase: **PASS**
 
 ## Build
@@ -70,4 +71,4 @@ Pending stage for manual commit.
 
 - Await explicit commit GO (manual Terminal; no Git trailers).
 - Pre-existing Store Vitest failures and pinned-content `tsc` import remain out of scope.
-- **Proposed next feature (not started):** UserMenu Capability Links V1
+- **Proposed next (not started):** product GO for Advertise hide policy and/or Admin Store menu link — no work started.

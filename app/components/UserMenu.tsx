@@ -12,6 +12,10 @@ import {
 } from "../../lib/supabase/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import { buildUserMenuGroups } from "../lib/nav/userMenuItems";
+import {
+  resolveUserMenuCapabilities,
+  type UserMenuCapabilities,
+} from "../lib/nav/userMenuCapabilities";
 
 /**
  * Account menu for AppTopNav (including /live and Watch).
@@ -27,6 +31,9 @@ export default function UserMenu() {
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [capabilities, setCapabilities] = useState<UserMenuCapabilities | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -38,26 +45,33 @@ export default function UserMenu() {
 
   useEffect(() => {
     let isActive = true;
-    const supabase = tryCreateClient();
-    if (!supabase) {
+    const supabaseClient = tryCreateClient();
+    if (!supabaseClient) {
       setProfile(null);
+      setCapabilities(null);
       setIsLoading(false);
       return;
     }
+    const supabase = supabaseClient;
 
     async function applyUser(user: User | null) {
       if (!isActive) return;
 
       if (!user) {
         setProfile(null);
+        setCapabilities(null);
         setIsLoading(false);
         return;
       }
 
       try {
-        const nextProfile = await getProfileForUser(user);
+        const [nextProfile, nextCapabilities] = await Promise.all([
+          getProfileForUser(user),
+          resolveUserMenuCapabilities(supabase, user),
+        ]);
         if (!isActive) return;
         setProfile(nextProfile);
+        setCapabilities(nextCapabilities);
         setErrorMessage("");
       } catch (error) {
         console.error(error);
@@ -78,6 +92,25 @@ export default function UserMenu() {
           avatar_url: null,
           avatar_initial: fallbackName.charAt(0).toUpperCase() || "U",
         });
+        // Profile fallback still signed-in — resolve capabilities independently.
+        try {
+          const nextCapabilities = await resolveUserMenuCapabilities(
+            supabase,
+            user
+          );
+          if (isActive) setCapabilities(nextCapabilities);
+        } catch (capabilityError) {
+          console.error(capabilityError);
+          if (isActive) {
+            setCapabilities({
+              showCreate: true,
+              showInstructor: false,
+              showAdmin: false,
+              showSeller: false,
+              showAdvertise: true,
+            });
+          }
+        }
         setErrorMessage("Unable to load profile.");
       } finally {
         if (isActive) {
@@ -135,6 +168,7 @@ export default function UserMenu() {
       setErrorMessage("");
       await signOut();
       setProfile(null);
+      setCapabilities(null);
       setOpen(false);
       router.push(APP_ROUTES.home);
       router.refresh();
@@ -152,6 +186,7 @@ export default function UserMenu() {
       setErrorMessage("");
       await signOut();
       setProfile(null);
+      setCapabilities(null);
       setOpen(false);
       router.push(loginHref);
       router.refresh();
@@ -184,7 +219,16 @@ export default function UserMenu() {
   }
 
   const profileHref = buildCreatorProfileHref({ username: profile.username });
-  const menuGroups = buildUserMenuGroups(profileHref);
+  const menuGroups = buildUserMenuGroups(
+    profileHref,
+    capabilities ?? {
+      showCreate: true,
+      showInstructor: false,
+      showAdmin: false,
+      showSeller: false,
+      showAdvertise: true,
+    }
+  );
 
   return (
     <div ref={rootRef} className="relative z-[60] shrink-0">

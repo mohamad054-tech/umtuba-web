@@ -27,6 +27,7 @@ import {
   isMobilePrimaryNavActive,
 } from "./mobileNav";
 import { buildUserMenuGroups, listUserMenuHrefs } from "./userMenuItems";
+import { USER_MENU_CAPABILITIES_SIGNED_IN_BASE } from "./userMenuCapabilities";
 import { getSafeRedirectPath } from "../../../lib/supabase/redirect";
 
 const ROOT = process.cwd();
@@ -70,17 +71,25 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("user menu structure", () => {
-    it("freezes You + Account groups and labels", () => {
-      const groups = buildUserMenuGroups("/profile/contract_user");
-      expect(groups.map((group) => group.id)).toEqual([...USER_MENU_GROUP_IDS]);
-      expect(groups.flatMap((group) => group.items.map((item) => item.label))).toEqual(
-        [...USER_MENU_ITEM_LABELS]
+    it("freezes You + Account baseline with Create; capability links optional", () => {
+      const groups = buildUserMenuGroups(
+        "/profile/contract_user",
+        USER_MENU_CAPABILITIES_SIGNED_IN_BASE
       );
+      expect(groups.map((group) => group.id)).toEqual([...USER_MENU_GROUP_IDS]);
+      expect(
+        groups.flatMap((group) => group.items.map((item) => item.label))
+      ).toEqual([...USER_MENU_ITEM_LABELS]);
       expect(() => assertUserMenuContract()).not.toThrow();
 
-      const hrefs = listUserMenuHrefs("/profile/contract_user");
+      const hrefs = listUserMenuHrefs(
+        "/profile/contract_user",
+        USER_MENU_CAPABILITIES_SIGNED_IN_BASE
+      );
+      expect(hrefs).toContain(APP_ROUTES.createVideo);
       expect(hrefs).toContain(APP_ROUTES.store);
-      expect(hrefs).toContain(APP_ROUTES.seller);
+      expect(hrefs).toContain(APP_ROUTES.advertise);
+      expect(hrefs).not.toContain(APP_ROUTES.seller);
       expect(hrefs).not.toContain("/admin/ads");
       expect(hrefs).not.toContain("/admin/store");
       expect(hrefs).not.toContain("/learning/instructor");

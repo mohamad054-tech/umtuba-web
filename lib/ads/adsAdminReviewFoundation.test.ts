@@ -191,7 +191,9 @@ describe("ads admin migration + route protection", () => {
     expect(actions).not.toMatch(/formData\.get\(["']reviewer/);
     expect(advertiserActions).not.toMatch(/admin_approve_/);
     expect(advertiserActions).not.toMatch(/approveAdvertiser\(/);
-    expect(menu).not.toMatch(/adminAds/);
+    // Capability Links V1: Admin may appear in UserMenu only behind showAdmin.
+    expect(menu).toMatch(/showAdmin/);
+    expect(menu).toMatch(/APP_ROUTES\.adminAds/);
     expect(top).not.toMatch(/adminAds/);
   });
 

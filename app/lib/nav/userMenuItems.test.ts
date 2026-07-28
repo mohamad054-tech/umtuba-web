@@ -3,16 +3,66 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { APP_ROUTES } from "./routes";
 import { buildUserMenuGroups, listUserMenuHrefs } from "./userMenuItems";
+import {
+  USER_MENU_CAPABILITIES_SIGNED_IN_BASE,
+  type UserMenuCapabilities,
+} from "./userMenuCapabilities";
+import { LEARNING_INSTRUCTOR_ROUTES } from "../../../lib/learning/instructorAuthoring";
 
-describe("userMenuItems", () => {
-  it("groups You and Account without duplicates", () => {
-    const groups = buildUserMenuGroups("/profile/demo_user");
+describe("userMenuItems — Capability Links V1", () => {
+  it("keeps You and Account groups for signed-in baseline", () => {
+    const groups = buildUserMenuGroups(
+      "/profile/demo_user",
+      USER_MENU_CAPABILITIES_SIGNED_IN_BASE
+    );
     expect(groups.map((g) => g.id)).toEqual(["you", "account"]);
     const labels = groups.flatMap((g) => g.items.map((i) => i.label));
     expect(labels).toEqual([
       "Profile",
+      "Create",
       "Saved",
       "Learning",
+      "Rewards",
+      "Notifications",
+      "Settings",
+      "Store",
+      "Wishlist",
+      "Advertise",
+    ]);
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+
+  it("adds Create for signed-in baseline and omits gated workspaces", () => {
+    const hrefs = listUserMenuHrefs(
+      "/profile/demo_user",
+      USER_MENU_CAPABILITIES_SIGNED_IN_BASE
+    );
+    expect(hrefs).toContain(APP_ROUTES.createVideo);
+    expect(hrefs).toContain(APP_ROUTES.advertise);
+    expect(hrefs).not.toContain(APP_ROUTES.seller);
+    expect(hrefs).not.toContain(LEARNING_INSTRUCTOR_ROUTES.hub);
+    expect(hrefs).not.toContain(APP_ROUTES.adminAds);
+    expect(hrefs).not.toContain("/feed");
+    expect(hrefs).not.toContain("/ai");
+  });
+
+  it("shows Instructor Seller Admin only when capabilities allow", () => {
+    const full: UserMenuCapabilities = {
+      showCreate: true,
+      showInstructor: true,
+      showAdmin: true,
+      showSeller: true,
+      showAdvertise: true,
+    };
+    const labels = buildUserMenuGroups("/profile/demo_user", full).flatMap(
+      (g) => g.items.map((i) => i.label)
+    );
+    expect(labels).toEqual([
+      "Profile",
+      "Create",
+      "Saved",
+      "Learning",
+      "Instructor",
       "Rewards",
       "Notifications",
       "Settings",
@@ -20,32 +70,22 @@ describe("userMenuItems", () => {
       "Seller hub",
       "Wishlist",
       "Advertise",
+      "Admin",
     ]);
-    expect(new Set(labels).size).toBe(labels.length);
-  });
-
-  it("exposes Saved, Rewards, Settings, and Advertise entry points", () => {
-    const hrefs = listUserMenuHrefs("/profile/demo_user");
-    expect(hrefs).toContain(APP_ROUTES.saved);
-    expect(hrefs).toContain(APP_ROUTES.learning);
-    expect(hrefs).toContain(APP_ROUTES.rewards);
-    expect(hrefs).toContain(APP_ROUTES.notifications);
-    expect(hrefs).toContain(APP_ROUTES.settings);
-    expect(hrefs).toContain(APP_ROUTES.store);
+    const hrefs = listUserMenuHrefs("/profile/demo_user", full);
+    expect(hrefs).toContain(LEARNING_INSTRUCTOR_ROUTES.hub);
     expect(hrefs).toContain(APP_ROUTES.seller);
-    expect(hrefs).toContain(APP_ROUTES.storeWishlist);
-    expect(hrefs).toContain(APP_ROUTES.advertise);
-    expect(hrefs).not.toContain("/feed");
-    expect(hrefs).not.toContain("/ai");
-    expect(hrefs).not.toContain("/uconnect");
+    expect(hrefs).toContain(APP_ROUTES.adminAds);
+    expect(hrefs).not.toContain(APP_ROUTES.adminStore);
   });
 
-  it("UserMenu renders grouped items and a11y menu roles", () => {
+  it("UserMenu resolves capabilities and renders grouped items", () => {
     const src = readFileSync(
       join(process.cwd(), "app/components/UserMenu.tsx"),
       "utf8"
     );
     expect(src).toMatch(/buildUserMenuGroups/);
+    expect(src).toMatch(/resolveUserMenuCapabilities/);
     expect(src).toMatch(/aria-label=\{"Account menu"\}|aria-label="Account menu"/);
     expect(src).toMatch(/role="menuitem"/);
     expect(src).not.toMatch(/Feed V1|Video V1|Accounts V1/);
