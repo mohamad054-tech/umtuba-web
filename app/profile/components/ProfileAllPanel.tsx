@@ -4,19 +4,24 @@ import {
   ContentCardSkeleton,
 } from "../../components/content-cards";
 import type { ContentCardViewModel } from "../../../lib/content/cards";
+import { partitionProfileAllContent } from "../lib/profilePinnedContentStructure";
+import ProfilePinnedRail from "./ProfilePinnedRail";
 
 type ProfileAllPanelProps = {
   cards: ContentCardViewModel[];
+  /** Explicit pins (structure readiness). Falls back to cards marked pinned. */
+  pinnedCards?: ContentCardViewModel[];
   loadFailed?: boolean;
   onRetry?: () => void;
 };
 
 /**
- * Profile All — unified chronological feed from content_registry.
- * Articles appear once (teaser videos are not duplicated as video items).
+ * Profile All — pinned rail (optional) + unified chronological feed.
+ * Pinned items are excluded from the chronological list (Creator Space §8).
  */
 export default function ProfileAllPanel({
   cards,
+  pinnedCards,
   loadFailed = false,
   onRetry,
 }: ProfileAllPanelProps) {
@@ -42,7 +47,12 @@ export default function ProfileAllPanel({
     );
   }
 
-  if (cards.length === 0) {
+  const { pinned, chronology, showPinnedRail } = partitionProfileAllContent({
+    cards,
+    pinned: pinnedCards,
+  });
+
+  if (!showPinnedRail && chronology.length === 0) {
     return (
       <ContentCardEmptyState
         title="No published content yet"
@@ -52,13 +62,18 @@ export default function ProfileAllPanel({
   }
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2" aria-label="All content">
-      {cards.map((card) => (
-        <li key={card.registryId}>
-          <ContentCard card={card} showCreator={false} />
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-6">
+      {showPinnedRail ? <ProfilePinnedRail cards={pinned} /> : null}
+      {chronology.length > 0 ? (
+        <ul className="grid gap-3 sm:grid-cols-2" aria-label="All content">
+          {chronology.map((card) => (
+            <li key={card.registryId}>
+              <ContentCard card={card} showCreator={false} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
 

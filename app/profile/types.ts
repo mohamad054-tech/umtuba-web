@@ -96,6 +96,10 @@ export type MockProfile = {
   videos: ProfileVideo[];
   liveSessions: ProfileLivePreview[];
   about: ProfileAbout;
+  /** Optional All-tab cards for mock/dev structure demos. */
+  contentCards?: ContentCardViewModel[];
+  /** Explicit pins (1–3 soft cap) — structure readiness only. */
+  pinnedContentCards?: ContentCardViewModel[];
 };
 
 /** Unified view model for real Supabase profiles and development mocks. */
@@ -136,6 +140,11 @@ export type ProfileView = {
   registryItems?: import("../../lib/content/contentRegistry").ProfileContentCard[];
   /** Creator Space V1 presentation cards derived from content projections. */
   contentCards?: ContentCardViewModel[];
+  /**
+   * Pinned Content Structure V1 — optional explicit pins (soft cap 1–3).
+   * No persistence; empty → rail hidden. Chronology excludes these ids.
+   */
+  pinnedContentCards?: ContentCardViewModel[];
   registryLoadFailed?: boolean;
   /** True when follow/stats aggregates failed. */
   statsLoadFailed?: boolean;

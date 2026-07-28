@@ -1,4 +1,41 @@
+import type { ContentCardViewModel } from "../../../lib/content/cards";
 import type { MockProfile } from "../types";
+
+/** Dev-only Content Card fixture for Pinned Content Structure demos. */
+function mockContentCard(
+  partial: Pick<
+    ContentCardViewModel,
+    "id" | "registryId" | "kind" | "title" | "canonicalHref" | "cta"
+  > &
+    Partial<ContentCardViewModel>
+): ContentCardViewModel {
+  return {
+    sourceEntityId: partial.sourceEntityId ?? partial.id,
+    creator: partial.creator ?? {
+      id: "c-lina",
+      displayName: "Lina Haddad",
+      username: "lina.creates",
+      avatarUrl: null,
+    },
+    summary: partial.summary ?? null,
+    publishedAt: partial.publishedAt ?? "2026-03-01T00:00:00.000Z",
+    visibility: partial.visibility ?? "public",
+    preview: partial.preview ?? {
+      recipe: "gradient",
+      aspect: "16:9",
+      alt: partial.title,
+      gradientClass: "from-[#1a1040] via-[#0c1a3a] to-[#061820]",
+    },
+    discoveryPostId: partial.discoveryPostId ?? null,
+    discoveryMode: partial.discoveryMode ?? "none",
+    hasGeneratedTeaser: partial.hasGeneratedTeaser ?? false,
+    badges: partial.badges ?? [],
+    presentationVariant:
+      partial.presentationVariant ??
+      (partial.kind === "video" ? "video" : "article"),
+    ...partial,
+  };
+}
 
 /**
  * Development-only mock profiles. Used as a fallback on /profile/[username]
@@ -75,6 +112,83 @@ export const MOCK_PROFILES: MockProfile[] = [
       achievements: ["Creator Space pioneer"],
       links: [{ label: "Portfolio", href: "https://umtuba.world/lina" }],
     },
+    contentCards: [
+      mockContentCard({
+        id: "mock-lina-pin-article",
+        registryId: "reg-lina-pin-article",
+        kind: "article",
+        title: "Light between alleys",
+        canonicalHref: "/articles/mock-lina-pin-article",
+        cta: {
+          verb: "read_article",
+          label: "Read article",
+          href: "/articles/mock-lina-pin-article",
+        },
+        badges: ["linked_article"],
+        pinned: true,
+      }),
+      mockContentCard({
+        id: "mock-lina-pin-video",
+        registryId: "reg-lina-pin-video",
+        kind: "video",
+        title: "Morning streets — pinned cut",
+        canonicalHref: "/watch?post=9001",
+        discoveryPostId: 9001,
+        discoveryMode: "native_video",
+        cta: {
+          verb: "watch",
+          label: "Watch",
+          href: "/watch?post=9001",
+        },
+        badges: ["independent_video"],
+        pinned: true,
+      }),
+      mockContentCard({
+        id: "mock-lina-chrono-1",
+        registryId: "reg-lina-chrono-1",
+        kind: "article",
+        title: "Harbor notes",
+        canonicalHref: "/articles/mock-lina-chrono-1",
+        cta: {
+          verb: "read_article",
+          label: "Read article",
+          href: "/articles/mock-lina-chrono-1",
+        },
+        badges: ["linked_article"],
+      }),
+    ],
+    pinnedContentCards: [
+      mockContentCard({
+        id: "mock-lina-pin-article",
+        registryId: "reg-lina-pin-article",
+        kind: "article",
+        title: "Light between alleys",
+        canonicalHref: "/articles/mock-lina-pin-article",
+        cta: {
+          verb: "read_article",
+          label: "Read article",
+          href: "/articles/mock-lina-pin-article",
+        },
+        badges: ["linked_article"],
+        pinned: true,
+      }),
+      mockContentCard({
+        id: "mock-lina-pin-video",
+        registryId: "reg-lina-pin-video",
+        kind: "video",
+        title: "Morning streets — pinned cut",
+        canonicalHref: "/watch?post=9001",
+        discoveryPostId: 9001,
+        discoveryMode: "native_video",
+        cta: {
+          verb: "watch",
+          label: "Watch",
+          href: "/watch?post=9001",
+        },
+        badges: ["independent_video"],
+        pinned: true,
+      }),
+    ],
   },
   {
     id: "c-omar",

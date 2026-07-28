@@ -2,46 +2,49 @@
 
 ## Task title
 
-Next feature after Profile Creator Hub Readiness V1 — determined, **not started**
+Pinned Content Structure V1
 
 ## Status
 
-`awaiting-go` — no implementation performed. Branch created only.
+`verification-pass` — **UNCOMMITTED** — awaiting explicit commit GO.
 
-## Prior task closed
+## Branch / sync
 
-- **Profile Creator Hub Readiness V1** — closed and fast-forward merged into `alpha-0.2` @ `6e886644ba23dfb55c123cb5e35ac30dbf4c1e25` (`docs(ai): record profile creator hub readiness v1`).
-- Local and remote `alpha-0.2` confirmed in sync at that commit.
+- **Branch:** `office/profile-pinned-content-structure-v1`
+- **Base:** `25cbed823f653f06158f4ae63b5ff540560a3394` (`feat(web): add profile about live structure v1`)
+- **Checkout:** feature branch (not merged)
 
-## Determined next feature
+## What was implemented
 
-- **Name:** About / Live Structure V1
-- **Source:** `docs/architecture/CREATOR_SPACE_EXPERIENCE_V1.md` §23 phased execution, step 5 (after step 4 "Tab visibility", which Profile Creator Hub Readiness V1 satisfied) — cross-checked against `docs/architecture/UNIFIED_EXPERIENCE_PAGE_CONSOLIDATION_V1.md` §12.
-- **Scope (expected, not yet implemented):**
-  - About tab: add structured sections per CREATOR_SPACE_EXPERIENCE_V1 §9 (Experience, Education, Specialties/interests distinct from current flat interests list, Achievements/badges, Links, Joined date) — currently only bio/location/website/interests.
-  - Live tab: restructure into Now / Upcoming / Past buckets per CREATOR_SPACE_EXPERIENCE_V1 §13 — currently a single flat session list.
-- **Excluded (explicit non-goals for this next feature):**
-  - Pinned content (§8) — requires data-model GO + migration, not authorized.
-  - Courses / Products full catalog UI (P3) — requires domain GO, not authorized.
-  - Any Home / DiscoverExperience / Watch player changes — hard-locked.
-  - Content-flow policy decision (UNIFIED §12.4, Profile-mediated vs Home direct article CTA) — separate policy track, deferred.
+- Pinned rail above All tab (Creator Space §8) — soft cap 1–3.
+- Empty pins → rail fully hidden (no empty header).
+- Pinned items excluded from All chronology.
+- Pure helpers in `app/profile/lib/profilePinnedContentStructure.ts`.
+- Optional `pinnedContentCards` on ProfileView; production defaults empty (no migration/backend).
+- Dev mock pins on `lina.creates` for structure demo.
 
-## Branch
+## Exact files changed
 
-- **New branch created (not checked out, no commits):** `office/profile-about-live-structure-v1`
-- **Parent commit:** `6e886644ba23dfb55c123cb5e35ac30dbf4c1e25` (`alpha-0.2` tip)
-- Current checkout remains `alpha-0.2` at the same commit; no files modified.
+- `app/profile/lib/profilePinnedContentStructure.ts` (new)
+- `app/profile/components/ProfilePinnedRail.tsx` (new)
+- `app/profile/components/ProfileAllPanel.tsx`
+- `app/profile/components/index.ts`
+- `app/profile/ProfileExperience.tsx`
+- `app/profile/types.ts`
+- `app/profile/lib/mapProfile.ts`
+- `app/profile/data/mockProfiles.ts`
+- `lib/content/profilePinnedContentStructure.v1.test.ts` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope (unchanged)
 
-- Home feed / DiscoverExperience / swipe / ranking
-- Watch player redesign
-- Full Courses / Products catalog UIs
-- Pinned data model + migration
-- Content Card Search variants
-- Alias hygiene / content-flow policy
-- Migrations / Commit / Push without explicit GO
-- Destructive git (reset/clean/stash/force)
+- Migrations / new tables / pin persistence
+- Owner pin management UI
+- Home feed / DiscoverExperience / Watch player
+- Courses / Products catalog UIs
+- Content-flow policy
+- Commit / Push without explicit GO
 
 ## Hard lock
 
@@ -49,4 +52,4 @@ Home remains official Discovery Layer — do not touch feed/player behavior.
 
 ## Next step
 
-**لم يبدأ التنفيذ — بانتظار GO.** Await explicit GO before any implementation on `office/profile-about-live-structure-v1`.
+Await explicit **commit GO** (then push/merge only on separate GO).

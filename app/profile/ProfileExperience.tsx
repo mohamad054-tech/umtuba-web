@@ -243,6 +243,7 @@ export default function ProfileExperience({
           {activeTab === "all" ? (
             <ProfileAllPanel
               cards={profile.contentCards ?? []}
+              pinnedCards={profile.pinnedContentCards}
               loadFailed={Boolean(profile.registryLoadFailed)}
             />
           ) : null}

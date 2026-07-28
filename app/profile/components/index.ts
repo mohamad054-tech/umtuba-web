@@ -8,6 +8,7 @@ export { default as ProfileLiveBadge } from "./ProfileLiveBadge";
 export { default as ProfileLivePanel } from "./ProfileLivePanel";
 export { default as ProfileCoursesPanel } from "./ProfileCoursesPanel";
 export { default as ProfilePhotosPanel } from "./ProfilePhotosPanel";
+export { default as ProfilePinnedRail } from "./ProfilePinnedRail";
 export { default as ProfilePostsPanel } from "./ProfilePostsPanel";
 export { default as ProfileProductsPanel } from "./ProfileProductsPanel";
 export { default as ProfileShell } from "./ProfileShell";
