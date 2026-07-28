@@ -1,6 +1,7 @@
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { normalizeCurrencyCode, validateAmountMinor } from "./money";
+import { clientSuppliedMoneyFieldPresent } from "./tradingContracts";
 
 export type CartEligibilityInput = {
   productStatus: string;
@@ -287,5 +288,5 @@ export function computeCartSummary(
 
 /** Reject client-provided price snapshots — server must supply. */
 export function rejectClientPriceSnapshot(clientPrice: unknown): boolean {
-  return clientPrice !== undefined && clientPrice !== null && clientPrice !== "";
+  return clientSuppliedMoneyFieldPresent(clientPrice);
 }

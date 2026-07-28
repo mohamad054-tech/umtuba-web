@@ -4,10 +4,10 @@
  */
 
 import {
-  formatMinorUnits,
   normalizeCurrencyCode,
   validateAmountMinor,
 } from "./money";
+import { computeExclusiveTaxOrderGrandTotalMinor, formatTrustedMoney } from "./tradingContracts";
 import type { StoreMemberRole } from "./types";
 import {
   FULFILLMENT_STATUSES,
@@ -161,10 +161,10 @@ export function formatFulfillmentStatus(status: FulfillmentStatus): string {
 }
 
 export function formatOrderMoney(
-  amountMinor: number,
-  currency: string
+  amountMinor: number | null | undefined,
+  currency: string | null | undefined
 ): string {
-  return formatMinorUnits(amountMinor, currency);
+  return formatTrustedMoney(amountMinor, currency);
 }
 
 export function canTransitionOrderStatus(
@@ -479,12 +479,8 @@ export function computeOrderGrandTotalMinor(input: {
   taxTotalMinor: number;
   shippingTotalMinor: number;
 }): number {
-  return (
-    input.subtotalMinor -
-    input.discountTotalMinor +
-    input.taxTotalMinor +
-    input.shippingTotalMinor
-  );
+  // Align with checkout pricing (exclusive tax) — do not fork grand-total math.
+  return computeExclusiveTaxOrderGrandTotalMinor(input);
 }
 
 export function validateOrderMoneyTotals(

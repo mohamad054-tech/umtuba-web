@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Seller Dashboard & Operational Insights V1
+Commerce Trading Domain Alignment & Integrity V1
 
 ## Status
 
@@ -10,17 +10,21 @@ Commerce Premium Seller Dashboard & Operational Insights V1
 
 ## Branch
 
-`office/commerce-premium-seller-dashboard-insights-v1`
+`office/commerce-trading-domain-alignment-integrity-v1`
 
 ## Base
 
-Trusted inventory commit `4d28ca7a13232e6a2bede126b59171a19fb8ea4f`
-Parent branch: `office/commerce-premium-seller-inventory-reservation-visibility-v1`
+Trusted dashboard commit `fa2aedfe5aa0a401c04c8ac3712727de5bc16ef4`
+Parent branch: `office/commerce-premium-seller-dashboard-insights-v1`
 
 ## Deliverable
 
-Premium `/seller/store` operational command center: attention center, trusted order/product/inventory snapshots, paid vs unpaid order-value honesty, optional analytics GMV when RPCs available, settlement intentionally withheld, store readiness, store settings retained. No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits.
+Code-level alignment of the Commerce trading path:
+
+Catalog Price → Cart Snapshot → Checkout Quote → Order Confirmation → Order Money Snapshots → Payment State
+
+Shared contract helpers in `lib/store/tradingContracts.ts`; consumers hardened for compare-at integrity, client money rejection, mixed-currency fail-closed, quote money without cart fallback, single exclusive-tax grand-total path, and unified payment-state classification. No payment provider. No Warehouse/Shipping Network. No frozen Commerce architecture edits. No migrations.
 
 ## Next after this task
 
-Trading-domain alignment or settlement visibility when ledger is connected — still no payment provider / Shipping Network unless requested.
+Settlement/payout visibility when trusted financial ledger is connected — still no payment provider / Shipping Network / Warehouse execution unless requested. Optional: payment-provider integration only if explicitly authorized.

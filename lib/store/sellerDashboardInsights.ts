@@ -8,6 +8,7 @@ import {
   isRealizedPaidOrder,
   isUnpaidPendingOrder,
 } from "./analyticsFinance";
+import { formatTrustedMoney } from "./tradingContracts";
 import type { SellerOrderListItem } from "./orders";
 import {
   deriveInventoryAvailabilityState,
@@ -107,16 +108,7 @@ export type SellerDashboardMetricCard = {
 };
 
 function moneyLabel(minor: number | null, currency: string | null): string {
-  if (minor == null || !currency) return "Unavailable";
-  try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 2,
-    }).format(minor / 100);
-  } catch {
-    return `${(minor / 100).toFixed(2)} ${currency}`;
-  }
+  return formatTrustedMoney(minor, currency);
 }
 
 export function formatDashboardMoney(

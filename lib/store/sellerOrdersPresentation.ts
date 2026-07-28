@@ -9,6 +9,7 @@ import {
   nextFulfillmentStatuses,
   nextSellerOrderStatuses,
 } from "./orderRules";
+import { classifyTradingPaymentState } from "./tradingContracts";
 import type {
   FulfillmentStatus,
   OrderStatus,
@@ -89,7 +90,10 @@ export function isPaymentBlockingFulfillmentProgress(
   paymentStatus: unknown
 ): boolean {
   if (!isPaymentStatus(paymentStatus)) return true;
-  return paymentStatus === "pending" || paymentStatus === "failed";
+  return classifyTradingPaymentState({
+    paymentStatus,
+    status: "pending",
+  }).blocksFulfillmentProgress;
 }
 
 export function paymentBlockReason(paymentStatus: unknown): string {

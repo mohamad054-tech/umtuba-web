@@ -18,6 +18,7 @@ import {
   multiSellerCheckoutNotice,
 } from "../../../lib/store/cartCheckoutPresentation";
 import { CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS } from "../../../lib/store/payments";
+import { formatTrustedMoney } from "../../../lib/store/tradingContracts";
 import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
@@ -392,18 +393,20 @@ export default function CheckoutClient({
   const payload = (quote?.payload as Record<string, unknown> | undefined) ?? null;
   const groups = (payload?.groups as Array<Record<string, unknown>>) ?? [];
   const totals = groups.length > 0 ? aggregateQuoteTotals(groups) : null;
+  const quoteMoneyTrusted = Boolean(totals?.complete && !totals.mixedCurrency);
   const moneyRows = buildCheckoutQuoteMoneyRows({
     cartSubtotalMinor: cart.subtotalMinor,
-    quoted: Boolean(quote),
-    quoteGroup: totals
-      ? {
-          subtotal_minor: totals.subtotalMinor || cart.subtotalMinor,
-          discount_total_minor: totals.discountMinor,
-          shipping_total_minor: totals.shippingMinor,
-          tax_total_minor: totals.taxMinor,
-          grand_total_minor: totals.grandMinor,
-        }
-      : null,
+    quoted: Boolean(quote) && quoteMoneyTrusted,
+    quoteGroup:
+      quoteMoneyTrusted && totals
+        ? {
+            subtotal_minor: totals.subtotalMinor,
+            discount_total_minor: totals.discountMinor,
+            shipping_total_minor: totals.shippingMinor,
+            tax_total_minor: totals.taxMinor,
+            grand_total_minor: totals.grandMinor,
+          }
+        : null,
   });
 
   return (
@@ -754,17 +757,38 @@ export default function CheckoutClient({
           ))}
         </dl>
 
-        {groups.length > 1 ? (
+        {totals?.mixedCurrency ? (
+          <p
+            className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"
+            role="alert"
+          >
+            Mixed currencies cannot be combined into one checkout total. Remove
+            conflicting cart lines or check out sellers separately.
+          </p>
+        ) : null}
+
+        {quoteMoneyTrusted && groups.length > 1 ? (
           <ul className="mt-4 space-y-2 text-xs text-[var(--sf-muted)]">
-            {groups.map((g) => (
-              <li
-                key={String(g.store_id)}
-                className="rounded-xl border border-[var(--sf-line)] px-3 py-2"
-              >
-                Seller order · Grand{" "}
-                {formatMinorUnits(Number(g.grand_total_minor ?? 0), currency)}
-              </li>
-            ))}
+            {groups.map((g) => {
+              const grand =
+                typeof g.grand_total_minor === "number"
+                  ? g.grand_total_minor
+                  : typeof g.grand_total_minor === "string" &&
+                      /^-?\d+$/.test(g.grand_total_minor.trim())
+                    ? Number(g.grand_total_minor.trim())
+                    : null;
+              const groupCurrency =
+                typeof g.currency === "string" ? g.currency : currency;
+              return (
+                <li
+                  key={String(g.store_id)}
+                  className="rounded-xl border border-[var(--sf-line)] px-3 py-2"
+                >
+                  Seller order · Grand{" "}
+                  {formatTrustedMoney(grand, groupCurrency)}
+                </li>
+              );
+            })}
           </ul>
         ) : null}
 

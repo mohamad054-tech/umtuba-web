@@ -170,6 +170,47 @@ describe("cartCheckoutPresentation — quote money rows", () => {
     ]);
     expect(totals.grandMinor).toBe(3970);
     expect(totals.shippingMinor).toBe(500);
+    expect(totals.complete).toBe(true);
+    expect(totals.mixedCurrency).toBe(false);
+  });
+
+  it("does not fall back to cart subtotal when quote fields are missing", () => {
+    const rows = buildCheckoutQuoteMoneyRows({
+      cartSubtotalMinor: 2500,
+      quoted: true,
+      quoteGroup: {
+        discount_total_minor: 100,
+        shipping_total_minor: 300,
+        tax_total_minor: 50,
+        grand_total_minor: 2750,
+      },
+    });
+    expect(rows.find((r) => r.key === "subtotal")?.known).toBe(false);
+    expect(rows.find((r) => r.key === "subtotal")?.amountMinor).toBeNull();
+  });
+
+  it("rejects summing mixed-currency quote groups", () => {
+    const totals = aggregateQuoteTotals([
+      {
+        currency: "USD",
+        discount_total_minor: 0,
+        shipping_total_minor: 0,
+        tax_total_minor: 0,
+        grand_total_minor: 1000,
+        subtotal_minor: 1000,
+      },
+      {
+        currency: "EUR",
+        discount_total_minor: 0,
+        shipping_total_minor: 0,
+        tax_total_minor: 0,
+        grand_total_minor: 2000,
+        subtotal_minor: 2000,
+      },
+    ]);
+    expect(totals.mixedCurrency).toBe(true);
+    expect(totals.complete).toBe(false);
+    expect(totals.grandMinor).toBe(0);
   });
 });
 

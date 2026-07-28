@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
+import { isLegitimateCompareAt } from "./tradingContracts";
 import type {
   ProductCategoryRow,
   ProductInventoryRow,
@@ -83,13 +84,9 @@ export async function enrichPublicCatalogRow(
         price.compare_at_amount_minor == null
           ? null
           : Number(price.compare_at_amount_minor);
-      compareAtMinor =
-        compareRaw != null &&
-        Number.isFinite(compareRaw) &&
-        priceMinor != null &&
-        compareRaw > priceMinor
-          ? compareRaw
-          : null;
+      compareAtMinor = isLegitimateCompareAt(priceMinor, compareRaw)
+        ? compareRaw
+        : null;
     }
 
     const { data: inv } = await supabase

@@ -5,13 +5,13 @@ import {
   computeCartSummary,
   evaluateCartAdd,
   evaluateCartSetQuantity,
-  rejectClientPriceSnapshot,
   type CartSummary,
   validateCartQuantity,
 } from "./cartRules";
 import { deriveCartLineBlockingIssue } from "./cartCheckoutPresentation";
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
+import { rejectClientCartPrice } from "./tradingContracts";
 
 type AnyClient = SupabaseClient;
 
@@ -435,10 +435,8 @@ export async function addToCart(
     clientPriceMinor?: unknown;
   }
 ): Promise<CartActionResult<{ cartId: string; itemId: string; quantity: number }>> {
-  if (rejectClientPriceSnapshot(input.clientPriceMinor)) {
-    // Fail closed: do not accept client price; ignore and continue with server price
-    // (explicit reject path if they try to force via other fields is server-only)
-  }
+  const clientPriceGate = rejectClientCartPrice(input.clientPriceMinor);
+  if (!clientPriceGate.ok) return clientPriceGate;
 
   const variantId =
     typeof input.variantId === "string" ? input.variantId.trim() : "";

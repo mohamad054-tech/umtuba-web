@@ -1,5 +1,6 @@
 import type { PublicCatalogItem } from "../../../lib/store/types";
 import type { ProductCategoryRow } from "../../../lib/store/types";
+import { isLegitimateCompareAt } from "../../../lib/store/tradingContracts";
 
 export type FeaturedStore = {
   id: string;
@@ -156,9 +157,5 @@ export function categoryHref(category: ProductCategoryRow): string {
 }
 
 export function hasLegitimateCompareAt(item: PublicCatalogItem): boolean {
-  return (
-    item.compareAtMinor != null &&
-    item.priceMinor != null &&
-    item.compareAtMinor > item.priceMinor
-  );
+  return isLegitimateCompareAt(item.priceMinor, item.compareAtMinor);
 }

@@ -12,6 +12,7 @@ import {
   type CheckoutAddressInput,
 } from "./checkoutRules";
 import { isSafeStoreBrandingUrl } from "./storeBranding";
+import { aggregateTrustedQuoteGroupTotals } from "./tradingContracts";
 
 export type CheckoutMoneyRow = {
   key: "subtotal" | "discount" | "shipping" | "tax" | "grand";
@@ -152,8 +153,7 @@ export function buildCheckoutQuoteMoneyRows(input: {
     ];
   }
 
-  const subtotal =
-    asMinor(group.subtotal_minor) ?? input.cartSubtotalMinor;
+  const subtotal = asMinor(group.subtotal_minor);
   const discount = asMinor(group.discount_total_minor);
   const shipping = asMinor(group.shipping_total_minor);
   const tax = asMinor(group.tax_total_minor);
@@ -164,7 +164,7 @@ export function buildCheckoutQuoteMoneyRows(input: {
       key: "subtotal",
       label: "Item subtotal",
       amountMinor: subtotal,
-      known: true,
+      known: subtotal != null,
     },
     {
       key: "discount",
@@ -202,20 +202,21 @@ export function aggregateQuoteTotals(
   taxMinor: number;
   grandMinor: number;
   subtotalMinor: number;
+  complete: boolean;
+  mixedCurrency: boolean;
+  currencies: string[];
 } {
-  let discountMinor = 0;
-  let shippingMinor = 0;
-  let taxMinor = 0;
-  let grandMinor = 0;
-  let subtotalMinor = 0;
-  for (const g of groups) {
-    discountMinor += Number(g.discount_total_minor ?? 0) || 0;
-    shippingMinor += Number(g.shipping_total_minor ?? 0) || 0;
-    taxMinor += Number(g.tax_total_minor ?? 0) || 0;
-    grandMinor += Number(g.grand_total_minor ?? 0) || 0;
-    subtotalMinor += Number(g.subtotal_minor ?? 0) || 0;
-  }
-  return { discountMinor, shippingMinor, taxMinor, grandMinor, subtotalMinor };
+  const trusted = aggregateTrustedQuoteGroupTotals(groups);
+  return {
+    discountMinor: trusted.discountMinor,
+    shippingMinor: trusted.shippingMinor,
+    taxMinor: trusted.taxMinor,
+    grandMinor: trusted.grandMinor,
+    subtotalMinor: trusted.subtotalMinor,
+    complete: trusted.complete,
+    mixedCurrency: trusted.mixedCurrency,
+    currencies: trusted.currencies,
+  };
 }
 
 export function evaluateCheckoutStepReadiness(input: {
