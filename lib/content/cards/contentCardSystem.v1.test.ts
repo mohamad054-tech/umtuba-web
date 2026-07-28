@@ -112,15 +112,19 @@ describe("Content Card System V1", () => {
     expect(card).toMatch(/motion-reduce/);
   });
 
-  it("retains creator profile panels and excludes future V1 tabs", () => {
+  it("retains creator profile panels with Creator Hub readiness tabs", () => {
     const experience = read("app/profile/ProfileExperience.tsx");
-    const tabs = read("app/profile/components/ProfileTabs.tsx");
+    const tabsModel = read("app/profile/lib/profileTabs.ts");
     expect(experience).toMatch(/ProfileLinkedArticlePrompt/);
     expect(experience).toMatch(/activeTab === "articles"/);
     expect(experience).toMatch(/activeTab === "videos"/);
     expect(experience).toMatch(/activeTab === "about"/);
-    expect(tabs).not.toMatch(/\{ id: "courses"/);
-    expect(tabs).not.toMatch(/\{ id: "products"/);
-    expect(tabs).not.toMatch(/\{ id: "photos"/);
+    expect(experience).toMatch(/activeTab === "courses"/);
+    expect(experience).toMatch(/activeTab === "products"/);
+    expect(experience).toMatch(/activeTab === "photos"/);
+    expect(tabsModel).toMatch(/"courses"/);
+    expect(tabsModel).toMatch(/"products"/);
+    expect(tabsModel).toMatch(/"photos"/);
+    expect(tabsModel).toMatch(/posts.*photos|legacy.*posts/i);
   });
 });

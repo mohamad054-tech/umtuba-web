@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FollowButton from "../components/social/FollowButton";
 import {
   formatFollowCountLabel,
@@ -22,10 +22,17 @@ import {
   type ProfileTabId,
 } from "./components";
 import ProfileArticlesPanel from "./components/ProfileArticlesPanel";
-import ProfilePostsPanel from "./components/ProfilePostsPanel";
+import ProfileCoursesPanel from "./components/ProfileCoursesPanel";
+import ProfilePhotosPanel from "./components/ProfilePhotosPanel";
+import ProfileProductsPanel from "./components/ProfileProductsPanel";
 import ProfileLinkedArticlePrompt from "./components/ProfileLinkedArticlePrompt";
 import type { ProfileView } from "./types";
 import { isUuid } from "../lib/nav";
+import {
+  countProfilePhotos,
+  getVisibleProfileTabs,
+  resolveActiveProfileTab,
+} from "./lib/profileTabs";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -33,33 +40,44 @@ type ProfileExperienceProps = {
   viewerId?: string | null;
 };
 
-const TAB_IDS: ProfileTabId[] = [
-  "all",
-  "posts",
-  "videos",
-  "articles",
-  "about",
-  "live",
-];
-
-function parseTab(raw: string | null): ProfileTabId {
-  if (raw === "posts") {
-    return "all";
-  }
-  if (raw && (TAB_IDS as string[]).includes(raw)) {
-    return raw as ProfileTabId;
-  }
-  return "all";
-}
-
 export default function ProfileExperience({
   profile,
   isOwner,
   viewerId = null,
 }: ProfileExperienceProps) {
   const searchParams = useSearchParams();
+  const showLiveTab =
+    profile.liveSessions.length > 0 || Boolean(profile.isLive);
+  const photoCount = useMemo(
+    () => countProfilePhotos(profile.posts),
+    [profile.posts]
+  );
+  /** Stub readiness — catalog counts land when domain projections exist. */
+  const courseCount = 0;
+  const productCount = 0;
+
+  const visibleTabs = useMemo(
+    () =>
+      getVisibleProfileTabs({
+        isOwner,
+        articleCount: profile.articles.length,
+        videoCount: profile.videoTotalCount,
+        courseCount,
+        productCount,
+        photoCount,
+        showLiveTab,
+      }),
+    [
+      isOwner,
+      profile.articles.length,
+      profile.videoTotalCount,
+      photoCount,
+      showLiveTab,
+    ]
+  );
+
   const [activeTab, setActiveTab] = useState<ProfileTabId>(() =>
-    parseTab(searchParams.get("tab"))
+    resolveActiveProfileTab(searchParams.get("tab"), visibleTabs)
   );
   const [isFollowing, setIsFollowing] = useState(
     Boolean(profile.isFollowing)
@@ -81,8 +99,10 @@ export default function ProfileExperience({
   const showLinkedArticlePrompt = Boolean(linkedArticleId);
 
   useEffect(() => {
-    setActiveTab(parseTab(searchParams.get("tab")));
-  }, [searchParams]);
+    setActiveTab(
+      resolveActiveProfileTab(searchParams.get("tab"), visibleTabs)
+    );
+  }, [searchParams, visibleTabs]);
 
   useEffect(() => {
     const updateHeroCollapse = () => setIsHeroCollapsed(window.scrollY >= 100);
@@ -97,8 +117,6 @@ export default function ProfileExperience({
     setFollowingLabel(formatFollowCountLabel(snapshot.followingCount));
   }
 
-  const showLiveTab =
-    profile.liveSessions.length > 0 || Boolean(profile.isLive);
   const canFollow =
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
 
@@ -197,10 +215,13 @@ export default function ProfileExperience({
           <ProfileTabs
             activeTab={activeTab}
             onChange={setActiveTab}
+            tabs={visibleTabs}
             videoCount={profile.videoTotalCount}
             articleCount={profile.articles.length}
             liveCount={profile.liveSessions.length}
-            showLiveTab={showLiveTab}
+            courseCount={courseCount}
+            productCount={productCount}
+            photoCount={photoCount}
           />
         </div>
 
@@ -225,10 +246,11 @@ export default function ProfileExperience({
               loadFailed={Boolean(profile.registryLoadFailed)}
             />
           ) : null}
-          {activeTab === "posts" ? (
-            <ProfilePostsPanel
-              posts={profile.posts}
-              loadFailed={Boolean(profile.postsLoadFailed)}
+          {activeTab === "articles" ? (
+            <ProfileArticlesPanel
+              articles={profile.articles}
+              loadFailed={Boolean(profile.articlesLoadFailed)}
+              isOwner={isOwner}
             />
           ) : null}
           {activeTab === "videos" ? (
@@ -238,10 +260,16 @@ export default function ProfileExperience({
               loadFailed={Boolean(profile.videosLoadFailed)}
             />
           ) : null}
-          {activeTab === "articles" ? (
-            <ProfileArticlesPanel
-              articles={profile.articles}
-              loadFailed={Boolean(profile.articlesLoadFailed)}
+          {activeTab === "courses" ? (
+            <ProfileCoursesPanel isOwner={isOwner} />
+          ) : null}
+          {activeTab === "products" ? (
+            <ProfileProductsPanel isOwner={isOwner} />
+          ) : null}
+          {activeTab === "photos" ? (
+            <ProfilePhotosPanel
+              posts={profile.posts}
+              loadFailed={Boolean(profile.postsLoadFailed)}
               isOwner={isOwner}
             />
           ) : null}
