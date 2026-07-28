@@ -2,24 +2,23 @@
 
 ## Task title
 
-Home Circular Arc Video-Edge Alignment V1 — Final Lock
+Home Assembly V1
 
 ## Status
 
-`commit-push-feature` — feature branch only (no alpha merge)
+`final-verification` — Commit / Push / FF-merge to alpha-0.2
 
 ## Branch
 
-`office/home-circular-arc-video-edge-alignment-v1` from `alpha-0.2`
+`office/home-assembly-v1` from `alpha-0.2` @ `302e32f`
+
+## Done
+
+- Page-row group centering (DiscoverExperience only)
+- Locked Video Stage sealed
+- Flags unchanged
 
 ## Gates
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
-- Preview: local `next dev`
 - `HOME_LOCK_ACTIVE = true`
-- Design locked: `left-[5px]`, arc `[0, -6, -11, -14, -11, -6, 0]`, 7 circles
-
-## Out of scope
-
-- Home Assembly
-- Merge to `alpha-0.2` (await separate GO)

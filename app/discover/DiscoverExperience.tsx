@@ -265,8 +265,13 @@ export default function DiscoverExperience({
     <DiscoverShell>
       <div className="flex flex-1 flex-col gap-3">
         <StoryRail viewerId={viewerId} />
-        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
-        <div className="relative mx-auto flex w-full max-w-[510px] flex-1">
+        {/*
+          Home Assembly V1 — page row only.
+          < xl: Stage centered alone (mx-auto).
+          xl+: center the sealed group [Stage 510][gap][Aside 280]; no Stage mx-auto.
+        */}
+        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:justify-center md:gap-6">
+        <div className="relative mx-auto w-full max-w-[510px] shrink-0 xl:mx-0 xl:w-[510px]">
           <div className="video-watch-stage relative z-10 h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
             <DiscoverFeed
               videos={videos}
@@ -392,6 +397,7 @@ export default function DiscoverExperience({
             </div>
           </div>
         </aside>
+        </div>
 
         <div className="flex justify-center px-4 pb-4 xl:hidden">
           <Link
@@ -400,7 +406,6 @@ export default function DiscoverExperience({
           >
             Explore this city
           </Link>
-        </div>
         </div>
       </div>
     </DiscoverShell>
