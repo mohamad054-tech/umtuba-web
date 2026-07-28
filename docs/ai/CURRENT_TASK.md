@@ -2,34 +2,49 @@
 
 ## Task title
 
-Content Card System V1
+Creator Space + Content Cards V1
 
 ## Status
 
-`architecture-complete` — design only; **no implementation**
+`verification-complete` — implementation on disk verified (vitest, tsc, build, diff-check, static review). **No commit. No push.** Await explicit GO.
 
 ## Branch / sync
 
-- Branch: `alpha-0.2`
-- HEAD base: `f053709`
-- Prior: Creator Space Experience V1 + Unified Experience consolidation (architecture)
+- Branch: `office/creator-space-content-cards-v1`
+- Parent / base: `76d30df` (`docs(architecture): define unified creator experience v1` on `alpha-0.2`)
+- Working tree: **dirty** (implementation changes uncommitted — intentional)
 
-## Allowed scope
+## Verification results (this session)
 
-- Architecture doc for unified Content Cards
-- Create `docs/architecture/CONTENT_CARD_SYSTEM_V1.md`
-- Update `docs/ai/CURRENT_TASK.md` and `docs/ai/CURSOR_REPORT.md`
+| Check | Result |
+| --- | --- |
+| Focused Vitest (prior session) | PASS 43/43 |
+| `npx tsc --noEmit` (prior session) | EXIT 0 |
+| `npm run build` | PASS (Next.js 16.2.10) |
+| `git diff --check` | PASS (whitespace warnings only on docs LF/CRLF) |
+| Home lock | PASS — no Home / Discover / Watch player files in diff |
 
-## Forbidden scope
+## Delivered (uncommitted)
 
-- React / components / UI implementation
-- Home redesign
-- Migrations / Commit / Push
+- `lib/content/cards/*` — View Model + mapper + tests
+- `app/components/content-cards/*` — shared ContentCard UI
+- Profile wiring: page, types, mapProfile, ProfileAllPanel, Tabs, Experience, Shell
+- Projection: `publishState` + teaser/independent badges via mapper
+- Creator Space: Hero collapse on scroll, sticky tabs + mini-header, All panel cards
 
-## Delivered
+## Next (human GO only)
 
-- Card anatomy, shared metadata, variants, preview/CTA recipes, status, motion, responsive, a11y, future kinds, integration with Creator Space / Home / Registry
+1. Manual QA on `/profile/[username]` (see CURSOR_REPORT routes)
+2. Explicit commit / push if approved
+3. Do **not** start Courses / Products / Photos / Pinned / Nav hygiene
 
-## Next (requires explicit GO)
+## Forbidden
 
-- Implementation of Card View Model / UI — **not started**
+- Home changes
+- Migrations
+- Commit / Push without explicit GO
+- Courses / Products / Photos / Pinned / Nav hygiene
+
+## Hard lock
+
+Home remains official Discovery Layer — do not touch.

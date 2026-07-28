@@ -1,4 +1,5 @@
 import type { ActivityTierProgress } from "../../lib/activity-tiers";
+import type { ContentCardViewModel } from "../../lib/content/cards";
 
 export type ProfileVideo = {
   id: string;
@@ -105,6 +106,8 @@ export type ProfileView = {
   articlesLoadFailed?: boolean;
   /** Unified Content Foundation — Profile All feed from registry. */
   registryItems?: import("../../lib/content/contentRegistry").ProfileContentCard[];
+  /** Creator Space V1 presentation cards derived from content projections. */
+  contentCards?: ContentCardViewModel[];
   registryLoadFailed?: boolean;
   /** True when follow/stats aggregates failed. */
   statsLoadFailed?: boolean;

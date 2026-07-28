@@ -45,6 +45,7 @@ export type ProfileContentBundle = {
   articles?: import("../types").ProfileArticle[];
   articlesFailed?: boolean;
   registryItems?: import("../../../lib/content/contentRegistry").ProfileContentCard[];
+  contentCards?: import("../../../lib/content/cards").ContentCardViewModel[];
   registryFailed?: boolean;
   liveRooms?: ProfileContentLiveRoom[];
   liveFailed?: boolean;
@@ -112,6 +113,7 @@ export function profileRowToView(
     posts: content?.posts ?? [],
     articles: content?.articles ?? [],
     registryItems: content?.registryItems ?? [],
+    contentCards: content?.contentCards ?? [],
     registryLoadFailed: Boolean(content?.registryFailed),
     liveSessions,
     hasMoreVideos: Boolean(content?.hasMoreVideos),
@@ -155,6 +157,7 @@ export function mockProfileToView(profile: MockProfile): ProfileView {
     posts: [],
     articles: [],
     registryItems: [],
+    contentCards: [],
     liveSessions: profile.liveSessions,
     about: profile.about,
   };

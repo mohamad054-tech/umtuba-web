@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import FollowButton from "../components/social/FollowButton";
 import {
   formatFollowCountLabel,
   type FollowSnapshot,
@@ -42,6 +43,9 @@ const TAB_IDS: ProfileTabId[] = [
 ];
 
 function parseTab(raw: string | null): ProfileTabId {
+  if (raw === "posts") {
+    return "all";
+  }
   if (raw && (TAB_IDS as string[]).includes(raw)) {
     return raw as ProfileTabId;
   }
@@ -62,6 +66,7 @@ export default function ProfileExperience({
   );
   const [followersLabel, setFollowersLabel] = useState(profile.followersLabel);
   const [followingLabel, setFollowingLabel] = useState(profile.followingLabel);
+  const [isHeroCollapsed, setIsHeroCollapsed] = useState(false);
   const linkedArticleIdRaw = searchParams.get("article");
   const linkedArticleId =
     linkedArticleIdRaw && isUuid(linkedArticleIdRaw)
@@ -79,6 +84,13 @@ export default function ProfileExperience({
     setActiveTab(parseTab(searchParams.get("tab")));
   }, [searchParams]);
 
+  useEffect(() => {
+    const updateHeroCollapse = () => setIsHeroCollapsed(window.scrollY >= 100);
+    updateHeroCollapse();
+    window.addEventListener("scroll", updateHeroCollapse, { passive: true });
+    return () => window.removeEventListener("scroll", updateHeroCollapse);
+  }, []);
+
   function handleFollowChange(snapshot: FollowSnapshot) {
     setIsFollowing(snapshot.following);
     setFollowersLabel(formatFollowCountLabel(snapshot.followersCount));
@@ -87,6 +99,8 @@ export default function ProfileExperience({
 
   const showLiveTab =
     profile.liveSessions.length > 0 || Boolean(profile.isLive);
+  const canFollow =
+    !isOwner && profile.source === "supabase" && isUuid(profile.id);
 
   return (
     <ProfileShell>
@@ -141,15 +155,54 @@ export default function ProfileExperience({
           ) : null}
         </section>
 
-        <ProfileTabs
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          videoCount={profile.videoTotalCount}
-          postCount={profile.posts.length}
-          articleCount={profile.articles.length}
-          liveCount={profile.liveSessions.length}
-          showLiveTab={showLiveTab}
-        />
+        <div className="sticky top-0 z-20 space-y-2 bg-[#050510]/80 py-2 backdrop-blur">
+          <div
+            className={`overflow-hidden rounded-2xl border border-white/10 bg-[#080816]/90 transition-[max-height,opacity,transform] duration-200 motion-reduce:transition-none ${
+              isHeroCollapsed
+                ? "max-h-20 translate-y-0 opacity-100"
+                : "pointer-events-none max-h-0 -translate-y-1 opacity-0"
+            }`}
+            aria-hidden={!isHeroCollapsed}
+          >
+            <div className="flex items-center gap-3 px-3 py-2.5">
+              {profile.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- public profile avatar
+                <img
+                  src={profile.avatarUrl}
+                  alt=""
+                  className="h-10 w-10 rounded-full object-cover ring-1 ring-white/15"
+                />
+              ) : (
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br text-sm font-black ${profile.avatarGradient}`}
+                >
+                  {profile.avatarInitial}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-black">{profile.displayName}</p>
+                <p className="truncate text-xs text-white/45">@{profile.username}</p>
+              </div>
+              {canFollow ? (
+                <FollowButton
+                  targetUserId={profile.id}
+                  viewerId={viewerId}
+                  initialFollowing={isFollowing}
+                  returnPath={`${APP_ROUTES.profile}/${profile.username}`}
+                  onFollowChange={handleFollowChange}
+                />
+              ) : null}
+            </div>
+          </div>
+          <ProfileTabs
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            videoCount={profile.videoTotalCount}
+            articleCount={profile.articles.length}
+            liveCount={profile.liveSessions.length}
+            showLiveTab={showLiveTab}
+          />
+        </div>
 
         {profile.statsLoadFailed ? (
           <p
@@ -168,7 +221,7 @@ export default function ProfileExperience({
         >
           {activeTab === "all" ? (
             <ProfileAllPanel
-              items={profile.registryItems ?? []}
+              cards={profile.contentCards ?? []}
               loadFailed={Boolean(profile.registryLoadFailed)}
             />
           ) : null}

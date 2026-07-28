@@ -5,8 +5,9 @@ import { buildActivityTierProgress } from "../../../lib/activity-tiers";
 import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
 import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
 import { listPublishedArticlesForUser } from "../../../lib/articles/articlesFoundation";
-import { listProfileContentRegistry } from "../../../lib/content/contentRegistry";
 import { ensureBuiltinContentAdaptersRegistered } from "../../../lib/content/runtime/registerBuiltinAdapters";
+import { mapProjectionsToContentCards } from "../../../lib/content/cards";
+import { listProfileProjections } from "../../../lib/content/services/profileProjectionService";
 import {
   getProfileContentStats,
   listProfileActiveLiveRooms,
@@ -105,7 +106,7 @@ async function resolveProfile(username: string): Promise<{
         postsPage,
         articlesPage,
         liveResult,
-        registryPage,
+        projectionPage,
       ] = await Promise.all([
         loadProfileActivityTier(row.id),
         getProfileFollowSnapshot(supabase, row.id),
@@ -116,7 +117,7 @@ async function resolveProfile(username: string): Promise<{
         listProfilePosts(supabase, row.id),
         listPublishedArticlesForUser(supabase, row.id),
         listProfileActiveLiveRooms(supabase, row.id),
-        listProfileContentRegistry(supabase, row.id, { viewerId }),
+        listProfileProjections(supabase, row.id, { viewerId }),
       ]);
 
       if (followResult.ok && followResult.missingProfile) {
@@ -124,6 +125,31 @@ async function resolveProfile(username: string): Promise<{
       }
 
       const follow = followResult.ok ? followResult : null;
+      const articleSummaryById = Object.fromEntries(
+        articlesPage.items.map((article) => [article.id, article.excerpt])
+      );
+      const durationByPostId = Object.fromEntries(
+        videoPage.videos.map((video) => [
+          String(video.postId),
+          video.durationLabel,
+        ])
+      );
+      const previewSrcBySourceId = Object.fromEntries(
+        videoPage.videos.map((video) => [String(video.postId), video.previewUrl])
+      );
+      const contentCards = mapProjectionsToContentCards(projectionPage.items, {
+        creator: {
+          id: row.id,
+          displayName:
+            row.display_name?.trim() || row.full_name?.trim() || row.username,
+          username: row.username,
+          avatarUrl: row.avatar_url,
+        },
+        layoutVariant: "profile",
+        summaryBySourceId: articleSummaryById,
+        previewSrcBySourceId,
+        durationByPostId,
+      });
 
       return {
         profile: {
@@ -139,8 +165,17 @@ async function resolveProfile(username: string): Promise<{
             postsFailed: Boolean(postsPage.failed),
             articles: articlesPage.items,
             articlesFailed: Boolean(articlesPage.failed),
-            registryItems: registryPage.items,
-            registryFailed: Boolean(registryPage.failed),
+            registryItems: projectionPage.items.map((item) => ({
+              registryId: item.registryId,
+              kind: item.kind,
+              sourceEntityId: item.sourceEntityId,
+              title: item.title,
+              href: item.href,
+              publishedAt: item.publishedAt,
+              discoveryPostId: item.discoveryPostId,
+            })),
+            contentCards,
+            registryFailed: Boolean(projectionPage.failed),
             liveRooms: liveResult.rooms,
             liveFailed: Boolean(liveResult.failed),
           }),

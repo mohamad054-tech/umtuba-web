@@ -23,6 +23,8 @@ export type ProfileContentVideo = {
   previewUrl: string | null;
   href: string;
   createdAt: string;
+  /** Null until authoritative media duration is available. */
+  durationLabel?: string | null;
 };
 
 export type ProfileContentLiveRoom = {
@@ -204,6 +206,7 @@ export async function listProfileVideos(
     previewUrl: post.video_url,
     href: `/watch?post=${post.id}`,
     createdAt: post.created_at,
+    durationLabel: null,
   }));
 
   return { videos, hasMore };
@@ -293,7 +296,7 @@ export function mapContentVideosToProfileVideos(
       title: video.title,
       viewsLabel: formatFollowCountLabel(video.views),
       likesLabel: formatFollowCountLabel(video.likes),
-      durationLabel: null,
+      durationLabel: video.durationLabel ?? null,
       href: video.href,
       previewUrl: video.previewUrl,
       gradient: palette.gradient,

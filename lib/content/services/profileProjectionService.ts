@@ -20,6 +20,7 @@ export type ProfileProjectionCard = ProfileContentCard & {
   contentKind: ContentKind;
   summary?: string | null;
   visibility: string;
+  publishState: string;
   presentationVariant: "article" | "video";
   badges: Array<"linked_article" | "generated_teaser" | "independent_video">;
 };
@@ -110,6 +111,7 @@ export function projectRegistryRowToCard(row: {
     contentKind: row.content_kind,
     summary: null,
     visibility: row.visibility,
+    publishState: row.publish_state,
     presentationVariant: row.content_kind === "article" ? "article" : "video",
     badges,
   };

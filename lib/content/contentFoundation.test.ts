@@ -93,12 +93,12 @@ describe("Unified Content Foundation V1", () => {
   it("profile All panel reads registry and keeps articles/videos tabs", () => {
     const experience = read("app/profile/ProfileExperience.tsx");
     expect(experience).toMatch(/ProfileAllPanel/);
-    expect(experience).toMatch(/registryItems/);
+    expect(experience).toMatch(/contentCards/);
     expect(experience).toMatch(/activeTab === "articles"/);
     expect(experience).toMatch(/activeTab === "videos"/);
     expect(experience).toMatch(/ProfileLinkedArticlePrompt/);
     const panel = read("app/profile/components/ProfileAllPanel.tsx");
-    expect(panel).toMatch(/dir=\{dir\}/);
+    expect(panel).toMatch(/ContentCard/);
     expect(panel).toMatch(/No published content yet/);
   });
 

@@ -17,7 +17,7 @@ export default function ProfileShell({ children }: ProfileShellProps) {
         <div className="absolute bottom-[-15%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
 
-      <AppTopNav title="Profile" subtitle="Public creator profile" />
+      <AppTopNav title="Creator Space" subtitle="Creator hub" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-1 flex-col px-3 py-3 md:px-6 md:py-6">
         {children}

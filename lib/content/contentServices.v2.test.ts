@@ -238,8 +238,10 @@ describe("Unified Content Services V2", () => {
     expect(experience).toMatch(/ProfileLinkedArticlePrompt/);
     expect(experience).toMatch(/activeTab === \"articles\"/);
     expect(experience).toMatch(/activeTab === \"videos\"/);
+    expect(experience).toMatch(/activeTab === \"about\"/);
     const panel = read("app/profile/components/ProfileAllPanel.tsx");
-    expect(panel).toMatch(/dir=\{dir\}/);
+    expect(panel).toMatch(/ContentCard/);
+    expect(panel).toMatch(/cards: ContentCardViewModel\[\]/);
     expect(existsSync(join(ROOT, "app/lib/nav/creatorProfileArticleDeeplink.test.ts"))).toBe(
       true
     );

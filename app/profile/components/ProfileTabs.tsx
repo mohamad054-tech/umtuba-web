@@ -6,13 +6,15 @@ export type ProfileTabId =
   | "videos"
   | "articles"
   | "about"
-  | "live";
+  | "live"
+  | "courses"
+  | "products"
+  | "photos";
 
 type ProfileTabsProps = {
   activeTab: ProfileTabId;
   onChange: (tab: ProfileTabId) => void;
   videoCount: number;
-  postCount: number;
   articleCount: number;
   liveCount: number;
   showLiveTab: boolean;
@@ -20,7 +22,6 @@ type ProfileTabsProps = {
 
 const BASE_TABS: { id: ProfileTabId; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "posts", label: "Posts" },
   { id: "videos", label: "Videos" },
   { id: "articles", label: "Articles" },
   { id: "about", label: "About" },
@@ -30,20 +31,19 @@ export default function ProfileTabs({
   activeTab,
   onChange,
   videoCount,
-  postCount,
   articleCount,
   liveCount,
   showLiveTab,
 }: ProfileTabsProps) {
   const tabs = showLiveTab
-    ? [...BASE_TABS.slice(0, 4), { id: "live" as const, label: "Live" }, BASE_TABS[4]!]
+    ? [...BASE_TABS, { id: "live" as const, label: "Live" }]
     : BASE_TABS;
 
   return (
     <div
       role="tablist"
       aria-label="Profile sections"
-      className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.03] p-1 backdrop-blur-sm"
+      className="sticky top-0 z-20 flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur"
       onKeyDown={(event) => {
         const currentIndex = tabs.findIndex((tab) => tab.id === activeTab);
         if (currentIndex < 0) return;
@@ -60,9 +60,7 @@ export default function ProfileTabs({
         const count =
           tab.id === "videos"
             ? videoCount
-            : tab.id === "posts"
-              ? postCount
-              : tab.id === "articles"
+            : tab.id === "articles"
                 ? articleCount
                 : tab.id === "live"
                   ? liveCount
