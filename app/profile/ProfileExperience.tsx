@@ -33,6 +33,10 @@ import {
   getVisibleProfileTabs,
   resolveActiveProfileTab,
 } from "./lib/profileTabs";
+import {
+  countProfileCourses,
+  countProfileProducts,
+} from "./lib/profileCoursesProductsStructure";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -52,9 +56,9 @@ export default function ProfileExperience({
     () => countProfilePhotos(profile.posts),
     [profile.posts]
   );
-  /** Stub readiness — catalog counts land when domain projections exist. */
-  const courseCount = 0;
-  const productCount = 0;
+  /** Courses / Products Structure V1 — counts from view-model previews. */
+  const courseCount = countProfileCourses(profile.courses);
+  const productCount = countProfileProducts(profile.products);
 
   const visibleTabs = useMemo(
     () =>
@@ -71,6 +75,8 @@ export default function ProfileExperience({
       isOwner,
       profile.articles.length,
       profile.videoTotalCount,
+      courseCount,
+      productCount,
       photoCount,
       showLiveTab,
     ]
@@ -262,10 +268,16 @@ export default function ProfileExperience({
             />
           ) : null}
           {activeTab === "courses" ? (
-            <ProfileCoursesPanel isOwner={isOwner} />
+            <ProfileCoursesPanel
+              courses={profile.courses}
+              isOwner={isOwner}
+            />
           ) : null}
           {activeTab === "products" ? (
-            <ProfileProductsPanel isOwner={isOwner} />
+            <ProfileProductsPanel
+              products={profile.products}
+              isOwner={isOwner}
+            />
           ) : null}
           {activeTab === "photos" ? (
             <ProfilePhotosPanel

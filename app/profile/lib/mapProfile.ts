@@ -47,6 +47,8 @@ export type ProfileContentBundle = {
   registryItems?: import("../../../lib/content/contentRegistry").ProfileContentCard[];
   contentCards?: import("../../../lib/content/cards").ContentCardViewModel[];
   pinnedContentCards?: import("../../../lib/content/cards").ContentCardViewModel[];
+  courses?: import("../types").ProfileCoursePreview[];
+  products?: import("../types").ProfileProductPreview[];
   registryFailed?: boolean;
   liveRooms?: ProfileContentLiveRoom[];
   liveFailed?: boolean;
@@ -116,6 +118,8 @@ export function profileRowToView(
     registryItems: content?.registryItems ?? [],
     contentCards: content?.contentCards ?? [],
     pinnedContentCards: content?.pinnedContentCards ?? [],
+    courses: content?.courses ?? [],
+    products: content?.products ?? [],
     registryLoadFailed: Boolean(content?.registryFailed),
     liveSessions,
     hasMoreVideos: Boolean(content?.hasMoreVideos),
@@ -161,6 +165,8 @@ export function mockProfileToView(profile: MockProfile): ProfileView {
     registryItems: [],
     contentCards: profile.contentCards ?? [],
     pinnedContentCards: profile.pinnedContentCards ?? [],
+    courses: profile.courses ?? [],
+    products: profile.products ?? [],
     liveSessions: profile.liveSessions,
     about: profile.about,
   };

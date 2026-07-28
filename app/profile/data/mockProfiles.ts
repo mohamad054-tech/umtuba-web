@@ -189,6 +189,42 @@ export const MOCK_PROFILES: MockProfile[] = [
         pinned: true,
       }),
     ],
+    courses: [
+      {
+        id: "course-lina-light",
+        title: "Documentary light foundations",
+        levelLabel: "Beginner",
+        lessonCountLabel: "12 lessons",
+        href: "/learning/catalog/documentary-light-foundations",
+        coverGradient: "from-[#1a1040] via-[#0c1a3a] to-[#061820]",
+      },
+      {
+        id: "course-lina-street",
+        title: "Street narrative cuts",
+        levelLabel: "Intermediate",
+        lessonCountLabel: "8 lessons",
+        href: "/learning/catalog/street-narrative-cuts",
+        coverGradient: "from-[#101828] via-[#0c1420] to-[#081410]",
+      },
+    ],
+    products: [
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        title: "Field light preset pack",
+        priceLabel: "$24",
+        href: "/store/products/11111111-1111-4111-8111-111111111111",
+        coverGradient: "from-[#2a1808] via-[#1a1410] to-[#081018]",
+        storeBadge: "Store",
+      },
+      {
+        id: "22222222-2222-4222-8222-222222222222",
+        title: "City morning LUT kit",
+        priceLabel: "$18",
+        href: "/store/products/22222222-2222-4222-8222-222222222222",
+        coverGradient: "from-[#0a1828] via-[#0c1020] to-[#180a18]",
+        storeBadge: "Store",
+      },
+    ],
   },
   {
     id: "c-omar",

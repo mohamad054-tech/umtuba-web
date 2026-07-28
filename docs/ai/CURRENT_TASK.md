@@ -2,7 +2,7 @@
 
 ## Task title
 
-Pinned Content Structure V1
+Courses / Products Panel Structure V1
 
 ## Status
 
@@ -10,40 +10,35 @@ Pinned Content Structure V1
 
 ## Branch / sync
 
-- **Branch:** `office/profile-pinned-content-structure-v1`
-- **Base:** `25cbed823f653f06158f4ae63b5ff540560a3394` (`feat(web): add profile about live structure v1`)
+- **Branch:** `office/profile-courses-products-structure-v1`
+- **Base:** `faf5a0954ff10055aa90644b516019588d2a32d3` (`feat(web): add profile pinned content structure v1`)
 - **Checkout:** feature branch (not merged)
 
 ## What was implemented
 
-- Pinned rail above All tab (Creator Space §8) — soft cap 1–3.
-- Empty pins → rail fully hidden (no empty header).
-- Pinned items excluded from All chronology.
-- Pure helpers in `app/profile/lib/profilePinnedContentStructure.ts`.
-- Optional `pinnedContentCards` on ProfileView; production defaults empty (no migration/backend).
-- Dev mock pins on `lina.creates` for structure demo.
+- Courses panel structured cards (§11): cover, title, level, CTA → Learning catalog href.
+- Products panel structured cards (§12): cover, title, price, CTA → store product href.
+- View-model `courses` / `products` + normalize/count helpers for tab visibility.
+- Production defaults empty arrays (no catalog backend); mock data on `lina.creates`.
 
 ## Exact files changed
 
-- `app/profile/lib/profilePinnedContentStructure.ts` (new)
-- `app/profile/components/ProfilePinnedRail.tsx` (new)
-- `app/profile/components/ProfileAllPanel.tsx`
-- `app/profile/components/index.ts`
+- `app/profile/lib/profileCoursesProductsStructure.ts` (new)
+- `app/profile/components/ProfileCoursesPanel.tsx`
+- `app/profile/components/ProfileProductsPanel.tsx`
 - `app/profile/ProfileExperience.tsx`
 - `app/profile/types.ts`
 - `app/profile/lib/mapProfile.ts`
 - `app/profile/data/mockProfiles.ts`
-- `lib/content/profilePinnedContentStructure.v1.test.ts` (new)
+- `lib/content/profileCoursesProductsStructure.v1.test.ts` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope (unchanged)
 
-- Migrations / new tables / pin persistence
-- Owner pin management UI
-- Home feed / DiscoverExperience / Watch player
-- Courses / Products catalog UIs
-- Content-flow policy
+- Migrations / catalog domain / LMS embed / checkout
+- Instructor / Seller dashboards
+- Home / Watch / Photos lightbox / Motion·a11y
 - Commit / Push without explicit GO
 
 ## Hard lock

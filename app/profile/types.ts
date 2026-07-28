@@ -76,6 +76,28 @@ export type ProfilePost = {
   createdAt: string;
 };
 
+/** Courses tab structure (Creator Space §11) — readiness only. */
+export type ProfileCoursePreview = {
+  id: string;
+  title: string;
+  levelLabel: string;
+  href: string;
+  coverGradient: string;
+  coverUrl?: string | null;
+  lessonCountLabel?: string;
+};
+
+/** Products tab structure (Creator Space §12) — readiness only. */
+export type ProfileProductPreview = {
+  id: string;
+  title: string;
+  priceLabel: string;
+  href: string;
+  coverGradient: string;
+  coverUrl?: string | null;
+  storeBadge?: string;
+};
+
 /** Local mock profile shape used only as a development fallback. */
 export type MockProfile = {
   id: string;
@@ -100,6 +122,8 @@ export type MockProfile = {
   contentCards?: ContentCardViewModel[];
   /** Explicit pins (1–3 soft cap) — structure readiness only. */
   pinnedContentCards?: ContentCardViewModel[];
+  courses?: ProfileCoursePreview[];
+  products?: ProfileProductPreview[];
 };
 
 /** Unified view model for real Supabase profiles and development mocks. */
@@ -128,6 +152,12 @@ export type ProfileView = {
   articles: ProfileArticle[];
   liveSessions: ProfileLivePreview[];
   about: ProfileAbout;
+  /**
+   * Courses / Products Panel Structure V1 — optional previews (no catalog backend).
+   * Empty → owner still sees tab; visitors rely on tab visibility counts.
+   */
+  courses?: ProfileCoursePreview[];
+  products?: ProfileProductPreview[];
   /** Authentic activity tier — separate from UM Points wallet. */
   activityTier?: ActivityTierProgress | null;
   /** True when more videos exist beyond the initial page. */
