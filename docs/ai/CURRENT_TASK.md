@@ -2,7 +2,7 @@
 
 ## Task title
 
-Platform Navigation Mobile World Affordance Decision V1
+Platform Navigation Content-flow Policy Decision V1
 
 ## Status
 
@@ -10,37 +10,35 @@ Platform Navigation Mobile World Affordance Decision V1
 
 ## Branch / sync
 
-- **Branch:** `office/platform-navigation-mobile-world-affordance-decision-v1`
-- **Base:** `63896af99a28667461521e3b96e0d37071f4d3c3` (`alpha-0.2`)
+- **Branch:** `office/platform-navigation-content-flow-policy-decision-v1`
+- **Base:** `f72c35e72a374e8b7b71a287ce11e5f3de060504` (`alpha-0.2`)
 - **Checkout:** feature branch (not merged)
 
 ## Product decision (frozen)
 
-- **World** remains in **Desktop primary**.
-- **World** is **not** in **Mobile bottom primary**.
-- Mobile reachability: Home circles + direct `/world` links (circles layout unchanged).
-- **Store** and **Watch** are **not** Mobile primary tabs.
-- Revisiting requires a **separate Product GO**.
-
-Docs + contract tests only — no visual/route behavior changes; Mobile bottom nav items unchanged.
+- **Preferred Flow:** Home → Creator Space → Content
+- **Allowed Shortcuts:** current direct Home→content (and related deep links) remain temporarily — not a policy breach
+- Policy is **architectural guidance only** — no Home/CTA/route behavior changes this phase
+- Any real Home funnel change needs **Product GO** + **explicit Home unlock**
+- No new redirects; `buildPostNotificationHref` unchanged
 
 ## Verification
 
 - **PASS** (in-scope)
 - In-scope Vitest: PASS
-- Full Vitest: 2720 passed; **3 Store failures pre-existing / out of scope**
+- Full Vitest: 2725 passed; **3 Store failures pre-existing / out of scope**
 - `npx tsc --noEmit`: **FAIL pre-existing / out of scope** — `lib/content/profilePinnedContentStructure.v1.test.ts` (`../cards`)
 - `npm run build`: PASS
 - `git diff --check`: PASS
 
 ## Forbidden scope
 
-- Home / circles layout / Desktop primary changes / adding World|Store|Watch to mobile bottom nav
-- Content-flow / Store Domain
+- Home feed / swipe / ranking / player / circles / CTA changes
+- Creator Space UI / Store Domain / Mobile primary / Advertise-Admin Store
 - Commit / Push / Merge without explicit GO
 
 ## Next step
 
 Await explicit **commit GO** (manual Terminal commit if Agent trailers apply).
 
-**Proposed next feature (not started):** Content-flow Policy Decision V1 (Home → Creator Space preferred article path) — requires explicit Product GO; Home remains locked until then. No execution started.
+**Proposed next (not started):** Platform Navigation track decisions under Home lock are complete. Next product pick among: (1) Content-flow Home Implementation V1 after Home unlock GO, or (2) Advertise Hide Policy Decision V1 (no Home changes). No execution started.

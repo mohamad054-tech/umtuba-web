@@ -87,6 +87,16 @@ export {
 } from "./mobileWorldAffordanceContract";
 
 export {
+  CONTENT_FLOW_ALLOWED_SHORTCUTS,
+  CONTENT_FLOW_PATHS,
+  CONTENT_FLOW_PREFERRED_STEPS,
+  CONTENT_FLOW_SURFACE_ROLES,
+  assertContentFlowPolicyDecision,
+  buildPreferredCreatorSpaceArticleHref,
+  type ContentFlowPreferredStep,
+} from "./contentFlowPolicyContract";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,

@@ -123,6 +123,22 @@ Contract: `app/lib/nav/secondarySurfaceContract.ts` — forbidden in desktop pri
 
 Revisiting World (or Store/Watch) on Mobile primary requires a **separate Product GO**.
 
+### 2.8 Content-flow Policy Decision V1
+
+Architectural policy only — **no Home / CTA / route execution changes** in this phase.
+
+| Concept | Definition |
+| --- | --- |
+| **Preferred Flow** | Home (Discovery) → Creator Space (`/profile/[username]`, optional `?article=`) → Content Destination |
+| **Allowed Shortcut** | Temporary direct Home → Content (or other deep links) that may skip Creator Space |
+| **Home** | Discovery Layer (`/`) |
+| **Creator Space** | Creator Hub (`/profile/[username]`) |
+| **Full content** | Destination (e.g. `/articles/[id]`, `/watch?post=`) |
+
+**Decision:** Preferred Flow is the platform intent. Current Allowed Shortcuts remain until a **separate Product GO** plus **explicit Home unlock**. Do not delete deep links; do not change `buildPostNotificationHref` or invent redirects in this phase.
+
+Code: `app/lib/nav/contentFlowPolicyContract.ts`
+
 ---
 
 ## 3. Role journeys (chrome reality)
@@ -162,7 +178,7 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 ## 6. Explicit non-goals (later phases)
 
 1. UserMenu capability gating (Instructor / Admin / hide Seller) — done in Capability Links V1
-2. Content-flow policy (Home → Profile preferred article path)
+2. Content-flow policy (Home → Profile preferred article path) — **decision documented** in Content-flow Policy Decision V1; Home funnel **implementation** still blocked until Product GO + Home unlock
 3. Adding Store/World/Watch to mobile primary — **blocked pending separate Product GO** (Mobile World Affordance Decision V1 keeps current asymmetry)
 4. Home feed / circles layout / player changes
 5. Store Domain implementation on laptop while desktop owns Store
@@ -171,11 +187,12 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 7. Verification
 
-Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 + Mobile World Affordance Decision V1 verified by:
+Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 + Mobile World Affordance Decision V1 + Content-flow Policy Decision V1 verified by:
 
 - `app/lib/nav/platformNavContract.test.ts`
 - `app/lib/nav/deepLinkAliasContract.test.ts`
 - `app/lib/nav/secondarySurfaceContract.test.ts`
 - `app/lib/nav/mobileWorldAffordanceContract.test.ts`
+- `app/lib/nav/contentFlowPolicyContract.test.ts`
 - Existing `shellCoherence`, `mobileNav`, `userMenuItems`, `pageAssembly` tests
 - `lib/supabase/redirect.test.ts` for `?next=` safety + Discover default
