@@ -303,14 +303,16 @@ Avoid converting full Content pages (article, course player, PDP, live room) int
 
 ## 14. Current navigation audit (snapshot)
 
+> **Contract Sync V1:** Official frozen contracts live in `PLATFORM_NAVIGATION_ARCHITECTURE_V1.md`. Discover is **not** a primary nav label.
+
 | Layer | Source | Destinations |
 | --- | --- | --- |
-| Desktop top | `AppTopNav` + `APP_NAV_ITEMS` | Home, Discover, World, Learning, Live, Messages (+ Search) |
-| Mobile bottom | `MOBILE_PRIMARY_NAV_ITEMS` | Home, Discover, Live, Messages, Profile |
+| Desktop top | `AppTopNav` + `APP_NAV_ITEMS` | Home, World, Learning, Live, Messages (+ Search) |
+| Mobile bottom | `MOBILE_PRIMARY_NAV_ITEMS` | Home, Live, Messages, Profile |
 | User menu | `userMenuItems.ts` | Profile, Saved, Learning, Rewards, Notifications, Settings, Store, Seller, Wishlist, Advertise |
 | Home circles | `HomeSectionCircles` | Learning, Store, Games, Live, World, Search, Messages, Create |
 
-**Discover quirk:** Listed in primary nav but active highlight is forced onto Home (`isNavActive` / `isMobilePrimaryNavActive` return false for Discover). Route redirects to `/`.
+**Discover alias:** `/discover` forever redirects to `/` with query preserved. Desktop/mobile **Home** stays active for `/discover` paths. Discover must not reappear as a primary chrome label.
 
 ---
 

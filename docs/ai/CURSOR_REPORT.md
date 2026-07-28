@@ -1,22 +1,35 @@
-# CURSOR_REPORT
+﻿# CURSOR_REPORT
 
 ## Summary
 
-**Creator Space Motion / A11y Pass V1 implemented (Profile only).** Page enter, hero collapse, sticky compact header, tab cross-fade, light card hover, live badge polite pulse with reduced-motion guards, and tablist a11y (Home/End, focus move, 44px targets). No Home/Watch/Store changes. Verification PASS for in-scope checks; Commit / Push / Merge **not** performed.
+**Platform Navigation Contract Sync V1** — official chrome contracts frozen (desktop, mobile, circles entry ramps, user menu, Discover→Home alias, profile resolver, auth `?next=` via `getSafeRedirectPath`). UNIFIED §14 drift fixed (Discover is not a primary label). No Home UI or Store Domain changes. **Verification PASS** (in-scope). Commit / Push / Merge **not** performed.
 
 ## Exact files changed
 
-- `app/profile/lib/profileMotionA11y.ts` (new)
-- `app/profile/ProfileExperience.tsx`
-- `app/profile/components/ProfileHeader.tsx`
-- `app/profile/components/ProfileTabs.tsx`
-- `app/profile/components/ProfileLiveBadge.tsx`
-- `app/profile/components/ProfileCoursesPanel.tsx`
-- `app/profile/components/ProfileProductsPanel.tsx`
-- `app/globals.css`
-- `lib/content/profileMotionA11y.v1.test.ts` (new)
+- `docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md` (new)
+- `docs/architecture/UNIFIED_EXPERIENCE_PAGE_CONSOLIDATION_V1.md` (§14 drift fix)
+- `app/lib/nav/platformNavContract.ts` (new)
+- `app/lib/nav/platformNavContract.test.ts` (new)
+- `app/lib/nav/index.ts`
+- `app/lib/nav/routes.ts` (contract comment)
+- `app/lib/nav/mobileNav.ts` (contract comment)
+- `app/lib/nav/shellCoherence.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+
+## Contracts frozen
+
+- Desktop primary: Home · World · Learning · Live · Messages (no Discover label)
+- Mobile primary: Home · Live · Messages · Profile
+- Home circles entry ramps order (layout unchanged)
+- User menu You + Account structure (no capability gating)
+- `/discover` forever alias to `/` with Home active highlight
+- `/profile` resolver contract
+- Auth `?next=` default `/discover` via `getSafeRedirectPath`
+
+## Drift corrected
+
+- UNIFIED §14 previously listed Discover in desktop/mobile primary nav; corrected to match code (alias only).
 
 ## Migrations created
 
@@ -24,26 +37,37 @@ None.
 
 ## Security review
 
-Not applicable beyond a11y announcements — no data access changes.
+- No Store Domain edits.
+- No Home feed/player/swipe/circles layout edits.
+- Admin/Store absent from primary chrome contracts.
+- Open-redirect protections on `getSafeRedirectPath` unchanged.
 
 ## Tests
 
-- In-scope: **PASS** (profile motion + related structure suites).
-- Full suite: 2691 passed · 3 failed (pre-existing Store only).
+- In-scope Vitest: **PASS**
+- Full Vitest: **2699 passed**, **3 failed** — pre-existing Store Domain only:
+  - `lib/store/paymentOutcomeSync.test.ts` (1)
+  - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS**
+- `npx tsc --noEmit`: **FAIL** pre-existing / out of scope — `lib/content/profilePinnedContentStructure.v1.test.ts` cannot resolve `../cards` (same without this branch’s changes).
+- `npm run build` TypeScript phase: **PASS**
 
 ## Build
 
-`npm run build` — **PASS**
+**PASS**
 
 ## git diff --check
 
 **PASS**
 
+## git status --short
+
+Pending stage for manual commit.
+
 ## Open issues
 
-- **Commit / Push / Merge not authorized** (prefer manual Terminal commit to avoid Agent trailers).
-- Pre-existing Store Vitest failures remain out of scope.
+- Await explicit commit GO (manual Terminal; no Git trailers).
+- Pre-existing Store Vitest failures and pinned-content `tsc` import remain out of scope.
+- **Proposed next feature (not started):** UserMenu Capability Links V1

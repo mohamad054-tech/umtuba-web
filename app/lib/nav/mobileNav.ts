@@ -2,6 +2,8 @@ import { APP_ROUTES, buildCreatorProfileHref } from "./routes";
 
 /**
  * Mobile primary destinations (bottom nav).
+ * Platform Navigation Contract Sync V1: Home, Live, Messages, Profile.
+ * Discover is not a mobile tab — `/discover` aliases Home active state only.
  * Visible below the `sm` breakpoint (max-width: 639px), matching AppTopNav
  * which reveals its primary links from `sm` upward — avoids duplicate bars.
  */

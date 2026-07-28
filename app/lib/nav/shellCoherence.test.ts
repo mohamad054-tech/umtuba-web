@@ -18,6 +18,11 @@ describe("shell coherence", () => {
       "Live",
       "Messages",
     ]);
+    // Contract Sync V1: Discover is a Home alias route, not a primary label.
+    expect(APP_NAV_ITEMS.some((i) => i.label === "Discover")).toBe(false);
+    expect(APP_NAV_ITEMS.some((i) => i.href === APP_ROUTES.discover)).toBe(
+      false
+    );
   });
 
   it("AppTopNav is the shared shell chrome", () => {

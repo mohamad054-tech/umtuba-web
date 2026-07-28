@@ -1,8 +1,8 @@
-# Current Task
+﻿# Current Task
 
 ## Task title
 
-Creator Space Motion / A11y Pass V1
+Platform Navigation Contract Sync V1
 
 ## Status
 
@@ -10,25 +10,37 @@ Creator Space Motion / A11y Pass V1
 
 ## Branch / sync
 
-- **Branch:** `office/profile-motion-a11y-pass-v1`
-- **Base:** `230b1b4f3a63b55d1e4401d3d8846ce328517078`
+- **Branch:** `office/platform-navigation-contract-sync-v1`
+- **Base:** `c28f8d8d177632248f9022c97fd0448107247591` (`alpha-0.2`)
 - **Checkout:** feature branch (not merged)
 
 ## What was implemented
 
-- Page enter fade/rise on Profile hero shell.
-- Hero collapse at 96px scroll + compressed cover/avatar; sticky compact header retained.
-- Tab panel cross-fade on tab change; sticky tablist with Home/End + focus move; ≥44px targets.
-- Live badge polite `aria-live` + pulse disabled under reduced motion.
-- Light card hover brightness on Courses/Products with reduced-motion guards.
-- Keyframes in `globals.css` scoped to Profile motion names.
+- Official architecture doc: `docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md`
+- Frozen contract module + tests: `app/lib/nav/platformNavContract.ts` (+ `.test.ts`)
+- Doc drift fix: UNIFIED §14 — Discover is **not** a primary nav label (alias only)
+- Contract comments on desktop/mobile nav sources; shellCoherence asserts no Discover label
+- Frozen contracts: desktop primary, mobile primary, Home circles entry ramps, user menu, `/discover`→`/` alias, `/profile` resolver, auth `?next=` default via `getSafeRedirectPath`
+
+## Verification
+
+- **PASS** (in-scope)
+- In-scope Vitest: PASS
+- Full Vitest: 2699 passed; **3 Store failures pre-existing / out of scope**
+- `npx tsc --noEmit`: **FAIL pre-existing / out of scope** — `lib/content/profilePinnedContentStructure.v1.test.ts` (`../cards`)
+- `npm run build`: PASS
+- `git diff --check`: PASS
 
 ## Forbidden scope
 
-- Home / Watch / swipe / Store domain
-- Migrations / catalog persistence / content-flow policy
-- Commit / Push without explicit GO
+- Home feed / swipe / ranking / player / circles layout
+- Primary nav destination add/remove
+- Role gating / UserMenu Capability Links (not started)
+- Store Domain
+- Commit / Push / Merge without explicit GO
 
 ## Next step
 
 Await explicit **commit GO** (manual Terminal commit if Agent trailers apply).
+
+**Proposed next feature (not started):** UserMenu Capability Links V1
