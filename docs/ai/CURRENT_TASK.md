@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce End-to-End Beta Readiness V1
+UMTUBA AI Core Platform Foundation V1
 
 ## Status
 
@@ -10,21 +10,16 @@ Commerce End-to-End Beta Readiness V1
 
 ## Branch
 
-`office/commerce-end-to-end-beta-readiness-v1`
+`office/ai-core-platform-foundation-v1`
 
 ## Base
 
-Trusted marketplace eligibility commit `6ed5eb611f044571ad8b6f32b8a10201c56f9df0`
-Parent branch: `office/commerce-marketplace-eligibility-listing-storefront-v1`
+Trusted Commerce beta readiness commit `6cbe0f68f418141ac887c99bf40e21eb1d0d27de`
 
 ## Deliverable
 
-Stabilize implemented Commerce only: verify customer + seller end-to-end paths, fix small defects (routes, nav, states, auth/RLS usage, money/trading/marketplace/inventory/provenance/UI), run Commerce test suites + tsc + production build, deliver Beta Readiness Report. No Shipping Network, Payment Provider, Warehouse Runtime, Payouts, Settlement UI, or Analytics Warehouse. No frozen Commerce architecture edits. No new product domains.
-
-## Out of scope
-
-New major Commerce features; architecture redesign; payment/warehouse/shipping/payouts.
+Shared server-side AI Core Platform: gateway, provider/model registry, router, prompt versioning, context envelope, permission-aware tools, run lifecycle, usage/cost, tracing/audit, safety/policy, session boundary, memory interface, evaluation hooks, admin diagnostics, and one Product Draft Assistant reference consumer. No broad agents. No frozen Commerce/Learning architecture edits. Migrations local-only until explicitly approved.
 
 ## Result
 
-**Ready for Beta** at **90%** (implemented scope). Report: `docs/ai/CURSOR_REPORT.md`. Residual: wishlist/id-PDP listing provenance; payment/shipping deferred.
+Complete. Report: `docs/ai/CURSOR_REPORT.md`. Migration `20260871` not remote-applied.

@@ -1,0 +1,100 @@
+import {
+  describeAiConfigStatus,
+  loadAiPlatformConfig,
+} from "./config";
+import { listPromptDefinitions } from "./prompts/registry";
+import { buildProviderRegistry, listAvailableModels } from "./providers/registry";
+import { listTools } from "./tools/registry";
+import { summarizeRunFailures, listRecentRuns } from "./lifecycle";
+import { summarizeUsage } from "./usage";
+import { countTraceEventsByType } from "./tracing";
+import { ensureAiReferenceToolsInstalled } from "./productDraftAssistant";
+
+export type AiPlatformDiagnostics = {
+  config: ReturnType<typeof describeAiConfigStatus>;
+  providers: Array<{
+    providerId: string;
+    available: boolean;
+    models: Array<{ modelId: string; available: boolean }>;
+  }>;
+  availableModelCount: number;
+  prompts: Array<{
+    promptId: string;
+    version: string;
+    status: string;
+    capabilityId: string;
+  }>;
+  tools: Array<{
+    toolId: string;
+    available: boolean;
+    mutating: boolean;
+    domainOwner: string;
+  }>;
+  recentRuns: Array<{
+    id: string;
+    capabilityId: string;
+    status: string;
+    providerId: string | null;
+    modelId: string | null;
+    startedAt: string;
+    errorCode: string | null;
+  }>;
+  failureCounts: ReturnType<typeof summarizeRunFailures>;
+  safetyBlocks24h: number;
+  usageSummary: ReturnType<typeof summarizeUsage>;
+  retentionNote: string;
+  costAvailabilityNote: string;
+};
+
+export function loadAiPlatformDiagnostics(): AiPlatformDiagnostics {
+  ensureAiReferenceToolsInstalled(null);
+  const config = loadAiPlatformConfig();
+  const status = describeAiConfigStatus(config);
+  const providers = buildProviderRegistry({
+    openaiConfigured: Boolean(config.openaiApiKey),
+    stubEligible: config.allowStub || config.mode === "stub",
+    openaiDefaultModel: config.openaiDefaultModel,
+    defaultTimeoutMs: config.defaultTimeoutMs,
+  });
+
+  return {
+    config: status,
+    providers: providers.map((p) => ({
+      providerId: p.providerId,
+      available: p.available,
+      models: p.models.map((m) => ({
+        modelId: m.modelId,
+        available: m.available,
+      })),
+    })),
+    availableModelCount: listAvailableModels(providers).length,
+    prompts: listPromptDefinitions().map((p) => ({
+      promptId: p.promptId,
+      version: p.version,
+      status: p.status,
+      capabilityId: String(p.capabilityId),
+    })),
+    tools: listTools().map((t) => ({
+      toolId: t.toolId,
+      available: t.available,
+      mutating: t.mutating,
+      domainOwner: t.domainOwner,
+    })),
+    recentRuns: listRecentRuns(25).map((r) => ({
+      id: r.id,
+      capabilityId: r.capabilityId,
+      status: r.status,
+      providerId: r.providerId,
+      modelId: r.modelId,
+      startedAt: r.startedAt,
+      errorCode: r.errorCode,
+    })),
+    failureCounts: summarizeRunFailures(200),
+    safetyBlocks24h: countTraceEventsByType("safety_block"),
+    usageSummary: summarizeUsage(200),
+    retentionNote:
+      "In-process run/trace/usage buffers are ephemeral until migration tables are applied. DB rows (when present) retain classification + timestamps for bounded retention.",
+    costAvailabilityNote:
+      "Cost is provider_reported, estimated, or unavailable — never fabricated.",
+  };
+}

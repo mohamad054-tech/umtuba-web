@@ -1,143 +1,67 @@
-﻿# CURSOR_REPORT — Commerce End-to-End Beta Readiness V1
+﻿# CURSOR_REPORT — UMTUBA AI Core Platform Foundation V1
 
 ## Summary
 
-Stabilized implemented Commerce only on branch `office/commerce-end-to-end-beta-readiness-v1`. Verified buyer and seller end-to-end transitions in code; fixed small nav, loading, error-surface, and marketplace UI defects. No new domains. No Shipping Network / Payment Provider / Warehouse / Payouts / Settlement UI / Analytics Warehouse. No frozen `docs/commerce/**` edits.
-
----
-
-## 1. Commerce health
-
-| Area | Status |
-| --- | --- |
-| Supplier enablement + product eligibility | Healthy (wired UI + lib) |
-| Marketplace listing → seller storefront | Healthy |
-| Listing-backed PDP resolution | Healthy (owned-first) |
-| Cart stamps seller store + listing | Healthy on storefront PDP path |
-| Checkout → order → buyer orders | Healthy in implemented stack |
-| Revenue bridge visibility | Healthy (seller dashboard bridge) |
-| Seller dashboard → products/inventory/reservations/orders/marketplace | Healthy after nav/error fixes |
-| Trading / money invariants (unit) | Healthy (tests green) |
-
-Overall: **implemented Commerce is coherent for beta** with documented residual gaps below.
-
----
-
-## 2. Broken paths found
-
-1. **Seller Marketplace “Source product” link** → seller product edit for *supplier* product ids → `notFound` (wrong ownership route).
-2. **Mojibake** success copy in marketplace client (“â€”” instead of em dash).
-3. **Seller ops nav** missing Marketplace links on Products / Inventory / Orders (and thin Marketplace page actions).
-4. **`listSellerProducts`** swallowed query errors as empty `[]` → false empty catalog / zero dashboard counts.
-5. **Seller store** had no route-level `loading.tsx`.
-6. **Dashboard product readiness** showed zeros when product load failed (no error surface).
-
-Documented, **not fixed this pass** (needs schema/product work beyond small defect):
-
-7. **Wishlist / id-based PDP** can lose listing provenance (favorites → PDP by product id may not stamp `seller_listing_id`).
-8. **Live checkout shipping quote** can fail for stores without configured shipping methods (out of Shipping Network scope; known from prior remote smoke).
-
----
-
-## 3. Fixes applied
-
-- Removed broken “Source product” edit link; keep Live PDP.
-- Fixed marketplace success string em dash.
-- Added Marketplace nav links on seller Products / Inventory / Orders; enriched Marketplace page actions (Dashboard / My products / Orders).
-- `listSellerProducts` returns `{ ok, data } | { ok: false, message }`; products page uses `StoreErrorState`.
-- Seller dashboard uses products result safely; surfaces `productError`.
-- Added `app/seller/store/loading.tsx`.
-
----
-
-## 4. Remaining blockers
-
-| Blocker | Severity | Notes |
-| --- | --- | --- |
-| Wishlist / id-PDP listing provenance | Medium | Can break marketplace cart stamp outside storefront path |
-| Payment provider | Out of scope | No live paid capture in beta without provider |
-| Shipping method coverage | Out of scope | Quote fails when store has no methods |
-| Warehouse / payouts / settlement UI | Out of scope | Explicitly deferred |
-
----
-
-## 5. Beta readiness percentage (implemented scope only)
-
-**90%**
-
-Deduction: wishlist/id-PDP provenance gap (~6%), residual empty/error polish (~2%), no fresh live paid E2E this pass (~2%). Out-of-scope payment/shipping/warehouse **not** counted against the percentage.
-
----
+Implemented the shared **AI Core Platform Foundation V1** on branch `office/ai-core-platform-foundation-v1`. One server-side gateway, provider/model registry, deterministic router, versioned prompts, trusted context envelope, permission-aware read-only tools, run lifecycle, usage/cost accounting, tracing, safety hooks, session/memory/evaluation foundations, admin diagnostics at `/admin/ai`, and Product Draft Assistant reference consumer on the seller product editor. No broad agents. No frozen Commerce/Learning architecture doc edits. Migration `20260871` local only (not remote-applied).
 
 ## Exact files changed
 
 ### Created
-- `app/seller/store/loading.tsx`
+- `lib/ai/**` (types, config, errors, context, router, gateway, lifecycle, usage, tracing, safety, session, memory, evaluation, diagnostics, productDraftAssistant, prompts, providers, tools, tests, README)
+- `supabase/migrations/20260871_ai_core_platform_foundation_v1.sql`
+- `app/actions/aiProductDraft.ts`
+- `app/components/store/ProductDraftAssistantPanel.tsx`
+- `app/admin/ai/page.tsx`
 
 ### Modified
-- `app/components/store/SellerMarketplaceClient.tsx`
-- `app/components/store/SellerDashboardInsights.tsx`
-- `app/seller/store/page.tsx`
-- `app/seller/store/products/page.tsx`
-- `app/seller/store/inventory/page.tsx`
-- `app/seller/store/orders/page.tsx`
-- `app/seller/store/marketplace/page.tsx`
-- `lib/store/sellerStore.ts`
+- `app/seller/store/products/[productId]/edit/page.tsx`
+- `app/admin/store/AdminStoreShell.tsx`
+- `app/lib/nav/routes.ts`
+- `.env.example`
+- `vitest.config.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-### Not included in commit
-Unrelated Learning / Nexus / AppTopNav / UserMenu / globals and untracked learning assets remain dirty locally and are excluded.
-
 ## Migrations created
 
-None.
+- `20260871_ai_core_platform_foundation_v1.sql` — `ai_sessions`, `ai_runs`, `ai_run_events`, `ai_usage_records`, `ai_evaluations`, `ai_memory_records` with FORCE RLS, owner select, admin select via `is_platform_admin` when present, no authenticated writes.
+- **Remote apply: NOT performed** (requires explicit approval).
 
 ## Security review
 
-- No RLS/policy changes.
-- Error surfacing for seller products reduces false-empty catalogs; no auth widening.
-- Removed dead-end seller edit link that could confuse ownership boundaries.
+- All execution server-side through gateway.
+- Provider keys server-only (`OPENAI_API_KEY`, never `NEXT_PUBLIC_*`).
+- Client cannot set system prompts, arbitrary tools, or elevate roles.
+- Mutating tools denied in V1.
+- Trace redaction for secrets / confidential fields.
+- Admin diagnostics gated by `assertPlatformAdminDb`.
+- Product draft suggestions never auto-save; cannot alter price/inventory/publish.
 
 ## Tests
 
-- `npx vitest run lib/store` → **33 files, 435 tests passed**
-- Focused commerce suites (marketplace, seller, buyer, revenue, trading, cart/checkout) included in the above — all green
+- `lib/ai/aiPlatformFoundation.test.ts` — **31 passed**
+- Existing AI tutor + seller catalog + nav smoke — **passed**
+- `npx tsc --noEmit` — **pass**
+- `npm run build` — **pass**
 
 ## TypeScript
 
-- `npx tsc --noEmit` → **pass**
+pass
 
 ## Build
 
-- `npm run build` → **pass** (`BUILD_OK`)
+pass (`BUILD_OK`), includes `/admin/ai` and seller product edit consumer.
 
 ## git diff --check
 
-- Pass on task files
+pass on task files
 
-## git status --short
+## Open issues / limitations
 
-(After commit/push — task files clean on branch; unrelated dirty tree may remain.)
-
-## Open issues
-
-- Wishlist / product-id PDP listing provenance
-- Shipping method dependency for checkout quotes (deferred)
-- Payment provider (deferred)
-
----
-
-## 9. Commit
-
-`fix(commerce): stabilize end-to-end beta readiness v1` (this branch)
-
-## 10. Push
-
-Branch push to `origin/office/commerce-end-to-end-beta-readiness-v1` only (no merge).
-
-## 11. Final recommendation
-
-**Ready for Beta** — for the *implemented* Commerce scope, with the residual blockers above tracked for a follow-up stabilization if wishlist→checkout marketplace integrity must be airtight before public beta traffic.
+- Live provider requires `OPENAI_API_KEY` + `UMTUBA_AI_MODE=live`
+- Stub mode only when explicitly allowed / test
+- DB persistence tables not yet wired as primary sink (in-process buffers + migration ready)
+- Learning AI Tutor remains a separate stub RPC conversation UX — future work should consume this gateway
+- No streaming, no autonomous agents, no customer AI billing
