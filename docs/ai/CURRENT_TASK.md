@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Cart and Checkout Experience V1
+Commerce Premium Buyer Orders Experience V1
 
 ## Status
 
@@ -10,25 +10,24 @@ Commerce Premium Cart and Checkout Experience V1
 
 ## Branch
 
-`office/commerce-premium-cart-checkout-experience-v1`
+`office/commerce-premium-buyer-orders-experience-v1`
 
 ## Base
 
-Trusted storefront commit `5e786e52a495e82255aa00230d940e6045575b73`  
-Parent branch: `office/commerce-premium-storefront-experience-foundation-v1`
+Trusted cart/checkout commit `49b2fe06ca912df840a9d1bc8856154b3e917343`  
+Parent branch: `office/commerce-premium-cart-checkout-experience-v1`
 
 ## Deliverable
 
-Premium customer Cart (`/store/cart`) and Checkout (`/store/checkout`) experience reusing existing cart/checkout/pricing/order foundations. No payment provider. No Shipping Network. No frozen Commerce architecture edits.
+Premium buyer `/store/orders` list and `/store/orders/[orderId]` detail with separated order/payment/fulfillment/delivery presentation, confirmed-only timeline, multi-seller sibling context, deferred payment recovery, and trusted cancel action. No payment provider. No Shipping Network.
 
 ## Constraints
 
-- Do not create a second cart/checkout source of truth
-- Server-authoritative totals only
-- Fail closed on stale price / availability
-- Multi-seller: group by seller; atomic multi-order policy preserved
-- No fabricated discounts/tax/shipping
+- Do not create a second order system
+- Do not fabricate tracking/carrier/ETA/money
+- Fail closed on unauthorized access (uniform not found)
+- Do not modify frozen Commerce architecture docs
 
 ## Next after this task
 
-Orders experience polish, deferred payment UX depth, or Trading-domain alignment — not another architecture document unless requested.
+Seller order ops polish, deferred payment depth, or Trading-domain alignment — not another architecture document unless requested.

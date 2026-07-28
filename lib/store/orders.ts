@@ -51,6 +51,26 @@ export type BuyerOrderListItem = {
   currency: string;
   grandTotalMinor: number;
   itemCount: number;
+  /** First few line titles for list preview (from trusted snapshots). */
+  previewTitles: string[];
+};
+
+export type BuyerSiblingOrder = {
+  id: string;
+  orderNumber: string;
+  storeName: string;
+  storeSlug: string | null;
+  grandTotalMinor: number;
+  currency: string;
+};
+
+export type BuyerPaymentAttemptSummary = {
+  id: string;
+  status: string;
+  provider: string;
+  amountMinor: number;
+  currency: string;
+  createdAt: string;
 };
 
 export type SellerOrderListItem = {
@@ -77,6 +97,10 @@ export type OrderDetailBundle = {
   billingContact: Record<string, string | null> | null;
   buyerDisplayName: string;
   canUpdate: boolean;
+  /** Other orders from the same checkout quote (buyer only; quote id never exposed). */
+  siblingOrders?: BuyerSiblingOrder[];
+  /** Buyer-owned payment attempts for this order. */
+  paymentAttempts?: BuyerPaymentAttemptSummary[];
 };
 
 const ORDER_SELECT = `
@@ -130,6 +154,30 @@ async function countItemsByOrderIds(
   return map;
 }
 
+async function previewTitlesByOrderIds(
+  supabase: AnyClient,
+  orderIds: string[]
+): Promise<Map<string, string[]>> {
+  const map = new Map<string, string[]>();
+  if (orderIds.length === 0) return map;
+  const { data, error } = await supabase
+    .from("order_items")
+    .select("order_id, title_snapshot, created_at")
+    .in("order_id", orderIds)
+    .order("created_at", { ascending: true });
+  if (error || !data) return map;
+  for (const row of data) {
+    const id = row.order_id as string;
+    const title =
+      typeof row.title_snapshot === "string" ? row.title_snapshot.trim() : "";
+    if (!title) continue;
+    const list = map.get(id) ?? [];
+    if (list.length < 3) list.push(title);
+    map.set(id, list);
+  }
+  return map;
+}
+
 export async function listBuyerOrders(
   supabase: AnyClient,
   userId: string,
@@ -166,10 +214,11 @@ export async function listBuyerOrders(
   const rows = (data ?? []) as unknown as Array<
     StoreOrderRow & { stores: { id: string; name: string; slug: string } | null }
   >;
-  const counts = await countItemsByOrderIds(
-    supabase,
-    rows.map((r) => r.id)
-  );
+  const orderIds = rows.map((r) => r.id);
+  const [counts, previews] = await Promise.all([
+    countItemsByOrderIds(supabase, orderIds),
+    previewTitlesByOrderIds(supabase, orderIds),
+  ]);
 
   return {
     ok: true,
@@ -186,6 +235,7 @@ export async function listBuyerOrders(
       currency: row.currency,
       grandTotalMinor: row.grand_total_minor,
       itemCount: counts.get(row.id) ?? 0,
+      previewTitles: previews.get(row.id) ?? [],
     })),
   };
 }
@@ -336,6 +386,57 @@ async function loadOrderDetail(
     options.mode
   );
 
+  let siblingOrders: BuyerSiblingOrder[] | undefined;
+  let paymentAttempts: BuyerPaymentAttemptSummary[] | undefined;
+
+  if (options.mode === "buyer" && options.expectBuyerId) {
+    const quoteId =
+      typeof row.checkout_quote_id === "string" ? row.checkout_quote_id : null;
+    if (quoteId) {
+      const { data: siblings } = await supabase
+        .from("orders")
+        .select(
+          "id, order_number, grand_total_minor, currency, stores!inner ( name, slug )"
+        )
+        .eq("buyer_id", options.expectBuyerId)
+        .eq("checkout_quote_id", quoteId)
+        .neq("id", orderId)
+        .order("created_at", { ascending: true });
+      siblingOrders = (siblings ?? []).map((s) => {
+        const store = s.stores as unknown as {
+          name: string;
+          slug: string;
+        } | null;
+        return {
+          id: s.id as string,
+          orderNumber: s.order_number as string,
+          storeName: store?.name ?? "Store",
+          storeSlug: store?.slug ?? null,
+          grandTotalMinor: Number(s.grand_total_minor),
+          currency: s.currency as string,
+        };
+      });
+    } else {
+      siblingOrders = [];
+    }
+
+    const { data: attempts } = await supabase
+      .from("payment_attempts")
+      .select("id, status, provider, amount_minor, currency, created_at")
+      .eq("order_id", orderId)
+      .eq("buyer_id", options.expectBuyerId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    paymentAttempts = (attempts ?? []).map((a) => ({
+      id: a.id as string,
+      status: String(a.status ?? "unknown"),
+      provider: String(a.provider ?? "none"),
+      amountMinor: Number(a.amount_minor),
+      currency: String(a.currency ?? row.currency),
+      createdAt: String(a.created_at),
+    }));
+  }
+
   return {
     ok: true,
     data: {
@@ -356,6 +457,8 @@ async function loadOrderDetail(
         Boolean(options.expectStoreId) &&
         canSellerManageOrders(options.memberRole) &&
         !isSellerTerminalOrderStatus(row.status),
+      siblingOrders,
+      paymentAttempts,
     },
   };
 }

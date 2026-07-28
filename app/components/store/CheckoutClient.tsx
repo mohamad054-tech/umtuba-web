@@ -18,7 +18,7 @@ import {
   multiSellerCheckoutNotice,
 } from "../../../lib/store/cartCheckoutPresentation";
 import { CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS } from "../../../lib/store/payments";
-import { APP_ROUTES } from "../../lib/nav";
+import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
 
@@ -255,15 +255,33 @@ export default function CheckoutClient({
               <p className="text-[var(--sf-faint)]">
                 Seller order · store {String(o.store_id).slice(0, 8)}…
               </p>
+              {typeof o.order_id === "string" ? (
+                <Link
+                  href={buildStoreOrderHref(o.order_id)}
+                  className="mt-2 inline-flex text-xs font-semibold text-[var(--sf-accent-strong)]"
+                >
+                  Open order detail →
+                </Link>
+              ) : null}
             </li>
           ))}
         </ul>
-        <Link
-          href={APP_ROUTES.storeOrders}
-          className="watch-focus-ring inline-flex rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
-        >
-          View my orders
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          {typeof orders[0]?.order_id === "string" ? (
+            <Link
+              href={buildStoreOrderHref(String(orders[0].order_id))}
+              className="watch-focus-ring inline-flex rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
+            >
+              View first order
+            </Link>
+          ) : null}
+          <Link
+            href={APP_ROUTES.storeOrders}
+            className="watch-focus-ring inline-flex rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-bold text-[var(--sf-ink)]"
+          >
+            View my orders
+          </Link>
+        </div>
       </div>
     );
   }

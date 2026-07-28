@@ -30,18 +30,40 @@ export default async function StoreOrderDetailPage({ params }: PageProps) {
   const result = await getBuyerOrderDetail(supabase, user.id, orderId);
 
   return (
-    <StoreShell title="Order" subtitle="Store" wide>
+    <StoreShell
+      title={result.ok ? result.data.order.order_number : "Order"}
+      subtitle="Store"
+      wide
+    >
       <div className="mt-4">
         <Link
           href={APP_ROUTES.storeOrders}
-          className="text-sm font-bold text-white/50 hover:text-white/80"
+          className="text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
         >
           ← Back to my orders
         </Link>
       </div>
       {!result.ok ? (
-        <div className="mt-6">
+        <div className="mt-6 space-y-4">
           <StoreErrorState message={result.message} />
+          <p className="text-sm text-[var(--sf-faint)]">
+            If this order belongs to another account, it will not be shown.
+            Continue from{" "}
+            <Link
+              href={APP_ROUTES.storeOrders}
+              className="font-semibold text-[var(--sf-accent-strong)]"
+            >
+              My orders
+            </Link>{" "}
+            or the{" "}
+            <Link
+              href={APP_ROUTES.store}
+              className="font-semibold text-[var(--sf-accent-strong)]"
+            >
+              Store
+            </Link>
+            .
+          </p>
         </div>
       ) : (
         <OrderDetailView bundle={result.data} mode="buyer" />

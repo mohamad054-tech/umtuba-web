@@ -2,22 +2,26 @@
 
 ## Summary
 
-Implemented **Commerce Premium Cart and Checkout Experience V1** on branch `office/commerce-premium-cart-checkout-experience-v1` from trusted storefront commit `5e786e52a495e82255aa00230d940e6045575b73`. Hardened `/store/cart` and `/store/checkout` with premium editorial UX continuous with storefront tokens, live price/availability integrity, multi-seller grouping, server-authoritative quote totals, deliberate checkout steps, and fail-closed submission. No payment provider. No Shipping Network. No frozen Commerce architecture document changes. No migrations. No duplicate cart/checkout system.
+Implemented **Commerce Premium Buyer Orders Experience V1** on branch `office/commerce-premium-buyer-orders-experience-v1` from trusted cart/checkout commit `49b2fe06ca912df840a9d1bc8856154b3e917343`. Hardened `/store/orders` and `/store/orders/[orderId]` with premium editorial UX, separated order/payment/fulfillment/delivery chips, confirmed-only timeline, multi-seller sibling orders (without exposing quote ids), deferred payment recovery, and trusted cancel. No payment provider. No Shipping Network. No frozen Commerce architecture edits. No migrations. No duplicate order system.
 
 ## Exact files changed
 
 ### Created
-- `lib/store/cartCheckoutPresentation.ts`
-- `lib/store/cartCheckoutExperience.test.ts`
+- `lib/store/buyerOrdersPresentation.ts`
+- `lib/store/buyerOrdersExperience.test.ts`
+- `app/components/store/BuyerDeferredPaymentRecoveryButton.tsx`
 
 ### Modified
-- `lib/store/cartRules.ts`
-- `lib/store/cart.ts`
-- `app/actions/storeCart.ts`
-- `app/components/store/CartView.tsx`
+- `lib/store/orders.ts`
+- `app/components/store/BuyerOrderList.tsx`
+- `app/components/store/OrderDetailView.tsx`
+- `app/components/store/OrderStatusBadges.tsx`
+- `app/components/store/OrderTimeline.tsx`
+- `app/components/store/BuyerCancelOrderButton.tsx`
 - `app/components/store/CheckoutClient.tsx`
-- `app/store/cart/page.tsx`
-- `app/store/checkout/page.tsx`
+- `app/store/orders/page.tsx`
+- `app/store/orders/[orderId]/page.tsx`
+- `app/store/orders/loading.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -29,18 +33,18 @@ None.
 
 ## Security review
 
-- Cart/checkout mutations remain server actions with buyer ownership checks.
-- Client money fields still rejected on quote/confirm.
-- Live price/availability enrichment is server-side; checkout blocked when blocking issues exist.
-- Payment remains deferred placeholder only — no gateway integration.
+- Buyer order list/detail remain owner-scoped; unauthorized access returns uniform “Order not found.”
+- `checkout_quote_id` still stripped from UI payload; siblings resolved server-side only.
+- Payment attempt reads use buyer_id filter; recovery uses existing deferred RPC (no charge).
+- Cancel uses existing `buyerCancelStoreOrder` server path.
 - No secrets exposed.
 
 ## Tests
 
+- `lib/store/buyerOrdersExperience.test.ts` — passed
+- `lib/store/orderManagement.test.ts` — passed
+- `lib/store/ordersFoundation.test.ts` — passed
 - `lib/store/cartCheckoutExperience.test.ts` — passed
-- `lib/store/cartFoundation.test.ts` — passed
-- `lib/store/checkoutFoundation.test.ts` — passed
-- `lib/store/commerceSafety.test.ts` — passed
 
 ## TypeScript
 
@@ -48,7 +52,7 @@ None.
 
 ## Build
 
-`npm run build` — passed (`/store/cart`, `/store/checkout` present)
+`npm run build` — passed (`/store/orders`, `/store/orders/[orderId]` present)
 
 ## git diff --check
 
@@ -56,11 +60,10 @@ Clean on task-scoped paths at commit time.
 
 ## git status --short
 
-See final report after commit/push (unrelated local learning noise excluded from commit).
+See final report after commit/push (unrelated local learning noise excluded).
 
 ## Open issues
 
-- Cart media shows public http(s) snapshots only; opaque storage keys use letter placeholders (signed media for cart lines not wired yet).
-- Separate billing address UI is honest/unavailable (billing mirrors delivery in foundation).
-- Live payment providers still deferred.
-- Quote enrichment N+1 per variant is acceptable for small carts; batch later if needed.
+- Product media thumbnails on order list use title previews only (snapshots; no signed media wiring).
+- Delivery status is derived from trusted order stamps/status only — no carrier/tracking until Shipping Network.
+- Live payment providers remain deferred.
