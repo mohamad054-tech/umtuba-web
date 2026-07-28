@@ -10,6 +10,7 @@ import {
 } from "./cartRules";
 import { deriveCartLineBlockingIssue } from "./cartCheckoutPresentation";
 import { availableUnits } from "./inventory";
+import { validateListingCartContext } from "./marketplaceEligibility";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { rejectClientCartPrice } from "./tradingContracts";
 
@@ -279,6 +280,7 @@ export async function getCartSummary(
       `
       id,
       store_id,
+      seller_listing_id,
       variant_id,
       quantity,
       unit_price_minor_snapshot,
@@ -375,54 +377,172 @@ export async function getCartSummary(
     }
   }
 
-  const lines = rows.map((row) => {
-    const store = row.stores as unknown as {
-      name: string;
-      slug?: string;
-      status?: string;
-    } | null;
-    const variantId = (row.variant_id as string | null) ?? null;
-    const live = variantId ? liveByVariant.get(variantId) : undefined;
-    const snapshotUnitPriceMinor = Number(row.unit_price_minor_snapshot);
-    const liveUnitPriceMinor = live?.unitPriceMinor ?? null;
-    const available = live?.available ?? null;
-    const priceChanged =
-      liveUnitPriceMinor != null && liveUnitPriceMinor !== snapshotUnitPriceMinor;
-    const blockingIssue = live
-      ? deriveCartLineBlockingIssue({
-          liveUnitPriceMinor,
-          snapshotUnitPriceMinor,
-          available,
-          quantity: row.quantity as number,
-          allowBackorder: live.allowBackorder,
-          productAvailable: live.productAvailable,
-          variantAvailable: live.variantAvailable,
-          storeActive: (store?.status ?? "active") === "active",
-        })
-      : variantId
-        ? "Unable to verify live availability for this item."
-        : "Variant is missing from this cart line.";
+  const lines = await Promise.all(
+    rows.map(async (row) => {
+      const store = row.stores as unknown as {
+        name: string;
+        slug?: string;
+        status?: string;
+      } | null;
+      const variantId = (row.variant_id as string | null) ?? null;
+      const sellerListingId =
+        (row.seller_listing_id as string | null | undefined) ?? null;
+      const live = variantId ? liveByVariant.get(variantId) : undefined;
+      const snapshotUnitPriceMinor = Number(row.unit_price_minor_snapshot);
+      const liveUnitPriceMinor = live?.unitPriceMinor ?? null;
+      const available = live?.available ?? null;
+      const priceChanged =
+        liveUnitPriceMinor != null &&
+        liveUnitPriceMinor !== snapshotUnitPriceMinor;
+      let blockingIssue = live
+        ? deriveCartLineBlockingIssue({
+            liveUnitPriceMinor,
+            snapshotUnitPriceMinor,
+            available,
+            quantity: row.quantity as number,
+            allowBackorder: live.allowBackorder,
+            productAvailable: live.productAvailable,
+            variantAvailable: live.variantAvailable,
+            storeActive: (store?.status ?? "active") === "active",
+          })
+        : variantId
+          ? "Unable to verify live availability for this item."
+          : "Variant is missing from this cart line.";
 
-    return {
-      id: row.id as string,
-      storeId: row.store_id as string,
-      storeName: store?.name ?? "Store",
-      storeSlug: store?.slug ?? null,
-      variantId,
-      quantity: row.quantity as number,
-      unitPriceMinor: snapshotUnitPriceMinor,
-      currency: row.currency as string,
-      productTitle: row.product_title_snapshot as string,
-      variantTitle: row.variant_title_snapshot as string,
-      mediaSnapshot: (row.media_snapshot as string | null) ?? null,
-      liveUnitPriceMinor,
-      available,
-      priceChanged,
-      blockingIssue,
-    };
-  });
+      if (!blockingIssue && sellerListingId && variantId) {
+        const listingGate = await revalidateListingCartLine(supabase, {
+          listingId: sellerListingId,
+          sellerStoreId: row.store_id as string,
+          variantId,
+        });
+        if (!listingGate.ok) {
+          blockingIssue = listingGate.message;
+        }
+      }
+
+      return {
+        id: row.id as string,
+        storeId: row.store_id as string,
+        storeName: store?.name ?? "Store",
+        storeSlug: store?.slug ?? null,
+        variantId,
+        quantity: row.quantity as number,
+        unitPriceMinor: snapshotUnitPriceMinor,
+        currency: row.currency as string,
+        productTitle: row.product_title_snapshot as string,
+        variantTitle: row.variant_title_snapshot as string,
+        mediaSnapshot: (row.media_snapshot as string | null) ?? null,
+        liveUnitPriceMinor,
+        available,
+        priceChanged,
+        blockingIssue,
+        sellerListingId,
+      };
+    })
+  );
 
   return { ok: true, data: computeCartSummary(lines) };
+}
+
+async function revalidateListingCartLine(
+  supabase: AnyClient,
+  input: { listingId: string; sellerStoreId: string; variantId: string }
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { data: listing } = await supabase
+    .from("store_seller_listings")
+    .select(
+      "id, status, seller_store_id, source_product_id, supplier_store_id"
+    )
+    .eq("id", input.listingId)
+    .maybeSingle();
+  if (!listing) {
+    return { ok: false, message: "Marketplace listing is no longer available." };
+  }
+  if (String(listing.seller_store_id) !== input.sellerStoreId) {
+    return {
+      ok: false,
+      message: "Cart listing provenance does not match the seller store.",
+    };
+  }
+
+  const { data: variant } = await supabase
+    .from("product_variants")
+    .select("product_id")
+    .eq("id", input.variantId)
+    .maybeSingle();
+  if (!variant) {
+    return { ok: false, message: "Variant is missing from this cart line." };
+  }
+
+  const { data: product } = await supabase
+    .from("store_products")
+    .select(
+      "id, status, moderation_status, marketplace_eligible, store_id, stores!inner(status, verification_status, marketplace_supplier_enabled)"
+    )
+    .eq("id", listing.source_product_id)
+    .maybeSingle();
+  if (!product) {
+    return { ok: false, message: "Supplier product is no longer available." };
+  }
+
+  const supplier = product.stores as unknown as {
+    status: string;
+    verification_status: string;
+    marketplace_supplier_enabled: boolean;
+  };
+
+  const { data: seller } = await supabase
+    .from("stores")
+    .select("id, status, verification_status")
+    .eq("id", input.sellerStoreId)
+    .maybeSingle();
+
+  const { data: price } = await supabase
+    .from("product_prices")
+    .select("amount_minor, currency")
+    .eq("variant_id", input.variantId)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const gate = validateListingCartContext({
+    listingId: input.listingId,
+    listingStatus: String(listing.status),
+    sellerStoreId: input.sellerStoreId,
+    sellerStoreStatus: seller?.status ? String(seller.status) : "inactive",
+    sellerVerificationStatus: seller?.verification_status
+      ? String(seller.verification_status)
+      : "unverified",
+    sourceProductId: String(listing.source_product_id),
+    variantProductId: String(variant.product_id),
+    supplierStoreId: String(product.store_id),
+    supplierStoreStatus: String(supplier.status),
+    supplierVerificationStatus: String(supplier.verification_status),
+    marketplaceSupplierEnabled: Boolean(supplier.marketplace_supplier_enabled),
+    marketplaceEligible: Boolean(product.marketplace_eligible),
+    productStatus: String(product.status),
+    moderationStatus: String(product.moderation_status),
+    priceAmountMinor: price ? Number(price.amount_minor) : null,
+    priceCurrency: price ? String(price.currency) : null,
+  });
+  if (!gate.ok) return gate;
+
+  const { data: allowed } = await supabase.rpc(
+    "store_listing_allows_seller_sale",
+    {
+      p_seller_store_id: input.sellerStoreId,
+      p_product_id: listing.source_product_id,
+      p_listing_id: input.listingId,
+    }
+  );
+  if (allowed !== true) {
+    return {
+      ok: false,
+      message: "Marketplace listing is no longer eligible for purchase.",
+    };
+  }
+  return { ok: true };
 }
 
 export async function addToCart(
@@ -433,6 +553,8 @@ export async function addToCart(
     quantity?: unknown;
     /** Ignored — server snapshots price. */
     clientPriceMinor?: unknown;
+    /** Required for supplier-sourced listing purchases; null/omit for owned. */
+    sellerListingId?: unknown;
   }
 ): Promise<CartActionResult<{ cartId: string; itemId: string; quantity: number }>> {
   const clientPriceGate = rejectClientCartPrice(input.clientPriceMinor);
@@ -444,11 +566,102 @@ export async function addToCart(
     return { ok: false, message: "Variant is invalid." };
   }
 
+  const listingIdRaw =
+    typeof input.sellerListingId === "string"
+      ? input.sellerListingId.trim()
+      : "";
+  const sellerListingId =
+    listingIdRaw && /^[0-9a-f-]{36}$/i.test(listingIdRaw) ? listingIdRaw : null;
+  if (listingIdRaw && !sellerListingId) {
+    return { ok: false, message: "Marketplace listing id is invalid." };
+  }
+
   const qtyParsed = validateCartQuantity(input.quantity ?? 1);
   if (!qtyParsed.ok) return qtyParsed;
 
   const offer = await loadVariantOffer(supabase, variantId);
   if (!offer.ok) return offer;
+
+  let cartStoreId = offer.data.storeId;
+  let stampedListingId: string | null = null;
+
+  if (sellerListingId) {
+    const { data: listing } = await supabase
+      .from("store_seller_listings")
+      .select(
+        "id, status, seller_store_id, source_product_id, supplier_store_id"
+      )
+      .eq("id", sellerListingId)
+      .maybeSingle();
+    if (!listing) {
+      return { ok: false, message: "Marketplace listing not found." };
+    }
+
+    const { data: seller } = await supabase
+      .from("stores")
+      .select("id, status, verification_status")
+      .eq("id", listing.seller_store_id)
+      .maybeSingle();
+    if (!seller) {
+      return { ok: false, message: "Seller store not found." };
+    }
+
+    const { data: product } = await supabase
+      .from("store_products")
+      .select(
+        "id, status, moderation_status, marketplace_eligible, store_id, stores!inner(status, verification_status, marketplace_supplier_enabled)"
+      )
+      .eq("id", listing.source_product_id)
+      .maybeSingle();
+    if (!product) {
+      return { ok: false, message: "Supplier product not found." };
+    }
+    const supplier = product.stores as unknown as {
+      status: string;
+      verification_status: string;
+      marketplace_supplier_enabled: boolean;
+    };
+
+    const listingGate = validateListingCartContext({
+      listingId: sellerListingId,
+      listingStatus: String(listing.status),
+      sellerStoreId: String(listing.seller_store_id),
+      sellerStoreStatus: String(seller.status),
+      sellerVerificationStatus: String(seller.verification_status),
+      sourceProductId: String(listing.source_product_id),
+      variantProductId: offer.data.productId,
+      supplierStoreId: String(product.store_id),
+      supplierStoreStatus: String(supplier.status),
+      supplierVerificationStatus: String(supplier.verification_status),
+      marketplaceSupplierEnabled: Boolean(
+        supplier.marketplace_supplier_enabled
+      ),
+      marketplaceEligible: Boolean(product.marketplace_eligible),
+      productStatus: String(product.status),
+      moderationStatus: String(product.moderation_status),
+      priceAmountMinor: offer.data.priceAmountMinor,
+      priceCurrency: offer.data.priceCurrency,
+    });
+    if (!listingGate.ok) return listingGate;
+
+    const { data: allowed } = await supabase.rpc(
+      "store_listing_allows_seller_sale",
+      {
+        p_seller_store_id: listing.seller_store_id,
+        p_product_id: listing.source_product_id,
+        p_listing_id: sellerListingId,
+      }
+    );
+    if (allowed !== true) {
+      return {
+        ok: false,
+        message: "Marketplace listing is not eligible for purchase.",
+      };
+    }
+
+    cartStoreId = String(listing.seller_store_id);
+    stampedListingId = sellerListingId;
+  }
 
   const currencyCheck = assertCurrenciesCompatible(null, offer.data.priceCurrency);
   if (!currencyCheck.ok) return currencyCheck;
@@ -465,10 +678,26 @@ export async function addToCart(
 
   const { data: existingItem } = await supabase
     .from("cart_items")
-    .select("id, quantity")
+    .select("id, quantity, store_id, seller_listing_id")
     .eq("cart_id", cart.data.id)
     .eq("variant_id", variantId)
     .maybeSingle();
+
+  if (existingItem) {
+    const existingListing =
+      (existingItem.seller_listing_id as string | null) ?? null;
+    const existingStore = existingItem.store_id as string;
+    if (
+      existingStore !== cartStoreId ||
+      existingListing !== stampedListingId
+    ) {
+      return {
+        ok: false,
+        message:
+          "This variant is already in your cart under a different store or listing. Remove it before adding again.",
+      };
+    }
+  }
 
   const evaluated = evaluateCartAdd({
     productStatus: offer.data.productStatus,
@@ -498,6 +727,8 @@ export async function addToCart(
         product_title_snapshot: offer.data.productTitle,
         variant_title_snapshot: offer.data.variantTitle,
         media_snapshot: offer.data.mediaSnapshot,
+        store_id: cartStoreId,
+        seller_listing_id: stampedListingId,
       })
       .eq("id", existingItem.id)
       .eq("cart_id", cart.data.id)
@@ -527,7 +758,8 @@ export async function addToCart(
       quantity: evaluated.quantity,
       unit_price_minor_snapshot: evaluated.unitPriceMinor,
       currency: evaluated.currency,
-      store_id: offer.data.storeId,
+      store_id: cartStoreId,
+      seller_listing_id: stampedListingId,
       product_title_snapshot: offer.data.productTitle,
       variant_title_snapshot: offer.data.variantTitle,
       media_snapshot: offer.data.mediaSnapshot,
@@ -541,6 +773,7 @@ export async function addToCart(
       return addToCart(supabase, userId, {
         variantId,
         quantity: qtyParsed.quantity,
+        sellerListingId: stampedListingId ?? undefined,
       });
     }
     console.error("addToCart insert", error);

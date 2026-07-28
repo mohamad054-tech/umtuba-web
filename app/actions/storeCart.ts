@@ -55,6 +55,8 @@ export async function getCartItemCountAction(): Promise<
 export async function addToCartAction(input: {
   variantId: string;
   quantity?: number;
+  /** Listing-backed PDP must pass this; owned products omit it. */
+  sellerListingId?: string | null;
 }): Promise<CartMutationResult> {
   const user = await getServerUser();
   if (!user) {
@@ -65,6 +67,7 @@ export async function addToCartAction(input: {
   const result = await addToCart(supabase, user.id, {
     variantId: input.variantId,
     quantity: input.quantity ?? 1,
+    sellerListingId: input.sellerListingId ?? undefined,
   });
 
   if (!result.ok) return result;

@@ -150,7 +150,15 @@ export default function ProductDetailClient({
       ? 99
       : Math.max(1, selected.available)
     : 1;
-  const canAdd = !!selected && inStock && price != null && !pending;
+  const purchaseBlocked =
+    detail.purchaseAllowed === false ||
+    Boolean(detail.purchaseBlockedReason);
+  const canAdd =
+    !!selected &&
+    inStock &&
+    price != null &&
+    !pending &&
+    !purchaseBlocked;
 
   return (
     <div className="mt-6">
@@ -249,8 +257,19 @@ export default function ProductDetailClient({
           </Link>
 
           <h1 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
-            {detail.product.title}
+            {detail.displayTitle?.trim() || detail.product.title}
           </h1>
+          {detail.marketplaceSourceType === "supplier_listing" ? (
+            <p
+              role="status"
+              className="mt-3 rounded-2xl border border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] px-3 py-2 text-xs leading-relaxed text-[var(--sf-accent-strong)]"
+            >
+              Sold by {detail.store.name}. Product supplied by{" "}
+              {detail.supplierStoreName ?? "a verified supplier"}. Inventory and
+              product specifications remain with the supplier; this storefront
+              does not own that stock.
+            </p>
+          ) : null}
           {detail.product.short_description ? (
             <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
               {detail.product.short_description}
@@ -293,6 +312,11 @@ export default function ProductDetailClient({
             <p className="mt-2 text-xs text-[var(--sf-faint)]">
               Purchase is closed until an active price is available for this
               variant.
+            </p>
+          ) : null}
+          {purchaseBlocked && detail.purchaseBlockedReason ? (
+            <p role="status" className="mt-2 text-xs text-[var(--sf-danger)]">
+              {detail.purchaseBlockedReason}
             </p>
           ) : null}
 
@@ -367,6 +391,7 @@ export default function ProductDetailClient({
                   const result = await addToCartAction({
                     variantId: selected.variant.id,
                     quantity,
+                    sellerListingId: detail.sellerListingId ?? null,
                   });
                   if (!result.ok) {
                     if (result.requiresAuth) {
@@ -392,7 +417,9 @@ export default function ProductDetailClient({
             >
               {pending
                 ? "Adding…"
-                : !price
+                : purchaseBlocked
+                  ? "Unavailable"
+                  : !price
                   ? "Price unavailable"
                   : !inStock
                     ? "Out of stock"

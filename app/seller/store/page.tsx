@@ -33,9 +33,13 @@ import {
   listSellerStoreReservations,
 } from "../../../lib/store/sellerInventoryQueries";
 import {
+  countListingsReferencingSupplier,
   listSellerStoreListings,
   summarizeSellerListingsForDashboard,
 } from "../../../lib/store/marketplaceSupplierSellerQueries";
+import {
+  explainMarketplaceSupplierToggle,
+} from "../../../lib/store/marketplaceEligibility";
 import {
   getOwnedOrMemberStore,
   listSellerProducts,
@@ -84,6 +88,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     fulfillmentCountsResult,
     analyticsResult,
     listingsResult,
+    supplierListingRefs,
   ] = await Promise.all([
     listSellerProducts(supabase, membership.store.id),
     listSellerOrders(supabase, membership.store.id, membership.role, {
@@ -111,6 +116,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           unavailable: true,
         }),
     listSellerStoreListings(supabase, membership.store.id),
+    countListingsReferencingSupplier(supabase, membership.store.id),
   ]);
 
   const productSnapshot = deriveProductSnapshot(products);
@@ -179,6 +185,14 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     hasPaidOrdersInWindow: (orderSnapshot?.paidOrderValueMinor ?? 0) > 0,
   });
 
+  const eligibleProductCount = products.filter(
+    (p) => Boolean(p.marketplace_eligible)
+  ).length;
+  const ineligibleProductCount = products.length - eligibleProductCount;
+  const supplierEnabled = Boolean(
+    membership.store.marketplace_supplier_enabled
+  );
+
   return (
     <SellerOpsShell title="Store dashboard" subtitle={membership.role} wide>
       <div className="mt-6">
@@ -211,6 +225,65 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           revenueBridge={revenueBridge}
         />
       </div>
+
+      <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <h2 className="sf-display text-xl font-semibold tracking-tight">
+          Marketplace supplier
+        </h2>
+        <p className="mt-2 text-sm text-[var(--sf-muted)]">
+          {explainMarketplaceSupplierToggle()}
+        </p>
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              label: "Participation",
+              value: supplierEnabled ? "Enabled" : "Paused",
+            },
+            {
+              label: "Eligible products",
+              value: String(eligibleProductCount),
+            },
+            {
+              label: "Ineligible products",
+              value: String(ineligibleProductCount),
+            },
+            {
+              label: "Active seller listings of yours",
+              value: String(supplierListingRefs.active),
+            },
+            {
+              label: "Hidden / archived refs",
+              value: String(
+                supplierListingRefs.hidden + supplierListingRefs.archived
+              ),
+            },
+          ].map((row) => (
+            <div
+              key={row.label}
+              className="rounded-2xl border border-[var(--sf-line)] bg-black/25 px-4 py-3"
+            >
+              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
+                {row.label}
+              </dt>
+              <dd className="mt-1 text-lg font-semibold text-[var(--sf-ink)]">
+                {row.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-3 text-xs text-[var(--sf-faint)]">
+          Hidden/archived listing counts stay on the seller Marketplace page.
+          Enabling participation does not mark every product eligible.
+        </p>
+        <div className="mt-4">
+          <Link
+            href={APP_ROUTES.sellerMarketplace}
+            className="text-sm font-semibold text-[var(--sf-accent-strong)] hover:underline"
+          >
+            Open marketplace workspace
+          </Link>
+        </div>
+      </section>
 
       <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <h2 className="sf-display text-xl font-semibold tracking-tight">
@@ -291,9 +364,30 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
             />
           </label>
+          {canManage ? (
+            <label className="flex items-start gap-3 rounded-2xl border border-[var(--sf-line)] bg-black/25 p-4">
+              <input
+                type="checkbox"
+                name="marketplaceSupplierEnabled"
+                defaultChecked={supplierEnabled}
+                className="mt-1 h-4 w-4 rounded border-[var(--sf-line)]"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-[var(--sf-ink)]">
+                  Enable marketplace supplier participation
+                </span>
+                <span className="mt-1 block text-xs text-[var(--sf-muted)]">
+                  Requires an active, verified store. Uncheck to pause discovery
+                  of newly eligible products. Existing seller listings may become
+                  purchase-blocked until eligibility is restored.
+                </span>
+              </span>
+            </label>
+          ) : null}
           <button
             type="submit"
-            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+            disabled={!canManage}
+            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] disabled:opacity-40"
           >
             Save changes
           </button>

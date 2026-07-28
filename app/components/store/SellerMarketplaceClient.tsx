@@ -267,10 +267,37 @@ export default function SellerMarketplaceClient({
                       )}
                     </h3>
                     <p className="mt-1 text-xs text-[var(--sf-muted)]">
-                      Status {listing.status} ֲ·{" "}
+                      Status {listing.status} ·{" "}
                       {moneyLabel(listing.priceMinor ?? null, listing.currency ?? null)}{" "}
-                      ֲ· fulfillment unresolved unless trusted fields are set
+                      · fulfillment unresolved unless trusted fields are set
                     </p>
+                    <p className="mt-2 text-xs text-[var(--sf-faint)]">
+                      Supplier participation:{" "}
+                      {listing.supplierMarketplaceEnabled ? "enabled" : "disabled"}{" "}
+                      · Product eligibility:{" "}
+                      {listing.productMarketplaceEligible
+                        ? "eligible"
+                        : "ineligible"}{" "}
+                      · Inventory:{" "}
+                      {listing.availabilityKnown
+                        ? `${listing.available ?? 0} available`
+                        : "unknown"}
+                    </p>
+                    {listing.blockingReason ? (
+                      <p
+                        role="status"
+                        className="mt-2 text-xs text-[var(--sf-danger)]"
+                      >
+                        Buyer PDP blocked: {listing.blockingReason}
+                      </p>
+                    ) : listing.buyerPdpAvailable ? (
+                      <p
+                        role="status"
+                        className="mt-2 text-xs text-[var(--sf-ok)]"
+                      >
+                        Buyer PDP available
+                      </p>
+                    ) : null}
                   </div>
                   {canManage ? (
                     <div className="flex flex-wrap gap-2">
@@ -301,6 +328,14 @@ export default function SellerMarketplaceClient({
                       >
                         Archive
                       </button>
+                      {listing.buyerPdpPath ? (
+                        <Link
+                          href={listing.buyerPdpPath}
+                          className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)]"
+                        >
+                          Live PDP
+                        </Link>
+                      ) : null}
                       {listing.sourceProductId ? (
                         <Link
                           href={buildSellerProductHref(listing.sourceProductId)}

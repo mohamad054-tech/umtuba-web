@@ -10,6 +10,7 @@ import {
   createDraftProduct,
   submitProductForReview,
   updateDraftProduct,
+  updateProductMarketplaceEligibility,
   updateProductMediaLayout,
   updateStoreBasics,
   upsertVariantPriceInventory,
@@ -52,6 +53,7 @@ export async function updateStoreAction(formData: FormData): Promise<void> {
     publicContactEmail: formData.get("publicContactEmail"),
     publicContactPhone: formData.get("publicContactPhone"),
     publicContactUrl: formData.get("publicContactUrl"),
+    marketplaceSupplierEnabled: formData.has("marketplaceSupplierEnabled"),
   });
 
   if (!result.ok) {
@@ -119,6 +121,34 @@ export async function updateDraftProductAction(formData: FormData): Promise<void
   }
   revalidatePath(`/seller/store/products/${productId}/edit`);
   revalidatePath("/seller/store/products");
+  redirect(`/seller/store/products/${productId}/edit`);
+}
+
+export async function updateProductMarketplaceEligibilityAction(
+  formData: FormData
+): Promise<void> {
+  const user = await requireUser();
+  const productId = String(formData.get("productId") || "");
+  if (!productId) {
+    redirect(`/seller/store/products?error=${encodeURIComponent("Missing product id.")}`);
+  }
+
+  const supabase = await createClient();
+  const result = await updateProductMarketplaceEligibility(
+    supabase,
+    user.id,
+    productId,
+    formData.has("marketplaceEligible")
+  );
+
+  if (!result.ok) {
+    redirect(
+      `/seller/store/products/${productId}/edit?error=${encodeURIComponent(result.message)}`
+    );
+  }
+  revalidatePath(`/seller/store/products/${productId}/edit`);
+  revalidatePath("/seller/store/products");
+  revalidatePath(APP_ROUTES.sellerMarketplace);
   redirect(`/seller/store/products/${productId}/edit`);
 }
 

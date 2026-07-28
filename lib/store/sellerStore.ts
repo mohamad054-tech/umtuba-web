@@ -123,16 +123,27 @@ export async function updateStoreBasics(
     return { ok: false, message: "Contact link must not contain spaces." };
   }
 
+  const patch: Record<string, unknown> = {
+    name,
+    description,
+    city,
+    public_contact_email: publicContactEmail,
+    public_contact_phone: publicContactPhone,
+    public_contact_url: publicContactUrl,
+  };
+
+  if (Object.prototype.hasOwnProperty.call(raw, "marketplaceSupplierEnabled")) {
+    const enabled =
+      raw.marketplaceSupplierEnabled === true ||
+      raw.marketplaceSupplierEnabled === "true" ||
+      raw.marketplaceSupplierEnabled === "on" ||
+      raw.marketplaceSupplierEnabled === "1";
+    patch.marketplace_supplier_enabled = enabled;
+  }
+
   const { data, error } = await supabase
     .from("stores")
-    .update({
-      name,
-      description,
-      city,
-      public_contact_email: publicContactEmail,
-      public_contact_phone: publicContactPhone,
-      public_contact_url: publicContactUrl,
-    })
+    .update(patch)
     .eq("id", storeId)
     .select("*")
     .single();
@@ -368,6 +379,58 @@ export async function updateDraftProduct(
       category_id: categoryId,
       is_primary: true,
     });
+  }
+
+  return { ok: true, data: data as StoreProductRow };
+}
+
+/**
+ * Toggle marketplace eligibility on a supplier-owned product.
+ * Allowed for catalog managers on any non-archived product they own.
+ * Sellers listing this product cannot call this for another store's product.
+ */
+export async function updateProductMarketplaceEligibility(
+  supabase: AnyClient,
+  userId: string,
+  productId: string,
+  marketplaceEligible: boolean
+): Promise<ActionResult<StoreProductRow>> {
+  const { data: existing } = await supabase
+    .from("store_products")
+    .select("*")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (!existing) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  const role = await getMembership(supabase, existing.store_id, userId);
+  if (!canManageCatalog(role)) {
+    return {
+      ok: false,
+      message: "You do not have permission to change marketplace eligibility.",
+    };
+  }
+
+  if (existing.status === "archived" || existing.status === "blocked") {
+    return {
+      ok: false,
+      message: "Archived or blocked products cannot be marketplace-eligible.",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("store_products")
+    .update({ marketplace_eligible: Boolean(marketplaceEligible) })
+    .eq("id", productId)
+    .eq("store_id", existing.store_id)
+    .select("*")
+    .single();
+
+  if (error || !data) {
+    console.error("updateProductMarketplaceEligibility", error);
+    return { ok: false, message: "Unable to update marketplace eligibility." };
   }
 
   return { ok: true, data: data as StoreProductRow };

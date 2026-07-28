@@ -15,6 +15,7 @@ import {
   type MarketplaceListingStatus,
   type SellerListingRow,
 } from "./marketplaceSupplierSeller";
+import { listingBuyerPdpPath } from "./marketplaceEligibility";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
 import { canManageCatalog } from "./permissions";
 import type { StoreMemberRole } from "./types";
@@ -314,15 +315,23 @@ export async function listSellerStoreListings(
   }
 
   const rows: SellerListingRow[] = [];
+  const { data: sellerStore } = await supabase
+    .from("stores")
+    .select("id, slug, status, verification_status")
+    .eq("id", sellerStoreId)
+    .maybeSingle();
+
   for (const row of data ?? []) {
     const { data: product } = await supabase
       .from("store_products")
-      .select("title, slug")
+      .select("title, slug, status, moderation_status, marketplace_eligible")
       .eq("id", row.source_product_id)
       .maybeSingle();
     const { data: supplier } = await supabase
       .from("stores")
-      .select("name, slug, status")
+      .select(
+        "name, slug, status, verification_status, marketplace_supplier_enabled"
+      )
       .eq("id", row.supplier_store_id)
       .maybeSingle();
     const offer = await enrichPriceInventory(
@@ -338,6 +347,51 @@ export async function listSellerStoreListings(
         userId: null,
       });
     }
+
+    const supplierEnabled = Boolean(supplier?.marketplace_supplier_enabled);
+    const productEligible = Boolean(product?.marketplace_eligible);
+    let blockingReason: string | null = null;
+    if (String(row.status) !== "active") {
+      blockingReason = `Listing is ${String(row.status)}.`;
+    } else if (!product) {
+      blockingReason = "Source product is missing.";
+    } else if (offer.priceMinor == null) {
+      blockingReason = "Trusted price is unavailable.";
+    } else {
+      const gate = evaluateMarketplaceEligibility({
+        productStatus: String(product.status),
+        moderationStatus: String(product.moderation_status),
+        marketplaceEligible: productEligible,
+        supplierStoreStatus: String(supplier?.status ?? "inactive"),
+        supplierVerificationStatus: String(
+          supplier?.verification_status ?? "unverified"
+        ),
+        marketplaceSupplierEnabled: supplierEnabled,
+        sellerStoreStatus: String(sellerStore?.status ?? "inactive"),
+        sellerVerificationStatus: String(
+          sellerStore?.verification_status ?? "unverified"
+        ),
+        sellerStoreId,
+        supplierStoreId: String(row.supplier_store_id),
+        priceAmountMinor: offer.priceMinor,
+        priceCurrency: offer.currency,
+      });
+      if (!gate.ok) blockingReason = gate.message;
+    }
+
+    const buyerPdpAvailable =
+      String(row.status) === "active" &&
+      !blockingReason &&
+      Boolean(sellerStore?.slug) &&
+      Boolean(product?.slug);
+    const buyerPdpPath =
+      buyerPdpAvailable && sellerStore?.slug && product?.slug
+        ? listingBuyerPdpPath({
+            sellerStoreSlug: String(sellerStore.slug),
+            productSlug: String(product.slug),
+          })
+        : null;
+
     rows.push({
       id: String(row.id),
       sellerStoreId: String(row.seller_store_id),
@@ -370,6 +424,14 @@ export async function listSellerStoreListings(
       available: offer.available,
       availabilityKnown: offer.availabilityKnown,
       coverUrl,
+      supplierMarketplaceEnabled: supplierEnabled,
+      productMarketplaceEligible: productEligible,
+      supplierStoreStatus: supplier?.status
+        ? String(supplier.status)
+        : undefined,
+      buyerPdpAvailable,
+      buyerPdpPath,
+      blockingReason,
     });
   }
 
@@ -462,6 +524,42 @@ export function summarizeSellerListingsForDashboard(listings: SellerListingRow[]
       supplierStatus: undefined,
     })),
   });
+}
+
+/** Bounded counts of other sellers’ listings that reference this supplier store’s products. */
+export async function countListingsReferencingSupplier(
+  supabase: AnyClient,
+  supplierStoreId: string
+): Promise<{ active: number; hidden: number; archived: number }> {
+  const empty = { active: 0, hidden: 0, archived: 0 };
+  if (!uuidOk(supplierStoreId)) return empty;
+  const { data, error } = await supabase
+    .from("store_seller_listings")
+    .select("status")
+    .eq("supplier_store_id", supplierStoreId)
+    .limit(500);
+  if (error || !data) return empty;
+  for (const row of data) {
+    const status = String(row.status);
+    if (status === "active") empty.active += 1;
+    else if (status === "hidden") empty.hidden += 1;
+    else if (status === "archived") empty.archived += 1;
+  }
+  return empty;
+}
+
+export async function countActiveListingsForProduct(
+  supabase: AnyClient,
+  productId: string
+): Promise<number> {
+  if (!uuidOk(productId)) return 0;
+  const { count, error } = await supabase
+    .from("store_seller_listings")
+    .select("id", { count: "exact", head: true })
+    .eq("source_product_id", productId)
+    .eq("status", "active");
+  if (error) return 0;
+  return count ?? 0;
 }
 
 export { listingDisplayTitle, sellerListingPricingControl };

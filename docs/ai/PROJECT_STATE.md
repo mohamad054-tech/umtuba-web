@@ -65,8 +65,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Trading Domain Alignment & Integrity V1 | **COMPLETE** (branch `office/commerce-trading-domain-alignment-integrity-v1`) |
 | Commerce Revenue Ledger Bridge Foundation V1 | **COMPLETE** (branch `office/commerce-revenue-ledger-bridge-foundation-v1`) |
 | Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
+| Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 
-Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Supplier→Seller landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

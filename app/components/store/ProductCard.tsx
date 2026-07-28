@@ -72,6 +72,11 @@ export default function ProductCard({
               {badge}
             </span>
           ) : null}
+          {item.marketplaceSourceType === "supplier_listing" ? (
+            <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
+              Marketplace
+            </span>
+          ) : null}
           {productType && productType !== "physical" ? (
             <span className="rounded-full border border-white/15 bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white/75 backdrop-blur-sm">
               {productType}

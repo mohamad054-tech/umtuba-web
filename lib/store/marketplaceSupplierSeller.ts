@@ -78,6 +78,13 @@ export type SellerListingRow = {
   available?: number | null;
   availabilityKnown?: boolean;
   coverUrl?: string | null;
+  /** Seller listing visibility / eligibility diagnostics */
+  supplierMarketplaceEnabled?: boolean;
+  productMarketplaceEligible?: boolean;
+  supplierStoreStatus?: string;
+  buyerPdpAvailable?: boolean;
+  buyerPdpPath?: string | null;
+  blockingReason?: string | null;
 };
 
 export type MarketplaceEligibilityInput = {

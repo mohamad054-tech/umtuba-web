@@ -18,15 +18,21 @@ import {
   sellerSeoPreview,
 } from "../../../../../../lib/store/sellerCatalogPresentation";
 import { productEditorInventoryAlignmentCopy } from "../../../../../../lib/store/sellerInventoryPresentation";
-import { getSellerProductBundle } from "../../../../../../lib/store/sellerStore";
+import { getOwnedOrMemberStore, getSellerProductBundle } from "../../../../../../lib/store/sellerStore";
 import { PRODUCT_TYPES } from "../../../../../../lib/store/types";
 import { formatMinorUnits } from "../../../../../../lib/store/money";
 import {
   archiveProductAction,
   submitProductReviewAction,
   updateDraftProductAction,
+  updateProductMarketplaceEligibilityAction,
   upsertVariantAction,
 } from "../../../../../actions/storeCatalog";
+import {
+  collectProductMarketplaceBlockers,
+  explainMarketplaceProductToggle,
+} from "../../../../../../lib/store/marketplaceEligibility";
+import { countActiveListingsForProduct } from "../../../../../../lib/store/marketplaceSupplierSellerQueries";
 
 type EditPageProps = {
   params: Promise<{ productId: string }>;
@@ -78,6 +84,28 @@ export default async function EditSellerProductPage({
       }),
     }))
   );
+
+  const membership = await getOwnedOrMemberStore(supabase, user.id);
+  const activeListingCount = await countActiveListingsForProduct(
+    supabase,
+    bundle.product.id
+  );
+  const primaryPrice = bundle.variants[0]?.price ?? null;
+  const eligibilityBlockers = collectProductMarketplaceBlockers({
+    marketplaceSupplierEnabled: Boolean(
+      membership?.store.marketplace_supplier_enabled
+    ),
+    supplierStoreStatus: membership?.store.status ?? "inactive",
+    supplierVerificationStatus:
+      membership?.store.verification_status ?? "unverified",
+    marketplaceEligible: Boolean(bundle.product.marketplace_eligible),
+    productStatus: bundle.product.status,
+    moderationStatus: bundle.product.moderation_status,
+    priceAmountMinor: primaryPrice
+      ? Number(primaryPrice.amount_minor)
+      : null,
+    priceCurrency: primaryPrice ? String(primaryPrice.currency) : null,
+  });
 
   const workflow = sellerPublishingWorkflowSteps({
     status: bundle.product.status,
@@ -292,6 +320,61 @@ export default async function EditSellerProductPage({
             </p>
           )}
         </form>
+      </section>
+
+      <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <h2 className="sf-display text-xl font-semibold tracking-tight">
+          Marketplace eligibility
+        </h2>
+        <p className="mt-2 text-sm text-[var(--sf-muted)]">
+          {explainMarketplaceProductToggle()}
+        </p>
+        <p className="mt-3 text-sm text-[var(--sf-ink)]">
+          Active seller listings referencing this product:{" "}
+          <span className="font-semibold">{activeListingCount}</span>
+        </p>
+        {eligibilityBlockers.length > 0 ? (
+          <ul className="mt-3 space-y-1 text-xs text-[var(--sf-danger)]" role="status">
+            {eligibilityBlockers.map((b) => (
+              <li key={b.code}>• {b.message}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-xs text-[var(--sf-ok)]" role="status">
+            No eligibility blockers detected for discovery gates.
+          </p>
+        )}
+        {canEditRole ? (
+          <form
+            action={updateProductMarketplaceEligibilityAction}
+            className="mt-4 space-y-3"
+          >
+            <input type="hidden" name="productId" value={bundle.product.id} />
+            <label className="flex items-start gap-3 rounded-2xl border border-[var(--sf-line)] bg-black/25 p-4">
+              <input
+                type="checkbox"
+                name="marketplaceEligible"
+                defaultChecked={Boolean(bundle.product.marketplace_eligible)}
+                className="mt-1 h-4 w-4 rounded border-[var(--sf-line)]"
+              />
+              <span>
+                <span className="block text-sm font-semibold">
+                  Mark marketplace-eligible
+                </span>
+                <span className="mt-1 block text-xs text-[var(--sf-muted)]">
+                  Sellers cannot change your product truth, prices, or inventory.
+                  Store marketplace participation must also be enabled.
+                </span>
+              </span>
+            </label>
+            <button
+              type="submit"
+              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+            >
+              Save eligibility
+            </button>
+          </form>
+        ) : null}
       </section>
 
       <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">

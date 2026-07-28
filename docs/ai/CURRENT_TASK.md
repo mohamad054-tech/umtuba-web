@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Marketplace Supplier-to-Seller Foundation V1
+Commerce Marketplace Eligibility & Listing Storefront Resolution V1
 
 ## Status
 
@@ -10,17 +10,17 @@ Commerce Marketplace Supplier-to-Seller Foundation V1
 
 ## Branch
 
-`office/commerce-marketplace-supplier-seller-foundation-v1`
+`office/commerce-marketplace-eligibility-listing-storefront-v1`
 
 ## Base
 
-Trusted revenue-bridge commit `35a122305505634716472b80c7c215bc74c205ae`
-Parent branch: `office/commerce-revenue-ledger-bridge-foundation-v1`
+Trusted marketplace foundation commit `3b7e1eaeede08059715507744cab978bf3c37c0c`
+Parent branch: `office/commerce-marketplace-supplier-seller-foundation-v1`
 
 ## Deliverable
 
-Supplier→seller listing foundation: `store_seller_listings` (no product clone), marketplace discovery + Add to My Store, seller listing management, buyer storefront inclusion of active listings, order/revenue-bridge provenance fields, checkout alignment migrations (local). Pricing Outcome B (read-only canonical offer). No payment provider / Warehouse / Shipping Network. No frozen Commerce architecture edits.
+Supplier/product marketplace eligibility controls, listing-backed PDP resolution on `/store/[storeSlug]/product/[productSlug]` (owned-first collision rule), cart/wishlist/checkout provenance for `seller_listing_id`, supplier/seller visibility, admin diagnostics. Migrations `20260869`/`20260870` validated locally; not remote-applied. No payment provider / Warehouse / Shipping Network. No frozen Commerce architecture edits.
 
 ## Next after this task
 
-Supplier opt-in admin/seller controls for `marketplace_supplier_enabled` / `marketplace_eligible`, PDP resolution for listing-backed slugs under seller store, and commission policy when authorized. Still no fabricated earnings.
+Apply marketplace migrations remotely when authorized, then commission/settlement only if a trusted policy exists. Still no fabricated earnings.

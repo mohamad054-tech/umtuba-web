@@ -51,6 +51,8 @@ export type CartSummaryLine = {
   priceChanged?: boolean;
   /** Buyer-facing issue that should block silent checkout progression. */
   blockingIssue?: string | null;
+  /** Present when the line was added from a supplier-sourced seller listing. */
+  sellerListingId?: string | null;
 };
 
 export type CartSummary = {
