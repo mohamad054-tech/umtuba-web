@@ -1,103 +1,72 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef, useState } from "react";
-import { layoutCircularArcNodes } from "./arcGeometry";
-import HomeCircularArcPortal from "./HomeCircularArcPortal";
+import { useEffectEvent } from "react";
 import {
   HOME_ARC_FOUNDATION_PORTALS,
   type HomeArcPortal,
 } from "./homeCircularArcPortals";
 
 export type HomeCircularArcProps = {
-  /** Override portal list (defaults to foundation mock set). */
   portals?: readonly HomeArcPortal[];
-  /**
-   * Foundation interaction: receives portal id only.
-   * Default logs id — no routing.
-   */
   onPortalPress?: (portalId: string) => void;
   className?: string;
 };
 
+/**
+ * Final approved arc (px). Slightly stronger gentle bulge (peak 14px).
+ * Negative = toward video edge.
+ */
+const LEFT_ARC_TRANSLATE_X_PX = [0, -6, -11, -14, -11, -6, 0] as const;
+
 function defaultPortalPress(portalId: string) {
-  // Foundation V1 — no navigation.
   console.info("[HomeCircularArc] portal press", portalId);
 }
 
 /**
- * Home Circular Arc Navigation Foundation V1
- *
- * Left C-arc overlay of world portals. Does not shrink the video plane.
- * Not a sidebar, drawer, or bottom navigation.
- *
- * Mount only when preview/product gate allows (`shouldMountHomeCircularArc`).
+ * Left Action Rail — same circle chrome as DiscoverActionRail
+ * (`watch-rail-btn` h-12). Height comes from the host (right-rail box).
+ * Arc = fixed translateX only.
  */
 export default function HomeCircularArc({
   portals = HOME_ARC_FOUNDATION_PORTALS,
   onPortalPress = defaultPortalPress,
   className = "",
 }: HomeCircularArcProps) {
-  const rootRef = useRef<HTMLElement | null>(null);
-  const [size, setSize] = useState({ width: 0, height: 0 });
-  const [reduceMotion, setReduceMotion] = useState(false);
-
   const handlePortalPress = useEffectEvent((portalId: string) => {
     onPortalPress(portalId);
   });
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduceMotion(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-
-    const update = () => {
-      const rect = el.getBoundingClientRect();
-      setSize((prev) => {
-        const width = Math.round(rect.width);
-        const height = Math.round(rect.height);
-        if (prev.width === width && prev.height === height) return prev;
-        return { width, height };
-      });
-    };
-
-    update();
-    // Single observer for the overlay root — never per portal.
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const { nodes } = layoutCircularArcNodes({
-    width: size.width,
-    height: size.height,
-    count: portals.length,
-  });
-
   return (
     <nav
-      ref={rootRef}
       aria-label="UMTUBA world portals"
-      data-home-circular-arc="ux-polish-v1"
-      className={`pointer-events-none absolute inset-0 z-30 overflow-visible ${className}`}
+      data-home-circular-arc="left-action-rail"
+      className={`relative flex h-full flex-col items-center justify-between ${className}`}
     >
-      {nodes.map((layout, index) => {
-        const portal = portals[index];
-        if (!portal) return null;
+      {portals.map((portal, index) => {
+        const offsetX =
+          LEFT_ARC_TRANSLATE_X_PX[
+            Math.min(index, LEFT_ARC_TRANSLATE_X_PX.length - 1)
+          ] ?? 0;
+
         return (
-          <HomeCircularArcPortal
+          <div
             key={portal.id}
-            portal={portal}
-            layout={layout}
-            reduceMotion={reduceMotion}
-            onPortalPress={handlePortalPress}
-          />
+            style={{ transform: `translateX(${offsetX}px)` }}
+          >
+            <button
+              type="button"
+              aria-label={`${portal.label} portal`}
+              data-portal-id={portal.id}
+              onClick={() => handlePortalPress(portal.id)}
+              className="watch-focus-ring flex items-center justify-center"
+            >
+              <span className="watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/45 text-[11px] font-black tracking-wide text-white backdrop-blur-md">
+                <span aria-hidden className="leading-none">
+                  {portal.glyph}
+                </span>
+              </span>
+            </button>
+          </div>
         );
       })}
     </nav>

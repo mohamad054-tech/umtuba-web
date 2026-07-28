@@ -2,51 +2,55 @@
 
 ## Summary
 
-**Home Circular Arc Navigation Foundation V1** — Final Verification **PASS**. Fail-closed (`HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`). No user-facing Home change; `HomeSectionCircles` only. Saved for handoff — continue tomorrow from feature branch.
+**Arc Final Lock — ready to ship (feature branch only).**
+
+Left Action Rail: 7 circles, arc `[0,-6,-11,-14,-11,-6,0]`, host `left-[5px]`,
+bound to Right Action Rail (±8px vertical extend). Flags unchanged
+(`FOUNDATION_ENABLED = false`, `HOME_LOCK_ACTIVE = true`).
+Mock/preview page removed. No merge to alpha-0.2 in this step.
 
 ## Exact files changed
 
-### Created
 - `app/components/home/circularArc/HomeCircularArc.tsx`
-- `app/components/home/circularArc/HomeCircularArcPortal.tsx`
-- `app/components/home/circularArc/arcGeometry.ts`
-- `app/components/home/circularArc/arcGeometry.test.ts`
-- `app/components/home/circularArc/homeCircularArcFlags.ts`
-- `app/components/home/circularArc/homeCircularArcPortals.ts`
+- `app/components/home/circularArc/HomeCircularArcPortal.tsx` (deleted)
 - `app/components/home/circularArc/index.ts`
-
-### Modified
-- `app/discover/components/DiscoverShell.tsx` (conditional mount, default off)
-- `vitest.config.ts`
-- `docs/ai/CURRENT_TASK.md`
+- `app/components/home/circularArc/homeCircularArcFlags.ts`
+- `app/components/home/circularArc/homeCircularArcFlags.test.ts`
+- `app/components/home/circularArc/arcGeometry.test.ts`
+- `app/components/home/circularArc/gentleActionRailLayout.test.ts` (new)
+- `app/discover/components/DiscoverVideoCard.tsx`
+- `app/discover/DiscoverExperience.tsx`
+- `app/discover/components/DiscoverShell.tsx`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/CURRENT_TASK.md`
 
 ## Migrations created
 
-None.
+- None
 
 ## Security review
 
-- Fail-closed; no routing; Home Guardrails not disabled; no Domain/AI edits.
+- Product unlock fail-closed
+- Preview via local `next dev` only
+- No auth/RLS/API changes
+- Right Action Rail / nav / Home Assembly untouched
 
 ## Tests
 
-- Arc + guardrails: **12 PASS**
+- Vitest `app/components/home/circularArc/`: recorded in this pass
 
 ## TypeScript
 
-- `npx tsc --noEmit`: **FAIL** pre-existing on `origin/alpha-0.2` — `../cards` in pinned-content test
+- Pre-existing only: `../cards` (if still present)
 
 ## Build
 
-Not required for last verification pass.
+- Recorded in this pass
 
 ## git diff --check
 
-**PASS** (last hardening/verification)
+- Recorded in this pass
 
-## Open issues / tomorrow
+## Open issues
 
-1. Merge Readiness + FF merge to `alpha-0.2` when approved
-2. Do not flip Arc flag without Product GO + Home unlock
-3. Pre-existing Store Vitest (3) + pinned-content `tsc` remain out of scope
+- None for Arc. Home Assembly deferred. No alpha merge yet.

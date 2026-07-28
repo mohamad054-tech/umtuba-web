@@ -60,7 +60,7 @@ function assertSafeLayout(
 }
 
 describe("Home Circular Arc fail-closed flag", () => {
-  it("stays disabled while Home is locked (foundation not user-facing)", () => {
+  it("stays disabled while Home is locked; Arc mounts in DiscoverVideoCard when previewing", () => {
     expect(HOME_CIRCULAR_ARC_FOUNDATION_ENABLED).toBe(false);
     expect(HOME_CIRCULAR_ARC_FOUNDATION_MODE).toBe("fail-closed");
 
@@ -68,11 +68,15 @@ describe("Home Circular Arc fail-closed flag", () => {
       join(process.cwd(), "app/discover/components/DiscoverShell.tsx"),
       "utf8"
     );
-    expect(shell).toMatch(/shouldMountHomeCircularArc/);
     expect(shell).toMatch(/HomeSectionCircles/);
-    expect(shell).toMatch(/showCircularArcPreview/);
-    expect(shell).toMatch(/HomeCircularArc/);
-    expect(shell).toMatch(/w-\[4\.75rem\]/);
+    expect(shell).not.toMatch(/HomeCircularArc/);
+
+    const card = readFileSync(
+      join(process.cwd(), "app/discover/components/DiscoverVideoCard.tsx"),
+      "utf8"
+    );
+    expect(card).toMatch(/shouldMountHomeCircularArc/);
+    expect(card).toMatch(/data-home-arc-rail="left-action"/);
   });
 });
 

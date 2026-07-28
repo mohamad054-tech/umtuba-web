@@ -71,8 +71,8 @@ export function isHomeCircularArcPreviewActive(): boolean {
 }
 
 /**
- * Mount decision for DiscoverShell.
- * Product unlock OR preview — production users stay on circles-only Home.
+ * Mount decision for the Home Circular Arc left action rail
+ * (inside DiscoverVideoCard, sibling chrome to DiscoverActionRail).
  */
 export function shouldMountHomeCircularArc(): boolean {
   if (HOME_CIRCULAR_ARC_FOUNDATION_ENABLED) return true;

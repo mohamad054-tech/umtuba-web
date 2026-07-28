@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { APP_ROUTES } from "../../lib/nav";
 import { recordFeedViewOnce } from "../../lib/video/recordFeedView";
@@ -12,6 +12,8 @@ import {
   type WatchSessionSnapshot,
 } from "../../lib/video/recordWatchSignal";
 import type { DiscoverStats, DiscoverVideo } from "../types";
+import { HomeCircularArc } from "../../components/home/circularArc";
+import { shouldMountHomeCircularArc } from "../../components/home/circularArc/homeCircularArcFlags";
 import DiscoverActionRail from "./DiscoverActionRail";
 import DiscoverCaption from "./DiscoverCaption";
 import DiscoverCreatorInfo from "./DiscoverCreatorInfo";
@@ -48,8 +50,40 @@ export default function DiscoverVideoCard({
   const [localViews] = useState(() => new Set<number>());
   const viewsSet = sessionViews ?? localViews;
   const postId = Number(video.id);
+  const showLeftActionRail = shouldMountHomeCircularArc();
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
+  const chromeRef = useRef<HTMLDivElement | null>(null);
+  const rightRailRef = useRef<HTMLDivElement | null>(null);
+  const leftRailRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    if (!showLeftActionRail) return;
+    const chrome = chromeRef.current;
+    const right = rightRailRef.current;
+    const left = leftRailRef.current;
+    if (!chrome || !right || !left) return;
+
+    const syncMirrorZone = () => {
+      const chromeRect = chrome.getBoundingClientRect();
+      const rightRect = right.getBoundingClientRect();
+      // Approved drawing: start slightly above first right button,
+      // end slightly below last right button.
+      const extendPx = 8;
+      left.style.top = `${Math.round(rightRect.top - chromeRect.top) - extendPx}px`;
+      left.style.height = `${Math.round(rightRect.height) + extendPx * 2}px`;
+    };
+
+    syncMirrorZone();
+    const ro = new ResizeObserver(syncMirrorZone);
+    ro.observe(right);
+    ro.observe(chrome);
+    window.addEventListener("resize", syncMirrorZone);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", syncMirrorZone);
+    };
+  }, [showLeftActionRail, active]);
 
   useEffect(() => {
     if (!active || !Number.isInteger(postId) || postId <= 0) {
@@ -161,8 +195,27 @@ export default function DiscoverVideoCard({
       <div className="pointer-events-none absolute inset-x-0 bottom-14 top-0 z-20 flex flex-col justify-end">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
 
-        <div className="relative z-10 flex items-end justify-between gap-3 p-5 pb-4 md:gap-4 md:p-6 md:pb-5">
-          <div className="min-w-0 flex-1 space-y-3">
+        <div
+          ref={chromeRef}
+          className="relative z-10 flex items-end justify-between gap-3 p-5 pb-4 md:gap-4 md:p-6 md:pb-5"
+        >
+          {showLeftActionRail ? (
+            // Bound to Right Action Rail (slight vertical extend).
+            // Micro-align: whole rail left for creator breathing room.
+            <div
+              ref={leftRailRef}
+              data-home-arc-rail="left-action"
+              className="pointer-events-auto absolute left-[5px] z-10 overflow-visible md:left-[5px]"
+            >
+              <HomeCircularArc />
+            </div>
+          ) : null}
+
+          <div
+            className={`min-w-0 flex-1 space-y-3 ${
+              showLeftActionRail ? "pl-16" : ""
+            }`}
+          >
             <div className="pointer-events-auto">
               <DiscoverCreatorInfo
                 creator={video.creator}
@@ -191,7 +244,11 @@ export default function DiscoverVideoCard({
             ) : null}
           </div>
 
-          <div className="pointer-events-auto">
+          <div
+            ref={rightRailRef}
+            className="pointer-events-auto shrink-0"
+            data-home-action-rail="right"
+          >
             <DiscoverActionRail
               postId={postId}
               stats={video.stats}

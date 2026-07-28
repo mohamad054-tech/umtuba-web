@@ -2,24 +2,24 @@
 
 ## Task title
 
-Home Circular Arc Preview + Polish V1
+Home Circular Arc Video-Edge Alignment V1 — Final Lock
 
 ## Status
 
-`verification-pass` — committing / pushing feature branch only (no merge to alpha-0.2).
+`commit-push-feature` — feature branch only (no alpha merge)
 
 ## Branch
 
-`office/home-circular-arc-preview-v1` from `alpha-0.2` @ `ea5d7e6`
+`office/home-circular-arc-video-edge-alignment-v1` from `alpha-0.2`
 
 ## Gates
 
-- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false` (product unlock fail-closed)
-- Preview: local `next dev` (or explicit non-production preview env)
+- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
+- Preview: local `next dev`
 - `HOME_LOCK_ACTIVE = true`
-- `HomeSectionCircles` retained
+- Design locked: `left-[5px]`, arc `[0, -6, -11, -14, -11, -6, 0]`, 7 circles
 
-## Done
+## Out of scope
 
-- Preview foundation + UX/layout polish + micro polish
-- Final Verification PASS (Vitest 19, Build PASS; tsc pre-existing `../cards` only)
+- Home Assembly
+- Merge to `alpha-0.2` (await separate GO)

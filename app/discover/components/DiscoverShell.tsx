@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
-import { HomeCircularArc } from "../../components/home/circularArc";
-import { shouldMountHomeCircularArc } from "../../components/home/circularArc/homeCircularArcFlags";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import HomeSectionCircles from "./HomeSectionCircles";
 
@@ -14,14 +12,10 @@ type DiscoverShellProps = {
  * Video-First Home chrome. Still used by DiscoverExperience (Home feed).
  * `/discover` redirects here; title stays Home.
  *
- * Circular Arc mounts only via `shouldMountHomeCircularArc()`:
- * - Product unlock flag stays fail-closed
- * - Preview may mount in development / explicit non-production preview env
- * Production keeps `HomeSectionCircles` (never removed). Arc is additive overlay when previewing.
+ * Circular Arc mounts on the video stage edge (DiscoverExperience), not here —
+ * so it stays aligned to the video card rather than a page-left rail.
  */
 export default function DiscoverShell({ children }: DiscoverShellProps) {
-  const showCircularArcPreview = shouldMountHomeCircularArc();
-
   return (
     <main
       className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -70,12 +64,6 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-0 md:px-6 md:py-5">
         {children}
-        {showCircularArcPreview ? (
-          // Left rail host: keeps Arc outside the centered video stage (layout only).
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-30 w-[4.75rem] sm:w-[5.75rem] md:left-2 md:w-[6.75rem] lg:w-[7.5rem]">
-            <HomeCircularArc />
-          </div>
-        ) : null}
       </div>
     </main>
   );
