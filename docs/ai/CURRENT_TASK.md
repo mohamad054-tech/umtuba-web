@@ -2,50 +2,53 @@
 
 ## Task title
 
-Home Readiness Guardrails V1
+Home Circular Arc Navigation Foundation V1
 
 ## Status
 
-`verification-pass` — **STAGED** — ready for manual commit (Agent stopped before commit).
+`verification-pass` — **saved on feature branch** — next session: Merge Readiness / commit already done if push succeeded; then FF merge to `alpha-0.2` when approved.
+
+## Resume here tomorrow
+
+1. `git fetch --prune`
+2. `git checkout office/home-circular-arc-navigation-foundation-v1`
+3. `git pull --ff-only`
+4. Read this file + `docs/ai/CURSOR_REPORT.md`
+5. Decide next product step (do **not** auto-start):
+   - Merge Foundation → `alpha-0.2` (FF), **or**
+   - Arc Preview / unlock GO (flip flag), **or**
+   - Other track (Advertise hide, etc.)
 
 ## Branch / sync
 
-- **Branch:** `office/home-readiness-guardrails-v1`
-- **Base:** `424897530272e8f81504497bbee54ad3b11f6d9b` (`origin/alpha-0.2`)
-- **Checkout:** feature branch (not merged)
-- **Commit / Push / Merge:** not performed
+- **Feature branch:** `office/home-circular-arc-navigation-foundation-v1`
+- **Base:** `origin/alpha-0.2` @ `2205d4c` (Home Readiness Guardrails V1 merged)
+- **Home Lock:** still active (`HOME_LOCK_ACTIVE = true`)
+- **Arc flag:** `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false` (fail-closed; not user-visible)
 
-## Product decision (frozen)
+## Done today
 
-- **Home Lock Active:** `HOME_LOCK_ACTIVE = true`
-- **Locked surfaces:** feed · swipe · ranking · player · circles-layout · engagement · home-shell
-- Path inventory + contracts + Vitest guard accidental Home edits
-- **Preferred Flow** `Home → Creator Space → Content` remains **documentation only** (not implemented on Home)
-- Later Home changes need **Product GO** + **explicit Home unlock**
-- **No actual Home behavior/visual changes** in this phase
-- No new redirects; no route changes
+- Platform Navigation Architecture V1 complete (earlier)
+- Home Readiness Guardrails V1 merged to `alpha-0.2`
+- Home Experience Vision V1 (architecture proposal only — chat)
+- Home Circular Arc Navigation Foundation V1 implemented + Review/Hardening + Final Verification **PASS**
+- Mock portals, no routing, geometry + a11y + perf foundation
+- Production Home still shows only `HomeSectionCircles` (no dual nav)
 
-## Verification
+## Verification (last run)
 
-- **PASS** (in-scope)
-- In-scope Vitest: **PASS**
-- Full Vitest: **2730 passed**; **3 Store failures pre-existing / out of scope**
-  - `lib/store/paymentOutcomeSync.test.ts` (1)
-  - `lib/store/storeRemoteE2eSandboxScripts.test.ts` (2)
-- `npx tsc --noEmit`: **FAIL pre-existing / out of scope** — `lib/content/profilePinnedContentStructure.v1.test.ts` (`../cards`)
-- `npm run build`: **PASS**
-- `git diff --check`: **PASS**
+- In-scope Vitest: **12 PASS** (arc + guardrails)
+- `tsc`: FAIL pre-existing only — `profilePinnedContentStructure.v1.test.ts` → `../cards` on `origin/alpha-0.2`
+- No Domain / AI / Platform Nav contract / Guardrails unlock changes
 
-## Forbidden scope
+## Forbidden until new GO
 
-- Any Home visual/behavioral change
-- feed / swipe / ranking / player / circles / engagement / CTA / funnel
-- Watch redesign / Creator Space UI / Store Domain / Mobile primary
-- New redirects / route changes / unlocking Home
-- Commit / Push / Merge without explicit GO
+- Flip Arc flag / show Arc to users
+- Real portal routing
+- Retire `HomeSectionCircles`
+- Home unlock without Product GO
+- Store Domain (desktop owns)
 
-## Next step
+## Next (not started)
 
-Manual Terminal commit (no Git trailers), then Merge Readiness / FF merge when approved.
-
-**Proposed next (not started):** Content-flow Home Implementation V1 only after Product GO + Home unlock; or Advertise Hide Policy Decision V1 (no Home changes).
+Merge Readiness → FF merge Foundation to `alpha-0.2` when you approve; then pick next Home/product slice.

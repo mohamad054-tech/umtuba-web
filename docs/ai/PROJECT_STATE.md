@@ -8,6 +8,12 @@
 
 `alpha-0.2`
 
+## Active feature (laptop — resume tomorrow)
+
+- **Branch:** `office/home-circular-arc-navigation-foundation-v1`
+- **Task:** Home Circular Arc Navigation Foundation V1 — Final Verification PASS, fail-closed
+- **See:** `docs/ai/CURRENT_TASK.md`
+
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
+import { HomeCircularArc } from "../../components/home/circularArc";
+import { HOME_CIRCULAR_ARC_FOUNDATION_ENABLED } from "../../components/home/circularArc/homeCircularArcFlags";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import HomeSectionCircles from "./HomeSectionCircles";
 
@@ -11,6 +13,10 @@ type DiscoverShellProps = {
 /**
  * Video-First Home chrome. Still used by DiscoverExperience (Home feed).
  * `/discover` redirects here; title stays Home.
+ *
+ * Circular Arc Foundation mounts only when
+ * `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED` is true (fail-closed while Home locked).
+ * Production Home keeps `HomeSectionCircles` only — no dual nav by default.
  */
 export default function DiscoverShell({ children }: DiscoverShellProps) {
   return (
@@ -61,6 +67,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-0 md:px-6 md:py-5">
         {children}
+        {HOME_CIRCULAR_ARC_FOUNDATION_ENABLED ? <HomeCircularArc /> : null}
       </div>
     </main>
   );

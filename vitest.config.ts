@@ -40,6 +40,7 @@ export default defineConfig({
       "app/lib/nav/**/*.test.ts",
       "app/lib/product/**/*.test.ts",
       "app/components/product/**/*.test.ts",
+      "app/components/home/**/*.test.ts",
       "app/create/video/**/*.test.ts",
       "app/components/social/**/*.test.ts",
     ],
