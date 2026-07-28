@@ -89,7 +89,6 @@ describe("shell coherence", () => {
       "app/components/AppTopNav.tsx",
       "app/components/UserMenu.tsx",
       "app/lib/nav/userMenuItems.ts",
-      "app/lib/nav/mobileNav.ts",
       "app/settings/SettingsShell.tsx",
     ]) {
       const src = read(rel);
@@ -97,7 +96,17 @@ describe("shell coherence", () => {
       expect(src).not.toMatch(/["']\/ai["']/);
       expect(src).not.toMatch(/["']\/uconnect["']/);
       expect(src).not.toMatch(/["']\/ideas["']/);
+      expect(src).not.toMatch(/["']\/journey-pro["']/);
+      expect(src).not.toMatch(/["']\/live\/media-lab["']/);
     }
+    // mobileNav may reference media-lab only as a hide exception (not a tab href).
+    const mobileNav = read("app/lib/nav/mobileNav.ts");
+    expect(mobileNav).not.toMatch(/["']\/feed["']/);
+    expect(mobileNav).not.toMatch(/["']\/ai["']/);
+    expect(mobileNav).not.toMatch(/["']\/uconnect["']/);
+    expect(mobileNav).not.toMatch(/["']\/ideas["']/);
+    expect(mobileNav).not.toMatch(/["']\/journey-pro["']/);
+    expect(mobileNav).not.toMatch(/href:\s*["']\/live\/media-lab["']/);
     expect(APP_ROUTES.discover).toBe("/discover");
   });
 });

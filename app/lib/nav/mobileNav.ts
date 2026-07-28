@@ -43,6 +43,8 @@ const LIVE_ROOM_PATH_RE = /^\/live\/(?!media-lab(?:\/|$))[^/]+/;
 /**
  * Live rooms hide the bottom nav so chat/media controls stay reachable.
  * Lobby `/live` keeps the nav. Auth + media-lab also hide it.
+ * `/live/media-lab` is a lab surface (Secondary Surface Cleanup V1) — listed
+ * here only to hide chrome, never as a primary nav destination.
  */
 export function shouldShowMobileBottomNav(pathname: string): boolean {
   const path = pathname.split("?")[0] || "/";

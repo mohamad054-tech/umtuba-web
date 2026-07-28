@@ -70,6 +70,15 @@ export {
 } from "./deepLinkAliasContract";
 
 export {
+  FORBIDDEN_OFFICIAL_CHROME_PATHS,
+  LIVING_NAVIGATION_PROTOTYPE_IDS,
+  SECONDARY_AND_EXPERIMENTAL_SURFACES,
+  isForbiddenOfficialChromePath,
+  type SecondarySurfaceKind,
+  type SecondarySurfaceRecord,
+} from "./secondarySurfaceContract";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,

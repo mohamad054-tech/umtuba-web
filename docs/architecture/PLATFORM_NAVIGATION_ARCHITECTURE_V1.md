@@ -32,7 +32,7 @@
 | **Workspace** | Role/capability tools | `/seller/**`, `/learning/instructor/**`, advertise dashboard |
 | **Internal** | Account utilities | `/messages`, `/notifications`, `/settings`, `/saved`, `/rewards`, buyer cart/orders |
 | **Admin / Auth / Legal** | Ops + identity + legal | `/admin/**`, `/login`, `/terms`, `/privacy`, `/welcome` |
-| **Legacy / Experimental** | Not primary chrome | `/feed`, `/journey-pro`, Living Navigation overlays, media-lab |
+| **Legacy / Experimental** | Not primary chrome | `/feed`, `/journey-pro`, `/post-journey`, `/live/media-lab`, `/city/*`, Living Navigation overlays |
 
 ---
 
@@ -96,6 +96,21 @@ Signed-out: Sign in only. Actions: Switch account, Sign out → Home.
 
 **Deep-link & Alias Clarity V1 — Auth default decision:** Keep fallback `/discover` (do **not** flip to `/`). Same Discovery destination after the forever redirect; avoids churn to callers, notification deep links, and redirect contract tests. Code: `app/lib/nav/deepLinkAliasContract.ts`, `lib/supabase/redirect.ts`.
 
+### 2.6 Secondary / Legacy / Experimental (non-primary)
+
+Secondary Surface Cleanup V1 freezes these as **not official chrome** (routes remain; not deleted or disabled):
+
+| Surface | Kind | Official chrome? |
+| --- | --- | --- |
+| Living Navigation overlays | prototype-overlay | No — Watch prototype only |
+| `/feed` | experimental | No |
+| `/journey-pro` | experimental | No |
+| `/post-journey` | legacy | No (deep-link / AppTopNav page shell OK; not a primary tab) |
+| `/live/media-lab` | lab | No (bottom nav already hidden) |
+| `/city/*` | experimental | No |
+
+Contract: `app/lib/nav/secondarySurfaceContract.ts` — forbidden in desktop primary, mobile primary, and UserMenu baseline.
+
 ---
 
 ## 3. Role journeys (chrome reality)
@@ -144,9 +159,10 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 7. Verification
 
-Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 verified by:
+Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 verified by:
 
 - `app/lib/nav/platformNavContract.test.ts`
 - `app/lib/nav/deepLinkAliasContract.test.ts`
+- `app/lib/nav/secondarySurfaceContract.test.ts`
 - Existing `shellCoherence`, `mobileNav`, `userMenuItems`, `pageAssembly` tests
 - `lib/supabase/redirect.test.ts` for `?next=` safety + Discover default

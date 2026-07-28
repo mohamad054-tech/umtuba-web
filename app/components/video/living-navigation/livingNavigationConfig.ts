@@ -1,3 +1,12 @@
+/**
+ * Living Navigation — Watch prototype overlays (Secondary Surface Cleanup V1).
+ *
+ * These items are **not** Platform Navigation primary chrome destinations.
+ * Internal `placement.group: "primary" | "secondary"` only orders overlay slots
+ * inside Watch — it must never be confused with `APP_NAV_ITEMS` / mobile primary.
+ * Surfaces remain available as prototypes; this module does not delete or disable them.
+ */
+
 export const LIVING_NAVIGATION_IDS = [
   "world",
   "store",
