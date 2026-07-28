@@ -9,16 +9,16 @@ export default function StoreCard({ store }: StoreCardProps) {
   return (
     <Link
       href={`/store/${store.slug}`}
-      className="watch-focus-ring group flex min-w-[200px] flex-1 flex-col rounded-[24px] border border-white/10 bg-[#080816]/85 p-4 transition duration-300 hover:-translate-y-1 hover:border-violet-400/35"
+      className="watch-focus-ring group flex min-w-[210px] flex-1 flex-col rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)]"
     >
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-violet-400/25 bg-gradient-to-br from-violet-600/40 to-fuchsia-600/20 text-lg font-black">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[rgba(214,196,161,0.28)] bg-[linear-gradient(145deg,rgba(214,196,161,0.22),rgba(255,255,255,0.04))] text-lg font-semibold text-[var(--sf-accent-strong)]">
         {(store.name[0] ?? "U").toUpperCase()}
       </div>
-      <p className="mt-4 text-base font-black tracking-tight group-hover:text-violet-100">
+      <p className="sf-display mt-4 text-base font-semibold tracking-tight group-hover:text-[var(--sf-accent-strong)]">
         {store.name}
       </p>
-      <p className="mt-1 text-xs text-white/40">@{store.slug}</p>
-      <p className="mt-3 text-xs font-bold text-violet-200/70">
+      <p className="mt-1 text-xs text-[var(--sf-faint)]">@{store.slug}</p>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--sf-accent)]">
         {store.productCount} active product{store.productCount === 1 ? "" : "s"}
       </p>
     </Link>

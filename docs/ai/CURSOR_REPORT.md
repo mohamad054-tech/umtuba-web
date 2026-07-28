@@ -2,83 +2,75 @@
 
 ## Summary
 
-**Unified Content Services V2 closed** on `office/unified-content-services-v2` from parent `c72e0d2`. Shared Lifecycle / Visibility / Canonical Link / Discovery Binding / Profile Projection / Adapter Runtime / Hook contracts. Article + Video adapters refactored onto services. **No new migration. No merge to `alpha-0.2`.**
+Implemented **Commerce Premium Storefront Experience Foundation V1** on branch `office/commerce-premium-storefront-experience-foundation-v1`. Hardened the existing `/store` customer surfaces into a premium editorial experience: landing discovery, product cards, PDP (quantity, fail-closed pricing, policies, gallery), search/category browsing, seller storefront polish. Reused existing catalog adapters, cart/wishlist actions, and Store components. No frozen Commerce architecture docs modified. No migrations. Commerce program recorded as moved from consolidation into implementation.
 
-## Branch / parent
-
-- Branch: `office/unified-content-services-v2`
-- Parent: `c72e0d285d47d5c87092c960625f80a8b51e18b5`
-- Chain: `45f315e` → `f9807f2` → `c72e0d2` → V2 commit
-
-## Exact files created and modified
+## Exact files changed
 
 ### Created
-- `lib/content/services/lifecycleService.ts`
-- `lib/content/services/visibilityService.ts`
-- `lib/content/services/canonicalLinkService.ts`
-- `lib/content/services/discoveryBindingService.ts`
-- `lib/content/services/profileProjectionService.ts`
-- `lib/content/services/hookContracts.ts`
-- `lib/content/runtime/adapterRuntime.ts`
-- `lib/content/runtime/registerBuiltinAdapters.ts`
-- `lib/content/contentServices.v2.test.ts`
-- `docs/architecture/UNIFIED_CONTENT_SERVICES_V2.md`
+- `app/components/store/storefront.css`
+- `lib/store/storefrontDeriveSections.test.ts`
 
-### Modified
-- `lib/content/adapters/articleAdapter.ts`
-- `lib/content/adapters/videoAdapter.ts`
-- `lib/content/contentRegistry.ts` (Profile All delegates to projection)
-- `app/profile/[username]/page.tsx`
+### Modified (storefront / handoff)
+- `app/components/store/CategoryRail.tsx`
+- `app/components/store/HeroCarousel.tsx`
+- `app/components/store/ProductCard.tsx`
+- `app/components/store/SearchFilters.tsx`
+- `app/components/store/StoreCard.tsx`
+- `app/components/store/StoreEmptyState.tsx`
+- `app/components/store/StoreErrorState.tsx`
+- `app/components/store/StoreSection.tsx`
+- `app/components/store/StoreShell.tsx`
+- `app/components/store/StoreSkeleton.tsx`
+- `app/lib/storefront/deriveSections.ts`
+- `app/store/page.tsx`
+- `app/store/search/page.tsx`
+- `app/store/[storeSlug]/page.tsx`
+- `app/store/[storeSlug]/product/[productSlug]/page.tsx`
+- `app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx`
+- `lib/store/catalogQueries.ts`
+- `lib/store/types.ts`
 - `docs/ai/CURRENT_TASK.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Database / migration
+## Migrations created
 
-**None.** Reuses `20260868` RPCs. No `20260869`. Migrations `20260867` and `20260868` remain in Git only (not applied remotely).
+None.
 
 ## Security review
 
-1. Domains remain authoritative — services orchestrate registry index only (no direct domain writes from Content Services).
-2. No direct client write to `content_registry`.
-3. Unknown content kind fails (no random fallback).
-4. Adapter runtime rejects duplicate registration.
-5. Unknown visibility fail-closed → `private`.
-6. Canonical links built only from allowlisted builders.
-7. Raw client hrefs rejected (`assertTrustedCanonicalHref`).
-8. Discovery binding checks owner, ready post, source linkage, and blocks article-teaser as independent video.
-9. Profile projection soft-fails missing sources (page does not crash).
-10. Profile All order: `published_at` desc then `id`.
-11. Sync/republish idempotent via upsert RPC (no duplicates).
-12. Hooks are bounded metadata only (no article body / private blobs).
-13. Default hooks no-op (no side effects without subscribers).
-14. Auto-Teaser still binds discovery via `bindDiscoveryPost` on article adapter.
-15. Home / Discover / Watch design and feed gate unchanged.
-16. No new migration in V2.
-17. `20260867` / `20260868` not applied remotely.
+- Public catalog still server-enriched via existing adapters; signed media URLs unchanged.
+- Add-to-cart remains server action; closed when price/stock missing.
+- No secrets exposed. No payment-provider work. No inventory quantity edits.
+- Compare-at only when legitimate higher active price exists.
 
 ## Tests
 
-- vitest: content V1 + V2 + articles + teaser + videoPosts + profile + deeplink + pageAssembly — **66/66 PASS**
-- `npx tsc --noEmit` — **PASS**
-- `npm run build` — **PASS**
-- `git diff --check` — **PASS**
+- `lib/store/storefrontDeriveSections.test.ts` — 9 passed
+- `lib/store/commerceSafety.test.ts` — passed
+- `lib/store/wishlist.test.ts` — passed
+- `lib/store/storeFoundation.test.ts` — passed
 
 ## TypeScript
 
-PASS (`npx tsc --noEmit`)
+`npx tsc --noEmit` — passed
 
 ## Build
 
-PASS (`npm run build`)
+`npm run build` — passed (includes `/store`, `/store/search`, `/store/[storeSlug]`, `/store/[storeSlug]/product/[productSlug]`)
 
 ## git diff --check
 
-PASS
+Clean on storefront-scoped paths.
 
 ## git status --short
 
-See post-commit / post-push output.
+See final report after commit/push (working tree still contains unrelated local learning/docs noise not included in this commit).
 
 ## Open issues
 
-Do not merge to `alpha-0.2`. Do not apply remote migrations. Do not open a PR unless requested.
+- Live shopping / flash deals / brand rail remain flag-gated placeholders (honest unavailable).
+- Recommendations are catalog heuristics, not personalized ML.
+- Wishlist on listing cards starts unwishlisted (existing capability; no server batch wishlist state on rails).
+- Shipping Network and payment providers intentionally out of scope.

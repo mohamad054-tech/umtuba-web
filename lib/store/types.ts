@@ -155,6 +155,8 @@ export type PublicCatalogItem = {
   /** Short-lived signed Storage URL (server-authorized). */
   coverUrl?: string | null;
   priceMinor: number | null;
+  /** Compare-at only when an active price row provides a higher legitimate amount. */
+  compareAtMinor?: number | null;
   currency: string | null;
   available: number | null;
 };

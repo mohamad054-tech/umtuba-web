@@ -53,19 +53,20 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
       actions={
         <Link
           href={APP_ROUTES.store}
-          className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70"
+          className="watch-focus-ring rounded-full border border-[var(--sf-line)] bg-white/5 px-3 py-1.5 text-xs font-semibold text-[var(--sf-muted)]"
         >
           Home
         </Link>
       }
     >
-      <header className="mt-6 rounded-[28px] border border-violet-400/20 bg-[#080816]/80 p-5 md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300/70">
-          Discovery
-        </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Search</h1>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">
-          Search active products by keyword, category, and sort order.
+      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <p className="sf-eyebrow">Browse</p>
+        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Search & categories
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
+          Filter active catalog products by keyword, category, and sort. Search
+          uses the existing store catalog contract — no fabricated matches.
         </p>
       </header>
 

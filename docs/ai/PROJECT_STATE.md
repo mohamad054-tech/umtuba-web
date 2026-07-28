@@ -8,10 +8,68 @@
 
 `alpha-0.2`
 
+## Learning chapter status
+
+**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
+
+Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
+Session continuity: `docs/ai/SESSION_HANDOFF.md`
+
+Frozen baselines (extend, do not replace):
+
+- Wave A production baseline (JA-01 / JA-02 / JA-03)
+- Nexus Learning Architecture
+- Nexus Design System
+- Nexus V2 Premium Experience
+- Portfolio / Certification / AI Assistant integration models
+
+## Active academy priority
+
+**Save point 2026-07-28 (Cursor Pro → Ultra restart).** Full state: `docs/ai/SESSION_HANDOFF.md`.
+
+| Track | Status |
+| --- | --- |
+| Wave B content | CLOSED |
+| Learning UX / Nexus | FROZEN |
+| Course Import & E2E V1 | PAUSED |
+| Commerce Research V1.1 | APPROVED |
+| Commerce Experience Architecture V1.1 | FROZEN |
+| Commerce Visual Design Foundation V1 | FROZEN |
+| Commerce Information Architecture V1 | FROZEN |
+| Commerce Design System Foundation V1 | FROZEN |
+| Commerce Product Architecture Foundation V1 | FROZEN |
+| Commerce Business Architecture Foundation V1 | **FROZEN** |
+| Commerce Domain Model Foundation V1 | **FROZEN** |
+| Commerce Technical Architecture Foundation V1 | **FROZEN** |
+| Commerce Data Architecture Foundation V1 | **FROZEN** |
+| Commerce Application Architecture Foundation V1 | **FROZEN** |
+| Commerce Integration Architecture Foundation V1 | **FROZEN** |
+| Commerce Security Architecture Foundation V1 | **FROZEN** |
+| Commerce Operational Architecture Foundation V1 | **FROZEN** |
+| Commerce Platform Architecture Foundation V1 | **FROZEN** |
+| Commerce Enterprise Architecture Foundation V1 | **FROZEN** |
+| Commerce Reference Architecture Foundation V1 | **FROZEN** |
+| Commerce Architecture Manifesto V1 | **FROZEN** |
+| Commerce Architecture Program | **COMPLETE** |
+| Physical Commerce Inventory Solution Architecture V1 | **FROZEN** |
+| Physical Commerce Warehouse & Fulfillment Solution Architecture V1 | **FROZEN** |
+| Physical Commerce Order Fulfillment Solution Architecture V1 | **FROZEN** |
+| Commerce Consolidation Report V1 | **COMPLETE** |
+| Commerce Premium Storefront Experience Foundation V1 | **COMPLETE** (branch `office/commerce-premium-storefront-experience-foundation-v1`) |
+
+Default: Consolidation complete. Program has moved from docs-only into **implementation**. Storefront foundation V1 landed on dedicated branch. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+
+### Autonomy (standing)
+
+Routine in-scope create/update/run/mirror/report work may proceed without per-step approval **only inside the explicitly active phase**.
+Paused phases must not auto-resume. Still ask before: destructive data loss, destructive prod DB, push/force-push, merge/delete branches, system-wide installs, credentials/payments, irreversible out-of-scope actions.
+
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.
 - Always synchronize with origin before starting work.
+- Learning curriculum packages: Bootcamp / Jinn Wave path + dist importers (see Learning V1 final doc).
+- Learner runtime state: UMTUBA Learning DB.
 
 ## Machines
 
@@ -37,3 +95,4 @@
 - Follow `docs/DEVELOPMENT_WORKFLOW.md` for Git, migrations, and push policy.
 - Follow `docs/ai/CURRENT_TASK.md` for the active handoff scope.
 - Write execution results to `docs/ai/CURSOR_REPORT.md`.
+- Prefer `docs/ai/SESSION_HANDOFF.md` for Learning continuity after V1 close-out.

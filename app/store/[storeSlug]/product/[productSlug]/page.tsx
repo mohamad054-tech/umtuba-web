@@ -78,7 +78,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <li>
               <Link
                 href={APP_ROUTES.store}
-                className="watch-focus-ring rounded hover:text-violet-200"
+                className="watch-focus-ring rounded hover:text-[var(--sf-accent-strong)]"
               >
                 Store
               </Link>
@@ -87,7 +87,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <li>
               <Link
                 href={`/store/${detail.store.slug}`}
-                className="watch-focus-ring rounded hover:text-violet-200"
+                className="watch-focus-ring rounded hover:text-[var(--sf-accent-strong)]"
               >
                 {detail.store.name}
               </Link>

@@ -47,7 +47,7 @@ export default function SearchFilters({
       <div>
         <label
           htmlFor="store-search-q"
-          className="text-xs font-bold uppercase tracking-[0.16em] text-white/45"
+          className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]"
         >
           Search
         </label>
@@ -61,12 +61,12 @@ export default function SearchFilters({
               push({ q: (e.target as HTMLInputElement).value });
             }
           }}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 p-3.5 text-sm outline-none transition focus:border-violet-400/50"
+          className="mt-2 w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3.5 text-sm outline-none transition focus:border-[rgba(214,196,161,0.45)]"
         />
       </div>
 
       <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+        <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
           Category
         </legend>
         <div className="mt-2 space-y-1.5">
@@ -89,7 +89,7 @@ export default function SearchFilters({
       <div>
         <label
           htmlFor="store-sort"
-          className="text-xs font-bold uppercase tracking-[0.16em] text-white/45"
+          className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]"
         >
           Sort
         </label>
@@ -97,7 +97,7 @@ export default function SearchFilters({
           id="store-sort"
           value={sort}
           onChange={(e) => push({ sort: e.target.value })}
-          className="mt-2 w-full rounded-2xl border border-white/10 bg-black/40 p-3.5 text-sm outline-none focus:border-violet-400/50"
+          className="mt-2 w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3.5 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
         >
           <option value="newest">Newest</option>
           <option value="price_asc">Price: low to high</option>
@@ -111,12 +111,12 @@ export default function SearchFilters({
   return (
     <aside className="lg:sticky lg:top-20" aria-label="Search filters">
       <div className="mb-3 flex items-center justify-between lg:hidden">
-        <p className="text-sm text-white/50">
+        <p className="text-sm text-[var(--sf-muted)]">
           {pending ? "Updating…" : `${resultCount} results`}
         </p>
         <button
           type="button"
-          className="watch-focus-ring rounded-full border border-violet-400/30 bg-violet-500/15 px-4 py-2 text-xs font-bold text-violet-100"
+          className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] px-4 py-2 text-xs font-semibold text-[var(--sf-accent-strong)]"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((v) => !v)}
         >
@@ -125,11 +125,11 @@ export default function SearchFilters({
       </div>
 
       <div
-        className={`rounded-[24px] border border-white/10 bg-[#080816]/85 p-4 backdrop-blur-xl ${
+        className={`rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 backdrop-blur-xl ${
           mobileOpen ? "block" : "hidden lg:block"
         }`}
       >
-        <p className="mb-4 hidden text-sm text-white/45 lg:block">
+        <p className="mb-4 hidden text-sm text-[var(--sf-muted)] lg:block">
           {pending ? "Updating…" : `${resultCount} results`}
         </p>
         {filters}
@@ -152,10 +152,10 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={selected}
-      className={`watch-focus-ring mr-1.5 mt-1.5 inline-flex rounded-full px-3 py-1.5 text-xs font-bold transition ${
+      className={`watch-focus-ring mr-1.5 mt-1.5 inline-flex rounded-full px-3 py-1.5 text-xs font-semibold transition ${
         selected
-          ? "bg-violet-500 text-white"
-          : "border border-white/10 bg-white/5 text-white/65 hover:bg-white/10"
+          ? "bg-[var(--sf-accent)] text-[#1a1712]"
+          : "border border-[var(--sf-line)] bg-white/5 text-[var(--sf-muted)] hover:bg-white/10"
       }`}
     >
       {label}

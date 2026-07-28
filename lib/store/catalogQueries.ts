@@ -62,6 +62,7 @@ export async function enrichPublicCatalogRow(
     .limit(1);
 
   let priceMinor: number | null = null;
+  let compareAtMinor: number | null = null;
   let currency: string | null = null;
   let available: number | null = null;
 
@@ -69,7 +70,7 @@ export async function enrichPublicCatalogRow(
   if (variantId) {
     const { data: price } = await supabase
       .from("product_prices")
-      .select("amount_minor, currency")
+      .select("amount_minor, compare_at_amount_minor, currency")
       .eq("variant_id", variantId)
       .eq("status", "active")
       .order("created_at", { ascending: false })
@@ -78,6 +79,17 @@ export async function enrichPublicCatalogRow(
     if (price) {
       priceMinor = Number(price.amount_minor);
       currency = price.currency;
+      const compareRaw =
+        price.compare_at_amount_minor == null
+          ? null
+          : Number(price.compare_at_amount_minor);
+      compareAtMinor =
+        compareRaw != null &&
+        Number.isFinite(compareRaw) &&
+        priceMinor != null &&
+        compareRaw > priceMinor
+          ? compareRaw
+          : null;
     }
 
     const { data: inv } = await supabase
@@ -111,6 +123,7 @@ export async function enrichPublicCatalogRow(
     coverPath: cover,
     coverUrl,
     priceMinor,
+    compareAtMinor,
     currency,
     available,
   };

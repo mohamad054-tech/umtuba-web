@@ -2,28 +2,34 @@
 
 ## Task title
 
-Unified Content Foundation V2 — Content Services
+Commerce Premium Storefront Experience Foundation V1
 
 ## Status
 
-`complete` — committed and pushed on `office/unified-content-services-v2` only
+`complete`
 
-## Branch / sync
+## Branch
 
-- Branch: `office/unified-content-services-v2`
-- Parent: `c72e0d2` (`office/unified-content-foundation-v1`)
-- Chain: `45f315e` → `f9807f2` → `c72e0d2` → **V2 commit**
-- Do **not** merge to `alpha-0.2`
-- No new migration; `20260867` / `20260868` remain Git-only (not applied remotely)
+`office/commerce-premium-storefront-experience-foundation-v1`
 
-## Scope delivered
+## Deliverable
 
-Lifecycle, Visibility, Canonical Link, Discovery Binding, Profile Projection, Adapter Runtime, Hook contracts; Article/Video adapters refactored onto services.
+Production-quality customer-facing Store experience foundation on canonical routes (`/store`, search, PDP, seller storefront), reusing existing Commerce/Store adapters and components.
 
-## Forbidden
+## Program note
 
-- Merge to `alpha-0.2` without explicit GO
-- Remote migration apply
-- Extra domain adapters
-- Home redesign
-- Co-authored-by / trailers
+Commerce consolidation is complete. The program has moved from documentation-only architecture into real implementation.
+
+## Constraints
+
+- Do not modify frozen Commerce architecture documents under `docs/commerce/**`
+- Do not delete previous Store work
+- No payment-provider integration
+- No Shipping Network architecture
+- No broad database redesign
+- Fail closed on missing commerce data; no fabricated prices/stock/claims
+- Home remains Discovery — do not convert Home into Store
+
+## Next (after this task)
+
+Continue storefront depth (seller policies UX, media polish) or Trading alignment in code; Shipping Network SA remains the recommended next architecture document when returning to docs.

@@ -1,0 +1,57 @@
+/* Premium Storefront Experience Foundation V1 — scoped tokens */
+.storefront-premium {
+  --sf-bg: #07070c;
+  --sf-surface: rgba(14, 14, 22, 0.92);
+  --sf-surface-2: rgba(20, 20, 32, 0.88);
+  --sf-ink: #f4f1ea;
+  --sf-muted: rgba(244, 241, 234, 0.58);
+  --sf-faint: rgba(244, 241, 234, 0.38);
+  --sf-line: rgba(244, 241, 234, 0.1);
+  --sf-accent: #d6c4a1;
+  --sf-accent-strong: #e8d7b5;
+  --sf-danger: #f0a8a8;
+  --sf-ok: #9fd6b8;
+  --sf-radius: 1.5rem;
+  --sf-radius-lg: 2rem;
+  color: var(--sf-ink);
+}
+
+.storefront-premium .sf-display {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.storefront-premium .sf-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--sf-accent);
+}
+
+@keyframes sf-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.storefront-premium .sf-enter {
+  animation: sf-fade-up 0.55s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storefront-premium .sf-enter,
+  .storefront-premium .sf-media-zoom {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .storefront-premium .group:hover .sf-media-zoom {
+    transform: none !important;
+  }
+}
