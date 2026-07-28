@@ -1,9 +1,8 @@
 /**
- * Home Circular Arc Navigation Foundation V1 — geometry only.
- * Pure layout math: left C-arc overlay positions for N portals (supports 1…20+).
+ * Home Circular Arc — geometry (Layout Final Polish V1).
  *
- * Safe-area fitting keeps nodes on-screen, left of the engagement rail, spaced apart,
- * and clear of the bottom caption/creator band — without collapsing into overlaps.
+ * Keeps the arc in a left navigation rail band that does **not** enter the
+ * Home video stage (max 510px, centered). Gap to video: 24–40px by viewport.
  */
 
 export type ArcLayoutInput = {
@@ -32,16 +31,23 @@ export type ArcGeometryMeta = {
   halfSpread: number;
 };
 
-/** Minimum interactive diameter (a11y hit target floor when viewport allows). */
-export const ARC_MIN_NODE_SIZE = 44;
-const MAX_NODE = 56;
-/** Keep portals in the left band — away from right engagement rail. */
-const MAX_X_RATIO = 0.4;
-/** Leave bottom band for creator/caption chrome. */
-const BOTTOM_SAFE_RATIO = 0.86;
-const TOP_SAFE_PX = 8;
-const EDGE_PAD_PX = 4;
-const MIN_GAP_FACTOR = 1.08;
+/** Matches DiscoverExperience video stage `max-w-[510px]`. */
+export const HOME_VIDEO_STAGE_MAX_PX = 510;
+
+/** Minimum interactive diameter when space allows. */
+export const ARC_MIN_NODE_SIZE = 48;
+const MAX_NODE = 60;
+/** Clear Stories / header — Micro Polish: +14px vs Layout Final. */
+const TOP_SAFE_PX = 94;
+/** Lift last portal slightly off the bottom edge. */
+const BOTTOM_SAFE_RATIO = 0.82;
+const BOTTOM_SAFE_EXTRA_PX = 14;
+const LEFT_INSET_PX = 14;
+const EDGE_PAD_PX = 8;
+/** Fixed-ish gap factor between disc centers. */
+const MIN_GAP_FACTOR = 1.18;
+/** Host widths at/under this are treated as dedicated left rails (not full Home). */
+const RAIL_HOST_MAX_PX = 160;
 
 function emptyMeta(): ArcGeometryMeta {
   return { centerX: 0, centerY: 0, radius: 0, halfSpread: 0 };
@@ -61,9 +67,41 @@ function sanitizeViewport(width: number, height: number): {
   return { width, height };
 }
 
+/** Gap between arc column (right edge) and video stage (left edge). */
+export function resolveArcVideoGapPx(width: number): number {
+  if (width < 900) return 24;
+  if (width < 1200) return 32;
+  return 40;
+}
+
+/** Estimated left edge of the centered Home video stage within `width`. */
+export function estimateHomeVideoLeftPx(width: number): number {
+  const videoW = Math.min(HOME_VIDEO_STAGE_MAX_PX, width);
+  return Math.max(0, (width - videoW) / 2);
+}
+
 /**
- * Layout portal centers along a left concave C-arc that opens toward the video.
- * Overlay-only: does not reserve layout space from the feed.
+ * Right limit for portal centers' containing band (before size/2 inset).
+ * Never advances into the video stage; keeps a stable gap.
+ */
+export function resolveArcBandMaxX(width: number, minX: number): number {
+  if (width <= RAIL_HOST_MAX_PX) {
+    return Math.max(minX + 24, width - EDGE_PAD_PX);
+  }
+
+  const videoLeft = estimateHomeVideoLeftPx(width);
+  const gap = resolveArcVideoGapPx(width);
+  const fromVideo = videoLeft - gap;
+
+  // Narrow full-bleed: keep a thin left gutter only (still not over mid-video).
+  const gutterFallback = Math.min(width * 0.2, 96);
+  const maxX = fromVideo > minX + 40 ? fromVideo : Math.max(minX + 48, gutterFallback);
+
+  return Math.min(maxX, width - EDGE_PAD_PX);
+}
+
+/**
+ * Layout portal centers along a calm left C-arc (modern nav rail — not a half-ring).
  */
 export function layoutCircularArcNodes(
   input: ArcLayoutInput
@@ -76,54 +114,57 @@ export function layoutCircularArcNodes(
   }
 
   const { width, height } = viewport;
-
-  const maxX = Math.min(width * MAX_X_RATIO, width - 72);
-  const minX = EDGE_PAD_PX;
+  const minX = LEFT_INSET_PX + EDGE_PAD_PX;
   const minY = TOP_SAFE_PX;
-  const maxY = Math.min(height * BOTTOM_SAFE_RATIO, height - EDGE_PAD_PX);
+  const maxY = Math.min(
+    height * BOTTOM_SAFE_RATIO,
+    height - EDGE_PAD_PX - BOTTOM_SAFE_EXTRA_PX
+  );
+  const maxX = resolveArcBandMaxX(width, minX);
 
-  if (maxX - minX < 24 || maxY - minY < 24) {
+  if (maxX - minX < 28 || maxY - minY < 28) {
     return { nodes: [], meta: emptyMeta() };
   }
 
-  const densityScale = Math.max(0.5, 1 - Math.max(0, count - 6) * 0.04);
+  const bandH = maxY - minY;
+  const bandW = maxX - minX;
+
+  // Size from width, then shrink for short viewports to preserve gap (no pile-up).
+  const densityScale = Math.max(0.55, 1 - Math.max(0, count - 6) * 0.036);
   const requested =
     input.nodeSize !== undefined && Number.isFinite(input.nodeSize)
       ? input.nodeSize
-      : Math.min(MAX_NODE, Math.max(ARC_MIN_NODE_SIZE, Math.min(width, height) * 0.09)) *
+      : Math.min(MAX_NODE, Math.max(ARC_MIN_NODE_SIZE, Math.min(bandW, height) * 0.42)) *
         densityScale;
 
-  let size = Math.min(MAX_NODE, Math.max(28, requested));
-
-  // Prefer 44px when the safe band can host the arc.
-  const bandH = maxY - minY;
-  const bandW = maxX - minX;
-  if (bandH >= ARC_MIN_NODE_SIZE * 2 && bandW >= ARC_MIN_NODE_SIZE) {
-    size = Math.max(Math.min(ARC_MIN_NODE_SIZE, bandW * 0.5), size);
-    size = Math.max(ARC_MIN_NODE_SIZE * 0.85, Math.min(MAX_NODE, size));
+  let size = Math.min(MAX_NODE, Math.max(26, requested));
+  if (count > 1) {
+    const maxByGap = (bandH - (count - 1) * (size * (MIN_GAP_FACTOR - 1))) / count;
+    // Prefer keeping gap: reduce size so centers fit with MIN_GAP_FACTOR.
+    const maxSizeForGap = bandH / ((count - 1) * MIN_GAP_FACTOR + 1);
+    size = Math.min(size, Math.max(22, maxSizeForGap));
+    void maxByGap;
   }
 
+  // Calm rail curve — not a vertical list, not a dramatic half-circle.
   const halfSpread =
-    count === 1 ? 0 : Math.min(1.2, 0.38 + (count - 1) * 0.042);
+    count === 1 ? 0 : Math.min(0.82, 0.32 + (count - 1) * 0.035);
 
-  // Arc center left of the safe band; radius fitted so raw points stay inside.
-  let centerX = minX - bandW * 0.35;
+  let centerX = minX - bandW * 0.45;
   let centerY = (minY + maxY) / 2;
 
-  const pad = size / 2 + 2;
-  const innerMinX = minX + pad;
-  const innerMaxX = maxX - pad;
-  const innerMinY = minY + pad;
-  const innerMaxY = maxY - pad;
+  let iMinX = minX + size / 2;
+  let iMaxX = maxX - size / 2;
+  let iMinY = minY + size / 2;
+  let iMaxY = maxY - size / 2;
 
-  if (innerMaxX <= innerMinX || innerMaxY <= innerMinY) {
-    size = Math.max(24, size * 0.7);
+  if (iMaxX <= iMinX || iMaxY <= iMinY) {
+    size = Math.max(22, size * 0.75);
+    iMinX = minX + size / 2;
+    iMaxX = maxX - size / 2;
+    iMinY = minY + size / 2;
+    iMaxY = maxY - size / 2;
   }
-
-  const iMinX = minX + size / 2 + 1;
-  const iMaxX = maxX - size / 2 - 1;
-  const iMinY = minY + size / 2 + 1;
-  const iMaxY = maxY - size / 2 - 1;
 
   if (iMaxX <= iMinX || iMaxY <= iMinY) {
     return { nodes: [], meta: emptyMeta() };
@@ -134,38 +175,33 @@ export function layoutCircularArcNodes(
     halfSpread < 1e-6
       ? iMaxY - iMinY
       : Math.min(centerY - iMinY, iMaxY - centerY) / Math.sin(halfSpread);
-  const maxRFromX = Math.max(8, iMaxX - centerX);
-  let radius = Math.min(
-    maxRFromY,
-    maxRFromX,
-    height * 0.4,
-    Math.max(width * 0.28, height * 0.22)
-  );
-  radius = Math.max(radius, size * 0.9);
+  const maxRFromX = Math.max(10, iMaxX - centerX);
+  let radius = Math.min(maxRFromY, maxRFromX, bandH * 0.55, bandW * 2.2);
+  radius = Math.max(radius, size * 0.95);
 
-  // If chord spacing too tight, shrink size (keep arc shape stable).
   if (count > 1) {
     const delta = (2 * halfSpread) / (count - 1);
     const sinHalf = Math.sin(delta / 2);
     if (sinHalf > 1e-6) {
-      const chord = 2 * radius * sinHalf;
       const need = size * MIN_GAP_FACTOR;
+      const chord = 2 * radius * sinHalf;
       if (chord < need) {
-        size = Math.max(24, chord / MIN_GAP_FACTOR);
-        // Recompute vertical fit with new size
-        const yPad = size / 2 + 1;
-        const y0 = minY + yPad;
-        const y1 = maxY - yPad;
-        if (y1 > y0) {
-          centerY = (y0 + y1) / 2;
-          const rY =
-            halfSpread < 1e-6
-              ? y1 - y0
-              : Math.min(centerY - y0, y1 - centerY) / Math.sin(halfSpread);
-          radius = Math.min(radius, rY, Math.max(8, iMaxX - centerX));
+        const neededR = need / (2 * sinHalf);
+        if (neededR <= maxRFromY * 1.02 && neededR <= maxRFromX * 1.02) {
+          radius = Math.min(neededR, maxRFromY, maxRFromX);
+        } else {
+          size = Math.max(22, chord / MIN_GAP_FACTOR);
         }
       }
     }
+  }
+
+  const jMinX = minX + size / 2;
+  const jMaxX = maxX - size / 2;
+  const jMinY = minY + size / 2;
+  const jMaxY = maxY - size / 2;
+  if (jMaxX <= jMinX || jMaxY <= jMinY) {
+    return { nodes: [], meta: emptyMeta() };
   }
 
   const angles: number[] =
@@ -180,27 +216,14 @@ export function layoutCircularArcNodes(
     const x = centerX + radius * Math.cos(angle);
     const y = centerY + radius * Math.sin(angle);
     return {
-      x: Math.min(iMaxX, Math.max(iMinX, x)),
-      y: Math.min(iMaxY, Math.max(iMinY, y)),
+      x: Math.min(jMaxX, Math.max(jMinX, x)),
+      y: Math.min(jMaxY, Math.max(jMinY, y)),
       size,
       angle,
     };
   });
 
-  // Prefer a11y-sized nodes when the vertical safe band can host them.
-  if (count > 1) {
-    const ySpan = iMaxY - iMinY;
-    const needForA11y = (count - 1) * ARC_MIN_NODE_SIZE * MIN_GAP_FACTOR;
-    if (ySpan >= needForA11y && size < ARC_MIN_NODE_SIZE) {
-      size = ARC_MIN_NODE_SIZE;
-      for (const n of nodes) n.size = size;
-    }
-  } else if (size < ARC_MIN_NODE_SIZE && iMaxY - iMinY >= ARC_MIN_NODE_SIZE) {
-    size = ARC_MIN_NODE_SIZE;
-    nodes[0]!.size = size;
-  }
-
-  // If clamping caused near-duplicates, redistribute Y evenly in-band (keep X).
+  // If clamp flattened spacing, redistribute with fixed Y gap + soft C bulge in X.
   if (count > 1) {
     let minDist = Infinity;
     for (let i = 1; i < nodes.length; i += 1) {
@@ -210,18 +233,20 @@ export function layoutCircularArcNodes(
       );
     }
     if (minDist < size * 0.98) {
-      const span = iMaxY - iMinY;
-      for (let i = 0; i < nodes.length; i += 1) {
-        const t = i / (nodes.length - 1);
-        nodes[i]!.y = iMinY + t * span;
-        nodes[i]!.x = Math.min(iMaxX, Math.max(iMinX, nodes[i]!.x));
-        nodes[i]!.size = size;
-      }
+      const span = jMaxY - jMinY;
       const step = span / (count - 1);
       if (step < size * MIN_GAP_FACTOR) {
-        const nextSize = Math.max(22, step / MIN_GAP_FACTOR);
-        size = nextSize;
-        for (const n of nodes) n.size = nextSize;
+        size = Math.max(22, step / MIN_GAP_FACTOR);
+      }
+      for (let i = 0; i < nodes.length; i += 1) {
+        const t = count === 1 ? 0.5 : i / (count - 1);
+        const bulge = Math.sin(Math.PI * t);
+        nodes[i]!.y = jMinY + t * span;
+        nodes[i]!.x = Math.min(
+          jMaxX,
+          Math.max(jMinX, jMinX + (jMaxX - jMinX) * (0.25 + 0.5 * bulge))
+        );
+        nodes[i]!.size = size;
       }
     }
   }

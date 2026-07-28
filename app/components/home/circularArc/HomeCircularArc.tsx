@@ -30,7 +30,7 @@ function defaultPortalPress(portalId: string) {
  * Left C-arc overlay of world portals. Does not shrink the video plane.
  * Not a sidebar, drawer, or bottom navigation.
  *
- * Mount only when `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED` is true (fail-closed).
+ * Mount only when preview/product gate allows (`shouldMountHomeCircularArc`).
  */
 export default function HomeCircularArc({
   portals = HOME_ARC_FOUNDATION_PORTALS,
@@ -84,8 +84,8 @@ export default function HomeCircularArc({
     <nav
       ref={rootRef}
       aria-label="UMTUBA world portals"
-      data-home-circular-arc="foundation-v1"
-      className={`pointer-events-none absolute inset-0 z-30 overflow-hidden ${className}`}
+      data-home-circular-arc="ux-polish-v1"
+      className={`pointer-events-none absolute inset-0 z-30 overflow-visible ${className}`}
     >
       {nodes.map((layout, index) => {
         const portal = portals[index];

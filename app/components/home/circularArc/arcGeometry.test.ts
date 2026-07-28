@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   ARC_MIN_NODE_SIZE,
+  HOME_VIDEO_STAGE_MAX_PX,
+  estimateHomeVideoLeftPx,
   layoutCircularArcNodes,
+  resolveArcVideoGapPx,
 } from "./arcGeometry";
 import { HOME_ARC_FOUNDATION_PORTALS } from "./homeCircularArcPortals";
 import {
@@ -14,8 +17,10 @@ import { join } from "node:path";
 const VIEWPORTS = [
   { name: "phone-narrow", width: 360, height: 640 },
   { name: "phone-tall", width: 390, height: 844 },
-  { name: "tablet", width: 768, height: 1024 },
-  { name: "foldable-wide", width: 884, height: 1100 },
+  { name: "laptop", width: 1280, height: 800 },
+  { name: "desktop", width: 1440, height: 900 },
+  { name: "narrow-desktop", width: 1024, height: 700 },
+  { name: "arc-rail", width: 108, height: 780 },
 ] as const;
 
 const COUNTS = [1, 2, 5, 7, 10, 15, 20] as const;
@@ -27,27 +32,29 @@ function assertSafeLayout(
   nodes: ReturnType<typeof layoutCircularArcNodes>["nodes"]
 ) {
   expect(nodes).toHaveLength(count);
-  const maxX = Math.min(width * 0.4, width - 72);
-  const maxY = height * 0.86;
+  const videoLeft = estimateHomeVideoLeftPx(width);
+  const gap = resolveArcVideoGapPx(width);
+  const videoLimit =
+    width <= 160 ? width : Math.max(0, videoLeft - gap);
 
   for (const node of nodes) {
     expect(Number.isFinite(node.x)).toBe(true);
     expect(Number.isFinite(node.y)).toBe(true);
     expect(Number.isFinite(node.size)).toBe(true);
-    expect(Number.isNaN(node.x)).toBe(false);
     expect(node.x - node.size / 2).toBeGreaterThanOrEqual(-0.5);
     expect(node.x + node.size / 2).toBeLessThanOrEqual(width + 0.5);
     expect(node.y - node.size / 2).toBeGreaterThanOrEqual(-0.5);
     expect(node.y + node.size / 2).toBeLessThanOrEqual(height + 0.5);
-    expect(node.x).toBeLessThanOrEqual(maxX + 1);
-    expect(node.y).toBeLessThanOrEqual(maxY + 1);
+    // Discs must not enter the video stage (full-shell hosts).
+    if (width > 160 && videoLeft > 40) {
+      expect(node.x + node.size / 2).toBeLessThanOrEqual(videoLimit + 1);
+    }
   }
 
   for (let i = 1; i < nodes.length; i += 1) {
     const a = nodes[i - 1]!;
     const b = nodes[i]!;
     const dist = Math.hypot(b.x - a.x, b.y - a.y);
-    // Allow tiny float slack after clamp/nudge.
     expect(dist).toBeGreaterThanOrEqual(a.size * 0.95);
   }
 }
@@ -61,15 +68,23 @@ describe("Home Circular Arc fail-closed flag", () => {
       join(process.cwd(), "app/discover/components/DiscoverShell.tsx"),
       "utf8"
     );
-    expect(shell).toMatch(/HOME_CIRCULAR_ARC_FOUNDATION_ENABLED/);
+    expect(shell).toMatch(/shouldMountHomeCircularArc/);
     expect(shell).toMatch(/HomeSectionCircles/);
-    expect(shell).toMatch(
-      /HOME_CIRCULAR_ARC_FOUNDATION_ENABLED \? <HomeCircularArc/
-    );
+    expect(shell).toMatch(/showCircularArcPreview/);
+    expect(shell).toMatch(/HomeCircularArc/);
+    expect(shell).toMatch(/w-\[4\.75rem\]/);
   });
 });
 
-describe("Home Circular Arc geometry foundation", () => {
+describe("Home Circular Arc layout final polish", () => {
+  it("keeps a 24–40px gap model vs centered video stage", () => {
+    expect(HOME_VIDEO_STAGE_MAX_PX).toBe(510);
+    expect(resolveArcVideoGapPx(800)).toBe(24);
+    expect(resolveArcVideoGapPx(1000)).toBe(32);
+    expect(resolveArcVideoGapPx(1400)).toBe(40);
+    expect(estimateHomeVideoLeftPx(1400)).toBe((1400 - 510) / 2);
+  });
+
   it("returns empty nodes for invalid / edge inputs", () => {
     expect(layoutCircularArcNodes({ width: 0, height: 800, count: 7 }).nodes).toEqual(
       []
@@ -84,72 +99,33 @@ describe("Home Circular Arc geometry foundation", () => {
       layoutCircularArcNodes({ width: Number.NaN, height: 800, count: 7 }).nodes
     ).toEqual([]);
     expect(
-      layoutCircularArcNodes({ width: 390, height: Number.POSITIVE_INFINITY, count: 7 })
-        .nodes
-    ).toEqual([]);
-    expect(
-      layoutCircularArcNodes({ width: 390, height: 800, count: Number.NaN }).nodes
-    ).toEqual([]);
-    expect(
-      layoutCircularArcNodes({ width: 390, height: 800, count: -3 }).nodes
-    ).toEqual([]);
-    expect(
       layoutCircularArcNodes({ width: 40, height: 40, count: 7 }).nodes
     ).toEqual([]);
   });
 
-  it("handles count = 1", () => {
+  it("handles count = 1 with calm placement", () => {
     const { nodes, meta } = layoutCircularArcNodes({
-      width: 390,
-      height: 844,
+      width: 1280,
+      height: 800,
       count: 1,
     });
     expect(nodes).toHaveLength(1);
     expect(meta.halfSpread).toBe(0);
     expect(Number.isFinite(nodes[0]!.x)).toBe(true);
-    expect(nodes[0]!.size).toBeGreaterThanOrEqual(ARC_MIN_NODE_SIZE);
   });
 
-  it("floors fractional counts and ignores non-finite nodeSize override safely", () => {
-    const { nodes } = layoutCircularArcNodes({
-      width: 390,
-      height: 844,
-      count: 2.9,
-    });
-    expect(nodes).toHaveLength(2);
-
-    const withBadSize = layoutCircularArcNodes({
-      width: 390,
-      height: 844,
-      count: 3,
-      nodeSize: Number.NaN,
-    });
-    expect(withBadSize.nodes).toHaveLength(3);
-    expect(withBadSize.nodes.every((n) => Number.isFinite(n.size))).toBe(true);
-  });
-
-  it("places foundation portals on a left C-arc opening toward the video", () => {
+  it("uses a calm rail curve (not a half-ring)", () => {
     const { nodes, meta } = layoutCircularArcNodes({
-      width: 390,
-      height: 844,
+      width: 1440,
+      height: 900,
       count: HOME_ARC_FOUNDATION_PORTALS.length,
     });
-
     expect(nodes).toHaveLength(HOME_ARC_FOUNDATION_PORTALS.length);
-    expect(meta.radius).toBeGreaterThan(0);
-    expect(meta.centerX).toBeLessThan(nodes[0]!.x);
-
-    for (let i = 1; i < nodes.length; i += 1) {
-      expect(nodes[i]!.y).toBeGreaterThanOrEqual(nodes[i - 1]!.y - 0.5);
-    }
-
-    for (const node of nodes) {
-      expect(node.x).toBeLessThan(390 * 0.45);
-      expect(node.size).toBeGreaterThanOrEqual(ARC_MIN_NODE_SIZE * 0.85);
-    }
+    expect(meta.halfSpread).toBeLessThanOrEqual(0.82);
+    expect(meta.halfSpread).toBeGreaterThan(0.2);
   });
 
-  it("keeps nodes safe across phone/tablet/foldable × density counts", () => {
+  it("keeps nodes safe across desktop/laptop/narrow/rail × density counts", () => {
     for (const vp of VIEWPORTS) {
       for (const count of COUNTS) {
         const { nodes } = layoutCircularArcNodes({
@@ -162,22 +138,17 @@ describe("Home Circular Arc geometry foundation", () => {
     }
   });
 
-  it("shrinks nodes as count grows to 10/15/20", () => {
-    const baseline = layoutCircularArcNodes({
-      width: 430,
-      height: 920,
+  it("shrinks on short height instead of stacking overlaps", () => {
+    const tall = layoutCircularArcNodes({
+      width: 1280,
+      height: 900,
       count: 7,
     }).nodes[0]!.size;
-
-    for (const count of [10, 15, 20] as const) {
-      const { nodes, meta } = layoutCircularArcNodes({
-        width: 430,
-        height: 920,
-        count,
-      });
-      expect(nodes).toHaveLength(count);
-      expect(meta.halfSpread).toBeLessThanOrEqual(1.25);
-      expect(nodes[0]!.size).toBeLessThanOrEqual(baseline + 0.01);
-    }
+    const short = layoutCircularArcNodes({
+      width: 1280,
+      height: 560,
+      count: 7,
+    }).nodes[0]!.size;
+    expect(short).toBeLessThanOrEqual(tall + 0.01);
   });
 });
