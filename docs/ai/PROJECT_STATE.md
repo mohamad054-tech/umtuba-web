@@ -6,12 +6,12 @@
 
 ## Primary working branch
 
-`alpha-0.2` @ `6fac4409f217b6e7d28b2ff4c0a2dab453f45427` (pre-merge tip; update after FF-merge)
+`alpha-0.2` @ `769039d796e37d3e27c4b8bdc2bb49aff57b53c7` (pre-merge tip; update after FF-merge)
 
 ## Active feature (this machine)
 
-- **Branch:** `office/profile-photos-lightbox-v1`
-- **Task:** Creator Space Photos Lightbox V1 — Final UX Polish → Commit / Push / FF-merge
+- **Branch:** `office/profile-all-timeline-contract-v1`
+- **Task:** Creator Space All Timeline Contract V1 — Final Verification → Commit / Push / FF-merge
 - **See:** `docs/ai/CURRENT_TASK.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -19,9 +19,10 @@
 - Home Circular Arc Navigation Foundation V1
 - Home Circular Arc Preview & Polish V1
 - Home Left Action Rail Arc Alignment V1
-- Home Assembly V1 (`6fac440`)
+- Home Assembly V1
+- Creator Space Photos Lightbox V1 (`769039d`)
 - Arc design locked: 7 circles, arc `[0,-6,-11,-14,-11,-6,0]`, host `left-[5px]`
-- Creator Space Photos Lightbox V1 (closing via this branch)
+- Creator Space All Timeline Contract V1 (closing via this branch)
 
 ## Gates (unchanged)
 

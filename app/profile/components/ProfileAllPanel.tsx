@@ -4,7 +4,7 @@ import {
   ContentCardSkeleton,
 } from "../../components/content-cards";
 import type { ContentCardViewModel } from "../../../lib/content/cards";
-import { partitionProfileAllContent } from "../lib/profilePinnedContentStructure";
+import { applyProfileAllTimelineContract } from "../lib/profileAllTimelineContract";
 import ProfilePinnedRail from "./ProfilePinnedRail";
 
 type ProfileAllPanelProps = {
@@ -17,7 +17,7 @@ type ProfileAllPanelProps = {
 
 /**
  * Profile All — pinned rail (optional) + unified chronological feed.
- * Pinned items are excluded from the chronological list (Creator Space §8).
+ * Applies All Timeline Contract V1 (dedup, fail-closed teaser filter, §6 density).
  */
 export default function ProfileAllPanel({
   cards,
@@ -47,10 +47,12 @@ export default function ProfileAllPanel({
     );
   }
 
-  const { pinned, chronology, showPinnedRail } = partitionProfileAllContent({
-    cards,
-    pinned: pinnedCards,
-  });
+  const { pinned, chronology, showPinnedRail } = applyProfileAllTimelineContract(
+    {
+      cards,
+      pinned: pinnedCards,
+    }
+  );
 
   if (!showPinnedRail && chronology.length === 0) {
     return (
@@ -65,7 +67,10 @@ export default function ProfileAllPanel({
     <div className="space-y-6">
       {showPinnedRail ? <ProfilePinnedRail cards={pinned} /> : null}
       {chronology.length > 0 ? (
-        <ul className="grid gap-3 sm:grid-cols-2" aria-label="All content">
+        <ul
+          className="mx-auto grid max-w-[45rem] gap-3"
+          aria-label="All content"
+        >
           {chronology.map((card) => (
             <li key={card.registryId}>
               <ContentCard card={card} showCreator={false} />
