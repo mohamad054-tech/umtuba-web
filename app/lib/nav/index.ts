@@ -79,6 +79,14 @@ export {
 } from "./secondarySurfaceContract";
 
 export {
+  MOBILE_PRIMARY_EXCLUDED_DOMAIN_HREFS,
+  MOBILE_PRIMARY_WITHOUT_WORLD_LABELS,
+  MOBILE_WORLD_DESKTOP_HREF,
+  MOBILE_WORLD_DESKTOP_LABEL,
+  assertMobileWorldAffordanceDecision,
+} from "./mobileWorldAffordanceContract";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,

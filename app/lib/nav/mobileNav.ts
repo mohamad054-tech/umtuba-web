@@ -4,6 +4,11 @@ import { APP_ROUTES, buildCreatorProfileHref } from "./routes";
  * Mobile primary destinations (bottom nav).
  * Platform Navigation Contract Sync V1: Home, Live, Messages, Profile.
  * Discover is not a mobile tab — `/discover` aliases Home active state only.
+ *
+ * Mobile World Affordance Decision V1: World stays on Desktop primary only.
+ * Mobile users reach World via Home circles / direct `/world` links — do **not**
+ * add World (or Store/Watch) to this list without a separate Product GO.
+ *
  * Visible below the `sm` breakpoint (max-width: 639px), matching AppTopNav
  * which reveals its primary links from `sm` upward — avoids duplicate bars.
  */

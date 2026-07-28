@@ -80,6 +80,24 @@ describe("desktop vs mobile nav contracts", () => {
     ]);
   });
 
+  it("keeps World on desktop only (Mobile World Affordance Decision V1)", () => {
+    expect(APP_NAV_ITEMS.some((item) => item.label === "World")).toBe(true);
+    expect(
+      MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.label === "World")
+    ).toBe(false);
+    expect(
+      MOBILE_PRIMARY_NAV_ITEMS.some(
+        (item) => item.href === APP_ROUTES.worldDiscovery
+      )
+    ).toBe(false);
+    expect(
+      MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.href === APP_ROUTES.store)
+    ).toBe(false);
+    expect(
+      MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.href === APP_ROUTES.watch)
+    ).toBe(false);
+  });
+
   it("scopes mobile bottom nav to below-sm via class contract", () => {
     expect(MOBILE_BOTTOM_NAV_MAX_CLASS).toBe("sm:hidden");
     expect(MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS).toContain(

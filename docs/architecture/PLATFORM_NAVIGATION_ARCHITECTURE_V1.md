@@ -66,6 +66,8 @@ Always alongside (not in `APP_NAV_ITEMS`): brand → `/`, Search → `/search`, 
 - Home active includes `/discover`.
 - Profile active includes `/settings` and `/profile/**`.
 
+**Mobile World Affordance Decision V1:** World is **desktop primary only**. It is **not** a Mobile bottom-nav item. Mobile reachability remains Home circles + direct `/world` links. Do **not** add World, Store, or Watch to Mobile primary without a **separate Product GO**.
+
 ### 2.3 Home circles (entry ramps only)
 
 Source: `HomeSectionCircles` — **layout locked** this phase; contract is the destination list/order:
@@ -111,6 +113,16 @@ Secondary Surface Cleanup V1 freezes these as **not official chrome** (routes re
 
 Contract: `app/lib/nav/secondarySurfaceContract.ts` — forbidden in desktop primary, mobile primary, and UserMenu baseline.
 
+### 2.7 Mobile World Affordance Decision V1
+
+| Surface | Desktop primary | Mobile bottom primary | Mobile entry today |
+| --- | --- | --- | --- |
+| World (`/world`) | Yes | **No** | Home circles + direct links |
+| Store | No | **No** | Circles / UserMenu |
+| Watch | No | **No** | Deep links / content paths |
+
+Revisiting World (or Store/Watch) on Mobile primary requires a **separate Product GO**.
+
 ---
 
 ## 3. Role journeys (chrome reality)
@@ -149,9 +161,9 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 6. Explicit non-goals (later phases)
 
-1. UserMenu capability gating (Instructor / Admin / hide Seller)
+1. UserMenu capability gating (Instructor / Admin / hide Seller) — done in Capability Links V1
 2. Content-flow policy (Home → Profile preferred article path)
-3. Adding Store/World/Watch to mobile primary
+3. Adding Store/World/Watch to mobile primary — **blocked pending separate Product GO** (Mobile World Affordance Decision V1 keeps current asymmetry)
 4. Home feed / circles layout / player changes
 5. Store Domain implementation on laptop while desktop owns Store
 
@@ -159,10 +171,11 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 7. Verification
 
-Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 verified by:
+Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 + Secondary Surface Cleanup V1 + Mobile World Affordance Decision V1 verified by:
 
 - `app/lib/nav/platformNavContract.test.ts`
 - `app/lib/nav/deepLinkAliasContract.test.ts`
 - `app/lib/nav/secondarySurfaceContract.test.ts`
+- `app/lib/nav/mobileWorldAffordanceContract.test.ts`
 - Existing `shellCoherence`, `mobileNav`, `userMenuItems`, `pageAssembly` tests
 - `lib/supabase/redirect.test.ts` for `?next=` safety + Discover default

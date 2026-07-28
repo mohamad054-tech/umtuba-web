@@ -84,6 +84,7 @@ export type AppNavItem = {
  * Desktop primary chrome — Platform Navigation Contract Sync V1.
  * Home is the Discovery Layer label. `/discover` is a forever alias to `/`
  * and must not appear here as a separate primary destination.
+ * Mobile World Affordance Decision V1: World is desktop-primary only (not mobile bottom nav).
  */
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Home", href: APP_ROUTES.home },
