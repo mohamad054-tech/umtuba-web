@@ -1,7 +1,7 @@
-import type { AiGatewayRequest, AiSafetyOutcome } from "./types";
-import type { AiPromptDefinition } from "./prompts/registry";
-import type { AiPlatformConfig } from "./config";
-import { AiPlatformError } from "./errors";
+import type { AiGatewayRequest, AiSafetyOutcome } from "../contracts/types";
+import type { AiPromptDefinition } from "../prompts/registry";
+import type { AiPlatformConfig } from "../config";
+import { AiPlatformError } from "../contracts/errors";
 
 const rateBuckets = new Map<string, number[]>();
 

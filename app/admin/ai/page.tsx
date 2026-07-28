@@ -1,27 +1,28 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../../components/AppTopNav";
-import { loadAiPlatformDiagnostics } from "../../../lib/ai/diagnostics";
+import { loadAiPlatformDiagnostics } from "../../../lib/ai/capabilities/admin/diagnostics";
 import {
   ADMIN_STORE_UNAUTHORIZED,
   assertPlatformAdminDb,
 } from "../../../lib/store/adminAuth";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
-import {
-  APP_ROUTES,
-  MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
-} from "../../lib/nav";
+import { APP_ROUTES } from "../../lib/nav";
 
 export const metadata = {
   title: "AI Platform Diagnostics | UMTUBA",
 };
 
+const ADMIN_AI_PATH = "/admin/ai";
+
+/**
+ * Isolated privileged diagnostics surface.
+ * Does not modify Navigation, App Shell, shared UI kits, or global styles.
+ */
 export default async function AdminAiPlatformPage() {
   const user = await getServerUser();
   if (!user) {
-    redirect(
-      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.adminAi)}`
-    );
+    redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(ADMIN_AI_PATH)}`);
   }
   const supabase = await createClient();
   const isAdmin = await assertPlatformAdminDb(supabase);
@@ -34,9 +35,7 @@ export default async function AdminAiPlatformPage() {
   const diagnostics = loadAiPlatformDiagnostics();
 
   return (
-    <main
-      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
-    >
+    <main className="min-h-screen bg-[#050510] pb-16 text-white">
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav title="AI platform" subtitle="Internal diagnostics" />
         <nav
@@ -49,12 +48,9 @@ export default async function AdminAiPlatformPage() {
           >
             Store admin
           </Link>
-          <Link
-            href={APP_ROUTES.adminAi}
-            className="watch-focus-ring rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white"
-          >
+          <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white">
             AI platform
-          </Link>
+          </span>
         </nav>
 
         <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">

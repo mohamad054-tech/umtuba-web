@@ -1,27 +1,34 @@
-export * from "./types";
-export * from "./errors";
-export * from "./config";
-export * from "./context";
-export * from "./router";
-export * from "./gateway";
-export * from "./lifecycle";
-export * from "./usage";
-export * from "./tracing";
-export * from "./safety";
-export * from "./session";
-export * from "./memory";
-export * from "./evaluation";
-export * from "./diagnostics";
-export * from "./productDraftAssistant";
-export { listPromptDefinitions, resolvePrompt } from "./prompts/registry";
+/**
+ * Shared AI Core — public exports for Domain AI and server adapters.
+ * UI must consume only `aiService` + `contracts/public`.
+ */
+
+export { aiService, runCapability } from "./services/aiService";
+export type {
+  AiServiceCapabilityId,
+  AiServiceContextRefs,
+  AiServiceRunRequest,
+  AiServiceResult,
+  AiServiceSuccess,
+  AiServiceFailure,
+  ProductDraftAssistantResult,
+} from "./contracts/public";
+export type { AiErrorCode, AiResult } from "./contracts/types";
+export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
+export { loadAiPlatformConfig, describeAiConfigStatus } from "./config";
+
+/** Domain capability (server-side only; no UI). */
+export { runProductDraftAssistant } from "./capabilities/commerce/productDraftAssistant";
+export { loadAiPlatformDiagnostics } from "./capabilities/admin/diagnostics";
+
+/** Internal modules — Domain AI may use; UI must not. */
+export { executeAiGateway } from "./gateway/execute";
+export { buildTrustedContext } from "./context/envelope";
+export { resolvePrompt, listPromptDefinitions } from "./prompts/registry";
 export {
   buildProviderRegistry,
   listAvailableModels,
   findModel,
-} from "./providers/registry";
-export {
-  listTools,
-  getTool,
-  invokeTool,
-  installReferenceTools,
-} from "./tools/registry";
+} from "./models/registry";
+export { routeModel } from "./routing/router";
+export { listTools, invokeTool, installReferenceTools } from "./tools/registry";

@@ -1,14 +1,14 @@
 import {
   describeAiConfigStatus,
   loadAiPlatformConfig,
-} from "./config";
-import { listPromptDefinitions } from "./prompts/registry";
-import { buildProviderRegistry, listAvailableModels } from "./providers/registry";
-import { listTools } from "./tools/registry";
-import { summarizeRunFailures, listRecentRuns } from "./lifecycle";
-import { summarizeUsage } from "./usage";
-import { countTraceEventsByType } from "./tracing";
-import { ensureAiReferenceToolsInstalled } from "./productDraftAssistant";
+} from "../../config";
+import { listPromptDefinitions } from "../../prompts/registry";
+import { buildProviderRegistry, listAvailableModels } from "../../models/registry";
+import { listTools } from "../../tools/registry";
+import { summarizeRunFailures, listRecentRuns } from "../../runs/lifecycle";
+import { summarizeUsage } from "../../usage/accounting";
+import { countTraceEventsByType } from "../../tracing/events";
+import { ensureReferenceToolCatalog } from "../../tools/referenceBootstrap";
 
 export type AiPlatformDiagnostics = {
   config: ReturnType<typeof describeAiConfigStatus>;
@@ -47,7 +47,7 @@ export type AiPlatformDiagnostics = {
 };
 
 export function loadAiPlatformDiagnostics(): AiPlatformDiagnostics {
-  ensureAiReferenceToolsInstalled(null);
+  ensureReferenceToolCatalog();
   const config = loadAiPlatformConfig();
   const status = describeAiConfigStatus(config);
   const providers = buildProviderRegistry({

@@ -1,47 +1,47 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { loadAiPlatformConfig, type AiPlatformConfig } from "./config";
+import { loadAiPlatformConfig, type AiPlatformConfig } from "../config";
 import {
   assertCapabilityAllowed,
   buildTrustedContext,
   estimateContextChars,
-} from "./context";
-import { AiPlatformError, failResult, sanitizeAiErrorMessage } from "./errors";
+} from "../context/envelope";
+import { AiPlatformError, failResult, sanitizeAiErrorMessage } from "../contracts/errors";
 import {
   evaluateProductDraftSuggestion,
   recordEvaluation,
-} from "./evaluation";
+} from "../evaluations/hooks";
 import {
   completeRun,
   createRun,
   failRun,
   updateRunStatus,
-} from "./lifecycle";
-import { resolvePrompt, validateStructuredAgainstPrompt } from "./prompts/registry";
+} from "../runs/lifecycle";
+import { resolvePrompt, validateStructuredAgainstPrompt } from "../prompts/registry";
 import {
   buildProviderRegistry,
   findModel,
-} from "./providers/registry";
-import { resolveProviderAdapters } from "./providers/adapters";
-import { routeModel } from "./router";
+} from "../models/registry";
+import { resolveProviderAdapters } from "../providers/adapters";
+import { routeModel } from "../routing/router";
 import {
   assertRateLimit,
   runPostExecutionPolicy,
   runPreExecutionPolicy,
-} from "./safety";
+} from "../safety/hooks";
 import {
   assertSessionWorkspace,
   attachRunToSession,
   getAiSessionForUser,
-} from "./session";
-import { appendTraceEvent } from "./tracing";
+} from "../sessions/session";
+import { appendTraceEvent } from "../tracing/events";
 import type {
   AiGatewayRequest,
   AiGatewaySuccess,
   AiResult,
   AiToolCallSummary,
-} from "./types";
-import { buildUsageRecord, recordUsage } from "./usage";
-import { invokeTool } from "./tools/registry";
+} from "../contracts/types";
+import { buildUsageRecord, recordUsage } from "../usage/accounting";
+import { invokeTool } from "../tools/registry";
 
 export type AiGatewayDeps = {
   config?: AiPlatformConfig;

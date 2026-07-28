@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import type { AiDataClassification } from "./types";
-import { AiPlatformError } from "./errors";
+import type { AiDataClassification } from "../contracts/types";
+import { AiPlatformError } from "../contracts/errors";
 
 export const AI_MEMORY_SCOPES = [
   "session",

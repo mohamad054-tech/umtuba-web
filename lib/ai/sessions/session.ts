@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { AiPlatformError } from "./errors";
-import { isAiUuid } from "./context";
+import { AiPlatformError } from "../contracts/errors";
+import { isAiUuid } from "../context/envelope";
 
 export type AiSession = {
   id: string;

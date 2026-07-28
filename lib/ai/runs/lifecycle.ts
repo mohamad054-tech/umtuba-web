@@ -7,7 +7,7 @@ import type {
   AiToolCallSummary,
   AiUsageRecord,
   AiDataClassification,
-} from "./types";
+} from "../contracts/types";
 
 const runs = new Map<string, AiRunRecord>();
 

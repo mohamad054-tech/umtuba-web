@@ -3,7 +3,7 @@ import type {
   AiDataClassification,
   AiLatencyClass,
   AiModality,
-} from "../types";
+} from "../contracts/types";
 
 export type AiModelCapabilityClass =
   | "chat"

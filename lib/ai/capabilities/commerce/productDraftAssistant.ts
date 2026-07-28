@@ -1,10 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { executeAiGateway } from "./gateway";
-import { installReferenceTools } from "./tools/registry";
-import { getOwnedOrMemberStore, getSellerProductBundle } from "../store/sellerStore";
-import { canManageCatalog } from "../store/permissions";
-import type { AiResult } from "./types";
-import { createAiSession } from "./session";
+import { executeAiGateway } from "../../gateway/execute";
+import { installReferenceTools } from "../../tools/registry";
+import { getOwnedOrMemberStore, getSellerProductBundle } from "../../../store/sellerStore";
+import { canManageCatalog } from "../../../store/permissions";
+import type { AiResult } from "../../contracts/types";
+import { createAiSession } from "../../sessions/session";
 
 let toolsReady = false;
 

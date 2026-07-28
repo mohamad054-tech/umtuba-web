@@ -1,4 +1,4 @@
-import type { AiUsageRecord } from "./types";
+import type { AiUsageRecord } from "../contracts/types";
 
 const usageRecords: AiUsageRecord[] = [];
 const MAX = 2000;

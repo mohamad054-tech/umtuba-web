@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import type { AiContextEnvelope, AiDataClassification } from "./types";
-import { AiPlatformError } from "./errors";
+import type { AiContextEnvelope, AiDataClassification } from "../contracts/types";
+import { AiPlatformError } from "../contracts/errors";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

@@ -4,10 +4,10 @@ import type {
   AiLatencyClass,
   AiModality,
   AiRouteDecision,
-} from "./types";
-import type { AiModelDefinition, AiProviderDefinition } from "./providers/registry";
-import { findModel, listAvailableModels } from "./providers/registry";
-import { AiPlatformError } from "./errors";
+} from "../contracts/types";
+import type { AiModelDefinition, AiProviderDefinition } from "../models/registry";
+import { findModel, listAvailableModels } from "../models/registry";
+import { AiPlatformError } from "../contracts/errors";
 
 export type RouteRequest = {
   capabilityId: string;

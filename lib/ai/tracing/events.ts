@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import type { AiTraceEvent, AiTraceEventType } from "./types";
-import { redactForTrace } from "./safety";
+import type { AiTraceEvent, AiTraceEventType } from "../contracts/types";
+import { redactForTrace } from "../safety/hooks";
 
 const events: AiTraceEvent[] = [];
 const MAX_EVENTS = 2000;

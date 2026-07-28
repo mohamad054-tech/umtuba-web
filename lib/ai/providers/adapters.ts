@@ -1,5 +1,5 @@
-import type { AiUsageRecord } from "../types";
-import { AiPlatformError, sanitizeAiErrorMessage } from "../errors";
+import type { AiUsageRecord } from "../contracts/types";
+import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
 import type { AiPlatformConfig } from "../config";
 
 export type ProviderChatMessage = {

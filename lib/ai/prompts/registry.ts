@@ -3,8 +3,8 @@ import type {
   AiDataClassification,
   AiOutputMode,
   AiPromptStatus,
-} from "../types";
-import { AiPlatformError } from "../errors";
+} from "../contracts/types";
+import { AiPlatformError } from "../contracts/errors";
 
 export type AiPromptDefinition = {
   promptId: string;

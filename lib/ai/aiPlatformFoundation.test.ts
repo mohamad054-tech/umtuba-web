@@ -1,27 +1,29 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { loadAiPlatformConfig } from "./config";
 import {
   assertCapabilityAllowed,
   buildTrustedContext,
-} from "./context";
+} from "./context/envelope";
 import {
   evaluateProductDraftSuggestion,
   listEvaluations,
   recordEvaluation,
   resetAiEvaluationState,
-} from "./evaluation";
-import { executeAiGateway } from "./gateway";
+} from "./evaluations/hooks";
+import { executeAiGateway } from "./gateway/execute";
 import {
   listRecentRuns,
   resetAiRunState,
   summarizeRunFailures,
-} from "./lifecycle";
+} from "./runs/lifecycle";
 import {
   AI_MEMORY_POLICIES,
   assertMemoryPermission,
   createInMemoryAiMemoryStore,
   resetAiMemoryState,
-} from "./memory";
+} from "./memory/policy";
 import {
   listPromptDefinitions,
   resolvePrompt,
@@ -30,20 +32,20 @@ import {
 import {
   buildProviderRegistry,
   listAvailableModels,
-} from "./providers/registry";
-import { routeModel } from "./router";
+} from "./models/registry";
+import { routeModel } from "./routing/router";
 import {
   assertRateLimit,
   redactForTrace,
   resetAiRateLimitState,
   runPostExecutionPolicy,
-} from "./safety";
+} from "./safety/hooks";
 import {
   assertSessionWorkspace,
   createAiSession,
   getAiSessionForUser,
   resetAiSessionState,
-} from "./session";
+} from "./sessions/session";
 import {
   installReferenceTools,
   invokeTool,
@@ -52,12 +54,15 @@ import {
 import {
   listRecentTraceEvents,
   resetAiTraceState,
-} from "./tracing";
-import { listRecentUsage, resetAiUsageState, summarizeUsage } from "./usage";
-import { loadAiPlatformDiagnostics } from "./diagnostics";
-import { AiPlatformError } from "./errors";
-import { readFileSync } from "fs";
-import { join } from "path";
+} from "./tracing/events";
+import {
+  listRecentUsage,
+  resetAiUsageState,
+  summarizeUsage,
+} from "./usage/accounting";
+import { loadAiPlatformDiagnostics } from "./capabilities/admin/diagnostics";
+import { AiPlatformError } from "./contracts/errors";
+import { aiService } from "./services/aiService";
 
 const USER_A = "11111111-1111-4111-8111-111111111111";
 const USER_B = "22222222-2222-4222-8222-222222222222";
@@ -432,6 +437,45 @@ describe("gateway end-to-end (stub)", () => {
   });
 });
 
+describe("aiService.runCapability boundary", () => {
+  it("exposes diagnostics probe through the stable service entry", async () => {
+    const result = await aiService.runCapability(
+      {
+        capabilityId: "platform.diagnostics_probe",
+        input: { text: "ping" },
+        context: {
+          productDomain: "platform",
+          surface: "test.service",
+        },
+      },
+      {
+        supabase: {} as never,
+        userId: USER_A,
+        forceStub: true,
+      }
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.runId).toBeTruthy();
+    expect(result.data.capabilityId).toBe("platform.diagnostics_probe");
+    expect(result.data.result).toBeTruthy();
+  });
+
+  it("fails closed without auth", async () => {
+    const result = await aiService.runCapability(
+      {
+        capabilityId: "platform.diagnostics_probe",
+        input: { text: "ping" },
+        context: { productDomain: "platform", surface: "test" },
+      },
+      { supabase: {} as never, userId: null }
+    );
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.code).toBe("unauthenticated");
+  });
+});
+
 describe("safety / redaction / post policy", () => {
   it("redacts secrets from traces", () => {
     const redacted = redactForTrace(
@@ -568,25 +612,34 @@ describe("evaluation + diagnostics", () => {
   });
 });
 
-describe("reference consumer invariants", () => {
-  it("action module never auto-saves product fields", () => {
+describe("reference capability invariants", () => {
+  it("commerce capability never mutates critical commerce state", () => {
     const src = readFileSync(
-      join(process.cwd(), "app/actions/aiProductDraft.ts"),
+      join(
+        process.cwd(),
+        "lib/ai/capabilities/commerce/productDraftAssistant.ts"
+      ),
       "utf8"
     );
-    expect(src).toMatch(/suggestProductDraftAction/);
-    expect(src).not.toMatch(/updateDraftProduct/);
-    expect(src).not.toMatch(/amount_minor|inventory|publish|submitProduct/);
+    expect(src).toMatch(/runProductDraftAssistant/);
+    expect(src).not.toMatch(/updateDraftProduct|submitProduct|amount_minor/);
+    expect(src).toMatch(/canAlterPrice: false/);
+    expect(src).toMatch(/autoSaved: false/);
   });
 
-  it("panel labels AI output and requires explicit apply", () => {
-    const src = readFileSync(
-      join(process.cwd(), "app/components/store/ProductDraftAssistantPanel.tsx"),
-      "utf8"
-    );
-    expect(src).toMatch(/AI-generated/);
-    expect(src).toMatch(/never saved automatically/i);
-    expect(src).toMatch(/Copy to apply/);
+  it("does not ship seller editor UI integration from Desktop AI ownership", () => {
+    expect(() =>
+      readFileSync(
+        join(
+          process.cwd(),
+          "app/components/store/ProductDraftAssistantPanel.tsx"
+        ),
+        "utf8"
+      )
+    ).toThrow();
+    expect(() =>
+      readFileSync(join(process.cwd(), "app/actions/aiProductDraft.ts"), "utf8")
+    ).toThrow();
   });
 });
 
@@ -611,13 +664,17 @@ describe("migration contract", () => {
       expect(sql).toContain(`force row level security`);
     }
     expect(sql).toMatch(/revoke all on table public\.ai_runs/);
-    expect(sql).toMatch(/cost_status in \('provider_reported', 'estimated', 'unavailable'\)/);
-    expect(sql).not.toMatch(/grant insert on table public\.ai_runs to authenticated/i);
+    expect(sql).toMatch(
+      /cost_status in \('provider_reported', 'estimated', 'unavailable'\)/
+    );
+    expect(sql).not.toMatch(
+      /grant insert on table public\.ai_runs to authenticated/i
+    );
   });
 });
 
 describe("admin diagnostics route authorization source", () => {
-  it("uses platform admin DB authority", () => {
+  it("uses platform admin DB authority and avoids secrets", () => {
     const src = readFileSync(
       join(process.cwd(), "app/admin/ai/page.tsx"),
       "utf8"
@@ -625,5 +682,6 @@ describe("admin diagnostics route authorization source", () => {
     expect(src).toMatch(/assertPlatformAdminDb/);
     expect(src).not.toMatch(/OPENAI_API_KEY/);
     expect(src).not.toMatch(/sk-/);
+    expect(src).not.toMatch(/AdminStoreShell/);
   });
 });

@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import type { AiRunStatus } from "./types";
+import type { AiRunStatus } from "../contracts/types";
 
 export type AiEvaluationRecord = {
   id: string;

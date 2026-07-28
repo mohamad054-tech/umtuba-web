@@ -11,7 +11,6 @@ const LINKS = [
   { href: APP_ROUTES.adminStoreSellers, label: "Seller applications" },
   { href: APP_ROUTES.adminStoreProducts, label: "Product review" },
   { href: APP_ROUTES.adminStoreReservations, label: "Reservations" },
-  { href: APP_ROUTES.adminAi, label: "AI platform" },
 ] as const;
 
 type Props = {

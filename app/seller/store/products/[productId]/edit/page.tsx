@@ -33,7 +33,6 @@ import {
   explainMarketplaceProductToggle,
 } from "../../../../../../lib/store/marketplaceEligibility";
 import { countActiveListingsForProduct } from "../../../../../../lib/store/marketplaceSupplierSellerQueries";
-import ProductDraftAssistantPanel from "../../../../../components/store/ProductDraftAssistantPanel";
 
 type EditPageProps = {
   params: Promise<{ productId: string }>;
@@ -209,15 +208,6 @@ export default async function EditSellerProductPage({
           activate.
         </p>
       </header>
-
-      <ProductDraftAssistantPanel
-        productId={bundle.product.id}
-        canEdit={canEditFields}
-        currentTitle={bundle.product.title}
-        currentDescription={
-          bundle.product.description ?? bundle.product.short_description ?? ""
-        }
-      />
 
       {!canEditRole ? (
         <p className="mt-6 rounded-2xl border border-[var(--sf-line)] px-4 py-6 text-sm text-[var(--sf-faint)]">

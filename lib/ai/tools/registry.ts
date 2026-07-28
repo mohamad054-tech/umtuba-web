@@ -1,5 +1,5 @@
-import type { AiDataClassification } from "../types";
-import { AiPlatformError } from "../errors";
+import type { AiDataClassification } from "../contracts/types";
+import { AiPlatformError } from "../contracts/errors";
 
 export type AiToolDefinition = {
   toolId: string;
