@@ -12,25 +12,23 @@ import {
 import { APP_NAV_ITEMS, APP_ROUTES } from "./routes";
 
 describe("MOBILE_PRIMARY_NAV_ITEMS", () => {
-  it("renders the five primary destinations in order", () => {
+  it("renders the four primary destinations in order", () => {
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
       "home",
-      "discover",
       "live",
       "messages",
       "profile",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
       "Home",
-      "Discover",
       "Live",
       "Messages",
       "Profile",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS[0]?.href).toBe(APP_ROUTES.home);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.discover);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.live);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.messages);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.live);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.messages);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.profile);
   });
 });
 
@@ -45,7 +43,6 @@ describe("isMobilePrimaryNavActive", () => {
     );
     expect(isMobilePrimaryNavActive("/settings", "profile")).toBe(true);
     expect(isMobilePrimaryNavActive("/messages", "messages")).toBe(true);
-    expect(isMobilePrimaryNavActive("/discover", "discover")).toBe(false);
     expect(isMobilePrimaryNavActive("/", "home")).toBe(true);
     expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
   });
@@ -76,7 +73,6 @@ describe("desktop vs mobile nav contracts", () => {
   it("keeps desktop primary links available via AppTopNav items", () => {
     expect(APP_NAV_ITEMS.map((item) => item.href)).toEqual([
       APP_ROUTES.home,
-      APP_ROUTES.discover,
       APP_ROUTES.worldDiscovery,
       APP_ROUTES.learning,
       APP_ROUTES.live,

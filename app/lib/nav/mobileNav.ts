@@ -18,7 +18,6 @@ export const MOBILE_BOTTOM_NAV_OFFSET_VAR = "--app-mobile-bottom-nav-offset";
 
 export type MobilePrimaryNavId =
   | "home"
-  | "discover"
   | "live"
   | "messages"
   | "profile";
@@ -32,7 +31,6 @@ export type MobilePrimaryNavItem = {
 
 export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] = [
   { id: "home", label: "Home", href: APP_ROUTES.home },
-  { id: "discover", label: "Discover", href: APP_ROUTES.discover },
   { id: "live", label: "Live", href: APP_ROUTES.live },
   { id: "messages", label: "Messages", href: APP_ROUTES.messages },
   { id: "profile", label: "Profile", href: APP_ROUTES.profile },
@@ -78,14 +76,12 @@ export function isMobilePrimaryNavActive(
 
   switch (id) {
     case "home":
+      // `/discover` aliases Home feed — keep Home highlighted for deeplinks.
       return (
         path === APP_ROUTES.home ||
         path === APP_ROUTES.discover ||
         path.startsWith(`${APP_ROUTES.discover}/`)
       );
-    case "discover":
-      // `/discover` aliases Home — avoid double-highlight with Home.
-      return false;
     case "live":
       return path === APP_ROUTES.live || path.startsWith(`${APP_ROUTES.live}/`);
     case "messages":

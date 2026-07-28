@@ -82,7 +82,6 @@ export type AppNavItem = {
 
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Home", href: APP_ROUTES.home },
-  { label: "Discover", href: APP_ROUTES.discover },
   { label: "World", href: APP_ROUTES.worldDiscovery },
   { label: "Learning", href: APP_ROUTES.learning },
   { label: "Live", href: APP_ROUTES.live },

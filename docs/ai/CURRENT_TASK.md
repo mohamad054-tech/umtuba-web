@@ -2,49 +2,53 @@
 
 ## Task title
 
-Creator Space + Content Cards V1
+Nav Chrome Hygiene V1
 
 ## Status
 
-`verification-complete` — implementation on disk verified (vitest, tsc, build, diff-check, static review). **No commit. No push.** Await explicit GO.
+`implemented` — Discover retired from desktop + mobile primary nav. Verification PASS. **No commit / push.**
 
 ## Branch / sync
 
-- Branch: `office/creator-space-content-cards-v1`
-- Parent / base: `76d30df` (`docs(architecture): define unified creator experience v1` on `alpha-0.2`)
-- Working tree: **dirty** (implementation changes uncommitted — intentional)
+- Branch: `office/nav-chrome-hygiene-v1`
+- Parent / base: `b7ef93e` (`feat(web): add creator space content cards v1` on `alpha-0.2`)
+- Sync: checked out; HEAD = `b7ef93e`; no ahead/behind vs base tip; working tree has implementation + handoff docs only
 
-## Verification results (this session)
+## Why this is next
 
-| Check | Result |
-| --- | --- |
-| Focused Vitest (prior session) | PASS 43/43 |
-| `npx tsc --noEmit` (prior session) | EXIT 0 |
-| `npm run build` | PASS (Next.js 16.2.10) |
-| `git diff --check` | PASS (whitespace warnings only on docs LF/CRLF) |
-| Home lock | PASS — no Home / Discover / Watch player files in diff |
+Closed spine (do not re-open):
 
-## Delivered (uncommitted)
+1. Unified Content Foundation V1
+2. Unified Content Services V2
+3. Media Processing Foundation V1
+4. Architecture docs (Unified Experience + Creator Space + Content Cards)
+5. Creator Space + Content Cards V1 — **merged into `alpha-0.2`**
 
-- `lib/content/cards/*` — View Model + mapper + tests
-- `app/components/content-cards/*` — shared ContentCard UI
-- Profile wiring: page, types, mapProfile, ProfileAllPanel, Tabs, Experience, Shell
-- Projection: `publishState` + teaser/independent badges via mapper
-- Creator Space: Hero collapse on scroll, sticky tabs + mini-header, All panel cards
+Per `docs/architecture/UNIFIED_EXPERIENCE_PAGE_CONSOLIDATION_V1.md` §12 execution order, step 2 is **Nav chrome hygiene** (Discover label retirement; keep `/discover` redirect; **zero Home feed changes**).
 
-## Next (human GO only)
+Deferred after this (not now): Creator Space tab visibility / Courses / Products / Photos / Pinned / Content Card Search variants / alias hygiene.
 
-1. Manual QA on `/profile/[username]` (see CURSOR_REPORT routes)
-2. Explicit commit / push if approved
-3. Do **not** start Courses / Products / Photos / Pinned / Nav hygiene
+## Done in this GO
 
-## Forbidden
+- Removed Discover from `APP_NAV_ITEMS` (desktop / AppTopNav / LandingHero via shared array)
+- Removed Discover from `MOBILE_PRIMARY_NAV_ITEMS`; dropped `discover` from `MobilePrimaryNavId` + NavIcon / active-state switch
+- Kept `APP_ROUTES.discover`, `/discover` redirect, `buildDiscoverCityHref`, `buildPostNotificationHref`, and Home≡Discover active highlight on Home
+- Updated `mobileNav.test`, `shellCoherence`, `pageAssembly` contracts
 
-- Home changes
+## Forbidden (still)
+
+- Home feed / DiscoverExperience player / swipe / ranking / engagement changes
+- Watch player redesign
+- Creator Space Courses / Products / Photos / Pinned implementation
 - Migrations
 - Commit / Push without explicit GO
-- Courses / Products / Photos / Pinned / Nav hygiene
 
 ## Hard lock
 
-Home remains official Discovery Layer — do not touch.
+Home remains official Discovery Layer — do not touch feed/player behavior.
+
+## Out-of-scope notes (documented only)
+
+- Architecture §15 inventory still lists Discover in primary nav — doc refresh deferred
+- Alias hygiene (`/seller/products*`, etc.) deferred per §12 step 5
+- No further nav chrome labels beyond Discover retirement
