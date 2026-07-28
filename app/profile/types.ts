@@ -16,6 +16,9 @@ export type ProfileVideo = {
   accent: string;
 };
 
+/** Live tab bucket (Creator Space §13) — structure readiness only. */
+export type ProfileLiveBucket = "now" | "upcoming" | "past";
+
 export type ProfileLivePreview = {
   streamId: string;
   title: string;
@@ -24,12 +27,37 @@ export type ProfileLivePreview = {
   country: string;
   previewGradient: string;
   isLiveNow?: boolean;
+  /** Explicit Now / Upcoming / Past; when omitted, derived from isLiveNow / profile.isLive. */
+  bucket?: ProfileLiveBucket;
+  /** Optional schedule copy for Upcoming structure (no scheduling backend). */
+  scheduledLabel?: string;
 };
 
+export type ProfileAboutExperience = {
+  title: string;
+  detail?: string;
+};
+
+export type ProfileAboutEducation = {
+  title: string;
+  detail?: string;
+};
+
+export type ProfileAboutLink = {
+  label: string;
+  href: string;
+};
+
+/** About tab structure (Creator Space §9) — optional fields omit when empty. */
 export type ProfileAbout = {
   joinedLabel: string;
   website?: string;
   interests: string[];
+  specialties?: string[];
+  experience?: ProfileAboutExperience[];
+  education?: ProfileAboutEducation[];
+  achievements?: string[];
+  links?: ProfileAboutLink[];
 };
 
 export type ProfileArticle = {

@@ -316,6 +316,7 @@ export function mapContentLiveToProfileSessions(
     country: room.country || "World",
     previewGradient: liveGradientForRoomId(room.roomId),
     isLiveNow: true,
+    bucket: "now" as const,
   }));
 }
 

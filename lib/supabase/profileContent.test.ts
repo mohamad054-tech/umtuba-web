@@ -158,7 +158,12 @@ describe("profile content architecture", () => {
     const livePanel = readRepoFile(
       "app/profile/components/ProfileLivePanel.tsx"
     );
-    expect(livePanel).toMatch(/Past live history/);
+    const content = readRepoFile("lib/supabase/profileContent.ts");
+    expect(livePanel).toMatch(/Live Now/);
+    expect(livePanel).toMatch(/Upcoming/);
+    expect(livePanel).toMatch(/Past/);
+    expect(content).toMatch(/\.eq\("status", "live"\)/);
+    expect(content).not.toMatch(/status", "ended"/);
   });
 
   it("video grid links to Watch and shows honest empty copy", () => {

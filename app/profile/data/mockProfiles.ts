@@ -59,6 +59,21 @@ export const MOCK_PROFILES: MockProfile[] = [
       joinedLabel: "Joined March 2024",
       website: "umtuba.world/lina",
       interests: ["Travel", "Documentary", "City light"],
+      specialties: ["Documentary film", "City light"],
+      experience: [
+        {
+          title: "Independent filmmaker",
+          detail: "Street and morning-light documentaries · 6 years",
+        },
+      ],
+      education: [
+        {
+          title: "Visual storytelling",
+          detail: "Workshops and field practice",
+        },
+      ],
+      achievements: ["Creator Space pioneer"],
+      links: [{ label: "Portfolio", href: "https://umtuba.world/lina" }],
     },
   },
   {
@@ -336,12 +351,36 @@ export const MOCK_PROFILES: MockProfile[] = [
         city: "Lagos",
         country: "Nigeria",
         previewGradient: "from-[#1a1040] via-[#0c1a3a] to-[#061820]",
+        isLiveNow: true,
+        bucket: "now",
+      },
+      {
+        streamId: "live-lagos-evening-qa",
+        title: "Evening waterfront Q&A",
+        viewersLabel: "0",
+        city: "Lagos",
+        country: "Nigeria",
+        previewGradient: "from-[#0c1a3a] via-[#101828] to-[#061820]",
+        isLiveNow: false,
+        bucket: "upcoming",
+        scheduledLabel: "Tomorrow · 7:00 PM",
+      },
+      {
+        streamId: "live-lagos-harbor-walk",
+        title: "Harbor walk — evening pass",
+        viewersLabel: "12.1K",
+        city: "Lagos",
+        country: "Nigeria",
+        previewGradient: "from-[#101828] via-[#0c1420] to-[#081018]",
+        isLiveNow: false,
+        bucket: "past",
       },
     ],
     about: {
       joinedLabel: "Joined November 2023",
       website: "umtuba.world/amara",
       interests: ["Travel", "Live", "Culture"],
+      specialties: ["Live documentary", "Travel"],
     },
   },
   {
