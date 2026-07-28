@@ -61,8 +61,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Premium Seller Orders Operations Experience V1 | **COMPLETE** (branch `office/commerce-premium-seller-orders-operations-v1`) |
 | Commerce Premium Seller Catalog & Product Management V1 | **COMPLETE** (branch `office/commerce-premium-seller-catalog-product-management-v1`) |
 | Commerce Premium Seller Inventory & Reservation Visibility V1 | **COMPLETE** (branch `office/commerce-premium-seller-inventory-reservation-visibility-v1`) |
+| Commerce Premium Seller Dashboard & Operational Insights V1 | **COMPLETE** (branch `office/commerce-premium-seller-dashboard-insights-v1`) |
 
-Default: Consolidation complete. Program is in **implementation**. Storefront through Seller Inventory visibility landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Program is in **implementation**. Storefront through Seller Dashboard insights landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

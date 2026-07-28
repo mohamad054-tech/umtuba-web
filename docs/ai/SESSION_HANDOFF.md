@@ -13,12 +13,13 @@ Consolidation complete. Implementation track active.
 3. Buyer Orders
 4. Seller Orders Operations
 5. Seller Catalog & Product Management
-6. Seller Inventory & Reservation Visibility (current) — `office/commerce-premium-seller-inventory-reservation-visibility-v1`
+6. Seller Inventory & Reservation Visibility
+7. Seller Dashboard & Operational Insights (current) — `office/commerce-premium-seller-dashboard-insights-v1`
 
 ## Frozen architecture
 
 Do not modify `docs/commerce/**` frozen foundations / Physical SAs / Manifesto.
 
-## Next after seller inventory visibility
+## Next
 
-Trading-domain alignment or merchant settlement visibility — no payment provider / Shipping Network / Warehouse execution unless asked.
+Trading-domain alignment or connecting settlement/payout visibility when trusted financial ledger is ready. No payment provider / Warehouse / Shipping Network unless asked.

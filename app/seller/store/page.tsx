@@ -1,16 +1,36 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AppTopNav from "../../components/AppTopNav";
-import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import SellerDashboardInsightsView from "../../components/store/SellerDashboardInsights";
+import SellerOpsShell from "../../components/store/SellerOpsShell";
+import { APP_ROUTES } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
-  EMPTY_FULFILLMENT_DASHBOARD_COUNTS,
-  SELLER_DASHBOARD_FULFILLMENT_CARDS,
-  parseFulfillmentDashboardCounts,
-  sellerOrdersHrefForDashboardCard,
-} from "../../../lib/store/adminUiHelpers";
-import { canManageStoreSettings } from "../../../lib/store/permissions";
+  ANALYTICS_PERIOD_PRESETS,
+  buildAnalyticsDateRange,
+  getSellerAnalyticsBundle,
+  resolveAnalyticsPeriod,
+  type AnalyticsPeriodKey,
+  type SellerAnalyticsBundle,
+} from "../../../lib/store/analyticsFinance";
+import { parseFulfillmentDashboardCounts } from "../../../lib/store/adminUiHelpers";
+import {
+  canManageStoreSettings,
+  canViewStore,
+} from "../../../lib/store/permissions";
 import { getSellerFulfillmentDashboardCounts } from "../../../lib/store/promotionsFulfillment";
+import { listSellerOrders } from "../../../lib/store/orders";
+import {
+  buildDashboardMetricCards,
+  deriveInventorySnapshot,
+  deriveOrderSnapshotFromRecentList,
+  deriveProductSnapshot,
+  deriveSellerDashboardAttention,
+  deriveStoreReadiness,
+} from "../../../lib/store/sellerDashboardInsights";
+import {
+  listSellerInventoryRows,
+  listSellerStoreReservations,
+} from "../../../lib/store/sellerInventoryQueries";
 import {
   getOwnedOrMemberStore,
   listSellerProducts,
@@ -21,7 +41,11 @@ export const metadata = {
   title: "Seller Store | UMTUBA",
 };
 
-export default async function SellerStorePage() {
+type PageProps = {
+  searchParams?: Promise<{ period?: string }> | { period?: string };
+};
+
+export default async function SellerStorePage({ searchParams }: PageProps) {
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -31,244 +55,251 @@ export default async function SellerStorePage() {
 
   const supabase = await createClient();
   const membership = await getOwnedOrMemberStore(supabase, user.id);
-
   if (!membership) {
     redirect(APP_ROUTES.sellerSetup);
   }
 
-  const products = await listSellerProducts(supabase, membership.store.id);
-  const draftCount = products.filter((p) => p.status === "draft").length;
-  const reviewCount = products.filter(
-    (p) => p.status === "in_review" || p.status === "pending_review"
-  ).length;
-  const activeCount = products.filter((p) => p.status === "active").length;
-  const verified = membership.store.verification_status === "verified";
+  if (!canViewStore(membership.role)) {
+    redirect(APP_ROUTES.seller);
+  }
+
+  const params = await Promise.resolve(searchParams ?? {});
+  const periodKey = resolveAnalyticsPeriod(params.period) as AnalyticsPeriodKey;
+  const periodPreset =
+    ANALYTICS_PERIOD_PRESETS.find((p) => p.key === periodKey) ??
+    ANALYTICS_PERIOD_PRESETS[1]!;
   const canManage = canManageStoreSettings(membership.role);
-  const fulfillmentCountsResult = await getSellerFulfillmentDashboardCounts(
-    supabase,
-    membership.store.id
-  );
+  const uiPeriod: "7d" | "30d" = periodKey === "7d" ? "7d" : "30d";
+
+  const [
+    products,
+    ordersResult,
+    inventoryResult,
+    reservationResult,
+    fulfillmentCountsResult,
+    analyticsResult,
+  ] = await Promise.all([
+    listSellerProducts(supabase, membership.store.id),
+    listSellerOrders(supabase, membership.store.id, membership.role, {
+      limit: 50,
+    }),
+    listSellerInventoryRows(supabase, membership.store.id, membership.role, {
+      limit: 200,
+    }),
+    listSellerStoreReservations(
+      supabase,
+      membership.store.id,
+      membership.role,
+      { limit: 100 }
+    ),
+    getSellerFulfillmentDashboardCounts(supabase, membership.store.id),
+    canManage
+      ? getSellerAnalyticsBundle(
+          supabase,
+          membership.store.id,
+          buildAnalyticsDateRange(uiPeriod)
+        )
+      : Promise.resolve({
+          ok: false as const,
+          message: "Analytics requires owner or manager.",
+          unavailable: true,
+        }),
+  ]);
+
+  const productSnapshot = deriveProductSnapshot(products);
+  const readiness = deriveStoreReadiness({
+    storeStatus: membership.store.status,
+    verificationStatus: membership.store.verification_status,
+    productSnapshot,
+  });
+
+  const orderSnapshot = ordersResult.ok
+    ? deriveOrderSnapshotFromRecentList({
+        orders: ordersResult.data,
+        scopeLabel: `Recent orders window (up to ${ordersResult.data.length} loaded)`,
+      })
+    : null;
+
+  const inventorySnapshot = inventoryResult.ok
+    ? deriveInventorySnapshot({
+        rows: inventoryResult.data,
+        reservations: reservationResult.ok ? reservationResult.data : [],
+        reservationsVisible: Boolean(
+          reservationResult.ok && reservationResult.canViewReservations
+        ),
+      })
+    : null;
+
+  const attention = deriveSellerDashboardAttention({
+    storeStatus: membership.store.status,
+    verificationStatus: membership.store.verification_status,
+    products,
+    orders: ordersResult.ok ? ordersResult.data : [],
+    inventory: inventoryResult.ok ? inventoryResult.data : [],
+    reservations: reservationResult.ok ? reservationResult.data : [],
+    reservationsVisible: Boolean(
+      reservationResult.ok && reservationResult.canViewReservations
+    ),
+  });
+
+  const analyticsBundle: SellerAnalyticsBundle | null = analyticsResult.ok
+    ? analyticsResult.bundle
+    : null;
+  const analyticsUnavailable =
+    canManage && !analyticsResult.ok && Boolean(analyticsResult.unavailable);
+
+  const metrics = buildDashboardMetricCards({
+    orderSnapshot,
+    productSnapshot,
+    inventorySnapshot,
+    analyticsGmvMinor: analyticsBundle
+      ? analyticsBundle.summary.grossMerchandiseValueMinor
+      : null,
+    analyticsCurrency: analyticsBundle
+      ? analyticsBundle.summary.currency
+      : null,
+    analyticsPeriodLabel: analyticsBundle ? periodPreset.label : null,
+  });
+
   const fulfillmentCounts = fulfillmentCountsResult.ok
     ? parseFulfillmentDashboardCounts(fulfillmentCountsResult.counts)
-    : EMPTY_FULFILLMENT_DASHBOARD_COUNTS;
+    : null;
 
   return (
-    <main
-      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
-    >
-      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="Seller Store" subtitle={membership.role} />
+    <SellerOpsShell title="Store dashboard" subtitle={membership.role} wide>
+      <div className="mt-6">
+        <SellerDashboardInsightsView
+          storeName={membership.store.name}
+          storeSlug={membership.store.slug}
+          role={membership.role}
+          readiness={readiness}
+          attention={attention}
+          metrics={metrics}
+          orderSnapshot={orderSnapshot}
+          orderError={ordersResult.ok ? null : ordersResult.message}
+          productSnapshot={productSnapshot}
+          inventorySnapshot={inventorySnapshot}
+          inventoryError={
+            inventoryResult.ok ? null : inventoryResult.message
+          }
+          fulfillmentCounts={fulfillmentCounts}
+          fulfillmentError={
+            fulfillmentCountsResult.ok
+              ? null
+              : "Fulfillment lifecycle counts unavailable (RPC not applied or failed)."
+          }
+          salesSeries={analyticsBundle ? analyticsBundle.salesSeries : null}
+          topProducts={analyticsBundle ? analyticsBundle.topProducts : null}
+          analyticsPeriodLabel={periodPreset.label}
+          analyticsUnavailable={analyticsUnavailable}
+          canManage={canManage}
+          periodKey={uiPeriod}
+        />
+      </div>
 
-        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            @{membership.store.slug}
-          </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">
-            {membership.store.name}
-          </h1>
-          <p className="mt-2 text-sm text-white/50">
-            Verification: {membership.store.verification_status} · Status:{" "}
-            {membership.store.status}
-          </p>
-
-          {!verified ? (
-            <p className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-              Your store is not verified yet — an operator reviews new
-              applications before catalog management unlocks.
-            </p>
-          ) : null}
-
-          <div className="mt-5 flex flex-wrap gap-3">
+      <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <h2 className="sf-display text-xl font-semibold tracking-tight">
+          Store settings
+        </h2>
+        <p className="mt-2 text-sm text-[var(--sf-muted)]">
+          City and public contact details show on your storefront About tab.
+        </p>
+        <form action={updateStoreAction} className="mt-4 space-y-4">
+          <input type="hidden" name="storeId" value={membership.store.id} />
+          <label className="block space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+              Name
+            </span>
+            <input
+              name="name"
+              required
+              defaultValue={membership.store.name}
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+              Description
+            </span>
+            <textarea
+              name="description"
+              rows={4}
+              defaultValue={membership.store.description ?? ""}
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+              City
+            </span>
+            <input
+              name="city"
+              defaultValue={membership.store.city ?? ""}
+              maxLength={80}
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+            />
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                Contact email
+              </span>
+              <input
+                name="publicContactEmail"
+                type="email"
+                defaultValue={membership.store.public_contact_email ?? ""}
+                maxLength={160}
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                Contact phone
+              </span>
+              <input
+                name="publicContactPhone"
+                defaultValue={membership.store.public_contact_phone ?? ""}
+                maxLength={40}
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              />
+            </label>
+          </div>
+          <label className="block space-y-2">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+              Contact link
+            </span>
+            <input
+              name="publicContactUrl"
+              placeholder="https://…"
+              defaultValue={membership.store.public_contact_url ?? ""}
+              maxLength={300}
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+            />
+          </label>
+          <button
+            type="submit"
+            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+          >
+            Save changes
+          </button>
+        </form>
+        {canManage ? (
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
             <Link
-              href="/seller/store/products"
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              href={APP_ROUTES.sellerPromotions}
+              className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent)]"
             >
-              Manage products
+              Promotions
             </Link>
             <Link
-              href={APP_ROUTES.sellerInventory}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+              href={APP_ROUTES.sellerShipping}
+              className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent)]"
             >
-              Inventory
-            </Link>
-            <Link
-              href={APP_ROUTES.sellerOrders}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-            >
-              Orders
-            </Link>
-            {canManage ? (
-              <>
-                <Link
-                  href={APP_ROUTES.sellerPromotions}
-                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-                >
-                  Promotions
-                </Link>
-                <Link
-                  href={APP_ROUTES.sellerShipping}
-                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-                >
-                  Shipping
-                </Link>
-                <Link
-                  href={APP_ROUTES.sellerAnalytics}
-                  className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-                >
-                  Analytics
-                </Link>
-              </>
-            ) : null}
-            <Link
-              href={`/store/${membership.store.slug}`}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-            >
-              View public store
+              Shipping
             </Link>
           </div>
-
-          <dl className="mt-6 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-              <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                Draft
-              </dt>
-              <dd className="mt-1 text-2xl font-black">{draftCount}</dd>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-              <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                In review
-              </dt>
-              <dd className="mt-1 text-2xl font-black">{reviewCount}</dd>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
-              <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                Active
-              </dt>
-              <dd className="mt-1 text-2xl font-black">{activeCount}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-          <h2 className="text-xl font-black tracking-tight">Fulfillment</h2>
-          <p className="mt-2 text-sm text-white/45">
-            Lifecycle counts for this store. Cards open the orders list.
-          </p>
-          {!fulfillmentCountsResult.ok ? (
-            <p className="mt-4 text-sm text-amber-100/90" role="status">
-              Fulfillment counts unavailable until Admin UI migration is
-              applied.
-            </p>
-          ) : null}
-          <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {SELLER_DASHBOARD_FULFILLMENT_CARDS.map((card) => (
-              <div key={card.key}>
-                <Link
-                  href={sellerOrdersHrefForDashboardCard(
-                    card,
-                    APP_ROUTES.sellerOrders
-                  )}
-                  className="watch-focus-ring block rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 transition hover:border-white/25 hover:bg-white/[0.05]"
-                >
-                  <dt className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                    {card.label}
-                  </dt>
-                  <dd className="mt-1 text-2xl font-black">
-                    {fulfillmentCounts[card.key]}
-                  </dd>
-                </Link>
-              </div>
-            ))}
-          </dl>
-        </section>
-
-        <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-          <h2 className="text-xl font-black tracking-tight">Store settings</h2>
-          <p className="mt-2 text-sm text-white/45">
-            City and public contact details show on your storefront&apos;s
-            About tab.
-          </p>
-          <form action={updateStoreAction} className="mt-4 space-y-4">
-            <input type="hidden" name="storeId" value={membership.store.id} />
-            <label className="block space-y-2">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Name
-              </span>
-              <input
-                name="name"
-                required
-                defaultValue={membership.store.name}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-              />
-            </label>
-            <label className="block space-y-2">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Description
-              </span>
-              <textarea
-                name="description"
-                rows={4}
-                defaultValue={membership.store.description ?? ""}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-              />
-            </label>
-            <label className="block space-y-2">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                City
-              </span>
-              <input
-                name="city"
-                defaultValue={membership.store.city ?? ""}
-                maxLength={80}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-              />
-            </label>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Contact email
-                </span>
-                <input
-                  name="publicContactEmail"
-                  type="email"
-                  defaultValue={membership.store.public_contact_email ?? ""}
-                  maxLength={160}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-              <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Contact phone
-                </span>
-                <input
-                  name="publicContactPhone"
-                  defaultValue={membership.store.public_contact_phone ?? ""}
-                  maxLength={40}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-                />
-              </label>
-            </div>
-            <label className="block space-y-2">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Contact link
-              </span>
-              <input
-                name="publicContactUrl"
-                placeholder="https://…"
-                defaultValue={membership.store.public_contact_url ?? ""}
-                maxLength={300}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none focus:border-blue-400/40"
-              />
-            </label>
-            <button
-              type="submit"
-              className="watch-focus-ring rounded-full bg-white px-5 py-3 text-sm font-black text-black"
-            >
-              Save changes
-            </button>
-          </form>
-        </section>
-      </div>
-    </main>
+        ) : null}
+      </section>
+    </SellerOpsShell>
   );
 }
