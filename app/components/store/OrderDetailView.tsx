@@ -323,6 +323,7 @@ export default function OrderDetailView({
                 orderId={order.id}
                 status={order.status}
                 fulfillmentStatus={order.fulfillment_status}
+                paymentStatus={order.payment_status}
                 canUpdate={bundle.canUpdate}
               />
             </div>

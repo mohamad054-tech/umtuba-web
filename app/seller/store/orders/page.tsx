@@ -1,12 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AppTopNav from "../../../components/AppTopNav";
+import SellerOpsShell from "../../../components/store/SellerOpsShell";
 import SellerOrderList from "../../../components/store/SellerOrderList";
 import StoreErrorState from "../../../components/store/StoreErrorState";
-import {
-  APP_ROUTES,
-  MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
-} from "../../../lib/nav";
+import { APP_ROUTES } from "../../../lib/nav";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { isOrderStatus } from "../../../../lib/store/orderRules";
 import { listSellerOrders } from "../../../../lib/store/orders";
@@ -22,6 +19,16 @@ type PageProps = {
     | Promise<{ status?: string }>
     | { status?: string };
 };
+
+const FILTERS = [
+  "pending",
+  "confirmed",
+  "processing",
+  "packed",
+  "shipped",
+  "delivered",
+  "cancelled",
+] as const;
 
 export default async function SellerStoreOrdersPage({
   searchParams,
@@ -39,6 +46,16 @@ export default async function SellerStoreOrdersPage({
     redirect(APP_ROUTES.sellerStore);
   }
 
+  if (membership.store.status !== "active") {
+    return (
+      <SellerOpsShell title="Orders" subtitle={membership.store.name}>
+        <div className="mt-6">
+          <StoreErrorState message="This store is not active. Order operations are unavailable." />
+        </div>
+      </SellerOpsShell>
+    );
+  }
+
   const params = await Promise.resolve(searchParams ?? {});
   const statusFilter =
     params.status && isOrderStatus(params.status)
@@ -49,74 +66,73 @@ export default async function SellerStoreOrdersPage({
     supabase,
     membership.store.id,
     membership.role,
-    { status: statusFilter }
+    { status: statusFilter, limit: 50 }
   );
 
   return (
-    <main
-      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
-    >
-      <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="Orders" subtitle={membership.store.name} />
-
-        <header className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            @{membership.store.slug}
-          </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">Orders</h1>
-          <p className="mt-2 text-sm text-white/50">
-            Manage orders for your store only. Payment status is read-only until
-            payment gateways are enabled.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
+    <SellerOpsShell title="Orders" subtitle={membership.store.name}>
+      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <p className="sf-eyebrow">@{membership.store.slug}</p>
+        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Seller orders
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+          Operate only on your store’s orders. Order, payment, fulfillment, and
+          delivery states stay separate. Payment collection remains deferred —
+          sellers cannot mark payments successful. Role: {membership.role}.
+        </p>
+        <div
+          className="mt-4 flex flex-wrap gap-2"
+          role="navigation"
+          aria-label="Filter seller orders"
+        >
+          <Link
+            href={APP_ROUTES.sellerOrders}
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+              statusFilter === "all"
+                ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                : "border-[var(--sf-line)] text-[var(--sf-muted)]"
+            }`}
+          >
+            All
+          </Link>
+          {FILTERS.map((status) => (
             <Link
-              href={APP_ROUTES.sellerOrders}
-              className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-white/70"
+              key={status}
+              href={`${APP_ROUTES.sellerOrders}?status=${status}`}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${
+                statusFilter === status
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                  : "border-[var(--sf-line)] text-[var(--sf-muted)]"
+              }`}
             >
-              All
+              {status}
             </Link>
-            {(
-              [
-                "pending",
-                "confirmed",
-                "processing",
-                "packed",
-                "shipped",
-                "delivered",
-                "cancelled",
-              ] as const
-            ).map((status) => (
-              <Link
-                key={status}
-                href={`${APP_ROUTES.sellerOrders}?status=${status}`}
-                className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
-                  statusFilter === status
-                    ? "border-white bg-white text-black"
-                    : "border-white/15 text-white/70"
-                }`}
-              >
-                {status}
-              </Link>
-            ))}
-          </div>
-          <div className="mt-4">
-            <Link
-              href={APP_ROUTES.sellerStore}
-              className="text-sm font-bold text-white/50 hover:text-white/80"
-            >
-              ← Store dashboard
-            </Link>
-          </div>
-        </header>
-
-        <div className="mt-6">
-          {!result.ok ? (
-            <StoreErrorState message={result.message} />
-          ) : (
-            <SellerOrderList orders={result.data} />
-          )}
+          ))}
         </div>
+        <div className="mt-4 flex flex-wrap gap-4 text-sm">
+          <Link
+            href={APP_ROUTES.sellerStore}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            ← Store dashboard
+          </Link>
+          <Link
+            href={`${APP_ROUTES.sellerStore}/products`}
+            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          >
+            Products
+          </Link>
+        </div>
+      </header>
+
+      <div className="mt-6">
+        {!result.ok ? (
+          <StoreErrorState message={result.message} />
+        ) : (
+          <SellerOrderList orders={result.data} />
+        )}
       </div>
-    </main>
+    </SellerOpsShell>
   );
 }

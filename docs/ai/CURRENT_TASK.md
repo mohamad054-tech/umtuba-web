@@ -2,7 +2,7 @@
 
 ## Task title
 
-Commerce Premium Buyer Orders Experience V1
+Commerce Premium Seller Orders Operations Experience V1
 
 ## Status
 
@@ -10,24 +10,25 @@ Commerce Premium Buyer Orders Experience V1
 
 ## Branch
 
-`office/commerce-premium-buyer-orders-experience-v1`
+`office/commerce-premium-seller-orders-operations-v1`
 
 ## Base
 
-Trusted cart/checkout commit `49b2fe06ca912df840a9d1bc8856154b3e917343`  
-Parent branch: `office/commerce-premium-cart-checkout-experience-v1`
+Trusted buyer-orders commit `cce1e5708fecf38b86bdb4239145de7a55332eba`
+Parent branch: `office/commerce-premium-buyer-orders-experience-v1`
 
 ## Deliverable
 
-Premium buyer `/store/orders` list and `/store/orders/[orderId]` detail with separated order/payment/fulfillment/delivery presentation, confirmed-only timeline, multi-seller sibling context, deferred payment recovery, and trusted cancel action. No payment provider. No Shipping Network.
+Premium seller `/seller/store/orders` list and detail with separated states, payment-blocked ship/deliver guards (UI + server action), stale-transition rejection, minimized buyer list identity, and SellerOpsShell visual continuity. No payment provider. No Shipping Network.
 
 ## Constraints
 
+- Store-scoped authorization fail-closed
 - Do not create a second order system
-- Do not fabricate tracking/carrier/ETA/money
-- Fail closed on unauthorized access (uniform not found)
+- Do not manually mark payment successful
+- Do not edit inventory quantities directly
 - Do not modify frozen Commerce architecture docs
 
 ## Next after this task
 
-Seller order ops polish, deferred payment depth, or Trading-domain alignment — not another architecture document unless requested.
+Seller catalog/product ops polish, inventory reservation visibility, or Trading-domain alignment — not another architecture document unless requested.

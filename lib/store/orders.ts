@@ -84,6 +84,8 @@ export type SellerOrderListItem = {
   currency: string;
   grandTotalMinor: number;
   itemCount: number;
+  /** First few line titles for operational preview. */
+  previewTitles: string[];
 };
 
 export type OrderDetailBundle = {
@@ -279,10 +281,11 @@ export async function listSellerOrders(
   const rows = (data ?? []) as StoreOrderRow[];
   // Defense in depth: never return another store's rows even if filters were wrong.
   const scoped = rows.filter((r) => r.store_id === storeId);
-  const counts = await countItemsByOrderIds(
-    supabase,
-    scoped.map((r) => r.id)
-  );
+  const orderIds = scoped.map((r) => r.id);
+  const [counts, previews] = await Promise.all([
+    countItemsByOrderIds(supabase, orderIds),
+    previewTitlesByOrderIds(supabase, orderIds),
+  ]);
 
   return {
     ok: true,
@@ -299,6 +302,7 @@ export async function listSellerOrders(
       currency: row.currency,
       grandTotalMinor: row.grand_total_minor,
       itemCount: counts.get(row.id) ?? 0,
+      previewTitles: previews.get(row.id) ?? [],
     })),
   };
 }

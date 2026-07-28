@@ -2,26 +2,23 @@
 
 ## Summary
 
-Implemented **Commerce Premium Buyer Orders Experience V1** on branch `office/commerce-premium-buyer-orders-experience-v1` from trusted cart/checkout commit `49b2fe06ca912df840a9d1bc8856154b3e917343`. Hardened `/store/orders` and `/store/orders/[orderId]` with premium editorial UX, separated order/payment/fulfillment/delivery chips, confirmed-only timeline, multi-seller sibling orders (without exposing quote ids), deferred payment recovery, and trusted cancel. No payment provider. No Shipping Network. No frozen Commerce architecture edits. No migrations. No duplicate order system.
+Implemented **Commerce Premium Seller Orders Operations Experience V1** on branch `office/commerce-premium-seller-orders-operations-v1` from trusted buyer-orders commit `cce1e5708fecf38b86bdb4239145de7a55332eba`. Hardened `/seller/store/orders` and detail with premium SellerOpsShell, attention indicators, minimized buyer list identity, payment-blocked ship/deliver/fulfilled transitions (UI + server action), stale-transition rejection, duplicate-submit lock, and honest fulfillment workspace boundaries. No payment provider. No Shipping Network. No frozen Commerce architecture edits. No migrations. No duplicate order system.
 
 ## Exact files changed
 
 ### Created
-- `lib/store/buyerOrdersPresentation.ts`
-- `lib/store/buyerOrdersExperience.test.ts`
-- `app/components/store/BuyerDeferredPaymentRecoveryButton.tsx`
+- `lib/store/sellerOrdersPresentation.ts`
+- `lib/store/sellerOrdersOperations.test.ts`
+- `app/components/store/SellerOpsShell.tsx`
 
 ### Modified
 - `lib/store/orders.ts`
-- `app/components/store/BuyerOrderList.tsx`
+- `app/actions/storeOrders.ts`
+- `app/components/store/SellerOrderList.tsx`
+- `app/components/store/SellerOrderStatusForm.tsx`
 - `app/components/store/OrderDetailView.tsx`
-- `app/components/store/OrderStatusBadges.tsx`
-- `app/components/store/OrderTimeline.tsx`
-- `app/components/store/BuyerCancelOrderButton.tsx`
-- `app/components/store/CheckoutClient.tsx`
-- `app/store/orders/page.tsx`
-- `app/store/orders/[orderId]/page.tsx`
-- `app/store/orders/loading.tsx`
+- `app/seller/store/orders/page.tsx`
+- `app/seller/store/orders/[orderId]/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -33,18 +30,18 @@ None.
 
 ## Security review
 
-- Buyer order list/detail remain owner-scoped; unauthorized access returns uniform “Order not found.”
-- `checkout_quote_id` still stripped from UI payload; siblings resolved server-side only.
-- Payment attempt reads use buyer_id filter; recovery uses existing deferred RPC (no charge).
-- Cancel uses existing `buyerCancelStoreOrder` server path.
+- Seller list/detail remain store-scoped via `getOwnedOrMemberStore` + `listSellerOrders`/`getSellerOrderDetail`.
+- Unauthorized/other-store access returns uniform not-found.
+- Client cannot supply store_id/payment_status/role.
+- Payment-blocked ship/deliver/fulfilled enforced in action + UI.
+- Buyer list identity minimized to first name.
 - No secrets exposed.
 
 ## Tests
 
-- `lib/store/buyerOrdersExperience.test.ts` — passed
+- `lib/store/sellerOrdersOperations.test.ts` — passed
 - `lib/store/orderManagement.test.ts` — passed
-- `lib/store/ordersFoundation.test.ts` — passed
-- `lib/store/cartCheckoutExperience.test.ts` — passed
+- Combined: 26 tests passed
 
 ## TypeScript
 
@@ -52,7 +49,7 @@ None.
 
 ## Build
 
-`npm run build` — passed (`/store/orders`, `/store/orders/[orderId]` present)
+`npm run build` — passed; routes `/seller/store/orders` and `/seller/store/orders/[orderId]` present
 
 ## git diff --check
 
@@ -60,10 +57,10 @@ Clean on task-scoped paths at commit time.
 
 ## git status --short
 
-See final report after commit/push (unrelated local learning noise excluded).
+Clean for committed task paths after push; local learning/unrelated dirty files remain unstaged.
 
 ## Open issues
 
-- Product media thumbnails on order list use title previews only (snapshots; no signed media wiring).
-- Delivery status is derived from trusted order stamps/status only — no carrier/tracking until Shipping Network.
-- Live payment providers remain deferred.
+- FulfillmentAdminPanel still exposes deferred shipment/tracking placeholders from prior foundation; gated when unpaid.
+- No live payment provider; unpaid ship remains blocked by policy.
+- Warehouse/Shipping Network not implemented (by design).
