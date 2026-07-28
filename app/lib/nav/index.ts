@@ -59,6 +59,17 @@ export {
 } from "./userMenuCapabilities";
 
 export {
+  AUTH_SAFE_REDIRECT_DEFAULT_PATH,
+  DISCOVER_ALIAS_QUERY_KEYS,
+  DISCOVER_ALIAS_TARGET_PATH,
+  DISCOVER_HOME_ALIAS_PATH,
+  PROFILE_INDEX_LOGIN_NEXT_PATH,
+  PROFILE_INDEX_RESOLVER_PATH,
+  buildPostFocusDeepLink,
+  isDiscoverHomeAliasPath,
+} from "./deepLinkAliasContract";
+
+export {
   AUTH_DEFAULT_NEXT_PATH,
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,

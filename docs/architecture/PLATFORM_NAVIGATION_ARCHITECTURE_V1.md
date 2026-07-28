@@ -94,6 +94,8 @@ Signed-out: Sign in only. Actions: Switch account, Sign out → Home.
 | Auth `?next=` | `getSafeRedirectPath(candidate, "/discover")` — default `/discover` equals Home via alias; open-redirect safe |
 | Post notification href | `buildPostNotificationHref` → `/discover?post=` (then alias to Home) |
 
+**Deep-link & Alias Clarity V1 — Auth default decision:** Keep fallback `/discover` (do **not** flip to `/`). Same Discovery destination after the forever redirect; avoids churn to callers, notification deep links, and redirect contract tests. Code: `app/lib/nav/deepLinkAliasContract.ts`, `lib/supabase/redirect.ts`.
+
 ---
 
 ## 3. Role journeys (chrome reality)
@@ -142,8 +144,9 @@ Chrome labels are **the same** for visitor and signed-in users. Capabilities unl
 
 ## 7. Verification
 
-Contract Sync V1 is verified by:
+Contract Sync V1 + Capability Links V1 + Deep-link & Alias Clarity V1 verified by:
 
 - `app/lib/nav/platformNavContract.test.ts`
+- `app/lib/nav/deepLinkAliasContract.test.ts`
 - Existing `shellCoherence`, `mobileNav`, `userMenuItems`, `pageAssembly` tests
-- `lib/supabase/redirect.test.ts` for `?next=` safety + default
+- `lib/supabase/redirect.test.ts` for `?next=` safety + Discover default

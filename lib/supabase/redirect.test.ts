@@ -2,6 +2,14 @@ import { describe, expect, it } from "vitest";
 import { getSafeRedirectPath } from "./redirect";
 
 describe("getSafeRedirectPath", () => {
+  it("defaults to /discover (Home alias) when next is missing", () => {
+    // Clarity V1: keep Discover as default — equals Home after forever redirect.
+    expect(getSafeRedirectPath(null)).toBe("/discover");
+    expect(getSafeRedirectPath(undefined)).toBe("/discover");
+    expect(getSafeRedirectPath("")).toBe("/discover");
+    expect(getSafeRedirectPath("   ")).toBe("/discover");
+  });
+
   it("allows same-origin relative paths and preserves query", () => {
     expect(getSafeRedirectPath("/discover")).toBe("/discover");
     expect(getSafeRedirectPath("/messages?conversation=1")).toBe(

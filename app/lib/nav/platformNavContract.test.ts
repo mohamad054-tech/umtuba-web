@@ -160,7 +160,7 @@ describe("Platform Navigation Contract Sync V1", () => {
 
   describe("auth ?next= behavior", () => {
     it("keeps default next as /discover (Home alias) and blocks open redirects", () => {
-      // Contract via getSafeRedirectPath only — auth.ts wiring is unchanged/out of scope.
+      // Clarity V1: Auth default stays `/discover` (equals Home via forever alias).
       expect(AUTH_DEFAULT_NEXT_PATH).toBe("/discover");
       expect(getSafeRedirectPath(null)).toBe("/discover");
       expect(getSafeRedirectPath(undefined)).toBe("/discover");

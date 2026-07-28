@@ -218,7 +218,10 @@ export function buildLiveStreamHref(streamId: string): string {
   return `${APP_ROUTES.live}/${streamId.trim()}`;
 }
 
-/** Deep-link into Discover focused on a post (and optional comment). */
+/** Deep-link into Discover focused on a post (and optional comment).
+ * Platform Navigation contract: keep `/discover?post=` so legacy clients and
+ * notifications hit the forever Home alias (`/` with query preserved).
+ */
 export function buildPostNotificationHref(input: {
   postId: string | number;
   commentId?: string | number | null;

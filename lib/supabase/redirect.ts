@@ -1,6 +1,12 @@
 /**
  * Prevent open redirects: only same-origin relative paths are allowed.
  * Query/hash may contain `@` (e.g. creator handles); `@` is only rejected in the path.
+ *
+ * Auth `?next=` default (Deep-link & Alias Clarity V1):
+ * Fallback remains `/discover`. That route forever redirects to Home (`/`), so
+ * the default already equals the Discovery Layer without rewriting callers or
+ * deep links such as `/discover?post=`. Changing the fallback to `/` was
+ * evaluated and deferred as unnecessary (same destination after one hop).
  */
 export function getSafeRedirectPath(
   candidate: string | null | undefined,
