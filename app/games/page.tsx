@@ -20,11 +20,13 @@ export default function GamesHubPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Games
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">Play later</h1>
+          <h1 className="mt-2 text-3xl font-black tracking-tight">
+            Unavailable in this Beta
+          </h1>
           <p className="mt-3 text-sm leading-7 text-white/55">
-            The Games hub route is live for navigation. Catalog and playable
-            sessions ship when Games runtime is opened for product use — no demo
-            games are listed here.
+            The Games route exists so Home shortcuts stay stable, but playable
+            catalog and sessions are not part of Alpha Beta Productization.
+            Nothing here can be played, purchased, or ranked yet.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link

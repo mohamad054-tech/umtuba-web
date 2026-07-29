@@ -134,7 +134,7 @@ export default function CheckoutClient({
       <div className="mt-6 space-y-4">
         <StoreEmptyState
           title="Nothing to checkout"
-          description="Add products to your cart before starting checkout. Cart is preserved until an order is confirmed."
+          description="Add products to your cart before starting checkout. Cart is preserved until an order is recorded."
           actionHref={APP_ROUTES.storeCart}
           actionLabel="Back to cart"
         />
@@ -197,9 +197,9 @@ export default function CheckoutClient({
         role="status"
         aria-live="polite"
       >
-        <p className="sf-eyebrow">Confirmed</p>
+        <p className="sf-eyebrow">Recorded · unpaid</p>
         <h2 className="sf-display text-2xl font-semibold tracking-tight">
-          Order recorded
+          Order recorded — payment pending
         </h2>
         <p className="text-sm leading-relaxed text-[var(--sf-muted)]">
           {(typeof result.payment_note === "string" && result.payment_note) ||
@@ -213,9 +213,9 @@ export default function CheckoutClient({
           >
             <p className="font-bold">Deferred payment recording incomplete</p>
             <p className="mt-1 text-amber-100/80">
-              Your order was confirmed. Recording the deferred payment attempt
+              Your order was recorded. Recording the deferred payment attempt
               failed for one or more sellers. No charge was attempted. Cart was
-              cleared only after order confirmation.
+              cleared only after order recording.
             </p>
             {failures.length > 0 ? (
               <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-100/70">
@@ -353,15 +353,15 @@ export default function CheckoutClient({
           if (!res.ok) {
             setError(res.message);
             setStatusMessage(
-              "Order was not confirmed. Your cart and quote state are preserved — refresh the quote if it expired."
+              "Order was not recorded. Your cart and quote state are preserved — refresh the quote if it expired."
             );
             return;
           }
           setResult(res.data as ConfirmResult);
           setStatusMessage(
             res.data.payment_recording_incomplete
-              ? "Order confirmed. Deferred payment recording needs a retry."
-              : "Order confirmed. No live payment was collected."
+              ? "Order recorded. Deferred payment recording needs a retry. No live charge was made."
+              : "Order recorded as pending payment. No live payment was collected."
           );
         } finally {
           submitLockRef.current = false;
@@ -680,30 +680,26 @@ export default function CheckoutClient({
           <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
             Live payment collection is not enabled. Placing an order only records
             it as pending payment and creates a deferred payment attempt — no
-            card, wallet, or gateway charge runs here.
+            card, wallet, or gateway charge runs here. Live PSP options are
+            hidden until a provider is explicitly enabled.
           </p>
           <fieldset className="mt-4 space-y-2" disabled={busy}>
             <legend className="sr-only">Payment method</legend>
-            {CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS.map((option) => (
+            {CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS.filter(
+              (option) => option.enabled
+            ).map((option) => (
               <label
                 key={option.provider}
-                className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-sm ${
-                  option.enabled
-                    ? "border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.08)]"
-                    : "border-[var(--sf-line)] opacity-50"
-                }`}
+                className="flex items-center gap-3 rounded-xl border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.08)] px-3 py-2 text-sm"
               >
                 <input
                   type="radio"
                   name="payment_provider"
                   value={option.provider}
-                  defaultChecked={option.enabled}
-                  disabled={!option.enabled || busy}
+                  defaultChecked
+                  disabled={busy}
                 />
-                <span>
-                  {option.label}
-                  {!option.enabled ? " (not available yet)" : ""}
-                </span>
+                <span>{option.label}</span>
               </label>
             ))}
           </fieldset>
@@ -808,7 +804,7 @@ export default function CheckoutClient({
           aria-disabled={busy || !readiness.canSubmit}
           className="watch-focus-ring mt-3 w-full rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/35"
         >
-          {pending ? "Placing order…" : "Place order"}
+          {pending ? "Recording order…" : "Record order (no charge)"}
         </button>
         {!purchasesAvailable ? (
           <p

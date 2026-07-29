@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { loadAiPlatformConfig } from "../config";
-import { AiPlatformError } from "../contracts/errors";
 import { executeAiGateway } from "../gateway/execute";
 import { LEARNING_TUTOR_PROMPTS } from "../capabilities/learning/prompts";
 import { runLearningTutorCapability } from "../capabilities/learning/tutorRunner";

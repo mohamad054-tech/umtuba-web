@@ -187,7 +187,7 @@ export default async function PostJourneyPage({
             className="block rounded-[28px] border border-cyan-400/20 bg-cyan-500/10 p-5 transition hover:bg-cyan-500/15"
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200/70">
-              AI Insights
+              Creator Insights
             </p>
             <p className="mt-2 text-sm font-semibold text-white/90">
               Open your creator insights

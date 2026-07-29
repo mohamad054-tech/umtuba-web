@@ -19,18 +19,18 @@ export default async function CreatorInsightsPage() {
 
   return (
     <main className="min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
-      <AppTopNav title="AI Insights" subtitle="Creator" />
+      <AppTopNav title="Creator Insights" subtitle="Creator" />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Creator
           </p>
           <h1 className="mt-1 text-3xl font-black tracking-tight">
-            AI Insights
+            Creator Insights
           </h1>
           <p className="mt-2 text-sm text-white/50">
-            Stored insights about your content performance. New insights appear
-            here when they are generated.
+            Stored performance notes about your content. These are account
+            insights records — not a live AI assistant session.
           </p>
 
           {insights.length === 0 ? (

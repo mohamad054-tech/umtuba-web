@@ -21,9 +21,15 @@ import StoreErrorState from "./StoreErrorState";
 
 type CartViewProps = {
   initialSummary: CartSummary;
+  purchasesAvailable?: boolean;
+  purchasesUnavailableMessage?: string | null;
 };
 
-export default function CartView({ initialSummary }: CartViewProps) {
+export default function CartView({
+  initialSummary,
+  purchasesAvailable = true,
+  purchasesUnavailableMessage = null,
+}: CartViewProps) {
   const router = useRouter();
   const [summary, setSummary] = useState(initialSummary);
   const [error, setError] = useState<string | null>(null);
@@ -364,12 +370,24 @@ export default function CartView({ initialSummary }: CartViewProps) {
           </p>
         ) : null}
 
+        {!purchasesAvailable ? (
+          <p
+            role="status"
+            className="mt-4 rounded-xl border border-amber-400/25 bg-amber-500/10 px-3 py-2 text-xs leading-relaxed text-amber-100"
+          >
+            {purchasesUnavailableMessage ||
+              "Order recording is currently disabled by the commerce confirm gate. You can still open checkout to review a quote preview."}
+          </p>
+        ) : null}
+
         {proceed.ok ? (
           <Link
             href={APP_ROUTES.storeCheckout}
             className="mt-5 flex w-full items-center justify-center rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] transition hover:bg-[var(--sf-accent-strong)]"
           >
-            Proceed to checkout
+            {purchasesAvailable
+              ? "Continue to checkout"
+              : "Review checkout (orders disabled)"}
           </Link>
         ) : (
           <button

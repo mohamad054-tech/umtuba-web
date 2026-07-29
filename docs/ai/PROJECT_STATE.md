@@ -6,44 +6,41 @@
 
 ## Primary working branch
 
-`alpha-0.2` — Wave 3.5 platform integration (Revenue + Commerce + AI, flags OFF)
+`alpha-0.2` — Alpha Beta Productization V1 (post Integration Program V1)
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `integration/w3-alpha-final`
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w3-alpha-final`
-- **Task:** Integration Program V1 — Wave 3.5 Alpha Integration (closing)
-- **See:** `docs/ai/CURSOR_REPORT.md`
+- **Branch:** `integration/alpha-beta-productization-v1`
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-alpha-beta-productization-v1`
+- **Task:** Alpha Beta Productization Program V1
+- **See:** `docs/ai/CURSOR_REPORT.md` and `docs/ops/ALPHA_BETA_OPERATIONS_V1.md`
 
 ## Closed on alpha-0.2 (do not reopen)
 
-- Home Circular Arc / Assembly V1 (`6fac440`)
-- Creator Space Photos Lightbox V1 (`769039d`)
-- Creator All Timeline Contract V1 (`4fdbf30`)
-- Integration W1 Revenue / W2 Commerce / W3 AI via Wave 3.5
+- Integration Program V1 Waves 0–4
+- Alpha Beta Productization V1 (honesty/gating/ops)
 
-## Gates (unchanged)
+## Gates (unchanged defaults)
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
 - `HOME_LOCK_ACTIVE = true`
 - AI product flags default OFF (`UMTUBA_AI_HUB`, `UMTUBA_AI_ASSISTANT_RUNTIME`, `UMTUBA_AI_VIDEO_PERSONALIZATION`)
+- Commerce confirm DB gate default OFF
 
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-
-Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
-Session continuity: `docs/ai/SESSION_HANDOFF.md`
+Protected Learning worktree remains untouched by Beta Productization.
 
 ## Integration status
 
 | Track | Status |
 | --- | --- |
-| Unified Revenue Platform Foundation | On alpha via W3.5 |
-| Commerce E2E Beta Readiness | On alpha via W3.5 |
-| Shared AI Core / Hub / Assistant | On alpha via W3.5 (flags OFF) |
-
-Default: Do not modify frozen Commerce architecture documents.
+| Unified Revenue Platform Foundation | On alpha |
+| Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
+| Shared AI Core / Hub / Assistant | On alpha; product surfaces gated OFF |
+| Alpha Stabilization Sweep | Wave 4 closed |
+| Alpha Beta Productization | This program |
 
 ## Source of truth
 
