@@ -85,6 +85,7 @@ Future Learning UI
 | `generatePracticeLearningTutorAction` | `generate_practice` |
 | `explainWrongAnswerLearningTutorAction` | `explain_wrong_answer` |
 | `giveHintLearningTutorAction` | `give_hint` |
+| `explainAgainLearningTutorAction` | `explain_again` |
 
 **Guarantees:**
 - Named functions only — no free-form action/capability string dispatcher
@@ -104,6 +105,9 @@ Future Learning UI
 | `learning.tutor.generate_practice@1.0.0` | Implemented |
 | `learning.tutor.explain_wrong_answer@1.0.0` | Implemented |
 | `learning.tutor.give_hint@1.0.0` | Implemented |
+| `learning.tutor.explain_again@1.0.0` | Implemented |
+
+Cross-capability `revealsAnswerKey` flag parity for `explain_again` is deferred; leakage remains fail-closed via banned fields.
 
 ## Migration status
 
@@ -111,4 +115,4 @@ Uses existing Shared AI Core migration `20260871` (local only, not remote-applie
 
 ## Next (after commit approval)
 
-Optional: `explain_again` backend capability (maps to Learning OS message kind). Further multi-provider adapters may register into Provider Foundation. Laptop may wire Learning UI to the named server actions. No Desktop UI.
+Optional: `code_review` backend capability (programming-narrow). Further multi-provider adapters may register into Provider Foundation. Laptop may wire Learning UI to the named server actions. No Desktop UI.

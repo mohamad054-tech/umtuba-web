@@ -11,6 +11,7 @@
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import type {
   LearningTutorAnswerQuestionActionInput,
+  LearningTutorExplainAgainActionInput,
   LearningTutorExplainLessonActionInput,
   LearningTutorExplainWrongAnswerActionInput,
   LearningTutorGeneratePracticeActionInput,
@@ -20,6 +21,7 @@ import type {
 } from "../../lib/ai/contracts/learningTutorServerActions";
 import {
   answerQuestionLearningTutor,
+  explainAgainLearningTutor,
   explainLessonLearningTutor,
   explainWrongAnswerLearningTutor,
   generatePracticeLearningTutor,
@@ -72,4 +74,10 @@ export async function giveHintLearningTutorAction(
   input: LearningTutorGiveHintActionInput
 ): Promise<LearningTutorServerActionResult> {
   return giveHintLearningTutor(input, await defaultRuntime());
+}
+
+export async function explainAgainLearningTutorAction(
+  input: LearningTutorExplainAgainActionInput
+): Promise<LearningTutorServerActionResult> {
+  return explainAgainLearningTutor(input, await defaultRuntime());
 }

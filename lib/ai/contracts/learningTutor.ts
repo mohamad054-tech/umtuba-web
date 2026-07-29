@@ -91,3 +91,26 @@ export type LearningTutorGiveHintResult = {
   mutatesProgress: false;
   mutatesGrades: false;
 };
+
+/**
+ * Simpler/alternate re-teach of published lesson material
+ * (maps to Learning OS message kind `explain_again`).
+ * Distinct from explain_lesson (first full explanation) and give_hint (scaffolding only).
+ *
+ * Note: `revealsAnswerKey: false` cross-capability flag parity with give_hint /
+ * explain_wrong_answer is deferred; leakage is still fail-closed via field bans.
+ */
+export type LearningTutorExplainAgainResult = {
+  title: string;
+  simplerExplanation: string;
+  keyPoints: string[];
+  analogy?: string;
+  checkUnderstanding: string[];
+  sourceReferences: LearningTutorSourceReference[];
+  groundingStatus: LearningTutorGroundingStatus;
+  limitations: string[];
+  labeledAiGenerated: true;
+  officialCourseContent: false;
+  mutatesProgress: false;
+  mutatesGrades: false;
+};

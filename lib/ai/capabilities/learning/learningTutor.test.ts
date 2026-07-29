@@ -117,6 +117,103 @@ describe("Learning tutor safety", () => {
     ).toThrow(/key leakage|full-answer/i);
   });
 
+  it("blocks explain_again outputs that leak keys or omit labeling", () => {
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          title: "t",
+          simplerExplanation: "s",
+          keyPoints: [],
+          checkUnderstanding: [],
+          labeledAiGenerated: false,
+        },
+      })
+    ).toThrow(/AI-generated/i);
+
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          title: "t",
+          simplerExplanation: "s",
+          keyPoints: [],
+          checkUnderstanding: [],
+          labeledAiGenerated: true,
+          correctAnswer: "42",
+        },
+      })
+    ).toThrow(/graded or key leakage/i);
+  });
+
+  it("fail-closes explain_again when title is missing or empty", () => {
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          simplerExplanation: "s",
+          keyPoints: [],
+          checkUnderstanding: [],
+          labeledAiGenerated: true,
+        },
+      })
+    ).toThrow(/title/i);
+
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          title: "   ",
+          simplerExplanation: "s",
+          keyPoints: [],
+          checkUnderstanding: [],
+          labeledAiGenerated: true,
+        },
+      })
+    ).toThrow(/title/i);
+  });
+
+  it("fail-closes explain_again when analogy is present but not a string", () => {
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          title: "t",
+          simplerExplanation: "s",
+          keyPoints: [],
+          checkUnderstanding: [],
+          analogy: 12,
+          labeledAiGenerated: true,
+        },
+      })
+    ).toThrow(/analogy/i);
+  });
+
+  it("accepts explain_again payload with safe limitations wording", () => {
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.explain_again",
+        userInput: "explain again",
+        structured: {
+          title: "Again",
+          simplerExplanation: "A simpler re-teach.",
+          keyPoints: ["One idea"],
+          checkUnderstanding: ["Restate the idea"],
+          limitations: [
+            "Re-teach only — not an official grade or hidden solution.",
+            "Uses protected assessment content boundaries.",
+          ],
+          labeledAiGenerated: true,
+        },
+      })
+    ).not.toThrow();
+  });
+
   it("validates groundingStatus", () => {
     const prompt = LEARNING_TUTOR_PROMPTS[0]!;
     const bad = validateLearningTutorStructured(prompt, {
@@ -133,10 +230,11 @@ describe("Learning tutor safety", () => {
 });
 
 describe("Learning tutor prompts registered", () => {
-  it("includes six V1 prompt versions", () => {
+  it("includes seven V1 prompt versions", () => {
     expect(LEARNING_TUTOR_PROMPTS.map((p) => p.promptId).sort()).toEqual(
       [
         "learning.tutor.answer_question",
+        "learning.tutor.explain_again",
         "learning.tutor.explain_lesson",
         "learning.tutor.explain_wrong_answer",
         "learning.tutor.generate_practice",
@@ -365,6 +463,43 @@ describe("Learning tutor authorization + capabilities (stub)", () => {
     });
     expect(ok.data.result).toHaveProperty("hint");
     expect(ok.data.result).toHaveProperty("hintLevel");
+  });
+
+  it("runs explain_again with optional focus and simpler re-teach shape", async () => {
+    const withoutFocus = await aiService.runCapability(
+      {
+        capabilityId: "learning.tutor.explain_again",
+        input: { lessonId: LESSON },
+        context: { productDomain: "learning", surface: "test", lessonId: LESSON },
+      },
+      { supabase: createFakeSupabase() as never, userId: USER, forceStub: true }
+    );
+    expect(withoutFocus.ok).toBe(true);
+    if (!withoutFocus.ok) return;
+    expect(withoutFocus.data.result).toMatchObject({
+      labeledAiGenerated: true,
+      officialCourseContent: false,
+      mutatesProgress: false,
+      mutatesGrades: false,
+    });
+    expect(withoutFocus.data.result).toHaveProperty("title");
+    expect(String(withoutFocus.data.result.title ?? "").trim().length).toBeGreaterThan(
+      0
+    );
+    expect(withoutFocus.data.result).toHaveProperty("simplerExplanation");
+    expect(withoutFocus.data.result).toHaveProperty("checkUnderstanding");
+    expect(withoutFocus.data.result).not.toHaveProperty("hint");
+    expect(withoutFocus.data.result).not.toHaveProperty("explanation");
+
+    const withFocus = await aiService.runCapability(
+      {
+        capabilityId: "learning.tutor.explain_again",
+        input: { lessonId: LESSON, focus: "neural networks" },
+        context: { productDomain: "learning", surface: "test", lessonId: LESSON },
+      },
+      { supabase: createFakeSupabase() as never, userId: USER, forceStub: true }
+    );
+    expect(withFocus.ok).toBe(true);
   });
 
   it("requires attemptId + questionId for explain_wrong_answer", async () => {

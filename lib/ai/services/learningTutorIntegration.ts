@@ -70,6 +70,12 @@ const ACTION_ALLOWED_KEYS: Record<
     "focus",
     ...COMMON_OPTIONAL_KEYS,
   ]),
+  explain_again: new Set([
+    "action",
+    "lessonId",
+    "focus",
+    ...COMMON_OPTIONAL_KEYS,
+  ]),
 };
 
 /**
@@ -333,6 +339,36 @@ export function parseLearningTutorIntegrationRequest(
         },
       };
     }
+    case "explain_again": {
+      if (typeof row.lessonId !== "string" || !isUuid(row.lessonId.trim())) {
+        return {
+          ok: false,
+          code: "invalid_input",
+          message: "lessonId is required and must be a valid UUID.",
+        };
+      }
+      let focus: string | undefined;
+      if ("focus" in row && row.focus != null) {
+        if (typeof row.focus !== "string" || !row.focus.trim()) {
+          return {
+            ok: false,
+            code: "invalid_input",
+            message: "focus must be a non-empty string when provided.",
+          };
+        }
+        focus = row.focus.trim();
+      }
+      return {
+        ok: true,
+        data: {
+          action: "explain_again",
+          lessonId: row.lessonId.trim(),
+          focus,
+          locale: common.locale,
+          surface: common.surface,
+        },
+      };
+    }
     default: {
       return {
         ok: false,
@@ -421,9 +457,15 @@ export async function runLearningTutorIntegration(
               focus: request.focus,
               question: request.focus,
             }
-          : {
-              lessonId: request.lessonId,
-            };
+          : request.action === "explain_again"
+            ? {
+                lessonId: request.lessonId,
+                focus: request.focus,
+                question: request.focus,
+              }
+            : {
+                lessonId: request.lessonId,
+              };
 
   // Execute only through the shared AI service — never call tutorRunner directly.
   const serviceResult = await aiService.runCapability(

@@ -34,6 +34,7 @@ export const LEARNING_TUTOR_CAPABILITIES = [
   "learning.tutor.generate_practice",
   "learning.tutor.explain_wrong_answer",
   "learning.tutor.give_hint",
+  "learning.tutor.explain_again",
 ] as const;
 
 export type LearningTutorCapabilityId =
@@ -169,7 +170,9 @@ export async function runLearningTutorCapability(
       (input.capabilityId === "learning.tutor.answer_question" ||
       input.capabilityId === "learning.tutor.give_hint"
         ? ""
-        : "Please help me with this lesson.");
+        : input.capabilityId === "learning.tutor.explain_again"
+          ? "Please explain this lesson again more simply."
+          : "Please help me with this lesson.");
 
     if (
       (input.capabilityId === "learning.tutor.answer_question" ||
@@ -191,9 +194,11 @@ export async function runLearningTutorCapability(
       grounded.pack,
       input.capabilityId === "learning.tutor.give_hint"
         ? `Learner focus for scaffolding hint (do not give a full graded answer): ${learnerQuestion}`
-        : learnerQuestion
-          ? `Learner request: ${learnerQuestion}`
-          : "",
+        : input.capabilityId === "learning.tutor.explain_again"
+          ? `Re-teach request (simpler/alternate explanation; not a graded solution): ${learnerQuestion}`
+          : learnerQuestion
+            ? `Learner request: ${learnerQuestion}`
+            : "",
     ]
       .filter(Boolean)
       .join("\n\n");

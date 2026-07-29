@@ -24,6 +24,7 @@ export type {
   LearningTutorPracticeResult,
   LearningTutorExplainWrongAnswerResult,
   LearningTutorGiveHintResult,
+  LearningTutorExplainAgainResult,
   LearningTutorGroundingStatus,
   LearningTutorSourceReference,
 } from "./contracts/learningTutor";
@@ -50,6 +51,7 @@ export type {
   LearningTutorGeneratePracticeActionInput,
   LearningTutorExplainWrongAnswerActionInput,
   LearningTutorGiveHintActionInput,
+  LearningTutorExplainAgainActionInput,
 } from "./contracts/learningTutorServerActions";
 export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";

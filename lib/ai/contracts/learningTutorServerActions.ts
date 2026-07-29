@@ -45,6 +45,12 @@ export type LearningTutorGiveHintActionInput =
     focus: string;
   };
 
+export type LearningTutorExplainAgainActionInput =
+  LearningTutorServerActionLocaleInput & {
+    lessonId: string;
+    focus?: string;
+  };
+
 export type LearningTutorServerActionSuccess = {
   runId: string;
   action: LearningTutorIntegrationAction;

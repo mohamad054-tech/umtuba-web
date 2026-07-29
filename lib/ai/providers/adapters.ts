@@ -148,6 +148,26 @@ export function createStubAdapter(): AiProviderAdapter {
             labeledAiGenerated: true,
             revealsAnswerKey: false,
           };
+        } else if (input.capabilityId === "learning.tutor.explain_again") {
+          structured = {
+            title: `Explaining ${lessonName} again`,
+            simplerExplanation: outside
+              ? "That focus is outside the authorized lesson material provided."
+              : `Stub simpler re-teach of ${lessonName}: start with one plain-language idea, then connect it to the published blocks.`,
+            keyPoints: ["Plain-language core idea", "How it appears in the lesson"],
+            analogy: "Think of it like retelling a story in simpler words.",
+            checkUnderstanding: [
+              "Can you restate the main idea in one sentence?",
+              "Which published block supports that idea?",
+            ],
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: [
+              "Stub provider — not live model output.",
+              "Re-teach only — not an official grade or hidden solution.",
+            ],
+            labeledAiGenerated: true,
+          };
         } else {
           structured = {
             title: `Explaining ${lessonName}`,

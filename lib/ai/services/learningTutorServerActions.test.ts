@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import {
   answerQuestionLearningTutor,
+  explainAgainLearningTutor,
   explainLessonLearningTutor,
   explainWrongAnswerLearningTutor,
   generatePracticeLearningTutor,
@@ -129,6 +130,10 @@ describe("Learning Tutor server actions foundation", () => {
         { lessonId: LESSON, focus: "neural networks" },
         rt
       ),
+      await explainAgainLearningTutor(
+        { lessonId: LESSON, focus: "still confused" },
+        rt
+      ),
     ];
 
     const expected = [
@@ -138,9 +143,10 @@ describe("Learning Tutor server actions foundation", () => {
       "answer_question",
       "explain_wrong_answer",
       "give_hint",
+      "explain_again",
     ] as const;
 
-    expect(runIntegration).toHaveBeenCalledTimes(6);
+    expect(runIntegration).toHaveBeenCalledTimes(7);
     results.forEach((result, index) => {
       expect(result.ok).toBe(true);
       if (!result.ok) return;
@@ -223,6 +229,7 @@ describe("Learning Tutor server actions foundation", () => {
     expect(src).toMatch(/generatePracticeLearningTutorAction/);
     expect(src).toMatch(/explainWrongAnswerLearningTutorAction/);
     expect(src).toMatch(/giveHintLearningTutorAction/);
+    expect(src).toMatch(/explainAgainLearningTutorAction/);
     expect(src).toMatch(/learningTutorServerActions/);
     const imports = src
       .split(/\r?\n/)

@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — `give_hint` capability
+UM Learning AI Tutor Backend — `explain_again` capability
 
 ## Status
 
@@ -10,27 +10,22 @@ UM Learning AI Tutor Backend — `give_hint` capability
 
 ## Branch
 
-`office/learning-ai-tutor-backend-foundation-v1`
+`office/learning-ai-tutor-explain-again-v1`
 
-## Milestone just completed
+## Base
 
-`learning.tutor.give_hint@1.0.0` / action `give_hint` / server action `giveHintLearningTutorAction`
+`office/learning-ai-tutor-backend-foundation-v1` @ `c83e29eb746339bc0d217888446ab610f986bfc8` (`give_hint`)
 
-Maps to Learning OS message kind `hint`. Scaffolding-only; fail-closed against answer keys.
+## Milestone
 
-## Prior completed (do not reopen)
+`learning.tutor.explain_again@1.0.0` / action `explain_again` / `explainAgainLearningTutorAction`
 
-- explain_lesson, summarize_lesson, answer_question, generate_practice, explain_wrong_answer
-- integration boundary, server actions, Provider Foundation, Assistant Runtime Integration
+Maps to Learning OS message kind `explain_again`. Simpler/alternate re-teach; distinct from `explain_lesson` and `give_hint`.
 
 ## Machine policy
 
-This laptop owns AI Tutor Backend only. Do **not** touch `alpha-0.2` / Home / Profile / Commerce / Store / Creator / Navigation / Web UI.
+This laptop owns AI Tutor Backend only. Do **not** touch `alpha-0.2` / Home / Profile / Commerce / Store / Creator / Navigation / Web UI. No `npm run build`.
 
-## Next (dependency-correct)
+## Next (after this lands)
 
-Optional: `explain_again` backend capability. No UI on this machine.
-
-## Gates
-
-AI product flags remain default OFF on alpha line (not modified here).
+Optional: `code_review` backend capability. No UI on this machine.

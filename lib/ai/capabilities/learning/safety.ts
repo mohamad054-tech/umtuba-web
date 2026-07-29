@@ -105,6 +105,69 @@ export function assertLearningTutorSafety(input: {
       );
     }
   }
+  if (
+    input.capabilityId === "learning.tutor.explain_again" &&
+    input.structured
+  ) {
+    if (input.structured.labeledAiGenerated !== true) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "Explain-again must be labeled AI-generated."
+      );
+    }
+    if (
+      "answerKey" in input.structured ||
+      "correctAnswer" in input.structured ||
+      "answer_key" in input.structured ||
+      "fullAnswer" in input.structured ||
+      "grade" in input.structured
+    ) {
+      throw new AiPlatformError(
+        "safety_block",
+        "Explain-again attempted graded or key leakage fields."
+      );
+    }
+    if (
+      typeof input.structured.title !== "string" ||
+      !String(input.structured.title).trim()
+    ) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "title is required."
+      );
+    }
+    if (
+      typeof input.structured.simplerExplanation !== "string" ||
+      !String(input.structured.simplerExplanation).trim()
+    ) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "simplerExplanation is required."
+      );
+    }
+    if (!Array.isArray(input.structured.keyPoints)) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "keyPoints must be an array."
+      );
+    }
+    if (!Array.isArray(input.structured.checkUnderstanding)) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "checkUnderstanding must be an array."
+      );
+    }
+    if (
+      "analogy" in input.structured &&
+      input.structured.analogy != null &&
+      typeof input.structured.analogy !== "string"
+    ) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "analogy must be a string when provided."
+      );
+    }
+  }
 }
 
 export function validateLearningTutorStructured(

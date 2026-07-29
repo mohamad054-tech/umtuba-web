@@ -248,7 +248,7 @@ function createFakeSupabase(opts?: FakeOpts) {
 }
 
 describe("Learning Tutor integration action contracts", () => {
-  it("exposes six actions mapped to six capabilities", () => {
+  it("exposes seven actions mapped to seven capabilities", () => {
     expect(LEARNING_TUTOR_INTEGRATION_ACTIONS).toEqual([
       "explain_lesson",
       "summarize_lesson",
@@ -256,6 +256,7 @@ describe("Learning Tutor integration action contracts", () => {
       "generate_practice",
       "explain_wrong_answer",
       "give_hint",
+      "explain_again",
     ]);
     expect([...LEARNING_TUTOR_INTEGRATION_CAPABILITIES].sort()).toEqual(
       [...LEARNING_TUTOR_CAPABILITIES].sort()
@@ -356,6 +357,26 @@ describe("Learning Tutor integration action contracts", () => {
     ).toBe(false);
     expect(
       parseLearningTutorIntegrationRequest({
+        action: "explain_again",
+        lessonId: LESSON,
+        focus: "",
+      }).ok
+    ).toBe(false);
+    expect(
+      parseLearningTutorIntegrationRequest({
+        action: "explain_again",
+        lessonId: LESSON,
+      }).ok
+    ).toBe(true);
+    expect(
+      parseLearningTutorIntegrationRequest({
+        action: "explain_again",
+        lessonId: LESSON,
+        focus: "neural networks",
+      }).ok
+    ).toBe(true);
+    expect(
+      parseLearningTutorIntegrationRequest({
         action: "explain_wrong_answer",
         attemptId: ATTEMPT,
       }).ok
@@ -420,7 +441,7 @@ describe("runLearningTutorIntegration", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it("runs all six actions via aiService with correct capability mapping", async () => {
+  it("runs all seven actions via aiService with correct capability mapping", async () => {
     const spy = vi.spyOn(aiService, "runCapability");
     const supabase = createFakeSupabase() as never;
 
@@ -452,6 +473,14 @@ describe("runLearningTutorIntegration", () => {
           focus: "neural networks definition",
         },
         capability: "learning.tutor.give_hint",
+      },
+      {
+        request: {
+          action: "explain_again" as const,
+          lessonId: LESSON,
+          focus: "still confused about layers",
+        },
+        capability: "learning.tutor.explain_again",
       },
     ];
 

@@ -9,6 +9,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   LearningTutorAnswerQuestionActionInput,
+  LearningTutorExplainAgainActionInput,
   LearningTutorExplainLessonActionInput,
   LearningTutorExplainWrongAnswerActionInput,
   LearningTutorGeneratePracticeActionInput,
@@ -154,6 +155,7 @@ async function executeNamedIntegration(
 const LESSON_KEYS = new Set(["lessonId", "locale"]);
 const ANSWER_KEYS = new Set(["lessonId", "question", "locale"]);
 const HINT_KEYS = new Set(["lessonId", "focus", "locale"]);
+const EXPLAIN_AGAIN_KEYS = new Set(["lessonId", "focus", "locale"]);
 const WRONG_KEYS = new Set(["attemptId", "questionId", "locale"]);
 
 export async function explainLessonLearningTutor(
@@ -236,6 +238,21 @@ export async function giveHintLearningTutor(
   if (rejected) return rejected;
   return executeNamedIntegration(runtime, {
     action: "give_hint",
+    lessonId: input.lessonId,
+    focus: input.focus,
+    locale: input.locale,
+    surface: SURFACE,
+  });
+}
+
+export async function explainAgainLearningTutor(
+  input: LearningTutorExplainAgainActionInput,
+  runtime: LearningTutorServerActionRuntime
+): Promise<LearningTutorServerActionResult> {
+  const rejected = rejectExtraKeys(input, EXPLAIN_AGAIN_KEYS);
+  if (rejected) return rejected;
+  return executeNamedIntegration(runtime, {
+    action: "explain_again",
     lessonId: input.lessonId,
     focus: input.focus,
     locale: input.locale,

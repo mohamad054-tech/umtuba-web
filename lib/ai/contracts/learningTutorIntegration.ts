@@ -10,6 +10,7 @@
 import type { AiErrorCode } from "./types";
 import type {
   LearningTutorAnswerResult,
+  LearningTutorExplainAgainResult,
   LearningTutorExplainResult,
   LearningTutorExplainWrongAnswerResult,
   LearningTutorGiveHintResult,
@@ -25,6 +26,7 @@ export const LEARNING_TUTOR_INTEGRATION_CAPABILITIES = [
   "learning.tutor.generate_practice",
   "learning.tutor.explain_wrong_answer",
   "learning.tutor.give_hint",
+  "learning.tutor.explain_again",
 ] as const;
 
 export type LearningTutorIntegrationCapabilityId =
@@ -38,6 +40,7 @@ export const LEARNING_TUTOR_INTEGRATION_ACTIONS = [
   "generate_practice",
   "explain_wrong_answer",
   "give_hint",
+  "explain_again",
 ] as const;
 
 export type LearningTutorIntegrationAction =
@@ -82,6 +85,12 @@ export type LearningTutorIntegrationRequest =
       lessonId: string;
       /** What the learner wants scaffolding on (not a graded answer request). */
       focus: string;
+    } & LearningTutorIntegrationCommon)
+  | ({
+      action: "explain_again";
+      lessonId: string;
+      /** Optional untrusted focus for what still confuses the learner. */
+      focus?: string;
     } & LearningTutorIntegrationCommon);
 
 export const LEARNING_TUTOR_ACTION_TO_CAPABILITY = {
@@ -91,6 +100,7 @@ export const LEARNING_TUTOR_ACTION_TO_CAPABILITY = {
   generate_practice: "learning.tutor.generate_practice",
   explain_wrong_answer: "learning.tutor.explain_wrong_answer",
   give_hint: "learning.tutor.give_hint",
+  explain_again: "learning.tutor.explain_again",
 } as const satisfies Record<
   LearningTutorIntegrationAction,
   LearningTutorIntegrationCapabilityId
@@ -127,4 +137,5 @@ export type LearningTutorIntegrationResultByAction = {
   generate_practice: LearningTutorPracticeResult;
   explain_wrong_answer: LearningTutorExplainWrongAnswerResult;
   give_hint: LearningTutorGiveHintResult;
+  explain_again: LearningTutorExplainAgainResult;
 };

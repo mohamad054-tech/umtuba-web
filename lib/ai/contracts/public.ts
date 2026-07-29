@@ -15,6 +15,7 @@ export type AiServiceCapabilityId =
   | "learning.tutor.generate_practice"
   | "learning.tutor.explain_wrong_answer"
   | "learning.tutor.give_hint"
+  | "learning.tutor.explain_again"
   | (string & {});
 
 export type AiServiceContextRefs = {
@@ -37,7 +38,7 @@ export type AiServiceRunRequest = {
     productId?: string;
     lessonId?: string;
     question?: string;
-    /** Focus text for give_hint (what the learner wants scaffolding on). */
+    /** Focus text for give_hint / optional explain_again focus. */
     focus?: string;
     /** Owner-scoped assessment attempt for wrong-answer explanation. */
     attemptId?: string;
