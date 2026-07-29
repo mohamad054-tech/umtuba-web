@@ -131,6 +131,8 @@ export function profileRowToView(
     about: {
       joinedLabel: formatJoinedLabel(row.created_at),
       interests: [],
+      // Identity Strip roles: no profiles.roles column yet — omit until Product/DB provides it.
+      roles: [],
     },
   };
 }

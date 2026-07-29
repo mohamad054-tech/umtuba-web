@@ -32,9 +32,10 @@ function session(
 }
 
 describe("About / Live Structure V1", () => {
-  it("orders About sections Bio → Experience → Education → Specialties & interests → Achievements → Links → Joined", () => {
+  it("orders About sections Bio → Roles → Experience → Education → Specialties & interests → Achievements → Links → Joined", () => {
     expect([...ABOUT_SECTION_ORDER]).toEqual([
       "bio",
+      "roles",
       "experience",
       "education",
       "specialtiesInterests",
@@ -67,6 +68,7 @@ describe("About / Live Structure V1", () => {
         about: {
           joinedLabel: "Joined 2024",
           interests: ["Travel"],
+          roles: ["Writer", "Teacher"],
           specialties: ["Film"],
           education: [{ title: "Arts" }],
           achievements: ["Badge"],
@@ -75,6 +77,7 @@ describe("About / Live Structure V1", () => {
       })
     ).toEqual([
       "bio",
+      "roles",
       "education",
       "specialtiesInterests",
       "achievements",

@@ -3,6 +3,7 @@ export { default as ProfileActions } from "./ProfileActions";
 export { default as ProfileAllPanel } from "./ProfileAllPanel";
 export { default as ProfileArticlesPanel } from "./ProfileArticlesPanel";
 export { default as ProfileHeader } from "./ProfileHeader";
+export { default as ProfileIdentityStrip } from "./ProfileIdentityStrip";
 export { default as ProfileLinkedArticlePrompt } from "./ProfileLinkedArticlePrompt";
 export { default as ProfileLiveBadge } from "./ProfileLiveBadge";
 export { default as ProfileLivePanel } from "./ProfileLivePanel";

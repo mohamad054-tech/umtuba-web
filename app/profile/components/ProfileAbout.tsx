@@ -75,6 +75,13 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
         </section>
       ) : null}
 
+      {sections.includes("roles") ? (
+        <section>
+          <SectionHeading>Roles</SectionHeading>
+          <ChipList items={profile.about.roles ?? []} />
+        </section>
+      ) : null}
+
       {sections.includes("experience") ? (
         <section>
           <SectionHeading>Experience</SectionHeading>

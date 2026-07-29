@@ -12,6 +12,7 @@ import type {
 
 export const ABOUT_SECTION_ORDER = [
   "bio",
+  "roles",
   "experience",
   "education",
   "specialtiesInterests",
@@ -116,6 +117,8 @@ export function getVisibleAboutSections(
     switch (id) {
       case "bio":
         return hasText(input.bio) || hasText(location);
+      case "roles":
+        return hasItems(about.roles);
       case "experience":
         return hasItems(about.experience);
       case "education":

@@ -6,19 +6,21 @@
 
 ## Primary working branch
 
-`alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8` — Integration Program V1 + Alpha Beta Productization V1 closed
+`alpha-0.2` @ `03fe5e7e78cf4239317551671c7c33206523def7` — Integration Program V1 + Alpha Beta Productization V1 + Profile Hero Completeness V1 closed on alpha
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/profile-hero-completeness-v1`
-- **Task:** Creator Space Hero Completeness V1 (re-sync onto latest alpha prepared; manual commit pending)
-- **Feature tip:** `3b88b01036269b60410d41830fd24b2af85af091`
+- **Branch:** `office/profile-identity-strip-v1`
+- **Task:** Creator Identity Strip V1 (CREATOR_SPACE §4)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-strip-v1`
+- **Base tip:** `03fe5e7e78cf4239317551671c7c33206523def7`
 - **See:** `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
 
 - Integration Program V1 Waves 0–4
 - Alpha Beta Productization V1 (honesty/gating/ops)
+- Profile Hero Completeness V1
 
 ## Gates (unchanged defaults)
 
@@ -30,7 +32,8 @@
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-Do not pop/apply Learning stash while finishing Profile Hero.
+Do not pop/apply Learning stash while finishing Web/Profile work on Desktop.
+Laptop owns Learning AI Tutor / AI Core / backend / server-actions / integration for that scope.
 
 ## Integration status
 
@@ -41,7 +44,8 @@ Do not pop/apply Learning stash while finishing Profile Hero.
 | Shared AI Core / Hub / Assistant | On alpha; product surfaces gated OFF |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |
-| Profile Hero Completeness V1 | Re-sync prepared on feature branch |
+| Profile Hero Completeness V1 | Closed on alpha |
+| Profile Identity Strip V1 | Active on Desktop feature branch |
 
 ## Source of truth
 

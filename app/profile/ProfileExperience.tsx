@@ -14,6 +14,7 @@ import {
   ProfileActions,
   ProfileAllPanel,
   ProfileHeader,
+  ProfileIdentityStrip,
   ProfileLivePanel,
   ProfileShell,
   ProfileStats,
@@ -156,6 +157,11 @@ export default function ProfileExperience({
           className={`space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7 ${PROFILE_PAGE_ENTER_CLASS}`}
         >
           <ProfileHeader profile={profile} isCollapsed={isHeroCollapsed} />
+          <ProfileIdentityStrip
+            profile={profile}
+            isCollapsed={isHeroCollapsed}
+            onOpenAbout={() => setActiveTab("about")}
+          />
           <ProfileStats
             followersLabel={followersLabel}
             followingLabel={followingLabel}
