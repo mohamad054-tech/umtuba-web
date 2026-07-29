@@ -1,34 +1,62 @@
-# CURSOR_REPORT — Profile Hero Completeness V1 (alpha re-sync)
+# CURSOR_REPORT — Creator Space Hero Completeness V1
 
 ## Summary
 
-**Creator Space Hero Completeness V1** (`3b88b01036269b60410d41830fd24b2af85af091`) is re-synced onto current truth line `origin/alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8` via merge `--no-ff --no-commit` (manual commit pending).
+**Creator Space Hero Completeness V1** implementation is complete on
+`office/profile-hero-completeness-v1` @ `434ee28f0e094b33f83bf1a94e135a2f48596e5b`
+(synced with latest alpha via trailer-free merge; feature branch pushed `0 0`).
+No further product code remaining in this V1 scope. **FF into `alpha-0.2` still pending explicit GO.**
 
-Alpha already closed:
-- Integration Program V1 Waves 0–4
-- Alpha Beta Productization V1 (honesty/gating/ops)
+## Exact files changed (feature commit `3b88b01`)
 
-## Hero Completeness V1 — files
-
-- `app/profile/lib/profileHeroCompleteness.ts`
-- `lib/content/profileHeroCompleteness.v1.test.ts`
+- `app/profile/lib/profileHeroCompleteness.ts` (new)
+- `lib/content/profileHeroCompleteness.v1.test.ts` (new)
 - `app/profile/components/ProfileHeader.tsx`
 - `app/profile/data/mockProfiles.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Security review
+## Exact files changed (this verification session — uncommitted docs only)
 
-- Hero Completeness: client UI over existing ProfileView fields only; no migrations; no invented profession/verified/cover fields
-- AI flags remain default OFF (from alpha)
-- Commerce kill-switch / Beta honesty retained (from alpha)
-- No Gemini/API keys / live PSP introduced by this sync
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/SESSION_HANDOFF.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
 None.
 
+## Security review
+
+- Client UI over existing ProfileView fields only
+- No migrations; no invented profession/verified/cover fields
+- No Home / Arc / Commerce / Learning / flag changes
+
+## Tests
+
+Hero + Creator Space focused Vitest (this session): **23/23 passed**
+- `profileHeroCompleteness.v1.test.ts` 5
+- `profileAllTimelineContract.v1.test.ts` 9
+- `profilePhotosLightbox.v1.test.ts` 6
+- `profileMotionA11y.v1.test.ts` 3
+
+## TypeScript
+
+- `npm run build` TS: **passed** (exit 0)
+- `npx tsc --noEmit`: baseline only
+  `lib/content/profilePinnedContentStructure.v1.test.ts(12,43): Cannot find module '../cards'`
+
+## Build
+
+**passed** (`npm run build` exit 0)
+
+## git diff --check
+
+**passed** (docs-only local changes)
+
 ## Open issues
 
-- Merge commit not created yet (prepared locally for manual commit)
-- Lint debt baseline on alpha (~74) unchanged by this feature
+- FF-merge into `alpha-0.2` + push alpha — **awaiting explicit GO**
+- Baseline `npx tsc --noEmit` may still report
+  `lib/content/profilePinnedContentStructure.v1.test.ts` → `Cannot find module '../cards'`
+  (pre-existing; out of Hero Completeness scope)
