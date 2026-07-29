@@ -10,11 +10,15 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/profile-identity-strip-v1`
-- **Task:** Creator Identity Strip V1 (CREATOR_SPACE §4)
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-strip-v1`
-- **Base tip:** `03fe5e7e78cf4239317551671c7c33206523def7`
+- **Branch:** `office/profile-identity-achievements-v1`
+- **Task:** Creator Identity Achievements V1 (CREATOR_SPACE §4 medals)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-achievements-v1`
+- **Dependency merge:** `95e33bf` integrates Identity Strip `f574eba`
 - **See:** `docs/ai/CURSOR_REPORT.md`
+
+## Closed on Desktop feature branches
+
+- Profile Identity Strip V1 — `office/profile-identity-strip-v1` @ `f574eba902ee424d944bf85d913fad80108dc83b` (integrated into Achievements branch)
 
 ## Closed on alpha-0.2 (do not reopen)
 
@@ -45,7 +49,8 @@ Laptop owns Learning AI Tutor / AI Core / backend / server-actions / integration
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |
 | Profile Hero Completeness V1 | Closed on alpha |
-| Profile Identity Strip V1 | Active on Desktop feature branch |
+| Profile Identity Strip V1 | Closed; merged into Achievements branch @ `95e33bf` |
+| Profile Identity Achievements V1 | Active on Desktop feature branch (staged for manual commit) |
 
 ## Source of truth
 

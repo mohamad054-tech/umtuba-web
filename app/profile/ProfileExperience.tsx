@@ -14,6 +14,7 @@ import {
   ProfileActions,
   ProfileAllPanel,
   ProfileHeader,
+  ProfileIdentityAchievements,
   ProfileIdentityStrip,
   ProfileLivePanel,
   ProfileShell,
@@ -158,6 +159,11 @@ export default function ProfileExperience({
         >
           <ProfileHeader profile={profile} isCollapsed={isHeroCollapsed} />
           <ProfileIdentityStrip
+            profile={profile}
+            isCollapsed={isHeroCollapsed}
+            onOpenAbout={() => setActiveTab("about")}
+          />
+          <ProfileIdentityAchievements
             profile={profile}
             isCollapsed={isHeroCollapsed}
             onOpenAbout={() => setActiveTab("about")}

@@ -1,30 +1,32 @@
-# CURSOR_REPORT — Creator Identity Strip V1
+# CURSOR_REPORT — Creator Identity Achievements V1
 
 ## Summary
 
-Implemented Creator Identity Strip V1 on isolated branch
-`office/profile-identity-strip-v1` from `origin/alpha-0.2` @
-`03fe5e7e78cf4239317551671c7c33206523def7`. Role chips (max 2 + `+N` → About)
-and optional interest teasers (max 2) render under Hero; specialties stay in
-Hero Completeness. No migrations. Validation previously passed in this worktree.
+Creator Identity Achievements V1 on `office/profile-identity-achievements-v1`,
+with Identity Strip dependency merged at `95e33bf` (`f574eba`). Optional
+achievement medals (max 3 + `+N` → About) render after Identity Strip under
+Hero. Uses existing `about.achievements`. No migrations. Staged for manual
+feature commit (no trailers).
 
-## Exact files changed
+## Exact files changed (Achievements feature, post-dependency)
 
-- `app/profile/lib/profileIdentityStrip.ts` (new)
-- `app/profile/components/ProfileIdentityStrip.tsx` (new)
-- `lib/content/profileIdentityStrip.v1.test.ts` (new)
-- `app/profile/ProfileExperience.tsx`
+- `app/profile/lib/profileIdentityAchievements.ts` (new)
+- `app/profile/components/ProfileIdentityAchievements.tsx` (new)
+- `lib/content/profileIdentityAchievements.v1.test.ts` (new)
+- `app/profile/ProfileExperience.tsx` (Strip + Achievements order)
 - `app/profile/components/index.ts`
-- `app/profile/components/ProfileAbout.tsx`
-- `app/profile/lib/profileAboutLiveStructure.ts`
-- `app/profile/lib/mapProfile.ts`
-- `app/profile/types.ts`
 - `app/profile/data/mockProfiles.ts`
-- `lib/content/profileAboutLiveStructure.v1.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
+
+## Dependency
+
+| Item | Hash |
+| --- | --- |
+| Merge commit | `95e33bfb99beed4b6b9dd88ee3891e060fe6fb60` |
+| Strip tip | `f574eba902ee424d944bf85d913fad80108dc83b` |
 
 ## Migrations created
 
@@ -32,38 +34,33 @@ None.
 
 ## Security review
 
-- Client UI over optional `ProfileAbout.roles` only; Supabase map uses `roles: []`
+- Client UI over existing `ProfileAbout.achievements` only
 - No invented verified badge / cover / DB column / migration
 - No Home / Arc / Learning / AI Tutor / Store edits
-- Existing dirty `umtuba-web` working directory and all git stashes untouched
 
 ## Tests
 
-Focused suite previously: **16/16 passed** (exit 0)
+Focused suite: **20/20 passed** (exit 0)
 - `profileIdentityStrip.v1.test.ts` — 5
-- `profileAboutLiveStructure.v1.test.ts` — 6
+- `profileIdentityAchievements.v1.test.ts` — 4
 - `profileHeroCompleteness.v1.test.ts` — 5
+- `profileAboutLiveStructure.v1.test.ts` — 6
 
 ## TypeScript
 
-`npx tsc --noEmit`: **passed** (exit 0) — prior run in this worktree
+`npx tsc --noEmit`: **passed** (exit 0)
 
 ## Build
 
-`npm run build`: **passed** (exit 0) — prior run in this worktree
+`npm run build`: **passed** (exit 0)
 
 ## git diff --check
 
-Pending post-commit verification.
-
-## git status --short
-
-Pending post-commit verification.
+**passed**
 
 ## Open issues
 
-- Local commit must contain **no trailers** (no Co-authored-by / Signed-off-by)
-- Push deferred until user requests
-- FF-merge into `alpha-0.2` still requires explicit GO
-- Real role persistence needs Product/DB column decision (out of scope)
+- Manual feature commit required (no trailers)
+- Push deferred until user approval
+- Preserve stash may still exist at `stash@{0}` (pop kept it after conflicts) — safe to drop only that Achievements preserve entry after feature commit
 - Home Unlock remains locked

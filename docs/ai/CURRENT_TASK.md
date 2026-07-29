@@ -2,47 +2,46 @@
 
 ## Task title
 
-Creator Identity Strip V1
+Creator Identity Achievements V1
 
 ## Status
 
-`implementation-complete` — Feature implemented in isolated worktree; awaiting clean local commit (no trailers)
+`implementation-complete` — Identity Strip dependency merged (`95e33bf`); Achievements restored and conflict-resolved; staged for manual feature commit (no trailers)
 
 ## Resume here (next session / next GO)
 
-1. Confirm branch `office/profile-identity-strip-v1` tip after commit
-2. Confirm sync with origin after push: `0 0`
-3. Confirm base was `origin/alpha-0.2` @ `03fe5e7e78cf4239317551671c7c33206523def7`
-4. **Next GO only (separate step):** Fast-Forward merge into `alpha-0.2` + push alpha
+1. Manual feature commit in worktree (no Co-authored-by / Signed-off-by / trailers)
+2. Push feature branch when approved; confirm `0 0`
+3. Base lineage: `origin/alpha-0.2` @ `03fe5e7` + Identity Strip @ `f574eba` via merge `95e33bf`
+4. **Next GO only (separate step):** Fast-Forward / land into `alpha-0.2` on explicit GO
 5. Do **not** start Home Unlock (`HOME_LOCK_ACTIVE` remains true)
 
 ## Branch
 
-`office/profile-identity-strip-v1`
+`office/profile-identity-achievements-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (`origin/alpha-0.2` at branch creation) | `03fe5e7e78cf4239317551671c7c33206523def7` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-strip-v1` |
+| Dependency merge | `95e33bfb99beed4b6b9dd88ee3891e060fe6fb60` |
+| Identity Strip tip integrated | `f574eba902ee424d944bf85d913fad80108dc83b` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-achievements-v1` |
 
 ## Done (feature — locked contract)
 
-- Identity Strip under Hero, above Stats/Actions/tabs (`ProfileIdentityStrip`)
-- Role chips: max 2 visible + `+N` overflow button opens About
-- Interest teasers: max 0–2 on strip; full interests remain on About
-- Optional `about.roles` on view-model; Supabase map → `[]` (no migration / invented DB column)
-- About tab Roles section when roles present
-- Specialties remain Hero Completeness (Header only)
-- Helpers + Vitest; mock `lina.creates` / `maya.labs` roles for preview
+- Optional achievement medals under Hero identity zone (after Identity Strip)
+- Order: Hero → Identity Strip → Identity Achievements → Stats/Actions/tabs
+- Max 3 visible medals + `+N` overflow opens About
+- Uses existing `profile.about.achievements` only (no migration)
+- Collapses with Hero; About Achievements section remains canonical
+- Helpers + Vitest; mock multi-achievement preview
 - Home locks / Learning / AI Tutor / Store untouched
 
 ## Not done yet
 
-- Local commit + push (no trailers)
-- FF-merge into `alpha-0.2` (explicit GO required)
-- Persisting roles from a real DB column (Product/DB decision)
+- Manual feature commit + push
+- FF-merge into `alpha-0.2` (explicit GO)
 
 ## Gates (unchanged)
 
@@ -51,4 +50,4 @@ Creator Identity Strip V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor backend, verified badge, cover image, Store/Commerce, inventing `profiles.roles` migration.
+Home Unlock, Learning AI Tutor, verified badge, cover image, game achievements system, Store/Commerce.

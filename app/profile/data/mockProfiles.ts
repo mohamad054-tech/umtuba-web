@@ -110,7 +110,12 @@ export const MOCK_PROFILES: MockProfile[] = [
           detail: "Workshops and field practice",
         },
       ],
-      achievements: ["Creator Space pioneer"],
+      achievements: [
+        "Creator Space pioneer",
+        "Top documentary week",
+        "City light series",
+        "Launch cohort",
+      ],
       links: [{ label: "Portfolio", href: "https://umtuba.world/lina" }],
     },
     contentCards: [
