@@ -109,10 +109,34 @@ Future Learning UI
 
 Cross-capability `revealsAnswerKey` flag parity for `explain_again` is deferred; leakage remains fail-closed via banned fields.
 
+## Thread Persistence Bridge V1
+
+Milestone: `learning.tutor.thread_persistence_bridge@1.0.0`
+
+| Piece | Detail |
+| --- | --- |
+| Migration (local only) | `20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql` |
+| RPC | `append_my_learning_ai_tutor_exchange(p_thread_id, p_kind, p_user_content, p_assistant_content)` |
+| Stub RPC | `append_my_learning_ai_tutor_message` preserved (stub assistant text) |
+| Bridge module | `lib/ai/capabilities/learning/threadPersistenceBridge.ts` |
+| Wiring | Optional `threadId` on `answer_question` / `explain_again` / `give_hint` → validate thread/lesson → AI → exchange RPC |
+| Kind map | `answer_question→ask_question`, `explain_again→explain_again`, `give_hint→hint` |
+| Unsupported actions | No guessed kinds; `threadId` rejected on other actions |
+| Fail closed | Missing/unowned thread, lesson mismatch, entitlement, persistence error (no silent success) |
+| App path | Authenticated RPC only — no `service_role` from application code |
+
+### Accepted V1 follow-ups (not in this milestone)
+
+- SQL-level lesson binding (`p_lesson_id` on exchange RPC)
+- Lean thread metadata read RPC (avoid full message history for validation)
+- Trusted-producer transcript integrity (prevent owner-forged assistant rows via direct RPC)
+- Structured oversize serialization (reject/rebuild instead of mid-JSON clamp)
+
 ## Migration status
 
-Uses existing Shared AI Core migration `20260871` (local only, not remote-applied). **No new migration.**
+- Shared AI Core: `20260871` (local only, not remote-applied)
+- Tutor exchange RPC: `20260872` (local only, not remote-applied)
 
 ## Next (after commit approval)
 
-Optional: `code_review` backend capability (programming-narrow). Further multi-provider adapters may register into Provider Foundation. Laptop may wire Learning UI to the named server actions. No Desktop UI.
+`code_review` remains **blocked** pending a trusted code-input contract. Optional: Provider Foundation restoration (separate). Do not merge Tutor work into alpha from the Tutor laptop.

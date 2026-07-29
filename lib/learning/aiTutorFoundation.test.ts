@@ -78,7 +78,12 @@ describe("AI Tutor Foundation — SQL", () => {
   });
 
   it("exposes create/append/list/get message RPCs", () => {
-    for (const name of Object.values(LEARNING_AI_TUTOR_RPCS)) {
+    for (const name of [
+      LEARNING_AI_TUTOR_RPCS.createThread,
+      LEARNING_AI_TUTOR_RPCS.appendMessage,
+      LEARNING_AI_TUTOR_RPCS.listThreads,
+      LEARNING_AI_TUTOR_RPCS.getMessages,
+    ]) {
       expect(sql).toMatch(
         new RegExp(`create or replace function public\\.${name}`)
       );

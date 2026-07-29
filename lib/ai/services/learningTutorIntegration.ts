@@ -24,6 +24,14 @@ import {
   type LearningTutorIntegrationResult,
 } from "../contracts/learningTutorIntegration";
 import { LEARNING_TUTOR_CAPABILITIES } from "../capabilities/learning/tutorRunner";
+import {
+  mapLearningTutorActionToMessageKind,
+  persistLearningTutorExchange,
+  serializeAssistantContentForPersistence,
+  serializeLearnerContentForPersistence,
+  validateThreadForPersistence,
+  type LearningTutorPersistableAction,
+} from "../capabilities/learning/threadPersistenceBridge";
 import { aiService } from "./aiService";
 
 export type LearningTutorIntegrationDeps = {
@@ -55,6 +63,7 @@ const ACTION_ALLOWED_KEYS: Record<
     "action",
     "lessonId",
     "question",
+    "threadId",
     ...COMMON_OPTIONAL_KEYS,
   ]),
   generate_practice: new Set(["action", "lessonId", ...COMMON_OPTIONAL_KEYS]),
@@ -68,12 +77,14 @@ const ACTION_ALLOWED_KEYS: Record<
     "action",
     "lessonId",
     "focus",
+    "threadId",
     ...COMMON_OPTIONAL_KEYS,
   ]),
   explain_again: new Set([
     "action",
     "lessonId",
     "focus",
+    "threadId",
     ...COMMON_OPTIONAL_KEYS,
   ]),
 };
@@ -190,6 +201,22 @@ function readOptionalCommon(row: Record<string, unknown>): {
   return { ok: true, locale, surface };
 }
 
+function readOptionalThreadId(row: Record<string, unknown>):
+  | { ok: true; threadId?: string }
+  | { ok: false; code: AiErrorCode; message: string } {
+  if (!("threadId" in row) || row.threadId == null) {
+    return { ok: true };
+  }
+  if (typeof row.threadId !== "string" || !isUuid(row.threadId.trim())) {
+    return {
+      ok: false,
+      code: "invalid_input",
+      message: "threadId must be a valid UUID.",
+    };
+  }
+  return { ok: true, threadId: row.threadId.trim() };
+}
+
 /**
  * Runtime parse + validation of an untrusted request into the action union.
  * Unknown actions, unknown keys, and forbidden control fields fail closed.
@@ -276,12 +303,15 @@ export function parseLearningTutorIntegrationRequest(
           message: "question is required.",
         };
       }
+      const threadId = readOptionalThreadId(row);
+      if (threadId && !threadId.ok) return threadId;
       return {
         ok: true,
         data: {
           action: "answer_question",
           lessonId: row.lessonId.trim(),
           question: row.question.trim(),
+          threadId: threadId && threadId.ok ? threadId.threadId : undefined,
           locale: common.locale,
           surface: common.surface,
         },
@@ -328,12 +358,15 @@ export function parseLearningTutorIntegrationRequest(
           message: "focus is required.",
         };
       }
+      const threadId = readOptionalThreadId(row);
+      if (threadId && !threadId.ok) return threadId;
       return {
         ok: true,
         data: {
           action: "give_hint",
           lessonId: row.lessonId.trim(),
           focus: row.focus.trim(),
+          threadId: threadId && threadId.ok ? threadId.threadId : undefined,
           locale: common.locale,
           surface: common.surface,
         },
@@ -358,12 +391,15 @@ export function parseLearningTutorIntegrationRequest(
         }
         focus = row.focus.trim();
       }
+      const threadId = readOptionalThreadId(row);
+      if (threadId && !threadId.ok) return threadId;
       return {
         ok: true,
         data: {
           action: "explain_again",
           lessonId: row.lessonId.trim(),
           focus,
+          threadId: threadId && threadId.ok ? threadId.threadId : undefined,
           locale: common.locale,
           surface: common.surface,
         },
@@ -440,6 +476,39 @@ export async function runLearningTutorIntegration(
   const capability = mapLearningTutorActionToCapability(request.action);
   const surface = request.surface?.trim() || "learning.tutor.integration";
 
+  const threadId =
+    "threadId" in request && typeof request.threadId === "string"
+      ? request.threadId
+      : undefined;
+
+  let persistKind: ReturnType<typeof mapLearningTutorActionToMessageKind> =
+    null;
+  let persistAction: LearningTutorPersistableAction | null = null;
+
+  if (threadId) {
+    persistKind = mapLearningTutorActionToMessageKind(request.action);
+    if (!persistKind) {
+      return fail(
+        "invalid_input",
+        "This Learning Tutor action cannot be persisted to a thread."
+      );
+    }
+    if (!("lessonId" in request) || typeof request.lessonId !== "string") {
+      return fail(
+        "invalid_input",
+        "lessonId is required to persist a Tutor thread exchange."
+      );
+    }
+    persistAction = request.action as LearningTutorPersistableAction;
+    const threadCheck = await validateThreadForPersistence(deps.supabase, {
+      threadId,
+      lessonId: request.lessonId,
+    });
+    if (!threadCheck.ok) {
+      return fail(threadCheck.error.code, threadCheck.error.message);
+    }
+  }
+
   const input =
     request.action === "explain_wrong_answer"
       ? {
@@ -489,7 +558,41 @@ export async function runLearningTutorIntegration(
     }
   );
 
-  return mapAiServiceResult(request.action, capability, serviceResult);
+  const mapped = mapAiServiceResult(request.action, capability, serviceResult);
+  if (!mapped.ok || !threadId || !persistKind || !persistAction) {
+    return mapped;
+  }
+
+  const learnerText = serializeLearnerContentForPersistence(persistAction, {
+    question:
+      request.action === "answer_question" ? request.question : undefined,
+    focus:
+      request.action === "give_hint" || request.action === "explain_again"
+        ? request.focus
+        : undefined,
+  });
+  const assistantText = serializeAssistantContentForPersistence(
+    persistAction,
+    mapped.data.result
+  );
+  if (!learnerText || !assistantText) {
+    return fail(
+      "invalid_input",
+      "Could not prepare tutor conversation for persistence."
+    );
+  }
+
+  const persisted = await persistLearningTutorExchange(deps.supabase, {
+    threadId,
+    kind: persistKind,
+    userContent: learnerText,
+    assistantContent: assistantText,
+  });
+  if (!persisted.ok) {
+    return fail(persisted.error.code, persisted.error.message, mapped.data.runId);
+  }
+
+  return mapped;
 }
 
 export const learningTutorIntegration = {

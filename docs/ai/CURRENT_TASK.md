@@ -2,30 +2,41 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — `explain_again` capability
+UM Learning AI Tutor Backend — Thread Persistence Bridge
 
 ## Status
 
-`implementation-complete-local` — awaiting commit/push GO (this laptop)
+`closed-local-push` — committed and pushed; migration **not** applied
 
 ## Branch
 
-`office/learning-ai-tutor-explain-again-v1`
+`office/learning-ai-tutor-thread-persistence-bridge-v1`
 
 ## Base
 
-`office/learning-ai-tutor-backend-foundation-v1` @ `c83e29eb746339bc0d217888446ab610f986bfc8` (`give_hint`)
+`office/learning-ai-tutor-explain-again-v1` @ `f5bd406de3d7ccf6e1b83c4e6c720f8b71fd92dd`
 
 ## Milestone
 
-`learning.tutor.explain_again@1.0.0` / action `explain_again` / `explainAgainLearningTutorAction`
+`learning.tutor.thread_persistence_bridge@1.0.0`
 
-Maps to Learning OS message kind `explain_again`. Simpler/alternate re-teach; distinct from `explain_lesson` and `give_hint`.
+## Delivered
+
+- Migration (local file only): `20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql`
+- RPC: `append_my_learning_ai_tutor_exchange`
+- Bridge wired for optional `threadId` on `answer_question` / `explain_again` / `give_hint`
+
+## Accepted follow-ups (V1)
+
+- SQL-level lesson binding
+- Lean thread metadata read RPC
+- Trusted-producer transcript integrity
+- Structured oversize serialization
 
 ## Machine policy
 
-This laptop owns AI Tutor Backend only. Do **not** touch `alpha-0.2` / Home / Profile / Commerce / Store / Creator / Navigation / Web UI. No `npm run build`.
+AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI. No `npm run build`. Do not apply migration remotely without explicit GO.
 
-## Next (after this lands)
+## Next
 
-Optional: `code_review` backend capability. No UI on this machine.
+`code_review` remains blocked. Do not restore Provider Foundation here.

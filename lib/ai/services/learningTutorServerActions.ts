@@ -153,9 +153,9 @@ async function executeNamedIntegration(
 }
 
 const LESSON_KEYS = new Set(["lessonId", "locale"]);
-const ANSWER_KEYS = new Set(["lessonId", "question", "locale"]);
-const HINT_KEYS = new Set(["lessonId", "focus", "locale"]);
-const EXPLAIN_AGAIN_KEYS = new Set(["lessonId", "focus", "locale"]);
+const ANSWER_KEYS = new Set(["lessonId", "question", "locale", "threadId"]);
+const HINT_KEYS = new Set(["lessonId", "focus", "locale", "threadId"]);
+const EXPLAIN_AGAIN_KEYS = new Set(["lessonId", "focus", "locale", "threadId"]);
 const WRONG_KEYS = new Set(["attemptId", "questionId", "locale"]);
 
 export async function explainLessonLearningTutor(
@@ -196,6 +196,7 @@ export async function answerQuestionLearningTutor(
     action: "answer_question",
     lessonId: input.lessonId,
     question: input.question,
+    threadId: input.threadId,
     locale: input.locale,
     surface: SURFACE,
   });
@@ -240,6 +241,7 @@ export async function giveHintLearningTutor(
     action: "give_hint",
     lessonId: input.lessonId,
     focus: input.focus,
+    threadId: input.threadId,
     locale: input.locale,
     surface: SURFACE,
   });
@@ -255,6 +257,7 @@ export async function explainAgainLearningTutor(
     action: "explain_again",
     lessonId: input.lessonId,
     focus: input.focus,
+    threadId: input.threadId,
     locale: input.locale,
     surface: SURFACE,
   });

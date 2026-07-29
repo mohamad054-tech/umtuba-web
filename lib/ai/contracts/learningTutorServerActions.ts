@@ -26,6 +26,8 @@ export type LearningTutorAnswerQuestionActionInput =
   LearningTutorServerActionLocaleInput & {
     lessonId: string;
     question: string;
+    /** Optional: persist exchange after success (Thread Persistence Bridge). */
+    threadId?: string;
   };
 
 export type LearningTutorGeneratePracticeActionInput =
@@ -43,12 +45,16 @@ export type LearningTutorGiveHintActionInput =
   LearningTutorServerActionLocaleInput & {
     lessonId: string;
     focus: string;
+    /** Optional: persist exchange after success (Thread Persistence Bridge). */
+    threadId?: string;
   };
 
 export type LearningTutorExplainAgainActionInput =
   LearningTutorServerActionLocaleInput & {
     lessonId: string;
     focus?: string;
+    /** Optional: persist exchange after success (Thread Persistence Bridge). */
+    threadId?: string;
   };
 
 export type LearningTutorServerActionSuccess = {

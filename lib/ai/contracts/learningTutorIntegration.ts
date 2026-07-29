@@ -70,6 +70,8 @@ export type LearningTutorIntegrationRequest =
       action: "answer_question";
       lessonId: string;
       question: string;
+      /** When set, persist exchange after successful AI result. */
+      threadId?: string;
     } & LearningTutorIntegrationCommon)
   | ({
       action: "generate_practice";
@@ -85,12 +87,16 @@ export type LearningTutorIntegrationRequest =
       lessonId: string;
       /** What the learner wants scaffolding on (not a graded answer request). */
       focus: string;
+      /** When set, persist exchange after successful AI result. */
+      threadId?: string;
     } & LearningTutorIntegrationCommon)
   | ({
       action: "explain_again";
       lessonId: string;
       /** Optional untrusted focus for what still confuses the learner. */
       focus?: string;
+      /** When set, persist exchange after successful AI result. */
+      threadId?: string;
     } & LearningTutorIntegrationCommon);
 
 export const LEARNING_TUTOR_ACTION_TO_CAPABILITY = {

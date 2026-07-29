@@ -63,13 +63,16 @@ describe("First Course Readiness V1 — tables & functions", () => {
   });
 
   it("defines major learner/instructor functions", () => {
+    const tutorRpcs = Object.values(LEARNING_AI_TUTOR_RPCS).filter(
+      (name) => name !== LEARNING_AI_TUTOR_RPCS.appendExchange
+    );
     const names = [
       ...Object.values(LEARNING_LESSON_ENGINE_RPCS),
       ...Object.values(LEARNING_PROJECT_RPCS),
       ...Object.values(LEARNING_LAB_RPCS),
       ...Object.values(LEARNING_COURSE_RESOURCE_RPCS),
       ...Object.values(LEARNING_LESSON_UNLOCK_RPCS),
-      ...Object.values(LEARNING_AI_TUTOR_RPCS),
+      ...tutorRpcs,
       "recompute_learning_section_progress",
       "get_my_learning_section_progress",
       "set_learning_lesson_objectives",

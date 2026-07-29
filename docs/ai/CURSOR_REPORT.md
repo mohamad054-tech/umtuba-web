@@ -1,31 +1,32 @@
-﻿# CURSOR_REPORT — Learning Tutor explain_again backend
+﻿# CURSOR_REPORT — Learning Tutor thread persistence bridge
 
 ## Summary
 
-Implemented **`learning.tutor.explain_again`** on `office/learning-ai-tutor-explain-again-v1` from `c83e29e`. No UI. No migration. No commit/push pending GO. Trailer-free commit required when approved.
+Closed **`learning.tutor.thread_persistence_bridge@1.0.0`** on
+`office/learning-ai-tutor-thread-persistence-bridge-v1`. Trailer-free commit + push.
+Migration `20260872` is local-only and **not** applied.
 
 ## Exact files changed
 
-See Final Verification Report in chat.
+See close-out Final Report in chat.
 
 ## Migrations created
 
-None.
+`supabase/migrations/20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql` — **not applied**.
 
 ## Security review
 
-- Fail-closed against answerKey/correctAnswer/fullAnswer/grade
-- Requires `labeledAiGenerated: true`
-- Lesson grounding only; optional untrusted `focus`
-- No progress/grade mutations
+PASS (pre-commit). Accepted V1 follow-ups documented in `AI_PLATFORM.md`:
+SQL-level lesson binding; lean thread metadata read; trusted-producer integrity; structured oversize serialization.
 
 ## Tests / TypeScript / Build
 
-Focused Learning Tutor backend Vitest: **56/56 passed**
-`npx tsc --noEmit`: **passed** (exit 0)
-Build: **skipped** (backend-only laptop policy)
+Focused Learning Tutor + bridge Vitest: **98/98**
+`npx tsc --noEmit`: passed
+Build: skipped
 
 ## Open issues
 
-- Commit/push only on explicit GO (use trailer-free path; normal `git commit` previously injected Co-authored-by)
+- Do not remote-apply `20260872` without approval
 - Do not merge into alpha from this laptop
+- `code_review` still blocked
