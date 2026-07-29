@@ -1,20 +1,17 @@
-# CURSOR_REPORT — Creator Space Accessibility Contract V1
+# CURSOR_REPORT — Creator Space Tab Overflow Fade V1
 
 ## Summary
 
-Implemented Creator Space Accessibility Contract V1 on
-`office/profile-accessibility-v1` from Error States tip `529783b`.
-§21 touch targets + focus-ring contract for Creator Space actions/tabs.
+Implemented Creator Space Tab Overflow Fade V1 on
+`office/profile-tab-overflow-fade-v1` from Accessibility tip `54f4120`.
+Mobile tab rail shows §5 fade edges when horizontally overflowing.
 Staged for manual commit.
 
 ## Exact files changed
 
-- `app/profile/lib/profileAccessibility.ts` (new)
-- `lib/content/profileAccessibility.v1.test.ts` (new)
-- `app/profile/components/ProfileActions.tsx`
+- `app/profile/lib/profileTabOverflow.ts` (new)
+- `lib/content/profileTabOverflow.v1.test.ts` (new)
 - `app/profile/components/ProfileTabs.tsx`
-- `app/profile/ProfileExperience.tsx`
-- `lib/content/profileMotionA11y.v1.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -26,13 +23,13 @@ None.
 
 ## Security review
 
-- Presentation-only a11y classes; no auth / data / Server Actions changes
-- Follow/Message still use existing shared controls via className only
-- No Home / Learning / AI Tutor / Store edits
+- Presentation-only scroll fade; no auth / data / Server Actions changes
+- Fade overlays are `pointer-events-none` / `aria-hidden`
+- No Home / Learning / AI / Store / World edits
 
 ## Tests
 
-`npm test -- --run lib/content/profileAccessibility.v1.test.ts lib/content/profileMotionA11y.v1.test.ts lib/content/profileErrorStates.v1.test.ts`
+`npm test -- --run lib/content/profileTabOverflow.v1.test.ts lib/content/profileAccessibility.v1.test.ts lib/content/profileMotionA11y.v1.test.ts`
 
 - Test Files: 3 passed
 - Tests: 7 passed

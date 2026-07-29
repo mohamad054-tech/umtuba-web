@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Space Accessibility Contract V1
+Creator Space Tab Overflow Fade V1
 
 ## Status
 
@@ -12,26 +12,25 @@ Creator Space Accessibility Contract V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-error-states-v1` @ `529783b`
+3. Base: `origin/office/profile-accessibility-v1` @ `54f4120`
 4. Do **not** start Home Unlock
 
 ## Branch
 
-`office/profile-accessibility-v1`
+`office/profile-tab-overflow-fade-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (Error States tip) | `529783b7309fe43b166c6cd95a850ff2ae89851b` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-accessibility-v1` |
+| Base (Accessibility tip) | `54f4120bf7fdd2bdb364a448497c6072d8e1a464` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-tab-overflow-fade-v1` |
 
 ## Done (feature — locked contract)
 
-- §21 touch-target helpers (`min-h-[44px]`) for Follow / Message / Share / tabs / owner CTAs
-- Focus-ring constant wired on actions + tabs
-- Contract tests for cover `aria-hidden`, avatar alt, tab ARIA, live polite, kind labels
-- No migrations; no Home / Learning / Store / Server Actions edits
+- §5 horizontal tab rail overflow fade edges (left/right) — no hamburger
+- Scroll + ResizeObserver edge detection via `getProfileTabOverflowEdges`
+- No migrations; no Home / Learning / Store / AI / World edits
 
 ## Gates (unchanged)
 
@@ -40,4 +39,4 @@ Creator Space Accessibility Contract V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor, Courses/Products domain GO.
+Home Unlock, Learning AI Tutor, Courses/Products domain GO, Pinned data-model GO.
