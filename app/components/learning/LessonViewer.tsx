@@ -21,6 +21,7 @@ import type {
 } from "../../../lib/learning/lessonEngineFoundation";
 import { completeLearningLessonAction } from "../../learning/progressActions";
 import { unlockLessonWithUmPointsAction } from "../../learning/firstCourseActions";
+import { isAiProductExperienceEnabled } from "../../../lib/ai/betaProductSurfaces";
 
 type LessonViewerProps = {
   delivery: LearningLearnerLessonDelivery;
@@ -142,7 +143,9 @@ export default function LessonViewer({
             ? ` · ~${engine.lesson.estimated_duration_minutes} min`
             : ""}
         </p>
-        {engine?.ai_tutor_enabled && !locked ? (
+        {engine?.ai_tutor_enabled &&
+        !locked &&
+        isAiProductExperienceEnabled() ? (
           <p className="mt-3">
             <Link
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
