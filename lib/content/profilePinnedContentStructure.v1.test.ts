@@ -122,10 +122,12 @@ describe("Pinned Content Structure V1", () => {
     const allPanel = read("app/profile/components/ProfileAllPanel.tsx");
     const rail = read("app/profile/components/ProfilePinnedRail.tsx");
     const structure = read("app/profile/lib/profilePinnedContentStructure.ts");
+    const contract = read("app/profile/lib/profileAllTimelineContract.ts");
     const experience = read("app/profile/ProfileExperience.tsx");
     const page = read("app/profile/[username]/page.tsx");
 
-    expect(allPanel).toMatch(/partitionProfileAllContent/);
+    expect(allPanel).toMatch(/applyProfileAllTimelineContract/);
+    expect(contract).toMatch(/partitionProfileAllContent/);
     expect(allPanel).toMatch(/ProfilePinnedRail/);
     expect(allPanel).toMatch(/pinnedCards/);
     expect(rail).toMatch(/Pinned/);
