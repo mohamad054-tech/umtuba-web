@@ -259,8 +259,15 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 | Ops Console UI | Admin-only app over diagnostics contracts | After authz model defined |
 | Video personalization integration | `lib/ai/integrations/video/` (flag-gated) | Signals/candidates/ranking boundary; **does not** change chronological feed order unless explicitly enabled later |
 | Video signals wiring | Server actions → `wireWatchSignalToPersonalization` / social wiring | Maps existing watch/social events to ingest only; ranking stays off |
+| AI Assistant Foundation | `lib/ai/assistant/` (contracts, skills, tools catalog, routing, assembly) | Cross-product gateway surface; no Chat UI; skills must not bind providers/models |
 
 **Non-goals for immediate next steps unless separately tasked:** building Hub UI, Ops UI, new providers, DB persistence, real RAG.
+
+---
+
+### Extension note — Assistant as Core consumer
+
+Assistant Foundation is the first **named cross-product** consumer surface for Shared AI Core (not Learning-only). Hub modules later present Assistant capabilities; Core remains server-side registries/contracts. Future Chat UI must call Assistant Foundation → Core, never providers directly.
 
 ---
 
@@ -270,7 +277,8 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 | --- | --- |
 | Learning Tutor | Named server actions → integration → `aiService` → Core |
 | Commerce Product Draft | Domain capability → gateway/Core |
-| Future Assistant / Search / Ads / World / Games | Domain capability + Hub module → same Core path |
+| AI Assistant Foundation | `lib/ai/assistant/` → Shared AI Core (skills/routing/assembly; no UI yet) |
+| Future Search / Ads / World / Games Hub modules | Domain capability + Hub module → Assistant Foundation / Core path |
 | Ops operators | Future Ops Console → Core diagnostics/config APIs |
 | End users | Hub modules only (never Core internals) |
 

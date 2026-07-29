@@ -219,3 +219,44 @@ export type {
   VideoSignalIngestResult,
 } from "./integrations/video";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";
+export {
+  AiAssistantFoundation,
+  aiAssistantFoundation,
+  resetAssistantFoundation,
+  assembleAssistantContext,
+  createAssistantConversation,
+  createAssistantResponse,
+  routeAssistantSkill,
+  invokeAssistantTool,
+  AiAssistantSkillRegistry,
+  AiAssistantToolRegistry,
+  aiAssistantSkillRegistry,
+  aiAssistantToolRegistry,
+  toClientSafeMessage,
+  validateAssistantMessage,
+  validateSystemContext,
+  validateToolRequest,
+  validateToolResponse,
+} from "./assistant";
+export type {
+  AiAssistantSkillId,
+  AiAssistantRequestKind,
+  AiAssistantToolId,
+  AiAssistantConversation,
+  AiAssistantMessage,
+  AiAssistantResponse,
+  AiAssistantSystemContext,
+  AiAssistantToolRequest,
+  AiAssistantToolResponse,
+  AiAssistantAssembledContext,
+  AiAssistantRoutingDecision,
+  AiAssistantSkillDefinition,
+  AiAssistantToolDefinition,
+  AiAssistantExtensionHooks,
+} from "./assistant/types";
+export {
+  AI_ASSISTANT_SKILL_IDS,
+  AI_ASSISTANT_REQUEST_KINDS,
+  AI_ASSISTANT_TOOL_IDS,
+  createNoopAssistantExtensionHooks,
+} from "./assistant/types";

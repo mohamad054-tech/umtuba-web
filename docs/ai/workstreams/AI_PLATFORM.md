@@ -3,47 +3,49 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** Video Personalization Signals Wiring V1
+**Active work:** AI Assistant Foundation V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `da1a8b8` — video personalization integration |
+| Base HEAD | `63a4a45` — video personalization signals wiring |
 | Remote | Synced; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Mapped existing watch-signal + social events → personalization ingest
-2. Best-effort wiring in server actions (flag-gated, never breaks primary flows)
-3. In-memory dedupe (no DB migration)
-4. Documented unwired events: hide / not_interested / report
-5. Tests + docs
+1. Assistant conversation contracts (conversation / message / response / tool / system / metadata)
+2. Conversation context assembly (memory, knowledge, personalization, user, domain) — no RAG
+3. Skills registry (learning, commerce, creator, search, world, assistant, video, marketing, ads)
+4. Tool invocation framework (catalog only; invoke fail-closed / not implemented)
+5. Deterministic skill routing by `requestKind` (prompt text ignored)
+6. Future hooks reserved: multi-agent, planner, tool chaining, long conversations, voice, multimodal, reasoning
+7. Tests + docs
 
 **NOT done:**
-- No UI / feed ranking / production order change
-- No hide/not_interested/report flows invented
-- Ranking remains disabled
+- No Chat UI / App Router / pages
+- No new providers / DB / migrations
+- No skill execution / tool execution / RAG
+- Skills do **not** bind to providers or models
 
 ---
 
-## Event mapping (existing → personalization)
+## Assistant Foundation (`lib/ai/assistant/`)
 
-| Source | Personalization event |
+Cross-product Shared AI Core consumer surface — **not** Learning-specific.
+
+| Layer | Role |
 | --- | --- |
-| `record_watch_signal` meaningful watch | `view_start`, `watch_progress` |
-| `completed=true` | `completion` |
-| `rewatch_count > 0` | `replay` |
-| `skipped_early` | `skip` |
-| watch engagement flags | `like` / `save` / `share` / `comment` / `follow_creator` |
-| `recordViewAction` (auth) | `impression` |
-| `toggleLikeAction` when liked | `like` |
-| `toggleSaveAction` when saved | `save` |
-| `recordShareAction` (auth) | `share` |
-| `createCommentAction` | `comment` |
+| Contracts | conversation, message, assistant response, tool request/response, system context, metadata |
+| Context assembly | Ordered blocks; `usedRag: false` / `usedVectorSearch: false` |
+| Skills registry | Definitions + allowed tools; `providerBindingForbidden: true` |
+| Tool framework | Registered tools with `available: false`; invoke → `tool_not_implemented` |
+| Routing | `assistant_skill_route_v1` — requestKind owns skill selection |
 
-**Unwired (no organic video source):** `hide`, `not_interested`, `report`
+Privacy: no system prompts to clients; no provider/model internals; bounded user context (not full profile); fail-closed.
 
-Flag: `UMTUBA_AI_VIDEO_PERSONALIZATION` default OFF → no ingest.
+## Prior: Video Personalization Signals Wiring
+
+Flag `UMTUBA_AI_VIDEO_PERSONALIZATION` default OFF. Feed order unchanged. Unwired: hide / not_interested / report.
 
 ## Migration status
 

@@ -1,23 +1,25 @@
-﻿# CURSOR_REPORT — Video Personalization Signals Wiring V1
+﻿# CURSOR_REPORT — AI Assistant Foundation V1
 
 ## Summary
 
-Wired existing video watch-signal and authenticated social/view actions into `lib/ai/integrations/video` ingest behind `UMTUBA_AI_VIDEO_PERSONALIZATION` (default OFF). Mapping is best-effort, fail-soft, server-identity only, with in-memory dedupe. Production feed order untouched. Ranking not enabled. hide/not_interested/report remain unwired (no fabricated flows). No DB migration. No commit/push pending GO.
+Added Shared AI Core **AI Assistant Foundation V1** under `lib/ai/assistant/`: conversation contracts, context assembly (no RAG), skills registry, tool invocation framework (catalog / fail-closed), deterministic skill routing, and reserved future hooks. Cross-product (Learning, Commerce, Creator, Search, Video, Ads, World, Marketing, general Assistant). Skills must not bind to providers/models. No UI, DB, migration, provider, commit, or push.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/integrations/video/watchSignalMapping.ts`
-- `lib/ai/integrations/video/signalDedupe.ts`
-- `lib/ai/integrations/video/wiring.ts`
-- `lib/ai/integrations/video/wiring.test.ts`
+- `lib/ai/assistant/types.ts`
+- `lib/ai/assistant/conversation.ts`
+- `lib/ai/assistant/contextAssembly.ts`
+- `lib/ai/assistant/skillRegistry.ts`
+- `lib/ai/assistant/toolFramework.ts`
+- `lib/ai/assistant/routing.ts`
+- `lib/ai/assistant/index.ts`
+- `lib/ai/assistant/assistantFoundation.test.ts`
 
 ### Modified
-- `app/actions/recommendations.ts`
-- `app/actions/socialInteractions.ts`
-- `lib/ai/integrations/video/index.ts`
+- `lib/ai/index.ts`
 - `docs/ai/workstreams/AI_PLATFORM.md`
-- `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md` (one-line next-step note)
+- `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -26,34 +28,33 @@ None.
 
 ## Security review
 
-- Server user id only; anonymous watch signals skip personalization.
-- Forbidden client weights/scores still rejected by ingest validation.
-- Wiring failures never break watch/like/save/share/comment/view.
-- No provider internals; no DB; no feed ranking.
-- hide / not_interested / report not fabricated.
+- Server-owned user UUID required for conversations / assembly.
+- System message content redacted in client-safe projection.
+- Assistant responses refuse forbidden fields (systemPrompt / provider / model / apiKey / rawProfile).
+- Tool invoke fail-closed (`tool_not_implemented`); skills cannot bind providers/models.
+- No full user profile in context — bounded user/domain/personalization summaries only.
 
 ## Tests
 
-- `vitest run lib/ai/integrations/video/` → 28 passed (wiring 12 + integration 16)
+- `vitest run lib/ai/assistant/` → **12 passed**
 
 ## TypeScript
 
-- `npx tsc --noEmit` → pass
+- `npx tsc --noEmit` → **pass**
 
 ## Build
 
-Not required (server wiring only; no UI/entry change).
+Not required (Shared AI Core library only; no UI/entry change).
 
 ## git diff --check
 
-Pass (whitespace warnings on Hub ops LF/CRLF only; no whitespace errors).
+**Pass** (`DIFF_CHECK_EXIT:0`; LF/CRLF warning on Hub ops doc only).
 
 ## git status --short
 
-Uncommitted: modified actions/docs/index + untracked wiring/mapping/dedupe/tests. No commit/push.
+Uncommitted: modified docs + `lib/ai/index.ts`; untracked `lib/ai/assistant/`. No commit/push.
 
 ## Open issues
 
 - Awaiting GO before commit/push.
-- hide / not_interested / report still unwired until real product flows exist.
-- In-memory dedupe is process-local / best-effort (no DB persistence).
+- Tool/skill execution, Chat UI, persistence, RAG, multi-agent — future phases.
