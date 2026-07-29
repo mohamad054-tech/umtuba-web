@@ -12,12 +12,21 @@ import {
 import type { CartSummary } from "../../lib/store/cartRules";
 
 export type CartMutationResult =
-  | { ok: true; quantity?: number; itemCount?: number }
+  | { ok: true; quantity?: number; itemCount?: number; summary?: CartSummary }
   | { ok: false; message: string; requiresAuth?: boolean };
 
 function revalidateCartPaths() {
   revalidatePath("/store/cart");
+  revalidatePath("/store/checkout");
   revalidatePath("/store");
+}
+
+async function summaryFor(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string
+): Promise<CartSummary | undefined> {
+  const summary = await getCartSummary(supabase, userId);
+  return summary.ok ? summary.data : undefined;
 }
 
 export async function getCartSummaryAction(): Promise<
@@ -46,6 +55,8 @@ export async function getCartItemCountAction(): Promise<
 export async function addToCartAction(input: {
   variantId: string;
   quantity?: number;
+  /** Listing-backed PDP must pass this; owned products omit it. */
+  sellerListingId?: string | null;
 }): Promise<CartMutationResult> {
   const user = await getServerUser();
   if (!user) {
@@ -56,16 +67,18 @@ export async function addToCartAction(input: {
   const result = await addToCart(supabase, user.id, {
     variantId: input.variantId,
     quantity: input.quantity ?? 1,
+    sellerListingId: input.sellerListingId ?? undefined,
   });
 
   if (!result.ok) return result;
 
   revalidateCartPaths();
-  const summary = await getCartSummary(supabase, user.id);
+  const summary = await summaryFor(supabase, user.id);
   return {
     ok: true,
     quantity: result.data.quantity,
-    itemCount: summary.ok ? summary.data.itemCount : undefined,
+    itemCount: summary?.itemCount,
+    summary,
   };
 }
 
@@ -86,7 +99,13 @@ export async function updateCartQuantityAction(input: {
 
   if (!result.ok) return result;
   revalidateCartPaths();
-  return { ok: true, quantity: result.data.quantity };
+  const summary = await summaryFor(supabase, user.id);
+  return {
+    ok: true,
+    quantity: result.data.quantity,
+    itemCount: summary?.itemCount,
+    summary,
+  };
 }
 
 export async function removeCartItemAction(input: {
@@ -101,7 +120,8 @@ export async function removeCartItemAction(input: {
   const result = await removeCartItem(supabase, user.id, input.itemId);
   if (!result.ok) return result;
   revalidateCartPaths();
-  return { ok: true };
+  const summary = await summaryFor(supabase, user.id);
+  return { ok: true, itemCount: summary?.itemCount ?? 0, summary };
 }
 
 export async function clearCartAction(): Promise<CartMutationResult> {
@@ -114,5 +134,15 @@ export async function clearCartAction(): Promise<CartMutationResult> {
   const result = await clearCart(supabase, user.id);
   if (!result.ok) return result;
   revalidateCartPaths();
-  return { ok: true };
+  return {
+    ok: true,
+    itemCount: 0,
+    summary: {
+      currency: null,
+      itemCount: 0,
+      subtotalMinor: 0,
+      groups: [],
+      hasBlockingIssues: false,
+    },
+  };
 }

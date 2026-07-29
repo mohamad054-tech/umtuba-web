@@ -20,6 +20,16 @@ type PageProps = {
     | { status?: string };
 };
 
+const FILTERS = [
+  "pending",
+  "confirmed",
+  "processing",
+  "packed",
+  "shipped",
+  "delivered",
+  "cancelled",
+] as const;
+
 export default async function StoreOrdersPage({ searchParams }: PageProps) {
   const user = await getServerUser();
   if (!user) {
@@ -37,43 +47,41 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
   const supabase = await createClient();
   const result = await listBuyerOrders(supabase, user.id, {
     status: statusFilter,
+    limit: 50,
   });
 
   return (
     <StoreShell title="My Orders" subtitle="Store" wide>
-      <header className="mt-6 rounded-[28px] border border-violet-400/20 bg-[#080816]/80 p-5 md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300/70">
-          Orders
+      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <p className="sf-eyebrow">Orders</p>
+        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          My orders
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
+          Each card is one seller order with separate order, payment,
+          fulfillment, and delivery states. Multi-seller checkouts appear as
+          multiple orders — not one shared shipment. Payment collection remains
+          deferred.
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">My orders</h1>
-        <p className="mt-2 max-w-2xl text-sm text-white/50">
-          Track purchases across stores. Payment collection is not enabled yet —
-          pending-payment orders are still recorded securely.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2" role="navigation" aria-label="Filter orders">
           <Link
             href={APP_ROUTES.storeOrders}
-            className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-white/70"
+            className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
+              statusFilter === "all"
+                ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                : "border-[var(--sf-line)] text-[var(--sf-muted)]"
+            }`}
           >
             All
           </Link>
-          {(
-            [
-              "pending",
-              "confirmed",
-              "processing",
-              "shipped",
-              "delivered",
-              "cancelled",
-            ] as const
-          ).map((status) => (
+          {FILTERS.map((status) => (
             <Link
               key={status}
               href={`${APP_ROUTES.storeOrders}?status=${status}`}
-              className={`rounded-full border px-3 py-1.5 text-xs font-bold ${
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${
                 statusFilter === status
-                  ? "border-white bg-white text-black"
-                  : "border-white/15 text-white/70"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                  : "border-[var(--sf-line)] text-[var(--sf-muted)]"
               }`}
             >
               {status}

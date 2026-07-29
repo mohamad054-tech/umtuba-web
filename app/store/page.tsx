@@ -12,6 +12,7 @@ import StoreSection from "../components/store/StoreSection";
 import StoreShell from "../components/store/StoreShell";
 import { APP_ROUTES } from "../lib/nav";
 import {
+  deriveCuratedCollections,
   deriveFeaturedStores,
   heroSlidesFromCatalog,
   pickNewArrivals,
@@ -27,7 +28,8 @@ import { STOREFRONT_FLAGS } from "../../lib/store/storefrontFlags";
 
 export const metadata = {
   title: "Store | UMTUBA",
-  description: "Premium UMTUBA storefront — browse active products and stores.",
+  description:
+    "Premium UMTUBA storefront — discover products, collections, and creators.",
 };
 
 export default async function StoreHomePage() {
@@ -42,18 +44,20 @@ export default async function StoreHomePage() {
   const arrivals = pickNewArrivals(items, 8);
   const recommended = pickRecommended(items, undefined, 8);
   const featuredStores = deriveFeaturedStores(items).slice(0, 8);
+  const collections = deriveCuratedCollections(items, categories, 6);
   const heroSlides = heroSlidesFromCatalog(items);
+  const catalogEmpty = !catalog.error && items.length === 0;
 
   return (
     <StoreShell
       title="Store"
-      subtitle="Discover"
+      subtitle="Commerce"
       actions={
         <Link
           href="/store/search"
-          className="watch-focus-ring rounded-full border border-violet-400/30 bg-violet-500/15 px-3 py-1.5 text-xs font-bold text-violet-100 transition hover:bg-violet-500/25"
+          className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:bg-[rgba(214,196,161,0.2)]"
         >
-          Search
+          Browse
         </Link>
       }
     >
@@ -65,29 +69,57 @@ export default async function StoreHomePage() {
         </div>
       ) : null}
 
+      {catalogEmpty ? (
+        <div className="mt-8">
+          <StoreEmptyState
+            title="Catalog is quiet right now"
+            description="Active, approved products will appear here as sellers publish. Home stays Discovery — this Store surface is the commerce layer."
+            actionHref="/store/search"
+            actionLabel="Open search"
+          />
+        </div>
+      ) : null}
+
       <StoreSection
         id="trending"
-        eyebrow="Now"
-        title="Trending products"
-        description="Active listings with the strongest availability signal."
+        eyebrow="Featured"
+        title="Featured products"
+        description="Active listings ranked by availability and recency — no fabricated popularity scores."
         href="/store/search?sort=newest"
+        linkLabel="See all"
       >
-        <ProductRail items={trending} badge="Hot" />
+        <ProductRail
+          items={trending}
+          emptyTitle="No featured products yet"
+          emptyDescription="Publish approved active listings to populate this rail."
+        />
+      </StoreSection>
+
+      <StoreSection
+        id="collections"
+        eyebrow="Curated"
+        title="Collections"
+        description="Category collections derived from products currently in the public catalog."
+        href="/store/search"
+        linkLabel="Browse categories"
+      >
+        <CategoryRail categories={collections} variant="collections" />
       </StoreSection>
 
       <StoreSection
         id="featured-stores"
-        eyebrow="Stores"
-        title="Featured stores"
+        eyebrow="Creators"
+        title="Featured sellers"
+        description="Sellers with active catalog presence on UMTUBA."
         href="/store/search"
       >
         {featuredStores.length === 0 ? (
           <StoreEmptyState
-            title="No featured stores yet"
+            title="No featured sellers yet"
             description="Active stores with approved products will appear here."
           />
         ) : (
-          <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2">
+          <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2 [scrollbar-width:thin]">
             {featuredStores.map((store) => (
               <StoreCard key={store.id} store={store} />
             ))}
@@ -99,8 +131,8 @@ export default async function StoreHomePage() {
         <StoreSection
           id="live"
           eyebrow="Live"
-          title="Live shopping now"
-          description="Realtime shoppable streams arrive in a later phase."
+          title="Live shopping"
+          description="Realtime shoppable streams are not enabled yet — this panel is intentionally unavailable."
         >
           <div className="grid gap-3 md:grid-cols-3">
             <PlaceholderPanel
@@ -115,7 +147,7 @@ export default async function StoreHomePage() {
             />
             <PlaceholderPanel
               title="Upcoming"
-              description="Scheduled live shopping sessions placeholder."
+              description="Scheduled live shopping is not available yet."
               tone="indigo"
             />
           </div>
@@ -130,7 +162,7 @@ export default async function StoreHomePage() {
         >
           <PlaceholderPanel
             title="Shoppable video rail"
-            description="Product-tagged videos will surface here — browsing only for now."
+            description="Product-tagged videos will surface here when video commerce is enabled."
             tone="violet"
           />
         </StoreSection>
@@ -141,14 +173,16 @@ export default async function StoreHomePage() {
         eyebrow="Browse"
         title="Categories"
         href="/store/search"
+        linkLabel="Open filters"
       >
         <CategoryRail categories={categories} />
       </StoreSection>
 
       <StoreSection
         id="new-arrivals"
-        eyebrow="Fresh"
+        eyebrow="New"
         title="New arrivals"
+        description="Recently published active products."
         href="/store/search?sort=newest"
       >
         <ProductRail items={arrivals} />
@@ -157,8 +191,8 @@ export default async function StoreHomePage() {
       {STOREFRONT_FLAGS.SHOW_FLASH_DEALS ? (
         <StoreSection id="flash" eyebrow="Limited" title="Flash deals">
           <PlaceholderPanel
-            title="Flash deals"
-            description="Timed promotions and deal pricing ship with the commerce phase."
+            title="Flash deals unavailable"
+            description="Timed promotions require trusted deal pricing — not invented for this surface."
             tone="fuchsia"
           />
         </StoreSection>
@@ -166,18 +200,19 @@ export default async function StoreHomePage() {
 
       <StoreSection
         id="recommended"
-        eyebrow="For you"
-        title="Recommended products"
+        eyebrow="Explore"
+        title="More to discover"
+        description="Additional active catalog picks when inventory allows."
       >
         {recommended.length === 0 ? (
           <StoreEmptyState
-            title="Recommendations warming up"
-            description="Personalized picks appear once there is an active catalog."
+            title="Nothing extra to show"
+            description="Recommendations appear once there is an active catalog with available products."
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {recommended.map((item) => (
-              <ProductCard key={item.product.id} item={item} badge="For you" />
+              <ProductCard key={item.product.id} item={item} />
             ))}
           </div>
         )}
@@ -189,23 +224,29 @@ export default async function StoreHomePage() {
         </StoreSection>
       ) : null}
 
-      <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6">
+      <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--sf-line)] pt-7">
         <Link
           href="/store/search"
-          className="text-sm font-bold text-violet-300 hover:text-violet-200"
+          className="text-sm font-semibold text-[var(--sf-accent-strong)] transition hover:text-[var(--sf-accent)]"
         >
-          Open full search →
+          Open full catalog →
         </Link>
         <div className="flex flex-wrap items-center gap-4">
           <Link
             href={APP_ROUTES.storeWishlist}
-            className="text-sm font-bold text-white/45 hover:text-white/70"
+            className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
           >
             Favorites
           </Link>
           <Link
+            href={APP_ROUTES.storeCart}
+            className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
+          >
+            Cart
+          </Link>
+          <Link
             href={APP_ROUTES.seller}
-            className="text-sm font-bold text-white/45 hover:text-white/70"
+            className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
           >
             Sell on UMTUBA
           </Link>

@@ -2,32 +2,24 @@
 
 ## Task title
 
-Creator Space Photos Lightbox V1
+UMTUBA Integration Program V1 — Wave 3.5 Alpha Integration and Stabilization
 
 ## Status
 
-`closed` — Final UX Polish complete; Commit / Push / FF-merge to alpha-0.2
+`in-progress` — merge W3 into latest `origin/alpha-0.2` and verify
 
 ## Branch
 
-`office/profile-photos-lightbox-v1` from `alpha-0.2` @ `6fac4409f217b6e7d28b2ff4c0a2dab453f45427`
+`integration/w3-alpha-final` from `origin/alpha-0.2` @ `769039d`
 
-## Done
+## Incoming
 
-- Photos grid opens lightbox
-- Prev/Next wrap, ESC / backdrop / Close
-- Focus trap + restore via `useDialogA11y`
-- Body scroll lock, ≥44px targets, reduced-motion
-- Final UX Polish: larger image area (~10–15%), nav buttons ~8–12px from image, subtle hover
-- Temporary `/dev/profile-photos-lightbox` removed before commit
+`origin/integration/w3-ai` @ `d4bbddc` (Revenue + Commerce + AI)
 
-## Forbidden (do not reopen unless real bug)
+## Scope
 
-- Zoom / pinch / download / share / fullscreen / gestures
-- Visibility / tab resolve rule changes
-- Backend / migration / upload / owner management
+Merge the full integration line into alpha. Preserve latest alpha Home/Navigation and creator photos lightbox. Keep Commerce seller routes. Keep AI behind flags (default OFF). No World / Games / Ads. No live providers or API keys.
 
-## Gates (unchanged)
+## Out of scope
 
-- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
-- `HOME_LOCK_ACTIVE = true`
+New features, Gemini/OpenAI live activation, force-push, Worktree cleanup, Learning dirty-tree changes.

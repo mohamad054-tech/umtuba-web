@@ -192,10 +192,10 @@ export function validatePriceInput(input: {
   if (input.compareAtMinor !== undefined && input.compareAtMinor !== null && input.compareAtMinor !== "") {
     const compare = validateAmountMinor(input.compareAtMinor, amount.currency);
     if (!compare.ok) return compare;
-    if (compare.amountMinor < amount.amountMinor) {
+    if (compare.amountMinor <= amount.amountMinor) {
       return {
         ok: false,
-        message: "Compare-at price must be greater than or equal to price.",
+        message: "Compare-at price must be greater than the selling price.",
       };
     }
     compareAtMinor = compare.amountMinor;
