@@ -3,57 +3,57 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** AI Knowledge & Memory Foundation V1
+**Active work:** UMTUBA AI Hub & AI Operations Architecture V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `b9603fe` — personalization foundation |
-| Remote | Synced before this task; **no commit/push until verification GO** |
+| Base HEAD | `0dc551f` — knowledge and memory foundation |
+| Remote | Synced; **architecture docs only — no commit/push until GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Knowledge Foundation + Knowledge Registry
-2. Memory Foundation + Memory Registry (alongside existing `memory/policy.ts`)
-3. Retrieval contracts (lexical only; no Vector DB / RAG)
-4. Context Assembly Foundation
-5. Future hooks: embeddings, indexing, vector/semantic retrieval, RAG, memory ranking
-6. Tests + docs
+1. Official AI Hub module map (Assistant → My AI)
+2. Official AI Operations Console module map (Providers → Experiments)
+3. Core ↔ Hub ↔ Ops ↔ Consumers relationship
+4. Canonical AI request lifecycle
+5. Ownership, boundaries, dependency rules, naming, extension strategy
+6. Architecture doc: `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`
 
 **NOT done / do not touch by mistake:**
-- UI / App Router / Learning / Commerce / Creator / Nexus
-- DB / Vector DB / real RAG
-- Direct Learning or Commerce product wiring
+- No UI / App Router / providers / foundation code changes
+- No Learning/Commerce/Creator/Nexus UI
+- No migration
+- No TypeScript API/behavior changes
 
 ---
 
-**Ownership:** Desktop owns Shared AI Core.
-**Laptop owns:** user-facing presentation.
+**Ownership:** Desktop owns Shared AI Core + AI architecture.
+**Laptop owns:** AI Hub presentation / App Shell / shared UI (when built).
 
 ## Status
 
-Provider / Registry / Routing / Usage / Personalization foundations closed.
-Knowledge & Memory Foundation V1 implemented (server-side, in-memory, domain-agnostic).
+Shared AI Core foundations (Provider, Registry/Routing, Usage/Cost, Personalization, Knowledge/Memory) closed as code.
+**UMTUBA AI Hub & AI Operations Architecture V1** documented (architecture-only).
 
-## Knowledge & Memory Platform (V1)
+## Canonical references
 
-```
-Domain AI (later)
-  → AiKnowledgeMemoryFoundation
-  → Knowledge Registry / Memory Registry
-  → retrieveKnowledgeAndMemory (contracts; lexical fallback)
-  → assembleContext
-  → future hooks (vector/RAG/embeddings) noop
-```
-
-Unified reference for Assistant, Video Personalization, Learning, Commerce, Creator, Ads, World, Search.
-
-| Knowledge sources | Memory kinds |
+| Doc | Role |
 | --- | --- |
-| platform, course, commerce, creator, world, user, uploaded_documents, external | session, short-term, long-term, preference, interaction_history |
+| [`UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`](./UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md) | Hub + Ops Console architecture |
+| This file | Workstream save point |
 
-**No UI. No DB. No RAG execution in this phase.**
+## Layers (summary)
+
+```
+Product surfaces → AI Hub (product map)
+  → Domain AI / server actions
+  → Shared AI Core
+  → Providers
+
+Shared AI Core ← AI Operations Console (ops map)
+```
 
 ## Migration status
 
-Uses existing `20260871` only. **No new migration.**
+No new migration. Existing `20260871` unchanged / not remote-applied by this phase.

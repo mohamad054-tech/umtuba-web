@@ -1,22 +1,15 @@
-﻿# CURSOR_REPORT — AI Knowledge & Memory Foundation V1
+﻿# CURSOR_REPORT — UMTUBA AI Hub & AI Operations Architecture V1
 
 ## Summary
 
-Implemented Knowledge & Memory Foundation V1 on `office/ai-core-provider-foundation-v1`. Shared AI Core now has domain-agnostic knowledge/memory registries, retrieval contracts (lexical fallback only), context assembly, and reserved hooks for vector DB/embeddings/semantic retrieval/RAG/memory ranking. Existing `lib/ai/memory/policy.ts` is untouched. No DB. No UI. No Learning/Commerce wiring. No migration. No commit/push pending GO.
+Delivered architecture-only reference for UMTUBA AI Hub and AI Operations Console on `office/ai-core-provider-foundation-v1` @ `0dc551f`. No TypeScript, no API/behavior changes, no UI, no providers, no foundation edits, no migration. Documents define Hub modules, Ops modules, Core relationships, request lifecycle, ownership, dependency rules, naming, and extension strategy.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/knowledge/types.ts`
-- `lib/ai/knowledge/knowledgeRegistry.ts`
-- `lib/ai/knowledge/memoryRegistry.ts`
-- `lib/ai/knowledge/retrieval.ts`
-- `lib/ai/knowledge/contextAssembly.ts`
-- `lib/ai/knowledge/foundation.ts`
-- `lib/ai/knowledge/knowledgeMemory.test.ts`
+- `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`
 
 ### Modified
-- `lib/ai/index.ts`
 - `docs/ai/workstreams/AI_PLATFORM.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -26,33 +19,31 @@ None.
 
 ## Security review
 
-- Server-side in-memory only; no client UI exposure.
-- Unknown source/memory kinds fail closed.
-- Retrieval never claims vector/RAG usage in V1.
-- No secrets; knowledge bodies are opaque catalog text.
+- Architecture forbids client exposure of provider secrets and Core internals.
+- Hub and Ops stay separate; execution remains fail-closed via Shared AI Core.
+- No code paths changed in this phase.
 
 ## Tests
 
-See verification report.
+Not applicable (docs only).
 
 ## TypeScript
 
-See verification report.
+Not applicable (no TS changes).
 
 ## Build
 
-Not required (no UI).
+Not applicable.
 
 ## git diff --check
 
-See verification report.
+See verification in chat if needed; docs-only diff.
 
 ## git status --short
 
-Knowledge/memory foundation + docs only for this task.
+Architecture markdown only for this task.
 
 ## Open issues
 
-- Awaiting GO before commit/push.
-- Ensure all new `lib/ai/knowledge/*` files are staged on commit (do not omit untracked files).
-- Real RAG/vector search intentionally out of scope.
+- Awaiting GO before commit/push of docs.
+- Hub UI and Ops Console UI intentionally not built.
