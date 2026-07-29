@@ -274,6 +274,7 @@ export default function ProfileExperience({
               cards={profile.contentCards ?? []}
               pinnedCards={profile.pinnedContentCards}
               loadFailed={Boolean(profile.registryLoadFailed)}
+              isOwner={isOwner}
             />
           ) : null}
           {activeTab === "articles" ? (
@@ -288,6 +289,7 @@ export default function ProfileExperience({
               videos={profile.videos}
               hasMore={Boolean(profile.hasMoreVideos)}
               loadFailed={Boolean(profile.videosLoadFailed)}
+              isOwner={isOwner}
             />
           ) : null}
           {activeTab === "courses" ? (

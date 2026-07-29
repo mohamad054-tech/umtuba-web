@@ -4,21 +4,17 @@
 
 **UMTUBA** (`umtuba-web`)
 
-## Primary working branch
-
-`alpha-0.2` @ `03fe5e7` — still behind Desktop Creator Space chain
-
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/profile-hero-joined-label-v1`
-- **Task:** Creator Hero Joined Label V1
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-joined-label-v1`
-- **Base tip:** `4436fad2b07554aa528057d9ad4abe77647e4963`
+- **Branch:** `office/profile-empty-states-v1`
+- **Task:** Creator Space Empty States V1 (CREATOR_SPACE §18)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-empty-states-v1`
+- **Base tip:** `f9bbf2a13f418170db0448495a713460514574b3`
 - **See:** `docs/ai/CURSOR_REPORT.md`
 
-## Closed on Desktop feature branches
+## Closed on Desktop feature chain
 
-- Identity Strip · Identity Achievements · Hero Social Links · Creator Space IA Rename (`4436fad`)
+Identity Strip · Achievements · Social Links · IA Rename · Joined Label (`f9bbf2a`)
 
 ## Gates (unchanged)
 

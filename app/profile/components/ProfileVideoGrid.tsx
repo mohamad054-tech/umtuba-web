@@ -3,17 +3,23 @@ import type { ProfileVideo } from "../types";
 import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
 import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import {
+  PROFILE_EMPTY_STATES_COPY,
+  shouldShowOwnerEmptyCreateActions,
+} from "../lib/profileEmptyStates";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
   hasMore?: boolean;
   loadFailed?: boolean;
+  isOwner?: boolean;
 };
 
 export default function ProfileVideoGrid({
   videos,
   hasMore = false,
   loadFailed = false,
+  isOwner = false,
 }: ProfileVideoGridProps) {
   if (loadFailed) {
     return (
@@ -23,22 +29,35 @@ export default function ProfileVideoGrid({
         title="Couldn't load videos"
         description="Something went wrong loading this creator's videos. Please try again."
         primaryHref={APP_ROUTES.discover}
-        primaryLabel="Open Discover"
+        primaryLabel={PROFILE_EMPTY_STATES_COPY.openDiscoverCta}
       />
     );
   }
 
   if (videos.length === 0) {
+    const showOwnerActions = shouldShowOwnerEmptyCreateActions(isOwner);
     return (
       <ProductEmptyState
         compact
         eyebrow="Videos"
-        title="No published videos yet"
-        description={CREATOR_SPACE_COPY.videosEmptyDescription}
-        primaryHref={APP_ROUTES.createVideo}
-        primaryLabel="Upload a video"
-        secondaryHref={APP_ROUTES.discover}
-        secondaryLabel="Open Discover"
+        title={PROFILE_EMPTY_STATES_COPY.videosTitle}
+        description={
+          showOwnerActions
+            ? PROFILE_EMPTY_STATES_COPY.videosOwnerDescription
+            : PROFILE_EMPTY_STATES_COPY.videosVisitorDescription
+        }
+        primaryHref={
+          showOwnerActions ? APP_ROUTES.createVideo : APP_ROUTES.discover
+        }
+        primaryLabel={
+          showOwnerActions
+            ? PROFILE_EMPTY_STATES_COPY.uploadVideoCta
+            : PROFILE_EMPTY_STATES_COPY.openDiscoverCta
+        }
+        secondaryHref={showOwnerActions ? APP_ROUTES.discover : undefined}
+        secondaryLabel={
+          showOwnerActions ? PROFILE_EMPTY_STATES_COPY.openDiscoverCta : undefined
+        }
       />
     );
   }

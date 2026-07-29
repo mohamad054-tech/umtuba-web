@@ -1,10 +1,16 @@
+import Link from "next/link";
 import {
   ContentCard,
   ContentCardEmptyState,
   ContentCardSkeleton,
 } from "../../components/content-cards";
 import type { ContentCardViewModel } from "../../../lib/content/cards";
+import { APP_ROUTES } from "../../lib/nav";
 import { applyProfileAllTimelineContract } from "../lib/profileAllTimelineContract";
+import {
+  PROFILE_EMPTY_STATES_COPY,
+  shouldShowOwnerEmptyCreateActions,
+} from "../lib/profileEmptyStates";
 import ProfilePinnedRail from "./ProfilePinnedRail";
 
 type ProfileAllPanelProps = {
@@ -13,17 +19,19 @@ type ProfileAllPanelProps = {
   pinnedCards?: ContentCardViewModel[];
   loadFailed?: boolean;
   onRetry?: () => void;
+  isOwner?: boolean;
 };
 
 /**
  * Profile All — pinned rail (optional) + unified chronological feed.
- * Applies All Timeline Contract V1 (dedup, fail-closed teaser filter, §6 density).
+ * Empty States V1: visitor copy vs owner create CTAs (§18).
  */
 export default function ProfileAllPanel({
   cards,
   pinnedCards,
   loadFailed = false,
   onRetry,
+  isOwner = false,
 }: ProfileAllPanelProps) {
   if (loadFailed) {
     return (
@@ -55,10 +63,33 @@ export default function ProfileAllPanel({
   );
 
   if (!showPinnedRail && chronology.length === 0) {
+    const showOwnerActions = shouldShowOwnerEmptyCreateActions(isOwner);
     return (
       <ContentCardEmptyState
-        title="No published content yet"
-        description="Articles and independent videos will appear here in one timeline."
+        title={PROFILE_EMPTY_STATES_COPY.allTitle}
+        description={
+          showOwnerActions
+            ? PROFILE_EMPTY_STATES_COPY.allOwnerDescription
+            : PROFILE_EMPTY_STATES_COPY.allVisitorDescription
+        }
+        action={
+          showOwnerActions ? (
+            <div className="flex flex-wrap justify-center gap-2">
+              <Link
+                href={APP_ROUTES.createArticle}
+                className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black transition hover:bg-white/90"
+              >
+                {PROFILE_EMPTY_STATES_COPY.writeArticleCta}
+              </Link>
+              <Link
+                href={APP_ROUTES.createVideo}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white/85 transition hover:bg-white/10"
+              >
+                {PROFILE_EMPTY_STATES_COPY.uploadVideoCta}
+              </Link>
+            </div>
+          ) : undefined
+        }
       />
     );
   }

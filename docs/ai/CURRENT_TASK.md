@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Hero Joined Label V1
+Creator Space Empty States V1
 
 ## Status
 
@@ -12,26 +12,25 @@ Creator Hero Joined Label V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-creator-space-ia-rename-v1` @ `4436fad`
+3. Base: `origin/office/profile-hero-joined-label-v1` @ `f9bbf2a`
 4. Do **not** start Home Unlock
 
 ## Branch
 
-`office/profile-hero-joined-label-v1`
+`office/profile-empty-states-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (IA Rename tip) | `4436fad2b07554aa528057d9ad4abe77647e4963` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-joined-label-v1` |
+| Base (Joined Label tip) | `f9bbf2a13f418170db0448495a713460514574b3` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-empty-states-v1` |
 
 ## Done (feature — locked contract)
 
-- `formatHeroJoinedLine` / `formatAboutJoinedBody` prevent “Joined Joined …”
-- Hero + About wired through helpers
-- No migrations; no cover/verification inventing
-- Identity stack preserved
+- All empty: visitor copy vs owner Write article / Upload video CTAs (§18)
+- Videos empty: visitor Discover CTA; owner Upload (+ Discover secondary)
+- No migrations; no Home / Learning / Store edits
 
 ## Gates (unchanged)
 
@@ -40,4 +39,4 @@ Creator Hero Joined Label V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor, route rename, Store.
+Home Unlock, Learning AI Tutor, cover/verification inventing, Courses/Products domain GO.

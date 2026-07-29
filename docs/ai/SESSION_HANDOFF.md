@@ -1,28 +1,27 @@
 # Session Handoff — UMTUBA
 
-**Updated:** 2026-07-30 (Desktop — Creator Hero Joined Label V1)
+**Updated:** 2026-07-30 (Desktop — Creator Space Empty States V1)
 
 ## Active task (RESUME HERE)
 
-**Creator Hero Joined Label V1** — implemented from IA Rename tip; staged for
+**Creator Space Empty States V1** — implemented from Joined Label tip; staged for
 manual commit (no trailers); do not push until approved.
 
 ### Exact stop point
 
-- Branch: `office/profile-hero-joined-label-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-joined-label-v1`
-- Base: `origin/office/profile-creator-space-ia-rename-v1` @ `4436fad`
-- Product: Hero/About joined labels without “Joined Joined …”
+- Branch: `office/profile-empty-states-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-profile-empty-states-v1`
+- Base: `origin/office/profile-hero-joined-label-v1` @ `f9bbf2a`
+- Product: All/Videos empty visitor vs owner CTAs (§18)
 
 ### Why this task (dependency-correct)
 
-Shell + identity + social links + IA rename are closed. Next minimal Hero polish
-is joined-label presentation (§3 / §9) without inventing cover/verification or
-unlocking Home.
+Hero/identity/social/IA/joined-label shell work is closed. Next approved
+Creator Space polish is empty states (§18) without Home Unlock or Learning.
 
 ### Next steps
 
-1. Manual commit: `feat(web): fix creator hero joined label v1`
+1. Manual commit: `feat(web): add creator space empty states v1`
 2. Push only when requested
 
 ## Isolation reminders (Desktop)
