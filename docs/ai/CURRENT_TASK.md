@@ -2,26 +2,34 @@
 
 ## Task title
 
-UMTUBA Integration Program V1 — Wave 3.5 Alpha Integration and Stabilization
+UMTUBA Integration Program V1 — Wave 4 Alpha Stabilization Sweep
 
 ## Status
 
-`complete` — platform line merged onto latest `origin/alpha-0.2` (includes lightbox + creator all timeline)
+`complete` — known alpha stability defects fixed; line measurable
 
 ## Branch
 
-`integration/w3-alpha-final`
+`integration/w4-alpha-stabilization`
 
-## Base progression
+## Worktree
 
-1. Started from `origin/alpha-0.2` @ `769039d` (creator photos lightbox)
-2. Merged `origin/integration/w3-ai` @ `d4bbddc` (Revenue + Commerce + AI)
-3. Re-merged newer `origin/alpha-0.2` @ `4fdbf30` (creator all timeline contract) before landing on alpha
+`C:\Users\1\Desktop\umtuba\umtuba-web-integration-w4-alpha-stabilization`
+
+## Base
+
+`origin/alpha-0.2` @ `6061a6ae22eb8a323e51af63ecdcf9b655177d37`
 
 ## Scope
 
-Land Revenue + Commerce + Shared AI on alpha. Preserve latest alpha Home/Navigation/profile contracts. AI flags default OFF. No World / Games / Ads. No live providers.
+Stabilize integrated alpha (Revenue + Commerce + AI). No new features.
+
+## Fixes
+
+1. Content pinned-structure test: `../cards` → `./cards`
+2. Store paymentOutcomeSync + sandbox script tests: CRLF-tolerant normalization
+3. AI lint delta (3 unused-symbol warnings) + unused import in touched store test
 
 ## Out of scope
 
-New features beyond the merged tips, Gemini/OpenAI live activation, force-push, Worktree cleanup.
+New features, UI, migrations, Gemini/API keys, World/Games/Ads, Home/Navigation redesign, SQL behavior changes, Worktree cleanup of other trees.

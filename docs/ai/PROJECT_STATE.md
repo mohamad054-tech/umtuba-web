@@ -6,13 +6,13 @@
 
 ## Primary working branch
 
-`alpha-0.2` — Wave 3.5 platform integration (Revenue + Commerce + AI, flags OFF)
+`alpha-0.2` — Wave 4 alpha stabilization complete (Revenue + Commerce + AI, flags OFF)
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `integration/w3-alpha-final`
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w3-alpha-final`
-- **Task:** Integration Program V1 — Wave 3.5 Alpha Integration (closing)
+- **Branch:** `integration/w4-alpha-stabilization`
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w4-alpha-stabilization`
+- **Task:** Integration Program V1 — Wave 4 Alpha Stabilization (closing)
 - **See:** `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -20,7 +20,8 @@
 - Home Circular Arc / Assembly V1 (`6fac440`)
 - Creator Space Photos Lightbox V1 (`769039d`)
 - Creator All Timeline Contract V1 (`4fdbf30`)
-- Integration W1 Revenue / W2 Commerce / W3 AI via Wave 3.5
+- Integration W1 Revenue / W2 Commerce / W3 AI via Wave 3.5 (`6061a6a`)
+- Wave 4 Alpha Stabilization Sweep (tsc + store CRLF + AI lint delta)
 
 ## Gates (unchanged)
 
@@ -40,8 +41,9 @@ Session continuity: `docs/ai/SESSION_HANDOFF.md`
 | Track | Status |
 | --- | --- |
 | Unified Revenue Platform Foundation | On alpha via W3.5 |
-| Commerce E2E Beta Readiness | On alpha via W3.5 |
-| Shared AI Core / Hub / Assistant | On alpha via W3.5 (flags OFF) |
+| Commerce E2E Beta Readiness | On alpha via W3.5; store suite fully green after W4 |
+| Shared AI Core / Hub / Assistant | On alpha via W3.5 (flags OFF); W4 cleared AI lint delta |
+| Alpha Stabilization Sweep | Wave 4 closed |
 
 Default: Do not modify frozen Commerce architecture documents.
 
