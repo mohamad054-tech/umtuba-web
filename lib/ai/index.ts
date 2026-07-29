@@ -287,6 +287,9 @@ export {
   aiHubActivityStore,
   aiHubFavoriteStore,
   AI_HUB_MODULE_IDS,
+  isAiHubExperienceAvailable,
+  toAiHubHomeViewModel,
+  AI_HUB_EXPERIENCE_ROUTES,
 } from "./hub";
 export type {
   AiHubModuleId,
@@ -296,4 +299,5 @@ export type {
   AiHubSnapshot,
   AiHubRuntimeStatus,
   LoadAiHubSnapshotInput,
+  AiHubHomeViewModel,
 } from "./hub";

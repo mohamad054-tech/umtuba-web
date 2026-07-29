@@ -22,6 +22,12 @@ export {
 } from "./foundation";
 export type { LoadAiHubSnapshotInput } from "./foundation";
 export {
+  isAiHubExperienceAvailable,
+  toAiHubHomeViewModel,
+  AI_HUB_EXPERIENCE_ROUTES,
+} from "./experience";
+export type { AiHubHomeViewModel } from "./experience";
+export {
   AI_HUB_MODULE_IDS,
   type AiHubModuleId,
   type AiHubNavItem,
