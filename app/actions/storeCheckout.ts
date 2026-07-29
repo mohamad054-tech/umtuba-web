@@ -11,6 +11,7 @@ import {
 } from "../../lib/store/checkout";
 import { getCartSummary } from "../../lib/store/cart";
 import { ensureDeferredPaymentAttempts } from "../../lib/store/paymentAttempts";
+import { rejectClientMoneyFormFields } from "../../lib/store/tradingContracts";
 import { APP_ROUTES } from "../lib/nav";
 
 function formString(formData: FormData, key: string): string {
@@ -80,21 +81,9 @@ export async function createCheckoutQuoteAction(formData: FormData) {
     return { ok: false as const, message: "Sign in required.", requiresAuth: true };
   }
   // Reject any client-supplied money fields (totals are server-derived).
-  for (const key of [
-    "subtotal_minor",
-    "grand_total_minor",
-    "tax_total_minor",
-    "shipping_total_minor",
-    "discount_total_minor",
-    "unit_price_minor",
-    "amount_minor",
-  ]) {
-    if (formData.has(key)) {
-      return {
-        ok: false as const,
-        message: "Client must not supply money fields.",
-      };
-    }
+  const moneyGate = rejectClientMoneyFormFields((key) => formData.has(key));
+  if (!moneyGate.ok) {
+    return { ok: false as const, message: moneyGate.message };
   }
 
   const supabase = await createClient();
@@ -124,6 +113,10 @@ export async function confirmCheckoutQuoteAction(formData: FormData) {
   const user = await getServerUser();
   if (!user) {
     return { ok: false as const, message: "Sign in required.", requiresAuth: true };
+  }
+  const moneyGate = rejectClientMoneyFormFields((key) => formData.has(key));
+  if (!moneyGate.ok) {
+    return { ok: false as const, message: moneyGate.message };
   }
   const quoteId = formString(formData, "quote_id");
   if (!quoteId) {
@@ -203,11 +196,9 @@ export async function ensureDeferredPaymentAttemptAction(formData: FormData) {
   }
 
   // Reject client money fields on recovery path too.
-  if (formData.has("amount_minor") || formData.has("grand_total_minor")) {
-    return {
-      ok: false as const,
-      message: "Client must not supply money fields.",
-    };
+  const moneyGate = rejectClientMoneyFormFields((key) => formData.has(key));
+  if (!moneyGate.ok) {
+    return { ok: false as const, message: moneyGate.message };
   }
 
   const supabase = await createClient();

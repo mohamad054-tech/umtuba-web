@@ -21,28 +21,30 @@ export default function StoreSection({
   children,
 }: StoreSectionProps) {
   return (
-    <section id={id} className="mt-10 md:mt-14" aria-labelledby={id ? `${id}-heading` : undefined}>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 md:mb-5">
-        <div className="min-w-0">
-          {eyebrow ? (
-            <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-violet-300/70">
-              {eyebrow}
-            </p>
-          ) : null}
+    <section
+      id={id}
+      className="mt-12 md:mt-16"
+      aria-labelledby={id ? `${id}-heading` : undefined}
+    >
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3 md:mb-6">
+        <div className="min-w-0 max-w-2xl">
+          {eyebrow ? <p className="sf-eyebrow">{eyebrow}</p> : null}
           <h2
             id={id ? `${id}-heading` : undefined}
-            className="mt-1 text-xl font-black tracking-tight md:text-2xl"
+            className="sf-display mt-2 text-2xl font-semibold tracking-tight md:text-3xl"
           >
             {title}
           </h2>
           {description ? (
-            <p className="mt-1 max-w-2xl text-sm text-white/50">{description}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+              {description}
+            </p>
           ) : null}
         </div>
         {href ? (
           <Link
             href={href}
-            className="watch-focus-ring shrink-0 rounded-full border border-violet-400/25 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-100 transition hover:bg-violet-500/20"
+            className="watch-focus-ring shrink-0 rounded-full border border-[var(--sf-line)] bg-white/5 px-4 py-2 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:border-[rgba(214,196,161,0.35)] hover:bg-white/8"
           >
             {linkLabel}
           </Link>

@@ -1,3 +1,5 @@
+import type { BuyerStatusChip } from "../../../lib/store/buyerOrdersPresentation";
+import { buildBuyerStatusChips } from "../../../lib/store/buyerOrdersPresentation";
 import {
   formatFulfillmentStatus,
   formatOrderStatus,
@@ -9,7 +11,7 @@ import type {
   PaymentStatus,
 } from "../../../lib/store/types";
 
-type Tone = "neutral" | "info" | "warn" | "good" | "bad";
+type Tone = BuyerStatusChip["tone"];
 
 const ORDER_TONE: Record<OrderStatus, Tone> = {
   pending: "warn",
@@ -37,11 +39,12 @@ const FULFILLMENT_TONE: Record<FulfillmentStatus, Tone> = {
 };
 
 const TONE_CLASS: Record<Tone, string> = {
-  neutral: "border-white/15 bg-white/5 text-white/70",
-  info: "border-sky-400/25 bg-sky-500/10 text-sky-100",
+  neutral:
+    "border-[var(--sf-line)] bg-white/5 text-[var(--sf-muted)]",
+  info: "border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.1)] text-[var(--sf-accent-strong)]",
   warn: "border-amber-400/25 bg-amber-500/10 text-amber-100",
-  good: "border-emerald-400/25 bg-emerald-500/10 text-emerald-100",
-  bad: "border-rose-400/25 bg-rose-500/10 text-rose-100",
+  good: "border-[rgba(159,214,184,0.35)] bg-[rgba(159,214,184,0.1)] text-[var(--sf-ok)]",
+  bad: "border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.1)] text-[var(--sf-danger)]",
 };
 
 function Badge({ label, tone }: { label: string; tone: Tone }) {
@@ -83,11 +86,37 @@ export function OrderStatusCluster({
   status,
   paymentStatus,
   fulfillmentStatus,
+  shippedAt,
+  deliveredAt,
+  buyerReadable = false,
 }: {
   status: OrderStatus;
   paymentStatus: string;
   fulfillmentStatus: FulfillmentStatus;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
+  /** When true, render separate order/payment/fulfillment/delivery chips. */
+  buyerReadable?: boolean;
 }) {
+  if (buyerReadable) {
+    const chips = buildBuyerStatusChips({
+      status,
+      paymentStatus,
+      fulfillmentStatus,
+      shippedAt,
+      deliveredAt,
+    });
+    return (
+      <div className="flex flex-wrap gap-2" role="list" aria-label="Order states">
+        {chips.map((chip) => (
+          <span key={chip.kind} role="listitem">
+            <Badge label={chip.label} tone={chip.tone} />
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   const payment = (
     ["pending", "authorized", "paid", "failed", "refunded"] as const
   ).includes(paymentStatus as PaymentStatus)

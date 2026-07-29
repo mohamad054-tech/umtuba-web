@@ -60,6 +60,8 @@ export type StoreRow = {
   return_policy?: string | null;
   shipping_policy?: string | null;
   privacy_policy?: string | null;
+  /** Supplier→Seller Marketplace V1 — store may supply products to other sellers. */
+  marketplace_supplier_enabled?: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -91,6 +93,8 @@ export type StoreProductRow = {
   width_mm?: number | null;
   height_mm?: number | null;
   origin_country_code?: string | null;
+  /** Supplier→Seller Marketplace V1 — product may be listed by other sellers. */
+  marketplace_eligible?: boolean;
 };
 
 export type ProductVariantRow = {
@@ -155,8 +159,15 @@ export type PublicCatalogItem = {
   /** Short-lived signed Storage URL (server-authorized). */
   coverUrl?: string | null;
   priceMinor: number | null;
+  /** Compare-at only when an active price row provides a higher legitimate amount. */
+  compareAtMinor?: number | null;
   currency: string | null;
   available: number | null;
+  /** Present when card represents a supplier-sourced seller listing. */
+  sellerListingId?: string | null;
+  /** Supplier store id when listing-backed; null/undefined for owned. */
+  supplierStoreId?: string | null;
+  marketplaceSourceType?: "owned" | "supplier_listing";
 };
 
 export type PublicProductDetail = {
@@ -170,6 +181,14 @@ export type PublicProductDetail = {
   }>;
   media: Array<ProductMediaRow & { mediaUrl?: string | null }>;
   category: ProductCategoryRow | null;
+  /** Listing-backed PDP fields */
+  sellerListingId?: string | null;
+  supplierStoreId?: string | null;
+  supplierStoreName?: string | null;
+  marketplaceSourceType?: "owned" | "supplier_listing";
+  displayTitle?: string | null;
+  purchaseAllowed?: boolean;
+  purchaseBlockedReason?: string | null;
 };
 
 /** Orders Foundation V1 — lifecycle status (DB lowercase; labels elsewhere). */

@@ -1,65 +1,49 @@
-﻿# CURSOR_REPORT — Unified Revenue Platform Foundation V1
+# CURSOR_REPORT — Integration Wave 2 Commerce
 
 ## Summary
 
-Created **Unified Revenue Platform Foundation V1** on branch `office/unified-revenue-platform-foundation-v1` from `origin/alpha-0.2` (`6fac440`) in an isolated Desktop worktree. Shared server-side financial contracts for Wallet, Ledger, Transactions, Sources, Consumers, Events, and noop billing/provider hooks. Did not touch AI Core, Home, Navigation, App Shell, or existing store/wallet/ads implementations. No UI, DB migration, PSP, commit, or push.
+Merged **Commerce End-to-End Beta Readiness** (`6cbe0f6`) into `integration/w2-commerce` on top of Wave 1 Revenue (`a1bde1f`). Conflicts limited to `docs/ai/CURRENT_TASK.md` and `docs/ai/CURSOR_REPORT.md` (resolved for the integration wave). `app/lib/nav/routes.ts` auto-merged: kept Platform Navigation / Home contracts from the integration line and added Commerce seller route constants. Revenue `lib/revenue/**` unchanged by conflict resolution. No AI / World / Games work.
 
 ## Exact files changed
 
-### Created
-- `lib/revenue/types.ts`
-- `lib/revenue/ids.ts`
-- `lib/revenue/sources.ts`
-- `lib/revenue/consumers.ts`
-- `lib/revenue/events.ts`
-- `lib/revenue/wallet.ts`
-- `lib/revenue/ledger.ts`
-- `lib/revenue/transactions.ts`
-- `lib/revenue/foundation.ts`
-- `lib/revenue/index.ts`
-- `lib/revenue/revenueFoundation.test.ts`
-- `docs/architecture/revenue/UNIFIED_REVENUE_PLATFORM_FOUNDATION_V1.md`
-- `docs/architecture/revenue/README.md`
-- `docs/ai/CURSOR_REPORT.md` (handoff report)
+See merge commit vs `a1bde1f` (Commerce tip + conflict-resolution docs). Conflict resolution touched only:
 
-### Modified
-- `docs/ai/PROJECT_STATE.md` (track row)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+Commerce tip includes marketplace migrations already on that branch (not newly authored in this wave):
+
+- `supabase/migrations/20260869_store_marketplace_supplier_seller_foundation_v1.sql`
+- `supabase/migrations/20260870_store_marketplace_listing_checkout_alignment_v1.sql`
+
+Remote apply is out of scope for this wave.
 
 ## Security review
 
-- Fail-closed validation for money, events, registries.
-- Immutable ledger contracts; rewrite/delete forbidden.
-- Direct wallet balance mutation forbidden.
-- Event metadata rejects apiKey/secret/token/providerPayload keys.
-- Provider hooks are noop and return null.
+- Commerce confirm kill-switch (`STORE_COMMERCE_CONFIRM_KILL_SWITCH`) remains fail-closed.
+- Revenue fail-closed contracts retained.
+- No auth widening intended by this merge.
 
 ## Tests
 
-- `vitest run lib/revenue/` → **8 passed**
+(Filled after verification in this wave.)
 
 ## TypeScript
 
-- No `lib/revenue` diagnostics from `tsc --noEmit`.
-- Full-project `tsc --noEmit` still reports a **pre-existing** error outside this phase: `lib/content/profilePinnedContentStructure.v1.test.ts` missing `../cards` (on `alpha-0.2` base; not introduced here).
+(Filled after verification in this wave.)
 
 ## Build
 
-Not required (Foundation library + docs only).
+(Filled after verification in this wave.)
 
 ## git diff --check
 
-**Pass**
-
-## git status --short
-
-Uncommitted on `office/unified-revenue-platform-foundation-v1` (worktree). No commit/push.
+(Filled after verification in this wave.)
 
 ## Open issues
 
-- Awaiting GO before commit/push.
-- Bridging Commerce settlement / Ads billing / UM Points wallet into this platform — future phases.
-- No Stripe / checkout / product implementations in this phase.
+- Pre-existing alpha `tsc` issue: `lib/content/profilePinnedContentStructure.v1.test.ts` → `../cards`
+- Pre-existing alpha lint debt
+- Commerce residual: wishlist/id-PDP listing provenance; deferred PSP/shipping network

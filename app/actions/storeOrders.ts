@@ -6,8 +6,11 @@ import {
   canSellerManageOrders,
   isFulfillmentStatus,
   isOrderStatus,
+  nextFulfillmentStatuses,
+  nextSellerOrderStatuses,
 } from "../../lib/store/orderRules";
 import { updateSellerOrderStatus } from "../../lib/store/orders";
+import { sellerTransitionPaymentBlocked } from "../../lib/store/sellerOrdersPresentation";
 import { buyerCancelStoreOrder } from "../../lib/store/commerceSafetyQueries";
 import { getMembership } from "../../lib/store/sellerStore";
 import { APP_ROUTES, buildSellerOrderHref, buildStoreOrderHref } from "../lib/nav";
@@ -84,7 +87,7 @@ export async function updateSellerOrderStatusAction(formData: FormData) {
   // Never trust a client-provided store_id. Uniform "not found" for IDOR.
   const { data: orderRow, error: orderError } = await supabase
     .from("orders")
-    .select("id, store_id")
+    .select("id, store_id, status, payment_status, fulfillment_status")
     .eq("id", orderId)
     .maybeSingle();
 
@@ -96,6 +99,45 @@ export async function updateSellerOrderStatusAction(formData: FormData) {
   if (!canSellerManageOrders(role)) {
     // Viewer / catalog_editor / non-member — do not reveal order existence nuance.
     return { ok: false as const, message: "Order not found." };
+  }
+
+  // Presentation/policy guard mirrored server-side: unpaid orders cannot ship/deliver.
+  const paymentBlock = sellerTransitionPaymentBlocked({
+    paymentStatus: orderRow.payment_status,
+    toStatus: status,
+    toFulfillment: fulfillmentStatus,
+  });
+  if (paymentBlock.blocked) {
+    return {
+      ok: false as const,
+      message: paymentBlock.reason || "Transition blocked by payment state.",
+    };
+  }
+
+  // Stale transition pre-check against current trusted state.
+  if (status) {
+    const current = orderRow.status;
+    if (
+      isOrderStatus(current) &&
+      !nextSellerOrderStatuses(current).includes(status)
+    ) {
+      return {
+        ok: false as const,
+        message: `Cannot transition order from ${current} to ${status}. Refresh and try again.`,
+      };
+    }
+  }
+  if (fulfillmentStatus) {
+    const current = orderRow.fulfillment_status;
+    if (
+      isFulfillmentStatus(current) &&
+      !nextFulfillmentStatuses(current).includes(fulfillmentStatus)
+    ) {
+      return {
+        ok: false as const,
+        message: `Cannot transition fulfillment from ${current} to ${fulfillmentStatus}. Refresh and try again.`,
+      };
+    }
   }
 
   const result = await updateSellerOrderStatus(supabase, {

@@ -2,23 +2,25 @@
 
 ## Task title
 
-Home Assembly V1
+UMTUBA Integration Program V1 — Wave 2 Commerce Integration
 
 ## Status
 
-`final-verification` — Commit / Push / FF-merge to alpha-0.2
+`in-progress` — merge + verify on `integration/w2-commerce`
 
 ## Branch
 
-`office/home-assembly-v1` from `alpha-0.2` @ `302e32f`
+`integration/w2-commerce` from `origin/integration/w1-revenue` @ `a1bde1f`
 
-## Done
+## Base
 
-- Page-row group centering (DiscoverExperience only)
-- Locked Video Stage sealed
-- Flags unchanged
+- Integration line: `origin/integration/w1-revenue` @ `a1bde1f` (Revenue Foundation on alpha tip)
+- Incoming: `origin/office/commerce-end-to-end-beta-readiness-v1` @ `6cbe0f6`
 
-## Gates
+## Scope
 
-- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
-- `HOME_LOCK_ACTIVE = true`
+Merge Commerce End-to-End Beta Readiness into the integration line. Preserve Revenue Foundation, Home lock, and Platform Navigation contracts. Resolve docs conflicts for the integration wave. No AI / World / Games. No new product features beyond the merged Commerce tip.
+
+## Out of scope
+
+AI Core, World, Games, Shipping Network, live PSP, Warehouse Runtime, Payouts, Settlement UI, Analytics Warehouse, alpha-0.2 merge.

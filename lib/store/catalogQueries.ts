@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
+import { isLegitimateCompareAt } from "./tradingContracts";
 import type {
   ProductCategoryRow,
   ProductInventoryRow,
@@ -62,6 +63,7 @@ export async function enrichPublicCatalogRow(
     .limit(1);
 
   let priceMinor: number | null = null;
+  let compareAtMinor: number | null = null;
   let currency: string | null = null;
   let available: number | null = null;
 
@@ -69,7 +71,7 @@ export async function enrichPublicCatalogRow(
   if (variantId) {
     const { data: price } = await supabase
       .from("product_prices")
-      .select("amount_minor, currency")
+      .select("amount_minor, compare_at_amount_minor, currency")
       .eq("variant_id", variantId)
       .eq("status", "active")
       .order("created_at", { ascending: false })
@@ -78,6 +80,13 @@ export async function enrichPublicCatalogRow(
     if (price) {
       priceMinor = Number(price.amount_minor);
       currency = price.currency;
+      const compareRaw =
+        price.compare_at_amount_minor == null
+          ? null
+          : Number(price.compare_at_amount_minor);
+      compareAtMinor = isLegitimateCompareAt(priceMinor, compareRaw)
+        ? compareRaw
+        : null;
     }
 
     const { data: inv } = await supabase
@@ -96,11 +105,12 @@ export async function enrichPublicCatalogRow(
   }
 
   const { stores: _stores, ...product } = row;
+  const mediaStoreId = (product as StoreProductRow).store_id || store.id;
   const coverUrl = cover
     ? await createAuthorizedProductMediaSignedUrl(supabase, {
         storagePath: cover,
         productId: row.id,
-        storeId: store.id,
+        storeId: mediaStoreId,
         userId: null,
       })
     : null;
@@ -111,8 +121,12 @@ export async function enrichPublicCatalogRow(
     coverPath: cover,
     coverUrl,
     priceMinor,
+    compareAtMinor,
     currency,
     available,
+    sellerListingId: null,
+    supplierStoreId: null,
+    marketplaceSourceType: "owned",
   };
 }
 
@@ -181,6 +195,67 @@ export async function listPublicCatalog(
     items.push(await enrichPublicCatalogRow(supabase, row));
   }
 
+  // Supplier-sourced active listings appear on the seller storefront without
+  // cloning products. Catalog card identity is the seller store; product truth
+  // remains the supplier-owned row.
+  if (options?.storeSlug) {
+    const sellerStore = await getPublicStoreBySlug(supabase, options.storeSlug);
+    if (sellerStore) {
+      const { data: listings } = await supabase
+        .from("store_seller_listings")
+        .select("id, source_product_id, display_title_override, supplier_store_id")
+        .eq("seller_store_id", sellerStore.id)
+        .eq("status", "active")
+        .limit(limit);
+
+      const ownedIds = new Set(items.map((i) => i.product.id));
+      for (const listing of listings ?? []) {
+        const sourceId = String(listing.source_product_id);
+        if (ownedIds.has(sourceId)) continue;
+        const { data: product } = await supabase
+          .from("store_products")
+          .select("*")
+          .eq("id", sourceId)
+          .eq("status", "active")
+          .eq("moderation_status", "approved")
+          .maybeSingle();
+        if (!product) continue;
+
+        const { data: allowed } = await supabase.rpc(
+          "store_listing_allows_seller_sale",
+          {
+            p_seller_store_id: sellerStore.id,
+            p_product_id: sourceId,
+            p_listing_id: listing.id,
+          }
+        );
+        if (allowed !== true) continue;
+
+        const enriched = await enrichPublicCatalogRow(supabase, {
+          ...(product as StoreProductRow),
+          stores: {
+            id: sellerStore.id,
+            slug: sellerStore.slug,
+            name: sellerStore.name,
+            logo_path: sellerStore.logo_path,
+            status: sellerStore.status,
+          },
+        });
+        if (listing.display_title_override) {
+          enriched.product = {
+            ...enriched.product,
+            title: String(listing.display_title_override),
+          };
+        }
+        enriched.sellerListingId = String(listing.id);
+        enriched.supplierStoreId = String(listing.supplier_store_id);
+        enriched.marketplaceSourceType = "supplier_listing";
+        items.push(enriched);
+        ownedIds.add(sourceId);
+      }
+    }
+  }
+
   return { items, error: null };
 }
 
@@ -207,33 +282,142 @@ export async function getPublicProductDetail(
     return { detail: null, error: null };
   }
 
-  const { data: product, error } = await supabase
+  const slug = productSlug.toLowerCase();
+
+  // Rule: owned product first (slug collision → seller-owned wins).
+  const { data: ownedProduct, error: ownedError } = await supabase
     .from("store_products")
     .select("*")
     .eq("store_id", store.id)
-    .eq("slug", productSlug.toLowerCase())
+    .eq("slug", slug)
     .eq("status", "active")
     .eq("moderation_status", "approved")
     .maybeSingle();
 
-  if (error) {
-    console.error("getPublicProductDetail", error);
+  if (ownedError) {
+    console.error("getPublicProductDetail owned", ownedError);
     return { detail: null, error: "Unable to load product." };
   }
-  if (!product) {
+
+  if (ownedProduct) {
+    const productRow = ownedProduct as StoreProductRow;
+    if (
+      !isPubliclyVisibleProduct({
+        productStatus: productRow.status,
+        moderationStatus: productRow.moderation_status,
+        storeStatus: store.status,
+      })
+    ) {
+      return { detail: null, error: null };
+    }
+    return buildPublicProductDetail(supabase, {
+      store,
+      productRow,
+      marketplaceSourceType: "owned",
+      sellerListingId: null,
+      supplierStoreId: null,
+      supplierStoreName: null,
+      displayTitle: null,
+    });
+  }
+
+  // Listing-backed: active listing on this seller store whose source product slug matches.
+  const { data: listingCandidates, error: listingError } = await supabase
+    .from("store_seller_listings")
+    .select(
+      "id, status, display_title_override, source_product_id, supplier_store_id"
+    )
+    .eq("seller_store_id", store.id)
+    .eq("status", "active")
+    .limit(50);
+
+  if (listingError) {
+    console.error("getPublicProductDetail listings", listingError);
+    return { detail: null, error: "Unable to load product." };
+  }
+
+  let matched:
+    | {
+        listingId: string;
+        displayTitle: string | null;
+        product: StoreProductRow;
+        supplierName: string | null;
+      }
+    | null = null;
+
+  for (const listing of listingCandidates ?? []) {
+    const { data: source } = await supabase
+      .from("store_products")
+      .select("*")
+      .eq("id", listing.source_product_id)
+      .eq("slug", slug)
+      .eq("status", "active")
+      .eq("moderation_status", "approved")
+      .maybeSingle();
+    if (!source) continue;
+
+    const { data: supplier } = await supabase
+      .from("stores")
+      .select("id, name, status, verification_status, marketplace_supplier_enabled")
+      .eq("id", source.store_id)
+      .maybeSingle();
+
+    if (!supplier) continue;
+
+    const { data: allowed } = await supabase.rpc(
+      "store_listing_allows_seller_sale",
+      {
+        p_seller_store_id: store.id,
+        p_product_id: source.id,
+        p_listing_id: listing.id,
+      }
+    );
+
+    if (allowed !== true) continue;
+
+    if (matched) {
+      // Ambiguous: two active listings map to same slug under this seller.
+      return { detail: null, error: null };
+    }
+    matched = {
+      listingId: String(listing.id),
+      displayTitle: listing.display_title_override
+        ? String(listing.display_title_override)
+        : null,
+      product: source as StoreProductRow,
+      supplierName: supplier.name ? String(supplier.name) : null,
+    };
+  }
+
+  if (!matched) {
     return { detail: null, error: null };
   }
 
-  const productRow = product as StoreProductRow;
-  if (
-    !isPubliclyVisibleProduct({
-      productStatus: productRow.status,
-      moderationStatus: productRow.moderation_status,
-      storeStatus: store.status,
-    })
-  ) {
-    return { detail: null, error: null };
+  return buildPublicProductDetail(supabase, {
+    store,
+    productRow: matched.product,
+    marketplaceSourceType: "supplier_listing",
+    sellerListingId: matched.listingId,
+    supplierStoreId: matched.product.store_id,
+    supplierStoreName: matched.supplierName,
+    displayTitle: matched.displayTitle,
+  });
+}
+
+async function buildPublicProductDetail(
+  supabase: AnyClient,
+  input: {
+    store: StoreRow;
+    productRow: StoreProductRow;
+    marketplaceSourceType: "owned" | "supplier_listing";
+    sellerListingId: string | null;
+    supplierStoreId: string | null;
+    supplierStoreName: string | null;
+    displayTitle: string | null;
   }
+): Promise<{ detail: PublicProductDetail | null; error: string | null }> {
+  const { store, productRow } = input;
+  const mediaStoreId = productRow.store_id;
 
   const [{ data: variants }, { data: media }, { data: category }] =
     await Promise.all([
@@ -261,6 +445,7 @@ export async function getPublicProductDetail(
 
   const variantRows = (variants ?? []) as ProductVariantRow[];
   const enriched = [];
+  let hasTrustedPrice = false;
   for (const variant of variantRows) {
     const [{ data: price }, { data: inventory }] = await Promise.all([
       supabase
@@ -280,6 +465,7 @@ export async function getPublicProductDetail(
     ]);
 
     const inv = (inventory as ProductInventoryRow | null) ?? null;
+    if (price) hasTrustedPrice = true;
     enriched.push({
       variant: {
         ...variant,
@@ -305,11 +491,25 @@ export async function getPublicProductDetail(
       mediaUrl: await createAuthorizedProductMediaSignedUrl(supabase, {
         storagePath: row.storage_path,
         productId: productRow.id,
-        storeId: store.id,
+        storeId: mediaStoreId,
         userId: null,
       }),
     }))
   );
+
+  let purchaseAllowed = enriched.length > 0 && hasTrustedPrice;
+  let purchaseBlockedReason: string | null = null;
+  if (!hasTrustedPrice) {
+    purchaseAllowed = false;
+    purchaseBlockedReason = "Trusted selling price is unavailable.";
+  } else if (enriched.every((v) => v.available <= 0 && !v.inventory?.allow_backorder)) {
+    purchaseAllowed = false;
+    purchaseBlockedReason = "This product is currently unavailable.";
+  }
+  if (input.marketplaceSourceType === "supplier_listing" && !input.sellerListingId) {
+    purchaseAllowed = false;
+    purchaseBlockedReason = "Marketplace listing is invalid.";
+  }
 
   return {
     detail: {
@@ -318,6 +518,13 @@ export async function getPublicProductDetail(
       variants: enriched,
       media: mediaWithUrls,
       category: (category as ProductCategoryRow | null) ?? null,
+      sellerListingId: input.sellerListingId,
+      supplierStoreId: input.supplierStoreId,
+      supplierStoreName: input.supplierStoreName,
+      marketplaceSourceType: input.marketplaceSourceType,
+      displayTitle: input.displayTitle,
+      purchaseAllowed,
+      purchaseBlockedReason,
     },
     error: null,
   };
