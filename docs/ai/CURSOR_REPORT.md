@@ -1,50 +1,46 @@
-﻿# CURSOR_REPORT — Learning Tutor explain_wrong_answer (Desktop)
+﻿# CURSOR_REPORT — Learning AI Tutor Backend Integration Foundation V1
 
 ## Summary
 
-Implemented the learner-safe wrong-answer contract and wired `learning.tutor.explain_wrong_answer@1.0.0` through `aiService.runCapability` on branch `office/learning-ai-tutor-backend-foundation-v1`. Server-side only. No UI. No new migration. No commit/push pending review of this report.
+Implemented a Learning-only server integration boundary over `aiService.runCapability` on branch `office/learning-ai-tutor-backend-foundation-v1`. Future UI/server actions call action-discriminated requests (`explain_lesson`, etc.); the boundary validates inputs, maps to the five allowlisted capabilities, and executes only through `aiService`. No UI. No new migration. No commit/push pending GO.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/capabilities/learning/wrongAnswerContract.ts`
-- `lib/ai/capabilities/learning/wrongAnswerContract.test.ts`
+- `lib/ai/contracts/learningTutorIntegration.ts`
+- `lib/ai/services/learningTutorIntegration.ts`
+- `lib/ai/services/learningTutorIntegration.test.ts`
 
 ### Modified
-- `lib/ai/capabilities/learning/tutorRunner.ts`
-- `lib/ai/capabilities/learning/prompts.ts`
-- `lib/ai/capabilities/learning/safety.ts`
-- `lib/ai/capabilities/learning/learningTutor.test.ts`
-- `lib/ai/services/aiService.ts`
-- `lib/ai/contracts/public.ts`
-- `lib/ai/contracts/learningTutor.ts`
-- `lib/ai/providers/adapters.ts`
+- `lib/ai/index.ts`
+- `lib/ai/architectureBoundary.test.ts`
 - `docs/ai/workstreams/AI_PLATFORM.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None. Reuses existing owner-scoped Learning RPCs + Shared AI Core `20260871` (still local-only / not remote-applied).
+None.
 
 ## Security review
 
-- Unauthenticated → rejected.
-- Unauthorized course access → `permission_denied`.
-- Non-owner attempt → `permission_denied`.
-- Unreleased results (`visibility !== available`) → fail-closed.
-- Missing incorrect released grade / missing answer / missing stem → fail-closed.
-- Grade/answer payloads with `answer_key` (and related forbidden keys) rejected.
-- Output must set `revealsAnswerKey: false`; key-like structured fields blocked.
-- No progress/grade mutation; no answer-key tables; no UI wiring.
+- Unknown actions rejected before `aiService`.
+- Free-form capability / non-Learning capabilities rejected.
+- Forbidden fields rejected: provider/model/prompt/system instructions/version/safety/metadata/`forceStub`/etc.
+- Action-specific required inputs validated (UUIDs).
+- Auth still enforced via `aiService` + existing Learning access/unlock/wrong-answer contract chain.
+- Safe error messages for future UI (no stack traces).
+- Does not bypass tutorRunner / wrong-answer contract / prompts / providers.
 
 ## Tests
 
 ```
-npx vitest run lib/ai/capabilities/learning/wrongAnswerContract.test.ts \
+npx vitest run lib/ai/services/learningTutorIntegration.test.ts \
   lib/ai/capabilities/learning/learningTutor.test.ts \
+  lib/ai/capabilities/learning/wrongAnswerContract.test.ts \
   lib/ai/architectureBoundary.test.ts
 ```
 
-Result: **35 passed** (16 contract/capability + 14 tutor + 5 architecture).
+Result: **50 passed**.
 
 ## TypeScript
 
@@ -52,32 +48,17 @@ Result: **35 passed** (16 contract/capability + 14 tutor + 5 architecture).
 
 ## Build
 
-Not run (no app UI/entry-point change; backend AI + docs only).
+Not run (no app UI/entry-point change).
 
 ## git diff --check
 
-**PASS** (scoped to `lib/ai` + `docs/ai/workstreams/AI_PLATFORM.md`)
+**PASS** (scoped to AI + docs for this task)
 
 ## git status --short
 
-Scoped AI changes only (unrelated Learning/Nexus dirty tree left untouched):
-
-```
- M docs/ai/workstreams/AI_PLATFORM.md
- M lib/ai/capabilities/learning/learningTutor.test.ts
- M lib/ai/capabilities/learning/prompts.ts
- M lib/ai/capabilities/learning/safety.ts
- M lib/ai/capabilities/learning/tutorRunner.ts
- M lib/ai/contracts/learningTutor.ts
- M lib/ai/contracts/public.ts
- M lib/ai/providers/adapters.ts
- M lib/ai/services/aiService.ts
-?? lib/ai/capabilities/learning/wrongAnswerContract.test.ts
-?? lib/ai/capabilities/learning/wrongAnswerContract.ts
-```
+AI/docs changes for this task only are staged-ready; Nexus/UI dirty tree remains unstaged and untouched.
 
 ## Open issues
 
-- Awaiting review approval before commit/push.
-- Laptop still owns any future UI wiring to `attemptId` + `questionId`.
-- Unrelated local dirty Learning/Nexus/shell files remain unstaged on purpose.
+- Awaiting review GO before commit/push.
+- Laptop owns future UI wiring to `learningTutorIntegration.run`.

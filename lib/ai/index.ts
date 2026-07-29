@@ -1,9 +1,13 @@
 /**
  * Shared AI Core — public exports for Domain AI and server adapters.
- * UI must consume only `aiService` + `contracts/public` (+ learningTutor types).
+ * UI must consume only `aiService` / `learningTutorIntegration` + contracts.
  */
 
 export { aiService, runCapability } from "./services/aiService";
+export {
+  learningTutorIntegration,
+  runLearningTutorIntegration,
+} from "./services/learningTutorIntegration";
 export type {
   AiServiceCapabilityId,
   AiServiceContextRefs,
@@ -18,9 +22,23 @@ export type {
   LearningTutorSummarizeResult,
   LearningTutorAnswerResult,
   LearningTutorPracticeResult,
+  LearningTutorExplainWrongAnswerResult,
   LearningTutorGroundingStatus,
   LearningTutorSourceReference,
 } from "./contracts/learningTutor";
+export type {
+  LearningTutorIntegrationAction,
+  LearningTutorIntegrationCapabilityId,
+  LearningTutorIntegrationRequest,
+  LearningTutorIntegrationResult,
+  LearningTutorIntegrationSuccess,
+  LearningTutorIntegrationFailure,
+} from "./contracts/learningTutorIntegration";
+export {
+  LEARNING_TUTOR_INTEGRATION_ACTIONS,
+  LEARNING_TUTOR_INTEGRATION_CAPABILITIES,
+  LEARNING_TUTOR_ACTION_TO_CAPABILITY,
+} from "./contracts/learningTutorIntegration";
 export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
 export { loadAiPlatformConfig, describeAiConfigStatus } from "./config";

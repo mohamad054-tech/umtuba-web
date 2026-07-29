@@ -84,9 +84,20 @@ describe("AI architecture boundary", () => {
   it("UI-facing contracts do not re-export provider secrets or raw prompts", () => {
     const pub = readFileSync(join(AI_ROOT, "contracts/public.ts"), "utf8");
     expect(pub).not.toMatch(/OPENAI_API_KEY|systemInstructions|apiKey/i);
+    const integration = readFileSync(
+      join(AI_ROOT, "contracts/learningTutorIntegration.ts"),
+      "utf8"
+    );
+    expect(integration).not.toMatch(/OPENAI_API_KEY|systemInstructions|apiKey/i);
     const service = readFileSync(join(AI_ROOT, "services/aiService.ts"), "utf8");
     expect(service).toMatch(/runCapability/);
     expect(service).not.toMatch(/NEXT_PUBLIC_/);
+    const tutorIntegration = readFileSync(
+      join(AI_ROOT, "services/learningTutorIntegration.ts"),
+      "utf8"
+    );
+    expect(tutorIntegration).toMatch(/aiService\.runCapability/);
+    expect(tutorIntegration).not.toMatch(/NEXT_PUBLIC_/);
   });
 
   it("Shared core index does not pull React", () => {
