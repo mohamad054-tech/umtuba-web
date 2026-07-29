@@ -515,13 +515,14 @@ describe("Learning Tutor backward compatibility", () => {
 });
 
 describe("gateway source uses Provider Foundation", () => {
-  it("imports createProviderFoundation and resolveRoute", () => {
+  it("imports createProviderFoundation and routing policy", () => {
     const src = readFileSync(
       join(process.cwd(), "lib/ai/gateway/execute.ts"),
       "utf8"
     );
     expect(src).toMatch(/createProviderFoundation/);
-    expect(src).toMatch(/foundation\.resolveRoute/);
+    expect(src).toMatch(/createRoutingPolicyEngine/);
+    expect(src).toMatch(/routingPolicy\.resolve/);
     expect(src).toMatch(/foundation\.requireAdapter/);
     expect(src).not.toMatch(/buildProviderRegistry\(/);
     expect(src).not.toMatch(/resolveProviderAdapters\(/);

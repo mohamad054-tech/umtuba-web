@@ -1,6 +1,8 @@
 /**
  * Canonical server-side AI service entry.
- * Flow: UI → typed contract → aiService.runCapability → Shared AI Core → provider
+ * Flow: UI → typed contract → aiService.runCapability → Shared AI Core gateway
+ *   → Routing Policy Engine → Provider Foundation adapter
+ * Capabilities never select models/providers directly.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";

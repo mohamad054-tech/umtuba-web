@@ -1,19 +1,24 @@
-﻿# CURSOR_REPORT — AI Core Platform Provider Foundation V1
+﻿# CURSOR_REPORT — AI Core Model Registry & Routing Policies Foundation V1
 
 ## Summary
 
-Implemented AI Core Platform Provider Foundation V1 on branch `office/learning-ai-tutor-backend-foundation-v1`. Shared AI Core now has a central provider/model registry and fail-closed selection layer. The gateway selects via `createProviderFoundation` → `resolveRoute` → `requireAdapter` instead of inline registry/router/adapter hardwiring. Existing stub + OpenAI adapters are reused; gemini/anthropic/local are disabled placeholders only. Learning Tutor path remains compatible. No UI. No migration. No commit/push pending GO.
+Implemented Model Registry & Routing Policies Foundation V1 on branch `office/ai-core-provider-foundation-v1`. Shared AI Core now has a formal model catalog (priority, fallbackOrder, capability/modality metadata, limits) and a Routing Policy Engine independent of aiService. The gateway selects models only through `createRoutingPolicyEngine`. Capabilities do not pick models. Extension hooks for cost/latency/region/tenant are reserved as no-ops. Learning Tutor remains compatible. No UI. No migration. No commit/push pending GO.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/providers/foundationTypes.ts`
-- `lib/ai/providers/foundation.ts`
-- `lib/ai/providers/foundation.test.ts`
+- `lib/ai/models/modelRegistryTypes.ts`
+- `lib/ai/models/modelRegistry.ts`
+- `lib/ai/routing/policyTypes.ts`
+- `lib/ai/routing/policyEngine.ts`
+- `lib/ai/routing/policyEngine.test.ts`
 
 ### Modified
-- `lib/ai/gateway/execute.ts`
+- `lib/ai/providers/foundation.ts` (resolveRoute delegates to policy engine)
+- `lib/ai/gateway/execute.ts` (uses Routing Policy Engine)
+- `lib/ai/services/aiService.ts` (documents policy-backed flow)
 - `lib/ai/index.ts`
+- `lib/ai/providers/foundation.test.ts`
 - `docs/ai/workstreams/AI_PLATFORM.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -23,15 +28,14 @@ None.
 
 ## Security review
 
-- Selection is server-side only; capabilities do not hardcode provider/model names.
-- Unknown / disabled / unregistered providers and models fail closed.
-- Future providers registered as disabled without adapters or API keys.
-- Client contracts / Learning Tutor server actions still strip provider/model internals.
-- No secrets added; no `NEXT_PUBLIC_` provider exposure.
+- Selection remains server-side; capabilities/aiService do not hardcode or choose models.
+- Unknown / disabled / unsupported / unregistered paths fail closed.
+- Extension hooks are noop and do not leak tenant/region data to clients.
+- Client contracts unchanged (provider/model internals still stripped at Learning Tutor boundary).
 
 ## Tests
 
-Targeted vitest: `lib/ai/providers/foundation.test.ts` plus existing AI foundation / Learning Tutor suites. See verification report in chat.
+Targeted vitest: policy engine + foundation + existing AI/Learning suites. See verification report in chat.
 
 ## TypeScript
 
@@ -47,9 +51,9 @@ See verification report.
 
 ## git status --short
 
-AI Core provider foundation + docs only for this task; Nexus/UI dirty tree left untouched.
+AI Core routing/model registry + docs only for this task.
 
 ## Open issues
 
 - Awaiting GO before commit/push.
-- Live Gemini/Anthropic/local adapters intentionally out of scope for V1.
+- cost/latency/region/tenant routing intentionally not implemented (hooks only).

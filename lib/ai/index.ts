@@ -71,6 +71,14 @@ export {
   findModel,
 } from "./models/registry";
 export {
+  AiModelRegistry,
+  toModelRegistryEntry,
+} from "./models/modelRegistry";
+export type {
+  AiModelRef,
+  AiModelRegistryEntry,
+} from "./models/modelRegistryTypes";
+export {
   AiProviderFoundation,
   createProviderFoundation,
 } from "./providers/foundation";
@@ -83,4 +91,14 @@ export type {
 } from "./providers/foundationTypes";
 export { AI_KNOWN_PROVIDER_IDS } from "./providers/foundationTypes";
 export { routeModel } from "./routing/router";
+export {
+  AiRoutingPolicyEngine,
+  createRoutingPolicyEngine,
+} from "./routing/policyEngine";
+export type {
+  AiRoutingPolicyRequest,
+  AiRoutingPolicyDecision,
+  AiRoutingExtensionHooks,
+} from "./routing/policyTypes";
+export { createNoopRoutingExtensionHooks } from "./routing/policyTypes";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";

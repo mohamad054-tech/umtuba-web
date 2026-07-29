@@ -18,6 +18,7 @@ import {
 } from "../runs/lifecycle";
 import { resolvePrompt, validateStructuredAgainstPrompt } from "../prompts/registry";
 import { createProviderFoundation } from "../providers/foundation";
+import { createRoutingPolicyEngine } from "../routing/policyEngine";
 import {
   assertRateLimit,
   runPostExecutionPolicy,
@@ -179,6 +180,7 @@ export async function executeAiGateway(
     });
 
     const foundation = createProviderFoundation(effectiveConfig);
+    const routingPolicy = createRoutingPolicyEngine(foundation);
 
     const contextChars = estimateContextChars([
       prompt.systemInstructions,
@@ -189,18 +191,27 @@ export async function executeAiGateway(
       throw new AiPlatformError("context_too_large", "Context exceeds limit.");
     }
 
-    const route = foundation.resolveRoute({
+    const route = routingPolicy.resolve({
       capabilityId: String(request.capabilityId),
       requiredModality: "text",
       requiresStructuredOutput: request.outputMode === "structured_json",
       requiresTools: (request.allowedToolIds ?? []).length > 0 && false,
       estimatedContextTokens: Math.ceil(contextChars / 4),
       dataClassification: context.dataClassification,
-      preferredProviderId: request.preferredProviderId,
-      preferredModelId: request.preferredModelId,
+      requiredCapabilityClass:
+        request.outputMode === "structured_json" ? "structured" : undefined,
+      preferredModel:
+        request.preferredProviderId && request.preferredModelId
+          ? {
+              providerId: request.preferredProviderId,
+              modelId: request.preferredModelId,
+            }
+          : undefined,
       allowFallback: true,
-      preferredCost: "economy",
-      preferredLatency: "standard",
+      routingHints: {
+        preferCost: "economy",
+        preferLatency: "standard",
+      },
     });
 
     updateRunStatus(runId, "routed", {

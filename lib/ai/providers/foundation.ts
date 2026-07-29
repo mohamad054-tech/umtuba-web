@@ -14,7 +14,8 @@ import {
   type AiModelDefinition,
   type AiProviderDefinition,
 } from "../models/registry";
-import { routeModel, type RouteRequest } from "../routing/router";
+import { type RouteRequest } from "../routing/router";
+import { createRoutingPolicyEngine } from "../routing/policyEngine";
 import {
   resolveProviderAdapters,
   type AiProviderAdapter,
@@ -232,42 +233,11 @@ export class AiProviderFoundation {
 
   /**
    * Fail-closed route resolution for the gateway.
+   * Delegates to Routing Policy Engine (Model Registry + policies).
    * Capabilities must call this (via gateway) — never adapters by name.
    */
   resolveRoute(request: RouteRequest): AiRouteDecision {
-    if (this.adapters.size === 0) {
-      throw new AiPlatformError(
-        "no_provider_configured",
-        "No AI provider adapter is registered."
-      );
-    }
-
-    if (request.preferredProviderId) {
-      this.requireProvider(request.preferredProviderId);
-      if (request.preferredModelId) {
-        // Explicit preference: unknown/disabled must fail closed before ranking
-        // when fallback is disallowed; when fallback is allowed, unknown still
-        // fails (cannot prefer an unknown id), disabled may fall through.
-        const preferred = this.getModel(
-          request.preferredProviderId,
-          request.preferredModelId
-        );
-        if (!preferred) {
-          throw new AiPlatformError(
-            "invalid_input",
-            `Unknown model: ${request.preferredProviderId}/${request.preferredModelId}`
-          );
-        }
-        if (!request.allowFallback) {
-          this.requireEnabledModel(
-            request.preferredProviderId,
-            request.preferredModelId
-          );
-        }
-      }
-    }
-
-    return routeModel(this.toRouterProviders(), request);
+    return createRoutingPolicyEngine(this).resolveFromRouteRequest(request);
   }
 
   snapshot(): AiProviderFoundationSnapshot {
