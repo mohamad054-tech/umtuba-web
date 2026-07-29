@@ -96,6 +96,7 @@ export const MOCK_PROFILES: MockProfile[] = [
       joinedLabel: "Joined March 2024",
       website: "umtuba.world/lina",
       interests: ["Travel", "Documentary", "City light"],
+      roles: ["Filmmaker", "Writer", "Teacher", "Seller"],
       specialties: ["Documentary film", "City light"],
       experience: [
         {
@@ -306,6 +307,7 @@ export const MOCK_PROFILES: MockProfile[] = [
     about: {
       joinedLabel: "Joined June 2024",
       interests: ["Urban", "Music", "Design"],
+      roles: ["Creator", "Musician"],
     },
   },
   {

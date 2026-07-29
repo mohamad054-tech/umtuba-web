@@ -53,6 +53,8 @@ export type ProfileAbout = {
   joinedLabel: string;
   website?: string;
   interests: string[];
+  /** Profession / role chips for Identity Strip (§4); optional — omit or [] when unknown. */
+  roles?: string[];
   specialties?: string[];
   experience?: ProfileAboutExperience[];
   education?: ProfileAboutEducation[];
