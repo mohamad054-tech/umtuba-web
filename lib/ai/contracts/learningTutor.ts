@@ -57,3 +57,18 @@ export type LearningTutorPracticeResult = {
   officialAssessment: false;
   mutatesGrades: false;
 };
+
+export type LearningTutorExplainWrongAnswerResult = {
+  explanation: string;
+  misconception: string;
+  betterApproach: string;
+  practiceHint: string;
+  sourceReferences: LearningTutorSourceReference[];
+  groundingStatus: LearningTutorGroundingStatus;
+  limitations: string[];
+  labeledAiGenerated: true;
+  officialCourseContent: false;
+  revealsAnswerKey: false;
+  mutatesProgress: false;
+  mutatesGrades: false;
+};

@@ -113,6 +113,24 @@ export function createStubAdapter(): AiProviderAdapter {
               "AI-generated practice only — not an official assessment.",
             ],
           };
+        } else if (input.capabilityId === "learning.tutor.explain_wrong_answer") {
+          structured = {
+            explanation: outside
+              ? "That attempt detail is outside the authorized learner-safe contract."
+              : `Stub explanation of the incorrect answer for ${lessonName}, without revealing hidden solutions.`,
+            misconception: "Likely mixed up a key concept from the lesson.",
+            betterApproach:
+              "Re-read the authorized material and reason from the definitions provided.",
+            practiceHint: "Try a non-graded concept check on the same idea.",
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: [
+              "Stub provider — not live model output.",
+              "Does not disclose hidden solutions.",
+            ],
+            labeledAiGenerated: true,
+            revealsAnswerKey: false,
+          };
         } else {
           structured = {
             title: `Explaining ${lessonName}`,

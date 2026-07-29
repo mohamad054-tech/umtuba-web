@@ -14,6 +14,10 @@ import {
 import { installLearningTutorTools } from "./tools";
 import { assertLearningTutorSafety } from "./safety";
 import { LEARNING_TUTOR_PROMPTS } from "./prompts";
+import {
+  buildWrongAnswerGroundingPack,
+  resolveLearnerSafeWrongAnswerContract,
+} from "./wrongAnswerContract";
 
 let promptsRegistered = false;
 
@@ -28,6 +32,7 @@ export const LEARNING_TUTOR_CAPABILITIES = [
   "learning.tutor.summarize_lesson",
   "learning.tutor.answer_question",
   "learning.tutor.generate_practice",
+  "learning.tutor.explain_wrong_answer",
 ] as const;
 
 export type LearningTutorCapabilityId =
@@ -36,9 +41,12 @@ export type LearningTutorCapabilityId =
 export type LearningTutorRunInput = {
   supabase: SupabaseClient;
   userId: string;
+  /** Required for lesson capabilities; resolved from attempt for wrong-answer. */
   lessonId: string;
   capabilityId: LearningTutorCapabilityId;
   question?: string;
+  attemptId?: string;
+  questionId?: string;
   locale?: string | null;
   forceStub?: boolean;
 };
@@ -74,45 +82,111 @@ export async function runLearningTutorCapability(
     };
   }
 
-  // Deferred: no learner-safe wrong-answer contract yet.
-  if (
-    (input.capabilityId as string) === "learning.tutor.explain_wrong_answer"
-  ) {
-    return {
-      ok: false,
-      code: "invalid_input",
-      message:
-        "explain_wrong_answer is not available until a learner-safe wrong-answer contract exists.",
-    };
-  }
-
   ensureLearningPromptsRegistered();
   installLearningTutorTools(input.supabase);
 
-  const ctx = await resolveLearningTutorContext({
-    supabase: input.supabase,
-    userId: input.userId,
-    lessonId: input.lessonId,
-    locale: input.locale,
-  });
-  if (!ctx.ok) return ctx;
+  let userInputBody: string;
+  let courseId: string;
+  let lessonId: string;
+  let sourceReferences: Array<{ type: string; id: string; label: string }>;
+  let learnerQuestion: string;
 
-  const { pack, sourceReferences } = buildGroundingPack(ctx.data);
-  const learnerQuestion =
-    input.question?.trim() ||
-    (input.capabilityId === "learning.tutor.answer_question"
-      ? ""
-      : "Please help me with this lesson.");
+  if (input.capabilityId === "learning.tutor.explain_wrong_answer") {
+    const attemptId = input.attemptId?.trim() ?? "";
+    const questionId = input.questionId?.trim() ?? "";
+    if (!attemptId || !questionId) {
+      return {
+        ok: false,
+        code: "invalid_input",
+        message: "attemptId and questionId are required.",
+      };
+    }
 
-  if (
-    input.capabilityId === "learning.tutor.answer_question" &&
-    !learnerQuestion
-  ) {
-    return {
-      ok: false,
-      code: "invalid_input",
-      message: "A learner question is required.",
-    };
+    const contract = await resolveLearnerSafeWrongAnswerContract({
+      supabase: input.supabase,
+      userId: input.userId,
+      attemptId,
+      questionId,
+    });
+    if (!contract.ok) return contract;
+
+    lessonId = contract.data.lessonId;
+    courseId = contract.data.courseId;
+
+    const ctx = await resolveLearningTutorContext({
+      supabase: input.supabase,
+      userId: input.userId,
+      lessonId,
+      locale: input.locale,
+    });
+    if (!ctx.ok) return ctx;
+
+    const grounded = buildGroundingPack(ctx.data);
+    sourceReferences = [
+      {
+        type: "attempt",
+        id: contract.data.attemptId,
+        label: "learner attempt",
+      },
+      {
+        type: "question",
+        id: contract.data.questionId,
+        label: `Q${contract.data.questionPosition}`,
+      },
+      ...grounded.sourceReferences,
+    ];
+    userInputBody = buildWrongAnswerGroundingPack(
+      contract.data,
+      grounded.pack
+    );
+    learnerQuestion =
+      input.question?.trim() ||
+      "Explain my incorrect answer using the learner-safe contract.";
+  } else {
+    if (!input.lessonId) {
+      return {
+        ok: false,
+        code: "invalid_input",
+        message: "lessonId is required.",
+      };
+    }
+
+    const ctx = await resolveLearningTutorContext({
+      supabase: input.supabase,
+      userId: input.userId,
+      lessonId: input.lessonId,
+      locale: input.locale,
+    });
+    if (!ctx.ok) return ctx;
+
+    courseId = ctx.data.courseId;
+    lessonId = ctx.data.lessonId;
+    const grounded = buildGroundingPack(ctx.data);
+    sourceReferences = grounded.sourceReferences;
+    learnerQuestion =
+      input.question?.trim() ||
+      (input.capabilityId === "learning.tutor.answer_question"
+        ? ""
+        : "Please help me with this lesson.");
+
+    if (
+      input.capabilityId === "learning.tutor.answer_question" &&
+      !learnerQuestion
+    ) {
+      return {
+        ok: false,
+        code: "invalid_input",
+        message: "A learner question is required.",
+      };
+    }
+
+    userInputBody = [
+      "Authorized published lesson material:",
+      grounded.pack,
+      learnerQuestion ? `Learner request: ${learnerQuestion}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
   }
 
   assertLearningTutorSafety({
@@ -124,16 +198,14 @@ export async function runLearningTutorCapability(
   const session = createAiSession({
     userId: input.userId,
     productDomain: "learning",
-    workspaceId: ctx.data.courseId,
+    workspaceId: courseId,
     locale: input.locale ?? null,
   });
 
   const userInput = [
     `Capability: ${input.capabilityId}`,
     `Locale: ${input.locale ?? "inherit"}`,
-    "Authorized published lesson material:",
-    pack,
-    learnerQuestion ? `Learner request: ${learnerQuestion}` : "",
+    userInputBody,
     "Respond with structured JSON only. Cite sourceReferences using lesson/block ids from the material.",
   ]
     .filter(Boolean)
@@ -156,8 +228,8 @@ export async function runLearningTutorCapability(
         productDomain: "learning",
         surface: "learning.tutor.backend",
         dataClassification: "confidential",
-        courseId: ctx.data.courseId,
-        workspaceId: ctx.data.courseId,
+        courseId,
+        workspaceId: courseId,
         locale: input.locale ?? null,
         allowedCapabilities: [input.capabilityId],
         allowedToolIds: [
@@ -166,8 +238,8 @@ export async function runLearningTutorCapability(
           "learning.read_enrollment_state",
         ],
         resourceRefs: [
-          { type: "course", id: ctx.data.courseId },
-          { type: "lesson", id: ctx.data.lessonId },
+          { type: "course", id: courseId },
+          { type: "lesson", id: lessonId },
         ],
       },
       _test: input.forceStub
@@ -190,9 +262,7 @@ export async function runLearningTutorCapability(
     structured,
   });
 
-  const groundingStatus = String(
-    structured.groundingStatus ?? "partial"
-  );
+  const groundingStatus = String(structured.groundingStatus ?? "partial");
   const refs = Array.isArray(structured.sourceReferences)
     ? (structured.sourceReferences as Array<{
         type?: string;

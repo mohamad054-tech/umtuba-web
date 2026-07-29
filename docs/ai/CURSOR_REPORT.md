@@ -1,67 +1,83 @@
-﻿# CURSOR_REPORT — UMTUBA AI Core Platform Foundation V1
+﻿# CURSOR_REPORT — Learning Tutor explain_wrong_answer (Desktop)
 
 ## Summary
 
-Implemented the shared **AI Core Platform Foundation V1** on branch `office/ai-core-platform-foundation-v1`. One server-side gateway, provider/model registry, deterministic router, versioned prompts, trusted context envelope, permission-aware read-only tools, run lifecycle, usage/cost accounting, tracing, safety hooks, session/memory/evaluation foundations, admin diagnostics at `/admin/ai`, and Product Draft Assistant reference consumer on the seller product editor. No broad agents. No frozen Commerce/Learning architecture doc edits. Migration `20260871` local only (not remote-applied).
+Implemented the learner-safe wrong-answer contract and wired `learning.tutor.explain_wrong_answer@1.0.0` through `aiService.runCapability` on branch `office/learning-ai-tutor-backend-foundation-v1`. Server-side only. No UI. No new migration. No commit/push pending review of this report.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/**` (types, config, errors, context, router, gateway, lifecycle, usage, tracing, safety, session, memory, evaluation, diagnostics, productDraftAssistant, prompts, providers, tools, tests, README)
-- `supabase/migrations/20260871_ai_core_platform_foundation_v1.sql`
-- `app/actions/aiProductDraft.ts`
-- `app/components/store/ProductDraftAssistantPanel.tsx`
-- `app/admin/ai/page.tsx`
+- `lib/ai/capabilities/learning/wrongAnswerContract.ts`
+- `lib/ai/capabilities/learning/wrongAnswerContract.test.ts`
 
 ### Modified
-- `app/seller/store/products/[productId]/edit/page.tsx`
-- `app/admin/store/AdminStoreShell.tsx`
-- `app/lib/nav/routes.ts`
-- `.env.example`
-- `vitest.config.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/CURSOR_REPORT.md`
+- `lib/ai/capabilities/learning/tutorRunner.ts`
+- `lib/ai/capabilities/learning/prompts.ts`
+- `lib/ai/capabilities/learning/safety.ts`
+- `lib/ai/capabilities/learning/learningTutor.test.ts`
+- `lib/ai/services/aiService.ts`
+- `lib/ai/contracts/public.ts`
+- `lib/ai/contracts/learningTutor.ts`
+- `lib/ai/providers/adapters.ts`
+- `docs/ai/workstreams/AI_PLATFORM.md`
 
 ## Migrations created
 
-- `20260871_ai_core_platform_foundation_v1.sql` — `ai_sessions`, `ai_runs`, `ai_run_events`, `ai_usage_records`, `ai_evaluations`, `ai_memory_records` with FORCE RLS, owner select, admin select via `is_platform_admin` when present, no authenticated writes.
-- **Remote apply: NOT performed** (requires explicit approval).
+None. Reuses existing owner-scoped Learning RPCs + Shared AI Core `20260871` (still local-only / not remote-applied).
 
 ## Security review
 
-- All execution server-side through gateway.
-- Provider keys server-only (`OPENAI_API_KEY`, never `NEXT_PUBLIC_*`).
-- Client cannot set system prompts, arbitrary tools, or elevate roles.
-- Mutating tools denied in V1.
-- Trace redaction for secrets / confidential fields.
-- Admin diagnostics gated by `assertPlatformAdminDb`.
-- Product draft suggestions never auto-save; cannot alter price/inventory/publish.
+- Unauthenticated → rejected.
+- Unauthorized course access → `permission_denied`.
+- Non-owner attempt → `permission_denied`.
+- Unreleased results (`visibility !== available`) → fail-closed.
+- Missing incorrect released grade / missing answer / missing stem → fail-closed.
+- Grade/answer payloads with `answer_key` (and related forbidden keys) rejected.
+- Output must set `revealsAnswerKey: false`; key-like structured fields blocked.
+- No progress/grade mutation; no answer-key tables; no UI wiring.
 
 ## Tests
 
-- `lib/ai/aiPlatformFoundation.test.ts` — **31 passed**
-- Existing AI tutor + seller catalog + nav smoke — **passed**
-- `npx tsc --noEmit` — **pass**
-- `npm run build` — **pass**
+```
+npx vitest run lib/ai/capabilities/learning/wrongAnswerContract.test.ts \
+  lib/ai/capabilities/learning/learningTutor.test.ts \
+  lib/ai/architectureBoundary.test.ts
+```
+
+Result: **35 passed** (16 contract/capability + 14 tutor + 5 architecture).
 
 ## TypeScript
 
-pass
+`npx tsc --noEmit` → **PASS**
 
 ## Build
 
-pass (`BUILD_OK`), includes `/admin/ai` and seller product edit consumer.
+Not run (no app UI/entry-point change; backend AI + docs only).
 
 ## git diff --check
 
-pass on task files
+**PASS** (scoped to `lib/ai` + `docs/ai/workstreams/AI_PLATFORM.md`)
 
-## Open issues / limitations
+## git status --short
 
-- Live provider requires `OPENAI_API_KEY` + `UMTUBA_AI_MODE=live`
-- Stub mode only when explicitly allowed / test
-- DB persistence tables not yet wired as primary sink (in-process buffers + migration ready)
-- Learning AI Tutor remains a separate stub RPC conversation UX — future work should consume this gateway
-- No streaming, no autonomous agents, no customer AI billing
+Scoped AI changes only (unrelated Learning/Nexus dirty tree left untouched):
+
+```
+ M docs/ai/workstreams/AI_PLATFORM.md
+ M lib/ai/capabilities/learning/learningTutor.test.ts
+ M lib/ai/capabilities/learning/prompts.ts
+ M lib/ai/capabilities/learning/safety.ts
+ M lib/ai/capabilities/learning/tutorRunner.ts
+ M lib/ai/contracts/learningTutor.ts
+ M lib/ai/contracts/public.ts
+ M lib/ai/providers/adapters.ts
+ M lib/ai/services/aiService.ts
+?? lib/ai/capabilities/learning/wrongAnswerContract.test.ts
+?? lib/ai/capabilities/learning/wrongAnswerContract.ts
+```
+
+## Open issues
+
+- Awaiting review approval before commit/push.
+- Laptop still owns any future UI wiring to `attemptId` + `questionId`.
+- Unrelated local dirty Learning/Nexus/shell files remain unstaged on purpose.

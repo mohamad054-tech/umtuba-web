@@ -46,6 +46,33 @@ export function assertLearningTutorSafety(input: {
       );
     }
   }
+  if (
+    input.capabilityId === "learning.tutor.explain_wrong_answer" &&
+    input.structured
+  ) {
+    if (input.structured.labeledAiGenerated !== true) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "Wrong-answer explanation must be labeled AI-generated."
+      );
+    }
+    if (input.structured.revealsAnswerKey !== false) {
+      throw new AiPlatformError(
+        "safety_block",
+        "Wrong-answer explanation must not reveal answer keys."
+      );
+    }
+    if (
+      "answerKey" in input.structured ||
+      "correctAnswer" in input.structured ||
+      "answer_key" in input.structured
+    ) {
+      throw new AiPlatformError(
+        "safety_block",
+        "Wrong-answer explanation attempted key leakage fields."
+      );
+    }
+  }
 }
 
 export function validateLearningTutorStructured(

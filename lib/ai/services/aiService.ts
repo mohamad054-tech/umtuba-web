@@ -96,10 +96,48 @@ export async function runCapability(
   }
 
   if (request.capabilityId === "learning.tutor.explain_wrong_answer") {
-    return asFailure(
-      "invalid_input",
-      "explain_wrong_answer is deferred until a learner-safe wrong-answer contract exists."
-    );
+    const attemptId = request.input.attemptId?.trim() ?? "";
+    const questionId = request.input.questionId?.trim() ?? "";
+    if (!attemptId || !questionId) {
+      return asFailure(
+        "invalid_input",
+        "attemptId and questionId are required."
+      );
+    }
+    const result = await runLearningTutorCapability({
+      supabase: deps.supabase,
+      userId: deps.userId,
+      lessonId: request.input.lessonId ?? request.context.lessonId ?? "",
+      capabilityId: "learning.tutor.explain_wrong_answer",
+      attemptId,
+      questionId,
+      question: request.input.question ?? request.input.text,
+      locale: request.context.locale,
+      forceStub: deps.forceStub,
+    });
+    if (!result.ok) {
+      return asFailure(result.code, result.message);
+    }
+    return {
+      ok: true,
+      data: {
+        runId: result.data.runId,
+        capabilityId: request.capabilityId,
+        result: {
+          ...result.data.result,
+          groundingStatus: result.data.groundingStatus,
+          sourceReferences: result.data.sourceReferences,
+          labeledAiGenerated: true,
+          officialCourseContent: false,
+          revealsAnswerKey: false,
+          mutatesProgress: false,
+          mutatesGrades: false,
+          promptVersion: result.data.promptVersion,
+          modelId: result.data.modelId,
+        },
+        retryable: false,
+      },
+    };
   }
 
   if (

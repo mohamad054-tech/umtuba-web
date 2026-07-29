@@ -104,11 +104,12 @@ describe("Learning tutor safety", () => {
 });
 
 describe("Learning tutor prompts registered", () => {
-  it("includes four V1 prompt versions", () => {
+  it("includes five V1 prompt versions", () => {
     expect(LEARNING_TUTOR_PROMPTS.map((p) => p.promptId).sort()).toEqual(
       [
         "learning.tutor.answer_question",
         "learning.tutor.explain_lesson",
+        "learning.tutor.explain_wrong_answer",
         "learning.tutor.generate_practice",
         "learning.tutor.summarize_lesson",
       ].sort()
@@ -303,7 +304,7 @@ describe("Learning tutor authorization + capabilities (stub)", () => {
     });
   });
 
-  it("defers explain_wrong_answer", async () => {
+  it("requires attemptId + questionId for explain_wrong_answer", async () => {
     const result = await aiService.runCapability(
       {
         capabilityId: "learning.tutor.explain_wrong_answer",
@@ -314,7 +315,7 @@ describe("Learning tutor authorization + capabilities (stub)", () => {
     );
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.error.message).toMatch(/deferred|wrong-answer/i);
+    expect(result.error.message).toMatch(/attemptId and questionId/i);
   });
 });
 

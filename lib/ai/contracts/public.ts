@@ -36,6 +36,10 @@ export type AiServiceRunRequest = {
     productId?: string;
     lessonId?: string;
     question?: string;
+    /** Owner-scoped assessment attempt for wrong-answer explanation. */
+    attemptId?: string;
+    /** Question within that attempt to explain. */
+    questionId?: string;
   };
   context: AiServiceContextRefs;
   /** Optional allowlisted preference only — never an arbitrary model. */
