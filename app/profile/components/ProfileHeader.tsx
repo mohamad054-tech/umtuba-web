@@ -14,6 +14,7 @@ import {
   shouldShowHeroWebsite,
   toExternalHref,
 } from "../lib/profileHeroSocialLinks";
+import { formatHeroJoinedLine } from "../lib/profileJoinedLabel";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import type { ProfileView } from "../types";
 
@@ -47,6 +48,7 @@ export default function ProfileHeader({
     !isCollapsed && shouldShowHeroWebsite(profile.about.website);
   const showSocial =
     !isCollapsed && shouldShowHeroSocialLinks(profile.about.links);
+  const joinedLine = formatHeroJoinedLine(profile.about.joinedLabel);
 
   return (
     <div className="space-y-5">
@@ -205,10 +207,8 @@ export default function ProfileHeader({
             </ul>
           ) : null}
 
-          {profile.about.joinedLabel ? (
-            <p className="text-xs text-white/40">
-              Joined {profile.about.joinedLabel}
-            </p>
+          {joinedLine ? (
+            <p className="text-xs text-white/40">{joinedLine}</p>
           ) : null}
         </div>
       </div>

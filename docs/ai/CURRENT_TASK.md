@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Space IA Rename V1
+Creator Hero Joined Label V1
 
 ## Status
 
@@ -12,27 +12,26 @@ Creator Space IA Rename V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-hero-social-links-v1` @ `549018d`
-4. Do **not** start Home Unlock; do **not** rename `/profile` route
+3. Base: `origin/office/profile-creator-space-ia-rename-v1` @ `4436fad`
+4. Do **not** start Home Unlock
 
 ## Branch
 
-`office/profile-creator-space-ia-rename-v1`
+`office/profile-hero-joined-label-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (Social Links tip) | `549018dcadbf9ceea319428da48a6dba117de162` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-creator-space-ia-rename-v1` |
+| Base (IA Rename tip) | `4436fad2b07554aa528057d9ad4abe77647e4963` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-joined-label-v1` |
 
 ## Done (feature — locked contract)
 
-- Central `CREATOR_SPACE_COPY` for user-facing Profile → Creator Space rename
-- Tabs / Actions / Linked-article prompt / Not-found / mock banner / videos copy
-- Route remains `/profile/[username]`
-- Prior identity stack preserved (Hero → Strip → Achievements → Stats)
-- No Learning / Home / Store / migrations
+- `formatHeroJoinedLine` / `formatAboutJoinedBody` prevent “Joined Joined …”
+- Hero + About wired through helpers
+- No migrations; no cover/verification inventing
+- Identity stack preserved
 
 ## Gates (unchanged)
 
@@ -41,4 +40,4 @@ Creator Space IA Rename V1
 
 ## Out of scope
 
-Home Unlock, route rename GO, Learning AI Tutor, verified/cover inventing.
+Home Unlock, Learning AI Tutor, route rename, Store.
