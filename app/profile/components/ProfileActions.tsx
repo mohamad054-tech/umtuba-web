@@ -14,6 +14,7 @@ import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
 import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 
 type ProfileActionsProps = {
   profile: ProfileView;
@@ -72,8 +73,8 @@ export default function ProfileActions({
     shareStatus === "error" ? (
       <p className="basis-full text-xs text-red-300" role="alert">
         {sanitizeUserFacingMessage(
-          CREATOR_SPACE_COPY.shareError,
-          CREATOR_SPACE_COPY.shareError
+          PROFILE_ERROR_STATES_COPY.shareError,
+          PROFILE_ERROR_STATES_COPY.shareError
         )}
       </p>
     ) : (

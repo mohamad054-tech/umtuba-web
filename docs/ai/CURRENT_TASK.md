@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Space Loading States V1
+Creator Space Error States V1
 
 ## Status
 
@@ -12,25 +12,26 @@ Creator Space Loading States V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-empty-states-v1` @ `7b321ee`
+3. Base: `origin/office/profile-loading-states-v1` @ `34cd4fd`
 4. Do **not** start Home Unlock
 
 ## Branch
 
-`office/profile-loading-states-v1`
+`office/profile-error-states-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (Empty States tip) | `7b321eefaa354e993c4ef5cb746bf3aaefc299db` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-loading-states-v1` |
+| Base (Loading States tip) | `34cd4fd713e255dca31b21fde0d965c1361cb55f` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-error-states-v1` |
 
 ## Done (feature — locked contract)
 
-- §19 Hero / Stats / Tabs / panel skeleton shell (`ProfileLoadingSkeleton`)
-- Route `app/profile/[username]/loading.tsx` + Suspense fallback (replaces pill “Opening profile…”)
-- Pulse placeholders honor `prefers-reduced-motion`
+- §20 soft stats banner copy + shared `ProfilePanelError`
+- All / Articles / Videos / Photos / Live panel errors with Retry via `router.refresh()`
+- Share/copy failure inline alert under actions
+- Profile not-found kept; page never blanks on secondary fetch failure
 - No migrations; no Home / Learning / Store / Server Actions edits
 
 ## Gates (unchanged)
@@ -40,4 +41,4 @@ Creator Space Loading States V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor, Error States V1 (§20), Courses/Products domain GO.
+Home Unlock, Learning AI Tutor, Courses/Products domain GO, Accessibility-only pass beyond existing patterns.

@@ -1,19 +1,24 @@
-# CURSOR_REPORT — Creator Space Loading States V1
+# CURSOR_REPORT — Creator Space Error States V1
 
 ## Summary
 
-Implemented Creator Space Loading States V1 on
-`office/profile-loading-states-v1` from Empty States tip `7b321ee`.
-Hero → Stats → Tabs → panel skeletons (§19) replace the pill fallback.
+Implemented Creator Space Error States V1 on
+`office/profile-error-states-v1` from Loading States tip `34cd4fd`.
+Secondary fetch failures stay soft/in-panel with Retry (§20).
 Staged for manual commit.
 
 ## Exact files changed
 
-- `app/profile/lib/profileLoadingStates.ts` (new)
-- `app/profile/components/ProfileLoadingSkeleton.tsx` (new)
-- `app/profile/[username]/loading.tsx` (new)
-- `lib/content/profileLoadingStates.v1.test.ts` (new)
-- `app/profile/[username]/page.tsx`
+- `app/profile/lib/profileErrorStates.ts` (new)
+- `app/profile/components/ProfilePanelError.tsx` (new)
+- `lib/content/profileErrorStates.v1.test.ts` (new)
+- `app/profile/ProfileExperience.tsx`
+- `app/profile/components/ProfileAllPanel.tsx`
+- `app/profile/components/ProfileArticlesPanel.tsx`
+- `app/profile/components/ProfileVideoGrid.tsx`
+- `app/profile/components/ProfilePhotosPanel.tsx`
+- `app/profile/components/ProfileLivePanel.tsx`
+- `app/profile/components/ProfileActions.tsx`
 - `app/profile/components/index.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -26,15 +31,16 @@ None.
 
 ## Security review
 
-- Presentation-only skeletons; no auth / data / Server Actions changes
+- Retry uses `router.refresh()` only (no Server Actions / backend changes)
+- Share error copy remains user-safe via `sanitizeUserFacingMessage`
 - No Home / Learning / AI Tutor / Store edits
 
 ## Tests
 
-`npm test -- --run lib/content/profileLoadingStates.v1.test.ts lib/content/profileEmptyStates.v1.test.ts`
+`npm test -- --run lib/content/profileErrorStates.v1.test.ts lib/content/profileLoadingStates.v1.test.ts lib/content/profileEmptyStates.v1.test.ts`
 
-- Test Files: 2 passed
-- Tests: 4 passed
+- Test Files: 3 passed
+- Tests: 6 passed
 
 ## TypeScript
 
@@ -55,5 +61,4 @@ Staged feature + handoff files; waiting for manual commit.
 ## Open issues
 
 - Manual commit + push deferred
-- Error States V1 (§20) not started
 - Home Unlock remains locked

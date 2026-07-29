@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import FollowButton from "../components/social/FollowButton";
 import {
   formatFollowCountLabel,
@@ -30,6 +30,10 @@ import ProfileProductsPanel from "./components/ProfileProductsPanel";
 import ProfileLinkedArticlePrompt from "./components/ProfileLinkedArticlePrompt";
 import type { ProfileView } from "./types";
 import { CREATOR_SPACE_COPY } from "./lib/profileCreatorSpaceIa";
+import {
+  PROFILE_ERROR_SOFT_BANNER_CLASS,
+  PROFILE_ERROR_STATES_COPY,
+} from "./lib/profileErrorStates";
 import { isUuid } from "../lib/nav";
 import {
   countProfilePhotos,
@@ -57,7 +61,11 @@ export default function ProfileExperience({
   isOwner,
   viewerId = null,
 }: ProfileExperienceProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const retrySecondaryFetch = useCallback(() => {
+    router.refresh();
+  }, [router]);
   const showLiveTab =
     profile.liveSessions.length > 0 || Boolean(profile.isLive);
   const photoCount = useMemo(
@@ -253,11 +261,8 @@ export default function ProfileExperience({
         </div>
 
         {profile.statsLoadFailed ? (
-          <p
-            role="status"
-            className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
-          >
-            Some profile stats couldn&apos;t be loaded. Counts may be incomplete.
+          <p role="status" className={PROFILE_ERROR_SOFT_BANNER_CLASS}>
+            {PROFILE_ERROR_STATES_COPY.statsSoftBanner}
           </p>
         ) : null}
 
@@ -274,6 +279,7 @@ export default function ProfileExperience({
               cards={profile.contentCards ?? []}
               pinnedCards={profile.pinnedContentCards}
               loadFailed={Boolean(profile.registryLoadFailed)}
+              onRetry={retrySecondaryFetch}
               isOwner={isOwner}
             />
           ) : null}
@@ -281,6 +287,7 @@ export default function ProfileExperience({
             <ProfileArticlesPanel
               articles={profile.articles}
               loadFailed={Boolean(profile.articlesLoadFailed)}
+              onRetry={retrySecondaryFetch}
               isOwner={isOwner}
             />
           ) : null}
@@ -289,6 +296,7 @@ export default function ProfileExperience({
               videos={profile.videos}
               hasMore={Boolean(profile.hasMoreVideos)}
               loadFailed={Boolean(profile.videosLoadFailed)}
+              onRetry={retrySecondaryFetch}
               isOwner={isOwner}
             />
           ) : null}
@@ -308,6 +316,7 @@ export default function ProfileExperience({
             <ProfilePhotosPanel
               posts={profile.posts}
               loadFailed={Boolean(profile.postsLoadFailed)}
+              onRetry={retrySecondaryFetch}
               isOwner={isOwner}
             />
           ) : null}
@@ -316,6 +325,7 @@ export default function ProfileExperience({
               sessions={profile.liveSessions}
               isLive={profile.isLive}
               loadFailed={Boolean(profile.liveLoadFailed)}
+              onRetry={retrySecondaryFetch}
             />
           ) : null}
           {activeTab === "about" ? <ProfileAbout profile={profile} /> : null}

@@ -9,6 +9,7 @@ export { default as ProfileLinkedArticlePrompt } from "./ProfileLinkedArticlePro
 export { default as ProfileLiveBadge } from "./ProfileLiveBadge";
 export { default as ProfileLivePanel } from "./ProfileLivePanel";
 export { default as ProfileLoadingSkeleton } from "./ProfileLoadingSkeleton";
+export { default as ProfilePanelError } from "./ProfilePanelError";
 export { default as ProfileCoursesPanel } from "./ProfileCoursesPanel";
 export { default as ProfilePhotosLightbox } from "./ProfilePhotosLightbox";
 export { default as ProfilePhotosPanel } from "./ProfilePhotosPanel";

@@ -11,6 +11,8 @@ import {
   PROFILE_EMPTY_STATES_COPY,
   shouldShowOwnerEmptyCreateActions,
 } from "../lib/profileEmptyStates";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import ProfilePanelError from "./ProfilePanelError";
 import ProfilePinnedRail from "./ProfilePinnedRail";
 
 type ProfileAllPanelProps = {
@@ -24,7 +26,7 @@ type ProfileAllPanelProps = {
 
 /**
  * Profile All — pinned rail (optional) + unified chronological feed.
- * Empty States V1: visitor copy vs owner create CTAs (§18).
+ * Empty States V1 + Error States V1 (§18 / §20).
  */
 export default function ProfileAllPanel({
   cards,
@@ -35,23 +37,10 @@ export default function ProfileAllPanel({
 }: ProfileAllPanelProps) {
   if (loadFailed) {
     return (
-      <div className="space-y-3">
-        <div
-          role="status"
-          className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
-        >
-          Content couldn&apos;t be loaded right now.
-        </div>
-        {onRetry ? (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white/80 transition hover:bg-white/10"
-          >
-            Try again
-          </button>
-        ) : null}
-      </div>
+      <ProfilePanelError
+        message={PROFILE_ERROR_STATES_COPY.allPanel}
+        onRetry={onRetry}
+      />
     );
   }
 

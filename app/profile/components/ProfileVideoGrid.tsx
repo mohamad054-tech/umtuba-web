@@ -7,11 +7,14 @@ import {
   PROFILE_EMPTY_STATES_COPY,
   shouldShowOwnerEmptyCreateActions,
 } from "../lib/profileEmptyStates";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import ProfilePanelError from "./ProfilePanelError";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
   hasMore?: boolean;
   loadFailed?: boolean;
+  onRetry?: () => void;
   isOwner?: boolean;
 };
 
@@ -19,17 +22,14 @@ export default function ProfileVideoGrid({
   videos,
   hasMore = false,
   loadFailed = false,
+  onRetry,
   isOwner = false,
 }: ProfileVideoGridProps) {
   if (loadFailed) {
     return (
-      <ProductEmptyState
-        compact
-        eyebrow="Videos"
-        title="Couldn't load videos"
-        description="Something went wrong loading this creator's videos. Please try again."
-        primaryHref={APP_ROUTES.discover}
-        primaryLabel={PROFILE_EMPTY_STATES_COPY.openDiscoverCta}
+      <ProfilePanelError
+        message={PROFILE_ERROR_STATES_COPY.videosPanel}
+        onRetry={onRetry}
       />
     );
   }

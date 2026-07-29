@@ -6,15 +6,15 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/profile-loading-states-v1`
-- **Task:** Creator Space Loading States V1 (CREATOR_SPACE §19)
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-loading-states-v1`
-- **Base tip:** `7b321eefaa354e993c4ef5cb746bf3aaefc299db`
+- **Branch:** `office/profile-error-states-v1`
+- **Task:** Creator Space Error States V1 (CREATOR_SPACE §20)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-profile-error-states-v1`
+- **Base tip:** `34cd4fd713e255dca31b21fde0d965c1361cb55f`
 - **See:** `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on Desktop feature chain
 
-Identity Strip · Achievements · Social Links · IA Rename · Joined Label · Empty States (`7b321ee`)
+Identity Strip · Achievements · Social Links · IA Rename · Joined Label · Empty States · Loading States (`34cd4fd`)
 
 ## Gates (unchanged)
 
