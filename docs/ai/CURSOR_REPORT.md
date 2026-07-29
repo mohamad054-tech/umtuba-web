@@ -1,23 +1,24 @@
-﻿# CURSOR_REPORT — AI Core Usage & Cost Tracking Foundation V1
+﻿# CURSOR_REPORT — AI Personalization & Recommendation Foundation V1
 
 ## Summary
 
-Implemented Usage & Cost Tracking Foundation V1 on `office/ai-core-provider-foundation-v1`. Shared AI Core now has an in-memory unified usage record, independent Usage Tracker and Cost Tracker, and post-execution recording from the gateway and aiService (deduped by request id). Extension hooks for billing/quotas/dashboards/analytics/tenant accounting are reserved as no-ops. No DB. No UI. No migration. No commit/push pending GO.
+Implemented Personalization & Recommendation Foundation V1 on `office/ai-core-provider-foundation-v1`. Shared AI Core now has domain-agnostic user/content profile stores, recommendation signal validation, candidate source interfaces, scoring/ranking contracts, a diversity layer foundation, and a Personalization Engine with reserved hooks for embeddings/vector/semantic/RL. No DB. No UI. No Video/Learning/Commerce product wiring. No migration. No commit/push pending GO.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/usage/trackingTypes.ts`
-- `lib/ai/usage/usageTracker.ts`
-- `lib/ai/usage/costTracker.ts`
-- `lib/ai/usage/trackingFoundation.ts`
-- `lib/ai/usage/trackingFoundation.test.ts`
+- `lib/ai/personalization/types.ts`
+- `lib/ai/personalization/userInterestProfile.ts`
+- `lib/ai/personalization/contentProfile.ts`
+- `lib/ai/personalization/signals.ts`
+- `lib/ai/personalization/candidateSources.ts`
+- `lib/ai/personalization/scoring.ts`
+- `lib/ai/personalization/diversity.ts`
+- `lib/ai/personalization/engine.ts`
+- `lib/ai/personalization/personalization.test.ts`
 
 ### Modified
-- `lib/ai/gateway/execute.ts`
-- `lib/ai/services/aiService.ts`
 - `lib/ai/index.ts`
-- `lib/ai/aiPlatformFoundation.test.ts`
 - `docs/ai/workstreams/AI_PLATFORM.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -27,11 +28,10 @@ None.
 
 ## Security review
 
-- Tracking is server-side only; raw records are not part of UI contracts.
-- Recording happens after execution only.
-- Duplicate request ids fail closed; aiService dedupes against gateway.
-- No secrets or API keys in usage payloads.
-- Extension hooks are noop and do not perform billing side effects.
+- Server-side only; no client exports of personalization internals beyond Shared AI Core index for Domain AI.
+- Signal/source validation is fail-closed.
+- No PII beyond opaque userId/contentId in in-memory stores.
+- No DB writes; no UI exposure.
 
 ## Tests
 
@@ -51,9 +51,9 @@ See verification report.
 
 ## git status --short
 
-Usage/cost tracking + docs only for this task.
+Personalization foundation + docs only for this task.
 
 ## Open issues
 
 - Awaiting GO before commit/push.
-- DB persistence / live billing intentionally out of scope.
+- Product candidate source implementations intentionally out of scope.

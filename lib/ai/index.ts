@@ -118,4 +118,47 @@ export type {
   AiUsagePublicAggregate,
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
+export {
+  AiPersonalizationEngine,
+  aiPersonalizationEngine,
+  resetPersonalizationFoundation,
+} from "./personalization/engine";
+export {
+  AiUserInterestProfileStore,
+  aiUserInterestProfiles,
+} from "./personalization/userInterestProfile";
+export {
+  AiContentProfileStore,
+  aiContentProfiles,
+} from "./personalization/contentProfile";
+export {
+  AiCandidateSourceRegistry,
+  collectCandidates,
+  validateCandidate,
+} from "./personalization/candidateSources";
+export { validateRecommendationSignal } from "./personalization/signals";
+export { rankCandidates, scoreCandidate } from "./personalization/scoring";
+export {
+  computeDiversityPenalties,
+  diversityContractSummary,
+} from "./personalization/diversity";
+export type {
+  AiProductSurface,
+  AiRecommendationSignalType,
+  AiCandidateSourceId,
+  AiUserInterestProfile,
+  AiContentProfile,
+  AiRecommendationSignal,
+  AiRecommendationCandidate,
+  AiRecommendationScore,
+  AiRankedRecommendation,
+  AiPersonalizationContext,
+  AiPersonalizationExtensionHooks,
+} from "./personalization/types";
+export {
+  AI_PRODUCT_SURFACES,
+  AI_RECOMMENDATION_SIGNAL_TYPES,
+  AI_CANDIDATE_SOURCE_IDS,
+  createNoopPersonalizationExtensionHooks,
+} from "./personalization/types";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";
