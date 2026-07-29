@@ -6,14 +6,14 @@
 
 ## Primary working branch
 
-`alpha-0.2` — Alpha Beta Productization V1 (post Integration Program V1)
+`alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8` — Integration Program V1 + Alpha Beta Productization V1 closed
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `integration/alpha-beta-productization-v1`
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-alpha-beta-productization-v1`
-- **Task:** Alpha Beta Productization Program V1
-- **See:** `docs/ai/CURSOR_REPORT.md` and `docs/ops/ALPHA_BETA_OPERATIONS_V1.md`
+- **Branch:** `office/profile-hero-completeness-v1`
+- **Task:** Creator Space Hero Completeness V1 (re-sync onto latest alpha prepared; manual commit pending)
+- **Feature tip:** `3b88b01036269b60410d41830fd24b2af85af091`
+- **See:** `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
 
@@ -30,7 +30,7 @@
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-Protected Learning worktree remains untouched by Beta Productization.
+Do not pop/apply Learning stash while finishing Profile Hero.
 
 ## Integration status
 
@@ -40,7 +40,8 @@ Protected Learning worktree remains untouched by Beta Productization.
 | Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
 | Shared AI Core / Hub / Assistant | On alpha; product surfaces gated OFF |
 | Alpha Stabilization Sweep | Wave 4 closed |
-| Alpha Beta Productization | This program |
+| Alpha Beta Productization | Closed on alpha |
+| Profile Hero Completeness V1 | Re-sync prepared on feature branch |
 
 ## Source of truth
 
