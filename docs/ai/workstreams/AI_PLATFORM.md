@@ -3,57 +3,54 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** UMTUBA AI Hub & AI Operations Architecture V1
+**Active work:** Video Personalization & Recommendation Integration V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `0dc551f` — knowledge and memory foundation |
-| Remote | Synced; **architecture docs only — no commit/push until GO** |
+| Base HEAD | `4ef07be` — hub and operations architecture |
+| Remote | Synced; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Official AI Hub module map (Assistant → My AI)
-2. Official AI Operations Console module map (Providers → Experiments)
-3. Core ↔ Hub ↔ Ops ↔ Consumers relationship
-4. Canonical AI request lifecycle
-5. Ownership, boundaries, dependency rules, naming, extension strategy
-6. Architecture doc: `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`
+1. Video signal contract + fail-closed validation (server-owned identity)
+2. Video content profile + candidate adapters
+3. Ranking boundary over Personalization Engine (passthrough when disabled)
+4. Feature flag `UMTUBA_AI_VIDEO_PERSONALIZATION` (default OFF)
+5. Tests + docs
 
 **NOT done / do not touch by mistake:**
-- No UI / App Router / providers / foundation code changes
-- No Learning/Commerce/Creator/Nexus UI
-- No migration
-- No TypeScript API/behavior changes
+- No UI / Home / Navigation / feed visual changes
+- No production feed order change (loader untouched)
+- No Learning/Commerce integration
+- No DB migration / remote apply
 
 ---
 
-**Ownership:** Desktop owns Shared AI Core + AI architecture.
-**Laptop owns:** AI Hub presentation / App Shell / shared UI (when built).
+**Ownership:** Desktop owns Shared AI Core + video AI integration adapters.
+**Laptop owns:** video UI / App Shell presentation.
 
 ## Status
 
-Shared AI Core foundations (Provider, Registry/Routing, Usage/Cost, Personalization, Knowledge/Memory) closed as code.
-**UMTUBA AI Hub & AI Operations Architecture V1** documented (architecture-only).
+AI Hub & Ops Architecture V1 closed.
+Video Personalization Integration V1 implemented (server-side, **disabled by default**).
 
-## Canonical references
-
-| Doc | Role |
-| --- | --- |
-| [`UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`](./UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md) | Hub + Ops Console architecture |
-| This file | Workstream save point |
-
-## Layers (summary)
+## Video integration (summary)
 
 ```
-Product surfaces → AI Hub (product map)
-  → Domain AI / server actions
-  → Shared AI Core
-  → Providers
+Watch telemetry / future callers
+  → validateVideoRecommendationSignalInput (server userId)
+  → ingestVideoRecommendationSignal (flag-gated)
+  → AiPersonalizationEngine
 
-Shared AI Core ← AI Operations Console (ops map)
+Future ranked pools (not production feed):
+  → toVideoContentProfile / toVideoRecommendationCandidates
+  → rankVideoCandidatesForPersonalization
+  → passthrough original order unless flag ON + profiles present
 ```
+
+Flag: `UMTUBA_AI_VIDEO_PERSONALIZATION=1|true` (default off).
 
 ## Migration status
 
-No new migration. Existing `20260871` unchanged / not remote-applied by this phase.
+No new migration.

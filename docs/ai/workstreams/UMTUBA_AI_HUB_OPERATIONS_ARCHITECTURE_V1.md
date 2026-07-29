@@ -257,6 +257,7 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 | Experiments | Evaluations + routing/prompt variants | Ops → Experiments |
 | Hub UI modules | Laptop presentation over named actions | One module at a time |
 | Ops Console UI | Admin-only app over diagnostics contracts | After authz model defined |
+| Video personalization integration | `lib/ai/integrations/video/` (flag-gated) | Signals/candidates/ranking boundary; **does not** change chronological feed order unless explicitly enabled later |
 
 **Non-goals for immediate next steps unless separately tasked:** building Hub UI, Ops UI, new providers, DB persistence, real RAG.
 

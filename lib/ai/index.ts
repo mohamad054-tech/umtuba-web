@@ -200,4 +200,22 @@ export {
   AI_MEMORY_KINDS,
   createNoopKnowledgeMemoryExtensionHooks,
 } from "./knowledge/types";
+export {
+  isVideoPersonalizationIntegrationEnabled,
+  validateVideoRecommendationSignalInput,
+  toVideoContentProfile,
+  toVideoRecommendationCandidates,
+  rankVideoCandidatesForPersonalization,
+  ingestVideoRecommendationSignal,
+  VIDEO_RECOMMENDATION_SIGNAL_EVENTS,
+  VIDEO_PERSONALIZATION_SURFACES,
+} from "./integrations/video";
+export type {
+  VideoRecommendationSignalEvent,
+  VideoContentMetadata,
+  VideoCandidateInput,
+  VideoRankRequest,
+  VideoRankResult,
+  VideoSignalIngestResult,
+} from "./integrations/video";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";
