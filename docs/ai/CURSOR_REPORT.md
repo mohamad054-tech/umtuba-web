@@ -1,22 +1,28 @@
-# CURSOR_REPORT — Wave 4 Alpha Stabilization
+# CURSOR_REPORT — Alpha Beta Productization V1
 
 ## Summary
 
-Wave 4 removed known post-merge stability defects on the integrated alpha line without adding features.
+Productized integrated alpha into a safer, more honest Beta surface without new domains.
 
-- TypeScript: fixed `lib/content/profilePinnedContentStructure.v1.test.ts` import `../cards` → `./cards`
-- Store: CRLF-tolerant reads/strip so payment lock-order and sandbox prohibition tests pass on Windows
-- Lint: cleared the 3 AI-integration unused-symbol warnings plus unused import in a touched store test file
-- Full store suite now **435/435 PASS** (was 432/3 fail)
+- AI Tutor / AI Insights no longer claim live AI while product flags are OFF
+- Commerce checkout/cart copy and payment method UI no longer imply live PSP
+- Cart surfaces commerce confirm gate state
+- Games route honesty for Beta (circle layout unchanged)
+- Ops guide: `docs/ops/ALPHA_BETA_OPERATIONS_V1.md`
 
 ## Exact files changed
 
-- `lib/content/profilePinnedContentStructure.v1.test.ts`
-- `lib/store/paymentOutcomeSync.test.ts`
-- `lib/store/storeRemoteE2eSandboxScripts.test.ts`
-- `lib/ai/contracts/errors.ts`
-- `lib/ai/hub/foundation.ts`
-- `lib/ai/routing/policyEngine.test.ts`
+- `lib/ai/betaProductSurfaces.ts` (+ test)
+- `app/components/learning/LessonViewer.tsx`
+- `app/learning/lessons/[lessonId]/ai-tutor/page.tsx`
+- `app/creator/insights/page.tsx`
+- `app/post-journey/page.tsx`
+- `app/components/store/CheckoutClient.tsx`
+- `app/components/store/CartView.tsx`
+- `app/store/cart/page.tsx`
+- `app/games/page.tsx`
+- `app/admin/store/reservations/page.tsx`
+- `docs/ops/ALPHA_BETA_OPERATIONS_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -27,38 +33,21 @@ None.
 
 ## Security review
 
-- No migrations, no live PSP, no API keys, no Gemini
-- AI flags remain default OFF
-- Commerce kill-switch / sandbox fail-closed assertions retained (regexes not weakened)
-- SQL migration bodies unchanged
+- No Gemini/API keys
+- No live PSP
+- AI product surfaces fail-closed when Hub + Assistant Runtime OFF
+- Commerce confirm remains DB-gated; env kill documented as app-layer only
 
 ## Tests
 
-- Affected content/store tests PASS
-- `lib/store` 435 PASS
-- Commerce focused 67 PASS
-- `lib/revenue` 8 PASS
-- `lib/ai` 218 PASS
-- `app/lib/nav` 68 PASS
-- Learning smoke 56 PASS
+- lib/ai + lib/revenue + lib/store + app/lib/nav: PASS
+- Commerce focused: PASS
+- Learning smoke: PASS
+- tsc / build: PASS
+- lint: 74 problems (baseline; no new Wave regression count)
 
-## TypeScript
+## Open issues (non-blocking conditions)
 
-`npx tsc --noEmit` PASS
-
-## Build
-
-`npm run build` PASS
-
-## git diff --check
-
-PASS
-
-## git status --short
-
-See final wave close report.
-
-## Open issues
-
-- Pre-existing lint debt remains (~74 problems after delta cleanup); Wave 4 did not expand it
-- No new Wave 4 lint in modified areas
+- Env commerce kill is not DB-authoritative (ops doc)
+- service_role deferred→captured remains sandbox/ops capability (ops doc)
+- Games Home circle retained by Home lock; page is Beta-unavailable
