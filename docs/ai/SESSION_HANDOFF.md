@@ -1,33 +1,51 @@
 # Session Handoff — UMTUBA
 
-**Updated:** 2026-07-28
+**Updated:** 2026-07-29 (resume — Hero Completeness verification)
 
-## Active platform track
+## Active task (RESUME HERE)
 
-**UMTUBA AI Core Platform Foundation V1 — COMPLETE** on `office/ai-core-platform-foundation-v1`.
+**Creator Space Hero Completeness V1** — implementation + alpha sync complete; branch pushed; awaiting **FF into `alpha-0.2`** on explicit GO.
 
-Shared gateway at `lib/ai/gateway.ts`. Reference consumer: Product Draft Assistant on seller product editor. Diagnostics: `/admin/ai`. Migration `20260871` local only.
+### Exact stop point
 
-## Commerce program status
+- Branch: `office/profile-hero-completeness-v1`
+- HEAD (local + origin): `434ee28f0e094b33f83bf1a94e135a2f48596e5b`
+  - Merge: `3b88b01` + `6061a6a`
+  - Message: `merge(alpha): sync latest alpha into profile hero completeness v1`
+  - **TRAILER: ABSENT**
+- Feature commit (unchanged): `3b88b01036269b60410d41830fd24b2af85af091`
+- Sync with origin: **0 0**
+- `origin/alpha-0.2` is ancestor of feature: **YES** → FF into alpha should be possible
 
-Consolidation complete. Commerce End-to-End Beta Readiness V1 complete — Ready for Beta (90% implemented scope). Stop major Commerce features unless fixing implemented flows.
+### Product scope — complete
 
-### Completed Commerce implementation (branches not merged)
+- Bio expand toggle + specialty chips (max 3) in `ProfileHeader`
+- Helpers: `app/profile/lib/profileHeroCompleteness.ts`
+- Tests: `lib/content/profileHeroCompleteness.v1.test.ts`
 
-1–12 as previously recorded through Marketplace Eligibility + Beta Readiness.
+### Next GO only
 
-## AI platform contracts (V1)
+1. Checkout `alpha-0.2`, `pull --ff-only`, `merge --ff-only office/profile-hero-completeness-v1`, push `alpha-0.2`
+2. Do not start a new Creator Space phase until this lands on alpha
 
-- Gateway is the only execution entry
-- Providers: OpenAI-compatible (live) + stub (test/explicit allow)
-- Prompts versioned in `lib/ai/prompts`
-- Tools: read-only reference tools only; mutating denied
-- Suggestions require explicit human apply; no auto-save / no price-inventory-publish mutation
+### Local uncommitted docs (keep; do not discard)
 
-## Frozen architecture
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/SESSION_HANDOFF.md`
 
-Do not modify `docs/commerce/**`, Learning frozen baselines, Games/Ads/Revenue/Platform architecture docs unless an operational handoff status line is required.
+---
 
-## Next recommended AI task
+## Platform track (background)
 
-Wire Learning AI Tutor (and/or Nexus Assistant) to consume the shared AI Gateway with a versioned Learning prompt — still no broad autonomous agent.
+Wave 3.5 (Revenue + Commerce + Shared AI) already on `alpha-0.2` @ `6061a6a`. AI flags default OFF. Home locks unchanged.
+
+### Gates
+
+- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
+- `HOME_LOCK_ACTIVE = true`
+
+### Do not
+
+- Force push / rebase that rewrites `3b88b01`
+- Merge to alpha without explicit GO
+- Start Home Unlock / Product Unlock / new Creator Space phase before Hero Completeness closes on alpha

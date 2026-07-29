@@ -1,19 +1,13 @@
-# CURSOR_REPORT — Wave 3.5 Alpha Integration + Hero Completeness Sync
+# CURSOR_REPORT — Creator Space Hero Completeness V1
 
 ## Summary
 
-Landed **Revenue + Commerce + Shared AI** on the alpha line via `integration/w3-alpha-final`.
-**Creator Space Hero Completeness V1** (`3b88b01036269b60410d41830fd24b2af85af091`) synced onto latest `origin/alpha-0.2` @ `6061a6a` via merge (docs conflicts only).
+**Creator Space Hero Completeness V1** implementation is complete on
+`office/profile-hero-completeness-v1` @ `434ee28f0e094b33f83bf1a94e135a2f48596e5b`
+(synced with latest alpha via trailer-free merge; feature branch pushed `0 0`).
+No further product code remaining in this V1 scope. **FF into `alpha-0.2` still pending explicit GO.**
 
-Sequence:
-1. Base `origin/alpha-0.2` @ `769039d` (creator photos lightbox after `6fac440`)
-2. Merge `origin/integration/w3-ai` @ `d4bbddc`
-3. Alpha advanced to `4fdbf30` (creator all timeline contract) during the wave — merged that tip in (no force / no rebase) before updating `alpha-0.2`
-4. Feature `office/profile-hero-completeness-v1` @ `3b88b01` merged with `6061a6a`
-
-Docs conflicts resolved for Wave 3.5. Home/nav retained. Commerce seller routes retained. AI Hub flag-gated OFF. No World / Games / Ads. No live AI providers or API keys.
-
-## Creator Space Hero Completeness V1 — files
+## Exact files changed (feature commit `3b88b01`)
 
 - `app/profile/lib/profileHeroCompleteness.ts` (new)
 - `lib/content/profileHeroCompleteness.v1.test.ts` (new)
@@ -22,33 +16,47 @@ Docs conflicts resolved for Wave 3.5. Home/nav retained. Commerce seller routes 
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Prior waves
+## Exact files changed (this verification session — uncommitted docs only)
 
-- W0 Work Protection
-- W1 Revenue
-- W2 Commerce
-- W3 AI (`d4bbddc`)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/SESSION_HANDOFF.md`
+- `docs/ai/CURSOR_REPORT.md`
+
+## Migrations created
+
+None.
 
 ## Security review
 
-- AI flags default OFF
-- Commerce kill-switch retained
-- Revenue fail-closed retained
-- No primary-nav AI entry
-- Hero Completeness: Client UI over existing ProfileView fields only; no migrations; no invented profession/verified/cover fields.
+- Client UI over existing ProfileView fields only
+- No migrations; no invented profession/verified/cover fields
+- No Home / Arc / Commerce / Learning / flag changes
 
 ## Tests
 
-See Wave 3.5 final verification report in chat.
-Hero Completeness Vitest (Hero + Creator Space): **31/31 passed** (pre-sync).
+Hero + Creator Space focused Vitest (this session): **23/23 passed**
+- `profileHeroCompleteness.v1.test.ts` 5
+- `profileAllTimelineContract.v1.test.ts` 9
+- `profilePhotosLightbox.v1.test.ts` 6
+- `profileMotionA11y.v1.test.ts` 3
 
 ## TypeScript
 
-Re-check after timeline tip (may fix prior `../cards` import).
-Hero Completeness: `npm run build` TS passed; `npx tsc --noEmit` baseline only (`../cards`).
+- `npm run build` TS: **passed** (exit 0)
+- `npx tsc --noEmit`: baseline only
+  `lib/content/profilePinnedContentStructure.v1.test.ts(12,43): Cannot find module '../cards'`
+
+## Build
+
+**passed** (`npm run build` exit 0)
+
+## git diff --check
+
+**passed** (docs-only local changes)
 
 ## Open issues
 
-- Pre-existing 3 Commerce store test failures on tip lineage
-- Lint debt baseline
-- Feature synced with alpha; merge into `alpha-0.2` not yet done in this step
+- FF-merge into `alpha-0.2` + push alpha — **awaiting explicit GO**
+- Baseline `npx tsc --noEmit` may still report
+  `lib/content/profilePinnedContentStructure.v1.test.ts` → `Cannot find module '../cards'`
+  (pre-existing; out of Hero Completeness scope)
