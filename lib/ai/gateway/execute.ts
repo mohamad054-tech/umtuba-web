@@ -17,12 +17,7 @@ import {
   updateRunStatus,
 } from "../runs/lifecycle";
 import { resolvePrompt, validateStructuredAgainstPrompt } from "../prompts/registry";
-import {
-  buildProviderRegistry,
-  findModel,
-} from "../models/registry";
-import { resolveProviderAdapters } from "../providers/adapters";
-import { routeModel } from "../routing/router";
+import { createProviderFoundation } from "../providers/foundation";
 import {
   assertRateLimit,
   runPostExecutionPolicy,
@@ -183,15 +178,7 @@ export async function executeAiGateway(
       eligible: deps.capabilityEligible !== false,
     });
 
-    const providers = buildProviderRegistry({
-      openaiConfigured: Boolean(effectiveConfig.openaiApiKey),
-      stubEligible:
-        effectiveConfig.allowStub ||
-        effectiveConfig.mode === "stub" ||
-        Boolean(request._test?.forceStub),
-      openaiDefaultModel: effectiveConfig.openaiDefaultModel,
-      defaultTimeoutMs: effectiveConfig.defaultTimeoutMs,
-    });
+    const foundation = createProviderFoundation(effectiveConfig);
 
     const contextChars = estimateContextChars([
       prompt.systemInstructions,
@@ -202,7 +189,7 @@ export async function executeAiGateway(
       throw new AiPlatformError("context_too_large", "Context exceeds limit.");
     }
 
-    const route = routeModel(providers, {
+    const route = foundation.resolveRoute({
       capabilityId: String(request.capabilityId),
       requiredModality: "text",
       requiresStructuredOutput: request.outputMode === "structured_json",
@@ -331,15 +318,11 @@ export async function executeAiGateway(
     }
 
     updateRunStatus(runId, "executing");
-    const adapters = resolveProviderAdapters(effectiveConfig);
-    const adapter = adapters.get(route.providerId);
-    if (!adapter) {
-      throw new AiPlatformError(
-        "provider_unavailable",
-        "Provider adapter unavailable."
-      );
-    }
-    const model = findModel(providers, route.providerId, route.modelId);
+    const adapter = foundation.requireAdapter(route.providerId);
+    const model = foundation.requireEnabledModel(
+      route.providerId,
+      route.modelId
+    );
     await appendTraceEvent({
       runId,
       traceId,
@@ -357,7 +340,7 @@ export async function executeAiGateway(
         { role: "user", content: request.userInput },
       ],
       structured: request.outputMode === "structured_json",
-      timeoutMs: model?.defaultTimeoutMs ?? effectiveConfig.defaultTimeoutMs,
+      timeoutMs: model.defaultTimeoutMs ?? effectiveConfig.defaultTimeoutMs,
       userId: authenticatedUserId,
       runId,
       capabilityId: String(request.capabilityId),
