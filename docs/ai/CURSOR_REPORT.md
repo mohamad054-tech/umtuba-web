@@ -1,26 +1,35 @@
-# CURSOR_REPORT — Creator Space Hero Completeness V1
+# CURSOR_REPORT — Creator Space Hero Completeness V1 (post-merge verification)
 
 ## Summary
 
-**Creator Space Hero Completeness V1** implementation is complete on
-`office/profile-hero-completeness-v1` @ `434ee28f0e094b33f83bf1a94e135a2f48596e5b`
-(synced with latest alpha via trailer-free merge; feature branch pushed `0 0`).
-No further product code remaining in this V1 scope. **FF into `alpha-0.2` still pending explicit GO.**
+Post-merge verification on `office/profile-hero-completeness-v1` @
+`be601116bb596405f08019b09bcc151120d86a0b` — **PASS**.
+Synced with latest alpha, pushed (`0 0`), no regressions in Creator Space suite.
+**Safe to FF-land into `alpha-0.2` on explicit GO.**
 
-## Exact files changed (feature commit `3b88b01`)
+## Exact refs
 
-- `app/profile/lib/profileHeroCompleteness.ts` (new)
-- `lib/content/profileHeroCompleteness.v1.test.ts` (new)
-- `app/profile/components/ProfileHeader.tsx`
-- `app/profile/data/mockProfiles.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+| Ref | Hash |
+|-----|------|
+| Feature HEAD | `be601116bb596405f08019b09bcc151120d86a0b` |
+| Merge parents | `1e08aca` + `71dfec2` (`origin/alpha-0.2`) |
+| Feature commit | `3b88b01036269b60410d41830fd24b2af85af091` (present on branch) |
+| Sync with origin | `0 0` |
+| `origin/alpha-0.2` ancestor | **YES** (FF possible) |
+| Trailers | **ABSENT** |
 
-## Exact files changed (this verification session — uncommitted docs only)
+## Commits ahead of alpha (4)
 
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/CURSOR_REPORT.md`
+1. `3b88b01` feat(web): add creator hero completeness v1
+2. `434ee28` merge(alpha): sync latest alpha into profile hero completeness v1
+3. `1e08aca` docs(ai): close profile hero completeness v1
+4. `be60111` merge(alpha): sync latest alpha into profile hero completeness v1
+
+## Feature files verified present
+
+- `app/profile/lib/profileHeroCompleteness.ts`
+- `lib/content/profileHeroCompleteness.v1.test.ts`
+- `app/profile/components/ProfileHeader.tsx` (bio clamp/more + specialty chips)
 
 ## Migrations created
 
@@ -29,34 +38,35 @@ None.
 ## Security review
 
 - Client UI over existing ProfileView fields only
-- No migrations; no invented profession/verified/cover fields
-- No Home / Arc / Commerce / Learning / flag changes
+- No invented profession/verified/cover fields in Header
+- Stats/Actions remain outside Header
+- No Home / Arc / production flag changes in this feature
 
 ## Tests
 
-Hero + Creator Space focused Vitest (this session): **23/23 passed**
-- `profileHeroCompleteness.v1.test.ts` 5
-- `profileAllTimelineContract.v1.test.ts` 9
-- `profilePhotosLightbox.v1.test.ts` 6
-- `profileMotionA11y.v1.test.ts` 3
+Creator Space profile v1 suite: **44/44 passed** (exit 0)
+- `profileHeroCompleteness.v1.test.ts` — 5
+- `profileAllTimelineContract.v1.test.ts` — 9
+- `profilePhotosLightbox.v1.test.ts` — 6
+- `profileMotionA11y.v1.test.ts` — 3
+- `profileCreatorHubReadiness.v1.test.ts` — 7
+- `profileAboutLiveStructure.v1.test.ts` — 6
+- `profileCoursesProductsStructure.v1.test.ts` — 3
+- `profilePinnedContentStructure.v1.test.ts` — 5
 
 ## TypeScript
 
-- `npm run build` TS: **passed** (exit 0)
-- `npx tsc --noEmit`: baseline only
-  `lib/content/profilePinnedContentStructure.v1.test.ts(12,43): Cannot find module '../cards'`
+`npx tsc --noEmit`: **passed** (exit 0) — prior `../cards` baseline resolved on this tip
 
 ## Build
 
-**passed** (`npm run build` exit 0)
+`npm run build`: **passed** (exit 0)
 
 ## git diff --check
 
-**passed** (docs-only local changes)
+**passed** (clean tree)
 
 ## Open issues
 
-- FF-merge into `alpha-0.2` + push alpha — **awaiting explicit GO**
-- Baseline `npx tsc --noEmit` may still report
-  `lib/content/profilePinnedContentStructure.v1.test.ts` → `Cannot find module '../cards'`
-  (pre-existing; out of Hero Completeness scope)
+- Land into `alpha-0.2` still requires explicit GO (FF-merge + push)
+- Merge commit message body still lists resolved conflict paths (not a trailer; non-blocking)
