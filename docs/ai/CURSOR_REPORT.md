@@ -1,15 +1,16 @@
-﻿# CURSOR_REPORT — Learning AI Tutor Backend Integration Foundation V1
+﻿# CURSOR_REPORT — Learning AI Tutor Server Actions Foundation V1
 
 ## Summary
 
-Implemented a Learning-only server integration boundary over `aiService.runCapability` on branch `office/learning-ai-tutor-backend-foundation-v1`. Future UI/server actions call action-discriminated requests (`explain_lesson`, etc.); the boundary validates inputs, maps to the five allowlisted capabilities, and executes only through `aiService`. No UI. No new migration. No commit/push pending GO.
+Implemented Learning AI Tutor Server Actions Foundation V1 on branch `office/learning-ai-tutor-backend-foundation-v1`. Five named server actions are the official future-UI entry points. They authenticate via `getServerUser`, execute only through `learningTutorIntegration` (never `aiService` directly), reject free-form capability/action strings, and strip provider/model/prompt internals from responses. No UI pages/components. No migration. No commit/push pending GO.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/contracts/learningTutorIntegration.ts`
-- `lib/ai/services/learningTutorIntegration.ts`
-- `lib/ai/services/learningTutorIntegration.test.ts`
+- `app/actions/learningTutor.ts`
+- `lib/ai/contracts/learningTutorServerActions.ts`
+- `lib/ai/services/learningTutorServerActions.ts`
+- `lib/ai/services/learningTutorServerActions.test.ts`
 
 ### Modified
 - `lib/ai/index.ts`
@@ -23,42 +24,34 @@ None.
 
 ## Security review
 
-- Unknown actions rejected before `aiService`.
-- Free-form capability / non-Learning capabilities rejected.
-- Forbidden fields rejected: provider/model/prompt/system instructions/version/safety/metadata/`forceStub`/etc.
-- Action-specific required inputs validated (UUIDs).
-- Auth still enforced via `aiService` + existing Learning access/unlock/wrong-answer contract chain.
-- Safe error messages for future UI (no stack traces).
-- Does not bypass tutorRunner / wrong-answer contract / prompts / providers.
+- Named exports only; no stringly-typed dispatcher.
+- Server actions do not import `aiService`, gateway, providers, or prompts.
+- Extra/forbidden input keys rejected before integration.
+- Auth required; `requiresAuth` surfaced on unauthenticated failures.
+- Success payloads strip `modelId`, `promptVersion`, provider fields, and do not expose capability ids.
+- Existing Learning access / unlock / wrong-answer contract chain unchanged (via integration).
 
 ## Tests
 
-```
-npx vitest run lib/ai/services/learningTutorIntegration.test.ts \
-  lib/ai/capabilities/learning/learningTutor.test.ts \
-  lib/ai/capabilities/learning/wrongAnswerContract.test.ts \
-  lib/ai/architectureBoundary.test.ts
-```
-
-Result: **50 passed**.
+Targeted vitest suite (server actions + integration + tutor + wrong-answer + architecture). See verification report in chat for pass counts.
 
 ## TypeScript
 
-`npx tsc --noEmit` → **PASS**
+`npx tsc --noEmit` — see verification report.
 
 ## Build
 
-Not run (no app UI/entry-point change).
+Not required (no UI entry pages).
 
 ## git diff --check
 
-**PASS** (scoped to AI + docs for this task)
+See verification report.
 
 ## git status --short
 
-AI/docs changes for this task only are staged-ready; Nexus/UI dirty tree remains unstaged and untouched.
+AI/docs + `app/actions/learningTutor.ts` only for this task; Nexus/UI dirty tree left untouched.
 
 ## Open issues
 
-- Awaiting review GO before commit/push.
-- Laptop owns future UI wiring to `learningTutorIntegration.run`.
+- Awaiting GO before commit/push.
+- Laptop owns future UI wiring to these named actions.

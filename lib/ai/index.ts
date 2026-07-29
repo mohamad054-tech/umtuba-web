@@ -39,6 +39,16 @@ export {
   LEARNING_TUTOR_INTEGRATION_CAPABILITIES,
   LEARNING_TUTOR_ACTION_TO_CAPABILITY,
 } from "./contracts/learningTutorIntegration";
+export type {
+  LearningTutorServerActionResult,
+  LearningTutorServerActionSuccess,
+  LearningTutorServerActionFailure,
+  LearningTutorExplainLessonActionInput,
+  LearningTutorSummarizeLessonActionInput,
+  LearningTutorAnswerQuestionActionInput,
+  LearningTutorGeneratePracticeActionInput,
+  LearningTutorExplainWrongAnswerActionInput,
+} from "./contracts/learningTutorServerActions";
 export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
 export { loadAiPlatformConfig, describeAiConfigStatus } from "./config";

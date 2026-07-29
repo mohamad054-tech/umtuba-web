@@ -108,6 +108,19 @@ describe("AI architecture boundary", () => {
     }
   });
 
+  it("Learning Tutor server actions stay on the integration boundary", () => {
+    const actionFile = join(process.cwd(), "app/actions/learningTutor.ts");
+    const src = readFileSync(actionFile, "utf8");
+    expect(src).toMatch(/["']use server["']/);
+    expect(src).toMatch(/learningTutorServerActions/);
+    const imports = src
+      .split(/\r?\n/)
+      .filter((l) => l.trim().startsWith("import "));
+    expect(imports.join("\n")).not.toMatch(
+      /aiService|executeAiGateway|runCapability|providers\/|prompts\/|gateway\//
+    );
+  });
+
   it("Learning UI pages do not import Shared AI internals", () => {
     const offenders: string[] = [];
     const roots = [
