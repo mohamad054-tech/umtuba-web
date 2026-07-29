@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Hero Social Links V1
+Creator Space IA Rename V1
 
 ## Status
 
@@ -12,28 +12,27 @@ Creator Hero Social Links V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-identity-achievements-v1` @ `8ca12b7`
-4. Do **not** start Home Unlock
+3. Base: `origin/office/profile-hero-social-links-v1` @ `549018d`
+4. Do **not** start Home Unlock; do **not** rename `/profile` route
 
 ## Branch
 
-`office/profile-hero-social-links-v1`
+`office/profile-creator-space-ia-rename-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (Achievements tip) | `8ca12b7c1d783ec079274fb61721f9c00c17c421` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-social-links-v1` |
+| Base (Social Links tip) | `549018dcadbf9ceea319428da48a6dba117de162` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-creator-space-ia-rename-v1` |
 
 ## Done (feature — locked contract)
 
-- Safe website href normalization in Hero (`https://` when missing; block unsafe schemes)
-- Optional social/external link row from `about.links` (max 4, hide empty)
-- Hides website/social row when Hero collapsed
-- About Links section remains canonical
-- No migrations; no verified/cover inventing
-- Dependency order preserved: Hero → Strip → Achievements → Stats
+- Central `CREATOR_SPACE_COPY` for user-facing Profile → Creator Space rename
+- Tabs / Actions / Linked-article prompt / Not-found / mock banner / videos copy
+- Route remains `/profile/[username]`
+- Prior identity stack preserved (Hero → Strip → Achievements → Stats)
+- No Learning / Home / Store / migrations
 
 ## Gates (unchanged)
 
@@ -42,4 +41,4 @@ Creator Hero Social Links V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor, verified badge, cover image, Store/Commerce.
+Home Unlock, route rename GO, Learning AI Tutor, verified/cover inventing.

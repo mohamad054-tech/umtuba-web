@@ -4,6 +4,7 @@ import {
   PROFILE_TAB_LABELS,
   type ProfileTabId,
 } from "../lib/profileTabs";
+import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 
 export type { ProfileTabId };
 
@@ -44,7 +45,7 @@ export default function ProfileTabs({
   return (
     <div
       role="tablist"
-      aria-label="Profile sections"
+      aria-label={CREATOR_SPACE_COPY.tablistAriaLabel}
       aria-orientation="horizontal"
       className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur"
       onKeyDown={(event) => {

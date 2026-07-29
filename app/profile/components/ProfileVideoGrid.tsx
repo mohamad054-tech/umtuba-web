@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ProfileVideo } from "../types";
 import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
+import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
@@ -33,7 +34,7 @@ export default function ProfileVideoGrid({
         compact
         eyebrow="Videos"
         title="No published videos yet"
-        description="Upload a clip to show it on this profile and on Discover."
+        description={CREATOR_SPACE_COPY.videosEmptyDescription}
         primaryHref={APP_ROUTES.createVideo}
         primaryLabel="Upload a video"
         secondaryHref={APP_ROUTES.discover}
@@ -102,7 +103,7 @@ export default function ProfileVideoGrid({
       </ul>
       {hasMore ? (
         <p className="text-center text-xs text-white/40">
-          Showing the latest videos on this profile. Open any clip to watch it.
+          {CREATOR_SPACE_COPY.videosShowingLatest}
         </p>
       ) : null}
     </div>

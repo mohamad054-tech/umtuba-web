@@ -1,18 +1,21 @@
-# CURSOR_REPORT — Creator Hero Social Links V1
+# CURSOR_REPORT — Creator Space IA Rename V1
 
 ## Summary
 
-Implemented Creator Hero Social Links V1 on
-`office/profile-hero-social-links-v1` from Achievements tip `8ca12b7`.
-Safe website href normalization + optional `about.links` row in Hero.
-No migrations. Staged for manual commit (no trailers).
+Implemented Creator Space IA Rename V1 on
+`office/profile-creator-space-ia-rename-v1` from Social Links tip `549018d`.
+User-facing Profile copy → Creator Space; route stays `/profile/[username]`.
+Staged for manual commit (no trailers).
 
 ## Exact files changed
 
-- `app/profile/lib/profileHeroSocialLinks.ts` (new)
-- `app/profile/components/ProfileHeader.tsx`
-- `lib/content/profileHeroSocialLinks.v1.test.ts` (new)
-- `app/profile/data/mockProfiles.ts`
+- `app/profile/lib/profileCreatorSpaceIa.ts` (new)
+- `lib/content/profileCreatorSpaceIa.v1.test.ts` (new)
+- `app/profile/components/ProfileTabs.tsx`
+- `app/profile/components/ProfileActions.tsx`
+- `app/profile/components/ProfileLinkedArticlePrompt.tsx`
+- `app/profile/components/ProfileVideoGrid.tsx`
+- `app/profile/ProfileExperience.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -24,14 +27,14 @@ None.
 
 ## Security review
 
-- External links use `rel="noopener noreferrer"`
-- `toExternalHref` blocks non-http(s) schemes (e.g. `javascript:`)
-- No verified/cover/DB inventing
+- Copy-only UX rename; no auth/data model changes
+- Route path unchanged
 - No Home / Learning / AI Tutor / Store edits
 
 ## Tests
 
-Focused suite: **17/17 passed** (exit 0)
+Focused suite: **19/19 passed** (exit 0)
+- `profileCreatorSpaceIa.v1.test.ts` — 2
 - `profileHeroSocialLinks.v1.test.ts` — 3
 - `profileIdentityStrip.v1.test.ts` — 5
 - `profileIdentityAchievements.v1.test.ts` — 4
@@ -53,4 +56,4 @@ Focused suite: **17/17 passed** (exit 0)
 
 - Manual commit + push deferred
 - Home Unlock remains locked
-- Alpha still missing Strip/Achievements until explicit land
+- Alpha still missing Desktop Creator Space chain until explicit land

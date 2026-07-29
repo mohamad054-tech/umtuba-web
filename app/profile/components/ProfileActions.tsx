@@ -13,6 +13,7 @@ import {
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
+import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 
 type ProfileActionsProps = {
   profile: ProfileView;
@@ -61,7 +62,7 @@ export default function ProfileActions({
       type="button"
       onClick={() => void shareProfile()}
       className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
-      aria-label="Copy profile link"
+      aria-label={CREATOR_SPACE_COPY.shareAriaLabel}
     >
       {shareStatus === "copied" ? "Copied" : "Share"}
     </button>
@@ -71,13 +72,13 @@ export default function ProfileActions({
     shareStatus === "error" ? (
       <p className="basis-full text-xs text-red-300" role="alert">
         {sanitizeUserFacingMessage(
-          "Couldn't copy the profile link.",
-          "Couldn't copy the profile link."
+          CREATOR_SPACE_COPY.shareError,
+          CREATOR_SPACE_COPY.shareError
         )}
       </p>
     ) : (
       <span className="sr-only" aria-live="polite">
-        {shareStatus === "copied" ? "Profile link copied" : ""}
+        {shareStatus === "copied" ? CREATOR_SPACE_COPY.shareCopiedSr : ""}
       </span>
     );
 
@@ -88,7 +89,7 @@ export default function ProfileActions({
           href={APP_ROUTES.settings}
           className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
         >
-          Edit profile
+          {CREATOR_SPACE_COPY.editOwnerCta}
         </Link>
         {shareButton}
         {shareFeedback}

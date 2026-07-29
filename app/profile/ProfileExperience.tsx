@@ -29,6 +29,7 @@ import ProfilePhotosPanel from "./components/ProfilePhotosPanel";
 import ProfileProductsPanel from "./components/ProfileProductsPanel";
 import ProfileLinkedArticlePrompt from "./components/ProfileLinkedArticlePrompt";
 import type { ProfileView } from "./types";
+import { CREATOR_SPACE_COPY } from "./lib/profileCreatorSpaceIa";
 import { isUuid } from "../lib/nav";
 import {
   countProfilePhotos,
@@ -142,7 +143,7 @@ export default function ProfileExperience({
             role="status"
             className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
-            Development mock profile — not a production Supabase record.
+            {CREATOR_SPACE_COPY.mockBanner}
           </p>
         ) : null}
 
@@ -327,14 +328,13 @@ export function ProfileNotFound({ username }: { username: string }) {
     <ProfileShell>
       <div className="flex flex-1 flex-col items-center justify-center rounded-[28px] border border-white/10 bg-[#080816]/70 px-6 py-16 text-center backdrop-blur-xl">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
-          Profile
+          {CREATOR_SPACE_COPY.notFoundEyebrow}
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-tight">
           @{username} not found
         </h2>
         <p className="mt-3 max-w-md text-sm text-white/55">
-          This profile is not in UMTUBA yet. Try Home or Live, or create an
-          account to claim your username.
+          {CREATOR_SPACE_COPY.notFoundBody}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           <Link
