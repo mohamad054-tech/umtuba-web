@@ -2,7 +2,7 @@
 
 ## Task title
 
-Creator Space Empty States V1
+Creator Space Loading States V1
 
 ## Status
 
@@ -12,25 +12,26 @@ Creator Space Empty States V1
 
 1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 2. Push when approved; confirm `0 0`
-3. Base: `origin/office/profile-hero-joined-label-v1` @ `f9bbf2a`
+3. Base: `origin/office/profile-empty-states-v1` @ `7b321ee`
 4. Do **not** start Home Unlock
 
 ## Branch
 
-`office/profile-empty-states-v1`
+`office/profile-loading-states-v1`
 
 ## Exact refs
 
 | Ref | Hash |
 |-----|------|
-| Base (Joined Label tip) | `f9bbf2a13f418170db0448495a713460514574b3` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-empty-states-v1` |
+| Base (Empty States tip) | `7b321eefaa354e993c4ef5cb746bf3aaefc299db` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-profile-loading-states-v1` |
 
 ## Done (feature — locked contract)
 
-- All empty: visitor copy vs owner Write article / Upload video CTAs (§18)
-- Videos empty: visitor Discover CTA; owner Upload (+ Discover secondary)
-- No migrations; no Home / Learning / Store edits
+- §19 Hero / Stats / Tabs / panel skeleton shell (`ProfileLoadingSkeleton`)
+- Route `app/profile/[username]/loading.tsx` + Suspense fallback (replaces pill “Opening profile…”)
+- Pulse placeholders honor `prefers-reduced-motion`
+- No migrations; no Home / Learning / Store / Server Actions edits
 
 ## Gates (unchanged)
 
@@ -39,4 +40,4 @@ Creator Space Empty States V1
 
 ## Out of scope
 
-Home Unlock, Learning AI Tutor, cover/verification inventing, Courses/Products domain GO.
+Home Unlock, Learning AI Tutor, Error States V1 (§20), Courses/Products domain GO.

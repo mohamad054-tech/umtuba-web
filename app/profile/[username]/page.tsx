@@ -19,6 +19,7 @@ import { getServerUser, createClient } from "../../../lib/supabase/server";
 import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
 import { normalizeUsername } from "../../../lib/supabase/validation";
 import ProfileExperience, { ProfileNotFound } from "../ProfileExperience";
+import ProfileLoadingSkeleton from "../components/ProfileLoadingSkeleton";
 import { getProfileByUsername } from "../data/mockProfiles";
 import { mockProfileToView, profileRowToView } from "../lib/mapProfile";
 import type { ProfileView } from "../types";
@@ -61,20 +62,6 @@ export async function generateMetadata({
   } catch {
     return buildPublicProfileMetadata(null);
   }
-}
-
-function ProfileFallback() {
-  return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] text-white">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-10%] top-[-10%] h-96 w-96 rounded-full bg-blue-600/25 blur-3xl" />
-        <div className="absolute right-[-10%] top-[20%] h-96 w-96 rounded-full bg-indigo-600/20 blur-3xl" />
-      </div>
-      <p className="relative rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 backdrop-blur">
-        Opening profile...
-      </p>
-    </main>
-  );
 }
 
 async function resolveProfile(username: string): Promise<{
@@ -214,7 +201,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const { profile, isOwner, viewerId } = await resolveProfile(username);
 
   return (
-    <Suspense fallback={<ProfileFallback />}>
+    <Suspense fallback={<ProfileLoadingSkeleton />}>
       {profile ? (
         <ProfileExperience
           profile={profile}

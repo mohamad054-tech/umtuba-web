@@ -1,20 +1,20 @@
-# CURSOR_REPORT — Creator Space Empty States V1
+# CURSOR_REPORT — Creator Space Loading States V1
 
 ## Summary
 
-Implemented Creator Space Empty States V1 on
-`office/profile-empty-states-v1` from Joined Label tip `f9bbf2a`.
-All/Videos empty states are visitor/owner aware (§18). Staged for manual commit.
+Implemented Creator Space Loading States V1 on
+`office/profile-loading-states-v1` from Empty States tip `7b321ee`.
+Hero → Stats → Tabs → panel skeletons (§19) replace the pill fallback.
+Staged for manual commit.
 
 ## Exact files changed
 
-- `app/profile/lib/profileEmptyStates.ts` (new)
-- `lib/content/profileEmptyStates.v1.test.ts` (new)
-- `app/profile/components/ProfileAllPanel.tsx`
-- `app/profile/components/ProfileVideoGrid.tsx`
-- `app/profile/ProfileExperience.tsx`
-- `lib/content/profileAllTimelineContract.v1.test.ts`
-- `lib/content/profileCreatorSpaceIa.v1.test.ts`
+- `app/profile/lib/profileLoadingStates.ts` (new)
+- `app/profile/components/ProfileLoadingSkeleton.tsx` (new)
+- `app/profile/[username]/loading.tsx` (new)
+- `lib/content/profileLoadingStates.v1.test.ts` (new)
+- `app/profile/[username]/page.tsx`
+- `app/profile/components/index.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -26,15 +26,15 @@ None.
 
 ## Security review
 
-- Owner-only create CTAs; visitors do not get Upload primary CTA on Videos empty
+- Presentation-only skeletons; no auth / data / Server Actions changes
 - No Home / Learning / AI Tutor / Store edits
 
 ## Tests
 
-`npm test -- --run lib/content/profileEmptyStates.v1.test.ts lib/content/profileJoinedLabel.v1.test.ts lib/content/profileCreatorSpaceIa.v1.test.ts lib/content/profileAllTimelineContract.v1.test.ts`
+`npm test -- --run lib/content/profileLoadingStates.v1.test.ts lib/content/profileEmptyStates.v1.test.ts`
 
-- Test Files: 4 passed
-- Tests: 15 passed
+- Test Files: 2 passed
+- Tests: 4 passed
 
 ## TypeScript
 
@@ -55,4 +55,5 @@ Staged feature + handoff files; waiting for manual commit.
 ## Open issues
 
 - Manual commit + push deferred
+- Error States V1 (§20) not started
 - Home Unlock remains locked
