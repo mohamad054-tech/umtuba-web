@@ -26,7 +26,9 @@ function read(rel: string) {
 
 /** Strip SQL comments + string literals so prohibition text is not a false positive. */
 function executableSql(sql: string) {
+  // Normalize CRLF first so `--` line comments are stripped on Windows checkouts.
   return sql
+    .replace(/\r\n/g, "\n")
     .replace(/\/\*[\s\S]*?\*\//g, " ")
     .split("\n")
     .map((line) => line.replace(/--.*$/, ""))

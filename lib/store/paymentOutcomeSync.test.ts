@@ -6,7 +6,6 @@ import {
   STORE_PAYMENT_FINGERPRINT_ALG_V1,
   STORE_PAYMENT_POLICY_CODES,
   STORE_PAYMENT_REFUND_POSTING_TEMPLATE,
-  STORE_PAYMENT_SYNC_RPC,
 } from "./paymentOutcomeSync";
 
 const ROOT = process.cwd();
@@ -17,7 +16,8 @@ const UEOS_MIGRATION =
   "supabase/migrations/20260822_ueos_foundation_v1.sql";
 
 function read(rel: string) {
-  return readFileSync(join(ROOT, rel), "utf8");
+  // Normalize CRLF so lock-order indexOf assertions are OS-agnostic.
+  return readFileSync(join(ROOT, rel), "utf8").replace(/\r\n/g, "\n");
 }
 
 describe("Payment Outcome Sync V1 — files", () => {
