@@ -9,7 +9,7 @@ import {
   resolvePinnedContentCards,
   shouldShowPinnedRail,
 } from "../../app/profile/lib/profilePinnedContentStructure";
-import type { ContentCardViewModel } from "../cards";
+import type { ContentCardViewModel } from "./cards";
 
 const ROOT = process.cwd();
 
