@@ -6,6 +6,7 @@ import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { getCartSummary } from "../../../lib/store/cart";
+import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
 
 export const metadata = {
   title: "Cart | UMTUBA Store",
@@ -22,6 +23,7 @@ export default async function StoreCartPage() {
 
   const supabase = await createClient();
   const result = await getCartSummary(supabase, user.id);
+  const commerceGate = await loadCommerceConfirmGate(supabase);
 
   return (
     <StoreShell title="Cart" subtitle="Store" wide>
@@ -41,6 +43,14 @@ export default async function StoreCartPage() {
             View my orders
           </Link>
         </p>
+        {!commerceGate.purchasesAvailable ? (
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+          >
+            {commerceGate.message}
+          </p>
+        ) : null}
       </header>
 
       {!result.ok ? (
@@ -48,7 +58,11 @@ export default async function StoreCartPage() {
           <StoreErrorState message={result.message} />
         </div>
       ) : (
-        <CartView initialSummary={result.data} />
+        <CartView
+          initialSummary={result.data}
+          purchasesAvailable={commerceGate.purchasesAvailable}
+          purchasesUnavailableMessage={commerceGate.message}
+        />
       )}
     </StoreShell>
   );

@@ -90,7 +90,9 @@ export default async function AdminStoreReservationsPage({
         </form>
         <p className="mt-3 text-[11px] text-white/40">
           Emergency env kill switch ({`STORE_COMMERCE_CONFIRM_KILL_SWITCH`}) is
-          server-only, kill-only, and never force-enables when DB is off.
+          server-only, kill-only, and never force-enables when DB is off. It
+          blocks Next.js confirm actions only — for a true emergency also set
+          DB gate to disabled here. Env alone does not stop direct RPC callers.
           Expiry cleanup RPC exists for manual/ops use — no automated schedule
           in this phase.
         </p>
