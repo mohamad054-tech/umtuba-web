@@ -70,5 +70,17 @@ export {
   listAvailableModels,
   findModel,
 } from "./models/registry";
+export {
+  AiProviderFoundation,
+  createProviderFoundation,
+} from "./providers/foundation";
+export type {
+  AiKnownProviderId,
+  AiModelFoundationDescriptor,
+  AiProviderFoundationDescriptor,
+  AiProviderFoundationSnapshot,
+  AiProviderRegistration,
+} from "./providers/foundationTypes";
+export { AI_KNOWN_PROVIDER_IDS } from "./providers/foundationTypes";
 export { routeModel } from "./routing/router";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";
