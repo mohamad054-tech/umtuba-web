@@ -1,43 +1,34 @@
 # Session Handoff — UMTUBA
 
-**Updated:** 2026-07-30 (Desktop — Creator Identity Achievements V1)
+**Updated:** 2026-07-30 (Desktop — Creator Hero Social Links V1)
 
 ## Active task (RESUME HERE)
 
-**Creator Identity Achievements V1** — Identity Strip dependency merged
-(`95e33bf`); Achievements restored; staged for **manual feature commit**
-(no trailers); do not push until approved.
+**Creator Hero Social Links V1** — implemented from Achievements tip; staged for
+manual commit (no trailers); do not push until approved.
 
 ### Exact stop point
 
-- Branch: `office/profile-identity-achievements-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-profile-identity-achievements-v1`
-- Dependency merge: `95e33bf` ← Strip `f574eba`
-- Product order: Hero → Identity Strip → Identity Achievements → Stats/Actions
-- Medals: max 3 + `+N` → About; uses `about.achievements`
-- No migrations
+- Branch: `office/profile-hero-social-links-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-profile-hero-social-links-v1`
+- Base: `origin/office/profile-identity-achievements-v1` @ `8ca12b7`
+- Product: safe website + optional social/external link row in Hero
+- Order preserved: Hero → Strip → Achievements → Stats
 
 ### Why this task (dependency-correct)
 
-After Hero Completeness + Identity Strip, CREATOR_SPACE §4 still requires
-optional achievement medals under identity. Strip is now on this branch via
-dependency merge. Home Unlock remains locked. Learning AI Tutor stays on Laptop.
+§4 Identity (roles/teasers/medals) is closed on the Achievements tip. Next
+approved Creator Space shell item from §3 is website/social links in Hero,
+without inventing cover/verification or unlocking Home.
 
 ### Next steps
 
-1. Manual commit: `feat(web): add creator identity achievements v1`
-2. Push only when requested; then confirm `0 0`
+1. Manual commit: `feat(web): add creator hero social links v1`
+2. Push only when requested
 3. Alpha land only on explicit GO
-
----
-
-## Platform track (background)
-
-Alpha-0.2 includes Integration Waves 0–4, Alpha Beta Productization V1, and
-Profile Hero Completeness V1. AI flags default OFF. Home locks unchanged.
 
 ## Isolation reminders (Desktop)
 
-- Do not touch Learning AI Tutor branches / AI Core / laptop backend scope
-- Do not pop/apply/drop unrelated git stashes
-- Use dedicated worktrees; do not implement in the dirty primary `umtuba-web` tree
+- Do not touch Learning AI Tutor / AI Core / laptop backend scope
+- Do not inspect/apply/pop/drop unrelated stashes
+- Do not implement in the dirty primary `umtuba-web` tree

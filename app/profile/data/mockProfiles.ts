@@ -116,7 +116,10 @@ export const MOCK_PROFILES: MockProfile[] = [
         "City light series",
         "Launch cohort",
       ],
-      links: [{ label: "Portfolio", href: "https://umtuba.world/lina" }],
+      links: [
+        { label: "Portfolio", href: "https://umtuba.world/lina" },
+        { label: "YouTube", href: "https://youtube.com/@lina.creates" },
+      ],
     },
     contentCards: [
       mockContentCard({

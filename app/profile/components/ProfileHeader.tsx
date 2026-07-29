@@ -7,6 +7,13 @@ import {
   bioNeedsExpandToggle,
   normalizeSpecialtyChips,
 } from "../lib/profileHeroCompleteness";
+import {
+  formatWebsiteLabel,
+  normalizeHeroSocialLinks,
+  shouldShowHeroSocialLinks,
+  shouldShowHeroWebsite,
+  toExternalHref,
+} from "../lib/profileHeroSocialLinks";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import type { ProfileView } from "../types";
 
@@ -20,7 +27,7 @@ type ProfileHeaderProps = {
 
 /**
  * Professional creator header (UMTUBA identity — not FB/TikTok clone).
- * Hero Completeness V1: bio clamp/more + conditional specialty chips only.
+ * Hero Completeness + Social Links V1: bio/specialties + safe website/social row.
  * Gradient background only; Stats/Actions stay outside this component.
  */
 export default function ProfileHeader({
@@ -33,6 +40,13 @@ export default function ProfileHeader({
   const bioText = profile.bio.trim();
   const canExpandBio = bioNeedsExpandToggle(bioText);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const websiteHref = toExternalHref(profile.about.website);
+  const websiteLabel = formatWebsiteLabel(profile.about.website);
+  const socialLinks = normalizeHeroSocialLinks(profile.about.links);
+  const showWebsite =
+    !isCollapsed && shouldShowHeroWebsite(profile.about.website);
+  const showSocial =
+    !isCollapsed && shouldShowHeroSocialLinks(profile.about.links);
 
   return (
     <div className="space-y-5">
@@ -160,15 +174,35 @@ export default function ProfileHeader({
             </p>
           ) : null}
 
-          {profile.about.website ? (
+          {showWebsite && websiteHref && websiteLabel ? (
             <a
-              href={profile.about.website}
+              href={websiteHref}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block text-sm font-bold text-sky-300 underline-offset-2 hover:underline"
             >
-              {profile.about.website.replace(/^https?:\/\//, "")}
+              {websiteLabel}
             </a>
+          ) : null}
+
+          {showSocial ? (
+            <ul
+              className="flex flex-wrap items-center gap-2"
+              aria-label="Creator links"
+            >
+              {socialLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="watch-focus-ring inline-flex rounded-full border border-white/12 bg-white/[0.03] px-3 py-1 text-[11px] font-semibold text-white/70 underline-offset-2 hover:text-sky-200 hover:underline"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           ) : null}
 
           {profile.about.joinedLabel ? (
