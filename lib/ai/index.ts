@@ -161,4 +161,43 @@ export {
   AI_CANDIDATE_SOURCE_IDS,
   createNoopPersonalizationExtensionHooks,
 } from "./personalization/types";
+export {
+  AiKnowledgeMemoryFoundation,
+  aiKnowledgeMemoryFoundation,
+  resetKnowledgeMemoryFoundation,
+} from "./knowledge/foundation";
+export {
+  AiKnowledgeRegistry,
+  aiKnowledgeRegistry,
+  validateKnowledgeRecord,
+  assertKnowledgeSourceKind,
+} from "./knowledge/knowledgeRegistry";
+export {
+  AiMemoryRegistry,
+  aiMemoryRegistry,
+  validateMemoryEntry,
+  assertMemoryKind,
+} from "./knowledge/memoryRegistry";
+export {
+  retrieveKnowledgeAndMemory,
+  validateRetrievalQuery,
+} from "./knowledge/retrieval";
+export { assembleContext } from "./knowledge/contextAssembly";
+export type {
+  AiKnowledgeSourceKind,
+  AiMemoryKind,
+  AiKnowledgeRecord,
+  AiMemoryEntry,
+  AiRetrievalQuery,
+  AiRetrievalHit,
+  AiRetrievalResult,
+  AiAssembledContext,
+  AiAssembledContextBlock,
+  AiKnowledgeMemoryExtensionHooks,
+} from "./knowledge/types";
+export {
+  AI_KNOWLEDGE_SOURCE_KINDS,
+  AI_MEMORY_KINDS,
+  createNoopKnowledgeMemoryExtensionHooks,
+} from "./knowledge/types";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";

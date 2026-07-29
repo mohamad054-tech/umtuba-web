@@ -1,21 +1,19 @@
-﻿# CURSOR_REPORT — AI Personalization & Recommendation Foundation V1
+﻿# CURSOR_REPORT — AI Knowledge & Memory Foundation V1
 
 ## Summary
 
-Implemented Personalization & Recommendation Foundation V1 on `office/ai-core-provider-foundation-v1`. Shared AI Core now has domain-agnostic user/content profile stores, recommendation signal validation, candidate source interfaces, scoring/ranking contracts, a diversity layer foundation, and a Personalization Engine with reserved hooks for embeddings/vector/semantic/RL. No DB. No UI. No Video/Learning/Commerce product wiring. No migration. No commit/push pending GO.
+Implemented Knowledge & Memory Foundation V1 on `office/ai-core-provider-foundation-v1`. Shared AI Core now has domain-agnostic knowledge/memory registries, retrieval contracts (lexical fallback only), context assembly, and reserved hooks for vector DB/embeddings/semantic retrieval/RAG/memory ranking. Existing `lib/ai/memory/policy.ts` is untouched. No DB. No UI. No Learning/Commerce wiring. No migration. No commit/push pending GO.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/personalization/types.ts`
-- `lib/ai/personalization/userInterestProfile.ts`
-- `lib/ai/personalization/contentProfile.ts`
-- `lib/ai/personalization/signals.ts`
-- `lib/ai/personalization/candidateSources.ts`
-- `lib/ai/personalization/scoring.ts`
-- `lib/ai/personalization/diversity.ts`
-- `lib/ai/personalization/engine.ts`
-- `lib/ai/personalization/personalization.test.ts`
+- `lib/ai/knowledge/types.ts`
+- `lib/ai/knowledge/knowledgeRegistry.ts`
+- `lib/ai/knowledge/memoryRegistry.ts`
+- `lib/ai/knowledge/retrieval.ts`
+- `lib/ai/knowledge/contextAssembly.ts`
+- `lib/ai/knowledge/foundation.ts`
+- `lib/ai/knowledge/knowledgeMemory.test.ts`
 
 ### Modified
 - `lib/ai/index.ts`
@@ -28,10 +26,10 @@ None.
 
 ## Security review
 
-- Server-side only; no client exports of personalization internals beyond Shared AI Core index for Domain AI.
-- Signal/source validation is fail-closed.
-- No PII beyond opaque userId/contentId in in-memory stores.
-- No DB writes; no UI exposure.
+- Server-side in-memory only; no client UI exposure.
+- Unknown source/memory kinds fail closed.
+- Retrieval never claims vector/RAG usage in V1.
+- No secrets; knowledge bodies are opaque catalog text.
 
 ## Tests
 
@@ -51,9 +49,10 @@ See verification report.
 
 ## git status --short
 
-Personalization foundation + docs only for this task.
+Knowledge/memory foundation + docs only for this task.
 
 ## Open issues
 
 - Awaiting GO before commit/push.
-- Product candidate source implementations intentionally out of scope.
+- Ensure all new `lib/ai/knowledge/*` files are staged on commit (do not omit untracked files).
+- Real RAG/vector search intentionally out of scope.
