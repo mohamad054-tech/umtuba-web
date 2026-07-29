@@ -2,25 +2,25 @@
 
 ## Task title
 
-UMTUBA Integration Program V1 — Wave 2 Commerce Integration
+UMTUBA Integration Program V1 — Wave 3 AI Integration
 
 ## Status
 
-`in-progress` — merge + verify on `integration/w2-commerce`
+`in-progress` — merge + verify on `integration/w3-ai`
 
 ## Branch
 
-`integration/w2-commerce` from `origin/integration/w1-revenue` @ `a1bde1f`
+`integration/w3-ai` from `origin/integration/w2-commerce` @ `0824cb4`
 
 ## Base
 
-- Integration line: `origin/integration/w1-revenue` @ `a1bde1f` (Revenue Foundation on alpha tip)
-- Incoming: `origin/office/commerce-end-to-end-beta-readiness-v1` @ `6cbe0f6`
+- Integration line: `origin/integration/w2-commerce` @ `0824cb4` (Revenue + Commerce)
+- Incoming: `origin/office/ai-core-provider-foundation-v1` @ `01f23d9`
 
 ## Scope
 
-Merge Commerce End-to-End Beta Readiness into the integration line. Preserve Revenue Foundation, Home lock, and Platform Navigation contracts. Resolve docs conflicts for the integration wave. No AI / World / Games. No new product features beyond the merged Commerce tip.
+Merge Shared AI Core / Assistant / Hub / Video personalization wiring into the integration line. Preserve Revenue, Commerce, Home lock, and Platform Navigation contracts. AI product surfaces remain flag-gated OFF by default. No World / Games / Ads. No live providers or API keys.
 
 ## Out of scope
 
-AI Core, World, Games, Shipping Network, live PSP, Warehouse Runtime, Payouts, Settlement UI, Analytics Warehouse, alpha-0.2 merge.
+World, Games, Ads, Gemini/OpenAI live calls, production env changes, alpha-0.2 merge, new AI features beyond tip `01f23d9`.

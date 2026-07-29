@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `integration/w2-commerce` (from `origin/integration/w1-revenue` @ `a1bde1f`)
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w2-commerce`
-- **Task:** Integration Program V1 — Wave 2 Commerce
-- **See:** `docs/ai/CURSOR_REPORT.md` · `docs/architecture/revenue/` · Commerce E2E tip `6cbe0f6`
+- **Branch:** `integration/w3-ai` (from `origin/integration/w2-commerce` @ `0824cb4`)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-integration-w3-ai`
+- **Task:** Integration Program V1 — Wave 3 AI
+- **See:** `docs/ai/CURSOR_REPORT.md` · AI tip `01f23d9` · Revenue + Commerce retained
 
 ## Closed on alpha-0.2 (do not reopen)
 
@@ -90,8 +90,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
 | Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 | Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
+| UMTUBA AI Core Platform Foundation V1 | **COMPLETE** (branch `office/ai-core-platform-foundation-v1`) |
 
-Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Commerce beta-ready on dedicated branches (not merged). Shared AI Core Platform Foundation landed on `office/ai-core-platform-foundation-v1` (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

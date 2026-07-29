@@ -1,30 +1,33 @@
-# CURSOR_REPORT — Integration Wave 2 Commerce
+# CURSOR_REPORT — Integration Wave 3 AI
 
 ## Summary
 
-Merged **Commerce End-to-End Beta Readiness** (`6cbe0f6`) into `integration/w2-commerce` on top of Wave 1 Revenue (`a1bde1f`). Conflicts limited to `docs/ai/CURRENT_TASK.md` and `docs/ai/CURSOR_REPORT.md` (resolved for the integration wave). `app/lib/nav/routes.ts` auto-merged: kept Platform Navigation / Home contracts from the integration line and added Commerce seller route constants. Revenue `lib/revenue/**` unchanged by conflict resolution. No AI / World / Games work.
+Merged **Shared AI Platform** (`office/ai-core-provider-foundation-v1` @ `01f23d9`) into `integration/w3-ai` on top of Wave 2 (`0824cb4` = Revenue + Commerce). Conflicts limited to `docs/ai/CURRENT_TASK.md` and `docs/ai/CURSOR_REPORT.md` (resolved for the integration wave). `vitest.config.ts` auto-merged: kept `lib/revenue/**` and platform includes; added `lib/ai/**/*.test.ts`. `app/lib/nav/routes.ts` unchanged vs W2 (Home/nav contracts + Commerce seller routes retained; AI Hub not added to primary nav). AI Hub / Assistant Runtime / Video personalization remain fail-closed behind flags (default OFF). No World / Games / Ads. No live provider wiring.
+
+## Prior waves (retained)
+
+- W0 Work Protection — Learning worktree protected
+- W1 Revenue — `lib/revenue/**` on integration line
+- W2 Commerce — Commerce E2E beta tip merged
 
 ## Exact files changed
 
-See merge commit vs `a1bde1f` (Commerce tip + conflict-resolution docs). Conflict resolution touched only:
+See merge commit vs `0824cb4` (AI tip delta + conflict-resolution docs). Conflict resolution touched:
 
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/PROJECT_STATE.md` (active wave pointer)
 
 ## Migrations created
 
-Commerce tip includes marketplace migrations already on that branch (not newly authored in this wave):
-
-- `supabase/migrations/20260869_store_marketplace_supplier_seller_foundation_v1.sql`
-- `supabase/migrations/20260870_store_marketplace_listing_checkout_alignment_v1.sql`
-
-Remote apply is out of scope for this wave.
+AI tip may include local-only migration(s) already authored on that branch (e.g. AI memory foundation). Remote apply is out of scope for this wave.
 
 ## Security review
 
-- Commerce confirm kill-switch (`STORE_COMMERCE_CONFIRM_KILL_SWITCH`) remains fail-closed.
-- Revenue fail-closed contracts retained.
-- No auth widening intended by this merge.
+- `UMTUBA_AI_HUB` / `UMTUBA_AI_ASSISTANT_RUNTIME` / `UMTUBA_AI_VIDEO_PERSONALIZATION` default OFF
+- No product Home / primary Navigation coupling for AI Hub
+- Commerce kill-switch and Revenue fail-closed contracts retained
+- No API keys or live provider activation in this wave
 
 ## Tests
 
@@ -32,18 +35,14 @@ Remote apply is out of scope for this wave.
 
 ## TypeScript
 
-(Filled after verification in this wave.)
+Pre-existing baseline: `lib/content/profilePinnedContentStructure.v1.test.ts` → `../cards`
 
 ## Build
 
-(Filled after verification in this wave.)
-
-## git diff --check
-
-(Filled after verification in this wave.)
+(Filled after verification.)
 
 ## Open issues
 
-- Pre-existing alpha `tsc` issue: `lib/content/profilePinnedContentStructure.v1.test.ts` → `../cards`
-- Pre-existing alpha lint debt
-- Commerce residual: wishlist/id-PDP listing provenance; deferred PSP/shipping network
+- Pre-existing alpha `tsc` `../cards`
+- Pre-existing lint debt
+- Pre-existing 3 store test failures on Commerce tip (not AI)
