@@ -49,6 +49,7 @@ import {
   PROFILE_PAGE_ENTER_CLASS,
   PROFILE_TAB_PANEL_FADE_CLASS,
 } from "./lib/profileMotionA11y";
+import { PROFILE_A11Y_TOUCH_TARGET_CLASS } from "./lib/profileAccessibility";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -194,13 +195,13 @@ export default function ProfileExperience({
             <div className="flex flex-wrap gap-2">
               <Link
                 href={APP_ROUTES.createArticle}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
+                className={`watch-focus-ring ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold`}
               >
                 Write article
               </Link>
               <Link
                 href={APP_ROUTES.createVideo}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
+                className={`watch-focus-ring ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold`}
               >
                 Upload video
               </Link>
@@ -243,6 +244,7 @@ export default function ProfileExperience({
                   initialFollowing={isFollowing}
                   returnPath={`${APP_ROUTES.profile}/${profile.username}`}
                   onFollowChange={handleFollowChange}
+                  className={PROFILE_A11Y_TOUCH_TARGET_CLASS}
                 />
               ) : null}
             </div>

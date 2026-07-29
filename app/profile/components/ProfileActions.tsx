@@ -13,6 +13,11 @@ import {
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
+import {
+  PROFILE_A11Y_FOCUS_RING_CLASS,
+  PROFILE_A11Y_MESSAGE_BUTTON_CLASS,
+  PROFILE_A11Y_TOUCH_TARGET_CLASS,
+} from "../lib/profileAccessibility";
 import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 
@@ -62,7 +67,7 @@ export default function ProfileActions({
     <button
       type="button"
       onClick={() => void shareProfile()}
-      className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
+      className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white`}
       aria-label={CREATOR_SPACE_COPY.shareAriaLabel}
     >
       {shareStatus === "copied" ? "Copied" : "Share"}
@@ -88,7 +93,7 @@ export default function ProfileActions({
       <div className="flex flex-wrap gap-2">
         <Link
           href={APP_ROUTES.settings}
-          className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
+          className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90`}
         >
           {CREATOR_SPACE_COPY.editOwnerCta}
         </Link>
@@ -107,6 +112,7 @@ export default function ProfileActions({
           initialFollowing={isFollowing}
           returnPath={`${APP_ROUTES.profile}/${profile.username}`}
           onFollowChange={onFollowChange}
+          className={PROFILE_A11Y_TOUCH_TARGET_CLASS}
         />
       ) : null}
 
@@ -114,12 +120,13 @@ export default function ProfileActions({
         peerUserId={profile.id}
         peerName={profile.displayName}
         hidden={!canMessage}
+        className={PROFILE_A11Y_MESSAGE_BUTTON_CLASS}
       />
 
       {liveHref ? (
         <Link
           href={liveHref}
-          className="watch-focus-ring rounded-full border border-red-400/35 bg-red-500/15 px-5 py-2.5 text-sm font-bold text-red-100 transition hover:bg-red-500/25"
+          className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full border border-red-400/35 bg-red-500/15 px-5 py-2.5 text-sm font-bold text-red-100 transition hover:bg-red-500/25`}
         >
           Watch live
         </Link>

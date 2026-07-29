@@ -4,6 +4,10 @@ import {
   PROFILE_TAB_LABELS,
   type ProfileTabId,
 } from "../lib/profileTabs";
+import {
+  PROFILE_A11Y_FOCUS_RING_CLASS,
+  PROFILE_A11Y_TOUCH_TARGET_CLASS,
+} from "../lib/profileAccessibility";
 import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 
 export type { ProfileTabId };
@@ -109,7 +113,7 @@ export default function ProfileTabs({
             aria-controls={panelId}
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(tabId)}
-            className={`watch-focus-ring min-h-[44px] shrink-0 rounded-xl px-3 py-2.5 text-sm font-bold transition motion-reduce:transition-none sm:flex-1 sm:px-4 ${
+            className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} shrink-0 rounded-xl px-3 py-2.5 text-sm font-bold transition motion-reduce:transition-none sm:flex-1 sm:px-4 ${
               active
                 ? "bg-blue-500/20 text-blue-100"
                 : "text-white/50 hover:bg-white/5 hover:text-white/80"

@@ -1,25 +1,20 @@
-# CURSOR_REPORT — Creator Space Error States V1
+# CURSOR_REPORT — Creator Space Accessibility Contract V1
 
 ## Summary
 
-Implemented Creator Space Error States V1 on
-`office/profile-error-states-v1` from Loading States tip `34cd4fd`.
-Secondary fetch failures stay soft/in-panel with Retry (§20).
+Implemented Creator Space Accessibility Contract V1 on
+`office/profile-accessibility-v1` from Error States tip `529783b`.
+§21 touch targets + focus-ring contract for Creator Space actions/tabs.
 Staged for manual commit.
 
 ## Exact files changed
 
-- `app/profile/lib/profileErrorStates.ts` (new)
-- `app/profile/components/ProfilePanelError.tsx` (new)
-- `lib/content/profileErrorStates.v1.test.ts` (new)
-- `app/profile/ProfileExperience.tsx`
-- `app/profile/components/ProfileAllPanel.tsx`
-- `app/profile/components/ProfileArticlesPanel.tsx`
-- `app/profile/components/ProfileVideoGrid.tsx`
-- `app/profile/components/ProfilePhotosPanel.tsx`
-- `app/profile/components/ProfileLivePanel.tsx`
+- `app/profile/lib/profileAccessibility.ts` (new)
+- `lib/content/profileAccessibility.v1.test.ts` (new)
 - `app/profile/components/ProfileActions.tsx`
-- `app/profile/components/index.ts`
+- `app/profile/components/ProfileTabs.tsx`
+- `app/profile/ProfileExperience.tsx`
+- `lib/content/profileMotionA11y.v1.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -31,16 +26,16 @@ None.
 
 ## Security review
 
-- Retry uses `router.refresh()` only (no Server Actions / backend changes)
-- Share error copy remains user-safe via `sanitizeUserFacingMessage`
+- Presentation-only a11y classes; no auth / data / Server Actions changes
+- Follow/Message still use existing shared controls via className only
 - No Home / Learning / AI Tutor / Store edits
 
 ## Tests
 
-`npm test -- --run lib/content/profileErrorStates.v1.test.ts lib/content/profileLoadingStates.v1.test.ts lib/content/profileEmptyStates.v1.test.ts`
+`npm test -- --run lib/content/profileAccessibility.v1.test.ts lib/content/profileMotionA11y.v1.test.ts lib/content/profileErrorStates.v1.test.ts`
 
 - Test Files: 3 passed
-- Tests: 6 passed
+- Tests: 7 passed
 
 ## TypeScript
 

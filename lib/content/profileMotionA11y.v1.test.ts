@@ -39,7 +39,7 @@ describe("Creator Space Motion / A11y Pass V1", () => {
     expect(header).toMatch(/isCollapsed/);
     expect(header).toMatch(/motion-reduce:transition-none/);
     expect(tabs).toMatch(/aria-orientation="horizontal"/);
-    expect(tabs).toMatch(/min-h-\[44px\]/);
+    expect(tabs).toMatch(/min-h-\[44px\]|PROFILE_A11Y_TOUCH_TARGET_CLASS/);
     expect(tabs).toMatch(/Home/);
     expect(tabs).toMatch(/End/);
     expect(badge).toMatch(/aria-live="polite"/);
