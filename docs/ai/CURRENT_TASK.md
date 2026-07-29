@@ -2,36 +2,29 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — Thread Persistence Bridge
+UM Learning AI Tutor Backend — Thread Metadata Read V1
 
 ## Status
 
-`closed-local-push` — committed and pushed; migration **not** applied
+`implementation-complete-local` — awaiting commit/push GO; migration **not** applied
 
 ## Branch
 
-`office/learning-ai-tutor-thread-persistence-bridge-v1`
+`office/learning-ai-tutor-thread-metadata-read-v1`
 
 ## Base
 
-`office/learning-ai-tutor-explain-again-v1` @ `f5bd406de3d7ccf6e1b83c4e6c720f8b71fd92dd`
+`office/learning-ai-tutor-thread-persistence-bridge-v1` @ `daeb4408a8f9794feb1fc8a6967ecdfa082aea53`
 
 ## Milestone
 
-`learning.tutor.thread_persistence_bridge@1.0.0`
+`learning.tutor.thread_metadata_read_v1`
 
 ## Delivered
 
-- Migration (local file only): `20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql`
-- RPC: `append_my_learning_ai_tutor_exchange`
-- Bridge wired for optional `threadId` on `answer_question` / `explain_again` / `give_hint`
-
-## Accepted follow-ups (V1)
-
-- SQL-level lesson binding
-- Lean thread metadata read RPC
-- Trusted-producer transcript integrity
-- Structured oversize serialization
+- Migration (local only): `20260873_learning_ai_tutor_thread_metadata_read_v1.sql`
+- RPC: `get_my_learning_ai_tutor_thread(p_thread_id)` — lean metadata, no messages
+- Bridge validation switched from full message history read to lean metadata RPC
 
 ## Machine policy
 
@@ -39,4 +32,4 @@ AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI. No `npm run
 
 ## Next
 
-`code_review` remains blocked. Do not restore Provider Foundation here.
+Await trailer-free commit/push GO, then separate apply GO for `20260873`. Conversation history summarization remains deferred. `code_review` remains blocked.

@@ -27,6 +27,8 @@ export const LEARNING_AI_TUTOR_RPCS = {
   appendExchange: "append_my_learning_ai_tutor_exchange",
   listThreads: "list_my_learning_ai_tutor_threads",
   getMessages: "get_my_learning_ai_tutor_thread_messages",
+  /** Lean metadata only (no messages) for bridge validation. */
+  getThread: "get_my_learning_ai_tutor_thread",
 } as const;
 
 /** Kinds accepted by append_my_learning_ai_tutor_exchange (narrower than message table). */
@@ -212,4 +214,33 @@ export async function getMyAiTutorThreadMessages(
   });
   if (!result.ok) return result;
   return { ok: true, data: asRecord(result.data) ?? {} };
+}
+
+/**
+ * Lean owner-scoped thread metadata (no messages).
+ * Used by Thread Persistence Bridge pre-validation.
+ */
+export async function getMyAiTutorThread(
+  supabase: AnyClient,
+  threadId: string
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  if (!isAiTutorUuid(threadId)) {
+    return { ok: false, message: "thread_id must be a valid UUID" };
+  }
+  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.getThread, {
+    p_thread_id: threadId,
+  });
+  if (!result.ok) return result;
+  const row = asRecord(result.data);
+  if (!row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  // Fail closed if a future RPC shape leaks messages or omits identity fields.
+  if ("messages" in row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.thread_id !== "string" || !isAiTutorUuid(row.thread_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  return { ok: true, data: row };
 }

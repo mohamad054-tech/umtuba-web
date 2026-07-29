@@ -15,7 +15,7 @@ import type { LearningTutorIntegrationAction } from "../../contracts/learningTut
 import {
   LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX,
   appendMyAiTutorExchange,
-  getMyAiTutorThreadMessages,
+  getMyAiTutorThread,
   isAiTutorUuid,
   type LearningAiTutorExchangeKind,
 } from "../../../learning/aiTutorFoundation";
@@ -200,8 +200,8 @@ export function serializeAssistantContentForPersistence(
 }
 
 /**
- * Load thread via existing get-messages RPC and verify ownership + lesson match.
- * Ownership is enforced inside the RPC (Thread not found if not owned).
+ * Load lean thread metadata (no messages) and verify ownership + lesson match.
+ * Ownership is enforced inside get_my_learning_ai_tutor_thread.
  */
 export async function validateThreadForPersistence(
   supabase: SupabaseClient,
@@ -226,7 +226,7 @@ export async function validateThreadForPersistence(
     };
   }
 
-  const loaded = await getMyAiTutorThreadMessages(supabase, input.threadId);
+  const loaded = await getMyAiTutorThread(supabase, input.threadId);
   if (!loaded.ok) {
     const msg = loaded.message.toLowerCase();
     if (msg.includes("not allowed") || msg.includes("entitled")) {
@@ -247,7 +247,7 @@ export async function validateThreadForPersistence(
     };
   }
 
-  const thread = asRecord(loaded.data.thread);
+  const thread = asRecord(loaded.data);
   if (!thread) {
     return {
       ok: false,

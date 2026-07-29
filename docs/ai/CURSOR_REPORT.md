@@ -1,32 +1,34 @@
-﻿# CURSOR_REPORT — Learning Tutor thread persistence bridge
+﻿# CURSOR_REPORT — Learning Tutor thread metadata read
 
 ## Summary
 
-Closed **`learning.tutor.thread_persistence_bridge@1.0.0`** on
-`office/learning-ai-tutor-thread-persistence-bridge-v1`. Trailer-free commit + push.
-Migration `20260872` is local-only and **not** applied.
+Implemented **`learning.tutor.thread_metadata_read_v1`** on
+`office/learning-ai-tutor-thread-metadata-read-v1` from bridge tip `daeb440`.
+Lean `get_my_learning_ai_tutor_thread` RPC + bridge validation wiring.
+Migration `20260873` local only — **not** applied. No commit/push pending GO.
 
 ## Exact files changed
 
-See close-out Final Report in chat.
+See Final Verification Report in chat.
 
 ## Migrations created
 
-`supabase/migrations/20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql` — **not applied**.
+`supabase/migrations/20260873_learning_ai_tutor_thread_metadata_read_v1.sql` (local only; **not** applied).
 
 ## Security review
 
-PASS (pre-commit). Accepted V1 follow-ups documented in `AI_PLATFORM.md`:
-SQL-level lesson binding; lean thread metadata read; trusted-producer integrity; structured oversize serialization.
+- SECURITY DEFINER + `search_path = public`
+- `auth.uid()` ownership; non-enumerating `Thread not found`
+- No messages / no `user_id` in return JSON
+- Revoke public/anon; grant authenticated (+ service_role convention)
+- App path: authenticated client only
 
 ## Tests / TypeScript / Build
 
-Focused Learning Tutor + bridge Vitest: **98/98**
-`npx tsc --noEmit`: passed
-Build: skipped
+See Final Verification Report.
 
 ## Open issues
 
-- Do not remote-apply `20260872` without approval
+- Commit/push only on explicit GO (trailer-free)
+- Do not remote-apply `20260873` without approval
 - Do not merge into alpha from this laptop
-- `code_review` still blocked

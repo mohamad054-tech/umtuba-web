@@ -125,18 +125,31 @@ Milestone: `learning.tutor.thread_persistence_bridge@1.0.0`
 | Fail closed | Missing/unowned thread, lesson mismatch, entitlement, persistence error (no silent success) |
 | App path | Authenticated RPC only — no `service_role` from application code |
 
-### Accepted V1 follow-ups (not in this milestone)
+## Thread Metadata Read V1
+
+Milestone: `learning.tutor.thread_metadata_read_v1`
+
+| Piece | Detail |
+| --- | --- |
+| Migration (local only) | `20260873_learning_ai_tutor_thread_metadata_read_v1.sql` |
+| RPC | `get_my_learning_ai_tutor_thread(p_thread_id)` |
+| Return | `thread_id`, `course_id`, `lesson_id`, `title`, `created_at`, `updated_at` only |
+| Bridge change | `validateThreadForPersistence` uses lean metadata RPC (no full message history fetch) |
+| Preserved | Full `get_my_learning_ai_tutor_thread_messages` for consumers that need messages |
+
+### Remaining follow-ups
 
 - SQL-level lesson binding (`p_lesson_id` on exchange RPC)
-- Lean thread metadata read RPC (avoid full message history for validation)
-- Trusted-producer transcript integrity (prevent owner-forged assistant rows via direct RPC)
-- Structured oversize serialization (reject/rebuild instead of mid-JSON clamp)
+- Trusted-producer transcript integrity
+- Structured oversize serialization
+- Conversation history summarization (deferred)
 
 ## Migration status
 
-- Shared AI Core: `20260871` (local only, not remote-applied)
-- Tutor exchange RPC: `20260872` (local only, not remote-applied)
+- Shared AI Core: `20260871` — **applied** on linked remote
+- Tutor exchange RPC: `20260872` — **applied** on linked remote
+- Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
 
 ## Next (after commit approval)
 
-`code_review` remains **blocked** pending a trusted code-input contract. Optional: Provider Foundation restoration (separate). Do not merge Tutor work into alpha from the Tutor laptop.
+Apply `20260873` on explicit GO. `code_review` remains **blocked**. Do not merge Tutor work into alpha from the Tutor laptop.

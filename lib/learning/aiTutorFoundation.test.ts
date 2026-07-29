@@ -6,6 +6,7 @@ import {
   LEARNING_AI_TUTOR_RPCS,
   LEARNING_AI_TUTOR_ROUTES,
   createMyAiTutorThread,
+  getMyAiTutorThread,
   sanitizeAiTutorError,
 } from "./aiTutorFoundation";
 
@@ -143,5 +144,79 @@ describe("AI Tutor Foundation — adapter", () => {
     expect(
       sanitizeAiTutorError("Not entitled to this course")
     ).toMatch(/not allowed/i);
+  });
+
+  it("loads lean thread metadata via getThread RPC only", async () => {
+    const THREAD = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    const calls: Array<{ name: string; args?: Record<string, unknown> }> = [];
+    const fake = {
+      rpc: async (name: string, args?: Record<string, unknown>) => {
+        calls.push({ name, args });
+        return {
+          data: {
+            thread_id: THREAD,
+            course_id: COURSE_ID,
+            lesson_id: LESSON_ID,
+            title: "AI Tutor",
+            created_at: "2026-07-30T00:00:00.000Z",
+            updated_at: "2026-07-30T00:00:00.000Z",
+          },
+          error: null,
+        };
+      },
+    };
+    const ok = await getMyAiTutorThread(fake as never, THREAD);
+    expect(ok.ok).toBe(true);
+    if (!ok.ok) return;
+    expect(ok.data.thread_id).toBe(THREAD);
+    expect(ok.data).not.toHaveProperty("messages");
+    expect(ok.data).not.toHaveProperty("user_id");
+    expect(calls).toEqual([
+      {
+        name: "get_my_learning_ai_tutor_thread",
+        args: { p_thread_id: THREAD },
+      },
+    ]);
+  });
+
+  it("fails closed on missing/foreign thread and malformed metadata", async () => {
+    const THREAD = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    const missing = await getMyAiTutorThread(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Thread not found" },
+        }),
+      } as never,
+      THREAD
+    );
+    expect(missing.ok).toBe(false);
+
+    const leakedMessages = await getMyAiTutorThread(
+      {
+        rpc: async () => ({
+          data: {
+            thread_id: THREAD,
+            course_id: COURSE_ID,
+            lesson_id: LESSON_ID,
+            messages: [{ id: "x" }],
+          },
+          error: null,
+        }),
+      } as never,
+      THREAD
+    );
+    expect(leakedMessages.ok).toBe(false);
+
+    const badId = await getMyAiTutorThread(
+      {
+        rpc: async () => ({
+          data: { thread_id: "not-uuid", course_id: COURSE_ID },
+          error: null,
+        }),
+      } as never,
+      THREAD
+    );
+    expect(badId.ok).toBe(false);
   });
 });

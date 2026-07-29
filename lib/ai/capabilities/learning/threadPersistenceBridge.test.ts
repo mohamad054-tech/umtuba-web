@@ -36,6 +36,8 @@ import { resetAiRateLimitState } from "../../safety/hooks";
 const ROOT = join(__dirname, "../../../..");
 const MIGRATION =
   "supabase/migrations/20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql";
+const METADATA_MIGRATION =
+  "supabase/migrations/20260873_learning_ai_tutor_thread_metadata_read_v1.sql";
 const STUB_MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
 const BRIDGE_SRC = readFileSync(
@@ -194,9 +196,61 @@ describe("Thread Persistence Bridge — architecture boundaries", () => {
     expect(LEARNING_AI_TUTOR_RPCS.appendExchange).toBe(
       "append_my_learning_ai_tutor_exchange"
     );
+    expect(LEARNING_AI_TUTOR_RPCS.getThread).toBe(
+      "get_my_learning_ai_tutor_thread"
+    );
     expect(FOUNDATION_SRC).toMatch(/appendMyAiTutorExchange/);
+    expect(FOUNDATION_SRC).toMatch(/getMyAiTutorThread/);
     expect(BRIDGE_SRC).toMatch(/appendMyAiTutorExchange/);
+    expect(BRIDGE_SRC).toMatch(/getMyAiTutorThread/);
     expect(BRIDGE_SRC).not.toMatch(/appendMyAiTutorMessage/);
+    expect(BRIDGE_SRC).not.toMatch(/getMyAiTutorThreadMessages/);
+  });
+});
+
+describe("Thread Metadata Read — migration SQL", () => {
+  const sql = read(METADATA_MIGRATION);
+  const body = stripSqlComments(sql);
+  const meta = stripSqlComments(fnBody(sql, "get_my_learning_ai_tutor_thread"));
+
+  it("ships as next migration after thread persistence bridge", () => {
+    expect(existsSync(join(ROOT, METADATA_MIGRATION))).toBe(true);
+    expect(readdirSync(join(ROOT, "supabase/migrations"))).toContain(
+      "20260873_learning_ai_tutor_thread_metadata_read_v1.sql"
+    );
+  });
+
+  it("is security definer with fixed safe search_path", () => {
+    expect(meta).toMatch(/security definer/i);
+    expect(meta).toMatch(/set search_path\s*=\s*public/i);
+  });
+
+  it("requires auth.uid and owner-scoped non-enumerating lookup", () => {
+    expect(meta).toMatch(/auth\.uid\(\)/);
+    expect(meta).toMatch(/user_id is distinct from v_uid/);
+    expect(meta).toMatch(/Thread not found/);
+  });
+
+  it("returns lean metadata only (no messages, no user_id)", () => {
+    expect(meta).toMatch(/thread_id/);
+    expect(meta).toMatch(/course_id/);
+    expect(meta).toMatch(/lesson_id/);
+    expect(meta).not.toMatch(/learning_ai_tutor_messages/);
+    expect(meta).not.toMatch(/'messages'/);
+    expect(meta).not.toMatch(/'user_id'/);
+  });
+
+  it("revokes public/anon and grants authenticated (+ service_role convention)", () => {
+    expect(body).toMatch(
+      /revoke all on function public\.get_my_learning_ai_tutor_thread\(uuid\)\s+from public, anon/i
+    );
+    expect(body).toMatch(
+      /grant execute on function public\.get_my_learning_ai_tutor_thread\(uuid\)\s+to authenticated, service_role/i
+    );
+  });
+
+  it("creates no new tables", () => {
+    expect(body).not.toMatch(/create table/i);
   });
 });
 
@@ -308,10 +362,13 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
 
   it("fails on non-owned / missing thread", async () => {
     const supabase = {
-      rpc: vi.fn(async () => ({
-        data: null,
-        error: { message: "Thread not found" },
-      })),
+      rpc: vi.fn(async (name: string) => {
+        expect(name).toBe("get_my_learning_ai_tutor_thread");
+        return {
+          data: null,
+          error: { message: "Thread not found" },
+        };
+      }),
     };
     const result = await validateThreadForPersistence(supabase as never, {
       threadId: THREAD,
@@ -325,18 +382,20 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
   it("fails on thread/lesson mismatch", async () => {
     const otherLesson = "99999999-9999-4999-8999-999999999999";
     const supabase = {
-      rpc: vi.fn(async () => ({
-        data: {
-          thread: {
-            id: THREAD,
+      rpc: vi.fn(async (name: string) => {
+        expect(name).toBe("get_my_learning_ai_tutor_thread");
+        return {
+          data: {
+            thread_id: THREAD,
             course_id: COURSE,
             lesson_id: otherLesson,
-            user_id: USER,
+            title: "AI Tutor",
+            created_at: "2026-07-30T00:00:00.000Z",
+            updated_at: "2026-07-30T00:00:00.000Z",
           },
-          messages: [],
-        },
-        error: null,
-      })),
+          error: null,
+        };
+      }),
     };
     const result = await validateThreadForPersistence(supabase as never, {
       threadId: THREAD,
@@ -345,6 +404,34 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.message).toMatch(/does not match this lesson/i);
+  });
+
+  it("uses lean metadata RPC instead of full messages RPC", async () => {
+    const rpc = vi.fn(async (name: string) => {
+      expect(name).toBe("get_my_learning_ai_tutor_thread");
+      return {
+        data: {
+          thread_id: THREAD,
+          course_id: COURSE,
+          lesson_id: LESSON,
+          title: "AI Tutor",
+          created_at: "2026-07-30T00:00:00.000Z",
+          updated_at: "2026-07-30T00:00:00.000Z",
+        },
+        error: null,
+      };
+    });
+    const ok = await validateThreadForPersistence({ rpc } as never, {
+      threadId: THREAD,
+      lessonId: LESSON,
+    });
+    expect(ok.ok).toBe(true);
+    expect(rpc).toHaveBeenCalledWith("get_my_learning_ai_tutor_thread", {
+      p_thread_id: THREAD,
+    });
+    expect(rpc.mock.calls.some((c) => c[0] === "get_my_learning_ai_tutor_thread_messages")).toBe(
+      false
+    );
   });
 
   it("persists via exchange RPC and surfaces persistence errors", async () => {
@@ -509,16 +596,15 @@ describe("Thread Persistence Bridge — integration wiring", () => {
           error: null,
         };
       }
-      if (name === "get_my_learning_ai_tutor_thread_messages") {
+      if (name === "get_my_learning_ai_tutor_thread") {
         return {
           data: {
-            thread: {
-              id: THREAD,
-              course_id: COURSE,
-              lesson_id: LESSON,
-              user_id: USER,
-            },
-            messages: [],
+            thread_id: THREAD,
+            course_id: COURSE,
+            lesson_id: LESSON,
+            title: "AI Tutor",
+            created_at: "2026-07-30T00:00:00.000Z",
+            updated_at: "2026-07-30T00:00:00.000Z",
           },
           error: null,
         };
@@ -581,16 +667,15 @@ describe("Thread Persistence Bridge — integration wiring", () => {
           error: null,
         };
       }
-      if (name === "get_my_learning_ai_tutor_thread_messages") {
+      if (name === "get_my_learning_ai_tutor_thread") {
         return {
           data: {
-            thread: {
-              id: THREAD,
-              course_id: COURSE,
-              lesson_id: LESSON,
-              user_id: USER,
-            },
-            messages: [],
+            thread_id: THREAD,
+            course_id: COURSE,
+            lesson_id: LESSON,
+            title: "AI Tutor",
+            created_at: "2026-07-30T00:00:00.000Z",
+            updated_at: "2026-07-30T00:00:00.000Z",
           },
           error: null,
         };
@@ -621,16 +706,15 @@ describe("Thread Persistence Bridge — integration wiring", () => {
 
   it("fails closed when entitlement denied (no exchange write)", async () => {
     const rpc = vi.fn(async (name: string) => {
-      if (name === "get_my_learning_ai_tutor_thread_messages") {
+      if (name === "get_my_learning_ai_tutor_thread") {
         return {
           data: {
-            thread: {
-              id: THREAD,
-              course_id: COURSE,
-              lesson_id: LESSON,
-              user_id: USER,
-            },
-            messages: [],
+            thread_id: THREAD,
+            course_id: COURSE,
+            lesson_id: LESSON,
+            title: "AI Tutor",
+            created_at: "2026-07-30T00:00:00.000Z",
+            updated_at: "2026-07-30T00:00:00.000Z",
           },
           error: null,
         };
