@@ -27,6 +27,7 @@ import {
   type PublicPostDTO,
   type VideoPostRow,
 } from "../../lib/supabase/videoPosts";
+import { wireSocialEngagementToPersonalization } from "../../lib/ai/integrations/video/wiring";
 
 function parsePostId(postId: number): ActionResult<{ postId: number }> {
   if (!Number.isInteger(postId) || postId <= 0) {
@@ -34,6 +35,22 @@ function parsePostId(postId: number): ActionResult<{ postId: number }> {
   }
 
   return { ok: true, postId };
+}
+
+function safeWireSocial(
+  event: "impression" | "like" | "save" | "share" | "comment",
+  contentId: string,
+  serverUserId: string | null
+): void {
+  try {
+    wireSocialEngagementToPersonalization({
+      event,
+      contentId,
+      serverUserId,
+    });
+  } catch {
+    // Personalization must never break primary social actions.
+  }
 }
 
 export async function toggleLikeAction(
@@ -55,7 +72,11 @@ export async function toggleLikeAction(
   }
 
   const supabase = await createClient();
-  return togglePostLike(supabase, parsed.postId);
+  const result = await togglePostLike(supabase, parsed.postId);
+  if (result.ok && result.liked) {
+    safeWireSocial("like", String(parsed.postId), user.id);
+  }
+  return result;
 }
 
 export async function toggleSaveAction(
@@ -77,7 +98,11 @@ export async function toggleSaveAction(
   }
 
   const supabase = await createClient();
-  return togglePostSave(supabase, parsed.postId);
+  const result = await togglePostSave(supabase, parsed.postId);
+  if (result.ok && result.saved) {
+    safeWireSocial("save", String(parsed.postId), user.id);
+  }
+  return result;
 }
 
 export async function recordShareAction(
@@ -107,7 +132,11 @@ export async function recordShareAction(
     }
   }
 
-  return recordPostShare(supabase, parsed.postId, resolvedKey);
+  const result = await recordPostShare(supabase, parsed.postId, resolvedKey);
+  if (result.ok && user) {
+    safeWireSocial("share", String(parsed.postId), user.id);
+  }
+  return result;
 }
 
 export async function recordViewAction(
@@ -179,12 +208,16 @@ export async function recordViewAction(
     (profileCountry && profileCountry.trim() ? profileCountry.trim() : null);
   const city = fromClient.city;
 
-  return recordPostView(supabase, parsed.postId, resolvedKey, {
+  const viewResult = await recordPostView(supabase, parsed.postId, resolvedKey, {
     countryCode,
     countryName,
     city,
     qualified: true,
   });
+  if (viewResult.ok && user) {
+    safeWireSocial("impression", String(parsed.postId), user.id);
+  }
+  return viewResult;
 }
 
 export async function listCommentsAction(
@@ -220,7 +253,11 @@ export async function createCommentAction(
   }
 
   const supabase = await createClient();
-  return createPostComment(supabase, parsed.postId, user.id, body);
+  const result = await createPostComment(supabase, parsed.postId, user.id, body);
+  if (result.ok) {
+    safeWireSocial("comment", String(parsed.postId), user.id);
+  }
+  return result;
 }
 
 export async function deleteCommentAction(

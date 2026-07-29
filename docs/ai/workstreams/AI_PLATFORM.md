@@ -3,53 +3,47 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** Video Personalization & Recommendation Integration V1
+**Active work:** Video Personalization Signals Wiring V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `4ef07be` — hub and operations architecture |
+| Base HEAD | `da1a8b8` — video personalization integration |
 | Remote | Synced; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Video signal contract + fail-closed validation (server-owned identity)
-2. Video content profile + candidate adapters
-3. Ranking boundary over Personalization Engine (passthrough when disabled)
-4. Feature flag `UMTUBA_AI_VIDEO_PERSONALIZATION` (default OFF)
+1. Mapped existing watch-signal + social events → personalization ingest
+2. Best-effort wiring in server actions (flag-gated, never breaks primary flows)
+3. In-memory dedupe (no DB migration)
+4. Documented unwired events: hide / not_interested / report
 5. Tests + docs
 
-**NOT done / do not touch by mistake:**
-- No UI / Home / Navigation / feed visual changes
-- No production feed order change (loader untouched)
-- No Learning/Commerce integration
-- No DB migration / remote apply
+**NOT done:**
+- No UI / feed ranking / production order change
+- No hide/not_interested/report flows invented
+- Ranking remains disabled
 
 ---
 
-**Ownership:** Desktop owns Shared AI Core + video AI integration adapters.
-**Laptop owns:** video UI / App Shell presentation.
+## Event mapping (existing → personalization)
 
-## Status
+| Source | Personalization event |
+| --- | --- |
+| `record_watch_signal` meaningful watch | `view_start`, `watch_progress` |
+| `completed=true` | `completion` |
+| `rewatch_count > 0` | `replay` |
+| `skipped_early` | `skip` |
+| watch engagement flags | `like` / `save` / `share` / `comment` / `follow_creator` |
+| `recordViewAction` (auth) | `impression` |
+| `toggleLikeAction` when liked | `like` |
+| `toggleSaveAction` when saved | `save` |
+| `recordShareAction` (auth) | `share` |
+| `createCommentAction` | `comment` |
 
-AI Hub & Ops Architecture V1 closed.
-Video Personalization Integration V1 implemented (server-side, **disabled by default**).
+**Unwired (no organic video source):** `hide`, `not_interested`, `report`
 
-## Video integration (summary)
-
-```
-Watch telemetry / future callers
-  → validateVideoRecommendationSignalInput (server userId)
-  → ingestVideoRecommendationSignal (flag-gated)
-  → AiPersonalizationEngine
-
-Future ranked pools (not production feed):
-  → toVideoContentProfile / toVideoRecommendationCandidates
-  → rankVideoCandidatesForPersonalization
-  → passthrough original order unless flag ON + profiles present
-```
-
-Flag: `UMTUBA_AI_VIDEO_PERSONALIZATION=1|true` (default off).
+Flag: `UMTUBA_AI_VIDEO_PERSONALIZATION` default OFF → no ingest.
 
 ## Migration status
 

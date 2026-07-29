@@ -35,3 +35,14 @@ export {
   ingestVideoRecommendationSignal,
   type VideoSignalIngestResult,
 } from "./ingest";
+export {
+  mapWatchSignalToPersonalizationEvents,
+  VIDEO_WIRING_AVAILABLE_EVENTS,
+  VIDEO_WIRING_UNWIRED_EVENTS,
+} from "./watchSignalMapping";
+export {
+  wireWatchSignalToPersonalization,
+  wireSocialEngagementToPersonalization,
+  type VideoWiringSummary,
+} from "./wiring";
+export { resetVideoSignalWiringDedupe } from "./signalDedupe";
