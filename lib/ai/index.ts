@@ -260,3 +260,18 @@ export {
   AI_ASSISTANT_TOOL_IDS,
   createNoopAssistantExtensionHooks,
 } from "./assistant/types";
+export {
+  runAssistantRuntime,
+  isAssistantRuntimeEnabled,
+  ASSISTANT_RUNTIME_CAPABILITY_ID,
+  sanitizeAssistantRuntimeResponse,
+  buildRuntimeContextAssemblyInput,
+} from "./assistant/runtime";
+export type {
+  AiAssistantRuntimeRequest,
+  AiAssistantRuntimeIdentity,
+  AiAssistantRuntimeResult,
+  AiAssistantRuntimeDiagnostics,
+  AiAssistantSanitizedResponse,
+  RunAssistantRuntimeInput,
+} from "./assistant/runtime";

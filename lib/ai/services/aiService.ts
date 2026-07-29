@@ -276,6 +276,60 @@ async function runCapabilityInner(
     };
   }
 
+  if (request.capabilityId === "assistant.runtime_turn") {
+    const config = loadAiPlatformConfig(
+      deps.forceStub
+        ? { mode: "stub", allowStub: true }
+        : undefined
+    );
+    const gateway = await executeAiGateway(
+      deps.userId,
+      {
+        capabilityId: "assistant.runtime_turn",
+        promptId: "assistant.runtime_turn",
+        userInput: request.input.text ?? "",
+        outputMode: "structured_json",
+        context: {
+          productDomain: request.context.productDomain || "platform",
+          surface: request.context.surface || "assistant.runtime",
+          dataClassification: "confidential",
+          allowedCapabilities: ["assistant.runtime_turn"],
+          allowedToolIds: [],
+          locale: request.context.locale ?? null,
+        },
+        _test: deps.forceStub
+          ? { forceStub: true, bypassRateLimit: true }
+          : undefined,
+      },
+      { config, capabilityEligible: true, permissions: [] }
+    );
+    if (!gateway.ok) {
+      return asFailure(gateway.code, gateway.message);
+    }
+    const structured = gateway.data.structured ?? {};
+    const content =
+      typeof structured.content === "string"
+        ? structured.content
+        : typeof structured.message === "string"
+          ? structured.message
+          : null;
+    if (!content?.trim()) {
+      return asFailure(
+        "invalid_structured_output",
+        "Assistant runtime turn missing content."
+      );
+    }
+    return {
+      ok: true,
+      data: {
+        runId: gateway.data.runId,
+        capabilityId: request.capabilityId,
+        result: { content: content.trim() },
+        retryable: false,
+      },
+    };
+  }
+
   return asFailure(
     "invalid_input",
     `Unknown capability: ${request.capabilityId}`

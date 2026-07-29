@@ -1,23 +1,26 @@
-﻿# CURSOR_REPORT — AI Assistant Foundation V1
+# CURSOR_REPORT — AI Assistant Runtime Integration V1
 
 ## Summary
 
-Added Shared AI Core **AI Assistant Foundation V1** under `lib/ai/assistant/`: conversation contracts, context assembly (no RAG), skills registry, tool invocation framework (catalog / fail-closed), deterministic skill routing, and reserved future hooks. Cross-product (Learning, Commerce, Creator, Search, Video, Ads, World, Marketing, general Assistant). Skills must not bind to providers/models. No UI, DB, migration, provider, commit, or push.
+Wired Assistant Foundation into Shared AI Core via **Assistant Runtime Integration V1**: feature-flagged server pipeline (conversation → context assembly → skill routing → `aiService`/`assistant.runtime_turn` → sanitized response). No Chat UI, no skill/tool execution, no RAG, no DB/migration. Flag `UMTUBA_AI_ASSISTANT_RUNTIME` defaults OFF.
 
 ## Exact files changed
 
 ### Created
-- `lib/ai/assistant/types.ts`
-- `lib/ai/assistant/conversation.ts`
-- `lib/ai/assistant/contextAssembly.ts`
-- `lib/ai/assistant/skillRegistry.ts`
-- `lib/ai/assistant/toolFramework.ts`
-- `lib/ai/assistant/routing.ts`
-- `lib/ai/assistant/index.ts`
-- `lib/ai/assistant/assistantFoundation.test.ts`
+- `lib/ai/assistant/runtime/featureFlag.ts`
+- `lib/ai/assistant/runtime/types.ts`
+- `lib/ai/assistant/runtime/contextSources.ts`
+- `lib/ai/assistant/runtime/sanitize.ts`
+- `lib/ai/assistant/runtime/service.ts`
+- `lib/ai/assistant/runtime/index.ts`
+- `lib/ai/assistant/runtime/runtime.test.ts`
 
 ### Modified
-- `lib/ai/index.ts`
+- `lib/ai/services/aiService.ts` — `assistant.runtime_turn` capability path
+- `lib/ai/prompts/registry.ts` — runtime turn prompt
+- `lib/ai/providers/adapters.ts` — stub response for runtime turn
+- `lib/ai/contracts/types.ts` / `public.ts` — capability id
+- `lib/ai/index.ts` — exports
 - `docs/ai/workstreams/AI_PLATFORM.md`
 - `docs/ai/workstreams/UMTUBA_AI_HUB_OPERATIONS_ARCHITECTURE_V1.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -28,15 +31,15 @@ None.
 
 ## Security review
 
-- Server-owned user UUID required for conversations / assembly.
-- System message content redacted in client-safe projection.
-- Assistant responses refuse forbidden fields (systemPrompt / provider / model / apiKey / rawProfile).
-- Tool invoke fail-closed (`tool_not_implemented`); skills cannot bind providers/models.
-- No full user profile in context — bounded user/domain/personalization summaries only.
+- Identity from server `userId` only (UUID validated).
+- Flag OFF → no Core invocation.
+- Sanitized response strips/rejects systemPrompt, provider, model, apiKey, raw memory/knowledge.
+- Diagnostics are server-side stage metadata only (no secrets).
+- No skill/tool execution in this phase.
 
 ## Tests
 
-- `vitest run lib/ai/assistant/` → **12 passed**
+- `vitest run lib/ai/assistant/` → **20 passed** (foundation 12 + runtime 8)
 
 ## TypeScript
 
@@ -44,17 +47,18 @@ None.
 
 ## Build
 
-Not required (Shared AI Core library only; no UI/entry change).
+Not required (Shared AI Core library + aiService capability; no UI).
 
 ## git diff --check
 
-**Pass** (`DIFF_CHECK_EXIT:0`; LF/CRLF warning on Hub ops doc only).
+**Pass** (`DIFF_CHECK_EXIT:0`).
 
 ## git status --short
 
-Uncommitted: modified docs + `lib/ai/index.ts`; untracked `lib/ai/assistant/`. No commit/push.
+Uncommitted runtime + Core capability wiring (+ possible unrelated CRLF-touched files in worktree — do not include those in commit). No commit/push.
 
 ## Open issues
 
 - Awaiting GO before commit/push.
-- Tool/skill execution, Chat UI, persistence, RAG, multi-agent — future phases.
+- Chat UI, skill execution, tool invocation, persistence — future phases.
+- On GO: stage only runtime + intentional Core/docs files; exclude accidental CRLF-only dirties if present.

@@ -3,49 +3,46 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** AI Assistant Foundation V1
+**Active work:** AI Assistant Runtime Integration V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `63a4a45` — video personalization signals wiring |
+| Base HEAD | `b335f87` — assistant foundation |
 | Remote | Synced; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Assistant conversation contracts (conversation / message / response / tool / system / metadata)
-2. Conversation context assembly (memory, knowledge, personalization, user, domain) — no RAG
-3. Skills registry (learning, commerce, creator, search, world, assistant, video, marketing, ads)
-4. Tool invocation framework (catalog only; invoke fail-closed / not implemented)
-5. Deterministic skill routing by `requestKind` (prompt text ignored)
-6. Future hooks reserved: multi-agent, planner, tool chaining, long conversations, voice, multimodal, reasoning
-7. Tests + docs
+1. Assistant Runtime Service + pipeline (conversation → assembly → routing → aiService → sanitize)
+2. Capability `assistant.runtime_turn` through Shared AI Core (prompt + stub + aiService)
+3. Context sources from Knowledge / Memory / Personalization foundations (no RAG)
+4. Feature flag `UMTUBA_AI_ASSISTANT_RUNTIME` default OFF
+5. Fail-closed sanitization + server-only diagnostics
+6. Tests + docs
 
 **NOT done:**
-- No Chat UI / App Router / pages
+- No Chat UI / App Router pages
+- No skill execution / real tool invocation
 - No new providers / DB / migrations
-- No skill execution / tool execution / RAG
-- Skills do **not** bind to providers or models
 
 ---
 
-## Assistant Foundation (`lib/ai/assistant/`)
+## Assistant Runtime (`lib/ai/assistant/runtime/`)
 
-Cross-product Shared AI Core consumer surface — **not** Learning-specific.
-
-| Layer | Role |
+| Item | Value |
 | --- | --- |
-| Contracts | conversation, message, assistant response, tool request/response, system context, metadata |
-| Context assembly | Ordered blocks; `usedRag: false` / `usedVectorSearch: false` |
-| Skills registry | Definitions + allowed tools; `providerBindingForbidden: true` |
-| Tool framework | Registered tools with `available: false`; invoke → `tool_not_implemented` |
-| Routing | `assistant_skill_route_v1` — requestKind owns skill selection |
+| Flag | `UMTUBA_AI_ASSISTANT_RUNTIME` (`1`/`true` only) |
+| Capability | `assistant.runtime_turn` |
+| Pipeline | Conversation → Context Assembly → Routing → AI Service → Sanitization |
+| Skills/Tools | **Not executed** — routing selects skill id only |
+| RAG | `usedRag: false` / `usedVectorSearch: false` |
 
-Privacy: no system prompts to clients; no provider/model internals; bounded user context (not full profile); fail-closed.
+Privacy: server `userId` only; no system prompts / provider / model / apiKey / raw memory|knowledge in sanitized responses.
 
-## Prior: Video Personalization Signals Wiring
+## Prior foundations
 
-Flag `UMTUBA_AI_VIDEO_PERSONALIZATION` default OFF. Feed order unchanged. Unwired: hide / not_interested / report.
+- Assistant Foundation (contracts, skills registry, tool catalog, routing)
+- Video personalization wiring (separate flag; feed order unchanged)
 
 ## Migration status
 

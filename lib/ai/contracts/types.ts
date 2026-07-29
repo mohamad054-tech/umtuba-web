@@ -14,6 +14,7 @@ export type AiDataClassification = (typeof AI_DATA_CLASSIFICATIONS)[number];
 export const AI_CAPABILITY_IDS = [
   "commerce.product_draft_assistant",
   "platform.diagnostics_probe",
+  "assistant.runtime_turn",
 ] as const;
 export type AiCapabilityId = (typeof AI_CAPABILITY_IDS)[number] | (string & {});
 

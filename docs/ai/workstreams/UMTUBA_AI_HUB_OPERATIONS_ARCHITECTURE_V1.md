@@ -260,6 +260,7 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 | Video personalization integration | `lib/ai/integrations/video/` (flag-gated) | Signals/candidates/ranking boundary; **does not** change chronological feed order unless explicitly enabled later |
 | Video signals wiring | Server actions → `wireWatchSignalToPersonalization` / social wiring | Maps existing watch/social events to ingest only; ranking stays off |
 | AI Assistant Foundation | `lib/ai/assistant/` (contracts, skills, tools catalog, routing, assembly) | Cross-product gateway surface; no Chat UI; skills must not bind providers/models |
+| AI Assistant Runtime | `lib/ai/assistant/runtime/` + capability `assistant.runtime_turn` | Flag `UMTUBA_AI_ASSISTANT_RUNTIME` (default OFF); full Core cycle; no skill/tool execution; no Chat UI |
 
 **Non-goals for immediate next steps unless separately tasked:** building Hub UI, Ops UI, new providers, DB persistence, real RAG.
 
@@ -267,7 +268,7 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 
 ### Extension note — Assistant as Core consumer
 
-Assistant Foundation is the first **named cross-product** consumer surface for Shared AI Core (not Learning-only). Hub modules later present Assistant capabilities; Core remains server-side registries/contracts. Future Chat UI must call Assistant Foundation → Core, never providers directly.
+Assistant Foundation is the first **named cross-product** consumer surface for Shared AI Core (not Learning-only). Runtime Integration adds a flag-gated server pipeline through `aiService` without Chat UI. Hub modules later present Assistant capabilities; Core remains server-side. Future Chat UI must call Assistant Runtime → Core, never providers directly.
 
 ---
 
@@ -278,7 +279,8 @@ Assistant Foundation is the first **named cross-product** consumer surface for S
 | Learning Tutor | Named server actions → integration → `aiService` → Core |
 | Commerce Product Draft | Domain capability → gateway/Core |
 | AI Assistant Foundation | `lib/ai/assistant/` → Shared AI Core (skills/routing/assembly; no UI yet) |
-| Future Search / Ads / World / Games Hub modules | Domain capability + Hub module → Assistant Foundation / Core path |
+| AI Assistant Runtime | `runAssistantRuntime` → `aiService` (`assistant.runtime_turn`); flag-gated |
+| Future Search / Ads / World / Games Hub modules | Domain capability + Hub module → Assistant Runtime / Core path |
 | Ops operators | Future Ops Console → Core diagnostics/config APIs |
 | End users | Hub modules only (never Core internals) |
 
