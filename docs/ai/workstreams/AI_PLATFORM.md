@@ -3,46 +3,50 @@
 ## SAVE POINT — 2026-07-29 (Desktop)
 
 **Machine:** Desktop
-**Active work:** AI Assistant Runtime Integration V1
+**Active work:** UMTUBA AI Hub Foundation V1
 
 | Item | Value |
 | --- | --- |
 | Active branch | `office/ai-core-provider-foundation-v1` |
-| Base HEAD | `b335f87` — assistant foundation |
+| Base HEAD | `0ffc6f5` — assistant runtime integration |
 | Remote | Synced; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Assistant Runtime Service + pipeline (conversation → assembly → routing → aiService → sanitize)
-2. Capability `assistant.runtime_turn` through Shared AI Core (prompt + stub + aiService)
-3. Context sources from Knowledge / Memory / Personalization foundations (no RAG)
-4. Feature flag `UMTUBA_AI_ASSISTANT_RUNTIME` default OFF
-5. Fail-closed sanitization + server-only diagnostics
-6. Tests + docs
+1. AI Hub navigation catalog (9 modules)
+2. Capability registry (Core + domain + coming_soon cards)
+3. Assistant entry (no chat / skills / tools / conversations)
+4. Recent activity + favorites contracts (in-memory)
+5. Hub recommendations over Personalization Foundation
+6. Runtime status from AI Core (sanitized)
+7. Feature flag `UMTUBA_AI_HUB` default OFF
+8. Tests + docs
 
 **NOT done:**
-- No Chat UI / App Router pages
-- No skill execution / real tool invocation
-- No new providers / DB / migrations
+- No Hub UI / App Shell / Home / App Router pages
+- No existing product navigation changes
+- No skill/tool/conversation execution
+- No providers / DB / migrations
 
 ---
 
-## Assistant Runtime (`lib/ai/assistant/runtime/`)
+## AI Hub Foundation (`lib/ai/hub/`)
 
 | Item | Value |
 | --- | --- |
-| Flag | `UMTUBA_AI_ASSISTANT_RUNTIME` (`1`/`true` only) |
-| Capability | `assistant.runtime_turn` |
-| Pipeline | Conversation → Context Assembly → Routing → AI Service → Sanitization |
-| Skills/Tools | **Not executed** — routing selects skill id only |
-| RAG | `usedRag: false` / `usedVectorSearch: false` |
+| Flag | `UMTUBA_AI_HUB` (`1`/`true` only) |
+| Entry API | `loadAiHubSnapshot({ userId })` |
+| OFF behavior | Empty disabled snapshot (fail-closed) |
+| ON behavior | Navigation + capabilities + assistant entry + activity/favorites/recs + runtime status |
+| Non-goals | `executedConversations/Skills/Tools: false` |
 
-Privacy: server `userId` only; no system prompts / provider / model / apiKey / raw memory|knowledge in sanitized responses.
+### Navigation modules
+AI Assistant · My AI · Learning AI · Creator AI · Commerce AI · Search AI · World AI · Marketing AI · Ads AI
 
-## Prior foundations
+## Prior
 
-- Assistant Foundation (contracts, skills registry, tool catalog, routing)
-- Video personalization wiring (separate flag; feed order unchanged)
+- Assistant Runtime (`UMTUBA_AI_ASSISTANT_RUNTIME`, default OFF)
+- Assistant Foundation, Video personalization wiring
 
 ## Migration status
 

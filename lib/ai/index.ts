@@ -275,3 +275,25 @@ export type {
   AiAssistantSanitizedResponse,
   RunAssistantRuntimeInput,
 } from "./assistant/runtime";
+export {
+  isAiHubEnabled,
+  loadAiHubSnapshot,
+  resetAiHubFoundation,
+  listAiHubNavigation,
+  listAiHubCapabilities,
+  getAiHubAssistantEntry,
+  buildAiHubRecommendations,
+  buildAiHubRuntimeStatus,
+  aiHubActivityStore,
+  aiHubFavoriteStore,
+  AI_HUB_MODULE_IDS,
+} from "./hub";
+export type {
+  AiHubModuleId,
+  AiHubNavItem,
+  AiHubCapabilityCard,
+  AiHubAssistantEntry,
+  AiHubSnapshot,
+  AiHubRuntimeStatus,
+  LoadAiHubSnapshotInput,
+} from "./hub";

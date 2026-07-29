@@ -261,6 +261,7 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 | Video signals wiring | Server actions → `wireWatchSignalToPersonalization` / social wiring | Maps existing watch/social events to ingest only; ranking stays off |
 | AI Assistant Foundation | `lib/ai/assistant/` (contracts, skills, tools catalog, routing, assembly) | Cross-product gateway surface; no Chat UI; skills must not bind providers/models |
 | AI Assistant Runtime | `lib/ai/assistant/runtime/` + capability `assistant.runtime_turn` | Flag `UMTUBA_AI_ASSISTANT_RUNTIME` (default OFF); full Core cycle; no skill/tool execution; no Chat UI |
+| AI Hub Foundation | `lib/ai/hub/` (`loadAiHubSnapshot`) | Flag `UMTUBA_AI_HUB` (default OFF); navigation + capability catalog + contracts; **no UI / no App Shell** |
 
 **Non-goals for immediate next steps unless separately tasked:** building Hub UI, Ops UI, new providers, DB persistence, real RAG.
 
@@ -268,7 +269,7 @@ Future work plugs into existing hooks/registries without redesigning Hub/Ops map
 
 ### Extension note — Assistant as Core consumer
 
-Assistant Foundation is the first **named cross-product** consumer surface for Shared AI Core (not Learning-only). Runtime Integration adds a flag-gated server pipeline through `aiService` without Chat UI. Hub modules later present Assistant capabilities; Core remains server-side. Future Chat UI must call Assistant Runtime → Core, never providers directly.
+Assistant Foundation is the first **named cross-product** consumer surface for Shared AI Core (not Learning-only). Runtime Integration adds a flag-gated server pipeline through `aiService` without Chat UI. **AI Hub Foundation** adds the product entry map + capability catalog contracts (`lib/ai/hub/`) behind `UMTUBA_AI_HUB`. Future Hub UI must call Hub Foundation → Assistant Runtime / Domain adapters → Core, never providers directly.
 
 ---
 
@@ -280,6 +281,7 @@ Assistant Foundation is the first **named cross-product** consumer surface for S
 | Commerce Product Draft | Domain capability → gateway/Core |
 | AI Assistant Foundation | `lib/ai/assistant/` → Shared AI Core (skills/routing/assembly; no UI yet) |
 | AI Assistant Runtime | `runAssistantRuntime` → `aiService` (`assistant.runtime_turn`); flag-gated |
+| AI Hub Foundation | `loadAiHubSnapshot` → navigation/capabilities/contracts; flag `UMTUBA_AI_HUB` |
 | Future Search / Ads / World / Games Hub modules | Domain capability + Hub module → Assistant Runtime / Core path |
 | Ops operators | Future Ops Console → Core diagnostics/config APIs |
 | End users | Hub modules only (never Core internals) |
