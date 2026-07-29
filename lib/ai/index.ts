@@ -101,4 +101,21 @@ export type {
   AiRoutingExtensionHooks,
 } from "./routing/policyTypes";
 export { createNoopRoutingExtensionHooks } from "./routing/policyTypes";
+export {
+  recordUsageAfterExecution,
+  recordAiServiceUsageAfterExecution,
+  listTrackedUsage,
+  resetUsageTrackingFoundation,
+  aiUsageTracker,
+  aiCostTracker,
+} from "./usage/trackingFoundation";
+export type {
+  AiUsageTrackingRecord,
+  AiUsageTrackingInput,
+  AiUsageExecutionStatus,
+  AiUsageCostStatus,
+  AiUsageTrackingExtensionHooks,
+  AiUsagePublicAggregate,
+} from "./usage/trackingTypes";
+export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";

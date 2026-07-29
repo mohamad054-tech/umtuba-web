@@ -35,8 +35,10 @@ import type {
   AiGatewaySuccess,
   AiResult,
   AiToolCallSummary,
+  AiUsageRecord,
 } from "../contracts/types";
-import { buildUsageRecord, recordUsage } from "../usage/accounting";
+import { buildUsageRecord } from "../usage/accounting";
+import { recordUsageAfterExecution } from "../usage/trackingFoundation";
 import { invokeTool } from "../tools/registry";
 
 export type AiGatewayDeps = {
@@ -381,14 +383,50 @@ export async function executeAiGateway(
       structured,
     });
 
-    const usage = buildUsageRecord({
-      partial: providerResult.usage,
+    const tracked = recordUsageAfterExecution({
+      requestId: runId,
+      capabilityId: String(request.capabilityId),
+      providerId: route.providerId,
+      modelId: route.modelId,
+      executionStatus: "completed",
+      executionTimeMs: Date.now() - started,
+      estimatedInputTokens: providerResult.usage.inputTokens,
+      estimatedOutputTokens: providerResult.usage.outputTokens,
+      estimatedCostMinor: providerResult.usage.costMinor,
+      costCurrency: providerResult.usage.costCurrency,
+      costStatus:
+        providerResult.usage.costStatus === "provider_reported" ||
+        providerResult.usage.costStatus === "estimated" ||
+        providerResult.usage.costStatus === "unavailable"
+          ? providerResult.usage.costStatus
+          : "estimated",
+      userId: authenticatedUserId,
+      workspaceId: context.workspaceId ?? context.storeId ?? null,
+    });
+
+    const usage: AiUsageRecord = buildUsageRecord({
+      partial: {
+        inputTokens: tracked.estimatedInputTokens,
+        outputTokens: tracked.estimatedOutputTokens,
+        cachedTokens: providerResult.usage.cachedTokens,
+        audioUnits: providerResult.usage.audioUnits,
+        imageUnits: providerResult.usage.imageUnits,
+        costMinor: tracked.estimatedCostMinor,
+        costCurrency: tracked.costCurrency,
+        costStatus:
+          tracked.costStatus === "zero"
+            ? "estimated"
+            : tracked.costStatus === "unavailable"
+              ? "unavailable"
+              : tracked.costStatus,
+        modelId: route.modelId,
+        providerId: route.providerId,
+      },
       capabilityId: String(request.capabilityId),
       userId: authenticatedUserId,
       workspaceId: context.workspaceId ?? context.storeId ?? null,
       runId,
     });
-    recordUsage(usage);
 
     completeRun({
       runId,
@@ -467,6 +505,25 @@ export async function executeAiGateway(
           ? "blocked"
           : "failed";
       failRun({ runId, status, code, message });
+      try {
+        recordUsageAfterExecution({
+          requestId: runId,
+          capabilityId: String(request.capabilityId),
+          providerId: null,
+          modelId: null,
+          executionStatus: status === "blocked" ? "blocked" : "failed",
+          executionTimeMs: Date.now() - started,
+          estimatedInputTokens: null,
+          estimatedOutputTokens: null,
+          estimatedCostMinor: null,
+          costStatus: "unavailable",
+          userId: authenticatedUserId,
+          workspaceId:
+            request.context.workspaceId ?? request.context.storeId ?? null,
+        });
+      } catch {
+        // Tracking must not mask the original failure.
+      }
       await appendTraceEvent({
         runId,
         traceId,
