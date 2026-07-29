@@ -248,13 +248,14 @@ function createFakeSupabase(opts?: FakeOpts) {
 }
 
 describe("Learning Tutor integration action contracts", () => {
-  it("exposes five actions mapped to five capabilities", () => {
+  it("exposes six actions mapped to six capabilities", () => {
     expect(LEARNING_TUTOR_INTEGRATION_ACTIONS).toEqual([
       "explain_lesson",
       "summarize_lesson",
       "answer_question",
       "generate_practice",
       "explain_wrong_answer",
+      "give_hint",
     ]);
     expect([...LEARNING_TUTOR_INTEGRATION_CAPABILITIES].sort()).toEqual(
       [...LEARNING_TUTOR_CAPABILITIES].sort()
@@ -341,6 +342,20 @@ describe("Learning Tutor integration action contracts", () => {
     ).toBe(false);
     expect(
       parseLearningTutorIntegrationRequest({
+        action: "give_hint",
+        lessonId: LESSON,
+      }).ok
+    ).toBe(false);
+    expect(
+      parseLearningTutorIntegrationRequest({
+        action: "give_hint",
+        lessonId: LESSON,
+        focus: "neural networks",
+        question: "extra",
+      }).ok
+    ).toBe(false);
+    expect(
+      parseLearningTutorIntegrationRequest({
         action: "explain_wrong_answer",
         attemptId: ATTEMPT,
       }).ok
@@ -405,7 +420,7 @@ describe("runLearningTutorIntegration", () => {
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it("runs all five actions via aiService with correct capability mapping", async () => {
+  it("runs all six actions via aiService with correct capability mapping", async () => {
     const spy = vi.spyOn(aiService, "runCapability");
     const supabase = createFakeSupabase() as never;
 
@@ -429,6 +444,14 @@ describe("runLearningTutorIntegration", () => {
           question: "What is a neural network?",
         },
         capability: "learning.tutor.answer_question",
+      },
+      {
+        request: {
+          action: "give_hint" as const,
+          lessonId: LESSON,
+          focus: "neural networks definition",
+        },
+        capability: "learning.tutor.give_hint",
       },
     ];
 

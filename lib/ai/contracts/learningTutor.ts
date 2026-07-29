@@ -72,3 +72,22 @@ export type LearningTutorExplainWrongAnswerResult = {
   mutatesProgress: false;
   mutatesGrades: false;
 };
+
+/**
+ * Scaffolding hint for a learner focus (maps to Learning OS message kind `hint`).
+ * Never a full graded answer or answer key.
+ */
+export type LearningTutorGiveHintResult = {
+  hint: string;
+  hintLevel: "gentle" | "moderate" | "strong" | string;
+  focusRestated: string;
+  nextStep: string;
+  sourceReferences: LearningTutorSourceReference[];
+  groundingStatus: LearningTutorGroundingStatus;
+  limitations: string[];
+  labeledAiGenerated: true;
+  officialCourseContent: false;
+  revealsAnswerKey: false;
+  mutatesProgress: false;
+  mutatesGrades: false;
+};

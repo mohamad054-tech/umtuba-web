@@ -84,6 +84,7 @@ Future Learning UI
 | `answerQuestionLearningTutorAction` | `answer_question` |
 | `generatePracticeLearningTutorAction` | `generate_practice` |
 | `explainWrongAnswerLearningTutorAction` | `explain_wrong_answer` |
+| `giveHintLearningTutorAction` | `give_hint` |
 
 **Guarantees:**
 - Named functions only — no free-form action/capability string dispatcher
@@ -102,6 +103,7 @@ Future Learning UI
 | `learning.tutor.answer_question@1.0.0` | Implemented |
 | `learning.tutor.generate_practice@1.0.0` | Implemented |
 | `learning.tutor.explain_wrong_answer@1.0.0` | Implemented |
+| `learning.tutor.give_hint@1.0.0` | Implemented |
 
 ## Migration status
 
@@ -109,4 +111,4 @@ Uses existing Shared AI Core migration `20260871` (local only, not remote-applie
 
 ## Next (after commit approval)
 
-Further multi-provider adapters (Gemini/Anthropic/local) may register into the foundation. Laptop may wire Learning UI to the five named server actions. No Desktop UI.
+Optional: `explain_again` backend capability (maps to Learning OS message kind). Further multi-provider adapters may register into Provider Foundation. Laptop may wire Learning UI to the named server actions. No Desktop UI.

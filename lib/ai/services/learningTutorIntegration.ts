@@ -64,6 +64,12 @@ const ACTION_ALLOWED_KEYS: Record<
     "questionId",
     ...COMMON_OPTIONAL_KEYS,
   ]),
+  give_hint: new Set([
+    "action",
+    "lessonId",
+    "focus",
+    ...COMMON_OPTIONAL_KEYS,
+  ]),
 };
 
 /**
@@ -301,6 +307,32 @@ export function parseLearningTutorIntegrationRequest(
         },
       };
     }
+    case "give_hint": {
+      if (typeof row.lessonId !== "string" || !isUuid(row.lessonId.trim())) {
+        return {
+          ok: false,
+          code: "invalid_input",
+          message: "lessonId is required and must be a valid UUID.",
+        };
+      }
+      if (typeof row.focus !== "string" || !row.focus.trim()) {
+        return {
+          ok: false,
+          code: "invalid_input",
+          message: "focus is required.",
+        };
+      }
+      return {
+        ok: true,
+        data: {
+          action: "give_hint",
+          lessonId: row.lessonId.trim(),
+          focus: row.focus.trim(),
+          locale: common.locale,
+          surface: common.surface,
+        },
+      };
+    }
     default: {
       return {
         ok: false,
@@ -383,9 +415,15 @@ export async function runLearningTutorIntegration(
             lessonId: request.lessonId,
             question: request.question,
           }
-        : {
-            lessonId: request.lessonId,
-          };
+        : request.action === "give_hint"
+          ? {
+              lessonId: request.lessonId,
+              focus: request.focus,
+              question: request.focus,
+            }
+          : {
+              lessonId: request.lessonId,
+            };
 
   // Execute only through the shared AI service — never call tutorRunner directly.
   const serviceResult = await aiService.runCapability(

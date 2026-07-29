@@ -23,6 +23,7 @@ export type {
   LearningTutorAnswerResult,
   LearningTutorPracticeResult,
   LearningTutorExplainWrongAnswerResult,
+  LearningTutorGiveHintResult,
   LearningTutorGroundingStatus,
   LearningTutorSourceReference,
 } from "./contracts/learningTutor";
@@ -48,6 +49,7 @@ export type {
   LearningTutorAnswerQuestionActionInput,
   LearningTutorGeneratePracticeActionInput,
   LearningTutorExplainWrongAnswerActionInput,
+  LearningTutorGiveHintActionInput,
 } from "./contracts/learningTutorServerActions";
 export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
@@ -70,17 +72,5 @@ export {
   listAvailableModels,
   findModel,
 } from "./models/registry";
-export {
-  AiProviderFoundation,
-  createProviderFoundation,
-} from "./providers/foundation";
-export type {
-  AiKnownProviderId,
-  AiModelFoundationDescriptor,
-  AiProviderFoundationDescriptor,
-  AiProviderFoundationSnapshot,
-  AiProviderRegistration,
-} from "./providers/foundationTypes";
-export { AI_KNOWN_PROVIDER_IDS } from "./providers/foundationTypes";
 export { routeModel } from "./routing/router";
 export { listTools, invokeTool, installReferenceTools } from "./tools/registry";

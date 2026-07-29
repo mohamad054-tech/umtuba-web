@@ -155,7 +155,10 @@ export async function runCapability(
       userId: deps.userId,
       lessonId,
       capabilityId: request.capabilityId as LearningTutorCapabilityId,
-      question: request.input.question ?? request.input.text,
+      question:
+        request.input.question ??
+        request.input.focus ??
+        request.input.text,
       locale: request.context.locale,
       forceStub: deps.forceStub,
     });

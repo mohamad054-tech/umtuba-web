@@ -2,24 +2,35 @@
 
 ## Task title
 
-UMTUBA AI Core Platform Foundation V1
+UM Learning AI Tutor Backend — `give_hint` capability
 
 ## Status
 
-`complete`
+`implementation-complete-local` — awaiting commit/push GO (this laptop)
 
 ## Branch
 
-`office/ai-core-platform-foundation-v1`
+`office/learning-ai-tutor-backend-foundation-v1`
 
-## Base
+## Milestone just completed
 
-Trusted Commerce beta readiness commit `6cbe0f68f418141ac887c99bf40e21eb1d0d27de`
+`learning.tutor.give_hint@1.0.0` / action `give_hint` / server action `giveHintLearningTutorAction`
 
-## Deliverable
+Maps to Learning OS message kind `hint`. Scaffolding-only; fail-closed against answer keys.
 
-Shared server-side AI Core Platform: gateway, provider/model registry, router, prompt versioning, context envelope, permission-aware tools, run lifecycle, usage/cost, tracing/audit, safety/policy, session boundary, memory interface, evaluation hooks, admin diagnostics, and one Product Draft Assistant reference consumer. No broad agents. No frozen Commerce/Learning architecture edits. Migrations local-only until explicitly approved.
+## Prior completed (do not reopen)
 
-## Result
+- explain_lesson, summarize_lesson, answer_question, generate_practice, explain_wrong_answer
+- integration boundary, server actions, Provider Foundation, Assistant Runtime Integration
 
-Complete. Report: `docs/ai/CURSOR_REPORT.md`. Migration `20260871` not remote-applied.
+## Machine policy
+
+This laptop owns AI Tutor Backend only. Do **not** touch `alpha-0.2` / Home / Profile / Commerce / Store / Creator / Navigation / Web UI.
+
+## Next (dependency-correct)
+
+Optional: `explain_again` backend capability. No UI on this machine.
+
+## Gates
+
+AI product flags remain default OFF on alpha line (not modified here).

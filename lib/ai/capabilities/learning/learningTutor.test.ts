@@ -88,6 +88,35 @@ describe("Learning tutor safety", () => {
     ).toThrow(/AI-generated/i);
   });
 
+  it("blocks give_hint outputs that reveal keys", () => {
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.give_hint",
+        userInput: "hint please",
+        structured: {
+          hint: "x",
+          hintLevel: "gentle",
+          labeledAiGenerated: true,
+          revealsAnswerKey: true,
+        },
+      })
+    ).toThrow(/answer keys/i);
+
+    expect(() =>
+      assertLearningTutorSafety({
+        capabilityId: "learning.tutor.give_hint",
+        userInput: "hint please",
+        structured: {
+          hint: "x",
+          hintLevel: "gentle",
+          labeledAiGenerated: true,
+          revealsAnswerKey: false,
+          correctAnswer: "42",
+        },
+      })
+    ).toThrow(/key leakage|full-answer/i);
+  });
+
   it("validates groundingStatus", () => {
     const prompt = LEARNING_TUTOR_PROMPTS[0]!;
     const bad = validateLearningTutorStructured(prompt, {
@@ -104,13 +133,14 @@ describe("Learning tutor safety", () => {
 });
 
 describe("Learning tutor prompts registered", () => {
-  it("includes five V1 prompt versions", () => {
+  it("includes six V1 prompt versions", () => {
     expect(LEARNING_TUTOR_PROMPTS.map((p) => p.promptId).sort()).toEqual(
       [
         "learning.tutor.answer_question",
         "learning.tutor.explain_lesson",
         "learning.tutor.explain_wrong_answer",
         "learning.tutor.generate_practice",
+        "learning.tutor.give_hint",
         "learning.tutor.summarize_lesson",
       ].sort()
     );
@@ -302,6 +332,39 @@ describe("Learning tutor authorization + capabilities (stub)", () => {
       labeledAiGenerated: true,
       mutatesGrades: false,
     });
+  });
+
+  it("requires focus for give_hint and returns scaffolding-only stub", async () => {
+    const missing = await aiService.runCapability(
+      {
+        capabilityId: "learning.tutor.give_hint",
+        input: { lessonId: LESSON },
+        context: { productDomain: "learning", surface: "test", lessonId: LESSON },
+      },
+      { supabase: createFakeSupabase() as never, userId: USER, forceStub: true }
+    );
+    expect(missing.ok).toBe(false);
+    if (missing.ok) return;
+    expect(missing.error.message).toMatch(/focus/i);
+
+    const ok = await aiService.runCapability(
+      {
+        capabilityId: "learning.tutor.give_hint",
+        input: { lessonId: LESSON, question: "neural networks definition" },
+        context: { productDomain: "learning", surface: "test", lessonId: LESSON },
+      },
+      { supabase: createFakeSupabase() as never, userId: USER, forceStub: true }
+    );
+    expect(ok.ok).toBe(true);
+    if (!ok.ok) return;
+    expect(ok.data.result).toMatchObject({
+      labeledAiGenerated: true,
+      revealsAnswerKey: false,
+      mutatesProgress: false,
+      mutatesGrades: false,
+    });
+    expect(ok.data.result).toHaveProperty("hint");
+    expect(ok.data.result).toHaveProperty("hintLevel");
   });
 
   it("requires attemptId + questionId for explain_wrong_answer", async () => {

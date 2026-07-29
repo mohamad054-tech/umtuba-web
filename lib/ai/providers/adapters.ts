@@ -131,6 +131,23 @@ export function createStubAdapter(): AiProviderAdapter {
             labeledAiGenerated: true,
             revealsAnswerKey: false,
           };
+        } else if (input.capabilityId === "learning.tutor.give_hint") {
+          structured = {
+            hint: outside
+              ? "That focus is outside the authorized lesson material provided."
+              : `Stub scaffolding hint for ${lessonName}: revisit the first published definition, then try restating it in your own words.`,
+            hintLevel: outside ? "gentle" : "moderate",
+            focusRestated: "Learner-requested focus (stub).",
+            nextStep: "Retry the concept check without looking at a full answer.",
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: [
+              "Stub provider — not live model output.",
+              "Scaffolding only — not a graded solution.",
+            ],
+            labeledAiGenerated: true,
+            revealsAnswerKey: false,
+          };
         } else {
           structured = {
             title: `Explaining ${lessonName}`,

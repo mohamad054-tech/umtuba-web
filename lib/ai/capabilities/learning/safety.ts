@@ -73,6 +73,38 @@ export function assertLearningTutorSafety(input: {
       );
     }
   }
+  if (input.capabilityId === "learning.tutor.give_hint" && input.structured) {
+    if (input.structured.labeledAiGenerated !== true) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "Hint must be labeled AI-generated."
+      );
+    }
+    if (input.structured.revealsAnswerKey !== false) {
+      throw new AiPlatformError(
+        "safety_block",
+        "Hint must not reveal answer keys."
+      );
+    }
+    if (
+      "answerKey" in input.structured ||
+      "correctAnswer" in input.structured ||
+      "answer_key" in input.structured ||
+      "fullAnswer" in input.structured
+    ) {
+      throw new AiPlatformError(
+        "safety_block",
+        "Hint attempted full-answer or key leakage fields."
+      );
+    }
+    const level = String(input.structured.hintLevel ?? "");
+    if (!["gentle", "moderate", "strong"].includes(level)) {
+      throw new AiPlatformError(
+        "invalid_structured_output",
+        "hintLevel must be gentle|moderate|strong."
+      );
+    }
+  }
 }
 
 export function validateLearningTutorStructured(

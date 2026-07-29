@@ -6,6 +6,7 @@ import {
   explainLessonLearningTutor,
   explainWrongAnswerLearningTutor,
   generatePracticeLearningTutor,
+  giveHintLearningTutor,
   summarizeLessonLearningTutor,
 } from "./learningTutorServerActions";
 import type {
@@ -124,6 +125,10 @@ describe("Learning Tutor server actions foundation", () => {
         { attemptId: ATTEMPT, questionId: QUESTION },
         rt
       ),
+      await giveHintLearningTutor(
+        { lessonId: LESSON, focus: "neural networks" },
+        rt
+      ),
     ];
 
     const expected = [
@@ -132,9 +137,10 @@ describe("Learning Tutor server actions foundation", () => {
       "generate_practice",
       "answer_question",
       "explain_wrong_answer",
+      "give_hint",
     ] as const;
 
-    expect(runIntegration).toHaveBeenCalledTimes(5);
+    expect(runIntegration).toHaveBeenCalledTimes(6);
     results.forEach((result, index) => {
       expect(result.ok).toBe(true);
       if (!result.ok) return;
@@ -216,6 +222,7 @@ describe("Learning Tutor server actions foundation", () => {
     expect(src).toMatch(/answerQuestionLearningTutorAction/);
     expect(src).toMatch(/generatePracticeLearningTutorAction/);
     expect(src).toMatch(/explainWrongAnswerLearningTutorAction/);
+    expect(src).toMatch(/giveHintLearningTutorAction/);
     expect(src).toMatch(/learningTutorServerActions/);
     const imports = src
       .split(/\r?\n/)

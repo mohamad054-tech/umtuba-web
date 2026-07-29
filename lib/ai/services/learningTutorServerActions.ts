@@ -12,6 +12,7 @@ import type {
   LearningTutorExplainLessonActionInput,
   LearningTutorExplainWrongAnswerActionInput,
   LearningTutorGeneratePracticeActionInput,
+  LearningTutorGiveHintActionInput,
   LearningTutorServerActionResult,
   LearningTutorSummarizeLessonActionInput,
 } from "../contracts/learningTutorServerActions";
@@ -152,6 +153,7 @@ async function executeNamedIntegration(
 
 const LESSON_KEYS = new Set(["lessonId", "locale"]);
 const ANSWER_KEYS = new Set(["lessonId", "question", "locale"]);
+const HINT_KEYS = new Set(["lessonId", "focus", "locale"]);
 const WRONG_KEYS = new Set(["attemptId", "questionId", "locale"]);
 
 export async function explainLessonLearningTutor(
@@ -221,6 +223,21 @@ export async function explainWrongAnswerLearningTutor(
     action: "explain_wrong_answer",
     attemptId: input.attemptId,
     questionId: input.questionId,
+    locale: input.locale,
+    surface: SURFACE,
+  });
+}
+
+export async function giveHintLearningTutor(
+  input: LearningTutorGiveHintActionInput,
+  runtime: LearningTutorServerActionRuntime
+): Promise<LearningTutorServerActionResult> {
+  const rejected = rejectExtraKeys(input, HINT_KEYS);
+  if (rejected) return rejected;
+  return executeNamedIntegration(runtime, {
+    action: "give_hint",
+    lessonId: input.lessonId,
+    focus: input.focus,
     locale: input.locale,
     surface: SURFACE,
   });

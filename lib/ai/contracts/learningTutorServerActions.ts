@@ -39,6 +39,12 @@ export type LearningTutorExplainWrongAnswerActionInput =
     questionId: string;
   };
 
+export type LearningTutorGiveHintActionInput =
+  LearningTutorServerActionLocaleInput & {
+    lessonId: string;
+    focus: string;
+  };
+
 export type LearningTutorServerActionSuccess = {
   runId: string;
   action: LearningTutorIntegrationAction;

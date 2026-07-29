@@ -33,6 +33,7 @@ export const LEARNING_TUTOR_CAPABILITIES = [
   "learning.tutor.answer_question",
   "learning.tutor.generate_practice",
   "learning.tutor.explain_wrong_answer",
+  "learning.tutor.give_hint",
 ] as const;
 
 export type LearningTutorCapabilityId =
@@ -165,25 +166,34 @@ export async function runLearningTutorCapability(
     sourceReferences = grounded.sourceReferences;
     learnerQuestion =
       input.question?.trim() ||
-      (input.capabilityId === "learning.tutor.answer_question"
+      (input.capabilityId === "learning.tutor.answer_question" ||
+      input.capabilityId === "learning.tutor.give_hint"
         ? ""
         : "Please help me with this lesson.");
 
     if (
-      input.capabilityId === "learning.tutor.answer_question" &&
+      (input.capabilityId === "learning.tutor.answer_question" ||
+        input.capabilityId === "learning.tutor.give_hint") &&
       !learnerQuestion
     ) {
       return {
         ok: false,
         code: "invalid_input",
-        message: "A learner question is required.",
+        message:
+          input.capabilityId === "learning.tutor.give_hint"
+            ? "A focus is required for a hint."
+            : "A learner question is required.",
       };
     }
 
     userInputBody = [
       "Authorized published lesson material:",
       grounded.pack,
-      learnerQuestion ? `Learner request: ${learnerQuestion}` : "",
+      input.capabilityId === "learning.tutor.give_hint"
+        ? `Learner focus for scaffolding hint (do not give a full graded answer): ${learnerQuestion}`
+        : learnerQuestion
+          ? `Learner request: ${learnerQuestion}`
+          : "",
     ]
       .filter(Boolean)
       .join("\n\n");

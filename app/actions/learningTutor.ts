@@ -14,6 +14,7 @@ import type {
   LearningTutorExplainLessonActionInput,
   LearningTutorExplainWrongAnswerActionInput,
   LearningTutorGeneratePracticeActionInput,
+  LearningTutorGiveHintActionInput,
   LearningTutorServerActionResult,
   LearningTutorSummarizeLessonActionInput,
 } from "../../lib/ai/contracts/learningTutorServerActions";
@@ -22,6 +23,7 @@ import {
   explainLessonLearningTutor,
   explainWrongAnswerLearningTutor,
   generatePracticeLearningTutor,
+  giveHintLearningTutor,
   summarizeLessonLearningTutor,
   type LearningTutorServerActionRuntime,
 } from "../../lib/ai/services/learningTutorServerActions";
@@ -64,4 +66,10 @@ export async function explainWrongAnswerLearningTutorAction(
   input: LearningTutorExplainWrongAnswerActionInput
 ): Promise<LearningTutorServerActionResult> {
   return explainWrongAnswerLearningTutor(input, await defaultRuntime());
+}
+
+export async function giveHintLearningTutorAction(
+  input: LearningTutorGiveHintActionInput
+): Promise<LearningTutorServerActionResult> {
+  return giveHintLearningTutor(input, await defaultRuntime());
 }
