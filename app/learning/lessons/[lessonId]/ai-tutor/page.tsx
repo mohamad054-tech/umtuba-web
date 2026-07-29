@@ -16,6 +16,7 @@ import {
   appendAiTutorMessageAction,
   createAiTutorThreadAction,
 } from "../../../firstCourseActions";
+import { isAiProductExperienceEnabled } from "../../../../../lib/ai/betaProductSurfaces";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,31 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
   if (!delivery.ok) {
     redirect(LEARNING_LEARNER_ROUTES.hub);
   }
+
+  if (!isAiProductExperienceEnabled()) {
+    return (
+      <LearningShell
+        title="Tutor unavailable"
+        subtitle="AI product surfaces are offline for this Beta"
+        backHref={LEARNING_LEARNER_ROUTES.lesson(lessonId)}
+        backLabel="Back to lesson"
+      >
+        <div
+          className="mt-6 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-5 text-sm text-amber-50"
+          role="status"
+        >
+          <p className="font-bold">AI Tutor is not enabled</p>
+          <p className="mt-2 text-amber-50/80">
+            UMTUBA AI Hub and Assistant Runtime are OFF. This route stays
+            available for deep links but does not run tutor threads, provider
+            calls, or AI-branded study sessions until product flags are
+            explicitly enabled.
+          </p>
+        </div>
+      </LearningShell>
+    );
+  }
+
   const courseId = delivery.data.lesson.course_id;
   const threadsResult = await listMyAiTutorThreads(supabase, courseId);
   const threads =

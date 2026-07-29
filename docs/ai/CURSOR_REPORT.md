@@ -1,54 +1,34 @@
-# CURSOR_REPORT — Wave 3.5 Alpha Integration + Hero Completeness Sync
+# CURSOR_REPORT — Profile Hero Completeness V1 (alpha re-sync)
 
 ## Summary
 
-Landed **Revenue + Commerce + Shared AI** on the alpha line via `integration/w3-alpha-final`.
-**Creator Space Hero Completeness V1** (`3b88b01036269b60410d41830fd24b2af85af091`) synced onto latest `origin/alpha-0.2` @ `6061a6a` via merge (docs conflicts only).
+**Creator Space Hero Completeness V1** (`3b88b01036269b60410d41830fd24b2af85af091`) is re-synced onto current truth line `origin/alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8` via merge `--no-ff --no-commit` (manual commit pending).
 
-Sequence:
-1. Base `origin/alpha-0.2` @ `769039d` (creator photos lightbox after `6fac440`)
-2. Merge `origin/integration/w3-ai` @ `d4bbddc`
-3. Alpha advanced to `4fdbf30` (creator all timeline contract) during the wave — merged that tip in (no force / no rebase) before updating `alpha-0.2`
-4. Feature `office/profile-hero-completeness-v1` @ `3b88b01` merged with `6061a6a`
+Alpha already closed:
+- Integration Program V1 Waves 0–4
+- Alpha Beta Productization V1 (honesty/gating/ops)
 
-Docs conflicts resolved for Wave 3.5. Home/nav retained. Commerce seller routes retained. AI Hub flag-gated OFF. No World / Games / Ads. No live AI providers or API keys.
+## Hero Completeness V1 — files
 
-## Creator Space Hero Completeness V1 — files
-
-- `app/profile/lib/profileHeroCompleteness.ts` (new)
-- `lib/content/profileHeroCompleteness.v1.test.ts` (new)
+- `app/profile/lib/profileHeroCompleteness.ts`
+- `lib/content/profileHeroCompleteness.v1.test.ts`
 - `app/profile/components/ProfileHeader.tsx`
 - `app/profile/data/mockProfiles.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-## Prior waves
-
-- W0 Work Protection
-- W1 Revenue
-- W2 Commerce
-- W3 AI (`d4bbddc`)
-
 ## Security review
 
-- AI flags default OFF
-- Commerce kill-switch retained
-- Revenue fail-closed retained
-- No primary-nav AI entry
-- Hero Completeness: Client UI over existing ProfileView fields only; no migrations; no invented profession/verified/cover fields.
+- Hero Completeness: client UI over existing ProfileView fields only; no migrations; no invented profession/verified/cover fields
+- AI flags remain default OFF (from alpha)
+- Commerce kill-switch / Beta honesty retained (from alpha)
+- No Gemini/API keys / live PSP introduced by this sync
 
-## Tests
+## Migrations created
 
-See Wave 3.5 final verification report in chat.
-Hero Completeness Vitest (Hero + Creator Space): **31/31 passed** (pre-sync).
-
-## TypeScript
-
-Re-check after timeline tip (may fix prior `../cards` import).
-Hero Completeness: `npm run build` TS passed; `npx tsc --noEmit` baseline only (`../cards`).
+None.
 
 ## Open issues
 
-- Pre-existing 3 Commerce store test failures on tip lineage
-- Lint debt baseline
-- Feature synced with alpha; merge into `alpha-0.2` not yet done in this step
+- Merge commit not created yet (prepared locally for manual commit)
+- Lint debt baseline on alpha (~74) unchanged by this feature

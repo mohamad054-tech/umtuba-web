@@ -6,15 +6,17 @@ Creator Space Hero Completeness V1
 
 ## Status
 
-`synced-with-alpha` — Feature commit `3b88b01036269b60410d41830fd24b2af85af091` merged with latest `origin/alpha-0.2` @ `6061a6a` (docs conflicts only)
+`resync-prepared` — Feature commit `3b88b01036269b60410d41830fd24b2af85af091` re-synced onto latest `origin/alpha-0.2` @ `71dfec2` via `merge --no-ff --no-commit` (awaiting manual commit)
 
 ## Branch
 
 `office/profile-hero-completeness-v1`
 
-## Alpha tip
+## Alpha tip (truth line)
 
-`origin/alpha-0.2` @ `6061a6ae22eb8a323e51af63ecdcf9b655177d37` (includes Wave 3.5 Revenue + Commerce + Shared AI, lightbox, creator all timeline)
+`origin/alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8`
+
+Includes: Wave 3.5 (Revenue + Commerce + Shared AI), Wave 4 stabilization, Alpha Beta Productization V1.
 
 ## Feature commit
 
@@ -24,23 +26,20 @@ Creator Space Hero Completeness V1
 
 - Bio clamp/more + specialty chips (max 3, conditional)
 - Helpers + tests; mock `lina.creates` long bio for preview
-- Synced feature onto latest alpha via merge (no rebase / no force)
+- Prior sync onto `6061a6a`; re-sync onto `71dfec2` prepared (no rebase / no force)
 
-## Prior alpha checkpoint (Wave 3.5)
+## Closed on alpha (do not reopen)
 
-- Status: `complete` on `alpha-0.2`
-- Branch: `integration/w3-alpha-final`
-- Base progression:
-  1. Started from `origin/alpha-0.2` @ `769039d` (creator photos lightbox)
-  2. Merged `origin/integration/w3-ai` @ `d4bbddc` (Revenue + Commerce + AI)
-  3. Re-merged newer `origin/alpha-0.2` @ `4fdbf30` (creator all timeline contract) before landing on alpha
-- Scope: Land Revenue + Commerce + Shared AI on alpha. Preserve latest alpha Home/Navigation/profile contracts. AI flags default OFF. No World / Games / Ads. No live providers.
+- Integration Program V1 Waves 0–4
+- Alpha Beta Productization V1
 
 ## Gates (unchanged)
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
 - `HOME_LOCK_ACTIVE = true`
+- AI product flags default OFF
+- Commerce confirm DB gate default OFF
 
 ## Out of scope
 
-New features beyond the merged tips, Gemini/OpenAI live activation, force-push, Worktree cleanup. Merge into `alpha-0.2` not in this sync step.
+New features beyond Hero Completeness, Gemini/OpenAI live activation, force-push, Worktree cleanup, Learning Nexus salvage, World/Games/Ads productization. Landing onto `alpha-0.2` is a separate manual step after commit.
