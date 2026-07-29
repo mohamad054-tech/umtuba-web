@@ -21,6 +21,7 @@ export default defineConfig({
       "lib/geo/**/*.test.ts",
       "lib/world/**/*.test.ts",
       "lib/wallet/**/*.test.ts",
+      "lib/revenue/**/*.test.ts",
       "lib/ueos/**/*.test.ts",
       "lib/activity-tiers/**/*.test.ts",
       "lib/media/**/*.test.ts",

@@ -6,13 +6,14 @@
 
 ## Primary working branch
 
-`alpha-0.2` @ `302e32f98bef66b7b04b732d1dbf587073a5aca6`
+`alpha-0.2` @ `6fac4409f217b6e7d28b2ff4c0a2dab453f45427`
 
-## Active feature (this machine)
+## Active feature (this machine — Desktop)
 
-- **Branch:** `office/home-assembly-v1` (from `alpha-0.2` @ `302e32f`)
-- **Task:** Home Assembly V1 — Revised planning (page-row Stage↔Aside only; Arc sealed)
-- **See:** `docs/ai/CURRENT_TASK.md`
+- **Branch:** `office/unified-revenue-platform-foundation-v1` (from `origin/alpha-0.2` @ `6fac440`)
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-revenue-platform-foundation-v1`
+- **Task:** Unified Revenue Platform Foundation V1
+- **See:** `docs/ai/CURSOR_REPORT.md` · `docs/architecture/revenue/`
 
 ## Closed on alpha-0.2 (do not reopen)
 
@@ -20,13 +21,15 @@
 - Home Circular Arc Preview & Polish V1
 - Home Left Action Rail Arc Alignment V1 (`302e32f`)
 - Arc design locked: 7 circles, arc `[0,-6,-11,-14,-11,-6,0]`, host `left-[5px]`
+- Home Assembly V1 landed on `alpha-0.2` (`6fac440`)
 
 ## Gates (unchanged)
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
 - `HOME_LOCK_ACTIVE = true`
 - Preview via existing `shouldMountHomeCircularArc()` only
-- Store Domain off-limits on laptop
+- Do not modify Home / Navigation / App Shell in this revenue phase
+- Do not modify AI Core in this revenue phase
 
 ## Source of truth
 
@@ -38,7 +41,7 @@
 | Machine | Role |
 | --- | --- |
 | **Laptop** | Primary development and integration machine |
-| **Desktop** | May perform isolated review / testing tasks only |
+| **Desktop** | Isolated feature worktrees (current: Revenue Platform Foundation) |
 
 ## Safety defaults
 
@@ -47,5 +50,5 @@
 - **No remote Supabase migration apply** without explicit approval.
 - **No destructive Git actions** without explicit approval.
 - Follow `docs/DEVELOPMENT_WORKFLOW.md`.
-- Follow `docs/ai/CURRENT_TASK.md` for active handoff scope.
+- Follow `docs/ai/CURRENT_TASK.md` for active handoff scope when applicable.
 - Write execution results to `docs/ai/CURSOR_REPORT.md`.
