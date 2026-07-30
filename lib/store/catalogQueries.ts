@@ -17,6 +17,79 @@ import type {
 
 type AnyClient = SupabaseClient;
 
+type CatalogStorePick = Pick<
+  StoreRow,
+  "id" | "slug" | "name" | "logo_path" | "status"
+>;
+
+type CatalogProductRow = StoreProductRow & { stores: CatalogStorePick };
+
+/** Explicit public catalog product columns — avoids SELECT * on storefront paths. */
+export const STORE_PRODUCT_PUBLIC_COLUMNS = [
+  "id",
+  "store_id",
+  "slug",
+  "title",
+  "short_description",
+  "description",
+  "product_type",
+  "status",
+  "moderation_status",
+  "primary_category_id",
+  "brand_id",
+  "created_by",
+  "created_at",
+  "updated_at",
+  "published_at",
+  "review_note",
+  "reviewed_at",
+  "item_type",
+  "weight_grams",
+  "length_mm",
+  "width_mm",
+  "height_mm",
+  "origin_country_code",
+  "marketplace_eligible",
+].join(", ");
+
+const STORE_PUBLIC_COLUMNS = [
+  "id",
+  "owner_user_id",
+  "slug",
+  "name",
+  "description",
+  "logo_path",
+  "cover_path",
+  "status",
+  "verification_status",
+  "default_currency",
+  "country_code",
+  "city",
+  "public_contact_email",
+  "public_contact_phone",
+  "public_contact_url",
+  "store_template",
+  "tagline",
+  "return_policy",
+  "shipping_policy",
+  "privacy_policy",
+  "marketplace_supplier_enabled",
+  "created_at",
+  "updated_at",
+].join(", ");
+
+const VARIANT_PUBLIC_COLUMNS =
+  "id, product_id, sku, title, option_values, status, created_at, updated_at";
+
+const MEDIA_PUBLIC_COLUMNS =
+  "id, product_id, variant_id, media_type, storage_path, alt_text, sort_order, role, status";
+
+const PRICE_PUBLIC_COLUMNS =
+  "id, variant_id, currency, amount_minor, compare_at_amount_minor, country_code, starts_at, ends_at, status, created_at";
+
+const INVENTORY_PUBLIC_COLUMNS =
+  "id, variant_id, warehouse_key, on_hand, reserved, safety_stock, allow_backorder";
+
 export async function listActiveCategories(
   supabase: AnyClient
 ): Promise<ProductCategoryRow[]> {
@@ -36,98 +109,188 @@ export async function listActiveCategories(
  */
 export async function enrichPublicCatalogRow(
   supabase: AnyClient,
-  row: StoreProductRow & {
-    stores: Pick<StoreRow, "id" | "slug" | "name" | "logo_path" | "status">;
-  }
+  row: CatalogProductRow
 ): Promise<PublicCatalogItem> {
-  const store = row.stores;
+  const [item] = await enrichPublicCatalogRows(supabase, [row]);
+  return item;
+}
 
-  const { data: media } = await supabase
-    .from("product_media")
-    .select("storage_path, role, status, sort_order")
-    .eq("product_id", row.id)
-    .eq("status", "active")
-    .order("sort_order", { ascending: true })
-    .limit(8);
+/**
+ * Batch catalog enrichment — replaces per-row N+1 media/variant/price/inventory
+ * round-trips with a fixed number of queries + parallel signed URL mints.
+ */
+export async function enrichPublicCatalogRows(
+  supabase: AnyClient,
+  rows: CatalogProductRow[]
+): Promise<PublicCatalogItem[]> {
+  if (rows.length === 0) return [];
 
-  const cover =
-    (media ?? []).find((m) => m.role === "cover")?.storage_path ??
-    (media ?? [])[0]?.storage_path ??
-    null;
+  const productIds = rows.map((row) => row.id);
 
-  const { data: variants } = await supabase
-    .from("product_variants")
-    .select("id")
-    .eq("product_id", row.id)
-    .eq("status", "active")
-    .limit(1);
-
-  let priceMinor: number | null = null;
-  let compareAtMinor: number | null = null;
-  let currency: string | null = null;
-  let available: number | null = null;
-
-  const variantId = variants?.[0]?.id;
-  if (variantId) {
-    const { data: price } = await supabase
-      .from("product_prices")
-      .select("amount_minor, compare_at_amount_minor, currency")
-      .eq("variant_id", variantId)
+  const [{ data: mediaRows }, { data: variantRows }] = await Promise.all([
+    supabase
+      .from("product_media")
+      .select("product_id, storage_path, role, status, sort_order")
+      .in("product_id", productIds)
       .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (price) {
-      priceMinor = Number(price.amount_minor);
-      currency = price.currency;
-      const compareRaw =
-        price.compare_at_amount_minor == null
-          ? null
-          : Number(price.compare_at_amount_minor);
-      compareAtMinor = isLegitimateCompareAt(priceMinor, compareRaw)
-        ? compareRaw
-        : null;
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("product_variants")
+      .select("id, product_id, created_at")
+      .in("product_id", productIds)
+      .eq("status", "active")
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const mediaByProduct = new Map<
+    string,
+    Array<{ storage_path: string; role: string; sort_order: number }>
+  >();
+  for (const row of mediaRows ?? []) {
+    const productId = String(row.product_id);
+    const list = mediaByProduct.get(productId) ?? [];
+    list.push({
+      storage_path: String(row.storage_path),
+      role: String(row.role),
+      sort_order: Number(row.sort_order ?? 0),
+    });
+    mediaByProduct.set(productId, list);
+  }
+
+  const variantIdByProduct = new Map<string, string>();
+  for (const row of variantRows ?? []) {
+    const productId = String(row.product_id);
+    if (variantIdByProduct.has(productId)) continue;
+    variantIdByProduct.set(productId, String(row.id));
+  }
+
+  const variantIds = Array.from(new Set(variantIdByProduct.values()));
+  let priceByVariant = new Map<
+    string,
+    {
+      amount_minor: number;
+      compare_at_amount_minor: number | null;
+      currency: string;
+      created_at: string;
+    }
+  >();
+  let inventoryByVariant = new Map<
+    string,
+    { on_hand: number; reserved: number; safety_stock: number }
+  >();
+
+  if (variantIds.length > 0) {
+    const [{ data: prices }, { data: inventories }] = await Promise.all([
+      supabase
+        .from("product_prices")
+        .select(
+          "variant_id, amount_minor, compare_at_amount_minor, currency, created_at"
+        )
+        .in("variant_id", variantIds)
+        .eq("status", "active")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("product_inventory")
+        .select("variant_id, on_hand, reserved, safety_stock")
+        .in("variant_id", variantIds)
+        .eq("warehouse_key", "default"),
+    ]);
+
+    priceByVariant = new Map();
+    for (const price of prices ?? []) {
+      const variantId = String(price.variant_id);
+      if (priceByVariant.has(variantId)) continue;
+      priceByVariant.set(variantId, {
+        amount_minor: Number(price.amount_minor),
+        compare_at_amount_minor:
+          price.compare_at_amount_minor == null
+            ? null
+            : Number(price.compare_at_amount_minor),
+        currency: String(price.currency),
+        created_at: String(price.created_at ?? ""),
+      });
     }
 
-    const { data: inv } = await supabase
-      .from("product_inventory")
-      .select("on_hand, reserved, safety_stock")
-      .eq("variant_id", variantId)
-      .eq("warehouse_key", "default")
-      .maybeSingle();
-    if (inv) {
-      available = availableUnits({
-        onHand: inv.on_hand,
-        reserved: inv.reserved,
-        safetyStock: inv.safety_stock,
+    inventoryByVariant = new Map();
+    for (const inv of inventories ?? []) {
+      inventoryByVariant.set(String(inv.variant_id), {
+        on_hand: Number(inv.on_hand),
+        reserved: Number(inv.reserved),
+        safety_stock: Number(inv.safety_stock),
       });
     }
   }
 
-  const { stores: _stores, ...product } = row;
-  const mediaStoreId = (product as StoreProductRow).store_id || store.id;
-  const coverUrl = cover
-    ? await createAuthorizedProductMediaSignedUrl(supabase, {
+  const coverByProduct = new Map<string, string | null>();
+  for (const row of rows) {
+    const media = mediaByProduct.get(row.id) ?? [];
+    const cover =
+      media.find((m) => m.role === "cover")?.storage_path ??
+      media[0]?.storage_path ??
+      null;
+    coverByProduct.set(row.id, cover);
+  }
+
+  const coverUrls = await Promise.all(
+    rows.map(async (row) => {
+      const cover = coverByProduct.get(row.id) ?? null;
+      if (!cover) return null;
+      const mediaStoreId = row.store_id || row.stores.id;
+      return createAuthorizedProductMediaSignedUrl(supabase, {
         storagePath: cover,
         productId: row.id,
         storeId: mediaStoreId,
         userId: null,
-      })
-    : null;
+      });
+    })
+  );
 
-  return {
-    product: product as StoreProductRow,
-    store,
-    coverPath: cover,
-    coverUrl,
-    priceMinor,
-    compareAtMinor,
-    currency,
-    available,
-    sellerListingId: null,
-    supplierStoreId: null,
-    marketplaceSourceType: "owned",
-  };
+  return rows.map((row, index) => {
+    const store = row.stores;
+    const cover = coverByProduct.get(row.id) ?? null;
+    const variantId = variantIdByProduct.get(row.id);
+    let priceMinor: number | null = null;
+    let compareAtMinor: number | null = null;
+    let currency: string | null = null;
+    let available: number | null = null;
+
+    if (variantId) {
+      const price = priceByVariant.get(variantId);
+      if (price) {
+        priceMinor = price.amount_minor;
+        currency = price.currency;
+        compareAtMinor = isLegitimateCompareAt(
+          priceMinor,
+          price.compare_at_amount_minor
+        )
+          ? price.compare_at_amount_minor
+          : null;
+      }
+      const inv = inventoryByVariant.get(variantId);
+      if (inv) {
+        available = availableUnits({
+          onHand: inv.on_hand,
+          reserved: inv.reserved,
+          safetyStock: inv.safety_stock,
+        });
+      }
+    }
+
+    const { stores: _stores, ...product } = row;
+    return {
+      product: product as StoreProductRow,
+      store,
+      coverPath: cover,
+      coverUrl: coverUrls[index] ?? null,
+      priceMinor,
+      compareAtMinor,
+      currency,
+      available,
+      sellerListingId: null,
+      supplierStoreId: null,
+      marketplaceSourceType: "owned" as const,
+    };
+  });
 }
 
 export async function listPublicCatalog(
@@ -144,10 +307,7 @@ export async function listPublicCatalog(
   let query = supabase
     .from("store_products")
     .select(
-      `
-      *,
-      stores!inner ( id, slug, name, logo_path, status )
-    `
+      `${STORE_PRODUCT_PUBLIC_COLUMNS}, stores!inner ( id, slug, name, logo_path, status )` as "id"
     )
     .eq("status", "active")
     .eq("moderation_status", "approved")
@@ -176,24 +336,16 @@ export async function listPublicCatalog(
     return { items: [], error: "Unable to load catalog." };
   }
 
-  const rows = (data ?? []) as Array<
-    StoreProductRow & { stores: Pick<StoreRow, "id" | "slug" | "name" | "logo_path" | "status"> }
-  >;
+  const rows = (data as unknown as CatalogProductRow[] | null) ?? [];
+  const visibleRows = rows.filter((row) =>
+    isPubliclyVisibleProduct({
+      productStatus: row.status,
+      moderationStatus: row.moderation_status,
+      storeStatus: row.stores.status,
+    })
+  );
 
-  const items: PublicCatalogItem[] = [];
-  for (const row of rows) {
-    if (
-      !isPubliclyVisibleProduct({
-        productStatus: row.status,
-        moderationStatus: row.moderation_status,
-        storeStatus: row.stores.status,
-      })
-    ) {
-      continue;
-    }
-
-    items.push(await enrichPublicCatalogRow(supabase, row));
-  }
+  const items = await enrichPublicCatalogRows(supabase, visibleRows);
 
   // Supplier-sourced active listings appear on the seller storefront without
   // cloning products. Catalog card identity is the seller store; product truth
@@ -209,49 +361,95 @@ export async function listPublicCatalog(
         .limit(limit);
 
       const ownedIds = new Set(items.map((i) => i.product.id));
-      for (const listing of listings ?? []) {
+      const candidateListings = (listings ?? []).filter((listing) => {
         const sourceId = String(listing.source_product_id);
-        if (ownedIds.has(sourceId)) continue;
-        const { data: product } = await supabase
-          .from("store_products")
-          .select("*")
-          .eq("id", sourceId)
-          .eq("status", "active")
-          .eq("moderation_status", "approved")
-          .maybeSingle();
-        if (!product) continue;
+        return !ownedIds.has(sourceId);
+      });
 
-        const { data: allowed } = await supabase.rpc(
-          "store_listing_allows_seller_sale",
-          {
-            p_seller_store_id: sellerStore.id,
-            p_product_id: sourceId,
-            p_listing_id: listing.id,
-          }
+      if (candidateListings.length > 0) {
+        const sourceIds = Array.from(
+          new Set(candidateListings.map((l) => String(l.source_product_id)))
         );
-        if (allowed !== true) continue;
 
-        const enriched = await enrichPublicCatalogRow(supabase, {
-          ...(product as StoreProductRow),
-          stores: {
-            id: sellerStore.id,
-            slug: sellerStore.slug,
-            name: sellerStore.name,
-            logo_path: sellerStore.logo_path,
-            status: sellerStore.status,
-          },
+        const { data: products } = await supabase
+          .from("store_products")
+          .select(STORE_PRODUCT_PUBLIC_COLUMNS as "id")
+          .in("id", sourceIds)
+          .eq("status", "active")
+          .eq("moderation_status", "approved");
+
+        const productById = new Map(
+          ((products as unknown as StoreProductRow[] | null) ?? []).map((p) => [
+            String(p.id),
+            p,
+          ])
+        );
+
+        const allowedFlags = await Promise.all(
+          candidateListings.map(async (listing) => {
+            const sourceId = String(listing.source_product_id);
+            if (!productById.has(sourceId)) return false;
+            const { data: allowed } = await supabase.rpc(
+              "store_listing_allows_seller_sale",
+              {
+                p_seller_store_id: sellerStore.id,
+                p_product_id: sourceId,
+                p_listing_id: listing.id,
+              }
+            );
+            return allowed === true;
+          })
+        );
+
+        const listingRows: CatalogProductRow[] = [];
+        const listingMeta: Array<{
+          listingId: string;
+          supplierStoreId: string;
+          displayTitle: string | null;
+        }> = [];
+
+        candidateListings.forEach((listing, index) => {
+          if (!allowedFlags[index]) return;
+          const sourceId = String(listing.source_product_id);
+          const product = productById.get(sourceId);
+          if (!product) return;
+          listingRows.push({
+            ...product,
+            stores: {
+              id: sellerStore.id,
+              slug: sellerStore.slug,
+              name: sellerStore.name,
+              logo_path: sellerStore.logo_path,
+              status: sellerStore.status,
+            },
+          });
+          listingMeta.push({
+            listingId: String(listing.id),
+            supplierStoreId: String(listing.supplier_store_id),
+            displayTitle: listing.display_title_override
+              ? String(listing.display_title_override)
+              : null,
+          });
         });
-        if (listing.display_title_override) {
-          enriched.product = {
-            ...enriched.product,
-            title: String(listing.display_title_override),
-          };
-        }
-        enriched.sellerListingId = String(listing.id);
-        enriched.supplierStoreId = String(listing.supplier_store_id);
-        enriched.marketplaceSourceType = "supplier_listing";
-        items.push(enriched);
-        ownedIds.add(sourceId);
+
+        const listingItems = await enrichPublicCatalogRows(
+          supabase,
+          listingRows
+        );
+        listingItems.forEach((enriched, index) => {
+          const meta = listingMeta[index];
+          if (meta.displayTitle) {
+            enriched.product = {
+              ...enriched.product,
+              title: meta.displayTitle,
+            };
+          }
+          enriched.sellerListingId = meta.listingId;
+          enriched.supplierStoreId = meta.supplierStoreId;
+          enriched.marketplaceSourceType = "supplier_listing";
+          items.push(enriched);
+          ownedIds.add(enriched.product.id);
+        });
       }
     }
   }
@@ -265,11 +463,11 @@ export async function getPublicStoreBySlug(
 ): Promise<StoreRow | null> {
   const { data } = await supabase
     .from("stores")
-    .select("*")
+    .select(STORE_PUBLIC_COLUMNS as "id")
     .eq("slug", storeSlug.toLowerCase())
     .eq("status", "active")
     .maybeSingle();
-  return (data as StoreRow | null) ?? null;
+  return (data as unknown as StoreRow | null) ?? null;
 }
 
 export async function getPublicProductDetail(
@@ -287,7 +485,7 @@ export async function getPublicProductDetail(
   // Rule: owned product first (slug collision → seller-owned wins).
   const { data: ownedProduct, error: ownedError } = await supabase
     .from("store_products")
-    .select("*")
+    .select(STORE_PRODUCT_PUBLIC_COLUMNS as "id")
     .eq("store_id", store.id)
     .eq("slug", slug)
     .eq("status", "active")
@@ -300,7 +498,7 @@ export async function getPublicProductDetail(
   }
 
   if (ownedProduct) {
-    const productRow = ownedProduct as StoreProductRow;
+    const productRow = ownedProduct as unknown as StoreProductRow;
     if (
       !isPubliclyVisibleProduct({
         productStatus: productRow.status,
@@ -336,6 +534,71 @@ export async function getPublicProductDetail(
     return { detail: null, error: "Unable to load product." };
   }
 
+  const candidates = listingCandidates ?? [];
+  if (candidates.length === 0) {
+    return { detail: null, error: null };
+  }
+
+  const sourceIds = Array.from(
+    new Set(candidates.map((listing) => String(listing.source_product_id)))
+  );
+
+  const { data: sourceProducts } = await supabase
+    .from("store_products")
+    .select(STORE_PRODUCT_PUBLIC_COLUMNS as "id")
+    .in("id", sourceIds)
+    .eq("slug", slug)
+    .eq("status", "active")
+    .eq("moderation_status", "approved");
+
+  const productById = new Map(
+    ((sourceProducts as unknown as StoreProductRow[] | null) ?? []).map((p) => [
+      String(p.id),
+      p,
+    ])
+  );
+
+  const slugMatches = candidates.filter((listing) =>
+    productById.has(String(listing.source_product_id))
+  );
+  if (slugMatches.length === 0) {
+    return { detail: null, error: null };
+  }
+
+  const supplierIds = Array.from(
+    new Set(
+      slugMatches
+        .map((listing) => productById.get(String(listing.source_product_id))!)
+        .map((product) => String(product.store_id))
+    )
+  );
+
+  const { data: suppliers } = await supabase
+    .from("stores")
+    .select("id, name, status, verification_status, marketplace_supplier_enabled")
+    .in("id", supplierIds);
+
+  const supplierById = new Map(
+    (suppliers ?? []).map((s) => [String(s.id), s])
+  );
+
+  const allowedFlags = await Promise.all(
+    slugMatches.map(async (listing) => {
+      const source = productById.get(String(listing.source_product_id))!;
+      const supplier = supplierById.get(String(source.store_id));
+      if (!supplier) return false;
+      const { data: allowed } = await supabase.rpc(
+        "store_listing_allows_seller_sale",
+        {
+          p_seller_store_id: store.id,
+          p_product_id: source.id,
+          p_listing_id: listing.id,
+        }
+      );
+      return allowed === true;
+    })
+  );
+
   let matched:
     | {
         listingId: string;
@@ -345,35 +608,12 @@ export async function getPublicProductDetail(
       }
     | null = null;
 
-  for (const listing of listingCandidates ?? []) {
-    const { data: source } = await supabase
-      .from("store_products")
-      .select("*")
-      .eq("id", listing.source_product_id)
-      .eq("slug", slug)
-      .eq("status", "active")
-      .eq("moderation_status", "approved")
-      .maybeSingle();
-    if (!source) continue;
-
-    const { data: supplier } = await supabase
-      .from("stores")
-      .select("id, name, status, verification_status, marketplace_supplier_enabled")
-      .eq("id", source.store_id)
-      .maybeSingle();
-
+  for (let i = 0; i < slugMatches.length; i++) {
+    if (!allowedFlags[i]) continue;
+    const listing = slugMatches[i];
+    const source = productById.get(String(listing.source_product_id))!;
+    const supplier = supplierById.get(String(source.store_id));
     if (!supplier) continue;
-
-    const { data: allowed } = await supabase.rpc(
-      "store_listing_allows_seller_sale",
-      {
-        p_seller_store_id: store.id,
-        p_product_id: source.id,
-        p_listing_id: listing.id,
-      }
-    );
-
-    if (allowed !== true) continue;
 
     if (matched) {
       // Ambiguous: two active listings map to same slug under this seller.
@@ -384,7 +624,7 @@ export async function getPublicProductDetail(
       displayTitle: listing.display_title_override
         ? String(listing.display_title_override)
         : null,
-      product: source as StoreProductRow,
+      product: source,
       supplierName: supplier.name ? String(supplier.name) : null,
     };
   }
@@ -423,13 +663,13 @@ async function buildPublicProductDetail(
     await Promise.all([
       supabase
         .from("product_variants")
-        .select("*")
+        .select(VARIANT_PUBLIC_COLUMNS as "id")
         .eq("product_id", productRow.id)
         .eq("status", "active")
         .order("created_at", { ascending: true }),
       supabase
         .from("product_media")
-        .select("*")
+        .select(MEDIA_PUBLIC_COLUMNS as "id")
         .eq("product_id", productRow.id)
         .eq("status", "active")
         .order("sort_order", { ascending: true }),
@@ -443,28 +683,45 @@ async function buildPublicProductDetail(
         : Promise.resolve({ data: null }),
     ]);
 
-  const variantRows = (variants ?? []) as ProductVariantRow[];
+  const variantRows =
+    (variants as unknown as ProductVariantRow[] | null) ?? [];
+  const variantIds = variantRows.map((v) => v.id);
+
+  let priceByVariant = new Map<string, ProductPriceRow>();
+  let inventoryByVariant = new Map<string, ProductInventoryRow>();
+
+  if (variantIds.length > 0) {
+    const [{ data: prices }, { data: inventories }] = await Promise.all([
+      supabase
+        .from("product_prices")
+        .select(PRICE_PUBLIC_COLUMNS as "id")
+        .in("variant_id", variantIds)
+        .eq("status", "active")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("product_inventory")
+        .select(INVENTORY_PUBLIC_COLUMNS as "id")
+        .in("variant_id", variantIds)
+        .eq("warehouse_key", "default"),
+    ]);
+
+    for (const price of (prices as unknown as ProductPriceRow[] | null) ??
+      []) {
+      const variantId = String(price.variant_id);
+      if (priceByVariant.has(variantId)) continue;
+      priceByVariant.set(variantId, price);
+    }
+    for (const inv of (inventories as unknown as ProductInventoryRow[] | null) ??
+      []) {
+      inventoryByVariant.set(String(inv.variant_id), inv);
+    }
+  }
+
   const enriched = [];
   let hasTrustedPrice = false;
   for (const variant of variantRows) {
-    const [{ data: price }, { data: inventory }] = await Promise.all([
-      supabase
-        .from("product_prices")
-        .select("*")
-        .eq("variant_id", variant.id)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase
-        .from("product_inventory")
-        .select("*")
-        .eq("variant_id", variant.id)
-        .eq("warehouse_key", "default")
-        .maybeSingle(),
-    ]);
-
-    const inv = (inventory as ProductInventoryRow | null) ?? null;
+    const price = priceByVariant.get(variant.id) ?? null;
+    const inv = inventoryByVariant.get(variant.id) ?? null;
     if (price) hasTrustedPrice = true;
     enriched.push({
       variant: {
@@ -472,7 +729,7 @@ async function buildPublicProductDetail(
         option_values:
           (variant.option_values as Record<string, string>) ?? {},
       },
-      price: (price as ProductPriceRow | null) ?? null,
+      price,
       inventory: inv,
       available: inv
         ? availableUnits({
@@ -484,7 +741,7 @@ async function buildPublicProductDetail(
     });
   }
 
-  const mediaRows = (media ?? []) as ProductMediaRow[];
+  const mediaRows = (media as unknown as ProductMediaRow[] | null) ?? [];
   const mediaWithUrls = await Promise.all(
     mediaRows.map(async (row) => ({
       ...row,

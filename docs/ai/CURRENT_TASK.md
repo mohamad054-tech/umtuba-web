@@ -2,33 +2,39 @@
 
 ## Task title
 
-Commerce Digital Product Versioning & Update Delivery V1
+UMTUBA Web Performance & Core Web Vitals V1 — Phase A: Store Query Optimization V1
 
 ## Status
 
-`implementation-complete-local` — awaiting commit / push / migration-apply GO
-
-## Worktree
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-digital-product-versioning-update-delivery-v1`
+`implementation-in-progress`
 
 ## Branch
 
-`office/commerce-digital-product-versioning-update-delivery-v1`
+`office/perf-store-query-optimization-v1`
 
 ## Base
 
-`9b2dacc0b792b46a1d3b566d5adc6503edb1d987`
+`office/commerce-digital-product-versioning-update-delivery-v1` @ `d01e1cd756055d39f38323dce46fd9119b081f8e`
 
 ## Milestone
 
-`commerce.digital.product_versioning_update_delivery_v1`
+`web.performance.store_query_optimization_v1`
 
-## Machine policy
+## Allowed scope
 
-Commerce laptop only. No Learning/AI/Home/Creator/Navigation.
-No remote migration apply / commit / push without explicit GO.
+- `lib/store/catalogQueries.ts`
+- `lib/store/catalogQueries.perf.test.ts` (new)
+- `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
 
-## Next
+## Forbidden scope
 
-Commit/push GO (trailer-free), then separate apply GO for `20260880`.
+- Learning / Home / Discover / Profile
+- next/image / next.config / new packages
+- UI changes / API contract changes
+- Migrations / schema
+- Commit / push / merge without GO
+- Phase B+
+
+## Goal
+
+Eliminate N+1 catalog enrichment round-trips for `/store`, storefront, and PDP query paths without changing buyer-visible results.

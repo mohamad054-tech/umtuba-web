@@ -1,61 +1,48 @@
-﻿# CURSOR_REPORT — Commerce Digital Product Versioning & Update Delivery V1
+﻿# CURSOR_REPORT — Store Query Optimization V1 (Phase A)
 
 ## Summary
 
-Additive digital asset versioning on post-purchase tip `9b2dacc`. Upload creates
-draft versions; Activate atomically sets one active version; delivery/publish
-readiness resolve always-latest active owned path. No entitlement pin. No
-commit/push. Migration `20260880` local only — not applied.
+Implemented batched catalog enrichment in `lib/store/catalogQueries.ts` to eliminate N+1 media/variant/price/inventory round-trips on `/store`, storefront, and PDP query paths. Explicit column selects replace SELECT *. No UI/API/schema/config changes. Not committed.
 
 ## Exact files changed
 
-- `supabase/migrations/20260880_store_digital_product_versioning_update_delivery_v1.sql` (new)
-- `lib/store/digitalProductVersioning.ts` (new)
-- `lib/store/digitalProductVersioning.test.ts` (new)
-- `lib/store/digitalAssetUpload.ts`
-- `lib/store/digitalAssetUpload.test.ts`
-- `lib/store/digitalAccessDelivery.ts`
-- `lib/store/digitalAccessDelivery.test.ts`
-- `lib/store/digitalProductPublishReadiness.ts`
-- `app/actions/storeDigitalAssets.ts`
-- `app/components/store/SellerDigitalAssetPanel.tsx`
-- `docs/store/implementation/DIGITAL_PRODUCT_VERSIONING_UPDATE_DELIVERY_V1.md` (new)
+- `lib/store/catalogQueries.ts`
+- `lib/store/catalogQueries.perf.test.ts` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-`20260880_store_digital_product_versioning_update_delivery_v1.sql` — **local only, not applied**
+None.
 
 ## Security review
 
-- Fail closed without active owned version
-- Activate rejects foreign store/product; RPC service_role only after editor auth
-- No entitlement/grant mutation; no path overwrite of history rows
-- Unsigned paths never returned to client
+- Ownership checks for signed URLs unchanged (`createAuthorizedProductMediaSignedUrl`).
+- Visibility / listing RPC gates preserved.
+- No service-role expansion; no schema change.
 
 ## Tests
 
-Focused vitest: **59 passed** (versioning + upload + delivery + readiness + post-purchase)
+Focused store suites + new perf tests: PASS (see Final Verification Report).
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS**
+`npx tsc --noEmit` → PASS
 
 ## Build
 
-See verification report (in progress / completed in session)
+`npm run build` → PASS
 
 ## git diff --check
 
-**PASS** (exit 0)
+PASS
 
 ## git status --short
 
-Uncommitted WIP on `office/commerce-digital-product-versioning-update-delivery-v1`
+See Final Verification Report.
 
 ## Open issues
 
-- Migration not applied remotely (await GO)
-- No commit/push (await GO)
-- Buyer multi-version picker deferred; always-latest only
+- Live production TTFB after-measure deferred (env load blocked in this session); query-count before/after is the Phase A numeric proof.
+- Signed URL mint still O(N) auth lookups inside `productMediaUrl` (parallelized, not batched) — candidate for later phase if approved.
+- Phase B not started.
