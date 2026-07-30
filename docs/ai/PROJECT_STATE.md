@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/ai-core-local-adapter-v1` (from Anthropic `fe07a1c`)
-- **Task:** AI Core Local / Self-hosted Adapter V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-ai-local-adapter-v1`
-- **Prior:** Anthropic Adapter closed @ `fe07a1c` on `office/ai-core-anthropic-adapter-v1`
+- **Branch:** `office/platform-internationalization-foundation-v1` (from Local Adapter `a462c88`)
+- **Task:** Platform Internationalization Foundation V1 — **implementation complete; staged; not committed**
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-platform-i18n-foundation-v1`
+- **Prior:** Local Adapter closed @ `a462c88` on `office/ai-core-local-adapter-v1`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -39,13 +39,11 @@ Tutor backend capabilities continue on AI Platform branches; Learning UX remains
 | --- | --- |
 | Unified Revenue Platform Foundation | On alpha |
 | Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
-| Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters expanding on feature branches |
+| Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters on feature tips |
+| AI Core Local / Self-hosted Adapter V1 | Committed + pushed @ `a462c88` (`0 0`) |
+| Platform Internationalization Foundation V1 | Staged on `office/platform-internationalization-foundation-v1` (awaiting commit GO) |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |
-| AI Tutor + Provider Reconciliation V1 | Committed + pushed |
-| AI Core Gemini Adapter V1 | Committed + pushed @ `2867a5e` (`0 0`) |
-| AI Core Anthropic Adapter V1 | Committed + pushed @ `fe07a1c` (`0 0`) |
-| AI Core Local / Self-hosted Adapter V1 | Staged on `office/ai-core-local-adapter-v1` (awaiting commit GO) |
 
 ## Source of truth
 

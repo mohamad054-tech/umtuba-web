@@ -1,53 +1,59 @@
-# CURSOR_REPORT — AI Core Local / Self-hosted Adapter V1
+# CURSOR_REPORT — Platform Internationalization Foundation V1
 
 ## Summary
 
-Added a fail-closed local / self-hosted OpenAI-compatible provider adapter behind
-existing `AiProviderAdapter` contracts. `aiService.runCapability()` unchanged.
-OpenAI, Gemini, Anthropic, and Local are interchangeable via Provider Foundation /
-routing policy when configured. Streaming remains disabled. Staged; not committed.
+Added a shared internationalization foundation for Arabic, English, French,
+Spanish, German, and Portuguese. Uses a lightweight custom `lib/i18n` layer
+(no third-party i18n package, no locale URL prefix migration). Root layout sets
+`html lang`/`dir` from fail-safe resolution. Foundation catalogs + typed
+`translate` / `useTranslation` + format helpers. `LanguageSelector` shipped as a
+reusable contract without Settings wiring. Staged; not committed.
 
 ## Exact files created
 
-- `lib/ai/providers/localAdapter.ts`
-- `lib/ai/providers/localAdapter.test.ts`
+- `lib/i18n/locales.ts`
+- `lib/i18n/resolve.ts`
+- `lib/i18n/cookie.ts`
+- `lib/i18n/translate.ts`
+- `lib/i18n/format.ts`
+- `lib/i18n/server.ts`
+- `lib/i18n/index.ts`
+- `lib/i18n/i18nFoundation.test.ts`
+- `lib/i18n/messages/types.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/fr.ts`
+- `lib/i18n/messages/es.ts`
+- `lib/i18n/messages/de.ts`
+- `lib/i18n/messages/pt.ts`
+- `lib/i18n/messages/catalogs.ts`
+- `app/components/i18n/I18nProvider.tsx`
+- `app/components/i18n/LanguageSelector.tsx`
+- `app/components/i18n/index.ts`
+- `docs/architecture/PLATFORM_INTERNATIONALIZATION_FOUNDATION_V1.md`
 
 ## Exact files modified
 
-- `lib/ai/config.ts`
-- `lib/ai/providers/adapters.ts`
-- `lib/ai/providers/foundation.ts`
-- `lib/ai/providers/foundation.test.ts`
-- `lib/ai/models/registry.ts`
-- `lib/ai/aiPlatformFoundation.test.ts`
-- `lib/ai/capabilities/admin/diagnostics.ts`
-- `lib/ai/hub/types.ts`
-- `lib/ai/hub/runtimeStatus.ts`
-- `lib/ai/hub/experience.test.ts`
-- `.env.example`
+- `app/layout.tsx`
+- `vitest.config.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/workstreams/AI_PLATFORM.md`
 
 ## Architecture summary
 
 ```
-Capability / aiService.runCapability
-  → gateway.execute
-  → createProviderFoundation(config)
-  → routing policy resolveRoute
-  → requireAdapter(providerId)  // openai | gemini | anthropic | local | stub
-  → adapter.execute(...)
+resolveRequestLocale (cookie → Accept-Language → en)
+  → <html lang={locale} dir={rtl|ltr}>
+  → I18nProvider
+  → translate / useTranslation / format*
+  → LanguageSelector (unwired)
 ```
 
-- Config: `LOCAL_AI_BASE_URL`, `LOCAL_AI_MODEL`, optional `LOCAL_AI_API_KEY`
-- Live mode accepts OpenAI and/or Gemini and/or Anthropic and/or local (URL+model)
-- No default base URL and no default model id (operator must set both)
-- Adapter uses OpenAI-compatible Chat Completions (`{base}/chat/completions`, no stream)
-- Structured: prompt-steered JSON + fail-closed parse (no `response_format`)
-- Errors map to existing `AiPlatformError` codes
+- Default/fallback: `en`
+- RTL: `ar` only
+- Cookie: `umtuba_locale` (client-writable; no DB)
 
 ## Migrations created
 
@@ -55,18 +61,16 @@ None.
 
 ## Security review
 
-- Secrets only server-side; never `NEXT_PUBLIC_*`
-- Adapter registered only when both base URL and model are present
-- Optional API key sent as Bearer only when configured
-- Error bodies sanitized via `sanitizeAiErrorMessage`
-- No Learning/UI/server-action surface changes for Tutor
+- No secrets
+- Cookie is non-httpOnly by design (client preference); SameSite=Lax; Secure in production
+- Missing translation keys never throw; warn only in development
 
 ## Tests
 
-`npm test -- --run lib/ai lib/learning/aiTutorFoundation.test.ts`
+`npm test -- --run lib/i18n/i18nFoundation.test.ts`
 
-- Test Files: **22 passed**
-- Tests: **294 passed**
+- Test Files: **1 passed**
+- Tests: **20 passed**
 
 ## TypeScript
 
@@ -74,7 +78,7 @@ None.
 
 ## Build
 
-Not run (provider-layer milestone).
+`npm run build` — **pass** (Turbopack; root layout locale wiring verified)
 
 ## git diff --check
 
@@ -87,5 +91,6 @@ See Final Verification Report (staged only; not committed).
 ## Open issues
 
 - Manual commit + push deferred
-- No live local/Ollama smoke in this milestone
-- Streaming still disabled across providers
+- LanguageSelector not yet in Settings UI
+- Full product surfaces remain English (by design)
+- DB user locale preference still absent (by design)
