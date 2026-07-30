@@ -110,13 +110,32 @@ export default function OrderDetailView({
             hold expiry.
           </p>
         ) : null}
+        {order.payment_status === "paid" &&
+        mode === "buyer" &&
+        (bundle.digitalEntitlements?.length ?? 0) > 0 ? (
+          <div className="mt-4 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)] px-4 py-3">
+            <p className="text-sm font-semibold text-[var(--sf-ink)]">
+              Digital access granted
+            </p>
+            <ul className="mt-2 space-y-1 text-sm text-[var(--sf-muted)]">
+              {bundle.digitalEntitlements!.map((entitlement) => (
+                <li key={entitlement.id}>
+                  {entitlement.titleSnapshot?.trim() || "Digital item"}
+                  {entitlement.skuSnapshot
+                    ? ` · ${entitlement.skuSnapshot}`
+                    : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         {order.payment_status === "failed" && mode === "buyer" ? (
           <p
             role="alert"
             className="mt-4 rounded-2xl border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-4 py-3 text-sm text-[var(--sf-danger)]"
           >
-            Payment is marked failed in trusted records. A live payment provider
-            is not integrated in this foundation.
+            Payment is marked failed in trusted records. Retry from checkout when
+            a live payment attempt is available for this order.
           </p>
         ) : null}
         {mode === "buyer" && retryAction ? (

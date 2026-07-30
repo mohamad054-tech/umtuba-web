@@ -1,5 +1,5 @@
 /**
- * Service-role executor for apply_store_payment_outcome + optional post-capture allocate.
+ * Service-role executor for apply_store_payment_outcome + allocate + entitlement grant.
  * Server-only module (API routes / workers). Never import from client components.
  */
 
@@ -12,6 +12,10 @@ import {
   allocateSettlementAfterTrustedCapture,
   type PostCaptureAllocateResult,
 } from "./postCaptureSettlementAllocate";
+import {
+  grantDigitalEntitlementsAfterTrustedCapture,
+  type DigitalEntitlementGrantResult,
+} from "./digitalEntitlementGrant";
 
 export type ApplyStorePaymentOutcomeInput = {
   paymentAttemptId: string;
@@ -30,6 +34,7 @@ export type ApplyStorePaymentOutcomeResult =
       data: Record<string, unknown>;
       replayed: boolean;
       settlement: PostCaptureAllocateResult;
+      entitlement: DigitalEntitlementGrantResult;
     }
   | { ok: false; message: string };
 
@@ -61,11 +66,8 @@ function serviceRoleClient():
 }
 
 /**
- * Apply a verified provider outcome via the existing Sync RPC exactly once
- * per event_key (DB-enforced replay). On trusted capture, also allocate once
- * via Settlement Foundation (idempotent event_key).
- *
- * `deps.supabase` is for server tests only — production callers omit it.
+ * Apply verified provider outcome via Sync. On capture: allocate then grant
+ * digital entitlements. Both post-steps are idempotent.
  */
 export async function applyVerifiedStorePaymentOutcome(
   input: ApplyStorePaymentOutcomeInput,
@@ -112,6 +114,10 @@ export async function applyVerifiedStorePaymentOutcome(
         status: "skipped",
         reason: `Outcome ${input.outcome} is not settlement-allocate eligible.`,
       },
+      entitlement: {
+        status: "skipped",
+        reason: `Outcome ${input.outcome} is not entitlement-grant eligible.`,
+      },
     };
   }
 
@@ -124,10 +130,20 @@ export async function applyVerifiedStorePaymentOutcome(
     providerReference: input.providerReference,
   });
 
+  const entitlement = await grantDigitalEntitlementsAfterTrustedCapture(
+    supabase,
+    {
+      paymentAttemptId: input.paymentAttemptId,
+      captureEventKey: input.eventKey,
+      correlationId: input.correlationId,
+    }
+  );
+
   return {
     ok: true,
     data: payload,
     replayed,
     settlement,
+    entitlement,
   };
 }

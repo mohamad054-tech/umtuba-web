@@ -1,38 +1,43 @@
-﻿# CURSOR_REPORT — Commerce Post-Capture Settlement Allocate V1
+﻿# CURSOR_REPORT — Commerce Post-Capture Digital Entitlement Grant V1
 
 ## Summary
 
-Wired trusted Stripe capture into Settlement Foundation `allocate` so captured
-digital funds leave platform liability into store escrow. No migration. No
-commit/push/remote apply. Base `0bde81d…` unchanged as tip parent.
+After trusted Stripe capture Sync + settlement allocate, grants digital
+entitlements, consumes inventory reservations, and marks coarse fulfillment
+fulfilled. Local migration `20260877` only — not applied remotely. No
+commit/push. Base `90283e8…` unchanged as tip parent.
 
 ## Exact files changed
 
-- `lib/store/postCaptureSettlementAllocate.ts` (new)
-- `lib/store/postCaptureSettlementAllocate.test.ts` (new)
+- `supabase/migrations/20260877_store_digital_entitlement_grant_v1.sql` (new)
+- `lib/store/digitalEntitlementGrant.ts` (new)
+- `lib/store/digitalEntitlementGrant.test.ts` (new)
 - `lib/store/stripePaymentOutcomeApply.ts`
-- `lib/store/livePaymentCaptureAdapter.test.ts`
+- `lib/store/postCaptureSettlementAllocate.test.ts`
+- `lib/store/orders.ts`
 - `app/api/store/payments/stripe/webhook/route.ts`
-- `docs/store/implementation/POST_CAPTURE_SETTLEMENT_ALLOCATE_V1.md` (new)
+- `app/components/store/OrderDetailView.tsx`
+- `docs/store/implementation/POST_CAPTURE_DIGITAL_ENTITLEMENT_GRANT_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+`supabase/migrations/20260877_store_digital_entitlement_grant_v1.sql` (local only; not applied)
 
 ## Security review
 
-- Allocate runs only on server-side service-role path after Sync
-- Client checkout/actions have no settlement RPC access
-- Money/correlation from trusted capture inputs; Settlement RPC re-validates
-  attempt/order/capture match
-- Non-captured outcomes skip allocate
-- Failure returns `settlement.status=failed` (never falsely `allocated`)
+- Grant RPC is service_role only; runs only after trusted capture Sync path
+- Buyer list RPC is authenticated (own rows) + service_role
+- Entitlement tables FORCE RLS; buyers SELECT own entitlements only
+- Requires attempt `captured`, order `paid`, matching capture `correlation_id`
+- Unique entitlement per `order_item_id`; grant-events idempotent on `event_key`
+- Non-captured outcomes skip grant
+- Grant failure surfaces as `entitlement.status=failed` (never falsely granted)
 
 ## Tests
 
-Focused suites: **164 passed**
+Focused Commerce suites: **225 passed** (14 files)
 
 ## TypeScript
 
@@ -40,7 +45,7 @@ Focused suites: **164 passed**
 
 ## Build
 
-`npm run build` — pass (local non-junction `node_modules` via `npm ci`)
+`npm run build` — pass
 
 ## git diff --check
 
@@ -48,9 +53,10 @@ pass
 
 ## git status --short
 
-See Final Verification Report.
+Uncommitted local WIP on base tip (see Final Verification Report).
 
 ## Open issues
 
 - Await commit / push GO
-- release / payouts / refunds / digital entitlement remain deferred
+- Await apply GO for `20260877`
+- release / payouts / refunds / download CDN / physical shipping remain deferred

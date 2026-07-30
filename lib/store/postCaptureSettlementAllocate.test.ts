@@ -224,6 +224,18 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
         });
         return { data: { replayed: false, action: "allocate" }, error: null };
       }
+      if (name === "grant_store_digital_entitlements_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            entitlements_granted: 1,
+            reservations_consumed: 0,
+            fulfillment_marked: true,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -244,7 +256,7 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
     if (!applied.ok) return;
     expect(applied.replayed).toBe(false);
     expect(applied.settlement.status).toBe("allocated");
-    expect(rpc).toHaveBeenCalledTimes(2);
+    expect(rpc).toHaveBeenCalledTimes(3);
     expect(rpc.mock.calls[0][0]).toBe(STORE_PAYMENT_SYNC_RPC);
     expect(rpc.mock.calls[1][0]).toBe(STORE_SETTLEMENT_RPC);
   });
@@ -254,7 +266,19 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
       if (name === STORE_PAYMENT_SYNC_RPC) {
         return { data: { replayed: true, event_id: "evt-1" }, error: null };
       }
-      return { data: { replayed: true, action: "allocate" }, error: null };
+      if (name === STORE_SETTLEMENT_RPC) {
+        return { data: { replayed: true, action: "allocate" }, error: null };
+      }
+      return {
+        data: {
+          ok: true,
+          replayed: true,
+          entitlements_granted: 1,
+          reservations_consumed: 0,
+          fulfillment_marked: true,
+        },
+        error: null,
+      };
     });
 
     const applied = await applyVerifiedStorePaymentOutcome(
@@ -315,11 +339,23 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
       if (name === STORE_PAYMENT_SYNC_RPC) {
         return { data: { replayed: false, event_id: "evt-1" }, error: null };
       }
+      if (name === STORE_SETTLEMENT_RPC) {
+        return {
+          data: null,
+          error: {
+            message: "settlement requires a trusted capture outcome event",
+          },
+        };
+      }
       return {
-        data: null,
-        error: {
-          message: "settlement requires a trusted capture outcome event",
+        data: {
+          ok: true,
+          replayed: false,
+          entitlements_granted: 1,
+          reservations_consumed: 0,
+          fulfillment_marked: true,
         },
+        error: null,
       };
     });
 

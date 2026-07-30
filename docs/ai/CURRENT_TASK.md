@@ -2,36 +2,35 @@
 
 ## Task title
 
-Commerce Post-Capture Settlement Allocate V1
+Commerce Post-Capture Digital Entitlement Grant V1
 
 ## Status
 
-`implementation-complete-local` — awaiting review / commit / push GO
+`verification-pass` — **UNCOMMITTED** — awaiting explicit commit / push / apply GO
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-settlement-allocate-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-digital-entitlement-grant-v1`
 
 ## Branch
 
-`office/commerce-post-capture-settlement-allocate-v1`
+`office/commerce-post-capture-digital-entitlement-grant-v1`
 
 ## Base / HEAD
 
-Base: `0bde81d75a8c461fb466128c4c8a6f354a209c1a`
+Base: `90283e88ee4fc37fe2f08170e615c1c1a43bf1ef`
 HEAD: uncommitted implementation on top of base
 
 ## Milestone
 
-`commerce.settlement.post_capture_allocate_v1`
+`commerce.digital.post_capture_entitlement_grant_v1`
 
 ## Delivered
 
-- Wire trusted Stripe capture → Settlement Foundation `allocate`
-- Idempotent `${captureEventKey}:allocate` event keys
-- Skip allocate for non-captured outcomes
-- No migration (reuses `apply_store_settlement_event`)
+- Migration (local): `20260877_store_digital_entitlement_grant_v1.sql`
+- Grant after trusted capture + reservation consume + fulfillment fulfilled
+- Buyer entitlement list on order detail
 
 ## Next
 
-Review → trailer-free commit GO → push GO (no migration apply)
+Review → trailer-free commit GO → push GO → apply `20260877` GO

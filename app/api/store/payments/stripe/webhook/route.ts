@@ -168,5 +168,6 @@ export async function POST(request: NextRequest) {
     ok: true,
     replayed: applied.replayed,
     settlement: applied.settlement,
+    entitlement: applied.entitlement,
   });
 }

@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { listMyDigitalEntitlements } from "./digitalEntitlementGrant";
 import {
   assertSellerFulfillmentConsistentWithOrder,
   assertSellerOrderStatusTransition,
@@ -103,6 +104,15 @@ export type OrderDetailBundle = {
   siblingOrders?: BuyerSiblingOrder[];
   /** Buyer-owned payment attempts for this order. */
   paymentAttempts?: BuyerPaymentAttemptSummary[];
+  /** Buyer digital entitlements for this order (active grants only). */
+  digitalEntitlements?: {
+    id: string;
+    orderItemId: string;
+    productId: string;
+    titleSnapshot: string | null;
+    skuSnapshot: string | null;
+    grantedAt: string;
+  }[];
 };
 
 const ORDER_SELECT = `
@@ -392,6 +402,7 @@ async function loadOrderDetail(
 
   let siblingOrders: BuyerSiblingOrder[] | undefined;
   let paymentAttempts: BuyerPaymentAttemptSummary[] | undefined;
+  let digitalEntitlements: OrderDetailBundle["digitalEntitlements"];
 
   if (options.mode === "buyer" && options.expectBuyerId) {
     const quoteId =
@@ -439,6 +450,23 @@ async function loadOrderDetail(
       currency: String(a.currency ?? row.currency),
       createdAt: String(a.created_at),
     }));
+
+    const entitlementList = await listMyDigitalEntitlements(supabase, {
+      orderId,
+      limit: 50,
+    });
+    if (entitlementList.ok) {
+      digitalEntitlements = entitlementList.entitlements.map((e) => ({
+        id: e.id,
+        orderItemId: e.orderItemId,
+        productId: e.productId,
+        titleSnapshot: e.titleSnapshot,
+        skuSnapshot: e.skuSnapshot,
+        grantedAt: e.grantedAt,
+      }));
+    } else {
+      digitalEntitlements = [];
+    }
   }
 
   return {
@@ -463,6 +491,7 @@ async function loadOrderDetail(
         !isSellerTerminalOrderStatus(row.status),
       siblingOrders,
       paymentAttempts,
+      digitalEntitlements,
     },
   };
 }
