@@ -42,7 +42,13 @@ export function createTranslationStudio(options?: {
     },
     listKeys(namespaceId) {
       const keys = workflow.getSnapshot().keys;
-      return namespaceId ? keys.filter((k) => k.namespaceId === namespaceId) : keys;
+      if (!namespaceId) return keys;
+      return keys.filter(
+        (k) =>
+          k.namespaceId === namespaceId ||
+          k.namespaceId === `ns_${namespaceId}` ||
+          k.key.startsWith(`${namespaceId}.`)
+      );
     },
     listValuesForKey(keyId) {
       return workflow.getSnapshot().values.filter((v) => v.keyId === keyId);
@@ -74,7 +80,13 @@ export function getTranslationStudio(): TranslationStudio {
     },
     listKeys(namespaceId) {
       const keys = workflow.getSnapshot().keys;
-      return namespaceId ? keys.filter((k) => k.namespaceId === namespaceId) : keys;
+      if (!namespaceId) return keys;
+      return keys.filter(
+        (k) =>
+          k.namespaceId === namespaceId ||
+          k.namespaceId === `ns_${namespaceId}` ||
+          k.key.startsWith(`${namespaceId}.`)
+      );
     },
     listValuesForKey(keyId) {
       return workflow.getSnapshot().values.filter((v) => v.keyId === keyId);

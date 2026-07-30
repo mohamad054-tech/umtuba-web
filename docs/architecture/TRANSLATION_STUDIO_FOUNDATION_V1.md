@@ -1,59 +1,61 @@
-# Translation Studio Foundation + Persistence Workflow V1
+# Translation Studio — Foundation, Persistence, App Shell Ingestion
 
 ## Status
 
-Persistence & Workflow V1 implemented on
-`office/platform-translation-studio-persistence-workflow-v1`
-(staged; awaiting commit GO). Built on Foundation V1 (`aced43c`).
+Catalog Ingestion & App Shell Review V1 on
+`office/platform-translation-studio-app-shell-ingestion-v1`
+(base Persistence `189ec08`). Migration `20260901` remains **not applied**.
 
 ## Goal
 
-Internal Translation Studio as durable TMS: edit, review, history, AI
-suggestions, publish contract — not a public translation product.
+Internal Translation Studio as durable TMS, with the first real platform
+batch: ingest App Shell catalogs, review EN/AR coverage, seed Arabic TM,
+preview an App Shell publish batch (dry-run only).
 
 ## Architecture
 
 ```
-Admin UI (editor + review + publish queues)
+Admin UI (overview / app-shell / keys filters / editor / review / publish)
   → server actions (platform-admin gated)
-  → lib/translationStudio workflow
-      ├─ Durable JSON file store (data/translation-studio/) — runtime V1
-      ├─ Additive SQL schema (20260901_…) — future Supabase; not applied
-      ├─ Languages / Namespaces / Keys / Values + workflow statuses
-      ├─ Versions + audit log
-      ├─ Translation Memory (approved reuse + fingerprint)
-      ├─ Terminology (conflict warnings; never silent replace)
-      ├─ Suggestion pipeline (memory → AI port → pending_review)
-      └─ Publish contract (autoPublish: false)
-
-AI path (no provider-specific code):
-  TranslationAiPort
-    → createAiServiceTranslationPort(runCapability)
-    → aiService.runCapability("platform.translation_suggest")
+  → lib/translationStudio
+      ├─ ingestion/ingestAppShellCatalog (idempotent, stable key ids)
+      ├─ Durable JSON file store — runtime V1
+      ├─ Additive SQL schema (20260901) — future; not applied this task
+      ├─ Workflow (draft → review → approve → ready_for_publish)
+      ├─ Translation Memory (AR App Shell seed; fingerprint uniqueness)
+      ├─ Terminology findings (warnings only; never silent replace)
+      ├─ App Shell publish batch (dryRun, writesCatalogFiles: false)
+      └─ Legacy publish contract (autoPublish: false)
 ```
 
-## Workflow statuses
+## App Shell inventory (ingested namespaces)
 
-`missing` → `draft` / `ai_suggested` → `needs_review` → `approved` /
-`ready_for_publish` (also `rejected`, `deprecated` + restore to draft)
+`languages`, `actions`, `status`, `nav`, `settings`, `menu`, `dialog`,
+`empty`, `error`, `success`
 
-## Explicit non-goals (this milestone)
+Surfaces: desktop/mobile nav, search, user menu, settings, language
+selector, sign-out, generic actions, loading/empty/error/success,
+common dialogs, shared product chrome.
 
-- No remote migration apply
-- No auto-publish into product i18n catalogs
-- No Learning / Commerce / Creator surface translation
-- No public translation API
-- No provider adapter modifications
+**Out of scope catalogs:** Learning, Commerce, Creator, Live, World, Games.
+
+## Import status rules
+
+| Locale | Rule |
+|--------|------|
+| EN | Approved source |
+| AR | Approved when non-empty and not EN leakage; else Needs Review / Missing |
+| FR/ES/DE/PT | Never auto-approved (fallback EN stays Needs Review) |
+| Source text change | Dependent non-EN values → Needs Review |
 
 ## Studio routes
 
 - `/admin/translation-studio`
+- `/admin/translation-studio/app-shell`
 - `/admin/translation-studio/languages`
 - `/admin/translation-studio/namespaces`
-- `/admin/translation-studio/keys`
-- `/admin/translation-studio/keys/[keyId]` (editor)
+- `/admin/translation-studio/keys` (namespace + status filters)
+- `/admin/translation-studio/keys/[keyId]`
 - `/admin/translation-studio/review`
 - `/admin/translation-studio/publish`
 - `/admin/translation-studio/terminology`
-
-Platform-admin gated (same DB admin authority as other admin surfaces).
