@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   APP_SHELL_NAMESPACES,
+  LEARNING_AREA_NAMESPACES,
   getTranslationStudio,
 } from "../../../../lib/translationStudio";
 import { requireTranslationStudioAdmin } from "../requireTranslationStudioAdmin";
@@ -56,7 +57,7 @@ export default async function TranslationStudioKeysPage({
     : rows;
 
   return (
-    <TranslationStudioShell title="Keys" subtitle="App Shell inventory">
+    <TranslationStudioShell title="Keys" subtitle="App Shell + Learning inventory">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-xl font-black">
           Keys{namespaceId ? ` · ${namespaceId}` : ""}
@@ -84,6 +85,21 @@ export default async function TranslationStudioKeysPage({
               }`}
             >
               {ns}
+            </Link>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {LEARNING_AREA_NAMESPACES.map((ns) => (
+            <Link
+              key={ns}
+              href={`${TRANSLATION_STUDIO_BASE}/keys?namespace=${encodeURIComponent(ns)}`}
+              className={`watch-focus-ring rounded-full border px-3 py-1.5 text-xs font-bold ${
+                namespaceId === ns
+                  ? "border-cyan-400/40 bg-cyan-500/15 text-cyan-100"
+                  : "border-white/10 text-white/60"
+              }`}
+            >
+              {ns.replace("learning.", "")}
             </Link>
           ))}
         </div>

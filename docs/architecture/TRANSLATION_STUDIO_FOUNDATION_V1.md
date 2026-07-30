@@ -61,5 +61,9 @@ common dialogs, shared product chrome.
 - `/admin/translation-studio/terminology`
 - `/admin/translation-studio/intelligence`
 - `/admin/translation-studio/intelligence/[recordId]`
+- `/admin/translation-studio/learning` (Learning platform UI foundation)
 
-See also: `docs/architecture/TRANSLATION_INTELLIGENCE_FOUNDATION_V1.md`
+See also:
+- `docs/architecture/TRANSLATION_INTELLIGENCE_FOUNDATION_V1.md`
+- Learning platform UI catalogs live under `lib/i18n/messages/learning/**`
+  (no course content / media translation in this milestone).

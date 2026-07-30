@@ -128,6 +128,38 @@ export {
   type BuildAppShellPublishBatchOptions,
 } from "./ingestion/publishBatch";
 
+export {
+  LEARNING_AREA_NAMESPACES,
+  LEARNING_SURFACES,
+  isLearningCatalogKey,
+  learningNamespaceOfKey,
+  stableLearningKeyId,
+  stableLearningNamespaceId,
+  stableLearningValueId,
+  type LearningAreaNamespace,
+} from "./ingestion/learningInventory";
+
+export {
+  ingestLearningCatalog,
+  type LearningIngestionReport,
+} from "./ingestion/ingestLearningCatalog";
+
+export {
+  mergeLearningTerminology,
+  seedLearningTerminology,
+} from "./ingestion/learningTerminology";
+
+export {
+  buildLearningPublishBatch,
+  type LearningPublishBatch,
+  type LearningPublishBatchRecord,
+} from "./ingestion/learningPublishBatch";
+
+export {
+  validateLearningCatalogQuality,
+  type LearningQualityFindings,
+} from "./ingestion/learningQuality";
+
 export type {
   ContentSensitivity,
   CorrectionFeedback,

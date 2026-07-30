@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   buildAppShellPublishBatch,
+  buildLearningPublishBatch,
   buildPublishContract,
   getTranslationStudio,
 } from "../../../../lib/translationStudio";
@@ -20,6 +21,7 @@ export default async function TranslationStudioPublishPage() {
   const snap = studio.getSnapshot();
   const contract = buildPublishContract(snap);
   const batch = buildAppShellPublishBatch(snap);
+  const learningBatch = buildLearningPublishBatch(snap);
   const queue = studio.workflow.listPublishEligible();
   const keyById = new Map(snap.keys.map((k) => [k.id, k]));
 
@@ -29,6 +31,44 @@ export default async function TranslationStudioPublishPage() {
       subtitle="Contract only — auto-publish disabled"
     >
       <section className="space-y-4">
+        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
+          <h1 className="text-xl font-black">Learning publish batch</h1>
+          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Format
+              </dt>
+              <dd className="mt-1 font-mono text-xs text-white/80">
+                {learningBatch.format}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Dry-run / writes
+              </dt>
+              <dd className="mt-1 text-amber-100">
+                {String(learningBatch.dryRun)} /{" "}
+                {String(learningBatch.writesCatalogFiles)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Records / keys
+              </dt>
+              <dd className="mt-1 text-white/70">
+                {learningBatch.preview.recordCount} /{" "}
+                {learningBatch.preview.keyCount}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Domain
+              </dt>
+              <dd className="mt-1 text-white/70">{learningBatch.domain}</dd>
+            </div>
+          </dl>
+        </div>
+
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
           <h1 className="text-xl font-black">App Shell publish batch</h1>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">

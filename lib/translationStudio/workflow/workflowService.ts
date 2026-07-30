@@ -286,6 +286,9 @@ export function createTranslationStudioWorkflow(options?: {
       const key = state.keys.find((k) => k.id === next.keyId);
       if (key && !ephemeral) {
         try {
+          const isLearning =
+            key.key.startsWith("learning.") ||
+            key.namespaceId.includes("learning");
           getTranslationIntelligenceService().recordApprovedTranslation({
             approvedValueId: next.id,
             approvedVersion: next.version,
@@ -293,8 +296,9 @@ export function createTranslationStudioWorkflow(options?: {
             approvedTargetText: next.value,
             targetLocale: next.language as StudioLanguageCode,
             namespaceId: key.namespaceId,
-            domain: key.namespaceId,
+            domain: isLearning ? "learning" : key.namespaceId,
             contentType: "ui_text",
+            styleProfileId: isLearning ? "learning_educational" : undefined,
             provenance: createProvenance({
               type: "human_authored",
               originalSourceOwnership: "umtuba_internal",
