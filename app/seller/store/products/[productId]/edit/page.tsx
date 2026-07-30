@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import SellerOpsShell from "../../../../../components/store/SellerOpsShell";
+import SellerDigitalAssetPanel from "../../../../../components/store/SellerDigitalAssetPanel";
 import SellerProductMediaStudio from "../../../../../components/store/SellerProductMediaStudio";
 import { APP_ROUTES } from "../../../../../lib/nav";
 import { createClient, getServerUser } from "../../../../../../lib/supabase/server";
 import { listActiveCategories } from "../../../../../../lib/store/catalogQueries";
+import { loadSellerDigitalAssetSummary } from "../../../../../../lib/store/digitalAssetUpload";
 import { canManageCatalog } from "../../../../../../lib/store/permissions";
 import { createAuthorizedProductMediaSignedUrl } from "../../../../../../lib/store/productMediaUrl";
 import {
@@ -84,6 +86,11 @@ export default async function EditSellerProductPage({
       }),
     }))
   );
+
+  const digitalAssetSummary = await loadSellerDigitalAssetSummary(supabase, {
+    productId: bundle.product.id,
+    userId: user.id,
+  });
 
   const membership = await getOwnedOrMemberStore(supabase, user.id);
   const activeListingCount = await countActiveListingsForProduct(
@@ -710,6 +717,21 @@ export default async function EditSellerProductPage({
             </button>
           </form>
         ) : null}
+      </section>
+
+      <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+        <h2 className="sf-display text-xl font-semibold tracking-tight">
+          Digital deliverable
+        </h2>
+        <div className="mt-4">
+          <SellerDigitalAssetPanel
+            productId={bundle.product.id}
+            storeId={bundle.product.store_id}
+            productType={bundle.product.product_type}
+            canEdit={canEditRole}
+            initialSummary={digitalAssetSummary}
+          />
+        </div>
       </section>
 
       <section className="mt-6 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
