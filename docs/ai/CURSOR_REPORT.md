@@ -1,47 +1,53 @@
-﻿# CURSOR_REPORT — Commerce Marketplace Listing Provenance Hardening V1
+﻿# CURSOR_REPORT — Commerce Live Payment Capture Adapter V1
 
 ## Summary
 
-Implemented listing provenance hardening on separate Commerce worktree
-`umtuba-web-commerce-listing-provenance-v1`, branch
-`office/commerce-marketplace-listing-provenance-hardening-v1` @ base `6cbe0f6`.
+Build gate cleared on `office/commerce-live-payment-capture-adapter-v1`
+(worktree `umtuba-web-commerce-live-payment-capture-v1`), base `3a369b57`.
 
-Wishlist + id-PDP now carry/validate `seller_listing_id`. No commit/push/apply.
-AI worktree left untouched.
+Replaced worktree `node_modules` junction with local `npm ci`. Standard
+`npm run build` **PASS**. Focused suites **149**, `tsc` **pass**,
+`git diff --check` **pass**. No commit / push / remote apply. No scope expansion.
 
 ## Exact files changed
 
-See Final Verification Report in chat.
+Unchanged from prior Commerce slice (no new implementation in this build-gate pass):
+
+Modified: `CheckoutClient.tsx`, `payments.ts`, `paymentOutcomeSync.test.ts`,
+`docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
+
+New: Stripe actions/routes/libs, `LIVE_PAYMENT_CAPTURE_ADAPTER_V1.md`,
+`20260876_…sql`
 
 ## Migrations created
 
-`supabase/migrations/20260875_store_marketplace_listing_provenance_hardening_v1.sql` (local only; **not** applied).
+`supabase/migrations/20260876_store_live_payment_capture_adapter_v1.sql` — local only, not applied.
 
 ## Security review
 
-- Fail-closed on invalid/ambiguous listing identity
-- No silent owned-store fallback when listing was requested
-- Listing eligibility still via `store_listing_allows_seller_sale`
-- No payment/shipping/commission/AI changes
+Unchanged — runtime fail-closed Stripe config; no fake secrets added for build.
 
 ## Tests
 
-Focused Commerce suites: **71 passed** (6 files)
+Focused Commerce suites: **149 passed**
 
 ## TypeScript
 
-`npx tsc --noEmit` — pass
+`npx tsc --noEmit` — **pass** (after clearing stale `.next` from prior webpack attempt)
 
 ## Build
 
-Skipped (focused verification sufficient; not required)
+`npm run build` — **PASS** (Turbopack, local non-junction `node_modules`)
 
-## git diff --check / status
+## git diff --check
 
-Commerce worktree dirty with Commerce-only files; HEAD still `6cbe0f6`.
+**pass**
+
+## git status --short
+
+See Build-Gate Report in chat (implementation files only; `node_modules` / `.next` ignored).
 
 ## Open issues
 
-- Await manual review + trailer-free commit/push GO
-- Do not remote-apply `20260875` without GO
-- `node_modules` is a junction to the main worktree — do not `npm install`/`npm ci` blindly in either tree while shared
+- Await commit / push / remote apply `20260876` GO
+- Runtime needs `STRIPE_SECRET_KEY` (`sk_test_`), webhook secret, app origin, service role

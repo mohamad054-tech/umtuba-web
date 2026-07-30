@@ -153,7 +153,7 @@ export const CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS: ReadonlyArray<{
   enabled: boolean;
 }> = [
   { provider: "none", label: "Record order without charging (deferred)", enabled: true },
-  { provider: "stripe", label: "Stripe", enabled: false },
+  { provider: "stripe", label: "Stripe test mode (after order)", enabled: false },
   { provider: "paypal", label: "PayPal", enabled: false },
   { provider: "apple_pay", label: "Apple Pay", enabled: false },
   { provider: "google_pay", label: "Google Pay", enabled: false },
@@ -170,6 +170,14 @@ export function mapPaymentRpcError(message: string | undefined): string {
   if (raw.includes("authentication")) return "Please sign in.";
   if (raw.includes("not found")) return "Order not found.";
   if (raw.includes("not authorized")) return "You cannot pay for this order.";
+  if (raw.includes("already paid")) return "This order is already paid.";
+  if (raw.includes("not payable")) return "This order cannot be charged.";
+  if (raw.includes("digital checkout")) {
+    return "Stripe test checkout is available for digital orders only.";
+  }
   if (raw.includes("already")) return "A payment attempt already exists.";
+  if (raw.includes("different provider")) {
+    return "This payment reference belongs to a different provider.";
+  }
   return message?.trim() || "Payment request failed.";
 }

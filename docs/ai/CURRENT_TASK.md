@@ -2,56 +2,36 @@
 
 ## Task title
 
-Commerce Marketplace Listing Provenance Hardening V1
+Commerce Live Payment Capture Adapter V1
 
 ## Status
 
-`implementation-complete-local` — tests + tsc green; awaiting manual review / trailer-free commit / push / migration apply GO
+`build-gate-cleared` — tests + tsc + `npm run build` green; awaiting commit / push / apply GO
 
-## Worktree (USE THIS TOMORROW)
+## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-listing-provenance-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-live-payment-capture-v1`
 
 ## Branch
 
-`office/commerce-marketplace-listing-provenance-hardening-v1`
+`office/commerce-live-payment-capture-adapter-v1`
 
 ## Base / HEAD
 
-`6cbe0f68f418141ac887c99bf40e21eb1d0d27de`  
-(`office/commerce-end-to-end-beta-readiness-v1` tip — not advanced; all work is uncommitted)
+`3a369b5729cf8a1621daa7c4e064fdfde7183b12` (uncommitted implementation on top)
 
-## Machine policy
+## Milestone
 
-- **This laptop = Commerce only**
-- Desktop = sole AI source of truth
-- Do **not** continue AI / Tutor / Gemini / Provider work on this laptop
-- Do **not** checkout inside the dirty AI worktree
+`commerce.payments.live_capture_adapter_v1` — Stripe test-mode only
 
-## Delivered (uncommitted)
+## Delivered
 
-- Migration (local only): `20260875_store_marketplace_listing_provenance_hardening_v1.sql`
-- Wishlist `seller_listing_id` persist + fail-closed reload enrichment
-- Id-PDP `?listing=` resolve to seller storefront (no silent owned fallback)
-- UI passes `sellerListingId` (ProductCard / PDP / wishlist)
-- Docs: `docs/store/implementation/LISTING_PROVENANCE_HARDENING_V1.md`
-- Tests: focused Commerce suites **71 passed**; `tsc --noEmit` **pass**
-- `node_modules` = **junction** → `C:\Users\Admin\Desktop\umtuba\umtuba-web\node_modules`  
-  (do not `npm install` / `npm ci` blindly while shared)
+- Migration (local): `20260876_store_live_payment_capture_adapter_v1.sql`
+- Stripe Checkout Session create/resume + attach provider_reference
+- Trusted return + signed webhook → `apply_store_payment_outcome`
+- Checkout UI: Pay with Stripe (test) after order
+- Digital-first gate (rejects physical lines)
 
-## Forbidden / deferred
+## Next
 
-- Commit / push / remote migration apply without GO
-- `npm run build` (skipped; optional later)
-- Payment / shipping carrier / commission / affiliate / supplier portal / AI
-
-## Next GO options (tomorrow)
-
-1. Manual review + trailer-free commit
-2. Push branch
-3. Apply migration `20260875` only (targeted SQL + repair) — separate GO
-
-## Do NOT open for Commerce work
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web`  
-→ AI branch `office/learning-ai-tutor-thread-lesson-binding-v1` @ `9e90448` with dirty AI files — leave untouched
+Security review → trailer-free commit GO → push GO → apply `20260876` GO

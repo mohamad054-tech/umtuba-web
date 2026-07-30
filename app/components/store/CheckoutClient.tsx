@@ -8,6 +8,7 @@ import {
   ensureDeferredPaymentAttemptAction,
   saveCheckoutAddressAction,
 } from "../../actions/storeCheckout";
+import { startStripeTestCheckoutAction } from "../../actions/storeStripePayments";
 import { formatMinorUnits } from "../../../lib/store/money";
 import type { CartSummary } from "../../../lib/store/cartRules";
 import type { BuyerAddressRow } from "../../../lib/store/checkout";
@@ -191,6 +192,29 @@ export default function CheckoutClient({
       }
     }
 
+    async function onPayWithStripe(orderId: string) {
+      if (recoveryBusy || submitLockRef.current) return;
+      setRecoveryBusy(true);
+      setError(null);
+      setStatusMessage("Preparing Stripe checkout…");
+      try {
+        const res = await startStripeTestCheckoutAction({ orderId });
+        if (!res.ok) {
+          setError(res.message);
+          setStatusMessage(
+            res.code === "unavailable"
+              ? "Stripe payment is unavailable."
+              : null
+          );
+          return;
+        }
+        setStatusMessage("Awaiting payment…");
+        window.location.assign(res.checkoutUrl);
+      } finally {
+        setRecoveryBusy(false);
+      }
+    }
+
     return (
       <div
         className="mt-6 space-y-4 rounded-[var(--sf-radius-lg)] border border-[rgba(159,214,184,0.35)] bg-[var(--sf-surface)] p-6"
@@ -203,8 +227,36 @@ export default function CheckoutClient({
         </h2>
         <p className="text-sm leading-relaxed text-[var(--sf-muted)]">
           {(typeof result.payment_note === "string" && result.payment_note) ||
-            "No payment was collected. Your order is recorded as pending payment with a deferred payment attempt — not a live charge."}
+            "No payment was collected yet. Your order is pending payment. You can pay with Stripe test mode when configured, or keep the deferred record."}
         </p>
+        <div className="space-y-2">
+          {orders.map((o) => {
+            const orderId =
+              typeof o.order_id === "string" ? o.order_id : "";
+            if (!orderId) return null;
+            return (
+              <div
+                key={orderId}
+                className="flex flex-wrap items-center gap-3 rounded-xl border border-[var(--sf-line)] p-3"
+              >
+                <Link
+                  href={buildStoreOrderHref(orderId)}
+                  className="text-sm font-semibold text-[var(--sf-accent)] underline-offset-2 hover:underline"
+                >
+                  View order
+                </Link>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => onPayWithStripe(orderId)}
+                  className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712] disabled:opacity-50"
+                >
+                  {recoveryBusy ? "Preparing…" : "Pay with Stripe (test)"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
         {incomplete ? (
           <div
             className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100"
@@ -678,9 +730,10 @@ export default function CheckoutClient({
         <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
           <h2 className="sf-display text-lg font-semibold">Payment</h2>
           <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
-            Live payment collection is not enabled. Placing an order only records
-            it as pending payment and creates a deferred payment attempt — no
-            card, wallet, or gateway charge runs here.
+            Placing an order records it as pending payment and creates a deferred
+            payment attempt. After confirmation you can start Stripe test-mode
+            checkout when configured — the order is never marked paid from the
+            browser alone.
           </p>
           <fieldset className="mt-4 space-y-2" disabled={busy}>
             <legend className="sr-only">Payment method</legend>
@@ -702,7 +755,11 @@ export default function CheckoutClient({
                 />
                 <span>
                   {option.label}
-                  {!option.enabled ? " (not available yet)" : ""}
+                  {!option.enabled
+                    ? option.provider === "stripe"
+                      ? " (start after order)"
+                      : " (not available yet)"
+                    : ""}
                 </span>
               </label>
             ))}

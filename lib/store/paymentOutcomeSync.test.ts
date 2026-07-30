@@ -126,14 +126,16 @@ describe("Payment Outcome Sync V1 — migration contracts", () => {
   });
 
   it("locks event then order then attempt", () => {
-    expect(sql).toMatch(/store_pay_event:/);
-    expect(sql).toMatch(/store_pay_order:/);
-    const eventLock = sql.indexOf("store_pay_event:");
-    const orderLock = sql.indexOf("store_pay_order:");
-    const orderForUpdate = sql.indexOf(
+    // Normalize CRLF so lock-order indexOf works on Windows checkouts.
+    const sqlLf = sql.replace(/\r\n/g, "\n");
+    expect(sqlLf).toMatch(/store_pay_event:/);
+    expect(sqlLf).toMatch(/store_pay_order:/);
+    const eventLock = sqlLf.indexOf("store_pay_event:");
+    const orderLock = sqlLf.indexOf("store_pay_order:");
+    const orderForUpdate = sqlLf.indexOf(
       "from public.orders\n  where id = v_order_id\n  for update"
     );
-    const attemptForUpdate = sql.lastIndexOf(
+    const attemptForUpdate = sqlLf.lastIndexOf(
       "from public.payment_attempts\n  where id = p_payment_attempt_id\n  for update"
     );
     expect(eventLock).toBeGreaterThan(0);
