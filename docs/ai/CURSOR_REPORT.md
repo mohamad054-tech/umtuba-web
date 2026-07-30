@@ -1,61 +1,71 @@
-# CURSOR_REPORT — AI Tutor + Provider Foundation Reconciliation V1
+# CURSOR_REPORT — AI Core Gemini Adapter V1
 
 ## Summary
 
-Reconciled Tutor tip `9e90448` with Provider Foundation tip `01f23d9` on
-`office/ai-tutor-provider-reconciliation-v1` via `--no-ff` merge commit
-`62cd3eb` (pushed, sync `0 0`). Preserves seven Learning Tutor capabilities +
-bridge/metadata + Provider Foundation / Hub / Assistant / knowledge / memory.
-**No Gemini adapter.** Handoff docs refreshed for next-session resume.
+Added a fail-closed Google Gemini provider adapter behind existing
+`AiProviderAdapter` contracts. `aiService.runCapability()` unchanged. OpenAI and
+Gemini are interchangeable via Provider Foundation / routing policy when
+credentials are present. Streaming remains disabled. Staged; not committed.
 
-## Exact source commits
+## Exact files created
 
-| Line | Ref | Commit |
-| --- | --- | --- |
-| Tutor (ours) | `origin/office/learning-ai-tutor-thread-metadata-read-v1` | `9e90448ce8e4566fd369476a2571844378b0950c` |
-| Provider (theirs) | `origin/office/ai-core-provider-foundation-v1` | `01f23d9a584d7b970788fd71444faf6979f25330` |
-| Merge-base | — | `a8010c5` (learning tutor server actions) |
+- `lib/ai/providers/geminiAdapter.ts`
+- `lib/ai/providers/geminiAdapter.test.ts`
 
-## Conflicts
+## Exact files modified
 
-Content conflicts only in docs (resolved manually):
-
+- `lib/ai/config.ts`
+- `lib/ai/providers/adapters.ts`
+- `lib/ai/providers/foundation.ts`
+- `lib/ai/providers/foundation.test.ts`
+- `lib/ai/models/registry.ts`
+- `lib/ai/aiPlatformFoundation.test.ts`
+- `lib/ai/capabilities/admin/diagnostics.ts`
+- `lib/ai/hub/types.ts`
+- `lib/ai/hub/runtimeStatus.ts`
+- `lib/ai/hub/experience.test.ts`
+- `.env.example`
+- `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/workstreams/AI_PLATFORM.md`
 
-AI TypeScript modules auto-merged without conflict markers.
+## Architecture summary
 
-## Duplicate / superseded reconciliation map
+```
+Capability / aiService.runCapability
+  → gateway.execute
+  → createProviderFoundation(config)
+  → routing policy resolveRoute
+  → requireAdapter(providerId)  // openai | gemini | stub
+  → adapter.execute(...)
+```
 
-| Area | Duplicate? | Canonical selected | Superseded / note |
-| --- | --- | --- | --- |
-| Learning Tutor capabilities (7) | No | Tutor tip (`tutorRunner`, contracts, actions, stubs) | Provider tip stopped at 5 caps pre-fork |
-| Thread persistence / metadata | No | Tutor tip (`threadPersistenceBridge`, migrations 72/73) | Absent on Provider tip |
-| Provider Foundation | No | Provider tip (`providers/foundation.ts`, routing policy) | Tutor tip lacked these files |
-| Gateway selection | Overlap | Provider tip wiring via `createProviderFoundation` | Auto-merged; Tutor gateway lacked foundation |
-| `lib/ai/index.ts` exports | Overlap | Union of both (Tutor + Provider/Hub exports) | Auto-merged |
-| Stub/OpenAI adapters | Overlap | Tutor tip stubs include `give_hint` / `explain_again` | Auto-merged with Provider adapter surface |
-| Hub / Assistant / knowledge / memory / video | No | Provider tip | Absent on Tutor tip |
-| Docs handoff | Conflict | Reconciled Desktop status (this report + AI_PLATFORM.md) | Old one-sided Hub vs Tutor reports superseded |
-| Gemini | Placeholder only | Disabled registry entry from Provider tip | **Unresolved gap** — Adapter V1 next |
+- Config: `GEMINI_API_KEY`, `GEMINI_BASE_URL`, `GEMINI_MODEL`
+- Live mode accepts OpenAI and/or Gemini keys
+- Default model: **`gemini-2.5-flash`** (Google-documented stable Flash; not preview/`latest`)
+- Adapter uses Gemini `generateContent` REST (no stream)
+- Structured: `generationConfig.responseMimeType = application/json`
+- Errors map to existing `AiPlatformError` codes
 
 ## Migrations created
 
-None in this reconciliation (inherits Tutor `20260872` / `20260873` from Tutor tip).
+None.
 
 ## Security review
 
-- No Gemini SDK / keys / adapters added
-- Provider placeholders remain disabled (gemini/anthropic/local)
-- Tutor server actions + bridge contracts preserved
-- Hub remains gated by `UMTUBA_AI_HUB` (default OFF)
+- Key only server-side; never `NEXT_PUBLIC_*`
+- Adapter registered only when key present
+- Error bodies sanitized via `sanitizeAiErrorMessage`
+- No Learning/UI/server-action surface changes for Tutor
 
 ## Tests
 
 `npm test -- --run lib/ai lib/learning/aiTutorFoundation.test.ts`
 
-- Test Files: **19 passed**
-- Tests: **268 passed**
+- Test Files: **20 passed**
+- Tests: **276 passed**
 
 ## TypeScript
 
@@ -63,14 +73,10 @@ None in this reconciliation (inherits Tutor `20260872` / `20260873` from Tutor t
 
 ## Build
 
-Not run (per milestone instructions).
-
-## git diff --check
-
-**Pass** (after resolving trailing whitespace in `AI_PLATFORM.md`).
+Not run (provider-layer milestone).
 
 ## Open issues
 
-- Gemini Adapter V1 = next GO (not started)
-- Do not merge to alpha without explicit GO
-- Resume tip: `62cd3eb` on this branch / worktree (already pushed)
+- Manual commit + push deferred
+- No live Google API smoke in this milestone
+- Anthropic / local still placeholders

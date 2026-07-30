@@ -1,6 +1,7 @@
 import type { AiUsageRecord } from "../contracts/types";
 import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
 import type { AiPlatformConfig } from "../config";
+import { createGeminiAdapter } from "./geminiAdapter";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -365,6 +366,9 @@ export function resolveProviderAdapters(
   }
   if (config.openaiApiKey) {
     map.set("openai", createOpenAiCompatibleAdapter(config));
+  }
+  if (config.geminiApiKey) {
+    map.set("gemini", createGeminiAdapter(config));
   }
   return map;
 }

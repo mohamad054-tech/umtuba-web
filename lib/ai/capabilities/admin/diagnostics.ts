@@ -52,8 +52,10 @@ export function loadAiPlatformDiagnostics(): AiPlatformDiagnostics {
   const status = describeAiConfigStatus(config);
   const providers = buildProviderRegistry({
     openaiConfigured: Boolean(config.openaiApiKey),
+    geminiConfigured: Boolean(config.geminiApiKey),
     stubEligible: config.allowStub || config.mode === "stub",
     openaiDefaultModel: config.openaiDefaultModel,
+    geminiDefaultModel: config.geminiDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
   });
 

@@ -1,39 +1,31 @@
 # Session Handoff — UMTUBA
 
-**Updated:** 2026-07-30 (saved before Desktop shutdown)
+**Updated:** 2026-07-30
 
 ## Active platform track
 
-**AI Tutor + Provider Foundation Reconciliation V1 — SAVED**
+**AI Core Gemini Adapter V1 — implementation complete (staged, not committed)**
 
 | Item | Value |
 | --- | --- |
-| Branch | `office/ai-tutor-provider-reconciliation-v1` |
-| HEAD | `62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3` |
-| Message | `merge(ai): reconcile tutor tip with provider foundation v1` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1` |
-| Sync | **0 0** (pushed) |
-| Working tree | clean |
+| Branch | `office/ai-core-gemini-adapter-v1` |
+| Base | `3d6dd6d` (reconciliation tip) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1` |
+| Prior closed | Reconciliation `62cd3eb` / handoff `3d6dd6d` on `office/ai-tutor-provider-reconciliation-v1` |
 
-## Sources merged
+## Done
 
-| Source | Tip |
-| --- | --- |
-| Tutor | `9e90448` `office/learning-ai-tutor-thread-metadata-read-v1` |
-| Provider | `01f23d9` `office/ai-core-provider-foundation-v1` |
+- Gemini `AiProviderAdapter` via generateContent REST
+- Registry + foundation selection; OpenAI/Gemini interchangeable
+- Fail-closed without `GEMINI_API_KEY`; structured JSON preserved
+- Streaming not enabled
+- Tests 20 files / 276 passed; `tsc --noEmit` pass
 
-## Preserved
+## Next GO
 
-- Seven Learning Tutor capabilities + thread persistence bridge + metadata read
-- Provider Foundation contracts/routing + Hub/Assistant/knowledge/memory/video
-- Gemini remains disabled placeholder only
-
-## Tomorrow — resume here
-
-1. `git fetch origin`
-2. Worktree path above; confirm `HEAD == 62cd3eb` and `0 0`
-3. Await GO for **Gemini Adapter V1**
-4. Do not merge to alpha without GO
+1. Manual commit (no trailers) + push when approved
+2. Optional live smoke with real `GEMINI_API_KEY`
+3. Do not merge to alpha without GO
 
 ## Frozen architecture
 

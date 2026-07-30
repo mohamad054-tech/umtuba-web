@@ -2,44 +2,51 @@
 
 ## Task title
 
-AI Tutor + Provider Foundation Reconciliation V1
+AI Core Gemini Adapter V1
 
 ## Status
 
-`closed-local+remote` — Merge committed and pushed. Sync **0 0**. Gemini not implemented.
+`implementation-complete` — Gemini provider adapter wired into Shared AI Core; staged for manual commit (no trailers). Not pushed.
 
 ## Resume here (next session / next GO)
 
-1. Open worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1`
-2. Confirm branch tip: `office/ai-tutor-provider-reconciliation-v1` @ `62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3`
-3. `git fetch origin` then confirm sync `0 0`
-4. **Next GO (separate milestone):** Gemini Adapter V1 — placeholders only today (disabled)
-5. Do **not** merge this branch into alpha without explicit GO
-6. Do **not** apply migrations without separate GO
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1`
+2. Branch: `office/ai-core-gemini-adapter-v1` (from reconciliation `3d6dd6d`)
+3. Manual commit (no Co-authored-by / Signed-off-by / trailers)
+4. Push when approved; confirm `0 0`
+5. Do **not** merge into alpha without explicit GO
 
 ## Branch
 
-`office/ai-tutor-provider-reconciliation-v1`
+`office/ai-core-gemini-adapter-v1`
 
 ## Exact refs
 
-| Ref | Hash |
-|-----|------|
-| Reconciliation HEAD (local + origin) | `62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3` |
-| Tutor source | `9e90448ce8e4566fd369476a2571844378b0950c` |
-| Provider source | `01f23d9a584d7b970788fd71444faf6979f25330` |
-| Merge-base | `a8010c5f578ce3aa1af50613b0144c8b220cd63c` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1` |
-| Remote sync | **0 0** |
+| Ref | Hash / path |
+|-----|-------------|
+| Base | `3d6dd6dafccb8e75dcc4f788546421e0695eb633` (reconciliation tip) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1` |
+
+## Allowed scope
+
+- Shared AI provider layer only (`lib/ai/providers/**`, config, model registry wiring, related tests, AI handoff docs, `.env.example`)
+
+## Forbidden scope
+
+- Learning / Creator / Commerce / RPCs / DB / UI / server actions changes (except diagnostics registry args)
+- Streaming enablement
+- Alpha merge
+- Commit/push without GO
 
 ## Done
 
-- Tutor tip + Provider Foundation tip reconciled (`merge --no-ff`)
-- Seven tutor capabilities + bridge/metadata preserved
-- Provider foundation / hub / assistant / knowledge / memory preserved
-- Tests: 19 files / 268 passed; `tsc --noEmit` pass
-- Commit + push complete (trailer-free)
+- `createGeminiAdapter` + registry + foundation selection
+- OpenAI / Gemini interchangeable via existing resolution
+- Fail-closed without `GEMINI_API_KEY`
+- Structured JSON via `responseMimeType=application/json`
+- Streaming not enabled (`streamingSupport: false`)
+- Tests + `tsc` pass
 
 ## Out of scope / next
 
-Gemini Adapter V1, alpha merge, Profile/Home/Store/World, migration apply without GO.
+Live smoke against Google API, Anthropic adapter, alpha merge.

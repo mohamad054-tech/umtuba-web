@@ -3,27 +3,26 @@
 ## SAVE POINT — 2026-07-30 (Desktop)
 
 **Machine:** Desktop  
-**Active work:** AI Tutor + Provider Foundation Reconciliation V1
+**Active work:** AI Core Gemini Adapter V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-tutor-provider-reconciliation-v1` |
-| Tutor source | `9e90448` — learning tutor thread metadata read |
-| Provider source | `01f23d9` — AI Hub experience foundation |
-| Merge-base | `a8010c5` — learning tutor server actions |
-| Remote | Local merge staged; **no commit/push until verification GO** |
+| Active branch | `office/ai-core-gemini-adapter-v1` |
+| Base | `3d6dd6d` — reconciliation tip |
+| Remote | Local implementation staged; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Merged Provider Foundation tip into Tutor tip (`--no-ff --no-commit`)
-2. Preserved seven Learning Tutor capabilities + thread bridge/metadata
-3. Preserved Provider Foundation registries, routing policy, gateway selection
-4. Preserved Hub / Assistant / knowledge / memory / video personalization from Provider tip
-5. Docs conflicts resolved; Gemini **not** implemented (placeholders stay disabled)
+1. Gemini provider adapter behind `AiProviderAdapter`
+2. Config + model registry + foundation selection (OpenAI/Gemini interchangeable)
+3. Normalized error mapping + structured JSON (`responseMimeType`)
+4. Streaming left disabled; fail-closed without `GEMINI_API_KEY`
+5. Unit tests + focused AI suite + `tsc`
 
 **NOT done / do not touch by mistake:**
-- Gemini Adapter / SDK / keys
-- Product Home / Navigation / Creator / App Shell (outside Hub-local `/ai-hub`)
+- Live Google API smoke (optional next)
+- Anthropic / local adapters
+- Product Home / Navigation / Creator / App Shell
 - Alpha merge
 - Remote migration apply without explicit GO
 
@@ -56,7 +55,8 @@ Capability / aiService
 | `AiProviderFoundation` | Central provider + model + adapter registries |
 | Typed model descriptors | provider id, model id, capabilities/modalities, enabled/available, context/output limits |
 | Selection layer | Capabilities never hardcode provider/model names |
-| Placeholders | `gemini` / `anthropic` / `local` registered disabled, no adapters |
+| Placeholders | `anthropic` / `local` registered disabled, no adapters |
+| Gemini | Adapter registered when `GEMINI_API_KEY` present; otherwise listed unavailable |
 
 **Fail-closed when:** unknown provider, unknown model, disabled/unavailable model, unsupported capability/modality, unregistered adapter.
 
@@ -168,5 +168,5 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 ## Next (after commit approval)
 
 1. Manual commit (no trailers) + push when approved
-2. Gemini Adapter V1 (separate GO) — placeholders only today
+2. Optional live smoke with real `GEMINI_API_KEY`
 3. Do not merge into alpha without explicit GO
