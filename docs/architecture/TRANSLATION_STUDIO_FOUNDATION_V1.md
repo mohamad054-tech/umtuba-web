@@ -59,3 +59,7 @@ common dialogs, shared product chrome.
 - `/admin/translation-studio/review`
 - `/admin/translation-studio/publish`
 - `/admin/translation-studio/terminology`
+- `/admin/translation-studio/intelligence`
+- `/admin/translation-studio/intelligence/[recordId]`
+
+See also: `docs/architecture/TRANSLATION_INTELLIGENCE_FOUNDATION_V1.md`

@@ -14,6 +14,7 @@ const NAV = [
   { href: `${TRANSLATION_STUDIO_BASE}/review`, label: "Review queue" },
   { href: `${TRANSLATION_STUDIO_BASE}/publish`, label: "Publish queue" },
   { href: `${TRANSLATION_STUDIO_BASE}/terminology`, label: "Terminology" },
+  { href: `${TRANSLATION_STUDIO_BASE}/intelligence`, label: "Intelligence" },
 ] as const;
 
 export default function TranslationStudioShell({
