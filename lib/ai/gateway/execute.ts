@@ -17,12 +17,8 @@ import {
   updateRunStatus,
 } from "../runs/lifecycle";
 import { resolvePrompt, validateStructuredAgainstPrompt } from "../prompts/registry";
-import {
-  buildProviderRegistry,
-  findModel,
-} from "../models/registry";
-import { resolveProviderAdapters } from "../providers/adapters";
-import { routeModel } from "../routing/router";
+import { createProviderFoundation } from "../providers/foundation";
+import { createRoutingPolicyEngine } from "../routing/policyEngine";
 import {
   assertRateLimit,
   runPostExecutionPolicy,
@@ -39,8 +35,10 @@ import type {
   AiGatewaySuccess,
   AiResult,
   AiToolCallSummary,
+  AiUsageRecord,
 } from "../contracts/types";
-import { buildUsageRecord, recordUsage } from "../usage/accounting";
+import { buildUsageRecord } from "../usage/accounting";
+import { recordUsageAfterExecution } from "../usage/trackingFoundation";
 import { invokeTool } from "../tools/registry";
 
 export type AiGatewayDeps = {
@@ -183,15 +181,8 @@ export async function executeAiGateway(
       eligible: deps.capabilityEligible !== false,
     });
 
-    const providers = buildProviderRegistry({
-      openaiConfigured: Boolean(effectiveConfig.openaiApiKey),
-      stubEligible:
-        effectiveConfig.allowStub ||
-        effectiveConfig.mode === "stub" ||
-        Boolean(request._test?.forceStub),
-      openaiDefaultModel: effectiveConfig.openaiDefaultModel,
-      defaultTimeoutMs: effectiveConfig.defaultTimeoutMs,
-    });
+    const foundation = createProviderFoundation(effectiveConfig);
+    const routingPolicy = createRoutingPolicyEngine(foundation);
 
     const contextChars = estimateContextChars([
       prompt.systemInstructions,
@@ -202,18 +193,27 @@ export async function executeAiGateway(
       throw new AiPlatformError("context_too_large", "Context exceeds limit.");
     }
 
-    const route = routeModel(providers, {
+    const route = routingPolicy.resolve({
       capabilityId: String(request.capabilityId),
       requiredModality: "text",
       requiresStructuredOutput: request.outputMode === "structured_json",
       requiresTools: (request.allowedToolIds ?? []).length > 0 && false,
       estimatedContextTokens: Math.ceil(contextChars / 4),
       dataClassification: context.dataClassification,
-      preferredProviderId: request.preferredProviderId,
-      preferredModelId: request.preferredModelId,
+      requiredCapabilityClass:
+        request.outputMode === "structured_json" ? "structured" : undefined,
+      preferredModel:
+        request.preferredProviderId && request.preferredModelId
+          ? {
+              providerId: request.preferredProviderId,
+              modelId: request.preferredModelId,
+            }
+          : undefined,
       allowFallback: true,
-      preferredCost: "economy",
-      preferredLatency: "standard",
+      routingHints: {
+        preferCost: "economy",
+        preferLatency: "standard",
+      },
     });
 
     updateRunStatus(runId, "routed", {
@@ -331,15 +331,11 @@ export async function executeAiGateway(
     }
 
     updateRunStatus(runId, "executing");
-    const adapters = resolveProviderAdapters(effectiveConfig);
-    const adapter = adapters.get(route.providerId);
-    if (!adapter) {
-      throw new AiPlatformError(
-        "provider_unavailable",
-        "Provider adapter unavailable."
-      );
-    }
-    const model = findModel(providers, route.providerId, route.modelId);
+    const adapter = foundation.requireAdapter(route.providerId);
+    const model = foundation.requireEnabledModel(
+      route.providerId,
+      route.modelId
+    );
     await appendTraceEvent({
       runId,
       traceId,
@@ -357,7 +353,7 @@ export async function executeAiGateway(
         { role: "user", content: request.userInput },
       ],
       structured: request.outputMode === "structured_json",
-      timeoutMs: model?.defaultTimeoutMs ?? effectiveConfig.defaultTimeoutMs,
+      timeoutMs: model.defaultTimeoutMs ?? effectiveConfig.defaultTimeoutMs,
       userId: authenticatedUserId,
       runId,
       capabilityId: String(request.capabilityId),
@@ -387,14 +383,50 @@ export async function executeAiGateway(
       structured,
     });
 
-    const usage = buildUsageRecord({
-      partial: providerResult.usage,
+    const tracked = recordUsageAfterExecution({
+      requestId: runId,
+      capabilityId: String(request.capabilityId),
+      providerId: route.providerId,
+      modelId: route.modelId,
+      executionStatus: "completed",
+      executionTimeMs: Date.now() - started,
+      estimatedInputTokens: providerResult.usage.inputTokens,
+      estimatedOutputTokens: providerResult.usage.outputTokens,
+      estimatedCostMinor: providerResult.usage.costMinor,
+      costCurrency: providerResult.usage.costCurrency,
+      costStatus:
+        providerResult.usage.costStatus === "provider_reported" ||
+        providerResult.usage.costStatus === "estimated" ||
+        providerResult.usage.costStatus === "unavailable"
+          ? providerResult.usage.costStatus
+          : "estimated",
+      userId: authenticatedUserId,
+      workspaceId: context.workspaceId ?? context.storeId ?? null,
+    });
+
+    const usage: AiUsageRecord = buildUsageRecord({
+      partial: {
+        inputTokens: tracked.estimatedInputTokens,
+        outputTokens: tracked.estimatedOutputTokens,
+        cachedTokens: providerResult.usage.cachedTokens,
+        audioUnits: providerResult.usage.audioUnits,
+        imageUnits: providerResult.usage.imageUnits,
+        costMinor: tracked.estimatedCostMinor,
+        costCurrency: tracked.costCurrency,
+        costStatus:
+          tracked.costStatus === "zero"
+            ? "estimated"
+            : tracked.costStatus === "unavailable"
+              ? "unavailable"
+              : tracked.costStatus,
+        modelId: route.modelId,
+        providerId: route.providerId,
+      },
       capabilityId: String(request.capabilityId),
       userId: authenticatedUserId,
       workspaceId: context.workspaceId ?? context.storeId ?? null,
       runId,
     });
-    recordUsage(usage);
 
     completeRun({
       runId,
@@ -473,6 +505,25 @@ export async function executeAiGateway(
           ? "blocked"
           : "failed";
       failRun({ runId, status, code, message });
+      try {
+        recordUsageAfterExecution({
+          requestId: runId,
+          capabilityId: String(request.capabilityId),
+          providerId: null,
+          modelId: null,
+          executionStatus: status === "blocked" ? "blocked" : "failed",
+          executionTimeMs: Date.now() - started,
+          estimatedInputTokens: null,
+          estimatedOutputTokens: null,
+          estimatedCostMinor: null,
+          costStatus: "unavailable",
+          userId: authenticatedUserId,
+          workspaceId:
+            request.context.workspaceId ?? request.context.storeId ?? null,
+        });
+      } catch {
+        // Tracking must not mask the original failure.
+      }
       await appendTraceEvent({
         runId,
         traceId,

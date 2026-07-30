@@ -2,34 +2,52 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — Thread Metadata Read V1
+AI Tutor + Provider Foundation Reconciliation V1
 
 ## Status
 
-`implementation-complete-local` — awaiting commit/push GO; migration **not** applied
+`implementation-complete` — Merge reconciled in isolated desktop worktree; staged for manual commit (no trailers). Gemini not implemented.
+
+## Resume here (next session / next GO)
+
+1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
+2. Push when approved; confirm `0 0`
+3. Do **not** implement Gemini Adapter in this milestone
+4. Do **not** apply migrations from this branch without separate GO
 
 ## Branch
 
-`office/learning-ai-tutor-thread-metadata-read-v1`
+`office/ai-tutor-provider-reconciliation-v1`
 
-## Base
+## Exact refs
 
-`office/learning-ai-tutor-thread-persistence-bridge-v1` @ `daeb4408a8f9794feb1fc8a6967ecdfa082aea53`
+| Ref | Hash |
+|-----|------|
+| Tutor source | `9e90448ce8e4566fd369476a2571844378b0950c` |
+| Provider source | `01f23d9a584d7b970788fd71444faf6979f25330` |
+| Merge-base | `a8010c5f578ce3aa1af50613b0144c8b220cd63c` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1` |
 
-## Milestone
+## Allowed scope
 
-`learning.tutor.thread_metadata_read_v1`
+- AI Core / Tutor / Provider Foundation reconciliation on this branch only
+- Docs under `docs/ai/**` for this milestone
 
-## Delivered
+## Forbidden scope
 
-- Migration (local only): `20260873_learning_ai_tutor_thread_metadata_read_v1.sql`
-- RPC: `get_my_learning_ai_tutor_thread(p_thread_id)` — lean metadata, no messages
-- Bridge validation switched from full message history read to lean metadata RPC
+- Gemini Adapter implementation
+- Alpha-0.2 merge
+- Profile / Home Unlock / Store / World
+- Remote migration apply
+- Commit/push without explicit GO
 
-## Machine policy
+## Done
 
-AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI. No `npm run build`. Do not apply migration remotely without explicit GO.
+- Tutor tip + Provider Foundation tip combined (`--no-ff --no-commit`)
+- Seven tutor capabilities + bridge/metadata preserved
+- Provider foundation / hub / assistant / knowledge / memory preserved
+- Docs conflicts resolved
 
-## Next
+## Out of scope
 
-Await trailer-free commit/push GO, then separate apply GO for `20260873`. Conversation history summarization remains deferred. `code_review` remains blocked.
+Gemini SDK/adapter, migration apply, alpha merge, Profile/Home/Store/World.

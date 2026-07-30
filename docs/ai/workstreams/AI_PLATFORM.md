@@ -1,43 +1,44 @@
 # AI Platform Workstream (Desktop-owned)
 
-## SAVE POINT — 2026-07-29 (Desktop)
+## SAVE POINT — 2026-07-30 (Desktop)
 
 **Machine:** Desktop  
-**Active work:** AI Core Platform Provider Foundation V1
+**Active work:** AI Tutor + Provider Foundation Reconciliation V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/learning-ai-tutor-backend-foundation-v1` |
-| Base HEAD (AI) | `a8010c5` — learning tutor server actions |
-| Remote | Synced; local may be ahead with unrelated UI commit; **no commit/push until verification GO** |
+| Active branch | `office/ai-tutor-provider-reconciliation-v1` |
+| Tutor source | `9e90448` — learning tutor thread metadata read |
+| Provider source | `01f23d9` — AI Hub experience foundation |
+| Merge-base | `a8010c5` — learning tutor server actions |
+| Remote | Local merge staged; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Provider Foundation types + central registries (`foundationTypes.ts`, `foundation.ts`)
-2. Gateway selection wired through `createProviderFoundation` / `resolveRoute` / `requireAdapter`
-3. Fail-closed unknown/disabled/unregistered provider-model paths
-4. Future provider placeholders (gemini/anthropic/local) registered disabled, no adapters/keys
-5. Foundation tests + docs
+1. Merged Provider Foundation tip into Tutor tip (`--no-ff --no-commit`)
+2. Preserved seven Learning Tutor capabilities + thread bridge/metadata
+3. Preserved Provider Foundation registries, routing policy, gateway selection
+4. Preserved Hub / Assistant / knowledge / memory / video personalization from Provider tip
+5. Docs conflicts resolved; Gemini **not** implemented (placeholders stay disabled)
 
 **NOT done / do not touch by mistake:**
-- Learning UI / Home / Navigation / Creator / App Shell / Shared UI (Laptop)
-- Unrelated local dirty Learning/Nexus/`globals.css` files — leave unstaged
-- Real OpenAI/Gemini/Anthropic live provider expansion beyond existing stub/OpenAI adapters
-- Do not remote-apply `20260871` without explicit approval
-- No new migration for this layer
+- Gemini Adapter / SDK / keys
+- Product Home / Navigation / Creator / App Shell (outside Hub-local `/ai-hub`)
+- Alpha merge
+- Remote migration apply without explicit GO
 
 ---
 
-**Ownership:** Desktop owns Shared AI Core + Learning Tutor backend capabilities/integration/server actions (no UI pages/components).
-**Laptop owns:** user-facing AI presentation wiring, Home, Navigation, Creator, App Shell, shared UI.
+**Ownership:** Desktop owns Shared AI Core + Learning Tutor backend + AI Hub (gated).
+**Laptop:** do not continue AI Platform work unless ownership reassigned.
 
 ## Status
 
 Shared AI Core Foundation V1 closed.
-Learning AI Tutor Backend Foundation V1 closed (five capabilities).
-Learning AI Tutor Backend Integration Foundation V1 closed.
-Learning AI Tutor Server Actions Foundation V1 closed.
-AI Core Platform Provider Foundation V1 implemented (server-side Shared AI Core only).
+Learning AI Tutor Backend (7 capabilities) + Integration + Server Actions closed.
+Thread Persistence Bridge V1 + Thread Metadata Read V1 closed on Tutor tip.
+AI Core Platform Provider Foundation V1 + Hub Experience closed on Provider tip.
+**Reconciliation V1:** combined tips staged on this branch.
 
 ## Provider Foundation (V1)
 
@@ -93,7 +94,7 @@ Future Learning UI
 - Auth via `getServerUser` + existing Learning access chain inside integration/capabilities
 - Strips `modelId` / `promptVersion` / provider fields from UI-facing success payloads
 - Safe error envelope with optional `requiresAuth`
-- No App Router pages / React components in this deliverable
+- No App Router Learning UI pages in Tutor deliverables
 
 ## Learning capabilities implemented
 
@@ -115,7 +116,7 @@ Milestone: `learning.tutor.thread_persistence_bridge@1.0.0`
 
 | Piece | Detail |
 | --- | --- |
-| Migration (local only) | `20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql` |
+| Migration | `20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql` |
 | RPC | `append_my_learning_ai_tutor_exchange(p_thread_id, p_kind, p_user_content, p_assistant_content)` |
 | Stub RPC | `append_my_learning_ai_tutor_message` preserved (stub assistant text) |
 | Bridge module | `lib/ai/capabilities/learning/threadPersistenceBridge.ts` |
@@ -131,25 +132,41 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 
 | Piece | Detail |
 | --- | --- |
-| Migration (local only) | `20260873_learning_ai_tutor_thread_metadata_read_v1.sql` |
+| Migration | `20260873_learning_ai_tutor_thread_metadata_read_v1.sql` |
 | RPC | `get_my_learning_ai_tutor_thread(p_thread_id)` |
 | Return | `thread_id`, `course_id`, `lesson_id`, `title`, `created_at`, `updated_at` only |
 | Bridge change | `validateThreadForPersistence` uses lean metadata RPC (no full message history fetch) |
 | Preserved | Full `get_my_learning_ai_tutor_thread_messages` for consumers that need messages |
 
-### Remaining follow-ups
+## AI Hub Experience (`/ai-hub`)
 
-- SQL-level lesson binding (`p_lesson_id` on exchange RPC)
-- Trusted-producer transcript integrity
-- Structured oversize serialization
-- Conversation history summarization (deferred)
+| Item | Value |
+| --- | --- |
+| Flag | `UMTUBA_AI_HUB` (`1`/`true` only) |
+| OFF | Routes return `notFound()` |
+| ON | Authenticated users see Hub Home / Assistant Entry |
+| Shell | `AiHubShell` — Hub-local only |
+| Data | `loadAiHubSnapshot` via `app/actions/aiHub.ts` |
+
+### Screens
+- `/ai-hub` — AI Home
+- `/ai-hub/assistant` — Assistant Entry only
+
+## Prior foundations (Provider tip)
+
+- AI Hub Foundation (`lib/ai/hub/`)
+- Assistant Runtime (`UMTUBA_AI_ASSISTANT_RUNTIME`)
+- Knowledge / memory / video personalization modules
 
 ## Migration status
 
 - Shared AI Core: `20260871` — **applied** on linked remote
 - Tutor exchange RPC: `20260872` — **applied** on linked remote
-- Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
+- Tutor lean thread metadata: `20260873` — treat remote apply status as operator-known; do not re-apply without GO
+- Provider / Hub path: no new migration in this reconciliation
 
 ## Next (after commit approval)
 
-Apply `20260873` on explicit GO. `code_review` remains **blocked**. Do not merge Tutor work into alpha from the Tutor laptop.
+1. Manual commit (no trailers) + push when approved
+2. Gemini Adapter V1 (separate GO) — placeholders only today
+3. Do not merge into alpha without explicit GO

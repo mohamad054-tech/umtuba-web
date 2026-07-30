@@ -1,6 +1,9 @@
 /**
  * Canonical server-side AI service entry.
- * Flow: UI → typed contract → aiService.runCapability → Shared AI Core → provider
+ * Flow: UI → typed contract → aiService.runCapability → Shared AI Core gateway
+ *   → Routing Policy Engine → Provider Foundation adapter
+ * Capabilities never select models/providers directly.
+ * Usage/cost tracking is recorded after execution only.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -19,6 +22,7 @@ import {
   type LearningTutorCapabilityId,
 } from "../capabilities/learning/tutorRunner";
 import { loadAiPlatformConfig } from "../config";
+import { recordAiServiceUsageAfterExecution } from "../usage/trackingFoundation";
 
 export type AiServiceDeps = {
   supabase: SupabaseClient;
@@ -43,10 +47,59 @@ function asFailure(
   };
 }
 
+function trackAfterServiceExecution(
+  request: AiServiceRunRequest,
+  deps: AiServiceDeps,
+  result: AiServiceResult,
+  startedMs: number
+): void {
+  if (!deps.userId) return;
+  const requestId = result.ok
+    ? result.data.runId
+    : result.error.runId;
+  if (!requestId) return;
+  try {
+    recordAiServiceUsageAfterExecution({
+      requestId,
+      capabilityId: request.capabilityId,
+      providerId: null,
+      modelId: result.ok
+        ? ((result.data.result as { modelId?: string } | undefined)?.modelId ??
+          null)
+        : null,
+      executionStatus: result.ok
+        ? "completed"
+        : result.error.code === "safety_block" ||
+            result.error.code === "permission_denied"
+          ? "blocked"
+          : "failed",
+      executionTimeMs: Math.max(0, Date.now() - startedMs),
+      estimatedInputTokens: null,
+      estimatedOutputTokens: null,
+      estimatedCostMinor: null,
+      costStatus: "unavailable",
+      userId: deps.userId,
+      workspaceId: request.context.storeId ?? request.context.courseId ?? null,
+    });
+  } catch {
+    // Tracking must not break the service response.
+  }
+}
+
 /**
  * Stable public entry point for all Domain AI capabilities.
  */
 export async function runCapability(
+  request: AiServiceRunRequest,
+  deps: AiServiceDeps
+): Promise<AiServiceResult> {
+  const startedMs = Date.now();
+  const result = await runCapabilityInner(request, deps);
+  trackAfterServiceExecution(request, deps, result, startedMs);
+  return result;
+}
+
+async function runCapabilityInner(
   request: AiServiceRunRequest,
   deps: AiServiceDeps
 ): Promise<AiServiceResult> {
@@ -221,6 +274,60 @@ export async function runCapability(
         runId: gateway.data.runId,
         capabilityId: request.capabilityId,
         result: gateway.data.structured ?? { ok: true },
+        retryable: false,
+      },
+    };
+  }
+
+  if (request.capabilityId === "assistant.runtime_turn") {
+    const config = loadAiPlatformConfig(
+      deps.forceStub
+        ? { mode: "stub", allowStub: true }
+        : undefined
+    );
+    const gateway = await executeAiGateway(
+      deps.userId,
+      {
+        capabilityId: "assistant.runtime_turn",
+        promptId: "assistant.runtime_turn",
+        userInput: request.input.text ?? "",
+        outputMode: "structured_json",
+        context: {
+          productDomain: request.context.productDomain || "platform",
+          surface: request.context.surface || "assistant.runtime",
+          dataClassification: "confidential",
+          allowedCapabilities: ["assistant.runtime_turn"],
+          allowedToolIds: [],
+          locale: request.context.locale ?? null,
+        },
+        _test: deps.forceStub
+          ? { forceStub: true, bypassRateLimit: true }
+          : undefined,
+      },
+      { config, capabilityEligible: true, permissions: [] }
+    );
+    if (!gateway.ok) {
+      return asFailure(gateway.code, gateway.message);
+    }
+    const structured = gateway.data.structured ?? {};
+    const content =
+      typeof structured.content === "string"
+        ? structured.content
+        : typeof structured.message === "string"
+          ? structured.message
+          : null;
+    if (!content?.trim()) {
+      return asFailure(
+        "invalid_structured_output",
+        "Assistant runtime turn missing content."
+      );
+    }
+    return {
+      ok: true,
+      data: {
+        runId: gateway.data.runId,
+        capabilityId: request.capabilityId,
+        result: { content: content.trim() },
         retryable: false,
       },
     };

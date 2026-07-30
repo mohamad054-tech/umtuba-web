@@ -8,7 +8,8 @@ import {
   recordWatchSignal,
   type RecordWatchSignalResult,
 } from "../../lib/supabase/recommendations";
-import { createClient } from "../../lib/supabase/server";
+import { createClient, getServerUser } from "../../lib/supabase/server";
+import { wireWatchSignalToPersonalization } from "../../lib/ai/integrations/video/wiring";
 
 export type RecordWatchSignalActionInput = {
   postId: number;
@@ -30,6 +31,7 @@ export type RecordWatchSignalActionInput = {
 /**
  * Server action for Discover/Watch watch-signal telemetry.
  * Additive — does not alter like/save/share/view reward RPCs.
+ * Optional personalization ingest is flag-gated and never fails this action.
  */
 export async function recordWatchSignalAction(
   input: RecordWatchSignalActionInput
@@ -52,5 +54,19 @@ export async function recordWatchSignalAction(
   };
 
   const supabase = await createClient();
-  return recordWatchSignal(supabase, payload);
+  const result = await recordWatchSignal(supabase, payload);
+
+  if (result.ok) {
+    try {
+      const user = await getServerUser();
+      wireWatchSignalToPersonalization({
+        watchSignal: payload,
+        serverUserId: user?.id ?? null,
+      });
+    } catch {
+      // Personalization must never break watch telemetry.
+    }
+  }
+
+  return result;
 }

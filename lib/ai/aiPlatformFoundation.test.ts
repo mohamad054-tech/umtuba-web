@@ -60,6 +60,7 @@ import {
   resetAiUsageState,
   summarizeUsage,
 } from "./usage/accounting";
+import { resetUsageTrackingFoundation } from "./usage/trackingFoundation";
 import { loadAiPlatformDiagnostics } from "./capabilities/admin/diagnostics";
 import { AiPlatformError } from "./contracts/errors";
 import { aiService } from "./services/aiService";
@@ -73,6 +74,7 @@ beforeEach(() => {
   resetAiRunState();
   resetAiTraceState();
   resetAiUsageState();
+  resetUsageTrackingFoundation();
   resetAiSessionState();
   resetAiMemoryState();
   resetAiEvaluationState();

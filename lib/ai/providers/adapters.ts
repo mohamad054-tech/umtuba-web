@@ -67,6 +67,30 @@ export function createStubAdapter(): AiProviderAdapter {
           },
         };
       }
+      if (input.capabilityId === "assistant.runtime_turn") {
+        const skillMatch = user.match(/skillId=([a-z_]+)/i);
+        const skillId = skillMatch?.[1]?.trim() || "assistant";
+        const messageMatch = user.match(/message=([^\n]+)/i);
+        const message = messageMatch?.[1]?.trim() || "your request";
+        return {
+          text: null,
+          structured: {
+            content: `UMTUBA Assistant (${skillId}) received: ${message.slice(0, 240)}`,
+          },
+          usage: {
+            inputTokens: estimateTokens(user),
+            outputTokens: 24,
+            cachedTokens: 0,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: 0,
+            costCurrency: "USD",
+            costStatus: "provider_reported",
+            modelId: input.modelId,
+            providerId: "stub",
+          },
+        };
+      }
       if (String(input.capabilityId).startsWith("learning.tutor.")) {
         const lessonMatch = user.match(/Lesson:\s*([^\n]+)/i);
         const lessonName = lessonMatch?.[1]?.trim() || "this lesson";

@@ -1,33 +1,36 @@
 # Session Handoff — UMTUBA
 
-**Updated:** 2026-07-28
+**Updated:** 2026-07-30
 
 ## Active platform track
 
-**UMTUBA AI Core Platform Foundation V1 — COMPLETE** on `office/ai-core-platform-foundation-v1`.
+**AI Tutor + Provider Foundation Reconciliation V1** on
+`office/ai-tutor-provider-reconciliation-v1` (isolated worktree).
 
-Shared gateway at `lib/ai/gateway.ts`. Reference consumer: Product Draft Assistant on seller product editor. Diagnostics: `/admin/ai`. Migration `20260871` local only.
+| Source | Tip |
+| --- | --- |
+| Tutor | `9e90448` `office/learning-ai-tutor-thread-metadata-read-v1` |
+| Provider | `01f23d9` `office/ai-core-provider-foundation-v1` |
 
-## Commerce program status
+Merge method: `git merge --no-ff --no-commit`. Staged; **not** committed/pushed.
 
-Consolidation complete. Commerce End-to-End Beta Readiness V1 complete — Ready for Beta (90% implemented scope). Stop major Commerce features unless fixing implemented flows.
+## Preserved
 
-### Completed Commerce implementation (branches not merged)
+- Seven Learning Tutor capabilities + thread persistence bridge + metadata read
+- Provider Foundation contracts/routing + Hub/Assistant/knowledge/memory/video modules
+- Gemini remains disabled placeholder only
 
-1–12 as previously recorded through Marketplace Eligibility + Beta Readiness.
+## Next GO
 
-## AI platform contracts (V1)
-
-- Gateway is the only execution entry
-- Providers: OpenAI-compatible (live) + stub (test/explicit allow)
-- Prompts versioned in `lib/ai/prompts`
-- Tools: read-only reference tools only; mutating denied
-- Suggestions require explicit human apply; no auto-save / no price-inventory-publish mutation
+1. Manual commit (no trailers) when approved
+2. Push + confirm `0 0`
+3. Separate milestone: Gemini Adapter V1
+4. Do not merge to alpha without explicit GO
 
 ## Frozen architecture
 
 Do not modify `docs/commerce/**`, Learning frozen baselines, Games/Ads/Revenue/Platform architecture docs unless an operational handoff status line is required.
 
-## Next recommended AI task
+## Commerce program status
 
-Wire Learning AI Tutor (and/or Nexus Assistant) to consume the shared AI Gateway with a versioned Learning prompt — still no broad autonomous agent.
+Consolidation complete. Commerce End-to-End Beta Readiness V1 complete — Ready for Beta (90% implemented scope). Stop major Commerce features unless fixing implemented flows.
