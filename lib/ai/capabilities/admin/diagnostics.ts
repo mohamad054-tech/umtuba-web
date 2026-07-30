@@ -54,10 +54,13 @@ export function loadAiPlatformDiagnostics(): AiPlatformDiagnostics {
     openaiConfigured: Boolean(config.openaiApiKey),
     geminiConfigured: Boolean(config.geminiApiKey),
     anthropicConfigured: Boolean(config.anthropicApiKey),
+    localConfigured:
+      Boolean(config.localBaseUrl) && Boolean(config.localDefaultModel),
     stubEligible: config.allowStub || config.mode === "stub",
     openaiDefaultModel: config.openaiDefaultModel,
     geminiDefaultModel: config.geminiDefaultModel,
     anthropicDefaultModel: config.anthropicDefaultModel,
+    localDefaultModel: config.localDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
   });
 

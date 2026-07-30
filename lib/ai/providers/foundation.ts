@@ -251,20 +251,24 @@ export class AiProviderFoundation {
 
 /**
  * Seed the foundation from existing config-backed registries/adapters.
- * Registers Gemini/Anthropic when configured; local remains a disabled placeholder.
+ * Registers Gemini/Anthropic/Local when configured.
  */
 export function createProviderFoundation(
   config: AiPlatformConfig
 ): AiProviderFoundation {
   const foundation = new AiProviderFoundation();
+  const localConfigured =
+    Boolean(config.localBaseUrl) && Boolean(config.localDefaultModel);
   const seeded = buildProviderRegistry({
     openaiConfigured: Boolean(config.openaiApiKey),
     geminiConfigured: Boolean(config.geminiApiKey),
     anthropicConfigured: Boolean(config.anthropicApiKey),
+    localConfigured,
     stubEligible: config.allowStub || config.mode === "stub",
     openaiDefaultModel: config.openaiDefaultModel,
     geminiDefaultModel: config.geminiDefaultModel,
     anthropicDefaultModel: config.anthropicDefaultModel,
+    localDefaultModel: config.localDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
   });
   const adapters = resolveProviderAdapters(config);
@@ -280,21 +284,6 @@ export function createProviderFoundation(
       adapter: adapters.get(provider.providerId) ?? null,
       models: provider.models.map((m) => toFoundationModel(m, true)),
     });
-  }
-
-  // Reserved multi-provider slots — structure only, not executable yet.
-  const placeholders: AiProviderFoundationDescriptor[] = [
-    {
-      providerId: "local",
-      displayName: "Local / self-hosted",
-      enabled: false,
-      available: false,
-    },
-  ];
-  for (const placeholder of placeholders) {
-    if (!foundation.getProvider(placeholder.providerId)) {
-      foundation.registerProvider({ descriptor: placeholder, adapter: null });
-    }
   }
 
   return foundation;

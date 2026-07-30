@@ -3,25 +3,25 @@
 ## SAVE POINT — 2026-07-30 (Desktop)
 
 **Machine:** Desktop  
-**Active work:** AI Core Anthropic Adapter V1
+**Active work:** AI Core Local / Self-hosted Adapter V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-core-anthropic-adapter-v1` |
-| Base | `2867a5e` — Gemini Adapter V1 |
+| Active branch | `office/ai-core-local-adapter-v1` |
+| Base | `fe07a1c` — Anthropic Adapter V1 |
 | Remote | Local implementation staged; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Anthropic provider adapter behind `AiProviderAdapter`
-2. Config + model registry + foundation selection (OpenAI/Gemini/Anthropic interchangeable)
-3. Normalized error mapping + structured JSON (prompt-steered; no illegal open-object `output_config`)
-4. Streaming left disabled; fail-closed without `ANTHROPIC_API_KEY`
-5. Default model `claude-haiku-4-5-20251001`; unit tests + focused AI suite + `tsc`
+1. Local OpenAI-compatible provider adapter behind `AiProviderAdapter`
+2. Config + model registry + foundation selection (OpenAI/Gemini/Anthropic/Local interchangeable)
+3. Normalized error mapping + structured JSON (prompt-steered; no `response_format`)
+4. Streaming left disabled; fail-closed without both `LOCAL_AI_BASE_URL` and `LOCAL_AI_MODEL`
+5. Optional `LOCAL_AI_API_KEY`; unit tests + focused AI suite + `tsc`
 
 **NOT done / do not touch by mistake:**
-- Live Anthropic API smoke (optional next)
-- Local / self-hosted adapter
+- Live local/Ollama smoke (optional next)
+- Streaming enablement
 - Product Home / Navigation / Creator / App Shell
 - Alpha merge
 - Remote migration apply without explicit GO
@@ -55,9 +55,9 @@ Capability / aiService
 | `AiProviderFoundation` | Central provider + model + adapter registries |
 | Typed model descriptors | provider id, model id, capabilities/modalities, enabled/available, context/output limits |
 | Selection layer | Capabilities never hardcode provider/model names |
-| Placeholders | `local` registered disabled, no adapter |
 | Gemini | Adapter registered when `GEMINI_API_KEY` present; otherwise listed unavailable |
 | Anthropic | Adapter registered when `ANTHROPIC_API_KEY` present; otherwise listed unavailable |
+| Local | Adapter registered when both `LOCAL_AI_BASE_URL` and `LOCAL_AI_MODEL` present; otherwise listed unavailable / empty catalog |
 
 **Fail-closed when:** unknown provider, unknown model, disabled/unavailable model, unsupported capability/modality, unregistered adapter.
 
@@ -169,6 +169,6 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 ## Next (after commit approval)
 
 1. Manual commit (no trailers) + push when approved
-2. Optional live smoke with real `ANTHROPIC_API_KEY`
-3. Next implementation candidate: Local / self-hosted adapter
+2. Optional live smoke against operator-hosted OpenAI-compatible endpoint
+3. Next implementation candidate: streaming (if GO) or alpha merge GO
 4. Do not merge into alpha without explicit GO

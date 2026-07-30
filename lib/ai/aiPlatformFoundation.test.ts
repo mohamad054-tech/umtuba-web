@@ -87,10 +87,12 @@ describe("provider/model registry", () => {
       openaiConfigured: true,
       geminiConfigured: false,
       anthropicConfigured: false,
+      localConfigured: false,
       stubEligible: true,
       openaiDefaultModel: "gpt-4o-mini",
       geminiDefaultModel: "gemini-2.5-flash",
       anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      localDefaultModel: null,
       defaultTimeoutMs: 1000,
     });
     expect(providers.some((p) => p.providerId === "stub")).toBe(true);
@@ -105,10 +107,12 @@ describe("provider/model registry", () => {
       openaiConfigured: false,
       geminiConfigured: false,
       anthropicConfigured: false,
+      localConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
       geminiDefaultModel: "gemini-2.5-flash",
       anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      localDefaultModel: null,
       defaultTimeoutMs: 1000,
     });
     expect(listAvailableModels(providers)).toHaveLength(0);
@@ -119,10 +123,12 @@ describe("provider/model registry", () => {
       openaiConfigured: false,
       geminiConfigured: true,
       anthropicConfigured: false,
+      localConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
       geminiDefaultModel: "gemini-2.5-flash",
       anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      localDefaultModel: null,
       defaultTimeoutMs: 1000,
     });
     expect(providers.some((p) => p.providerId === "gemini" && p.available)).toBe(
@@ -138,10 +144,12 @@ describe("provider/model registry", () => {
       openaiConfigured: false,
       geminiConfigured: false,
       anthropicConfigured: true,
+      localConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
       geminiDefaultModel: "gemini-2.5-flash",
       anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      localDefaultModel: null,
       defaultTimeoutMs: 1000,
     });
     expect(
@@ -151,6 +159,27 @@ describe("provider/model registry", () => {
       listAvailableModels(providers).every((m) => m.providerId === "anthropic")
     ).toBe(true);
   });
+
+  it("lists local models only when operator model + configured", () => {
+    const providers = buildProviderRegistry({
+      openaiConfigured: false,
+      geminiConfigured: false,
+      anthropicConfigured: false,
+      localConfigured: true,
+      stubEligible: false,
+      openaiDefaultModel: "gpt-4o-mini",
+      geminiDefaultModel: "gemini-2.5-flash",
+      anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      localDefaultModel: "operator-hosted-model",
+      defaultTimeoutMs: 1000,
+    });
+    expect(providers.some((p) => p.providerId === "local" && p.available)).toBe(
+      true
+    );
+    expect(
+      listAvailableModels(providers).every((m) => m.providerId === "local")
+    ).toBe(true);
+  });
 });
 
 describe("deterministic routing", () => {
@@ -158,10 +187,12 @@ describe("deterministic routing", () => {
     openaiConfigured: true,
     geminiConfigured: false,
     anthropicConfigured: false,
+    localConfigured: false,
     stubEligible: true,
     openaiDefaultModel: "gpt-4o-mini",
     geminiDefaultModel: "gemini-2.5-flash",
     anthropicDefaultModel: "claude-haiku-4-5-20251001",
+    localDefaultModel: null,
     defaultTimeoutMs: 1000,
   });
 

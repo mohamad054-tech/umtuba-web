@@ -1,17 +1,16 @@
-# CURSOR_REPORT — AI Core Anthropic Adapter V1
+# CURSOR_REPORT — AI Core Local / Self-hosted Adapter V1
 
 ## Summary
 
-Added a fail-closed Anthropic Claude provider adapter behind existing
-`AiProviderAdapter` contracts. `aiService.runCapability()` unchanged. OpenAI,
-Gemini, and Anthropic are interchangeable via Provider Foundation / routing
-policy when credentials are present. Streaming remains disabled. Staged; not
-committed.
+Added a fail-closed local / self-hosted OpenAI-compatible provider adapter behind
+existing `AiProviderAdapter` contracts. `aiService.runCapability()` unchanged.
+OpenAI, Gemini, Anthropic, and Local are interchangeable via Provider Foundation /
+routing policy when configured. Streaming remains disabled. Staged; not committed.
 
 ## Exact files created
 
-- `lib/ai/providers/anthropicAdapter.ts`
-- `lib/ai/providers/anthropicAdapter.test.ts`
+- `lib/ai/providers/localAdapter.ts`
+- `lib/ai/providers/localAdapter.test.ts`
 
 ## Exact files modified
 
@@ -39,16 +38,15 @@ Capability / aiService.runCapability
   → gateway.execute
   → createProviderFoundation(config)
   → routing policy resolveRoute
-  → requireAdapter(providerId)  // openai | gemini | anthropic | stub
+  → requireAdapter(providerId)  // openai | gemini | anthropic | local | stub
   → adapter.execute(...)
 ```
 
-- Config: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`
-- Live mode accepts OpenAI and/or Gemini and/or Anthropic keys
-- Default model: **`claude-haiku-4-5-20251001`** (exact dated stable Haiku snapshot)
-- Premium catalog entry: `claude-sonnet-5`
-- Adapter uses Anthropic Messages REST (`/v1/messages`, no stream)
-- Structured: prompt-steered JSON + fail-closed parse (open-object `output_config` schemas are illegal under Anthropic JSON Schema limitations)
+- Config: `LOCAL_AI_BASE_URL`, `LOCAL_AI_MODEL`, optional `LOCAL_AI_API_KEY`
+- Live mode accepts OpenAI and/or Gemini and/or Anthropic and/or local (URL+model)
+- No default base URL and no default model id (operator must set both)
+- Adapter uses OpenAI-compatible Chat Completions (`{base}/chat/completions`, no stream)
+- Structured: prompt-steered JSON + fail-closed parse (no `response_format`)
 - Errors map to existing `AiPlatformError` codes
 
 ## Migrations created
@@ -57,8 +55,9 @@ None.
 
 ## Security review
 
-- Key only server-side; never `NEXT_PUBLIC_*`
-- Adapter registered only when key present
+- Secrets only server-side; never `NEXT_PUBLIC_*`
+- Adapter registered only when both base URL and model are present
+- Optional API key sent as Bearer only when configured
 - Error bodies sanitized via `sanitizeAiErrorMessage`
 - No Learning/UI/server-action surface changes for Tutor
 
@@ -66,8 +65,8 @@ None.
 
 `npm test -- --run lib/ai lib/learning/aiTutorFoundation.test.ts`
 
-- Test Files: **21 passed**
-- Tests: **283 passed**
+- Test Files: **22 passed**
+- Tests: **294 passed**
 
 ## TypeScript
 
@@ -77,8 +76,16 @@ None.
 
 Not run (provider-layer milestone).
 
+## git diff --check
+
+Run on staged changes at verification time.
+
+## git status --short
+
+See Final Verification Report (staged only; not committed).
+
 ## Open issues
 
 - Manual commit + push deferred
-- No live Anthropic API smoke in this milestone
-- Local / self-hosted provider still a placeholder
+- No live local/Ollama smoke in this milestone
+- Streaming still disabled across providers

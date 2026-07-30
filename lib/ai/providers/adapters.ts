@@ -1,8 +1,12 @@
 import type { AiUsageRecord } from "../contracts/types";
 import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
-import type { AiPlatformConfig } from "../config";
+import {
+  isLocalProviderConfigured,
+  type AiPlatformConfig,
+} from "../config";
 import { createGeminiAdapter } from "./geminiAdapter";
 import { createAnthropicAdapter } from "./anthropicAdapter";
+import { createLocalAdapter } from "./localAdapter";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -373,6 +377,9 @@ export function resolveProviderAdapters(
   }
   if (config.anthropicApiKey) {
     map.set("anthropic", createAnthropicAdapter(config));
+  }
+  if (isLocalProviderConfigured(config)) {
+    map.set("local", createLocalAdapter(config));
   }
   return map;
 }

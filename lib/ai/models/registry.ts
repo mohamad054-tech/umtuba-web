@@ -45,10 +45,12 @@ export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
   geminiConfigured: boolean;
   anthropicConfigured: boolean;
+  localConfigured: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
   geminiDefaultModel: string;
   anthropicDefaultModel: string;
+  localDefaultModel: string | null;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
   const providers: AiProviderDefinition[] = [];
@@ -226,6 +228,43 @@ export function buildProviderRegistry(input: {
       },
     ],
   });
+
+  if (input.localDefaultModel != null && input.localDefaultModel.length > 0) {
+    providers.push({
+      providerId: "local",
+      displayName: "Local / self-hosted (OpenAI-compatible)",
+      available: input.localConfigured,
+      models: [
+        {
+          providerId: "local",
+          modelId: input.localDefaultModel,
+          displayName: input.localDefaultModel,
+          capabilityClasses: ["chat", "structured"],
+          inputModalities: ["text"],
+          outputModalities: ["text"],
+          contextLimitTokens: 32_000,
+          structuredOutputSupport: true,
+          toolCallSupport: false,
+          streamingSupport: false,
+          available: input.localConfigured,
+          costClass: "economy",
+          inputCostPer1M: 0,
+          outputCostPer1M: 0,
+          dataHandlingMax: "confidential",
+          defaultTimeoutMs: input.defaultTimeoutMs,
+          fallbackEligible: true,
+          latencyClass: "low",
+        },
+      ],
+    });
+  } else {
+    providers.push({
+      providerId: "local",
+      displayName: "Local / self-hosted (OpenAI-compatible)",
+      available: false,
+      models: [],
+    });
+  }
 
   return providers;
 }
