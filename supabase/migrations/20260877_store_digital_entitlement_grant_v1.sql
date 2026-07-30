@@ -40,7 +40,7 @@ drop trigger if exists store_digital_entitlements_set_updated_at
 create trigger store_digital_entitlements_set_updated_at
   before update on public.store_digital_entitlements
   for each row
-  execute function public.set_updated_at();
+  execute function public.set_row_updated_at();
 
 alter table public.store_digital_entitlements enable row level security;
 alter table public.store_digital_entitlements force row level security;
