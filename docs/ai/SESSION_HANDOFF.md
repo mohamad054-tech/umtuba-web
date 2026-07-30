@@ -2,21 +2,26 @@
 
 ## Active task
 
-Translation Studio for Learning V1
+Knowledge Acquisition Platform Foundation V1
 
 | Field | Value |
 |-------|-------|
-| Branch | `office/platform-translation-learning-foundation-v1` |
-| Base | `7296ac3` (Translation Intelligence Foundation V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-learning-foundation-v1` |
-| Status | Implementation complete; awaiting stage/commit GO |
+| Branch | `office/platform-knowledge-acquisition-foundation-v1` |
+| Base | `6a3cb3d` (Learning Translation Studio foundation v1) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-knowledge-acquisition-foundation-v1` |
+| Status | Implementation complete; awaiting commit GO |
 
 ## Scope reminder
 
-Learning **platform UI** catalogs only. No course content / media translation.
+Governance registry for knowledge sources, rights, quality, privacy,
+classification, datasets, graph lineage, and history. Read-only admin UI.
+Not training. Not scraping.
 
 ## Do not
 
 - Commit/push without GO
 - Apply migrations remotely
-- Train models / STT / TTS / dubbing
+- Train / fine-tune models
+- Scrape or download external datasets
+- Change Learning / Commerce / Creator product modules
+- Use git trailers
