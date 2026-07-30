@@ -9,6 +9,7 @@ import type { AiErrorCode } from "./types";
 export type AiServiceCapabilityId =
   | "commerce.product_draft_assistant"
   | "platform.diagnostics_probe"
+  | "platform.translation_suggest"
   | "assistant.runtime_turn"
   | "learning.tutor.explain_lesson"
   | "learning.tutor.summarize_lesson"

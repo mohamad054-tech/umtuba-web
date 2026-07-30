@@ -276,6 +276,68 @@ async function runCapabilityInner(
     };
   }
 
+  if (request.capabilityId === "platform.translation_suggest") {
+    const config = loadAiPlatformConfig(
+      deps.forceStub
+        ? { mode: "stub", allowStub: true }
+        : undefined
+    );
+    const gateway = await executeAiGateway(
+      deps.userId,
+      {
+        capabilityId: "platform.translation_suggest",
+        promptId: "platform.translation_suggest",
+        userInput: [
+          request.input.text ?? "",
+          request.input.notes ? `\n${request.input.notes}` : "",
+        ].join(""),
+        outputMode: "structured_json",
+        context: {
+          productDomain: request.context.productDomain || "platform",
+          surface: request.context.surface || "admin.translation_studio",
+          dataClassification: "internal",
+          locale: request.context.locale ?? null,
+          allowedCapabilities: ["platform.translation_suggest"],
+          allowedToolIds: [],
+        },
+        _test: deps.forceStub
+          ? { forceStub: true, bypassRateLimit: true }
+          : undefined,
+      },
+      { config, capabilityEligible: true, permissions: [] }
+    );
+    if (!gateway.ok) {
+      return asFailure(gateway.code, gateway.message);
+    }
+    const structured = (gateway.data.structured ?? {}) as Record<
+      string,
+      unknown
+    >;
+    // Fail closed to empty candidate rather than inventing translations in stub fallbacks.
+    const candidateText =
+      typeof structured.candidateText === "string"
+        ? structured.candidateText
+        : "";
+    const confidence =
+      typeof structured.confidence === "number" ? structured.confidence : 0;
+    return {
+      ok: true,
+      data: {
+        runId: gateway.data.runId,
+        capabilityId: request.capabilityId,
+        result: {
+          candidateText,
+          confidence,
+          notes:
+            typeof structured.notes === "string"
+              ? structured.notes
+              : "Human review required before Translation Memory publish.",
+        },
+        retryable: false,
+      },
+    };
+  }
+
   if (request.capabilityId === "assistant.runtime_turn") {
     const config = loadAiPlatformConfig(
       deps.forceStub
