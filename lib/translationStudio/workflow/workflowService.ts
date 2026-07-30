@@ -1,4 +1,6 @@
 import { createStubTranslationAiPort } from "../ai/translationAiPort";
+import { getTranslationIntelligenceService } from "../intelligence/service";
+import { createProvenance, createUsageRights } from "../intelligence/provenance";
 import { sourceFingerprint } from "../normalize";
 import {
   readPersistedStudioState,
@@ -281,6 +283,34 @@ export function createTranslationStudioWorkflow(options?: {
         };
       });
       rememberIfApproved(next, actor.userId);
+      const key = state.keys.find((k) => k.id === next.keyId);
+      if (key && !ephemeral) {
+        try {
+          getTranslationIntelligenceService().recordApprovedTranslation({
+            approvedValueId: next.id,
+            approvedVersion: next.version,
+            sourceText: key.sourceText,
+            approvedTargetText: next.value,
+            targetLocale: next.language as StudioLanguageCode,
+            namespaceId: key.namespaceId,
+            domain: key.namespaceId,
+            contentType: "ui_text",
+            provenance: createProvenance({
+              type: "human_authored",
+              originalSourceOwnership: "umtuba_internal",
+            }),
+            usageRights: createUsageRights({
+              status: "owned_internal",
+              permissionReuseInternally: true,
+              permissionModelCustomization: true,
+            }),
+            approverId: actor.userId,
+            trustLevel: "trusted_approved",
+          });
+        } catch {
+          // Intelligence recording must not block approval workflow.
+        }
+      }
       save();
       return next;
     },

@@ -2,34 +2,19 @@
 
 ## Active task
 
-Translation Studio Catalog Ingestion & App Shell Review V1
+UMTUBA Translation Intelligence Foundation V1
 
 | Field | Value |
 |-------|-------|
-| Branch | `office/platform-translation-studio-app-shell-ingestion-v1` |
-| Base | `189ec08` (Persistence & Workflow V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-app-shell-ingestion-v1` |
-| Status | Implementation complete; staged for manual commit; not pushed |
-| Migration 20260874 | **Not applied** (forbidden this task) |
-
-## What landed
-
-- Idempotent App Shell catalog ingestion (`lib/translationStudio/ingestion/**`)
-- Status rules: EN approved; valid AR approved; FR/ES/DE/PT never auto-approved
-- Arabic TM seed + terminology findings (warnings only)
-- App Shell publish batch dry-run (`writesCatalogFiles: false`)
-- Admin UI: overview, `/app-shell`, keys filters, publish preview
-
-## Next GO
-
-1. Manual commit (no trailers)
-2. Push when approved
-3. Separate GO for catalog file write / production publish
-4. Do not apply 20260874 in this track without explicit GO
+| Branch | `office/platform-translation-intelligence-foundation-v1` |
+| Base | `e12cd6d` (App Shell ingestion) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-intelligence-foundation-v1` |
+| Status | Implementation complete; awaiting stage/commit GO |
+| Migrations | `20260875` local only; `20260874` untouched / not applied |
 
 ## Do not
 
+- Train or fine-tune models
+- Apply migrations remotely
 - Commit/push without GO
-- Apply migration 20260874
-- Touch other worktrees
-- Auto-publish catalogs
+- Auto-approve or auto-publish

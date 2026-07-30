@@ -127,3 +127,73 @@ export {
   type AppShellPublishBatchRecord,
   type BuildAppShellPublishBatchOptions,
 } from "./ingestion/publishBatch";
+
+export type {
+  ContentSensitivity,
+  CorrectionFeedback,
+  ExternalTranslationImportCandidate,
+  FeedbackOutcome,
+  IntelligenceContentType,
+  IntelligenceEligibility,
+  IntelligenceIndexEntry,
+  MediaIntelligenceMetadata,
+  PersistedIntelligenceState,
+  ProvenanceRecord,
+  ProvenanceType,
+  QualityDimensionId,
+  QualityScoreReport,
+  StyleProfile,
+  StyleProfileId,
+  TranslationIntelligenceRecord,
+  TrustLevel,
+  UsageRightsRecord,
+  UsageRightsStatus,
+} from "./intelligence/types";
+
+export {
+  createProvenance,
+  createUsageRights,
+  isExternalUntrustedProvenance,
+  isTrustedProvenance,
+} from "./intelligence/provenance";
+
+export {
+  canEnterModelCustomizationDataset,
+  canEnterTranslationMemory,
+  decideIntelligenceEligibility,
+} from "./intelligence/eligibility";
+
+export { scoreTranslationQuality } from "./intelligence/qualityScoring";
+
+export {
+  STYLE_PROFILES,
+  getStyleProfile,
+  listStyleProfiles,
+  selectStyleProfileForContent,
+} from "./intelligence/styleProfiles";
+
+export {
+  buildCorrectionFeedback,
+  classifyEditOutcome,
+  editDistance,
+} from "./intelligence/feedback";
+
+export {
+  buildMediaIntelligenceContract,
+  createEmptyMediaMetadata,
+} from "./intelligence/mediaContracts";
+
+export {
+  assertCandidateUntrusted,
+  createExternalTranslationCandidate,
+  hashRawResponse,
+  recordExternalApprovalEdits,
+} from "./intelligence/externalIngestion";
+
+export {
+  createTranslationIntelligenceService,
+  getTranslationIntelligenceService,
+  resetTranslationIntelligenceForTests,
+  type RecordApprovedTranslationInput,
+  type TranslationIntelligenceService,
+} from "./intelligence/service";

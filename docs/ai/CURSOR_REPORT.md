@@ -2,73 +2,55 @@
 
 ## Summary
 
-Translation Studio Catalog Ingestion & App Shell Review V1 is implemented on
-`office/platform-translation-studio-app-shell-ingestion-v1` (base `189ec08`).
-App Shell catalogs are ingested idempotently with stable key IDs; EN/AR
-approved; FR/ES/DE/PT never auto-approved; Arabic TM seeded; terminology
-warnings only; App Shell publish batch is dry-run only. Migration `20260874`
-**not applied**. Staged for manual commit — **not committed, not pushed**.
+Translation Intelligence Foundation V1 is implemented on
+`office/platform-translation-intelligence-foundation-v1` (base `e12cd6d`).
+Approved translations can feed a provenance/rights/quality/eligibility layer
+and derived index without training models. External candidates stay untrusted
+until review. Additive migration `20260875` is local-only (not applied).
+`20260874` untouched. Staged for manual commit — **not committed, not pushed**.
 
 ## Exact files changed
 
-- `lib/translationStudio/ingestion/appShellInventory.ts`
-- `lib/translationStudio/ingestion/ingestAppShellCatalog.ts`
-- `lib/translationStudio/ingestion/terminologyReport.ts`
-- `lib/translationStudio/ingestion/publishBatch.ts`
-- `lib/translationStudio/persistence/seed.ts`
+- `lib/translationStudio/intelligence/**`
 - `lib/translationStudio/index.ts`
-- `lib/translationStudio/studio.ts`
-- `lib/translationStudio/translationStudioAppShellIngestion.test.ts`
-- `app/admin/translation-studio/page.tsx`
-- `app/admin/translation-studio/app-shell/page.tsx`
-- `app/admin/translation-studio/keys/page.tsx`
-- `app/admin/translation-studio/publish/page.tsx`
+- `lib/translationStudio/workflow/workflowService.ts` (approve → intelligence hook)
+- `lib/translationStudio/translationIntelligenceFoundation.test.ts`
+- `app/admin/translation-studio/intelligence/**`
 - `app/admin/translation-studio/TranslationStudioShell.tsx`
+- `supabase/migrations/20260875_translation_intelligence_foundation_v1.sql`
+- `docs/architecture/TRANSLATION_INTELLIGENCE_FOUNDATION_V1.md`
+- `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`
 
 ## Migrations created
 
-None this task. Existing `20260874_translation_studio_persistence_workflow_v1.sql`
-remains local-only and was **not** remote-applied.
+- `20260875_translation_intelligence_foundation_v1.sql` — additive
+  `translation_intelligence_*` only; **not remote-applied**
 
 ## Security review
 
-- Admin UI remains platform-admin gated
-- No catalog file writes; publish batch `writesCatalogFiles: false`
-- Terminology validator never mutates approved strings
-- No secrets; no migration apply
+- Admin-only UI; FORCE RLS + revoke client writes in migration
+- Fail-closed rights for model customization
+- No auto-approve / auto-publish / training
+- Intelligence recording errors do not block approve workflow
 
 ## Tests
 
-Translation Studio + i18n App Shell:
-
-`vitest run lib/translationStudio/ lib/i18n/`
-
-**pass** — 51/51
+`vitest run lib/translationStudio/ lib/i18n/` — **63/63 pass**
 
 ## TypeScript
 
-`npx tsc --noEmit` / build typecheck — **pass**
+`npx tsc --noEmit` — **pass**
 
 ## Build
 
-`npm run build` — **pass** (includes `/admin/translation-studio/app-shell`)
-
-## git diff --check
-
-Pending stage verification in Final Report.
-
-## git status --short
-
-Staged intended files only after handoff.
+`npm run build` — **pass**
 
 ## Open issues
 
-- FR/ES/DE/PT shell localization still Needs Review
-- One duplicate-label Arabic inconsistency reported (findings UI)
-- Catalog file write / production publish deferred (explicit GO)
-- Supabase wiring / migration apply deferred
+- Media contracts only (no STT/TTS)
+- Prompt-example retrieval not wired into live AI prompts yet
+- Migration not applied / not wired to runtime (JSON store)
