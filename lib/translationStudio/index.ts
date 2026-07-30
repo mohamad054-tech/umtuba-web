@@ -93,3 +93,37 @@ export {
 } from "./workflow/publishContract";
 
 export { detectTerminologyConflicts } from "./workflow/terminologyGuard";
+
+export {
+  APP_SHELL_NAMESPACES,
+  APP_SHELL_SURFACES,
+  isAppShellCatalogKey,
+  isAppShellNamespace,
+  namespaceOfKey,
+  stableAppShellKeyId,
+  stableAppShellNamespaceId,
+  stableAppShellValueId,
+  type AppShellNamespace,
+} from "./ingestion/appShellInventory";
+
+export {
+  classifyImportedValueStatus,
+  ingestAppShellCatalog,
+  type AppShellIngestionReport,
+  type IngestAppShellOptions,
+  type IngestStatusCounts,
+} from "./ingestion/ingestAppShellCatalog";
+
+export {
+  appShellKeysByNamespace,
+  summarizeFindings,
+  validateAppShellTerminology,
+  type AppShellTerminologyFindings,
+} from "./ingestion/terminologyReport";
+
+export {
+  buildAppShellPublishBatch,
+  type AppShellPublishBatch,
+  type AppShellPublishBatchRecord,
+  type BuildAppShellPublishBatchOptions,
+} from "./ingestion/publishBatch";

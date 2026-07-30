@@ -2,60 +2,52 @@
 
 ## Task title
 
-Translation Studio Persistence & Workflow V1
+Translation Studio Catalog Ingestion & App Shell Review V1
 
 ## Status
 
-`implementation-complete` — Persistent workflow staged for manual commit (no trailers). Not pushed. Migration created locally only (not remote-applied).
+`implementation-in-progress` — App Shell ingestion + review surfaces; stage for manual commit (no trailers). Not pushed. Migration 20260874 **not** applied.
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-persistence-workflow-v1`
-2. Branch: `office/platform-translation-studio-persistence-workflow-v1` (from foundation tip `aced43c`)
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-app-shell-ingestion-v1`
+2. Branch: `office/platform-translation-studio-app-shell-ingestion-v1` (from Persistence tip `189ec08`)
 3. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 4. Push when approved; confirm `0 0`
-5. Do **not** remote-apply `20260874_translation_studio_persistence_workflow_v1.sql` without GO
-6. Do **not** merge into alpha without explicit GO
+5. Do **not** apply `20260874_translation_studio_persistence_workflow_v1.sql`
+6. Do **not** write product catalog files / production publish without GO
 
 ## Branch
 
-`office/platform-translation-studio-persistence-workflow-v1`
+`office/platform-translation-studio-app-shell-ingestion-v1`
 
 ## Exact refs
 
 | Ref | Hash / path |
 |-----|-------------|
-| Base | `aced43c844d93e0bae6cbb6a53cae25698c3cdad` (Translation Studio Foundation V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-persistence-workflow-v1` |
+| Base | `189ec08` — feat(platform): add translation studio persistence and workflow v1 |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-app-shell-ingestion-v1` |
 
 ## Allowed scope
 
-- `lib/translationStudio/**` (persistence, workflow, history, publish contract, tests)
-- `/admin/translation-studio/**` (editor, review, publish queues)
-- `app/actions/translationStudio.ts`
-- Additive local migration `20260874_translation_studio_persistence_workflow_v1.sql`
-- Architecture + handoff docs
+- `lib/translationStudio/ingestion/**`
+- Admin UI for App Shell filter / findings / publish batch preview
+- Focused tests + architecture / handoff docs
 
 ## Forbidden scope
 
-- Commit / push / remote migration apply
-- Public translation product
-- Auto-publish into product i18n catalogs
-- Learning / Commerce / Creator product translation surfaces
-- Touching other worktrees / `office/profile-hero-completeness-v1`
+- Remote apply migration 20260874
+- Commit / push without GO
+- Learning / Commerce / Creator / Live / World / Games domain catalogs
+- Automatic catalog file writes / production publish
+- Other worktrees
 
-## Done
+## Done (target)
 
-- Durable JSON file store (`data/translation-studio/store.json`, gitignored)
-- Workflow: draft / submit / approve / reject / deprecate / restore + audit + versions
-- AI suggestions via stub/aiService port — never auto-approve
-- Terminology conflict warnings (no silent replace)
-- Memory reuse before AI; memory write on human approve
-- Publish contract only (`autoPublish: false`)
-- Admin UI: editor, review queue, publish queue
-- Additive SQL schema (local file only)
-- Focused tests + handoff docs
-
-## Out of scope / next
-
-Wire runtime to Supabase tables, live AI smoke, XLIFF writers, alpha merge.
+- Idempotent App Shell catalog ingestion (stable key ids)
+- EN approved source; valid AR approved; FR/ES/DE/PT not falsely approved
+- Stale-source → needs_review
+- Arabic TM seed without fingerprint duplicates
+- Terminology findings (warnings only)
+- Publish batch dry-run contract
+- Admin App Shell / keys / publish UI

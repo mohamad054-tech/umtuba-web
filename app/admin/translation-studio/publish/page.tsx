@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  buildAppShellPublishBatch,
   buildPublishContract,
   getTranslationStudio,
 } from "../../../../lib/translationStudio";
@@ -18,6 +19,7 @@ export default async function TranslationStudioPublishPage() {
   const studio = getTranslationStudio();
   const snap = studio.getSnapshot();
   const contract = buildPublishContract(snap);
+  const batch = buildAppShellPublishBatch(snap);
   const queue = studio.workflow.listPublishEligible();
   const keyById = new Map(snap.keys.map((k) => [k.id, k]));
 
@@ -28,40 +30,60 @@ export default async function TranslationStudioPublishPage() {
     >
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-xl font-black">Publish contract</h1>
+          <h1 className="text-xl font-black">App Shell publish batch</h1>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
                 Format
               </dt>
               <dd className="mt-1 font-mono text-xs text-white/80">
-                {contract.format}
+                {batch.format}
               </dd>
             </div>
             <div>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Auto-publish
+                Dry-run
+              </dt>
+              <dd className="mt-1 text-amber-100">{String(batch.dryRun)}</dd>
+            </div>
+            <div>
+              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                Writes catalog files
               </dt>
               <dd className="mt-1 text-amber-100">
-                {String(contract.autoPublish)} (hard off)
+                {String(batch.writesCatalogFiles)}
               </dd>
             </div>
             <div>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Eligibility
+                Records / keys
               </dt>
-              <dd className="mt-1 text-white/70">{contract.eligibility}</dd>
-            </div>
-            <div>
-              <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                Records
-              </dt>
-              <dd className="mt-1 text-white/70">{contract.records.length}</dd>
+              <dd className="mt-1 text-white/70">
+                {batch.preview.recordCount} / {batch.preview.keyCount}
+              </dd>
             </div>
           </dl>
           <p className="mt-4 text-xs text-white/50">
-            Future publisher may read this contract. This UI does not write
-            product i18n catalogs.
+            Preview only. No production publish and no catalog file write in
+            this milestone.
+          </p>
+          <details className="mt-4">
+            <summary className="cursor-pointer text-xs font-bold text-white/70">
+              Changed keys ({batch.changedKeys.length})
+            </summary>
+            <ul className="mt-2 max-h-48 overflow-auto font-mono text-[11px] text-white/55">
+              {batch.changedKeys.map((key) => (
+                <li key={key}>{key}</li>
+              ))}
+            </ul>
+          </details>
+        </div>
+
+        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
+          <h2 className="text-lg font-black">Legacy publish contract</h2>
+          <p className="mt-2 text-xs text-white/50">
+            {contract.format} · records {contract.records.length} · autoPublish=
+            {String(contract.autoPublish)}
           </p>
         </div>
 
@@ -102,11 +124,6 @@ export default async function TranslationStudioPublishPage() {
               })}
             </ul>
           )}
-          {queue.length > 80 ? (
-            <p className="mt-3 text-xs text-white/40">
-              Showing first 80 of {queue.length}.
-            </p>
-          ) : null}
         </div>
       </section>
     </TranslationStudioShell>

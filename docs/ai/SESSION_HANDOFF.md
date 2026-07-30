@@ -2,30 +2,34 @@
 
 ## Active task
 
-Translation Studio Persistence & Workflow V1
+Translation Studio Catalog Ingestion & App Shell Review V1
 
 | Field | Value |
 |-------|-------|
-| Branch | `office/platform-translation-studio-persistence-workflow-v1` |
-| Base | `aced43c844d93e0bae6cbb6a53cae25698c3cdad` (Foundation V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-persistence-workflow-v1` |
+| Branch | `office/platform-translation-studio-app-shell-ingestion-v1` |
+| Base | `189ec08` (Persistence & Workflow V1) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-app-shell-ingestion-v1` |
 | Status | Implementation complete; staged for manual commit; not pushed |
-| Migration | `supabase/migrations/20260874_translation_studio_persistence_workflow_v1.sql` — created, **not** remote-applied |
+| Migration 20260874 | **Not applied** (forbidden this task) |
 
-## Runtime persistence note
+## What landed
 
-V1 durable store is a JSON file under `data/translation-studio/` (gitignored).
-SQL migration is the future Supabase shape only.
+- Idempotent App Shell catalog ingestion (`lib/translationStudio/ingestion/**`)
+- Status rules: EN approved; valid AR approved; FR/ES/DE/PT never auto-approved
+- Arabic TM seed + terminology findings (warnings only)
+- App Shell publish batch dry-run (`writesCatalogFiles: false`)
+- Admin UI: overview, `/app-shell`, keys filters, publish preview
 
 ## Next GO
 
 1. Manual commit (no trailers)
 2. Push when approved
-3. Separate GO for remote migration apply
-4. Separate GO for alpha merge
+3. Separate GO for catalog file write / production publish
+4. Do not apply 20260874 in this track without explicit GO
 
 ## Do not
 
 - Commit/push without GO
-- Apply migration remotely without GO
-- Switch to other feature worktrees mid-task
+- Apply migration 20260874
+- Touch other worktrees
+- Auto-publish catalogs

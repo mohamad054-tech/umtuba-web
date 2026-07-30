@@ -7,6 +7,7 @@ export const TRANSLATION_STUDIO_BASE = "/admin/translation-studio";
 
 const NAV = [
   { href: TRANSLATION_STUDIO_BASE, label: "Overview" },
+  { href: `${TRANSLATION_STUDIO_BASE}/app-shell`, label: "App Shell" },
   { href: `${TRANSLATION_STUDIO_BASE}/languages`, label: "Languages" },
   { href: `${TRANSLATION_STUDIO_BASE}/namespaces`, label: "Namespaces" },
   { href: `${TRANSLATION_STUDIO_BASE}/keys`, label: "Keys" },
