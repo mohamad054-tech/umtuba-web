@@ -1,13 +1,15 @@
-﻿# CURSOR_REPORT — Store Query Optimization V1 (Phase A)
+﻿# CURSOR_REPORT — Learning Catalog Optimization V1 (Phase B)
 
 ## Summary
 
-Implemented batched catalog enrichment in `lib/store/catalogQueries.ts` to eliminate N+1 media/variant/price/inventory round-trips on `/store`, storefront, and PDP query paths. Explicit column selects replace SELECT *. No UI/API/schema/config changes. Not committed.
+Bounded public learning catalog list (`limit`/`offset`, default 48), count-only lesson refs (`section_id` only), parallel auth on catalog page and parallel hub/instructor on `/learning`. Production `/learning/catalog` avg **476 ms** (target ≤700 ms). No store/home/profile/config changes. Not committed.
 
 ## Exact files changed
 
-- `lib/store/catalogQueries.ts`
-- `lib/store/catalogQueries.perf.test.ts` (new)
+- `lib/learning/publicCatalog.ts`
+- `lib/learning/publicCatalog.list.test.ts` (new)
+- `app/learning/catalog/page.tsx`
+- `app/learning/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -17,13 +19,13 @@ None.
 
 ## Security review
 
-- Ownership checks for signed URLs unchanged (`createAuthorizedProductMediaSignedUrl`).
-- Visibility / listing RPC gates preserved.
-- No service-role expansion; no schema change.
+- Catalog still filters `status=published` + `visibility=public`.
+- Curriculum/lesson names remain on `loadPublicCourseBySlug` only.
+- No secrets logged; env loaded process-only for prod measure.
 
 ## Tests
 
-Focused store suites + new perf tests: PASS (see Final Verification Report).
+`npx vitest run lib/learning` → **895 passed**.
 
 ## TypeScript
 
@@ -43,6 +45,6 @@ See Final Verification Report.
 
 ## Open issues
 
-- Live production TTFB after-measure deferred (env load blocked in this session); query-count before/after is the Phase A numeric proof.
-- Signed URL mint still O(N) auth lookups inside `productMediaUrl` (parallelized, not batched) — candidate for later phase if approved.
-- Phase B not started.
+- Lesson count path still reads one row per published lesson (`section_id` only); a SQL aggregate/RPC would further cut payload (deferred; needs migration approval).
+- Catalog pagination UI (“next page”) not added — first page of 48 is enough for current catalog size.
+- Phase C not started.

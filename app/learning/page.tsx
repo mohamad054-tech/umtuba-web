@@ -29,8 +29,10 @@ export default async function LearningHubPage() {
   }
 
   const supabase = await createClient();
-  const hub = await loadMyLearningHub(supabase, user.id);
-  const authorable = await listInstructorAuthorableCourses(supabase);
+  const [hub, authorable] = await Promise.all([
+    loadMyLearningHub(supabase, user.id),
+    listInstructorAuthorableCourses(supabase),
+  ]);
   const showInstructor =
     authorable.ok &&
     (authorable.data as InstructorAuthorableCourse[]).length > 0;

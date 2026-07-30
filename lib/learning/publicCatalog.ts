@@ -334,9 +334,34 @@ export function mapPublicPreview(raw: unknown): PublicPreview | null {
   };
 }
 
+/** Catalog list page size — cards only; detail/curriculum loads separately. */
+export const PUBLIC_CATALOG_DEFAULT_LIMIT = 48;
+export const PUBLIC_CATALOG_MAX_LIMIT = 100;
+
+export type ListPublicCatalogCoursesOptions = {
+  /** Max course cards to return (clamped 1..PUBLIC_CATALOG_MAX_LIMIT). */
+  limit?: number;
+  /** Zero-based offset for pagination. */
+  offset?: number;
+};
+
+/**
+ * Public catalog course cards for `/learning/catalog`.
+ *
+ * Loads card fields + module/lesson *counts* only.
+ * Does NOT load lesson names, curriculum trees, previews, or content blocks.
+ * Course landing (`loadPublicCourseBySlug`) remains the curriculum path.
+ */
 export async function listPublicCatalogCourses(
-  supabase: AnyClient
+  supabase: AnyClient,
+  options?: ListPublicCatalogCoursesOptions
 ): Promise<PublicCourseCard[]> {
+  const limit = Math.min(
+    Math.max(options?.limit ?? PUBLIC_CATALOG_DEFAULT_LIMIT, 1),
+    PUBLIC_CATALOG_MAX_LIMIT
+  );
+  const offset = Math.max(options?.offset ?? 0, 0);
+
   const { data, error } = await supabase
     .from("learning_courses")
     .select(
@@ -344,7 +369,8 @@ export async function listPublicCatalogCourses(
     )
     .eq("status", "published")
     .eq("visibility", "public")
-    .order("position", { ascending: true });
+    .order("position", { ascending: true })
+    .range(offset, offset + limit - 1);
 
   if (error || !data?.length) return [];
 
@@ -364,6 +390,8 @@ export async function listPublicCatalogCourses(
   const lessonCounts = new Map<string, number>();
 
   if (courseIds.length > 0) {
+    // Lightweight count path: section→course map + lesson section_id only.
+    // Never select lesson name/slug/body — those belong on the course landing.
     const { data: sections } = await supabase
       .from("learning_sections")
       .select("id, course_id")
@@ -383,14 +411,14 @@ export async function listPublicCatalogCourses(
     }
 
     if (sectionIds.length > 0) {
-      const { data: lessons } = await supabase
+      const { data: lessonRefs } = await supabase
         .from("learning_lessons")
-        .select("id, section_id")
+        .select("section_id")
         .in("section_id", sectionIds)
         .eq("status", "published")
         .eq("visibility", "public");
 
-      for (const les of lessons ?? []) {
+      for (const les of lessonRefs ?? []) {
         const sectionId = asString(les.section_id);
         if (!sectionId) continue;
         const cid = sectionCourse.get(sectionId);
@@ -418,6 +446,8 @@ export async function listPublicCatalogCourses(
       ai_metadata: row.ai_metadata,
       module_count: moduleCounts.get(id) ?? 0,
       lesson_count: lessonCounts.get(id) ?? 0,
+      status: asString(row.status),
+      visibility: asString(row.visibility),
     });
     if (card) cards.push(card);
   }

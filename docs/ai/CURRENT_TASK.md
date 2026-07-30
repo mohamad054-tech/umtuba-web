@@ -2,7 +2,7 @@
 
 ## Task title
 
-UMTUBA Web Performance & Core Web Vitals V1 — Phase A: Store Query Optimization V1
+UMTUBA Web Performance & Core Web Vitals V1 — Phase B: Learning Catalog Optimization V1
 
 ## Status
 
@@ -10,31 +10,32 @@ UMTUBA Web Performance & Core Web Vitals V1 — Phase A: Store Query Optimizatio
 
 ## Branch
 
-`office/perf-store-query-optimization-v1`
+`office/perf-learning-catalog-optimization-v1`
 
 ## Base
 
-`office/commerce-digital-product-versioning-update-delivery-v1` @ `d01e1cd756055d39f38323dce46fd9119b081f8e`
+`office/perf-store-query-optimization-v1` @ `bdfe36a367ebb65ed3e518686d94920af9bb2b85`
 
 ## Milestone
 
-`web.performance.store_query_optimization_v1`
+`web.performance.learning_catalog_optimization_v1`
 
 ## Allowed scope
 
-- `lib/store/catalogQueries.ts`
-- `lib/store/catalogQueries.perf.test.ts` (new)
+- `lib/learning/publicCatalog.ts`
+- `lib/learning/publicCatalog.list.test.ts` (new)
+- `app/learning/catalog/page.tsx`
+- `app/learning/page.tsx` (parallel hub/instructor fetch only)
 - `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Learning / Home / Discover / Profile
+- Store / Home / Discover / Profile
 - next/image / next.config / new packages
-- UI changes / API contract changes
 - Migrations / schema
 - Commit / push / merge without GO
-- Phase B+
+- Phase C
 
 ## Goal
 
-Eliminate N+1 catalog enrichment round-trips for `/store`, storefront, and PDP query paths without changing buyer-visible results.
+Bound public catalog list queries; count-only module/lesson stats; keep curriculum on course landing; `/learning/catalog` production TTFB ≤ 700ms avg.

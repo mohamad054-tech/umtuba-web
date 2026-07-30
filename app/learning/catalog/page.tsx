@@ -3,6 +3,7 @@ import LearningShell from "../../components/learning/LearningShell";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_PUBLIC_ROUTES,
+  PUBLIC_CATALOG_DEFAULT_LIMIT,
   listPublicCatalogCourses,
 } from "../../../lib/learning/publicCatalog";
 import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
@@ -16,9 +17,13 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function LearningPublicCatalogPage() {
-  const user = await getServerUser();
-  const supabase = await createClient();
-  const courses = await listPublicCatalogCourses(supabase);
+  const [user, supabase] = await Promise.all([
+    getServerUser(),
+    createClient(),
+  ]);
+  const courses = await listPublicCatalogCourses(supabase, {
+    limit: PUBLIC_CATALOG_DEFAULT_LIMIT,
+  });
 
   return (
     <LearningShell
