@@ -6,7 +6,7 @@
  */
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { STORE_DIGITAL_PRODUCT_ASSETS_TABLE } from "./digitalAccessDelivery";
+import { resolveActiveDigitalAssetVersion } from "./digitalProductVersioning";
 import { isOwnedStoreDigitalProductAssetPath } from "./mediaConstants";
 
 export const DIGITAL_PRODUCT_PUBLISH_READINESS_ID =
@@ -167,19 +167,13 @@ export async function loadDigitalAssetReadinessSnapshot(
   admin: AnyClient,
   input: { productId: string; storeId: string }
 ): Promise<DigitalAssetReadinessSnapshot | null> {
-  const { data: asset } = await admin
-    .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("store_id, product_id, status, storage_path")
-    .eq("product_id", input.productId)
-    .eq("store_id", input.storeId)
-    .maybeSingle();
-
-  if (!asset) return null;
+  const active = await resolveActiveDigitalAssetVersion(admin, input);
+  if (!active) return null;
   return {
-    storeId: String(asset.store_id),
-    productId: String(asset.product_id),
-    status: String(asset.status ?? ""),
-    storagePath: String(asset.storage_path ?? ""),
+    storeId: active.storeId,
+    productId: active.productId,
+    status: active.status,
+    storagePath: active.storagePath,
   };
 }
 
@@ -264,30 +258,18 @@ export async function mapDigitalPublishReadinessByProductId(
 
   if (digital.length === 0) return out;
 
-  const ids = digital.map((p) => p.productId);
-  const { data: rows } = await admin
-    .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("store_id, product_id, status, storage_path")
-    .in("product_id", ids);
-
-  const byProduct = new Map<string, DigitalAssetReadinessSnapshot>();
-  for (const row of rows ?? []) {
-    byProduct.set(String(row.product_id), {
-      storeId: String(row.store_id),
-      productId: String(row.product_id),
-      status: String(row.status ?? ""),
-      storagePath: String(row.storage_path ?? ""),
-    });
-  }
-
   for (const p of digital) {
+    const asset = await loadDigitalAssetReadinessSnapshot(admin, {
+      productId: p.productId,
+      storeId: p.storeId,
+    });
     out.set(
       p.productId,
       evaluateDigitalProductPublishReadiness({
         productType: p.productType,
         storeId: p.storeId,
         productId: p.productId,
-        asset: byProduct.get(p.productId) ?? null,
+        asset,
       })
     );
   }

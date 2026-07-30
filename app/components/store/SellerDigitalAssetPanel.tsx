@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
+  activateSellerDigitalAssetVersionAction,
   finalizeSellerDigitalAssetAttachAction,
   prepareSellerDigitalAssetUploadAction,
 } from "../../actions/storeDigitalAssets";
@@ -21,7 +22,7 @@ type Props = {
   initialSummary: SellerDigitalAssetSummary;
 };
 
-type Phase = "idle" | "preparing" | "uploading" | "attaching";
+type Phase = "idle" | "preparing" | "uploading" | "attaching" | "activating";
 
 function statusCopy(summary: SellerDigitalAssetSummary): string {
   if (summary.uiStatus === "unavailable") {
@@ -32,12 +33,15 @@ function statusCopy(summary: SellerDigitalAssetSummary): string {
       ? summary.fileExtension.toUpperCase()
       : "file";
     const title = summary.title ? `“${summary.title}”` : "Digital deliverable";
-    return `${title} is ready (${ext}). Buyers with an active entitlement can open secure access.`;
+    return `${title} is active (${ext}). Buyers with an entitlement always receive this active version.`;
+  }
+  if (summary.uiStatus === "draft_only") {
+    return "Draft version(s) exist, but nothing is active yet. Activate a version to enable buyer delivery and publish readiness.";
   }
   if (summary.uiStatus === "inactive") {
-    return "A digital asset exists but is inactive. Upload a replacement to restore delivery.";
+    return "No active digital version. Upload a draft and activate it to restore delivery.";
   }
-  return "No digital asset attached yet. Upload one file to enable secure buyer delivery.";
+  return "No digital asset attached yet. Upload a draft, then activate it for secure buyer delivery.";
 }
 
 export default function SellerDigitalAssetPanel({
@@ -101,9 +105,9 @@ export default function SellerDigitalAssetPanel({
 
       setSummary(attached.summary);
       setMessage(
-        attached.replaced
-          ? "Digital asset replaced. Buyer delivery now uses the new file."
-          : "Digital asset attached and ready for secure delivery."
+        attached.activePreserved
+          ? `Draft v${attached.draftVersionNumber} created. The previous active version is still delivered until you activate the draft.`
+          : `Draft v${attached.draftVersionNumber} created. Activate it to enable secure buyer delivery.`
       );
       setPhase("idle");
       router.refresh();
@@ -113,6 +117,38 @@ export default function SellerDigitalAssetPanel({
         err instanceof Error
           ? err.message
           : "Digital upload failed. Try again."
+      );
+    }
+  }
+
+  async function onActivate(versionId: string) {
+    if (!canEdit || !isDigital || busy) return;
+    setError(null);
+    setMessage(null);
+    setPhase("activating");
+    try {
+      const body = new FormData();
+      body.set("productId", productId);
+      body.set("versionId", versionId);
+      const result = await activateSellerDigitalAssetVersionAction(body);
+      if (!result.ok) {
+        setError(result.message);
+        setPhase("idle");
+        return;
+      }
+      setMessage(
+        result.alreadyActive
+          ? `Version v${result.versionNumber} is already active.`
+          : `Version v${result.versionNumber} is now active for buyer delivery.`
+      );
+      setPhase("idle");
+      router.refresh();
+    } catch (err) {
+      setPhase("idle");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to activate digital version."
       );
     }
   }
@@ -138,13 +174,52 @@ export default function SellerDigitalAssetPanel({
   return (
     <div className="space-y-4">
       <p className="text-sm leading-relaxed text-[var(--sf-muted)]">
-        Attach one private deliverable for this digital product. Paths are
-        generated server-side; buyers never see permanent URLs.
+        Upload creates a private draft version. Activate one version to deliver
+        always-latest access to entitled buyers. Paths are generated
+        server-side; buyers never see permanent URLs.
       </p>
       <p className="text-sm text-[var(--sf-ink)]" role="status">
         {statusCopy(summary)}
       </p>
       <p className="text-xs text-[var(--sf-faint)]">{STORE_DIGITAL_ASSET_FILE_HINT}</p>
+
+      {summary.versions.length > 0 ? (
+        <ul className="space-y-2" aria-label="Digital asset versions">
+          {summary.versions.map((version) => (
+            <li
+              key={version.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--sf-line)] bg-black/20 px-4 py-3"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[var(--sf-ink)]">
+                  v{version.versionNumber}
+                  {version.title ? ` · ${version.title}` : ""}
+                  {version.fileExtension
+                    ? ` · ${version.fileExtension.toUpperCase()}`
+                    : ""}
+                </p>
+                <p className="text-xs uppercase tracking-wide text-[var(--sf-faint)]">
+                  {version.status}
+                </p>
+              </div>
+              {version.isActive ? (
+                <span className="text-xs font-bold text-[var(--sf-ok)]">
+                  Active
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={busy}
+                  className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-4 py-2 text-xs font-bold text-[var(--sf-ink)] disabled:cursor-wait disabled:text-[var(--sf-faint)]"
+                  onClick={() => void onActivate(version.id)}
+                >
+                  Activate
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {phase !== "idle" ? (
         <p className="text-sm font-semibold text-[var(--sf-accent-strong)]">
@@ -152,7 +227,9 @@ export default function SellerDigitalAssetPanel({
             ? "Preparing secure upload…"
             : phase === "uploading"
               ? "Uploading file…"
-              : "Attaching verified asset…"}
+              : phase === "attaching"
+                ? "Creating draft version…"
+                : "Activating version…"}
         </p>
       ) : null}
 
@@ -161,7 +238,7 @@ export default function SellerDigitalAssetPanel({
           role="alert"
           className="rounded-2xl border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-4 py-3 text-sm text-[var(--sf-danger)]"
         >
-          {error} You can retry without losing a previously attached file.
+          {error} You can retry without losing a previously active version.
         </p>
       ) : null}
 
@@ -175,11 +252,7 @@ export default function SellerDigitalAssetPanel({
       ) : null}
 
       <label className="inline-flex cursor-pointer flex-col gap-2">
-        <span className="sr-only">
-          {summary.uiStatus === "active" || summary.uiStatus === "inactive"
-            ? "Replace digital asset"
-            : "Upload digital asset"}
-        </span>
+        <span className="sr-only">Upload digital asset draft</span>
         <span
           className={`watch-focus-ring inline-flex w-fit rounded-full px-5 py-3 text-sm font-bold ${
             busy
@@ -189,8 +262,8 @@ export default function SellerDigitalAssetPanel({
         >
           {busy
             ? "Working…"
-            : summary.uiStatus === "active" || summary.uiStatus === "inactive"
-              ? "Replace asset"
+            : summary.versions.length > 0
+              ? "Upload new draft"
               : "Upload digital asset"}
         </span>
         <input

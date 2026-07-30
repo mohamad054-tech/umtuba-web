@@ -150,6 +150,8 @@ describe("Digital access delivery — minting", () => {
     };
   }
 
+  const VERSION_ID = "99999999-9999-4999-8999-999999999999";
+
   function mockAdmin(opts: {
     productType?: string;
     asset?: { storage_path: string; status: string; title?: string } | null;
@@ -165,6 +167,14 @@ describe("Digital access delivery — minting", () => {
         })),
       })),
     };
+    const asset =
+      opts.asset === undefined
+        ? {
+            storage_path: SAFE_PATH,
+            status: "active",
+            title: "Lesson pack",
+          }
+        : opts.asset;
     return {
       storage,
       from: vi.fn((table: string) => {
@@ -209,14 +219,44 @@ describe("Digital access delivery — minting", () => {
               eq: () => ({
                 eq: () => ({
                   maybeSingle: async () => ({
-                    data: opts.asset === undefined
+                    data: asset
                       ? {
-                          storage_path: SAFE_PATH,
-                          status: "active",
-                          title: "Lesson pack",
+                          id: "asset-1",
+                          store_id: STORE,
+                          product_id: PRODUCT,
+                          active_version_id: VERSION_ID,
+                          status: asset.status,
+                          storage_path: asset.storage_path,
+                          title: asset.title ?? null,
                         }
-                      : opts.asset,
+                      : null,
                     error: null,
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () => ({
+              eq: () => ({
+                eq: () => ({
+                  eq: () => ({
+                    maybeSingle: async () => ({
+                      data: asset
+                        ? {
+                            id: VERSION_ID,
+                            store_id: STORE,
+                            product_id: PRODUCT,
+                            storage_path: asset.storage_path,
+                            status: asset.status,
+                            version_number: 1,
+                            title: asset.title ?? null,
+                          }
+                        : null,
+                      error: null,
+                    }),
                   }),
                 }),
               }),
@@ -334,7 +374,8 @@ describe("Digital access delivery — minting", () => {
     );
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.code).toBe("unsafe_path");
+    // Active-version resolve fail-closes unowned paths before mint signing.
+    expect(result.code).toBe("asset_missing");
   });
 
   it("physical product fails closed", async () => {

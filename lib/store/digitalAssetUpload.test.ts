@@ -278,41 +278,58 @@ describe("Seller digital asset upload — prepare", () => {
   });
 });
 
-describe("Seller digital asset upload — finalize / replacement safety", () => {
-  it("failed object verification does not activate and preserves previous", async () => {
-    const updates: unknown[] = [];
-    const inserts: unknown[] = [];
+describe("Seller digital asset upload — finalize / draft safety", () => {
+  const VERSION_ACTIVE = "44444444-4444-4444-8444-444444444444";
+
+  function chainEq(final: () => Promise<unknown>) {
+    const node: Record<string, unknown> = {};
+    node.eq = () => node;
+    node.order = () => node;
+    node.limit = () => node;
+    node.maybeSingle = final;
+    node.then = (
+      resolve: (v: unknown) => unknown,
+      reject?: (e: unknown) => unknown
+    ) => final().then(resolve, reject);
+    return node;
+  }
+
+  it("failed object verification does not create draft and preserves previous", async () => {
+    const versionInserts: unknown[] = [];
     const admin = {
       from: vi.fn((table: string) => {
         if (table === "store_digital_product_assets") {
           return {
-            select: () => ({
-              eq: () => ({
-                eq: () => ({
-                  maybeSingle: async () => ({
-                    data: {
-                      id: "asset-1",
-                      storage_path: OLD_PATH,
-                      status: "active",
-                      title: "old",
-                    },
-                    error: null,
-                  }),
-                }),
-              }),
-            }),
-            update: (payload: unknown) => {
-              updates.push(payload);
-              return {
-                eq: () => ({
-                  eq: () => ({
-                    eq: async () => ({ error: null }),
-                  }),
-                }),
-              };
-            },
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: "asset-1",
+                  active_version_id: VERSION_ACTIVE,
+                  status: "active",
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                },
+                error: null,
+              })),
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: VERSION_ACTIVE,
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                  storage_path: OLD_PATH,
+                  status: "active",
+                  version_number: 1,
+                  title: "old",
+                },
+                error: null,
+              })),
             insert: (payload: unknown) => {
-              inserts.push(payload);
+              versionInserts.push(payload);
               return Promise.resolve({ error: null });
             },
           };
@@ -345,8 +362,7 @@ describe("Seller digital asset upload — finalize / replacement safety", () => 
       expect(result.code).toBe("object_missing");
       expect(result.previousPreserved).toBe(true);
     }
-    expect(updates).toHaveLength(0);
-    expect(inserts).toHaveLength(0);
+    expect(versionInserts).toHaveLength(0);
   });
 
   it("forged path fails closed without DB write", async () => {
@@ -383,33 +399,50 @@ describe("Seller digital asset upload — finalize / replacement safety", () => 
     expect(wrote).toBe(false);
   });
 
-  it("failed attach after verified upload preserves previous active asset", async () => {
+  it("failed draft insert after verified upload preserves previous active", async () => {
     const admin = {
       from: vi.fn((table: string) => {
         if (table === "store_digital_product_assets") {
           return {
-            select: () => ({
-              eq: () => ({
-                eq: () => ({
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: "asset-1",
+                  active_version_id: VERSION_ACTIVE,
+                  status: "active",
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                },
+                error: null,
+              })),
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () => {
+              const node = chainEq(async () => ({
+                data: {
+                  id: VERSION_ACTIVE,
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                  storage_path: OLD_PATH,
+                  status: "active",
+                  version_number: 1,
+                  title: "old",
+                },
+                error: null,
+              }));
+              node.order = () => ({
+                limit: () => ({
                   maybeSingle: async () => ({
-                    data: {
-                      id: "asset-1",
-                      storage_path: OLD_PATH,
-                      status: "active",
-                      title: "old",
-                    },
+                    data: { version_number: 1 },
                     error: null,
                   }),
                 }),
-              }),
-            }),
-            update: () => ({
-              eq: () => ({
-                eq: () => ({
-                  eq: async () => ({ error: { message: "db" } }),
-                }),
-              }),
-            }),
+              });
+              return node;
+            },
+            insert: () => Promise.resolve({ error: { message: "db" } }),
           };
         }
         throw new Error(table);
@@ -441,36 +474,85 @@ describe("Seller digital asset upload — finalize / replacement safety", () => 
     }
   });
 
-  it("successful replacement switches the active asset safely", async () => {
-    const updates: Array<Record<string, unknown>> = [];
+  it("successful upload creates draft without changing active pointer", async () => {
+    const versionInserts: Array<Record<string, unknown>> = [];
+    const assetUpdates: Array<Record<string, unknown>> = [];
     const admin = {
       from: vi.fn((table: string) => {
         if (table === "store_digital_product_assets") {
           return {
-            select: () => ({
-              eq: () => ({
-                eq: () => ({
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: "asset-1",
+                  active_version_id: VERSION_ACTIVE,
+                  status: "active",
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                },
+                error: null,
+              })),
+            update: (payload: Record<string, unknown>) => {
+              assetUpdates.push(payload);
+              return chainEq(async () => ({ error: null }));
+            },
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () => {
+              const node = chainEq(async () => ({
+                data: {
+                  id: VERSION_ACTIVE,
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                  storage_path: OLD_PATH,
+                  status: "active",
+                  version_number: 1,
+                  title: "old",
+                },
+                error: null,
+              }));
+              node.order = () => ({
+                limit: () => ({
                   maybeSingle: async () => ({
-                    data: {
-                      id: "asset-1",
-                      storage_path: OLD_PATH,
-                      status: "active",
-                      title: "old",
-                    },
+                    data: { version_number: 1 },
                     error: null,
                   }),
                 }),
-              }),
-            }),
-            update: (payload: Record<string, unknown>) => {
-              updates.push(payload);
-              return {
-                eq: () => ({
-                  eq: () => ({
-                    eq: async () => ({ error: null }),
-                  }),
-                }),
-              };
+                then: (
+                  resolve: (v: unknown) => unknown,
+                  reject?: (e: unknown) => unknown
+                ) =>
+                  Promise.resolve({
+                    data: [
+                      {
+                        id: "draft-2",
+                        store_id: STORE,
+                        product_id: PRODUCT,
+                        storage_path: SAFE_PATH,
+                        status: "draft",
+                        version_number: 2,
+                        title: "new-pack",
+                      },
+                      {
+                        id: VERSION_ACTIVE,
+                        store_id: STORE,
+                        product_id: PRODUCT,
+                        storage_path: OLD_PATH,
+                        status: "active",
+                        version_number: 1,
+                        title: "old",
+                      },
+                    ],
+                    error: null,
+                  }).then(resolve, reject),
+              });
+              return node;
+            },
+            insert: (payload: Record<string, unknown>) => {
+              versionInserts.push(payload);
+              return Promise.resolve({ error: null });
             },
           };
         }
@@ -498,30 +580,65 @@ describe("Seller digital asset upload — finalize / replacement safety", () => 
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.replaced).toBe(true);
+    expect(result.activePreserved).toBe(true);
+    expect(result.draftVersionNumber).toBe(2);
     expect(result.summary.uiStatus).toBe("active");
-    expect(result.summary.fileExtension).toBe("pdf");
-    expect(updates[0]?.storage_path).toBe(SAFE_PATH);
-    expect(updates[0]?.status).toBe("active");
+    expect(versionInserts[0]?.status).toBe("draft");
+    expect(versionInserts[0]?.storage_path).toBe(SAFE_PATH);
+    expect(assetUpdates).toHaveLength(0);
     expect(JSON.stringify(result)).not.toMatch(/SERVICE_ROLE|eyJ/);
     expect(JSON.stringify(result.summary)).not.toContain(SAFE_PATH);
   });
 
-  it("first attach inserts a single active pointer", async () => {
-    const inserts: Array<Record<string, unknown>> = [];
+  it("first upload inserts inactive asset container plus draft version", async () => {
+    const assetInserts: Array<Record<string, unknown>> = [];
+    const versionInserts: Array<Record<string, unknown>> = [];
     const admin = {
       from: vi.fn((table: string) => {
         if (table === "store_digital_product_assets") {
           return {
-            select: () => ({
-              eq: () => ({
-                eq: () => ({
+            select: () =>
+              chainEq(async () => ({ data: null, error: null })),
+            insert: (payload: Record<string, unknown>) => {
+              assetInserts.push(payload);
+              return Promise.resolve({ error: null });
+            },
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () => {
+              const node = chainEq(async () => ({
+                data: null,
+                error: null,
+              }));
+              node.order = () => ({
+                limit: () => ({
                   maybeSingle: async () => ({ data: null, error: null }),
                 }),
-              }),
-            }),
+                then: (
+                  resolve: (v: unknown) => unknown,
+                  reject?: (e: unknown) => unknown
+                ) =>
+                  Promise.resolve({
+                    data: [
+                      {
+                        id: "draft-1",
+                        store_id: STORE,
+                        product_id: PRODUCT,
+                        storage_path: SAFE_PATH,
+                        status: "draft",
+                        version_number: 1,
+                        title: "pack",
+                      },
+                    ],
+                    error: null,
+                  }).then(resolve, reject),
+              });
+              return node;
+            },
             insert: (payload: Record<string, unknown>) => {
-              inserts.push(payload);
+              versionInserts.push(payload);
               return Promise.resolve({ error: null });
             },
           };
@@ -550,51 +667,83 @@ describe("Seller digital asset upload — finalize / replacement safety", () => 
     );
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.replaced).toBe(false);
-    expect(inserts).toHaveLength(1);
-    expect(inserts[0]?.status).toBe("active");
-    expect(inserts[0]?.storage_path).toBe(SAFE_PATH);
+    expect(result.activePreserved).toBe(false);
+    expect(result.draftVersionNumber).toBe(1);
+    expect(assetInserts).toHaveLength(1);
+    expect(assetInserts[0]?.status).toBe("inactive");
+    expect(assetInserts[0]?.active_version_id).toBeNull();
+    expect(versionInserts[0]?.status).toBe("draft");
+    expect(result.summary.uiStatus).toBe("draft_only");
   });
 });
 
 describe("Seller digital asset upload — buyer delivery continuity", () => {
-  it("buyer delivery resolves the newly active asset path", async () => {
+  const VERSION_ACTIVE = "44444444-4444-4444-8444-444444444444";
+
+  function chainEq(final: () => Promise<unknown>) {
+    const node: Record<string, unknown> = {};
+    node.eq = () => node;
+    node.maybeSingle = final;
+    return node;
+  }
+
+  it("buyer delivery resolves the active version path", async () => {
+    const adminForAvailability = {
+      from: vi.fn((table: string) => {
+        if (table === "store_products") {
+          return {
+            select: () => ({
+              eq: () => ({
+                maybeSingle: async () => ({
+                  data: {
+                    id: PRODUCT,
+                    store_id: STORE,
+                    product_type: "digital",
+                  },
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === "store_digital_product_assets") {
+          return {
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: "asset-1",
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                  active_version_id: VERSION_ACTIVE,
+                  status: "active",
+                },
+                error: null,
+              })),
+          };
+        }
+        if (table === "store_digital_product_asset_versions") {
+          return {
+            select: () =>
+              chainEq(async () => ({
+                data: {
+                  id: VERSION_ACTIVE,
+                  store_id: STORE,
+                  product_id: PRODUCT,
+                  storage_path: SAFE_PATH,
+                  status: "active",
+                  version_number: 1,
+                  title: "new-pack",
+                },
+                error: null,
+              })),
+          };
+        }
+        throw new Error(table);
+      }),
+    };
+
     const availability = await resolveDigitalDeliveryAvailability(
-      {
-        from: vi.fn((table: string) => {
-          if (table === "store_products") {
-            return {
-              select: () => ({
-                eq: () => ({
-                  maybeSingle: async () => ({
-                    data: {
-                      id: PRODUCT,
-                      store_id: STORE,
-                      product_type: "digital",
-                    },
-                    error: null,
-                  }),
-                }),
-              }),
-            };
-          }
-          if (table === "store_digital_product_assets") {
-            return {
-              select: () => ({
-                eq: () => ({
-                  eq: () => ({
-                    maybeSingle: async () => ({
-                      data: { storage_path: SAFE_PATH, status: "active" },
-                      error: null,
-                    }),
-                  }),
-                }),
-              }),
-            };
-          }
-          throw new Error(table);
-        }),
-      } as never,
+      adminForAvailability as never,
       {
         productId: PRODUCT,
         storeId: STORE,
@@ -668,20 +817,34 @@ describe("Seller digital asset upload — buyer delivery continuity", () => {
             }
             if (table === "store_digital_product_assets") {
               return {
-                select: () => ({
-                  eq: () => ({
-                    eq: () => ({
-                      maybeSingle: async () => ({
-                        data: {
-                          storage_path: SAFE_PATH,
-                          status: "active",
-                          title: "new-pack",
-                        },
-                        error: null,
-                      }),
-                    }),
-                  }),
-                }),
+                select: () =>
+                  chainEq(async () => ({
+                    data: {
+                      id: "asset-1",
+                      store_id: STORE,
+                      product_id: PRODUCT,
+                      active_version_id: VERSION_ACTIVE,
+                      status: "active",
+                    },
+                    error: null,
+                  })),
+              };
+            }
+            if (table === "store_digital_product_asset_versions") {
+              return {
+                select: () =>
+                  chainEq(async () => ({
+                    data: {
+                      id: VERSION_ACTIVE,
+                      store_id: STORE,
+                      product_id: PRODUCT,
+                      storage_path: SAFE_PATH,
+                      status: "active",
+                      version_number: 1,
+                      title: "new-pack",
+                    },
+                    error: null,
+                  })),
               };
             }
             throw new Error(table);
@@ -737,6 +900,7 @@ describe("Seller digital asset upload — surface wiring", () => {
     const actions = read("app/actions/storeDigitalAssets.ts");
     expect(actions).toMatch(/prepareSellerDigitalAssetUploadAction/);
     expect(actions).toMatch(/finalizeSellerDigitalAssetAttachAction/);
+    expect(actions).toMatch(/activateSellerDigitalAssetVersionAction/);
     expect(actions).not.toMatch(/payment_status|settlement|entitlement/);
   });
 
@@ -746,8 +910,12 @@ describe("Seller digital asset upload — surface wiring", () => {
     );
     expect(doc).toMatch(/prepare/i);
     expect(doc).toMatch(/attach/i);
-    expect(doc).toMatch(/replace/i);
-    expect(doc).toMatch(/previous active asset preserved/i);
     expect(doc).toMatch(/Out of scope/);
+    const versioning = read(
+      "docs/store/implementation/DIGITAL_PRODUCT_VERSIONING_UPDATE_DELIVERY_V1.md"
+    );
+    expect(versioning).toMatch(/draft/i);
+    expect(versioning).toMatch(/Activate/i);
+    expect(versioning).toMatch(/always-latest/i);
   });
 });

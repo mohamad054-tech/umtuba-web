@@ -1,62 +1,61 @@
-﻿# CURSOR_REPORT — Commerce Buyer Delivery & Post-Purchase Flow V1
+﻿# CURSOR_REPORT — Commerce Digital Product Versioning & Update Delivery V1
 
 ## Summary
 
-UX/orchestration over existing entitlement list + delivery availability + mint.
-Orders list cues, digital access library, checkout success CTA, digital-aware
-buyer chips, and copy fixes. No migration. No commit/push. Base `14bf224` tip
-parent unchanged.
+Additive digital asset versioning on post-purchase tip `9b2dacc`. Upload creates
+draft versions; Activate atomically sets one active version; delivery/publish
+readiness resolve always-latest active owned path. No entitlement pin. No
+commit/push. Migration `20260880` local only — not applied.
 
 ## Exact files changed
 
-- `lib/store/buyerDigitalPostPurchase.ts` (new)
-- `lib/store/buyerDigitalPostPurchase.test.ts` (new)
-- `lib/store/orders.ts`
-- `lib/store/buyerOrdersPresentation.ts`
-- `app/actions/storeOrders.ts`
-- `app/components/store/BuyerOrderList.tsx`
-- `app/components/store/BuyerDigitalAccessLibrary.tsx` (new)
-- `app/components/store/OrderStatusBadges.tsx`
-- `app/components/store/OrderDetailView.tsx`
-- `app/components/store/CheckoutClient.tsx`
-- `app/store/orders/page.tsx`
-- `app/store/orders/digital-access/page.tsx` (new)
-- `app/lib/nav/routes.ts`
-- `docs/store/implementation/BUYER_DELIVERY_POST_PURCHASE_FLOW_V1.md` (new)
+- `supabase/migrations/20260880_store_digital_product_versioning_update_delivery_v1.sql` (new)
+- `lib/store/digitalProductVersioning.ts` (new)
+- `lib/store/digitalProductVersioning.test.ts` (new)
+- `lib/store/digitalAssetUpload.ts`
+- `lib/store/digitalAssetUpload.test.ts`
+- `lib/store/digitalAccessDelivery.ts`
+- `lib/store/digitalAccessDelivery.test.ts`
+- `lib/store/digitalProductPublishReadiness.ts`
+- `app/actions/storeDigitalAssets.ts`
+- `app/components/store/SellerDigitalAssetPanel.tsx`
+- `docs/store/implementation/DIGITAL_PRODUCT_VERSIONING_UPDATE_DELIVERY_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None
+`20260880_store_digital_product_versioning_update_delivery_v1.sql` — **local only, not applied**
 
 ## Security review
 
-- Digital cues fail-closed (active entitlement required; listing errors → no cue)
-- Library/mint reuse existing session + ownership checks
-- No new mint/RPC/table; no payment/settlement mutation
+- Fail closed without active owned version
+- Activate rejects foreign store/product; RPC service_role only after editor auth
+- No entitlement/grant mutation; no path overwrite of history rows
+- Unsigned paths never returned to client
 
 ## Tests
 
-Focused: **62 passed** (6 files)
+Focused vitest: **59 passed** (versioning + upload + delivery + readiness + post-purchase)
 
 ## TypeScript
 
-`npx tsc --noEmit` — pass
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-`npm run build` — pass (`/store/orders/digital-access` present)
+See verification report (in progress / completed in session)
 
 ## git diff --check
 
-pass
+**PASS** (exit 0)
 
 ## git status --short
 
-Uncommitted local WIP (see Final Verification Report).
+Uncommitted WIP on `office/commerce-digital-product-versioning-update-delivery-v1`
 
 ## Open issues
 
-- Await commit / push GO
-- Seller payable visibility, refunds, CDN remain deferred
+- Migration not applied remotely (await GO)
+- No commit/push (await GO)
+- Buyer multi-version picker deferred; always-latest only

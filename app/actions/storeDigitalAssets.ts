@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
+  activateSellerDigitalAssetVersion,
   finalizeSellerDigitalAssetAttach,
   prepareSellerDigitalAssetUpload,
+  type ActivateDigitalAssetVersionResult,
   type FinalizeDigitalAssetAttachResult,
   type PrepareDigitalAssetUploadResult,
 } from "../../lib/store/digitalAssetUpload";
@@ -72,6 +74,36 @@ export async function finalizeSellerDigitalAssetAttachAction(
     userId: user?.id ?? null,
     storagePath: formData.get("storagePath"),
     title: formData.get("title"),
+  });
+
+  if (result.ok) {
+    revalidatePath(`/seller/store/products/${productId}/edit`);
+  }
+
+  return result;
+}
+
+export async function activateSellerDigitalAssetVersionAction(
+  formData: FormData
+): Promise<ActivateDigitalAssetVersionResult> {
+  const authorityError = rejectAuthorityClaims(formData);
+  if (authorityError) {
+    return {
+      ok: false,
+      code: "forbidden",
+      message: authorityError,
+    };
+  }
+
+  const user = await getServerUser();
+  const productId = String(formData.get("productId") || "").trim();
+  const versionId = String(formData.get("versionId") || "").trim();
+  const supabase = await createClient();
+
+  const result = await activateSellerDigitalAssetVersion(supabase, {
+    productId,
+    versionId,
+    userId: user?.id ?? null,
   });
 
   if (result.ok) {

@@ -17,6 +17,15 @@ import {
 import { validateStoreDigitalAssetFile } from "./mediaValidation";
 import { canManageCatalog } from "./permissions";
 import { STORE_DIGITAL_PRODUCT_ASSETS_TABLE } from "./digitalAccessDelivery";
+import {
+  STORE_DIGITAL_PRODUCT_ASSET_VERSIONS_TABLE,
+  interpretActivateRpcPayload,
+  listDigitalAssetVersionsForProduct,
+  resolveActiveDigitalAssetVersion,
+  toSellerVersionSummaries,
+  type ActivateDigitalAssetVersionResult,
+} from "./digitalProductVersioning";
+import type { SellerDigitalAssetVersionSummary } from "./digitalProductVersioning";
 import { getMembership } from "./sellerStore";
 import type { StoreMemberRole } from "./types";
 
@@ -32,6 +41,7 @@ export type SellerDigitalAssetUiStatus =
   | "none"
   | "active"
   | "inactive"
+  | "draft_only"
   | "unavailable";
 
 export type SellerDigitalAssetSummary = {
@@ -39,6 +49,8 @@ export type SellerDigitalAssetSummary = {
   title: string | null;
   fileExtension: AllowedStoreDigitalFileExtension | null;
   productType: string | null;
+  activeVersionId: string | null;
+  versions: SellerDigitalAssetVersionSummary[];
 };
 
 export type PrepareDigitalAssetUploadResult =
@@ -68,7 +80,9 @@ export type FinalizeDigitalAssetAttachResult =
   | {
       ok: true;
       summary: SellerDigitalAssetSummary;
-      replaced: boolean;
+      /** True when a prior active version remains the delivery pointer. */
+      activePreserved: boolean;
+      draftVersionNumber: number;
     }
   | {
       ok: false;
@@ -85,6 +99,8 @@ export type FinalizeDigitalAssetAttachResult =
       message: string;
       previousPreserved: boolean;
     };
+
+export type { ActivateDigitalAssetVersionResult };
 
 function requireServiceRoleEnv():
   | { ok: true; url: string; key: string }
@@ -117,34 +133,53 @@ function isProductId(value: string): boolean {
   return UUID_RE.test(value.trim());
 }
 
-function toSummary(input: {
+function emptySummary(
+  productType: string | null = null
+): SellerDigitalAssetSummary {
+  return {
+    uiStatus: productType && productType !== "digital" ? "unavailable" : "none",
+    title: null,
+    fileExtension: null,
+    productType,
+    activeVersionId: null,
+    versions: [],
+  };
+}
+
+function buildSummaryFromVersions(input: {
   productType: string | null;
-  status: string | null;
-  title: string | null;
-  storagePath: string | null;
+  versions: Awaited<ReturnType<typeof listDigitalAssetVersionsForProduct>>;
+  activeVersionId: string | null;
 }): SellerDigitalAssetSummary {
   if (input.productType && input.productType !== "digital") {
+    return emptySummary(input.productType);
+  }
+  const versions = toSellerVersionSummaries(input.versions);
+  const active = input.versions.find((v) => v.status === "active") ?? null;
+  if (active) {
     return {
-      uiStatus: "unavailable",
-      title: null,
-      fileExtension: null,
+      uiStatus: "active",
+      title: active.title,
+      fileExtension: extensionFromStoreDigitalAssetPath(active.storagePath),
       productType: input.productType,
+      activeVersionId: active.id,
+      versions,
     };
   }
-  if (!input.status || !input.storagePath) {
+  if (input.versions.length > 0) {
+    const latest = input.versions[0];
     return {
-      uiStatus: "none",
-      title: null,
-      fileExtension: null,
+      uiStatus: "draft_only",
+      title: latest?.title ?? null,
+      fileExtension: latest
+        ? extensionFromStoreDigitalAssetPath(latest.storagePath)
+        : null,
       productType: input.productType,
+      activeVersionId: null,
+      versions,
     };
   }
-  return {
-    uiStatus: input.status === "active" ? "active" : "inactive",
-    title: input.title,
-    fileExtension: extensionFromStoreDigitalAssetPath(input.storagePath),
-    productType: input.productType,
-  };
+  return emptySummary(input.productType);
 }
 
 async function authorizeDigitalProductEditor(
@@ -237,12 +272,7 @@ export async function loadSellerDigitalAssetSummary(
   deps?: { admin?: AnyClient }
 ): Promise<SellerDigitalAssetSummary> {
   if (!input.userId || !isProductId(input.productId)) {
-    return {
-      uiStatus: "none",
-      title: null,
-      fileExtension: null,
-      productType: null,
-    };
+    return emptySummary(null);
   }
 
   const { data: product } = await userClient
@@ -252,12 +282,7 @@ export async function loadSellerDigitalAssetSummary(
     .maybeSingle();
 
   if (!product) {
-    return {
-      uiStatus: "none",
-      title: null,
-      fileExtension: null,
-      productType: null,
-    };
+    return emptySummary(null);
   }
 
   const role = await getMembership(
@@ -266,66 +291,36 @@ export async function loadSellerDigitalAssetSummary(
     input.userId
   );
   if (!canManageCatalog(role)) {
-    return {
-      uiStatus: "none",
-      title: null,
-      fileExtension: null,
-      productType: String(product.product_type ?? ""),
-    };
+    return emptySummary(String(product.product_type ?? ""));
   }
 
   if (String(product.product_type) !== "digital") {
-    return toSummary({
-      productType: String(product.product_type),
-      status: null,
-      title: null,
-      storagePath: null,
-    });
+    return emptySummary(String(product.product_type));
   }
 
   const adminClient = deps?.admin
     ? { ok: true as const, supabase: deps.admin }
     : serviceRoleClient();
   if (!adminClient.ok) {
-    return toSummary({
-      productType: "digital",
-      status: null,
-      title: null,
-      storagePath: null,
-    });
+    return emptySummary("digital");
   }
 
-  const { data: asset } = await adminClient.supabase
-    .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("status, title, storage_path")
-    .eq("product_id", String(product.id))
-    .eq("store_id", String(product.store_id))
-    .maybeSingle();
+  const versions = await listDigitalAssetVersionsForProduct(
+    adminClient.supabase,
+    {
+      productId: String(product.id),
+      storeId: String(product.store_id),
+    }
+  );
+  const active = await resolveActiveDigitalAssetVersion(adminClient.supabase, {
+    productId: String(product.id),
+    storeId: String(product.store_id),
+  });
 
-  if (
-    asset?.storage_path &&
-    !isOwnedStoreDigitalProductAssetPath(
-      String(product.store_id),
-      String(product.id),
-      String(asset.storage_path)
-    )
-  ) {
-    return toSummary({
-      productType: "digital",
-      status: null,
-      title: null,
-      storagePath: null,
-    });
-  }
-
-  return toSummary({
+  return buildSummaryFromVersions({
     productType: "digital",
-    status: asset ? String(asset.status) : null,
-    title:
-      typeof asset?.title === "string" && asset.title.trim()
-        ? asset.title.trim()
-        : null,
-    storagePath: asset ? String(asset.storage_path ?? "") : null,
+    versions,
+    activeVersionId: active?.id ?? null,
   });
 }
 
@@ -404,8 +399,8 @@ async function verifyUploadedDigitalObject(
 }
 
 /**
- * After a successful storage upload, attach verified metadata as the single
- * active digital asset. Failed attach preserves any previous active row.
+ * After a successful storage upload, insert a draft version.
+ * Never overwrites prior version rows or changes the active pointer.
  */
 export async function finalizeSellerDigitalAssetAttach(
   userClient: AnyClient,
@@ -468,66 +463,192 @@ export async function finalizeSellerDigitalAssetAttach(
     };
   }
 
-  const { data: existing } = await admin
+  const priorActive = await resolveActiveDigitalAssetVersion(admin, {
+    productId: auth.productId,
+    storeId: auth.storeId,
+  });
+
+  const { data: existingAsset } = await admin
     .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("id, storage_path, status, title")
+    .select("id, active_version_id, status")
     .eq("product_id", auth.productId)
     .eq("store_id", auth.storeId)
     .maybeSingle();
 
-  const previousPath = existing ? String(existing.storage_path ?? "") : "";
-  const replaced = Boolean(existing && previousPath && previousPath !== storagePath);
-
-  if (existing?.id) {
-    const { error } = await admin
+  if (!existingAsset?.id) {
+    const { error: assetInsertError } = await admin
       .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-      .update({
-        storage_path: storagePath,
-        status: "active",
-        title,
-      })
-      .eq("id", existing.id)
-      .eq("product_id", auth.productId)
-      .eq("store_id", auth.storeId);
-
-    if (error) {
-      console.error("finalizeSellerDigitalAssetAttach update failed");
+      .insert({
+        store_id: auth.storeId,
+        product_id: auth.productId,
+        storage_path: null,
+        status: "inactive",
+        title: null,
+        active_version_id: null,
+      });
+    if (assetInsertError) {
+      console.error("finalizeSellerDigitalAssetAttach asset insert failed");
       return {
         ok: false,
         code: "attach_failed",
-        message:
-          "Unable to attach the new digital file. The previous asset was kept.",
-        previousPreserved: true,
-      };
-    }
-  } else {
-    const { error } = await admin.from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE).insert({
-      store_id: auth.storeId,
-      product_id: auth.productId,
-      storage_path: storagePath,
-      status: "active",
-      title,
-    });
-
-    if (error) {
-      console.error("finalizeSellerDigitalAssetAttach insert failed");
-      return {
-        ok: false,
-        code: "attach_failed",
-        message: "Unable to attach the digital file. No active asset was set.",
+        message: "Unable to attach the digital file. No draft version was set.",
         previousPreserved: true,
       };
     }
   }
 
+  const { data: maxRow } = await admin
+    .from(STORE_DIGITAL_PRODUCT_ASSET_VERSIONS_TABLE)
+    .select("version_number")
+    .eq("product_id", auth.productId)
+    .eq("store_id", auth.storeId)
+    .order("version_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextVersion =
+    Number.isInteger(Number(maxRow?.version_number)) &&
+    Number(maxRow?.version_number) >= 1
+      ? Number(maxRow?.version_number) + 1
+      : 1;
+
+  const { error: versionInsertError } = await admin
+    .from(STORE_DIGITAL_PRODUCT_ASSET_VERSIONS_TABLE)
+    .insert({
+      store_id: auth.storeId,
+      product_id: auth.productId,
+      storage_path: storagePath,
+      status: "draft",
+      version_number: nextVersion,
+      title,
+    });
+
+  if (versionInsertError) {
+    console.error("finalizeSellerDigitalAssetAttach version insert failed");
+    return {
+      ok: false,
+      code: "attach_failed",
+      message:
+        "Unable to create the draft digital version. The active version was kept.",
+      previousPreserved: true,
+    };
+  }
+
+  const versions = await listDigitalAssetVersionsForProduct(admin, {
+    productId: auth.productId,
+    storeId: auth.storeId,
+  });
+
   return {
     ok: true,
-    replaced,
-    summary: toSummary({
+    activePreserved: Boolean(priorActive),
+    draftVersionNumber: nextVersion,
+    summary: buildSummaryFromVersions({
       productType: auth.productType,
-      status: "active",
-      title,
-      storagePath,
+      versions,
+      activeVersionId: priorActive?.id ?? null,
     }),
   };
+}
+
+/**
+ * Explicit seller activation of an owned draft/inactive version.
+ * Atomic swap via DB RPC — fail closed on store/product mismatch.
+ */
+export async function activateSellerDigitalAssetVersion(
+  userClient: AnyClient,
+  input: {
+    productId: string;
+    versionId: string;
+    userId: string | null | undefined;
+  },
+  deps?: { admin?: AnyClient }
+): Promise<ActivateDigitalAssetVersionResult> {
+  const auth = await authorizeDigitalProductEditor(userClient, {
+    productId: input.productId,
+    userId: input.userId,
+  });
+  if (!auth.ok) return auth;
+
+  const versionId = String(input.versionId ?? "").trim();
+  if (!UUID_RE.test(versionId)) {
+    return {
+      ok: false,
+      code: "invalid_version_id",
+      message: "Invalid digital asset version id.",
+    };
+  }
+
+  const adminClient = deps?.admin
+    ? { ok: true as const, supabase: deps.admin }
+    : serviceRoleClient();
+  if (!adminClient.ok) {
+    return {
+      ok: false,
+      code: "server_misconfigured",
+      message: adminClient.message,
+    };
+  }
+  const admin = adminClient.supabase;
+
+  const { data: version } = await admin
+    .from(STORE_DIGITAL_PRODUCT_ASSET_VERSIONS_TABLE)
+    .select(
+      "id, store_id, product_id, storage_path, status, version_number, title"
+    )
+    .eq("id", versionId)
+    .maybeSingle();
+
+  if (!version) {
+    return {
+      ok: false,
+      code: "version_missing",
+      message: "Digital asset version was not found.",
+    };
+  }
+
+  if (
+    String(version.product_id) !== auth.productId ||
+    String(version.store_id) !== auth.storeId
+  ) {
+    return {
+      ok: false,
+      code: "version_mismatch",
+      message: "Digital asset version does not belong to this product.",
+    };
+  }
+
+  if (
+    !isOwnedStoreDigitalProductAssetPath(
+      auth.storeId,
+      auth.productId,
+      String(version.storage_path ?? "")
+    )
+  ) {
+    return {
+      ok: false,
+      code: "unsafe_path",
+      message: "Digital asset path failed ownership checks.",
+    };
+  }
+
+  const { data, error } = await admin.rpc(
+    "activate_store_digital_product_asset_version",
+    {
+      p_version_id: versionId,
+      p_product_id: auth.productId,
+      p_store_id: auth.storeId,
+    }
+  );
+
+  if (error) {
+    console.error("activateSellerDigitalAssetVersion rpc failed");
+    return {
+      ok: false,
+      code: "activate_failed",
+      message: "Unable to activate digital asset version.",
+    };
+  }
+
+  return interpretActivateRpcPayload(data);
 }

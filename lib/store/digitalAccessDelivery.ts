@@ -10,6 +10,7 @@ import {
   STORE_PRODUCT_MEDIA_BUCKET,
   isOwnedStoreDigitalProductAssetPath,
 } from "./mediaConstants";
+import { resolveActiveDigitalAssetVersion } from "./digitalProductVersioning";
 
 export const DIGITAL_ACCESS_DELIVERY_ID =
   "commerce.digital.buyer_access_delivery_v1" as const;
@@ -105,24 +106,11 @@ export async function resolveDigitalDeliveryAvailability(
   if (!product || product.store_id !== input.storeId) return "unavailable";
   if (String(product.product_type) !== "digital") return "unsupported";
 
-  const { data: asset } = await admin
-    .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("storage_path, status")
-    .eq("product_id", input.productId)
-    .eq("store_id", input.storeId)
-    .maybeSingle();
-
-  if (!asset) return "unavailable";
-  if (String(asset.status) !== "active") return "inactive";
-  if (
-    !isOwnedStoreDigitalProductAssetPath(
-      input.storeId,
-      input.productId,
-      String(asset.storage_path ?? "")
-    )
-  ) {
-    return "unavailable";
-  }
+  const active = await resolveActiveDigitalAssetVersion(admin, {
+    productId: input.productId,
+    storeId: input.storeId,
+  });
+  if (!active) return "unavailable";
   return "available";
 }
 
@@ -239,29 +227,20 @@ export async function mintBuyerDigitalAccessSignedUrl(
     };
   }
 
-  const { data: asset } = await admin
-    .from(STORE_DIGITAL_PRODUCT_ASSETS_TABLE)
-    .select("storage_path, status, title")
-    .eq("product_id", productId)
-    .eq("store_id", storeId)
-    .maybeSingle();
+  const active = await resolveActiveDigitalAssetVersion(admin, {
+    productId,
+    storeId,
+  });
 
-  if (!asset) {
+  if (!active) {
     return {
       ok: false,
       code: "asset_missing",
       message: "Secure digital file is not ready for this product yet.",
     };
   }
-  if (String(asset.status) !== "active") {
-    return {
-      ok: false,
-      code: "asset_inactive",
-      message: "Digital access is temporarily inactive.",
-    };
-  }
 
-  const storagePath = String(asset.storage_path ?? "").trim();
+  const storagePath = active.storagePath;
   if (!isOwnedStoreDigitalProductAssetPath(storeId, productId, storagePath)) {
     return {
       ok: false,
@@ -289,7 +268,7 @@ export async function mintBuyerDigitalAccessSignedUrl(
     signedUrl: signed.signedUrl,
     expiresInSeconds,
     title:
-      (typeof asset.title === "string" && asset.title.trim()) ||
+      active.title ||
       (typeof entitlement.title_snapshot === "string"
         ? entitlement.title_snapshot
         : null),
