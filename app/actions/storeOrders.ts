@@ -13,6 +13,7 @@ import { updateSellerOrderStatus } from "../../lib/store/orders";
 import { sellerTransitionPaymentBlocked } from "../../lib/store/sellerOrdersPresentation";
 import { buyerCancelStoreOrder } from "../../lib/store/commerceSafetyQueries";
 import { mintBuyerDigitalAccessSignedUrl } from "../../lib/store/digitalAccessDelivery";
+import { buyerOrdersHaveDigitalEntitlements } from "../../lib/store/buyerDigitalPostPurchase";
 import { getMembership } from "../../lib/store/sellerStore";
 import { APP_ROUTES, buildSellerOrderHref, buildStoreOrderHref } from "../lib/nav";
 import type { FulfillmentStatus, OrderStatus } from "../../lib/store/types";
@@ -203,4 +204,39 @@ export async function mintBuyerDigitalAccessAction(entitlementId: string) {
     entitlementId: id,
     userId: user.id,
   });
+}
+
+export async function probeBuyerDigitalAccessForOrdersAction(
+  orderIds: string[]
+): Promise<
+  | {
+      ok: true;
+      hasDigitalAccess: boolean;
+      entitlementCount: number;
+    }
+  | { ok: false; message: string; requiresAuth?: boolean }
+> {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: "Sign in required.",
+      requiresAuth: true,
+    };
+  }
+
+  const ids = Array.isArray(orderIds)
+    ? orderIds
+        .map((id) => (typeof id === "string" ? id.trim() : ""))
+        .filter(Boolean)
+        .slice(0, 20)
+    : [];
+
+  const supabase = await createClient();
+  const probe = await buyerOrdersHaveDigitalEntitlements(supabase, ids);
+  return {
+    ok: true,
+    hasDigitalAccess: probe.hasDigitalAccess,
+    entitlementCount: probe.entitlementCount,
+  };
 }

@@ -1,22 +1,28 @@
-﻿# CURSOR_REPORT — Commerce Digital Product Publish Readiness V1
+﻿# CURSOR_REPORT — Commerce Buyer Delivery & Post-Purchase Flow V1
 
 ## Summary
 
-Digital products cannot enter review or marketplace-sellable paths without a
-valid active owned digital asset. Reuses `store_digital_product_assets` and the
-owned path contract. No migration. No commit/push. Base `55fb87d…` unchanged.
+UX/orchestration over existing entitlement list + delivery availability + mint.
+Orders list cues, digital access library, checkout success CTA, digital-aware
+buyer chips, and copy fixes. No migration. No commit/push. Base `14bf224` tip
+parent unchanged.
 
 ## Exact files changed
 
-- `lib/store/digitalProductPublishReadiness.ts` (new)
-- `lib/store/digitalProductPublishReadiness.test.ts` (new)
-- `lib/store/sellerStore.ts`
-- `lib/store/marketplaceEligibility.ts`
-- `lib/store/marketplaceSupplierSeller.ts`
-- `lib/store/marketplaceSupplierSellerQueries.ts`
-- `lib/store/cart.ts`
-- `app/seller/store/products/[productId]/edit/page.tsx`
-- `docs/store/implementation/DIGITAL_PRODUCT_PUBLISH_READINESS_V1.md` (new)
+- `lib/store/buyerDigitalPostPurchase.ts` (new)
+- `lib/store/buyerDigitalPostPurchase.test.ts` (new)
+- `lib/store/orders.ts`
+- `lib/store/buyerOrdersPresentation.ts`
+- `app/actions/storeOrders.ts`
+- `app/components/store/BuyerOrderList.tsx`
+- `app/components/store/BuyerDigitalAccessLibrary.tsx` (new)
+- `app/components/store/OrderStatusBadges.tsx`
+- `app/components/store/OrderDetailView.tsx`
+- `app/components/store/CheckoutClient.tsx`
+- `app/store/orders/page.tsx`
+- `app/store/orders/digital-access/page.tsx` (new)
+- `app/lib/nav/routes.ts`
+- `docs/store/implementation/BUYER_DELIVERY_POST_PURCHASE_FLOW_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -26,16 +32,13 @@ None
 
 ## Security review
 
-- Product type and asset readiness re-fetched server-side on submit and eligibility enable
-- Client readiness/asset/path/store claims are not trusted
-- Fail-closed for missing/inactive/malformed/cross-store/cross-product assets
-- Physical products remain ungated by this slice
-- Marketplace discovery, listing diagnostics, and listing cart exclude unready digital products
-- Does not mutate payment, settlement, entitlement, or buyer delivery state
+- Digital cues fail-closed (active entitlement required; listing errors → no cue)
+- Library/mint reuse existing session + ownership checks
+- No new mint/RPC/table; no payment/settlement mutation
 
 ## Tests
 
-Focused Commerce suites: **131 passed** (11 files)
+Focused: **62 passed** (6 files)
 
 ## TypeScript
 
@@ -43,7 +46,7 @@ Focused Commerce suites: **131 passed** (11 files)
 
 ## Build
 
-`npm run build` — pass
+`npm run build` — pass (`/store/orders/digital-access` present)
 
 ## git diff --check
 
@@ -51,9 +54,9 @@ pass
 
 ## git status --short
 
-Uncommitted local WIP on base tip (see Final Verification Report).
+Uncommitted local WIP (see Final Verification Report).
 
 ## Open issues
 
 - Await commit / push GO
-- CDN/library, multi-file bundles, payouts, refunds remain deferred
+- Seller payable visibility, refunds, CDN remain deferred

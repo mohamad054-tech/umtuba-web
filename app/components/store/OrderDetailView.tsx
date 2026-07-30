@@ -49,6 +49,10 @@ export default function OrderDetailView({
   const hasDeferredAttempt = attempts.some(
     (a) => a.status === "deferred" || a.provider === "none"
   );
+  const hasDigitalAccess =
+    mode === "buyer" &&
+    order.payment_status === "paid" &&
+    (bundle.digitalEntitlements?.length ?? 0) > 0;
   const buyerActions =
     mode === "buyer"
       ? deriveBuyerOrderActions({
@@ -97,6 +101,7 @@ export default function OrderDetailView({
             fulfillmentStatus={order.fulfillment_status}
             shippedAt={order.shipped_at}
             deliveredAt={order.delivered_at}
+            hasDigitalAccess={hasDigitalAccess}
             buyerReadable={mode === "buyer"}
           />
         </div>
@@ -105,10 +110,9 @@ export default function OrderDetailView({
             role="status"
             className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
-            This order exists and is recorded as payment pending. Live payment
-            collection is not enabled — no charge is collected here. Inventory
-            holds follow trusted commerce rules until payment, cancellation, or
-            hold expiry.
+            Payment is still pending for this order. Inventory holds follow
+            trusted commerce rules until payment succeeds, cancellation, or hold
+            expiry.
           </p>
         ) : null}
         {order.payment_status === "paid" &&
@@ -117,6 +121,15 @@ export default function OrderDetailView({
           <div className="mt-4 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)] px-4 py-3">
             <p className="text-sm font-semibold text-[var(--sf-ink)]">
               Digital access
+            </p>
+            <p className="mt-1 text-xs text-[var(--sf-faint)]">
+              Secure short-lived access for this order.{" "}
+              <Link
+                href={APP_ROUTES.storeDigitalAccess}
+                className="font-semibold text-[var(--sf-accent-strong)]"
+              >
+                View all digital access →
+              </Link>
             </p>
             <ul className="mt-3 space-y-3">
               {bundle.digitalEntitlements!.map((entitlement) => {

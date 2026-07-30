@@ -50,6 +50,9 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
     limit: 50,
   });
 
+  const hasAnyDigital =
+    result.ok && result.data.some((order) => order.hasDigitalAccess);
+
   return (
     <StoreShell title="My Orders" subtitle="Store" wide>
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
@@ -59,10 +62,19 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Each card is one seller order with separate order, payment,
-          fulfillment, and delivery states. Multi-seller checkouts appear as
-          multiple orders — not one shared shipment. Payment collection remains
-          deferred.
+          fulfillment, and delivery or digital-access states. Multi-seller
+          checkouts appear as multiple orders. Paid digital purchases unlock
+          secure access from the order detail or Digital access library.
         </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={APP_ROUTES.storeDigitalAccess}
+            className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-4 py-2 text-xs font-semibold text-[var(--sf-ink)]"
+          >
+            Digital access
+            {hasAnyDigital ? " · available" : ""}
+          </Link>
+        </div>
         <div className="mt-4 flex flex-wrap gap-2" role="navigation" aria-label="Filter orders">
           <Link
             href={APP_ROUTES.storeOrders}

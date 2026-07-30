@@ -33,6 +33,7 @@ export const APP_ROUTES = {
   storeCart: "/store/cart",
   storeCheckout: "/store/checkout",
   storeOrders: "/store/orders",
+  storeDigitalAccess: "/store/orders/digital-access",
   storeWishlist: "/store/wishlist",
   seller: "/seller",
   sellerApply: "/seller/apply",

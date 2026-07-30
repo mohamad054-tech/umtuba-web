@@ -88,6 +88,7 @@ export function OrderStatusCluster({
   fulfillmentStatus,
   shippedAt,
   deliveredAt,
+  hasDigitalAccess = false,
   buyerReadable = false,
 }: {
   status: OrderStatus;
@@ -95,6 +96,8 @@ export function OrderStatusCluster({
   fulfillmentStatus: FulfillmentStatus;
   shippedAt?: string | null;
   deliveredAt?: string | null;
+  /** Fail-closed digital entitlement cue for buyer-readable chips. */
+  hasDigitalAccess?: boolean;
   /** When true, render separate order/payment/fulfillment/delivery chips. */
   buyerReadable?: boolean;
 }) {
@@ -105,6 +108,7 @@ export function OrderStatusCluster({
       fulfillmentStatus,
       shippedAt,
       deliveredAt,
+      hasDigitalAccess,
     });
     return (
       <div className="flex flex-wrap gap-2" role="list" aria-label="Order states">

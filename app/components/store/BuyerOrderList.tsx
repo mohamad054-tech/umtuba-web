@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { formatOrderMoney } from "../../../lib/store/orderRules";
 import type { BuyerOrderListItem } from "../../../lib/store/orders";
@@ -26,7 +28,7 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
     return (
       <StoreEmptyState
         title="No orders yet"
-        description="When checkout confirms an order, it appears here with separate order, payment, fulfillment, and delivery states."
+        description="When checkout confirms an order, it appears here with separate order, payment, fulfillment, and access or delivery states."
         actionHref={APP_ROUTES.store}
         actionLabel="Browse the Store"
       />
@@ -56,13 +58,23 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
                     {order.previewTitles.join(" · ")}
                   </p>
                 ) : null}
+                {order.hasDigitalAccess ? (
+                  <p
+                    className="mt-2 text-xs font-semibold text-[var(--sf-ok)]"
+                    role="status"
+                  >
+                    Digital access available on this order
+                  </p>
+                ) : null}
               </div>
               <div className="text-end">
                 <p className="text-base font-semibold text-[var(--sf-accent-strong)]">
                   {formatOrderMoney(order.grandTotalMinor, order.currency)}
                 </p>
                 <p className="mt-1 text-xs font-semibold text-[var(--sf-faint)] transition group-hover:text-[var(--sf-accent)]">
-                  View details →
+                  {order.hasDigitalAccess
+                    ? "Open access / details →"
+                    : "View details →"}
                 </p>
               </div>
             </div>
@@ -71,12 +83,14 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
                 status={order.status}
                 paymentStatus={order.paymentStatus}
                 fulfillmentStatus={order.fulfillmentStatus}
+                hasDigitalAccess={order.hasDigitalAccess}
                 buyerReadable
               />
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-[var(--sf-faint)]">
-              This is one seller order. Multi-seller checkouts create separate
-              orders — not one shared shipment.
+              {order.hasDigitalAccess
+                ? "This seller order includes digital access. Open details to use secure access, or visit Digital access for all purchases."
+                : "This is one seller order. Multi-seller checkouts create separate orders — not one shared shipment."}
             </p>
           </Link>
         </li>

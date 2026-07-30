@@ -9,6 +9,7 @@ import {
   resolveDigitalDeliveryAvailability,
   type DigitalDeliveryAvailability,
 } from "./digitalAccessDelivery";
+import { mapOrdersWithDigitalEntitlements } from "./buyerDigitalPostPurchase";
 import {
   assertSellerFulfillmentConsistentWithOrder,
   assertSellerOrderStatusTransition,
@@ -58,6 +59,11 @@ export type BuyerOrderListItem = {
   itemCount: number;
   /** First few line titles for list preview (from trusted snapshots). */
   previewTitles: string[];
+  /**
+   * True only when an active digital entitlement exists for this order.
+   * Fail-closed: false when listing fails or none found.
+   */
+  hasDigitalAccess: boolean;
 };
 
 export type BuyerSiblingOrder = {
@@ -233,9 +239,10 @@ export async function listBuyerOrders(
     StoreOrderRow & { stores: { id: string; name: string; slug: string } | null }
   >;
   const orderIds = rows.map((r) => r.id);
-  const [counts, previews] = await Promise.all([
+  const [counts, previews, digitalOrders] = await Promise.all([
     countItemsByOrderIds(supabase, orderIds),
     previewTitlesByOrderIds(supabase, orderIds),
+    mapOrdersWithDigitalEntitlements(supabase, orderIds),
   ]);
 
   return {
@@ -254,6 +261,7 @@ export async function listBuyerOrders(
       grandTotalMinor: row.grand_total_minor,
       itemCount: counts.get(row.id) ?? 0,
       previewTitles: previews.get(row.id) ?? [],
+      hasDigitalAccess: digitalOrders.has(row.id),
     })),
   };
 }

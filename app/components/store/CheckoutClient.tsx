@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   confirmCheckoutQuoteAction,
   createCheckoutQuoteAction,
@@ -9,6 +9,7 @@ import {
   saveCheckoutAddressAction,
 } from "../../actions/storeCheckout";
 import { startStripeTestCheckoutAction } from "../../actions/storeStripePayments";
+import { probeBuyerDigitalAccessForOrdersAction } from "../../actions/storeOrders";
 import { formatMinorUnits } from "../../../lib/store/money";
 import type { CartSummary } from "../../../lib/store/cartRules";
 import type { BuyerAddressRow } from "../../../lib/store/checkout";
@@ -89,11 +90,44 @@ export default function CheckoutClient({
   const [result, setResult] = useState<ConfirmResult | null>(null);
   const [recoveryBusy, setRecoveryBusy] = useState(false);
   const [sameBilling, setSameBilling] = useState(true);
+  const [digitalPostPurchase, setDigitalPostPurchase] = useState<{
+    hasDigitalAccess: boolean;
+    entitlementCount: number;
+  } | null>(null);
 
   const selectedAddress = useMemo(
     () => addresses.find((a) => a.id === selectedAddressId) ?? null,
     [addresses, selectedAddressId]
   );
+
+  useEffect(() => {
+    if (!result?.orders || !Array.isArray(result.orders)) {
+      setDigitalPostPurchase(null);
+      return;
+    }
+    const orderIds = result.orders
+      .map((o) => (typeof o.order_id === "string" ? o.order_id.trim() : ""))
+      .filter(Boolean);
+    let cancelled = false;
+    void (async () => {
+      const probe = await probeBuyerDigitalAccessForOrdersAction(orderIds);
+      if (cancelled) return;
+      if (!probe.ok) {
+        setDigitalPostPurchase({
+          hasDigitalAccess: false,
+          entitlementCount: 0,
+        });
+        return;
+      }
+      setDigitalPostPurchase({
+        hasDigitalAccess: probe.hasDigitalAccess,
+        entitlementCount: probe.entitlementCount,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [result]);
 
   const currency = cart.currency ?? "USD";
   const busy = pending || recoveryBusy;
@@ -227,8 +261,40 @@ export default function CheckoutClient({
         </h2>
         <p className="text-sm leading-relaxed text-[var(--sf-muted)]">
           {(typeof result.payment_note === "string" && result.payment_note) ||
-            "No payment was collected yet. Your order is pending payment. You can pay with Stripe test mode when configured, or keep the deferred record."}
+            "Your order was recorded. Complete payment from this page or the order detail when a payment method is available."}
         </p>
+        {digitalPostPurchase?.hasDigitalAccess ? (
+          <div
+            className="rounded-xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)] p-3"
+            role="status"
+          >
+            <p className="text-sm font-semibold text-[var(--sf-ink)]">
+              Digital access is ready
+            </p>
+            <p className="mt-1 text-xs text-[var(--sf-muted)]">
+              {digitalPostPurchase.entitlementCount} secure digital item
+              {digitalPostPurchase.entitlementCount === 1 ? "" : "s"}{" "}
+              detected for this checkout. Open Digital access or an order
+              detail to continue.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href={APP_ROUTES.storeDigitalAccess}
+                className="watch-focus-ring inline-flex rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712]"
+              >
+                Open digital access
+              </Link>
+              {typeof orders[0]?.order_id === "string" ? (
+                <Link
+                  href={buildStoreOrderHref(String(orders[0].order_id))}
+                  className="watch-focus-ring inline-flex rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold"
+                >
+                  Open order detail
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
         <div className="space-y-2">
           {orders.map((o) => {
             const orderId =
@@ -333,6 +399,12 @@ export default function CheckoutClient({
             className="watch-focus-ring inline-flex rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-bold text-[var(--sf-ink)]"
           >
             View my orders
+          </Link>
+          <Link
+            href={APP_ROUTES.storeDigitalAccess}
+            className="watch-focus-ring inline-flex rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-bold text-[var(--sf-ink)]"
+          >
+            Digital access
           </Link>
         </div>
       </div>

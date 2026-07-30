@@ -98,22 +98,31 @@ export function buyerPaymentStatusLabel(status: unknown): string {
     : "Unknown payment state";
 }
 
-export function buyerFulfillmentStatusLabel(status: unknown): string {
-  if (isFulfillmentStatus(status)) return FULFILLMENT_BUYER_LABELS[status];
-  return typeof status === "string" && status.trim()
-    ? `Unknown fulfillment state (${status})`
-    : "Unknown fulfillment state";
-}
-
 /**
  * Delivery presentation is derived only from trusted order stamps/status.
  * Never invents carriers, tracking, or ETAs.
+ * When hasDigitalAccess is true, prefer digital access wording over shipping metaphors.
  */
 export function buyerDeliveryStatusLabel(input: {
   status: unknown;
   shippedAt?: string | null;
   deliveredAt?: string | null;
+  hasDigitalAccess?: boolean;
 }): { label: string; tone: BuyerStatusChip["tone"]; raw: string } {
+  if (input.hasDigitalAccess) {
+    if (input.status === "cancelled" || input.status === "refunded") {
+      return {
+        label: "Digital access not applicable",
+        tone: "neutral",
+        raw: "digital_na",
+      };
+    }
+    return {
+      label: "Digital access",
+      tone: "good",
+      raw: "digital_access",
+    };
+  }
   if (input.deliveredAt || input.status === "delivered") {
     return { label: "Delivered", tone: "good", raw: "delivered" };
   }
@@ -141,17 +150,39 @@ export function buyerDeliveryStatusLabel(input: {
   };
 }
 
+export function buyerFulfillmentStatusLabel(
+  status: unknown,
+  options?: { hasDigitalAccess?: boolean }
+): string {
+  if (options?.hasDigitalAccess) {
+    if (isFulfillmentStatus(status)) {
+      if (status === "fulfilled") return "Digital fulfillment complete";
+      if (status === "partial") return "Digital fulfillment partial";
+      return "Digital fulfillment pending";
+    }
+    return typeof status === "string" && status.trim()
+      ? `Unknown fulfillment state (${status})`
+      : "Unknown fulfillment state";
+  }
+  if (isFulfillmentStatus(status)) return FULFILLMENT_BUYER_LABELS[status];
+  return typeof status === "string" && status.trim()
+    ? `Unknown fulfillment state (${status})`
+    : "Unknown fulfillment state";
+}
+
 export function buildBuyerStatusChips(input: {
   status: unknown;
   paymentStatus: unknown;
   fulfillmentStatus: unknown;
   shippedAt?: string | null;
   deliveredAt?: string | null;
+  hasDigitalAccess?: boolean;
 }): BuyerStatusChip[] {
+  const hasDigitalAccess = Boolean(input.hasDigitalAccess);
   const orderTone: BuyerStatusChip["tone"] = isOrderStatus(input.status)
     ? input.status === "cancelled" || input.status === "refunded"
       ? "bad"
-      : input.status === "delivered" || input.status === "shipped"
+      : input.status === "delivered" || input.status === "shipped" || hasDigitalAccess
         ? "good"
         : input.status === "pending"
           ? "warn"
@@ -178,7 +209,12 @@ export function buildBuyerStatusChips(input: {
         : "warn"
     : "neutral";
 
-  const delivery = buyerDeliveryStatusLabel(input);
+  const delivery = buyerDeliveryStatusLabel({
+    status: input.status,
+    shippedAt: input.shippedAt,
+    deliveredAt: input.deliveredAt,
+    hasDigitalAccess,
+  });
 
   return [
     {
@@ -195,13 +231,17 @@ export function buildBuyerStatusChips(input: {
     },
     {
       kind: "fulfillment",
-      label: `Fulfillment · ${buyerFulfillmentStatusLabel(input.fulfillmentStatus)}`,
+      label: `Fulfillment · ${buyerFulfillmentStatusLabel(input.fulfillmentStatus, {
+        hasDigitalAccess,
+      })}`,
       tone: fulfillmentTone,
       raw: String(input.fulfillmentStatus ?? "unknown"),
     },
     {
       kind: "delivery",
-      label: `Delivery · ${delivery.label}`,
+      label: hasDigitalAccess
+        ? `Access · ${delivery.label}`
+        : `Delivery · ${delivery.label}`,
       tone: delivery.tone,
       raw: delivery.raw,
     },
