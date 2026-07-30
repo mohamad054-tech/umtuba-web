@@ -8,6 +8,35 @@ export const MAX_STORE_PRODUCT_MEDIA_BYTES = 10 * 1024 * 1024;
 /** Short-lived signed media URLs (15 minutes). */
 export const STORE_PRODUCT_MEDIA_SIGNED_URL_TTL_SECONDS = 15 * 60;
 
+/** Buyer digital delivery signed URLs — same bound as catalog media. */
+export const STORE_DIGITAL_ACCESS_SIGNED_URL_TTL_SECONDS =
+  STORE_PRODUCT_MEDIA_SIGNED_URL_TTL_SECONDS;
+
+export const ALLOWED_STORE_DIGITAL_FILE_EXTENSIONS = [
+  "pdf",
+  "zip",
+  "epub",
+  "mp3",
+  "mp4",
+  "webm",
+  "txt",
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+] as const;
+
+export type AllowedStoreDigitalFileExtension =
+  (typeof ALLOWED_STORE_DIGITAL_FILE_EXTENSIONS)[number];
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const DIGITAL_FILE_EXT_RE = new RegExp(
+  `^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\.(${ALLOWED_STORE_DIGITAL_FILE_EXTENSIONS.join("|")})$`,
+  "i"
+);
+
 export const ALLOWED_STORE_PRODUCT_IMAGE_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -27,9 +56,6 @@ export const STORE_PRODUCT_MEDIA_ACCEPT_ATTR = [
 
 export const STORE_PRODUCT_MEDIA_FILE_HINT =
   "JPEG, PNG, or WebP — maximum 10 MB";
-
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function extensionForStoreProductMime(
   mime: AllowedStoreProductImageMimeType
@@ -71,4 +97,40 @@ export function isOwnedStoreProductMediaPath(
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$/i.test(
     rest
   );
+}
+
+/**
+ * Digital deliverable path:
+ * stores/{storeId}/products/{productId}/digital/{uuid}.{ext}
+ */
+export function buildStoreDigitalProductAssetPath(
+  storeId: string,
+  productId: string,
+  fileId: string,
+  extension: AllowedStoreDigitalFileExtension
+): string {
+  return `stores/${storeId}/products/${productId}/digital/${fileId}.${extension}`;
+}
+
+export function isOwnedStoreDigitalProductAssetPath(
+  storeId: string,
+  productId: string,
+  storagePath: string
+): boolean {
+  if (
+    !UUID_RE.test(storeId) ||
+    !UUID_RE.test(productId) ||
+    !storagePath ||
+    storagePath.includes("..") ||
+    storagePath.startsWith("/") ||
+    storagePath.includes("\\") ||
+    storagePath.length > 512
+  ) {
+    return false;
+  }
+  const prefix = `stores/${storeId}/products/${productId}/digital/`;
+  if (!storagePath.startsWith(prefix)) return false;
+  const rest = storagePath.slice(prefix.length);
+  if (!rest || rest.includes("/") || rest.includes("\\")) return false;
+  return DIGITAL_FILE_EXT_RE.test(rest);
 }

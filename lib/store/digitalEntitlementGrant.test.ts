@@ -230,7 +230,7 @@ describe("Digital entitlement grant — capture wiring", () => {
     );
     expect(read("lib/store/orders.ts")).toMatch(/listMyDigitalEntitlements/);
     expect(read("app/components/store/OrderDetailView.tsx")).toMatch(
-      /Digital access granted/
+      /Digital access|BuyerDigitalAccessButton/
     );
   });
 });

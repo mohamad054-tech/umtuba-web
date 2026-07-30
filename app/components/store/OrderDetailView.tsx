@@ -9,6 +9,7 @@ import type { OrderDetailBundle } from "../../../lib/store/orders";
 import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
 import BuyerCancelOrderButton from "./BuyerCancelOrderButton";
 import BuyerDeferredPaymentRecoveryButton from "./BuyerDeferredPaymentRecoveryButton";
+import BuyerDigitalAccessButton from "./BuyerDigitalAccessButton";
 import { OrderStatusCluster } from "./OrderStatusBadges";
 import OrderTimeline from "./OrderTimeline";
 import SellerOrderStatusForm from "./SellerOrderStatusForm";
@@ -115,17 +116,30 @@ export default function OrderDetailView({
         (bundle.digitalEntitlements?.length ?? 0) > 0 ? (
           <div className="mt-4 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)] px-4 py-3">
             <p className="text-sm font-semibold text-[var(--sf-ink)]">
-              Digital access granted
+              Digital access
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-[var(--sf-muted)]">
-              {bundle.digitalEntitlements!.map((entitlement) => (
-                <li key={entitlement.id}>
-                  {entitlement.titleSnapshot?.trim() || "Digital item"}
-                  {entitlement.skuSnapshot
-                    ? ` · ${entitlement.skuSnapshot}`
-                    : ""}
-                </li>
-              ))}
+            <ul className="mt-3 space-y-3">
+              {bundle.digitalEntitlements!.map((entitlement) => {
+                const title =
+                  entitlement.titleSnapshot?.trim() || "Digital item";
+                return (
+                  <li key={entitlement.id} className="space-y-1">
+                    <p className="text-sm text-[var(--sf-muted)]">
+                      {title}
+                      {entitlement.skuSnapshot
+                        ? ` · ${entitlement.skuSnapshot}`
+                        : ""}
+                    </p>
+                    <BuyerDigitalAccessButton
+                      entitlementId={entitlement.id}
+                      title={title}
+                      deliveryAvailability={
+                        entitlement.deliveryAvailability ?? "unavailable"
+                      }
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ) : null}

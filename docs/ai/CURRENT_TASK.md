@@ -2,35 +2,35 @@
 
 ## Task title
 
-Commerce Post-Capture Settlement Release V1
+Commerce Buyer Digital Access Delivery V1
 
 ## Status
 
-`verification-pass` — **UNCOMMITTED** — awaiting explicit commit / push GO
+`verification-pass` — **UNCOMMITTED** — awaiting explicit commit / push / apply GO
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-settlement-release-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-buyer-digital-access-delivery-v1`
 
 ## Branch
 
-`office/commerce-post-capture-settlement-release-v1`
+`office/commerce-buyer-digital-access-delivery-v1`
 
 ## Base / HEAD
 
-Base: `dd27b3af635f456a91c2ebf9ad84288374b4fcf6`
+Base: `98ae6caaca23552c72b9016c990daf7cdbd46a40`
 HEAD: uncommitted implementation on top of base
 
 ## Milestone
 
-`commerce.settlement.post_capture_release_v1`
+`commerce.digital.buyer_access_delivery_v1`
 
 ## Delivered
 
-- Release after successful allocate + digital entitlement grant
-- Deterministic `${captureEventKey}:release` event key
-- No migration (reuse Settlement Foundation release)
+- Migration (local): `20260878_store_digital_access_delivery_v1.sql`
+- Entitlement-gated short-lived signed access
+- Buyer order detail access action
 
 ## Next
 
-Verification → trailer-free commit GO → push GO
+Verification → trailer-free commit GO → push GO → apply `20260878` GO

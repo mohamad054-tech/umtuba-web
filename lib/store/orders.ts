@@ -3,8 +3,12 @@
  * Relies on RLS for read isolation; mutations go through SECURITY DEFINER RPC.
  */
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { listMyDigitalEntitlements } from "./digitalEntitlementGrant";
+import {
+  resolveDigitalDeliveryAvailability,
+  type DigitalDeliveryAvailability,
+} from "./digitalAccessDelivery";
 import {
   assertSellerFulfillmentConsistentWithOrder,
   assertSellerOrderStatusTransition,
@@ -112,6 +116,8 @@ export type OrderDetailBundle = {
     titleSnapshot: string | null;
     skuSnapshot: string | null;
     grantedAt: string;
+    /** Delivery readiness — never includes storage paths. */
+    deliveryAvailability: "available" | "unavailable" | "inactive" | "unsupported";
   }[];
 };
 
@@ -456,14 +462,38 @@ async function loadOrderDetail(
       limit: 50,
     });
     if (entitlementList.ok) {
-      digitalEntitlements = entitlementList.entitlements.map((e) => ({
-        id: e.id,
-        orderItemId: e.orderItemId,
-        productId: e.productId,
-        titleSnapshot: e.titleSnapshot,
-        skuSnapshot: e.skuSnapshot,
-        grantedAt: e.grantedAt,
-      }));
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+      const admin =
+        url && key
+          ? createClient(url, key, {
+              auth: { persistSession: false, autoRefreshToken: false },
+            })
+          : null;
+
+      digitalEntitlements = [];
+      for (const e of entitlementList.entitlements) {
+        let deliveryAvailability: DigitalDeliveryAvailability = "unavailable";
+        if (admin) {
+          deliveryAvailability = await resolveDigitalDeliveryAvailability(
+            admin,
+            {
+              productId: e.productId,
+              storeId: e.storeId,
+              entitlementStatus: e.status,
+            }
+          );
+        }
+        digitalEntitlements.push({
+          id: e.id,
+          orderItemId: e.orderItemId,
+          productId: e.productId,
+          titleSnapshot: e.titleSnapshot,
+          skuSnapshot: e.skuSnapshot,
+          grantedAt: e.grantedAt,
+          deliveryAvailability,
+        });
+      }
     } else {
       digitalEntitlements = [];
     }

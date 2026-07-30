@@ -12,6 +12,7 @@ import {
 import { updateSellerOrderStatus } from "../../lib/store/orders";
 import { sellerTransitionPaymentBlocked } from "../../lib/store/sellerOrdersPresentation";
 import { buyerCancelStoreOrder } from "../../lib/store/commerceSafetyQueries";
+import { mintBuyerDigitalAccessSignedUrl } from "../../lib/store/digitalAccessDelivery";
 import { getMembership } from "../../lib/store/sellerStore";
 import { APP_ROUTES, buildSellerOrderHref, buildStoreOrderHref } from "../lib/nav";
 import type { FulfillmentStatus, OrderStatus } from "../../lib/store/types";
@@ -175,4 +176,31 @@ export async function buyerCancelOrderAction(orderId: string) {
     revalidatePath(buildStoreOrderHref(id));
   }
   return result;
+}
+
+export async function mintBuyerDigitalAccessAction(entitlementId: string) {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false as const,
+      code: "unauthenticated" as const,
+      message: "Sign in required to open digital access.",
+      requiresAuth: true as const,
+    };
+  }
+
+  const id = typeof entitlementId === "string" ? entitlementId.trim() : "";
+  if (!id) {
+    return {
+      ok: false as const,
+      code: "invalid_entitlement_id" as const,
+      message: "Invalid digital entitlement.",
+    };
+  }
+
+  const supabase = await createClient();
+  return mintBuyerDigitalAccessSignedUrl(supabase, {
+    entitlementId: id,
+    userId: user.id,
+  });
 }

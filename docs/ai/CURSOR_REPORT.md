@@ -1,42 +1,42 @@
-﻿# CURSOR_REPORT — Commerce Post-Capture Settlement Release V1
+﻿# CURSOR_REPORT — Commerce Buyer Digital Access Delivery V1
 
 ## Summary
 
-After trusted Stripe capture Sync + settlement allocate + digital entitlement
-grant, invokes Settlement Foundation `release` so seller funds move from store
-escrow to payable. No migration. No commit/push/remote apply. Base `dd27b3a…`
-unchanged as tip parent.
+Entitlement-gated short-lived signed access for paid digital products on the
+buyer order detail surface. Local migration `20260878` only — not applied.
+No commit/push. Base `98ae6ca…` unchanged as tip parent.
 
 ## Exact files changed
 
-- `lib/store/postCaptureSettlementRelease.ts` (new)
-- `lib/store/postCaptureSettlementRelease.test.ts` (new)
-- `lib/store/stripePaymentOutcomeApply.ts`
-- `lib/store/postCaptureSettlementAllocate.ts` (comment only)
-- `lib/store/postCaptureSettlementAllocate.test.ts`
+- `supabase/migrations/20260878_store_digital_access_delivery_v1.sql` (new)
+- `lib/store/digitalAccessDelivery.ts` (new)
+- `lib/store/digitalAccessDelivery.test.ts` (new)
+- `lib/store/mediaConstants.ts`
+- `lib/store/orders.ts`
 - `lib/store/digitalEntitlementGrant.test.ts`
-- `lib/store/livePaymentCaptureAdapter.test.ts`
-- `app/api/store/payments/stripe/webhook/route.ts`
-- `docs/store/implementation/POST_CAPTURE_SETTLEMENT_RELEASE_V1.md` (new)
+- `app/actions/storeOrders.ts`
+- `app/components/store/BuyerDigitalAccessButton.tsx` (new)
+- `app/components/store/OrderDetailView.tsx`
+- `docs/store/implementation/BUYER_DIGITAL_ACCESS_DELIVERY_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+`supabase/migrations/20260878_store_digital_access_delivery_v1.sql` (local only; not applied)
 
 ## Security review
 
-- Release runs only on server-side service-role path after Sync
-- Release gated on allocate success **and** entitlement grant success
-- Non-captured outcomes skip release
-- Client checkout/actions have no settlement RPC access
-- Money/correlation from trusted capture inputs; Settlement RPC re-validates
-- Failure returns `release.status=failed` (never falsely `released`)
+- Mint requires authenticated buyer + active own entitlement (session RLS)
+- Service-role signs only after product_type=digital, active asset, owned path
+- Client may pass entitlement id only — no storage path/bucket/product forge
+- Signed URL TTL = 15 minutes (matches catalog media bound)
+- Response never includes storage_path or secrets
+- Delivery does not mutate entitlement/payment/settlement
 
 ## Tests
 
-Focused suites: **239 passed** (15 files)
+Focused Commerce suites: **226 passed** (14 files)
 
 ## TypeScript
 
@@ -56,5 +56,6 @@ Uncommitted local WIP on base tip (see Final Verification Report).
 
 ## Open issues
 
-- Await commit / push GO
-- bank payouts / refunds / download CDN remain deferred
+- Await commit / push / apply GO for `20260878`
+- Seller digital-asset upload UX remains deferred
+- CDN/library product, payouts, refunds remain deferred
