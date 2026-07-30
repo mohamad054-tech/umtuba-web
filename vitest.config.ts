@@ -32,6 +32,7 @@ export default defineConfig({
       "lib/learning/**/*.test.ts",
       "lib/ai/**/*.test.ts",
       "lib/i18n/**/*.test.ts",
+      "lib/translationStudio/**/*.test.ts",
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",

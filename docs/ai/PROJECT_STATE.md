@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/platform-app-shell-translation-v1` (from I18n Foundation `6528202`)
-- **Task:** Arabic + English App Shell Translation V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-platform-app-shell-translation-v1`
-- **Prior:** I18n Foundation closed @ `6528202` on `office/platform-internationalization-foundation-v1`
+- **Branch:** `office/platform-translation-studio-foundation-v1` (from App Shell `0d181604`)
+- **Task:** Translation Studio Foundation V1 — **implementation complete; staged; not committed**
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-foundation-v1`
+- **Prior:** App Shell Translation closed @ `0d181604`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -36,8 +36,9 @@
 
 | Track | Status |
 | --- | --- |
-| Platform Internationalization Foundation V1 | Committed + pushed @ `6528202` (`0 0`) |
-| Arabic + English App Shell Translation V1 | Staged on `office/platform-app-shell-translation-v1` (awaiting commit GO) |
+| Platform Internationalization Foundation V1 | Committed + pushed |
+| Arabic + English App Shell Translation V1 | Committed + pushed @ `0d181604` (`0 0`) |
+| Translation Studio Foundation V1 | Staged on `office/platform-translation-studio-foundation-v1` (awaiting commit GO) |
 | Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters on feature tips |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |

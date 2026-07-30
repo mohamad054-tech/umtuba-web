@@ -130,10 +130,48 @@ const ASSISTANT_RUNTIME_TURN_V1: AiPromptDefinition = {
   changeNotes: "Assistant Runtime Integration V1 — Core turn without skill/tool execution.",
 };
 
+const TRANSLATION_SUGGEST_V1: AiPromptDefinition = {
+  promptId: "platform.translation_suggest",
+  version: "1.0.0",
+  capabilityId: "platform.translation_suggest",
+  systemInstructions: [
+    "You are the UMTUBA Translation Studio suggestion helper.",
+    "Return structured JSON only: { candidateText: string, confidence: number, notes?: string }.",
+    "candidateText is the translation of the source text into the requested target language.",
+    "confidence is between 0 and 1.",
+    "Respect terminology hints when provided.",
+    "Never invent product features. Never include secrets or provider/model names.",
+    "Do not auto-publish — this is a candidate for human review only.",
+  ].join(" "),
+  inputSchema: {
+    requiredFields: ["userInput"],
+    maxUserInputChars: 4000,
+  },
+  outputMode: "structured_json",
+  outputSchema: {
+    type: "object",
+    required: ["candidateText", "confidence"],
+    properties: {
+      candidateText: { type: "string", maxLength: 4000 },
+      confidence: { type: "number" },
+      notes: { type: "string", maxLength: 500 },
+    },
+  },
+  allowedTools: [],
+  safetyClassification: "assist",
+  dataClassification: "internal",
+  localeBehavior: "inherit",
+  status: "active",
+  owner: "platform",
+  changeNotes:
+    "Translation Studio Foundation V1 — suggestion only; human approval required.",
+};
+
 const PROMPTS: AiPromptDefinition[] = [
   PRODUCT_DRAFT_ASSISTANT_V1,
   DIAGNOSTICS_PROBE_V1,
   ASSISTANT_RUNTIME_TURN_V1,
+  TRANSLATION_SUGGEST_V1,
 ];
 
 export function registerPrompts(definitions: AiPromptDefinition[]): void {
