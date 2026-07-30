@@ -3,10 +3,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 
 type ProductEmptyStateProps = {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   eyebrow?: string;
   primaryHref?: string;
   primaryLabel?: string;
@@ -29,14 +30,20 @@ export default function ProductEmptyState({
   description,
   eyebrow = "UMTUBA",
   primaryHref = APP_ROUTES.discover,
-  primaryLabel = "Open Discover",
+  primaryLabel,
   secondaryHref = APP_ROUTES.live,
-  secondaryLabel = "Browse Live",
+  secondaryLabel,
   compact = false,
   onPrimaryAction,
   primaryBusy = false,
   children,
 }: ProductEmptyStateProps) {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("empty.title");
+  const resolvedDescription = description ?? t("empty.description");
+  const resolvedPrimaryLabel = primaryLabel ?? t("nav.discover");
+  const resolvedSecondaryLabel = secondaryLabel ?? t("nav.live");
+
   const card = (
     <div
       className={`w-full max-w-md rounded-[28px] border border-dashed border-white/15 bg-[#080816]/85 px-6 py-8 text-center backdrop-blur-xl ${
@@ -48,11 +55,11 @@ export default function ProductEmptyState({
         {eyebrow}
       </p>
       {compact ? (
-        <h2 className="mt-3 text-xl font-black tracking-tight">{title}</h2>
+        <h2 className="mt-3 text-xl font-black tracking-tight">{resolvedTitle}</h2>
       ) : (
-        <h1 className="mt-3 text-2xl font-black tracking-tight">{title}</h1>
+        <h1 className="mt-3 text-2xl font-black tracking-tight">{resolvedTitle}</h1>
       )}
-      <p className="mt-3 text-sm leading-7 text-white/55">{description}</p>
+      <p className="mt-3 text-sm leading-7 text-white/55">{resolvedDescription}</p>
 
       <div className="mt-7 flex flex-col gap-2 sm:flex-row sm:justify-center">
         {onPrimaryAction ? (
@@ -62,22 +69,22 @@ export default function ProductEmptyState({
             disabled={primaryBusy}
             className="watch-focus-ring inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90 disabled:opacity-50"
           >
-            {primaryBusy ? "Working…" : primaryLabel}
+            {primaryBusy ? t("status.working") : resolvedPrimaryLabel}
           </button>
         ) : (
           <Link
             href={primaryHref}
             className="watch-focus-ring inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
           >
-            {primaryLabel}
+            {resolvedPrimaryLabel}
           </Link>
         )}
-        {secondaryHref && secondaryLabel ? (
+        {secondaryHref && resolvedSecondaryLabel ? (
           <Link
             href={secondaryHref}
             className="watch-focus-ring inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10"
           >
-            {secondaryLabel}
+            {resolvedSecondaryLabel}
           </Link>
         ) : null}
       </div>

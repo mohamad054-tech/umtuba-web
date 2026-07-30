@@ -2,7 +2,9 @@
 
 ## Status
 
-Implementation complete on `office/platform-internationalization-foundation-v1` (staged; awaiting commit GO).
+I18n foundation closed @ `6528202`.
+**Active:** Arabic + English App Shell Translation V1 on
+`office/platform-app-shell-translation-v1`.
 
 ## Goal
 
@@ -58,7 +60,7 @@ Request
 ## Deferred
 
 - Full product-surface translation
-- Settings screen wiring of `LanguageSelector`
+- FR/ES/DE/PT App Shell string pass (shell keys currently inherit English)
 - DB persistence of user locale
 - Locale URL prefixes
 - AI provider / Learning / Commerce copy

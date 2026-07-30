@@ -1,6 +1,9 @@
+import { enMessages } from "./en";
 import type { FoundationMessages } from "./types";
 
+/** Spanish: foundation keys localized; App Shell keys inherit English until ES shell pass. */
 export const esMessages: FoundationMessages = {
+  ...enMessages,
   "languages.ar": "Árabe",
   "languages.en": "Inglés",
   "languages.fr": "Francés",
@@ -17,6 +20,5 @@ export const esMessages: FoundationMessages = {
   "status.empty": "Todavía no hay nada aquí.",
   "status.error": "Algo salió mal. Inténtalo de nuevo.",
   "settings.language": "Idioma",
-  "settings.languageDescription":
-    "Elige el idioma usado en UMTUBA.",
+  "settings.languageDescription": "Elige el idioma usado en UMTUBA.",
 };

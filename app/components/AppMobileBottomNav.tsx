@@ -15,6 +15,8 @@ import {
   shouldShowMobileBottomNav,
   type MobilePrimaryNavId,
 } from "../lib/nav/mobileNav";
+import { mobileNavLabelKey } from "../../lib/i18n";
+import { useTranslation } from "./i18n";
 
 function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
   const stroke = active ? "currentColor" : "currentColor";
@@ -65,6 +67,7 @@ function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
 export default function AppMobileBottomNav() {
   const pathname = usePathname() || "/";
   const visible = shouldShowMobileBottomNav(pathname);
+  const { t } = useTranslation();
   const [profileUsername, setProfileUsername] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState(false);
 
@@ -134,7 +137,7 @@ export default function AppMobileBottomNav() {
 
   return (
     <nav
-      aria-label="Primary mobile"
+      aria-label={t("nav.primaryMobile")}
       className={`fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-1 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
@@ -144,13 +147,14 @@ export default function AppMobileBottomNav() {
               ? resolveMobileProfileHref(profileUsername, { signedIn })
               : item.href;
           const active = isMobilePrimaryNavActive(pathname, item.id);
+          const label = t(mobileNavLabelKey(item.id));
 
           return (
             <li key={item.id} className="min-w-0 flex-1">
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                aria-label={item.label}
+                aria-label={label}
                 className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${
                   active
                     ? "text-blue-100"
@@ -164,7 +168,7 @@ export default function AppMobileBottomNav() {
                 >
                   <NavIcon id={item.id} active={active} />
                 </span>
-                <span className="truncate">{item.label}</span>
+                <span className="truncate">{label}</span>
               </Link>
             </li>
           );

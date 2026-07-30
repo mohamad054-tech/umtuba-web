@@ -1,6 +1,9 @@
+import { enMessages } from "./en";
 import type { FoundationMessages } from "./types";
 
+/** French: foundation keys localized; App Shell keys inherit English until FR shell pass. */
 export const frMessages: FoundationMessages = {
+  ...enMessages,
   "languages.ar": "Arabe",
   "languages.en": "Anglais",
   "languages.fr": "Français",

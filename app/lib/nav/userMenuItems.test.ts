@@ -86,7 +86,7 @@ describe("userMenuItems — Capability Links V1", () => {
     );
     expect(src).toMatch(/buildUserMenuGroups/);
     expect(src).toMatch(/resolveUserMenuCapabilities/);
-    expect(src).toMatch(/aria-label=\{"Account menu"\}|aria-label="Account menu"/);
+    expect(src).toMatch(/menu\.accountMenu/);
     expect(src).toMatch(/role="menuitem"/);
     expect(src).not.toMatch(/Feed V1|Video V1|Accounts V1/);
   });

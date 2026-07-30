@@ -1,6 +1,7 @@
 "use client";
 
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
+import { useTranslation } from "../i18n";
 
 type ProductErrorStateProps = {
   title?: string;
@@ -12,16 +13,17 @@ type ProductErrorStateProps = {
 };
 
 export default function ProductErrorState({
-  title = "Something went wrong",
+  title,
   message = null,
   onRetry,
-  retryLabel = "Try again",
+  retryLabel,
   retryBusy = false,
   compact = false,
 }: ProductErrorStateProps) {
+  const { t } = useTranslation();
   const safeMessage = sanitizeUserFacingMessage(
     message,
-    "Couldn't complete that request. Please try again."
+    t("error.description")
   );
 
   return (
@@ -31,7 +33,9 @@ export default function ProductErrorState({
       }`}
       role="alert"
     >
-      <p className="text-xl font-black text-red-200">{title}</p>
+      <p className="text-xl font-black text-red-200">
+        {title ?? t("error.title")}
+      </p>
       <p className="mt-3 text-sm leading-6 text-white/60">{safeMessage}</p>
       {onRetry ? (
         <button
@@ -40,7 +44,9 @@ export default function ProductErrorState({
           disabled={retryBusy}
           className="watch-focus-ring mt-6 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white/85 transition hover:bg-white/10 disabled:opacity-50"
         >
-          {retryBusy ? "Retrying…" : retryLabel}
+          {retryBusy
+            ? t("status.retrying")
+            : (retryLabel ?? t("error.tryAgain"))}
         </button>
       ) : null}
     </div>
