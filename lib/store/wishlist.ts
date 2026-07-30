@@ -1,5 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { enrichPublicCatalogRow } from "./catalogQueries";
+import {
+  enrichCatalogItemAsSellerListing,
+  enrichPublicCatalogRow,
+} from "./catalogQueries";
+import {
+  assertOptionalSellerListingId,
+  catalogItemBuyerPdpPath,
+} from "./listingProvenance";
 import { isPubliclyVisibleProduct } from "./permissions";
 import type { PublicCatalogItem, StoreProductRow, StoreRow } from "./types";
 
@@ -26,6 +33,9 @@ function normalizeProductId(raw: unknown): string | null {
  * List a user's saved products. Fail-closed: any product that is no longer
  * publicly visible (unpublished, unapproved, store suspended, etc.) is
  * silently dropped rather than shown broken.
+ *
+ * When `seller_listing_id` is present, re-enrich as the seller storefront
+ * listing. Invalid listing provenance is dropped (no silent owned fallback).
  */
 export async function listWishlist(
   supabase: AnyClient,
@@ -41,6 +51,7 @@ export async function listWishlist(
       id,
       created_at,
       product_id,
+      seller_listing_id,
       store_products!inner (
         *,
         stores!inner ( id, slug, name, logo_path, status )
@@ -75,10 +86,32 @@ export async function listWishlist(
       continue;
     }
 
+    const listingIdRaw = (row as { seller_listing_id?: unknown })
+      .seller_listing_id;
+    const listingAssert = assertOptionalSellerListingId(listingIdRaw);
+    if (!listingAssert.ok) {
+      continue;
+    }
+
+    let item: PublicCatalogItem;
+    if (listingAssert.sellerListingId) {
+      const listed = await enrichCatalogItemAsSellerListing(supabase, {
+        product,
+        sellerListingId: listingAssert.sellerListingId,
+      });
+      if (!listed) {
+        // Listing no longer valid — do not silently rewrite to owned supplier PDP.
+        continue;
+      }
+      item = listed;
+    } else {
+      item = await enrichPublicCatalogRow(supabase, product);
+    }
+
     entries.push({
       wishlistItemId: row.id as string,
       wishlistedAt: row.created_at as string,
-      item: await enrichPublicCatalogRow(supabase, product),
+      item,
     });
   }
 
@@ -89,29 +122,71 @@ export async function listWishlist(
 export async function addToWishlist(
   supabase: AnyClient,
   userId: string,
-  productIdRaw: unknown
+  productIdRaw: unknown,
+  sellerListingIdRaw?: unknown
 ): Promise<WishlistActionResult<{ id: string }>> {
   const productId = normalizeProductId(productIdRaw);
   if (!productId) {
     return { ok: false, message: "Product is invalid." };
   }
 
+  const listingAssert = assertOptionalSellerListingId(sellerListingIdRaw);
+  if (!listingAssert.ok) {
+    return { ok: false, message: listingAssert.message };
+  }
+  const sellerListingId = listingAssert.sellerListingId;
+
+  if (sellerListingId) {
+    const { data: listing } = await supabase
+      .from("store_seller_listings")
+      .select("id, status, source_product_id, seller_store_id")
+      .eq("id", sellerListingId)
+      .maybeSingle();
+    if (
+      !listing ||
+      listing.status !== "active" ||
+      String(listing.source_product_id) !== productId
+    ) {
+      return { ok: false, message: "Listing identity is invalid." };
+    }
+    const { data: allowed } = await supabase.rpc(
+      "store_listing_allows_seller_sale",
+      {
+        p_seller_store_id: listing.seller_store_id,
+        p_product_id: productId,
+        p_listing_id: sellerListingId,
+      }
+    );
+    if (allowed !== true) {
+      return { ok: false, message: "Listing identity is invalid." };
+    }
+  }
+
   const { data, error } = await supabase
     .from("store_wishlist_items")
-    .insert({ user_id: userId, product_id: productId })
+    .insert({
+      user_id: userId,
+      product_id: productId,
+      seller_listing_id: sellerListingId,
+    })
     .select("id")
     .single();
 
   if (error) {
     if (error.code === "23505") {
-      // Already saved — treat as success (idempotent add).
-      const { data: existing } = await supabase
+      // Already saved — update listing stamp (last write wins) and treat as success.
+      const { data: existing, error: updateError } = await supabase
         .from("store_wishlist_items")
-        .select("id")
+        .update({ seller_listing_id: sellerListingId })
         .eq("user_id", userId)
         .eq("product_id", productId)
+        .select("id")
         .maybeSingle();
-      if (existing) return { ok: true, data: { id: existing.id as string } };
+      if (updateError || !existing) {
+        console.error("addToWishlist update", updateError);
+        return { ok: false, message: "Unable to save this product." };
+      }
+      return { ok: true, data: { id: existing.id as string } };
     }
     console.error("addToWishlist", error);
     return { ok: false, message: "Unable to save this product." };
@@ -163,4 +238,12 @@ export async function isProductWishlisted(
     .maybeSingle();
 
   return Boolean(data);
+}
+
+/** Buyer PDP href for a wishlist/catalog entry (uses enriched store slug). */
+export function wishlistEntryBuyerPdpPath(entry: WishlistEntry): string {
+  return catalogItemBuyerPdpPath({
+    storeSlug: entry.item.store.slug,
+    productSlug: entry.item.product.slug,
+  });
 }

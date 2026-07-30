@@ -19,6 +19,7 @@ export type WishlistToggleResult =
  */
 export async function toggleWishlistAction(input: {
   productId: unknown;
+  sellerListingId?: unknown;
 }): Promise<WishlistToggleResult> {
   const user = await getServerUser();
   if (!user) {
@@ -38,7 +39,12 @@ export async function toggleWishlistAction(input: {
 
   const result = currentlyWishlisted
     ? await removeFromWishlist(supabase, user.id, input.productId)
-    : await addToWishlist(supabase, user.id, input.productId);
+    : await addToWishlist(
+        supabase,
+        user.id,
+        input.productId,
+        input.sellerListingId
+      );
 
   if (!result.ok) {
     return { ok: false, message: result.message };

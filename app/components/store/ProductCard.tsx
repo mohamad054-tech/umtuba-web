@@ -88,6 +88,7 @@ export default function ProductCard({
           <div className="pointer-events-auto absolute right-3 top-3 z-20">
             <WishlistButton
               productId={item.product.id}
+              sellerListingId={item.sellerListingId ?? null}
               initialWishlisted={false}
               nextHref={href}
               className="watch-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40 text-base text-white backdrop-blur-sm transition hover:bg-black/55"

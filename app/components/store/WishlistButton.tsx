@@ -7,6 +7,8 @@ import { APP_ROUTES } from "../../lib/nav";
 
 type WishlistButtonProps = {
   productId: string;
+  /** Marketplace listing provenance when saving from a listing PDP/card. */
+  sellerListingId?: string | null;
   initialWishlisted: boolean;
   /** Where to send the user back after signing in. */
   nextHref?: string;
@@ -24,6 +26,7 @@ const DEFAULT_CLASS =
  */
 export default function WishlistButton({
   productId,
+  sellerListingId = null,
   initialWishlisted,
   nextHref,
   onToggled,
@@ -46,7 +49,10 @@ export default function WishlistButton({
           event.stopPropagation();
           setError(null);
           startTransition(async () => {
-            const result = await toggleWishlistAction({ productId });
+            const result = await toggleWishlistAction({
+              productId,
+              sellerListingId,
+            });
             if (!result.ok) {
               if (result.requiresAuth) {
                 router.push(

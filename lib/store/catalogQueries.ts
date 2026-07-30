@@ -534,11 +534,29 @@ async function buildPublicProductDetail(
  * Resolve a product by id to its canonical slug PDP location.
  * Used by the `/store/products/[productId]` id-based redirect route
  * (e.g. links shared from Watch/wishlist that only carry a UUID).
+ *
+ * When `sellerListingId` is provided, resolve the **seller storefront** for
+ * that listing (fail closed — never silently fall back to the owner store).
  */
 export async function getPublicProductById(
   supabase: AnyClient,
-  productId: string
-): Promise<{ storeSlug: string; productSlug: string } | null> {
+  productId: string,
+  options?: { sellerListingId?: string | null }
+): Promise<{
+  storeSlug: string;
+  productSlug: string;
+  sellerListingId: string | null;
+} | null> {
+  const listingId =
+    typeof options?.sellerListingId === "string" &&
+    options.sellerListingId.trim()
+      ? options.sellerListingId.trim()
+      : null;
+
+  if (listingId) {
+    return resolvePublicProductByListingId(supabase, productId, listingId);
+  }
+
   const { data, error } = await supabase
     .from("store_products")
     .select(
@@ -566,7 +584,151 @@ export async function getPublicProductById(
     return null;
   }
 
-  return { storeSlug: store.slug, productSlug: data.slug as string };
+  return {
+    storeSlug: store.slug,
+    productSlug: data.slug as string,
+    sellerListingId: null,
+  };
+}
+
+/**
+ * Fail-closed listing-aware id resolution. Invalid / inactive / mismatched
+ * listing identity returns null (no owned-store fallback).
+ */
+export async function resolvePublicProductByListingId(
+  supabase: AnyClient,
+  productId: string,
+  sellerListingId: string
+): Promise<{
+  storeSlug: string;
+  productSlug: string;
+  sellerListingId: string;
+} | null> {
+  const { data: listing, error: listingError } = await supabase
+    .from("store_seller_listings")
+    .select(
+      "id, status, source_product_id, seller_store_id, supplier_store_id"
+    )
+    .eq("id", sellerListingId)
+    .maybeSingle();
+
+  if (listingError || !listing) return null;
+  if (listing.status !== "active") return null;
+  if (String(listing.source_product_id) !== productId) return null;
+
+  const { data: product, error: productError } = await supabase
+    .from("store_products")
+    .select("id, slug, status, moderation_status")
+    .eq("id", productId)
+    .maybeSingle();
+
+  if (productError || !product) return null;
+
+  const { data: sellerStore, error: sellerError } = await supabase
+    .from("stores")
+    .select("id, slug, status")
+    .eq("id", listing.seller_store_id)
+    .eq("status", "active")
+    .maybeSingle();
+
+  if (sellerError || !sellerStore) return null;
+
+  if (
+    !isPubliclyVisibleProduct({
+      productStatus: product.status as string,
+      moderationStatus: product.moderation_status as string,
+      storeStatus: sellerStore.status as string,
+    })
+  ) {
+    return null;
+  }
+
+  const { data: allowed } = await supabase.rpc(
+    "store_listing_allows_seller_sale",
+    {
+      p_seller_store_id: sellerStore.id,
+      p_product_id: productId,
+      p_listing_id: sellerListingId,
+    }
+  );
+  if (allowed !== true) return null;
+
+  return {
+    storeSlug: sellerStore.slug as string,
+    productSlug: product.slug as string,
+    sellerListingId,
+  };
+}
+
+/**
+ * Re-enrich a catalog item as a validated supplier listing on the seller store.
+ * Returns null when listing provenance is invalid (fail closed — do not invent).
+ */
+export async function enrichCatalogItemAsSellerListing(
+  supabase: AnyClient,
+  input: {
+    product: StoreProductRow;
+    sellerListingId: string;
+  }
+): Promise<PublicCatalogItem | null> {
+  const { data: listing } = await supabase
+    .from("store_seller_listings")
+    .select(
+      "id, status, source_product_id, seller_store_id, supplier_store_id, display_title_override"
+    )
+    .eq("id", input.sellerListingId)
+    .maybeSingle();
+
+  if (!listing || listing.status !== "active") return null;
+  if (String(listing.source_product_id) !== input.product.id) return null;
+
+  const sellerStore = await supabase
+    .from("stores")
+    .select("id, slug, name, logo_path, status")
+    .eq("id", listing.seller_store_id)
+    .eq("status", "active")
+    .maybeSingle();
+
+  const store = sellerStore.data as Pick<
+    StoreRow,
+    "id" | "slug" | "name" | "logo_path" | "status"
+  > | null;
+  if (!store) return null;
+
+  if (
+    !isPubliclyVisibleProduct({
+      productStatus: input.product.status,
+      moderationStatus: input.product.moderation_status,
+      storeStatus: store.status,
+    })
+  ) {
+    return null;
+  }
+
+  const { data: allowed } = await supabase.rpc(
+    "store_listing_allows_seller_sale",
+    {
+      p_seller_store_id: store.id,
+      p_product_id: input.product.id,
+      p_listing_id: input.sellerListingId,
+    }
+  );
+  if (allowed !== true) return null;
+
+  const enriched = await enrichPublicCatalogRow(supabase, {
+    ...input.product,
+    stores: store,
+  });
+  if (listing.display_title_override) {
+    enriched.product = {
+      ...enriched.product,
+      title: String(listing.display_title_override),
+    };
+  }
+  enriched.sellerListingId = String(listing.id);
+  enriched.supplierStoreId = String(listing.supplier_store_id);
+  enriched.marketplaceSourceType = "supplier_listing";
+  return enriched;
 }
 
 /**

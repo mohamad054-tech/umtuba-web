@@ -427,6 +427,7 @@ export default function ProductDetailClient({
             </button>
             <WishlistButton
               productId={detail.product.id}
+              sellerListingId={detail.sellerListingId ?? null}
               initialWishlisted={initialWishlisted}
               nextHref={`/store/${detail.store.slug}/product/${detail.product.slug}`}
               className="watch-focus-ring flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border border-[var(--sf-line)] bg-white/5 text-xl text-white transition hover:bg-white/10"

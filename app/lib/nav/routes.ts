@@ -276,9 +276,17 @@ function sanitizeIdSegment(id: string): string {
 /**
  * Id-based product link (e.g. from a wishlist row or a shoppable video
  * attachment) — resolves server-side to the canonical slug PDP.
+ * Optional `sellerListingId` preserves marketplace provenance via `?listing=`.
  */
-export function buildStoreProductIdHref(productId: string): string {
-  return `${APP_ROUTES.store}/products/${sanitizeIdSegment(productId)}`;
+export function buildStoreProductIdHref(
+  productId: string,
+  sellerListingId?: string | null
+): string {
+  const base = `${APP_ROUTES.store}/products/${sanitizeIdSegment(productId)}`;
+  const listing =
+    typeof sellerListingId === "string" ? sellerListingId.trim() : "";
+  if (!listing || !PRODUCT_ID_RE.test(listing)) return base;
+  return `${base}?listing=${encodeURIComponent(listing)}`;
 }
 
 /**

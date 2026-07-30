@@ -60,20 +60,25 @@ describe("wishlist adapter", () => {
       data: null,
       error: { code: "23505", message: "duplicate" },
     });
-    const existingChain = createChain({
+    const updateChain = createChain({
       data: { id: WISHLIST_ID },
       error: null,
     });
+    // Prefer update() on the duplicate path (listing stamp refresh).
+    (updateChain as { update: unknown }).update = vi.fn(() => updateChain);
     let calls = 0;
     const supabase = {
       from: vi.fn(() => {
         calls += 1;
-        return calls === 1 ? insertChain : existingChain;
+        return calls === 1 ? insertChain : updateChain;
       }),
     };
 
     const result = await addToWishlist(supabase as never, USER_ID, PRODUCT_ID);
     expect(result).toEqual({ ok: true, data: { id: WISHLIST_ID } });
+    expect((updateChain as { update: ReturnType<typeof vi.fn> }).update).toHaveBeenCalledWith({
+      seller_listing_id: null,
+    });
   });
 
   it("removeFromWishlist succeeds when delete has no error", async () => {

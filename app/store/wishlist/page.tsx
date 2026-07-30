@@ -56,6 +56,7 @@ export default async function StoreWishlistPage() {
               <div className="absolute right-3 top-3">
                 <WishlistButton
                   productId={entry.item.product.id}
+                  sellerListingId={entry.item.sellerListingId ?? null}
                   initialWishlisted={true}
                   nextHref={APP_ROUTES.storeWishlist}
                 />

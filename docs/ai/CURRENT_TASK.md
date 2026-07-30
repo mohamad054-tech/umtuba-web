@@ -2,29 +2,56 @@
 
 ## Task title
 
-Commerce End-to-End Beta Readiness V1
+Commerce Marketplace Listing Provenance Hardening V1
 
 ## Status
 
-`complete`
+`implementation-complete-local` — tests + tsc green; awaiting manual review / trailer-free commit / push / migration apply GO
+
+## Worktree (USE THIS TOMORROW)
+
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-listing-provenance-v1`
 
 ## Branch
 
-`office/commerce-end-to-end-beta-readiness-v1`
+`office/commerce-marketplace-listing-provenance-hardening-v1`
 
-## Base
+## Base / HEAD
 
-Trusted marketplace eligibility commit `6ed5eb611f044571ad8b6f32b8a10201c56f9df0`
-Parent branch: `office/commerce-marketplace-eligibility-listing-storefront-v1`
+`6cbe0f68f418141ac887c99bf40e21eb1d0d27de`  
+(`office/commerce-end-to-end-beta-readiness-v1` tip — not advanced; all work is uncommitted)
 
-## Deliverable
+## Machine policy
 
-Stabilize implemented Commerce only: verify customer + seller end-to-end paths, fix small defects (routes, nav, states, auth/RLS usage, money/trading/marketplace/inventory/provenance/UI), run Commerce test suites + tsc + production build, deliver Beta Readiness Report. No Shipping Network, Payment Provider, Warehouse Runtime, Payouts, Settlement UI, or Analytics Warehouse. No frozen Commerce architecture edits. No new product domains.
+- **This laptop = Commerce only**
+- Desktop = sole AI source of truth
+- Do **not** continue AI / Tutor / Gemini / Provider work on this laptop
+- Do **not** checkout inside the dirty AI worktree
 
-## Out of scope
+## Delivered (uncommitted)
 
-New major Commerce features; architecture redesign; payment/warehouse/shipping/payouts.
+- Migration (local only): `20260875_store_marketplace_listing_provenance_hardening_v1.sql`
+- Wishlist `seller_listing_id` persist + fail-closed reload enrichment
+- Id-PDP `?listing=` resolve to seller storefront (no silent owned fallback)
+- UI passes `sellerListingId` (ProductCard / PDP / wishlist)
+- Docs: `docs/store/implementation/LISTING_PROVENANCE_HARDENING_V1.md`
+- Tests: focused Commerce suites **71 passed**; `tsc --noEmit` **pass**
+- `node_modules` = **junction** → `C:\Users\Admin\Desktop\umtuba\umtuba-web\node_modules`  
+  (do not `npm install` / `npm ci` blindly while shared)
 
-## Result
+## Forbidden / deferred
 
-**Ready for Beta** at **90%** (implemented scope). Report: `docs/ai/CURSOR_REPORT.md`. Residual: wishlist/id-PDP listing provenance; payment/shipping deferred.
+- Commit / push / remote migration apply without GO
+- `npm run build` (skipped; optional later)
+- Payment / shipping carrier / commission / affiliate / supplier portal / AI
+
+## Next GO options (tomorrow)
+
+1. Manual review + trailer-free commit
+2. Push branch
+3. Apply migration `20260875` only (targeted SQL + repair) — separate GO
+
+## Do NOT open for Commerce work
+
+`C:\Users\Admin\Desktop\umtuba\umtuba-web`  
+→ AI branch `office/learning-ai-tutor-thread-lesson-binding-v1` @ `9e90448` with dirty AI files — leave untouched
