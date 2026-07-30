@@ -1,53 +1,56 @@
-﻿# CURSOR_REPORT — Commerce Live Payment Capture Adapter V1
+﻿# CURSOR_REPORT — Commerce Post-Capture Settlement Allocate V1
 
 ## Summary
 
-Build gate cleared on `office/commerce-live-payment-capture-adapter-v1`
-(worktree `umtuba-web-commerce-live-payment-capture-v1`), base `3a369b57`.
-
-Replaced worktree `node_modules` junction with local `npm ci`. Standard
-`npm run build` **PASS**. Focused suites **149**, `tsc` **pass**,
-`git diff --check` **pass**. No commit / push / remote apply. No scope expansion.
+Wired trusted Stripe capture into Settlement Foundation `allocate` so captured
+digital funds leave platform liability into store escrow. No migration. No
+commit/push/remote apply. Base `0bde81d…` unchanged as tip parent.
 
 ## Exact files changed
 
-Unchanged from prior Commerce slice (no new implementation in this build-gate pass):
-
-Modified: `CheckoutClient.tsx`, `payments.ts`, `paymentOutcomeSync.test.ts`,
-`docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
-
-New: Stripe actions/routes/libs, `LIVE_PAYMENT_CAPTURE_ADAPTER_V1.md`,
-`20260876_…sql`
+- `lib/store/postCaptureSettlementAllocate.ts` (new)
+- `lib/store/postCaptureSettlementAllocate.test.ts` (new)
+- `lib/store/stripePaymentOutcomeApply.ts`
+- `lib/store/livePaymentCaptureAdapter.test.ts`
+- `app/api/store/payments/stripe/webhook/route.ts`
+- `docs/store/implementation/POST_CAPTURE_SETTLEMENT_ALLOCATE_V1.md` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-`supabase/migrations/20260876_store_live_payment_capture_adapter_v1.sql` — local only, not applied.
+None.
 
 ## Security review
 
-Unchanged — runtime fail-closed Stripe config; no fake secrets added for build.
+- Allocate runs only on server-side service-role path after Sync
+- Client checkout/actions have no settlement RPC access
+- Money/correlation from trusted capture inputs; Settlement RPC re-validates
+  attempt/order/capture match
+- Non-captured outcomes skip allocate
+- Failure returns `settlement.status=failed` (never falsely `allocated`)
 
 ## Tests
 
-Focused Commerce suites: **149 passed**
+Focused suites: **164 passed**
 
 ## TypeScript
 
-`npx tsc --noEmit` — **pass** (after clearing stale `.next` from prior webpack attempt)
+`npx tsc --noEmit` — pass
 
 ## Build
 
-`npm run build` — **PASS** (Turbopack, local non-junction `node_modules`)
+`npm run build` — pass (local non-junction `node_modules` via `npm ci`)
 
 ## git diff --check
 
-**pass**
+pass
 
 ## git status --short
 
-See Build-Gate Report in chat (implementation files only; `node_modules` / `.next` ignored).
+See Final Verification Report.
 
 ## Open issues
 
-- Await commit / push / remote apply `20260876` GO
-- Runtime needs `STRIPE_SECRET_KEY` (`sk_test_`), webhook secret, app origin, service role
+- Await commit / push GO
+- release / payouts / refunds / digital entitlement remain deferred

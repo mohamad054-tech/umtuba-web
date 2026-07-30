@@ -2,36 +2,36 @@
 
 ## Task title
 
-Commerce Live Payment Capture Adapter V1
+Commerce Post-Capture Settlement Allocate V1
 
 ## Status
 
-`build-gate-cleared` — tests + tsc + `npm run build` green; awaiting commit / push / apply GO
+`implementation-complete-local` — awaiting review / commit / push GO
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-live-payment-capture-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-settlement-allocate-v1`
 
 ## Branch
 
-`office/commerce-live-payment-capture-adapter-v1`
+`office/commerce-post-capture-settlement-allocate-v1`
 
 ## Base / HEAD
 
-`3a369b5729cf8a1621daa7c4e064fdfde7183b12` (uncommitted implementation on top)
+Base: `0bde81d75a8c461fb466128c4c8a6f354a209c1a`
+HEAD: uncommitted implementation on top of base
 
 ## Milestone
 
-`commerce.payments.live_capture_adapter_v1` — Stripe test-mode only
+`commerce.settlement.post_capture_allocate_v1`
 
 ## Delivered
 
-- Migration (local): `20260876_store_live_payment_capture_adapter_v1.sql`
-- Stripe Checkout Session create/resume + attach provider_reference
-- Trusted return + signed webhook → `apply_store_payment_outcome`
-- Checkout UI: Pay with Stripe (test) after order
-- Digital-first gate (rejects physical lines)
+- Wire trusted Stripe capture → Settlement Foundation `allocate`
+- Idempotent `${captureEventKey}:allocate` event keys
+- Skip allocate for non-captured outcomes
+- No migration (reuses `apply_store_settlement_event`)
 
 ## Next
 
-Security review → trailer-free commit GO → push GO → apply `20260876` GO
+Review → trailer-free commit GO → push GO (no migration apply)

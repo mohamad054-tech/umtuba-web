@@ -167,5 +167,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     replayed: applied.replayed,
+    settlement: applied.settlement,
   });
 }

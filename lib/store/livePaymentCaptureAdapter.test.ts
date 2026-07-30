@@ -321,6 +321,7 @@ describe("Live payment capture — architecture boundaries", () => {
 
     const apply = read("lib/store/stripePaymentOutcomeApply.ts");
     expect(apply).toMatch(/apply_store_payment_outcome|STORE_PAYMENT_SYNC_RPC/);
+    expect(apply).toMatch(/allocateSettlementAfterTrustedCapture|STORE_SETTLEMENT/);
     expect(apply).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
 
     const webhook = read("app/api/store/payments/stripe/webhook/route.ts");
