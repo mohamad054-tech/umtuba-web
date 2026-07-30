@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "../i18n";
+
 type ProductLoadingStateProps = {
   label?: string;
   /** Full-page centered shell (Suspense fallbacks). */
@@ -8,9 +12,12 @@ type ProductLoadingStateProps = {
  * Branded loading status — polite live region, stable footprint to limit layout shift.
  */
 export default function ProductLoadingState({
-  label = "Loading…",
+  label,
   fullPage = false,
 }: ProductLoadingStateProps) {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t("status.loading");
+
   const pill = (
     <p
       className="inline-flex min-h-11 min-w-[12rem] items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 backdrop-blur"
@@ -18,7 +25,7 @@ export default function ProductLoadingState({
       aria-live="polite"
       aria-busy="true"
     >
-      {label}
+      {resolvedLabel}
     </p>
   );
 

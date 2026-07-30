@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/platform-internationalization-foundation-v1` (from Local Adapter `a462c88`)
-- **Task:** Platform Internationalization Foundation V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-platform-i18n-foundation-v1`
-- **Prior:** Local Adapter closed @ `a462c88` on `office/ai-core-local-adapter-v1`
+- **Branch:** `office/platform-app-shell-translation-v1` (from I18n Foundation `6528202`)
+- **Task:** Arabic + English App Shell Translation V1 — **implementation complete; staged; not committed**
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-platform-app-shell-translation-v1`
+- **Prior:** I18n Foundation closed @ `6528202` on `office/platform-internationalization-foundation-v1`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -25,23 +25,20 @@
 
 - `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
 - `HOME_LOCK_ACTIVE = true`
-- AI product flags default OFF (`UMTUBA_AI_HUB`, `UMTUBA_AI_ASSISTANT_RUNTIME`, `UMTUBA_AI_VIDEO_PERSONALIZATION`)
+- AI product flags default OFF
 - Commerce confirm DB gate default OFF
 
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-Tutor backend capabilities continue on AI Platform branches; Learning UX remains frozen.
 
 ## Integration status
 
 | Track | Status |
 | --- | --- |
-| Unified Revenue Platform Foundation | On alpha |
-| Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
+| Platform Internationalization Foundation V1 | Committed + pushed @ `6528202` (`0 0`) |
+| Arabic + English App Shell Translation V1 | Staged on `office/platform-app-shell-translation-v1` (awaiting commit GO) |
 | Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters on feature tips |
-| AI Core Local / Self-hosted Adapter V1 | Committed + pushed @ `a462c88` (`0 0`) |
-| Platform Internationalization Foundation V1 | Staged on `office/platform-internationalization-foundation-v1` (awaiting commit GO) |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |
 

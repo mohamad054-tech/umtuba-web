@@ -42,3 +42,10 @@ export {
 
 export type { FoundationMessages, TranslationKey } from "./messages/types";
 export { MESSAGE_CATALOGS, getMessageCatalog } from "./messages/catalogs";
+
+export {
+  desktopNavLabelKey,
+  mobileNavLabelKey,
+  userMenuGroupLabelKey,
+  userMenuItemLabelKey,
+} from "./shellLabels";

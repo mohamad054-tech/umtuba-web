@@ -134,6 +134,8 @@ describe("translation catalogs", () => {
     "status.loading",
     "settings.language",
     "languages.ar",
+    "nav.home",
+    "settings.title",
   ];
 
   it("provides foundation keys for every supported locale", () => {
