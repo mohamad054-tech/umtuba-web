@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/platform-translation-studio-foundation-v1` (from App Shell `0d181604`)
-- **Task:** Translation Studio Foundation V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-foundation-v1`
-- **Prior:** App Shell Translation closed @ `0d181604`
+- **Branch:** `office/platform-translation-studio-persistence-workflow-v1` (from Foundation `aced43c`)
+- **Task:** Translation Studio Persistence & Workflow V1 — **implementation complete; staged; not committed**
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-persistence-workflow-v1`
+- **Prior foundation tip:** `aced43c844d93e0bae6cbb6a53cae25698c3cdad`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -38,7 +38,8 @@
 | --- | --- |
 | Platform Internationalization Foundation V1 | Committed + pushed |
 | Arabic + English App Shell Translation V1 | Committed + pushed @ `0d181604` (`0 0`) |
-| Translation Studio Foundation V1 | Staged on `office/platform-translation-studio-foundation-v1` (awaiting commit GO) |
+| Translation Studio Foundation V1 | On `office/platform-translation-studio-foundation-v1` @ `aced43c` |
+| Translation Studio Persistence & Workflow V1 | Staged on `office/platform-translation-studio-persistence-workflow-v1` (awaiting commit GO) |
 | Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters on feature tips |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |

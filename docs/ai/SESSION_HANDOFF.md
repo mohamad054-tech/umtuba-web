@@ -1,32 +1,31 @@
-# Session Handoff — UMTUBA
+# Session Handoff
 
-**Updated:** 2026-07-30
+## Active task
 
-## Active platform track
+Translation Studio Persistence & Workflow V1
 
-**Translation Studio Foundation V1 — implementation complete (staged, not committed)**
+| Field | Value |
+|-------|-------|
+| Branch | `office/platform-translation-studio-persistence-workflow-v1` |
+| Base | `aced43c844d93e0bae6cbb6a53cae25698c3cdad` (Foundation V1) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-persistence-workflow-v1` |
+| Status | Implementation complete; staged for manual commit; not pushed |
+| Migration | `supabase/migrations/20260874_translation_studio_persistence_workflow_v1.sql` — created, **not** remote-applied |
 
-| Item | Value |
-| --- | --- |
-| Branch | `office/platform-translation-studio-foundation-v1` |
-| Base | `0d181604` (App Shell Translation V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-translation-studio-foundation-v1` |
-| Prior closed | App Shell Translation `0d181604` on `office/platform-app-shell-translation-v1` |
+## Runtime persistence note
 
-## Done
-
-- In-memory Translation Studio domain + Memory + Terminology
-- AI suggestions via `aiService` port (`platform.translation_suggest`)
-- Read-only admin Studio UI
-- Import/export contracts (JSON/CSV/XLIFF)
-- Focused tests + `tsc` + build pass
+V1 durable store is a JSON file under `data/translation-studio/` (gitignored).
+SQL migration is the future Supabase shape only.
 
 ## Next GO
 
-1. Manual commit (no trailers) + push when approved
-2. Optional next: approval UI + DB persistence (separate task)
-3. Do not merge to alpha without GO
+1. Manual commit (no trailers)
+2. Push when approved
+3. Separate GO for remote migration apply
+4. Separate GO for alpha merge
 
-## Frozen architecture
+## Do not
 
-Do not modify `docs/commerce/**`, Learning frozen baselines, Games/Ads/Revenue architecture docs unless an operational handoff status line is required.
+- Commit/push without GO
+- Apply migration remotely without GO
+- Switch to other feature worktrees mid-task

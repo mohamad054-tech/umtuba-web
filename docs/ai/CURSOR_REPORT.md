@@ -1,60 +1,82 @@
-# CURSOR_REPORT — Translation Studio Foundation V1
+# Cursor Report
 
 ## Summary
 
-Added an internal Translation Studio foundation: domain model, Translation Memory,
-terminology database, AI suggestion port over `aiService` (no provider-specific
-code), suggestion pipeline without auto-publish, import/export contracts, and a
-read-only admin UI. Staged; not committed.
+Translation Studio Persistence & Workflow V1 is implemented on
+`office/platform-translation-studio-persistence-workflow-v1` (base `aced43c`).
+Runtime persistence uses a durable JSON file store; additive SQL schema is
+local-only (not remote-applied). Editing/review workflow, AI suggestions
+(never auto-approved), terminology warnings, history/audit, and publish
+contract (`autoPublish: false`) are in place. Staged for manual commit —
+**not committed, not pushed**.
 
-## Exact files created
+## Exact files changed
 
-- `lib/translationStudio/**` (domain, memory, terminology, AI port, pipeline, contracts, studio, tests)
-- `app/admin/translation-studio/**` (shell, pages, status badge, admin gate)
-- `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`
-
-## Exact files modified
-
-- `lib/ai/contracts/public.ts`
-- `lib/ai/contracts/types.ts`
-- `lib/ai/prompts/registry.ts`
-- `lib/ai/services/aiService.ts`
-- `vitest.config.ts`
+- `.gitignore`
+- `app/actions/translationStudio.ts`
+- `app/admin/translation-studio/TranslationStatusBadge.tsx`
+- `app/admin/translation-studio/TranslationStudioShell.tsx`
+- `app/admin/translation-studio/keys/[keyId]/page.tsx`
+- `app/admin/translation-studio/review/page.tsx`
+- `app/admin/translation-studio/publish/page.tsx`
+- `lib/translationStudio/types.ts`
+- `lib/translationStudio/status.ts`
+- `lib/translationStudio/studio.ts`
+- `lib/translationStudio/index.ts`
+- `lib/translationStudio/suggestion/pipeline.ts`
+- `lib/translationStudio/persistence/fileStore.ts`
+- `lib/translationStudio/persistence/seed.ts`
+- `lib/translationStudio/workflow/workflowService.ts`
+- `lib/translationStudio/workflow/terminologyGuard.ts`
+- `lib/translationStudio/workflow/publishContract.ts`
+- `lib/translationStudio/translationStudioFoundation.test.ts`
+- `lib/translationStudio/translationStudioPersistenceWorkflow.test.ts`
+- `supabase/migrations/20260874_translation_studio_persistence_workflow_v1.sql`
 - `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
-
-## Architecture summary
-
-See `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`.
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/CURSOR_REPORT.md`
+- `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`
 
 ## Migrations created
 
-None.
+- `supabase/migrations/20260874_translation_studio_persistence_workflow_v1.sql`
+  — additive studio tables + FORCE RLS; **not remote-applied**
 
 ## Security review
 
-- Studio routes gated by platform admin DB check
-- AI path uses existing aiService; no provider secrets in Studio
-- No automatic publishing of translations
+- Admin surfaces + server actions gated by platform-admin DB assert
+- Runtime store is server-local JSON (gitignored); no secrets written
+- Migration revokes client writes; admin select only when `is_platform_admin()` exists
+- AI path uses stub/aiService port only — no provider-specific imports
+- Publish remains contract-only; no catalog auto-write
 
-## Tests / TypeScript / Build
+## Tests
 
-`npm test -- --run lib/translationStudio`
+`npx vitest run lib/translationStudio/translationStudioFoundation.test.ts lib/translationStudio/translationStudioPersistenceWorkflow.test.ts`
 
-- Test Files: **1 passed**
-- Tests: **9 passed**
+**pass** — 16/16
 
-AI smoke: `lib/ai/aiPlatformFoundation.test.ts` + `hubFoundation.test.ts` — **44 passed**
+## TypeScript
 
 `npx tsc --noEmit` — **pass**
 
-`npm run build` — **pass** (includes `/admin/translation-studio/**`)
+## Build
+
+`npm run build` — **pass** (includes `/admin/translation-studio/review` + `/publish`)
+
+## git diff --check
+
+`git diff --cached --check` — **pass** (no whitespace errors)
+
+## git status --short
+
+Staged (24+ files including this report after add). Working tree clean of
+unintended unstaged studio changes. Branch ahead of base only by staged
+index (no commit yet).
 
 ## Open issues
 
-- Manual commit + push deferred
-- DB persistence deferred
-- Editing / approval UI deferred
-- Stub provider adapter does not synthesize translation JSON (live providers do)
+- Runtime still file-store; Supabase tables not wired
+- Live AI smoke not run (stub used in workflow AI path)
+- Awaiting manual commit GO (no trailers) + push GO + remote migration GO

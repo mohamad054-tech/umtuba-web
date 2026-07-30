@@ -1,16 +1,21 @@
 export type {
+  AuditLogEntry,
+  PersistedStudioState,
   StudioLanguage,
   StudioLanguageCode,
   StudioNamespace,
   StudioSnapshot,
   StudioTranslationKey,
   StudioTranslationValue,
+  SuggestionAiMetadata,
   SuggestionQualityMetadata,
+  TerminologyConflict,
   TerminologyEntry,
   TerminologyStatus,
   TranslationMemoryEntry,
   TranslationSuggestion,
   TranslationValueStatus,
+  TranslationVersionRecord,
 } from "./types";
 
 export {
@@ -23,7 +28,9 @@ export {
 export {
   assertTransitionTranslationStatus,
   canTransitionTranslationStatus,
+  isPublishCatalogEligible,
   isPublishableToMemory,
+  isReviewQueueStatus,
 } from "./status";
 
 export { normalizeSourceText, sourceFingerprint } from "./normalize";
@@ -69,3 +76,20 @@ export {
   getTranslationStudio,
   type TranslationStudio,
 } from "./studio";
+
+export {
+  createTranslationStudioWorkflow,
+  getTranslationStudioWorkflow,
+  resetTranslationStudioWorkflowForTests,
+  type TranslationStudioWorkflow,
+  type WorkflowActor,
+} from "./workflow/workflowService";
+
+export {
+  buildPublishContract,
+  listPublishQueue,
+  type PublishCatalogRecord,
+  type PublishContract,
+} from "./workflow/publishContract";
+
+export { detectTerminologyConflicts } from "./workflow/terminologyGuard";
