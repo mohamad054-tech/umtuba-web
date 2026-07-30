@@ -48,6 +48,9 @@ tmp-*
 *.tsbuildinfo
 next-env.d.ts
 
+# Translation Studio local durable store (runtime V1; never commit)
+/data/translation-studio/
+
 # store remote E2E local Auth UUID config (never commit real user ids)
 scripts/store-e2e/config.local.sql
 scripts/store-e2e/_tmp*

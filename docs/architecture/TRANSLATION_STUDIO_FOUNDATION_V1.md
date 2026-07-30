@@ -1,37 +1,46 @@
-# Translation Studio Foundation V1
+# Translation Studio Foundation + Persistence Workflow V1
 
 ## Status
 
-Implementation complete on `office/platform-translation-studio-foundation-v1`
-(staged; awaiting commit GO).
+Persistence & Workflow V1 implemented on
+`office/platform-translation-studio-persistence-workflow-v1`
+(staged; awaiting commit GO). Built on Foundation V1 (`aced43c`).
 
 ## Goal
 
-Internal Translation Studio as the future single source of truth for UMTUBA
-translations. Not a public translation product.
+Internal Translation Studio as durable TMS: edit, review, history, AI
+suggestions, publish contract — not a public translation product.
 
 ## Architecture
 
 ```
-Admin UI (read-only)
-  → lib/translationStudio (in-memory domain)
-      ├─ Languages / Namespaces / Keys / Values + status
-      ├─ Translation Memory (approved reuse + duplicate fingerprint)
-      ├─ Terminology database (seeded UMTUBA terms)
-      ├─ Suggestion pipeline (memory → AI port → pending_review → human approve → memory)
-      └─ Import/Export contracts (JSON / CSV / XLIFF) — contracts only
+Admin UI (editor + review + publish queues)
+  → server actions (platform-admin gated)
+  → lib/translationStudio workflow
+      ├─ Durable JSON file store (data/translation-studio/) — runtime V1
+      ├─ Additive SQL schema (20260901_…) — future Supabase; not applied
+      ├─ Languages / Namespaces / Keys / Values + workflow statuses
+      ├─ Versions + audit log
+      ├─ Translation Memory (approved reuse + fingerprint)
+      ├─ Terminology (conflict warnings; never silent replace)
+      ├─ Suggestion pipeline (memory → AI port → pending_review)
+      └─ Publish contract (autoPublish: false)
 
 AI path (no provider-specific code):
   TranslationAiPort
     → createAiServiceTranslationPort(runCapability)
     → aiService.runCapability("platform.translation_suggest")
-    → Shared AI Core gateway → Provider Foundation (OpenAI/Gemini/Anthropic/Local)
 ```
+
+## Workflow statuses
+
+`missing` → `draft` / `ai_suggested` → `needs_review` → `approved` /
+`ready_for_publish` (also `rejected`, `deprecated` + restore to draft)
 
 ## Explicit non-goals (this milestone)
 
-- No DB migration / persistence
-- No editing workflow / automatic publishing
+- No remote migration apply
+- No auto-publish into product i18n catalogs
 - No Learning / Commerce / Creator surface translation
 - No public translation API
 - No provider adapter modifications
@@ -42,7 +51,9 @@ AI path (no provider-specific code):
 - `/admin/translation-studio/languages`
 - `/admin/translation-studio/namespaces`
 - `/admin/translation-studio/keys`
-- `/admin/translation-studio/keys/[keyId]`
+- `/admin/translation-studio/keys/[keyId]` (editor)
+- `/admin/translation-studio/review`
+- `/admin/translation-studio/publish`
 - `/admin/translation-studio/terminology`
 
 Platform-admin gated (same DB admin authority as other admin surfaces).

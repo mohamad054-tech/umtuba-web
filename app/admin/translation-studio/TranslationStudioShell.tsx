@@ -10,6 +10,8 @@ const NAV = [
   { href: `${TRANSLATION_STUDIO_BASE}/languages`, label: "Languages" },
   { href: `${TRANSLATION_STUDIO_BASE}/namespaces`, label: "Namespaces" },
   { href: `${TRANSLATION_STUDIO_BASE}/keys`, label: "Keys" },
+  { href: `${TRANSLATION_STUDIO_BASE}/review`, label: "Review queue" },
+  { href: `${TRANSLATION_STUDIO_BASE}/publish`, label: "Publish queue" },
   { href: `${TRANSLATION_STUDIO_BASE}/terminology`, label: "Terminology" },
 ] as const;
 
@@ -56,7 +58,8 @@ export default function TranslationStudioShell({
           ))}
         </nav>
         <p className="mt-3 text-xs text-amber-200/80">
-          Read-only foundation — no editing workflow and no automatic publishing.
+          Persistent workflow — drafts/reviews are saved; automatic publishing
+          remains disabled.
         </p>
         <div className="mt-6">{children}</div>
       </div>

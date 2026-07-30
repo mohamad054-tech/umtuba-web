@@ -149,7 +149,13 @@ describe("Suggestion pipeline", () => {
         language: "ar",
         value: "",
         status: "needs_review",
+        createdAt: new Date(0).toISOString(),
         updatedAt: new Date(0).toISOString(),
+        createdBy: null,
+        updatedBy: null,
+        approvedBy: null,
+        suggestionId: null,
+        version: 1,
       },
     });
     expect(approved.value?.status).toBe("approved");
@@ -177,7 +183,7 @@ describe("Import/export contracts", () => {
 
 describe("Studio seed", () => {
   it("seeds languages, namespaces, keys, and terminology for read-only UI", () => {
-    const studio = createTranslationStudio();
+    const studio = createTranslationStudio({ ephemeral: true });
     const snap = studio.getSnapshot();
     expect(snap.languages.map((l) => l.code)).toEqual([
       "ar",

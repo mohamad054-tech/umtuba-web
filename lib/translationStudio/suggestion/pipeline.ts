@@ -88,6 +88,7 @@ export function createSuggestionPipeline(deps: {
       return {
         id: `sug_${seq}`,
         keyId: input.keyId ?? null,
+        valueId: null,
         sourceText: input.sourceText,
         targetLanguage: input.targetLanguage,
         candidateText,
@@ -95,11 +96,14 @@ export function createSuggestionPipeline(deps: {
           confidence,
           reusedFromMemory,
           terminologyHits: terminologyHints.map((h) => h.term),
+          terminologyConflicts: [],
           providerVia,
           notes,
+          ai: null,
         },
         status: "pending_review",
         createdAt: new Date().toISOString(),
+        createdBy: null,
       };
     },
 
@@ -115,12 +119,15 @@ export function createSuggestionPipeline(deps: {
       }
 
       assertTransitionTranslationStatus(value.status, "approved");
+      const now = new Date().toISOString();
       const next: StudioTranslationValue = {
         ...value,
         value: suggestion.candidateText,
         status: "approved",
         suggestionId: suggestion.id,
-        updatedAt: new Date().toISOString(),
+        updatedAt: now,
+        approvedBy: value.approvedBy ?? "system:pipeline",
+        version: value.version + 1,
       };
       return { memoryId: remembered.id, value: next };
     },
