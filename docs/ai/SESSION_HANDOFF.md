@@ -2,26 +2,24 @@
 
 ## Active task
 
-AI Data Platform & Model Registry Foundation V1
+AI Data Platform Workflow & Dataset Approval V1
 
 | Field | Value |
 |-------|-------|
-| Branch | `office/platform-ai-data-platform-foundation-v1` |
-| Base | `4484144` (Knowledge Acquisition Platform Foundation V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-data-platform-foundation-v1` |
+| Branch | `office/platform-ai-data-platform-workflow-v1` |
+| Base | `b33054f` (AI Data Platform Foundation; typo fixed from `3b3054fa`) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-data-platform-workflow-v1` |
 | Status | Implementation complete; awaiting commit GO |
 
 ## Scope reminder
 
-Registries + promotion gates for future internal models. Read-only admin UI.
-Not training. Not fine-tuning. Not inference.
+Governed dataset approval lifecycle + audit + candidates. No training.
 
 ## Do not
 
 - Commit/push without GO
 - Apply migrations remotely
-- Train / fine-tune models
-- Change inference or AI providers
-- Scrape or download external datasets
-- Change Learning / Commerce / Creator runtimes
+- Train / fine-tune / run inference or benchmarks
+- Switch to unrelated branches (e.g. profile-hero) or other worktrees
+- Stash / discard / reset / restore
 - Use git trailers

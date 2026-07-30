@@ -2,21 +2,24 @@
 
 ## Summary
 
-AI Data Platform & Model Registry Foundation V1 is implemented on
-`office/platform-ai-data-platform-foundation-v1` (base `4484144`). Provides
-dataset/version/evaluation/experiment/model registries, dataset builder
-contracts, fail-closed promotion gates, Knowledge Acquisition rights
-integration, file persistence, read-only admin UI under `/admin/ai-data`, and
-local-only migration `20260877`. No training, fine-tuning, or inference
-changes. Staged for manual commit — **not committed, not pushed**.
+AI Data Platform Workflow & Dataset Approval V1 is implemented on
+`office/platform-ai-data-platform-workflow-v1` (base `b33054f`). Adds
+dataset approval lifecycle, validation gates (rights/privacy/quality/
+eligibility), version workflow, experiment/model candidates, audit trail,
+and read-only review/audit admin pages. No training, fine-tuning, or
+inference. Staged for manual commit — **not committed, not pushed**.
 
 ## Exact files changed
 
-- `lib/aiDataPlatform/**`
-- `app/admin/ai-data/**`
-- `supabase/migrations/20260877_ai_data_platform_foundation_v1.sql`
-- `vitest.config.ts`
-- `docs/architecture/AI_DATA_PLATFORM_FOUNDATION_V1.md`
+- `lib/aiDataPlatform/workflow/**`
+- `lib/aiDataPlatform/aiDataPlatformWorkflow.test.ts`
+- `lib/aiDataPlatform/index.ts`
+- `app/admin/ai-data/AiDataPlatformShell.tsx`
+- `app/admin/ai-data/review/page.tsx`
+- `app/admin/ai-data/audit/page.tsx`
+- `supabase/migrations/20260878_ai_data_platform_workflow_approval_v1.sql`
+- `docs/architecture/AI_DATA_PLATFORM_WORKFLOW_APPROVAL_V1.md`
+- `docs/architecture/AI_DATA_PLATFORM_FOUNDATION_V1.md` (workflow pointer)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -24,19 +27,19 @@ changes. Staged for manual commit — **not committed, not pushed**.
 
 ## Migrations created
 
-- `20260877_ai_data_platform_foundation_v1.sql` — **not remote-applied**
+- `20260878_ai_data_platform_workflow_approval_v1.sql` — **not remote-applied**
 
 ## Security review
 
-- Admin pages gated via `assertPlatformAdminDb`
-- Migration: FORCE RLS + revoke anon/authenticated; admin SELECT only
-- Experiment registration fail-closed on rights/eligibility
-- Promotion never automatic (full checklist required)
-- No secrets; no training execution; no inference changes
+- Admin pages platform-admin gated
+- Migration: FORCE RLS + admin SELECT only
+- Approval never automatic; fail-closed rights/privacy/quality gates
+- Audit trail records actor, states, reason
+- No training execution; no inference changes
 
 ## Tests
 
-`npx vitest run lib/aiDataPlatform/` — **7/7 pass**
+`npx vitest run lib/aiDataPlatform/` — **13/13 pass**
 
 ## TypeScript
 
@@ -44,7 +47,7 @@ changes. Staged for manual commit — **not committed, not pushed**.
 
 ## Build
 
-`npm run build` — pass (`/admin/ai-data` routes registered)
+`npm run build` — pass (`/admin/ai-data/review`, `/admin/ai-data/audit` registered)
 
 ## git diff --check
 
@@ -52,11 +55,10 @@ changes. Staged for manual commit — **not committed, not pushed**.
 
 ## git status --short
 
-25 files staged (+2028 / −55). Intended scope only.
+Staged intended scope only. See Final Verification Report.
 
 ## Open issues
 
-- No training / benchmark execution (by design)
-- No edit workflow UI (read-only foundation)
-- Supabase tables unused until persistence cutover
+- No interactive edit forms (read-only dashboard; workflow APIs for tests/ops)
+- Supabase workflow tables unused until persistence cutover
 - No commit / push until GO

@@ -54,3 +54,25 @@ export {
   type AiDataPlatformService,
   type RegisterDatasetInput,
 } from "./service";
+
+export {
+  assertTransitionApproval,
+  canTransitionApproval,
+  createAiDataWorkflowService,
+  createAuditTrailEntry,
+  emptyChecks,
+  getAiDataWorkflowService,
+  resetAiDataWorkflowForTests,
+  validateDatasetPrivacy,
+  validateDatasetQualityForApproval,
+  validateDatasetRights,
+  type AiDataWorkflowService,
+  type AuditTrailEntry,
+  type DatasetApprovalState,
+  type DatasetWorkflowRecord,
+  type ExperimentCandidateRecord,
+  type ModelCandidateRecord,
+  type PersistedAiDataWorkflowState,
+  type ValidationCheckResult,
+  type WorkflowDashboardSnapshot,
+} from "./workflow";

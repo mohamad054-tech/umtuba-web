@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Data Platform & Model Registry Foundation V1
+AI Data Platform Workflow & Dataset Approval V1
 
 ## Status
 
@@ -10,29 +10,29 @@ AI Data Platform & Model Registry Foundation V1
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-data-platform-foundation-v1`
-2. Branch: `office/platform-ai-data-platform-foundation-v1`
-3. Base: `4484144` (Knowledge Acquisition Platform Foundation V1)
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-data-platform-workflow-v1`
+2. Branch: `office/platform-ai-data-platform-workflow-v1`
+3. Base: `b33054f` (AI Data Platform Foundation; requested `3b3054fa` was a typo)
 4. Manual commit (no trailers) → push when approved
-5. Do not train/fine-tune; do not change inference; do not apply migrations remotely
+5. Do not train/fine-tune/infer; do not apply migrations remotely
 
 ## Branch
 
-`office/platform-ai-data-platform-foundation-v1`
+`office/platform-ai-data-platform-workflow-v1`
 
 ## Allowed scope
 
-- `lib/aiDataPlatform/**`
-- `app/admin/ai-data/**`
-- `data/ai-data-platform/**` (runtime store if generated)
-- `supabase/migrations/20260877_ai_data_platform_foundation_v1.sql` (local only)
-- `vitest.config.ts` (include path)
-- Handoff + architecture docs + focused tests
+- `lib/aiDataPlatform/workflow/**`
+- `lib/aiDataPlatform/index.ts` / workflow tests
+- `app/admin/ai-data/**` (review, audit, shell nav)
+- `supabase/migrations/20260878_ai_data_platform_workflow_approval_v1.sql` (local only)
+- Handoff + architecture docs
 
 ## Forbidden scope
 
-- Model training / fine-tuning / inference / provider changes
-- Dataset downloads / scraping / external integrations
-- Learning / Commerce / Creator runtime product changes
+- Training / fine-tuning / inference / benchmark execution
+- Dataset download / scraping / external integrations
+- AI provider or runtime AI changes
 - Commit / push / remote migration apply without GO
 - Git trailers
+- Switching unrelated branches or worktrees

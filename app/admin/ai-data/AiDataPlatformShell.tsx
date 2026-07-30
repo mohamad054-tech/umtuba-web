@@ -7,12 +7,14 @@ export const AI_DATA_PLATFORM_BASE = "/admin/ai-data";
 
 const NAV = [
   { href: AI_DATA_PLATFORM_BASE, label: "Overview" },
+  { href: `${AI_DATA_PLATFORM_BASE}/review`, label: "Review" },
   { href: `${AI_DATA_PLATFORM_BASE}/datasets`, label: "Datasets" },
   { href: `${AI_DATA_PLATFORM_BASE}/versions`, label: "Versions" },
   { href: `${AI_DATA_PLATFORM_BASE}/experiments`, label: "Experiments" },
   { href: `${AI_DATA_PLATFORM_BASE}/models`, label: "Models" },
   { href: `${AI_DATA_PLATFORM_BASE}/evaluation-sets`, label: "Evaluation Sets" },
   { href: `${AI_DATA_PLATFORM_BASE}/promotion`, label: "Promotion Queue" },
+  { href: `${AI_DATA_PLATFORM_BASE}/audit`, label: "Audit Trail" },
 ] as const;
 
 export default function AiDataPlatformShell({
@@ -64,8 +66,8 @@ export default function AiDataPlatformShell({
           ))}
         </nav>
         <p className="mt-3 text-xs text-amber-200/80">
-          Read-only foundation — registries and promotion gates only. No
-          training, fine-tuning, or inference changes.
+          Read-only workflow dashboard — governed dataset lifecycle. No
+          training, fine-tuning, inference, or benchmark execution.
         </p>
         <div className="mt-6">{children}</div>
       </div>

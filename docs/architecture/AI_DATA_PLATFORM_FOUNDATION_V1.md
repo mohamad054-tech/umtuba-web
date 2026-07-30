@@ -48,3 +48,9 @@ dataset · rights · quality · evaluation · human
 
 `20260877_ai_data_platform_foundation_v1.sql` adds `ai_*` tables with FORCE
 RLS and admin-select policies. Does not alter prior migrations.
+
+## Follow-on
+
+Workflow & Dataset Approval V1 (`office/platform-ai-data-platform-workflow-v1`)
+adds governed approval lifecycle, audit trail, and candidate contracts on top
+of this foundation. See `AI_DATA_PLATFORM_WORKFLOW_APPROVAL_V1.md`.
