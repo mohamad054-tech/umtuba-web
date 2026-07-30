@@ -19,6 +19,11 @@ import { listingBuyerPdpPath } from "./marketplaceEligibility";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
 import { canManageCatalog } from "./permissions";
 import type { StoreMemberRole } from "./types";
+import {
+  mapDigitalPublishReadinessByProductId,
+  resolveDigitalProductPublishReadiness,
+  serviceRoleClientForDigitalReadiness,
+} from "./digitalProductPublishReadiness";
 
 type AnyClient = SupabaseClient;
 
@@ -132,7 +137,7 @@ export async function listMarketplaceDiscoveryForSeller(
   const { data: products, error } = await supabase
     .from("store_products")
     .select(
-      "id, title, slug, short_description, status, moderation_status, marketplace_eligible, store_id, primary_category_id, stores!inner(id, name, slug, status, verification_status, marketplace_supplier_enabled)"
+      "id, title, slug, short_description, status, moderation_status, marketplace_eligible, product_type, store_id, primary_category_id, stores!inner(id, name, slug, status, verification_status, marketplace_supplier_enabled)"
     )
     .eq("marketplace_eligible", true)
     .eq("status", "active")
@@ -145,6 +150,18 @@ export async function listMarketplaceDiscoveryForSeller(
     console.error("listMarketplaceDiscoveryForSeller", error);
     return { ok: false, message: "Unable to load marketplace products." };
   }
+
+  const readinessAdmin = serviceRoleClientForDigitalReadiness();
+  const readinessMap = readinessAdmin.ok
+    ? await mapDigitalPublishReadinessByProductId(
+        readinessAdmin.supabase,
+        (products ?? []).map((row) => ({
+          productId: String(row.id),
+          storeId: String(row.store_id),
+          productType: String(row.product_type ?? ""),
+        }))
+      )
+    : new Map();
 
   const { data: existing } = await supabase
     .from("store_seller_listings")
@@ -173,6 +190,13 @@ export async function listMarketplaceDiscoveryForSeller(
       continue;
     }
 
+    const productType = String(row.product_type ?? "");
+    const digitalReady =
+      readinessMap.get(String(row.id))?.ready === true || productType !== "digital";
+    if (productType === "digital" && !digitalReady) {
+      continue;
+    }
+
     const offer = await enrichPriceInventory(supabase, String(row.id));
     const gate = evaluateMarketplaceEligibility({
       productStatus: String(row.status),
@@ -187,6 +211,8 @@ export async function listMarketplaceDiscoveryForSeller(
       supplierStoreId: store.id,
       priceAmountMinor: offer.priceMinor,
       priceCurrency: offer.currency,
+      productType,
+      digitalPublishReady: digitalReady,
     });
     if (!gate.ok) continue;
 
@@ -324,7 +350,9 @@ export async function listSellerStoreListings(
   for (const row of data ?? []) {
     const { data: product } = await supabase
       .from("store_products")
-      .select("title, slug, status, moderation_status, marketplace_eligible")
+      .select(
+        "title, slug, status, moderation_status, marketplace_eligible, product_type, store_id"
+      )
       .eq("id", row.source_product_id)
       .maybeSingle();
     const { data: supplier } = await supabase
@@ -350,6 +378,17 @@ export async function listSellerStoreListings(
 
     const supplierEnabled = Boolean(supplier?.marketplace_supplier_enabled);
     const productEligible = Boolean(product?.marketplace_eligible);
+    const productType = product ? String(product.product_type ?? "") : "";
+    let digitalPublishReady = productType !== "digital";
+    if (product && productType === "digital") {
+      const readiness = await resolveDigitalProductPublishReadiness({
+        productType,
+        storeId: String(product.store_id ?? row.supplier_store_id),
+        productId: String(row.source_product_id),
+      });
+      digitalPublishReady = readiness.ready;
+    }
+
     let blockingReason: string | null = null;
     if (String(row.status) !== "active") {
       blockingReason = `Listing is ${String(row.status)}.`;
@@ -375,6 +414,8 @@ export async function listSellerStoreListings(
         supplierStoreId: String(row.supplier_store_id),
         priceAmountMinor: offer.priceMinor,
         priceCurrency: offer.currency,
+        productType,
+        digitalPublishReady,
       });
       if (!gate.ok) blockingReason = gate.message;
     }

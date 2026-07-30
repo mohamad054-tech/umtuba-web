@@ -20,6 +20,8 @@ export function collectProductMarketplaceBlockers(input: {
   moderationStatus: string;
   priceAmountMinor: number | null;
   priceCurrency: string | null;
+  productType?: string | null;
+  digitalPublishReady?: boolean | null;
 }): MarketplaceEligibilityBlocker[] {
   const blockers: MarketplaceEligibilityBlocker[] = [];
   if (!input.marketplaceSupplierEnabled) {
@@ -67,6 +69,16 @@ export function collectProductMarketplaceBlockers(input: {
     blockers.push({
       code: "missing_price",
       message: "A trusted active selling price is required.",
+    });
+  }
+  if (
+    String(input.productType ?? "").trim() === "digital" &&
+    input.digitalPublishReady !== true
+  ) {
+    blockers.push({
+      code: "digital_asset_not_ready",
+      message:
+        "Digital products require an active owned digital deliverable before marketplace sale.",
     });
   }
   return blockers;
@@ -217,6 +229,8 @@ export function validateListingCartContext(input: {
   moderationStatus: string;
   priceAmountMinor: number | null;
   priceCurrency: string | null;
+  productType?: string | null;
+  digitalPublishReady?: boolean | null;
 }): { ok: true } | { ok: false; message: string } {
   if (input.listingStatus !== "active") {
     return { ok: false, message: "This marketplace listing is not active." };
@@ -243,6 +257,8 @@ export function validateListingCartContext(input: {
     supplierStoreId: input.supplierStoreId,
     priceAmountMinor: input.priceAmountMinor,
     priceCurrency: input.priceCurrency,
+    productType: input.productType,
+    digitalPublishReady: input.digitalPublishReady,
   });
   if (!gate.ok) {
     return { ok: false, message: gate.message };

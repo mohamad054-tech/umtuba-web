@@ -100,6 +100,9 @@ export type MarketplaceEligibilityInput = {
   supplierStoreId: string;
   priceAmountMinor: number | null;
   priceCurrency: string | null;
+  /** When productType is digital, must be true to pass. Physical ignores. */
+  productType?: string | null;
+  digitalPublishReady?: boolean | null;
 };
 
 export function isMarketplaceListingStatus(
@@ -197,6 +200,17 @@ export function evaluateMarketplaceEligibility(
       ok: false,
       message: "Trusted selling price is missing or invalid.",
       code: "missing_price",
+    };
+  }
+  if (
+    String(input.productType ?? "").trim() === "digital" &&
+    input.digitalPublishReady !== true
+  ) {
+    return {
+      ok: false,
+      message:
+        "Digital product is missing an active owned deliverable for marketplace sale.",
+      code: "digital_asset_not_ready",
     };
   }
   return { ok: true };

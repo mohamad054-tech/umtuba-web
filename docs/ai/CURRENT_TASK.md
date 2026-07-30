@@ -2,35 +2,35 @@
 
 ## Task title
 
-Commerce Seller Digital Product Asset Upload V1
+Commerce Digital Product Publish Readiness V1
 
 ## Status
 
-`implementation-complete-local` — awaiting commit / push / apply GO
+`implementation-complete-local` — awaiting commit / push GO
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-seller-digital-product-asset-upload-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-digital-product-publish-readiness-v1`
 
 ## Branch
 
-`office/commerce-seller-digital-product-asset-upload-v1`
+`office/commerce-digital-product-publish-readiness-v1`
 
 ## Base
 
-`1a2ede70c17455937fdd1a068ac5c87c9aeafe2e`
-(`office/commerce-buyer-digital-access-delivery-v1`)
+`55fb87ded4b257ad56d504ae97797b9c7319b57d`
+(`office/commerce-seller-digital-product-asset-upload-v1`)
 
 ## Milestone
 
-`commerce.digital.seller_product_asset_upload_v1`
+`commerce.digital.product_publish_readiness_v1`
 
 ## Delivered
 
-- Migration (local): `20260879_store_seller_digital_product_asset_upload_v1.sql`
-- Server prepare → client upload → service-role finalize attach
-- Seller product editor “Digital deliverable” section
-- One active digital asset per product; replacement preserves previous on failure
+- Digital publish readiness evaluator (no migration)
+- Server gates on submit-for-review and marketplace eligibility enable
+- Marketplace discovery / listing / cart fail-closed for unready digital products
+- Product editor readiness status + blocked submit messaging
 
 ## Machine policy
 
@@ -38,25 +38,25 @@ Commerce laptop only. Digital-first. Physical dormant. Do not touch Learning / A
 
 ## Allowed scope
 
-- `lib/store/digitalAssetUpload.ts` (+ tests)
-- `lib/store/uploadDigitalProductAsset.ts`
-- `lib/store/mediaConstants.ts`
-- `lib/store/mediaValidation.ts`
-- `app/actions/storeDigitalAssets.ts`
-- `app/components/store/SellerDigitalAssetPanel.tsx`
+- `lib/store/digitalProductPublishReadiness.ts` (+ tests)
+- `lib/store/sellerStore.ts`
+- `lib/store/marketplaceEligibility.ts`
+- `lib/store/marketplaceSupplierSeller.ts`
+- `lib/store/marketplaceSupplierSellerQueries.ts`
+- `lib/store/cart.ts`
 - `app/seller/store/products/[productId]/edit/page.tsx`
-- `supabase/migrations/20260879_store_seller_digital_product_asset_upload_v1.sql`
-- `docs/store/implementation/SELLER_DIGITAL_PRODUCT_ASSET_UPLOAD_V1.md`
+- `docs/store/implementation/DIGITAL_PRODUCT_PUBLISH_READINESS_V1.md`
 - `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
 - Learning / AI Tutor / Home / Creator / Navigation
-- Physical commerce / shipping / warehouse / carriers / returns
-- Payouts / refunds / capture-allocate-entitlement-release redesign
-- Buyer delivery rewrite / CDN studio
+- Physical commerce redesign / shipping / warehouse
+- Payouts / refunds / CDN / multi-file bundles
+- Capture/allocate/entitlement/release redesign
+- Buyer delivery rewrite
 - Commit / push / remote migration apply without GO
 
 ## Next
 
-Verification report, then separate commit/push GO, then separate apply GO for `20260879`.
+Verification report, then separate commit/push GO.

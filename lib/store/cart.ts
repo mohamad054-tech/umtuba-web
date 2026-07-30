@@ -11,6 +11,7 @@ import {
 import { deriveCartLineBlockingIssue } from "./cartCheckoutPresentation";
 import { availableUnits } from "./inventory";
 import { validateListingCartContext } from "./marketplaceEligibility";
+import { resolveDigitalProductPublishReadiness } from "./digitalProductPublishReadiness";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { rejectClientCartPrice } from "./tradingContracts";
 
@@ -477,7 +478,7 @@ async function revalidateListingCartLine(
   const { data: product } = await supabase
     .from("store_products")
     .select(
-      "id, status, moderation_status, marketplace_eligible, store_id, stores!inner(status, verification_status, marketplace_supplier_enabled)"
+      "id, status, moderation_status, marketplace_eligible, product_type, store_id, stores!inner(status, verification_status, marketplace_supplier_enabled)"
     )
     .eq("id", listing.source_product_id)
     .maybeSingle();
@@ -506,6 +507,17 @@ async function revalidateListingCartLine(
     .limit(1)
     .maybeSingle();
 
+  const productType = String(product.product_type ?? "");
+  let digitalPublishReady = productType !== "digital";
+  if (productType === "digital") {
+    const readiness = await resolveDigitalProductPublishReadiness({
+      productType,
+      storeId: String(product.store_id),
+      productId: String(product.id),
+    });
+    digitalPublishReady = readiness.ready;
+  }
+
   const gate = validateListingCartContext({
     listingId: input.listingId,
     listingStatus: String(listing.status),
@@ -525,6 +537,8 @@ async function revalidateListingCartLine(
     moderationStatus: String(product.moderation_status),
     priceAmountMinor: price ? Number(price.amount_minor) : null,
     priceCurrency: price ? String(price.currency) : null,
+    productType,
+    digitalPublishReady,
   });
   if (!gate.ok) return gate;
 

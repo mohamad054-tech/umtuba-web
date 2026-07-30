@@ -7,6 +7,7 @@ import { APP_ROUTES } from "../../../../../lib/nav";
 import { createClient, getServerUser } from "../../../../../../lib/supabase/server";
 import { listActiveCategories } from "../../../../../../lib/store/catalogQueries";
 import { loadSellerDigitalAssetSummary } from "../../../../../../lib/store/digitalAssetUpload";
+import { resolveDigitalProductPublishReadiness } from "../../../../../../lib/store/digitalProductPublishReadiness";
 import { canManageCatalog } from "../../../../../../lib/store/permissions";
 import { createAuthorizedProductMediaSignedUrl } from "../../../../../../lib/store/productMediaUrl";
 import {
@@ -91,6 +92,15 @@ export default async function EditSellerProductPage({
     productId: bundle.product.id,
     userId: user.id,
   });
+  const digitalPublishReadiness = await resolveDigitalProductPublishReadiness({
+    productType: bundle.product.product_type,
+    storeId: bundle.product.store_id,
+    productId: bundle.product.id,
+  });
+  const digitalReadyForReview = digitalPublishReadiness.ready;
+  const canSubmitDigital =
+    canSubmit &&
+    (bundle.product.product_type !== "digital" || digitalReadyForReview);
 
   const membership = await getOwnedOrMemberStore(supabase, user.id);
   const activeListingCount = await countActiveListingsForProduct(
@@ -112,6 +122,8 @@ export default async function EditSellerProductPage({
       ? Number(primaryPrice.amount_minor)
       : null,
     priceCurrency: primaryPrice ? String(primaryPrice.currency) : null,
+    productType: bundle.product.product_type,
+    digitalPublishReady: digitalReadyForReview,
   });
 
   const workflow = sellerPublishingWorkflowSteps({
@@ -723,6 +735,32 @@ export default async function EditSellerProductPage({
         <h2 className="sf-display text-xl font-semibold tracking-tight">
           Digital deliverable
         </h2>
+        {bundle.product.product_type === "digital" ? (
+          <div
+            className="mt-3 rounded-2xl border border-[var(--sf-line)] bg-black/25 px-4 py-3 text-sm"
+            role="status"
+          >
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+              Publish readiness
+            </p>
+            <p className="mt-1 text-[var(--sf-ink)]">
+              {digitalPublishReadiness.uiState === "asset_missing"
+                ? "Asset missing — submit for review is blocked."
+                : digitalPublishReadiness.uiState === "asset_invalid"
+                  ? "Asset invalid — submit for review is blocked."
+                  : digitalPublishReadiness.uiState === "asset_ready"
+                    ? canSubmit
+                      ? "Asset ready — ready for review."
+                      : "Asset ready."
+                    : digitalPublishReadiness.message}
+            </p>
+            {!digitalReadyForReview ? (
+              <p className="mt-2 text-xs text-[var(--sf-danger)]">
+                {digitalPublishReadiness.message}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         <div className="mt-4">
           <SellerDigitalAssetPanel
             productId={bundle.product.id}
@@ -750,7 +788,7 @@ export default async function EditSellerProductPage({
 
       {canEditRole ? (
         <section className="mt-6 flex flex-wrap gap-3 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
-          {canSubmit ? (
+          {canSubmitDigital ? (
             <form action={submitProductReviewAction}>
               <input type="hidden" name="productId" value={bundle.product.id} />
               <button
@@ -760,6 +798,16 @@ export default async function EditSellerProductPage({
                 Submit for review
               </button>
             </form>
+          ) : null}
+          {canSubmit && !canSubmitDigital ? (
+            <p
+              role="status"
+              className="w-full rounded-2xl border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-4 py-3 text-sm text-[var(--sf-danger)]"
+            >
+              Submit for review is blocked until a valid active digital
+              deliverable is attached. Use the Digital deliverable section
+              above.
+            </p>
           ) : null}
           {canArchive ? (
             <form action={archiveProductAction}>

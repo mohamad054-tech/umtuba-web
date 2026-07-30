@@ -11,6 +11,7 @@ import { canManageCatalog, canManageStoreSettings } from "./permissions";
 import { canManageSellerCatalog } from "./sellerApplications";
 import { majorToMinorUnits } from "./money";
 import { isOwnedStoreProductMediaPath } from "./mediaConstants";
+import { resolveDigitalProductPublishReadiness } from "./digitalProductPublishReadiness";
 
 type AnyClient = SupabaseClient;
 
@@ -418,6 +419,17 @@ export async function updateProductMarketplaceEligibility(
       ok: false,
       message: "Archived or blocked products cannot be marketplace-eligible.",
     };
+  }
+
+  if (marketplaceEligible) {
+    const readiness = await resolveDigitalProductPublishReadiness({
+      productType: existing.product_type,
+      storeId: String(existing.store_id),
+      productId: String(existing.id),
+    });
+    if (!readiness.ready) {
+      return { ok: false, message: readiness.message };
+    }
   }
 
   const { data, error } = await supabase
@@ -850,6 +862,15 @@ export async function submitProductForReview(
 
   if (!product.primary_category_id) {
     return { ok: false, message: "Add a primary category before submitting for review." };
+  }
+
+  const readiness = await resolveDigitalProductPublishReadiness({
+    productType: product.product_type,
+    storeId: String(product.store_id),
+    productId: String(product.id),
+  });
+  if (!readiness.ready) {
+    return { ok: false, message: readiness.message };
   }
 
   const { data, error } = await supabase
