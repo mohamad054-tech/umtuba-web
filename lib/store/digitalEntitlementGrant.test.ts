@@ -137,12 +137,15 @@ describe("Digital entitlement grant — helpers", () => {
 });
 
 describe("Digital entitlement grant — capture wiring", () => {
-  it("captured Sync allocates then grants; failed outcomes skip grant", async () => {
-    const rpc = vi.fn(async (name: string) => {
+  it("captured Sync allocates then grants then releases; failed outcomes skip grant", async () => {
+    const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => {
       if (name === STORE_PAYMENT_SYNC_RPC) {
         return { data: { replayed: false, event_id: "evt-1" }, error: null };
       }
       if (name === STORE_SETTLEMENT_RPC) {
+        if (args?.p_action === "release") {
+          return { data: { replayed: false, action: "release" }, error: null };
+        }
         return { data: { replayed: false, action: "allocate" }, error: null };
       }
       if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {
@@ -176,10 +179,12 @@ describe("Digital entitlement grant — capture wiring", () => {
     if (!applied.ok) return;
     expect(applied.settlement.status).toBe("allocated");
     expect(applied.entitlement.status).toBe("granted");
+    expect(applied.release.status).toBe("released");
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
+      STORE_SETTLEMENT_RPC,
     ]);
 
     rpc.mockClear();
@@ -205,6 +210,7 @@ describe("Digital entitlement grant — capture wiring", () => {
     expect(cancelled.ok).toBe(true);
     if (!cancelled.ok) return;
     expect(cancelled.entitlement.status).toBe("skipped");
+    expect(cancelled.release.status).toBe("skipped");
     expect(rpc).toHaveBeenCalledTimes(1);
   });
 

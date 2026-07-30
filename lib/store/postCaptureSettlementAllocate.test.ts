@@ -215,14 +215,21 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
         return { data: { replayed: false, event_id: "evt-1" }, error: null };
       }
       if (name === STORE_SETTLEMENT_RPC) {
+        if (args.p_action === "allocate") {
+          expect(args).toMatchObject({
+            p_action: "allocate",
+            p_event_key: `${CAPTURE_KEY}:allocate`,
+            p_correlation_id: CORR,
+            p_amount_minor: 2500,
+            p_currency: "USD",
+          });
+          return { data: { replayed: false, action: "allocate" }, error: null };
+        }
         expect(args).toMatchObject({
-          p_action: "allocate",
-          p_event_key: `${CAPTURE_KEY}:allocate`,
-          p_correlation_id: CORR,
-          p_amount_minor: 2500,
-          p_currency: "USD",
+          p_action: "release",
+          p_event_key: `${CAPTURE_KEY}:release`,
         });
-        return { data: { replayed: false, action: "allocate" }, error: null };
+        return { data: { replayed: false, action: "release" }, error: null };
       }
       if (name === "grant_store_digital_entitlements_after_capture") {
         return {
@@ -256,17 +263,21 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
     if (!applied.ok) return;
     expect(applied.replayed).toBe(false);
     expect(applied.settlement.status).toBe("allocated");
-    expect(rpc).toHaveBeenCalledTimes(3);
+    expect(applied.release.status).toBe("released");
+    expect(rpc).toHaveBeenCalledTimes(4);
     expect(rpc.mock.calls[0][0]).toBe(STORE_PAYMENT_SYNC_RPC);
     expect(rpc.mock.calls[1][0]).toBe(STORE_SETTLEMENT_RPC);
   });
 
   it("replayed capture still attempts allocate with same event_key (idempotent)", async () => {
-    const rpc = vi.fn(async (name: string) => {
+    const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => {
       if (name === STORE_PAYMENT_SYNC_RPC) {
         return { data: { replayed: true, event_id: "evt-1" }, error: null };
       }
       if (name === STORE_SETTLEMENT_RPC) {
+        if (args?.p_action === "release") {
+          return { data: { replayed: true, action: "release" }, error: null };
+        }
         return { data: { replayed: true, action: "allocate" }, error: null };
       }
       return {
@@ -327,6 +338,7 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
       expect(applied.ok).toBe(true);
       if (!applied.ok) return;
       expect(applied.settlement.status).toBe("skipped");
+      expect(applied.release.status).toBe("skipped");
       expect(rpc).toHaveBeenCalledTimes(1);
       expect(rpc.mock.calls.map((call) => call[0])).toEqual([
         STORE_PAYMENT_SYNC_RPC,
@@ -377,6 +389,7 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
     if (applied.settlement.status === "failed") {
       expect(applied.settlement.message).toMatch(/trusted capture/i);
     }
+    expect(applied.release.status).toBe("skipped");
   });
 
   it("Sync failure never attempts allocate", async () => {
@@ -422,14 +435,12 @@ describe("Post-capture allocate — architecture boundaries", () => {
     expect(webhook).toMatch(/settlement: applied\.settlement/);
   });
 
-  it("does not introduce release or payout behavior", () => {
+  it("allocate module itself does not perform release or bank disbursement", () => {
     const src = read("lib/store/postCaptureSettlementAllocate.ts");
     expect(src).not.toMatch(/p_action:\s*["']release["']/);
     expect(src).not.toMatch(/p_action:\s*["']hold["']/);
     expect(src).not.toMatch(/p_action:\s*["']reverse_allocation["']/);
-    expect(read("lib/store/stripePaymentOutcomeApply.ts")).not.toMatch(
-      /p_action:\s*["']release["']/
-    );
+    expect(src).not.toMatch(/stripe\.payouts|Payout\.create|transfer\.create/i);
   });
 
   it("preserves listing provenance modules", () => {

@@ -169,5 +169,6 @@ export async function POST(request: NextRequest) {
     replayed: applied.replayed,
     settlement: applied.settlement,
     entitlement: applied.entitlement,
+    release: applied.release,
   });
 }

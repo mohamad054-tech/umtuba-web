@@ -2,35 +2,35 @@
 
 ## Task title
 
-Commerce Post-Capture Digital Entitlement Grant V1
+Commerce Post-Capture Settlement Release V1
 
 ## Status
 
-`verification-pass` — **UNCOMMITTED** — awaiting explicit commit / push / apply GO
+`verification-pass` — **UNCOMMITTED** — awaiting explicit commit / push GO
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-digital-entitlement-grant-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-post-capture-settlement-release-v1`
 
 ## Branch
 
-`office/commerce-post-capture-digital-entitlement-grant-v1`
+`office/commerce-post-capture-settlement-release-v1`
 
 ## Base / HEAD
 
-Base: `90283e88ee4fc37fe2f08170e615c1c1a43bf1ef`
+Base: `dd27b3af635f456a91c2ebf9ad84288374b4fcf6`
 HEAD: uncommitted implementation on top of base
 
 ## Milestone
 
-`commerce.digital.post_capture_entitlement_grant_v1`
+`commerce.settlement.post_capture_release_v1`
 
 ## Delivered
 
-- Migration (local): `20260877_store_digital_entitlement_grant_v1.sql`
-- Grant after trusted capture + reservation consume + fulfillment fulfilled
-- Buyer entitlement list on order detail
+- Release after successful allocate + digital entitlement grant
+- Deterministic `${captureEventKey}:release` event key
+- No migration (reuse Settlement Foundation release)
 
 ## Next
 
-Review → trailer-free commit GO → push GO → apply `20260877` GO
+Verification → trailer-free commit GO → push GO

@@ -1,7 +1,8 @@
 /**
- * Commerce Post-Capture Settlement Allocate V1.
- * After a trusted Sync capture, allocate via existing Settlement Foundation RPC.
- * Server-only. Does not release, initiate seller bank disbursements, or accept client money fields.
+ * Commerce Post-Capture Settlement Release V1.
+ * After trusted Sync capture + allocate + digital entitlement grant, release
+ * via existing Settlement Foundation RPC (escrow → payable).
+ * Server-only. Does not initiate seller bank disbursements or accept client money fields.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -10,17 +11,17 @@ import {
   type StoreSettlementAction,
 } from "./settlementFoundation";
 
-export const POST_CAPTURE_SETTLEMENT_ALLOCATE_ID =
-  "commerce.settlement.post_capture_allocate_v1" as const;
+export const POST_CAPTURE_SETTLEMENT_RELEASE_ID =
+  "commerce.settlement.post_capture_release_v1" as const;
 
-export const POST_CAPTURE_ALLOCATE_ACTION =
-  "allocate" as const satisfies StoreSettlementAction;
+export const POST_CAPTURE_RELEASE_ACTION =
+  "release" as const satisfies StoreSettlementAction;
 
 type AnyClient = SupabaseClient;
 
-export type PostCaptureAllocateResult =
+export type PostCaptureReleaseResult =
   | {
-      status: "allocated";
+      status: "released";
       replayed: boolean;
       data: Record<string, unknown>;
     }
@@ -28,22 +29,23 @@ export type PostCaptureAllocateResult =
   | { status: "failed"; message: string };
 
 /**
- * Deterministic allocate event_key from the trusted capture Sync event_key.
- * Matches Revenue Bridge pattern: `${captureEventKey}:allocate`.
+ * Deterministic release event_key from the trusted capture Sync event_key.
+ * Parallel to allocate (`:allocate`) and entitlement (`:entitlement`).
  */
-export function buildPostCaptureAllocateEventKey(
+export function buildPostCaptureReleaseEventKey(
   captureEventKey: string
 ): string {
   const base = captureEventKey.trim();
-  return `${base}:allocate`;
+  return `${base}:release`;
 }
 
 /**
- * Invoke apply_store_settlement_event(allocate) for a trusted captured attempt.
+ * Invoke apply_store_settlement_event(release) for a trusted captured attempt
+ * that already allocated and completed digital entitlement grant.
  * Amount/currency must already be server-derived (attempt/order). Correlation
  * must match the capture outcome event (Settlement Foundation contract).
  */
-export async function allocateSettlementAfterTrustedCapture(
+export async function releaseSettlementAfterTrustedFulfillment(
   supabase: AnyClient,
   input: {
     paymentAttemptId: string;
@@ -53,7 +55,7 @@ export async function allocateSettlementAfterTrustedCapture(
     currency: string;
     providerReference?: string;
   }
-): Promise<PostCaptureAllocateResult> {
+): Promise<PostCaptureReleaseResult> {
   if (
     typeof input.amountMinor !== "number" ||
     !Number.isInteger(input.amountMinor) ||
@@ -61,7 +63,7 @@ export async function allocateSettlementAfterTrustedCapture(
   ) {
     return {
       status: "failed",
-      message: "Settlement allocate requires a positive trusted amount.",
+      message: "Settlement release requires a positive trusted amount.",
     };
   }
   const currency = String(input.currency ?? "")
@@ -70,28 +72,28 @@ export async function allocateSettlementAfterTrustedCapture(
   if (!/^[A-Z]{3}$/.test(currency)) {
     return {
       status: "failed",
-      message: "Settlement allocate requires a trusted ISO currency.",
+      message: "Settlement release requires a trusted ISO currency.",
     };
   }
 
-  const eventKey = buildPostCaptureAllocateEventKey(input.captureEventKey);
+  const eventKey = buildPostCaptureReleaseEventKey(input.captureEventKey);
   if (eventKey.length < 8 || eventKey.length > 128) {
     return {
       status: "failed",
-      message: "Settlement allocate event_key length is invalid.",
+      message: "Settlement release event_key length is invalid.",
     };
   }
 
   const metadata: Record<string, string> = {
-    note: POST_CAPTURE_SETTLEMENT_ALLOCATE_ID,
-    provider_event_type: "stripe.checkout.session.allocate",
+    note: POST_CAPTURE_SETTLEMENT_RELEASE_ID,
+    provider_event_type: "stripe.checkout.session.release",
   };
   if (input.providerReference?.trim()) {
     metadata.provider_payload_id = input.providerReference.trim();
   }
 
   const { data, error } = await supabase.rpc(STORE_SETTLEMENT_RPC, {
-    p_action: POST_CAPTURE_ALLOCATE_ACTION,
+    p_action: POST_CAPTURE_RELEASE_ACTION,
     p_event_key: eventKey,
     p_correlation_id: input.correlationId,
     p_payment_attempt_id: input.paymentAttemptId,
@@ -105,13 +107,13 @@ export async function allocateSettlementAfterTrustedCapture(
       status: "failed",
       message:
         error.message?.trim() ||
-        "Settlement allocate failed after trusted capture.",
+        "Settlement release failed after trusted fulfillment.",
     };
   }
 
   const payload = (data ?? {}) as Record<string, unknown>;
   return {
-    status: "allocated",
+    status: "released",
     replayed: Boolean(payload.replayed),
     data: payload,
   };

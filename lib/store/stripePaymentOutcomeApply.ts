@@ -1,5 +1,6 @@
 /**
- * Service-role executor for apply_store_payment_outcome + allocate + entitlement grant.
+ * Service-role executor for apply_store_payment_outcome + allocate +
+ * entitlement grant + settlement release.
  * Server-only module (API routes / workers). Never import from client components.
  */
 
@@ -16,6 +17,10 @@ import {
   grantDigitalEntitlementsAfterTrustedCapture,
   type DigitalEntitlementGrantResult,
 } from "./digitalEntitlementGrant";
+import {
+  releaseSettlementAfterTrustedFulfillment,
+  type PostCaptureReleaseResult,
+} from "./postCaptureSettlementRelease";
 
 export type ApplyStorePaymentOutcomeInput = {
   paymentAttemptId: string;
@@ -35,6 +40,7 @@ export type ApplyStorePaymentOutcomeResult =
       replayed: boolean;
       settlement: PostCaptureAllocateResult;
       entitlement: DigitalEntitlementGrantResult;
+      release: PostCaptureReleaseResult;
     }
   | { ok: false; message: string };
 
@@ -66,8 +72,9 @@ function serviceRoleClient():
 }
 
 /**
- * Apply verified provider outcome via Sync. On capture: allocate then grant
- * digital entitlements. Both post-steps are idempotent.
+ * Apply verified provider outcome via Sync. On capture: allocate, grant
+ * digital entitlements, then release to payable. Post-steps are idempotent.
+ * Release runs only after both allocate and entitlement succeed.
  */
 export async function applyVerifiedStorePaymentOutcome(
   input: ApplyStorePaymentOutcomeInput,
@@ -118,6 +125,10 @@ export async function applyVerifiedStorePaymentOutcome(
         status: "skipped",
         reason: `Outcome ${input.outcome} is not entitlement-grant eligible.`,
       },
+      release: {
+        status: "skipped",
+        reason: `Outcome ${input.outcome} is not settlement-release eligible.`,
+      },
     };
   }
 
@@ -139,11 +150,40 @@ export async function applyVerifiedStorePaymentOutcome(
     }
   );
 
+  let release: PostCaptureReleaseResult;
+  if (settlement.status !== "allocated") {
+    release = {
+      status: "skipped",
+      reason:
+        settlement.status === "failed"
+          ? "Settlement release skipped because allocate failed."
+          : "Settlement release skipped because allocate did not succeed.",
+    };
+  } else if (entitlement.status !== "granted") {
+    release = {
+      status: "skipped",
+      reason:
+        entitlement.status === "failed"
+          ? "Settlement release skipped because entitlement grant failed."
+          : "Settlement release skipped because entitlement grant did not succeed.",
+    };
+  } else {
+    release = await releaseSettlementAfterTrustedFulfillment(supabase, {
+      paymentAttemptId: input.paymentAttemptId,
+      correlationId: input.correlationId,
+      captureEventKey: input.eventKey,
+      amountMinor: input.amountMinor,
+      currency: input.currency,
+      providerReference: input.providerReference,
+    });
+  }
+
   return {
     ok: true,
     data: payload,
     replayed,
     settlement,
     entitlement,
+    release,
   };
 }
