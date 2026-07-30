@@ -35,6 +35,7 @@ export default defineConfig({
       "lib/translationStudio/**/*.test.ts",
       "lib/knowledgeAcquisition/**/*.test.ts",
       "lib/aiDataPlatform/**/*.test.ts",
+      "lib/privateAi/**/*.test.ts",
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",
