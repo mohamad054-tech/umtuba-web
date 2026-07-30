@@ -2,6 +2,7 @@ import type { AiUsageRecord } from "../contracts/types";
 import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
 import type { AiPlatformConfig } from "../config";
 import { createGeminiAdapter } from "./geminiAdapter";
+import { createAnthropicAdapter } from "./anthropicAdapter";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -369,6 +370,9 @@ export function resolveProviderAdapters(
   }
   if (config.geminiApiKey) {
     map.set("gemini", createGeminiAdapter(config));
+  }
+  if (config.anthropicApiKey) {
+    map.set("anthropic", createAnthropicAdapter(config));
   }
   return map;
 }

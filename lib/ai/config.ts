@@ -11,6 +11,9 @@ export type AiPlatformConfig = {
   geminiApiKey: string | null;
   geminiBaseUrl: string;
   geminiDefaultModel: string;
+  anthropicApiKey: string | null;
+  anthropicBaseUrl: string;
+  anthropicDefaultModel: string;
   allowStub: boolean;
   defaultTimeoutMs: number;
   maxInputChars: number;
@@ -27,9 +30,10 @@ function readEnv(name: string): string | undefined {
 
 function hasLiveProviderKey(
   openaiApiKey: string | null,
-  geminiApiKey: string | null
+  geminiApiKey: string | null,
+  anthropicApiKey: string | null
 ): boolean {
-  return Boolean(openaiApiKey || geminiApiKey);
+  return Boolean(openaiApiKey || geminiApiKey || anthropicApiKey);
 }
 
 export function loadAiPlatformConfig(
@@ -38,6 +42,7 @@ export function loadAiPlatformConfig(
   const explicitMode = (readEnv("UMTUBA_AI_MODE") ?? "").toLowerCase();
   const openaiApiKey = readEnv("OPENAI_API_KEY") ?? null;
   const geminiApiKey = readEnv("GEMINI_API_KEY") ?? null;
+  const anthropicApiKey = readEnv("ANTHROPIC_API_KEY") ?? null;
   const allowStub =
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "1" ||
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "true" ||
@@ -49,8 +54,10 @@ export function loadAiPlatformConfig(
   } else if (explicitMode === "stub") {
     mode = allowStub ? "stub" : "disabled";
   } else if (explicitMode === "live") {
-    mode = hasLiveProviderKey(openaiApiKey, geminiApiKey) ? "live" : "disabled";
-  } else if (hasLiveProviderKey(openaiApiKey, geminiApiKey)) {
+    mode = hasLiveProviderKey(openaiApiKey, geminiApiKey, anthropicApiKey)
+      ? "live"
+      : "disabled";
+  } else if (hasLiveProviderKey(openaiApiKey, geminiApiKey, anthropicApiKey)) {
     mode = "live";
   } else if (allowStub) {
     mode = "stub";
@@ -67,6 +74,12 @@ export function loadAiPlatformConfig(
       readEnv("GEMINI_BASE_URL") ??
       "https://generativelanguage.googleapis.com/v1beta",
     geminiDefaultModel: readEnv("GEMINI_MODEL") ?? "gemini-2.5-flash",
+    anthropicApiKey,
+    anthropicBaseUrl:
+      readEnv("ANTHROPIC_BASE_URL") ?? "https://api.anthropic.com/v1",
+    // Exact dated Haiku snapshot (stable Flash-class default; not a latest alias).
+    anthropicDefaultModel:
+      readEnv("ANTHROPIC_MODEL") ?? "claude-haiku-4-5-20251001",
     allowStub,
     defaultTimeoutMs: Number(readEnv("UMTUBA_AI_TIMEOUT_MS") ?? 30000),
     maxInputChars: Number(readEnv("UMTUBA_AI_MAX_INPUT_CHARS") ?? 8000),
@@ -81,6 +94,7 @@ export function describeAiConfigStatus(config: AiPlatformConfig): {
   mode: AiPlatformConfig["mode"];
   openaiConfigured: boolean;
   geminiConfigured: boolean;
+  anthropicConfigured: boolean;
   stubEligible: boolean;
   missing: string[];
 } {
@@ -88,17 +102,19 @@ export function describeAiConfigStatus(config: AiPlatformConfig): {
   if (
     config.mode === "live" &&
     !config.openaiApiKey &&
-    !config.geminiApiKey
+    !config.geminiApiKey &&
+    !config.anthropicApiKey
   ) {
-    missing.push("OPENAI_API_KEY|GEMINI_API_KEY");
+    missing.push("OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY");
   }
   if (config.mode === "disabled") {
-    missing.push("UMTUBA_AI_MODE/OPENAI_API_KEY|GEMINI_API_KEY");
+    missing.push("UMTUBA_AI_MODE/OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY");
   }
   return {
     mode: config.mode,
     openaiConfigured: Boolean(config.openaiApiKey),
     geminiConfigured: Boolean(config.geminiApiKey),
+    anthropicConfigured: Boolean(config.anthropicApiKey),
     stubEligible: config.allowStub,
     missing,
   };

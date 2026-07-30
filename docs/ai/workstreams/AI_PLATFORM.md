@@ -3,25 +3,25 @@
 ## SAVE POINT — 2026-07-30 (Desktop)
 
 **Machine:** Desktop  
-**Active work:** AI Core Gemini Adapter V1
+**Active work:** AI Core Anthropic Adapter V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-core-gemini-adapter-v1` |
-| Base | `3d6dd6d` — reconciliation tip |
+| Active branch | `office/ai-core-anthropic-adapter-v1` |
+| Base | `2867a5e` — Gemini Adapter V1 |
 | Remote | Local implementation staged; **no commit/push until verification GO** |
 | Do not merge / no PR unless asked | Yes |
 
 **Done this session (Desktop):**
-1. Gemini provider adapter behind `AiProviderAdapter`
-2. Config + model registry + foundation selection (OpenAI/Gemini interchangeable)
-3. Normalized error mapping + structured JSON (`responseMimeType`)
-4. Streaming left disabled; fail-closed without `GEMINI_API_KEY`
-5. Unit tests + focused AI suite + `tsc`
+1. Anthropic provider adapter behind `AiProviderAdapter`
+2. Config + model registry + foundation selection (OpenAI/Gemini/Anthropic interchangeable)
+3. Normalized error mapping + structured JSON (prompt-steered; no illegal open-object `output_config`)
+4. Streaming left disabled; fail-closed without `ANTHROPIC_API_KEY`
+5. Default model `claude-haiku-4-5-20251001`; unit tests + focused AI suite + `tsc`
 
 **NOT done / do not touch by mistake:**
-- Live Google API smoke (optional next)
-- Anthropic / local adapters
+- Live Anthropic API smoke (optional next)
+- Local / self-hosted adapter
 - Product Home / Navigation / Creator / App Shell
 - Alpha merge
 - Remote migration apply without explicit GO
@@ -55,8 +55,9 @@ Capability / aiService
 | `AiProviderFoundation` | Central provider + model + adapter registries |
 | Typed model descriptors | provider id, model id, capabilities/modalities, enabled/available, context/output limits |
 | Selection layer | Capabilities never hardcode provider/model names |
-| Placeholders | `anthropic` / `local` registered disabled, no adapters |
+| Placeholders | `local` registered disabled, no adapter |
 | Gemini | Adapter registered when `GEMINI_API_KEY` present; otherwise listed unavailable |
+| Anthropic | Adapter registered when `ANTHROPIC_API_KEY` present; otherwise listed unavailable |
 
 **Fail-closed when:** unknown provider, unknown model, disabled/unavailable model, unsupported capability/modality, unregistered adapter.
 
@@ -168,5 +169,6 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 ## Next (after commit approval)
 
 1. Manual commit (no trailers) + push when approved
-2. Optional live smoke with real `GEMINI_API_KEY`
-3. Do not merge into alpha without explicit GO
+2. Optional live smoke with real `ANTHROPIC_API_KEY`
+3. Next implementation candidate: Local / self-hosted adapter
+4. Do not merge into alpha without explicit GO

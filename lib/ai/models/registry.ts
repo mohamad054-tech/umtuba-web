@@ -44,9 +44,11 @@ export type AiProviderDefinition = {
 export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
   geminiConfigured: boolean;
+  anthropicConfigured: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
   geminiDefaultModel: string;
+  anthropicDefaultModel: string;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
   const providers: AiProviderDefinition[] = [];
@@ -169,6 +171,54 @@ export function buildProviderRegistry(input: {
         costClass: "premium",
         inputCostPer1M: 1.25,
         outputCostPer1M: 5,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: false,
+        latencyClass: "standard",
+      },
+    ],
+  });
+
+  providers.push({
+    providerId: "anthropic",
+    displayName: "Anthropic Claude",
+    available: input.anthropicConfigured,
+    models: [
+      {
+        providerId: "anthropic",
+        modelId: input.anthropicDefaultModel,
+        displayName: input.anthropicDefaultModel,
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text"],
+        outputModalities: ["text"],
+        contextLimitTokens: 200_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: input.anthropicConfigured,
+        costClass: "economy",
+        inputCostPer1M: 1,
+        outputCostPer1M: 5,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: true,
+        latencyClass: "low",
+      },
+      {
+        providerId: "anthropic",
+        modelId: "claude-sonnet-5",
+        displayName: "Claude Sonnet 5",
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text", "image"],
+        outputModalities: ["text"],
+        contextLimitTokens: 200_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: input.anthropicConfigured,
+        costClass: "premium",
+        inputCostPer1M: 3,
+        outputCostPer1M: 15,
         dataHandlingMax: "confidential",
         defaultTimeoutMs: input.defaultTimeoutMs,
         fallbackEligible: false,

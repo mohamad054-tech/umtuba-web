@@ -10,10 +10,10 @@
 
 ## Active feature (this machine — Desktop)
 
-- **Branch:** `office/ai-core-gemini-adapter-v1` (from reconciliation `3d6dd6d`)
-- **Task:** AI Core Gemini Adapter V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1`
-- **Prior:** Reconciliation closed @ `3d6dd6d` on `office/ai-tutor-provider-reconciliation-v1`
+- **Branch:** `office/ai-core-anthropic-adapter-v1` (from Gemini `2867a5e`)
+- **Task:** AI Core Anthropic Adapter V1 — **implementation complete; staged; not committed**
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-ai-anthropic-adapter-v1`
+- **Prior:** Gemini Adapter closed @ `2867a5e` on `office/ai-core-gemini-adapter-v1`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
 ## Closed on alpha-0.2 (do not reopen)
@@ -39,11 +39,12 @@ Tutor backend capabilities continue on AI Platform branches; Learning UX remains
 | --- | --- |
 | Unified Revenue Platform Foundation | On alpha |
 | Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
-| Shared AI Core / Hub / Assistant | On alpha (gated); Provider tip + Tutor tip being reconciled on feature branch |
+| Shared AI Core / Hub / Assistant | On alpha (gated); provider adapters expanding on feature branches |
 | Alpha Stabilization Sweep | Wave 4 closed |
 | Alpha Beta Productization | Closed on alpha |
-| AI Tutor + Provider Reconciliation V1 | Committed + pushed @ `3d6dd6d` (`0 0`) |
-| AI Core Gemini Adapter V1 | Staged on `office/ai-core-gemini-adapter-v1` (awaiting commit GO) |
+| AI Tutor + Provider Reconciliation V1 | Committed + pushed |
+| AI Core Gemini Adapter V1 | Committed + pushed @ `2867a5e` (`0 0`) |
+| AI Core Anthropic Adapter V1 | Staged on `office/ai-core-anthropic-adapter-v1` (awaiting commit GO) |
 
 ## Source of truth
 

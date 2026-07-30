@@ -1,16 +1,17 @@
-# CURSOR_REPORT — AI Core Gemini Adapter V1
+# CURSOR_REPORT — AI Core Anthropic Adapter V1
 
 ## Summary
 
-Added a fail-closed Google Gemini provider adapter behind existing
-`AiProviderAdapter` contracts. `aiService.runCapability()` unchanged. OpenAI and
-Gemini are interchangeable via Provider Foundation / routing policy when
-credentials are present. Streaming remains disabled. Staged; not committed.
+Added a fail-closed Anthropic Claude provider adapter behind existing
+`AiProviderAdapter` contracts. `aiService.runCapability()` unchanged. OpenAI,
+Gemini, and Anthropic are interchangeable via Provider Foundation / routing
+policy when credentials are present. Streaming remains disabled. Staged; not
+committed.
 
 ## Exact files created
 
-- `lib/ai/providers/geminiAdapter.ts`
-- `lib/ai/providers/geminiAdapter.test.ts`
+- `lib/ai/providers/anthropicAdapter.ts`
+- `lib/ai/providers/anthropicAdapter.test.ts`
 
 ## Exact files modified
 
@@ -38,15 +39,16 @@ Capability / aiService.runCapability
   → gateway.execute
   → createProviderFoundation(config)
   → routing policy resolveRoute
-  → requireAdapter(providerId)  // openai | gemini | stub
+  → requireAdapter(providerId)  // openai | gemini | anthropic | stub
   → adapter.execute(...)
 ```
 
-- Config: `GEMINI_API_KEY`, `GEMINI_BASE_URL`, `GEMINI_MODEL`
-- Live mode accepts OpenAI and/or Gemini keys
-- Default model: **`gemini-2.5-flash`** (Google-documented stable Flash; not preview/`latest`)
-- Adapter uses Gemini `generateContent` REST (no stream)
-- Structured: `generationConfig.responseMimeType = application/json`
+- Config: `ANTHROPIC_API_KEY`, `ANTHROPIC_BASE_URL`, `ANTHROPIC_MODEL`
+- Live mode accepts OpenAI and/or Gemini and/or Anthropic keys
+- Default model: **`claude-haiku-4-5-20251001`** (exact dated stable Haiku snapshot)
+- Premium catalog entry: `claude-sonnet-5`
+- Adapter uses Anthropic Messages REST (`/v1/messages`, no stream)
+- Structured: prompt-steered JSON + fail-closed parse (open-object `output_config` schemas are illegal under Anthropic JSON Schema limitations)
 - Errors map to existing `AiPlatformError` codes
 
 ## Migrations created
@@ -64,8 +66,8 @@ None.
 
 `npm test -- --run lib/ai lib/learning/aiTutorFoundation.test.ts`
 
-- Test Files: **20 passed**
-- Tests: **276 passed**
+- Test Files: **21 passed**
+- Tests: **283 passed**
 
 ## TypeScript
 
@@ -78,5 +80,5 @@ Not run (provider-layer milestone).
 ## Open issues
 
 - Manual commit + push deferred
-- No live Google API smoke in this milestone
-- Anthropic / local still placeholders
+- No live Anthropic API smoke in this milestone
+- Local / self-hosted provider still a placeholder

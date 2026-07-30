@@ -251,7 +251,7 @@ export class AiProviderFoundation {
 
 /**
  * Seed the foundation from existing config-backed registries/adapters.
- * Registers Gemini when configured; anthropic/local remain disabled placeholders.
+ * Registers Gemini/Anthropic when configured; local remains a disabled placeholder.
  */
 export function createProviderFoundation(
   config: AiPlatformConfig
@@ -260,9 +260,11 @@ export function createProviderFoundation(
   const seeded = buildProviderRegistry({
     openaiConfigured: Boolean(config.openaiApiKey),
     geminiConfigured: Boolean(config.geminiApiKey),
+    anthropicConfigured: Boolean(config.anthropicApiKey),
     stubEligible: config.allowStub || config.mode === "stub",
     openaiDefaultModel: config.openaiDefaultModel,
     geminiDefaultModel: config.geminiDefaultModel,
+    anthropicDefaultModel: config.anthropicDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
   });
   const adapters = resolveProviderAdapters(config);
@@ -282,12 +284,6 @@ export function createProviderFoundation(
 
   // Reserved multi-provider slots — structure only, not executable yet.
   const placeholders: AiProviderFoundationDescriptor[] = [
-    {
-      providerId: "anthropic",
-      displayName: "Anthropic",
-      enabled: false,
-      available: false,
-    },
     {
       providerId: "local",
       displayName: "Local / self-hosted",

@@ -2,30 +2,30 @@
 
 ## Task title
 
-AI Core Gemini Adapter V1
+AI Core Anthropic Adapter V1
 
 ## Status
 
-`implementation-complete` — Gemini provider adapter wired into Shared AI Core; staged for manual commit (no trailers). Not pushed.
+`implementation-complete` — Anthropic provider adapter wired into Shared AI Core; staged for manual commit (no trailers). Not pushed.
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1`
-2. Branch: `office/ai-core-gemini-adapter-v1` (from reconciliation `3d6dd6d`)
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-anthropic-adapter-v1`
+2. Branch: `office/ai-core-anthropic-adapter-v1` (from Gemini tip `2867a5e`)
 3. Manual commit (no Co-authored-by / Signed-off-by / trailers)
 4. Push when approved; confirm `0 0`
 5. Do **not** merge into alpha without explicit GO
 
 ## Branch
 
-`office/ai-core-gemini-adapter-v1`
+`office/ai-core-anthropic-adapter-v1`
 
 ## Exact refs
 
 | Ref | Hash / path |
 |-----|-------------|
-| Base | `3d6dd6dafccb8e75dcc4f788546421e0695eb633` (reconciliation tip) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1` |
+| Base | `2867a5e90119aa152cbec5dd868207b38d1d474b` (Gemini Adapter V1) |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-anthropic-adapter-v1` |
 
 ## Allowed scope
 
@@ -33,20 +33,22 @@ AI Core Gemini Adapter V1
 
 ## Forbidden scope
 
-- Learning / Creator / Commerce / RPCs / DB / UI / server actions changes (except diagnostics registry args)
+- Learning / Creator / Commerce / RPCs / DB / UI / server actions (except diagnostics registry args)
 - Streaming enablement
+- Local provider adapter
 - Alpha merge
 - Commit/push without GO
 
 ## Done
 
-- `createGeminiAdapter` + registry + foundation selection
-- OpenAI / Gemini interchangeable via existing resolution
-- Fail-closed without `GEMINI_API_KEY`
-- Structured JSON via `responseMimeType=application/json`
+- `createAnthropicAdapter` + registry + foundation selection
+- OpenAI / Gemini / Anthropic interchangeable via existing resolution
+- Fail-closed without `ANTHROPIC_API_KEY`
+- Structured JSON via prompt-steered JSON + fail-closed parse (no illegal open-object `output_config`)
+- Default model `claude-haiku-4-5-20251001` (exact dated stable snapshot)
 - Streaming not enabled (`streamingSupport: false`)
 - Tests + `tsc` pass
 
 ## Out of scope / next
 
-Live smoke against Google API, Anthropic adapter, alpha merge.
+Local / self-hosted adapter, live Anthropic smoke, alpha merge.
