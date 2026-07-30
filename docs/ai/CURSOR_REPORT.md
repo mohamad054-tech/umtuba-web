@@ -3,10 +3,10 @@
 ## Summary
 
 Reconciled Tutor tip `9e90448` with Provider Foundation tip `01f23d9` on
-`office/ai-tutor-provider-reconciliation-v1` via `--no-ff --no-commit` merge.
-Preserves seven Learning Tutor capabilities + bridge/metadata + Provider
-Foundation / Hub / Assistant / knowledge / memory. **No Gemini adapter.**
-Staged for manual commit.
+`office/ai-tutor-provider-reconciliation-v1` via `--no-ff` merge commit
+`62cd3eb` (pushed, sync `0 0`). Preserves seven Learning Tutor capabilities +
+bridge/metadata + Provider Foundation / Hub / Assistant / knowledge / memory.
+**No Gemini adapter.** Handoff docs refreshed for next-session resume.
 
 ## Exact source commits
 
@@ -71,6 +71,6 @@ Not run (per milestone instructions).
 
 ## Open issues
 
-- Manual commit + push deferred
-- Gemini Adapter not in this milestone
+- Gemini Adapter V1 = next GO (not started)
 - Do not merge to alpha without explicit GO
+- Resume tip: `62cd3eb` on this branch / worktree (already pushed)

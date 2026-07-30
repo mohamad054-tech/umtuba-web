@@ -6,14 +6,16 @@ AI Tutor + Provider Foundation Reconciliation V1
 
 ## Status
 
-`implementation-complete` — Merge reconciled in isolated desktop worktree; staged for manual commit (no trailers). Gemini not implemented.
+`closed-local+remote` — Merge committed and pushed. Sync **0 0**. Gemini not implemented.
 
 ## Resume here (next session / next GO)
 
-1. Manual commit (no Co-authored-by / Signed-off-by / trailers)
-2. Push when approved; confirm `0 0`
-3. Do **not** implement Gemini Adapter in this milestone
-4. Do **not** apply migrations from this branch without separate GO
+1. Open worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1`
+2. Confirm branch tip: `office/ai-tutor-provider-reconciliation-v1` @ `62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3`
+3. `git fetch origin` then confirm sync `0 0`
+4. **Next GO (separate milestone):** Gemini Adapter V1 — placeholders only today (disabled)
+5. Do **not** merge this branch into alpha without explicit GO
+6. Do **not** apply migrations without separate GO
 
 ## Branch
 
@@ -23,31 +25,21 @@ AI Tutor + Provider Foundation Reconciliation V1
 
 | Ref | Hash |
 |-----|------|
+| Reconciliation HEAD (local + origin) | `62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3` |
 | Tutor source | `9e90448ce8e4566fd369476a2571844378b0950c` |
 | Provider source | `01f23d9a584d7b970788fd71444faf6979f25330` |
 | Merge-base | `a8010c5f578ce3aa1af50613b0144c8b220cd63c` |
 | Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-tutor-provider-reconciliation-v1` |
-
-## Allowed scope
-
-- AI Core / Tutor / Provider Foundation reconciliation on this branch only
-- Docs under `docs/ai/**` for this milestone
-
-## Forbidden scope
-
-- Gemini Adapter implementation
-- Alpha-0.2 merge
-- Profile / Home Unlock / Store / World
-- Remote migration apply
-- Commit/push without explicit GO
+| Remote sync | **0 0** |
 
 ## Done
 
-- Tutor tip + Provider Foundation tip combined (`--no-ff --no-commit`)
+- Tutor tip + Provider Foundation tip reconciled (`merge --no-ff`)
 - Seven tutor capabilities + bridge/metadata preserved
 - Provider foundation / hub / assistant / knowledge / memory preserved
-- Docs conflicts resolved
+- Tests: 19 files / 268 passed; `tsc --noEmit` pass
+- Commit + push complete (trailer-free)
 
-## Out of scope
+## Out of scope / next
 
-Gemini SDK/adapter, migration apply, alpha merge, Profile/Home/Store/World.
+Gemini Adapter V1, alpha merge, Profile/Home/Store/World, migration apply without GO.
