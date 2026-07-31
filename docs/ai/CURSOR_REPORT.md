@@ -2,24 +2,26 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.inventory.seller_inventory_availability_foundation_v1` on `office/commerce-inventory-seller-availability-foundation-v1` (base `16f5754`).
+**PASS + STAGED** for `commerce.marketplace.supplier_listing_create_hardening_v1` on `office/commerce-marketplace-supplier-listing-create-hardening-v1` (base `451cb7d`).
 
 ## Exact milestone
 
-`commerce.inventory.seller_inventory_availability_foundation_v1` — approved and implemented.
+`commerce.marketplace.supplier_listing_create_hardening_v1` — approved and implemented.
 
-## Inventory behavior
+## Listing hardening behavior
 
-- **Unlimited** — digital / service / subscription / bundle (finite warehouse math skipped)
-- **Finite** — physical / booking via `product_inventory` + reserved/safety stock
-- **Unavailable** — inactive statuses, missing/inconsistent inventory, zero stock without backorder, unknown type (fail closed)
-- Client stock fields rejected; reserved remains system-managed
-- Physical stays launch-gated (`commerce_confirm_enabled` default OFF); digital publish readiness + category gates unchanged
+- Owner/manager only create
+- Product↔supplier ownership validated
+- Active category required and stamped on listing
+- Trusted price + finite inventory model + digital readiness gates
+- Duplicate active listings rejected (fail closed)
+- Direct table INSERT revoked (RPC-only)
+- No commission/settlement invention; reuses existing listing table
 
 ## Migration
 
-**None** — reuses existing `product_inventory`.
+`20260886_store_supplier_listing_create_hardening_v1.sql` — **local only**, not applied remotely.
 
 ## Boundaries
 
-No Dashboard, no Admin UI, no AI, no shipping, no commit/push in this phase.
+No Dashboard, no Admin UI, no AI, no redesign, no commit/push in this phase.

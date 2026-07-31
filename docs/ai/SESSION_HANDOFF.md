@@ -2,20 +2,20 @@
 
 ## Active milestone
 
-`commerce.inventory.seller_inventory_availability_foundation_v1`
+`commerce.marketplace.supplier_listing_create_hardening_v1`
 
 Status: **PASS + STAGED** — awaiting human commit/push GO
 
 ## Branch / worktree
 
-- Branch: `office/commerce-inventory-seller-availability-foundation-v1`
+- Branch: `office/commerce-marketplace-supplier-listing-create-hardening-v1`
 - Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-- Base: `16f57548303d37acfd07da57c48e79d5a9750e2a`
+- Base: `451cb7d` (inventory availability foundation)
 - HEAD: uncommitted staged tip on feature branch
 
 ## Delivered
 
-Trusted availability resolution (unlimited / finite / unavailable) over existing `product_inventory`; wired into cart, catalog, and seller inventory surfaces; no schema migration.
+Hardened supplier listing create over existing `store_seller_listings` / `add_store_seller_listing` with owner/manager auth, category/price/inventory/digital gates, duplicate-active rejection, and RPC-only inserts.
 
 ## Coordination
 
@@ -23,4 +23,4 @@ Desktop owns AI / Dashboard / Admin — untouched.
 
 ## Next human action
 
-Commit + push when ready. No migration apply.
+Commit + push when ready. Apply `20260886` locally/remotely only when Product asks.
