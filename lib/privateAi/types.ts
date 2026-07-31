@@ -819,8 +819,99 @@ export type ProviderRoutingResult = {
   evaluatedAt: string;
 };
 
+/** Inference Invocation Orchestration — attempt lifecycle only; no live inference. */
+export type InvocationLifecycle =
+  | "created"
+  | "validating"
+  | "ready"
+  | "invoking"
+  | "awaiting_result"
+  | "succeeded"
+  | "failed"
+  | "cancelled"
+  | "timed_out"
+  | "retry_scheduled"
+  | "exhausted"
+  | "blocked";
+
+export type InvocationCancellationState = {
+  requested: boolean;
+  accepted: boolean | null;
+  rejected: boolean;
+  reason: string | null;
+  actorId: string | null;
+  source: "requester" | "admin" | "system" | null;
+  requestedAt: string | null;
+  resolvedAt: string | null;
+};
+
+export type InvocationRetryState = {
+  eligible: boolean;
+  reason: string | null;
+  nextRetryAt: string | null;
+  cooldownUntil: string | null;
+  scheduled: boolean;
+};
+
+export type InvocationTimeoutState = {
+  timeoutAt: string | null;
+  timedOut: boolean;
+  phase: "none" | "before_invocation" | "awaiting_result";
+  classification: "none" | "timeout_before_invocation" | "timeout_awaiting_result";
+};
+
+export type OrchestrationNormalizedResult = {
+  invocationStatus: InvocationLifecycle;
+  outputStatus: ExecutionOutputEnvelope["status"] | "none";
+  finishReason: string | null;
+  usage: ExecutionOutputEnvelope["usage"] | null;
+  latencyMs: number | null;
+  structuredOutputValid: boolean | null;
+  retryable: boolean;
+  failureClass: AdapterFailureClass | "orchestration_blocked" | "orchestration_internal" | null;
+  safeUserMessage: string | null;
+  adminDiagnostic: string | null;
+  adapterId: string | null;
+  providerId: string | null;
+  runtimeId: string | null;
+  modelId: string | null;
+  attemptCount: number;
+  fixtureOnly: boolean;
+};
+
+export type InferenceInvocationRecord = {
+  invocationId: string;
+  requestId: string;
+  executionPlanId: string;
+  adapterId: string | null;
+  providerId: string | null;
+  runtimeId: string | null;
+  modelId: string | null;
+  capabilityId: AiCapabilityId;
+  attemptNumber: number;
+  maxAttempts: number;
+  lifecycle: InvocationLifecycle;
+  createdAt: string;
+  startedAt: string | null;
+  finishedAt: string | null;
+  timeout: InvocationTimeoutState;
+  cancellation: InvocationCancellationState;
+  retry: InvocationRetryState;
+  correlationId: string;
+  tenantId: string;
+  requester: InferenceRequester;
+  idempotencyKey: string | null;
+  inputEnvelope: ExecutionInputEnvelope | null;
+  outputEnvelope: ExecutionOutputEnvelope | null;
+  normalizedResult: OrchestrationNormalizedResult | null;
+  auditEventIds: string[];
+  active: boolean;
+  notes: string;
+  updatedAt: string;
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 8;
+  schemaVersion: 9;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -841,4 +932,5 @@ export type PersistedPrivateAiState = {
   /** Provider adapter registry — contracts only; no live SDKs. */
   providerAdapters: ProviderAdapterContract[];
   adapterNormalizedFailures: NormalizedAdapterError[];
+  inferenceInvocations: InferenceInvocationRecord[];
 };

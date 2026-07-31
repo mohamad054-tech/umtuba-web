@@ -26,7 +26,7 @@ function replaceRuntime(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     runtimes: state.runtimes.map((r) => (r.id === updated.id ? updated : r)),
     runtimeIncidents: incident
       ? [...(state.runtimeIncidents ?? []), incident]
@@ -40,7 +40,7 @@ export function ensureRuntimeOpsDefaults(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     runtimes: (state.runtimes ?? []).map((r) => ({
       ...r,
       ops: r.ops ?? createEmptyRuntimeOpsState(),
@@ -64,6 +64,7 @@ export function ensureRuntimeOpsDefaults(
     providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
     providerAdapters: state.providerAdapters ?? [],
     adapterNormalizedFailures: state.adapterNormalizedFailures ?? [],
+    inferenceInvocations: state.inferenceInvocations ?? [],
   };
 }
 

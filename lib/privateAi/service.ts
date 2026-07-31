@@ -65,6 +65,13 @@ import {
   resolveProviderRoutingPolicy,
 } from "./providerRoutingPolicy";
 import {
+  markInvocationTimedOut,
+  orchestrateInvocation,
+  requestInvocationCancellation,
+  scheduleInvocationRetry,
+  type OrchestrateInvocationInput,
+} from "./invocationOrchestrator";
+import {
   ensureInferenceRequestDefaults,
   handleAdvanceInferenceRequest,
   handleCancelInferenceRequest,
@@ -130,6 +137,7 @@ import type {
   RuntimeReadinessResult,
   AdapterLifecycle,
   AdapterNegotiationRequest,
+  InferenceInvocationRecord,
   NormalizedAdapterError,
   ProviderAdapterContract,
   ProviderCatalogEntry,
@@ -386,6 +394,33 @@ export type PrivateAiService = {
     typeof resolveAdapterForNegotiation
   >;
   listAdapterNormalizedFailures(): NormalizedAdapterError[];
+  listInvocations(): InferenceInvocationRecord[];
+  getInvocation(invocationId: string): InferenceInvocationRecord | null;
+  orchestrateInvocation(
+    input: OrchestrateInvocationInput
+  ): InferenceInvocationRecord;
+  requestInvocationCancellation(input: {
+    invocationId: string;
+    reason?: string;
+    actorRole?: string;
+    actorId?: string | null;
+    source?: "requester" | "admin" | "system";
+    now?: string;
+  }): InferenceInvocationRecord;
+  scheduleInvocationRetry(input: {
+    invocationId: string;
+    actorRole?: string;
+    actorId?: string | null;
+    now?: string;
+    cooldownMs?: number;
+  }): InferenceInvocationRecord;
+  markInvocationTimedOut(input: {
+    invocationId: string;
+    phase?: "before_invocation" | "awaiting_result";
+    actorRole?: string;
+    actorId?: string | null;
+    now?: string;
+  }): InferenceInvocationRecord;
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -460,7 +495,7 @@ export function createPrivateAiService(options?: {
   state = ensureInferenceRequestDefaults(ensureRuntimeOpsDefaults(state));
   state = {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     executionPolicy: resolveExecutionPolicy(state.executionPolicy),
     executionQuota: resolveExecutionQuota(state.executionQuota),
     executionPlans: state.executionPlans ?? [],
@@ -476,6 +511,7 @@ export function createPrivateAiService(options?: {
             createContractTestAdapter(now0),
           ],
     adapterNormalizedFailures: state.adapterNormalizedFailures ?? [],
+    inferenceInvocations: state.inferenceInvocations ?? [],
   };
 
   const persist = () => {
@@ -1150,7 +1186,7 @@ export function createPrivateAiService(options?: {
       const failure = result.plan.outputEnvelope?.failure ?? null;
       state = {
         ...state,
-        schemaVersion: 8,
+        schemaVersion: 9,
         executionPlans: [...(state.executionPlans ?? []), result.plan],
         auditTrail: [...state.auditTrail, ...result.auditEntries],
         adapterNormalizedFailures: failure
@@ -1178,7 +1214,7 @@ export function createPrivateAiService(options?: {
       const result = evaluateProviderRouting(state, criteria);
       state = {
         ...state,
-        schemaVersion: 8,
+        schemaVersion: 9,
         providerRoutingEvaluations: [
           result,
           ...(state.providerRoutingEvaluations ?? []),
@@ -1196,7 +1232,7 @@ export function createPrivateAiService(options?: {
       });
       state = {
         ...state,
-        schemaVersion: 8,
+        schemaVersion: 9,
         providerRoutingPolicy: next,
         updatedAt: new Date().toISOString(),
       };
@@ -1235,6 +1271,46 @@ export function createPrivateAiService(options?: {
 
     listAdapterNormalizedFailures() {
       return [...(state.adapterNormalizedFailures ?? [])];
+    },
+
+    listInvocations() {
+      return [...(state.inferenceInvocations ?? [])];
+    },
+
+    getInvocation(invocationId) {
+      return (
+        (state.inferenceInvocations ?? []).find(
+          (i) => i.invocationId === invocationId
+        ) ?? null
+      );
+    },
+
+    orchestrateInvocation(input) {
+      const result = orchestrateInvocation(state, input);
+      state = result.state;
+      persist();
+      return result.invocation;
+    },
+
+    requestInvocationCancellation(input) {
+      const result = requestInvocationCancellation(state, input);
+      state = result.state;
+      persist();
+      return result.invocation;
+    },
+
+    scheduleInvocationRetry(input) {
+      const result = scheduleInvocationRetry(state, input);
+      state = result.state;
+      persist();
+      return result.invocation;
+    },
+
+    markInvocationTimedOut(input) {
+      const result = markInvocationTimedOut(state, input);
+      state = result.state;
+      persist();
+      return result.invocation;
     },
 
     checkPermission(input) {

@@ -1,8 +1,8 @@
-# CURSOR_REPORT — Private AI Provider Adapter Boundary V1
+# CURSOR_REPORT — Private AI Inference Invocation Orchestration V1
 
 ## Summary
 
-Built Private AI Provider Adapter Boundary above Execution Plan + Routing Policy. Contracts/registry/envelopes/errors/lifecycle/negotiation only — no live provider I/O. Dispatcher stops after adapter resolution + envelopes (contract-test fixture opt-in). schemaVersion 8. Admin `/admin/private-ai/adapters`. Tests + tsc + diff --check PASS. Uncommitted pending GO.
+Built Inference Invocation Orchestration above Adapter Boundary. Attempt lifecycle, timeout/cancellation/retry/idempotency metadata, normalized outcomes, audit, permissions, admin UI. Production adapters non-executable; contract-test fixture opt-in only. schemaVersion 9. Tests + tsc + diff --check PASS. Uncommitted pending GO.
 
 ## Exact files changed
 
@@ -10,14 +10,15 @@ Built Private AI Provider Adapter Boundary above Execution Plan + Routing Policy
 
 - `app/admin/private-ai/PrivateAiShell.tsx`
 - `app/admin/private-ai/page.tsx`
-- `lib/privateAi/executionDispatcher.ts`
+- `lib/privateAi/types.ts`
+- `lib/privateAi/permissions.ts`
 - `lib/privateAi/fileStore.ts`
-- `lib/privateAi/index.ts`
-- `lib/privateAi/inferenceRequestHandlers.ts`
-- `lib/privateAi/runtimeOpsHandlers.ts`
 - `lib/privateAi/seed.ts`
 - `lib/privateAi/service.ts`
-- `lib/privateAi/types.ts`
+- `lib/privateAi/index.ts`
+- `lib/privateAi/adapterRegistry.ts`
+- `lib/privateAi/runtimeOpsHandlers.ts`
+- `lib/privateAi/inferenceRequestHandlers.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -25,39 +26,26 @@ Built Private AI Provider Adapter Boundary above Execution Plan + Routing Policy
 
 ### Added
 
-- `lib/privateAi/adapterLifecycle.ts`
-- `lib/privateAi/adapterErrors.ts`
-- `lib/privateAi/adapterNegotiation.ts`
-- `lib/privateAi/adapterRegistry.ts`
-- `lib/privateAi/executionEnvelopes.ts`
-- `lib/privateAi/contractTestAdapter.ts`
-- `lib/privateAi/adapterBoundary.ts`
-- `lib/privateAi/privateAiProviderAdapterBoundary.test.ts`
-- `app/admin/private-ai/adapters/page.tsx`
+- `lib/privateAi/invocationLifecycle.ts`
+- `lib/privateAi/invocationOrchestrator.ts`
+- `lib/privateAi/privateAiInferenceInvocationOrchestration.test.ts`
+- `app/admin/private-ai/invocations/page.tsx`
+- `app/admin/private-ai/invocations/actions.ts`
 
 ## Migrations created
 
-None (file SoT schemaVersion 8; normalize migrates 1–7 → 8).
+None (file SoT schemaVersion 9).
 
 ## Security review
 
-- Fail-closed adapter resolution; permission check before resolve
-- No secrets in envelopes; redaction helper; safe user messages
-- Contract-test not production-enabled
-- No Shared AI / Gemini / network invoke
+- Fail-closed transitions; permission gates; redacted diagnostics
+- No secrets in envelopes; production adapters never executed
+- Contract-test requires opt-in + permission
 - Admin behind `requirePrivateAiAdmin`
 
 ## Tests
 
-```
-npx vitest run lib/privateAi/privateAiProviderAdapterBoundary.test.ts \
-  lib/privateAi/privateAiProviderRoutingPolicy.test.ts \
-  lib/privateAi/privateAiInferenceExecutionBoundary.test.ts \
-  lib/privateAi/privateAiInferenceRequestContracts.test.ts \
-  lib/privateAi/privateAiRuntimeOperationsFailover.test.ts
-```
-
-- 58 passed (17 adapter + 41 prior)
+58 prior + 17 orchestration = **75 passed** across focused suites.
 
 ## TypeScript
 
@@ -65,7 +53,7 @@ npx vitest run lib/privateAi/privateAiProviderAdapterBoundary.test.ts \
 
 ## Build
 
-Not required (admin + lib contracts).
+Not required.
 
 ## git diff --check
 
@@ -73,7 +61,7 @@ PASS
 
 ## git status --short
 
-Uncommitted feature files listed above; local `node_modules` for tooling — do not commit.
+Uncommitted feature files; local `node_modules` — do not commit.
 
 ## Open issues
 

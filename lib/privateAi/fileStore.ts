@@ -35,7 +35,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -55,6 +55,7 @@ export function emptyPrivateAiState(
     providerRoutingEvaluations: [],
     providerAdapters: [],
     adapterNormalizedFailures: [],
+    inferenceInvocations: [],
   };
 }
 
@@ -256,7 +257,8 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     version !== 5 &&
     version !== 6 &&
     version !== 7 &&
-    version !== 8
+    version !== 8 &&
+    version !== 9
   ) {
     return null;
   }
@@ -277,7 +279,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
       ];
 
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     updatedAt: nowIso,
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -350,6 +352,9 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     adapterNormalizedFailures: Array.isArray(obj.adapterNormalizedFailures)
       ? (obj.adapterNormalizedFailures as PersistedPrivateAiState["adapterNormalizedFailures"])
       : [],
+    inferenceInvocations: Array.isArray(obj.inferenceInvocations)
+      ? (obj.inferenceInvocations as PersistedPrivateAiState["inferenceInvocations"])
+      : [],
   };
 }
 
@@ -373,7 +378,7 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     runtimes: state.runtimes ?? [],
     runtimeIncidents: state.runtimeIncidents ?? [],
     runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
@@ -388,6 +393,7 @@ export function writePersistedPrivateAiState(
     providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
     providerAdapters: state.providerAdapters ?? [],
     adapterNormalizedFailures: state.adapterNormalizedFailures ?? [],
+    inferenceInvocations: state.inferenceInvocations ?? [],
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);

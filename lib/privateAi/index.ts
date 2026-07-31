@@ -67,6 +67,9 @@ export type {
   ExecutionOutputEnvelope,
   NormalizedAdapterError,
   ProviderAdapterContract,
+  InferenceInvocationRecord,
+  InvocationLifecycle,
+  OrchestrationNormalizedResult,
 } from "./types";
 
 export {
@@ -207,6 +210,24 @@ export {
 } from "./contractTestAdapter";
 
 export { applyAdapterBoundary } from "./adapterBoundary";
+
+export {
+  INVOCATION_LIFECYCLE_ORDER,
+  assertTransitionInvocationLifecycle,
+  canTransitionInvocationLifecycle,
+  isActiveInvocationLifecycle,
+  isTerminalInvocationLifecycle,
+  listAllowedInvocationTransitions,
+} from "./invocationLifecycle";
+
+export {
+  markInvocationTimedOut,
+  orchestrateInvocation,
+  requestInvocationCancellation,
+  scheduleInvocationRetry,
+  type OrchestrateInvocationInput,
+  type OrchestrateInvocationResult,
+} from "./invocationOrchestrator";
 
 export {
   getHardwareContract,

@@ -62,6 +62,12 @@ export const DEFAULT_PLATFORM_ADMIN_ACTIONS = [
   "runtime_recover",
   "inference_request",
   "inference_execute",
+  "invocation_create",
+  "invocation_contract_test",
+  "invocation_cancel",
+  "invocation_retry",
+  "invocation_diagnostics",
+  "invocation_policy",
 ] as const;
 
 export function hasRuntimeOpsPermission(

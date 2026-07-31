@@ -21,6 +21,7 @@ const NAV = [
   { href: `${PRIVATE_AI_BASE}/inference`, label: "Inference" },
   { href: `${PRIVATE_AI_BASE}/execution`, label: "Execution" },
   { href: `${PRIVATE_AI_BASE}/adapters`, label: "Adapters" },
+  { href: `${PRIVATE_AI_BASE}/invocations`, label: "Invocations" },
 ] as const;
 
 export default function PrivateAiShell({
@@ -37,7 +38,9 @@ export default function PrivateAiShell({
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav
           title={title}
-          subtitle={subtitle ?? "Private AI Provider Adapter Boundary"}
+          subtitle={
+            subtitle ?? "Private AI Inference Invocation Orchestration"
+          }
         />
         <nav
           aria-label="Private AI"

@@ -2,7 +2,7 @@
 
 ## Task title
 
-Private AI Provider Adapter Boundary V1
+Private AI Inference Invocation Orchestration V1
 
 ## Status
 
@@ -10,23 +10,23 @@ Private AI Provider Adapter Boundary V1
 
 ## Resume here
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-provider-adapter-boundary-v1`
-2. Branch: `office/platform-private-ai-provider-adapter-boundary-v1`
-3. Base: `origin/office/platform-private-ai-provider-routing-policy-v1` @ `53637d8`
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-inference-invocation-orchestration-v1`
+2. Branch: `office/platform-private-ai-inference-invocation-orchestration-v1`
+3. Base: `origin/office/platform-private-ai-provider-adapter-boundary-v1` @ `855b240`
 4. Manual commit (no trailers) → push → `0 0`
 
 ## Allowed scope
 
-- `lib/privateAi/**` (adapter boundary contracts, registry, envelopes, dispatcher wire)
-- `app/admin/private-ai/**` (adapters admin + nav/overview)
+- `lib/privateAi/**` (invocation orchestration on top of adapter boundary)
+- `app/admin/private-ai/**` (invocations admin + nav/overview)
 - `docs/ai/**` handoff docs for this task
 
 ## Forbidden
 
-Real inference; network provider calls; Gemini/OpenAI/Local LLM; Shared AI / Learning / Commerce / Home edits; commit/push/merge without GO.
+Real inference; network; Gemini/OpenAI/Local LLM; Shared AI / Learning / Commerce / Home; commit/push/merge without GO.
 
 ## Approved commit message (on GO)
 
 ```
-feat(ai): add private AI provider adapter boundary v1
+feat(ai): add private AI inference invocation orchestration v1
 ```

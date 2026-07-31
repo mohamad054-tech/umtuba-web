@@ -44,7 +44,7 @@ export function registerProviderAdapter(
   };
   return {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     providerAdapters: [...existing, withReadiness],
     updatedAt: withReadiness.updatedAt,
   };
@@ -103,7 +103,7 @@ export function advanceAdapterLifecycle(
   next.readiness = evaluateAdapterReadiness(next);
   return {
     ...state,
-    schemaVersion: 8,
+    schemaVersion: 9,
     providerAdapters: (state.providerAdapters ?? []).map((a) =>
       a.adapterId === adapterId ? next : a
     ),

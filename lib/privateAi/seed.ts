@@ -175,7 +175,7 @@ export function buildPrivateAiSeedState(
   };
 
   return {
-    schemaVersion: 8,
+    schemaVersion: 9,
     updatedAt: now,
     models: [
       {
@@ -220,6 +220,7 @@ export function buildPrivateAiSeedState(
       createContractTestAdapter(now),
     ],
     adapterNormalizedFailures: [],
+    inferenceInvocations: [],
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",
