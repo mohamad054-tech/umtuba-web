@@ -2,24 +2,21 @@
 
 ## Task title
 
-UMTUBA Commerce — Supplier Listing Create Hardening V1
+UMTUBA Commerce — Production Integration Preparation
 
 ## Status
 
-`pass-staged` — **implementation complete** — stop at PASS + STAGED (no commit / no push)
+`pass-staged` — **integration docs complete** — stop at PASS + STAGED (no commit / no push)
 
-## Capability (APPROVED)
+## Capability (coordination)
 
-`commerce.marketplace.supplier_listing_create_hardening_v1`
+`commerce.ops.production_integration_preparation_v1`
 
-## Branch
+## Branch / tip
 
-`office/commerce-marketplace-supplier-listing-create-hardening-v1`
-
-## Base / HEAD
-
-- Base (closed tip): `451cb7d` (Seller Inventory Availability Foundation V1)
-- HEAD: uncommitted / staged on feature branch (no commit yet)
+- Branch: `office/commerce-marketplace-supplier-listing-create-hardening-v1`
+- Tip: `ca157d716348ba107f546e453602eae7c48ec989`
+- No new branch created
 
 ## Worktree
 
@@ -27,16 +24,20 @@ UMTUBA Commerce — Supplier Listing Create Hardening V1
 
 ## Coordination
 
-- **Desktop** owns: AI Platform / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini / Tutor — do not touch
-- **Laptop** = Commerce marketplace listing create only
+- **Desktop:** AI Platform / Usage / Billing / Dashboard / Admin UI — do not touch
+- **Laptop:** Commerce Production Integration docs only
 
-## Delivered
+## Delivered (docs only)
 
-- TS SSOT `lib/store/supplierListingCreateHardening.ts`
-- Migration `20260886` — hardened RPC, owner/manager only, duplicate active reject, category/price/inventory/digital gates, RPC-only insert
-- Wired `addSupplierProductToMyStore` + `addToMyStoreAction`
-- Docs: `SUPPLIER_LISTING_CREATE_HARDENING_V1.md`
+- `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md`
+- `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md`
+- `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md`
+- SSOT: CURRENT_TASK / CURSOR_REPORT / SESSION_HANDOFF
 
-## Next
+## Explicit non-actions
 
-Human GO to commit / push. Apply `20260886` locally/remotely only when Product asks.
+No code · no migrations · no features · no branches · no commit · no push · no remote apply
+
+## Next human actions
+
+Execute Phases A–F per `COMMERCE_PRODUCTION_ROLLOUT.md` under Product GO.

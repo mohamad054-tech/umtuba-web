@@ -2,26 +2,40 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.marketplace.supplier_listing_create_hardening_v1` on `office/commerce-marketplace-supplier-listing-create-hardening-v1` (base `451cb7d`).
+**PASS + STAGED** for `commerce.ops.production_integration_preparation_v1` — documentation/integration audit only.
 
-## Exact milestone
+## Documents created
 
-`commerce.marketplace.supplier_listing_create_hardening_v1` — approved and implemented.
+| Doc | Purpose |
+| --- | --- |
+| `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md` | Phases A–H playbook, dependency graph, migration waves, RPC matrix |
+| `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md` | First supplier onboarding ops |
+| `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md` | First digital product + listing ops |
 
-## Listing hardening behavior
+## Milestone verification
 
-- Owner/manager only create
-- Product↔supplier ownership validated
-- Active category required and stamped on listing
-- Trusted price + finite inventory model + digital readiness gates
-- Duplicate active listings rejected (fail closed)
-- Direct table INSERT revoked (RPC-only)
-- No commission/settlement invention; reuses existing listing table
+Tip `ca157d7` contains completed Commerce lineage through listing create hardening. Remote E2E has **20260809–20260821**. Wave A (`20260869→70→75→78→79→85→86`) still waiting for remote apply.
 
-## Migration
+## Dependency graph (condensed)
 
-`20260886_store_supplier_listing_create_hardening_v1.sql` — **local only**, not applied remotely.
+Product Foundation → Category → Inventory (TS) → Digital upload → Publish readiness → Review → Marketplace listing stack → (defer) Settlement → Payout → Refund
+
+## Remaining blockers (product load)
+
+1. Merge tip to deploy line  
+2. Remote apply Wave A  
+3. Storage verify  
+4. Ops: approve first seller + first digital product  
+
+Money path (confirm ON, Stripe live, commission rates, bank rails) is **not** a load blocker.
+
+## Production readiness %
+
+| Lens | % |
+| --- | --- |
+| Ready to load first digital product | **~58%** (→ ~80% after Phases A–F) |
+| Full live sell + settle + payout | **~35%** |
 
 ## Boundaries
 
-No Dashboard, no Admin UI, no AI, no redesign, no commit/push in this phase.
+No code, no migrations, no Dashboard, no AI, no commit, no push in this slice.
