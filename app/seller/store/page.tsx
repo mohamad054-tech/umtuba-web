@@ -44,6 +44,13 @@ import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../lib/store/sellerStore";
+import { fetchMySellerPayouts } from "../../../lib/store/sellerPayoutReadModel";
+import {
+  SELLER_PAYOUT_HISTORY_PAGE_SIZE,
+  buildSellerPayoutHistoryLoadMoreHref,
+  buildSellerPayoutHistorySurface,
+  parseSellerPayoutHistoryCursor,
+} from "../../../lib/store/sellerPayoutHistorySurface";
 import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
@@ -51,7 +58,17 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams?: Promise<{ period?: string }> | { period?: string };
+  searchParams?:
+    | Promise<{
+        period?: string;
+        payout_before?: string;
+        payout_before_id?: string;
+      }>
+    | {
+        period?: string;
+        payout_before?: string;
+        payout_before_id?: string;
+      };
 };
 
 export default async function SellerStorePage({ searchParams }: PageProps) {
@@ -192,6 +209,51 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     }
   );
 
+  const payoutCursorParsed = parseSellerPayoutHistoryCursor({
+    beforeCreatedAt: params.payout_before,
+    beforeId: params.payout_before_id,
+  });
+  let payoutHistory: ReturnType<typeof buildSellerPayoutHistorySurface> | null =
+    null;
+  let payoutHistoryLoadMoreHref: string | null = null;
+  if (canManage) {
+    if (!payoutCursorParsed.ok) {
+      payoutHistory = buildSellerPayoutHistorySurface({
+        storeId: membership.store.id,
+        page: null,
+        unavailable: true,
+        errorMessage: payoutCursorParsed.message,
+      });
+    } else {
+      const payoutList = await fetchMySellerPayouts(supabase, {
+        storeId: membership.store.id,
+        limit: SELLER_PAYOUT_HISTORY_PAGE_SIZE,
+        beforeCreatedAt: payoutCursorParsed.cursor?.beforeCreatedAt,
+        beforeId: payoutCursorParsed.cursor?.beforeId,
+      });
+      if (!payoutList.ok) {
+        payoutHistory = buildSellerPayoutHistorySurface({
+          storeId: membership.store.id,
+          page: null,
+          unavailable: true,
+          errorMessage: payoutList.message,
+        });
+      } else {
+        payoutHistory = buildSellerPayoutHistorySurface({
+          storeId: membership.store.id,
+          page: payoutList.data,
+        });
+        if (payoutHistory.hasMore && payoutHistory.nextCursor) {
+          payoutHistoryLoadMoreHref = buildSellerPayoutHistoryLoadMoreHref({
+            basePath: APP_ROUTES.sellerStore,
+            periodKey: uiPeriod,
+            cursor: payoutHistory.nextCursor,
+          });
+        }
+      }
+    }
+  }
+
   const eligibleProductCount = products.filter(
     (p) => Boolean(p.marketplace_eligible)
   ).length;
@@ -231,6 +293,8 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           canManage={canManage}
           periodKey={uiPeriod}
           revenueBridge={revenueBridge}
+          payoutHistory={payoutHistory}
+          payoutHistoryLoadMoreHref={payoutHistoryLoadMoreHref}
         />
       </div>
 

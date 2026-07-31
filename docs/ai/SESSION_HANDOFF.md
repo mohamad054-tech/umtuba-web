@@ -1,26 +1,27 @@
-# Session Handoff — Settlement ↔ Payout Reconciliation Read V1
+# Session Handoff — Seller Payout History Surface V1
 
 **Updated:** 2026-07-31
 
 ## Active milestone
 
-Capability: `commerce.settlement.payout_reconciliation_read_v1` (**APPROVED**)
-Branch: `office/commerce-settlement-payout-reconciliation-read-v1`
+Capability: `commerce.settlement.seller_payout_history_surface_v1` (**APPROVED**)
+Branch: `office/commerce-settlement-seller-payout-history-surface-v1`
 Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-Base tip: `af1eedd2eadd06fa7ad8beba76ce90d91d5d3b40`
-Status: **PASS + STAGED** — no commit / push / remote apply yet
+Base tip: `6b210755925bbf4e0f1be753e080fc409896c6a0`
+Status: **PASS + STAGED** — no commit / push yet
 
 ## What landed locally
 
-- SQL migration `20260883` — list + summary reconciliation RPCs
-- TS pure reconcile + parsers + RPC wrappers
-- Vitest contracts covering mismatch classes, pagination, auth surface, migration text
-- Commerce + AI SSOT docs updated
+- Pure history view-model + Vitest contracts
+- Seller store section (empty / unavailable / ready + load older)
+- Wired owner/manager fetch of `get_my_seller_payouts`
+- Commerce + SSOT docs updated; **no migration**
 
 ## Closed tips (do not reopen)
 
 | Track | Tip |
 | --- | --- |
+| Settlement ↔ Payout Reconciliation Read V1 | `6b21075` |
 | Payout Balance Visibility V1 | `af1eedd` |
 | Seller Payout Read Model V1 | `66a8bed` |
 | Seller Payout Foundation V1 | `aa99592` + handoff `032ac77` |
@@ -28,10 +29,10 @@ Status: **PASS + STAGED** — no commit / push / remote apply yet
 ## Coordination
 
 - Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — leave alone
-- This worktree = Commerce only
+- This worktree = Commerce seller-facing only
 
 ## Do not
 
-- Commit / push / remote-apply unless asked
+- Commit / push unless asked
 - Touch Dashboard / Admin / AI
 - Enable bank rails or invent the next Commerce feature without SSOT GO

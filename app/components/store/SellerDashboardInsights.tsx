@@ -15,7 +15,9 @@ import {
 } from "../../../lib/store/sellerDashboardInsights";
 import type { AnalyticsSalesSeriesPoint, AnalyticsTopProductRow } from "../../../lib/store/analyticsFinance";
 import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/commerceRevenueBridge";
+import type { SellerPayoutHistorySurfaceView } from "../../../lib/store/sellerPayoutHistorySurface";
 import { APP_ROUTES } from "../../lib/nav";
+import SellerPayoutHistory from "./SellerPayoutHistory";
 
 type Props = {
   storeName: string;
@@ -39,6 +41,8 @@ type Props = {
   canManage: boolean;
   periodKey: "7d" | "30d";
   revenueBridge: CommerceRevenueBridgeSellerVisibility;
+  payoutHistory: SellerPayoutHistorySurfaceView | null;
+  payoutHistoryLoadMoreHref: string | null;
 };
 
 export default function SellerDashboardInsightsView(props: Props) {
@@ -64,6 +68,8 @@ export default function SellerDashboardInsightsView(props: Props) {
     canManage,
     periodKey,
     revenueBridge,
+    payoutHistory,
+    payoutHistoryLoadMoreHref,
   } = props;
 
   return (
@@ -546,6 +552,13 @@ export default function SellerDashboardInsightsView(props: Props) {
           {revenueBridge.payoutsEnabled ? "enabled" : "not yet enabled"}.
         </p>
       </section>
+
+      {payoutHistory ? (
+        <SellerPayoutHistory
+          surface={payoutHistory}
+          loadMoreHref={payoutHistoryLoadMoreHref}
+        />
+      ) : null}
     </div>
   );
 }

@@ -68,3 +68,5 @@ Bank/provider rails, maker-checker batches, Dashboard/admin UI, write RPCs, comm
 Seller balance visibility through the Revenue Bridge is `commerce.revenue.payout_balance_visibility_v1` (consumes these RPCs; does not enable bank payouts).
 
 Settlement↔payout mismatch diagnostics are `commerce.settlement.payout_reconciliation_read_v1` (`SETTLEMENT_PAYOUT_RECONCILIATION_READ_V1.md`) — read-only; does not change this projection.
+
+Seller-facing history UI on the existing seller store is `commerce.settlement.seller_payout_history_surface_v1` (`SELLER_PAYOUT_HISTORY_SURFACE_V1.md`) — consumes `get_my_seller_payouts`; no bank rails.
