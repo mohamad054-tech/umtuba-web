@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* UMTUBA is dark-first; do not follow OS light scheme for the shell. */
+  color-scheme: dark;
+  --background: #050510;
+  --foreground: #ededed;
   /* Set by AppMobileBottomNav while visible on small viewports */
   --app-mobile-bottom-nav-offset: 0px;
 }
@@ -20,16 +22,20 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
+  background-color: #050510;
+}
+
+html,
+body {
+  min-height: 100%;
+  background-color: #050510 !important;
+  background: #050510 !important;
+  color: #ededed;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
@@ -565,4 +571,106 @@ body {
     animation: none !important;
     opacity: 0.7;
   }
+}
+
+/* —— Nexus Learning Home —— */
+@keyframes lx-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lx-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes lx-pulse-soft {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-safe\:animate-\[lx-fade-up_0\.45s_ease-out_both\],
+  .motion-safe\:animate-\[lx-breathe_6s_ease-in-out_infinite\],
+  .motion-safe\:animate-\[lx-pulse-soft_2\.8s_ease-in-out_infinite\] {
+    animation: none !important;
+  }
+
+  .lx-bento-cell {
+    animation-delay: 0ms !important;
+  }
+}
+
+/* —— Nexus Design System tokens (Learning OS) —— */
+.lx-root {
+  --lx-bg: #050510;
+  --lx-bg-elevated: #080816;
+  --lx-panel: rgba(8, 8, 22, 0.82);
+  --lx-panel-strong: rgba(12, 16, 36, 0.92);
+  --lx-panel-accent: rgba(14, 165, 233, 0.08);
+  --lx-border: rgba(255, 255, 255, 0.1);
+  --lx-border-strong: rgba(255, 255, 255, 0.2);
+  --lx-border-accent: rgba(56, 189, 248, 0.25);
+  --lx-fg: #ffffff;
+  --lx-fg-muted: rgba(255, 255, 255, 0.55);
+  --lx-fg-subtle: rgba(255, 255, 255, 0.4);
+  --lx-fg-faint: rgba(255, 255, 255, 0.28);
+  --lx-accent: rgb(56, 189, 248);
+  --lx-accent-soft: rgb(125, 211, 252);
+  --lx-on-accent: #050510;
+  --lx-status-neutral: rgba(255, 255, 255, 0.7);
+  --lx-status-info: rgb(56, 189, 248);
+  --lx-status-success: rgb(52, 211, 153);
+  --lx-status-warning: rgb(251, 191, 36);
+  --lx-status-danger: rgb(251, 113, 133);
+  --lx-status-locked: rgba(255, 255, 255, 0.25);
+  --lx-radius: 1.75rem;
+  --lx-radius-sm: 1.25rem;
+  --lx-page-x: 1.5rem;
+  --lx-page-y: 1.5rem;
+  color: var(--lx-fg);
+  background-color: var(--lx-bg);
+}
+
+.lx-hover-border {
+  transition: border-color 200ms ease;
+}
+
+.lx-skip-link {
+  position: absolute;
+  inset-inline-start: 1rem;
+  top: 0.75rem;
+  z-index: 60;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
+  color: #050510;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  transform: translateY(-150%);
+}
+
+.lx-skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid rgb(125, 211, 252);
+  outline-offset: 2px;
 }

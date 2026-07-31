@@ -20,6 +20,8 @@ import {
 } from "../../lib/supabase/validation";
 import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
 import SettingsShell from "./SettingsShell";
+import { LanguageSelector, useTranslation } from "../components/i18n";
+import type { TranslationKey } from "../../lib/i18n";
 
 export type SettingsProfile = {
   id: string;
@@ -38,33 +40,46 @@ type FieldErrors = {
   avatar?: string;
 };
 
-type SettingsSection = "profile" | "notifications" | "account";
+type SettingsSection = "profile" | "notifications" | "account" | "language";
 
 type SettingsExperienceProps = {
   profile: SettingsProfile;
 };
 
-const SECTIONS: { id: SettingsSection; label: string; description: string }[] =
-  [
-    {
-      id: "profile",
-      label: "Profile",
-      description: "Name, username, bio, and location",
-    },
-    {
-      id: "notifications",
-      label: "Notifications",
-      description: "Email and in-app preferences",
-    },
-    {
-      id: "account",
-      label: "Account",
-      description: "Saved, rewards, and sign out",
-    },
-  ];
+const SECTIONS: {
+  id: SettingsSection;
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
+}[] = [
+  {
+    id: "profile",
+    labelKey: "settings.profile",
+    descriptionKey: "settings.profileDescription",
+  },
+  {
+    id: "notifications",
+    labelKey: "settings.notifications",
+    descriptionKey: "settings.notificationsDescription",
+  },
+  {
+    id: "language",
+    labelKey: "settings.languageNav",
+    descriptionKey: "settings.languageNavDescription",
+  },
+  {
+    id: "account",
+    labelKey: "settings.account",
+    descriptionKey: "settings.accountDescription",
+  },
+];
 
 function resolveSection(raw: string | null): SettingsSection {
-  if (raw === "notifications" || raw === "account" || raw === "profile") {
+  if (
+    raw === "notifications" ||
+    raw === "account" ||
+    raw === "profile" ||
+    raw === "language"
+  ) {
     return raw;
   }
   return "profile";
@@ -75,6 +90,7 @@ export default function SettingsExperience({
 }: SettingsExperienceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const activeSection = resolveSection(searchParams.get("section"));
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(profile.displayName);
@@ -213,13 +229,13 @@ export default function SettingsExperience({
           href={profileHref}
           className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
         >
-          View profile
+          {t("settings.viewProfile")}
         </Link>
       }
     >
       <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
         <nav
-          aria-label="Settings sections"
+          aria-label={t("settings.sectionsLabel")}
           className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
         >
           {SECTIONS.map((section) => {
@@ -236,9 +252,11 @@ export default function SettingsExperience({
                     : "border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                <span className="block text-sm font-black">{section.label}</span>
+                <span className="block text-sm font-black">
+                  {t(section.labelKey)}
+                </span>
                 <span className="mt-0.5 hidden text-[11px] text-white/45 lg:block">
-                  {section.description}
+                  {t(section.descriptionKey)}
                 </span>
               </button>
             );
@@ -249,9 +267,11 @@ export default function SettingsExperience({
           {activeSection === "profile" ? (
             <form className="space-y-4" onSubmit={handleSubmit} noValidate>
               <div>
-                <h2 className="text-2xl font-black tracking-tight">Profile</h2>
+                <h2 className="text-2xl font-black tracking-tight">
+                  {t("settings.profileHeading")}
+                </h2>
                 <p className="mt-1 text-sm text-white/55">
-                  Update how you appear across UMTUBA.
+                  {t("settings.profileIntro")}
                 </p>
               </div>
 
@@ -397,19 +417,35 @@ export default function SettingsExperience({
                 aria-busy={isSaving}
                 className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSaving ? "Saving..." : "Save profile"}
+                {isSaving ? t("status.saving") : t("settings.saveProfile")}
               </button>
             </form>
+          ) : null}
+
+          {activeSection === "language" ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">
+                  {t("settings.language")}
+                </h2>
+                <p className="mt-1 text-sm text-white/55">
+                  {t("settings.languageDescription")}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+                <LanguageSelector tone="dark" />
+              </div>
+            </div>
           ) : null}
 
           {activeSection === "notifications" ? (
             <div className="space-y-4">
               <div>
                 <h2 className="text-2xl font-black tracking-tight">
-                  Notifications
+                  {t("settings.notificationsHeading")}
                 </h2>
                 <p className="mt-1 text-sm text-white/55">
-                  Choose what you hear about across UMTUBA.
+                  {t("settings.notificationsIntro")}
                 </p>
               </div>
               <NotificationPreferencesPanel highlighted />
@@ -419,9 +455,11 @@ export default function SettingsExperience({
           {activeSection === "account" ? (
             <div className="space-y-5">
               <div>
-                <h2 className="text-2xl font-black tracking-tight">Account</h2>
+                <h2 className="text-2xl font-black tracking-tight">
+                  {t("settings.accountHeading")}
+                </h2>
                 <p className="mt-1 text-sm text-white/55">
-                  Shortcuts and session controls.
+                  {t("settings.accountIntro")}
                 </p>
               </div>
 
@@ -479,7 +517,7 @@ export default function SettingsExperience({
                 }}
                 className="watch-focus-ring w-full rounded-2xl border border-red-400/25 bg-red-500/10 py-4 font-bold text-red-100 transition hover:bg-red-500/15 disabled:opacity-50"
               >
-                {isSigningOut ? "Signing out..." : "Sign out"}
+                {isSigningOut ? t("status.signingOut") : t("settings.signOut")}
               </button>
             </div>
           ) : null}

@@ -1,28 +1,47 @@
-# Current Task
+﻿# Current Task
 
 ## Task title
 
-Commerce Refund Operations Surface V1
+AI Creator Studio Foundation V1
 
 ## Status
 
-`pass` — stop for human GO (no commit / no push / no remote migration)
+`implementation-complete` — awaiting GO for commit/push
 
-## Capability
+## Branch
 
-`commerce.refund.operations_surface_v1`
+`office/platform-ai-creator-studio-foundation-v1`
 
-## Branch / tip
+## Worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-refund-operations-surface-v1`
-- Branch: `office/commerce-refund-operations-surface-v1`
-- Base: `origin/office/commerce-seller-payout-rails-v1` @ `9a93fc9`
-- HEAD: `9a93fc9` + uncommitted refund ops work
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-creator-studio-foundation-v1`
 
-## Explicit non-actions
+## Base
 
-No commit · no push · no merge · no remote migration · no commission/payout/stripe-config · no partial refund · no `.env.local`
+`origin/office/platform-ai-unified-capability-execution-v1` @ `1c504ff`
 
-## Next human actions
+## Allowed scope
 
-Review uncommitted diff → GO for commit/push when ready. Apply `20260888` locally/remotely under separate ops GO.
+- `lib/ai/creatorStudio/**`
+- `app/creator/studio/**`
+- `app/admin/ai/creator-studio/**`
+- `app/admin/ai/**` nav links only
+- `app/lib/nav/routes.ts` Creator Studio route only
+- `lib/ai/catalog/definitions.ts` capability binding only
+- `lib/ai/policy/fixtures.ts` policy binding only
+- `lib/ai/index.ts` exports only
+- `docs/ai/**`
+
+## Forbidden
+
+- Commit / push / merge
+- Live inference / network / Gemini / OpenAI
+- Commerce / Learning / Home / Private AI rewrites
+- `.env.local` / secrets
+
+## Done
+
+- Creator Studio contracts, templates, sessions, drafts, history, versions
+- Unified Capability Execution integration (mock results only)
+- Creator UI `/creator/studio` + Admin `/admin/ai/creator-studio`
+- Tests + docs handoff

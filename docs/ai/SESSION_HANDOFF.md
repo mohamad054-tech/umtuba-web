@@ -1,26 +1,20 @@
-# Session Handoff
+# SESSION_HANDOFF — AI Capability Catalog & Service Registry V1
 
-## Active milestone
+## Where
 
-`commerce.product.production_readiness_audit_v1`
+- Worktree: `umtuba-web-ai-capability-catalog-service-registry-v1`
+- Branch: `office/platform-ai-capability-catalog-service-registry-v1`
+- Base: `16bbaa4`
 
-Status: **PASS + STAGED** — awaiting human commit/push GO
+## Done
 
-## Branch / worktree
+- Central catalog of real Shared AI + Private AI domain + Hub placeholders
+- Service registry: register/unregister/lookup/filter/negotiate/lifecycle
+- Validation: duplicates, providers, runtimes, lifecycle, contracts
+- `aiService.runCapability` fail-closed via `requireExecutable`
+- Admin `/admin/ai/capabilities`
+- Vitest catalog suite + Shared AI surface still green
 
-- Branch: `office/commerce-product-production-readiness-audit-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-- Base: `d47f825`
-- HEAD: uncommitted staged tip
+## Next GO
 
-## Delivered
-
-Trusted server-side product production readiness audit (READY / NOT_READY + blockers) composing existing Commerce SSOTs.
-
-## Coordination
-
-Desktop AI / Dashboard / Admin — untouched.
-
-## Next human action
-
-Commit + push when ready. No migration apply.
+Manual commit (no trailers) → push → `0 0`

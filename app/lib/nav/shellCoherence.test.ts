@@ -23,12 +23,12 @@ describe("shell coherence", () => {
 
   it("AppTopNav is the shared shell chrome", () => {
     const top = read("app/components/AppTopNav.tsx");
-    expect(top).toMatch(/aria-label="Primary"/);
+    expect(top).toMatch(/aria-label=\{t\("nav\.primary"\)\}/);
     expect(top).toMatch(/UserMenu/);
     expect(top).toMatch(/WalletBalanceIndicator/);
     expect(top).toMatch(/NotificationBell/);
     expect(top).toMatch(/APP_ROUTES\.search/);
-    expect(top).toMatch(/aria-label="Search"/);
+    expect(top).toMatch(/actions\.search|nav\.search/);
     expect(top).toMatch(/watch-focus-ring/);
   });
 
@@ -45,10 +45,12 @@ describe("shell coherence", () => {
     const settings = read("app/settings/SettingsExperience.tsx");
     const shell = read("app/settings/SettingsShell.tsx");
     expect(shell).toMatch(/AppTopNav/);
-    expect(shell).toMatch(/title="Settings"/);
+    expect(shell).toMatch(/settings\.title/);
     expect(settings).toMatch(/SettingsShell/);
     expect(settings).not.toMatch(/AuthShell/);
     expect(settings).toMatch(/"notifications"/);
+    expect(settings).toMatch(/"language"/);
+    expect(settings).toMatch(/LanguageSelector/);
     expect(settings).toMatch(/searchParams\.get\("section"\)/);
   });
 

@@ -12,6 +12,11 @@ import {
 } from "../../lib/supabase/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import { buildUserMenuGroups } from "../lib/nav/userMenuItems";
+import {
+  userMenuGroupLabelKey,
+  userMenuItemLabelKey,
+} from "../../lib/i18n";
+import { useTranslation } from "./i18n";
 
 /**
  * Account menu for AppTopNav (including /live and Watch).
@@ -24,6 +29,7 @@ import { buildUserMenuGroups } from "../lib/nav/userMenuItems";
 export default function UserMenu() {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const rootRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -178,7 +184,7 @@ export default function UserMenu() {
         href={loginHref}
         className="watch-focus-ring relative z-[60] shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
       >
-        Sign in
+        {t("menu.signIn")}
       </Link>
     );
   }
@@ -195,7 +201,7 @@ export default function UserMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={open ? `${menuId}-menu` : undefined}
-        aria-label="Account menu"
+        aria-label={t("menu.accountMenu")}
         className="watch-focus-ring flex max-w-[11rem] items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1 pl-1 pr-2.5 text-left transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 sm:max-w-[14rem]"
         title={profile.display_name || profile.username}
       >
@@ -235,15 +241,17 @@ export default function UserMenu() {
             <p className="truncate text-xs text-white/45">@{profile.username}</p>
           </div>
 
-          {menuGroups.map((group) => (
+          {menuGroups.map((group) => {
+            const groupLabel = t(userMenuGroupLabelKey(group.id));
+            return (
             <div
               key={group.id}
               role="group"
-              aria-label={group.label}
+              aria-label={groupLabel}
               className="border-b border-white/10 p-1.5 last:border-b-0"
             >
               <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
-                {group.label}
+                {groupLabel}
               </p>
               {group.items.map((item) => (
                 <Link
@@ -253,13 +261,14 @@ export default function UserMenu() {
                   onClick={() => setOpen(false)}
                   className="watch-focus-ring block rounded-xl px-3 py-2 text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white focus-visible:bg-white/5 focus-visible:outline-none"
                 >
-                  {item.label}
+                  {t(userMenuItemLabelKey(item.id))}
                 </Link>
               ))}
             </div>
-          ))}
+            );
+          })}
 
-          <div role="group" aria-label="Session" className="p-1.5">
+          <div role="group" aria-label={t("menu.session")} className="p-1.5">
             <button
               type="button"
               role="menuitem"
@@ -269,7 +278,7 @@ export default function UserMenu() {
               disabled={isSigningOut}
               className="watch-focus-ring w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white focus-visible:bg-white/5 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSigningOut ? "Switching…" : "Switch account"}
+              {isSigningOut ? t("menu.switching") : t("menu.switchAccount")}
             </button>
             <button
               type="button"
@@ -280,7 +289,7 @@ export default function UserMenu() {
               disabled={isSigningOut}
               className="watch-focus-ring w-full rounded-xl px-3 py-2 text-left text-sm font-bold text-red-200/90 transition hover:bg-red-500/10 hover:text-red-100 focus-visible:bg-red-500/10 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSigningOut ? "Signing out…" : "Sign out"}
+              {isSigningOut ? t("status.signingOut") : t("menu.signOut")}
             </button>
           </div>
 

@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 import AppTopNav from "../components/AppTopNav";
+import { useTranslation } from "../components/i18n";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
 
 type SettingsShellProps = {
@@ -11,6 +14,8 @@ export default function SettingsShell({
   children,
   actions,
 }: SettingsShellProps) {
+  const { t } = useTranslation();
+
   return (
     <main
       className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -22,8 +27,8 @@ export default function SettingsShell({
       </div>
 
       <AppTopNav
-        title="Settings"
-        subtitle="Account & preferences"
+        title={t("settings.title")}
+        subtitle={t("settings.subtitle")}
         actions={actions}
       />
 

@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { desktopNavLabelKey } from "../../lib/i18n";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
 import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
+import { useTranslation } from "./i18n";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
 import WalletBalanceIndicator from "./wallet/WalletBalanceIndicator";
@@ -26,6 +28,7 @@ export default function AppTopNav({
   sticky = true,
 }: AppTopNavProps) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
     <header
@@ -37,7 +40,7 @@ export default function AppTopNav({
         <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <Link
             href={APP_ROUTES.home}
-            aria-label="UMTUBA home"
+            aria-label={t("nav.homeAria")}
             className="watch-focus-ring shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
           >
             UMTUBA
@@ -56,7 +59,7 @@ export default function AppTopNav({
         </div>
 
         <nav
-          aria-label="Primary"
+          aria-label={t("nav.primary")}
           className="hidden items-center gap-1 sm:flex sm:gap-2"
         >
           {APP_NAV_ITEMS.map((item) => {
@@ -73,7 +76,7 @@ export default function AppTopNav({
                     : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                {item.label}
+                {t(desktopNavLabelKey(item.href))}
               </Link>
             );
           })}
@@ -88,7 +91,7 @@ export default function AppTopNav({
           ) : null}
           <Link
             href={APP_ROUTES.search}
-            aria-label="Search"
+            aria-label={t("actions.search")}
             aria-current={
               pathname === APP_ROUTES.search ||
               pathname.startsWith(`${APP_ROUTES.search}/`)
@@ -102,7 +105,7 @@ export default function AppTopNav({
                 : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
             }`}
           >
-            Search
+            {t("nav.search")}
           </Link>
           <ActivityTierIndicator />
           <WalletBalanceIndicator />

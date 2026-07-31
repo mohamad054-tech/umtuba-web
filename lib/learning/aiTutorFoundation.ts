@@ -23,9 +23,24 @@ export type LearningAiTutorMessageKind =
 export const LEARNING_AI_TUTOR_RPCS = {
   createThread: "create_my_learning_ai_tutor_thread",
   appendMessage: "append_my_learning_ai_tutor_message",
+  /** Real Core assistant text (Thread Persistence Bridge). Stub append remains. */
+  appendExchange: "append_my_learning_ai_tutor_exchange",
   listThreads: "list_my_learning_ai_tutor_threads",
   getMessages: "get_my_learning_ai_tutor_thread_messages",
+  /** Lean metadata only (no messages) for bridge validation. */
+  getThread: "get_my_learning_ai_tutor_thread",
 } as const;
+
+/** Kinds accepted by append_my_learning_ai_tutor_exchange (narrower than message table). */
+export const LEARNING_AI_TUTOR_EXCHANGE_KINDS = [
+  "ask_question",
+  "explain_again",
+  "hint",
+] as const;
+export type LearningAiTutorExchangeKind =
+  (typeof LEARNING_AI_TUTOR_EXCHANGE_KINDS)[number];
+
+export const LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX = 20000;
 
 export const LEARNING_AI_TUTOR_ROUTES = {
   lesson: (lessonId: string) => `/learning/lessons/${lessonId}/ai-tutor`,
@@ -128,6 +143,51 @@ export async function appendMyAiTutorMessage(
   return { ok: true, data: asRecord(result.data) ?? {} };
 }
 
+/**
+ * Persist one learner + one real assistant exchange (Core bridge).
+ * Does not use the stub append RPC.
+ */
+export async function appendMyAiTutorExchange(
+  supabase: AnyClient,
+  input: {
+    threadId: string;
+    kind: LearningAiTutorExchangeKind;
+    userContent: string;
+    assistantContent: string;
+  }
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  if (!isAiTutorUuid(input.threadId)) {
+    return { ok: false, message: "thread_id must be a valid UUID" };
+  }
+  if (
+    !(LEARNING_AI_TUTOR_EXCHANGE_KINDS as readonly string[]).includes(input.kind)
+  ) {
+    return { ok: false, message: "Invalid message_kind" };
+  }
+  const userContent = input.userContent.trim();
+  const assistantContent = input.assistantContent.trim();
+  if (
+    !userContent ||
+    userContent.length > LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX
+  ) {
+    return { ok: false, message: "user content must be 1..20000 chars" };
+  }
+  if (
+    !assistantContent ||
+    assistantContent.length > LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX
+  ) {
+    return { ok: false, message: "assistant content must be 1..20000 chars" };
+  }
+  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.appendExchange, {
+    p_thread_id: input.threadId,
+    p_kind: input.kind,
+    p_user_content: userContent,
+    p_assistant_content: assistantContent,
+  });
+  if (!result.ok) return result;
+  return { ok: true, data: asRecord(result.data) ?? {} };
+}
+
 export async function listMyAiTutorThreads(
   supabase: AnyClient,
   courseId?: string | null
@@ -154,4 +214,33 @@ export async function getMyAiTutorThreadMessages(
   });
   if (!result.ok) return result;
   return { ok: true, data: asRecord(result.data) ?? {} };
+}
+
+/**
+ * Lean owner-scoped thread metadata (no messages).
+ * Used by Thread Persistence Bridge pre-validation.
+ */
+export async function getMyAiTutorThread(
+  supabase: AnyClient,
+  threadId: string
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  if (!isAiTutorUuid(threadId)) {
+    return { ok: false, message: "thread_id must be a valid UUID" };
+  }
+  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.getThread, {
+    p_thread_id: threadId,
+  });
+  if (!result.ok) return result;
+  const row = asRecord(result.data);
+  if (!row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  // Fail closed if a future RPC shape leaks messages or omits identity fields.
+  if ("messages" in row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.thread_id !== "string" || !isAiTutorUuid(row.thread_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  return { ok: true, data: row };
 }

@@ -26,6 +26,7 @@ export const APP_ROUTES = {
   worldSearch: "/world/search",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
+  creatorStudio: "/creator/studio",
   learning: "/learning",
   games: "/games",
   store: "/store",
