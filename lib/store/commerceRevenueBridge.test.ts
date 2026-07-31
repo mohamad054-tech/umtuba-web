@@ -56,8 +56,12 @@ describe("commerce revenue bridge — canonical event", () => {
     expect(built.event.financialEligibility).toBe(
       "eligible_for_capture_posting"
     );
-    expect(built.event.commission.merchantAmountMinor).toBeNull();
-    expect(built.event.commission.platformCommissionMinor).toBeNull();
+    // Activation → bridge apply: USD launch policy decomposes merchandise_net.
+    expect(built.event.commission.policyStatus).toBe("applied");
+    if (built.event.commission.policyStatus !== "applied") return;
+    expect(built.event.commission.platformCommissionMinor).toBe(450);
+    expect(built.event.commission.merchantAmountMinor).toBe(3825);
+    expect(built.event.commission.supplierAmountMinor).toBe(225);
   });
 
   it("rejects amount component / grand total mismatch", () => {
@@ -171,10 +175,21 @@ describe("commerce revenue bridge — commission", () => {
       "not_configured"
     );
     expect(COMMISSION_DECOMPOSITION_UNAVAILABLE.merchantAmountMinor).toBeNull();
-    const built = buildCommerceFinancialEvent(baseSnapshot());
+    const built = buildCommerceFinancialEvent(baseSnapshot(), {
+      commissionPolicies: [],
+    });
     expect(built.ok).toBe(true);
     if (!built.ok) return;
     expect(built.event.commission).toEqual(COMMISSION_DECOMPOSITION_UNAVAILABLE);
+  });
+
+  it("fail-closes unsupported currency even with activation defaults", () => {
+    const built = buildCommerceFinancialEvent(
+      baseSnapshot({ currency: "ZAR" })
+    );
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    expect(built.event.commission.policyStatus).toBe("not_configured");
   });
 
   it("applies trusted commission policy without changing settlement posture", () => {
@@ -260,6 +275,28 @@ describe("commerce revenue bridge — reconciliation + backfill dry-run", () => 
     expect(
       issues.some((i) => i.code === "confirmed_paid_without_financial_event")
     ).toBe(true);
+    // USD is a launch currency — no global missing_commission_policy flag.
+    expect(issues.some((i) => i.code === "missing_commission_policy")).toBe(
+      false
+    );
+  });
+
+  it("flags missing commission only for unsupported currencies", () => {
+    const issues = diagnoseCommerceRevenueBridge({
+      orders: [
+        {
+          orderId: ORDER_ID,
+          storeId: STORE_ID,
+          paymentStatus: "paid",
+          orderStatus: "confirmed",
+          currency: "ZAR",
+          grandTotalMinor: 5000,
+          hasCaptureFinancialEvent: true,
+          captureAmountMinor: 5000,
+          captureCurrency: "ZAR",
+        },
+      ],
+    });
     expect(issues.some((i) => i.code === "missing_commission_policy")).toBe(
       true
     );

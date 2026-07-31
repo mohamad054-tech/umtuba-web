@@ -2,41 +2,42 @@
 
 ## Task title
 
-UMTUBA Commerce — Commission Policy Activation V1
+UMTUBA Commerce — Commission Decomposition Bridge Apply V1
 
 ## Status
 
-`pass` — implementation complete locally — **uncommitted / unpushed** (awaiting human GO)
+`pass` — implementation complete locally — **staged / uncommitted / unpushed**
 
 ## Capability (APPROVED)
 
-`commerce.revenue.commission_policy_activation_v1`
+`commerce.revenue.commission_decomposition_bridge_apply_v1`
 
 ## Branch
 
-`office/commerce-commission-policy-activation-v1`
+`office/commerce-revenue-commission-decomposition-bridge-apply-v1`
 
 ## Base / HEAD
 
-- Base: `origin/office/commerce-marketplace-supplier-listing-create-hardening-v1` @ `d47f825`
-- HEAD: local uncommitted tip on feature branch
+- Base tip: `fded934` (`feat(commerce): activate default commission policies`)
+- HEAD: local staged tip on feature branch (no commit this phase)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1`
-(Note: host user is `Admin`; requested `C:\Users\1\...` path was not present on this machine.)
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-commission-decomposition-bridge-apply-v1`
 
 ## Coordination
 
 - Commerce only — no Dashboard / Admin UI / AI / Stripe / payout rails / wallet mutations
+- Desktop owns Dashboard, Admin UI, AI Platform / Usage / Quotas / Billing / Providers / Gemini / Tutor
 
 ## Delivered
 
-- Migration `20260887` — idempotent active launch seed for UEOS fiat currencies
-- Conflict trigger (one active policy_code family per currency)
-- TS SSOT `lib/store/commissionPolicyActivation.ts` + tests
-- Docs: `COMMISSION_POLICY_ACTIVATION_V1.md`
+- TS SSOT `lib/store/commissionDecompositionBridgeApply.ts` + focused tests
+- Revenue Bridge defaults to Activation launch policies when `commissionPolicies` omitted
+- Explicit `[]` / `null` remains fail-closed
+- Docs: `COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
+- Migration: **none**
 
 ## Next
 
-Human GO to commit / push. Apply `20260887` locally/remotely only when Product asks.
+Human GO to commit / push. No remote migration apply.

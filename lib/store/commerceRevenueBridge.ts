@@ -33,6 +33,11 @@ import {
   type CommissionPolicyContract,
 } from "./commissionPolicyFoundation";
 import {
+  COMMISSION_POLICY_ACTIVATION_ID,
+  applyLaunchCommissionPolicySeed,
+  isCommissionLaunchCurrency,
+} from "./commissionPolicyActivation";
+import {
   classifyTradingPaymentState,
   clientSuppliedMoneyFieldPresent,
   computeExclusiveTaxOrderGrandTotalMinor,
@@ -48,6 +53,15 @@ import {
   type SellerPayoutSummary,
 } from "./sellerPayoutReadModel";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/** Activation launch set when bridge callers omit policies. null/[] stay fail-closed. */
+function resolveBridgeCommissionPolicies(
+  policies?: CommissionPolicyContract[] | null
+): CommissionPolicyContract[] {
+  if (policies === null) return [];
+  if (policies !== undefined) return policies;
+  return applyLaunchCommissionPolicySeed([]).policies;
+}
 
 export const COMMERCE_REVENUE_BRIDGE_VERSION = 1 as const;
 export const COMMERCE_REVENUE_BRIDGE_SOURCE_DOMAIN = "commerce" as const;
@@ -556,9 +570,13 @@ export function mapCommissionCalculationToBridgeDecomposition(
 
 export function resolveCommissionForOrderSnapshot(input: {
   snapshot: CommerceOrderMoneySnapshot;
+  /**
+   * undefined → use Commission Policy Activation launch set (bridge apply).
+   * null or [] → force not_configured (explicit opt-out / tests).
+   */
   policies?: CommissionPolicyContract[] | null;
 }): CommerceCommissionDecomposition {
-  const policies = input.policies ?? [];
+  const policies = resolveBridgeCommissionPolicies(input.policies);
   if (policies.length === 0) {
     return COMMISSION_DECOMPOSITION_UNAVAILABLE;
   }
@@ -817,7 +835,7 @@ export function planCommerceRevenueBridgePosting(
     settlement,
     willPostLedger: true,
     reason: allocateSettlement
-      ? "Capture Sync + Settlement allocate planned. Commission decomposition unavailable; release/payout not enabled."
+      ? "Capture Sync + Settlement allocate planned. Commission decomposition is bridge metadata only; release/payout not enabled."
       : "Capture Sync planned. Settlement allocate deferred; payouts not enabled.",
   };
 }
@@ -985,8 +1003,7 @@ export function buildAdminCommerceBridgeStatus(): AdminCommerceBridgeStatusRow[]
     },
     {
       label: "Commission policy",
-      value:
-        "foundation available (commerce.revenue.commission_policy_foundation_v1); no active policy seed — merchant share not assumed until activated",
+      value: `activation wired (${COMMISSION_POLICY_ACTIVATION_ID}) → bridge apply; settlement capture amounts unchanged; payout rails still not_enabled`,
     },
     {
       label: "Payouts (bank rails)",
@@ -1025,11 +1042,18 @@ export function diagnoseCommerceRevenueBridge(input: {
   }>;
 }): CommerceRevenueReconciliationIssue[] {
   const issues: CommerceRevenueReconciliationIssue[] = [];
-  issues.push({
-    code: "missing_commission_policy",
-    severity: "info",
-    message: COMMISSION_DECOMPOSITION_UNAVAILABLE.message,
-  });
+  const unsupported = input.orders.filter(
+    (o) => !isCommissionLaunchCurrency(o.currency)
+  );
+  if (unsupported.length > 0) {
+    issues.push({
+      code: "missing_commission_policy",
+      severity: "info",
+      message: COMMISSION_DECOMPOSITION_UNAVAILABLE.message,
+      orderId: unsupported[0]?.orderId,
+      storeId: unsupported[0]?.storeId,
+    });
+  }
 
   for (const order of input.orders) {
     const eligibility = resolveCommerceFinancialEligibility({

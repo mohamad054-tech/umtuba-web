@@ -1,21 +1,32 @@
 # Cursor Report
 
-## Summary
+**PASS (staged, uncommitted)** for `commerce.revenue.commission_decomposition_bridge_apply_v1` on `office/commerce-revenue-commission-decomposition-bridge-apply-v1` (base `fded934`).
 
-**PASS (uncommitted)** for `commerce.revenue.commission_policy_activation_v1` on `office/commerce-commission-policy-activation-v1` (base `d47f825`).
+## What changed
 
-## Activation behavior
+- Wired Commission Policy Activation into Revenue Bridge decomposition (default when policies omitted).
+- Added apply SSOT + conservation helper; no duplicate commission engine.
+- Updated bridge / diagnose / dry-run to stop flagging launch currencies as “missing policy”.
+- No migration (reuses Activation seed).
 
-- Seeds active `store.launch.commission.v1` for UEOS fiat_minor: USD, EUR, ILS, JOD, SAR, AED, EGP
-- Split: platform 10% / seller 85% / supplier 5%
-- Skips currency when any active policy already exists (no overwrite)
-- Rejects conflicting distinct active policy_code per currency
-- Unsupported currencies remain fail-closed
+## Financial guarantees
+
+- Settlement / payout / wallet amounts unchanged
+- Decomposition totals = trusted basis when applied
+- Unsupported / missing policy → fail closed
 
 ## Migration
 
-`20260887_store_commission_policy_activation_v1.sql` — **local only**, not applied remotely.
+None. Local only. No remote apply.
 
-## Boundaries
+## Tests / TypeScript / Build
 
-No Stripe, no payout rails, no wallet mutations, no Commerce UI, no commit/push/merge, no remote apply.
+- Focused: `commissionDecompositionBridgeApply` (16), `commerceRevenueBridge` (25), activation (11), foundation (13) — **65 passed**
+- Affected: `analyticsFinance` (15), `sellerPayoutReadModel` (15) — **30 passed**
+- `npx tsc --noEmit`: PASS
+- `git diff --check`: PASS
+- Build: not required (no UI / Next surface changes)
+
+## Open issues
+
+Await commit/push GO.

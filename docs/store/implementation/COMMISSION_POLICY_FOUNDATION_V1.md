@@ -26,6 +26,8 @@ Trusted **single source of truth** for commission policy contracts and decomposi
 
 **Activation:** Launch active seeds for UEOS fiat currencies are `commerce.revenue.commission_policy_activation_v1` (`COMMISSION_POLICY_ACTIVATION_V1.md`, migration `20260887`). Foundation itself still does not invent rates; activation is an explicit follow-up seed.
 
+**Bridge apply:** Activation → Revenue Bridge wiring is `commerce.revenue.commission_decomposition_bridge_apply_v1` (`COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`).
+
 ## Party roles
 
 `platform` · `seller` · `supplier` · `affiliate` · `partner`

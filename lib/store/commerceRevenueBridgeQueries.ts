@@ -164,16 +164,17 @@ export async function bridgeCommerceOrderToRevenueLedger(
   });
 
   if (!input.executePosting) {
-    const issues: CommerceRevenueReconciliationIssue[] = [
-      {
+    const issues: CommerceRevenueReconciliationIssue[] = [];
+    if (built.event.commission.policyStatus === "not_configured") {
+      issues.push({
         code: "missing_commission_policy",
         severity: "info",
         message: built.event.commission.message,
         orderId: built.event.orderId,
         storeId: built.event.storeId,
         sourceEventId: built.event.sourceEventId,
-      },
-    ];
+      });
+    }
     if (
       built.event.financialEligibility === "eligible_for_capture_posting" &&
       !built.event.paymentAttemptId

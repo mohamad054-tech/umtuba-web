@@ -1,25 +1,27 @@
 # Session Handoff
 
-## Active milestone
+## Capability
 
-`commerce.revenue.commission_policy_activation_v1`
+`commerce.revenue.commission_decomposition_bridge_apply_v1`
 
-Status: **PASS — uncommitted / unpushed** (awaiting human GO)
+## Status
+
+PASS + STAGED — no commit, no push.
 
 ## Branch / worktree
 
-- Branch: `office/commerce-commission-policy-activation-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1`
-- Base: `origin/office/commerce-marketplace-supplier-listing-create-hardening-v1` @ `d47f825`
+- Branch: `office/commerce-revenue-commission-decomposition-bridge-apply-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-commission-decomposition-bridge-apply-v1`
+- Base: `fded934` (commission policy activation)
 
-## Delivered
+## Summary
 
-Idempotent active commission launch seed for UEOS-supported fiat currencies; conflict guard; TS activation SSOT + tests.
-
-## Next human action
-
-Commit + push when ready. Apply `20260887` only with Product GO. No remote apply in this slice.
+Activation launch policies now feed Revenue Bridge financial-event commission decomposition by default. Settlement capture posting still uses trusted grand total. Fail closed for unsupported currencies / empty policy override.
 
 ## Coordination
 
-Desktop AI / Dashboard / Admin — untouched.
+Commerce only. Do not touch Dashboard, Admin UI, or AI surfaces.
+
+## Next
+
+Commit/push only on human GO.

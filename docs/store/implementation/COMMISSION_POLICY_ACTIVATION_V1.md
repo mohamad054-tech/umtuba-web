@@ -46,6 +46,4 @@ Settlement capture amounts are **unchanged** (parallel decomposition only).
 
 `lib/store/commissionPolicyActivation.ts`
 
-## Out of scope
-
-Stripe, payout rails, wallet mutations, Dashboard/Admin commission UI, remote apply, inventing currencies, changing settlement posting amounts.
+**Next:** Trusted decomposition is applied into the Revenue Bridge by `commerce.revenue.commission_decomposition_bridge_apply_v1` (`COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`).
