@@ -29,6 +29,7 @@ import {
   resolveMeteringOrDefault,
 } from "../usage/usageFoundation";
 import type { AiUsageActor } from "../usage/quotasBillingTypes";
+import { aiPolicyEvaluationEngine, aiPolicyRegistry } from "../policy";
 
 export type AiServiceDeps = {
   supabase: SupabaseClient;
@@ -168,11 +169,45 @@ async function runCapabilityInner(
     const entry =
       getCapabilityCatalogRegistry().requireExecutable(request.capabilityId);
     metering = resolveMeteringOrDefault(entry.metering);
+    const binding = aiPolicyRegistry.getBinding(request.capabilityId);
+    if (binding?.meteringQuotaPolicyId) {
+      metering = { ...metering, quotaPolicyId: binding.meteringQuotaPolicyId };
+    }
+    if (binding?.meteringBudgetPolicyId) {
+      metering = {
+        ...metering,
+        budgetPolicyId: binding.meteringBudgetPolicyId,
+      };
+    }
   } catch {
     return asFailure("invalid_input", "Unknown capability.");
   }
 
   const tenantId = resolveTenantId(request, deps.userId);
+  try {
+    const policyDecision = aiPolicyEvaluationEngine.evaluate({
+      capabilityId: request.capabilityId,
+      tenantId,
+      userId: deps.userId,
+      runtimeId: "shared_ai_gateway",
+    });
+    if (!policyDecision.allowed) {
+      const reason =
+        policyDecision.violations.find((v) => v.severity === "blocking")
+          ?.message ??
+        (policyDecision.decision === "requires_approval"
+          ? "Policy requires approval."
+          : policyDecision.decision === "requires_admin_override"
+            ? "Policy requires admin override."
+            : "Capability denied by AI policy.");
+      return asFailure("permission_denied", reason);
+    }
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Policy evaluation failed.";
+    return asFailure("configuration_invalid", message);
+  }
+
   try {
     const gate = aiUsageQuotasBillingFoundation.preflight({
       actor: usageActorFor(deps, tenantId),

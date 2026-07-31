@@ -148,6 +148,37 @@ export type {
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
 
+/** AI Policy & Governance Foundation V1 (no inference). */
+export {
+  AI_POLICY_FOUNDATION_SCHEMA_VERSION,
+  AI_POLICY_FOUNDATION_VERSION,
+  AiGovernanceRegistry,
+  AiPolicyEvaluationEngine,
+  AiPolicyRegistry,
+  aiGovernanceRegistry,
+  aiPolicyEvaluationEngine,
+  aiPolicyRegistry,
+  resetPolicyGovernanceFoundation,
+  buildDefaultPolicies,
+  buildDefaultGovernance,
+  DEFAULT_TENANT_POLICY_ID,
+  DEFAULT_GOVERNANCE_ID,
+} from "./policy";
+export type {
+  AiCapabilityPolicyBinding,
+  AiGovernanceRecord,
+  AiPolicyDecisionKind,
+  AiPolicyDecisionResult,
+  AiPolicyEvaluationRequest,
+  AiPolicyKind,
+  AiPolicyLifecycle,
+  AiPolicyRecord,
+  AiPolicyViolation,
+  AiTenantPolicy,
+  AiProviderPolicy,
+  AiRuntimePolicy,
+} from "./policy";
+
 /** AI Usage, Quotas & Billing Foundation V1 (estimated only; no real charges). */
 export {
   AI_USAGE_FOUNDATION_SCHEMA_VERSION,

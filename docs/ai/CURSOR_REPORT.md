@@ -1,73 +1,62 @@
-# CURSOR_REPORT — AI Usage, Quotas & Billing Foundation V1
+# CURSOR_REPORT — AI Policy & Governance Foundation V1
 
 ## Summary
 
-Built Shared AI **Usage, Quotas & Billing Foundation V1** on top of Capability Catalog. Process-local store with schema v1, preflight fail-closed gate in `aiService`, post-execution recording, local fixture cost estimation, catalog metering bindings, admin `/admin/ai/usage`, disabled non-executable `AiUsageChargeIntent`. No Stripe/wallet/invoice/live inference.
+Central Policy Registry + Governance Registry + Evaluation Engine under `lib/ai/policy/`. Wired into `aiService` before usage preflight; capability bindings link catalog metering quota/budget policy IDs. Admin `/admin/ai/policies`. No inference, network, Private AI, Gemini, Learning, Commerce, or Home changes.
 
 ## Exact files changed
 
 ### Modified
+- `lib/ai/services/aiService.ts`
+- `lib/ai/index.ts`
 - `app/admin/ai/page.tsx`
 - `app/admin/ai/capabilities/page.tsx`
-- `lib/ai/catalog/definitions.ts`
-- `lib/ai/catalog/types.ts`
-- `lib/ai/catalog/validation.ts`
-- `lib/ai/index.ts`
-- `lib/ai/services/aiService.ts`
+- `app/admin/ai/usage/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
+- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ### New
-- `app/admin/ai/usage/page.tsx`
-- `lib/ai/usage/quotasBillingTypes.ts`
-- `lib/ai/usage/policyFixtures.ts`
-- `lib/ai/usage/usageFoundationStore.ts`
-- `lib/ai/usage/quotaBudgetEvaluation.ts`
-- `lib/ai/usage/costEstimation.ts`
-- `lib/ai/usage/usageRedaction.ts`
-- `lib/ai/usage/usagePermissions.ts`
-- `lib/ai/usage/chargeIntent.ts`
-- `lib/ai/usage/usageFoundation.ts`
-- `lib/ai/usage/usageFoundationIndex.ts`
-- `lib/ai/usage/usageQuotasBillingFoundation.test.ts`
+- `lib/ai/policy/types.ts`
+- `lib/ai/policy/fixtures.ts`
+- `lib/ai/policy/registry.ts`
+- `lib/ai/policy/evaluation.ts`
+- `lib/ai/policy/index.ts`
+- `lib/ai/policy/policyGovernanceFoundation.test.ts`
+- `app/admin/ai/policies/page.tsx`
 
 ## Migrations created
 
-None. Shared AI process-local store is the Source of Truth for V1 (not Private AI registry; no SQL).
+None.
 
 ## Security review
 
-- No prompts/outputs/API keys in usage logs (redaction)
-- Tenant isolation + permission checks
-- Admin page server-only + `assertPlatformAdminDb`
-- Charge intent disabled / non-executable
-- No Stripe / wallet / revenue bridge calls
+- Server-side evaluation only
+- Admin page gated by `assertPlatformAdminDb`
+- No prompts/secrets/outputs
+- No financial mutations
 
 ## Tests
 
-- `usageQuotasBillingFoundation.test.ts`: **16 passed**
-- `capabilityCatalogRegistry.test.ts`: **10 passed**
-- `trackingFoundation.test.ts`: **12 passed** (earlier run)
-- Focused combined: **38 passed** / later **26 passed** (catalog+usage)
+Focused: policy + catalog + usage foundations (see Final Verification Report).
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS**
+`npx tsc --noEmit` — run at verification.
 
 ## Build
 
-Not required for this foundation layer (admin page added; tsc covers types).
+Not required for foundation layer.
 
 ## git diff --check
 
-**PASS** (clean)
+Run at verification.
 
 ## git status --short
 
-Uncommitted implementation on `office/platform-ai-usage-quotas-billing-foundation-v1` (awaiting GO).
+Uncommitted pending GO.
 
 ## Open issues
 
-- Process-local store (not durable across restarts) — intentional Foundation V1
-- User-facing UI not built (view model only)
-- Charge intent remains disabled until a future billing task
+- Process-local registries (not durable)
+- Private AI still has separate execution policies (intentionally not unified in V1)

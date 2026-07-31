@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Usage, Quotas & Billing Foundation V1
+AI Policy & Governance Foundation V1
 
 ## Status
 
@@ -10,42 +10,37 @@ AI Usage, Quotas & Billing Foundation V1
 
 ## Branch
 
-`office/platform-ai-usage-quotas-billing-foundation-v1`
+`office/platform-ai-policy-governance-foundation-v1`
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-usage-quotas-billing-foundation-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-policy-governance-foundation-v1`
 
 ## Base
 
-`origin/office/platform-ai-capability-catalog-service-registry-v1` @ `493e17c`
+`origin/office/platform-ai-usage-quotas-billing-foundation-v1` @ `70dbc5f`
 
 ## Allowed scope
 
-- `lib/ai/usage/**` usage/quotas/billing foundation
-- Capability Catalog metering binding fields
-- `aiService` preflight gate + post-execution recording hook
-- Admin `/admin/ai/usage` (+ nav links)
-- Docs handoff / report
+- `lib/ai/policy/**`
+- Light wire into `aiService` policy evaluation
+- Admin `/admin/ai/policies` + nav links
+- Public exports in `lib/ai/index.ts`
+- Docs handoff
 
-## Forbidden scope
+## Forbidden
 
-- Real Stripe / wallet / invoice / payout
-- Live inference / network / Gemini / OpenAI
-- Commit / push / remote migrations
-- Learning / Commerce / Home rewrites beyond gate hook
+- Commit / push / inference / network / Learning / Commerce / Home / Gemini / `.env.local`
 
 ## Done
 
-- Usage event contract, unit types, quota/budget/cost policies
-- Preflight gate (fail-closed) + post-execution recording
-- Idempotency, aggregation, permissions, view model
-- Catalog metering integration
-- Disabled `AiUsageChargeIntent` revenue boundary
-- Admin usage UI
-- Focused tests + tsc + diff --check
+- Policy + Governance registries
+- Capability bindings, tenant/provider/runtime/safety/privacy/moderation/execution/audit/retention policies
+- Evaluation engine + decisions + violations
+- Admin UI
+- Tests / tsc / diff --check PASS
 
 ## Next
 
-- User GO for Terminal commit (no Agent commit)
+- User GO → Terminal commit only
 - Push after trailer review

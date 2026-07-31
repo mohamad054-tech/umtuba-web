@@ -73,6 +73,12 @@ export default async function AdminAiUsagePage() {
           <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-white">
             Usage
           </span>
+          <Link
+            href="/admin/ai/policies"
+            className="watch-focus-ring rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-bold text-white/70"
+          >
+            Policies
+          </Link>
         </nav>
 
         <section className="mt-6 space-y-4">
