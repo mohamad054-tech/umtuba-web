@@ -10,6 +10,8 @@ import {
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
 } from "./permissions";
 import { createEmptyRuntimeHealth } from "./runtimeHealth";
+import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
+import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 import { buildDefaultRoutingContracts } from "./routingContracts";
 import type { PersistedPrivateAiState, PrivateAiRuntimeRecord } from "./types";
 
@@ -106,6 +108,7 @@ export function buildPrivateAiSeedState(
       lastSuccessAt: now,
     },
     failoverRuntimeIds: ["prt_external_general_failover"],
+    ops: createEmptyRuntimeOpsState(),
     notes: "Contract runtime only — no inference.",
     createdAt: now,
     updatedAt: now,
@@ -133,6 +136,7 @@ export function buildPrivateAiSeedState(
       lastHeartbeatAt: now,
     },
     failoverRuntimeIds: [],
+    ops: createEmptyRuntimeOpsState(),
     notes: "Failover contract endpoint.",
     createdAt: now,
     updatedAt: now,
@@ -155,13 +159,14 @@ export function buildPrivateAiSeedState(
     availability: "unknown",
     health: createEmptyRuntimeHealth(),
     failoverRuntimeIds: [],
+    ops: createEmptyRuntimeOpsState(),
     notes: "Awaiting deployment — model still draft.",
     createdAt: now,
     updatedAt: now,
   };
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     updatedAt: now,
     models: [
       {
@@ -185,6 +190,8 @@ export function buildPrivateAiSeedState(
     deploymentProfiles: [...DEPLOYMENT_PROFILES],
     routingContracts,
     runtimes: [runtimePrimary, runtimeFailover, runtimeTranslatorPending],
+    runtimeIncidents: [],
+    runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

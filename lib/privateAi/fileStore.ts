@@ -1,10 +1,13 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "fs";
 import { join } from "path";
+import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
+import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 import type {
   PersistedPrivateAiState,
   PrivateAiLifecycle,
   PrivateAiRuntimeRecord,
   PrivateModelRecord,
+  RuntimeOpsState,
 } from "./types";
 
 export function resolvePrivateAiDataDir(override?: string): string {
@@ -23,7 +26,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -33,6 +36,8 @@ export function emptyPrivateAiState(
     permissions: [],
     auditTrail: [],
     runtimes: [],
+    runtimeIncidents: [],
+    runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
   };
 }
 
@@ -85,6 +90,51 @@ function migrateModel(raw: Record<string, unknown>): PrivateModelRecord {
       typeof raw.reviewReason === "string" ? raw.reviewReason : null,
     createdAt: String(raw.createdAt ?? new Date().toISOString()),
     updatedAt: String(raw.updatedAt ?? new Date().toISOString()),
+  };
+}
+
+function migrateOps(raw: unknown): RuntimeOpsState {
+  const base = createEmptyRuntimeOpsState();
+  if (!raw || typeof raw !== "object") return base;
+  const o = raw as Record<string, unknown>;
+  const maint =
+    o.maintenance && typeof o.maintenance === "object"
+      ? (o.maintenance as Record<string, unknown>)
+      : {};
+  const ov =
+    o.override && typeof o.override === "object"
+      ? (o.override as Record<string, unknown>)
+      : {};
+  return {
+    maintenance: {
+      active: Boolean(maint.active),
+      reason: typeof maint.reason === "string" ? maint.reason : null,
+      scheduledAt: typeof maint.scheduledAt === "string" ? maint.scheduledAt : null,
+      enteredAt: typeof maint.enteredAt === "string" ? maint.enteredAt : null,
+      exitedAt: typeof maint.exitedAt === "string" ? maint.exitedAt : null,
+      actorId: typeof maint.actorId === "string" ? maint.actorId : null,
+    },
+    override: {
+      active: Boolean(ov.active),
+      mode: (ov.mode as RuntimeOpsState["override"]["mode"]) ?? null,
+      reason: typeof ov.reason === "string" ? ov.reason : null,
+      actorId: typeof ov.actorId === "string" ? ov.actorId : null,
+      appliedAt: typeof ov.appliedAt === "string" ? ov.appliedAt : null,
+    },
+    activeFailoverTargetId:
+      typeof o.activeFailoverTargetId === "string"
+        ? o.activeFailoverTargetId
+        : null,
+    lastFailoverAt:
+      typeof o.lastFailoverAt === "string" ? o.lastFailoverAt : null,
+    lastFailoverFromId:
+      typeof o.lastFailoverFromId === "string" ? o.lastFailoverFromId : null,
+    cooldownUntil: typeof o.cooldownUntil === "string" ? o.cooldownUntil : null,
+    healthyObservationCount:
+      typeof o.healthyObservationCount === "number"
+        ? o.healthyObservationCount
+        : 0,
+    retryCount: typeof o.retryCount === "number" ? o.retryCount : 0,
   };
 }
 
@@ -150,10 +200,27 @@ function migrateRuntime(raw: Record<string, unknown>): PrivateAiRuntimeRecord {
         (healthRaw.availability as PrivateAiRuntimeRecord["availability"]) ??
         "unknown",
       notes: String(healthRaw.notes ?? ""),
+      consecutiveFailures:
+        typeof healthRaw.consecutiveFailures === "number"
+          ? healthRaw.consecutiveFailures
+          : 0,
+      consecutiveSuccesses:
+        typeof healthRaw.consecutiveSuccesses === "number"
+          ? healthRaw.consecutiveSuccesses
+          : 0,
+      lastHeartbeatSource:
+        typeof healthRaw.lastHeartbeatSource === "string"
+          ? healthRaw.lastHeartbeatSource
+          : null,
+      lastLatencyMs:
+        typeof healthRaw.lastLatencyMs === "number"
+          ? healthRaw.lastLatencyMs
+          : null,
     },
     failoverRuntimeIds: Array.isArray(raw.failoverRuntimeIds)
       ? (raw.failoverRuntimeIds as string[])
       : [],
+    ops: migrateOps(raw.ops),
     notes: String(raw.notes ?? ""),
     createdAt: String(raw.createdAt ?? new Date().toISOString()),
     updatedAt: String(raw.updatedAt ?? new Date().toISOString()),
@@ -164,7 +231,9 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
   if (!parsed || typeof parsed !== "object") return null;
   const obj = parsed as Record<string, unknown>;
   const version = obj.schemaVersion;
-  if (version !== 1 && version !== 2 && version !== 3) return null;
+  if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
+    return null;
+  }
 
   const models = Array.isArray(obj.models)
     ? obj.models.map((m) => migrateModel(m as Record<string, unknown>))
@@ -174,7 +243,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     : [];
 
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -196,6 +265,13 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
       ? (obj.auditTrail as PersistedPrivateAiState["auditTrail"])
       : [],
     runtimes,
+    runtimeIncidents: Array.isArray(obj.runtimeIncidents)
+      ? (obj.runtimeIncidents as PersistedPrivateAiState["runtimeIncidents"])
+      : [],
+    runtimeOpsPolicy: {
+      ...DEFAULT_RUNTIME_OPS_POLICY,
+      ...((obj.runtimeOpsPolicy as object) ?? {}),
+    },
   };
 }
 
@@ -219,8 +295,12 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 3,
+    schemaVersion: 4,
     runtimes: state.runtimes ?? [],
+    runtimeIncidents: state.runtimeIncidents ?? [],
+    runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
+      ...DEFAULT_RUNTIME_OPS_POLICY,
+    },
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);

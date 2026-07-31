@@ -1,30 +1,18 @@
-# SESSION_HANDOFF — Private AI Deployment & Runtime V1
+# SESSION_HANDOFF — Private AI Runtime Operations & Failover V1
 
 ## Where
 
-- Worktree: `umtuba-web-private-ai-deployment-runtime-v1`
-- Branch: `office/platform-private-ai-deployment-runtime-v1`
-- Base HEAD: `eb9e743` (Private AI Workflow & Lifecycle V1)
+- Worktree: `umtuba-web-private-ai-runtime-operations-failover-v1`
+- Branch: `office/platform-private-ai-runtime-operations-failover-v1`
+- Base: `cf3de8d`
 
-## Prior closed tracks
+## Done
 
-- Gemini Live Provider V1
-- Shared AI Surface Integration V1
-- Private AI Workflow & Lifecycle V1
-
-## Done this session
-
-- Runtime + deployment contracts (state, health, readiness, selection, failover)
-- Admin diagnostics page `/admin/private-ai/runtime`
-- schemaVersion 3 (`runtimes[]`)
-- Focused vitest suite + `tsc --noEmit`
-
-## Not done
-
-- Commit / push (await GO)
-- Real provisioning / inference (explicitly out of scope)
+- Heartbeat / failure detection / failover / recovery / maintenance / incidents
+- Ops permissions + Admin Runtime actions UI
+- schemaVersion 4 (file SoT; no SQL migration)
+- Focused tests + prior Deployment Runtime suite
 
 ## Next GO
 
-1. Review Final Verification Report
-2. Manual commit without trailers → push → `0 0`
+Manual commit (no trailers) → push → `0 0`

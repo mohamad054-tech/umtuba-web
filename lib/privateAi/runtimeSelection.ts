@@ -15,7 +15,7 @@ const COST_RANK: Record<RuntimeCostTier, number> = {
   premium: 3,
 };
 
-function eligibilityReasons(
+export function eligibilityReasonsForOps(
   runtime: PrivateAiRuntimeRecord,
   state: PersistedPrivateAiState,
   criteria: RuntimeSelectionCriteria
@@ -45,6 +45,9 @@ function eligibilityReasons(
   if (!deploymentStateIsRoutable(runtime.deploymentState)) {
     reasons.push(`deployment_${runtime.deploymentState}`);
   }
+  if (runtime.ops?.maintenance?.active) {
+    reasons.push("maintenance");
+  }
   if (
     criteria.requireAvailable !== false &&
     runtime.availability === "unavailable"
@@ -69,7 +72,7 @@ export function selectPrivateAiRuntime(
   const eligible: PrivateAiRuntimeRecord[] = [];
 
   for (const runtime of state.runtimes) {
-    const reasons = eligibilityReasons(runtime, state, criteria);
+    const reasons = eligibilityReasonsForOps(runtime, state, criteria);
     if (reasons.length > 0) {
       rejected.push({ runtimeId: runtime.id, reasons });
     } else {
@@ -112,7 +115,12 @@ function buildFailoverChain(
     if (seen.has(id)) continue;
     const rt = all.find((r) => r.id === id);
     if (!rt) continue;
-    if (eligibilityReasons(rt, state, { ...criteria, requireAvailable: true }).length === 0) {
+    if (
+      eligibilityReasonsForOps(rt, state, {
+        ...criteria,
+        requireAvailable: true,
+      }).length === 0
+    ) {
       chain.push(id);
       seen.add(id);
     }
@@ -121,7 +129,10 @@ function buildFailoverChain(
   for (const rt of all) {
     if (seen.has(rt.id)) continue;
     if (
-      eligibilityReasons(rt, state, { ...criteria, requireAvailable: true }).length === 0
+      eligibilityReasonsForOps(rt, state, {
+        ...criteria,
+        requireAvailable: true,
+      }).length === 0
     ) {
       chain.push(rt.id);
       seen.add(rt.id);

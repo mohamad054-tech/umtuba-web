@@ -28,6 +28,7 @@ import {
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
   hasModelLifecyclePermission,
   hasPermission,
+  hasRuntimeOpsPermission,
 } from "./permissions";
 import {
   evaluatePrivateAiReadiness,
@@ -38,6 +39,21 @@ import {
   applyRuntimeHealthEvent,
   createEmptyRuntimeHealth,
 } from "./runtimeHealth";
+import {
+  ensureRuntimeOpsDefaults,
+  handleApplyOverride,
+  handleClearOverride,
+  handleEnterMaintenance,
+  handleEvaluateFailureDetection,
+  handleExitMaintenance,
+  handleMarkRecovered,
+  handleMarkUnhealthy,
+  handleRecordHeartbeat,
+  handleRecordSuccessObservation,
+  handleTriggerFailover,
+} from "./runtimeOpsHandlers";
+import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
+import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 import {
   evaluateRuntimeReadiness,
   runtimeMayBecomeDeploymentReady,
@@ -64,6 +80,9 @@ import type {
   PrivateModelRecord,
   RuntimeCostTier,
   RuntimeDiagnosticRow,
+  RuntimeOperationalIncident,
+  RuntimeOpsPolicy,
+  RuntimeOverrideMode,
   RuntimeReadinessResult,
   RuntimeSelectionCriteria,
   RuntimeSelectionResult,
@@ -161,6 +180,86 @@ export type PrivateAiService = {
   }): PrivateAiRuntimeRecord;
   selectRuntime(criteria: RuntimeSelectionCriteria): RuntimeSelectionResult;
   listRuntimeDiagnostics(): RuntimeDiagnosticRow[];
+  listRuntimeIncidents(runtimeId?: string): RuntimeOperationalIncident[];
+  getRuntimeOpsPolicy(): RuntimeOpsPolicy;
+  recordHeartbeat(input: {
+    runtimeId: string;
+    source?: string;
+    status?: "healthy" | "degraded" | "unhealthy" | "unknown";
+    latencyMs?: number | null;
+    actorRole?: string;
+    at?: string;
+  }): PrivateAiRuntimeRecord;
+  evaluateFailureDetection(
+    runtimeId: string,
+    now?: string
+  ): {
+    runtime: PrivateAiRuntimeRecord;
+    detection: ReturnType<typeof handleEvaluateFailureDetection>["detection"];
+  };
+  markRuntimeUnhealthy(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
+  enterMaintenance(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    scheduledAt?: string | null;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
+  exitMaintenance(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
+  triggerFailover(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    criteria?: Partial<RuntimeSelectionCriteria>;
+    now?: string;
+  }): {
+    source: PrivateAiRuntimeRecord;
+    target: PrivateAiRuntimeRecord | null;
+    ok: boolean;
+    reason: string;
+  };
+  markRuntimeRecovered(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    force?: boolean;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
+  recordHealthyObservation(input: {
+    runtimeId: string;
+    actorRole?: string;
+    at?: string;
+  }): PrivateAiRuntimeRecord;
+  applyRuntimeOverride(input: {
+    runtimeId: string;
+    mode: RuntimeOverrideMode;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
+  clearRuntimeOverride(input: {
+    runtimeId: string;
+    reason: string;
+    actorId?: string | null;
+    actorRole?: string;
+    now?: string;
+  }): PrivateAiRuntimeRecord;
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -177,39 +276,42 @@ export function createPrivateAiService(options?: {
 }): PrivateAiService {
   const dataDir = resolvePrivateAiDataDir(options?.dataDir);
   const now0 = new Date().toISOString();
-  const emptyWithCatalog = (): PersistedPrivateAiState => ({
-    ...emptyPrivateAiState(now0),
-    capabilities: buildCapabilityRegistry(now0),
-    hardwareContracts: [...HARDWARE_CONTRACTS],
-    deploymentProfiles: [...DEPLOYMENT_PROFILES],
-    routingContracts: buildDefaultRoutingContracts(),
-    permissions: [
-      createPrivateAiPermission({
-        id: "perm_admin_models",
-        scope: "model",
-        resourceId: "*",
-        role: "platform_admin",
-        actions: [...DEFAULT_PLATFORM_ADMIN_ACTIONS],
-        granted: true,
-      }),
-      createPrivateAiPermission({
-        id: "perm_admin_audit",
-        scope: "audit",
-        resourceId: "*",
-        role: "platform_admin",
-        actions: ["audit_read"],
-        granted: true,
-      }),
-      createPrivateAiPermission({
-        id: "perm_reviewer_models",
-        scope: "model",
-        resourceId: "*",
-        role: "model_reviewer",
-        actions: ["read", "request_changes", "reject", "approve"],
-        granted: true,
-      }),
-    ],
-  });
+  const emptyWithCatalog = (): PersistedPrivateAiState =>
+    ensureRuntimeOpsDefaults({
+      ...emptyPrivateAiState(now0),
+      capabilities: buildCapabilityRegistry(now0),
+      hardwareContracts: [...HARDWARE_CONTRACTS],
+      deploymentProfiles: [...DEPLOYMENT_PROFILES],
+      routingContracts: buildDefaultRoutingContracts(),
+      runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
+      runtimeIncidents: [],
+      permissions: [
+        createPrivateAiPermission({
+          id: "perm_admin_models",
+          scope: "model",
+          resourceId: "*",
+          role: "platform_admin",
+          actions: [...DEFAULT_PLATFORM_ADMIN_ACTIONS],
+          granted: true,
+        }),
+        createPrivateAiPermission({
+          id: "perm_admin_audit",
+          scope: "audit",
+          resourceId: "*",
+          role: "platform_admin",
+          actions: ["audit_read"],
+          granted: true,
+        }),
+        createPrivateAiPermission({
+          id: "perm_reviewer_models",
+          scope: "model",
+          resourceId: "*",
+          role: "model_reviewer",
+          actions: ["read", "request_changes", "reject", "approve"],
+          granted: true,
+        }),
+      ],
+    });
   let state: PersistedPrivateAiState = options?.ephemeral
     ? options.seed === false
       ? emptyWithCatalog()
@@ -219,13 +321,29 @@ export function createPrivateAiService(options?: {
         ? emptyWithCatalog()
         : buildPrivateAiSeedState(now0));
 
-  if (!Array.isArray(state.runtimes)) {
-    state = { ...state, schemaVersion: 3, runtimes: [] };
-  }
+  state = ensureRuntimeOpsDefaults(state);
 
   const persist = () => {
     if (options?.ephemeral) return;
     writePersistedPrivateAiState(dataDir, state);
+  };
+
+  const requireOps = (
+    runtime: PrivateAiRuntimeRecord,
+    role: string,
+    action: string
+  ) => {
+    if (
+      !hasRuntimeOpsPermission(state.permissions, {
+        role,
+        modelId: runtime.modelId,
+        action,
+      })
+    ) {
+      throw new Error(
+        `Permission denied for ${role} to ${action} on ${runtime.id}`
+      );
+    }
   };
 
   const service: PrivateAiService = {
@@ -448,6 +566,7 @@ export function createPrivateAiService(options?: {
         availability: "unknown",
         health: createEmptyRuntimeHealth(),
         failoverRuntimeIds: input.failoverRuntimeIds ?? [],
+        ops: createEmptyRuntimeOpsState(),
         notes:
           input.notes ??
           "Runtime contract only — no inference, no live probes.",
@@ -570,6 +689,13 @@ export function createPrivateAiService(options?: {
           health.status === "unhealthy" && runtime.deploymentState === "ready"
             ? "unhealthy"
             : runtime.deploymentState,
+        ops: {
+          ...runtime.ops,
+          healthyObservationCount:
+            input.kind === "success"
+              ? runtime.ops.healthyObservationCount + 1
+              : runtime.ops.healthyObservationCount,
+        },
         updatedAt: now,
       };
       state = {
@@ -611,12 +737,167 @@ export function createPrivateAiService(options?: {
       return buildRuntimeDiagnostics(state);
     },
 
+    listRuntimeIncidents(runtimeId) {
+      const all = state.runtimeIncidents ?? [];
+      if (!runtimeId) return [...all];
+      return all.filter((i) => i.runtimeId === runtimeId);
+    },
+
+    getRuntimeOpsPolicy() {
+      return { ...resolvePolicy() };
+    },
+
+    recordHeartbeat(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "heartbeat_record"
+      );
+      const result = handleRecordHeartbeat(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    evaluateFailureDetection(runtimeId, now) {
+      const result = handleEvaluateFailureDetection(state, runtimeId, now);
+      state = result.state;
+      persist();
+      return { runtime: result.runtime, detection: result.detection };
+    },
+
+    markRuntimeUnhealthy(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "runtime_operate"
+      );
+      const result = handleMarkUnhealthy(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    enterMaintenance(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "maintenance_manage"
+      );
+      const result = handleEnterMaintenance(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    exitMaintenance(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "maintenance_manage"
+      );
+      const result = handleExitMaintenance(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    triggerFailover(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "failover_trigger"
+      );
+      const beforeIncidents = (state.runtimeIncidents ?? []).length;
+      const result = handleTriggerFailover(state, input);
+      state = result.state;
+      // only persist; incidents already appended on success/fail inside handler
+      void beforeIncidents;
+      persist();
+      return {
+        source: result.source,
+        target: result.target,
+        ok: result.ok,
+        reason: result.reason,
+      };
+    },
+
+    markRuntimeRecovered(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "runtime_recover"
+      );
+      const result = handleMarkRecovered(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    recordHealthyObservation(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "heartbeat_record"
+      );
+      const result = handleRecordSuccessObservation(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    applyRuntimeOverride(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "override_manage"
+      );
+      const result = handleApplyOverride(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
+    clearRuntimeOverride(input) {
+      const runtime = state.runtimes.find((r) => r.id === input.runtimeId);
+      if (!runtime) throw new Error(`Unknown runtime: ${input.runtimeId}`);
+      requireOps(
+        runtime,
+        input.actorRole ?? "platform_admin",
+        "override_manage"
+      );
+      const result = handleClearOverride(state, input);
+      state = result.state;
+      persist();
+      return result.runtime;
+    },
+
     checkPermission(input) {
       return hasPermission(state.permissions, input);
     },
 
     persist,
   };
+
+  function resolvePolicy(): RuntimeOpsPolicy {
+    return { ...DEFAULT_RUNTIME_OPS_POLICY, ...state.runtimeOpsPolicy };
+  }
 
   for (const r of state.routingContracts) {
     const blockers = assertRoutingContractShape(r);

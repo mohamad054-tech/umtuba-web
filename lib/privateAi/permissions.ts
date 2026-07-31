@@ -55,7 +55,42 @@ export const DEFAULT_PLATFORM_ADMIN_ACTIONS = [
   "audit_read",
   "runtime_operate",
   "deployment_update",
+  "heartbeat_record",
+  "maintenance_manage",
+  "failover_trigger",
+  "override_manage",
+  "runtime_recover",
 ] as const;
+
+export function hasRuntimeOpsPermission(
+  permissions: PrivateAiPermission[],
+  input: {
+    role: string;
+    modelId: string;
+    action: string;
+  }
+): boolean {
+  return (
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: input.modelId,
+      role: input.role,
+      action: input.action,
+    }) ||
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: "*",
+      role: input.role,
+      action: input.action,
+    }) ||
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: "*",
+      role: input.role,
+      action: "runtime_operate",
+    })
+  );
+}
 
 /** True if role may act on resourceId or wildcard "*". */
 export function hasModelLifecyclePermission(

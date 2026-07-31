@@ -12,7 +12,7 @@ export default async function PrivateAiOverviewPage() {
   return (
     <PrivateAiShell
       title="Private AI"
-      subtitle="Deployment & Runtime V1"
+      subtitle="Runtime Operations & Failover V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-xl font-black">Private AI platform</h1>

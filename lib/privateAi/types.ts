@@ -216,6 +216,82 @@ export type RuntimeHealthSnapshot = {
   errorClass: RuntimeErrorClass;
   availability: RuntimeAvailability;
   notes: string;
+  consecutiveFailures: number;
+  consecutiveSuccesses: number;
+  lastHeartbeatSource: string | null;
+  lastLatencyMs: number | null;
+};
+
+export type RuntimeOpsPolicy = {
+  missedHeartbeatMs: number;
+  consecutiveFailureThreshold: number;
+  consecutiveSuccessThreshold: number;
+  maxRetries: number;
+  retryDelayMs: number;
+  cooldownMs: number;
+  recoveryGraceMs: number;
+  failoverSuppressionMs: number;
+};
+
+export type RuntimeIncidentType =
+  | "heartbeat_missed"
+  | "runtime_unhealthy"
+  | "runtime_offline"
+  | "failover_triggered"
+  | "failover_unavailable"
+  | "runtime_recovered"
+  | "maintenance_entered"
+  | "maintenance_exited"
+  | "manual_override_applied"
+  | "manual_override_cleared";
+
+export type RuntimeIncidentSeverity = "info" | "warning" | "critical";
+
+export type RuntimeOperationalIncident = {
+  id: string;
+  runtimeId: string;
+  type: RuntimeIncidentType;
+  severity: RuntimeIncidentSeverity;
+  timestamp: string;
+  actorId: string | null;
+  source: string;
+  reason: string;
+  relatedRuntimeId: string | null;
+  metadata: Record<string, unknown>;
+};
+
+export type RuntimeMaintenanceMeta = {
+  active: boolean;
+  reason: string | null;
+  scheduledAt: string | null;
+  enteredAt: string | null;
+  exitedAt: string | null;
+  actorId: string | null;
+};
+
+export type RuntimeOverrideMode =
+  | "force_unhealthy"
+  | "force_ready"
+  | "block_failover"
+  | "pin_primary";
+
+export type RuntimeManualOverride = {
+  active: boolean;
+  mode: RuntimeOverrideMode | null;
+  reason: string | null;
+  actorId: string | null;
+  appliedAt: string | null;
+};
+
+export type RuntimeOpsState = {
+  maintenance: RuntimeMaintenanceMeta;
+  override: RuntimeManualOverride;
+  activeFailoverTargetId: string | null;
+  lastFailoverAt: string | null;
+  lastFailoverFromId: string | null;
+  cooldownUntil: string | null;
+  healthyObservationCount: number;
+  retryCount: number;
 };
 
 export type PrivateAiRuntimeRecord = {
@@ -237,6 +313,7 @@ export type PrivateAiRuntimeRecord = {
   health: RuntimeHealthSnapshot;
   /** Ordered failover candidates (runtime ids). */
   failoverRuntimeIds: string[];
+  ops: RuntimeOpsState;
   notes: string;
   createdAt: string;
   updatedAt: string;
@@ -274,10 +351,20 @@ export type RuntimeDiagnosticRow = {
   routingEligible: boolean;
   failureReasons: string[];
   health: RuntimeHealthSnapshot;
+  consecutiveFailures: number;
+  consecutiveSuccesses: number;
+  lastHeartbeatAt: string | null;
+  activeIncident: RuntimeOperationalIncident | null;
+  activeFailoverTargetId: string | null;
+  cooldownUntil: string | null;
+  maintenanceActive: boolean;
+  overrideActive: boolean;
+  recentIncidents: RuntimeOperationalIncident[];
+  allowedOpsActions: string[];
 };
 
 export type PersistedPrivateAiState = {
-  schemaVersion: 3;
+  schemaVersion: 4;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -287,4 +374,6 @@ export type PersistedPrivateAiState = {
   permissions: PrivateAiPermission[];
   auditTrail: PrivateAiAuditTrailEntry[];
   runtimes: PrivateAiRuntimeRecord[];
+  runtimeIncidents: RuntimeOperationalIncident[];
+  runtimeOpsPolicy: RuntimeOpsPolicy;
 };

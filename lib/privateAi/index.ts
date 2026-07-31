@@ -24,6 +24,11 @@ export type {
   RuntimeDiagnosticRow,
   RuntimeErrorClass,
   RuntimeHealthSnapshot,
+  RuntimeIncidentSeverity,
+  RuntimeIncidentType,
+  RuntimeOperationalIncident,
+  RuntimeOpsPolicy,
+  RuntimeOverrideMode,
   RuntimeReadinessResult,
   RuntimeSelectionCriteria,
   RuntimeSelectionResult,
@@ -71,9 +76,26 @@ export {
   runtimeMayBecomeDeploymentReady,
 } from "./runtimeReadiness";
 
-export { selectPrivateAiRuntime } from "./runtimeSelection";
+export {
+  eligibilityReasonsForOps,
+  selectPrivateAiRuntime,
+} from "./runtimeSelection";
 
 export { buildRuntimeDiagnostics } from "./runtimeDiagnostics";
+
+export { evaluateRuntimeFailureDetection } from "./runtimeFailureDetection";
+
+export { decideRuntimeFailover } from "./runtimeFailoverOps";
+
+export {
+  DEFAULT_RUNTIME_OPS_POLICY,
+  isCooldownActive,
+  resolveRuntimeOpsPolicy,
+} from "./runtimeOpsPolicy";
+
+export { createRuntimeIncident } from "./runtimeIncidents";
+
+export { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 
 export {
   getHardwareContract,
@@ -97,6 +119,7 @@ export {
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
   hasModelLifecyclePermission,
   hasPermission,
+  hasRuntimeOpsPermission,
 } from "./permissions";
 
 export {

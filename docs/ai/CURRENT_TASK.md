@@ -2,7 +2,7 @@
 
 ## Task title
 
-Private AI Deployment & Runtime V1
+Private AI Runtime Operations & Failover V1
 
 ## Status
 
@@ -10,34 +10,19 @@ Private AI Deployment & Runtime V1
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-deployment-runtime-v1`
-2. Branch: `office/platform-private-ai-deployment-runtime-v1`
-3. Base: `origin/office/platform-private-ai-workflow-lifecycle-v1-final` @ `eb9e743`
-4. Manual commit (no trailers) → push when approved → verify `0 0`
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-runtime-operations-failover-v1`
+2. Branch: `office/platform-private-ai-runtime-operations-failover-v1`
+3. Base: `origin/office/platform-private-ai-deployment-runtime-v1` @ `cf3de8d`
+4. Manual commit (no trailers) → push → verify `0 0`
 
-## Branch
-
-`office/platform-private-ai-deployment-runtime-v1`
-
-## Platform track (facts)
+## Platform track
 
 | Track | Status |
 | --- | --- |
-| Gemini Live Provider V1 | Closed & pushed |
-| Shared AI Surface Integration V1 | Closed & pushed |
-| Private AI Workflow & Lifecycle V1 | Closed & pushed (`eb9e743`) |
-| Private AI Deployment & Runtime V1 | Current task (this worktree) |
+| Gemini / Shared AI / Lifecycle / Deployment Runtime | Closed & pushed |
+| Runtime Operations & Failover V1 | Current |
 
-## Allowed scope
+## Forbidden
 
-- `lib/privateAi/**` (runtime/deployment contracts, tests)
-- `app/admin/private-ai/**` (runtime diagnostics UI)
-- `docs/architecture/PRIVATE_AI_DEPLOYMENT_RUNTIME_V1.md`
-- Handoff docs for this task
-
-## Forbidden scope
-
-- Commit / push / merge without GO
-- Training / fine-tuning / private inference / weights / live pings
-- Gemini adapter or Shared AI rewrites unless required by Runtime
-- Learning / Commerce / Home changes
+Commit/push without GO; training/fine-tuning/inference/live ping/cron/worker;
+Gemini/Shared AI/Learning/Commerce/Home edits.

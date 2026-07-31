@@ -16,6 +16,10 @@ export function createEmptyRuntimeHealth(
     errorClass: "none",
     availability: "unknown",
     notes,
+    consecutiveFailures: 0,
+    consecutiveSuccesses: 0,
+    lastHeartbeatSource: null,
+    lastLatencyMs: null,
   };
 }
 
@@ -60,15 +64,24 @@ export function applyRuntimeHealthEvent(
     at?: string;
     reason?: string | null;
     status?: RuntimeHealthSnapshot["status"];
+    source?: string | null;
+    latencyMs?: number | null;
   }
 ): RuntimeHealthSnapshot {
   const at = input.at ?? new Date().toISOString();
+  const source = input.source ?? current.lastHeartbeatSource;
+  const latencyMs =
+    typeof input.latencyMs === "number" ? input.latencyMs : current.lastLatencyMs;
+
   if (input.kind === "heartbeat") {
-    const status = input.status ?? (current.status === "unknown" ? "healthy" : current.status);
+    const status =
+      input.status ?? (current.status === "unknown" ? "healthy" : current.status);
     return {
       ...current,
       status,
       lastHeartbeatAt: at,
+      lastHeartbeatSource: source,
+      lastLatencyMs: latencyMs,
       availability: availabilityFromHealthStatus(status),
       notes: current.notes,
     };
@@ -80,8 +93,12 @@ export function applyRuntimeHealthEvent(
       status,
       lastHeartbeatAt: at,
       lastSuccessAt: at,
+      lastHeartbeatSource: source,
+      lastLatencyMs: latencyMs,
       errorClass: "none",
       lastFailureReason: null,
+      consecutiveFailures: 0,
+      consecutiveSuccesses: current.consecutiveSuccesses + 1,
       availability: availabilityFromHealthStatus(status),
     };
   }
@@ -93,7 +110,11 @@ export function applyRuntimeHealthEvent(
     lastHeartbeatAt: at,
     lastFailureAt: at,
     lastFailureReason: reason,
+    lastHeartbeatSource: source,
+    lastLatencyMs: latencyMs,
     errorClass: classifyRuntimeError(reason),
+    consecutiveFailures: current.consecutiveFailures + 1,
+    consecutiveSuccesses: 0,
     availability: availabilityFromHealthStatus(status),
   };
 }
