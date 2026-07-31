@@ -2,21 +2,24 @@
 
 ## Task title
 
-UMTUBA Commerce — Production Integration Preparation
+UMTUBA Commerce — Product Production Readiness Audit V1
 
 ## Status
 
-`pass-staged` — **integration docs complete** — stop at PASS + STAGED (no commit / no push)
+`pass-staged` — **implementation complete** — stop at PASS + STAGED (no commit / no push)
 
-## Capability (coordination)
+## Capability (APPROVED)
 
-`commerce.ops.production_integration_preparation_v1`
+`commerce.product.production_readiness_audit_v1`
 
-## Branch / tip
+## Branch
 
-- Branch: `office/commerce-marketplace-supplier-listing-create-hardening-v1`
-- Tip: `ca157d716348ba107f546e453602eae7c48ec989`
-- No new branch created
+`office/commerce-product-production-readiness-audit-v1`
+
+## Base / HEAD
+
+- Base: `d47f825` (production rollout runbooks)
+- HEAD: uncommitted / staged on feature branch (no commit yet)
 
 ## Worktree
 
@@ -24,20 +27,16 @@ UMTUBA Commerce — Production Integration Preparation
 
 ## Coordination
 
-- **Desktop:** AI Platform / Usage / Billing / Dashboard / Admin UI — do not touch
-- **Laptop:** Commerce Production Integration docs only
+- **Desktop** owns: AI / Dashboard / Admin — do not touch
+- **Laptop** = Commerce readiness audit only
 
-## Delivered (docs only)
+## Delivered
 
-- `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md`
-- `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md`
-- `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md`
-- SSOT: CURRENT_TASK / CURSOR_REPORT / SESSION_HANDOFF
+- TS SSOT `lib/store/productProductionReadinessAudit.ts` (+ tests)
+- Docs: `PRODUCT_PRODUCTION_READINESS_AUDIT_V1.md`
+- Composes existing category / inventory / digital / marketplace / confirm / money-compatibility helpers
+- No migration
 
-## Explicit non-actions
+## Next
 
-No code · no migrations · no features · no branches · no commit · no push · no remote apply
-
-## Next human actions
-
-Execute Phases A–F per `COMMERCE_PRODUCTION_ROLLOUT.md` under Product GO.
+Human GO to commit / push.
