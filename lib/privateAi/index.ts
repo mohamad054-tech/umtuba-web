@@ -7,8 +7,11 @@ export type {
   ModelFamilyKind,
   PermissionScope,
   PersistedPrivateAiState,
+  PrivateAiAuditTrailEntry,
   PrivateAiLifecycle,
   PrivateAiPermission,
+  PrivateAiReadinessResult,
+  PrivateAiWorkflowAction,
   PrivateModelClass,
   PrivateModelRecord,
   RoutingContract,
@@ -24,8 +27,18 @@ export {
 export {
   assertTransitionPrivateAiLifecycle,
   canTransitionPrivateAiLifecycle,
+  listAllowedPrivateAiTransitions,
   PRIVATE_AI_LIFECYCLE_ORDER,
+  transitionRequiresReason,
+  workflowActionForTransition,
 } from "./lifecycle";
+
+export {
+  evaluatePrivateAiReadiness,
+  readinessRequiredForTransition,
+} from "./readiness";
+
+export { createPrivateAiAuditEntry } from "./audit";
 
 export {
   getHardwareContract,
@@ -47,6 +60,7 @@ export {
 export {
   createPrivateAiPermission,
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
+  hasModelLifecyclePermission,
   hasPermission,
 } from "./permissions";
 
@@ -64,6 +78,7 @@ export {
   createPrivateAiService,
   getPrivateAiService,
   resetPrivateAiForTests,
+  type AdvanceLifecycleInput,
   type PrivateAiService,
   type RegisterPrivateModelInput,
 } from "./service";

@@ -1,24 +1,28 @@
-# SESSION_HANDOFF — Shared AI Surface Integration V1
+# SESSION_HANDOFF — Private AI Workflow & Lifecycle V1
 
 ## Where
 
-- Worktree: `umtuba-web-shared-ai-surface-integration-v1-final`
-- Branch: `office/platform-shared-ai-surface-integration-v1`
-- Base HEAD: `30bda6a` (Gemini live provider)
+- Worktree: `umtuba-web-private-ai-workflow-lifecycle-v1-final`
+- Branch: `office/platform-private-ai-workflow-lifecycle-v1-final`
+- Base HEAD: `b0655bb` (Shared AI Surface Integration V1)
+
+## Prior closed tracks
+
+- Gemini Live Provider V1 — pushed @ `30bda6a`
+- Shared AI Surface Integration V1 — pushed @ `b0655bb`
 
 ## Done this session
 
-- Selective Shared AI file transfer onto clean Gemini tip
-- Translation Studio admin AI path via `aiService.runCapability`
-- Architecture guards for vendor domains / action bypass
-- Gemini secret sanitize for `AQ.` / `AIza` key shapes
-- Focused integration tests
+- Created clean final worktree from Shared AI tip
+- Selective transfer of Private AI lifecycle implementation from older mixed worktree (source left intact)
+- Admin lifecycle transitions, readiness gate, audit trail, write permissions, non-read-only UI
+- Local migration `20260880` present; not remote-applied
+- Focused Private AI tests + `tsc --noEmit`
 
 ## Not done
 
 - Commit / push (await GO)
-- Live smoke (no `.env.local` in this worktree)
-- Learning Tutor learner UI still on stub RPC (known follow-up)
+- Remote migration apply (explicitly out of scope)
 
 ## Next GO
 
