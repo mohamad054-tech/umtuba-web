@@ -18,7 +18,7 @@ import { applyVerifiedStorePaymentOutcome } from "../../../../../../lib/store/st
 export const runtime = "nodejs";
 
 /**
- * Stripe webhook (test-mode). Signature required.
+ * Stripe webhook. Signature required. Mode follows Production Gate config.
  * Deduplicates via apply_store_payment_outcome event_key.
  * Production hardening deferred: retry storm metrics, dispute events.
  */

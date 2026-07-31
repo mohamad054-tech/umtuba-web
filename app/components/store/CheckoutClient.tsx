@@ -317,7 +317,7 @@ export default function CheckoutClient({
                   onClick={() => onPayWithStripe(orderId)}
                   className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712] disabled:opacity-50"
                 >
-                  {recoveryBusy ? "Preparing…" : "Pay with Stripe (test)"}
+                  {recoveryBusy ? "Preparing…" : "Pay with Stripe"}
                 </button>
               </div>
             );
