@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Policy & Governance Foundation V1
+AI Service Orchestration Foundation V1
 
 ## Status
 
@@ -10,23 +10,22 @@ AI Policy & Governance Foundation V1
 
 ## Branch
 
-`office/platform-ai-policy-governance-foundation-v1`
+`office/platform-ai-service-orchestration-foundation-v1`
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-policy-governance-foundation-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-service-orchestration-foundation-v1`
 
 ## Base
 
-`origin/office/platform-ai-usage-quotas-billing-foundation-v1` @ `70dbc5f`
+`origin/office/platform-ai-policy-governance-foundation-v1` @ `2477bd9`
 
 ## Allowed scope
 
-- `lib/ai/policy/**`
-- Light wire into `aiService` policy evaluation
-- Admin `/admin/ai/policies` + nav links
-- Public exports in `lib/ai/index.ts`
-- Docs handoff
+- `lib/ai/orchestration/**`
+- Light wire into `aiService`
+- Admin `/admin/ai/orchestration` + nav
+- Exports + docs
 
 ## Forbidden
 
@@ -34,13 +33,6 @@ AI Policy & Governance Foundation V1
 
 ## Done
 
-- Policy + Governance registries
-- Capability bindings, tenant/provider/runtime/safety/privacy/moderation/execution/audit/retention policies
-- Evaluation engine + decisions + violations
-- Admin UI
-- Tests / tsc / diff --check PASS
-
-## Next
-
-- User GO → Terminal commit only
-- Push after trailer review
+- Unified pipeline stages + result builder
+- Wired into aiService pre-execution path
+- Admin UI + tests

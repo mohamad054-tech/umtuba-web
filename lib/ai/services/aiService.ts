@@ -29,7 +29,8 @@ import {
   resolveMeteringOrDefault,
 } from "../usage/usageFoundation";
 import type { AiUsageActor } from "../usage/quotasBillingTypes";
-import { aiPolicyEvaluationEngine, aiPolicyRegistry } from "../policy";
+import { aiPolicyRegistry } from "../policy";
+import { orchestrateAiServiceRequest } from "../orchestration";
 
 export type AiServiceDeps = {
   supabase: SupabaseClient;
@@ -165,6 +166,7 @@ async function runCapabilityInner(
   }
 
   let metering = resolveMeteringOrDefault(null);
+  const tenantId = resolveTenantId(request, deps.userId);
   try {
     const entry =
       getCapabilityCatalogRegistry().requireExecutable(request.capabilityId);
@@ -183,46 +185,26 @@ async function runCapabilityInner(
     return asFailure("invalid_input", "Unknown capability.");
   }
 
-  const tenantId = resolveTenantId(request, deps.userId);
   try {
-    const policyDecision = aiPolicyEvaluationEngine.evaluate({
+    const orch = orchestrateAiServiceRequest({
       capabilityId: request.capabilityId,
       tenantId,
       userId: deps.userId,
       runtimeId: "shared_ai_gateway",
-    });
-    if (!policyDecision.allowed) {
-      const reason =
-        policyDecision.violations.find((v) => v.severity === "blocking")
-          ?.message ??
-        (policyDecision.decision === "requires_approval"
-          ? "Policy requires approval."
-          : policyDecision.decision === "requires_admin_override"
-            ? "Policy requires admin override."
-            : "Capability denied by AI policy.");
-      return asFailure("permission_denied", reason);
-    }
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Policy evaluation failed.";
-    return asFailure("configuration_invalid", message);
-  }
-
-  try {
-    const gate = aiUsageQuotasBillingFoundation.preflight({
-      actor: usageActorFor(deps, tenantId),
-      capabilityId: request.capabilityId,
-      metering,
-      tenantId,
-      userId: deps.userId,
       correlationId: request.context.workspaceId ?? null,
     });
-    if (!gate.allowed) {
+    if (orch.outcome === "requires_approval") {
+      return asFailure(
+        "permission_denied",
+        orch.stopReason ?? "Policy requires approval."
+      );
+    }
+    if (orch.outcome === "blocked") {
       try {
         aiUsageQuotasBillingFoundation.recordUsage({
           actor: usageActorFor(deps, tenantId),
           metering,
-          requestId: `rejected_${Date.now().toString(36)}`,
+          requestId: orch.requestId,
           capabilityId: request.capabilityId,
           tenantId,
           userId: deps.userId,
@@ -235,12 +217,24 @@ async function runCapabilityInner(
       }
       return asFailure(
         "rate_limited",
-        gate.denialReason ?? "Usage quota or budget denied."
+        orch.stopReason ?? "Request blocked by orchestration."
+      );
+    }
+    if (orch.outcome === "rejected") {
+      return asFailure(
+        "permission_denied",
+        orch.stopReason ?? "Orchestration rejected the request."
+      );
+    }
+    if (orch.outcome !== "ready_for_execution" && orch.outcome !== "accepted") {
+      return asFailure(
+        "configuration_invalid",
+        orch.stopReason ?? "Orchestration did not reach execution readiness."
       );
     }
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Usage preflight failed.";
+      err instanceof Error ? err.message : "Orchestration failed.";
     return asFailure("configuration_invalid", message);
   }
 

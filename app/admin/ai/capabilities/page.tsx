@@ -74,6 +74,12 @@ export default async function AdminAiCapabilityCatalogPage() {
             Policies
           </Link>
           <Link
+            href="/admin/ai/orchestration"
+            className="watch-focus-ring rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-bold text-white/70"
+          >
+            Orchestration
+          </Link>
+          <Link
             href="/admin/private-ai"
             className="watch-focus-ring rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-bold text-white/70"
           >

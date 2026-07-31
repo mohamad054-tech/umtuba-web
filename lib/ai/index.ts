@@ -148,6 +148,25 @@ export type {
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
 
+/** AI Service Orchestration Foundation V1 (no live inference). */
+export {
+  AI_ORCHESTRATION_FOUNDATION_VERSION,
+  AI_PIPELINE_STAGES,
+  AiServiceOrchestrator,
+  aiServiceOrchestrator,
+  aiOrchestrationStore,
+  buildOrchestrationResultView,
+  orchestrateAiServiceRequest,
+  resetAiOrchestrationFoundation,
+} from "./orchestration";
+export type {
+  AiOrchestrationPipelineResult,
+  AiOrchestrationRequest,
+  AiPipelineOutcome,
+  AiPipelineStageId,
+  AiPipelineStageResult,
+} from "./orchestration";
+
 /** AI Policy & Governance Foundation V1 (no inference). */
 export {
   AI_POLICY_FOUNDATION_SCHEMA_VERSION,
