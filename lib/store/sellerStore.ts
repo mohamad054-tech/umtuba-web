@@ -12,6 +12,7 @@ import { canManageSellerCatalog } from "./sellerApplications";
 import { majorToMinorUnits } from "./money";
 import { isOwnedStoreProductMediaPath } from "./mediaConstants";
 import { resolveDigitalProductPublishReadiness } from "./digitalProductPublishReadiness";
+import { assertPrimaryCategoryEligibleForReview } from "./categoryTaxonomySeed";
 
 type AnyClient = SupabaseClient;
 
@@ -862,6 +863,21 @@ export async function submitProductForReview(
 
   if (!product.primary_category_id) {
     return { ok: false, message: "Add a primary category before submitting for review." };
+  }
+
+  const { data: categoryRow } = await supabase
+    .from("product_categories")
+    .select("id, status")
+    .eq("id", product.primary_category_id)
+    .maybeSingle();
+
+  const categoryGate = assertPrimaryCategoryEligibleForReview({
+    primaryCategoryId: String(product.primary_category_id),
+    categoryFound: Boolean(categoryRow),
+    categoryStatus: categoryRow ? String(categoryRow.status) : null,
+  });
+  if (!categoryGate.ok) {
+    return { ok: false, message: categoryGate.message };
   }
 
   const readiness = await resolveDigitalProductPublishReadiness({

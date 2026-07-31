@@ -2,34 +2,20 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.payments.full_order_refund_path_v1` on `office/commerce-payments-full-order-refund-path-v1` (base `54404e8`).
+**PASS + STAGED** for `commerce.catalog.category_taxonomy_seed_v1` on `office/commerce-catalog-category-taxonomy-seed-v1` (base `584943f`).
 
 ## Exact milestone
 
-`commerce.payments.full_order_refund_path_v1` — approved and implemented.
+`commerce.catalog.category_taxonomy_seed_v1` — approved and implemented.
 
-## Refund behavior
+## How this unblocks product loading
 
-| Step | Behavior |
-| --- | --- |
-| Validate | Paid + captured; exact store ownership; trusted money only |
-| Payout gate | Reject `IN_TRANSIT` and `COMPLETED` |
-| Settlement | `RELEASED`→`hold`→`reverse_allocation`; else reverse if allocated/held |
-| Sync | `apply_store_payment_outcome(refunded)` full capture amount |
-| Idempotency | Same key replays; conflict fails closed |
-
-## Files
-
-- `lib/store/fullOrderRefundPath.ts` (new)
-- `lib/store/fullOrderRefundPath.test.ts` (new)
-- `docs/store/implementation/FULL_ORDER_REFUND_PATH_V1.md` (new)
-- `docs/store/implementation/SETTLEMENT_FOUNDATION_V1.md` (cross-link)
-- `docs/ai/CURRENT_TASK.md` / `CURSOR_REPORT.md` / `SESSION_HANDOFF.md`
+Sellers can load active categories via `listActiveCategories`, assign `primary_category_id`, and pass the category gate in `submitProductForReview`. Physical categories do **not** enable physical checkout (`commerce_confirm_enabled` stays default OFF).
 
 ## Migration
 
-None.
+`20260885_store_catalog_category_taxonomy_seed_v1.sql` — **local only**, not applied remotely.
 
 ## Boundaries
 
-No Dashboard, Admin UI, AI, bank rails, partial refunds, or COMPLETED clawback.
+No Dashboard/Admin taxonomy editor, no AI, no catalog UI redesign, no gate weakening.

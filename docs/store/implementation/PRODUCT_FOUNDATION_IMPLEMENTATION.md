@@ -114,7 +114,7 @@ Auth gate coverage extended for `/seller` and public `/store`.
 
 ## Limitations / safe TODOs
 
-1. Categories empty until operators insert `product_categories`
+1. ~~Categories empty until operators insert `product_categories`~~ — launch taxonomy seeded by `commerce.catalog.category_taxonomy_seed_v1` (`CATEGORY_TAXONOMY_SEED_V1.md`, migration `20260885`)
 2. Binary media upload deferred
 3. Cart / checkout intentionally disabled
 4. Follow store placeholder only
@@ -124,4 +124,4 @@ Auth gate coverage extended for `/seller` and public `/store`.
 
 ## Next phase
 
-Cart + checkout + orders, payments, shipping, Storage upload, admin moderation UI, category seed/admin, search ranking.
+Cart + checkout + orders, payments, shipping, Storage upload, admin moderation UI, search ranking. Category Admin editor remains out of scope until Product GO.

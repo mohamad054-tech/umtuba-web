@@ -2,7 +2,7 @@
 
 ## Task title
 
-UMTUBA Commerce — Full Order Refund Path V1
+UMTUBA Commerce — Category Taxonomy Seed V1
 
 ## Status
 
@@ -10,15 +10,15 @@ UMTUBA Commerce — Full Order Refund Path V1
 
 ## Capability (APPROVED)
 
-`commerce.payments.full_order_refund_path_v1`
+`commerce.catalog.category_taxonomy_seed_v1`
 
 ## Branch
 
-`office/commerce-payments-full-order-refund-path-v1`
+`office/commerce-catalog-category-taxonomy-seed-v1`
 
 ## Base / HEAD
 
-- Base: `54404e860eb23eee7f94f72604ddcd18bac8d455` (Payout Booking Ops Helpers V1)
+- Base (closed tip): `584943fc8f59a41c48e03fc03f3be3804dcf785c` (Full Order Refund Path V1)
 - HEAD: uncommitted / staged on feature branch (no commit yet)
 
 ## Worktree
@@ -27,23 +27,16 @@ UMTUBA Commerce — Full Order Refund Path V1
 
 ## Coordination
 
-- **Desktop** owns: Dashboard / Admin UI / AI Platform / Usage / Quotas / Billing / Providers / Gemini / Tutor — do not touch
-- **Laptop** = Commerce only
+- **Desktop** owns: AI Platform / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini / Tutor — do not touch
+- **Laptop** = Commerce catalog only
 
 ## Delivered
 
-Trusted full-order refund orchestration:
-
-1. Validate paid+captured, store ownership, currency/amount consistency
-2. Reject payout `IN_TRANSIT` / `COMPLETED`
-3. Settlement unwind: `RELEASED`→hold→reverse; `ALLOCATED|HELD`→reverse
-4. Sync `refunded` full capture amount via existing Payment Outcome Sync
-
-- Module: `lib/store/fullOrderRefundPath.ts`
-- Tests: `lib/store/fullOrderRefundPath.test.ts`
-- Doc: `docs/store/implementation/FULL_ORDER_REFUND_PATH_V1.md`
-- **No new migration** (reuses Settlement + Sync RPCs)
+- Migration `20260885` — idempotent launch taxonomy seed (12 categories)
+- TS SSOT `lib/store/categoryTaxonomySeed.ts`
+- `submitProductForReview` rejects missing/inactive categories (keeps digital readiness)
+- Docs: `CATEGORY_TAXONOMY_SEED_V1.md` + Product Foundation cross-link
 
 ## Next
 
-Human GO to commit / push. Remote-apply pending Commerce migrations only when Product asks.
+Human GO to commit / push. Local migration only — no remote apply unless asked.
