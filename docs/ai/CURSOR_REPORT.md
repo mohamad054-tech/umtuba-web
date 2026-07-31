@@ -2,40 +2,68 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.ops.production_integration_preparation_v1` — documentation/integration audit only.
+**PASS** for **Commerce Seller Payout Rails V1** (`commerce.settlement.seller_payout_rails_v1`).
 
-## Documents created
+Closed the Seller Payout Rails gap from Commerce Completion Audit with contracts + in-memory mock rails only. No live transfers, Stripe Connect, bank API, wallet mutations, commission, notifications, AI, Learning, or Home changes. Work left **uncommitted / unpushed** pending human GO.
 
-| Doc | Purpose |
-| --- | --- |
-| `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md` | Phases A–H playbook, dependency graph, migration waves, RPC matrix |
-| `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md` | First supplier onboarding ops |
-| `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md` | First digital product + listing ops |
+## Exact files changed
 
-## Milestone verification
+Modified:
+- `app/admin/store/AdminStoreShell.tsx` — Payouts nav link
+- `app/lib/nav/routes.ts` — `adminStorePayouts`
 
-Tip `ca157d7` contains completed Commerce lineage through listing create hardening. Remote E2E has **20260809–20260821**. Wave A (`20260869→70→75→78→79→85→86`) still waiting for remote apply.
+Added:
+- `app/admin/store/payouts/page.tsx`
+- `docs/store/implementation/SELLER_PAYOUT_RAILS_V1.md`
+- `lib/store/sellerPayoutRails/types.ts`
+- `lib/store/sellerPayoutRails/providers.ts`
+- `lib/store/sellerPayoutRails/engine.ts`
+- `lib/store/sellerPayoutRails/readModels.ts`
+- `lib/store/sellerPayoutRails/index.ts`
+- `lib/store/sellerPayoutRails/sellerPayoutRails.test.ts`
 
-## Dependency graph (condensed)
+## Migrations created
 
-Product Foundation → Category → Inventory (TS) → Digital upload → Publish readiness → Review → Marketplace listing stack → (defer) Settlement → Payout → Refund
+None.
 
-## Remaining blockers (product load)
+## Security review
 
-1. Merge tip to deploy line  
-2. Remote apply Wave A  
-3. Storage verify  
-4. Ops: approve first seller + first digital product  
+- No secrets / `.env.local` touched
+- `supportsLiveTransfer: false`, `bankRailsEnabled: false`, `liveTransferEnabled: false`
+- Mock execution only; `assertNoLivePayoutTransfer` blocks live provider ids
+- Admin page gated by `assertPlatformAdminDb`
+- No wallet mutations; no network payout I/O
 
-Money path (confirm ON, Stripe live, commission rates, bank rails) is **not** a load blocker.
+## Tests
 
-## Production readiness %
+`npx vitest run lib/store/sellerPayoutRails/sellerPayoutRails.test.ts` — **7 passed**
 
-| Lens | % |
-| --- | --- |
-| Ready to load first digital product | **~58%** (→ ~80% after Phases A–F) |
-| Full live sell + settle + payout | **~35%** |
+Coverage: provider contracts, eligibility, request + idempotency, batch + mock execution, history + read models, failures, architecture guard.
 
-## Boundaries
+## TypeScript
 
-No code, no migrations, no Dashboard, no AI, no commit, no push in this slice.
+`npx tsc --noEmit` — **PASS**
+
+## Build
+
+Not required (admin diagnostics + lib contracts; no public entry rewrite).
+
+## git diff --check
+
+**PASS** (clean)
+
+## git status --short
+
+```
+ M app/admin/store/AdminStoreShell.tsx
+ M app/lib/nav/routes.ts
+?? app/admin/store/payouts/
+?? docs/store/implementation/SELLER_PAYOUT_RAILS_V1.md
+?? lib/store/sellerPayoutRails/
+```
+
+## Open issues
+
+- Rails engine is in-process memory only (not persisted); production persistence / real providers are out of scope
+- Existing ledger booking (`sellerPayoutFoundation` / migrations 20260881+) unchanged; rails layer does not yet bridge to RPC booking
+- Laptop Commission Policy Activation work must remain untouched
