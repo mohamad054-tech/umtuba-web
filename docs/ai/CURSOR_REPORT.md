@@ -1,52 +1,54 @@
-# CURSOR_REPORT — Seller Payout Eligibility Surface V1
+# CURSOR_REPORT — Commission Policy Foundation V1
 
 ## Summary
 
 **PASS** — Implemented and staged locally. No commit / push / remote migration apply.
 
-Product GO approved `commerce.settlement.seller_payout_eligibility_surface_v1` after recon surface `94040b4`. Narrow seller-store eligibility over trusted Read Model RPCs. No Dashboard/Admin/AI/bank rails.
+Product GO approved `commerce.revenue.commission_policy_foundation_v1`. Trusted versioned currency-isolated commission policy foundation with optional Bridge apply. Settlement/payout amounts unchanged. No Dashboard/Admin/AI.
 
 ## Exact selected milestone
 
-`commerce.settlement.seller_payout_eligibility_surface_v1`
+`commerce.revenue.commission_policy_foundation_v1`
 
 ## SSOT justification
 
-Roadmap audit recommended this as the single best next Commerce milestone after Payout Reconciliation Surface V1. Human GO approved it as the official next Commerce milestone.
+Human GO approved this as the official next Commerce milestone after seller payout eligibility surface.
 
 ## Exact files changed
 
-- `lib/store/sellerPayoutEligibilitySurface.ts`
-- `lib/store/sellerPayoutEligibilitySurface.test.ts`
-- `app/components/store/SellerPayoutEligibility.tsx`
-- `app/components/store/SellerDashboardInsights.tsx`
-- `app/seller/store/page.tsx`
-- `docs/store/implementation/SELLER_PAYOUT_ELIGIBILITY_SURFACE_V1.md`
-- `docs/store/implementation/SELLER_PAYOUT_READ_MODEL_V1.md` (cross-link)
+- `lib/store/commissionPolicyFoundation.ts`
+- `lib/store/commissionPolicyFoundation.test.ts`
+- `supabase/migrations/20260884_store_commission_policy_foundation_v1.sql`
+- `lib/store/commerceRevenueBridge.ts`
+- `lib/store/commerceRevenueBridge.test.ts`
+- `lib/store/analyticsFinance.ts`
+- `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
+- `docs/store/implementation/ANALYTICS_FINANCE_FOUNDATION_V1.md`
+- `docs/store/implementation/REVENUE_PAYOUT_BALANCE_VISIBILITY_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/SESSION_HANDOFF.md`
 
 ## Migrations created
 
-None — reuses `20260882`.
+`20260884_store_commission_policy_foundation_v1.sql` — **local only**, not applied remotely. No active policy seed.
 
 ## Security review
 
-- Membership store id only; foreign eligibility/summary fails closed
-- Unknown reason codes omitted; `bank_payouts_enabled=true` fails closed
-- No journal / fingerprint / bank / provider fields
-- No withdraw / bank-connect controls
-- Owner/manager gate aligned with payout read RPCs
+- Client percentages rejected
+- Missing/invalid/currency-mismatched policies fail closed
+- SQL resolve/compute service_role only
+- Settlement capture amounts not altered
+- Payout execution not enabled
 
 ## Tests / TypeScript / Build
 
-- Focused: `sellerPayoutEligibilitySurface.test.ts` — 10 passed
-- Affected: read-model, bridge, history, recon surface, recon read, foundation — **117 passed** across 7 files
+- Focused: `commissionPolicyFoundation.test.ts` — 13 passed
+- Affected: bridge, analytics, settlement, payout foundation, allocate — **118 passed** across 6 files
 - `npx tsc --noEmit`: PASS
-- `npm run build`: PASS
-- `git diff --check`: PASS (this pass)
+- Build: skipped (no UI surface; not required)
+- `git diff --check`: PASS
 
 ## Open issues
 
-Await commit/push GO. Bank rails remain disabled.
+Await commit/push/remote-apply GO. No active commercial rates seeded.

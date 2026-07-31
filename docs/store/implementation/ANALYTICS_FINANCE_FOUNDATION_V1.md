@@ -55,7 +55,9 @@ Multi-currency safety: analytics fail closed when more than one order currency a
 
 ## Finance foundation (future)
 
-`FINANCE_FOUNDATION_PLACEHOLDER` documents platform commission, net proceeds, processing fees, reserves, adjustments, settlement periods, and payout status — all **not configured** in V1.
+`FINANCE_FOUNDATION_PLACEHOLDER` documents platform commission, net proceeds, processing fees, reserves, adjustments, settlement periods, and payout status — analytics surfaces remain **not configured** until explicitly approved.
+
+Trusted calculation SSOT (no active commercial rates seeded): `commerce.revenue.commission_policy_foundation_v1` (`COMMISSION_POLICY_FOUNDATION_V1.md`).
 
 ## UI
 

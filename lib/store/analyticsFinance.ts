@@ -113,13 +113,15 @@ export type FinanceFoundationModels = {
 };
 
 export const FINANCE_FOUNDATION_PLACEHOLDER: FinanceFoundationModels = {
-  platformCommission: {
-    status: "not_configured",
-    description: "Platform commission is not configured for this store.",
-  },
   sellerNetProceeds: {
     status: "not_configured",
-    description: "Seller net proceeds are not available until payout rules exist.",
+    description:
+      "Seller net proceeds remain not configured for analytics until a commission-aware seller surface is approved. Calculation SSOT: commerce.revenue.commission_policy_foundation_v1.",
+  },
+  platformCommission: {
+    status: "not_configured",
+    description:
+      "Platform commission analytics remain not configured until an active store policy is approved and surfaced. Calculation SSOT: commerce.revenue.commission_policy_foundation_v1.",
   },
   paymentProcessingFees: {
     status: "not_configured",

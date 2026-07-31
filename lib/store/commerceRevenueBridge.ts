@@ -25,6 +25,14 @@ import {
   type StoreSettlementAction,
 } from "./settlementFoundation";
 import {
+  COMMISSION_POLICY_FOUNDATION_ID,
+  calculateCommissionSplit,
+  merchandiseNetBasisMinor,
+  selectCommissionPolicy,
+  type CommissionCalculationResult,
+  type CommissionPolicyContract,
+} from "./commissionPolicyFoundation";
+import {
   classifyTradingPaymentState,
   clientSuppliedMoneyFieldPresent,
   computeExclusiveTaxOrderGrandTotalMinor,
@@ -82,26 +90,53 @@ export const COMMERCE_FINANCIAL_ELIGIBILITY = [
 export type CommerceFinancialEligibility =
   (typeof COMMERCE_FINANCIAL_ELIGIBILITY)[number];
 
-export type CommerceCommissionDecomposition = {
-  /** No trusted commission policy exists in V1. */
-  policyStatus: "not_configured";
-  policyCode: null;
-  policyVersion: null;
-  platformCommissionMinor: null;
-  merchantAmountMinor: null;
-  message: string;
-};
+export type CommerceCommissionDecomposition =
+  | {
+      /** No trusted active commission policy for this event. */
+      policyStatus: "not_configured";
+      policyCode: null;
+      policyVersion: null;
+      platformCommissionMinor: null;
+      merchantAmountMinor: null;
+      supplierAmountMinor: null;
+      affiliateAmountMinor: null;
+      partnerAmountMinor: null;
+      basisMinor: null;
+      calculationFingerprint: null;
+      message: string;
+    }
+  | {
+      /** Trusted policy applied via Commission Policy Foundation. */
+      policyStatus: "applied";
+      policyCode: string;
+      policyVersion: number;
+      platformCommissionMinor: number;
+      merchantAmountMinor: number;
+      supplierAmountMinor: number;
+      affiliateAmountMinor: number;
+      partnerAmountMinor: number;
+      basisMinor: number;
+      calculationFingerprint: string;
+      message: string;
+    };
 
-export const COMMISSION_DECOMPOSITION_UNAVAILABLE: CommerceCommissionDecomposition =
-  {
-    policyStatus: "not_configured",
-    policyCode: null,
-    policyVersion: null,
-    platformCommissionMinor: null,
-    merchantAmountMinor: null,
-    message:
-      "Settlement decomposition unavailable — no trusted commission policy is configured. Gross Commerce facts are recorded; merchant share is not assumed.",
-  };
+export const COMMISSION_DECOMPOSITION_UNAVAILABLE: Extract<
+  CommerceCommissionDecomposition,
+  { policyStatus: "not_configured" }
+> = {
+  policyStatus: "not_configured",
+  policyCode: null,
+  policyVersion: null,
+  platformCommissionMinor: null,
+  merchantAmountMinor: null,
+  supplierAmountMinor: null,
+  affiliateAmountMinor: null,
+  partnerAmountMinor: null,
+  basisMinor: null,
+  calculationFingerprint: null,
+  message:
+    "Settlement decomposition unavailable — no trusted commission policy is configured. Gross Commerce facts are recorded; merchant share is not assumed.",
+};
 
 /** Canonical Commerce financial event — derived from trusted order snapshots only. */
 export type CommerceFinancialEvent = {
@@ -501,6 +536,70 @@ export function resolveCommerceFinancialEligibility(input: {
   };
 }
 
+export function mapCommissionCalculationToBridgeDecomposition(
+  calc: CommissionCalculationResult
+): Extract<CommerceCommissionDecomposition, { policyStatus: "applied" }> {
+  return {
+    policyStatus: "applied",
+    policyCode: calc.policyCode,
+    policyVersion: calc.policyVersion,
+    platformCommissionMinor: calc.platformCommissionMinor,
+    merchantAmountMinor: calc.sellerAmountMinor,
+    supplierAmountMinor: calc.supplierAmountMinor,
+    affiliateAmountMinor: calc.affiliateAmountMinor,
+    partnerAmountMinor: calc.partnerAmountMinor,
+    basisMinor: calc.basisMinor,
+    calculationFingerprint: calc.calculationFingerprint,
+    message: `Trusted commission policy ${calc.policyCode}@v${calc.policyVersion} applied (${COMMISSION_POLICY_FOUNDATION_ID}). Settlement capture amounts remain unchanged.`,
+  };
+}
+
+export function resolveCommissionForOrderSnapshot(input: {
+  snapshot: CommerceOrderMoneySnapshot;
+  policies?: CommissionPolicyContract[] | null;
+}): CommerceCommissionDecomposition {
+  const policies = input.policies ?? [];
+  if (policies.length === 0) {
+    return COMMISSION_DECOMPOSITION_UNAVAILABLE;
+  }
+
+  const currency = normalizeCurrencyCode(input.snapshot.currency);
+  if (!currency) {
+    return COMMISSION_DECOMPOSITION_UNAVAILABLE;
+  }
+
+  const selected = selectCommissionPolicy({
+    policies,
+    currency,
+    at: input.snapshot.occurredAt,
+  });
+  if (!selected.ok) {
+    return COMMISSION_DECOMPOSITION_UNAVAILABLE;
+  }
+
+  const basisMinor =
+    selected.policy.basisKind === "merchandise_net"
+      ? merchandiseNetBasisMinor({
+          subtotalMinor: input.snapshot.subtotalMinor,
+          discountTotalMinor: input.snapshot.discountTotalMinor,
+        })
+      : input.snapshot.grandTotalMinor;
+
+  if (basisMinor == null || !Number.isInteger(input.snapshot.grandTotalMinor)) {
+    return COMMISSION_DECOMPOSITION_UNAVAILABLE;
+  }
+
+  const calc = calculateCommissionSplit({
+    policy: selected.policy,
+    basisMinor,
+    currency,
+  });
+  if (!calc.ok) {
+    return COMMISSION_DECOMPOSITION_UNAVAILABLE;
+  }
+  return mapCommissionCalculationToBridgeDecomposition(calc);
+}
+
 export function buildCommerceFinancialIdempotencyKey(input: {
   orderId: string;
   sourceEventType: CommerceFinancialEventType;
@@ -518,7 +617,8 @@ export function buildCommerceFinancialIdempotencyKey(input: {
 }
 
 export function buildCommerceFinancialEvent(
-  snapshot: CommerceOrderMoneySnapshot
+  snapshot: CommerceOrderMoneySnapshot,
+  options?: { commissionPolicies?: CommissionPolicyContract[] | null }
 ):
   | { ok: true; event: CommerceFinancialEvent }
   | {
@@ -547,6 +647,11 @@ export function buildCommerceFinancialEvent(
     }
   );
 
+  const commission = resolveCommissionForOrderSnapshot({
+    snapshot,
+    policies: options?.commissionPolicies,
+  });
+
   const event: CommerceFinancialEvent = {
     version: COMMERCE_REVENUE_BRIDGE_VERSION,
     sourceDomain: COMMERCE_REVENUE_BRIDGE_SOURCE_DOMAIN,
@@ -568,7 +673,7 @@ export function buildCommerceFinancialEvent(
     financialEligibility: eligibility,
     occurredAt: snapshot.occurredAt,
     paymentAttemptId: snapshot.paymentAttemptId ?? null,
-    commission: COMMISSION_DECOMPOSITION_UNAVAILABLE,
+    commission,
     marketplace: buildMarketplaceRevenueBridgeProvenance({
       sellerStoreId: snapshot.storeId,
       supplierStoreId: snapshot.supplierStoreId,
@@ -880,7 +985,8 @@ export function buildAdminCommerceBridgeStatus(): AdminCommerceBridgeStatusRow[]
     },
     {
       label: "Commission policy",
-      value: "not_configured (gross facts only; merchant share not assumed)",
+      value:
+        "foundation available (commerce.revenue.commission_policy_foundation_v1); no active policy seed — merchant share not assumed until activated",
     },
     {
       label: "Payouts (bank rails)",

@@ -176,6 +176,36 @@ describe("commerce revenue bridge — commission", () => {
     if (!built.ok) return;
     expect(built.event.commission).toEqual(COMMISSION_DECOMPOSITION_UNAVAILABLE);
   });
+
+  it("applies trusted commission policy without changing settlement posture", () => {
+    const built = buildCommerceFinancialEvent(baseSnapshot(), {
+      commissionPolicies: [
+        {
+          policyCode: "store.default.commission",
+          version: 1,
+          status: "active",
+          currency: "USD",
+          effectiveFrom: "2020-01-01T00:00:00.000Z",
+          effectiveTo: null,
+          basisKind: "merchandise_net",
+          lines: [
+            { role: "platform", bps: 1000 },
+            { role: "seller", bps: 9000 },
+          ],
+        },
+      ],
+    });
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    expect(built.event.commission.policyStatus).toBe("applied");
+    if (built.event.commission.policyStatus !== "applied") return;
+    expect(built.event.commission.platformCommissionMinor).toBeGreaterThan(0);
+    expect(built.event.commission.merchantAmountMinor).toBeGreaterThan(0);
+    expect(
+      (built.event.commission.platformCommissionMinor ?? 0) +
+        (built.event.commission.merchantAmountMinor ?? 0)
+    ).toBe(built.event.commission.basisMinor);
+  });
 });
 
 describe("commerce revenue bridge — idempotency", () => {

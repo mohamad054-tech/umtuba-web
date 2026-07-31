@@ -2,23 +2,23 @@
 
 ## Task title
 
-Seller Payout Eligibility Surface V1
+Commission Policy Foundation V1
 
 ## Status
 
-`implementation-complete-local` — **PASS + STAGED** — awaiting commit/push GO
+`implementation-complete-local` — **PASS + STAGED** — awaiting commit/push/remote-apply GO
 
 ## Capability
 
-`commerce.settlement.seller_payout_eligibility_surface_v1` — **APPROVED** (Product GO 2026-07-31)
+`commerce.revenue.commission_policy_foundation_v1` — **APPROVED** (Product GO 2026-07-31)
 
 ## Branch
 
-`office/commerce-settlement-seller-payout-eligibility-surface-v1`
+`office/commerce-revenue-commission-policy-foundation-v1`
 
 ## Base / tip
 
-Base: `94040b4fbdc9415c0a496447db417cc892a68ba1` (Payout Reconciliation Surface V1)
+Base: `cf3a50a28f778a27de78c41b4b94462114825d42` (Seller Payout Eligibility Surface V1)
 
 ## Worktree
 
@@ -27,20 +27,19 @@ Base: `94040b4fbdc9415c0a496447db417cc892a68ba1` (Payout Reconciliation Surface 
 ## Coordination
 
 - Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — do not touch
-- Laptop = Commerce seller-store only
+- Laptop = Commerce only
 
 ## Delivered
 
-- Pure surface: `lib/store/sellerPayoutEligibilitySurface.ts` (+ tests)
-- UI: `app/components/store/SellerPayoutEligibility.tsx`
-- Wired into existing seller store insights + page (owner/manager)
-- Doc: `docs/store/implementation/SELLER_PAYOUT_ELIGIBILITY_SURFACE_V1.md`
-- **No new migration** — reuses `20260882` eligibility RPCs
+- TS SSOT: `lib/store/commissionPolicyFoundation.ts` (+ tests)
+- Migration `20260884_store_commission_policy_foundation_v1.sql` (local only; no active seed)
+- Bridge optional apply via `buildCommerceFinancialEvent(..., { commissionPolicies })`
+- Doc: `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
 
 ## Scope held
 
-Read-only eligibility honesty. No bank rails, Dashboard/Admin, payout writes, or withdraw CTAs. Balances / history / recon preserved.
+Trusted policy contracts + calculation SSOT. No payout execution, no settlement amount changes, no Dashboard/Admin/AI, no auto-activated commercial rates.
 
 ## Next
 
-Human GO for: commit → push. Do not invent the following milestone until SSOT names it.
+Human GO for: commit → push → (optional) remote migration apply. Do not invent the following milestone until SSOT names it.

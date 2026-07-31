@@ -37,3 +37,5 @@ When payout reads fail or are omitted → fail closed: balances withheld (legacy
 ## Out of scope
 
 Bank rails, write/booking RPCs, Dashboard/admin UI, commission invention, broad new payout screens, migrations.
+
+Trusted commission calculation SSOT (not auto-activated): `commerce.revenue.commission_policy_foundation_v1`. Seller visibility still withholds `commission` / `net_earnings` until a dedicated surface is approved.
