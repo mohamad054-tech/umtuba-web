@@ -2,27 +2,46 @@
 
 ## Summary
 
-**PASS** for `commerce.marketplace.supplier_listing_create_hardening_v1` on `office/commerce-supplier-listing-create-hardening-v1` (base `29f0f6b`, cherry-pick `ca157d7`).
+**PASS** for `commerce.ops.production_integration_preparation_v1` on `office/commerce-production-integration-preparation-v1` (base `82b3606`, cherry-pick `d47f825`). Documentation / operational preparation only.
 
-## Exact milestone
+## Documents created
 
-`commerce.marketplace.supplier_listing_create_hardening_v1` — reused via verified cherry-pick.
+| Doc | Purpose |
+| --- | --- |
+| `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md` | Phases A–H playbook, dependency graph, migration waves, RPC matrix |
+| `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md` | First supplier onboarding ops |
+| `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md` | First digital product + listing ops |
 
-## Listing hardening behavior
+## Completed Commerce chain (closed)
 
-- Owner/manager only create
-- Product↔supplier ownership validated
-- Active category required and stamped on listing
-- Trusted price + finite inventory model + digital readiness gates
-- Duplicate active listings rejected (fail closed)
-- Direct table INSERT revoked (RPC-only)
-- No commission/settlement invention; reuses existing listing table
-- Inventory gates resolve through Seller Inventory Availability Foundation on `29f0f6b`
+1. Category Taxonomy Seed V1
+2. Seller Inventory Availability Foundation V1
+3. Supplier Listing Create Hardening V1 (`82b3606`)
 
-## Migration
+## Milestone verification
 
-`20260886_store_supplier_listing_create_hardening_v1.sql` — **local only**, not applied remotely.
+Tip `82b3606` contains completed Commerce lineage through listing create hardening. This slice adds production rollout / first-supplier / first-product runbooks only. No source code or migrations changed.
+
+## Dependency graph (condensed)
+
+Product Foundation → Category → Inventory (TS) → Digital upload → Publish readiness → Review → Marketplace listing stack → (defer) Settlement → Payout → Refund
+
+## Remaining blockers (product load)
+
+1. Merge tip to deploy line  
+2. Remote apply Wave A  
+3. Storage verify  
+4. Ops: approve first seller + first digital product  
+
+Money path (confirm ON, Stripe live, commission rates, bank rails) is **not** a load blocker.
+
+## Production readiness %
+
+| Lens | % |
+| --- | --- |
+| Ready to load first digital product | **~58%** (→ ~80% after Phases A–F) |
+| Full live sell + settle + payout | **~35%** |
 
 ## Boundaries
 
-No Dashboard, no Admin UI, no AI, no redesign, no push in this phase.
+No code, no migrations, no Dashboard, no Admin, no AI, no shipping implementation, no push in this slice.

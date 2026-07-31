@@ -2,25 +2,37 @@
 
 ## Active milestone
 
-`commerce.marketplace.supplier_listing_create_hardening_v1`
+`commerce.ops.production_integration_preparation_v1`
 
-Status: **PASS** — cherry-picked onto inventory foundation tip `29f0f6b`
+Status: **PASS** — cherry-picked `d47f825` onto Supplier Listing Create Hardening tip `82b3606` (no push)
 
 ## Branch / worktree
 
-- Branch: `office/commerce-supplier-listing-create-hardening-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-supplier-listing-create-hardening-v1`
-- Base: `29f0f6b` (Seller Inventory Availability Foundation V1)
-- Milestone: cherry-pick of `ca157d7`
+- Branch: `office/commerce-production-integration-preparation-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-production-integration-preparation-v1`
+- Base: `82b3606` (Supplier Listing Create Hardening V1)
+- Milestone: cherry-pick of `d47f825` (docs(commerce): add production rollout runbooks)
+
+## Completed Commerce chain (closed)
+
+1. Category Taxonomy Seed V1
+2. Seller Inventory Availability Foundation V1
+3. Supplier Listing Create Hardening V1 (`82b3606`)
 
 ## Delivered
 
-Hardened supplier listing create over existing `store_seller_listings` / `add_store_seller_listing` with owner/manager auth, category/price/inventory/digital gates, duplicate-active rejection, and RPC-only inserts. Inventory resolution uses the current foundation on `29f0f6b`.
+Operational package:
 
-## Coordination
-
-Desktop owns AI / Dashboard / Admin — untouched.
+1. `COMMERCE_PRODUCTION_ROLLOUT.md` — merge, migrate, storage, onboard, product, listing, purchase validation, rollback  
+2. `FIRST_SUPPLIER_RUNBOOK.md`  
+3. `FIRST_PRODUCT_RUNBOOK.md`
 
 ## Next human action
 
-Push when ready. Apply `20260886` locally/remotely only when Product asks.
+1. Execute rollout Phases A–B under Product GO  
+2. Run supplier + product runbooks  
+3. Keep `commerce_confirm_enabled = 0` until Product GO for live confirm  
+
+## Coordination
+
+Desktop AI / Dashboard / Admin — untouched. Docs-only; no push; no remote apply.
