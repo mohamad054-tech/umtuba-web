@@ -1,71 +1,64 @@
-﻿# CURSOR_REPORT — Learning Tutor thread lesson binding hardening
+﻿# CURSOR_REPORT — Learning Tutor Thread Resume / History Read Foundation V1
 
 ## Summary
 
-**PASS** — Completed and verified **`learning.tutor.thread_lesson_binding_hardening_v1`** on
-`office/learning-ai-tutor-thread-lesson-binding-v1` from metadata-read tip `9e90448`.
+**PASS** — Implemented **`learning.tutor.thread_resume_history_read_v1`** on
+`office/learning-ai-tutor-thread-resume-history-v1` from closed Lesson Binding tip `b85081b`.
 
-- Local migration `20260874` drops 4-arg exchange overload and creates 5-arg RPC with SQL lesson binding.
-- Foundation / bridge / integration pass `lessonId` → `p_lesson_id`.
-- Bridge fail-closed for mismatch, auth, entitlement, and invalid ids; metadata validation retained.
+- Local migration `20260875` drops unbounded messages RPC and creates lesson/course-bound resume RPC with bounded history.
+- Foundation + bridge resume contracts fail-closed; lean payload (no `user_id` / provider internals).
+- Minimal page call-site update only.
 - Migration **not** applied. Staged only — **no commit/push**.
 
 ## Exact files changed
 
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (new)
+- `supabase/migrations/20260875_learning_ai_tutor_thread_resume_history_read_v1.sql` (new)
 - `lib/learning/aiTutorFoundation.ts`
 - `lib/learning/aiTutorFoundation.test.ts`
 - `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.test.ts`
-- `lib/ai/services/learningTutorIntegration.ts`
+- `lib/ai/capabilities/learning/threadResumeHistory.test.ts` (new)
+- `app/learning/lessons/[lessonId]/ai-tutor/page.tsx` (call-site only)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/SESSION_HANDOFF.md`
+- `docs/ai/workstreams/AI_PLATFORM.md`
 
 ## Migrations created
 
-`supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (local only; **not** applied).
+`supabase/migrations/20260875_learning_ai_tutor_thread_resume_history_read_v1.sql` (local only; **not** applied).
 
 ## Behavior implemented
 
-- Exchange persistence requires `lessonId` end-to-end (integration → bridge → foundation → RPC `p_lesson_id`).
-- SQL enforces `auth.uid` ownership, live course entitlement, exact `thread.lesson_id = p_lesson_id`, and lesson belongs to `thread.course_id`.
-- Old 4-arg overload dropped so callers cannot bypass binding.
-- App maps lesson mismatch → `invalid_input`; auth/entitlement/not-found → `permission_denied`.
+- Resume requires authenticated owner + `courseId` + `lessonId` + `threadId`.
+- SQL enforces ownership, live entitlement, exact course/lesson match, lesson∈course.
+- Messages ordered by `created_at asc, id asc`; limit default 50 / hard max 100.
+- No silent fallback to another thread/lesson/course.
+- Response omits `user_id` and provider/prompt internals.
 
 ## Security review
 
 - `SECURITY DEFINER` + `search_path = public`
-- `auth.uid()` ownership; course entitlement re-check
-- Exact `thread.lesson_id = p_lesson_id`; lesson must belong to `thread.course_id`
-- Old 4-arg overload dropped (cannot bypass binding)
+- Non-enumerating `Thread not found` for missing/foreign threads
 - Revoke public/anon; grant authenticated (+ service_role convention)
-- App path: authenticated client only; no service-role client
-- Idempotent function replace + drop-if-exists; no table/column create/drop; stub append preserved
+- Idempotent create-or-replace + drop-if-exists; no table/data destruction
 
 ## Tests
 
-- Narrow: foundation + bridge — **56 passed**
-- Affected Tutor surface (`lib/ai/capabilities/learning` + foundation + integration + server actions): **115 passed**
-- Includes: correct binding, mismatch rejection, unauthorized/auth rejection, missing/invalid ids, valid persist, no capability regression
+- Affected Tutor surface: **130 passed** (includes new resume suite 15 + foundation/bridge/integration/capabilities)
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS (exit 0)
+`npx tsc --noEmit` — PASS
 
 ## Build
 
-Not run (policy).
+Not run (Tutor backend policy).
 
 ## git diff --check
 
-PASS (exit 0)
-
-## git status --short
-
-Staged milestone files only after verification (see Final Response).
+PASS
 
 ## Open issues
 
 - Await trailer-free commit/push GO
-- Do not remote-apply `20260874` without explicit GO
-- Do not touch Provider / Gemini / alpha / Web UI from this laptop
+- Do not remote-apply `20260875` without explicit GO

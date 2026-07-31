@@ -84,12 +84,16 @@ describe("AI Tutor Foundation — SQL", () => {
       LEARNING_AI_TUTOR_RPCS.createThread,
       LEARNING_AI_TUTOR_RPCS.appendMessage,
       LEARNING_AI_TUTOR_RPCS.listThreads,
-      LEARNING_AI_TUTOR_RPCS.getMessages,
+      // Historical unbounded read in 20260863; superseded by resumeThread (20260875).
+      "get_my_learning_ai_tutor_thread_messages",
     ]) {
       expect(sql).toMatch(
         new RegExp(`create or replace function public\\.${name}`)
       );
     }
+    expect(LEARNING_AI_TUTOR_RPCS.resumeThread).toBe(
+      "resume_my_learning_ai_tutor_thread"
+    );
   });
 
   it("has no external provider / openai / anthropic", () => {

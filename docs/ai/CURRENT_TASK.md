@@ -2,64 +2,59 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — Thread Lesson Binding Hardening V1
+UM Learning AI Tutor Backend — Thread Resume / History Read Foundation V1
 
 ## Status
 
-`verification-pass` — **STAGED** — awaiting trailer-free commit/push GO, then separate apply GO for `20260874`
+`verification-pass` — **STAGED** — awaiting trailer-free commit/push GO, then separate apply GO for `20260875`
 
 ## Branch
 
-`office/learning-ai-tutor-thread-lesson-binding-v1`
+`office/learning-ai-tutor-thread-resume-history-v1`
 
 ## Base
 
-`office/learning-ai-tutor-thread-metadata-read-v1` @ `9e90448ce8e4566fd369476a2571844378b0950c`
+`office/learning-ai-tutor-thread-lesson-binding-v1` @ `b85081bf083b132250e06e398b24c993e59f6274`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web` (no alternate worktree)
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-thread-resume-history-v1`
 
 ## Milestone
 
-`learning.tutor.thread_lesson_binding_hardening_v1`
+`learning.tutor.thread_resume_history_read_v1`
+
+## Why this milestone
+
+After closed Lesson Binding (`b85081b`), `docs/ai/workstreams/AI_PLATFORM.md` listed **Trusted-producer transcript integrity** as the next follow-up. Metadata Read intentionally excluded message history; the prior unbounded `get_my_learning_ai_tutor_thread_messages(uuid)` lacked course/lesson binding and live entitlement. This milestone is the concrete Resume / History Read foundation that implements that integrity follow-up.
 
 ## Delivered
 
-- Migration (local only): `20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- Drops 4-arg `append_my_learning_ai_tutor_exchange(uuid, text, text, text)`
-- Creates 5-arg RPC with SQL `thread.lesson_id = p_lesson_id` + lesson∈course + course membership + auth.uid ownership
-- Foundation + bridge + integration pass `lessonId` / `p_lesson_id`
-- Bridge maps mismatch / auth / entitlement fail-closed; validates threadId+lessonId UUIDs
-- Lean metadata validation retained as defense in depth
+- Migration (local only): `20260875_learning_ai_tutor_thread_resume_history_read_v1.sql`
+- Drops unbounded `get_my_learning_ai_tutor_thread_messages(uuid)`
+- Creates `resume_my_learning_ai_tutor_thread(p_thread_id, p_course_id, p_lesson_id, p_limit)` with ownership, entitlement, exact course+lesson match, lesson∈course, ordered + bounded history
+- Foundation `resumeMyAiTutorThread` + bridge `resumeLearningTutorThread`
+- Minimal AI Tutor page call-site wiring to pass courseId+lessonId (no UI redesign)
 
 ## Verification (local)
 
-- Narrow + affected Tutor suites: **115 passed**
+- Affected Tutor suites: **130 passed**
 - `npx tsc --noEmit`: PASS
 - `git diff --check`: PASS
-- `npm run build`: not run (policy)
+- `npm run build`: not run (Tutor backend policy)
 - Migration: **not applied** remotely
 
 ## Machine policy
 
-AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI / Provider / Gemini. No `npm run build`. Do not apply migration remotely without explicit GO.
-
-## Allowed scope
-
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- `lib/learning/aiTutorFoundation.ts` (+ tests)
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts` (+ tests)
-- `lib/ai/services/learningTutorIntegration.ts` (pass lessonId only)
-- `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
+AI Tutor Backend laptop only. Do **not** touch Provider / Gemini / alpha / broad Web UI. No remote migration apply without GO. No commit/push from Cursor unless asked.
 
 ## Forbidden scope
 
 - Provider Foundation / Gemini
-- alpha-0.2 / Web UI
-- New Tutor capabilities
+- New Tutor capabilities beyond resume/history
+- Home / Commerce / Profile / App Shell / Translation
 - Commit / push / remote migration apply without GO
 
 ## Next
 
-Trailer-free commit/push GO, then separate apply GO for `20260874`.
+Trailer-free commit/push GO, then separate apply GO for `20260875` (and any still-pending prior Tutor migrations as separately approved).

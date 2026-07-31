@@ -26,10 +26,19 @@ export const LEARNING_AI_TUTOR_RPCS = {
   /** Real Core assistant text (Thread Persistence Bridge). Stub append remains. */
   appendExchange: "append_my_learning_ai_tutor_exchange",
   listThreads: "list_my_learning_ai_tutor_threads",
-  getMessages: "get_my_learning_ai_tutor_thread_messages",
+  /**
+   * Lesson-bound resume + bounded history
+   * (`resume_my_learning_ai_tutor_thread`).
+   * Unbounded `get_my_learning_ai_tutor_thread_messages(uuid)` was dropped.
+   */
+  resumeThread: "resume_my_learning_ai_tutor_thread",
   /** Lean metadata only (no messages) for bridge validation. */
   getThread: "get_my_learning_ai_tutor_thread",
 } as const;
+
+/** Default / hard max for resume history reads. */
+export const LEARNING_AI_TUTOR_RESUME_HISTORY_DEFAULT_LIMIT = 50;
+export const LEARNING_AI_TUTOR_RESUME_HISTORY_MAX_LIMIT = 100;
 
 /** Kinds accepted by append_my_learning_ai_tutor_exchange (narrower than message table). */
 export const LEARNING_AI_TUTOR_EXCHANGE_KINDS = [
@@ -218,18 +227,87 @@ export async function listMyAiTutorThreads(
   return { ok: true, data: asRecord(result.data) ?? {} };
 }
 
-export async function getMyAiTutorThreadMessages(
+function clampResumeLimit(limit?: number | null): number {
+  if (limit == null || Number.isNaN(limit)) {
+    return LEARNING_AI_TUTOR_RESUME_HISTORY_DEFAULT_LIMIT;
+  }
+  const n = Math.floor(limit);
+  if (n < 1) return 1;
+  if (n > LEARNING_AI_TUTOR_RESUME_HISTORY_MAX_LIMIT) {
+    return LEARNING_AI_TUTOR_RESUME_HISTORY_MAX_LIMIT;
+  }
+  return n;
+}
+
+/**
+ * Resume a lesson-bound AI Tutor thread with bounded, ordered message history.
+ * Fail-closed on missing/invalid ids; SQL enforces ownership + entitlement + binding.
+ */
+export async function resumeMyAiTutorThread(
   supabase: AnyClient,
-  threadId: string
+  input: {
+    threadId: string;
+    courseId: string;
+    lessonId: string;
+    limit?: number | null;
+  }
 ): Promise<AiTutorResult<Record<string, unknown>>> {
-  if (!isAiTutorUuid(threadId)) {
+  if (!isAiTutorUuid(input.threadId)) {
     return { ok: false, message: "thread_id must be a valid UUID" };
   }
-  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.getMessages, {
-    p_thread_id: threadId,
+  if (!isAiTutorUuid(input.courseId)) {
+    return { ok: false, message: "course_id must be a valid UUID" };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return { ok: false, message: "lesson_id must be a valid UUID" };
+  }
+
+  const limit = clampResumeLimit(input.limit);
+  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.resumeThread, {
+    p_thread_id: input.threadId,
+    p_course_id: input.courseId,
+    p_lesson_id: input.lessonId,
+    p_limit: limit,
   });
   if (!result.ok) return result;
-  return { ok: true, data: asRecord(result.data) ?? {} };
+
+  const row = asRecord(result.data);
+  if (!row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.thread_id !== "string" || !isAiTutorUuid(row.thread_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.course_id !== "string" || !isAiTutorUuid(row.course_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.lesson_id !== "string" || !isAiTutorUuid(row.lesson_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (!Array.isArray(row.messages)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  // Fail closed if a future RPC shape leaks ownership / provider internals.
+  if ("user_id" in row || "provider" in row || "modelId" in row || "prompt" in row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  return { ok: true, data: row };
+}
+
+/**
+ * @deprecated Prefer `resumeMyAiTutorThread`. Kept as a thin alias for call sites
+ * that already pass course + lesson context.
+ */
+export async function getMyAiTutorThreadMessages(
+  supabase: AnyClient,
+  input: {
+    threadId: string;
+    courseId: string;
+    lessonId: string;
+    limit?: number | null;
+  }
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  return resumeMyAiTutorThread(supabase, input);
 }
 
 /**

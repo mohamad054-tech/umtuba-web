@@ -137,10 +137,33 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 | Bridge change | `validateThreadForPersistence` uses lean metadata RPC (no full message history fetch) |
 | Preserved | Full `get_my_learning_ai_tutor_thread_messages` for consumers that need messages |
 
+## Thread Lesson Binding Hardening V1
+
+Milestone: `learning.tutor.thread_lesson_binding_hardening_v1` — **CLOSED** @ `b85081b`
+
+| Piece | Detail |
+| --- | --- |
+| Migration (local only until apply GO) | `20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` |
+| RPC | `append_my_learning_ai_tutor_exchange(p_thread_id, p_lesson_id, p_kind, p_user_content, p_assistant_content)` |
+| Dropped | 4-arg exchange overload |
+
+## Thread Resume / History Read Foundation V1
+
+Milestone: `learning.tutor.thread_resume_history_read_v1`
+
+Implements documented follow-up **Trusted-producer transcript integrity** after lesson binding:
+
+| Piece | Detail |
+| --- | --- |
+| Migration (local only) | `20260875_learning_ai_tutor_thread_resume_history_read_v1.sql` |
+| RPC | `resume_my_learning_ai_tutor_thread(p_thread_id, p_course_id, p_lesson_id, p_limit)` |
+| Dropped | Unbounded `get_my_learning_ai_tutor_thread_messages(uuid)` |
+| Foundation | `resumeMyAiTutorThread` (+ bounded limits) |
+| Bridge | `resumeLearningTutorThread` |
+| Guarantees | auth.uid ownership, live entitlement, exact course+lesson match, lesson∈course, deterministic order, limit default 50 / max 100, lean fields (no user_id / provider internals) |
+
 ### Remaining follow-ups
 
-- SQL-level lesson binding (`p_lesson_id` on exchange RPC)
-- Trusted-producer transcript integrity
 - Structured oversize serialization
 - Conversation history summarization (deferred)
 
@@ -149,7 +172,9 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 - Shared AI Core: `20260871` — **applied** on linked remote
 - Tutor exchange RPC: `20260872` — **applied** on linked remote
 - Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
+- Tutor lesson binding: `20260874` — closed in Git; remote apply only with GO
+- Tutor resume/history: `20260875` — local only, **not** remote-applied
 
 ## Next (after commit approval)
 
-Apply `20260873` on explicit GO. `code_review` remains **blocked**. Do not merge Tutor work into alpha from the Tutor laptop.
+Apply pending Tutor migrations only with explicit GO. `code_review` remains **blocked**. Do not merge Tutor work into alpha from the Tutor laptop.

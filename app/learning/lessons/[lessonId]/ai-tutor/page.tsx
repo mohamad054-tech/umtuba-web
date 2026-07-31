@@ -58,7 +58,11 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
 
   const threadId = query.thread ?? (threads[0] ? String(threads[0].id) : "");
   const messagesResult = threadId
-    ? await getMyAiTutorThreadMessages(supabase, threadId)
+    ? await getMyAiTutorThreadMessages(supabase, {
+        threadId,
+        courseId,
+        lessonId,
+      })
     : null;
   const messages =
     messagesResult?.ok && Array.isArray(messagesResult.data.messages)

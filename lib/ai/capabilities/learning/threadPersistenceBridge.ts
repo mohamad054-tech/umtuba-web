@@ -17,6 +17,7 @@ import {
   appendMyAiTutorExchange,
   getMyAiTutorThread,
   isAiTutorUuid,
+  resumeMyAiTutorThread,
   type LearningAiTutorExchangeKind,
 } from "../../../learning/aiTutorFoundation";
 
@@ -363,6 +364,107 @@ export async function persistLearningTutorExchange(
       error: {
         code: "provider_error",
         message: "Could not save the Learning Tutor conversation.",
+      },
+    };
+  }
+
+  return { ok: true, data: result.data };
+}
+
+/**
+ * Resume a lesson-bound tutor thread and load bounded exchange history.
+ * Fail-closed: ownership, entitlement, exact course + lesson match (SQL).
+ */
+export async function resumeLearningTutorThread(
+  supabase: SupabaseClient,
+  input: {
+    threadId: string;
+    courseId: string;
+    lessonId: string;
+    limit?: number | null;
+  }
+): Promise<ThreadPersistenceBridgeResult> {
+  if (!isAiTutorUuid(input.threadId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "threadId is required and must be a valid UUID.",
+      },
+    };
+  }
+  if (!isAiTutorUuid(input.courseId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "courseId is required and must be a valid UUID.",
+      },
+    };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "lessonId is required and must be a valid UUID.",
+      },
+    };
+  }
+
+  const result = await resumeMyAiTutorThread(supabase, {
+    threadId: input.threadId,
+    courseId: input.courseId,
+    lessonId: input.lessonId,
+    limit: input.limit,
+  });
+
+  if (!result.ok) {
+    const lower = result.message.toLowerCase();
+    if (
+      lower.includes("authentication required") ||
+      lower.includes("not allowed") ||
+      lower.includes("entitled")
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: "permission_denied",
+          message: "You are not allowed to resume this Learning Tutor thread.",
+        },
+      };
+    }
+    if (
+      lower.includes("lesson mismatch") ||
+      lower.includes("course mismatch") ||
+      lower.includes("does not match this lesson")
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: "invalid_input",
+          message: "Tutor thread does not match this lesson or course.",
+        },
+      };
+    }
+    if (
+      lower.includes("not found") ||
+      lower.includes("lesson is invalid") ||
+      lower.includes("unavailable or invalid")
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: "permission_denied",
+          message: "Tutor thread is unavailable or not owned by you.",
+        },
+      };
+    }
+    return {
+      ok: false,
+      error: {
+        code: "provider_error",
+        message: "Could not resume the Learning Tutor conversation.",
       },
     };
   }
