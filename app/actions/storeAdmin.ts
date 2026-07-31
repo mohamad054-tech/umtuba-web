@@ -16,8 +16,10 @@ import {
   validateRejectionReason,
   validateRevisionReason,
 } from "../../lib/store/adminReview";
+import { wireCommerceModeration } from "../../lib/store/commerceNotifications";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function revalidateStoreAdmin() {
   revalidatePath(APP_ROUTES.adminStore);
@@ -60,16 +62,61 @@ function backPath(formData: FormData, fallback: string): string {
   return fallback;
 }
 
+async function lookupProductSeller(
+  supabase: SupabaseClient,
+  productId: string
+): Promise<{ sellerId: string | null; storeId: string | null }> {
+  const { data } = await supabase
+    .from("store_products")
+    .select("store_id, stores!inner(owner_user_id)")
+    .eq("id", productId)
+    .maybeSingle();
+  const storeId =
+    data && typeof data.store_id === "string" ? data.store_id : null;
+  const stores = data?.stores as { owner_user_id?: string } | null | undefined;
+  const sellerId =
+    stores && typeof stores.owner_user_id === "string"
+      ? stores.owner_user_id
+      : null;
+  return { sellerId, storeId };
+}
+
+async function lookupApplicationApplicant(
+  supabase: SupabaseClient,
+  applicationId: string
+): Promise<{ sellerId: string | null; storeId: string | null }> {
+  const { data } = await supabase
+    .from("seller_applications")
+    .select("applicant_user_id, store_id")
+    .eq("id", applicationId)
+    .maybeSingle();
+  return {
+    sellerId:
+      data && typeof data.applicant_user_id === "string"
+        ? data.applicant_user_id
+        : null,
+    storeId: data && typeof data.store_id === "string" ? data.store_id : null,
+  };
+}
+
 export async function approveSellerApplicationAction(
   formData: FormData
 ): Promise<void> {
-  const { supabase } = await requirePlatformAdmin();
+  const { user, supabase } = await requirePlatformAdmin();
   const id = formString(formData, "applicationId");
   const result = await approveSellerApplicationAdmin(supabase, id);
   const back = backPath(formData, APP_ROUTES.adminStoreSellers);
   if (!result.ok) {
     redirect(`${back}?error=${encodeURIComponent(result.message)}`);
   }
+  const parties = await lookupApplicationApplicant(supabase, id);
+  wireCommerceModeration({
+    kind: "seller_approved",
+    sellerId: parties.sellerId,
+    storeId: parties.storeId,
+    actorId: user.id,
+    platformAdminIds: [user.id],
+  });
   revalidateStoreAdmin();
   redirect(`${back}?approved=1`);
 }
@@ -77,7 +124,7 @@ export async function approveSellerApplicationAction(
 export async function rejectSellerApplicationAction(
   formData: FormData
 ): Promise<void> {
-  const { supabase } = await requirePlatformAdmin();
+  const { user, supabase } = await requirePlatformAdmin();
   const id = formString(formData, "applicationId");
   const note = formString(formData, "note");
   const reason = validateRejectionReason(note);
@@ -89,6 +136,13 @@ export async function rejectSellerApplicationAction(
   if (!result.ok) {
     redirect(`${back}?error=${encodeURIComponent(result.message)}`);
   }
+  const parties = await lookupApplicationApplicant(supabase, id);
+  wireCommerceModeration({
+    kind: "seller_rejected",
+    sellerId: parties.sellerId,
+    storeId: parties.storeId,
+    actorId: user.id,
+  });
   revalidateStoreAdmin();
   redirect(`${back}?rejected=1`);
 }
@@ -110,13 +164,22 @@ export async function suspendSellerApplicationAction(
 export async function approveStoreProductAction(
   formData: FormData
 ): Promise<void> {
-  const { supabase } = await requirePlatformAdmin();
+  const { user, supabase } = await requirePlatformAdmin();
   const id = formString(formData, "productId");
   const result = await approveStoreProductAdmin(supabase, id);
   const back = backPath(formData, APP_ROUTES.adminStoreProducts);
   if (!result.ok) {
     redirect(`${back}?error=${encodeURIComponent(result.message)}`);
   }
+  const parties = await lookupProductSeller(supabase, id);
+  wireCommerceModeration({
+    kind: "product_approved",
+    productId: id,
+    sellerId: parties.sellerId,
+    storeId: parties.storeId,
+    actorId: user.id,
+    platformAdminIds: [user.id],
+  });
   revalidateStoreAdmin();
   redirect(`${back}?approved=1`);
 }
@@ -124,7 +187,7 @@ export async function approveStoreProductAction(
 export async function rejectStoreProductAction(
   formData: FormData
 ): Promise<void> {
-  const { supabase } = await requirePlatformAdmin();
+  const { user, supabase } = await requirePlatformAdmin();
   const id = formString(formData, "productId");
   const note = formString(formData, "note");
   const reason = validateRejectionReason(note);
@@ -136,6 +199,15 @@ export async function rejectStoreProductAction(
   if (!result.ok) {
     redirect(`${back}?error=${encodeURIComponent(result.message)}`);
   }
+  const parties = await lookupProductSeller(supabase, id);
+  wireCommerceModeration({
+    kind: "product_rejected",
+    productId: id,
+    sellerId: parties.sellerId,
+    storeId: parties.storeId,
+    actorId: user.id,
+    platformAdminIds: [user.id],
+  });
   revalidateStoreAdmin();
   redirect(`${back}?rejected=1`);
 }

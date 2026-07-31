@@ -22,6 +22,7 @@ import {
   sellerSafeFulfillmentContact,
 } from "./orderRules";
 import { canViewStore } from "./permissions";
+import { wireCommerceFulfillmentUpdate } from "./commerceNotifications";
 import type {
   FulfillmentStatus,
   OrderStatus,
@@ -660,10 +661,27 @@ export async function updateSellerOrderStatus(
     return { ok: false, message: "Unexpected order update response." };
   }
 
+  const orderId = String(payload.order_id ?? input.orderId);
+  if (!Boolean(payload.unchanged)) {
+    wireCommerceFulfillmentUpdate({
+      orderId,
+      fulfillmentStatus: fulfillment,
+      orderStatus: status,
+      buyerId:
+        typeof payload.buyer_id === "string" ? payload.buyer_id : null,
+      sellerId:
+        typeof payload.seller_id === "string" ? payload.seller_id : null,
+      storeId:
+        typeof payload.store_id === "string" ? payload.store_id : null,
+      supplierId:
+        typeof payload.supplier_id === "string" ? payload.supplier_id : null,
+    });
+  }
+
   return {
     ok: true,
     data: {
-      orderId: String(payload.order_id ?? input.orderId),
+      orderId,
       status,
       fulfillmentStatus: fulfillment,
       paymentStatus: String(payload.payment_status ?? "pending"),
