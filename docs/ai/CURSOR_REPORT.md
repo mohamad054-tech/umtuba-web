@@ -1,27 +1,18 @@
-# CURSOR_REPORT — AI Service Orchestration Foundation V1
+# CURSOR_REPORT — AI Unified Capability Execution V1
 
 ## Summary
 
-Unified Shared AI pre-execution pipeline under `lib/ai/orchestration/`: preflight → policy → quota → routing plan → invocation plan → post-processing → audit. Returns ready_for_execution without live inference. Wired into `aiService`; admin `/admin/ai/orchestration`.
+Unified Capability Execution Engine under `lib/ai/execution/` chains catalog → policy → quota → orchestration → routing → adapter → invocation planning. `aiService.runCapability` enters only via `executeUnifiedCapability`. Admin `/admin/ai/execution-pipeline`. No live inference.
 
-## Exact files changed
-
-See Final Verification Report.
-
-## Migrations created
+## Migrations
 
 None.
 
-## Security review
+## Security
 
-- Server-side only; admin gated
-- No prompts/secrets; no live providers
-
-## Tests / TypeScript / git diff --check
-
-See Final Verification Report.
+Server-side only; admin gated; no secrets/prompts; no provider calls in unified layer.
 
 ## Open issues
 
-- Routing uses catalog hints (not live RoutingPolicyEngine resolve) to stay network-free
-- Invocation plans only; Adapter/Private invocation not executed
+- Domain runners after readiness may still use gateway stubs (unchanged Learning/Commerce modules)
+- Adapter/Invocation are planned, not executed

@@ -148,6 +148,26 @@ export type {
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
 
+/** AI Unified Capability Execution V1 (no live inference). */
+export {
+  AI_UNIFIED_EXECUTION_VERSION,
+  AiUnifiedCapabilityExecutionEngine,
+  aiUnifiedCapabilityExecutionEngine,
+  aiUnifiedExecutionStore,
+  executeUnifiedCapability,
+  isUnifiedExecutionReady,
+  resetUnifiedCapabilityExecution,
+} from "./execution";
+export type {
+  AiUnifiedAuditRecord,
+  AiUnifiedCapabilityExecutionResult,
+  AiUnifiedContext,
+  AiUnifiedError,
+  AiUnifiedExecutionState,
+  AiUnifiedRequest,
+  AiUnifiedResultKind,
+} from "./execution";
+
 /** AI Service Orchestration Foundation V1 (no live inference). */
 export {
   AI_ORCHESTRATION_FOUNDATION_VERSION,

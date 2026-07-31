@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Service Orchestration Foundation V1
+AI Unified Capability Execution V1
 
 ## Status
 
@@ -10,29 +10,29 @@ AI Service Orchestration Foundation V1
 
 ## Branch
 
-`office/platform-ai-service-orchestration-foundation-v1`
+`office/platform-ai-unified-capability-execution-v1`
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-service-orchestration-foundation-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-unified-capability-execution-v1`
 
 ## Base
 
-`origin/office/platform-ai-policy-governance-foundation-v1` @ `2477bd9`
+`origin/office/platform-ai-service-orchestration-foundation-v1` @ `f5a2613`
 
 ## Allowed scope
 
-- `lib/ai/orchestration/**`
-- Light wire into `aiService`
-- Admin `/admin/ai/orchestration` + nav
+- `lib/ai/execution/**`
+- `aiService` single-entry wire
+- Admin `/admin/ai/execution-pipeline` + nav
 - Exports + docs
 
 ## Forbidden
 
-- Commit / push / inference / network / Learning / Commerce / Home / Gemini / `.env.local`
+- Commit / push / inference / network / Gemini / OpenAI / Learning / Commerce / Home / `.env.local`
 
 ## Done
 
-- Unified pipeline stages + result builder
-- Wired into aiService pre-execution path
-- Admin UI + tests
+- Unified request/context/state/result/error/audit/metrics/trace
+- Chains orchestration + adapter/invocation plans
+- `runCapability` enters only via `executeUnifiedCapability`

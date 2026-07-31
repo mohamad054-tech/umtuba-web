@@ -29,8 +29,10 @@ import {
   resolveMeteringOrDefault,
 } from "../usage/usageFoundation";
 import type { AiUsageActor } from "../usage/quotasBillingTypes";
-import { aiPolicyRegistry } from "../policy";
-import { orchestrateAiServiceRequest } from "../orchestration";
+import {
+  executeUnifiedCapability,
+  isUnifiedExecutionReady,
+} from "../execution";
 
 export type AiServiceDeps = {
   supabase: SupabaseClient;
@@ -165,76 +167,64 @@ async function runCapabilityInner(
     return asFailure("unauthenticated", "Authentication required.");
   }
 
-  let metering = resolveMeteringOrDefault(null);
   const tenantId = resolveTenantId(request, deps.userId);
-  try {
-    const entry =
-      getCapabilityCatalogRegistry().requireExecutable(request.capabilityId);
-    metering = resolveMeteringOrDefault(entry.metering);
-    const binding = aiPolicyRegistry.getBinding(request.capabilityId);
-    if (binding?.meteringQuotaPolicyId) {
-      metering = { ...metering, quotaPolicyId: binding.meteringQuotaPolicyId };
-    }
-    if (binding?.meteringBudgetPolicyId) {
-      metering = {
-        ...metering,
-        budgetPolicyId: binding.meteringBudgetPolicyId,
-      };
-    }
-  } catch {
-    return asFailure("invalid_input", "Unknown capability.");
-  }
+  const metering = resolveMeteringOrDefault(
+    getCapabilityCatalogRegistry().lookup(request.capabilityId)?.metering
+  );
 
   try {
-    const orch = orchestrateAiServiceRequest({
+    const unified = executeUnifiedCapability({
       capabilityId: request.capabilityId,
       tenantId,
       userId: deps.userId,
       runtimeId: "shared_ai_gateway",
       correlationId: request.context.workspaceId ?? null,
+      surface: request.context.surface,
+      productDomain: request.context.productDomain,
     });
-    if (orch.outcome === "requires_approval") {
-      return asFailure(
-        "permission_denied",
-        orch.stopReason ?? "Policy requires approval."
-      );
-    }
-    if (orch.outcome === "blocked") {
-      try {
-        aiUsageQuotasBillingFoundation.recordUsage({
-          actor: usageActorFor(deps, tenantId),
-          metering,
-          requestId: orch.requestId,
-          capabilityId: request.capabilityId,
-          tenantId,
-          userId: deps.userId,
-          status: "rejected",
-          source: "shared_ai_service",
-          correlationId: request.context.workspaceId ?? null,
-        });
-      } catch {
-        /* ignore */
+
+    if (!isUnifiedExecutionReady(unified)) {
+      if (unified.result === "blocked" || unified.result === "requires_approval") {
+        try {
+          aiUsageQuotasBillingFoundation.recordUsage({
+            actor: usageActorFor(deps, tenantId),
+            metering,
+            requestId: unified.requestId,
+            capabilityId: request.capabilityId,
+            tenantId,
+            userId: deps.userId,
+            status: "rejected",
+            source: "shared_ai_service",
+            correlationId: request.context.workspaceId ?? null,
+          });
+        } catch {
+          /* ignore */
+        }
+      }
+      if (unified.result === "requires_approval") {
+        return asFailure(
+          "permission_denied",
+          unified.error?.message ?? "Policy requires approval."
+        );
+      }
+      if (unified.result === "blocked") {
+        return asFailure(
+          unified.error?.code === "quota_denied"
+            ? "rate_limited"
+            : "permission_denied",
+          unified.error?.message ?? "Request blocked by unified execution."
+        );
       }
       return asFailure(
-        "rate_limited",
-        orch.stopReason ?? "Request blocked by orchestration."
-      );
-    }
-    if (orch.outcome === "rejected") {
-      return asFailure(
-        "permission_denied",
-        orch.stopReason ?? "Orchestration rejected the request."
-      );
-    }
-    if (orch.outcome !== "ready_for_execution" && orch.outcome !== "accepted") {
-      return asFailure(
-        "configuration_invalid",
-        orch.stopReason ?? "Orchestration did not reach execution readiness."
+        unified.error?.code === "capability_unknown"
+          ? "invalid_input"
+          : "permission_denied",
+        unified.error?.message ?? "Unified execution rejected the request."
       );
     }
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Orchestration failed.";
+      err instanceof Error ? err.message : "Unified execution failed.";
     return asFailure("configuration_invalid", message);
   }
 
