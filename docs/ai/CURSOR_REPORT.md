@@ -1,54 +1,45 @@
-# CURSOR_REPORT — Commission Policy Foundation V1
+# Cursor Report
 
 ## Summary
 
-**PASS** — Implemented and staged locally. No commit / push / remote migration apply.
+**PASS + STAGED** for `commerce.settlement.payout_booking_ops_helpers_v1` on branch `office/commerce-settlement-payout-booking-ops-helpers-v1` (base `a0aade7`).
 
-Product GO approved `commerce.revenue.commission_policy_foundation_v1`. Trusted versioned currency-isolated commission policy foundation with optional Bridge apply. Settlement/payout amounts unchanged. No Dashboard/Admin/AI.
+## Exact milestone
 
-## Exact selected milestone
+`commerce.settlement.payout_booking_ops_helpers_v1` — approved and implemented.
 
-`commerce.revenue.commission_policy_foundation_v1`
+## What changed
 
-## SSOT justification
+Service-side submit / fail / confirm helpers that:
 
-Human GO approved this as the official next Commerce milestone after seller payout eligibility surface.
+1. Load trusted capture / attempt / order / settlement / payout facts
+2. Validate store ownership and money consistency (no client amounts)
+3. Call existing `apply_store_payout_event` (service_role foundation RPC)
+4. Map idempotent replays, concurrent conflicts, and terminal-state errors
+5. Attach pure reconciliation projection on success
 
-## Exact files changed
+## Files
 
-- `lib/store/commissionPolicyFoundation.ts`
-- `lib/store/commissionPolicyFoundation.test.ts`
-- `supabase/migrations/20260884_store_commission_policy_foundation_v1.sql`
-- `lib/store/commerceRevenueBridge.ts`
-- `lib/store/commerceRevenueBridge.test.ts`
-- `lib/store/analyticsFinance.ts`
-- `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
-- `docs/store/implementation/ANALYTICS_FINANCE_FOUNDATION_V1.md`
-- `docs/store/implementation/REVENUE_PAYOUT_BALANCE_VISIBILITY_V1.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/SESSION_HANDOFF.md`
+- `lib/store/payoutBookingOpsHelpers.ts` (new)
+- `lib/store/payoutBookingOpsHelpers.test.ts` (new)
+- `docs/store/implementation/PAYOUT_BOOKING_OPS_HELPERS_V1.md` (new)
+- `docs/store/implementation/SELLER_PAYOUT_FOUNDATION_V1.md` (cross-link)
+- `docs/ai/CURRENT_TASK.md` / `CURSOR_REPORT.md` / `SESSION_HANDOFF.md`
 
-## Migrations created
+## Migration
 
-`20260884_store_commission_policy_foundation_v1.sql` — **local only**, not applied remotely. No active policy seed.
+None. Reuses `20260881_store_seller_payout_foundation_v1.sql`.
 
-## Security review
+## Verification
 
-- Client percentages rejected
-- Missing/invalid/currency-mismatched policies fail closed
-- SQL resolve/compute service_role only
-- Settlement capture amounts not altered
-- Payout execution not enabled
+| Check | Result |
+| --- | --- |
+| Focused + affected vitest | **194 passed** (11 files) |
+| `npx tsc --noEmit` | PASS |
+| `git diff --check` | PASS (after SSOT rewrite) |
+| Build | Not required (no UI) |
+| Commit / push / remote apply | **Not done** (per GO) |
 
-## Tests / TypeScript / Build
+## Boundaries respected
 
-- Focused: `commissionPolicyFoundation.test.ts` — 13 passed
-- Affected: bridge, analytics, settlement, payout foundation, allocate — **118 passed** across 6 files
-- `npx tsc --noEmit`: PASS
-- Build: skipped (no UI surface; not required)
-- `git diff --check`: PASS
-
-## Open issues
-
-Await commit/push/remote-apply GO. No active commercial rates seeded.
+No Dashboard, Admin UI, AI, bank rails, seller payout button, or duplicate financial engine.

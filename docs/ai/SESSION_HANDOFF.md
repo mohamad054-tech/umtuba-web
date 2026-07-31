@@ -1,38 +1,46 @@
-# Session Handoff — Commission Policy Foundation V1
-
-**Updated:** 2026-07-31
+# Session Handoff
 
 ## Active milestone
 
-Capability: `commerce.revenue.commission_policy_foundation_v1` (**APPROVED**)
-Branch: `office/commerce-revenue-commission-policy-foundation-v1`
-Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-Base tip: `cf3a50a28f778a27de78c41b4b94462114825d42`
-Status: **PASS + STAGED** — no commit / push / remote apply yet
+`commerce.settlement.payout_booking_ops_helpers_v1`
 
-## What landed locally
+Status: **PASS + STAGED** — implementation complete; awaiting human commit/push GO
 
-- Pure commission policy SSOT (validate/select/calculate)
-- SQL registry + service_role resolve/compute (no active seed)
-- Optional Bridge decomposition apply
-- Analytics/Balance Visibility docs note foundation without inventing configured UI
+## Branch / worktree
 
-## Closed tips (do not reopen)
+- Branch: `office/commerce-settlement-payout-booking-ops-helpers-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
+- Base: `a0aade7d46de52a57504cb7357fcbbad062aa13b` (Commission Policy Foundation V1)
+- HEAD: uncommitted staged tip on feature branch
 
-| Track | Tip |
+## Delivered
+
+Trusted service helpers:
+
+- `submitPayoutBooking` — RELEASED payable → `IN_TRANSIT`
+- `failPayoutBooking` — `IN_TRANSIT` → `NONE` (retry via new submit)
+- `confirmPayoutBooking` — `IN_TRANSIT` → `COMPLETED` (terminal)
+
+Reuses `apply_store_payout_event`. No migration. No bank rails. No UI.
+
+## Closed Commerce money path (prior tips)
+
+| Milestone | Tip |
 | --- | --- |
-| Seller Payout Eligibility Surface V1 | `cf3a50a` |
-| Payout Reconciliation Surface V1 | `94040b4` |
-| Seller Payout History Surface V1 | `747f1d5` |
+| Seller Payout Foundation V1 | `aa99592` (+ handoff `032ac77`) |
+| Seller Payout Read Model V1 | `66a8bed` |
+| Payout Balance Visibility V1 | `af1eedd` |
 | Settlement ↔ Payout Reconciliation Read V1 | `6b21075` |
+| Seller Payout History Surface V1 | `747f1d5` |
+| Payout Reconciliation Surface V1 | `94040b4` |
+| Seller Payout Eligibility Surface V1 | `cf3a50a` |
+| Commission Policy Foundation V1 | `a0aade7` |
+| **Payout Booking Ops Helpers V1** | **this branch (staged)** |
 
 ## Coordination
 
-- Desktop owns Dashboard / Admin UI / AI — leave alone
-- This worktree = Commerce only
+Desktop owns AI Usage / Quotas / Billing / Dashboard / Admin AI — untouched.
 
-## Do not
+## Next human action
 
-- Commit / push / remote-apply unless asked
-- Activate commercial rates without Product GO
-- Touch Dashboard / Admin / AI
+Commit + push when ready. Remote-apply `20260881`–`20260884` only when Product asks.

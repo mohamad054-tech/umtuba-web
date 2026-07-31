@@ -105,4 +105,4 @@ Seller Payout Foundation V1 intentionally does **not** include:
 - UM Points / UMT changes
 - country capability matrix / KYC gates (fail-closed absence: no rail)
 
-Settlement release remains the eligibility gate; this foundation only books payable â†’ in_transit â†’ clearing (or fail back to payable). Seller-facing read projection is `commerce.settlement.seller_payout_read_model_v1`.
+Settlement release remains the eligibility gate; this foundation only books payable â†’ in_transit â†’ clearing (or fail back to payable). Seller-facing read projection is `commerce.settlement.seller_payout_read_model_v1`. Service-side submit/fail/confirm wrappers: `commerce.settlement.payout_booking_ops_helpers_v1`.

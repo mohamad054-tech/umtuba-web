@@ -2,23 +2,24 @@
 
 ## Task title
 
-Commission Policy Foundation V1
+UMTUBA Commerce — Payout Booking Ops Helpers V1
 
 ## Status
 
-`implementation-complete-local` — **PASS + STAGED** — awaiting commit/push/remote-apply GO
+`pass-staged` — **implementation complete** — stop at PASS + STAGED (no commit / no push)
 
-## Capability
+## Capability (APPROVED)
 
-`commerce.revenue.commission_policy_foundation_v1` — **APPROVED** (Product GO 2026-07-31)
+`commerce.settlement.payout_booking_ops_helpers_v1`
 
 ## Branch
 
-`office/commerce-revenue-commission-policy-foundation-v1`
+`office/commerce-settlement-payout-booking-ops-helpers-v1`
 
-## Base / tip
+## Base / HEAD
 
-Base: `cf3a50a28f778a27de78c41b4b94462114825d42` (Seller Payout Eligibility Surface V1)
+- Base (closed tip): `a0aade7d46de52a57504cb7357fcbbad062aa13b` (Commission Policy Foundation V1)
+- HEAD: uncommitted / staged on feature branch (no commit yet)
 
 ## Worktree
 
@@ -26,20 +27,25 @@ Base: `cf3a50a28f778a27de78c41b4b94462114825d42` (Seller Payout Eligibility Surf
 
 ## Coordination
 
-- Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — do not touch
-- Laptop = Commerce only
+- **Desktop** owns: AI Platform / Runtime / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini — do not touch
+- **Laptop** = Commerce only (no AI, Dashboard, Admin UI, Usage, Quotas, Billing)
 
 ## Delivered
 
-- TS SSOT: `lib/store/commissionPolicyFoundation.ts` (+ tests)
-- Migration `20260884_store_commission_policy_foundation_v1.sql` (local only; no active seed)
-- Bridge optional apply via `buildCommerceFinancialEvent(..., { commissionPolicies })`
-- Doc: `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
+Trusted service-side helpers over Seller Payout Foundation:
 
-## Scope held
+| Helper | Action | Transition |
+| --- | --- | --- |
+| `submitPayoutBooking` | submit | `NONE` → `IN_TRANSIT` |
+| `failPayoutBooking` | fail | `IN_TRANSIT` → `NONE` |
+| `confirmPayoutBooking` | confirm | `IN_TRANSIT` → `COMPLETED` |
 
-Trusted policy contracts + calculation SSOT. No payout execution, no settlement amount changes, no Dashboard/Admin/AI, no auto-activated commercial rates.
+- Module: `lib/store/payoutBookingOpsHelpers.ts`
+- Tests: `lib/store/payoutBookingOpsHelpers.test.ts`
+- Doc: `docs/store/implementation/PAYOUT_BOOKING_OPS_HELPERS_V1.md`
+- Reuses `apply_store_payout_event` — **no new migration**
+- No bank rails, Dashboard, Admin UI, seller write UI, or AI
 
 ## Next
 
-Human GO for: commit → push → (optional) remote migration apply. Do not invent the following milestone until SSOT names it.
+Human GO to commit / push / remote-apply (migrations `20260881`–`20260884` remain local until asked).
