@@ -2,24 +2,35 @@
 
 **Updated:** 2026-07-31
 
-## Closed
+## Closed (do not modify)
 
-- Thread Lesson Binding V1 @ `b85081b`
-- Thread Resume / History Read Foundation V1 @ `6930d86`  
-  Branch `office/learning-ai-tutor-thread-resume-history-v1` — Sync 0 0
+| Milestone | Tip |
+| --- | --- |
+| Thread Lesson Binding V1 | `b85081b` |
+| Thread Resume / History Read Foundation V1 | `6930d86` |
+| Structured Oversize Serialization V1 | `7d03178` |
 
-## Active WIP
+## Active (PASS + STAGED — no commit yet)
 
-**Structured Oversize Serialization V1**  
-Branch: `office/learning-ai-tutor-structured-oversize-serialization-v1`  
-Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-structured-oversize-serialization-v1`  
-Base: `6930d86`  
-Status: verification-pass / STAGED — no commit/push; **no migration**
+| Milestone | Branch / worktree |
+| --- | --- |
+| Thread Lifecycle Foundation V1 (`learning.tutor.thread_lifecycle_foundation_v1`) | Branch: `office/learning-ai-tutor-thread-lifecycle-foundation-v1` · Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-next-milestone-proposal-v1` · Base: `7d03178` |
 
-## Not next (unless SSOT updated)
+### Lifecycle contract
 
-Thread Lifecycle Foundation V1 — **not documented**; do not invent.
+- States: `active` | `archived`
+- Ensure = get-or-create single active thread for `(auth.uid, course_id, lesson_id)`
+- Never reuse across lesson / course / learner; archived → new active on ensure
+- Migration: `20260876` local only
 
-## Next
+## Still deferred / blocked
 
-Manual trailer-free commit, then push GO.
+- Conversation History Summarization — **deferred**, no unblock condition
+- `code_review` capability — blocked
+- Remote apply of Tutor migrations — requires explicit apply GO
+
+## Do not
+
+- Start summarization while deferred
+- Amend closed tips
+- Commit / push / remote-apply from Cursor unless asked

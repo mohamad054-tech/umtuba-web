@@ -1,38 +1,64 @@
-﻿# CURSOR_REPORT — Structured Oversize Serialization V1
+﻿# CURSOR_REPORT — Thread Lifecycle Foundation V1
 
 ## Summary
 
-**PASS** — `learning.tutor.structured_oversize_serialization_v1` on
-`office/learning-ai-tutor-structured-oversize-serialization-v1` from resume tip `6930d86`.
+**PASS + STAGED** — Implemented `learning.tutor.thread_lifecycle_foundation_v1` after SSOT approval.
 
-Assistant exchange persistence no longer mid-slices JSON when over the 20k bound. Structured drop/shrink keeps parseable transcripts compatible with resume/history. **No migration.** Staged only — no commit/push.
-
-## Why not Thread Lifecycle
-
-SSOT remaining follow-ups after Resume/History were: Structured oversize serialization; Conversation history summarization (deferred). Thread Lifecycle is not listed.
+Official next Tutor milestone after Structured Oversize Serialization V1 (`7d03178`). Get-or-create active thread per learner+course+lesson; `active` | `archived`; race-safe unique index; fail-closed auth/entitlement; compatible with Persistence Bridge, Lesson Binding, Resume/History, Oversize Serialization.
 
 ## Exact files changed
 
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/workstreams/AI_PLATFORM.md`
+- `lib/learning/aiTutorFoundation.ts`
+- `lib/learning/aiTutorFoundation.test.ts`
+- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
+- `lib/ai/capabilities/learning/threadLifecycleFoundation.test.ts` (new)
+- `supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` (new)
 
 ## Migrations created
 
-None.
+- `20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` — **local only**; not remote-applied
 
-## Tests / TypeScript
+## Security review
 
-- Affected Tutor suites: **117 passed**
-- `npx tsc --noEmit`: PASS
-- `git diff --check`: PASS
-- Build: not run (Tutor backend policy)
+- Ensure/archive/create/get/resume remain security definer + fixed `search_path`
+- Ownership via `auth.uid()`; entitlement via `has_learning_course_access`
+- Lesson must belong to course; never reuses other learners / other lessons / other courses
+- One active thread uniqueness; concurrent insert → `unique_violation` re-select
+- Revoke public/anon on ensure + archive; lean JSON (no `user_id` leak in projections)
+- Fail-closed client sanitization preserved
+
+## Tests
+
+- `threadLifecycleFoundation.test.ts` — PASS  
+- `aiTutorFoundation.test.ts` — PASS  
+- `threadResumeHistory.test.ts` — PASS  
+- `threadPersistenceBridge.test.ts` — PASS  
+- `learningTutorIntegration.test.ts` — PASS  
+- `learningTutor.test.ts` — PASS  
+- Totals: **134 passed** / 0 failed (6 files)
+
+## TypeScript
+
+`npx tsc --noEmit` — PASS
+
+## Build
+
+Not required for this Tutor backend milestone (no UI/entry change).
+
+## git diff --check
+
+PASS (no whitespace errors)
+
+## git status --short
+
+All in-scope files **staged**; working tree clean of untracked junk. PASS + STAGED only.
 
 ## Open issues
 
-- Await trailer-free commit/push GO
-- Conversation history summarization remains deferred
-- Thread Lifecycle requires explicit SSOT milestone before implementation
+- Remote apply of `20260876` awaits explicit GO
+- Summarization remains deferred
+- No commit / no push from this agent turn

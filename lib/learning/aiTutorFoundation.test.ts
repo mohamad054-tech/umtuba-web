@@ -127,7 +127,14 @@ describe("AI Tutor Foundation — adapter", () => {
       rpc: async (name: string) => {
         calls.push(name);
         return {
-          data: { id: "55555555-5555-4555-8555-555555555555", course_id: COURSE_ID },
+          data: {
+            thread_id: "55555555-5555-4555-8555-555555555555",
+            course_id: COURSE_ID,
+            lesson_id: LESSON_ID,
+            title: "AI Tutor",
+            lifecycle_status: "active",
+            created: true,
+          },
           error: null,
         };
       },
@@ -143,7 +150,7 @@ describe("AI Tutor Foundation — adapter", () => {
         })
       ).ok
     ).toBe(true);
-    expect(calls).toEqual(["create_my_learning_ai_tutor_thread"]);
+    expect(calls).toEqual(["ensure_my_learning_ai_tutor_active_thread"]);
     expect(SRC).not.toMatch(/\.from\(/);
     expect(SRC).not.toMatch(/openai|anthropic/i);
     expect(

@@ -15,6 +15,7 @@ import type { LearningTutorIntegrationAction } from "../../contracts/learningTut
 import {
   LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX,
   appendMyAiTutorExchange,
+  ensureMyAiTutorActiveThread,
   getMyAiTutorThread,
   isAiTutorUuid,
   resumeMyAiTutorThread,
@@ -535,6 +536,88 @@ export async function resumeLearningTutorThread(
       error: {
         code: "provider_error",
         message: "Could not resume the Learning Tutor conversation.",
+      },
+    };
+  }
+
+  return { ok: true, data: result.data };
+}
+
+/**
+ * Ensure (get-or-create) the single active tutor thread for this lesson.
+ * Fail-closed: auth/entitlement/ids; never crosses course/lesson/learner.
+ */
+export async function ensureLearningTutorActiveThread(
+  supabase: SupabaseClient,
+  input: {
+    courseId: string;
+    lessonId: string;
+    title?: string | null;
+  }
+): Promise<ThreadPersistenceBridgeResult> {
+  if (!isAiTutorUuid(input.courseId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "courseId is required and must be a valid UUID.",
+      },
+    };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "lessonId is required and must be a valid UUID.",
+      },
+    };
+  }
+
+  const result = await ensureMyAiTutorActiveThread(supabase, {
+    courseId: input.courseId,
+    lessonId: input.lessonId,
+    title: input.title,
+  });
+
+  if (!result.ok) {
+    const lower = result.message.toLowerCase();
+    if (
+      lower.includes("authentication required") ||
+      lower.includes("not allowed") ||
+      lower.includes("entitled")
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: "permission_denied",
+          message: "You are not allowed to open a Learning Tutor thread.",
+        },
+      };
+    }
+    if (lower.includes("not in this course") || lower.includes("lesson_id")) {
+      return {
+        ok: false,
+        error: {
+          code: "invalid_input",
+          message: "Tutor lesson does not belong to this course.",
+        },
+      };
+    }
+    if (lower.includes("unavailable or invalid") || lower.includes("not found")) {
+      return {
+        ok: false,
+        error: {
+          code: "permission_denied",
+          message: "Tutor thread is unavailable or not owned by you.",
+        },
+      };
+    }
+    return {
+      ok: false,
+      error: {
+        code: "provider_error",
+        message: "Could not open the Learning Tutor thread.",
       },
     };
   }

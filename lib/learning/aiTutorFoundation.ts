@@ -22,6 +22,10 @@ export type LearningAiTutorMessageKind =
 
 export const LEARNING_AI_TUTOR_RPCS = {
   createThread: "create_my_learning_ai_tutor_thread",
+  /** Get-or-create the single active thread for learner+course+lesson. */
+  ensureActiveThread: "ensure_my_learning_ai_tutor_active_thread",
+  /** Archive owner thread (terminal); ensure may create a replacement. */
+  archiveThread: "archive_my_learning_ai_tutor_thread",
   appendMessage: "append_my_learning_ai_tutor_message",
   /** Real Core assistant text (Thread Persistence Bridge). Stub append remains. */
   appendExchange: "append_my_learning_ai_tutor_exchange",
@@ -35,6 +39,13 @@ export const LEARNING_AI_TUTOR_RPCS = {
   /** Lean metadata only (no messages) for bridge validation. */
   getThread: "get_my_learning_ai_tutor_thread",
 } as const;
+
+export const LEARNING_AI_TUTOR_LIFECYCLE_STATUSES = [
+  "active",
+  "archived",
+] as const;
+export type LearningAiTutorLifecycleStatus =
+  (typeof LEARNING_AI_TUTOR_LIFECYCLE_STATUSES)[number];
 
 /** Default / hard max for resume history reads. */
 export const LEARNING_AI_TUTOR_RESUME_HISTORY_DEFAULT_LIMIT = 50;
@@ -118,13 +129,84 @@ export async function createMyAiTutorThread(
   if (input.lessonId && !isAiTutorUuid(input.lessonId)) {
     return { ok: false, message: "lesson_id must be a valid UUID" };
   }
+  // Prefer ensure when lesson is known (no duplicate actives).
+  if (input.lessonId) {
+    return ensureMyAiTutorActiveThread(supabase, {
+      courseId: input.courseId,
+      lessonId: input.lessonId,
+      title: input.title,
+    });
+  }
   const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.createThread, {
     p_course_id: input.courseId,
-    p_lesson_id: input.lessonId ?? null,
+    p_lesson_id: null,
     p_title: input.title ?? "AI Tutor",
   });
   if (!result.ok) return result;
-  return { ok: true, data: asRecord(result.data) ?? {} };
+  return parseLifecycleThreadRow(result.data);
+}
+
+/**
+ * Get-or-create the single active AI Tutor thread for learner + course + lesson.
+ */
+export async function ensureMyAiTutorActiveThread(
+  supabase: AnyClient,
+  input: {
+    courseId: string;
+    lessonId: string;
+    title?: string | null;
+  }
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  if (!isAiTutorUuid(input.courseId)) {
+    return { ok: false, message: "course_id must be a valid UUID" };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return { ok: false, message: "lesson_id must be a valid UUID" };
+  }
+  const result = await callRpc(
+    supabase,
+    LEARNING_AI_TUTOR_RPCS.ensureActiveThread,
+    {
+      p_course_id: input.courseId,
+      p_lesson_id: input.lessonId,
+      p_title: input.title ?? "AI Tutor",
+    }
+  );
+  if (!result.ok) return result;
+  return parseLifecycleThreadRow(result.data);
+}
+
+/**
+ * Archive an owned tutor thread. Idempotent if already archived.
+ */
+export async function archiveMyAiTutorThread(
+  supabase: AnyClient,
+  threadId: string
+): Promise<AiTutorResult<Record<string, unknown>>> {
+  if (!isAiTutorUuid(threadId)) {
+    return { ok: false, message: "thread_id must be a valid UUID" };
+  }
+  const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.archiveThread, {
+    p_thread_id: threadId,
+  });
+  if (!result.ok) return result;
+  return parseLifecycleThreadRow(result.data);
+}
+
+function parseLifecycleThreadRow(
+  data: unknown
+): AiTutorResult<Record<string, unknown>> {
+  const row = asRecord(data);
+  if (!row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.thread_id !== "string" || !isAiTutorUuid(row.thread_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if ("user_id" in row || "provider" in row || "modelId" in row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  return { ok: true, data: row };
 }
 
 export async function appendMyAiTutorMessage(

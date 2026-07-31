@@ -2,7 +2,7 @@
 
 ## SAVE POINT — 2026-07-29 (Desktop)
 
-**Machine:** Desktop  
+**Machine:** Desktop
 **Active work:** AI Core Platform Provider Foundation V1
 
 | Item | Value |
@@ -164,18 +164,41 @@ Implements documented follow-up **Trusted-producer transcript integrity** after 
 
 ### Remaining follow-ups
 
-- Conversation history summarization (deferred)
-- Thread Lifecycle Foundation is **not** specified in this SSOT; do not invent it without an explicit milestone update
+- Conversation history summarization (**deferred** — **no documented unblock condition**; do not implement until SSOT removes deferral with explicit GO)
 
 ## Structured Oversize Serialization V1
 
-Milestone: `learning.tutor.structured_oversize_serialization_v1`
+Milestone: `learning.tutor.structured_oversize_serialization_v1` — **CLOSED** @ `7d03178`
 
 | Piece | Detail |
 | --- | --- |
 | Module | `serializeJsonObjectWithinLimit` in `threadPersistenceBridge.ts` |
 | Behavior | Persist assistant JSON within 20k bound without mid-slicing; drop secondary fields then shrink strings; fail closed if unfittable |
 | Compatibility | Persistence / lesson binding / resume history unchanged |
+
+## Thread Lifecycle Foundation V1
+
+Milestone: `learning.tutor.thread_lifecycle_foundation_v1` — **PASS + STAGED** (awaiting human commit)
+
+Official next Tutor milestone after Structured Oversize Serialization V1.
+
+| Piece | Detail |
+| --- | --- |
+| Migration (local only) | `20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` |
+| States | `active` \| `archived` |
+| Ensure RPC | `ensure_my_learning_ai_tutor_active_thread(course, lesson, title)` — get-or-create |
+| Archive RPC | `archive_my_learning_ai_tutor_thread(thread_id)` — owner + entitlement; idempotent |
+| Uniqueness | Partial unique index: one `active` per `(user_id, course_id, lesson_id)` when `lesson_id` not null |
+| Race | `unique_violation` → re-select active |
+| Foundation | `ensureMyAiTutorActiveThread`, `archiveMyAiTutorThread`; `createMyAiTutorThread` with lesson → ensure |
+| Bridge | `ensureLearningTutorActiveThread` |
+| Guarantees | Never reuse across lesson/course/learner; archived not reused; fail-closed auth/entitlement; compat with Persistence / Binding / Resume / Oversize |
+
+### Remaining follow-ups (after Lifecycle)
+
+- Conversation history summarization (**deferred** — do not implement until SSOT undefer + GO)
+- Remote apply pending Tutor migrations only with explicit apply GO
+- `code_review` remains **blocked**
 
 ## Migration status
 
@@ -184,7 +207,10 @@ Milestone: `learning.tutor.structured_oversize_serialization_v1`
 - Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
 - Tutor lesson binding: `20260874` — closed in Git; remote apply only with GO
 - Tutor resume/history: `20260875` — closed in Git; remote apply only with GO
+- Tutor thread lifecycle: `20260876` — **local only**; remote apply only with GO
 
 ## Next (after commit approval)
 
-Apply pending Tutor migrations only with explicit GO. `code_review` remains **blocked**. Do not merge Tutor work into alpha from the Tutor laptop.
+1. Human commit of Lifecycle staged work (trailer-free).
+2. Apply pending Tutor migrations only with explicit apply GO.
+3. Summarization remains deferred. `code_review` remains blocked. Do not merge Tutor work into alpha from the Tutor laptop.
