@@ -36,3 +36,5 @@ Blocked submit directs sellers to the existing Digital deliverable panel.
 
 CDN/library, multi-file bundles, payouts, refunds, physical redesign,
 Learning/AI/Home/Creator/Navigation, capture/allocate/entitlement/release redesign.
+
+Inventory availability (`commerce.inventory.seller_inventory_availability_foundation_v1`) is orthogonal — unlimited digital stock does **not** replace asset publish readiness.

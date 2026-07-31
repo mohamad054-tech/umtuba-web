@@ -9,9 +9,9 @@ import {
   validateCartQuantity,
 } from "./cartRules";
 import { deriveCartLineBlockingIssue } from "./cartCheckoutPresentation";
-import { availableUnits } from "./inventory";
 import { validateListingCartContext } from "./marketplaceEligibility";
 import { resolveDigitalProductPublishReadiness } from "./digitalProductPublishReadiness";
+import { resolveTrustedInventoryAvailability } from "./sellerInventoryAvailabilityFoundation";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { rejectClientCartPrice } from "./tradingContracts";
 
@@ -59,7 +59,7 @@ async function loadVariantOffer(
   const { data: product } = await supabase
     .from("store_products")
     .select(
-      "id, title, status, moderation_status, store_id, stores!inner(id, name, status)"
+      "id, title, status, moderation_status, product_type, store_id, stores!inner(id, name, status)"
     )
     .eq("id", variant.product_id)
     .maybeSingle();
@@ -107,6 +107,21 @@ async function loadVariantOffer(
     (media ?? [])[0]?.storage_path ??
     null;
 
+  const availability = resolveTrustedInventoryAvailability({
+    productType: String(product.product_type ?? ""),
+    productStatus: String(product.status),
+    variantStatus: String(variant.status),
+    moderationStatus: String(product.moderation_status ?? ""),
+    inventory: inventory
+      ? {
+          onHand: Number(inventory.on_hand),
+          reserved: Number(inventory.reserved),
+          safetyStock: Number(inventory.safety_stock),
+          allowBackorder: Boolean(inventory.allow_backorder),
+        }
+      : null,
+  });
+
   return {
     ok: true,
     data: {
@@ -126,7 +141,9 @@ async function loadVariantOffer(
       onHand: inventory?.on_hand ?? 0,
       reserved: inventory?.reserved ?? 0,
       safetyStock: inventory?.safety_stock ?? 0,
-      allowBackorder: Boolean(inventory?.allow_backorder),
+      // Unlimited / backorder paths skip finite stock checks in cart rules.
+      allowBackorder:
+        availability.skipFiniteStockCheck || Boolean(inventory?.allow_backorder),
       mediaSnapshot: cover,
     },
   };
@@ -324,7 +341,7 @@ export async function getCartSummary(
     const { data: variants } = await supabase
       .from("product_variants")
       .select(
-        "id, status, product_id, store_products!inner(status, moderation_status, store_id)"
+        "id, status, product_id, store_products!inner(status, moderation_status, product_type, store_id)"
       )
       .in("id", variantIds);
 
@@ -332,6 +349,7 @@ export async function getCartSummary(
       const product = variant.store_products as unknown as {
         status: string;
         moderation_status: string;
+        product_type: string;
         store_id: string;
       };
       const { data: price } = await supabase
@@ -355,19 +373,32 @@ export async function getCartSummary(
         | null;
       const storeActive = (storeMeta?.status ?? "active") === "active";
 
+      const availability = resolveTrustedInventoryAvailability({
+        productType: String(product.product_type ?? ""),
+        productStatus: String(product.status),
+        variantStatus: String(variant.status),
+        moderationStatus: String(product.moderation_status ?? ""),
+        inventory: inv
+          ? {
+              onHand: Number(inv.on_hand),
+              reserved: Number(inv.reserved),
+              safetyStock: Number(inv.safety_stock),
+              allowBackorder: Boolean(inv.allow_backorder),
+            }
+          : null,
+      });
+
       liveByVariant.set(variant.id as string, {
         unitPriceMinor:
           price && price.status === "active"
             ? Number(price.amount_minor)
             : null,
-        available: inv
-          ? availableUnits({
-              onHand: inv.on_hand,
-              reserved: inv.reserved,
-              safetyStock: inv.safety_stock,
-            })
-          : null,
-        allowBackorder: Boolean(inv?.allow_backorder),
+        available:
+          availability.mode === "unlimited"
+            ? null
+            : availability.availableQuantity,
+        allowBackorder:
+          availability.skipFiniteStockCheck || Boolean(inv?.allow_backorder),
         productAvailable: isPubliclyVisibleProduct({
           productStatus: product.status,
           moderationStatus: product.moderation_status,

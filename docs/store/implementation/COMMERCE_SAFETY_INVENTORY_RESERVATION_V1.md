@@ -38,6 +38,8 @@ Tables:
 - `inventory_reservations` — operational pointer
 - `inventory_reservation_events` — **append-only** audit (no client UPDATE/DELETE)
 
+Availability resolution for sellable quantity (unlimited digital vs finite physical) is documented in `SELLER_INVENTORY_AVAILABILITY_FOUNDATION_V1.md` (`commerce.inventory.seller_inventory_availability_foundation_v1`). Reservation holds still decrement sellable finite stock via `reserved`.
+
 Statuses: `active` | `pending_capture` | `consumed` | `released` | `expired`
 
 V1 confirm always creates **`active`** holds.

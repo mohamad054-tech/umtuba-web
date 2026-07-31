@@ -19,6 +19,7 @@ function row(
     productTitle: "Lamp",
     productSlug: "lamp",
     productStatus: "active",
+    productType: "physical",
     variantId: "v1",
     variantTitle: "Default",
     sku: "SKU-1",
@@ -32,6 +33,7 @@ function row(
     availableToSell: 5,
     inventoryUpdatedAt: "2026-07-28T00:00:00Z",
     missingInventory: false,
+    availabilityMode: "finite",
     ...overrides,
   };
 }
@@ -72,6 +74,32 @@ describe("sellerInventoryPresentation — quantity separation", () => {
         row({ onHand: null, reserved: null, safetyStock: null, availableToSell: null })
       )
     ).toBe("unknown");
+  });
+
+  it("treats unlimited digital/service rows as unlimited without missing-inventory pressure", () => {
+    expect(
+      deriveInventoryAvailabilityState(
+        row({
+          productType: "digital",
+          availabilityMode: "unlimited",
+          missingInventory: false,
+          onHand: null,
+          reserved: null,
+          safetyStock: null,
+          availableToSell: null,
+          allowBackorder: true,
+        })
+      )
+    ).toBe("unlimited");
+    expect(
+      deriveSellerInventoryAttention(
+        row({
+          productType: "digital",
+          availabilityMode: "unlimited",
+          availableToSell: null,
+        })
+      ).level
+    ).toBe("none");
   });
 
   it("does not invent low-stock when safety stock is zero", () => {

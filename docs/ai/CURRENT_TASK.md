@@ -2,7 +2,7 @@
 
 ## Task title
 
-UMTUBA Commerce — Category Taxonomy Seed V1
+UMTUBA Commerce — Seller Inventory Availability Foundation V1
 
 ## Status
 
@@ -10,15 +10,15 @@ UMTUBA Commerce — Category Taxonomy Seed V1
 
 ## Capability (APPROVED)
 
-`commerce.catalog.category_taxonomy_seed_v1`
+`commerce.inventory.seller_inventory_availability_foundation_v1`
 
 ## Branch
 
-`office/commerce-catalog-category-taxonomy-seed-v1`
+`office/commerce-inventory-seller-availability-foundation-v1`
 
 ## Base / HEAD
 
-- Base (closed tip): `584943fc8f59a41c48e03fc03f3be3804dcf785c` (Full Order Refund Path V1)
+- Base (closed tip): `16f57548303d37acfd07da57c48e79d5a9750e2a` (Category Taxonomy Seed V1)
 - HEAD: uncommitted / staged on feature branch (no commit yet)
 
 ## Worktree
@@ -28,15 +28,16 @@ UMTUBA Commerce — Category Taxonomy Seed V1
 ## Coordination
 
 - **Desktop** owns: AI Platform / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini / Tutor — do not touch
-- **Laptop** = Commerce catalog only
+- **Laptop** = Commerce inventory only
 
 ## Delivered
 
-- Migration `20260885` — idempotent launch taxonomy seed (12 categories)
-- TS SSOT `lib/store/categoryTaxonomySeed.ts`
-- `submitProductForReview` rejects missing/inactive categories (keeps digital readiness)
-- Docs: `CATEGORY_TAXONOMY_SEED_V1.md` + Product Foundation cross-link
+- TS SSOT `lib/store/sellerInventoryAvailabilityFoundation.ts` (unlimited / finite / unavailable)
+- Wired into cart, catalog queries, seller inventory queries/presentation
+- Reuses `product_inventory` + `availableUnits` — no duplicate system, no migration
+- Orthogonal to digital publish readiness + category taxonomy
+- Docs: `SELLER_INVENTORY_AVAILABILITY_FOUNDATION_V1.md`
 
 ## Next
 
-Human GO to commit / push. Local migration only — no remote apply unless asked.
+Human GO to commit / push. No migration to apply.

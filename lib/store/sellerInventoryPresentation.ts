@@ -27,6 +27,7 @@ export type SellerInventoryAttentionLevel = "none" | "info" | "warn" | "critical
 
 export type SellerInventoryAvailabilityState =
   | "available"
+  | "unlimited"
   | "low_stock"
   | "out_of_stock"
   | "fully_reserved"
@@ -64,8 +65,12 @@ export function deriveInventoryAvailabilityState(
     | "safetyStock"
     | "availableToSell"
     | "allowBackorder"
+    | "availabilityMode"
   >
 ): SellerInventoryAvailabilityState {
+  if (row.availabilityMode === "unlimited") {
+    return "unlimited";
+  }
   if (row.missingInventory) return "missing";
   if (
     row.onHand == null ||
@@ -94,6 +99,8 @@ export function sellerInventoryAvailabilityLabel(
   switch (state) {
     case "available":
       return "Available";
+    case "unlimited":
+      return "Unlimited";
     case "low_stock":
       return "Low stock";
     case "out_of_stock":
@@ -111,6 +118,12 @@ export function deriveSellerInventoryAttention(
   row: SellerInventoryRow
 ): { level: SellerInventoryAttentionLevel; message: string | null } {
   const state = deriveInventoryAvailabilityState(row);
+  if (state === "unlimited") {
+    return {
+      level: "none",
+      message: null,
+    };
+  }
   if (state === "missing") {
     return {
       level: "critical",
