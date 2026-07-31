@@ -13,7 +13,7 @@ import {
   readMetaString,
 } from "../lib/notificationMeta";
 
-const TYPE_LABEL: Record<NotificationType, string> = {
+const TYPE_LABEL: Partial<Record<NotificationType, string>> = {
   follow: "Follow",
   post_like: "Like",
   comment: "Comment",
@@ -39,9 +39,29 @@ const TYPE_LABEL: Record<NotificationType, string> = {
   learning_live_session_scheduled: "Learning",
   learning_live_session_updated: "Learning",
   learning_live_session_cancelled: "Learning",
+  commerce_order_created: "Commerce",
+  commerce_payment_pending: "Commerce",
+  commerce_payment_captured: "Commerce",
+  commerce_payment_failed: "Commerce",
+  commerce_order_confirmed: "Commerce",
+  commerce_order_cancelled: "Commerce",
+  commerce_fulfillment_ready: "Commerce",
+  commerce_digital_access_granted: "Commerce",
+  commerce_order_shipped: "Commerce",
+  commerce_order_delivered: "Commerce",
+  commerce_refund_requested: "Commerce",
+  commerce_refund_completed: "Commerce",
+  commerce_product_approved: "Commerce",
+  commerce_product_rejected: "Commerce",
+  commerce_seller_approved: "Commerce",
+  commerce_seller_rejected: "Commerce",
+  commerce_inventory_low: "Commerce",
+  commerce_inventory_out: "Commerce",
+  commerce_payout_ready: "Commerce",
+  commerce_payout_blocked: "Commerce",
 };
 
-const TYPE_ICON: Record<NotificationType, string> = {
+const TYPE_ICON: Partial<Record<NotificationType, string>> = {
   follow: "👤",
   post_like: "♥",
   comment: "💬",
@@ -67,7 +87,35 @@ const TYPE_ICON: Record<NotificationType, string> = {
   learning_live_session_scheduled: "📅",
   learning_live_session_updated: "📅",
   learning_live_session_cancelled: "📅",
+  commerce_order_created: "🛒",
+  commerce_payment_pending: "🛒",
+  commerce_payment_captured: "🛒",
+  commerce_payment_failed: "🛒",
+  commerce_order_confirmed: "🛒",
+  commerce_order_cancelled: "🛒",
+  commerce_fulfillment_ready: "🛒",
+  commerce_digital_access_granted: "🛒",
+  commerce_order_shipped: "🛒",
+  commerce_order_delivered: "🛒",
+  commerce_refund_requested: "🛒",
+  commerce_refund_completed: "🛒",
+  commerce_product_approved: "🛒",
+  commerce_product_rejected: "🛒",
+  commerce_seller_approved: "🛒",
+  commerce_seller_rejected: "🛒",
+  commerce_inventory_low: "🛒",
+  commerce_inventory_out: "🛒",
+  commerce_payout_ready: "🛒",
+  commerce_payout_blocked: "🛒",
 };
+
+function labelForType(type: NotificationType): string {
+  return TYPE_LABEL[type] ?? (type.startsWith("commerce_") ? "Commerce" : "Update");
+}
+
+function iconForType(type: NotificationType): string {
+  return TYPE_ICON[type] ?? (type.startsWith("commerce_") ? "🛒" : "•");
+}
 
 type NotificationListItemProps = {
   notification: AppNotification;
@@ -116,11 +164,11 @@ export default function NotificationListItem({
           />
         ) : (
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/40 to-cyan-400/20 text-sm font-black text-white">
-            {flag || TYPE_ICON[notification.type] || initial}
+            {flag || iconForType(notification.type) || initial}
           </div>
         )}
         <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-[#080816] bg-[#12122a] text-[10px] text-white/80">
-          {TYPE_ICON[notification.type]}
+          {iconForType(notification.type)}
         </span>
         {notification.unread ? (
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]" />
@@ -138,7 +186,7 @@ export default function NotificationListItem({
             {notification.title}
           </p>
           <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-white/35">
-            {TYPE_LABEL[notification.type]}
+            {labelForType(notification.type)}
           </span>
         </div>
 

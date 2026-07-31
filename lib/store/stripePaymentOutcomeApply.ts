@@ -21,6 +21,7 @@ import {
   releaseSettlementAfterTrustedFulfillment,
   type PostCaptureReleaseResult,
 } from "./postCaptureSettlementRelease";
+import { wireCommercePaymentOutcome } from "./commerceNotifications";
 
 export type ApplyStorePaymentOutcomeInput = {
   paymentAttemptId: string;
@@ -113,6 +114,12 @@ export async function applyVerifiedStorePaymentOutcome(
   const replayed = Boolean(payload.replayed);
 
   if (input.outcome !== "captured") {
+    wireCommercePaymentOutcome({
+      outcome: input.outcome,
+      paymentAttemptId: input.paymentAttemptId,
+      correlationId: input.correlationId,
+      payload,
+    });
     return {
       ok: true,
       data: payload,
@@ -177,6 +184,14 @@ export async function applyVerifiedStorePaymentOutcome(
       providerReference: input.providerReference,
     });
   }
+
+  wireCommercePaymentOutcome({
+    outcome: input.outcome,
+    paymentAttemptId: input.paymentAttemptId,
+    correlationId: input.correlationId,
+    payload,
+    entitlementGranted: entitlement.status === "granted",
+  });
 
   return {
     ok: true,

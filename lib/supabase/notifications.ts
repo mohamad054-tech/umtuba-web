@@ -7,7 +7,8 @@ export type NotificationFilterCategory =
   | "journey"
   | "live"
   | "rewards"
-  | "ai";
+  | "ai"
+  | "commerce";
 
 export type NotificationPreferences = {
   journeyEnabled: boolean;
@@ -56,7 +57,27 @@ export type NotificationType =
   | "learning_qa_answered"
   | "learning_live_session_scheduled"
   | "learning_live_session_updated"
-  | "learning_live_session_cancelled";
+  | "learning_live_session_cancelled"
+  | "commerce_order_created"
+  | "commerce_payment_pending"
+  | "commerce_payment_captured"
+  | "commerce_payment_failed"
+  | "commerce_order_confirmed"
+  | "commerce_order_cancelled"
+  | "commerce_fulfillment_ready"
+  | "commerce_digital_access_granted"
+  | "commerce_order_shipped"
+  | "commerce_order_delivered"
+  | "commerce_refund_requested"
+  | "commerce_refund_completed"
+  | "commerce_product_approved"
+  | "commerce_product_rejected"
+  | "commerce_seller_approved"
+  | "commerce_seller_rejected"
+  | "commerce_inventory_low"
+  | "commerce_inventory_out"
+  | "commerce_payout_ready"
+  | "commerce_payout_blocked";
 
 export type NotificationActor = {
   id: string;
@@ -109,6 +130,26 @@ const NOTIFICATION_TYPES = new Set<NotificationType>([
   "learning_live_session_scheduled",
   "learning_live_session_updated",
   "learning_live_session_cancelled",
+  "commerce_order_created",
+  "commerce_payment_pending",
+  "commerce_payment_captured",
+  "commerce_payment_failed",
+  "commerce_order_confirmed",
+  "commerce_order_cancelled",
+  "commerce_fulfillment_ready",
+  "commerce_digital_access_granted",
+  "commerce_order_shipped",
+  "commerce_order_delivered",
+  "commerce_refund_requested",
+  "commerce_refund_completed",
+  "commerce_product_approved",
+  "commerce_product_rejected",
+  "commerce_seller_approved",
+  "commerce_seller_rejected",
+  "commerce_inventory_low",
+  "commerce_inventory_out",
+  "commerce_payout_ready",
+  "commerce_payout_blocked",
 ]);
 
 function getErrorMessage(error: unknown, fallback: string): string {

@@ -9,6 +9,7 @@ import {
   type CheckoutAddress,
   type CheckoutAddressInput,
 } from "./checkoutRules";
+import { wireCommerceOrderCreated } from "./commerceNotifications";
 
 type AnyClient = SupabaseClient;
 
@@ -171,5 +172,7 @@ export async function confirmCheckoutQuote(
     }
     return { ok: false, message: mapCheckoutRpcError(error.message) };
   }
-  return { ok: true, data: (data ?? {}) as Record<string, unknown> };
+  const payload = (data ?? {}) as Record<string, unknown>;
+  wireCommerceOrderCreated(payload);
+  return { ok: true, data: payload };
 }

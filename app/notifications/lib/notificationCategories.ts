@@ -12,6 +12,7 @@ export const NOTIFICATION_FILTERS: {
   { id: "live", label: "Live" },
   { id: "rewards", label: "Rewards" },
   { id: "ai", label: "AI" },
+  { id: "commerce", label: "Commerce" },
 ];
 
 const SOCIAL = new Set([
@@ -38,12 +39,36 @@ const REWARDS = new Set(["um_points_earned", "reward_milestone", "referral_rewar
 
 const AI = new Set(["ai_creator_insight"]);
 
+const COMMERCE = new Set([
+  "commerce_order_created",
+  "commerce_payment_pending",
+  "commerce_payment_captured",
+  "commerce_payment_failed",
+  "commerce_order_confirmed",
+  "commerce_order_cancelled",
+  "commerce_fulfillment_ready",
+  "commerce_digital_access_granted",
+  "commerce_order_shipped",
+  "commerce_order_delivered",
+  "commerce_refund_requested",
+  "commerce_refund_completed",
+  "commerce_product_approved",
+  "commerce_product_rejected",
+  "commerce_seller_approved",
+  "commerce_seller_rejected",
+  "commerce_inventory_low",
+  "commerce_inventory_out",
+  "commerce_payout_ready",
+  "commerce_payout_blocked",
+]);
+
 export function categoryForNotificationType(type: string): NotificationFilterCategory {
   if (SOCIAL.has(type)) return "social";
   if (JOURNEY.has(type)) return "journey";
   if (LIVE.has(type)) return "live";
   if (REWARDS.has(type)) return "rewards";
   if (AI.has(type)) return "ai";
+  if (COMMERCE.has(type) || type.startsWith("commerce_")) return "commerce";
   return "all";
 }
 
@@ -64,7 +89,8 @@ export function parseNotificationFilter(
     v === "journey" ||
     v === "live" ||
     v === "rewards" ||
-    v === "ai"
+    v === "ai" ||
+    v === "commerce"
   ) {
     return v;
   }

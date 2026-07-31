@@ -20,6 +20,7 @@ import {
   STORE_PAYOUT_STATES,
   type StorePayoutState,
 } from "./sellerPayoutFoundation";
+import { wireCommerceRefundCompleted } from "./commerceNotifications";
 
 export const FULL_ORDER_REFUND_PATH_ID =
   "commerce.payments.full_order_refund_path_v1" as const;
@@ -842,6 +843,13 @@ export async function applyFullOrderRefund(
   const anySettlementReplay = settlementSteps.some(
     (s) => s.status === "replayed"
   );
+
+  wireCommerceRefundCompleted({
+    orderId: ctx.orderId,
+    storeId: ctx.storeId,
+    paymentAttemptId: ctx.paymentAttemptId,
+    correlationId: ctx.correlationId,
+  });
 
   return {
     ok: true,
