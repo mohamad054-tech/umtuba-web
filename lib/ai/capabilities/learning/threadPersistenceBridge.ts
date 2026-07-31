@@ -277,11 +277,31 @@ export async function persistLearningTutorExchange(
   supabase: SupabaseClient,
   input: {
     threadId: string;
+    lessonId: string;
     kind: LearningAiTutorExchangeKind;
     userContent: string;
     assistantContent: string;
   }
 ): Promise<ThreadPersistenceBridgeResult> {
+  if (!isAiTutorUuid(input.threadId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "threadId is required and must be a valid UUID.",
+      },
+    };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return {
+      ok: false,
+      error: {
+        code: "invalid_input",
+        message: "lessonId is required and must be a valid UUID.",
+      },
+    };
+  }
+
   const userContent = clampContent(input.userContent);
   const assistantContent = clampContent(input.assistantContent);
   if (!userContent || !assistantContent) {
@@ -296,6 +316,7 @@ export async function persistLearningTutorExchange(
 
   const result = await appendMyAiTutorExchange(supabase, {
     threadId: input.threadId,
+    lessonId: input.lessonId,
     kind: input.kind,
     userContent,
     assistantContent,
@@ -303,7 +324,11 @@ export async function persistLearningTutorExchange(
 
   if (!result.ok) {
     const lower = result.message.toLowerCase();
-    if (lower.includes("not allowed") || lower.includes("entitled")) {
+    if (
+      lower.includes("authentication required") ||
+      lower.includes("not allowed") ||
+      lower.includes("entitled")
+    ) {
       return {
         ok: false,
         error: {
@@ -312,7 +337,19 @@ export async function persistLearningTutorExchange(
         },
       };
     }
-    if (lower.includes("not found") || lower.includes("invalid")) {
+    if (
+      lower.includes("lesson mismatch") ||
+      lower.includes("does not match this lesson")
+    ) {
+      return {
+        ok: false,
+        error: {
+          code: "invalid_input",
+          message: "Tutor thread does not match this lesson.",
+        },
+      };
+    }
+    if (lower.includes("not found") || lower.includes("lesson is invalid")) {
       return {
         ok: false,
         error: {

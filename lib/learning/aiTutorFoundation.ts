@@ -145,12 +145,14 @@ export async function appendMyAiTutorMessage(
 
 /**
  * Persist one learner + one real assistant exchange (Core bridge).
+ * Requires lessonId so SQL can enforce thread.lesson_id binding.
  * Does not use the stub append RPC.
  */
 export async function appendMyAiTutorExchange(
   supabase: AnyClient,
   input: {
     threadId: string;
+    lessonId: string;
     kind: LearningAiTutorExchangeKind;
     userContent: string;
     assistantContent: string;
@@ -158,6 +160,9 @@ export async function appendMyAiTutorExchange(
 ): Promise<AiTutorResult<Record<string, unknown>>> {
   if (!isAiTutorUuid(input.threadId)) {
     return { ok: false, message: "thread_id must be a valid UUID" };
+  }
+  if (!isAiTutorUuid(input.lessonId)) {
+    return { ok: false, message: "lesson_id must be a valid UUID" };
   }
   if (
     !(LEARNING_AI_TUTOR_EXCHANGE_KINDS as readonly string[]).includes(input.kind)
@@ -180,12 +185,23 @@ export async function appendMyAiTutorExchange(
   }
   const result = await callRpc(supabase, LEARNING_AI_TUTOR_RPCS.appendExchange, {
     p_thread_id: input.threadId,
+    p_lesson_id: input.lessonId,
     p_kind: input.kind,
     p_user_content: userContent,
     p_assistant_content: assistantContent,
   });
   if (!result.ok) return result;
-  return { ok: true, data: asRecord(result.data) ?? {} };
+  const row = asRecord(result.data);
+  if (!row) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (typeof row.thread_id !== "string" || !isAiTutorUuid(row.thread_id)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  if (!asRecord(row.user_message) || !asRecord(row.assistant_message)) {
+    return { ok: false, message: "AI Tutor data is unavailable or invalid." };
+  }
+  return { ok: true, data: row };
 }
 
 export async function listMyAiTutorThreads(

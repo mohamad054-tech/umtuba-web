@@ -5,6 +5,7 @@ import {
   LEARNING_AI_TUTOR_MESSAGE_KINDS,
   LEARNING_AI_TUTOR_RPCS,
   LEARNING_AI_TUTOR_ROUTES,
+  appendMyAiTutorExchange,
   createMyAiTutorThread,
   getMyAiTutorThread,
   sanitizeAiTutorError,
@@ -218,5 +219,69 @@ describe("AI Tutor Foundation — adapter", () => {
       THREAD
     );
     expect(badId.ok).toBe(false);
+  });
+
+  it("passes lessonId to exchange RPC and fails closed on malformed response", async () => {
+    const THREAD = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    const calls: Array<{ name: string; args?: Record<string, unknown> }> = [];
+    const okFake = {
+      rpc: async (name: string, args?: Record<string, unknown>) => {
+        calls.push({ name, args });
+        return {
+          data: {
+            thread_id: THREAD,
+            user_message: { id: "u1", role: "user" },
+            assistant_message: { id: "a1", role: "assistant" },
+          },
+          error: null,
+        };
+      },
+    };
+    const ok = await appendMyAiTutorExchange(okFake as never, {
+      threadId: THREAD,
+      lessonId: LESSON_ID,
+      kind: "ask_question",
+      userContent: "What is a neuron?",
+      assistantContent: JSON.stringify({ answer: "A cell." }),
+    });
+    expect(ok.ok).toBe(true);
+    expect(calls).toEqual([
+      {
+        name: "append_my_learning_ai_tutor_exchange",
+        args: {
+          p_thread_id: THREAD,
+          p_lesson_id: LESSON_ID,
+          p_kind: "ask_question",
+          p_user_content: "What is a neuron?",
+          p_assistant_content: JSON.stringify({ answer: "A cell." }),
+        },
+      },
+    ]);
+
+    const malformed = await appendMyAiTutorExchange(
+      {
+        rpc: async () => ({
+          data: { thread_id: THREAD },
+          error: null,
+        }),
+      } as never,
+      {
+        threadId: THREAD,
+        lessonId: LESSON_ID,
+        kind: "hint",
+        userContent: "focus",
+        assistantContent: JSON.stringify({ hint: "try" }),
+      }
+    );
+    expect(malformed.ok).toBe(false);
+
+    const badLesson = await appendMyAiTutorExchange({} as never, {
+      threadId: THREAD,
+      lessonId: "bad",
+      kind: "hint",
+      userContent: "focus",
+      assistantContent: "ok",
+    });
+    expect(badLesson.ok).toBe(false);
   });
 });

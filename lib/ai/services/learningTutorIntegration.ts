@@ -582,8 +582,21 @@ export async function runLearningTutorIntegration(
     );
   }
 
+  const persistLessonId =
+    "lessonId" in request && typeof request.lessonId === "string"
+      ? request.lessonId
+      : null;
+  if (!persistLessonId) {
+    return fail(
+      "invalid_input",
+      "lessonId is required to persist a Tutor thread exchange.",
+      mapped.data.runId
+    );
+  }
+
   const persisted = await persistLearningTutorExchange(deps.supabase, {
     threadId,
+    lessonId: persistLessonId,
     kind: persistKind,
     userContent: learnerText,
     assistantContent: assistantText,

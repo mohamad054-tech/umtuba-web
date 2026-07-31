@@ -38,6 +38,8 @@ const MIGRATION =
   "supabase/migrations/20260872_learning_ai_tutor_thread_persistence_bridge_v1.sql";
 const METADATA_MIGRATION =
   "supabase/migrations/20260873_learning_ai_tutor_thread_metadata_read_v1.sql";
+const BINDING_MIGRATION =
+  "supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql";
 const STUB_MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
 const BRIDGE_SRC = readFileSync(
@@ -171,6 +173,98 @@ describe("Thread Persistence Bridge — migration SQL", () => {
 
   it("creates no new tables", () => {
     expect(body).not.toMatch(/create table/i);
+  });
+});
+
+describe("Thread Lesson Binding — migration SQL", () => {
+  const sql = read(BINDING_MIGRATION);
+  const body = stripSqlComments(sql);
+  const exchange = stripSqlComments(
+    fnBody(sql, "append_my_learning_ai_tutor_exchange")
+  );
+
+  it("ships as next migration after metadata read", () => {
+    expect(existsSync(join(ROOT, BINDING_MIGRATION))).toBe(true);
+    expect(readdirSync(join(ROOT, "supabase/migrations"))).toContain(
+      "20260874_learning_ai_tutor_thread_lesson_binding_v1.sql"
+    );
+  });
+
+  it("creates five-argument signature with p_lesson_id", () => {
+    expect(exchange).toMatch(
+      /create or replace function public\.append_my_learning_ai_tutor_exchange\(\s*p_thread_id uuid,\s*p_lesson_id uuid,\s*p_kind text,\s*p_user_content text,\s*p_assistant_content text\s*\)/i
+    );
+  });
+
+  it("drops old four-argument overload so it cannot bypass binding", () => {
+    expect(body).toMatch(
+      /drop function if exists public\.append_my_learning_ai_tutor_exchange\(uuid, text, text, text\)/i
+    );
+    expect(body).not.toMatch(
+      /grant execute on function public\.append_my_learning_ai_tutor_exchange\(uuid, text, text, text\)/i
+    );
+    expect(body).toMatch(
+      /grant execute on function public\.append_my_learning_ai_tutor_exchange\(uuid, uuid, text, text, text\)/i
+    );
+  });
+
+  it("is security definer with fixed safe search_path", () => {
+    expect(exchange).toMatch(/security definer/i);
+    expect(exchange).toMatch(/set search_path\s*=\s*public/i);
+  });
+
+  it("guards auth.uid ownership and course entitlement", () => {
+    expect(exchange).toMatch(/auth\.uid\(\)/);
+    expect(exchange).toMatch(/user_id is distinct from v_uid/);
+    expect(exchange).toMatch(/has_learning_course_access/);
+    expect(exchange).toMatch(/Thread not found/);
+    expect(exchange).toMatch(/Not entitled to this course/);
+  });
+
+  it("requires p_lesson_id and enforces thread.lesson_id equality", () => {
+    expect(exchange).toMatch(/p_lesson_id is null/);
+    expect(exchange).toMatch(/lesson_id is required/);
+    expect(exchange).toMatch(
+      /v_thread\.lesson_id is distinct from p_lesson_id/
+    );
+    expect(exchange).toMatch(/Thread lesson mismatch/);
+  });
+
+  it("requires lesson to belong to thread.course_id", () => {
+    expect(exchange).toMatch(/learning_lessons/);
+    expect(exchange).toMatch(/learning_sections/);
+    expect(exchange).toMatch(/sec\.course_id = v_thread\.course_id/);
+    expect(exchange).toMatch(/les\.id = p_lesson_id/);
+    expect(exchange).toMatch(/Thread lesson is invalid/);
+  });
+
+  it("preserves kind allowlist, bounds, safe-text, and return shape", () => {
+    expect(exchange).toMatch(
+      /v_kind not in \('ask_question', 'explain_again', 'hint'\)/
+    );
+    expect(exchange).toMatch(/1\.\.20000/);
+    expect(exchange).toMatch(/learning_lesson_content_block_assert_safe_text/);
+    expect(exchange).toMatch(/'user_message'/);
+    expect(exchange).toMatch(/'assistant_message'/);
+  });
+
+  it("revokes public/anon and grants authenticated (+ service_role convention)", () => {
+    expect(body).toMatch(
+      /revoke all on function public\.append_my_learning_ai_tutor_exchange\(uuid, uuid, text, text, text\)\s+from public, anon/i
+    );
+    expect(body).toMatch(
+      /grant execute on function public\.append_my_learning_ai_tutor_exchange\(uuid, uuid, text, text, text\)\s+to authenticated, service_role/i
+    );
+  });
+
+  it("creates no new tables/columns and preserves stub append", () => {
+    expect(body).not.toMatch(/create table/i);
+    expect(body).not.toMatch(/alter table/i);
+    expect(body).not.toMatch(/drop function.*append_my_learning_ai_tutor_message/i);
+    const stub = read(STUB_MIGRATION);
+    expect(stub).toMatch(
+      /create or replace function public\.append_my_learning_ai_tutor_message/
+    );
   });
 });
 
@@ -439,6 +533,8 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
       rpc: vi.fn(async (name: string, args: Record<string, unknown>) => {
         expect(name).toBe("append_my_learning_ai_tutor_exchange");
         expect(args.p_kind).toBe("ask_question");
+        expect(args.p_lesson_id).toBe(LESSON);
+        expect(args.p_thread_id).toBe(THREAD);
         expect(args.p_assistant_content).not.toMatch(/not connected yet/i);
         return {
           data: {
@@ -452,11 +548,33 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
     };
     const ok = await persistLearningTutorExchange(okClient as never, {
       threadId: THREAD,
+      lessonId: LESSON,
       kind: "ask_question",
       userContent: "What is AI?",
       assistantContent: JSON.stringify({ answer: "AI is…" }),
     });
     expect(ok.ok).toBe(true);
+
+    const mismatchClient = {
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Thread lesson mismatch" },
+      })),
+    };
+    const mismatch = await persistLearningTutorExchange(
+      mismatchClient as never,
+      {
+        threadId: THREAD,
+        lessonId: LESSON,
+        kind: "ask_question",
+        userContent: "What is AI?",
+        assistantContent: JSON.stringify({ answer: "AI is…" }),
+      }
+    );
+    expect(mismatch.ok).toBe(false);
+    if (mismatch.ok) return;
+    expect(mismatch.error.code).toBe("invalid_input");
+    expect(mismatch.error.message).toMatch(/does not match this lesson/i);
 
     const failClient = {
       rpc: vi.fn(async () => ({
@@ -466,6 +584,7 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
     };
     const failed = await persistLearningTutorExchange(failClient as never, {
       threadId: THREAD,
+      lessonId: LESSON,
       kind: "hint",
       userContent: "focus",
       assistantContent: JSON.stringify({ hint: "try again" }),
@@ -475,9 +594,70 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
     expect(failed.error.code).toBe("provider_error");
   });
 
-  it("foundation appendMyAiTutorExchange rejects bad kind / bounds", async () => {
+  it("rejects missing/invalid ids and unauthorized course access on persist", async () => {
+    const missingLesson = await persistLearningTutorExchange({} as never, {
+      threadId: THREAD,
+      lessonId: "",
+      kind: "hint",
+      userContent: "focus",
+      assistantContent: JSON.stringify({ hint: "try" }),
+    });
+    expect(missingLesson.ok).toBe(false);
+    if (missingLesson.ok) return;
+    expect(missingLesson.error.code).toBe("invalid_input");
+    expect(missingLesson.error.message).toMatch(/lessonId/i);
+
+    const badThread = await persistLearningTutorExchange({} as never, {
+      threadId: "not-a-uuid",
+      lessonId: LESSON,
+      kind: "hint",
+      userContent: "focus",
+      assistantContent: JSON.stringify({ hint: "try" }),
+    });
+    expect(badThread.ok).toBe(false);
+    if (badThread.ok) return;
+    expect(badThread.error.code).toBe("invalid_input");
+    expect(badThread.error.message).toMatch(/threadId/i);
+
+    const entitledClient = {
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Not entitled to this course" },
+      })),
+    };
+    const denied = await persistLearningTutorExchange(entitledClient as never, {
+      threadId: THREAD,
+      lessonId: LESSON,
+      kind: "ask_question",
+      userContent: "What?",
+      assistantContent: JSON.stringify({ answer: "A" }),
+    });
+    expect(denied.ok).toBe(false);
+    if (denied.ok) return;
+    expect(denied.error.code).toBe("permission_denied");
+
+    const authClient = {
+      rpc: vi.fn(async () => ({
+        data: null,
+        error: { message: "Authentication required" },
+      })),
+    };
+    const unauth = await persistLearningTutorExchange(authClient as never, {
+      threadId: THREAD,
+      lessonId: LESSON,
+      kind: "ask_question",
+      userContent: "What?",
+      assistantContent: JSON.stringify({ answer: "A" }),
+    });
+    expect(unauth.ok).toBe(false);
+    if (unauth.ok) return;
+    expect(unauth.error.code).toBe("permission_denied");
+  });
+
+  it("foundation appendMyAiTutorExchange rejects bad kind / bounds / lesson", async () => {
     const badKind = await appendMyAiTutorExchange({} as never, {
       threadId: THREAD,
+      lessonId: LESSON,
       kind: "code_review" as never,
       userContent: "x",
       assistantContent: "y",
@@ -486,11 +666,68 @@ describe("Thread Persistence Bridge — validate + persist units", () => {
 
     const empty = await appendMyAiTutorExchange({} as never, {
       threadId: THREAD,
+      lessonId: LESSON,
       kind: "hint",
       userContent: "   ",
       assistantContent: "ok",
     });
     expect(empty.ok).toBe(false);
+
+    const badLesson = await appendMyAiTutorExchange({} as never, {
+      threadId: THREAD,
+      lessonId: "not-a-uuid",
+      kind: "hint",
+      userContent: "focus",
+      assistantContent: "ok",
+    });
+    expect(badLesson.ok).toBe(false);
+  });
+
+  it("foundation appendMyAiTutorExchange fails closed on malformed response", async () => {
+    const malformed = {
+      rpc: vi.fn(async () => ({
+        data: { thread_id: THREAD },
+        error: null,
+      })),
+    };
+    const result = await appendMyAiTutorExchange(malformed as never, {
+      threadId: THREAD,
+      lessonId: LESSON,
+      kind: "hint",
+      userContent: "focus",
+      assistantContent: JSON.stringify({ hint: "try" }),
+    });
+    expect(result.ok).toBe(false);
+
+    const okClient = {
+      rpc: vi.fn(async (_name: string, args: Record<string, unknown>) => {
+        expect(args.p_lesson_id).toBe(LESSON);
+        return {
+          data: {
+            thread_id: THREAD,
+            user_message: { id: "u1", role: "user" },
+            assistant_message: { id: "a1", role: "assistant" },
+          },
+          error: null,
+        };
+      }),
+    };
+    const ok = await appendMyAiTutorExchange(okClient as never, {
+      threadId: THREAD,
+      lessonId: LESSON,
+      kind: "ask_question",
+      userContent: "What?",
+      assistantContent: JSON.stringify({ answer: "A" }),
+    });
+    expect(ok.ok).toBe(true);
+    expect(okClient.rpc).toHaveBeenCalledWith(
+      "append_my_learning_ai_tutor_exchange",
+      expect.objectContaining({
+        p_thread_id: THREAD,
+        p_lesson_id: LESSON,
+        p_kind: "ask_question",
+      })
+    );
   });
 });
 
@@ -611,6 +848,8 @@ describe("Thread Persistence Bridge — integration wiring", () => {
       }
       if (name === "append_my_learning_ai_tutor_exchange") {
         expect(args?.p_kind).toBe("ask_question");
+        expect(args?.p_lesson_id).toBe(LESSON);
+        expect(args?.p_thread_id).toBe(THREAD);
         expect(String(args?.p_user_content)).toContain("neuron");
         expect(String(args?.p_assistant_content)).not.toMatch(/not connected/i);
         expect(String(args?.p_assistant_content)).not.toMatch(
