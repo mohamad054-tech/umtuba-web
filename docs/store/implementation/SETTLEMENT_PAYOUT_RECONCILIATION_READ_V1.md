@@ -77,3 +77,5 @@ Amounts/currency come only from trusted capture rows — never from client input
 ## Out of scope
 
 Payout execution, bank/provider rails, Dashboard/Admin UI, new financial engine, write/booking RPCs, commission invention, seller store UI wiring (this milestone is read model only).
+
+Seller-facing diagnostics UI on the existing seller store is `commerce.settlement.payout_reconciliation_surface_v1` (`PAYOUT_RECONCILIATION_SURFACE_V1.md`) — consumes these RPCs; no bank rails or repair actions.

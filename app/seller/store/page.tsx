@@ -51,6 +51,16 @@ import {
   buildSellerPayoutHistorySurface,
   parseSellerPayoutHistoryCursor,
 } from "../../../lib/store/sellerPayoutHistorySurface";
+import {
+  fetchMySellerSettlementPayoutReconciliation,
+  fetchMySellerSettlementPayoutReconciliationSummary,
+} from "../../../lib/store/settlementPayoutReconciliation";
+import {
+  PAYOUT_RECONCILIATION_SURFACE_PAGE_SIZE,
+  buildPayoutReconSurfaceLoadMoreHref,
+  buildPayoutReconciliationSurface,
+  parsePayoutReconSurfaceCursor,
+} from "../../../lib/store/payoutReconciliationSurface";
 import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
@@ -63,11 +73,15 @@ type PageProps = {
         period?: string;
         payout_before?: string;
         payout_before_id?: string;
+        recon_before?: string;
+        recon_before_id?: string;
       }>
     | {
         period?: string;
         payout_before?: string;
         payout_before_id?: string;
+        recon_before?: string;
+        recon_before_id?: string;
       };
 };
 
@@ -213,9 +227,17 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     beforeCreatedAt: params.payout_before,
     beforeId: params.payout_before_id,
   });
+  const reconCursorParsed = parsePayoutReconSurfaceCursor({
+    beforeCreatedAt: params.recon_before,
+    beforeId: params.recon_before_id,
+  });
   let payoutHistory: ReturnType<typeof buildSellerPayoutHistorySurface> | null =
     null;
   let payoutHistoryLoadMoreHref: string | null = null;
+  let payoutReconciliation: ReturnType<
+    typeof buildPayoutReconciliationSurface
+  > | null = null;
+  let payoutReconciliationLoadMoreHref: string | null = null;
   if (canManage) {
     if (!payoutCursorParsed.ok) {
       payoutHistory = buildSellerPayoutHistorySurface({
@@ -249,6 +271,65 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
             periodKey: uiPeriod,
             cursor: payoutHistory.nextCursor,
           });
+        }
+      }
+    }
+
+    if (!reconCursorParsed.ok) {
+      payoutReconciliation = buildPayoutReconciliationSurface({
+        storeId: membership.store.id,
+        page: null,
+        unavailable: true,
+        errorMessage: reconCursorParsed.message,
+      });
+    } else {
+      const [reconList, reconSummary] = await Promise.all([
+        fetchMySellerSettlementPayoutReconciliation(supabase, {
+          storeId: membership.store.id,
+          limit: PAYOUT_RECONCILIATION_SURFACE_PAGE_SIZE,
+          beforeCreatedAt: reconCursorParsed.cursor?.beforeCreatedAt,
+          beforeId: reconCursorParsed.cursor?.beforeId,
+          issuesOnly: true,
+        }),
+        fetchMySellerSettlementPayoutReconciliationSummary(
+          supabase,
+          membership.store.id
+        ),
+      ]);
+      if (!reconList.ok) {
+        payoutReconciliation = buildPayoutReconciliationSurface({
+          storeId: membership.store.id,
+          page: null,
+          unavailable: true,
+          errorMessage: reconList.message,
+        });
+      } else if (!reconSummary.ok) {
+        payoutReconciliation = buildPayoutReconciliationSurface({
+          storeId: membership.store.id,
+          page: null,
+          unavailable: true,
+          errorMessage: reconSummary.message,
+        });
+      } else {
+        payoutReconciliation = buildPayoutReconciliationSurface({
+          storeId: membership.store.id,
+          page: reconList.data,
+          summary: reconSummary.data,
+        });
+        if (
+          payoutReconciliation.hasMore &&
+          payoutReconciliation.nextCursor
+        ) {
+          payoutReconciliationLoadMoreHref = buildPayoutReconSurfaceLoadMoreHref(
+            {
+              basePath: APP_ROUTES.sellerStore,
+              periodKey: uiPeriod,
+              cursor: payoutReconciliation.nextCursor,
+              payoutHistoryCursor: payoutCursorParsed.ok
+                ? payoutCursorParsed.cursor
+                : null,
+            }
+          );
         }
       }
     }
@@ -295,6 +376,8 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           revenueBridge={revenueBridge}
           payoutHistory={payoutHistory}
           payoutHistoryLoadMoreHref={payoutHistoryLoadMoreHref}
+          payoutReconciliation={payoutReconciliation}
+          payoutReconciliationLoadMoreHref={payoutReconciliationLoadMoreHref}
         />
       </div>
 

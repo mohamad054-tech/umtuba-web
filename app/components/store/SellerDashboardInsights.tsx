@@ -16,8 +16,10 @@ import {
 import type { AnalyticsSalesSeriesPoint, AnalyticsTopProductRow } from "../../../lib/store/analyticsFinance";
 import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/commerceRevenueBridge";
 import type { SellerPayoutHistorySurfaceView } from "../../../lib/store/sellerPayoutHistorySurface";
+import type { PayoutReconSurfaceView } from "../../../lib/store/payoutReconciliationSurface";
 import { APP_ROUTES } from "../../lib/nav";
 import SellerPayoutHistory from "./SellerPayoutHistory";
+import SellerPayoutReconciliation from "./SellerPayoutReconciliation";
 
 type Props = {
   storeName: string;
@@ -43,6 +45,8 @@ type Props = {
   revenueBridge: CommerceRevenueBridgeSellerVisibility;
   payoutHistory: SellerPayoutHistorySurfaceView | null;
   payoutHistoryLoadMoreHref: string | null;
+  payoutReconciliation: PayoutReconSurfaceView | null;
+  payoutReconciliationLoadMoreHref: string | null;
 };
 
 export default function SellerDashboardInsightsView(props: Props) {
@@ -70,6 +74,8 @@ export default function SellerDashboardInsightsView(props: Props) {
     revenueBridge,
     payoutHistory,
     payoutHistoryLoadMoreHref,
+    payoutReconciliation,
+    payoutReconciliationLoadMoreHref,
   } = props;
 
   return (
@@ -557,6 +563,13 @@ export default function SellerDashboardInsightsView(props: Props) {
         <SellerPayoutHistory
           surface={payoutHistory}
           loadMoreHref={payoutHistoryLoadMoreHref}
+        />
+      ) : null}
+
+      {payoutReconciliation ? (
+        <SellerPayoutReconciliation
+          surface={payoutReconciliation}
+          loadMoreHref={payoutReconciliationLoadMoreHref}
         />
       ) : null}
     </div>

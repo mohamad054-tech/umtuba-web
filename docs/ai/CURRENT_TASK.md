@@ -2,7 +2,7 @@
 
 ## Task title
 
-Seller Payout History Surface V1
+Settlement ↔ Payout Reconciliation Surface V1
 
 ## Status
 
@@ -10,15 +10,15 @@ Seller Payout History Surface V1
 
 ## Capability
 
-`commerce.settlement.seller_payout_history_surface_v1` — **APPROVED** (Product GO 2026-07-31)
+`commerce.settlement.payout_reconciliation_surface_v1` — **APPROVED** (Product GO 2026-07-31)
 
 ## Branch
 
-`office/commerce-settlement-seller-payout-history-surface-v1`
+`office/commerce-settlement-payout-reconciliation-surface-v1`
 
 ## Base / tip
 
-Base: `6b210755925bbf4e0f1be753e080fc409896c6a0` (Settlement ↔ Payout Reconciliation Read V1)
+Base: `747f1d51ed7052b6627be74c05b1e1ec41f02383` (Seller Payout History Surface V1)
 
 ## Worktree
 
@@ -27,19 +27,19 @@ Base: `6b210755925bbf4e0f1be753e080fc409896c6a0` (Settlement ↔ Payout Reconcil
 ## Coordination
 
 - Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — do not touch
-- Laptop = Commerce seller-facing only
+- Laptop = Commerce seller-store only
 
 ## Delivered
 
-- Pure surface: `lib/store/sellerPayoutHistorySurface.ts` (+ tests)
-- UI: `app/components/store/SellerPayoutHistory.tsx`
-- Wired into existing seller store insights + page (owner/manager)
-- Doc: `docs/store/implementation/SELLER_PAYOUT_HISTORY_SURFACE_V1.md`
-- **No new migration** — reuses `20260882` `get_my_seller_payouts`
+- Pure surface: `lib/store/payoutReconciliationSurface.ts` (+ tests)
+- UI: `app/components/store/SellerPayoutReconciliation.tsx`
+- Wired into existing seller store insights + page (owner/manager, issues-only)
+- Doc: `docs/store/implementation/PAYOUT_RECONCILIATION_SURFACE_V1.md`
+- **No new migration** — reuses `20260883` recon RPCs
 
 ## Scope held
 
-Read-only history from trusted Read Model. No bank rails, Dashboard/Admin, payout writes, or redesign.
+Read-only diagnostics from trusted Recon Read. No bank rails, Dashboard/Admin, payout writes, or repair actions. History + balances preserved.
 
 ## Next
 

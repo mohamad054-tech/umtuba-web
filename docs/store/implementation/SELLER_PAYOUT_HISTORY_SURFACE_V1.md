@@ -49,3 +49,5 @@ Narrow **seller-facing payout history** on the existing seller store surface, so
 ## Out of scope
 
 Bank rails, payout writes, provider integration, Dashboard/Admin UI, broad nav redesign, reconciliation UI surface, commission invention.
+
+Settlement↔payout diagnostics UI is `commerce.settlement.payout_reconciliation_surface_v1` (`PAYOUT_RECONCILIATION_SURFACE_V1.md`) — separate section; does not change this history surface.
