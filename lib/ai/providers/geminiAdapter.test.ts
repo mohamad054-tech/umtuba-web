@@ -1,9 +1,15 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AiPlatformError } from "../contracts/errors";
+import {
+  AiPlatformError,
+  sanitizeAiErrorMessage,
+} from "../contracts/errors";
 import { loadAiPlatformConfig } from "../config";
 import { createGeminiAdapter } from "./geminiAdapter";
 import { createProviderFoundation } from "./foundation";
 import { resolveProviderAdapters } from "./adapters";
+
+/** Fixture secret for leak assertions only — never a real key. */
+const FIXTURE_SECRET = "AIzaSyTestGeminiKeyDoNotLeak1234567890";
 
 const BASE_INPUT = {
   providerId: "gemini",
@@ -202,4 +208,105 @@ describe("createGeminiAdapter", () => {
     });
     expect(geminiRoute.providerId).toBe("gemini");
   });
+
+  it("does not leak API key in URL, body, or sanitized errors", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: false,
+      status: 401,
+      text: async () => `bad key ${FIXTURE_SECRET}`,
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const adapter = createGeminiAdapter(
+      loadAiPlatformConfig({
+        mode: "live",
+        geminiApiKey: FIXTURE_SECRET,
+        openaiApiKey: null,
+        allowStub: false,
+      })
+    );
+
+    let thrown: unknown;
+    try {
+      await adapter.execute(BASE_INPUT);
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(AiPlatformError);
+    const message = String((thrown as Error).message);
+    expect(message).not.toContain(FIXTURE_SECRET);
+    expect(message.toLowerCase()).not.toContain("aiza");
+    expect(
+      sanitizeAiErrorMessage(`auth failed with ${FIXTURE_SECRET}`)
+    ).not.toContain(FIXTURE_SECRET);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const call = fetchMock.mock.calls[0] as unknown as
+      | [string, RequestInit]
+      | undefined;
+    expect(call).toBeTruthy();
+    const url = String(call?.[0] ?? "");
+    const init = call?.[1] ?? {};
+    expect(url).not.toContain(FIXTURE_SECRET);
+    expect(url).not.toMatch(/[?&]key=/i);
+    expect(String(init.body ?? "")).not.toContain(FIXTURE_SECRET);
+    expect((init.headers as Record<string, string>)["x-goog-api-key"]).toBe(
+      FIXTURE_SECRET
+    );
+  });
+
+  it("registers gemini adapter when key present without breaking openai/stub", () => {
+    const both = resolveProviderAdapters(
+      loadAiPlatformConfig({
+        mode: "live",
+        allowStub: true,
+        openaiApiKey: "sk-test-openai",
+        geminiApiKey: FIXTURE_SECRET,
+      })
+    );
+    expect(both.get("stub")?.providerId).toBe("stub");
+    expect(both.get("openai")?.providerId).toBe("openai");
+    expect(both.get("gemini")?.providerId).toBe("gemini");
+  });
+});
+
+describe("Gemini live smoke (opt-in; do not use exposed keys)", () => {
+  const enabled =
+    process.env.UMTUBA_GEMINI_SMOKE === "1" &&
+    Boolean(process.env.GEMINI_API_KEY?.trim());
+  const smokeIt = enabled ? it : it.skip;
+
+  smokeIt(
+    "reaches Gemini generateContent without leaking the key",
+    async () => {
+      const key = process.env.GEMINI_API_KEY!.trim();
+      const modelId =
+        process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash-lite";
+      const adapter = createGeminiAdapter(
+        loadAiPlatformConfig({
+          mode: "live",
+          openaiApiKey: null,
+          geminiApiKey: key,
+          geminiDefaultModel: modelId,
+          allowStub: false,
+          defaultTimeoutMs: 20_000,
+        })
+      );
+      const result = await adapter.execute({
+        ...BASE_INPUT,
+        modelId,
+        timeoutMs: 20_000,
+        messages: [
+          {
+            role: "user",
+            content: 'Reply with exactly: {"ok":true}',
+          },
+        ],
+      });
+      expect(result.structured).toBeTruthy();
+      expect(JSON.stringify(result)).not.toContain(key);
+      expect(result.usage.providerId).toBe("gemini");
+    },
+    25_000
+  );
 });

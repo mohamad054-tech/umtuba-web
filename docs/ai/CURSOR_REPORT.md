@@ -1,60 +1,81 @@
-# Cursor Report
+# CURSOR_REPORT — Final Verification (pre-commit)
 
 ## Summary
 
-Private AI Foundation V1 is implemented on
-`office/platform-private-ai-foundation-v1` (base `2344c1b`). Provides private
-model registry, capability registry, lifecycle metadata, hardware/deployment/
-routing contracts, permissions, file persistence, read-only admin UI under
-`/admin/private-ai`, and local-only migration `20260879`. No training,
-fine-tuning, inference, or weights. Staged for manual commit — **not
-committed, not pushed**.
+**READY FOR REVIEW / GO.** Gemini live provider wiring verified on
+`office/platform-gemini-live-provider-v1` @ base `db6f52a` (0 commits ahead;
+uncommitted working tree only). Live smoke PASS (9/9). Unit suites PASS with
+clean env. `tsc --noEmit` PASS. `.env.local` gitignored / untracked. Key prefix
+absent from tracked files, diffs, tests, and this report. No commit / no push.
 
-## Exact files changed
+## Exact files changed (uncommitted)
 
-- `lib/privateAi/**`
-- `app/admin/private-ai/**`
-- `supabase/migrations/20260879_private_ai_foundation_v1.sql`
-- `vitest.config.ts`
-- `docs/architecture/PRIVATE_AI_FOUNDATION_V1.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/SESSION_HANDOFF.md`
+| File | Role |
+| --- | --- |
+| `.env.example` | Document `GEMINI_MODEL=gemini-3.5-flash-lite` |
+| `docs/ai/CURSOR_REPORT.md` | Handoff / verification report |
+| `lib/ai/config.ts` | Default model → `gemini-3.5-flash-lite` |
+| `lib/ai/contracts/errors.ts` | Sanitize Gemini key patterns |
+| `lib/ai/providers/geminiAdapter.test.ts` | No-leak + coexistence + opt-in smoke |
+
+Local only (not in git): `.env.local` (`GEMINI_API_KEY` + `GEMINI_MODEL`).
 
 ## Migrations created
 
-- `20260879_private_ai_foundation_v1.sql` — **not remote-applied**
+None.
 
 ## Security review
 
-- Admin pages platform-admin gated
-- Migration: FORCE RLS + admin SELECT only
-- Permission contracts for model/capability/dataset/experiment/audit
-- No secrets; no weights; no inference/provider runtime changes
+- `.env.local` exists, matched by `.gitignore` (`.env*`), status `!!`, not tracked.
+- Key prefix scan of tracked/diff paths: **no hits**.
+- Key appears only in gitignored `.env.local` (expected).
+- Chat-pasted key: rotate in Google AI Studio when convenient (ops note).
 
 ## Tests
 
-`npx vitest run lib/privateAi/privateAiFoundation.test.ts` — **6/6 pass**
+Clean env (no `GEMINI_API_KEY`):
+
+```
+npx vitest run lib/ai/providers/geminiAdapter.test.ts \
+  lib/ai/providers/foundation.test.ts \
+  lib/ai/aiPlatformFoundation.test.ts
+```
+
+**3 files passed — 65 passed | 1 skipped** (live smoke skipped without gate).
+
+Opt-in live smoke (key from `.env.local` + `UMTUBA_GEMINI_SMOKE=1`):
+
+```
+npx vitest run lib/ai/providers/geminiAdapter.test.ts
+```
+
+**9 passed (9).**
 
 ## TypeScript
 
-`npx tsc --noEmit` — pass
+`npx tsc --noEmit` — **PASS** (exit 0).
 
 ## Build
 
-`npm run build` — pass (`/admin/private-ai` routes registered)
+Not required for this provider/env verification. Not run.
 
 ## git diff --check
 
-`git diff --cached --check` — pass
+**PASS** (exit 0).
 
 ## git status --short
 
-Staged intended scope only. See Final Verification Report.
+```
+## office/platform-gemini-live-provider-v1
+ M .env.example
+ M docs/ai/CURSOR_REPORT.md
+ M lib/ai/config.ts
+ M lib/ai/contracts/errors.ts
+ M lib/ai/providers/geminiAdapter.test.ts
+```
 
-## Open issues
+## Open issues / deferred
 
-- No runtime routing or hardware provisioning (by design)
-- Supabase tables unused until persistence cutover
-- No commit / push until GO
+1. **Await GO** before commit / push.
+2. **Optional ops:** rotate chat-exposed API key.
+3. No code TODOs left in this task scope.

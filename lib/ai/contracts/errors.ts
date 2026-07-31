@@ -20,7 +20,9 @@ export function sanitizeAiErrorMessage(
     lower.includes("api key") ||
     lower.includes("authorization") ||
     lower.includes("bearer ") ||
-    lower.includes("sk-")
+    lower.includes("x-goog-api-key") ||
+    lower.includes("sk-") ||
+    lower.includes("aiza")
   ) {
     return "AI provider authentication failed.";
   }

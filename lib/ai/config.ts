@@ -106,7 +106,7 @@ export function loadAiPlatformConfig(
     geminiBaseUrl:
       readEnv("GEMINI_BASE_URL") ??
       "https://generativelanguage.googleapis.com/v1beta",
-    geminiDefaultModel: readEnv("GEMINI_MODEL") ?? "gemini-2.5-flash",
+    geminiDefaultModel: readEnv("GEMINI_MODEL") ?? "gemini-3.5-flash-lite",
     anthropicApiKey,
     anthropicBaseUrl:
       readEnv("ANTHROPIC_BASE_URL") ?? "https://api.anthropic.com/v1",
