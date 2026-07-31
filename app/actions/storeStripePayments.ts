@@ -16,7 +16,7 @@ export type StartStripePaymentResult =
   | { ok: false; message: string; code?: string; requiresAuth?: boolean };
 
 /**
- * Start Stripe test-mode Checkout for a buyer order.
+ * Start Stripe Checkout for a buyer order (test or gated live mode).
  * Rejects any client money fields. Does not mark the order paid.
  */
 export async function startStripeTestCheckoutAction(input: {

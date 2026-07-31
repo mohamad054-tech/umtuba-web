@@ -1,9 +1,14 @@
 # Commerce Live Payment Capture Adapter V1
 
-Capability: `commerce.payments.live_capture_adapter_v1`  
-Provider: Stripe **test mode only** (`sk_test_…`)  
-Branch: `office/commerce-live-payment-capture-adapter-v1`  
+Capability: `commerce.payments.live_capture_adapter_v1`
+
+Provider: Stripe **test mode** (`sk_test_…`) by default; **live** only via Production Gate V1
+
+Branch: `office/commerce-live-payment-capture-adapter-v1` (+ Production Gate follow-up)
+
 Migration (local only): `20260876_store_live_payment_capture_adapter_v1.sql`
+
+See also: `LIVE_PAYMENT_PRODUCTION_GATE_V1.md`
 
 ## Lifecycle
 
@@ -19,12 +24,14 @@ Migration (local only): `20260876_store_live_payment_capture_adapter_v1.sql`
 - Browser “success” alone never marks paid.
 - Amount/currency matched to `payment_attempts` row (from order).
 - Webhook requires `Stripe-Signature` verification.
-- Live keys (`sk_live_`) rejected by adapter config.
+- Live keys (`sk_live_`) allowed only when Production Gate is complete (see gate doc).
 
 ## Env (never commit values)
 
-- `STRIPE_SECRET_KEY` — must be `sk_test_…`
-- `STRIPE_WEBHOOK_SECRET` — required for webhook route
+- `STRIPE_SECRET_KEY` — `sk_test_…` or gated `sk_live_…`
+- `STRIPE_MODE` — must match secret mode
+- `STRIPE_WEBHOOK_SECRET` — required for webhook route (`whsec_…`; required for live capture config)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — required for live (`pk_live_…`)
 - `NEXT_PUBLIC_APP_URL` (or `APP_ORIGIN` / `NEXT_PUBLIC_SITE_URL`)
 - `SUPABASE_SERVICE_ROLE_KEY` — server-only outcome apply
 

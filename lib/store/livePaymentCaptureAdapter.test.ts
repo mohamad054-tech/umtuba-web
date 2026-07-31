@@ -60,12 +60,14 @@ describe("Live payment capture — config fail-closed", () => {
     expect(getStripeLiveCaptureConfig().ok).toBe(false);
   });
 
-  it("rejects non-test Stripe secrets", () => {
+  it("rejects live Stripe secrets without production gate", () => {
     vi.stubEnv("STRIPE_SECRET_KEY", "sk_live_not_allowed");
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://example.test");
     const cfg = getStripeLiveCaptureConfig();
     expect(cfg.ok).toBe(false);
-    if (!cfg.ok) expect(cfg.message).toMatch(/test mode/i);
+    if (!cfg.ok) {
+      expect(cfg.message).toMatch(/live|production gate|forbidden|unavailable/i);
+    }
   });
 });
 
@@ -311,7 +313,7 @@ describe("Live payment capture — outcome mapping + sync boundary", () => {
 describe("Live payment capture — architecture boundaries", () => {
   it("keeps secrets out of client checkout and documents deferred webhook hardening", () => {
     const checkout = read("app/components/store/CheckoutClient.tsx");
-    expect(checkout).toMatch(/Pay with Stripe \(test\)/);
+    expect(checkout).toMatch(/Pay with Stripe/);
     expect(checkout).not.toMatch(/STRIPE_SECRET_KEY|sk_test_|sk_live_/);
     expect(checkout).toMatch(/startStripeTestCheckoutAction/);
 
