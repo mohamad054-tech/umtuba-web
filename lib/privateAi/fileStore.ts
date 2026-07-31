@@ -4,6 +4,10 @@ import {
   DEFAULT_EXECUTION_POLICY,
   DEFAULT_EXECUTION_QUOTA,
 } from "./executionPolicy";
+import {
+  createContractTestAdapter,
+  createExternalContractAdapter,
+} from "./contractTestAdapter";
 import { DEFAULT_PROVIDER_ROUTING_POLICY } from "./providerRoutingPolicy";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
 import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
@@ -31,7 +35,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -49,6 +53,8 @@ export function emptyPrivateAiState(
     executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
     providerRoutingPolicy: { ...DEFAULT_PROVIDER_ROUTING_POLICY },
     providerRoutingEvaluations: [],
+    providerAdapters: [],
+    adapterNormalizedFailures: [],
   };
 }
 
@@ -249,7 +255,8 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     version !== 4 &&
     version !== 5 &&
     version !== 6 &&
-    version !== 7
+    version !== 7 &&
+    version !== 8
   ) {
     return null;
   }
@@ -261,9 +268,17 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     ? obj.runtimes.map((r) => migrateRuntime(r as Record<string, unknown>))
     : [];
 
+  const nowIso = String(obj.updatedAt ?? new Date().toISOString());
+  const adapters = Array.isArray(obj.providerAdapters)
+    ? (obj.providerAdapters as PersistedPrivateAiState["providerAdapters"])
+    : [
+        createExternalContractAdapter(nowIso),
+        createContractTestAdapter(nowIso),
+      ];
+
   return {
-    schemaVersion: 7,
-    updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
+    schemaVersion: 8,
+    updatedAt: nowIso,
     models,
     capabilities: Array.isArray(obj.capabilities)
       ? (obj.capabilities as PersistedPrivateAiState["capabilities"])
@@ -295,7 +310,14 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
       ? (obj.inferenceRequests as PersistedPrivateAiState["inferenceRequests"])
       : [],
     executionPlans: Array.isArray(obj.executionPlans)
-      ? (obj.executionPlans as PersistedPrivateAiState["executionPlans"])
+      ? (obj.executionPlans as PersistedPrivateAiState["executionPlans"]).map(
+          (p) => ({
+            ...p,
+            adapterResolution: p.adapterResolution ?? null,
+            inputEnvelope: p.inputEnvelope ?? null,
+            outputEnvelope: p.outputEnvelope ?? null,
+          })
+        )
       : [],
     executionPolicy: {
       ...DEFAULT_EXECUTION_POLICY,
@@ -324,6 +346,10 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     providerRoutingEvaluations: Array.isArray(obj.providerRoutingEvaluations)
       ? (obj.providerRoutingEvaluations as PersistedPrivateAiState["providerRoutingEvaluations"])
       : [],
+    providerAdapters: adapters,
+    adapterNormalizedFailures: Array.isArray(obj.adapterNormalizedFailures)
+      ? (obj.adapterNormalizedFailures as PersistedPrivateAiState["adapterNormalizedFailures"])
+      : [],
   };
 }
 
@@ -347,7 +373,7 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 7,
+    schemaVersion: 8,
     runtimes: state.runtimes ?? [],
     runtimeIncidents: state.runtimeIncidents ?? [],
     runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
@@ -360,6 +386,8 @@ export function writePersistedPrivateAiState(
     providerRoutingPolicy:
       state.providerRoutingPolicy ?? { ...DEFAULT_PROVIDER_ROUTING_POLICY },
     providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
+    providerAdapters: state.providerAdapters ?? [],
+    adapterNormalizedFailures: state.adapterNormalizedFailures ?? [],
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);

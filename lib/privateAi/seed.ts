@@ -13,6 +13,10 @@ import {
   DEFAULT_EXECUTION_POLICY,
   DEFAULT_EXECUTION_QUOTA,
 } from "./executionPolicy";
+import {
+  createContractTestAdapter,
+  createExternalContractAdapter,
+} from "./contractTestAdapter";
 import { DEFAULT_PROVIDER_ROUTING_POLICY } from "./providerRoutingPolicy";
 import { createEmptyRuntimeHealth } from "./runtimeHealth";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
@@ -171,7 +175,7 @@ export function buildPrivateAiSeedState(
   };
 
   return {
-    schemaVersion: 7,
+    schemaVersion: 8,
     updatedAt: now,
     models: [
       {
@@ -211,6 +215,11 @@ export function buildPrivateAiSeedState(
       tenantPreferredProviders: {},
     },
     providerRoutingEvaluations: [],
+    providerAdapters: [
+      createExternalContractAdapter(now),
+      createContractTestAdapter(now),
+    ],
+    adapterNormalizedFailures: [],
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

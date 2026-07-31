@@ -1,3 +1,4 @@
+import { applyAdapterBoundary } from "./adapterBoundary";
 import { evaluateExecutionGuard } from "./executionGuard";
 import {
   DEFAULT_EXECUTION_POLICY,
@@ -14,6 +15,7 @@ import type {
   ExecutionPlanStatus,
   InferenceRequestRecord,
   PersistedPrivateAiState,
+  PrivateAiAuditTrailEntry,
 } from "./types";
 
 export type DispatchExecutionInput = {
@@ -22,11 +24,16 @@ export type DispatchExecutionInput = {
   budget?: Partial<ExecutionBudgetContract>;
   /** When true and request lacks runtime, attempt contract selection. */
   selectRuntimeIfMissing?: boolean;
+  /** Allow negotiating the non-production contract-test adapter. */
+  allowContractTestAdapter?: boolean;
+  /** Invoke contract-test fixture only (never live providers). */
+  invokeContractTestAdapter?: boolean;
 };
 
 export type DispatchExecutionResult = {
   plan: ExecutionPlanRecord;
   status: ExecutionPlanStatus;
+  auditEntries: PrivateAiAuditTrailEntry[];
 };
 
 function makeError(
@@ -36,6 +43,14 @@ function makeError(
   retriable = false
 ): ExecutionErrorContract {
   return { code, message, class: cls, retriable };
+}
+
+function emptyPlanFields() {
+  return {
+    adapterResolution: null as ExecutionPlanRecord["adapterResolution"],
+    inputEnvelope: null as ExecutionPlanRecord["inputEnvelope"],
+    outputEnvelope: null as ExecutionPlanRecord["outputEnvelope"],
+  };
 }
 
 function buildContext(
@@ -84,8 +99,10 @@ function buildContext(
 }
 
 /**
- * Dispatcher: Validate → Authorize/Guard → Select Runtime → Build Context → Plan.
- * Never calls a provider or executes inference.
+ * Dispatcher:
+ * Validate → Authorize/Guard → Provider Routing → Runtime → Plan →
+ * Adapter Resolution → Input Envelope → (optional contract-test fixture).
+ * Never calls Gemini/OpenAI/Local LLM or any live provider.
  */
 export function dispatchInferenceExecution(
   state: PersistedPrivateAiState,
@@ -96,6 +113,7 @@ export function dispatchInferenceExecution(
   const request = (state.inferenceRequests ?? []).find(
     (r) => r.requestId === input.requestId
   );
+  const auditEntries: PrivateAiAuditTrailEntry[] = [];
 
   const baseSession = {
     sessionId: `exs_${input.requestId}`,
@@ -111,18 +129,22 @@ export function dispatchInferenceExecution(
       requestId: input.requestId,
       status: "failed_before_dispatch",
       context: null,
-      session: { ...baseSession, status: "failed_before_dispatch", closedAt: now },
+      session: {
+        ...baseSession,
+        status: "failed_before_dispatch",
+        closedAt: now,
+      },
       guardErrors: ["request_missing"],
       error: makeError("request_missing", "Unknown inference request", "unknown"),
       selectedRuntimeId: null,
+      ...emptyPlanFields(),
       notes: "Execution boundary — no provider call.",
       createdAt: now,
       updatedAt: now,
     };
-    return { plan, status: plan.status };
+    return { plan, status: plan.status, auditEntries };
   }
 
-  // 1) Validate request contract
   const validation = validateInferenceRequestContract(request, state);
   if (!validation.ok) {
     const plan: ExecutionPlanRecord = {
@@ -138,20 +160,17 @@ export function dispatchInferenceExecution(
         "guard"
       ),
       selectedRuntimeId: request.runtimeId,
+      ...emptyPlanFields(),
       notes: "Blocked at validation — no provider call.",
       createdAt: now,
       updatedAt: now,
     };
-    return { plan, status: plan.status };
+    return { plan, status: plan.status, auditEntries };
   }
 
-  // Working copy for optional runtime selection (not persisted here)
   let working: InferenceRequestRecord = { ...request };
 
-  if (
-    input.selectRuntimeIfMissing !== false &&
-    !working.runtimeId
-  ) {
+  if (input.selectRuntimeIfMissing !== false && !working.runtimeId) {
     const routed = evaluateProviderRouting(state, {
       capabilityId: working.capabilityId,
       tenantId: working.requester.tenantId,
@@ -178,7 +197,6 @@ export function dispatchInferenceExecution(
     estimatedUnits: input.budget?.estimatedUnits ?? 1,
   };
 
-  // 2) Guard (authorize + runtime/lifecycle/quota/budget)
   const guard = evaluateExecutionGuard(working, state, { budget });
   if (!guard.ok || !guard.runtime) {
     const plan: ExecutionPlanRecord = {
@@ -200,11 +218,12 @@ export function dispatchInferenceExecution(
               : "guard"
       ),
       selectedRuntimeId: working.runtimeId,
+      ...emptyPlanFields(),
       notes: "Blocked by execution guard — no provider call.",
       createdAt: now,
       updatedAt: now,
     };
-    return { plan, status: plan.status };
+    return { plan, status: plan.status, auditEntries };
   }
 
   if (working.cancellationRequested) {
@@ -221,11 +240,12 @@ export function dispatchInferenceExecution(
         "cancellation"
       ),
       selectedRuntimeId: working.runtimeId,
+      ...emptyPlanFields(),
       notes: "Cancelled before dispatch — no provider call.",
       createdAt: now,
       updatedAt: now,
     };
-    return { plan, status: plan.status };
+    return { plan, status: plan.status, auditEntries };
   }
 
   const providerId =
@@ -240,6 +260,46 @@ export function dispatchInferenceExecution(
     now,
     budget
   );
+
+  const boundary = applyAdapterBoundary({
+    state,
+    planId,
+    request: working,
+    context,
+    allowContractTest: input.allowContractTestAdapter === true,
+    invokeContractTest: input.invokeContractTestAdapter === true,
+    now,
+  });
+  auditEntries.push(...boundary.auditEntries);
+
+  if (!boundary.resolution.ok) {
+    const plan: ExecutionPlanRecord = {
+      planId,
+      requestId: working.requestId,
+      status: "blocked",
+      context,
+      session: { ...baseSession, status: "blocked", closedAt: now },
+      guardErrors: boundary.resolution.negotiation.reasons.length
+        ? boundary.resolution.negotiation.reasons
+        : ["adapter_resolution_failed"],
+      error: makeError(
+        boundary.resolution.failureClass ?? "adapter_resolution_failed",
+        boundary.normalizedFailure?.safeMessage ??
+          "Adapter resolution failed",
+        "guard",
+        boundary.resolution.retryable
+      ),
+      selectedRuntimeId: guard.runtime.id,
+      adapterResolution: boundary.resolution,
+      inputEnvelope: boundary.inputEnvelope,
+      outputEnvelope: boundary.outputEnvelope,
+      notes:
+        "Blocked at adapter boundary — no live provider invoke or inference.",
+      createdAt: now,
+      updatedAt: now,
+    };
+    return { plan, status: plan.status, auditEntries };
+  }
 
   const status: ExecutionPlanStatus =
     working.lifecycle === "queued" ? "queued" : "planned";
@@ -257,14 +317,16 @@ export function dispatchInferenceExecution(
     guardErrors: [],
     error: null,
     selectedRuntimeId: guard.runtime.id,
+    adapterResolution: boundary.resolution,
+    inputEnvelope: boundary.inputEnvelope,
+    outputEnvelope: boundary.outputEnvelope,
     notes:
-      "Execution plan only — dispatcher does not invoke providers or models.",
+      "Execution plan + adapter envelopes only — dispatcher does not invoke live providers or models.",
     createdAt: now,
     updatedAt: now,
   };
 
-  // silence unused default import lint if any
   void DEFAULT_EXECUTION_POLICY;
 
-  return { plan, status };
+  return { plan, status, auditEntries };
 }

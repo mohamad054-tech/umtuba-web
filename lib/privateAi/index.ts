@@ -57,6 +57,16 @@ export type {
   ProviderRoutingPolicy,
   ProviderRoutingRejection,
   ProviderRoutingResult,
+  AdapterKind,
+  AdapterLifecycle,
+  AdapterFailureClass,
+  AdapterNegotiationRequest,
+  AdapterNegotiationResult,
+  AdapterResolutionResult,
+  ExecutionInputEnvelope,
+  ExecutionOutputEnvelope,
+  NormalizedAdapterError,
+  ProviderAdapterContract,
 } from "./types";
 
 export {
@@ -157,6 +167,46 @@ export {
 } from "./providerRoutingPolicy";
 
 export { evaluateProviderRouting } from "./providerRoutingEngine";
+
+export {
+  ADAPTER_LIFECYCLE_ORDER,
+  assertTransitionAdapterLifecycle,
+  canTransitionAdapterLifecycle,
+  listAllowedAdapterTransitions,
+} from "./adapterLifecycle";
+
+export {
+  normalizeAdapterError,
+  redactSecretLikeText,
+} from "./adapterErrors";
+
+export { negotiateAdapter } from "./adapterNegotiation";
+
+export {
+  advanceAdapterLifecycle,
+  evaluateAdapterReadiness,
+  lookupAdapterById,
+  lookupAdapters,
+  registerProviderAdapter,
+  resolveAdapterForNegotiation,
+} from "./adapterRegistry";
+
+export {
+  buildExecutionInputEnvelope,
+  buildFixtureOutputEnvelope,
+  buildNotExecutedOutputEnvelope,
+  validateExecutionInputEnvelope,
+} from "./executionEnvelopes";
+
+export {
+  CONTRACT_TEST_ADAPTER_ID,
+  CONTRACT_TEST_FIXTURE_TEXT,
+  CONTRACT_TEST_PROVIDER_ID,
+  createContractTestAdapter,
+  createExternalContractAdapter,
+} from "./contractTestAdapter";
+
+export { applyAdapterBoundary } from "./adapterBoundary";
 
 export {
   getHardwareContract,

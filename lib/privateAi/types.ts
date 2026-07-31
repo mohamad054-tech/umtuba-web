@@ -559,9 +559,203 @@ export type ExecutionPlanRecord = {
   guardErrors: string[];
   error: ExecutionErrorContract | null;
   selectedRuntimeId: string | null;
+  /** Adapter boundary resolution (never a live provider call). */
+  adapterResolution: AdapterResolutionResult | null;
+  inputEnvelope: ExecutionInputEnvelope | null;
+  outputEnvelope: ExecutionOutputEnvelope | null;
   notes: string;
   createdAt: string;
   updatedAt: string;
+};
+
+/** Provider Adapter Boundary — contracts only; no live inference. */
+export type AdapterKind =
+  | "contract_test"
+  | "external_contract"
+  | "private_contract"
+  | "local_contract";
+
+export type AdapterLifecycle =
+  | "registered"
+  | "validating"
+  | "ready"
+  | "degraded"
+  | "unavailable"
+  | "disabled"
+  | "retired";
+
+export type AdapterInputMode = "text" | "messages" | "empty";
+export type AdapterOutputMode = "text" | "structured" | "empty";
+export type AdapterRuntimeKind = "external" | "private" | "local" | "contract_test";
+
+export type AdapterHealthMetadata = {
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
+  lastCheckedAt: string | null;
+  notes: string;
+};
+
+export type AdapterReadinessMetadata = {
+  ready: boolean;
+  blockers: string[];
+  evaluatedAt: string | null;
+};
+
+export type ProviderAdapterContract = {
+  adapterId: string;
+  providerId: string;
+  adapterKind: AdapterKind;
+  version: string;
+  lifecycle: AdapterLifecycle;
+  enabled: boolean;
+  /** Never true for contract_test in production paths. */
+  productionEnabled: boolean;
+  available: boolean;
+  supportedCapabilities: AiCapabilityId[];
+  supportedModels: string[];
+  supportedRuntimeKinds: AdapterRuntimeKind[];
+  supportedInputModes: AdapterInputMode[];
+  supportedOutputModes: AdapterOutputMode[];
+  supportsStreaming: boolean;
+  supportsStructuredOutput: boolean;
+  supportsCancellation: boolean;
+  supportsTimeout: boolean;
+  minPolicyVersion: string | null;
+  maxPayloadBytes: number;
+  health: AdapterHealthMetadata;
+  readiness: AdapterReadinessMetadata;
+  notes: string;
+  registeredAt: string;
+  updatedAt: string;
+};
+
+export type AdapterNegotiationRequest = {
+  providerId?: string | null;
+  capabilityId: AiCapabilityId;
+  modelId?: string | null;
+  runtimeKind?: AdapterRuntimeKind | null;
+  requireStreaming?: boolean;
+  requireStructuredOutput?: boolean;
+  requireCancellation?: boolean;
+  requireTimeout?: boolean;
+  policyVersion?: string | null;
+  allowContractTest?: boolean;
+  now?: string;
+};
+
+export type AdapterRejection = {
+  adapterId: string;
+  providerId: string;
+  reasons: string[];
+};
+
+export type AdapterNegotiationResult = {
+  ok: boolean;
+  selectedAdapterId: string | null;
+  rejected: AdapterRejection[];
+  reasons: string[];
+  evaluatedAt: string;
+};
+
+export type AdapterResolutionResult = {
+  ok: boolean;
+  adapterId: string | null;
+  providerId: string | null;
+  negotiation: AdapterNegotiationResult;
+  failureClass: AdapterFailureClass | null;
+  retryable: boolean;
+  auditEventId: string | null;
+  notes: string;
+};
+
+export type AdapterFailureClass =
+  | "adapter_unavailable"
+  | "adapter_not_ready"
+  | "capability_unsupported"
+  | "model_unsupported"
+  | "invalid_execution_input"
+  | "timeout_before_execution"
+  | "cancellation_before_execution"
+  | "provider_rate_limited"
+  | "provider_auth_failed"
+  | "provider_unavailable"
+  | "provider_rejected"
+  | "malformed_provider_response"
+  | "structured_output_invalid"
+  | "internal_adapter_error"
+  | "no_eligible_adapter";
+
+export type NormalizedAdapterError = {
+  class: AdapterFailureClass;
+  code: string;
+  safeMessage: string;
+  retryable: boolean;
+  adminDiagnostic: string;
+  redacted: boolean;
+};
+
+export type ExecutionInputEnvelope = {
+  requestId: string;
+  executionPlanId: string;
+  providerId: string;
+  runtimeId: string;
+  modelId: string;
+  capabilityId: AiCapabilityId;
+  adapterId: string;
+  tenantId: string;
+  requester: {
+    actorId: string | null;
+    role: string;
+    tenantId: string;
+    sessionId: string | null;
+  };
+  normalizedInput: {
+    kind: AdapterInputMode;
+    /** Redacted/summarized only — never secrets. */
+    promptChars: number;
+    messageCount: number;
+    hasPrompt: boolean;
+  };
+  structuredOutput: InferenceStructuredOutputContract;
+  streaming: InferenceStreamingContract;
+  timeout: ExecutionTimeoutContract;
+  cancellation: ExecutionCancellationContract;
+  retry: InferenceRetryMetadata;
+  correlationId: string;
+  trace: ExecutionTraceMetadata;
+  payloadBytesEstimate: number;
+  maxPayloadBytes: number;
+  redactionApplied: boolean;
+  notes: string;
+};
+
+export type ExecutionOutputEnvelope = {
+  status: "fixture_ok" | "fixture_error" | "not_executed" | "blocked";
+  requestId: string;
+  executionPlanId: string;
+  providerId: string;
+  runtimeId: string;
+  modelId: string;
+  adapterId: string | null;
+  output: {
+    kind: AdapterOutputMode;
+    /** Fixture text only in tests — never live model output. */
+    fixtureText: string | null;
+    structuredValid: boolean | null;
+  };
+  usage: {
+    inputTokens: number | null;
+    outputTokens: number | null;
+    totalTokens: number | null;
+  };
+  latencyMs: number | null;
+  finishReason: string | null;
+  retryable: boolean;
+  failure: NormalizedAdapterError | null;
+  providerSafeDiagnostic: string | null;
+  correlationId: string;
+  auditEventId: string | null;
+  notes: string;
+  createdAt: string;
 };
 
 /** Provider routing policy — selection only; never invokes providers. */
@@ -626,7 +820,7 @@ export type ProviderRoutingResult = {
 };
 
 export type PersistedPrivateAiState = {
-  schemaVersion: 7;
+  schemaVersion: 8;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -644,4 +838,7 @@ export type PersistedPrivateAiState = {
   executionQuota: ExecutionQuotaContract;
   providerRoutingPolicy: ProviderRoutingPolicy;
   providerRoutingEvaluations: ProviderRoutingResult[];
+  /** Provider adapter registry — contracts only; no live SDKs. */
+  providerAdapters: ProviderAdapterContract[];
+  adapterNormalizedFailures: NormalizedAdapterError[];
 };

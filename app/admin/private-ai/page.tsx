@@ -12,13 +12,13 @@ export default async function PrivateAiOverviewPage() {
   return (
     <PrivateAiShell
       title="Private AI"
-      subtitle="Provider Routing Policy V1"
+      subtitle="Provider Adapter Boundary V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-xl font-black">Private AI platform</h1>
         <p className="mt-2 text-sm text-white/55">
-          Registry, lifecycle, deployment/runtime, and provider routing policy —
-          no training, fine-tuning, inference, or weights.
+          Registry through adapter boundary contracts — no training,
+          fine-tuning, inference, or weights.
         </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           {[
@@ -32,6 +32,7 @@ export default async function PrivateAiOverviewPage() {
               "Providers",
               state.providerRoutingPolicy?.providers?.length ?? 0,
             ],
+            ["Adapters", state.providerAdapters?.length ?? 0],
             ["Permissions", state.permissions.length],
             ["Audit events", state.auditTrail.length],
             [

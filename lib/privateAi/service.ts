@@ -40,6 +40,16 @@ import {
   createEmptyRuntimeHealth,
 } from "./runtimeHealth";
 import {
+  advanceAdapterLifecycle,
+  lookupAdapterById,
+  registerProviderAdapter,
+  resolveAdapterForNegotiation,
+} from "./adapterRegistry";
+import {
+  createContractTestAdapter,
+  createExternalContractAdapter,
+} from "./contractTestAdapter";
+import {
   dispatchInferenceExecution,
   type DispatchExecutionInput,
 } from "./executionDispatcher";
@@ -118,6 +128,10 @@ import type {
   RuntimeOpsPolicy,
   RuntimeOverrideMode,
   RuntimeReadinessResult,
+  AdapterLifecycle,
+  AdapterNegotiationRequest,
+  NormalizedAdapterError,
+  ProviderAdapterContract,
   ProviderCatalogEntry,
   ProviderRoutingCriteria,
   ProviderRoutingPolicy,
@@ -360,6 +374,18 @@ export type PrivateAiService = {
   updateProviderRoutingPolicy(
     patch: Partial<ProviderRoutingPolicy>
   ): ProviderRoutingPolicy;
+  listProviderAdapters(): ProviderAdapterContract[];
+  getProviderAdapter(adapterId: string): ProviderAdapterContract | null;
+  registerProviderAdapter(adapter: ProviderAdapterContract): ProviderAdapterContract;
+  advanceAdapterLifecycle(input: {
+    adapterId: string;
+    to: AdapterLifecycle;
+    now?: string;
+  }): ProviderAdapterContract;
+  negotiateAdapter(req: AdapterNegotiationRequest): ReturnType<
+    typeof resolveAdapterForNegotiation
+  >;
+  listAdapterNormalizedFailures(): NormalizedAdapterError[];
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -390,6 +416,11 @@ export function createPrivateAiService(options?: {
       executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
       providerRoutingPolicy: { ...DEFAULT_PROVIDER_ROUTING_POLICY },
       providerRoutingEvaluations: [],
+      providerAdapters: [
+        createExternalContractAdapter(now0),
+        createContractTestAdapter(now0),
+      ],
+      adapterNormalizedFailures: [],
       permissions: [
         createPrivateAiPermission({
           id: "perm_admin_models",
@@ -429,7 +460,7 @@ export function createPrivateAiService(options?: {
   state = ensureInferenceRequestDefaults(ensureRuntimeOpsDefaults(state));
   state = {
     ...state,
-    schemaVersion: 7,
+    schemaVersion: 8,
     executionPolicy: resolveExecutionPolicy(state.executionPolicy),
     executionQuota: resolveExecutionQuota(state.executionQuota),
     executionPlans: state.executionPlans ?? [],
@@ -437,6 +468,14 @@ export function createPrivateAiService(options?: {
       state.providerRoutingPolicy
     ),
     providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
+    providerAdapters:
+      state.providerAdapters?.length
+        ? state.providerAdapters
+        : [
+            createExternalContractAdapter(now0),
+            createContractTestAdapter(now0),
+          ],
+    adapterNormalizedFailures: state.adapterNormalizedFailures ?? [],
   };
 
   const persist = () => {
@@ -1108,10 +1147,15 @@ export function createPrivateAiService(options?: {
 
     dispatchExecution(input) {
       const result = dispatchInferenceExecution(state, input);
+      const failure = result.plan.outputEnvelope?.failure ?? null;
       state = {
         ...state,
-        schemaVersion: 7,
+        schemaVersion: 8,
         executionPlans: [...(state.executionPlans ?? []), result.plan],
+        auditTrail: [...state.auditTrail, ...result.auditEntries],
+        adapterNormalizedFailures: failure
+          ? [failure, ...(state.adapterNormalizedFailures ?? [])].slice(0, 100)
+          : state.adapterNormalizedFailures ?? [],
         updatedAt: result.plan.updatedAt,
       };
       persist();
@@ -1134,7 +1178,7 @@ export function createPrivateAiService(options?: {
       const result = evaluateProviderRouting(state, criteria);
       state = {
         ...state,
-        schemaVersion: 7,
+        schemaVersion: 8,
         providerRoutingEvaluations: [
           result,
           ...(state.providerRoutingEvaluations ?? []),
@@ -1152,12 +1196,45 @@ export function createPrivateAiService(options?: {
       });
       state = {
         ...state,
-        schemaVersion: 7,
+        schemaVersion: 8,
         providerRoutingPolicy: next,
         updatedAt: new Date().toISOString(),
       };
       persist();
       return next;
+    },
+
+    listProviderAdapters() {
+      return [...(state.providerAdapters ?? [])];
+    },
+
+    getProviderAdapter(adapterId) {
+      return lookupAdapterById(state, adapterId);
+    },
+
+    registerProviderAdapter(adapter) {
+      state = registerProviderAdapter(state, adapter);
+      persist();
+      return lookupAdapterById(state, adapter.adapterId)!;
+    },
+
+    advanceAdapterLifecycle(input) {
+      state = advanceAdapterLifecycle(
+        state,
+        input.adapterId,
+        input.to,
+        input.now
+      );
+      persist();
+      return lookupAdapterById(state, input.adapterId)!;
+    },
+
+    negotiateAdapter(req) {
+      return resolveAdapterForNegotiation(state, req);
+    },
+
+    listAdapterNormalizedFailures() {
+      return [...(state.adapterNormalizedFailures ?? [])];
     },
 
     checkPermission(input) {

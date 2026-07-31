@@ -1,8 +1,8 @@
-# CURSOR_REPORT — Private AI Provider Routing Policy V1
+# CURSOR_REPORT — Private AI Provider Adapter Boundary V1
 
 ## Summary
 
-Built Provider Routing Policy Engine above the Inference Execution Boundary. Selection decisions only — no Gemini/provider calls, no inference. Persisted schemaVersion 7. Admin page at `/admin/private-ai/provider-routing`. Tests + `tsc --noEmit` + `git diff --check` PASS. Uncommitted pending GO.
+Built Private AI Provider Adapter Boundary above Execution Plan + Routing Policy. Contracts/registry/envelopes/errors/lifecycle/negotiation only — no live provider I/O. Dispatcher stops after adapter resolution + envelopes (contract-test fixture opt-in). schemaVersion 8. Admin `/admin/private-ai/adapters`. Tests + tsc + diff --check PASS. Uncommitted pending GO.
 
 ## Exact files changed
 
@@ -10,7 +10,6 @@ Built Provider Routing Policy Engine above the Inference Execution Boundary. Sel
 
 - `app/admin/private-ai/PrivateAiShell.tsx`
 - `app/admin/private-ai/page.tsx`
-- `app/admin/private-ai/routing/page.tsx`
 - `lib/privateAi/executionDispatcher.ts`
 - `lib/privateAi/fileStore.ts`
 - `lib/privateAi/index.ts`
@@ -26,28 +25,39 @@ Built Provider Routing Policy Engine above the Inference Execution Boundary. Sel
 
 ### Added
 
-- `app/admin/private-ai/provider-routing/page.tsx`
-- `lib/privateAi/providerRoutingPolicy.ts`
-- `lib/privateAi/providerRoutingEngine.ts`
-- `lib/privateAi/privateAiProviderRoutingPolicy.test.ts`
+- `lib/privateAi/adapterLifecycle.ts`
+- `lib/privateAi/adapterErrors.ts`
+- `lib/privateAi/adapterNegotiation.ts`
+- `lib/privateAi/adapterRegistry.ts`
+- `lib/privateAi/executionEnvelopes.ts`
+- `lib/privateAi/contractTestAdapter.ts`
+- `lib/privateAi/adapterBoundary.ts`
+- `lib/privateAi/privateAiProviderAdapterBoundary.test.ts`
+- `app/admin/private-ai/adapters/page.tsx`
 
 ## Migrations created
 
-None (file SoT schemaVersion 7).
+None (file SoT schemaVersion 8; normalize migrates 1–7 → 8).
 
 ## Security review
 
-- Fail-closed: blacklist, whitelist, maintenance, cooldown, unhealthy, unreadiness, region/cost/budget, ineligible manual override
-- No secrets; no live provider I/O
-- Admin page reuses `requirePrivateAiAdmin`
+- Fail-closed adapter resolution; permission check before resolve
+- No secrets in envelopes; redaction helper; safe user messages
+- Contract-test not production-enabled
+- No Shared AI / Gemini / network invoke
+- Admin behind `requirePrivateAiAdmin`
 
 ## Tests
 
 ```
-npx vitest run lib/privateAi/privateAiProviderRoutingPolicy.test.ts lib/privateAi/privateAiInferenceExecutionBoundary.test.ts
+npx vitest run lib/privateAi/privateAiProviderAdapterBoundary.test.ts \
+  lib/privateAi/privateAiProviderRoutingPolicy.test.ts \
+  lib/privateAi/privateAiInferenceExecutionBoundary.test.ts \
+  lib/privateAi/privateAiInferenceRequestContracts.test.ts \
+  lib/privateAi/privateAiRuntimeOperationsFailover.test.ts
 ```
 
-- 20 passed (13 routing + 7 boundary)
+- 58 passed (17 adapter + 41 prior)
 
 ## TypeScript
 
@@ -55,16 +65,16 @@ npx vitest run lib/privateAi/privateAiProviderRoutingPolicy.test.ts lib/privateA
 
 ## Build
 
-Not required (admin + lib contracts only; no app entry redesign beyond Private AI admin).
+Not required (admin + lib contracts).
 
 ## git diff --check
 
-PASS (clean)
+PASS
 
 ## git status --short
 
-Uncommitted feature files listed above; `node_modules` local install for tooling only — do not commit.
+Uncommitted feature files listed above; local `node_modules` for tooling — do not commit.
 
 ## Open issues
 
-Awaiting user GO for commit/push. No inference execution beyond prior boundary plans.
+Awaiting user GO for commit/push.
