@@ -44,7 +44,11 @@ import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../lib/store/sellerStore";
-import { fetchMySellerPayouts } from "../../../lib/store/sellerPayoutReadModel";
+import {
+  fetchMySellerPayoutEligibility,
+  fetchMySellerPayoutSummary,
+  fetchMySellerPayouts,
+} from "../../../lib/store/sellerPayoutReadModel";
 import {
   SELLER_PAYOUT_HISTORY_PAGE_SIZE,
   buildSellerPayoutHistoryLoadMoreHref,
@@ -61,6 +65,7 @@ import {
   buildPayoutReconciliationSurface,
   parsePayoutReconSurfaceCursor,
 } from "../../../lib/store/payoutReconciliationSurface";
+import { buildSellerPayoutEligibilitySurface } from "../../../lib/store/sellerPayoutEligibilitySurface";
 import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
@@ -238,7 +243,41 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     typeof buildPayoutReconciliationSurface
   > | null = null;
   let payoutReconciliationLoadMoreHref: string | null = null;
+  let payoutEligibility: ReturnType<
+    typeof buildSellerPayoutEligibilitySurface
+  > | null = null;
   if (canManage) {
+    const [eligibilityRes, summaryRes] = await Promise.all([
+      fetchMySellerPayoutEligibility(supabase, membership.store.id),
+      fetchMySellerPayoutSummary(supabase, membership.store.id),
+    ]);
+    if (!eligibilityRes.ok) {
+      const unauthorized =
+        /cannot view|not authorized|sign in required/i.test(
+          eligibilityRes.message
+        );
+      payoutEligibility = buildSellerPayoutEligibilitySurface({
+        storeId: membership.store.id,
+        eligibility: null,
+        unavailable: !unauthorized,
+        unauthorized,
+        errorMessage: eligibilityRes.message,
+      });
+    } else if (!summaryRes.ok) {
+      payoutEligibility = buildSellerPayoutEligibilitySurface({
+        storeId: membership.store.id,
+        eligibility: null,
+        unavailable: true,
+        errorMessage: summaryRes.message,
+      });
+    } else {
+      payoutEligibility = buildSellerPayoutEligibilitySurface({
+        storeId: membership.store.id,
+        eligibility: eligibilityRes.data,
+        summary: summaryRes.data,
+      });
+    }
+
     if (!payoutCursorParsed.ok) {
       payoutHistory = buildSellerPayoutHistorySurface({
         storeId: membership.store.id,
@@ -374,6 +413,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           canManage={canManage}
           periodKey={uiPeriod}
           revenueBridge={revenueBridge}
+          payoutEligibility={payoutEligibility}
           payoutHistory={payoutHistory}
           payoutHistoryLoadMoreHref={payoutHistoryLoadMoreHref}
           payoutReconciliation={payoutReconciliation}

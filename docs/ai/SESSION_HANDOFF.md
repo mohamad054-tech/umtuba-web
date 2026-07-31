@@ -1,27 +1,28 @@
-# Session Handoff — Settlement ↔ Payout Reconciliation Surface V1
+# Session Handoff — Seller Payout Eligibility Surface V1
 
 **Updated:** 2026-07-31
 
 ## Active milestone
 
-Capability: `commerce.settlement.payout_reconciliation_surface_v1` (**APPROVED**)
-Branch: `office/commerce-settlement-payout-reconciliation-surface-v1`
+Capability: `commerce.settlement.seller_payout_eligibility_surface_v1` (**APPROVED**)
+Branch: `office/commerce-settlement-seller-payout-eligibility-surface-v1`
 Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-Base tip: `747f1d51ed7052b6627be74c05b1e1ec41f02383`
+Base tip: `94040b4fbdc9415c0a496447db417cc892a68ba1`
 Status: **PASS + STAGED** — no commit / push yet
 
 ## What landed locally
 
-- Pure recon surface view-model + Vitest contracts
-- Seller store section (aligned / issues_detected / unavailable + load older)
-- Owner/manager fetch of recon list (issues-only) + summary
+- Pure eligibility view-model + Vitest contracts
+- Seller store section (ready / unavailable / unauthorized)
+- Owner/manager fetch of eligibility + summary
 - Commerce + SSOT docs updated; **no migration**
-- Existing payout history + balance visibility preserved
+- Existing balances, history, and reconciliation preserved
 
 ## Closed tips (do not reopen)
 
 | Track | Tip |
 | --- | --- |
+| Payout Reconciliation Surface V1 | `94040b4` |
 | Seller Payout History Surface V1 | `747f1d5` |
 | Settlement ↔ Payout Reconciliation Read V1 | `6b21075` |
 | Payout Balance Visibility V1 | `af1eedd` |

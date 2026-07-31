@@ -17,7 +17,9 @@ import type { AnalyticsSalesSeriesPoint, AnalyticsTopProductRow } from "../../..
 import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/commerceRevenueBridge";
 import type { SellerPayoutHistorySurfaceView } from "../../../lib/store/sellerPayoutHistorySurface";
 import type { PayoutReconSurfaceView } from "../../../lib/store/payoutReconciliationSurface";
+import type { SellerPayoutEligibilitySurfaceView } from "../../../lib/store/sellerPayoutEligibilitySurface";
 import { APP_ROUTES } from "../../lib/nav";
+import SellerPayoutEligibility from "./SellerPayoutEligibility";
 import SellerPayoutHistory from "./SellerPayoutHistory";
 import SellerPayoutReconciliation from "./SellerPayoutReconciliation";
 
@@ -43,6 +45,7 @@ type Props = {
   canManage: boolean;
   periodKey: "7d" | "30d";
   revenueBridge: CommerceRevenueBridgeSellerVisibility;
+  payoutEligibility: SellerPayoutEligibilitySurfaceView | null;
   payoutHistory: SellerPayoutHistorySurfaceView | null;
   payoutHistoryLoadMoreHref: string | null;
   payoutReconciliation: PayoutReconSurfaceView | null;
@@ -72,6 +75,7 @@ export default function SellerDashboardInsightsView(props: Props) {
     canManage,
     periodKey,
     revenueBridge,
+    payoutEligibility,
     payoutHistory,
     payoutHistoryLoadMoreHref,
     payoutReconciliation,
@@ -558,6 +562,10 @@ export default function SellerDashboardInsightsView(props: Props) {
           {revenueBridge.payoutsEnabled ? "enabled" : "not yet enabled"}.
         </p>
       </section>
+
+      {payoutEligibility ? (
+        <SellerPayoutEligibility surface={payoutEligibility} />
+      ) : null}
 
       {payoutHistory ? (
         <SellerPayoutHistory

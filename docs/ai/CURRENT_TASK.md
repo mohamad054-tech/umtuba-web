@@ -2,7 +2,7 @@
 
 ## Task title
 
-Settlement ↔ Payout Reconciliation Surface V1
+Seller Payout Eligibility Surface V1
 
 ## Status
 
@@ -10,15 +10,15 @@ Settlement ↔ Payout Reconciliation Surface V1
 
 ## Capability
 
-`commerce.settlement.payout_reconciliation_surface_v1` — **APPROVED** (Product GO 2026-07-31)
+`commerce.settlement.seller_payout_eligibility_surface_v1` — **APPROVED** (Product GO 2026-07-31)
 
 ## Branch
 
-`office/commerce-settlement-payout-reconciliation-surface-v1`
+`office/commerce-settlement-seller-payout-eligibility-surface-v1`
 
 ## Base / tip
 
-Base: `747f1d51ed7052b6627be74c05b1e1ec41f02383` (Seller Payout History Surface V1)
+Base: `94040b4fbdc9415c0a496447db417cc892a68ba1` (Payout Reconciliation Surface V1)
 
 ## Worktree
 
@@ -31,15 +31,15 @@ Base: `747f1d51ed7052b6627be74c05b1e1ec41f02383` (Seller Payout History Surface 
 
 ## Delivered
 
-- Pure surface: `lib/store/payoutReconciliationSurface.ts` (+ tests)
-- UI: `app/components/store/SellerPayoutReconciliation.tsx`
-- Wired into existing seller store insights + page (owner/manager, issues-only)
-- Doc: `docs/store/implementation/PAYOUT_RECONCILIATION_SURFACE_V1.md`
-- **No new migration** — reuses `20260883` recon RPCs
+- Pure surface: `lib/store/sellerPayoutEligibilitySurface.ts` (+ tests)
+- UI: `app/components/store/SellerPayoutEligibility.tsx`
+- Wired into existing seller store insights + page (owner/manager)
+- Doc: `docs/store/implementation/SELLER_PAYOUT_ELIGIBILITY_SURFACE_V1.md`
+- **No new migration** — reuses `20260882` eligibility RPCs
 
 ## Scope held
 
-Read-only diagnostics from trusted Recon Read. No bank rails, Dashboard/Admin, payout writes, or repair actions. History + balances preserved.
+Read-only eligibility honesty. No bank rails, Dashboard/Admin, payout writes, or withdraw CTAs. Balances / history / recon preserved.
 
 ## Next
 
