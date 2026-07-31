@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Unified Capability Execution V1
+AI Creator Studio Foundation V1
 
 ## Status
 
@@ -10,29 +10,38 @@ AI Unified Capability Execution V1
 
 ## Branch
 
-`office/platform-ai-unified-capability-execution-v1`
+`office/platform-ai-creator-studio-foundation-v1`
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-unified-capability-execution-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-creator-studio-foundation-v1`
 
 ## Base
 
-`origin/office/platform-ai-service-orchestration-foundation-v1` @ `f5a2613`
+`origin/office/platform-ai-unified-capability-execution-v1` @ `1c504ff`
 
 ## Allowed scope
 
-- `lib/ai/execution/**`
-- `aiService` single-entry wire
-- Admin `/admin/ai/execution-pipeline` + nav
-- Exports + docs
+- `lib/ai/creatorStudio/**`
+- `app/creator/studio/**`
+- `app/admin/ai/creator-studio/**`
+- `app/admin/ai/**` nav links only
+- `app/lib/nav/routes.ts` Creator Studio route only
+- `lib/ai/catalog/definitions.ts` capability binding only
+- `lib/ai/policy/fixtures.ts` policy binding only
+- `lib/ai/index.ts` exports only
+- `docs/ai/**`
 
 ## Forbidden
 
-- Commit / push / inference / network / Gemini / OpenAI / Learning / Commerce / Home / `.env.local`
+- Commit / push / merge
+- Live inference / network / Gemini / OpenAI
+- Commerce / Learning / Home / Private AI rewrites
+- `.env.local` / secrets
 
 ## Done
 
-- Unified request/context/state/result/error/audit/metrics/trace
-- Chains orchestration + adapter/invocation plans
-- `runCapability` enters only via `executeUnifiedCapability`
+- Creator Studio contracts, templates, sessions, drafts, history, versions
+- Unified Capability Execution integration (mock results only)
+- Creator UI `/creator/studio` + Admin `/admin/ai/creator-studio`
+- Tests + docs handoff

@@ -190,6 +190,7 @@ export function buildDefaultBindings(): AiCapabilityPolicyBinding[] {
     "platform.translation_suggest",
     "platform.diagnostics_probe",
     "assistant.runtime_turn",
+    "creator.studio.assist",
     "learning.tutor.explain_lesson",
     "learning.tutor.summarize_lesson",
     "learning.tutor.answer_question",

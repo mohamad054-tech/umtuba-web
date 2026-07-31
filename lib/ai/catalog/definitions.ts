@@ -257,6 +257,30 @@ export function buildBuiltinCapabilityCatalogEntries(): AiCapabilityCatalogEntry
       },
       executionPolicy: { allowStreaming: true },
     }),
+    sharedEntry({
+      capabilityId: "creator.studio.assist",
+      displayName: "Creator Studio Assist",
+      description:
+        "Creator Studio Foundation assist capability (contracts/mock only; no live inference).",
+      category: "creator",
+      owner: "creator",
+      version: "1.0.0",
+      stability: "experimental",
+      visibility: "authenticated",
+      lifecycle: "active",
+      requiredPermissions: ["authenticated"],
+      supportedProviders: sharedProviders,
+      supportedRuntimes: sharedRuntimes,
+      requiredModels: [],
+      structuredOutputSupport: true,
+      streamingSupport: false,
+      documentation: {
+        summary:
+          "Creator Studio Foundation entry via Unified Capability Execution.",
+        docsPath: "lib/ai/creatorStudio/service.ts",
+        sourceModule: "lib/ai/creatorStudio/service.ts",
+      },
+    }),
   ];
 
   const tutors = LEARNING_TUTOR_CAPABILITIES.map((id) =>

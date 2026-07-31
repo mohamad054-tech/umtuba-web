@@ -148,6 +148,35 @@ export type {
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
 
+/** AI Creator Studio Foundation V1 (contracts/mock; unified execution only). */
+export {
+  AI_CREATOR_STUDIO_VERSION,
+  CREATOR_STUDIO_CAPABILITY_ID,
+  CREATOR_TEMPLATE_KINDS,
+  buildCreatorPromptTemplates,
+  creatorStudioStore,
+  creatorStudioTemplateRegistry,
+  resetCreatorStudioFoundation,
+  runCreatorStudioRequest,
+  CREATOR_SUGGESTION_CONTRACT,
+  CREATOR_REWRITE_CONTRACT,
+  CREATOR_TITLE_CONTRACT,
+  CREATOR_DESCRIPTION_CONTRACT,
+  CREATOR_HASHTAG_CONTRACT,
+  CREATOR_SEO_CONTRACT,
+  CREATOR_TRANSLATION_CONTRACT,
+  CREATOR_MODERATION_CONTRACT,
+} from "./creatorStudio";
+export type {
+  CreatorAiSession,
+  CreatorContentRequest,
+  CreatorContentResult,
+  CreatorDraft,
+  CreatorPromptTemplate,
+  CreatorStudioOperation,
+  CreatorTemplateKind,
+} from "./creatorStudio";
+
 /** AI Unified Capability Execution V1 (no live inference). */
 export {
   AI_UNIFIED_EXECUTION_VERSION,

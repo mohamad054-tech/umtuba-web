@@ -86,6 +86,12 @@ export default async function AdminAiCapabilityCatalogPage() {
             Execution
           </Link>
           <Link
+            href="/admin/ai/creator-studio"
+            className="watch-focus-ring rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-bold text-white/70"
+          >
+            Creator Studio
+          </Link>
+          <Link
             href="/admin/private-ai"
             className="watch-focus-ring rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-xs font-bold text-white/70"
           >
