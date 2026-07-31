@@ -13,6 +13,7 @@ const NAV = [
   { href: `${PRIVATE_AI_BASE}/hardware`, label: "Hardware" },
   { href: `${PRIVATE_AI_BASE}/routing`, label: "Routing" },
   { href: `${PRIVATE_AI_BASE}/lifecycle`, label: "Lifecycle" },
+  { href: `${PRIVATE_AI_BASE}/runtime`, label: "Runtime" },
 ] as const;
 
 export default function PrivateAiShell({
@@ -29,7 +30,7 @@ export default function PrivateAiShell({
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav
           title={title}
-          subtitle={subtitle ?? "Private AI Workflow & Lifecycle"}
+          subtitle={subtitle ?? "Private AI Deployment & Runtime"}
         />
         <nav
           aria-label="Private AI"
@@ -64,8 +65,8 @@ export default function PrivateAiShell({
           ))}
         </nav>
         <p className="mt-3 text-xs text-amber-200/80">
-          Workflow-managed registry — admin lifecycle + readiness gate + audit
-          trail. No training, fine-tuning, inference, or model weights.
+          Registry + lifecycle + deployment/runtime contracts. No training,
+          fine-tuning, inference, weights, or live host probes.
         </p>
         <div className="mt-6">{children}</div>
       </div>

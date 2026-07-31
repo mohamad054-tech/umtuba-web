@@ -8,14 +8,25 @@ export type {
   PermissionScope,
   PersistedPrivateAiState,
   PrivateAiAuditTrailEntry,
+  PrivateAiDeploymentState,
   PrivateAiLifecycle,
   PrivateAiPermission,
   PrivateAiReadinessResult,
+  PrivateAiRuntimeRecord,
+  PrivateAiRuntimeState,
   PrivateAiWorkflowAction,
   PrivateModelClass,
   PrivateModelRecord,
   RoutingContract,
   RoutingTargetKind,
+  RuntimeAvailability,
+  RuntimeCostTier,
+  RuntimeDiagnosticRow,
+  RuntimeErrorClass,
+  RuntimeHealthSnapshot,
+  RuntimeReadinessResult,
+  RuntimeSelectionCriteria,
+  RuntimeSelectionResult,
 } from "./types";
 
 export {
@@ -39,6 +50,30 @@ export {
 } from "./readiness";
 
 export { createPrivateAiAuditEntry } from "./audit";
+
+export {
+  assertTransitionDeploymentState,
+  canTransitionDeploymentState,
+  deploymentStateIsRoutable,
+  listAllowedDeploymentTransitions,
+  PRIVATE_AI_DEPLOYMENT_STATE_ORDER,
+} from "./deploymentState";
+
+export {
+  applyRuntimeHealthEvent,
+  availabilityFromHealthStatus,
+  classifyRuntimeError,
+  createEmptyRuntimeHealth,
+} from "./runtimeHealth";
+
+export {
+  evaluateRuntimeReadiness,
+  runtimeMayBecomeDeploymentReady,
+} from "./runtimeReadiness";
+
+export { selectPrivateAiRuntime } from "./runtimeSelection";
+
+export { buildRuntimeDiagnostics } from "./runtimeDiagnostics";
 
 export {
   getHardwareContract,
@@ -78,7 +113,9 @@ export {
   createPrivateAiService,
   getPrivateAiService,
   resetPrivateAiForTests,
+  type AdvanceDeploymentInput,
   type AdvanceLifecycleInput,
   type PrivateAiService,
   type RegisterPrivateModelInput,
+  type RegisterRuntimeInput,
 } from "./service";

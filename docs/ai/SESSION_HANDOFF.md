@@ -1,28 +1,28 @@
-# SESSION_HANDOFF — Private AI Workflow & Lifecycle V1
+# SESSION_HANDOFF — Private AI Deployment & Runtime V1
 
 ## Where
 
-- Worktree: `umtuba-web-private-ai-workflow-lifecycle-v1-final`
-- Branch: `office/platform-private-ai-workflow-lifecycle-v1-final`
-- Base HEAD: `b0655bb` (Shared AI Surface Integration V1)
+- Worktree: `umtuba-web-private-ai-deployment-runtime-v1`
+- Branch: `office/platform-private-ai-deployment-runtime-v1`
+- Base HEAD: `eb9e743` (Private AI Workflow & Lifecycle V1)
 
 ## Prior closed tracks
 
-- Gemini Live Provider V1 — pushed @ `30bda6a`
-- Shared AI Surface Integration V1 — pushed @ `b0655bb`
+- Gemini Live Provider V1
+- Shared AI Surface Integration V1
+- Private AI Workflow & Lifecycle V1
 
 ## Done this session
 
-- Created clean final worktree from Shared AI tip
-- Selective transfer of Private AI lifecycle implementation from older mixed worktree (source left intact)
-- Admin lifecycle transitions, readiness gate, audit trail, write permissions, non-read-only UI
-- Local migration `20260880` present; not remote-applied
-- Focused Private AI tests + `tsc --noEmit`
+- Runtime + deployment contracts (state, health, readiness, selection, failover)
+- Admin diagnostics page `/admin/private-ai/runtime`
+- schemaVersion 3 (`runtimes[]`)
+- Focused vitest suite + `tsc --noEmit`
 
 ## Not done
 
 - Commit / push (await GO)
-- Remote migration apply (explicitly out of scope)
+- Real provisioning / inference (explicitly out of scope)
 
 ## Next GO
 

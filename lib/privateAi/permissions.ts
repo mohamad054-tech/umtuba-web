@@ -53,6 +53,8 @@ export const DEFAULT_PLATFORM_ADMIN_ACTIONS = [
   "return_to_draft",
   "map_capability",
   "audit_read",
+  "runtime_operate",
+  "deployment_update",
 ] as const;
 
 /** True if role may act on resourceId or wildcard "*". */
