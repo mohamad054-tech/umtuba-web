@@ -1,46 +1,39 @@
-# CURSOR_REPORT — Commerce Seller Payout Read Model V1
+# CURSOR_REPORT — Commerce Revenue ↔ Payout Balance Visibility V1
 
 ## Summary
 
-**PASS** — Approved milestone `commerce.settlement.seller_payout_read_model_v1` implemented locally on dedicated branch. Trusted seller payout eligibility, per-currency balance summary, and newest-first history/status over Settlement RELEASED + Payout Foundation states. No bank rails. No Dashboard/AI. Migration `20260882` local only.
+**PASS** — Approved milestone `commerce.revenue.payout_balance_visibility_v1` implemented locally. Revenue Bridge seller visibility loads trusted payout eligibility/summary and exposes per-currency available / in-transit / completed balances. Bank payout execution stays disabled. No migration. No Dashboard/AI.
 
 ## Exact selected milestone
 
-`commerce.settlement.seller_payout_read_model_v1`
+`commerce.revenue.payout_balance_visibility_v1`
 
 ## SSOT approval
 
-Gate proposal converted to active APPROVED implementation after Product GO. Prior tip: Seller Payout Foundation closed @ `aa99592` / handoff `032ac77`.
+Gate proposal converted to active APPROVED implementation after Product GO. Base tip: Seller Payout Read Model `66a8bed`.
 
 ## Exact files changed
 
-- `supabase/migrations/20260882_store_seller_payout_read_model_v1.sql` (new)
-- `lib/store/sellerPayoutReadModel.ts` (new)
-- `lib/store/sellerPayoutReadModel.test.ts` (new)
-- `docs/store/implementation/SELLER_PAYOUT_READ_MODEL_V1.md` (new)
-- `docs/store/implementation/SELLER_PAYOUT_FOUNDATION_V1.md` (cross-link)
+- `lib/store/commerceRevenueBridge.ts`
+- `lib/store/commerceRevenueBridge.test.ts`
+- `app/seller/store/page.tsx`
+- `docs/store/implementation/REVENUE_PAYOUT_BALANCE_VISIBILITY_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/SESSION_HANDOFF.md`
 
 ## Migrations created
 
-`20260882_store_seller_payout_read_model_v1.sql` — **local only, not applied**
+None.
 
 ## Security review
 
-- Owner/manager membership required; fail closed on auth/ownership
-- Store-scoped projection; cross-store returns null / excluded
-- No client money totals; per-currency buckets only
-- Omits fingerprints, journals, metadata, rails, bank fields
-- `bank_payouts_enabled` always false
-
-## Tests / TypeScript / Build
-
-See Final Verification Report.
+- Balances only from authenticated owner/manager payout read RPCs
+- Fail closed when reads unavailable
+- `payoutsEnabled` forced false; rejects unexpected `bankPayoutsEnabled=true`
+- No client money; no sensitive ledger/provider fields
 
 ## Open issues
 
 - Await commit / push GO
-- Await remote apply GO for `20260882`
-- Broad seller payout UI still out of scope
+- Broad payout UI / bank rails still deferred

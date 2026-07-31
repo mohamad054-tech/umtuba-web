@@ -27,7 +27,7 @@ import {
   deriveSellerDashboardAttention,
   deriveStoreReadiness,
 } from "../../../lib/store/sellerDashboardInsights";
-import { buildSellerRevenueBridgeVisibility } from "../../../lib/store/commerceRevenueBridge";
+import { loadSellerRevenueBridgeVisibility } from "../../../lib/store/commerceRevenueBridge";
 import {
   listSellerInventoryRows,
   listSellerStoreReservations,
@@ -184,9 +184,13 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     ? parseFulfillmentDashboardCounts(fulfillmentCountsResult.counts)
     : null;
 
-  const revenueBridge = buildSellerRevenueBridgeVisibility({
-    hasPaidOrdersInWindow: (orderSnapshot?.paidOrderValueMinor ?? 0) > 0,
-  });
+  const revenueBridge = await loadSellerRevenueBridgeVisibility(
+    supabase,
+    membership.store.id,
+    {
+      hasPaidOrdersInWindow: (orderSnapshot?.paidOrderValueMinor ?? 0) > 0,
+    }
+  );
 
   const eligibleProductCount = products.filter(
     (p) => Boolean(p.marketplace_eligible)

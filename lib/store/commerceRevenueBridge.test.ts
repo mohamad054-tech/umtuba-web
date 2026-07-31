@@ -277,17 +277,107 @@ describe("commerce revenue bridge — reconciliation + backfill dry-run", () => 
 });
 
 describe("commerce revenue bridge — seller / admin visibility", () => {
-  it("withholds unsupported payout values", () => {
+  it("withholds unsupported payout values when trusted reads are absent", () => {
     const vis = buildSellerRevenueBridgeVisibility({
       hasPaidOrdersInWindow: true,
     });
     expect(vis.financialLedgerConnected).toBe(true);
     expect(vis.payoutsEnabled).toBe(false);
+    expect(vis.balanceVisibilityEnabled).toBe(false);
+    expect(vis.payoutBalances).toBeNull();
     expect(vis.settlementDecompositionUnavailable).toBe(true);
     for (const key of BRIDGE_WITHHELD_SELLER_VALUES) {
       expect(vis.withheldUnsupportedValues).toContain(key);
     }
-    expect(vis.summaryLines.join(" ")).not.toMatch(/available payout|net earnings/i);
+    expect(vis.capability).toBe("commerce.revenue.payout_balance_visibility_v1");
+  });
+
+  it("exposes trusted available / in-transit / completed balances without enabling bank payouts", () => {
+    const vis = buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: true,
+      payoutSummary: {
+        storeId: STORE_ID,
+        byCurrency: [
+          {
+            currency: "USD",
+            availableMinor: 5000,
+            inTransitMinor: 1500,
+            completedMinor: 2000,
+            availableCount: 1,
+            inTransitCount: 1,
+            completedCount: 1,
+          },
+          {
+            currency: "EUR",
+            availableMinor: 100,
+            inTransitMinor: 0,
+            completedMinor: 0,
+            availableCount: 1,
+            inTransitCount: 0,
+            completedCount: 0,
+          },
+        ],
+        failedEventCount: 2,
+        bankPayoutsEnabled: false,
+        capability: "commerce.settlement.seller_payout_read_model_v1",
+      },
+      payoutEligibility: {
+        storeId: STORE_ID,
+        eligibleForBalanceRead: true,
+        hasAvailableForPayout: true,
+        availableCaptureCount: 2,
+        inTransitCaptureCount: 1,
+        releaseCurrencyCount: 2,
+        bankPayoutsEnabled: false,
+        reasons: ["has_in_transit_payouts"],
+        capability: "commerce.settlement.seller_payout_read_model_v1",
+      },
+    });
+
+    expect(vis.payoutsEnabled).toBe(false);
+    expect(vis.balanceVisibilityEnabled).toBe(true);
+    expect(vis.payoutBalances?.source).toBe(
+      "commerce.settlement.seller_payout_read_model_v1"
+    );
+    expect(vis.payoutBalances?.byCurrency).toEqual([
+      {
+        currency: "USD",
+        availablePayoutMinor: 5000,
+        inTransitMinor: 1500,
+        completedMinor: 2000,
+      },
+      {
+        currency: "EUR",
+        availablePayoutMinor: 100,
+        inTransitMinor: 0,
+        completedMinor: 0,
+      },
+    ]);
+    expect(vis.payoutBalances?.failedEventCount).toBe(2);
+    expect(vis.payoutBalances?.hasAvailableForPayout).toBe(true);
+    expect(vis.withheldUnsupportedValues).not.toContain("available_payout");
+    expect(vis.withheldUnsupportedValues).not.toContain("seller_balance");
+    expect(vis.withheldUnsupportedValues).toContain("commission");
+    expect(vis.withheldUnsupportedValues).toContain("net_earnings");
+    expect(vis.summaryLines.join(" ")).toMatch(/available 5000 USD minor/i);
+    expect(vis.summaryLines.join(" ")).toMatch(/in-transit 1500 USD minor/i);
+    expect(vis.summaryLines.join(" ")).toMatch(/completed 2000 USD minor/i);
+    expect(vis.summaryLines.join(" ")).toMatch(/EUR/);
+    expect(JSON.stringify(vis)).not.toMatch(
+      /ueos_journal|request_fingerprint|bank_account|beneficiary/i
+    );
+  });
+
+  it("fails closed on payout read unavailable and keeps balances withheld", () => {
+    const vis = buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: true,
+      payoutReadUnavailable: true,
+    });
+    expect(vis.balanceVisibilityEnabled).toBe(false);
+    expect(vis.payoutBalances).toBeNull();
+    expect(vis.payoutsEnabled).toBe(false);
+    expect(vis.withheldUnsupportedValues).toContain("available_payout");
+    expect(vis.summaryLines.join(" ")).toMatch(/fail closed/i);
   });
 
   it("exposes bounded admin bridge status without secrets", () => {
@@ -296,5 +386,6 @@ describe("commerce revenue bridge — seller / admin visibility", () => {
     expect(rows.map((r) => r.value).join(" ")).not.toMatch(
       /SERVICE_ROLE_KEY|secret|password/i
     );
+    expect(rows.some((r) => r.label === "Payout balance visibility")).toBe(true);
   });
 });

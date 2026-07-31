@@ -10,6 +10,8 @@
  * - Client money is never authoritative
  * - No Commerce-only ledger / wallet / balance / payout engine
  * - Commission is not fabricated when no trusted policy exists
+ * - Seller payout balance visibility (v1) may surface trusted read-model
+ *   available/in-transit/completed minors; bank payout execution stays disabled
  */
 
 import {
@@ -30,9 +32,19 @@ import {
 import { isValidCurrencyCode, normalizeCurrencyCode } from "./money";
 import { buildMarketplaceRevenueBridgeProvenance } from "./marketplaceSupplierSeller";
 import type { OrderStatus, PaymentStatus } from "./types";
+import {
+  SELLER_PAYOUT_READ_MODEL_ID,
+  fetchMySellerPayoutEligibility,
+  fetchMySellerPayoutSummary,
+  type SellerPayoutEligibility,
+  type SellerPayoutSummary,
+} from "./sellerPayoutReadModel";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const COMMERCE_REVENUE_BRIDGE_VERSION = 1 as const;
 export const COMMERCE_REVENUE_BRIDGE_SOURCE_DOMAIN = "commerce" as const;
+export const COMMERCE_PAYOUT_BALANCE_VISIBILITY_ID =
+  "commerce.revenue.payout_balance_visibility_v1" as const;
 
 export const COMMERCE_FINANCIAL_EVENT_TYPES = [
   "order_confirmed_unpaid",
@@ -207,17 +219,50 @@ export type CommerceRevenueReconciliationIssue = {
 };
 
 /** Seller-facing honest visibility — never invents balances/payouts. */
+export type CommerceRevenueBridgePayoutCurrencyBalance = {
+  currency: string;
+  availablePayoutMinor: number;
+  inTransitMinor: number;
+  completedMinor: number;
+};
+
+export type CommerceRevenueBridgePayoutBalances = {
+  /** True when balances are backed by Seller Payout Read Model RPCs. */
+  balanceVisibilityEnabled: boolean;
+  source: typeof SELLER_PAYOUT_READ_MODEL_ID | "unavailable";
+  byCurrency: CommerceRevenueBridgePayoutCurrencyBalance[];
+  failedEventCount: number;
+  hasAvailableForPayout: boolean;
+};
+
 export type CommerceRevenueBridgeSellerVisibility = {
   financialLedgerConnected: boolean;
   paidOrderValueRecordedHint: string;
   settlementStatus: "pending" | "not_enabled" | "decomposition_unavailable";
   settlementDecompositionUnavailable: boolean;
+  /** Bank/rail execution — remains false until rails exist. */
   payoutsEnabled: boolean;
+  /** True when settled payout balances are visible from trusted reads. */
+  balanceVisibilityEnabled: boolean;
+  payoutBalances: CommerceRevenueBridgePayoutBalances | null;
   /** Explicit withhold list for UI honesty. */
   withheldUnsupportedValues: readonly string[];
   summaryLines: string[];
+  capability: typeof COMMERCE_PAYOUT_BALANCE_VISIBILITY_ID;
 };
 
+/** Always withheld — never invent commission/net/reserve/payout schedule. */
+export const BRIDGE_ALWAYS_WITHHELD_SELLER_VALUES = [
+  "net_earnings",
+  "commission",
+  "reserve",
+  "payout_date",
+] as const;
+
+/**
+ * Historic withhold list (pre balance-visibility). Kept for compatibility
+ * assertions when trusted payout reads are unavailable.
+ */
 export const BRIDGE_WITHHELD_SELLER_VALUES = [
   "available_payout",
   "net_earnings",
@@ -225,6 +270,11 @@ export const BRIDGE_WITHHELD_SELLER_VALUES = [
   "commission",
   "reserve",
   "payout_date",
+] as const;
+
+/** When balance visibility is on, only non-payout-balance fields stay withheld. */
+export const BRIDGE_WITHHELD_WHEN_BALANCE_VISIBLE = [
+  ...BRIDGE_ALWAYS_WITHHELD_SELLER_VALUES,
 ] as const;
 
 function isUuid(value: string): boolean {
@@ -667,10 +717,92 @@ export function planCommerceRevenueBridgePosting(
   };
 }
 
+export function mapTrustedPayoutSummaryToBridgeBalances(
+  summary: SellerPayoutSummary,
+  eligibility?: SellerPayoutEligibility | null
+): CommerceRevenueBridgePayoutBalances {
+  return {
+    balanceVisibilityEnabled: true,
+    source: SELLER_PAYOUT_READ_MODEL_ID,
+    byCurrency: summary.byCurrency.map((b) => ({
+      currency: b.currency,
+      availablePayoutMinor: b.availableMinor,
+      inTransitMinor: b.inTransitMinor,
+      completedMinor: b.completedMinor,
+    })),
+    failedEventCount: summary.failedEventCount,
+    hasAvailableForPayout: Boolean(eligibility?.hasAvailableForPayout),
+  };
+}
+
+function formatMinorHint(amount: number, currency: string): string {
+  return `${amount} ${currency} minor`;
+}
+
 export function buildSellerRevenueBridgeVisibility(input?: {
   hasPaidOrdersInWindow?: boolean;
+  /** Trusted payout summary — never client-authored money. */
+  payoutSummary?: SellerPayoutSummary | null;
+  payoutEligibility?: SellerPayoutEligibility | null;
+  /** True when read-model RPC failed / unavailable (fail closed on balances). */
+  payoutReadUnavailable?: boolean;
 }): CommerceRevenueBridgeSellerVisibility {
   const hasPaid = Boolean(input?.hasPaidOrdersInWindow);
+  const summary = input?.payoutSummary ?? null;
+  const eligibility = input?.payoutEligibility ?? null;
+  const readUnavailable = Boolean(input?.payoutReadUnavailable);
+
+  const balances =
+    !readUnavailable && summary
+      ? mapTrustedPayoutSummaryToBridgeBalances(summary, eligibility)
+      : null;
+
+  const balanceVisibilityEnabled = Boolean(balances?.balanceVisibilityEnabled);
+
+  const withheld = balanceVisibilityEnabled
+    ? BRIDGE_WITHHELD_WHEN_BALANCE_VISIBLE
+    : BRIDGE_WITHHELD_SELLER_VALUES;
+
+  const summaryLines: string[] = [
+    "Financial ledger connected (UEOS + Payment Outcome Sync + Settlement foundations).",
+    hasPaid
+      ? "Paid order value recorded from immutable order money snapshots."
+      : "Paid order value will appear when trusted paid orders exist.",
+    "Settlement decomposition unavailable — no trusted commission policy.",
+    "Bank payout rails are not enabled (payoutsEnabled=false).",
+  ];
+
+  if (balanceVisibilityEnabled && balances) {
+    summaryLines.push(
+      "Settled payout balances are visible from the Seller Payout Read Model (trusted server reads)."
+    );
+    if (balances.byCurrency.length === 0) {
+      summaryLines.push(
+        "No RELEASED settled captures currently project available, in-transit, or completed payout balances."
+      );
+    } else {
+      for (const row of balances.byCurrency) {
+        summaryLines.push(
+          `${row.currency}: available ${formatMinorHint(row.availablePayoutMinor, row.currency)}; in-transit ${formatMinorHint(row.inTransitMinor, row.currency)}; completed ${formatMinorHint(row.completedMinor, row.currency)}.`
+        );
+      }
+    }
+    if (balances.failedEventCount > 0) {
+      summaryLines.push(
+        `Recorded payout fail events: ${balances.failedEventCount} (funds return to available when fail completes).`
+      );
+    }
+  } else if (readUnavailable) {
+    summaryLines.push(
+      "Payout balance visibility unavailable — trusted payout read model did not return (fail closed)."
+    );
+  } else {
+    summaryLines.push(
+      "Settlement pending — merchant escrow/payable posting is not auto-released to payouts."
+    );
+    summaryLines.push("Payout balance fields remain withheld until trusted payout reads are supplied.");
+  }
+
   return {
     financialLedgerConnected: true,
     paidOrderValueRecordedHint: hasPaid
@@ -679,17 +811,56 @@ export function buildSellerRevenueBridgeVisibility(input?: {
     settlementStatus: "decomposition_unavailable",
     settlementDecompositionUnavailable: true,
     payoutsEnabled: false,
-    withheldUnsupportedValues: BRIDGE_WITHHELD_SELLER_VALUES,
-    summaryLines: [
-      "Financial ledger connected (UEOS + Payment Outcome Sync + Settlement foundations).",
-      hasPaid
-        ? "Paid order value recorded from immutable order money snapshots."
-        : "Paid order value will appear when trusted paid orders exist.",
-      "Settlement pending — merchant escrow/payable posting is not auto-released to payouts.",
-      "Settlement decomposition unavailable — no trusted commission policy.",
-      "Payouts are not yet enabled.",
-    ],
+    balanceVisibilityEnabled,
+    payoutBalances: balances,
+    withheldUnsupportedValues: withheld,
+    summaryLines,
+    capability: COMMERCE_PAYOUT_BALANCE_VISIBILITY_ID,
   };
+}
+
+/**
+ * Server-side loader: owner/manager payout reads → Revenue Bridge visibility.
+ * Never accepts client money. Fail closed → balances withheld.
+ */
+export async function loadSellerRevenueBridgeVisibility(
+  supabase: SupabaseClient,
+  storeId: string,
+  options?: { hasPaidOrdersInWindow?: boolean }
+): Promise<CommerceRevenueBridgeSellerVisibility> {
+  const moneyGate = rejectClientBridgeMoneyFields({ store_id: storeId });
+  if (!moneyGate.ok) {
+    return buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: options?.hasPaidOrdersInWindow,
+      payoutReadUnavailable: true,
+    });
+  }
+
+  const [summaryRes, eligibilityRes] = await Promise.all([
+    fetchMySellerPayoutSummary(supabase, storeId),
+    fetchMySellerPayoutEligibility(supabase, storeId),
+  ]);
+
+  if (!summaryRes.ok || !eligibilityRes.ok) {
+    return buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: options?.hasPaidOrdersInWindow,
+      payoutReadUnavailable: true,
+    });
+  }
+
+  if (summaryRes.data.bankPayoutsEnabled || eligibilityRes.data.bankPayoutsEnabled) {
+    // Defense in depth: read model must keep bank rails disabled.
+    return buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: options?.hasPaidOrdersInWindow,
+      payoutReadUnavailable: true,
+    });
+  }
+
+  return buildSellerRevenueBridgeVisibility({
+    hasPaidOrdersInWindow: options?.hasPaidOrdersInWindow,
+    payoutSummary: summaryRes.data,
+    payoutEligibility: eligibilityRes.data,
+  });
 }
 
 export type AdminCommerceBridgeStatusRow = {
@@ -712,8 +883,12 @@ export function buildAdminCommerceBridgeStatus(): AdminCommerceBridgeStatusRow[]
       value: "not_configured (gross facts only; merchant share not assumed)",
     },
     {
-      label: "Payouts",
+      label: "Payouts (bank rails)",
       value: "not_enabled",
+    },
+    {
+      label: "Payout balance visibility",
+      value: "via Seller Payout Read Model (execution still disabled)",
     },
     {
       label: "Posting privilege",
