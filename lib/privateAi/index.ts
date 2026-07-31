@@ -41,6 +41,17 @@ export type {
   InferenceRetryMetadata,
   InferenceStructuredOutputContract,
   InferenceStreamingContract,
+  ExecutionBudgetContract,
+  ExecutionCancellationContract,
+  ExecutionContext,
+  ExecutionErrorContract,
+  ExecutionPlanRecord,
+  ExecutionPlanStatus,
+  ExecutionPolicy,
+  ExecutionQuotaContract,
+  ExecutionSession,
+  ExecutionTimeoutContract,
+  ExecutionTraceMetadata,
 } from "./types";
 
 export {
@@ -118,6 +129,21 @@ export {
 export { validateInferenceRequestContract } from "./inferenceRequestValidation";
 
 export { createInferenceRequestRecord } from "./inferenceRequestFactory";
+
+export {
+  DEFAULT_EXECUTION_POLICY,
+  DEFAULT_EXECUTION_QUOTA,
+  resolveExecutionPolicy,
+  resolveExecutionQuota,
+} from "./executionPolicy";
+
+export { evaluateExecutionGuard } from "./executionGuard";
+
+export {
+  dispatchInferenceExecution,
+  type DispatchExecutionInput,
+  type DispatchExecutionResult,
+} from "./executionDispatcher";
 
 export {
   getHardwareContract,

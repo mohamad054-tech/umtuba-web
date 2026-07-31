@@ -460,8 +460,112 @@ export type InferenceRequestRecord = {
   updatedAt: string;
 };
 
+/** Execution boundary — plans only; never invokes providers/models. */
+export type ExecutionPlanStatus =
+  | "planned"
+  | "queued"
+  | "blocked"
+  | "cancelled"
+  | "failed_before_dispatch";
+
+export type ExecutionPolicy = {
+  requireReadyRuntime: boolean;
+  requireApprovedModelLifecycle: boolean;
+  requireInferencePermission: boolean;
+  allowOfflineRuntime: boolean;
+  maxTimeoutMs: number;
+  defaultTimeoutMs: number;
+};
+
+export type ExecutionQuotaContract = {
+  requestQuota: number;
+  dailyQuota: number;
+  tenantQuota: number;
+  requestsUsed: number;
+  dailyUsed: number;
+  tenantUsed: number;
+};
+
+export type ExecutionBudgetContract = {
+  tokenBudget: number | null;
+  executionBudgetUnits: number;
+  estimatedTokens: number | null;
+  estimatedUnits: number;
+};
+
+export type ExecutionTimeoutContract = {
+  timeoutMs: number;
+  hardDeadlineAt: string | null;
+};
+
+export type ExecutionCancellationContract = {
+  cancellationTokenId: string;
+  cancellable: boolean;
+  cancelRequested: boolean;
+  cancelReason: string | null;
+};
+
+export type ExecutionErrorContract = {
+  code: string;
+  message: string;
+  class:
+    | "guard"
+    | "authorization"
+    | "quota"
+    | "budget"
+    | "timeout"
+    | "cancellation"
+    | "unknown";
+  retriable: boolean;
+};
+
+export type ExecutionTraceMetadata = {
+  traceId: string;
+  spanId: string;
+  parentSpanId: string | null;
+};
+
+export type ExecutionContext = {
+  requestId: string;
+  runtimeId: string;
+  providerId: string;
+  modelId: string;
+  capabilityId: AiCapabilityId;
+  tenantId: string;
+  requester: InferenceRequester;
+  correlationId: string;
+  trace: ExecutionTraceMetadata;
+  policy: ExecutionPolicy;
+  timeout: ExecutionTimeoutContract;
+  quota: ExecutionQuotaContract;
+  budget: ExecutionBudgetContract;
+  cancellation: ExecutionCancellationContract;
+};
+
+export type ExecutionSession = {
+  sessionId: string;
+  requestId: string;
+  openedAt: string;
+  closedAt: string | null;
+  status: ExecutionPlanStatus;
+};
+
+export type ExecutionPlanRecord = {
+  planId: string;
+  requestId: string;
+  status: ExecutionPlanStatus;
+  context: ExecutionContext | null;
+  session: ExecutionSession;
+  guardErrors: string[];
+  error: ExecutionErrorContract | null;
+  selectedRuntimeId: string | null;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 5;
+  schemaVersion: 6;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -474,4 +578,7 @@ export type PersistedPrivateAiState = {
   runtimeIncidents: RuntimeOperationalIncident[];
   runtimeOpsPolicy: RuntimeOpsPolicy;
   inferenceRequests: InferenceRequestRecord[];
+  executionPlans: ExecutionPlanRecord[];
+  executionPolicy: ExecutionPolicy;
+  executionQuota: ExecutionQuotaContract;
 };

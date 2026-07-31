@@ -40,6 +40,16 @@ import {
   createEmptyRuntimeHealth,
 } from "./runtimeHealth";
 import {
+  dispatchInferenceExecution,
+  type DispatchExecutionInput,
+} from "./executionDispatcher";
+import {
+  DEFAULT_EXECUTION_POLICY,
+  DEFAULT_EXECUTION_QUOTA,
+  resolveExecutionPolicy,
+  resolveExecutionQuota,
+} from "./executionPolicy";
+import {
   ensureInferenceRequestDefaults,
   handleAdvanceInferenceRequest,
   handleCancelInferenceRequest,
@@ -76,6 +86,10 @@ import { buildPrivateAiSeedState } from "./seed";
 import type {
   AiCapabilityId,
   DeploymentProfileId,
+  ExecutionBudgetContract,
+  ExecutionPlanRecord,
+  ExecutionPolicy,
+  ExecutionQuotaContract,
   InferenceFailureClass,
   InferenceRequestLifecycle,
   InferenceRequestRecord,
@@ -321,6 +335,13 @@ export type PrivateAiService = {
     requestId: string;
     now?: string;
   }): InferenceRequestRecord;
+  listExecutionPlans(): ExecutionPlanRecord[];
+  getExecutionPlan(planId: string): ExecutionPlanRecord | null;
+  getExecutionPolicy(): ExecutionPolicy;
+  getExecutionQuota(): ExecutionQuotaContract;
+  dispatchExecution(input: DispatchExecutionInput & {
+    budget?: Partial<ExecutionBudgetContract>;
+  }): ExecutionPlanRecord;
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -346,6 +367,9 @@ export function createPrivateAiService(options?: {
       routingContracts: buildDefaultRoutingContracts(),
       runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
       runtimeIncidents: [],
+      executionPlans: [],
+      executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
+      executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
       permissions: [
         createPrivateAiPermission({
           id: "perm_admin_models",
@@ -383,6 +407,12 @@ export function createPrivateAiService(options?: {
         : buildPrivateAiSeedState(now0));
 
   state = ensureInferenceRequestDefaults(ensureRuntimeOpsDefaults(state));
+  state = {
+    ...state,
+    executionPolicy: resolveExecutionPolicy(state.executionPolicy),
+    executionQuota: resolveExecutionQuota(state.executionQuota),
+    executionPlans: state.executionPlans ?? [],
+  };
 
   const persist = () => {
     if (options?.ephemeral) return;
@@ -1031,6 +1061,36 @@ export function createPrivateAiService(options?: {
       state = result.state;
       persist();
       return result.request;
+    },
+
+    listExecutionPlans() {
+      return [...(state.executionPlans ?? [])];
+    },
+
+    getExecutionPlan(planId) {
+      return (
+        (state.executionPlans ?? []).find((p) => p.planId === planId) ?? null
+      );
+    },
+
+    getExecutionPolicy() {
+      return resolveExecutionPolicy(state.executionPolicy);
+    },
+
+    getExecutionQuota() {
+      return resolveExecutionQuota(state.executionQuota);
+    },
+
+    dispatchExecution(input) {
+      const result = dispatchInferenceExecution(state, input);
+      state = {
+        ...state,
+        schemaVersion: 6,
+        executionPlans: [...(state.executionPlans ?? []), result.plan],
+        updatedAt: result.plan.updatedAt,
+      };
+      persist();
+      return result.plan;
     },
 
     checkPermission(input) {

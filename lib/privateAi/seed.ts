@@ -9,6 +9,10 @@ import {
   createPrivateAiPermission,
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
 } from "./permissions";
+import {
+  DEFAULT_EXECUTION_POLICY,
+  DEFAULT_EXECUTION_QUOTA,
+} from "./executionPolicy";
 import { createEmptyRuntimeHealth } from "./runtimeHealth";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
 import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
@@ -166,7 +170,7 @@ export function buildPrivateAiSeedState(
   };
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     updatedAt: now,
     models: [
       {
@@ -193,6 +197,9 @@ export function buildPrivateAiSeedState(
     runtimeIncidents: [],
     runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
     inferenceRequests: [],
+    executionPlans: [],
+    executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
+    executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

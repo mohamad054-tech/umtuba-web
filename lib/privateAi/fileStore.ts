@@ -1,5 +1,9 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "fs";
 import { join } from "path";
+import {
+  DEFAULT_EXECUTION_POLICY,
+  DEFAULT_EXECUTION_QUOTA,
+} from "./executionPolicy";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
 import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 import type {
@@ -26,7 +30,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -39,6 +43,9 @@ export function emptyPrivateAiState(
     runtimeIncidents: [],
     runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
     inferenceRequests: [],
+    executionPlans: [],
+    executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
+    executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
   };
 }
 
@@ -237,7 +244,8 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     version !== 2 &&
     version !== 3 &&
     version !== 4 &&
-    version !== 5
+    version !== 5 &&
+    version !== 6
   ) {
     return null;
   }
@@ -250,7 +258,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     : [];
 
   return {
-    schemaVersion: 5,
+    schemaVersion: 6,
     updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -282,6 +290,17 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     inferenceRequests: Array.isArray(obj.inferenceRequests)
       ? (obj.inferenceRequests as PersistedPrivateAiState["inferenceRequests"])
       : [],
+    executionPlans: Array.isArray(obj.executionPlans)
+      ? (obj.executionPlans as PersistedPrivateAiState["executionPlans"])
+      : [],
+    executionPolicy: {
+      ...DEFAULT_EXECUTION_POLICY,
+      ...((obj.executionPolicy as object) ?? {}),
+    },
+    executionQuota: {
+      ...DEFAULT_EXECUTION_QUOTA,
+      ...((obj.executionQuota as object) ?? {}),
+    },
   };
 }
 
@@ -305,13 +324,16 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 5,
+    schemaVersion: 6,
     runtimes: state.runtimes ?? [],
     runtimeIncidents: state.runtimeIncidents ?? [],
     runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
       ...DEFAULT_RUNTIME_OPS_POLICY,
     },
     inferenceRequests: state.inferenceRequests ?? [],
+    executionPlans: state.executionPlans ?? [],
+    executionPolicy: state.executionPolicy ?? { ...DEFAULT_EXECUTION_POLICY },
+    executionQuota: state.executionQuota ?? { ...DEFAULT_EXECUTION_QUOTA },
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);
