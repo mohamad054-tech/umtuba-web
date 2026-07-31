@@ -116,12 +116,13 @@ Auth gate coverage extended for `/seller` and public `/store`.
 
 1. ~~Categories empty until operators insert `product_categories`~~ — launch taxonomy seeded by `commerce.catalog.category_taxonomy_seed_v1` (`CATEGORY_TAXONOMY_SEED_V1.md`, migration `20260885`)
 2. ~~Trusted availability modes (unlimited / finite / unavailable)~~ — `commerce.inventory.seller_inventory_availability_foundation_v1` (`SELLER_INVENTORY_AVAILABILITY_FOUNDATION_V1.md`); reuses `product_inventory`
-3. Binary media upload deferred
-4. Cart / checkout intentionally disabled
-5. Follow store placeholder only
-6. `database.types.ts` not regenerated; domain uses `lib/store/types.ts`
-7. Catalog query N+1 acceptable for foundation
-8. Full DB RLS e2e depends on local/remote Supabase apply
+3. ~~Single production readiness verdict~~ — `commerce.product.production_readiness_audit_v1` (`PRODUCT_PRODUCTION_READINESS_AUDIT_V1.md`); composes category / inventory / digital / marketplace / confirm gates
+4. Binary media upload deferred
+5. Cart / checkout intentionally disabled
+6. Follow store placeholder only
+7. `database.types.ts` not regenerated; domain uses `lib/store/types.ts`
+8. Catalog query N+1 acceptable for foundation
+9. Full DB RLS e2e depends on local/remote Supabase apply
 
 ## Next phase
 
