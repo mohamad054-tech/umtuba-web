@@ -1,51 +1,44 @@
-# CURSOR_REPORT — Private AI Inference Invocation Orchestration V1
+# CURSOR_REPORT — AI Capability Catalog & Service Registry V1
 
 ## Summary
 
-Built Inference Invocation Orchestration above Adapter Boundary. Attempt lifecycle, timeout/cancellation/retry/idempotency metadata, normalized outcomes, audit, permissions, admin UI. Production adapters non-executable; contract-test fixture opt-in only. schemaVersion 9. Tests + tsc + diff --check PASS. Uncommitted pending GO.
+Built central AI Capability Catalog & Service Registry from real project capabilities only. Registry supports lookup/filter/version negotiation/lifecycle/validation. `aiService` gates on catalog. Admin page at `/admin/ai/capabilities`. No inference/network. Tests + tsc + diff --check PASS. Uncommitted pending GO.
 
 ## Exact files changed
 
+### Added
+
+- `lib/ai/catalog/types.ts`
+- `lib/ai/catalog/definitions.ts`
+- `lib/ai/catalog/validation.ts`
+- `lib/ai/catalog/registry.ts`
+- `lib/ai/catalog/index.ts`
+- `lib/ai/catalog/capabilityCatalogRegistry.test.ts`
+- `app/admin/ai/capabilities/page.tsx`
+
 ### Modified
 
-- `app/admin/private-ai/PrivateAiShell.tsx`
-- `app/admin/private-ai/page.tsx`
-- `lib/privateAi/types.ts`
-- `lib/privateAi/permissions.ts`
-- `lib/privateAi/fileStore.ts`
-- `lib/privateAi/seed.ts`
-- `lib/privateAi/service.ts`
-- `lib/privateAi/index.ts`
-- `lib/privateAi/adapterRegistry.ts`
-- `lib/privateAi/runtimeOpsHandlers.ts`
-- `lib/privateAi/inferenceRequestHandlers.ts`
+- `lib/ai/services/aiService.ts`
+- `lib/ai/index.ts`
+- `app/admin/ai/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-### Added
-
-- `lib/privateAi/invocationLifecycle.ts`
-- `lib/privateAi/invocationOrchestrator.ts`
-- `lib/privateAi/privateAiInferenceInvocationOrchestration.test.ts`
-- `app/admin/private-ai/invocations/page.tsx`
-- `app/admin/private-ai/invocations/actions.ts`
-
 ## Migrations created
 
-None (file SoT schemaVersion 9).
+None.
 
 ## Security review
 
-- Fail-closed transitions; permission gates; redacted diagnostics
-- No secrets in envelopes; production adapters never executed
-- Contract-test requires opt-in + permission
-- Admin behind `requirePrivateAiAdmin`
+- Catalog metadata only; no secrets
+- Fail-closed unknown/non-executable capabilities in aiService
+- Admin behind platform admin auth
 
 ## Tests
 
-58 prior + 17 orchestration = **75 passed** across focused suites.
+`capabilityCatalogRegistry.test.ts` 10 + `sharedAiSurfaceIntegration.test.ts` 11 = **21 passed**
 
 ## TypeScript
 
@@ -59,10 +52,6 @@ Not required.
 
 PASS
 
-## git status --short
-
-Uncommitted feature files; local `node_modules` — do not commit.
-
 ## Open issues
 
-Awaiting user GO for commit/push.
+Awaiting GO for commit/push.

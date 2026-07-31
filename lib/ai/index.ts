@@ -57,6 +57,31 @@ export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
 export { loadAiPlatformConfig, describeAiConfigStatus } from "./config";
 
+/** Central AI Capability Catalog & Service Registry V1 (no inference). */
+export {
+  AiCapabilityServiceRegistry,
+  buildBuiltinCapabilityCatalogEntries,
+  checkCapabilityCompatibility,
+  createCapabilityCatalogRegistry,
+  getCapabilityCatalogRegistry,
+  listExecutableSharedCapabilityIds,
+  resetCapabilityCatalogRegistryForTests,
+  validateCapabilityEntry,
+  versionsCompatible,
+} from "./catalog";
+export type {
+  AiCapabilityCatalogEntry,
+  AiCapabilityCategory,
+  AiCapabilityExecutionSurface,
+  AiCapabilityLifecycle,
+  AiCapabilityStability,
+  AiCapabilityVisibility,
+  CapabilityCompatibilityResult,
+  CapabilityLookupQuery,
+  CapabilityValidationResult,
+  CapabilityVersionNegotiation,
+} from "./catalog";
+
 /** Domain capability (server-side only; no UI). */
 export { runProductDraftAssistant } from "./capabilities/commerce/productDraftAssistant";
 export { loadAiPlatformDiagnostics } from "./capabilities/admin/diagnostics";

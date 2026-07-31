@@ -21,6 +21,7 @@ import {
   runLearningTutorCapability,
   type LearningTutorCapabilityId,
 } from "../capabilities/learning/tutorRunner";
+import { getCapabilityCatalogRegistry } from "../catalog";
 import { loadAiPlatformConfig } from "../config";
 import { recordAiServiceUsageAfterExecution } from "../usage/trackingFoundation";
 
@@ -105,6 +106,12 @@ async function runCapabilityInner(
 ): Promise<AiServiceResult> {
   if (!deps.userId) {
     return asFailure("unauthenticated", "Authentication required.");
+  }
+
+  try {
+    getCapabilityCatalogRegistry().requireExecutable(request.capabilityId);
+  } catch {
+    return asFailure("invalid_input", "Unknown capability.");
   }
 
   if (request.capabilityId === "commerce.product_draft_assistant") {

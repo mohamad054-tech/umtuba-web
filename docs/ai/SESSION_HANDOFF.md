@@ -1,23 +1,19 @@
-# SESSION_HANDOFF — Private AI Inference Invocation Orchestration V1
+# SESSION_HANDOFF — AI Capability Catalog & Service Registry V1
 
 ## Where
 
-- Worktree: `umtuba-web-private-ai-inference-invocation-orchestration-v1`
-- Branch: `office/platform-private-ai-inference-invocation-orchestration-v1`
-- Base / HEAD tip before feature commit: `855b240`
+- Worktree: `umtuba-web-ai-capability-catalog-service-registry-v1`
+- Branch: `office/platform-ai-capability-catalog-service-registry-v1`
+- Base: `16bbaa4`
 
 ## Done
 
-- Invocation contract + lifecycle FSM
-- Orchestrator: plan → resolve → envelope → attempt → normalize (no live invoke)
-- Attempts / retry / exhaustion / cooldown metadata (no worker)
-- Timeout / cancellation / idempotency
-- Result normalization + safe failure handling + audit events
-- Permissions: invocation_create/contract_test/cancel/retry/diagnostics/policy
-- Admin `/admin/private-ai/invocations`
-- schemaVersion 9 (`inferenceInvocations[]`)
-- Contract-test full path opt-in only
-- Vitest orchestration + prior Private AI suites green
+- Central catalog of real Shared AI + Private AI domain + Hub placeholders
+- Service registry: register/unregister/lookup/filter/negotiate/lifecycle
+- Validation: duplicates, providers, runtimes, lifecycle, contracts
+- `aiService.runCapability` fail-closed via `requireExecutable`
+- Admin `/admin/ai/capabilities`
+- Vitest catalog suite + Shared AI surface still green
 
 ## Next GO
 

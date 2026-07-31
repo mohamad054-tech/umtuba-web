@@ -2,15 +2,11 @@
 
 ## Active feature
 
-- **Branch:** `office/platform-private-ai-inference-invocation-orchestration-v1`
-- **Task:** Private AI Inference Invocation Orchestration V1 — complete; not committed
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-inference-invocation-orchestration-v1`
-- **Base:** `855b240` (`origin/office/platform-private-ai-provider-adapter-boundary-v1`)
-
-## Stack (closed / synced)
-
-- … through Private AI Provider Adapter Boundary V1
+- **Branch:** `office/platform-ai-capability-catalog-service-registry-v1`
+- **Task:** AI Capability Catalog & Service Registry V1 — complete; not committed
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-ai-capability-catalog-service-registry-v1`
+- **Base:** `16bbaa4` (`origin/office/platform-private-ai-inference-invocation-orchestration-v1`)
 
 ## Safety
 
-No remote migration; no inference engines; after GO: commit without trailers → push → `0 0`.
+No remote migration; no inference; after GO: commit without trailers → push → `0 0`.
