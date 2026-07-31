@@ -164,8 +164,18 @@ Implements documented follow-up **Trusted-producer transcript integrity** after 
 
 ### Remaining follow-ups
 
-- Structured oversize serialization
 - Conversation history summarization (deferred)
+- Thread Lifecycle Foundation is **not** specified in this SSOT; do not invent it without an explicit milestone update
+
+## Structured Oversize Serialization V1
+
+Milestone: `learning.tutor.structured_oversize_serialization_v1`
+
+| Piece | Detail |
+| --- | --- |
+| Module | `serializeJsonObjectWithinLimit` in `threadPersistenceBridge.ts` |
+| Behavior | Persist assistant JSON within 20k bound without mid-slicing; drop secondary fields then shrink strings; fail closed if unfittable |
+| Compatibility | Persistence / lesson binding / resume history unchanged |
 
 ## Migration status
 
@@ -173,7 +183,7 @@ Implements documented follow-up **Trusted-producer transcript integrity** after 
 - Tutor exchange RPC: `20260872` — **applied** on linked remote
 - Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
 - Tutor lesson binding: `20260874` — closed in Git; remote apply only with GO
-- Tutor resume/history: `20260875` — local only, **not** remote-applied
+- Tutor resume/history: `20260875` — closed in Git; remote apply only with GO
 
 ## Next (after commit approval)
 

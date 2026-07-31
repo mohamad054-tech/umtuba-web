@@ -2,28 +2,24 @@
 
 **Updated:** 2026-07-31
 
-## Active Tutor track (Laptop)
+## Closed
 
-**Closed:** Learning AI Tutor Thread Lesson Binding V1 @ `b85081b`  
-Branch: `office/learning-ai-tutor-thread-lesson-binding-v1` — Committed + Pushed + Sync 0 0
+- Thread Lesson Binding V1 @ `b85081b`
+- Thread Resume / History Read Foundation V1 @ `6930d86`  
+  Branch `office/learning-ai-tutor-thread-resume-history-v1` — Sync 0 0
 
-**Active WIP:** Learning AI Tutor Thread Resume / History Read Foundation V1  
-Branch: `office/learning-ai-tutor-thread-resume-history-v1`  
-Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-thread-resume-history-v1`  
-Base: `b85081b`  
-Status: **verification-pass / STAGED** — no commit/push; migration `20260875` local only
+## Active WIP
 
-## Milestone selected
+**Structured Oversize Serialization V1**  
+Branch: `office/learning-ai-tutor-structured-oversize-serialization-v1`  
+Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-structured-oversize-serialization-v1`  
+Base: `6930d86`  
+Status: verification-pass / STAGED — no commit/push; **no migration**
 
-`learning.tutor.thread_resume_history_read_v1` — implements AI_PLATFORM follow-up **Trusted-producer transcript integrity** after lesson binding.
+## Not next (unless SSOT updated)
 
-## Do not
-
-- Amend/reset closed Lesson Binding commit
-- Work on the closed binding branch
-- Apply migrations remotely without GO
-- Touch Provider / Gemini / Home / Commerce / Profile
+Thread Lifecycle Foundation V1 — **not documented**; do not invent.
 
 ## Next
 
-Manual trailer-free commit from PowerShell in the resume worktree, then push GO, then separate apply GO for `20260875`.
+Manual trailer-free commit, then push GO.

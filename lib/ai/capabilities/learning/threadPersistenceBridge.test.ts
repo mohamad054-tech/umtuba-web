@@ -17,6 +17,7 @@ import {
   mapLearningTutorActionToMessageKind,
   persistLearningTutorExchange,
   serializeAssistantContentForPersistence,
+  serializeJsonObjectWithinLimit,
   serializeLearnerContentForPersistence,
   validateThreadForPersistence,
 } from "./threadPersistenceBridge";
@@ -437,9 +438,49 @@ describe("Thread Persistence Bridge — serialization", () => {
     });
     expect(text).toContain("Simpler view");
     expect(text).toContain("Think of layers.");
+    expect(() => JSON.parse(text!)).not.toThrow();
     expect(text).not.toMatch(
       /mutatesGrades|officialCourseContent|groundingStatus/
     );
+  });
+
+  it("keeps oversize assistant JSON valid instead of mid-slicing", () => {
+    const huge = "A".repeat(LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX);
+    const text = serializeAssistantContentForPersistence("answer_question", {
+      answer: huge,
+      modelId: "should-not-leak",
+    });
+    expect(text).toBeTruthy();
+    expect(text!.length).toBeLessThanOrEqual(
+      LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX
+    );
+    const parsed = JSON.parse(text!) as { answer: string };
+    expect(typeof parsed.answer).toBe("string");
+    expect(parsed.answer.length).toBeGreaterThan(0);
+    expect(text).not.toMatch(/modelId/);
+  });
+
+  it("drops secondary explain_again fields before failing closed", () => {
+    const huge = "B".repeat(Math.floor(LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX * 0.6));
+    const text = serializeAssistantContentForPersistence("explain_again", {
+      title: "T".repeat(2000),
+      simplerExplanation: huge,
+      keyPoints: Array.from({ length: 20 }, () => "point-".repeat(40)),
+      analogy: "analogy-".repeat(400),
+      checkUnderstanding: Array.from({ length: 10 }, () => "q-".repeat(80)),
+    });
+    expect(text).toBeTruthy();
+    expect(text!.length).toBeLessThanOrEqual(
+      LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX
+    );
+    const parsed = JSON.parse(text!) as Record<string, unknown>;
+    expect(typeof parsed.simplerExplanation).toBe("string");
+    // Secondary arrays should be droppable under pressure.
+    expect(parsed.checkUnderstanding).toBeUndefined();
+  });
+
+  it("serializeJsonObjectWithinLimit fails closed when nothing fits", () => {
+    expect(serializeJsonObjectWithinLimit({ answer: "x" }, 1)).toBeNull();
   });
 });
 

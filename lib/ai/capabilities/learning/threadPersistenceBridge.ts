@@ -94,6 +94,76 @@ function clampContent(text: string): string {
   return trimmed.slice(0, LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX);
 }
 
+/**
+ * Encode a plain object as JSON that always stays within the exchange content
+ * bound. Never mid-slices JSON (which would produce invalid transcripts).
+ * Shrinks/drops secondary fields first; fail-closed with null if it cannot fit.
+ */
+export function serializeJsonObjectWithinLimit(
+  value: Record<string, unknown>,
+  maxChars: number = LEARNING_AI_TUTOR_EXCHANGE_CONTENT_MAX
+): string | null {
+  if (maxChars < 2) return null;
+
+  const current: Record<string, unknown> = { ...value };
+
+  const encode = (): string | null => {
+    if (Object.keys(current).length === 0) return null;
+    const json = JSON.stringify(current);
+    if (!json || json === "{}") return null;
+    return json;
+  };
+
+  let json = encode();
+  if (!json) return null;
+  if (json.length <= maxChars) return json;
+
+  // Drop optional / secondary keys before shrinking primary text.
+  const dropOrder = [
+    "checkUnderstanding",
+    "keyPoints",
+    "analogy",
+    "title",
+    "focusRestated",
+    "hintLevel",
+    "nextStep",
+  ] as const;
+  for (const key of dropOrder) {
+    if (!(key in current)) continue;
+    delete current[key];
+    json = encode();
+    if (!json) return null;
+    if (json.length <= maxChars) return json;
+  }
+
+  // Shrink remaining string fields until the payload fits.
+  for (let guard = 0; guard < 64; guard += 1) {
+    if (!json || json.length <= maxChars) break;
+    const stringKeys = Object.keys(current).filter(
+      (k) => typeof current[k] === "string" && (current[k] as string).length > 1
+    );
+    if (stringKeys.length === 0) break;
+
+    const overflow = json.length - maxChars;
+    const perField = Math.max(1, Math.ceil(overflow / stringKeys.length));
+    for (const key of stringKeys) {
+      const text = current[key] as string;
+      current[key] = text.slice(0, Math.max(1, text.length - perField));
+    }
+    json = encode();
+    if (!json) return null;
+  }
+
+  if (!json || json.length > maxChars) return null;
+
+  try {
+    JSON.parse(json);
+  } catch {
+    return null;
+  }
+  return json;
+}
+
 export function isLearningTutorPersistableAction(
   action: LearningTutorIntegrationAction
 ): action is LearningTutorPersistableAction {
@@ -195,9 +265,9 @@ export function serializeAssistantContentForPersistence(
 
   if (Object.keys(clean).length === 0) return null;
 
-  const json = JSON.stringify(clean);
-  if (!json || json === "{}") return null;
-  return clampContent(json);
+  // Structured oversize serialization: keep valid JSON within the DB bound.
+  // Never blindly clamp JSON mid-string (invalid transcript on resume).
+  return serializeJsonObjectWithinLimit(clean);
 }
 
 /**
