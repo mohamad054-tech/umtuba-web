@@ -177,6 +177,30 @@ export function wireCommerceModeration(input: {
   });
 }
 
+export function wireCommerceRefundRequested(input: {
+  orderId: string;
+  storeId: string;
+  paymentAttemptId: string;
+  buyerId?: string | null;
+  sellerId?: string | null;
+}) {
+  return notifyCommerceBestEffort({
+    eventType: "refund_requested",
+    orderId: input.orderId,
+    storeId: input.storeId,
+    paymentId: input.paymentAttemptId,
+    buyerId: input.buyerId,
+    sellerId: input.sellerId,
+    idempotencyKey: buildEventIdempotencyKey({
+      eventType: "refund_requested",
+      orderId: input.orderId,
+      paymentId: input.paymentAttemptId,
+      storeId: input.storeId,
+    }),
+    metadata: { source: "refund_operations" },
+  });
+}
+
 export function wireCommerceRefundCompleted(input: {
   orderId: string;
   storeId: string;
@@ -200,6 +224,62 @@ export function wireCommerceRefundCompleted(input: {
       storeId: input.storeId,
     }),
     metadata: { source: "full_order_refund_path" },
+  });
+}
+
+export function wireCommerceRefundRejected(input: {
+  orderId: string;
+  storeId: string;
+  paymentAttemptId: string;
+  buyerId?: string | null;
+  sellerId?: string | null;
+  reason?: string | null;
+}) {
+  return notifyCommerceBestEffort({
+    eventType: "refund_rejected",
+    orderId: input.orderId,
+    storeId: input.storeId,
+    paymentId: input.paymentAttemptId,
+    buyerId: input.buyerId,
+    sellerId: input.sellerId,
+    idempotencyKey: buildEventIdempotencyKey({
+      eventType: "refund_rejected",
+      orderId: input.orderId,
+      paymentId: input.paymentAttemptId,
+      storeId: input.storeId,
+    }),
+    metadata: {
+      source: "refund_operations",
+      reason: input.reason ? String(input.reason).slice(0, 120) : null,
+    },
+  });
+}
+
+export function wireCommerceRefundFailed(input: {
+  orderId: string;
+  storeId: string;
+  paymentAttemptId: string;
+  buyerId?: string | null;
+  sellerId?: string | null;
+  code?: string | null;
+}) {
+  return notifyCommerceBestEffort({
+    eventType: "refund_failed",
+    orderId: input.orderId,
+    storeId: input.storeId,
+    paymentId: input.paymentAttemptId,
+    buyerId: input.buyerId,
+    sellerId: input.sellerId,
+    idempotencyKey: buildEventIdempotencyKey({
+      eventType: "refund_failed",
+      orderId: input.orderId,
+      paymentId: input.paymentAttemptId,
+      storeId: input.storeId,
+    }),
+    metadata: {
+      source: "refund_operations",
+      code: input.code ? String(input.code).slice(0, 80) : null,
+    },
   });
 }
 

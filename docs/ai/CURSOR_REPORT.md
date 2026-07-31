@@ -2,9 +2,9 @@
 
 ## Summary
 
-**PASS** for `commerce.settlement.seller_payout_rails_v1` on `office/commerce-seller-payout-rails-v1-current` (base `2c11852`, cherry-pick `9a93fc9`).
+**PASS** for `commerce.refund.operations_surface_v1` on `office/commerce-refund-operations-surface-v1-current` (base `b6a3bf6`, cherry-pick `100c98e`).
 
-Contracts + in-memory mock rails only over existing seller payout/settlement read models. No live transfers, Stripe Connect, bank API, wallet mutations, commission, notification, or Stripe payment-config changes.
+Durable refund request/approval/rejection/execution workflow over existing `applyFullOrderRefund`. Admin UI at `/admin/store/refunds`, seller read surface on order detail, notifications for requested/completed/rejected/failed. Migration `20260888` local only — not remote-applied.
 
 ## Completed Commerce chain (closed)
 
@@ -14,38 +14,21 @@ Contracts + in-memory mock rails only over existing seller payout/settlement rea
 4. Commerce Production Integration Preparation V1
 5. Product Production Readiness Audit V1
 6. Live Payment Production Gate V1
-7. Commerce Transactional Notifications V1 (`2c11852`)
-
-## Exact files changed
-
-Modified:
-- `app/admin/store/AdminStoreShell.tsx` — Payouts nav link
-- `app/lib/nav/routes.ts` — `adminStorePayouts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-Added:
-- `app/admin/store/payouts/page.tsx`
-- `docs/store/implementation/SELLER_PAYOUT_RAILS_V1.md`
-- `lib/store/sellerPayoutRails/types.ts`
-- `lib/store/sellerPayoutRails/providers.ts`
-- `lib/store/sellerPayoutRails/engine.ts`
-- `lib/store/sellerPayoutRails/readModels.ts`
-- `lib/store/sellerPayoutRails/index.ts`
-- `lib/store/sellerPayoutRails/sellerPayoutRails.test.ts`
+7. Commerce Transactional Notifications V1
+8. Seller Payout Rails V1 (`b6a3bf6`)
 
 ## Migrations created
 
-None.
+- `supabase/migrations/20260888_store_refund_operations_surface_v1.sql` — local only, not applied to remote
 
 ## Security review
 
-- No secrets / `.env.local` touched
-- `supportsLiveTransfer: false`, `bankRailsEnabled: false`, `liveTransferEnabled: false`
-- Mock execution only; `assertNoLivePayoutTransfer` blocks live provider ids
-- Admin page gated by `assertPlatformAdminDb`
-- No wallet mutations; no network payout I/O
+- Admin gates: `assertPlatformAdminDb` + DEFINER RPCs (`require_platform_admin`)
+- Seller isolation via `can_read_store_order` / store membership; seller UI cannot execute money refunds
+- No client money fields; trusted amount from capture at request create
+- No Stripe secrets; no partial refund; fail-closed transitions
+- Append-only audit events with forbid mutation triggers
 
 ## Boundaries
 
-No AI, no shipping, no commission invention, no remote apply, no push.
+No AI, no shipping, no commission/payout invention, no remote apply, no push.

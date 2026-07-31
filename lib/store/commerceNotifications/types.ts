@@ -19,6 +19,8 @@ export const COMMERCE_NOTIFICATION_EVENT_TYPES = [
   "order_delivered",
   "refund_requested",
   "refund_completed",
+  "refund_rejected",
+  "refund_failed",
   "product_approved",
   "product_rejected",
   "seller_approved",

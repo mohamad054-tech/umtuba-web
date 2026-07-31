@@ -16,6 +16,7 @@ const ALLOWED_PREFIXES = [
   "/admin/store/products",
   "/admin/store/sellers",
   "/admin/store/notifications",
+  "/admin/store/refunds",
   "/notifications",
 ] as const;
 
@@ -55,6 +56,11 @@ export function buildCommerceDeepLink(input: {
     case "order_delivered":
     case "refund_requested":
     case "refund_completed":
+    case "refund_rejected":
+    case "refund_failed":
+      if (role === "platform_admin") {
+        return "/admin/store/refunds";
+      }
       if (role === "buyer" && event.orderId) {
         return `/store/orders/${event.orderId}`;
       }

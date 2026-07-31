@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import FulfillmentAdminPanel from "../../../../components/store/FulfillmentAdminPanel";
 import OrderDetailView from "../../../../components/store/OrderDetailView";
 import SellerOpsShell from "../../../../components/store/SellerOpsShell";
+import SellerRefundOperationsPanel from "../../../../components/store/SellerRefundOperationsPanel";
 import StoreErrorState from "../../../../components/store/StoreErrorState";
 import { APP_ROUTES } from "../../../../lib/nav";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
@@ -17,6 +18,7 @@ import {
   getOrderFulfillment,
   listOrderShipments,
 } from "../../../../../lib/store/promotionsFulfillment";
+import { loadSellerRefundOperationsForOrder } from "../../../../../lib/store/refundOperations";
 import { getOwnedOrMemberStore } from "../../../../../lib/store/sellerStore";
 
 export const metadata = {
@@ -69,6 +71,12 @@ export default async function SellerStoreOrderDetailPage({
     : null;
   const shipmentsResult = result.ok
     ? await listOrderShipments(supabase, orderId)
+    : null;
+  const refundOpsResult = result.ok
+    ? await loadSellerRefundOperationsForOrder(supabase, {
+        storeId: membership.store.id,
+        orderId,
+      })
     : null;
 
   const attention = result.ok
@@ -180,6 +188,10 @@ export default async function SellerStoreOrderDetailPage({
               />
             </div>
           </div>
+
+          {refundOpsResult && "requests" in refundOpsResult ? (
+            <SellerRefundOperationsPanel surface={refundOpsResult} />
+          ) : null}
         </>
       )}
     </SellerOpsShell>

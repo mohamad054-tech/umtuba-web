@@ -13,6 +13,7 @@ const LINKS = [
   { href: APP_ROUTES.adminStoreReservations, label: "Reservations" },
   { href: APP_ROUTES.adminStoreNotifications, label: "Notifications" },
   { href: APP_ROUTES.adminStorePayouts, label: "Payouts" },
+  { href: APP_ROUTES.adminStoreRefunds, label: "Refunds" },
 ] as const;
 
 type Props = {

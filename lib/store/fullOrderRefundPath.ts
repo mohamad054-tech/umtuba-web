@@ -115,6 +115,9 @@ export type FullOrderRefundInput = {
   paymentAttemptId: string;
   /** Claim-first Sync refund event_key (8..128). */
   idempotencyKey: string;
+  /** Optional notify recipients (never money). */
+  buyerId?: string | null;
+  sellerId?: string | null;
   /**
    * Optional assertion only — must match trusted capture currency.
    * Never used as the money source of truth.
@@ -848,6 +851,8 @@ export async function applyFullOrderRefund(
     orderId: ctx.orderId,
     storeId: ctx.storeId,
     paymentAttemptId: ctx.paymentAttemptId,
+    buyerId: input.buyerId,
+    sellerId: input.sellerId,
     correlationId: ctx.correlationId,
   });
 
