@@ -52,6 +52,8 @@ const COMMERCE = new Set([
   "commerce_order_delivered",
   "commerce_refund_requested",
   "commerce_refund_completed",
+  "commerce_refund_rejected",
+  "commerce_refund_failed",
   "commerce_product_approved",
   "commerce_product_rejected",
   "commerce_seller_approved",

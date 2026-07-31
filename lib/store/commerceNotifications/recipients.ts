@@ -20,6 +20,8 @@ const ROLE_MAP: Record<
   order_delivered: ["buyer", "seller"],
   refund_requested: ["buyer", "seller"],
   refund_completed: ["buyer", "seller"],
+  refund_rejected: ["buyer", "seller"],
+  refund_failed: ["buyer", "seller"],
   product_approved: ["seller", "platform_admin"],
   product_rejected: ["seller", "platform_admin"],
   seller_approved: ["seller", "platform_admin"],

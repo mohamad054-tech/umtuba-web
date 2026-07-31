@@ -2,43 +2,29 @@
 
 ## Summary
 
-**PASS** for **Commerce Seller Payout Rails V1** (`commerce.settlement.seller_payout_rails_v1`).
+**PASS** for **Commerce Refund Operations Surface V1**.
 
-Closed the Seller Payout Rails gap from Commerce Completion Audit with contracts + in-memory mock rails only. No live transfers, Stripe Connect, bank API, wallet mutations, commission, notifications, AI, Learning, or Home changes. Work left **uncommitted / unpushed** pending human GO.
+Durable refund request/approval/rejection/execution workflow over existing `applyFullOrderRefund`. Admin UI at `/admin/store/refunds`, seller read surface on order detail, notifications for requested/completed/rejected/failed. Migration `20260888` created locally and **not** remote-applied. Work left **uncommitted / unpushed**.
 
 ## Exact files changed
 
-Modified:
-- `app/admin/store/AdminStoreShell.tsx` — Payouts nav link
-- `app/lib/nav/routes.ts` — `adminStorePayouts`
-
-Added:
-- `app/admin/store/payouts/page.tsx`
-- `docs/store/implementation/SELLER_PAYOUT_RAILS_V1.md`
-- `lib/store/sellerPayoutRails/types.ts`
-- `lib/store/sellerPayoutRails/providers.ts`
-- `lib/store/sellerPayoutRails/engine.ts`
-- `lib/store/sellerPayoutRails/readModels.ts`
-- `lib/store/sellerPayoutRails/index.ts`
-- `lib/store/sellerPayoutRails/sellerPayoutRails.test.ts`
+See git status in Final Verification Report.
 
 ## Migrations created
 
-None.
+- `supabase/migrations/20260888_store_refund_operations_surface_v1.sql` — local only, not applied to remote
 
 ## Security review
 
-- No secrets / `.env.local` touched
-- `supportsLiveTransfer: false`, `bankRailsEnabled: false`, `liveTransferEnabled: false`
-- Mock execution only; `assertNoLivePayoutTransfer` blocks live provider ids
-- Admin page gated by `assertPlatformAdminDb`
-- No wallet mutations; no network payout I/O
+- Admin gates: `assertPlatformAdminDb` + DEFINER RPCs (`require_platform_admin`)
+- Seller isolation via `can_read_store_order` / store membership; seller UI cannot execute money refunds
+- No client money fields; trusted amount from capture at request create
+- No Stripe secrets; no partial refund; fail-closed transitions
+- Append-only audit events with forbid mutation triggers
 
 ## Tests
 
-`npx vitest run lib/store/sellerPayoutRails/sellerPayoutRails.test.ts` — **7 passed**
-
-Coverage: provider contracts, eligibility, request + idempotency, batch + mock execution, history + read models, failures, architecture guard.
+Focused suite: **64 passed** (`refundOperations` 13 + `fullOrderRefundPath` 22 + commerce notifications 13 + paymentOutcomeSync 16)
 
 ## TypeScript
 
@@ -46,24 +32,18 @@ Coverage: provider contracts, eligibility, request + idempotency, batch + mock e
 
 ## Build
 
-Not required (admin diagnostics + lib contracts; no public entry rewrite).
+Not required for this surface.
 
 ## git diff --check
 
-**PASS** (clean)
+**PASS**
 
 ## git status --short
 
-```
- M app/admin/store/AdminStoreShell.tsx
- M app/lib/nav/routes.ts
-?? app/admin/store/payouts/
-?? docs/store/implementation/SELLER_PAYOUT_RAILS_V1.md
-?? lib/store/sellerPayoutRails/
-```
+Uncommitted (see Final Verification Report).
 
 ## Open issues
 
-- Rails engine is in-process memory only (not persisted); production persistence / real providers are out of scope
-- Existing ledger booking (`sellerPayoutFoundation` / migrations 20260881+) unchanged; rails layer does not yet bridge to RPC booking
-- Laptop Commission Policy Activation work must remain untouched
+- Migration not applied remotely (by design until human GO)
+- Number collision risk with laptop commission branch (`20260887` already diverged there); this slice uses `20260888`
+- Stripe PSP refund rail still out of scope (Sync finalize after trusted confirmation)

@@ -66,6 +66,7 @@ export const APP_ROUTES = {
   adminStoreReservations: "/admin/store/reservations",
   adminStoreNotifications: "/admin/store/notifications",
   adminStorePayouts: "/admin/store/payouts",
+  adminStoreRefunds: "/admin/store/refunds",
 } as const;
 
 /** Campaign detail workspace under Advertise. */
