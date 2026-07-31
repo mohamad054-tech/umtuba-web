@@ -13,8 +13,9 @@ export default async function PrivateAiRoutingPage() {
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-lg font-black">Routing contracts</h1>
         <p className="mt-2 text-sm text-white/50">
-          Future routing between providers and private models — not implemented
-          at runtime.
+          Capability routing contracts (primary/fallback targets). Provider
+          selection policy lives under Provider policy — decision only, no
+          inference.
         </p>
         <ul className="mt-4 divide-y divide-white/10">
           {routes.map((r) => (

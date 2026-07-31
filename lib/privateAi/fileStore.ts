@@ -4,6 +4,7 @@ import {
   DEFAULT_EXECUTION_POLICY,
   DEFAULT_EXECUTION_QUOTA,
 } from "./executionPolicy";
+import { DEFAULT_PROVIDER_ROUTING_POLICY } from "./providerRoutingPolicy";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
 import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
 import type {
@@ -30,7 +31,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -46,6 +47,8 @@ export function emptyPrivateAiState(
     executionPlans: [],
     executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
     executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
+    providerRoutingPolicy: { ...DEFAULT_PROVIDER_ROUTING_POLICY },
+    providerRoutingEvaluations: [],
   };
 }
 
@@ -245,7 +248,8 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     version !== 3 &&
     version !== 4 &&
     version !== 5 &&
-    version !== 6
+    version !== 6 &&
+    version !== 7
   ) {
     return null;
   }
@@ -258,7 +262,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     : [];
 
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -301,6 +305,25 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
       ...DEFAULT_EXECUTION_QUOTA,
       ...((obj.executionQuota as object) ?? {}),
     },
+    providerRoutingPolicy: {
+      ...DEFAULT_PROVIDER_ROUTING_POLICY,
+      ...((obj.providerRoutingPolicy as object) ?? {}),
+      providers:
+        (obj.providerRoutingPolicy as { providers?: unknown } | undefined)
+          ?.providers &&
+        Array.isArray(
+          (obj.providerRoutingPolicy as { providers: unknown }).providers
+        )
+          ? (
+              obj.providerRoutingPolicy as {
+                providers: PersistedPrivateAiState["providerRoutingPolicy"]["providers"];
+              }
+            ).providers
+          : DEFAULT_PROVIDER_ROUTING_POLICY.providers,
+    },
+    providerRoutingEvaluations: Array.isArray(obj.providerRoutingEvaluations)
+      ? (obj.providerRoutingEvaluations as PersistedPrivateAiState["providerRoutingEvaluations"])
+      : [],
   };
 }
 
@@ -324,7 +347,7 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 6,
+    schemaVersion: 7,
     runtimes: state.runtimes ?? [],
     runtimeIncidents: state.runtimeIncidents ?? [],
     runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
@@ -334,6 +357,9 @@ export function writePersistedPrivateAiState(
     executionPlans: state.executionPlans ?? [],
     executionPolicy: state.executionPolicy ?? { ...DEFAULT_EXECUTION_POLICY },
     executionQuota: state.executionQuota ?? { ...DEFAULT_EXECUTION_QUOTA },
+    providerRoutingPolicy:
+      state.providerRoutingPolicy ?? { ...DEFAULT_PROVIDER_ROUTING_POLICY },
+    providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);

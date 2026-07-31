@@ -564,8 +564,69 @@ export type ExecutionPlanRecord = {
   updatedAt: string;
 };
 
+/** Provider routing policy — selection only; never invokes providers. */
+export type ProviderCatalogEntry = {
+  id: string;
+  label: string;
+  /** Lower number = higher priority. */
+  priority: number;
+  capabilities: AiCapabilityId[];
+  regions: string[];
+  costTier: RuntimeCostTier;
+  enabled: boolean;
+  notes: string;
+};
+
+export type ProviderRoutingPolicy = {
+  version: string;
+  providers: ProviderCatalogEntry[];
+  /** null = all non-blacklisted providers allowed */
+  whitelist: string[] | null;
+  blacklist: string[];
+  preferredProviderId: string | null;
+  fallbackProviderIds: string[];
+  tenantPreferredProviders: Record<string, string>;
+  manualOverrideProviderId: string | null;
+  preferCostTier: RuntimeCostTier | null;
+  /** Reject providers above this cost tier (budget policy). null = no max. */
+  maxCostTier: RuntimeCostTier | null;
+  preferRegion: string | null;
+  respectMaintenance: boolean;
+  respectCooldown: boolean;
+  respectHealth: boolean;
+  /** Suppress providers whose runtime recently failed over (ops window). */
+  respectFailureSuppression: boolean;
+  allowPremiumCost: boolean;
+};
+
+export type ProviderRoutingCriteria = {
+  capabilityId: AiCapabilityId;
+  tenantId?: string | null;
+  region?: string | null;
+  preferCostTier?: RuntimeCostTier | null;
+  preferredProviderId?: string | null;
+  now?: string;
+};
+
+export type ProviderRoutingRejection = {
+  providerId: string;
+  runtimeId: string | null;
+  reasons: string[];
+};
+
+export type ProviderRoutingResult = {
+  selectedProviderId: string | null;
+  selectedRuntimeId: string | null;
+  selectionReason: string;
+  rejected: ProviderRoutingRejection[];
+  fallbackChain: string[];
+  policyVersion: string;
+  confidence: number;
+  evaluatedAt: string;
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 6;
+  schemaVersion: 7;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -581,4 +642,6 @@ export type PersistedPrivateAiState = {
   executionPlans: ExecutionPlanRecord[];
   executionPolicy: ExecutionPolicy;
   executionQuota: ExecutionQuotaContract;
+  providerRoutingPolicy: ProviderRoutingPolicy;
+  providerRoutingEvaluations: ProviderRoutingResult[];
 };

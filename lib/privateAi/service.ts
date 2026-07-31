@@ -49,6 +49,11 @@ import {
   resolveExecutionPolicy,
   resolveExecutionQuota,
 } from "./executionPolicy";
+import { evaluateProviderRouting } from "./providerRoutingEngine";
+import {
+  DEFAULT_PROVIDER_ROUTING_POLICY,
+  resolveProviderRoutingPolicy,
+} from "./providerRoutingPolicy";
 import {
   ensureInferenceRequestDefaults,
   handleAdvanceInferenceRequest,
@@ -113,6 +118,10 @@ import type {
   RuntimeOpsPolicy,
   RuntimeOverrideMode,
   RuntimeReadinessResult,
+  ProviderCatalogEntry,
+  ProviderRoutingCriteria,
+  ProviderRoutingPolicy,
+  ProviderRoutingResult,
   RuntimeSelectionCriteria,
   RuntimeSelectionResult,
 } from "./types";
@@ -342,6 +351,15 @@ export type PrivateAiService = {
   dispatchExecution(input: DispatchExecutionInput & {
     budget?: Partial<ExecutionBudgetContract>;
   }): ExecutionPlanRecord;
+  getProviderRoutingPolicy(): ProviderRoutingPolicy;
+  listProviderCatalog(): ProviderCatalogEntry[];
+  listProviderRoutingEvaluations(): ProviderRoutingResult[];
+  evaluateProviderRouting(
+    criteria: ProviderRoutingCriteria
+  ): ProviderRoutingResult;
+  updateProviderRoutingPolicy(
+    patch: Partial<ProviderRoutingPolicy>
+  ): ProviderRoutingPolicy;
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -370,6 +388,8 @@ export function createPrivateAiService(options?: {
       executionPlans: [],
       executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
       executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
+      providerRoutingPolicy: { ...DEFAULT_PROVIDER_ROUTING_POLICY },
+      providerRoutingEvaluations: [],
       permissions: [
         createPrivateAiPermission({
           id: "perm_admin_models",
@@ -409,9 +429,14 @@ export function createPrivateAiService(options?: {
   state = ensureInferenceRequestDefaults(ensureRuntimeOpsDefaults(state));
   state = {
     ...state,
+    schemaVersion: 7,
     executionPolicy: resolveExecutionPolicy(state.executionPolicy),
     executionQuota: resolveExecutionQuota(state.executionQuota),
     executionPlans: state.executionPlans ?? [],
+    providerRoutingPolicy: resolveProviderRoutingPolicy(
+      state.providerRoutingPolicy
+    ),
+    providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
   };
 
   const persist = () => {
@@ -1085,12 +1110,54 @@ export function createPrivateAiService(options?: {
       const result = dispatchInferenceExecution(state, input);
       state = {
         ...state,
-        schemaVersion: 6,
+        schemaVersion: 7,
         executionPlans: [...(state.executionPlans ?? []), result.plan],
         updatedAt: result.plan.updatedAt,
       };
       persist();
       return result.plan;
+    },
+
+    getProviderRoutingPolicy() {
+      return resolveProviderRoutingPolicy(state.providerRoutingPolicy);
+    },
+
+    listProviderCatalog() {
+      return [...resolveProviderRoutingPolicy(state.providerRoutingPolicy).providers];
+    },
+
+    listProviderRoutingEvaluations() {
+      return [...(state.providerRoutingEvaluations ?? [])];
+    },
+
+    evaluateProviderRouting(criteria) {
+      const result = evaluateProviderRouting(state, criteria);
+      state = {
+        ...state,
+        schemaVersion: 7,
+        providerRoutingEvaluations: [
+          result,
+          ...(state.providerRoutingEvaluations ?? []),
+        ].slice(0, 100),
+        updatedAt: result.evaluatedAt,
+      };
+      persist();
+      return result;
+    },
+
+    updateProviderRoutingPolicy(patch) {
+      const next = resolveProviderRoutingPolicy({
+        ...resolveProviderRoutingPolicy(state.providerRoutingPolicy),
+        ...patch,
+      });
+      state = {
+        ...state,
+        schemaVersion: 7,
+        providerRoutingPolicy: next,
+        updatedAt: new Date().toISOString(),
+      };
+      persist();
+      return next;
     },
 
     checkPermission(input) {

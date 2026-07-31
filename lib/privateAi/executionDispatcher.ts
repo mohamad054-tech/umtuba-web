@@ -4,7 +4,7 @@ import {
   resolveExecutionPolicy,
   resolveExecutionQuota,
 } from "./executionPolicy";
-import { selectPrivateAiRuntime } from "./runtimeSelection";
+import { evaluateProviderRouting } from "./providerRoutingEngine";
 import { validateInferenceRequestContract } from "./inferenceRequestValidation";
 import type {
   ExecutionBudgetContract,
@@ -152,17 +152,20 @@ export function dispatchInferenceExecution(
     input.selectRuntimeIfMissing !== false &&
     !working.runtimeId
   ) {
-    const selected = selectPrivateAiRuntime(state, {
+    const routed = evaluateProviderRouting(state, {
       capabilityId: working.capabilityId,
-      providerHint: working.providerId,
-      requireAvailable: true,
+      tenantId: working.requester.tenantId,
+      preferredProviderId: working.providerId,
+      preferCostTier: working.costTier,
+      now,
     });
-    if (selected.selected) {
+    if (routed.selectedRuntimeId) {
+      const rt = state.runtimes.find((r) => r.id === routed.selectedRuntimeId);
       working = {
         ...working,
-        runtimeId: selected.selected.id,
-        modelId: working.modelId ?? selected.selected.modelId,
-        providerId: working.providerId ?? selected.selected.providerHint,
+        runtimeId: routed.selectedRuntimeId,
+        modelId: working.modelId ?? rt?.modelId ?? null,
+        providerId: working.providerId ?? routed.selectedProviderId,
       };
     }
   }

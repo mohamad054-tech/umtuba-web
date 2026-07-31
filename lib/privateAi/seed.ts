@@ -13,6 +13,7 @@ import {
   DEFAULT_EXECUTION_POLICY,
   DEFAULT_EXECUTION_QUOTA,
 } from "./executionPolicy";
+import { DEFAULT_PROVIDER_ROUTING_POLICY } from "./providerRoutingPolicy";
 import { createEmptyRuntimeHealth } from "./runtimeHealth";
 import { DEFAULT_RUNTIME_OPS_POLICY } from "./runtimeOpsPolicy";
 import { createEmptyRuntimeOpsState } from "./runtimeOpsState";
@@ -170,7 +171,7 @@ export function buildPrivateAiSeedState(
   };
 
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     updatedAt: now,
     models: [
       {
@@ -200,6 +201,16 @@ export function buildPrivateAiSeedState(
     executionPlans: [],
     executionPolicy: { ...DEFAULT_EXECUTION_POLICY },
     executionQuota: { ...DEFAULT_EXECUTION_QUOTA },
+    providerRoutingPolicy: {
+      ...DEFAULT_PROVIDER_ROUTING_POLICY,
+      providers: [...DEFAULT_PROVIDER_ROUTING_POLICY.providers],
+      blacklist: [],
+      fallbackProviderIds: [
+        ...DEFAULT_PROVIDER_ROUTING_POLICY.fallbackProviderIds,
+      ],
+      tenantPreferredProviders: {},
+    },
+    providerRoutingEvaluations: [],
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

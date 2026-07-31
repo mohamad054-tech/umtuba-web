@@ -3,6 +3,7 @@ import { decideRuntimeFailover } from "./runtimeFailoverOps";
 import { evaluateRuntimeFailureDetection } from "./runtimeFailureDetection";
 import { applyRuntimeHealthEvent } from "./runtimeHealth";
 import { createRuntimeIncident } from "./runtimeIncidents";
+import { resolveProviderRoutingPolicy } from "./providerRoutingPolicy";
 import {
   cooldownUntilFrom,
   resolveRuntimeOpsPolicy,
@@ -25,7 +26,7 @@ function replaceRuntime(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 6,
+    schemaVersion: 7,
     runtimes: state.runtimes.map((r) => (r.id === updated.id ? updated : r)),
     runtimeIncidents: incident
       ? [...(state.runtimeIncidents ?? []), incident]
@@ -39,7 +40,7 @@ export function ensureRuntimeOpsDefaults(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 6,
+    schemaVersion: 7,
     runtimes: (state.runtimes ?? []).map((r) => ({
       ...r,
       ops: r.ops ?? createEmptyRuntimeOpsState(),
@@ -57,6 +58,10 @@ export function ensureRuntimeOpsDefaults(
     executionPlans: state.executionPlans ?? [],
     executionPolicy: state.executionPolicy,
     executionQuota: state.executionQuota,
+    providerRoutingPolicy: resolveProviderRoutingPolicy(
+      state.providerRoutingPolicy
+    ),
+    providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
   };
 }
 

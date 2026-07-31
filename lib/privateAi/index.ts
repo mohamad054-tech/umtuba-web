@@ -52,6 +52,11 @@ export type {
   ExecutionSession,
   ExecutionTimeoutContract,
   ExecutionTraceMetadata,
+  ProviderCatalogEntry,
+  ProviderRoutingCriteria,
+  ProviderRoutingPolicy,
+  ProviderRoutingRejection,
+  ProviderRoutingResult,
 } from "./types";
 
 export {
@@ -144,6 +149,14 @@ export {
   type DispatchExecutionInput,
   type DispatchExecutionResult,
 } from "./executionDispatcher";
+
+export {
+  DEFAULT_PROVIDER_CATALOG,
+  DEFAULT_PROVIDER_ROUTING_POLICY,
+  resolveProviderRoutingPolicy,
+} from "./providerRoutingPolicy";
+
+export { evaluateProviderRouting } from "./providerRoutingEngine";
 
 export {
   getHardwareContract,

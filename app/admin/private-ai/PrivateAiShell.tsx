@@ -12,6 +12,10 @@ const NAV = [
   { href: `${PRIVATE_AI_BASE}/deployments`, label: "Deployments" },
   { href: `${PRIVATE_AI_BASE}/hardware`, label: "Hardware" },
   { href: `${PRIVATE_AI_BASE}/routing`, label: "Routing" },
+  {
+    href: `${PRIVATE_AI_BASE}/provider-routing`,
+    label: "Provider policy",
+  },
   { href: `${PRIVATE_AI_BASE}/lifecycle`, label: "Lifecycle" },
   { href: `${PRIVATE_AI_BASE}/runtime`, label: "Runtime" },
   { href: `${PRIVATE_AI_BASE}/inference`, label: "Inference" },
@@ -32,7 +36,7 @@ export default function PrivateAiShell({
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav
           title={title}
-          subtitle={subtitle ?? "Private AI Inference Execution Boundary"}
+          subtitle={subtitle ?? "Private AI Provider Routing Policy"}
         />
         <nav
           aria-label="Private AI"

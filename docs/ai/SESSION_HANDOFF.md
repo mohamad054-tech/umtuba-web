@@ -1,17 +1,20 @@
-# SESSION_HANDOFF — Private AI Inference Execution Boundary V1
+# SESSION_HANDOFF — Private AI Provider Routing Policy V1
 
 ## Where
 
-- Worktree: `umtuba-web-private-ai-inference-execution-boundary-v1`
-- Branch: `office/platform-private-ai-inference-execution-boundary-v1`
-- Base: `ba0cca4`
+- Worktree: `umtuba-web-private-ai-provider-routing-policy-v1`
+- Branch: `office/platform-private-ai-provider-routing-policy-v1`
+- Base / HEAD tip before feature commit: `14ce7fd`
 
 ## Done
 
-- Execution context/session/policy/guard/dispatcher/result contracts
-- Quota/budget/timeout/cancellation metadata
-- Admin `/admin/private-ai/execution`
-- schemaVersion 6 (file SoT; no SQL migration)
+- Provider Routing Policy Engine (`evaluateProviderRouting`) — decision only
+- Policy: priority, capability, readiness, deployment, health, cost/region, tenant, override, preferred, fallback, black/white lists, maintenance, cooldown, failure suppression, budget max cost
+- Result: selected provider/runtime, reason, rejections, fallback chain, policy version, confidence
+- Dispatcher uses routing when `runtimeId` missing
+- Admin `/admin/private-ai/provider-routing`
+- schemaVersion 7 (file SoT; no SQL migration)
+- Vitest: `privateAiProviderRoutingPolicy.test.ts` (12) + boundary suite still green
 
 ## Next GO
 

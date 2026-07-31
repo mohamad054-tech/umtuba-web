@@ -12,13 +12,13 @@ export default async function PrivateAiOverviewPage() {
   return (
     <PrivateAiShell
       title="Private AI"
-      subtitle="Inference Execution Boundary V1"
+      subtitle="Provider Routing Policy V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-xl font-black">Private AI platform</h1>
         <p className="mt-2 text-sm text-white/55">
-          Registry, lifecycle, and deployment/runtime contracts — no training,
-          fine-tuning, inference, or weights.
+          Registry, lifecycle, deployment/runtime, and provider routing policy —
+          no training, fine-tuning, inference, or weights.
         </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           {[
@@ -28,6 +28,10 @@ export default async function PrivateAiOverviewPage() {
             ["Runtimes", state.runtimes.length],
             ["Hardware", state.hardwareContracts.length],
             ["Routing", state.routingContracts.length],
+            [
+              "Providers",
+              state.providerRoutingPolicy?.providers?.length ?? 0,
+            ],
             ["Permissions", state.permissions.length],
             ["Audit events", state.auditTrail.length],
             [
@@ -45,6 +49,10 @@ export default async function PrivateAiOverviewPage() {
             ],
             ["Inference requests", state.inferenceRequests?.length ?? 0],
             ["Execution plans", state.executionPlans?.length ?? 0],
+            [
+              "Routing evals",
+              state.providerRoutingEvaluations?.length ?? 0,
+            ],
           ].map(([label, value]) => (
             <div key={String(label)}>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">

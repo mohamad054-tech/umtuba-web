@@ -25,7 +25,7 @@ function replaceRequest(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 6,
+    schemaVersion: 7,
     inferenceRequests: (state.inferenceRequests ?? []).map((r) =>
       r.requestId === updated.requestId ? updated : r
     ),
@@ -38,9 +38,10 @@ export function ensureInferenceRequestDefaults(
 ): PersistedPrivateAiState {
   return {
     ...state,
-    schemaVersion: 6,
+    schemaVersion: 7,
     inferenceRequests: state.inferenceRequests ?? [],
     executionPlans: state.executionPlans ?? [],
+    providerRoutingEvaluations: state.providerRoutingEvaluations ?? [],
   };
 }
 
@@ -124,7 +125,7 @@ export function handleCreateInferenceRequest(
   return {
     state: {
       ...state,
-      schemaVersion: 6,
+      schemaVersion: 7,
       inferenceRequests: [...(state.inferenceRequests ?? []), withAudit],
       auditTrail: [...state.auditTrail, audit],
       updatedAt: now,
