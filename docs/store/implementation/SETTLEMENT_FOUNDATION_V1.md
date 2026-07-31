@@ -103,7 +103,7 @@ The Sync migration file `20260823_...sql` is **not** edited (already applied rem
 
 Settlement Foundation V1 intentionally does **not** include:
 
-- payouts / bank transfers
+- bank transfers / payout rail adapters (see Seller Payout Foundation V1 for payable → in_transit booking)
 - commission / fee split
 - partial allocate or partial refund unwind from RELEASED
 - seller UI / balance dashboards
@@ -111,4 +111,4 @@ Settlement Foundation V1 intentionally does **not** include:
 - UM Points / UMT changes
 - live PSP / webhook integrations
 
-Captured funds remain platform liability until `allocate`; seller payable is the release target for a future payout engine.
+Captured funds remain platform liability until `allocate`; seller payable is the release target. Payout custody booking after `RELEASED` is `commerce.settlement.seller_payout_foundation_v1` (`SELLER_PAYOUT_FOUNDATION_V1.md`).
