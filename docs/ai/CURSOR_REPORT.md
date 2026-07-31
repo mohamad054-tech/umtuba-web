@@ -1,57 +1,46 @@
-# CURSOR_REPORT — Commerce Seller Payout Foundation V1
+# CURSOR_REPORT — Commerce Seller Payout Read Model V1
 
 ## Summary
 
-**PASS** — Seller Payout Foundation V1 is **closed**: committed, pushed, and synced at `aa995922d4ad8f5d4602e3e61ed08db2cc57749a` on `office/commerce-settlement-seller-payout-foundation-v1`.
-
-This docs pass only updates AI handoff files that still carried a stale pre-implementation gate proposal (`blocked-awaiting-go` / “approve payout”). No code or migrations changed in this pass.
+**PASS** — Approved milestone `commerce.settlement.seller_payout_read_model_v1` implemented locally on dedicated branch. Trusted seller payout eligibility, per-currency balance summary, and newest-first history/status over Settlement RELEASED + Payout Foundation states. No bank rails. No Dashboard/AI. Migration `20260882` local only.
 
 ## Exact selected milestone
 
-`commerce.settlement.seller_payout_foundation_v1` — **CLOSED**.
+`commerce.settlement.seller_payout_read_model_v1`
 
-## What was stale (removed)
+## SSOT approval
 
-- Gate title/status claiming no approved non-AI milestone
-- Branch name `office/non-ai-next-milestone-gate-v1` (superseded by payout branch)
-- Proposal framing Seller Payout as draft awaiting GO
-- “None implemented” / docs-only gate report for payout
-- Next steps that asked to approve payout foundation
+Gate proposal converted to active APPROVED implementation after Product GO. Prior tip: Seller Payout Foundation closed @ `aa99592` / handoff `032ac77`.
 
-## Preserved handoff
+## Exact files changed
 
-- Worktree path for this non-AI tree
-- AI / Tutor / Providers leave-alone
-- Closed Commerce versioning tip `d01e1cd`
-- Perf Phase C STAGED PASS (await commit); Phase D needs GO
-- Creator Space / Learning frozen constraints
-- Migration `20260881` not remotely applied until separate GO
-
-## Exact files changed (this docs pass)
-
+- `supabase/migrations/20260882_store_seller_payout_read_model_v1.sql` (new)
+- `lib/store/sellerPayoutReadModel.ts` (new)
+- `lib/store/sellerPayoutReadModel.test.ts` (new)
+- `docs/store/implementation/SELLER_PAYOUT_READ_MODEL_V1.md` (new)
+- `docs/store/implementation/SELLER_PAYOUT_FOUNDATION_V1.md` (cross-link)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/SESSION_HANDOFF.md`
 
 ## Migrations created
 
-None in this docs pass. Implementation migration `20260881_store_seller_payout_foundation_v1.sql` is already in tip `aa99592`.
+`20260882_store_seller_payout_read_model_v1.sql` — **local only, not applied**
 
 ## Security review
 
-N/A — handoff docs only.
+- Owner/manager membership required; fail closed on auth/ownership
+- Store-scoped projection; cross-store returns null / excluded
+- No client money totals; per-currency buckets only
+- Omits fingerprints, journals, metadata, rails, bank fields
+- `bank_payouts_enabled` always false
 
 ## Tests / TypeScript / Build
 
-Not re-run (docs-only). Prior payout tip already verified before commit.
-
-## git diff --check
-
-PASS (this pass).
+See Final Verification Report.
 
 ## Open issues
 
-- Remote apply GO for `20260881` still outstanding
-- Next feature milestone requires explicit Product/Architecture GO
-- Buyer multi-version picker remains deferred
-- Perf Phase C still awaits human commit
+- Await commit / push GO
+- Await remote apply GO for `20260882`
+- Broad seller payout UI still out of scope

@@ -97,7 +97,7 @@ Seller Payout Foundation V1 intentionally does **not** include:
 
 - bank / connected-account / wallet rail adapters
 - payout profiles, batches, maker-checker approval
-- seller payout UI / balance dashboards
+- seller payout UI dashboards (see Seller Payout Read Model V1 for trusted balance/history reads)
 - commission / fee split
 - partial payouts
 - post-payout clawback / refunds from COMPLETED
@@ -105,4 +105,4 @@ Seller Payout Foundation V1 intentionally does **not** include:
 - UM Points / UMT changes
 - country capability matrix / KYC gates (fail-closed absence: no rail)
 
-Settlement release remains the eligibility gate; this foundation only books payable â†’ in_transit â†’ clearing (or fail back to payable).
+Settlement release remains the eligibility gate; this foundation only books payable â†’ in_transit â†’ clearing (or fail back to payable). Seller-facing read projection is `commerce.settlement.seller_payout_read_model_v1`.

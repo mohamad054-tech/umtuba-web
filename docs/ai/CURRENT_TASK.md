@@ -2,15 +2,19 @@
 
 ## Task title
 
-Commerce Seller Payout Foundation V1
+Commerce Seller Payout Read Model V1
 
 ## Status
 
-`closed` — committed, pushed, and synced @ `aa995922d4ad8f5d4602e3e61ed08db2cc57749a`
+`implementation-complete-local` — awaiting commit / push / migration-apply GO
 
 ## Branch
 
-`office/commerce-settlement-seller-payout-foundation-v1`
+`office/commerce-settlement-seller-payout-read-model-v1`
+
+## Base
+
+`032ac7782459aa266ff1463556a4f3890f5617bb` (Seller Payout handoff close) atop `aa99592`
 
 ## Worktree
 
@@ -18,32 +22,17 @@ Commerce Seller Payout Foundation V1
 
 ## Milestone
 
-`commerce.settlement.seller_payout_foundation_v1`
+`commerce.settlement.seller_payout_read_model_v1` — **APPROVED** and implemented locally
 
-## Closed tip
+## Scope delivered
 
-Seller Payout Foundation V1 books store payable → in_transit → clearing (or fail back to payable) after settlement `RELEASED`. No bank rails / payout UI. Migration `20260881` shipped in commit; **remote apply still awaits separate GO**.
-
-## Prior Commerce tip (do not reopen)
-
-Digital Product Versioning V1 **CLOSED** @ `d01e1cd` (buyer multi-version picker still deferred).
+Trusted owner/manager read RPCs: eligibility, per-currency available/in-transit/completed summary, newest-first payout history/status. Reuses foundation payout states. No bank rails. No Dashboard.
 
 ## Machine policy
 
-Commerce / non-AI laptop only. No Learning/AI/Home/Creator/Navigation.
+Commerce laptop only. No Dashboard/admin UI. No AI tracks.
 No remote migration apply / commit / push without explicit GO.
-
-## Preserved open tracks (not this milestone)
-
-| Track | State |
-| --- | --- |
-| Perf Phase C Home JS | **STAGED PASS** (await human commit) |
-| Perf Phase D | Not started — needs explicit GO + named scope |
-| Creator Space | Do not start new phase until Hero Completeness FF on `alpha-0.2` |
-| Learning (non-AI) | V1 **FROZEN** |
-| AI Platform / Tutor / Providers | Other workstation — leave alone |
 
 ## Next
 
-1. Separate apply GO for `20260881` (if/when Product asks), and/or
-2. Explicit GO naming the next non-AI milestone (e.g. Perf Phase D scope, Creator next, Translation wire, ops-only Phase C commit).
+Commit/push GO (trailer-free), then separate apply GO for `20260882`.

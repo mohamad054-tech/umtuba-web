@@ -1,38 +1,27 @@
-# Session Handoff — Commerce Seller Payout Foundation V1
+# Session Handoff — Commerce Seller Payout Read Model V1
 
 **Updated:** 2026-07-31
 
-## Active tip (CLOSED)
+## Active tip (local PASS — not committed)
 
-Branch: `office/commerce-settlement-seller-payout-foundation-v1`
+Branch: `office/commerce-settlement-seller-payout-read-model-v1`
 Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-HEAD (synced): `aa995922d4ad8f5d4602e3e61ed08db2cc57749a`
-Milestone: `commerce.settlement.seller_payout_foundation_v1` — **CLOSED** (commit + push done)
-Migration `20260881`: in tip — **remote apply awaits separate GO**
+Base: `032ac77` / payout foundation `aa99592`
+Milestone: `commerce.settlement.seller_payout_read_model_v1` — **APPROVED**, local implementation staged
+Migration `20260882`: local only — **remote apply awaits GO**
 
-## Closed non-AI tips (do not reopen)
+## Closed tips (do not reopen)
 
-| Track | Tip / state |
+| Track | Tip |
 | --- | --- |
-| Commerce Seller Payout Foundation V1 | `aa99592` |
-| Commerce digital chain through Versioning | `d01e1cd` |
-| Perf Phase A Store | `bdfe36a` |
-| Perf Phase B Learning catalog | `1bc60e0` |
-| Perf Phase C Home JS | **STAGED PASS** (await human commit) |
+| Seller Payout Foundation V1 | `aa99592` + handoff `032ac77` |
+| Digital Product Versioning | `d01e1cd` |
 
-## AI workstation (leave alone)
+## Coordination
 
-Do not touch AI Platform / Gemini / Providers / Runtime / Tutor / threads / summarization / knowledge acquisition branches or files.
+- Desktop owns Dashboard — do not touch
+- AI closed on desktop — do not touch AI code/branches/migrations
 
-## Next (requires explicit GO)
+## Next
 
-- Ops: apply `20260881` remotely, and/or commit Perf Phase C
-- Or name next non-AI milestone (Perf Phase D scope, Creator next after Hero Completeness FF, Translation wire)
-
-## Do not
-
-- Reopen Seller Payout / Versioning implementation
-- Start Performance Phase D without GO
-- Start new Creator Space phase before Hero Completeness FF on alpha
-- Invent Commerce features without GO
-- Touch AI tracks from this workstation
+Commit/push GO, then apply `20260882` GO.
