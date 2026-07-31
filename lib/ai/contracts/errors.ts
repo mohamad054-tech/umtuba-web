@@ -9,6 +9,9 @@ export class AiPlatformError extends Error {
   }
 }
 
+const SECRET_LIKE =
+  /\b(?:sk-[A-Za-z0-9_-]{8,}|AIza[0-9A-Za-z_-]{10,}|AQ\.[0-9A-Za-z_-]{10,})\b/g;
+
 export function sanitizeAiErrorMessage(
   message: string | undefined,
   fallback = "AI request could not be completed."
@@ -22,7 +25,8 @@ export function sanitizeAiErrorMessage(
     lower.includes("bearer ") ||
     lower.includes("x-goog-api-key") ||
     lower.includes("sk-") ||
-    lower.includes("aiza")
+    lower.includes("aiza") ||
+    /\baq\./i.test(raw)
   ) {
     return "AI provider authentication failed.";
   }
@@ -32,8 +36,9 @@ export function sanitizeAiErrorMessage(
   if (lower.includes("rate") && lower.includes("limit")) {
     return "AI rate limit reached. Try again shortly.";
   }
-  if (raw.length > 240) return `${raw.slice(0, 237)}...`;
-  return raw;
+  const redacted = raw.replace(SECRET_LIKE, "[redacted]");
+  if (redacted.length > 240) return `${redacted.slice(0, 237)}...`;
+  return redacted;
 }
 
 export function failResult<T = never>(

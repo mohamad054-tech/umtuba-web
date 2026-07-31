@@ -2,36 +2,36 @@
 
 ## Task title
 
-Private AI Foundation V1
+Shared AI Surface Integration V1
 
 ## Status
 
-`implementation-complete` — staged for manual commit (no trailers). Not pushed.
+`implementation-complete` — uncommitted; awaiting GO (no commit / no push)
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-foundation-v1`
-2. Branch: `office/platform-private-ai-foundation-v1`
-3. Base: `2344c1b` (AI Data Platform Workflow & Dataset Approval V1)
-4. Manual commit (no trailers) → push when approved
-5. Do not train/fine-tune/infer; do not download weights; do not apply migrations remotely
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-shared-ai-surface-integration-v1-final`
+2. Branch: `office/platform-shared-ai-surface-integration-v1`
+3. Base: `origin/office/platform-gemini-live-provider-v1` @ `30bda6a`
+4. Manual commit (no trailers) → push when approved → verify `0 0`
+5. Optional: add worktree `.env.local` with `GEMINI_API_KEY` for live smoke via Shared AI Core
 
 ## Branch
 
-`office/platform-private-ai-foundation-v1`
+`office/platform-shared-ai-surface-integration-v1`
 
 ## Allowed scope
 
-- `lib/privateAi/**`
-- `app/admin/private-ai/**`
-- `supabase/migrations/20260879_private_ai_foundation_v1.sql` (local only)
-- `vitest.config.ts` (include path)
-- Handoff + architecture docs + focused tests
+- `lib/ai/**` (surface wiring, guards, sanitize, tests — not Gemini adapter rewrite)
+- `lib/translationStudio/**` (AI port injection only)
+- `app/actions/translationStudio.ts`
+- `.env.example` (model default docs when changed)
+- Handoff docs for this task
 
 ## Forbidden scope
 
-- Training / fine-tuning / inference / model weights / downloads
-- Provider runtime changes
-- Commit / push / remote migration apply without GO
-- Git trailers
-- Switching unrelated branches or worktrees
+- Commit / push / merge without GO
+- Changing / printing `GEMINI_API_KEY`
+- Inventing new product AI features
+- Training / fine-tuning / private inference
+- Private AI workflow / migrations

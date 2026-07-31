@@ -1,25 +1,26 @@
-# Session Handoff
+# SESSION_HANDOFF — Shared AI Surface Integration V1
 
-## Active task
+## Where
 
-Private AI Foundation V1
+- Worktree: `umtuba-web-shared-ai-surface-integration-v1-final`
+- Branch: `office/platform-shared-ai-surface-integration-v1`
+- Base HEAD: `30bda6a` (Gemini live provider)
 
-| Field | Value |
-|-------|-------|
-| Branch | `office/platform-private-ai-foundation-v1` |
-| Base | `2344c1b` (AI Data Platform Workflow & Dataset Approval V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-foundation-v1` |
-| Status | Implementation complete; awaiting commit GO |
+## Done this session
 
-## Scope reminder
+- Selective Shared AI file transfer onto clean Gemini tip
+- Translation Studio admin AI path via `aiService.runCapability`
+- Architecture guards for vendor domains / action bypass
+- Gemini secret sanitize for `AQ.` / `AIza` key shapes
+- Focused integration tests
 
-Private AI registries and contracts. No training. No weights. No inference.
+## Not done
 
-## Do not
+- Commit / push (await GO)
+- Live smoke (no `.env.local` in this worktree)
+- Learning Tutor learner UI still on stub RPC (known follow-up)
 
-- Commit/push without GO
-- Apply migrations remotely
-- Train / fine-tune / run inference
-- Download model weights
-- Switch unrelated branches or worktrees
-- Use git trailers
+## Next GO
+
+1. Review Final Verification Report
+2. Manual commit without trailers → push → `0 0`
