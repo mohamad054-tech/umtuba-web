@@ -1,6 +1,6 @@
 /**
- * Private AI Foundation + Workflow + Deployment/Runtime service.
- * Does not train, fine-tune, download weights, run inference, or ping hosts.
+ * Private AI Foundation + Workflow + Deployment/Runtime + Inference Request Contracts.
+ * Does not train, fine-tune, download weights, run inference engines, or ping hosts.
  */
 
 import { createPrivateAiAuditEntry } from "./audit";
@@ -40,6 +40,15 @@ import {
   createEmptyRuntimeHealth,
 } from "./runtimeHealth";
 import {
+  ensureInferenceRequestDefaults,
+  handleAdvanceInferenceRequest,
+  handleCancelInferenceRequest,
+  handleCreateInferenceRequest,
+  handleRetryInferenceMetadata,
+  handleTimeoutInferenceRequest,
+  handleValidateInferenceRequest,
+} from "./inferenceRequestHandlers";
+import {
   ensureRuntimeOpsDefaults,
   handleApplyOverride,
   handleClearOverride,
@@ -67,6 +76,12 @@ import { buildPrivateAiSeedState } from "./seed";
 import type {
   AiCapabilityId,
   DeploymentProfileId,
+  InferenceFailureClass,
+  InferenceRequestLifecycle,
+  InferenceRequestRecord,
+  InferenceRequester,
+  InferenceStructuredOutputContract,
+  InferenceStreamingContract,
   ModelFamilyKind,
   PersistedPrivateAiState,
   PrivateAiAuditTrailEntry,
@@ -260,6 +275,52 @@ export type PrivateAiService = {
     actorRole?: string;
     now?: string;
   }): PrivateAiRuntimeRecord;
+  listInferenceRequests(): InferenceRequestRecord[];
+  getInferenceRequest(requestId: string): InferenceRequestRecord | null;
+  createInferenceRequest(input: {
+    requestId?: string;
+    capabilityId: AiCapabilityId;
+    providerId?: string | null;
+    runtimeId?: string | null;
+    modelId?: string | null;
+    requester: InferenceRequester;
+    correlationId?: string;
+    priority?: number;
+    costTier?: RuntimeCostTier;
+    timeoutMs?: number;
+    maxTokens?: number | null;
+    prompt?: string;
+    inputKind?: "text" | "messages" | "empty";
+    messageCount?: number;
+    streaming?: Partial<InferenceStreamingContract>;
+    structuredOutput?: Partial<InferenceStructuredOutputContract>;
+    maxAttempts?: number;
+    retryDelayMs?: number;
+    notes?: string;
+    now?: string;
+    autoSelectRuntime?: boolean;
+  }): InferenceRequestRecord;
+  validateInferenceRequest(requestId: string, now?: string): InferenceRequestRecord;
+  advanceInferenceRequest(input: {
+    requestId: string;
+    to: InferenceRequestLifecycle;
+    reason?: string | null;
+    now?: string;
+    failureClass?: InferenceFailureClass;
+  }): InferenceRequestRecord;
+  cancelInferenceRequest(input: {
+    requestId: string;
+    reason?: string;
+    now?: string;
+  }): InferenceRequestRecord;
+  timeoutInferenceRequest(input: {
+    requestId: string;
+    now?: string;
+  }): InferenceRequestRecord;
+  retryInferenceRequest(input: {
+    requestId: string;
+    now?: string;
+  }): InferenceRequestRecord;
   checkPermission(input: {
     scope: PrivateAiPermission["scope"];
     resourceId: string;
@@ -321,7 +382,7 @@ export function createPrivateAiService(options?: {
         ? emptyWithCatalog()
         : buildPrivateAiSeedState(now0));
 
-  state = ensureRuntimeOpsDefaults(state);
+  state = ensureInferenceRequestDefaults(ensureRuntimeOpsDefaults(state));
 
   const persist = () => {
     if (options?.ephemeral) return;
@@ -886,6 +947,90 @@ export function createPrivateAiService(options?: {
       state = result.state;
       persist();
       return result.runtime;
+    },
+
+    listInferenceRequests() {
+      return [...(state.inferenceRequests ?? [])];
+    },
+
+    getInferenceRequest(requestId) {
+      return (
+        (state.inferenceRequests ?? []).find((r) => r.requestId === requestId) ??
+        null
+      );
+    },
+
+    createInferenceRequest(input) {
+      const role = input.requester.role;
+      const mayCreate =
+        hasPermission(state.permissions, {
+          scope: "capability",
+          resourceId: input.capabilityId,
+          role,
+          action: "inference_request",
+        }) ||
+        hasPermission(state.permissions, {
+          scope: "capability",
+          resourceId: "*",
+          role,
+          action: "inference_request",
+        }) ||
+        hasPermission(state.permissions, {
+          scope: "model",
+          resourceId: "*",
+          role,
+          action: "inference_request",
+        }) ||
+        hasPermission(state.permissions, {
+          scope: "model",
+          resourceId: "*",
+          role,
+          action: "runtime_operate",
+        });
+      if (!mayCreate) {
+        throw new Error(
+          `Permission denied for ${role} to create inference request`
+        );
+      }
+      const result = handleCreateInferenceRequest(state, input);
+      state = result.state;
+      persist();
+      return result.request;
+    },
+
+    validateInferenceRequest(requestId, now) {
+      const result = handleValidateInferenceRequest(state, requestId, now);
+      state = result.state;
+      persist();
+      return result.request;
+    },
+
+    advanceInferenceRequest(input) {
+      const result = handleAdvanceInferenceRequest(state, input);
+      state = result.state;
+      persist();
+      return result.request;
+    },
+
+    cancelInferenceRequest(input) {
+      const result = handleCancelInferenceRequest(state, input);
+      state = result.state;
+      persist();
+      return result.request;
+    },
+
+    timeoutInferenceRequest(input) {
+      const result = handleTimeoutInferenceRequest(state, input);
+      state = result.state;
+      persist();
+      return result.request;
+    },
+
+    retryInferenceRequest(input) {
+      const result = handleRetryInferenceMetadata(state, input);
+      state = result.state;
+      persist();
+      return result.request;
     },
 
     checkPermission(input) {

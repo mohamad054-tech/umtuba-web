@@ -14,6 +14,7 @@ const NAV = [
   { href: `${PRIVATE_AI_BASE}/routing`, label: "Routing" },
   { href: `${PRIVATE_AI_BASE}/lifecycle`, label: "Lifecycle" },
   { href: `${PRIVATE_AI_BASE}/runtime`, label: "Runtime" },
+  { href: `${PRIVATE_AI_BASE}/inference`, label: "Inference" },
 ] as const;
 
 export default function PrivateAiShell({
@@ -30,7 +31,7 @@ export default function PrivateAiShell({
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav
           title={title}
-          subtitle={subtitle ?? "Private AI Deployment & Runtime"}
+          subtitle={subtitle ?? "Private AI Inference Request Contracts"}
         />
         <nav
           aria-label="Private AI"

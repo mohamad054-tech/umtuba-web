@@ -32,6 +32,15 @@ export type {
   RuntimeReadinessResult,
   RuntimeSelectionCriteria,
   RuntimeSelectionResult,
+  InferenceFailureClass,
+  InferenceRequestLifecycle,
+  InferenceRequestMetrics,
+  InferenceRequestPayload,
+  InferenceRequestRecord,
+  InferenceRequester,
+  InferenceRetryMetadata,
+  InferenceStructuredOutputContract,
+  InferenceStreamingContract,
 } from "./types";
 
 export {
@@ -96,6 +105,19 @@ export {
 export { createRuntimeIncident } from "./runtimeIncidents";
 
 export { createEmptyRuntimeOpsState } from "./runtimeOpsState";
+
+export {
+  assertTransitionInferenceRequest,
+  canTransitionInferenceRequest,
+  INFERENCE_REQUEST_LIFECYCLE_ORDER,
+  isClosedInferenceLifecycle,
+  isTerminalInferenceLifecycle,
+  listAllowedInferenceRequestTransitions,
+} from "./inferenceRequestLifecycle";
+
+export { validateInferenceRequestContract } from "./inferenceRequestValidation";
+
+export { createInferenceRequestRecord } from "./inferenceRequestFactory";
 
 export {
   getHardwareContract,

@@ -12,7 +12,7 @@ export default async function PrivateAiOverviewPage() {
   return (
     <PrivateAiShell
       title="Private AI"
-      subtitle="Runtime Operations & Failover V1"
+      subtitle="Inference Request Contracts V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
         <h1 className="text-xl font-black">Private AI platform</h1>
@@ -43,6 +43,7 @@ export default async function PrivateAiOverviewPage() {
               "Runtime ready",
               state.runtimes.filter((r) => r.deploymentState === "ready").length,
             ],
+            ["Inference requests", state.inferenceRequests?.length ?? 0],
           ].map(([label, value]) => (
             <div key={String(label)}>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">

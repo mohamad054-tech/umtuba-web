@@ -363,8 +363,105 @@ export type RuntimeDiagnosticRow = {
   allowedOpsActions: string[];
 };
 
+/** Inference request lifecycle — contracts only, no model execution. */
+export type InferenceRequestLifecycle =
+  | "pending"
+  | "validated"
+  | "accepted"
+  | "queued"
+  | "running"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "rejected"
+  | "timed_out";
+
+export type InferenceRequester = {
+  actorId: string | null;
+  role: string;
+  tenantId: string;
+  sessionId: string | null;
+};
+
+export type InferenceStructuredOutputContract = {
+  mode: "none" | "json" | "schema";
+  schemaId: string | null;
+  schemaVersion: string | null;
+  validateOutput: boolean;
+};
+
+export type InferenceStreamingContract = {
+  enabled: boolean;
+  streamId: string | null;
+  chunkSequenceStart: number;
+  completionMarker: string;
+  cancellationSupported: boolean;
+  backpressureHint: "none" | "slow_consumer" | "buffer_limit";
+  maxBufferedChunks: number | null;
+};
+
+export type InferenceRetryMetadata = {
+  attempt: number;
+  maxAttempts: number;
+  retryDelayMs: number;
+  lastRetryAt: string | null;
+};
+
+export type InferenceFailureClass =
+  | "none"
+  | "validation"
+  | "authorization"
+  | "timeout"
+  | "cancelled"
+  | "runtime"
+  | "unknown";
+
+export type InferenceRequestMetrics = {
+  createdAt: string;
+  validatedAt: string | null;
+  acceptedAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  latencyMs: number | null;
+  failureClass: InferenceFailureClass;
+};
+
+export type InferenceRequestPayload = {
+  prompt: string;
+  inputKind: "text" | "messages" | "empty";
+  messageCount: number;
+};
+
+export type InferenceRequestRecord = {
+  requestId: string;
+  capabilityId: AiCapabilityId;
+  providerId: string | null;
+  runtimeId: string | null;
+  modelId: string | null;
+  requester: InferenceRequester;
+  correlationId: string;
+  priority: number;
+  costTier: RuntimeCostTier;
+  timeoutMs: number;
+  maxTokens: number | null;
+  streaming: InferenceStreamingContract;
+  structuredOutput: InferenceStructuredOutputContract;
+  cancellationRequested: boolean;
+  retry: InferenceRetryMetadata;
+  lifecycle: InferenceRequestLifecycle;
+  payload: InferenceRequestPayload;
+  validationErrors: string[];
+  rejectionReason: string | null;
+  failureReason: string | null;
+  auditEntryId: string | null;
+  metrics: InferenceRequestMetrics;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 4;
+  schemaVersion: 5;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -376,4 +473,5 @@ export type PersistedPrivateAiState = {
   runtimes: PrivateAiRuntimeRecord[];
   runtimeIncidents: RuntimeOperationalIncident[];
   runtimeOpsPolicy: RuntimeOpsPolicy;
+  inferenceRequests: InferenceRequestRecord[];
 };

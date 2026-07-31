@@ -1,17 +1,17 @@
-# SESSION_HANDOFF — Private AI Runtime Operations & Failover V1
+# SESSION_HANDOFF — Private AI Inference Request Contracts V1
 
 ## Where
 
-- Worktree: `umtuba-web-private-ai-runtime-operations-failover-v1`
-- Branch: `office/platform-private-ai-runtime-operations-failover-v1`
-- Base: `cf3de8d`
+- Worktree: `umtuba-web-private-ai-inference-request-contracts-v1`
+- Branch: `office/platform-private-ai-inference-request-contracts-v1`
+- Base: `517cff5`
 
 ## Done
 
-- Heartbeat / failure detection / failover / recovery / maintenance / incidents
-- Ops permissions + Admin Runtime actions UI
-- schemaVersion 4 (file SoT; no SQL migration)
-- Focused tests + prior Deployment Runtime suite
+- Inference request contracts, validation, auth, lifecycle
+- Structured output + streaming metadata
+- Admin inference list
+- schemaVersion 5 (file SoT; no SQL migration)
 
 ## Next GO
 

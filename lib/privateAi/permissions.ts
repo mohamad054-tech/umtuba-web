@@ -60,6 +60,8 @@ export const DEFAULT_PLATFORM_ADMIN_ACTIONS = [
   "failover_trigger",
   "override_manage",
   "runtime_recover",
+  "inference_request",
+  "inference_execute",
 ] as const;
 
 export function hasRuntimeOpsPermission(

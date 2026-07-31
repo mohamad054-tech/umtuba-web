@@ -1,18 +1,18 @@
-# CURSOR_REPORT — Private AI Runtime Operations & Failover V1
+# CURSOR_REPORT — Private AI Inference Request Contracts V1
 
 ## Summary
 
-**PASS (ops/failover contracts on Deployment Runtime tip).** Worktree
-`umtuba-web-private-ai-runtime-operations-failover-v1` @ base `cf3de8d`.
-No live probes / cron / inference. No commit / no push.
+**PASS (inference request contracts on Ops/Failover tip).** Worktree
+`umtuba-web-private-ai-inference-request-contracts-v1` @ base `517cff5`.
+No real inference / streaming transport. No commit / no push.
 
 ## Storage
 
-schemaVersion 4 in `registry.json` only — **no SQL migration**.
+schemaVersion 5 in `registry.json` — **no SQL migration**.
 
 ## Tests
 
-- Foundation + Lifecycle + Deployment Runtime + Ops/Failover: **4 files / 36 tests PASS**
+- Foundation + Lifecycle + Deployment + Ops/Failover + Inference Contracts: **5 files / 44 tests PASS**
 - `tsc --noEmit`: **PASS**
 - `git diff --check`: **clean**
 

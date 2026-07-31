@@ -166,7 +166,7 @@ export function buildPrivateAiSeedState(
   };
 
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     updatedAt: now,
     models: [
       {
@@ -192,6 +192,7 @@ export function buildPrivateAiSeedState(
     runtimes: [runtimePrimary, runtimeFailover, runtimeTranslatorPending],
     runtimeIncidents: [],
     runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
+    inferenceRequests: [],
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

@@ -2,11 +2,11 @@
 
 ## Active feature
 
-- **Branch:** `office/platform-private-ai-runtime-operations-failover-v1`
-- **Task:** Private AI Runtime Operations & Failover V1 — implementation complete; not committed
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-runtime-operations-failover-v1`
-- **Base:** `cf3de8d` (`origin/office/platform-private-ai-deployment-runtime-v1`)
+- **Branch:** `office/platform-private-ai-inference-request-contracts-v1`
+- **Task:** Private AI Inference Request Contracts V1 — complete; not committed
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-inference-request-contracts-v1`
+- **Base:** `517cff5`
 
 ## Safety
 
-No remote migration apply; no inference/pings; after GO: commit without trailers → push → `0 0`.
+No remote migration; no inference engines; after GO: commit without trailers → push → `0 0`.

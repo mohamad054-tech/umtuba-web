@@ -26,7 +26,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -38,6 +38,7 @@ export function emptyPrivateAiState(
     runtimes: [],
     runtimeIncidents: [],
     runtimeOpsPolicy: { ...DEFAULT_RUNTIME_OPS_POLICY },
+    inferenceRequests: [],
   };
 }
 
@@ -231,7 +232,13 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
   if (!parsed || typeof parsed !== "object") return null;
   const obj = parsed as Record<string, unknown>;
   const version = obj.schemaVersion;
-  if (version !== 1 && version !== 2 && version !== 3 && version !== 4) {
+  if (
+    version !== 1 &&
+    version !== 2 &&
+    version !== 3 &&
+    version !== 4 &&
+    version !== 5
+  ) {
     return null;
   }
 
@@ -243,7 +250,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     : [];
 
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -272,6 +279,9 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
       ...DEFAULT_RUNTIME_OPS_POLICY,
       ...((obj.runtimeOpsPolicy as object) ?? {}),
     },
+    inferenceRequests: Array.isArray(obj.inferenceRequests)
+      ? (obj.inferenceRequests as PersistedPrivateAiState["inferenceRequests"])
+      : [],
   };
 }
 
@@ -295,12 +305,13 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 4,
+    schemaVersion: 5,
     runtimes: state.runtimes ?? [],
     runtimeIncidents: state.runtimeIncidents ?? [],
     runtimeOpsPolicy: state.runtimeOpsPolicy ?? {
       ...DEFAULT_RUNTIME_OPS_POLICY,
     },
+    inferenceRequests: state.inferenceRequests ?? [],
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);
