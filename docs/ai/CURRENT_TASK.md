@@ -1,34 +1,49 @@
-﻿# Current Task
+# Current Task
 
 ## Task title
 
-Commerce Digital Product Versioning & Update Delivery V1
+Commerce Seller Payout Foundation V1
 
 ## Status
 
-`implementation-complete-local` — awaiting commit / push / migration-apply GO
-
-## Worktree
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-digital-product-versioning-update-delivery-v1`
+`closed` — committed, pushed, and synced @ `aa995922d4ad8f5d4602e3e61ed08db2cc57749a`
 
 ## Branch
 
-`office/commerce-digital-product-versioning-update-delivery-v1`
+`office/commerce-settlement-seller-payout-foundation-v1`
 
-## Base
+## Worktree
 
-`9b2dacc0b792b46a1d3b566d5adc6503edb1d987`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
 
 ## Milestone
 
-`commerce.digital.product_versioning_update_delivery_v1`
+`commerce.settlement.seller_payout_foundation_v1`
+
+## Closed tip
+
+Seller Payout Foundation V1 books store payable → in_transit → clearing (or fail back to payable) after settlement `RELEASED`. No bank rails / payout UI. Migration `20260881` shipped in commit; **remote apply still awaits separate GO**.
+
+## Prior Commerce tip (do not reopen)
+
+Digital Product Versioning V1 **CLOSED** @ `d01e1cd` (buyer multi-version picker still deferred).
 
 ## Machine policy
 
-Commerce laptop only. No Learning/AI/Home/Creator/Navigation.
+Commerce / non-AI laptop only. No Learning/AI/Home/Creator/Navigation.
 No remote migration apply / commit / push without explicit GO.
+
+## Preserved open tracks (not this milestone)
+
+| Track | State |
+| --- | --- |
+| Perf Phase C Home JS | **STAGED PASS** (await human commit) |
+| Perf Phase D | Not started — needs explicit GO + named scope |
+| Creator Space | Do not start new phase until Hero Completeness FF on `alpha-0.2` |
+| Learning (non-AI) | V1 **FROZEN** |
+| AI Platform / Tutor / Providers | Other workstation — leave alone |
 
 ## Next
 
-Commit/push GO (trailer-free), then separate apply GO for `20260880`.
+1. Separate apply GO for `20260881` (if/when Product asks), and/or
+2. Explicit GO naming the next non-AI milestone (e.g. Perf Phase D scope, Creator next, Translation wire, ops-only Phase C commit).

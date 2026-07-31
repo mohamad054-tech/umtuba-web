@@ -1,81 +1,38 @@
-# SESSION HANDOFF — Laptop Commerce (saved before shutdown)
+# Session Handoff — Commerce Seller Payout Foundation V1
 
-**Saved:** 2026-07-30 (local)  
-**Resume tomorrow from this file + `docs/ai/CURRENT_TASK.md` in the Commerce worktree.**
+**Updated:** 2026-07-31
 
----
+## Active tip (CLOSED)
 
-## Open this folder tomorrow
+Branch: `office/commerce-settlement-seller-payout-foundation-v1`
+Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
+HEAD (synced): `aa995922d4ad8f5d4602e3e61ed08db2cc57749a`
+Milestone: `commerce.settlement.seller_payout_foundation_v1` — **CLOSED** (commit + push done)
+Migration `20260881`: in tip — **remote apply awaits separate GO**
 
-```text
-C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-listing-provenance-v1
-```
+## Closed non-AI tips (do not reopen)
 
-Branch: `office/commerce-marketplace-listing-provenance-hardening-v1`  
-HEAD (base, no commit yet): `6cbe0f68f418141ac887c99bf40e21eb1d0d27de`
+| Track | Tip / state |
+| --- | --- |
+| Commerce Seller Payout Foundation V1 | `aa99592` |
+| Commerce digital chain through Versioning | `d01e1cd` |
+| Perf Phase A Store | `bdfe36a` |
+| Perf Phase B Learning catalog | `1bc60e0` |
+| Perf Phase C Home JS | **STAGED PASS** (await human commit) |
 
----
+## AI workstation (leave alone)
 
-## Where we stopped
+Do not touch AI Platform / Gemini / Providers / Runtime / Tutor / threads / summarization / knowledge acquisition branches or files.
 
-**Milestone:** Commerce Marketplace Listing Provenance Hardening V1  
-**Verdict:** Implementation complete locally — **71 tests pass**, **tsc pass**, **not committed / not pushed / migration not applied**.
+## Next (requires explicit GO)
 
-### Root cause (fixed in WIP)
-Wishlist + id-PDP dropped `seller_listing_id` → buyer landed on supplier-owned PDP → cart had no marketplace listing stamp.
+- Ops: apply `20260881` remotely, and/or commit Perf Phase C
+- Or name next non-AI milestone (Perf Phase D scope, Creator next after Hero Completeness FF, Translation wire)
 
-### Fix in uncommitted files
-- `20260875` adds wishlist `seller_listing_id`
-- Wishlist / id-PDP / UI preserve listing provenance fail-closed
-- Owned products without listing still work
+## Do not
 
-### Full report
-See chat Final Verification Report + `docs/ai/CURSOR_REPORT.md` in this worktree.
-
----
-
-## Git status snapshot (Commerce worktree)
-
-Uncommitted Commerce-only changes (expected):
-
-- Modified: wishlist/PDP/cart provenance wiring (`wishlist.ts`, `catalogQueries.ts`, UI, routes, …)
-- Untracked: `20260875_*.sql`, `listingProvenance.ts`, `listingProvenanceHardening.test.ts`, docs
-
----
-
-## Dependencies
-
-`node_modules` is a **Windows junction** to:
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web\node_modules`
-
-Do not run `npm install` / `npm ci` in either tree without deciding whether to keep the junction.
-
----
-
-## Leave alone (AI worktree)
-
-```text
-C:\Users\Admin\Desktop\umtuba\umtuba-web
-```
-
-- Branch: `office/learning-ai-tutor-thread-lesson-binding-v1` @ `9e90448`
-- Dirty AI lesson-binding files + local `20260874` — **Desktop owns AI now**
-- Do not modify / commit / stash / checkout away without explicit plan
-
----
-
-## Tomorrow first commands (suggested)
-
-```powershell
-cd C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-listing-provenance-v1
-git status -sb
-git rev-parse HEAD
-# Then: review → trailer-free commit GO → push GO → apply 20260875 GO
-```
-
----
-
-## Policy reminder
-
-Laptop = Commerce only. No AI / Gemini / Provider / Tutor work here.
+- Reopen Seller Payout / Versioning implementation
+- Start Performance Phase D without GO
+- Start new Creator Space phase before Hero Completeness FF on alpha
+- Invent Commerce features without GO
+- Touch AI tracks from this workstation
