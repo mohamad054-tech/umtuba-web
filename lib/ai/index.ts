@@ -147,6 +147,42 @@ export type {
   AiUsagePublicAggregate,
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
+
+/** AI Usage, Quotas & Billing Foundation V1 (estimated only; no real charges). */
+export {
+  AI_USAGE_FOUNDATION_SCHEMA_VERSION,
+  AI_USAGE_POLICY_VERSION,
+  AI_USAGE_UNIT_TYPES,
+  DEFAULT_BUDGET_POLICY_ID,
+  DEFAULT_COST_POLICY_ID,
+  DEFAULT_QUOTA_POLICY_ID,
+  AiUsageQuotasBillingFoundation,
+  aiUsageQuotasBillingFoundation,
+  aiUsageFoundationStore,
+  resetUsageQuotasBillingFoundation,
+  resolveMeteringOrDefault,
+  defaultMeteringBinding,
+  estimateUsageCost,
+  createDisabledUsageChargeIntent,
+  executeUsageChargeIntent,
+  isRevenueBridgeAllowed,
+  adminUsageActor,
+  redactUsageMetadata,
+} from "./usage/usageFoundationIndex";
+export type {
+  AiBudgetPolicy,
+  AiCapabilityMeteringBinding,
+  AiCostEstimationPolicy,
+  AiPreflightGateResult,
+  AiQuotaPolicy,
+  AiUsageAggregationReport,
+  AiUsageActor,
+  AiUsageChargeIntent,
+  AiUsageEvent,
+  AiUsagePermission,
+  AiUsageUnitType,
+  AiUserUsageViewModel,
+} from "./usage/usageFoundationIndex";
 export {
   AiPersonalizationEngine,
   aiPersonalizationEngine,

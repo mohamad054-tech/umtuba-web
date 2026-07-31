@@ -1,5 +1,9 @@
 import { LEARNING_TUTOR_CAPABILITIES } from "../capabilities/learning/tutorRunner";
 import { AI_CAPABILITY_CATALOG as PRIVATE_AI_DOMAIN_CATALOG } from "../../privateAi/capabilities";
+import {
+  ADMIN_QUOTA_POLICY_ID,
+  defaultMeteringBinding,
+} from "../usage/policyFixtures";
 import type { AiCapabilityCatalogEntry } from "./types";
 
 const NOW = "1970-01-01T00:00:00.000Z";
@@ -59,6 +63,7 @@ function sharedEntry(
     | "privateAiDomainId"
     | "executable"
     | "executionSurface"
+    | "metering"
   > & {
     executionPolicy?: Partial<AiCapabilityCatalogEntry["executionPolicy"]>;
     privateAiDomainId?: string | null;
@@ -67,9 +72,14 @@ function sharedEntry(
     replacementCapabilityId?: string | null;
     executable?: boolean;
     executionSurface?: AiCapabilityCatalogEntry["executionSurface"];
+    metering?: AiCapabilityCatalogEntry["metering"];
   }
 ): AiCapabilityCatalogEntry {
   const policies = basePolicies(input.executionPolicy);
+  const executable = input.executable ?? true;
+  const executionSurface = input.executionSurface ?? "shared_ai_service";
+  const adminOnly =
+    input.visibility === "admin" || input.category === "admin";
   return {
     capabilityId: input.capabilityId,
     displayName: input.displayName,
@@ -80,8 +90,8 @@ function sharedEntry(
     stability: input.stability,
     visibility: input.visibility,
     lifecycle: input.lifecycle,
-    executable: input.executable ?? true,
-    executionSurface: input.executionSurface ?? "shared_ai_service",
+    executable,
+    executionSurface,
     requiredPermissions: input.requiredPermissions,
     supportedProviders: input.supportedProviders,
     supportedRuntimes: input.supportedRuntimes,
@@ -94,6 +104,14 @@ function sharedEntry(
     replacementCapabilityId: input.replacementCapabilityId ?? null,
     documentation: input.documentation,
     privateAiDomainId: input.privateAiDomainId ?? null,
+    metering:
+      input.metering ??
+      defaultMeteringBinding({
+        billable: executable && executionSurface !== "hub_placeholder",
+        adminOnly,
+        visibilityToUser: !adminOnly && executable,
+        quotaPolicyId: adminOnly ? ADMIN_QUOTA_POLICY_ID : undefined,
+      }),
     registeredAt: NOW,
     updatedAt: NOW,
   };

@@ -2,33 +2,50 @@
 
 ## Task title
 
-AI Capability Catalog & Service Registry V1
+AI Usage, Quotas & Billing Foundation V1
 
 ## Status
 
-`implementation-complete` — uncommitted; awaiting GO
+`implementation-complete` — awaiting GO for commit/push
 
-## Resume here
+## Branch
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-ai-capability-catalog-service-registry-v1`
-2. Branch: `office/platform-ai-capability-catalog-service-registry-v1`
-3. Base: `origin/office/platform-private-ai-inference-invocation-orchestration-v1` @ `16bbaa4`
-4. Manual commit (no trailers) → push → `0 0`
+`office/platform-ai-usage-quotas-billing-foundation-v1`
+
+## Worktree
+
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-usage-quotas-billing-foundation-v1`
+
+## Base
+
+`origin/office/platform-ai-capability-catalog-service-registry-v1` @ `493e17c`
 
 ## Allowed scope
 
-- `lib/ai/catalog/**`
-- `lib/ai/services/aiService.ts` (catalog gate only)
-- `lib/ai/index.ts` (exports)
-- `app/admin/ai/**` (capabilities admin + nav)
-- `docs/ai/**` handoff
+- `lib/ai/usage/**` usage/quotas/billing foundation
+- Capability Catalog metering binding fields
+- `aiService` preflight gate + post-execution recording hook
+- Admin `/admin/ai/usage` (+ nav links)
+- Docs handoff / report
 
-## Forbidden
+## Forbidden scope
 
-Inference; network; Gemini edits beyond catalog gate; Learning/Commerce/Home feature rewrites; commit/push without GO.
+- Real Stripe / wallet / invoice / payout
+- Live inference / network / Gemini / OpenAI
+- Commit / push / remote migrations
+- Learning / Commerce / Home rewrites beyond gate hook
 
-## Approved commit message (on GO)
+## Done
 
-```
-feat(ai): add AI capability catalog and service registry v1
-```
+- Usage event contract, unit types, quota/budget/cost policies
+- Preflight gate (fail-closed) + post-execution recording
+- Idempotency, aggregation, permissions, view model
+- Catalog metering integration
+- Disabled `AiUsageChargeIntent` revenue boundary
+- Admin usage UI
+- Focused tests + tsc + diff --check
+
+## Next
+
+- User GO for Terminal commit (no Agent commit)
+- Push after trailer review

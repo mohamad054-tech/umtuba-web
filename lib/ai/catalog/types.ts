@@ -3,6 +3,10 @@
  * Does not invoke providers, train models, or perform inference.
  */
 
+import type { AiCapabilityMeteringBinding } from "../usage/quotasBillingTypes";
+
+export type { AiCapabilityMeteringBinding };
+
 export type AiCapabilityCategory =
   | "learning"
   | "commerce"
@@ -88,6 +92,8 @@ export type AiCapabilityCatalogEntry = {
     sourceModule: string;
   };
   privateAiDomainId: string | null;
+  /** Usage/quotas/billing metering binding (Foundation V1). */
+  metering: AiCapabilityMeteringBinding;
   registeredAt: string;
   updatedAt: string;
 };

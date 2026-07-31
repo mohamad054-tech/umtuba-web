@@ -99,6 +99,18 @@ export function validateCapabilityEntry(
   if (entry.retryPolicy.maxAttempts < 1) {
     errors.push("invalid_retry_policy");
   }
+  if (!entry.metering?.quotaPolicyId?.trim()) {
+    errors.push("metering_quota_policy_required");
+  }
+  if (!entry.metering?.budgetPolicyId?.trim()) {
+    errors.push("metering_budget_policy_required");
+  }
+  if (!entry.metering?.estimationPolicyId?.trim()) {
+    errors.push("metering_estimation_policy_required");
+  }
+  if (!entry.metering?.usageUnitType) {
+    errors.push("metering_unit_type_required");
+  }
 
   return { ok: errors.length === 0, errors };
 }
