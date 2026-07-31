@@ -20,9 +20,11 @@ Trusted **single source of truth** for commission policy contracts and decomposi
 | Piece | Role |
 | --- | --- |
 | TS SSOT | `lib/store/commissionPolicyFoundation.ts` — validate, select, calculate |
-| SQL registry | `store_commission_policies` — durable contracts (no active seed) |
+| SQL registry | `store_commission_policies` — durable contracts |
 | Resolve RPC | `resolve_store_commission_policy(currency, at)` — service_role |
 | Split helper | `compute_store_commission_split(...)` — service_role; mirrors TS |
+
+**Activation:** Launch active seeds for UEOS fiat currencies are `commerce.revenue.commission_policy_activation_v1` (`COMMISSION_POLICY_ACTIVATION_V1.md`, migration `20260887`). Foundation itself still does not invent rates; activation is an explicit follow-up seed.
 
 ## Party roles
 
@@ -54,8 +56,8 @@ Trusted **single source of truth** for commission policy contracts and decomposi
 - Never trusts client percentages / rates / bps
 - Missing / invalid / currency-mismatched / out-of-window policies fail closed
 - No authenticated policy shopping (service_role only for SQL resolve/compute)
-- No active policy seed — operators must insert intentionally
+- Active launch seed is opt-in via Activation V1 (`20260887`) — not part of this foundation migration
 
 ## Out of scope
 
-Payout execution, bank rails, Dashboard/Admin UI, AI, auto-activating commercial rates, changing settlement/payout booking amounts, seller UI surfacing of commission (still withheld on Balance Visibility).
+Payout execution, bank rails, Dashboard/Admin UI, AI, changing settlement/payout booking amounts, seller UI surfacing of commission (still withheld on Balance Visibility).

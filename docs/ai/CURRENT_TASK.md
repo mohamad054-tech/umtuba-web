@@ -2,42 +2,41 @@
 
 ## Task title
 
-UMTUBA Commerce — Production Integration Preparation
+UMTUBA Commerce — Commission Policy Activation V1
 
 ## Status
 
-`pass-staged` — **integration docs complete** — stop at PASS + STAGED (no commit / no push)
+`pass` — implementation complete locally — **uncommitted / unpushed** (awaiting human GO)
 
-## Capability (coordination)
+## Capability (APPROVED)
 
-`commerce.ops.production_integration_preparation_v1`
+`commerce.revenue.commission_policy_activation_v1`
 
-## Branch / tip
+## Branch
 
-- Branch: `office/commerce-marketplace-supplier-listing-create-hardening-v1`
-- Tip: `ca157d716348ba107f546e453602eae7c48ec989`
-- No new branch created
+`office/commerce-commission-policy-activation-v1`
+
+## Base / HEAD
+
+- Base: `origin/office/commerce-marketplace-supplier-listing-create-hardening-v1` @ `d47f825`
+- HEAD: local uncommitted tip on feature branch
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1`
+(Note: host user is `Admin`; requested `C:\Users\1\...` path was not present on this machine.)
 
 ## Coordination
 
-- **Desktop:** AI Platform / Usage / Billing / Dashboard / Admin UI — do not touch
-- **Laptop:** Commerce Production Integration docs only
+- Commerce only — no Dashboard / Admin UI / AI / Stripe / payout rails / wallet mutations
 
-## Delivered (docs only)
+## Delivered
 
-- `docs/store/operations/COMMERCE_PRODUCTION_ROLLOUT.md`
-- `docs/store/operations/FIRST_SUPPLIER_RUNBOOK.md`
-- `docs/store/operations/FIRST_PRODUCT_RUNBOOK.md`
-- SSOT: CURRENT_TASK / CURSOR_REPORT / SESSION_HANDOFF
+- Migration `20260887` — idempotent active launch seed for UEOS fiat currencies
+- Conflict trigger (one active policy_code family per currency)
+- TS SSOT `lib/store/commissionPolicyActivation.ts` + tests
+- Docs: `COMMISSION_POLICY_ACTIVATION_V1.md`
 
-## Explicit non-actions
+## Next
 
-No code · no migrations · no features · no branches · no commit · no push · no remote apply
-
-## Next human actions
-
-Execute Phases A–F per `COMMERCE_PRODUCTION_ROLLOUT.md` under Product GO.
+Human GO to commit / push. Apply `20260887` locally/remotely only when Product asks.
