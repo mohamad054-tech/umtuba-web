@@ -2,7 +2,7 @@
 
 ## Task title
 
-UMTUBA Commerce — Payout Booking Ops Helpers V1
+UMTUBA Commerce — Full Order Refund Path V1
 
 ## Status
 
@@ -10,15 +10,15 @@ UMTUBA Commerce — Payout Booking Ops Helpers V1
 
 ## Capability (APPROVED)
 
-`commerce.settlement.payout_booking_ops_helpers_v1`
+`commerce.payments.full_order_refund_path_v1`
 
 ## Branch
 
-`office/commerce-settlement-payout-booking-ops-helpers-v1`
+`office/commerce-payments-full-order-refund-path-v1`
 
 ## Base / HEAD
 
-- Base (closed tip): `a0aade7d46de52a57504cb7357fcbbad062aa13b` (Commission Policy Foundation V1)
+- Base: `54404e860eb23eee7f94f72604ddcd18bac8d455` (Payout Booking Ops Helpers V1)
 - HEAD: uncommitted / staged on feature branch (no commit yet)
 
 ## Worktree
@@ -27,25 +27,23 @@ UMTUBA Commerce — Payout Booking Ops Helpers V1
 
 ## Coordination
 
-- **Desktop** owns: AI Platform / Runtime / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini — do not touch
-- **Laptop** = Commerce only (no AI, Dashboard, Admin UI, Usage, Quotas, Billing)
+- **Desktop** owns: Dashboard / Admin UI / AI Platform / Usage / Quotas / Billing / Providers / Gemini / Tutor — do not touch
+- **Laptop** = Commerce only
 
 ## Delivered
 
-Trusted service-side helpers over Seller Payout Foundation:
+Trusted full-order refund orchestration:
 
-| Helper | Action | Transition |
-| --- | --- | --- |
-| `submitPayoutBooking` | submit | `NONE` → `IN_TRANSIT` |
-| `failPayoutBooking` | fail | `IN_TRANSIT` → `NONE` |
-| `confirmPayoutBooking` | confirm | `IN_TRANSIT` → `COMPLETED` |
+1. Validate paid+captured, store ownership, currency/amount consistency
+2. Reject payout `IN_TRANSIT` / `COMPLETED`
+3. Settlement unwind: `RELEASED`→hold→reverse; `ALLOCATED|HELD`→reverse
+4. Sync `refunded` full capture amount via existing Payment Outcome Sync
 
-- Module: `lib/store/payoutBookingOpsHelpers.ts`
-- Tests: `lib/store/payoutBookingOpsHelpers.test.ts`
-- Doc: `docs/store/implementation/PAYOUT_BOOKING_OPS_HELPERS_V1.md`
-- Reuses `apply_store_payout_event` — **no new migration**
-- No bank rails, Dashboard, Admin UI, seller write UI, or AI
+- Module: `lib/store/fullOrderRefundPath.ts`
+- Tests: `lib/store/fullOrderRefundPath.test.ts`
+- Doc: `docs/store/implementation/FULL_ORDER_REFUND_PATH_V1.md`
+- **No new migration** (reuses Settlement + Sync RPCs)
 
 ## Next
 
-Human GO to commit / push / remote-apply (migrations `20260881`–`20260884` remain local until asked).
+Human GO to commit / push. Remote-apply pending Commerce migrations only when Product asks.

@@ -2,44 +2,34 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.settlement.payout_booking_ops_helpers_v1` on branch `office/commerce-settlement-payout-booking-ops-helpers-v1` (base `a0aade7`).
+**PASS + STAGED** for `commerce.payments.full_order_refund_path_v1` on `office/commerce-payments-full-order-refund-path-v1` (base `54404e8`).
 
 ## Exact milestone
 
-`commerce.settlement.payout_booking_ops_helpers_v1` — approved and implemented.
+`commerce.payments.full_order_refund_path_v1` — approved and implemented.
 
-## What changed
+## Refund behavior
 
-Service-side submit / fail / confirm helpers that:
-
-1. Load trusted capture / attempt / order / settlement / payout facts
-2. Validate store ownership and money consistency (no client amounts)
-3. Call existing `apply_store_payout_event` (service_role foundation RPC)
-4. Map idempotent replays, concurrent conflicts, and terminal-state errors
-5. Attach pure reconciliation projection on success
+| Step | Behavior |
+| --- | --- |
+| Validate | Paid + captured; exact store ownership; trusted money only |
+| Payout gate | Reject `IN_TRANSIT` and `COMPLETED` |
+| Settlement | `RELEASED`→`hold`→`reverse_allocation`; else reverse if allocated/held |
+| Sync | `apply_store_payment_outcome(refunded)` full capture amount |
+| Idempotency | Same key replays; conflict fails closed |
 
 ## Files
 
-- `lib/store/payoutBookingOpsHelpers.ts` (new)
-- `lib/store/payoutBookingOpsHelpers.test.ts` (new)
-- `docs/store/implementation/PAYOUT_BOOKING_OPS_HELPERS_V1.md` (new)
-- `docs/store/implementation/SELLER_PAYOUT_FOUNDATION_V1.md` (cross-link)
+- `lib/store/fullOrderRefundPath.ts` (new)
+- `lib/store/fullOrderRefundPath.test.ts` (new)
+- `docs/store/implementation/FULL_ORDER_REFUND_PATH_V1.md` (new)
+- `docs/store/implementation/SETTLEMENT_FOUNDATION_V1.md` (cross-link)
 - `docs/ai/CURRENT_TASK.md` / `CURSOR_REPORT.md` / `SESSION_HANDOFF.md`
 
 ## Migration
 
-None. Reuses `20260881_store_seller_payout_foundation_v1.sql`.
+None.
 
-## Verification
+## Boundaries
 
-| Check | Result |
-| --- | --- |
-| Focused + affected vitest | **194 passed** (11 files) |
-| `npx tsc --noEmit` | PASS |
-| `git diff --check` | PASS (after SSOT rewrite) |
-| Build | Not required (no UI) |
-| Commit / push / remote apply | **Not done** (per GO) |
-
-## Boundaries respected
-
-No Dashboard, Admin UI, AI, bank rails, seller payout button, or duplicate financial engine.
+No Dashboard, Admin UI, AI, bank rails, partial refunds, or COMPLETED clawback.

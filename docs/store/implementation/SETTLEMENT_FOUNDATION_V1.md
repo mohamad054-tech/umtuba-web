@@ -73,7 +73,7 @@ after capture provenance checks. That guard reads only trusted capture + settlem
 | `UNALLOCATED` (never allocated) | Allowed |
 | `REVERSED` (after reverse) | Allowed only if: no `active_allocations` row, and a `reverse_allocation` for the latest allocate has `ueos_journal_entry_id IS NOT NULL` |
 | `ALLOCATED` / `HELD` | Blocked — reverse_allocation required first |
-| `RELEASED` | Blocked — V1 does not unwind payable |
+| `RELEASED` | Blocked **directly** — V1 Sync refund guard does not unwind payable. Use Full Order Refund Path V1 (`hold` → `reverse_allocation` → Sync `refunded`). |
 
 Correlation must still match the trusted capture (mismatch fails closed).
 
@@ -105,7 +105,7 @@ Settlement Foundation V1 intentionally does **not** include:
 
 - bank transfers / payout rail adapters (see Seller Payout Foundation V1 for payable → in_transit booking)
 - commission / fee split
-- partial allocate or partial refund unwind from RELEASED
+- partial allocate or partial refund unwind from RELEASED without the Full Order Refund Path V1 orchestration
 - seller UI / balance dashboards
 - chargebacks
 - UM Points / UMT changes
