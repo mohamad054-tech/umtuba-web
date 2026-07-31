@@ -59,6 +59,18 @@ describe("marketplace supplier-seller — migrations", () => {
     expect(b).toMatch(/store_listing_allows_seller_sale/);
     expect(b).toMatch(/seller_listing_id/);
   });
+
+  it("ships supplier listing create hardening migration", () => {
+    const path =
+      "supabase/migrations/20260886_store_supplier_listing_create_hardening_v1.sql";
+    expect(existsSync(join(ROOT, path))).toBe(true);
+    const sql = readFileSync(join(ROOT, path), "utf8");
+    expect(sql).toMatch(/array\['owner', 'manager'\]/);
+    expect(sql).not.toMatch(
+      /is_store_member_with_role\(\s*v_seller_store_id,\s*array\['owner', 'manager', 'catalog_editor'\]/
+    );
+    expect(sql).toMatch(/An active listing already exists for this product/);
+  });
 });
 
 describe("marketplace eligibility", () => {

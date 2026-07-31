@@ -29,3 +29,5 @@ Seller storefront catalog/PDP already stamps `sellerListingId` â†’ add-to-cart â
 ## Out of scope
 
 Payment providers, shipping carriers, commission, affiliate, supplier portal, AI.
+
+Listing **create** hardening (auth, category, inventory model, duplicate active) is documented in `SUPPLIER_LISTING_CREATE_HARDENING_V1.md` (`commerce.marketplace.supplier_listing_create_hardening_v1`).

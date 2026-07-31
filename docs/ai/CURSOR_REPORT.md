@@ -2,20 +2,27 @@
 
 ## Summary
 
-**PASS** for `commerce.inventory.seller_inventory_availability_foundation_v1` on `office/commerce-catalog-category-taxonomy-seed-v1`.
+**PASS** for `commerce.marketplace.supplier_listing_create_hardening_v1` on `office/commerce-supplier-listing-create-hardening-v1` (base `29f0f6b`, cherry-pick `ca157d7`).
 
 ## Exact milestone
 
-`commerce.inventory.seller_inventory_availability_foundation_v1` — approved and implemented.
+`commerce.marketplace.supplier_listing_create_hardening_v1` — reused via verified cherry-pick.
 
-## How this unblocks product loading
+## Listing hardening behavior
 
-Catalog, PDP, cart, and seller inventory now resolve availability via a single trusted foundation (`unlimited` / `finite` / `unavailable`) over existing `product_inventory`. Digital/service types skip finite warehouse math; physical remains finite and launch-gated.
+- Owner/manager only create
+- Product↔supplier ownership validated
+- Active category required and stamped on listing
+- Trusted price + finite inventory model + digital readiness gates
+- Duplicate active listings rejected (fail closed)
+- Direct table INSERT revoked (RPC-only)
+- No commission/settlement invention; reuses existing listing table
+- Inventory gates resolve through Seller Inventory Availability Foundation on `29f0f6b`
 
 ## Migration
 
-**None.**
+`20260886_store_supplier_listing_create_hardening_v1.sql` — **local only**, not applied remotely.
 
 ## Boundaries
 
-No Dashboard/Admin expansion, no AI, no shipping, no duplicate inventory ledger, no weakening of publish readiness / taxonomy / `commerce_confirm_enabled` gates. No commit / no push in this phase.
+No Dashboard, no Admin UI, no AI, no redesign, no push in this phase.

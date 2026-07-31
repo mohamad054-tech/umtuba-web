@@ -24,6 +24,11 @@ import {
   resolveDigitalProductPublishReadiness,
   serviceRoleClientForDigitalReadiness,
 } from "./digitalProductPublishReadiness";
+import {
+  canCreateSupplierListing,
+  evaluateSupplierListingCreate,
+  isUuid,
+} from "./supplierListingCreateHardening";
 
 type AnyClient = SupabaseClient;
 
@@ -32,9 +37,7 @@ export type MarketplaceActionResult<T = undefined> =
   | { ok: false; message: string; requiresAuth?: boolean };
 
 function uuidOk(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value
-  );
+  return isUuid(value);
 }
 
 async function enrichPriceInventory(
@@ -279,20 +282,164 @@ export async function listMarketplaceDiscoveryForSeller(
 
 export async function addSupplierProductToMyStore(
   supabase: AnyClient,
-  input: { sourceProductId: string; sellerStoreId?: string | null }
+  input: {
+    sourceProductId: string;
+    sellerStoreId: string;
+    role: StoreMemberRole | null | undefined;
+  }
 ): Promise<
   MarketplaceActionResult<{ listingId: string; status: string; reused: boolean }>
 > {
+  if (!canCreateSupplierListing(input.role)) {
+    return {
+      ok: false,
+      message: "Only store owners or managers may create marketplace listings.",
+    };
+  }
   if (!uuidOk(input.sourceProductId)) {
     return { ok: false, message: "Product is invalid." };
   }
-  if (input.sellerStoreId && !uuidOk(input.sellerStoreId)) {
+  if (!uuidOk(input.sellerStoreId)) {
     return { ok: false, message: "Store not found." };
+  }
+
+  const { data: product, error: productError } = await supabase
+    .from("store_products")
+    .select(
+      "id, store_id, status, moderation_status, marketplace_eligible, product_type, primary_category_id"
+    )
+    .eq("id", input.sourceProductId)
+    .maybeSingle();
+
+  if (productError || !product) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  const supplierStoreId = String(product.store_id ?? "");
+  const productType = String(product.product_type ?? "");
+  const primaryCategoryId = product.primary_category_id
+    ? String(product.primary_category_id)
+    : null;
+
+  const { data: category } = primaryCategoryId
+    ? await supabase
+        .from("product_categories")
+        .select("id, status")
+        .eq("id", primaryCategoryId)
+        .maybeSingle()
+    : { data: null };
+
+  const [{ data: supplier }, { data: seller }] = await Promise.all([
+    supabase
+      .from("stores")
+      .select(
+        "id, status, verification_status, marketplace_supplier_enabled"
+      )
+      .eq("id", supplierStoreId)
+      .maybeSingle(),
+    supabase
+      .from("stores")
+      .select("id, status, verification_status")
+      .eq("id", input.sellerStoreId)
+      .maybeSingle(),
+  ]);
+
+  if (!supplier || !seller) {
+    return { ok: false, message: "Store not found." };
+  }
+
+  const offer = await enrichPriceInventory(supabase, input.sourceProductId);
+
+  const { data: variants } = await supabase
+    .from("product_variants")
+    .select("id, status")
+    .eq("product_id", input.sourceProductId)
+    .eq("status", "active")
+    .limit(1);
+  const variant = variants?.[0] ?? null;
+  let inventory: {
+    onHand: number;
+    reserved: number;
+    safetyStock: number;
+    allowBackorder: boolean;
+  } | null = null;
+  if (variant?.id) {
+    const { data: inv } = await supabase
+      .from("product_inventory")
+      .select("on_hand, reserved, safety_stock, allow_backorder")
+      .eq("variant_id", variant.id)
+      .eq("warehouse_key", "default")
+      .maybeSingle();
+    if (inv) {
+      inventory = {
+        onHand: Number(inv.on_hand),
+        reserved: Number(inv.reserved),
+        safetyStock: Number(inv.safety_stock),
+        allowBackorder: Boolean(inv.allow_backorder),
+      };
+    }
+  }
+
+  let digitalPublishReady = productType !== "digital";
+  if (productType === "digital") {
+    const readiness = await resolveDigitalProductPublishReadiness({
+      productType,
+      storeId: supplierStoreId,
+      productId: input.sourceProductId,
+    });
+    digitalPublishReady = readiness.ready;
+  }
+
+  const { data: existing } = await supabase
+    .from("store_seller_listings")
+    .select(
+      "id, status, seller_store_id, source_product_id, supplier_store_id"
+    )
+    .eq("seller_store_id", input.sellerStoreId)
+    .eq("source_product_id", input.sourceProductId)
+    .maybeSingle();
+
+  const gate = evaluateSupplierListingCreate({
+    role: input.role,
+    sellerStoreId: input.sellerStoreId,
+    sourceProductId: input.sourceProductId,
+    productStoreId: supplierStoreId,
+    supplierStoreId,
+    productStatus: String(product.status),
+    moderationStatus: String(product.moderation_status),
+    marketplaceEligible: Boolean(product.marketplace_eligible),
+    productType,
+    primaryCategoryId,
+    categoryFound: Boolean(category),
+    categoryStatus: category ? String(category.status) : null,
+    supplierStoreStatus: String(supplier.status),
+    supplierVerificationStatus: String(supplier.verification_status),
+    marketplaceSupplierEnabled: Boolean(supplier.marketplace_supplier_enabled),
+    sellerStoreStatus: String(seller.status),
+    sellerVerificationStatus: String(seller.verification_status),
+    priceAmountMinor: offer.priceMinor,
+    priceCurrency: offer.currency,
+    digitalPublishReady,
+    inventory,
+    variantStatus: variant ? String(variant.status) : null,
+    existingListing: existing
+      ? {
+          id: String(existing.id),
+          status: String(existing.status),
+          sellerStoreId: String(existing.seller_store_id),
+          sourceProductId: String(existing.source_product_id),
+          supplierStoreId: String(existing.supplier_store_id),
+        }
+      : null,
+  });
+
+  if (!gate.ok) {
+    return { ok: false, message: gate.message };
   }
 
   const { data, error } = await supabase.rpc(ADD_STORE_SELLER_LISTING_RPC, {
     p_source_product_id: input.sourceProductId,
-    p_seller_store_id: input.sellerStoreId ?? null,
+    p_seller_store_id: input.sellerStoreId,
   });
 
   if (error) {
@@ -305,7 +452,7 @@ export async function addSupplierProductToMyStore(
 
   const payload = (data ?? {}) as Record<string, unknown>;
   const listingId = String(payload.listing_id ?? "");
-  if (!listingId) {
+  if (!listingId || !uuidOk(listingId)) {
     return { ok: false, message: "Unexpected listing response." };
   }
   return {
@@ -313,7 +460,8 @@ export async function addSupplierProductToMyStore(
     data: {
       listingId,
       status: String(payload.status ?? "active"),
-      reused: Boolean(payload.reused),
+      // Prefer explicit reused; fall back to legacy idempotent key.
+      reused: Boolean(payload.reused ?? payload.idempotent),
     },
   };
 }
