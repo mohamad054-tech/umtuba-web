@@ -1,27 +1,37 @@
-# Session Handoff — Commerce Revenue ↔ Payout Balance Visibility V1
+# Session Handoff — Settlement ↔ Payout Reconciliation Read V1
 
 **Updated:** 2026-07-31
 
-## Active tip (local PASS — not committed)
+## Active milestone
 
-Branch: `office/commerce-revenue-payout-balance-visibility-v1`
+Capability: `commerce.settlement.payout_reconciliation_read_v1` (**APPROVED**)
+Branch: `office/commerce-settlement-payout-reconciliation-read-v1`
 Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-Base: `66a8bed` (Seller Payout Read Model)
-Milestone: `commerce.revenue.payout_balance_visibility_v1` — **APPROVED**, local implementation staged
-Migration: none
+Base tip: `af1eedd2eadd06fa7ad8beba76ce90d91d5d3b40`
+Status: **PASS + STAGED** — no commit / push / remote apply yet
+
+## What landed locally
+
+- SQL migration `20260883` — list + summary reconciliation RPCs
+- TS pure reconcile + parsers + RPC wrappers
+- Vitest contracts covering mismatch classes, pagination, auth surface, migration text
+- Commerce + AI SSOT docs updated
 
 ## Closed tips (do not reopen)
 
 | Track | Tip |
 | --- | --- |
+| Payout Balance Visibility V1 | `af1eedd` |
 | Seller Payout Read Model V1 | `66a8bed` |
 | Seller Payout Foundation V1 | `aa99592` + handoff `032ac77` |
-| Digital Product Versioning | `d01e1cd` |
 
 ## Coordination
 
-- Desktop owns Dashboard / Admin UI / AI — leave alone
+- Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — leave alone
+- This worktree = Commerce only
 
-## Next
+## Do not
 
-Commit/push GO.
+- Commit / push / remote-apply unless asked
+- Touch Dashboard / Admin / AI
+- Enable bank rails or invent the next Commerce feature without SSOT GO

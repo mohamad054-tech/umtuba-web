@@ -2,37 +2,44 @@
 
 ## Task title
 
-Commerce Revenue ↔ Payout Balance Visibility V1
+Settlement ↔ Payout Reconciliation Read V1
 
 ## Status
 
-`implementation-complete-local` — awaiting commit / push GO
+`implementation-complete-local` — **PASS + STAGED** — awaiting commit/push/remote apply GO
+
+## Capability
+
+`commerce.settlement.payout_reconciliation_read_v1` — **APPROVED** (Product GO 2026-07-31)
 
 ## Branch
 
-`office/commerce-revenue-payout-balance-visibility-v1`
+`office/commerce-settlement-payout-reconciliation-read-v1`
 
-## Base
+## Base / tip
 
-`66a8bedc3edb238a9a14055d9b1aca5391d67a4b` (Seller Payout Read Model)
+Base: `af1eedd2eadd06fa7ad8beba76ce90d91d5d3b40` (Payout Balance Visibility)
 
 ## Worktree
 
 `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
 
-## Milestone
+## Coordination
 
-`commerce.revenue.payout_balance_visibility_v1` — **APPROVED** and implemented locally
+- Desktop owns Dashboard / Admin UI / AI Platform / Providers / Runtime / Gemini / Tutor — do not touch
+- Laptop = Commerce only
 
-## Scope delivered
+## Delivered
 
-Revenue Bridge seller visibility now surfaces trusted available / in-transit / completed payout balances from the Seller Payout Read Model. `payoutsEnabled` remains false. No migration. No Dashboard/AI.
+- Migration `20260883_store_settlement_payout_reconciliation_read_v1.sql` (local only)
+- Pure + RPC TS: `lib/store/settlementPayoutReconciliation.ts`
+- Tests: `lib/store/settlementPayoutReconciliation.test.ts`
+- Doc: `docs/store/implementation/SETTLEMENT_PAYOUT_RECONCILIATION_READ_V1.md`
 
-## Machine policy
+## Scope held
 
-Commerce laptop only. No Dashboard/admin UI. No AI tracks.
-No remote migration apply / commit / push without explicit GO.
+Read-only reconciliation over capture → allocate → release → payout booking → completion. No payout execution, bank rails, Dashboard, Admin UI, or new financial engine.
 
 ## Next
 
-Commit/push GO (trailer-free).
+Human GO for: commit → push → (optional) remote migration apply. Do not invent the following milestone until SSOT names it.

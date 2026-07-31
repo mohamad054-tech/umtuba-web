@@ -66,3 +66,5 @@ Keyset: `before_created_at` + `before_id` together (or both null). Limit default
 Bank/provider rails, maker-checker batches, Dashboard/admin UI, write RPCs, commissions, dispute tables (none in V1 foundation), broad seller payout screens.
 
 Seller balance visibility through the Revenue Bridge is `commerce.revenue.payout_balance_visibility_v1` (consumes these RPCs; does not enable bank payouts).
+
+Settlement↔payout mismatch diagnostics are `commerce.settlement.payout_reconciliation_read_v1` (`SETTLEMENT_PAYOUT_RECONCILIATION_READ_V1.md`) — read-only; does not change this projection.
