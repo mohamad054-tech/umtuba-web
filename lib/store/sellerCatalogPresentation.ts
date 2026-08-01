@@ -32,6 +32,8 @@ export type SellerCatalogListItem = {
   updatedAt: string;
   createdAt: string;
   shortDescription?: string | null;
+  /** Optional — used by bulk field editing preview/no-op. */
+  primaryCategoryId?: string | null;
 };
 
 const FILTER_STATUSES: Record<

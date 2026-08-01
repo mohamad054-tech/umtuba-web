@@ -54,4 +54,6 @@ Toolbar + confirmation panel + result summary on `/seller/store/products`. No da
 
 ## Deferred
 
-Seller self-publish, unpublish/hide, restore-from-archive, true cross-page select-all-all-results, bulk edit fields.
+Seller self-publish, unpublish/hide, restore-from-archive, true cross-page select-all-all-results.
+
+Bulk field editing is covered by `SELLER_CATALOG_BULK_FIELD_EDITING_FOUNDATION_V1.md`.

@@ -32,6 +32,7 @@ import {
   parseSellerCatalogPaginationUrlState,
   sellerCatalogPaginationLabels,
 } from "../../../../lib/store/sellerCatalogPaginationExperience";
+import { listActiveCategories } from "../../../../lib/store/catalogQueries";
 import type { SellerCatalogListItem } from "../../../../lib/store/sellerCatalogPresentation";
 
 export const metadata = {
@@ -188,6 +189,7 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
     updatedAt: p.updated_at,
     createdAt: p.created_at,
     shortDescription: p.short_description,
+    primaryCategoryId: p.primary_category_id,
   }));
 
   let searchItems = buildSellerCatalogSearchItems({
@@ -260,6 +262,12 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
   });
 
   const canManage = canManageCatalog(membership.role);
+  const categories = canManage
+    ? (await listActiveCategories(supabase)).map((row) => ({
+        id: String(row.id),
+        name: String(row.name),
+      }))
+    : [];
 
   return (
     <SellerOpsShell title="Products" subtitle={membership.store.name} wide>
@@ -316,6 +324,7 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
           resultKind={resultKind}
           paginationLabels={paginationLabels}
           healthFilterScope={catalogPage.applied.healthFilterScope}
+          categories={categories}
         />
       </div>
     </SellerOpsShell>

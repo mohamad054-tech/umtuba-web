@@ -347,8 +347,10 @@ export async function updateDraftProduct(
   });
   if (!parsed.ok) return parsed;
 
-  const categoryId =
-    typeof raw.categoryId === "string" && raw.categoryId.trim()
+  const clearPrimaryCategory = raw.clearPrimaryCategory === true;
+  const categoryId = clearPrimaryCategory
+    ? null
+    : typeof raw.categoryId === "string" && raw.categoryId.trim()
       ? raw.categoryId.trim()
       : existing.primary_category_id;
 
@@ -381,6 +383,11 @@ export async function updateDraftProduct(
       category_id: categoryId,
       is_primary: true,
     });
+  } else if (clearPrimaryCategory) {
+    await supabase
+      .from("product_category_links")
+      .update({ is_primary: false })
+      .eq("product_id", productId);
   }
 
   return { ok: true, data: data as StoreProductRow };
