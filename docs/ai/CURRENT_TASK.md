@@ -2,46 +2,35 @@
 
 ## Task title
 
-AI Creator Studio Foundation V1
+UMTUBA — Unified Integration Verification V1
 
 ## Status
 
-`implementation-complete` — awaiting GO for commit/push
+`pass` — verification complete locally — **staged / uncommitted / unpushed**
 
-## Branch
+## Capability
 
-`office/platform-ai-creator-studio-foundation-v1`
+`platform.unified_integration_verification_v1` (verification only)
 
-## Worktree
+## Source of Truth base
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-creator-studio-foundation-v1`
+- Branch: `origin/integration/laptop-desktop-unification-v1`
+- Commit: `1e425100020cb74fbdafe8646695447d47c31c85`
 
-## Base
+## Verification branch / worktree
 
-`origin/office/platform-ai-unified-capability-execution-v1` @ `1c504ff`
+- Branch: `office/unified-integration-verification-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-unified-integration-verification-v1`
 
-## Allowed scope
+## Fixes in this pass
 
-- `lib/ai/creatorStudio/**`
-- `app/creator/studio/**`
-- `app/admin/ai/creator-studio/**`
-- `app/admin/ai/**` nav links only
-- `app/lib/nav/routes.ts` Creator Studio route only
-- `lib/ai/catalog/definitions.ts` capability binding only
-- `lib/ai/policy/fixtures.ts` policy binding only
-- `lib/ai/index.ts` exports only
-- `docs/ai/**`
+1. `lib/ai/services/aiService.ts` — diagnostics probe approval boundary after unified execution wiring
+2. `lib/ai/sharedAiSurfaceIntegration.test.ts` — coming_soon fail-closed message
+3. Docs handoff
 
-## Forbidden
+## Explicitly not done
 
-- Commit / push / merge
-- Live inference / network / Gemini / OpenAI
-- Commerce / Learning / Home / Private AI rewrites
-- `.env.local` / secrets
-
-## Done
-
-- Creator Studio contracts, templates, sessions, drafts, history, versions
-- Unified Capability Execution integration (mock results only)
-- Creator UI `/creator/studio` + Admin `/admin/ai/creator-studio`
-- Tests + docs handoff
+- No commit / push
+- No SoT rewrite
+- No migration renumber
+- No product feature work

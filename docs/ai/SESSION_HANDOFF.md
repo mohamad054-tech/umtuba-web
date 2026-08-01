@@ -1,20 +1,17 @@
-# SESSION_HANDOFF — AI Capability Catalog & Service Registry V1
+# Session Handoff
 
-## Where
+## Unified Integration Verification V1 — SAVE
 
-- Worktree: `umtuba-web-ai-capability-catalog-service-registry-v1`
-- Branch: `office/platform-ai-capability-catalog-service-registry-v1`
-- Base: `16bbaa4`
+- Worktree: `umtuba-web-unified-integration-verification-v1`
+- Branch: `office/unified-integration-verification-v1`
+- Base/HEAD start: `1e42510`
+- Status: **PASS + STAGED** (await commit GO)
 
-## Done
+## SoT
 
-- Central catalog of real Shared AI + Private AI domain + Hub placeholders
-- Service registry: register/unregister/lookup/filter/negotiate/lifecycle
-- Validation: duplicates, providers, runtimes, lifecycle, contracts
-- `aiService.runCapability` fail-closed via `requireExecutable`
-- Admin `/admin/ai/capabilities`
-- Vitest catalog suite + Shared AI surface still green
+`origin/integration/laptop-desktop-unification-v1` @ `1e425100020cb74fbdafe8646695447d47c31c85`
 
-## Next GO
+## Deferred
 
-Manual commit (no trailers) → push → `0 0`
+- Commission Policy Activation / Decomposition Bridge Apply / Entitlement Revoke not on this tip
+- Historical duplicate migration prefixes `20260875`–`20260880` (Commerce + AI parallel) — do not renumber without a dedicated cutover plan

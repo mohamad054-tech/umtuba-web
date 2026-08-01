@@ -276,7 +276,11 @@ describe("Shared AI Surface Integration V1", () => {
     );
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error.message).toMatch(/Unknown capability/);
+      // Catalog registers coming_soon placeholders as non-executable; either
+      // unknown or not-executable remains fail-closed.
+      expect(result.error.message).toMatch(
+        /Unknown capability|not executable/i
+      );
     }
   });
 

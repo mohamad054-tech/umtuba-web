@@ -1,74 +1,29 @@
-# CURSOR_REPORT — AI Creator Studio Foundation V1
+# Cursor Report
 
-## Summary
+**PASS (staged, uncommitted)** — Unified Integration Verification V1
 
-Creator Studio Foundation under `lib/ai/creatorStudio/` provides contracts, template registry, sessions/drafts/history/versions, and mock content results. Every generation request enters only via `executeUnifiedCapability` for capability `creator.studio.assist`. Creator UI `/creator/studio` and Admin `/admin/ai/creator-studio`. No live inference, no provider/network calls.
+## Base
 
-## Exact files changed
+- SoT: `origin/integration/laptop-desktop-unification-v1` @ `1e425100020cb74fbdafe8646695447d47c31c85`
+- Branch: `office/unified-integration-verification-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-unified-integration-verification-v1`
 
-### New
+## Environment note
 
-- `lib/ai/creatorStudio/types.ts`
-- `lib/ai/creatorStudio/templates.ts`
-- `lib/ai/creatorStudio/registry.ts`
-- `lib/ai/creatorStudio/service.ts`
-- `lib/ai/creatorStudio/index.ts`
-- `lib/ai/creatorStudio/creatorStudioFoundation.test.ts`
-- `app/creator/studio/page.tsx`
-- `app/creator/studio/actions.ts`
-- `app/creator/studio/CreatorStudioClient.tsx`
-- `app/admin/ai/creator-studio/page.tsx`
+Replaced out-of-tree `node_modules` junction with local `npm ci` in this worktree only (required for Next/Turbopack build). `package.json` / `package-lock.json` unchanged.
 
-### Modified
+## Merge regression fix
 
-- `app/lib/nav/routes.ts` — `creatorStudio` route
-- `lib/ai/catalog/definitions.ts` — `creator.studio.assist` executable capability
-- `lib/ai/policy/fixtures.ts` — policy binding for `creator.studio.assist`
-- `lib/ai/index.ts` — Creator Studio exports
-- `app/admin/ai/page.tsx` — nav link
-- `app/admin/ai/capabilities/page.tsx` — nav link
-- `app/admin/ai/usage/page.tsx` — nav link
-- `app/admin/ai/policies/page.tsx` — nav link
-- `app/admin/ai/orchestration/page.tsx` — nav link
-- `app/admin/ai/execution-pipeline/page.tsx` — nav link
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/CURSOR_REPORT.md`
+`aiService.runCapability` always runs Unified Capability Execution first. Diagnostics uses strict moderation → blocked without `approvalGranted`. Fix: grant approval at the trusted diagnostics service boundary. Coming-soon placeholders now fail closed with `not executable` (test expectation updated).
 
-## Migrations created
+## Verification summary
 
-None.
+- Commerce focused: PASS (227 + live payment gate 25)
+- AI + nav focused: PASS (567 passed, 1 skipped)
+- `npx tsc --noEmit`: PASS
+- `npm run build`: PASS
+- Migrations: duplicate timestamp prefixes 20260875–20260880 (Commerce∥AI) documented; no renumber this pass
 
-## Security review
+## Open
 
-- No secrets / `.env.local` changes
-- Admin route gated by platform admin
-- Creator route requires authenticated user
-- No Gemini / OpenAI / provider imports in Creator Studio modules
-- Results are mock/contracts only; Unified Execution stops at planning readiness
-
-## Tests
-
-`vitest run` focused suites: **4 files / 44 tests passed**  
-(`creatorStudioFoundation` 13, `unifiedCapabilityExecution` 8, `capabilityCatalogRegistry` 10, `policyGovernanceFoundation` 13).
-
-## TypeScript
-
-`npx tsc --noEmit` — **PASS** (exit 0).
-
-## Build
-
-Not required for this foundation task (no app entry/shell redesign).
-
-## git diff --check
-
-**PASS** (exit 0).
-
-## git status --short
-
-Uncommitted on `office/platform-ai-creator-studio-foundation-v1` (pending GO).
-
-## Open issues
-
-- Process-local in-memory store (sessions/drafts/history) is foundation-only; not durable across workers
-- Live inference / provider invocation intentionally deferred to later tasks
+Await commit/push GO. Laptop commission activation / revoke-on-refund not present on SoT tip (deferred).

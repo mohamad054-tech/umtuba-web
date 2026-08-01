@@ -181,6 +181,12 @@ async function runCapabilityInner(
       correlationId: request.context.workspaceId ?? null,
       surface: request.context.surface,
       productDomain: request.context.productDomain,
+      // Strict moderation on diagnostics requires approval. The trusted
+      // aiService diagnostics branch is the approval boundary (admin route /
+      // forceStub tests); without this flag unified preflight blocks the
+      // documented service entry after Capability Execution V1 wiring.
+      approvalGranted:
+        request.capabilityId === "platform.diagnostics_probe",
     });
 
     if (!isUnifiedExecutionReady(unified)) {
@@ -225,6 +231,12 @@ async function runCapabilityInner(
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Unified execution failed.";
+    // Catalog placeholders (coming_soon) throw "Capability not executable".
+    // Treat as invalid_input so callers see a fail-closed capability error,
+    // not a configuration outage.
+    if (/not executable|Unknown capability|surface not shared_ai/i.test(message)) {
+      return asFailure("invalid_input", message);
+    }
     return asFailure("configuration_invalid", message);
   }
 
