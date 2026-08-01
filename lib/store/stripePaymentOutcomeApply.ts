@@ -1,6 +1,6 @@
 /**
  * Service-role executor for apply_store_payment_outcome + allocate +
- * entitlement grant + settlement release.
+ * commission decomposition apply + entitlement grant + settlement release.
  * Server-only module (API routes / workers). Never import from client components.
  */
 
@@ -13,6 +13,10 @@ import {
   allocateSettlementAfterTrustedCapture,
   type PostCaptureAllocateResult,
 } from "./postCaptureSettlementAllocate";
+import {
+  applyCommissionDecompositionAfterTrustedCapture,
+  type CommissionDecompositionApplyResult,
+} from "./commissionDecompositionBridgeApply";
 import {
   grantDigitalEntitlementsAfterTrustedCapture,
   type DigitalEntitlementGrantResult,
@@ -40,6 +44,7 @@ export type ApplyStorePaymentOutcomeResult =
       data: Record<string, unknown>;
       replayed: boolean;
       settlement: PostCaptureAllocateResult;
+      commission: CommissionDecompositionApplyResult;
       entitlement: DigitalEntitlementGrantResult;
       release: PostCaptureReleaseResult;
     }
@@ -73,9 +78,10 @@ function serviceRoleClient():
 }
 
 /**
- * Apply verified provider outcome via Sync. On capture: allocate, grant
- * digital entitlements, then release to payable. Post-steps are idempotent.
- * Release runs only after both allocate and entitlement succeed.
+ * Apply verified provider outcome via Sync. On capture: allocate, apply
+ * commission decomposition, grant digital entitlements, then release to payable.
+ * Post-steps are idempotent. Release runs only after both allocate and
+ * entitlement succeed. Commission apply does not gate release.
  */
 export async function applyVerifiedStorePaymentOutcome(
   input: ApplyStorePaymentOutcomeInput,
@@ -128,6 +134,10 @@ export async function applyVerifiedStorePaymentOutcome(
         status: "skipped",
         reason: `Outcome ${input.outcome} is not settlement-allocate eligible.`,
       },
+      commission: {
+        status: "skipped",
+        reason: `Outcome ${input.outcome} is not commission-apply eligible.`,
+      },
       entitlement: {
         status: "skipped",
         reason: `Outcome ${input.outcome} is not entitlement-grant eligible.`,
@@ -147,6 +157,26 @@ export async function applyVerifiedStorePaymentOutcome(
     currency: input.currency,
     providerReference: input.providerReference,
   });
+
+  let commission: CommissionDecompositionApplyResult;
+  if (settlement.status !== "allocated") {
+    commission = {
+      status: "skipped",
+      reason:
+        settlement.status === "failed"
+          ? "Commission decomposition skipped because allocate failed."
+          : "Commission decomposition skipped because allocate did not succeed.",
+    };
+  } else {
+    commission = await applyCommissionDecompositionAfterTrustedCapture(
+      supabase,
+      {
+        paymentAttemptId: input.paymentAttemptId,
+        captureEventKey: input.eventKey,
+        correlationId: input.correlationId,
+      }
+    );
+  }
 
   const entitlement = await grantDigitalEntitlementsAfterTrustedCapture(
     supabase,
@@ -198,6 +228,7 @@ export async function applyVerifiedStorePaymentOutcome(
     data: payload,
     replayed,
     settlement,
+    commission,
     entitlement,
     release,
   };

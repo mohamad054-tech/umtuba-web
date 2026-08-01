@@ -13,6 +13,7 @@ import {
   revokeDigitalEntitlementsAfterTrustedRefund,
   STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
 } from "./digitalEntitlementRevoke";
+import { STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC } from "./commissionDecompositionBridgeApply";
 import {
   applyFullOrderRefund,
   type TrustedFullOrderRefundContext,
@@ -192,6 +193,16 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
+      if (name === STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC) {
+        return {
+          data: {
+            ok: true,
+            skipped: true,
+            reason: "no_commission_decomposition_for_attempt",
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -215,10 +226,11 @@ describe("Digital entitlement revoke — refund path wiring", () => {
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+      STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
 
     rpc.mockClear();
-    rpc.mockImplementation(async (name: string) => {
+    rpc.mockImplementation((async (name: string) => {
       if (name === STORE_PAYMENT_SYNC_RPC) {
         return {
           data: { replayed: true, outcome: "refunded", event_key: IDEM },
@@ -235,8 +247,20 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
+      if (name === STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: true,
+            skipped: false,
+            reason: null,
+            lifecycle_status: "superseded_by_refund",
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
-    });
+    }) as never);
 
     const replay = await applyFullOrderRefund(
       { rpc } as never,
@@ -264,6 +288,7 @@ describe("Digital entitlement revoke — refund path wiring", () => {
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+      STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
   });
 

@@ -14,6 +14,7 @@ import {
   STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
   STORE_DIGITAL_ENTITLEMENT_LIST_RPC,
 } from "./digitalEntitlementGrant";
+import { STORE_COMMISSION_DECOMPOSITION_APPLY_RPC } from "./commissionDecompositionBridgeApply";
 import { applyVerifiedStorePaymentOutcome } from "./stripePaymentOutcomeApply";
 
 const ROOT = join(__dirname, "../..");
@@ -148,6 +149,18 @@ describe("Digital entitlement grant — capture wiring", () => {
         }
         return { data: { replayed: false, action: "allocate" }, error: null };
       }
+      if (name === STORE_COMMISSION_DECOMPOSITION_APPLY_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            policy_status: "not_configured",
+            lifecycle_status: "not_configured",
+            capture_amount_minor: 2500,
+          },
+          error: null,
+        };
+      }
       if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {
         return {
           data: {
@@ -178,11 +191,13 @@ describe("Digital entitlement grant — capture wiring", () => {
     expect(applied.ok).toBe(true);
     if (!applied.ok) return;
     expect(applied.settlement.status).toBe("allocated");
+    expect(applied.commission.status).toBe("not_configured");
     expect(applied.entitlement.status).toBe("granted");
     expect(applied.release.status).toBe("released");
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
+      STORE_COMMISSION_DECOMPOSITION_APPLY_RPC,
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
       STORE_SETTLEMENT_RPC,
     ]);

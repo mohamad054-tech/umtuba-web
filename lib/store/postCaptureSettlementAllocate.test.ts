@@ -231,6 +231,18 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
         });
         return { data: { replayed: false, action: "release" }, error: null };
       }
+      if (name === "apply_store_commission_decomposition_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            policy_status: "not_configured",
+            lifecycle_status: "not_configured",
+            capture_amount_minor: 2500,
+          },
+          error: null,
+        };
+      }
       if (name === "grant_store_digital_entitlements_after_capture") {
         return {
           data: {
@@ -264,7 +276,7 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
     expect(applied.replayed).toBe(false);
     expect(applied.settlement.status).toBe("allocated");
     expect(applied.release.status).toBe("released");
-    expect(rpc).toHaveBeenCalledTimes(4);
+    expect(rpc).toHaveBeenCalledTimes(5);
     expect(rpc.mock.calls[0][0]).toBe(STORE_PAYMENT_SYNC_RPC);
     expect(rpc.mock.calls[1][0]).toBe(STORE_SETTLEMENT_RPC);
   });
@@ -279,6 +291,18 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
           return { data: { replayed: true, action: "release" }, error: null };
         }
         return { data: { replayed: true, action: "allocate" }, error: null };
+      }
+      if (name === "apply_store_commission_decomposition_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: true,
+            policy_status: "not_configured",
+            lifecycle_status: "not_configured",
+            capture_amount_minor: 2500,
+          },
+          error: null,
+        };
       }
       return {
         data: {

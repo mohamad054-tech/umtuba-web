@@ -2,25 +2,25 @@
 
 ## Task title
 
-UMTUBA Commerce — Digital Entitlement Revoke on Refund V1
+UMTUBA Commerce — Commission Decomposition Bridge Apply V1
 
 ## Status
 
-`pass` — cherry-pick of `306a023` onto `a933624` (no push / no remote migration)
+`pass` — cherry-pick of `7d90a05` onto `0ccdb63` (no push / no remote migration)
 
 ## Capability
 
-`commerce.digital.entitlement_revoke_on_refund_v1`
+`commerce.revenue.commission_decomposition_bridge_apply_v1`
 
 ## Branch / tip
 
-- Branch: `office/commerce-digital-entitlement-revoke-on-refund-v1-current`
-- Base (closed tip): `a933624` (Refund Operations Surface V1)
-- Milestone: cherry-pick of `306a023` (feat(commerce): revoke digital entitlements after refund v1)
+- Branch: `office/commerce-commission-decomposition-bridge-apply-v1-current`
+- Base (closed tip): `0ccdb63` (Digital Entitlement Revoke on Refund V1)
+- Milestone: cherry-pick of `7d90a05` (feat(commerce): apply commission decomposition bridge v1)
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1-current`
+`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-commission-decomposition-bridge-apply-v1-current`
 
 ## Completed Commerce chain (closed)
 
@@ -32,26 +32,27 @@ UMTUBA Commerce — Digital Entitlement Revoke on Refund V1
 6. Live Payment Production Gate V1
 7. Commerce Transactional Notifications V1
 8. Seller Payout Rails V1
-9. Refund Operations Surface V1 (`a933624`)
+9. Refund Operations Surface V1
+10. Digital Entitlement Revoke on Refund V1 (`0ccdb63`)
 
 ## Coordination
 
 - **Desktop** owns: AI / Dashboard — do not touch
-- **Laptop** = Commerce digital entitlement revoke-on-refund only
-- Do **not** touch commission / payout rails / Stripe payment config / Admin UI
+- **Laptop** = Commerce commission decomposition bridge apply only
+- Do **not** touch payout-net redesign / Admin UI / shipping
 
 ## Delivered
 
-- TS SSOT `lib/store/digitalEntitlementRevoke.ts` (+ tests)
-- SQL RPC `revoke_store_digital_entitlements_after_refund` + revoke events
-- Wired into `applyFullOrderRefund` (success + Sync replay)
-- Migration `20260889` local only
-- Docs: `DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md`
+- TS SSOT `lib/store/commissionDecompositionBridgeApply.ts` (+ tests)
+- RPCs: apply after capture, mark after refund, get for attempt
+- Wired into `applyVerifiedStorePaymentOutcome` + `applyFullOrderRefund`
+- Migration `20260890` local only
+- Docs: `COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
 
 ## Explicit non-actions
 
-No push · no remote migration · no partial/line revoke · no Stripe refund adapter · no commission/payout/wallet/shipping · no Admin UI · no AI
+No push · no remote migration · no invented shares · no partial refund · no payout-net redesign · no bank rails · no Admin UI · no settlement amount mutation · no AI
 
 ## Next
 
-Human GO to push when ready. Apply `20260889` only under separate ops GO.
+Human GO to push when ready. Apply `20260890` only under separate ops GO.

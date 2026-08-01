@@ -49,6 +49,9 @@ Trusted **single source of truth** for commission policy contracts and decomposi
 
 **Settlement capture amounts are not changed.** Commission is a parallel decomposition.
 
+Durable apply after capture+allocate is **Commission Decomposition Bridge Apply V1**
+(`commerce.revenue.commission_decomposition_bridge_apply_v1`, migration `20260890`).
+
 ## Security
 
 - Never trusts client percentages / rates / bps
