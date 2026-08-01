@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   bulkArchiveProductsAction,
+  bulkEditProductFieldsAction,
   bulkSubmitProductsAction,
 } from "../../actions/storeCatalog";
 import {
@@ -35,9 +36,18 @@ import {
   selectAllVisibleBulkItems,
   toggleBulkSelection,
   type SellerCatalogBulkOperationId,
-  type SellerCatalogBulkSelectionItem,
   type SellerCatalogBulkSummary,
 } from "../../../lib/store/sellerCatalogBulkOperations";
+import {
+  allowedOperationsForBulkField,
+  deriveSellerCatalogBulkFieldToolbar,
+  isSellerCatalogBulkFieldSupported,
+  planSellerCatalogBulkFieldEdit,
+  type SellerCatalogBulkFieldId,
+  type SellerCatalogBulkFieldOperation,
+  type SellerCatalogBulkFieldSelectionItem,
+  type SellerCatalogBulkFieldSummary,
+} from "../../../lib/store/sellerCatalogBulkFieldEditing";
 import StoreEmptyState from "./StoreEmptyState";
 
 type PaginationLabels = {
@@ -48,6 +58,8 @@ type PaginationLabels = {
   nextDisabled: boolean;
   previousDisabled: boolean;
 };
+
+type CategoryOption = { id: string; name: string };
 
 type Props = {
   products: SellerCatalogSearchItem[];
@@ -63,16 +75,19 @@ type Props = {
   resultKind: SellerCatalogResultKind;
   paginationLabels: PaginationLabels;
   healthFilterScope: "none" | "page_only";
+  categories: CategoryOption[];
 };
 
 function toSelectionItem(
   product: SellerCatalogSearchItem
-): SellerCatalogBulkSelectionItem {
+): SellerCatalogBulkFieldSelectionItem {
   return {
     id: product.id,
     title: product.title,
     status: String(product.status),
     storeId: product.storeId,
+    primaryCategoryId: product.primaryCategoryId ?? null,
+    shortDescription: product.shortDescription ?? null,
   };
 }
 
@@ -89,17 +104,28 @@ export default function SellerProductDashboard({
   resultKind,
   paginationLabels,
   healthFilterScope,
+  categories,
 }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState(applied.search);
   const [selected, setSelected] = useState<
-    Record<string, SellerCatalogBulkSelectionItem>
+    Record<string, SellerCatalogBulkFieldSelectionItem>
   >({});
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [summary, setSummary] = useState<SellerCatalogBulkSummary | null>(null);
+  const [summary, setSummary] = useState<
+    SellerCatalogBulkSummary | SellerCatalogBulkFieldSummary | null
+  >(null);
   const [confirmOp, setConfirmOp] =
     useState<SellerCatalogBulkOperationId | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editField, setEditField] =
+    useState<SellerCatalogBulkFieldId>("category");
+  const [editOperation, setEditOperation] =
+    useState<SellerCatalogBulkFieldOperation>("replace");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editShortDescription, setEditShortDescription] = useState("");
+  const [editPreview, setEditPreview] = useState(false);
   const [pending, startTransition] = useTransition();
   const [navPending, startNavTransition] = useTransition();
 
@@ -110,6 +136,7 @@ export default function SellerProductDashboard({
   const selectedItems = useMemo(() => Object.values(selected), [selected]);
   const selectedCount = selectedItems.length;
   const toolbar = deriveSellerCatalogBulkToolbar({ selectedCount });
+  const fieldToolbar = deriveSellerCatalogBulkFieldToolbar({ selectedCount });
 
   const visibleSelectionItems = products.map(toSelectionItem);
   const allVisibleSelected =
@@ -123,6 +150,32 @@ export default function SellerProductDashboard({
         items: selectedItems,
       })
     : null;
+
+  const selectedCategoryName =
+    categories.find((c) => c.id === editCategoryId)?.name ?? null;
+
+  const fieldPlan =
+    editOpen && editPreview
+      ? planSellerCatalogBulkFieldEdit({
+          field: editField,
+          operation: editOperation,
+          storeId,
+          items: selectedItems,
+          categoryId: editCategoryId,
+          categoryName: selectedCategoryName,
+          shortDescription: editShortDescription,
+          categoryFound: editCategoryId
+            ? categories.some((c) => c.id === editCategoryId)
+            : undefined,
+          categoryStatus: editCategoryId
+            ? categories.some((c) => c.id === editCategoryId)
+              ? "active"
+              : undefined
+            : undefined,
+        })
+      : null;
+
+  const fieldOps = allowedOperationsForBulkField(editField);
 
   function navigateFilters(patch: {
     search?: string;
@@ -159,7 +212,26 @@ export default function SellerProductDashboard({
     setError(null);
     setMessage(null);
     setSummary(null);
+    setEditOpen(false);
+    setEditPreview(false);
     setConfirmOp(operation);
+  }
+
+  function openBulkEdit() {
+    if (selectedCount === 0) {
+      setError("Select products first.");
+      return;
+    }
+    setError(null);
+    setMessage(null);
+    setSummary(null);
+    setConfirmOp(null);
+    setEditField("category");
+    setEditOperation("replace");
+    setEditCategoryId(categories[0]?.id ?? "");
+    setEditShortDescription("");
+    setEditPreview(false);
+    setEditOpen(true);
   }
 
   function runConfirmedBulk() {
@@ -203,13 +275,7 @@ export default function SellerProductDashboard({
       });
       setSummary(merged);
       if (merged.overall === "success") {
-        setMessage(
-          `${merged.label}: ${merged.succeeded} succeeded.`
-        );
-      } else if (merged.overall === "partial") {
-        setMessage(
-          `${merged.label}: ${merged.succeeded} succeeded, ${merged.failed} failed, ${merged.skipped} skipped.`
-        );
+        setMessage(`${merged.label}: ${merged.succeeded} succeeded.`);
       } else {
         setMessage(
           `${merged.label}: ${merged.succeeded} succeeded, ${merged.failed} failed, ${merged.skipped} skipped.`
@@ -218,6 +284,77 @@ export default function SellerProductDashboard({
       setSelected((prev) => {
         const next = { ...prev };
         for (const row of merged.results) {
+          if (row.outcome === "success") delete next[row.productId];
+        }
+        return next;
+      });
+      router.refresh();
+    });
+  }
+
+  function runConfirmedFieldEdit() {
+    if (!fieldPlan || !fieldPlan.supported) {
+      setError(fieldPlan?.deferredReason || "Preview this edit first.");
+      return;
+    }
+    if (selectedCount === 0) {
+      setError("Select at least one product.");
+      return;
+    }
+
+    const body = new FormData();
+    body.set("field", fieldPlan.field);
+    body.set("operation", fieldPlan.operation);
+    if (fieldPlan.field === "category" && fieldPlan.operation === "replace") {
+      body.set("categoryId", editCategoryId);
+    }
+    if (
+      fieldPlan.field === "short_description" &&
+      fieldPlan.operation === "replace"
+    ) {
+      body.set("shortDescription", editShortDescription);
+    }
+    for (const item of selectedItems) body.append("productId", item.id);
+    const label = fieldPlan.label;
+    const field = fieldPlan.field;
+    const operation = fieldPlan.operation;
+    const titleById = new Map(
+      selectedItems.map((item) => [item.id, item.title] as const)
+    );
+    setEditOpen(false);
+    setEditPreview(false);
+    startTransition(async () => {
+      const result = await bulkEditProductFieldsAction(body);
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
+      setSummary({
+        field,
+        operation,
+        label,
+        succeeded: result.succeeded,
+        failed: result.failed,
+        skipped: result.skipped,
+        total: result.results.length,
+        overall: result.overall,
+        results: result.results.map((row) => ({
+          productId: row.productId,
+          title: titleById.get(row.productId),
+          outcome: row.outcome,
+          reason: row.reason,
+        })),
+      });
+      if (result.overall === "success") {
+        setMessage(`${label}: ${result.succeeded} succeeded.`);
+      } else {
+        setMessage(
+          `${label}: ${result.succeeded} succeeded, ${result.failed} failed, ${result.skipped} skipped.`
+        );
+      }
+      setSelected((prev) => {
+        const next = { ...prev };
+        for (const row of result.results) {
           if (row.outcome === "success") delete next[row.productId];
         }
         return next;
@@ -400,6 +537,14 @@ export default function SellerProductDashboard({
             >
               Clear selection
             </button>
+            <button
+              type="button"
+              disabled={pending || selectedCount === 0}
+              onClick={openBulkEdit}
+              className="rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-ink)] disabled:opacity-40"
+            >
+              Bulk Edit
+            </button>
             {toolbar.map((action) => (
               <button
                 key={action.id}
@@ -460,6 +605,196 @@ export default function SellerProductDashboard({
               ) : null}
             </div>
           ) : null}
+        </div>
+      ) : null}
+
+      {editOpen ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bulk-edit-title"
+          className="rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5"
+        >
+          <h2
+            id="bulk-edit-title"
+            className="sf-display text-lg font-semibold tracking-tight"
+          >
+            Bulk Edit fields
+          </h2>
+          <p className="mt-2 text-sm text-[var(--sf-muted)]">
+            {selectedCount} selected. Preview before confirming. Unsupported
+            fields stay disabled.
+          </p>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                Field
+              </span>
+              <select
+                value={editField}
+                onChange={(event) => {
+                  const next = event.target.value as SellerCatalogBulkFieldId;
+                  setEditField(next);
+                  const ops = allowedOperationsForBulkField(next);
+                  setEditOperation(ops[0] ?? "replace");
+                  setEditPreview(false);
+                }}
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none"
+              >
+                {fieldToolbar.map((row) => (
+                  <option
+                    key={row.id}
+                    value={row.id}
+                    disabled={!isSellerCatalogBulkFieldSupported(row.id)}
+                  >
+                    {row.label}
+                    {!isSellerCatalogBulkFieldSupported(row.id)
+                      ? " (unavailable)"
+                      : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                Operation
+              </span>
+              <select
+                value={editOperation}
+                onChange={(event) => {
+                  setEditOperation(
+                    event.target.value as SellerCatalogBulkFieldOperation
+                  );
+                  setEditPreview(false);
+                }}
+                disabled={!isSellerCatalogBulkFieldSupported(editField)}
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none disabled:opacity-40"
+              >
+                {fieldOps.map((op) => (
+                  <option key={op} value={op}>
+                    {op}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {editField === "category" && editOperation === "replace" ? (
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                  Category
+                </span>
+                <select
+                  value={editCategoryId}
+                  onChange={(event) => {
+                    setEditCategoryId(event.target.value);
+                    setEditPreview(false);
+                  }}
+                  className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none"
+                >
+                  {categories.length === 0 ? (
+                    <option value="">No active categories</option>
+                  ) : (
+                    categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </label>
+            ) : null}
+
+            {editField === "short_description" &&
+            editOperation === "replace" ? (
+              <label className="block space-y-2 md:col-span-1">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+                  Short description
+                </span>
+                <input
+                  value={editShortDescription}
+                  onChange={(event) => {
+                    setEditShortDescription(event.target.value);
+                    setEditPreview(false);
+                  }}
+                  maxLength={280}
+                  placeholder="Up to 280 characters"
+                  className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none"
+                />
+              </label>
+            ) : null}
+          </div>
+
+          {!isSellerCatalogBulkFieldSupported(editField) ? (
+            <p className="mt-3 text-xs text-[var(--sf-faint)]">
+              {fieldToolbar.find((row) => row.id === editField)?.reason}
+            </p>
+          ) : null}
+
+          {fieldPlan ? (
+            <div className="mt-4 rounded-xl border border-[var(--sf-line)] bg-black/20 px-3 py-3 text-sm text-[var(--sf-muted)]">
+              <p className="font-semibold text-[var(--sf-ink)]">
+                Preview · {fieldPlan.label}
+              </p>
+              <p className="mt-1">
+                Selected {fieldPlan.selectedCount} · Eligible{" "}
+                {fieldPlan.eligible.length} · Skipped {fieldPlan.skipped.length}
+              </p>
+              <p className="mt-1">Value: {fieldPlan.valuePreview}</p>
+              <p className="mt-1">{fieldPlan.expectedImpact}</p>
+              {fieldPlan.warnings.length > 0 ? (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[var(--sf-faint)]">
+                  {fieldPlan.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              ) : null}
+              {fieldPlan.skipped.length > 0 ? (
+                <ul className="mt-2 max-h-28 space-y-1 overflow-auto text-xs text-[var(--sf-faint)]">
+                  {fieldPlan.skipped.slice(0, 10).map((row) => (
+                    <li key={row.id}>
+                      {row.title}: {row.reason}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={pending || !isSellerCatalogBulkFieldSupported(editField)}
+              onClick={() => setEditPreview(true)}
+              className="rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold text-[var(--sf-ink)] disabled:opacity-40"
+            >
+              Preview
+            </button>
+            <button
+              type="button"
+              disabled={
+                pending ||
+                !fieldPlan?.supported ||
+                fieldPlan.eligible.length === 0
+              }
+              onClick={runConfirmedFieldEdit}
+              className="rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712] disabled:opacity-40"
+            >
+              Confirm edit
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                setEditOpen(false);
+                setEditPreview(false);
+              }}
+              className="rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold text-[var(--sf-ink)]"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       ) : null}
 

@@ -8,6 +8,7 @@ import {
   archiveProductMedia,
   attachProductMediaMetadata,
   createDraftProduct,
+  getOwnedOrMemberStore,
   submitProductForReview,
   updateDraftProduct,
   updateProductMarketplaceEligibility,
@@ -15,7 +16,26 @@ import {
   updateStoreBasics,
   upsertVariantPriceInventory,
 } from "../../lib/store/sellerStore";
+import { canManageCatalog } from "../../lib/store/permissions";
+import { assertPrimaryCategoryEligibleForReview } from "../../lib/store/categoryTaxonomySeed";
 import { buildOptionValuesPayload } from "../../lib/store/sellerCatalogPresentation";
+import {
+  assertBulkFieldEditBatchSize,
+  buildBulkFieldUpdateDraftPayload,
+  deferredSellerCatalogBulkFieldReason,
+  isBulkFieldOperationAllowed,
+  isSellerCatalogBulkFieldSupported,
+  mapWithConcurrencyLimit,
+  mergeBulkFieldPlanWithExecutionResults,
+  normalizeBulkCategoryId,
+  normalizeBulkShortDescription,
+  parseSellerCatalogBulkFieldId,
+  parseSellerCatalogBulkFieldOperation,
+  planSellerCatalogBulkFieldEdit,
+  SELLER_CATALOG_BULK_FIELD_EDIT_CONCURRENCY,
+  type SellerCatalogBulkFieldSelectionItem,
+} from "../../lib/store/sellerCatalogBulkFieldEditing";
+import { uniqueBulkSelectionIds } from "../../lib/store/sellerCatalogBulkOperations";
 import { APP_ROUTES } from "../lib/nav";
 
 async function requireUser() {
@@ -381,6 +401,268 @@ export async function bulkSubmitProductsAction(
   }
   revalidatePath("/seller/store/products");
   return { ok: true, submitted, failed, skipped: 0, results };
+}
+
+export async function bulkEditProductFieldsAction(
+  formData: FormData
+): Promise<
+  | {
+      ok: true;
+      succeeded: number;
+      failed: number;
+      skipped: number;
+      overall: "success" | "partial" | "failed" | "skipped_only" | "empty";
+      results: Array<{
+        productId: string;
+        outcome: "success" | "failed" | "skipped";
+        reason?: string;
+      }>;
+    }
+  | { ok: false; message: string }
+> {
+  const user = await requireUser();
+  const fieldRaw = formData.get("field");
+  const operationRaw = formData.get("operation");
+  const field = parseSellerCatalogBulkFieldId(fieldRaw);
+  const operation = parseSellerCatalogBulkFieldOperation(operationRaw);
+
+  if (!field) {
+    return { ok: false, message: "Invalid bulk field." };
+  }
+  if (!operation) {
+    return { ok: false, message: "Invalid bulk field operation." };
+  }
+  if (!isSellerCatalogBulkFieldSupported(field)) {
+    return {
+      ok: false,
+      message:
+        deferredSellerCatalogBulkFieldReason(field) ||
+        "Field is not supported for bulk edit.",
+    };
+  }
+  if (!isBulkFieldOperationAllowed(field, operation)) {
+    return {
+      ok: false,
+      message: `Operation "${operation}" is not allowed for this field.`,
+    };
+  }
+
+  const ids = uniqueBulkSelectionIds(
+    formData
+      .getAll("productId")
+      .map((value) => ({
+        id: String(value || "").trim(),
+        title: "",
+        status: "draft",
+        storeId: "",
+      }))
+  );
+  const sizeGate = assertBulkFieldEditBatchSize(ids.length);
+  if (!sizeGate.ok) {
+    return { ok: false, message: sizeGate.message };
+  }
+
+  const supabase = await createClient();
+  const membership = await getOwnedOrMemberStore(supabase, user.id);
+  if (!membership) {
+    return { ok: false, message: "Store membership required." };
+  }
+  if (!canManageCatalog(membership.role)) {
+    return {
+      ok: false,
+      message: "You do not have permission to edit catalog products.",
+    };
+  }
+
+  const storeId = membership.store.id;
+  const categoryIdRaw = String(formData.get("categoryId") || "").trim();
+  const shortDescriptionRaw = String(
+    formData.get("shortDescription") || ""
+  );
+
+  let categoryFound: boolean | undefined;
+  let categoryStatus: string | null | undefined;
+  let categoryName: string | null = null;
+
+  if (field === "category" && operation === "replace") {
+    const parsed = normalizeBulkCategoryId(categoryIdRaw);
+    if (!parsed.ok) {
+      return { ok: false, message: parsed.message };
+    }
+    const { data: categoryRow } = await supabase
+      .from("product_categories")
+      .select("id, name, status")
+      .eq("id", parsed.value)
+      .maybeSingle();
+    categoryFound = Boolean(categoryRow);
+    categoryStatus = categoryRow ? String(categoryRow.status) : null;
+    categoryName = categoryRow ? String(categoryRow.name) : null;
+    const eligibility = assertPrimaryCategoryEligibleForReview({
+      primaryCategoryId: parsed.value,
+      categoryFound,
+      categoryStatus,
+    });
+    if (!eligibility.ok) {
+      return { ok: false, message: eligibility.message };
+    }
+  }
+
+  if (field === "short_description" && operation === "replace") {
+    const parsed = normalizeBulkShortDescription(shortDescriptionRaw);
+    if (!parsed.ok) {
+      return { ok: false, message: parsed.message };
+    }
+  }
+
+  const { data: rows, error } = await supabase
+    .from("store_products")
+    .select(
+      "id, title, status, store_id, primary_category_id, short_description"
+    )
+    .eq("store_id", storeId)
+    .in("id", ids);
+
+  if (error) {
+    console.error("bulkEditProductFieldsAction load", error);
+    return { ok: false, message: "Unable to load selected products." };
+  }
+
+  const byId = new Map(
+    (rows ?? []).map((row) => [String(row.id), row] as const)
+  );
+  const selectionItems: SellerCatalogBulkFieldSelectionItem[] = ids.map(
+    (id) => {
+      const row = byId.get(id);
+      if (!row) {
+        return {
+          id,
+          title: id,
+          status: "missing",
+          storeId,
+          primaryCategoryId: null,
+          shortDescription: null,
+        };
+      }
+      return {
+        id: String(row.id),
+        title: String(row.title ?? ""),
+        status: String(row.status ?? ""),
+        storeId: String(row.store_id ?? ""),
+        primaryCategoryId: row.primary_category_id
+          ? String(row.primary_category_id)
+          : null,
+        shortDescription: row.short_description
+          ? String(row.short_description)
+          : null,
+      };
+    }
+  );
+
+  // Mark missing rows as outside store by forcing a rejected store id in plan
+  // via a synthetic status skip — rebuild items so missing stay in store scope
+  // but fail editability, then add explicit skip for missing.
+  const presentItems: SellerCatalogBulkFieldSelectionItem[] = [];
+  const missingResults: Array<{
+    productId: string;
+    outcome: "skipped";
+    reason: string;
+  }> = [];
+  for (const item of selectionItems) {
+    if (!byId.has(item.id)) {
+      missingResults.push({
+        productId: item.id,
+        outcome: "skipped",
+        reason: "Product not found in this store (stale or cross-store id).",
+      });
+      continue;
+    }
+    presentItems.push(item);
+  }
+
+  if (presentItems.length === 0) {
+    revalidatePath("/seller/store/products");
+    return {
+      ok: true,
+      succeeded: 0,
+      failed: 0,
+      skipped: missingResults.length,
+      overall: missingResults.length > 0 ? "skipped_only" : "empty",
+      results: missingResults,
+    };
+  }
+
+  const plan = planSellerCatalogBulkFieldEdit({
+    field,
+    operation,
+    storeId,
+    items: presentItems,
+    categoryId: categoryIdRaw || null,
+    categoryName,
+    shortDescription: shortDescriptionRaw,
+    categoryFound,
+    categoryStatus,
+  });
+
+  if (!plan.supported) {
+    return {
+      ok: false,
+      message: plan.deferredReason || "Bulk field edit is not available.",
+    };
+  }
+
+  const payload = buildBulkFieldUpdateDraftPayload({
+    field: field as "category" | "short_description",
+    operation,
+    categoryId: categoryIdRaw || null,
+    shortDescription: shortDescriptionRaw,
+  });
+
+  const execution = await mapWithConcurrencyLimit(
+    plan.eligible,
+    SELLER_CATALOG_BULK_FIELD_EDIT_CONCURRENCY,
+    async (item) => {
+      const result = await updateDraftProduct(
+        supabase,
+        user.id,
+        item.id,
+        payload
+      );
+      return {
+        productId: item.id,
+        ok: result.ok,
+        message: result.ok ? undefined : result.message,
+      };
+    }
+  );
+
+  const summary = mergeBulkFieldPlanWithExecutionResults({
+    plan,
+    execution,
+  });
+
+  const results = [
+    ...missingResults,
+    ...summary.results,
+  ];
+  let succeeded = 0;
+  let failed = 0;
+  let skipped = 0;
+  for (const row of results) {
+    if (row.outcome === "success") succeeded += 1;
+    else if (row.outcome === "failed") failed += 1;
+    else skipped += 1;
+  }
+  const total = results.length;
+  let overall: "success" | "partial" | "failed" | "skipped_only" | "empty" =
+    "empty";
+  if (total === 0) overall = "empty";
+  else if (succeeded === total) overall = "success";
+  else if (succeeded === 0 && failed === 0) overall = "skipped_only";
+  else if (succeeded === 0) overall = "failed";
+  else overall = "partial";
+
+  revalidatePath("/seller/store/products");
+  return { ok: true, succeeded, failed, skipped, overall, results };
 }
 
 export async function updateProductMediaLayoutAction(
