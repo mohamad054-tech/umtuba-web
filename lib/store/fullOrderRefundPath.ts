@@ -25,6 +25,10 @@ import {
   revokeDigitalEntitlementsAfterTrustedRefund,
   type DigitalEntitlementRevokeResult,
 } from "./digitalEntitlementRevoke";
+import {
+  markCommissionDecompositionAfterTrustedRefund,
+  type CommissionDecompositionRefundMarkResult,
+} from "./commissionDecompositionBridgeApply";
 
 export const FULL_ORDER_REFUND_PATH_ID =
   "commerce.payments.full_order_refund_path_v1" as const;
@@ -64,6 +68,7 @@ export type FullOrderRefundFailureCode =
   | "client_money_rejected"
   | "settlement_unwind_failed"
   | "entitlement_revoke_failed"
+  | "commission_mark_failed"
   | "rpc_failed";
 
 export type FullOrderRefundSettlementStep = {
@@ -110,6 +115,14 @@ export type FullOrderRefundResult =
         status: "revoked";
         replayed: boolean;
         entitlementsRevoked: number;
+        data: Record<string, unknown>;
+      };
+      /** Historical commission decomposition reference mark after refund. */
+      commissionDecomposition: {
+        status: "marked" | "skipped";
+        replayed: boolean;
+        lifecycleStatus: string | null;
+        reason: string | null;
         data: Record<string, unknown>;
       };
       sellerPayableProtected: true;
@@ -612,6 +625,60 @@ export async function loadTrustedFullOrderRefundContext(
   };
 }
 
+async function applyCommissionMarkAfterRefund(
+  supabase: AnyClient,
+  ctx: TrustedFullOrderRefundContext
+): Promise<
+  | {
+      ok: true;
+      commissionDecomposition: Extract<
+        FullOrderRefundResult,
+        { ok: true }
+      >["commissionDecomposition"];
+    }
+  | { ok: false; code: "commission_mark_failed"; message: string }
+> {
+  const mark: CommissionDecompositionRefundMarkResult =
+    await markCommissionDecompositionAfterTrustedRefund(supabase, {
+      paymentAttemptId: ctx.paymentAttemptId,
+      correlationId: ctx.correlationId,
+    });
+
+  if (mark.status === "failed") {
+    return {
+      ok: false,
+      code: "commission_mark_failed",
+      message:
+        mark.message ||
+        "Commission decomposition refund mark failed after trusted refund.",
+    };
+  }
+
+  if (mark.status === "skipped") {
+    return {
+      ok: true,
+      commissionDecomposition: {
+        status: "skipped",
+        replayed: false,
+        lifecycleStatus: null,
+        reason: mark.reason,
+        data: {},
+      },
+    };
+  }
+
+  return {
+    ok: true,
+    commissionDecomposition: {
+      status: "marked",
+      replayed: mark.replayed,
+      lifecycleStatus: mark.lifecycleStatus,
+      reason: null,
+      data: mark.data,
+    },
+  };
+}
+
 async function applyEntitlementRevokeAfterRefund(
   supabase: AnyClient,
   ctx: TrustedFullOrderRefundContext
@@ -790,6 +857,17 @@ export async function applyFullOrderRefund(
           message: revoke.message,
         };
       }
+      const commissionMark = await applyCommissionMarkAfterRefund(
+        supabase,
+        ctx
+      );
+      if (!commissionMark.ok) {
+        return {
+          ok: false,
+          code: commissionMark.code,
+          message: commissionMark.message,
+        };
+      }
       return {
         ok: true,
         capability: FULL_ORDER_REFUND_PATH_ID,
@@ -810,6 +888,7 @@ export async function applyFullOrderRefund(
         payoutState: ctx.payoutState,
         commission: projectCommissionConsistency(ctx, input.commissionPolicy),
         entitlementRevoke: revoke.entitlementRevoke,
+        commissionDecomposition: commissionMark.commissionDecomposition,
         sellerPayableProtected: true,
         payoutProtected: true,
       };
@@ -918,6 +997,15 @@ export async function applyFullOrderRefund(
     };
   }
 
+  const commissionMark = await applyCommissionMarkAfterRefund(supabase, ctx);
+  if (!commissionMark.ok) {
+    return {
+      ok: false,
+      code: commissionMark.code,
+      message: commissionMark.message,
+    };
+  }
+
   wireCommerceRefundCompleted({
     orderId: ctx.orderId,
     storeId: ctx.storeId,
@@ -947,6 +1035,7 @@ export async function applyFullOrderRefund(
     payoutState: ctx.payoutState,
     commission: projectCommissionConsistency(ctx, input.commissionPolicy),
     entitlementRevoke: revoke.entitlementRevoke,
+    commissionDecomposition: commissionMark.commissionDecomposition,
     sellerPayableProtected: true,
     payoutProtected: true,
   };

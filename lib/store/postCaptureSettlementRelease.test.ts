@@ -172,6 +172,18 @@ describe("Post-capture release — capture wiring", () => {
           });
           return { data: { replayed: false, action: "release" }, error: null };
         }
+        if (name === "apply_store_commission_decomposition_after_capture") {
+          return {
+            data: {
+              ok: true,
+              replayed: false,
+              policy_status: "not_configured",
+              lifecycle_status: "not_configured",
+              capture_amount_minor: 2500,
+            },
+            error: null,
+          };
+        }
         if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {
           return {
             data: {
@@ -208,11 +220,12 @@ describe("Post-capture release — capture wiring", () => {
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
+      "apply_store_commission_decomposition_after_capture",
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
       STORE_SETTLEMENT_RPC,
     ]);
     expect(rpc.mock.calls[1]?.[1]).toMatchObject({ p_action: "allocate" });
-    expect(rpc.mock.calls[3]?.[1]).toMatchObject({
+    expect(rpc.mock.calls[4]?.[1]).toMatchObject({
       p_action: "release",
       p_event_key: `${CAPTURE_KEY}:release`,
     });
@@ -232,6 +245,18 @@ describe("Post-capture release — capture wiring", () => {
             };
           }
           return { data: { replayed: true, action: "release" }, error: null };
+        }
+        if (name === "apply_store_commission_decomposition_after_capture") {
+          return {
+            data: {
+              ok: true,
+              replayed: true,
+              policy_status: "not_configured",
+              lifecycle_status: "not_configured",
+              capture_amount_minor: 2500,
+            },
+            error: null,
+          };
         }
         if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {
           return {
@@ -371,6 +396,18 @@ describe("Post-capture release — capture wiring", () => {
           expect(args?.p_action).toBe("allocate");
           return { data: { replayed: false, action: "allocate" }, error: null };
         }
+        if (name === "apply_store_commission_decomposition_after_capture") {
+          return {
+            data: {
+              ok: true,
+              replayed: false,
+              policy_status: "not_configured",
+              lifecycle_status: "not_configured",
+              capture_amount_minor: 2500,
+            },
+            error: null,
+          };
+        }
         if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {
           return {
             data: null,
@@ -420,6 +457,18 @@ describe("Post-capture release — capture wiring", () => {
             error: {
               message: "settlement action release not allowed: capture is UNALLOCATED",
             },
+          };
+        }
+        if (name === "apply_store_commission_decomposition_after_capture") {
+          return {
+            data: {
+              ok: true,
+              replayed: false,
+              policy_status: "not_configured",
+              lifecycle_status: "not_configured",
+              capture_amount_minor: 2500,
+            },
+            error: null,
           };
         }
         if (name === STORE_DIGITAL_ENTITLEMENT_GRANT_RPC) {

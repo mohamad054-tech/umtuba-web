@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { STORE_PAYMENT_SYNC_RPC } from "./paymentOutcomeSync";
 import { STORE_SETTLEMENT_RPC } from "./settlementFoundation";
 import { STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC } from "./digitalEntitlementRevoke";
+import { STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC } from "./commissionDecompositionBridgeApply";
 import {
   applyFullOrderRefund,
   assertTrustedFullOrderRefundContext,
@@ -210,6 +211,18 @@ describe("Full order refund path — apply", () => {
           error: null,
         };
       }
+      if (name === STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            skipped: false,
+            lifecycle_status: "superseded_by_refund",
+            policy_status: "applied",
+          },
+          error: null,
+        };
+      }
       expect(name).toBe(STORE_PAYMENT_SYNC_RPC);
       expect(args).toMatchObject({
         p_outcome: "refunded",
@@ -260,11 +273,13 @@ describe("Full order refund path — apply", () => {
       (result.commission.platformCommissionMinor ?? 0) +
         (result.commission.sellerAmountMinor ?? 0)
     ).toBe(4500);
+    expect(result.commissionDecomposition.status).toBe("marked");
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_SETTLEMENT_RPC,
       STORE_SETTLEMENT_RPC,
       STORE_PAYMENT_SYNC_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+      STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
   });
 
@@ -276,6 +291,18 @@ describe("Full order refund path — apply", () => {
             ok: true,
             replayed: true,
             entitlements_revoked: 1,
+          },
+          error: null,
+        };
+      }
+      if (name === STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: true,
+            skipped: false,
+            lifecycle_status: "superseded_by_refund",
+            policy_status: "applied",
           },
           error: null,
         };
@@ -313,6 +340,7 @@ describe("Full order refund path — apply", () => {
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+      STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
   });
 
@@ -451,6 +479,16 @@ describe("Full order refund path — apply", () => {
           error: null,
         };
       }
+      if (name === STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC) {
+        return {
+          data: {
+            ok: true,
+            skipped: true,
+            reason: "no_commission_decomposition_for_attempt",
+          },
+          error: null,
+        };
+      }
       expect(name).toBe(STORE_PAYMENT_SYNC_RPC);
       return {
         data: { replayed: false, outcome: "refunded" },
@@ -476,10 +514,12 @@ describe("Full order refund path — apply", () => {
       expect(result.settlementSteps).toEqual([]);
       expect(result.sellerPayableProtected).toBe(true);
       expect(result.entitlementRevoke.entitlementsRevoked).toBe(0);
+      expect(result.commissionDecomposition.status).toBe("skipped");
     }
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+      STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
   });
 

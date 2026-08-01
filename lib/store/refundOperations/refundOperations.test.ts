@@ -343,6 +343,13 @@ describe("Commerce Refund Operations Surface V1", () => {
           entitlementsRevoked: 0,
           data: {},
         },
+        commissionDecomposition: {
+          status: "skipped" as const,
+          replayed: false,
+          lifecycleStatus: null,
+          reason: "no_commission_decomposition_for_attempt",
+          data: {},
+        },
         sellerPayableProtected: true as const,
         payoutProtected: true as const,
       };
