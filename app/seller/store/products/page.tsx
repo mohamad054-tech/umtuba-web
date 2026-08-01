@@ -10,6 +10,16 @@ import {
   getOwnedOrMemberStore,
   listSellerProducts,
 } from "../../../../lib/store/sellerStore";
+import { listSellerInventoryRows } from "../../../../lib/store/sellerInventoryQueries";
+import {
+  loadSellerCatalogHealthFacts,
+  loadSellerCatalogVariantSearchTokens,
+} from "../../../../lib/store/sellerCatalogWiring";
+import { deriveSellerProductHealth } from "../../../../lib/store/sellerExperienceFoundation";
+import {
+  buildSellerCatalogSearchItems,
+  indexVariantSearchTokens,
+} from "../../../../lib/store/sellerCatalogSearchFiltering";
 import type { SellerCatalogListItem } from "../../../../lib/store/sellerCatalogPresentation";
 
 export const metadata = {
@@ -40,23 +50,63 @@ export default async function SellerProductsPage() {
     );
   }
 
-  const productsResult = await listSellerProducts(
-    supabase,
-    membership.store.id
+  const storeId = membership.store.id;
+  const [productsResult, inventoryResult] = await Promise.all([
+    listSellerProducts(supabase, storeId),
+    listSellerInventoryRows(supabase, storeId, membership.role, {
+      limit: 500,
+    }),
+  ]);
+
+  const products = productsResult.ok ? productsResult.data : [];
+  const listItems: SellerCatalogListItem[] = products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    status: p.status,
+    moderationStatus: p.moderation_status,
+    productType: p.product_type,
+    updatedAt: p.updated_at,
+    createdAt: p.created_at,
+    shortDescription: p.short_description,
+  }));
+
+  const [healthFacts, variantSearch] = products.length
+    ? await Promise.all([
+        loadSellerCatalogHealthFacts(supabase, {
+          storeId,
+          products,
+          inventoryRows: inventoryResult.ok ? inventoryResult.data : null,
+        }),
+        loadSellerCatalogVariantSearchTokens(supabase, {
+          storeId,
+          products,
+        }),
+      ])
+    : [[], { tokens: [], queryCount: 0, error: null } as const];
+
+  const healthCodesByProductId = new Map(
+    (Array.isArray(healthFacts) ? healthFacts : []).map((facts) => [
+      facts.product.id,
+      deriveSellerProductHealth(facts).codes,
+    ])
   );
-  const items: SellerCatalogListItem[] = productsResult.ok
-    ? productsResult.data.map((p) => ({
-        id: p.id,
-        title: p.title,
-        slug: p.slug,
-        status: p.status,
-        moderationStatus: p.moderation_status,
-        productType: p.product_type,
-        updatedAt: p.updated_at,
-        createdAt: p.created_at,
-        shortDescription: p.short_description,
-      }))
-    : [];
+  const storeIdByProductId = new Map(
+    products.map((p) => [p.id, String(p.store_id)])
+  );
+  const variantTokens = indexVariantSearchTokens(
+    variantSearch.tokens,
+    products.map((p) => p.id)
+  );
+
+  const searchItems = buildSellerCatalogSearchItems({
+    storeId,
+    items: listItems,
+    storeIdByProductId,
+    variantTokens,
+    healthCodesByProductId,
+  });
+
   const canManage = canManageCatalog(membership.role);
 
   return (
@@ -69,7 +119,7 @@ export default async function SellerProductsPage() {
               Products
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
-              Manage drafts, review submissions, and live catalog items for @
+              Search, filter, and sort catalog items for @
               {membership.store.slug}. Publishing still requires operator
               approval — sellers cannot self-activate.
             </p>
@@ -116,7 +166,8 @@ export default async function SellerProductsPage() {
           <StoreErrorState message={productsResult.message} />
         ) : (
           <SellerProductDashboard
-            products={items}
+            products={searchItems}
+            storeId={storeId}
             canManage={canManage}
             storeName={membership.store.name}
           />
