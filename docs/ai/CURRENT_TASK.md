@@ -2,7 +2,7 @@
 
 ## Task title
 
-Seller Catalog Data Access Foundation V1
+Seller Catalog Pagination Experience V1
 
 ## Status
 
@@ -10,15 +10,15 @@ Seller Catalog Data Access Foundation V1
 
 ## Capability
 
-`commerce.seller.catalog_data_access_v1`
+`commerce.seller.catalog_pagination_experience_v1`
 
 ## Base
 
-`origin/office/seller-catalog-search-filtering-v1` @ `58f3d1d9fc5a4fe9de23a3e105c7edcb471ee218`
+`origin/office/seller-catalog-data-access-v1` @ `f7b454e3590480c41eb810e4cd00db26ee584248`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-data-access-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-pagination-experience-v1`
 
 ## Explicitly not done
 

@@ -21,10 +21,17 @@ import {
   productMatchesCatalogStatusFilter,
 } from "../../../../lib/store/sellerCatalogSearchFiltering";
 import {
-  buildSellerCatalogProductsHref,
   listSellerCatalogPage,
   parseSellerCatalogUrlState,
 } from "../../../../lib/store/sellerCatalogDataAccess";
+import {
+  buildNextPaginationHref,
+  buildPreviousPaginationHref,
+  buildSellerCatalogFilterResetHref,
+  deriveSellerCatalogResultKind,
+  parseSellerCatalogPaginationUrlState,
+  sellerCatalogPaginationLabels,
+} from "../../../../lib/store/sellerCatalogPaginationExperience";
 import type { SellerCatalogListItem } from "../../../../lib/store/sellerCatalogPresentation";
 
 export const metadata = {
@@ -62,6 +69,7 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
   const storeId = membership.store.id;
   const params = (await searchParams) ?? {};
   const urlState = parseSellerCatalogUrlState(params);
+  const paginationState = parseSellerCatalogPaginationUrlState(params, urlState);
 
   const catalogPage = await listSellerCatalogPage(supabase, {
     storeId,
@@ -69,27 +77,61 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
   });
 
   if (!catalogPage.ok) {
+    const resetHref = buildSellerCatalogFilterResetHref({
+      search: urlState.search,
+      status: urlState.status,
+      productType: urlState.productType,
+      sort: urlState.sort,
+      health: urlState.health,
+      limit: urlState.limit,
+    });
+    const kind = deriveSellerCatalogResultKind({
+      productCount: 0,
+      hasMore: false,
+      pageNumber: paginationState.pageNumber,
+      applied: {
+        search: paginationState.search,
+        status: paginationState.status,
+        productType: paginationState.productType,
+        sort: paginationState.sort,
+        health: paginationState.health,
+        healthFilterScope: "none",
+        serverStatus: "all",
+      },
+      errorCode: catalogPage.code,
+    });
+
     return (
       <SellerOpsShell title="Products" subtitle={membership.store.name} wide>
-        <div className="mt-6">
-          <StoreErrorState message={catalogPage.message} />
-          {catalogPage.code === "invalid_cursor" ? (
-            <p className="mt-3 text-sm text-[var(--sf-muted)]">
+        <div className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+          {kind === "invalid_cursor" ? (
+            <>
+              <h2 className="sf-display text-xl font-semibold tracking-tight">
+                This catalog page is no longer valid
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--sf-muted)]">
+                The pagination link expired, was edited, or no longer matches
+                your current sort. Your filters are preserved — return to the
+                first page to continue.
+              </p>
               <Link
-                href={buildSellerCatalogProductsHref({
-                  search: urlState.search,
-                  status: urlState.status,
-                  productType: urlState.productType,
-                  sort: urlState.sort,
-                  health: urlState.health,
-                  limit: urlState.limit,
-                })}
-                className="font-semibold text-[var(--sf-accent-strong)]"
+                href={resetHref}
+                className="mt-5 inline-flex rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
               >
-                Reset pagination
+                Back to first page
               </Link>
-            </p>
-          ) : null}
+            </>
+          ) : (
+            <>
+              <StoreErrorState message="Could not load this catalog page. Please try again." />
+              <Link
+                href={resetHref}
+                className="mt-4 inline-flex text-sm font-semibold text-[var(--sf-accent-strong)]"
+              >
+                Retry from first page
+              </Link>
+            </>
+          )}
         </div>
       </SellerOpsShell>
     );
@@ -186,16 +228,36 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
   }
 
   const nextHref = catalogPage.nextCursor
-    ? buildSellerCatalogProductsHref({
-        search: catalogPage.applied.search,
-        status: catalogPage.applied.status,
-        productType: catalogPage.applied.productType,
-        sort: catalogPage.applied.sort,
-        health: catalogPage.applied.health,
-        limit: catalogPage.pageSize,
-        cursor: catalogPage.nextCursor,
+    ? buildNextPaginationHref({
+        applied: catalogPage.applied,
+        pageSize: catalogPage.pageSize,
+        currentCursor: paginationState.cursor,
+        nextCursor: catalogPage.nextCursor,
+        history: paginationState.history,
+        pageNumber: paginationState.pageNumber,
       })
     : null;
+
+  const previousHref = buildPreviousPaginationHref({
+    applied: catalogPage.applied,
+    pageSize: catalogPage.pageSize,
+    history: paginationState.history,
+    pageNumber: paginationState.pageNumber,
+  });
+
+  const resultKind = deriveSellerCatalogResultKind({
+    productCount: searchItems.length,
+    hasMore: catalogPage.hasMore,
+    pageNumber: paginationState.pageNumber,
+    applied: catalogPage.applied,
+  });
+
+  const paginationLabels = sellerCatalogPaginationLabels({
+    pageNumber: paginationState.pageNumber,
+    itemCount: searchItems.length,
+    hasMore: catalogPage.hasMore,
+    kind: resultKind,
+  });
 
   const canManage = canManageCatalog(membership.role);
 
@@ -249,6 +311,10 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
           pageSize={catalogPage.pageSize}
           hasMore={catalogPage.hasMore}
           nextHref={nextHref}
+          previousHref={previousHref}
+          pageNumber={paginationState.pageNumber}
+          resultKind={resultKind}
+          paginationLabels={paginationLabels}
           healthFilterScope={catalogPage.applied.healthFilterScope}
         />
       </div>
