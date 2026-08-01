@@ -1,20 +1,20 @@
 # Cursor Report
 
-**PASS + STAGED** — Seller Catalog Search & Filtering Foundation V1
+**PASS + STAGED** - Seller Catalog Data Access Foundation V1
 
 ## Base
 
-- SoT: `origin/office/seller-catalog-performance-batching-v1` @ `2463192`
-- Branch: `office/seller-catalog-search-filtering-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-search-filtering-v1`
+- SoT: `origin/office/seller-catalog-search-filtering-v1` @ `58f3d1d`
+- Branch: `office/seller-catalog-data-access-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-data-access-v1`
 
 ## Change
 
-In-memory catalog search (title/id/SKU/barcode), status/health/type filters over existing health codes, honest sorts; batched variant tokens on products page.
+Cursor-based seller catalog pages; server search/status/type/sort; page-only health facts; URL state; Load more.
 
 ## Verification
 
-- Vitest: **37 passed** (search 9 + wiring 9 + experience 6 + dashboard 6 + presentation 7)
+- Vitest: **46 passed** (data-access 9 + search 9 + wiring 9 + experience 6 + dashboard 6 + presentation 7)
 - tsc PASS · build PASS · lockfile unchanged · `git diff --cached --check` PASS
 
 ## Open

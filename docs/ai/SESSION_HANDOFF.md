@@ -2,26 +2,22 @@
 
 ## Active milestone (laptop)
 
-Seller Catalog Search & Filtering Foundation V1 — `commerce.seller.catalog_search_filtering_v1`
+Seller Catalog Data Access Foundation V1 - `commerce.seller.catalog_data_access_v1`
 
-Status: **PASS + STAGED** — awaiting commit GO; uncommitted / unpushed
+Status: **PASS + STAGED** - awaiting commit GO; uncommitted / unpushed
 
 ## Branch / worktree
 
-- Branch: `office/seller-catalog-search-filtering-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-search-filtering-v1`
-- Base: `origin/office/seller-catalog-performance-batching-v1` @ `2463192`
+- Branch: `office/seller-catalog-data-access-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-data-access-v1`
+- Base: `origin/office/seller-catalog-search-filtering-v1` @ `58f3d1d`
 
 ## Delivered
 
-- In-memory search (title / id / SKU / barcode)
-- Status + health + type filters over existing health codes
-- Honest sort (no invented views/sales)
-- Batched variant token load + health reuse on products page
-
-## Desktop
-
-Do not touch Desktop migration / money lines from this worktree.
+- Data-access contracts + opaque cursor keyset pagination
+- Server-side search / status / type / sort
+- Page-only health enrichment + page-local health chips
+- Products page URL state + Load more
 
 ## Next
 

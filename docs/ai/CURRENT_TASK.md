@@ -2,24 +2,24 @@
 
 ## Task title
 
-Seller Catalog Search & Filtering Foundation V1
+Seller Catalog Data Access Foundation V1
 
 ## Status
 
-`PASS + STAGED` — **uncommitted / unpushed**
+`PASS + STAGED` - **uncommitted / unpushed**
 
 ## Capability
 
-`commerce.seller.catalog_search_filtering_v1`
+`commerce.seller.catalog_data_access_v1`
 
 ## Base
 
-`origin/office/seller-catalog-performance-batching-v1` @ `2463192fa891253ad13b8dc67b7b5ddc7674c4f2`
+`origin/office/seller-catalog-search-filtering-v1` @ `58f3d1d9fc5a4fe9de23a3e105c7edcb471ee218`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-search-filtering-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-data-access-v1`
 
 ## Explicitly not done
 
-No commit / push / migration. No payment/physical/refund changes.
+No commit / push / migration / RPC.

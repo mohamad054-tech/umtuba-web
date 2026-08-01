@@ -6,10 +6,7 @@ import StoreErrorState from "../../../components/store/StoreErrorState";
 import { APP_ROUTES } from "../../../lib/nav";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { canManageCatalog } from "../../../../lib/store/permissions";
-import {
-  getOwnedOrMemberStore,
-  listSellerProducts,
-} from "../../../../lib/store/sellerStore";
+import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import { listSellerInventoryRows } from "../../../../lib/store/sellerInventoryQueries";
 import {
   loadSellerCatalogHealthFacts,
@@ -18,15 +15,27 @@ import {
 import { deriveSellerProductHealth } from "../../../../lib/store/sellerExperienceFoundation";
 import {
   buildSellerCatalogSearchItems,
+  filterSellerCatalogSearchItems,
   indexVariantSearchTokens,
+  productMatchesCatalogHealthFilter,
+  productMatchesCatalogStatusFilter,
 } from "../../../../lib/store/sellerCatalogSearchFiltering";
+import {
+  buildSellerCatalogProductsHref,
+  listSellerCatalogPage,
+  parseSellerCatalogUrlState,
+} from "../../../../lib/store/sellerCatalogDataAccess";
 import type { SellerCatalogListItem } from "../../../../lib/store/sellerCatalogPresentation";
 
 export const metadata = {
   title: "Seller Products | UMTUBA",
 };
 
-export default async function SellerProductsPage() {
+type PageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function SellerProductsPage({ searchParams }: PageProps) {
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -51,32 +60,60 @@ export default async function SellerProductsPage() {
   }
 
   const storeId = membership.store.id;
-  const [productsResult, inventoryResult] = await Promise.all([
-    listSellerProducts(supabase, storeId),
-    listSellerInventoryRows(supabase, storeId, membership.role, {
-      limit: 500,
-    }),
-  ]);
+  const params = (await searchParams) ?? {};
+  const urlState = parseSellerCatalogUrlState(params);
 
-  const products = productsResult.ok ? productsResult.data : [];
-  const listItems: SellerCatalogListItem[] = products.map((p) => ({
-    id: p.id,
-    title: p.title,
-    slug: p.slug,
-    status: p.status,
-    moderationStatus: p.moderation_status,
-    productType: p.product_type,
-    updatedAt: p.updated_at,
-    createdAt: p.created_at,
-    shortDescription: p.short_description,
-  }));
+  const catalogPage = await listSellerCatalogPage(supabase, {
+    storeId,
+    ...urlState,
+  });
+
+  if (!catalogPage.ok) {
+    return (
+      <SellerOpsShell title="Products" subtitle={membership.store.name} wide>
+        <div className="mt-6">
+          <StoreErrorState message={catalogPage.message} />
+          {catalogPage.code === "invalid_cursor" ? (
+            <p className="mt-3 text-sm text-[var(--sf-muted)]">
+              <Link
+                href={buildSellerCatalogProductsHref({
+                  search: urlState.search,
+                  status: urlState.status,
+                  productType: urlState.productType,
+                  sort: urlState.sort,
+                  health: urlState.health,
+                  limit: urlState.limit,
+                })}
+                className="font-semibold text-[var(--sf-accent-strong)]"
+              >
+                Reset pagination
+              </Link>
+            </p>
+          ) : null}
+        </div>
+      </SellerOpsShell>
+    );
+  }
+
+  const products = catalogPage.items;
+  const pageIds = new Set(products.map((p) => p.id));
+
+  const inventoryResult = await listSellerInventoryRows(
+    supabase,
+    storeId,
+    membership.role,
+    { limit: Math.min(500, Math.max(products.length * 4, 50)) }
+  );
+  const inventoryForPage = inventoryResult.ok
+    ? inventoryResult.data.filter((row) => pageIds.has(row.productId))
+    : null;
 
   const [healthFacts, variantSearch] = products.length
     ? await Promise.all([
         loadSellerCatalogHealthFacts(supabase, {
           storeId,
           products,
-          inventoryRows: inventoryResult.ok ? inventoryResult.data : null,
+          inventoryRows: inventoryForPage,
         }),
         loadSellerCatalogVariantSearchTokens(supabase, {
           storeId,
@@ -99,13 +136,66 @@ export default async function SellerProductsPage() {
     products.map((p) => p.id)
   );
 
-  const searchItems = buildSellerCatalogSearchItems({
+  const listItems: SellerCatalogListItem[] = products.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    status: p.status,
+    moderationStatus: p.moderation_status,
+    productType: p.product_type,
+    updatedAt: p.updated_at,
+    createdAt: p.created_at,
+    shortDescription: p.short_description,
+  }));
+
+  let searchItems = buildSellerCatalogSearchItems({
     storeId,
     items: listItems,
     storeIdByProductId,
     variantTokens,
     healthCodesByProductId,
   });
+
+  // Page-local only for ready / needs_attention / health chips — not catalog-wide.
+  if (catalogPage.applied.healthFilterScope === "page_only") {
+    searchItems = searchItems.filter((item) => {
+      if (
+        catalogPage.applied.status === "ready" ||
+        catalogPage.applied.status === "needs_attention"
+      ) {
+        if (
+          !productMatchesCatalogStatusFilter(item, catalogPage.applied.status)
+        ) {
+          return false;
+        }
+      }
+      return productMatchesCatalogHealthFilter(
+        item,
+        catalogPage.applied.health
+      );
+    });
+  } else {
+    // Defense: keep store scope even if enrichment mixed rows.
+    searchItems = filterSellerCatalogSearchItems(searchItems, {
+      storeId,
+      status: "all",
+      health: "any",
+      productType: "all",
+      sort: catalogPage.applied.sort,
+    });
+  }
+
+  const nextHref = catalogPage.nextCursor
+    ? buildSellerCatalogProductsHref({
+        search: catalogPage.applied.search,
+        status: catalogPage.applied.status,
+        productType: catalogPage.applied.productType,
+        sort: catalogPage.applied.sort,
+        health: catalogPage.applied.health,
+        limit: catalogPage.pageSize,
+        cursor: catalogPage.nextCursor,
+      })
+    : null;
 
   const canManage = canManageCatalog(membership.role);
 
@@ -119,9 +209,9 @@ export default async function SellerProductsPage() {
               Products
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
-              Search, filter, and sort catalog items for @
-              {membership.store.slug}. Publishing still requires operator
-              approval — sellers cannot self-activate.
+              Paginated catalog for @{membership.store.slug}. Search, status,
+              type, and sort run server-side; health chips apply to the current
+              page only.
             </p>
           </div>
           {canManage ? (
@@ -146,32 +236,21 @@ export default async function SellerProductsPage() {
           >
             Inventory
           </Link>
-          <Link
-            href={APP_ROUTES.sellerOrders}
-            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
-          >
-            Orders
-          </Link>
-          <Link
-            href={APP_ROUTES.sellerMarketplace}
-            className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
-          >
-            Marketplace
-          </Link>
         </div>
       </header>
 
       <div className="mt-6">
-        {!productsResult.ok ? (
-          <StoreErrorState message={productsResult.message} />
-        ) : (
-          <SellerProductDashboard
-            products={searchItems}
-            storeId={storeId}
-            canManage={canManage}
-            storeName={membership.store.name}
-          />
-        )}
+        <SellerProductDashboard
+          products={searchItems}
+          storeId={storeId}
+          canManage={canManage}
+          storeName={membership.store.name}
+          applied={catalogPage.applied}
+          pageSize={catalogPage.pageSize}
+          hasMore={catalogPage.hasMore}
+          nextHref={nextHref}
+          healthFilterScope={catalogPage.applied.healthFilterScope}
+        />
       </div>
     </SellerOpsShell>
   );
