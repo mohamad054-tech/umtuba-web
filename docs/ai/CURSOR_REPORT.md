@@ -2,9 +2,11 @@
 
 ## Summary
 
-**PASS** for `commerce.revenue.commission_policy_activation_v1` on `office/commerce-commission-policy-activation-v1-current` (base `1746bc7`, cherry-pick `8b6caa0` only — not merge tip `be87fb3`).
+**PASS** for `commerce.ops.chain_migration_apply_readiness_v1` on `office/commerce-chain-migration-apply-readiness-v1-current` (base `c9f9458`, cherry-pick `6875847` only — not merge tip `be87fb3`, not `fded934`).
 
-Safe activate/deactivate lifecycle for currency-scoped commission policies: exactly one `active` policy per currency, historical `superseded` versions preserved and resolvable inside effective windows, idempotent activation events, service-role RPCs only. Bridge apply continues to resolve at capture time and store `policy_code`/`policy_version`. Migration `20260891` local only — not remote-applied.
+Repository-level apply readiness for order `20260889 → 20260890 → 20260891`. Static verifier + focused tests. Remote database **not** inspected or modified. Migrations **not** applied.
+
+**Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human remote-apply GO still required).
 
 ## Completed Commerce chain (closed)
 
@@ -18,37 +20,36 @@ Safe activate/deactivate lifecycle for currency-scoped commission policies: exac
 8. Seller Payout Rails V1
 9. Refund Operations Surface V1
 10. Digital Entitlement Revoke on Refund V1
-11. Commission Decomposition Bridge Apply V1 (`1746bc7`)
+11. Commission Decomposition Bridge Apply V1
+12. Commission Policy Activation V1 (`c9f9458`)
 
 ## Exact files changed
 
 ### Created
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql`
-- `lib/store/commissionPolicyActivation.ts`
-- `lib/store/commissionPolicyActivation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
+- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
+- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
+- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 
 ### Modified
-- `lib/store/commissionPolicyFoundation.ts` — fail-closed ambiguous actives; historical superseded window resolve
-- `lib/store/commissionPolicyFoundation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
+- `package.json` — npm script `verify:commerce-chain-migration-apply-readiness`
+- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
+- `docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
+- `docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
 
 ## Migrations created
 
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql` — local only, not applied to remote
+None (readiness task; inventory is existing `20260889` / `20260890` / `20260891`).
 
 ## Security review
 
-- Activate/deactivate RPCs: `SECURITY DEFINER`, service_role execute only
-- Activation events: FORCE RLS; client writes revoked
-- Unique index enforces one active per currency
-- Resolve fails closed on ambiguous actives/windows
-- No client percentages; no auto-seed; no silent policy fallback
-- Does not mutate settlement/payout booking amounts
+- Verifier is static filesystem-only; no DB credentials, no remote inspect
+- Documents fail-closed multi-active preflight before unique index on 91
+- Confirms service_role GRANT + public/anon/authenticated REVOKE patterns
+- No secrets exposed; no privilege widening
 
 ## Boundaries
 
-No AI, no Admin UI, no shipping, no store-scoped policies, no auto-seed commercial rates, no payout-net redesign, no remote apply, no push.
+No AI, no Admin, no shipping, no feature code, no remote apply, no deploy, no push.

@@ -2,25 +2,25 @@
 
 ## Task title
 
-UMTUBA Commerce — Commission Policy Activation V1
+UMTUBA Commerce — Chain Migration Apply Readiness V1
 
 ## Status
 
-`pass` — cherry-pick of `8b6caa0` onto `1746bc7` (no push / no remote migration)
+`pass` — cherry-pick of `6875847` onto `c9f9458` — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` (no push / no remote DB inspect / no remote migration)
 
 ## Capability
 
-`commerce.revenue.commission_policy_activation_v1`
+`commerce.ops.chain_migration_apply_readiness_v1`
 
 ## Branch / tip
 
-- Branch: `office/commerce-commission-policy-activation-v1-current`
-- Base (closed tip): `1746bc7` (Commission Decomposition Bridge Apply V1)
-- Milestone: cherry-pick of `8b6caa0` only (not merge tip `be87fb3`)
+- Branch: `office/commerce-chain-migration-apply-readiness-v1-current`
+- Base (closed tip): `c9f9458` (Commission Policy Activation V1)
+- Milestone: cherry-pick of `6875847` only (not merge tip `be87fb3`; not `fded934`)
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1-current`
+`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-chain-migration-apply-readiness-v1-current`
 
 ## Completed Commerce chain (closed)
 
@@ -33,27 +33,35 @@ UMTUBA Commerce — Commission Policy Activation V1
 7. Commerce Transactional Notifications V1
 8. Seller Payout Rails V1
 9. Refund Operations Surface V1
-10. Digital Entitlement Revoke on Refund V1
-11. Commission Decomposition Bridge Apply V1 (`1746bc7`)
+10. Digital Entitlement Revoke on Refund V1 (`20260889`)
+11. Commission Decomposition Bridge Apply V1 (`20260890`)
+12. Commission Policy Activation V1 (`c9f9458` / `20260891`)
 
-## Coordination
+## Allowed scope
 
-- **Desktop** owns: AI / Dashboard — do not touch
-- **Laptop** = Commerce commission policy activation only
-- Do **not** touch payout-net redesign / Admin UI / store-scoped policies / shipping
+- Migration apply readiness documentation
+- Static verification script / focused tests for `20260889 → 20260890 → 20260891`
+- AI handoff docs (`CURRENT_TASK`, `CURSOR_REPORT`, `PROJECT_STATE`)
+- Commerce implementation docs consistency for the apply chain
+
+## Forbidden scope
+
+- Remote database inspection or mutation
+- Applying any Supabase migration
+- Deploy / feature code / Admin / AI / shipping
+- Merge tip `be87fb3` / obsolete `fded934` lineage
 
 ## Delivered
 
-- TS SSOT `lib/store/commissionPolicyActivation.ts` (+ tests)
-- RPCs: activate/deactivate + activation events
-- Foundation resolve: one active per currency; historical superseded windows
-- Migration `20260891` local only
-- Docs: `COMMISSION_POLICY_ACTIVATION_V1.md`
+- `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
+- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
+- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
+- Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`
 
 ## Explicit non-actions
 
-No push · no remote migration · no auto-seed commercial rates · no store-specific policies · no Admin UI · no payout-net redesign · no merge tip `be87fb3` · no AI
+No push · no remote DB inspect · no remote migration · no deploy · no migration file edits · no AI
 
 ## Next
 
-Human GO to push when ready. Apply `20260891` only under separate ops GO.
+When ready for database mutation, issue a **separate** remote-apply GO following `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md` (`89 → 90 → 91`).

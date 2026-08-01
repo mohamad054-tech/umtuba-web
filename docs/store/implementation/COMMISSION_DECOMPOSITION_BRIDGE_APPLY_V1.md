@@ -2,7 +2,8 @@
 
 Capability: `commerce.revenue.commission_decomposition_bridge_apply_v1`  
 Branch: `office/commerce-commission-decomposition-bridge-apply-v1`  
-Migration (local only): `20260890_store_commission_decomposition_bridge_apply_v1.sql`
+Migration: `20260890_store_commission_decomposition_bridge_apply_v1.sql` (in repository; **not** remote-applied until separate GO)
+Apply readiness: `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md` (order `20260889 → 20260890 → 20260891`)
 
 Depends on:
 

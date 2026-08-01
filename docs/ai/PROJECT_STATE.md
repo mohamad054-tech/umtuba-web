@@ -67,9 +67,10 @@ Frozen baselines (extend, do not replace):
 | Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
 | Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 | Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
-| Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1-current`) |
-| Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) |
-| Commerce Commission Policy Activation V1 | **IMPLEMENTED locally** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
+| Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1-current`) — migration `20260889` not remote-applied |
+| Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) — migration `20260890` not remote-applied |
+| Commerce Commission Policy Activation V1 | **COMPLETE** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
+| Commerce Chain Verification & Migration Apply Readiness V1 | **IMPLEMENTED locally** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO`; remote DB not inspected/applied |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
