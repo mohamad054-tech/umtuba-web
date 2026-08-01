@@ -2,25 +2,24 @@
 
 ## Task title
 
-Seller Catalog Wiring V1
+Seller Catalog Performance & Query Batching V1
 
 ## Status
 
-`pass` — verification complete locally — **staged / uncommitted / unpushed**
+`PASS + STAGED` — **uncommitted / unpushed**
 
 ## Capability
 
-`commerce.seller.catalog_wiring_v1`
+`commerce.seller.catalog_performance_batching_v1`
 
 ## Base
 
-`origin/office/seller-experience-foundation-v1` @ `3a4d1c4679b2e364c153e5327ed4d682f0b051f4`
+`origin/office/seller-catalog-wiring-v1` @ `0f20502a8298d91e591c3e9bebeed515c3d137cf`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-wiring-v1`
-`office/seller-catalog-wiring-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-performance-batching-v1`
 
 ## Explicitly not done
 
-No commit / push / migration. No Physical/Refund/Commission/Stripe/Settlement edits.
+No commit / push / migration. No payment/physical/refund changes.

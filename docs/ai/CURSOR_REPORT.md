@@ -1,23 +1,22 @@
 # Cursor Report
 
-**PASS (staged, uncommitted)** — Seller Catalog Wiring V1
+**PASS + STAGED** — Seller Catalog Performance & Query Batching V1
 
 ## Base
 
-- SoT: `origin/office/seller-experience-foundation-v1` @ `3a4d1c4`
-- Branch: `office/seller-catalog-wiring-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-wiring-v1`
+- SoT: `origin/office/seller-catalog-wiring-v1` @ `0f20502`
+- Branch: `office/seller-catalog-performance-batching-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-performance-batching-v1`
 
-## Wiring
+## Change
 
-Real catalog facts (media/prices/digital assets/inventory presence/physical metadata) feed Seller Experience Foundation. Analytics shows "No data yet" when empty.
+Hardened seller catalog health batching: dedupe/chunk IDs, parallel wave A (media/variants/digital), wave B (prices), fail-closed on batch errors, store-scope filter, `queryCount` instrumentation + tests.
 
 ## Verification
 
-- Vitest: **14 passed** (wiring 2 + experience 6 + dashboard insights 6)
-- Note: `SellerDashboardInsights.test.tsx` does not exist; used `sellerDashboardInsights.test.ts`
-- tsc PASS · build PASS · lockfile unchanged
+- Vitest: **21 passed** (wiring/perf 9 + experience 6 + dashboard insights 6)
+- tsc PASS · build PASS · lockfile unchanged · `git diff --cached --check` PASS
 
 ## Open
 
-Await commit GO.
+Await commit GO. No push.
