@@ -27,6 +27,7 @@ import {
   deriveSellerDashboardAttention,
   deriveStoreReadiness,
 } from "../../../lib/store/sellerDashboardInsights";
+import { buildSellerExperienceBundle } from "../../../lib/store/sellerExperienceFoundation";
 import { loadSellerRevenueBridgeVisibility } from "../../../lib/store/commerceRevenueBridge";
 import {
   listSellerInventoryRows,
@@ -214,6 +215,37 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
       ? analyticsBundle.summary.currency
       : null,
     analyticsPeriodLabel: analyticsBundle ? periodPreset.label : null,
+  });
+
+  const sellerExperience = buildSellerExperienceBundle({
+    storeId: membership.store.id,
+    storeName: membership.store.name,
+    storeSlug: membership.store.slug,
+    storeStatus: membership.store.status,
+    verificationStatus: membership.store.verification_status,
+    products,
+    orderSnapshot,
+    revenue: analyticsBundle
+      ? {
+          gmvMinor: analyticsBundle.summary.grossMerchandiseValueMinor,
+          netSalesMinor: analyticsBundle.summary.netSalesMinor,
+          currency: analyticsBundle.summary.currency,
+          periodLabel: periodPreset.label,
+        }
+      : null,
+    analytics: {
+      orders: orderSnapshot?.totalOrders ?? null,
+      salesMinor: analyticsBundle
+        ? analyticsBundle.summary.netSalesMinor
+        : null,
+      currency: analyticsBundle
+        ? analyticsBundle.summary.currency
+        : orderSnapshot?.currency ?? null,
+      topProducts: analyticsBundle ? analyticsBundle.topProducts : null,
+      periodLabel: periodPreset.label,
+      productViews: null,
+      storeViews: null,
+    },
   });
 
   const fulfillmentCounts = fulfillmentCountsResult.ok
@@ -418,6 +450,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           payoutHistoryLoadMoreHref={payoutHistoryLoadMoreHref}
           payoutReconciliation={payoutReconciliation}
           payoutReconciliationLoadMoreHref={payoutReconciliationLoadMoreHref}
+          sellerExperience={sellerExperience}
         />
       </div>
 

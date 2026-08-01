@@ -18,6 +18,7 @@ import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/c
 import type { SellerPayoutHistorySurfaceView } from "../../../lib/store/sellerPayoutHistorySurface";
 import type { PayoutReconSurfaceView } from "../../../lib/store/payoutReconciliationSurface";
 import type { SellerPayoutEligibilitySurfaceView } from "../../../lib/store/sellerPayoutEligibilitySurface";
+import type { SellerExperienceBundle } from "../../../lib/store/sellerExperienceFoundation";
 import { APP_ROUTES } from "../../lib/nav";
 import SellerPayoutEligibility from "./SellerPayoutEligibility";
 import SellerPayoutHistory from "./SellerPayoutHistory";
@@ -50,6 +51,7 @@ type Props = {
   payoutHistoryLoadMoreHref: string | null;
   payoutReconciliation: PayoutReconSurfaceView | null;
   payoutReconciliationLoadMoreHref: string | null;
+  sellerExperience?: SellerExperienceBundle | null;
 };
 
 export default function SellerDashboardInsightsView(props: Props) {
@@ -80,6 +82,7 @@ export default function SellerDashboardInsightsView(props: Props) {
     payoutHistoryLoadMoreHref,
     payoutReconciliation,
     payoutReconciliationLoadMoreHref,
+    sellerExperience = null,
   } = props;
 
   return (
@@ -93,6 +96,29 @@ export default function SellerDashboardInsightsView(props: Props) {
           Operational command center · Role {role}. Metrics are trusted
           summaries only — not forecasts, traffic, or profit.
         </p>
+        {sellerExperience ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] px-3 py-2 text-sm">
+              <p className="text-xs text-[var(--sf-muted)]">Products</p>
+              <p className="font-semibold">{sellerExperience.summary.totalProducts}</p>
+            </div>
+            <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] px-3 py-2 text-sm">
+              <p className="text-xs text-[var(--sf-muted)]">Published</p>
+              <p className="font-semibold">{sellerExperience.summary.publishedProducts}</p>
+            </div>
+            <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] px-3 py-2 text-sm">
+              <p className="text-xs text-[var(--sf-muted)]">Drafts</p>
+              <p className="font-semibold">{sellerExperience.summary.draftProducts}</p>
+            </div>
+            <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] px-3 py-2 text-sm">
+              <p className="text-xs text-[var(--sf-muted)]">Readiness</p>
+              <p className="font-semibold">
+                {sellerExperience.storeReadiness.readinessPercent}%
+                {sellerExperience.storeReadiness.readyToSell ? " · Ready" : " · Not ready"}
+              </p>
+            </div>
+          </div>
+        ) : null}
         <div className="mt-4 flex flex-wrap gap-2">
           {(["7d", "30d"] as const).map((key) => (
             <Link
@@ -148,6 +174,30 @@ export default function SellerDashboardInsightsView(props: Props) {
         <h2 className="sf-display text-xl font-semibold tracking-tight">
           Store readiness
         </h2>
+        {sellerExperience ? (
+          <>
+            <p className="mt-2 text-sm text-[var(--sf-muted)]">
+              Experience readiness {sellerExperience.storeReadiness.readinessPercent}% ·{" "}
+              {sellerExperience.storeReadiness.readyToSell
+                ? "Ready to sell (catalog signals)"
+                : "Not ready to sell yet"}
+            </p>
+            <ul className="mt-3 space-y-1 text-sm text-[var(--sf-muted)]">
+              {sellerExperience.storeReadiness.checklist.map((item) => (
+                <li key={item.id}>
+                  {item.done ? "✓" : "○"} {item.label}
+                </li>
+              ))}
+            </ul>
+            {sellerExperience.storeReadiness.suggestions.length > 0 ? (
+              <ul className="mt-3 space-y-1 text-sm text-[var(--sf-muted)]">
+                {sellerExperience.storeReadiness.suggestions.map((tip) => (
+                  <li key={tip}>· {tip}</li>
+                ))}
+              </ul>
+            ) : null}
+          </>
+        ) : null}
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="rounded-full border border-[var(--sf-line)] px-3 py-1 text-xs font-semibold">
             Store · {readiness.storeActive ? "Active" : "Inactive"}
@@ -174,6 +224,60 @@ export default function SellerDashboardInsightsView(props: Props) {
           </p>
         )}
       </section>
+
+      {sellerExperience && sellerExperience.actionCenter.length > 0 ? (
+        <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
+          <h2 className="sf-display text-xl font-semibold tracking-tight">
+            Action center
+          </h2>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {sellerExperience.actionCenter.slice(0, 6).map((card) => (
+              <Link
+                key={card.id}
+                href={card.href}
+                className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] p-4 transition hover:border-[var(--sf-accent)]"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--sf-muted)]">
+                  {card.severity}
+                  {typeof card.count === "number" ? ` · ${card.count}` : ""}
+                </p>
+                <p className="mt-1 text-sm font-semibold">{card.title}</p>
+                <p className="mt-1 text-sm text-[var(--sf-muted)]">{card.reason}</p>
+                <p className="mt-2 text-xs font-semibold text-[var(--sf-accent)]">
+                  {card.actionLabel}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {sellerExperience ? (
+        <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
+          <h2 className="sf-display text-xl font-semibold tracking-tight">
+            Product health
+          </h2>
+          <p className="mt-1 text-sm text-[var(--sf-muted)]">
+            Catalog completeness signals — not inventory or payout truth.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {sellerExperience.productHealth.slice(0, 8).map((item) => (
+              <li key={item.productId}>
+                <Link
+                  href={item.href}
+                  className="flex flex-wrap items-baseline justify-between gap-2 rounded-[var(--sf-radius)] border border-[var(--sf-line)] px-3 py-2 text-sm"
+                >
+                  <span className="font-semibold">{item.title}</span>
+                  <span className="text-[var(--sf-muted)]">
+                    {item.completenessScore}%
+                    {item.primaryIssue ? ` · ${item.primaryIssue}` : " · complete"}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
         <h2 className="sf-display text-xl font-semibold tracking-tight">
