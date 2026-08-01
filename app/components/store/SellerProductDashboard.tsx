@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   bulkArchiveProductsAction,
   bulkSubmitProductsAction,
 } from "../../actions/storeCatalog";
 import {
-  deriveSellerCatalogBulkActions,
   sellerModerationLabel,
   sellerProductStatusLabel,
 } from "../../../lib/store/sellerCatalogPresentation";
@@ -28,6 +27,17 @@ import {
   buildSellerCatalogFilterResetHref,
   type SellerCatalogResultKind,
 } from "../../../lib/store/sellerCatalogPaginationExperience";
+import {
+  clearBulkSelection,
+  deriveSellerCatalogBulkToolbar,
+  mergeBulkPlanWithExecutionResults,
+  planSellerCatalogBulkOperation,
+  selectAllVisibleBulkItems,
+  toggleBulkSelection,
+  type SellerCatalogBulkOperationId,
+  type SellerCatalogBulkSelectionItem,
+  type SellerCatalogBulkSummary,
+} from "../../../lib/store/sellerCatalogBulkOperations";
 import StoreEmptyState from "./StoreEmptyState";
 
 type PaginationLabels = {
@@ -55,8 +65,20 @@ type Props = {
   healthFilterScope: "none" | "page_only";
 };
 
+function toSelectionItem(
+  product: SellerCatalogSearchItem
+): SellerCatalogBulkSelectionItem {
+  return {
+    id: product.id,
+    title: product.title,
+    status: String(product.status),
+    storeId: product.storeId,
+  };
+}
+
 export default function SellerProductDashboard({
   products,
+  storeId,
   canManage,
   applied,
   pageSize,
@@ -70,9 +92,14 @@ export default function SellerProductDashboard({
 }: Props) {
   const router = useRouter();
   const [query, setQuery] = useState(applied.search);
-  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [selected, setSelected] = useState<
+    Record<string, SellerCatalogBulkSelectionItem>
+  >({});
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [summary, setSummary] = useState<SellerCatalogBulkSummary | null>(null);
+  const [confirmOp, setConfirmOp] =
+    useState<SellerCatalogBulkOperationId | null>(null);
   const [pending, startTransition] = useTransition();
   const [navPending, startNavTransition] = useTransition();
 
@@ -80,13 +107,22 @@ export default function SellerProductDashboard({
     setQuery(applied.search);
   }, [applied.search]);
 
-  const selectedIds = products
-    .filter((item) => selected[item.id])
-    .map((item) => item.id);
-  const selectedStatuses = products
-    .filter((item) => selected[item.id])
-    .map((item) => item.status);
-  const bulkActions = deriveSellerCatalogBulkActions({ selectedStatuses });
+  const selectedItems = useMemo(() => Object.values(selected), [selected]);
+  const selectedCount = selectedItems.length;
+  const toolbar = deriveSellerCatalogBulkToolbar({ selectedCount });
+
+  const visibleSelectionItems = products.map(toSelectionItem);
+  const allVisibleSelected =
+    visibleSelectionItems.length > 0 &&
+    visibleSelectionItems.every((item) => Boolean(selected[item.id]));
+
+  const confirmPlan = confirmOp
+    ? planSellerCatalogBulkOperation({
+        operation: confirmOp,
+        storeId,
+        items: selectedItems,
+      })
+    : null;
 
   function navigateFilters(patch: {
     search?: string;
@@ -95,7 +131,6 @@ export default function SellerProductDashboard({
     sort?: SellerCatalogSearchSortKey;
     health?: SellerCatalogHealthFilter;
   }) {
-    // Filter/search/sort changes always reset pagination to page 1.
     const href = buildSellerCatalogFilterResetHref({
       search: patch.search ?? applied.search,
       status: patch.status ?? applied.status,
@@ -115,49 +150,86 @@ export default function SellerProductDashboard({
     });
   }
 
-  function toggleAll(next: boolean) {
-    const patch: Record<string, boolean> = {};
-    for (const item of products) patch[item.id] = next;
-    setSelected((prev) => ({ ...prev, ...patch }));
-  }
-
-  function runBulk(action: "submit_review" | "archive") {
-    if (!canManage || selectedIds.length === 0) return;
-    const gate = bulkActions.find((a) => a.id === action);
-    if (!gate?.enabled) {
-      setError(gate?.reason || "Action unavailable.");
+  function openConfirm(operation: SellerCatalogBulkOperationId) {
+    const action = toolbar.find((row) => row.id === operation);
+    if (!action?.enabled) {
+      setError(action?.reason || "Action unavailable.");
       return;
     }
     setError(null);
     setMessage(null);
+    setSummary(null);
+    setConfirmOp(operation);
+  }
+
+  function runConfirmedBulk() {
+    if (!confirmPlan || !confirmOp || !confirmPlan.supported) {
+      setConfirmOp(null);
+      return;
+    }
+    const eligibleIds = confirmPlan.eligible.map((item) => item.id);
+    if (eligibleIds.length === 0) {
+      const emptySummary = mergeBulkPlanWithExecutionResults({
+        plan: confirmPlan,
+        execution: [],
+      });
+      setSummary(emptySummary);
+      setConfirmOp(null);
+      setMessage(null);
+      return;
+    }
+
     const body = new FormData();
-    for (const id of selectedIds) body.append("productId", id);
+    for (const id of eligibleIds) body.append("productId", id);
+    const operation = confirmOp;
+    const plan = confirmPlan;
+    setConfirmOp(null);
     startTransition(async () => {
       const result =
-        action === "archive"
+        operation === "archive"
           ? await bulkArchiveProductsAction(body)
           : await bulkSubmitProductsAction(body);
       if (!result.ok) {
         setError(result.message);
         return;
       }
-      if (action === "archive" && "archived" in result) {
+      const merged = mergeBulkPlanWithExecutionResults({
+        plan,
+        execution: result.results.map((row) => ({
+          productId: row.productId,
+          ok: row.outcome === "success",
+          message: row.reason,
+        })),
+      });
+      setSummary(merged);
+      if (merged.overall === "success") {
         setMessage(
-          `Archived ${result.archived} product${result.archived === 1 ? "" : "s"}${
-            result.failed ? ` · ${result.failed} failed` : ""
-          }.`
+          `${merged.label}: ${merged.succeeded} succeeded.`
         );
-      } else if ("submitted" in result) {
+      } else if (merged.overall === "partial") {
         setMessage(
-          `Submitted ${result.submitted} product${result.submitted === 1 ? "" : "s"}${
-            result.failed ? ` · ${result.failed} failed` : ""
-          }.`
+          `${merged.label}: ${merged.succeeded} succeeded, ${merged.failed} failed, ${merged.skipped} skipped.`
+        );
+      } else {
+        setMessage(
+          `${merged.label}: ${merged.succeeded} succeeded, ${merged.failed} failed, ${merged.skipped} skipped.`
         );
       }
-      setSelected({});
+      setSelected((prev) => {
+        const next = { ...prev };
+        for (const row of merged.results) {
+          if (row.outcome === "success") delete next[row.productId];
+        }
+        return next;
+      });
       router.refresh();
     });
   }
+
+  const prevDisabled =
+    paginationLabels.previousDisabled || !previousHref || navPending;
+  const nextDisabled =
+    paginationLabels.nextDisabled || !nextHref || navPending;
 
   if (resultKind === "empty_catalog") {
     return (
@@ -169,11 +241,6 @@ export default function SellerProductDashboard({
       />
     );
   }
-
-  const prevDisabled =
-    paginationLabels.previousDisabled || !previousHref || navPending;
-  const nextDisabled =
-    paginationLabels.nextDisabled || !nextHref || navPending;
 
   return (
     <div className="space-y-5">
@@ -297,36 +364,62 @@ export default function SellerProductDashboard({
 
       {canManage ? (
         <div className="sticky top-2 z-20 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)]/95 p-3 backdrop-blur-md">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
             <label className="flex items-center gap-2 text-sm text-[var(--sf-muted)]">
               <input
                 type="checkbox"
-                checked={
-                  products.length > 0 &&
-                  products.every((item) => selected[item.id])
-                }
-                onChange={(event) => toggleAll(event.target.checked)}
+                checked={allVisibleSelected}
+                onChange={(event) => {
+                  if (event.target.checked) {
+                    setSelected((prev) =>
+                      selectAllVisibleBulkItems(
+                        prev,
+                        visibleSelectionItems,
+                        storeId
+                      )
+                    );
+                  } else {
+                    setSelected((prev) => {
+                      const next = { ...prev };
+                      for (const item of visibleSelectionItems) {
+                        delete next[item.id];
+                      }
+                      return next;
+                    });
+                  }
+                }}
+                aria-label="Select all products on this page"
               />
-              Select visible ({selectedIds.length})
+              Select page ({selectedCount} selected)
             </label>
             <button
               type="button"
-              disabled={pending || !bulkActions[0]?.enabled}
-              onClick={() => runBulk("submit_review")}
+              disabled={selectedCount === 0}
+              onClick={() => setSelected(clearBulkSelection())}
               className="rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-ink)] disabled:opacity-40"
             >
-              Submit for review
+              Clear selection
             </button>
-            <button
-              type="button"
-              disabled={pending || !bulkActions[1]?.enabled}
-              onClick={() => runBulk("archive")}
-              className="rounded-full border border-[rgba(240,168,168,0.35)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-danger)] disabled:opacity-40"
-            >
-              Archive
-            </button>
+            {toolbar.map((action) => (
+              <button
+                key={action.id}
+                type="button"
+                disabled={pending || !action.enabled}
+                title={action.reason}
+                onClick={() => openConfirm(action.id)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold disabled:opacity-40 ${
+                  action.id === "archive"
+                    ? "border-[rgba(240,168,168,0.35)] text-[var(--sf-danger)]"
+                    : "border-[var(--sf-line)] text-[var(--sf-ink)]"
+                }`}
+              >
+                {action.label}
+              </button>
+            ))}
             {pending ? (
-              <span className="text-xs text-[var(--sf-faint)]">Working…</span>
+              <span className="text-xs text-[var(--sf-faint)]" aria-live="polite">
+                Working…
+              </span>
             ) : null}
           </div>
           {error ? (
@@ -339,6 +432,89 @@ export default function SellerProductDashboard({
               {message}
             </p>
           ) : null}
+          {summary ? (
+            <div
+              role="status"
+              className="mt-3 rounded-xl border border-[var(--sf-line)] bg-black/20 px-3 py-2 text-xs text-[var(--sf-muted)]"
+            >
+              <p className="font-semibold text-[var(--sf-ink)]">
+                {summary.label} result · {summary.overall}
+              </p>
+              <p className="mt-1">
+                Success {summary.succeeded} · Failed {summary.failed} · Skipped{" "}
+                {summary.skipped}
+              </p>
+              {summary.results.filter((r) => r.outcome !== "success").length >
+              0 ? (
+                <ul className="mt-2 max-h-28 space-y-1 overflow-auto">
+                  {summary.results
+                    .filter((r) => r.outcome !== "success")
+                    .slice(0, 8)
+                    .map((row) => (
+                      <li key={`${row.productId}-${row.outcome}`}>
+                        {row.title || row.productId}: {row.outcome}
+                        {row.reason ? ` — ${row.reason}` : ""}
+                      </li>
+                    ))}
+                </ul>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {confirmPlan && confirmOp ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bulk-confirm-title"
+          className="rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5"
+        >
+          <h2
+            id="bulk-confirm-title"
+            className="sf-display text-lg font-semibold tracking-tight"
+          >
+            Confirm {confirmPlan.label}
+          </h2>
+          <p className="mt-2 text-sm text-[var(--sf-muted)]">
+            {confirmPlan.eligible.length} product
+            {confirmPlan.eligible.length === 1 ? "" : "s"} will run.{" "}
+            {confirmPlan.skipped.length} will be skipped.
+          </p>
+          {confirmPlan.warnings.length > 0 ? (
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[var(--sf-faint)]">
+              {confirmPlan.warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
+              ))}
+            </ul>
+          ) : null}
+          {confirmPlan.skipped.length > 0 ? (
+            <ul className="mt-3 max-h-32 space-y-1 overflow-auto text-xs text-[var(--sf-faint)]">
+              {confirmPlan.skipped.slice(0, 10).map((row) => (
+                <li key={row.id}>
+                  {row.title}: {row.reason}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={pending || confirmPlan.eligible.length === 0}
+              onClick={runConfirmedBulk}
+              className="rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712] disabled:opacity-40"
+            >
+              Confirm {confirmPlan.label}
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => setConfirmOp(null)}
+              className="rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold text-[var(--sf-ink)]"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       ) : null}
 
@@ -400,10 +576,14 @@ export default function SellerProductDashboard({
                     className="mt-1"
                     checked={Boolean(selected[product.id])}
                     onChange={(event) =>
-                      setSelected((prev) => ({
-                        ...prev,
-                        [product.id]: event.target.checked,
-                      }))
+                      setSelected((prev) =>
+                        toggleBulkSelection(
+                          prev,
+                          toSelectionItem(product),
+                          event.target.checked,
+                          storeId
+                        )
+                      )
                     }
                     aria-label={`Select ${product.title}`}
                   />
