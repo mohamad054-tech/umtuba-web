@@ -10,7 +10,8 @@ Depends on:
 - Seller Payout Foundation V1 (blocks settlement while payout `IN_TRANSIT`/`COMPLETED`; blocks payout after refund)
 - Payout Booking Ops Helpers V1 (compatible; refunded funds cannot submit)
 - Commission Policy Foundation V1 (optional consistency projection; no settlement amount mutation)
-- Digital entitlement grant (unchanged — revoke-on-refund is a separate milestone)
+- Digital entitlement grant (unchanged)
+- Digital Entitlement Revoke on Refund V1 (wired after Sync `refunded`)
 
 ## Purpose
 
@@ -23,6 +24,7 @@ Trusted **service-side** orchestration for **full-order** refunds:
    - `ALLOCATED` / `HELD` → `reverse_allocation` → `REVERSED`
    - `UNALLOCATED` / already `REVERSED` → Sync only
 4. Apply Sync `refunded` for the **full** trusted capture amount/currency
+5. Revoke digital entitlements for the payment attempt (fail closed; idempotent)
 
 ## Module
 
@@ -52,8 +54,8 @@ Trusted **service-side** orchestration for **full-order** refunds:
 - Partial refunds
 - Bank/PSP refund rail adapters (caller supplies trusted Sync key after provider confirmation)
 - Payout clawback from `COMPLETED`
-- Digital entitlement revoke
 - Dashboard / Admin UI / AI
+- Entitlement grant redesign (see Digital Entitlement Revoke on Refund V1 for revoke)
 
 ## Compatibility
 

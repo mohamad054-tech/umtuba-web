@@ -337,6 +337,12 @@ describe("Commerce Refund Operations Surface V1", () => {
           sellerAmountMinor: null,
           policyStatus: "not_configured" as const,
         },
+        entitlementRevoke: {
+          status: "revoked" as const,
+          replayed: false,
+          entitlementsRevoked: 0,
+          data: {},
+        },
         sellerPayableProtected: true as const,
         payoutProtected: true as const,
       };
