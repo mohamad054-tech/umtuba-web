@@ -7,6 +7,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { STORE_PAYMENT_SYNC_RPC } from "./paymentOutcomeSync";
 import { STORE_SETTLEMENT_RPC } from "./settlementFoundation";
+import { STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC } from "./digitalEntitlementRevoke";
 import {
   applyFullOrderRefund,
   assertTrustedFullOrderRefundContext,
@@ -167,7 +168,7 @@ describe("Full order refund path — planning", () => {
 });
 
 describe("Full order refund path — apply", () => {
-  it("successful full refund: hold + reverse + sync refunded", async () => {
+  it("successful full refund: hold + reverse + sync refunded + revoke", async () => {
     const rpc = vi.fn(async (name: string, args?: Record<string, unknown>) => {
       if (name === STORE_SETTLEMENT_RPC) {
         if (args?.p_action === "hold") {
@@ -190,6 +191,21 @@ describe("Full order refund path — apply", () => {
             replayed: false,
             action: "reverse_allocation",
             settlement_state: "REVERSED",
+          },
+          error: null,
+        };
+      }
+      if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
+        expect(args).toMatchObject({
+          p_payment_attempt_id: ATTEMPT,
+          p_event_key: `${CAPTURE_KEY}:entitlement:revoke`,
+          p_correlation_id: CORR,
+        });
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            entitlements_revoked: 1,
           },
           error: null,
         };
@@ -234,6 +250,8 @@ describe("Full order refund path — apply", () => {
     expect(result.settlementSteps[1]?.action).toBe("reverse_allocation");
     expect(result.finalSettlementState).toBe("REVERSED");
     expect(result.refund.replayed).toBe(false);
+    expect(result.entitlementRevoke.status).toBe("revoked");
+    expect(result.entitlementRevoke.entitlementsRevoked).toBe(1);
     expect(result.sellerPayableProtected).toBe(true);
     expect(result.payoutProtected).toBe(true);
     expect(result.commission.policyStatus).toBe("applied");
@@ -242,14 +260,31 @@ describe("Full order refund path — apply", () => {
       (result.commission.platformCommissionMinor ?? 0) +
         (result.commission.sellerAmountMinor ?? 0)
     ).toBe(4500);
-    expect(rpc).toHaveBeenCalledTimes(3);
+    expect(rpc.mock.calls.map((c) => c[0])).toEqual([
+      STORE_SETTLEMENT_RPC,
+      STORE_SETTLEMENT_RPC,
+      STORE_PAYMENT_SYNC_RPC,
+      STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+    ]);
   });
 
   it("duplicate refund with same key replays safely", async () => {
-    const rpc = vi.fn(async () => ({
-      data: { replayed: true, outcome: "refunded", event_key: IDEM },
-      error: null,
-    }));
+    const rpc = vi.fn(async (name: string) => {
+      if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: true,
+            entitlements_revoked: 1,
+          },
+          error: null,
+        };
+      }
+      return {
+        data: { replayed: true, outcome: "refunded", event_key: IDEM },
+        error: null,
+      };
+    });
     const result = await applyFullOrderRefund(
       { rpc } as never,
       {
@@ -273,7 +308,12 @@ describe("Full order refund path — apply", () => {
     if (result.ok) {
       expect(result.replayed).toBe(true);
       expect(result.refund.replayed).toBe(true);
+      expect(result.entitlementRevoke.replayed).toBe(true);
     }
+    expect(rpc.mock.calls.map((c) => c[0])).toEqual([
+      STORE_PAYMENT_SYNC_RPC,
+      STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+    ]);
   });
 
   it("already refunded with conflicting key fails closed", async () => {
@@ -401,6 +441,16 @@ describe("Full order refund path — apply", () => {
 
   it("seller balance path: UNALLOCATED refunds without settlement writes", async () => {
     const rpc = vi.fn(async (name: string) => {
+      if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            entitlements_revoked: 0,
+          },
+          error: null,
+        };
+      }
       expect(name).toBe(STORE_PAYMENT_SYNC_RPC);
       return {
         data: { replayed: false, outcome: "refunded" },
@@ -425,8 +475,12 @@ describe("Full order refund path — apply", () => {
     if (result.ok) {
       expect(result.settlementSteps).toEqual([]);
       expect(result.sellerPayableProtected).toBe(true);
+      expect(result.entitlementRevoke.entitlementsRevoked).toBe(0);
     }
-    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc.mock.calls.map((c) => c[0])).toEqual([
+      STORE_PAYMENT_SYNC_RPC,
+      STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
+    ]);
   });
 
   it("currency consistency: expectedCurrency mismatch fails closed", async () => {

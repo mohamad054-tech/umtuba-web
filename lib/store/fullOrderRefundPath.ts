@@ -21,6 +21,10 @@ import {
   type StorePayoutState,
 } from "./sellerPayoutFoundation";
 import { wireCommerceRefundCompleted } from "./commerceNotifications";
+import {
+  revokeDigitalEntitlementsAfterTrustedRefund,
+  type DigitalEntitlementRevokeResult,
+} from "./digitalEntitlementRevoke";
 
 export const FULL_ORDER_REFUND_PATH_ID =
   "commerce.payments.full_order_refund_path_v1" as const;
@@ -59,6 +63,7 @@ export type FullOrderRefundFailureCode =
   | "invalid_idempotency_key"
   | "client_money_rejected"
   | "settlement_unwind_failed"
+  | "entitlement_revoke_failed"
   | "rpc_failed";
 
 export type FullOrderRefundSettlementStep = {
@@ -100,6 +105,12 @@ export type FullOrderRefundResult =
         platformCommissionMinor: number | null;
         sellerAmountMinor: number | null;
         policyStatus: "applied" | "not_configured";
+      };
+      entitlementRevoke: {
+        status: "revoked";
+        replayed: boolean;
+        entitlementsRevoked: number;
+        data: Record<string, unknown>;
       };
       sellerPayableProtected: true;
       payoutProtected: true;
@@ -601,6 +612,47 @@ export async function loadTrustedFullOrderRefundContext(
   };
 }
 
+async function applyEntitlementRevokeAfterRefund(
+  supabase: AnyClient,
+  ctx: TrustedFullOrderRefundContext
+): Promise<
+  | {
+      ok: true;
+      entitlementRevoke: Extract<
+        FullOrderRefundResult,
+        { ok: true }
+      >["entitlementRevoke"];
+    }
+  | { ok: false; code: "entitlement_revoke_failed"; message: string }
+> {
+  const revoke: DigitalEntitlementRevokeResult =
+    await revokeDigitalEntitlementsAfterTrustedRefund(supabase, {
+      paymentAttemptId: ctx.paymentAttemptId,
+      captureEventKey: ctx.captureEventKey,
+      correlationId: ctx.correlationId,
+    });
+
+  if (revoke.status !== "revoked") {
+    return {
+      ok: false,
+      code: "entitlement_revoke_failed",
+      message:
+        revoke.message ||
+        "Digital entitlement revoke failed after trusted refund.",
+    };
+  }
+
+  return {
+    ok: true,
+    entitlementRevoke: {
+      status: "revoked",
+      replayed: revoke.replayed,
+      entitlementsRevoked: revoke.entitlementsRevoked,
+      data: revoke.data,
+    },
+  };
+}
+
 async function applySettlementStep(
   supabase: AnyClient,
   ctx: TrustedFullOrderRefundContext,
@@ -655,6 +707,7 @@ async function applySettlementStep(
  * 2) Block payout IN_TRANSIT / COMPLETED
  * 3) Unwind settlement (hold if RELEASED, then reverse when allocated/held)
  * 4) Sync outcome=refunded (full capture amount)
+ * 5) Revoke digital entitlements for the payment attempt (fail closed)
  */
 export async function applyFullOrderRefund(
   supabase: AnyClient,
@@ -729,6 +782,14 @@ export async function applyFullOrderRefund(
       },
     });
     if (!error && data && Boolean((data as Record<string, unknown>).replayed)) {
+      const revoke = await applyEntitlementRevokeAfterRefund(supabase, ctx);
+      if (!revoke.ok) {
+        return {
+          ok: false,
+          code: revoke.code,
+          message: revoke.message,
+        };
+      }
       return {
         ok: true,
         capability: FULL_ORDER_REFUND_PATH_ID,
@@ -748,6 +809,7 @@ export async function applyFullOrderRefund(
         finalSettlementState: ctx.settlementState,
         payoutState: ctx.payoutState,
         commission: projectCommissionConsistency(ctx, input.commissionPolicy),
+        entitlementRevoke: revoke.entitlementRevoke,
         sellerPayableProtected: true,
         payoutProtected: true,
       };
@@ -847,6 +909,15 @@ export async function applyFullOrderRefund(
     (s) => s.status === "replayed"
   );
 
+  const revoke = await applyEntitlementRevokeAfterRefund(supabase, ctx);
+  if (!revoke.ok) {
+    return {
+      ok: false,
+      code: revoke.code,
+      message: revoke.message,
+    };
+  }
+
   wireCommerceRefundCompleted({
     orderId: ctx.orderId,
     storeId: ctx.storeId,
@@ -875,6 +946,7 @@ export async function applyFullOrderRefund(
     finalSettlementState,
     payoutState: ctx.payoutState,
     commission: projectCommissionConsistency(ctx, input.commissionPolicy),
+    entitlementRevoke: revoke.entitlementRevoke,
     sellerPayableProtected: true,
     payoutProtected: true,
   };

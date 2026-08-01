@@ -67,6 +67,7 @@ Frozen baselines (extend, do not replace):
 | Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
 | Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 | Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
+| Commerce Digital Entitlement Revoke on Refund V1 | **IMPLEMENTED locally** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1`) — uncommitted; migration `20260889` not remote-applied |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
