@@ -93,6 +93,20 @@ export type StoreProductRow = {
   width_mm?: number | null;
   height_mm?: number | null;
   origin_country_code?: string | null;
+  /** Physical Commerce Foundation V1 — shipping / fulfillment metadata. */
+  shipping_required?: boolean | null;
+  inventory_tracked?: boolean | null;
+  fulfillment_required?: boolean | null;
+  shippable?: boolean | null;
+  weight_unit?: string | null;
+  dimension_unit?: string | null;
+  shipping_class?: string | null;
+  fragile?: boolean;
+  special_handling?: boolean;
+  package_weight_grams?: number | null;
+  package_length_mm?: number | null;
+  package_width_mm?: number | null;
+  package_height_mm?: number | null;
   /** Supplier→Seller Marketplace V1 — product may be listed by other sellers. */
   marketplace_eligible?: boolean;
 };
@@ -106,6 +120,12 @@ export type ProductVariantRow = {
   status: string;
   created_at: string;
   updated_at: string;
+  /** Physical Commerce Foundation V1 */
+  barcode?: string | null;
+  weight_grams?: number | null;
+  length_mm?: number | null;
+  width_mm?: number | null;
+  height_mm?: number | null;
 };
 
 export type ProductPriceRow = {
@@ -128,6 +148,8 @@ export type ProductInventoryRow = {
   reserved: number;
   safety_stock: number;
   allow_backorder: boolean;
+  /** Physical Commerce Foundation V1 */
+  low_stock_threshold?: number;
 };
 
 export type ProductMediaRow = {
