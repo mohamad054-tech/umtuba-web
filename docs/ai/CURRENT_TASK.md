@@ -2,25 +2,23 @@
 
 ## Task title
 
-UMTUBA Commerce — Chain Migration Apply Readiness V1
+Commerce Chain Remote Migration Preflight V1
 
 ## Status
 
-`pass` — cherry-pick of `6875847` onto `c9f9458` — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` (no push / no remote DB inspect / no remote migration)
+`pass` (preflight complete) — remote decision **`NOT_READY_FOR_REMOTE_APPLY`** (no push / no remote mutation / no migration apply)
 
 ## Capability
 
-`commerce.ops.chain_migration_apply_readiness_v1`
+`commerce.ops.chain_migration_apply_readiness_v1` (remote preflight phase)
 
 ## Branch / tip
 
-- Branch: `office/commerce-chain-migration-apply-readiness-v1-current`
-- Base (closed tip): `c9f9458` (Commission Policy Activation V1)
-- Milestone: cherry-pick of `6875847` only (not merge tip `be87fb3`; not `fded934`)
-
-## Worktree
-
-`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-chain-migration-apply-readiness-v1-current`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-remote-migration-preflight-v1-current`
+- Branch: `office/commerce-remote-migration-preflight-v1-current`
+- Base: `c473630` (`docs(commerce): add migration apply readiness v1`)
+- Cherry-pick: `5166c95` (historical preflight; re-verified live)
+- Linked project: `tgucwnjwoyeqoxqaxmew`
 
 ## Completed Commerce chain (closed)
 
@@ -36,32 +34,30 @@ UMTUBA Commerce — Chain Migration Apply Readiness V1
 10. Digital Entitlement Revoke on Refund V1 (`20260889`)
 11. Commission Decomposition Bridge Apply V1 (`20260890`)
 12. Commission Policy Activation V1 (`c9f9458` / `20260891`)
+13. Commerce Chain Migration Apply Readiness V1 (`c473630`)
 
 ## Allowed scope
 
-- Migration apply readiness documentation
-- Static verification script / focused tests for `20260889 → 20260890 → 20260891`
+- Read-only remote preflight (SELECT / migration list / schema probes)
+- Remote preflight + readiness documentation updates
+- Static verification / focused tests for apply chain readiness
 - AI handoff docs (`CURRENT_TASK`, `CURSOR_REPORT`, `PROJECT_STATE`)
-- Commerce implementation docs consistency for the apply chain
 
 ## Forbidden scope
 
-- Remote database inspection or mutation
-- Applying any Supabase migration
-- Deploy / feature code / Admin / AI / shipping
-- Merge tip `be87fb3` / obsolete `fded934` lineage
-
-## Delivered
-
-- `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
-- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
-- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
-- Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`
+- Push / merge
+- Any remote write (DDL/DML), `db push`, `migration up`, `db reset`, `db repair`, deploy
+- Applying `20260889` / `20260890` / `20260891`
+- Inspecting or printing secrets / `.env`
+- Admin / UI / AI / shipping feature changes
+- Laptop-owned Commerce launch readiness (do not duplicate)
 
 ## Explicit non-actions
 
-No push · no remote DB inspect · no remote migration · no deploy · no migration file edits · no AI
+No push · no remote mutation · no migration apply · no deploy · no secret inspection
 
 ## Next
 
-When ready for database mutation, issue a **separate** remote-apply GO following `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md` (`89 → 90 → 91`).
+1. Review `docs/store/implementation/COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`.
+2. Plan separate GOs for missing prerequisites (`20260824`, `20260884`) and `20260823` history drift.
+3. Re-run remote preflight after prerequisites land; only then consider apply GO for `20260889 → 20260890 → 20260891`.

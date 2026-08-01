@@ -2,11 +2,13 @@
 
 ## Summary
 
-**PASS** for `commerce.ops.chain_migration_apply_readiness_v1` on `office/commerce-chain-migration-apply-readiness-v1-current` (base `c9f9458`, cherry-pick `6875847` only — not merge tip `be87fb3`, not `fded934`).
+**PASS** for remote migration **preflight execution** (read-only) in the correct worktree.  
+**Remote apply gate: `NOT_READY_FOR_REMOTE_APPLY`.**
 
-Repository-level apply readiness for order `20260889 → 20260890 → 20260891`. Static verifier + focused tests. Remote database **not** inspected or modified. Migrations **not** applied.
-
-**Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human remote-apply GO still required).
+Worktree: `umtuba-web-commerce-remote-migration-preflight-v1-current`  
+Branch: `office/commerce-remote-migration-preflight-v1-current`  
+Base: `c473630` · cherry-pick `5166c95`  
+Linked project `tgucwnjwoyeqoxqaxmew` inspected with SELECT-only probes. Targets `20260889`/`20260890`/`20260891` absent (no partial apply). Blocked by missing remote settlement (`20260824`) and commission foundation (`20260884`) objects/RPCs, plus `20260823` history drift. No remote mutations. No push.
 
 ## Completed Commerce chain (closed)
 
@@ -22,34 +24,39 @@ Repository-level apply readiness for order `20260889 → 20260890 → 20260891`.
 10. Digital Entitlement Revoke on Refund V1
 11. Commission Decomposition Bridge Apply V1
 12. Commission Policy Activation V1 (`c9f9458`)
+13. Commerce Chain Migration Apply Readiness V1 (`c473630`)
 
 ## Exact files changed
 
 ### Created
-- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
-- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
-- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
+- `docs/store/implementation/COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`
+- `scripts/remote-preflight/` — SELECT-only probe SQL + README
 
 ### Modified
-- `package.json` — npm script `verify:commerce-chain-migration-apply-readiness`
-- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
-- `docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
-- `docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md`
+- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
+- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
 
 ## Migrations created
 
-None (readiness task; inventory is existing `20260889` / `20260890` / `20260891`).
+None. No migrations applied remotely.
 
 ## Security review
 
-- Verifier is static filesystem-only; no DB credentials, no remote inspect
-- Documents fail-closed multi-active preflight before unique index on 91
-- Confirms service_role GRANT + public/anon/authenticated REVOKE patterns
-- No secrets exposed; no privilege widening
+- Inspection used linked CLI + SELECT only
+- No secrets printed or read from `.env` into reports
+- Existing money RPCs remain service_role-execute (spot-checked)
+- No privilege changes performed
 
 ## Boundaries
 
 No AI, no Admin, no shipping, no feature code, no remote apply, no deploy, no push.
+
+## Open issues / blockers
+
+1. Remote missing `20260824` settlement objects
+2. Remote missing `20260884` commission foundation objects/RPCs
+3. `20260823` history drift (objects without migration row)
+4. `20260887` / `20260888` also absent remotely (product chain)

@@ -1,12 +1,14 @@
 # Commerce Chain Verification & Migration Apply Readiness V1
 
 Capability: `commerce.ops.chain_migration_apply_readiness_v1`  
-Branch: `office/commerce-chain-migration-apply-readiness-v1-current`  
-Base (closed tip): `c9f9458` (Commission Policy Activation V1)  
-Milestone: cherry-pick of `6875847` only (not merge tip `be87fb3`; not obsolete `fded934`)
+Branch (readiness): `office/commerce-chain-migration-apply-readiness-v1-current`  
+Remote preflight worktree/branch: `umtuba-web-commerce-remote-migration-preflight-v1-current` / `office/commerce-remote-migration-preflight-v1-current`  
+Base (closed readiness tip): `c473630`  
+Milestone lineage: cherry-pick of `6875847` only for readiness (not merge tip `be87fb3`; not obsolete `fded934`); remote preflight from `5166c95`
 
-**Remote database status: NOT INSPECTED / NOT MODIFIED**  
-**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human GO still required)
+**Remote database status: INSPECTED (read-only) / NOT MODIFIED**
+**Repository static decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (SQL/TS inventory intact)
+**Remote preflight decision: `NOT_READY_FOR_REMOTE_APPLY`** — see `COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`
 
 This document is desktop-owned migration apply readiness. It does **not** duplicate laptop-owned Commerce launch readiness.
 
@@ -24,7 +26,7 @@ This document is desktop-owned migration apply readiness. It does **not** duplic
 | 6 | Commission Decomposition Bridge Apply V1 | migration `20260890` |
 | 7 | Commission Policy Activation V1 | tip `c9f9458` / migration `20260891` |
 
-Static verifier: `scripts/verify-commerce-chain-migration-apply-readiness.mjs`  
+Static verifier: `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
 Focused tests: `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 
 ---
@@ -108,7 +110,7 @@ Static verifier fails closed if the obsolete activation filename reappears or if
 
 ## 5. Pre-apply checklist (DBA / ops)
 
-Remote DB is **not** inspected by this task. Before human GO, operators must confirm on the **target** database:
+Remote preflight evidence lives in `COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`. Before any apply GO, operators must re-confirm on the **target** database:
 
 1. Prerequisites listed in §2 are already applied (`supabase_migrations.schema_migrations` / project history).
 2. `20260889`, `20260890`, `20260891` are **not** already applied.
@@ -287,15 +289,15 @@ No large backfills in 89/90/91.
 
 ## 11. DBA checklist (summary)
 
-- [ ] Backup / PITR confirmed  
-- [ ] Prerequisites present  
-- [ ] Multi-active commission preflight clean  
-- [ ] Apply 89 → verify  
-- [ ] Apply 90 → verify  
-- [ ] Apply 91 → verify  
-- [ ] App release aligned  
-- [ ] Smoke capture + refund  
-- [ ] Record applied versions in ops log  
+- [ ] Backup / PITR confirmed
+- [ ] Prerequisites present
+- [ ] Multi-active commission preflight clean
+- [ ] Apply 89 → verify
+- [ ] Apply 90 → verify
+- [ ] Apply 91 → verify
+- [ ] App release aligned
+- [ ] Smoke capture + refund
+- [ ] Record applied versions in ops log
 
 ---
 
@@ -304,10 +306,16 @@ No large backfills in 89/90/91.
 | Layer | Status |
 | --- | --- |
 | Repository static readiness | **PASS** |
-| Remote database | **NOT INSPECTED / NOT MODIFIED** |
+| Remote database | **INSPECTED (read-only) / NOT MODIFIED** — project `tgucwnjwoyeqoxqaxmew` |
+| Remote preflight (full 89→90→91) | **`NOT_READY_FOR_REMOTE_APPLY`** |
 | Remote migration apply | **NOT PERFORMED** |
-| Human remote-apply GO | **REQUIRED (separate instruction)** |
+| Human remote-apply GO | **BLOCKED** until prerequisites applied |
 
-**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`**
+**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (static only)
+**Remote decision: `NOT_READY_FOR_REMOTE_APPLY`**
 
-Remote apply remains blocked until an explicit human GO that authorizes database mutation.
+Primary remote blockers (detail in preflight doc):
+
+1. `20260824` settlement foundation objects missing
+2. `20260884` commission policy foundation objects/RPCs missing
+3. `20260823` history drift (objects present, migration row absent)

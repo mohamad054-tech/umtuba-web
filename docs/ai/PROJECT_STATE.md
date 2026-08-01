@@ -70,7 +70,8 @@ Frozen baselines (extend, do not replace):
 | Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1-current`) — migration `20260889` not remote-applied |
 | Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) — migration `20260890` not remote-applied |
 | Commerce Commission Policy Activation V1 | **COMPLETE** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
-| Commerce Chain Verification & Migration Apply Readiness V1 | **IMPLEMENTED locally** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO`; remote DB not inspected/applied |
+| Commerce Chain Verification & Migration Apply Readiness V1 | **COMPLETE** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` @ `c473630` |
+| Commerce Chain Remote Migration Preflight V1 | **IMPLEMENTED locally** (branch `office/commerce-remote-migration-preflight-v1-current`) — project `tgucwnjwoyeqoxqaxmew` inspected read-only; decision **`NOT_READY_FOR_REMOTE_APPLY`** (missing `20260824`/`20260884`; no mutations) |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
