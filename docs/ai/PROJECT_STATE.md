@@ -68,7 +68,8 @@ Frozen baselines (extend, do not replace):
 | Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 | Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
 | Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1-current`) |
-| Commerce Commission Decomposition Bridge Apply V1 | **IMPLEMENTED locally** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) — migration `20260890` not remote-applied |
+| Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) |
+| Commerce Commission Policy Activation V1 | **IMPLEMENTED locally** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 

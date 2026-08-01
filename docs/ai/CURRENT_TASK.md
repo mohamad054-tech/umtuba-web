@@ -2,25 +2,25 @@
 
 ## Task title
 
-UMTUBA Commerce — Commission Decomposition Bridge Apply V1
+UMTUBA Commerce — Commission Policy Activation V1
 
 ## Status
 
-`pass` — cherry-pick of `7d90a05` onto `0ccdb63` (no push / no remote migration)
+`pass` — cherry-pick of `8b6caa0` onto `1746bc7` (no push / no remote migration)
 
 ## Capability
 
-`commerce.revenue.commission_decomposition_bridge_apply_v1`
+`commerce.revenue.commission_policy_activation_v1`
 
 ## Branch / tip
 
-- Branch: `office/commerce-commission-decomposition-bridge-apply-v1-current`
-- Base (closed tip): `0ccdb63` (Digital Entitlement Revoke on Refund V1)
-- Milestone: cherry-pick of `7d90a05` (feat(commerce): apply commission decomposition bridge v1)
+- Branch: `office/commerce-commission-policy-activation-v1-current`
+- Base (closed tip): `1746bc7` (Commission Decomposition Bridge Apply V1)
+- Milestone: cherry-pick of `8b6caa0` only (not merge tip `be87fb3`)
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-commission-decomposition-bridge-apply-v1-current`
+`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1-current`
 
 ## Completed Commerce chain (closed)
 
@@ -33,26 +33,27 @@ UMTUBA Commerce — Commission Decomposition Bridge Apply V1
 7. Commerce Transactional Notifications V1
 8. Seller Payout Rails V1
 9. Refund Operations Surface V1
-10. Digital Entitlement Revoke on Refund V1 (`0ccdb63`)
+10. Digital Entitlement Revoke on Refund V1
+11. Commission Decomposition Bridge Apply V1 (`1746bc7`)
 
 ## Coordination
 
 - **Desktop** owns: AI / Dashboard — do not touch
-- **Laptop** = Commerce commission decomposition bridge apply only
-- Do **not** touch payout-net redesign / Admin UI / shipping
+- **Laptop** = Commerce commission policy activation only
+- Do **not** touch payout-net redesign / Admin UI / store-scoped policies / shipping
 
 ## Delivered
 
-- TS SSOT `lib/store/commissionDecompositionBridgeApply.ts` (+ tests)
-- RPCs: apply after capture, mark after refund, get for attempt
-- Wired into `applyVerifiedStorePaymentOutcome` + `applyFullOrderRefund`
-- Migration `20260890` local only
-- Docs: `COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
+- TS SSOT `lib/store/commissionPolicyActivation.ts` (+ tests)
+- RPCs: activate/deactivate + activation events
+- Foundation resolve: one active per currency; historical superseded windows
+- Migration `20260891` local only
+- Docs: `COMMISSION_POLICY_ACTIVATION_V1.md`
 
 ## Explicit non-actions
 
-No push · no remote migration · no invented shares · no partial refund · no payout-net redesign · no bank rails · no Admin UI · no settlement amount mutation · no AI
+No push · no remote migration · no auto-seed commercial rates · no store-specific policies · no Admin UI · no payout-net redesign · no merge tip `be87fb3` · no AI
 
 ## Next
 
-Human GO to push when ready. Apply `20260890` only under separate ops GO.
+Human GO to push when ready. Apply `20260891` only under separate ops GO.

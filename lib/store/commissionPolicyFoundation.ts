@@ -84,6 +84,7 @@ export type CommissionCalculationFailure = {
   code:
     | "missing_policy"
     | "invalid_policy"
+    | "ambiguous_policy"
     | "currency_mismatch"
     | "invalid_basis"
     | "invalid_amount"
@@ -263,8 +264,10 @@ export function validateCommissionPolicyContract(
 }
 
 /**
- * Select the active policy for currency + instant.
- * Prefer highest version among active, currency-exact, effective-window matches.
+ * Select the authoritative policy for currency + instant.
+ * Activation V1: at most one status=active per currency. Resolve may use
+ * active or historically superseded rows whose effective window covers `at`.
+ * Ambiguous windows / multiple actives fail closed (no silent fallback).
  */
 export function selectCommissionPolicy(input: {
   policies: CommissionPolicyContract[];
@@ -290,13 +293,17 @@ export function selectCommissionPolicy(input: {
     };
   }
 
+  const validatedActiveForCurrency: CommissionPolicyContract[] = [];
   const candidates: CommissionPolicyContract[] = [];
   for (const raw of input.policies) {
     const validated = validateCommissionPolicyContract(raw);
     if (!validated.ok) continue;
     const p = validated.policy;
-    if (p.status !== "active") continue;
     if (p.currency !== currency) continue;
+    if (p.status === "active") {
+      validatedActiveForCurrency.push(p);
+    }
+    if (p.status !== "active" && p.status !== "superseded") continue;
     const from = parseInstant(p.effectiveFrom)!;
     if (at < from) continue;
     if (p.effectiveTo != null) {
@@ -304,6 +311,15 @@ export function selectCommissionPolicy(input: {
       if (at >= to) continue;
     }
     candidates.push(p);
+  }
+
+  if (validatedActiveForCurrency.length > 1) {
+    return {
+      ok: false,
+      code: "ambiguous_policy",
+      message:
+        "Multiple active commission policies for this currency — activation required to keep exactly one.",
+    };
   }
 
   if (candidates.length === 0) {
@@ -315,10 +331,14 @@ export function selectCommissionPolicy(input: {
     };
   }
 
-  candidates.sort((a, b) => {
-    if (a.version !== b.version) return b.version - a.version;
-    return a.policyCode < b.policyCode ? -1 : a.policyCode > b.policyCode ? 1 : 0;
-  });
+  if (candidates.length > 1) {
+    return {
+      ok: false,
+      code: "ambiguous_policy",
+      message:
+        "Ambiguous commission policy window for this currency and effective time.",
+    };
+  }
 
   return { ok: true, policy: candidates[0]! };
 }
