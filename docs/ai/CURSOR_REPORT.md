@@ -2,42 +2,45 @@
 
 ## Summary
 
-**PASS** for **Commerce Commission Policy Activation V1**.
+**PASS** for **Commerce Chain Verification & Migration Apply Readiness V1**.
 
-Adds safe activate/deactivate lifecycle for currency-scoped commission policies: exactly one `active` policy per currency (unique index + fail-closed resolve), historical `superseded` versions preserved and still resolvable inside their effective windows, idempotent activation events, service-role RPCs only. Capture/decomposition continue to resolve at transaction time and permanently store `policy_code`/`policy_version`; refunds reference historical applied decomposition. Migration `20260891` created locally and **not** remote-applied. Work left **uncommitted / unpushed**.
+Repository-level audit and readiness implementation for apply order `20260889 → 20260890 → 20260891`. Static verifier confirms: no numbering collisions on the apply chain, obsolete `20260887` commission-activation artifact absent (active `20260887` is transactional notifications), RPC names/args match TypeScript call sites, capture/refund wire-ins present, and dependency graph intact. Production readiness document + DBA checklist + GO/NO-GO gate published. Remote database **not** inspected or modified. Migrations **not** applied. Work left **uncommitted / unpushed**.
+
+**Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human remote-apply GO still required).
 
 ## Exact files changed
 
 ### Created
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql`
-- `lib/store/commissionPolicyActivation.ts`
-- `lib/store/commissionPolicyActivation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
+- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
+- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
+- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 
 ### Modified
-- `lib/store/commissionPolicyFoundation.ts` — fail-closed ambiguous actives; historical superseded window resolve
-- `lib/store/commissionPolicyFoundation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
+- `package.json` — npm script `verify:commerce-chain-migration-apply-readiness`
+- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md` — remote-apply framing + readiness pointer
+- `docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md` — same
+- `docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md` — same
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/PROJECT_STATE.md` — Activation COMPLETE; readiness track added
 
 ## Migrations created
 
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql` — local only, not applied to remote
+None (readiness task; inventory is existing `20260889` / `20260890` / `20260891`).
 
 ## Security review
 
-- Activate/deactivate RPCs: `SECURITY DEFINER`, service_role execute only
-- Activation events: FORCE RLS; client writes revoked
-- Unique index enforces one active per currency
-- Resolve fails closed on ambiguous actives/windows
-- No client percentages; no auto-seed; no silent policy fallback
-- Does not mutate settlement/payout booking amounts
+- Verifier is static filesystem-only; no DB credentials, no remote inspect
+- Documents fail-closed multi-active preflight before unique index on 91
+- Confirms service_role GRANT + public/anon/authenticated REVOKE patterns for money/activation RPCs
+- No secrets exposed; no privilege widening
 
 ## Tests
 
-Focused suite: **110 passed** (activation 8 + foundation 13 + decomposition 9 + refund path 22 + refund ops 13 + entitlement revoke 7 + allocate 15 + revenue bridge 23)
+- `node scripts/verify-commerce-chain-migration-apply-readiness.mjs` — **PASS**
+- `npm run verify:commerce-chain-migration-apply-readiness` — **PASS**
+- Focused Vitest: **65 passed** (6 files)
+  - readiness 6, foundation 13, activation 8, revoke 7, decomposition 9, refund path 22
 
 ## TypeScript
 
@@ -45,7 +48,7 @@ Focused suite: **110 passed** (activation 8 + foundation 13 + decomposition 9 + 
 
 ## Build
 
-Not required for this capability (no app UI/entry-point change).
+Not required (docs + static script; no app UI/entry-point change).
 
 ## git diff --check
 
@@ -53,11 +56,49 @@ Not required for this capability (no app UI/entry-point change).
 
 ## git status --short
 
-Uncommitted (see Final Verification Report).
+```
+## office/commerce-chain-migration-apply-readiness-v1
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M docs/ai/PROJECT_STATE.md
+ M docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md
+ M docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md
+ M docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md
+ M package.json
+?? docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md
+?? lib/store/commerceChainMigrationApplyReadiness.test.ts
+?? scripts/verify-commerce-chain-migration-apply-readiness.mjs
+```
 
 ## Open issues
 
-- Migration not applied remotely (by design until human GO)
-- No active commercial policy seed — operators insert `draft` then activate
-- Store-scoped policies still out of scope
-- Payout booking still full RELEASED capture (commission-aware nets are a future milestone)
+- Remote apply still blocked until separate human GO
+- Production multi-active commission policies (if any) must be cleaned before 91
+- Launch readiness remains laptop-owned (out of scope here)
+
+---
+
+## Final Verification Report
+
+| Field | Value |
+| --- | --- |
+| Verdict | **PASS** |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-chain-migration-apply-readiness-v1` |
+| Branch | `office/commerce-chain-migration-apply-readiness-v1` |
+| Base | `origin/office/commerce-commission-policy-activation-v1` = `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` |
+| HEAD | `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` (+ uncommitted readiness work) |
+| Migration inventory | Prerequisites: 23, 24, 77, 84, 87 (notifications), 88. Apply slice: **89 → 90 → 91** |
+| Dependency verification | **PASS** (static script + tests) |
+| Obsolete migration verification | **PASS** — obsolete `20260887_store_commission_policy_activation_v1.sql` absent; activate RPC only in 91 |
+| Documentation updates | CURRENT_TASK, CURSOR_REPORT, PROJECT_STATE, readiness doc, revoke/decomp/activation impl docs |
+| Files modified | 7 modified + 3 created (see above) |
+| Tests executed | Verifier PASS; Vitest 65/65; tsc PASS; git diff --check PASS |
+| Decision | **`READY_FOR_SEPARATE_REMOTE_APPLY_GO`** |
+
+### Confirmations
+
+- no commit
+- no push
+- no remote database inspection
+- no migration applied
+- remote DB status: NOT INSPECTED / NOT MODIFIED

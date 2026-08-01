@@ -2,7 +2,8 @@
 
 Capability: `commerce.revenue.commission_policy_activation_v1`  
 Branch: `office/commerce-commission-policy-activation-v1`  
-Migration (local only): `20260891_store_commission_policy_activation_v1.sql`
+Migration: `20260891_store_commission_policy_activation_v1.sql` (in repository; **not** remote-applied until separate GO)
+Apply readiness: `COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md` (order `20260889 → 20260890 → 20260891`)
 
 Depends on:
 
