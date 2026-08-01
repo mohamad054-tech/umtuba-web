@@ -1,33 +1,30 @@
 # Session Handoff
 
-## Active milestone
+## Active milestone (laptop)
 
-`commerce.ops.production_integration_preparation_v1`
+Physical Commerce Foundation V1 — `commerce.physical.foundation_v1`
 
-Status: **PASS + STAGED** — awaiting human commit of docs (optional) and Product GO for rollout Phases A–F
+Status: **PASS + STAGED** — awaiting commit GO; migration `20260892` not remote-applied
 
 ## Branch / worktree
 
-- Branch: `office/commerce-marketplace-supplier-listing-create-hardening-v1` @ `ca157d7`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
-- No new branch
+- Branch: `office/commerce-physical-foundation-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-physical-foundation-v1`
+- Base: `origin/office/commerce-chain-migration-apply-readiness-v1` @ `6875847`
 
 ## Delivered
 
-Operational package:
+- Physical product / inventory / variant / shipping-metadata domain module
+- Mixed-order classification (digital ≠ physical fulfillment)
+- Launch gate remains closed
+- Local migration `20260892_store_physical_commerce_foundation_v1.sql`
 
-1. `COMMERCE_PRODUCTION_ROLLOUT.md` — merge, migrate, storage, onboard, product, listing, purchase validation, rollback  
-2. `FIRST_SUPPLIER_RUNBOOK.md`  
-3. `FIRST_PRODUCT_RUNBOOK.md`
+## Desktop
 
-## Next human action
+Owns Commerce Remote Migration Preflight V1 — do not touch from laptop.
 
-1. Stage/commit docs when Product asks (this slice stops at STAGED)  
-2. Execute rollout Phases A–B under Product GO  
-3. Run supplier + product runbooks  
+## Next
 
-Keep `commerce_confirm_enabled = 0`.
-
-## Coordination
-
-Desktop AI / Dashboard / Admin — untouched.
+1. Commit GO when ready
+2. Later phase: physical shipping/carriers (deferred)
+3. Keep physical live Stripe capture disabled
