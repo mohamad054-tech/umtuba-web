@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   bulkArchiveProductsAction,
   bulkSubmitProductsAction,
@@ -23,11 +23,21 @@ import {
   type SellerCatalogSearchSortKey,
   type SellerCatalogStatusFilter,
 } from "../../../lib/store/sellerCatalogSearchFiltering";
+import { type SellerCatalogAppliedFilters } from "../../../lib/store/sellerCatalogDataAccess";
 import {
-  buildSellerCatalogProductsHref,
-  type SellerCatalogAppliedFilters,
-} from "../../../lib/store/sellerCatalogDataAccess";
+  buildSellerCatalogFilterResetHref,
+  type SellerCatalogResultKind,
+} from "../../../lib/store/sellerCatalogPaginationExperience";
 import StoreEmptyState from "./StoreEmptyState";
+
+type PaginationLabels = {
+  pageLabel: string;
+  statusLabel: string;
+  nextLabel: string;
+  previousLabel: string;
+  nextDisabled: boolean;
+  previousDisabled: boolean;
+};
 
 type Props = {
   products: SellerCatalogSearchItem[];
@@ -38,6 +48,10 @@ type Props = {
   pageSize: number;
   hasMore: boolean;
   nextHref: string | null;
+  previousHref: string | null;
+  pageNumber: number;
+  resultKind: SellerCatalogResultKind;
+  paginationLabels: PaginationLabels;
   healthFilterScope: "none" | "page_only";
 };
 
@@ -48,6 +62,10 @@ export default function SellerProductDashboard({
   pageSize,
   hasMore,
   nextHref,
+  previousHref,
+  pageNumber,
+  resultKind,
+  paginationLabels,
   healthFilterScope,
 }: Props) {
   const router = useRouter();
@@ -56,6 +74,11 @@ export default function SellerProductDashboard({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [navPending, startNavTransition] = useTransition();
+
+  useEffect(() => {
+    setQuery(applied.search);
+  }, [applied.search]);
 
   const selectedIds = products
     .filter((item) => selected[item.id])
@@ -65,23 +88,31 @@ export default function SellerProductDashboard({
     .map((item) => item.status);
   const bulkActions = deriveSellerCatalogBulkActions({ selectedStatuses });
 
-  function navigate(patch: {
+  function navigateFilters(patch: {
     search?: string;
     status?: SellerCatalogStatusFilter;
     productType?: SellerCatalogProductTypeFilter;
     sort?: SellerCatalogSearchSortKey;
     health?: SellerCatalogHealthFilter;
   }) {
-    const href = buildSellerCatalogProductsHref({
+    // Filter/search/sort changes always reset pagination to page 1.
+    const href = buildSellerCatalogFilterResetHref({
       search: patch.search ?? applied.search,
       status: patch.status ?? applied.status,
       productType: patch.productType ?? applied.productType,
       sort: patch.sort ?? applied.sort,
       health: patch.health ?? applied.health,
       limit: pageSize,
-      cursor: null,
     });
-    router.push(href);
+    startNavTransition(() => {
+      router.push(href);
+    });
+  }
+
+  function navigatePage(href: string) {
+    startNavTransition(() => {
+      router.push(href);
+    });
   }
 
   function toggleAll(next: boolean) {
@@ -128,18 +159,7 @@ export default function SellerProductDashboard({
     });
   }
 
-  const emptyCatalog = useMemo(
-    () =>
-      products.length === 0 &&
-      !applied.search &&
-      applied.status === "all" &&
-      applied.productType === "all" &&
-      applied.health === "any" &&
-      !hasMore,
-    [products.length, applied, hasMore]
-  );
-
-  if (emptyCatalog) {
+  if (resultKind === "empty_catalog") {
     return (
       <StoreEmptyState
         title="No products yet"
@@ -150,6 +170,11 @@ export default function SellerProductDashboard({
     );
   }
 
+  const prevDisabled =
+    paginationLabels.previousDisabled || !previousHref || navPending;
+  const nextDisabled =
+    paginationLabels.nextDisabled || !nextHref || navPending;
+
   return (
     <div className="space-y-5">
       <div className="rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5">
@@ -157,7 +182,7 @@ export default function SellerProductDashboard({
           className="flex flex-col gap-3 md:flex-row md:items-end"
           onSubmit={(event) => {
             event.preventDefault();
-            navigate({ search: query });
+            navigateFilters({ search: query });
           }}
         >
           <label className="block min-w-0 flex-1 space-y-2">
@@ -178,7 +203,7 @@ export default function SellerProductDashboard({
             <select
               value={applied.sort}
               onChange={(event) =>
-                navigate({
+                navigateFilters({
                   sort: event.target.value as SellerCatalogSearchSortKey,
                 })
               }
@@ -208,7 +233,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => navigate({ status: filter.id })}
+              onClick={() => navigateFilters({ status: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.status === filter.id
                   ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
@@ -229,7 +254,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => navigate({ health: filter.id })}
+              onClick={() => navigateFilters({ health: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.health === filter.id
                   ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
@@ -250,7 +275,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => navigate({ productType: filter.id })}
+              onClick={() => navigateFilters({ productType: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.productType === filter.id
                   ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
@@ -262,12 +287,8 @@ export default function SellerProductDashboard({
           ))}
         </div>
 
-        <p className="mt-3 text-xs text-[var(--sf-faint)]">
-          Showing {products.length} on this page
-          {hasMore ? " · more available" : ""}
-        </p>
         {healthFilterScope === "page_only" ? (
-          <p className="mt-2 text-xs text-[var(--sf-muted)]">
+          <p className="mt-3 text-xs text-[var(--sf-muted)]">
             Ready / Needs Attention / health filters apply to this page only.
             Catalog-wide health pagination is deferred to Phase 2.
           </p>
@@ -321,9 +342,52 @@ export default function SellerProductDashboard({
         </div>
       ) : null}
 
-      {products.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[var(--sf-line)] px-4 py-10 text-center text-sm text-[var(--sf-faint)]">
-          No products match this search or filter on this page.
+      <div
+        className="flex flex-col gap-3 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        role="navigation"
+        aria-label="Catalog pagination"
+      >
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-[var(--sf-ink)]">
+            {paginationLabels.pageLabel}
+          </p>
+          <p
+            className="mt-0.5 text-xs text-[var(--sf-faint)]"
+            aria-live="polite"
+          >
+            {navPending ? "Loading page…" : paginationLabels.statusLabel}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            disabled={prevDisabled}
+            aria-label={`${paginationLabels.previousLabel} page`}
+            onClick={() => previousHref && navigatePage(previousHref)}
+            className="rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold text-[var(--sf-ink)] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {paginationLabels.previousLabel}
+          </button>
+          <button
+            type="button"
+            disabled={nextDisabled}
+            aria-label={`${paginationLabels.nextLabel} page`}
+            onClick={() => nextHref && navigatePage(nextHref)}
+            className="rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold text-[var(--sf-ink)] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {paginationLabels.nextLabel}
+          </button>
+        </div>
+      </div>
+
+      {resultKind === "no_results" || products.length === 0 ? (
+        <p
+          role="status"
+          className="rounded-2xl border border-dashed border-[var(--sf-line)] px-4 py-10 text-center text-sm text-[var(--sf-faint)]"
+        >
+          {pageNumber > 1
+            ? "No products on this page. Try Previous, or reset filters."
+            : "No products match this search or filter."}
         </p>
       ) : (
         <ul className="space-y-3">
@@ -378,15 +442,10 @@ export default function SellerProductDashboard({
         </ul>
       )}
 
-      {nextHref ? (
-        <div className="flex justify-center pt-2">
-          <Link
-            href={nextHref}
-            className="rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-semibold text-[var(--sf-ink)] hover:border-[rgba(214,196,161,0.45)]"
-          >
-            Load more
-          </Link>
-        </div>
+      {!hasMore && products.length > 0 ? (
+        <p className="text-center text-xs text-[var(--sf-faint)]" role="status">
+          End of results
+        </p>
       ) : null}
     </div>
   );
