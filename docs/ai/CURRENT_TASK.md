@@ -2,7 +2,7 @@
 
 ## Task title
 
-Seller Catalog Pagination Experience V1
+Seller Catalog Bulk Operations Foundation V1
 
 ## Status
 
@@ -10,15 +10,15 @@ Seller Catalog Pagination Experience V1
 
 ## Capability
 
-`commerce.seller.catalog_pagination_experience_v1`
+`commerce.seller.catalog_bulk_operations_v1`
 
 ## Base
 
-`origin/office/seller-catalog-data-access-v1` @ `f7b454e3590480c41eb810e4cd00db26ee584248`
+`origin/office/seller-catalog-pagination-experience-v1` @ `f10cb08b6b9f413a5c16c87bb7493f33d9112e4e`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-pagination-experience-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-bulk-operations-v1`
 
 ## Explicitly not done
 

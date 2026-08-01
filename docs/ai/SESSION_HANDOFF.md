@@ -2,22 +2,22 @@
 
 ## Active milestone (laptop)
 
-Seller Catalog Pagination Experience V1 - `commerce.seller.catalog_pagination_experience_v1`
+Seller Catalog Bulk Operations Foundation V1 - `commerce.seller.catalog_bulk_operations_v1`
 
 Status: **PASS + STAGED** - awaiting commit GO; uncommitted / unpushed
 
 ## Branch / worktree
 
-- Branch: `office/seller-catalog-pagination-experience-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-pagination-experience-v1`
-- Base: `origin/office/seller-catalog-data-access-v1` @ `f7b454e`
+- Branch: `office/seller-catalog-bulk-operations-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-bulk-operations-v1`
+- Base: `origin/office/seller-catalog-pagination-experience-v1` @ `f10cb08`
 
 ## Delivered
 
-- Page-replacement Previous / Next / Page N
-- Opaque `ph` history in URL; filter resets clear pagination
-- Friendly invalid-cursor recovery
-- Distinct empty / no-results / end states
+- Multi-select + select page + clear
+- Plan / confirm / partial result summary
+- Submit for review + Archive via existing services
+- Publish / Unpublish / Restore deferred disabled
 
 ## Next
 

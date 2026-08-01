@@ -283,7 +283,20 @@ export async function archiveProductAction(formData: FormData): Promise<void> {
 
 export async function bulkArchiveProductsAction(
   formData: FormData
-): Promise<{ ok: true; archived: number; failed: number } | { ok: false; message: string }> {
+): Promise<
+  | {
+      ok: true;
+      archived: number;
+      failed: number;
+      skipped: number;
+      results: Array<{
+        productId: string;
+        outcome: "success" | "failed" | "skipped";
+        reason?: string;
+      }>;
+    }
+  | { ok: false; message: string }
+> {
   const user = await requireUser();
   const ids = formData
     .getAll("productId")
@@ -296,18 +309,45 @@ export async function bulkArchiveProductsAction(
   const supabase = await createClient();
   let archived = 0;
   let failed = 0;
+  const results: Array<{
+    productId: string;
+    outcome: "success" | "failed" | "skipped";
+    reason?: string;
+  }> = [];
   for (const productId of ids) {
     const result = await archiveProduct(supabase, user.id, productId);
-    if (result.ok) archived += 1;
-    else failed += 1;
+    if (result.ok) {
+      archived += 1;
+      results.push({ productId, outcome: "success" });
+    } else {
+      failed += 1;
+      results.push({
+        productId,
+        outcome: "failed",
+        reason: result.message,
+      });
+    }
   }
   revalidatePath("/seller/store/products");
-  return { ok: true, archived, failed };
+  return { ok: true, archived, failed, skipped: 0, results };
 }
 
 export async function bulkSubmitProductsAction(
   formData: FormData
-): Promise<{ ok: true; submitted: number; failed: number } | { ok: false; message: string }> {
+): Promise<
+  | {
+      ok: true;
+      submitted: number;
+      failed: number;
+      skipped: number;
+      results: Array<{
+        productId: string;
+        outcome: "success" | "failed" | "skipped";
+        reason?: string;
+      }>;
+    }
+  | { ok: false; message: string }
+> {
   const user = await requireUser();
   const ids = formData
     .getAll("productId")
@@ -320,13 +360,27 @@ export async function bulkSubmitProductsAction(
   const supabase = await createClient();
   let submitted = 0;
   let failed = 0;
+  const results: Array<{
+    productId: string;
+    outcome: "success" | "failed" | "skipped";
+    reason?: string;
+  }> = [];
   for (const productId of ids) {
     const result = await submitProductForReview(supabase, user.id, productId);
-    if (result.ok) submitted += 1;
-    else failed += 1;
+    if (result.ok) {
+      submitted += 1;
+      results.push({ productId, outcome: "success" });
+    } else {
+      failed += 1;
+      results.push({
+        productId,
+        outcome: "failed",
+        reason: result.message,
+      });
+    }
   }
   revalidatePath("/seller/store/products");
-  return { ok: true, submitted, failed };
+  return { ok: true, submitted, failed, skipped: 0, results };
 }
 
 export async function updateProductMediaLayoutAction(

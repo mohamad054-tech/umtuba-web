@@ -1,20 +1,20 @@
 # Cursor Report
 
-**PASS + STAGED** - Seller Catalog Pagination Experience V1
+**PASS + STAGED** - Seller Catalog Bulk Operations Foundation V1
 
 ## Base
 
-- SoT: `origin/office/seller-catalog-data-access-v1` @ `f7b454e`
-- Branch: `office/seller-catalog-pagination-experience-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-pagination-experience-v1`
+- SoT: `origin/office/seller-catalog-pagination-experience-v1` @ `f10cb08`
+- Branch: `office/seller-catalog-bulk-operations-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-bulk-operations-v1`
 
 ## Change
 
-Page-replacement Previous/Next with opaque URL history (`ph`), filter reset rules, friendlier invalid-cursor UX, a11y labels.
+Bulk selection foundation, plan/confirm/result summaries; submit/archive via existing services; publish/unpublish/restore deferred disabled.
 
 ## Verification
 
-- Vitest: **52 passed** (pagination 6 + data-access 9 + search 9 + wiring 9 + experience 6 + dashboard 6 + presentation 7)
+- Vitest: **59 passed** (bulk 7 + pagination 6 + data-access 9 + search 9 + wiring 9 + experience 6 + dashboard 6 + presentation 7)
 - tsc PASS · build PASS · lockfile unchanged · `git diff --cached --check` PASS
 
 ## Open
