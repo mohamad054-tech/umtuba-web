@@ -7,38 +7,58 @@ import {
   bulkSubmitProductsAction,
 } from "../../actions/storeCatalog";
 import {
-  SELLER_CATALOG_FILTERS,
   deriveSellerCatalogBulkActions,
-  filterSellerCatalogItems,
   sellerModerationLabel,
   sellerProductStatusLabel,
-  type SellerCatalogFilterBucket,
-  type SellerCatalogListItem,
-  type SellerCatalogSortKey,
 } from "../../../lib/store/sellerCatalogPresentation";
+import {
+  SELLER_CATALOG_HEALTH_FILTERS,
+  SELLER_CATALOG_SEARCH_SORTS,
+  SELLER_CATALOG_STATUS_FILTERS,
+  SELLER_CATALOG_TYPE_FILTERS,
+  filterSellerCatalogSearchItems,
+  type SellerCatalogHealthFilter,
+  type SellerCatalogProductTypeFilter,
+  type SellerCatalogSearchItem,
+  type SellerCatalogSearchSortKey,
+  type SellerCatalogStatusFilter,
+} from "../../../lib/store/sellerCatalogSearchFiltering";
 import StoreEmptyState from "./StoreEmptyState";
 
 type Props = {
-  products: SellerCatalogListItem[];
+  products: SellerCatalogSearchItem[];
+  storeId: string;
   canManage: boolean;
   storeName: string;
 };
 
 export default function SellerProductDashboard({
   products,
+  storeId,
   canManage,
 }: Props) {
   const [query, setQuery] = useState("");
-  const [bucket, setBucket] = useState<SellerCatalogFilterBucket>("all");
-  const [sort, setSort] = useState<SellerCatalogSortKey>("updated_desc");
+  const [status, setStatus] = useState<SellerCatalogStatusFilter>("all");
+  const [health, setHealth] = useState<SellerCatalogHealthFilter>("any");
+  const [productType, setProductType] =
+    useState<SellerCatalogProductTypeFilter>("all");
+  const [sort, setSort] = useState<SellerCatalogSearchSortKey>("updated_desc");
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const filtered = useMemo(
-    () => filterSellerCatalogItems(products, { query, bucket, sort }),
-    [products, query, bucket, sort]
+    () =>
+      filterSellerCatalogSearchItems(products, {
+        storeId,
+        query,
+        status,
+        health,
+        productType,
+        sort,
+      }),
+    [products, storeId, query, status, health, productType, sort]
   );
 
   const selectedIds = filtered
@@ -114,27 +134,26 @@ export default function SellerProductDashboard({
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Title, slug, or status"
+              placeholder="Title, SKU, barcode, or product ID"
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
             />
           </label>
-          <label className="block space-y-2 md:w-48">
+          <label className="block space-y-2 md:w-52">
             <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
               Sort
             </span>
             <select
               value={sort}
               onChange={(event) =>
-                setSort(event.target.value as SellerCatalogSortKey)
+                setSort(event.target.value as SellerCatalogSearchSortKey)
               }
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
             >
-              <option value="updated_desc">Updated · newest</option>
-              <option value="updated_asc">Updated · oldest</option>
-              <option value="created_desc">Created · newest</option>
-              <option value="title_asc">Title · A–Z</option>
-              <option value="title_desc">Title · Z–A</option>
-              <option value="status_asc">Status</option>
+              {SELLER_CATALOG_SEARCH_SORTS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -142,15 +161,15 @@ export default function SellerProductDashboard({
         <div
           className="mt-4 flex flex-wrap gap-2"
           role="navigation"
-          aria-label="Filter products"
+          aria-label="Filter by status"
         >
-          {SELLER_CATALOG_FILTERS.map((filter) => (
+          {SELLER_CATALOG_STATUS_FILTERS.map((filter) => (
             <button
               key={filter.id}
               type="button"
-              onClick={() => setBucket(filter.id)}
+              onClick={() => setStatus(filter.id)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                bucket === filter.id
+                status === filter.id
                   ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
                   : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(214,196,161,0.35)]"
               }`}
@@ -159,6 +178,52 @@ export default function SellerProductDashboard({
             </button>
           ))}
         </div>
+
+        <div
+          className="mt-3 flex flex-wrap gap-2"
+          role="navigation"
+          aria-label="Filter by health"
+        >
+          {SELLER_CATALOG_HEALTH_FILTERS.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => setHealth(filter.id)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                health === filter.id
+                  ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
+                  : "border-[var(--sf-line)] text-[var(--sf-faint)] hover:border-[rgba(214,196,161,0.35)]"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="mt-3 flex flex-wrap gap-2"
+          role="navigation"
+          aria-label="Filter by product type"
+        >
+          {SELLER_CATALOG_TYPE_FILTERS.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => setProductType(filter.id)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                productType === filter.id
+                  ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
+                  : "border-[var(--sf-line)] text-[var(--sf-faint)] hover:border-[rgba(214,196,161,0.35)]"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <p className="mt-3 text-xs text-[var(--sf-faint)]">
+          Showing {filtered.length} of {products.length} products
+        </p>
       </div>
 
       {canManage ? (
@@ -240,6 +305,7 @@ export default function SellerProductDashboard({
                       </h2>
                       <p className="mt-1 text-sm text-[var(--sf-faint)]">
                         /{product.slug}
+                        {product.skus[0] ? ` · ${product.skus[0]}` : ""}
                       </p>
                     </div>
                     <Link

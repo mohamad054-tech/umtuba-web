@@ -2,7 +2,7 @@
 
 ## Task title
 
-Seller Catalog Performance & Query Batching V1
+Seller Catalog Search & Filtering Foundation V1
 
 ## Status
 
@@ -10,15 +10,15 @@ Seller Catalog Performance & Query Batching V1
 
 ## Capability
 
-`commerce.seller.catalog_performance_batching_v1`
+`commerce.seller.catalog_search_filtering_v1`
 
 ## Base
 
-`origin/office/seller-catalog-wiring-v1` @ `0f20502a8298d91e591c3e9bebeed515c3d137cf`
+`origin/office/seller-catalog-performance-batching-v1` @ `2463192fa891253ad13b8dc67b7b5ddc7674c4f2`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-performance-batching-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-search-filtering-v1`
 
 ## Explicitly not done
 

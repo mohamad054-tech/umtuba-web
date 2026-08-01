@@ -2,29 +2,27 @@
 
 ## Active milestone (laptop)
 
-Physical Commerce Foundation V1 — `commerce.physical.foundation_v1`
+Seller Catalog Search & Filtering Foundation V1 — `commerce.seller.catalog_search_filtering_v1`
 
-Status: **PASS + STAGED** — awaiting commit GO; migration `20260892` not remote-applied
+Status: **PASS + STAGED** — awaiting commit GO; uncommitted / unpushed
 
 ## Branch / worktree
 
-- Branch: `office/commerce-physical-foundation-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-physical-foundation-v1`
-- Base: `origin/office/commerce-chain-migration-apply-readiness-v1` @ `6875847`
+- Branch: `office/seller-catalog-search-filtering-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-search-filtering-v1`
+- Base: `origin/office/seller-catalog-performance-batching-v1` @ `2463192`
 
 ## Delivered
 
-- Physical product / inventory / variant / shipping-metadata domain module
-- Mixed-order classification (digital ≠ physical fulfillment)
-- Launch gate remains closed
-- Local migration `20260892_store_physical_commerce_foundation_v1.sql`
+- In-memory search (title / id / SKU / barcode)
+- Status + health + type filters over existing health codes
+- Honest sort (no invented views/sales)
+- Batched variant token load + health reuse on products page
 
 ## Desktop
 
-Owns Commerce Remote Migration Preflight V1 — do not touch from laptop.
+Do not touch Desktop migration / money lines from this worktree.
 
 ## Next
 
-1. Commit GO when ready
-2. Later phase: physical shipping/carriers (deferred)
-3. Keep physical live Stripe capture disabled
+1. Commit GO when ordered (no trailers / no push)

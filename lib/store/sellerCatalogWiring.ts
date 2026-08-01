@@ -407,3 +407,70 @@ export function deriveSellerPayoutConfiguredFromEligibility(input: {
   }
   return input.payoutEligibility.eligibility != null;
 }
+
+/**
+ * Batch-load variant SKU/barcode tokens for seller catalog search.
+ * Scoped to product IDs already owned by the store catalog page.
+ */
+export async function loadSellerCatalogVariantSearchTokens(
+  supabase: AnyClient,
+  input: {
+    storeId: string;
+    products: StoreProductRow[];
+    chunkSize?: number;
+  }
+): Promise<{
+  tokens: Array<{ productId: string; sku: string | null; barcode: string | null }>;
+  queryCount: number;
+  error: string | null;
+}> {
+  const storeId = String(input.storeId ?? "").trim();
+  const owned = input.products.filter(
+    (p) => String(p.store_id ?? "") === storeId
+  );
+  const productIds = uniqueIds(owned.map((p) => p.id));
+  if (productIds.length === 0) {
+    return { tokens: [], queryCount: 0, error: null };
+  }
+
+  const chunks = chunkIds(productIds, input.chunkSize);
+  const tokens: Array<{
+    productId: string;
+    sku: string | null;
+    barcode: string | null;
+  }> = [];
+  let queryCount = 0;
+  let error: string | null = null;
+
+  for (const chunk of chunks) {
+    queryCount += 1;
+    const res = await runInSelect(
+      supabase,
+      "product_variants",
+      "product_id, sku, barcode",
+      "product_id",
+      chunk
+    );
+    if (res.error) {
+      error = res.error.message?.trim() || "product_variants search tokens failed";
+      // Fail closed for search enrichment: return what we have; missing tokens
+      // only reduce SKU/barcode matchability — never invent cross-store rows.
+      break;
+    }
+    for (const row of (res.data ?? []) as Array<{
+      product_id: string;
+      sku?: string | null;
+      barcode?: string | null;
+    }>) {
+      const productId = String(row?.product_id ?? "");
+      if (!productId) continue;
+      tokens.push({
+        productId,
+        sku: row.sku == null ? null : String(row.sku),
+        barcode: row.barcode == null ? null : String(row.barcode),
+      });
+    }
+  }
+
+  return { tokens, queryCount, error };
+}
