@@ -29,14 +29,20 @@ const HREF = {
 
 export type SellerProductHealthCode =
   | "complete"
+  | "missing_title"
   | "missing_images"
   | "missing_description"
   | "missing_pricing"
+  | "missing_category"
   | "missing_inventory"
+  | "inventory_required"
+  | "missing_digital_asset"
+  | "missing_physical_metadata"
   | "pending_review"
   | "rejected"
   | "published"
-  | "draft";
+  | "draft"
+  | "ready_to_publish";
 
 export type SellerProductHealthItem = {
   productId: string;
@@ -109,6 +115,8 @@ export type SellerAnalyticsFoundation = {
     salesMinor: number;
   }>;
   periodLabel: string | null;
+  /** False when no trusted analytics rows/sales are available. */
+  hasData: boolean;
   notes: string[];
 };
 
@@ -150,6 +158,12 @@ export type SellerProductHealthFacts = {
    * Omit entirely to skip missing_inventory (do not invent inventory logic).
    */
   hasInventoryRow?: boolean;
+  /** Digital products only — active deliverable present. */
+  hasDigitalAsset?: boolean;
+  /** Physical products — weight/dims or shipping metadata present. */
+  hasPhysicalMetadata?: boolean;
+  /** Inventory tracking required for this product type. */
+  inventoryRequired?: boolean;
 };
 
 function hasText(value: string | null | undefined, min = 1): boolean {
@@ -166,6 +180,7 @@ export function deriveSellerProductHealth(
   const p = facts.product;
   const codes: SellerProductHealthCode[] = [];
 
+  if (!hasText(p.title, 2)) codes.push("missing_title");
   if (p.status === "draft") codes.push("draft");
   if (p.status === "active") codes.push("published");
   if (p.status === "rejected" || p.moderation_status === "rejected") {
@@ -183,28 +198,77 @@ export function deriveSellerProductHealth(
   const hasDescription =
     hasText(p.description, 20) || hasText(p.short_description, 8);
   if (!hasDescription) codes.push("missing_description");
+  if (!p.primary_category_id) codes.push("missing_category");
 
   if (facts.hasImages === false) codes.push("missing_images");
   if (facts.hasPricing === false) codes.push("missing_pricing");
-  if (facts.hasInventoryRow === false) codes.push("missing_inventory");
+  if (facts.inventoryRequired === true) {
+    codes.push("inventory_required");
+    if (facts.hasInventoryRow === false) codes.push("missing_inventory");
+  } else if (facts.hasInventoryRow === false) {
+    codes.push("missing_inventory");
+  }
+  if (facts.hasDigitalAsset === false) codes.push("missing_digital_asset");
+  if (facts.hasPhysicalMetadata === false) {
+    codes.push("missing_physical_metadata");
+  }
 
   let fieldScore = 0;
-  const fieldTotal = 3 + (facts.hasImages !== undefined ? 1 : 0) + (facts.hasPricing !== undefined ? 1 : 0) + (facts.hasInventoryRow !== undefined ? 1 : 0);
-  if (hasDescription) fieldScore += 1;
+  let fieldTotal = 3; // title, description, category
   if (hasText(p.title, 2)) fieldScore += 1;
+  if (hasDescription) fieldScore += 1;
   if (p.primary_category_id) fieldScore += 1;
-  if (facts.hasImages === true) fieldScore += 1;
-  if (facts.hasPricing === true) fieldScore += 1;
-  if (facts.hasInventoryRow === true) fieldScore += 1;
+  if (facts.hasImages !== undefined) {
+    fieldTotal += 1;
+    if (facts.hasImages) fieldScore += 1;
+  }
+  if (facts.hasPricing !== undefined) {
+    fieldTotal += 1;
+    if (facts.hasPricing) fieldScore += 1;
+  }
+  if (facts.hasInventoryRow !== undefined) {
+    fieldTotal += 1;
+    if (facts.hasInventoryRow) fieldScore += 1;
+  }
+  if (facts.hasDigitalAsset !== undefined) {
+    fieldTotal += 1;
+    if (facts.hasDigitalAsset) fieldScore += 1;
+  }
+  if (facts.hasPhysicalMetadata !== undefined) {
+    fieldTotal += 1;
+    if (facts.hasPhysicalMetadata) fieldScore += 1;
+  }
 
-  const completenessScore = Math.round((fieldScore / Math.max(fieldTotal, 1)) * 100);
+  const completenessScore = Math.round(
+    (fieldScore / Math.max(fieldTotal, 1)) * 100
+  );
+
+  const catalogGaps = [
+    "missing_title",
+    "missing_description",
+    "missing_category",
+    "missing_images",
+    "missing_pricing",
+    "missing_inventory",
+    "missing_digital_asset",
+    "missing_physical_metadata",
+  ] as const;
+  const hasCatalogGap = catalogGaps.some((c) => codes.includes(c));
+
+  if (!hasCatalogGap && p.status === "draft" && !codes.includes("rejected")) {
+    codes.push("ready_to_publish");
+  }
 
   const blocking: SellerProductHealthCode[] = [
     "rejected",
+    "missing_title",
     "missing_pricing",
     "missing_images",
     "missing_description",
+    "missing_category",
     "missing_inventory",
+    "missing_digital_asset",
+    "missing_physical_metadata",
     "pending_review",
     "draft",
   ];
@@ -216,10 +280,7 @@ export function deriveSellerProductHealth(
     completenessScore >= 100 &&
     p.status === "active" &&
     p.moderation_status === "approved" &&
-    !codes.includes("missing_images") &&
-    !codes.includes("missing_pricing") &&
-    !codes.includes("missing_description") &&
-    !codes.includes("missing_inventory")
+    !hasCatalogGap
   ) {
     codes.push("complete");
   }
@@ -353,6 +414,24 @@ export function deriveSellerActionCenter(
     });
   }
 
+  const requiringAttention = health.filter(
+    (h) =>
+      h.primaryIssue != null &&
+      h.primaryIssue !== "published" &&
+      h.primaryIssue !== "complete"
+  );
+  if (requiringAttention.length) {
+    cards.push({
+      id: "requiring-attention",
+      severity: "warn",
+      title: "منتجات تحتاج انتباهًا",
+      reason: `${requiringAttention.length} منتجًا يحتاج متابعة.`,
+      href: HREF.products,
+      actionLabel: "مراجعة المنتجات",
+      count: requiringAttention.length,
+    });
+  }
+
   if (!health.length) {
     cards.push({
       id: "create-first-product",
@@ -451,9 +530,7 @@ export function deriveSellerAnalyticsFoundation(input: {
       : null;
 
   if (productViews == null && storeViews == null) {
-    notes.push(
-      "Product/store views are not wired yet — conversion stays null until telemetry exists."
-    );
+    notes.push("No data yet");
   }
 
   let conversionRate: number | null = null;
@@ -470,6 +547,17 @@ export function deriveSellerAnalyticsFoundation(input: {
     salesMinor: row.merchandiseSubtotalMinor ?? 0,
   }));
 
+  const hasData =
+    (orders != null && orders > 0) ||
+    (salesMinor != null && salesMinor !== 0) ||
+    topProducts.length > 0 ||
+    productViews != null ||
+    storeViews != null;
+
+  if (!hasData && !notes.includes("No data yet")) {
+    notes.push("No data yet");
+  }
+
   return {
     capability: SELLER_EXPERIENCE_FOUNDATION_ID,
     productViews,
@@ -480,6 +568,7 @@ export function deriveSellerAnalyticsFoundation(input: {
     conversionRate,
     topProducts,
     periodLabel: input.periodLabel ?? null,
+    hasData,
     notes,
   };
 }
@@ -489,6 +578,10 @@ export function deriveSellerStoreReadinessReport(input: {
   verificationStatus: string;
   products: StoreProductRow[];
   health?: SellerProductHealthItem[];
+  /** Store profile fields present (name/slug/etc already on store row). */
+  profileComplete?: boolean;
+  /** Existing payout eligibility/config signal when available. */
+  payoutConfigured?: boolean | null;
 }): SellerStoreReadinessReport {
   const productSnapshot = deriveProductSnapshot(input.products);
   const base = deriveStoreReadiness({
@@ -505,35 +598,42 @@ export function deriveSellerStoreReadinessReport(input: {
   const hasPricingGaps = health.some((h) => h.codes.includes("missing_pricing"));
   const hasImageGaps = health.some((h) => h.codes.includes("missing_images"));
   const hasRejected = health.some((h) => h.codes.includes("rejected"));
+  const productsReady =
+    hasCompletePublished ||
+    (base.hasActiveProducts && !hasPricingGaps && !hasImageGaps);
+  const profileComplete =
+    input.profileComplete ??
+    (base.storeActive && base.storeVerified);
+  const payoutConfigured = input.payoutConfigured;
 
   const checklist: SellerStoreReadinessChecklistItem[] = [
+    {
+      id: "profile-complete",
+      label: "الملف الشخصي مكتمل",
+      done: profileComplete,
+      weight: 20,
+      suggestion: "أكمل اسم المتجر والتوثيق من الإعداد.",
+    },
     {
       id: "store-active",
       label: "المتجر نشط",
       done: base.storeActive,
-      weight: 25,
+      weight: 15,
       suggestion: "فعّل حالة المتجر من الإعدادات.",
     },
     {
       id: "store-verified",
       label: "المتجر موثّق",
       done: base.storeVerified,
-      weight: 25,
+      weight: 15,
       suggestion: "أكمل خطوات التوثيق في الإعداد.",
     },
     {
-      id: "has-published",
-      label: "يوجد منتج منشور",
-      done: base.hasActiveProducts,
+      id: "products-ready",
+      label: "منتجات جاهزة",
+      done: productsReady,
       weight: 20,
-      suggestion: "انشر منتجًا واحدًا على الأقل بعد الموافقة.",
-    },
-    {
-      id: "complete-listing",
-      label: "منتج مكتمل البيانات",
-      done: hasCompletePublished || (base.hasActiveProducts && !hasPricingGaps && !hasImageGaps),
-      weight: 15,
-      suggestion: "أكمل الوصف والسعر والصور لمنتج منشور.",
+      suggestion: "أكمل بيانات منتج منشور واحد على الأقل.",
     },
     {
       id: "no-rejected",
@@ -543,6 +643,24 @@ export function deriveSellerStoreReadinessReport(input: {
       suggestion: "أصلح المنتجات المرفوضة أو أرشفتها.",
     },
   ];
+
+  if (payoutConfigured !== null && payoutConfigured !== undefined) {
+    checklist.push({
+      id: "payout-configured",
+      label: "إعدادات الدفع للبائع",
+      done: payoutConfigured,
+      weight: 15,
+      suggestion: "راجع أهلية الدفع من لوحة البائع عند توفرها.",
+    });
+  } else {
+    checklist.push({
+      id: "required-information",
+      label: "المعلومات المطلوبة للكتالوج",
+      done: base.hasActiveProducts && !hasPricingGaps,
+      weight: 15,
+      suggestion: "أضف سعرًا وفئة ووصفًا للمنتجات.",
+    });
+  }
 
   const earned = checklist.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
   const readinessPercent = Math.min(100, Math.max(0, earned));
@@ -586,6 +704,8 @@ export function buildSellerExperienceBundle(input: {
     topProducts?: AnalyticsTopProductRow[] | null;
     periodLabel?: string | null;
   };
+  profileComplete?: boolean;
+  payoutConfigured?: boolean | null;
 }): SellerExperienceBundle {
   const factsById = new Map(
     (input.productFacts ?? []).map((f) => [f.product.id, f] as const)
@@ -639,6 +759,8 @@ export function buildSellerExperienceBundle(input: {
     verificationStatus: input.verificationStatus,
     products: input.products,
     health: productHealth,
+    profileComplete: input.profileComplete,
+    payoutConfigured: input.payoutConfigured,
   });
 
   return {

@@ -28,6 +28,11 @@ import {
   deriveStoreReadiness,
 } from "../../../lib/store/sellerDashboardInsights";
 import { buildSellerExperienceBundle } from "../../../lib/store/sellerExperienceFoundation";
+import {
+  deriveSellerPayoutConfiguredFromEligibility,
+  deriveSellerProfileComplete,
+  loadSellerCatalogHealthFacts,
+} from "../../../lib/store/sellerCatalogWiring";
 import { loadSellerRevenueBridgeVisibility } from "../../../lib/store/commerceRevenueBridge";
 import {
   listSellerInventoryRows,
@@ -217,37 +222,6 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     analyticsPeriodLabel: analyticsBundle ? periodPreset.label : null,
   });
 
-  const sellerExperience = buildSellerExperienceBundle({
-    storeId: membership.store.id,
-    storeName: membership.store.name,
-    storeSlug: membership.store.slug,
-    storeStatus: membership.store.status,
-    verificationStatus: membership.store.verification_status,
-    products,
-    orderSnapshot,
-    revenue: analyticsBundle
-      ? {
-          gmvMinor: analyticsBundle.summary.grossMerchandiseValueMinor,
-          netSalesMinor: analyticsBundle.summary.netSalesMinor,
-          currency: analyticsBundle.summary.currency,
-          periodLabel: periodPreset.label,
-        }
-      : null,
-    analytics: {
-      orders: orderSnapshot?.totalOrders ?? null,
-      salesMinor: analyticsBundle
-        ? analyticsBundle.summary.netSalesMinor
-        : null,
-      currency: analyticsBundle
-        ? analyticsBundle.summary.currency
-        : orderSnapshot?.currency ?? null,
-      topProducts: analyticsBundle ? analyticsBundle.topProducts : null,
-      periodLabel: periodPreset.label,
-      productViews: null,
-      storeViews: null,
-    },
-  });
-
   const fulfillmentCounts = fulfillmentCountsResult.ok
     ? parseFulfillmentDashboardCounts(fulfillmentCountsResult.counts)
     : null;
@@ -405,6 +379,51 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
       }
     }
   }
+
+  const productFacts = await loadSellerCatalogHealthFacts(supabase, {
+    storeId: membership.store.id,
+    products,
+    inventoryRows: inventoryResult.ok ? inventoryResult.data : null,
+  });
+
+  const sellerExperience = buildSellerExperienceBundle({
+    storeId: membership.store.id,
+    storeName: membership.store.name,
+    storeSlug: membership.store.slug,
+    storeStatus: membership.store.status,
+    verificationStatus: membership.store.verification_status,
+    products,
+    productFacts,
+    orderSnapshot,
+    revenue: analyticsBundle
+      ? {
+          gmvMinor: analyticsBundle.summary.grossMerchandiseValueMinor,
+          netSalesMinor: analyticsBundle.summary.netSalesMinor,
+          currency: analyticsBundle.summary.currency,
+          periodLabel: periodPreset.label,
+        }
+      : null,
+    analytics: {
+      orders: analyticsBundle
+        ? analyticsBundle.summary.paidOrders +
+          analyticsBundle.summary.unpaidPendingOrders
+        : orderSnapshot?.totalOrders ?? null,
+      salesMinor: analyticsBundle
+        ? analyticsBundle.summary.netSalesMinor
+        : null,
+      currency: analyticsBundle
+        ? analyticsBundle.summary.currency
+        : orderSnapshot?.currency ?? null,
+      topProducts: analyticsBundle ? analyticsBundle.topProducts : null,
+      periodLabel: periodPreset.label,
+      productViews: null,
+      storeViews: null,
+    },
+    profileComplete: deriveSellerProfileComplete(membership.store),
+    payoutConfigured: deriveSellerPayoutConfiguredFromEligibility({
+      payoutEligibility,
+    }),
+  });
 
   const eligibleProductCount = products.filter(
     (p) => Boolean(p.marketplace_eligible)

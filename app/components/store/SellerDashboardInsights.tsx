@@ -578,7 +578,7 @@ export default function SellerDashboardInsightsView(props: Props) {
         )}
       </section>
 
-      {(salesSeries || topProducts || analyticsUnavailable) && canManage ? (
+      {canManage ? (
         <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
           <h2 className="sf-display text-xl font-semibold tracking-tight">
             Trusted sales signals
@@ -594,6 +594,9 @@ export default function SellerDashboardInsightsView(props: Props) {
               Analytics RPCs unavailable — showing operational list summaries
               only.
             </p>
+          ) : null}
+          {sellerExperience && !sellerExperience.analytics.hasData ? (
+            <p className="mt-3 text-sm text-[var(--sf-muted)]">No data yet</p>
           ) : null}
           {salesSeries && salesSeries.length > 0 ? (
             <ul className="mt-4 space-y-2">
@@ -632,7 +635,8 @@ export default function SellerDashboardInsightsView(props: Props) {
                 </li>
               ))}
             </ul>
-          ) : !analyticsUnavailable ? (
+          ) : !analyticsUnavailable &&
+            !(sellerExperience && !sellerExperience.analytics.hasData) ? (
             <p className="mt-3 text-sm text-[var(--sf-faint)]">
               No product order quantity in this analytics window.
             </p>
