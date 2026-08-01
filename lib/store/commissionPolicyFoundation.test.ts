@@ -78,7 +78,7 @@ describe("Commission Policy Foundation V1 — calculation", () => {
     expect(calc.calculationFingerprint).toContain("policyCode=");
   });
 
-  it("version selection prefers highest active version", () => {
+  it("multiple active policies for one currency fail closed", () => {
     const selected = selectCommissionPolicy({
       currency: "USD",
       at: "2026-06-01T00:00:00.000Z",
@@ -87,9 +87,9 @@ describe("Commission Policy Foundation V1 — calculation", () => {
         policy({ version: 2, lines: [{ role: "platform", bps: 1000 }, { role: "seller", bps: 9000 }] }),
       ],
     });
-    expect(selected.ok).toBe(true);
-    if (selected.ok) {
-      expect(selected.policy.version).toBe(2);
+    expect(selected.ok).toBe(false);
+    if (!selected.ok) {
+      expect(selected.code).toBe("ambiguous_policy");
     }
   });
 
@@ -115,15 +115,17 @@ describe("Commission Policy Foundation V1 — calculation", () => {
     }
   });
 
-  it("effective date selection respects windows", () => {
+  it("effective date selection uses superseded historical windows", () => {
     const policies = [
       policy({
         version: 1,
+        status: "superseded",
         effectiveFrom: "2026-01-01T00:00:00.000Z",
         effectiveTo: "2026-04-01T00:00:00.000Z",
       }),
       policy({
         version: 2,
+        status: "active",
         effectiveFrom: "2026-04-01T00:00:00.000Z",
         effectiveTo: null,
       }),

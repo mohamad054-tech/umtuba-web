@@ -52,12 +52,17 @@ Trusted **single source of truth** for commission policy contracts and decomposi
 Durable apply after capture+allocate is **Commission Decomposition Bridge Apply V1**
 (`commerce.revenue.commission_decomposition_bridge_apply_v1`, migration `20260890`).
 
+Safe activate/deactivate lifecycle is **Commission Policy Activation V1**
+(`commerce.revenue.commission_policy_activation_v1`, migration `20260891`):
+exactly one `active` policy per currency; historical `superseded` versions remain
+resolvable inside their effective windows.
+
 ## Security
 
 - Never trusts client percentages / rates / bps
-- Missing / invalid / currency-mismatched / out-of-window policies fail closed
-- No authenticated policy shopping (service_role only for SQL resolve/compute)
-- No active policy seed — operators must insert intentionally
+- Missing / invalid / currency-mismatched / out-of-window / ambiguous policies fail closed
+- No authenticated policy shopping (service_role only for SQL resolve/compute/activate)
+- No active policy seed — operators insert `draft` then activate intentionally
 
 ## Out of scope
 

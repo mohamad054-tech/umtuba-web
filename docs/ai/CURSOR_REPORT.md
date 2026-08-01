@@ -2,27 +2,21 @@
 
 ## Summary
 
-**PASS** for **Commerce Commission Decomposition Bridge Apply V1**.
+**PASS** for **Commerce Commission Policy Activation V1**.
 
-After trusted Sync `captured` + settlement `allocate`, `applyVerifiedStorePaymentOutcome` persists commission decomposition via service-role `apply_store_commission_decomposition_after_capture` (or explicit `not_configured` when no active policy). Exact party shares (platform/seller/supplier/affiliate/partner) are stored with payment/order/store/seller/supplier provenance, policy version, basis, lines, and fingerprint. Full-order refund marks the row `superseded_by_refund` without deleting history. Settlement/payout booking amounts unchanged. Migration `20260890` created locally and **not** remote-applied. Work left **uncommitted / unpushed**.
+Adds safe activate/deactivate lifecycle for currency-scoped commission policies: exactly one `active` policy per currency (unique index + fail-closed resolve), historical `superseded` versions preserved and still resolvable inside their effective windows, idempotent activation events, service-role RPCs only. Capture/decomposition continue to resolve at transaction time and permanently store `policy_code`/`policy_version`; refunds reference historical applied decomposition. Migration `20260891` created locally and **not** remote-applied. Work left **uncommitted / unpushed**.
 
 ## Exact files changed
 
 ### Created
-- `supabase/migrations/20260890_store_commission_decomposition_bridge_apply_v1.sql`
-- `lib/store/commissionDecompositionBridgeApply.ts`
-- `lib/store/commissionDecompositionBridgeApply.test.ts`
-- `docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md`
+- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql`
+- `lib/store/commissionPolicyActivation.ts`
+- `lib/store/commissionPolicyActivation.test.ts`
+- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
 
 ### Modified
-- `lib/store/stripePaymentOutcomeApply.ts` — apply after allocate
-- `lib/store/fullOrderRefundPath.ts` — refund supersede mark
-- `lib/store/fullOrderRefundPath.test.ts`
-- `lib/store/digitalEntitlementGrant.test.ts`
-- `lib/store/digitalEntitlementRevoke.test.ts`
-- `lib/store/postCaptureSettlementAllocate.test.ts`
-- `lib/store/postCaptureSettlementRelease.test.ts`
-- `lib/store/refundOperations/refundOperations.test.ts`
+- `lib/store/commissionPolicyFoundation.ts` — fail-closed ambiguous actives; historical superseded window resolve
+- `lib/store/commissionPolicyFoundation.test.ts`
 - `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -30,27 +24,20 @@ After trusted Sync `captured` + settlement `allocate`, `applyVerifiedStorePaymen
 
 ## Migrations created
 
-- `supabase/migrations/20260890_store_commission_decomposition_bridge_apply_v1.sql` — local only, not applied to remote
+- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql` — local only, not applied to remote
 
 ## Security review
 
-- Apply/mark/get RPCs: `SECURITY DEFINER`, `search_path = public`, **EXECUTE** to `service_role` only
-- Events table: FORCE RLS; client write privileges revoked
-- No client percentages/rates; resolve uses foundation policy registry only
-- Fail closed on linkage / currency / amount / correlation / supplier-share-without-supplier
-- No Stripe secrets; no settlement amount mutation; no payout execution enablement
+- Activate/deactivate RPCs: `SECURITY DEFINER`, service_role execute only
+- Activation events: FORCE RLS; client writes revoked
+- Unique index enforces one active per currency
+- Resolve fails closed on ambiguous actives/windows
+- No client percentages; no auto-seed; no silent policy fallback
+- Does not mutate settlement/payout booking amounts
 
 ## Tests
 
-Focused suite: **99 passed**
-- commissionDecompositionBridgeApply 9
-- commissionPolicyFoundation 13
-- fullOrderRefundPath 22
-- digitalEntitlementGrant 6
-- digitalEntitlementRevoke 7
-- postCaptureSettlementAllocate 15
-- postCaptureSettlementRelease 14
-- refundOperations 13
+Focused suite: **110 passed** (activation 8 + foundation 13 + decomposition 9 + refund path 22 + refund ops 13 + entitlement revoke 7 + allocate 15 + revenue bridge 23)
 
 ## TypeScript
 
@@ -71,7 +58,6 @@ Uncommitted (see Final Verification Report).
 ## Open issues
 
 - Migration not applied remotely (by design until human GO)
-- No active commission policy seed — production remains `not_configured` until operators insert an active policy
-- Affiliate/partner entity graphs still unsupported (amounts only)
-- Seller payout booking remains full RELEASED capture (commission-aware nets are a future milestone)
-- Partial refunds remain out of scope
+- No active commercial policy seed — operators insert `draft` then activate
+- Store-scoped policies still out of scope
+- Payout booking still full RELEASED capture (commission-aware nets are a future milestone)
