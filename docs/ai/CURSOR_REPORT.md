@@ -1,63 +1,39 @@
 # Cursor Report
 
-## Summary
+**PASS (staged, uncommitted)** — Commerce Launch Readiness V1 (laptop audit packaging)
 
-**PASS** for **Commerce Commission Policy Activation V1**.
+## Base
 
-Adds safe activate/deactivate lifecycle for currency-scoped commission policies: exactly one `active` policy per currency (unique index + fail-closed resolve), historical `superseded` versions preserved and still resolvable inside their effective windows, idempotent activation events, service-role RPCs only. Capture/decomposition continue to resolve at transaction time and permanently store `policy_code`/`policy_version`; refunds reference historical applied decomposition. Migration `20260891` created locally and **not** remote-applied. Work left **uncommitted / unpushed**.
+- SoT tip: `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` (`merge(commerce): reconcile prior commission policy activation history`)
+- Remote contains: `origin/office/commerce-commission-policy-activation-v1`
+- Branch: `office/commerce-launch-readiness-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-launch-readiness-v1`
 
-## Exact files changed
+## Verdict
 
-### Created
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql`
-- `lib/store/commissionPolicyActivation.ts`
-- `lib/store/commissionPolicyActivation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md`
+- **Laptop readiness packaging:** PASS + STAGED
+- **Production money launch:** **NO-GO** until Desktop applies migrations through `20260891`, Stripe/webhook configured, confirm-gate probe GO
 
-### Modified
-- `lib/store/commissionPolicyFoundation.ts` — fail-closed ambiguous actives; historical superseded window resolve
-- `lib/store/commissionPolicyFoundation.test.ts`
-- `docs/store/implementation/COMMISSION_POLICY_FOUNDATION_V1.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
+## Created
 
-## Migrations created
+- `docs/store/operations/COMMERCE_LAUNCH_READINESS_V1.md`
+- `docs/store/operations/COMMERCE_LAUNCH_READINESS_CHECKLIST_V1.md`
+- `docs/store/operations/COMMERCE_LAUNCH_ROLLBACK_RUNBOOK_V1.md`
+- `lib/store/commerceLaunchReadiness.test.ts`
 
-- `supabase/migrations/20260891_store_commission_policy_activation_v1.sql` — local only, not applied to remote
+## Not modified (by policy)
 
-## Security review
+- `commissionPolicy*` / `commissionDecomposition*` / `fullOrderRefundPath*`
+- Migrations `20260889`–`20260891`
 
-- Activate/deactivate RPCs: `SECURITY DEFINER`, service_role execute only
-- Activation events: FORCE RLS; client writes revoked
-- Unique index enforces one active per currency
-- Resolve fails closed on ambiguous actives/windows
-- No client percentages; no auto-seed; no silent policy fallback
-- Does not mutate settlement/payout booking amounts
+## Verification
 
-## Tests
+- Focused vitest: **198 passed** (16 files)
+- `npx tsc --noEmit`: PASS
+- `npm run build`: PASS
+- `npm ci`: local only; lockfile unchanged
+- Migration static audit: no dupes in `20260869–91`; digital-only capture asserted
 
-Focused suite: **110 passed** (activation 8 + foundation 13 + decomposition 9 + refund path 22 + refund ops 13 + entitlement revoke 7 + allocate 15 + revenue bridge 23)
+## Open
 
-## TypeScript
-
-`npx tsc --noEmit` — **PASS**
-
-## Build
-
-Not required for this capability (no app UI/entry-point change).
-
-## git diff --check
-
-**PASS**
-
-## git status --short
-
-Uncommitted (see Final Verification Report).
-
-## Open issues
-
-- Migration not applied remotely (by design until human GO)
-- No active commercial policy seed — operators insert `draft` then activate
-- Store-scoped policies still out of scope
-- Payout booking still full RELEASED capture (commission-aware nets are a future milestone)
+Await commit GO. Desktop owns remote migration apply.

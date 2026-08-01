@@ -2,27 +2,32 @@
 
 ## Task title
 
-Commerce Commission Policy Activation V1
+Commerce Launch Readiness V1
 
 ## Status
 
-`pass` — stop for human GO (no commit / no push / no remote migration)
+`pass` — laptop audit packaging complete — **staged / uncommitted / unpushed**
 
 ## Capability
 
-`commerce.revenue.commission_policy_activation_v1`
+`commerce.ops.launch_readiness_v1`
 
-## Branch / tip
+## Source of Truth base
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-commission-policy-activation-v1`
-- Branch: `office/commerce-commission-policy-activation-v1`
-- Base: `7d90a0569e49f789f26159565125ad78b4ffd992`
-- HEAD: `7d90a05` + uncommitted commission policy activation work
+- Commit: `be87fb30c2c7ba15d66f8540e5e6c57e181649f6`
+- Contained in: `origin/office/commerce-commission-policy-activation-v1`
 
-## Explicit non-actions
+## Worktree
 
-No commit · no push · no merge · no remote migration · no payout-net redesign · no store-scoped policies · no `.env.local`
+- Branch: `office/commerce-launch-readiness-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-commerce-launch-readiness-v1`
 
-## Next human actions
+## Production launch
 
-Review uncommitted diff → GO for commit/push when ready. Apply `20260891` locally/remotely under separate ops GO.
+**NO-GO** for money until Desktop migration apply + Stripe + confirm probe.
+
+## Explicitly not done
+
+- No commit / push
+- No remote migration apply
+- No sensitive commission/refund code edits
