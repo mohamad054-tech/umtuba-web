@@ -2,7 +2,7 @@
 
 ## Task title
 
-Seller Experience Foundation V1
+Seller Catalog Wiring V1
 
 ## Status
 
@@ -10,18 +10,17 @@ Seller Experience Foundation V1
 
 ## Capability
 
-`commerce.seller.experience_foundation_v1`
+`commerce.seller.catalog_wiring_v1`
 
-## Source of Truth base
+## Base
 
-- `origin/office/commerce-physical-foundation-v1` @ `d2b961f63ffd201be62301cfd81ef6d3b342f836`
+`origin/office/seller-experience-foundation-v1` @ `3a4d1c4679b2e364c153e5327ed4d682f0b051f4`
 
 ## Worktree
 
-- Branch: `office/seller-experience-foundation-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-experience-foundation-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-wiring-v1`
+`office/seller-catalog-wiring-v1`
 
 ## Explicitly not done
 
-- No commit / push / merge / migration
-- No Physical / Refund / Commission / Stripe / Settlement edits
+No commit / push / migration. No Physical/Refund/Commission/Stripe/Settlement edits.

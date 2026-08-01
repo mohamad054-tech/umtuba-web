@@ -1,23 +1,22 @@
 # Cursor Report
 
-**PASS (staged, uncommitted)** — Seller Experience Foundation V1
+**PASS (staged, uncommitted)** — Seller Catalog Wiring V1
 
 ## Base
 
-- SoT: `origin/office/commerce-physical-foundation-v1` @ `d2b961f63ffd201be62301cfd81ef6d3b342f836`
-- Branch: `office/seller-experience-foundation-v1`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-experience-foundation-v1`
+- SoT: `origin/office/seller-experience-foundation-v1` @ `3a4d1c4`
+- Branch: `office/seller-catalog-wiring-v1`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-wiring-v1`
 
-## Summary
+## Wiring
 
-Pure TS seller experience layer: dashboard summary, product health, action center, analytics foundation, store readiness. Light UI wiring on `/seller/store`. No migrations. Physical/Refund/Commission/Stripe/Settlement untouched.
+Real catalog facts (media/prices/digital assets/inventory presence/physical metadata) feed Seller Experience Foundation. Analytics shows "No data yet" when empty.
 
 ## Verification
 
-- Focused vitest: **12 passed** (sellerExperience 6 + sellerDashboardInsights 6)
-- `npx tsc --noEmit`: PASS
-- `npm run build`: PASS
-- `npm ci`: local only; lockfile unchanged
+- Vitest: **14 passed** (wiring 2 + experience 6 + dashboard insights 6)
+- Note: `SellerDashboardInsights.test.tsx` does not exist; used `sellerDashboardInsights.test.ts`
+- tsc PASS · build PASS · lockfile unchanged
 
 ## Open
 

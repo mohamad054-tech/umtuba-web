@@ -2,8 +2,8 @@
 
 ## Active Laptop Commerce feature (this worktree)
 
-- **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-experience-foundation-v1`
-- **Branch:** `office/seller-experience-foundation-v1`
-- **Task:** Seller Experience Foundation V1
-- **Base:** `origin/office/commerce-physical-foundation-v1` @ `d2b961f`
+- **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-seller-catalog-wiring-v1`
+- **Branch:** `office/seller-catalog-wiring-v1`
+- **Task:** Seller Catalog Wiring V1
+- **Base:** `origin/office/seller-experience-foundation-v1` @ `3a4d1c4`
 - **Status:** **PASS + STAGED** (await commit GO)

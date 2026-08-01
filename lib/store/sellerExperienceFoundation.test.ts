@@ -200,7 +200,13 @@ describe("Seller Experience Foundation V1 — analytics foundation", () => {
 
     const noViews = deriveSellerAnalyticsFoundation({ orders: 2 });
     expect(noViews.conversionRate).toBeNull();
-    expect(noViews.notes[0]).toMatch(/views/i);
+    expect(noViews.notes).toContain("No data yet");
+    // orders>0 counts as hasData
+    expect(noViews.hasData).toBe(true);
+
+    const empty = deriveSellerAnalyticsFoundation({});
+    expect(empty.hasData).toBe(false);
+    expect(empty.notes).toContain("No data yet");
   });
 });
 
