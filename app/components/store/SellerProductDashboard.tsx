@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   bulkArchiveProductsAction,
@@ -16,13 +17,16 @@ import {
   SELLER_CATALOG_SEARCH_SORTS,
   SELLER_CATALOG_STATUS_FILTERS,
   SELLER_CATALOG_TYPE_FILTERS,
-  filterSellerCatalogSearchItems,
   type SellerCatalogHealthFilter,
   type SellerCatalogProductTypeFilter,
   type SellerCatalogSearchItem,
   type SellerCatalogSearchSortKey,
   type SellerCatalogStatusFilter,
 } from "../../../lib/store/sellerCatalogSearchFiltering";
+import {
+  buildSellerCatalogProductsHref,
+  type SellerCatalogAppliedFilters,
+} from "../../../lib/store/sellerCatalogDataAccess";
 import StoreEmptyState from "./StoreEmptyState";
 
 type Props = {
@@ -30,48 +34,59 @@ type Props = {
   storeId: string;
   canManage: boolean;
   storeName: string;
+  applied: SellerCatalogAppliedFilters;
+  pageSize: number;
+  hasMore: boolean;
+  nextHref: string | null;
+  healthFilterScope: "none" | "page_only";
 };
 
 export default function SellerProductDashboard({
   products,
-  storeId,
   canManage,
+  applied,
+  pageSize,
+  hasMore,
+  nextHref,
+  healthFilterScope,
 }: Props) {
-  const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<SellerCatalogStatusFilter>("all");
-  const [health, setHealth] = useState<SellerCatalogHealthFilter>("any");
-  const [productType, setProductType] =
-    useState<SellerCatalogProductTypeFilter>("all");
-  const [sort, setSort] = useState<SellerCatalogSearchSortKey>("updated_desc");
+  const router = useRouter();
+  const [query, setQuery] = useState(applied.search);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const filtered = useMemo(
-    () =>
-      filterSellerCatalogSearchItems(products, {
-        storeId,
-        query,
-        status,
-        health,
-        productType,
-        sort,
-      }),
-    [products, storeId, query, status, health, productType, sort]
-  );
-
-  const selectedIds = filtered
+  const selectedIds = products
     .filter((item) => selected[item.id])
     .map((item) => item.id);
-  const selectedStatuses = filtered
+  const selectedStatuses = products
     .filter((item) => selected[item.id])
     .map((item) => item.status);
   const bulkActions = deriveSellerCatalogBulkActions({ selectedStatuses });
 
+  function navigate(patch: {
+    search?: string;
+    status?: SellerCatalogStatusFilter;
+    productType?: SellerCatalogProductTypeFilter;
+    sort?: SellerCatalogSearchSortKey;
+    health?: SellerCatalogHealthFilter;
+  }) {
+    const href = buildSellerCatalogProductsHref({
+      search: patch.search ?? applied.search,
+      status: patch.status ?? applied.status,
+      productType: patch.productType ?? applied.productType,
+      sort: patch.sort ?? applied.sort,
+      health: patch.health ?? applied.health,
+      limit: pageSize,
+      cursor: null,
+    });
+    router.push(href);
+  }
+
   function toggleAll(next: boolean) {
     const patch: Record<string, boolean> = {};
-    for (const item of filtered) patch[item.id] = next;
+    for (const item of products) patch[item.id] = next;
     setSelected((prev) => ({ ...prev, ...patch }));
   }
 
@@ -109,10 +124,22 @@ export default function SellerProductDashboard({
         );
       }
       setSelected({});
+      router.refresh();
     });
   }
 
-  if (products.length === 0) {
+  const emptyCatalog = useMemo(
+    () =>
+      products.length === 0 &&
+      !applied.search &&
+      applied.status === "all" &&
+      applied.productType === "all" &&
+      applied.health === "any" &&
+      !hasMore,
+    [products.length, applied, hasMore]
+  );
+
+  if (emptyCatalog) {
     return (
       <StoreEmptyState
         title="No products yet"
@@ -126,7 +153,13 @@ export default function SellerProductDashboard({
   return (
     <div className="space-y-5">
       <div className="rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end">
+        <form
+          className="flex flex-col gap-3 md:flex-row md:items-end"
+          onSubmit={(event) => {
+            event.preventDefault();
+            navigate({ search: query });
+          }}
+        >
           <label className="block min-w-0 flex-1 space-y-2">
             <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
               Search
@@ -143,9 +176,11 @@ export default function SellerProductDashboard({
               Sort
             </span>
             <select
-              value={sort}
+              value={applied.sort}
               onChange={(event) =>
-                setSort(event.target.value as SellerCatalogSearchSortKey)
+                navigate({
+                  sort: event.target.value as SellerCatalogSearchSortKey,
+                })
               }
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
             >
@@ -156,7 +191,13 @@ export default function SellerProductDashboard({
               ))}
             </select>
           </label>
-        </div>
+          <button
+            type="submit"
+            className="rounded-2xl border border-[var(--sf-line)] px-4 py-3 text-sm font-semibold text-[var(--sf-ink)]"
+          >
+            Apply
+          </button>
+        </form>
 
         <div
           className="mt-4 flex flex-wrap gap-2"
@@ -167,9 +208,9 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => setStatus(filter.id)}
+              onClick={() => navigate({ status: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                status === filter.id
+                applied.status === filter.id
                   ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
                   : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(214,196,161,0.35)]"
               }`}
@@ -188,9 +229,9 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => setHealth(filter.id)}
+              onClick={() => navigate({ health: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                health === filter.id
+                applied.health === filter.id
                   ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
                   : "border-[var(--sf-line)] text-[var(--sf-faint)] hover:border-[rgba(214,196,161,0.35)]"
               }`}
@@ -209,9 +250,9 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
-              onClick={() => setProductType(filter.id)}
+              onClick={() => navigate({ productType: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
-                productType === filter.id
+                applied.productType === filter.id
                   ? "border-[rgba(214,196,161,0.55)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-ink)]"
                   : "border-[var(--sf-line)] text-[var(--sf-faint)] hover:border-[rgba(214,196,161,0.35)]"
               }`}
@@ -222,8 +263,15 @@ export default function SellerProductDashboard({
         </div>
 
         <p className="mt-3 text-xs text-[var(--sf-faint)]">
-          Showing {filtered.length} of {products.length} products
+          Showing {products.length} on this page
+          {hasMore ? " · more available" : ""}
         </p>
+        {healthFilterScope === "page_only" ? (
+          <p className="mt-2 text-xs text-[var(--sf-muted)]">
+            Ready / Needs Attention / health filters apply to this page only.
+            Catalog-wide health pagination is deferred to Phase 2.
+          </p>
+        ) : null}
       </div>
 
       {canManage ? (
@@ -233,8 +281,8 @@ export default function SellerProductDashboard({
               <input
                 type="checkbox"
                 checked={
-                  filtered.length > 0 &&
-                  filtered.every((item) => selected[item.id])
+                  products.length > 0 &&
+                  products.every((item) => selected[item.id])
                 }
                 onChange={(event) => toggleAll(event.target.checked)}
               />
@@ -273,13 +321,13 @@ export default function SellerProductDashboard({
         </div>
       ) : null}
 
-      {filtered.length === 0 ? (
+      {products.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[var(--sf-line)] px-4 py-10 text-center text-sm text-[var(--sf-faint)]">
-          No products match this search or filter.
+          No products match this search or filter on this page.
         </p>
       ) : (
         <ul className="space-y-3">
-          {filtered.map((product) => (
+          {products.map((product) => (
             <li key={product.id}>
               <div className="group flex gap-3 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)] md:p-5">
                 {canManage ? (
@@ -329,6 +377,17 @@ export default function SellerProductDashboard({
           ))}
         </ul>
       )}
+
+      {nextHref ? (
+        <div className="flex justify-center pt-2">
+          <Link
+            href={nextHref}
+            className="rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-semibold text-[var(--sf-ink)] hover:border-[rgba(214,196,161,0.45)]"
+          >
+            Load more
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }
