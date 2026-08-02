@@ -150,6 +150,18 @@ describe("Live payment capture — money trust + checkout start", () => {
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 

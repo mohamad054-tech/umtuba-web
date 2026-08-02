@@ -17,7 +17,8 @@ Base: `93009b0d1348dc4e10f3ec8b4c7be2993ef228ed` (`origin/office/seller-inventor
 
 **Chosen commitment:** `trusted_payment_capture` only.
 
-**Runtime status:** No safe reusable `on_hand` decrement RPC exists. Digital grant consumes holds without touching `on_hand`. Therefore this milestone is **Foundation/Contract only** — no migration, no apply Runtime.
+**Runtime status (this foundation milestone):** contract only.
+**Runtime follow-up:** `PURCHASE_STOCK_DECREMENT_RUNTIME_V1.md` adds `decrement_store_purchase_stock_after_capture` + persisted `:purchase_stock` events after trusted capture.
 
 ## Sequence contract
 

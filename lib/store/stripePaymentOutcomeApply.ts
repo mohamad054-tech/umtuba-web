@@ -1,6 +1,7 @@
 /**
  * Service-role executor for apply_store_payment_outcome + allocate +
- * commission decomposition apply + entitlement grant + settlement release.
+ * commission decomposition apply + purchase stock decrement + entitlement
+ * grant + settlement release.
  * Server-only module (API routes / workers). Never import from client components.
  */
 
@@ -17,6 +18,10 @@ import {
   applyCommissionDecompositionAfterTrustedCapture,
   type CommissionDecompositionApplyResult,
 } from "./commissionDecompositionBridgeApply";
+import {
+  decrementPurchaseStockAfterTrustedCapture,
+  type PurchaseStockDecrementRuntimeResult,
+} from "./purchaseStockDecrementRuntime";
 import {
   grantDigitalEntitlementsAfterTrustedCapture,
   type DigitalEntitlementGrantResult,
@@ -45,6 +50,7 @@ export type ApplyStorePaymentOutcomeResult =
       replayed: boolean;
       settlement: PostCaptureAllocateResult;
       commission: CommissionDecompositionApplyResult;
+      purchaseStock: PurchaseStockDecrementRuntimeResult;
       entitlement: DigitalEntitlementGrantResult;
       release: PostCaptureReleaseResult;
     }
@@ -79,9 +85,10 @@ function serviceRoleClient():
 
 /**
  * Apply verified provider outcome via Sync. On capture: allocate, apply
- * commission decomposition, grant digital entitlements, then release to payable.
- * Post-steps are idempotent. Release runs only after both allocate and
- * entitlement succeed. Commission apply does not gate release.
+ * commission decomposition, decrement finite purchase stock, grant digital
+ * entitlements, then release to payable.
+ * Post-steps are idempotent. Release runs only after allocate, purchase-stock,
+ * and entitlement succeed. Commission apply does not gate release.
  */
 export async function applyVerifiedStorePaymentOutcome(
   input: ApplyStorePaymentOutcomeInput,
@@ -138,6 +145,10 @@ export async function applyVerifiedStorePaymentOutcome(
         status: "skipped",
         reason: `Outcome ${input.outcome} is not commission-apply eligible.`,
       },
+      purchaseStock: {
+        status: "skipped",
+        reason: `Outcome ${input.outcome} is not purchase-stock eligible.`,
+      },
       entitlement: {
         status: "skipped",
         reason: `Outcome ${input.outcome} is not entitlement-grant eligible.`,
@@ -178,6 +189,15 @@ export async function applyVerifiedStorePaymentOutcome(
     );
   }
 
+  const purchaseStock = await decrementPurchaseStockAfterTrustedCapture(
+    supabase,
+    {
+      paymentAttemptId: input.paymentAttemptId,
+      captureEventKey: input.eventKey,
+      correlationId: input.correlationId,
+    }
+  );
+
   const entitlement = await grantDigitalEntitlementsAfterTrustedCapture(
     supabase,
     {
@@ -187,6 +207,9 @@ export async function applyVerifiedStorePaymentOutcome(
     }
   );
 
+  const purchaseStockOk =
+    purchaseStock.status === "decremented" || purchaseStock.status === "noop";
+
   let release: PostCaptureReleaseResult;
   if (settlement.status !== "allocated") {
     release = {
@@ -195,6 +218,14 @@ export async function applyVerifiedStorePaymentOutcome(
         settlement.status === "failed"
           ? "Settlement release skipped because allocate failed."
           : "Settlement release skipped because allocate did not succeed.",
+    };
+  } else if (!purchaseStockOk) {
+    release = {
+      status: "skipped",
+      reason:
+        purchaseStock.status === "failed"
+          ? "Settlement release skipped because purchase stock decrement failed."
+          : "Settlement release skipped because purchase stock decrement did not succeed.",
     };
   } else if (entitlement.status !== "granted") {
     release = {
@@ -229,6 +260,7 @@ export async function applyVerifiedStorePaymentOutcome(
     replayed,
     settlement,
     commission,
+    purchaseStock,
     entitlement,
     release,
   };
