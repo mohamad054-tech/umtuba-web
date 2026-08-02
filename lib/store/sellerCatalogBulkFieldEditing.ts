@@ -30,6 +30,7 @@ export type SellerCatalogBulkFieldId =
   | "price"
   | "status"
   | "stock_quantity"
+  | "availability"
   | "marketplace_eligible";
 
 export type SellerCatalogBulkFieldOperation =
@@ -85,6 +86,7 @@ const FIELD_LABELS: Record<SellerCatalogBulkFieldId, string> = {
   price: "Price",
   status: "Status",
   stock_quantity: "Stock quantity",
+  availability: "Availability",
   marketplace_eligible: "Marketplace eligibility",
 };
 
@@ -104,6 +106,7 @@ const FIELD_OPERATIONS: Record<
   price: ["replace"],
   status: ["replace"],
   stock_quantity: ["replace"],
+  availability: ["replace"],
   marketplace_eligible: ["replace"],
 };
 
@@ -136,6 +139,8 @@ export function deferredSellerCatalogBulkFieldReason(
       return "Bulk status changes deferred — use submit/archive bulk ops, not field mass-assign.";
     case "stock_quantity":
       return "Bulk stock edits are forbidden in this foundation.";
+    case "availability":
+      return "Availability is derived from trusted inventory seed fields; bulk status mass-assign is deferred.";
     case "marketplace_eligible":
       return "Marketplace eligibility bulk toggle deferred — not storefront visibility.";
     default:
@@ -174,6 +179,7 @@ export function deriveSellerCatalogBulkFieldToolbar(input: {
       "price",
       "status",
       "stock_quantity",
+      "availability",
       "marketplace_eligible",
     ] as SellerCatalogBulkFieldId[]
   ).map((id) => {

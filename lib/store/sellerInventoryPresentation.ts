@@ -31,6 +31,7 @@ export type SellerInventoryAvailabilityState =
   | "unlimited"
   | "low_stock"
   | "out_of_stock"
+  | "backorder"
   | "fully_reserved"
   | "missing"
   | "unknown";
@@ -85,6 +86,8 @@ export function deriveInventoryAvailabilityState(
     return "fully_reserved";
   }
   if (row.availableToSell === 0) {
+    // Backorder is distinct from out_of_stock (do not mislabel sellable holds).
+    if (row.allowBackorder) return "backorder";
     return "out_of_stock";
   }
   // Low stock only when safety_stock is configured — explainable from trusted data.
@@ -106,6 +109,8 @@ export function sellerInventoryAvailabilityLabel(
       return "Low stock";
     case "out_of_stock":
       return "Out of stock";
+    case "backorder":
+      return "Backorder";
     case "fully_reserved":
       return "Fully reserved";
     case "missing":
@@ -143,12 +148,17 @@ export function deriveSellerInventoryAttention(
       message: "All on-hand units are reserved by checkout holds.",
     };
   }
+  if (state === "backorder") {
+    return {
+      level: "info",
+      message:
+        "Available-to-sell is zero, but backorder is allowed on the inventory row.",
+    };
+  }
   if (state === "out_of_stock") {
     return {
       level: "warn",
-      message: row.allowBackorder
-        ? "Available-to-sell is zero (backorder allowed on the inventory row)."
-        : "Available-to-sell is zero after reserved and safety stock.",
+      message: "Available-to-sell is zero after reserved and safety stock.",
     };
   }
   if (state === "low_stock") {

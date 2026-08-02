@@ -49,6 +49,7 @@ import {
   type SellerCatalogBulkFieldSummary,
 } from "../../../lib/store/sellerCatalogBulkFieldEditing";
 import { buildSellerCatalogCategoryShortDescriptionDisplay } from "../../../lib/store/sellerCatalogCategoryShortDescription";
+import { sellerCatalogAvailabilityLabel } from "../../../lib/store/sellerCatalogAvailability";
 import StoreEmptyState from "./StoreEmptyState";
 
 type PaginationLabels = {
@@ -960,6 +961,11 @@ export default function SellerProductDashboard({
                     </span>
                     <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-faint)]">
                       {sellerModerationLabel(product.moderationStatus)}
+                    </span>
+                    <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-muted)]">
+                      {sellerCatalogAvailabilityLabel(
+                        product.availabilityStatus ?? "unknown"
+                      )}
                     </span>
                     {meta.categoryLabel ? (
                       <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-muted)]">

@@ -34,6 +34,18 @@ export type SellerCatalogListItem = {
   shortDescription?: string | null;
   /** Optional — used by bulk field editing preview/no-op. */
   primaryCategoryId?: string | null;
+  /**
+   * Derived seller-catalog availability (not a stored column).
+   * Null/omitted = unknown; never treat as in_stock by default.
+   */
+  availabilityStatus?:
+    | "in_stock"
+    | "out_of_stock"
+    | "backorder"
+    | "unlimited"
+    | "unavailable"
+    | "unknown"
+    | null;
 };
 
 const FILTER_STATUSES: Record<

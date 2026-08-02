@@ -8,6 +8,7 @@ import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { canManageCatalog } from "../../../../lib/store/permissions";
 import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import { listSellerInventoryRows } from "../../../../lib/store/sellerInventoryQueries";
+import { indexSellerCatalogAvailabilityByProductId } from "../../../../lib/store/sellerCatalogAvailability";
 import {
   loadSellerCatalogHealthFacts,
   loadSellerCatalogVariantSearchTokens,
@@ -178,6 +179,9 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
     variantSearch.tokens,
     products.map((p) => p.id)
   );
+  const availabilityByProductId = inventoryForPage
+    ? indexSellerCatalogAvailabilityByProductId(inventoryForPage)
+    : new Map();
 
   const listItems: SellerCatalogListItem[] = products.map((p) => ({
     id: p.id,
@@ -190,6 +194,8 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
     createdAt: p.created_at,
     shortDescription: p.short_description,
     primaryCategoryId: p.primary_category_id,
+    // Missing inventory rows → unknown (fail closed; never default in_stock).
+    availabilityStatus: availabilityByProductId.get(p.id) ?? "unknown",
   }));
 
   let searchItems = buildSellerCatalogSearchItems({
