@@ -357,6 +357,18 @@ describe("Commission decomposition bridge apply — capture wiring", () => {
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -382,6 +394,7 @@ describe("Commission decomposition bridge apply — capture wiring", () => {
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
       STORE_COMMISSION_DECOMPOSITION_APPLY_RPC,
+      "decrement_store_purchase_stock_after_capture",
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
       STORE_SETTLEMENT_RPC,
     ]);
@@ -406,6 +419,18 @@ describe("Commission decomposition bridge apply — capture wiring", () => {
             entitlements_granted: 0,
             reservations_consumed: 0,
             fulfillment_marked: false,
+          },
+          error: null,
+        };
+      }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
           },
           error: null,
         };
@@ -479,6 +504,18 @@ describe("Commission decomposition bridge apply — refund reference", () => {
             skipped: false,
             lifecycle_status: "superseded_by_refund",
             policy_status: "applied",
+          },
+          error: null,
+        };
+      }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
           },
           error: null,
         };

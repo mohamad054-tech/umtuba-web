@@ -203,6 +203,18 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -259,6 +271,18 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     }) as never);
 
@@ -307,6 +331,18 @@ describe("Digital entitlement revoke — refund path wiring", () => {
             message:
               "digital entitlement revoke failed closed: 1 active entitlement(s) remain",
           },
+        };
+      }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
         };
       }
       return { data: null, error: { message: `unexpected ${name}` } };

@@ -196,7 +196,19 @@ describe("Post-capture release — capture wiring", () => {
             error: null,
           };
         }
-        return { data: null, error: { message: `unexpected ${name}` } };
+              if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: { message: `unexpected ${name}` } };
       }
     );
 
@@ -221,11 +233,12 @@ describe("Post-capture release — capture wiring", () => {
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
       "apply_store_commission_decomposition_after_capture",
+      "decrement_store_purchase_stock_after_capture",
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
       STORE_SETTLEMENT_RPC,
     ]);
     expect(rpc.mock.calls[1]?.[1]).toMatchObject({ p_action: "allocate" });
-    expect(rpc.mock.calls[4]?.[1]).toMatchObject({
+    expect(rpc.mock.calls[5]?.[1]).toMatchObject({
       p_action: "release",
       p_event_key: `${CAPTURE_KEY}:release`,
     });
@@ -270,7 +283,19 @@ describe("Post-capture release — capture wiring", () => {
             error: null,
           };
         }
-        return { data: null, error: { message: `unexpected ${name}` } };
+              if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: { message: `unexpected ${name}` } };
       }
     );
 
@@ -355,7 +380,19 @@ describe("Post-capture release — capture wiring", () => {
             error: null,
           };
         }
-        return { data: null, error: { message: `unexpected ${_name}` } };
+              if (_name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: { message: `unexpected ${_name}` } };
       }
     );
     const applied = await applyVerifiedStorePaymentOutcome(
@@ -414,7 +451,19 @@ describe("Post-capture release — capture wiring", () => {
             error: { message: "digital entitlement grant failed closed" },
           };
         }
-        return { data: null, error: { message: `unexpected ${name}` } };
+              if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: { message: `unexpected ${name}` } };
       }
     );
     const applied = await applyVerifiedStorePaymentOutcome(
@@ -483,7 +532,19 @@ describe("Post-capture release — capture wiring", () => {
             error: null,
           };
         }
-        return { data: null, error: { message: `unexpected ${name}` } };
+              if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
+      return { data: null, error: { message: `unexpected ${name}` } };
       }
     );
     const applied = await applyVerifiedStorePaymentOutcome(
@@ -523,6 +584,7 @@ describe("Post-capture release — architecture boundaries", () => {
     const webhook = read(
       "app/api/store/payments/stripe/webhook/route.ts"
     );
+    expect(webhook).toMatch(/purchaseStock: applied\.purchaseStock/);
     expect(webhook).toMatch(/release: applied\.release/);
   });
 

@@ -255,6 +255,18 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -276,7 +288,7 @@ describe("Post-capture allocate — applyVerifiedStorePaymentOutcome wiring", ()
     expect(applied.replayed).toBe(false);
     expect(applied.settlement.status).toBe("allocated");
     expect(applied.release.status).toBe("released");
-    expect(rpc).toHaveBeenCalledTimes(5);
+    expect(rpc).toHaveBeenCalledTimes(6);
     expect(rpc.mock.calls[0][0]).toBe(STORE_PAYMENT_SYNC_RPC);
     expect(rpc.mock.calls[1][0]).toBe(STORE_SETTLEMENT_RPC);
   });

@@ -173,6 +173,18 @@ describe("Digital entitlement grant — capture wiring", () => {
           error: null,
         };
       }
+            if (name === "decrement_store_purchase_stock_after_capture") {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_decremented: 0,
+            quantity_decremented: 0,
+            reservations_consumed: 0,
+          },
+          error: null,
+        };
+      }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
 
@@ -198,6 +210,7 @@ describe("Digital entitlement grant — capture wiring", () => {
       STORE_PAYMENT_SYNC_RPC,
       STORE_SETTLEMENT_RPC,
       STORE_COMMISSION_DECOMPOSITION_APPLY_RPC,
+      "decrement_store_purchase_stock_after_capture",
       STORE_DIGITAL_ENTITLEMENT_GRANT_RPC,
       STORE_SETTLEMENT_RPC,
     ]);
