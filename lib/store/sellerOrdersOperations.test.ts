@@ -76,6 +76,22 @@ describe("sellerOrdersPresentation — payment safety", () => {
     const cancel = options.find((o) => o.value === "cancelled");
     expect(cancel?.paymentBlocked).toBe(false);
   });
+
+  it("blocks paid cancel in status menus (refund path only)", () => {
+    expect(
+      sellerTransitionPaymentBlocked({
+        paymentStatus: "paid",
+        toStatus: "cancelled",
+      }).blocked
+    ).toBe(true);
+    const options = sellerOrderStatusOptions({
+      status: "packed",
+      paymentStatus: "paid",
+    });
+    expect(options.find((o) => o.value === "cancelled")?.paymentBlocked).toBe(
+      true
+    );
+  });
 });
 
 describe("sellerOrdersPresentation — action derivation and stale guards", () => {

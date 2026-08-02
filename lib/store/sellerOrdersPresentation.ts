@@ -22,6 +22,7 @@ import {
   buyerOrderStatusLabel,
   buyerPaymentStatusLabel,
 } from "./buyerOrdersPresentation";
+import { assertSellerCancelAllowedForStockSafety } from "./cancellationStockReleaseSafety";
 
 export type SellerAttentionLevel = "none" | "info" | "warn" | "critical";
 
@@ -118,6 +119,19 @@ export function sellerTransitionPaymentBlocked(input: {
   toStatus?: OrderStatus | null;
   toFulfillment?: FulfillmentStatus | null;
 }): { blocked: boolean; reason?: string } {
+  // Paid/authorized cancel must use refund+restock — never reservation release.
+  if (input.toStatus === "cancelled") {
+    const cancelStock = assertSellerCancelAllowedForStockSafety({
+      paymentStatus: input.paymentStatus,
+    });
+    if (!cancelStock.ok) {
+      return {
+        blocked: true,
+        reason:
+          "Paid or authorized orders cannot be cancelled here. Use the full-order refund path so purchase stock is restocked safely.",
+      };
+    }
+  }
   if (!isPaymentBlockingFulfillmentProgress(input.paymentStatus)) {
     return { blocked: false };
   }
