@@ -70,13 +70,17 @@ Frozen baselines (extend, do not replace):
 | Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** — migration `20260889` remote-applied |
 | Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** — migration `20260890` remote-applied |
 | Commerce Commission Policy Activation V1 | **COMPLETE** — migration `20260891` remote-applied |
-| Commerce SoT Unification + Stock Drift V1 | **COMPLETE (git)** — branch `office/commerce-sot-unification-stock-drift-v1`; remote stock history remediation pending |
+| Commerce SoT Unification + Stock Drift V1 | **COMPLETE** — branch `office/commerce-sot-unification-stock-drift-v1` @ base `91e90e4`; remote stock/Wave A/money chain applied |
+| Commerce Wave A Remainder Remote Apply | **COMPLETE** — `20260885–88` remote |
+| Commerce Commission Policy Seed + Activate V1 | **COMPLETE** — `umtuba_launch_usd_v1` v1 active USD 15%/85% |
+| Commerce Stripe Production Gate Readiness Audit V1 | **COMPLETE** — code READY; host live env **NOT_READY_FOR_STRIPE_LIVE_TEST** |
+| Commerce Final Handoff Documentation + Push V1 | **COMPLETE** — `docs/store/operations/COMMERCE_CURRENT_STATE_2026-08-02.md` |
 | Commerce Chain Verification & Migration Apply Readiness V1 | **COMPLETE** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` @ `c473630` |
-| Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — **`NOT_READY_FOR_REMOTE_APPLY`** |
-| Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — `20260823` SAFE; 24/84 apply readiness planned |
-| Commerce Migration History Drift Verification V1 | **IMPLEMENTED locally** (branch `office/commerce-migration-history-drift-verification-v1`) — `20260822`+`20260823` **`SAFE_TO_REGISTER_HISTORY`**; repair order `22→23` proposed not executed; no mutations |
+| Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — historical preflight; superseded by applied remote chain |
+| Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — historical |
+| Commerce Migration History Drift Verification V1 | **COMPLETE historically** — `20260822`+`20260823` registered remotely |
 
-Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Commerce remote foundations closed through `20260895` + active USD commission. Next: external Stripe live env → gate audit → E2E → then consider confirm. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 
@@ -85,11 +89,17 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 
 ## Commerce source of truth (desktop-only)
 
+- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-sot-unification-stock-drift-v1`
 - **Active Commerce branch:** `office/commerce-sot-unification-stock-drift-v1`
-- **Unified from:** money tip `9fb7a05` + inventory-only cherry-picks through `a06800f`
-- Laptop Commerce work is **stopped**; do not depend on uncommitted laptop files
-- Remote money chain `20260889→90→91` applied; stock history remediation for `92–94` is the next remote GO
-- Do **not** seed commission policies; keep `commerce_confirm_enabled = 0`
+- **Base implementation HEAD:** `91e90e456971f498b7b8f9382dda9b609da7ef3d` (docs commit may be tip)
+- **Unified from:** money tip `9fb7a05` + 20 inventory-only cherry-picks through `a06800f`
+- Desktop is the **sole active Commerce workstation**. Laptop Commerce work is **stopped** (laptop → Learning)
+- Remote project: `umtuba` / `tgucwnjwoyeqoxqaxmew`
+- Remote migrations verified: `20260822/23/24/77/84–95`
+- Active commission: `umtuba_launch_usd_v1` v1 · USD · 1500/8500 · merchandise_net
+- Keep `commerce_confirm_enabled = 0` until Stripe E2E PASS + explicit GO
+- Do **not** seed another commission policy without an explicit commercial GO
+- Canonical checkpoint: `docs/store/operations/COMMERCE_CURRENT_STATE_2026-08-02.md`
 
 ## Source of truth
 
@@ -102,8 +112,8 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 
 | Machine | Role |
 | --- | --- |
-| **Laptop** | Primary development and integration machine |
-| **Desktop** | May perform isolated review / testing tasks only |
+| **Desktop** | Sole active Commerce workstation |
+| **Laptop** | Learning only — Commerce work stopped |
 
 ## Multi-machine rules
 
