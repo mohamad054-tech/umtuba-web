@@ -24,6 +24,7 @@ import {
   type TrustedFullOrderRefundContext,
 } from "./fullOrderRefundPath";
 import { STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC } from "./digitalEntitlementRevoke";
+import { STORE_PURCHASE_STOCK_RESTOCK_RPC } from "./refundStockRestockRuntime";
 import {
   calculateCommissionSplit,
   type CommissionPolicyContract,
@@ -508,14 +509,13 @@ describe("Commission decomposition bridge apply — refund reference", () => {
           error: null,
         };
       }
-            if (name === "decrement_store_purchase_stock_after_capture") {
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
         return {
           data: {
             ok: true,
             replayed: false,
-            lines_decremented: 0,
-            quantity_decremented: 0,
-            reservations_consumed: 0,
+            lines_restocked: 0,
+            quantity_restocked: 0,
           },
           error: null,
         };
@@ -537,6 +537,7 @@ describe("Commission decomposition bridge apply — refund reference", () => {
     expect(result.commissionDecomposition.status).toBe("marked");
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);

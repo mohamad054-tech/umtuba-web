@@ -14,10 +14,23 @@ import {
   STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
 } from "./digitalEntitlementRevoke";
 import { STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC } from "./commissionDecompositionBridgeApply";
+import { STORE_PURCHASE_STOCK_RESTOCK_RPC } from "./refundStockRestockRuntime";
 import {
   applyFullOrderRefund,
   type TrustedFullOrderRefundContext,
 } from "./fullOrderRefundPath";
+
+function mockStockRestockSuccess() {
+  return {
+    data: {
+      ok: true,
+      replayed: false,
+      lines_restocked: 0,
+      quantity_restocked: 0,
+    },
+    error: null,
+  };
+}
 
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
@@ -203,17 +216,8 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
-            if (name === "decrement_store_purchase_stock_after_capture") {
-        return {
-          data: {
-            ok: true,
-            replayed: false,
-            lines_decremented: 0,
-            quantity_decremented: 0,
-            reservations_consumed: 0,
-          },
-          error: null,
-        };
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
+        return mockStockRestockSuccess();
       }
       return { data: null, error: { message: `unexpected ${name}` } };
     });
@@ -237,6 +241,7 @@ describe("Digital entitlement revoke — refund path wiring", () => {
     expect(result.entitlementRevoke.entitlementsRevoked).toBe(1);
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
@@ -271,14 +276,13 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
-            if (name === "decrement_store_purchase_stock_after_capture") {
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
         return {
           data: {
             ok: true,
-            replayed: false,
-            lines_decremented: 0,
-            quantity_decremented: 0,
-            reservations_consumed: 0,
+            replayed: true,
+            lines_restocked: 0,
+            quantity_restocked: 0,
           },
           error: null,
         };
@@ -311,6 +315,7 @@ describe("Digital entitlement revoke — refund path wiring", () => {
     expect(replay.entitlementRevoke.replayed).toBe(true);
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
@@ -324,6 +329,9 @@ describe("Digital entitlement revoke — refund path wiring", () => {
           error: null,
         };
       }
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
+        return mockStockRestockSuccess();
+      }
       if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
         return {
           data: null,
@@ -331,18 +339,6 @@ describe("Digital entitlement revoke — refund path wiring", () => {
             message:
               "digital entitlement revoke failed closed: 1 active entitlement(s) remain",
           },
-        };
-      }
-            if (name === "decrement_store_purchase_stock_after_capture") {
-        return {
-          data: {
-            ok: true,
-            replayed: false,
-            lines_decremented: 0,
-            quantity_decremented: 0,
-            reservations_consumed: 0,
-          },
-          error: null,
         };
       }
       return { data: null, error: { message: `unexpected ${name}` } };
