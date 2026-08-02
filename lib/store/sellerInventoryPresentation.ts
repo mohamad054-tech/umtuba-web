@@ -314,6 +314,7 @@ export const SELLER_INVENTORY_FILTERS: Array<{
 /**
  * Product editor stock field contract alignment.
  * Direct on-hand edits are draft/in-review catalog seed mutations — not a movement ledger.
+ * Adjustment intents (reason + delta) are a separate contract foundation and are not applied here.
  */
 export function productEditorInventoryAlignmentCopy(): {
   eyebrow: string;
@@ -322,7 +323,7 @@ export function productEditorInventoryAlignmentCopy(): {
 } {
   return {
     eyebrow: "Catalog seed · not inventory ledger",
-    body: "On-hand and safety stock edits here run through the trusted draft/in-review catalog upsert. They are not warehouse movements. Canonical visibility and reservation pressure live in Inventory.",
+    body: "On-hand and safety stock edits here run through the trusted draft/in-review catalog upsert. They are not warehouse movements or adjustment ledger entries. Adjustment intents remain contract-only until an apply runtime exists. Canonical visibility and reservation pressure live in Inventory.",
     reservedNote:
       "Reserved quantity is system-managed by checkout holds and cannot be set by sellers.",
   };
