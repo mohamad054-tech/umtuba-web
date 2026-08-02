@@ -5,6 +5,7 @@ import {
   LEARNING_COLLABORATION_WORKSPACE_ROUTES,
   loadCollaborationWorkspaceSpine,
 } from "../../../../../lib/learning/collaborationWorkspaceSpine";
+import { loadCollaborationWorkspaceAttachments } from "../../../../../lib/learning/collaborationWorkspaceAttachments";
 
 export const dynamic = "force-dynamic";
 
@@ -31,13 +32,25 @@ export default async function LearningCourseWorkspacePage({
   }
 
   const supabase = await createClient();
-  const loaded = await loadCollaborationWorkspaceSpine(supabase, {
+  const spine = await loadCollaborationWorkspaceSpine(supabase, {
     courseId,
     learnerUserId: user.id,
   });
-  if (!loaded.ok) {
+  if (!spine.ok) {
     notFound();
   }
 
-  return <CollaborationWorkspaceShell view={loaded.data} />;
+  const attachments = await loadCollaborationWorkspaceAttachments(supabase, {
+    courseId,
+  });
+  if (!attachments.ok) {
+    notFound();
+  }
+
+  return (
+    <CollaborationWorkspaceShell
+      view={spine.data}
+      attachments={attachments.data.cards}
+    />
+  );
 }

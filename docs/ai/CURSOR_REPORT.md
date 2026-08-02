@@ -2,26 +2,15 @@
 
 ## Summary
 
-**PASS (local)** — Collaboration Platform Workspace Spine Foundation V1 on `office/learning-collaboration-workspace-spine-foundation-v1`.
+**PASS (local)** — Collaboration Workspace Attachments Foundation V1.
 
-- Base: `c3168eff3a324979efa5cab694e294c4daeeb4da` (`origin/office/learning-ai-tutor-learner-ui-integration-v1`)
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-spine-foundation-v1`
-- Derive-first workspace identity; course entitlement access; Spaces membership contextual only
-- Route + shell + four attachment slots (empty/unavailable)
-- **No migration** (identity does not require persistence)
-- No Commerce / realtime / shared-files / AI-memory scope expansion
+- Base: `70e00e3` (`origin/office/learning-collaboration-workspace-spine-foundation-v1`)
+- Worktree: `…\umtuba-web-learning-collaboration-workspace-attachments-foundation-v1`
+- Wired Community / Assignments·Projects / AI Tutor / Live summaries into workspace shell
+- Reused existing Learning RPCs/selectors; no migration; no Commerce; no realtime; no shared AI memory
+- Verification: attachments+spine+related Learning tests 76 PASS; `tsc --noEmit` PASS; `git diff --check` PASS; secret scan clean
 - No commit / no push
-
-## Delivered files
-
-- `lib/learning/collaborationWorkspaceSpine.ts`
-- `lib/learning/collaborationWorkspaceSpine.test.ts`
-- `app/learning/courses/[courseId]/workspace/page.tsx`
-- `app/components/learning/CollaborationWorkspaceShell.tsx`
-- `app/components/learning/CollaborationWorkspaceNav.tsx`
-- `docs/learning/implementation/COLLABORATION_WORKSPACE_SPINE_FOUNDATION_V1.md`
-- Handoffs: `CURRENT_TASK.md`, `SESSION_HANDOFF.md`, `CURSOR_REPORT.md`
 
 ## Next
 
-Human review → explicit commit/push GO. Later milestones may wire attachment payloads behind the same slot ids.
+Human review → explicit commit/push GO.
