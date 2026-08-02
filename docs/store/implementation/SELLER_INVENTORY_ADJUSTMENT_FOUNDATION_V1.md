@@ -34,6 +34,11 @@ Validation projects before/after on-hand / reserved / available using Quantity F
 - Owns: reason parse, delta validation, projection helpers, presentation labels, client-execution reject
 - Does **not** own: apply runtime, movement ledger writes, reservation runtime, checkout/refund stock engines
 
+## Related
+
+Movement type contracts (projection/read helpers, no append runtime) continue in
+`SELLER_INVENTORY_MOVEMENT_LEDGER_FOUNDATION_V1.md`.
+
 ## Out of scope
 
 Decrement after purchase, reservation runtime, warehouses, supplier sync, checkout, shipping, pricing, entitlement, AI/Learning/Navigation/Home.
