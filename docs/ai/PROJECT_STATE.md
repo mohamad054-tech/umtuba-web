@@ -67,9 +67,10 @@ Frozen baselines (extend, do not replace):
 | Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
 | Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
 | Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
-| Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1-current`) — migration `20260889` not remote-applied |
-| Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1-current`) — migration `20260890` not remote-applied |
-| Commerce Commission Policy Activation V1 | **COMPLETE** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
+| Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** — migration `20260889` remote-applied |
+| Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** — migration `20260890` remote-applied |
+| Commerce Commission Policy Activation V1 | **COMPLETE** — migration `20260891` remote-applied |
+| Commerce SoT Unification + Stock Drift V1 | **COMPLETE (git)** — branch `office/commerce-sot-unification-stock-drift-v1`; remote stock history remediation pending |
 | Commerce Chain Verification & Migration Apply Readiness V1 | **COMPLETE** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` @ `c473630` |
 | Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — **`NOT_READY_FOR_REMOTE_APPLY`** |
 | Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — `20260823` SAFE; 24/84 apply readiness planned |
@@ -81,6 +82,14 @@ Default: Consolidation complete. Program is in **implementation**. Storefront th
 
 Routine in-scope create/update/run/mirror/report work may proceed without per-step approval **only inside the explicitly active phase**.
 Paused phases must not auto-resume. Still ask before: destructive data loss, destructive prod DB, push/force-push, merge/delete branches, system-wide installs, credentials/payments, irreversible out-of-scope actions.
+
+## Commerce source of truth (desktop-only)
+
+- **Active Commerce branch:** `office/commerce-sot-unification-stock-drift-v1`
+- **Unified from:** money tip `9fb7a05` + inventory-only cherry-picks through `a06800f`
+- Laptop Commerce work is **stopped**; do not depend on uncommitted laptop files
+- Remote money chain `20260889→90→91` applied; stock history remediation for `92–94` is the next remote GO
+- Do **not** seed commission policies; keep `commerce_confirm_enabled = 0`
 
 ## Source of truth
 

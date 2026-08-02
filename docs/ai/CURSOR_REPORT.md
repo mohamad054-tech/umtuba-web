@@ -2,14 +2,16 @@
 
 ## Summary
 
-**PASS** for read-only history drift verification on `office/commerce-migration-history-drift-verification-v1` (base `ac49585`).
+**PASS** for Commerce Source-of-Truth Unification V1 on `office/commerce-sot-unification-stock-drift-v1`.
 
-`20260822`: remote UEOS matches local foundation; **not** payout-era `20260881` (`in_transit` absent) → **`SAFE_TO_REGISTER_HISTORY`**.  
-`20260823`: reconfirmed **`SAFE_TO_REGISTER_HISTORY`**.  
-Proposed contiguous repair: `20260822 → 20260823` (commands documented, **not executed**). No commit/push/mutation.
+- Base: `9fb7a05`
+- Integrated inventory-only commits `d2b961f` → `a06800f` (20 cherry-picks)
+- Conflicts: `docs/ai/*` only — resolved by keeping money-tip versions during picks; handoffs rewritten to unified SoT
+- Migrations `20260892–95` present once; money migrations `23/24/84/89/90/91` byte-identical to `9fb7a05`
+- No superseded money history; no `fded934` commission seed
+- Stock hooks wired into money-tip capture/refund orchestration
+- No push; no remote mutation
 
-## Files (local, uncommitted per GO)
+## Next
 
-- `docs/store/implementation/COMMERCE_MIGRATION_HISTORY_DRIFT_VERIFICATION_V1.md`
-- `scripts/remote-preflight/history-drift/`
-- `docs/ai/CURRENT_TASK.md`, `CURSOR_REPORT.md`, `PROJECT_STATE.md`
+Remote stock history remediation: register `20260893`/`20260894`; composed-apply `20260892`; never reapply `20260895`.

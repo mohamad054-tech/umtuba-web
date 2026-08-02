@@ -1,17 +1,20 @@
 # Current Task
 
-## Task title
+## Milestone
 
-Commerce Migration History Repair Apply V1
+Commerce Source-of-Truth Unification + Stock History Drift Remediation V1 — **Git unification executed**.
 
-## Status
+## Active branch
 
-`pass` — repaired remote history `20260822` then `20260823` on `tgucwnjwoyeqoxqaxmew`. No migration SQL. No commit. No push.
+`office/commerce-sot-unification-stock-drift-v1`
 
-## Branch
+## Done
 
-`office/commerce-migration-history-repair-apply-v1` @ `904c8bb`
+- Cherry-picked 20 inventory-only commits onto `9fb7a05`
+- Preserved money-path migrations and logic
+- Integrated stock decrement/restock/cancellation runtimes
+- No default commission seed
 
 ## Next
 
-Separate GOs: apply `20260824` → apply `20260884` → re-run remote preflight → only then consider `89→90→91`.
+Remote stock history remediation GO (register 93/94; apply 92; never reapply 95). No push until approved.
