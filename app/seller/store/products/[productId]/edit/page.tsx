@@ -24,6 +24,7 @@ import { productEditorInventoryAlignmentCopy } from "../../../../../../lib/store
 import { getOwnedOrMemberStore, getSellerProductBundle } from "../../../../../../lib/store/sellerStore";
 import { PRODUCT_TYPES } from "../../../../../../lib/store/types";
 import { formatMinorUnits } from "../../../../../../lib/store/money";
+import { SELLER_CATALOG_SHORT_DESCRIPTION_MAX } from "../../../../../../lib/store/sellerCatalogCategoryShortDescription";
 import {
   archiveProductAction,
   submitProductReviewAction,
@@ -270,6 +271,7 @@ export default async function EditSellerProductPage({
             <input
               name="shortDescription"
               defaultValue={bundle.product.short_description ?? ""}
+              maxLength={SELLER_CATALOG_SHORT_DESCRIPTION_MAX}
               disabled={!canEditFields}
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
             />

@@ -48,6 +48,7 @@ import {
   type SellerCatalogBulkFieldSelectionItem,
   type SellerCatalogBulkFieldSummary,
 } from "../../../lib/store/sellerCatalogBulkFieldEditing";
+import { buildSellerCatalogCategoryShortDescriptionDisplay } from "../../../lib/store/sellerCatalogCategoryShortDescription";
 import StoreEmptyState from "./StoreEmptyState";
 
 type PaginationLabels = {
@@ -902,7 +903,13 @@ export default function SellerProductDashboard({
         </p>
       ) : (
         <ul className="space-y-3">
-          {products.map((product) => (
+          {products.map((product) => {
+            const meta = buildSellerCatalogCategoryShortDescriptionDisplay({
+              primaryCategoryId: product.primaryCategoryId,
+              shortDescription: product.shortDescription,
+              categories,
+            });
+            return (
             <li key={product.id}>
               <div className="group flex gap-3 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)] md:p-5">
                 {canManage ? (
@@ -934,6 +941,11 @@ export default function SellerProductDashboard({
                         /{product.slug}
                         {product.skus[0] ? ` · ${product.skus[0]}` : ""}
                       </p>
+                      {meta.shortDescriptionPreview ? (
+                        <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+                          {meta.shortDescriptionPreview}
+                        </p>
+                      ) : null}
                     </div>
                     <Link
                       href={`/seller/store/products/${product.id}/edit`}
@@ -949,11 +961,21 @@ export default function SellerProductDashboard({
                     <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-faint)]">
                       {sellerModerationLabel(product.moderationStatus)}
                     </span>
+                    {meta.categoryLabel ? (
+                      <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-muted)]">
+                        {meta.categoryLabel}
+                      </span>
+                    ) : (
+                      <span className="rounded-full border border-dashed border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-faint)]">
+                        No category
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 

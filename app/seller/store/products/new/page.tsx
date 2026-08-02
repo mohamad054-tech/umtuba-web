@@ -6,6 +6,7 @@ import { createClient, getServerUser } from "../../../../../lib/supabase/server"
 import { listActiveCategories } from "../../../../../lib/store/catalogQueries";
 import { getOwnedOrMemberStore } from "../../../../../lib/store/sellerStore";
 import { PRODUCT_TYPES } from "../../../../../lib/store/types";
+import { SELLER_CATALOG_SHORT_DESCRIPTION_MAX } from "../../../../../lib/store/sellerCatalogCategoryShortDescription";
 import { createDraftProductAction } from "../../../../actions/storeCatalog";
 import { canManageCatalog } from "../../../../../lib/store/permissions";
 
@@ -106,7 +107,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
             </span>
             <input
               name="shortDescription"
-              maxLength={280}
+              maxLength={SELLER_CATALOG_SHORT_DESCRIPTION_MAX}
               className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
             />
           </label>

@@ -11,6 +11,7 @@ import {
   type SellerCatalogBulkSelectionItem,
 } from "./sellerCatalogBulkOperations";
 import { assertPrimaryCategoryEligibleForReview } from "./categoryTaxonomySeed";
+import { requireSellerCatalogShortDescription } from "./sellerCatalogCategoryShortDescription";
 
 export const SELLER_CATALOG_BULK_FIELD_EDITING_ID =
   "commerce.seller.catalog_bulk_field_editing_v1" as const;
@@ -204,20 +205,7 @@ export function deriveSellerCatalogBulkFieldToolbar(input: {
 export function normalizeBulkShortDescription(
   value: unknown
 ): { ok: true; value: string } | { ok: false; message: string } {
-  if (typeof value !== "string") {
-    return { ok: false, message: "Short description must be a string." };
-  }
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return { ok: false, message: "Short description cannot be empty." };
-  }
-  if (trimmed.length > 280) {
-    return {
-      ok: false,
-      message: "Short description must be at most 280 characters.",
-    };
-  }
-  return { ok: true, value: trimmed };
+  return requireSellerCatalogShortDescription(value);
 }
 
 export function normalizeBulkCategoryId(
