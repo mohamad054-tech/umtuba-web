@@ -1,12 +1,38 @@
 # UMTUBA Project State (AI Handoff)
 
+## CURRENT LAPTOP SOURCE OF TRUTH (2026-08-03)
+
+| Item | Value |
+| --- | --- |
+| Branch | `office/collaboration-workspace-ui-foundation-v1` |
+| Remote | `origin/office/collaboration-workspace-ui-foundation-v1` |
+| Commit | `cfd8a2889edab7a1767fba8716cce975ffe75def` |
+| Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-ui-foundation-v1` |
+
+### Closed on laptop
+
+- Learning AI Tutor Learner UI Integration V1 — `c3168ef`
+- Collaboration Workspace Spine Foundation V1 — `321e7e8` (remote `20260896`)
+- Collaboration Workspace Membership Runtime V1 — `c3bf87e` (remote `20260897`)
+- Collaboration Workspace UI Foundation V1 — `cfd8a28` (flag default=false)
+
+### Next on laptop
+
+**Collaboration Workspace Settings & Lifecycle UI V1** (no Learning/Commerce/UEOS/Billing binding)
+
+### Commerce on laptop
+
+**Owned by desktop — do not touch.**
+
+See also: `docs/ai/CURRENT_TASK.md`, `docs/ai/SESSION_HANDOFF.md`, `docs/ai/CURSOR_REPORT.md`.
+
 ## Project
 
 **UMTUBA** (`umtuba-web`)
 
 ## Primary working branch
 
-`alpha-0.2`
+`office/collaboration-workspace-ui-foundation-v1` (laptop SoT; historical note: `alpha-0.2` remains a long-lived integration branch)
 
 ## Learning chapter status
 

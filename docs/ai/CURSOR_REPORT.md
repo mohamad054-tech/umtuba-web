@@ -1,64 +1,42 @@
-﻿# CURSOR_REPORT — Thread Lifecycle Foundation V1
+﻿# CURSOR_REPORT — Laptop Final Save & Collaboration Handoff
 
 ## Summary
 
-**PASS + STAGED** — Implemented `learning.tutor.thread_lifecycle_foundation_v1` after SSOT approval.
+Laptop Collaboration Platform line closed through UI Foundation V1. Source of Truth for next Cursor session is the collaboration UI worktree/branch tip below. Commerce remains desktop-owned.
 
-Official next Tutor milestone after Structured Oversize Serialization V1 (`7d03178`). Get-or-create active thread per learner+course+lesson; `active` | `archived`; race-safe unique index; fail-closed auth/entitlement; compatible with Persistence Bridge, Lesson Binding, Resume/History, Oversize Serialization.
+## CURRENT LAPTOP SOURCE OF TRUTH
 
-## Exact files changed
+- Branch: `office/collaboration-workspace-ui-foundation-v1`
+- Remote: `origin/office/collaboration-workspace-ui-foundation-v1`
+- Commit: `cfd8a2889edab7a1767fba8716cce975ffe75def`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-ui-foundation-v1`
 
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/workstreams/AI_PLATFORM.md`
-- `lib/learning/aiTutorFoundation.ts`
-- `lib/learning/aiTutorFoundation.test.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadLifecycleFoundation.test.ts` (new)
-- `supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` (new)
+## CLOSED MILESTONES
 
-## Migrations created
+| Milestone | Commit | Notes |
+| --- | --- | --- |
+| Learning AI Tutor Learner UI Integration V1 | `c3168eff3a324979efa5cab694e294c4daeeb4da` | Closed |
+| Collaboration Workspace Spine Foundation V1 | `321e7e8de95d81efecfa423b7c515d36afa84a75` | Remote migration `20260896` |
+| Collaboration Workspace Membership Runtime V1 | `c3bf87e7f6ec2cbcb0b8e1812c0cac58b20594af` | Remote migration `20260897` |
+| Collaboration Workspace UI Foundation V1 | `cfd8a2889edab7a1767fba8716cce975ffe75def` | Flag default=false; routes/actions/menu gated |
 
-- `20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` — **local only**; not remote-applied
+## COLLABORATION FLAG
 
-## Security review
+default=false — enable only via `COLLABORATION_PLATFORM_ENABLED=1|true`
 
-- Ensure/archive/create/get/resume remain security definer + fixed `search_path`
-- Ownership via `auth.uid()`; entitlement via `has_learning_course_access`
-- Lesson must belong to course; never reuses other learners / other lessons / other courses
-- One active thread uniqueness; concurrent insert → `unique_violation` re-select
-- Revoke public/anon on ensure + archive; lean JSON (no `user_id` leak in projections)
-- Fail-closed client sanitization preserved
+## COMMERCE
 
-## Tests
+owned by desktop — do not touch on laptop
 
-- `threadLifecycleFoundation.test.ts` — PASS  
-- `aiTutorFoundation.test.ts` — PASS  
-- `threadResumeHistory.test.ts` — PASS  
-- `threadPersistenceBridge.test.ts` — PASS  
-- `learningTutorIntegration.test.ts` — PASS  
-- `learningTutor.test.ts` — PASS  
-- Totals: **134 passed** / 0 failed (6 files)
+## NEXT TASK
 
-## TypeScript
+Collaboration Workspace Settings & Lifecycle UI V1  
+(settings + leave/suspend/remove/transfer/archive; last-owner protection; no Learning/Commerce/UEOS/Billing)
 
-`npx tsc --noEmit` — PASS
+## Shutdown blocker (non-commerce)
 
-## Build
+Staged unique work remains in:
 
-Not required for this Tutor backend milestone (no UI/entry change).
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-perf-home-javascript-optimization-v1`
 
-## git diff --check
-
-PASS (no whitespace errors)
-
-## git status --short
-
-All in-scope files **staged**; working tree clean of untracked junk. PASS + STAGED only.
-
-## Open issues
-
-- Remote apply of `20260876` awaits explicit GO
-- Summarization remains deferred
-- No commit / no push from this agent turn
+Files staged (not committed): DiscoverExperience, DiscoverActionRail, DiscoverCreatorInfo, StoryRail, homeJavascriptOptimization.v1.test.ts, storiesFoundation.test.ts, plus docs/ai handoff files on that branch. Human decision required before considering laptop fully clean.

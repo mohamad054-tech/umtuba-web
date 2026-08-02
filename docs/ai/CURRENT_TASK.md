@@ -1,54 +1,56 @@
 ﻿# Current Task
 
-## Task title
+## CURRENT LAPTOP SOURCE OF TRUTH
 
-UM Learning AI Tutor — Thread Lifecycle Foundation V1
+- **Remote tip:** `origin/office/collaboration-workspace-ui-foundation-v1` @ `cfd8a2889edab7a1767fba8716cce975ffe75def`
+- **CURRENT WORKTREE:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-ui-foundation-v1`
+- **CURRENT BRANCH:** `office/collaboration-workspace-ui-foundation-v1`
+
+## CLOSED MILESTONES (laptop)
+
+| Milestone | Commit |
+| --- | --- |
+| Learning AI Tutor Learner UI Integration V1 | `c3168eff3a324979efa5cab694e294c4daeeb4da` |
+| Collaboration Workspace Spine Foundation V1 | `321e7e8de95d81efecfa423b7c515d36afa84a75` |
+| Collaboration Workspace Membership & Invitation Runtime V1 | `c3bf87e7f6ec2cbcb0b8e1812c0cac58b20594af` |
+| Collaboration Workspace UI Foundation V1 | `cfd8a2889edab7a1767fba8716cce975ffe75def` |
+
+## REMOTE MIGRATIONS APPLIED
+
+- `20260896` — collaboration workspace spine foundation v1
+- `20260897` — collaboration workspace membership runtime v1
+
+## COLLABORATION FLAG
+
+- Default **`false`** (`COLLABORATION_PLATFORM_ENABLED` env; compile-time constant false)
+- When disabled: User menu Workspaces hidden; `/workspaces/**` → `notFound()`; collaboration server actions fail-closed
+
+## COMMERCE
+
+- Owned by **desktop**
+- Do **not** touch on laptop (no edit / commit / push / cleanup of Commerce worktrees)
+
+## NEXT TASK
+
+**Collaboration Workspace Settings & Lifecycle UI V1**
+
+### Scope
+
+- Workspace basic settings
+- Rename / description / allowed kind updates
+- Leave workspace
+- Suspend / remove member
+- Transfer ownership
+- Archive workspace
+- Last-owner protection
+
+### Out of scope
+
+- Learning binding
+- Commerce
+- UEOS
+- Billing
 
 ## Status
 
-`pass-staged` — implementation complete; **STAGED only** (no commit / no push / no remote migration apply)
-
-## Milestone id
-
-`learning.tutor.thread_lifecycle_foundation_v1`
-
-## Branch
-
-`office/learning-ai-tutor-thread-lifecycle-foundation-v1`
-
-## Base
-
-`office/learning-ai-tutor-structured-oversize-serialization-v1` @ `7d03178e4b10d09c514386804405154c785c1031`
-
-## Worktree
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-next-milestone-proposal-v1`
-
-## Allowed scope
-
-- Lifecycle contract: `active` | `archived`
-- Get-or-create / reuse single active thread per `(auth.uid, course_id, lesson_id)`
-- Archive → replacement active on next ensure
-- Migration `20260876` (local only)
-- Foundation + bridge APIs + focused tests
-- SSOT docs for this milestone
-
-## Forbidden scope
-
-- Conversation History Summarization (still deferred)
-- Provider / Gemini / alpha / Web UI redesign
-- Reopening closed Tutor tips (Binding / Resume / Oversize)
-- Commit, push, remote migration apply
-
-## Done
-
-- SSOT approved Lifecycle as the official next milestone after Oversize Serialization
-- Migration + ensure/archive RPCs + unique active index
-- Foundation/bridge wiring; create-with-lesson uses ensure
-- Focused + regression tests
-
-## Next (human)
-
-1. Review staged diff; commit trailer-free outside Cursor if approved
-2. Remote-apply `20260876` only with explicit apply GO
-3. Summarization remains deferred until SSOT undefer + GO
+Laptop handoff save point — resume from Source of Truth above.
