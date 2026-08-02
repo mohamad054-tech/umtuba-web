@@ -32,6 +32,11 @@ Concurrent callers serialize via advisory lock; webhook retries replay without d
 
 `20260893_store_purchase_stock_decrement_runtime_v1.sql` — required for atomic on_hand mutation + persisted idempotency. Local file only; not remote-applied by this task.
 
+## Related
+
+Refund restock contracts (trusted Sync `refunded`, `return_increment`, no Runtime) continue in
+`REFUND_STOCK_RESTOCK_FOUNDATION_V1.md`.
+
 ## Out of scope
 
 Refund restock, cancel restock, warehouses, supplier sync, preorder/backorder orchestration, shipping, pricing, AI/Learning/Navigation/Home.
