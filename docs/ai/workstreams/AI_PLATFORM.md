@@ -155,7 +155,7 @@ Implements documented follow-up **Trusted-producer transcript integrity** after 
 
 | Piece | Detail |
 | --- | --- |
-| Migration (local only) | `20260875_learning_ai_tutor_thread_resume_history_read_v1.sql` |
+| Migration (local only) | `20260896_learning_ai_tutor_thread_resume_history_read_v1.sql` |
 | RPC | `resume_my_learning_ai_tutor_thread(p_thread_id, p_course_id, p_lesson_id, p_limit)` |
 | Dropped | Unbounded `get_my_learning_ai_tutor_thread_messages(uuid)` |
 | Foundation | `resumeMyAiTutorThread` (+ bounded limits) |
@@ -184,7 +184,7 @@ Official next Tutor milestone after Structured Oversize Serialization V1.
 
 | Piece | Detail |
 | --- | --- |
-| Migration (local only) | `20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` |
+| Migration (local only) | `20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` |
 | States | `active` \| `archived` |
 | Ensure RPC | `ensure_my_learning_ai_tutor_active_thread(course, lesson, title)` — get-or-create |
 | Archive RPC | `archive_my_learning_ai_tutor_thread(thread_id)` — owner + entitlement; idempotent |
@@ -206,8 +206,8 @@ Official next Tutor milestone after Structured Oversize Serialization V1.
 - Tutor exchange RPC: `20260872` — **applied** on linked remote
 - Tutor lean thread metadata: `20260873` — local only, **not** remote-applied
 - Tutor lesson binding: `20260874` — closed in Git; remote apply only with GO
-- Tutor resume/history: `20260875` — closed in Git; remote apply only with GO
-- Tutor thread lifecycle: `20260876` — **local only**; remote apply only with GO
+- Tutor resume/history: `20260896` — closed in Git (renumbered from colliding `20260875`); remote apply only with GO
+- Tutor thread lifecycle: `20260897` — **local only** (renumbered from colliding `20260876`); remote apply only with GO
 
 ## Next (after commit approval)
 

@@ -25,9 +25,9 @@ const OVERSIZE_BRIDGE =
 const BINDING_MIGRATION =
   "supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql";
 const RESUME_MIGRATION =
-  "supabase/migrations/20260875_learning_ai_tutor_thread_resume_history_read_v1.sql";
+  "supabase/migrations/20260896_learning_ai_tutor_thread_resume_history_read_v1.sql";
 const LIFECYCLE_MIGRATION =
-  "supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql";
+  "supabase/migrations/20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql";
 
 const COURSE = "22222222-2222-4222-8222-222222222222";
 const COURSE_B = "22222222-2222-4222-8222-222222222223";
@@ -90,7 +90,7 @@ describe("Thread Lifecycle Foundation — migration SQL", () => {
     expect(existsSync(join(ROOT, RESUME_MIGRATION))).toBe(true);
     expect(existsSync(join(ROOT, LIFECYCLE_MIGRATION))).toBe(true);
     expect(readdirSync(join(ROOT, "supabase/migrations"))).toContain(
-      "20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql"
+      "20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql"
     );
   });
 

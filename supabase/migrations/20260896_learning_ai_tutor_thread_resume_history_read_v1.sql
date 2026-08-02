@@ -1,6 +1,6 @@
 -- =============================================================================
 -- UMTUBA Learning AI Tutor — Thread Resume / History Read Foundation V1
--- Migration: 20260875_learning_ai_tutor_thread_resume_history_read_v1.sql
+-- Migration: 20260896_learning_ai_tutor_thread_resume_history_read_v1.sql
 --
 -- Trusted-producer transcript integrity: resume a lesson-bound tutor thread with
 -- bounded message history. Requires p_course_id + p_lesson_id and enforces

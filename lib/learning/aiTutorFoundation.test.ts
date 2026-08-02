@@ -84,7 +84,7 @@ describe("AI Tutor Foundation — SQL", () => {
       LEARNING_AI_TUTOR_RPCS.createThread,
       LEARNING_AI_TUTOR_RPCS.appendMessage,
       LEARNING_AI_TUTOR_RPCS.listThreads,
-      // Historical unbounded read in 20260863; superseded by resumeThread (20260875).
+      // Historical unbounded read in 20260863; superseded by resumeThread (20260896).
       "get_my_learning_ai_tutor_thread_messages",
     ]) {
       expect(sql).toMatch(
