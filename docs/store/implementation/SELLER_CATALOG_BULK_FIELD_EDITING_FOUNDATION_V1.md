@@ -105,6 +105,11 @@ On `/seller/store/products` toolbar:
 
 Regressions: existing bulk operations + pagination/search/data-access/wiring/experience suites.
 
+## Related
+
+List display and shared short-description validation continue in
+`SELLER_CATALOG_CATEGORY_SHORT_DESCRIPTION_FOUNDATION_V1.md`.
+
 ## Out of scope (deferred)
 
 Bulk inventory/price/shipping/commission, publish/unpublish/restore, tags schema, migrations/RPCs, CSV, scheduled jobs, undo, media bulk upload.

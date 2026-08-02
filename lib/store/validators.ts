@@ -1,5 +1,6 @@
 import { PRODUCT_TYPES, type ProductType } from "./types";
 import { validateAmountMinor } from "./money";
+import { normalizeSellerCatalogShortDescription } from "./sellerCatalogCategoryShortDescription";
 
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{1,62}[a-z0-9]$/;
 const SKU_RE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
@@ -112,10 +113,11 @@ export function validateProductDraftInput(input: {
     return { ok: false, message: "Product type is invalid." };
   }
 
-  const shortDescription =
-    typeof input.shortDescription === "string" && input.shortDescription.trim()
-      ? input.shortDescription.trim().slice(0, 280)
-      : null;
+  const shortParsed = normalizeSellerCatalogShortDescription(
+    input.shortDescription
+  );
+  if (!shortParsed.ok) return shortParsed;
+  const shortDescription = shortParsed.value;
   const description =
     typeof input.description === "string" && input.description.trim()
       ? input.description.trim().slice(0, 10000)
