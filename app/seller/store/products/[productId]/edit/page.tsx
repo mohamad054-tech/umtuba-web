@@ -31,6 +31,10 @@ import {
   sellerCatalogAvailabilityLabel,
 } from "../../../../../../lib/store/sellerCatalogAvailability";
 import {
+  formatSellerInventoryQuantityDetail,
+  resolveSellerInventoryQuantitySnapshot,
+} from "../../../../../../lib/store/sellerInventoryQuantityFoundation";
+import {
   archiveProductAction,
   submitProductReviewAction,
   updateDraftProductAction,
@@ -465,6 +469,21 @@ export default async function EditSellerProductPage({
 
         <ul className="mt-4 space-y-3">
           {bundle.variants.map((variant) => {
+            const quantitySnap = resolveSellerInventoryQuantitySnapshot({
+              productType: bundle.product.product_type,
+              onHand: variant.inventory
+                ? Number(variant.inventory.on_hand)
+                : null,
+              reserved: variant.inventory
+                ? Number(variant.inventory.reserved)
+                : null,
+              safetyStock: variant.inventory
+                ? Number(variant.inventory.safety_stock)
+                : null,
+              missingInventory: !variant.inventory,
+            });
+            const quantityDetail =
+              formatSellerInventoryQuantityDetail(quantitySnap);
             const availabilityStatus = deriveSellerCatalogAvailabilityDisplay({
               productType: bundle.product.product_type,
               inventory: variant.inventory
@@ -499,7 +518,13 @@ export default async function EditSellerProductPage({
                     {sellerCatalogAvailabilityLabel(availabilityStatus)}
                   </p>
                   <p className="mt-1 text-xs text-[var(--sf-muted)]">
-                    Reserved (system): {variant.inventory?.reserved ?? "—"} ·{" "}
+                    {quantityDetail.summary}
+                    {quantitySnap.tracking === "finite"
+                      ? ` · Safety ${quantityDetail.safetyStockLabel}`
+                      : ""}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--sf-muted)]">
+                    Reserved (system): {quantityDetail.reservedLabel} ·{" "}
                     <Link
                       href={`${APP_ROUTES.sellerInventory}?variant=${variant.id}`}
                       className="font-semibold text-[var(--sf-accent)]"

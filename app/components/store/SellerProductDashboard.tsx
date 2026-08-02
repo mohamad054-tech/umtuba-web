@@ -50,6 +50,7 @@ import {
 } from "../../../lib/store/sellerCatalogBulkFieldEditing";
 import { buildSellerCatalogCategoryShortDescriptionDisplay } from "../../../lib/store/sellerCatalogCategoryShortDescription";
 import { sellerCatalogAvailabilityLabel } from "../../../lib/store/sellerCatalogAvailability";
+import { formatSellerInventoryQuantitySummary } from "../../../lib/store/sellerInventoryQuantityFoundation";
 import StoreEmptyState from "./StoreEmptyState";
 
 type PaginationLabels = {
@@ -965,6 +966,17 @@ export default function SellerProductDashboard({
                     <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-muted)]">
                       {sellerCatalogAvailabilityLabel(
                         product.availabilityStatus ?? "unknown"
+                      )}
+                    </span>
+                    <span className="rounded-full border border-[var(--sf-line)] px-2.5 py-1 text-[11px] font-semibold text-[var(--sf-faint)]">
+                      {formatSellerInventoryQuantitySummary(
+                        product.quantity ?? {
+                          tracking: "unknown",
+                          onHand: null,
+                          reserved: null,
+                          safetyStock: null,
+                          available: null,
+                        }
                       )}
                     </span>
                     {meta.categoryLabel ? (

@@ -9,6 +9,7 @@ import { canManageCatalog } from "../../../../lib/store/permissions";
 import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import { listSellerInventoryRows } from "../../../../lib/store/sellerInventoryQueries";
 import { indexSellerCatalogAvailabilityByProductId } from "../../../../lib/store/sellerCatalogAvailability";
+import { indexSellerInventoryQuantityByProductId } from "../../../../lib/store/sellerInventoryQuantityFoundation";
 import {
   loadSellerCatalogHealthFacts,
   loadSellerCatalogVariantSearchTokens,
@@ -182,6 +183,9 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
   const availabilityByProductId = inventoryForPage
     ? indexSellerCatalogAvailabilityByProductId(inventoryForPage)
     : new Map();
+  const quantityByProductId = inventoryForPage
+    ? indexSellerInventoryQuantityByProductId(inventoryForPage)
+    : new Map();
 
   const listItems: SellerCatalogListItem[] = products.map((p) => ({
     id: p.id,
@@ -196,6 +200,13 @@ export default async function SellerProductsPage({ searchParams }: PageProps) {
     primaryCategoryId: p.primary_category_id,
     // Missing inventory rows → unknown (fail closed; never default in_stock).
     availabilityStatus: availabilityByProductId.get(p.id) ?? "unknown",
+    quantity: quantityByProductId.get(p.id) ?? {
+      tracking: "unknown" as const,
+      onHand: null,
+      reserved: null,
+      safetyStock: null,
+      available: null,
+    },
   }));
 
   let searchItems = buildSellerCatalogSearchItems({

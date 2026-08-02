@@ -40,6 +40,11 @@ Deferred: `preorder`.
 - Product edit shows derived availability; hides finite seed controls for unlimited types
 - Bulk field `availability` / `stock_quantity` remain deferred/forbidden (derived, not mass-assigned)
 
+## Related
+
+Numeric on-hand / reserved / safety / available read models continue in
+`SELLER_INVENTORY_QUANTITY_FOUNDATION_V1.md`.
+
 ## Migration
 
 **None.** Reuses existing inventory schema and foundation resolver.
