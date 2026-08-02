@@ -173,6 +173,8 @@ describe("sellerInventoryPresentation — reservations and editor alignment", ()
   it("keeps product-editor stock labeled as catalog seed not ledger", () => {
     const copy = productEditorInventoryAlignmentCopy();
     expect(copy.body.toLowerCase()).toContain("not warehouse movements");
+    expect(copy.body.toLowerCase()).toContain("adjustment ledger entries");
+    expect(copy.body.toLowerCase()).toContain("contract-only");
     expect(copy.reservedNote.toLowerCase()).toContain("system-managed");
   });
 });

@@ -36,6 +36,11 @@ Stuck = blocking hold past `expires_at` (read-only heuristic).
 - Presentation attention wired through the foundation
 - Explicit non-ownership of checkout reserve/release/expire/consume runtime
 
+## Related
+
+Adjustment intent contracts (reason + delta projection, no apply runtime) continue in
+`SELLER_INVENTORY_ADJUSTMENT_FOUNDATION_V1.md`.
+
 ## Out of scope
 
 Checkout reservation runtime, expire schedulers, queues, release-after-payment, on-hand decrement after purchase, warehouses, shipping, pricing.
