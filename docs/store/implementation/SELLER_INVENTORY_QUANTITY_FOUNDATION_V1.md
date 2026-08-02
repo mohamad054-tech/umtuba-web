@@ -31,6 +31,11 @@ Digital/unlimited product types expose `tracking: "unlimited"` with null quantit
 - Product edit shows on-hand / reserved / available / safety summary
 - Seed helper `validateSellerInventoryQuantitySeed` forces reserved=0 for seller input
 
+## Related
+
+Hold-ledger / reserved-pressure read contracts continue in
+`SELLER_INVENTORY_RESERVATION_FOUNDATION_V1.md` (Commerce Safety remains runtime SoT).
+
 ## Out of scope
 
 Purchase decrement, reservation runtime, warehouses, checkout enforcement, shipping, pricing, preorder, entitlement, delivery.

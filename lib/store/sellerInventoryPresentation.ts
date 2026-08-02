@@ -5,8 +5,11 @@
  */
 
 import { availableUnits } from "./inventory";
-import { isStuckReservation } from "./commerceSafety";
 import type { SellerInventoryRow, SellerReservationRow } from "./sellerInventoryQueries";
+import {
+  deriveSellerReservationHoldAttention,
+  mapSellerInventoryReservationHold,
+} from "./sellerInventoryReservationFoundation";
 
 export type SellerInventoryFilterBucket =
   | "all"
@@ -285,32 +288,9 @@ export function deriveReservationAttention(row: SellerReservationRow): {
   message: string | null;
   stuck: boolean;
 } {
-  const stuck = isStuckReservation({
-    status: row.status,
-    expiresAtIso: row.expiresAt,
-  });
-  if (stuck) {
-    return {
-      level: "critical",
-      message: "Hold is past expiry and still active — reservation pressure.",
-      stuck: true,
-    };
-  }
-  if (row.status === "active" || row.status === "pending_capture") {
-    return {
-      level: "info",
-      message: "Checkout/order inventory hold is active.",
-      stuck: false,
-    };
-  }
-  if (row.status === "expired") {
-    return {
-      level: "warn",
-      message: "Hold expired and should no longer block sellable stock.",
-      stuck: false,
-    };
-  }
-  return { level: "none", message: null, stuck: false };
+  return deriveSellerReservationHoldAttention(
+    mapSellerInventoryReservationHold(row)
+  );
 }
 
 /** Privacy-safe order reference for seller inventory context. */
