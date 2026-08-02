@@ -72,7 +72,8 @@ Frozen baselines (extend, do not replace):
 | Commerce Commission Policy Activation V1 | **COMPLETE** (branch `office/commerce-commission-policy-activation-v1-current`) — migration `20260891` not remote-applied |
 | Commerce Chain Verification & Migration Apply Readiness V1 | **COMPLETE** (branch `office/commerce-chain-migration-apply-readiness-v1-current`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO` @ `c473630` |
 | Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — **`NOT_READY_FOR_REMOTE_APPLY`** |
-| Commerce Remote Migration Blocker Remediation Planning V1 | **IMPLEMENTED locally** (branch `office/commerce-remote-migration-blocker-remediation-v1`) — `20260823` **`SAFE_TO_REGISTER_HISTORY`**; `20260824`/`20260884` apply readiness planned; no mutations |
+| Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — `20260823` SAFE; 24/84 apply readiness planned |
+| Commerce Migration History Drift Verification V1 | **IMPLEMENTED locally** (branch `office/commerce-migration-history-drift-verification-v1`) — `20260822`+`20260823` **`SAFE_TO_REGISTER_HISTORY`**; repair order `22→23` proposed not executed; no mutations |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
