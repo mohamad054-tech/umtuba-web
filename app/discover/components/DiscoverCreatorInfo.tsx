@@ -1,10 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
+import dynamic from "next/dynamic";
 import FollowButton from "../../components/social/FollowButton";
 import { APP_ROUTES, buildCreatorProfileHref, isUuid } from "../../lib/nav";
 import type { DiscoverCreator, DiscoverLocation } from "../types";
+
+const StartDirectMessageButton = dynamic(
+  () => import("../../components/messaging/StartDirectMessageButton"),
+  { ssr: false }
+);
 
 type DiscoverCreatorInfoProps = {
   creator: DiscoverCreator;

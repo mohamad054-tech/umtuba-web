@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode, useEffectEvent } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import {
   recordShareAction,
@@ -8,8 +9,11 @@ import {
   toggleSaveAction,
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
-import ShareMenu from "../../components/social/ShareMenu";
 import { APP_ROUTES } from "../../lib/nav";
+
+const ShareMenu = dynamic(() => import("../../components/social/ShareMenu"), {
+  ssr: false,
+});
 import {
   formatInteractionCount,
   getOrCreateViewerKey,
@@ -382,12 +386,14 @@ export default function DiscoverActionRail({
           }
         />
 
-        <ShareMenu
-          open={shareMenuOpen}
-          disabled={sharePending}
-          onClose={() => setShareMenuOpen(false)}
-          onSelect={(target) => void handleShareTarget(target)}
-        />
+        {shareMenuOpen ? (
+          <ShareMenu
+            open={shareMenuOpen}
+            disabled={sharePending}
+            onClose={() => setShareMenuOpen(false)}
+            onSelect={(target) => void handleShareTarget(target)}
+          />
+        ) : null}
       </div>
     </div>
   );

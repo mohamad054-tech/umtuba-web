@@ -256,8 +256,10 @@ describe("stories application layer contracts", () => {
 describe("stories UI + navigation contracts", () => {
   it("mounts StoryRail on Discover without dead links", () => {
     const experience = readRepoFile("app/discover/DiscoverExperience.tsx");
-    expect(experience).toMatch(/import StoryRail from "\.\.\/stories\/components\/StoryRail"/);
-    expect(experience).toMatch(/<StoryRail viewerId=\{viewerId\} \/>/);
+    expect(experience).toMatch(
+      /dynamic\(\(\)\s*=>\s*import\("\.\.\/stories\/components\/StoryRail"\)/
+    );
+    expect(experience).toMatch(/<DeferredStoryRail viewerId=\{viewerId\} \/>/);
     expect(experience).toMatch(/5\.75rem/);
   });
 

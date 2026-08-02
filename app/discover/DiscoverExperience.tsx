@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useRef, useState, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
-import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
-import CommentsPanel from "../components/social/CommentsPanel";
 import ProductEmptyState from "../components/product/ProductEmptyState";
 import ProductErrorState from "../components/product/ProductErrorState";
 import {
@@ -22,10 +21,84 @@ import {
   shouldStartFeedLoadMore,
 } from "../lib/video/feedPagination";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
-import StoryRail from "../stories/components/StoryRail";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
+
+/** Reserved rail shell — matches StoryRail outer chrome to avoid CLS. */
+function StoryRailFallback() {
+  return (
+    <section
+      className="relative z-20 w-full shrink-0 border-b border-white/5 bg-black/20 px-3 py-2.5 backdrop-blur-md md:rounded-2xl md:border md:border-white/10"
+      aria-label="Stories"
+      aria-busy="true"
+    >
+      <div className="flex h-[4.75rem] items-center gap-3 overflow-hidden">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-14 w-14 shrink-0 animate-pulse rounded-full bg-white/10"
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const StoryRail = dynamic(() => import("../stories/components/StoryRail"), {
+  ssr: false,
+  loading: () => <StoryRailFallback />,
+});
+
+const CommentsPanel = dynamic(
+  () => import("../components/social/CommentsPanel"),
+  { ssr: false }
+);
+
+const StartDirectMessageButton = dynamic(
+  () => import("../components/messaging/StartDirectMessageButton"),
+  { ssr: false }
+);
+
+/** Mount StoryRail after first paint so its chunk is not eager-hydrated. */
+function DeferredStoryRail({ viewerId }: { viewerId: string | null }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const enable = () => {
+      if (!cancelled) setReady(true);
+    };
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (
+        callback: IdleRequestCallback,
+        options?: IdleRequestOptions
+      ) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    if (typeof idleWindow.requestIdleCallback === "function") {
+      const idleId = idleWindow.requestIdleCallback(enable, { timeout: 1200 });
+      return () => {
+        cancelled = true;
+        idleWindow.cancelIdleCallback?.(idleId);
+      };
+    }
+
+    const timeoutId = window.setTimeout(enable, 200);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
+
+  if (!ready) {
+    return <StoryRailFallback />;
+  }
+
+  return <StoryRail viewerId={viewerId} />;
+}
 
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
@@ -212,7 +285,7 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 flex-col gap-3">
-          <StoryRail viewerId={viewerId} />
+          <DeferredStoryRail viewerId={viewerId} />
           <div className="flex flex-1 items-center justify-center px-6 py-16">
             <ProductErrorState
               title="Could not load videos"
@@ -231,7 +304,7 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 flex-col gap-3">
-          <StoryRail viewerId={viewerId} />
+          <DeferredStoryRail viewerId={viewerId} />
           <div className="flex flex-1 items-center justify-center px-6 py-16">
             <ProductEmptyState
               compact
@@ -264,7 +337,7 @@ export default function DiscoverExperience({
   return (
     <DiscoverShell>
       <div className="flex flex-1 flex-col gap-3">
-        <StoryRail viewerId={viewerId} />
+        <DeferredStoryRail viewerId={viewerId} />
         <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:gap-6">
         <div className="relative mx-auto flex w-full max-w-[510px] flex-1">
           <div className="video-watch-stage relative h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">

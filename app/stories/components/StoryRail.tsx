@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { APP_ROUTES } from "../../lib/nav";
 import { useStoriesRail } from "../hooks/useStoriesRail";
-import StoryComposer from "./StoryComposer";
-import StoryViewer from "./StoryViewer";
 import type { StoryRailGroup } from "../../../lib/stories/types";
+
+const StoryComposer = dynamic(() => import("./StoryComposer"), { ssr: false });
+const StoryViewer = dynamic(() => import("./StoryViewer"), { ssr: false });
 
 type StoryRailProps = {
   viewerId: string | null;
@@ -143,11 +145,13 @@ export default function StoryRail({ viewerId }: StoryRailProps) {
         </div>
       ) : null}
 
-      <StoryComposer
-        open={composerOpen}
-        onClose={() => setComposerOpen(false)}
-        onCreated={() => void refresh()}
-      />
+      {composerOpen ? (
+        <StoryComposer
+          open={composerOpen}
+          onClose={() => setComposerOpen(false)}
+          onCreated={() => void refresh()}
+        />
+      ) : null}
 
       {viewerOwnerId ? (
         <StoryViewer
