@@ -89,6 +89,9 @@ describe("Collaboration Workspace Attachments — assignments", () => {
         type: "assignment",
         dueAt: "2026-08-10T00:00:00.000Z",
         submissionStatus: "draft",
+        publishedAt: "2026-08-01T00:00:00.000Z",
+        submittedAt: null,
+        reviewedAt: null,
       },
     ]);
     expect(card.availability).toBe("available");

@@ -9,25 +9,25 @@
 | **Desktop** | Active Learning workstation |
 | **Laptop** | Learning only when assigned; Commerce stopped |
 
-## Prior tip (spine)
+## Prior tip (attachments)
 
 | Field | Value |
 | --- | --- |
-| Branch | `origin/office/learning-collaboration-workspace-spine-foundation-v1` |
-| Commit | `70e00e3f188338b47770ffe8bd368f611d3efd43` |
+| Branch | `origin/office/learning-collaboration-workspace-attachments-foundation-v1` |
+| Commit | `67cf30ff9c6ed7e04c99ccf0e2b8926fe898a2d5` |
 
 ## Active milestone
 
 | Milestone | Branch / worktree |
 | --- | --- |
-| Collaboration Workspace Attachments Foundation V1 | `office/learning-collaboration-workspace-attachments-foundation-v1` · `C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-attachments-foundation-v1` |
+| Collaboration Workspace Activity Timeline Foundation V1 | `office/learning-collaboration-workspace-activity-timeline-foundation-v1` · `C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1` |
 
-### Attachments contract
+### Timeline contract
 
-- Community: latest activity + unanswered-questions attention indicator
-- Assignments/Projects: overview, due summary, submission state
-- AI Tutor: continue latest learner-owned thread (`sharedMemory=false`)
-- Live: next session, status, join availability (no realtime product)
+- Read-model aggregation only (newest first)
+- Sources: Community, Assignments/Projects, AI Tutor, Live
+- Shared hub sources with attachments (no duplicate queries)
+- No realtime / push / chat / shared memory
 
 ## Do not
 

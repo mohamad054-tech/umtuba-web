@@ -5,7 +5,11 @@ import {
   LEARNING_COLLABORATION_WORKSPACE_ROUTES,
   loadCollaborationWorkspaceSpine,
 } from "../../../../../lib/learning/collaborationWorkspaceSpine";
-import { loadCollaborationWorkspaceAttachments } from "../../../../../lib/learning/collaborationWorkspaceAttachments";
+import {
+  buildCollaborationWorkspaceAttachmentCards,
+  loadCollaborationWorkspaceHubSources,
+} from "../../../../../lib/learning/collaborationWorkspaceAttachments";
+import { buildCollaborationWorkspaceTimeline } from "../../../../../lib/learning/collaborationWorkspaceTimeline";
 
 export const dynamic = "force-dynamic";
 
@@ -40,17 +44,22 @@ export default async function LearningCourseWorkspacePage({
     notFound();
   }
 
-  const attachments = await loadCollaborationWorkspaceAttachments(supabase, {
+  const sources = await loadCollaborationWorkspaceHubSources(supabase, {
     courseId,
   });
-  if (!attachments.ok) {
+  if (!sources.ok) {
     notFound();
   }
+
+  const attachments = buildCollaborationWorkspaceAttachmentCards(sources.data);
+  const timeline = buildCollaborationWorkspaceTimeline(sources.data);
 
   return (
     <CollaborationWorkspaceShell
       view={spine.data}
-      attachments={attachments.data.cards}
+      attachments={attachments}
+      timeline={timeline.items}
+      timelineAvailability={timeline.availability}
     />
   );
 }

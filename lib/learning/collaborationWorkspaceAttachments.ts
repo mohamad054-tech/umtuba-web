@@ -14,6 +14,7 @@ import { LEARNING_ASSIGNMENT_ROUTES, loadMyAssignment } from "./assignmentsCours
 import {
   LEARNING_COMMUNITY_ROUTES,
   getLearningCourseCommunityFeed,
+  listLearningDiscussionThreads,
   readCommunityItems,
   readCommunityNumber,
   readCommunityString,
@@ -258,7 +259,36 @@ export type AssignmentOverviewItem = {
   type: "assignment" | "project";
   dueAt: string | null;
   submissionStatus: string | null;
+  publishedAt: string | null;
+  submittedAt: string | null;
+  reviewedAt: string | null;
 };
+
+/** Shared read-model sources for attachments + activity timeline (one fetch). */
+export type CollaborationWorkspaceHubSources = {
+  courseId: string;
+  communityFeed: Record<string, unknown> | null;
+  discussionThreads: Record<string, unknown> | null;
+  assignmentItems: AssignmentOverviewItem[] | null;
+  tutorThreads: Record<string, unknown> | null;
+  liveSessions: Record<string, unknown> | null;
+  joinGate: Record<string, unknown> | null;
+};
+
+export function filterUpcomingLiveSessionsPayload(
+  payload: Record<string, unknown> | null
+): Record<string, unknown> | null {
+  if (!payload) return null;
+  const sessions = readLiveItems(payload, "sessions").filter((row) => {
+    const status = (readLiveString(row, "status") ?? "").toLowerCase();
+    return status === "scheduled" || status === "live";
+  });
+  return {
+    ...payload,
+    sessions,
+    session_count: sessions.length,
+  };
+}
 
 /** Pure assignments/projects mapper. */
 export function mapAssignmentsAttachmentCard(
@@ -390,7 +420,7 @@ async function loadAssignmentOverviewItems(
 
   const { data: activities, error } = await supabase
     .from("learning_activities")
-    .select("id, name, type, lesson_id, status")
+    .select("id, name, type, lesson_id, status, published_at, created_at")
     .in("lesson_id", lessonIds)
     .in("type", ["assignment", "project"])
     .eq("status", "published")
@@ -424,6 +454,11 @@ async function loadAssignmentOverviewItems(
     if (!activityId || (type !== "assignment" && type !== "project")) continue;
 
     let submissionStatus: string | null = null;
+    let submittedAt: string | null = null;
+    let reviewedAt: string | null = null;
+    const publishedAt =
+      asString(row.published_at) ?? asString(row.created_at) ?? null;
+
     if (type === "assignment") {
       const mine = await loadMyAssignment(supabase, activityId);
       if (mine.ok) {
@@ -431,6 +466,9 @@ async function loadAssignmentOverviewItems(
           asString(mine.data.submission_status) ??
           asString(mine.data.status) ??
           null;
+        submittedAt = asString(mine.data.latest_submitted_at);
+        const result = asRecord(mine.data.result);
+        reviewedAt = result ? asString(result.reviewed_at) : null;
         if (!dueByActivity.has(activityId) && asString(mine.data.due_at)) {
           dueByActivity.set(activityId, asString(mine.data.due_at));
         }
@@ -442,6 +480,13 @@ async function loadAssignmentOverviewItems(
           asString(mine.data.submission_status) ??
           asString(mine.data.status) ??
           null;
+        submittedAt =
+          asString(mine.data.latest_submitted_at) ??
+          asString(mine.data.submitted_at);
+        const result = asRecord(mine.data.result);
+        reviewedAt = result
+          ? asString(result.reviewed_at)
+          : asString(mine.data.reviewed_at);
       }
     }
 
@@ -451,34 +496,45 @@ async function loadAssignmentOverviewItems(
       type,
       dueAt: dueByActivity.get(activityId) ?? null,
       submissionStatus,
+      publishedAt,
+      submittedAt,
+      reviewedAt,
     });
   }
   return items;
 }
 
 /**
- * Load all four attachment cards for an entitled course workspace.
- * Access is assumed already verified by the spine loader; each card fail-soft.
+ * Single hub source fetch shared by attachments + activity timeline.
+ * Access is assumed already verified by the spine loader; each source fail-soft.
  */
-export async function loadCollaborationWorkspaceAttachments(
+export async function loadCollaborationWorkspaceHubSources(
   supabase: AnyClient,
   input: { courseId: string }
-): Promise<CollaborationWorkspaceAttachmentsResult<CollaborationWorkspaceAttachmentsView>> {
+): Promise<CollaborationWorkspaceAttachmentsResult<CollaborationWorkspaceHubSources>> {
   const courseId = input.courseId.trim();
   if (!isCollaborationWorkspaceUuid(courseId)) {
     return { ok: false, message: "Course id is invalid." };
   }
 
-  const [communityRes, liveRes, assignmentItems, tutorRes] = await Promise.all([
+  const [
+    communityRes,
+    discussionRes,
+    liveRes,
+    assignmentItems,
+    tutorRes,
+  ] = await Promise.all([
     getLearningCourseCommunityFeed(supabase, courseId, 8),
-    listMyLearningLiveSessions(supabase, courseId, "upcoming"),
+    listLearningDiscussionThreads(supabase, courseId, 8),
+    listMyLearningLiveSessions(supabase, courseId, "all"),
     loadAssignmentOverviewItems(supabase, courseId),
     listMyAiTutorThreads(supabase, courseId),
   ]);
 
   let joinGate: Record<string, unknown> | null = null;
   if (liveRes.ok) {
-    const sessions = readLiveItems(liveRes.data, "sessions");
+    const upcoming = filterUpcomingLiveSessionsPayload(liveRes.data);
+    const sessions = upcoming ? readLiveItems(upcoming, "sessions") : [];
     const nextId = sessions[0] ? readLiveString(sessions[0], "session_id") : null;
     if (nextId) {
       const gate = await getLearningLiveSessionJoinGate(supabase, nextId);
@@ -486,36 +542,47 @@ export async function loadCollaborationWorkspaceAttachments(
     }
   }
 
+  return {
+    ok: true,
+    data: {
+      courseId,
+      communityFeed: communityRes.ok ? communityRes.data : null,
+      discussionThreads: discussionRes.ok ? discussionRes.data : null,
+      assignmentItems,
+      tutorThreads: tutorRes.ok ? tutorRes.data : null,
+      liveSessions: liveRes.ok ? liveRes.data : null,
+      joinGate,
+    },
+  };
+}
+
+export function buildCollaborationWorkspaceAttachmentCards(
+  sources: CollaborationWorkspaceHubSources
+): CollaborationWorkspaceAttachmentCard[] {
   const byId = new Map<
     CollaborationWorkspaceAttachmentId,
     CollaborationWorkspaceAttachmentCard
   >([
     [
       "community",
-      mapCommunityAttachmentCard(
-        courseId,
-        communityRes.ok ? communityRes.data : null
-      ),
+      mapCommunityAttachmentCard(sources.courseId, sources.communityFeed),
     ],
     [
       "assignments_projects",
-      mapAssignmentsAttachmentCard(courseId, assignmentItems),
+      mapAssignmentsAttachmentCard(sources.courseId, sources.assignmentItems),
     ],
-    [
-      "tutor",
-      mapTutorAttachmentCard(courseId, tutorRes.ok ? tutorRes.data : null),
-    ],
+    ["tutor", mapTutorAttachmentCard(sources.courseId, sources.tutorThreads)],
     [
       "live",
       mapLiveAttachmentCard(
-        courseId,
-        liveRes.ok ? liveRes.data : null,
-        joinGate
+        sources.courseId,
+        filterUpcomingLiveSessionsPayload(sources.liveSessions),
+        sources.joinGate
       ),
     ],
   ]);
 
-  const ordered = COLLABORATION_WORKSPACE_ATTACHMENT_CARD_ORDER.map((id) => {
+  return COLLABORATION_WORKSPACE_ATTACHMENT_CARD_ORDER.map((id) => {
     const card = byId.get(id);
     if (!card) {
       return unavailableCard(
@@ -533,13 +600,28 @@ export async function loadCollaborationWorkspaceAttachments(
     }
     return card;
   });
+}
+
+/**
+ * Load all four attachment cards for an entitled course workspace.
+ * Pass preloaded hub sources to avoid duplicate queries with the timeline.
+ */
+export async function loadCollaborationWorkspaceAttachments(
+  supabase: AnyClient,
+  input: { courseId: string },
+  preloaded?: CollaborationWorkspaceHubSources
+): Promise<CollaborationWorkspaceAttachmentsResult<CollaborationWorkspaceAttachmentsView>> {
+  const sourcesRes = preloaded
+    ? { ok: true as const, data: preloaded }
+    : await loadCollaborationWorkspaceHubSources(supabase, input);
+  if (!sourcesRes.ok) return sourcesRes;
 
   return {
     ok: true,
     data: {
-      courseId,
+      courseId: sourcesRes.data.courseId,
       capability: COLLABORATION_WORKSPACE_ATTACHMENTS_ID,
-      cards: ordered,
+      cards: buildCollaborationWorkspaceAttachmentCards(sourcesRes.data),
     },
   };
 }

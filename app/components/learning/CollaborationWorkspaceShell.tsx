@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { CollaborationWorkspaceView } from "../../../lib/learning/collaborationWorkspaceSpine";
 import type { CollaborationWorkspaceAttachmentCard } from "../../../lib/learning/collaborationWorkspaceAttachments";
+import type { CollaborationWorkspaceTimelineItem } from "../../../lib/learning/collaborationWorkspaceTimeline";
 import LearningShell from "./LearningShell";
 import CollaborationWorkspaceNav from "./CollaborationWorkspaceNav";
 import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
@@ -8,6 +9,8 @@ import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
 type Props = {
   view: CollaborationWorkspaceView;
   attachments: CollaborationWorkspaceAttachmentCard[];
+  timeline: CollaborationWorkspaceTimelineItem[];
+  timelineAvailability?: "available" | "empty" | "unavailable";
 };
 
 function iconGlyph(icon: CollaborationWorkspaceAttachmentCard["icon"]): string {
@@ -33,9 +36,18 @@ function availabilityLabel(
   return "Unavailable";
 }
 
+function sourceLabel(source: CollaborationWorkspaceTimelineItem["source"]): string {
+  if (source === "assignments_projects") return "Assignments";
+  if (source === "tutor") return "AI Tutor";
+  if (source === "live") return "Live";
+  return "Community";
+}
+
 export default function CollaborationWorkspaceShell({
   view,
   attachments,
+  timeline,
+  timelineAvailability = "available",
 }: Props) {
   const memberLabel =
     view.access.spaceMemberActive === true
@@ -135,6 +147,61 @@ export default function CollaborationWorkspaceShell({
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="workspace-timeline-heading" className="mt-10">
+        <h2
+          id="workspace-timeline-heading"
+          className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40"
+        >
+          Activity Timeline
+        </h2>
+        <p className="mt-2 text-sm text-white/55">
+          Unified chronological feed from Community, Assignments, AI Tutor, and
+          Live. Read-model only — no realtime.
+        </p>
+        {timelineAvailability === "unavailable" ? (
+          <p role="status" className="mt-4 text-sm text-white/40">
+            Timeline unavailable — Learning sources could not be loaded.
+          </p>
+        ) : null}
+        {timelineAvailability === "empty" ? (
+          <p role="status" className="mt-4 text-sm text-white/40">
+            No timeline activity yet for this course.
+          </p>
+        ) : null}
+        {timeline.length > 0 ? (
+          <ol className="mt-4 space-y-3">
+            {timeline.map((entry) => (
+              <li
+                key={entry.id}
+                className="rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-bold text-white/90">{entry.title}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
+                    {sourceLabel(entry.source)}
+                    {entry.unread ? " · Unread" : ""}
+                  </p>
+                </div>
+                <p className="mt-2 text-sm text-white/70">{entry.summary}</p>
+                {entry.timestamp ? (
+                  <p className="mt-1 font-mono text-xs text-white/40">
+                    {entry.timestamp}
+                  </p>
+                ) : null}
+                {entry.href ? (
+                  <Link
+                    href={entry.href}
+                    className="watch-focus-ring mt-3 inline-block text-sm font-bold text-sky-300 hover:text-sky-200"
+                  >
+                    Open
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        ) : null}
       </section>
     </LearningShell>
   );
