@@ -52,6 +52,12 @@ Helpers:
 
 **None.** Schema already supports trusted stock; this milestone is the availability convention and server-side resolution.
 
+## Related
+
+Seller Catalog list/edit display mapping continues in
+`SELLER_CATALOG_AVAILABILITY_FOUNDATION_V1.md` (`in_stock` / `out_of_stock` /
+`backorder` / `unlimited` over the same trusted facts). Preorder remains deferred.
+
 ## Out of scope
 
 Shipping, Dashboard, Admin UI, AI, duplicate inventory ledger, remote migration apply, weakening publish/category/commerce-confirm gates.

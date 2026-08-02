@@ -25,6 +25,11 @@ import { getOwnedOrMemberStore, getSellerProductBundle } from "../../../../../..
 import { PRODUCT_TYPES } from "../../../../../../lib/store/types";
 import { formatMinorUnits } from "../../../../../../lib/store/money";
 import { SELLER_CATALOG_SHORT_DESCRIPTION_MAX } from "../../../../../../lib/store/sellerCatalogCategoryShortDescription";
+import { isUnlimitedInventoryProductType } from "../../../../../../lib/store/sellerInventoryAvailabilityFoundation";
+import {
+  deriveSellerCatalogAvailabilityDisplay,
+  sellerCatalogAvailabilityLabel,
+} from "../../../../../../lib/store/sellerCatalogAvailability";
 import {
   archiveProductAction,
   submitProductReviewAction,
@@ -137,6 +142,9 @@ export default async function EditSellerProductPage({
     slug: bundle.product.slug,
   });
   const inventoryAlignment = productEditorInventoryAlignmentCopy();
+  const unlimitedInventory = isUnlimitedInventoryProductType(
+    bundle.product.product_type
+  );
   const query = await Promise.resolve(searchParams ?? {});
   const error =
     typeof query.error === "string" && query.error.trim()
@@ -456,7 +464,21 @@ export default async function EditSellerProductPage({
         </div>
 
         <ul className="mt-4 space-y-3">
-          {bundle.variants.map((variant) => (
+          {bundle.variants.map((variant) => {
+            const availabilityStatus = deriveSellerCatalogAvailabilityDisplay({
+              productType: bundle.product.product_type,
+              inventory: variant.inventory
+                ? {
+                    onHand: Number(variant.inventory.on_hand ?? 0),
+                    reserved: Number(variant.inventory.reserved ?? 0),
+                    safetyStock: Number(variant.inventory.safety_stock ?? 0),
+                    allowBackorder: Boolean(
+                      variant.inventory.allow_backorder
+                    ),
+                  }
+                : null,
+            });
+            return (
             <li
               key={variant.id}
               className="rounded-2xl border border-[var(--sf-line)] bg-black/20 p-4"
@@ -472,7 +494,11 @@ export default async function EditSellerProductPage({
                           .join(" · ")}`
                       : ""}
                   </p>
-                  <p className="mt-2 text-xs text-[var(--sf-muted)]">
+                  <p className="mt-2 text-xs font-semibold text-[var(--sf-muted)]">
+                    Availability:{" "}
+                    {sellerCatalogAvailabilityLabel(availabilityStatus)}
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--sf-muted)]">
                     Reserved (system): {variant.inventory?.reserved ?? "—"} ·{" "}
                     <Link
                       href={`${APP_ROUTES.sellerInventory}?variant=${variant.id}`}
@@ -593,47 +619,75 @@ export default async function EditSellerProductPage({
                         className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
                       />
                     </label>
-                    <label className="block space-y-1">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                        On hand (seed)
-                      </span>
-                      <input
-                        name="onHand"
-                        type="number"
-                        min="0"
-                        defaultValue={variant.inventory?.on_hand ?? 0}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
-                      />
-                    </label>
-                    <div className="block space-y-1">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                        Reserved (system)
-                      </span>
-                      <p className="rounded-xl border border-[var(--sf-line)] bg-black/20 p-3 text-sm text-[var(--sf-muted)]">
-                        {variant.inventory?.reserved ?? 0}
-                      </p>
-                    </div>
+                    {unlimitedInventory ? (
+                      <>
+                        <input
+                          type="hidden"
+                          name="onHand"
+                          value={String(variant.inventory?.on_hand ?? 0)}
+                        />
+                        <input
+                          type="hidden"
+                          name="safetyStock"
+                          value={String(variant.inventory?.safety_stock ?? 0)}
+                        />
+                        <div className="sm:col-span-2 rounded-xl border border-[var(--sf-line)] bg-black/20 p-3 text-sm text-[var(--sf-muted)]">
+                          Unlimited availability for this product type. Finite
+                          on-hand / backorder seeds are not edited here.
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <label className="block space-y-1">
+                          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
+                            On hand (seed)
+                          </span>
+                          <input
+                            name="onHand"
+                            type="number"
+                            min="0"
+                            defaultValue={variant.inventory?.on_hand ?? 0}
+                            className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                          />
+                        </label>
+                        <div className="block space-y-1">
+                          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
+                            Reserved (system)
+                          </span>
+                          <p className="rounded-xl border border-[var(--sf-line)] bg-black/20 p-3 text-sm text-[var(--sf-muted)]">
+                            {variant.inventory?.reserved ?? 0}
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <label className="block space-y-1 sm:max-w-xs">
-                    <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                      Safety stock
-                    </span>
-                    <input
-                      name="safetyStock"
-                      type="number"
-                      min="0"
-                      defaultValue={variant.inventory?.safety_stock ?? 0}
-                      className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
-                    />
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-[var(--sf-muted)]">
-                    <input
-                      type="checkbox"
-                      name="allowBackorder"
-                      defaultChecked={variant.inventory?.allow_backorder ?? false}
-                    />
-                    Allow backorder
-                  </label>
+                  {unlimitedInventory ? null : (
+                    <>
+                      <label className="block space-y-1 sm:max-w-xs">
+                        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
+                          Safety stock
+                        </span>
+                        <input
+                          name="safetyStock"
+                          type="number"
+                          min="0"
+                          defaultValue={variant.inventory?.safety_stock ?? 0}
+                          className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        />
+                      </label>
+                      <label className="flex items-center gap-2 text-sm text-[var(--sf-muted)]">
+                        <input
+                          type="checkbox"
+                          name="allowBackorder"
+                          defaultChecked={
+                            variant.inventory?.allow_backorder ?? false
+                          }
+                        />
+                        Allow backorder (sets availability to Backorder when
+                        sellable quantity is zero)
+                      </label>
+                    </>
+                  )}
                   <button
                     type="submit"
                     className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712]"
@@ -655,7 +709,8 @@ export default async function EditSellerProductPage({
                 </p>
               )}
             </li>
-          ))}
+            );
+          })}
         </ul>
 
         {canEditVariants ? (
