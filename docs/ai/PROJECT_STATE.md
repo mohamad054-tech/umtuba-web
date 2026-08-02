@@ -10,10 +10,15 @@
 
 ## Learning chapter status
 
-**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
+**Learning Desktop active (2026-08-03).** Curriculum V1 close-out remains approved; post-V1 foundations continue on office Learning branches.
 
-Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
-Session continuity: `docs/ai/SESSION_HANDOFF.md`
+- Session continuity: `docs/ai/SESSION_HANDOFF.md`
+- Current snapshot: `docs/learning/operations/LEARNING_CURRENT_STATE_2026-08-03.md`
+- SoT branch: `office/learning-collaboration-workspace-activity-timeline-foundation-v1`
+- Completion **82%** · Launch readiness **52%** · Launch gate **FAIL**
+- Next milestone: **Learning Production Smoke & E2E Gate V1** (no new features before gate)
+- Remote Learning migrations through `20260897` applied/registered; AI Tutor chain closed
+- Commerce remains **frozen** on Desktop
 
 Frozen baselines (extend, do not replace):
 
@@ -25,13 +30,15 @@ Frozen baselines (extend, do not replace):
 
 ## Active academy priority
 
-**Save point 2026-07-28 (Cursor Pro → Ultra restart).** Full state: `docs/ai/SESSION_HANDOFF.md`.
+**Save point 2026-08-03 (Learning handoff).** Full state: `docs/ai/SESSION_HANDOFF.md` + `docs/learning/operations/LEARNING_CURRENT_STATE_2026-08-03.md`.
 
 | Track | Status |
 | --- | --- |
 | Wave B content | CLOSED |
-| Learning UX / Nexus | FROZEN |
-| Course Import & E2E V1 | PAUSED |
+| Learning UX / Nexus | FROZEN (baselines) |
+| Learning post-V1 foundations (catalog→workspace→AI Tutor remote) | **ACTIVE on Desktop** |
+| Learning Production Smoke & E2E Gate V1 | **NEXT** |
+| Course Import & E2E V1 | PAUSED (superseded directionally by Smoke Gate) |
 | Commerce Research V1.1 | APPROVED |
 | Commerce Experience Architecture V1.1 | FROZEN |
 | Commerce Visual Design Foundation V1 | FROZEN |
@@ -87,8 +94,8 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 
 | Machine | Role |
 | --- | --- |
-| **Laptop** | Primary development and integration machine |
-| **Desktop** | May perform isolated review / testing tasks only |
+| **Desktop** | Active Learning workstation (Commerce frozen here) |
+| **Laptop** | Do not dual-write Learning unless reassigned |
 
 ## Multi-machine rules
 

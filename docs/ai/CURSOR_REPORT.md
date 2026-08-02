@@ -1,16 +1,18 @@
-﻿# Cursor Report
+# Cursor Report
 
 ## Summary
 
-**PASS (local)** — Collaboration Workspace Activity Timeline Foundation V1.
+**PASS** — Learning Final Session Handoff + Repository Sync V1 (docs only).
 
-- Base: `67cf30f` (`origin/office/learning-collaboration-workspace-attachments-foundation-v1`)
-- Worktree: `…\umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1`
-- Unified chronological feed from Community / Assignments / AI Tutor / Live
-- Shared hub sources with attachments; no migration; no Commerce; no realtime
-- Verification: timeline+attachments+spine+related Learning tests 83 PASS; `tsc --noEmit` PASS; `git diff --check` PASS; secret scan clean
-- No commit / no push
+- SoT branch: `office/learning-collaboration-workspace-activity-timeline-foundation-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1`
+- Persisted checkpoint: `docs/learning/operations/LEARNING_CURRENT_STATE_2026-08-03.md`
+- Updated: `docs/ai/CURRENT_TASK.md`, `PROJECT_STATE.md`, `SESSION_HANDOFF.md`, `CURSOR_REPORT.md`
+- Learning completion **82%** · Launch readiness **52%** · Launch **FAIL**
+- Remote Learning migrations through `20260897` recorded; AI Tutor chain closed
+- Commerce frozen; no Learning feature/migration/remote mutation in this handoff
 
 ## Next
 
-Human review → explicit commit/push GO.
+**Learning Production Smoke & E2E Gate V1** — explicit GO required.
+No new Learning features before that gate. No LiveKit setup. No realtime. No Commerce.
