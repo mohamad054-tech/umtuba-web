@@ -59,6 +59,7 @@ function inv(
     productTitle: "Lamp",
     productSlug: "lamp",
     productStatus: "active",
+    productType: "physical",
     variantId: "v1",
     variantTitle: "Default",
     sku: "SKU-1",
@@ -72,6 +73,7 @@ function inv(
     availableToSell: 8,
     inventoryUpdatedAt: "2026-07-01T00:00:00Z",
     missingInventory: false,
+    availabilityMode: "finite",
     ...overrides,
   };
 }

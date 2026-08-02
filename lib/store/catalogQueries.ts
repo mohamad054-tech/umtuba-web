@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
+import { resolveTrustedInventoryAvailability } from "./sellerInventoryAvailabilityFoundation";
 import { isLegitimateCompareAt } from "./tradingContracts";
 import type {
   ProductCategoryRow,
@@ -91,16 +91,30 @@ export async function enrichPublicCatalogRow(
 
     const { data: inv } = await supabase
       .from("product_inventory")
-      .select("on_hand, reserved, safety_stock")
+      .select("on_hand, reserved, safety_stock, allow_backorder")
       .eq("variant_id", variantId)
       .eq("warehouse_key", "default")
       .maybeSingle();
-    if (inv) {
-      available = availableUnits({
-        onHand: inv.on_hand,
-        reserved: inv.reserved,
-        safetyStock: inv.safety_stock,
-      });
+    const availability = resolveTrustedInventoryAvailability({
+      productType: String(row.product_type ?? ""),
+      productStatus: String(row.status),
+      variantStatus: "active",
+      moderationStatus: String(row.moderation_status ?? ""),
+      inventory: inv
+        ? {
+            onHand: Number(inv.on_hand),
+            reserved: Number(inv.reserved),
+            safetyStock: Number(inv.safety_stock),
+            allowBackorder: Boolean(inv.allow_backorder),
+          }
+        : null,
+    });
+    if (availability.mode === "unlimited") {
+      available = null;
+    } else if (availability.sellable || availability.availableQuantity != null) {
+      available = availability.availableQuantity;
+    } else {
+      available = 0;
     }
   }
 
@@ -466,6 +480,37 @@ async function buildPublicProductDetail(
 
     const inv = (inventory as ProductInventoryRow | null) ?? null;
     if (price) hasTrustedPrice = true;
+    const availability = resolveTrustedInventoryAvailability({
+      productType: String(productRow.product_type ?? ""),
+      productStatus: String(productRow.status),
+      variantStatus: String(variant.status),
+      moderationStatus: String(productRow.moderation_status ?? ""),
+      inventory: inv
+        ? {
+            onHand: Number(inv.on_hand),
+            reserved: Number(inv.reserved),
+            safetyStock: Number(inv.safety_stock),
+            allowBackorder: Boolean(inv.allow_backorder),
+          }
+        : null,
+    });
+    const inventoryView: ProductInventoryRow | null = inv
+      ? {
+          ...inv,
+          allow_backorder:
+            Boolean(inv.allow_backorder) || availability.skipFiniteStockCheck,
+        }
+      : availability.skipFiniteStockCheck
+        ? ({
+            id: "",
+            variant_id: variant.id,
+            warehouse_key: "default",
+            on_hand: 0,
+            reserved: 0,
+            safety_stock: 0,
+            allow_backorder: true,
+          } as ProductInventoryRow)
+        : null;
     enriched.push({
       variant: {
         ...variant,
@@ -473,14 +518,11 @@ async function buildPublicProductDetail(
           (variant.option_values as Record<string, string>) ?? {},
       },
       price: (price as ProductPriceRow | null) ?? null,
-      inventory: inv,
-      available: inv
-        ? availableUnits({
-            onHand: inv.on_hand,
-            reserved: inv.reserved,
-            safetyStock: inv.safety_stock,
-          })
-        : 0,
+      inventory: inventoryView,
+      available:
+        availability.mode === "unlimited"
+          ? 0
+          : availability.availableQuantity ?? 0,
     });
   }
 
@@ -502,9 +544,28 @@ async function buildPublicProductDetail(
   if (!hasTrustedPrice) {
     purchaseAllowed = false;
     purchaseBlockedReason = "Trusted selling price is unavailable.";
-  } else if (enriched.every((v) => v.available <= 0 && !v.inventory?.allow_backorder)) {
-    purchaseAllowed = false;
-    purchaseBlockedReason = "This product is currently unavailable.";
+  } else {
+    const anySellable = enriched.some((v) => {
+      const availability = resolveTrustedInventoryAvailability({
+        productType: String(productRow.product_type ?? ""),
+        productStatus: String(productRow.status),
+        variantStatus: String(v.variant.status),
+        moderationStatus: String(productRow.moderation_status ?? ""),
+        inventory: v.inventory
+          ? {
+              onHand: Number(v.inventory.on_hand),
+              reserved: Number(v.inventory.reserved),
+              safetyStock: Number(v.inventory.safety_stock),
+              allowBackorder: Boolean(v.inventory.allow_backorder),
+            }
+          : null,
+      });
+      return availability.sellable;
+    });
+    if (!anySellable) {
+      purchaseAllowed = false;
+      purchaseBlockedReason = "This product is currently unavailable.";
+    }
   }
   if (input.marketplaceSourceType === "supplier_listing" && !input.sellerListingId) {
     purchaseAllowed = false;

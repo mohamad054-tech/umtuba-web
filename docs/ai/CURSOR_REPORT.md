@@ -2,20 +2,20 @@
 
 ## Summary
 
-**PASS + STAGED** for `commerce.catalog.category_taxonomy_seed_v1` on `office/commerce-catalog-category-taxonomy-seed-v1` (base `584943f`).
+**PASS** for `commerce.inventory.seller_inventory_availability_foundation_v1` on `office/commerce-catalog-category-taxonomy-seed-v1`.
 
 ## Exact milestone
 
-`commerce.catalog.category_taxonomy_seed_v1` — approved and implemented.
+`commerce.inventory.seller_inventory_availability_foundation_v1` — approved and implemented.
 
 ## How this unblocks product loading
 
-Sellers can load active categories via `listActiveCategories`, assign `primary_category_id`, and pass the category gate in `submitProductForReview`. Physical categories do **not** enable physical checkout (`commerce_confirm_enabled` stays default OFF).
+Catalog, PDP, cart, and seller inventory now resolve availability via a single trusted foundation (`unlimited` / `finite` / `unavailable`) over existing `product_inventory`. Digital/service types skip finite warehouse math; physical remains finite and launch-gated.
 
 ## Migration
 
-`20260885_store_catalog_category_taxonomy_seed_v1.sql` — **local only**, not applied remotely.
+**None.**
 
 ## Boundaries
 
-No Dashboard/Admin taxonomy editor, no AI, no catalog UI redesign, no gate weakening.
+No Dashboard/Admin expansion, no AI, no shipping, no duplicate inventory ledger, no weakening of publish readiness / taxonomy / `commerce_confirm_enabled` gates. No commit / no push in this phase.

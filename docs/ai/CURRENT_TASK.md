@@ -2,15 +2,15 @@
 
 ## Task title
 
-UMTUBA Commerce — Category Taxonomy Seed V1
+UMTUBA Commerce — Seller Inventory Availability Foundation V1
 
 ## Status
 
-`pass-staged` — **implementation complete** — stop at PASS + STAGED (no commit / no push)
+`pass-staged` — **implementation complete** — stop at PASS (no commit / no push)
 
 ## Capability (APPROVED)
 
-`commerce.catalog.category_taxonomy_seed_v1`
+`commerce.inventory.seller_inventory_availability_foundation_v1`
 
 ## Branch
 
@@ -18,25 +18,26 @@ UMTUBA Commerce — Category Taxonomy Seed V1
 
 ## Base / HEAD
 
-- Base (closed tip): `584943fc8f59a41c48e03fc03f3be3804dcf785c` (Full Order Refund Path V1)
-- HEAD: uncommitted / staged on feature branch (no commit yet)
+- Prior closed tip context: Category Taxonomy Seed V1 on this branch
+- HEAD: uncommitted inventory availability foundation work (no commit yet)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-non-ai-next-milestone-gate-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-commerce-catalog-category-taxonomy-seed-v1`
 
 ## Coordination
 
 - **Desktop** owns: AI Platform / Usage / Quotas / Billing / Admin AI / Dashboard / Providers / Gemini / Tutor — do not touch
-- **Laptop** = Commerce catalog only
+- **Laptop** = Commerce inventory availability only
 
 ## Delivered
 
-- Migration `20260885` — idempotent launch taxonomy seed (12 categories)
-- TS SSOT `lib/store/categoryTaxonomySeed.ts`
-- `submitProductForReview` rejects missing/inactive categories (keeps digital readiness)
-- Docs: `CATEGORY_TAXONOMY_SEED_V1.md` + Product Foundation cross-link
+- TS SSOT `lib/store/sellerInventoryAvailabilityFoundation.ts` (+ comprehensive unit tests)
+- Wired catalog queries, PDP purchase gate, cart offer/live enrichment, seller inventory queries + presentation
+- Docs: `SELLER_INVENTORY_AVAILABILITY_FOUNDATION_V1.md`
+- No migration; reuses `product_inventory`
+- Preserved category taxonomy + digital publish readiness gates; did not touch `commerce_confirm_enabled`
 
 ## Next
 
-Human GO to commit / push. Local migration only — no remote apply unless asked.
+Human GO to commit / push when ready. No remote migration (none added).

@@ -8,6 +8,7 @@ import {
   canManageStoreSettings,
   canViewStore,
 } from "./permissions";
+import { resolveTrustedInventoryAvailability } from "./sellerInventoryAvailabilityFoundation";
 import type { StoreMemberRole } from "./types";
 
 type AnyClient = {
@@ -19,6 +20,7 @@ export type SellerInventoryRow = {
   productTitle: string;
   productSlug: string;
   productStatus: string;
+  productType: string;
   variantId: string;
   variantTitle: string;
   sku: string;
@@ -32,6 +34,8 @@ export type SellerInventoryRow = {
   availableToSell: number | null;
   inventoryUpdatedAt: string | null;
   missingInventory: boolean;
+  /** Trusted availability mode from Inventory Availability Foundation. */
+  availabilityMode: "unlimited" | "finite" | "unavailable" | "unknown";
 };
 
 export type SellerReservationRow = {
@@ -70,7 +74,7 @@ export async function listSellerInventoryRows(
 
   const { data: products, error: productError } = await supabase
     .from("store_products")
-    .select("id, title, slug, status")
+    .select("id, title, slug, status, product_type")
     .eq("store_id", storeId)
     .neq("status", "archived")
     .order("updated_at", { ascending: false })
@@ -88,6 +92,7 @@ export async function listSellerInventoryRows(
     title: string;
     slug: string;
     status: string;
+    product_type: string;
   }>;
   // Defense in depth — never trust a mismatched store filter.
   const scopedProducts = productRows.filter(Boolean);
@@ -173,11 +178,18 @@ export async function listSellerInventoryRows(
     if (!product) continue;
     const locations = invByVariant.get(variant.id) ?? [];
     if (locations.length === 0) {
+      const availability = resolveTrustedInventoryAvailability({
+        productType: product.product_type,
+        productStatus: product.status,
+        variantStatus: variant.status,
+        inventory: null,
+      });
       out.push({
         productId: product.id,
         productTitle: product.title,
         productSlug: product.slug,
         productStatus: product.status,
+        productType: product.product_type,
         variantId: variant.id,
         variantTitle: variant.title,
         sku: variant.sku,
@@ -187,10 +199,12 @@ export async function listSellerInventoryRows(
         onHand: null,
         reserved: null,
         safetyStock: null,
-        allowBackorder: null,
-        availableToSell: null,
+        allowBackorder: availability.skipFiniteStockCheck ? true : null,
+        availableToSell:
+          availability.mode === "unlimited" ? null : availability.availableQuantity,
         inventoryUpdatedAt: null,
-        missingInventory: true,
+        missingInventory: availability.mode !== "unlimited",
+        availabilityMode: availability.mode,
       });
       continue;
     }
@@ -202,11 +216,25 @@ export async function listSellerInventoryRows(
         Number.isFinite(onHand) &&
         Number.isFinite(reserved) &&
         Number.isFinite(safetyStock);
+      const availability = resolveTrustedInventoryAvailability({
+        productType: product.product_type,
+        productStatus: product.status,
+        variantStatus: variant.status,
+        inventory: quantitiesTrusted
+          ? {
+              onHand,
+              reserved,
+              safetyStock,
+              allowBackorder: Boolean(inv.allow_backorder),
+            }
+          : null,
+      });
       out.push({
         productId: product.id,
         productTitle: product.title,
         productSlug: product.slug,
         productStatus: product.status,
+        productType: product.product_type,
         variantId: variant.id,
         variantTitle: variant.title,
         sku: variant.sku,
@@ -216,16 +244,21 @@ export async function listSellerInventoryRows(
         onHand: quantitiesTrusted ? onHand : null,
         reserved: quantitiesTrusted ? reserved : null,
         safetyStock: quantitiesTrusted ? safetyStock : null,
-        allowBackorder: Boolean(inv.allow_backorder),
-        availableToSell: quantitiesTrusted
-          ? availableUnits({
-              onHand,
-              reserved,
-              safetyStock,
-            })
-          : null,
+        allowBackorder:
+          Boolean(inv.allow_backorder) || availability.skipFiniteStockCheck,
+        availableToSell:
+          availability.mode === "unlimited"
+            ? null
+            : quantitiesTrusted
+              ? availableUnits({
+                  onHand,
+                  reserved,
+                  safetyStock,
+                })
+              : null,
         inventoryUpdatedAt: inv.updated_at ?? null,
         missingInventory: false,
+        availabilityMode: availability.mode,
       });
     }
   }
