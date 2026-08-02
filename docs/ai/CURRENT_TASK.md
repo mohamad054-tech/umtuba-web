@@ -2,27 +2,16 @@
 
 ## Task title
 
-Commerce Migration History Drift Verification V1
+Commerce Migration History Repair Apply V1
 
 ## Status
 
-`pass` (read-only) — `20260822` and `20260823` both **`SAFE_TO_REGISTER_HISTORY`**; proposed repair order `20260822 → 20260823` documented; **not executed**. No commit. No push.
+`pass` — repaired remote history `20260822` then `20260823` on `tgucwnjwoyeqoxqaxmew`. No migration SQL. No commit. No push.
 
-## Capability
+## Branch
 
-`commerce.ops.chain_migration_apply_readiness_v1` (history drift verification)
-
-## Branch / tip
-
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-migration-history-drift-verification-v1`
-- Branch: `office/commerce-migration-history-drift-verification-v1`
-- Base: `ac49585`
-- Linked project: `tgucwnjwoyeqoxqaxmew`
-
-## Forbidden (this milestone)
-
-`migration repair` · history registration · `db push` · `migration up` · `db reset` · SQL DDL/DML · deploy · commit · push
+`office/commerce-migration-history-repair-apply-v1` @ `904c8bb`
 
 ## Next
 
-Separate human GO to execute history repair `20260822 → 20260823` only, then continue blocker remediation apply plan for `20260824` / `20260884`.
+Separate GOs: apply `20260824` → apply `20260884` → re-run remote preflight → only then consider `89→90→91`.
