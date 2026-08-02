@@ -40,6 +40,11 @@ That mapping reuses the hold audit boundary; it does not turn reservation events
 - Owns: movement type parse, delta shape validation, projection helpers, read-row normalize, presentation labels, client-execution reject
 - Does **not** own: append/record runtime, purchase decrement runtime, reservation runtime, checkout/refund stock engines
 
+## Related
+
+Purchase stock decrement commitment (`trusted_payment_capture`, consume→decrement, no Runtime) continues in
+`PURCHASE_STOCK_DECREMENT_FOUNDATION_V1.md`.
+
 ## Out of scope
 
 Runtime movement engine, purchase decrement runtime, checkout, reservation runtime, warehouses, supplier sync, pricing, shipping, entitlement, AI/Learning/Navigation/Home.
