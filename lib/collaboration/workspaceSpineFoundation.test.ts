@@ -77,7 +77,7 @@ describe("Collaboration Workspace Spine — role RBAC fail-closed", () => {
     );
   });
 
-  it("keeps platform flag off and invite roles exclude owner", () => {
+  it("keeps platform flag off by default and invite roles exclude owner", () => {
     expect(COLLABORATION_PLATFORM_ENABLED).toBe(false);
     expect([...COLLABORATION_WORKSPACE_INVITE_ROLES]).not.toContain("owner");
     expect([...COLLABORATION_WORKSPACE_KINDS]).toEqual([

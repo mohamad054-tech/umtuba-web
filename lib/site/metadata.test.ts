@@ -107,6 +107,7 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/forgot-password") ||
           path.startsWith("/auth") ||
           path.startsWith("/settings") ||
+          path.startsWith("/workspaces") ||
           path.startsWith("/messages") ||
           path.startsWith("/notifications") ||
           path.startsWith("/create") ||

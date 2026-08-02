@@ -1,3 +1,4 @@
+import { isCollaborationPlatformEnabled } from "../../../lib/collaboration/collaborationPlatformGate";
 import { APP_ROUTES } from "./routes";
 
 /**
@@ -16,8 +17,38 @@ export type UserMenuGroup = {
   items: UserMenuLinkItem[];
 };
 
+export type UserMenuBuildOptions = {
+  /** Explicit override (tests / server-injected). */
+  collaborationPlatformEnabled?: boolean;
+  /** Injectable env source (surfaceGates pattern). */
+  env?: Record<string, string | undefined>;
+};
+
 /** Link groups only — Switch account / Sign out stay as actions in UserMenu. */
-export function buildUserMenuGroups(profileHref: string): UserMenuGroup[] {
+export function buildUserMenuGroups(
+  profileHref: string,
+  options?: UserMenuBuildOptions
+): UserMenuGroup[] {
+  const collaborationEnabled =
+    options?.collaborationPlatformEnabled ??
+    isCollaborationPlatformEnabled(options?.env);
+
+  const accountItems: UserMenuLinkItem[] = [
+    { id: "settings", label: "Settings", href: APP_ROUTES.settings },
+    { id: "store", label: "Store", href: APP_ROUTES.store },
+    { id: "seller", label: "Seller hub", href: APP_ROUTES.seller },
+    { id: "wishlist", label: "Wishlist", href: APP_ROUTES.storeWishlist },
+    { id: "advertise", label: "Advertise", href: APP_ROUTES.advertise },
+  ];
+
+  if (collaborationEnabled) {
+    accountItems.push({
+      id: "workspaces",
+      label: "Workspaces",
+      href: APP_ROUTES.workspaces,
+    });
+  }
+
   return [
     {
       id: "you",
@@ -37,20 +68,17 @@ export function buildUserMenuGroups(profileHref: string): UserMenuGroup[] {
     {
       id: "account",
       label: "Account",
-      items: [
-        { id: "settings", label: "Settings", href: APP_ROUTES.settings },
-        { id: "store", label: "Store", href: APP_ROUTES.store },
-        { id: "seller", label: "Seller hub", href: APP_ROUTES.seller },
-        { id: "wishlist", label: "Wishlist", href: APP_ROUTES.storeWishlist },
-        { id: "advertise", label: "Advertise", href: APP_ROUTES.advertise },
-      ],
+      items: accountItems,
     },
   ];
 }
 
 /** Flat href list for contract tests. */
-export function listUserMenuHrefs(profileHref: string): string[] {
-  return buildUserMenuGroups(profileHref).flatMap((group) =>
+export function listUserMenuHrefs(
+  profileHref: string,
+  options?: UserMenuBuildOptions
+): string[] {
+  return buildUserMenuGroups(profileHref, options).flatMap((group) =>
     group.items.map((item) => item.href)
   );
 }

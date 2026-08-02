@@ -53,6 +53,8 @@ export const APP_ROUTES = {
   advertiseCampaignsNew: "/advertise/campaigns/new",
   advertiseCreativesNew: "/advertise/creatives/new",
   advertiseSettings: "/advertise/settings",
+  workspaces: "/workspaces",
+  workspacesInvite: "/workspaces/invite",
   adminAds: "/admin/ads",
   adminAdsAdvertisers: "/admin/ads/advertisers",
   adminAdsCampaigns: "/admin/ads/campaigns",
@@ -68,6 +70,21 @@ export const APP_ROUTES = {
 /** Campaign detail workspace under Advertise. */
 export function advertiseCampaignDetail(campaignId: string): string {
   return `${APP_ROUTES.advertiseCampaigns}/${campaignId.trim()}`;
+}
+
+/** Collaboration workspace detail. */
+export function collaborationWorkspaceDetail(workspaceId: string): string {
+  return `${APP_ROUTES.workspaces}/${workspaceId.trim()}`;
+}
+
+/** Collaboration workspace members. */
+export function collaborationWorkspaceMembers(workspaceId: string): string {
+  return `${APP_ROUTES.workspaces}/${workspaceId.trim()}/members`;
+}
+
+/** Collaboration workspace invites. */
+export function collaborationWorkspaceInvites(workspaceId: string): string {
+  return `${APP_ROUTES.workspaces}/${workspaceId.trim()}/invites`;
 }
 
 export type AppRouteHref =

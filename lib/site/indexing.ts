@@ -21,6 +21,7 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/forgot-password",
   "/auth/",
   "/settings",
+  "/workspaces",
   "/messages",
   "/notifications",
   "/create",

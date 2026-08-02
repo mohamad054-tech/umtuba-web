@@ -5,8 +5,10 @@ import { APP_ROUTES } from "./routes";
 import { buildUserMenuGroups, listUserMenuHrefs } from "./userMenuItems";
 
 describe("userMenuItems", () => {
-  it("groups You and Account without duplicates", () => {
-    const groups = buildUserMenuGroups("/profile/demo_user");
+  it("groups You and Account without duplicates when collaboration disabled", () => {
+    const groups = buildUserMenuGroups("/profile/demo_user", {
+      collaborationPlatformEnabled: false,
+    });
     expect(groups.map((g) => g.id)).toEqual(["you", "account"]);
     const labels = groups.flatMap((g) => g.items.map((i) => i.label));
     expect(labels).toEqual([
@@ -21,11 +23,33 @@ describe("userMenuItems", () => {
       "Wishlist",
       "Advertise",
     ]);
+    expect(labels).not.toContain("Workspaces");
     expect(new Set(labels).size).toBe(labels.length);
   });
 
+  it("hides Workspaces when collaboration platform disabled", () => {
+    const hrefs = listUserMenuHrefs("/profile/demo_user", {
+      env: { COLLABORATION_PLATFORM_ENABLED: "false" },
+    });
+    expect(hrefs).not.toContain(APP_ROUTES.workspaces);
+  });
+
+  it("shows Workspaces when collaboration platform enabled", () => {
+    const hrefs = listUserMenuHrefs("/profile/demo_user", {
+      collaborationPlatformEnabled: true,
+    });
+    expect(hrefs).toContain(APP_ROUTES.workspaces);
+
+    const viaEnv = listUserMenuHrefs("/profile/demo_user", {
+      env: { COLLABORATION_PLATFORM_ENABLED: "1" },
+    });
+    expect(viaEnv).toContain(APP_ROUTES.workspaces);
+  });
+
   it("exposes Saved, Rewards, Settings, and Advertise entry points", () => {
-    const hrefs = listUserMenuHrefs("/profile/demo_user");
+    const hrefs = listUserMenuHrefs("/profile/demo_user", {
+      collaborationPlatformEnabled: false,
+    });
     expect(hrefs).toContain(APP_ROUTES.saved);
     expect(hrefs).toContain(APP_ROUTES.learning);
     expect(hrefs).toContain(APP_ROUTES.rewards);

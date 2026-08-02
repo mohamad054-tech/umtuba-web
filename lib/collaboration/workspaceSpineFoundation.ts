@@ -9,6 +9,11 @@
  * (no product binding RPCs).
  */
 
+/**
+ * Compile-time default for Collaboration Platform UI.
+ * Runtime exposure is gated by `isCollaborationPlatformEnabled()`
+ * (`COLLABORATION_PLATFORM_ENABLED` env, default false).
+ */
 export const COLLABORATION_PLATFORM_ENABLED = false;
 
 export const COLLABORATION_WORKSPACE_KINDS = [
