@@ -34,8 +34,8 @@ Concurrent callers serialize via advisory lock; webhook retries replay without d
 
 ## Related
 
-Refund restock contracts (trusted Sync `refunded`, `return_increment`, no Runtime) continue in
-`REFUND_STOCK_RESTOCK_FOUNDATION_V1.md`.
+Refund restock Runtime (trusted Sync `refunded`, `return_increment`) is in
+`REFUND_STOCK_RESTOCK_RUNTIME_V1.md` (foundation contracts in `REFUND_STOCK_RESTOCK_FOUNDATION_V1.md`).
 
 ## Out of scope
 

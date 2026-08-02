@@ -97,7 +97,7 @@ export type RefundStockRestockProjection = {
   orderItemId: string;
   quantity: number;
   restock: SellerInventoryMovementProjection;
-  /** Always false — Runtime deferred. */
+  /** Always false on Foundation projections — Runtime apply is separate. */
   applied: false;
 };
 
@@ -429,7 +429,7 @@ export function refundStockRestockPresentationCopy(): {
   return {
     eyebrow: "Refund restock · contract only",
     body: "Finite purchase stock may be restocked only after trusted Sync refunded, and only when a prior purchase_stock decrement is proven. Cancel release and unlimited product types never restock on_hand.",
-    note: "Partial refunds are out of contract. Runtime append/apply remains deferred.",
+    note: "Partial refunds are out of contract. Runtime apply is owned by refund stock restock runtime v1.",
   };
 }
 
@@ -448,7 +448,7 @@ export function rejectClientRefundStockRestockExecutionFields(
       return {
         ok: false,
         message:
-          "Client must not execute refund stock restock — Runtime is deferred and must use trusted prior-decrement facts only.",
+          "Client must not execute refund stock restock — only trusted service Runtime may apply prior-decrement facts.",
       };
     }
   }

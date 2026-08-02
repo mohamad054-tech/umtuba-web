@@ -10,13 +10,13 @@ Base: `c3cbe9f0e5d16df9b78b35ad441a79f0e9ad200d` (`origin/office/purchase-stock-
 | --- | --- | --- |
 | Cancel / reservation release | **No** — `reserved -=` only | Commerce Safety release RPCs |
 | Trusted payment capture | Decrements finite stock | `decrement_store_purchase_stock_after_capture` |
-| Trusted Sync `refunded` | **Designed here; Runtime deferred** | Full-order refund path; no restock RPC today |
+| Trusted Sync `refunded` | **Runtime:** `restock_store_purchase_stock_after_refund` | See `REFUND_STOCK_RESTOCK_RUNTIME_V1.md` |
 | Entitlement revoke | Access only | `revoke_store_digital_entitlements_after_refund` |
 | Partial refund | **Forbidden** | Full Order Refund Path contracts |
 | Stripe webhook today | Capture sessions only | No `charge.refunded` handler |
 
 **Chosen commitment:** `trusted_payment_refund` (after Sync `refunded`).
-**Future wire-in:** beside revoke in `applyFullOrderRefund` — not at cancel/ops approve.
+**Runtime wire-in:** after Sync in `applyFullOrderRefund`, before entitlement revoke — not at cancel/ops approve.
 
 ## Restock model (contract only)
 
@@ -35,13 +35,13 @@ Missing prior decrement evidence: **fail closed**.
 - `${captureEventKey}:purchase_stock:restock`
 - `${captureEventKey}:purchase_stock:restock:{reservationId}`
 
-Persisted uniqueness + replay no-op are deferred to a future Runtime RPC.
+Persisted uniqueness + replay no-op are implemented by Runtime migration `20260894`.
 
 ## Scope
 
 - Owns: commitment guard, relation checks, prior-decrement prerequisite, return_increment projection, read-row normalize, presentation copy, client-execution reject
 - Does **not** own: apply RPC, migration, cancel restock, partial restock, refund money path
 
-## Out of scope
+## Out of scope (Foundation)
 
-Runtime, warehouses, supplier sync, preorder/backorder, shipping, pricing, AI/Learning/Navigation/Home.
+Runtime apply (see Runtime doc), warehouses, supplier sync, preorder/backorder, shipping, pricing, AI/Learning/Navigation/Home.

@@ -9,6 +9,7 @@ import { STORE_PAYMENT_SYNC_RPC } from "./paymentOutcomeSync";
 import { STORE_SETTLEMENT_RPC } from "./settlementFoundation";
 import { STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC } from "./digitalEntitlementRevoke";
 import { STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC } from "./commissionDecompositionBridgeApply";
+import { STORE_PURCHASE_STOCK_RESTOCK_RPC } from "./refundStockRestockRuntime";
 import {
   applyFullOrderRefund,
   assertTrustedFullOrderRefundContext,
@@ -196,6 +197,22 @@ describe("Full order refund path — apply", () => {
           error: null,
         };
       }
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
+        expect(args).toMatchObject({
+          p_payment_attempt_id: ATTEMPT,
+          p_event_key: `${CAPTURE_KEY}:purchase_stock:restock`,
+          p_correlation_id: CORR,
+        });
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_restocked: 1,
+            quantity_restocked: 1,
+          },
+          error: null,
+        };
+      }
       if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
         expect(args).toMatchObject({
           p_payment_attempt_id: ATTEMPT,
@@ -263,6 +280,8 @@ describe("Full order refund path — apply", () => {
     expect(result.settlementSteps[1]?.action).toBe("reverse_allocation");
     expect(result.finalSettlementState).toBe("REVERSED");
     expect(result.refund.replayed).toBe(false);
+    expect(result.stockRestock.status).toBe("restocked");
+    expect(result.stockRestock.quantityRestocked).toBe(1);
     expect(result.entitlementRevoke.status).toBe("revoked");
     expect(result.entitlementRevoke.entitlementsRevoked).toBe(1);
     expect(result.sellerPayableProtected).toBe(true);
@@ -278,6 +297,7 @@ describe("Full order refund path — apply", () => {
       STORE_SETTLEMENT_RPC,
       STORE_SETTLEMENT_RPC,
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
@@ -285,6 +305,17 @@ describe("Full order refund path — apply", () => {
 
   it("duplicate refund with same key replays safely", async () => {
     const rpc = vi.fn(async (name: string) => {
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: true,
+            lines_restocked: 1,
+            quantity_restocked: 1,
+          },
+          error: null,
+        };
+      }
       if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
         return {
           data: {
@@ -335,10 +366,12 @@ describe("Full order refund path — apply", () => {
     if (result.ok) {
       expect(result.replayed).toBe(true);
       expect(result.refund.replayed).toBe(true);
+      expect(result.stockRestock.replayed).toBe(true);
       expect(result.entitlementRevoke.replayed).toBe(true);
     }
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);
@@ -469,6 +502,17 @@ describe("Full order refund path — apply", () => {
 
   it("seller balance path: UNALLOCATED refunds without settlement writes", async () => {
     const rpc = vi.fn(async (name: string) => {
+      if (name === STORE_PURCHASE_STOCK_RESTOCK_RPC) {
+        return {
+          data: {
+            ok: true,
+            replayed: false,
+            lines_restocked: 0,
+            quantity_restocked: 0,
+          },
+          error: null,
+        };
+      }
       if (name === STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC) {
         return {
           data: {
@@ -513,11 +557,13 @@ describe("Full order refund path — apply", () => {
     if (result.ok) {
       expect(result.settlementSteps).toEqual([]);
       expect(result.sellerPayableProtected).toBe(true);
+      expect(result.stockRestock.status).toBe("noop");
       expect(result.entitlementRevoke.entitlementsRevoked).toBe(0);
       expect(result.commissionDecomposition.status).toBe("skipped");
     }
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       STORE_PAYMENT_SYNC_RPC,
+      STORE_PURCHASE_STOCK_RESTOCK_RPC,
       STORE_DIGITAL_ENTITLEMENT_REVOKE_RPC,
       STORE_COMMISSION_DECOMPOSITION_MARK_REFUND_RPC,
     ]);

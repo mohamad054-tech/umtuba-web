@@ -1,6 +1,7 @@
 /**
  * Full Order Refund Path V1.
- * Trusted service-side orchestration: settle unwind → Sync refunded.
+ * Trusted service-side orchestration: settle unwind → Sync refunded →
+ * purchase stock restock → entitlement revoke → commission mark.
  * Full-order only. No bank rails, Dashboard, Admin UI, or client money.
  * Reuses Settlement Foundation + Payment Outcome Sync; preserves payout guards.
  */
@@ -29,6 +30,10 @@ import {
   markCommissionDecompositionAfterTrustedRefund,
   type CommissionDecompositionRefundMarkResult,
 } from "./commissionDecompositionBridgeApply";
+import {
+  restockPurchaseStockAfterTrustedRefund,
+  type RefundStockRestockRuntimeResult,
+} from "./refundStockRestockRuntime";
 
 export const FULL_ORDER_REFUND_PATH_ID =
   "commerce.payments.full_order_refund_path_v1" as const;
@@ -68,6 +73,7 @@ export type FullOrderRefundFailureCode =
   | "client_money_rejected"
   | "settlement_unwind_failed"
   | "entitlement_revoke_failed"
+  | "stock_restock_failed"
   | "commission_mark_failed"
   | "rpc_failed";
 
@@ -110,6 +116,13 @@ export type FullOrderRefundResult =
         platformCommissionMinor: number | null;
         sellerAmountMinor: number | null;
         policyStatus: "applied" | "not_configured";
+      };
+      stockRestock: {
+        status: "restocked" | "noop";
+        replayed: boolean;
+        linesRestocked: number;
+        quantityRestocked: number;
+        data: Record<string, unknown>;
       };
       entitlementRevoke: {
         status: "revoked";
@@ -679,6 +692,61 @@ async function applyCommissionMarkAfterRefund(
   };
 }
 
+async function applyStockRestockAfterRefund(
+  supabase: AnyClient,
+  ctx: TrustedFullOrderRefundContext
+): Promise<
+  | {
+      ok: true;
+      stockRestock: Extract<
+        FullOrderRefundResult,
+        { ok: true }
+      >["stockRestock"];
+    }
+  | { ok: false; code: "stock_restock_failed"; message: string }
+> {
+  const restock: RefundStockRestockRuntimeResult =
+    await restockPurchaseStockAfterTrustedRefund(supabase, {
+      paymentAttemptId: ctx.paymentAttemptId,
+      captureEventKey: ctx.captureEventKey,
+      correlationId: ctx.correlationId,
+    });
+
+  if (restock.status === "failed") {
+    return {
+      ok: false,
+      code: "stock_restock_failed",
+      message:
+        restock.message ||
+        "Purchase stock restock failed after trusted refund.",
+    };
+  }
+
+  if (restock.status === "noop") {
+    return {
+      ok: true,
+      stockRestock: {
+        status: "noop",
+        replayed: restock.replayed,
+        linesRestocked: 0,
+        quantityRestocked: 0,
+        data: restock.data,
+      },
+    };
+  }
+
+  return {
+    ok: true,
+    stockRestock: {
+      status: "restocked",
+      replayed: restock.replayed,
+      linesRestocked: restock.linesRestocked,
+      quantityRestocked: restock.quantityRestocked,
+      data: restock.data,
+    },
+  };
+}
+
 async function applyEntitlementRevokeAfterRefund(
   supabase: AnyClient,
   ctx: TrustedFullOrderRefundContext
@@ -774,7 +842,8 @@ async function applySettlementStep(
  * 2) Block payout IN_TRANSIT / COMPLETED
  * 3) Unwind settlement (hold if RELEASED, then reverse when allocated/held)
  * 4) Sync outcome=refunded (full capture amount)
- * 5) Revoke digital entitlements for the payment attempt (fail closed)
+ * 5) Restock finite purchase stock previously decremented (fail closed)
+ * 6) Revoke digital entitlements for the payment attempt (fail closed)
  */
 export async function applyFullOrderRefund(
   supabase: AnyClient,
@@ -849,6 +918,14 @@ export async function applyFullOrderRefund(
       },
     });
     if (!error && data && Boolean((data as Record<string, unknown>).replayed)) {
+      const restock = await applyStockRestockAfterRefund(supabase, ctx);
+      if (!restock.ok) {
+        return {
+          ok: false,
+          code: restock.code,
+          message: restock.message,
+        };
+      }
       const revoke = await applyEntitlementRevokeAfterRefund(supabase, ctx);
       if (!revoke.ok) {
         return {
@@ -887,6 +964,7 @@ export async function applyFullOrderRefund(
         finalSettlementState: ctx.settlementState,
         payoutState: ctx.payoutState,
         commission: projectCommissionConsistency(ctx, input.commissionPolicy),
+        stockRestock: restock.stockRestock,
         entitlementRevoke: revoke.entitlementRevoke,
         commissionDecomposition: commissionMark.commissionDecomposition,
         sellerPayableProtected: true,
@@ -988,6 +1066,15 @@ export async function applyFullOrderRefund(
     (s) => s.status === "replayed"
   );
 
+  const restock = await applyStockRestockAfterRefund(supabase, ctx);
+  if (!restock.ok) {
+    return {
+      ok: false,
+      code: restock.code,
+      message: restock.message,
+    };
+  }
+
   const revoke = await applyEntitlementRevokeAfterRefund(supabase, ctx);
   if (!revoke.ok) {
     return {
@@ -1034,6 +1121,7 @@ export async function applyFullOrderRefund(
     finalSettlementState,
     payoutState: ctx.payoutState,
     commission: projectCommissionConsistency(ctx, input.commissionPolicy),
+    stockRestock: restock.stockRestock,
     entitlementRevoke: revoke.entitlementRevoke,
     commissionDecomposition: commissionMark.commissionDecomposition,
     sellerPayableProtected: true,

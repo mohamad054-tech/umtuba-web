@@ -11,7 +11,8 @@ Depends on:
 - Payout Booking Ops Helpers V1 (compatible; refunded funds cannot submit)
 - Commission Policy Foundation V1 (optional consistency projection; no settlement amount mutation)
 - Digital entitlement grant (unchanged)
-- Digital Entitlement Revoke on Refund V1 (wired after Sync `refunded`)
+- Refund Stock Restock Runtime V1 (wired after Sync `refunded`, before revoke)
+- Digital Entitlement Revoke on Refund V1 (wired after restock)
 
 ## Purpose
 
@@ -24,7 +25,8 @@ Trusted **service-side** orchestration for **full-order** refunds:
    - `ALLOCATED` / `HELD` → `reverse_allocation` → `REVERSED`
    - `UNALLOCATED` / already `REVERSED` → Sync only
 4. Apply Sync `refunded` for the **full** trusted capture amount/currency
-5. Revoke digital entitlements for the payment attempt (fail closed; idempotent)
+5. Restock finite purchase stock previously decremented (fail closed; idempotent)
+6. Revoke digital entitlements for the payment attempt (fail closed; idempotent)
 
 ## Module
 
