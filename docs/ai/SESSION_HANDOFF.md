@@ -1,36 +1,44 @@
-# Session Handoff — UMTUBA Learning AI Tutor
+# Session Handoff — UMTUBA Learning
 
-**Updated:** 2026-07-31
+**Updated:** 2026-08-02
 
-## Closed (do not modify)
+## Machine assignment
 
-| Milestone | Tip |
+| Machine | Role |
 | --- | --- |
-| Thread Lesson Binding V1 | `b85081b` |
-| Thread Resume / History Read Foundation V1 | `6930d86` |
-| Structured Oversize Serialization V1 | `7d03178` |
+| **Desktop** | Active Learning workstation |
+| **Laptop** | Learning support only when assigned; Commerce stopped |
 
-## Active (PASS + STAGED — no commit yet)
+Commerce SoT remains on its dedicated branch/worktree and is **closed** for this Learning resume.
+
+## Authoritative Learning tip (base)
+
+| Field | Value |
+| --- | --- |
+| Branch (base) | `origin/office/learning-ai-tutor-learner-ui-integration-v1` |
+| Commit | `c3168eff3a324979efa5cab694e294c4daeeb4da` |
+| Note | AI Tutor learner UI integration complete |
+
+## Active milestone
 
 | Milestone | Branch / worktree |
 | --- | --- |
-| Thread Lifecycle Foundation V1 (`learning.tutor.thread_lifecycle_foundation_v1`) | Branch: `office/learning-ai-tutor-thread-lifecycle-foundation-v1` · Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-next-milestone-proposal-v1` · Base: `7d03178` |
+| Collaboration Platform Workspace Spine Foundation V1 | Branch: `office/learning-collaboration-workspace-spine-foundation-v1` · Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-spine-foundation-v1` · Base: `c3168ef` |
 
-### Lifecycle contract
+### Spine contract (current)
 
-- States: `active` | `archived`
-- Ensure = get-or-create single active thread for `(auth.uid, course_id, lesson_id)`
-- Never reuse across lesson / course / learner; archived → new active on ensure
-- Migration: `20260876` local only
+- Derive-first identity: `lwsp_v1:{spaceId}:{courseId}`
+- Access: course entitlement RLS; Spaces membership contextual only
+- Route: `/learning/courses/[courseId]/workspace`
+- Attachments: community / live / assignments_projects / tutor → empty or unavailable
+- No migration; no realtime; no shared files; no AI shared memory
 
-## Still deferred / blocked
+## Completed Learning foundations (do not re-open)
 
-- Conversation History Summarization — **deferred**, no unblock condition
-- `code_review` capability — blocked
-- Remote apply of Tutor migrations — requires explicit apply GO
+Catalog · learner experience · instructor authoring · assessments · progress · completion · assignments · discussions · live · AI Tutor backend · AI Tutor learner UI integration
 
 ## Do not
 
-- Start summarization while deferred
-- Amend closed tips
-- Commit / push / remote-apply from Cursor unless asked
+- Resume Commerce on Desktop while Learning is active unless an explicit Commerce GO reassigns
+- Add workspace membership tables without an explicit GO
+- Commit / push / remote-apply unless asked

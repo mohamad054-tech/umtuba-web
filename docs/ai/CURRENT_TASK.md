@@ -2,53 +2,57 @@
 
 ## Task title
 
-UM Learning AI Tutor — Thread Lifecycle Foundation V1
+Collaboration Platform Workspace Spine Foundation V1
 
 ## Status
 
-`pass-staged` — implementation complete; **STAGED only** (no commit / no push / no remote migration apply)
+`pass-local` — implementation complete; **no commit / no push**
 
 ## Milestone id
 
-`learning.tutor.thread_lifecycle_foundation_v1`
+`learning.collaboration.workspace_spine_foundation_v1`
 
 ## Branch
 
-`office/learning-ai-tutor-thread-lifecycle-foundation-v1`
+`office/learning-collaboration-workspace-spine-foundation-v1`
 
 ## Base
 
-`office/learning-ai-tutor-structured-oversize-serialization-v1` @ `7d03178e4b10d09c514386804405154c785c1031`
+`origin/office/learning-ai-tutor-learner-ui-integration-v1` @ `c3168eff3a324979efa5cab694e294c4daeeb4da`
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-next-milestone-proposal-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-workspace-spine-foundation-v1`
+
+## Desktop role
+
+Desktop is the active Learning workstation. Commerce is closed on this machine.
 
 ## Allowed scope
 
-- Lifecycle contract: `active` | `archived`
-- Get-or-create / reuse single active thread per `(auth.uid, course_id, lesson_id)`
-- Archive → replacement active on next ensure
-- Migration `20260876` (local only)
-- Foundation + bridge APIs + focused tests
-- SSOT docs for this milestone
+- Derive-first workspace identity `(spaceId, courseId)`
+- Course entitlement access + parent Space context
+- Route `/learning/courses/[courseId]/workspace`
+- Shell + attachment slots (empty/unavailable only)
+- Docs + focused tests
+- No migration (derive-first)
 
 ## Forbidden scope
 
-- Conversation History Summarization (still deferred)
-- Provider / Gemini / alpha / Web UI redesign
-- Reopening closed Tutor tips (Binding / Resume / Oversize)
-- Commit, push, remote migration apply
+- Commerce / Stripe / payouts / refunds
+- Realtime chat / presence / shared files
+- Assignment bucket reuse / AI shared memory
+- Second membership system
+- Commit / push / remote migration apply
 
 ## Done
 
-- SSOT approved Lifecycle as the official next milestone after Oversize Serialization
-- Migration + ensure/archive RPCs + unique active index
-- Foundation/bridge wiring; create-with-lesson uses ensure
-- Focused + regression tests
+- Spine contract + load fail-closed path
+- Workspace route + shell + nav
+- Attachment slots explicit empty/unavailable
+- SSOT doc + handoffs updated for this tip
 
 ## Next (human)
 
-1. Review staged diff; commit trailer-free outside Cursor if approved
-2. Remote-apply `20260876` only with explicit apply GO
-3. Summarization remains deferred until SSOT undefer + GO
+1. Review local diff; commit/push only with explicit GO
+2. Later: attach real payloads behind the same slot ids (separate milestone)
