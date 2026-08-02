@@ -46,6 +46,17 @@ export type SellerCatalogListItem = {
     | "unavailable"
     | "unknown"
     | null;
+  /**
+   * Derived quantity snapshot for catalog rows (not stored columns).
+   * Available is always derived; nulls mean unknown/unlimited — never invent stock.
+   */
+  quantity?: {
+    tracking: "finite" | "unlimited" | "unavailable" | "unknown";
+    onHand: number | null;
+    reserved: number | null;
+    safetyStock: number | null;
+    available: number | null;
+  } | null;
 };
 
 const FILTER_STATUSES: Record<
