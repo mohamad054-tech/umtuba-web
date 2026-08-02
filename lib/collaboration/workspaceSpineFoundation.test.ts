@@ -11,6 +11,7 @@ import {
   COLLABORATION_WORKSPACE_ROLES,
   COLLABORATION_WORKSPACE_ROLE_RANKS,
   COLLABORATION_WORKSPACE_RPCS,
+  COLLABORATION_WORKSPACE_SPINE_RPCS,
   COLLABORATION_WORKSPACE_STATUSES,
   collaborationWorkspaceAllows,
   collaborationWorkspaceCanMutatePeer,
@@ -156,11 +157,17 @@ describe("Collaboration Workspace Spine — SQL contracts", () => {
         new RegExp(`create or replace function public\\.${name}`, "i")
       );
     }
-    for (const name of Object.values(COLLABORATION_WORKSPACE_RPCS)) {
+    for (const name of Object.values(COLLABORATION_WORKSPACE_SPINE_RPCS)) {
       expect(sql).toMatch(
         new RegExp(`create or replace function public\\.${name}`, "i")
       );
     }
+    expect(COLLABORATION_WORKSPACE_RPCS.revokeInvite).toBe(
+      "revoke_collaboration_workspace_invite"
+    );
+    expect(COLLABORATION_WORKSPACE_RPCS.leaveWorkspace).toBe(
+      "leave_collaboration_workspace"
+    );
     expect(sql).not.toMatch(/link_collaboration_workspace_resource/i);
     expect(sql).not.toMatch(/unlink_collaboration_workspace_resource/i);
     for (const t of COLLABORATION_RESOURCE_TYPES_RESERVED) {

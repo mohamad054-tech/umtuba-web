@@ -115,7 +115,8 @@ export const COLLABORATION_WORKSPACE_PERMISSIONS = {
 export type CollaborationWorkspacePermission =
   keyof typeof COLLABORATION_WORKSPACE_PERMISSIONS;
 
-export const COLLABORATION_WORKSPACE_RPCS = {
+/** Spine foundation RPCs (20260896). */
+export const COLLABORATION_WORKSPACE_SPINE_RPCS = {
   create: "create_collaboration_workspace",
   activate: "activate_collaboration_workspace",
   archive: "archive_collaboration_workspace",
@@ -127,6 +128,13 @@ export const COLLABORATION_WORKSPACE_RPCS = {
   suspendMember: "suspend_collaboration_workspace_member",
   removeMember: "remove_collaboration_workspace_member",
   transferOwnership: "transfer_collaboration_workspace_ownership",
+} as const;
+
+/** Full membership RPC catalog (spine + runtime additive revoke/leave). */
+export const COLLABORATION_WORKSPACE_RPCS = {
+  ...COLLABORATION_WORKSPACE_SPINE_RPCS,
+  revokeInvite: "revoke_collaboration_workspace_invite",
+  leaveWorkspace: "leave_collaboration_workspace",
 } as const;
 
 export const COLLABORATION_WORKSPACE_HELPERS = {
