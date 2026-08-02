@@ -42,8 +42,11 @@ That mapping reuses the hold audit boundary; it does not turn reservation events
 
 ## Related
 
-Purchase stock decrement commitment (`trusted_payment_capture`, consume→decrement, no Runtime) continues in
-`PURCHASE_STOCK_DECREMENT_FOUNDATION_V1.md`.
+Purchase stock decrement commitment (`trusted_payment_capture`, consume→decrement) continues in
+`PURCHASE_STOCK_DECREMENT_FOUNDATION_V1.md` / `PURCHASE_STOCK_DECREMENT_RUNTIME_V1.md`.
+
+Refund restock commitment (`trusted_payment_refund`, `return_increment`, no Runtime) continues in
+`REFUND_STOCK_RESTOCK_FOUNDATION_V1.md`.
 
 ## Out of scope
 
