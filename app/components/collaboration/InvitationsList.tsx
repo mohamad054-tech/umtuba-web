@@ -33,6 +33,7 @@ export default function InvitationsList({
     <ul
       className="divide-y divide-white/10 overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/80"
       aria-label={COLLABORATION_UI_COPY.invitesTitle}
+      data-testid="collaboration-invites-list"
     >
       {invites.map((invite) => (
         <li

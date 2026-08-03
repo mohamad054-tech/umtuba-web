@@ -9,6 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:collaboration-smoke": "vitest run lib/collaboration/collaborationSmokeE2eReadiness.test.ts lib/collaboration/collaborationPlatformGate.test.ts",
+    "test:e2e:collaboration": "playwright test -c e2e/collaboration/playwright.config.ts",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once"
   },
@@ -28,6 +30,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19.2.17",
