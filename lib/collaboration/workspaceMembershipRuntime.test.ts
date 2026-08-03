@@ -82,12 +82,19 @@ describe("Collaboration Membership Runtime — RPC catalog", () => {
       transferOwnership: "transfer_collaboration_workspace_ownership",
       leaveWorkspace: "leave_collaboration_workspace",
       archive: "archive_collaboration_workspace",
+      updateSettings: "update_collaboration_workspace_settings",
     });
     expect(COLLABORATION_WORKSPACE_RPCS.revokeInvite).toBe(
       COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.revokeInvite
     );
+    expect(COLLABORATION_WORKSPACE_RPCS.updateSettings).toBe(
+      COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateSettings
+    );
     expect(Object.keys(COLLABORATION_WORKSPACE_SPINE_RPCS)).not.toContain(
       "revokeInvite"
+    );
+    expect(Object.keys(COLLABORATION_WORKSPACE_SPINE_RPCS)).not.toContain(
+      "updateSettings"
     );
   });
 });

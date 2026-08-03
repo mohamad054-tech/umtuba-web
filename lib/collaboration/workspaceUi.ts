@@ -1,12 +1,14 @@
 /**
- * Collaboration Workspace UI Foundation V1 — routes, copy, and presentation helpers.
+ * Collaboration Workspace UI — routes, copy, and presentation helpers.
  * Arabic-first surface (RTL). Overlay only — no Learning/Commerce bindings.
+ * Settings & Lifecycle UI V1 extends Foundation V1 routes/capabilities.
  */
 
 import {
   COLLABORATION_WORKSPACE_INVITE_ROLES,
   COLLABORATION_WORKSPACE_KINDS,
   collaborationWorkspaceAllows,
+  collaborationWorkspaceCanMutatePeer,
   type CollaborationWorkspaceInviteRole,
   type CollaborationWorkspaceKind,
   type CollaborationWorkspaceRole,
@@ -19,6 +21,7 @@ export const COLLABORATION_UI_ROUTES = {
   workspace: (workspaceId: string) => `/workspaces/${workspaceId}`,
   members: (workspaceId: string) => `/workspaces/${workspaceId}/members`,
   invites: (workspaceId: string) => `/workspaces/${workspaceId}/invites`,
+  settings: (workspaceId: string) => `/workspaces/${workspaceId}/settings`,
 } as const;
 
 export const COLLABORATION_UI_COPY = {
@@ -35,6 +38,7 @@ export const COLLABORATION_UI_COPY = {
   detailsTitle: "تفاصيل المساحة",
   membersTitle: "الأعضاء",
   invitesTitle: "الدعوات",
+  settingsTitle: "الإعدادات",
   loading: "جارٍ التحميل…",
   loadErrorTitle: "تعذّر تحميل مساحات العمل",
   membersEmpty: "لا يوجد أعضاء ظاهرون وفق صلاحياتك.",
@@ -55,6 +59,27 @@ export const COLLABORATION_UI_COPY = {
   myRoleLabel: "دورك",
   openWorkspace: "فتح المساحة",
   backToList: "كل المساحات",
+  saveSettings: "حفظ الإعدادات",
+  settingsSaved: "تم حفظ إعدادات المساحة.",
+  allowMemberInvitesLabel: "السماح بدعوات الأعضاء",
+  publicMemberDirectoryLabel: "دليل أعضاء عام",
+  lifecycleTitle: "دورة حياة المساحة",
+  leaveWorkspace: "مغادرة المساحة",
+  leaveOwnerBlocked:
+    "لا يمكن للمالك الوحيد المغادرة قبل نقل الملكية إلى عضو نشط آخر.",
+  leaveConfirm: "مغادرة مساحة العمل؟",
+  archiveWorkspace: "أرشفة المساحة",
+  archiveConfirm: "أرشفة مساحة العمل؟ لا يمكن التراجع بسهولة.",
+  transferOwnership: "نقل الملكية",
+  transferConfirm: "نقل ملكية مساحة العمل إلى هذا العضو؟",
+  suspendMember: "تعليق",
+  removeMember: "إزالة",
+  removeConfirm: "إزالة هذا العضو من المساحة؟",
+  lastOwnerProtectionTitle: "حماية المالك الأخير",
+  lastOwnerProtectionBody:
+    "المالك النشط لا يُعلَّق ولا يُزال ولا يغادر قبل نقل الملكية.",
+  unauthorizedAction: "ليست لديك صلاحية لهذا الإجراء.",
+  transferTargetLabel: "المالك الجديد",
 } as const;
 
 export const COLLABORATION_KIND_LABELS: Record<
@@ -125,6 +150,49 @@ export function canViewCollaborationInvites(
     collaborationWorkspaceAllows(role, "manage_members") ||
     collaborationWorkspaceAllows(role, "invite_members")
   );
+}
+
+export function canManageCollaborationWorkspaceSettings(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return collaborationWorkspaceAllows(role, "manage_workspace");
+}
+
+export function canManageCollaborationMembers(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return collaborationWorkspaceAllows(role, "manage_members");
+}
+
+export function canTransferCollaborationOwnership(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return collaborationWorkspaceAllows(role, "transfer_ownership");
+}
+
+export function canArchiveCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return role === "owner";
+}
+
+/** Non-owners may leave; owners must transfer first (SQL-enforced). */
+export function canLeaveCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return role !== "owner";
+}
+
+export function canMutateCollaborationMember(
+  actorRole: CollaborationWorkspaceRole | string,
+  targetRole: CollaborationWorkspaceRole | string,
+  targetUserId: string,
+  actorUserId: string
+): boolean {
+  if (targetUserId === actorUserId) return false;
+  if (targetRole === "owner") return false;
+  if (!canManageCollaborationMembers(actorRole)) return false;
+  return collaborationWorkspaceCanMutatePeer(String(actorRole), String(targetRole));
 }
 
 export function isCollaborationInviteRole(

@@ -135,11 +135,12 @@ export const COLLABORATION_WORKSPACE_SPINE_RPCS = {
   transferOwnership: "transfer_collaboration_workspace_ownership",
 } as const;
 
-/** Full membership RPC catalog (spine + runtime additive revoke/leave). */
+/** Full membership RPC catalog (spine + additive revoke/leave/settings). */
 export const COLLABORATION_WORKSPACE_RPCS = {
   ...COLLABORATION_WORKSPACE_SPINE_RPCS,
   revokeInvite: "revoke_collaboration_workspace_invite",
   leaveWorkspace: "leave_collaboration_workspace",
+  updateSettings: "update_collaboration_workspace_settings",
 } as const;
 
 export const COLLABORATION_WORKSPACE_HELPERS = {

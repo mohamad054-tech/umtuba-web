@@ -39,9 +39,15 @@ export type CollaborationWorkspaceSummary = {
   myStatus: CollaborationWorkspaceMemberStatus;
 };
 
+export type CollaborationWorkspaceSettingsFlags = {
+  allowMemberInvites: boolean;
+  publicMemberDirectory: boolean;
+};
+
 export type CollaborationWorkspaceDetail = CollaborationWorkspaceSummary & {
   legalName: string | null;
   createdAt: string;
+  settings: CollaborationWorkspaceSettingsFlags;
 };
 
 export type CollaborationWorkspaceMemberRow = {
@@ -264,12 +270,24 @@ export async function getCollaborationWorkspaceDetail(
     .eq("workspace_id", workspaceId)
     .maybeSingle();
 
+  const { data: settings } = await supabase
+    .from("collaboration_workspace_settings")
+    .select("allow_member_invites, public_member_directory")
+    .eq("workspace_id", workspaceId)
+    .maybeSingle();
+
+  const settingsRec = asRecord(settings);
+
   return {
     ok: true,
     data: {
       ...summary,
       legalName: asString(asRecord(profile)?.legal_name),
       createdAt: asString(asRecord(workspace)?.created_at) ?? "",
+      settings: {
+        allowMemberInvites: Boolean(settingsRec?.allow_member_invites),
+        publicMemberDirectory: Boolean(settingsRec?.public_member_directory),
+      },
     },
   };
 }

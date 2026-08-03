@@ -142,6 +142,7 @@ describe("Collaboration Platform Exposure Gate V1", () => {
       "app/workspaces/[workspaceId]/page.tsx",
       "app/workspaces/[workspaceId]/members/page.tsx",
       "app/workspaces/[workspaceId]/invites/page.tsx",
+      "app/workspaces/[workspaceId]/settings/page.tsx",
     ]) {
       const src = readFileSync(join(ROOT, rel), "utf8");
       expect(src).toMatch(/robots:\s*\{\s*index:\s*false/);

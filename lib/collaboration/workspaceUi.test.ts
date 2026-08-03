@@ -25,6 +25,9 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(COLLABORATION_UI_ROUTES.members("abc")).toBe(
       "/workspaces/abc/members"
     );
+    expect(COLLABORATION_UI_ROUTES.settings("abc")).toBe(
+      "/workspaces/abc/settings"
+    );
   });
 
   it("labels kinds/roles/statuses for UI", () => {
@@ -47,6 +50,7 @@ describe("Collaboration Workspace UI Foundation V1", () => {
       "app/workspaces/[workspaceId]/page.tsx",
       "app/workspaces/[workspaceId]/members/page.tsx",
       "app/workspaces/[workspaceId]/invites/page.tsx",
+      "app/workspaces/[workspaceId]/settings/page.tsx",
       "app/components/collaboration/CollaborationShell.tsx",
       "app/components/collaboration/WorkspaceCard.tsx",
       "app/components/collaboration/WorkspaceSwitcher.tsx",
@@ -54,6 +58,8 @@ describe("Collaboration Workspace UI Foundation V1", () => {
       "app/components/collaboration/MembersList.tsx",
       "app/components/collaboration/InvitationsList.tsx",
       "app/components/collaboration/CreateWorkspaceDialog.tsx",
+      "app/components/collaboration/WorkspaceSettingsForm.tsx",
+      "app/components/collaboration/WorkspaceLifecyclePanel.tsx",
       "app/actions/collaboration.ts",
       "lib/collaboration/workspaceQueries.ts",
     ];
@@ -84,6 +90,8 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(actions).toMatch(/createCollaborationWorkspace/);
     expect(actions).toMatch(/inviteCollaborationWorkspaceMember/);
     expect(actions).toMatch(/revokeCollaborationWorkspaceInvite/);
+    expect(actions).toMatch(/updateCollaborationWorkspaceSettings/);
+    expect(actions).toMatch(/leaveCollaborationWorkspace/);
     expect(actions).not.toMatch(/learning_/);
     expect(actions).not.toMatch(/from\("stores"\)/);
   });

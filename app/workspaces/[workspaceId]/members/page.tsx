@@ -68,7 +68,12 @@ export default async function WorkspaceMembersPage({ params }: PageProps) {
           message={members.message}
         />
       ) : (
-        <MembersList members={members.data} />
+        <MembersList
+          members={members.data}
+          workspaceId={workspaceId}
+          currentUserId={user.id}
+          myRole={detail.data.myRole}
+        />
       )}
     </CollaborationShell>
   );

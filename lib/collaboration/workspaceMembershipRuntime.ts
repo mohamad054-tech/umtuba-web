@@ -21,6 +21,7 @@ export const COLLABORATION_MEMBERSHIP_RUNTIME_RPCS = {
   ...COLLABORATION_WORKSPACE_RPCS,
   revokeInvite: "revoke_collaboration_workspace_invite",
   leaveWorkspace: "leave_collaboration_workspace",
+  updateSettings: "update_collaboration_workspace_settings",
 } as const;
 
 export type CollaborationMembershipResult<T> =
@@ -58,6 +59,20 @@ export function sanitizeCollaborationMembershipError(
     lower.includes("cannot change the active owner")
   ) {
     return "Ownership must be transferred before this membership change.";
+  }
+  if (
+    lower.includes("not allowed to update workspace settings") ||
+    lower.includes("only the workspace owner can archive") ||
+    lower.includes("only the current owner can transfer")
+  ) {
+    return "You are not allowed to perform this workspace action.";
+  }
+  if (
+    lower.includes("not available for settings updates") ||
+    lower.includes("invalid workspace display_name") ||
+    lower.includes("invalid workspace kind")
+  ) {
+    return "Workspace settings could not be updated.";
   }
   if (
     lower.includes("invite has expired") ||
@@ -503,6 +518,81 @@ export async function archiveCollaborationWorkspace(
     data: {
       workspace_id: workspace.data,
       status: asString(result.data.status) ?? "archived",
+    },
+  };
+}
+
+export type UpdateCollaborationWorkspaceSettingsInput = {
+  workspaceId: string;
+  displayName: string;
+  description?: string | null;
+  kind: CollaborationWorkspaceKind | string;
+  allowMemberInvites?: boolean | null;
+  publicMemberDirectory?: boolean | null;
+};
+
+export async function updateCollaborationWorkspaceSettings(
+  supabase: AnyClient,
+  input: UpdateCollaborationWorkspaceSettingsInput
+): Promise<
+  CollaborationMembershipResult<{
+    workspace_id: string;
+    display_name: string;
+    description: string | null;
+    kind: string;
+    allow_member_invites: boolean;
+    public_member_directory: boolean;
+  }>
+> {
+  const workspace = requireUuid(input.workspaceId, "workspace_id");
+  if (!workspace.ok) return workspace;
+
+  const displayName = (input.displayName ?? "").trim();
+  if (displayName.length < 1 || displayName.length > 120) {
+    return { ok: false, message: "Invalid workspace display_name" };
+  }
+
+  if (
+    !(COLLABORATION_WORKSPACE_KINDS as readonly string[]).includes(input.kind)
+  ) {
+    return { ok: false, message: "Invalid workspace kind" };
+  }
+
+  const description =
+    input.description == null ? null : String(input.description);
+  if (description != null && description.length > 4000) {
+    return { ok: false, message: "Description too long" };
+  }
+
+  const result = await callRpc(
+    supabase,
+    COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateSettings,
+    {
+      p_workspace_id: workspace.data,
+      p_display_name: displayName,
+      p_description: description,
+      p_kind: input.kind,
+      p_allow_member_invites:
+        typeof input.allowMemberInvites === "boolean"
+          ? input.allowMemberInvites
+          : null,
+      p_public_member_directory:
+        typeof input.publicMemberDirectory === "boolean"
+          ? input.publicMemberDirectory
+          : null,
+    }
+  );
+  if (!result.ok) return result;
+
+  return {
+    ok: true,
+    data: {
+      workspace_id: workspace.data,
+      display_name: asString(result.data.display_name) ?? displayName,
+      description: asString(result.data.description),
+      kind: asString(result.data.kind) ?? String(input.kind),
+      allow_member_invites: Boolean(result.data.allow_member_invites),
+      public_member_directory: Boolean(result.data.public_member_directory),
     },
   };
 }

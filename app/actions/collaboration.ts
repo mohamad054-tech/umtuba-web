@@ -8,12 +8,19 @@ import {
 } from "../../lib/collaboration/collaborationPlatformGate";
 import {
   acceptCollaborationWorkspaceInvite,
+  archiveCollaborationWorkspace,
   createCollaborationWorkspace,
   declineCollaborationWorkspaceInvite,
   inviteCollaborationWorkspaceMember,
+  leaveCollaborationWorkspace,
+  removeCollaborationWorkspaceMember,
   revokeCollaborationWorkspaceInvite,
+  suspendCollaborationWorkspaceMember,
+  transferCollaborationWorkspaceOwnership,
+  updateCollaborationWorkspaceSettings,
 } from "../../lib/collaboration/workspaceMembershipRuntime";
 import {
+  COLLABORATION_UI_COPY,
   COLLABORATION_UI_ROUTES,
   isCollaborationInviteRole,
 } from "../../lib/collaboration/workspaceUi";
@@ -27,6 +34,7 @@ function revalidateWorkspaces(workspaceId?: string) {
     revalidatePath(COLLABORATION_UI_ROUTES.workspace(workspaceId));
     revalidatePath(COLLABORATION_UI_ROUTES.members(workspaceId));
     revalidatePath(COLLABORATION_UI_ROUTES.invites(workspaceId));
+    revalidatePath(COLLABORATION_UI_ROUTES.settings(workspaceId));
   }
 }
 
@@ -189,6 +197,192 @@ export async function declineCollaborationWorkspaceInviteAction(
 
   revalidateWorkspaces();
   return { ok: true, message: "تم رفض الدعوة." };
+}
+
+export async function updateCollaborationWorkspaceSettingsAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const displayName = String(formData.get("displayName") ?? "");
+  const kind = String(formData.get("kind") ?? "");
+  const description = String(formData.get("description") ?? "");
+  const allowMemberInvites = formData.get("allowMemberInvites") === "on";
+  const publicMemberDirectory =
+    formData.get("publicMemberDirectory") === "on";
+
+  if (
+    !(COLLABORATION_WORKSPACE_KINDS as readonly string[]).includes(kind)
+  ) {
+    return { ok: false, message: "Invalid workspace kind" };
+  }
+
+  const supabase = await createClient();
+  const result = await updateCollaborationWorkspaceSettings(supabase, {
+    workspaceId,
+    displayName,
+    kind,
+    description,
+    allowMemberInvites,
+    publicMemberDirectory,
+  });
+
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: COLLABORATION_UI_COPY.settingsSaved,
+    workspaceId,
+  };
+}
+
+export async function leaveCollaborationWorkspaceAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const supabase = await createClient();
+  const result = await leaveCollaborationWorkspace(supabase, workspaceId);
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  redirect(COLLABORATION_UI_ROUTES.root);
+}
+
+export async function archiveCollaborationWorkspaceAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const supabase = await createClient();
+  const result = await archiveCollaborationWorkspace(supabase, workspaceId);
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: "تم أرشفة مساحة العمل.",
+    workspaceId,
+  };
+}
+
+export async function transferCollaborationWorkspaceOwnershipAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const newOwnerUserId = String(formData.get("newOwnerUserId") ?? "");
+  const supabase = await createClient();
+  const result = await transferCollaborationWorkspaceOwnership(
+    supabase,
+    workspaceId,
+    newOwnerUserId
+  );
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: "تم نقل ملكية مساحة العمل.",
+    workspaceId,
+  };
+}
+
+export async function suspendCollaborationWorkspaceMemberAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const targetUserId = String(formData.get("userId") ?? "");
+  const supabase = await createClient();
+  const result = await suspendCollaborationWorkspaceMember(
+    supabase,
+    workspaceId,
+    targetUserId
+  );
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return { ok: true, message: "تم تعليق العضو.", workspaceId };
+}
+
+export async function removeCollaborationWorkspaceMemberAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const targetUserId = String(formData.get("userId") ?? "");
+  const supabase = await createClient();
+  const result = await removeCollaborationWorkspaceMember(
+    supabase,
+    workspaceId,
+    targetUserId
+  );
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return { ok: true, message: "تم إزالة العضو.", workspaceId };
 }
 
 /** Exported for tests — must stay aligned with action fail-closed copy. */
