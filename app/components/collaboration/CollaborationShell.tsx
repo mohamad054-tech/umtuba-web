@@ -37,6 +37,10 @@ export default function CollaborationShell({
           label: COLLABORATION_UI_COPY.invitesTitle,
         },
         {
+          href: COLLABORATION_UI_ROUTES.settings(workspaceId),
+          label: COLLABORATION_UI_COPY.settingsTitle,
+        },
+        {
           href: COLLABORATION_UI_ROUTES.root,
           label: COLLABORATION_UI_COPY.backToList,
         },

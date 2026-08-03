@@ -19,6 +19,7 @@ export const COLLABORATION_UI_ROUTES = {
   workspace: (workspaceId: string) => `/workspaces/${workspaceId}`,
   members: (workspaceId: string) => `/workspaces/${workspaceId}/members`,
   invites: (workspaceId: string) => `/workspaces/${workspaceId}/invites`,
+  settings: (workspaceId: string) => `/workspaces/${workspaceId}/settings`,
 } as const;
 
 export const COLLABORATION_UI_COPY = {
@@ -55,6 +56,25 @@ export const COLLABORATION_UI_COPY = {
   myRoleLabel: "دورك",
   openWorkspace: "فتح المساحة",
   backToList: "كل المساحات",
+  settingsTitle: "الإعدادات ودورة الحياة",
+  settingsSubtitle: "عرض الحالة والإجراءات الآمنة لمساحة العمل",
+  settingsDenied: "ليست لديك صلاحية إدارة إعدادات هذه المساحة.",
+  profileReadOnlyNote:
+    "الاسم والوصف للقراءة فقط — لا يوجد عقد تعديل آمن في وقت التشغيل بعد الإنشاء.",
+  profileEditUnsupported: "تعديل الاسم أو الوصف غير مدعوم بعد.",
+  lifecycleTitle: "دورة حياة المساحة",
+  archiveTitle: "أرشفة المساحة",
+  archiveHelp: "الأرشفة متاحة للمالك فقط. لا تحذف الأعضاء أو الرسائل عبر هذه الواجهة.",
+  archiveConfirm: "أؤكّد أرشفة مساحة العمل",
+  archiveSubmit: "أرشفة المساحة",
+  archiveDisabled: "الأرشفة متاحة للمالك عندما لا تكون المساحة مؤرشفة.",
+  activateTitle: "تفعيل المسودة",
+  activateHelp: "يمكن للمالك تفعيل مساحة بحالة مسودة فقط.",
+  activateSubmit: "تفعيل المساحة",
+  leaveTitle: "مغادرة المساحة",
+  leaveHelp: "المالك لا يمكنه المغادرة قبل نقل الملكية.",
+  leaveSubmit: "مغادرة المساحة",
+  leaveDisabled: "المغادرة غير متاحة لدورك أو لحالة المساحة الحالية.",
 } as const;
 
 export const COLLABORATION_KIND_LABELS: Record<
@@ -125,6 +145,34 @@ export function canViewCollaborationInvites(
     collaborationWorkspaceAllows(role, "manage_members") ||
     collaborationWorkspaceAllows(role, "invite_members")
   );
+}
+
+/** Owner/admin settings chrome (manage_workspace). */
+export function canManageCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return collaborationWorkspaceAllows(role, "manage_workspace");
+}
+
+/** SQL archive RPC is owner-only (not admin). */
+export function canArchiveCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return role === "owner";
+}
+
+/** SQL activate RPC is owner-only and draft-only (status checked separately). */
+export function canActivateCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return role === "owner";
+}
+
+/** Non-owners may leave; owner must transfer first (enforced by RPC). */
+export function canLeaveCollaborationWorkspace(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return role !== "owner";
 }
 
 export function isCollaborationInviteRole(

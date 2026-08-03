@@ -5,7 +5,9 @@ import { COLLABORATION_PLATFORM_ENABLED } from "./workspaceSpineFoundation";
 import {
   COLLABORATION_UI_COPY,
   COLLABORATION_UI_ROUTES,
+  canArchiveCollaborationWorkspace,
   canManageCollaborationInvites,
+  canManageCollaborationWorkspace,
   canViewCollaborationInvites,
   collaborationKindLabel,
   collaborationRoleLabel,
@@ -25,6 +27,9 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(COLLABORATION_UI_ROUTES.members("abc")).toBe(
       "/workspaces/abc/members"
     );
+    expect(COLLABORATION_UI_ROUTES.settings("abc")).toBe(
+      "/workspaces/abc/settings"
+    );
   });
 
   it("labels kinds/roles/statuses for UI", () => {
@@ -35,6 +40,9 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(isCollaborationInviteRole("owner")).toBe(false);
     expect(canManageCollaborationInvites("manager")).toBe(true);
     expect(canViewCollaborationInvites("member")).toBe(false);
+    expect(canManageCollaborationWorkspace("admin")).toBe(true);
+    expect(canArchiveCollaborationWorkspace("admin")).toBe(false);
+    expect(canArchiveCollaborationWorkspace("owner")).toBe(true);
     expect(
       shortenCollaborationId("11111111-1111-4111-8111-111111111111")
     ).toMatch(/…/);
@@ -47,7 +55,9 @@ describe("Collaboration Workspace UI Foundation V1", () => {
       "app/workspaces/[workspaceId]/page.tsx",
       "app/workspaces/[workspaceId]/members/page.tsx",
       "app/workspaces/[workspaceId]/invites/page.tsx",
+      "app/workspaces/[workspaceId]/settings/page.tsx",
       "app/components/collaboration/CollaborationShell.tsx",
+      "app/components/collaboration/WorkspaceSettingsPanel.tsx",
       "app/components/collaboration/WorkspaceCard.tsx",
       "app/components/collaboration/WorkspaceSwitcher.tsx",
       "app/components/collaboration/WorkspaceList.tsx",

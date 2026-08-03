@@ -2,37 +2,39 @@
 
 ## Task title
 
-Learning Collaboration Smoke & E2E Readiness V1
+Collaboration Settings & Lifecycle UI V1
 
 ## Status
 
-`pass-local` — readiness coverage implemented; **no commit / no push**
+`pass-local` — implementation complete; **no commit / no push**
 
 ## Milestone id
 
-`collaboration.ops.smoke_e2e_readiness_v1`
+`collaboration.workspace.settings_lifecycle_ui_v1`
 
 ## Branch
 
-`office/learning-collaboration-smoke-e2e-readiness-v1`
+`office/collaboration-settings-lifecycle-ui-v1`
 
 ## Base
 
-`b00240226b274c479dddd081da2332fd1f956145`
-(`origin/office/collaboration-workspace-ui-foundation-v1`)
+`616d4f7710e9b2c3db7b9dc1384111f4887a0fce`
+(`office/learning-collaboration-smoke-e2e-readiness-v1`)
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-learning-collaboration-smoke-e2e-readiness-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-collaboration-settings-lifecycle-ui-v1`
 
-## Scope
+## Allowed
 
-Repository-grounded smoke/E2E readiness for completed Collaboration chain
-(Spine → Membership → UI Foundation / `/workspaces`).
+- Settings entry `/workspaces/[id]/settings` (owner/admin)
+- Read-only profile + lifecycle status visibility
+- Archive / activate draft / leave via existing RPCs
+- Fail-closed profile edit stub
 
 ## Forbidden
 
-- Commerce / Home / Creator / Translation / AI providers / shared nav redesign
-- Credentialed remote seed mutation without separate GO
-- Blind copy of stale uncommitted files from other worktrees
-- Commit / push without explicit GO
+- Invented DB update RPCs / destructive delete
+- Learning course binding, realtime, LiveKit, Commerce
+- Changing platform gate default
+- Commit / push without GO

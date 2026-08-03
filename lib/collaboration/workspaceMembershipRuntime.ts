@@ -506,3 +506,29 @@ export async function archiveCollaborationWorkspace(
     },
   };
 }
+
+/** Draft → active. Owner-only; enforced by SQL RPC. */
+export async function activateCollaborationWorkspace(
+  supabase: AnyClient,
+  workspaceId: string
+): Promise<
+  CollaborationMembershipResult<{ workspace_id: string; status: string }>
+> {
+  const workspace = requireUuid(workspaceId, "workspace_id");
+  if (!workspace.ok) return workspace;
+
+  const result = await callRpc(
+    supabase,
+    COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.activate,
+    { p_workspace_id: workspace.data }
+  );
+  if (!result.ok) return result;
+
+  return {
+    ok: true,
+    data: {
+      workspace_id: workspace.data,
+      status: asString(result.data.status) ?? "active",
+    },
+  };
+}

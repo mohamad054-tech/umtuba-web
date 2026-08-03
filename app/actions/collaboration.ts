@@ -8,11 +8,15 @@ import {
 } from "../../lib/collaboration/collaborationPlatformGate";
 import {
   acceptCollaborationWorkspaceInvite,
+  activateCollaborationWorkspace,
+  archiveCollaborationWorkspace,
   createCollaborationWorkspace,
   declineCollaborationWorkspaceInvite,
   inviteCollaborationWorkspaceMember,
+  leaveCollaborationWorkspace,
   revokeCollaborationWorkspaceInvite,
 } from "../../lib/collaboration/workspaceMembershipRuntime";
+import { rejectUnsupportedCollaborationProfileEdit } from "../../lib/collaboration/workspaceSettingsLifecycle";
 import {
   COLLABORATION_UI_ROUTES,
   isCollaborationInviteRole,
@@ -27,6 +31,7 @@ function revalidateWorkspaces(workspaceId?: string) {
     revalidatePath(COLLABORATION_UI_ROUTES.workspace(workspaceId));
     revalidatePath(COLLABORATION_UI_ROUTES.members(workspaceId));
     revalidatePath(COLLABORATION_UI_ROUTES.invites(workspaceId));
+    revalidatePath(COLLABORATION_UI_ROUTES.settings(workspaceId));
   }
 }
 
@@ -189,6 +194,99 @@ export async function declineCollaborationWorkspaceInviteAction(
 
   revalidateWorkspaces();
   return { ok: true, message: "تم رفض الدعوة." };
+}
+
+/**
+ * Fail-closed stub — no profile update RPC exists. Kept so UI never invents
+ * a mutation path without a backend contract.
+ */
+export async function updateCollaborationWorkspaceProfileAction(
+  _prev: CollaborationActionState | null,
+  _formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+  return rejectUnsupportedCollaborationProfileEdit();
+}
+
+export async function archiveCollaborationWorkspaceAction(
+  formData: FormData
+): Promise<void> {
+  if (rejectIfCollaborationPlatformDisabled()) {
+    return;
+  }
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const confirmed = String(formData.get("confirm") ?? "") === "1";
+  if (!confirmed) {
+    redirect(
+      `${COLLABORATION_UI_ROUTES.settings(workspaceId)}?archive=confirm_required`
+    );
+  }
+
+  const supabase = await createClient();
+  const result = await archiveCollaborationWorkspace(supabase, workspaceId);
+  if (!result.ok) {
+    redirect(
+      `${COLLABORATION_UI_ROUTES.settings(workspaceId)}?archive=error`
+    );
+  }
+
+  revalidateWorkspaces(workspaceId);
+  redirect(`${COLLABORATION_UI_ROUTES.settings(workspaceId)}?archived=1`);
+}
+
+export async function activateCollaborationWorkspaceAction(
+  formData: FormData
+): Promise<void> {
+  if (rejectIfCollaborationPlatformDisabled()) {
+    return;
+  }
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const supabase = await createClient();
+  const result = await activateCollaborationWorkspace(supabase, workspaceId);
+  if (!result.ok) {
+    redirect(
+      `${COLLABORATION_UI_ROUTES.settings(workspaceId)}?activate=error`
+    );
+  }
+
+  revalidateWorkspaces(workspaceId);
+  redirect(`${COLLABORATION_UI_ROUTES.settings(workspaceId)}?activated=1`);
+}
+
+export async function leaveCollaborationWorkspaceAction(
+  formData: FormData
+): Promise<void> {
+  if (rejectIfCollaborationPlatformDisabled()) {
+    return;
+  }
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const supabase = await createClient();
+  const result = await leaveCollaborationWorkspace(supabase, workspaceId);
+  if (!result.ok) {
+    redirect(`${COLLABORATION_UI_ROUTES.settings(workspaceId)}?leave=error`);
+  }
+
+  revalidateWorkspaces(workspaceId);
+  redirect(`${COLLABORATION_UI_ROUTES.root}?left=1`);
 }
 
 /** Exported for tests — must stay aligned with action fail-closed copy. */
