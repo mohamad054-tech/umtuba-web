@@ -1,42 +1,46 @@
-﻿# CURSOR_REPORT — Laptop Final Save & Collaboration Handoff
+﻿# CURSOR_REPORT — Pre-reboot Collaboration Save
 
 ## Summary
 
-Laptop Collaboration Platform line closed through UI Foundation V1. Source of Truth for next Cursor session is the collaboration UI worktree/branch tip below. Commerce remains desktop-owned.
+Collaboration Settings & Lifecycle UI V1 closed and pushed. Laptop reboot save point recorded. Migration `20260898` is in git and **not** applied to remote DB.
 
 ## CURRENT LAPTOP SOURCE OF TRUTH
 
-- Branch: `office/collaboration-workspace-ui-foundation-v1`
-- Remote: `origin/office/collaboration-workspace-ui-foundation-v1`
-- Commit: `cfd8a2889edab7a1767fba8716cce975ffe75def`
-- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-ui-foundation-v1`
+- Branch: `office/collaboration-workspace-settings-lifecycle-ui-v1`
+- Remote: `origin/office/collaboration-workspace-settings-lifecycle-ui-v1`
+- Commit: `6b60205dfb01168552ff6344523ec3e8b22eb70e`
+- Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
+- Sync: `0 0`
 
-## CLOSED MILESTONES
+## CLOSED
 
-| Milestone | Commit | Notes |
-| --- | --- | --- |
-| Learning AI Tutor Learner UI Integration V1 | `c3168eff3a324979efa5cab694e294c4daeeb4da` | Closed |
-| Collaboration Workspace Spine Foundation V1 | `321e7e8de95d81efecfa423b7c515d36afa84a75` | Remote migration `20260896` |
-| Collaboration Workspace Membership Runtime V1 | `c3bf87e7f6ec2cbcb0b8e1812c0cac58b20594af` | Remote migration `20260897` |
-| Collaboration Workspace UI Foundation V1 | `cfd8a2889edab7a1767fba8716cce975ffe75def` | Flag default=false; routes/actions/menu gated |
+| Milestone | Commit |
+| --- | --- |
+| Spine Foundation V1 | `321e7e8` + remote `20260896` |
+| Membership Runtime V1 | `c3bf87e` + remote `20260897` |
+| UI Foundation V1 | `cfd8a28` |
+| Handoff docs | `b002402` |
+| Settings & Lifecycle UI V1 | `6b60205` + local migration `20260898` (**DB NOT APPLIED**) |
 
-## COLLABORATION FLAG
+## FLAG
 
-default=false — enable only via `COLLABORATION_PLATFORM_ENABLED=1|true`
+`COLLABORATION_PLATFORM_ENABLED` default **false**
 
 ## COMMERCE
 
-owned by desktop — do not touch on laptop
+desktop-owned — do not touch
 
-## NEXT TASK
+## NEXT
 
-Collaboration Workspace Settings & Lifecycle UI V1  
-(settings + leave/suspend/remove/transfer/archive; last-owner protection; no Learning/Commerce/UEOS/Billing)
+1. Optional: apply `20260898` with explicit GO  
+2. Else: next Collaboration milestone gate (TBD)
 
-## Shutdown blocker (non-commerce)
+## Pre-reboot residuals (not pushed as part of this save unless separately handled)
 
-Staged unique work remains in:
+- `umtuba-web-collaboration-workspace-ui-foundation-v1`: dirty `app/workspaces/layout.tsx`
+- `umtuba-mobile`: dirty/untracked docs + build.json files
+- `umtuba-web`: branch without upstream (`office/learning-ai-tutor-thread-lesson-binding-v1` @ `b85081b`)
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-perf-home-javascript-optimization-v1`
+## Shutdown
 
-Files staged (not committed): DiscoverExperience, DiscoverActionRail, DiscoverCreatorInfo, StoryRail, homeJavascriptOptimization.v1.test.ts, storiesFoundation.test.ts, plus docs/ai handoff files on that branch. Human decision required before considering laptop fully clean.
+Collaboration feature tip is **SAFE_TO_REBOOT** (pushed). Do not apply `20260898` without GO.

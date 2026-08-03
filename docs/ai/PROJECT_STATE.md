@@ -1,13 +1,13 @@
 # UMTUBA Project State (AI Handoff)
 
-## CURRENT LAPTOP SOURCE OF TRUTH (2026-08-03)
+## CURRENT LAPTOP SOURCE OF TRUTH (2026-08-03 reboot save)
 
 | Item | Value |
 | --- | --- |
-| Branch | `office/collaboration-workspace-ui-foundation-v1` |
-| Remote | `origin/office/collaboration-workspace-ui-foundation-v1` |
-| Commit | `cfd8a2889edab7a1767fba8716cce975ffe75def` |
-| Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-ui-foundation-v1` |
+| Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
+| Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
+| Commit | `6b60205dfb01168552ff6344523ec3e8b22eb70e` |
+| Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed on laptop
 
@@ -15,16 +15,17 @@
 - Collaboration Workspace Spine Foundation V1 — `321e7e8` (remote `20260896`)
 - Collaboration Workspace Membership Runtime V1 — `c3bf87e` (remote `20260897`)
 - Collaboration Workspace UI Foundation V1 — `cfd8a28` (flag default=false)
+- Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration `20260898` in git; **remote DB NOT APPLIED**)
 
 ### Next on laptop
 
-**Collaboration Workspace Settings & Lifecycle UI V1** (no Learning/Commerce/UEOS/Billing binding)
+Human GO: apply `20260898` **or** gate next Collaboration milestone (TBD).
 
 ### Commerce on laptop
 
 **Owned by desktop — do not touch.**
 
-See also: `docs/ai/CURRENT_TASK.md`, `docs/ai/SESSION_HANDOFF.md`, `docs/ai/CURSOR_REPORT.md`.
+See also: `docs/ai/CURRENT_TASK.md`, `docs/ai/SESSION_HANDOFF.md`, `docs/ai/CURSOR_REPORT.md`, `docs/ai/LAPTOP_REBOOT_SAVEPOINT.md`.
 
 ## Project
 
@@ -32,7 +33,7 @@ See also: `docs/ai/CURRENT_TASK.md`, `docs/ai/SESSION_HANDOFF.md`, `docs/ai/CURS
 
 ## Primary working branch
 
-`office/collaboration-workspace-ui-foundation-v1` (laptop SoT; historical note: `alpha-0.2` remains a long-lived integration branch)
+`office/collaboration-workspace-settings-lifecycle-ui-v1` (laptop SoT; historical note: `alpha-0.2` remains a long-lived integration branch)
 
 ## Learning chapter status
 
