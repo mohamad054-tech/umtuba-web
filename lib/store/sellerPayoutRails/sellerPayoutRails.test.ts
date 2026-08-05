@@ -306,7 +306,13 @@ describe("Commerce Seller Payout Rails V1", () => {
       join(ROOT, "app/admin/store/payouts/page.tsx"),
       "utf8"
     );
+    // Mock rails diagnostics remain secondary; live Connect/Wise/PayPal stay blocked.
     expect(page).toMatch(/bankRailsEnabled/);
-    expect(page).not.toMatch(/Stripe Connect|sk_live_/i);
+    expect(page).toMatch(/data-mock-payout-diagnostics="secondary"/);
+    expect(page).toMatch(/"stripe_connect"/);
+    expect(page).toMatch(/data-live-payout-provider-blocked=\{id\}/);
+    expect(page).toMatch(/remain unavailable|not\s+selectable/i);
+    expect(page).not.toMatch(/sk_live_/i);
+    expect(page).not.toMatch(/stripe\.com|wise\.com|api\.paypal/i);
   });
 });

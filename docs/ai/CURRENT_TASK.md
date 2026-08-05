@@ -2,40 +2,37 @@
 
 ## Milestone
 
-Seller Live Payout Provider V1 — **Slice S7** (seller live payout UI)
+Seller Live Payout Provider V1 — **CLOSED** (S1–S8)
 
 ## Status
 
-`s7-closed` — seller destination form + request controls + eligibility/revenue bridge wiring + contract tests; **committed + pushed** on close; no migrations; S8 not started
+`milestone-closed` — S1–S8 complete; S8 docs/closeout **committed + pushed**; gate OFF; no remote migration apply; no real payout; no next milestone started
 
 ## Branch / worktree
 
 - Branch: `office/commerce-seller-live-payout-provider-v1`
 - Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
-- S6 tip / S7 base: `253552fa58dd7c1a3bf660cfae5d7e630cc9fffb`
+- S7 tip / S8 base: `a77094f272df8178e422303b3e60d1cbac6bf7ae`
 
-## S7 scope closed
+## S8 closeout files
 
 Created:
-- `app/components/store/SellerPayoutDestinationForm.tsx`
-- `app/components/store/SellerPayoutRequestButton.tsx`
+- `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_V1.md`
+- `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1.md`
 
 Modified:
-- `app/components/store/SellerPayoutEligibility.tsx`
-- `app/components/store/SellerDashboardInsights.tsx`
-- `app/seller/store/page.tsx`
-- `lib/store/sellerPayoutEligibilitySurface.ts`
-- `lib/store/sellerPayoutEligibilitySurface.test.ts`
-- `lib/store/commerceRevenueBridge.ts`
-- `lib/store/commerceRevenueBridge.test.ts`
-- `lib/store/sellerLivePayout/ui.contract.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/SESSION_HANDOFF.md`
+- `lib/store/sellerPayoutRails/sellerPayoutRails.test.ts`
 
-## Explicit non-actions
+## Explicit non-actions preserved
 
-No S8 · no admin UI · no migrations · no remote apply · no Stripe payment / commerce_confirm / UEOS SQL changes · no server action changes
+No remote migration apply · no live gate enablement · no real payout · no commerce_confirm enable · no Stripe Connect/Wise/PayPal · no next milestone auto-start
 
-## Next (not this GO)
+## Next (separate explicit GO only)
 
-Slice S8 — docs/closeout (explicit GO only)
+1. Verify/remote-apply `20260881–83` then `20260896` only on named GO.
+2. Controlled Manual Ops Live drill with gate carefully managed.
+3. Separate track: Stripe production env → gate audit → E2E → consider `commerce_confirm`.

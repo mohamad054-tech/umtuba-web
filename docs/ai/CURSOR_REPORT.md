@@ -2,43 +2,37 @@
 
 ## Summary
 
-**PASS** — Seller Live Payout Provider V1 **Slice S7 closed** (seller live payout request + destination UI).
+**PASS** — Seller Live Payout Provider V1 **milestone closed** (S1–S8).
 
-Committed and pushed on closeout. No migrations created or applied. S8 not started. No server action changes. No admin UI beyond already-committed S6.
+S8 docs/runbook + AI handoff updates committed and pushed. Production gate remains OFF. Migration `20260896` remains local-only / not remote-applied. No real payout performed. No next milestone started.
 
-## Exact files changed
+## Exact files changed (S8 closeout)
 
 | Path | Action |
 | --- | --- |
-| `app/components/store/SellerPayoutDestinationForm.tsx` | created |
-| `app/components/store/SellerPayoutRequestButton.tsx` | created |
-| `app/components/store/SellerPayoutEligibility.tsx` | modified |
-| `app/components/store/SellerDashboardInsights.tsx` | modified |
-| `app/seller/store/page.tsx` | modified |
-| `lib/store/sellerPayoutEligibilitySurface.ts` | modified |
-| `lib/store/sellerPayoutEligibilitySurface.test.ts` | modified |
-| `lib/store/commerceRevenueBridge.ts` | modified |
-| `lib/store/commerceRevenueBridge.test.ts` | modified |
-| `lib/store/sellerLivePayout/ui.contract.test.ts` | modified |
+| `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_V1.md` | created |
+| `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1.md` | created |
 | `docs/ai/CURRENT_TASK.md` | modified |
 | `docs/ai/CURSOR_REPORT.md` | this report |
+| `docs/ai/PROJECT_STATE.md` | modified |
+| `docs/ai/SESSION_HANDOFF.md` | modified |
+| `lib/store/sellerPayoutRails/sellerPayoutRails.test.ts` | modified |
 
 ## Migrations created
 
-None.
+None in S8. `20260896` exists from S2 and was **not** remote-applied.
 
 ## Security review
 
-- Owner/manager only for live destination/request controls
-- Destination upsert has no self-verify path; UI cannot set verification state
-- Request sends identifiers only (no client money fields)
-- Seller UI does not call Supabase / UEOS / booking helpers / orchestrator directly
-- Gate OFF keeps request disabled with honest messaging
-- Unsupported providers remain blocked
+- Docs: env names only; no secret values
+- Gate default OFF; unsupported providers blocked
+- Manual Ops Live: durable, gated, human-attested, no bank API
+- commerce_confirm / buyer Stripe paths unchanged
+- No real payout; no production enablement claimed
 
 ## Tests
 
-Focused suite (S7 + S6–S1): **143 passed / 10 files**
+Focused suite: **197 passed / 13 files**
 
 ## TypeScript
 
@@ -46,7 +40,7 @@ Focused suite (S7 + S6–S1): **143 passed / 10 files**
 
 ## Build
 
-Not required for S7 closeout validation list (tsc clean).
+Not required for S8 docs closeout.
 
 ## git diff --check
 
@@ -54,8 +48,8 @@ Clean (exit 0)
 
 ## git status --short
 
-Clean after S7 closeout commit + push (see closure report).
+Clean after S8/milestone closeout commit + push (see closure report).
 
 ## Open issues
 
-None for S7. Next slice is S8 docs/closeout (explicit GO only).
+None for this milestone. Next steps require separate explicit GOs (remote-apply / drill / Stripe confirm track).

@@ -79,8 +79,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — historical preflight; superseded by applied remote chain |
 | Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — historical |
 | Commerce Migration History Drift Verification V1 | **COMPLETE historically** — `20260822`+`20260823` registered remotely |
+| Commerce Seller Live Payout Provider V1 | **COMPLETE (code + docs)** — branch `office/commerce-seller-live-payout-provider-v1` @ S7 tip `a77094f` (+ S8 docs); Manual Ops Live gated path; gate **OFF** by default; **no real payout performed**; migration `20260896` **local-only / not remote-applied**; foundations `20260881–83` still require explicit remote-apply GO; Stripe Connect / Wise / PayPal unsupported; buyer Stripe + `commerce_confirm` unchanged |
 
-Default: Commerce remote foundations closed through `20260895` + active USD commission. Next: external Stripe live env → gate audit → E2E → then consider confirm. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Commerce remote foundations closed through `20260895` + active USD commission. Seller Live Payout Provider V1 is implemented and documented but **not production-enabled**. Next external track remains: Stripe live env → gate audit → E2E → then consider confirm. Live payout remote migration apply + gate enablement require separate explicit GOs. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 
@@ -98,8 +99,10 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 - Remote migrations verified: `20260822/23/24/77/84–95`
 - Active commission: `umtuba_launch_usd_v1` v1 · USD · 1500/8500 · merchandise_net
 - Keep `commerce_confirm_enabled = 0` until Stripe E2E PASS + explicit GO
+- Seller live payout gate remains **OFF**; do **not** remote-apply `20260896` / enable live payouts without explicit GO
 - Do **not** seed another commission policy without an explicit commercial GO
 - Canonical checkpoint: `docs/store/operations/COMMERCE_CURRENT_STATE_2026-08-02.md`
+- Live payout docs: `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_V1.md` · runbook `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1.md`
 
 ## Source of truth
 
