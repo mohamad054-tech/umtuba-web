@@ -150,4 +150,17 @@ describe("Collaboration Platform Exposure Gate V1", () => {
     const indexing = readFileSync(join(ROOT, "lib/site/indexing.ts"), "utf8");
     expect(indexing).toMatch(/\/workspaces/);
   });
+
+  it("keepalive: gate docs present and default remains fail-closed", () => {
+    expect(
+      existsSync(
+        join(
+          ROOT,
+          "docs/collaboration/operations/COLLABORATION_PLATFORM_GATE_KEEPALIVE_V1.md"
+        )
+      )
+    ).toBe(true);
+    expect(COLLABORATION_PLATFORM_ENABLED).toBe(false);
+    expect(isCollaborationPlatformEnabled({})).toBe(false);
+  });
 });
