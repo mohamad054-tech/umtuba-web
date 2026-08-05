@@ -1,34 +1,25 @@
 # Session Handoff — UMTUBA AI Platform
 
-**Updated:** 2026-08-05 (Provider Streaming Foundation V1)
+**Updated:** 2026-08-05 (Private AI Foundation onto Alpha V1)
 
 ## Active task (RESUME HERE)
 
-**AI Core Provider Streaming Foundation V1** — implementation complete on feature branch; awaiting **FF into `alpha-0.2`** on explicit GO.
+**AI Core Private AI Foundation onto Alpha V1** — clean port of Private AI registry/admin/migration onto streaming tip.
 
 ### Exact stop point
 
-- Worktree: `D:\umtuba-central\repos\umtuba-web-ai-core-provider-streaming-foundation-v1`
-- Branch: `office/ai-core-provider-streaming-foundation-v1`
-- Base: `origin/alpha-0.2` @ `4690bb7`
-- Sync with origin: confirm `0 0` after push
-- Merge to alpha: **blocked until explicit GO**
+- Worktree: `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-foundation-onto-alpha-v1`
+- Branch: `office/ai-core-private-ai-foundation-onto-alpha-v1`
+- Base: streaming tip `0a04d59`
+- Source: `origin/office/platform-private-ai-foundation-v1` (Private AI paths only)
 
-### Product scope — complete
+### Prior completed (do not reopen)
 
-- Provider streaming contracts + SSE parsers
-- `stream()` on all Shared AI Core adapters (gate OFF by default)
-- Registry advertises `streamingSupport` from `UMTUBA_AI_STREAMING`
-
-### Next AI milestone candidates (after this lands or in parallel worktree)
-
-1. Private AI Foundation onto alpha (catalog depends on it)
-2. Capability Catalog / Orchestration / Policy (after Private AI)
-3. Gateway streaming HTTP surface (product)
+- Providers onto alpha → merged to `alpha-0.2` @ `4690bb7`
+- Provider Streaming Foundation V1 @ `0a04d59` (awaiting alpha GO)
 
 ### Do not
 
-- Force push / rewrite alpha history
+- Port Learning / Translation / Knowledge / AI Data Platform with this milestone
 - Merge to alpha without explicit GO
-- Live provider smoke unless asked
-- Touch Commerce / Learning / Collaboration / Mobile / Guardian
+- Remote-apply migration `20260879`

@@ -1,41 +1,41 @@
-# CURSOR_REPORT — AI Core Provider Streaming Foundation V1
+# CURSOR_REPORT — AI Core Private AI Foundation onto Alpha V1
 
 ## Summary
 
-Provider Streaming Foundation V1 on
-`office/ai-core-provider-streaming-foundation-v1` — opt-in adapter `stream()`,
-SSE parsers, `UMTUBA_AI_STREAMING` gate (default OFF), registry
-`streamingSupport`, mocked tests only. **Not merged to alpha** (awaiting GO).
+Clean port of Private AI Foundation (`lib/privateAi`, admin UI, migration
+`20260879`) onto the streaming tip. Excludes Learning / Translation /
+Knowledge / AI Data Platform trees from the historical private-AI branch tip.
 
 ## Exact refs
 
 | Ref | Value |
 |-----|-------|
-| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-provider-streaming-foundation-v1` |
-| Branch | `office/ai-core-provider-streaming-foundation-v1` |
-| Base | `origin/alpha-0.2` @ `4690bb7` |
-| Sync | confirm after push |
+| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-foundation-onto-alpha-v1` |
+| Branch | `office/ai-core-private-ai-foundation-onto-alpha-v1` |
+| Base | `0a04d59` (streaming foundation) |
+| Source | `origin/office/platform-private-ai-foundation-v1` (scoped paths) |
 
 ## Feature files
 
-- `lib/ai/providers/streaming.ts`
-- `lib/ai/providers/streaming.test.ts`
-- Adapter `stream()`: `adapters.ts`, `anthropicAdapter.ts`, `geminiAdapter.ts`, `localAdapter.ts`
-- `lib/ai/models/registry.ts` (`streamingEnabled` → `streamingSupport`)
-- `lib/ai/config.ts` / `.env.example` (`UMTUBA_AI_STREAMING`)
+- `lib/privateAi/**`
+- `app/admin/private-ai/**`
+- `supabase/migrations/20260879_private_ai_foundation_v1.sql` (not remote-applied)
+- `docs/architecture/PRIVATE_AI_FOUNDATION_V1.md`
+- `vitest.config.ts` (`lib/privateAi/**/*.test.ts`)
 
-## Migrations created
+## Tests
 
-None.
+- `lib/privateAi/privateAiFoundation.test.ts` — pass
+- `lib/ai` + `lib/privateAi` — 268 pass / 1 skip
+- `npx tsc --noEmit` — pass
 
-## Security review
+## Security
 
-- Streaming fail-closed unless `UMTUBA_AI_STREAMING=1/true`
-- Structured streaming rejected
-- No live provider calls in tests
-- Secrets stay server-side; sanitize on errors
+- Admin pages platform-admin gated
+- Migration local-only; FORCE RLS expected in SQL
+- No inference / weights / live providers
 
 ## Next
 
-1. Explicit GO → FF merge into `alpha-0.2`
-2. Next AI milestone: Private AI Foundation onto alpha (or Gateway streaming HTTP surface)
+1. Commit + push this branch; sync `0 0`
+2. Explicit GO required for alpha FF (streaming then this, or stacked tip)

@@ -1,0 +1,150 @@
+/**
+ * Internal seed only — no weights, downloads, training, or inference.
+ */
+
+import { buildCapabilityRegistry } from "./capabilities";
+import { DEPLOYMENT_PROFILES } from "./deploymentProfiles";
+import { HARDWARE_CONTRACTS } from "./hardwareContracts";
+import {
+  createPrivateAiPermission,
+  DEFAULT_PLATFORM_ADMIN_ACTIONS,
+} from "./permissions";
+import { buildDefaultRoutingContracts } from "./routingContracts";
+import type { PersistedPrivateAiState } from "./types";
+
+export function buildPrivateAiSeedState(
+  now = new Date().toISOString()
+): PersistedPrivateAiState {
+  const capabilities = buildCapabilityRegistry(now);
+  const routingContracts = buildDefaultRoutingContracts();
+
+  const privateTranslator = {
+    id: "pam_umtuba_translator_private",
+    name: "UMTUBA Private Translator (planned)",
+    modelClass: "private" as const,
+    family: "specialized" as const,
+    version: "0.0.0-planned",
+    capabilities: ["translation"] as const,
+    lifecycle: "draft" as const,
+    deploymentProfileIds: ["development", "internal", "offline"] as const,
+    hardwareContractId: "hw_gpu_internal",
+    routingContractIds: ["route_translation_v1"],
+    providerHint: "umtuba-private",
+    architecture: "registry-placeholder",
+    notes: "Architecture placeholder — no weights, no training.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const externalGeneral = {
+    id: "pam_external_general_ref",
+    name: "External General Reference",
+    modelClass: "external" as const,
+    family: "foundation" as const,
+    version: "ref",
+    capabilities: ["reasoning", "tool_use"] as const,
+    lifecycle: "approved" as const,
+    deploymentProfileIds: ["development", "internal", "testing"] as const,
+    hardwareContractId: null,
+    routingContractIds: ["route_reasoning_v1", "route_tool_use_v1"],
+    providerHint: "external-provider-contract",
+    architecture: "provider-api-contract",
+    notes: "External provider contract reference only.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const localEmbedding = {
+    id: "pam_local_embedding_exp",
+    name: "Local Embedding Experimental",
+    modelClass: "experimental" as const,
+    family: "embedding" as const,
+    version: "exp-0",
+    capabilities: ["retrieval"] as const,
+    lifecycle: "training_planned" as const,
+    deploymentProfileIds: ["development", "air_gapped"] as const,
+    hardwareContractId: "hw_airgap_secure",
+    routingContractIds: ["route_retrieval_v1"],
+    providerHint: "umtuba-local",
+    architecture: "embedding-placeholder",
+    notes: "Experimental local embedding — no training run.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const caps = capabilities.map((c) => {
+    const mapped = [privateTranslator, externalGeneral, localEmbedding]
+      .filter((m) => (m.capabilities as readonly string[]).includes(c.id))
+      .map((m) => m.id);
+    return { ...c, mappedModelIds: mapped, updatedAt: now };
+  });
+
+  return {
+    schemaVersion: 1,
+    updatedAt: now,
+    models: [
+      {
+        ...privateTranslator,
+        capabilities: [...privateTranslator.capabilities],
+        deploymentProfileIds: [...privateTranslator.deploymentProfileIds],
+      },
+      {
+        ...externalGeneral,
+        capabilities: [...externalGeneral.capabilities],
+        deploymentProfileIds: [...externalGeneral.deploymentProfileIds],
+      },
+      {
+        ...localEmbedding,
+        capabilities: [...localEmbedding.capabilities],
+        deploymentProfileIds: [...localEmbedding.deploymentProfileIds],
+      },
+    ],
+    capabilities: caps,
+    hardwareContracts: [...HARDWARE_CONTRACTS],
+    deploymentProfiles: [...DEPLOYMENT_PROFILES],
+    routingContracts,
+    permissions: [
+      createPrivateAiPermission({
+        id: "perm_admin_models",
+        scope: "model",
+        resourceId: "*",
+        role: "platform_admin",
+        actions: [...DEFAULT_PLATFORM_ADMIN_ACTIONS],
+        granted: true,
+        notes: "Platform admin model registry access.",
+      }),
+      createPrivateAiPermission({
+        id: "perm_admin_capabilities",
+        scope: "capability",
+        resourceId: "*",
+        role: "platform_admin",
+        actions: ["read", "map_capability"],
+        granted: true,
+      }),
+      createPrivateAiPermission({
+        id: "perm_admin_audit",
+        scope: "audit",
+        resourceId: "*",
+        role: "platform_admin",
+        actions: ["audit_read"],
+        granted: true,
+      }),
+      createPrivateAiPermission({
+        id: "perm_admin_dataset",
+        scope: "dataset",
+        resourceId: "*",
+        role: "platform_admin",
+        actions: ["read"],
+        granted: true,
+      }),
+      createPrivateAiPermission({
+        id: "perm_admin_experiment",
+        scope: "experiment",
+        resourceId: "*",
+        role: "platform_admin",
+        actions: ["read"],
+        granted: true,
+      }),
+    ],
+  };
+}

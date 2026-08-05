@@ -2,46 +2,37 @@
 
 ## Task title
 
-AI Core Provider Streaming Foundation V1
+AI Core Private AI Foundation onto Alpha V1 (clean port)
 
 ## Status
 
-`implementation-complete` — Feature branch pushed; **not yet FF-merged into alpha-0.2**
-
-## Resume here (next session / next GO)
-
-1. Confirm branch `office/ai-core-provider-streaming-foundation-v1`
-2. Confirm sync with origin: `0 0`
-3. Confirm `origin/alpha-0.2` is ancestor of feature (`YES`)
-4. **Next GO only (separate step):** Fast-Forward merge into `alpha-0.2` + push alpha
-5. Do **not** start the next AI milestone until this lands on alpha (or continue parallel only on a new worktree after this closes)
+`implementation-in-progress` — scoped port from `office/platform-private-ai-foundation-v1` onto streaming tip; excluding Learning / Translation / Knowledge / AI Data Platform.
 
 ## Branch
 
-`office/ai-core-provider-streaming-foundation-v1`
+`office/ai-core-private-ai-foundation-onto-alpha-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-ai-core-provider-streaming-foundation-v1`
+`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-foundation-onto-alpha-v1`
 
 ## Base
 
-`origin/alpha-0.2` @ `4690bb7` (providers onto alpha)
+`origin/office/ai-core-provider-streaming-foundation-v1` @ `0a04d59` (stacks on streaming; alpha ancestor)
 
-## Done (feature — locked contract)
+## Scope (allowed)
 
-- `lib/ai/providers/streaming.ts` — SSE helpers + `assertStreamingAllowed`
-- Adapter `stream()` on stub / OpenAI / Gemini / Anthropic / Local
-- Operator gate `UMTUBA_AI_STREAMING` (default OFF); structured streaming fail-closed
-- Model registry `streamingSupport` mirrors config gate
-- Mocked unit tests only (no live provider calls)
+- `lib/privateAi/**`
+- `app/admin/private-ai/**`
+- `supabase/migrations/20260879_private_ai_foundation_v1.sql` (local only; not remote-applied)
+- `docs/architecture/PRIVATE_AI_FOUNDATION_V1.md`
+- `vitest.config.ts` include `lib/privateAi/**/*.test.ts`
+- AI handoff docs
 
-## Not done yet
+## Forbidden
 
-- FF-merge into `alpha-0.2` (explicit GO required)
-- Gateway/HTTP SSE product surface (deferred)
-- Structured-output streaming (deferred)
-
-## Out of scope
-
-Commerce / Learning / Collaboration / Mobile / Guardian / live keys / alpha merge without GO
+- Learning / Commerce / Collaboration / Mobile / Guardian
+- Translation Studio / Knowledge Acquisition / AI Data Platform trees
+- Other migrations (`20260872`–`20260878`)
+- Live inference / weights / remote migration apply
+- Alpha merge without explicit GO

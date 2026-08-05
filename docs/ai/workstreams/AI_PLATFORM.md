@@ -2,16 +2,15 @@
 
 ## SAVE POINT — 2026-08-05 (Windows Server)
 
-**Active work:** AI Core Provider Streaming Foundation V1
+**Active work:** AI Core Private AI Foundation onto Alpha V1 (clean port)
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-core-provider-streaming-foundation-v1` |
-| Base | `origin/alpha-0.2` @ `4690bb7` |
-| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-provider-streaming-foundation-v1` |
+| Active branch | `office/ai-core-private-ai-foundation-onto-alpha-v1` |
+| Base | streaming tip `0a04d59` |
+| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-foundation-onto-alpha-v1` |
+| Source | `origin/office/platform-private-ai-foundation-v1` (scoped) |
 
-**Done on alpha already:** OpenAI / Gemini / Anthropic / Local via Shared AI Core Provider Foundation (`4690bb7`).
+**Porting:** `lib/privateAi/**`, `app/admin/private-ai/**`, migration `20260879`, architecture doc, vitest include.
 
-**This branch adds:** Opt-in provider `stream()` (SSE deltas), `UMTUBA_AI_STREAMING` gate (default OFF), registry `streamingSupport`, mocked streaming tests. No live calls. No gateway HTTP SSE product surface yet.
-
-**NOT done / forbidden for this branch:** Learning / Commerce / Collaboration / Mobile / Guardian, migrations unrelated to AI, live smoke, alpha merge without explicit GO.
+**Excluded:** Learning, Translation Studio, Knowledge Acquisition, AI Data Platform, other migrations.
