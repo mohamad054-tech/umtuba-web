@@ -24,6 +24,11 @@ export type AiPlatformConfig = {
    */
   localDefaultModel: string | null;
   allowStub: boolean;
+  /**
+   * Opt-in provider streaming (UMTUBA_AI_STREAMING=1/true).
+   * Default OFF — fail-closed for stream() until explicitly enabled.
+   */
+  streamingEnabled: boolean;
   defaultTimeoutMs: number;
   maxInputChars: number;
   maxContextChars: number;
@@ -73,6 +78,9 @@ export function loadAiPlatformConfig(
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "1" ||
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "true" ||
     process.env.NODE_ENV === "test";
+  const streamingEnabled =
+    (readEnv("UMTUBA_AI_STREAMING") ?? "").toLowerCase() === "1" ||
+    (readEnv("UMTUBA_AI_STREAMING") ?? "").toLowerCase() === "true";
 
   let mode: AiPlatformConfig["mode"] = "disabled";
   if (explicitMode === "disabled" || explicitMode === "off") {
@@ -117,6 +125,7 @@ export function loadAiPlatformConfig(
     localApiKey,
     localDefaultModel,
     allowStub,
+    streamingEnabled,
     defaultTimeoutMs: Number(readEnv("UMTUBA_AI_TIMEOUT_MS") ?? 30000),
     maxInputChars: Number(readEnv("UMTUBA_AI_MAX_INPUT_CHARS") ?? 8000),
     maxContextChars: Number(readEnv("UMTUBA_AI_MAX_CONTEXT_CHARS") ?? 24000),

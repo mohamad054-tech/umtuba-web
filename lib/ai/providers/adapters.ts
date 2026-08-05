@@ -6,6 +6,12 @@ import {
 } from "../config";
 import { createAnthropicAdapter } from "./anthropicAdapter";
 import { createLocalAdapter } from "./localAdapter";
+import {
+  assertStreamingAllowed,
+  iterateOpenAiCompatibleSse,
+  iterateGeminiSse,
+  type ProviderStreamEvent,
+} from "./streaming";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -35,16 +41,25 @@ export type ProviderExecuteResult = {
 
 export type AiProviderAdapter = {
   providerId: string;
+  /** True when stream() is available and operator streaming gate is ON. */
+  streamingSupport: boolean;
   execute: (input: ProviderExecuteInput) => Promise<ProviderExecuteResult>;
+  stream?: (
+    input: ProviderExecuteInput
+  ) => AsyncGenerator<ProviderStreamEvent, void, unknown>;
 };
 
 function estimateTokens(text: string): number {
   return Math.max(1, Math.ceil(text.length / 4));
 }
 
-export function createStubAdapter(): AiProviderAdapter {
+export function createStubAdapter(options?: {
+  streamingEnabled?: boolean;
+}): AiProviderAdapter {
+  const streamingEnabled = Boolean(options?.streamingEnabled);
   return {
     providerId: "stub",
+    streamingSupport: streamingEnabled,
     async execute(input) {
       const user = input.messages.find((m) => m.role === "user")?.content ?? "";
       const titleSeed =
@@ -219,14 +234,36 @@ export function createStubAdapter(): AiProviderAdapter {
         },
       };
     },
+    async *stream(input) {
+      assertStreamingAllowed({
+        streamingEnabled,
+        structured: input.structured,
+      });
+      const user = input.messages.find((m) => m.role === "user")?.content ?? "";
+      const full = `Stub stream reply: ${user.slice(0, 80)}`;
+      const mid = Math.max(1, Math.ceil(full.length / 2));
+      yield { type: "delta", text: full.slice(0, mid) };
+      yield { type: "delta", text: full.slice(mid) };
+      yield {
+        type: "completed",
+        text: full,
+        usage: {
+          inputTokens: Math.max(1, Math.ceil(user.length / 4)),
+          outputTokens: Math.max(1, Math.ceil(full.length / 4)),
+          cachedTokens: 0,
+        },
+      };
+    },
   };
 }
 
 export function createOpenAiCompatibleAdapter(
   config: AiPlatformConfig
 ): AiProviderAdapter {
+  const streamingEnabled = Boolean(config.streamingEnabled);
   return {
     providerId: "openai",
+    streamingSupport: streamingEnabled,
     async execute(input) {
       if (!config.openaiApiKey) {
         throw new AiPlatformError(
@@ -321,6 +358,76 @@ export function createOpenAiCompatibleAdapter(
         clearTimeout(timer);
       }
     },
+    async *stream(input) {
+      assertStreamingAllowed({
+        streamingEnabled,
+        structured: input.structured,
+      });
+      if (!config.openaiApiKey) {
+        throw new AiPlatformError(
+          "no_provider_configured",
+          "OPENAI_API_KEY is not configured."
+        );
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+      let assembled = "";
+      try {
+        const res = await fetch(`${config.openaiBaseUrl}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            authorization: `Bearer ${config.openaiApiKey}`,
+          },
+          body: JSON.stringify({
+            model: input.modelId,
+            messages: input.messages,
+            temperature: 0.3,
+            stream: true,
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          if (res.status === 429) {
+            throw new AiPlatformError("rate_limited", "Provider rate limited.");
+          }
+          throw new AiPlatformError(
+            "provider_error",
+            sanitizeAiErrorMessage(errText || `Provider HTTP ${res.status}`)
+          );
+        }
+        for await (const delta of iterateOpenAiCompatibleSse(
+          res.body,
+          controller.signal
+        )) {
+          assembled += delta;
+          yield { type: "delta", text: delta };
+        }
+        yield {
+          type: "completed",
+          text: assembled,
+          usage: {
+            inputTokens: null,
+            outputTokens: null,
+            cachedTokens: null,
+          },
+        };
+      } catch (error) {
+        if (error instanceof AiPlatformError) throw error;
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new AiPlatformError("timeout", "AI provider timed out.");
+        }
+        throw new AiPlatformError(
+          "provider_unavailable",
+          sanitizeAiErrorMessage(
+            error instanceof Error ? error.message : "Provider unavailable"
+          )
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+    },
   };
 }
 
@@ -368,8 +475,10 @@ function toGeminiContents(messages: ProviderChatMessage[]): {
 export function createGeminiAdapter(
   config: AiPlatformConfig
 ): AiProviderAdapter {
+  const streamingEnabled = Boolean(config.streamingEnabled);
   return {
     providerId: "gemini",
+    streamingSupport: streamingEnabled,
     async execute(input) {
       if (!config.geminiApiKey) {
         throw new AiPlatformError(
@@ -473,6 +582,84 @@ export function createGeminiAdapter(
         clearTimeout(timer);
       }
     },
+    async *stream(input) {
+      assertStreamingAllowed({
+        streamingEnabled,
+        structured: input.structured,
+      });
+      if (!config.geminiApiKey) {
+        throw new AiPlatformError(
+          "no_provider_configured",
+          "GEMINI_API_KEY is not configured."
+        );
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+      let assembled = "";
+      try {
+        const { systemInstruction, contents } = toGeminiContents(input.messages);
+        if (contents.length === 0) {
+          throw new AiPlatformError(
+            "invalid_input",
+            "Gemini request requires at least one user or assistant message."
+          );
+        }
+        const body: Record<string, unknown> = {
+          contents,
+          generationConfig: { temperature: 0.3 },
+        };
+        if (systemInstruction) {
+          body.systemInstruction = systemInstruction;
+        }
+        const base = config.geminiBaseUrl.replace(/\/+$/, "");
+        const url = `${base}/models/${encodeURIComponent(input.modelId)}:streamGenerateContent?alt=sse`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-goog-api-key": config.geminiApiKey,
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          if (res.status === 429) {
+            throw new AiPlatformError("rate_limited", "Provider rate limited.");
+          }
+          throw new AiPlatformError(
+            "provider_error",
+            sanitizeAiErrorMessage(errText || `Provider HTTP ${res.status}`)
+          );
+        }
+        for await (const delta of iterateGeminiSse(res.body, controller.signal)) {
+          assembled += delta;
+          yield { type: "delta", text: delta };
+        }
+        yield {
+          type: "completed",
+          text: assembled,
+          usage: {
+            inputTokens: null,
+            outputTokens: null,
+            cachedTokens: null,
+          },
+        };
+      } catch (error) {
+        if (error instanceof AiPlatformError) throw error;
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new AiPlatformError("timeout", "AI provider timed out.");
+        }
+        throw new AiPlatformError(
+          "provider_unavailable",
+          sanitizeAiErrorMessage(
+            error instanceof Error ? error.message : "Provider unavailable"
+          )
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+    },
   };
 }
 
@@ -481,7 +668,7 @@ export function resolveProviderAdapters(
 ): Map<string, AiProviderAdapter> {
   const map = new Map<string, AiProviderAdapter>();
   if (config.allowStub || config.mode === "stub") {
-    map.set("stub", createStubAdapter());
+    map.set("stub", createStubAdapter({ streamingEnabled: config.streamingEnabled }));
   }
   if (config.openaiApiKey) {
     map.set("openai", createOpenAiCompatibleAdapter(config));

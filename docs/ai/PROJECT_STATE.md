@@ -2,54 +2,44 @@
 
 ## Project
 
-**UMTUBA** (`umtuba-web`)
+**UMTUBA** (`umtuba-web`) — AI Platform execution machine
 
 ## Primary working branch
 
-`alpha-0.2` @ `71dfec204dd06a0058918831aac1e937108f4de8` — Integration Program V1 + Alpha Beta Productization V1 closed
+`alpha-0.2` @ `4690bb743374a06d9e884d5fc827fde8c738d83d` — Shared AI Core providers (OpenAI/Gemini/Anthropic/Local)
 
-## Active feature (this machine — Desktop)
+## Active feature (this machine — AI)
 
-- **Branch:** `office/profile-hero-completeness-v1`
-- **Task:** Creator Space Hero Completeness V1 (re-sync onto latest alpha prepared; manual commit pending)
-- **Feature tip:** `3b88b01036269b60410d41830fd24b2af85af091`
-- **See:** `docs/ai/CURSOR_REPORT.md`
+- **Branch:** `office/ai-core-provider-streaming-foundation-v1`
+- **Task:** AI Core Provider Streaming Foundation V1
+- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-provider-streaming-foundation-v1`
+- **See:** `docs/ai/CURRENT_TASK.md`
 
 ## Closed on alpha-0.2 (do not reopen)
 
-- Integration Program V1 Waves 0–4
-- Alpha Beta Productization V1 (honesty/gating/ops)
+- Shared AI Core Provider Foundation + OpenAI / Gemini / Anthropic / Local adapters (`4690bb7`)
+- AI Hub / Assistant foundations (product flags default OFF)
 
 ## Gates (unchanged defaults)
 
-- `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED = false`
-- `HOME_LOCK_ACTIVE = true`
-- AI product flags default OFF (`UMTUBA_AI_HUB`, `UMTUBA_AI_ASSISTANT_RUNTIME`, `UMTUBA_AI_VIDEO_PERSONALIZATION`)
-- Commerce confirm DB gate default OFF
+- AI product flags default OFF (`UMTUBA_AI_HUB`, `UMTUBA_AI_ASSISTANT_RUNTIME`, …)
+- Provider streaming default OFF (`UMTUBA_AI_STREAMING`)
 
-## Learning chapter status
-
-**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-Do not pop/apply Learning stash while finishing Profile Hero.
-
-## Integration status
+## Integration status (AI)
 
 | Track | Status |
 | --- | --- |
-| Unified Revenue Platform Foundation | On alpha |
-| Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
-| Shared AI Core / Hub / Assistant | On alpha; product surfaces gated OFF |
-| Alpha Stabilization Sweep | Wave 4 closed |
-| Alpha Beta Productization | Closed on alpha |
-| Profile Hero Completeness V1 | Re-sync prepared on feature branch |
+| Shared AI Core providers | On alpha @ `4690bb7` |
+| Provider Streaming Foundation V1 | Feature branch (awaiting alpha GO) |
+| Private AI / Catalog / Orchestration | Not on alpha yet |
 
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.
-- Always synchronize with origin before starting work.
 
 ## Safety defaults
 
 - Follow `docs/DEVELOPMENT_WORKFLOW.md`.
-- No remote Supabase migration apply without explicit approval.
-- No destructive Git actions without explicit approval.
+- No live provider requests unless explicitly requested.
+- No alpha merge without explicit GO.
+- No Commerce / Learning / Collaboration / Mobile / Guardian work on this machine.

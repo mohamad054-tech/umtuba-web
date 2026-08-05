@@ -83,6 +83,7 @@ export type AiErrorCode =
   | "partial_completion"
   | "configuration_invalid"
   | "provider_error"
+  | "streaming_unsupported"
   | "cancelled";
 
 export type AiContextEnvelope = {

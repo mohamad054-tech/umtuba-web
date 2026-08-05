@@ -3,7 +3,8 @@
  *
  * OpenAI-compatible Chat Completions against an operator-configured base URL
  * (Ollama OpenAI compat, LM Studio, vLLM, llama.cpp server, etc.).
- * No streaming. Structured JSON via prompt-steered parse (many local servers
+ * Streaming via OpenAI-compatible SSE when UMTUBA_AI_STREAMING is enabled.
+ * Structured JSON via prompt-steered parse (many local servers
  * do not reliably support response_format).
  * Fail-closed without LOCAL_AI_BASE_URL (+ model supplied on the request).
  */
@@ -15,10 +16,16 @@ import type {
   ProviderExecuteInput,
   ProviderExecuteResult,
 } from "./adapters";
+import {
+  assertStreamingAllowed,
+  iterateOpenAiCompatibleSse,
+} from "./streaming";
 
 export function createLocalAdapter(config: AiPlatformConfig): AiProviderAdapter {
+  const streamingEnabled = Boolean(config.streamingEnabled);
   return {
     providerId: "local",
+    streamingSupport: streamingEnabled,
     async execute(input: ProviderExecuteInput): Promise<ProviderExecuteResult> {
       const baseUrl = config.localBaseUrl?.replace(/\/$/, "") ?? null;
       if (!baseUrl) {
@@ -119,6 +126,80 @@ export function createLocalAdapter(config: AiPlatformConfig): AiProviderAdapter 
             costStatus: "unavailable",
             modelId: input.modelId,
             providerId: "local",
+          },
+        };
+      } catch (error) {
+        if (error instanceof AiPlatformError) throw error;
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new AiPlatformError("timeout", "AI provider timed out.");
+        }
+        throw new AiPlatformError(
+          "provider_unavailable",
+          sanitizeAiErrorMessage(
+            error instanceof Error ? error.message : "Provider unavailable"
+          )
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+    },
+    async *stream(input: ProviderExecuteInput) {
+      assertStreamingAllowed({
+        streamingEnabled,
+        structured: input.structured,
+      });
+      const baseUrl = config.localBaseUrl?.replace(/\/$/, "") ?? null;
+      if (!baseUrl) {
+        throw new AiPlatformError(
+          "no_provider_configured",
+          "LOCAL_AI_BASE_URL is not configured."
+        );
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+      let assembled = "";
+      try {
+        const headers: Record<string, string> = {
+          "content-type": "application/json",
+        };
+        if (config.localApiKey) {
+          headers.authorization = `Bearer ${config.localApiKey}`;
+        }
+        const res = await fetch(`${baseUrl}/chat/completions`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            model: input.modelId,
+            messages: input.messages,
+            temperature: 0.3,
+            stream: true,
+          }),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          if (res.status === 429) {
+            throw new AiPlatformError("rate_limited", "Provider rate limited.");
+          }
+          throw new AiPlatformError(
+            "provider_error",
+            sanitizeAiErrorMessage(errText || `Provider HTTP ${res.status}`)
+          );
+        }
+        for await (const delta of iterateOpenAiCompatibleSse(
+          res.body,
+          controller.signal
+        )) {
+          assembled += delta;
+          yield { type: "delta", text: delta };
+        }
+        yield {
+          type: "completed",
+          text: assembled,
+          usage: {
+            inputTokens: null,
+            outputTokens: null,
+            cachedTokens: null,
           },
         };
       } catch (error) {

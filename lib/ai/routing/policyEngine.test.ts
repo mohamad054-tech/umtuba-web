@@ -41,6 +41,7 @@ beforeEach(() => {
 function stubAdapter(providerId = "stub"): AiProviderAdapter {
   return {
     providerId,
+    streamingSupport: false,
     async execute() {
       return {
         text: null,

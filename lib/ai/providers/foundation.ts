@@ -271,6 +271,7 @@ export function createProviderFoundation(
     anthropicDefaultModel: config.anthropicDefaultModel,
     localDefaultModel: config.localDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
+    streamingEnabled: config.streamingEnabled,
   });
   const adapters = resolveProviderAdapters(config);
 
