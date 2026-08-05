@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Core Knowledge Acquisition Foundation onto Alpha V1 (clean port)
+AI Core Data Platform Workflow & Dataset Approval onto Alpha V1
 
 ## Status
 
@@ -10,27 +10,27 @@ AI Core Knowledge Acquisition Foundation onto Alpha V1 (clean port)
 
 ## Branch
 
-`office/ai-core-knowledge-acquisition-onto-alpha-v1`
+`office/ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-ai-core-knowledge-acquisition-onto-alpha-v1`
+`D:\umtuba-central\repos\umtuba-web-ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
 
 ## Base
 
-`a05e57e` — AI Data Platform onto alpha tip
+`c2f30e9` — Knowledge Acquisition onto alpha tip
 
 ## Scope
 
-- `lib/knowledgeAcquisition/**` (complete foundation)
-- `app/admin/knowledge/**` (read-only admin)
-- `supabase/migrations/20260876_knowledge_acquisition_foundation_v1.sql` (local only)
-- `docs/architecture/KNOWLEDGE_ACQUISITION_PLATFORM_FOUNDATION_V1.md`
-- `vitest.config.ts` include
-- AI handoff docs
+- `lib/aiDataPlatform/workflow/**`
+- `lib/aiDataPlatform/aiDataPlatformWorkflow.test.ts`
+- `lib/aiDataPlatform/index.ts` (workflow exports)
+- `app/admin/ai-data/{review,audit,AiDataPlatformShell}`
+- `supabase/migrations/20260878_ai_data_platform_workflow_approval_v1.sql` (local only)
+- Architecture docs + AI handoff docs
 
 ## Forbidden
 
 - Commerce / Learning / Collaboration / Mobile / Guardian
 - Alpha merge / remote migration apply / live providers
-- Unrelated ai-data behavior changes
+- Training / inference execution

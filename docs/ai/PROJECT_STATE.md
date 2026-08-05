@@ -2,17 +2,18 @@
 
 ## Active feature
 
-- **Branch:** `office/ai-core-knowledge-acquisition-onto-alpha-v1`
-- **Task:** Knowledge Acquisition Foundation onto Alpha V1
-- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-knowledge-acquisition-onto-alpha-v1`
+- **Branch:** `office/ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
+- **Task:** Data Platform Workflow & Dataset Approval onto Alpha V1
+- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
 
 ## Lineage tip chain (awaiting alpha GO)
 
 1. `4690bb7` providers on alpha (merged)
-2. `0a04d59` streaming foundation
-3. `e8f2e4b` private AI onto alpha
-4. `a05e57e` data platform onto alpha
-5. (this) knowledge acquisition onto alpha
+2. `0a04d59` streaming
+3. `e8f2e4b` private AI
+4. `a05e57e` data platform
+5. `c2f30e9` knowledge acquisition
+6. (this) data platform workflow approval
 
 ## Safety
 
