@@ -1,10 +1,12 @@
 /**
- * Seller Live Payout Provider Port V1 (Slice S1).
+ * Seller Live Payout Provider Port V1 (Slice S1 + S3 resolve).
  *
- * Abstraction only — no Manual Ops or Stripe Connect implementations here.
- * Ungated external provider ids remain forbidden.
+ * Contracts + gated resolve. Ungated external provider ids remain forbidden.
+ * Concrete Manual Ops Live adapter lives in providers/manualOpsLive.ts (S3).
  */
 
+import { isSellerLivePayoutGateSatisfied } from "./gate";
+import { getManualOpsLiveProvider } from "./providers/manualOpsLive";
 import type {
   SellerLivePayoutProviderId,
   SellerLivePayoutTransferInput,
@@ -33,7 +35,7 @@ export const SELLER_LIVE_PAYOUT_PROVIDER_CONTRACTS: SellerLivePayoutProviderCont
       supportsLiveTransfer: true,
       enabledForV1: true,
       notes:
-        "V1 live rail. Ops attestation after ledger submit; no bank API in S1.",
+        "V1 live rail. Ops attestation after ledger submit; no bank API.",
     },
     {
       providerId: "stripe_connect",
@@ -46,8 +48,7 @@ export const SELLER_LIVE_PAYOUT_PROVIDER_CONTRACTS: SellerLivePayoutProviderCont
   ];
 
 /**
- * Runtime port future slices implement (Manual Ops in S3, Connect later).
- * S1 defines the shape only — no concrete provider module.
+ * Runtime port — Manual Ops Live (S3). Stripe Connect remains reserved.
  */
 export type SellerLivePayoutProviderPort = {
   readonly providerId: SellerLivePayoutProviderId;
@@ -73,7 +74,7 @@ export function getSellerLivePayoutProviderContract(
 /**
  * Fail-closed: reject unknown providers and any id that looks like an
  * ungated external rail. V1 live execution is allowed only for
- * `manual_ops_live` (implementation arrives in a later slice).
+ * `manual_ops_live` (gated Manual Ops Live adapter in S3).
  */
 export function assertSellerLivePayoutProviderAllowed(
   providerId: string
@@ -101,13 +102,20 @@ export function assertSellerLivePayoutProviderAllowed(
 }
 
 /**
- * S1 placeholder: concrete ports are not registered yet.
- * Later slices register Manual Ops Live behind the production gate.
+ * Resolve a concrete live provider port.
+ * Fail-closed: returns null unless the S1 gate is satisfied and the id is
+ * the V1 Manual Ops Live provider. Stripe Connect / Wise / PayPal stay forbidden.
  */
 export function resolveSellerLivePayoutProviderPort(
-  providerId: string
+  providerId: string,
+  env: Record<string, string | undefined> = process.env
 ): SellerLivePayoutProviderPort | null {
   assertSellerLivePayoutProviderAllowed(providerId);
-  // No concrete implementation in S1.
-  return null;
+  if (!isSellerLivePayoutGateSatisfied(env)) {
+    return null;
+  }
+  if (providerId !== SELLER_LIVE_PAYOUT_V1_PROVIDER_ID) {
+    return null;
+  }
+  return getManualOpsLiveProvider();
 }

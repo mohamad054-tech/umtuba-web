@@ -2,28 +2,29 @@
 
 ## Milestone
 
-Seller Live Payout Provider V1 — **Slice S2** (migration + contract tests)
+Seller Live Payout Provider V1 — **Slice S3** (Manual Ops Live provider + helpers)
 
 ## Status
 
-`s2-complete` — local migration `20260896` + contract tests; **not committed**; **not remote-applied**
+`s3-complete` — Manual Ops Live adapter + destination/execution helpers + focused tests; **committed + pushed** on close; no migrations; S4 not started
 
 ## Branch / worktree
 
 - Branch: `office/commerce-seller-live-payout-provider-v1`
 - Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
-- S1 tip: `f77378833424008abaa106d29860735b50bedfdc`
+- S2 tip (pre-S3): `756057ba438c9b51862b8fa905dcaf9ca0f3c0b0`
 
-## S2 scope
+## S3 scope
 
-- `supabase/migrations/20260896_store_seller_live_payout_provider_v1.sql`
-- Destinations + executions, FORCE RLS, required RPCs
-- Migration contract tests only
+- `lib/store/sellerLivePayout/providers/manualOpsLive.ts`
+- `lib/store/sellerLivePayout/destinations.ts`
+- `lib/store/sellerLivePayout/executions.ts`
+- Focused S3 tests; wire `resolveSellerLivePayoutProviderPort` behind S1 gate
 
 ## Explicit non-actions
 
-No S3 Manual Ops · no orchestrator · no UI · no server actions · no remote apply · no commit/push · no edits to 20260881/82/83
+No S4 orchestrator · no server actions · no UI · no migrations · no UEOS/booking changes · no remote apply
 
 ## Next (not this GO)
 
-Slice S3 — Manual Ops Live provider adapters
+Slice S4 — orchestrator (attestation → ledger booking coordination)
