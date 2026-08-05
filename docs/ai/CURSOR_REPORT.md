@@ -1,17 +1,21 @@
-﻿# CURSOR_REPORT — Instructor Course Enrollment Management V1
+﻿# CURSOR_REPORT — Learner Lesson Delivery Defense-in-Depth V1
 
 ## Summary
 
-**PASS** — Instructors can create course enrollments by learner user id and run
-activate / suspend / reinstate / cancel from the learners page. Existing progress
-read model preserved. Existing RPCs only; no migration.
+Closed the Learning-owned data-plane hole where `/learning/lessons/[lessonId]`
+loaded protected content blocks / activities and mutated progress
+(`start`/`touch`) in parallel with the lesson engine — before unlock was
+positively proven. Delivery is now engine-first and split into metadata-only
+vs verified-full paths.
 
 ## Exact files changed
 
-- `lib/learning/enrollmentsFoundation.ts`
-- `lib/learning/enrollmentsFoundation.test.ts`
-- `app/learning/instructor/enrollmentActions.ts` (new)
-- `app/learning/instructor/courses/[courseId]/learners/page.tsx`
+- `lib/learning/learnerDelivery.ts`
+- `lib/learning/learnerDelivery.test.ts`
+- `lib/learning/lessonContentAccess.test.ts`
+- `app/learning/lessons/[lessonId]/page.tsx`
+- `app/learning/lessons/[lessonId]/ai-tutor/page.tsx`
+- `app/components/learning/LessonViewer.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -19,25 +23,23 @@ read model preserved. Existing RPCs only; no migration.
 
 None.
 
-## RPCs wired
-
-- `create_learning_enrollment`
-- `activate_learning_enrollment`
-- `suspend_learning_enrollment`
-- `reinstate_learning_enrollment`
-- `cancel_learning_enrollment`
-- RLS SELECT on `learning_enrollments` for lifecycle enrollment ids
-
 ## Security review
 
-- Fail-closed UUID/source/status validation
-- Manager sources only (no self_enrollment masquerade)
-- Sanitized errors; JWT client; SQL auth/lifecycle authority
-- No Commerce / Guardian / Tutor / ledger changes
+- Protected SELECTs (`learning_lesson_content_blocks`, `learning_activities`)
+  and progress mutations only run after `verified_unlocked`.
+- Metadata-only type has no `blocks`/`activities` fields (no accidental
+  fallback).
+- LessonViewer still renders protected content only from verified engine.
+- AI Tutor keeps unlock gate; uses metadata-only (no delivery progress mutation).
 
 ## Tests
 
-`npx vitest run lib/learning/enrollmentsFoundation.test.ts` — **50 passed**
+```
+npx vitest run lib/learning/learnerDelivery.test.ts
+npx vitest run lib/learning/lessonContentAccess.test.ts
+```
+
+69 passed (55 + 14). Also ran AI Tutor regression suites (36 passed).
 
 ## TypeScript
 
@@ -45,7 +47,7 @@ None.
 
 ## Build
 
-Not run (policy).
+Not required (no app entry / package change beyond Learning routes).
 
 ## git diff --check
 
@@ -53,10 +55,17 @@ PASS
 
 ## git status --short
 
-Local uncommitted changes (stop before commit).
+```
+ M app/components/learning/LessonViewer.tsx
+ M app/learning/lessons/[lessonId]/ai-tutor/page.tsx
+ M app/learning/lessons/[lessonId]/page.tsx
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M lib/learning/learnerDelivery.test.ts
+ M lib/learning/learnerDelivery.ts
+ M lib/learning/lessonContentAccess.test.ts
+```
 
 ## Open issues
 
-- Program-target manager enroll UI not in this milestone
-- Contact search / invitations deferred
-- Remote schema apply remains ops GO
+- Awaiting commit GO (no commit/push performed)

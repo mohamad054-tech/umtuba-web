@@ -11,7 +11,7 @@ import {
   resolveLessonCompletionHandoff,
   LEARNING_LEARNER_ROUTES,
   type LearningLearnerActivitySummary,
-  type LearningLearnerLessonDelivery,
+  type LearningLearnerLessonShell,
 } from "../../../lib/learning/learnerDelivery";
 import type { LearningLessonContentBlock } from "../../../lib/learning/lessonContentBlocksFoundation";
 import type {
@@ -29,7 +29,11 @@ import { completeLearningLessonAction } from "../../learning/progressActions";
 import { unlockLessonWithUmPointsAction } from "../../learning/firstCourseActions";
 
 type LessonViewerProps = {
-  delivery: LearningLearnerLessonDelivery;
+  /**
+   * Shell / delivery metadata only. Protected content always comes from
+   * `access` (verified engine) — never from a delivery SELECT payload.
+   */
+  delivery: LearningLearnerLessonShell;
   /**
    * Prefer passing the full engine result so missing/failed engine never
    * falls open to delivery SELECT content.

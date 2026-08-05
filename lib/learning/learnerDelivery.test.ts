@@ -26,6 +26,10 @@ import {
   completeMyLearningLesson,
   filterPublishedCreatableBlocks,
   isAttemptInputLocked,
+  isVerifiedUnlockedLessonAccess,
+  loadLessonDeliveryForAccess,
+  loadLessonDeliveryMetadata,
+  loadLessonDeliveryProtected,
   loadMyLearningHub,
   parseLearningLessonCompleteView,
   resolveAdjacentLessonTargets,
@@ -35,6 +39,7 @@ import {
   sanitizeLearningLessonCompletionError,
   toLearnerActivityHints,
 } from "./learnerDelivery";
+import type { LearningLessonContentAccess } from "./lessonEngineFoundation";
 import type { LearningLessonContentBlock } from "./lessonContentBlocksFoundation";
 
 const ROOT = process.cwd();
@@ -1011,5 +1016,325 @@ describe("Learner Experience V1 — activity type routing", () => {
     expect(gateUi).toMatch(/resolveLearnerActivityTarget/);
     expect(gateUi).toMatch(/redirect\(target\.href\)/);
     expect(gateUi).not.toMatch(/Preview published assessment/);
+  });
+});
+
+describe("Learner Delivery — defense-in-depth load paths", () => {
+  const LESSON_ID = "33333333-3333-4333-8333-333333333333";
+  const SECTION_ID = "22222222-2222-4222-8222-222222222222";
+  const COURSE_ID = "11111111-1111-4111-8111-111111111111";
+  const BLOCK_ID = "44444444-4444-4444-8444-444444444444";
+  const ACTIVITY_ID = "55555555-5555-4555-8555-555555555555";
+
+  function verifiedAccess(): LearningLessonContentAccess {
+    return {
+      state: "verified_unlocked",
+      canRenderProtectedContent: true,
+      engine: {
+        lesson_id: LESSON_ID,
+        lesson: {
+          name: "Intro",
+          difficulty: null,
+          estimated_duration_minutes: 10,
+          description: null,
+          status: "published",
+        },
+        objectives: [],
+        prerequisites: [],
+        unlock: {
+          lesson_id: LESSON_ID,
+          locked: false,
+          cost: null,
+          balance: 0,
+          unlocked: true,
+        },
+        unlock_required: false,
+        blocks: [],
+        media_position: null,
+        activities: [],
+        ai_tutor_enabled: true,
+      },
+      unlock: {
+        lesson_id: LESSON_ID,
+        locked: false,
+        cost: null,
+        balance: 0,
+        unlocked: true,
+      },
+    };
+  }
+
+  function lockedAccess(): LearningLessonContentAccess {
+    return {
+      state: "locked",
+      canRenderProtectedContent: false,
+      engine: verifiedAccess().engine!,
+      unlock: {
+        lesson_id: LESSON_ID,
+        locked: true,
+        cost: 50,
+        balance: 0,
+        unlocked: false,
+      },
+      message: "locked",
+    };
+  }
+
+  function createTrackingClient() {
+    const tables: string[] = [];
+    const rpcs: string[] = [];
+
+    const client = {
+      rpc: async (name: string) => {
+        rpcs.push(name);
+        return { data: null, error: null };
+      },
+      from: (table: string) => {
+        tables.push(table);
+        const builder: {
+          select: () => typeof builder;
+          eq: () => typeof builder;
+          in: () => typeof builder;
+          order: () => typeof builder;
+          maybeSingle: () => Promise<{ data: unknown; error: null }>;
+          then: (
+            onfulfilled?: (value: { data: unknown; error: null }) => unknown,
+            onrejected?: (reason: unknown) => unknown
+          ) => Promise<unknown>;
+        } = {
+          select() {
+            return builder;
+          },
+          eq() {
+            return builder;
+          },
+          in() {
+            return builder;
+          },
+          order() {
+            return builder;
+          },
+          maybeSingle: async () => {
+            if (table === "learning_lessons") {
+              return {
+                data: {
+                  id: LESSON_ID,
+                  section_id: SECTION_ID,
+                  name: "Intro",
+                  slug: "intro",
+                  description: "Safe description",
+                  status: "published",
+                },
+                error: null,
+              };
+            }
+            if (table === "learning_sections") {
+              return {
+                data: {
+                  id: SECTION_ID,
+                  course_id: COURSE_ID,
+                  status: "published",
+                },
+                error: null,
+              };
+            }
+            if (table === "learning_courses") {
+              return {
+                data: {
+                  id: COURSE_ID,
+                  name: "Course",
+                  status: "published",
+                },
+                error: null,
+              };
+            }
+            if (table === "learning_lesson_progress") {
+              return { data: { status: "not_started" }, error: null };
+            }
+            return { data: null, error: null };
+          },
+          then(onfulfilled, onrejected) {
+            let data: unknown = [];
+            if (table === "learning_sections") {
+              data = [
+                { id: SECTION_ID, position: 0, status: "published" },
+              ];
+            } else if (table === "learning_lessons") {
+              data = [
+                {
+                  id: LESSON_ID,
+                  section_id: SECTION_ID,
+                  position: 0,
+                  status: "published",
+                },
+              ];
+            } else if (table === "learning_lesson_content_blocks") {
+              data = [
+                {
+                  id: BLOCK_ID,
+                  lesson_id: LESSON_ID,
+                  block_type: "rich_text",
+                  status: "published",
+                  position: 0,
+                  content: { body: "secret gated body" },
+                  created_by: "u",
+                  updated_by: null,
+                  created_at: "",
+                  updated_at: "",
+                  published_at: null,
+                  suspended_at: null,
+                  archived_at: null,
+                },
+              ];
+            } else if (table === "learning_activities") {
+              data = [
+                {
+                  id: ACTIVITY_ID,
+                  name: "Quiz",
+                  slug: "quiz",
+                  type: "quiz",
+                  description: null,
+                  position: 0,
+                  status: "published",
+                },
+              ];
+            } else if (table === "learning_activity_settings") {
+              data = [];
+            }
+            return Promise.resolve({ data, error: null }).then(
+              onfulfilled,
+              onrejected
+            );
+          },
+        };
+        return builder;
+      },
+    };
+
+    return { client, tables, rpcs };
+  }
+
+  it("isVerifiedUnlockedLessonAccess is true only for verified_unlocked", () => {
+    expect(isVerifiedUnlockedLessonAccess(verifiedAccess())).toBe(true);
+    expect(isVerifiedUnlockedLessonAccess(lockedAccess())).toBe(false);
+    expect(
+      isVerifiedUnlockedLessonAccess({
+        state: "engine_unavailable",
+        canRenderProtectedContent: false,
+        engine: null,
+        unlock: null,
+        message: "x",
+      })
+    ).toBe(false);
+    expect(
+      isVerifiedUnlockedLessonAccess({
+        state: "access_unverified",
+        canRenderProtectedContent: false,
+        engine: null,
+        unlock: null,
+        message: "x",
+      })
+    ).toBe(false);
+  });
+
+  it("metadata-only path skips content blocks, activities, and progress RPCs", async () => {
+    const { client, tables, rpcs } = createTrackingClient();
+    const result = await loadLessonDeliveryMetadata(client as never, LESSON_ID);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.delivery_kind).toBe("metadata_only");
+    expect(result.data.lesson.name).toBe("Intro");
+    expect(result.data.lesson.course_id).toBe(COURSE_ID);
+    expect(result.data).not.toHaveProperty("blocks");
+    expect(result.data).not.toHaveProperty("activities");
+    expect(tables).not.toContain("learning_lesson_content_blocks");
+    expect(tables).not.toContain("learning_activities");
+    expect(tables).not.toContain("learning_activity_settings");
+    expect(rpcs).not.toContain(LEARNING_PROGRESS_RPCS.startLesson);
+    expect(rpcs).not.toContain(LEARNING_PROGRESS_RPCS.touchLesson);
+  });
+
+  it("locked / engine_unavailable / unverified use metadata-only via forAccess", async () => {
+    const cases: LearningLessonContentAccess[] = [
+      lockedAccess(),
+      {
+        state: "engine_unavailable",
+        canRenderProtectedContent: false,
+        engine: null,
+        unlock: null,
+        message: "engine down",
+      },
+      {
+        state: "access_unverified",
+        canRenderProtectedContent: false,
+        engine: null,
+        unlock: null,
+        message: "unverified",
+      },
+    ];
+
+    for (const access of cases) {
+      const { client, tables, rpcs } = createTrackingClient();
+      const result = await loadLessonDeliveryForAccess(
+        client as never,
+        LESSON_ID,
+        access
+      );
+      expect(result.ok).toBe(true);
+      if (!result.ok) continue;
+      expect(result.data.delivery_kind).toBe("metadata_only");
+      expect(tables).not.toContain("learning_lesson_content_blocks");
+      expect(tables).not.toContain("learning_activities");
+      expect(rpcs).toEqual([]);
+    }
+  });
+
+  it("verified-unlocked path loads blocks, activities, and progress start/touch", async () => {
+    const { client, tables, rpcs } = createTrackingClient();
+    const result = await loadLessonDeliveryProtected(client as never, LESSON_ID);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.delivery_kind).toBe("verified_full");
+    expect(result.data.blocks).toHaveLength(1);
+    expect(result.data.blocks[0]?.content).toEqual({
+      body: "secret gated body",
+    });
+    expect(result.data.activities).toHaveLength(1);
+    expect(result.data.activities[0]?.id).toBe(ACTIVITY_ID);
+    expect(tables).toContain("learning_lesson_content_blocks");
+    expect(tables).toContain("learning_activities");
+    expect(rpcs).toEqual([
+      LEARNING_PROGRESS_RPCS.startLesson,
+      LEARNING_PROGRESS_RPCS.touchLesson,
+    ]);
+  });
+
+  it("forAccess returns verified_full only for verified_unlocked", async () => {
+    const { client, tables, rpcs } = createTrackingClient();
+    const result = await loadLessonDeliveryForAccess(
+      client as never,
+      LESSON_ID,
+      verifiedAccess()
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.delivery_kind).toBe("verified_full");
+    expect(tables).toContain("learning_lesson_content_blocks");
+    expect(rpcs).toContain(LEARNING_PROGRESS_RPCS.startLesson);
+  });
+
+  it("metadata-only delivery cannot fall back to protected content fields", async () => {
+    const { client } = createTrackingClient();
+    const result = await loadLessonDeliveryMetadata(client as never, LESSON_ID);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const delivery = result.data;
+    expect(delivery.delivery_kind).toBe("metadata_only");
+    expect(delivery).not.toHaveProperty("blocks");
+    expect(delivery).not.toHaveProperty("activities");
+    // Viewer contract: metadata-only never supplies renderable SELECT content.
+    const asUnknown = delivery as Record<string, unknown>;
+    expect(asUnknown.blocks).toBeUndefined();
+    expect(asUnknown.activities).toBeUndefined();
   });
 });

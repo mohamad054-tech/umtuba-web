@@ -21,6 +21,7 @@ import {
   type LearningLessonContentBlock,
 } from "./lessonContentBlocksFoundation";
 import { LEARNING_COMPLETION_ROUTES } from "./completionFoundation";
+import type { LearningLessonContentAccess } from "./lessonEngineFoundation";
 import { LEARNING_PROGRESS_RPCS } from "./progressFoundation";
 import type { LearningProgressStatus } from "./progressFoundation";
 import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
@@ -351,7 +352,8 @@ export type LearningLearnerActivitySummary = {
   hints: LearningLearnerActivityHints;
 };
 
-export type LearningLearnerLessonDelivery = {
+/** Safe lesson shell — identity, nav, and non-mutating progress read. */
+export type LearningLearnerLessonShell = {
   lesson: {
     id: string;
     name: string;
@@ -361,14 +363,35 @@ export type LearningLearnerLessonDelivery = {
     course_id: string;
     course_name: string;
   };
-  blocks: LearningLessonContentBlock[];
-  activities: LearningLearnerActivitySummary[];
   progress_status: LearningProgressStatus;
   /** Null at first lesson or when navigation cannot be resolved. */
   previous_lesson: LearningLessonNavTarget | null;
   /** Null at last lesson or when navigation cannot be resolved. */
   next_lesson: LearningLessonNavTarget | null;
 };
+
+/**
+ * Metadata-only delivery — allowed before unlock proof.
+ * Intentionally has no `blocks` / `activities` fields so callers cannot
+ * accidentally fall back to a protected SELECT payload.
+ */
+export type LearningLearnerLessonMetadataDelivery = LearningLearnerLessonShell & {
+  delivery_kind: "metadata_only";
+};
+
+/**
+ * Full delivery after positive `verified_unlocked` proof.
+ * Still must not be used by LessonViewer as a content authority — engine wins.
+ */
+export type LearningLearnerLessonProtectedDelivery = LearningLearnerLessonShell & {
+  delivery_kind: "verified_full";
+  blocks: LearningLessonContentBlock[];
+  activities: LearningLearnerActivitySummary[];
+};
+
+export type LearningLearnerLessonDelivery =
+  | LearningLearnerLessonMetadataDelivery
+  | LearningLearnerLessonProtectedDelivery;
 
 export type LearningLearnerSnapshotQuestion = {
   question_id: string;
@@ -1088,10 +1111,25 @@ export async function loadCourseOutline(
   };
 }
 
-export async function loadLessonDelivery(
+type LessonShellContext = {
+  lessonId: string;
+  sectionId: string;
+  courseId: string;
+  lesson: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    section_id: string;
+    course_id: string;
+    course_name: string;
+  };
+};
+
+async function loadLessonShellContext(
   supabase: AnyClient,
   lessonId: string
-): Promise<LearningDeliveryResult<LearningLearnerLessonDelivery>> {
+): Promise<LearningDeliveryResult<LessonShellContext>> {
   const { data: lesson, error: lessonError } = await supabase
     .from("learning_lessons")
     .select("id, section_id, name, slug, description, status")
@@ -1141,12 +1179,117 @@ export async function loadLessonDelivery(
     return { ok: false, message: "Course not found or not accessible" };
   }
 
-  // Progress heartbeat — idempotent RPCs; ignore soft failures for read UX.
+  return {
+    ok: true,
+    data: {
+      lessonId: asString(lesson.id) ?? lessonId,
+      sectionId,
+      courseId,
+      lesson: {
+        id: asString(lesson.id) ?? lessonId,
+        name: asString(lesson.name) ?? "Lesson",
+        slug: asString(lesson.slug) ?? lessonId,
+        description: asString(lesson.description),
+        section_id: sectionId,
+        course_id: courseId,
+        course_name: asString(course.name) ?? "Course",
+      },
+    },
+  };
+}
+
+async function loadLessonShellFields(
+  supabase: AnyClient,
+  ctx: LessonShellContext
+): Promise<LearningLearnerLessonShell> {
+  let progress_status: LearningProgressStatus = "not_started";
+  const { data: progressRow } = await supabase
+    .from("learning_lesson_progress")
+    .select("status")
+    .eq("lesson_id", ctx.lessonId)
+    .maybeSingle();
+  const st = asString(progressRow?.status) as LearningProgressStatus | null;
+  if (st) progress_status = st;
+
+  // Adjacent nav is best-effort — never fail lesson delivery for nav errors.
+  let previous_lesson: LearningLessonNavTarget | null = null;
+  let next_lesson: LearningLessonNavTarget | null = null;
+  try {
+    const orderedIds = await loadOrderedPublishedLessonIdsForCourse(
+      supabase,
+      ctx.courseId
+    );
+    const adjacent = resolveAdjacentLessonTargets({
+      current_lesson_id: ctx.lessonId,
+      ordered_lesson_ids: orderedIds,
+    });
+    previous_lesson = adjacent.previous;
+    next_lesson = adjacent.next;
+  } catch {
+    previous_lesson = null;
+    next_lesson = null;
+  }
+
+  return {
+    lesson: ctx.lesson,
+    progress_status,
+    previous_lesson,
+    next_lesson,
+  };
+}
+
+/**
+ * True only when the engine gate positively proves unlock.
+ * Locked / unavailable / unverified must use metadata-only delivery.
+ */
+export function isVerifiedUnlockedLessonAccess(
+  access: LearningLessonContentAccess
+): boolean {
+  return (
+    access.state === "verified_unlocked" && access.canRenderProtectedContent
+  );
+}
+
+/**
+ * Metadata-only lesson delivery — safe before unlock proof.
+ * Does not SELECT content blocks or activities, and never mutates progress.
+ */
+export async function loadLessonDeliveryMetadata(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<LearningDeliveryResult<LearningLearnerLessonMetadataDelivery>> {
+  const ctxResult = await loadLessonShellContext(supabase, lessonId);
+  if (!ctxResult.ok) return ctxResult;
+
+  const shell = await loadLessonShellFields(supabase, ctxResult.data);
+  return {
+    ok: true,
+    data: {
+      delivery_kind: "metadata_only",
+      ...shell,
+    },
+  };
+}
+
+/**
+ * Protected/full lesson delivery — call only after `verified_unlocked`.
+ * Loads content blocks + activities and runs progress start/touch.
+ */
+export async function loadLessonDeliveryProtected(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<LearningDeliveryResult<LearningLearnerLessonProtectedDelivery>> {
+  const ctxResult = await loadLessonShellContext(supabase, lessonId);
+  if (!ctxResult.ok) return ctxResult;
+
+  const { lessonId: resolvedLessonId } = ctxResult.data;
+
+  // Progress heartbeat — only on the verified-unlocked path.
   await supabase.rpc(LEARNING_PROGRESS_RPCS.startLesson, {
-    p_lesson_id: lessonId,
+    p_lesson_id: resolvedLessonId,
   });
   await supabase.rpc(LEARNING_PROGRESS_RPCS.touchLesson, {
-    p_lesson_id: lessonId,
+    p_lesson_id: resolvedLessonId,
   });
 
   const { data: blockRows, error: blockError } = await supabase
@@ -1154,7 +1297,7 @@ export async function loadLessonDelivery(
     .select(
       "id, lesson_id, block_type, status, position, content, created_by, updated_by, created_at, updated_at, published_at, suspended_at, archived_at"
     )
-    .eq("lesson_id", lessonId)
+    .eq("lesson_id", resolvedLessonId)
     .eq("status", "published")
     .order("position", { ascending: true });
 
@@ -1172,7 +1315,7 @@ export async function loadLessonDelivery(
   const { data: activityRows, error: activityError } = await supabase
     .from("learning_activities")
     .select("id, name, slug, type, description, position, status")
-    .eq("lesson_id", lessonId)
+    .eq("lesson_id", resolvedLessonId)
     .eq("status", "published")
     .order("position", { ascending: true });
 
@@ -1224,53 +1367,31 @@ export async function loadLessonDelivery(
     }
   );
 
-  let progress_status: LearningProgressStatus = "not_started";
-  const { data: progressRow } = await supabase
-    .from("learning_lesson_progress")
-    .select("status")
-    .eq("lesson_id", lessonId)
-    .maybeSingle();
-  const st = asString(progressRow?.status) as LearningProgressStatus | null;
-  if (st) progress_status = st;
-
-  // Adjacent nav is best-effort — never fail lesson delivery for nav errors.
-  let previous_lesson: LearningLessonNavTarget | null = null;
-  let next_lesson: LearningLessonNavTarget | null = null;
-  try {
-    const orderedIds = await loadOrderedPublishedLessonIdsForCourse(
-      supabase,
-      courseId
-    );
-    const adjacent = resolveAdjacentLessonTargets({
-      current_lesson_id: asString(lesson.id) ?? lessonId,
-      ordered_lesson_ids: orderedIds,
-    });
-    previous_lesson = adjacent.previous;
-    next_lesson = adjacent.next;
-  } catch {
-    previous_lesson = null;
-    next_lesson = null;
-  }
-
+  const shell = await loadLessonShellFields(supabase, ctxResult.data);
   return {
     ok: true,
     data: {
-      lesson: {
-        id: asString(lesson.id) ?? lessonId,
-        name: asString(lesson.name) ?? "Lesson",
-        slug: asString(lesson.slug) ?? lessonId,
-        description: asString(lesson.description),
-        section_id: sectionId,
-        course_id: courseId,
-        course_name: asString(course.name) ?? "Course",
-      },
+      delivery_kind: "verified_full",
+      ...shell,
       blocks,
       activities,
-      progress_status,
-      previous_lesson,
-      next_lesson,
     },
   };
+}
+
+/**
+ * Engine-gated delivery loader.
+ * Protected SELECTs + progress mutations only when access is verified_unlocked.
+ */
+export async function loadLessonDeliveryForAccess(
+  supabase: AnyClient,
+  lessonId: string,
+  access: LearningLessonContentAccess
+): Promise<LearningDeliveryResult<LearningLearnerLessonDelivery>> {
+  if (isVerifiedUnlockedLessonAccess(access)) {
+    return loadLessonDeliveryProtected(supabase, lessonId);
+  }
+  return loadLessonDeliveryMetadata(supabase, lessonId);
 }
 
 export async function loadPublishedActivityGate(

@@ -4,8 +4,7 @@ import LessonViewer from "../../../components/learning/LessonViewer";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
-  loadLessonDelivery,
-  type LearningLearnerLessonDelivery,
+  loadLessonDeliveryForAccess,
 } from "../../../../lib/learning/learnerDelivery";
 import {
   loadMyLearningLessonEngine,
@@ -21,17 +20,6 @@ type PageProps = {
     | Promise<{ error?: string; completed?: string; unlocked?: string }>
     | { error?: string; completed?: string; unlocked?: string };
 };
-
-/** Strip direct SELECT content so RSC props cannot bypass the engine gate. */
-function toMetadataDelivery(
-  delivery: LearningLearnerLessonDelivery
-): LearningLearnerLessonDelivery {
-  return {
-    ...delivery,
-    blocks: [],
-    activities: [],
-  };
-}
 
 export async function generateMetadata({ params }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
@@ -55,16 +43,18 @@ export default async function LearningLessonPage({
   }
 
   const supabase = await createClient();
-  const [delivery, engineResult] = await Promise.all([
-    loadLessonDelivery(supabase, lessonId),
-    loadMyLearningLessonEngine(supabase, lessonId),
-  ]);
+
+  // Engine-first: never start protected delivery until access is resolved.
+  const engineResult = await loadMyLearningLessonEngine(supabase, lessonId);
+  const access = resolveLessonContentAccess(engineResult);
+  const delivery = await loadLessonDeliveryForAccess(
+    supabase,
+    lessonId,
+    access
+  );
   if (!delivery.ok) {
     notFound();
   }
-
-  const access = resolveLessonContentAccess(engineResult);
-  const safeDelivery = toMetadataDelivery(delivery.data);
 
   return (
     <LearningShell
@@ -100,7 +90,7 @@ export default async function LearningLessonPage({
         </p>
       ) : null}
 
-      <LessonViewer delivery={safeDelivery} access={access} />
+      <LessonViewer delivery={delivery.data} access={access} />
     </LearningShell>
   );
 }

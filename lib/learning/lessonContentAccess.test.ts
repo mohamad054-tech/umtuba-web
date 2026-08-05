@@ -200,23 +200,39 @@ describe("LessonViewer + lesson page wiring — no delivery bypass", () => {
     );
     expect(ui).toMatch(/resolveLessonContentAccess/);
     expect(ui).toMatch(/canRenderProtectedContent/);
+    expect(ui).toMatch(/LearningLearnerLessonShell/);
     expect(ui).not.toMatch(/: delivery\.blocks/);
     expect(ui).not.toMatch(/delivery\.activities/);
+    expect(ui).not.toMatch(/LearningLearnerLessonDelivery/);
   });
 
-  it("lesson page strips delivery blocks before LessonViewer and passes access", () => {
+  it("lesson page is engine-first and never parallel-loads full delivery", () => {
     const page = readFileSync(
       join(ROOT, "app/learning/lessons/[lessonId]/page.tsx"),
       "utf8"
     );
     expect(page).toMatch(/resolveLessonContentAccess/);
-    expect(page).toMatch(/toMetadataDelivery/);
-    expect(page).toMatch(/blocks:\s*\[\]/);
-    expect(page).toMatch(/activities:\s*\[\]/);
+    expect(page).toMatch(/loadLessonDeliveryForAccess/);
+    expect(page).toMatch(/loadMyLearningLessonEngine/);
     expect(page).toMatch(/access=\{access\}/);
+    expect(page).not.toMatch(/Promise\.all/);
+    expect(page).not.toMatch(/loadLessonDeliveryProtected/);
+    expect(page).not.toMatch(/toMetadataDelivery/);
     expect(page).not.toMatch(
       /engine=\{engineResult\.ok \? engineResult\.data : null\}/
     );
+  });
+
+  it("AI Tutor page uses metadata-only delivery after unlock gate", () => {
+    const page = readFileSync(
+      join(ROOT, "app/learning/lessons/[lessonId]/ai-tutor/page.tsx"),
+      "utf8"
+    );
+    expect(page).toMatch(/requireLessonUnlockedForLearner/);
+    expect(page).toMatch(/loadLessonDeliveryMetadata/);
+    expect(page).not.toMatch(/loadLessonDeliveryProtected/);
+    expect(page).not.toMatch(/loadLessonDeliveryForAccess/);
+    expect(page).not.toMatch(/\bloadLessonDelivery\b/);
   });
 
   it("direct delivery blocks cannot bypass a failed access decision", () => {
@@ -237,5 +253,18 @@ describe("LessonViewer + lesson page wiring — no delivery bypass", () => {
       ? deliveryBlocks
       : [];
     expect(renderable).toEqual([]);
+  });
+
+  it("metadata-only delivery type has no protected content fields", () => {
+    const src = readFileSync(
+      join(ROOT, "lib/learning/learnerDelivery.ts"),
+      "utf8"
+    );
+    expect(src).toMatch(/delivery_kind:\s*"metadata_only"/);
+    expect(src).toMatch(/delivery_kind:\s*"verified_full"/);
+    expect(src).toMatch(/isVerifiedUnlockedLessonAccess/);
+    expect(src).toMatch(/loadLessonDeliveryMetadata/);
+    expect(src).toMatch(/loadLessonDeliveryProtected/);
+    expect(src).toMatch(/loadLessonDeliveryForAccess/);
   });
 });

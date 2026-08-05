@@ -10,7 +10,7 @@ import {
 } from "../../../../../lib/learning/aiTutorLearnerUi";
 import {
   LEARNING_LEARNER_ROUTES,
-  loadLessonDelivery,
+  loadLessonDeliveryMetadata,
 } from "../../../../../lib/learning/learnerDelivery";
 import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 
@@ -49,7 +49,9 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
     );
   }
 
-  const delivery = await loadLessonDelivery(supabase, lessonId);
+  // Unlock already proven — metadata-only (no block/activity SELECT, no progress
+  // start/touch). This page does not render lesson content bodies.
+  const delivery = await loadLessonDeliveryMetadata(supabase, lessonId);
   if (!delivery.ok) {
     redirect(LEARNING_LEARNER_ROUTES.hub);
   }
