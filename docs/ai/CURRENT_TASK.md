@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Learning — Instructor Lesson Point-Cost Controls V1
+UM Learning — Instructor Course Enrollment Management V1
 
 ## Status
 
@@ -10,7 +10,7 @@ UM Learning — Instructor Lesson Point-Cost Controls V1
 
 ## Milestone id
 
-`learning.instructor.lesson_point_cost_controls_v1`
+`learning.instructor.course_enrollment_management_v1`
 
 ## Branch
 
@@ -18,7 +18,7 @@ UM Learning — Instructor Lesson Point-Cost Controls V1
 
 ## Base
 
-`064e26a6480fb5efa921647975a04dd31b37f8ff`
+`644969b7ca113d12173f5cba39031c2456faaf1f`
 
 ## Worktree
 
@@ -26,23 +26,18 @@ UM Learning — Instructor Lesson Point-Cost Controls V1
 
 ## Delivered
 
-- Instructor UM Points unlock controls on lesson authoring page
-- Server action `setLessonPointCostAction` (enable / update / disable)
-- Foundation: typed set-cost + fail-closed unlock RPC parser (`success === true` && `unlocked === true`)
-- Learner unlock action no longer treats soft `{success:false}` as success
-- Existing RPCs only; no migration; no platform ledger
+- Typed enrollment adapters: create / activate / suspend / reinstate / cancel
+- Instructor enroll-by-user-id form on learners page (assignable sources only)
+- Lifecycle controls by status; SQL remains authoritative
+- Existing progress filters/list preserved
+- Duplicate live enrollment → sanitized non-destructive message
+- No migration; no complete/moderate in this UI
 
 ## Verification (local)
 
-- `npx vitest run lib/learning/lessonUnlockFoundation.test.ts` — **24 passed**
+- `npx vitest run lib/learning/enrollmentsFoundation.test.ts` — **50 passed**
 - `npx tsc --noEmit` — PASS
 - `git diff --check` — PASS
-
-## Explicitly deferred
-
-- Platform Single Ledger
-- Commerce / Guardian / Collaboration / AI Tutor
-- Remote migration apply
 
 ## Next
 

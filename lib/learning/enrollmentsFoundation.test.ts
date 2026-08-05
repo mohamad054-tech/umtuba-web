@@ -14,6 +14,12 @@ import {
   LEARNING_ENROLLMENT_STATUSES,
   LEARNING_ENROLLMENT_TARGET_TYPES,
   LEARNING_ENROLLMENT_TERMINAL_STATUSES,
+  activateLearningEnrollment,
+  cancelLearningEnrollment,
+  createLearningEnrollment,
+  enrollmentLifecycleActionsForStatus,
+  reinstateLearningEnrollment,
+  suspendLearningEnrollment,
 } from "./enrollmentsFoundation";
 
 const ROOT = process.cwd();
@@ -575,5 +581,265 @@ describe("Enrollments Foundation V1 — documentation", () => {
     // soft refs
     expect(doc).toMatch(/soft ref/i);
     expect(doc).toMatch(/next slice/i);
+  });
+});
+
+describe("Enrollment management adapters — create", () => {
+  const COURSE_ID = "22222222-2222-4222-8222-222222222222";
+  const USER_ID = "11111111-1111-4111-8111-111111111111";
+  const ENROLLMENT_ID = "33333333-3333-4333-8333-333333333333";
+
+  it("creates a valid manager enrollment", async () => {
+    const fake = {
+      rpc: async (name: string, args?: Record<string, unknown>) => {
+        expect(name).toBe("create_learning_enrollment");
+        expect(args?.p_source).toBe("admin_assignment");
+        expect(args?.p_target_type).toBe("course");
+        return {
+          data: {
+            enrollment_id: ENROLLMENT_ID,
+            target_type: "course",
+            course_id: COURSE_ID,
+            user_id: USER_ID,
+            status: "active",
+          },
+          error: null,
+        };
+      },
+    };
+    const result = await createLearningEnrollment(fake as never, {
+      targetType: "course",
+      targetId: COURSE_ID,
+      userId: USER_ID,
+      source: "admin_assignment",
+      status: "active",
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.enrollment_id).toBe(ENROLLMENT_ID);
+      expect(result.data.status).toBe("active");
+    }
+  });
+
+  it("rejects malformed courseId and learner userId", async () => {
+    const fake = {
+      rpc: async () => {
+        throw new Error("should not call");
+      },
+    };
+    const badCourse = await createLearningEnrollment(fake as never, {
+      targetType: "course",
+      targetId: "nope",
+      userId: USER_ID,
+      source: "admin_assignment",
+    });
+    expect(badCourse.ok).toBe(false);
+    const badUser = await createLearningEnrollment(fake as never, {
+      targetType: "course",
+      targetId: COURSE_ID,
+      userId: "nope",
+      source: "admin_assignment",
+    });
+    expect(badUser.ok).toBe(false);
+  });
+
+  it("rejects unsupported / self_enrollment source", async () => {
+    const fake = {
+      rpc: async () => {
+        throw new Error("should not call");
+      },
+    };
+    const unsupported = await createLearningEnrollment(fake as never, {
+      targetType: "course",
+      targetId: COURSE_ID,
+      userId: USER_ID,
+      source: "not_a_source" as never,
+    });
+    expect(unsupported.ok).toBe(false);
+  });
+
+  it("maps duplicate live enrollment errors", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: null,
+        error: {
+          message: "A live enrollment already exists for this learner and target",
+        },
+      }),
+    };
+    const result = await createLearningEnrollment(fake as never, {
+      targetType: "course",
+      targetId: COURSE_ID,
+      userId: USER_ID,
+      source: "admin_assignment",
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/already exists/i);
+    }
+  });
+
+  it("maps unauthorized and transport failures", async () => {
+    const unauthorized = await createLearningEnrollment(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Not allowed to assign enrollments for this target" },
+        }),
+      } as never,
+      {
+        targetType: "course",
+        targetId: COURSE_ID,
+        userId: USER_ID,
+        source: "admin_assignment",
+      }
+    );
+    expect(unauthorized.ok).toBe(false);
+    if (!unauthorized.ok) {
+      expect(unauthorized.message).toMatch(/not allowed/i);
+    }
+  });
+
+  it("fails closed on null or malformed response", async () => {
+    const nullPayload = await createLearningEnrollment(
+      { rpc: async () => ({ data: null, error: null }) } as never,
+      {
+        targetType: "course",
+        targetId: COURSE_ID,
+        userId: USER_ID,
+        source: "admin_assignment",
+      }
+    );
+    expect(nullPayload.ok).toBe(false);
+
+    const malformed = await createLearningEnrollment(
+      {
+        rpc: async () => ({
+          data: { enrollment_id: ENROLLMENT_ID, status: "weird" },
+          error: null,
+        }),
+      } as never,
+      {
+        targetType: "course",
+        targetId: COURSE_ID,
+        userId: USER_ID,
+        source: "admin_assignment",
+      }
+    );
+    expect(malformed.ok).toBe(false);
+  });
+});
+
+describe("Enrollment management adapters — lifecycle", () => {
+  const ENROLLMENT_ID = "33333333-3333-4333-8333-333333333333";
+
+  function okClient(status: string) {
+    return {
+      rpc: async (name: string, args?: Record<string, unknown>) => {
+        expect(args?.p_enrollment_id).toBe(ENROLLMENT_ID);
+        return {
+          data: { enrollment_id: ENROLLMENT_ID, status },
+          error: null,
+        };
+      },
+    };
+  }
+
+  it("activate / suspend / reinstate / cancel succeed with parsed status", async () => {
+    expect(
+      (await activateLearningEnrollment(okClient("active") as never, ENROLLMENT_ID))
+        .ok
+    ).toBe(true);
+    expect(
+      (
+        await suspendLearningEnrollment(
+          okClient("suspended") as never,
+          ENROLLMENT_ID
+        )
+      ).ok
+    ).toBe(true);
+    expect(
+      (
+        await reinstateLearningEnrollment(
+          okClient("active") as never,
+          ENROLLMENT_ID
+        )
+      ).ok
+    ).toBe(true);
+    expect(
+      (
+        await cancelLearningEnrollment(
+          okClient("cancelled") as never,
+          ENROLLMENT_ID
+        )
+      ).ok
+    ).toBe(true);
+  });
+
+  it("invalid transition / RPC failure is sanitized", async () => {
+    const result = await activateLearningEnrollment(
+      {
+        rpc: async () => ({
+          data: null,
+          error: { message: "Only pending enrollments can be activated" },
+        }),
+      } as never,
+      ENROLLMENT_ID
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/pending/i);
+    }
+  });
+
+  it("rejects malformed enrollment id", async () => {
+    const result = await suspendLearningEnrollment(
+      {
+        rpc: async () => {
+          throw new Error("should not call");
+        },
+      } as never,
+      "bad"
+    );
+    expect(result.ok).toBe(false);
+  });
+
+  it("enrollmentLifecycleActionsForStatus exposes only valid UX actions", () => {
+    expect(enrollmentLifecycleActionsForStatus("pending")).toEqual([
+      "activate",
+      "suspend",
+      "cancel",
+    ]);
+    expect(enrollmentLifecycleActionsForStatus("active")).toEqual([
+      "suspend",
+      "cancel",
+    ]);
+    expect(enrollmentLifecycleActionsForStatus("suspended")).toEqual([
+      "reinstate",
+      "cancel",
+    ]);
+    expect(enrollmentLifecycleActionsForStatus("completed")).toEqual([]);
+  });
+});
+
+describe("Enrollment management — UI/action wiring", () => {
+  it("learners page and enrollment actions wire create + lifecycle", () => {
+    const page = read(
+      "app/learning/instructor/courses/[courseId]/learners/page.tsx"
+    );
+    const actions = read("app/learning/instructor/enrollmentActions.ts");
+    expect(page).toMatch(/createCourseEnrollmentAction/);
+    expect(page).toMatch(/enrollmentLifecycleAction/);
+    expect(page).toMatch(/Enroll learner/);
+    expect(page).toMatch(/refreshOnSuccess/);
+    expect(page).toMatch(/loadCourseEnrollmentsForManage/);
+    expect(actions).toMatch(/createLearningEnrollment/);
+    expect(actions).toMatch(/activateLearningEnrollment/);
+    expect(actions).toMatch(/suspendLearningEnrollment/);
+    expect(actions).toMatch(/reinstateLearningEnrollment/);
+    expect(actions).toMatch(/cancelLearningEnrollment/);
+    expect(actions).toMatch(/LEARNING_ENROLLMENT_MANAGE_ROUTES\.learners/);
+    expect(actions).toMatch(/LEARNING_ENROLLMENT_ASSIGNABLE_SOURCES/);
+    expect(actions).not.toMatch(/p_source:\s*["']self_enrollment["']/);
   });
 });

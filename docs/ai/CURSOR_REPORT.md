@@ -1,18 +1,17 @@
-﻿# CURSOR_REPORT — Instructor Lesson Point-Cost Controls V1
+﻿# CURSOR_REPORT — Instructor Course Enrollment Management V1
 
 ## Summary
 
-**PASS** — Instructors can enable/update/disable lesson UM Points unlock costs via
-existing `set_learning_lesson_point_cost`. Unlock adapter now fail-closes unless
-`success === true` and `unlocked === true`. No migration; no platform ledger work.
+**PASS** — Instructors can create course enrollments by learner user id and run
+activate / suspend / reinstate / cancel from the learners page. Existing progress
+read model preserved. Existing RPCs only; no migration.
 
 ## Exact files changed
 
-- `lib/learning/lessonUnlockFoundation.ts`
-- `lib/learning/lessonUnlockFoundation.test.ts`
-- `app/learning/instructor/actions.ts`
-- `app/learning/instructor/courses/[courseId]/lessons/[lessonId]/page.tsx`
-- `app/learning/firstCourseActions.ts`
+- `lib/learning/enrollmentsFoundation.ts`
+- `lib/learning/enrollmentsFoundation.test.ts`
+- `app/learning/instructor/enrollmentActions.ts` (new)
+- `app/learning/instructor/courses/[courseId]/learners/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -20,31 +19,25 @@ existing `set_learning_lesson_point_cost`. Unlock adapter now fail-closes unless
 
 None.
 
-## RPCs used
+## RPCs wired
 
-- `set_learning_lesson_point_cost`
-- `get_my_learning_lesson_unlock_state` (unchanged load path)
-- `unlock_my_learning_lesson_with_um_points` (adapter contract only)
-- Direct SELECT `learning_lesson_point_costs` for instructor saved-state display (RLS)
-
-## Behavior
-
-- Instructor UI: current cost / free / disabled; enable+update form; disable paid unlock
-- Disable = `enabled=false` with retained `unlock_cost > 0` (RPC contract)
-- Unlock adapter: PostgREST error / null / malformed / `success !== true` /
-  `unlocked !== true` → `ok: false`
-- Learner action: only redirects `?unlocked=1` on adapter ok; else `?error=` sanitized
+- `create_learning_enrollment`
+- `activate_learning_enrollment`
+- `suspend_learning_enrollment`
+- `reinstate_learning_enrollment`
+- `cancel_learning_enrollment`
+- RLS SELECT on `learning_enrollments` for lifecycle enrollment ids
 
 ## Security review
 
-- No service-role; JWT + existing SECURITY DEFINER RPCs
-- No client-side authorization duplicate
-- Sanitized errors; no ledger / Commerce / Guardian / Tutor changes
-- No secrets
+- Fail-closed UUID/source/status validation
+- Manager sources only (no self_enrollment masquerade)
+- Sanitized errors; JWT client; SQL auth/lifecycle authority
+- No Commerce / Guardian / Tutor / ledger changes
 
 ## Tests
 
-`npx vitest run lib/learning/lessonUnlockFoundation.test.ts` — **24 passed** / 0 failed
+`npx vitest run lib/learning/enrollmentsFoundation.test.ts` — **50 passed**
 
 ## TypeScript
 
@@ -64,5 +57,6 @@ Local uncommitted changes (stop before commit).
 
 ## Open issues
 
-- Platform Single Ledger still deferred
-- Remote Learning schema apply remains ops GO
+- Program-target manager enroll UI not in this milestone
+- Contact search / invitations deferred
+- Remote schema apply remains ops GO

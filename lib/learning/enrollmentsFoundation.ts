@@ -17,6 +17,10 @@
  * via has_learning_program_access / has_learning_course_access.
  */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+type AnyClient = SupabaseClient;
+
 /** Enrollment target discriminator (Program XOR Course). */
 export const LEARNING_ENROLLMENT_TARGET_TYPES = ["program", "course"] as const;
 export type LearningEnrollmentTargetType =
@@ -176,3 +180,317 @@ export const LEARNING_ENROLLMENT_AUDIT_ACTIONS = {
   moderation: "enrollment.moderation",
   expire: "enrollment.expire",
 } as const;
+
+export type EnrollmentResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
+
+export type LearningEnrollmentMutationResult = {
+  enrollment_id: string;
+  status: LearningEnrollmentStatus;
+  target_type?: LearningEnrollmentTargetType;
+  program_id?: string | null;
+  course_id?: string | null;
+  user_id?: string;
+};
+
+export type CreateLearningEnrollmentInput = {
+  targetType: LearningEnrollmentTargetType;
+  targetId: string;
+  userId: string;
+  source: Exclude<LearningEnrollmentSource, "self_enrollment">;
+  status?: "pending" | "active";
+  sourceReferenceType?: string | null;
+  sourceReferenceId?: string | null;
+  startsAt?: string | null;
+  expiresAt?: string | null;
+  metadata?: Record<string, unknown>;
+};
+
+export type LearningEnrollmentLifecycleAction =
+  | "activate"
+  | "suspend"
+  | "reinstate"
+  | "cancel";
+
+export type LearningCourseEnrollmentManageRow = {
+  enrollment_id: string;
+  user_id: string;
+  status: LearningEnrollmentStatus;
+  source: LearningEnrollmentSource | string;
+  target_type: LearningEnrollmentTargetType | string;
+};
+
+export const LEARNING_ENROLLMENT_MANAGE_ROUTES = {
+  learners: (courseId: string) =>
+    `/learning/instructor/courses/${courseId}/learners`,
+} as const;
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const CREATE_STATUSES = new Set(["pending", "active"]);
+const STATUS_SET = new Set<string>(LEARNING_ENROLLMENT_STATUSES);
+const ASSIGNABLE_SOURCE_SET = new Set<string>(
+  LEARNING_ENROLLMENT_ASSIGNABLE_SOURCES
+);
+
+export function isLearningEnrollmentUuid(value: string): boolean {
+  return UUID_RE.test(value);
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
+export function sanitizeLearningEnrollmentError(
+  message: string | undefined
+): string {
+  const raw = (message ?? "").trim();
+  if (!raw) return "Enrollment could not be processed.";
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("authentication required") ||
+    lower.includes("not allowed")
+  ) {
+    return "You are not allowed to manage this enrollment.";
+  }
+  if (lower.includes("live enrollment already exists")) {
+    return "A live enrollment already exists for this learner and course.";
+  }
+  if (lower.includes("learner profile not found")) {
+    return "Learner profile not found.";
+  }
+  if (lower.includes("self_enrollment is reserved")) {
+    return "Managers cannot create self-enrollment records.";
+  }
+  if (lower.includes("only pending")) {
+    return "Only pending enrollments can be activated.";
+  }
+  if (lower.includes("only pending or active")) {
+    return "Only pending or active enrollments can be suspended.";
+  }
+  if (lower.includes("only suspended")) {
+    return "Only suspended enrollments can be reinstated.";
+  }
+  if (lower.includes("only live")) {
+    return "Only live enrollments can be cancelled.";
+  }
+  if (lower.includes("must be draft or published")) {
+    return "Course or program must be draft or published for enrollment.";
+  }
+  if (lower.includes("space must be active")) {
+    return "Learning space must be active for enrollment changes.";
+  }
+  if (raw.length > 180) return "Enrollment could not be processed.";
+  return raw;
+}
+
+export function parseLearningEnrollmentMutationResult(
+  raw: unknown
+): LearningEnrollmentMutationResult | null {
+  const row = asRecord(raw);
+  if (!row) return null;
+  const enrollment_id = asString(row.enrollment_id);
+  const status = asString(row.status);
+  if (!enrollment_id || !status || !STATUS_SET.has(status)) return null;
+  const target_type = asString(row.target_type);
+  return {
+    enrollment_id,
+    status: status as LearningEnrollmentStatus,
+    target_type:
+      target_type === "program" || target_type === "course"
+        ? target_type
+        : undefined,
+    program_id: asString(row.program_id),
+    course_id: asString(row.course_id),
+    user_id: asString(row.user_id) ?? undefined,
+  };
+}
+
+/** UX-only: which lifecycle buttons to show. SQL still enforces transitions. */
+export function enrollmentLifecycleActionsForStatus(
+  status: string | null | undefined
+): LearningEnrollmentLifecycleAction[] {
+  switch (status) {
+    case "pending":
+      return ["activate", "suspend", "cancel"];
+    case "active":
+      return ["suspend", "cancel"];
+    case "suspended":
+      return ["reinstate", "cancel"];
+    default:
+      return [];
+  }
+}
+
+export async function createLearningEnrollment(
+  supabase: AnyClient,
+  input: CreateLearningEnrollmentInput
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  if (
+    input.targetType !== "program" &&
+    input.targetType !== "course"
+  ) {
+    return { ok: false, message: "target_type must be program or course" };
+  }
+  if (!isLearningEnrollmentUuid(input.targetId)) {
+    return { ok: false, message: "target_id must be a valid UUID" };
+  }
+  if (!isLearningEnrollmentUuid(input.userId)) {
+    return { ok: false, message: "user_id must be a valid UUID" };
+  }
+  if (!ASSIGNABLE_SOURCE_SET.has(input.source)) {
+    return {
+      ok: false,
+      message: "Unsupported enrollment source for manager assignment.",
+    };
+  }
+  if (input.source === ("self_enrollment" as never)) {
+    return {
+      ok: false,
+      message: "Managers cannot create self-enrollment records.",
+    };
+  }
+  const status = input.status ?? "active";
+  if (!CREATE_STATUSES.has(status)) {
+    return {
+      ok: false,
+      message: "create_learning_enrollment status must be pending or active",
+    };
+  }
+
+  const { data, error } = await supabase.rpc(LEARNING_ENROLLMENT_RPCS.create, {
+    p_target_type: input.targetType,
+    p_target_id: input.targetId,
+    p_user_id: input.userId,
+    p_source: input.source,
+    p_status: status,
+    p_source_reference_type: input.sourceReferenceType ?? null,
+    p_source_reference_id: input.sourceReferenceId ?? null,
+    p_starts_at: input.startsAt ?? null,
+    p_expires_at: input.expiresAt ?? null,
+    p_metadata: input.metadata ?? {},
+  });
+  if (error) {
+    return { ok: false, message: sanitizeLearningEnrollmentError(error.message) };
+  }
+  const parsed = parseLearningEnrollmentMutationResult(data);
+  if (!parsed) {
+    return { ok: false, message: "Enrollment create payload is malformed." };
+  }
+  return { ok: true, data: parsed };
+}
+
+async function runEnrollmentLifecycleRpc(
+  supabase: AnyClient,
+  rpc: string,
+  enrollmentId: string
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  if (!isLearningEnrollmentUuid(enrollmentId)) {
+    return { ok: false, message: "enrollment_id must be a valid UUID" };
+  }
+  const { data, error } = await supabase.rpc(rpc, {
+    p_enrollment_id: enrollmentId,
+  });
+  if (error) {
+    return { ok: false, message: sanitizeLearningEnrollmentError(error.message) };
+  }
+  const parsed = parseLearningEnrollmentMutationResult(data);
+  if (!parsed) {
+    return { ok: false, message: "Enrollment lifecycle payload is malformed." };
+  }
+  return { ok: true, data: parsed };
+}
+
+export async function activateLearningEnrollment(
+  supabase: AnyClient,
+  enrollmentId: string
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  return runEnrollmentLifecycleRpc(
+    supabase,
+    LEARNING_ENROLLMENT_RPCS.activate,
+    enrollmentId
+  );
+}
+
+export async function suspendLearningEnrollment(
+  supabase: AnyClient,
+  enrollmentId: string
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  return runEnrollmentLifecycleRpc(
+    supabase,
+    LEARNING_ENROLLMENT_RPCS.suspend,
+    enrollmentId
+  );
+}
+
+export async function reinstateLearningEnrollment(
+  supabase: AnyClient,
+  enrollmentId: string
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  return runEnrollmentLifecycleRpc(
+    supabase,
+    LEARNING_ENROLLMENT_RPCS.reinstate,
+    enrollmentId
+  );
+}
+
+export async function cancelLearningEnrollment(
+  supabase: AnyClient,
+  enrollmentId: string
+): Promise<EnrollmentResult<LearningEnrollmentMutationResult>> {
+  return runEnrollmentLifecycleRpc(
+    supabase,
+    LEARNING_ENROLLMENT_RPCS.cancel,
+    enrollmentId
+  );
+}
+
+/**
+ * Load course enrollments for instructor lifecycle controls.
+ * Relies on manager RLS SELECT; fail closed on query errors.
+ */
+export async function loadCourseEnrollmentsForManage(
+  supabase: AnyClient,
+  courseId: string
+): Promise<EnrollmentResult<LearningCourseEnrollmentManageRow[]>> {
+  if (!isLearningEnrollmentUuid(courseId)) {
+    return { ok: false, message: "course_id must be a valid UUID" };
+  }
+  const { data, error } = await supabase
+    .from("learning_enrollments")
+    .select("id, user_id, status, source, target_type, course_id")
+    .eq("course_id", courseId)
+    .in("status", ["pending", "active", "suspended", "completed"])
+    .order("created_at", { ascending: false });
+  if (error) {
+    return { ok: false, message: sanitizeLearningEnrollmentError(error.message) };
+  }
+  const rows: LearningCourseEnrollmentManageRow[] = [];
+  for (const item of data ?? []) {
+    const enrollment_id = asString((item as { id?: unknown }).id);
+    const user_id = asString((item as { user_id?: unknown }).user_id);
+    const status = asString((item as { status?: unknown }).status);
+    const source = asString((item as { source?: unknown }).source) ?? "";
+    const target_type =
+      asString((item as { target_type?: unknown }).target_type) ?? "course";
+    if (!enrollment_id || !user_id || !status || !STATUS_SET.has(status)) {
+      continue;
+    }
+    rows.push({
+      enrollment_id,
+      user_id,
+      status: status as LearningEnrollmentStatus,
+      source,
+      target_type,
+    });
+  }
+  return { ok: true, data: rows };
+}
