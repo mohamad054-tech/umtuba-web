@@ -1,25 +1,22 @@
-# CURSOR_REPORT — AI Core Anthropic on Gemini Recovery V1
+# CURSOR_REPORT — AI Core Local on Gemini Recovery V1
 
 ## Summary
 
-Port Anthropic Claude provider adapter onto the Gemini recovery tip
-(`919dc75`). OpenAI / Gemini / Anthropic are interchangeable via existing
-Provider Foundation resolution. Fail-closed without `ANTHROPIC_API_KEY`.
-Streaming not enabled. No Learning / Commerce / Private AI / UI changes.
+Port Local / self-hosted OpenAI-compatible provider adapter onto the Gemini
+recovery + Anthropic tip (`6447f33`). OpenAI / Gemini / Anthropic / Local are
+interchangeable via Provider Foundation. Fail-closed without both
+`LOCAL_AI_BASE_URL` and `LOCAL_AI_MODEL`. Streaming not enabled.
 
 ## Exact files changed
 
-- `.env.example` — Anthropic env docs in live-key line
-- `lib/ai/providers/anthropicAdapter.ts` — new
-- `lib/ai/providers/anthropicAdapter.test.ts` — new
-- `lib/ai/providers/adapters.ts` — register Anthropic adapter
+- `.env.example` — Local AI env docs
+- `lib/ai/providers/localAdapter.ts` — new
+- `lib/ai/providers/localAdapter.test.ts` — new
+- `lib/ai/providers/adapters.ts` — register Local adapter
 - `lib/ai/providers/foundation.ts` / `foundation.test.ts` — seed + tests
-- `lib/ai/config.ts` — Anthropic in live-key helper / status
-- `lib/ai/models/registry.ts` — Anthropic catalog models
-- `lib/ai/aiPlatformFoundation.test.ts` — registry/routing coverage
-- `lib/ai/capabilities/admin/diagnostics.ts` — anthropic status fields
-- `lib/ai/hub/{types,runtimeStatus,experience.test}.ts` — anthropicConfigured
-- `docs/ai/*` — handoff for this milestone
+- `lib/ai/config.ts` — Local config + live-provider helper
+- `lib/ai/models/registry.ts` — Local catalog when configured
+- Related hub/diagnostics/tests + AI handoff docs
 
 ## Migrations created
 
@@ -27,9 +24,9 @@ None.
 
 ## Security review
 
-- `ANTHROPIC_API_KEY` server-only; never `NEXT_PUBLIC_*`
-- Fail-closed when key absent (adapter not registered / unavailable)
-- No secrets committed; `.env.local` untouched
+- `LOCAL_AI_API_KEY` optional server-only; never `NEXT_PUBLIC_*`
+- No default localhost / no invented cloud model ids
+- Fail-closed when base URL or model absent
 - Scope limited to Shared AI provider layer + handoff docs
 
 ## Tests
@@ -40,12 +37,8 @@ Focused provider / foundation suites (see commit verification).
 
 `npx tsc --noEmit` required.
 
-## Build
-
-Not required for provider-adapter milestone.
-
 ## Open issues
 
-- Live Anthropic API smoke optional (needs key)
-- Local / self-hosted adapter still next on this recovery lineage
+- Live local/Ollama smoke optional
+- Streaming deferred
 - Do not merge to `alpha-0.2` without explicit GO

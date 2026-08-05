@@ -45,10 +45,12 @@ export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
   geminiConfigured?: boolean;
   anthropicConfigured?: boolean;
+  localConfigured?: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
   geminiDefaultModel?: string;
   anthropicDefaultModel?: string;
+  localDefaultModel?: string | null;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
   const geminiConfigured = Boolean(input.geminiConfigured);
@@ -56,6 +58,7 @@ export function buildProviderRegistry(input: {
   const anthropicConfigured = Boolean(input.anthropicConfigured);
   const anthropicDefaultModel =
     input.anthropicDefaultModel ?? "claude-haiku-4-5-20251001";
+  const localConfigured = Boolean(input.localConfigured);
   const providers: AiProviderDefinition[] = [];
 
   if (input.stubEligible) {
@@ -211,6 +214,43 @@ export function buildProviderRegistry(input: {
       },
     ],
   });
+
+  if (input.localDefaultModel != null && input.localDefaultModel.length > 0) {
+    providers.push({
+      providerId: "local",
+      displayName: "Local / self-hosted (OpenAI-compatible)",
+      available: localConfigured,
+      models: [
+        {
+          providerId: "local",
+          modelId: input.localDefaultModel,
+          displayName: input.localDefaultModel,
+          capabilityClasses: ["chat", "structured"],
+          inputModalities: ["text"],
+          outputModalities: ["text"],
+          contextLimitTokens: 32_000,
+          structuredOutputSupport: true,
+          toolCallSupport: false,
+          streamingSupport: false,
+          available: localConfigured,
+          costClass: "economy",
+          inputCostPer1M: 0,
+          outputCostPer1M: 0,
+          dataHandlingMax: "confidential",
+          defaultTimeoutMs: input.defaultTimeoutMs,
+          fallbackEligible: true,
+          latencyClass: "low",
+        },
+      ],
+    });
+  } else {
+    providers.push({
+      providerId: "local",
+      displayName: "Local / self-hosted (OpenAI-compatible)",
+      available: false,
+      models: [],
+    });
+  }
 
   return providers;
 }

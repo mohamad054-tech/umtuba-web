@@ -95,6 +95,7 @@ export type AiHubRuntimeStatus = {
   openaiConfigured: boolean;
   geminiConfigured: boolean;
   anthropicConfigured: boolean;
+  localConfigured: boolean;
   stubEligible: boolean;
   assistantRuntimeFlagHint: "on" | "off" | "unknown";
   /** Sanitized missing config keys only — never secret values. */

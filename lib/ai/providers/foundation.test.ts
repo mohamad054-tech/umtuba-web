@@ -352,7 +352,7 @@ describe("capability compatibility via foundation selection", () => {
 });
 
 describe("createProviderFoundation seeding", () => {
-  it("seeds stub + openai + gemini + anthropic catalog + disabled local placeholder", () => {
+  it("seeds stub + cloud catalogs + unconfigured local (available false)", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "stub",
@@ -360,6 +360,8 @@ describe("createProviderFoundation seeding", () => {
         openaiApiKey: null,
         geminiApiKey: null,
         anthropicApiKey: null,
+        localBaseUrl: null,
+        localDefaultModel: null,
       })
     );
     expect(f.getProvider("stub")?.enabled).toBe(true);
@@ -368,7 +370,8 @@ describe("createProviderFoundation seeding", () => {
     expect(f.getProvider("gemini")?.available).toBe(false);
     expect(f.getProvider("anthropic")?.enabled).toBe(true);
     expect(f.getProvider("anthropic")?.available).toBe(false);
-    expect(f.getProvider("local")?.enabled).toBe(false);
+    expect(f.getProvider("local")?.enabled).toBe(true);
+    expect(f.getProvider("local")?.available).toBe(false);
     expect(f.getAdapter("gemini")).toBeNull();
     expect(f.getAdapter("anthropic")).toBeNull();
     expect(f.getAdapter("local")).toBeNull();
@@ -382,12 +385,15 @@ describe("createProviderFoundation seeding", () => {
         openaiApiKey: null,
         geminiApiKey: null,
         anthropicApiKey: null,
+        localBaseUrl: null,
+        localDefaultModel: null,
       })
     );
     const route = f.resolveRoute(baseRoute);
     expect(["stub", "openai"]).toContain(route.providerId);
     expect(route.providerId).not.toBe("gemini");
     expect(route.providerId).not.toBe("anthropic");
+    expect(route.providerId).not.toBe("local");
   });
 
   it("loads gemini provider + adapter when GEMINI_API_KEY is configured", () => {
@@ -398,6 +404,8 @@ describe("createProviderFoundation seeding", () => {
         openaiApiKey: null,
         geminiApiKey: "test-gemini-key-not-real",
         anthropicApiKey: null,
+        localBaseUrl: null,
+        localDefaultModel: null,
         geminiDefaultModel: "gemini-2.5-flash",
       })
     );
@@ -435,6 +443,8 @@ describe("createProviderFoundation seeding", () => {
         openaiApiKey: null,
         geminiApiKey: null,
         anthropicApiKey: "test-anthropic-key",
+        localBaseUrl: null,
+        localDefaultModel: null,
         anthropicDefaultModel: "claude-haiku-4-5-20251001",
       })
     );
@@ -448,6 +458,30 @@ describe("createProviderFoundation seeding", () => {
     });
     expect(route.providerId).toBe("anthropic");
     expect(route.modelId).toBe("claude-haiku-4-5-20251001");
+  });
+
+  it("registers local adapter when LOCAL_AI_BASE_URL and LOCAL_AI_MODEL are set", () => {
+    const f = createProviderFoundation(
+      loadAiPlatformConfig({
+        mode: "live",
+        allowStub: false,
+        openaiApiKey: null,
+        geminiApiKey: null,
+        anthropicApiKey: null,
+        localBaseUrl: "http://127.0.0.1:11434/v1",
+        localDefaultModel: "operator-hosted-model",
+      })
+    );
+    expect(f.getProvider("local")?.available).toBe(true);
+    expect(f.getAdapter("local")?.providerId).toBe("local");
+    const route = f.resolveRoute({
+      ...baseRoute,
+      preferredProviderId: "local",
+      preferredModelId: "operator-hosted-model",
+      allowFallback: false,
+    });
+    expect(route.providerId).toBe("local");
+    expect(route.modelId).toBe("operator-hosted-model");
   });
 });
 
