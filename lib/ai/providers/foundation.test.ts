@@ -231,7 +231,12 @@ describe("AiProviderFoundation fail-closed lookup", () => {
 describe("capability compatibility via foundation selection", () => {
   it("fails closed when modality is unsupported", () => {
     const f = createProviderFoundation(
-      loadAiPlatformConfig({ mode: "stub", allowStub: true, openaiApiKey: null })
+      loadAiPlatformConfig({
+        mode: "stub",
+        allowStub: true,
+        openaiApiKey: null,
+        geminiApiKey: null,
+      })
     );
     expect(() =>
       f.resolveRoute({
@@ -274,6 +279,7 @@ describe("capability compatibility via foundation selection", () => {
         mode: "stub",
         allowStub: true,
         openaiApiKey: null,
+        geminiApiKey: null,
       })
     );
     const a = f.resolveRoute(baseRoute);
@@ -285,7 +291,12 @@ describe("capability compatibility via foundation selection", () => {
 
   it("rejects unknown preferred provider/model fail-closed", () => {
     const f = createProviderFoundation(
-      loadAiPlatformConfig({ mode: "stub", allowStub: true, openaiApiKey: null })
+      loadAiPlatformConfig({
+        mode: "stub",
+        allowStub: true,
+        openaiApiKey: null,
+        geminiApiKey: null,
+      })
     );
     expect(() =>
       f.resolveRoute({
@@ -341,7 +352,7 @@ describe("capability compatibility via foundation selection", () => {
 });
 
 describe("createProviderFoundation seeding", () => {
-  it("seeds stub + openai + gemini catalog + disabled future placeholders", () => {
+  it("seeds stub + openai + gemini slot + disabled future placeholders", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "stub",
@@ -361,7 +372,7 @@ describe("createProviderFoundation seeding", () => {
     expect(f.getAdapter("local")).toBeNull();
   });
 
-  it("does not expose unconfigured gemini as executable routes", () => {
+  it("does not expose gemini without key as an executable route", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "stub",
@@ -375,26 +386,40 @@ describe("createProviderFoundation seeding", () => {
     expect(route.providerId).not.toBe("gemini");
   });
 
-  it("registers gemini adapter when GEMINI_API_KEY is configured", () => {
+  it("loads gemini provider + adapter when GEMINI_API_KEY is configured", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "live",
         allowStub: false,
         openaiApiKey: null,
-        geminiApiKey: "test-gemini-key",
+        geminiApiKey: "test-gemini-key-not-real",
         geminiDefaultModel: "gemini-2.5-flash",
       })
     );
+    expect(f.getProvider("gemini")?.enabled).toBe(true);
     expect(f.getProvider("gemini")?.available).toBe(true);
     expect(f.getAdapter("gemini")?.providerId).toBe("gemini");
-    const route = f.resolveRoute({
-      ...baseRoute,
-      preferredProviderId: "gemini",
-      preferredModelId: "gemini-2.5-flash",
-      allowFallback: false,
-    });
-    expect(route.providerId).toBe("gemini");
-    expect(route.modelId).toBe("gemini-2.5-flash");
+    expect(f.requireEnabledModel("gemini", "gemini-2.5-flash").modelId).toBe(
+      "gemini-2.5-flash"
+    );
+    // OpenAI remains registered but non-executable without its key.
+    expect(f.getProvider("openai")?.available).toBe(false);
+    expect(f.getAdapter("openai")).toBeNull();
+  });
+
+  it("fail-closes gemini when key is absent", () => {
+    const f = createProviderFoundation(
+      loadAiPlatformConfig({
+        mode: "stub",
+        allowStub: true,
+        openaiApiKey: null,
+        geminiApiKey: null,
+      })
+    );
+    expect(() =>
+      f.requireEnabledModel("gemini", "gemini-2.5-flash")
+    ).toThrow(AiPlatformError);
+    expect(() => f.requireAdapter("gemini")).toThrow(/no executable adapter|not registered/i);
   });
 });
 
@@ -507,6 +532,7 @@ describe("gateway uses foundation selection (not hardcoded adapters)", () => {
           mode: "stub",
           allowStub: true,
           openaiApiKey: null,
+          geminiApiKey: null,
         }),
         capabilityEligible: true,
       }

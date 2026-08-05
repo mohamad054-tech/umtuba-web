@@ -1,7 +1,6 @@
 import type { AiUsageRecord } from "../contracts/types";
 import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
 import type { AiPlatformConfig } from "../config";
-import { createGeminiAdapter } from "./geminiAdapter";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -156,43 +155,6 @@ export function createStubAdapter(): AiProviderAdapter {
             labeledAiGenerated: true,
             revealsAnswerKey: false,
           };
-        } else if (input.capabilityId === "learning.tutor.give_hint") {
-          structured = {
-            hint: outside
-              ? "That focus is outside the authorized lesson material provided."
-              : `Stub scaffolding hint for ${lessonName}: revisit the first published definition, then try restating it in your own words.`,
-            hintLevel: outside ? "gentle" : "moderate",
-            focusRestated: "Learner-requested focus (stub).",
-            nextStep: "Retry the concept check without looking at a full answer.",
-            sourceReferences: commonRefs,
-            groundingStatus: outside ? "outside_material" : "grounded",
-            limitations: [
-              "Stub provider — not live model output.",
-              "Scaffolding only — not a graded solution.",
-            ],
-            labeledAiGenerated: true,
-            revealsAnswerKey: false,
-          };
-        } else if (input.capabilityId === "learning.tutor.explain_again") {
-          structured = {
-            title: `Explaining ${lessonName} again`,
-            simplerExplanation: outside
-              ? "That focus is outside the authorized lesson material provided."
-              : `Stub simpler re-teach of ${lessonName}: start with one plain-language idea, then connect it to the published blocks.`,
-            keyPoints: ["Plain-language core idea", "How it appears in the lesson"],
-            analogy: "Think of it like retelling a story in simpler words.",
-            checkUnderstanding: [
-              "Can you restate the main idea in one sentence?",
-              "Which published block supports that idea?",
-            ],
-            sourceReferences: commonRefs,
-            groundingStatus: outside ? "outside_material" : "grounded",
-            limitations: [
-              "Stub provider — not live model output.",
-              "Re-teach only — not an official grade or hidden solution.",
-            ],
-            labeledAiGenerated: true,
-          };
         } else {
           structured = {
             title: `Explaining ${lessonName}`,
@@ -337,6 +299,158 @@ export function createOpenAiCompatibleAdapter(
             costStatus: "unavailable",
             modelId: input.modelId,
             providerId: "openai",
+          },
+        };
+      } catch (error) {
+        if (error instanceof AiPlatformError) throw error;
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new AiPlatformError("timeout", "AI provider timed out.");
+        }
+        throw new AiPlatformError(
+          "provider_unavailable",
+          sanitizeAiErrorMessage(
+            error instanceof Error ? error.message : "Provider unavailable"
+          )
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+    },
+  };
+}
+
+type GeminiContent = {
+  role: "user" | "model";
+  parts: Array<{ text: string }>;
+};
+
+function toGeminiContents(messages: ProviderChatMessage[]): {
+  systemInstruction: { parts: Array<{ text: string }> } | undefined;
+  contents: GeminiContent[];
+} {
+  const systemParts = messages
+    .filter((m) => m.role === "system")
+    .map((m) => m.content.trim())
+    .filter(Boolean);
+  const contents: GeminiContent[] = [];
+  for (const message of messages) {
+    if (message.role === "system") continue;
+    const role = message.role === "assistant" ? "model" : "user";
+    const text = message.content;
+    const last = contents[contents.length - 1];
+    if (last && last.role === role) {
+      last.parts.push({ text });
+    } else {
+      contents.push({ role, parts: [{ text }] });
+    }
+  }
+  if (contents.length === 0) {
+    contents.push({ role: "user", parts: [{ text: "" }] });
+  }
+  return {
+    systemInstruction:
+      systemParts.length > 0
+        ? { parts: [{ text: systemParts.join("\n\n") }] }
+        : undefined,
+    contents,
+  };
+}
+
+/**
+ * Google Gemini adapter via Generative Language REST API (no extra SDK).
+ * API key stays server-side in config — never logged or returned.
+ */
+export function createGeminiAdapter(
+  config: AiPlatformConfig
+): AiProviderAdapter {
+  return {
+    providerId: "gemini",
+    async execute(input) {
+      if (!config.geminiApiKey) {
+        throw new AiPlatformError(
+          "no_provider_configured",
+          "GEMINI_API_KEY is not configured."
+        );
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+      try {
+        const { systemInstruction, contents } = toGeminiContents(input.messages);
+        const generationConfig: Record<string, unknown> = {
+          temperature: 0.3,
+        };
+        if (input.structured) {
+          generationConfig.responseMimeType = "application/json";
+        }
+        const body: Record<string, unknown> = {
+          contents,
+          generationConfig,
+        };
+        if (systemInstruction) {
+          body.systemInstruction = systemInstruction;
+        }
+        const base = config.geminiBaseUrl.replace(/\/+$/, "");
+        const url = `${base}/models/${encodeURIComponent(input.modelId)}:generateContent`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-goog-api-key": config.geminiApiKey,
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          if (res.status === 429) {
+            throw new AiPlatformError("rate_limited", "Provider rate limited.");
+          }
+          throw new AiPlatformError(
+            "provider_error",
+            sanitizeAiErrorMessage(errText || `Provider HTTP ${res.status}`)
+          );
+        }
+        const json = (await res.json()) as {
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string }> };
+          }>;
+          usageMetadata?: {
+            promptTokenCount?: number;
+            candidatesTokenCount?: number;
+            cachedContentTokenCount?: number;
+          };
+        };
+        const content =
+          json.candidates?.[0]?.content?.parts
+            ?.map((p) => p.text ?? "")
+            .join("") ?? "";
+        let structured: Record<string, unknown> | null = null;
+        let text: string | null = content || null;
+        if (input.structured) {
+          try {
+            structured = JSON.parse(content) as Record<string, unknown>;
+            text = null;
+          } catch {
+            throw new AiPlatformError(
+              "invalid_structured_output",
+              "Provider returned non-JSON structured output."
+            );
+          }
+        }
+        return {
+          text,
+          structured,
+          usage: {
+            inputTokens: json.usageMetadata?.promptTokenCount ?? null,
+            outputTokens: json.usageMetadata?.candidatesTokenCount ?? null,
+            cachedTokens: json.usageMetadata?.cachedContentTokenCount ?? null,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: null,
+            costCurrency: null,
+            costStatus: "unavailable",
+            modelId: input.modelId,
+            providerId: "gemini",
           },
         };
       } catch (error) {

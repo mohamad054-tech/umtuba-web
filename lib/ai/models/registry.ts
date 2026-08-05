@@ -43,12 +43,14 @@ export type AiProviderDefinition = {
 
 export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
-  geminiConfigured: boolean;
+  geminiConfigured?: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
-  geminiDefaultModel: string;
+  geminiDefaultModel?: string;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
+  const geminiConfigured = Boolean(input.geminiConfigured);
+  const geminiDefaultModel = input.geminiDefaultModel ?? "gemini-2.5-flash";
   const providers: AiProviderDefinition[] = [];
 
   if (input.stubEligible) {
@@ -132,46 +134,26 @@ export function buildProviderRegistry(input: {
   providers.push({
     providerId: "gemini",
     displayName: "Google Gemini",
-    available: input.geminiConfigured,
+    available: geminiConfigured,
     models: [
       {
         providerId: "gemini",
-        modelId: input.geminiDefaultModel,
-        displayName: input.geminiDefaultModel,
+        modelId: geminiDefaultModel,
+        displayName: geminiDefaultModel,
         capabilityClasses: ["chat", "structured"],
         inputModalities: ["text"],
-        outputModalities: ["text"],
-        contextLimitTokens: 128_000,
-        structuredOutputSupport: true,
-        toolCallSupport: false,
-        streamingSupport: false,
-        available: input.geminiConfigured,
-        costClass: "economy",
-        inputCostPer1M: 0.1,
-        outputCostPer1M: 0.4,
-        dataHandlingMax: "confidential",
-        defaultTimeoutMs: input.defaultTimeoutMs,
-        fallbackEligible: true,
-        latencyClass: "standard",
-      },
-      {
-        providerId: "gemini",
-        modelId: "gemini-1.5-pro",
-        displayName: "Gemini 1.5 Pro",
-        capabilityClasses: ["chat", "structured"],
-        inputModalities: ["text", "image"],
         outputModalities: ["text"],
         contextLimitTokens: 1_000_000,
         structuredOutputSupport: true,
         toolCallSupport: false,
         streamingSupport: false,
-        available: input.geminiConfigured,
-        costClass: "premium",
-        inputCostPer1M: 1.25,
-        outputCostPer1M: 5,
+        available: geminiConfigured,
+        costClass: "economy",
+        inputCostPer1M: 0.15,
+        outputCostPer1M: 0.6,
         dataHandlingMax: "confidential",
         defaultTimeoutMs: input.defaultTimeoutMs,
-        fallbackEligible: false,
+        fallbackEligible: true,
         latencyClass: "standard",
       },
     ],
