@@ -1,18 +1,18 @@
 # Session Handoff — UMTUBA AI Platform
 
-**Updated:** 2026-08-06 (AI Data Platform Foundation onto Alpha V1)
+**Updated:** 2026-08-06 (Knowledge Acquisition Foundation onto Alpha V1)
 
 ## Active task
 
-**AI Core Data Platform Foundation onto Alpha V1** — clean port onto private-AI tip.
+**AI Core Knowledge Acquisition Foundation onto Alpha V1**
 
-- Worktree: `D:\umtuba-central\repos\umtuba-web-ai-core-data-platform-foundation-onto-alpha-v1`
-- Branch: `office/ai-core-data-platform-foundation-onto-alpha-v1`
-- Base: `e8f2e4b` (private AI onto alpha)
-- Source: `origin/office/platform-ai-data-platform-foundation-v1` (scoped)
+- Worktree: `D:\umtuba-central\repos\umtuba-web-ai-core-knowledge-acquisition-onto-alpha-v1`
+- Branch: `office/ai-core-knowledge-acquisition-onto-alpha-v1`
+- Base: `a05e57e` (data platform onto alpha)
+- Source: `origin/office/platform-knowledge-acquisition-foundation-v1`
 
 ## Do not
 
-- Remote-apply `20260877`
+- Remote-apply `20260876`
 - Merge to alpha without GO
-- Port Learning / Commerce / Collaboration / Mobile / Guardian
+- Touch Commerce / Learning / Collaboration / Mobile / Guardian
