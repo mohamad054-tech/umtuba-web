@@ -131,6 +131,7 @@ export default function MembersList({
     <ul
       className="divide-y divide-white/10 overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/80"
       aria-label={COLLABORATION_UI_COPY.membersTitle}
+      data-testid="collaboration-members-list"
     >
       {members.map((member) => (
         <li

@@ -60,6 +60,7 @@ export default function CollaborationShell({
     <main
       dir="rtl"
       lang="ar"
+      data-testid="collaboration-shell"
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
@@ -67,6 +68,7 @@ export default function CollaborationShell({
         {showWorkspaceNav || !workspaceId ? (
           <nav
             aria-label={COLLABORATION_UI_COPY.brand}
+            data-testid="collaboration-nav"
             className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
           >
             {links.map((link) => (

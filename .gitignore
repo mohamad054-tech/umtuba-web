@@ -52,3 +52,12 @@ next-env.d.ts
 scripts/store-e2e/config.local.sql
 scripts/store-e2e/_tmp*
 scripts/store-e2e/*.local.*
+
+# collaboration E2E local Auth UUID config (never commit real user ids)
+scripts/collaboration-e2e/config.local.sql
+scripts/collaboration-e2e/_tmp*
+scripts/collaboration-e2e/*.local.*
+
+# playwright local artifacts
+test-results/
+playwright-report/
