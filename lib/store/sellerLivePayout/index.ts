@@ -100,6 +100,7 @@ export {
 } from "./orchestrator";
 export type {
   SellerLivePayoutOrchestratorInput,
+  SellerLivePayoutResolveAttestationInput,
   SellerLivePayoutAttestationDecision,
   SellerLivePayoutOrchestratorResult,
   SellerLivePayoutOrchestratorDeps,

@@ -67,6 +67,15 @@ export type SellerLivePayoutAttestationDecision =
   | "failed"
   | "uncertain";
 
+export type SellerLivePayoutResolveAttestationInput = {
+  storeId: string;
+  paymentAttemptId: string;
+  orchestrationKey: string;
+  executionId: string;
+  decision: SellerLivePayoutAttestationDecision;
+  attestationRef?: string | null;
+  expectedCurrency?: string;
+};
 export type SellerLivePayoutOrchestratorResult =
   | {
       ok: true;
@@ -699,11 +708,7 @@ export async function orchestrateSellerLivePayoutSubmit(
  */
 export async function orchestrateSellerLivePayoutResolveAttestation(
   supabase: AnyClient,
-  input: SellerLivePayoutOrchestratorInput & {
-    executionId: string;
-    decision: SellerLivePayoutAttestationDecision;
-    attestationRef?: string | null;
-  },
+  input: SellerLivePayoutResolveAttestationInput,
   deps: SellerLivePayoutOrchestratorDeps = {}
 ): Promise<SellerLivePayoutOrchestratorResult> {
   const env = deps.env ?? process.env;

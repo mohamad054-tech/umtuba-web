@@ -2,18 +2,20 @@
 
 ## Summary
 
-**PASS** — Seller Live Payout Provider V1 **Slice S4 closed** (orchestrator coordinating gate → booking helpers → Manual Ops Live → durable executions).
+**PASS** — Seller Live Payout Provider V1 **Slice S5 closed** (seller + admin server actions + contract tests).
 
-Committed and pushed on closeout. No migrations created or applied. S5 not started (no server actions / UI).
+Committed and pushed on closeout. No migrations created or applied. S6 not started (no UI).
 
 ## Exact files changed
 
 | Path | Action |
 | --- | --- |
-| `lib/store/sellerLivePayout/orchestrator.ts` | created |
-| `lib/store/sellerLivePayout/orchestrator.test.ts` | created |
-| `lib/store/sellerLivePayout/index.ts` | modified (S4 exports) |
-| `lib/store/sellerLivePayout/types.ts` | modified (orchestration phase + failure codes) |
+| `app/actions/storeSellerLivePayout.ts` | created |
+| `app/actions/storeAdminLivePayout.ts` | created |
+| `lib/store/sellerLivePayout/actionSupport.ts` | created |
+| `lib/store/sellerLivePayout/actions.contract.test.ts` | created |
+| `lib/store/sellerLivePayout/orchestrator.ts` | modified (resolve attestation input type) |
+| `lib/store/sellerLivePayout/index.ts` | modified (export resolve input type) |
 | `docs/ai/CURRENT_TASK.md` | modified |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
@@ -23,19 +25,17 @@ None.
 
 ## Security review
 
-- Trusted server context only; client money fields rejected
-- Gate must be satisfied before submit/resolve
-- Stripe Connect / Wise / PayPal remain forbidden
-- Uncertain outcomes never auto-fail booking
-- Confirm never runs merely because an execution was created
-- Confirm failure after attestation → `succeeded_pending_confirm` (no auto-fail)
-- COMPLETED remains terminal for new submits
-- No UEOS fork; foundation booking helpers remain authoritative
-- No secrets in source
+- Seller: owner/manager via `getMembership` + `canManageStoreSettings`
+- Admin: platform admin via `assertPlatformAdminDb`
+- Client money / self-verify / secret fields rejected
+- Safe projections omit `providerRef` / attestation refs / secrets
+- Attestation booking routed through S4 orchestrator (no direct foundation RPC / UEOS from actions)
+- Gate env not mutated by actions
+- Unsupported providers remain blocked
 
 ## Tests
 
-Focused suite (S4 + S3 + S2 + S1 + booking helpers + foundation): **108 passed / 8 files**
+Focused suite (S5 + S4 + S3 + S2 + S1 + booking + foundation): **127 passed / 9 files**
 
 ## TypeScript
 
@@ -43,7 +43,7 @@ Focused suite (S4 + S3 + S2 + S1 + booking helpers + foundation): **108 passed /
 
 ## Build
 
-Not required for S4 (no UI/entry-point changes).
+Not required for S5 (no UI/entry-point page changes).
 
 ## git diff --check
 
@@ -51,8 +51,8 @@ Clean (exit 0)
 
 ## git status --short
 
-Clean after S4 closeout commit + push (see closure report).
+Clean after S5 closeout commit + push (see closure report).
 
 ## Open issues
 
-None for S4. Next slice is S5 server actions (explicit GO only).
+None for S5. Next slice is S6 admin UI (explicit GO only).
