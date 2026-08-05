@@ -7,11 +7,13 @@ import {
   loadInstructorLessonBlocks,
   type InstructorLessonBlocksPayload,
 } from "../../../../../../../lib/learning/instructorAuthoring";
+import { loadLessonPointCostConfig } from "../../../../../../../lib/learning/lessonUnlockFoundation";
 import {
   archiveContentBlockAction,
   createContentBlockAction,
   publishContentBlockAction,
   reorderContentBlocksAction,
+  setLessonPointCostAction,
   unpublishContentBlockAction,
   updateContentBlockAction,
 } from "../../../../actions";
@@ -32,7 +34,10 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
   }
 
   const supabase = await createClient();
-  const blocksResult = await loadInstructorLessonBlocks(supabase, lessonId);
+  const [blocksResult, pointCostResult] = await Promise.all([
+    loadInstructorLessonBlocks(supabase, lessonId),
+    loadLessonPointCostConfig(supabase, lessonId),
+  ]);
   if (!blocksResult.ok) {
     return (
       <LearningShell
@@ -64,6 +69,11 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
     );
   }
 
+  const pointCost = pointCostResult.ok ? pointCostResult.data : null;
+  const paidEnabled = pointCost?.enabled === true;
+  const storedCost = pointCost?.unlock_cost ?? null;
+  const defaultCost = storedCost != null ? String(storedCost) : "50";
+
   const blockIdsOrdered = blocks.map((b) => b.id).join(",");
 
   return (
@@ -77,6 +87,68 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
         Basic text/heading blocks only in this minimal slice. Media pipelines and
         questions remain out of scope.
       </p>
+
+      <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <h2 className="text-base font-bold">UM Points unlock</h2>
+        <p className="mt-1 text-sm text-white/55">
+          {paidEnabled && storedCost != null
+            ? `Paid unlock enabled · cost ${storedCost} UM Points.`
+            : pointCost && !paidEnabled
+              ? `Free for learners · paid unlock disabled (saved cost ${storedCost}).`
+              : "Free for learners · no point cost configured."}
+        </p>
+        {!pointCostResult.ok ? (
+          <p className="mt-2 text-sm text-amber-200" role="status">
+            Point cost status could not be loaded. You can still try saving a
+            cost.
+          </p>
+        ) : null}
+
+        <InstructorActionForm
+          action={setLessonPointCostAction}
+          className="mt-3 space-y-2"
+          successMessage={
+            paidEnabled ? "Point cost updated." : "Paid unlock enabled."
+          }
+          submitLabel={paidEnabled ? "Update cost" : "Enable paid unlock"}
+          refreshOnSuccess
+        >
+          <input type="hidden" name="courseId" value={courseId} />
+          <input type="hidden" name="lessonId" value={lessonId} />
+          <input
+            type="hidden"
+            name="mode"
+            value={paidEnabled ? "update" : "enable"}
+          />
+          <label className="block text-xs font-bold uppercase tracking-wider text-white/45">
+            Unlock cost (UM Points)
+            <input
+              type="number"
+              name="unlockCost"
+              min={1}
+              step={1}
+              required
+              defaultValue={defaultCost}
+              className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white"
+            />
+          </label>
+        </InstructorActionForm>
+
+        {paidEnabled && storedCost != null ? (
+          <InstructorActionForm
+            action={setLessonPointCostAction}
+            className="mt-3"
+            successMessage="Paid unlock disabled. Lesson is free for entitled learners."
+            submitLabel="Disable paid unlock"
+            refreshOnSuccess
+          >
+            <input type="hidden" name="courseId" value={courseId} />
+            <input type="hidden" name="lessonId" value={lessonId} />
+            <input type="hidden" name="mode" value="disable" />
+            <input type="hidden" name="unlockCost" value={String(storedCost)} />
+          </InstructorActionForm>
+        ) : null}
+      </section>
 
       <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-4">
         <h2 className="text-base font-bold">Add content block</h2>

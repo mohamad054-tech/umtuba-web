@@ -8,6 +8,7 @@ import {
   runInstructorAuthoringOperation,
   type InstructorAuthoringResult,
 } from "../../../lib/learning/instructorAuthoring";
+import { setLessonPointCost } from "../../../lib/learning/lessonUnlockFoundation";
 import { createWithUniqueInstructorSlug } from "../../../lib/learning/instructorSlug";
 
 function formString(formData: FormData, key: string): string {
@@ -285,6 +286,59 @@ export async function archiveLessonAction(
     { lesson_id: formString(formData, "lessonId") },
     { courseId }
   );
+}
+
+/**
+ * Set / enable / disable lesson UM Points unlock cost via existing RPC.
+ * Disable = enabled=false with unlock_cost > 0 (RPC contract).
+ */
+export async function setLessonPointCostAction(
+  formData: FormData
+): Promise<InstructorAuthoringResult> {
+  const authErr = await requireUser();
+  if (authErr) return authErr;
+
+  const courseId = formString(formData, "courseId");
+  const lessonId = formString(formData, "lessonId");
+  const costRaw = formString(formData, "unlockCost");
+  const mode = formString(formData, "mode"); // "enable" | "update" | "disable"
+
+  if (!lessonId) {
+    return { ok: false, message: "Lesson is required." };
+  }
+
+  const unlockCost = Number(costRaw);
+  if (!Number.isFinite(unlockCost)) {
+    return { ok: false, message: "Unlock cost must be a valid number." };
+  }
+  if (unlockCost <= 0) {
+    return { ok: false, message: "Unlock cost must be > 0." };
+  }
+  if (unlockCost !== Math.floor(unlockCost)) {
+    return { ok: false, message: "Unlock cost must be a whole number." };
+  }
+
+  let enabled = true;
+  if (mode === "disable") {
+    enabled = false;
+  } else if (mode === "enable" || mode === "update" || mode === "") {
+    enabled = true;
+  } else {
+    return { ok: false, message: "Invalid point-cost mode." };
+  }
+
+  const supabase = await createClient();
+  const result = await setLessonPointCost(supabase, {
+    lessonId,
+    unlockCost,
+    enabled,
+  });
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateAuthoring(courseId, lessonId);
+  return { ok: true, data: result.data };
 }
 
 export async function reorderLessonsAction(

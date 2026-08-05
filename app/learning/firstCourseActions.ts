@@ -49,8 +49,14 @@ export async function unlockLessonWithUmPointsAction(
   if (!user) {
     redirect(`/login?next=${encodeURIComponent(path)}`);
   }
+  if (!lessonId) {
+    redirect(
+      `${LEARNING_LEARNER_ROUTES.hub}?error=${encodeURIComponent("Lesson is required.")}`
+    );
+  }
   const supabase = await createClient();
   const result = await unlockMyLessonWithUmPoints(supabase, lessonId);
+  // Fail closed: only success===true && unlocked===true reach ok:true.
   if (!result.ok) {
     redirect(`${path}?error=${encodeURIComponent(result.message)}`);
   }

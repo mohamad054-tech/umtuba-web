@@ -4,6 +4,7 @@
  * `supabase/migrations/20260863_learning_first_course_readiness_v1.sql`.
  *
  * Does NOT alter um_points_ledger_points_positive / ledger CHECK constraints.
+ * Does NOT implement platform Single Ledger spends.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -32,6 +33,29 @@ export type LearningLessonUnlockState = {
   unlocked: boolean;
 };
 
+/** Persisted instructor point-cost row (`learning_lesson_point_costs`). */
+export type LearningLessonPointCostConfig = {
+  lesson_id: string;
+  unlock_cost: number;
+  enabled: boolean;
+  updated_at: string | null;
+};
+
+/** Successful unlock RPC body (JSON success path, not PostgREST error). */
+export type LearningLessonUnlockRpcSuccess = {
+  success: true;
+  unlocked: true;
+  reason?: string;
+  points_spent?: number;
+  balance?: number;
+};
+
+export type SetLessonPointCostInput = {
+  lessonId: string;
+  unlockCost: number;
+  enabled?: boolean;
+};
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -57,7 +81,9 @@ export function sanitizeLessonUnlockError(
   const lower = raw.toLowerCase();
   if (
     lower.includes("authentication required") ||
+    lower.includes("authentication_required") ||
     lower.includes("not entitled") ||
+    lower.includes("not_entitled") ||
     lower.includes("not allowed")
   ) {
     return "You are not allowed to unlock this lesson.";
@@ -69,18 +95,94 @@ export function sanitizeLessonUnlockError(
   return raw;
 }
 
-async function callRpc(
-  supabase: AnyClient,
-  rpc: string,
-  args?: Record<string, unknown>
-): Promise<LessonUnlockResult<unknown>> {
-  const { data, error } = args
-    ? await supabase.rpc(rpc, args)
-    : await supabase.rpc(rpc);
-  if (error) {
-    return { ok: false, message: sanitizeLessonUnlockError(error.message) };
+export function sanitizeLessonPointCostError(
+  message: string | undefined
+): string {
+  const raw = (message ?? "").trim();
+  if (!raw) return "Lesson point cost could not be saved.";
+  const lower = raw.toLowerCase();
+  if (
+    lower.includes("authentication required") ||
+    lower.includes("not allowed") ||
+    lower.includes("not entitled")
+  ) {
+    return "You are not allowed to manage this lesson point cost.";
   }
-  return { ok: true, data };
+  if (lower.includes("unlock_cost must be")) {
+    return "Unlock cost must be a positive whole number.";
+  }
+  if (raw.length > 180) return "Lesson point cost could not be saved.";
+  return raw;
+}
+
+/**
+ * Fail-closed unlock RPC JSON contract.
+ * Trust only success === true AND unlocked === true.
+ */
+export function parseLearningLessonUnlockRpcResult(
+  raw: unknown
+): LessonUnlockResult<LearningLessonUnlockRpcSuccess> {
+  if (raw == null) {
+    return { ok: false, message: "Unlock response was empty." };
+  }
+  const row = asRecord(raw);
+  if (!row) {
+    return { ok: false, message: "Unlock response was malformed." };
+  }
+  if (row.success !== true) {
+    const code =
+      typeof row.error === "string" && row.error.trim()
+        ? row.error.trim()
+        : "unlock_failed";
+    return { ok: false, message: sanitizeLessonUnlockError(code) };
+  }
+  if (row.unlocked !== true) {
+    return {
+      ok: false,
+      message: "Lesson unlock could not be confirmed.",
+    };
+  }
+  return {
+    ok: true,
+    data: {
+      success: true,
+      unlocked: true,
+      reason: typeof row.reason === "string" ? row.reason : undefined,
+      points_spent:
+        typeof row.points_spent === "number" && Number.isFinite(row.points_spent)
+          ? row.points_spent
+          : undefined,
+      balance:
+        typeof row.balance === "number" && Number.isFinite(row.balance)
+          ? row.balance
+          : undefined,
+    },
+  };
+}
+
+export function parseLearningLessonPointCostConfig(
+  raw: unknown,
+  expectedLessonId?: string
+): LearningLessonPointCostConfig | null {
+  const row = asRecord(raw);
+  if (!row) return null;
+  const lesson_id = asString(row.lesson_id);
+  if (!lesson_id) return null;
+  if (expectedLessonId && lesson_id !== expectedLessonId) return null;
+  if (
+    typeof row.unlock_cost !== "number" ||
+    !Number.isFinite(row.unlock_cost) ||
+    row.unlock_cost <= 0
+  ) {
+    return null;
+  }
+  if (typeof row.enabled !== "boolean") return null;
+  return {
+    lesson_id,
+    unlock_cost: Math.floor(row.unlock_cost),
+    enabled: row.enabled,
+    updated_at: typeof row.updated_at === "string" ? row.updated_at : null,
+  };
 }
 
 export function parseLearningLessonUnlockState(
@@ -99,6 +201,38 @@ export function parseLearningLessonUnlockState(
   };
 }
 
+/**
+ * Load persisted point-cost config for instructor UI.
+ * Relies on RLS (entitled readers / managers). No row → free lesson.
+ */
+export async function loadLessonPointCostConfig(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<LessonUnlockResult<LearningLessonPointCostConfig | null>> {
+  if (!isLessonUnlockUuid(lessonId)) {
+    return { ok: false, message: "lesson_id must be a valid UUID" };
+  }
+  const { data, error } = await supabase
+    .from("learning_lesson_point_costs")
+    .select("lesson_id, unlock_cost, enabled, updated_at")
+    .eq("lesson_id", lessonId)
+    .maybeSingle();
+  if (error) {
+    return {
+      ok: false,
+      message: sanitizeLessonPointCostError(error.message),
+    };
+  }
+  if (!data) {
+    return { ok: true, data: null };
+  }
+  const parsed = parseLearningLessonPointCostConfig(data, lessonId);
+  if (!parsed) {
+    return { ok: false, message: "Lesson point cost payload is malformed." };
+  }
+  return { ok: true, data: parsed };
+}
+
 export async function loadMyLessonUnlockState(
   supabase: AnyClient,
   lessonId: string
@@ -106,39 +240,39 @@ export async function loadMyLessonUnlockState(
   if (!isLessonUnlockUuid(lessonId)) {
     return { ok: false, message: "lesson_id must be a valid UUID" };
   }
-  const result = await callRpc(
-    supabase,
+  const { data, error } = await supabase.rpc(
     LEARNING_LESSON_UNLOCK_RPCS.getUnlockState,
     { p_lesson_id: lessonId }
   );
-  if (!result.ok) return result;
-  const parsed = parseLearningLessonUnlockState(result.data);
+  if (error) {
+    return { ok: false, message: sanitizeLessonUnlockError(error.message) };
+  }
+  const parsed = parseLearningLessonUnlockState(data);
   if (!parsed || parsed.lesson_id !== lessonId) {
     return { ok: false, message: "Unlock state payload is malformed." };
   }
   return { ok: true, data: parsed };
 }
 
+/**
+ * Set or update lesson UM Points unlock cost.
+ * RPC requires unlock_cost > 0 always. Disable paid unlock with enabled=false
+ * (keeps stored cost; unlock state treats disabled as free).
+ */
 export async function setLessonPointCost(
   supabase: AnyClient,
-  input: {
-    lessonId: string;
-    unlockCost: number;
-    enabled?: boolean;
-  }
-): Promise<LessonUnlockResult<Record<string, unknown>>> {
+  input: SetLessonPointCostInput
+): Promise<LessonUnlockResult<LearningLessonPointCostConfig>> {
   if (!isLessonUnlockUuid(input.lessonId)) {
     return { ok: false, message: "lesson_id must be a valid UUID" };
   }
-  if (
-    typeof input.unlockCost !== "number" ||
-    !Number.isFinite(input.unlockCost) ||
-    input.unlockCost <= 0
-  ) {
+  if (typeof input.unlockCost !== "number" || !Number.isFinite(input.unlockCost)) {
+    return { ok: false, message: "unlock_cost must be a valid number" };
+  }
+  if (input.unlockCost <= 0) {
     return { ok: false, message: "unlock_cost must be > 0" };
   }
-  const result = await callRpc(
-    supabase,
+  const { data, error } = await supabase.rpc(
     LEARNING_LESSON_UNLOCK_RPCS.setPointCost,
     {
       p_lesson_id: input.lessonId,
@@ -146,24 +280,31 @@ export async function setLessonPointCost(
       p_enabled: input.enabled ?? true,
     }
   );
-  if (!result.ok) return result;
-  return { ok: true, data: asRecord(result.data) ?? {} };
+  if (error) {
+    return { ok: false, message: sanitizeLessonPointCostError(error.message) };
+  }
+  const parsed = parseLearningLessonPointCostConfig(data, input.lessonId);
+  if (!parsed) {
+    return { ok: false, message: "Lesson point cost payload is malformed." };
+  }
+  return { ok: true, data: parsed };
 }
 
 export async function unlockMyLessonWithUmPoints(
   supabase: AnyClient,
   lessonId: string
-): Promise<LessonUnlockResult<Record<string, unknown>>> {
+): Promise<LessonUnlockResult<LearningLessonUnlockRpcSuccess>> {
   if (!isLessonUnlockUuid(lessonId)) {
     return { ok: false, message: "lesson_id must be a valid UUID" };
   }
-  const result = await callRpc(
-    supabase,
+  const { data, error } = await supabase.rpc(
     LEARNING_LESSON_UNLOCK_RPCS.unlockWithUmPoints,
     { p_lesson_id: lessonId }
   );
-  if (!result.ok) return result;
-  return { ok: true, data: asRecord(result.data) ?? {} };
+  if (error) {
+    return { ok: false, message: sanitizeLessonUnlockError(error.message) };
+  }
+  return parseLearningLessonUnlockRpcResult(data);
 }
 
 /**
