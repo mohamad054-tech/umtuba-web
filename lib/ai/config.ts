@@ -85,11 +85,11 @@ export function describeAiConfigStatus(config: AiPlatformConfig): {
   missing: string[];
 } {
   const missing: string[] = [];
-  if (
-    config.mode === "live" &&
-    !config.openaiApiKey &&
-    !config.geminiApiKey
-  ) {
+  const anyLiveKey = hasLiveProviderKey(
+    config.openaiApiKey,
+    config.geminiApiKey
+  );
+  if (config.mode === "live" && !anyLiveKey) {
     missing.push("OPENAI_API_KEY|GEMINI_API_KEY");
   }
   if (config.mode === "disabled") {

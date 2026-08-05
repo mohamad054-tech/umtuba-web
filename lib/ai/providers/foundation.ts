@@ -251,7 +251,8 @@ export class AiProviderFoundation {
 
 /**
  * Seed the foundation from existing config-backed registries/adapters.
- * Registers Gemini when configured; anthropic/local remain disabled placeholders.
+ * Registers future provider placeholders (anthropic/local) as disabled.
+ * Gemini is seeded from the registry (executable only when GEMINI_API_KEY is set).
  */
 export function createProviderFoundation(
   config: AiPlatformConfig

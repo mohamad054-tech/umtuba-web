@@ -88,11 +88,13 @@ describe("provider/model registry", () => {
       geminiConfigured: false,
       stubEligible: true,
       openaiDefaultModel: "gpt-4o-mini",
-      geminiDefaultModel: "gemini-2.5-flash",
       defaultTimeoutMs: 1000,
     });
     expect(providers.some((p) => p.providerId === "stub")).toBe(true);
     expect(providers.some((p) => p.providerId === "openai" && p.available)).toBe(
+      true
+    );
+    expect(providers.some((p) => p.providerId === "gemini" && !p.available)).toBe(
       true
     );
     expect(listAvailableModels(providers).length).toBeGreaterThan(0);
@@ -104,13 +106,12 @@ describe("provider/model registry", () => {
       geminiConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
-      geminiDefaultModel: "gemini-2.5-flash",
       defaultTimeoutMs: 1000,
     });
     expect(listAvailableModels(providers)).toHaveLength(0);
   });
 
-  it("lists gemini models when configured", () => {
+  it("marks gemini available when configured", () => {
     const providers = buildProviderRegistry({
       openaiConfigured: false,
       geminiConfigured: true,
@@ -123,7 +124,7 @@ describe("provider/model registry", () => {
       true
     );
     expect(
-      listAvailableModels(providers).every((m) => m.providerId === "gemini")
+      listAvailableModels(providers).some((m) => m.modelId === "gemini-2.5-flash")
     ).toBe(true);
   });
 });
@@ -131,10 +132,8 @@ describe("provider/model registry", () => {
 describe("deterministic routing", () => {
   const providers = buildProviderRegistry({
     openaiConfigured: true,
-    geminiConfigured: false,
     stubEligible: true,
     openaiDefaultModel: "gpt-4o-mini",
-    geminiDefaultModel: "gemini-2.5-flash",
     defaultTimeoutMs: 1000,
   });
 
