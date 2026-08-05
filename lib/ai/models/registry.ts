@@ -44,13 +44,18 @@ export type AiProviderDefinition = {
 export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
   geminiConfigured?: boolean;
+  anthropicConfigured?: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
   geminiDefaultModel?: string;
+  anthropicDefaultModel?: string;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
   const geminiConfigured = Boolean(input.geminiConfigured);
   const geminiDefaultModel = input.geminiDefaultModel ?? "gemini-2.5-flash";
+  const anthropicConfigured = Boolean(input.anthropicConfigured);
+  const anthropicDefaultModel =
+    input.anthropicDefaultModel ?? "claude-haiku-4-5-20251001";
   const providers: AiProviderDefinition[] = [];
 
   if (input.stubEligible) {
@@ -154,6 +159,54 @@ export function buildProviderRegistry(input: {
         dataHandlingMax: "confidential",
         defaultTimeoutMs: input.defaultTimeoutMs,
         fallbackEligible: true,
+        latencyClass: "standard",
+      },
+    ],
+  });
+
+  providers.push({
+    providerId: "anthropic",
+    displayName: "Anthropic Claude",
+    available: anthropicConfigured,
+    models: [
+      {
+        providerId: "anthropic",
+        modelId: anthropicDefaultModel,
+        displayName: anthropicDefaultModel,
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text"],
+        outputModalities: ["text"],
+        contextLimitTokens: 200_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: anthropicConfigured,
+        costClass: "economy",
+        inputCostPer1M: 1,
+        outputCostPer1M: 5,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: true,
+        latencyClass: "low",
+      },
+      {
+        providerId: "anthropic",
+        modelId: "claude-sonnet-5",
+        displayName: "Claude Sonnet 5",
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text", "image"],
+        outputModalities: ["text"],
+        contextLimitTokens: 200_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: anthropicConfigured,
+        costClass: "premium",
+        inputCostPer1M: 3,
+        outputCostPer1M: 15,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: false,
         latencyClass: "standard",
       },
     ],

@@ -8,18 +8,17 @@
 
 `alpha-0.2` — Integration Program V1 + Alpha Beta Productization V1 closed
 
-## Active feature (this machine — Desktop)
+## Active feature (this machine — Windows Server)
 
-- **Branch:** `office/ai-core-gemini-adapter-v1` (from reconciliation `3d6dd6d`)
-- **Task:** AI Core Gemini Adapter V1 — **implementation complete; staged; not committed**
-- **Worktree:** `C:\Users\1\Desktop\umtuba\umtuba-web-ai-gemini-adapter-v1`
-- **Prior:** Reconciliation closed @ `3d6dd6d` on `office/ai-tutor-provider-reconciliation-v1`
+- **Branch:** `office/ai-core-anthropic-on-gemini-recovery-v1`
+- **Task:** AI Core Anthropic on Gemini Recovery V1
+- **Base:** `919dc75` — `office/ai-core-gemini-adapter-recovery-v1`
+- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-anthropic-on-gemini-recovery-v1`
 - **See:** `docs/ai/SESSION_HANDOFF.md` / `docs/ai/CURSOR_REPORT.md`
 
-## Closed on alpha-0.2 (do not reopen)
+## Closed on AI provider recovery lineage (do not reopen)
 
-- Integration Program V1 Waves 0–4
-- Alpha Beta Productization V1 (honesty/gating/ops)
+- AI Core Gemini Adapter Recovery V1 @ `919dc75`
 
 ## Gates (unchanged defaults)
 
@@ -30,25 +29,12 @@
 
 ## Learning chapter status
 
-**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
-Tutor backend capabilities continue on AI Platform branches; Learning UX remains frozen.
-
-## Integration status
-
-| Track | Status |
-| --- | --- |
-| Unified Revenue Platform Foundation | On alpha |
-| Commerce E2E Beta Readiness | On alpha; Beta honesty pass applied |
-| Shared AI Core / Hub / Assistant | On alpha (gated); Provider tip + Tutor tip being reconciled on feature branch |
-| Alpha Stabilization Sweep | Wave 4 closed |
-| Alpha Beta Productization | Closed on alpha |
-| AI Tutor + Provider Reconciliation V1 | Committed + pushed @ `3d6dd6d` (`0 0`) |
-| AI Core Gemini Adapter V1 | Staged on `office/ai-core-gemini-adapter-v1` (awaiting commit GO) |
+**Learning V1 is officially APPROVED and FROZEN.** Do not touch Learning in this milestone.
 
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.
-- Always synchronize with origin before starting work.
+- Latest completed AI provider SoT tip before this task: `office/ai-core-gemini-adapter-recovery-v1` @ `919dc75`.
 
 ## Safety defaults
 

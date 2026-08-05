@@ -25,6 +25,7 @@ export function buildAiHubRuntimeStatus(
     coreMode: status.mode,
     openaiConfigured: status.openaiConfigured,
     geminiConfigured: status.geminiConfigured,
+    anthropicConfigured: status.anthropicConfigured,
     stubEligible: status.stubEligible,
     assistantRuntimeFlagHint: assistantOn ? "on" : "off",
     missingConfigKeys: [...status.missing],
