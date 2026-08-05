@@ -18,6 +18,7 @@ import {
 import {
   assertNoSensitiveActionPayload,
   createLivePayoutServiceRoleClient,
+  enrichAdminLivePayoutQueueRows,
   projectSafeExecution,
   projectSafeOrchestratorResult,
   rejectClientLivePayoutActionFields,
@@ -31,6 +32,7 @@ const ADMIN_ATTEST_RPC = "admin_attest_store_live_payout_execution";
 
 function revalidateAdminPayoutSurfaces() {
   revalidatePath(APP_ROUTES.adminStore);
+  revalidatePath(APP_ROUTES.adminStorePayouts);
   revalidatePath(APP_ROUTES.seller);
 }
 
@@ -101,10 +103,15 @@ export async function adminListLivePayoutExecutionsAction(
     executions.push(projectSafeExecution(parsed));
   }
 
+  const service = createLivePayoutServiceRoleClient();
+  const enriched = service.ok
+    ? await enrichAdminLivePayoutQueueRows(service.supabase, executions)
+    : executions;
+
   const safe = {
     ok: true as const,
-    executions,
-    limit: typeof payload.limit === "number" ? payload.limit : executions.length,
+    executions: enriched,
+    limit: typeof payload.limit === "number" ? payload.limit : enriched.length,
   };
   if (!assertNoSensitiveActionPayload(safe)) {
     return { ok: false as const, message: "Execution list response is unsafe." };

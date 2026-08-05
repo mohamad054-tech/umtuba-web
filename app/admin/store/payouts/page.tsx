@@ -7,9 +7,16 @@ import {
   PAYOUT_PROVIDER_CONTRACTS,
   buildAdminPayoutRailsDiagnostics,
 } from "../../../../lib/store/sellerPayoutRails";
+import {
+  buildSellerLivePayoutGateReadinessReport,
+  SELLER_LIVE_PAYOUT_V1_PROVIDER_ID,
+} from "../../../../lib/store/sellerLivePayout";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
+import { adminListLivePayoutExecutionsAction } from "../../../actions/storeAdminLivePayout";
 import { APP_ROUTES } from "../../../lib/nav";
 import AdminStoreShell, { StatusChip } from "../AdminStoreShell";
+import AdminLivePayoutQueue from "../../../components/store/AdminLivePayoutQueue";
+import LivePayoutGateBadge from "../../../components/store/LivePayoutGateBadge";
 
 export const metadata = {
   title: "Store payouts | UMTUBA Admin",
@@ -30,18 +37,82 @@ export default async function AdminStorePayoutsPage() {
     );
   }
 
+  const gateReport = buildSellerLivePayoutGateReadinessReport();
+  const liveControlsEnabled = gateReport.ready;
+
+  const listResult = await adminListLivePayoutExecutionsAction({ limit: 50 });
+  const executions = listResult.ok ? listResult.executions : [];
+  const listError = listResult.ok ? null : listResult.message;
+
+  // Mock rails diagnostics remain secondary developer information only.
   const diagnostics = buildAdminPayoutRailsDiagnostics();
 
   return (
-    <AdminStoreShell title="Seller payout rails">
+    <AdminStoreShell title="Seller live payouts">
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
           <h1 className="text-2xl font-black tracking-tight">
-            Payout Rails V1
+            Live payout operations
           </h1>
           <p className="mt-2 text-sm text-white/50">
-            Contracts and mock execution diagnostics only. Live bank rails and
-            external transfer providers remain disabled.
+            Durable Manual Ops Live queue for platform admins. Stripe Connect,
+            Wise, and PayPal remain unavailable as live providers.
+          </p>
+        </div>
+
+        <LivePayoutGateBadge report={gateReport} />
+
+        <AdminLivePayoutQueue
+          executions={executions}
+          liveControlsEnabled={liveControlsEnabled}
+          listError={listError}
+        />
+
+        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
+          <h2 className="text-lg font-black">Live provider availability</h2>
+          <p className="mt-1 text-xs text-white/45">
+            Only the V1 Manual Ops Live provider is in scope. Unsupported
+            providers are not selectable for live execution.
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-white/70">
+            <li data-live-payout-provider={SELLER_LIVE_PAYOUT_V1_PROVIDER_ID}>
+              <code className="text-cyan-200/80">
+                {SELLER_LIVE_PAYOUT_V1_PROVIDER_ID}
+              </code>{" "}
+              — Manual Ops Live (V1)
+              {liveControlsEnabled ? "" : " · controls gated"}
+            </li>
+            {(["stripe_connect", "wise", "paypal"] as const).map((id) => (
+              <li
+                key={id}
+                className="text-white/40"
+                data-live-payout-provider-blocked={id}
+              >
+                <code>{id}</code> — not selectable for live payouts
+              </li>
+            ))}
+            {PAYOUT_PROVIDER_CONTRACTS.map((p) => (
+              <li
+                key={p.providerId}
+                className="text-white/35"
+                data-mock-payout-provider={p.providerId}
+              >
+                <code>{p.providerId}</code> — mock/deferred rail only (not live
+                selectable)
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <details
+          className="rounded-[28px] border border-white/10 bg-[#080816]/60 p-5"
+          data-mock-payout-diagnostics="secondary"
+        >
+          <summary className="cursor-pointer text-sm font-bold text-white/60">
+            Developer: mock payout rails diagnostics (secondary)
+          </summary>
+          <p className="mt-2 text-xs text-white/40">
+            In-process mock rails only — not the durable live payout queue.
           </p>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-4">
             <Stat label="Requests" value={String(diagnostics.requests.length)} />
@@ -55,116 +126,37 @@ export default async function AdminStorePayoutsPage() {
               value={diagnostics.bankRailsEnabled ? "on" : "disabled"}
             />
           </dl>
-        </div>
 
-        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
-          <h2 className="text-lg font-black">Providers</h2>
-          <ul className="mt-3 space-y-2 text-sm text-white/70">
-            {PAYOUT_PROVIDER_CONTRACTS.map((p) => (
-              <li key={p.providerId}>
-                <code className="text-cyan-200/80">{p.providerId}</code> —{" "}
-                {p.displayName} · live={String(p.supportsLiveTransfer)} · mock=
-                {String(p.supportsMockExecution)}
-                <p className="text-xs text-white/40">{p.notes}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
-          <h2 className="text-lg font-black">Payout requests</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {diagnostics.requests.length === 0 ? (
-              <li className="text-white/45">
-                No in-process payout requests yet.
-              </li>
-            ) : (
-              diagnostics.requests
-                .slice()
-                .reverse()
-                .map((req) => (
-                  <li
-                    key={req.requestId}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-white">
-                        {req.amountMinor} {req.currency}
-                      </span>
-                      <StatusChip status={req.status} />
-                    </div>
-                    <p className="mt-1 text-xs text-white/45">
-                      {req.requestId} · store {req.storeId} · account{" "}
-                      {req.accountId}
-                      {req.failureCode ? ` · ${req.failureCode}` : ""}
-                      {req.batchId ? ` · batch ${req.batchId}` : ""}
-                    </p>
-                  </li>
-                ))
-            )}
-          </ul>
-        </div>
-
-        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
-          <h2 className="text-lg font-black">Batches</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {diagnostics.batches.length === 0 ? (
-              <li className="text-white/45">No batches yet.</li>
-            ) : (
-              diagnostics.batches
-                .slice()
-                .reverse()
-                .map((batch) => (
-                  <li
-                    key={batch.batchId}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-white">
-                        {batch.providerId} · {batch.totalAmountMinor}{" "}
-                        {batch.currency}
-                      </span>
-                      <StatusChip status={batch.status} />
-                    </div>
-                    <p className="mt-1 text-xs text-white/45">
-                      {batch.batchId} · {batch.requestIds.length} request(s)
-                    </p>
-                  </li>
-                ))
-            )}
-          </ul>
-        </div>
-
-        <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
-          <h2 className="text-lg font-black">Executions / failures</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {diagnostics.executions.length === 0 ? (
-              <li className="text-white/45">No mock executions yet.</li>
-            ) : (
-              diagnostics.executions
-                .slice()
-                .reverse()
-                .map((ex) => (
-                  <li
-                    key={ex.executionId}
-                    className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-white">
-                        {ex.providerId}
-                      </span>
-                      <StatusChip status={ex.status} />
-                    </div>
-                    <p className="mt-1 text-xs text-white/45">
-                      {ex.mockProviderReference}
-                      {ex.failureCode ? ` · ${ex.failureCode}` : ""}
-                    </p>
-                    <p className="mt-1 text-xs text-white/40">{ex.note}</p>
-                  </li>
-                ))
-            )}
-          </ul>
-        </div>
+          <div className="mt-4 space-y-3">
+            <h3 className="text-sm font-bold text-white/70">Mock requests</h3>
+            <ul className="space-y-2 text-sm">
+              {diagnostics.requests.length === 0 ? (
+                <li className="text-white/45">No in-process mock requests.</li>
+              ) : (
+                diagnostics.requests
+                  .slice()
+                  .reverse()
+                  .map((req) => (
+                    <li
+                      key={req.requestId}
+                      className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-white">
+                          {req.amountMinor} {req.currency}
+                        </span>
+                        <StatusChip status={req.status} />
+                      </div>
+                      <p className="mt-1 text-xs text-white/45">
+                        {req.requestId} · store {req.storeId}
+                        {req.failureCode ? ` · ${req.failureCode}` : ""}
+                      </p>
+                    </li>
+                  ))
+              )}
+            </ul>
+          </div>
+        </details>
       </section>
     </AdminStoreShell>
   );
