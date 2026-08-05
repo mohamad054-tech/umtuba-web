@@ -5,8 +5,12 @@ import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
   loadLessonDelivery,
+  type LearningLearnerLessonDelivery,
 } from "../../../../lib/learning/learnerDelivery";
-import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
+import {
+  loadMyLearningLessonEngine,
+  resolveLessonContentAccess,
+} from "../../../../lib/learning/lessonEngineFoundation";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +21,17 @@ type PageProps = {
     | Promise<{ error?: string; completed?: string; unlocked?: string }>
     | { error?: string; completed?: string; unlocked?: string };
 };
+
+/** Strip direct SELECT content so RSC props cannot bypass the engine gate. */
+function toMetadataDelivery(
+  delivery: LearningLearnerLessonDelivery
+): LearningLearnerLessonDelivery {
+  return {
+    ...delivery,
+    blocks: [],
+    activities: [],
+  };
+}
 
 export async function generateMetadata({ params }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
@@ -47,6 +62,9 @@ export default async function LearningLessonPage({
   if (!delivery.ok) {
     notFound();
   }
+
+  const access = resolveLessonContentAccess(engineResult);
+  const safeDelivery = toMetadataDelivery(delivery.data);
 
   return (
     <LearningShell
@@ -82,10 +100,7 @@ export default async function LearningLessonPage({
         </p>
       ) : null}
 
-      <LessonViewer
-        delivery={delivery.data}
-        engine={engineResult.ok ? engineResult.data : null}
-      />
+      <LessonViewer delivery={safeDelivery} access={access} />
     </LearningShell>
   );
 }

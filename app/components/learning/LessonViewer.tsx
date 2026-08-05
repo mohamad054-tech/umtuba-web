@@ -15,28 +15,29 @@ import {
 } from "../../../lib/learning/learnerDelivery";
 import type { LearningLessonContentBlock } from "../../../lib/learning/lessonContentBlocksFoundation";
 import type {
+  LearningLessonContentAccess,
   LearningLessonEngineActivity,
   LearningLessonEngineBlock,
   LearningLessonEnginePayload,
+} from "../../../lib/learning/lessonEngineFoundation";
+import {
+  LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+  LEARNING_LESSON_LOCKED_MESSAGE,
+  resolveLessonContentAccess,
 } from "../../../lib/learning/lessonEngineFoundation";
 import { completeLearningLessonAction } from "../../learning/progressActions";
 import { unlockLessonWithUmPointsAction } from "../../learning/firstCourseActions";
 
 type LessonViewerProps = {
   delivery: LearningLearnerLessonDelivery;
+  /**
+   * Prefer passing the full engine result so missing/failed engine never
+   * falls open to delivery SELECT content.
+   */
+  access?: LearningLessonContentAccess;
+  /** @deprecated Prefer `access` from resolveLessonContentAccess. */
   engine?: LearningLessonEnginePayload | null;
 };
-
-function isLessonPointLocked(
-  engine: LearningLessonEnginePayload | null
-): boolean {
-  if (!engine) return false;
-  const unlock = engine.unlock;
-  if (!unlock || typeof unlock !== "object" || !("locked" in unlock)) {
-    return false;
-  }
-  return (unlock as { locked?: boolean }).locked === true;
-}
 
 function toRenderableBlocks(
   lessonId: string,
@@ -79,47 +80,62 @@ function toActivitySummaries(
 
 export default function LessonViewer({
   delivery,
+  access: accessProp,
   engine = null,
 }: LessonViewerProps) {
+  const access =
+    accessProp ??
+    resolveLessonContentAccess(
+      engine
+        ? { ok: true, data: engine }
+        : {
+            ok: false,
+            message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+          }
+    );
+
+  const canRender = access.canRenderProtectedContent;
+  const locked = access.state === "locked";
+  const verificationFailed =
+    access.state === "engine_unavailable" ||
+    access.state === "access_unverified";
+  const enginePayload =
+    access.state === "verified_unlocked" || access.state === "locked"
+      ? access.engine
+      : null;
+  const verifiedEngine =
+    access.state === "verified_unlocked" ? access.engine : null;
+
   const hasNav = Boolean(delivery.previous_lesson || delivery.next_lesson);
-  const locked = isLessonPointLocked(engine);
-  const handoff = locked
-    ? null
-    : resolveLessonCompletionHandoff({
+  const handoff = canRender
+    ? resolveLessonCompletionHandoff({
         progress_status: delivery.progress_status,
         next_lesson: delivery.next_lesson,
         course_id: delivery.lesson.course_id,
-      });
+      })
+    : null;
 
-  const unlock =
-    engine &&
-    engine.unlock &&
-    typeof engine.unlock === "object" &&
-    "locked" in engine.unlock
-      ? (engine.unlock as {
-          locked: boolean;
-          cost: number | null;
-          balance: number;
-          unlocked: boolean;
-        })
-      : null;
+  const unlock = access.unlock;
 
   const resumeSeconds =
-    engine?.media_position?.last_media_position_seconds ?? null;
-  const resumeBlockId = engine?.media_position?.last_content_block_id ?? null;
+    verifiedEngine?.media_position?.last_media_position_seconds ?? null;
+  const resumeBlockId =
+    verifiedEngine?.media_position?.last_content_block_id ?? null;
 
-  // Prefer engine payload (authoritative unlock redaction). When locked, never
-  // fall back to delivery SELECT which bypasses point gates.
-  const blocks: LearningLessonContentBlock[] = locked
-    ? []
-    : engine
-      ? toRenderableBlocks(delivery.lesson.id, engine.blocks)
-      : delivery.blocks;
-  const activities: LearningLearnerActivitySummary[] = locked
-    ? []
-    : engine
-      ? toActivitySummaries(engine.activities)
-      : delivery.activities;
+  // Protected content only from a positively verified engine payload.
+  // Never fall back to delivery SELECT blocks/activities (fail-open path).
+  const blocks: LearningLessonContentBlock[] = verifiedEngine
+    ? toRenderableBlocks(delivery.lesson.id, verifiedEngine.blocks)
+    : [];
+  const activities: LearningLearnerActivitySummary[] = verifiedEngine
+    ? toActivitySummaries(verifiedEngine.activities)
+    : [];
+
+  const gateMessage = locked
+    ? access.message || LEARNING_LESSON_LOCKED_MESSAGE
+    : verificationFailed
+      ? access.message || LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE
+      : null;
 
   return (
     <div className="mt-6 space-y-6">
@@ -135,14 +151,14 @@ export default function LessonViewer({
         ) : null}
         <p className="mt-3 text-xs text-white/40">
           Progress: {delivery.progress_status.replaceAll("_", " ")}
-          {engine?.lesson.difficulty
-            ? ` · ${engine.lesson.difficulty}`
+          {enginePayload?.lesson.difficulty
+            ? ` · ${enginePayload.lesson.difficulty}`
             : ""}
-          {engine?.lesson.estimated_duration_minutes != null
-            ? ` · ~${engine.lesson.estimated_duration_minutes} min`
+          {enginePayload?.lesson.estimated_duration_minutes != null
+            ? ` · ~${enginePayload.lesson.estimated_duration_minutes} min`
             : ""}
         </p>
-        {engine?.ai_tutor_enabled && !locked ? (
+        {enginePayload?.ai_tutor_enabled && canRender ? (
           <p className="mt-3">
             <Link
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
@@ -154,26 +170,26 @@ export default function LessonViewer({
         ) : null}
       </section>
 
-      {engine && engine.objectives.length > 0 ? (
+      {enginePayload && enginePayload.objectives.length > 0 ? (
         <section className="space-y-2">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Learning objectives
           </h2>
           <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">
-            {engine.objectives.map((o) => (
+            {enginePayload.objectives.map((o) => (
               <li key={o.id}>{o.objective_text}</li>
             ))}
           </ul>
         </section>
       ) : null}
 
-      {engine && engine.prerequisites.length > 0 ? (
+      {enginePayload && enginePayload.prerequisites.length > 0 ? (
         <section className="space-y-2">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Prerequisites
           </h2>
           <ul className="space-y-1 text-sm">
-            {engine.prerequisites.map((p) => (
+            {enginePayload.prerequisites.map((p) => (
               <li key={p.prerequisite_lesson_id} className="text-white/75">
                 {p.satisfied ? "✓" : "○"} {p.name}
               </li>
@@ -182,7 +198,7 @@ export default function LessonViewer({
         </section>
       ) : null}
 
-      {unlock && unlock.locked ? (
+      {locked && unlock ? (
         <section className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-4">
           <h2 className="text-sm font-bold text-amber-50">Unlock with UM Points</h2>
           <p className="mt-1 text-sm text-amber-50/80">
@@ -200,7 +216,16 @@ export default function LessonViewer({
         </section>
       ) : null}
 
-      {!locked ? (
+      {verificationFailed ? (
+        <p
+          role="alert"
+          className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+        >
+          {gateMessage}
+        </p>
+      ) : null}
+
+      {canRender ? (
         <>
           <section className="space-y-4">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
@@ -248,11 +273,9 @@ export default function LessonViewer({
             <ActivityList activities={activities} />
           </section>
         </>
-      ) : (
-        <p className="text-sm text-white/55">
-          Content and activities stay hidden until this lesson is unlocked.
-        </p>
-      )}
+      ) : locked ? (
+        <p className="text-sm text-white/55">{gateMessage}</p>
+      ) : null}
 
       {handoff?.kind === "mark_complete" ? (
         <form action={completeLearningLessonAction} className="pt-2">

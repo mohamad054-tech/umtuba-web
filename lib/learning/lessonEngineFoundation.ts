@@ -89,6 +89,45 @@ export type LessonEngineResult<T> =
   | { ok: true; data: T }
   | { ok: false; message: string };
 
+/** Fail-closed content gate states for the learner lesson viewer. */
+export type LearningLessonContentAccessState =
+  | "verified_unlocked"
+  | "locked"
+  | "engine_unavailable"
+  | "access_unverified";
+
+export type LearningLessonContentAccess =
+  | {
+      state: "verified_unlocked";
+      canRenderProtectedContent: true;
+      engine: LearningLessonEnginePayload;
+      unlock: LearningLessonEngineUnlock;
+      message?: undefined;
+    }
+  | {
+      state: "locked";
+      canRenderProtectedContent: false;
+      engine: LearningLessonEnginePayload;
+      unlock: LearningLessonEngineUnlock;
+      message: string;
+    }
+  | {
+      state: "engine_unavailable" | "access_unverified";
+      canRenderProtectedContent: false;
+      engine: null;
+      unlock: null;
+      message: string;
+    };
+
+export const LEARNING_LESSON_LOCKED_MESSAGE =
+  "Content and activities stay hidden until this lesson is unlocked." as const;
+
+export const LEARNING_LESSON_ENGINE_UNAVAILABLE_MESSAGE =
+  "Lesson access could not be verified. Protected content is hidden." as const;
+
+export const LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE =
+  "Lesson access could not be verified. Protected content is hidden." as const;
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -194,11 +233,135 @@ export async function loadMyLearningLessonEngine(
     { p_lesson_id: lessonId }
   );
   if (!result.ok) return result;
+  if (result.data == null) {
+    return { ok: false, message: "Lesson engine returned no data." };
+  }
   const parsed = parseLearningLessonEnginePayload(result.data);
   if (!parsed || parsed.lesson_id !== lessonId) {
     return { ok: false, message: "Lesson engine payload is malformed." };
   }
   return { ok: true, data: parsed };
+}
+
+/**
+ * Fail-closed content-access decision for the learner lesson viewer.
+ *
+ * Positive proof comes only from a successful `get_my_learning_lesson_engine`
+ * payload. Missing / failed / malformed engine data never implies unlocked.
+ * Direct delivery SELECTs must not override this decision.
+ *
+ * SQL contract:
+ * - `unlock_required === true` → point-locked redaction path (no blocks)
+ * - `unlock_required === false` → free, already unlocked, or instructor/manage
+ *   authorized content (blocks may be present; unlock.locked may still be true
+ *   for managers viewing a point-gated lesson)
+ */
+export function resolveLessonContentAccess(
+  engineResult: LessonEngineResult<LearningLessonEnginePayload> | null | undefined
+): LearningLessonContentAccess {
+  if (engineResult == null) {
+    return {
+      state: "access_unverified",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+    };
+  }
+
+  if (!engineResult.ok) {
+    return {
+      state: "engine_unavailable",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message:
+        engineResult.message.trim() ||
+        LEARNING_LESSON_ENGINE_UNAVAILABLE_MESSAGE,
+    };
+  }
+
+  const engine = engineResult.data;
+  if (!engine || !asString(engine.lesson_id)) {
+    return {
+      state: "access_unverified",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+    };
+  }
+
+  const unlock = parseLearningLessonEngineUnlock(engine.unlock, engine.lesson_id);
+  if (!unlock) {
+    return {
+      state: "access_unverified",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+    };
+  }
+
+  // DB redaction path for point-locked learners (not managers).
+  if (engine.unlock_required === true || unlock.locked === true) {
+    // Managers receive unlock_required=false with full blocks even when the
+    // unlock row still reports locked=true — treat that as authorized.
+    if (engine.unlock_required === false) {
+      return {
+        state: "verified_unlocked",
+        canRenderProtectedContent: true,
+        engine,
+        unlock,
+      };
+    }
+    return {
+      state: "locked",
+      canRenderProtectedContent: false,
+      engine,
+      unlock,
+      message: LEARNING_LESSON_LOCKED_MESSAGE,
+    };
+  }
+
+  // Free / unlocked learner: unlock_required false and locked false.
+  return {
+    state: "verified_unlocked",
+    canRenderProtectedContent: true,
+    engine,
+    unlock,
+  };
+}
+
+export function parseLearningLessonEngineUnlock(
+  raw: unknown,
+  expectedLessonId?: string
+): LearningLessonEngineUnlock | null {
+  const row = asRecord(raw);
+  if (!row) return null;
+  const lesson_id = asString(row.lesson_id);
+  if (!lesson_id) return null;
+  if (expectedLessonId && lesson_id !== expectedLessonId) return null;
+  if (typeof row.locked !== "boolean") return null;
+  if (typeof row.unlocked !== "boolean") return null;
+  if (typeof row.balance !== "number" || !Number.isFinite(row.balance)) {
+    return null;
+  }
+  let cost: number | null = null;
+  if (row.cost === null || row.cost === undefined) {
+    cost = null;
+  } else if (typeof row.cost === "number" && Number.isFinite(row.cost)) {
+    cost = row.cost;
+  } else {
+    return null;
+  }
+  return {
+    lesson_id,
+    locked: row.locked,
+    cost,
+    balance: row.balance,
+    unlocked: row.unlocked,
+  };
 }
 
 export async function upsertMyLearningLessonMediaPosition(

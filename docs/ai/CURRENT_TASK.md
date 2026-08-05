@@ -2,15 +2,15 @@
 
 ## Task title
 
-UM Learning — Instructor Program & Course Publish Controls V1
+UM Learning — Lesson Unlock Fail-Closed Hardening V1
 
 ## Status
 
-`verification-pass` — **COMMITTED + PUSHED** on `office/learning-ai-tutor-learner-ui-integration-v1`. Branch synced `0 0` with origin after push.
+`verification-pass` — implementation complete locally; **not committed** (stop before commit).
 
 ## Milestone id
 
-`learning.instructor.program_course_publish_controls_v1`
+`learning.lesson_unlock.fail_closed_hardening_v1`
 
 ## Branch
 
@@ -18,7 +18,7 @@ UM Learning — Instructor Program & Course Publish Controls V1
 
 ## Base
 
-`c3168eff3a324979efa5cab694e294c4daeeb4da` (`feat(learning): integrate learner ai tutor ui v1`)
+`d71745925e1bbeae79dde402186ae89ebf6986e3` (`feat(learning): add instructor program and course publish controls v1`)
 
 ## Worktree
 
@@ -26,24 +26,24 @@ UM Learning — Instructor Program & Course Publish Controls V1
 
 ## Delivered
 
-- Authoring ops: `publish_program`, `archive_program`, `publish_course`, `archive_course`
-- Existing RPCs only: `publish_learning_program` / `archive_learning_program` / `publish_learning_course` / `archive_learning_course`
-- Program page lifecycle UI + Course authoring lifecycle UI
-- Status labels Draft / Published / Archived; invalid transitions disabled
-- Fail-closed validation; sanitized RPC errors; `router.refresh` after success
+- `resolveLessonContentAccess` fail-closed gate on `get_my_learning_lesson_engine` result
+- Typed states: `verified_unlocked` / `locked` / `engine_unavailable` / `access_unverified`
+- `LessonViewer` renders protected blocks/activities only when access is positively verified
+- Lesson page strips delivery SELECT blocks/activities before RSC props
+- Free + instructor/manage paths remain accessible when engine proves `unlock_required === false`
 - No migration
 
 ## Verification (local)
 
-- `npx vitest run lib/learning/instructorAuthoring.test.ts` — **35 passed**
+- `npx vitest run lib/learning/lessonContentAccess.test.ts lib/learning/lessonEngineFoundation.test.ts lib/learning/learnerDelivery.test.ts` — **68 passed**
 - `npx tsc --noEmit` — PASS
 - `git diff --check` — PASS
 - Build: not required (policy)
 
 ## Machine policy
 
-Laptop only. Do not touch Commerce / Collaboration / Guardian / AI Tutor. No remote migration apply.
+Laptop only. Do not touch Commerce / Collaboration / Guardian / AI Tutor. No remote migration apply. No commit / no push until asked.
 
 ## Next
 
-None for this milestone. Separate ops GO remains for Learning migration apply (unchanged).
+Await commit/push GO.

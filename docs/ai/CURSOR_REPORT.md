@@ -1,24 +1,21 @@
-﻿# CURSOR_REPORT — Instructor Program & Course Publish Controls V1
+﻿# CURSOR_REPORT — Lesson Unlock Fail-Closed Hardening V1
 
 ## Summary
 
-**PASS** — Completed, committed, and pushed **`learning.instructor.program_course_publish_controls_v1`** on
-`office/learning-ai-tutor-learner-ui-integration-v1` from SoT tip `c3168ef`.
+**PASS** — Closed the learner lesson delivery fail-open path on
+`office/learning-ai-tutor-learner-ui-integration-v1` (base `d717459`).
 
-- Reused existing program/course publish and archive RPCs (no migration / no new SQL).
-- Instructor Program page and Course authoring page expose lifecycle controls.
-- Fail-closed allowlisted authoring ops; sanitized errors; refresh after success.
-- Invalid UI transitions disabled (publish only from draft; archive not for archived/suspended).
+Previously, when `get_my_learning_lesson_engine` failed or returned null,
+`LessonViewer` treated the lesson as unlocked and rendered
+`loadLessonDelivery` content blocks. Access is now fail-closed: protected
+content renders only after a positively verified engine payload.
 
 ## Exact files changed
 
-- `lib/learning/instructorAuthoring.ts`
-- `lib/learning/instructorAuthoring.test.ts`
-- `app/learning/instructor/actions.ts`
-- `app/components/learning/instructor/InstructorActionForm.tsx`
-- `app/learning/instructor/courses/[courseId]/page.tsx`
-- `app/learning/instructor/programs/[programId]/page.tsx` (new)
-- `app/learning/instructor/programs/[programId]/courses/new/page.tsx`
+- `lib/learning/lessonEngineFoundation.ts`
+- `lib/learning/lessonContentAccess.test.ts` (new)
+- `app/components/learning/LessonViewer.tsx`
+- `app/learning/lessons/[lessonId]/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -26,26 +23,51 @@
 
 None.
 
-## Behavior implemented
+## Exact fail-open root cause
 
-- Ops `publish_program` / `archive_program` → `publish_learning_program` / `archive_learning_program`
-- Ops `publish_course` / `archive_course` → `publish_learning_course` / `archive_learning_course`
-- Auth remains DB-authoritative via SECURITY DEFINER RPCs
-- UI shows Draft / Published / Archived
-- Server actions revalidate program/course/hub paths
+1. Lesson page passed `engine={engineResult.ok ? engineResult.data : null}`.
+2. `isLessonPointLocked(null)` returned `false`.
+3. Viewer fell back to `delivery.blocks` / `delivery.activities` from direct
+   `learning_lesson_content_blocks` SELECT, bypassing engine unlock redaction.
+
+## Exact security decision implemented
+
+- `resolveLessonContentAccess(engineResult)` is the sole content gate.
+- Positive render requires engine OK + parseable unlock +
+  (`unlock_required === false`, including instructor/manage when unlock row
+  still reports `locked: true`).
+- Engine failure / null / malformed unlock → `engine_unavailable` or
+  `access_unverified`; no protected content.
+- Point-locked learners (`unlock_required === true`) → `locked`; unlock CTA only.
+- Page strips delivery blocks/activities before LessonViewer props so RSC
+  serialization cannot leak direct SELECT content.
+- Viewer never reads `delivery.blocks` / `delivery.activities`.
+
+## Behavior
+
+| Case | Result |
+| --- | --- |
+| Verified unlocked / free | Engine blocks + activities render |
+| Verified locked | Unlock CTA; content hidden |
+| Engine RPC failure / null / malformed | Safe alert; content hidden |
+| Instructor/manage (`unlock_required: false`) | Content remains accessible |
 
 ## Security review
 
-- No service-role client; JWT user client only
-- Input allowlists + UUID validation fail closed
-- Status cannot be set by clients (forbidden field)
-- RPC remains final authorization authority
-- Error sanitization strips schema/permission internals for UI
+- No service-role client; JWT + existing SECURITY DEFINER engine RPC
+- No client-side SQL authorization duplicate; DB remains authority
+- Sanitized user-facing messages; no raw Supabase/DB details added
 - No secrets in diff
+- AI Tutor / Commerce / Collaboration / Guardian untouched
 
 ## Tests
 
-`npx vitest run lib/learning/instructorAuthoring.test.ts` — **35 passed** / 0 failed
+`npx vitest run lib/learning/lessonContentAccess.test.ts lib/learning/lessonEngineFoundation.test.ts lib/learning/learnerDelivery.test.ts`
+
+- **68 passed** / 0 failed
+  - `lessonContentAccess.test.ts`: 12
+  - `lessonEngineFoundation.test.ts`: 7
+  - `learnerDelivery.test.ts`: 49
 
 ## TypeScript
 
@@ -61,9 +83,10 @@ PASS (exit 0)
 
 ## git status --short
 
-Clean after commit + push (synced `0 0` with upstream).
+Local uncommitted changes only (stop before commit per task).
 
 ## Open issues
 
 - Remote Learning schema apply remains a separate ops concern (unchanged)
-- Parent program must be draft|published for course publish (SQL); UI links to program page
+- Point-lock RLS on direct block SELECT (if any) is still a DB concern; UI
+  no longer trusts that path for rendering
