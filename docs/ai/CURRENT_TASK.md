@@ -2,29 +2,29 @@
 
 ## Milestone
 
-Seller Live Payout Provider V1 — **Slice S3** (Manual Ops Live provider + helpers)
+Seller Live Payout Provider V1 — **Slice S4** (orchestrator)
 
 ## Status
 
-`s3-complete` — Manual Ops Live adapter + destination/execution helpers + focused tests; **committed + pushed** on close; no migrations; S4 not started
+`s4-complete` — live payout orchestrator + focused tests; **committed + pushed** on close; no migrations; S5 not started
 
 ## Branch / worktree
 
 - Branch: `office/commerce-seller-live-payout-provider-v1`
 - Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
-- S2 tip (pre-S3): `756057ba438c9b51862b8fa905dcaf9ca0f3c0b0`
+- S3 tip (pre-S4): `91dc26b54e87ddb0b12959401942fbae221af3e5`
 
-## S3 scope
+## S4 scope
 
-- `lib/store/sellerLivePayout/providers/manualOpsLive.ts`
-- `lib/store/sellerLivePayout/destinations.ts`
-- `lib/store/sellerLivePayout/executions.ts`
-- Focused S3 tests; wire `resolveSellerLivePayoutProviderPort` behind S1 gate
+- `lib/store/sellerLivePayout/orchestrator.ts`
+- `lib/store/sellerLivePayout/orchestrator.test.ts`
+- Wire exports; extend failure/phase types if required
+- Reuse `submitPayoutBooking` / `failPayoutBooking` / `confirmPayoutBooking`
 
 ## Explicit non-actions
 
-No S4 orchestrator · no server actions · no UI · no migrations · no UEOS/booking changes · no remote apply
+No S5 server actions · no UI · no migrations · no Stripe payment / commerce_confirm changes · no remote apply
 
 ## Next (not this GO)
 
-Slice S4 — orchestrator (attestation → ledger booking coordination)
+Slice S5 — seller + admin server actions

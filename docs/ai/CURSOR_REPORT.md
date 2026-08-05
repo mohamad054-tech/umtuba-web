@@ -2,22 +2,18 @@
 
 ## Summary
 
-**PASS** — Seller Live Payout Provider V1 **Slice S3 closed** (Manual Ops Live provider + destination/execution helpers + focused tests).
+**PASS** — Seller Live Payout Provider V1 **Slice S4 closed** (orchestrator coordinating gate → booking helpers → Manual Ops Live → durable executions).
 
-Committed and pushed on closeout. No migrations created or applied. S4 not started (`orchestrator.ts` absent).
+Committed and pushed on closeout. No migrations created or applied. S5 not started (no server actions / UI).
 
 ## Exact files changed
 
 | Path | Action |
 | --- | --- |
-| `lib/store/sellerLivePayout/providers/manualOpsLive.ts` | created |
-| `lib/store/sellerLivePayout/destinations.ts` | created |
-| `lib/store/sellerLivePayout/executions.ts` | created |
-| `lib/store/sellerLivePayout/manualOpsLive.test.ts` | created |
-| `lib/store/sellerLivePayout/destinations.test.ts` | created |
-| `lib/store/sellerLivePayout/executions.test.ts` | created |
-| `lib/store/sellerLivePayout/providerPort.ts` | modified (gated resolve → Manual Ops) |
-| `lib/store/sellerLivePayout/index.ts` | modified (S3 exports) |
+| `lib/store/sellerLivePayout/orchestrator.ts` | created |
+| `lib/store/sellerLivePayout/orchestrator.test.ts` | created |
+| `lib/store/sellerLivePayout/index.ts` | modified (S4 exports) |
+| `lib/store/sellerLivePayout/types.ts` | modified (orchestration phase + failure codes) |
 | `docs/ai/CURRENT_TASK.md` | modified |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
@@ -27,16 +23,19 @@ None.
 
 ## Security review
 
-- Manual Ops Live performs **no bank network call**; create outcome is `pending` + `attestation_required` (durable `awaiting_attestation`), never `succeeded` on create.
-- Provider resolve returns `null` unless S1 live gate is satisfied.
-- Stripe Connect / Wise / PayPal remain forbidden via `assertSellerLivePayoutProviderAllowed`.
-- Destination helpers: masked labels only; reject long digit runs / secret field names; S2 destination RPCs only.
-- Execution helpers: trusted server amount only; reject client money aliases; S2 execution RPCs only; fail-closed transitions; idempotent insert replay.
-- No secrets in source; no UEOS / payout booking / `commerce_confirm` / Stripe payment changes.
+- Trusted server context only; client money fields rejected
+- Gate must be satisfied before submit/resolve
+- Stripe Connect / Wise / PayPal remain forbidden
+- Uncertain outcomes never auto-fail booking
+- Confirm never runs merely because an execution was created
+- Confirm failure after attestation → `succeeded_pending_confirm` (no auto-fail)
+- COMPLETED remains terminal for new submits
+- No UEOS fork; foundation booking helpers remain authoritative
+- No secrets in source
 
 ## Tests
 
-`npx vitest run` (S3 + S1 gate + S2 migration + sellerPayoutRails): **53 passed / 6 files**
+Focused suite (S4 + S3 + S2 + S1 + booking helpers + foundation): **108 passed / 8 files**
 
 ## TypeScript
 
@@ -44,7 +43,7 @@ None.
 
 ## Build
 
-Not required for S3 (no UI/entry-point changes).
+Not required for S4 (no UI/entry-point changes).
 
 ## git diff --check
 
@@ -52,8 +51,8 @@ Clean (exit 0)
 
 ## git status --short
 
-Clean after S3 closeout commit + push (see closure report).
+Clean after S4 closeout commit + push (see closure report).
 
 ## Open issues
 
-None for S3. Next slice is S4 orchestrator (explicit GO only).
+None for S4. Next slice is S5 server actions (explicit GO only).

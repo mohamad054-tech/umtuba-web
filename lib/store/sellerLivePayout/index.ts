@@ -1,7 +1,7 @@
 /**
- * Seller Live Payout — Slice S1 public surface (+ S3 adapter exports).
- * Gate + types + provider port + Manual Ops Live + destination/execution helpers.
- * No orchestrator, UI, or server actions in this package surface.
+ * Seller Live Payout — public surface (S1–S4).
+ * Gate + types + provider port + Manual Ops Live + destination/execution helpers + orchestrator.
+ * No server actions or UI in this package surface.
  */
 
 export {
@@ -17,6 +17,7 @@ export type {
   SellerLivePayoutTransferStatus,
   SellerLivePayoutDestinationVerificationState,
   SellerLivePayoutFailureCode,
+  SellerLivePayoutOrchestrationPhase,
   SellerLivePayoutTransferInput,
   SellerLivePayoutTransferResult,
 } from "./types";
@@ -89,3 +90,17 @@ export type {
   InsertSellerLivePayoutExecutionInput,
   UpdateSellerLivePayoutExecutionInput,
 } from "./executions";
+
+export {
+  rejectClientLivePayoutOrchestratorMoneyFields,
+  validateOrchestrationKey,
+  buildLivePayoutBookingIdempotencyKey,
+  orchestrateSellerLivePayoutSubmit,
+  orchestrateSellerLivePayoutResolveAttestation,
+} from "./orchestrator";
+export type {
+  SellerLivePayoutOrchestratorInput,
+  SellerLivePayoutAttestationDecision,
+  SellerLivePayoutOrchestratorResult,
+  SellerLivePayoutOrchestratorDeps,
+} from "./orchestrator";

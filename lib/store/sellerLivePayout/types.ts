@@ -66,7 +66,25 @@ export type SellerLivePayoutFailureCode =
   | "currency_mismatch"
   | "attestation_required"
   | "provider_rejected"
-  | "execution_uncertain";
+  | "execution_uncertain"
+  | "terminal_completed"
+  | "destination_invalid"
+  | "idempotency_conflict"
+  | "booking_failed"
+  | "confirm_pending";
+
+/**
+ * Orchestrator phase (S4). Not a second payout ledger state machine —
+ * ledger remains NONE | IN_TRANSIT | COMPLETED via foundation booking helpers.
+ */
+export type SellerLivePayoutOrchestrationPhase =
+  | "awaiting_attestation"
+  | "failed"
+  | "uncertain"
+  | "completed"
+  | "succeeded_pending_confirm"
+  | "blocked"
+  | "terminal_completed";
 
 export type SellerLivePayoutTransferInput = {
   storeId: string;
