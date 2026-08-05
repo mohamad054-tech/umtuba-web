@@ -5,6 +5,9 @@ import InstructorActionForm from "../../../../components/learning/instructor/Ins
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
+  canArchiveInstructorLifecycle,
+  canPublishInstructorLifecycle,
+  formatInstructorLifecycleStatus,
   loadInstructorCourseTree,
   type InstructorCourseTree,
 } from "../../../../../lib/learning/instructorAuthoring";
@@ -19,12 +22,14 @@ import { LEARNING_LAB_ROUTES } from "../../../../../lib/learning/labsFoundation"
 import { LEARNING_COURSE_RESOURCE_ROUTES } from "../../../../../lib/learning/courseResourcesFoundation";
 import {
   archiveActivityAction,
+  archiveCourseAction,
   archiveLessonAction,
   archiveSectionAction,
   createActivityAction,
   createLessonAction,
   createSectionAction,
   publishActivityAction,
+  publishCourseAction,
   publishLessonAction,
   publishSectionAction,
   reorderActivitiesAction,
@@ -73,11 +78,14 @@ export default async function InstructorCourseAuthoringPage({
   const tree = payload.tree;
   const canManage = payload.canManage;
   const sectionIdsOrdered = tree.sections.map((s) => s.id).join(",");
+  const courseStatusLabel = formatInstructorLifecycleStatus(tree.course.status);
+  const canPublishCourse = canPublishInstructorLifecycle(tree.course.status);
+  const canArchiveCourse = canArchiveInstructorLifecycle(tree.course.status);
 
   return (
     <LearningShell
       title={tree.course.name}
-      subtitle={`Authoring · ${tree.course.status}`}
+      subtitle={`Authoring · ${courseStatusLabel}`}
       backHref={LEARNING_INSTRUCTOR_ROUTES.hub}
       backLabel="Instructor workspace"
     >
@@ -85,6 +93,58 @@ export default async function InstructorCourseAuthoringPage({
         Lifecycle controls call existing publish/archive RPCs. Double-publish of
         non-draft items fails closed. Open an activity to manage its questions.
       </p>
+
+      {canManage ? (
+        <div className="mt-4 space-y-3 rounded-xl border border-white/10 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-bold text-white/70">Course lifecycle</h2>
+            <p className="text-sm font-bold text-white">
+              Status: {courseStatusLabel}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <InstructorActionForm
+              action={publishCourseAction}
+              submitLabel="Publish Course"
+              successMessage="Course published."
+              disabled={!canPublishCourse}
+              refreshOnSuccess
+            >
+              <input type="hidden" name="courseId" value={courseId} />
+              {!canPublishCourse ? (
+                <p className="text-xs text-white/45">
+                  Publish is available only when status is Draft.
+                </p>
+              ) : null}
+            </InstructorActionForm>
+            <InstructorActionForm
+              action={archiveCourseAction}
+              submitLabel="Archive Course"
+              successMessage="Course archived."
+              disabled={!canArchiveCourse}
+              refreshOnSuccess
+            >
+              <input type="hidden" name="courseId" value={courseId} />
+              {!canArchiveCourse ? (
+                <p className="text-xs text-white/45">
+                  Archive is unavailable for this status.
+                </p>
+              ) : null}
+            </InstructorActionForm>
+          </div>
+          {tree.course.program_id ? (
+            <p className="text-xs text-white/45">
+              Parent program must be draft or published for course publish.{" "}
+              <Link
+                href={LEARNING_INSTRUCTOR_ROUTES.program(tree.course.program_id)}
+                className="underline underline-offset-2"
+              >
+                Open program lifecycle
+              </Link>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <nav className="mt-3 flex flex-wrap gap-3 text-sm">
         <Link

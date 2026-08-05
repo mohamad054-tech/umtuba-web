@@ -9,6 +9,7 @@ import {
   LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES,
   getBootstrapProgram,
 } from "../../../../../../../lib/learning/instructorBootstrap";
+import { LEARNING_INSTRUCTOR_ROUTES } from "../../../../../../../lib/learning/instructorAuthoring";
 import { createCourseBootstrapAction } from "../../../../bootstrapActions";
 
 export const dynamic = "force-dynamic";
@@ -48,9 +49,7 @@ export default async function NewInstructorCoursePage({
     <LearningShell
       title="Create Course"
       subtitle={`Step 3 of 3 · ${program.data.name}`}
-      backHref={LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES.programNew(
-        program.data.space_id
-      )}
+      backHref={LEARNING_INSTRUCTOR_ROUTES.program(programId)}
       backLabel="Back to program"
     >
       <p className="mt-3 text-sm text-white/55">

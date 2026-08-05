@@ -29,8 +29,15 @@ async function requireUser(): Promise<InstructorAuthoringResult | null> {
   return null;
 }
 
-function revalidateAuthoring(courseId?: string, lessonId?: string) {
+function revalidateAuthoring(
+  courseId?: string,
+  lessonId?: string,
+  programId?: string
+) {
   revalidatePath(LEARNING_INSTRUCTOR_ROUTES.hub);
+  if (programId) {
+    revalidatePath(LEARNING_INSTRUCTOR_ROUTES.program(programId));
+  }
   if (courseId) {
     revalidatePath(LEARNING_INSTRUCTOR_ROUTES.course(courseId));
   }
@@ -66,7 +73,7 @@ async function listSiblingSlugs(
 export async function instructorAuthoringAction(
   operation: string,
   input: Record<string, unknown>,
-  revalidate?: { courseId?: string; lessonId?: string }
+  revalidate?: { courseId?: string; lessonId?: string; programId?: string }
 ): Promise<InstructorAuthoringResult> {
   const authErr = await requireUser();
   if (authErr) return authErr;
@@ -78,9 +85,57 @@ export async function instructorAuthoringAction(
     input
   );
   if (result.ok) {
-    revalidateAuthoring(revalidate?.courseId, revalidate?.lessonId);
+    revalidateAuthoring(
+      revalidate?.courseId,
+      revalidate?.lessonId,
+      revalidate?.programId
+    );
   }
   return result;
+}
+
+export async function publishProgramAction(
+  formData: FormData
+): Promise<InstructorAuthoringResult> {
+  const programId = formString(formData, "programId");
+  return instructorAuthoringAction(
+    "publish_program",
+    { program_id: programId },
+    { programId }
+  );
+}
+
+export async function archiveProgramAction(
+  formData: FormData
+): Promise<InstructorAuthoringResult> {
+  const programId = formString(formData, "programId");
+  return instructorAuthoringAction(
+    "archive_program",
+    { program_id: programId },
+    { programId }
+  );
+}
+
+export async function publishCourseAction(
+  formData: FormData
+): Promise<InstructorAuthoringResult> {
+  const courseId = formString(formData, "courseId");
+  return instructorAuthoringAction(
+    "publish_course",
+    { course_id: courseId },
+    { courseId }
+  );
+}
+
+export async function archiveCourseAction(
+  formData: FormData
+): Promise<InstructorAuthoringResult> {
+  const courseId = formString(formData, "courseId");
+  return instructorAuthoringAction(
+    "archive_course",
+    { course_id: courseId },
+    { courseId }
+  );
 }
 
 export async function createSectionAction(

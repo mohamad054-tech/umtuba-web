@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
+import { LEARNING_LESSON_RPCS } from "./lessonsFoundation";
+import { LEARNING_ACTIVITY_RPCS } from "./activitiesFoundation";
+import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "./lessonContentBlocksFoundation";
+import { LEARNING_COURSE_RPCS } from "./coursesFoundation";
+import { LEARNING_PROGRAM_RPCS } from "./programsFoundation";
 import {
   INSTRUCTOR_AUTHORING_EXCLUDED_OPERATIONS,
   INSTRUCTOR_AUTHORING_OPERATIONS,
@@ -8,15 +14,15 @@ import {
   LEARNING_INSTRUCTOR_COURSE_TREE_RPC,
   LEARNING_INSTRUCTOR_LESSON_BLOCKS_RPC,
   buildInstructorAuthoringRpcCall,
+  canArchiveInstructorLifecycle,
+  canPublishInstructorLifecycle,
+  formatInstructorLifecycleStatus,
   loadInstructorCourseTree,
   loadInstructorLessonBlocks,
   parseInstructorCourseTreePayload,
   parseInstructorLessonBlocksPayload,
+  runInstructorAuthoringOperation,
 } from "./instructorAuthoring";
-import { LEARNING_SECTION_RPCS } from "./sectionsFoundation";
-import { LEARNING_LESSON_RPCS } from "./lessonsFoundation";
-import { LEARNING_ACTIVITY_RPCS } from "./activitiesFoundation";
-import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "./lessonContentBlocksFoundation";
 
 const ROOT = join(__dirname, "../..");
 const TREE_MIGRATION =
@@ -55,6 +61,7 @@ const SECTION_ID = "22222222-2222-4222-8222-222222222222";
 const LESSON_ID = "33333333-3333-4333-8333-333333333333";
 const ACTIVITY_ID = "44444444-4444-4444-8444-444444444444";
 const BLOCK_ID = "55555555-5555-4555-8555-555555555555";
+const PROGRAM_ID = "66666666-6666-4666-8666-666666666666";
 
 describe("Instructor Authoring Minimal V1 — operation map", () => {
   it("maps every allowlisted operation to an existing foundation RPC", () => {
@@ -79,7 +86,19 @@ describe("Instructor Authoring Minimal V1 — operation map", () => {
     expect(INSTRUCTOR_AUTHORING_RPC_BY_OPERATION.unpublish_content_block).toBe(
       LEARNING_LESSON_CONTENT_BLOCK_RPCS.unpublish
     );
-    expect(INSTRUCTOR_AUTHORING_OPERATIONS).toHaveLength(21);
+    expect(INSTRUCTOR_AUTHORING_RPC_BY_OPERATION.publish_program).toBe(
+      LEARNING_PROGRAM_RPCS.publish
+    );
+    expect(INSTRUCTOR_AUTHORING_RPC_BY_OPERATION.archive_program).toBe(
+      LEARNING_PROGRAM_RPCS.archive
+    );
+    expect(INSTRUCTOR_AUTHORING_RPC_BY_OPERATION.publish_course).toBe(
+      LEARNING_COURSE_RPCS.publish
+    );
+    expect(INSTRUCTOR_AUTHORING_RPC_BY_OPERATION.archive_course).toBe(
+      LEARNING_COURSE_RPCS.archive
+    );
+    expect(INSTRUCTOR_AUTHORING_OPERATIONS).toHaveLength(25);
   });
 
   it("excludes questions, answer keys, and moderation from Minimal V1", () => {
@@ -492,5 +511,189 @@ describe("Instructor Lesson Blocks Read RPC optimization V1", () => {
       expect(data.canManage).toBe(true);
     }
     expect(calls).toEqual(["get_instructor_learning_lesson_blocks"]);
+  });
+});
+
+describe("Instructor Program/Course publish controls", () => {
+  it("formats lifecycle status labels", () => {
+    expect(formatInstructorLifecycleStatus("draft")).toBe("Draft");
+    expect(formatInstructorLifecycleStatus("published")).toBe("Published");
+    expect(formatInstructorLifecycleStatus("archived")).toBe("Archived");
+  });
+
+  it("enables publish only for draft", () => {
+    expect(canPublishInstructorLifecycle("draft")).toBe(true);
+    expect(canPublishInstructorLifecycle("published")).toBe(false);
+    expect(canPublishInstructorLifecycle("archived")).toBe(false);
+    expect(canPublishInstructorLifecycle("suspended")).toBe(false);
+  });
+
+  it("enables archive for draft/published only", () => {
+    expect(canArchiveInstructorLifecycle("draft")).toBe(true);
+    expect(canArchiveInstructorLifecycle("published")).toBe(true);
+    expect(canArchiveInstructorLifecycle("archived")).toBe(false);
+    expect(canArchiveInstructorLifecycle("suspended")).toBe(false);
+  });
+
+  it("builds publish_program RPC for draft publish success path", () => {
+    const r = buildInstructorAuthoringRpcCall("publish_program", {
+      program_id: PROGRAM_ID,
+    });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.rpc).toBe("publish_learning_program");
+      expect(r.args).toEqual({ p_program_id: PROGRAM_ID });
+    }
+  });
+
+  it("builds archive_program RPC", () => {
+    const r = buildInstructorAuthoringRpcCall("archive_program", {
+      program_id: PROGRAM_ID,
+    });
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      expect(r.rpc).toBe("archive_learning_program");
+      expect(r.args).toEqual({ p_program_id: PROGRAM_ID });
+    }
+  });
+
+  it("builds publish_course and archive_course RPC args", () => {
+    const publish = buildInstructorAuthoringRpcCall("publish_course", {
+      course_id: COURSE_ID,
+    });
+    expect(publish.ok).toBe(true);
+    if (publish.ok) {
+      expect(publish.rpc).toBe("publish_learning_course");
+      expect(publish.args).toEqual({ p_course_id: COURSE_ID });
+    }
+    const archive = buildInstructorAuthoringRpcCall("archive_course", {
+      course_id: COURSE_ID,
+    });
+    expect(archive.ok).toBe(true);
+    if (archive.ok) {
+      expect(archive.rpc).toBe("archive_learning_course");
+      expect(archive.args).toEqual({ p_course_id: COURSE_ID });
+    }
+  });
+
+  it("rejects invalid program/course ids", () => {
+    const badProgram = buildInstructorAuthoringRpcCall("publish_program", {
+      program_id: "bad",
+    });
+    expect(badProgram.ok).toBe(false);
+    const badCourse = buildInstructorAuthoringRpcCall("archive_course", {
+      course_id: "bad",
+    });
+    expect(badCourse.ok).toBe(false);
+  });
+
+  it("runInstructorAuthoringOperation: publish success", async () => {
+    const fake = {
+      rpc: async (name: string, args: Record<string, unknown>) => {
+        expect(name).toBe("publish_learning_course");
+        expect(args).toEqual({ p_course_id: COURSE_ID });
+        return {
+          data: { course_id: COURSE_ID, status: "published" },
+          error: null,
+        };
+      },
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "publish_course",
+      { course_id: COURSE_ID }
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it("runInstructorAuthoringOperation: archive success", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: { program_id: PROGRAM_ID, status: "archived" },
+        error: null,
+      }),
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "archive_program",
+      { program_id: PROGRAM_ID }
+    );
+    expect(result.ok).toBe(true);
+  });
+
+  it("maps already-published RPC error to meaningful message", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: null,
+        error: { message: "Only draft courses can be published" },
+      }),
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "publish_course",
+      { course_id: COURSE_ID }
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe("Only draft items can be published.");
+    }
+  });
+
+  it("maps already-archived / archived RPC error", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: null,
+        error: { message: "Archived programs cannot be changed this way" },
+      }),
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "archive_program",
+      { program_id: PROGRAM_ID }
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe(
+        "Archived items cannot be changed this way."
+      );
+    }
+  });
+
+  it("maps unauthorized user to permission message", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: null,
+        error: { message: "Not allowed to publish this course" },
+      }),
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "publish_course",
+      { course_id: COURSE_ID }
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe(
+        "You are not allowed to perform this action."
+      );
+    }
+  });
+
+  it("maps generic RPC failure safely", async () => {
+    const fake = {
+      rpc: async () => ({
+        data: null,
+        error: { message: "relation learning_courses does not exist" },
+      }),
+    };
+    const result = await runInstructorAuthoringOperation(
+      fake as never,
+      "publish_course",
+      { course_id: COURSE_ID }
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toBe("Request could not be completed.");
+    }
   });
 });

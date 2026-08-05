@@ -1,64 +1,69 @@
-﻿# CURSOR_REPORT — Thread Lifecycle Foundation V1
+﻿# CURSOR_REPORT — Instructor Program & Course Publish Controls V1
 
 ## Summary
 
-**PASS + STAGED** — Implemented `learning.tutor.thread_lifecycle_foundation_v1` after SSOT approval.
+**PASS** — Completed, committed, and pushed **`learning.instructor.program_course_publish_controls_v1`** on
+`office/learning-ai-tutor-learner-ui-integration-v1` from SoT tip `c3168ef`.
 
-Official next Tutor milestone after Structured Oversize Serialization V1 (`7d03178`). Get-or-create active thread per learner+course+lesson; `active` | `archived`; race-safe unique index; fail-closed auth/entitlement; compatible with Persistence Bridge, Lesson Binding, Resume/History, Oversize Serialization.
+- Reused existing program/course publish and archive RPCs (no migration / no new SQL).
+- Instructor Program page and Course authoring page expose lifecycle controls.
+- Fail-closed allowlisted authoring ops; sanitized errors; refresh after success.
+- Invalid UI transitions disabled (publish only from draft; archive not for archived/suspended).
 
 ## Exact files changed
 
+- `lib/learning/instructorAuthoring.ts`
+- `lib/learning/instructorAuthoring.test.ts`
+- `app/learning/instructor/actions.ts`
+- `app/components/learning/instructor/InstructorActionForm.tsx`
+- `app/learning/instructor/courses/[courseId]/page.tsx`
+- `app/learning/instructor/programs/[programId]/page.tsx` (new)
+- `app/learning/instructor/programs/[programId]/courses/new/page.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/workstreams/AI_PLATFORM.md`
-- `lib/learning/aiTutorFoundation.ts`
-- `lib/learning/aiTutorFoundation.test.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadLifecycleFoundation.test.ts` (new)
-- `supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` (new)
 
 ## Migrations created
 
-- `20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql` — **local only**; not remote-applied
+None.
+
+## Behavior implemented
+
+- Ops `publish_program` / `archive_program` → `publish_learning_program` / `archive_learning_program`
+- Ops `publish_course` / `archive_course` → `publish_learning_course` / `archive_learning_course`
+- Auth remains DB-authoritative via SECURITY DEFINER RPCs
+- UI shows Draft / Published / Archived
+- Server actions revalidate program/course/hub paths
 
 ## Security review
 
-- Ensure/archive/create/get/resume remain security definer + fixed `search_path`
-- Ownership via `auth.uid()`; entitlement via `has_learning_course_access`
-- Lesson must belong to course; never reuses other learners / other lessons / other courses
-- One active thread uniqueness; concurrent insert → `unique_violation` re-select
-- Revoke public/anon on ensure + archive; lean JSON (no `user_id` leak in projections)
-- Fail-closed client sanitization preserved
+- No service-role client; JWT user client only
+- Input allowlists + UUID validation fail closed
+- Status cannot be set by clients (forbidden field)
+- RPC remains final authorization authority
+- Error sanitization strips schema/permission internals for UI
+- No secrets in diff
 
 ## Tests
 
-- `threadLifecycleFoundation.test.ts` — PASS  
-- `aiTutorFoundation.test.ts` — PASS  
-- `threadResumeHistory.test.ts` — PASS  
-- `threadPersistenceBridge.test.ts` — PASS  
-- `learningTutorIntegration.test.ts` — PASS  
-- `learningTutor.test.ts` — PASS  
-- Totals: **134 passed** / 0 failed (6 files)
+`npx vitest run lib/learning/instructorAuthoring.test.ts` — **35 passed** / 0 failed
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS
+`npx tsc --noEmit` — PASS (exit 0)
 
 ## Build
 
-Not required for this Tutor backend milestone (no UI/entry change).
+Not run (policy).
 
 ## git diff --check
 
-PASS (no whitespace errors)
+PASS (exit 0)
 
 ## git status --short
 
-All in-scope files **staged**; working tree clean of untracked junk. PASS + STAGED only.
+Clean after commit + push (synced `0 0` with upstream).
 
 ## Open issues
 
-- Remote apply of `20260876` awaits explicit GO
-- Summarization remains deferred
-- No commit / no push from this agent turn
+- Remote Learning schema apply remains a separate ops concern (unchanged)
+- Parent program must be draft|published for course publish (SQL); UI links to program page

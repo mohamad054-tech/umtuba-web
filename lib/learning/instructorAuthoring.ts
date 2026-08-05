@@ -16,6 +16,7 @@ import {
 } from "./activitiesFoundation";
 import {
   LEARNING_COURSE_HELPERS,
+  LEARNING_COURSE_RPCS,
   type LearningCourse,
 } from "./coursesFoundation";
 import {
@@ -28,6 +29,10 @@ import {
   LEARNING_LESSON_VISIBILITIES,
   type LearningLessonVisibility,
 } from "./lessonsFoundation";
+import {
+  LEARNING_PROGRAM_HELPERS,
+  LEARNING_PROGRAM_RPCS,
+} from "./programsFoundation";
 import {
   LEARNING_SECTION_RPCS,
   LEARNING_SECTION_VISIBILITIES,
@@ -67,6 +72,10 @@ export const INSTRUCTOR_AUTHORING_FORBIDDEN_INPUT_KEYS = [
 ] as const;
 
 export const INSTRUCTOR_AUTHORING_OPERATIONS = [
+  "publish_program",
+  "archive_program",
+  "publish_course",
+  "archive_course",
   "create_section",
   "update_section",
   "publish_section",
@@ -94,6 +103,10 @@ export type InstructorAuthoringOperation =
   (typeof INSTRUCTOR_AUTHORING_OPERATIONS)[number];
 
 export const INSTRUCTOR_AUTHORING_RPC_BY_OPERATION = {
+  publish_program: LEARNING_PROGRAM_RPCS.publish,
+  archive_program: LEARNING_PROGRAM_RPCS.archive,
+  publish_course: LEARNING_COURSE_RPCS.publish,
+  archive_course: LEARNING_COURSE_RPCS.archive,
   create_section: LEARNING_SECTION_RPCS.create,
   update_section: LEARNING_SECTION_RPCS.update,
   publish_section: LEARNING_SECTION_RPCS.publish,
@@ -133,10 +146,43 @@ export const INSTRUCTOR_AUTHORING_EXCLUDED_OPERATIONS = [
 
 export const LEARNING_INSTRUCTOR_ROUTES = {
   hub: "/learning/instructor",
+  program: (programId: string) => `/learning/instructor/programs/${programId}`,
   course: (courseId: string) => `/learning/instructor/courses/${courseId}`,
   lesson: (courseId: string, lessonId: string) =>
     `/learning/instructor/courses/${courseId}/lessons/${lessonId}`,
 } as const;
+
+/** Lifecycle statuses shown in instructor publish/archive UI. */
+export const INSTRUCTOR_LIFECYCLE_STATUSES = [
+  "draft",
+  "published",
+  "archived",
+] as const;
+export type InstructorLifecycleStatus =
+  (typeof INSTRUCTOR_LIFECYCLE_STATUSES)[number];
+
+export function formatInstructorLifecycleStatus(status: string): string {
+  const lower = status.trim().toLowerCase();
+  if (lower === "draft") return "Draft";
+  if (lower === "published") return "Published";
+  if (lower === "archived") return "Archived";
+  if (lower === "suspended") return "Suspended";
+  return status;
+}
+
+/** Publish is only valid from draft (matches SQL). */
+export function canPublishInstructorLifecycle(status: string): boolean {
+  return status.trim().toLowerCase() === "draft";
+}
+
+/**
+ * Archive UI enablement: draft or published.
+ * Suspended requires platform moderation; archived is already terminal.
+ */
+export function canArchiveInstructorLifecycle(status: string): boolean {
+  const lower = status.trim().toLowerCase();
+  return lower === "draft" || lower === "published";
+}
 
 export type InstructorAuthoringOk = {
   ok: true;
@@ -187,6 +233,7 @@ function rejectForbiddenKeys(input: Record<string, unknown>): string | null {
     ) {
       // Parent ids are allowed only via explicit allowlists per operation.
       if (
+        key === "program_id" ||
         key === "course_id" ||
         key === "section_id" ||
         key === "lesson_id" ||
@@ -341,6 +388,30 @@ export function buildInstructorAuthoringRpcCall(
   const rpc = INSTRUCTOR_AUTHORING_RPC_BY_OPERATION[op];
 
   switch (op) {
+    case "publish_program":
+    case "archive_program": {
+      const err =
+        rejectUnknownKeys(rawInput, ["program_id"]) ??
+        requireUuid(rawInput.program_id, "program_id");
+      if (err) return { ok: false, message: err };
+      return {
+        ok: true,
+        rpc,
+        args: { p_program_id: rawInput.program_id },
+      };
+    }
+    case "publish_course":
+    case "archive_course": {
+      const err =
+        rejectUnknownKeys(rawInput, ["course_id"]) ??
+        requireUuid(rawInput.course_id, "course_id");
+      if (err) return { ok: false, message: err };
+      return {
+        ok: true,
+        rpc,
+        args: { p_course_id: rawInput.course_id },
+      };
+    }
     case "create_section": {
       const err =
         rejectUnknownKeys(rawInput, [
@@ -767,6 +838,20 @@ export async function canManageLearningCourseUx(
   const { data, error } = await supabase.rpc(
     LEARNING_COURSE_HELPERS.canManage,
     { p_course_id: courseId }
+  );
+  if (error) return false;
+  return data === true;
+}
+
+/** UX pre-check only — RPC remains authoritative. */
+export async function canManageLearningProgramUx(
+  supabase: AnyClient,
+  programId: string
+): Promise<boolean> {
+  if (!isUuid(programId)) return false;
+  const { data, error } = await supabase.rpc(
+    LEARNING_PROGRAM_HELPERS.canManage,
+    { p_program_id: programId }
   );
   if (error) return false;
   return data === true;

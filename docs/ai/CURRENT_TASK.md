@@ -2,53 +2,48 @@
 
 ## Task title
 
-UM Learning AI Tutor — Thread Lifecycle Foundation V1
+UM Learning — Instructor Program & Course Publish Controls V1
 
 ## Status
 
-`pass-staged` — implementation complete; **STAGED only** (no commit / no push / no remote migration apply)
+`verification-pass` — **COMMITTED + PUSHED** on `office/learning-ai-tutor-learner-ui-integration-v1`. Branch synced `0 0` with origin after push.
 
 ## Milestone id
 
-`learning.tutor.thread_lifecycle_foundation_v1`
+`learning.instructor.program_course_publish_controls_v1`
 
 ## Branch
 
-`office/learning-ai-tutor-thread-lifecycle-foundation-v1`
+`office/learning-ai-tutor-learner-ui-integration-v1`
 
 ## Base
 
-`office/learning-ai-tutor-structured-oversize-serialization-v1` @ `7d03178e4b10d09c514386804405154c785c1031`
+`c3168eff3a324979efa5cab694e294c4daeeb4da` (`feat(learning): integrate learner ai tutor ui v1`)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-next-milestone-proposal-v1`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-learner-ui-integration-v1`
 
-## Allowed scope
+## Delivered
 
-- Lifecycle contract: `active` | `archived`
-- Get-or-create / reuse single active thread per `(auth.uid, course_id, lesson_id)`
-- Archive → replacement active on next ensure
-- Migration `20260876` (local only)
-- Foundation + bridge APIs + focused tests
-- SSOT docs for this milestone
+- Authoring ops: `publish_program`, `archive_program`, `publish_course`, `archive_course`
+- Existing RPCs only: `publish_learning_program` / `archive_learning_program` / `publish_learning_course` / `archive_learning_course`
+- Program page lifecycle UI + Course authoring lifecycle UI
+- Status labels Draft / Published / Archived; invalid transitions disabled
+- Fail-closed validation; sanitized RPC errors; `router.refresh` after success
+- No migration
 
-## Forbidden scope
+## Verification (local)
 
-- Conversation History Summarization (still deferred)
-- Provider / Gemini / alpha / Web UI redesign
-- Reopening closed Tutor tips (Binding / Resume / Oversize)
-- Commit, push, remote migration apply
+- `npx vitest run lib/learning/instructorAuthoring.test.ts` — **35 passed**
+- `npx tsc --noEmit` — PASS
+- `git diff --check` — PASS
+- Build: not required (policy)
 
-## Done
+## Machine policy
 
-- SSOT approved Lifecycle as the official next milestone after Oversize Serialization
-- Migration + ensure/archive RPCs + unique active index
-- Foundation/bridge wiring; create-with-lesson uses ensure
-- Focused + regression tests
+Laptop only. Do not touch Commerce / Collaboration / Guardian / AI Tutor. No remote migration apply.
 
-## Next (human)
+## Next
 
-1. Review staged diff; commit trailer-free outside Cursor if approved
-2. Remote-apply `20260876` only with explicit apply GO
-3. Summarization remains deferred until SSOT undefer + GO
+None for this milestone. Separate ops GO remains for Learning migration apply (unchanged).
