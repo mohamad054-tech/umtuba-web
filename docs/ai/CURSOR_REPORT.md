@@ -8,7 +8,8 @@
 - Local migration `20260874` drops 4-arg exchange overload and creates 5-arg RPC with SQL lesson binding.
 - Foundation / bridge / integration pass `lessonId` → `p_lesson_id`.
 - Bridge fail-closed for mismatch, auth, entitlement, and invalid ids; metadata validation retained.
-- Migration **not** applied. Staged only — **no commit/push**.
+- Migration **not** applied remotely.
+- Feature commit **pushed**: `b85081b` on `office/learning-ai-tutor-thread-lesson-binding-v1` (synced `0 0`).
 
 ## Exact files changed
 
@@ -62,10 +63,9 @@ PASS (exit 0)
 
 ## git status --short
 
-Staged milestone files only after verification (see Final Response).
+Clean on branch after docs handoff sync (feature already at `b85081b`).
 
 ## Open issues
 
-- Await trailer-free commit/push GO
 - Do not remote-apply `20260874` without explicit GO
 - Do not touch Provider / Gemini / alpha / Web UI from this laptop

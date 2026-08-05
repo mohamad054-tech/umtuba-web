@@ -6,7 +6,7 @@ UM Learning AI Tutor Backend — Thread Lesson Binding Hardening V1
 
 ## Status
 
-`verification-pass` — **STAGED** — awaiting trailer-free commit/push GO, then separate apply GO for `20260874`
+`verification-pass` — **COMMITTED + PUSHED** @ `b85081b` — branch synced `0 0` with `origin/office/learning-ai-tutor-thread-lesson-binding-v1`. Awaiting separate apply GO for `20260874` only.
 
 ## Branch
 
@@ -62,4 +62,4 @@ AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI / Provider /
 
 ## Next
 
-Trailer-free commit/push GO, then separate apply GO for `20260874`.
+Separate apply GO for migration `20260874` only (do not re-commit feature work).
