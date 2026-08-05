@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Core Data Platform Workflow & Dataset Approval onto Alpha V1
+AI Core Private AI Workflow Lifecycle onto Alpha V1
 
 ## Status
 
@@ -10,27 +10,28 @@ AI Core Data Platform Workflow & Dataset Approval onto Alpha V1
 
 ## Branch
 
-`office/ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
+`office/ai-core-private-ai-workflow-lifecycle-onto-alpha-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1`
+`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-workflow-lifecycle-onto-alpha-v1`
 
 ## Base
 
-`c2f30e9` — Knowledge Acquisition onto alpha tip
+`91ddbb6` — Data Platform Workflow Approval tip
+
+## Source
+
+`origin/office/platform-private-ai-workflow-lifecycle-v1-final`
 
 ## Scope
 
-- `lib/aiDataPlatform/workflow/**`
-- `lib/aiDataPlatform/aiDataPlatformWorkflow.test.ts`
-- `lib/aiDataPlatform/index.ts` (workflow exports)
-- `app/admin/ai-data/{review,audit,AiDataPlatformShell}`
-- `supabase/migrations/20260878_ai_data_platform_workflow_approval_v1.sql` (local only)
-- Architecture docs + AI handoff docs
+- `lib/privateAi/**` lifecycle/readiness/audit updates
+- `app/admin/private-ai/**` lifecycle UI + actions
+- `supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql` (local only)
+- Architecture + AI handoff docs
 
 ## Forbidden
 
 - Commerce / Learning / Collaboration / Mobile / Guardian
-- Alpha merge / remote migration apply / live providers
-- Training / inference execution
+- Alpha merge / remote migration apply / live providers / deployment execution

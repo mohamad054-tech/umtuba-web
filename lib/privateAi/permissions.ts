@@ -43,6 +43,51 @@ export const DEFAULT_PLATFORM_ADMIN_ACTIONS = [
   "read",
   "register",
   "lifecycle_update",
+  "submit_for_review",
+  "request_changes",
+  "reject",
+  "approve",
+  "activate",
+  "deprecate",
+  "retire",
+  "return_to_draft",
   "map_capability",
   "audit_read",
 ] as const;
+
+/** True if role may act on resourceId or wildcard "*". */
+export function hasModelLifecyclePermission(
+  permissions: PrivateAiPermission[],
+  input: {
+    role: string;
+    modelId: string;
+    action: string;
+  }
+): boolean {
+  return (
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: input.modelId,
+      role: input.role,
+      action: input.action,
+    }) ||
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: "*",
+      role: input.role,
+      action: input.action,
+    }) ||
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: "*",
+      role: input.role,
+      action: "lifecycle_update",
+    }) ||
+    hasPermission(permissions, {
+      scope: "model",
+      resourceId: input.modelId,
+      role: input.role,
+      action: "lifecycle_update",
+    })
+  );
+}

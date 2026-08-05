@@ -1,42 +1,35 @@
-# CURSOR_REPORT — AI Core Data Platform Workflow & Dataset Approval onto Alpha V1
+# CURSOR_REPORT — AI Core Private AI Workflow Lifecycle onto Alpha V1
 
 ## Summary
 
-Clean port of AI Data Platform Workflow & Dataset Approval onto the Knowledge
-Acquisition tip. Adds dataset approval lifecycle, fail-closed validation
-gates, audit trail, and read-only review/audit admin pages. Preserves Data
-Platform foundation and Knowledge Acquisition behavior.
+Clean port of Private AI Workflow & Lifecycle onto the Data Platform Workflow
+tip. Adds permissioned lifecycle transitions, readiness gates, audit trail,
+and admin lifecycle actions. No deployment/runtime execution.
 
 ## Exact refs
 
 | Ref | Value |
 |-----|-------|
-| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1` |
-| Branch | `office/ai-core-data-platform-workflow-dataset-approval-onto-alpha-v1` |
-| Base | `c2f30e9` |
-| Source | `origin/office/platform-ai-data-platform-workflow-v1` |
+| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-workflow-lifecycle-onto-alpha-v1` |
+| Branch | `office/ai-core-private-ai-workflow-lifecycle-onto-alpha-v1` |
+| Base | `91ddbb6` |
+| Source | `origin/office/platform-private-ai-workflow-lifecycle-v1-final` @ `eb9e743` |
 
 ## Feature files
 
-- `lib/aiDataPlatform/workflow/**`
-- `lib/aiDataPlatform/aiDataPlatformWorkflow.test.ts`
-- `lib/aiDataPlatform/index.ts`
-- `app/admin/ai-data/AiDataPlatformShell.tsx`
-- `app/admin/ai-data/review/page.tsx`
-- `app/admin/ai-data/audit/page.tsx`
-- `supabase/migrations/20260878_ai_data_platform_workflow_approval_v1.sql` (not remote-applied)
-- `docs/architecture/AI_DATA_PLATFORM_WORKFLOW_APPROVAL_V1.md`
-- `docs/architecture/AI_DATA_PLATFORM_FOUNDATION_V1.md` (workflow pointer)
+- `lib/privateAi/{audit,readiness,lifecycle,service,types,permissions,seed,fileStore,index}.ts`
+- `lib/privateAi/privateAiWorkflowLifecycle.test.ts`
+- `app/admin/private-ai/{PrivateAiShell,page,lifecycle/**}`
+- `docs/architecture/PRIVATE_AI_WORKFLOW_LIFECYCLE_V1.md`
+- `supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql` (not remote-applied)
 
 ## Migrations inventory (AI local lineage)
 
-- `20260876` knowledge acquisition
-- `20260877` AI data platform
-- `20260878` workflow approval — this milestone
-- `20260879` private AI
+- `20260876`–`20260879` prior
+- `20260880` this milestone
 
 ## Security
 
-- Approval never automatic; fail-closed rights/privacy/quality gates
-- Audit trail records actor, states, reason
-- Admin platform-admin gated
+- Illegal transitions fail closed
+- Approve/activate blocked by readiness gate
+- Admin + Private AI permission model

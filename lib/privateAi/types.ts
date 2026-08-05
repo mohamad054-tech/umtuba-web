@@ -1,5 +1,5 @@
 /**
- * UMTUBA Private AI Foundation V1 — domain contracts.
+ * UMTUBA Private AI Foundation + Workflow & Lifecycle V1 — domain contracts.
  * Architecture for a future private AI ecosystem.
  * Not training. Not fine-tuning. Not inference. No model weights.
  */
@@ -36,16 +36,28 @@ export type ModelFamilyKind =
   | "multimodal"
   | "reasoning";
 
+/** Admin review / operations lifecycle (Workflow & Lifecycle V1). */
 export type PrivateAiLifecycle =
   | "draft"
-  | "training_planned"
-  | "training_running"
-  | "evaluation"
-  | "candidate"
+  | "submitted_for_review"
+  | "changes_requested"
+  | "rejected"
   | "approved"
-  | "production"
+  | "active"
   | "deprecated"
-  | "archived";
+  | "retired";
+
+export type PrivateAiWorkflowAction =
+  | "register"
+  | "submit_for_review"
+  | "request_changes"
+  | "reject"
+  | "approve"
+  | "activate"
+  | "deprecate"
+  | "retire"
+  | "return_to_draft"
+  | "lifecycle_update";
 
 export type DeploymentProfileId =
   | "development"
@@ -125,6 +137,7 @@ export type PrivateModelRecord = {
   providerHint: string | null;
   architecture: string;
   notes: string;
+  reviewReason: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -139,8 +152,26 @@ export type PrivateAiPermission = {
   notes: string;
 };
 
+export type PrivateAiAuditTrailEntry = {
+  id: string;
+  actorId: string | null;
+  actorRole: string | null;
+  timestamp: string;
+  action: PrivateAiWorkflowAction | string;
+  reason: string | null;
+  previousState: PrivateAiLifecycle | null;
+  newState: PrivateAiLifecycle | null;
+  modelId: string | null;
+  detail: Record<string, unknown>;
+};
+
+export type PrivateAiReadinessResult = {
+  ready: boolean;
+  blockers: string[];
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 1;
+  schemaVersion: 2;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -148,4 +179,5 @@ export type PersistedPrivateAiState = {
   deploymentProfiles: DeploymentProfile[];
   routingContracts: RoutingContract[];
   permissions: PrivateAiPermission[];
+  auditTrail: PrivateAiAuditTrailEntry[];
 };

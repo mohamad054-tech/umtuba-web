@@ -29,7 +29,7 @@ export default function PrivateAiShell({
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
         <AppTopNav
           title={title}
-          subtitle={subtitle ?? "Private AI Foundation"}
+          subtitle={subtitle ?? "Private AI Workflow & Lifecycle"}
         />
         <nav
           aria-label="Private AI"
@@ -64,8 +64,8 @@ export default function PrivateAiShell({
           ))}
         </nav>
         <p className="mt-3 text-xs text-amber-200/80">
-          Read-only architecture — private AI registry and contracts only. No
-          training, fine-tuning, inference, or model weights.
+          Workflow-managed registry — admin lifecycle + readiness gate + audit
+          trail. No training, fine-tuning, inference, or model weights.
         </p>
         <div className="mt-6">{children}</div>
       </div>
