@@ -341,17 +341,19 @@ describe("capability compatibility via foundation selection", () => {
 });
 
 describe("createProviderFoundation seeding", () => {
-  it("seeds stub + openai + disabled future placeholders", () => {
+  it("seeds stub + openai + gemini catalog + disabled future placeholders", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "stub",
         allowStub: true,
         openaiApiKey: null,
+        geminiApiKey: null,
       })
     );
     expect(f.getProvider("stub")?.enabled).toBe(true);
     expect(f.getProvider("openai")).toBeTruthy();
-    expect(f.getProvider("gemini")?.enabled).toBe(false);
+    expect(f.getProvider("gemini")?.enabled).toBe(true);
+    expect(f.getProvider("gemini")?.available).toBe(false);
     expect(f.getProvider("anthropic")?.enabled).toBe(false);
     expect(f.getProvider("local")?.enabled).toBe(false);
     expect(f.getAdapter("gemini")).toBeNull();
@@ -359,13 +361,40 @@ describe("createProviderFoundation seeding", () => {
     expect(f.getAdapter("local")).toBeNull();
   });
 
-  it("does not expose disabled placeholders as executable routes", () => {
+  it("does not expose unconfigured gemini as executable routes", () => {
     const f = createProviderFoundation(
-      loadAiPlatformConfig({ mode: "stub", allowStub: true, openaiApiKey: null })
+      loadAiPlatformConfig({
+        mode: "stub",
+        allowStub: true,
+        openaiApiKey: null,
+        geminiApiKey: null,
+      })
     );
     const route = f.resolveRoute(baseRoute);
     expect(["stub", "openai"]).toContain(route.providerId);
     expect(route.providerId).not.toBe("gemini");
+  });
+
+  it("registers gemini adapter when GEMINI_API_KEY is configured", () => {
+    const f = createProviderFoundation(
+      loadAiPlatformConfig({
+        mode: "live",
+        allowStub: false,
+        openaiApiKey: null,
+        geminiApiKey: "test-gemini-key",
+        geminiDefaultModel: "gemini-2.5-flash",
+      })
+    );
+    expect(f.getProvider("gemini")?.available).toBe(true);
+    expect(f.getAdapter("gemini")?.providerId).toBe("gemini");
+    const route = f.resolveRoute({
+      ...baseRoute,
+      preferredProviderId: "gemini",
+      preferredModelId: "gemini-2.5-flash",
+      allowFallback: false,
+    });
+    expect(route.providerId).toBe("gemini");
+    expect(route.modelId).toBe("gemini-2.5-flash");
   });
 });
 

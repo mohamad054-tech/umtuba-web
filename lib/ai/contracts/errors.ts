@@ -34,7 +34,7 @@ export function sanitizeAiErrorMessage(
   return raw;
 }
 
-export function failResult(
+export function failResult<T = never>(
   code: AiErrorCode,
   message: string
 ): { ok: false; code: AiErrorCode; message: string } {

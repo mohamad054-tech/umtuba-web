@@ -43,8 +43,10 @@ export type AiProviderDefinition = {
 
 export function buildProviderRegistry(input: {
   openaiConfigured: boolean;
+  geminiConfigured: boolean;
   stubEligible: boolean;
   openaiDefaultModel: string;
+  geminiDefaultModel: string;
   defaultTimeoutMs: number;
 }): AiProviderDefinition[] {
   const providers: AiProviderDefinition[] = [];
@@ -119,6 +121,54 @@ export function buildProviderRegistry(input: {
         costClass: "premium",
         inputCostPer1M: 2.5,
         outputCostPer1M: 10,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: false,
+        latencyClass: "standard",
+      },
+    ],
+  });
+
+  providers.push({
+    providerId: "gemini",
+    displayName: "Google Gemini",
+    available: input.geminiConfigured,
+    models: [
+      {
+        providerId: "gemini",
+        modelId: input.geminiDefaultModel,
+        displayName: input.geminiDefaultModel,
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text"],
+        outputModalities: ["text"],
+        contextLimitTokens: 128_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: input.geminiConfigured,
+        costClass: "economy",
+        inputCostPer1M: 0.1,
+        outputCostPer1M: 0.4,
+        dataHandlingMax: "confidential",
+        defaultTimeoutMs: input.defaultTimeoutMs,
+        fallbackEligible: true,
+        latencyClass: "standard",
+      },
+      {
+        providerId: "gemini",
+        modelId: "gemini-1.5-pro",
+        displayName: "Gemini 1.5 Pro",
+        capabilityClasses: ["chat", "structured"],
+        inputModalities: ["text", "image"],
+        outputModalities: ["text"],
+        contextLimitTokens: 1_000_000,
+        structuredOutputSupport: true,
+        toolCallSupport: false,
+        streamingSupport: false,
+        available: input.geminiConfigured,
+        costClass: "premium",
+        inputCostPer1M: 1.25,
+        outputCostPer1M: 5,
         dataHandlingMax: "confidential",
         defaultTimeoutMs: input.defaultTimeoutMs,
         fallbackEligible: false,

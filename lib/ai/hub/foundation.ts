@@ -36,7 +36,7 @@ export type LoadAiHubSnapshotInput = {
   env?: Record<string, string | undefined>;
 };
 
-function emptyDisabledSnapshot(): AiHubSnapshot {
+function emptyDisabledSnapshot(userId: string): AiHubSnapshot {
   return {
     snapshotId: randomUUID(),
     generatedAt: new Date().toISOString(),
@@ -74,7 +74,7 @@ export function loadAiHubSnapshot(
       : isAiHubEnabled(input.env ? { env: input.env } : {});
 
   if (!enabled) {
-    const snap = emptyDisabledSnapshot();
+    const snap = emptyDisabledSnapshot(input.userId);
     snap.runtimeStatus = buildAiHubRuntimeStatus({
       hubEnabled: false,
       env: input.env,

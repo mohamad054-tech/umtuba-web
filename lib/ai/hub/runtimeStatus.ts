@@ -24,6 +24,7 @@ export function buildAiHubRuntimeStatus(
     hubEnabled: input.hubEnabled,
     coreMode: status.mode,
     openaiConfigured: status.openaiConfigured,
+    geminiConfigured: status.geminiConfigured,
     stubEligible: status.stubEligible,
     assistantRuntimeFlagHint: assistantOn ? "on" : "off",
     missingConfigKeys: [...status.missing],

@@ -45,6 +45,7 @@ function sampleSnapshot(enabled: boolean): AiHubSnapshot {
       hubEnabled: enabled,
       coreMode: "stub",
       openaiConfigured: false,
+      geminiConfigured: false,
       stubEligible: true,
       assistantRuntimeFlagHint: "off",
       missingConfigKeys: [],

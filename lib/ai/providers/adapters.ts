@@ -1,6 +1,7 @@
 import type { AiUsageRecord } from "../contracts/types";
 import { AiPlatformError, sanitizeAiErrorMessage } from "../contracts/errors";
 import type { AiPlatformConfig } from "../config";
+import { createGeminiAdapter } from "./geminiAdapter";
 
 export type ProviderChatMessage = {
   role: "system" | "user" | "assistant";
@@ -154,6 +155,43 @@ export function createStubAdapter(): AiProviderAdapter {
             ],
             labeledAiGenerated: true,
             revealsAnswerKey: false,
+          };
+        } else if (input.capabilityId === "learning.tutor.give_hint") {
+          structured = {
+            hint: outside
+              ? "That focus is outside the authorized lesson material provided."
+              : `Stub scaffolding hint for ${lessonName}: revisit the first published definition, then try restating it in your own words.`,
+            hintLevel: outside ? "gentle" : "moderate",
+            focusRestated: "Learner-requested focus (stub).",
+            nextStep: "Retry the concept check without looking at a full answer.",
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: [
+              "Stub provider — not live model output.",
+              "Scaffolding only — not a graded solution.",
+            ],
+            labeledAiGenerated: true,
+            revealsAnswerKey: false,
+          };
+        } else if (input.capabilityId === "learning.tutor.explain_again") {
+          structured = {
+            title: `Explaining ${lessonName} again`,
+            simplerExplanation: outside
+              ? "That focus is outside the authorized lesson material provided."
+              : `Stub simpler re-teach of ${lessonName}: start with one plain-language idea, then connect it to the published blocks.`,
+            keyPoints: ["Plain-language core idea", "How it appears in the lesson"],
+            analogy: "Think of it like retelling a story in simpler words.",
+            checkUnderstanding: [
+              "Can you restate the main idea in one sentence?",
+              "Which published block supports that idea?",
+            ],
+            sourceReferences: commonRefs,
+            groundingStatus: outside ? "outside_material" : "grounded",
+            limitations: [
+              "Stub provider — not live model output.",
+              "Re-teach only — not an official grade or hidden solution.",
+            ],
+            labeledAiGenerated: true,
           };
         } else {
           structured = {
@@ -328,6 +366,9 @@ export function resolveProviderAdapters(
   }
   if (config.openaiApiKey) {
     map.set("openai", createOpenAiCompatibleAdapter(config));
+  }
+  if (config.geminiApiKey) {
+    map.set("gemini", createGeminiAdapter(config));
   }
   return map;
 }
