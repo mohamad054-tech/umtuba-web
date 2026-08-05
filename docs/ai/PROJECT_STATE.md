@@ -70,7 +70,7 @@ Frozen baselines (extend, do not replace):
 | Commerce Digital Entitlement Revoke on Refund V1 | **COMPLETE** (branch `office/commerce-digital-entitlement-revoke-on-refund-v1`) — migration `20260889` not remote-applied |
 | Commerce Commission Decomposition Bridge Apply V1 | **COMPLETE** (branch `office/commerce-commission-decomposition-bridge-apply-v1`) — migration `20260890` not remote-applied |
 | Commerce Commission Policy Activation V1 | **COMPLETE** (branch `office/commerce-commission-policy-activation-v1`) — migration `20260891` not remote-applied |
-| Commerce Chain Verification & Migration Apply Readiness V1 | **IMPLEMENTED locally** (branch `office/commerce-chain-migration-apply-readiness-v1`) — repository `READY_FOR_SEPARATE_REMOTE_APPLY_GO`; remote DB not inspected/applied |
+| Commerce Chain Verification & Migration Apply Readiness V1 | **IMPLEMENTED locally** (branch `office/commerce-chain-migration-apply-readiness-v1`) — repo static `READY_FOR_SEPARATE_REMOTE_APPLY_GO`; remote preflight on `tgucwnjwoyeqoxqaxmew` = **`NOT_READY_FOR_REMOTE_APPLY`** (missing `20260824`/`20260884` objects; no mutations) |
 
 Default: Consolidation complete. Program is in **implementation**. Storefront through Marketplace Eligibility/PDP + Beta Readiness landed on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 

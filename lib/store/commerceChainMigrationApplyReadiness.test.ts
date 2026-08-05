@@ -12,6 +12,8 @@ const ROOT = join(__dirname, "../..");
 const MIGRATIONS = join(ROOT, "supabase/migrations");
 const DOC =
   "docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md";
+const PREFLIGHT_DOC =
+  "docs/store/implementation/COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md";
 const SCRIPT =
   "scripts/verify-commerce-chain-migration-apply-readiness.mjs";
 
@@ -26,17 +28,22 @@ function read(rel: string) {
 }
 
 describe("Commerce chain migration apply readiness — artifacts", () => {
-  it("ships readiness doc and static verifier", () => {
+  it("ships readiness doc, remote preflight doc, and static verifier", () => {
     expect(existsSync(join(ROOT, DOC))).toBe(true);
+    expect(existsSync(join(ROOT, PREFLIGHT_DOC))).toBe(true);
     expect(existsSync(join(ROOT, SCRIPT))).toBe(true);
     const doc = read(DOC);
     expect(doc).toMatch(/READY_FOR_SEPARATE_REMOTE_APPLY_GO|NOT_READY/);
     expect(doc).toMatch(/DO NOT RUN YET/);
-    expect(doc).toMatch(/NOT INSPECTED|NOT MODIFIED/);
+    expect(doc).toMatch(/NOT MODIFIED/);
     expect(doc).toMatch(/20260889/);
     expect(doc).toMatch(/20260890/);
     expect(doc).toMatch(/20260891/);
     expect(doc).toMatch(/fded934|obsolete/i);
+    const preflight = read(PREFLIGHT_DOC);
+    expect(preflight).toMatch(/tgucwnjwoyeqoxqaxmew/);
+    expect(preflight).toMatch(/NOT_READY_FOR_REMOTE_APPLY|READY_FOR_REMOTE_APPLY_GO/);
+    expect(preflight).toMatch(/read-only|SELECT/i);
   });
 });
 

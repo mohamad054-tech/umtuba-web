@@ -2,45 +2,41 @@
 
 ## Summary
 
-**PASS** for **Commerce Chain Verification & Migration Apply Readiness V1**.
+**PASS** for remote migration **preflight execution** (read-only).
+**Remote apply gate: `NOT_READY_FOR_REMOTE_APPLY`.**
 
-Repository-level audit and readiness implementation for apply order `20260889 → 20260890 → 20260891`. Static verifier confirms: no numbering collisions on the apply chain, obsolete `20260887` commission-activation artifact absent (active `20260887` is transactional notifications), RPC names/args match TypeScript call sites, capture/refund wire-ins present, and dependency graph intact. Production readiness document + DBA checklist + GO/NO-GO gate published. Remote database **not** inspected or modified. Migrations **not** applied. Work left **uncommitted / unpushed**.
-
-**Decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human remote-apply GO still required).
+Linked project `tgucwnjwoyeqoxqaxmew` inspected with SELECT-only probes. Targets `20260889`/`20260890`/`20260891` are absent (no partial apply). Full-chain apply is blocked because remote is missing settlement foundation (`20260824`) and commission policy foundation (`20260884`) objects/RPCs. Payment-outcome objects exist without a `20260823` history row (drift). No remote mutations. No commit/push.
 
 ## Exact files changed
 
 ### Created
-- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
-- `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
-- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
+- `docs/store/implementation/COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`
+- `scripts/remote-preflight/` — SELECT-only probe SQL + README
 
 ### Modified
-- `package.json` — npm script `verify:commerce-chain-migration-apply-readiness`
-- `docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md` — remote-apply framing + readiness pointer
-- `docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md` — same
-- `docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md` — same
+- `docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md`
+- `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md` — Activation COMPLETE; readiness track added
+- `docs/ai/PROJECT_STATE.md`
 
 ## Migrations created
 
-None (readiness task; inventory is existing `20260889` / `20260890` / `20260891`).
+None. No migrations applied remotely.
 
 ## Security review
 
-- Verifier is static filesystem-only; no DB credentials, no remote inspect
-- Documents fail-closed multi-active preflight before unique index on 91
-- Confirms service_role GRANT + public/anon/authenticated REVOKE patterns for money/activation RPCs
-- No secrets exposed; no privilege widening
+- Inspection used linked CLI + SELECT only
+- No secrets printed or read from `.env`
+- Existing money RPCs remain service_role-execute (spot-checked)
+- No privilege changes performed
 
 ## Tests
 
 - `node scripts/verify-commerce-chain-migration-apply-readiness.mjs` — **PASS**
-- `npm run verify:commerce-chain-migration-apply-readiness` — **PASS**
-- Focused Vitest: **65 passed** (6 files)
-  - readiness 6, foundation 13, activation 8, revoke 7, decomposition 9, refund path 22
+- `npx vitest run lib/store/commerceChainMigrationApplyReadiness.test.ts` — **6 passed**
+- `npx tsc --noEmit` — **PASS**
+- `git diff --check` — **PASS**
 
 ## TypeScript
 
@@ -48,7 +44,7 @@ None (readiness task; inventory is existing `20260889` / `20260890` / `20260891`
 
 ## Build
 
-Not required (docs + static script; no app UI/entry-point change).
+Not required.
 
 ## git diff --check
 
@@ -57,24 +53,22 @@ Not required (docs + static script; no app UI/entry-point change).
 ## git status --short
 
 ```
-## office/commerce-chain-migration-apply-readiness-v1
+## office/commerce-chain-migration-apply-readiness-v1...origin/office/commerce-chain-migration-apply-readiness-v1
  M docs/ai/CURRENT_TASK.md
  M docs/ai/CURSOR_REPORT.md
  M docs/ai/PROJECT_STATE.md
- M docs/store/implementation/COMMISSION_DECOMPOSITION_BRIDGE_APPLY_V1.md
- M docs/store/implementation/COMMISSION_POLICY_ACTIVATION_V1.md
- M docs/store/implementation/DIGITAL_ENTITLEMENT_REVOKE_ON_REFUND_V1.md
- M package.json
-?? docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md
-?? lib/store/commerceChainMigrationApplyReadiness.test.ts
-?? scripts/verify-commerce-chain-migration-apply-readiness.mjs
+ M docs/store/implementation/COMMERCE_CHAIN_MIGRATION_APPLY_READINESS_V1.md
+ M lib/store/commerceChainMigrationApplyReadiness.test.ts
+?? docs/store/implementation/COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md
+?? scripts/remote-preflight/
 ```
 
-## Open issues
+## Open issues / blockers
 
-- Remote apply still blocked until separate human GO
-- Production multi-active commission policies (if any) must be cleaned before 91
-- Launch readiness remains laptop-owned (out of scope here)
+1. Remote missing `20260824` settlement objects
+2. Remote missing `20260884` commission foundation objects/RPCs
+3. `20260823` history drift (objects without migration row)
+4. `20260887` / `20260888` also absent remotely (product chain)
 
 ---
 
@@ -82,23 +76,24 @@ Not required (docs + static script; no app UI/entry-point change).
 
 | Field | Value |
 | --- | --- |
-| Verdict | **PASS** |
+| Verdict | **PASS** (preflight completed) · apply gate **`NOT_READY_FOR_REMOTE_APPLY`** |
 | Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-chain-migration-apply-readiness-v1` |
 | Branch | `office/commerce-chain-migration-apply-readiness-v1` |
-| Base | `origin/office/commerce-commission-policy-activation-v1` = `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` |
-| HEAD | `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` (+ uncommitted readiness work) |
-| Migration inventory | Prerequisites: 23, 24, 77, 84, 87 (notifications), 88. Apply slice: **89 → 90 → 91** |
-| Dependency verification | **PASS** (static script + tests) |
-| Obsolete migration verification | **PASS** — obsolete `20260887_store_commission_policy_activation_v1.sql` absent; activate RPC only in 91 |
-| Documentation updates | CURRENT_TASK, CURSOR_REPORT, PROJECT_STATE, readiness doc, revoke/decomp/activation impl docs |
-| Files modified | 7 modified + 3 created (see above) |
-| Tests executed | Verifier PASS; Vitest 65/65; tsc PASS; git diff --check PASS |
-| Decision | **`READY_FOR_SEPARATE_REMOTE_APPLY_GO`** |
+| Base | `be87fb30c2c7ba15d66f8540e5e6c57e181649f6` (activation tip / merge-base) |
+| HEAD | `6875847eddc1e832b542135babce50eb036bd4ca` (+ uncommitted preflight docs) |
+| Linked project | **`tgucwnjwoyeqoxqaxmew`** confirmed |
+| Migration inventory | Remote Store tip `20260880`; targets 89/90/91 **absent**; prereqs 24/84 **absent** |
+| Dependency verification | Repo static PASS; remote FAIL (24 + 84) |
+| Obsolete migration verification | Repo PASS; remote activate RPC count **0** |
+| Documentation updates | Preflight doc + readiness/AI handoff |
+| Files modified | 5 modified + preflight doc + `scripts/remote-preflight/` |
+| Tests executed | Verifier PASS; Vitest 6/6; tsc PASS; git diff --check PASS |
+| Decision | **`NOT_READY_FOR_REMOTE_APPLY`** |
 
 ### Confirmations
 
 - no commit
 - no push
-- no remote database inspection
+- no remote mutation
 - no migration applied
-- remote DB status: NOT INSPECTED / NOT MODIFIED
+- remote inspection: read-only SELECT / migration list only

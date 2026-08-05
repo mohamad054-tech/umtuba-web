@@ -1,12 +1,13 @@
 # Commerce Chain Verification & Migration Apply Readiness V1
 
-Capability: `commerce.ops.chain_migration_apply_readiness_v1`  
-Branch: `office/commerce-chain-migration-apply-readiness-v1`  
-HEAD (authoritative base): `be87fb30c2c7ba15d66f8540e5e6c57e181649f6`  
+Capability: `commerce.ops.chain_migration_apply_readiness_v1`
+Branch: `office/commerce-chain-migration-apply-readiness-v1`
+HEAD (authoritative base): `be87fb30c2c7ba15d66f8540e5e6c57e181649f6`
 (`origin/office/commerce-commission-policy-activation-v1`)
 
-**Remote database status: NOT INSPECTED / NOT MODIFIED**  
-**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (human GO still required)
+**Remote database status: INSPECTED (read-only) / NOT MODIFIED**
+**Repository static decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (SQL/TS inventory intact)
+**Remote preflight decision: `NOT_READY_FOR_REMOTE_APPLY`** — see `COMMERCE_CHAIN_REMOTE_MIGRATION_PREFLIGHT_V1.md`
 
 This document is desktop-owned migration apply readiness. It does **not** duplicate laptop-owned Commerce launch readiness.
 
@@ -24,7 +25,7 @@ This document is desktop-owned migration apply readiness. It does **not** duplic
 | 6 | Commission Decomposition Bridge Apply V1 | `7d90a05` |
 | 7 | Commission Policy Activation V1 | `8b6caa0` (+ history reconcile merge `be87fb3`) |
 
-Static verifier: `scripts/verify-commerce-chain-migration-apply-readiness.mjs`  
+Static verifier: `scripts/verify-commerce-chain-migration-apply-readiness.mjs`
 Focused tests: `lib/store/commerceChainMigrationApplyReadiness.test.ts`
 
 ---
@@ -287,15 +288,15 @@ No large backfills in 89/90/91.
 
 ## 11. DBA checklist (summary)
 
-- [ ] Backup / PITR confirmed  
-- [ ] Prerequisites present  
-- [ ] Multi-active commission preflight clean  
-- [ ] Apply 89 → verify  
-- [ ] Apply 90 → verify  
-- [ ] Apply 91 → verify  
-- [ ] App release aligned  
-- [ ] Smoke capture + refund  
-- [ ] Record applied versions in ops log  
+- [ ] Backup / PITR confirmed
+- [ ] Prerequisites present
+- [ ] Multi-active commission preflight clean
+- [ ] Apply 89 → verify
+- [ ] Apply 90 → verify
+- [ ] Apply 91 → verify
+- [ ] App release aligned
+- [ ] Smoke capture + refund
+- [ ] Record applied versions in ops log
 
 ---
 
@@ -304,10 +305,16 @@ No large backfills in 89/90/91.
 | Layer | Status |
 | --- | --- |
 | Repository static readiness | **PASS** |
-| Remote database | **NOT INSPECTED / NOT MODIFIED** |
+| Remote database | **INSPECTED (read-only) / NOT MODIFIED** — project `tgucwnjwoyeqoxqaxmew` |
+| Remote preflight (full 89→90→91) | **`NOT_READY_FOR_REMOTE_APPLY`** |
 | Remote migration apply | **NOT PERFORMED** |
-| Human remote-apply GO | **REQUIRED (separate instruction)** |
+| Human remote-apply GO | **BLOCKED** until prerequisites applied |
 
-**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`**
+**Repository decision: `READY_FOR_SEPARATE_REMOTE_APPLY_GO`** (static only)
+**Remote decision: `NOT_READY_FOR_REMOTE_APPLY`**
 
-Remote apply remains blocked until an explicit human GO that authorizes database mutation.
+Primary remote blockers (detail in preflight doc):
+
+1. `20260824` settlement foundation objects missing
+2. `20260884` commission policy foundation objects/RPCs missing
+3. `20260823` history drift (objects present, migration row absent)
