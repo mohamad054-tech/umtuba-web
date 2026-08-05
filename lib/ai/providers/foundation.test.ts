@@ -352,20 +352,22 @@ describe("capability compatibility via foundation selection", () => {
 });
 
 describe("createProviderFoundation seeding", () => {
-  it("seeds stub + openai + gemini slot + disabled future placeholders", () => {
+  it("seeds stub + openai + gemini + anthropic catalog + disabled local placeholder", () => {
     const f = createProviderFoundation(
       loadAiPlatformConfig({
         mode: "stub",
         allowStub: true,
         openaiApiKey: null,
         geminiApiKey: null,
+        anthropicApiKey: null,
       })
     );
     expect(f.getProvider("stub")?.enabled).toBe(true);
     expect(f.getProvider("openai")).toBeTruthy();
     expect(f.getProvider("gemini")?.enabled).toBe(true);
     expect(f.getProvider("gemini")?.available).toBe(false);
-    expect(f.getProvider("anthropic")?.enabled).toBe(false);
+    expect(f.getProvider("anthropic")?.enabled).toBe(true);
+    expect(f.getProvider("anthropic")?.available).toBe(false);
     expect(f.getProvider("local")?.enabled).toBe(false);
     expect(f.getAdapter("gemini")).toBeNull();
     expect(f.getAdapter("anthropic")).toBeNull();
@@ -379,11 +381,13 @@ describe("createProviderFoundation seeding", () => {
         allowStub: true,
         openaiApiKey: null,
         geminiApiKey: null,
+        anthropicApiKey: null,
       })
     );
     const route = f.resolveRoute(baseRoute);
     expect(["stub", "openai"]).toContain(route.providerId);
     expect(route.providerId).not.toBe("gemini");
+    expect(route.providerId).not.toBe("anthropic");
   });
 
   it("loads gemini provider + adapter when GEMINI_API_KEY is configured", () => {
@@ -393,6 +397,7 @@ describe("createProviderFoundation seeding", () => {
         allowStub: false,
         openaiApiKey: null,
         geminiApiKey: "test-gemini-key-not-real",
+        anthropicApiKey: null,
         geminiDefaultModel: "gemini-2.5-flash",
       })
     );
@@ -420,6 +425,29 @@ describe("createProviderFoundation seeding", () => {
       f.requireEnabledModel("gemini", "gemini-2.5-flash")
     ).toThrow(AiPlatformError);
     expect(() => f.requireAdapter("gemini")).toThrow(/no executable adapter|not registered/i);
+  });
+
+  it("registers anthropic adapter when ANTHROPIC_API_KEY is configured", () => {
+    const f = createProviderFoundation(
+      loadAiPlatformConfig({
+        mode: "live",
+        allowStub: false,
+        openaiApiKey: null,
+        geminiApiKey: null,
+        anthropicApiKey: "test-anthropic-key",
+        anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      })
+    );
+    expect(f.getProvider("anthropic")?.available).toBe(true);
+    expect(f.getAdapter("anthropic")?.providerId).toBe("anthropic");
+    const route = f.resolveRoute({
+      ...baseRoute,
+      preferredProviderId: "anthropic",
+      preferredModelId: "claude-haiku-4-5-20251001",
+      allowFallback: false,
+    });
+    expect(route.providerId).toBe("anthropic");
+    expect(route.modelId).toBe("claude-haiku-4-5-20251001");
   });
 });
 

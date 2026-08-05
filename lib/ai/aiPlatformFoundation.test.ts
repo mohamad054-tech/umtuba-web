@@ -86,8 +86,11 @@ describe("provider/model registry", () => {
     const providers = buildProviderRegistry({
       openaiConfigured: true,
       geminiConfigured: false,
+      anthropicConfigured: false,
       stubEligible: true,
       openaiDefaultModel: "gpt-4o-mini",
+      geminiDefaultModel: "gemini-2.5-flash",
+      anthropicDefaultModel: "claude-haiku-4-5-20251001",
       defaultTimeoutMs: 1000,
     });
     expect(providers.some((p) => p.providerId === "stub")).toBe(true);
@@ -104,8 +107,11 @@ describe("provider/model registry", () => {
     const providers = buildProviderRegistry({
       openaiConfigured: false,
       geminiConfigured: false,
+      anthropicConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
+      geminiDefaultModel: "gemini-2.5-flash",
+      anthropicDefaultModel: "claude-haiku-4-5-20251001",
       defaultTimeoutMs: 1000,
     });
     expect(listAvailableModels(providers)).toHaveLength(0);
@@ -115,9 +121,11 @@ describe("provider/model registry", () => {
     const providers = buildProviderRegistry({
       openaiConfigured: false,
       geminiConfigured: true,
+      anthropicConfigured: false,
       stubEligible: false,
       openaiDefaultModel: "gpt-4o-mini",
       geminiDefaultModel: "gemini-2.5-flash",
+      anthropicDefaultModel: "claude-haiku-4-5-20251001",
       defaultTimeoutMs: 1000,
     });
     expect(providers.some((p) => p.providerId === "gemini" && p.available)).toBe(
@@ -127,13 +135,36 @@ describe("provider/model registry", () => {
       listAvailableModels(providers).some((m) => m.modelId === "gemini-2.5-flash")
     ).toBe(true);
   });
+
+  it("lists anthropic models when configured", () => {
+    const providers = buildProviderRegistry({
+      openaiConfigured: false,
+      geminiConfigured: false,
+      anthropicConfigured: true,
+      stubEligible: false,
+      openaiDefaultModel: "gpt-4o-mini",
+      geminiDefaultModel: "gemini-2.5-flash",
+      anthropicDefaultModel: "claude-haiku-4-5-20251001",
+      defaultTimeoutMs: 1000,
+    });
+    expect(
+      providers.some((p) => p.providerId === "anthropic" && p.available)
+    ).toBe(true);
+    expect(
+      listAvailableModels(providers).every((m) => m.providerId === "anthropic")
+    ).toBe(true);
+  });
 });
 
 describe("deterministic routing", () => {
   const providers = buildProviderRegistry({
     openaiConfigured: true,
+    geminiConfigured: false,
+    anthropicConfigured: false,
     stubEligible: true,
     openaiDefaultModel: "gpt-4o-mini",
+    geminiDefaultModel: "gemini-2.5-flash",
+    anthropicDefaultModel: "claude-haiku-4-5-20251001",
     defaultTimeoutMs: 1000,
   });
 
