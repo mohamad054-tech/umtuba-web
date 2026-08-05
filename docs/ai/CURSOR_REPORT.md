@@ -2,72 +2,59 @@
 
 ## Summary
 
-**PASS** — Seller Live Payout Provider V1 **Slice S1 only** (gate + types + provider port).
+**PASS** — Seller Live Payout Provider V1 **Slice S2 only** (local migration `20260896` + contract tests).
 
-Live gate remains **OFF by default**. No migrations, UI, server actions, Manual Ops adapter, or foundation SQL changes.
+Not committed. Not pushed. Not remote-applied. S3 not started.
 
 ## Exact files changed
 
 | Path | Action |
 | --- | --- |
-| `lib/store/sellerLivePayout/types.ts` | created |
-| `lib/store/sellerLivePayout/gate.ts` | created |
-| `lib/store/sellerLivePayout/providerPort.ts` | created |
-| `lib/store/sellerLivePayout/index.ts` | created |
-| `lib/store/sellerLivePayout/gate.test.ts` | created |
-| `.env.example` | modified (placeholder env names only) |
+| `supabase/migrations/20260896_store_seller_live_payout_provider_v1.sql` | created |
+| `lib/store/sellerLivePayout/sellerLivePayout.migration.test.ts` | created |
 | `docs/ai/CURRENT_TASK.md` | modified |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
 ## Migrations created
 
-**None** (S2 not started).
+`20260896_store_seller_live_payout_provider_v1.sql` (local only)
 
 ## Security review
 
-- No secrets committed; ACK value is a public constant string (same pattern as Stripe payment gate).
-- Gate fail-closed: empty env ⇒ `live_flag_disabled`.
-- `stripe_connect` / wise / paypal ids forbidden via `assertSellerLivePayoutProviderAllowed`.
-- `resolveSellerLivePayoutProviderPort` returns `null` in S1 (no concrete provider).
-- `.env.example` documents names/placeholders only; live flag documented as `false`.
+- FORCE RLS; revoke all on new tables from `public/anon/authenticated`
+- Seller RPCs: owner/manager only; cannot self-verify destinations
+- Masked labels / refs forbid long digit runs
+- Service insert/update: `service_role` only
+- Admin attest: platform admin; returns `ueos_posted=false`, `payout_booking_called=false`
+- No secrets; no edits to `20260881/82/83`
 
 ## Tests
 
-```
-npx vitest run lib/store/sellerLivePayout/gate.test.ts
-```
-
-**PASS** — 12/12
+Vitest: migration + gate + payout foundation — **47/47 PASS**
 
 ## TypeScript
 
-```
-npx tsc --noEmit
-```
-
-**PASS** (exit 0)
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-Not required for S1 (no app UI/entry change beyond `.env.example` comments).
+Not required (no UI/entry).
 
 ## git diff --check
 
-**PASS** (no whitespace errors)
+**PASS**
 
 ## git status --short
 
 ```
- M .env.example
  M docs/ai/CURRENT_TASK.md
  M docs/ai/CURSOR_REPORT.md
-?? lib/store/sellerLivePayout/
+?? lib/store/sellerLivePayout/sellerLivePayout.migration.test.ts
+?? supabase/migrations/20260896_store_seller_live_payout_provider_v1.sql
 ```
-
-Branch: `office/commerce-seller-live-payout-provider-v1` @ base `e4d9a8d` (uncommitted S1 work)
 
 ## Open issues
 
-- S2+ not started (migration, Manual Ops, orchestrator, UI).
-- No commit/push (not requested).
-- Remote apply of `20260881–83` remains a later prerequisite, not S1.
+- S3+ not started
+- Remote apply of `20260881–83` / `20260896` deferred (explicit GO)
+- No commit/push requested for S2
