@@ -2,34 +2,30 @@
 
 ## Milestone
 
-Commerce Final Handoff Documentation + Push V1 — **checkpoint persisted**.
+Seller Live Payout Provider V1 — **Slice S1 only** (gate + types + provider port)
 
-## Active branch / worktree
+## Status
 
-- Branch: `office/commerce-sot-unification-stock-drift-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-sot-unification-stock-drift-v1`
-- Base implementation HEAD (before this docs commit): `91e90e456971f498b7b8f9382dda9b609da7ef3d`
-- Desktop is the sole active Commerce workstation. Laptop Commerce work is stopped (laptop → Learning).
+`s1-complete` — gate/types/port + tests PASS; not committed
 
-## Done (Commerce checkpoint 2026-08-02)
+## Branch / worktree
 
-- Money + inventory SoT unified (20 inventory commits; 29 focused files / 276 tests PASS; `tsc --noEmit` PASS; secret scan CLEAN)
-- Remote project `umtuba` / `tgucwnjwoyeqoxqaxmew` — Wave A remainder, money chain, stock runtimes applied
-- Active commission policy: `umtuba_launch_usd_v1` v1 · USD · 15%/85% · merchandise_net
-- `commerce_confirm_enabled = 0`; Stripe live env not configured; payout rails mock/manual
+- Branch: `office/commerce-seller-live-payout-provider-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
+- Base SoT tip: `e4d9a8d3ca89a3c41f8a9c3be727a7f8a62ccbaf`
 
-Canonical state: `docs/store/operations/COMMERCE_CURRENT_STATE_2026-08-02.md`
+## S1 scope (this GO)
 
-## Exact next Commerce step
+- Live payout production gate (default OFF)
+- Shared types
+- Provider port + contracts (no Manual Ops adapter yet)
+- `.env.example` placeholder names only
+- Unit tests
 
-1. Provision Stripe production environment externally (HTTPS URL, mode, live keys, webhook, live flag, production ACK).
-2. Re-run Stripe Production Gate Readiness Audit → require `READY_FOR_STRIPE_LIVE_TEST`.
-3. Controlled Stripe E2E drill.
-4. Only after full PASS, consider controlled `commerce_confirm` enable (separate GO).
+## Explicit non-actions
 
-## Stop conditions
+No S2 migration · no UI · no server actions · no payout foundation SQL edits · no Manual Ops provider · no commit/push unless asked · no remote apply
 
-- Do not enable `commerce_confirm` before Stripe E2E PASS.
-- Do not place secrets in Git or print Stripe keys.
-- Do not seed another commission policy without an explicit commercial GO.
-- Do not resume Commerce work on the laptop.
+## Next (not this GO)
+
+Slice S2 — destinations/executions migration `20260896`

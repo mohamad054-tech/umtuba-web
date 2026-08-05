@@ -2,29 +2,72 @@
 
 ## Summary
 
-**PASS** — Commerce Final Handoff Documentation + Push V1.
+**PASS** — Seller Live Payout Provider V1 **Slice S1 only** (gate + types + provider port).
 
-Authoritative tip before this docs commit: `91e90e456971f498b7b8f9382dda9b609da7ef3d` on `office/commerce-sot-unification-stock-drift-v1`.
+Live gate remains **OFF by default**. No migrations, UI, server actions, Manual Ops adapter, or foundation SQL changes.
 
-### Checkpoint recorded
+## Exact files changed
 
-| Area | Result |
+| Path | Action |
 | --- | --- |
-| SoT unification | Money + inventory unified; 20 inventory commits; 276 tests / tsc / secret scan PASS |
-| Remote project | `umtuba` / `tgucwnjwoyeqoxqaxmew` |
-| Remote migrations | `22/23/24/77/84–95` verified present (incl. Wave A 85–88, money 89–91, stock 92–95) |
-| Commission | `umtuba_launch_usd_v1` v1 active · USD 15%/85% · merchandise_net |
-| Safety | `commerce_confirm_enabled = 0`; Stripe live env not configured; payouts mock |
-| Docs | `COMMERCE_CURRENT_STATE_2026-08-02.md` + AI handoff quartet updated |
+| `lib/store/sellerLivePayout/types.ts` | created |
+| `lib/store/sellerLivePayout/gate.ts` | created |
+| `lib/store/sellerLivePayout/providerPort.ts` | created |
+| `lib/store/sellerLivePayout/index.ts` | created |
+| `lib/store/sellerLivePayout/gate.test.ts` | created |
+| `.env.example` | modified (placeholder env names only) |
+| `docs/ai/CURRENT_TASK.md` | modified |
+| `docs/ai/CURSOR_REPORT.md` | this report |
 
-### Exact next Commerce step
+## Migrations created
 
-External Stripe production env provisioning → Stripe Production Gate Readiness Audit → require `READY_FOR_STRIPE_LIVE_TEST` → controlled Stripe E2E → only then consider `commerce_confirm` enable.
+**None** (S2 not started).
 
-### Stop conditions
+## Security review
 
-No confirm before Stripe E2E PASS; no secrets in Git; no Stripe key printing; no extra commission seed without GO; no laptop Commerce resume.
+- No secrets committed; ACK value is a public constant string (same pattern as Stripe payment gate).
+- Gate fail-closed: empty env ⇒ `live_flag_disabled`.
+- `stripe_connect` / wise / paypal ids forbidden via `assertSellerLivePayoutProviderAllowed`.
+- `resolveSellerLivePayoutProviderPort` returns `null` in S1 (no concrete provider).
+- `.env.example` documents names/placeholders only; live flag documented as `false`.
 
-### This GO scope
+## Tests
 
-Documentation only. No implementation, migration, or Supabase mutation.
+```
+npx vitest run lib/store/sellerLivePayout/gate.test.ts
+```
+
+**PASS** — 12/12
+
+## TypeScript
+
+```
+npx tsc --noEmit
+```
+
+**PASS** (exit 0)
+
+## Build
+
+Not required for S1 (no app UI/entry change beyond `.env.example` comments).
+
+## git diff --check
+
+**PASS** (no whitespace errors)
+
+## git status --short
+
+```
+ M .env.example
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+?? lib/store/sellerLivePayout/
+```
+
+Branch: `office/commerce-seller-live-payout-provider-v1` @ base `e4d9a8d` (uncommitted S1 work)
+
+## Open issues
+
+- S2+ not started (migration, Manual Ops, orchestrator, UI).
+- No commit/push (not requested).
+- Remote apply of `20260881–83` remains a later prerequisite, not S1.
