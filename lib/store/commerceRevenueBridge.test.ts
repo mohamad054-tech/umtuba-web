@@ -11,10 +11,16 @@ import {
   planCommerceRevenueBridgePosting,
   rejectClientBridgeMoneyFields,
   resolveCommerceFinancialEligibility,
+  resolveCommerceLivePayoutsEnabled,
   type CommerceOrderMoneySnapshot,
 } from "./commerceRevenueBridge";
 import { STORE_PAYMENT_SYNC_RPC } from "./paymentOutcomeSync";
 import { STORE_SETTLEMENT_RPC } from "./settlementFoundation";
+import {
+  SELLER_LIVE_PAYOUT_NON_PRODUCTION_FIXTURE_TOKEN,
+  SELLER_LIVE_PAYOUT_PRODUCTION_GATE_ACK_VALUE,
+  SELLER_LIVE_PAYOUT_V1_PROVIDER_ID,
+} from "./sellerLivePayout";
 
 const ORDER_ID = "11111111-1111-4111-8111-111111111111";
 const STORE_ID = "22222222-2222-4222-8222-222222222222";
@@ -408,6 +414,35 @@ describe("commerce revenue bridge — seller / admin visibility", () => {
     expect(vis.payoutsEnabled).toBe(false);
     expect(vis.withheldUnsupportedValues).toContain("available_payout");
     expect(vis.summaryLines.join(" ")).toMatch(/fail closed/i);
+  });
+
+  it("payoutsEnabled remains false by default and true only when live path ready", () => {
+    const off = buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: true,
+    });
+    expect(off.payoutsEnabled).toBe(false);
+    expect(off.summaryLines.join(" ")).toMatch(/payoutsEnabled=false/);
+
+    const on = buildSellerRevenueBridgeVisibility({
+      hasPaidOrdersInWindow: true,
+      livePayoutsEnabled: true,
+    });
+    expect(on.payoutsEnabled).toBe(true);
+    expect(on.summaryLines.join(" ")).toMatch(/payoutsEnabled=true/);
+
+    expect(resolveCommerceLivePayoutsEnabled({})).toBe(false);
+    expect(
+      resolveCommerceLivePayoutsEnabled({
+        NODE_ENV: "production",
+        VERCEL_ENV: "production",
+        SELLER_LIVE_PAYOUTS_ENABLED: "true",
+        SELLER_LIVE_PAYOUT_PRODUCTION_GATE_ACK:
+          SELLER_LIVE_PAYOUT_PRODUCTION_GATE_ACK_VALUE,
+        SELLER_LIVE_PAYOUT_PROVIDER: SELLER_LIVE_PAYOUT_V1_PROVIDER_ID,
+        SELLER_LIVE_PAYOUT_ALLOW_IN_NON_PRODUCTION:
+          SELLER_LIVE_PAYOUT_NON_PRODUCTION_FIXTURE_TOKEN,
+      })
+    ).toBe(true);
   });
 
   it("exposes bounded admin bridge status without secrets", () => {

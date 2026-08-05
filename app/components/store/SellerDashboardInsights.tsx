@@ -672,7 +672,10 @@ export default function SellerDashboardInsightsView(props: Props) {
       </section>
 
       {payoutEligibility ? (
-        <SellerPayoutEligibility surface={payoutEligibility} />
+        <SellerPayoutEligibility
+          surface={payoutEligibility}
+          canManagePayouts={canManage}
+        />
       ) : null}
 
       {payoutHistory ? (

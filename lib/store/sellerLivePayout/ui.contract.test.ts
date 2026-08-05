@@ -280,3 +280,82 @@ describe("S6 admin actions remain the only mutation boundary", () => {
     expect(admin).toMatch(/adminListLivePayoutExecutionsAction/);
   });
 });
+
+const SELLER_PAGE = "app/seller/store/page.tsx";
+const SELLER_ELIG = "app/components/store/SellerPayoutEligibility.tsx";
+const SELLER_DEST = "app/components/store/SellerPayoutDestinationForm.tsx";
+const SELLER_REQ = "app/components/store/SellerPayoutRequestButton.tsx";
+const SELLER_ACTIONS = "app/actions/storeSellerLivePayout.ts";
+
+describe("S7 seller live payout UI contracts", () => {
+  it("owner/manager wiring loads destinations and live gate context", () => {
+    const page = read(SELLER_PAGE);
+    expect(page).toMatch(/listMyStorePayoutDestinations/);
+    expect(page).toMatch(/buildSellerLivePayoutGateReadinessReport/);
+    expect(page).toMatch(/canManageStoreSettings/);
+    expect(page).toMatch(/live:\s*liveContext/);
+  });
+
+  it("unauthorized store role does not receive payout controls without canManage", () => {
+    const insights = read("app/components/store/SellerDashboardInsights.tsx");
+    const elig = read(SELLER_ELIG);
+    expect(insights).toMatch(/canManagePayouts=\{canManage\}/);
+    expect(elig).toMatch(/canManagePayouts/);
+    expect(elig).toMatch(/data-seller-payout-controls="hidden-role"/);
+  });
+
+  it("seller cannot self-verify destination and unsafe money fields are absent", () => {
+    const dest = read(SELLER_DEST);
+    const req = read(SELLER_REQ);
+    expect(dest).toMatch(/upsertSellerPayoutDestinationAction/);
+    expect(dest).toMatch(/cannot self-verify/i);
+    expect(dest).not.toMatch(/data-destination-field="verification/);
+    expect(dest + req).not.toMatch(/amountMinor|settlement_amount|commission/);
+    expect(req).toMatch(/requestSellerLivePayoutAction/);
+    expect(req).not.toMatch(/expectedCurrency/);
+  });
+
+  it("seller UI never calls DB/UEOS/booking/orchestrator directly", () => {
+    const combined = [
+      read(SELLER_ELIG),
+      read(SELLER_DEST),
+      read(SELLER_REQ),
+    ].join("\n");
+    expect(combined).not.toMatch(/createClient|@supabase/);
+    expect(combined).not.toMatch(/\.from\(|\.rpc\(/);
+    expect(combined).not.toMatch(/orchestrateSellerLivePayout/);
+    expect(combined).not.toMatch(
+      /submitPayoutBooking|failPayoutBooking|confirmPayoutBooking/
+    );
+    expect(combined).not.toMatch(/apply_store_payout_event|ueos_post|postUeos/i);
+  });
+
+  it("unsupported providers stay blocked and not selectable in seller form", () => {
+    const dest = read(SELLER_DEST);
+    expect(dest).toMatch(/SELLER_LIVE_PAYOUT_V1_PROVIDER_ID/);
+    expect(dest).toMatch(/not\s+selectable/i);
+    expect(dest).not.toMatch(/<option[^>]+stripe_connect/i);
+    expect(dest).not.toMatch(/<option[^>]+wise/i);
+    expect(dest).not.toMatch(/<option[^>]+paypal/i);
+    expect(() =>
+      assertSellerLivePayoutProviderAllowed("stripe_connect")
+    ).toThrow();
+  });
+
+  it("RTL/LTR-safe markup on seller destination and request controls", () => {
+    const dest = read(SELLER_DEST);
+    const req = read(SELLER_REQ);
+    expect(dest).toMatch(/dir="auto"/);
+    expect(dest).toMatch(/dir="ltr"/);
+    expect(req).toMatch(/dir="auto"/);
+    expect(req).toMatch(/dir="ltr"/);
+  });
+
+  it("seller action module remains the mutation boundary", () => {
+    const actions = read(SELLER_ACTIONS);
+    expect(actions).toMatch(/canManageStoreSettings/);
+    expect(actions).toMatch(/requestSellerLivePayoutAction/);
+    expect(actions).toMatch(/upsertSellerPayoutDestinationAction/);
+    expect(actions).not.toMatch(/apply_store_payout_event/);
+  });
+});

@@ -72,6 +72,12 @@ import {
   parsePayoutReconSurfaceCursor,
 } from "../../../lib/store/payoutReconciliationSurface";
 import { buildSellerPayoutEligibilitySurface } from "../../../lib/store/sellerPayoutEligibilitySurface";
+import {
+  assertSellerLivePayoutProviderAllowed,
+  buildSellerLivePayoutGateReadinessReport,
+  listMyStorePayoutDestinations,
+  SELLER_LIVE_PAYOUT_V1_PROVIDER_ID,
+} from "../../../lib/store/sellerLivePayout";
 import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
@@ -253,10 +259,64 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     typeof buildSellerPayoutEligibilitySurface
   > | null = null;
   if (canManage) {
-    const [eligibilityRes, summaryRes] = await Promise.all([
-      fetchMySellerPayoutEligibility(supabase, membership.store.id),
-      fetchMySellerPayoutSummary(supabase, membership.store.id),
-    ]);
+    const gateReport = buildSellerLivePayoutGateReadinessReport();
+    let providerEnabled = false;
+    try {
+      assertSellerLivePayoutProviderAllowed(SELLER_LIVE_PAYOUT_V1_PROVIDER_ID);
+      providerEnabled = true;
+    } catch {
+      providerEnabled = false;
+    }
+
+    const [eligibilityRes, summaryRes, destinationsRes, payoutListRes] =
+      await Promise.all([
+        fetchMySellerPayoutEligibility(supabase, membership.store.id),
+        fetchMySellerPayoutSummary(supabase, membership.store.id),
+        listMyStorePayoutDestinations(supabase, membership.store.id),
+        payoutCursorParsed.ok
+          ? fetchMySellerPayouts(supabase, {
+              storeId: membership.store.id,
+              limit: SELLER_PAYOUT_HISTORY_PAGE_SIZE,
+              beforeCreatedAt: payoutCursorParsed.cursor?.beforeCreatedAt,
+              beforeId: payoutCursorParsed.cursor?.beforeId,
+            })
+          : Promise.resolve({
+              ok: false as const,
+              message: payoutCursorParsed.message,
+            }),
+      ]);
+
+    const liveDestinations = destinationsRes.ok
+      ? destinationsRes.destinations.map((d) => ({
+          id: d.id,
+          providerId: d.providerId,
+          currency: d.currency,
+          displayLabel: d.displayLabel,
+          verificationState: d.verificationState,
+          isActive: d.isActive,
+        }))
+      : [];
+
+    const liveCaptures =
+      payoutListRes.ok
+        ? payoutListRes.data.items.map((item) => ({
+            paymentAttemptId: item.paymentAttemptId,
+            orderId: item.orderId,
+            amountMinor: item.amountMinor,
+            currency: item.currency,
+            settlementState: item.settlementState,
+            payoutStatus: String(item.payoutStatus),
+            payoutState: String(item.payoutState),
+          }))
+        : [];
+
+    const liveContext = {
+      gateReady: gateReport.ready,
+      providerEnabled,
+      destinations: liveDestinations,
+      captures: liveCaptures,
+    };
+
     if (!eligibilityRes.ok) {
       const unauthorized =
         /cannot view|not authorized|sign in required/i.test(
@@ -268,6 +328,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
         unavailable: !unauthorized,
         unauthorized,
         errorMessage: eligibilityRes.message,
+        live: liveContext,
       });
     } else if (!summaryRes.ok) {
       payoutEligibility = buildSellerPayoutEligibilitySurface({
@@ -275,12 +336,14 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
         eligibility: null,
         unavailable: true,
         errorMessage: summaryRes.message,
+        live: liveContext,
       });
     } else {
       payoutEligibility = buildSellerPayoutEligibilitySurface({
         storeId: membership.store.id,
         eligibility: eligibilityRes.data,
         summary: summaryRes.data,
+        live: liveContext,
       });
     }
 
@@ -291,32 +354,24 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
         unavailable: true,
         errorMessage: payoutCursorParsed.message,
       });
-    } else {
-      const payoutList = await fetchMySellerPayouts(supabase, {
+    } else if (!payoutListRes.ok) {
+      payoutHistory = buildSellerPayoutHistorySurface({
         storeId: membership.store.id,
-        limit: SELLER_PAYOUT_HISTORY_PAGE_SIZE,
-        beforeCreatedAt: payoutCursorParsed.cursor?.beforeCreatedAt,
-        beforeId: payoutCursorParsed.cursor?.beforeId,
+        page: null,
+        unavailable: true,
+        errorMessage: payoutListRes.message,
       });
-      if (!payoutList.ok) {
-        payoutHistory = buildSellerPayoutHistorySurface({
-          storeId: membership.store.id,
-          page: null,
-          unavailable: true,
-          errorMessage: payoutList.message,
+    } else {
+      payoutHistory = buildSellerPayoutHistorySurface({
+        storeId: membership.store.id,
+        page: payoutListRes.data,
+      });
+      if (payoutHistory.hasMore && payoutHistory.nextCursor) {
+        payoutHistoryLoadMoreHref = buildSellerPayoutHistoryLoadMoreHref({
+          basePath: APP_ROUTES.sellerStore,
+          periodKey: uiPeriod,
+          cursor: payoutHistory.nextCursor,
         });
-      } else {
-        payoutHistory = buildSellerPayoutHistorySurface({
-          storeId: membership.store.id,
-          page: payoutList.data,
-        });
-        if (payoutHistory.hasMore && payoutHistory.nextCursor) {
-          payoutHistoryLoadMoreHref = buildSellerPayoutHistoryLoadMoreHref({
-            basePath: APP_ROUTES.sellerStore,
-            periodKey: uiPeriod,
-            cursor: payoutHistory.nextCursor,
-          });
-        }
       }
     }
 

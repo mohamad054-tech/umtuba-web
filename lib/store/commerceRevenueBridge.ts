@@ -47,7 +47,27 @@ import {
   type SellerPayoutEligibility,
   type SellerPayoutSummary,
 } from "./sellerPayoutReadModel";
+import {
+  assertSellerLivePayoutProviderAllowed,
+  buildSellerLivePayoutGateReadinessReport,
+  SELLER_LIVE_PAYOUT_V1_PROVIDER_ID,
+  type SellerLivePayoutGateEnv,
+} from "./sellerLivePayout";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/** True only when live gate is ready and V1 provider is allowed. */
+export function resolveCommerceLivePayoutsEnabled(
+  env: SellerLivePayoutGateEnv = process.env
+): boolean {
+  const gate = buildSellerLivePayoutGateReadinessReport(env);
+  if (!gate.ready) return false;
+  try {
+    assertSellerLivePayoutProviderAllowed(SELLER_LIVE_PAYOUT_V1_PROVIDER_ID);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export const COMMERCE_REVENUE_BRIDGE_VERSION = 1 as const;
 export const COMMERCE_REVENUE_BRIDGE_SOURCE_DOMAIN = "commerce" as const;
@@ -275,7 +295,10 @@ export type CommerceRevenueBridgeSellerVisibility = {
   paidOrderValueRecordedHint: string;
   settlementStatus: "pending" | "not_enabled" | "decomposition_unavailable";
   settlementDecompositionUnavailable: boolean;
-  /** Bank/rail execution — remains false until rails exist. */
+  /**
+   * Live payout execution — true only when the seller live payout gate and
+   * V1 provider are ready. Defaults false.
+   */
   payoutsEnabled: boolean;
   /** True when settled payout balances are visible from trusted reads. */
   balanceVisibilityEnabled: boolean;
@@ -851,11 +874,17 @@ export function buildSellerRevenueBridgeVisibility(input?: {
   payoutEligibility?: SellerPayoutEligibility | null;
   /** True when read-model RPC failed / unavailable (fail closed on balances). */
   payoutReadUnavailable?: boolean;
+  /**
+   * Live payout path ready (gate + V1 provider). Defaults false.
+   * Never inferred from client money or client flags alone.
+   */
+  livePayoutsEnabled?: boolean;
 }): CommerceRevenueBridgeSellerVisibility {
   const hasPaid = Boolean(input?.hasPaidOrdersInWindow);
   const summary = input?.payoutSummary ?? null;
   const eligibility = input?.payoutEligibility ?? null;
   const readUnavailable = Boolean(input?.payoutReadUnavailable);
+  const payoutsEnabled = Boolean(input?.livePayoutsEnabled);
 
   const balances =
     !readUnavailable && summary
@@ -874,7 +903,9 @@ export function buildSellerRevenueBridgeVisibility(input?: {
       ? "Paid order value recorded from immutable order money snapshots."
       : "Paid order value will appear when trusted paid orders exist.",
     "Settlement decomposition unavailable — no trusted commission policy.",
-    "Bank payout rails are not enabled (payoutsEnabled=false).",
+    payoutsEnabled
+      ? "Live Manual Ops payout path is ready (payoutsEnabled=true)."
+      : "Live payout path is not enabled (payoutsEnabled=false).",
   ];
 
   if (balanceVisibilityEnabled && balances) {
@@ -915,7 +946,7 @@ export function buildSellerRevenueBridgeVisibility(input?: {
       : "No paid orders in the current window — paid order value remains zero until trusted paid snapshots exist.",
     settlementStatus: "decomposition_unavailable",
     settlementDecompositionUnavailable: true,
-    payoutsEnabled: false,
+    payoutsEnabled,
     balanceVisibilityEnabled,
     payoutBalances: balances,
     withheldUnsupportedValues: withheld,
@@ -965,6 +996,7 @@ export async function loadSellerRevenueBridgeVisibility(
     hasPaidOrdersInWindow: options?.hasPaidOrdersInWindow,
     payoutSummary: summaryRes.data,
     payoutEligibility: eligibilityRes.data,
+    livePayoutsEnabled: resolveCommerceLivePayoutsEnabled(),
   });
 }
 

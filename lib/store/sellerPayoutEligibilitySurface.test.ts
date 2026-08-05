@@ -18,6 +18,8 @@ const ROOT = process.cwd();
 const DOC =
   "docs/store/implementation/SELLER_PAYOUT_ELIGIBILITY_SURFACE_V1.md";
 const COMPONENT = "app/components/store/SellerPayoutEligibility.tsx";
+const DEST_FORM = "app/components/store/SellerPayoutDestinationForm.tsx";
+const REQUEST_BTN = "app/components/store/SellerPayoutRequestButton.tsx";
 const PAGE = "app/seller/store/page.tsx";
 const INSIGHTS = "app/components/store/SellerDashboardInsights.tsx";
 
@@ -25,11 +27,16 @@ function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
 }
 
+const STORE = "11111111-1111-4111-8111-111111111111";
+const ATTEMPT = "33333333-3333-4333-8333-333333333333";
+const ORDER = "22222222-2222-4222-8222-222222222222";
+const DEST = "66666666-6666-4666-8666-666666666666";
+
 function eligibility(
   overrides: Partial<SellerPayoutEligibility> = {}
 ): SellerPayoutEligibility {
   return {
-    storeId: "11111111-1111-4111-8111-111111111111",
+    storeId: STORE,
     eligibleForBalanceRead: true,
     hasAvailableForPayout: true,
     availableCaptureCount: 2,
@@ -46,7 +53,7 @@ function summary(
   overrides: Partial<SellerPayoutSummary> = {}
 ): SellerPayoutSummary {
   return {
-    storeId: "11111111-1111-4111-8111-111111111111",
+    storeId: STORE,
     byCurrency: [
       {
         currency: "USD",
@@ -74,12 +81,34 @@ function summary(
   };
 }
 
+const verifiedDest = {
+  id: DEST,
+  providerId: "manual_ops_live",
+  currency: "USD",
+  displayLabel: "Ops clearing •••• 42",
+  verificationState: "verified",
+  isActive: true,
+};
+
+const availableCapture = {
+  paymentAttemptId: ATTEMPT,
+  orderId: ORDER,
+  amountMinor: 1500,
+  currency: "USD",
+  settlementState: "RELEASED",
+  payoutStatus: "available",
+  payoutState: "NONE",
+};
+
 describe("Seller Payout Eligibility Surface V1 — files", () => {
   it("ships documentation and seller store wiring", () => {
     expect(existsSync(join(ROOT, DOC))).toBe(true);
     expect(existsSync(join(ROOT, COMPONENT))).toBe(true);
+    expect(existsSync(join(ROOT, DEST_FORM))).toBe(true);
+    expect(existsSync(join(ROOT, REQUEST_BTN))).toBe(true);
     expect(read(PAGE)).toMatch(/fetchMySellerPayoutEligibility/);
     expect(read(PAGE)).toMatch(/buildSellerPayoutEligibilitySurface/);
+    expect(read(PAGE)).toMatch(/listMyStorePayoutDestinations/);
     expect(read(INSIGHTS)).toMatch(/SellerPayoutEligibility/);
     expect(read(COMPONENT)).toMatch(/Payout eligibility/);
   });
@@ -88,7 +117,7 @@ describe("Seller Payout Eligibility Surface V1 — files", () => {
 describe("Seller Payout Eligibility Surface V1 — projection", () => {
   it("eligible seller state renders correctly", () => {
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility(),
       summary: summary(),
     });
@@ -99,11 +128,12 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
     expect(surface.highlights).toContain("bank_rails_disabled");
     expect(surface.bankRailsDisabled).toBe(true);
     expect(surface.payoutExecutionEnabled).toBe(false);
+    expect(surface.actionButtonsEnabled).toBe(false);
   });
 
   it("no settled payable balance state", () => {
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility({
         hasAvailableForPayout: false,
         availableCaptureCount: 0,
@@ -119,26 +149,137 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
     );
   });
 
-  it("bank rails disabled state is always honest", () => {
+  it("bank rails / live gate OFF keeps request disabled with honest messaging", () => {
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility(),
     });
     expect(surface.bankRailsDisabled).toBe(true);
     expect(surface.highlights).toContain("bank_rails_disabled");
+    expect(surface.highlights).toContain("live_payout_gate_off");
     expect(surface.actionButtonsEnabled).toBe(false);
     expect(eligibilitySurfaceHasActionButtons(surface)).toBe(false);
+    expect(surface.livePayoutBlockReason).toMatch(/disabled|incomplete/i);
 
     const inconsistent = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility({ bankPayoutsEnabled: true }),
     });
     expect(inconsistent.overallState).toBe("unavailable");
   });
 
+  it("gate ready + verified destination + eligible capture enables request", () => {
+    const surface = buildSellerPayoutEligibilitySurface({
+      storeId: STORE,
+      eligibility: eligibility(),
+      summary: summary(),
+      live: {
+        gateReady: true,
+        providerEnabled: true,
+        destinations: [verifiedDest],
+        captures: [availableCapture],
+      },
+    });
+    expect(surface.payoutExecutionEnabled).toBe(true);
+    expect(surface.hasVerifiedActiveDestination).toBe(true);
+    expect(surface.requestCandidates).toHaveLength(1);
+    expect(surface.requestPayoutAllowed).toBe(true);
+    expect(surface.actionButtonsEnabled).toBe(true);
+    expect(eligibilitySurfaceHasActionButtons(surface)).toBe(true);
+    expect(surface.highlights).toContain("live_payout_ready");
+    expect(surface.verifiedDestinationId).toBe(DEST);
+  });
+
+  it("missing verified destination blocks request", () => {
+    const pending = buildSellerPayoutEligibilitySurface({
+      storeId: STORE,
+      eligibility: eligibility(),
+      live: {
+        gateReady: true,
+        providerEnabled: true,
+        destinations: [
+          {
+            ...verifiedDest,
+            verificationState: "pending_review",
+          },
+        ],
+        captures: [availableCapture],
+      },
+    });
+    expect(pending.requestPayoutAllowed).toBe(false);
+    expect(pending.highlights).toContain("destination_unverified");
+    expect(pending.livePayoutBlockReason).toMatch(/pending review/i);
+
+    const missing = buildSellerPayoutEligibilitySurface({
+      storeId: STORE,
+      eligibility: eligibility(),
+      live: {
+        gateReady: true,
+        providerEnabled: true,
+        destinations: [],
+        captures: [availableCapture],
+      },
+    });
+    expect(missing.highlights).toContain("destination_missing");
+    expect(missing.requestPayoutAllowed).toBe(false);
+  });
+
+  it("in-transit and completed captures are not request candidates", () => {
+    const surface = buildSellerPayoutEligibilitySurface({
+      storeId: STORE,
+      eligibility: eligibility({
+        hasAvailableForPayout: false,
+        availableCaptureCount: 0,
+        inTransitCaptureCount: 1,
+      }),
+      live: {
+        gateReady: true,
+        providerEnabled: true,
+        destinations: [verifiedDest],
+        captures: [
+          {
+            ...availableCapture,
+            payoutStatus: "in_transit",
+            payoutState: "IN_TRANSIT",
+          },
+          {
+            ...availableCapture,
+            paymentAttemptId: "44444444-4444-4444-8444-444444444444",
+            payoutStatus: "completed",
+            payoutState: "COMPLETED",
+          },
+        ],
+      },
+    });
+    expect(surface.requestCandidates).toHaveLength(0);
+    expect(surface.requestPayoutAllowed).toBe(false);
+    expect(surface.highlights).toContain("payout_in_transit");
+  });
+
+  it("failed capture may return to available when read model says available", () => {
+    const surface = buildSellerPayoutEligibilitySurface({
+      storeId: STORE,
+      eligibility: eligibility(),
+      live: {
+        gateReady: true,
+        providerEnabled: true,
+        destinations: [verifiedDest],
+        captures: [
+          {
+            ...availableCapture,
+            payoutStatus: "available",
+            payoutState: "NONE",
+          },
+        ],
+      },
+    });
+    expect(surface.requestCandidates).toHaveLength(1);
+    expect(surface.requestPayoutAllowed).toBe(true);
+  });
+
   it("payout reads unavailable state", () => {
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: null,
       unavailable: true,
       errorMessage:
@@ -153,21 +294,16 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
     const foreign = eligibility({
       storeId: "99999999-9999-4999-8999-999999999999",
     });
-    expect(
-      assertEligibilityBelongsToStore(
-        foreign,
-        "11111111-1111-4111-8111-111111111111"
-      ).ok
-    ).toBe(false);
+    expect(assertEligibilityBelongsToStore(foreign, STORE).ok).toBe(false);
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: foreign,
     });
     expect(surface.overallState).toBe("unauthorized");
     expect(surface.currencyBuckets).toHaveLength(0);
 
     const auth = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: null,
       unauthorized: true,
       errorMessage: "You cannot view payouts for this store.",
@@ -184,7 +320,7 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
     expect(buckets[0].availableLabel).toMatch(/15\.00|USD|US\$/);
 
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility(),
       summary: summary(),
     });
@@ -194,7 +330,7 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
 
   it("no sensitive fields rendered", () => {
     const surface = buildSellerPayoutEligibilitySurface({
-      storeId: "11111111-1111-4111-8111-111111111111",
+      storeId: STORE,
       eligibility: eligibility({
         reasons: ["has_in_transit_payouts"],
       }),
@@ -211,14 +347,25 @@ describe("Seller Payout Eligibility Surface V1 — projection", () => {
 });
 
 describe("Seller Payout Eligibility Surface V1 — UI contracts", () => {
-  it("component has no action buttons while rails disabled", () => {
+  it("component wires destination/request only through approved actions", () => {
     const src = read(COMPONENT);
+    const dest = read(DEST_FORM);
+    const req = read(REQUEST_BTN);
     expect(src).toMatch(/Payout eligibility/);
-    expect(src).toMatch(/No withdraw or bank-connect actions/);
-    expect(src).toMatch(/role="status"/);
-    expect(src).not.toMatch(/<button/i);
+    expect(src).toMatch(/canManagePayouts/);
+    expect(src).toMatch(/SellerPayoutDestinationForm/);
+    expect(src).toMatch(/SellerPayoutRequestButton/);
+    expect(src).toMatch(/data-live-payout-disabled-message="honest"/);
     expect(src).not.toMatch(/apply_store_payout_event/);
     expect(src).not.toMatch(/ueos_journal|request_fingerprint|beneficiary/i);
+    expect(dest).toMatch(/upsertSellerPayoutDestinationAction/);
+    expect(dest).toMatch(/cannot self-verify/i);
+    expect(dest).not.toMatch(/data-destination-field="verification/);
+    expect(dest).not.toMatch(/verification_state\s*:/);
+    expect(dest).not.toMatch(/amountMinor|settlement_amount|commission/);
+    expect(req).toMatch(/requestSellerLivePayoutAction/);
+    expect(req).not.toMatch(/amountMinor|fee:|commission|settlement_amount/);
+    expect(req).not.toMatch(/orchestrateSellerLivePayout|submitPayoutBooking/);
   });
 
   it("documents capability and boundaries", () => {

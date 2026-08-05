@@ -1,7 +1,11 @@
 import type { SellerPayoutEligibilitySurfaceView } from "../../../lib/store/sellerPayoutEligibilitySurface";
+import SellerPayoutDestinationForm from "./SellerPayoutDestinationForm";
+import SellerPayoutRequestButton from "./SellerPayoutRequestButton";
 
 type Props = {
   surface: SellerPayoutEligibilitySurfaceView;
+  /** Owner/manager only — other roles must not see payout controls. */
+  canManagePayouts: boolean;
 };
 
 function highlightLabel(
@@ -18,21 +22,43 @@ function highlightLabel(
       return "Payout reads unavailable";
     case "unauthorized":
       return "Not authorized";
+    case "live_payout_gate_off":
+      return "Live payouts unavailable";
+    case "live_payout_ready":
+      return "Live payout path ready";
+    case "destination_missing":
+      return "Destination required";
+    case "destination_unverified":
+      return "Destination pending review";
+    case "payout_in_transit":
+      return "Payout in transit";
+    case "payout_completed_readonly":
+      return "Completed payout (read-only)";
     default:
       return highlight;
   }
 }
 
 /**
- * Narrow seller-facing payout eligibility. Read-only — no withdraw / bank controls.
+ * Seller-facing payout eligibility + optional live destination/request controls.
  */
-export default function SellerPayoutEligibility({ surface }: Props) {
+export default function SellerPayoutEligibility({
+  surface,
+  canManagePayouts,
+}: Props) {
+  const showLiveControls =
+    canManagePayouts && surface.overallState === "ready";
+
   return (
     <section
       className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5"
       aria-labelledby="seller-payout-eligibility-heading"
       data-capability={surface.capability}
       data-overall-state={surface.overallState}
+      data-payout-execution={
+        surface.payoutExecutionEnabled ? "enabled" : "disabled"
+      }
+      data-request-allowed={surface.requestPayoutAllowed ? "true" : "false"}
     >
       <h2
         id="seller-payout-eligibility-heading"
@@ -41,8 +67,10 @@ export default function SellerPayoutEligibility({ surface }: Props) {
         Payout eligibility
       </h2>
       <p className="mt-1 text-sm text-[var(--sf-faint)]">
-        Trusted status only. Withdrawals and bank connections are not available
-        yet.
+        Trusted status only. Amounts and settlement are derived on the server.
+        {!surface.payoutExecutionEnabled
+          ? " Live payout requests stay unavailable until the production gate is ready."
+          : " Manual Ops Live destination and request controls appear below for owners and managers."}
       </p>
 
       {surface.overallState === "unavailable" ||
@@ -62,9 +90,9 @@ export default function SellerPayoutEligibility({ surface }: Props) {
               <li
                 key={h}
                 className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-                  h === "eligible_balance_available"
+                  h === "eligible_balance_available" || h === "live_payout_ready"
                     ? "border-[var(--sf-ok)]/40 text-[var(--sf-ok)]"
-                    : h === "bank_rails_disabled"
+                    : h === "bank_rails_disabled" || h === "live_payout_gate_off"
                       ? "border-[var(--sf-line)] text-[var(--sf-faint)]"
                       : "border-amber-400/30 text-amber-100"
                 }`}
@@ -128,7 +156,7 @@ export default function SellerPayoutEligibility({ surface }: Props) {
                   <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
                     {bucket.currency}
                   </dt>
-                  <dd className="mt-1 text-sm text-[var(--sf-muted)]">
+                  <dd className="mt-1 text-sm text-[var(--sf-muted)]" dir="auto">
                     Available {bucket.availableLabel}
                   </dd>
                 </div>
@@ -138,9 +166,41 @@ export default function SellerPayoutEligibility({ surface }: Props) {
         </>
       ) : null}
 
-      {!surface.actionButtonsEnabled && surface.bankRailsDisabled ? (
-        <p className="mt-4 text-xs text-[var(--sf-faint)]">
-          No withdraw or bank-connect actions while payout rails remain disabled.
+      {!surface.payoutExecutionEnabled ? (
+        <p
+          className="mt-4 text-xs text-[var(--sf-faint)]"
+          data-live-payout-disabled-message="honest"
+        >
+          No withdraw or bank-connect actions while the live payout path remains
+          unavailable. Traditional bank rails stay disabled.
+        </p>
+      ) : null}
+
+      {showLiveControls ? (
+        <>
+          <SellerPayoutDestinationForm
+            storeId={surface.storeId}
+            destinations={surface.destinations}
+            enabled={canManagePayouts}
+          />
+          <SellerPayoutRequestButton
+            storeId={surface.storeId}
+            destinationId={surface.verifiedDestinationId}
+            candidates={surface.requestCandidates}
+            requestAllowed={surface.requestPayoutAllowed}
+            blockReason={surface.livePayoutBlockReason}
+            inTransitCaptureCount={surface.inTransitCaptureCount}
+          />
+        </>
+      ) : null}
+
+      {!canManagePayouts && surface.overallState === "ready" ? (
+        <p
+          className="mt-4 text-xs text-[var(--sf-faint)]"
+          data-seller-payout-controls="hidden-role"
+        >
+          Payout destination and request controls are limited to store owners
+          and managers.
         </p>
       ) : null}
     </section>
