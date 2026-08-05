@@ -14,6 +14,15 @@ export type AiPlatformConfig = {
   anthropicApiKey: string | null;
   anthropicBaseUrl: string;
   anthropicDefaultModel: string;
+  /** OpenAI-compatible local/self-hosted base URL (no default — fail-closed). */
+  localBaseUrl: string | null;
+  /** Optional bearer token for gated local gateways. */
+  localApiKey: string | null;
+  /**
+   * Operator-configured local model id (no cloud vendor default).
+   * Required together with localBaseUrl for local to be executable.
+   */
+  localDefaultModel: string | null;
   allowStub: boolean;
   defaultTimeoutMs: number;
   maxInputChars: number;
@@ -28,12 +37,22 @@ function readEnv(name: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function hasLiveProviderKey(
+export function isLocalProviderConfigured(config: {
+  localBaseUrl: string | null;
+  localDefaultModel: string | null;
+}): boolean {
+  return Boolean(config.localBaseUrl && config.localDefaultModel);
+}
+
+function hasLiveProvider(
   openaiApiKey: string | null,
   geminiApiKey: string | null,
-  anthropicApiKey: string | null
+  anthropicApiKey: string | null,
+  localConfigured: boolean
 ): boolean {
-  return Boolean(openaiApiKey || geminiApiKey || anthropicApiKey);
+  return Boolean(
+    openaiApiKey || geminiApiKey || anthropicApiKey || localConfigured
+  );
 }
 
 export function loadAiPlatformConfig(
@@ -43,6 +62,13 @@ export function loadAiPlatformConfig(
   const openaiApiKey = readEnv("OPENAI_API_KEY") ?? null;
   const geminiApiKey = readEnv("GEMINI_API_KEY") ?? null;
   const anthropicApiKey = readEnv("ANTHROPIC_API_KEY") ?? null;
+  const localBaseUrl = readEnv("LOCAL_AI_BASE_URL") ?? null;
+  const localApiKey = readEnv("LOCAL_AI_API_KEY") ?? null;
+  const localDefaultModel = readEnv("LOCAL_AI_MODEL") ?? null;
+  const localConfigured = isLocalProviderConfigured({
+    localBaseUrl,
+    localDefaultModel,
+  });
   const allowStub =
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "1" ||
     (readEnv("UMTUBA_AI_ALLOW_STUB") ?? "").toLowerCase() === "true" ||
@@ -54,10 +80,17 @@ export function loadAiPlatformConfig(
   } else if (explicitMode === "stub") {
     mode = allowStub ? "stub" : "disabled";
   } else if (explicitMode === "live") {
-    mode = hasLiveProviderKey(openaiApiKey, geminiApiKey, anthropicApiKey)
+    mode = hasLiveProvider(
+      openaiApiKey,
+      geminiApiKey,
+      anthropicApiKey,
+      localConfigured
+    )
       ? "live"
       : "disabled";
-  } else if (hasLiveProviderKey(openaiApiKey, geminiApiKey, anthropicApiKey)) {
+  } else if (
+    hasLiveProvider(openaiApiKey, geminiApiKey, anthropicApiKey, localConfigured)
+  ) {
     mode = "live";
   } else if (allowStub) {
     mode = "stub";
@@ -80,6 +113,9 @@ export function loadAiPlatformConfig(
     // Exact dated Haiku snapshot (stable Flash-class default; not a latest alias).
     anthropicDefaultModel:
       readEnv("ANTHROPIC_MODEL") ?? "claude-haiku-4-5-20251001",
+    localBaseUrl,
+    localApiKey,
+    localDefaultModel,
     allowStub,
     defaultTimeoutMs: Number(readEnv("UMTUBA_AI_TIMEOUT_MS") ?? 30000),
     maxInputChars: Number(readEnv("UMTUBA_AI_MAX_INPUT_CHARS") ?? 8000),
@@ -95,26 +131,34 @@ export function describeAiConfigStatus(config: AiPlatformConfig): {
   openaiConfigured: boolean;
   geminiConfigured: boolean;
   anthropicConfigured: boolean;
+  localConfigured: boolean;
   stubEligible: boolean;
   missing: string[];
 } {
+  const localConfigured = isLocalProviderConfigured(config);
   const missing: string[] = [];
-  const anyLiveKey = hasLiveProviderKey(
+  const anyLiveKey = hasLiveProvider(
     config.openaiApiKey,
     config.geminiApiKey,
-    config.anthropicApiKey
+    config.anthropicApiKey,
+    localConfigured
   );
   if (config.mode === "live" && !anyLiveKey) {
-    missing.push("OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY");
+    missing.push(
+      "OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY|LOCAL_AI_BASE_URL+LOCAL_AI_MODEL"
+    );
   }
   if (config.mode === "disabled") {
-    missing.push("UMTUBA_AI_MODE/OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY");
+    missing.push(
+      "UMTUBA_AI_MODE/OPENAI_API_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY|LOCAL_AI_BASE_URL+LOCAL_AI_MODEL"
+    );
   }
   return {
     mode: config.mode,
     openaiConfigured: Boolean(config.openaiApiKey),
     geminiConfigured: Boolean(config.geminiApiKey),
     anthropicConfigured: Boolean(config.anthropicApiKey),
+    localConfigured,
     stubEligible: config.allowStub,
     missing,
   };

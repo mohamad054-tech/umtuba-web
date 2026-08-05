@@ -47,6 +47,7 @@ function sampleSnapshot(enabled: boolean): AiHubSnapshot {
       openaiConfigured: false,
       geminiConfigured: false,
       anthropicConfigured: false,
+      localConfigured: false,
       stubEligible: true,
       assistantRuntimeFlagHint: "off",
       missingConfigKeys: [],
