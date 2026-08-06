@@ -154,20 +154,21 @@ describe("App Shell catalog ingestion", () => {
     const findings = validateAppShellTerminology(state);
     const summary = summarizeFindings(findings);
     const batch = buildAppShellPublishBatch(state);
-    expect(report.keyCount).toBe(85);
-    expect(report.statusCounts.en?.approved).toBe(85);
-    expect(report.statusCounts.ar?.approved).toBe(85);
+    const keyCount = Object.keys(enMessages).filter(isAppShellCatalogKey).length;
+    expect(report.keyCount).toBe(keyCount);
+    expect(report.statusCounts.en?.approved).toBe(keyCount);
+    expect(report.statusCounts.ar?.approved).toBe(keyCount);
     expect(report.statusCounts.ar?.needs_review ?? 0).toBe(0);
-    expect(report.statusCounts.fr?.needs_review).toBe(85);
-    expect(report.statusCounts.es?.needs_review).toBe(85);
-    expect(report.statusCounts.de?.needs_review).toBe(85);
-    expect(report.statusCounts.pt?.needs_review).toBe(85);
+    expect(report.statusCounts.fr?.needs_review).toBe(keyCount);
+    expect(report.statusCounts.es?.needs_review).toBe(keyCount);
+    expect(report.statusCounts.de?.needs_review).toBe(keyCount);
+    expect(report.statusCounts.pt?.needs_review).toBe(keyCount);
     expect(report.statusCounts.fr?.approved ?? 0).toBe(0);
     expect(report.memorySeeded).toBe(
       state.memory.filter((m) => m.language === "ar").length
     );
-    expect(batch.preview.byLanguage.en).toBe(85);
-    expect(batch.preview.byLanguage.ar).toBe(85);
+    expect(batch.preview.byLanguage.en).toBe(keyCount);
+    expect(batch.preview.byLanguage.ar).toBe(keyCount);
     expect(summary.leakageCount).toBe(0);
     expect(summary.conflictCount).toBe(0);
     expect(summary.capitalizationIssues).toBe(0);

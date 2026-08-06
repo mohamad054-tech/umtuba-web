@@ -71,8 +71,10 @@ export type FoundationMessages = {
   "menu.account": string;
   "menu.session": string;
   "menu.profile": string;
+  "menu.create": string;
   "menu.saved": string;
   "menu.learning": string;
+  "menu.instructor": string;
   "menu.rewards": string;
   "menu.notifications": string;
   "menu.settings": string;
@@ -80,6 +82,7 @@ export type FoundationMessages = {
   "menu.seller": string;
   "menu.wishlist": string;
   "menu.advertise": string;
+  "menu.admin": string;
   "menu.signIn": string;
   "menu.signOut": string;
   "menu.switchAccount": string;

@@ -20,8 +20,10 @@ const MOBILE_NAV_KEYS: Record<string, TranslationKey> = {
 
 const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
   profile: "menu.profile",
+  create: "menu.create",
   saved: "menu.saved",
   learning: "menu.learning",
+  instructor: "menu.instructor",
   rewards: "menu.rewards",
   notifications: "menu.notifications",
   settings: "menu.settings",
@@ -29,6 +31,7 @@ const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
   seller: "menu.seller",
   wishlist: "menu.wishlist",
   advertise: "menu.advertise",
+  "admin-ads": "menu.admin",
 };
 
 const USER_MENU_GROUP_KEYS: Record<string, TranslationKey> = {

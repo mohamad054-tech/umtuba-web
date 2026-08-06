@@ -2,37 +2,62 @@
 
 ## Task title
 
-AI Core Private AI Deployment & Runtime onto Alpha V1
+UMTUBA Translation Trunk Port V1
 
 ## Status
 
-`implementation-in-progress`
+`implementation-complete` — six platform translation commits ported onto
+`origin/alpha-0.2` @ `62c6c5d`. Learning Translation Foundation excluded.
+Migrations renumbered to `20260901` / `20260902` (not remotely applied).
+Focused tests + `tsc --noEmit` passed. Push follows finalize commit.
 
 ## Branch
 
-`office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
+`office/platform-translation-trunk-port-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
+`C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1`
 
 ## Base
 
-`6219633` — Private AI Workflow Lifecycle tip
+`62c6c5d04f962b9615c1fb8037bae6b76d7f8e36` — `origin/alpha-0.2`
 
-## Source
+## Ported commits (platform only)
 
-`origin/office/platform-private-ai-deployment-runtime-v1` @ `cf3de8d`
+1. `6528202` → i18n Foundation V1
+2. `0d18160` → App Shell Translation V1
+3. `aced43c` → Translation Studio Foundation V1
+4. `189ec08` → Persistence & Workflow V1 (migration → `20260901`)
+5. `e12cd6d` → App Shell Ingestion V1
+6. `7296ac3` → Translation Intelligence Foundation V1 (migration → `20260902`)
 
-## Scope
+## Excluded
 
-- `lib/privateAi/**` deployment state + runtime readiness/selection/health/diagnostics
-- `app/admin/private-ai/runtime/**` + shell/page updates
-- `docs/architecture/PRIVATE_AI_DEPLOYMENT_RUNTIME_V1.md`
-- No new migration (historical milestone created none)
+- `6a3cb3d` Learning Translation Foundation — not cherry-picked
+
+## Migrations
+
+| Role | Old (do not reuse) | New |
+| --- | --- | --- |
+| Persistence & Workflow | `20260874_translation_studio_persistence_workflow_v1.sql` | `20260901_translation_studio_persistence_workflow_v1.sql` |
+| Intelligence | `20260875_translation_intelligence_foundation_v1.sql` | `20260902_translation_intelligence_foundation_v1.sql` |
+
+- Runtime remains JSON file store under `/data/translation-studio/` (gitignored)
+- **Do not** remote-apply these migrations without explicit approval
+
+## Allowed scope
+
+- `lib/i18n/**`, `lib/translationStudio/**`
+- `app/components/i18n/**`, App Shell label wiring
+- `app/admin/translation-studio/**`, `app/actions/translationStudio.ts`
+- Additive Translation Studio AI suggestion port into `lib/ai/**` (no Private AI behavior replacement)
+- Architecture docs under `docs/architecture/*TRANSLATION*` / i18n foundation
 
 ## Forbidden
 
-- Learning migrations 20260872–75
-- Commerce / Collaboration / Mobile / Guardian
-- Alpha merge / live providers / real deployment
+- Learning Translation Foundation
+- Commerce / Collaboration product work
+- Remote Supabase migration apply
+- Auto-publish / catalog file writes
+- Model training / STT / TTS / dubbing
