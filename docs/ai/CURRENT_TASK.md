@@ -2,28 +2,27 @@
 
 ## Task title
 
-UM Learning - Production Smoke & E2E Gate onto SoT V1
+UM Learning - Content Block Render Test Coverage V1
 
 ## Status
 
-`implementation-complete` — smoke gate ported onto SoT; validating / committing.
+`implementation-complete` — dedicated renderer coverage landed; validating / committing.
 
 ## Milestone
 
-`learning.ops.production_smoke_e2e_gate_onto_sot_v1`
+`learning.learner.content_block_render_test_coverage_v1`
 
 ## Scope
 
-- Port `lib/learning/productionSmokeE2eGate.test.ts`
-- Port / retarget `docs/learning/implementation/LEARNING_PRODUCTION_SMOKE_E2E_GATE_V1.md`
-- Additive inventory only; no Learning business behavior changes
+- `lib/learning/contentBlockRender.test.ts`
+- `docs/learning/implementation/LEARNING_CONTENT_BLOCK_RENDER_TEST_COVERAGE_V1.md`
+- Tests-only against existing helpers + ContentBlockRenderer contracts
 
 ## Branch / HEAD base
 
-`office/learning-production-smoke-e2e-gate-onto-sot-v1`
-Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `15b1d7b`
-Historical source: `6e74333`
+`office/learning-content-block-render-test-coverage-v1`
+Base: `origin/office/learning-production-smoke-e2e-gate-onto-sot-v1` @ `e334f00`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-production-smoke-e2e-gate-onto-sot-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-content-block-render-test-coverage-v1`
