@@ -2,37 +2,50 @@
 
 ## Task title
 
-AI Core Private AI Deployment & Runtime onto Alpha V1
+UM Core Platform Foundation P1 — CLOSED
 
 ## Status
 
-`implementation-in-progress`
+`closed` — Foundation P1 committed and pushed on `office/um-core-platform-foundation-p1`.
 
 ## Branch
 
-`office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-
-## Worktree
-
-`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
+`office/um-core-platform-foundation-p1`
 
 ## Base
 
-`6219633` — Private AI Workflow Lifecycle tip
+`origin/alpha-0.2` @ `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
 
-## Source
+## Worktree
 
-`origin/office/platform-private-ai-deployment-runtime-v1` @ `cf3de8d`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web`
 
-## Scope
+## Milestone
 
-- `lib/privateAi/**` deployment state + runtime readiness/selection/health/diagnostics
-- `app/admin/private-ai/runtime/**` + shell/page updates
-- `docs/architecture/PRIVATE_AI_DEPLOYMENT_RUNTIME_V1.md`
-- No new migration (historical milestone created none)
+`um.core.foundation_p1`
 
-## Forbidden
+## Final layout
 
-- Learning migrations 20260872–75
-- Commerce / Collaboration / Mobile / Guardian
-- Alpha merge / live providers / real deployment
+`platforms/core/**` (not `lib/core/**`)
+
+## Delivered
+
+Isolated contracts-only UM Core platform:
+
+- platform/module/capability vocabulary
+- manifest, registry, event, flag, health, dependency, naming contracts
+- validation + SDK ports
+- maturity / compliance / certification vocabulary
+- focused contract tests
+- docs under `docs/core/`
+
+## Confirmed non-scope
+
+- No runtime engines
+- No product-platform integration
+- No database schema / migrations
+- No Commerce / Learning / AI / UEOS / Ads / Collaboration changes
+
+## Next
+
+Do not start P2 unless a new task is issued. Do not merge unless separately tasked.

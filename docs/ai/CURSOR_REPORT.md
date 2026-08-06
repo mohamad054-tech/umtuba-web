@@ -1,35 +1,46 @@
-# CURSOR_REPORT — AI Core Private AI Deployment & Runtime onto Alpha V1
+# CURSOR_REPORT — UM Core Platform Foundation P1 CLOSE
 
 ## Summary
 
-Clean port of Private AI Deployment & Runtime onto the Workflow Lifecycle tip.
-Adds deployment state machine, runtime readiness/selection/health/diagnostics,
-and admin runtime page. No real deployment, no live providers, no new migration.
+**PASS** — UM Core Platform Foundation P1 closed on
+`office/um-core-platform-foundation-p1` from `origin/alpha-0.2` @ `62c6c5d`.
 
-## Exact refs
+Final layout: `platforms/core/**` (contracts-only; no runtime; no product integration).
 
-| Ref | Value |
-|-----|-------|
-| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1` |
-| Branch | `office/ai-core-private-ai-deployment-runtime-onto-alpha-v1` |
-| Base | `6219633` |
-| Source | `origin/office/platform-private-ai-deployment-runtime-v1` @ `cf3de8d` |
+An earlier local commit briefly included an auto-appended `Co-authored-by` trailer;
+that trailer was removed via amend before push.
 
-## Feature files
+## Exact files in commit
 
-- `lib/privateAi/deploymentState.ts`
-- `lib/privateAi/runtime{Diagnostics,Health,Readiness,Selection}.ts`
-- `lib/privateAi/privateAiDeploymentRuntime.test.ts`
-- updates: `service/types/seed/fileStore/permissions/index`
-- `app/admin/private-ai/runtime/page.tsx` + shell/page
-- `docs/architecture/PRIVATE_AI_DEPLOYMENT_RUNTIME_V1.md`
+- `platforms/core/**`
+- `docs/core/**`
+- `vitest.config.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
-## Migrations
+## Migrations created
 
-None new (lineage still 20260876–20260880).
+None.
 
-## Security
+## Security / isolation
 
-- Fail-closed illegal transitions + readiness gate for `ready`
-- Admin-gated diagnostics
-- No live host access
+- Isolated under `platforms/core`
+- No product-platform imports
+- No secrets
+- No DB/migrations
+
+## Tests
+
+`npx vitest run platforms/core/coreFoundationContracts.test.ts` — PASS (2)
+
+## TypeScript
+
+`npx tsc --noEmit` — PASS
+
+## git diff --check
+
+PASS
+
+## Open issues
+
+None for P1. Do not start P2 unless separately tasked.
