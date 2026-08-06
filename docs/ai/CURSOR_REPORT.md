@@ -1,25 +1,24 @@
-# CURSOR_REPORT — UM Core Manifest Validation P2
+# CURSOR_REPORT — UM Core Compliance Engine P3
 
 ## Summary
 
-**READY** — Manifest Validation Foundation P2 closed on
-`office/um-core-platform-manifest-validation-p2` (base P1 tip `c80b15e`).
+**READY** — Compliance Engine Foundation P3 closed on
+`office/um-core-platform-compliance-engine-p3` (base P2 tip `99300de`).
 
-Pure in-process validation only. No registry/runtime/product integration.
-No migrations. Unrelated full-suite media test failure is pre-existing on P1 tip.
+Pure in-process assessment only. Certification is eligibility, not grant.
+No registry/runtime/product integration. No migrations.
 
 ## Exact files changed
 
-- `platforms/core/validation/codes.ts` (new)
-- `platforms/core/validation/naming.ts` (new)
-- `platforms/core/validation/manifestValidator.ts` (new)
-- `platforms/core/validation/registrationValidator.ts` (new)
-- `platforms/core/validation/manifestValidation.test.ts` (new)
-- `platforms/core/validation/interfaces.ts`
+- `platforms/core/compliance/codes.ts` (new)
+- `platforms/core/compliance/complianceEngine.ts` (new)
+- `platforms/core/compliance/complianceEngine.test.ts` (new)
+- `platforms/core/compliance/types.ts`
+- `platforms/core/compliance/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_MANIFEST_VALIDATION_P2.md` (new)
+- `docs/core/UM_CORE_PLATFORM_COMPLIANCE_ENGINE_P3.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -29,17 +28,16 @@ None.
 
 ## Security review
 
-- Validation is pure and in-process only
+- Assessment is pure and in-process only
 - No product imports from Core
 - No secrets / service-role / env leakage
 - No networking / persistence / registry runtime
+- Waiver expiry uses explicit `assessedAt` only (no clock)
 
 ## Tests
 
-- `npx vitest run platforms/core` — **PASS** (15 tests)
-- `npx vitest run` — 1 unrelated fail:
-  `lib/media/processing/mediaProcessing.foundation.test.ts`
-  (`20260869` migration present at P1 tip; P2 does not touch media/migrations)
+- `npx vitest run platforms/core` — **PASS** (27 tests)
+- Full suite: see final report (unrelated media failure if present)
 
 ## TypeScript
 
@@ -47,7 +45,7 @@ None.
 
 ## Build
 
-Not required for this contracts/validation milestone (no app UI/entry change).
+Not required for this contracts/assessment milestone.
 
 ## git diff --check
 
@@ -59,7 +57,6 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Cross-platform dependency graph validation remains future (needs registry).
-- Do not start P3 from this close.
-- Unrelated media foundation test expects absence of `20260869` migration
-  that already exists on base `c80b15e` — out of P2 scope.
+- Live certificate grant/revoke remains future (eligibility only).
+- Cross-platform dependency graph compliance remains future (needs registry).
+- Do not start P4 from this close.

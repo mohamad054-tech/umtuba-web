@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Manifest Validation P2
+UM Core Platform Compliance Engine P3
 
 ## Status
 
@@ -10,25 +10,26 @@ UM Core Platform Manifest Validation P2
 
 ## Branch
 
-`office/um-core-platform-manifest-validation-p2`
+`office/um-core-platform-compliance-engine-p3`
 
 ## Base HEAD
 
-`c80b15e0c2822c91e0e6f43ee228fe80a79f0ea5` (Foundation P1 close)
+`99300de78530b25bc19dff877926919957de6d06` (Manifest Validation P2 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-compliance-engine-p3`
 
 ## Milestone
 
-`um.core.manifest_validation_p2`
+`um.core.compliance_engine_p3`
 
 ## Allowed scope
 
-- `platforms/core/validation/**`
+- `platforms/core/compliance/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
+- `platforms/core/README.md`
 - `docs/core/**`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
@@ -41,6 +42,7 @@ UM Core Platform Manifest Validation P2
 
 ## Delivered
 
-Pure manifest + admission validation engine with deterministic diagnostics and focused tests.
-Committed and pushed on `office/um-core-platform-manifest-validation-p2`.
-Do not start P3 from this handoff.
+Pure compliance assessment engine with score, certification eligibility,
+maturity checks, deterministic diagnostics, waivers, and focused tests.
+Committed and pushed on `office/um-core-platform-compliance-engine-p3`.
+Do not start P4 from this handoff.
