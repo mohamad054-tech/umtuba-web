@@ -5,6 +5,7 @@ import {
   LEARNING_LIVE_RPCS,
   LEARNING_LIVE_ROUTES,
   LEARNING_LIVE_EARLY_JOIN_MINUTES,
+  LEARNING_CALENDAR_KINDS,
   sanitizeLiveCalendarError,
   isLiveCalendarUuid,
   formatLearningLiveInstant,
@@ -156,6 +157,7 @@ describe("Live Learning & Calendar Foundation V1 — SQL", () => {
     expect(mine).toMatch(/assignment_due/);
     expect(mine).toMatch(/learning_assignment_specs/);
     expect(mine).toMatch(/assessment_due_supported/);
+    // Foundation V1 shipped false; Assessment Due Dates V1 (20260905) flips true.
     expect(mine).toMatch(/false/);
 
     const instr = stripSqlComments(
@@ -163,6 +165,14 @@ describe("Live Learning & Calendar Foundation V1 — SQL", () => {
     );
     expect(instr).toMatch(/learning_live_assert_manage/);
     expect(instr).toMatch(/assignment_due/);
+  });
+
+  it("exposes calendar kinds including assessment_due", () => {
+    expect(LEARNING_CALENDAR_KINDS).toEqual([
+      "live_session",
+      "assignment_due",
+      "assessment_due",
+    ]);
   });
 
   it("does not introduce Zoom/Teams/recording/email/push", () => {

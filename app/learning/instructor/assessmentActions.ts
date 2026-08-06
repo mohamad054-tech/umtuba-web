@@ -1,12 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   assessmentRevalidatePaths,
+  LEARNING_ASSESSMENT_ROUTES,
   runAssessmentAuthoringOperation,
   type AssessmentAuthoringResult,
 } from "../../../lib/learning/assessmentAuthoring";
+import {
+  clearLearningAssessmentDueAt,
+  setLearningAssessmentDueAt,
+} from "../../../lib/learning/assessmentDueDates";
 import {
   LEARNING_QUESTION_CREATABLE_TYPES,
   type LearningQuestionCreatableType,
@@ -340,4 +346,56 @@ export async function setAnswerKeyAction(
     courseId,
     activityId
   );
+}
+
+export async function setAssessmentDueAtAction(
+  formData: FormData
+): Promise<void> {
+  const courseId = formString(formData, "courseId");
+  const activityId = formString(formData, "activityId");
+  const dueAtRaw = formString(formData, "dueAt");
+  const path = LEARNING_ASSESSMENT_ROUTES.activityQuestions(
+    courseId,
+    activityId
+  );
+
+  const authErr = await requireUser();
+  if (authErr) {
+    redirect(`/login?next=${encodeURIComponent(path)}`);
+  }
+
+  const supabase = await createClient();
+  const result = await setLearningAssessmentDueAt(supabase, {
+    activityId,
+    dueAt: dueAtRaw,
+  });
+  if (!result.ok) {
+    redirect(`${path}?error=${encodeURIComponent(result.message)}`);
+  }
+  revalidateAssessment(courseId, activityId);
+  redirect(`${path}?due=1`);
+}
+
+export async function clearAssessmentDueAtAction(
+  formData: FormData
+): Promise<void> {
+  const courseId = formString(formData, "courseId");
+  const activityId = formString(formData, "activityId");
+  const path = LEARNING_ASSESSMENT_ROUTES.activityQuestions(
+    courseId,
+    activityId
+  );
+
+  const authErr = await requireUser();
+  if (authErr) {
+    redirect(`/login?next=${encodeURIComponent(path)}`);
+  }
+
+  const supabase = await createClient();
+  const result = await clearLearningAssessmentDueAt(supabase, activityId);
+  if (!result.ok) {
+    redirect(`${path}?error=${encodeURIComponent(result.message)}`);
+  }
+  revalidateAssessment(courseId, activityId);
+  redirect(`${path}?due=cleared`);
 }

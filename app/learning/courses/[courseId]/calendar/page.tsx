@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import LearningShell from "../../../../components/learning/LearningShell";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
+import { learnerCalendarItemHref } from "../../../../../lib/learning/assessmentDueDates";
 import {
   LEARNING_LIVE_ROUTES,
   formatLearningLiveInstant,
@@ -45,7 +46,7 @@ export default async function LearnerCourseCalendarPage({ params }: PageProps) {
   return (
     <LearningShell
       title="Course calendar"
-      subtitle="Live sessions and assignment due dates"
+      subtitle="Live sessions, assignment dues, and assessment dues"
       backHref={LEARNING_LEARNER_ROUTES.course(courseId)}
       backLabel="Course"
     >
@@ -65,10 +66,7 @@ export default async function LearnerCourseCalendarPage({ params }: PageProps) {
           {items.map((item) => {
             const kind = readLiveString(item, "kind");
             const id = readLiveString(item, "item_id");
-            const href =
-              kind === "live_session" && id
-                ? LEARNING_LIVE_ROUTES.learnerSession(courseId, id)
-                : LEARNING_LIVE_ROUTES.learnerSchedule(courseId);
+            const href = learnerCalendarItemHref(kind, courseId, id);
             return (
               <li key={`${kind}-${id}`}>
                 <Link

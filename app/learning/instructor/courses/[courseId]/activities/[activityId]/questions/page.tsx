@@ -9,20 +9,29 @@ import {
   type AssessmentAuthoringActivityContext,
   type AssessmentAuthoringQuestion,
 } from "../../../../../../../../lib/learning/assessmentAuthoring";
+import {
+  formatAssessmentDueLocalInput,
+  loadLearningAssessmentDueAt,
+} from "../../../../../../../../lib/learning/assessmentDueDates";
 import { LEARNING_INSTRUCTOR_ROUTES } from "../../../../../../../../lib/learning/instructorAuthoring";
 import { LEARNING_QUESTION_CREATABLE_TYPES } from "../../../../../../../../lib/learning/questionsFoundation";
 import {
   archiveQuestionAction,
+  clearAssessmentDueAtAction,
   createQuestionAction,
   publishQuestionAction,
   reorderQuestionsAction,
   setAnswerKeyAction,
+  setAssessmentDueAtAction,
   unpublishQuestionAction,
   updateQuestionAction,
 } from "../../../../../assessmentActions";
 
 type PageProps = {
   params: Promise<{ courseId: string; activityId: string }>;
+  searchParams?:
+    | Promise<{ error?: string; due?: string }>
+    | { error?: string; due?: string };
 };
 
 function optionsDefault(content: Record<string, unknown>): string {
@@ -246,8 +255,12 @@ function ContentFields({
   );
 }
 
-export default async function AssessmentQuestionsPage({ params }: PageProps) {
+export default async function AssessmentQuestionsPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { courseId, activityId } = await params;
+  const query = await Promise.resolve(searchParams ?? {});
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -286,6 +299,10 @@ export default async function AssessmentQuestionsPage({ params }: PageProps) {
   const questionIdsOrdered = ctx.questions.map((q) => q.id).join(",");
   const canLifecycle = ctx.canManageActivity;
   const canCreate = ctx.canCreate;
+  const dueLoaded = await loadLearningAssessmentDueAt(supabase, activityId);
+  const dueAt =
+    dueLoaded.ok && dueLoaded.data.due_at ? dueLoaded.data.due_at : null;
+  const isQuiz = ctx.activity.type === "quiz";
 
   return (
     <LearningShell
@@ -303,6 +320,19 @@ export default async function AssessmentQuestionsPage({ params }: PageProps) {
           Answer keys are staff-only and are never shown on learner pages.
         </p>
 
+        {query.error ? (
+          <p role="alert" className="text-sm text-rose-100">
+            {query.error}
+          </p>
+        ) : null}
+        {query.due === "1" || query.due === "cleared" ? (
+          <p role="status" className="text-sm text-emerald-100">
+            {query.due === "cleared"
+              ? "Assessment due date cleared."
+              : "Assessment due date saved."}
+          </p>
+        ) : null}
+
         {!canCreate && !canLifecycle ? (
           <div
             className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-50"
@@ -311,6 +341,51 @@ export default async function AssessmentQuestionsPage({ params }: PageProps) {
             You can view this activity’s questions if RLS allows, but you are not
             entitled to create or manage them here.
           </div>
+        ) : null}
+
+        {isQuiz && canLifecycle ? (
+          <section
+            className="rounded-xl border border-white/10 bg-white/5 p-4"
+            data-testid="assessment-due-date"
+          >
+            <h2 className="text-base font-bold">Assessment due date</h2>
+            <p className="mt-1 text-xs text-white/55">
+              Optional calendar due instant (UTC storage). Does not block
+              attempts or scoring in V1.
+            </p>
+            <form action={setAssessmentDueAtAction} className="mt-3 space-y-3">
+              <input type="hidden" name="courseId" value={courseId} />
+              <input type="hidden" name="activityId" value={activityId} />
+              <label className="block text-xs text-white/70">
+                Due date
+                <input
+                  type="datetime-local"
+                  name="dueAt"
+                  aria-label="Assessment due date"
+                  defaultValue={formatAssessmentDueLocalInput(dueAt)}
+                  className="mt-1 w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
+                />
+              </label>
+              <button
+                type="submit"
+                className="rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+              >
+                Save due date
+              </button>
+            </form>
+            {dueAt ? (
+              <form action={clearAssessmentDueAtAction} className="mt-3">
+                <input type="hidden" name="courseId" value={courseId} />
+                <input type="hidden" name="activityId" value={activityId} />
+                <button
+                  type="submit"
+                  className="text-sm font-bold text-white/70 underline underline-offset-2"
+                >
+                  Clear due date
+                </button>
+              </form>
+            ) : null}
+          </section>
         ) : null}
 
         {canCreate ? (

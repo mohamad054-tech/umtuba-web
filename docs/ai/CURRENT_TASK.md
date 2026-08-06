@@ -2,31 +2,38 @@
 
 ## Task title
 
-UM Learning - Accessibility Contract Suite V1
+UM Learning - Assessment Due Dates on Calendar V1
 
 ## Status
 
-`closed` — accessibility contracts + minimal aria-label fixes committed on branch.
+`implementation-complete` — local commit pending validation; migration **not** applied remotely.
 
 ## Milestone
 
-`learning.accessibility.ui_contract_suite_v1`
+`learning.calendar.assessment_due_dates_v1`
 
 ## Scope landed
 
-- `lib/learning/accessibilityUiContract.test.ts`
-- `docs/learning/implementation/LEARNING_ACCESSIBILITY_CONTRACT_SUITE_V1.md`
-- Minimal `aria-label` additions on instructor course/lesson authoring controls
+- Migration `20260905_learning_assessment_due_dates_calendar_v1.sql`
+  - `learning_activity_settings.due_at`
+  - `set_learning_assessment_due_at`
+  - calendar RPCs include `assessment_due` + `assessment_due_supported: true`
+- Adapter `lib/learning/assessmentDueDates.ts`
+- Instructor due controls on quiz questions authoring
+- Learner + instructor calendar routing for assessment/assignment/live
 
-## Branch / HEAD base
+## Branch / worktree
 
-`office/learning-accessibility-contract-suite-v1`
-Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `f2f5ed2`
+`office/learning-assessment-due-dates-calendar-v1`  
+`D:\umtuba-central\repos\umtuba-web-learning-assessment-due-dates-calendar-v1`  
+Base: `17ce7e498757c8bd984b776bdde9fbf9a71dd36d`
 
-## Worktree
+## Explicitly out of scope
 
-`D:\umtuba-central\repos\umtuba-web-learning-accessibility-contract-suite-v1`
+- Remote migration apply
+- Attempt/scoring/answer/submission/completion enforcement
+- Commerce / Translation / Collaboration / Billing / UEOS / Mobile / Guardian
 
 ## Recommended next
 
-Fast-forward Learning SoT to this tip, or Instructor Browser E2E Foundation (testids + harness; live run deferred).
+Fast-forward Learning SoT after review, then optional remote apply GO for `20260905`.

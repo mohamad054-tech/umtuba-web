@@ -29,6 +29,15 @@ export const LEARNING_LIVE_RPCS = {
   instructorCalendar: "get_instructor_learning_calendar",
 } as const;
 
+/** Calendar item kinds returned by get_*_learning_calendar (V1 + assessment dues). */
+export const LEARNING_CALENDAR_KINDS = [
+  "live_session",
+  "assignment_due",
+  "assessment_due",
+] as const;
+
+export type LearningCalendarKind = (typeof LEARNING_CALENDAR_KINDS)[number];
+
 export const LEARNING_LIVE_ROUTES = {
   learnerSchedule: (courseId: string) =>
     `/learning/courses/${courseId}/live`,
