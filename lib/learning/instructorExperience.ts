@@ -8,6 +8,10 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "./assessmentManualReview";
+import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../platform/navigation/routeTemplates";
 
 type AnyClient = SupabaseClient;
 
@@ -27,18 +31,27 @@ export const LEARNING_INSTRUCTOR_EXPERIENCE_INTERNAL = {
 } as const;
 
 export const LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES = {
-  hub: "/learning/instructor",
-  reviewQueue: "/learning/instructor/review",
+  hub: requireRegistryPath("learning.instructor"),
+  reviewQueue: requireRegistryPath("learning.instructor.review"),
   courseOverview: (courseId: string) =>
-    `/learning/instructor/courses/${courseId}/overview`,
+    fillRegistryPath("learning.instructor.courses.by-courseid.overview", {
+      courseId,
+    }),
   learners: (courseId: string) =>
-    `/learning/instructor/courses/${courseId}/learners`,
+    fillRegistryPath("learning.instructor.courses.by-courseid.learners", {
+      courseId,
+    }),
   learnerDetail: (courseId: string, learnerUserId: string) =>
-    `/learning/instructor/courses/${courseId}/learners/${learnerUserId}`,
+    fillRegistryPath(
+      "learning.instructor.courses.by-courseid.learners.by-learneruserid",
+      { courseId, learnerUserId }
+    ),
   completion: (courseId: string) =>
-    `/learning/instructor/courses/${courseId}/completion`,
+    fillRegistryPath("learning.instructor.courses.by-courseid.completion", {
+      courseId,
+    }),
   authoring: (courseId: string) =>
-    `/learning/instructor/courses/${courseId}`,
+    fillRegistryPath("learning.instructor.courses.by-courseid", { courseId }),
   manualReview: LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES.queue,
   manualReviewAttempt: LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES.attempt,
 } as const;

@@ -59,7 +59,9 @@ export {
   listAdminStoreNavLinks,
   listAiAdminNavLinks,
   listAiDataNavLinks,
+  listCommerceNavLinks,
   listKnowledgeNavLinks,
+  listLearningNavLinks,
   listPrivateAiNavLinks,
   listSettingsNavLinks,
   type WiredNavLink,
@@ -71,6 +73,10 @@ export {
   MOBILE_MAIN_PRESENTATION,
   USER_MENU_ACCOUNT_PRESENTATION,
   USER_MENU_YOU_PRESENTATION,
+  SELLER_STORE_CHROME_PRESENTATION,
+  BUYER_STORE_CHROME_PRESENTATION,
+  LEARNING_LEARNER_CHROME_PRESENTATION,
+  LEARNING_INSTRUCTOR_CHROME_PRESENTATION,
   isPresentationEnabled,
   type ChromeFeatureFlags,
   type ChromeNavPresentation,
@@ -86,3 +92,31 @@ export {
   type ChromeUserMenuCapabilities,
   type ChromeUserMenuGroup,
 } from "./chromeNavigation";
+
+export {
+  fillRegistryPath,
+  isRegistryHrefActive,
+  requireRegistryPath,
+  requireRegistryTemplate,
+} from "./routeTemplates";
+
+export {
+  buildLearningActivityHref,
+  buildLearningCourseHref,
+  buildLearningInstructorCourseHref,
+  buildLearningInstructorLessonHref,
+  buildLearningLessonHref,
+  buildSellerOrderDetailHref,
+  buildSellerProductEditHref,
+  buildStoreBySlugHref,
+  buildStoreOrderDetailHref,
+  buildStoreProductSlugHref,
+  listBuyerStoreChromeNavLinks,
+  listLearningInstructorChromeNavLinks,
+  listLearningLearnerChromeNavLinks,
+  listSellerStoreChromeNavLinks,
+  resolveCommerceStaticPath,
+  resolveLearningStaticPath,
+  COMMERCE_STATIC_PAGE_IDS,
+  LEARNING_STATIC_PAGE_IDS,
+} from "./commerceLearningChrome";

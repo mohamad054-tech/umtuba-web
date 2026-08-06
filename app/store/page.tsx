@@ -54,7 +54,7 @@ export default async function StoreHomePage() {
       subtitle="Commerce"
       actions={
         <Link
-          href="/store/search"
+          href={APP_ROUTES.storeSearch}
           className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:bg-[rgba(214,196,161,0.2)]"
         >
           Browse
@@ -74,7 +74,7 @@ export default async function StoreHomePage() {
           <StoreEmptyState
             title="Catalog is quiet right now"
             description="Active, approved products will appear here as sellers publish. Home stays Discovery — this Store surface is the commerce layer."
-            actionHref="/store/search"
+            actionHref={APP_ROUTES.storeSearch}
             actionLabel="Open search"
           />
         </div>
@@ -85,7 +85,7 @@ export default async function StoreHomePage() {
         eyebrow="Featured"
         title="Featured products"
         description="Active listings ranked by availability and recency — no fabricated popularity scores."
-        href="/store/search?sort=newest"
+        href={`${APP_ROUTES.storeSearch}?sort=newest`}
         linkLabel="See all"
       >
         <ProductRail
@@ -100,7 +100,7 @@ export default async function StoreHomePage() {
         eyebrow="Curated"
         title="Collections"
         description="Category collections derived from products currently in the public catalog."
-        href="/store/search"
+        href={APP_ROUTES.storeSearch}
         linkLabel="Browse categories"
       >
         <CategoryRail categories={collections} variant="collections" />
@@ -111,7 +111,7 @@ export default async function StoreHomePage() {
         eyebrow="Creators"
         title="Featured sellers"
         description="Sellers with active catalog presence on UMTUBA."
-        href="/store/search"
+        href={APP_ROUTES.storeSearch}
       >
         {featuredStores.length === 0 ? (
           <StoreEmptyState
@@ -172,7 +172,7 @@ export default async function StoreHomePage() {
         id="categories"
         eyebrow="Browse"
         title="Categories"
-        href="/store/search"
+        href={APP_ROUTES.storeSearch}
         linkLabel="Open filters"
       >
         <CategoryRail categories={categories} />
@@ -183,7 +183,7 @@ export default async function StoreHomePage() {
         eyebrow="New"
         title="New arrivals"
         description="Recently published active products."
-        href="/store/search?sort=newest"
+        href={`${APP_ROUTES.storeSearch}?sort=newest`}
       >
         <ProductRail items={arrivals} />
       </StoreSection>
@@ -226,7 +226,7 @@ export default async function StoreHomePage() {
 
       <div className="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--sf-line)] pt-7">
         <Link
-          href="/store/search"
+          href={APP_ROUTES.storeSearch}
           className="text-sm font-semibold text-[var(--sf-accent-strong)] transition hover:text-[var(--sf-accent)]"
         >
           Open full catalog →

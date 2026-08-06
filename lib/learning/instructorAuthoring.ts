@@ -29,6 +29,10 @@ import {
   type LearningLessonVisibility,
 } from "./lessonsFoundation";
 import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../platform/navigation/routeTemplates";
+import {
   LEARNING_SECTION_RPCS,
   LEARNING_SECTION_VISIBILITIES,
   type LearningSectionVisibility,
@@ -131,11 +135,19 @@ export const INSTRUCTOR_AUTHORING_EXCLUDED_OPERATIONS = [
   "create_course",
 ] as const;
 
+/**
+ * Instructor chrome / authoring route helpers.
+ * Hubs and templates resolve from Page Registry; IDs from caller context.
+ */
 export const LEARNING_INSTRUCTOR_ROUTES = {
-  hub: "/learning/instructor",
-  course: (courseId: string) => `/learning/instructor/courses/${courseId}`,
+  hub: requireRegistryPath("learning.instructor"),
+  course: (courseId: string) =>
+    fillRegistryPath("learning.instructor.courses.by-courseid", { courseId }),
   lesson: (courseId: string, lessonId: string) =>
-    `/learning/instructor/courses/${courseId}/lessons/${lessonId}`,
+    fillRegistryPath(
+      "learning.instructor.courses.by-courseid.lessons.by-lessonid",
+      { courseId, lessonId }
+    ),
 } as const;
 
 export type InstructorAuthoringOk = {

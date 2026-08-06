@@ -43,7 +43,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
     <SellerOpsShell title="New product" subtitle="Draft" wide>
       <div className="mt-4">
         <Link
-          href="/seller/store/products"
+          href={APP_ROUTES.sellerStoreProducts}
           className="text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
         >
           ← Products

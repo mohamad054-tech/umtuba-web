@@ -1,5 +1,13 @@
 import { slugifyCity } from "../journey/handoff";
-import { listDesktopMainNavLinks } from "../../../lib/platform/navigation";
+import {
+  listDesktopMainNavLinks,
+  resolveCommerceStaticPath,
+  resolveLearningStaticPath,
+} from "../../../lib/platform/navigation";
+import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../../../lib/platform/navigation/routeTemplates";
 
 export const APP_ROUTES = {
   home: "/",
@@ -27,26 +35,28 @@ export const APP_ROUTES = {
   worldSearch: "/world/search",
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
-  learning: "/learning",
+  /** Registry: learning */
+  learning: resolveLearningStaticPath("learning"),
   games: "/games",
-  store: "/store",
-  storeSearch: "/store/search",
-  storeCart: "/store/cart",
-  storeCheckout: "/store/checkout",
-  storeOrders: "/store/orders",
-  storeWishlist: "/store/wishlist",
-  seller: "/seller",
-  sellerApply: "/seller/apply",
-  sellerSetup: "/seller/setup",
-  sellerStore: "/seller/store",
-  sellerStoreProducts: "/seller/store/products",
-  sellerMarketplace: "/seller/store/marketplace",
-  sellerProducts: "/seller/products",
-  sellerOrders: "/seller/store/orders",
-  sellerInventory: "/seller/store/inventory",
-  sellerPromotions: "/seller/store/promotions",
-  sellerShipping: "/seller/store/shipping",
-  sellerAnalytics: "/seller/store/analytics",
+  /** Registry commerce static hubs */
+  store: resolveCommerceStaticPath("store"),
+  storeSearch: resolveCommerceStaticPath("storeSearch"),
+  storeCart: resolveCommerceStaticPath("storeCart"),
+  storeCheckout: resolveCommerceStaticPath("storeCheckout"),
+  storeOrders: resolveCommerceStaticPath("storeOrders"),
+  storeWishlist: resolveCommerceStaticPath("storeWishlist"),
+  seller: resolveCommerceStaticPath("seller"),
+  sellerApply: resolveCommerceStaticPath("sellerApply"),
+  sellerSetup: resolveCommerceStaticPath("sellerSetup"),
+  sellerStore: resolveCommerceStaticPath("sellerStore"),
+  sellerStoreProducts: resolveCommerceStaticPath("sellerStoreProducts"),
+  sellerMarketplace: resolveCommerceStaticPath("sellerMarketplace"),
+  sellerProducts: resolveCommerceStaticPath("sellerProducts"),
+  sellerOrders: resolveCommerceStaticPath("sellerOrders"),
+  sellerInventory: resolveCommerceStaticPath("sellerInventory"),
+  sellerPromotions: resolveCommerceStaticPath("sellerPromotions"),
+  sellerShipping: resolveCommerceStaticPath("sellerShipping"),
+  sellerAnalytics: resolveCommerceStaticPath("sellerAnalytics"),
   advertise: "/advertise",
   advertiseApply: "/advertise/apply",
   advertiseDashboard: "/advertise/dashboard",
@@ -284,32 +294,64 @@ function sanitizeIdSegment(id: string): string {
 /**
  * Id-based product link (e.g. from a wishlist row or a shoppable video
  * attachment) — resolves server-side to the canonical slug PDP.
+ * Path template from Page Registry (`store.products.by-productid`).
  */
 export function buildStoreProductIdHref(productId: string): string {
-  return `${APP_ROUTES.store}/products/${sanitizeIdSegment(productId)}`;
+  return fillRegistryPath("store.products.by-productid", {
+    productId: sanitizeIdSegment(productId),
+  });
 }
 
 /**
  * Id-based store link — resolves server-side to the canonical slug store
- * profile page.
+ * profile page. Path template from Page Registry (`store.shops.by-shopid`).
  */
 export function buildStoreShopIdHref(shopId: string): string {
-  return `${APP_ROUTES.store}/shops/${sanitizeIdSegment(shopId)}`;
+  return fillRegistryPath("store.shops.by-shopid", {
+    shopId: sanitizeIdSegment(shopId),
+  });
 }
 
 /** Seller-side deep link to edit a specific product draft/listing. */
 export function buildSellerProductHref(productId: string): string {
-  return `${APP_ROUTES.sellerStore}/products/${sanitizeIdSegment(productId)}/edit`;
+  return fillRegistryPath("seller.store.products.by-productid.edit", {
+    productId: sanitizeIdSegment(productId),
+  });
 }
 
 /** Buyer order detail. */
 export function buildStoreOrderHref(orderId: string): string {
-  return `${APP_ROUTES.storeOrders}/${sanitizeIdSegment(orderId)}`;
+  return fillRegistryPath("store.orders.by-orderid", {
+    orderId: sanitizeIdSegment(orderId),
+  });
 }
 
 /** Seller order detail. */
 export function buildSellerOrderHref(orderId: string): string {
-  return `${APP_ROUTES.sellerOrders}/${sanitizeIdSegment(orderId)}`;
+  return fillRegistryPath("seller.store.orders.by-orderid", {
+    orderId: sanitizeIdSegment(orderId),
+  });
+}
+
+/** Public storefront by slug — registry template + caller slug. */
+export function buildStoreBySlugHref(storeSlug: string): string {
+  return fillRegistryPath("store.by-storeslug", { storeSlug });
+}
+
+/** Canonical PDP by store + product slugs. */
+export function buildStoreProductSlugHref(
+  storeSlug: string,
+  productSlug: string
+): string {
+  return fillRegistryPath("store.by-storeslug.product.by-productslug", {
+    storeSlug,
+    productSlug,
+  });
+}
+
+/** Seller new-product path from registry (static). */
+export function buildSellerProductNewHref(): string {
+  return requireRegistryPath("seller.store.products.new");
 }
 
 export function findIndexByPostId<T extends { id: string | number }>(

@@ -2,7 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import StoreErrorState from "../../../../components/store/StoreErrorState";
 import StoreShell from "../../../../components/store/StoreShell";
-import { APP_ROUTES } from "../../../../lib/nav";
+import {
+  APP_ROUTES,
+  buildStoreBySlugHref,
+  buildStoreProductSlugHref,
+} from "../../../../lib/nav";
+import {
+  assertBreadcrumbsResolve,
+  buildBreadcrumbs,
+} from "../../../../../lib/platform/navigation";
 import {
   pickRecommended,
   pickTrending,
@@ -68,6 +76,14 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     detail.product.id
   );
 
+  // Registry hierarchy/path identity; specialized store name label preserved.
+  const productPath = buildStoreProductSlugHref(
+    detail.store.slug,
+    detail.product.slug
+  );
+  const storePath = buildStoreBySlugHref(detail.store.slug);
+  assertBreadcrumbsResolve(buildBreadcrumbs(productPath));
+
   return (
     <StoreShell
       title={detail.product.title}
@@ -86,7 +102,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
             <li aria-hidden>/</li>
             <li>
               <Link
-                href={`/store/${detail.store.slug}`}
+                href={storePath}
                 className="watch-focus-ring rounded hover:text-[var(--sf-accent-strong)]"
               >
                 {detail.store.name}

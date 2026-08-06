@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { APP_ROUTES, buildSellerOrderHref } from "../../lib/nav";
+import { APP_ROUTES, buildSellerOrderHref, buildSellerProductHref, buildSellerProductNewHref } from "../../lib/nav";
 import {
   SELLER_INVENTORY_FILTERS,
   deriveInventoryAvailabilityState,
@@ -62,7 +62,7 @@ export default function SellerInventoryWorkspace({
       <StoreEmptyState
         title="No inventory rows yet"
         description="Create product drafts with variants to seed inventory. This workspace is visibility-first — reserved holds come from checkout, not seller edits."
-        actionHref="/seller/store/products/new"
+        actionHref={buildSellerProductNewHref()}
         actionLabel="Create product draft"
       />
     );
@@ -243,7 +243,7 @@ export default function SellerInventoryWorkspace({
                     {open ? "Hide detail" : "Show detail"}
                   </button>
                   <Link
-                    href={`/seller/store/products/${row.productId}/edit`}
+                    href={buildSellerProductHref(row.productId)}
                     className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
                   >
                     Open product

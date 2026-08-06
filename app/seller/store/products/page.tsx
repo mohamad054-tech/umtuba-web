@@ -20,7 +20,7 @@ export default async function SellerProductsPage() {
   const user = await getServerUser();
   if (!user) {
     redirect(
-      `${APP_ROUTES.login}?next=${encodeURIComponent("/seller/store/products")}`
+      `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.sellerStoreProducts)}`
     );
   }
 
@@ -76,7 +76,7 @@ export default async function SellerProductsPage() {
           </div>
           {canManage ? (
             <Link
-              href="/seller/store/products/new"
+              href={`${APP_ROUTES.sellerStoreProducts}/new`}
               className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
             >
               New draft

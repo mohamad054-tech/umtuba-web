@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { APP_ROUTES } from "../../lib/nav";
 
 export type HeroSlide = {
   id: string;
@@ -83,7 +84,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               {slide.ctaLabel ?? "Explore"}
             </Link>
             <Link
-              href="/store/search"
+              href={APP_ROUTES.storeSearch}
               className="watch-focus-ring inline-flex rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/85 backdrop-blur-sm transition hover:bg-white/10"
             >
               Browse catalog

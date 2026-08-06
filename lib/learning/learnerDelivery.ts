@@ -24,6 +24,10 @@ import { LEARNING_COMPLETION_ROUTES } from "./completionFoundation";
 import { LEARNING_PROGRESS_RPCS } from "./progressFoundation";
 import type { LearningProgressStatus } from "./progressFoundation";
 import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
+import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../platform/navigation/routeTemplates";
 
 type AnyClient = SupabaseClient;
 
@@ -32,28 +36,48 @@ export const LEARNING_LEARNER_SUBMITTED_MESSAGE =
   "Submitted — results are not available yet." as const;
 
 /** Routes owned by this slice (APP_ROUTES intentionally untouched). */
+/**
+ * Learner chrome / delivery route helpers.
+ * Static hubs and dynamic templates resolve from Page Registry.
+ * Callers supply real course/lesson/activity IDs — never invent examples.
+ */
 export const LEARNING_LEARNER_ROUTES = {
-  hub: "/learning",
-  course: (courseId: string) => `/learning/courses/${courseId}`,
-  lesson: (lessonId: string) => `/learning/lessons/${lessonId}`,
-  activity: (activityId: string) => `/learning/activities/${activityId}`,
+  hub: requireRegistryPath("learning"),
+  course: (courseId: string) =>
+    fillRegistryPath("learning.courses.by-courseid", { courseId }),
+  lesson: (lessonId: string) =>
+    fillRegistryPath("learning.lessons.by-lessonid", { lessonId }),
+  activity: (activityId: string) =>
+    fillRegistryPath("learning.activities.by-activityid", { activityId }),
   /** Matches assessment delivery route; kept here to avoid circular imports. */
   assessment: (activityId: string) =>
-    `/learning/activities/${activityId}/assessment`,
+    fillRegistryPath("learning.activities.by-activityid.assessment", {
+      activityId,
+    }),
   /** Matches assignment learner route; kept here to avoid circular imports. */
   assignment: (activityId: string) =>
-    `/learning/activities/${activityId}/assignment`,
+    fillRegistryPath("learning.activities.by-activityid.assignment", {
+      activityId,
+    }),
   /** Matches project learner route; kept here to avoid circular imports. */
-  project: (activityId: string) => `/learning/activities/${activityId}/project`,
+  project: (activityId: string) =>
+    fillRegistryPath("learning.activities.by-activityid.project", {
+      activityId,
+    }),
   /** Matches lab learner route; kept here to avoid circular imports. */
-  lab: (activityId: string) => `/learning/activities/${activityId}/lab`,
-  attempt: (attemptId: string) => `/learning/attempts/${attemptId}`,
+  lab: (activityId: string) =>
+    fillRegistryPath("learning.activities.by-activityid.lab", { activityId }),
+  attempt: (attemptId: string) =>
+    fillRegistryPath("learning.attempts.by-attemptid", { attemptId }),
   /** Matches course resources learner route; kept here to avoid circular imports. */
-  resources: (courseId: string) => `/learning/courses/${courseId}/resources`,
+  resources: (courseId: string) =>
+    fillRegistryPath("learning.courses.by-courseid.resources", { courseId }),
   /** Matches course progress bundle learner route; kept here to avoid circular imports. */
-  progress: (courseId: string) => `/learning/courses/${courseId}/progress`,
+  progress: (courseId: string) =>
+    fillRegistryPath("learning.courses.by-courseid.progress", { courseId }),
   /** Matches AI Tutor learner route; kept here to avoid circular imports. */
-  aiTutor: (lessonId: string) => `/learning/lessons/${lessonId}/ai-tutor`,
+  aiTutor: (lessonId: string) =>
+    fillRegistryPath("learning.lessons.by-lessonid.ai-tutor", { lessonId }),
 } as const;
 
 export const LEARNING_LEARNER_LOGIN_NEXT = LEARNING_LEARNER_ROUTES.hub;

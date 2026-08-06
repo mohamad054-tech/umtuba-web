@@ -30,6 +30,10 @@ import {
   createWithUniqueInstructorSlug,
   slugifyInstructorName,
 } from "./instructorSlug";
+import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../platform/navigation/routeTemplates";
 
 type AnyClient = SupabaseClient;
 
@@ -39,12 +43,16 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const LANG_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
 
 export const LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES = {
-  hub: "/learning/instructor/bootstrap",
-  spaceNew: "/learning/instructor/spaces/new",
+  hub: requireRegistryPath("learning.instructor.bootstrap"),
+  spaceNew: requireRegistryPath("learning.instructor.spaces.new"),
   programNew: (spaceId: string) =>
-    `/learning/instructor/spaces/${spaceId}/programs/new`,
+    fillRegistryPath("learning.instructor.spaces.by-spaceid.programs.new", {
+      spaceId,
+    }),
   courseNew: (programId: string) =>
-    `/learning/instructor/programs/${programId}/courses/new`,
+    fillRegistryPath("learning.instructor.programs.by-programid.courses.new", {
+      programId,
+    }),
   authoring: LEARNING_INSTRUCTOR_ROUTES.course,
 } as const;
 

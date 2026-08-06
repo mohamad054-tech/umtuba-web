@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import SellerOpsShell from "../../../../../components/store/SellerOpsShell";
 import SellerProductMediaStudio from "../../../../../components/store/SellerProductMediaStudio";
-import { APP_ROUTES } from "../../../../../lib/nav";
+import { APP_ROUTES, buildSellerProductHref } from "../../../../../lib/nav";
 import { createClient, getServerUser } from "../../../../../../lib/supabase/server";
 import { listActiveCategories } from "../../../../../../lib/store/catalogQueries";
 import { canManageCatalog } from "../../../../../../lib/store/permissions";
@@ -51,7 +51,7 @@ export default async function EditSellerProductPage({
   const user = await getServerUser();
   if (!user) {
     redirect(
-      `${APP_ROUTES.login}?next=${encodeURIComponent(`/seller/store/products/${productId}/edit`)}`
+      `${APP_ROUTES.login}?next=${encodeURIComponent(buildSellerProductHref(productId))}`
     );
   }
 
@@ -59,7 +59,7 @@ export default async function EditSellerProductPage({
   const bundle = await getSellerProductBundle(supabase, user.id, productId);
   if (!bundle.ok) {
     if (bundle.message.includes("not found")) notFound();
-    redirect("/seller/store/products");
+    redirect(APP_ROUTES.sellerStoreProducts);
   }
 
   const categories = await listActiveCategories(supabase);
@@ -134,7 +134,7 @@ export default async function EditSellerProductPage({
     >
       <div className="mt-4 flex flex-wrap gap-4 text-sm">
         <Link
-          href="/seller/store/products"
+          href={APP_ROUTES.sellerStoreProducts}
           className="font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
         >
           ← Products

@@ -1,5 +1,5 @@
 /**
- * Presentation metadata for Main / User chrome.
+ * Presentation metadata for Main / User / Commerce / Learning chrome.
  * Maps registry page IDs → labels, slots, and capability gates.
  * Does NOT store route paths — paths come from Page Registry.
  */
@@ -107,6 +107,92 @@ export const USER_MENU_ACCOUNT_PRESENTATION: readonly ChromeNavPresentation[] =
       pageId: "admin.ads",
       label: "Admin",
       capability: "showAdmin",
+    },
+  ] as const;
+
+/**
+ * Seller store operational chrome (seller audience only).
+ * Paths from registry; labels are presentation overlays.
+ */
+export const SELLER_STORE_CHROME_PRESENTATION: readonly ChromeNavPresentation[] =
+  [
+    { chromeId: "dashboard", pageId: "seller.store", label: "Dashboard" },
+    {
+      chromeId: "products",
+      pageId: "seller.store.products",
+      label: "Products",
+    },
+    { chromeId: "orders", pageId: "seller.store.orders", label: "Orders" },
+    {
+      chromeId: "inventory",
+      pageId: "seller.store.inventory",
+      label: "Inventory",
+    },
+    {
+      chromeId: "marketplace",
+      pageId: "seller.store.marketplace",
+      label: "Marketplace",
+    },
+    {
+      chromeId: "analytics",
+      pageId: "seller.store.analytics",
+      label: "Analytics",
+    },
+    {
+      chromeId: "promotions",
+      pageId: "seller.store.promotions",
+      label: "Promotions",
+    },
+    {
+      chromeId: "shipping",
+      pageId: "seller.store.shipping",
+      label: "Shipping",
+    },
+  ] as const;
+
+/**
+ * Buyer store entry chrome (buyer / public storefront utilities).
+ * Never includes seller or admin destinations.
+ */
+export const BUYER_STORE_CHROME_PRESENTATION: readonly ChromeNavPresentation[] =
+  [
+    { chromeId: "store", pageId: "store", label: "Store" },
+    { chromeId: "search", pageId: "store.search", label: "Search" },
+    { chromeId: "cart", pageId: "store.cart", label: "Cart" },
+    { chromeId: "orders", pageId: "store.orders", label: "Orders" },
+    { chromeId: "wishlist", pageId: "store.wishlist", label: "Wishlist" },
+  ] as const;
+
+/**
+ * Learner hub chrome — learner audience only.
+ * Instructor/admin destinations stay out of this list.
+ */
+export const LEARNING_LEARNER_CHROME_PRESENTATION: readonly ChromeNavPresentation[] =
+  [
+    { chromeId: "hub", pageId: "learning", label: "My Learning" },
+    { chromeId: "catalog", pageId: "learning.catalog", label: "Catalog" },
+    {
+      chromeId: "transcript",
+      pageId: "learning.transcript",
+      label: "Transcript",
+    },
+  ] as const;
+
+/**
+ * Instructor chrome — instructor capability gated at call site.
+ * Never mixed into learner chrome builders.
+ */
+export const LEARNING_INSTRUCTOR_CHROME_PRESENTATION: readonly ChromeNavPresentation[] =
+  [
+    {
+      chromeId: "instructor",
+      pageId: "learning.instructor",
+      label: "Instructor",
+    },
+    {
+      chromeId: "review",
+      pageId: "learning.instructor.review",
+      label: "Review",
     },
   ] as const;
 

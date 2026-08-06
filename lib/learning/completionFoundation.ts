@@ -7,6 +7,8 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { requireRegistryPath } from "../platform/navigation/routeTemplates";
+
 type AnyClient = SupabaseClient;
 
 export const LEARNING_COMPLETION_RPCS = {
@@ -30,7 +32,7 @@ export const LEARNING_COMPLETION_NOTIFICATION_TYPE =
   "learning_course_completed" as const;
 
 export const LEARNING_COMPLETION_ROUTES = {
-  transcript: "/learning/transcript",
+  transcript: requireRegistryPath("learning.transcript"),
 } as const;
 
 export type LearningTranscriptEntry = {

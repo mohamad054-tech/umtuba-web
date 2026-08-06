@@ -16,6 +16,10 @@ import {
   type SellerCatalogListItem,
   type SellerCatalogSortKey,
 } from "../../../lib/store/sellerCatalogPresentation";
+import {
+  buildSellerProductHref,
+  buildSellerProductNewHref,
+} from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 
 type Props = {
@@ -97,7 +101,7 @@ export default function SellerProductDashboard({
       <StoreEmptyState
         title="No products yet"
         description="Create a draft to start your catalog. Products stay in draft until submitted for operator review — sellers cannot self-publish."
-        actionHref="/seller/store/products/new"
+        actionHref={buildSellerProductNewHref()}
         actionLabel="Create draft"
       />
     );
@@ -243,7 +247,7 @@ export default function SellerProductDashboard({
                       </p>
                     </div>
                     <Link
-                      href={`/seller/store/products/${product.id}/edit`}
+                      href={buildSellerProductHref(product.id)}
                       className="shrink-0 rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition group-hover:border-[rgba(214,196,161,0.45)]"
                     >
                       Open workspace →

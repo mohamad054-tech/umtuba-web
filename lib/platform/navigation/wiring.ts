@@ -19,11 +19,11 @@ export type WiredNavLink = {
 };
 
 function wireFromGroup(options: {
-  groupId: "admin" | "aiAdmin" | "settings";
+  groupId: "admin" | "aiAdmin" | "settings" | "commerce" | "learning";
   pathPrefix?: string;
   preferredOrder: readonly string[];
   labelOverrides?: Readonly<Record<string, string>>;
-  context?: typeof ADMIN_NAV_CONTEXT;
+  context?: typeof ADMIN_NAV_CONTEXT | typeof AUTHENTICATED_NAV_CONTEXT;
 }): WiredNavLink[] {
   const group = buildNavigationGroup(
     options.groupId,
@@ -266,4 +266,77 @@ export function listAiAdminNavLinks(): WiredNavLink[] {
     pageId: item.pageId,
     label: shortLabel(item),
   }));
+}
+
+/**
+ * Commerce navigation group hubs — buyer/seller/advertise static chrome.
+ * Does not invent dynamic product/store IDs.
+ * Uses seller capability so role-gated seller hubs are included in the inventory.
+ */
+export function listCommerceNavLinks(): WiredNavLink[] {
+  return wireFromGroup({
+    groupId: "commerce",
+    preferredOrder: [
+      "/store",
+      "/store/search",
+      "/store/cart",
+      "/store/orders",
+      "/store/wishlist",
+      "/seller",
+      "/seller/store",
+      "/seller/store/products",
+      "/seller/store/orders",
+      "/seller/store/inventory",
+    ],
+    labelOverrides: {
+      "/store": "Store",
+      "/store/search": "Search",
+      "/store/cart": "Cart",
+      "/store/orders": "Orders",
+      "/store/wishlist": "Wishlist",
+      "/seller": "Seller",
+      "/seller/store": "Seller store",
+      "/seller/store/products": "Products",
+      "/seller/store/orders": "Orders",
+      "/seller/store/inventory": "Inventory",
+    },
+    context: {
+      authenticated: true,
+      isAdmin: false,
+      capabilities: {
+        showSeller: true,
+        showAdvertise: true,
+      },
+    },
+  });
+}
+
+/**
+ * Learning navigation group hubs — learner + instructor static chrome.
+ * Group membership is depth-limited (≤2); deeper instructor tools use
+ * presentation chrome builders instead.
+ */
+export function listLearningNavLinks(): WiredNavLink[] {
+  return wireFromGroup({
+    groupId: "learning",
+    preferredOrder: [
+      "/learning",
+      "/learning/catalog",
+      "/learning/transcript",
+      "/learning/instructor",
+    ],
+    labelOverrides: {
+      "/learning": "My Learning",
+      "/learning/catalog": "Catalog",
+      "/learning/transcript": "Transcript",
+      "/learning/instructor": "Instructor",
+    },
+    context: {
+      authenticated: true,
+      isAdmin: false,
+      capabilities: {
+        showInstructor: true,
+      },
+    },
+  });
 }

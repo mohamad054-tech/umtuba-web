@@ -15,7 +15,12 @@ import {
 } from "../../../lib/store/sellerDashboardInsights";
 import type { AnalyticsSalesSeriesPoint, AnalyticsTopProductRow } from "../../../lib/store/analyticsFinance";
 import type { CommerceRevenueBridgeSellerVisibility } from "../../../lib/store/commerceRevenueBridge";
-import { APP_ROUTES } from "../../lib/nav";
+import {
+  APP_ROUTES,
+  buildSellerOrderHref,
+  buildSellerProductHref,
+  buildStoreBySlugHref,
+} from "../../lib/nav";
 
 type Props = {
   storeName: string;
@@ -94,7 +99,7 @@ export default function SellerDashboardInsightsView(props: Props) {
         </div>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
-            href="/seller/store/products"
+            href={APP_ROUTES.sellerStoreProducts}
             className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712]"
           >
             Products
@@ -120,7 +125,7 @@ export default function SellerDashboardInsightsView(props: Props) {
             </Link>
           ) : null}
           <Link
-            href={`/store/${storeSlug}`}
+            href={buildStoreBySlugHref(storeSlug)}
             className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold"
           >
             Public store
@@ -286,7 +291,7 @@ export default function SellerDashboardInsightsView(props: Props) {
                 {orderSnapshot.recent.map((order) => (
                   <li key={order.id}>
                     <Link
-                      href={`${APP_ROUTES.sellerOrders}/${order.id}`}
+                      href={buildSellerOrderHref(order.id)}
                       className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--sf-line)] px-3 py-2 text-sm hover:border-[rgba(214,196,161,0.35)]"
                     >
                       <span>
@@ -501,7 +506,7 @@ export default function SellerDashboardInsightsView(props: Props) {
                   className="flex flex-wrap justify-between gap-2 rounded-xl border border-[var(--sf-line)] px-3 py-2 text-sm"
                 >
                   <Link
-                    href={`/seller/store/products/${row.productId}/edit`}
+                    href={buildSellerProductHref(row.productId)}
                     className="font-semibold text-[var(--sf-accent-strong)]"
                   >
                     {row.title}

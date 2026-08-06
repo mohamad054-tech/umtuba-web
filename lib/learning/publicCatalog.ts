@@ -6,12 +6,17 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { LearningCourseDifficulty } from "./coursesFoundation";
+import {
+  fillRegistryPath,
+  requireRegistryPath,
+} from "../platform/navigation/routeTemplates";
 
 type AnyClient = SupabaseClient;
 
 export const LEARNING_PUBLIC_ROUTES = {
-  catalog: "/learning/catalog",
-  course: (slug: string) => `/learning/catalog/${slug}`,
+  catalog: requireRegistryPath("learning.catalog"),
+  course: (slug: string) =>
+    fillRegistryPath("learning.catalog.by-courseslug", { courseSlug: slug }),
 } as const;
 
 export const LEARNING_PUBLIC_PREVIEW_RPCS = {
