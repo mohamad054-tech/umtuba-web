@@ -142,7 +142,7 @@ export default function LessonViewer({
       : null;
 
   return (
-    <div className="mt-6 space-y-6">
+    <div className="mt-6 space-y-6" data-testid="learning-lesson-viewer">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {delivery.lesson.course_name}
@@ -231,7 +231,7 @@ export default function LessonViewer({
 
       {canRender ? (
         <>
-          <section className="space-y-4">
+          <section className="space-y-4" data-testid="learning-lesson-content">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               Content
             </h2>
@@ -278,7 +278,13 @@ export default function LessonViewer({
           </section>
         </>
       ) : locked ? (
-        <p className="text-sm text-white/55">{gateMessage}</p>
+        <p
+          className="text-sm text-white/55"
+          data-testid="learning-lesson-locked"
+          role="status"
+        >
+          {gateMessage}
+        </p>
       ) : null}
 
       {handoff?.kind === "mark_complete" ? (
@@ -325,11 +331,13 @@ export default function LessonViewer({
         <nav
           aria-label="Lesson navigation"
           className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4"
+          data-testid="learning-lesson-nav"
         >
           {delivery.previous_lesson ? (
             <Link
               href={delivery.previous_lesson.href}
               className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              data-testid="learning-lesson-nav-prev"
             >
               ← Previous
             </Link>
@@ -340,6 +348,7 @@ export default function LessonViewer({
             <Link
               href={delivery.next_lesson.href}
               className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              data-testid="learning-lesson-nav-next"
             >
               Next →
             </Link>

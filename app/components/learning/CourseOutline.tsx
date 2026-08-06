@@ -19,7 +19,7 @@ function progressLabel(status: string) {
 
 export default function CourseOutline({ outline }: CourseOutlineProps) {
   return (
-    <div className="mt-6 space-y-6">
+    <div className="mt-6 space-y-6" data-testid="learning-course-outline">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           Course
@@ -87,6 +87,7 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
                     <Link
                       href={LEARNING_LEARNER_ROUTES.lesson(lesson.id)}
                       className="watch-focus-ring flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3 transition hover:border-white/25"
+                      data-testid={`learning-outline-lesson-${lesson.id}`}
                     >
                       <span className="font-bold text-white/90">{lesson.name}</span>
                       <span className="text-xs text-white/40">

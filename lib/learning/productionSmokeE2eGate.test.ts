@@ -45,6 +45,16 @@ describe("Learning Production Smoke & E2E Gate onto SoT V1", () => {
     }
   });
 
+  it("keeps browser e2e foundation entrypoints present", () => {
+    for (const rel of [
+      "e2e/learning/learner-access-journey.mjs",
+      "scripts/learning-e2e/run-foundation.mjs",
+      "docs/learning/implementation/LEARNING_BROWSER_E2E_FOUNDATION_V1.md",
+    ]) {
+      expect(existsSync(join(ROOT, rel)), rel).toBe(true);
+    }
+  });
+
   it("keeps gate documentation in docs/learning", () => {
     expect(
       existsSync(

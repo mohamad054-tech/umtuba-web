@@ -44,7 +44,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
   const continueCourse = pickContinueCourse(hub.courses);
 
   return (
-    <div className="mt-6 space-y-6">
+    <div className="mt-6 space-y-6" data-testid="learning-hub">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           My Learning
@@ -59,6 +59,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
         <section
           className="rounded-[28px] border border-sky-400/20 bg-sky-500/10 p-5 backdrop-blur-xl md:p-7"
           aria-label="Continue learning"
+          data-testid="learning-hub-continue"
         >
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-100/70">
             Continue Learning
@@ -80,6 +81,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
             <Link
               href={continueCourse.continue_href}
               className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              data-testid="learning-hub-resume"
             >
               Resume
             </Link>

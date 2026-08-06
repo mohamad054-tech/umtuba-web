@@ -2,27 +2,28 @@
 
 ## Task title
 
-UM Learning - Content Block Render Test Coverage V1
+UM Learning - Browser E2E Foundation V1
 
 ## Status
 
-`implementation-complete` — dedicated renderer coverage landed; validating / committing.
+`implementation-complete` — harness + narrow learner journey; validating / committing.
 
 ## Milestone
 
-`learning.learner.content_block_render_test_coverage_v1`
+`learning.ops.browser_e2e_foundation_v1`
 
 ## Scope
 
-- `lib/learning/contentBlockRender.test.ts`
-- `docs/learning/implementation/LEARNING_CONTENT_BLOCK_RENDER_TEST_COVERAGE_V1.md`
-- Tests-only against existing helpers + ContentBlockRenderer contracts
+- `e2e/learning/**`
+- `scripts/learning-e2e/**`
+- minimal Learning `data-testid` hooks
+- `docs/learning/implementation/LEARNING_BROWSER_E2E_FOUNDATION_V1.md`
 
 ## Branch / HEAD base
 
-`office/learning-content-block-render-test-coverage-v1`
-Base: `origin/office/learning-production-smoke-e2e-gate-onto-sot-v1` @ `e334f00`
+`office/learning-browser-e2e-foundation-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `31ea770`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-content-block-render-test-coverage-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-browser-e2e-foundation-v1`
