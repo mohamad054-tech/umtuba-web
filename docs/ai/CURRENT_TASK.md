@@ -2,27 +2,31 @@
 
 ## Task title
 
-UM Learning - Attempt Player Autosave Flush Coverage V1
+UM Learning - Learner UI Contract Suite V1
 
 ## Status
 
-`implementation-complete` — dedicated AttemptPlayer autosave flush contracts; validating / committing.
+`closed` — learner Hub/Outline/Viewer source contracts committed on branch.
 
 ## Milestone
 
-`learning.learner.attempt_player_autosave_flush_coverage_v1`
+`learning.learner.ui_contract_suite_v1`
 
-## Scope
+## Scope landed
 
-- `lib/learning/attemptPlayerAutosave.test.ts` (new)
-- `docs/learning/implementation/LEARNING_ATTEMPT_PLAYER_AUTOSAVE_FLUSH_COVERAGE_V1.md`
-- Tests-only against existing `AttemptPlayer.tsx` behavior
+- `lib/learning/learnerUiContract.test.ts` (21 tests)
+- `docs/learning/implementation/LEARNING_LEARNER_UI_CONTRACT_SUITE_V1.md`
+- Tests-only; no UI/CSS/migration changes
 
 ## Branch / HEAD base
 
-`office/learning-attempt-player-autosave-flush-coverage-v1`
-Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `f3987cc`
+`office/learning-learner-ui-contract-suite-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `dd7aff0`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-attempt-player-autosave-flush-coverage-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-learner-ui-contract-suite-v1`
+
+## Recommended next
+
+Learning learner Browser E2E smoke against provisioned fixtures (deferred until env credentials), or instructor UI contract suite mirror.
