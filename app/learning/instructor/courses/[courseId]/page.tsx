@@ -220,11 +220,13 @@ export default async function InstructorCourseAuthoringPage({
           <input
             name="name"
             required
+            aria-label="Section name"
             placeholder="Section name"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
           />
           <textarea
             name="description"
+            aria-label="Section description"
             placeholder="Description (optional)"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
             rows={2}
@@ -247,6 +249,7 @@ export default async function InstructorCourseAuthoringPage({
             <textarea
               name="sectionIds"
               required
+              aria-label="Ordered section ids"
               defaultValue={sectionIdsOrdered}
               className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 font-mono text-xs"
               rows={3}
@@ -284,11 +287,13 @@ export default async function InstructorCourseAuthoringPage({
                     <input type="hidden" name="sectionId" value={section.id} />
                     <input
                       name="name"
+                      aria-label="Update section name"
                       defaultValue={section.name}
                       className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                     />
                     <textarea
                       name="description"
+                      aria-label="Update section description"
                       defaultValue={section.description ?? ""}
                       className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                       rows={2}
@@ -337,6 +342,7 @@ export default async function InstructorCourseAuthoringPage({
                     <input
                       name="name"
                       required
+                      aria-label="Lesson name"
                       placeholder="Lesson name"
                       className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                     />
@@ -355,6 +361,7 @@ export default async function InstructorCourseAuthoringPage({
                       <textarea
                         name="lessonIds"
                         required
+                        aria-label="Ordered lesson ids"
                         defaultValue={lessonIdsOrdered}
                         className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 font-mono text-xs"
                         rows={2}
@@ -405,6 +412,7 @@ export default async function InstructorCourseAuthoringPage({
                             />
                             <input
                               name="name"
+                              aria-label="Update lesson name"
                               defaultValue={lesson.name}
                               className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                             />
@@ -458,6 +466,7 @@ export default async function InstructorCourseAuthoringPage({
                             <select
                               name="type"
                               defaultValue="quiz"
+                              aria-label="Activity type"
                               className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                             >
                               <option value="quiz">quiz</option>
@@ -470,6 +479,7 @@ export default async function InstructorCourseAuthoringPage({
                             <input
                               name="name"
                               required
+                              aria-label="Activity name"
                               placeholder="Activity name"
                               className="w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 text-sm"
                             />
@@ -495,6 +505,7 @@ export default async function InstructorCourseAuthoringPage({
                               <textarea
                                 name="activityIds"
                                 required
+                                aria-label="Ordered activity ids"
                                 defaultValue={activityIdsOrdered}
                                 className="mt-2 w-full rounded border border-white/15 bg-black/40 px-2 py-1.5 font-mono text-xs"
                                 rows={2}
@@ -578,6 +589,7 @@ export default async function InstructorCourseAuthoringPage({
                                   />
                                   <input
                                     name="name"
+                                    aria-label="Update activity name"
                                     defaultValue={activity.name}
                                     className="w-full rounded border border-white/15 bg-black/40 px-2 py-1 text-sm"
                                   />

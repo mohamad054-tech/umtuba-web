@@ -162,6 +162,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
           <select
             name="blockType"
             defaultValue="rich_text"
+            aria-label="Content block type"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
           >
             <option value="rich_text">rich_text</option>
@@ -171,6 +172,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
           <textarea
             name="text"
             required
+            aria-label="Block text"
             placeholder="Block text"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
             rows={3}
@@ -191,6 +193,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
             <textarea
               name="blockIds"
               required
+              aria-label="Ordered content block ids"
               defaultValue={blockIdsOrdered}
               className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 font-mono text-xs"
               rows={3}
@@ -233,6 +236,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
                   <input type="hidden" name="blockId" value={block.id} />
                   <textarea
                     name="text"
+                    aria-label="Update block text"
                     defaultValue={text}
                     className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
                     rows={3}
