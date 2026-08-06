@@ -2,28 +2,27 @@
 
 ## Task title
 
-UM Learning - E2E Fixture Provisioning Foundation V1
+UM Learning - Attempt Player Autosave Flush Coverage V1
 
 ## Status
 
-`implementation-complete` — safe fixture provisioner closed as tooling foundation; live run deferred pending isolated env credentials.
+`implementation-complete` — dedicated AttemptPlayer autosave flush contracts; validating / committing.
 
 ## Milestone
 
-`learning.ops.e2e_fixture_provisioning_foundation_v1`
+`learning.learner.attempt_player_autosave_flush_coverage_v1`
 
-## What landed
+## Scope
 
-- Idempotent `UMTUBA_LEARNING_E2E_V1` provisioner (`scripts/learning-e2e/provision-*.mjs`)
-- Fail-closed env gates + prod refuse unless `LEARNING_E2E_ALLOW_PROD=1`
-- Contract tests + operations doc
-- No live browser execution in this close
+- `lib/learning/attemptPlayerAutosave.test.ts` (new)
+- `docs/learning/implementation/LEARNING_ATTEMPT_PLAYER_AUTOSAVE_FLUSH_COVERAGE_V1.md`
+- Tests-only against existing `AttemptPlayer.tsx` behavior
 
 ## Branch / HEAD base
 
-`office/learning-e2e-fixture-provisioning-v1`
-Base: `origin/office/learning-browser-e2e-foundation-v1` @ `88de13b`
+`office/learning-attempt-player-autosave-flush-coverage-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `f3987cc`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-e2e-fixture-provisioning-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-attempt-player-autosave-flush-coverage-v1`
