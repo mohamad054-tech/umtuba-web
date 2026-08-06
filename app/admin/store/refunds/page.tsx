@@ -20,6 +20,7 @@ import { APP_ROUTES } from "../../../lib/nav";
 import AdminStoreShell, { StatusChip } from "../AdminStoreShell";
 import PartialRefundAccountingReviewPanel from "./PartialRefundAccountingReviewPanel";
 import PartialRefundReservationPanel from "./PartialRefundReservationPanel";
+import PartialRefundStuckCommittingRecoveryPanel from "./PartialRefundStuckCommittingRecoveryPanel";
 import RefundOpsActions from "./RefundOpsActions";
 
 export const metadata = {
@@ -68,6 +69,14 @@ export default async function AdminStoreRefundsPage({
   const prOk = sp.prOk === "1";
   const prLedgerId =
     typeof sp.prLedgerId === "string" ? sp.prLedgerId : null;
+
+  const prRecOk = sp.prRecOk === "1";
+  const prRecStatus =
+    typeof sp.prRecStatus === "string" ? sp.prRecStatus : null;
+  const prRecError =
+    typeof sp.prRecError === "string" ? sp.prRecError : null;
+  const prRecLedgerId =
+    typeof sp.prRecLedgerId === "string" ? sp.prRecLedgerId : null;
 
   let prFacts: TrustedPartialRefundFactLoadResult | null = null;
   let prReservations: readonly PartialRefundReservationSafeCommitView[] = [];
@@ -188,6 +197,14 @@ export default async function AdminStoreRefundsPage({
           flashError={prError}
           flashOk={prOk}
           flashLedgerId={prLedgerId}
+        />
+
+        <PartialRefundStuckCommittingRecoveryPanel
+          path={PATH}
+          flashOk={prRecOk}
+          flashStatus={prRecStatus}
+          flashError={prRecError}
+          flashLedgerId={prRecLedgerId}
         />
 
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">

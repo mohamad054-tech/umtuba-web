@@ -2,30 +2,26 @@
 
 ## Milestone
 
-Commerce Partial Refund Reservation Accounting Audit & Review Surface V1 — **CLOSED**
+Commerce Partial Refund Reservation Stuck-Committing Recovery V1
 
 ## Status
 
-**`PARTIAL_REFUND_ACCOUNTING_AUDIT_REVIEW_V1_CLOSED`**
+**`PARTIAL_REFUND_STUCK_COMMITTING_RECOVERY_READY_FOR_REVIEW`**
 
-Read-only capture accounting + committed reservation review for admin/seller closed and pushed.
+Admin-only `committing → failed` in-flight lock release. No commit/push in this pass.
 
-- Migrations `20260899`/`20260900` remotely applied (unchanged)
-- No create/cancel/compensate in this milestone
-- Existing reservation request panel unchanged
-- No provider/money/restock/entitlement/settlement/commission/payout
-- Provider execution remains a separate GO
+- Releases committing lock only
+- Does not cancel/compensate committed reservations
+- No provider/money/restock/entitlement/settlement/commission
+- Seller/buyer recovery absent
+- Migrations `20260899`/`20260900` unchanged
 
 ## Branch / worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1`
-- Branch: `office/commerce-partial-refund-reservation-accounting-audit-review-v1`
-- Base: `5d4bf186efc3eff55431127965a0666e4c4ff512`
-
-## Forbidden without new GO
-
-Create/cancel/compensate reservation · provider/money · seller request · buyer/public · restock/entitlement/settlement/commission · payout · commerce_confirm · migrations · merge
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-reservation-stuck-committing-recovery-v1`
+- Branch: `office/commerce-partial-refund-reservation-stuck-committing-recovery-v1`
+- Base: `191924178723f1ee9d3f5e42dba966451e735a0e`
 
 ## Doc
 
-`docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md`
+`docs/store/implementation/PARTIAL_REFUND_RESERVATION_STUCK_COMMITTING_RECOVERY_V1.md`

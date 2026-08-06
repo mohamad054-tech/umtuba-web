@@ -2,24 +2,24 @@
 
 ## Summary
 
-**`PARTIAL_REFUND_ACCOUNTING_AUDIT_REVIEW_V1_CLOSED`**
+**`PARTIAL_REFUND_STUCK_COMMITTING_RECOVERY_READY_FOR_REVIEW`**
 
-Closed read-only capture accounting + committed reservation review for admin and seller on base `5d4bf18`. Remaining amount/qty derived from trusted capture facts and DB accounting snapshot. No create/cancel/compensate, no provider/money, no migrations.
+Admin-only stuck-committing recovery (`committing → failed`) on base
+`191924178723f1ee9d3f5e42dba966451e735a0e`. Releases in-flight capture lock only.
+No committed cancel/compensation, no provider/money, no migrations, no commit/push.
 
 ## Exact files changed
 
-- `lib/store/partialRefundReservationAccounting/accountingRead.ts` (new)
-- `lib/store/partialRefundReservationAccounting/accountingRead.test.ts` (new)
-- `lib/store/partialRefundReservationAccounting/capability.ts` (new)
-- `lib/store/partialRefundReservationAccounting/index.ts` (new)
-- `lib/store/partialRefundReservationAccounting/types.ts` (new)
-- `app/actions/storePartialRefundReservationAccounting.ts` (new)
-- `app/admin/store/refunds/PartialRefundAccountingReviewPanel.tsx` (new)
+- `lib/store/partialRefundStuckCommittingRecovery/capability.ts` (new)
+- `lib/store/partialRefundStuckCommittingRecovery/types.ts` (new)
+- `lib/store/partialRefundStuckCommittingRecovery/recoveryService.ts` (new)
+- `lib/store/partialRefundStuckCommittingRecovery/recoveryService.test.ts` (new)
+- `lib/store/partialRefundStuckCommittingRecovery/index.ts` (new)
+- `app/actions/storePartialRefundStuckCommittingRecovery.ts` (new)
+- `app/admin/store/refunds/PartialRefundStuckCommittingRecoveryPanel.tsx` (new)
 - `app/admin/store/refunds/page.tsx`
-- `app/components/store/SellerPartialRefundReservationPanel.tsx`
-- `app/seller/store/orders/[orderId]/page.tsx`
-- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md` (new)
-- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACTIONS_WIRING_V1.md`
+- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_STUCK_COMMITTING_RECOVERY_V1.md` (new)
+- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -31,15 +31,31 @@ None.
 
 ## Security review
 
-- Admin: `assertPlatformAdminDb`
-- Seller: `getOwnedOrMemberStore` + store scope
-- Read RPCs only (`getCaptureAccounting`, `listCommitted`, `getCommit`)
-- No mutation RPCs; no service_role to browser
-- Explicit non-events: no money/provider/create/cancel/compensate
+- Platform admin only (`assertPlatformAdminDb`)
+- Optional trusted `expectedStoreId` scope check
+- Fail transition only when status is exactly `committing`
+- Operator reason constrained; rejects money/compensation claim language
+- Explicit non-event flags on all results
+- Seller/buyer recovery absent
 
 ## Tests
 
-PASS — accounting read/UI audits; reservation wiring; ledger/path/adapter; refundOps; restock; `tsc --noEmit`
+PASS — 10 files / 124 tests:
+
+- recovery service/UI audits (14)
+- reservation wiring regression (19)
+- accounting review regression (13)
+- ledger + serviceAdapter + rpcReadiness (33)
+- partialRefundPath (16)
+- refundOperations (13)
+- restock foundation + runtime (16)
+- `npx tsc --noEmit` PASS
+- `git diff --check` PASS
+- secret / provider / money-input / cancel-CTA / migration audits PASS
+
+## TypeScript
+
+PASS
 
 ## Build
 
@@ -51,10 +67,11 @@ PASS
 
 ## git status --short
 
-Clean after closeout commit/push (expected).
+Dirty working tree (uncommitted by design). No upstream. HEAD still base tip
+`1919241` with uncommitted implementation on top.
 
 ## Open issues
 
-- Cancel/compensation still deferred
-- Provider execution requires separate GO
-- Do not claim partial-refund money execution complete
+- Committed compensation/cancel remains a separate unimplemented milestone
+- Provider money execution requires a separate GO
+- Seller/buyer recovery intentionally absent

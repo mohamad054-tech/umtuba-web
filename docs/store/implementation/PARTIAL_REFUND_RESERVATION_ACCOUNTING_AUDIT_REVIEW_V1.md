@@ -65,4 +65,6 @@ They do **not** mean:
 
 ## Deferred
 
-Provider execution · cancel/compensation · seller request · buyer/public · restock/entitlement/settlement/commission · payout · `commerce_confirm`
+Provider execution · cancel/compensation for **committed** · seller request · buyer/public · restock/entitlement/settlement/commission · payout · `commerce_confirm`
+
+Stuck-committing recovery (admin `committing → failed`): see `PARTIAL_REFUND_RESERVATION_STUCK_COMMITTING_RECOVERY_V1.md`.
