@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import FulfillmentAdminPanel from "../../../../components/store/FulfillmentAdminPanel";
 import OrderDetailView from "../../../../components/store/OrderDetailView";
 import SellerOpsShell from "../../../../components/store/SellerOpsShell";
+import SellerPartialRefundReservationPanel from "../../../../components/store/SellerPartialRefundReservationPanel";
 import SellerRefundOperationsPanel from "../../../../components/store/SellerRefundOperationsPanel";
 import StoreErrorState from "../../../../components/store/StoreErrorState";
 import { APP_ROUTES } from "../../../../lib/nav";
@@ -13,6 +14,12 @@ import {
   paymentBlockReason,
 } from "../../../../../lib/store/sellerOrdersPresentation";
 import { getSellerOrderDetail } from "../../../../../lib/store/orders";
+import {
+  createPartialRefundReservationServiceRole,
+  listPartialRefundReservationsForPaymentAttempt,
+  resolveCapturedPaymentAttemptForOrder,
+  type PartialRefundReservationSafeCommitView,
+} from "../../../../../lib/store/partialRefundReservation";
 import { canManageStoreSettings } from "../../../../../lib/store/permissions";
 import {
   getOrderFulfillment,
@@ -78,6 +85,36 @@ export default async function SellerStoreOrderDetailPage({
         orderId,
       })
     : null;
+
+  let prReservations: readonly PartialRefundReservationSafeCommitView[] = [];
+  let prLoadError: string | null = null;
+  if (result.ok) {
+    const boot = createPartialRefundReservationServiceRole();
+    if (!boot.ok) {
+      prLoadError = boot.message;
+    } else {
+      const resolved = await resolveCapturedPaymentAttemptForOrder(
+        boot.supabase,
+        { storeId: membership.store.id, orderId }
+      );
+      if (resolved.ok) {
+        const listed = await listPartialRefundReservationsForPaymentAttempt(
+          { factClient: boot.supabase, repository: boot.repository },
+          {
+            storeId: membership.store.id,
+            paymentAttemptId: resolved.paymentAttemptId,
+          }
+        );
+        if (listed.ok) {
+          prReservations = listed.reservations;
+        } else {
+          prLoadError = listed.message;
+        }
+      } else if (resolved.code !== "not_found") {
+        prLoadError = resolved.message;
+      }
+    }
+  }
 
   const attention = result.ok
     ? deriveSellerOrderAttention({
@@ -191,6 +228,13 @@ export default async function SellerStoreOrderDetailPage({
 
           {refundOpsResult && "requests" in refundOpsResult ? (
             <SellerRefundOperationsPanel surface={refundOpsResult} />
+          ) : null}
+
+          {result.ok ? (
+            <SellerPartialRefundReservationPanel
+              reservations={prReservations}
+              loadError={prLoadError}
+            />
           ) : null}
         </>
       )}

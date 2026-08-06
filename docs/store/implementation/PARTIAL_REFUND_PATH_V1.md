@@ -59,6 +59,7 @@ Completed prerequisites:
 
 - Remote apply of durable ledger migration (`20260899`/`20260900`; tip `20260900`)
 - Service-role adapter + reservation orchestration — see `PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`
+- Reservation server actions + admin/seller wiring — see `PARTIAL_REFUND_RESERVATION_ACTIONS_WIRING_V1.md`
 
 Ledger reservation domain: `docs/store/implementation/PARTIAL_REFUND_LEDGER_COMMIT_BOUNDARY_V1.md`
 

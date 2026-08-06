@@ -3,10 +3,18 @@ import {
   ADMIN_STORE_UNAUTHORIZED,
   assertPlatformAdminDb,
 } from "../../../../lib/store/adminAuth";
+import {
+  createPartialRefundReservationServiceRole,
+  listPartialRefundReservationsForPaymentAttempt,
+  loadTrustedPartialRefundReservationFacts,
+  type PartialRefundReservationSafeCommitView,
+  type TrustedPartialRefundFactLoadResult,
+} from "../../../../lib/store/partialRefundReservation";
 import { loadAdminRefundOperations } from "../../../../lib/store/refundOperations";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { APP_ROUTES } from "../../../lib/nav";
 import AdminStoreShell, { StatusChip } from "../AdminStoreShell";
+import PartialRefundReservationPanel from "./PartialRefundReservationPanel";
 import RefundOpsActions from "./RefundOpsActions";
 
 export const metadata = {
@@ -44,6 +52,38 @@ export default async function AdminStoreRefundsPage({
           ? "Refund execution finished."
           : null;
 
+  const prStoreId =
+    typeof sp.prStoreId === "string" ? sp.prStoreId.trim() : "";
+  const prPaymentAttemptId =
+    typeof sp.prPaymentAttemptId === "string"
+      ? sp.prPaymentAttemptId.trim()
+      : "";
+  const prError = typeof sp.prError === "string" ? sp.prError : null;
+  const prStatus = typeof sp.prStatus === "string" ? sp.prStatus : null;
+  const prOk = sp.prOk === "1";
+  const prLedgerId =
+    typeof sp.prLedgerId === "string" ? sp.prLedgerId : null;
+
+  let prFacts: TrustedPartialRefundFactLoadResult | null = null;
+  let prReservations: readonly PartialRefundReservationSafeCommitView[] = [];
+
+  if (prStoreId && prPaymentAttemptId) {
+    const boot = createPartialRefundReservationServiceRole();
+    if (boot.ok) {
+      prFacts = await loadTrustedPartialRefundReservationFacts(boot.supabase, {
+        storeId: prStoreId,
+        paymentAttemptId: prPaymentAttemptId,
+      });
+      const listed = await listPartialRefundReservationsForPaymentAttempt(
+        { factClient: boot.supabase, repository: boot.repository },
+        { storeId: prStoreId, paymentAttemptId: prPaymentAttemptId }
+      );
+      if (listed.ok) {
+        prReservations = listed.reservations;
+      }
+    }
+  }
+
   const loaded = await loadAdminRefundOperations(supabase, { limit: 50 });
   const requests = "requests" in loaded ? loaded.requests : [];
   const loadError =
@@ -59,7 +99,8 @@ export default async function AdminStoreRefundsPage({
           <p className="mt-2 text-sm text-white/50">
             Full-order workflow only. Approve/reject/execute are server-side and
             fail-closed. Execute uses the existing full-order refund path — no
-            partial refunds and no client money fields.
+            partial refunds and no client money fields. Partial ledger
+            reservation is a separate panel below and never executes money.
           </p>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
             <Stat label="Requests" value={String(requests.length)} />
@@ -98,6 +139,18 @@ export default async function AdminStoreRefundsPage({
             {error ?? loadError}
           </p>
         ) : null}
+
+        <PartialRefundReservationPanel
+          path={PATH}
+          storeIdDefault={prStoreId}
+          paymentAttemptIdDefault={prPaymentAttemptId}
+          facts={prFacts}
+          reservations={prReservations}
+          flashStatus={prStatus}
+          flashError={prError}
+          flashOk={prOk}
+          flashLedgerId={prLedgerId}
+        />
 
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
           <h2 className="text-lg font-black">Refund requests</h2>

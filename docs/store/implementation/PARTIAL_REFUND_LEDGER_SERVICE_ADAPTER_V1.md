@@ -33,7 +33,7 @@ No UI execution wiring. Provider execution requires a later separate GO.
 | partialSettlement | **false** |
 | partialCommission | **false** |
 | compensation | **false** |
-| public/admin/seller execution wiring | **false** (deferred) |
+| public/admin/seller execution wiring | **false** at adapter layer; **admin reservation + seller read** implemented in `PARTIAL_REFUND_RESERVATION_ACTIONS_WIRING_V1.md` (still no money/provider execution) |
 
 ## Sequence
 
@@ -59,7 +59,8 @@ Post-begin failure: invoke `failPartialRefundLedgerCommit` when complete fails.
 ## Deferred (separate GO)
 
 - Provider / Sync money execution
-- Admin/seller/buyer execution UI wiring
+- Buyer execution UI wiring
+- Seller reservation *request* (policy currently read-only)
 - Restock / entitlement / settlement / commission unwind
 - Compensation for committed reservations
 
