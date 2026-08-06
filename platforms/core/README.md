@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1` contracts + `P2` manifest validation + `P3` compliance engine
+- Phase: `P1`–`P4` (contracts, validation, compliance, in-memory registry)
 
 ## Phase P3 scope
 
@@ -43,3 +43,15 @@ Pure **compliance assessment** under `platforms/core/compliance/`.
 
 Out of scope for P3: registry, runtime, event bus, persistence, networking,
 SDK/health engines, product integration.
+
+## Phase P4 scope
+
+Pure **in-memory platform registry** under `platforms/core/registry/`.
+
+- Stores identity, manifest, validation, compliance, module/capability catalogs,
+  version + registration metadata
+- Registers only platforms that pass P2 validation and P3 compliance
+  (including Core Certified eligibility)
+
+Out of scope for P4: persistence, networking, discovery services, plugin
+loading, runtime execution, flag/health/SDK engines, product integration.

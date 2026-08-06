@@ -19,5 +19,8 @@ export const UM_CORE_MANIFEST_VALIDATION_PHASE = "P2" as const;
 /** Compliance engine foundation phase. */
 export const UM_CORE_COMPLIANCE_ENGINE_PHASE = "P3" as const;
 
+/** Platform registry foundation phase. */
+export const UM_CORE_REGISTRY_FOUNDATION_PHASE = "P4" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;

@@ -12,6 +12,7 @@ import {
   UM_CORE_MANIFEST_VALIDATION_PHASE,
   UM_CORE_PACKAGE_ID,
   UM_CORE_PACKAGE_LABEL,
+  UM_CORE_REGISTRY_FOUNDATION_PHASE,
   UM_MATURITY_DESCRIPTORS,
 } from "./index";
 
@@ -21,6 +22,7 @@ describe("um.core foundation P1 package identity", () => {
     expect(UM_CORE_FOUNDATION_PHASE).toBe("P1");
     expect(UM_CORE_MANIFEST_VALIDATION_PHASE).toBe("P2");
     expect(UM_CORE_COMPLIANCE_ENGINE_PHASE).toBe("P3");
+    expect(UM_CORE_REGISTRY_FOUNDATION_PHASE).toBe("P4");
     expect(UM_CORE_PACKAGE_LABEL).toBe("UM Core Platform");
   });
 
