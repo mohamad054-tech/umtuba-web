@@ -2,35 +2,61 @@
 
 ## Summary
 
-**`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**
+**`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**
 
-Preparation milestone closed and pushed. Controlled live drill was **not** run and remains **NOT READY** due to absence of a real eligible RELEASED capture and verified destination.
+Closed and preserved the calculation-only Partial Refund Foundation V1. Durable commit, ledger, restock, entitlement, and settlement/commission unwind remain unsupported. No migration. No production or live refund. Do not begin the runtime milestone without a new GO.
 
-## Exact files in closeout commit
+## Exact files changed
 
 | Path | Action |
 | --- | --- |
-| `docs/store/operations/SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md` | created |
-| `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1.md` | updated (remote migration truth + prep pointer) |
-| `lib/store/sellerLivePayout/manualOpsDrillPrep.contract.test.ts` | created |
-| `docs/ai/CURRENT_TASK.md` | preparation closed handoff |
-| `docs/ai/SESSION_HANDOFF.md` | preparation closed handoff |
+| `lib/store/partialRefundPath/types.ts` | created |
+| `lib/store/partialRefundPath/capability.ts` | created |
+| `lib/store/partialRefundPath/calculate.ts` | created |
+| `lib/store/partialRefundPath/index.ts` | created |
+| `lib/store/partialRefundPath/partialRefundPath.test.ts` | created |
+| `docs/store/implementation/PARTIAL_REFUND_PATH_V1.md` | created |
+| `docs/store/implementation/REFUND_OPERATIONS_SURFACE_V1.md` | updated (pointer) |
+| `docs/ai/CURRENT_TASK.md` | closed handoff |
+| `docs/ai/SESSION_HANDOFF.md` | closed handoff |
 | `docs/ai/PROJECT_STATE.md` | status |
 | `docs/ai/CURSOR_REPORT.md` | this report |
 
-## Facts preserved
+## Migrations created
 
-- Preparation completed
-- Live drill **NOT READY** / **not completed**
-- Blocker: no eligible RELEASED capture + no verified destination
-- Gate OFF · commerce_confirm false · no payout · no invented production data
-- No migration/implementation change needed beyond prep contract test
-- Future drill requires new explicit GO after prerequisites exist
+None.
 
-## Validation
+## Security review
 
-Focused sellerLivePayout tests, `tsc --noEmit`, `git diff --check`, secret scan — recorded in closeout GO.
+- Client money rejected; amounts/currency from trusted stored facts only
+- Prior refund money/qty reduce ceilings; over-refund / over-qty fail closed
+- Capability ownership: calculation true; commit/restock/entitlement/settlement/commission false
+- No secrets; no Stripe; no production mutation
+
+## Tests
+
+Focused partialRefundPath + refundOperations + refund stock restock foundation/runtime — see closeout validation.
+
+## TypeScript
+
+`npx tsc --noEmit` — recorded in closeout GO
+
+## Build
+
+Not required
+
+## git diff --check
+
+Recorded in closeout GO
+
+## git status --short
+
+Clean after closeout commit + push
+
+## Open issues
+
+Runtime blockers preserved: durable ledger + concurrency-safe commit; non-invented settlement/commission unwind. Separate GO required.
 
 ## Final verdict
 
-**`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**
+**`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**

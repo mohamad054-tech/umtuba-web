@@ -2,30 +2,34 @@
 
 ## Milestone
 
-Commerce Seller Live Payout Manual Ops Controlled Drill V1 — **PREPARATION CLOSED**
+Commerce Partial Refund Path V1 — **FOUNDATION CLOSED**
 
 ## Status
 
-`preparation-closed-not-ready` — verdict **`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**
+**`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**
 
-Preparation/readiness artifacts preserved. Live controlled drill remains **`NOT_READY_FOR_CONTROLLED_LIVE_DRILL`**.
-
-- Exact blocker: no safely nominable eligible **RELEASED** capture and no verified active `manual_ops_live` destination
-- Remote aggregates at prep time: release=0, active allocations=0, destinations=0, verified destinations=0
-- Gate remains **OFF** · `commerce_confirm` remains **false** · **no payout** · **no production data invented**
-- No migration or implementation change required (prep docs/contract test only)
-- Actual live drill is **not** completed; future drill needs a **new explicit GO** after prerequisites exist
+Calculation / validation foundation only. No durable partial-refund commit. No production or live refund. No migration.
 
 ## Branch / worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1`
-- Branch: `office/commerce-seller-live-payout-manual-ops-drill-v1`
-- Base: `3ebe1841ee04db9cc9d58f15b1080965854fd7fe`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-path-v1`
+- Branch: `office/commerce-partial-refund-path-v1`
+- Base: `6b1dc297ba80c362fda7d97820390baf925b7c84`
 
-## Prep artifact
+## Preserved ownership (fail-closed)
 
-`docs/store/operations/SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md`
+- `ownsPartialRefundCalculation` = true
+- `ownsPartialRefundCommit` = false
+- `ownsPartialRefundRestock` = false
+- `ownsPartialEntitlementAdjustment` = false
+- `ownsPartialSettlementUnwind` = false
+- `ownsPartialCommissionUnwind` = false
+
+## Preserved blockers
+
+- Durable prior-refund ledger + concurrency-safe commit
+- Non-invented partial settlement / commission unwind semantics
 
 ## Forbidden without new GO
 
-Enable gate · execute payout · invent RELEASED capture/destination · change commerce_confirm · migration apply/repair · begin another milestone from this closeout
+Durable commit · ledger · restock ownership change · entitlement/settlement/commission unwind · admin/seller execute UI · Stripe · commerce_confirm · payout/Manual Ops · migration · begin runtime milestone

@@ -2,33 +2,40 @@
 
 ## Active milestone
 
-Commerce Seller Live Payout Manual Ops Controlled Drill V1
+Commerce Partial Refund Path V1 — **FOUNDATION CLOSED**
 
-Status: **PREPARATION CLOSED** — `MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`
-
-Live drill status remains: **`NOT_READY_FOR_CONTROLLED_LIVE_DRILL`** (not executed, not passed).
+Verdict: **`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**
 
 ## Source of truth
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1`
-- Branch: `office/commerce-seller-live-payout-manual-ops-drill-v1`
-- Base: `3ebe1841ee04db9cc9d58f15b1080965854fd7fe`
-- Prep doc: `docs/store/operations/SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-path-v1`
+- Branch: `office/commerce-partial-refund-path-v1`
+- Base: `6b1dc297ba80c362fda7d97820390baf925b7c84`
+- Doc: `docs/store/implementation/PARTIAL_REFUND_PATH_V1.md`
+- Module: `lib/store/partialRefundPath/`
 
 ## What closed
 
-Preparation checklists, runbook migration truth, contract tests, AI handoff. Gate OFF. No payout. No fabricated RELEASED capture or destination.
+Server-trusted partial refund **calculation / validation** foundation:
+typed intent + trusted line facts, deterministic amount from stored unit prices,
+prior-refund accounting validation, stable failure codes, capability metadata,
+fail-closed unsupported commit boundary, focused tests, docs.
 
-## Preserved blocker
+## What did not happen
 
-No safely nominable eligible RELEASED capture + no verified active `manual_ops_live` destination (release=0, allocations=0, destinations=0, verified=0 at prep).
+- No durable partial-refund commit
+- No refund ledger
+- No migration
+- No Stripe / live provider / commerce_confirm
+- No production or live refund
+- No restock / entitlement / settlement / commission unwind invention
+- No payout or Manual Ops changes
 
-## Exact next steps (new GO only)
+## Preserved blockers for any future runtime GO
 
-1. Operators obtain real eligible RELEASED capture + verified masked destination (no inventing in agent session).
-2. Explicit controlled drill GO with window + gate-OFF rollback owner.
-3. Do not auto-start live drill or another milestone from this closeout.
+1. Durable per-line prior-refund ledger + concurrency-safe commit
+2. Non-invented partial settlement / commission unwind semantics
 
-## Safety
+## Exact next steps
 
-Gate OFF · commerce_confirm false · no bank API · no Connect/Wise/PayPal
+Do **not** auto-start the next milestone. Runtime/commit requires a **separate design and explicit GO**.

@@ -30,6 +30,11 @@ Durable request → review → approve/reject → execute workflow on top of the
 - Seller read surface cannot execute money refunds
 - Notifications: requested / completed / rejected / failed
 
+## Related (calculation only)
+
+Partial refund **calculation** foundation: `docs/store/implementation/PARTIAL_REFUND_PATH_V1.md`
+(`ownsPartialRefundCommit` remains false — ops execute still full-order only.)
+
 ## Out of scope
 
 Stripe refund adapter, payout rails changes, commission changes, wallet mutations, remote migration apply
