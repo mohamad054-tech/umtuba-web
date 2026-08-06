@@ -48,17 +48,17 @@ Rejects: zero/negative/malformed qty, unknown/duplicate lines, over-qty, over-re
 - Selecting all remaining quantities with merchandise-equal capture yields `isFullRemainingCaptureRefund`
 - Does **not** require `commerce_confirm` or live Stripe
 
-## Deferred blockers (runtime commit GO required)
+## Deferred blockers (runtime money GO required)
 
 These remain **unsupported** until designed and authorized separately:
 
-- Durable per-line refund ledger + concurrency-safe commit RPC (**blocker**)
-- Non-invented partial settlement / commission unwind semantics (**blocker**)
-- Sync / provider partial refund execution
-- Partial restock (foundation still forbids `partial_refund` commitment)
-- Partial entitlement reduction
+- Provider / Sync partial refund **money execution**
+- Partial restock / entitlement / settlement / commission unwind (must not invent)
+- Remote apply of durable ledger migration (see Ledger & Commit Boundary V1)
 
-Do **not** begin the runtime milestone from this closeout without a new GO.
+Ledger reservation domain: `docs/store/implementation/PARTIAL_REFUND_LEDGER_COMMIT_BOUNDARY_V1.md`
+
+Do **not** begin money execution from the calculation closeout without a new GO.
 
 ## Migration
 

@@ -2,34 +2,33 @@
 
 ## Milestone
 
-Commerce Partial Refund Path V1 — **FOUNDATION CLOSED**
+Commerce Partial Refund Durable Ledger & Commit Boundary V1 — **CLOSED**
 
 ## Status
 
-**`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**
+**`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED`**
 
-Calculation / validation foundation only. No durable partial-refund commit. No production or live refund. No migration.
+Foundation complete. Migration `20260899` is **local only / not remotely applied**.
+`committed` = durable prior-accounting reservation only. No partial refund executed. No production money moved.
 
 ## Branch / worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-path-v1`
-- Branch: `office/commerce-partial-refund-path-v1`
-- Base: `6b1dc297ba80c362fda7d97820390baf925b7c84`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1`
+- Branch: `office/commerce-partial-refund-ledger-commit-boundary-v1`
+- Base: `c902eb9934633d7ca31db8f3eea1b4766668c4a4`
 
-## Preserved ownership (fail-closed)
+## Ownership preserved
 
-- `ownsPartialRefundCalculation` = true
-- `ownsPartialRefundCommit` = false
-- `ownsPartialRefundRestock` = false
-- `ownsPartialEntitlementAdjustment` = false
-- `ownsPartialSettlementUnwind` = false
-- `ownsPartialCommissionUnwind` = false
+- ledgerDomain / commitBoundary = **true**
+- moneyExecution / providerRefund / restock / entitlement / settlement / commission = **false**
 
-## Preserved blockers
+## Next-step blockers (separate GOs)
 
-- Durable prior-refund ledger + concurrency-safe commit
-- Non-invented partial settlement / commission unwind semantics
+1. Remote apply of `20260899` (+ privileged RPCs)
+2. Provider / Sync money execution
+3. Partial restock / entitlement / settlement / commission unwind (must not invent)
+4. Compensation for committed reservations (must not invent)
 
 ## Forbidden without new GO
 
-Durable commit · ledger · restock ownership change · entitlement/settlement/commission unwind · admin/seller execute UI · Stripe · commerce_confirm · payout/Manual Ops · migration · begin runtime milestone
+Remote migrate · Stripe/Sync refund · commerce_confirm · restock/entitlement/settlement/commission ownership · payout/Manual Ops · begin next milestone

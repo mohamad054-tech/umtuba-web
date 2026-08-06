@@ -81,9 +81,10 @@ Frozen baselines (extend, do not replace):
 | Commerce Migration History Drift Verification V1 | **COMPLETE historically** — `20260822`+`20260823` registered remotely |
 | Commerce Seller Live Payout Provider V1 | **COMPLETE / CLOSED** — remote tip **`20260898`**; closeout `3ebe184`; gate OFF |
 | Commerce Seller Live Payout Manual Ops Controlled Drill V1 | **PREPARATION CLOSED** — branch `office/commerce-seller-live-payout-manual-ops-drill-v1` @ `6b1dc297`; verdict **`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**; live drill still **NOT READY**; gate OFF; no payout |
-| Commerce Partial Refund Path V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-path-v1`; base `6b1dc297`; verdict **`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**; calculation-only; commit/restock/entitlement/settlement ownership false; no migration; runtime GO required separately |
+| Commerce Partial Refund Path V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-path-v1` @ `c902eb9`; calculation-only |
+| Commerce Partial Refund Durable Ledger & Commit Boundary V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-ledger-commit-boundary-v1`; base `c902eb9`; verdict **`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED`**; local migration draft `20260899` **not remote-applied**; money/provider/restock/entitlement/settlement/commission ownership false |
 
-Default: Payout schema remote through **`20260898`**. Live gate **OFF**. Manual Ops drill still blocked. Active coding worktree for this GO: Partial Refund Path V1. Do not auto-start drill. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Payout schema remote through **`20260898`**. Live gate **OFF**. Partial refund ledger `20260899` local only. Do not auto-apply. Do not auto-start provider execution. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

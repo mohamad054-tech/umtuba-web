@@ -2,40 +2,37 @@
 
 ## Active milestone
 
-Commerce Partial Refund Path V1 — **FOUNDATION CLOSED**
+Commerce Partial Refund Durable Ledger & Commit Boundary V1 — **CLOSED**
 
-Verdict: **`PARTIAL_REFUND_FOUNDATION_V1_CLOSED`**
+Verdict: **`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED`**
 
 ## Source of truth
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-path-v1`
-- Branch: `office/commerce-partial-refund-path-v1`
-- Base: `6b1dc297ba80c362fda7d97820390baf925b7c84`
-- Doc: `docs/store/implementation/PARTIAL_REFUND_PATH_V1.md`
-- Module: `lib/store/partialRefundPath/`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1`
+- Branch: `office/commerce-partial-refund-ledger-commit-boundary-v1`
+- Base: `c902eb9934633d7ca31db8f3eea1b4766668c4a4`
+- Doc: `docs/store/implementation/PARTIAL_REFUND_LEDGER_COMMIT_BOUNDARY_V1.md`
+- Module: `lib/store/partialRefundLedger/`
+- Migration: `20260899` **local draft only — not remote-applied**
 
 ## What closed
 
-Server-trusted partial refund **calculation / validation** foundation:
-typed intent + trusted line facts, deterministic amount from stored unit prices,
-prior-refund accounting validation, stable failure codes, capability metadata,
-fail-closed unsupported commit boundary, focused tests, docs.
+Durable partial-refund ledger domain + commit boundary (reservation semantics).
+Memory repository + focused tests. Local additive migration draft.
 
-## What did not happen
+## Explicit non-events
 
-- No durable partial-refund commit
-- No refund ledger
-- No migration
-- No Stripe / live provider / commerce_confirm
-- No production or live refund
-- No restock / entitlement / settlement / commission unwind invention
-- No payout or Manual Ops changes
+- No remote migration apply
+- No partial refund executed
+- No production money movement
+- No Stripe / Sync / provider call
+- No restock / entitlement / settlement / commission unwind
+- `committed` ≠ money movement (reservation only)
 
-## Preserved blockers for any future runtime GO
+## Preserved blockers
 
-1. Durable per-line prior-refund ledger + concurrency-safe commit
-2. Non-invented partial settlement / commission unwind semantics
+Remote apply `20260899` · provider execution · partial restock/entitlement/settlement/commission · compensation inventing — each needs a **separate GO**.
 
-## Exact next steps
+## Safety
 
-Do **not** auto-start the next milestone. Runtime/commit requires a **separate design and explicit GO**.
+commerce_confirm false · gate OFF · no payout/Manual Ops edits · do not auto-start next milestone
