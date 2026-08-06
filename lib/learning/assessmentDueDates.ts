@@ -19,7 +19,7 @@ export const LEARNING_ASSESSMENT_DUE_RPCS = {
 } as const;
 
 export const LEARNING_ASSESSMENT_DUE_MIGRATION =
-  "20260905_learning_assessment_due_dates_calendar_v1.sql";
+  "20260906_learning_assessment_due_dates_calendar_v1.sql";
 
 export const LEARNING_CALENDAR_ITEM_KINDS = [
   "live_session",

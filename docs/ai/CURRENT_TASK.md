@@ -14,7 +14,7 @@ UM Learning - Assessment Due Dates on Calendar V1
 
 ## Scope landed
 
-- Migration `20260905_learning_assessment_due_dates_calendar_v1.sql`
+- Migration `20260906_learning_assessment_due_dates_calendar_v1.sql`
   - `learning_activity_settings.due_at`
   - `set_learning_assessment_due_at`
   - calendar RPCs include `assessment_due` + `assessment_due_supported: true`
@@ -36,4 +36,4 @@ Base: `17ce7e498757c8bd984b776bdde9fbf9a71dd36d`
 
 ## Recommended next
 
-Fast-forward Learning SoT after review, then optional remote apply GO for `20260905`.
+Optional remote apply GO for `20260906` (reallocated off collided `20260905`).

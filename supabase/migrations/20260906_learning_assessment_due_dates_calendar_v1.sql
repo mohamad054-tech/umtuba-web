@@ -1,6 +1,6 @@
 -- =============================================================================
 -- UM Learning OS — Assessment Due Dates on Calendar V1
--- Migration: 20260905_learning_assessment_due_dates_calendar_v1.sql
+-- Migration: 20260906_learning_assessment_due_dates_calendar_v1.sql
 --
 -- Additive nullable due_at on learning_activity_settings for quiz assessments.
 -- Calendar aggregation gains assessment_due events.

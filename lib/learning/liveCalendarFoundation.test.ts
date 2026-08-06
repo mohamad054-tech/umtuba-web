@@ -157,7 +157,7 @@ describe("Live Learning & Calendar Foundation V1 — SQL", () => {
     expect(mine).toMatch(/assignment_due/);
     expect(mine).toMatch(/learning_assignment_specs/);
     expect(mine).toMatch(/assessment_due_supported/);
-    // Foundation V1 shipped false; Assessment Due Dates V1 (20260905) flips true.
+    // Foundation V1 shipped false; Assessment Due Dates V1 (20260906) flips true.
     expect(mine).toMatch(/false/);
 
     const instr = stripSqlComments(

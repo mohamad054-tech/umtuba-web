@@ -4,7 +4,7 @@ Status: **implemented** (migration created, **not applied remotely**)
 
 Branch: `office/learning-assessment-due-dates-calendar-v1`
 
-Migration: `supabase/migrations/20260905_learning_assessment_due_dates_calendar_v1.sql`
+Migration: `supabase/migrations/20260906_learning_assessment_due_dates_calendar_v1.sql`
 
 Capability: `learning.calendar.assessment_due_dates_v1`
 
@@ -73,7 +73,7 @@ widening that delivery RPC is out of scope for this calendar milestone.
 
 ## Deferred
 
-- Remote apply of `20260905` (explicit GO required)
+- Remote apply of `20260906` (explicit GO required; reallocated off collided `20260905`)
 - Browser runtime smoke (env/fixture debt; not a product blocker)
 
 ## Tests
