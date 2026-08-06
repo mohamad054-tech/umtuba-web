@@ -14,6 +14,9 @@ function isSitemapEligible(
   if (page.dynamic) return false;
   if (page.deprecated || page.status === "deprecated") return false;
   if (page.navigationVisibility === "hidden") return false;
+  // Auth / identity entry points stay crawlable via links but are not sitemap destinations.
+  if (page.domain === "identity") return false;
+  if (page.section === "auth") return false;
   if (page.legacy && page.path !== "/discover") {
     // Keep discover out of sitemap (alias); exclude other legacy labs.
     return false;

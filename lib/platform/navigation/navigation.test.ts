@@ -115,6 +115,8 @@ describe("UMTUBA Unified Navigation Foundation V1", () => {
         !p.dynamic &&
         !p.deprecated &&
         p.navigationVisibility !== "hidden" &&
+        p.domain !== "identity" &&
+        p.section !== "auth" &&
         !(p.legacy && p.path !== "/discover") &&
         p.path !== "/discover"
     );
@@ -129,9 +131,11 @@ describe("UMTUBA Unified Navigation Foundation V1", () => {
       expect(page.adminOnly).toBe(false);
       expect(page.access).toBe("public");
       expect(page.dynamic).toBe(false);
+      expect(page.domain).not.toBe("identity");
     }
 
     expect(sitemap.some((e) => e.path.startsWith("/admin"))).toBe(false);
+    expect(sitemap.some((e) => e.path === "/login")).toBe(false);
   });
 
   it("robots disallow includes admin prefix", () => {

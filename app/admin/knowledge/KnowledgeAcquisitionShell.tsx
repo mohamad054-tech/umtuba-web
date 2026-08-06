@@ -2,22 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES } from "../../lib/nav";
+import { listKnowledgeNavLinks } from "../../../lib/platform/navigation";
 
 export const KNOWLEDGE_ACQUISITION_BASE = "/admin/knowledge";
 
-const NAV = [
-  { href: KNOWLEDGE_ACQUISITION_BASE, label: "Overview" },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/sources`, label: "Sources" },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/datasets`, label: "Datasets" },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/rights`, label: "Rights" },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/quality`, label: "Quality" },
-  {
-    href: `${KNOWLEDGE_ACQUISITION_BASE}/classification`,
-    label: "Classification",
-  },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/eligibility`, label: "Eligibility" },
-  { href: `${KNOWLEDGE_ACQUISITION_BASE}/history`, label: "History" },
-] as const;
+const NAV = listKnowledgeNavLinks();
 
 export default function KnowledgeAcquisitionShell({
   children,

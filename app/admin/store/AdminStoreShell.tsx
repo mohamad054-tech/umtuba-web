@@ -2,16 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
 import {
-  APP_ROUTES,
   MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
 } from "../../lib/nav";
+import { listAdminStoreNavLinks } from "../../../lib/platform/navigation";
 
-const LINKS = [
-  { href: APP_ROUTES.adminStore, label: "Overview" },
-  { href: APP_ROUTES.adminStoreSellers, label: "Seller applications" },
-  { href: APP_ROUTES.adminStoreProducts, label: "Product review" },
-  { href: APP_ROUTES.adminStoreReservations, label: "Reservations" },
-] as const;
+const LINKS = listAdminStoreNavLinks();
 
 type Props = {
   title: string;

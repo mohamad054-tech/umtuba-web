@@ -52,3 +52,15 @@ export {
   collectRobotsDisallowPaths,
   renderRobotsTxt,
 } from "./robotsBuilder";
+
+export {
+  listAdminAdsNavLinks,
+  listAdminNavLinks,
+  listAdminStoreNavLinks,
+  listAiAdminNavLinks,
+  listAiDataNavLinks,
+  listKnowledgeNavLinks,
+  listPrivateAiNavLinks,
+  listSettingsNavLinks,
+  type WiredNavLink,
+} from "./wiring";

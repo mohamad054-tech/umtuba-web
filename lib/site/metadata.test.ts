@@ -116,21 +116,34 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/feed") ||
           path.startsWith("/journey-pro") ||
           path.startsWith("/city") ||
-          path.startsWith("/live/media-lab")
+          path.startsWith("/live/media-lab") ||
+          path.startsWith("/admin") ||
+          path.startsWith("/seller") ||
+          path.startsWith("/advertise") ||
+          path.startsWith("/store/cart") ||
+          path.startsWith("/store/checkout") ||
+          path.startsWith("/store/orders") ||
+          path.startsWith("/store/wishlist") ||
+          path.startsWith("/learning") ||
+          path.startsWith("/profile") ||
+          path.startsWith("/ai-hub") ||
+          path.startsWith("/discover") ||
+          path.startsWith("/post-journey") ||
+          path.startsWith("/invite")
       ).toBe(true);
     }
+    expect(ROBOTS_DISALLOW_PATHS).toContain("/admin/");
   });
 
   it("sitemap includes only public static routes", () => {
-    expect([...SITEMAP_STATIC_ROUTES]).toEqual([
-      "/",
-      "/discover",
-      "/live",
-      "/watch",
-      "/post-journey",
-      "/terms",
-      "/privacy",
-    ]);
+    expect(SITEMAP_STATIC_ROUTES).toContain("/");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/terms");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/privacy");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/live");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/watch");
+    // Registry policy: forever Home alias + legacy labs stay out of sitemap.
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/discover");
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/post-journey");
     const blocked = [
       "/login",
       "/messages",
@@ -140,10 +153,15 @@ describe("route robots / sitemap policy", () => {
       "/city",
       "/rewards",
       "/live/media-lab",
+      "/admin",
+      "/admin/store",
     ];
     for (const path of blocked) {
       expect(SITEMAP_STATIC_ROUTES).not.toContain(path);
     }
+    expect(
+      SITEMAP_STATIC_ROUTES.some((path) => path.startsWith("/admin"))
+    ).toBe(false);
   });
 
   it("buildPageMetadata sets canonical and OG image dimensions", () => {

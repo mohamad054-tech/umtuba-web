@@ -2,20 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES } from "../../lib/nav";
+import { listAiDataNavLinks } from "../../../lib/platform/navigation";
 
 export const AI_DATA_PLATFORM_BASE = "/admin/ai-data";
 
-const NAV = [
-  { href: AI_DATA_PLATFORM_BASE, label: "Overview" },
-  { href: `${AI_DATA_PLATFORM_BASE}/review`, label: "Review" },
-  { href: `${AI_DATA_PLATFORM_BASE}/datasets`, label: "Datasets" },
-  { href: `${AI_DATA_PLATFORM_BASE}/versions`, label: "Versions" },
-  { href: `${AI_DATA_PLATFORM_BASE}/experiments`, label: "Experiments" },
-  { href: `${AI_DATA_PLATFORM_BASE}/models`, label: "Models" },
-  { href: `${AI_DATA_PLATFORM_BASE}/evaluation-sets`, label: "Evaluation Sets" },
-  { href: `${AI_DATA_PLATFORM_BASE}/promotion`, label: "Promotion Queue" },
-  { href: `${AI_DATA_PLATFORM_BASE}/audit`, label: "Audit Trail" },
-] as const;
+const NAV = listAiDataNavLinks();
 
 export default function AiDataPlatformShell({
   children,

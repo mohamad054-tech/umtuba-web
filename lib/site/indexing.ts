@@ -1,48 +1,28 @@
 /**
- * Route indexing policy for robots.txt and page-level robots metadata.
+ * Route indexing policy for robots.txt and sitemap.
  *
- * Index (public marketing / discovery / profiles):
- * - /, /discover, /live, /watch, /post-journey, /terms, /privacy, /profile/*, /invite/*
+ * Wired to Unified Navigation Foundation + Page Registry (Wiring V1).
+ * Route membership is derived — not a duplicated hardcoded tree.
  *
- * Noindex (auth, account, private, gated labs):
- * - login, signup, register, password reset, auth callbacks
- * - settings, messages, notifications, create, saved, rewards, creator
- * - feed, journey-pro, city, live/media-lab
- *
- * Dynamic live rooms (/live/[roomId]) are allowlisted for crawling when linked
- * but are not enumerated in the sitemap.
+ * Public profiles (`/profile/[username]`) remain deferred (dynamic).
  */
 
-/** Path prefixes disallowed in robots.txt (trailing slash means prefix match). */
-export const ROBOTS_DISALLOW_PATHS = [
-  "/login",
-  "/signup",
-  "/register",
-  "/forgot-password",
-  "/auth/",
-  "/settings",
-  "/messages",
-  "/notifications",
-  "/create",
-  "/saved",
-  "/rewards",
-  "/creator",
-  "/feed",
-  "/journey-pro",
-  "/city",
-  "/live/media-lab",
-] as const;
+import {
+  buildSitemapEntries,
+  collectRobotsDisallowPaths,
+} from "../platform/navigation";
+
+/**
+ * Path prefixes / paths disallowed in robots.txt.
+ * Derived from registry access, admin, hidden, and deprecated metadata.
+ */
+export const ROBOTS_DISALLOW_PATHS: readonly string[] =
+  collectRobotsDisallowPaths();
 
 /**
  * Legitimate public static routes for the sitemap.
- * Public profiles are deferred (see sitemap.ts comment) — not queried here.
+ * Derived from registry-eligible public static pages.
  */
-export const SITEMAP_STATIC_ROUTES = [
-  "/",
-  "/discover",
-  "/live",
-  "/watch",
-  "/post-journey",
-  "/terms",
-  "/privacy",
-] as const;
+export const SITEMAP_STATIC_ROUTES: readonly string[] = buildSitemapEntries().map(
+  (entry) => entry.path
+);

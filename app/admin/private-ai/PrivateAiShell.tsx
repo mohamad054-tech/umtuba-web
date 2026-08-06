@@ -2,19 +2,11 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES } from "../../lib/nav";
+import { listPrivateAiNavLinks } from "../../../lib/platform/navigation";
 
 export const PRIVATE_AI_BASE = "/admin/private-ai";
 
-const NAV = [
-  { href: PRIVATE_AI_BASE, label: "Overview" },
-  { href: `${PRIVATE_AI_BASE}/models`, label: "Private Models" },
-  { href: `${PRIVATE_AI_BASE}/capabilities`, label: "Capabilities" },
-  { href: `${PRIVATE_AI_BASE}/deployments`, label: "Deployments" },
-  { href: `${PRIVATE_AI_BASE}/hardware`, label: "Hardware" },
-  { href: `${PRIVATE_AI_BASE}/routing`, label: "Routing" },
-  { href: `${PRIVATE_AI_BASE}/lifecycle`, label: "Lifecycle" },
-  { href: `${PRIVATE_AI_BASE}/runtime`, label: "Runtime" },
-] as const;
+const NAV = listPrivateAiNavLinks();
 
 export default function PrivateAiShell({
   children,

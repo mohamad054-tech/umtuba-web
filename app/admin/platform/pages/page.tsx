@@ -13,7 +13,12 @@ import {
 import {
   ADMIN_NAV_CONTEXT,
   buildAllNavigationGroups,
+  buildBreadcrumbs,
   buildSitemapEntries,
+  listAdminAdsNavLinks,
+  listAdminStoreNavLinks,
+  listAiAdminNavLinks,
+  listSettingsNavLinks,
   reportNavigationOrphans,
 } from "../../../../lib/platform/navigation";
 import {
@@ -55,11 +60,36 @@ export default async function AdminPlatformPagesPage() {
   );
   const sitemapCount = buildSitemapEntries(PAGE_REGISTRY).length;
   const navOrphans = reportNavigationOrphans(PAGE_REGISTRY);
+  const breadcrumbs = buildBreadcrumbs(PATH);
+  const wiredAdminStore = listAdminStoreNavLinks();
+  const wiredAdminAds = listAdminAdsNavLinks();
+  const wiredAiAdmin = listAiAdminNavLinks();
+  const wiredSettings = listSettingsNavLinks();
 
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
         <AppTopNav title="Platform" subtitle="Unified page registry" />
+        <nav
+          aria-label="Breadcrumb"
+          className="mt-3 flex flex-wrap items-center gap-2 text-xs text-white/45"
+        >
+          {breadcrumbs.map((crumb, index) => (
+            <span key={crumb.pageId} className="inline-flex items-center gap-2">
+              {index > 0 ? <span aria-hidden="true">/</span> : null}
+              {index === breadcrumbs.length - 1 ? (
+                <span className="font-bold text-white/70">{crumb.label}</span>
+              ) : (
+                <Link
+                  href={crumb.dynamic ? "#" : crumb.href}
+                  className="watch-focus-ring rounded hover:text-white"
+                >
+                  {crumb.label}
+                </Link>
+              )}
+            </span>
+          ))}
+        </nav>
         <nav
           aria-label="Platform admin"
           className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
@@ -96,6 +126,10 @@ export default async function AdminPlatformPagesPage() {
               ["Learning", counts.learning],
               ["Sitemap (public)", sitemapCount],
               ["Nav orphans", navOrphans.length],
+              ["Wired store admin", wiredAdminStore.length],
+              ["Wired ads admin", wiredAdminAds.length],
+              ["Wired AI admin", wiredAiAdmin.length],
+              ["Wired settings", wiredSettings.length],
             ].map(([label, value]) => (
               <div
                 key={String(label)}
@@ -115,7 +149,7 @@ export default async function AdminPlatformPagesPage() {
             </h2>
             <p className="mt-1 text-xs text-white/40">
               Groups built from Page Registry via unified navigation foundation.
-              Production chrome is not replaced.
+              Production Main/User chrome is not replaced in Wiring V1.
             </p>
             <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {navGroups.map((group) => (
