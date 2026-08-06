@@ -94,6 +94,8 @@ Success always includes: `reservationCommitted=true` and all money/provider/rest
 - Partial restock / entitlement / settlement / commission / compensation
 - `commerce_confirm`
 
+Accounting audit/review (read-only): see `PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md`.
+
 ## Related
 
 - Adapter: `PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`

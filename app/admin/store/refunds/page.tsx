@@ -10,10 +10,15 @@ import {
   type PartialRefundReservationSafeCommitView,
   type TrustedPartialRefundFactLoadResult,
 } from "../../../../lib/store/partialRefundReservation";
+import {
+  loadPartialRefundCaptureAccountingReview,
+  type PartialRefundAccountingReviewModel,
+} from "../../../../lib/store/partialRefundReservationAccounting";
 import { loadAdminRefundOperations } from "../../../../lib/store/refundOperations";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { APP_ROUTES } from "../../../lib/nav";
 import AdminStoreShell, { StatusChip } from "../AdminStoreShell";
+import PartialRefundAccountingReviewPanel from "./PartialRefundAccountingReviewPanel";
 import PartialRefundReservationPanel from "./PartialRefundReservationPanel";
 import RefundOpsActions from "./RefundOpsActions";
 
@@ -84,6 +89,31 @@ export default async function AdminStoreRefundsPage({
     }
   }
 
+  const prAcctStoreId =
+    typeof sp.prAcctStoreId === "string" ? sp.prAcctStoreId.trim() : "";
+  const prAcctPaymentAttemptId =
+    typeof sp.prAcctPaymentAttemptId === "string"
+      ? sp.prAcctPaymentAttemptId.trim()
+      : "";
+  let prAcctReview: PartialRefundAccountingReviewModel | null = null;
+  let prAcctError: string | null = null;
+  if (prAcctStoreId && prAcctPaymentAttemptId) {
+    const boot = createPartialRefundReservationServiceRole();
+    if (!boot.ok) {
+      prAcctError = boot.message;
+    } else {
+      const acct = await loadPartialRefundCaptureAccountingReview(
+        { factClient: boot.supabase, repository: boot.repository },
+        { storeId: prAcctStoreId, paymentAttemptId: prAcctPaymentAttemptId }
+      );
+      if (acct.ok) {
+        prAcctReview = acct.review;
+      } else {
+        prAcctError = acct.message;
+      }
+    }
+  }
+
   const loaded = await loadAdminRefundOperations(supabase, { limit: 50 });
   const requests = "requests" in loaded ? loaded.requests : [];
   const loadError =
@@ -139,6 +169,14 @@ export default async function AdminStoreRefundsPage({
             {error ?? loadError}
           </p>
         ) : null}
+
+        <PartialRefundAccountingReviewPanel
+          path={PATH}
+          storeIdDefault={prAcctStoreId}
+          paymentAttemptIdDefault={prAcctPaymentAttemptId}
+          review={prAcctReview}
+          loadError={prAcctError}
+        />
 
         <PartialRefundReservationPanel
           path={PATH}

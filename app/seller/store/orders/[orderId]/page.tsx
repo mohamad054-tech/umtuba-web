@@ -20,6 +20,10 @@ import {
   resolveCapturedPaymentAttemptForOrder,
   type PartialRefundReservationSafeCommitView,
 } from "../../../../../lib/store/partialRefundReservation";
+import {
+  loadPartialRefundCaptureAccountingReview,
+  type PartialRefundAccountingReviewModel,
+} from "../../../../../lib/store/partialRefundReservationAccounting";
 import { canManageStoreSettings } from "../../../../../lib/store/permissions";
 import {
   getOrderFulfillment,
@@ -88,10 +92,13 @@ export default async function SellerStoreOrderDetailPage({
 
   let prReservations: readonly PartialRefundReservationSafeCommitView[] = [];
   let prLoadError: string | null = null;
+  let prAccounting: PartialRefundAccountingReviewModel | null = null;
+  let prAccountingError: string | null = null;
   if (result.ok) {
     const boot = createPartialRefundReservationServiceRole();
     if (!boot.ok) {
       prLoadError = boot.message;
+      prAccountingError = boot.message;
     } else {
       const resolved = await resolveCapturedPaymentAttemptForOrder(
         boot.supabase,
@@ -110,8 +117,21 @@ export default async function SellerStoreOrderDetailPage({
         } else {
           prLoadError = listed.message;
         }
+        const acct = await loadPartialRefundCaptureAccountingReview(
+          { factClient: boot.supabase, repository: boot.repository },
+          {
+            storeId: membership.store.id,
+            paymentAttemptId: resolved.paymentAttemptId,
+          }
+        );
+        if (acct.ok) {
+          prAccounting = acct.review;
+        } else {
+          prAccountingError = acct.message;
+        }
       } else if (resolved.code !== "not_found") {
         prLoadError = resolved.message;
+        prAccountingError = resolved.message;
       }
     }
   }
@@ -234,6 +254,8 @@ export default async function SellerStoreOrderDetailPage({
             <SellerPartialRefundReservationPanel
               reservations={prReservations}
               loadError={prLoadError}
+              accounting={prAccounting}
+              accountingError={prAccountingError}
             />
           ) : null}
         </>

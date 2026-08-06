@@ -2,28 +2,27 @@
 
 ## Active milestone
 
-Commerce Partial Refund Reservation Server Actions & Admin/Seller Wiring V1 — **CLOSED**
+Commerce Partial Refund Reservation Accounting Audit & Review Surface V1 — **CLOSED**
 
-Verdict: **`PARTIAL_REFUND_RESERVATION_ACTIONS_WIRING_V1_CLOSED`**
+Verdict: **`PARTIAL_REFUND_ACCOUNTING_AUDIT_REVIEW_V1_CLOSED`**
 
 ## Source of truth
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-reservation-actions-wiring-v1`
-- Branch: `office/commerce-partial-refund-reservation-actions-wiring-v1`
-- Base: `6a2420e829280aa951f4f87150c820d6b6c45e04`
-- Doc: `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACTIONS_WIRING_V1.md`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1`
+- Branch: `office/commerce-partial-refund-reservation-accounting-audit-review-v1`
+- Base: `5d4bf186efc3eff55431127965a0666e4c4ff512`
+- Doc: `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md`
 
 ## Facts
 
-- Remote tip `20260900` (`20260899` → `20260900` applied earlier; unchanged here)
-- Service-role adapter + reservation orchestration closed (prior)
-- Server actions + admin reservation / seller read wiring implemented and closed
-- `committed` / action success = durable reservation only
-- Explicit non-events: no provider refund, money, restock, entitlement, settlement, commission, compensation
-- Seller initiation omitted (existing refund-ops policy: read-only)
-- No buyer/public execution
+- Remote tip `20260900` unchanged
+- Read-only capture accounting + committed reservation review implemented and closed
+- Remaining amount/qty derived from trusted capture + DB accounting snapshot
+- Reservation still ≠ provider refund / money movement
+- No cancel/compensation; no seller request; no buyer/public
+- Existing reservation create wiring untouched
 - Provider execution requires a separate GO
 
 ## Next
 
-Do not auto-start provider-execution milestone. Separate GO required.
+Do not auto-start provider-execution or compensation milestones. Separate GO required.
