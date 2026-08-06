@@ -2,27 +2,31 @@
 
 ## Task title
 
-UM Learning - Assessment Runtime UI Contract Suite V1
+UM Learning - Public Catalog UI Contract Suite V1
 
 ## Status
 
-`closed` — assessment runtime UI source contracts committed on branch.
+`closed` — public catalog listing/detail UI contracts committed on branch.
 
 ## Milestone
 
-`learning.assessment.runtime_ui_contract_suite_v1`
+`learning.public_catalog.ui_contract_suite_v1`
 
 ## Scope landed
 
-- `lib/learning/assessmentRuntimeUiContract.test.ts`
-- `docs/learning/implementation/LEARNING_ASSESSMENT_RUNTIME_UI_CONTRACT_SUITE_V1.md`
+- `lib/learning/publicCatalogUiContract.test.ts`
+- `docs/learning/implementation/LEARNING_PUBLIC_CATALOG_UI_CONTRACT_SUITE_V1.md`
 - Tests-only; no UI/CSS/migration changes
 
 ## Branch / HEAD base
 
-`office/learning-assessment-runtime-ui-contract-suite-v1`
-Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `525c046`
+`office/learning-public-catalog-ui-contract-suite-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `69cd89c`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-assessment-runtime-ui-contract-suite-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-public-catalog-ui-contract-suite-v1`
+
+## Recommended next
+
+Fast-forward Learning SoT to this tip, or Instructor Browser E2E Foundation (testids + harness; live run deferred).
