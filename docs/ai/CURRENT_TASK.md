@@ -2,31 +2,27 @@
 
 ## Task title
 
-UM Learning - Instructor UI Contract Suite V1
+UM Learning - Assessment Runtime UI Contract Suite V1
 
 ## Status
 
-`closed` — instructor dashboard/authoring/assessment UI contracts committed on branch.
+`closed` — assessment runtime UI source contracts committed on branch.
 
 ## Milestone
 
-`learning.instructor.ui_contract_suite_v1`
+`learning.assessment.runtime_ui_contract_suite_v1`
 
 ## Scope landed
 
-- `lib/learning/instructorUiContract.test.ts` (24 tests)
-- `docs/learning/implementation/LEARNING_INSTRUCTOR_UI_CONTRACT_SUITE_V1.md`
+- `lib/learning/assessmentRuntimeUiContract.test.ts`
+- `docs/learning/implementation/LEARNING_ASSESSMENT_RUNTIME_UI_CONTRACT_SUITE_V1.md`
 - Tests-only; no UI/CSS/migration changes
 
 ## Branch / HEAD base
 
-`office/learning-instructor-ui-contract-suite-v1`
-Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `0c7793c`
+`office/learning-assessment-runtime-ui-contract-suite-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `525c046`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-instructor-ui-contract-suite-v1`
-
-## Recommended next
-
-Fast-forward Learning SoT to this tip, or Learning instructor Browser E2E foundation once learner E2E env is ready.
+`D:\umtuba-central\repos\umtuba-web-learning-assessment-runtime-ui-contract-suite-v1`
