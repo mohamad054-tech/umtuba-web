@@ -64,3 +64,25 @@ export {
   listSettingsNavLinks,
   type WiredNavLink,
 } from "./wiring";
+
+export {
+  DEFAULT_CHROME_FEATURE_FLAGS,
+  DESKTOP_MAIN_PRESENTATION,
+  MOBILE_MAIN_PRESENTATION,
+  USER_MENU_ACCOUNT_PRESENTATION,
+  USER_MENU_YOU_PRESENTATION,
+  isPresentationEnabled,
+  type ChromeFeatureFlags,
+  type ChromeNavPresentation,
+  type UserMenuCapabilityKey,
+} from "./presentation";
+
+export {
+  assertChromeLinksMatchRegistry,
+  buildChromeUserMenuGroups,
+  listDesktopMainNavLinks,
+  listMobileMainNavLinks,
+  type ChromeNavLink,
+  type ChromeUserMenuCapabilities,
+  type ChromeUserMenuGroup,
+} from "./chromeNavigation";

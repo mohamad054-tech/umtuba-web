@@ -1,16 +1,13 @@
 import { APP_ROUTES, buildCreatorProfileHref } from "./routes";
+import { listMobileMainNavLinks } from "../../../lib/platform/navigation";
 
 /**
  * Mobile primary destinations (bottom nav).
  * Platform Navigation Contract Sync V1: Home, Live, Messages, Profile.
+ * Paths come from Unified Navigation / Page Registry; labels are presentation.
  * Discover is not a mobile tab — `/discover` aliases Home active state only.
  *
  * Mobile World Affordance Decision V1: World stays on Desktop primary only.
- * Mobile users reach World via Home circles / direct `/world` links — do **not**
- * add World (or Store/Watch) to this list without a separate Product GO.
- *
- * Visible below the `sm` breakpoint (max-width: 639px), matching AppTopNav
- * which reveals its primary links from `sm` upward — avoids duplicate bars.
  */
 export const MOBILE_BOTTOM_NAV_MAX_CLASS = "sm:hidden" as const;
 
@@ -36,12 +33,12 @@ export type MobilePrimaryNavItem = {
   href: string;
 };
 
-export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] = [
-  { id: "home", label: "Home", href: APP_ROUTES.home },
-  { id: "live", label: "Live", href: APP_ROUTES.live },
-  { id: "messages", label: "Messages", href: APP_ROUTES.messages },
-  { id: "profile", label: "Profile", href: APP_ROUTES.profile },
-];
+export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] =
+  listMobileMainNavLinks().map((item) => ({
+    id: item.chromeId as MobilePrimaryNavId,
+    label: item.label,
+    href: item.href,
+  }));
 
 const LIVE_ROOM_PATH_RE = /^\/live\/(?!media-lab(?:\/|$))[^/]+/;
 

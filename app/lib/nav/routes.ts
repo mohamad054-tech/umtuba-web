@@ -1,4 +1,5 @@
 import { slugifyCity } from "../journey/handoff";
+import { listDesktopMainNavLinks } from "../../../lib/platform/navigation";
 
 export const APP_ROUTES = {
   home: "/",
@@ -85,18 +86,17 @@ export type AppNavItem = {
 
 /**
  * Desktop primary chrome — Platform Navigation Contract Sync V1.
- * Home is the Discovery Layer label. `/discover` is a forever alias to `/`
+ * Paths and registry identity come from Unified Navigation (main group).
+ * Labels remain presentation metadata. `/discover` is a forever alias to `/`
  * and must not appear here as a separate primary destination.
- * Mobile World Affordance Decision V1: World is desktop-primary only (not mobile bottom nav).
+ * Mobile World Affordance Decision V1: World is desktop-primary only.
  */
-export const APP_NAV_ITEMS: AppNavItem[] = [
-  { label: "Home", href: APP_ROUTES.home },
-  { label: "World", href: APP_ROUTES.worldDiscovery },
-  { label: "Learning", href: APP_ROUTES.learning },
-  { label: "Live", href: APP_ROUTES.live },
-  { label: "Messages", href: APP_ROUTES.messages },
-];
-
+export const APP_NAV_ITEMS: AppNavItem[] = listDesktopMainNavLinks().map(
+  (item) => ({
+    label: item.label,
+    href: item.href as AppRouteHref,
+  })
+);
 export function isNavActive(pathname: string, href: AppRouteHref): boolean {
   if (href === APP_ROUTES.home) {
     // `/discover` aliases Home feed — keep Home highlighted after redirect targets.
