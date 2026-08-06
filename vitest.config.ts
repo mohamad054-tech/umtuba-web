@@ -35,6 +35,7 @@ export default defineConfig({
       "lib/privateAi/**/*.test.ts",
       "lib/aiDataPlatform/**/*.test.ts",
       "lib/knowledgeAcquisition/**/*.test.ts",
+      "lib/platform/**/*.test.ts",
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",
