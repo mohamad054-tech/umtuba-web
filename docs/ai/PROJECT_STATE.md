@@ -79,9 +79,10 @@ Frozen baselines (extend, do not replace):
 | Commerce Chain Remote Migration Preflight V1 | **COMPLETE** (branch `office/commerce-remote-migration-preflight-v1-current` @ `2dc6dfd`) — historical preflight; superseded by applied remote chain |
 | Commerce Remote Migration Blocker Remediation Planning V1 | **COMPLETE** (branch `office/commerce-remote-migration-blocker-remediation-v1` @ `ac49585`) — historical |
 | Commerce Migration History Drift Verification V1 | **COMPLETE historically** — `20260822`+`20260823` registered remotely |
-| Commerce Seller Live Payout Provider V1 | **COMPLETE / CLOSED** — branch `office/commerce-seller-live-payout-provider-v1`; Manual Ops Live gated path; gate **OFF**; remote tip **`20260898`**; migrations `81→82→83→98` applied; closeout verdict **`SELLER_LIVE_PAYOUT_REMOTE_MIGRATION_CLOSEOUT_COMPLETE`**; no real payout; Learning `96/97` untouched |
+| Commerce Seller Live Payout Provider V1 | **COMPLETE / CLOSED** — remote tip **`20260898`**; closeout `3ebe184`; gate OFF |
+| Commerce Seller Live Payout Manual Ops Controlled Drill V1 | **PREPARATION CLOSED** — branch `office/commerce-seller-live-payout-manual-ops-drill-v1` @ base `3ebe184`; verdict **`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**; live drill still **NOT READY** (no RELEASED capture / no verified destination); gate OFF; no payout; no invented production data |
 
-Default: Commerce remote foundations include payout chain through **`20260898`** + Learning `20260896–97` + active USD commission. Seller live payouts remain **gate-OFF**. Do not auto-start another milestone. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Payout schema remote through **`20260898`**. Live gate **OFF**. Controlled Manual Ops drill blocked until eligible RELEASED capture + verified destination exist. Do not auto-start drill. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 

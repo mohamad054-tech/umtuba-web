@@ -9,11 +9,10 @@ Operational companion to `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_
 
 ## Current operational truth
 
-- Code capability S1–S7 is implemented on branch `office/commerce-seller-live-payout-provider-v1`.
+- Code capability S1–S8 is implemented; remote migration closeout applied `20260881` → `20260882` → `20260883` → `20260898` (tip `20260898`).
 - Production gate defaults **OFF**.
-- **No real payout** has been performed as part of this milestone.
-- Migration `20260898` is **local-only** until an explicit remote-apply GO.
-- Foundations `20260881–83` are prerequisites and must not be assumed remote-applied without verification + GO.
+- **No real payout** has been performed as part of provider + migration closeout.
+- Manual Ops controlled drill requires a **separate explicit GO** — see `SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md`.
 - Buyer Stripe payment path and `commerce_confirm` are independent and unchanged.
 
 ---
@@ -37,10 +36,10 @@ Operational companion to `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_
 
 | Migration | Apply policy |
 | --- | --- |
-| `20260881` | Explicit remote GO only |
-| `20260882` | Explicit remote GO only |
-| `20260883` | Explicit remote GO only |
-| `20260898` | Explicit remote GO only — **not applied** during S1–S8 implementation (renumbered off Learning collision) |
+| `20260881` | Remote-applied (payout foundation) — do not re-apply without GO |
+| `20260882` | Remote-applied (read model) |
+| `20260883` | Remote-applied (recon read) |
+| `20260898` | Remote-applied (live destinations + executions; tip) |
 
 Never remote-apply from an AI agent session without an explicit human GO that names the migrations.
 

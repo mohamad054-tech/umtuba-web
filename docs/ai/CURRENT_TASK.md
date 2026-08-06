@@ -2,32 +2,30 @@
 
 ## Milestone
 
-Seller Live Payout Provider V1 — **CLOSED** (S1–S8 + remote migration closeout)
+Commerce Seller Live Payout Manual Ops Controlled Drill V1 — **PREPARATION CLOSED**
 
 ## Status
 
-`milestone-closed` — verdict **`SELLER_LIVE_PAYOUT_REMOTE_MIGRATION_CLOSEOUT_COMPLETE`**
+`preparation-closed-not-ready` — verdict **`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**
 
-- Code S1–S8 previously pushed @ `2d1b6a6…`
-- Live migration renumbered locally `20260896` → `20260898`
-- Remote applied and verified: `20260881` → `20260882` → `20260883` → `20260898`
-- Remote tip: **`20260898`**
-- Learning `20260896` / `20260897` unchanged
-- Live payout gate **OFF** · `commerce_confirm_enabled()` **false** · **no payout** occurred
-- Closeout commit + push of renumber/docs (this GO)
+Preparation/readiness artifacts preserved. Live controlled drill remains **`NOT_READY_FOR_CONTROLLED_LIVE_DRILL`**.
+
+- Exact blocker: no safely nominable eligible **RELEASED** capture and no verified active `manual_ops_live` destination
+- Remote aggregates at prep time: release=0, active allocations=0, destinations=0, verified destinations=0
+- Gate remains **OFF** · `commerce_confirm` remains **false** · **no payout** · **no production data invented**
+- No migration or implementation change required (prep docs/contract test only)
+- Actual live drill is **not** completed; future drill needs a **new explicit GO** after prerequisites exist
 
 ## Branch / worktree
 
-- Branch: `office/commerce-seller-live-payout-provider-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1`
+- Branch: `office/commerce-seller-live-payout-manual-ops-drill-v1`
+- Base: `3ebe1841ee04db9cc9d58f15b1080965854fd7fe`
 
-## Explicit non-actions preserved
+## Prep artifact
 
-No additional migration apply · no migration repair · no live gate enablement · no real payout · no commerce_confirm enable · no merge · no force-push · no next milestone started
+`docs/store/operations/SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md`
 
-## Next (separate explicit GO only)
+## Forbidden without new GO
 
-1. Controlled Manual Ops Live drill with gate carefully managed.
-2. Separate track: Stripe production env → gate audit → E2E → consider `commerce_confirm`.
-
-Do not begin another milestone from this closeout.
+Enable gate · execute payout · invent RELEASED capture/destination · change commerce_confirm · migration apply/repair · begin another milestone from this closeout

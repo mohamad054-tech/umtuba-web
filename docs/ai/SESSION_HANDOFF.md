@@ -2,52 +2,33 @@
 
 ## Active milestone
 
-`commerce.seller_live_payout_provider_v1` + remote migration closeout
+Commerce Seller Live Payout Manual Ops Controlled Drill V1
 
-Status: **CLOSED** — `SELLER_LIVE_PAYOUT_REMOTE_MIGRATION_CLOSEOUT_COMPLETE`
+Status: **PREPARATION CLOSED** — `MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`
+
+Live drill status remains: **`NOT_READY_FOR_CONTROLLED_LIVE_DRILL`** (not executed, not passed).
 
 ## Source of truth
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-provider-v1`
-- Branch: `office/commerce-seller-live-payout-provider-v1`
-- Docs: `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_V1.md`
-- Runbook: `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1.md`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1`
+- Branch: `office/commerce-seller-live-payout-manual-ops-drill-v1`
+- Base: `3ebe1841ee04db9cc9d58f15b1080965854fd7fe`
+- Prep doc: `docs/store/operations/SELLER_LIVE_PAYOUT_MANUAL_OPS_DRILL_PREP_V1.md`
 
-Desktop remains the sole active Commerce workstation.
+## What closed
 
-## What shipped
+Preparation checklists, runbook migration truth, contract tests, AI handoff. Gate OFF. No payout. No fabricated RELEASED capture or destination.
 
-- S1–S8 Manual Ops Live seller payout path (gate OFF by default)
-- Local live migration renumbered to **`20260898`** (avoids Learning `20260896` collision)
-- Remote apply verified: **`20260881` → `20260882` → `20260883` → `20260898`**
-- Remote tip: **`20260898`**
+## Preserved blocker
 
-## Current safety gates
+No safely nominable eligible RELEASED capture + no verified active `manual_ops_live` destination (release=0, allocations=0, destinations=0, verified=0 at prep).
 
-- `SELLER_LIVE_PAYOUTS_ENABLED` default OFF (fail-closed)
-- `commerce_confirm_enabled = false`
-- No real payout / destination / execution rows created during apply
-- Stripe Connect / Wise / PayPal unsupported
-- Manual Ops Live has no bank API network call in V1
+## Exact next steps (new GO only)
 
-## Migrations (remote)
+1. Operators obtain real eligible RELEASED capture + verified masked destination (no inventing in agent session).
+2. Explicit controlled drill GO with window + gate-OFF rollback owner.
+3. Do not auto-start live drill or another milestone from this closeout.
 
-| Migration | Role | Remote |
-| --- | --- | --- |
-| `20260881–83` | Payout foundation / read / recon | **Applied** |
-| Learning `20260896–97` | Tutor history/lifecycle | Present (unchanged) |
-| `20260898` | Live destinations + executions | **Applied** (tip) |
+## Safety
 
-## Exact next steps (separate GOs)
-
-1. Do **not** auto-start another milestone.
-2. Controlled Manual Ops Live drill with gate carefully managed (explicit GO).
-3. Separate track: Stripe production env → gate audit → E2E → consider `commerce_confirm`.
-
-## Deferred / out of scope for V1
-
-Bank API network transfers; Stripe Connect; Wise; PayPal; second payout ledger; client-trusted money; auto-fail on uncertain.
-
-## Coordination
-
-Follow `docs/DEVELOPMENT_WORKFLOW.md`. Full report: `docs/ai/CURSOR_REPORT.md`.
+Gate OFF · commerce_confirm false · no bank API · no Connect/Wise/PayPal
