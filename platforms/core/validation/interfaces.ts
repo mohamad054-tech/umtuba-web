@@ -1,6 +1,8 @@
 /**
- * Validation interfaces (Standards §3.8, §7.8, §15.8).
- * No validators implemented in P1.
+ * Validation interfaces and P2 engines.
+ *
+ * P1: contracts only.
+ * P2: manifest + admission validators (pure; no registry/runtime).
  */
 
 import type { UmDependencyValidationResult } from "../dependency/types";
@@ -23,21 +25,23 @@ export interface UmValidationResult {
 }
 
 /**
- * Manifest validator — interface only.
+ * Manifest validator port.
  */
 export interface UmManifestValidator {
   validate(manifest: UmPlatformManifest): UmValidationResult;
 }
 
 /**
- * Registration admission validator — interface only.
+ * Registration admission validator port.
  */
 export interface UmRegistrationValidator {
   validateAdmission(manifest: UmPlatformManifest): UmValidationResult;
 }
 
 /**
- * Composite Core validator surface — interface only.
+ * Composite Core validator surface.
+ * P2 implements manifests + registration only.
+ * `validateDependencies(platformId)` remains unimplemented (needs registry).
  */
 export interface UmCoreValidator {
   readonly manifests: UmManifestValidator;
@@ -46,3 +50,22 @@ export interface UmCoreValidator {
     platformId: UmPlatformId,
   ): UmDependencyValidationResult | UmValidationResult;
 }
+
+export {
+  UmManifestValidationCode,
+  type UmManifestValidationCodeName,
+} from "./codes";
+export {
+  isNonEmptyTrimmed,
+  isScopedUnderPlatform,
+  isUmMachineId,
+  isUmVersionToken,
+} from "./naming";
+export {
+  createManifestValidator,
+  validatePlatformManifest,
+} from "./manifestValidator";
+export {
+  createRegistrationValidator,
+  validateManifestAdmission,
+} from "./registrationValidator";

@@ -2,19 +2,19 @@
 
 ## Task title
 
-UM Core Platform Foundation P1 — CLOSED
+UM Core Platform Manifest Validation P2
 
 ## Status
 
-`closed` — Foundation P1 committed and pushed on `office/um-core-platform-foundation-p1`.
+`closed` — committed and pushed on milestone branch.
 
 ## Branch
 
-`office/um-core-platform-foundation-p1`
+`office/um-core-platform-manifest-validation-p2`
 
-## Base
+## Base HEAD
 
-`origin/alpha-0.2` @ `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
+`c80b15e0c2822c91e0e6f43ee228fe80a79f0ea5` (Foundation P1 close)
 
 ## Worktree
 
@@ -22,30 +22,25 @@ UM Core Platform Foundation P1 — CLOSED
 
 ## Milestone
 
-`um.core.foundation_p1`
+`um.core.manifest_validation_p2`
 
-## Final layout
+## Allowed scope
 
-`platforms/core/**` (not `lib/core/**`)
+- `platforms/core/validation/**`
+- `platforms/core/packageIdentity.ts`
+- `platforms/core/coreFoundationContracts.test.ts`
+- `docs/core/**`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
+
+## Forbidden scope
+
+- Registry / runtime / event bus / SDK behavior / health engine
+- Product-platform integration
+- Migrations / database
 
 ## Delivered
 
-Isolated contracts-only UM Core platform:
-
-- platform/module/capability vocabulary
-- manifest, registry, event, flag, health, dependency, naming contracts
-- validation + SDK ports
-- maturity / compliance / certification vocabulary
-- focused contract tests
-- docs under `docs/core/`
-
-## Confirmed non-scope
-
-- No runtime engines
-- No product-platform integration
-- No database schema / migrations
-- No Commerce / Learning / AI / UEOS / Ads / Collaboration changes
-
-## Next
-
-Do not start P2 unless a new task is issued. Do not merge unless separately tasked.
+Pure manifest + admission validation engine with deterministic diagnostics and focused tests.
+Committed and pushed on `office/um-core-platform-manifest-validation-p2`.
+Do not start P3 from this handoff.
