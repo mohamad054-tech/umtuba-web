@@ -12,7 +12,7 @@ Operational companion to `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_
 - Code capability S1–S7 is implemented on branch `office/commerce-seller-live-payout-provider-v1`.
 - Production gate defaults **OFF**.
 - **No real payout** has been performed as part of this milestone.
-- Migration `20260896` is **local-only** until an explicit remote-apply GO.
+- Migration `20260898` is **local-only** until an explicit remote-apply GO.
 - Foundations `20260881–83` are prerequisites and must not be assumed remote-applied without verification + GO.
 - Buyer Stripe payment path and `commerce_confirm` are independent and unchanged.
 
@@ -23,7 +23,7 @@ Operational companion to `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_
 ```
 □ Git tip includes S1–S8 closeout docs
 □ 20260881 / 20260882 / 20260883 present and applied only if explicitly approved
-□ 20260896 present and applied only if explicitly approved
+□ 20260898 present and applied only if explicitly approved
 □ commerce_confirm_enabled remains 0 (unless a separate Stripe GO says otherwise)
 □ SELLER_LIVE_PAYOUTS_ENABLED is false / unset in production until enablement GO
 □ Platform admin accounts known
@@ -40,7 +40,7 @@ Operational companion to `docs/store/implementation/SELLER_LIVE_PAYOUT_PROVIDER_
 | `20260881` | Explicit remote GO only |
 | `20260882` | Explicit remote GO only |
 | `20260883` | Explicit remote GO only |
-| `20260896` | Explicit remote GO only — **not applied** during S1–S8 implementation |
+| `20260898` | Explicit remote GO only — **not applied** during S1–S8 implementation (renumbered off Learning collision) |
 
 Never remote-apply from an AI agent session without an explicit human GO that names the migrations.
 
@@ -99,7 +99,7 @@ If gate is off/incomplete: seller sees honest disabled messaging; request is una
 
 Only after explicit human GO:
 
-1. Verify remote migration prerequisites (`20260881–83`, then `20260896`) against the target project.
+1. Verify remote migration prerequisites (`20260881–83`, then `20260898`) against the target project.
 2. Confirm buyer Stripe live env readiness is a **separate** track; do not couple enablement.
 3. Set host secrets for gate variables (names above) — values never in git.
 4. Keep `SELLER_LIVE_PAYOUT_PROVIDER=manual_ops_live`.

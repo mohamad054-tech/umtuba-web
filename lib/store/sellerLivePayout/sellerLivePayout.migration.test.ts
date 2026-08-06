@@ -9,7 +9,7 @@ import { join } from "node:path";
 
 const ROOT = join(__dirname, "../../..");
 const MIGRATION =
-  "supabase/migrations/20260896_store_seller_live_payout_provider_v1.sql";
+  "supabase/migrations/20260898_store_seller_live_payout_provider_v1.sql";
 const FOUNDATION =
   "supabase/migrations/20260881_store_seller_payout_foundation_v1.sql";
 const READ_MODEL =
@@ -22,13 +22,14 @@ function read(rel: string): string {
 }
 
 describe("Seller Live Payout S2 — migration presence", () => {
-  it("ships 20260896 without colliding prior payout migrations", () => {
+  it("ships 20260898 without colliding prior payout migrations", () => {
     const sql = read(MIGRATION);
     expect(sql.length).toBeGreaterThan(1000);
     expect(read(FOUNDATION)).toMatch(/apply_store_payout_event/);
     expect(read(READ_MODEL)).toMatch(/get_my_seller_payout_eligibility/);
     expect(read(RECON)).toMatch(/store_settlement_payout_recon/);
-    expect(MIGRATION).toContain("20260896");
+    expect(MIGRATION).toContain("20260898");
+    expect(MIGRATION).not.toContain("20260896");
     expect(sql).not.toMatch(/20260881_store_seller_payout_foundation/);
   });
 });

@@ -21,7 +21,7 @@ Companion runbook: `docs/store/operations/SELLER_LIVE_PAYOUT_PROVIDER_RUNBOOK_V1
 | Documentation / closeout S8 | This document |
 | Production gate | **OFF by default** — live payouts have **not** been enabled |
 | Real payouts performed | **None** |
-| Migration `20260896` | Present locally; **not remote-applied** |
+| Migration `20260898` | Present locally; **not remote-applied** (renumbered from colliding `20260896`) |
 | Payout foundation `20260881–83` | Required prerequisites for booking path; treat as **local / not assumed remote-applied** until an explicit remote-apply GO |
 | `commerce_confirm` | Unchanged and independent — remains off until separate Stripe GO |
 | Buyer Stripe payment path | Unchanged and independent |
@@ -52,7 +52,7 @@ V1 does **not**:
 
 | Property | V1 truth |
 | --- | --- |
-| Durable | Yes — destinations + executions in Postgres (`20260896`) |
+| Durable | Yes — destinations + executions in Postgres (`20260898`) |
 | Gated | Yes — fail-closed production gate (default OFF) |
 | Human-attested | Yes — platform admin records success/failure attestation |
 | Bank API network call | **No** in V1 |
@@ -84,7 +84,7 @@ Trusted amount and currency always come from server-side capture/settlement cont
 | Slice | Commit (subject) | Deliverable |
 | --- | --- | --- |
 | S1 | `f773788` gate + provider port | Gate, types, provider contracts |
-| S2 | `756057b` destinations/executions migration | `20260896` schema + RPCs (local) |
+| S2 | `756057b` destinations/executions migration | originally `20260896`; renumbered locally to `20260898` schema + RPCs |
 | S3 | `91dc26b` Manual Ops Live adapters | Provider + destination/execution helpers |
 | S4 | `63758da` orchestrator | Submit + resolve attestation |
 | S5 | `d311e6c` server actions | Seller + admin actions |
@@ -168,7 +168,7 @@ Never paste secret values into docs, commits, or tickets.
 
 - Seller/admin supply an `orchestrationKey` (8–120 chars).
 - Booking action keys are derived as `${orchestrationKey}:submit|fail|confirm` (≤ 128).
-- Durable execution uniqueness: store + idempotency key; open-capture constraints in `20260896`.
+- Durable execution uniqueness: store + idempotency key; open-capture constraints in `20260898`.
 - Orchestrator replays idempotently for already-submitted / terminal / uncertain states without inventing money.
 - Duplicate request for IN_TRANSIT / COMPLETED captures is blocked.
 
@@ -196,7 +196,7 @@ Never paste secret values into docs, commits, or tickets.
 | `20260881` | Seller payout foundation booking | **Not assumed remote-applied** — local prerequisite for live booking path |
 | `20260882` | Seller payout read model | **Not assumed remote-applied** |
 | `20260883` | Settlement/payout reconciliation reads (as applicable) | **Not assumed remote-applied** |
-| `20260896` | Live destinations + executions + admin/seller RPCs | **Local only — not remote-applied** |
+| `20260898` | Live destinations + executions + admin/seller RPCs | **Local only — not remote-applied** (avoids Learning `20260896`) |
 
 Remote apply of these migrations requires an **explicit separate GO**. This milestone did not apply them remotely.
 
@@ -242,5 +242,5 @@ app/components/store/SellerPayoutRequestButton.tsx
 app/components/store/SellerPayoutEligibility.tsx
 app/admin/store/payouts/page.tsx
 app/seller/store/page.tsx
-supabase/migrations/20260896_store_seller_live_payout_provider_v1.sql
+supabase/migrations/20260898_store_seller_live_payout_provider_v1.sql
 ```
