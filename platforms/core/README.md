@@ -30,4 +30,4 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`
+- Phase: `P1` contracts skeleton + `P2` manifest validation

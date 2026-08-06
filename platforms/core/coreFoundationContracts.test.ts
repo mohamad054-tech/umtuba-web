@@ -8,6 +8,7 @@
 import { describe, expect, it } from "vitest";
 import {
   UM_CORE_FOUNDATION_PHASE,
+  UM_CORE_MANIFEST_VALIDATION_PHASE,
   UM_CORE_PACKAGE_ID,
   UM_CORE_PACKAGE_LABEL,
   UM_MATURITY_DESCRIPTORS,
@@ -17,6 +18,7 @@ describe("um.core foundation P1 package identity", () => {
   it("exposes durable package identity literals", () => {
     expect(UM_CORE_PACKAGE_ID).toBe("um.core");
     expect(UM_CORE_FOUNDATION_PHASE).toBe("P1");
+    expect(UM_CORE_MANIFEST_VALIDATION_PHASE).toBe("P2");
     expect(UM_CORE_PACKAGE_LABEL).toBe("UM Core Platform");
   });
 
