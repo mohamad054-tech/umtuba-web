@@ -1,6 +1,6 @@
 -- =============================================================================
 -- UMTUBA Translation Studio Persistence & Workflow V1
--- Migration: 20260901_translation_studio_persistence_workflow_v1.sql
+-- Migration: 20260910_translation_studio_persistence_workflow_v1.sql
 --
 -- Additive schema for future Supabase-backed studio persistence.
 -- Runtime V1 uses a durable JSON file store (data/translation-studio/).

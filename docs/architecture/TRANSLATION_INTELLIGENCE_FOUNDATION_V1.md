@@ -58,6 +58,6 @@ marketing_friendly · subtitles_concise · dubbing_natural
 ## Migration note
 
 `20260902_translation_intelligence_foundation_v1.sql` adds
-`translation_intelligence_*` tables only. Does not alter `20260901`.
+`translation_intelligence_*` tables only. Does not alter `20260910`.
 Required to preserve a future Supabase shape for intelligence data before
 any approved examples would otherwise live only in ephemeral runtime state.

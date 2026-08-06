@@ -5,7 +5,7 @@
 -- Additive schema for future Supabase-backed intelligence records.
 -- Runtime V1 uses data/translation-studio/intelligence.json.
 -- Local file only — do NOT remote-apply without explicit approval.
--- Does NOT modify 20260901 translation_studio_* tables.
+-- Does NOT modify 20260910 translation_studio_* tables.
 -- Does NOT: train models, STT/TTS, auto-approve, client writes.
 -- =============================================================================
 
