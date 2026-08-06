@@ -1,7 +1,7 @@
 /**
- * UMTUBA Private AI Foundation + Workflow & Lifecycle V1 — domain contracts.
- * Architecture for a future private AI ecosystem.
- * Not training. Not fine-tuning. Not inference. No model weights.
+ * UMTUBA Private AI — Foundation + Workflow/Lifecycle + Deployment/Runtime V1.
+ * Architecture / contracts only.
+ * Not training. Not fine-tuning. Not inference. No model weights. No live pings.
  */
 
 export type PrivateModelClass =
@@ -170,8 +170,114 @@ export type PrivateAiReadinessResult = {
   blockers: string[];
 };
 
+/** Deployment lifecycle for a runtime endpoint (contracts only). */
+export type PrivateAiDeploymentState =
+  | "pending"
+  | "provisioning"
+  | "ready"
+  | "unhealthy"
+  | "maintenance"
+  | "offline"
+  | "retired";
+
+/** Logical runtime process state (no real engines). */
+export type PrivateAiRuntimeState =
+  | "unregistered"
+  | "registered"
+  | "starting"
+  | "running"
+  | "degraded"
+  | "stopped"
+  | "failed";
+
+export type RuntimeAvailability =
+  | "available"
+  | "degraded"
+  | "unavailable"
+  | "unknown";
+
+export type RuntimeCostTier = "low" | "standard" | "high" | "premium";
+
+export type RuntimeErrorClass =
+  | "none"
+  | "timeout"
+  | "auth"
+  | "capacity"
+  | "config"
+  | "dependency"
+  | "unknown";
+
+export type RuntimeHealthSnapshot = {
+  status: "healthy" | "degraded" | "unhealthy" | "unknown";
+  lastHeartbeatAt: string | null;
+  lastSuccessAt: string | null;
+  lastFailureAt: string | null;
+  lastFailureReason: string | null;
+  errorClass: RuntimeErrorClass;
+  availability: RuntimeAvailability;
+  notes: string;
+};
+
+export type PrivateAiRuntimeRecord = {
+  id: string;
+  modelId: string;
+  label: string;
+  providerHint: string | null;
+  region: string | null;
+  costTier: RuntimeCostTier;
+  /** Lower number = higher selection priority. */
+  priority: number;
+  deploymentState: PrivateAiDeploymentState;
+  runtimeState: PrivateAiRuntimeState;
+  capabilityIds: AiCapabilityId[];
+  hardwareContractId: string | null;
+  deploymentProfileId: DeploymentProfileId | null;
+  routingContractIds: string[];
+  availability: RuntimeAvailability;
+  health: RuntimeHealthSnapshot;
+  /** Ordered failover candidates (runtime ids). */
+  failoverRuntimeIds: string[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RuntimeReadinessResult = {
+  ready: boolean;
+  blockers: string[];
+};
+
+export type RuntimeSelectionCriteria = {
+  capabilityId: AiCapabilityId;
+  providerHint?: string | null;
+  hardwareContractId?: string | null;
+  region?: string | null;
+  preferCostTier?: RuntimeCostTier | null;
+  requireAvailable?: boolean;
+};
+
+export type RuntimeSelectionResult = {
+  selected: PrivateAiRuntimeRecord | null;
+  candidates: PrivateAiRuntimeRecord[];
+  rejected: Array<{ runtimeId: string; reasons: string[] }>;
+  failoverChain: string[];
+};
+
+export type RuntimeDiagnosticRow = {
+  runtimeId: string;
+  modelId: string;
+  label: string;
+  deploymentState: PrivateAiDeploymentState;
+  runtimeState: PrivateAiRuntimeState;
+  readiness: RuntimeReadinessResult;
+  availability: RuntimeAvailability;
+  routingEligible: boolean;
+  failureReasons: string[];
+  health: RuntimeHealthSnapshot;
+};
+
 export type PersistedPrivateAiState = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   updatedAt: string;
   models: PrivateModelRecord[];
   capabilities: CapabilityRecord[];
@@ -180,4 +286,5 @@ export type PersistedPrivateAiState = {
   routingContracts: RoutingContract[];
   permissions: PrivateAiPermission[];
   auditTrail: PrivateAiAuditTrailEntry[];
+  runtimes: PrivateAiRuntimeRecord[];
 };

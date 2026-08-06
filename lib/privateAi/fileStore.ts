@@ -3,6 +3,7 @@ import { join } from "path";
 import type {
   PersistedPrivateAiState,
   PrivateAiLifecycle,
+  PrivateAiRuntimeRecord,
   PrivateModelRecord,
 } from "./types";
 
@@ -22,7 +23,7 @@ export function emptyPrivateAiState(
   now = new Date().toISOString()
 ): PersistedPrivateAiState {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     updatedAt: now,
     models: [],
     capabilities: [],
@@ -31,6 +32,7 @@ export function emptyPrivateAiState(
     routingContracts: [],
     permissions: [],
     auditTrail: [],
+    runtimes: [],
   };
 }
 
@@ -86,18 +88,93 @@ function migrateModel(raw: Record<string, unknown>): PrivateModelRecord {
   };
 }
 
+function migrateRuntime(raw: Record<string, unknown>): PrivateAiRuntimeRecord {
+  const healthRaw =
+    raw.health && typeof raw.health === "object"
+      ? (raw.health as Record<string, unknown>)
+      : {};
+  return {
+    id: String(raw.id ?? ""),
+    modelId: String(raw.modelId ?? ""),
+    label: String(raw.label ?? ""),
+    providerHint:
+      typeof raw.providerHint === "string" ? raw.providerHint : null,
+    region: typeof raw.region === "string" ? raw.region : null,
+    costTier: (raw.costTier as PrivateAiRuntimeRecord["costTier"]) ?? "standard",
+    priority: typeof raw.priority === "number" ? raw.priority : 100,
+    deploymentState:
+      (raw.deploymentState as PrivateAiRuntimeRecord["deploymentState"]) ??
+      "pending",
+    runtimeState:
+      (raw.runtimeState as PrivateAiRuntimeRecord["runtimeState"]) ??
+      "unregistered",
+    capabilityIds: Array.isArray(raw.capabilityIds)
+      ? (raw.capabilityIds as PrivateAiRuntimeRecord["capabilityIds"])
+      : [],
+    hardwareContractId:
+      typeof raw.hardwareContractId === "string"
+        ? raw.hardwareContractId
+        : null,
+    deploymentProfileId:
+      (raw.deploymentProfileId as PrivateAiRuntimeRecord["deploymentProfileId"]) ??
+      null,
+    routingContractIds: Array.isArray(raw.routingContractIds)
+      ? (raw.routingContractIds as string[])
+      : [],
+    availability:
+      (raw.availability as PrivateAiRuntimeRecord["availability"]) ?? "unknown",
+    health: {
+      status:
+        (healthRaw.status as PrivateAiRuntimeRecord["health"]["status"]) ??
+        "unknown",
+      lastHeartbeatAt:
+        typeof healthRaw.lastHeartbeatAt === "string"
+          ? healthRaw.lastHeartbeatAt
+          : null,
+      lastSuccessAt:
+        typeof healthRaw.lastSuccessAt === "string"
+          ? healthRaw.lastSuccessAt
+          : null,
+      lastFailureAt:
+        typeof healthRaw.lastFailureAt === "string"
+          ? healthRaw.lastFailureAt
+          : null,
+      lastFailureReason:
+        typeof healthRaw.lastFailureReason === "string"
+          ? healthRaw.lastFailureReason
+          : null,
+      errorClass:
+        (healthRaw.errorClass as PrivateAiRuntimeRecord["health"]["errorClass"]) ??
+        "none",
+      availability:
+        (healthRaw.availability as PrivateAiRuntimeRecord["availability"]) ??
+        "unknown",
+      notes: String(healthRaw.notes ?? ""),
+    },
+    failoverRuntimeIds: Array.isArray(raw.failoverRuntimeIds)
+      ? (raw.failoverRuntimeIds as string[])
+      : [],
+    notes: String(raw.notes ?? ""),
+    createdAt: String(raw.createdAt ?? new Date().toISOString()),
+    updatedAt: String(raw.updatedAt ?? new Date().toISOString()),
+  };
+}
+
 function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
   if (!parsed || typeof parsed !== "object") return null;
   const obj = parsed as Record<string, unknown>;
   const version = obj.schemaVersion;
-  if (version !== 1 && version !== 2) return null;
+  if (version !== 1 && version !== 2 && version !== 3) return null;
 
   const models = Array.isArray(obj.models)
     ? obj.models.map((m) => migrateModel(m as Record<string, unknown>))
     : [];
+  const runtimes = Array.isArray(obj.runtimes)
+    ? obj.runtimes.map((r) => migrateRuntime(r as Record<string, unknown>))
+    : [];
 
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     updatedAt: String(obj.updatedAt ?? new Date().toISOString()),
     models,
     capabilities: Array.isArray(obj.capabilities)
@@ -118,6 +195,7 @@ function normalizeState(parsed: unknown): PersistedPrivateAiState | null {
     auditTrail: Array.isArray(obj.auditTrail)
       ? (obj.auditTrail as PersistedPrivateAiState["auditTrail"])
       : [],
+    runtimes,
   };
 }
 
@@ -141,7 +219,8 @@ export function writePersistedPrivateAiState(
   const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
   const toWrite: PersistedPrivateAiState = {
     ...state,
-    schemaVersion: 2,
+    schemaVersion: 3,
+    runtimes: state.runtimes ?? [],
   };
   writeFileSync(temp, JSON.stringify(toWrite, null, 2), "utf8");
   renameSync(temp, target);

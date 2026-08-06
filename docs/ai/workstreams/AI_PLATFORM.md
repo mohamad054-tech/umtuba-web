@@ -2,13 +2,13 @@
 
 ## SAVE POINT — 2026-08-06 (Windows Server)
 
-**Active work:** AI Core Private AI Workflow Lifecycle onto Alpha V1
+**Active work:** AI Core Private AI Deployment & Runtime onto Alpha V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-core-private-ai-workflow-lifecycle-onto-alpha-v1` |
-| Base | workflow tip `91ddbb6` |
-| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-workflow-lifecycle-onto-alpha-v1` |
-| Source | `origin/office/platform-private-ai-workflow-lifecycle-v1-final` |
+| Active branch | `office/ai-core-private-ai-deployment-runtime-onto-alpha-v1` |
+| Base | lifecycle tip `6219633` |
+| Worktree | `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1` |
+| Source | `origin/office/platform-private-ai-deployment-runtime-v1` |
 
-**Porting:** lifecycle states, readiness gates, permissioned transitions, audit trail, admin lifecycle UI, local migration `20260880`.
+**Porting:** deployment state machine, runtime readiness/selection/health/diagnostics, admin runtime page. No migration.

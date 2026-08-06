@@ -9,8 +9,9 @@ import {
   createPrivateAiPermission,
   DEFAULT_PLATFORM_ADMIN_ACTIONS,
 } from "./permissions";
+import { createEmptyRuntimeHealth } from "./runtimeHealth";
 import { buildDefaultRoutingContracts } from "./routingContracts";
-import type { PersistedPrivateAiState } from "./types";
+import type { PersistedPrivateAiState, PrivateAiRuntimeRecord } from "./types";
 
 export function buildPrivateAiSeedState(
   now = new Date().toISOString()
@@ -82,8 +83,85 @@ export function buildPrivateAiSeedState(
     return { ...c, mappedModelIds: mapped, updatedAt: now };
   });
 
+  const runtimePrimary: PrivateAiRuntimeRecord = {
+    id: "prt_external_general_primary",
+    modelId: externalGeneral.id,
+    label: "External General Primary Runtime",
+    providerHint: "external-provider-contract",
+    region: "eu-central",
+    costTier: "standard",
+    priority: 10,
+    deploymentState: "ready",
+    runtimeState: "running",
+    capabilityIds: ["reasoning", "tool_use"],
+    hardwareContractId: null,
+    deploymentProfileId: "internal",
+    routingContractIds: ["route_reasoning_v1", "route_tool_use_v1"],
+    availability: "available",
+    health: {
+      ...createEmptyRuntimeHealth("Seed health — no live probes."),
+      status: "healthy",
+      availability: "available",
+      lastHeartbeatAt: now,
+      lastSuccessAt: now,
+    },
+    failoverRuntimeIds: ["prt_external_general_failover"],
+    notes: "Contract runtime only — no inference.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const runtimeFailover: PrivateAiRuntimeRecord = {
+    id: "prt_external_general_failover",
+    modelId: externalGeneral.id,
+    label: "External General Failover Runtime",
+    providerHint: "external-provider-contract",
+    region: "eu-west",
+    costTier: "high",
+    priority: 40,
+    deploymentState: "ready",
+    runtimeState: "running",
+    capabilityIds: ["reasoning", "tool_use"],
+    hardwareContractId: null,
+    deploymentProfileId: "internal",
+    routingContractIds: ["route_reasoning_v1"],
+    availability: "available",
+    health: {
+      ...createEmptyRuntimeHealth("Failover seed — no live probes."),
+      status: "healthy",
+      availability: "available",
+      lastHeartbeatAt: now,
+    },
+    failoverRuntimeIds: [],
+    notes: "Failover contract endpoint.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const runtimeTranslatorPending: PrivateAiRuntimeRecord = {
+    id: "prt_translator_pending",
+    modelId: privateTranslator.id,
+    label: "Private Translator Pending Runtime",
+    providerHint: "umtuba-private",
+    region: "eu-central",
+    costTier: "low",
+    priority: 20,
+    deploymentState: "pending",
+    runtimeState: "registered",
+    capabilityIds: ["translation"],
+    hardwareContractId: "hw_gpu_internal",
+    deploymentProfileId: "development",
+    routingContractIds: ["route_translation_v1"],
+    availability: "unknown",
+    health: createEmptyRuntimeHealth(),
+    failoverRuntimeIds: [],
+    notes: "Awaiting deployment — model still draft.",
+    createdAt: now,
+    updatedAt: now,
+  };
+
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     updatedAt: now,
     models: [
       {
@@ -106,6 +184,7 @@ export function buildPrivateAiSeedState(
     hardwareContracts: [...HARDWARE_CONTRACTS],
     deploymentProfiles: [...DEPLOYMENT_PROFILES],
     routingContracts,
+    runtimes: [runtimePrimary, runtimeFailover, runtimeTranslatorPending],
     permissions: [
       createPrivateAiPermission({
         id: "perm_admin_models",

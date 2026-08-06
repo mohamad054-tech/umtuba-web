@@ -12,19 +12,20 @@ export default async function PrivateAiOverviewPage() {
   return (
     <PrivateAiShell
       title="Private AI"
-      subtitle="Workflow & Lifecycle V1"
+      subtitle="Deployment & Runtime V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Private AI Workflow</h1>
+        <h1 className="text-xl font-black">Private AI platform</h1>
         <p className="mt-2 text-sm text-white/55">
-          Admin lifecycle for private model registries and contracts — no
-          training, fine-tuning, inference, or weights.
+          Registry, lifecycle, and deployment/runtime contracts — no training,
+          fine-tuning, inference, or weights.
         </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           {[
             ["Models", state.models.length],
             ["Capabilities", state.capabilities.length],
             ["Deployments", state.deploymentProfiles.length],
+            ["Runtimes", state.runtimes.length],
             ["Hardware", state.hardwareContracts.length],
             ["Routing", state.routingContracts.length],
             ["Permissions", state.permissions.length],
@@ -37,6 +38,10 @@ export default async function PrivateAiOverviewPage() {
             [
               "Active",
               state.models.filter((m) => m.lifecycle === "active").length,
+            ],
+            [
+              "Runtime ready",
+              state.runtimes.filter((r) => r.deploymentState === "ready").length,
             ],
           ].map(([label, value]) => (
             <div key={String(label)}>

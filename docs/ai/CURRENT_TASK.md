@@ -2,7 +2,7 @@
 
 ## Task title
 
-AI Core Private AI Workflow Lifecycle onto Alpha V1
+AI Core Private AI Deployment & Runtime onto Alpha V1
 
 ## Status
 
@@ -10,28 +10,29 @@ AI Core Private AI Workflow Lifecycle onto Alpha V1
 
 ## Branch
 
-`office/ai-core-private-ai-workflow-lifecycle-onto-alpha-v1`
+`office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-workflow-lifecycle-onto-alpha-v1`
+`D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
 
 ## Base
 
-`91ddbb6` — Data Platform Workflow Approval tip
+`6219633` — Private AI Workflow Lifecycle tip
 
 ## Source
 
-`origin/office/platform-private-ai-workflow-lifecycle-v1-final`
+`origin/office/platform-private-ai-deployment-runtime-v1` @ `cf3de8d`
 
 ## Scope
 
-- `lib/privateAi/**` lifecycle/readiness/audit updates
-- `app/admin/private-ai/**` lifecycle UI + actions
-- `supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql` (local only)
-- Architecture + AI handoff docs
+- `lib/privateAi/**` deployment state + runtime readiness/selection/health/diagnostics
+- `app/admin/private-ai/runtime/**` + shell/page updates
+- `docs/architecture/PRIVATE_AI_DEPLOYMENT_RUNTIME_V1.md`
+- No new migration (historical milestone created none)
 
 ## Forbidden
 
-- Commerce / Learning / Collaboration / Mobile / Guardian
-- Alpha merge / remote migration apply / live providers / deployment execution
+- Learning migrations 20260872–75
+- Commerce / Collaboration / Mobile / Guardian
+- Alpha merge / live providers / real deployment
