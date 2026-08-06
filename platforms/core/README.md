@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P4` (contracts, validation, compliance, in-memory registry)
+- Phase: `P1`–`P5` (contracts → validation → compliance → platform registry → capability registry)
 
 ## Phase P3 scope
 
@@ -55,3 +55,15 @@ Pure **in-memory platform registry** under `platforms/core/registry/`.
 
 Out of scope for P4: persistence, networking, discovery services, plugin
 loading, runtime execution, flag/health/SDK engines, product integration.
+
+## Phase P5 scope
+
+Pure **in-memory capability registry** under `platforms/core/capability/`.
+
+- Catalog of capabilities owned by registered platforms
+- Lookups by id, platform, module, side-effect class, stability
+- Rejects unknown platform/module, duplicates, namespace violations,
+  invalid side-effects/versions/ownership
+
+Out of scope for P5: capability execution, AI, event routing, flag evaluation,
+persistence, networking, SDK/health runtime, product integration.

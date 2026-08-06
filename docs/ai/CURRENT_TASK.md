@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Registry Foundation P4
+UM Core Platform Capability Registry Foundation P5
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Registry Foundation P4
 
 ## Branch
 
-`office/um-core-platform-registry-foundation-p4`
+`office/um-core-platform-capability-registry-foundation-p5`
 
 ## Base HEAD
 
-`cfc0d26c6177a19ee2fc0fea535d46e60d6ecaed` (Compliance Engine P3 close)
+`5215e15267ae1c6955c6101b914066d771acabe7` (Platform Registry P4 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-registry-foundation-p4`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-capability-registry-foundation-p5`
 
 ## Milestone
 
-`um.core.registry_foundation_p4`
+`um.core.capability_registry_foundation_p5`
 
 ## Allowed scope
 
-- `platforms/core/registry/**`
+- `platforms/core/capability/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,13 +36,13 @@ UM Core Platform Registry Foundation P4
 
 ## Forbidden scope
 
-- Persistence / networking / discovery / runtime execution
-- Product-platform integration
+- Capability execution / AI / event routing / flag evaluation
+- Persistence / networking / product integration
 - Migrations / database
 
 ## Delivered
 
-Pure in-memory platform registry with P2/P3 admission gates, catalogs,
-deterministic rejection findings, and focused tests.
-Committed and pushed on `office/um-core-platform-registry-foundation-p4`.
-Do not start P5 from this handoff.
+Pure in-memory capability registry bound to registered platforms, with
+lookups, deterministic rejection findings, and focused tests.
+Committed and pushed on `office/um-core-platform-capability-registry-foundation-p5`.
+Do not start P6 from this handoff.
