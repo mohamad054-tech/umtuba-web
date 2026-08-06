@@ -120,6 +120,25 @@ describe("Lesson Notes Foundation — SQL schema and RLS", () => {
     );
   });
 
+  it("resolves lesson course access via section→course join (not learning_lessons.course_id)", () => {
+    expect(body).not.toMatch(/learning_lessons\.course_id/);
+    expect(body).not.toMatch(/l\.course_id/);
+    expect(body).toMatch(
+      /from public\.learning_lessons l\s+join public\.learning_sections s on s\.id = l\.section_id/
+    );
+    expect(body).toMatch(
+      /has_learning_course_access\(s\.course_id, \(select auth\.uid\(\)\)\)/
+    );
+
+    const assertAccess = fnBody(sql, "learning_lesson_notes_assert_lesson_access");
+    expect(assertAccess).toMatch(
+      /join public\.learning_sections s on s\.id = l\.section_id/
+    );
+    expect(assertAccess).toMatch(/select s\.course_id/);
+    expect(assertAccess).toMatch(/has_learning_course_access\(v_course_id, p_user_id\)/);
+    expect(assertAccess).not.toMatch(/l\.course_id/);
+  });
+
   it("exposes list/create/update/delete RPCs that bind identity to auth.uid()", () => {
     for (const name of [
       "list_my_learning_lesson_notes",

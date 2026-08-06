@@ -6,7 +6,8 @@
 --
 -- Locked decisions:
 --  1. Owner-only RLS for SELECT/INSERT/UPDATE/DELETE (auth.uid() = user_id).
---  2. Writes also require live has_learning_course_access for the lesson's course.
+--  2. Writes also require live has_learning_course_access for the lesson's
+--     course, resolved via learning_lessons.section_id → learning_sections.course_id.
 --  3. Client mutations via SECURITY DEFINER RPCs; identity from auth.uid() only.
 --  4. Deterministic list order: updated_at desc, id desc.
 --  5. No public / staff / instructor SELECT policy on this table.
@@ -82,8 +83,9 @@ create policy "Learners insert own lesson notes"
     and exists (
       select 1
       from public.learning_lessons l
+      join public.learning_sections s on s.id = l.section_id
       where l.id = lesson_id
-        and public.has_learning_course_access(l.course_id, (select auth.uid()))
+        and public.has_learning_course_access(s.course_id, (select auth.uid()))
     )
   );
 
@@ -99,8 +101,9 @@ create policy "Learners update own lesson notes"
     and exists (
       select 1
       from public.learning_lessons l
+      join public.learning_sections s on s.id = l.section_id
       where l.id = lesson_id
-        and public.has_learning_course_access(l.course_id, (select auth.uid()))
+        and public.has_learning_course_access(s.course_id, (select auth.uid()))
     )
   );
 
@@ -136,9 +139,10 @@ begin
     raise exception 'Lesson not found';
   end if;
 
-  select l.course_id
+  select s.course_id
     into v_course_id
   from public.learning_lessons l
+  join public.learning_sections s on s.id = l.section_id
   where l.id = p_lesson_id;
 
   if v_course_id is null then
@@ -159,7 +163,7 @@ grant execute on function public.learning_lesson_notes_assert_lesson_access(uuid
   to authenticated, service_role;
 
 comment on function public.learning_lesson_notes_assert_lesson_access(uuid, uuid) is
-  'Fail-closed lesson entitlement for personal notes. Returns course_id when has_learning_course_access.';
+  'Fail-closed lesson entitlement for personal notes. Resolves course via lesson→section→course, then has_learning_course_access.';
 
 -- ---------------------------------------------------------------------------
 -- 3) RPCs — identity from auth.uid(); never accept client user_id
