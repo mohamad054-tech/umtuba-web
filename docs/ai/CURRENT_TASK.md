@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Compliance Engine P3
+UM Core Platform Registry Foundation P4
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Compliance Engine P3
 
 ## Branch
 
-`office/um-core-platform-compliance-engine-p3`
+`office/um-core-platform-registry-foundation-p4`
 
 ## Base HEAD
 
-`99300de78530b25bc19dff877926919957de6d06` (Manifest Validation P2 close)
+`cfc0d26c6177a19ee2fc0fea535d46e60d6ecaed` (Compliance Engine P3 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-compliance-engine-p3`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-registry-foundation-p4`
 
 ## Milestone
 
-`um.core.compliance_engine_p3`
+`um.core.registry_foundation_p4`
 
 ## Allowed scope
 
-- `platforms/core/compliance/**`
+- `platforms/core/registry/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,13 +36,13 @@ UM Core Platform Compliance Engine P3
 
 ## Forbidden scope
 
-- Registry / runtime / event bus / SDK behavior / health engine
+- Persistence / networking / discovery / runtime execution
 - Product-platform integration
 - Migrations / database
 
 ## Delivered
 
-Pure compliance assessment engine with score, certification eligibility,
-maturity checks, deterministic diagnostics, waivers, and focused tests.
-Committed and pushed on `office/um-core-platform-compliance-engine-p3`.
-Do not start P4 from this handoff.
+Pure in-memory platform registry with P2/P3 admission gates, catalogs,
+deterministic rejection findings, and focused tests.
+Committed and pushed on `office/um-core-platform-registry-foundation-p4`.
+Do not start P5 from this handoff.

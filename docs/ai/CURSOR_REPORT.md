@@ -1,24 +1,25 @@
-# CURSOR_REPORT — UM Core Compliance Engine P3
+# CURSOR_REPORT — UM Core Platform Registry Foundation P4
 
 ## Summary
 
-**READY** — Compliance Engine Foundation P3 closed on
-`office/um-core-platform-compliance-engine-p3` (base P2 tip `99300de`).
+**READY** — Platform Registry Foundation P4 closed on
+`office/um-core-platform-registry-foundation-p4` (base P3 tip `cfc0d26`).
 
-Pure in-process assessment only. Certification is eligibility, not grant.
-No registry/runtime/product integration. No migrations.
+In-memory catalog only. Admission requires P2 valid + P3 compliant +
+Core Certified eligibility (not Production/Enterprise/LTS).
+No persistence/networking/runtime/product integration. No migrations.
 
 ## Exact files changed
 
-- `platforms/core/compliance/codes.ts` (new)
-- `platforms/core/compliance/complianceEngine.ts` (new)
-- `platforms/core/compliance/complianceEngine.test.ts` (new)
-- `platforms/core/compliance/types.ts`
-- `platforms/core/compliance/index.ts`
+- `platforms/core/registry/codes.ts` (new)
+- `platforms/core/registry/platformRegistry.ts` (new)
+- `platforms/core/registry/platformRegistry.test.ts` (new)
+- `platforms/core/registry/interfaces.ts`
+- `platforms/core/registry/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_COMPLIANCE_ENGINE_P3.md` (new)
+- `docs/core/UM_CORE_PLATFORM_REGISTRY_FOUNDATION_P4.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -28,15 +29,14 @@ None.
 
 ## Security review
 
-- Assessment is pure and in-process only
-- No product imports from Core
-- No secrets / service-role / env leakage
-- No networking / persistence / registry runtime
-- Waiver expiry uses explicit `assessedAt` only (no clock)
+- Heap-only registry; no DB / network / secrets
+- No product imports
+- No clock reads; `registeredAt` pass-through only
+- Rejection does not mutate state
 
 ## Tests
 
-- `npx vitest run platforms/core` — **PASS** (27 tests)
+- `npx vitest run platforms/core` — **PASS** (see final report)
 - Full suite: see final report (unrelated media failure if present)
 
 ## TypeScript
@@ -45,7 +45,7 @@ None.
 
 ## Build
 
-Not required for this contracts/assessment milestone.
+Not required for this registry-foundation milestone.
 
 ## git diff --check
 
@@ -57,6 +57,6 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Live certificate grant/revoke remains future (eligibility only).
-- Cross-platform dependency graph compliance remains future (needs registry).
-- Do not start P4 from this close.
+- Aggregate `UmCoreRegistry` remains future.
+- Do not start P5 from this close.
+- Unrelated media foundation test may fail on pre-existing `20260869` migration.
