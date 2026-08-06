@@ -41,11 +41,17 @@ export type PartialRefundLedgerRepository = {
     nowIso: string
   ): Promise<PartialRefundLedgerResult<PartialRefundLedgerCommitRecord>>;
 
+  /**
+   * planned|failed → committing.
+   * Service-role adapter requires purchasedQuantityByLineId (begin RPC quantity guard).
+   * Memory repository may ignore the optional guard (app layer already validated).
+   */
   transitionToCommitting(
     ledgerId: string,
     expectedStatus: "planned" | "failed",
     expectedAccountingVersion: number,
-    nowIso: string
+    nowIso: string,
+    purchasedQuantityByLineId?: Readonly<Record<string, number>>
   ): Promise<PartialRefundLedgerResult<PartialRefundLedgerCommitRecord>>;
 
   completeCommitted(

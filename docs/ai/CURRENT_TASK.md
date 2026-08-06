@@ -2,37 +2,26 @@
 
 ## Milestone
 
-Commerce Partial Refund Ledger + RPC remote apply — **COMPLETE / CLOSED**
+Commerce Partial Refund Ledger Service-Role Adapter & Reservation Orchestration V1 — **CLOSED**
 
 ## Status
 
-**`PARTIAL_REFUND_REMOTE_APPLY_CLOSEOUT_COMPLETE`**
+**`PARTIAL_REFUND_SERVICE_ADAPTER_V1_CLOSED`**
 
-Remote applied and registered:
+Service-role adapter + reservation-only orchestration closed and pushed.
 
-1. `20260899` — partial-refund ledger schema
-2. `20260900` — privileged ledger RPCs
-
-Apply order: `20260899 → 20260900`. Remote tip: **`20260900`**.
-Learning `20260896`/`20260897` unchanged. Payout `20260898` unchanged.
-Four ledger tables exist with RLS/constraints/indexes and **zero rows**.
-Eight RPCs + helper exist; EXECUTE is **service_role only** (no public/anon/authenticated).
-Smoke: `SAFE_SMOKE_SKIPPED_NO_APPROVED_FIXTURE`.
-`commerce_confirm` false. Seller Live Payout gate OFF.
-No refund occurred. No provider call. No production money movement.
-Provider execution and downstream unwind remain **unsupported**.
-Next milestone requires a **separate GO**.
+- `committed` = durable reservation only
+- Explicit non-events: no provider refund, money movement, restock, entitlement, settlement, commission, or compensation
+- Migrations `20260899`/`20260900` remotely applied (tip `20260900`); unchanged in this milestone
+- No UI execution wiring
+- Provider execution requires a later separate GO
 
 ## Branch / worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1`
-- Branch: `office/commerce-partial-refund-rpc-remote-apply-readiness-v1`
-- Prior HEAD: `79f15131d6defebe950d942a189ee05b35306082`
-
-## Ownership preserved
-
-Ledger schema + privileged RPCs true · money/provider/restock/entitlement/settlement/commission false · public exposure false · commerce_confirm false · payout gate OFF
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-ledger-service-adapter-v1`
+- Branch: `office/commerce-partial-refund-ledger-service-adapter-v1`
+- Base: `078e26441ef8a33b9481f28d1d6d685a52c60776`
 
 ## Forbidden without new GO
 
-Provider/Sync refund execution · restock/entitlement/settlement/commission unwind · public RPC grants · commerce_confirm enable · payout/Manual Ops · merge
+Provider/Sync refund · money movement · restock/entitlement/settlement/commission · UI wiring · commerce_confirm · payout/Manual Ops · merge

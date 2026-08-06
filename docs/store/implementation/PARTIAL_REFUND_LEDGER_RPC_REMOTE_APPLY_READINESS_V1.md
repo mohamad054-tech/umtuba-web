@@ -2,14 +2,15 @@
 
 Capability: `commerce.payments.partial_refund_ledger_rpc_remote_apply_readiness_v1`
 Module: `lib/store/partialRefundLedger/rpcContracts.ts`, `rpcValidate.ts`
-SQL draft (local only): `supabase/migrations/20260900_store_partial_refund_ledger_rpc_v1.sql`
+SQL (remotely applied): `supabase/migrations/20260900_store_partial_refund_ledger_rpc_v1.sql`
 
 ## Status
 
 **FOUNDATION CLOSED** (`PARTIAL_REFUND_RPC_FOUNDATION_V1_CLOSED`).
 
-`20260899` and `20260900` are **local only and not remotely applied**.
-Apply order for a **separate explicit GO**: `20260899` → `20260900`.
+Migrations `20260899` and `20260900` are **remotely applied** (tip `20260900`).
+Service-role adapter + reservation orchestration implemented locally — see
+`PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`.
 Provider/Sync execution is a **later independent milestone**.
 `complete` = durable reservation only. No refund occurred. No production money moved.
 `commerce_confirm` / payout / Manual Ops untouched. Public RPC exposure prohibited.
@@ -47,20 +48,22 @@ Helper (also service_role only): `store_partial_refund_ledger_commit_json`
 - Partial unique index: at most one `committing` per capture (`20260899`)
 - Unique `(store_id, idempotency_key)` with fingerprint replay
 
-## Remote apply readiness (future GO only)
+## Remote apply readiness (completed)
 
-1. Confirm tip still allows `20260899` then `20260900`
-2. Apply `20260899` (schema)
-3. Apply `20260900` (RPCs)
-4. Smoke reservation path without provider refund
-5. Keep money/provider/restock/entitlement/settlement/commission unsupported until separate GOs
+1. Confirmed tip allowed `20260899` then `20260900`
+2. Applied `20260899` (schema)
+3. Applied `20260900` (RPCs)
+4. Mutation smoke skipped (`SAFE_SMOKE_SKIPPED_NO_APPROVED_FIXTURE`)
+5. Money/provider/restock/entitlement/settlement/commission remain unsupported until separate GOs
+
+Service-role TypeScript adapter: `PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`
 
 ## Ownership
 
 | Flag | Value |
 | --- | --- |
-| RPC contracts / SQL draft | **true** |
-| Remote migration apply | **false** |
+| RPC contracts / SQL | **true** |
+| Remote migration apply | **true** (completed in remote-apply closeout) |
 | Money / provider / restock / entitlement / settlement / commission | **false** |
 | Public RPC exposure | **false** |
 

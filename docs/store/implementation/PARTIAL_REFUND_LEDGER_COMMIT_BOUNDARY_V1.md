@@ -3,29 +3,22 @@
 Capability: `commerce.payments.partial_refund_ledger_commit_boundary_v1`
 Module: `lib/store/partialRefundLedger/`
 Version: `commerce-partial-refund-ledger-commit-boundary-v1`
-Migration (local draft only): `supabase/migrations/20260899_store_partial_refund_ledger_commit_boundary_v1.sql`
+Migration (remotely applied): `supabase/migrations/20260899_store_partial_refund_ledger_commit_boundary_v1.sql`
 
 ## Status
 
-**FOUNDATION COMPLETE** — closed as durable ledger + commit-boundary foundation only
-(`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED` after closeout push).
+**FOUNDATION COMPLETE** — durable ledger + commit-boundary foundation
+(`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED`).
 
-## Purpose
-
-Durable **ledger reservation** and **commit boundary** for partial refunds.
-
-- Records trusted planned refunds (from calculation foundation)
-- Transitions: `planned → committing → committed | failed` (`failed → committing` retry)
-- Enforces capture money ceilings and per-line quantity ceilings
-- Optimistic `accounting_version` + exclusive one-`committing`-per-capture
+Migration `20260899` is **remotely applied** (with `20260900` RPCs; remote tip `20260900`).
+Service-role adapter + reservation orchestration: see
+`PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`.
+Provider / money execution remains a **later independent milestone**.
+Compensation for committed reservations is **deferred** and must not be invented.
 
 **`committed` means durable prior-accounting reservation only.**
-It is **not** a Stripe refund, Sync refund, provider refund, settlement unwind, commission unwind, stock restock, entitlement change, payout, or any production money movement.
-
-No partial refund was executed in this milestone. No production money moved.
-Migration `20260899` is **local only and not remotely applied**. Remote apply requires a **separate explicit GO**.
-Provider / runtime integration is a **later independent milestone**.
-Compensation for committed reservations is **deferred** and must not be invented.
+It is **not** a payment-provider refund, Sync refund, settlement unwind, commission unwind,
+stock restock, entitlement change, payout, or any production money movement.
 
 ## Ownership
 
@@ -70,10 +63,9 @@ Unique `(store_id, idempotency_key)`. Same key + same fingerprint replays; confl
 
 ## Migration version proof (local draft)
 
-- Fresh remote tip (closeout preflight): **`20260898`**
-- Remote versions `20260896–20260902`: `96` Learning, `97` Learning, `98` payout; **`99`–`902` absent**
-- Local duplicate `20260899` files: **only this migration path**
-- **Not applied remotely**
+- Remote tip after apply closeout: **`20260900`**
+- Learning `20260896–97` and payout `20260898` unchanged
+- `20260899` / `20260900` **remotely applied and registered**
 
 ## Related
 

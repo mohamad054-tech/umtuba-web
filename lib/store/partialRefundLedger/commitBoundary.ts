@@ -131,7 +131,8 @@ export async function beginPartialRefundLedgerCommit(
     ledgerId,
     from,
     capture.accountingVersion,
-    nowIso()
+    nowIso(),
+    quantityGuard.purchasedQuantityByLineId
   );
 }
 

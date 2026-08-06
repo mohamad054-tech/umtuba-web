@@ -52,9 +52,13 @@ Rejects: zero/negative/malformed qty, unknown/duplicate lines, over-qty, over-re
 
 These remain **unsupported** until designed and authorized separately:
 
-- Provider / Sync partial refund **money execution**
+- Provider / Sync partial refund **money execution** (separate GO)
 - Partial restock / entitlement / settlement / commission unwind (must not invent)
-- Remote apply of durable ledger migration (see Ledger & Commit Boundary V1)
+
+Completed prerequisites:
+
+- Remote apply of durable ledger migration (`20260899`/`20260900`; tip `20260900`)
+- Service-role adapter + reservation orchestration — see `PARTIAL_REFUND_LEDGER_SERVICE_ADAPTER_V1.md`
 
 Ledger reservation domain: `docs/store/implementation/PARTIAL_REFUND_LEDGER_COMMIT_BOUNDARY_V1.md`
 

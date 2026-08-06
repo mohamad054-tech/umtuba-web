@@ -18,6 +18,40 @@ export type {
 export { MemoryPartialRefundLedgerRepository } from "./memoryRepository";
 export type { PartialRefundLedgerRepository } from "./repository";
 export {
+  createPartialRefundLedgerRpcPort,
+  assertNotBrowser,
+  PARTIAL_REFUND_LEDGER_RPC_CLIENT_BOUNDARY,
+  type PartialRefundLedgerRpcInvoke,
+} from "./rpcClient";
+export {
+  ServiceRolePartialRefundLedgerRepository,
+} from "./serviceRoleRepository";
+export {
+  reservePartialRefundLedgerCommit,
+  type ReservePartialRefundInput,
+  type ReservePartialRefundResult,
+  type ReservePartialRefundSuccess,
+  type ReservePartialRefundFailure,
+  type ReservePartialRefundNonEvents,
+} from "./reservationOrchestrator";
+export {
+  PARTIAL_REFUND_SERVICE_ADAPTER_ID,
+  PARTIAL_REFUND_SERVICE_ADAPTER_VERSION,
+  partialRefundServiceAdapterOwnership,
+  type PartialRefundServiceAdapterOwnership,
+} from "./serviceAdapterCapability";
+export {
+  mapPartialRefundRpcErrorMessage,
+  safeRpcErrorMessage,
+  type PartialRefundServiceAdapterErrorCode,
+} from "./errors";
+export {
+  parseCaptureAccountingRpc,
+  parseCommitEnvelope,
+  parseCommittedList,
+  parseLedgerCommitJson,
+} from "./rpcParse";
+export {
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_FILE,
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_VERSION,
   PARTIAL_REFUND_LEDGER_RPC_NAME_LIST,

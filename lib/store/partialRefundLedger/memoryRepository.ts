@@ -193,7 +193,8 @@ export class MemoryPartialRefundLedgerRepository
     ledgerId: string,
     expectedStatus: "planned" | "failed",
     expectedAccountingVersion: number,
-    nowIso: string
+    nowIso: string,
+    _purchasedQuantityByLineId?: Readonly<Record<string, number>>
   ): Promise<PartialRefundLedgerResult<PartialRefundLedgerCommitRecord>> {
     const row = this.byId.get(ledgerId);
     if (!row) {
