@@ -170,21 +170,74 @@ export type LearningLearnerActivityTarget = {
 };
 
 /**
- * Resolve a Continue Learning resume target.
- * Prefers last_lesson_id; otherwise the first available published lesson.
- * Fail closed when neither exists.
+ * Resolve a Continue Learning resume target against an explicit accessible
+ * published lesson id set for the course.
+ *
+ * Prefers `last_lesson_id` only when it is present in
+ * `accessible_lesson_ids`. Otherwise falls back to the first accessible id.
+ * Never emits an href for an unvalidated / stale / unpublished lesson id.
+ * Fail closed when the accessible set is empty.
  */
 export function resolveContinueLearningTarget(input: {
   last_lesson_id: string | null | undefined;
-  first_lesson_id: string | null | undefined;
+  /**
+   * Ordered accessible published lesson ids for the course (RLS + published
+   * section/lesson tree). First entry is the safe fallback.
+   */
+  accessible_lesson_ids: readonly string[];
 }): LearningContinueLearningTarget | null {
+  const accessible: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of input.accessible_lesson_ids) {
+    const id =
+      typeof raw === "string" && raw.trim().length > 0 ? raw.trim() : null;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    accessible.push(id);
+  }
+  if (accessible.length === 0) return null;
+
+  const last = asString(input.last_lesson_id);
   const lessonId =
-    asString(input.last_lesson_id) ?? asString(input.first_lesson_id);
+    last && seen.has(last) ? last : accessible[0];
   if (!lessonId) return null;
+
   return {
     lesson_id: lessonId,
     href: LEARNING_LEARNER_ROUTES.lesson(lessonId),
   };
+}
+
+/**
+ * Load ordered accessible published lesson ids for a course (RLS + published
+ * section/lesson tree). Shared input for Resume target validation.
+ */
+export async function loadAccessiblePublishedLessonIdsForCourse(
+  supabase: AnyClient,
+  courseId: string
+): Promise<string[]> {
+  const course = asString(courseId);
+  if (!course) return [];
+  return loadOrderedPublishedLessonIdsForCourse(supabase, course);
+}
+
+/**
+ * Load the course's accessible published lesson order, then resolve a Resume
+ * target. Shared by hub + course progress so href validation stays consistent.
+ */
+export async function resolveValidatedContinueLearningTarget(
+  supabase: AnyClient,
+  courseId: string,
+  lastLessonId: string | null | undefined
+): Promise<LearningContinueLearningTarget | null> {
+  const accessibleLessonIds = await loadAccessiblePublishedLessonIdsForCourse(
+    supabase,
+    courseId
+  );
+  return resolveContinueLearningTarget({
+    last_lesson_id: lastLessonId,
+    accessible_lesson_ids: accessibleLessonIds,
+  });
 }
 
 /**
@@ -813,12 +866,6 @@ export async function loadMyLearningHub(
 
   void courseIds;
 
-  const hubCourseIds = courses.map((c) => c.id);
-  const firstLessonByCourse = await loadFirstPublishedLessonIdsByCourse(
-    supabase,
-    hubCourseIds
-  );
-
   for (const course of courses) {
     const { data: courseProgressRaw, error: progressError } =
       await supabase.rpc(LEARNING_PROGRESS_RPCS.getCourseProgress, {
@@ -828,10 +875,11 @@ export async function loadMyLearningHub(
       course.progress = parseHubCourseProgress(courseProgressRaw);
     }
 
-    const target = resolveContinueLearningTarget({
-      last_lesson_id: course.progress?.last_lesson_id ?? null,
-      first_lesson_id: firstLessonByCourse.get(course.id) ?? null,
-    });
+    const target = await resolveValidatedContinueLearningTarget(
+      supabase,
+      course.id,
+      course.progress?.last_lesson_id ?? null
+    );
     course.continue_href = target?.href ?? null;
   }
 

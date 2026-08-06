@@ -312,51 +312,117 @@ describe("Learner Delivery V1 — docs contract", () => {
 });
 
 describe("Learner Experience V1 — continue target resolution", () => {
-  it("prefers last_lesson_id over first_lesson_id", () => {
+  const FIRST = "lesson-first";
+  const LAST = "lesson-last";
+  const STALE = "lesson-stale-deleted";
+  const UNPUBLISHED = "lesson-unpublished";
+
+  it("A — prefers valid accessible last_lesson_id", () => {
     const target = resolveContinueLearningTarget({
-      last_lesson_id: "lesson-last",
-      first_lesson_id: "lesson-first",
+      last_lesson_id: LAST,
+      accessible_lesson_ids: [FIRST, LAST],
     });
     expect(target).toEqual({
-      lesson_id: "lesson-last",
-      href: LEARNING_LEARNER_ROUTES.lesson("lesson-last"),
+      lesson_id: LAST,
+      href: LEARNING_LEARNER_ROUTES.lesson(LAST),
     });
   });
 
-  it("falls back to first available lesson when last_lesson_id is missing", () => {
+  it("B — missing last_lesson_id falls back to first accessible published lesson", () => {
     expect(
       resolveContinueLearningTarget({
         last_lesson_id: null,
-        first_lesson_id: "lesson-first",
+        accessible_lesson_ids: [FIRST, LAST],
       })
     ).toEqual({
-      lesson_id: "lesson-first",
-      href: LEARNING_LEARNER_ROUTES.lesson("lesson-first"),
+      lesson_id: FIRST,
+      href: LEARNING_LEARNER_ROUTES.lesson(FIRST),
     });
     expect(
       resolveContinueLearningTarget({
         last_lesson_id: "",
-        first_lesson_id: "lesson-first",
+        accessible_lesson_ids: [FIRST],
       })
     ).toEqual({
-      lesson_id: "lesson-first",
-      href: LEARNING_LEARNER_ROUTES.lesson("lesson-first"),
+      lesson_id: FIRST,
+      href: LEARNING_LEARNER_ROUTES.lesson(FIRST),
     });
   });
 
-  it("fails closed when no lesson target exists", () => {
+  it("C — deleted/stale last_lesson_id falls back safely", () => {
+    expect(
+      resolveContinueLearningTarget({
+        last_lesson_id: STALE,
+        accessible_lesson_ids: [FIRST, LAST],
+      })
+    ).toEqual({
+      lesson_id: FIRST,
+      href: LEARNING_LEARNER_ROUTES.lesson(FIRST),
+    });
+  });
+
+  it("D — unpublished/inaccessible last_lesson_id falls back safely", () => {
+    // Accessible set only contains published/accessible ids — unpublished omitted.
+    expect(
+      resolveContinueLearningTarget({
+        last_lesson_id: UNPUBLISHED,
+        accessible_lesson_ids: [FIRST],
+      })
+    ).toEqual({
+      lesson_id: FIRST,
+      href: LEARNING_LEARNER_ROUTES.lesson(FIRST),
+    });
+  });
+
+  it("E — invalid last_lesson_id with no accessible fallback returns null", () => {
+    expect(
+      resolveContinueLearningTarget({
+        last_lesson_id: STALE,
+        accessible_lesson_ids: [],
+      })
+    ).toBeNull();
     expect(
       resolveContinueLearningTarget({
         last_lesson_id: null,
-        first_lesson_id: null,
+        accessible_lesson_ids: [],
       })
     ).toBeNull();
     expect(
       resolveContinueLearningTarget({
         last_lesson_id: undefined,
-        first_lesson_id: "",
+        accessible_lesson_ids: ["", "  "],
       })
     ).toBeNull();
+  });
+
+  it("F — Resume never generates a lesson URL for an unvalidated lesson id", () => {
+    const target = resolveContinueLearningTarget({
+      last_lesson_id: STALE,
+      accessible_lesson_ids: [FIRST],
+    });
+    expect(target?.href).toBe(LEARNING_LEARNER_ROUTES.lesson(FIRST));
+    expect(target?.href).not.toContain(STALE);
+    expect(target?.lesson_id).not.toBe(STALE);
+  });
+
+  it("G — existing valid Resume behavior remains unchanged when last is accessible", () => {
+    const target = resolveContinueLearningTarget({
+      last_lesson_id: LAST,
+      accessible_lesson_ids: [FIRST, LAST],
+    });
+    expect(target).toEqual({
+      lesson_id: LAST,
+      href: `/learning/lessons/${LAST}`,
+    });
+  });
+
+  it("dedupes accessible ids and ignores empty entries", () => {
+    expect(
+      resolveContinueLearningTarget({
+        last_lesson_id: LAST,
+        accessible_lesson_ids: ["", FIRST, FIRST, LAST],
+      })?.lesson_id
+    ).toBe(LAST);
   });
 });
 
@@ -435,6 +501,12 @@ describe("Learner Experience V1 — hub progress enrichment", () => {
               position: 1,
               status: "published",
             },
+            {
+              id: LAST_LESSON_ID,
+              section_id: SECTION_ID,
+              position: 2,
+              status: "published",
+            },
           ]);
         }
         return chainResult([]);
@@ -478,6 +550,140 @@ describe("Learner Experience V1 — hub progress enrichment", () => {
         args: { p_course_id: COURSE_ID },
       },
     ]);
+  });
+
+  it("falls back continue_href when last_lesson_id is stale/inaccessible", async () => {
+    const STALE_LESSON_ID = "99999999-9999-4999-8999-999999999999";
+    const fake = {
+      from: (table: string) => {
+        if (table === "learning_enrollments") {
+          return chainResult([
+            {
+              id: ENROLLMENT_ID,
+              target_type: "course",
+              program_id: null,
+              course_id: COURSE_ID,
+              status: "active",
+              starts_at: null,
+              expires_at: null,
+            },
+          ]);
+        }
+        if (table === "learning_courses") {
+          return chainResult([
+            {
+              id: COURSE_ID,
+              name: "Hub Course",
+              slug: "hub-course",
+              description: "desc",
+              program_id: PROGRAM_ID,
+              status: "published",
+            },
+          ]);
+        }
+        if (table === "learning_programs") {
+          return chainResult([{ id: PROGRAM_ID, name: "Hub Program" }]);
+        }
+        if (table === "learning_sections") {
+          return chainResult([
+            {
+              id: SECTION_ID,
+              course_id: COURSE_ID,
+              position: 1,
+              status: "published",
+            },
+          ]);
+        }
+        if (table === "learning_lessons") {
+          // Accessible published set does not include progress.last_lesson_id.
+          return chainResult([
+            {
+              id: FIRST_LESSON_ID,
+              section_id: SECTION_ID,
+              position: 1,
+              status: "published",
+            },
+          ]);
+        }
+        return chainResult([]);
+      },
+      rpc: async () => ({
+        data: {
+          status: "in_progress",
+          completed_lessons_count: 1,
+          total_lessons_count: 2,
+          percent_complete: 50,
+          last_lesson_id: STALE_LESSON_ID,
+        },
+        error: null,
+      }),
+    };
+
+    const hub = await loadMyLearningHub(fake as never, USER_ID);
+    expect(hub.ok).toBe(true);
+    if (!hub.ok) return;
+    expect(hub.data.courses[0].progress?.last_lesson_id).toBe(STALE_LESSON_ID);
+    expect(hub.data.courses[0].continue_href).toBe(
+      LEARNING_LEARNER_ROUTES.lesson(FIRST_LESSON_ID)
+    );
+    expect(hub.data.courses[0].continue_href).not.toContain(STALE_LESSON_ID);
+  });
+
+  it("returns no continue_href when no accessible published lessons exist", async () => {
+    const fake = {
+      from: (table: string) => {
+        if (table === "learning_enrollments") {
+          return chainResult([
+            {
+              id: ENROLLMENT_ID,
+              target_type: "course",
+              program_id: null,
+              course_id: COURSE_ID,
+              status: "active",
+              starts_at: null,
+              expires_at: null,
+            },
+          ]);
+        }
+        if (table === "learning_courses") {
+          return chainResult([
+            {
+              id: COURSE_ID,
+              name: "Hub Course",
+              slug: "hub-course",
+              description: null,
+              program_id: PROGRAM_ID,
+              status: "published",
+            },
+          ]);
+        }
+        if (table === "learning_programs") {
+          return chainResult([{ id: PROGRAM_ID, name: "Hub Program" }]);
+        }
+        if (table === "learning_sections") {
+          return chainResult([]);
+        }
+        if (table === "learning_lessons") {
+          return chainResult([]);
+        }
+        return chainResult([]);
+      },
+      rpc: async () => ({
+        data: {
+          status: "in_progress",
+          completed_lessons_count: 0,
+          total_lessons_count: 0,
+          percent_complete: 0,
+          last_lesson_id: LAST_LESSON_ID,
+        },
+        error: null,
+      }),
+    };
+
+    const hub = await loadMyLearningHub(fake as never, USER_ID);
+    expect(hub.ok).toBe(true);
+    if (!hub.ok) return;
+    expect(hub.data.courses[0].continue_href).toBeNull();
   });
 
   it("falls back continue_href to first published lesson when last_lesson_id is null", async () => {
@@ -559,6 +765,15 @@ describe("Learner Experience V1 — hub progress enrichment", () => {
     expect(hubUi).toMatch(/percent_complete/);
     expect(hubUi).toMatch(/Resume/);
     expect(hubUi).toMatch(/continue_href/);
+  });
+
+  it("course progress page validates Resume via shared accessible lesson set", () => {
+    const page = read("app/learning/courses/[courseId]/progress/page.tsx");
+    expect(page).toMatch(/loadAccessiblePublishedLessonIdsForCourse/);
+    expect(page).toMatch(/resolveContinueLearningTarget/);
+    expect(page).not.toMatch(
+      /href=\{LEARNING_LEARNER_ROUTES\.lesson\(resumeLessonId\)\}/
+    );
   });
 });
 

@@ -2,7 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import LearningShell from "../../../../components/learning/LearningShell";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
-import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import {
+  LEARNING_LEARNER_ROUTES,
+  loadAccessiblePublishedLessonIdsForCourse,
+  resolveContinueLearningTarget,
+} from "../../../../../lib/learning/learnerDelivery";
 import { loadMyLearningCourseProgressBundle } from "../../../../../lib/learning/lessonEngineFoundation";
 
 export const dynamic = "force-dynamic";
@@ -38,12 +42,21 @@ export default async function CourseProgressPage({ params }: PageProps) {
     typeof loaded.data.continue_target === "object"
       ? (loaded.data.continue_target as Record<string, unknown>)
       : null;
-  const resumeLessonId =
+
+  const candidateLastLessonId =
     typeof continueTarget?.lesson_id === "string"
       ? continueTarget.lesson_id
       : typeof courseProgress?.last_lesson_id === "string"
         ? courseProgress.last_lesson_id
         : null;
+
+  const accessibleLessonIds = loaded.ok
+    ? await loadAccessiblePublishedLessonIdsForCourse(supabase, courseId)
+    : [];
+  const resumeTarget = resolveContinueLearningTarget({
+    last_lesson_id: candidateLastLessonId,
+    accessible_lesson_ids: accessibleLessonIds,
+  });
 
   return (
     <LearningShell
@@ -73,13 +86,14 @@ export default async function CourseProgressPage({ params }: PageProps) {
             ) : (
               <p className="text-sm text-white/50">No course progress yet.</p>
             )}
-            {resumeLessonId ? (
+            {resumeTarget ? (
               <p className="mt-3">
                 <Link
-                  href={LEARNING_LEARNER_ROUTES.lesson(resumeLessonId)}
+                  href={resumeTarget.href}
                   className="watch-focus-ring inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-black"
                 >
-                  {continueTarget?.last_media_position_seconds != null
+                  {continueTarget?.last_media_position_seconds != null &&
+                  resumeTarget.lesson_id === candidateLastLessonId
                     ? "Continue watching"
                     : "Resume learning"}
                 </Link>
@@ -93,31 +107,45 @@ export default async function CourseProgressPage({ params }: PageProps) {
               <p className="text-sm text-white/45">No section progress yet.</p>
             ) : (
               <ul className="space-y-2">
-                {sections.map((section) => (
-                  <li
-                    key={String(section.section_id)}
-                    className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/75"
-                  >
-                    Section {String(section.section_id).slice(0, 8)}… ·{" "}
-                    {String(section.status ?? "—")} ·{" "}
-                    {String(section.percent_complete ?? 0)}% (
-                    {String(section.completed_lessons_count ?? 0)}/
-                    {String(section.total_lessons_count ?? 0)})
-                    {typeof section.last_lesson_id === "string" ? (
-                      <>
-                        {" · "}
-                        <Link
-                          href={LEARNING_LEARNER_ROUTES.lesson(
-                            section.last_lesson_id
-                          )}
-                          className="underline underline-offset-2"
-                        >
-                          last lesson
-                        </Link>
-                      </>
-                    ) : null}
-                  </li>
-                ))}
+                {sections.map((section) => {
+                  const sectionLastRaw =
+                    typeof section.last_lesson_id === "string"
+                      ? section.last_lesson_id
+                      : null;
+                  // Only link when that exact lesson id is in the accessible set
+                  // (do not fall back to another lesson for section "last lesson").
+                  const sectionLastAccessible =
+                    sectionLastRaw != null &&
+                    accessibleLessonIds.includes(sectionLastRaw)
+                      ? sectionLastRaw
+                      : null;
+
+                  return (
+                    <li
+                      key={String(section.section_id)}
+                      className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/75"
+                    >
+                      Section {String(section.section_id).slice(0, 8)}… ·{" "}
+                      {String(section.status ?? "—")} ·{" "}
+                      {String(section.percent_complete ?? 0)}% (
+                      {String(section.completed_lessons_count ?? 0)}/
+                      {String(section.total_lessons_count ?? 0)})
+                      {sectionLastAccessible ? (
+                        <>
+                          {" · "}
+                          <Link
+                            href={LEARNING_LEARNER_ROUTES.lesson(
+                              sectionLastAccessible
+                            )}
+                            className="underline underline-offset-2"
+                          >
+                            last lesson
+                          </Link>
+                        </>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </section>
