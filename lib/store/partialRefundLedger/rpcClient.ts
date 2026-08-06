@@ -92,6 +92,13 @@ export function createPartialRefundLedgerRpcPort(
         p_capture_event_id: captureEventId,
       });
     },
+    async listCommitting(args) {
+      return invokeRpc(invoke, PARTIAL_REFUND_LEDGER_RPCS.listCommitting, {
+        p_store_id: args.storeId ?? null,
+        p_capture_event_id: args.captureEventId ?? null,
+        p_limit: args.limit ?? 50,
+      });
+    },
   };
 }
 

@@ -312,3 +312,55 @@ export function parseCommittedList(
   }
   return out;
 }
+
+/** Parse lean committing-visibility RPC rows (no amounts/lines). */
+export function parseCommittingList(
+  raw: unknown
+):
+  | { ok: true; rows: readonly import("./repository").PartialRefundInFlightCommittingRow[] }
+  | { ok: false } {
+  if (!isRecord(raw)) return { ok: false };
+  if (asBool(raw.ok) !== true) return { ok: false };
+  const arr = raw.commits;
+  if (!Array.isArray(arr)) return { ok: false };
+  const out: import("./repository").PartialRefundInFlightCommittingRow[] = [];
+  for (const item of arr) {
+    if (!isRecord(item)) return { ok: false };
+    const ledgerId = asString(item.ledger_id ?? item.ledgerId);
+    const storeId = asString(item.store_id ?? item.storeId);
+    const orderId = asString(item.order_id ?? item.orderId);
+    const captureEventId = asString(
+      item.capture_event_id ?? item.captureEventId
+    );
+    const status = asString(item.status);
+    const accountingVersion = asNumber(
+      item.accounting_version ?? item.accountingVersion
+    );
+    const createdAtIso = isoFromRpc(item.created_at ?? item.createdAtIso);
+    const updatedAtIso = isoFromRpc(item.updated_at ?? item.updatedAtIso);
+    if (
+      !ledgerId ||
+      !storeId ||
+      !orderId ||
+      !captureEventId ||
+      status !== "committing" ||
+      accountingVersion === null ||
+      !Number.isInteger(accountingVersion) ||
+      !createdAtIso ||
+      !updatedAtIso
+    ) {
+      return { ok: false };
+    }
+    out.push({
+      ledgerId,
+      storeId,
+      orderId,
+      captureEventId,
+      status: "committing",
+      accountingVersion,
+      createdAtIso,
+      updatedAtIso,
+    });
+  }
+  return { ok: true, rows: out };
+}

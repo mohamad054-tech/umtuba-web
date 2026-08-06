@@ -16,7 +16,10 @@ export type {
   PartialRefundCaptureLockToken,
 } from "./locking";
 export { MemoryPartialRefundLedgerRepository } from "./memoryRepository";
-export type { PartialRefundLedgerRepository } from "./repository";
+export type {
+  PartialRefundLedgerRepository,
+  PartialRefundInFlightCommittingRow,
+} from "./repository";
 export {
   createPartialRefundLedgerRpcPort,
   assertNotBrowser,
@@ -49,11 +52,14 @@ export {
   parseCaptureAccountingRpc,
   parseCommitEnvelope,
   parseCommittedList,
+  parseCommittingList,
   parseLedgerCommitJson,
 } from "./rpcParse";
 export {
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_FILE,
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_VERSION,
+  PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_FILE,
+  PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_VERSION,
   PARTIAL_REFUND_LEDGER_RPC_NAME_LIST,
   PARTIAL_REFUND_LEDGER_RPCS,
   PARTIAL_REFUND_RPC_READINESS_ID,

@@ -14,6 +14,8 @@ import {
   loadPartialRefundCaptureAccountingReview,
   type PartialRefundAccountingReviewModel,
 } from "../../../../lib/store/partialRefundReservationAccounting";
+import { listInFlightCommittingPartialRefundReservations } from "../../../../lib/store/partialRefundInFlightCommittingVisibility";
+import type { PartialRefundInFlightCommittingVisibilityRow } from "../../../../lib/store/partialRefundInFlightCommittingVisibility";
 import { loadAdminRefundOperations } from "../../../../lib/store/refundOperations";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { APP_ROUTES } from "../../../lib/nav";
@@ -77,6 +79,22 @@ export default async function AdminStoreRefundsPage({
     typeof sp.prRecError === "string" ? sp.prRecError : null;
   const prRecLedgerId =
     typeof sp.prRecLedgerId === "string" ? sp.prRecLedgerId : null;
+  const prRecPrefill =
+    typeof sp.prRecPrefill === "string" ? sp.prRecPrefill : null;
+
+  const prVisOk = sp.prVisOk === "1";
+  const prVisStatus =
+    typeof sp.prVisStatus === "string" ? sp.prVisStatus : null;
+  const prVisError =
+    typeof sp.prVisError === "string" ? sp.prVisError : null;
+  const prVisCount =
+    typeof sp.prVisCount === "string" && /^\d+$/.test(sp.prVisCount)
+      ? Number(sp.prVisCount)
+      : null;
+  const prVisStoreId =
+    typeof sp.prVisStoreId === "string" ? sp.prVisStoreId.trim() : "";
+  const prVisCaptureId =
+    typeof sp.prVisCaptureId === "string" ? sp.prVisCaptureId.trim() : "";
 
   let prFacts: TrustedPartialRefundFactLoadResult | null = null;
   let prReservations: readonly PartialRefundReservationSafeCommitView[] = [];
@@ -94,6 +112,29 @@ export default async function AdminStoreRefundsPage({
       );
       if (listed.ok) {
         prReservations = listed.reservations;
+      }
+    }
+  }
+
+  let committingRows: readonly PartialRefundInFlightCommittingVisibilityRow[] =
+    [];
+  let visLoadError: string | null = null;
+  {
+    const boot = createPartialRefundReservationServiceRole();
+    if (!boot.ok) {
+      visLoadError = boot.message;
+    } else {
+      const listed = await listInFlightCommittingPartialRefundReservations(
+        { repository: boot.repository },
+        {
+          storeId: prVisStoreId || null,
+          captureEventId: prVisCaptureId || null,
+        }
+      );
+      if (!listed.ok) {
+        visLoadError = listed.message;
+      } else {
+        committingRows = listed.rows;
       }
     }
   }
@@ -205,6 +246,15 @@ export default async function AdminStoreRefundsPage({
           flashStatus={prRecStatus}
           flashError={prRecError}
           flashLedgerId={prRecLedgerId}
+          visOk={prVisOk}
+          visStatus={prVisStatus}
+          visError={prVisError}
+          visCount={prVisCount}
+          committingRows={committingRows}
+          visLoadError={visLoadError}
+          prefillLedgerId={prRecPrefill}
+          visStoreIdDefault={prVisStoreId}
+          visCaptureIdDefault={prVisCaptureId}
         />
 
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">

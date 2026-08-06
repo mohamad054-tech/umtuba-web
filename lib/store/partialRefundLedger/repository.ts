@@ -70,4 +70,26 @@ export type PartialRefundLedgerRepository = {
   listCommittedForCapture(
     captureEventId: string
   ): Promise<readonly PartialRefundLedgerCommitRecord[]>;
+
+  /**
+   * Read-only list of status=committing rows (privileged RPC).
+   * Does not mutate ledger state.
+   */
+  listCommitting(input?: {
+    storeId?: string | null;
+    captureEventId?: string | null;
+    limit?: number | null;
+  }): Promise<readonly PartialRefundInFlightCommittingRow[]>;
+};
+
+/** Operator-safe in-flight committing discovery row (no amounts/lines). */
+export type PartialRefundInFlightCommittingRow = {
+  ledgerId: string;
+  storeId: string;
+  orderId: string;
+  captureEventId: string;
+  status: "committing";
+  accountingVersion: number;
+  createdAtIso: string;
+  updatedAtIso: string;
 };

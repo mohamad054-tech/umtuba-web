@@ -14,6 +14,7 @@ import {
   parseCaptureAccountingRpc,
   parseCommitEnvelope,
   parseCommittedList,
+  parseCommittingList,
 } from "./rpcParse";
 import type { PartialRefundLedgerRepository } from "./repository";
 import type {
@@ -22,6 +23,7 @@ import type {
   PartialRefundLedgerPlanInput,
   PartialRefundLedgerResult,
 } from "./types";
+import type { PartialRefundInFlightCommittingRow } from "./repository";
 import { failLedger, okLedger, validateLedgerPlanInput } from "./validate";
 import {
   validateBeginRpcArgs,
@@ -261,6 +263,28 @@ export class ServiceRolePartialRefundLedgerRepository
       return parseCommittedList(raw) ?? [];
     } catch {
       return [];
+    }
+  }
+
+  async listCommitting(input?: {
+    storeId?: string | null;
+    captureEventId?: string | null;
+    limit?: number | null;
+  }): Promise<readonly PartialRefundInFlightCommittingRow[]> {
+    try {
+      const raw = await this.rpc.listCommitting({
+        storeId: input?.storeId ?? null,
+        captureEventId: input?.captureEventId ?? null,
+        limit: input?.limit ?? 50,
+      });
+      const parsed = parseCommittingList(raw);
+      if (!parsed.ok) {
+        throw new Error("malformed_rpc_response");
+      }
+      return parsed.rows;
+    } catch (e) {
+      // Surface as throw so visibility service can map repository_error.
+      throw e instanceof Error ? e : new Error("list_committing_failed");
     }
   }
 

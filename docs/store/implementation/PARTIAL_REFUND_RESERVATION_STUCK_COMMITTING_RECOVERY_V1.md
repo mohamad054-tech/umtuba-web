@@ -6,9 +6,9 @@ Version: `commerce-partial-refund-reservation-stuck-committing-recovery-v1`
 
 ## Status
 
-**READY FOR REVIEW** (this milestone — do not claim money execution or committed cancellation).
+**CLOSED** — `PARTIAL_REFUND_STUCK_COMMITTING_RECOVERY_V1_CLOSED` @ tip `8e16c8c108d418457ccdcbeb2ed542cca4d30472`.
 
-Migrations `20260899` / `20260900` remain remotely applied (tip `20260900`); unchanged here.
+Migrations `20260899` / `20260900` remain remotely applied (tip `20260900`); unchanged by recovery.
 
 ## Purpose
 

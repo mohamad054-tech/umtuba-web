@@ -2,24 +2,38 @@
 
 ## Summary
 
-**`PARTIAL_REFUND_STUCK_COMMITTING_RECOVERY_READY_FOR_REVIEW`**
+**`COMMERCE_PARTIAL_REFUND_IN_FLIGHT_COMMITTING_VISIBILITY_V1_CLOSED`**
 
-Admin-only stuck-committing recovery (`committing → failed`) on base
-`191924178723f1ee9d3f5e42dba966451e735a0e`. Releases in-flight capture lock only.
-No committed cancel/compensation, no provider/money, no migrations, no commit/push.
+Admin-only read-only discovery of exact `committing` partial-refund ledger rows
+via privileged RPC `list_store_partial_refund_ledger_committing`. Local migration
+`20260901` committed and pushed; **not** remote-applied. Base parent
+`8e16c8c108d418457ccdcbeb2ed542cca4d30472`. No money/provider/lock-release/auto-recovery.
 
 ## Exact files changed
 
-- `lib/store/partialRefundStuckCommittingRecovery/capability.ts` (new)
-- `lib/store/partialRefundStuckCommittingRecovery/types.ts` (new)
-- `lib/store/partialRefundStuckCommittingRecovery/recoveryService.ts` (new)
-- `lib/store/partialRefundStuckCommittingRecovery/recoveryService.test.ts` (new)
-- `lib/store/partialRefundStuckCommittingRecovery/index.ts` (new)
-- `app/actions/storePartialRefundStuckCommittingRecovery.ts` (new)
-- `app/admin/store/refunds/PartialRefundStuckCommittingRecoveryPanel.tsx` (new)
+### New
+- `supabase/migrations/20260901_store_partial_refund_ledger_list_committing_v1.sql`
+- `lib/store/partialRefundInFlightCommittingVisibility/capability.ts`
+- `lib/store/partialRefundInFlightCommittingVisibility/types.ts`
+- `lib/store/partialRefundInFlightCommittingVisibility/visibilityService.ts`
+- `lib/store/partialRefundInFlightCommittingVisibility/visibilityService.test.ts`
+- `lib/store/partialRefundInFlightCommittingVisibility/index.ts`
+- `app/actions/storePartialRefundInFlightCommittingVisibility.ts`
+- `docs/store/implementation/PARTIAL_REFUND_IN_FLIGHT_COMMITTING_VISIBILITY_V1.md`
+
+### Modified
+- `lib/store/partialRefundLedger/rpcContracts.ts`
+- `lib/store/partialRefundLedger/rpcClient.ts`
+- `lib/store/partialRefundLedger/rpcParse.ts`
+- `lib/store/partialRefundLedger/repository.ts`
+- `lib/store/partialRefundLedger/serviceRoleRepository.ts`
+- `lib/store/partialRefundLedger/memoryRepository.ts`
+- `lib/store/partialRefundLedger/index.ts`
+- `lib/store/partialRefundLedger/rpcReadiness.test.ts`
+- `lib/store/partialRefundLedger/serviceAdapter.test.ts`
+- `app/admin/store/refunds/PartialRefundStuckCommittingRecoveryPanel.tsx`
 - `app/admin/store/refunds/page.tsx`
-- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_STUCK_COMMITTING_RECOVERY_V1.md` (new)
-- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_ACCOUNTING_AUDIT_REVIEW_V1.md`
+- `docs/store/implementation/PARTIAL_REFUND_RESERVATION_STUCK_COMMITTING_RECOVERY_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/SESSION_HANDOFF.md`
@@ -27,31 +41,23 @@ No committed cancel/compensation, no provider/money, no migrations, no commit/pu
 
 ## Migrations created
 
-None.
+Yes — `20260901_store_partial_refund_ledger_list_committing_v1.sql` (local only; not applied).
 
 ## Security review
 
-- Platform admin only (`assertPlatformAdminDb`)
-- Optional trusted `expectedStoreId` scope check
-- Fail transition only when status is exactly `committing`
-- Operator reason constrained; rejects money/compensation claim language
-- Explicit non-event flags on all results
-- Seller/buyer recovery absent
+- `SECURITY DEFINER` + `search_path=public`; execute revoked from public/anon/authenticated; granted to `service_role` only
+- Hard-coded `status = 'committing'` (no client status)
+- Bound limit 1–100; UUID validation; fail-closed parse
+- Admin action uses `assertPlatformAdminDb`; no seller/buyer actions
+- No money/provider/payout/compensation inputs or execution
+- Listing does not mutate ledger or release locks
+- Row selection only prefills recovery form; recovery submit stays explicit
 
 ## Tests
 
-PASS — 10 files / 124 tests:
-
-- recovery service/UI audits (14)
-- reservation wiring regression (19)
-- accounting review regression (13)
-- ledger + serviceAdapter + rpcReadiness (33)
-- partialRefundPath (16)
-- refundOperations (13)
-- restock foundation + runtime (16)
-- `npx tsc --noEmit` PASS
-- `git diff --check` PASS
-- secret / provider / money-input / cancel-CTA / migration audits PASS
+Combined focused + regressions: **11 files / 139 tests passed**  
+`npx tsc --noEmit`: **PASS**  
+`git diff --check`: **PASS**
 
 ## TypeScript
 
@@ -59,7 +65,7 @@ PASS
 
 ## Build
 
-Not required.
+Not required for this closeout.
 
 ## git diff --check
 
@@ -67,11 +73,9 @@ PASS
 
 ## git status --short
 
-Dirty working tree (uncommitted by design). No upstream. HEAD still base tip
-`1919241` with uncommitted implementation on top.
+Clean after commit/push (see final close report).
 
 ## Open issues
 
-- Committed compensation/cancel remains a separate unimplemented milestone
-- Provider money execution requires a separate GO
-- Seller/buyer recovery intentionally absent
+- Remote apply of `20260901` requires a **separate explicit GO**
+- Provider money execution / committed compensation remain unsupported

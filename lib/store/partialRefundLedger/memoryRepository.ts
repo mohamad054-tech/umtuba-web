@@ -354,6 +354,41 @@ export class MemoryPartialRefundLedgerRepository
       .map(cloneCommit);
   }
 
+  async listCommitting(input?: {
+    storeId?: string | null;
+    captureEventId?: string | null;
+    limit?: number | null;
+  }): Promise<
+    readonly import("./repository").PartialRefundInFlightCommittingRow[]
+  > {
+    const limRaw = input?.limit;
+    const lim =
+      limRaw == null || limRaw === undefined
+        ? 50
+        : Math.min(100, Math.max(1, Math.floor(limRaw)));
+    const storeId = input?.storeId?.trim() || null;
+    const captureEventId = input?.captureEventId?.trim() || null;
+    return [...this.byId.values()]
+      .filter((r) => r.status === "committing")
+      .filter((r) => (storeId ? r.storeId === storeId : true))
+      .filter((r) => (captureEventId ? r.captureEventId === captureEventId : true))
+      .sort((a, b) => {
+        const t = a.createdAtIso.localeCompare(b.createdAtIso);
+        return t !== 0 ? t : a.ledgerId.localeCompare(b.ledgerId);
+      })
+      .slice(0, lim)
+      .map((r) => ({
+        ledgerId: r.ledgerId,
+        storeId: r.storeId,
+        orderId: r.orderId,
+        captureEventId: r.captureEventId,
+        status: "committing" as const,
+        accountingVersion: r.accountingVersion,
+        createdAtIso: r.createdAtIso,
+        updatedAtIso: r.updatedAtIso,
+      }));
+  }
+
   async acquire(
     captureEventId: string,
     expectedVersion: number

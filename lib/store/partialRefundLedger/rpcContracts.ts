@@ -28,7 +28,15 @@ export const PARTIAL_REFUND_LEDGER_RPCS = {
   getCaptureAccounting: "get_store_partial_refund_capture_accounting",
   getCommit: "get_store_partial_refund_ledger_commit",
   listCommitted: "list_store_partial_refund_ledger_committed",
+  /** Local draft 20260901 — read-only in-flight committing discovery. */
+  listCommitting: "list_store_partial_refund_ledger_committing",
 } as const;
+
+/** Local-only visibility RPC migration (not remote-applied in this GO). */
+export const PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_VERSION = "20260901" as const;
+
+export const PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_FILE =
+  "20260901_store_partial_refund_ledger_list_committing_v1.sql" as const;
 
 export type PartialRefundLedgerRpcName =
   (typeof PARTIAL_REFUND_LEDGER_RPCS)[keyof typeof PARTIAL_REFUND_LEDGER_RPCS];
@@ -121,4 +129,9 @@ export type PartialRefundLedgerRpcPort = {
   getCaptureAccounting(captureEventId: string): Promise<unknown>;
   getCommit(ledgerId: string): Promise<unknown>;
   listCommitted(captureEventId: string): Promise<unknown>;
+  listCommitting(args: {
+    storeId?: string | null;
+    captureEventId?: string | null;
+    limit?: number | null;
+  }): Promise<unknown>;
 };

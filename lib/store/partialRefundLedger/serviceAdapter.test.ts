@@ -318,6 +318,37 @@ function createFakeRpc(options?: {
         .map(commitJson);
       return { ok: true, commits };
     },
+    async listCommitting(args) {
+      calls.push(PARTIAL_REFUND_LEDGER_RPCS.listCommitting);
+      const lim =
+        args.limit == null || args.limit === undefined ? 50 : args.limit;
+      const commits = [...byId.values()]
+        .filter((c) => c.status === "committing")
+        .filter((c) =>
+          args.storeId ? c.storeId === args.storeId : true
+        )
+        .filter((c) =>
+          args.captureEventId
+            ? c.captureEventId === args.captureEventId
+            : true
+        )
+        .sort((a, b) => {
+          const t = a.createdAt.localeCompare(b.createdAt);
+          return t !== 0 ? t : a.ledgerId.localeCompare(b.ledgerId);
+        })
+        .slice(0, lim)
+        .map((c) => ({
+          ledger_id: c.ledgerId,
+          store_id: c.storeId,
+          order_id: c.orderId,
+          capture_event_id: c.captureEventId,
+          status: c.status,
+          accounting_version: c.plannedAccountingVersion,
+          created_at: c.createdAt,
+          updated_at: c.updatedAt,
+        }));
+      return { ok: true, commits };
+    },
   };
 
   return { port, calls, get providerCalls() { return providerCalls; } };
@@ -422,6 +453,9 @@ describe("partial refund service-role adapter", () => {
       },
       async listCommitted() {
         return { ok: true, commits: [] };
+      },
+      async listCommitting() {
+        return { ok: true, commits: [{ status: "planned" }] };
       },
     };
     const repo = new ServiceRolePartialRefundLedgerRepository(port);
@@ -670,6 +704,48 @@ describe("partial refund reservation orchestrator", () => {
       expect(result.moneyMoved).toBe(false);
     }
     expect(calls).toContain(PARTIAL_REFUND_LEDGER_RPCS.fail);
+  });
+
+  it("maps listCommitting to privileged read-only RPC only", async () => {
+    const { port, calls } = createFakeRpc();
+    const repo = new ServiceRolePartialRefundLedgerRepository(port);
+    await port.ensureCaptureAccounting({
+      storeId: IDS.store,
+      orderId: IDS.order,
+      paymentAttemptId: IDS.attempt,
+      captureEventId: IDS.capture,
+      currency: "USD",
+      captureAmountMinor: 10000,
+    });
+    await port.plan({
+      ledgerId: IDS.ledger,
+      storeId: IDS.store,
+      orderId: IDS.order,
+      paymentAttemptId: IDS.attempt,
+      captureEventId: IDS.capture,
+      currency: "USD",
+      captureAmountMinor: 10000,
+      refundAmountMinor: 1500,
+      calculationFingerprint: "fp-list-committing",
+      idempotencyKey: "idem-list-committing",
+      expectedAccountingVersion: 0,
+      lines: [
+        {
+          orderItemId: IDS.item,
+          requestedQuantity: 1,
+          refundAmountMinor: 1500,
+        },
+      ],
+    });
+    await port.begin({
+      ledgerId: IDS.ledger,
+      purchasedQuantityByLineId: { [IDS.item]: 4 },
+    });
+    const rows = await repo.listCommitting({ storeId: IDS.store, limit: 10 });
+    expect(calls).toContain(PARTIAL_REFUND_LEDGER_RPCS.listCommitting);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.status).toBe("committing");
+    expect(rows[0]?.ledgerId).toBe(IDS.ledger);
   });
 
   it("keeps ownership flags unsupported for money/downstream", () => {
