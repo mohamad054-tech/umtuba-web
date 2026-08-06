@@ -2,30 +2,37 @@
 
 ## Milestone
 
-Commerce Partial Refund Ledger RPC & Remote Apply Readiness V1 — **CLOSED**
+Commerce Partial Refund Ledger + RPC remote apply — **COMPLETE / CLOSED**
 
 ## Status
 
-**`PARTIAL_REFUND_RPC_FOUNDATION_V1_CLOSED`**
+**`PARTIAL_REFUND_REMOTE_APPLY_CLOSEOUT_COMPLETE`**
 
-Privileged RPC contracts + local SQL draft `20260900` closed.
-`20260899` and `20260900` remain **local only / not remotely applied**.
-`complete` = durable reservation only. No refund executed. No money moved.
+Remote applied and registered:
+
+1. `20260899` — partial-refund ledger schema
+2. `20260900` — privileged ledger RPCs
+
+Apply order: `20260899 → 20260900`. Remote tip: **`20260900`**.
+Learning `20260896`/`20260897` unchanged. Payout `20260898` unchanged.
+Four ledger tables exist with RLS/constraints/indexes and **zero rows**.
+Eight RPCs + helper exist; EXECUTE is **service_role only** (no public/anon/authenticated).
+Smoke: `SAFE_SMOKE_SKIPPED_NO_APPROVED_FIXTURE`.
+`commerce_confirm` false. Seller Live Payout gate OFF.
+No refund occurred. No provider call. No production money movement.
+Provider execution and downstream unwind remain **unsupported**.
+Next milestone requires a **separate GO**.
 
 ## Branch / worktree
 
 - Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1`
 - Branch: `office/commerce-partial-refund-rpc-remote-apply-readiness-v1`
-- Base: `6a332c4969f681ef46e9b4c44f15a75a64ea265c`
-
-## Apply order (future GO only)
-
-`20260899` → `20260900`
+- Prior HEAD: `79f15131d6defebe950d942a189ee05b35306082`
 
 ## Ownership preserved
 
-RPC contracts/SQL draft true · remote apply false · money/provider/restock/entitlement/settlement/commission false · public exposure false
+Ledger schema + privileged RPCs true · money/provider/restock/entitlement/settlement/commission false · public exposure false · commerce_confirm false · payout gate OFF
 
 ## Forbidden without new GO
 
-Remote apply · provider execution · restock/entitlement/settlement/commission unwind · public RPC grants · commerce_confirm · payout/Manual Ops
+Provider/Sync refund execution · restock/entitlement/settlement/commission unwind · public RPC grants · commerce_confirm enable · payout/Manual Ops · merge

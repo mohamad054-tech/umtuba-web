@@ -82,10 +82,11 @@ Frozen baselines (extend, do not replace):
 | Commerce Seller Live Payout Provider V1 | **COMPLETE / CLOSED** — remote tip **`20260898`**; closeout `3ebe184`; gate OFF |
 | Commerce Seller Live Payout Manual Ops Controlled Drill V1 | **PREPARATION CLOSED** — branch `office/commerce-seller-live-payout-manual-ops-drill-v1` @ `6b1dc297`; verdict **`MANUAL_OPS_DRILL_PREPARATION_CLOSED_NOT_READY`**; live drill still **NOT READY**; gate OFF; no payout |
 | Commerce Partial Refund Path V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-path-v1` @ `c902eb9`; calculation-only |
-| Commerce Partial Refund Durable Ledger & Commit Boundary V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-ledger-commit-boundary-v1` @ `6a332c4`; local `20260899` not applied |
-| Commerce Partial Refund Ledger RPC & Remote Apply Readiness V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-rpc-remote-apply-readiness-v1`; base `6a332c4`; verdict **`PARTIAL_REFUND_RPC_FOUNDATION_V1_CLOSED`**; local `20260900` (+ prerequisite `20260899`); neither remote-applied |
+| Commerce Partial Refund Durable Ledger & Commit Boundary V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-ledger-commit-boundary-v1` @ `6a332c4`; schema migration `20260899` |
+| Commerce Partial Refund Ledger RPC & Remote Apply Readiness V1 | **FOUNDATION CLOSED** — branch `office/commerce-partial-refund-rpc-remote-apply-readiness-v1` @ `79f1513`; RPC migration `20260900` |
+| Commerce Partial Refund Ledger + RPC Remote Apply | **COMPLETE / CLOSED** — verdict **`PARTIAL_REFUND_REMOTE_APPLY_CLOSEOUT_COMPLETE`**; remote tip **`20260900`**; order `20260899→20260900`; 4 ledger tables zero rows; 8 RPCs+helper service_role only; smoke skipped (no approved fixture); no refund/money; confirm false; gate OFF; provider execution unsupported |
 
-Default: Payout schema remote through **`20260898`**. Partial refund `20260899`/`20260900` local only. Live gate **OFF**. Do not auto-apply. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Remote tip **`20260900`** (partial-refund ledger schema + privileged RPCs, service_role only). Learning `20260896–97` and payout `20260898` unchanged. Live gate **OFF**. `commerce_confirm` false. Provider refund execution unsupported without a separate GO. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 
@@ -100,7 +101,7 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 - **Unified from:** money tip `9fb7a05` + 20 inventory-only cherry-picks through `a06800f`
 - Desktop is the **sole active Commerce workstation**. Laptop Commerce work is **stopped** (laptop → Learning)
 - Remote project: `umtuba` / `tgucwnjwoyeqoxqaxmew`
-- Remote migrations verified: `20260822/23/24/77/84–95` + Learning `20260896–97` + payout **`20260881–83` + `20260898`** (tip `20260898`); live gate still OFF
+- Remote migrations verified: `20260822/23/24/77/84–95` + Learning `20260896–97` + payout **`20260881–83` + `20260898`** + partial refund **`20260899` + `20260900`** (tip **`20260900`**); live gate still OFF
 - Active commission: `umtuba_launch_usd_v1` v1 · USD · 1500/8500 · merchandise_net
 - Keep `commerce_confirm_enabled = 0` until Stripe E2E PASS + explicit GO
 - Seller live payout gate remains **OFF**; do **not** enable live payouts / perform real payouts without explicit GO
