@@ -4,7 +4,7 @@
 
 Catalog Ingestion & App Shell Review V1 on
 `office/platform-translation-studio-app-shell-ingestion-v1`
-(base Persistence `189ec08`). Migration `20260901` remains **not applied**.
+(base Persistence `189ec08`). Migration `20260903` remains **not applied**.
 
 ## Goal
 
@@ -20,7 +20,7 @@ Admin UI (overview / app-shell / keys filters / editor / review / publish)
   → lib/translationStudio
       ├─ ingestion/ingestAppShellCatalog (idempotent, stable key ids)
       ├─ Durable JSON file store — runtime V1
-      ├─ Additive SQL schema (20260901) — future; not applied this task
+      ├─ Additive SQL schema (20260903) — future; not applied this task
       ├─ Workflow (draft → review → approve → ready_for_publish)
       ├─ Translation Memory (AR App Shell seed; fingerprint uniqueness)
       ├─ Terminology findings (warnings only; never silent replace)

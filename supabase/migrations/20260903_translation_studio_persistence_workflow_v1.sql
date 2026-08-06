@@ -1,10 +1,10 @@
--- =============================================================================
+﻿-- =============================================================================
 -- UMTUBA Translation Studio Persistence & Workflow V1
--- Migration: 20260901_translation_studio_persistence_workflow_v1.sql
+-- Migration: 20260903_translation_studio_persistence_workflow_v1.sql
 --
 -- Additive schema for future Supabase-backed studio persistence.
 -- Runtime V1 uses a durable JSON file store (data/translation-studio/).
--- Local file only — do NOT remote-apply without explicit approval.
+-- Local file only â€” do NOT remote-apply without explicit approval.
 -- Style: FORCE RLS, revoke client writes, platform-admin read via
 -- is_platform_admin() when available.
 -- Does NOT: auto-publish, public translation API, product catalog writers.

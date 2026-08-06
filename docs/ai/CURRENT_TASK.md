@@ -8,7 +8,8 @@ UMTUBA Translation Trunk Port V1
 
 `implementation-complete` — six platform translation commits ported onto
 `origin/alpha-0.2` @ `62c6c5d`. Learning Translation Foundation excluded.
-Migrations renumbered to `20260901` / `20260902` (not remotely applied).
+Migrations renumbered to `20260903` / `20260904` (not remotely applied;
+`20260901` reserved by Learning personal notes).
 Focused tests + `tsc --noEmit` passed. Push follows finalize commit.
 
 ## Branch
@@ -28,9 +29,9 @@ Focused tests + `tsc --noEmit` passed. Push follows finalize commit.
 1. `6528202` → i18n Foundation V1
 2. `0d18160` → App Shell Translation V1
 3. `aced43c` → Translation Studio Foundation V1
-4. `189ec08` → Persistence & Workflow V1 (migration → `20260901`)
+4. `189ec08` → Persistence & Workflow V1 (migration → `20260903`)
 5. `e12cd6d` → App Shell Ingestion V1
-6. `7296ac3` → Translation Intelligence Foundation V1 (migration → `20260902`)
+6. `7296ac3` → Translation Intelligence Foundation V1 (migration → `20260904`)
 
 ## Excluded
 
@@ -40,8 +41,8 @@ Focused tests + `tsc --noEmit` passed. Push follows finalize commit.
 
 | Role | Old (do not reuse) | New |
 | --- | --- | --- |
-| Persistence & Workflow | `20260874_translation_studio_persistence_workflow_v1.sql` | `20260901_translation_studio_persistence_workflow_v1.sql` |
-| Intelligence | `20260875_translation_intelligence_foundation_v1.sql` | `20260902_translation_intelligence_foundation_v1.sql` |
+| Persistence & Workflow | `20260874_translation_studio_persistence_workflow_v1.sql` | `20260903_translation_studio_persistence_workflow_v1.sql` |
+| Intelligence | `20260875_translation_intelligence_foundation_v1.sql` | `20260904_translation_intelligence_foundation_v1.sql` |
 
 - Runtime remains JSON file store under `/data/translation-studio/` (gitignored)
 - **Do not** remote-apply these migrations without explicit approval

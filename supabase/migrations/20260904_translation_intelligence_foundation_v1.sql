@@ -1,11 +1,11 @@
--- =============================================================================
+﻿-- =============================================================================
 -- UMTUBA Translation Intelligence Foundation V1
--- Migration: 20260902_translation_intelligence_foundation_v1.sql
+-- Migration: 20260904_translation_intelligence_foundation_v1.sql
 --
 -- Additive schema for future Supabase-backed intelligence records.
 -- Runtime V1 uses data/translation-studio/intelligence.json.
--- Local file only — do NOT remote-apply without explicit approval.
--- Does NOT modify 20260901 translation_studio_* tables.
+-- Local file only â€” do NOT remote-apply without explicit approval.
+-- Does NOT modify 20260903 translation_studio_* tables.
 -- Does NOT: train models, STT/TTS, auto-approve, client writes.
 -- =============================================================================
 

@@ -4,7 +4,7 @@
 
 Implemented on `office/platform-translation-intelligence-foundation-v1`
 (base App Shell ingestion `e12cd6d`). No model training. Migration
-`20260902` created locally only — **not remote-applied**.
+`20260904` created locally only — **not remote-applied**.
 
 ## Goal
 
@@ -57,7 +57,7 @@ marketing_friendly · subtitles_concise · dubbing_natural
 
 ## Migration note
 
-`20260902_translation_intelligence_foundation_v1.sql` adds
-`translation_intelligence_*` tables only. Does not alter `20260901`.
+`20260904_translation_intelligence_foundation_v1.sql` adds
+`translation_intelligence_*` tables only. Does not alter `20260903`.
 Required to preserve a future Supabase shape for intelligence data before
 any approved examples would otherwise live only in ephemeral runtime state.
