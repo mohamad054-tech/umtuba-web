@@ -30,4 +30,16 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1` contracts skeleton + `P2` manifest validation
+- Phase: `P1` contracts + `P2` manifest validation + `P3` compliance engine
+
+## Phase P3 scope
+
+Pure **compliance assessment** under `platforms/core/compliance/`.
+
+- Inputs: manifest, validation/admission results, ownership, capabilities,
+  dependencies, flags, maturity, optional waivers/metadata
+- Outputs: score, status, certification eligibility, findings, evidence gaps,
+  failed standards, waivers, recommendation
+
+Out of scope for P3: registry, runtime, event bus, persistence, networking,
+SDK/health engines, product integration.
