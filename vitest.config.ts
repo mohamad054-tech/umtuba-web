@@ -40,6 +40,7 @@ export default defineConfig({
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",
+      "platforms/core/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/messages/**/*.test.ts",
       "app/lib/video/**/*.test.ts",
