@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:learning-e2e": "node scripts/learning-e2e/run-foundation.mjs",
+    "test:learning-e2e:provision": "node scripts/learning-e2e/provision-fixtures.mjs",
+    "test:learning-e2e:live": "node scripts/learning-e2e/provision-and-run.mjs",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once"
   },
