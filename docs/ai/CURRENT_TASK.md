@@ -2,33 +2,30 @@
 
 ## Milestone
 
-Commerce Partial Refund Durable Ledger & Commit Boundary V1 — **CLOSED**
+Commerce Partial Refund Ledger RPC & Remote Apply Readiness V1 — **CLOSED**
 
 ## Status
 
-**`PARTIAL_REFUND_LEDGER_FOUNDATION_V1_CLOSED`**
+**`PARTIAL_REFUND_RPC_FOUNDATION_V1_CLOSED`**
 
-Foundation complete. Migration `20260899` is **local only / not remotely applied**.
-`committed` = durable prior-accounting reservation only. No partial refund executed. No production money moved.
+Privileged RPC contracts + local SQL draft `20260900` closed.
+`20260899` and `20260900` remain **local only / not remotely applied**.
+`complete` = durable reservation only. No refund executed. No money moved.
 
 ## Branch / worktree
 
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1`
-- Branch: `office/commerce-partial-refund-ledger-commit-boundary-v1`
-- Base: `c902eb9934633d7ca31db8f3eea1b4766668c4a4`
+- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1`
+- Branch: `office/commerce-partial-refund-rpc-remote-apply-readiness-v1`
+- Base: `6a332c4969f681ef46e9b4c44f15a75a64ea265c`
+
+## Apply order (future GO only)
+
+`20260899` → `20260900`
 
 ## Ownership preserved
 
-- ledgerDomain / commitBoundary = **true**
-- moneyExecution / providerRefund / restock / entitlement / settlement / commission = **false**
-
-## Next-step blockers (separate GOs)
-
-1. Remote apply of `20260899` (+ privileged RPCs)
-2. Provider / Sync money execution
-3. Partial restock / entitlement / settlement / commission unwind (must not invent)
-4. Compensation for committed reservations (must not invent)
+RPC contracts/SQL draft true · remote apply false · money/provider/restock/entitlement/settlement/commission false · public exposure false
 
 ## Forbidden without new GO
 
-Remote migrate · Stripe/Sync refund · commerce_confirm · restock/entitlement/settlement/commission ownership · payout/Manual Ops · begin next milestone
+Remote apply · provider execution · restock/entitlement/settlement/commission unwind · public RPC grants · commerce_confirm · payout/Manual Ops
