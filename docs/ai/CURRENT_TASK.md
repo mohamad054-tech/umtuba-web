@@ -2,27 +2,28 @@
 
 ## Task title
 
-UM Learning — Lesson Engine Composite Access Fix V1
+UM Learning - Production Smoke & E2E Gate onto SoT V1
 
 ## Status
 
-`implementation-complete` — validating / committing on server.
+`implementation-complete` — smoke gate ported onto SoT; validating / committing.
 
 ## Milestone
 
-`learning.learner.lesson_engine_composite_access_fix_v1`
+`learning.ops.production_smoke_e2e_gate_onto_sot_v1`
 
-## What landed
+## Scope
 
-- Hardened composite unlock decision (`unlock_required` / `locked` / `unlocked`)
-- Accessible published-set composition before protected delivery
-- Lesson page uses `resolveComposedLessonLearnerAccess`
-- Focused tests + implementation doc
+- Port `lib/learning/productionSmokeE2eGate.test.ts`
+- Port / retarget `docs/learning/implementation/LEARNING_PRODUCTION_SMOKE_E2E_GATE_V1.md`
+- Additive inventory only; no Learning business behavior changes
 
 ## Branch / HEAD base
 
-`office/learning-lesson-engine-composite-access-fix-v1` (base `b4a1668`)
+`office/learning-production-smoke-e2e-gate-onto-sot-v1`
+Base: `origin/office/learning-resume-accessible-target-hardening-v1` @ `15b1d7b`
+Historical source: `6e74333`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-lesson-engine-composite-access-fix-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-production-smoke-e2e-gate-onto-sot-v1`
