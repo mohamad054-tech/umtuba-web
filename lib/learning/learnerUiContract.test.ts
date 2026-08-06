@@ -160,6 +160,12 @@ describe("Learner UI contract — LessonViewer", () => {
     expect(VIEWER).toMatch(/asPlainString\(/);
     expect(VIEWER).toMatch(/isSafeHttpUrl\(/);
   });
+
+  it("mounts learner-only personal notes panel inside verified content path", () => {
+    expect(VIEWER).toMatch(/LessonNotesPanel/);
+    expect(VIEWER).toMatch(/<LessonNotesPanel lessonId=\{delivery\.lesson\.id\} \/>/);
+    expect(VIEWER).toMatch(/canRender \? \([\s\S]*LessonNotesPanel/);
+  });
 });
 
 describe("Learner UI contract — shared Learning route truth", () => {

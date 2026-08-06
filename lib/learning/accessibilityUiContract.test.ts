@@ -71,6 +71,19 @@ describe("Learning accessibility contract — names and controls", () => {
     expect(VIEWER).toMatch(/Next →/);
   });
 
+  it("Lesson notes panel exposes accessible names, status, and focus rings", () => {
+    const notes = read("app/components/learning/LessonNotesPanel.tsx");
+    expect(notes).toMatch(/aria-label="Personal lesson notes"/);
+    expect(notes).toMatch(/aria-label="New note text"/);
+    expect(notes).toMatch(/aria-label="Edit note text"/);
+    expect(notes).toMatch(/aria-label="Optional lesson position in seconds"/);
+    expect(notes).toMatch(/role="alert"/);
+    expect(notes).toMatch(/role="status"/);
+    expect(notes).toMatch(/watch-focus-ring/);
+    expect(notes).toMatch(/data-testid="learning-lesson-notes"/);
+    expect(VIEWER).toMatch(/LessonNotesPanel/);
+  });
+
   it("AttemptPlayer buttons are text-labeled and disabled state is semantic", () => {
     expect(PLAYER).toMatch(/type="button"/);
     expect(PLAYER).toMatch(/>\s*Submit attempt\s*</);

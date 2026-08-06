@@ -2,6 +2,7 @@ import Link from "next/link";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 import ContinueWatchingVideo from "./ContinueWatchingVideo";
 import ActivityList from "./ActivityList";
+import LessonNotesPanel from "./LessonNotesPanel";
 import {
   asPlainString,
   asVideoProvider,
@@ -276,6 +277,8 @@ export default function LessonViewer({
             </h2>
             <ActivityList activities={activities} />
           </section>
+
+          <LessonNotesPanel lessonId={delivery.lesson.id} />
         </>
       ) : locked ? (
         <p
