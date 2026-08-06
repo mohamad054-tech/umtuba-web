@@ -11,6 +11,12 @@ import {
   listPublicPages,
 } from "../../../../lib/platform/pageRegistry";
 import {
+  ADMIN_NAV_CONTEXT,
+  buildAllNavigationGroups,
+  buildSitemapEntries,
+  reportNavigationOrphans,
+} from "../../../../lib/platform/navigation";
+import {
   ADMIN_STORE_UNAUTHORIZED,
   assertPlatformAdminDb,
 } from "../../../../lib/store/adminAuth";
@@ -43,6 +49,12 @@ export default async function AdminPlatformPagesPage() {
 
   const counts = domainCounts();
   const pages = PAGE_REGISTRY.map((page) => ({ ...page }));
+  const navGroups = buildAllNavigationGroups(
+    PAGE_REGISTRY,
+    ADMIN_NAV_CONTEXT
+  );
+  const sitemapCount = buildSitemapEntries(PAGE_REGISTRY).length;
+  const navOrphans = reportNavigationOrphans(PAGE_REGISTRY);
 
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
@@ -82,6 +94,8 @@ export default async function AdminPlatformPagesPage() {
               ["Orphans", listOrphanPages().length],
               ["Commerce", counts.commerce],
               ["Learning", counts.learning],
+              ["Sitemap (public)", sitemapCount],
+              ["Nav orphans", navOrphans.length],
             ].map(([label, value]) => (
               <div
                 key={String(label)}
@@ -94,6 +108,29 @@ export default async function AdminPlatformPagesPage() {
               </div>
             ))}
           </dl>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <h2 className="text-sm font-black uppercase tracking-[0.16em] text-white/55">
+              Navigation foundation (read-only)
+            </h2>
+            <p className="mt-1 text-xs text-white/40">
+              Groups built from Page Registry via unified navigation foundation.
+              Production chrome is not replaced.
+            </p>
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {navGroups.map((group) => (
+                <li
+                  key={group.id}
+                  className="rounded-xl border border-white/10 bg-[#0b0b18] px-3 py-2"
+                >
+                  <p className="text-sm font-bold text-white">{group.label}</p>
+                  <p className="text-xs text-white/45">
+                    {group.items.length} items · {group.id}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <PageRegistryViewer pages={pages} />
         </section>
