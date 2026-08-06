@@ -5,6 +5,7 @@ import {
   LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
   LEARNING_LESSON_ENGINE_UNAVAILABLE_MESSAGE,
   LEARNING_LESSON_LOCKED_MESSAGE,
+  composeLessonContentAccessWithAccessibleSet,
   parseLearningLessonEngineUnlock,
   resolveLessonContentAccess,
   type LearningLessonEnginePayload,
@@ -169,10 +170,63 @@ describe("resolveLessonContentAccess — fail-closed", () => {
     expect(access.canRenderProtectedContent).toBe(true);
   });
 
+  it("does not fail open when unlock_required is false but locked without unlocked proof", () => {
+    const access = resolveLessonContentAccess(
+      ok(
+        baseEngine({
+          unlock_required: false,
+          unlock: {
+            lesson_id: LESSON_ID,
+            locked: true,
+            cost: 50,
+            balance: 10,
+            unlocked: false,
+          },
+        })
+      )
+    );
+    expect(access.state).toBe("locked");
+    expect(access.canRenderProtectedContent).toBe(false);
+  });
+
   it("empty engine unavailable message uses sanitized default", () => {
     const access = resolveLessonContentAccess({ ok: false, message: "   " });
     expect(access.state).toBe("engine_unavailable");
     expect(access.message).toBe(LEARNING_LESSON_ENGINE_UNAVAILABLE_MESSAGE);
+  });
+});
+
+describe("composeLessonContentAccessWithAccessibleSet", () => {
+  it("keeps verified access when lesson is in the accessible published set", () => {
+    const access = resolveLessonContentAccess(ok(baseEngine()));
+    const composed = composeLessonContentAccessWithAccessibleSet(access, {
+      lessonId: LESSON_ID,
+      accessibleLessonIds: [LESSON_ID, "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"],
+    });
+    expect(composed.state).toBe("verified_unlocked");
+    expect(composed.canRenderProtectedContent).toBe(true);
+  });
+
+  it("fail-closes verified access when lesson is outside the accessible set", () => {
+    const access = resolveLessonContentAccess(ok(baseEngine()));
+    const composed = composeLessonContentAccessWithAccessibleSet(access, {
+      lessonId: LESSON_ID,
+      accessibleLessonIds: ["aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"],
+    });
+    expect(composed.state).toBe("access_unverified");
+    expect(composed.canRenderProtectedContent).toBe(false);
+    expect(composed.engine).toBeNull();
+    expect(composed.message).toBe(LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE);
+  });
+
+  it("fail-closes when accessible set is empty", () => {
+    const access = resolveLessonContentAccess(ok(baseEngine()));
+    const composed = composeLessonContentAccessWithAccessibleSet(access, {
+      lessonId: LESSON_ID,
+      accessibleLessonIds: [],
+    });
+    expect(composed.state).toBe("access_unverified");
+    expect(composed.canRenderProtectedContent).toBe(false);
   });
 });
 
@@ -211,7 +265,7 @@ describe("LessonViewer + lesson page wiring — no delivery bypass", () => {
       join(ROOT, "app/learning/lessons/[lessonId]/page.tsx"),
       "utf8"
     );
-    expect(page).toMatch(/resolveLessonContentAccess/);
+    expect(page).toMatch(/resolveComposedLessonLearnerAccess/);
     expect(page).toMatch(/loadLessonDeliveryForAccess/);
     expect(page).toMatch(/loadMyLearningLessonEngine/);
     expect(page).toMatch(/access=\{access\}/);

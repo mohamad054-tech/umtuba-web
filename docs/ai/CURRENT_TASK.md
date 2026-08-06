@@ -2,33 +2,27 @@
 
 ## Task title
 
-UM Learning — Learner Lesson Delivery Defense-in-Depth V1
+UM Learning — Lesson Engine Composite Access Fix V1
 
 ## Status
 
-`implementation-complete` — awaiting commit GO.
+`implementation-complete` — validating / committing on server.
 
 ## Milestone
 
-`learning.learner.lesson_delivery_defense_in_depth_v1`
+`learning.learner.lesson_engine_composite_access_fix_v1`
 
 ## What landed
 
-- Engine-first sequencing on `/learning/lessons/[lessonId]`
-- Split `loadLessonDeliveryMetadata` vs `loadLessonDeliveryProtected`
-- `loadLessonDeliveryForAccess` gates protected SELECTs + progress mutations
-- Discriminated delivery types (`metadata_only` | `verified_full`)
-- AI Tutor uses metadata-only after existing unlock gate
-- LessonViewer typed to shell only (engine remains content authority)
+- Hardened composite unlock decision (`unlock_required` / `locked` / `unlocked`)
+- Accessible published-set composition before protected delivery
+- Lesson page uses `resolveComposedLessonLearnerAccess`
+- Focused tests + implementation doc
 
 ## Branch / HEAD base
 
-`office/learning-ai-tutor-learner-ui-integration-v1` (base `9628557`)
+`office/learning-lesson-engine-composite-access-fix-v1` (base `b4a1668`)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-learning-ai-tutor-learner-ui-integration-v1`
-
-## Next
-
-Await commit GO. Do not push.
+`D:\umtuba-central\repos\umtuba-web-learning-lesson-engine-composite-access-fix-v1`

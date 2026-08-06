@@ -253,8 +253,11 @@ export async function loadMyLearningLessonEngine(
  * SQL contract:
  * - `unlock_required === true` → point-locked redaction path (no blocks)
  * - `unlock_required === false` → free, already unlocked, or instructor/manage
- *   authorized content (blocks may be present; unlock.locked may still be true
- *   for managers viewing a point-gated lesson)
+ *   authorized content (blocks may be present)
+ *
+ * Composite unlock signals (`unlock_required`, `unlock.locked`, `unlock.unlocked`)
+ * must agree before protected content is shown. A locked unlock row with a
+ * missing/false `unlock_required` must not fail open as "manager authorized".
  */
 export function resolveLessonContentAccess(
   engineResult: LessonEngineResult<LearningLessonEnginePayload> | null | undefined
@@ -303,11 +306,23 @@ export function resolveLessonContentAccess(
     };
   }
 
-  // DB redaction path for point-locked learners (not managers).
-  if (engine.unlock_required === true || unlock.locked === true) {
-    // Managers receive unlock_required=false with full blocks even when the
-    // unlock row still reports locked=true — treat that as authorized.
-    if (engine.unlock_required === false) {
+  // DB redaction path for point-locked learners — always hide content.
+  if (engine.unlock_required === true) {
+    return {
+      state: "locked",
+      canRenderProtectedContent: false,
+      engine,
+      unlock,
+      message: LEARNING_LESSON_LOCKED_MESSAGE,
+    };
+  }
+
+  // unlock_required is false (free / unlocked / manage content path).
+  // If the unlock row still reports locked, require positive unlocked=true
+  // (manager/admin bypass). locked=true + unlocked=false must fail closed —
+  // never treat a false/missing unlock_required as manager authorization alone.
+  if (unlock.locked === true) {
+    if (unlock.unlocked === true) {
       return {
         state: "verified_unlocked",
         canRenderProtectedContent: true,
@@ -324,13 +339,48 @@ export function resolveLessonContentAccess(
     };
   }
 
-  // Free / unlocked learner: unlock_required false and locked false.
+  // Free / point-unlocked learner: unlock_required false and locked false.
+  // unlocked may be false on free lessons (no spend row) — that remains open.
   return {
     state: "verified_unlocked",
     canRenderProtectedContent: true,
     engine,
     unlock,
   };
+}
+
+/**
+ * Compose engine unlock access with the course's accessible published lesson set.
+ * Resume / Prev / Next / deep links must not authorize content for lesson ids
+ * outside the published accessible tree. Unknown / empty sets fail closed.
+ */
+export function composeLessonContentAccessWithAccessibleSet(
+  access: LearningLessonContentAccess,
+  input: {
+    lessonId: string;
+    accessibleLessonIds: readonly string[];
+  }
+): LearningLessonContentAccess {
+  const lessonId =
+    typeof input.lessonId === "string" ? input.lessonId.trim() : "";
+  const accessible = new Set<string>();
+  for (const raw of input.accessibleLessonIds) {
+    if (typeof raw !== "string") continue;
+    const id = raw.trim();
+    if (id) accessible.add(id);
+  }
+
+  if (!lessonId || accessible.size === 0 || !accessible.has(lessonId)) {
+    return {
+      state: "access_unverified",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+    };
+  }
+
+  return access;
 }
 
 export function parseLearningLessonEngineUnlock(

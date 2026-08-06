@@ -21,7 +21,14 @@ import {
   type LearningLessonContentBlock,
 } from "./lessonContentBlocksFoundation";
 import { LEARNING_COMPLETION_ROUTES } from "./completionFoundation";
-import type { LearningLessonContentAccess } from "./lessonEngineFoundation";
+import {
+  LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+  composeLessonContentAccessWithAccessibleSet,
+  resolveLessonContentAccess,
+  type LearningLessonContentAccess,
+  type LearningLessonEnginePayload,
+  type LessonEngineResult,
+} from "./lessonEngineFoundation";
 import { LEARNING_PROGRESS_RPCS } from "./progressFoundation";
 import type { LearningProgressStatus } from "./progressFoundation";
 import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
@@ -1440,6 +1447,47 @@ export async function loadLessonDeliveryForAccess(
     return loadLessonDeliveryProtected(supabase, lessonId);
   }
   return loadLessonDeliveryMetadata(supabase, lessonId);
+}
+
+/**
+ * Compose lesson-engine unlock access with the course accessible published
+ * lesson set (same source as Resume / Prev / Next). Must run before protected
+ * delivery so progress mutations never start for out-of-tree lesson ids.
+ */
+export async function resolveComposedLessonLearnerAccess(
+  supabase: AnyClient,
+  lessonId: string,
+  engineResult:
+    | LessonEngineResult<LearningLessonEnginePayload>
+    | null
+    | undefined
+): Promise<LearningLessonContentAccess> {
+  const access = resolveLessonContentAccess(engineResult);
+  const ctx = await loadLessonShellContext(supabase, lessonId);
+  if (!ctx.ok) {
+    if (
+      access.state === "engine_unavailable" ||
+      access.state === "access_unverified"
+    ) {
+      return access;
+    }
+    return {
+      state: "access_unverified",
+      canRenderProtectedContent: false,
+      engine: null,
+      unlock: null,
+      message: LEARNING_LESSON_ACCESS_UNVERIFIED_MESSAGE,
+    };
+  }
+
+  const accessibleLessonIds = await loadAccessiblePublishedLessonIdsForCourse(
+    supabase,
+    ctx.data.courseId
+  );
+  return composeLessonContentAccessWithAccessibleSet(access, {
+    lessonId,
+    accessibleLessonIds,
+  });
 }
 
 export async function loadPublishedActivityGate(

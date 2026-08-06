@@ -5,11 +5,9 @@ import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
   loadLessonDeliveryForAccess,
+  resolveComposedLessonLearnerAccess,
 } from "../../../../lib/learning/learnerDelivery";
-import {
-  loadMyLearningLessonEngine,
-  resolveLessonContentAccess,
-} from "../../../../lib/learning/lessonEngineFoundation";
+import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 
 export const dynamic = "force-dynamic";
@@ -44,9 +42,14 @@ export default async function LearningLessonPage({
 
   const supabase = await createClient();
 
-  // Engine-first: never start protected delivery until access is resolved.
+  // Engine-first composite access: unlock signals + accessible published set
+  // before any protected delivery / progress mutation.
   const engineResult = await loadMyLearningLessonEngine(supabase, lessonId);
-  const access = resolveLessonContentAccess(engineResult);
+  const access = await resolveComposedLessonLearnerAccess(
+    supabase,
+    lessonId,
+    engineResult
+  );
   const delivery = await loadLessonDeliveryForAccess(
     supabase,
     lessonId,
