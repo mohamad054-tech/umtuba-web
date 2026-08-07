@@ -44,10 +44,13 @@ describe("Partial refund ledger RPC readiness — contracts", () => {
       "commerce.payments.partial_refund_ledger_rpc_remote_apply_readiness_v1"
     );
     expect(PARTIAL_REFUND_LEDGER_RPC_MIGRATION_VERSION).toBe("20260900");
-    // 8 core ledger RPCs in 20260900 + listCommitting in local draft 20260905.
-    expect(PARTIAL_REFUND_LEDGER_RPC_NAME_LIST).toHaveLength(9);
+    // 8 core ledger RPCs in 20260900 + listCommitting (20260905) + compensateCommitted (20260907).
+    expect(PARTIAL_REFUND_LEDGER_RPC_NAME_LIST).toHaveLength(10);
     expect(PARTIAL_REFUND_LEDGER_RPCS.listCommitting).toBe(
       "list_store_partial_refund_ledger_committing"
+    );
+    expect(PARTIAL_REFUND_LEDGER_RPCS.compensateCommitted).toBe(
+      "compensate_store_partial_refund_ledger_commit"
     );
     expect(PARTIAL_REFUND_LEDGER_RPCS.plan).toBe(
       "plan_store_partial_refund_ledger"
@@ -142,7 +145,9 @@ describe("Partial refund ledger RPC readiness — SQL draft", () => {
     expect(sql).toMatch(/20260899/);
     expect(sql).toMatch(/20260900/);
     const coreRpcs = PARTIAL_REFUND_LEDGER_RPC_NAME_LIST.filter(
-      (name) => name !== PARTIAL_REFUND_LEDGER_RPCS.listCommitting
+      (name) =>
+        name !== PARTIAL_REFUND_LEDGER_RPCS.listCommitting &&
+        name !== PARTIAL_REFUND_LEDGER_RPCS.compensateCommitted
     );
     expect(coreRpcs).toHaveLength(8);
     for (const name of coreRpcs) {
@@ -160,6 +165,7 @@ describe("Partial refund ledger RPC readiness — SQL draft", () => {
       );
     }
     expect(sql).not.toContain(PARTIAL_REFUND_LEDGER_RPCS.listCommitting);
+    expect(sql).not.toContain(PARTIAL_REFUND_LEDGER_RPCS.compensateCommitted);
     expect(sql).not.toMatch(/grant execute[\s\S]*to authenticated;/);
     expect(sql).not.toMatch(/grant execute[\s\S]*to anon;/);
     expect(sql).not.toMatch(/apply_store_payment_outcome/);

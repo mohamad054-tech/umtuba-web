@@ -2,21 +2,21 @@
 
 ## Task
 
-Commerce Partial Refund In-Flight Committing Visibility — controlled targeted apply of **`20260905`**.
+Commerce Partial Refund Committed Reservation Compensation V1
 
 ## Status
 
-**CLOSED** — remote apply + history registration of `20260905` succeeded; push pending/complete in this GO.
+**CLOSED** — `PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`
 
-## Facts
+## Closure facts
 
-- Branch: `office/commerce-partial-refund-in-flight-committing-visibility-v1`
-- Corrective commit: `ddfc0130d12323d2549eca01527cc0d309c30bd6`
-- Migration: `supabase/migrations/20260905_store_partial_refund_ledger_list_committing_v1.sql`
-- Method: `npx supabase db query --linked -f` + single-version `schema_migrations` INSERT
-- Learning `20260901` untouched
-- No `db push`; Translation versions not applied by this operation
+- Branch: `office/commerce-partial-refund-committed-reservation-compensation-v1`
+- Migration: `20260907_store_partial_refund_ledger_compensate_committed_v1.sql`
+- Remote apply: **VERIFIED** (`tgucwnjwoyeqoxqaxmew`)
+- Focused validation: **124 passed** / 11 files
+- TypeScript: PASS · `git diff --check`: PASS
+- No forbidden side effects; Learning/Translation neighbors unchanged
 
 ## Next
 
-No further Commerce visibility apply work on this branch unless a new GO opens.
+Wait for explicit GO before any new Commerce milestone.

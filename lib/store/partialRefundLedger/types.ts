@@ -17,6 +17,7 @@ export const PARTIAL_REFUND_LEDGER_STATES = [
   "committing",
   "committed",
   "failed",
+  "compensated",
 ] as const;
 
 export type PartialRefundLedgerState =
@@ -48,6 +49,9 @@ export type PartialRefundLedgerCommitRecord = {
   attemptCount: number;
   failureCode: PartialRefundLedgerFailureCode | null;
   failureMessageSafe: string | null;
+  /** Present after committed -> compensated (accounting unwind). */
+  compensationReasonSafe: string | null;
+  compensatedAtIso: string | null;
   createdAtIso: string;
   updatedAtIso: string;
 };

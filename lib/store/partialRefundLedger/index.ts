@@ -3,12 +3,14 @@ export {
 } from "./capability";
 export {
   beginPartialRefundLedgerCommit,
+  compensatePartialRefundLedgerCommit,
   completePartialRefundLedgerCommit,
   failPartialRefundLedgerCommit,
   planPartialRefundLedgerCommit,
   priorAccountingFromCommittedLedger,
   purchasedQuantityGuardFromLineFacts,
   type BeginCommitQuantityGuard,
+  type CompensatePartialRefundLedgerCommitResult,
 } from "./commitBoundary";
 export type {
   PartialRefundCaptureLockAcquireResult,
@@ -53,9 +55,12 @@ export {
   parseCommitEnvelope,
   parseCommittedList,
   parseCommittingList,
+  parseCompensateEnvelope,
   parseLedgerCommitJson,
 } from "./rpcParse";
 export {
+  PARTIAL_REFUND_COMPENSATE_COMMITTED_MIGRATION_FILE,
+  PARTIAL_REFUND_COMPENSATE_COMMITTED_MIGRATION_VERSION,
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_FILE,
   PARTIAL_REFUND_LEDGER_RPC_MIGRATION_VERSION,
   PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_FILE,
@@ -66,6 +71,7 @@ export {
   PARTIAL_REFUND_RPC_READINESS_VERSION,
   partialRefundRpcReadinessOwnership,
   type BeginStorePartialRefundLedgerRpcArgs,
+  type CompensateStorePartialRefundLedgerRpcArgs,
   type FailStorePartialRefundLedgerRpcArgs,
   type PartialRefundLedgerRpcName,
   type PartialRefundLedgerRpcPort,
@@ -78,6 +84,7 @@ export {
   isKnownPartialRefundLedgerRpc,
   rejectClientMoneyOnRpcBag,
   validateBeginRpcArgs,
+  validateCompensateRpcArgs,
   validateFailRpcArgs,
   validatePlanRpcArgs,
 } from "./rpcValidate";

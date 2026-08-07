@@ -308,5 +308,6 @@ describe("partialRefundStuckCommittingRecovery UI audits", () => {
     expect(page).toMatch(/PartialRefundReservationPanel/);
     expect(page).toMatch(/PartialRefundAccountingReviewPanel/);
     expect(page).toMatch(/PartialRefundStuckCommittingRecoveryPanel/);
+    expect(page).toMatch(/prCompOk/);
   });
 });

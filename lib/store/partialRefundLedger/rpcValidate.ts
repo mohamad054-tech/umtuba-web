@@ -9,6 +9,7 @@ import {
   PARTIAL_REFUND_RPC_READINESS_VERSION,
   partialRefundRpcReadinessOwnership,
   type BeginStorePartialRefundLedgerRpcArgs,
+  type CompensateStorePartialRefundLedgerRpcArgs,
   type FailStorePartialRefundLedgerRpcArgs,
   type PartialRefundLedgerRpcName,
   type PlanStorePartialRefundLedgerRpcArgs,
@@ -198,6 +199,29 @@ export function validateFailRpcArgs(
   }
   if (msg.length < 1 || msg.length > 500) {
     return fail("malformed_idempotency_key", "failureMessageSafe must be 1..500 characters.");
+  }
+  return ok();
+}
+
+export function validateCompensateRpcArgs(
+  args: CompensateStorePartialRefundLedgerRpcArgs
+): RpcArgValidationResult {
+  if (!isPartialRefundLedgerUuid(args.ledgerId)) {
+    return fail("malformed_id", "Compensate RPC ledger id is malformed.");
+  }
+  const reason = args.operatorReason.trim();
+  if (reason.length < 3 || reason.length > 500) {
+    return fail(
+      "malformed_idempotency_key",
+      "operatorReason must be 3..500 characters."
+    );
+  }
+  if (
+    args.expectedStoreId != null &&
+    args.expectedStoreId.trim() !== "" &&
+    !isPartialRefundLedgerUuid(args.expectedStoreId)
+  ) {
+    return fail("malformed_id", "expectedStoreId must be a valid UUID when provided.");
   }
   return ok();
 }

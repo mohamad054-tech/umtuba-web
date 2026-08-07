@@ -99,6 +99,13 @@ export function createPartialRefundLedgerRpcPort(
         p_limit: args.limit ?? 50,
       });
     },
+    async compensateCommitted(args) {
+      return invokeRpc(invoke, PARTIAL_REFUND_LEDGER_RPCS.compensateCommitted, {
+        p_ledger_id: args.ledgerId,
+        p_operator_reason: args.operatorReason,
+        p_expected_store_id: args.expectedStoreId ?? null,
+      });
+    },
   };
 }
 

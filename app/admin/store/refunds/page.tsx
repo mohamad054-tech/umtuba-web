@@ -145,6 +145,19 @@ export default async function AdminStoreRefundsPage({
     typeof sp.prAcctPaymentAttemptId === "string"
       ? sp.prAcctPaymentAttemptId.trim()
       : "";
+
+  const prCompOk = sp.prCompOk === "1";
+  const prCompStatus =
+    typeof sp.prCompStatus === "string" ? sp.prCompStatus : null;
+  const prCompError =
+    typeof sp.prCompError === "string" ? sp.prCompError : null;
+  const prCompLedgerId =
+    typeof sp.prCompLedgerId === "string" ? sp.prCompLedgerId : null;
+  const prCompRestored =
+    typeof sp.prCompRestored === "string" ? sp.prCompRestored : null;
+  const prCompPrefill =
+    typeof sp.prCompPrefill === "string" ? sp.prCompPrefill : null;
+
   let prAcctReview: PartialRefundAccountingReviewModel | null = null;
   let prAcctError: string | null = null;
   if (prAcctStoreId && prAcctPaymentAttemptId) {
@@ -226,6 +239,12 @@ export default async function AdminStoreRefundsPage({
           paymentAttemptIdDefault={prAcctPaymentAttemptId}
           review={prAcctReview}
           loadError={prAcctError}
+          flashOk={prCompOk}
+          flashStatus={prCompStatus}
+          flashError={prCompError}
+          flashLedgerId={prCompLedgerId}
+          flashRestored={prCompRestored}
+          prefillLedgerId={prCompPrefill}
         />
 
         <PartialRefundReservationPanel

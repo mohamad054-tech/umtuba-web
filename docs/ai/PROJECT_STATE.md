@@ -90,8 +90,9 @@ Frozen baselines (extend, do not replace):
 | Commerce Partial Refund Reservation Accounting Audit & Review Surface V1 | **COMPLETE / CLOSED** — branch `office/commerce-partial-refund-reservation-accounting-audit-review-v1` @ `1919241`; verdict **`PARTIAL_REFUND_ACCOUNTING_AUDIT_REVIEW_V1_CLOSED`**; read-only accounting; no create/cancel/compensate/money/provider |
 | Commerce Partial Refund Reservation Stuck-Committing Recovery V1 | **COMPLETE / CLOSED** — branch `office/commerce-partial-refund-reservation-stuck-committing-recovery-v1` @ `8e16c8c`; verdict **`PARTIAL_REFUND_STUCK_COMMITTING_RECOVERY_V1_CLOSED`**; admin committing→failed lock release only; no committed cancel/compensation/money |
 | Commerce Partial Refund In-Flight Committing Visibility RPC Foundation V1 | **COMPLETE / CLOSED** — branch `office/commerce-partial-refund-in-flight-committing-visibility-v1` @ corrective `ddfc013` (+ feature `a3c155b`); migration **`20260905`** remotely applied+registered; Learning `20260901` untouched; orphan RPC rebound; verdict **`COMMERCE_PARTIAL_REFUND_IN_FLIGHT_COMMITTING_VISIBILITY_V1_CLOSED`** (apply closeout) |
+| Commerce Partial Refund Committed Reservation Compensation V1 | **COMPLETE / CLOSED** — branch `office/commerce-partial-refund-committed-reservation-compensation-v1`; migration **`20260907`** remotely applied+registered on `tgucwnjwoyeqoxqaxmew`; admin accounting-only `committed→compensated`; verdict **`PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`**; Learning `20260906` / Translation `20260910–12` untouched |
 
-Default: Commerce visibility RPC live under history **`20260905`**. Learning owns **`20260901`**. Live gate **OFF**. `commerce_confirm` false. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Commerce compensation RPC live under history **`20260907`** (visibility **`20260905`**; ledger tip chain **`20260899`→`20260900`→`20260905`→`20260907`**). Learning owns **`20260901`** / **`20260906`**. Live gate **OFF**. `commerce_confirm` false. Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 
@@ -106,7 +107,7 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 - **Unified from:** money tip `9fb7a05` + 20 inventory-only cherry-picks through `a06800f`
 - Desktop is the **sole active Commerce workstation**. Laptop Commerce work is **stopped** (laptop → Learning)
 - Remote project: `umtuba` / `tgucwnjwoyeqoxqaxmew`
-- Remote migrations verified: `20260822/23/24/77/84–95` + Learning `20260896–97` + payout **`20260881–83` + `20260898`** + partial refund **`20260899` + `20260900`** (tip **`20260900`**); live gate still OFF
+- Remote migrations verified: `20260822/23/24/77/84–95` + Learning `20260896–97` + payout **`20260881–83` + `20260898`** + partial refund **`20260899` + `20260900` + `20260905` + `20260907`**; live gate still OFF
 - Active commission: `umtuba_launch_usd_v1` v1 · USD · 1500/8500 · merchandise_net
 - Keep `commerce_confirm_enabled = 0` until Stripe E2E PASS + explicit GO
 - Seller live payout gate remains **OFF**; do **not** enable live payouts / perform real payouts without explicit GO

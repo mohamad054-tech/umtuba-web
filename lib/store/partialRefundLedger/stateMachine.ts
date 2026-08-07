@@ -1,7 +1,8 @@
 /**
  * Explicit ledger commit state machine.
- * planned → committing → committed | failed
- * failed → committing (retry)
+ * planned -> committing -> committed | failed
+ * failed -> committing (retry)
+ * committed -> compensated (accounting-only unwind)
  * No other transitions.
  */
 
@@ -14,7 +15,8 @@ export type LedgerTransition =
   | { from: "planned"; to: "committing" }
   | { from: "committing"; to: "committed" }
   | { from: "committing"; to: "failed" }
-  | { from: "failed"; to: "committing" };
+  | { from: "failed"; to: "committing" }
+  | { from: "committed"; to: "compensated" };
 
 const ALLOWED: ReadonlyArray<readonly [PartialRefundLedgerState, PartialRefundLedgerState]> =
   [
@@ -22,6 +24,7 @@ const ALLOWED: ReadonlyArray<readonly [PartialRefundLedgerState, PartialRefundLe
     ["committing", "committed"],
     ["committing", "failed"],
     ["failed", "committing"],
+    ["committed", "compensated"],
   ];
 
 export function canTransitionPartialRefundLedgerState(

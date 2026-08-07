@@ -180,7 +180,7 @@ export async function completePartialRefundLedgerCommit(
 
 /**
  * committing → failed. Releases in-flight reservation without durable money impact.
- * Committed entries are immutable (no rollback of committed reservations in V1).
+ * Committed entries use compensatePartialRefundLedgerCommit (accounting-only).
  */
 export async function failPartialRefundLedgerCommit(
   repo: PartialRefundLedgerRepository,
@@ -192,13 +192,91 @@ export async function failPartialRefundLedgerCommit(
   if (!row) {
     return failLedger("unknown_refund", "Ledger commit not found.");
   }
-  if (row.status === "committed") {
+  if (row.status === "committed" || row.status === "compensated") {
     return failLedger(
       "invalid_state",
-      "Committed ledger entries have no rollback in V1 — compensation requires a new GO."
+      "Committed/compensated ledger entries cannot be marked failed — use accounting compensation for committed."
     );
   }
   return repo.markFailed(ledgerId, code, messageSafe, nowIso());
+}
+
+export type CompensatePartialRefundLedgerCommitResult = {
+  commit: PartialRefundLedgerCommitRecord;
+  alreadyCompensated: boolean;
+  restoredRefundAmountMinor: number;
+};
+
+/**
+ * committed → compensated (accounting ceilings restored once).
+ * Idempotent when already compensated. Never money/provider/restock/settlement.
+ */
+export async function compensatePartialRefundLedgerCommit(
+  repo: PartialRefundLedgerRepository,
+  ledgerId: string,
+  operatorReason: string,
+  expectedStoreId?: string | null
+): Promise<PartialRefundLedgerResult<CompensatePartialRefundLedgerCommitResult>> {
+  const moneyGate = assertPartialRefundMoneyExecutionAllowed();
+  if (moneyGate.ok) {
+    return failLedger(
+      "unsupported_runtime",
+      "Money execution must remain unsupported at ledger compensation boundary."
+    );
+  }
+
+  const reason = operatorReason.trim();
+  if (reason.length < 3 || reason.length > 500) {
+    return failLedger(
+      "malformed_idempotency_key",
+      "Operator reason must be 3–500 characters."
+    );
+  }
+
+  const row = await repo.getByLedgerId(ledgerId);
+  if (!row) {
+    return failLedger("unknown_refund", "Ledger commit not found.");
+  }
+  if (
+    expectedStoreId != null &&
+    expectedStoreId.trim() !== "" &&
+    row.storeId !== expectedStoreId.trim()
+  ) {
+    return failLedger(
+      "missing_ownership",
+      "Ledger commit does not belong to the expected store."
+    );
+  }
+  if (row.status === "compensated") {
+    // Prefer repository path for durable idempotency (service-role → RPC).
+    return repo.compensateCommitted(
+      ledgerId,
+      reason,
+      nowIso(),
+      expectedStoreId
+    );
+  }
+  if (row.status !== "committed") {
+    return failLedger(
+      "invalid_state",
+      "Only committed ledger reservations can be compensated."
+    );
+  }
+
+  const transition = assertPartialRefundLedgerTransition(
+    "committed",
+    "compensated"
+  );
+  if (!transition.ok) {
+    return failLedger(transition.code, transition.message);
+  }
+
+  return repo.compensateCommitted(
+    ledgerId,
+    reason,
+    nowIso(),
+    expectedStoreId
+  );
 }
 
 /**

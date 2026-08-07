@@ -424,7 +424,8 @@ describe("partialRefundReservationAccounting UI audits", () => {
     );
     expect(src).toMatch(/Partial refund reservation accounting/);
     expect(src).toMatch(/no provider refund or money movement has\s+occurred/i);
-    expect(src).not.toMatch(/Execute Refund|Cancel reservation|Compensate/);
+    expect(src).toMatch(/ACCOUNTING COMPENSATION ONLY/);
+    expect(src).not.toMatch(/Execute Refund|Cancel reservation|Refund Money/);
     expect(src).not.toMatch(/name=["']amount/i);
     expect(src).not.toMatch(/adminRequestPartialRefundReservationAction/);
   });

@@ -181,6 +181,8 @@ export class MemoryPartialRefundLedgerRepository
       attemptCount: 0,
       failureCode: null,
       failureMessageSafe: null,
+      compensationReasonSafe: null,
+      compensatedAtIso: null,
       createdAtIso: nowIso,
       updatedAtIso: nowIso,
     };
@@ -306,6 +308,89 @@ export class MemoryPartialRefundLedgerRepository
     return okLedger(cloneCommit(row));
   }
 
+  async compensateCommitted(
+    ledgerId: string,
+    operatorReason: string,
+    nowIso: string,
+    expectedStoreId?: string | null
+  ): Promise<
+    PartialRefundLedgerResult<{
+      commit: PartialRefundLedgerCommitRecord;
+      alreadyCompensated: boolean;
+      restoredRefundAmountMinor: number;
+    }>
+  > {
+    const reason = operatorReason.trim();
+    if (reason.length < 3 || reason.length > 500) {
+      return failLedger(
+        "malformed_idempotency_key",
+        "Operator reason must be 3–500 characters."
+      );
+    }
+    const row = this.byId.get(ledgerId);
+    if (!row) {
+      return failLedger("unknown_refund", "Ledger commit not found.");
+    }
+    if (
+      expectedStoreId != null &&
+      expectedStoreId.trim() !== "" &&
+      row.storeId !== expectedStoreId.trim()
+    ) {
+      return failLedger(
+        "missing_ownership",
+        "Ledger commit does not belong to the expected store."
+      );
+    }
+    if (row.status === "compensated") {
+      return okLedger({
+        commit: cloneCommit(row),
+        alreadyCompensated: true,
+        restoredRefundAmountMinor: 0,
+      });
+    }
+    const transition = assertPartialRefundLedgerTransition(
+      row.status,
+      "compensated"
+    );
+    if (!transition.ok) {
+      return failLedger(transition.code, transition.message);
+    }
+
+    const capture = this.captures.get(row.captureEventId);
+    if (!capture) {
+      return failLedger("missing_capture", "Capture accounting row missing.");
+    }
+    if (capture.committedRefundAmountMinor < row.refundAmountMinor) {
+      return failLedger(
+        "over_refund",
+        "Cannot compensate: capture committed refund below ledger amount."
+      );
+    }
+    for (const line of row.lines) {
+      const prior = capture.committedQuantityByLineId[line.orderItemId] ?? 0;
+      if (prior < line.requestedQuantity) {
+        return failLedger(
+          "over_quantity",
+          "Cannot compensate: line committed quantity below ledger request."
+        );
+      }
+      capture.committedQuantityByLineId[line.orderItemId] =
+        prior - line.requestedQuantity;
+    }
+    capture.committedRefundAmountMinor -= row.refundAmountMinor;
+    capture.accountingVersion += 1;
+
+    row.status = "compensated";
+    row.compensationReasonSafe = reason.slice(0, 500);
+    row.compensatedAtIso = nowIso;
+    row.updatedAtIso = nowIso;
+    return okLedger({
+      commit: cloneCommit(row),
+      alreadyCompensated: false,
+      restoredRefundAmountMinor: row.refundAmountMinor,
+    });
+  }
+
   async markFailed(
     ledgerId: string,
     code: string,
@@ -316,10 +401,10 @@ export class MemoryPartialRefundLedgerRepository
     if (!row) {
       return failLedger("unknown_refund", "Ledger commit not found.");
     }
-    if (row.status === "committed") {
+    if (row.status === "committed" || row.status === "compensated") {
       return failLedger(
         "invalid_state",
-        "Committed ledger entries cannot be marked failed."
+        "Committed or compensated ledger entries cannot be marked failed."
       );
     }
     if (row.status !== "committing" && row.status !== "planned") {

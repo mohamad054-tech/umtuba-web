@@ -15,6 +15,7 @@ import {
   parseCommitEnvelope,
   parseCommittedList,
   parseCommittingList,
+  parseCompensateEnvelope,
 } from "./rpcParse";
 import type { PartialRefundLedgerRepository } from "./repository";
 import type {
@@ -27,6 +28,7 @@ import type { PartialRefundInFlightCommittingRow } from "./repository";
 import { failLedger, okLedger, validateLedgerPlanInput } from "./validate";
 import {
   validateBeginRpcArgs,
+  validateCompensateRpcArgs,
   validateFailRpcArgs,
   validatePlanRpcArgs,
 } from "./rpcValidate";
@@ -222,6 +224,56 @@ export class ServiceRolePartialRefundLedgerRepository
       return okLedger(parsed.commit);
     } catch (e) {
       return this.mapThrown(e, "Complete ledger RPC failed.");
+    }
+  }
+
+  async compensateCommitted(
+    ledgerId: string,
+    operatorReason: string,
+    _nowIso: string,
+    expectedStoreId?: string | null
+  ): Promise<
+    PartialRefundLedgerResult<{
+      commit: PartialRefundLedgerCommitRecord;
+      alreadyCompensated: boolean;
+      restoredRefundAmountMinor: number;
+    }>
+  > {
+    const args = {
+      ledgerId,
+      operatorReason,
+      expectedStoreId: expectedStoreId ?? null,
+    };
+    const argCheck = validateCompensateRpcArgs(args);
+    if (!argCheck.ok) {
+      return failLedger(
+        argCheck.code === "malformed_idempotency_key"
+          ? "malformed_idempotency_key"
+          : "malformed_id",
+        argCheck.message
+      );
+    }
+    try {
+      const raw = await this.rpc.compensateCommitted(args);
+      const parsed = parseCompensateEnvelope(raw);
+      if (!parsed.ok) {
+        return failLedger(
+          "malformed_id",
+          safeRpcErrorMessage(
+            "malformed_rpc_response",
+            "Compensate RPC malformed."
+          )
+        );
+      }
+      return okLedger({
+        commit: parsed.commit,
+        alreadyCompensated: parsed.alreadyCompensated,
+        restoredRefundAmountMinor: parsed.alreadyCompensated
+          ? 0
+          : (parsed.restoredRefundAmountMinor ?? parsed.commit.refundAmountMinor),
+      });
+    } catch (e) {
+      return this.mapThrown(e, "Compensate ledger RPC failed.");
     }
   }
 

@@ -122,13 +122,19 @@ export function parseLedgerCommitJson(
   }
 
   const accountingVersion =
-    status === "committed" && committedVersion !== null
+    (status === "committed" || status === "compensated") &&
+    committedVersion !== null
       ? committedVersion
       : plannedVersion;
 
   const failureCodeRaw = raw.failure_code ?? raw.failureCode;
   const failureMessageRaw =
     raw.failure_message_safe ?? raw.failureMessageSafe;
+  const compensationReasonRaw =
+    raw.compensation_reason_safe ?? raw.compensationReasonSafe;
+  const compensatedAtIso = isoFromRpc(
+    raw.compensated_at ?? raw.compensatedAtIso
+  );
 
   return {
     ledgerId,
@@ -153,6 +159,11 @@ export function parseLedgerCommitJson(
       failureMessageRaw === null || failureMessageRaw === undefined
         ? null
         : asString(failureMessageRaw),
+    compensationReasonSafe:
+      compensationReasonRaw === null || compensationReasonRaw === undefined
+        ? null
+        : asString(compensationReasonRaw),
+    compensatedAtIso: compensatedAtIso ?? null,
     createdAtIso,
     updatedAtIso,
   };
@@ -295,6 +306,44 @@ export function parseCommitEnvelope(
   }
 
   return { ok: false };
+}
+
+/** Parse compensate RPC envelope (committed -> compensated or already_compensated). */
+export function parseCompensateEnvelope(
+  raw: unknown
+):
+  | {
+      ok: true;
+      alreadyCompensated: boolean;
+      commit: PartialRefundLedgerCommitRecord;
+      restoredRefundAmountMinor?: number;
+      accountingVersion?: number;
+      committedRefundAmountMinor?: number;
+    }
+  | { ok: false } {
+  if (!isRecord(raw)) return { ok: false };
+  if (asBool(raw.ok) !== true) return { ok: false };
+  const commit = parseLedgerCommitJson(raw.commit);
+  if (!commit) return { ok: false };
+  const already =
+    asBool(raw.already_compensated ?? raw.alreadyCompensated) === true;
+  const restored = asNumber(
+    raw.restored_refund_amount_minor ?? raw.restoredRefundAmountMinor
+  );
+  const accountingVersion = asNumber(
+    raw.accounting_version ?? raw.accountingVersion
+  );
+  const committedRefundAmountMinor = asNumber(
+    raw.committed_refund_amount_minor ?? raw.committedRefundAmountMinor
+  );
+  return {
+    ok: true,
+    alreadyCompensated: already,
+    commit,
+    restoredRefundAmountMinor: restored ?? undefined,
+    accountingVersion: accountingVersion ?? undefined,
+    committedRefundAmountMinor: committedRefundAmountMinor ?? undefined,
+  };
 }
 
 export function parseCommittedList(

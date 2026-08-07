@@ -2,48 +2,40 @@
 
 ## Summary
 
-**`COMMERCE_PARTIAL_REFUND_20260905_CONTROLLED_TARGETED_APPLY_FINAL_REPORT`**
+**`PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`**
 
-Verdict: **CLOSED**
-
-Controlled targeted apply of Commerce `20260905` succeeded against legitimate remote tip Learning `20260901`. Orphan committing-list RPC rebound via `CREATE OR REPLACE`. History registered once. No `db push`. Learning/Translation history not modified by this operation.
+Commerce Partial Refund Committed Reservation Compensation V1 is closed. Admin-only accounting compensation (`committed → compensated`) restores refundable amount and quantity ceilings once with idempotent replay. Migration **`20260907`** remotely applied and verified on `tgucwnjwoyeqoxqaxmew`. No provider refund, money movement, restock, entitlement, settlement, commission, payout, committed cancellation, or `commerce_confirm`.
 
 ## Exact files changed
 
-Closure handoff only (this commit):
-
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/SESSION_HANDOFF.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-Prior corrective commit `ddfc013` already holds migration renumber + contracts/tests/impl doc.
+See final commit on `office/commerce-partial-refund-committed-reservation-compensation-v1` (ledger adapter, compensation service, admin action/UI, migration, docs, tests).
 
 ## Migrations created
 
-None in this closure commit. Applied remotely: `20260905_store_partial_refund_ledger_list_committing_v1.sql`.
+`20260907_store_partial_refund_ledger_compensate_committed_v1.sql` — remotely applied + registered.
 
 ## Security review
 
-- RPC remains `SECURITY DEFINER`, `service_role` EXECUTE only (anon/authenticated revoked).
-- Read-only committing discovery; no money/provider/lock release.
-- Learning `20260901` row unchanged.
+- RPC: SECURITY DEFINER, `search_path` public, service_role EXECUTE only
+- Admin: `assertPlatformAdminDb` + optional store ownership
+- No seller/buyer mutation access
+- Neighbor Learning/Translation history unchanged
 
 ## Tests
 
-Focused: **18 passed**.
+Focused: **124 passed** / 11 files.
 
 ## TypeScript
 
-N/A for apply/docs closure.
+PASS (`npx tsc --noEmit`).
 
 ## Build
 
-N/A
+N/A for closeout packaging.
 
 ## git diff --check
 
-PASS (closure docs).
+PASS.
 
 ## git status --short
 
@@ -51,4 +43,4 @@ Expect clean after push.
 
 ## Open issues
 
-None for this milestone. Concurrent remote Translation rows (`20260902`, `20260910`) observed at verify time were **not** applied by this operation.
+None for this milestone. Next Commerce work requires a new explicit GO.

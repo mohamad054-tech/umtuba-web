@@ -83,6 +83,8 @@ type CommitRow = {
   attemptCount: number;
   failureCode: string | null;
   failureMessageSafe: string | null;
+  compensationReasonSafe: string | null;
+  compensatedAt: string | null;
   createdAt: string;
   updatedAt: string;
   lines: { order_item_id: string; requested_quantity: number; refund_amount_minor: number }[];
@@ -106,6 +108,8 @@ function commitJson(c: CommitRow) {
     attempt_count: c.attemptCount,
     failure_code: c.failureCode,
     failure_message_safe: c.failureMessageSafe,
+    compensation_reason_safe: c.compensationReasonSafe,
+    compensated_at: c.compensatedAt,
     created_at: c.createdAt,
     updated_at: c.updatedAt,
     lines: c.lines,
@@ -206,6 +210,8 @@ function createFakeRpc(options?: {
         attemptCount: 0,
         failureCode: null,
         failureMessageSafe: null,
+        compensationReasonSafe: null,
+        compensatedAt: null,
         createdAt: now,
         updatedAt: now,
         lines: args.lines.map((l) => ({
@@ -349,6 +355,50 @@ function createFakeRpc(options?: {
         }));
       return { ok: true, commits };
     },
+    async compensateCommitted(args) {
+      calls.push(PARTIAL_REFUND_LEDGER_RPCS.compensateCommitted);
+      providerCalls += 0;
+      const row = byId.get(args.ledgerId);
+      if (!row) throw new Error("unknown_refund");
+      if (
+        args.expectedStoreId != null &&
+        row.storeId !== args.expectedStoreId
+      ) {
+        throw new Error("missing_ownership");
+      }
+      if (row.status === "compensated") {
+        return {
+          ok: true,
+          already_compensated: true,
+          commit: commitJson(row),
+        };
+      }
+      if (row.status !== "committed") throw new Error("invalid_state");
+      const capture = captures.get(row.captureEventId);
+      if (!capture) throw new Error("missing_capture");
+      if (capture.committedRefundAmountMinor < row.refundAmountMinor) {
+        throw new Error("over_refund");
+      }
+      for (const line of row.lines) {
+        const prior = capture.qty[line.order_item_id] ?? 0;
+        if (prior < line.requested_quantity) throw new Error("over_quantity");
+        capture.qty[line.order_item_id] = prior - line.requested_quantity;
+      }
+      capture.committedRefundAmountMinor -= row.refundAmountMinor;
+      capture.accountingVersion += 1;
+      row.status = "compensated";
+      row.compensationReasonSafe = args.operatorReason;
+      row.compensatedAt = now;
+      row.updatedAt = now;
+      return {
+        ok: true,
+        already_compensated: false,
+        commit: commitJson(row),
+        accounting_version: capture.accountingVersion,
+        committed_refund_amount_minor: capture.committedRefundAmountMinor,
+        restored_refund_amount_minor: row.refundAmountMinor,
+      };
+    },
   };
 
   return { port, calls, get providerCalls() { return providerCalls; } };
@@ -456,6 +506,9 @@ describe("partial refund service-role adapter", () => {
       },
       async listCommitting() {
         return { ok: true, commits: [{ status: "planned" }] };
+      },
+      async compensateCommitted() {
+        return { ok: true };
       },
     };
     const repo = new ServiceRolePartialRefundLedgerRepository(port);

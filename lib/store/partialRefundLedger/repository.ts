@@ -67,6 +67,23 @@ export type PartialRefundLedgerRepository = {
     nowIso: string
   ): Promise<PartialRefundLedgerResult<PartialRefundLedgerCommitRecord>>;
 
+  /**
+   * committed -> compensated (accounting ceilings restored once).
+   * Idempotent when already compensated.
+   */
+  compensateCommitted(
+    ledgerId: string,
+    operatorReason: string,
+    nowIso: string,
+    expectedStoreId?: string | null
+  ): Promise<
+    PartialRefundLedgerResult<{
+      commit: PartialRefundLedgerCommitRecord;
+      alreadyCompensated: boolean;
+      restoredRefundAmountMinor: number;
+    }>
+  >;
+
   listCommittedForCapture(
     captureEventId: string
   ): Promise<readonly PartialRefundLedgerCommitRecord[]>;

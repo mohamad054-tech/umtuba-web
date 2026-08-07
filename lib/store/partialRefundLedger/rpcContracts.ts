@@ -30,6 +30,8 @@ export const PARTIAL_REFUND_LEDGER_RPCS = {
   listCommitted: "list_store_partial_refund_ledger_committed",
   /** Corrective local draft 20260905 — read-only in-flight committing discovery. */
   listCommitting: "list_store_partial_refund_ledger_committing",
+  /** Local draft 20260907 — accounting-only committed -> compensated. */
+  compensateCommitted: "compensate_store_partial_refund_ledger_commit",
 } as const;
 
 /** Corrective visibility RPC migration (was invalidly numbered 20260901). */
@@ -37,6 +39,13 @@ export const PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_VERSION = "20260905" as co
 
 export const PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_FILE =
   "20260905_store_partial_refund_ledger_list_committing_v1.sql" as const;
+
+/** Local-only compensation RPC migration (not remote-applied in this GO). */
+export const PARTIAL_REFUND_COMPENSATE_COMMITTED_MIGRATION_VERSION =
+  "20260907" as const;
+
+export const PARTIAL_REFUND_COMPENSATE_COMMITTED_MIGRATION_FILE =
+  "20260907_store_partial_refund_ledger_compensate_committed_v1.sql" as const;
 
 export type PartialRefundLedgerRpcName =
   (typeof PARTIAL_REFUND_LEDGER_RPCS)[keyof typeof PARTIAL_REFUND_LEDGER_RPCS];
@@ -113,6 +122,12 @@ export type FailStorePartialRefundLedgerRpcArgs = {
   failureMessageSafe: string;
 };
 
+export type CompensateStorePartialRefundLedgerRpcArgs = {
+  ledgerId: string;
+  operatorReason: string;
+  expectedStoreId?: string | null;
+};
+
 export type PartialRefundLedgerRpcPort = {
   ensureCaptureAccounting(args: {
     storeId: string;
@@ -134,4 +149,7 @@ export type PartialRefundLedgerRpcPort = {
     captureEventId?: string | null;
     limit?: number | null;
   }): Promise<unknown>;
+  compensateCommitted(
+    args: CompensateStorePartialRefundLedgerRpcArgs
+  ): Promise<unknown>;
 };
