@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P9` (… → feature flag registry → dependency registry)
+- Phase: `P1`–`P10` (… → dependency registry → health declaration catalog)
 
 ## Phase P3 scope
 
@@ -113,3 +113,15 @@ Pure **in-memory dependency edge catalog** under `platforms/core/dependency/`.
 Out of scope for P9: runtime resolution, DI, discovery, startup orchestration,
 health/SDK/naming registries, aggregate `UmCoreRegistry`, persistence,
 networking, product integration, migrations.
+
+## Phase P10 scope
+
+Pure **in-memory health declaration catalog** under `platforms/core/health/`.
+
+- Materializes each registered platform’s `manifest.health` (one row per platform)
+- Opaque `probeRef` metadata only — never fetched or executed
+- Lookups by platform id and `reportsStatus`
+
+Out of scope for P10: probe execution, polling, scheduling, live snapshots,
+`UmHealthReporter`, networking, alerting, Naming/SDK/`UmCoreRegistry` facade,
+persistence, product integration, migrations.
