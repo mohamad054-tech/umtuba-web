@@ -1,30 +1,29 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1
 
 ## Summary
 
 **Verdict: PASS**
 
-Complete Studio product flow: professional generate → QA → independent review →
-pending suggestion → human review UI. Value text/status unchanged. No
-auto-approve/publish. Offline heuristic/glossary-aware path ready.
-`LIVE_PROVIDER_NOT_CONFIGURED`. Migration **NONE**. Shadow dual-write preserved.
-Dual-read observe OFF / `WAITING_FOR_ADMIN_LOGIN` untouched.
+Readiness/benchmark design only. Live provider **not** activated. Credentials
+not added. Current state: `LIVE_PROVIDER_NOT_CONFIGURED` with offline pipeline
+usable. Migration **NONE**. Shadow dual-write preserved. Dual-read observe OFF.
 
-Next (not started): `TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1`
+Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1`
 
 ## Exact files changed
 
-- `lib/translationStudio/professionalQuality/productWorkflow.ts` (new)
-- `lib/translationStudio/professionalQuality/providerSelection.ts` (new)
-- `lib/translationStudio/professionalQuality/glossaryAwareGenerator.ts` (new)
-- `lib/translationStudio/professionalQuality/reviewResultCache.ts` (new)
-- `lib/translationStudio/professionalQuality/{index,suggestionQualityTag,twoPassOrchestrator,productWorkflow}.ts`
-- `lib/translationStudio/workflow/workflowService.ts` — suggestion no longer replaces value
-- `lib/translationStudio/types.ts` — extended professionalQuality metadata
-- `app/actions/translationStudioProfessionalGeneration.ts` (new)
-- `app/admin/translation-studio/ProfessionalSuggestionPanel.tsx` (new)
-- `app/admin/translation-studio/keys/[keyId]/page.tsx` — actions + panel
-- tests + `docs/translation/PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1.md`
+- `lib/translationStudio/professionalQuality/liveProviderConfig.ts`
+- `lib/translationStudio/professionalQuality/liveProviderReadiness.ts`
+- `lib/translationStudio/professionalQuality/providerAudit.ts`
+- `lib/translationStudio/professionalQuality/benchmarkCorpus.ts`
+- `lib/translationStudio/professionalQuality/benchmarkRubrics.ts`
+- `lib/translationStudio/professionalQuality/benchmarkScoring.ts`
+- `lib/translationStudio/professionalQuality/benchmarkMatrix.ts`
+- `lib/translationStudio/professionalQuality/benchmarkRunner.ts`
+- `lib/translationStudio/professionalQuality/humanBenchmarkRating.ts`
+- `lib/translationStudio/professionalQuality/index.ts`
+- `lib/translationStudio/translationStudioLiveProfessionalAiProviderReadiness.test.ts`
+- `docs/translation/LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -33,15 +32,14 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_
 
 ## Security review
 
-- Admin-gated FormData actions; no client glossary/style/provider injection
-- No secrets/CoT in suggestion metadata or UI
-- AI authority flags false; pending_review only
-- Review-current is read-only (no value mutation)
-- Generate creates suggestion without replacing current translation
+- No credentials stored/committed
+- Readiness reports booleans/names only
+- Benchmark non-mutating; curated UI strings only
+- Provider config centralized; browser cannot inject models
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **208 passed** (20 files)
+`npx vitest run lib/translationStudio` — expect PASS (readiness suite included)
 
 ## TypeScript
 
@@ -49,7 +47,7 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_
 
 ## Build
 
-Not strictly required; key page UI updated (admin forms + panel).
+Not required (domain readiness/benchmark foundation).
 
 ## git diff --check
 
@@ -61,5 +59,6 @@ Expect clean after commit/push.
 
 ## Open issues
 
-1. Live AI provider not configured (`LIVE_PROVIDER_NOT_CONFIGURED`).
-2. Dual-read activation remains `WAITING_FOR_ADMIN_LOGIN`.
+1. Live professional quality still requires dedicated generate/review capabilities
+   (translation_suggest schema gap).
+2. Dual-read gate remains WAITING_FOR_ADMIN_LOGIN (untouched).
