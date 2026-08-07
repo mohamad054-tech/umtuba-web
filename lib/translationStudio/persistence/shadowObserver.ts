@@ -23,37 +23,43 @@ export type StudioShadowEntityCounts = {
   auditLog: number;
 };
 
+/** Optional journal correlation fields (never secrets). */
+export type StudioShadowObserveMeta = {
+  snapshot_hash?: string;
+  correlation_id?: string;
+};
+
 export type StudioShadowObserveEvent =
-  | {
+  | ({
       type: "queued";
       save_seq: number;
       entity_counts: StudioShadowEntityCounts;
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "superseded";
       save_seq: number;
       superseded_by: number;
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "skipped";
       save_seq: number;
       reason: "no_request_transport";
       category: "unavailable";
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "started";
       save_seq: number;
       attempt: number;
       entity_counts: StudioShadowEntityCounts;
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "retry";
       save_seq: number;
       attempt: number;
       category: StudioShadowErrorCategory;
       message: string;
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "succeeded";
       save_seq: number;
       attempt: number;
@@ -61,15 +67,15 @@ export type StudioShadowObserveEvent =
       inserted: number;
       updated: number;
       skipped: number;
-    }
-  | {
+    } & StudioShadowObserveMeta)
+  | ({
       type: "failed";
       save_seq: number;
       attempt: number;
       duration_ms: number;
       category: StudioShadowErrorCategory;
       message: string;
-    };
+    } & StudioShadowObserveMeta);
 
 export type StudioShadowObserver = {
   onEvent(event: StudioShadowObserveEvent): void;

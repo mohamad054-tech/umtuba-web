@@ -4,11 +4,7 @@
  * - JSON load/save remain synchronous and authoritative.
  * - After JSON save succeeds, enqueue async DB shadow write (non-blocking).
  * - DB failure never fails the caller.
- * - DB is append/upsert-only (no prune); stale remote rows may remain if JSON
- *   removes entities — DB is not authoritative in V1.
- *
- * Transport is resolved at enqueue time from request scope (ALS or injected
- * getTransport) and captured on the job — never stored on the process singleton.
+ * - Optional local reconciliation journal records outcomes (non-fatal).
  */
 
 import type { PersistedStudioState } from "../types";
@@ -25,6 +21,13 @@ import {
 } from "./shadowWriteQueue";
 import { getStudioShadowWriteTransport } from "./shadowWriteContext";
 import type { TranslationStudioWriteRpcTransport } from "./writeRpcTransport";
+import { fingerprintStudioSnapshot } from "./snapshotFingerprint";
+import {
+  composeStudioShadowObservers,
+  createJournalingShadowObserver,
+  createShadowReconciliationJournal,
+  type ShadowReconciliationJournal,
+} from "./shadowReconciliationJournal";
 
 export type ShadowDualWriteStudioPersistence = StudioPersistencePort & {
   readonly kind: "shadow_dual_write";
@@ -55,6 +58,16 @@ export type CreateShadowDualWriteStudioPersistenceOptions = {
   delay?: (ms: number) => Promise<void>;
   /** Use console observer instead of no-op when observer omitted. */
   logToConsole?: boolean;
+  /**
+   * Enable local reconciliation journal (default false; runtime factory opts in).
+   */
+  enableReconciliationJournal?: boolean;
+  /** Journal data dir / path overrides (tests). */
+  journalDataDir?: string;
+  journalFilePath?: string;
+  journal?: ShadowReconciliationJournal;
+  /** Optional correlation id factory (no secrets). */
+  correlationId?: () => string | undefined;
 };
 
 export function createShadowDualWriteStudioPersistence(
@@ -62,11 +75,42 @@ export function createShadowDualWriteStudioPersistence(
 ): ShadowDualWriteStudioPersistence {
   const getTransport =
     options.getTransport ?? (() => getStudioShadowWriteTransport());
-  const observer =
+
+  const metaBySeq = new Map<
+    number,
+    { snapshot_hash: string; correlation_id?: string }
+  >();
+
+  const enableJournal = options.enableReconciliationJournal === true;
+  const journal =
+    options.journal ??
+    (enableJournal
+      ? createShadowReconciliationJournal({
+          dataDir: options.journalDataDir,
+          filePath: options.journalFilePath,
+        })
+      : null);
+
+  const baseObserver =
     options.observer ??
     (options.logToConsole
       ? consoleStudioShadowObserver
       : noopStudioShadowObserver);
+
+  const journalObserver = journal
+    ? createJournalingShadowObserver({
+        journal,
+        getMeta: (save_seq) => metaBySeq.get(save_seq) ?? null,
+        onJournalError: (err) => {
+          console.warn(
+            "[translation-studio-shadow-journal]",
+            err instanceof Error ? err.message : "journal_error"
+          );
+        },
+      })
+    : null;
+
+  const observer = composeStudioShadowObservers(baseObserver, journalObserver);
 
   const queue = createStudioShadowWriteQueue({
     observer,
@@ -92,13 +136,30 @@ export function createShadowDualWriteStudioPersistence(
     save(state) {
       // A. JSON authoritative first
       options.json.save(state);
+
+      let snapshot_hash = "";
+      try {
+        snapshot_hash = fingerprintStudioSnapshot(state);
+      } catch {
+        snapshot_hash = "fingerprint_failed";
+      }
+      const correlation_id = options.correlationId?.();
+      const meta = { snapshot_hash, correlation_id };
+
       // C. Shadow only after JSON success; capture transport now
       const transport = getTransport();
       if (!transport) {
-        queue.skipNoTransport();
+        // Reserve seq first so journal getMeta sees hash even if event races
+        const provisionalSeq = queue.lastSeq + 1;
+        metaBySeq.set(provisionalSeq, meta);
+        const seq = queue.skipNoTransport(meta);
+        if (seq !== provisionalSeq) metaBySeq.set(seq, meta);
         return;
       }
-      queue.enqueue(state, transport);
+      const provisionalSeq = queue.lastSeq + 1;
+      metaBySeq.set(provisionalSeq, meta);
+      const seq = queue.enqueue(state, transport, meta);
+      if (seq !== provisionalSeq) metaBySeq.set(seq, meta);
     },
     whenShadowIdle() {
       return queue.whenIdle();

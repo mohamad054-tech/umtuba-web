@@ -43,6 +43,12 @@ export type StudioShadowWriteQueueOptions = {
 
 export type StudioShadowIdleDrainResult = "idle" | "timeout";
 
+/** Optional correlation metadata attached at enqueue time (for journal). */
+export type StudioShadowJobMeta = {
+  snapshot_hash?: string;
+  correlation_id?: string;
+};
+
 export type StudioShadowWriteQueue = {
   /**
    * Enqueue after authoritative JSON save.
@@ -50,13 +56,14 @@ export type StudioShadowWriteQueue = {
    */
   enqueue(
     state: PersistedStudioState,
-    transport: TranslationStudioWriteRpcTransport
+    transport: TranslationStudioWriteRpcTransport,
+    meta?: StudioShadowJobMeta
   ): number;
   /**
    * Reserve a save_seq and emit skipped (no DB call).
    * Used when request-scoped transport is missing.
    */
-  skipNoTransport(): number;
+  skipNoTransport(meta?: StudioShadowJobMeta): number;
   /** Test helper: wait until idle (no in-flight / pending). */
   whenIdle(): Promise<void>;
   /**
@@ -72,6 +79,7 @@ type Job = {
   save_seq: number;
   state: PersistedStudioState;
   transport: TranslationStudioWriteRpcTransport;
+  meta?: StudioShadowJobMeta;
 };
 
 function freezeState(state: PersistedStudioState): PersistedStudioState {
@@ -151,6 +159,10 @@ export function createStudioShadowWriteQueue(
     const counts = countStudioShadowEntities(job.state);
     let attempt = 0;
     const maxAttempts = maxRetries + 1;
+    const metaFields = {
+      snapshot_hash: job.meta?.snapshot_hash,
+      correlation_id: job.meta?.correlation_id,
+    };
 
     while (attempt < maxAttempts) {
       attempt += 1;
@@ -159,6 +171,7 @@ export function createStudioShadowWriteQueue(
         save_seq: job.save_seq,
         attempt,
         entity_counts: counts,
+        ...metaFields,
       });
       const startedAt = now();
       try {
@@ -174,6 +187,7 @@ export function createStudioShadowWriteQueue(
           inserted: result.inserted,
           updated: result.updated,
           skipped: result.skipped,
+          ...metaFields,
         });
         return;
       } catch (err) {
@@ -188,6 +202,7 @@ export function createStudioShadowWriteQueue(
             attempt,
             category,
             message,
+            ...metaFields,
           });
           await delay(retryDelayMs);
           continue;
@@ -199,6 +214,7 @@ export function createStudioShadowWriteQueue(
           duration_ms,
           category,
           message,
+          ...metaFields,
         });
         return;
       }
@@ -209,7 +225,7 @@ export function createStudioShadowWriteQueue(
     get lastSeq() {
       return lastSeq;
     },
-    skipNoTransport() {
+    skipNoTransport(meta) {
       lastSeq += 1;
       const save_seq = lastSeq;
       observer.onEvent({
@@ -217,21 +233,26 @@ export function createStudioShadowWriteQueue(
         save_seq,
         reason: "no_request_transport",
         category: "unavailable",
+        snapshot_hash: meta?.snapshot_hash,
+        correlation_id: meta?.correlation_id,
       });
       return save_seq;
     },
-    enqueue(state, transport) {
+    enqueue(state, transport, meta) {
       lastSeq += 1;
       const save_seq = lastSeq;
       const job: Job = {
         save_seq,
         state: freezeState(state),
         transport,
+        meta,
       };
       observer.onEvent({
         type: "queued",
         save_seq,
         entity_counts: countStudioShadowEntities(job.state),
+        snapshot_hash: meta?.snapshot_hash,
+        correlation_id: meta?.correlation_id,
       });
 
       if (!inFlight && !pending) {
@@ -245,6 +266,8 @@ export function createStudioShadowWriteQueue(
           type: "superseded",
           save_seq: pending.save_seq,
           superseded_by: save_seq,
+          snapshot_hash: pending.meta?.snapshot_hash,
+          correlation_id: pending.meta?.correlation_id,
         });
       }
       pending = job;

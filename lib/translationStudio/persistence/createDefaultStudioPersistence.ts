@@ -60,6 +60,8 @@ export function createDefaultStudioPersistence(options?: {
         observer: options?.shadowObserver,
         getTransport: options?.getShadowTransport,
         logToConsole: options?.shadowObserver == null,
+        enableReconciliationJournal: true,
+        journalDataDir: options?.dataDir,
       }),
     };
   }

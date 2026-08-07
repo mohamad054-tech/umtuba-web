@@ -166,9 +166,64 @@ export {
 export {
   createStudioShadowWriteQueue,
   type StudioShadowIdleDrainResult,
+  type StudioShadowJobMeta,
   type StudioShadowWriteQueue,
   type StudioShadowWriteQueueOptions,
 } from "./persistence/shadowWriteQueue";
+
+export {
+  fingerprintNormalizedStudioSnapshot,
+  fingerprintStudioSnapshot,
+} from "./persistence/snapshotFingerprint";
+
+export {
+  SHADOW_RECONCILIATION_JOURNAL_SCHEMA_VERSION,
+  SHADOW_RECONCILIATION_JOURNAL_V1_FILENAME,
+  composeStudioShadowObservers,
+  createJournalingShadowObserver,
+  createShadowReconciliationJournal,
+  parseShadowReconciliationJournalLine,
+  resolveShadowReconciliationJournalPath,
+  type ShadowJournalOutcome,
+  type ShadowReconciliationJournal,
+  type ShadowReconciliationJournalEntryV1,
+} from "./persistence/shadowReconciliationJournal";
+
+export {
+  TRANSLATION_STUDIO_READ_RPC_V1,
+  parseTranslationStudioReadSnapshot,
+  type TranslationStudioReadSnapshotOptions,
+  type TranslationStudioReadSnapshotV1,
+} from "./persistence/readRpcContract";
+
+export {
+  createSupabaseReadRpcTransport,
+  type TranslationStudioReadRpcTransport,
+} from "./persistence/readRpcTransport";
+
+export {
+  compareStudioSnapshots,
+  createRemoteReadFailedReport,
+  fingerprintReadSnapshot,
+  isReservedShadowSmokeIdentity,
+  isSmokeOnlyClassifiableIdentity,
+  type ReconciliationEntityType,
+  type ReconciliationFinding,
+  type ReconciliationMismatchCategory,
+  type ReconciliationReport,
+  type ReconciliationReportStatus,
+} from "./reconciliation/compareStudioSnapshots";
+
+export {
+  assessShadowResubmitEligibility,
+  type ShadowResubmitEligibility,
+} from "./reconciliation/resubmitEligibility";
+
+export {
+  buildStudioReconciliationReport,
+  loadAuthoritativeStudioJson,
+  type BuildReconciliationReportResult,
+} from "./reconciliation/buildReconciliationReport";
 
 export {
   SHADOW_SMOKE_ALLOW_ENV,
