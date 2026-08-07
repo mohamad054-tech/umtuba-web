@@ -38,6 +38,10 @@ const REVIEW_QUEUE = read("app/learning/instructor/review/page.tsx");
 const ACTION_FORM = read(
   "app/components/learning/instructor/InstructorActionForm.tsx"
 );
+const CREATE_FORM = read(
+  "app/components/learning/instructor/InstructorContentBlockCreateForm.tsx"
+);
+const INSTRUCTOR_ACTIONS = read("app/learning/instructor/actions.ts");
 const AUTHORING_SRC = read("lib/learning/instructorAuthoring.ts");
 const EXPERIENCE_SRC = read("lib/learning/instructorExperience.ts");
 
@@ -131,22 +135,44 @@ describe("Instructor UI contract — lesson content-block editor", () => {
     expect(LESSON_BLOCKS).toMatch(/LEARNING_INSTRUCTOR_ROUTES\.course\(courseId\)/);
   });
 
-  it("offers only the minimal authoring block types currently supported in UI", () => {
-    expect(LESSON_BLOCKS).toMatch(/<option value="rich_text">rich_text<\/option>/);
-    expect(LESSON_BLOCKS).toMatch(/<option value="heading">heading<\/option>/);
-    expect(LESSON_BLOCKS).toMatch(/<option value="callout">callout<\/option>/);
-    expect(LESSON_BLOCKS).toMatch(/Basic text\/heading blocks only/);
+  it("offers expanded authoring block types in the create select", () => {
+    expect(LESSON_BLOCKS).toMatch(/InstructorContentBlockCreateForm/);
+    expect(CREATE_FORM).toMatch(/value="rich_text"/);
+    expect(CREATE_FORM).toMatch(/value="heading"/);
+    expect(CREATE_FORM).toMatch(/value="callout"/);
+    expect(CREATE_FORM).toMatch(/value="image"/);
+    expect(CREATE_FORM).toMatch(/value="video"/);
+    expect(CREATE_FORM).toMatch(/value="audio"/);
+    expect(CREATE_FORM).toMatch(/value="quote"/);
+    expect(CREATE_FORM).toMatch(/value="divider"/);
+    expect(CREATE_FORM).toMatch(/value="external_link"/);
+    expect(CREATE_FORM).toMatch(/value="code_block"/);
+    expect(CREATE_FORM).toMatch(/name="url"/);
+    expect(CREATE_FORM).toMatch(/name="alt"/);
+    expect(CREATE_FORM).toMatch(/name="caption"/);
+    expect(CREATE_FORM).toMatch(/name="provider"/);
+    expect(CREATE_FORM).toMatch(/name="attribution"/);
+    expect(CREATE_FORM).toMatch(/name="style"/);
+    expect(CREATE_FORM).toMatch(/name="label"/);
+    expect(CREATE_FORM).toMatch(/name="description"/);
+    expect(CREATE_FORM).toMatch(/name="code"/);
+    expect(CREATE_FORM).toMatch(/name="language"/);
+    expect(CREATE_FORM).toMatch(/name="variant"/);
+    expect(LESSON_BLOCKS).not.toMatch(/Basic text\/heading blocks only/);
   });
 
   it("keeps reserved and deferred block types unavailable in the create select", () => {
     for (const t of LEARNING_LESSON_CONTENT_BLOCK_RESERVED_TYPES) {
-      expect(LESSON_BLOCKS).not.toMatch(new RegExp(`value="${t}"`));
+      expect(CREATE_FORM).not.toMatch(new RegExp(`value="${t}"`));
     }
     for (const t of LEARNING_LESSON_CONTENT_BLOCK_DEFERRED_TYPES) {
-      expect(LESSON_BLOCKS).not.toMatch(new RegExp(`value="${t}"`));
+      expect(CREATE_FORM).not.toMatch(new RegExp(`value="${t}"`));
     }
-    expect(LESSON_BLOCKS).not.toMatch(/value="html"/);
-    expect(LESSON_BLOCKS).not.toMatch(/value="embed"/);
+    expect(CREATE_FORM).not.toMatch(/value="html"/);
+    expect(CREATE_FORM).not.toMatch(/value="embed"/);
+    expect(CREATE_FORM).not.toMatch(/value="transcript"/);
+    expect(CREATE_FORM).not.toMatch(/value="pdf"/);
+    expect(CREATE_FORM).not.toMatch(/value="downloadable_file"/);
   });
 
   it("presents block order, status, and publish/unpublish/archive actions", () => {
@@ -158,12 +184,22 @@ describe("Instructor UI contract — lesson content-block editor", () => {
     expect(LESSON_BLOCKS).toMatch(/unpublishContentBlockAction/);
     expect(LESSON_BLOCKS).toMatch(/archiveContentBlockAction/);
     expect(LESSON_BLOCKS).toMatch(/updateContentBlockAction/);
+    expect(LESSON_BLOCKS).toMatch(/summarizeInstructorContentBlock/);
+    expect(LESSON_BLOCKS).toMatch(/name="blockType"/);
   });
 
   it("has no raw HTML injection path", () => {
     expect(LESSON_BLOCKS).not.toMatch(/dangerouslySetInnerHTML/);
     expect(LESSON_BLOCKS).not.toMatch(/innerHTML/);
     expect(ACTION_FORM).not.toMatch(/dangerouslySetInnerHTML/);
+    expect(CREATE_FORM).not.toMatch(/dangerouslySetInnerHTML/);
+  });
+
+  it("create/update actions use type-aware shaping without raw JSON", () => {
+    expect(INSTRUCTOR_ACTIONS).toMatch(/shapeInstructorContentBlock/);
+    expect(INSTRUCTOR_ACTIONS).toMatch(/fieldsFromFormData/);
+    expect(INSTRUCTOR_ACTIONS).not.toMatch(/JSON\.parse\(form/);
+    expect(INSTRUCTOR_ACTIONS).not.toMatch(/content:\s*JSON\.parse/);
   });
 });
 

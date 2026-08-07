@@ -10,6 +10,10 @@ import {
 } from "../../../lib/learning/instructorAuthoring";
 import { setLessonPointCost } from "../../../lib/learning/lessonUnlockFoundation";
 import { createWithUniqueInstructorSlug } from "../../../lib/learning/instructorSlug";
+import {
+  fieldsFromFormData,
+  shapeInstructorContentBlock,
+} from "../../../lib/learning/instructorContentBlockAuthoring";
 
 function formString(formData: FormData, key: string): string {
   return String(formData.get(key) ?? "").trim();
@@ -443,24 +447,17 @@ export async function createContentBlockAction(
 ): Promise<InstructorAuthoringResult> {
   const courseId = formString(formData, "courseId");
   const lessonId = formString(formData, "lessonId");
-  const blockType = formString(formData, "blockType") || "rich_text";
-  const text = formString(formData, "text");
-  const content =
-    blockType === "heading"
-      ? { text, level: 2 }
-      : blockType === "external_link"
-        ? {
-            url: formString(formData, "url"),
-            label: formString(formData, "label") || "Link",
-          }
-        : { text };
+  const shaped = shapeInstructorContentBlock(fieldsFromFormData(formData));
+  if (!shaped.ok) {
+    return { ok: false, message: shaped.message };
+  }
 
   return instructorAuthoringAction(
     "create_content_block",
     {
       lesson_id: lessonId,
-      block_type: blockType,
-      content,
+      block_type: shaped.blockType,
+      content: shaped.content,
     },
     { courseId, lessonId }
   );
@@ -471,12 +468,16 @@ export async function updateContentBlockAction(
 ): Promise<InstructorAuthoringResult> {
   const courseId = formString(formData, "courseId");
   const lessonId = formString(formData, "lessonId");
-  const text = formString(formData, "text");
+  const shaped = shapeInstructorContentBlock(fieldsFromFormData(formData));
+  if (!shaped.ok) {
+    return { ok: false, message: shaped.message };
+  }
+
   return instructorAuthoringAction(
     "update_content_block",
     {
       block_id: formString(formData, "blockId"),
-      content: { text },
+      content: shaped.content,
     },
     { courseId, lessonId }
   );

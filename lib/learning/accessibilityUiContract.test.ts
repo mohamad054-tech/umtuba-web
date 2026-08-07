@@ -22,6 +22,9 @@ const INSTR_COURSE = read("app/learning/instructor/courses/[courseId]/page.tsx")
 const INSTR_LESSON = read(
   "app/learning/instructor/courses/[courseId]/lessons/[lessonId]/page.tsx"
 );
+const INSTR_BLOCK_CREATE = read(
+  "app/components/learning/instructor/InstructorContentBlockCreateForm.tsx"
+);
 const ACTION_FORM = read(
   "app/components/learning/instructor/InstructorActionForm.tsx"
 );
@@ -138,8 +141,8 @@ describe("Learning accessibility contract — catalog and instructor", () => {
     expect(INSTR_COURSE).toMatch(/aria-label="Activity name"/);
     expect(INSTR_COURSE).toMatch(/aria-label="Activity type"/);
     expect(INSTR_COURSE).toMatch(/aria-label="Ordered section ids"/);
-    expect(INSTR_LESSON).toMatch(/aria-label="Content block type"/);
-    expect(INSTR_LESSON).toMatch(/aria-label="Block text"/);
+    expect(INSTR_BLOCK_CREATE).toMatch(/aria-label="Content block type"/);
+    expect(INSTR_BLOCK_CREATE).toMatch(/"Block text"/);
     expect(INSTR_LESSON).toMatch(/aria-label="Ordered content block ids"/);
     expect(INSTR_LESSON).toMatch(/Unlock cost \(UM Points\)/);
   });

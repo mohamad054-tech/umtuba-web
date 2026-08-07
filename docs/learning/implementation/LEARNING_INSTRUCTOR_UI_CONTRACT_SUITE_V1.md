@@ -25,7 +25,7 @@ no live E2E, no new instructor features.
 - Instructor-only entry points and empty manageable-course state
 - Section → lesson → activity hierarchy + create/edit/reorder actions
 - `canManage` / draft-aware publish-archive guards
-- Minimal content-block authoring types; reserved/deferred types unavailable
+- Expanded content-block authoring types (media/link/code/quote/divider); reserved/deferred types unavailable
 - No `dangerouslySetInnerHTML` / raw HTML path
 - Assessment/assignment authoring routes; no learner attempt/submission players
 - Canonical `LEARNING_INSTRUCTOR_*` / assessment / assignment route builders
