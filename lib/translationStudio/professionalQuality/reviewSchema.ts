@@ -187,6 +187,15 @@ export function parseStrictProfessionalReviewResult(
 
   const dim = parseDimensionScores(raw.dimensionScores);
   if (!dim.ok) return dim;
+  // Professional review requires the full dimension set (no silent partials).
+  for (const required of TRANSLATION_QUALITY_DIMENSIONS) {
+    if (typeof dim.value[required] !== "number") {
+      return {
+        ok: false,
+        error: `missing required dimension score: ${required}`,
+      };
+    }
+  }
 
   const findings = parseFindings(raw.findings);
   if (!findings.ok) return findings;

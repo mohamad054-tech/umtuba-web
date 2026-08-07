@@ -15,6 +15,8 @@ export const AI_CAPABILITY_IDS = [
   "commerce.product_draft_assistant",
   "platform.diagnostics_probe",
   "platform.translation_suggest",
+  "platform.translation_professional_generate",
+  "platform.translation_professional_review",
   "assistant.runtime_turn",
 ] as const;
 export type AiCapabilityId = (typeof AI_CAPABILITY_IDS)[number] | (string & {});

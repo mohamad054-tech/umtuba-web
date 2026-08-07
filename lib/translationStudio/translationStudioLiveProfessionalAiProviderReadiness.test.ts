@@ -169,13 +169,17 @@ describe("live professional AI provider readiness", () => {
     expect(report.activated).toBe(false);
     expect(report.secretsExposed).toBe(false);
     expect(report.offlinePipelineRemainsUsable).toBe(true);
+    expect(report.professionalCapabilitiesRegistered).toBe(true);
+    expect(report.translationSuggestRemainsCompatible).toBe(true);
     expect([
-      "LIVE_PROVIDER_READY",
+      "LIVE_BENCHMARK_READY",
       "LIVE_PROVIDER_NOT_CONFIGURED",
       "LIVE_PROVIDER_CONFIG_INVALID",
-    ]).toContain(report.state);
+    ]).toContain(report.overall);
     // Current Computer 2 expectation
-    expect(report.state).toBe("LIVE_PROVIDER_NOT_CONFIGURED");
+    expect(report.overall).toBe("LIVE_PROVIDER_NOT_CONFIGURED");
+    expect(report.generator.state).toBe("NOT_CONFIGURED");
+    expect(report.reviewer.state).toBe("NOT_CONFIGURED");
     expect(AI_CORE_PROVIDER_AUDIT_V1.length).toBeGreaterThanOrEqual(4);
   });
 

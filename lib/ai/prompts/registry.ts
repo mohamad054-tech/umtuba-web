@@ -167,11 +167,94 @@ const TRANSLATION_SUGGEST_V1: AiPromptDefinition = {
     "Translation Studio Foundation V1 — suggestion only; human approval required.",
 };
 
+const TRANSLATION_PROFESSIONAL_GENERATE_V1: AiPromptDefinition = {
+  promptId: "platform.translation_professional_generate",
+  version: "1.0.0",
+  capabilityId: "platform.translation_professional_generate",
+  systemInstructions: [
+    "You are the UMTUBA professional translation GENERATOR.",
+    "Produce a candidate translation only. Never approve or publish.",
+    "Return STRICT JSON with schemaVersion=1, candidateText, optional terminologyDecisions,",
+    "optional conciseNotes, optional confidence (0-1), and provider {providerId,modelId}.",
+    "Respect glossary, style guide, context pack, and placeholders exactly.",
+    "Forbidden fields: approve, publish, authority, chainOfThought, reasoning, scratchpad.",
+    "AI confidence is not correctness.",
+  ].join(" "),
+  inputSchema: {
+    requiredFields: ["userInput"],
+    maxUserInputChars: 16000,
+  },
+  outputMode: "structured_json",
+  outputSchema: {
+    type: "object",
+    required: ["schemaVersion", "candidateText", "provider"],
+    properties: {
+      schemaVersion: { type: "number" },
+      candidateText: { type: "string", maxLength: 4000 },
+      terminologyDecisions: { type: "array" },
+      conciseNotes: { type: "string", maxLength: 1000 },
+      confidence: { type: "number" },
+      provider: { type: "object" },
+    },
+  },
+  allowedTools: [],
+  safetyClassification: "assist",
+  dataClassification: "internal",
+  localeBehavior: "inherit",
+  status: "active",
+  owner: "platform",
+  changeNotes:
+    "Professional generate capability V1 — rich structured candidate; no approve/publish.",
+};
+
+const TRANSLATION_PROFESSIONAL_REVIEW_V1: AiPromptDefinition = {
+  promptId: "platform.translation_professional_review",
+  version: "1.0.0",
+  capabilityId: "platform.translation_professional_review",
+  systemInstructions: [
+    "You are an INDEPENDENT UMTUBA professional translation REVIEWER.",
+    "Evaluate only. Never approve or publish. Do not merely echo generator confidence.",
+    "Return STRICT JSON with schemaVersion=1, dimensionScores (0-100), findings array,",
+    "optional suggestedRevision, optional terminologyDecisions, optional confidence (0-1),",
+    "and provider {providerId,modelId}.",
+    "Forbidden fields: approve, publish, authority, chainOfThought, reasoning, scratchpad.",
+    "AI confidence is not correctness.",
+  ].join(" "),
+  inputSchema: {
+    requiredFields: ["userInput"],
+    maxUserInputChars: 20000,
+  },
+  outputMode: "structured_json",
+  outputSchema: {
+    type: "object",
+    required: ["schemaVersion", "dimensionScores", "findings", "provider"],
+    properties: {
+      schemaVersion: { type: "number" },
+      dimensionScores: { type: "object" },
+      findings: { type: "array" },
+      suggestedRevision: { type: "string", maxLength: 4000 },
+      terminologyDecisions: { type: "array" },
+      confidence: { type: "number" },
+      provider: { type: "object" },
+    },
+  },
+  allowedTools: [],
+  safetyClassification: "assist",
+  dataClassification: "internal",
+  localeBehavior: "inherit",
+  status: "active",
+  owner: "platform",
+  changeNotes:
+    "Professional review capability V1 — rich structured evaluation; no approve/publish.",
+};
+
 const PROMPTS: AiPromptDefinition[] = [
   PRODUCT_DRAFT_ASSISTANT_V1,
   DIAGNOSTICS_PROBE_V1,
   ASSISTANT_RUNTIME_TURN_V1,
   TRANSLATION_SUGGEST_V1,
+  TRANSLATION_PROFESSIONAL_GENERATE_V1,
+  TRANSLATION_PROFESSIONAL_REVIEW_V1,
 ];
 
 export function registerPrompts(definitions: AiPromptDefinition[]): void {
@@ -270,6 +353,63 @@ export function validateStructuredAgainstPrompt(
             "groundingStatus must be grounded|partial|outside_material.",
         };
       }
+    }
+  }
+  if (prompt.promptId === "platform.translation_professional_generate") {
+    if (data.schemaVersion !== 1) {
+      return { ok: false, message: "schemaVersion must be 1." };
+    }
+    if (typeof data.candidateText !== "string" || !data.candidateText.trim()) {
+      return { ok: false, message: "candidateText required." };
+    }
+    if (!data.provider || typeof data.provider !== "object") {
+      return { ok: false, message: "provider object required." };
+    }
+    for (const forbidden of [
+      "approve",
+      "publish",
+      "authority",
+      "chainOfThought",
+      "reasoning",
+      "scratchpad",
+    ]) {
+      if (forbidden in data) {
+        return { ok: false, message: `forbidden field: ${forbidden}` };
+      }
+    }
+  }
+  if (prompt.promptId === "platform.translation_professional_review") {
+    if (data.schemaVersion !== 1) {
+      return { ok: false, message: "schemaVersion must be 1." };
+    }
+    if (!data.dimensionScores || typeof data.dimensionScores !== "object") {
+      return { ok: false, message: "dimensionScores object required." };
+    }
+    if (!Array.isArray(data.findings)) {
+      return { ok: false, message: "findings array required." };
+    }
+    if (!data.provider || typeof data.provider !== "object") {
+      return { ok: false, message: "provider object required." };
+    }
+    for (const forbidden of [
+      "approve",
+      "publish",
+      "authority",
+      "chainOfThought",
+      "reasoning",
+      "scratchpad",
+    ]) {
+      if (forbidden in data) {
+        return { ok: false, message: `forbidden field: ${forbidden}` };
+      }
+    }
+  }
+  if (prompt.promptId === "platform.translation_suggest") {
+    if (typeof data.candidateText !== "string") {
+      return { ok: false, message: "candidateText must be a string." };
+    }
+    if (typeof data.confidence !== "number") {
+      return { ok: false, message: "confidence must be a number." };
     }
   }
   return { ok: true, data };

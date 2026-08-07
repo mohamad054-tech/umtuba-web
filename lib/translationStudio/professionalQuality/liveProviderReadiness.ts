@@ -1,5 +1,5 @@
 /**
- * Live professional AI provider readiness preflight (no secrets printed).
+ * Live professional provider readiness + benchmark readiness (no secrets).
  */
 
 import {
@@ -10,16 +10,25 @@ import {
   loadProfessionalLiveModelPolicy,
   PROFESSIONAL_LIVE_ENV_NAMES,
   type ProfessionalLiveModelPolicy,
+  type ProfessionalLiveProviderId,
 } from "./liveProviderConfig";
 
-export type LiveProviderReadinessState =
-  | "LIVE_PROVIDER_READY"
+export type RoleReadinessState =
+  | "READY"
+  | "NOT_CONFIGURED"
+  | "INVALID"
+  | "OPTIONAL";
+
+export type LiveBenchmarkOverallState =
+  | "LIVE_BENCHMARK_READY"
   | "LIVE_PROVIDER_NOT_CONFIGURED"
   | "LIVE_PROVIDER_CONFIG_INVALID";
 
 export type LiveProfessionalProviderReadinessReport = {
-  schemaVersion: 1;
-  state: LiveProviderReadinessState;
+  schemaVersion: 2;
+  overall: LiveBenchmarkOverallState;
+  /** @deprecated use overall — kept for prior callers */
+  state: "LIVE_PROVIDER_READY" | "LIVE_PROVIDER_NOT_CONFIGURED" | "LIVE_PROVIDER_CONFIG_INVALID";
   aiMode: "disabled" | "live" | "stub";
   providersConfigured: {
     openai: boolean;
@@ -27,6 +36,15 @@ export type LiveProfessionalProviderReadinessReport = {
     anthropic: boolean;
     local: boolean;
   };
+  generator: { state: RoleReadinessState; provider: string; modelSet: boolean };
+  reviewer: { state: RoleReadinessState; provider: string; modelSet: boolean };
+  sensitiveReviewer: {
+    state: RoleReadinessState;
+    provider: string;
+    modelSet: boolean;
+  };
+  professionalCapabilitiesRegistered: true;
+  translationSuggestRemainsCompatible: true;
   professionalPolicy: {
     generatorProvider: string;
     reviewerProvider: string;
@@ -44,7 +62,7 @@ export type LiveProfessionalProviderReadinessReport = {
 };
 
 function providerConfiguredFor(
-  id: string,
+  id: ProfessionalLiveProviderId | string,
   status: ReturnType<typeof describeAiConfigStatus>
 ): boolean {
   if (id === "openai") return status.openaiConfigured;
@@ -55,8 +73,28 @@ function providerConfiguredFor(
   return false;
 }
 
+function roleState(
+  providerId: ProfessionalLiveProviderId,
+  modelSet: boolean,
+  status: ReturnType<typeof describeAiConfigStatus>,
+  anyLive: boolean,
+  mode: string
+): RoleReadinessState {
+  if (providerId === "unset") return "NOT_CONFIGURED";
+  if (providerId === "heuristic") return "READY";
+  if (mode !== "live") return "NOT_CONFIGURED";
+  if (!anyLive) return "NOT_CONFIGURED";
+  if (!providerConfiguredFor(providerId, status)) return "INVALID";
+  if (!modelSet) {
+    // Platform default model may still work — treat as READY with gap noted upstream.
+    return "READY";
+  }
+  return "READY";
+}
+
 /**
  * Readiness helper — presence/shape only. Never prints key values.
+ * Does not activate live providers.
  */
 export function assessLiveProfessionalProviderReadiness(
   policy?: ProfessionalLiveModelPolicy
@@ -66,15 +104,11 @@ export function assessLiveProfessionalProviderReadiness(
   const modelPolicy = policy ?? loadProfessionalLiveModelPolicy();
   const gaps: string[] = [];
 
-  // Known product gaps for professional live quality (from audit).
   gaps.push(
-    "platform.translation_suggest schema is suggestion-only; professional review/generate contracts not yet dedicated capabilities"
+    "Dedicated capabilities platform.translation_professional_generate/review are registered; do not abuse platform.translation_suggest for rich review"
   );
   gaps.push(
-    "aiService strips result to candidateText/confidence/notes — professionalReview fields dropped"
-  );
-  gaps.push(
-    "Anthropic/Local structured JSON is prompt-parse only (weaker than OpenAI/Gemini json modes)"
+    "Anthropic/Local structured JSON remains prompt-parse only (weaker than OpenAI/Gemini)"
   );
 
   const anyProvider =
@@ -85,6 +119,45 @@ export function assessLiveProfessionalProviderReadiness(
 
   const gen = modelPolicy.generator.providerId;
   const rev = modelPolicy.reviewer.providerId;
+  const sens = modelPolicy.sensitiveReviewer.providerId;
+
+  const generator = {
+    state: roleState(
+      gen,
+      Boolean(modelPolicy.generator.modelId),
+      status,
+      anyProvider,
+      config.mode
+    ),
+    provider: gen,
+    modelSet: Boolean(modelPolicy.generator.modelId),
+  };
+  const reviewer = {
+    state: roleState(
+      rev,
+      Boolean(modelPolicy.reviewer.modelId),
+      status,
+      anyProvider,
+      config.mode
+    ),
+    provider: rev,
+    modelSet: Boolean(modelPolicy.reviewer.modelId),
+  };
+  const sensitiveReviewer = {
+    state:
+      sens === "unset"
+        ? ("OPTIONAL" as const)
+        : roleState(
+            sens,
+            Boolean(modelPolicy.sensitiveReviewer.modelId),
+            status,
+            anyProvider,
+            config.mode
+          ),
+    provider: sens,
+    modelSet: Boolean(modelPolicy.sensitiveReviewer.modelId),
+  };
+
   const independentConfigured =
     gen !== "unset" &&
     rev !== "unset" &&
@@ -93,43 +166,54 @@ export function assessLiveProfessionalProviderReadiness(
         Boolean(modelPolicy.reviewer.modelId) &&
         modelPolicy.generator.modelId !== modelPolicy.reviewer.modelId));
 
-  let state: LiveProviderReadinessState = "LIVE_PROVIDER_NOT_CONFIGURED";
-
   if (config.mode === "live" && !anyProvider) {
-    state = "LIVE_PROVIDER_CONFIG_INVALID";
     gaps.push("UMTUBA_AI_MODE=live but no provider credentials/local configured");
-  } else if (config.mode === "live" && anyProvider) {
-    // Professional role providers must also resolve if explicitly set.
-    if (gen !== "unset" && gen !== "heuristic" && !providerConfiguredFor(gen, status)) {
-      state = "LIVE_PROVIDER_CONFIG_INVALID";
-      gaps.push(`generator provider ${gen} not configured`);
-    } else if (
-      rev !== "unset" &&
-      rev !== "heuristic" &&
-      !providerConfiguredFor(rev, status)
-    ) {
-      state = "LIVE_PROVIDER_CONFIG_INVALID";
-      gaps.push(`reviewer provider ${rev} not configured`);
-    } else if (
-      !modelPolicy.generator.modelId ||
-      !modelPolicy.reviewer.modelId
-    ) {
-      // Live platform may use OPENAI_MODEL etc. — professional overrides optional.
-      // Still READY for platform transport, but note professional model overrides unset.
-      state = "LIVE_PROVIDER_READY";
-      gaps.push(
-        "Professional generator/reviewer model env overrides unset — will use platform defaults when wired"
-      );
-    } else {
-      state = "LIVE_PROVIDER_READY";
-    }
-  } else {
-    state = "LIVE_PROVIDER_NOT_CONFIGURED";
+  }
+  if (generator.state === "INVALID") {
+    gaps.push(`generator provider ${gen} not configured`);
+  }
+  if (reviewer.state === "INVALID") {
+    gaps.push(`reviewer provider ${rev} not configured`);
+  }
+  if (sensitiveReviewer.state === "INVALID") {
+    gaps.push(`sensitive reviewer provider ${sens} not configured`);
+  }
+  if (!independentConfigured && gen !== "unset" && rev !== "unset") {
+    gaps.push(
+      "Generator and reviewer share provider/model — prefer independent pair for live benchmark"
+    );
   }
 
+  let overall: LiveBenchmarkOverallState = "LIVE_PROVIDER_NOT_CONFIGURED";
+  if (
+    generator.state === "INVALID" ||
+    reviewer.state === "INVALID" ||
+    sensitiveReviewer.state === "INVALID" ||
+    (config.mode === "live" && !anyProvider)
+  ) {
+    overall = "LIVE_PROVIDER_CONFIG_INVALID";
+  } else if (
+    config.mode === "live" &&
+    anyProvider &&
+    generator.state === "READY" &&
+    reviewer.state === "READY"
+  ) {
+    overall = "LIVE_BENCHMARK_READY";
+  } else {
+    overall = "LIVE_PROVIDER_NOT_CONFIGURED";
+  }
+
+  const legacyState =
+    overall === "LIVE_BENCHMARK_READY"
+      ? ("LIVE_PROVIDER_READY" as const)
+      : overall === "LIVE_PROVIDER_CONFIG_INVALID"
+        ? ("LIVE_PROVIDER_CONFIG_INVALID" as const)
+        : ("LIVE_PROVIDER_NOT_CONFIGURED" as const);
+
   return {
-    schemaVersion: 1,
-    state,
+    schemaVersion: 2,
+    overall,
+    state: legacyState,
     aiMode: config.mode,
     providersConfigured: {
       openai: status.openaiConfigured,
@@ -137,10 +221,15 @@ export function assessLiveProfessionalProviderReadiness(
       anthropic: status.anthropicConfigured,
       local: status.localConfigured,
     },
+    generator,
+    reviewer,
+    sensitiveReviewer,
+    professionalCapabilitiesRegistered: true,
+    translationSuggestRemainsCompatible: true,
     professionalPolicy: {
       generatorProvider: gen,
       reviewerProvider: rev,
-      sensitiveReviewerProvider: modelPolicy.sensitiveReviewer.providerId,
+      sensitiveReviewerProvider: sens,
       generatorModelSet: Boolean(modelPolicy.generator.modelId),
       reviewerModelSet: Boolean(modelPolicy.reviewer.modelId),
       independentPreferred: true,

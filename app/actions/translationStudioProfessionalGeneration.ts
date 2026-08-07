@@ -110,9 +110,13 @@ async function resolveProvidersForValue(input: {
     const config = loadAiPlatformConfig();
     if (config.mode === "live") {
       liveTransport = createLiveTransportFromAiServiceRunner(async (req) => {
+        const capabilityId =
+          req.capabilityId === "platform.translation_professional_review"
+            ? "platform.translation_professional_review"
+            : "platform.translation_professional_generate";
         const result = await runCapability(
           {
-            capabilityId: "platform.translation_suggest",
+            capabilityId,
             input: req.input,
             context: {
               surface: req.context.surface,

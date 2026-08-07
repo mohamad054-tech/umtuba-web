@@ -33,6 +33,8 @@ export function createHeuristicProfessionalReviewer(options?: {
         consistency: 90,
         grammar_spelling: 92,
         locale_conventions: 90,
+        placeholder_integrity: 100,
+        formatting_integrity: 100,
       };
 
       // Preserve absolute integrity from deterministic findings.

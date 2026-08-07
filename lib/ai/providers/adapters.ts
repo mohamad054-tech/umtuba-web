@@ -87,6 +87,119 @@ export function createStubAdapter(options?: {
           },
         };
       }
+      if (input.capabilityId === "platform.translation_suggest") {
+        return {
+          text: null,
+          structured: {
+            candidateText: `[stub] ${user.slice(0, 200) || "translation"}`,
+            confidence: 0.42,
+            notes: "Stub translation_suggest — human review required.",
+          },
+          usage: {
+            inputTokens: estimateTokens(user),
+            outputTokens: 24,
+            cachedTokens: 0,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: 0,
+            costCurrency: "USD",
+            costStatus: "provider_reported",
+            modelId: input.modelId,
+            providerId: "stub",
+          },
+        };
+      }
+      if (input.capabilityId === "platform.translation_professional_generate") {
+        let sourceText = user.slice(0, 200) || "Back";
+        let targetLocale = "ar";
+        try {
+          const jsonStart = user.indexOf("{");
+          const jsonEnd = user.lastIndexOf("}");
+          const blob =
+            jsonStart >= 0 && jsonEnd > jsonStart
+              ? user.slice(jsonStart, jsonEnd + 1)
+              : user;
+          const parsed = JSON.parse(blob) as Record<string, unknown>;
+          if (typeof parsed.sourceText === "string") sourceText = parsed.sourceText;
+          if (typeof parsed.targetLocale === "string") targetLocale = parsed.targetLocale;
+        } catch {
+          // user may be wrapped with notes
+        }
+        const phraseMap: Record<string, string> = {
+          back: "رجوع",
+          cancel: "إلغاء",
+          refund: "استرداد",
+        };
+        const candidate =
+          targetLocale === "ar"
+            ? phraseMap[sourceText.trim().toLowerCase()] ??
+              `[${targetLocale}] ${sourceText}`
+            : `[${targetLocale}] ${sourceText}`;
+        return {
+          text: null,
+          structured: {
+            schemaVersion: 1,
+            candidateText: candidate,
+            terminologyDecisions: [],
+            conciseNotes: "Stub professional generate — not a live provider.",
+            confidence: 0.55,
+            provider: { providerId: "stub", modelId: input.modelId },
+          },
+          usage: {
+            inputTokens: estimateTokens(user),
+            outputTokens: 48,
+            cachedTokens: 0,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: 0,
+            costCurrency: "USD",
+            costStatus: "provider_reported",
+            modelId: input.modelId,
+            providerId: "stub",
+          },
+        };
+      }
+      if (input.capabilityId === "platform.translation_professional_review") {
+        return {
+          text: null,
+          structured: {
+            schemaVersion: 1,
+            dimensionScores: {
+              semantic_accuracy: 90,
+              terminology_compliance: 100,
+              contextual_fit: 88,
+              fluency_naturalness: 90,
+              ui_conciseness: 92,
+              consistency: 90,
+              grammar_spelling: 90,
+              locale_conventions: 88,
+              placeholder_integrity: 100,
+              formatting_integrity: 100,
+            },
+            findings: [
+              {
+                severity: "info",
+                dimension: "semantic_accuracy",
+                message: "Stub professional reviewer — independent of generator.",
+              },
+            ],
+            confidence: 0.5,
+            provider: { providerId: "stub", modelId: input.modelId },
+          },
+          usage: {
+            inputTokens: estimateTokens(user),
+            outputTokens: 64,
+            cachedTokens: 0,
+            audioUnits: null,
+            imageUnits: null,
+            costMinor: 0,
+            costCurrency: "USD",
+            costStatus: "provider_reported",
+            modelId: input.modelId,
+            providerId: "stub",
+          },
+        };
+      }
       if (input.capabilityId === "assistant.runtime_turn") {
         const skillMatch = user.match(/skillId=([a-z_]+)/i);
         const skillId = skillMatch?.[1]?.trim() || "assistant";

@@ -71,9 +71,13 @@ async function tryCreateLiveTransport(deps: {
   if (config.mode !== "live") return null;
   return createAiServiceProfessionalTransport({
     runCapability: async (req) => {
+      const capabilityId =
+        req.capabilityId === "platform.translation_professional_review"
+          ? "platform.translation_professional_review"
+          : "platform.translation_professional_generate";
       const result = await runCapability(
         {
-          capabilityId: "platform.translation_suggest",
+          capabilityId,
           input: req.input,
           context: {
             surface: req.context.surface,

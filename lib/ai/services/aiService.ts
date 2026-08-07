@@ -300,6 +300,7 @@ async function runCapabilityInner(
           allowedCapabilities: ["platform.translation_suggest"],
           allowedToolIds: [],
         },
+        preferredModelId: request.preferredModelHint,
         _test: deps.forceStub
           ? { forceStub: true, bypassRateLimit: true }
           : undefined,
@@ -313,7 +314,7 @@ async function runCapabilityInner(
       string,
       unknown
     >;
-    // Fail closed to empty candidate rather than inventing translations in stub fallbacks.
+    // Backwards-compatible narrow shape for legacy suggestion path only.
     const candidateText =
       typeof structured.candidateText === "string"
         ? structured.candidateText
@@ -333,6 +334,62 @@ async function runCapabilityInner(
               ? structured.notes
               : "Human review required before Translation Memory publish.",
         },
+        retryable: false,
+      },
+    };
+  }
+
+  if (
+    request.capabilityId === "platform.translation_professional_generate" ||
+    request.capabilityId === "platform.translation_professional_review"
+  ) {
+    const config = loadAiPlatformConfig(
+      deps.forceStub
+        ? { mode: "stub", allowStub: true }
+        : undefined
+    );
+    const capabilityId = request.capabilityId;
+    const gateway = await executeAiGateway(
+      deps.userId,
+      {
+        capabilityId,
+        promptId: capabilityId,
+        userInput: [
+          request.input.text ?? "",
+          request.input.notes ? `\n${request.input.notes}` : "",
+        ].join(""),
+        outputMode: "structured_json",
+        context: {
+          productDomain: request.context.productDomain || "platform",
+          surface:
+            request.context.surface ||
+            "admin.translation_studio.professional",
+          dataClassification: "internal",
+          locale: request.context.locale ?? null,
+          allowedCapabilities: [capabilityId],
+          allowedToolIds: [],
+        },
+        preferredModelId: request.preferredModelHint,
+        _test: deps.forceStub
+          ? { forceStub: true, bypassRateLimit: true }
+          : undefined,
+      },
+      { config, capabilityEligible: true, permissions: [] }
+    );
+    if (!gateway.ok) {
+      return asFailure(gateway.code, gateway.message);
+    }
+    // Preserve FULL structured professional payload — never strip to suggest-only.
+    const structured = (gateway.data.structured ?? {}) as Record<
+      string,
+      unknown
+    >;
+    return {
+      ok: true,
+      data: {
+        runId: gateway.data.runId,
+        capabilityId,
+        result: { ...structured },
         retryable: false,
       },
     };

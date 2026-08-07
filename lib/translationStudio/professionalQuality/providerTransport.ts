@@ -188,9 +188,8 @@ export function createScriptedProfessionalAiTransport(script: {
 }
 
 /**
- * Live adapter over existing AI Core `runCapability` (platform.translation_suggest).
- * Structured review/generate JSON is requested via notes; response parsed from result.
- * Does not introduce a duplicate provider stack.
+ * Live adapter over dedicated professional AI Core capabilities.
+ * Does NOT use platform.translation_suggest (too narrow for rich payloads).
  */
 export type AiServiceJsonRunner = (request: {
   capabilityId: string;
@@ -211,32 +210,50 @@ export type AiServiceJsonRunner = (request: {
   | { ok: false; error: { message: string } }
 >;
 
+/**
+ * Live adapter over dedicated professional AI Core capabilities.
+ * Does NOT use platform.translation_suggest (too narrow).
+ */
 export function createAiServiceProfessionalTransport(deps: {
   runCapability: AiServiceJsonRunner;
   providerId?: string;
-  modelId?: string;
+  generatorModelId?: string;
+  reviewerModelId?: string;
 }): ProfessionalAiTransport {
   const provider: ProfessionalAiProviderMetadata = {
     providerId: deps.providerId ?? "ai_service",
-    modelId: deps.modelId ?? "platform.translation_suggest",
+    modelId:
+      deps.generatorModelId ??
+      deps.reviewerModelId ??
+      "platform.translation_professional",
   };
   return createBoundedProfessionalAiTransport({
     kind: "ai_service",
     provider,
     async complete(request) {
+      const capabilityId =
+        request.role === "reviewer"
+          ? "platform.translation_professional_review"
+          : "platform.translation_professional_generate";
+      const modelId =
+        request.role === "reviewer"
+          ? deps.reviewerModelId ?? provider.modelId
+          : deps.generatorModelId ?? provider.modelId;
+
       const result = await deps.runCapability({
-        capabilityId: "platform.translation_suggest",
+        capabilityId,
         input: {
           text: JSON.stringify(request.userPayload),
           notes: [
             request.systemPrompt,
-            "Return ONLY JSON matching the requiredOutput schema.",
+            "Return ONLY JSON matching the professional capability schema.",
             `role=${request.role}`,
+            `preferredModel=${modelId}`,
           ].join("\n"),
         },
         context: {
           productDomain: "platform",
-          surface: "admin.translation_studio.professional_review",
+          surface: "admin.translation_studio.professional",
           locale:
             typeof request.userPayload.targetLocale === "string"
               ? request.userPayload.targetLocale
@@ -247,77 +264,26 @@ export function createAiServiceProfessionalTransport(deps: {
         throw new Error(result.error.message || "transport_error");
       }
       const payload = result.data.result;
-      // Prefer nested professionalReview / professionalGenerate, else whole result.
-      if (
-        request.role === "reviewer" &&
-        payload.professionalReview &&
-        typeof payload.professionalReview === "object"
-      ) {
-        return {
-          ...(payload.professionalReview as object),
-          provider: {
-            ...provider,
-            requestId: result.data.runId,
-          },
-        };
+      if (!payload || typeof payload !== "object") {
+        throw new Error("schema_mismatch");
       }
-      if (
-        request.role === "generator" &&
-        (payload.candidateText || payload.professionalGenerate)
-      ) {
-        if (
-          payload.professionalGenerate &&
-          typeof payload.professionalGenerate === "object"
-        ) {
-          return {
-            ...(payload.professionalGenerate as object),
-            provider: {
-              ...provider,
-              requestId: result.data.runId,
-            },
-          };
-        }
-        return {
-          candidateText: payload.candidateText,
-          confidence: payload.confidence,
-          rationaleNotes: payload.notes,
-          provider: {
-            ...provider,
-            requestId: result.data.runId,
-          },
-        };
-      }
-      // If provider returned JSON string in content/notes, try parse.
-      for (const key of ["content", "notes", "json"] as const) {
-        const v = payload[key];
-        if (typeof v === "string" && v.trim().startsWith("{")) {
-          try {
-            const parsed = JSON.parse(v) as unknown;
-            if (parsed && typeof parsed === "object") {
-              return {
-                ...(parsed as object),
-                provider: {
-                  ...provider,
-                  requestId: result.data.runId,
-                },
-              };
-            }
-          } catch {
-            throw new Error("invalid_json");
-          }
-        }
-      }
-      // Fall through: treat structured result as the JSON body if it looks useful.
-      if (payload.dimensionScores || payload.findings || payload.candidateText) {
-        return {
-          ...payload,
-          provider: {
-            ...provider,
-            requestId: result.data.runId,
-          },
-        };
-      }
-      throw new Error("schema_mismatch");
+      // Full structured payload preserved by aiService for professional caps.
+      return {
+        ...payload,
+        provider: {
+          providerId:
+            typeof (payload.provider as { providerId?: string } | undefined)
+              ?.providerId === "string"
+              ? (payload.provider as { providerId: string }).providerId
+              : provider.providerId,
+          modelId:
+            typeof (payload.provider as { modelId?: string } | undefined)
+              ?.modelId === "string"
+              ? (payload.provider as { modelId: string }).modelId
+              : modelId,
+          requestId: result.data.runId,
+        },
+      };
     },
   });
 }

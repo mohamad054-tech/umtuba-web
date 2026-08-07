@@ -1,29 +1,42 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1
 
 ## Summary
 
 **Verdict: PASS**
 
-Readiness/benchmark design only. Live provider **not** activated. Credentials
-not added. Current state: `LIVE_PROVIDER_NOT_CONFIGURED` with offline pipeline
-usable. Migration **NONE**. Shadow dual-write preserved. Dual-read observe OFF.
+Dedicated professional AI Core capabilities
+(`platform.translation_professional_generate` /
+`platform.translation_professional_review`) preserve rich structured payloads
+end-to-end. `platform.translation_suggest` remains backwards-compatible. Live
+provider **not** activated; readiness overall `LIVE_PROVIDER_NOT_CONFIGURED`.
+Migration **NONE**. Shadow dual-write preserved. Dual-read observe OFF. No
+credentials requested or committed. No winner declared.
 
-Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1`
+Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1`
 
 ## Exact files changed
 
+- `lib/ai/contracts/types.ts`
+- `lib/ai/contracts/public.ts`
+- `lib/ai/prompts/registry.ts`
+- `lib/ai/providers/adapters.ts`
+- `lib/ai/services/aiService.ts`
+- `lib/translationStudio/professionalQuality/providerTransport.ts`
 - `lib/translationStudio/professionalQuality/liveProviderConfig.ts`
 - `lib/translationStudio/professionalQuality/liveProviderReadiness.ts`
-- `lib/translationStudio/professionalQuality/providerAudit.ts`
-- `lib/translationStudio/professionalQuality/benchmarkCorpus.ts`
-- `lib/translationStudio/professionalQuality/benchmarkRubrics.ts`
-- `lib/translationStudio/professionalQuality/benchmarkScoring.ts`
-- `lib/translationStudio/professionalQuality/benchmarkMatrix.ts`
-- `lib/translationStudio/professionalQuality/benchmarkRunner.ts`
-- `lib/translationStudio/professionalQuality/humanBenchmarkRating.ts`
+- `lib/translationStudio/professionalQuality/reviewSchema.ts`
+- `lib/translationStudio/professionalQuality/heuristicReviewer.ts`
+- `lib/translationStudio/professionalQuality/acceptanceBars.ts` (new)
+- `lib/translationStudio/professionalQuality/benchmarkPhases.ts` (new)
+- `lib/translationStudio/professionalQuality/benchmarkPreflight.ts` (new)
+- `lib/translationStudio/professionalQuality/humanBlindReview.ts` (new)
 - `lib/translationStudio/professionalQuality/index.ts`
+- `lib/translationStudio/translationStudioLiveAiProviderConfigurationAndBenchmark.test.ts` (new)
 - `lib/translationStudio/translationStudioLiveProfessionalAiProviderReadiness.test.ts`
-- `docs/translation/LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1.md`
+- `lib/translationStudio/translationStudioProfessionalAiReviewPipeline.test.ts`
+- `app/actions/translationStudioProfessionalGeneration.ts`
+- `app/actions/translationStudioProfessionalReview.ts`
+- `docs/translation/LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1.md` (new)
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -32,14 +45,16 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCH
 
 ## Security review
 
-- No credentials stored/committed
-- Readiness reports booleans/names only
-- Benchmark non-mutating; curated UI strings only
-- Provider config centralized; browser cannot inject models
+- No credentials requested, stored, or committed
+- Readiness never prints secret values
+- Benchmark non-mutating; curated UI corpus privacy check
+- Professional contracts forbid approve/publish/CoT
+- Browser cannot set generator/reviewer models
+- Studio actions now route live mode through dedicated professional capabilities
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — expect PASS (readiness suite included)
+`npx vitest run lib/translationStudio` — **226 passed**
 
 ## TypeScript
 
@@ -47,7 +62,7 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCH
 
 ## Build
 
-Not required (domain readiness/benchmark foundation).
+Not required (configuration/capability foundation).
 
 ## git diff --check
 
@@ -55,10 +70,10 @@ Not required (domain readiness/benchmark foundation).
 
 ## git status --short
 
-Expect clean after commit/push.
+Pending commit/push close-out.
 
 ## Open issues
 
-1. Live professional quality still requires dedicated generate/review capabilities
-   (translation_suggest schema gap).
-2. Dual-read gate remains WAITING_FOR_ADMIN_LOGIN (untouched).
+1. Dual-read gate remains WAITING_FOR_ADMIN_LOGIN (untouched).
+2. Anthropic/Local remain prompt+parse for structured JSON (weaker than OpenAI/Gemini).
+3. No live smoke until operator GO + credentials (next milestone prep only).

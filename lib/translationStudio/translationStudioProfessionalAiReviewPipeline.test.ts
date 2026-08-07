@@ -37,6 +37,8 @@ function cleanReviewerJson(overrides: Record<string, unknown> = {}) {
       consistency: 92,
       grammar_spelling: 95,
       locale_conventions: 92,
+      placeholder_integrity: 100,
+      formatting_integrity: 100,
     },
     findings: [],
     confidence: 0.6,
@@ -77,6 +79,8 @@ describe("professional AI review pipeline", () => {
           consistency: 80,
           grammar_spelling: 80,
           locale_conventions: 80,
+          placeholder_integrity: 100,
+          formatting_integrity: 100,
         },
         findings: [
           {
