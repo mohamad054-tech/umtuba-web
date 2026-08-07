@@ -114,6 +114,37 @@ export function formatAssessmentDueLocalInput(
   return d.toISOString().slice(0, 16);
 }
 
+/** Presentation-only due status for learner assessment delivery. */
+export type AssessmentDueDisplayStatus = "none" | "due" | "overdue";
+
+/**
+ * Classify assessment due_at for UI only.
+ * Does NOT authorize attempts, saves, submit, scoring, or completion.
+ * Boundary: due_at <= now => overdue; due_at > now => due.
+ */
+export function classifyAssessmentDueStatus(
+  dueAt: string | null | undefined,
+  now: Date = new Date()
+): AssessmentDueDisplayStatus {
+  if (dueAt == null || dueAt === "") return "none";
+  const ms = Date.parse(dueAt);
+  if (!Number.isFinite(ms)) return "none";
+  return ms <= now.getTime() ? "overdue" : "due";
+}
+
+/** Learner-facing due timestamp formatting (presentation only). */
+export function formatAssessmentDueDisplay(
+  dueAt: string | null | undefined
+): string {
+  if (!dueAt) return "";
+  const d = new Date(dueAt);
+  if (Number.isNaN(d.getTime())) return dueAt;
+  return d.toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+}
+
 function requireUuid(
   value: string,
   label: string
