@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P13` (… → aggregate registry facade → validator composition)
+- Phase: `P1`–`P14` (… → validator composition → flag evaluator)
 
 ## Phase P3 scope
 
@@ -163,3 +163,16 @@ Pure **validator composition** under `platforms/core/validation/`.
 Out of scope for P13: `UmDependencyValidator`, dependency resolver, cycle
 solver, SDK/runtime ports, persistence, networking, product integration,
 migrations.
+
+## Phase P14 scope
+
+Pure **catalog-backed flag evaluator** under `platforms/core/flag/`.
+
+- `createInMemoryFlagEvaluator({ flags })` implements `UmFlagEvaluator`
+- Unknown flags fail closed (`source: "unknown"`)
+- Known flags use P8 catalog `defaultState` only (`source: "default"`)
+- Begins runtime-port layer after control-plane completion at P13
+
+Out of scope for P14: overrides, cohorts, kill-switch execution,
+`UmCapabilityAsserter`, SDK, event publisher, health reporter, networking,
+persistence, product integration, migrations.

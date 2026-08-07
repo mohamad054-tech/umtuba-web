@@ -3,9 +3,12 @@
  *
  * P1: interfaces only.
  * P8: pure in-memory flag catalog (no evaluation runtime).
+ * P14: pure deterministic catalog-backed UmFlagEvaluator (default-state only).
  *
  * Policy law belongs to Core; meaning belongs to declaring platforms.
  * FLAG REGISTRATION IS NOT FLAG EVALUATION.
+ * FLAG EVALUATION IS NOT FLAG REGISTRATION.
+ * FLAG EVALUATION IS NOT CAPABILITY AUTHORIZATION.
  */
 
 import type { UmCapabilityId, UmFlagId, UmPlatformId } from "../identity/types";
@@ -103,7 +106,7 @@ export interface UmFlagRegistryDeps {
 
 /**
  * Evaluation context — intentionally abstract (no cohort vendor assumptions).
- * Used only by UmFlagEvaluator (NOT implemented in P8).
+ * Accepted by UmFlagEvaluator; P14 default-only policy ignores context fields.
  */
 export interface UmFlagEvaluationContext {
   readonly platformId?: UmPlatformId;
@@ -120,16 +123,28 @@ export interface UmFlagEvaluationResult {
   readonly flagId: UmFlagId;
   readonly enabled: boolean;
   readonly reasonCode?: string;
+  /**
+   * Result provenance.
+   * P14 produces only `"unknown"` | `"default"`.
+   * `"override"` / `"kill_switch"` are retained for future ports and are not emitted in P14.
+   */
   readonly source: "default" | "override" | "kill_switch" | "unknown";
 }
 
 /**
- * Flag evaluator — interface only (Standards: fail closed for elevated unknown).
- * P8 does NOT implement this.
+ * Flag evaluator — catalog-backed evaluation (Standards: fail closed for unknown).
+ * P14: default-state only; no overrides, cohorts, or kill-switch execution.
  */
 export interface UmFlagEvaluator {
   evaluate(request: UmFlagEvaluationRequest): UmFlagEvaluationResult;
   evaluateBatch(
     requests: readonly UmFlagEvaluationRequest[],
   ): readonly UmFlagEvaluationResult[];
+}
+
+/**
+ * Dependencies for the in-memory flag evaluator (P14).
+ */
+export interface UmFlagEvaluatorDeps {
+  readonly flags: UmFlagRegistry;
 }
