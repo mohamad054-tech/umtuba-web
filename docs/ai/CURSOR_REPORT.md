@@ -1,51 +1,46 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_DUAL_READ_RUNTIME_OBSERVATION_WIRING_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_QUALITY_FOUNDATION_V1
 
 ## Summary
 
-**Verdict: WAITING_FOR_ADMIN_LOGIN**
+**Verdict: PASS**
 
-Non-blocking dual-read observation is wired into Translation Studio
-**landing** and **key detail** admin pages via `next/server` `after()`,
-gated by `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE`. A process-local
-circuit breaker governs automatic observation only (JSON + shadow
-untouched).
+Pure application/domain foundation for professional translation quality:
+official terminology policy + seed, locale style guides, context packs,
+deterministic QA (incl. Arabic heuristics), quality gates/profiles,
+provider-neutral AI generator/reviewer contracts, two-pass workflow model,
+human-review escalation, memory ranking policy, compact quality reports,
+and non-mutating `evaluateProfessionalTranslationDraft` integration helper.
 
-Authenticated browser page smoke **not completed** — no platform-admin
-session (tabs on `/login`). Implementation + unit/breaker tests **PASS**.
+Persistence unchanged: `shadow_dual_write`, JSON authoritative, dual_read
+observe absent. Migration **NONE**. No auto-publish / approve. AI has no
+approve/publish authority.
 
-Observe remains **OFF**. Persistent `shadow_dual_write` remains **ON**.
-
-Next (not started): after admin login smoke, retry
-`TRANSLATION_STUDIO_DUAL_READ_CONTROLLED_ACTIVATION_GATE_V1_RETRY`.
+Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1`
 
 ## Exact files changed
 
-- `app/admin/translation-studio/scheduleDualReadObservation.ts` (new)
-- `app/admin/translation-studio/requireTranslationStudioAdmin.ts` — returns `{user,supabase}`
-- `app/admin/translation-studio/page.tsx` — schedule `landing`
-- `app/admin/translation-studio/keys/[keyId]/page.tsx` — schedule `key_detail`
-- `app/actions/translationStudioDualRead.ts` — breaker snapshot + reset action
-- `lib/translationStudio/persistence/dualReadObservation.ts` (new)
-- `lib/translationStudio/persistence/dualReadObservationBreaker.ts` (new)
-- `lib/translationStudio/persistence/dualReadJournal.ts` — auto/breaker outcomes
-- `lib/translationStudio/persistence/shadowReconciliationJournal.ts` — outcomes
-- `lib/translationStudio/index.ts` — exports
-- `lib/translationStudio/translationStudioDualReadObservation.test.ts` (new)
+- `lib/translationStudio/professionalQuality/**` (new module)
+- `lib/translationStudio/index.ts` — export barrel
+- `lib/translationStudio/translationStudioProfessionalQualityFoundation.test.ts` (new)
+- `docs/translation/PROFESSIONAL_TRANSLATION_QUALITY_V1.md` (new)
+- `docs/ai/CURSOR_REPORT.md` (this handoff)
 
 ## Migrations created
 
-**NONE.**
+**NONE.** Quality model is application-domain only over existing Studio data.
 
 ## Security review
 
-- No `service_role`; authenticated cookie client only for read RPC
-- Observe off by default; no anonymous RPC from unauthenticated pages
-- Breaker does not affect JSON authority or shadow writes
-- TI untouched; no schema/RLS/grant changes
+- No `service_role`; no provider keys in client/contracts
+- AI authority flags all `false` (cannot approve/publish)
+- Invalid AI payloads fail closed
+- No remote schema / RLS / grant changes
+- No dual_read activation; shadow dual-write preserved
+- Integration helper does not mutate Studio save/submit/approve flows
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **167 passed** (17 files)
+`npx vitest run lib/translationStudio` — **PASS** (180+ tests; quality foundation suite included)
 
 ## TypeScript
 
@@ -53,27 +48,18 @@ Next (not started): after admin login smoke, retry
 
 ## Build
 
-Not required (admin server helper + pages; no new UI chrome).
+Not required (domain foundation + tests/docs; no UI entry-point chrome).
 
 ## git diff --check
 
 **PASS**
 
-## git status — closeout note
+## git status --short
 
-Product commit: `5b5ad1956161a2638c0803c49377332e3f6ab86e`
-Expect clean tree after this docs commit + push.
+Expect clean tree after product commit + push (exclude `.env.local` /
+`store.json` / journal / backups).
 
 ## Open issues
 
-1. Need authenticated platform-admin browser session to complete live
-   landing/key observation smoke under temporary observe=true.
-2. Activation gate retry blocked until that smoke passes.
-
-### Architecture notes
-
-- Non-blocking: `after(() => runObservation)` — page returns JSON immediately
-- One slot per `surface:hash` per request (dedupe)
-- Breaker OPEN on auth / invalid_response / actionable drift; 2 consecutive
-  or 3 session transport/rpc/timeout failures
-- Reset: process restart or `resetTranslationStudioDualReadObservationBreakerAction`
+None blocking this foundation. Recommended next milestone only:
+`TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1` (do not start here).

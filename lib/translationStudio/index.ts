@@ -457,3 +457,5 @@ export {
   type RecordApprovedTranslationInput,
   type TranslationIntelligenceService,
 } from "./intelligence/service";
+
+export * from "./professionalQuality";
