@@ -1,6 +1,6 @@
 -- =============================================================================
 -- UM Learning OS — Learner Lesson Bookmarks / Saved Lessons V1
--- Migration: 20260914_learning_lesson_bookmarks_v1.sql
+-- Migration: 20260915_learning_lesson_bookmarks_v1.sql
 --
 -- Private per-learner lesson bookmarks. One row per (user, lesson).
 -- Distinct from Resume/Continue Learning and Personal Notes.
