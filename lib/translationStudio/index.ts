@@ -85,6 +85,29 @@ export {
   type WorkflowActor,
 } from "./workflow/workflowService";
 
+export type { StudioPersistencePort } from "./persistence/studioPersistencePort";
+
+export {
+  TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV,
+  TRANSLATION_STUDIO_PERSISTENCE_MODES,
+  isExecutableJsonPersistenceMode,
+  requestsDbBackedPersistence,
+  resolveTranslationStudioPersistenceMode,
+  type PersistenceModeResolution,
+  type TranslationStudioPersistenceMode,
+} from "./persistence/mode";
+
+export {
+  createEphemeralStudioPersistence,
+  createJsonStudioPersistence,
+  createNonDurableStudioPersistence,
+} from "./persistence/jsonStudioPersistence";
+
+export {
+  createDefaultStudioPersistence,
+  type StudioPersistenceSelection,
+} from "./persistence/createDefaultStudioPersistence";
+
 export {
   buildPublishContract,
   listPublishQueue,

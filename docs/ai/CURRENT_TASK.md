@@ -6,7 +6,9 @@ UMTUBA Translation Trunk Port V1 — remote migration apply + history CLOSED
 
 ## Milestone status
 
-`TRANSLATION_REMOTE_MIGRATION_APPLY_AND_HISTORY_V1_CLOSED`
+`TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1` — Phase 1 persistence port + mode gate (JSON-only)
+
+Previously closed: `TRANSLATION_REMOTE_MIGRATION_APPLY_AND_HISTORY_V1_CLOSED`
 
 ## Status
 
@@ -76,8 +78,14 @@ Runtime remains JSON file store — no JSON→DB switch.
 - Never touch Learning / Commerce / Collaboration / Billing
 - Do not switch runtime off JSON store without a dedicated readiness + GO milestone
 
+## Persistence activation progress
+
+- Readiness: `TRANSLATION_RUNTIME_PERSISTENCE_ACTIVATION_READINESS_V1` complete (NOT_READY for DB activation)
+- Phase 1 in progress / landed: `TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1`
+  - `StudioPersistencePort` + JSON adapter
+  - `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE` (only `json` executable; future modes fail closed to JSON)
+  - Runtime remains JSON-only — no DB reads/writes
+
 ## Next milestone
 
-`TRANSLATION_RUNTIME_PERSISTENCE_ACTIVATION_READINESS_V1`
-
-Begin with **analysis/readiness only**. Do **not** switch runtime, wire DB persistence into product paths, or migrate JSON→DB in that first readiness pass without a separate explicit GO.
+`TRANSLATION_STUDIO_STABLE_ID_AND_WRITE_RPC_DESIGN_V1` (or equivalent ID strategy + RPC design) — **not started**. Do **not** create SQL/RPCs/importers without a separate GO.

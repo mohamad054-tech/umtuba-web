@@ -2,11 +2,8 @@ import { createStubTranslationAiPort } from "../ai/translationAiPort";
 import { getTranslationIntelligenceService } from "../intelligence/service";
 import { createProvenance, createUsageRights } from "../intelligence/provenance";
 import { sourceFingerprint } from "../normalize";
-import {
-  readPersistedStudioState,
-  resolveStudioDataDir,
-  writePersistedStudioState,
-} from "../persistence/fileStore";
+import { createDefaultStudioPersistence } from "../persistence/createDefaultStudioPersistence";
+import type { StudioPersistencePort } from "../persistence/studioPersistencePort";
 import { buildSeedPersistedState } from "../persistence/seed";
 import {
   assertTransitionTranslationStatus,
@@ -23,7 +20,6 @@ import type {
   StudioSnapshot,
   StudioTranslationValue,
   TranslationSuggestion,
-  TranslationValueStatus,
   TranslationVersionRecord,
 } from "../types";
 
@@ -87,13 +83,19 @@ export function createTranslationStudioWorkflow(options?: {
   dataDir?: string;
   /** When true, never reads/writes disk — pure in-memory (tests). */
   ephemeral?: boolean;
+  /** Injected persistence port (defaults to JSON via mode gate). */
+  persistence?: StudioPersistencePort;
 }): TranslationStudioWorkflow {
-  const dataDir = resolveStudioDataDir(options?.dataDir);
   const ephemeral = options?.ephemeral === true;
+  const persistence: StudioPersistencePort =
+    options?.persistence ??
+    createDefaultStudioPersistence({
+      dataDir: options?.dataDir,
+      ephemeral,
+    }).persistence;
 
   let state: PersistedStudioState =
-    (!ephemeral ? readPersistedStudioState(dataDir) : null) ??
-    buildSeedPersistedState();
+    persistence.load() ?? buildSeedPersistedState();
 
   const seq = {
     n:
@@ -106,9 +108,7 @@ export function createTranslationStudioWorkflow(options?: {
 
   function save(): void {
     state = { ...state, updatedAt: new Date().toISOString() };
-    if (!ephemeral) {
-      writePersistedStudioState(dataDir, state);
-    }
+    persistence.save(state);
   }
 
   function audit(
@@ -223,7 +223,7 @@ export function createTranslationStudioWorkflow(options?: {
     },
     reload() {
       if (ephemeral) return;
-      state = readPersistedStudioState(dataDir) ?? buildSeedPersistedState();
+      state = persistence.load() ?? buildSeedPersistedState();
     },
     persist() {
       save();
