@@ -2,33 +2,30 @@
 
 ## ACTIVE FEATURE BRANCH (not SoT)
 
-- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_MUTATION_RUNTIME_V1`
+- **Milestone closed on branch:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_MUTATION_RUNTIME_REMOTE_APPLY_V1`
 - **Branch:** `office/collaboration-workspace-resource-link-mutation-runtime-v1`
-- **Base SoT HEAD:** `9e140fd4642f5f2bd0b304d3956bdba1028f1e84`
+- **HEAD (feature tip before docs closeout):** `8711bd31d5e3e1cf49db735f69ffbad233f43f4e`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
 - **Do not merge to SoT in this task.**
 
-## Goal
+## Status
 
-Authenticated Collaboration-internal mutation runtime for workspace resource links
-over existing `collaboration_workspace_resource_links`. SECURITY DEFINER RPCs
-required (authenticated grants are SELECT-only). Migration created locally only —
-**do not apply remotely**. No product bindings. Platform flag stays `false`.
+- Migration `20260919` = **APPLIED + VERIFIED** on linked UMTUBA project (`tgucwnjwoyeqoxqaxmew` / umtuba)
+- RPCs remote:
+  - `create_collaboration_workspace_resource_link`
+  - `update_collaboration_workspace_resource_link`
+  - `delete_collaboration_workspace_resource_link`
+- Authenticated direct table writes remain **prohibited** (SELECT-only + FORCE RLS)
+- Product bindings remain deferred
+- Platform flag remains default `false`
+- Feature branch is **ready for SoT integration** (separate milestone)
 
-## Allowed scope
+## Do NOT start automatically
 
-- `lib/collaboration/workspaceResourceLinkMutationRuntime.ts` (+ tests)
-- spine RPC name exports if needed
-- local migration `20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql`
-- `docs/ai/CURRENT_TASK.md` / `CURSOR_REPORT.md`
-
-## Forbidden scope
-
+- SoT integration
 - Learning / Commerce / advertiser bindings
 - Platform flag enablement
-- Remote migration apply
-- Broad UI / invite expansion / smoke-keepalive / UM Core P17
-- Touching `20260898` or `20260917`
+- UM Core P17
 
 ## CLOSED ON SoT (do not redo)
 

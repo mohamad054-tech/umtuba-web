@@ -1,61 +1,50 @@
-# CURSOR_REPORT — Collaboration Workspace Resource Link Mutation Runtime V1
+# CURSOR_REPORT — Resource Link Mutation Runtime remote apply V1
 
 ## Summary
 
-**CLOSED** — Authenticated mutation runtime for workspace resource links via
-SECURITY DEFINER RPCs (local migration `20260919`). Table grants remain
-SELECT-only. No remote apply. No product bindings. Platform flag default `false`.
-Not merged to Collaboration SoT.
+**CLOSED** — Targeted remote apply of `20260919` to linked UMTUBA project.
+Three SECURITY DEFINER mutation RPCs verified. Authenticated table grants remain
+SELECT-only. Platform flag default `false`. Not merged to Collaboration SoT.
 
-## Exact files changed
+## Apply method
 
-- `supabase/migrations/20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql` (new, local only)
-- `lib/collaboration/workspaceResourceLinkMutationRuntime.ts` (new)
-- `lib/collaboration/workspaceResourceLinkMutationRuntime.test.ts` (new)
-- `lib/collaboration/workspaceSpineFoundation.ts` (RPC name exports)
+1. Preflight: project `umtuba` / `tgucwnjwoyeqoxqaxmew` linked; `20260919` absent remotely; target RPCs absent; FORCE RLS + SELECT-only confirmed.
+2. Apply SQL: `npx supabase db query --linked -f supabase/migrations/20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql`
+3. Register history (target-only): `npx supabase migration repair --linked --status applied 20260919`
+4. No `db push`. No unrelated versions repaired/applied.
+
+## Remote verification
+
+- History: `20260919` / `collaboration_workspace_resource_link_mutation_runtime_v1` registered once; max version `20260919`
+- RPCs: create / update / delete exist; SECURITY DEFINER; `search_path=public`
+- EXECUTE: authenticated + service_role; anon denied
+- Table: FORCE RLS still true; authenticated SELECT-only (no INSERT/UPDATE/DELETE)
+
+## Exact files changed (docs closeout)
+
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-YES — `20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql` (NOT applied)
+None in this milestone (apply-only).
+
+## Migrations applied
+
+YES — `20260919` only.
 
 ## Security review
 
-- No direct authenticated INSERT/UPDATE/DELETE grants
-- SECURITY DEFINER RPCs with `search_path = public`, `auth.uid()` required
-- Authorization via `can_manage_collaboration_workspace` (owner/admin/platform admin)
-- Unique `(resource_type, resource_id)` conflict mapped explicitly
-- Error sanitization for auth/permission/duplicate/not-found
-- No service-role in user-facing runtime
-- No Learning/Commerce/advertiser binding
+- No direct authenticated table writes enabled
+- Authorization remains via `can_manage_collaboration_workspace`
+- No product bindings
+- No platform flag change
 
 ## Tests
 
-- mutation runtime — 10/10 PASS
-- resource link foundation — 11/11 PASS
-- platform gate — 7/7 PASS
-- spine foundation — 12/12 PASS
-- Total focused: 40/40 PASS
-
-## TypeScript
-
-`npx tsc --noEmit` — PASS
-
-## Build
-
-Not required (lib + migration only).
-
-## git diff --check
-
-PASS
-
-## git status --short
-
-Clean after commit/push (see closeout).
+Focused 40/40 PASS; `tsc --noEmit` PASS
 
 ## Open issues
 
-- Migration `20260919` not applied remotely
+- SoT integration of mutation runtime branch
 - Product bindings deferred
-- No UI / SoT integration in this milestone
