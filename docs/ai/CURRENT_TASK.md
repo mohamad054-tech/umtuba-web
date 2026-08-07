@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Validator Composition Foundation P13
+UM Core Flag Evaluator Foundation P14
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Validator Composition Foundation P13
 
 ## Branch
 
-`office/um-core-platform-validator-composition-foundation-p13`
+`office/um-core-platform-flag-evaluator-foundation-p14`
 
 ## Base HEAD
 
-`6a7c0d60cfe895f5ca374e7524fcb859f6edb001` (Aggregate Registry Facade Foundation P12 close)
+`a16d2ccf9d16d67ef5ed8e5005f030ad60773442` (Validator Composition Foundation P13 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-validator-composition-foundation-p13`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-flag-evaluator-foundation-p14`
 
 ## Milestone
 
-`um.core.validator_composition_foundation_p13`
+`um.core.flag_evaluator_foundation_p14`
 
 ## Allowed scope
 
-- `platforms/core/validation/**`
+- `platforms/core/flag/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,15 +36,15 @@ UM Core Validator Composition Foundation P13
 
 ## Forbidden scope
 
-- `UmDependencyValidator` / dependency resolver / second dependency registry
-- P9 behavior changes / P12 facade changes
-- SDK / runtime ports / networking / persistence / migrations / product wiring
-- P14 and later milestones
+- Overrides / cohorts / kill-switch execution / remote config
+- `UmCapabilityAsserter` / SDK / other runtime ports
+- `UmDependencyValidator` / P9/P13 changes
+- Persistence / networking / migrations / product wiring
+- P15 and later milestones
 
 ## Delivered
 
-Model C `createUmCoreValidator` composing P2 validators with pure
-registry-backed dependency completeness/drift review. No resolution, no
-second registry, no SDK/runtime.
-Committed and pushed on `office/um-core-platform-validator-composition-foundation-p13`.
-Do not start P14 from this handoff.
+Pure catalog-backed `createInMemoryFlagEvaluator` implementing `UmFlagEvaluator`
+with fail-closed unknown and default-state-only known evaluation.
+Committed and pushed on `office/um-core-platform-flag-evaluator-foundation-p14`.
+Do not start P15 from this handoff.
