@@ -1,8 +1,8 @@
-﻿# CURSOR_REPORT — Pre-reboot Collaboration Save
+# CURSOR_REPORT — Pre-reboot Collaboration Save
 
 ## Summary
 
-Collaboration Settings & Lifecycle UI V1 closed and pushed. Laptop reboot save point recorded. Migration `20260898` is in git and **not** applied to remote DB.
+Collaboration Settings & Lifecycle UI V1 closed and pushed. Laptop reboot save point recorded. Migration `20260917` is in git and **not** applied to remote DB.
 
 ## CURRENT LAPTOP SOURCE OF TRUTH
 
@@ -20,7 +20,7 @@ Collaboration Settings & Lifecycle UI V1 closed and pushed. Laptop reboot save p
 | Membership Runtime V1 | `c3bf87e` + remote `20260897` |
 | UI Foundation V1 | `cfd8a28` |
 | Handoff docs | `b002402` |
-| Settings & Lifecycle UI V1 | `6b60205` + local migration `20260898` (**DB NOT APPLIED**) |
+| Settings & Lifecycle UI V1 | `6b60205` + local migration `20260917` (**DB NOT APPLIED**) |
 
 ## FLAG
 
@@ -32,7 +32,7 @@ desktop-owned — do not touch
 
 ## NEXT
 
-1. Optional: apply `20260898` with explicit GO  
+1. Optional: apply `20260917` with explicit GO  
 2. Else: next Collaboration milestone gate (TBD)
 
 ## Pre-reboot residuals (not pushed as part of this save unless separately handled)
@@ -43,4 +43,4 @@ desktop-owned — do not touch
 
 ## Shutdown
 
-Collaboration feature tip is **SAFE_TO_REBOOT** (pushed). Do not apply `20260898` without GO.
+Collaboration feature tip is **SAFE_TO_REBOOT** (pushed). Do not apply `20260917` without GO.

@@ -15,11 +15,11 @@
 - Collaboration Workspace Spine Foundation V1 — `321e7e8` (remote `20260896`)
 - Collaboration Workspace Membership Runtime V1 — `c3bf87e` (remote `20260897`)
 - Collaboration Workspace UI Foundation V1 — `cfd8a28` (flag default=false)
-- Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration `20260898` in git; **remote DB NOT APPLIED**)
+- Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration `20260917` in git; **remote DB NOT APPLIED**)
 
 ### Next on laptop
 
-Human GO: apply `20260898` **or** gate next Collaboration milestone (TBD).
+Human GO: apply `20260917` **or** gate next Collaboration milestone (TBD).
 
 ### Commerce on laptop
 

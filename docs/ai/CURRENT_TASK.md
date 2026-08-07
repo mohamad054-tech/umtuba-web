@@ -1,4 +1,4 @@
-﻿# Current Task
+# Current Task
 
 ## CURRENT LAPTOP SOURCE OF TRUTH (2026-08-03 reboot save)
 
@@ -24,7 +24,7 @@
 | --- | --- |
 | `20260896` spine foundation | **APPLIED** |
 | `20260897` membership runtime | **APPLIED** |
-| `20260898` settings lifecycle UI | **NOT APPLIED** (file is in git; do not apply until explicit GO) |
+| `20260917` settings lifecycle UI | **NOT APPLIED** (file is in git; do not apply until explicit GO) |
 
 ## COLLABORATION FLAG
 
@@ -39,7 +39,7 @@
 
 Decide with human:
 
-1. **Apply** migration `20260898` remotely (explicit GO required), **or**
+1. **Apply** migration `20260917` remotely (explicit GO required), **or**
 2. Gate / start the **next Collaboration milestone** after Settings & Lifecycle UI V1 (TBD — do not invent without docs/approval)
 
 ## Pre-reboot dirty leftovers (not Collaboration SoT)
@@ -52,4 +52,4 @@ Decide with human:
 
 ## Status
 
-**SAFE_TO_REBOOT** for Collaboration feature tip (`6b60205` pushed). Migration `20260898` remains **NOT APPLIED**.
+**SAFE_TO_REBOOT** for Collaboration feature tip (`6b60205` pushed). Migration `20260917` remains **NOT APPLIED**.

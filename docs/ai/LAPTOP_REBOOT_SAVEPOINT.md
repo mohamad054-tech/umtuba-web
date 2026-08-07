@@ -11,12 +11,12 @@
 | Commit | `6b60205dfb01168552ff6344523ec3e8b22eb70e` |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 | Sync | `0 0` with origin at feature closeout |
-| Migration `20260898` | In git; **remote DB NOT APPLIED** |
+| Migration `20260917` | In git; **remote DB NOT APPLIED** |
 | Flag | `COLLABORATION_PLATFORM_ENABLED` default false |
 
 ## Do NOT on resume without GO
 
-- Apply `20260898` remotely
+- Apply `20260917` remotely
 - Touch Commerce worktrees
 - Merge unrelated branches
 

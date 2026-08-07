@@ -19,12 +19,12 @@
 3. Collaboration Workspace Membership & Invitation Runtime V1 — `c3bf87e` (migration `20260897` applied remote)
 4. Collaboration Workspace UI Foundation V1 — `cfd8a28` (flag default=false; exposure gate)
 5. Collaboration laptop handoff docs — `b002402`
-6. Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration file `20260898` in repo; **DB NOT APPLIED**)
+6. Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration file `20260917` in repo; **DB NOT APPLIED**)
 
 ## REMOTE MIGRATIONS
 
 - Applied: `20260896`, `20260897`
-- **NOT APPLIED:** `20260898`
+- **NOT APPLIED:** `20260917`
 
 ## COLLABORATION FLAG
 
@@ -38,7 +38,7 @@ default = **false**
 
 Human decision after reboot:
 
-- Apply `20260898` remotely (explicit GO), **or**
+- Apply `20260917` remotely (explicit GO), **or**
 - Gate/start next Collaboration milestone (TBD)
 
 ## Resume commands

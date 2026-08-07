@@ -23,7 +23,7 @@ import {
 
 const ROOT = process.cwd();
 const SETTINGS_MIGRATION =
-  "supabase/migrations/20260898_collaboration_workspace_settings_lifecycle_ui_v1.sql";
+  "supabase/migrations/20260917_collaboration_workspace_settings_lifecycle_ui_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
