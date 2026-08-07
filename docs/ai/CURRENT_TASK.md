@@ -1,44 +1,43 @@
-﻿# Current Task
+# CURRENT_TASK
 
-## Task title
+## Task
 
-UM Learning — Lesson Bookmarks / Saved Lessons V1
+LEARNING_STRUCTURED_COURSE_IMPORT_FOUNDATION_V1
 
 ## Status
 
-`implementation-complete` — local commit pending push / remote apply; **no remote apply**.
+`implementation-complete-pending-review`
 
-## Milestone
+## Branch
 
-`learning.learner.lesson_bookmarks_v1`
+`office/learning-structured-course-import-foundation-v1`
+
+## Worktree
+
+`D:\umtuba-central\repos\umtuba-web-learning-structured-course-import-foundation-v1`
+
+## Base
+
+Learning SoT `office/learning-resume-accessible-target-hardening-v1` @ `da676abda659b8de6caae8a7ddf4c3835c0c79ea`
 
 ## Migration
 
-`supabase/migrations/20260916_learning_lesson_bookmarks_v1.sql`
+`20260918_learning_structured_course_import_foundation_v1.sql`
+**Centrally reserved.** **NOT remote-applied.**
 
-## Scope landed
+## Scope
 
-- Private `learning_lesson_bookmarks` table + RLS
-- save / delete / state / list RPCs
-- Lesson Viewer Save lesson / Remove from saved control (`canRender` only)
-- Saved Lessons hub `/learning/saved` + Learning hub nav link
-- Adapter, server actions, docs, focused tests
+- Course Manifest V1 types + validation + dry-run planner
+- Draft-first importer via existing create_* RPCs
+- Import run ledger + external-id map (migration)
+- Operator CLI validate/dry-run/import-draft
+- Synthetic fixture + docs
+- Tests
 
-## Branch / worktree
+## Forbidden / not done
 
-`office/learning-lesson-bookmarks-v1`  
-`D:\umtuba-central\repos\umtuba-web-learning-lesson-bookmarks-v1`  
-Base: `2c3b97f258b315ae4bc42af4b3ae11fc0ec20a49`
-
-## Explicitly out of scope
-
-- Remote apply / migration repair / `db push`
-- Social `/saved` / Store Favorites
-- Personal Notes / Resume / progress semantics
-- Instructor browse-all
-- Folders / tags / sharing / AI
-- Commerce / Translation / Collaboration / Billing / UEOS / Guardian
-
-## Recommended next
-
-Feature branch push + SoT FF when validation PASS; remote apply of `20260916` only on explicit GO.
+- Real course ingestion
+- Auto-publish / catalog public
+- Learning SoT FF
+- Remote migration apply
+- ≥20260919 allocation

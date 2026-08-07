@@ -1,0 +1,78 @@
+{
+  "manifest_version": "umtuba.learning.course_manifest.v1",
+  "program_id": "00000000-0000-4000-8000-000000000001",
+  "course": {
+    "external_id": "synth.course.welcome",
+    "title": "Synthetic Welcome Course",
+    "slug": "synthetic-welcome-course",
+    "description": "Small synthetic course for Course Manifest V1 demos.",
+    "visibility_intent": "private",
+    "publication_intent": "draft",
+    "default_language": "en",
+    "sections": [
+      {
+        "external_id": "synth.section.intro",
+        "title": "Introduction",
+        "slug": "introduction",
+        "lessons": [
+          {
+            "external_id": "synth.lesson.start",
+            "title": "Getting Started",
+            "slug": "getting-started",
+            "content_blocks": [
+              {
+                "external_id": "synth.block.heading",
+                "type": "heading",
+                "content": { "text": "Welcome", "level": 2 }
+              },
+              {
+                "external_id": "synth.block.rich",
+                "type": "rich_text",
+                "content": { "text": "Synthetic lesson body.", "format": "plain" }
+              },
+              {
+                "external_id": "synth.block.image",
+                "type": "image",
+                "content": { "url": "https://cdn.example.com/learning/synth/diagram.png", "alt": "Diagram" }
+              },
+              {
+                "external_id": "synth.block.pdf",
+                "type": "pdf",
+                "content": { "url": "https://cdn.example.com/learning/synth/handout.pdf", "title": "Handout" }
+              }
+            ],
+            "activities": [
+              {
+                "external_id": "synth.activity.quiz1",
+                "type": "quiz",
+                "title": "Warm-up Quiz",
+                "slug": "warm-up-quiz",
+                "questions": [
+                  {
+                    "external_id": "synth.q1",
+                    "prompt": "Is draft-first import the default?",
+                    "question_type": "single_choice",
+                    "choices": [
+                      { "id": "a", "label": "Yes" },
+                      { "id": "b", "label": "No" }
+                    ],
+                    "answer_key": { "correct_choice_ids": ["a"] },
+                    "points": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "resources": [
+      {
+        "external_id": "synth.resource.syllabus",
+        "title": "Syllabus PDF",
+        "resource_kind": "pdf",
+        "url": "https://cdn.example.com/learning/synth/syllabus.pdf"
+      }
+    ]
+  }
+}
