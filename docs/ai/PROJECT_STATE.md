@@ -6,45 +6,37 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Commit | see `docs/ai/CURRENT_TASK.md` (canonical tip after SoT clarify) |
+| Commit | see tip after remote-apply verify/closeout docs commit (base `8b7ee1e`) |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
-### Closed on laptop (Collaboration)
+### Closed (Collaboration)
 
-- Spine Foundation V1 — `321e7e8` (remote `20260896`)
-- Membership Runtime V1 — `c3bf87e` (remote `20260897`)
-- UI Foundation V1 — `cfd8a28` (flag default=false)
-- Settings & Lifecycle UI V1 — `6b60205` (migration now `20260917` at tip; **remote DB NOT APPLIED**)
-- Migration reallocation — `1d05d92` (`20260898` → `20260917`)
+- Settings & Lifecycle UI V1 feature + reallocation to `20260917`
+- SoT clarify @ `8b7ee1e`
+- **`20260917` remote dependency = APPLIED + VERIFIED (CLOSED)** — no further apply
 
 ### Ops forks (NOT SoT)
 
-- Smoke E2E on settings tip — `850421d`
-- Platform gate keepalive — `807550e`
-- Do not use `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724` (superseded)
+- Smoke / keepalive — NOT SoT; stale Collaboration `20260898` filename = DO NOT APPLY
+- Remote `20260898` belongs to Commerce
+- Superseded alternate @ `f5ab724` — do not use
+
+### History drift note
+
+Remote `schema_migrations` names for versions `20260896`/`20260897` may not match Collaboration git filenames. That is **not** a reason to re-apply or repair history in this closeout.
 
 ### Next
 
-Human GO: apply `20260917` **or** gate next Collaboration milestone (TBD).
+Collaboration Workspace Member Role Management UI V1
 
 ### UM Core (separate)
 
-P16 Event Publisher closed @ `3120432`. Do not start P17 from this handoff.
+P16 @ `3120432` closed. Do not start P17 from this handoff.
 
-### Commerce on laptop
+### Commerce
 
 **Owned by desktop — do not touch.**
-
-See also: `docs/ai/CURRENT_TASK.md`, `docs/ai/SESSION_HANDOFF.md`, `docs/ai/CURSOR_REPORT.md`, `docs/ai/LAPTOP_REBOOT_SAVEPOINT.md`.
-
-## Project
-
-**UMTUBA** (`umtuba-web`)
 
 ## Primary working branch
 
 `office/collaboration-workspace-settings-lifecycle-ui-v1` (Collaboration SoT)
-
-## Learning chapter status
-
-**Learning V1 is officially APPROVED and FROZEN** (2026-07-27).

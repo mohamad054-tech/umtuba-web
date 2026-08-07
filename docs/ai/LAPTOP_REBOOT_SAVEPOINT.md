@@ -1,47 +1,32 @@
 # Laptop Central Handoff Savepoint — 2026-08-07
 
-**Purpose:** Clear Collaboration SoT ambiguity before central coordination / laptop restart.
+**Purpose:** Settings Lifecycle remote dependency closed via verify/closeout (no SQL re-apply).
 
 ## Collaboration SoT (canonical)
 
 | Item | Value |
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | `1d05d92` + SoT-clarify docs commit on same branch |
+| Tip | `8b7ee1e` + remote-apply verify/closeout docs commit |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
-| Migration `20260917` | In git on SoT; **remote DB NOT APPLIED** |
+| Migration `20260917` | **APPLIED + VERIFIED** — no further apply |
 | Flag | `COLLABORATION_PLATFORM_ENABLED` default false |
 
 ## Not SoT (accounted)
 
-| Ref | SHA | Notes |
-| --- | --- | --- |
-| smoke-e2e branch | `850421d` | Ops only; stale `20260898` |
-| keepalive branch | `807550e` | Ops only; local tracking `0 0` |
-| gate-docs local branch | `807550e` | Duplicate of keepalive tip |
-| `collaboration-settings-lifecycle-ui-v1` (no workspace) | `f5ab724` | Superseded divergent — unsafe |
-
-## UM Core
-
-| Item | Value |
+| Ref | Notes |
 | --- | --- |
-| Branch | `office/um-core-platform-event-publisher-foundation-p16` |
-| Tip | `3120432` |
-| Status | CLOSED / READY; P17 not started |
+| smoke / keepalive | NOT SoT; stale Collaboration `20260898` filename = **DO NOT APPLY** |
+| remote `20260898` | Commerce `store_seller_live_payout_provider_v1` |
+| `collaboration-settings-lifecycle-ui-v1` (no workspace) @ `f5ab724` | Superseded — unsafe |
 
-## Do NOT without GO
+## Do NOT
 
-- Apply `20260917` (or stale `20260898`) remotely
-- Touch Commerce worktrees
-- Merge smoke/keepalive into SoT
-- Start UM Core P17
+- Re-apply `20260917`
+- Apply stale Collaboration `20260898` from ops forks
+- Repair/re-apply `20260896`/`20260897` due to remote history name drift
+- Touch Commerce / start UM Core P17 / use keepalive as SoT
 
-## After resume
+## Next product milestone
 
-```powershell
-Set-Location "C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1"
-git fetch origin
-git status -sb
-git rev-parse HEAD
-# expect SoT clarify tip on settings-lifecycle branch; ahead/behind 0 0
-```
+Collaboration Workspace Member Role Management UI V1

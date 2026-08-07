@@ -1,56 +1,45 @@
-# CURSOR_REPORT — Collaboration SoT clarify for central handoff
+# CURSOR_REPORT — Settings Lifecycle remote apply verify/closeout V1
 
 ## Summary
 
-Clarified Collaboration canonical tip after central migration reallocation
-`20260898` → `20260917` (`1d05d92`). Classified smoke/keepalive as ops
-non-SoT forks. Local keepalive fast-forwarded + upstream set. No migration
-apply. No Commerce touch. No UM Core P17.
+**CLOSED** — Verified (read-only) that canonical migration `20260917` is already
+registered remotely and RPC `update_collaboration_workspace_settings` matches
+expected signature/security/grants. Docs updated to APPLIED + VERIFIED.
+**No SQL apply. No migration history mutation.**
 
 ## CURRENT COLLABORATION SOURCE OF TRUTH
 
 - Branch: `office/collaboration-workspace-settings-lifecycle-ui-v1`
 - Remote: `origin/office/collaboration-workspace-settings-lifecycle-ui-v1`
-- Commit: `1d05d92cfc1e207124c56479127e09ba3275109f` (after this docs commit: newer)
+- Base HEAD before closeout: `8b7ee1ee0bb79680bfb947ab240479a1338e5bdc`
 - Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
-- Sync target: `0 0` after push
 
-## Tip chain
+## Verification (read-only)
 
-| SHA | Meaning |
-| --- | --- |
-| `6b60205` | Settings & Lifecycle UI V1 feature close |
-| `6ea0634` | Reboot handoff docs |
-| `1d05d92` | Migration reallocation to `20260917` (canonical pre-clarify tip) |
+- Remote `schema_migrations`: `20260917` / `collaboration_workspace_settings_lifecycle_ui_v1`
+- RPC: `update_collaboration_workspace_settings(... ) → jsonb`
+- Security: DEFINER + `search_path=public`
+- Grants: authenticated + service_role EXECUTE; anon/public denied
+- Remote `20260898` = Commerce `store_seller_live_payout_provider_v1`
+- SoT has no Collaboration `20260898` file
+- Platform flag default `false`
 
-## Non-SoT classifications
+## Migrations status (docs truth)
 
-- Smoke `850421d` — ops readiness; NOT SoT; stale `20260898` filename
-- Keepalive `807550e` — gate keepalive; NOT SoT; stale `20260898` filename
-- Local gate-docs branch @ `807550e` — duplicate of keepalive tip; NOT SoT
-- `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724` — SUPERSEDED divergent alternate
+- `20260917` = **APPLIED + VERIFIED** (no further apply)
+- Collaboration stale `20260898` on ops forks = **DO NOT APPLY**
+- Do not re-apply / repair `20260896`/`20260897` due to remote history name drift
 
-## Migrations
+## Non-SoT
 
-- Applied remote: `20260896`, `20260897`
-- Pending (SoT): `20260917` — **NOT APPLIED**
-- Do not apply stale `20260898` from smoke/keepalive forks
-
-## UM Core
-
-- P16 closed @ `3120432` on `office/um-core-platform-event-publisher-foundation-p16`
-- P17 not started
+- Smoke / keepalive = NOT SoT
+- Superseded alternate `collaboration-settings-lifecycle-ui-v1` @ `f5ab724`
 
 ## FLAG
 
 `COLLABORATION_PLATFORM_ENABLED` default **false**
 
-## COMMERCE
-
-desktop-owned — do not touch
-
 ## NEXT
 
-1. Optional: apply `20260917` with explicit GO
-2. Else: next Collaboration milestone gate (TBD)
-3. Do not integrate smoke/keepalive into SoT without explicit GO
+Collaboration Workspace Member Role Management UI V1 (product).  
+Do not start from keepalive/smoke. Do not start UM Core P17 here.

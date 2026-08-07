@@ -1,57 +1,44 @@
 # Session Handoff — UMTUBA Laptop Collaboration Platform
 
-**Updated:** 2026-08-07 (central handoff SoT clarify)
+**Updated:** 2026-08-07 (settings lifecycle remote apply verify/closeout)
 
 ## CURRENT COLLABORATION SOURCE OF TRUTH
 
 | Item | Value |
 | --- | --- |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip base | `1d05d92` + this clarify docs commit |
+| Tip base | `8b7ee1e` + this closeout docs commit |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Sync | expect `0 0` after push |
 
-## CLOSED MILESTONES
+## CLOSED
 
-1. Spine Foundation V1 — `321e7e8` (`20260896` applied remote)
-2. Membership & Invitation Runtime V1 — `c3bf87e` (`20260897` applied remote)
-3. UI Foundation V1 — `cfd8a28` (flag default=false)
-4. Laptop handoff docs — `b002402`
-5. Settings & Lifecycle UI V1 — `6b60205`
-6. Migration reallocation to `20260917` — `1d05d92`
+1. Spine / Membership / UI Foundation / Settings & Lifecycle UI feature
+2. Migration reallocation to `20260917` (`1d05d92`)
+3. SoT clarify (`8b7ee1e`)
+4. **Remote apply verify/closeout** — `20260917` **APPLIED + VERIFIED** (no re-apply)
 
 ## OPS FORKS (NOT SoT)
 
-- Smoke E2E readiness — `office/collaboration-smoke-e2e-on-settings-tip-v1` @ `850421d`
-- Platform gate keepalive — `office/collaboration-platform-gate-keepalive-v1` @ `807550e` (local upstream set; `0 0`)
-- Superseded alternate: `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724` — **DO NOT USE**
+- Smoke / keepalive — NOT SoT; may still carry stale Collaboration `20260898` filename (**DO NOT APPLY**)
+- Superseded: `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724`
 
 ## REMOTE MIGRATIONS
 
-- Applied: `20260896`, `20260897`
-- **NOT APPLIED (canonical):** `20260917`
-- Stale name on ops forks only: `20260898` — do not apply
+- `20260917` = **APPLIED + VERIFIED** (`collaboration_workspace_settings_lifecycle_ui_v1`)
+- Remote `20260898` = Commerce (`store_seller_live_payout_provider_v1`)
+- Do **not** re-apply or repair `20260896`/`20260897` because remote history names differ from Collaboration git filenames
 
-## COLLABORATION FLAG
+## FLAG
 
 default = **false**
 
-## UM CORE
+## NEXT
 
-P16 @ `3120432` closed. P17 not started.
+Collaboration Workspace Member Role Management UI V1
 
-## COMMERCE
-
-**LOCKED_FOR_DESKTOP** — do not touch on laptop.
-
-## NEXT TASK
-
-- Apply `20260917` remotely (explicit GO), **or**
-- Gate/start next Collaboration milestone (TBD)
-- Do not merge smoke/keepalive into SoT without explicit integration GO
-
-## Resume commands
+## Resume
 
 ```powershell
 Set-Location "C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1"
