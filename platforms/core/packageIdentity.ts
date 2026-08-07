@@ -52,5 +52,8 @@ export const UM_CORE_VALIDATOR_COMPOSITION_PHASE = "P13" as const;
 /** Flag evaluator foundation phase. */
 export const UM_CORE_FLAG_EVALUATOR_PHASE = "P14" as const;
 
+/** Capability asserter foundation phase. */
+export const UM_CORE_CAPABILITY_ASSERTER_PHASE = "P15" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;

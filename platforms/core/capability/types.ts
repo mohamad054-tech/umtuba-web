@@ -3,9 +3,14 @@
  *
  * P1: interfaces only.
  * P5: pure in-memory capability registry (no execution/persistence).
+ * P15: pure deterministic UmCapabilityAsserter over P5 + P14.
+ *
+ * CAPABILITY ASSERTION IS NOT USER AUTHORIZATION.
+ * CAPABILITY ASSERTION IS NOT FLAG EVALUATION.
  */
 
 import type { UmComplianceStatus } from "../compliance/types";
+import type { UmFlagEvaluator } from "../flag/types";
 import type {
   UmArtifactStability,
   UmAuthClass,
@@ -109,13 +114,14 @@ export interface UmInMemoryCapabilityRegistry extends UmCapabilityRegistry {
 }
 
 /**
- * Capability assertion port (SDK-facing) — interface only.
- * Fail-closed semantics are required by Spec; enforcement is later phases.
+ * Capability assertion port (SDK-facing).
+ * P15: result-returning availability check over P5 + P14 (fail closed).
+ * Does not throw; does not perform user/RBAC authorization.
  */
 export interface UmCapabilityAsserter {
   /**
-   * Assert a capability is lawfully usable in the current exposure context.
-   * MUST fail closed when unknown/disabled/incompatible (Spec §2.5).
+   * Report whether a capability is lawfully available in the current Core state.
+   * MUST fail closed when unknown/disabled/unresolved (Spec §2.5).
    */
   assertEnabled(capabilityId: UmCapabilityId): UmCapabilityAssertionResult;
 }
@@ -126,4 +132,12 @@ export interface UmCapabilityAssertionResult {
   readonly reasonCode?: string;
   readonly flagId?: UmFlagId;
   readonly stability?: UmArtifactStability;
+}
+
+/**
+ * Dependencies for the in-memory capability asserter (P15).
+ */
+export interface UmCapabilityAsserterDeps {
+  readonly capabilities: UmCapabilityRegistry;
+  readonly flags: UmFlagEvaluator;
 }
