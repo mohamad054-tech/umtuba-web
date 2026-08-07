@@ -33,8 +33,8 @@ export const AI_CORE_PROVIDER_AUDIT_V1: SupportedProviderAuditEntry[] = [
     usableViaTranslationSuggestToday: true,
     professionalQualityFitToday: "transport_only",
     gaps: [
-      "translation_suggest schema lacks professional review fields",
-      "aiService strips richer JSON",
+      "Dedicated professional generate/review capabilities registered",
+      "Live credentials still required for paid smoke (not activated)",
     ],
   },
   {
@@ -53,7 +53,7 @@ export const AI_CORE_PROVIDER_AUDIT_V1: SupportedProviderAuditEntry[] = [
     professionalQualityFitToday: "transport_only",
     gaps: [
       "Dual Gemini adapter implementations risk drift",
-      "Same translation_suggest schema gap",
+      "Dedicated professional caps available; live not activated",
     ],
   },
   {
@@ -73,7 +73,7 @@ export const AI_CORE_PROVIDER_AUDIT_V1: SupportedProviderAuditEntry[] = [
     professionalQualityFitToday: "transport_only",
     gaps: [
       "Weaker structured JSON reliability vs OpenAI/Gemini",
-      "Professional schema not dedicated",
+      "Dedicated professional caps available; prefer as later independent reviewer",
     ],
   },
   {
@@ -87,7 +87,7 @@ export const AI_CORE_PROVIDER_AUDIT_V1: SupportedProviderAuditEntry[] = [
     secretHandling: "Optional Bearer; requires BASE_URL+MODEL",
     usableViaTranslationSuggestToday: true,
     professionalQualityFitToday: "transport_only",
-    gaps: ["No response_format; quality depends on local model"],
+    gaps: ["No response_format; not recommended for first live smoke"],
   },
   {
     providerId: "stub",
@@ -98,9 +98,9 @@ export const AI_CORE_PROVIDER_AUDIT_V1: SupportedProviderAuditEntry[] = [
     timeoutBehavior: "N/A",
     retryBehavior: "N/A",
     secretHandling: "N/A",
-    usableViaTranslationSuggestToday: false,
-    professionalQualityFitToday: "no",
-    gaps: ["No translation_suggest stub fixture — fails closed"],
+    usableViaTranslationSuggestToday: true,
+    professionalQualityFitToday: "transport_only",
+    gaps: ["Offline/CI fixtures only — not a live provider"],
   },
 ];
 

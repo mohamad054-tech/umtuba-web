@@ -1,42 +1,29 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1
 
 ## Summary
 
 **Verdict: PASS**
 
-Dedicated professional AI Core capabilities
-(`platform.translation_professional_generate` /
-`platform.translation_professional_review`) preserve rich structured payloads
-end-to-end. `platform.translation_suggest` remains backwards-compatible. Live
-provider **not** activated; readiness overall `LIVE_PROVIDER_NOT_CONFIGURED`.
-Migration **NONE**. Shadow dual-write preserved. Dual-read observe OFF. No
-credentials requested or committed. No winner declared.
+Locked 5-case small-smoke package, readiness/cost/privacy gates, offline
+five-case proof (`SMOKE_PASS`), CLI helper. Live provider remains
+`LIVE_PROVIDER_NOT_CONFIGURED`. No credentials. No paid calls. No Studio
+mutation. Migration **NONE**. Shadow dual-write preserved.
 
-Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1`
+Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_EXECUTION_V1`
 
 ## Exact files changed
 
-- `lib/ai/contracts/types.ts`
-- `lib/ai/contracts/public.ts`
-- `lib/ai/prompts/registry.ts`
-- `lib/ai/providers/adapters.ts`
-- `lib/ai/services/aiService.ts`
-- `lib/translationStudio/professionalQuality/providerTransport.ts`
-- `lib/translationStudio/professionalQuality/liveProviderConfig.ts`
-- `lib/translationStudio/professionalQuality/liveProviderReadiness.ts`
-- `lib/translationStudio/professionalQuality/reviewSchema.ts`
-- `lib/translationStudio/professionalQuality/heuristicReviewer.ts`
-- `lib/translationStudio/professionalQuality/acceptanceBars.ts` (new)
-- `lib/translationStudio/professionalQuality/benchmarkPhases.ts` (new)
-- `lib/translationStudio/professionalQuality/benchmarkPreflight.ts` (new)
-- `lib/translationStudio/professionalQuality/humanBlindReview.ts` (new)
+- `lib/translationStudio/professionalQuality/smallSmokePackage.ts` (new)
+- `lib/translationStudio/professionalQuality/smallSmokeEligibility.ts` (new)
+- `lib/translationStudio/professionalQuality/smallSmokeRunner.ts` (new)
+- `lib/translationStudio/professionalQuality/benchmarkPhases.ts`
+- `lib/translationStudio/professionalQuality/glossaryAwareGenerator.ts`
+- `lib/translationStudio/professionalQuality/providerAudit.ts`
 - `lib/translationStudio/professionalQuality/index.ts`
-- `lib/translationStudio/translationStudioLiveAiProviderConfigurationAndBenchmark.test.ts` (new)
-- `lib/translationStudio/translationStudioLiveProfessionalAiProviderReadiness.test.ts`
-- `lib/translationStudio/translationStudioProfessionalAiReviewPipeline.test.ts`
-- `app/actions/translationStudioProfessionalGeneration.ts`
-- `app/actions/translationStudioProfessionalReview.ts`
-- `docs/translation/LIVE_AI_PROVIDER_CONFIGURATION_AND_BENCHMARK_V1.md` (new)
+- `lib/translationStudio/translationStudioLiveAiProviderSmallSmokePrep.test.ts` (new)
+- `scripts/translation/professionalProviderSmoke.ts` (new)
+- `package.json`
+- `docs/translation/LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1.md` (new)
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -45,16 +32,16 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1`
 
 ## Security review
 
-- No credentials requested, stored, or committed
-- Readiness never prints secret values
-- Benchmark non-mutating; curated UI corpus privacy check
-- Professional contracts forbid approve/publish/CoT
-- Browser cannot set generator/reviewer models
-- Studio actions now route live mode through dedicated professional capabilities
+- No credentials requested/added
+- Readiness/CLI never print secrets
+- Smoke non-mutating; privacy preflight PASS
+- Live path refuses without GO + LIVE_BENCHMARK_READY
+- Blind human artifacts hide provider labels by default
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **226 passed**
+`npx vitest run lib/translationStudio` — **237 passed**  
+Offline CLI: `npm run translation:provider-smoke` — **SMOKE_PASS**
 
 ## TypeScript
 
@@ -62,7 +49,7 @@ Next (not started): `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_PREP_V1`
 
 ## Build
 
-Not required (configuration/capability foundation).
+Not required.
 
 ## git diff --check
 
@@ -70,10 +57,9 @@ Not required (configuration/capability foundation).
 
 ## git status --short
 
-Pending commit/push close-out.
+Expect clean after commit/push.
 
 ## Open issues
 
-1. Dual-read gate remains WAITING_FOR_ADMIN_LOGIN (untouched).
-2. Anthropic/Local remain prompt+parse for structured JSON (weaker than OpenAI/Gemini).
-3. No live smoke until operator GO + credentials (next milestone prep only).
+1. Dual-read gate WAITING_FOR_ADMIN_LOGIN (untouched).
+2. Live smoke execution deferred to next milestone (credentials may be required there).

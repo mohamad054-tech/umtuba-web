@@ -59,11 +59,11 @@ export const LIVE_BENCHMARK_PHASES: LiveBenchmarkPhasePlan[] = [
   },
 ];
 
-/** Smoke case ids for Phase A (subset of corpus). */
+/** Smoke case ids for Phase A (subset of corpus) — locked order. */
 export const PHASE_A_SMOKE_CASE_IDS = [
   "appshell_back",
   "appshell_cancel",
+  "collab_workspace",
   "commerce_refund",
   "ph_hello_name",
-  "collab_workspace",
 ] as const;

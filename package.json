@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "translation:provider-smoke": "npx tsx scripts/translation/professionalProviderSmoke.ts --phase small --offline",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once",
     "media:worker": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser",

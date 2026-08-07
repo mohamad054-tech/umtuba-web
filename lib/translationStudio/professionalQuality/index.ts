@@ -48,3 +48,6 @@ export * from "./benchmarkPhases";
 export * from "./acceptanceBars";
 export * from "./benchmarkPreflight";
 export * from "./humanBlindReview";
+export * from "./smallSmokePackage";
+export * from "./smallSmokeEligibility";
+export * from "./smallSmokeRunner";
