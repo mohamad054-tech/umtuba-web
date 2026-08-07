@@ -2,13 +2,15 @@
 
 ## Task
 
-Commerce Partial Refund Provider Money Execution V1 — **CHECKPOINT + CENTRAL HANDOFF**
+Commerce Partial Refund Provider Money Execution V1 — **IMPLEMENTATION CLOSED**
 
 ## Status
 
-**CHECKPOINTED / NOT CLOSED** — state **`P6R_BLOCKED_NO_TEST_CONFIG`**
+**`PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSED`**
 
-Local direct milestone progression is **PAUSED**. Central server/coordinator owns next-task and migration allocation. Do **not** start P6R2 until assigned.
+Approved closeout: **`CLOSE_IMPLEMENTATION_DEFER_TEST_ACTIVATION`**.
+
+Not production-enabled. No Stripe TEST/LIVE refund executed. Gates OFF / execution mode `off`.
 
 ## Setup
 
@@ -16,11 +18,16 @@ Local direct milestone progression is **PAUSED**. Central server/coordinator own
 | --- | --- |
 | Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-provider-money-execution-v1` |
 | Branch | `office/commerce-partial-refund-provider-money-execution-v1` |
-| Base | `b8be33469f35c5ccb394925d666a5812f4c70c70` |
-| Remote migration | `20260915` APPLIED |
+| Checkpoint | `8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c` |
+| Remote migration | `20260915` APPLIED + VERIFIED |
 | Gates | OFF / execution mode `off` |
-| Handoff | `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md` |
+| Closeout report | `docs/store/implementation/COMMERCE_PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSEOUT_REPORT.md` |
 
-## Next
+## Next (coordinator-owned only — DO NOT START)
 
-Await central coordinator assignment (recommended: P6R2 isolated Stripe TEST fixture/env).
+| Field | Value |
+| --- | --- |
+| Milestone | **Commerce Partial Refund Provider Money Activation & Test Validation V1** |
+| Status | **`WAITING_CENTRAL_COORDINATOR_ASSIGNMENT`** |
+
+Desktop must not self-start activation. Requires isolated Stripe TEST configuration/environment + explicit coordinator GO.

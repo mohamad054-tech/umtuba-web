@@ -2,25 +2,39 @@
 
 ## Summary
 
-**`COMMERCE_PROVIDER_MONEY_CENTRAL_SERVER_HANDOFF_REPORT`** — Commerce Partial Refund Provider Money Execution V1 **checkpointed** at `P6R_BLOCKED_NO_TEST_CONFIG`. Remote `20260915` applied; gates OFF; no Stripe refund executed. Central coordinator handoff published; Desktop did not assign/start next task.
+**`COMMERCE_PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSEOUT_REPORT`**
+
+Formal implementation closeout under **`CLOSE_IMPLEMENTATION_DEFER_TEST_ACTIVATION`**.
+Final state: **`PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSED`**.
+
+Not production-enabled. No Stripe TEST/LIVE refund executed. Gates OFF / mode `off`.
+Stripe activation deferred to coordinator-owned **Activation & Test Validation V1** (`WAITING_CENTRAL_COORDINATOR_ASSIGNMENT`). Desktop did not start it.
 
 ## Exact files changed
 
-Full P0–P6R milestone tree + `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md` + AI state docs. See commit.
+- `lib/store/partialRefundProviderMoneyExecution/partialRefundProviderMoneyExecution.p7.test.ts` (new)
+- `docs/store/implementation/COMMERCE_PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_P7_HARDENING_REPORT.md` (new)
+- `docs/store/implementation/COMMERCE_PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSEOUT_REPORT.md` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md`
+- `docs/store/implementation/PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1.md`
 
 ## Migrations created
 
-`20260915_store_partial_refund_provider_money_execution_v1.sql` (remote APPLIED).
+None. Active Commerce provider-money migration remains only `20260915_store_partial_refund_provider_money_execution_v1.sql` (remote APPLIED).
 
 ## Security review
 
 - Gates default OFF; execution mode `off`
-- service_role-only RPCs; no secrets in tree
-- No money movement
+- service_role-only RPCs; platform-admin actions
+- No secrets staged; no Stripe network; no money movement
+- Activation intentionally not started
 
 ## Tests
 
-Test Files **18** passed / Tests **235** passed.
+Test Files **19** passed / Tests **246** passed (includes P7 hardening).
 
 ## TypeScript
 
@@ -28,7 +42,7 @@ Test Files **18** passed / Tests **235** passed.
 
 ## Build
 
-N/A for checkpoint GO.
+N/A for closeout GO.
 
 ## git diff --check
 
@@ -36,8 +50,8 @@ PASS
 
 ## git status --short
 
-Clean after checkpoint commit/push (expected).
+Clean after closeout commit/push (expected).
 
 ## Open issues
 
-P6R2 isolated Stripe TEST fixture/env — **coordinator-assigned only**. Milestone not CLOSED.
+Next milestone **Commerce Partial Refund Provider Money Activation & Test Validation V1** waiting central coordinator assignment. Blocker: isolated Stripe TEST config/environment.

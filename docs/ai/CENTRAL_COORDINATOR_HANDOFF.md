@@ -2,7 +2,7 @@
 
 **Authority:** The central server/coordinator is the sole task-allocation and migration-reservation authority for UMTUBA workstreams.
 
-**Desktop local progression:** **PAUSED** after this Commerce checkpoint. Agents must not self-start the next milestone or self-select migration versions.
+**Desktop local progression:** **PAUSED**. Implementation milestone is CLOSED. Agents must **not** self-start activation or self-select migration versions.
 
 ---
 
@@ -11,14 +11,41 @@
 | Field | Value |
 | --- | --- |
 | Milestone | **Commerce Partial Refund Provider Money Execution V1** |
-| State | **`P6R_BLOCKED_NO_TEST_CONFIG`** â€” checkpointed, **not CLOSED** |
+| State | **`PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSED`** |
+| Closeout decision | **`CLOSE_IMPLEMENTATION_DEFER_TEST_ACTIVATION`** |
 | Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-provider-money-execution-v1` |
 | Branch | `office/commerce-partial-refund-provider-money-execution-v1` |
-| Base SHA | `b8be33469f35c5ccb394925d666a5812f4c70c70` |
+| Checkpoint SHA | `8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c` |
+| Final commit SHA | `(see branch tip after P8 push)` |
 | Project | `umtuba` / `tgucwnjwoyeqoxqaxmew` |
-| Remote migration | **`20260915`** `store_partial_refund_provider_money_execution_v1` â€” **APPLIED + VERIFIED** |
-| Local validation | **235** tests / **18** files PASS; `tsc --noEmit` PASS |
-| Final commit SHA | `(see branch tip / git rev-parse HEAD)` |
+| Remote migration | **`20260915`** `store_partial_refund_provider_money_execution_v1` — **APPLIED + VERIFIED** (Commerce-owned) |
+| New migration requested | **NONE** |
+| Production-enabled | **NO** |
+| Stripe TEST refund executed | **NO** |
+| Stripe LIVE refund executed | **NO** |
+| Live readiness claimed | **NO** |
+
+---
+
+## Implementation complete (closed)
+
+* Provider execution persistence deployed (`20260915`)
+* Service-role repository complete
+* Trusted PaymentIntent resolution complete
+* Stable idempotency `prf-prov:{ledgerId}`
+* First-submit orchestration complete
+* Unknown outcome → uncertain / recovery
+* Recovery LOOKUP ONLY
+* No blind resubmit (P7 hardened)
+* Admin execute / recovery surfaces complete
+* Gates / execution mode fail-closed by default
+* P7 hardening complete
+
+## Deferred activation prerequisite
+
+**`Stripe Test/Production Activation & Validation`**
+
+Requires centrally assigned isolated TEST configuration/environment. The closed implementation milestone does **not** automatically transition into activation.
 
 ---
 
@@ -39,25 +66,34 @@
 | --- | --- |
 | `20260908` | Learning `learning_personal_notes_hub_v1` |
 | `20260909` | Learning `learning_assessment_due_ux_followthrough_v1` |
-| `20260910`â€“`20260914` | Translation (through `translation_studio_memory_identity_contract_align_v1`) |
-| `20260915` | Commerce `store_partial_refund_provider_money_execution_v1` |
+| `20260910`–`20260914` | Translation (through `translation_studio_memory_identity_contract_align_v1`) |
+| `20260915` | Commerce `store_partial_refund_provider_money_execution_v1` (**APPLIED**) |
 
 **CRITICAL RULE:** Remote absence (`schema_migrations` count = 0) does **NOT** mean a version is free. Active origin branches, Desktop worktrees, uncommitted drafts, and CURRENT_TASK/handoff reservations **MUST** be checked before allocation.
 
+**Activation milestone:** currently requires **no new migration allocation** unless future design proves otherwise.
+
 ---
-
-## Commerce P6 blocker
-
-- No Stripe TEST configuration in local Desktop environments
-- No safe isolated test PaymentIntent
-- No committed test ledger fixture
-- Shared primary project is not approved for artificial money fixtures without explicit authorization
 
 ## Exact next Commerce task (DO NOT START until coordinator assigns)
 
-**`P6R2 â€” isolated Stripe TEST fixture/environment preparation`**
+| Field | Value |
+| --- | --- |
+| Milestone | **Commerce Partial Refund Provider Money Activation & Test Validation V1** |
+| Status | **`WAITING_CENTRAL_COORDINATOR_ASSIGNMENT`** |
+| Blocker | Stripe TEST credentials / isolated safe fixture environment absent |
 
-Then, only after a filled safe fixture manifest: re-issue **P6** test-mode dry-run under temporary gates with mandatory post-run OFF.
+Future activation task must separately own:
+
+* isolated Stripe TEST configuration
+* isolated safe fixture/environment
+* TEST dry-run
+* idempotency confirmation against Stripe
+* recovery confirmation where applicable
+* production enablement review
+* explicit coordinator GO before any live activation
+
+Desktop must **not** self-start this milestone.
 
 ---
 
@@ -96,10 +132,10 @@ Minimal reservation fields:
 | Field | Notes |
 | --- | --- |
 | version | e.g. `20260916` |
-| workstream | Learning / Translation / Commerce / â€¦ |
+| workstream | Learning / Translation / Commerce / … |
 | milestone | name |
 | agent/device | owner |
-| branch | office/â€¦ |
+| branch | office/… |
 | status | `RESERVED` \| `LOCAL_DRAFT` \| `APPLIED` \| `RELEASED` |
 | timestamp / update reference | |
 
@@ -146,12 +182,15 @@ Every agent reports back:
 | --- | --- |
 | repository | `umtuba-web` |
 | pushed branch | `office/commerce-partial-refund-provider-money-execution-v1` |
-| final commit SHA | `(see branch tip / git rev-parse HEAD)` |
+| final commit SHA | `(see branch tip after P8 push)` |
 | milestone | Commerce Partial Refund Provider Money Execution V1 |
-| milestone state | `P6R_BLOCKED_NO_TEST_CONFIG` (checkpointed, not CLOSED) |
-| remote migration | `20260915` APPLIED |
-| blocked next task | P6R2 (coordinator-assigned only) |
+| milestone state | `PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1_IMPLEMENTATION_CLOSED` |
+| remote migration | `20260915` APPLIED (Commerce-owned) |
+| new migration requested | NONE |
+| next milestone | Commerce Partial Refund Provider Money Activation & Test Validation V1 |
+| next status | `WAITING_CENTRAL_COORDINATOR_ASSIGNMENT` |
+| activation blocker | Stripe TEST credentials / isolated fixture env |
 | gates | OFF / execution mode `off` |
 | this document | `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md` |
 
-Desktop did **not** assign or start the next task.
+Desktop did **not** assign or start the activation milestone.
