@@ -109,6 +109,12 @@ export {
 } from "./persistence/createDefaultStudioPersistence";
 
 export {
+  TRANSLATION_STUDIO_WRITE_RPC_V1,
+  type TranslationStudioUpsertSnapshotOptions,
+  type TranslationStudioUpsertSnapshotResult,
+} from "./persistence/writeRpcContract";
+
+export {
   buildPublishContract,
   listPublishQueue,
   type PublishCatalogRecord,
