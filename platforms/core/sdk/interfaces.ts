@@ -52,7 +52,7 @@ export type UmSdkFlagEvaluate = (
 
 export type UmSdkPublishEvent = <TPayload>(
   event: UmPlatformEventEnvelope<TPayload>,
-) => void;
+) => ReturnType<UmEventPublisher["publish"]>;
 
 export type UmSdkReportHealth = (snapshot: UmHealthSnapshot) => void;
 

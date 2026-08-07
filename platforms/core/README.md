@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P15` (… → flag evaluator → capability asserter)
+- Phase: `P1`–`P16` (… → capability asserter → event publisher)
 
 ## Phase P3 scope
 
@@ -189,3 +189,17 @@ Pure **capability availability asserter** under `platforms/core/capability/`.
 Out of scope for P15: user/RBAC authorization, SDK, event publisher, health
 reporter, dependency validator, networking, persistence, product integration,
 migrations.
+
+## Phase P16 scope
+
+Pure **P6-backed event publish admission** under `platforms/core/event/`.
+
+- `createInMemoryEventPublisher({ eventTypes })` implements `UmEventPublisher`
+- Validates envelope structure + catalog producer/schemaVersion/subject kind
+- Returns deterministic `UmEventPublishResult` (admission only)
+- Payload remains opaque; caller supplies ids/timestamps
+
+Out of scope for P16: event delivery/bus, P7 routing execution, consumer
+dispatch, queue/outbox/retry/DLQ, schema runtime, HealthReporter,
+DependencyValidator, SDK client/factory, networking, persistence, product
+integration, migrations.
