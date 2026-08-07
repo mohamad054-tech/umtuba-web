@@ -34,11 +34,16 @@ export type ChromeNavPresentation = {
   featureFlag?: string;
 };
 
-/** Desktop primary chrome order (matches Platform Navigation Contract). */
+/**
+ * Desktop primary chrome order (U1 Global Shell / Navigation Coherence).
+ * Canonical labels: Home (not Discover), World (not Map), Store (not Commerce).
+ * Collaboration/Workspaces deferred — route absent on this baseline (HOLD).
+ */
 export const DESKTOP_MAIN_PRESENTATION: readonly ChromeNavPresentation[] = [
   { chromeId: "home", pageId: "platform.home", label: "Home" },
   { chromeId: "world", pageId: "world", label: "World" },
   { chromeId: "learning", pageId: "learning", label: "Learning" },
+  { chromeId: "store", pageId: "store", label: "Store" },
   { chromeId: "live", pageId: "live", label: "Live" },
   { chromeId: "messages", pageId: "messages", label: "Messages" },
 ] as const;
@@ -54,7 +59,11 @@ export const MOBILE_MAIN_PRESENTATION: readonly ChromeNavPresentation[] = [
   { chromeId: "profile", pageId: "profile", label: "Profile" },
 ] as const;
 
-/** Authenticated user menu — You group. */
+/**
+ * Authenticated user menu — You group.
+ * U1: World + Store listed here for mobile discovery (bottom nav capacity frozen;
+ * Mobile World Affordance Decision V1 keeps World/Store off mobile primary tabs).
+ */
 export const USER_MENU_YOU_PRESENTATION: readonly ChromeNavPresentation[] = [
   {
     chromeId: "profile",
@@ -70,6 +79,8 @@ export const USER_MENU_YOU_PRESENTATION: readonly ChromeNavPresentation[] = [
   },
   { chromeId: "saved", pageId: "saved", label: "Saved" },
   { chromeId: "learning", pageId: "learning", label: "Learning" },
+  { chromeId: "store", pageId: "store", label: "Store" },
+  { chromeId: "world", pageId: "world", label: "World" },
   {
     chromeId: "instructor",
     pageId: "learning.instructor",
@@ -88,7 +99,6 @@ export const USER_MENU_YOU_PRESENTATION: readonly ChromeNavPresentation[] = [
 export const USER_MENU_ACCOUNT_PRESENTATION: readonly ChromeNavPresentation[] =
   [
     { chromeId: "settings", pageId: "settings", label: "Settings" },
-    { chromeId: "store", pageId: "store", label: "Store" },
     {
       chromeId: "seller",
       pageId: "seller",

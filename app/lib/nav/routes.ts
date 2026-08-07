@@ -87,7 +87,8 @@ export type AppRouteHref =
   | (typeof APP_ROUTES)["live"]
   | (typeof APP_ROUTES)["messages"]
   | (typeof APP_ROUTES)["worldDiscovery"]
-  | (typeof APP_ROUTES)["learning"];
+  | (typeof APP_ROUTES)["learning"]
+  | (typeof APP_ROUTES)["store"];
 
 export type AppNavItem = {
   label: string;

@@ -33,6 +33,7 @@ describe("UMTUBA Main & User Navigation Wiring V1", () => {
       "/",
       "/world",
       "/learning",
+      "/store",
       "/live",
       "/messages",
     ]);

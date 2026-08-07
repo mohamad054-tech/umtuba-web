@@ -3035,7 +3035,7 @@ export const PAGE_REGISTRY: readonly PageRegistryEntry[] = [
     section: "storefront",
     audience: "public",
     access: "public",
-    navigationVisibility: "secondary",
+    navigationVisibility: "primary",
     adminOnly: false,
     authenticated: false,
     dynamic: false,
