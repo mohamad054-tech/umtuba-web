@@ -165,9 +165,48 @@ export {
 
 export {
   createStudioShadowWriteQueue,
+  type StudioShadowIdleDrainResult,
   type StudioShadowWriteQueue,
   type StudioShadowWriteQueueOptions,
 } from "./persistence/shadowWriteQueue";
+
+export {
+  SHADOW_SMOKE_ALLOW_ENV,
+  SHADOW_SMOKE_V1_DEFAULT_DRAIN_MS,
+  SHADOW_SMOKE_V1_IDS,
+  SHADOW_SMOKE_V1_JSON_FILENAME,
+  SHADOW_SMOKE_V1_PREFIX,
+} from "./smoke/shadowSmokeV1Constants";
+
+export {
+  assertIsolatedShadowSmokeGates,
+  isShadowSmokeAllowEnabled,
+  type ShadowSmokeGateFailureCode,
+  type ShadowSmokeGateResult,
+} from "./smoke/shadowSmokeV1Gates";
+
+export {
+  assertOnlyShadowSmokeV1Identities,
+  buildShadowSmokeV1State,
+  listShadowSmokeV1StableIds,
+  type BuildShadowSmokeV1StateOptions,
+} from "./smoke/buildShadowSmokeV1State";
+
+export {
+  cleanupShadowSmokeV1JsonLocal,
+  createShadowSmokeV1JsonPersistence,
+  resolveNormalStudioStoreJsonPath,
+  resolveShadowSmokeV1JsonPath,
+} from "./smoke/shadowSmokeV1Persistence";
+
+export {
+  runIsolatedShadowSmokeV1,
+  type IsolatedShadowSmokeV1Failure,
+  type IsolatedShadowSmokeV1Result,
+  type IsolatedShadowSmokeV1SafeEvent,
+  type IsolatedShadowSmokeV1Success,
+  type RunIsolatedShadowSmokeV1Input,
+} from "./smoke/runIsolatedShadowSmokeV1";
 
 export {
   buildPublishContract,

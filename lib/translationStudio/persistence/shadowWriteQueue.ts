@@ -41,6 +41,8 @@ export type StudioShadowWriteQueueOptions = {
   delay?: (ms: number) => Promise<void>;
 };
 
+export type StudioShadowIdleDrainResult = "idle" | "timeout";
+
 export type StudioShadowWriteQueue = {
   /**
    * Enqueue after authoritative JSON save.
@@ -57,6 +59,11 @@ export type StudioShadowWriteQueue = {
   skipNoTransport(): number;
   /** Test helper: wait until idle (no in-flight / pending). */
   whenIdle(): Promise<void>;
+  /**
+   * Bounded idle wait for controlled smoke / tests.
+   * Does not block ordinary save callers; never throws on timeout.
+   */
+  whenIdleBounded(timeoutMs: number): Promise<StudioShadowIdleDrainResult>;
   /** Current monotonic sequence (last assigned). */
   readonly lastSeq: number;
 };
@@ -250,6 +257,29 @@ export function createStudioShadowWriteQueue(
       if (!inFlight && !pending) return Promise.resolve();
       return new Promise<void>((resolve) => {
         idleWaiters.push(resolve);
+      });
+    },
+    whenIdleBounded(timeoutMs: number) {
+      const ms = Number.isFinite(timeoutMs) ? Math.max(0, timeoutMs) : 0;
+      if (!inFlight && !pending) {
+        return Promise.resolve("idle" as const);
+      }
+      return new Promise<StudioShadowIdleDrainResult>((resolve) => {
+        let settled = false;
+        const onIdle = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve("idle");
+        };
+        const timer = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          const idx = idleWaiters.indexOf(onIdle);
+          if (idx >= 0) idleWaiters.splice(idx, 1);
+          resolve("timeout");
+        }, ms);
+        idleWaiters.push(onIdle);
       });
     },
   };

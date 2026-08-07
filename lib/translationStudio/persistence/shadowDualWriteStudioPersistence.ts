@@ -19,7 +19,10 @@ import {
   noopStudioShadowObserver,
   type StudioShadowObserver,
 } from "./shadowObserver";
-import { createStudioShadowWriteQueue } from "./shadowWriteQueue";
+import {
+  createStudioShadowWriteQueue,
+  type StudioShadowIdleDrainResult,
+} from "./shadowWriteQueue";
 import { getStudioShadowWriteTransport } from "./shadowWriteContext";
 import type { TranslationStudioWriteRpcTransport } from "./writeRpcTransport";
 
@@ -27,6 +30,13 @@ export type ShadowDualWriteStudioPersistence = StudioPersistencePort & {
   readonly kind: "shadow_dual_write";
   /** Test helper. */
   whenShadowIdle(): Promise<void>;
+  /**
+   * Bounded drain for controlled smoke / tests only.
+   * Does not alter synchronous save semantics.
+   */
+  whenShadowIdleBounded(
+    timeoutMs: number
+  ): Promise<StudioShadowIdleDrainResult>;
   readonly lastShadowSeq: number;
 };
 
@@ -92,6 +102,9 @@ export function createShadowDualWriteStudioPersistence(
     },
     whenShadowIdle() {
       return queue.whenIdle();
+    },
+    whenShadowIdleBounded(timeoutMs: number) {
+      return queue.whenIdleBounded(timeoutMs);
     },
     get lastShadowSeq() {
       return queue.lastSeq;
