@@ -1,9 +1,13 @@
 /**
- * Default Studio persistence factory — mode gate + JSON adapter only.
- * DB adapter (`createDbStudioPersistence`) is intentionally not selected here.
+ * Default Studio persistence factory — mode gate + JSON or shadow dual-write.
+ *
+ * Deletion/pruning note (shadow V1):
+ * Remote DB remains append/upsert-only. JSON removals may leave stale DB rows.
+ * DB is not authoritative; no prune/delete reconciliation in V1.
  */
 
 import {
+  isExecutableShadowDualWriteMode,
   resolveTranslationStudioPersistenceMode,
   type PersistenceModeResolution,
 } from "./mode";
@@ -12,15 +16,14 @@ import {
   createNonDurableStudioPersistence,
   type JsonStudioPersistenceOptions,
 } from "./jsonStudioPersistence";
+import { createShadowDualWriteStudioPersistence } from "./shadowDualWriteStudioPersistence";
 import type { StudioPersistencePort } from "./studioPersistencePort";
+import type { StudioShadowObserver } from "./shadowObserver";
+import type { TranslationStudioWriteRpcTransport } from "./writeRpcTransport";
 
 export type StudioPersistenceSelection = {
   resolution: PersistenceModeResolution;
-  /**
-   * Runtime default remains `json` only.
-   * DB adapter is injectable separately; never auto-selected by this factory.
-   */
-  implementation: "json";
+  implementation: "json" | "shadow_dual_write";
   persistence: StudioPersistencePort;
 };
 
@@ -29,6 +32,10 @@ export function createDefaultStudioPersistence(options?: {
   dataDir?: string;
   /** When true, use non-durable port (tests). */
   ephemeral?: boolean;
+  /** Optional observer for shadow mode. */
+  shadowObserver?: StudioShadowObserver;
+  /** Optional transport resolver (defaults to request ALS). */
+  getShadowTransport?: () => TranslationStudioWriteRpcTransport | null;
 }): StudioPersistenceSelection {
   const resolution = resolveTranslationStudioPersistenceMode(options?.env);
   if (options?.ephemeral) {
@@ -42,12 +49,25 @@ export function createDefaultStudioPersistence(options?: {
   const jsonOptions: JsonStudioPersistenceOptions = {
     dataDir: options?.dataDir,
   };
+  const json = createJsonStudioPersistence(jsonOptions);
 
-  // Unsupported/invalid modes fail closed to JSON.
-  // Never construct or activate the DB adapter from the default factory.
+  if (isExecutableShadowDualWriteMode(resolution)) {
+    return {
+      resolution,
+      implementation: "shadow_dual_write",
+      persistence: createShadowDualWriteStudioPersistence({
+        json,
+        observer: options?.shadowObserver,
+        getTransport: options?.getShadowTransport,
+        logToConsole: options?.shadowObserver == null,
+      }),
+    };
+  }
+
+  // unsupported/invalid → JSON fail-closed
   return {
     resolution,
     implementation: "json",
-    persistence: createJsonStudioPersistence(jsonOptions),
+    persistence: json,
   };
 }

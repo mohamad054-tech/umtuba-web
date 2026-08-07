@@ -6,9 +6,16 @@ import {
   ADMIN_STORE_UNAUTHORIZED,
   assertPlatformAdminDb,
 } from "../../lib/store/adminAuth";
-import { getTranslationStudioWorkflow } from "../../lib/translationStudio";
+import {
+  createSupabaseWriteRpcTransport,
+  getTranslationStudioWorkflow,
+  runWithStudioShadowWriteTransport,
+  runWithStudioShadowWriteTransportAsync,
+} from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
+import type { User } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const STUDIO_BASE = "/admin/translation-studio";
 
@@ -22,7 +29,10 @@ function revalidateStudio(keyId?: string) {
   }
 }
 
-async function requireStudioAdmin() {
+async function requireStudioAdmin(): Promise<{
+  user: User;
+  supabase: SupabaseClient;
+}> {
   const user = await getServerUser();
   if (!user) {
     redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(STUDIO_BASE)}`);
@@ -34,7 +44,7 @@ async function requireStudioAdmin() {
       `${APP_ROUTES.home}?error=${encodeURIComponent(ADMIN_STORE_UNAUTHORIZED)}`
     );
   }
-  return { user };
+  return { user, supabase };
 }
 
 function formString(formData: FormData, key: string): string {
@@ -48,19 +58,42 @@ function safeReturnTo(formData: FormData, fallback: string): string {
   return fallback;
 }
 
+/** Bind request-scoped authenticated RPC transport for shadow dual-write. */
+function withShadowTransport<T>(
+  supabase: SupabaseClient,
+  fn: () => T
+): T {
+  return runWithStudioShadowWriteTransport(
+    createSupabaseWriteRpcTransport(supabase),
+    fn
+  );
+}
+
+async function withShadowTransportAsync<T>(
+  supabase: SupabaseClient,
+  fn: () => Promise<T>
+): Promise<T> {
+  return runWithStudioShadowWriteTransportAsync(
+    createSupabaseWriteRpcTransport(supabase),
+    fn
+  );
+}
+
 export async function saveTranslationDraftAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const text = formString(formData, "text");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    getTranslationStudioWorkflow().saveDraft({
-      valueId,
-      text,
-      actor: { userId: user.id },
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().saveDraft({
+        valueId,
+        text,
+        actor: { userId: user.id },
+      });
     });
   } catch (error) {
     const message =
@@ -74,14 +107,16 @@ export async function saveTranslationDraftAction(
 export async function submitTranslationReviewAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    getTranslationStudioWorkflow().submitForReview({
-      valueId,
-      actor: { userId: user.id },
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().submitForReview({
+        valueId,
+        actor: { userId: user.id },
+      });
     });
   } catch (error) {
     const message =
@@ -95,16 +130,18 @@ export async function submitTranslationReviewAction(
 export async function approveTranslationAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const ready = formString(formData, "readyForPublish") === "1";
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    getTranslationStudioWorkflow().approve({
-      valueId,
-      actor: { userId: user.id },
-      markReadyForPublish: ready,
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().approve({
+        valueId,
+        actor: { userId: user.id },
+        markReadyForPublish: ready,
+      });
     });
   } catch (error) {
     const message =
@@ -118,16 +155,18 @@ export async function approveTranslationAction(
 export async function rejectTranslationAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const note = formString(formData, "note");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/review`);
   try {
-    getTranslationStudioWorkflow().reject({
-      valueId,
-      actor: { userId: user.id },
-      note: note || undefined,
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().reject({
+        valueId,
+        actor: { userId: user.id },
+        note: note || undefined,
+      });
     });
   } catch (error) {
     const message =
@@ -141,14 +180,16 @@ export async function rejectTranslationAction(
 export async function deprecateTranslationAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    getTranslationStudioWorkflow().deprecate({
-      valueId,
-      actor: { userId: user.id },
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().deprecate({
+        valueId,
+        actor: { userId: user.id },
+      });
     });
   } catch (error) {
     const message =
@@ -162,14 +203,16 @@ export async function deprecateTranslationAction(
 export async function restoreTranslationAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    getTranslationStudioWorkflow().restore({
-      valueId,
-      actor: { userId: user.id },
+    withShadowTransport(supabase, () => {
+      getTranslationStudioWorkflow().restore({
+        valueId,
+        actor: { userId: user.id },
+      });
     });
   } catch (error) {
     const message =
@@ -183,14 +226,16 @@ export async function restoreTranslationAction(
 export async function requestAiSuggestionAction(
   formData: FormData
 ): Promise<void> {
-  const { user } = await requireStudioAdmin();
+  const { user, supabase } = await requireStudioAdmin();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
   try {
-    await getTranslationStudioWorkflow().requestAiSuggestion({
-      valueId,
-      actor: { userId: user.id },
+    await withShadowTransportAsync(supabase, async () => {
+      await getTranslationStudioWorkflow().requestAiSuggestion({
+        valueId,
+        actor: { userId: user.id },
+      });
     });
   } catch (error) {
     const message =

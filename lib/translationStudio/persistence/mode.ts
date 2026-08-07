@@ -1,9 +1,9 @@
 /**
  * Translation Studio persistence mode gate V1.
- * Only `json` is executable at runtime.
- * A DB write adapter exists for injection/tests, but modes that would use it
- * (`shadow_dual_write`, `dual_read`, `db_primary_json_fallback`) remain
- * unsupported and fail closed to JSON — never silently activate DB writes.
+ * - `json`: executable, JSON only (default)
+ * - `shadow_dual_write`: executable composition (JSON authoritative + DB shadow);
+ *   DB calls require request-scoped transport at save time or shadow is skipped
+ * - `dual_read` / `db_primary_json_fallback`: unsupported (fail closed to JSON)
  */
 
 export const TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV =
@@ -27,8 +27,14 @@ export type PersistenceModeResolution =
       implementation: "json";
     }
   | {
+      kind: "executable";
+      mode: "shadow_dual_write";
+      envRaw: string;
+      implementation: "shadow_dual_write";
+    }
+  | {
       kind: "unsupported";
-      mode: Exclude<TranslationStudioPersistenceMode, "json">;
+      mode: "dual_read" | "db_primary_json_fallback";
       envRaw: string;
       implementation: "json";
       message: string;
@@ -41,8 +47,7 @@ export type PersistenceModeResolution =
       message: string;
     };
 
-const FUTURE_MODES = new Set<string>([
-  "shadow_dual_write",
+const UNSUPPORTED_MODES = new Set<string>([
   "dual_read",
   "db_primary_json_fallback",
 ]);
@@ -54,8 +59,9 @@ function normalizeModeToken(raw: string): string {
 /**
  * Resolve persistence mode from env.
  * Unset / blank / explicit `json` → executable JSON.
- * Known future modes → unsupported (still implementation:"json"; no DB).
- * Anything else → invalid (still implementation:"json"; no DB).
+ * `shadow_dual_write` → executable shadow composition (transport still required at save).
+ * Other known future modes → unsupported (JSON).
+ * Anything else → invalid (JSON).
  */
 export function resolveTranslationStudioPersistenceMode(
   env: Record<string, string | undefined> = process.env
@@ -80,16 +86,24 @@ export function resolveTranslationStudioPersistenceMode(
     };
   }
 
-  if (FUTURE_MODES.has(token)) {
+  if (token === "shadow_dual_write") {
+    return {
+      kind: "executable",
+      mode: "shadow_dual_write",
+      envRaw,
+      implementation: "shadow_dual_write",
+    };
+  }
+
+  if (UNSUPPORTED_MODES.has(token)) {
     return {
       kind: "unsupported",
-      mode: token as Exclude<TranslationStudioPersistenceMode, "json">,
+      mode: token as "dual_read" | "db_primary_json_fallback",
       envRaw,
       implementation: "json",
       message:
-        `Persistence mode "${token}" is recognized but not executable. ` +
-        `Failing closed to JSON file store; DB adapter is injectable only ` +
-        `(no dual-write / dual-read / db-primary activation).`,
+        `Persistence mode "${token}" is not executable. ` +
+        `Failing closed to JSON file store.`,
     };
   }
 
@@ -110,14 +124,27 @@ export function isExecutableJsonPersistenceMode(
   return resolution.kind === "executable" && resolution.mode === "json";
 }
 
-/** True only for modes that would imply DB participation once implemented. */
-export function requestsDbBackedPersistence(
+export function isExecutableShadowDualWriteMode(
   resolution: PersistenceModeResolution
 ): boolean {
   return (
+    resolution.kind === "executable" && resolution.mode === "shadow_dual_write"
+  );
+}
+
+/** True when mode implies DB participation (shadow executable or future unsupported). */
+export function requestsDbBackedPersistence(
+  resolution: PersistenceModeResolution
+): boolean {
+  if (
+    resolution.kind === "executable" &&
+    resolution.mode === "shadow_dual_write"
+  ) {
+    return true;
+  }
+  return (
     resolution.kind === "unsupported" &&
-    (resolution.mode === "shadow_dual_write" ||
-      resolution.mode === "dual_read" ||
+    (resolution.mode === "dual_read" ||
       resolution.mode === "db_primary_json_fallback")
   );
 }

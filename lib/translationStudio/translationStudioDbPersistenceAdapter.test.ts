@@ -308,20 +308,16 @@ describe("Translation Studio DB persistence adapter V1", () => {
     expect(src).toMatch(/transport\.upsertSnapshot/);
   });
 
-  it("JSON remains the only executable default; unsupported modes stay closed", () => {
+  it("JSON remains the only default; dual_read/db_primary stay closed; shadow is opt-in", () => {
     resetTranslationStudioWorkflowForTests();
-    for (const mode of [
-      "shadow_dual_write",
-      "dual_read",
-      "db_primary_json_fallback",
-    ] as const) {
+    for (const mode of ["dual_read", "db_primary_json_fallback"] as const) {
       const resolution = resolveTranslationStudioPersistenceMode({
         [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode,
       });
       expect(resolution.kind).toBe("unsupported");
       expect(resolution.implementation).toBe("json");
       if (resolution.kind === "unsupported") {
-        expect(resolution.message).toMatch(/injectable only|not executable/i);
+        expect(resolution.message).toMatch(/not executable/i);
       }
 
       const selected = createDefaultStudioPersistence({
@@ -330,6 +326,12 @@ describe("Translation Studio DB persistence adapter V1", () => {
       });
       expect(selected.implementation).toBe("json");
     }
+
+    const shadow = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "shadow_dual_write",
+    });
+    expect(shadow.kind).toBe("executable");
+    expect(shadow.mode).toBe("shadow_dual_write");
 
     const jsonDefault = createDefaultStudioPersistence({ ephemeral: true });
     expect(jsonDefault.implementation).toBe("json");

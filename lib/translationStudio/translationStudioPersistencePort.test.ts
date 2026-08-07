@@ -57,11 +57,7 @@ describe("Translation Studio persistence mode gate", () => {
   });
 
   it("unsupported future modes cannot activate DB behavior", () => {
-    for (const mode of [
-      "shadow_dual_write",
-      "dual_read",
-      "db_primary_json_fallback",
-    ] as const) {
+    for (const mode of ["dual_read", "db_primary_json_fallback"] as const) {
       const resolution = resolveTranslationStudioPersistenceMode({
         [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode,
       });
@@ -79,6 +75,23 @@ describe("Translation Studio persistence mode gate", () => {
       // JSON adapter only — load returns null on empty dir (seed path).
       expect(selected.persistence.load()).toBeNull();
     }
+  });
+
+  it("shadow_dual_write is executable composition (JSON authoritative)", () => {
+    const resolution = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "shadow_dual_write",
+    });
+    expect(resolution.kind).toBe("executable");
+    expect(resolution.mode).toBe("shadow_dual_write");
+    expect(resolution.implementation).toBe("shadow_dual_write");
+    expect(requestsDbBackedPersistence(resolution)).toBe(true);
+
+    const selected = createDefaultStudioPersistence({
+      env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "shadow_dual_write" },
+      dataDir: tempDataDir(),
+      shadowObserver: { onEvent() {} },
+    });
+    expect(selected.implementation).toBe("shadow_dual_write");
   });
 
   it("invalid mode fails closed to json implementation", () => {

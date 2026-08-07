@@ -91,6 +91,7 @@ export {
   TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV,
   TRANSLATION_STUDIO_PERSISTENCE_MODES,
   isExecutableJsonPersistenceMode,
+  isExecutableShadowDualWriteMode,
   requestsDbBackedPersistence,
   resolveTranslationStudioPersistenceMode,
   type PersistenceModeResolution,
@@ -133,6 +134,40 @@ export {
   type CreateDbStudioPersistenceOptions,
   type DbStudioPersistence,
 } from "./persistence/dbStudioPersistence";
+
+export {
+  createShadowDualWriteStudioPersistence,
+  type CreateShadowDualWriteStudioPersistenceOptions,
+  type ShadowDualWriteStudioPersistence,
+} from "./persistence/shadowDualWriteStudioPersistence";
+
+export {
+  getStudioShadowWriteTransport,
+  runWithStudioShadowWriteTransport,
+  runWithStudioShadowWriteTransportAsync,
+  type StudioShadowWriteContext,
+} from "./persistence/shadowWriteContext";
+
+export {
+  classifyStudioShadowError,
+  isRetryableStudioShadowCategory,
+} from "./persistence/shadowErrorClassification";
+
+export {
+  consoleStudioShadowObserver,
+  countStudioShadowEntities,
+  noopStudioShadowObserver,
+  type StudioShadowEntityCounts,
+  type StudioShadowErrorCategory,
+  type StudioShadowObserveEvent,
+  type StudioShadowObserver,
+} from "./persistence/shadowObserver";
+
+export {
+  createStudioShadowWriteQueue,
+  type StudioShadowWriteQueue,
+  type StudioShadowWriteQueueOptions,
+} from "./persistence/shadowWriteQueue";
 
 export {
   buildPublishContract,
