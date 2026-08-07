@@ -1,35 +1,50 @@
-# CURSOR_REPORT — Resource Link Mutation Runtime SoT integration V1
+# CURSOR_REPORT — Collaboration Learning Resource Binding V1
 
 ## Summary
 
-**CLOSED** — Fast-forwarded Resource Link Mutation Runtime V1 (`a2cd114`) into
-canonical Collaboration SoT. No merge commit. No migration re-apply. Flag remains
-default `false`. Product bindings deferred.
+**CLOSED** — First product binding: Collaboration Workspace → Learning Space
+reference (`learning_space` ↔ `learning_spaces.id`). Writes use existing
+mutation runtime. Learning auth via `can_manage_learning_space`. No migration.
+No UI marketplace. Platform flag default `false`. Not merged to SoT.
 
-## Integration
+## Exact files changed
 
-- Method: **fast-forward only**
-- Source: `office/collaboration-workspace-resource-link-mutation-runtime-v1` @ `a2cd114`
-- SoT before: `9e140fd`
-- SoT after FF: `a2cd114` (+ docs closeout commit if present)
+- `lib/collaboration/learningWorkspaceResourceBinding.ts` (new)
+- `lib/collaboration/learningWorkspaceResourceBinding.test.ts` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
-## Architecture / security
+## Migrations created
 
-- Boundary: Workspace → Resource Reference
-- Writes: SECURITY DEFINER RPCs only; authenticated table grants SELECT-only
-- Authz: `can_manage_collaboration_workspace`
-- Update whitelist + explicit duplicate conflict
-- `20260919` parity: blob `f3b42ca8e160cfe2258e52f33d6a3f105b437554` (APPLIED + VERIFIED; not re-applied)
+NO
 
-## Validation
+## Security review
 
-- Focused Collaboration tests 40/40 PASS
-- `tsc --noEmit` PASS
-- Trailer scan PASS
-- Scope: mutation runtime + tests + spine exports + `20260919` + docs only
+- Learning manage gate before Collaboration create/unlink
+- Collaboration mutation RPCs remain backend authz for workspace
+- No Learning lifecycle mutations
+- Lightweight reference metadata only (name/slug/status/mode/href)
+- Commerce/advertiser types rejected by Learning resolver
 
-## Deferred
+## Tests
 
-- Resource-link product bindings
-- Invite expansion
-- Credentialed E2E mutation smoke
+- Learning binding — 10/10 PASS
+- Resource link foundation — 11/11 PASS
+- Mutation runtime — 10/10 PASS
+- Platform gate — 7/7 PASS
+- Learning spaces foundation — 35/35 PASS
+- Total focused: 73/73 PASS
+
+## TypeScript
+
+`npx tsc --noEmit` — PASS
+
+## Build
+
+Not required (lib binding only).
+
+## Open issues
+
+- SoT integration
+- Minimal UI surface for link/unlink
+- Commerce / advertiser bindings deferred

@@ -1,35 +1,36 @@
 # Current Task
 
-## COLLABORATION SoT — Resource Link Mutation Runtime INTEGRATED
+## ACTIVE FEATURE BRANCH (not SoT)
 
-- **Milestone closed:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_MUTATION_RUNTIME_SOT_INTEGRATION_V1`
-- **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Integrated feature:** `office/collaboration-workspace-resource-link-mutation-runtime-v1` @ `a2cd114`
-- **Method:** fast-forward only (`9e140fd` → `a2cd114`)
+- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_LEARNING_BINDING_V1`
+- **Branch:** `office/collaboration-workspace-resource-link-learning-binding-v1`
+- **Base SoT HEAD:** `fd1ff049bde3e8d22f0227e6354671c063cf69f4`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
+- **Do not merge to SoT in this task.**
 
-## Status
+## Goal
 
-- Resource Link Foundation V1 = **CLOSED / INTEGRATED**
-- Resource Link Mutation Runtime V1 = **CLOSED / INTEGRATED**
-- Migration `20260919` = **APPLIED + VERIFIED** (not re-applied in this integration)
-- Mutation RPCs live remotely (create / update / delete)
-- Direct authenticated table mutation remains **prohibited**
-- Product bindings remain deferred
-- Platform flag remains default `false`
+First product binding: Collaboration Workspace → Learning Space reference only.
+Uses existing resource-link mutation runtime. No Learning lifecycle mutation.
+No migration. Platform flag stays `false`.
 
-## Do NOT start automatically
+## Selected identity
 
-- Learning / Commerce / advertiser product bindings
+- Learning: `public.learning_spaces.id` (UUID)
+- Collaboration `resource_type`: `learning_space` (already reserved)
+- Auth dependency: `can_manage_learning_space` (existing)
+
+## Allowed scope
+
+- `lib/collaboration/learningWorkspaceResourceBinding.ts` (+ tests)
+- docs task/report only as needed
+- minimal optional UI only if already-suitable surface exists (prefer runtime-only)
+
+## Forbidden scope
+
+- Learning lifecycle / enrollment / publish / lesson mutations
+- Commerce / advertiser binding
 - Platform flag enablement
-- UM Core P17
-
-## CLOSED ON SoT (do not redo)
-
-- Workspace Spine / Membership / Settings Lifecycle UI
-- `20260917` APPLIED + VERIFIED
-- Member Role Management UI V1
-- Resource Link Foundation V1
-- Resource Link Mutation Runtime V1 + `20260919`
-- stale `20260898` NON-SOT; remote Commerce only
-- smoke/keepalive NOT SoT
+- Remote migration apply
+- SoT merge
+- smoke/keepalive / UM Core P17
