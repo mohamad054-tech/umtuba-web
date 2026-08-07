@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Feature Flag Registry Foundation P8
+UM Core Platform Dependency Registry Foundation P9
 
 ## Status
 
@@ -10,42 +10,44 @@ UM Core Platform Feature Flag Registry Foundation P8
 
 ## Branch
 
-`office/um-core-platform-feature-flag-registry-foundation-p8`
+`office/um-core-platform-dependency-registry-foundation-p9`
 
 ## Base HEAD
 
-`7e1dc2541662305276d5796e9851e8a2dfc7037f` (Event Routing Foundation P7 close)
+`a335e397fd0780b11ef6df6a1b0b957c2f6dcb8b` (Feature Flag Registry Foundation P8 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-feature-flag-registry-foundation-p8`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-dependency-registry-foundation-p9`
 
 ## Milestone
 
-`um.core.feature_flag_registry_foundation_p8`
+`um.core.dependency_registry_foundation_p9`
 
 ## Allowed scope
 
-- `platforms/core/flag/**`
+- `platforms/core/dependency/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
+- Fixture `requires[]` peer_kernel corrections under `platforms/core/**/*.test.ts`
 - `docs/core/**`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Forbidden scope
 
-- Flag evaluation / overrides / cohorts / kill-switch execution
-- Event bus / publish / consume / outbox / transport
-- Persistence / networking / product integration
+- Dependency runtime resolution / DI / discovery / startup orchestration
+- Health / Naming / SDK / aggregate `UmCoreRegistry`
+- Event bus / flag evaluation / persistence / networking / product integration
 - Migrations / database / Supabase
-- P9 and later milestones
+- P10 and later milestones
 
 ## Delivered
 
-Pure in-memory feature flag catalog bound to P4 platforms (optional P5
+Pure in-memory dependency edge catalog bound to P4 platforms (optional P5
 capability integrity), with lookups, deterministic rejection findings,
-and focused tests. Registration is not evaluation.
-Committed and pushed on `office/um-core-platform-feature-flag-registry-foundation-p8`.
-Do not start P9 from this handoff.
+required platform-cycle integrity, and focused tests. Registration is not
+resolution.
+Committed and pushed on `office/um-core-platform-dependency-registry-foundation-p9`.
+Do not start P10 from this handoff.

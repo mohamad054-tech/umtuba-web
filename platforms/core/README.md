@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P8` (… → event routing → feature flag registry)
+- Phase: `P1`–`P9` (… → feature flag registry → dependency registry)
 
 ## Phase P3 scope
 
@@ -100,3 +100,16 @@ Pure **in-memory feature flag catalog** under `platforms/core/flag/`.
 
 Out of scope for P8: flag evaluation, overrides, cohorts, kill-switch
 execution, event bus/delivery, persistence, networking, product integration.
+
+## Phase P9 scope
+
+Pure **in-memory dependency edge catalog** under `platforms/core/dependency/`.
+
+- Materializes platform manifest `requires[]` as direct declared edges
+- Binds owner platforms to P4; optional P5 capability-target integrity
+- Lookups by edge id, requirements, dependents, target kind, strength
+- Catalog integrity cycles only among required platform→platform edges
+
+Out of scope for P9: runtime resolution, DI, discovery, startup orchestration,
+health/SDK/naming registries, aggregate `UmCoreRegistry`, persistence,
+networking, product integration, migrations.

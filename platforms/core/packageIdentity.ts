@@ -34,5 +34,8 @@ export const UM_CORE_EVENT_ROUTING_PHASE = "P7" as const;
 /** Feature flag registry foundation phase. */
 export const UM_CORE_FEATURE_FLAG_REGISTRY_PHASE = "P8" as const;
 
+/** Dependency registry foundation phase. */
+export const UM_CORE_DEPENDENCY_REGISTRY_PHASE = "P9" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;
