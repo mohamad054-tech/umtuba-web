@@ -43,12 +43,19 @@ export default async function LearningHubPage() {
         showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
       }
     >
-      <p className="mt-3 text-sm">
+      <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
         <Link
           href={LEARNING_COMPLETION_ROUTES.transcript}
           className="font-bold text-white underline underline-offset-2"
         >
           View transcript &amp; certificates
+        </Link>
+        <Link
+          href={LEARNING_LEARNER_ROUTES.notes}
+          className="font-bold text-white underline underline-offset-2"
+          data-testid="learning-hub-notes-link"
+        >
+          My notes
         </Link>
       </p>
       {hub.ok ? (

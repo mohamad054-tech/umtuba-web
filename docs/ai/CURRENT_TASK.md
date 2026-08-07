@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Learning - Assessment Due Dates on Calendar V1
+UM Learning - Personal Notes Hub V1
 
 ## Status
 
@@ -10,30 +10,32 @@ UM Learning - Assessment Due Dates on Calendar V1
 
 ## Milestone
 
-`learning.calendar.assessment_due_dates_v1`
+`learning.learner.personal_notes_hub_v1`
 
 ## Scope landed
 
-- Migration `20260906_learning_assessment_due_dates_calendar_v1.sql`
-  - `learning_activity_settings.due_at`
-  - `set_learning_assessment_due_at`
-  - calendar RPCs include `assessment_due` + `assessment_due_supported: true`
-- Adapter `lib/learning/assessmentDueDates.ts`
-- Instructor due controls on quiz questions authoring
-- Learner + instructor calendar routing for assessment/assignment/live
+- Migration `20260907_learning_personal_notes_hub_v1.sql`
+  - Index `learning_lesson_notes_user_updated_idx`
+  - RPC `list_my_learning_notes_hub`
+- Adapter hub list in `lib/learning/lessonNotesFoundation.ts`
+- Learner route `/learning/notes` + hub nav link
+- Docs: `LEARNING_PERSONAL_NOTES_HUB_V1.md`
 
 ## Branch / worktree
 
-`office/learning-assessment-due-dates-calendar-v1`  
-`D:\umtuba-central\repos\umtuba-web-learning-assessment-due-dates-calendar-v1`  
-Base: `17ce7e498757c8bd984b776bdde9fbf9a71dd36d`
+`office/learning-personal-notes-hub-v1`  
+`D:\umtuba-central\repos\umtuba-web-learning-personal-notes-hub-v1`  
+Base: `ad71442469bdf1506cb2fa4fcebc4b4caefe4389`
 
 ## Explicitly out of scope
 
 - Remote migration apply
-- Attempt/scoring/answer/submission/completion enforcement
-- Commerce / Translation / Collaboration / Billing / UEOS / Mobile / Guardian
+- Instructor/admin note browsing
+- Sharing / collaboration / AI
+- Bookmarks
+- DB free-text search
+- Commerce / Translation / Collaboration / Billing / UEOS / Guardian
 
 ## Recommended next
 
-Optional remote apply GO for `20260906` (reallocated off collided `20260905`).
+Optional remote apply GO for `20260907` after SoT FF merge.

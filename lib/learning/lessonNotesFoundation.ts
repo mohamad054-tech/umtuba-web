@@ -14,12 +14,17 @@ type AnyClient = SupabaseClient;
 
 export const LEARNING_LESSON_NOTES_RPCS = {
   list: "list_my_learning_lesson_notes",
+  listHub: "list_my_learning_notes_hub",
   create: "create_my_learning_lesson_note",
   update: "update_my_learning_lesson_note",
   delete: "delete_my_learning_lesson_note",
 } as const;
 
 export const LEARNING_LESSON_NOTE_BODY_MAX = 20000;
+
+/** Hub list default / clamp (mirrors SQL). */
+export const LEARNING_NOTES_HUB_DEFAULT_LIMIT = 50;
+export const LEARNING_NOTES_HUB_MAX_LIMIT = 100;
 
 export type LessonNotesResult<T> =
   | { ok: true; data: T }
@@ -32,6 +37,19 @@ export type LearningLessonNote = {
   lesson_position_seconds: number | null;
   created_at: string;
   updated_at: string;
+};
+
+/** Cross-lesson Personal Notes Hub row (owner-only). */
+export type LearningLessonNoteHubItem = LearningLessonNote & {
+  course_id: string;
+  course_name: string;
+  lesson_name: string;
+};
+
+export type LearningLessonNotesHub = {
+  notes: LearningLessonNoteHubItem[];
+  limit: number;
+  has_more: boolean;
 };
 
 const UUID_RE =
@@ -171,6 +189,37 @@ function parseNote(value: unknown): LearningLessonNote | null {
   };
 }
 
+function parseHubNote(value: unknown): LearningLessonNoteHubItem | null {
+  const base = parseNote(value);
+  if (!base) return null;
+  const row = asRecord(value);
+  if (!row) return null;
+  const course_id = asString(row.course_id);
+  const course_name = typeof row.course_name === "string" ? row.course_name : null;
+  const lesson_name = typeof row.lesson_name === "string" ? row.lesson_name : null;
+  if (!course_id || course_name === null || lesson_name === null) {
+    return null;
+  }
+  return {
+    ...base,
+    course_id,
+    course_name,
+    lesson_name,
+  };
+}
+
+export function clampLearningNotesHubLimit(
+  limit: number | null | undefined
+): number {
+  if (limit === null || limit === undefined || !Number.isFinite(limit)) {
+    return LEARNING_NOTES_HUB_DEFAULT_LIMIT;
+  }
+  const n = Math.trunc(limit);
+  if (n < 1) return 1;
+  if (n > LEARNING_NOTES_HUB_MAX_LIMIT) return LEARNING_NOTES_HUB_MAX_LIMIT;
+  return n;
+}
+
 export async function listMyLessonNotes(
   supabase: AnyClient,
   lessonId: string
@@ -197,6 +246,70 @@ export async function listMyLessonNotes(
     notes.push(note);
   }
   return { ok: true, data: notes };
+}
+
+/**
+ * Cross-lesson Personal Notes Hub for the signed-in learner.
+ * Owner-only; optional course filter; no DB free-text search.
+ */
+export async function listMyLearningNotesHub(
+  supabase: AnyClient,
+  input?: {
+    courseId?: string | null;
+    limit?: number | null;
+  }
+): Promise<LessonNotesResult<LearningLessonNotesHub>> {
+  const courseId = input?.courseId ?? null;
+  if (courseId) {
+    const bad = requireUuid(courseId, "courseId");
+    if (bad) return bad;
+  }
+
+  const limit = clampLearningNotesHubLimit(input?.limit);
+  const args: Record<string, unknown> = {
+    p_limit: limit,
+  };
+  if (courseId) {
+    args.p_course_id = courseId;
+  } else {
+    args.p_course_id = null;
+  }
+
+  const result = await callRpc(
+    supabase,
+    LEARNING_LESSON_NOTES_RPCS.listHub,
+    args
+  );
+  if (!result.ok) return result;
+
+  const root = asRecord(result.data);
+  if (!root) {
+    return { ok: false, message: "Notes response was invalid." };
+  }
+
+  const notes: LearningLessonNoteHubItem[] = [];
+  for (const item of asArray(root.notes)) {
+    const note = parseHubNote(item);
+    if (!note) {
+      return { ok: false, message: "Notes response was invalid." };
+    }
+    notes.push(note);
+  }
+
+  const returnedLimit =
+    typeof root.limit === "number" && Number.isInteger(root.limit)
+      ? clampLearningNotesHubLimit(root.limit)
+      : limit;
+  const hasMore = root.has_more === true;
+
+  return {
+    ok: true,
+    data: {
+      notes,
+      limit: returnedLimit,
+      has_more: hasMore,
+    },
+  };
 }
 
 export async function createMyLessonNote(

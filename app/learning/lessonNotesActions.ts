@@ -4,9 +4,11 @@ import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
   createMyLessonNote,
   deleteMyLessonNote,
+  listMyLearningNotesHub,
   listMyLessonNotes,
   updateMyLessonNote,
   type LearningLessonNote,
+  type LearningLessonNotesHub,
   type LessonNotesResult,
 } from "../../lib/learning/lessonNotesFoundation";
 
@@ -36,6 +38,25 @@ export async function listLessonNotesAction(
   }
   const supabase = await createClient();
   return listMyLessonNotes(supabase, lessonId);
+}
+
+/** Cross-lesson Personal Notes Hub (read-only). */
+export async function listLearningNotesHubAction(input?: {
+  courseId?: string | null;
+  limit?: number | null;
+}): Promise<LessonNotesActionResult<LearningLessonNotesHub>> {
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: "You are not allowed to access notes for this lesson.",
+    };
+  }
+  const supabase = await createClient();
+  return listMyLearningNotesHub(supabase, {
+    courseId: input?.courseId ?? null,
+    limit: input?.limit ?? null,
+  });
 }
 
 export async function createLessonNoteAction(input: {

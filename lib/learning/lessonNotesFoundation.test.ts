@@ -4,22 +4,29 @@ import { join } from "node:path";
 import {
   LEARNING_LESSON_NOTES_RPCS,
   LEARNING_LESSON_NOTE_BODY_MAX,
+  clampLearningNotesHubLimit,
   createMyLessonNote,
   deleteMyLessonNote,
+  listMyLearningNotesHub,
   listMyLessonNotes,
   sanitizeLessonNotesError,
   updateMyLessonNote,
   validateLessonNoteBody,
   validateLessonPositionSeconds,
 } from "./lessonNotesFoundation";
+import { LEARNING_LEARNER_ROUTES } from "./learnerDelivery";
 
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
   "supabase/migrations/20260901_learning_lesson_notes_foundation_v1.sql";
+const HUB_MIGRATION =
+  "supabase/migrations/20260907_learning_personal_notes_hub_v1.sql";
 const PANEL = "app/components/learning/LessonNotesPanel.tsx";
 const VIEWER = "app/components/learning/LessonViewer.tsx";
 const ACTIONS = "app/learning/lessonNotesActions.ts";
 const ADAPTER = "lib/learning/lessonNotesFoundation.ts";
+const NOTES_PAGE = "app/learning/notes/page.tsx";
+const LEARNING_HUB_PAGE = "app/learning/page.tsx";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8").replace(/\r\n/g, "\n");
@@ -221,6 +228,7 @@ describe("Lesson Notes Foundation — adapter RPC surface", () => {
     expect(src).not.toMatch(/localStorage/);
     expect(Object.values(LEARNING_LESSON_NOTES_RPCS)).toEqual([
       "list_my_learning_lesson_notes",
+      "list_my_learning_notes_hub",
       "create_my_learning_lesson_note",
       "update_my_learning_lesson_note",
       "delete_my_learning_lesson_note",
@@ -384,8 +392,206 @@ describe("Lesson Notes Foundation — UI contracts", () => {
     expect(actions).toMatch(/updateMyLessonNote/);
     expect(actions).toMatch(/deleteMyLessonNote/);
     expect(actions).toMatch(/listMyLessonNotes/);
+    expect(actions).toMatch(/listMyLearningNotesHub/);
     expect(actions).not.toMatch(/user_id|userId:/);
     expect(actions).not.toMatch(/service_role|SERVICE_ROLE/);
     expect(actions).not.toMatch(/localStorage/);
+  });
+});
+
+describe("Personal Notes Hub V1 — migration + privacy", () => {
+  const hubSql = read(HUB_MIGRATION);
+  const hubBody = stripSqlComments(hubSql);
+  const foundationSql = read(MIGRATION);
+
+  it("ships unique 20260907 hub migration with supporting index", () => {
+    expect(existsSync(join(ROOT, HUB_MIGRATION))).toBe(true);
+    const migrations = readdirSync(join(ROOT, "supabase/migrations"));
+    expect(migrations).toContain(
+      "20260907_learning_personal_notes_hub_v1.sql"
+    );
+    const sameVersion = migrations.filter((f) => f.startsWith("20260907_"));
+    expect(sameVersion).toEqual([
+      "20260907_learning_personal_notes_hub_v1.sql",
+    ]);
+    expect(hubBody).toMatch(/learning_lesson_notes_user_updated_idx/);
+    expect(hubBody).toMatch(
+      /on public\.learning_lesson_notes \(user_id, updated_at desc\)/
+    );
+  });
+
+  it("defines list_my_learning_notes_hub with auth, ownership, access, limit, has_more", () => {
+    const hub = fnBody(hubSql, "list_my_learning_notes_hub");
+    expect(hub).toMatch(/v_uid uuid := auth\.uid\(\)/);
+    expect(hub).toMatch(/raise exception 'Authentication required'/);
+    expect(hub).toMatch(/n\.user_id = v_uid/);
+    expect(hub).toMatch(/has_learning_course_access\(c\.id, v_uid\)/);
+    expect(hub).toMatch(/p_course_id is null or c\.id = p_course_id/);
+    expect(hub).toMatch(/least\(greatest\(coalesce\(p_limit, 50\), 1\), 100\)/);
+    expect(hub).toMatch(/v_fetch := v_limit \+ 1/);
+    expect(hub).toMatch(/v_has_more := v_count > v_limit/);
+    expect(hub).toMatch(/order by n\.updated_at desc, n\.id desc/);
+    expect(hub).toMatch(/'course_name'/);
+    expect(hub).toMatch(/'lesson_name'/);
+    expect(hub).toMatch(/'has_more'/);
+    expect(hub).not.toMatch(/p_user_id/);
+    expect(hub).not.toMatch(/ilike|to_tsvector|plainto_tsquery/i);
+    expect(hub).not.toMatch(/offset /i);
+    expect(hub).not.toMatch(/is_platform_admin/);
+    expect(hub).not.toMatch(/can_manage_learning_course/);
+    expect(hub).toMatch(
+      /join public\.learning_lessons l on l\.id = n\.lesson_id/
+    );
+    expect(hub).toMatch(
+      /join public\.learning_sections s on s\.id = l\.section_id/
+    );
+    expect(hub).toMatch(
+      /join public\.learning_courses c on c\.id = s\.course_id/
+    );
+    expect(hub).not.toMatch(/learning_lessons\.course_id|l\.course_id/);
+  });
+
+  it("revokes anon/public and does not weaken foundation RLS policies", () => {
+    expect(hubBody).toMatch(
+      /revoke all on function public\.list_my_learning_notes_hub\(uuid, integer\)\s+from public, anon/
+    );
+    expect(hubBody).toMatch(
+      /grant execute on function public\.list_my_learning_notes_hub\(uuid, integer\)\s+to authenticated, service_role/
+    );
+    expect(hubBody).toMatch(/set search_path = public/);
+    expect(hubBody).not.toMatch(/create policy/i);
+    expect(hubBody).not.toMatch(/alter table public\.learning_lesson_notes/);
+    expect(foundationSql).toMatch(
+      /create policy "Learners read own lesson notes"/
+    );
+    expect(foundationSql).not.toMatch(
+      /create policy "[^"]*(instructor|staff|admin)[^"]*"/i
+    );
+  });
+
+  it("does not alter existing CRUD RPC definitions", () => {
+    expect(hubBody).not.toMatch(/create or replace function public\.list_my_learning_lesson_notes/);
+    expect(hubBody).not.toMatch(/create or replace function public\.create_my_learning_lesson_note/);
+    expect(hubBody).not.toMatch(/create or replace function public\.update_my_learning_lesson_note/);
+    expect(hubBody).not.toMatch(/create or replace function public\.delete_my_learning_lesson_note/);
+  });
+});
+
+describe("Personal Notes Hub V1 — adapter", () => {
+  const COURSE_ID = "55555555-5555-4555-8555-555555555555";
+
+  it("listMyLearningNotesHub maps metadata, course filter, and has_more", async () => {
+    const calls: RpcCall[] = [];
+    const client = fakeClient((call) => {
+      calls.push(call);
+      return {
+        data: {
+          notes: [
+            {
+              id: NOTE_ID,
+              lesson_id: LESSON_ID,
+              course_id: COURSE_ID,
+              course_name: "Course A",
+              lesson_name: "Lesson 1",
+              body: "hub note",
+              lesson_position_seconds: 30,
+              created_at: "2026-01-01T00:00:00Z",
+              updated_at: "2026-01-03T00:00:00Z",
+            },
+          ],
+          limit: 50,
+          has_more: true,
+        },
+        error: null,
+      };
+    });
+    const result = await listMyLearningNotesHub(client, {
+      courseId: COURSE_ID,
+      limit: 50,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.has_more).toBe(true);
+      expect(result.data.limit).toBe(50);
+      expect(result.data.notes[0]?.course_name).toBe("Course A");
+      expect(result.data.notes[0]?.lesson_name).toBe("Lesson 1");
+      expect(result.data.notes[0]?.body).toBe("hub note");
+    }
+    expect(calls[0]?.name).toBe(LEARNING_LESSON_NOTES_RPCS.listHub);
+    expect(calls[0]?.args).toEqual({
+      p_course_id: COURSE_ID,
+      p_limit: 50,
+    });
+  });
+
+  it("clamps hub limit and rejects invalid course UUID without RPC", async () => {
+    expect(clampLearningNotesHubLimit(0)).toBe(1);
+    expect(clampLearningNotesHubLimit(999)).toBe(100);
+    expect(clampLearningNotesHubLimit(null)).toBe(50);
+
+    let called = false;
+    const bad = await listMyLearningNotesHub(
+      fakeClient(() => {
+        called = true;
+        return { data: null, error: null };
+      }),
+      { courseId: "bad" }
+    );
+    expect(bad.ok).toBe(false);
+    expect(called).toBe(false);
+  });
+
+  it("rejects malformed hub payloads", async () => {
+    const result = await listMyLearningNotesHub(
+      fakeClient(() => ({
+        data: {
+          notes: [
+            {
+              id: NOTE_ID,
+              lesson_id: LESSON_ID,
+              body: "missing course fields",
+              created_at: "2026-01-01T00:00:00Z",
+              updated_at: "2026-01-01T00:00:00Z",
+            },
+          ],
+          limit: 50,
+          has_more: false,
+        },
+        error: null,
+      }))
+    );
+    expect(result.ok).toBe(false);
+  });
+});
+
+describe("Personal Notes Hub V1 — UI contracts", () => {
+  const page = read(NOTES_PAGE);
+  const hubPage = read(LEARNING_HUB_PAGE);
+
+  it("notes hub page lists context, empty state, and lesson deep links", () => {
+    expect(existsSync(join(ROOT, NOTES_PAGE))).toBe(true);
+    expect(page).toMatch(/listMyLearningNotesHub/);
+    expect(page).toMatch(/LEARNING_LEARNER_ROUTES\.notes/);
+    expect(page).toMatch(/LEARNING_LEARNER_ROUTES\.lesson/);
+    expect(page).toMatch(/data-testid="learning-notes-hub"/);
+    expect(page).toMatch(/data-testid="learning-notes-hub-empty"/);
+    expect(page).toMatch(/data-testid="learning-notes-hub-item"/);
+    expect(page).toMatch(/data-testid="learning-notes-hub-open-lesson"/);
+    expect(page).toMatch(/course_name/);
+    expect(page).toMatch(/lesson_name/);
+    expect(page).not.toMatch(/createLessonNoteAction|updateLessonNoteAction|deleteLessonNoteAction/);
+    expect(page).not.toMatch(/instructor|share|collaborat|summariz/i);
+    expect(page).not.toMatch(/service_role|SERVICE_ROLE/);
+    expect(page).not.toMatch(/dangerouslySetInnerHTML/);
+  });
+
+  it("Learning hub links to /learning/notes and no instructor notes route exists", () => {
+    expect(hubPage).toMatch(/LEARNING_LEARNER_ROUTES\.notes/);
+    expect(hubPage).toMatch(/data-testid="learning-hub-notes-link"/);
+    expect(LEARNING_LEARNER_ROUTES.notes).toBe("/learning/notes");
+    expect(existsSync(join(ROOT, "app/learning/instructor/notes"))).toBe(false);
+    expect(
+      existsSync(join(ROOT, "app/learning/instructor/notes/page.tsx"))
+    ).toBe(false);
   });
 });

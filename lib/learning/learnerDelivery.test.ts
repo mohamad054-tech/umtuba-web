@@ -73,6 +73,7 @@ describe("Learner Delivery V1 — files & routes", () => {
 
   it("documents the approved learner routes", () => {
     expect(LEARNING_LEARNER_ROUTES.hub).toBe("/learning");
+    expect(LEARNING_LEARNER_ROUTES.notes).toBe("/learning/notes");
     expect(LEARNING_LEARNER_ROUTES.course("c1")).toBe("/learning/courses/c1");
     expect(LEARNING_LEARNER_ROUTES.lesson("l1")).toBe("/learning/lessons/l1");
     expect(LEARNING_LEARNER_ROUTES.activity("a1")).toBe(
