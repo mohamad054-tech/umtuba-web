@@ -1,6 +1,12 @@
 /**
  * JSON-authoritative vs remote snapshot reconciliation comparator V1.
  * Pure — no I/O, no mutations.
+ *
+ * Representation alignment:
+ * - UUID-only actor columns (value/memory/suggestion/version) cannot store
+ *   non-UUID system refs; local `system:*` ↔ remote null is harmless.
+ * - Audit persists actor_kind/actor_ref; compare those strictly.
+ * - JSON object key order is canonicalized; arrays stay order-sensitive.
  */
 
 import { createHash } from "crypto";
@@ -120,11 +126,16 @@ export type ReconciliationEntityType =
   | "terminology"
   | "audit";
 
+export type ReconciliationRepresentationReasonCode =
+  | "actor_system_ref_not_persisted"
+  | "json_object_key_order";
+
 export type ReconciliationFinding = {
   category: ReconciliationMismatchCategory;
   entityType: ReconciliationEntityType;
   identity: string;
   fields?: string[];
+  reasonCodes?: ReconciliationRepresentationReasonCode[];
   smokeResidue: boolean;
   /** Extra remote rows under no-prune are expected stale. */
   expectedStaleExtra?: boolean;
@@ -143,6 +154,19 @@ export type ReconciliationReport = {
   findings: ReconciliationFinding[];
   smokeResidueIdentities: string[];
   errorMessage?: string;
+};
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Entity fields stored as UUID-only actor columns (no actor_ref). */
+const UUID_ONLY_ACTOR_FIELDS: Partial<
+  Record<ReconciliationEntityType, ReadonlySet<string>>
+> = {
+  suggestion: new Set(["createdBy"]),
+  value: new Set(["createdBy", "updatedBy", "approvedBy"]),
+  version: new Set(["changedBy"]),
+  memory: new Set(["createdBy"]),
 };
 
 function emptyCounts(): Record<ReconciliationMismatchCategory, number> {
@@ -177,6 +201,140 @@ function normNull(v: unknown): unknown {
 function str(v: unknown): string {
   if (v == null) return "";
   return String(v);
+}
+
+function isUuid(v: unknown): v is string {
+  return typeof v === "string" && UUID_RE.test(v);
+}
+
+function isSystemActorRef(v: unknown): v is string {
+  return typeof v === "string" && /^system:/i.test(v);
+}
+
+/**
+ * Recursively canonicalize JSON object key order.
+ * Arrays remain order-sensitive (elements still recurse).
+ */
+export function canonicalizeJsonValue(value: unknown): unknown {
+  if (value === undefined) return null;
+  if (value === null) return null;
+  if (Array.isArray(value)) {
+    return value.map((item) => canonicalizeJsonValue(item));
+  }
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const out: Record<string, unknown> = {};
+    for (const key of Object.keys(obj).sort()) {
+      out[key] = canonicalizeJsonValue(obj[key]);
+    }
+    return out;
+  }
+  return value;
+}
+
+function deepEqualCanonical(a: unknown, b: unknown): boolean {
+  return (
+    JSON.stringify(canonicalizeJsonValue(a)) ===
+    JSON.stringify(canonicalizeJsonValue(b))
+  );
+}
+
+function rawJsonEqual(a: unknown, b: unknown): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+/**
+ * Map local audit actorId → write-RPC actor_kind / actor_ref / actor_uuid.
+ * Matches 20260912 write RPC audit branch semantics.
+ */
+export function deriveAuditActorIdentity(actorId: unknown): {
+  actor_kind: string;
+  actor_ref: string | null;
+  actor_uuid: string | null;
+} {
+  if (actorId == null) {
+    return {
+      actor_kind: "system",
+      actor_ref: "system:unknown",
+      actor_uuid: null,
+    };
+  }
+  const raw = String(actorId);
+  if (raw.length === 0) {
+    return {
+      actor_kind: "system",
+      actor_ref: "system:unknown",
+      actor_uuid: null,
+    };
+  }
+  if (UUID_RE.test(raw)) {
+    return { actor_kind: "user", actor_ref: null, actor_uuid: raw.toLowerCase() };
+  }
+  return {
+    actor_kind: "system",
+    actor_ref: raw.slice(0, 200),
+    actor_uuid: null,
+  };
+}
+
+type FieldDiffClass =
+  | { kind: "equal" }
+  | { kind: "harmless"; reason: ReconciliationRepresentationReasonCode }
+  | { kind: "mismatch" };
+
+function classifyUuidOnlyActorDiff(
+  localVal: unknown,
+  remoteVal: unknown
+): FieldDiffClass {
+  const l = normNull(localVal);
+  const r = normNull(remoteVal);
+  if (l === r) return { kind: "equal" };
+  if (str(l) === str(r) && (l == null || r == null || typeof l !== "object")) {
+    return { kind: "equal" };
+  }
+  // Intentional write-RPC storage: non-UUID system refs cannot populate uuid cols.
+  if (isSystemActorRef(l) && r === null) {
+    return { kind: "harmless", reason: "actor_system_ref_not_persisted" };
+  }
+  if (l === null && isSystemActorRef(r)) {
+    return { kind: "harmless", reason: "actor_system_ref_not_persisted" };
+  }
+  return { kind: "mismatch" };
+}
+
+function classifyFieldDiff(
+  entityType: ReconciliationEntityType,
+  field: string,
+  localVal: unknown,
+  remoteVal: unknown
+): FieldDiffClass {
+  const l = normNull(localVal);
+  const r = normNull(remoteVal);
+
+  if (rawJsonEqual(l, r)) return { kind: "equal" };
+  if (
+    str(l) === str(r) &&
+    (l == null || r == null || typeof l !== "object")
+  ) {
+    return { kind: "equal" };
+  }
+
+  const uuidOnly = UUID_ONLY_ACTOR_FIELDS[entityType];
+  if (uuidOnly?.has(field)) {
+    return classifyUuidOnlyActorDiff(l, r);
+  }
+
+  if (deepEqualCanonical(l, r)) {
+    // Content-equal after object-key canonicalization (arrays stay ordered).
+    if (
+      (typeof l === "object" && l !== null) ||
+      (typeof r === "object" && r !== null)
+    ) {
+      return { kind: "harmless", reason: "json_object_key_order" };
+    }
+  }
+
+  return { kind: "mismatch" };
 }
 
 type LocalNorm = {
@@ -283,11 +441,14 @@ function normalizeLocal(state: PersistedStudioState): LocalNorm {
   }
   const audit = new Map<string, Record<string, unknown>>();
   for (const a of snap.auditLog) {
+    const derived = deriveAuditActorIdentity(a.actorId);
     audit.set(a.id, {
       entityType: a.entityType,
       entityId: a.entityId,
       action: a.action,
-      actorId: normNull(a.actorId),
+      actor_kind: derived.actor_kind,
+      actor_ref: derived.actor_ref,
+      actor_uuid: derived.actor_uuid,
     });
   }
   return {
@@ -394,11 +555,16 @@ function normalizeRemote(remote: TranslationStudioReadSnapshotV1): LocalNorm {
   }
   const audit = new Map<string, Record<string, unknown>>();
   for (const a of remote.auditLog) {
+    const kind = (a.actor_kind ?? "").toLowerCase() || "system";
+    const uuid =
+      kind === "user" && isUuid(a.actorId) ? String(a.actorId).toLowerCase() : null;
     audit.set(a.stable_id, {
       entityType: a.entityType,
       entityId: a.entityId,
       action: a.action,
-      actorId: normNull(a.actorId),
+      actor_kind: kind,
+      actor_ref: kind === "user" ? null : normNull(a.actor_ref),
+      actor_uuid: uuid,
     });
   }
   return {
@@ -433,24 +599,37 @@ function compareMaps(
       });
       continue;
     }
-    const fields: string[] = [];
+
+    const semanticFields: string[] = [];
+    const harmlessFields: string[] = [];
+    const reasonCodes = new Set<ReconciliationRepresentationReasonCode>();
+
     for (const key of Object.keys(loc)) {
-      const lv = loc[key];
-      const rv = rem[key];
-      if (JSON.stringify(lv) !== JSON.stringify(rv)) {
-        // Actor uuid string vs identical string
-        if (str(lv) === str(rv) && (lv == null || rv == null || typeof lv !== "object")) {
-          continue;
-        }
-        fields.push(key);
+      const classified = classifyFieldDiff(entityType, key, loc[key], rem[key]);
+      if (classified.kind === "equal") continue;
+      if (classified.kind === "harmless") {
+        harmlessFields.push(key);
+        reasonCodes.add(classified.reason);
+        continue;
       }
+      semanticFields.push(key);
     }
-    if (fields.length > 0) {
+
+    if (semanticFields.length > 0) {
       findings.push({
         category: "field_mismatch",
         entityType,
         identity: id,
-        fields,
+        fields: semanticFields.sort(),
+        smokeResidue: isSmokeOnlyClassifiableIdentity(entityType, id),
+      });
+    } else if (harmlessFields.length > 0) {
+      findings.push({
+        category: "harmless_representation_difference",
+        entityType,
+        identity: id,
+        fields: harmlessFields.sort(),
+        reasonCodes: [...reasonCodes].sort(),
         smokeResidue: isSmokeOnlyClassifiableIdentity(entityType, id),
       });
     }
@@ -462,7 +641,8 @@ function compareMaps(
         entityType,
         identity: id,
         smokeResidue: isSmokeOnlyClassifiableIdentity(entityType, id),
-        expectedStaleExtra: extraCat === "extra_remote" || extraCat === "audit_extra",
+        expectedStaleExtra:
+          extraCat === "extra_remote" || extraCat === "audit_extra",
       });
     }
   }
@@ -479,15 +659,88 @@ export function compareStudioSnapshots(input: {
   const rem = normalizeRemote(input.remote);
   const findings: ReconciliationFinding[] = [];
 
-  compareMaps("language", loc.languages, rem.languages, findings, "missing_remote", "extra_remote");
-  compareMaps("namespace", loc.namespaces, rem.namespaces, findings, "missing_remote", "extra_remote");
-  compareMaps("key", loc.keys, rem.keys, findings, "missing_remote", "extra_remote");
-  compareMaps("suggestion", loc.suggestions, rem.suggestions, findings, "missing_remote", "extra_remote");
-  compareMaps("value", loc.values, rem.values, findings, "missing_remote", "extra_remote");
-  compareMaps("version", loc.versions, rem.versions, findings, "missing_remote", "extra_remote");
-  compareMaps("memory", loc.memory, rem.memory, findings, "missing_remote", "extra_remote");
-  compareMaps("terminology", loc.terminology, rem.terminology, findings, "missing_remote", "extra_remote");
-  compareMaps("audit", loc.audit, rem.audit, findings, "audit_missing", "audit_extra");
+  compareMaps(
+    "language",
+    loc.languages,
+    rem.languages,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "namespace",
+    loc.namespaces,
+    rem.namespaces,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "key",
+    loc.keys,
+    rem.keys,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "suggestion",
+    loc.suggestions,
+    rem.suggestions,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "value",
+    loc.values,
+    rem.values,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "version",
+    loc.versions,
+    rem.versions,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "memory",
+    loc.memory,
+    rem.memory,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "terminology",
+    loc.terminology,
+    rem.terminology,
+    findings,
+    "missing_remote",
+    "extra_remote"
+  );
+  compareMaps(
+    "audit",
+    loc.audit,
+    rem.audit,
+    findings,
+    "audit_missing",
+    "audit_extra"
+  );
+
+  findings.sort((a, b) => {
+    if (a.category < b.category) return -1;
+    if (a.category > b.category) return 1;
+    if (a.entityType < b.entityType) return -1;
+    if (a.entityType > b.entityType) return 1;
+    if (a.identity < b.identity) return -1;
+    if (a.identity > b.identity) return 1;
+    return 0;
+  });
 
   const counts = emptyCounts();
   for (const f of findings) {
@@ -500,8 +753,12 @@ export function compareStudioSnapshots(input: {
         .filter((f) => f.smokeResidue)
         .map((f) => f.identity)
         .concat(
-          [...loc.namespaces.keys(), ...loc.keys.keys(), ...loc.values.keys(), ...loc.audit.keys()]
-            .filter((id) => isReservedShadowSmokeIdentity(id))
+          [
+            ...loc.namespaces.keys(),
+            ...loc.keys.keys(),
+            ...loc.values.keys(),
+            ...loc.audit.keys(),
+          ].filter((id) => isReservedShadowSmokeIdentity(id))
         )
     ),
   ].sort();

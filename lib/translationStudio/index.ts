@@ -202,14 +202,17 @@ export {
 } from "./persistence/readRpcTransport";
 
 export {
+  canonicalizeJsonValue,
   compareStudioSnapshots,
   createRemoteReadFailedReport,
+  deriveAuditActorIdentity,
   fingerprintReadSnapshot,
   isReservedShadowSmokeIdentity,
   isSmokeOnlyClassifiableIdentity,
   type ReconciliationEntityType,
   type ReconciliationFinding,
   type ReconciliationMismatchCategory,
+  type ReconciliationRepresentationReasonCode,
   type ReconciliationReport,
   type ReconciliationReportStatus,
 } from "./reconciliation/compareStudioSnapshots";
