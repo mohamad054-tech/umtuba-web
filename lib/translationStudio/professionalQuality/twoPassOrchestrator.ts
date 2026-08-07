@@ -45,6 +45,7 @@ export type RunProfessionalGenerateAndReviewResult = {
   reviewerResultAvailable: boolean;
   report: ProfessionalTranslationQualityReport | null;
   recommendation: ProfessionalQualityRecommendation;
+  suggestedRevision: string | null;
   observation: ProfessionalReviewObservation;
   authority: typeof PROFESSIONAL_AI_AUTHORITY;
   failure?: ProfessionalReviewFailure;
@@ -70,6 +71,7 @@ export async function runProfessionalGenerateAndReview(
       reviewerResultAvailable: false,
       report: null,
       recommendation: "HUMAN_REVIEW",
+      suggestedRevision: null,
       observation: gen.observation,
       authority: PROFESSIONAL_AI_AUTHORITY,
       failure: gen.failure,
@@ -89,6 +91,9 @@ export async function runProfessionalGenerateAndReview(
     reviewerResultAvailable: review.availability.available,
     report: review.report,
     recommendation: review.recommendation,
+    suggestedRevision: review.revisionAccepted
+      ? review.suggestedRevision
+      : null,
     observation: {
       ...review.observation,
       role: "two_pass",

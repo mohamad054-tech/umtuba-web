@@ -20,6 +20,14 @@ export type ProfessionalQualitySuggestionEnvelope = {
   providerId: string | null;
   modelId: string | null;
   findingCounts?: ProfessionalReviewObservation["findingCounts"];
+  qualityProfileId?: string;
+  contextPackId?: string;
+  glossaryVersion?: string;
+  cacheKey?: string;
+  generatedAt?: string;
+  humanReviewRequired?: boolean;
+  suggestedRevision?: string | null;
+  providerMode?: string;
   /** Compact report — never secrets / CoT. */
   report?: ProfessionalTranslationQualityReport;
 };

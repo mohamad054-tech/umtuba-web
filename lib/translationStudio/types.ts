@@ -145,6 +145,14 @@ export type SuggestionQualityMetadata = {
       warning: number;
       info: number;
     };
+    qualityProfileId?: string;
+    contextPackId?: string;
+    glossaryVersion?: string;
+    cacheKey?: string;
+    generatedAt?: string;
+    humanReviewRequired?: boolean;
+    suggestedRevision?: string | null;
+    providerMode?: string;
     /** Compact report object — never secrets / chain-of-thought. */
     report?: Record<string, unknown>;
   } | null;

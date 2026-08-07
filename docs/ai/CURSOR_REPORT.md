@@ -1,49 +1,47 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1
 
 ## Summary
 
 **Verdict: PASS**
 
-Professional AI review pipeline V1 on top of the quality foundation:
-`runProfessionalTranslationReview`, `generateProfessionalTranslationCandidate`,
-`runProfessionalGenerateAndReview`, strict schema validation, aggregation hard
-rules, suggested-revision re-QA, cache-key foundation, observability, failure
-semantics, provider-neutral transport (scripted / unavailable / optional
-ai_service), heuristic reviewer, and platform-admin server actions.
+Complete Studio product flow: professional generate → QA → independent review →
+pending suggestion → human review UI. Value text/status unchanged. No
+auto-approve/publish. Offline heuristic/glossary-aware path ready.
+`LIVE_PROVIDER_NOT_CONFIGURED`. Migration **NONE**. Shadow dual-write preserved.
+Dual-read observe OFF / `WAITING_FOR_ADMIN_LOGIN` untouched.
 
-Live provider env not configured → `RUNTIME_PROVIDER_NOT_CONFIGURED` (does not
-block PASS; fake/heuristic adapters complete). Persistence: migration **NONE**.
-Shadow dual-write preserved. Dual-read observe OFF. Dual-read
-`WAITING_FOR_ADMIN_LOGIN` gate untouched.
-
-Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1`
+Next (not started): `TRANSLATION_STUDIO_LIVE_PROFESSIONAL_AI_PROVIDER_READINESS_V1`
 
 ## Exact files changed
 
-- `lib/translationStudio/professionalQuality/*` pipeline modules (new/updated)
-- `lib/translationStudio/types.ts` — optional `professionalQuality` on suggestion quality
-- `lib/translationStudio/workflow/workflowService.ts` — `createProfessionalCandidateSuggestion`
-- `app/actions/translationStudioProfessionalReview.ts` (new)
-- `lib/translationStudio/translationStudioProfessionalAiReviewPipeline.test.ts` (new)
-- `docs/translation/PROFESSIONAL_AI_REVIEW_PIPELINE_V1.md` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `lib/translationStudio/professionalQuality/productWorkflow.ts` (new)
+- `lib/translationStudio/professionalQuality/providerSelection.ts` (new)
+- `lib/translationStudio/professionalQuality/glossaryAwareGenerator.ts` (new)
+- `lib/translationStudio/professionalQuality/reviewResultCache.ts` (new)
+- `lib/translationStudio/professionalQuality/{index,suggestionQualityTag,twoPassOrchestrator,productWorkflow}.ts`
+- `lib/translationStudio/workflow/workflowService.ts` — suggestion no longer replaces value
+- `lib/translationStudio/types.ts` — extended professionalQuality metadata
+- `app/actions/translationStudioProfessionalGeneration.ts` (new)
+- `app/admin/translation-studio/ProfessionalSuggestionPanel.tsx` (new)
+- `app/admin/translation-studio/keys/[keyId]/page.tsx` — actions + panel
+- tests + `docs/translation/PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-**NONE.** Quality reports ephemeral or under existing suggestion `quality` jsonb.
+**NONE.**
 
 ## Security review
 
-- No `service_role`; admin-gated server actions only
-- No provider keys to client; observation strips secrets/CoT
-- AI authority flags all false
-- Review-only action does not mutate Studio state
-- Generate creates pending suggestion only (no approve/publish)
-- Glossary/style guides server-built (not client-injected)
+- Admin-gated FormData actions; no client glossary/style/provider injection
+- No secrets/CoT in suggestion metadata or UI
+- AI authority flags false; pending_review only
+- Review-current is read-only (no value mutation)
+- Generate creates suggestion without replacing current translation
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **196 passed** (19 files)
+`npx vitest run lib/translationStudio` — **208 passed** (20 files)
 
 ## TypeScript
 
@@ -51,7 +49,7 @@ Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_TRANSLATION_GENERATION_AND_
 
 ## Build
 
-Not required (domain + server actions; no UI chrome).
+Not strictly required; key page UI updated (admin forms + panel).
 
 ## git diff --check
 
@@ -63,5 +61,5 @@ Expect clean after commit/push.
 
 ## Open issues
 
-1. Live runtime provider not configured on this device (`RUNTIME_PROVIDER_NOT_CONFIGURED`).
-2. Dual-read activation gate remains `WAITING_FOR_ADMIN_LOGIN` (untouched).
+1. Live AI provider not configured (`LIVE_PROVIDER_NOT_CONFIGURED`).
+2. Dual-read activation remains `WAITING_FOR_ADMIN_LOGIN`.

@@ -31,3 +31,7 @@ export * from "./generateCandidate";
 export * from "./twoPassOrchestrator";
 export * from "./suggestionQualityTag";
 export * from "./heuristicReviewer";
+export * from "./glossaryAwareGenerator";
+export * from "./providerSelection";
+export * from "./reviewResultCache";
+export * from "./productWorkflow";

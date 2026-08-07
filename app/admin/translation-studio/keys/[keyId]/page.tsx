@@ -8,9 +8,14 @@ import {
   saveTranslationDraftAction,
   submitTranslationReviewAction,
 } from "../../../../actions/translationStudio";
+import {
+  generateProfessionalTranslationSuggestionAction,
+  reviewCurrentTranslationProfessionallyAction,
+} from "../../../../actions/translationStudioProfessionalGeneration";
 import { getTranslationStudio } from "../../../../../lib/translationStudio";
 import { requireTranslationStudioAdmin } from "../../requireTranslationStudioAdmin";
 import { scheduleTranslationStudioDualReadObservation } from "../../scheduleDualReadObservation";
+import ProfessionalSuggestionPanel from "../../ProfessionalSuggestionPanel";
 import TranslationStatusBadge from "../../TranslationStatusBadge";
 import TranslationStudioShell, {
   TRANSLATION_STUDIO_BASE,
@@ -64,6 +69,24 @@ export default async function TranslationStudioKeyDetailPage({
         {query.error ? (
           <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
             {query.error}
+          </p>
+        ) : null}
+        {query.professional_suggested === "1" ? (
+          <p className="rounded-xl border border-violet-400/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-50">
+            Professional suggestion created
+            {query.recommendation ? ` · ${query.recommendation}` : ""}
+            {query.score ? ` · score ${query.score}` : ""}. Current translation
+            unchanged — human approval required.
+          </p>
+        ) : null}
+        {query.professional_reviewed === "1" ? (
+          <p className="rounded-xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 text-sm text-sky-50">
+            Professional review (read-only)
+            {query.recommendation ? ` · ${query.recommendation}` : ""}
+            {query.score ? ` · score ${query.score}` : ""}
+            {query.human === "1" ? " · human review required" : ""}
+            {query.cache ? ` · cache ${query.cache}` : ""}
+            {query.findings ? ` · ${query.findings}` : ""}. Value not mutated.
           </p>
         ) : null}
 
@@ -197,6 +220,28 @@ export default async function TranslationStudioKeyDetailPage({
                     Request AI suggestion
                   </button>
                 </form>
+                <form action={generateProfessionalTranslationSuggestionAction}>
+                  <input type="hidden" name="valueId" value={value.id} />
+                  <input type="hidden" name="keyId" value={key.id} />
+                  <input type="hidden" name="returnTo" value={returnTo} />
+                  <button
+                    type="submit"
+                    className="watch-focus-ring rounded-full border border-violet-400/40 px-3 py-1.5 text-xs font-bold text-violet-100"
+                  >
+                    Professional generate + review
+                  </button>
+                </form>
+                <form action={reviewCurrentTranslationProfessionallyAction}>
+                  <input type="hidden" name="valueId" value={value.id} />
+                  <input type="hidden" name="keyId" value={key.id} />
+                  <input type="hidden" name="returnTo" value={returnTo} />
+                  <button
+                    type="submit"
+                    className="watch-focus-ring rounded-full border border-fuchsia-400/30 px-3 py-1.5 text-xs font-bold text-fuchsia-100"
+                  >
+                    Review current professionally
+                  </button>
+                </form>
               </div>
 
               {conflicts.length > 0 ? (
@@ -229,6 +274,14 @@ export default async function TranslationStudioKeyDetailPage({
                       : ""}
                   </p>
                 </div>
+              ) : null}
+
+              {latestSuggestion?.quality.professionalQuality ? (
+                <ProfessionalSuggestionPanel
+                  candidateText={latestSuggestion.candidateText}
+                  locale={value.language}
+                  quality={latestSuggestion.quality}
+                />
               ) : null}
 
               <div className="mt-4 grid gap-4 lg:grid-cols-2">

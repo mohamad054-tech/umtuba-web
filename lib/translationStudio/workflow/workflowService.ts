@@ -453,16 +453,9 @@ export function createTranslationStudioWorkflow(options?: {
       };
 
       state.suggestions.unshift(enriched);
-
-      mutateValue(valueId, "ai_suggest", actor, null, (current) => ({
-        ...current,
-        value: enriched.candidateText,
-        status: "ai_suggested",
-        suggestionId: enriched.id,
-        updatedAt: new Date().toISOString(),
-        updatedBy: actor.userId,
-        version: current.version + 1,
-      }));
+      // Do NOT replace current translation text or change status.
+      // Human must explicitly approve/apply via existing controls.
+      save();
 
       return enriched;
     },

@@ -437,10 +437,10 @@ describe("professional AI review pipeline", () => {
       "professional_quality_v1"
     );
     const updated = wf.getValue(value!.id);
-    expect(updated?.status).toBe("ai_suggested");
-    // Not approved/published
-    expect(updated?.status).not.toBe("approved");
-    expect(updated?.status).not.toBe("ready_for_publish");
+    // Professional suggestion must NOT replace current translation or change status
+    expect(updated?.value).toBe(value!.value);
+    expect(updated?.status).toBe(value!.status);
+    expect(suggestion.status).toBe("pending_review");
   });
 
   it("generator pipeline cannot approve; no secrets in observation", async () => {
