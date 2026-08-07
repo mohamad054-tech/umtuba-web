@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P12` (… → naming registry → aggregate registry facade)
+- Phase: `P1`–`P13` (… → aggregate registry facade → validator composition)
 
 ## Phase P3 scope
 
@@ -150,3 +150,16 @@ Pure **Model A aggregate registry facade** under `platforms/core/registry/`.
 Out of scope for P12: mega-wire factory, event routing slot, validator
 completion, SDK/runtime ports, DI/startup orchestration, persistence,
 networking, product integration, migrations.
+
+## Phase P13 scope
+
+Pure **validator composition** under `platforms/core/validation/`.
+
+- `createUmCoreValidator(deps)` composes existing P2 validators with
+  registry-backed `validateDependencies(platformId)`
+- Completeness (missing/stale materialization) + referential drift only
+- Minimal DI: platforms + dependencies (+ optional capabilities/validators)
+
+Out of scope for P13: `UmDependencyValidator`, dependency resolver, cycle
+solver, SDK/runtime ports, persistence, networking, product integration,
+migrations.
