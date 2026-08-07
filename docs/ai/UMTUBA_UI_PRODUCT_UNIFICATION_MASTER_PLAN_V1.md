@@ -2,7 +2,7 @@
 
 **Program:** `UMTUBA_UI_PRODUCT_UNIFICATION`  
 **Owner:** Central Server  
-**Status:** U1 IMPLEMENTED / pending review  
+**Status:** U1 INTEGRATED · U2 IMPLEMENTED_PENDING_REVIEW  
 **Baseline tip for first wave:** `origin/office/platform-commerce-learning-chrome-wiring-v1` @ `3b7315667ab6824062e89126b1f94bd729376082`  
 **Inventory:** `docs/ai/UMTUBA_FULL_PRODUCT_SURFACE_INVENTORY_V1.md`  
 **Migration required:** NO  
@@ -15,10 +15,10 @@
 3. **Global nav:** `AppTopNav` + `AppMobileBottomNav` + `AppChrome`.  
 4. **Platform-local nav:** LearningShell / StoreShell / SellerOpsShell / AiHubShell.  
 5. **Account:** UserMenu + `/profile` + `/settings`.  
-6. **Search:** Top-nav Search â†’ `/search`.  
+6. **Search:** Top-nav Search Ã¢â€ â€™ `/search`.  
 7. **Map:** World Discovery `/world` (desktop-primary; mobile policy excludes World from bottom nav).  
-8. **Notifications:** NotificationBell â†’ `/notifications`.  
-9. **Return Home:** UMTUBA mark â†’ `/`.  
+8. **Notifications:** NotificationBell Ã¢â€ â€™ `/notifications`.  
+9. **Return Home:** UMTUBA mark Ã¢â€ â€™ `/`.  
 
 Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live feed Home without replacing either blindly.
 
@@ -32,8 +32,8 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 ### P1
 | ID | Platform | Problem | Correction | Conflict | Size | Parallel |
 |----|----------|---------|------------|----------|------|----------|
-| P1-1 | Home / Nav | Store & Collaboration weak vs Learning on primary chrome | Shell/nav coherence wave â€” expose Store (and Collab when gate on) without removing Home feed | avoid Commerce money files | M | YES vs Commerce WAITING |
-| P1-2 | Home | Circular arc / HOME_CIRCLE contracts â‰  live Home UI | Document + flag-gated wiring to real hrefs; keep Discover feed | Home lock paths | M | after U1 |
+| P1-1 | Home / Nav | Store & Collaboration weak vs Learning on primary chrome | Shell/nav coherence wave Ã¢â‚¬â€ expose Store (and Collab when gate on) without removing Home feed | avoid Commerce money files | M | YES vs Commerce WAITING |
+| P1-2 | Home | Circular arc / HOME_CIRCLE contracts Ã¢â€°Â  live Home UI | Document + flag-gated wiring to real hrefs; keep Discover feed | Home lock paths | M | after U1 |
 | P1-3 | World | City route duplication `/city` vs `/world/city` | Classify canonical; alias or redirect plan | none | S | YES |
 | P1-4 | Collaboration | Home/global entry weak | Entry from menu/chrome after platform gate | Collab apply HOLD | S | after 20260917 apply GO |
 | P1-5 | Learning tip drift | `/learning/saved` on Learning SoT not on chrome tip | Later FF/port Learning UI onto UI baseline | Learning IDLE ok for inventory | M | after assign |
@@ -58,7 +58,7 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 | Wave | Name | Scope | Migration | DB | Owner |
 |------|------|-------|-----------|----|-------|
 | **U0** | Recover/classify accepted UI | inventory (this doc) | NO | NO | Server DONE |
-| **U1** | Global shell/navigation consistency | AppTopNav/UserMenu/mobile contracts; Store (+ Collab entry when allowed); no Home feed rewrite | NO | NO | Server â€” **SELECTED FIRST** |
+| **U1** | Global shell/navigation consistency | AppTopNav/UserMenu/mobile contracts; Store (+ Collab entry when allowed); no Home feed rewrite | NO | NO | Server Ã¢â‚¬â€ **SELECTED FIRST** |
 | U2 | Home organization | Reconcile circle/arc entries with Discover Home under flags | NO | NO | Server |
 | U3 | Map/World consolidation | Canonical city routes; mobile affordance docs | NO | NO | Server |
 | U4 | Platform hubs | Learning/Store/Workspaces hub chrome | NO | NO | per platform holds |
@@ -80,9 +80,9 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 | Branch (when GO) | `office/central-ui-shell-navigation-coherence-v1` |
 | Worktree (when GO) | `D:\umtuba-central\repos\umtuba-web-central-ui-shell-navigation-coherence-v1` |
 | Base SHA | `3b7315667ab6824062e89126b1f94bd729376082` |
-| Preserves Home | YES â€” no DiscoverExperience replacement |
-| Preserves Map | YES â€” no World rewrite |
-| Avoids holds | YES â€” no Commerce money, Translation, Collab migration SQL, Learning bookmarks SQL |
+| Preserves Home | YES Ã¢â‚¬â€ no DiscoverExperience replacement |
+| Preserves Map | YES Ã¢â‚¬â€ no World rewrite |
+| Avoids holds | YES Ã¢â‚¬â€ no Commerce money, Translation, Collab migration SQL, Learning bookmarks SQL |
 | Tests | nav contract tests under `app/lib/nav/**` |
 | Migration | NO |
 | Remote DB | NO |
@@ -95,7 +95,7 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 - Mobile discovery: Store + World in user-menu You group (no bottom-nav overload)
 - Canonical labels: Home, World, Store (not Discover/Map/Commerce in chrome)
 - Collaboration/Workspaces entry: **DEFERRED_TO_LATER_WAVE** (route absent on baseline)
-- Migration: NONE · Remote DB: NONE
+- Migration: NONE Â· Remote DB: NONE
 
 ---
 
@@ -103,8 +103,24 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 
 | Workstream | Owner | Status |
 |------------|-------|--------|
-| UMTUBA_UI_PRODUCT_UNIFICATION | Central Server | **U1 IMPLEMENTED / pending review** |
-| Learning Bookmarks | â€” | COMPLETE (HISTORY_ALIGNED) |
+| UMTUBA_UI_PRODUCT_UNIFICATION | Central Server | **U1 INTEGRATED** · **U2 IMPLEMENTED_PENDING_REVIEW** |
+| Learning Bookmarks | Ã¢â‚¬â€ | COMPLETE (HISTORY_ALIGNED) |
 | Collaboration 20260917 | Agent4 lineage | GIT_LANDED_PENDING_REMOTE (SoT FF done) |
 | Commerce P6R2 | Desktop | WAITING_DEPENDENCY |
 | Translation | Computer 2 | FROZEN |
+
+---
+
+## U2 Home Organization (this wave)
+
+| Field | Value |
+|-------|-------|
+| State | **IMPLEMENTED_PENDING_REVIEW** |
+| Branch | `office/central-ui-home-organization-v1` |
+| Base | Central UI integration `office/central-ui-product-integration-v1` @ `5acb0a0…` |
+| Preserves | video-first DiscoverExperience; U1 chrome; World internals untouched |
+| Platform entries | Section circles + arc portals wire real hrefs via `homePlatformEntryContract` |
+| Flags | `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED=false`; preview gate unchanged |
+| Collaboration entry | DEFERRED (no `/workspaces` on baseline) |
+| Migration | NONE |
+| U3 Map | **NOT STARTED** |

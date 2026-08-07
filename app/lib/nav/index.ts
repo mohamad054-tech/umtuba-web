@@ -126,3 +126,11 @@ export {
   assertUserMenuContract,
   expectedUserMenuLabels,
 } from "./platformNavContract";
+
+export {
+  HOME_ARC_PORTAL_HREFS,
+  HOME_COLLABORATION_ENTRY,
+  HOME_SECTION_CIRCLE_ENTRIES,
+  assertHomeCircleHrefContract,
+  resolveHomeArcPortalHref,
+} from "./homePlatformEntryContract";

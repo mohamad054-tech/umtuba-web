@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffectEvent } from "react";
+import { resolveHomeArcPortalHref } from "../../../lib/nav/homePlatformEntryContract";
 import {
   HOME_ARC_FOUNDATION_PORTALS,
   type HomeArcPortal,
@@ -8,6 +10,10 @@ import {
 
 export type HomeCircularArcProps = {
   portals?: readonly HomeArcPortal[];
+  /**
+   * Optional override. When omitted, portals with a known Home entry href
+   * navigate via Link; unknown portals keep foundation log-only behavior.
+   */
   onPortalPress?: (portalId: string) => void;
   className?: string;
 };
@@ -18,22 +24,29 @@ export type HomeCircularArcProps = {
  */
 const LEFT_ARC_TRANSLATE_X_PX = [0, -6, -11, -14, -11, -6, 0] as const;
 
-function defaultPortalPress(portalId: string) {
-  console.info("[HomeCircularArc] portal press", portalId);
+function defaultUnknownPortalPress(portalId: string) {
+  console.info("[HomeCircularArc] portal press (no href)", portalId);
 }
 
 /**
  * Left Action Rail — same circle chrome as DiscoverActionRail
  * (`watch-rail-btn` h-12). Height comes from the host (right-rail box).
  * Arc = fixed translateX only.
+ *
+ * U2: when a portal maps to an accepted platform href, render a Link.
+ * Flags still gate mounting via shouldMountHomeCircularArc().
  */
 export default function HomeCircularArc({
   portals = HOME_ARC_FOUNDATION_PORTALS,
-  onPortalPress = defaultPortalPress,
+  onPortalPress,
   className = "",
 }: HomeCircularArcProps) {
-  const handlePortalPress = useEffectEvent((portalId: string) => {
-    onPortalPress(portalId);
+  const handleUnknownPress = useEffectEvent((portalId: string) => {
+    if (onPortalPress) {
+      onPortalPress(portalId);
+      return;
+    }
+    defaultUnknownPortalPress(portalId);
   });
 
   return (
@@ -47,25 +60,48 @@ export default function HomeCircularArc({
           LEFT_ARC_TRANSLATE_X_PX[
             Math.min(index, LEFT_ARC_TRANSLATE_X_PX.length - 1)
           ] ?? 0;
+        const href = onPortalPress
+          ? null
+          : resolveHomeArcPortalHref(portal.id);
+
+        const chrome = (
+          <span className="watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/45 text-[11px] font-black tracking-wide text-white backdrop-blur-md">
+            <span aria-hidden className="leading-none">
+              {portal.glyph}
+            </span>
+          </span>
+        );
 
         return (
           <div
             key={portal.id}
             style={{ transform: `translateX(${offsetX}px)` }}
           >
-            <button
-              type="button"
-              aria-label={`${portal.label} portal`}
-              data-portal-id={portal.id}
-              onClick={() => handlePortalPress(portal.id)}
-              className="watch-focus-ring flex items-center justify-center"
-            >
-              <span className="watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/45 text-[11px] font-black tracking-wide text-white backdrop-blur-md">
-                <span aria-hidden className="leading-none">
-                  {portal.glyph}
-                </span>
-              </span>
-            </button>
+            {href ? (
+              <Link
+                href={href}
+                aria-label={`${portal.label} portal`}
+                data-portal-id={portal.id}
+                data-portal-href={href}
+                className="watch-focus-ring flex items-center justify-center"
+              >
+                {chrome}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                aria-label={`${portal.label} portal`}
+                data-portal-id={portal.id}
+                onClick={() =>
+                  onPortalPress
+                    ? onPortalPress(portal.id)
+                    : handleUnknownPress(portal.id)
+                }
+                className="watch-focus-ring flex items-center justify-center"
+              >
+                {chrome}
+              </button>
+            )}
           </div>
         );
       })}

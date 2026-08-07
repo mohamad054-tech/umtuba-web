@@ -110,15 +110,17 @@ describe("Platform Navigation Contract Sync V1", () => {
       ]);
       const circles = read("app/discover/components/HomeSectionCircles.tsx");
       expect(circles).toMatch(/aria-label="Section shortcuts"/);
-      // Order contract via APP_ROUTES keys (layout of HomeSectionCircles stays locked).
-      const learningIdx = circles.indexOf("APP_ROUTES.learning");
-      const storeIdx = circles.indexOf("APP_ROUTES.store");
-      const gamesIdx = circles.indexOf("APP_ROUTES.games");
-      const liveIdx = circles.indexOf("APP_ROUTES.live");
-      const worldIdx = circles.indexOf("APP_ROUTES.worldDiscovery");
-      const searchIdx = circles.indexOf("APP_ROUTES.search");
-      const messagesIdx = circles.indexOf("APP_ROUTES.messages");
-      const createIdx = circles.indexOf("APP_ROUTES.createVideo");
+      expect(circles).toMatch(/HOME_SECTION_CIRCLE_ENTRIES/);
+      // Order contract lives in homePlatformEntryContract (lockstep with HOME_CIRCLE_ENTRY_HREFS).
+      const contract = read("app/lib/nav/homePlatformEntryContract.ts");
+      const learningIdx = contract.indexOf('id: "learning"');
+      const storeIdx = contract.indexOf('id: "store"');
+      const gamesIdx = contract.indexOf('id: "games"');
+      const liveIdx = contract.indexOf('id: "live"');
+      const worldIdx = contract.indexOf('id: "world"');
+      const searchIdx = contract.indexOf('id: "search"');
+      const messagesIdx = contract.indexOf('id: "messages"');
+      const createIdx = contract.indexOf('id: "create"');
       expect(learningIdx).toBeGreaterThan(-1);
       expect(storeIdx).toBeGreaterThan(learningIdx);
       expect(gamesIdx).toBeGreaterThan(storeIdx);

@@ -53,10 +53,13 @@ describe("Page Assembly V1 — routes", () => {
 
   it("Home shell includes section circles for Learning Store Games Live", () => {
     const circles = read("app/discover/components/HomeSectionCircles.tsx");
-    expect(circles).toMatch(/APP_ROUTES\.learning/);
-    expect(circles).toMatch(/APP_ROUTES\.store/);
-    expect(circles).toMatch(/APP_ROUTES\.games/);
-    expect(circles).toMatch(/APP_ROUTES\.live/);
+    expect(circles).toMatch(/HOME_SECTION_CIRCLE_ENTRIES/);
+    expect(circles).toMatch(/aria-label="Section shortcuts"/);
+    const contract = read("app/lib/nav/homePlatformEntryContract.ts");
+    expect(contract).toMatch(/APP_ROUTES\.learning/);
+    expect(contract).toMatch(/APP_ROUTES\.store/);
+    expect(contract).toMatch(/APP_ROUTES\.games/);
+    expect(contract).toMatch(/APP_ROUTES\.live/);
     const shell = read("app/discover/components/DiscoverShell.tsx");
     expect(shell).toMatch(/HomeSectionCircles/);
     expect(shell).toMatch(/title="Home"/);

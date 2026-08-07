@@ -1,6 +1,6 @@
 /**
- * Portal identity for Home Circular Arc Navigation Foundation V1.
- * Mock / foundation data only — no domain routing or business logic.
+ * Portal identity for Home Circular Arc.
+ * Labels/glyphs are presentation; hrefs resolve via homePlatformEntryContract (U2).
  */
 
 export type HomeArcPortalId =
