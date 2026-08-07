@@ -1,35 +1,37 @@
 # Current Task
 
-## COLLABORATION SoT — Resource Link Foundation INTEGRATED
+## ACTIVE FEATURE BRANCH (not SoT)
 
-- **Milestone closed:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_FOUNDATION_SOT_INTEGRATION_V1`
-- **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Integrated feature:** `office/collaboration-workspace-resource-link-foundation-v1` @ `d490849`
-- **Method:** fast-forward only (`90be871` → `d490849`)
+- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_MUTATION_RUNTIME_V1`
+- **Branch:** `office/collaboration-workspace-resource-link-mutation-runtime-v1`
+- **Base SoT HEAD:** `9e140fd4642f5f2bd0b304d3956bdba1028f1e84`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
+- **Do not merge to SoT in this task.**
 
-## Status
+## Goal
 
-Resource Link Foundation V1 = **INTEGRATED / CLOSED** on Collaboration SoT.
+Authenticated Collaboration-internal mutation runtime for workspace resource links
+over existing `collaboration_workspace_resource_links`. SECURITY DEFINER RPCs
+required (authenticated grants are SELECT-only). Migration created locally only —
+**do not apply remotely**. No product bindings. Platform flag stays `false`.
 
-- Existing table `collaboration_workspace_resource_links` reused (spine `20260896`)
-- No migration required / no migration applied
-- Read/model foundation only; mutation execution intentionally fail-closed
-- Platform flag remains default `false`
-- Product-specific bindings deferred
-- Authenticated write/RPC path remains the next gap
+## Allowed scope
 
-## Do NOT start automatically
+- `lib/collaboration/workspaceResourceLinkMutationRuntime.ts` (+ tests)
+- spine RPC name exports if needed
+- local migration `20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql`
+- `docs/ai/CURRENT_TASK.md` / `CURSOR_REPORT.md`
 
-- Mutation Runtime
+## Forbidden scope
+
 - Learning / Commerce / advertiser bindings
-- UM Core P17
+- Platform flag enablement
+- Remote migration apply
+- Broad UI / invite expansion / smoke-keepalive / UM Core P17
+- Touching `20260898` or `20260917`
 
 ## CLOSED ON SoT (do not redo)
 
-- Workspace Spine / Membership / Settings Lifecycle UI
+- Resource Link Foundation V1 INTEGRATED
+- Settings / Membership / Role Management
 - `20260917` APPLIED + VERIFIED
-- Member Role Management UI V1
-- Resource Link Foundation V1
-- stale `20260898` NON-SOT; remote Commerce only
-- smoke/keepalive NOT SoT

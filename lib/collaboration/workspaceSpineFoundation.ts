@@ -149,6 +149,13 @@ export const COLLABORATION_WORKSPACE_RPCS = {
   updateSettings: "update_collaboration_workspace_settings",
 } as const;
 
+/** Resource-link mutation RPCs (20260919; local until applied). */
+export const COLLABORATION_RESOURCE_LINK_MUTATION_RPCS = {
+  create: "create_collaboration_workspace_resource_link",
+  update: "update_collaboration_workspace_resource_link",
+  delete: "delete_collaboration_workspace_resource_link",
+} as const;
+
 export const COLLABORATION_WORKSPACE_HELPERS = {
   roleRank: "collaboration_workspace_role_rank",
   roleAtLeast: "collaboration_workspace_role_at_least",

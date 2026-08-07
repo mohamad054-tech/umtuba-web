@@ -1,35 +1,61 @@
-# CURSOR_REPORT — Resource Link Foundation SoT integration V1
+# CURSOR_REPORT — Collaboration Workspace Resource Link Mutation Runtime V1
 
 ## Summary
 
-**CLOSED** — Fast-forwarded Resource Link Foundation V1 (`d490849`) into
-canonical Collaboration SoT. No merge commit. No migration. Flag remains
-default `false`. Mutation execution remains fail-closed. Product bindings deferred.
+**CLOSED** — Authenticated mutation runtime for workspace resource links via
+SECURITY DEFINER RPCs (local migration `20260919`). Table grants remain
+SELECT-only. No remote apply. No product bindings. Platform flag default `false`.
+Not merged to Collaboration SoT.
 
-## Integration
+## Exact files changed
 
-- Method: **fast-forward only**
-- Source: `office/collaboration-workspace-resource-link-foundation-v1` @ `d490849`
-- SoT before: `90be871`
-- SoT after FF: `d490849` (+ docs closeout commit if present)
+- `supabase/migrations/20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql` (new, local only)
+- `lib/collaboration/workspaceResourceLinkMutationRuntime.ts` (new)
+- `lib/collaboration/workspaceResourceLinkMutationRuntime.test.ts` (new)
+- `lib/collaboration/workspaceSpineFoundation.ts` (RPC name exports)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
-## Architecture
+## Migrations created
 
-- Boundary: Workspace → Resource Reference (not product ownership)
-- Table: existing `collaboration_workspace_resource_links`
-- Types: `learning_space` | `store` | `advertiser_account`
-- Reads + typed intents only; `rejectCollaborationResourceLinkMutation` fail-closed
+YES — `20260919_collaboration_workspace_resource_link_mutation_runtime_v1.sql` (NOT applied)
 
-## Validation
+## Security review
 
-- Focused Collaboration tests 30/30 PASS
-- `tsc --noEmit` PASS
-- Trailer/secret scan PASS
-- Scope review: no migrations / Learning / Commerce / UM Core / 20260898 / smoke-keepalive
+- No direct authenticated INSERT/UPDATE/DELETE grants
+- SECURITY DEFINER RPCs with `search_path = public`, `auth.uid()` required
+- Authorization via `can_manage_collaboration_workspace` (owner/admin/platform admin)
+- Unique `(resource_type, resource_id)` conflict mapped explicitly
+- Error sanitization for auth/permission/duplicate/not-found
+- No service-role in user-facing runtime
+- No Learning/Commerce/advertiser binding
 
-## Deferred
+## Tests
 
-- Authenticated write / mutation runtime
-- Resource-link product bindings
-- Invite expansion
-- Credentialed E2E role-update smoke
+- mutation runtime — 10/10 PASS
+- resource link foundation — 11/11 PASS
+- platform gate — 7/7 PASS
+- spine foundation — 12/12 PASS
+- Total focused: 40/40 PASS
+
+## TypeScript
+
+`npx tsc --noEmit` — PASS
+
+## Build
+
+Not required (lib + migration only).
+
+## git diff --check
+
+PASS
+
+## git status --short
+
+Clean after commit/push (see closeout).
+
+## Open issues
+
+- Migration `20260919` not applied remotely
+- Product bindings deferred
+- No UI / SoT integration in this milestone
