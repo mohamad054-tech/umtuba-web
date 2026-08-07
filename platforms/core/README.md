@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P5` (contracts → validation → compliance → platform registry → capability registry)
+- Phase: `P1`–`P6` (… → capability registry → event type registry)
 
 ## Phase P3 scope
 
@@ -67,3 +67,14 @@ Pure **in-memory capability registry** under `platforms/core/capability/`.
 
 Out of scope for P5: capability execution, AI, event routing, flag evaluation,
 persistence, networking, SDK/health runtime, product integration.
+
+## Phase P6 scope
+
+Pure **in-memory event type registry** under `platforms/core/event/`.
+
+- Catalog of event TYPE definitions owned by registered producer platforms
+- Lookups by id, producer, schema version, stability, PII class, delivery
+- Registration is **not** emission or consumption authorization
+
+Out of scope for P6: event bus, publish/consume, outbox, retry, queues,
+transport, persistence, networking, product integration.

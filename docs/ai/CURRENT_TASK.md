@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Capability Registry Foundation P5
+UM Core Platform Event Type Registry Foundation P6
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Capability Registry Foundation P5
 
 ## Branch
 
-`office/um-core-platform-capability-registry-foundation-p5`
+`office/um-core-platform-event-type-registry-foundation-p6`
 
 ## Base HEAD
 
-`5215e15267ae1c6955c6101b914066d771acabe7` (Platform Registry P4 close)
+`d57e481d5177051dcd2a7b06c81717d3cb918053` (Capability Registry P5 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-capability-registry-foundation-p5`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-event-type-registry-foundation-p6`
 
 ## Milestone
 
-`um.core.capability_registry_foundation_p5`
+`um.core.event_type_registry_foundation_p6`
 
 ## Allowed scope
 
-- `platforms/core/capability/**`
+- `platforms/core/event/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,13 +36,14 @@ UM Core Platform Capability Registry Foundation P5
 
 ## Forbidden scope
 
-- Capability execution / AI / event routing / flag evaluation
+- Event bus / publish / consume / outbox / transport
 - Persistence / networking / product integration
 - Migrations / database
 
 ## Delivered
 
-Pure in-memory capability registry bound to registered platforms, with
+Pure in-memory event type catalog bound to registered platforms, with
 lookups, deterministic rejection findings, and focused tests.
-Committed and pushed on `office/um-core-platform-capability-registry-foundation-p5`.
-Do not start P6 from this handoff.
+Registration is not emission or consumption authorization.
+Committed and pushed on `office/um-core-platform-event-type-registry-foundation-p6`.
+Do not start P7 from this handoff.
