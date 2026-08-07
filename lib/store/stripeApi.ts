@@ -142,6 +142,57 @@ export async function retrieveStripePaymentIntent(
   );
 }
 
+export type StripeRefund = {
+  id: string;
+  object?: string;
+  amount: number;
+  currency: string;
+  payment_intent: string | { id: string } | null;
+  status: string;
+  charge?: string | { id: string } | null;
+};
+
+/**
+ * Create a Stripe Refund (partial or full) against a PaymentIntent.
+ * Caller must supply a stable Idempotency-Key.
+ */
+export async function createStripeRefund(
+  secretKey: string,
+  input: {
+    paymentIntentId: string;
+    amountMinor: number;
+    currency: string;
+    idempotencyKey: string;
+    reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+  }
+): Promise<StripeApiResult<StripeRefund>> {
+  return stripeRequest<StripeRefund>(
+    secretKey,
+    "POST",
+    "/refunds",
+    {
+      payment_intent: input.paymentIntentId,
+      amount: input.amountMinor,
+      currency: input.currency.toLowerCase(),
+      ...(input.reason ? { reason: input.reason } : {}),
+      "metadata[adapter]":
+        "commerce.payments.partial_refund_provider_money_execution_v1",
+    },
+    input.idempotencyKey
+  );
+}
+
+export async function retrieveStripeRefund(
+  secretKey: string,
+  refundId: string
+): Promise<StripeApiResult<StripeRefund>> {
+  return stripeRequest<StripeRefund>(
+    secretKey,
+    "GET",
+    `/refunds/${encodeURIComponent(refundId)}`
+  );
+}
+
 /**
  * Verify Stripe webhook signature (v1). Returns the event payload object.
  */

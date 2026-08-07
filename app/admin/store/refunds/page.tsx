@@ -11,6 +11,14 @@ import {
   type TrustedPartialRefundFactLoadResult,
 } from "../../../../lib/store/partialRefundReservation";
 import {
+  buildPartialRefundProviderMoneyReadinessReport,
+  buildProviderMoneyExecuteCandidate,
+  createPartialRefundProviderMoneyServiceRole,
+  resolveTrustedStripePaymentIntentRef,
+  type PartialRefundProviderExecutionRecord,
+  type ProviderMoneyExecuteCandidateModel,
+} from "../../../../lib/store/partialRefundProviderMoneyExecution";
+import {
   loadPartialRefundCaptureAccountingReview,
   type PartialRefundAccountingReviewModel,
 } from "../../../../lib/store/partialRefundReservationAccounting";
@@ -23,6 +31,9 @@ import AdminStoreShell, { StatusChip } from "../AdminStoreShell";
 import PartialRefundAccountingReviewPanel from "./PartialRefundAccountingReviewPanel";
 import PartialRefundReservationPanel from "./PartialRefundReservationPanel";
 import PartialRefundStuckCommittingRecoveryPanel from "./PartialRefundStuckCommittingRecoveryPanel";
+import PartialRefundProviderMoneyExecutePanel from "./PartialRefundProviderMoneyExecutePanel";
+import PartialRefundProviderMoneyReadinessPanel from "./PartialRefundProviderMoneyReadinessPanel";
+import PartialRefundProviderMoneyRecoveryPanel from "./PartialRefundProviderMoneyRecoveryPanel";
 import RefundOpsActions from "./RefundOpsActions";
 
 export const metadata = {
@@ -157,6 +168,36 @@ export default async function AdminStoreRefundsPage({
     typeof sp.prCompRestored === "string" ? sp.prCompRestored : null;
   const prCompPrefill =
     typeof sp.prCompPrefill === "string" ? sp.prCompPrefill : null;
+  const prProvErr =
+    typeof sp.prProvErr === "string" ? sp.prProvErr : null;
+  const prProvStoreId =
+    typeof sp.prProvStoreId === "string" ? sp.prProvStoreId.trim() : "";
+  const prProvRecOk = sp.prProvRecOk === "1";
+  const prProvRecStatus =
+    typeof sp.prProvRecStatus === "string" ? sp.prProvRecStatus : null;
+  const prProvRecError =
+    typeof sp.prProvRecError === "string" ? sp.prProvRecError : null;
+  const prProvRecLedgerId =
+    typeof sp.prProvRecLedgerId === "string" ? sp.prProvRecLedgerId : null;
+  const prProvRecExecutionId =
+    typeof sp.prProvRecExecutionId === "string"
+      ? sp.prProvRecExecutionId
+      : null;
+  const prProvExecOk = sp.prProvExecOk === "1";
+  const prProvExecStatus =
+    typeof sp.prProvExecStatus === "string" ? sp.prProvExecStatus : null;
+  const prProvExecError =
+    typeof sp.prProvExecError === "string" ? sp.prProvExecError : null;
+  const prProvExecLedgerId =
+    typeof sp.prProvExecLedgerId === "string"
+      ? sp.prProvExecLedgerId.trim()
+      : "";
+  const prProvExecExecutionId =
+    typeof sp.prProvExecExecutionId === "string"
+      ? sp.prProvExecExecutionId
+      : null;
+  const prProvExecSubmit =
+    typeof sp.prProvExecSubmit === "string" ? sp.prProvExecSubmit : null;
 
   let prAcctReview: PartialRefundAccountingReviewModel | null = null;
   let prAcctError: string | null = null;
@@ -173,6 +214,109 @@ export default async function AdminStoreRefundsPage({
         prAcctReview = acct.review;
       } else {
         prAcctError = acct.message;
+      }
+    }
+  }
+
+  let prProvExecutions: readonly PartialRefundProviderExecutionRecord[] = [];
+  let prProvLoadError: string | null = null;
+  let prProvExecCandidates: ProviderMoneyExecuteCandidateModel[] = [];
+  let prProvExecLoadError: string | null = null;
+  const prProvReadiness = buildPartialRefundProviderMoneyReadinessReport(
+    process.env
+  );
+
+  if (prProvStoreId) {
+    const boot = createPartialRefundProviderMoneyServiceRole();
+    if (!boot.ok) {
+      prProvLoadError = boot.message;
+      prProvExecLoadError = boot.message;
+    } else {
+      const listed = await boot.repository.list({
+        storeId: prProvStoreId,
+        limit: 50,
+      });
+      if (!listed.ok) {
+        prProvLoadError = listed.message;
+      } else {
+        prProvExecutions = listed.executions;
+      }
+
+      const ledgerBoot = createPartialRefundReservationServiceRole();
+      if (!ledgerBoot.ok) {
+        prProvExecLoadError = ledgerBoot.message;
+      } else {
+        const candidateLedgers: Array<{
+          ledgerId: string;
+          storeId: string;
+          orderId: string;
+          paymentAttemptId: string;
+          captureEventId: string;
+          refundAmountMinor: number;
+          currency: string;
+          status: string;
+        }> = [];
+
+        if (prProvExecLedgerId) {
+          const row = await ledgerBoot.repository.getByLedgerId(
+            prProvExecLedgerId
+          );
+          if (row && row.storeId === prProvStoreId) {
+            candidateLedgers.push(row);
+          } else if (row && row.storeId !== prProvStoreId) {
+            prProvExecLoadError = "Ledger does not belong to store.";
+          } else {
+            prProvExecLoadError = "Ledger not found.";
+          }
+        } else if (prAcctReview) {
+          for (const c of prAcctReview.committedReservations) {
+            const row = await ledgerBoot.repository.getByLedgerId(c.ledgerId);
+            if (row && row.storeId === prProvStoreId) {
+              candidateLedgers.push(row);
+            }
+          }
+        }
+
+        for (const ledger of candidateLedgers) {
+          const existing =
+            (await boot.repository.getByLedger(ledger.ledgerId)) ?? null;
+          let trustedPi: string | null = null;
+          if (ledger.status === "committed") {
+            const resolved = await resolveTrustedStripePaymentIntentRef(
+              ledgerBoot.supabase,
+              {
+                storeId: ledger.storeId,
+                orderId: ledger.orderId,
+                paymentAttemptId: ledger.paymentAttemptId,
+                captureEventId: ledger.captureEventId,
+              }
+            );
+            if (resolved.ok) {
+              trustedPi = resolved.paymentIntentId;
+            }
+          }
+          prProvExecCandidates.push(
+            buildProviderMoneyExecuteCandidate({
+              ledger: {
+                ledgerId: ledger.ledgerId,
+                storeId: ledger.storeId,
+                orderId: ledger.orderId,
+                paymentAttemptId: ledger.paymentAttemptId,
+                refundAmountMinor: ledger.refundAmountMinor,
+                currency: ledger.currency,
+                status: ledger.status as
+                  | "planned"
+                  | "committing"
+                  | "committed"
+                  | "failed"
+                  | "compensated",
+              },
+              existingExecution: existing,
+              trustedPaymentIntentId: trustedPi,
+              env: process.env,
+            })
+          );
+        }
       }
     }
   }
@@ -274,6 +418,36 @@ export default async function AdminStoreRefundsPage({
           prefillLedgerId={prRecPrefill}
           visStoreIdDefault={prVisStoreId}
           visCaptureIdDefault={prVisCaptureId}
+        />
+
+        <PartialRefundProviderMoneyReadinessPanel flashError={prProvErr} />
+
+        <PartialRefundProviderMoneyExecutePanel
+          path={PATH}
+          storeIdDefault={prProvStoreId}
+          ledgerIdDefault={prProvExecLedgerId}
+          candidates={prProvExecCandidates}
+          loadError={prProvExecLoadError}
+          firstTimeSubmitAllowed={prProvReadiness.firstTimeSubmitAllowed}
+          executionMode={prProvReadiness.executionMode}
+          flashOk={prProvExecOk}
+          flashStatus={prProvExecStatus}
+          flashError={prProvExecError}
+          flashLedgerId={prProvExecLedgerId || null}
+          flashExecutionId={prProvExecExecutionId}
+          flashSubmit={prProvExecSubmit}
+        />
+
+        <PartialRefundProviderMoneyRecoveryPanel
+          path={PATH}
+          storeIdDefault={prProvStoreId}
+          executions={prProvExecutions}
+          loadError={prProvLoadError}
+          flashOk={prProvRecOk}
+          flashStatus={prProvRecStatus}
+          flashError={prProvRecError}
+          flashLedgerId={prProvRecLedgerId}
+          flashExecutionId={prProvRecExecutionId}
         />
 
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">

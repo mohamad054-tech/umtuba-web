@@ -1,35 +1,40 @@
 # SESSION_HANDOFF
 
-## Closed milestone
+## Active checkpoint (not closed)
 
-**Partial Refund Committed Reservation Compensation V1** — `PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`.
+**Commerce Partial Refund Provider Money Execution V1** — state **`P6R_BLOCKED_NO_TEST_CONFIG`**.
 
-Admin-only accounting compensation for committed partial-refund ledger reservations (`committed → compensated`), one-time ceiling restore, idempotent replay. Migration **`20260907`** remotely applied + verified.
+Provider-money execution foundation through verified remote migration **`20260915`**. Gates OFF. No live/test Stripe refund executed. Local progression paused; central coordinator owns next assignment.
+
+Authoritative coordination doc: `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md`
 
 ## Branch / worktree
 
 | Item | Value |
 | --- | --- |
-| Branch | `office/commerce-partial-refund-committed-reservation-compensation-v1` |
-| Base (pre-closeout) | `556f82a7499d15174016bfca4357882b649744a2` |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-committed-reservation-compensation-v1` |
-| Implementation doc | `docs/store/implementation/PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1.md` |
+| Branch | `office/commerce-partial-refund-provider-money-execution-v1` |
+| Base | `b8be33469f35c5ccb394925d666a5812f4c70c70` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-provider-money-execution-v1` |
+| Implementation | `docs/store/implementation/PARTIAL_REFUND_PROVIDER_MONEY_EXECUTION_V1.md` |
 
 ## Remote
 
 | Item | Value |
 | --- | --- |
 | Project | `umtuba` / `tgucwnjwoyeqoxqaxmew` |
-| Applied | `20260907` / `store_partial_refund_ledger_compensate_committed_v1` |
-| Neighbors unchanged | Learning `20260906`; Translation `20260910–12`; Commerce `20260899`/`20260900`/`20260905` |
+| Applied | `20260915` / `store_partial_refund_provider_money_execution_v1` |
+| Neighbors | Learning `20260908`/`20260909`; Translation `20260910–14` |
 
 ## Validation
 
-- Focused tests: **124 passed** / 11 files
+- Focused tests: **235 passed** / 18 files
 - `npx tsc --noEmit`: PASS
 - `git diff --check`: PASS
-- No forbidden money/provider/restock/settlement side effects
 
-## Verdict
+## Next (coordinator only)
 
-`PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`
+`P6R2 — isolated Stripe TEST fixture/environment preparation` — do not start until centrally assigned.
+
+## Prior closed milestone
+
+**Partial Refund Committed Reservation Compensation V1** — `PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED` (`20260907`).

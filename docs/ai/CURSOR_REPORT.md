@@ -2,45 +2,42 @@
 
 ## Summary
 
-**`PARTIAL_REFUND_COMMITTED_RESERVATION_COMPENSATION_V1_CLOSED`**
-
-Commerce Partial Refund Committed Reservation Compensation V1 is closed. Admin-only accounting compensation (`committed → compensated`) restores refundable amount and quantity ceilings once with idempotent replay. Migration **`20260907`** remotely applied and verified on `tgucwnjwoyeqoxqaxmew`. No provider refund, money movement, restock, entitlement, settlement, commission, payout, committed cancellation, or `commerce_confirm`.
+**`COMMERCE_PROVIDER_MONEY_CENTRAL_SERVER_HANDOFF_REPORT`** — Commerce Partial Refund Provider Money Execution V1 **checkpointed** at `P6R_BLOCKED_NO_TEST_CONFIG`. Remote `20260915` applied; gates OFF; no Stripe refund executed. Central coordinator handoff published; Desktop did not assign/start next task.
 
 ## Exact files changed
 
-See final commit on `office/commerce-partial-refund-committed-reservation-compensation-v1` (ledger adapter, compensation service, admin action/UI, migration, docs, tests).
+Full P0–P6R milestone tree + `docs/ai/CENTRAL_COORDINATOR_HANDOFF.md` + AI state docs. See commit.
 
 ## Migrations created
 
-`20260907_store_partial_refund_ledger_compensate_committed_v1.sql` — remotely applied + registered.
+`20260915_store_partial_refund_provider_money_execution_v1.sql` (remote APPLIED).
 
 ## Security review
 
-- RPC: SECURITY DEFINER, `search_path` public, service_role EXECUTE only
-- Admin: `assertPlatformAdminDb` + optional store ownership
-- No seller/buyer mutation access
-- Neighbor Learning/Translation history unchanged
+- Gates default OFF; execution mode `off`
+- service_role-only RPCs; no secrets in tree
+- No money movement
 
 ## Tests
 
-Focused: **124 passed** / 11 files.
+Test Files **18** passed / Tests **235** passed.
 
 ## TypeScript
 
-PASS (`npx tsc --noEmit`).
+`npx tsc --noEmit` — PASS
 
 ## Build
 
-N/A for closeout packaging.
+N/A for checkpoint GO.
 
 ## git diff --check
 
-PASS.
+PASS
 
 ## git status --short
 
-Expect clean after push.
+Clean after checkpoint commit/push (expected).
 
 ## Open issues
 
-None for this milestone. Next Commerce work requires a new explicit GO.
+P6R2 isolated Stripe TEST fixture/env — **coordinator-assigned only**. Milestone not CLOSED.
