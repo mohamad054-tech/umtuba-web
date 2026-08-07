@@ -1,21 +1,35 @@
 # Current Task
 
-## ACTIVE FEATURE BRANCH (not SoT)
+## COLLABORATION SoT — Resource Link Foundation INTEGRATED
 
-- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_FOUNDATION_V1`
-- **Branch:** `office/collaboration-workspace-resource-link-foundation-v1`
-- **Base SoT HEAD:** `90be8717d1a1bda9c5ea7f2867273f3878f7ed30`
+- **Milestone closed:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_FOUNDATION_SOT_INTEGRATION_V1`
+- **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
+- **Integrated feature:** `office/collaboration-workspace-resource-link-foundation-v1` @ `d490849`
+- **Method:** fast-forward only (`90be871` → `d490849`)
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
-- **Do not merge to SoT in this task.**
 
-## Goal
+## Status
 
-Resource Link Foundation V1: typed reference/binding metadata + read runtime over existing spine table. No product bindings. No migration (schema already in `20260896`). No remote apply. Platform flag stays `false`.
+Resource Link Foundation V1 = **INTEGRATED / CLOSED** on Collaboration SoT.
+
+- Existing table `collaboration_workspace_resource_links` reused (spine `20260896`)
+- No migration required / no migration applied
+- Read/model foundation only; mutation execution intentionally fail-closed
+- Platform flag remains default `false`
+- Product-specific bindings deferred
+- Authenticated write/RPC path remains the next gap
+
+## Do NOT start automatically
+
+- Mutation Runtime
+- Learning / Commerce / advertiser bindings
+- UM Core P17
 
 ## CLOSED ON SoT (do not redo)
 
 - Workspace Spine / Membership / Settings Lifecycle UI
 - `20260917` APPLIED + VERIFIED
-- Member Role Management UI V1 integrated
+- Member Role Management UI V1
+- Resource Link Foundation V1
 - stale `20260898` NON-SOT; remote Commerce only
 - smoke/keepalive NOT SoT
