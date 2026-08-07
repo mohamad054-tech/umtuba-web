@@ -1,25 +1,25 @@
-# CURSOR_REPORT — UM Core Event Type Registry Foundation P6
+# CURSOR_REPORT — UM Core Event Routing Foundation P7
 
 ## Summary
 
-**READY** — Event Type Registry Foundation P6 closed on
-`office/um-core-platform-event-type-registry-foundation-p6`
-(base P5 tip `d57e481`).
+**READY** — Event Routing Foundation P7 closed on
+`office/um-core-platform-event-routing-foundation-p7`
+(base P6 tip `1263091`).
 
-Type catalog only. No bus/publish/consume/transport.
+Routing catalog only. No bus/publish/consume/transport/outbox.
 No persistence/networking/product integration. No migrations.
 
 ## Exact files changed
 
-- `platforms/core/event/codes.ts` (new)
-- `platforms/core/event/eventTypeRegistry.ts` (new)
-- `platforms/core/event/eventTypeRegistry.test.ts` (new)
+- `platforms/core/event/routingCodes.ts` (new)
+- `platforms/core/event/eventRouting.ts` (new)
+- `platforms/core/event/eventRouting.test.ts` (new)
 - `platforms/core/event/types.ts`
 - `platforms/core/event/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_EVENT_TYPE_REGISTRY_FOUNDATION_P6.md` (new)
+- `docs/core/UM_CORE_PLATFORM_EVENT_ROUTING_FOUNDATION_P7.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -31,14 +31,13 @@ None.
 
 - Heap-only catalog; no DB / network / secrets
 - No product imports
-- No publish/consume runtime
+- No publish/consume/delivery runtime
 - Failed registration does not mutate state
-- Registration is not emission or consumption authorization
+- No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
 - `npx vitest run platforms/core` — **PASS** (see final report)
-- Full suite: known unrelated failures only (see final report)
 
 ## TypeScript
 
@@ -46,7 +45,7 @@ None.
 
 ## Build
 
-Not required for this registry-foundation milestone.
+Not required for this routing-foundation milestone.
 
 ## git diff --check
 
@@ -58,7 +57,4 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- `UmEventPublisher` / `UmEventConsumer` remain interface-only.
-- Do not start P7 from this close.
-- Unrelated full-suite failures: media `20260869`; flaky timeouts in
-  `lib/rewards` / `lib/site` under load (pass alone).
+- Do not start P8 from this close.

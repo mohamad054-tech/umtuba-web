@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P6` (… → capability registry → event type registry)
+- Phase: `P1`–`P7` (… → event type registry → event routing)
 
 ## Phase P3 scope
 
@@ -78,3 +78,14 @@ Pure **in-memory event type registry** under `platforms/core/event/`.
 
 Out of scope for P6: event bus, publish/consume, outbox, retry, queues,
 transport, persistence, networking, product integration.
+
+## Phase P7 scope
+
+Pure **in-memory event routing catalog** under `platforms/core/event/`.
+
+- Rules from registered event type → destination platform(s)
+- Validates event type + producer + destination against P4/P6 catalogs
+- Lookups by event type, producer, destination
+
+Out of scope for P7: event bus, publish/consume, delivery, outbox, retry,
+queues, transport, persistence, networking, product integration.
