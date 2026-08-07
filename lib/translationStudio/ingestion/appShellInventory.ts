@@ -61,3 +61,14 @@ export function stableAppShellValueId(
 export function stableAppShellNamespaceId(namespace: string): string {
   return `ns_${namespace}`;
 }
+
+/**
+ * App Shell translation-memory stable id — key + target locale.
+ * Must not truncate source fingerprints (collisions across distinct source texts).
+ */
+export function stableAppShellMemoryId(
+  key: string,
+  language: string
+): string {
+  return `tm_appshell_${key.replace(/\./g, "__")}_${language}`;
+}

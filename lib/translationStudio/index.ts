@@ -279,18 +279,26 @@ export {
   isAppShellNamespace,
   namespaceOfKey,
   stableAppShellKeyId,
+  stableAppShellMemoryId,
   stableAppShellNamespaceId,
   stableAppShellValueId,
   type AppShellNamespace,
 } from "./ingestion/appShellInventory";
 
 export {
+  APP_SHELL_INGEST_AUDIT_ID,
   classifyImportedValueStatus,
   ingestAppShellCatalog,
   type AppShellIngestionReport,
   type IngestAppShellOptions,
   type IngestStatusCounts,
 } from "./ingestion/ingestAppShellCatalog";
+
+export {
+  TRANSLATION_STUDIO_SEED_ACTOR_V1,
+  TRANSLATION_STUDIO_SEED_TIMESTAMP_V1,
+  buildSeedPersistedState,
+} from "./persistence/seed";
 
 export {
   appShellKeysByNamespace,

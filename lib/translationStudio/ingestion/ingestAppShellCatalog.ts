@@ -7,6 +7,9 @@ import { enMessages } from "../../i18n/messages/en";
 import type { TranslationKey } from "../../i18n/messages/types";
 import { listStudioLanguages } from "../languages";
 import { sourceFingerprint } from "../normalize";
+import {
+  TRANSLATION_STUDIO_SEED_TIMESTAMP_V1,
+} from "../persistence/seedConstants";
 import { seedUmtubaTerminology } from "../terminology";
 import type {
   AuditLogEntry,
@@ -23,9 +26,13 @@ import {
   isAppShellCatalogKey,
   namespaceOfKey,
   stableAppShellKeyId,
+  stableAppShellMemoryId,
   stableAppShellNamespaceId,
   stableAppShellValueId,
 } from "./appShellInventory";
+
+/** Stable audit id for App Shell catalog ingest events (replace-on-reingest). */
+export const APP_SHELL_INGEST_AUDIT_ID = "audit_appshell_ingest_v1" as const;
 
 export type IngestStatusCounts = Record<
   StudioLanguageCode,
@@ -129,6 +136,8 @@ function ensureBaseState(
 function upsertMemory(
   memory: TranslationMemoryEntry[],
   input: {
+    /** Catalog key — used for collision-safe stable memory id. */
+    catalogKey: string;
     sourceText: string;
     language: StudioLanguageCode;
     translatedText: string;
@@ -138,19 +147,20 @@ function upsertMemory(
   }
 ): { memory: TranslationMemoryEntry[]; seeded: boolean; reused: boolean } {
   const fp = sourceFingerprint(input.sourceText);
-  const idx = memory.findIndex(
-    (m) => m.sourceFingerprint === fp && m.language === input.language
-  );
+  const id = stableAppShellMemoryId(input.catalogKey, input.language);
+  const idx = memory.findIndex((m) => m.id === id);
   if (idx >= 0) {
     const prev = memory[idx]!;
     const next = [...memory];
     next[idx] = {
       ...prev,
+      id,
+      sourceFingerprint: fp,
       sourceText: input.sourceText,
       translatedText: input.translatedText,
       namespaceId: input.namespaceId,
       status: "approved",
-      createdAt: input.now,
+      createdAt: prev.createdAt || input.now,
       createdBy: input.actorId,
     };
     return { memory: next, seeded: false, reused: true };
@@ -159,7 +169,7 @@ function upsertMemory(
     memory: [
       ...memory,
       {
-        id: `tm_appshell_${fp.slice(0, 12)}_${input.language}`,
+        id,
         sourceFingerprint: fp,
         sourceText: input.sourceText,
         language: input.language,
@@ -182,7 +192,13 @@ export function ingestAppShellCatalog(
   existing: PersistedStudioState | null = null,
   options: IngestAppShellOptions = {}
 ): { state: PersistedStudioState; report: AppShellIngestionReport } {
-  const now = options.now ?? new Date().toISOString();
+  // Fresh seed construction is clock-independent; re-ingest of existing state
+  // may use wall clock unless the caller passes an explicit `now`.
+  const now =
+    options.now ??
+    (existing == null
+      ? TRANSLATION_STUDIO_SEED_TIMESTAMP_V1
+      : new Date().toISOString());
   const actorId = options.actorId ?? "system:app_shell_ingestion";
   const state = ensureBaseState(existing, now);
   const languages = listStudioLanguages();
@@ -324,6 +340,7 @@ export function ingestAppShellCatalog(
         catalogValue.trim()
       ) {
         const mem = upsertMemory(memory, {
+          catalogKey: key,
           sourceText,
           language: "ar",
           translatedText: catalogValue,
@@ -342,13 +359,18 @@ export function ingestAppShellCatalog(
     ...retainedKeys,
     ...keysByCatalogKey.values(),
   ].sort((a, b) => a.key.localeCompare(b.key));
-  const values = [...valuesById.values()];
+  const values = [...valuesById.values()].sort((a, b) =>
+    a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+  );
   const namespaces = [...namespacesByName.values()].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
+  memory = [...memory].sort((a, b) =>
+    a.id < b.id ? -1 : a.id > b.id ? 1 : 0
+  );
 
-  auditLog.unshift({
-    id: `audit_appshell_ingest_${now}`,
+  const ingestAudit: AuditLogEntry = {
+    id: APP_SHELL_INGEST_AUDIT_ID,
     entityType: "translation_value",
     entityId: "app_shell_catalog",
     action: "ingest_app_shell_catalog",
@@ -362,7 +384,12 @@ export function ingestAppShellCatalog(
       memoryReused,
     },
     createdAt: now,
-  });
+  };
+  // Replace prior ingest audit with the same stable id (keeps uniqueness).
+  const nextAuditLog = [
+    ingestAudit,
+    ...auditLog.filter((a) => a.id !== APP_SHELL_INGEST_AUDIT_ID),
+  ];
 
   const nextState: PersistedStudioState = {
     ...state,
@@ -372,7 +399,7 @@ export function ingestAppShellCatalog(
     values,
     memory,
     versions,
-    auditLog,
+    auditLog: nextAuditLog,
   };
 
   const report: AppShellIngestionReport = {

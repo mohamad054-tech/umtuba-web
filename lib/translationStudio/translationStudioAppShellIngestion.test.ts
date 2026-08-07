@@ -100,12 +100,19 @@ describe("App Shell catalog ingestion", () => {
     expect(ar?.status).toBe("needs_review");
   });
 
-  it("seeds Arabic Translation Memory without duplicate fingerprint+locale", () => {
+  it("seeds Arabic Translation Memory with unique key-scoped stable ids", () => {
     const { state, report } = ingestAppShellCatalog(null);
     expect(report.memorySeeded).toBeGreaterThan(0);
     const ar = state.memory.filter((m) => m.language === "ar");
-    const fps = ar.map((m) => m.sourceFingerprint);
-    expect(new Set(fps).size).toBe(fps.length);
+    const ids = ar.map((m) => m.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    // Truncated-fingerprint collisions must not occur (e.g. nothing here / something we).
+    expect(ids).not.toContain("tm_appshell_nothing here_ar");
+    expect(ids).not.toContain("tm_appshell_something we_ar");
+    expect(ids).toContain("tm_appshell_status__empty_ar");
+    expect(ids).toContain("tm_appshell_empty__title_ar");
+    expect(ids).toContain("tm_appshell_status__error_ar");
+    expect(ids).toContain("tm_appshell_error__title_ar");
 
     const again = ingestAppShellCatalog(state);
     const ar2 = again.state.memory.filter((m) => m.language === "ar");
