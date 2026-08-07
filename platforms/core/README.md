@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P11` (… → health declaration catalog → naming registry)
+- Phase: `P1`–`P12` (… → naming registry → aggregate registry facade)
 
 ## Phase P3 scope
 
@@ -137,3 +137,16 @@ Pure **deterministic derived naming index** under `platforms/core/naming/`.
 Out of scope for P11: name authoring, discovery, DNS, SDK runtime,
 `UmCoreRegistry` facade, persistence, networking, product integration,
 migrations.
+
+## Phase P12 scope
+
+Pure **Model A aggregate registry facade** under `platforms/core/registry/`.
+
+- `createUmCoreRegistry(deps)` borrows already-created specialized registries
+- Exact seven slots: platforms, capabilities, events, flags, health,
+  dependencies, naming
+- Caller retains ownership; facade does not construct or mutate registries
+
+Out of scope for P12: mega-wire factory, event routing slot, validator
+completion, SDK/runtime ports, DI/startup orchestration, persistence,
+networking, product integration, migrations.
