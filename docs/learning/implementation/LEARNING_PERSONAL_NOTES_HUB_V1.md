@@ -1,12 +1,23 @@
 # UM Learning — Personal Notes Hub V1
 
-Status: **implemented** (migration created, **not applied remotely**)
+Status: **implemented** (schema live remotely; history reallocated to `20260908`)
 
 Branch: `office/learning-personal-notes-hub-v1`
 
-Migration: `supabase/migrations/20260907_learning_personal_notes_hub_v1.sql`
+Migration: `supabase/migrations/20260908_learning_personal_notes_hub_v1.sql`
 
 Capability: `learning.learner.personal_notes_hub_v1`
+
+## Version reservation / history note
+
+- Active Learning Hub migration version: **`20260908`**
+- Previously drafted as `20260907`; remote `20260907` is owned by Commerce
+  (`store_partial_refund_ledger_compensate_committed_v1`). Learning Git was
+  reallocated to `20260908` without changing Hub SQL semantics.
+- **`20260909`**: reserved next candidate for Learner Assessment Due UX
+  Follow-through (not created in this correction).
+- **`20260910–12`**: Translation — untouched.
+- **`20260907`**: Commerce — untouched.
 
 ## Purpose
 
@@ -64,7 +75,8 @@ Existing per-lesson CRUD RPCs are unchanged.
 
 ## Deferred
 
-- Remote apply of `20260907` (explicit GO required)
+- Remote `schema_migrations` registration of `20260908` via migration repair
+  (explicit GO; do **not** re-run Hub SQL — objects already live)
 - Browser runtime smoke (env/fixture debt; not a product blocker)
 
 ## Tests

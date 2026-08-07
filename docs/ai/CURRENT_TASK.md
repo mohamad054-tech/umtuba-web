@@ -2,38 +2,42 @@
 
 ## Task title
 
-UM Learning - Instructor Content-Block Authoring Expansion V1
+UM Learning — Personal Notes Hub history reallocation (`20260907` → `20260908`)
 
 ## Status
 
-`implementation-complete` — local commit pending validation; **no migration**.
+`git-correction-in-progress` — rename only; **no SQL apply**; **no migration repair** in this step.
 
 ## Milestone
 
-`learning.instructor.content_block_authoring_expansion_v1`
+`learning.learner.personal_notes_hub_v1` (history alignment)
 
-## Scope landed
+## Version map (Learning SoT)
 
-- Pure helper `lib/learning/instructorContentBlockAuthoring.ts`
-- Hardened create/update instructor actions (callout variant fix)
-- Expanded lesson authoring create/edit UI (10 types)
-- Docs: `LEARNING_INSTRUCTOR_CONTENT_BLOCK_AUTHORING_EXPANSION_V1.md`
+- `20260908` — Learning Personal Notes Hub (active migration filename)
+- `20260909` — reserved next candidate for Learner Assessment Due UX Follow-through (**not created**)
+- `20260910–12` — Translation (untouched)
+- `20260907` — Commerce remote owner (untouched)
+
+## Scope
+
+- Rename Hub migration file to `20260908_learning_personal_notes_hub_v1.sql`
+- Update tests/docs/version references
+- No Hub SQL semantic changes
+- No remote schema / repair in this GO
 
 ## Branch / worktree
 
-`office/learning-instructor-content-block-authoring-expansion-v1`  
-`D:\umtuba-central\repos\umtuba-web-learning-instructor-content-block-authoring-expansion-v1`  
-Base: `95b332cd46e24156f211bc8f91b6a78ab090858d`
+`office/learning-resume-accessible-target-hardening-v1`  
+`D:\umtuba-central\repos\umtuba-web-learning-sot-ff-merge-v1`
 
 ## Explicitly out of scope
 
-- Migrations / remote DB
-- Uploads / storage / signed URLs
-- `ai_block` / `interactive_block`
-- `transcript` / `pdf` / `downloadable_file` authoring
-- Learner renderer changes
-- Commerce / Translation / Collaboration / Billing / UEOS / Guardian
+- Migration repair of `20260908`
+- SQL replay / `db push`
+- Commerce / Translation / Due UX implementation
+- Creating `20260909`
 
 ## Recommended next
 
-Feature branch push + SoT FF when validation PASS.
+After this commit is pushed: explicit GO for `migration repair 20260908 --status applied` only.

@@ -20,7 +20,7 @@ const ROOT = join(__dirname, "../..");
 const MIGRATION =
   "supabase/migrations/20260901_learning_lesson_notes_foundation_v1.sql";
 const HUB_MIGRATION =
-  "supabase/migrations/20260907_learning_personal_notes_hub_v1.sql";
+  "supabase/migrations/20260908_learning_personal_notes_hub_v1.sql";
 const PANEL = "app/components/learning/LessonNotesPanel.tsx";
 const VIEWER = "app/components/learning/LessonViewer.tsx";
 const ACTIONS = "app/learning/lessonNotesActions.ts";
@@ -404,15 +404,16 @@ describe("Personal Notes Hub V1 — migration + privacy", () => {
   const hubBody = stripSqlComments(hubSql);
   const foundationSql = read(MIGRATION);
 
-  it("ships unique 20260907 hub migration with supporting index", () => {
+  it("ships unique 20260908 hub migration with supporting index", () => {
     expect(existsSync(join(ROOT, HUB_MIGRATION))).toBe(true);
     const migrations = readdirSync(join(ROOT, "supabase/migrations"));
     expect(migrations).toContain(
-      "20260907_learning_personal_notes_hub_v1.sql"
+      "20260908_learning_personal_notes_hub_v1.sql"
     );
-    const sameVersion = migrations.filter((f) => f.startsWith("20260907_"));
+    expect(migrations.filter((f) => f.startsWith("20260907_"))).toEqual([]);
+    const sameVersion = migrations.filter((f) => f.startsWith("20260908_"));
     expect(sameVersion).toEqual([
-      "20260907_learning_personal_notes_hub_v1.sql",
+      "20260908_learning_personal_notes_hub_v1.sql",
     ]);
     expect(hubBody).toMatch(/learning_lesson_notes_user_updated_idx/);
     expect(hubBody).toMatch(
