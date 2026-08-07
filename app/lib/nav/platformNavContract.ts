@@ -6,11 +6,15 @@ import {
   type UserMenuCapabilities,
 } from "./userMenuCapabilities";
 
-/** Desktop primary labels (Discover is intentionally absent). */
+/**
+ * Desktop primary labels (Discover is intentionally absent).
+ * U1: Store promoted to primary; Collaboration/Workspaces deferred (no route on baseline).
+ */
 export const DESKTOP_PRIMARY_NAV_LABELS = [
   "Home",
   "World",
   "Learning",
+  "Store",
   "Live",
   "Messages",
 ] as const;
@@ -20,6 +24,7 @@ export const DESKTOP_PRIMARY_NAV_HREFS = [
   APP_ROUTES.home,
   APP_ROUTES.worldDiscovery,
   APP_ROUTES.learning,
+  APP_ROUTES.store,
   APP_ROUTES.live,
   APP_ROUTES.messages,
 ] as const;
@@ -67,10 +72,11 @@ export const USER_MENU_BASE_ITEM_LABELS = [
   "Create",
   "Saved",
   "Learning",
+  "Store",
+  "World",
   "Rewards",
   "Notifications",
   "Settings",
-  "Store",
   "Wishlist",
   "Advertise",
 ] as const;

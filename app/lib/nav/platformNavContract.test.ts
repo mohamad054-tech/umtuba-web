@@ -172,15 +172,15 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("shell coherence boundary", () => {
-    it("does not place Store Domain or Admin into primary chrome contracts", () => {
-      expect(DESKTOP_PRIMARY_NAV_HREFS).not.toContain(APP_ROUTES.store);
+    it("places Store in desktop primary; keeps seller/admin off primary chrome", () => {
+      expect(DESKTOP_PRIMARY_NAV_HREFS).toContain(APP_ROUTES.store);
+      expect(DESKTOP_PRIMARY_NAV_LABELS).toContain("Store");
       expect(DESKTOP_PRIMARY_NAV_HREFS).not.toContain(APP_ROUTES.seller);
       expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.href)).not.toContain(
         APP_ROUTES.store
       );
       const topNav = read("app/components/AppTopNav.tsx");
       const mobileNav = read("app/components/AppMobileBottomNav.tsx");
-      expect(topNav).not.toMatch(/APP_ROUTES\.store/);
       expect(topNav).not.toMatch(/admin\/store/);
       expect(mobileNav).not.toMatch(/APP_ROUTES\.store/);
       expect(mobileNav).not.toMatch(/admin\/store/);

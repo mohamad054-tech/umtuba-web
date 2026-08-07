@@ -25,7 +25,7 @@ export default function AppTopNav({
   actions,
   sticky = true,
 }: AppTopNavProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <header

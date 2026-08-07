@@ -87,7 +87,8 @@ export type AppRouteHref =
   | (typeof APP_ROUTES)["live"]
   | (typeof APP_ROUTES)["messages"]
   | (typeof APP_ROUTES)["worldDiscovery"]
-  | (typeof APP_ROUTES)["learning"];
+  | (typeof APP_ROUTES)["learning"]
+  | (typeof APP_ROUTES)["store"];
 
 export type AppNavItem = {
   label: string;
@@ -107,7 +108,14 @@ export const APP_NAV_ITEMS: AppNavItem[] = listDesktopMainNavLinks().map(
     href: item.href as AppRouteHref,
   })
 );
-export function isNavActive(pathname: string, href: AppRouteHref): boolean {
+export function isNavActive(
+  pathname: string | null | undefined,
+  href: AppRouteHref
+): boolean {
+  if (!pathname) {
+    return false;
+  }
+
   if (href === APP_ROUTES.home) {
     // `/discover` aliases Home feed — keep Home highlighted after redirect targets.
     return (
