@@ -1,5 +1,6 @@
 /**
  * Default Studio persistence factory — mode gate + JSON adapter only.
+ * DB adapter (`createDbStudioPersistence`) is intentionally not selected here.
  */
 
 import {
@@ -15,7 +16,10 @@ import type { StudioPersistencePort } from "./studioPersistencePort";
 
 export type StudioPersistenceSelection = {
   resolution: PersistenceModeResolution;
-  /** Always `json` in V1 — never a DB implementation. */
+  /**
+   * Runtime default remains `json` only.
+   * DB adapter is injectable separately; never auto-selected by this factory.
+   */
   implementation: "json";
   persistence: StudioPersistencePort;
 };
@@ -39,8 +43,8 @@ export function createDefaultStudioPersistence(options?: {
     dataDir: options?.dataDir,
   };
 
-  // V1: unsupported/invalid modes fail closed to the JSON adapter.
-  // No DB adapter is constructed under any resolution.
+  // Unsupported/invalid modes fail closed to JSON.
+  // Never construct or activate the DB adapter from the default factory.
   return {
     resolution,
     implementation: "json",

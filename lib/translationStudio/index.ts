@@ -110,9 +110,29 @@ export {
 
 export {
   TRANSLATION_STUDIO_WRITE_RPC_V1,
+  parseTranslationStudioUpsertSnapshotResult,
   type TranslationStudioUpsertSnapshotOptions,
   type TranslationStudioUpsertSnapshotResult,
 } from "./persistence/writeRpcContract";
+
+export {
+  toTranslationStudioWriteSnapshot,
+  type TranslationStudioWriteSnapshotV1,
+} from "./persistence/writeRpcSnapshot";
+
+export {
+  createSupabaseWriteRpcTransport,
+  type TranslationStudioRpcClient,
+  type TranslationStudioWriteRpcTransport,
+} from "./persistence/writeRpcTransport";
+
+export {
+  createDbStudioPersistence,
+  StudioDbLoadUnsupportedError,
+  StudioDbSyncSaveUnsupportedError,
+  type CreateDbStudioPersistenceOptions,
+  type DbStudioPersistence,
+} from "./persistence/dbStudioPersistence";
 
 export {
   buildPublishContract,

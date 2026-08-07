@@ -1,7 +1,9 @@
 /**
  * Translation Studio persistence mode gate V1.
- * Only `json` is executable. Future modes are recognized but fail closed
- * (never invent a DB adapter).
+ * Only `json` is executable at runtime.
+ * A DB write adapter exists for injection/tests, but modes that would use it
+ * (`shadow_dual_write`, `dual_read`, `db_primary_json_fallback`) remain
+ * unsupported and fail closed to JSON — never silently activate DB writes.
  */
 
 export const TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV =
@@ -85,8 +87,9 @@ export function resolveTranslationStudioPersistenceMode(
       envRaw,
       implementation: "json",
       message:
-        `Persistence mode "${token}" is not implemented in V1. ` +
-        `Failing closed to JSON file store; no DB adapter is available.`,
+        `Persistence mode "${token}" is recognized but not executable. ` +
+        `Failing closed to JSON file store; DB adapter is injectable only ` +
+        `(no dual-write / dual-read / db-primary activation).`,
     };
   }
 
@@ -97,7 +100,7 @@ export function resolveTranslationStudioPersistenceMode(
     implementation: "json",
     message:
       `Invalid UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE="${envRaw}". ` +
-      `Failing closed to JSON file store; no DB adapter is available.`,
+      `Failing closed to JSON file store; no mode activation.`,
   };
 }
 
