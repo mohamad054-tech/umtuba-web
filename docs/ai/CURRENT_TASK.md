@@ -2,54 +2,58 @@
 
 ## Task title
 
-UMTUBA Translation Trunk Port V1 — paused for next session
+UMTUBA Translation Trunk Port V1 — remote migration apply + history CLOSED
+
+## Milestone status
+
+`TRANSLATION_REMOTE_MIGRATION_APPLY_AND_HISTORY_V1_CLOSED`
 
 ## Status
 
-`paused-ready-to-resume` — all work saved and pushed (`0/0`).
-No remote migration apply yet.
+Closed on 2026-08-07. Schema applied and history registered on linked Supabase.
+Runtime remains JSON file store — no JSON→DB switch.
 
-## Resume here (tomorrow / next GO)
+## Device / worktree
 
-1. Worktree: `C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1`
-2. Branch: `office/platform-translation-trunk-port-v1`
-3. Expected HEAD: `a4c19ea8571b9809786b03da735ff5cf8b2e9fd0`
-4. Device: كمبيوتر 2 — Translation & Internationalization only
-5. First commands:
-   - `git fetch origin --prune`
-   - confirm branch / HEAD / clean / sync `0 0`
-6. Next milestone (not started): **controlled targeted remote apply** of Translation migrations only:
-   - `20260910_translation_studio_persistence_workflow_v1.sql`
-   - `20260902_translation_intelligence_foundation_v1.sql`
-7. Hard rules next session:
-   - never use `db push` / `--include-all`
-   - never touch Learning / Commerce / Collaboration
-   - `20260901` is **reserved for Learning** — do not reclaim
-   - do not apply until explicit GO after final gate
+- Device: كمبيوتر 2 — Translation & Internationalization only
+- Worktree: `C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1`
+- Branch: `office/platform-translation-trunk-port-v1`
+- Pre-closure HEAD: `e861ef997631454f9584807dd03b723e61fed629`
+- Linked Supabase: `umtuba` / `tgucwnjwoyeqoxqaxmew` (eu-west-1)
 
-## Branch
+## Translation migrations (final)
 
-`office/platform-translation-trunk-port-v1`
+| Role | File | Remote schema | Remote history |
+| --- | --- | --- | --- |
+| Intelligence | `20260902_translation_intelligence_foundation_v1.sql` | APPLIED | REGISTERED (`translation_intelligence_foundation_v1`) |
+| Persistence & Workflow | `20260910_translation_studio_persistence_workflow_v1.sql` | APPLIED | REGISTERED (`translation_studio_persistence_workflow_v1`) |
 
-## Worktree
+- `20260901` remains **Learning-owned** (`learning_lesson_notes_foundation_v1`) — not reclaimed
+- Forbidden/collision numbers retired: `20260874_*`, `20260875_*`, Learning-reserved `20260901`
 
-`C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1`
+## Remote closure facts (verified)
 
-## Base
+- Project: `umtuba` / `tgucwnjwoyeqoxqaxmew`
+- Apply order used: `20260902` → `20260910` (targeted `db query --file` only; no `db push` / `--include-all`)
+- History registration: `supabase migration repair <version> --status applied --linked` for `20260902` then `20260910`
+- Translation tables present: **12** (3 `translation_intelligence_*` + 9 `translation_studio_*`)
+- RLS + FORCE RLS on all 12
+- Policies: 3 intelligence + 9 studio admin SELECT (`is_platform_admin()`)
+- Grants: authenticated SELECT only (12); anon grants = 0
+- Runtime remains JSON store (`data/translation-studio/`); publish stays dry-run / `writesCatalogFiles: false` / `autoPublish: false`
+- No JSON→DB runtime switch performed
+- No Translation migration collision remains against Learning `20260901`
 
-`62c6c5d04f962b9615c1fb8037bae6b76d7f8e36` — `origin/alpha-0.2`
+## Concurrent remote note (OUT OF SCOPE)
 
-## Completed today
+- Remote history also contains `20260905` = `store_partial_refund_ledger_list_committing_v1` (Store/Commerce)
+- Observed during history registration window; **not** Translation-owned; do not repair or alter
 
-1. Translation SoT audit
-2. Trunk-port worktree + migration allocation preflight
-3. Six platform commits cherry-picked onto alpha-0.2 (Learning tip excluded)
-4. Migrations renumbered away from colliding `20260874`/`20260875`
-5. Finalize commit + push trunk-port branch
-6. Remote history gap analysis (`20260872`–`75` = Learning/Commerce on remote)
-7. Persistence reallocated off Learning-reserved `20260901` → `20260910`
-8. Intelligence kept at `20260902` after free-number audit
-9. Reallocation commit pushed; sync `0 0`
+## Prior gate notes (retained)
+
+- SHA256 `20260910`: `D7044A5FD97CE159A0C57BF515D2D0125E4D7EFE6F6D571CEEB9A638102A8D01`
+- SHA256 `20260902`: `F0ECE0EFBA023886E8D226682F9427DF33DF44A19EB6E5A565D4977BA435674C`
+- `is_platform_admin()` zero-arg OK via `DEFAULT auth.uid()` — false blocker cleared before apply
 
 ## Ported commits (platform only)
 
@@ -64,26 +68,16 @@ No remote migration apply yet.
 
 - `6a3cb3d` Learning Translation Foundation — not cherry-picked
 
-## Migrations (current)
+## Hard rules (still in force)
 
-| Role | Forbidden | Current file |
-| --- | --- | --- |
-| Persistence & Workflow | `20260874_*`, Learning-reserved `20260901` | `20260910_translation_studio_persistence_workflow_v1.sql` |
-| Intelligence | `20260875_*` | `20260902_translation_intelligence_foundation_v1.sql` |
+- Never `db push` / `--include-all` / blind `migration up` / wholesale history repair
+- Do not reclaim `20260901`
+- Do not port Learning Translation Foundation `6a3cb3d`
+- Never touch Learning / Commerce / Collaboration / Billing
+- Do not switch runtime off JSON store without a dedicated readiness + GO milestone
 
-- Runtime = JSON file store (`/data/translation-studio/`) — not Supabase-backed yet
-- Publish = dry-run / `writesCatalogFiles: false` / `autoPublish: false`
-- **Do not** remote-apply without explicit approval
+## Next milestone
 
-## Open / next
+`TRANSLATION_RUNTIME_PERSISTENCE_ACTIVATION_READINESS_V1`
 
-- Final controlled targeted apply gate (read-only) then apply GO
-- Known risk to re-check before apply: `is_platform_admin` remote signature may be `(uuid)` while SQL policies call `is_platform_admin()`
-- Broader repo↔remote migration history misalignment remains (not Translation’s to repair wholesale)
-
-## Forbidden
-
-- Learning Translation Foundation / Learning domain work
-- Commerce / Collaboration
-- `db push` / `--include-all` / blind history repair
-- Reusing `20260901`
+Begin with **analysis/readiness only**. Do **not** switch runtime, wire DB persistence into product paths, or migrate JSON→DB in that first readiness pass without a separate explicit GO.
