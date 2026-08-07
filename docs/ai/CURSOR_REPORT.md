@@ -1,26 +1,25 @@
-# CURSOR_REPORT — UM Core Health Declaration Catalog Foundation P10
+# CURSOR_REPORT — UM Core Naming Registry Foundation P11
 
 ## Summary
 
-**READY** — Health Declaration Catalog Foundation P10 closed on
-`office/um-core-platform-health-declaration-catalog-foundation-p10`
-(base P9 tip `0c05319`).
+**READY** — Naming Registry Foundation P11 closed on
+`office/um-core-platform-naming-registry-foundation-p11`
+(base P10 tip `951fc55`).
 
-Health declaration catalog only. No monitoring/probing/polling/scheduling.
-`UmHealthReporter` remains interface-only. No Naming/SDK/`UmCoreRegistry`
-facade. No persistence/networking/product integration. No migrations.
+Deterministic derived read-only naming index only. Specialized registries
+remain identity SoT; `validation/naming.ts` remains policy SoT. No name
+authoring, discovery, SDK, or `UmCoreRegistry` facade. No migrations.
 
 ## Exact files changed
 
-- `platforms/core/health/codes.ts` (new)
-- `platforms/core/health/healthRegistry.ts` (new)
-- `platforms/core/health/healthRegistry.test.ts` (new)
-- `platforms/core/health/types.ts`
-- `platforms/core/health/index.ts`
+- `platforms/core/naming/namingRegistry.ts` (new)
+- `platforms/core/naming/namingRegistry.test.ts` (new)
+- `platforms/core/naming/types.ts`
+- `platforms/core/naming/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_HEALTH_DECLARATION_CATALOG_FOUNDATION_P10.md` (new)
+- `docs/core/UM_CORE_PLATFORM_NAMING_REGISTRY_FOUNDATION_P11.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -30,16 +29,15 @@ None.
 
 ## Security review
 
-- Heap-only catalog; no DB / network / secrets
-- `probeRef` opaque metadata only (never fetched)
+- Heap-only derived index; no DB / network / secrets
+- Does not mutate source registries
 - No product imports
-- Failed registration does not mutate state
 - No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
-- `npx vitest run platforms/core/health/healthRegistry.test.ts` — **PASS** (10)
-- `npx vitest run platforms/core` — **PASS** (100)
+- `npx vitest run platforms/core/naming/namingRegistry.test.ts` — **PASS** (9)
+- `npx vitest run platforms/core` — **PASS** (109)
 
 ## TypeScript
 
@@ -47,7 +45,7 @@ None.
 
 ## Build
 
-Not required for this health-declaration-catalog milestone.
+Not required for this naming-registry-foundation milestone.
 
 ## git diff --check
 
@@ -59,4 +57,4 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Do not start P11 from this close.
+- Do not start P12 from this close.

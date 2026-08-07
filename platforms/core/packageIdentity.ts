@@ -40,5 +40,8 @@ export const UM_CORE_DEPENDENCY_REGISTRY_PHASE = "P9" as const;
 /** Health declaration catalog foundation phase. */
 export const UM_CORE_HEALTH_DECLARATION_CATALOG_PHASE = "P10" as const;
 
+/** Naming registry foundation phase. */
+export const UM_CORE_NAMING_REGISTRY_PHASE = "P11" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;

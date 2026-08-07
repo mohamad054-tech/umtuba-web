@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P10` (… → dependency registry → health declaration catalog)
+- Phase: `P1`–`P11` (… → health declaration catalog → naming registry)
 
 ## Phase P3 scope
 
@@ -125,3 +125,15 @@ Pure **in-memory health declaration catalog** under `platforms/core/health/`.
 Out of scope for P10: probe execution, polling, scheduling, live snapshots,
 `UmHealthReporter`, networking, alerting, Naming/SDK/`UmCoreRegistry` facade,
 persistence, product integration, migrations.
+
+## Phase P11 scope
+
+Pure **deterministic derived naming index** under `platforms/core/naming/`.
+
+- Read-only cross-kind lookup over P4 (+ optional P5/P6/P8)
+- Indexes `platform`, `module`, `capability`, `event_type`, `flag`
+- Specialized registries remain identity SoT; `validation/naming.ts` remains policy
+
+Out of scope for P11: name authoring, discovery, DNS, SDK runtime,
+`UmCoreRegistry` facade, persistence, networking, product integration,
+migrations.

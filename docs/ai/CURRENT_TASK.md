@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Health Declaration Catalog Foundation P10
+UM Core Platform Naming Registry Foundation P11
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Health Declaration Catalog Foundation P10
 
 ## Branch
 
-`office/um-core-platform-health-declaration-catalog-foundation-p10`
+`office/um-core-platform-naming-registry-foundation-p11`
 
 ## Base HEAD
 
-`0c05319776351b8cb648d269156fb8e900a497bd` (Dependency Registry Foundation P9 close)
+`951fc552a344acdb3cd94cfd0aacc426affbf5c5` (Health Declaration Catalog Foundation P10 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-health-declaration-catalog-foundation-p10`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-naming-registry-foundation-p11`
 
 ## Milestone
 
-`um.core.health_declaration_catalog_foundation_p10`
+`um.core.naming_registry_foundation_p11`
 
 ## Allowed scope
 
-- `platforms/core/health/**`
+- `platforms/core/naming/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,17 +36,15 @@ UM Core Platform Health Declaration Catalog Foundation P10
 
 ## Forbidden scope
 
-- Health probe execution / polling / scheduling / networking / alerting
-- `UmHealthReporter` implementation / live snapshots
-- Naming / SDK / aggregate `UmCoreRegistry`
-- Persistence / product integration / migrations
-- P11 and later milestones
+- Independent name authoring / writable naming SoT
+- DNS / discovery / routing / package resolution / SDK runtime
+- Aggregate `UmCoreRegistry` / validator aggregate completion
+- Persistence / networking / product integration / migrations
+- P12 and later milestones
 
 ## Delivered
 
-Pure in-memory health declaration catalog bound to P4 platforms, with
-lookups, deterministic rejection findings, and focused tests. Registration
-is not monitoring.
-Committed and pushed on
-`office/um-core-platform-health-declaration-catalog-foundation-p10`.
-Do not start P11 from this handoff.
+Pure deterministic derived read-only naming index over P4 (+ optional P5/P6/P8),
+with kind-scoped lookups and focused tests. Indexing is not name authoring.
+Committed and pushed on `office/um-core-platform-naming-registry-foundation-p11`.
+Do not start P12 from this handoff.
