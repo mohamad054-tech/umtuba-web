@@ -130,10 +130,20 @@ export {
 export {
   createDbStudioPersistence,
   StudioDbLoadUnsupportedError,
+  StudioDbReadError,
+  StudioDbSyncLoadUnsupportedError,
   StudioDbSyncSaveUnsupportedError,
   type CreateDbStudioPersistenceOptions,
   type DbStudioPersistence,
+  type StudioDbReadErrorCategory,
 } from "./persistence/dbStudioPersistence";
+
+export {
+  fromTranslationStudioReadSnapshot,
+  mapRemoteAuditActorId,
+  mapRemoteUuidActorField,
+  REMOTE_READ_SUGGESTION_QUALITY_PLACEHOLDER,
+} from "./persistence/fromTranslationStudioReadSnapshot";
 
 export {
   createShadowDualWriteStudioPersistence,

@@ -11,7 +11,7 @@ import {
   resetTranslationStudioWorkflowForTests,
   resolveTranslationStudioPersistenceMode,
   toTranslationStudioWriteSnapshot,
-  StudioDbLoadUnsupportedError,
+  StudioDbSyncLoadUnsupportedError,
   StudioDbSyncSaveUnsupportedError,
   type PersistedStudioState,
   type TranslationStudioWriteRpcTransport,
@@ -266,7 +266,7 @@ describe("Translation Studio DB persistence adapter V1", () => {
     );
   });
 
-  it("load and sync save are unsupported; saveAsync is the write path", async () => {
+  it("loadSupported via loadAsync; sync load/save unsupported; saveAsync write path", async () => {
     const transport: TranslationStudioWriteRpcTransport = {
       async upsertSnapshot() {
         return okRpcResult();
@@ -274,11 +274,14 @@ describe("Translation Studio DB persistence adapter V1", () => {
     };
     const db = createDbStudioPersistence({ transport });
     expect(db.kind).toBe("db");
-    expect(db.loadSupported).toBe(false);
+    expect(db.loadSupported).toBe(true);
+    expect(db.syncLoadSupported).toBe(false);
+    expect(db.asyncLoadSupported).toBe(true);
     expect(db.syncSaveSupported).toBe(false);
-    expect(() => db.load()).toThrow(StudioDbLoadUnsupportedError);
+    expect(() => db.load()).toThrow(StudioDbSyncLoadUnsupportedError);
     expect(() => db.save(sampleState())).toThrow(StudioDbSyncSaveUnsupportedError);
     await expect(db.saveAsync(sampleState())).resolves.toMatchObject({ ok: true });
+    await expect(db.loadAsync()).rejects.toThrow(/readTransport/);
   });
 
   it("supabase transport uses rpc only with p_snapshot / p_options", async () => {
@@ -306,6 +309,8 @@ describe("Translation Studio DB persistence adapter V1", () => {
     expect(src).not.toMatch(/\.from\(/);
     expect(src).not.toMatch(/\.(insert|update|delete|upsert)\(/);
     expect(src).toMatch(/transport\.upsertSnapshot/);
+    expect(src).toMatch(/readTransport\.readSnapshot/);
+    expect(src).toMatch(/fromTranslationStudioReadSnapshot/);
   });
 
   it("JSON remains the only default; dual_read/db_primary stay closed; shadow is opt-in", () => {
