@@ -70,6 +70,16 @@ export type TranslationStudioWorkflow = {
     valueId: string;
     actor: WorkflowActor;
   }): Promise<TranslationSuggestion>;
+  /**
+   * Record a professional-pipeline candidate as a normal pending suggestion.
+   * Never auto-approves or publishes. Updates value → ai_suggested like stub AI path.
+   */
+  createProfessionalCandidateSuggestion(input: {
+    valueId: string;
+    actor: WorkflowActor;
+    candidateText: string;
+    quality: TranslationSuggestion["quality"];
+  }): TranslationSuggestion;
   getHistory(valueId: string): TranslationVersionRecord[];
   getAudit(entityId?: string): AuditLogEntry[];
 };
@@ -389,6 +399,56 @@ export function createTranslationStudioWorkflow(options?: {
                 confidence: suggestion.quality.confidence,
                 rawResponseRef: `studio://suggestion/${suggestion.id}`,
               },
+        },
+      };
+
+      state.suggestions.unshift(enriched);
+
+      mutateValue(valueId, "ai_suggest", actor, null, (current) => ({
+        ...current,
+        value: enriched.candidateText,
+        status: "ai_suggested",
+        suggestionId: enriched.id,
+        updatedAt: new Date().toISOString(),
+        updatedBy: actor.userId,
+        version: current.version + 1,
+      }));
+
+      return enriched;
+    },
+    createProfessionalCandidateSuggestion({
+      valueId,
+      actor,
+      candidateText,
+      quality,
+    }) {
+      const value = state.values.find((v) => v.id === valueId);
+      if (!value) throw new Error("Unknown translation value.");
+      const key = state.keys.find((k) => k.id === value.keyId);
+      if (!key) throw new Error("Unknown translation key.");
+
+      const conflicts = detectTerminologyConflicts({
+        candidateText,
+        language: value.language,
+        terminology: state.terminology,
+      });
+
+      const enriched: TranslationSuggestion = {
+        id: nextId("sug", seq),
+        keyId: key.id,
+        valueId: value.id,
+        sourceText: key.sourceText,
+        targetLanguage: value.language as StudioLanguageCode,
+        candidateText,
+        status: "pending_review",
+        createdAt: new Date().toISOString(),
+        createdBy: actor.userId,
+        quality: {
+          ...quality,
+          terminologyConflicts: [
+            ...(quality.terminologyConflicts ?? []),
+            ...conflicts,
+          ],
         },
       };
 

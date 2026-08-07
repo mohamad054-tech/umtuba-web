@@ -1,5 +1,5 @@
 /**
- * Professional Translation Quality Foundation V1 — public barrel.
+ * Professional Translation Quality + AI Review Pipeline — public barrel.
  */
 
 export * from "./types";
@@ -17,3 +17,17 @@ export * from "./humanReviewPolicy";
 export * from "./qualityReport";
 export * from "./twoPassWorkflow";
 export * from "./evaluateDraft";
+export * from "./reviewFailures";
+export * from "./observability";
+export * from "./reviewCache";
+export * from "./qualityAggregation";
+export * from "./suggestedRevision";
+export * from "./reviewSchema";
+export * from "./reviewerPrompt";
+export * from "./providerTransport";
+export * from "./transportAdapters";
+export * from "./reviewPipeline";
+export * from "./generateCandidate";
+export * from "./twoPassOrchestrator";
+export * from "./suggestionQualityTag";
+export * from "./heuristicReviewer";

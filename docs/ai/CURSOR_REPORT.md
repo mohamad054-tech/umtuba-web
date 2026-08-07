@@ -1,46 +1,49 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_QUALITY_FOUNDATION_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1
 
 ## Summary
 
 **Verdict: PASS**
 
-Pure application/domain foundation for professional translation quality:
-official terminology policy + seed, locale style guides, context packs,
-deterministic QA (incl. Arabic heuristics), quality gates/profiles,
-provider-neutral AI generator/reviewer contracts, two-pass workflow model,
-human-review escalation, memory ranking policy, compact quality reports,
-and non-mutating `evaluateProfessionalTranslationDraft` integration helper.
+Professional AI review pipeline V1 on top of the quality foundation:
+`runProfessionalTranslationReview`, `generateProfessionalTranslationCandidate`,
+`runProfessionalGenerateAndReview`, strict schema validation, aggregation hard
+rules, suggested-revision re-QA, cache-key foundation, observability, failure
+semantics, provider-neutral transport (scripted / unavailable / optional
+ai_service), heuristic reviewer, and platform-admin server actions.
 
-Persistence unchanged: `shadow_dual_write`, JSON authoritative, dual_read
-observe absent. Migration **NONE**. No auto-publish / approve. AI has no
-approve/publish authority.
+Live provider env not configured → `RUNTIME_PROVIDER_NOT_CONFIGURED` (does not
+block PASS; fake/heuristic adapters complete). Persistence: migration **NONE**.
+Shadow dual-write preserved. Dual-read observe OFF. Dual-read
+`WAITING_FOR_ADMIN_LOGIN` gate untouched.
 
-Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1`
+Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_TRANSLATION_GENERATION_AND_REVIEW_V1`
 
 ## Exact files changed
 
-- `lib/translationStudio/professionalQuality/**` (new module)
-- `lib/translationStudio/index.ts` — export barrel
-- `lib/translationStudio/translationStudioProfessionalQualityFoundation.test.ts` (new)
-- `docs/translation/PROFESSIONAL_TRANSLATION_QUALITY_V1.md` (new)
+- `lib/translationStudio/professionalQuality/*` pipeline modules (new/updated)
+- `lib/translationStudio/types.ts` — optional `professionalQuality` on suggestion quality
+- `lib/translationStudio/workflow/workflowService.ts` — `createProfessionalCandidateSuggestion`
+- `app/actions/translationStudioProfessionalReview.ts` (new)
+- `lib/translationStudio/translationStudioProfessionalAiReviewPipeline.test.ts` (new)
+- `docs/translation/PROFESSIONAL_AI_REVIEW_PIPELINE_V1.md` (new)
 - `docs/ai/CURSOR_REPORT.md` (this handoff)
 
 ## Migrations created
 
-**NONE.** Quality model is application-domain only over existing Studio data.
+**NONE.** Quality reports ephemeral or under existing suggestion `quality` jsonb.
 
 ## Security review
 
-- No `service_role`; no provider keys in client/contracts
-- AI authority flags all `false` (cannot approve/publish)
-- Invalid AI payloads fail closed
-- No remote schema / RLS / grant changes
-- No dual_read activation; shadow dual-write preserved
-- Integration helper does not mutate Studio save/submit/approve flows
+- No `service_role`; admin-gated server actions only
+- No provider keys to client; observation strips secrets/CoT
+- AI authority flags all false
+- Review-only action does not mutate Studio state
+- Generate creates pending suggestion only (no approve/publish)
+- Glossary/style guides server-built (not client-injected)
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **PASS** (180+ tests; quality foundation suite included)
+`npx vitest run lib/translationStudio` — **196 passed** (19 files)
 
 ## TypeScript
 
@@ -48,7 +51,7 @@ Next (not started): `TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1`
 
 ## Build
 
-Not required (domain foundation + tests/docs; no UI entry-point chrome).
+Not required (domain + server actions; no UI chrome).
 
 ## git diff --check
 
@@ -56,10 +59,9 @@ Not required (domain foundation + tests/docs; no UI entry-point chrome).
 
 ## git status --short
 
-Expect clean tree after product commit + push (exclude `.env.local` /
-`store.json` / journal / backups).
+Expect clean after commit/push.
 
 ## Open issues
 
-None blocking this foundation. Recommended next milestone only:
-`TRANSLATION_STUDIO_PROFESSIONAL_AI_REVIEW_PIPELINE_V1` (do not start here).
+1. Live runtime provider not configured on this device (`RUNTIME_PROVIDER_NOT_CONFIGURED`).
+2. Dual-read activation gate remains `WAITING_FOR_ADMIN_LOGIN` (untouched).

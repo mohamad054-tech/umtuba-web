@@ -127,6 +127,27 @@ export type SuggestionQualityMetadata = {
   providerVia: "ai_service" | "stub" | "memory";
   notes?: string;
   ai?: SuggestionAiMetadata | null;
+  /**
+   * Professional quality pipeline V1 envelope (optional).
+   * Stored in existing quality jsonb — no DB migration.
+   */
+  professionalQuality?: {
+    tag: "professional_quality_v1";
+    recommendation: "PASS" | "HUMAN_REVIEW" | "BLOCK";
+    overallScore: number;
+    gateDecision?: "QUALITY_PASS" | "QUALITY_REVIEW_REQUIRED" | "QUALITY_BLOCKED";
+    providerId: string | null;
+    modelId: string | null;
+    findingCounts?: {
+      total: number;
+      blocking: number;
+      error: number;
+      warning: number;
+      info: number;
+    };
+    /** Compact report object — never secrets / chain-of-thought. */
+    report?: Record<string, unknown>;
+  } | null;
 };
 
 export type TerminologyConflict = {
