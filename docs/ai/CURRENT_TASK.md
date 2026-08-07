@@ -1,36 +1,37 @@
 # Current Task
 
-## ACTIVE FEATURE BRANCH (not SoT)
+## COLLABORATION SoT — Learning Resource Binding INTEGRATED
 
-- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_LEARNING_BINDING_V1`
-- **Branch:** `office/collaboration-workspace-resource-link-learning-binding-v1`
-- **Base SoT HEAD:** `fd1ff049bde3e8d22f0227e6354671c063cf69f4`
+- **Milestone closed:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_LEARNING_BINDING_SOT_INTEGRATION_V1`
+- **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
+- **Integrated feature:** `office/collaboration-workspace-resource-link-learning-binding-v1` @ `298d91c`
+- **Method:** fast-forward only (`fd1ff04` → `298d91c`)
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
-- **Do not merge to SoT in this task.**
 
-## Goal
+## Status
 
-First product binding: Collaboration Workspace → Learning Space reference only.
-Uses existing resource-link mutation runtime. No Learning lifecycle mutation.
-No migration. Platform flag stays `false`.
+- Learning Binding V1 = **INTEGRATED / CLOSED**
+- Canonical binding target = Learning Space (`learning_spaces.id` → `learning_space`)
+- No migration required / no migration applied
+- No Learning lifecycle mutation
+- Platform flag remains default `false`
+- Minimal workspace UI for Learning link/unlink remains a separate gap
+- Commerce and advertiser bindings remain deferred
 
-## Selected identity
+## Do NOT start automatically
 
-- Learning: `public.learning_spaces.id` (UUID)
-- Collaboration `resource_type`: `learning_space` (already reserved)
-- Auth dependency: `can_manage_learning_space` (existing)
-
-## Allowed scope
-
-- `lib/collaboration/learningWorkspaceResourceBinding.ts` (+ tests)
-- docs task/report only as needed
-- minimal optional UI only if already-suitable surface exists (prefer runtime-only)
-
-## Forbidden scope
-
-- Learning lifecycle / enrollment / publish / lesson mutations
-- Commerce / advertiser binding
+- Learning link/unlink UI
+- Commerce / advertiser bindings
 - Platform flag enablement
-- Remote migration apply
-- SoT merge
-- smoke/keepalive / UM Core P17
+- UM Core P17
+
+## CLOSED ON SoT (do not redo)
+
+- Workspace Spine / Membership / Settings Lifecycle UI
+- `20260917` APPLIED + VERIFIED
+- Member Role Management UI V1
+- Resource Link Foundation V1
+- Resource Link Mutation Runtime V1 + `20260919`
+- Learning Resource Binding V1
+- stale `20260898` NON-SOT; remote Commerce only
+- smoke/keepalive NOT SoT

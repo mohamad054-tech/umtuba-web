@@ -6,7 +6,7 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Resource Link Mutation Runtime V1 INTEGRATED (`a2cd114` + docs closeout) |
+| Tip | Learning Resource Binding V1 INTEGRATED (`298d91c` + docs closeout) |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
@@ -14,10 +14,10 @@
 - Settings & Lifecycle UI V1 + `20260917` APPLIED + VERIFIED
 - Member Role Management UI V1 INTEGRATED / CLOSED on SoT
 - Resource Link Foundation V1 INTEGRATED / CLOSED on SoT
-- Resource Link Mutation Runtime V1 INTEGRATED / CLOSED on SoT
-  - Migration `20260919` APPLIED + VERIFIED
-  - RPCs live: create / update / delete resource link
-  - Authenticated table grants remain SELECT-only; FORCE RLS on
+- Resource Link Mutation Runtime V1 INTEGRATED / CLOSED on SoT (`20260919` APPLIED + VERIFIED)
+- Learning Resource Binding V1 INTEGRATED / CLOSED on SoT
+  - Canonical target: Learning Space (`learning_spaces.id` → `learning_space`)
+  - No migration; no Learning lifecycle mutation
 
 ### Ops forks (NOT SoT)
 
@@ -26,7 +26,8 @@
 
 ### Deferred
 
-- Resource-link product bindings (Learning / Commerce / advertiser)
+- Minimal workspace UI for Learning link/unlink
+- Commerce / advertiser resource-link bindings
 - Invite expansion
 - Credentialed E2E role-update / mutation smoke
 
