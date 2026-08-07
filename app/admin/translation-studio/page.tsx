@@ -7,6 +7,7 @@ import {
   validateAppShellTerminology,
 } from "../../../lib/translationStudio";
 import { requireTranslationStudioAdmin } from "./requireTranslationStudioAdmin";
+import { scheduleTranslationStudioDualReadObservation } from "./scheduleDualReadObservation";
 import TranslationStudioShell, {
   TRANSLATION_STUDIO_BASE,
 } from "./TranslationStudioShell";
@@ -16,7 +17,11 @@ export const metadata = {
 };
 
 export default async function TranslationStudioOverviewPage() {
-  await requireTranslationStudioAdmin();
+  const { supabase } = await requireTranslationStudioAdmin();
+  scheduleTranslationStudioDualReadObservation({
+    supabase,
+    surface: "landing",
+  });
   const studio = getTranslationStudio();
   const snap = studio.getSnapshot();
   const findingsLive = validateAppShellTerminology({

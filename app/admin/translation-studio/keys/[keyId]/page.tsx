@@ -10,6 +10,7 @@ import {
 } from "../../../../actions/translationStudio";
 import { getTranslationStudio } from "../../../../../lib/translationStudio";
 import { requireTranslationStudioAdmin } from "../../requireTranslationStudioAdmin";
+import { scheduleTranslationStudioDualReadObservation } from "../../scheduleDualReadObservation";
 import TranslationStatusBadge from "../../TranslationStatusBadge";
 import TranslationStudioShell, {
   TRANSLATION_STUDIO_BASE,
@@ -28,7 +29,11 @@ export default async function TranslationStudioKeyDetailPage({
   params,
   searchParams,
 }: PageProps) {
-  await requireTranslationStudioAdmin();
+  const { supabase } = await requireTranslationStudioAdmin();
+  scheduleTranslationStudioDualReadObservation({
+    supabase,
+    surface: "key_detail",
+  });
   const { keyId } = await params;
   const query = (await searchParams) ?? {};
   const studio = getTranslationStudio();

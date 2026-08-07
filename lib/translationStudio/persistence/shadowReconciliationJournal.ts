@@ -32,7 +32,12 @@ export type ShadowJournalOutcome =
   | "dual_read_transient_lag"
   | "dual_read_failed"
   | "dual_read_unavailable"
-  | "dual_read_stale_discarded";
+  | "dual_read_stale_discarded"
+  | "dual_read_auto_compare_started"
+  | "dual_read_auto_compare_succeeded"
+  | "dual_read_auto_compare_failed"
+  | "dual_read_breaker_opened"
+  | "dual_read_breaker_skipped";
 
 export type ShadowReconciliationJournalEntryV1 = {
   schemaVersion: typeof SHADOW_RECONCILIATION_JOURNAL_SCHEMA_VERSION;

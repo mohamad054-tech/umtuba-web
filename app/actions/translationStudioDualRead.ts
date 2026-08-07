@@ -2,8 +2,8 @@
 
 /**
  * Platform-admin dual-read compare diagnostic (read-only).
- * JSON authoritative snapshot taken server-side. No browser snapshot payload.
- * No mutations. Does not change persistence mode / does not activate dual_read env.
+ * Reports breaker state; does not silently hide OPEN breaker.
+ * Manual compare still runs (explicit diagnostics), but returns breaker snapshot.
  */
 
 import { redirect } from "next/navigation";
@@ -15,11 +15,14 @@ import {
   createShadowReconciliationJournal,
   createSupabaseReadRpcTransport,
   fingerprintStudioSnapshot,
+  getDualReadObservationBreaker,
   getTranslationStudioWorkflow,
   resolveShadowReconciliationJournalPath,
+  resetDualReadObservationBreaker,
   runStudioDualReadCompare,
   runWithStudioDualReadTransportAsync,
   type DualReadCompareResult,
+  type DualReadObservationBreakerSnapshot,
 } from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
@@ -34,6 +37,7 @@ export type DualReadDiagnosticsResult = {
   counts: DualReadCompareResult["counts"];
   category?: DualReadCompareResult["category"];
   message?: string;
+  breaker: DualReadObservationBreakerSnapshot;
 };
 
 function authoritativeLocalFromWorkflow() {
@@ -47,6 +51,7 @@ function authoritativeLocalFromWorkflow() {
 
 /**
  * Trigger one dual-read comparison now (platform admin only).
+ * Manual path — does not bypass reporting of breaker-open state.
  */
 export async function runTranslationStudioDualReadCompareAction(): Promise<DualReadDiagnosticsResult> {
   const user = await getServerUser();
@@ -88,5 +93,25 @@ export async function runTranslationStudioDualReadCompareAction(): Promise<DualR
     counts: result.counts,
     category: result.category,
     message: result.message,
+    breaker: getDualReadObservationBreaker(),
   };
+}
+
+/**
+ * Explicit admin reset of dual-read observation breaker (server-only).
+ * Does not change persistence mode / observe env.
+ */
+export async function resetTranslationStudioDualReadObservationBreakerAction(): Promise<DualReadObservationBreakerSnapshot> {
+  const user = await getServerUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(STUDIO_BASE)}`);
+  }
+  const supabase = await createClient();
+  const isAdmin = await assertPlatformAdminDb(supabase);
+  if (!isAdmin) {
+    redirect(
+      `${APP_ROUTES.home}?error=${encodeURIComponent(ADMIN_STORE_UNAUTHORIZED)}`
+    );
+  }
+  return resetDualReadObservationBreaker();
 }

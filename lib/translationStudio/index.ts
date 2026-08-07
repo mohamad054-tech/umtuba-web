@@ -200,6 +200,26 @@ export {
 } from "./persistence/dualReadStudioPersistence";
 
 export {
+  claimDualReadObservationSlot,
+  releaseDualReadObservationSlot,
+  runTranslationStudioDualReadObservation,
+  __clearDualReadObservationSlotsForTests,
+  type DualReadObservationRunResult,
+  type DualReadObservationSurface,
+} from "./persistence/dualReadObservation";
+
+export {
+  getDualReadObservationBreaker,
+  isDualReadObservationBreakerOpen,
+  recordDualReadObservationResult,
+  resetDualReadObservationBreaker,
+  __setDualReadObservationBreakerForTests,
+  type DualReadObservationBreakerReason,
+  type DualReadObservationBreakerSnapshot,
+  type DualReadObservationBreakerState,
+} from "./persistence/dualReadObservationBreaker";
+
+export {
   classifyStudioShadowError,
   isRetryableStudioShadowCategory,
 } from "./persistence/shadowErrorClassification";
