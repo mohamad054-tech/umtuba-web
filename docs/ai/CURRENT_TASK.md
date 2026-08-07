@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Naming Registry Foundation P11
+UM Core Aggregate Registry Facade Foundation P12
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Naming Registry Foundation P11
 
 ## Branch
 
-`office/um-core-platform-naming-registry-foundation-p11`
+`office/um-core-platform-aggregate-registry-facade-foundation-p12`
 
 ## Base HEAD
 
-`951fc552a344acdb3cd94cfd0aacc426affbf5c5` (Health Declaration Catalog Foundation P10 close)
+`0516eceff8e62c5af6b1a446889f4282d21cef3b` (Naming Registry Foundation P11 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-naming-registry-foundation-p11`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-aggregate-registry-facade-foundation-p12`
 
 ## Milestone
 
-`um.core.naming_registry_foundation_p11`
+`um.core.aggregate_registry_facade_foundation_p12`
 
 ## Allowed scope
 
-- `platforms/core/naming/**`
+- `platforms/core/registry/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,15 +36,16 @@ UM Core Platform Naming Registry Foundation P11
 
 ## Forbidden scope
 
-- Independent name authoring / writable naming SoT
-- DNS / discovery / routing / package resolution / SDK runtime
-- Aggregate `UmCoreRegistry` / validator aggregate completion
+- Model B/C mega-wire factory / DI / startup orchestration
+- Event routing slot on `UmCoreRegistry`
+- Validator completion / SDK / runtime ports
 - Persistence / networking / product integration / migrations
-- P12 and later milestones
+- P13 and later milestones
 
 ## Delivered
 
-Pure deterministic derived read-only naming index over P4 (+ optional P5/P6/P8),
-with kind-scoped lookups and focused tests. Indexing is not name authoring.
-Committed and pushed on `office/um-core-platform-naming-registry-foundation-p11`.
-Do not start P12 from this handoff.
+Model A pure composition facade `createUmCoreRegistry(deps)` exposing the
+existing seven `UmCoreRegistry` slots by borrowed reference. Caller retains
+ownership. No runtime orchestration, SDK, or validator completion.
+Committed and pushed on `office/um-core-platform-aggregate-registry-facade-foundation-p12`.
+Do not start P13 from this handoff.

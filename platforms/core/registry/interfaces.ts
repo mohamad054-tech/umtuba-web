@@ -123,10 +123,29 @@ export interface UmInMemoryPlatformRegistry extends UmPlatformRegistry {
 }
 
 /**
- * Aggregate Core registry facade — interface only.
+ * Aggregate Core registry facade (Standards §15 / Spec aggregate surface).
+ *
+ * P1: interface only.
+ * P12: Model A pure composition — borrows already-created specialized registries.
+ *
+ * AGGREGATE REGISTRY COMPOSITION IS NOT RUNTIME ORCHESTRATION.
  * Implementations MUST NOT import product platforms (Spec §5.3).
  */
 export interface UmCoreRegistry {
+  readonly platforms: UmPlatformRegistry;
+  readonly capabilities: UmCapabilityRegistry;
+  readonly events: UmEventTypeRegistry;
+  readonly flags: UmFlagRegistry;
+  readonly health: UmHealthRegistry;
+  readonly dependencies: UmDependencyRegistry;
+  readonly naming: UmNamingRegistry;
+}
+
+/**
+ * Dependencies for Model A aggregate composition.
+ * Caller owns every instance; the facade only borrows references.
+ */
+export interface UmCoreRegistryDeps {
   readonly platforms: UmPlatformRegistry;
   readonly capabilities: UmCapabilityRegistry;
   readonly events: UmEventTypeRegistry;
