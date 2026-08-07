@@ -1,46 +1,36 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_DUAL_READ_IMPLEMENTATION_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_DUAL_READ_RUNTIME_OBSERVATION_WIRING_V1
 
 ## Summary
 
-**TRANSLATION_STUDIO_DUAL_READ_IMPLEMENTATION_V1 = PASS.**
+**Verdict: WAITING_FOR_ADMIN_LOGIN**
 
-Dual-read V1 is implemented as a **secondary read/compare** capability:
-JSON remains authoritative; DB is never merged into JSON; `db_primary`
-remains unsupported. Computer-2 runtime stays on **`shadow_dual_write`**
-(`.env.local` unchanged; dual_read **not** activated).
+Non-blocking dual-read observation is wired into Translation Studio
+**landing** and **key detail** admin pages via `next/server` `after()`,
+gated by `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE`. A process-local
+circuit breaker governs automatic observation only (JSON + shadow
+untouched).
 
-Authenticated remote compare smoke (platform-admin JWT claim simulation,
-read-only): **IN_SYNC** under policy (missing/field/audit_missing **0**;
-known smoke extras accepted). Store hash unchanged; journal received
-`dual_read` event; no remote writes.
+Authenticated browser page smoke **not completed** — no platform-admin
+session (tabs on `/login`). Implementation + unit/breaker tests **PASS**.
 
-Next milestone **not started**:
-`TRANSLATION_STUDIO_DUAL_READ_CONTROLLED_ACTIVATION_GATE_V1`.
+Observe remains **OFF**. Persistent `shadow_dual_write` remains **ON**.
+
+Next (not started): after admin login smoke, retry
+`TRANSLATION_STUDIO_DUAL_READ_CONTROLLED_ACTIVATION_GATE_V1_RETRY`.
 
 ## Exact files changed
 
-New:
-- `lib/translationStudio/persistence/dualReadContext.ts`
-- `lib/translationStudio/persistence/dualReadObserver.ts`
-- `lib/translationStudio/persistence/dualReadJournal.ts`
-- `lib/translationStudio/persistence/dualReadCompare.ts`
-- `lib/translationStudio/persistence/dualReadStudioPersistence.ts`
-- `lib/translationStudio/translationStudioDualRead.test.ts`
-- `app/actions/translationStudioDualRead.ts`
-
-Updated:
-- `lib/translationStudio/persistence/mode.ts` — `dual_read` executable; observe flag
-- `lib/translationStudio/persistence/createDefaultStudioPersistence.ts` — nest composition
-- `lib/translationStudio/persistence/shadowReconciliationJournal.ts` — dual_read rows
+- `app/admin/translation-studio/scheduleDualReadObservation.ts` (new)
+- `app/admin/translation-studio/requireTranslationStudioAdmin.ts` — returns `{user,supabase}`
+- `app/admin/translation-studio/page.tsx` — schedule `landing`
+- `app/admin/translation-studio/keys/[keyId]/page.tsx` — schedule `key_detail`
+- `app/actions/translationStudioDualRead.ts` — breaker snapshot + reset action
+- `lib/translationStudio/persistence/dualReadObservation.ts` (new)
+- `lib/translationStudio/persistence/dualReadObservationBreaker.ts` (new)
+- `lib/translationStudio/persistence/dualReadJournal.ts` — auto/breaker outcomes
+- `lib/translationStudio/persistence/shadowReconciliationJournal.ts` — outcomes
 - `lib/translationStudio/index.ts` — exports
-- `app/actions/translationStudio.ts` — bind read ALS with write ALS
-- `app/actions/translationStudioReconciliation.ts` — same read transport reuse
-- Mode-gate tests: persistence port / shadow / db adapter / remote read adapter
-
-Not committed (gitignored runtime):
-- `.env.local` — still `shadow_dual_write`
-- `data/translation-studio/store.json`
-- `data/translation-studio/shadow-reconciliation-v1.jsonl`
+- `lib/translationStudio/translationStudioDualReadObservation.test.ts` (new)
 
 ## Migrations created
 
@@ -48,23 +38,22 @@ Not committed (gitignored runtime):
 
 ## Security review
 
-- No `service_role`; request-scoped authenticated read/write transports only
-- No prune/delete; no DB→JSON merge/fallback
-- `db_primary_json_fallback` remains unsupported
-- TI untouched; no migration / RLS / grant changes
-- Diagnostics action: platform-admin gated; server-side JSON snapshot; no browser payload
+- No `service_role`; authenticated cookie client only for read RPC
+- Observe off by default; no anonymous RPC from unauthenticated pages
+- Breaker does not affect JSON authority or shadow writes
+- TI untouched; no schema/RLS/grant changes
 
 ## Tests
 
-`npx vitest run lib/translationStudio` — **158 passed** (16 files)
+`npx vitest run lib/translationStudio` — **167 passed** (17 files)
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS** (exit 0)
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-Not required for this milestone (admin action + lib only; no UI activation).
+Not required (admin server helper + pages; no new UI chrome).
 
 ## git diff --check
 
@@ -72,24 +61,19 @@ Not required for this milestone (admin action + lib only; no UI activation).
 
 ## git status — closeout note
 
-Expect clean tree after commit/push of dual-read implementation sources only.
+Product commit: `5b5ad1956161a2638c0803c49377332e3f6ab86e`
+Expect clean tree after this docs commit + push.
 
 ## Open issues
 
-None for implementation. Controlled activation of dual_read (or observe nest
-over shadow) is deferred to
-`TRANSLATION_STUDIO_DUAL_READ_CONTROLLED_ACTIVATION_GATE_V1`.
+1. Need authenticated platform-admin browser session to complete live
+   landing/key observation smoke under temporary observe=true.
+2. Activation gate retry blocked until that smoke passes.
 
-### Authenticated remote compare smoke (read-only)
+### Architecture notes
 
-| Check | Result |
-|-------|--------|
-| Status | **IN_SYNC** |
-| missing_remote / field_mismatch / audit_missing | **0 / 0 / 0** |
-| Smoke extras | accepted (`extra_remote` 3, `audit_extra` 1) |
-| Store SHA256 | unchanged `3c9b4dee…ca6f` |
-| Journal | `dual_read` / `dual_read_succeeded` / `IN_SYNC` |
-| Writes | none |
-| `.env.local` mode | still `shadow_dual_write` |
-| Observe flag | absent |
-| Factory under shadow mode | `dualReadEnabled: false` |
+- Non-blocking: `after(() => runObservation)` — page returns JSON immediately
+- One slot per `surface:hash` per request (dedupe)
+- Breaker OPEN on auth / invalid_response / actionable drift; 2 consecutive
+  or 3 session transport/rpc/timeout failures
+- Reset: process restart or `resetTranslationStudioDualReadObservationBreakerAction`
