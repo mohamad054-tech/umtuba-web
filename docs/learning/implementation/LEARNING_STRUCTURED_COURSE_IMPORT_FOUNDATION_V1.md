@@ -94,3 +94,8 @@ No production publication command in V1.
 ## Publication separation
 
 Import ≠ publish. Catalog appearance requires published + `visibility=public` and enrollment strategy — **separate GO**.
+
+## Commit hygiene
+
+Corrective tip commits must remain free of Co-authored-by / Signed-off-by trailers.
+
