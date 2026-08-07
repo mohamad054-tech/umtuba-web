@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Platform Event Routing Foundation P7
+UM Core Platform Feature Flag Registry Foundation P8
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Platform Event Routing Foundation P7
 
 ## Branch
 
-`office/um-core-platform-event-routing-foundation-p7`
+`office/um-core-platform-feature-flag-registry-foundation-p8`
 
 ## Base HEAD
 
-`1263091bb0daafdce6f3cb9adb2074ba89926c4d` (Event Type Registry P6 close)
+`7e1dc2541662305276d5796e9851e8a2dfc7037f` (Event Routing Foundation P7 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-event-routing-foundation-p7`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-feature-flag-registry-foundation-p8`
 
 ## Milestone
 
-`um.core.event_routing_foundation_p7`
+`um.core.feature_flag_registry_foundation_p8`
 
 ## Allowed scope
 
-- `platforms/core/event/**`
+- `platforms/core/flag/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,14 +36,16 @@ UM Core Platform Event Routing Foundation P7
 
 ## Forbidden scope
 
-- Event bus / publish / consume / outbox / transport / retry / queues
+- Flag evaluation / overrides / cohorts / kill-switch execution
+- Event bus / publish / consume / outbox / transport
 - Persistence / networking / product integration
 - Migrations / database / Supabase
+- P9 and later milestones
 
 ## Delivered
 
-Pure in-memory event routing catalog bound to P4 platforms + P6 event types,
-with lookups, deterministic rejection findings, and focused tests.
-Routing is not delivery.
-Committed and pushed on `office/um-core-platform-event-routing-foundation-p7`.
-Do not start P8 from this handoff.
+Pure in-memory feature flag catalog bound to P4 platforms (optional P5
+capability integrity), with lookups, deterministic rejection findings,
+and focused tests. Registration is not evaluation.
+Committed and pushed on `office/um-core-platform-feature-flag-registry-foundation-p8`.
+Do not start P9 from this handoff.

@@ -1,25 +1,26 @@
-# CURSOR_REPORT — UM Core Event Routing Foundation P7
+# CURSOR_REPORT — UM Core Feature Flag Registry Foundation P8
 
 ## Summary
 
-**READY** — Event Routing Foundation P7 closed on
-`office/um-core-platform-event-routing-foundation-p7`
-(base P6 tip `1263091`).
+**READY** — Feature Flag Registry Foundation P8 closed on
+`office/um-core-platform-feature-flag-registry-foundation-p8`
+(base P7 tip `7e1dc25`).
 
-Routing catalog only. No bus/publish/consume/transport/outbox.
-No persistence/networking/product integration. No migrations.
+Flag catalog only. No evaluation/overrides/cohorts/kill-switch execution.
+No event bus/delivery. No persistence/networking/product integration.
+No migrations. `UmFlagEvaluator` remains interface-only.
 
 ## Exact files changed
 
-- `platforms/core/event/routingCodes.ts` (new)
-- `platforms/core/event/eventRouting.ts` (new)
-- `platforms/core/event/eventRouting.test.ts` (new)
-- `platforms/core/event/types.ts`
-- `platforms/core/event/index.ts`
+- `platforms/core/flag/codes.ts` (new)
+- `platforms/core/flag/flagRegistry.ts` (new)
+- `platforms/core/flag/flagRegistry.test.ts` (new)
+- `platforms/core/flag/types.ts`
+- `platforms/core/flag/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_EVENT_ROUTING_FOUNDATION_P7.md` (new)
+- `docs/core/UM_CORE_PLATFORM_FEATURE_FLAG_REGISTRY_FOUNDATION_P8.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -31,13 +32,14 @@ None.
 
 - Heap-only catalog; no DB / network / secrets
 - No product imports
-- No publish/consume/delivery runtime
+- No flag evaluation runtime
 - Failed registration does not mutate state
 - No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
-- `npx vitest run platforms/core` — **PASS** (see final report)
+- `npx vitest run platforms/core/flag/flagRegistry.test.ts` — **PASS** (10)
+- `npx vitest run platforms/core` — **PASS** (75)
 
 ## TypeScript
 
@@ -45,7 +47,7 @@ None.
 
 ## Build
 
-Not required for this routing-foundation milestone.
+Not required for this flag-registry-foundation milestone.
 
 ## git diff --check
 
@@ -57,4 +59,4 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Do not start P8 from this close.
+- Do not start P9 from this close.

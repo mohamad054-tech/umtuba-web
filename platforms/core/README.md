@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P7` (… → event type registry → event routing)
+- Phase: `P1`–`P8` (… → event routing → feature flag registry)
 
 ## Phase P3 scope
 
@@ -89,3 +89,14 @@ Pure **in-memory event routing catalog** under `platforms/core/event/`.
 
 Out of scope for P7: event bus, publish/consume, delivery, outbox, retry,
 queues, transport, persistence, networking, product integration.
+
+## Phase P8 scope
+
+Pure **in-memory feature flag catalog** under `platforms/core/flag/`.
+
+- Flags owned by registered platforms; must match manifest `flags[]`
+- Optional P5 capability integrity for linked capabilities
+- Lookups by id, platform, linked capability, dangerElevated
+
+Out of scope for P8: flag evaluation, overrides, cohorts, kill-switch
+execution, event bus/delivery, persistence, networking, product integration.
