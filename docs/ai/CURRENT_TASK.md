@@ -1,34 +1,21 @@
 # Current Task
 
-## CURRENT COLLABORATION SOURCE OF TRUTH (2026-08-07)
+## ACTIVE FEATURE BRANCH (not SoT)
 
-- **Branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Tip base:** `2f6516f1b29f72d4ff88c12a6963c2fc15b5f6f2` (+ this integration docs commit)
+- **Milestone:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_FOUNDATION_V1`
+- **Branch:** `office/collaboration-workspace-resource-link-foundation-v1`
+- **Base SoT HEAD:** `90be8717d1a1bda9c5ea7f2867273f3878f7ed30`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
-- **Sync:** expect `0 0` after push
+- **Do not merge to SoT in this task.**
 
-## CLOSED ON SoT
+## Goal
 
-| Milestone | Status |
-| --- | --- |
-| Settings & Lifecycle UI V1 | CLOSED |
-| Settings Lifecycle remote apply (`20260917`) | APPLIED + VERIFIED / CLOSED |
-| Member Role Management UI V1 | **INTEGRATED / CLOSED** on SoT (FF from `office/collaboration-workspace-member-role-management-ui-v1` @ `2f6516f`) |
+Resource Link Foundation V1: typed reference/binding metadata + read runtime over existing spine table. No product bindings. No migration (schema already in `20260896`). No remote apply. Platform flag stays `false`.
 
-## Notes
+## CLOSED ON SoT (do not redo)
 
-- No migration required for Member Role Management (uses spine RPC `update_collaboration_workspace_member_role`)
-- Platform flag remains default **`false`**
-- Stale Collaboration `20260898` on smoke/keepalive = DO NOT APPLY
-- Remote `20260898` = Commerce only
-- smoke/keepalive = NOT SoT
-
-## Deferred
-
-- Resource-link product bindings
-- Invite system expansion
-- Credentialed E2E role-update smoke (future validation gap)
-
-## NEXT
-
-Defer Resource Link / invite expansion until explicit GO. Do not start from keepalive/smoke.
+- Workspace Spine / Membership / Settings Lifecycle UI
+- `20260917` APPLIED + VERIFIED
+- Member Role Management UI V1 integrated
+- stale `20260898` NON-SOT; remote Commerce only
+- smoke/keepalive NOT SoT

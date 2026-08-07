@@ -94,17 +94,23 @@ export const COLLABORATION_RESOURCE_TYPES_RESERVED = [
   "store",
   "advertiser_account",
 ] as const;
+export type CollaborationResourceType =
+  (typeof COLLABORATION_RESOURCE_TYPES_RESERVED)[number];
 
 export const COLLABORATION_RESOURCE_LINK_RELATIONSHIPS = [
   "linked",
   "manages",
   "owns",
 ] as const;
+export type CollaborationResourceLinkRelationship =
+  (typeof COLLABORATION_RESOURCE_LINK_RELATIONSHIPS)[number];
 
 export const COLLABORATION_RESOURCE_LINK_STATUSES = [
   "active",
   "revoked",
 ] as const;
+export type CollaborationResourceLinkStatus =
+  (typeof COLLABORATION_RESOURCE_LINK_STATUSES)[number];
 
 /** Fixed RBAC capability matrix (workspace plane only). */
 export const COLLABORATION_WORKSPACE_PERMISSIONS = {
