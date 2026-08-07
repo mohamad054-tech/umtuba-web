@@ -57,6 +57,13 @@ export default async function LearningHubPage() {
         >
           My notes
         </Link>
+        <Link
+          href={LEARNING_LEARNER_ROUTES.saved}
+          className="font-bold text-white underline underline-offset-2"
+          data-testid="learning-hub-saved-link"
+        >
+          Saved lessons
+        </Link>
       </p>
       {hub.ok ? (
         <LearningHub hub={hub.data} />

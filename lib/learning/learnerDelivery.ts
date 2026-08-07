@@ -43,6 +43,7 @@ export const LEARNING_LEARNER_SUBMITTED_MESSAGE =
 export const LEARNING_LEARNER_ROUTES = {
   hub: "/learning",
   notes: "/learning/notes",
+  saved: "/learning/saved",
   course: (courseId: string) => `/learning/courses/${courseId}`,
   lesson: (lessonId: string) => `/learning/lessons/${lessonId}`,
   activity: (activityId: string) => `/learning/activities/${activityId}`,

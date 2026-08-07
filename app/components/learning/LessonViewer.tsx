@@ -3,6 +3,7 @@ import ContentBlockRenderer from "./ContentBlockRenderer";
 import ContinueWatchingVideo from "./ContinueWatchingVideo";
 import ActivityList from "./ActivityList";
 import LessonNotesPanel from "./LessonNotesPanel";
+import LessonBookmarkControl from "./LessonBookmarkControl";
 import {
   asPlainString,
   asVideoProvider,
@@ -42,6 +43,8 @@ type LessonViewerProps = {
   access?: LearningLessonContentAccess;
   /** @deprecated Prefer `access` from resolveLessonContentAccess. */
   engine?: LearningLessonEnginePayload | null;
+  /** Initial bookmark state for verified canRender lessons only. */
+  initialBookmarkSaved?: boolean;
 };
 
 function toRenderableBlocks(
@@ -87,6 +90,7 @@ export default function LessonViewer({
   delivery,
   access: accessProp,
   engine = null,
+  initialBookmarkSaved = false,
 }: LessonViewerProps) {
   const access =
     accessProp ??
@@ -172,6 +176,14 @@ export default function LessonViewer({
               AI Tutor
             </Link>
           </p>
+        ) : null}
+        {canRender ? (
+          <div className="mt-4">
+            <LessonBookmarkControl
+              lessonId={delivery.lesson.id}
+              initialSaved={initialBookmarkSaved}
+            />
+          </div>
         ) : null}
       </section>
 

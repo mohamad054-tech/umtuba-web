@@ -8,6 +8,7 @@ import {
   resolveComposedLessonLearnerAccess,
 } from "../../../../lib/learning/learnerDelivery";
 import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
+import { getMyLearningLessonBookmarkState } from "../../../../lib/learning/lessonBookmarksFoundation";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 
 export const dynamic = "force-dynamic";
@@ -59,6 +60,17 @@ export default async function LearningLessonPage({
     notFound();
   }
 
+  let initialBookmarkSaved = false;
+  if (access.canRenderProtectedContent) {
+    const bookmarkState = await getMyLearningLessonBookmarkState(
+      supabase,
+      lessonId
+    );
+    if (bookmarkState.ok) {
+      initialBookmarkSaved = bookmarkState.data.saved;
+    }
+  }
+
   return (
     <LearningShell
       title="Lesson"
@@ -93,7 +105,11 @@ export default async function LearningLessonPage({
         </p>
       ) : null}
 
-      <LessonViewer delivery={delivery.data} access={access} />
+      <LessonViewer
+        delivery={delivery.data}
+        access={access}
+        initialBookmarkSaved={initialBookmarkSaved}
+      />
     </LearningShell>
   );
 }
