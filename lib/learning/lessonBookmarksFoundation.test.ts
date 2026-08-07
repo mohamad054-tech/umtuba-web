@@ -14,7 +14,7 @@ import { LEARNING_LEARNER_ROUTES } from "./learnerDelivery";
 
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
-  "supabase/migrations/20260915_learning_lesson_bookmarks_v1.sql";
+  "supabase/migrations/20260916_learning_lesson_bookmarks_v1.sql";
 const ADAPTER = "lib/learning/lessonBookmarksFoundation.ts";
 const ACTIONS = "app/learning/lessonBookmarkActions.ts";
 const CONTROL = "app/components/learning/LessonBookmarkControl.tsx";
@@ -66,7 +66,7 @@ function fakeClient(
 }
 
 describe("Lesson Bookmarks Foundation — files", () => {
-  it("ships migration, adapter, actions, control, hub, and unique 20260915", () => {
+  it("ships migration, adapter, actions, control, hub, and unique 20260916", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
     expect(existsSync(join(ROOT, ADAPTER))).toBe(true);
     expect(existsSync(join(ROOT, ACTIONS))).toBe(true);
@@ -75,9 +75,9 @@ describe("Lesson Bookmarks Foundation — files", () => {
     expect(existsSync(join(ROOT, DOCS))).toBe(true);
 
     const migrations = readdirSync(join(ROOT, "supabase/migrations"));
-    const sameVersion = migrations.filter((f) => f.startsWith("20260915_"));
+    const sameVersion = migrations.filter((f) => f.startsWith("20260916_"));
     expect(sameVersion).toEqual([
-      "20260915_learning_lesson_bookmarks_v1.sql",
+      "20260916_learning_lesson_bookmarks_v1.sql",
     ]);
   });
 });
@@ -349,7 +349,7 @@ describe("Lesson Bookmarks Foundation — UI contracts", () => {
 
   it("docs capture stale entitlement and no social/Store coupling", () => {
     const docs = read(DOCS);
-    expect(docs).toMatch(/20260915/);
+    expect(docs).toMatch(/20260916/);
     expect(docs).toMatch(/preserved/i);
     expect(docs).toMatch(/omit/i);
     expect(docs).toMatch(/Resume/);

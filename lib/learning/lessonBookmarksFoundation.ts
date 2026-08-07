@@ -2,7 +2,7 @@
  * UM Learning OS — Learner Lesson Bookmarks / Saved Lessons V1.
  *
  * Private per-learner lesson bookmarks. DB-authoritative RPCs in
- * `supabase/migrations/20260915_learning_lesson_bookmarks_v1.sql`.
+ * `supabase/migrations/20260916_learning_lesson_bookmarks_v1.sql`.
  *
  * Distinct from Resume/Continue Learning and Personal Notes.
  * No sharing, folders, tags, social saves, Store favorites, or instructor browse.

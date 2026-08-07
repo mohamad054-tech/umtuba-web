@@ -4,7 +4,7 @@ Status: **implemented locally** (Git-only; **no remote apply**)
 
 Branch: `office/learning-lesson-bookmarks-v1`
 
-Migration: `supabase/migrations/20260915_learning_lesson_bookmarks_v1.sql`
+Migration: `supabase/migrations/20260916_learning_lesson_bookmarks_v1.sql`
 
 Capability: `learning.learner.lesson_bookmarks_v1`
 
@@ -84,7 +84,7 @@ Helper: `learning_lesson_bookmarks_assert_lesson_access`.
 ## Deferred
 
 - Browser smoke (trusted runtime env + entitled learner fixture)
-- Remote apply of `20260915` (separate GO)
+- Remote apply of `20260916` (separate GO)
 
 ## Migration ownership note
 
@@ -92,4 +92,5 @@ Helper: `learning_lesson_bookmarks_assert_lesson_access`.
 - `20260908` Learning Personal Notes Hub
 - `20260909` Learning Assessment Due UX
 - `20260910`–`20260914` Translation (incl. memory identity contract on `20260914`)
-- **`20260915`** this milestone (reallocated after `20260914` Translation collision)
+- `20260915` Commerce (`store_partial_refund_provider_money_execution_v1`)
+- **`20260916`** this milestone (reallocated after `20260915` Commerce collision)

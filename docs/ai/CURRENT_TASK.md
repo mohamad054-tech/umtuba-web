@@ -14,7 +14,7 @@ UM Learning — Lesson Bookmarks / Saved Lessons V1
 
 ## Migration
 
-`supabase/migrations/20260915_learning_lesson_bookmarks_v1.sql`
+`supabase/migrations/20260916_learning_lesson_bookmarks_v1.sql`
 
 ## Scope landed
 
@@ -41,4 +41,4 @@ Base: `2c3b97f258b315ae4bc42af4b3ae11fc0ec20a49`
 
 ## Recommended next
 
-Feature branch push + SoT FF when validation PASS; remote apply of `20260915` only on explicit GO.
+Feature branch push + SoT FF when validation PASS; remote apply of `20260916` only on explicit GO.
