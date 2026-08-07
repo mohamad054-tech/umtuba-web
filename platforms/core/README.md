@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P14` (… → validator composition → flag evaluator)
+- Phase: `P1`–`P15` (… → flag evaluator → capability asserter)
 
 ## Phase P3 scope
 
@@ -176,3 +176,16 @@ Pure **catalog-backed flag evaluator** under `platforms/core/flag/`.
 Out of scope for P14: overrides, cohorts, kill-switch execution,
 `UmCapabilityAsserter`, SDK, event publisher, health reporter, networking,
 persistence, product integration, migrations.
+
+## Phase P15 scope
+
+Pure **capability availability asserter** under `platforms/core/capability/`.
+
+- `createInMemoryCapabilityAsserter({ capabilities, flags })` implements
+  `UmCapabilityAsserter.assertEnabled`
+- Composes P5 catalog + P14 evaluator; result-returning, fail closed
+- Ungated cataloged capabilities may be enabled; linked flags follow P14
+
+Out of scope for P15: user/RBAC authorization, SDK, event publisher, health
+reporter, dependency validator, networking, persistence, product integration,
+migrations.

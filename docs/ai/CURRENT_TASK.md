@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Flag Evaluator Foundation P14
+UM Core Capability Asserter Foundation P15
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Flag Evaluator Foundation P14
 
 ## Branch
 
-`office/um-core-platform-flag-evaluator-foundation-p14`
+`office/um-core-platform-capability-asserter-foundation-p15`
 
 ## Base HEAD
 
-`a16d2ccf9d16d67ef5ed8e5005f030ad60773442` (Validator Composition Foundation P13 close)
+`7fd4f8e56a533f49e152901a2705b2c41fbe5a0f` (Flag Evaluator Foundation P14 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-flag-evaluator-foundation-p14`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-capability-asserter-foundation-p15`
 
 ## Milestone
 
-`um.core.flag_evaluator_foundation_p14`
+`um.core.capability_asserter_foundation_p15`
 
 ## Allowed scope
 
-- `platforms/core/flag/**`
+- `platforms/core/capability/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,15 +36,15 @@ UM Core Flag Evaluator Foundation P14
 
 ## Forbidden scope
 
-- Overrides / cohorts / kill-switch execution / remote config
-- `UmCapabilityAsserter` / SDK / other runtime ports
-- `UmDependencyValidator` / P9/P13 changes
+- User/RBAC/permissions authorization
+- SDK / Event Publisher / Health Reporter / Dependency Validator
+- P14 evaluator behavior changes / P8 registry changes
 - Persistence / networking / migrations / product wiring
-- P15 and later milestones
+- P16 and later milestones
 
 ## Delivered
 
-Pure catalog-backed `createInMemoryFlagEvaluator` implementing `UmFlagEvaluator`
-with fail-closed unknown and default-state-only known evaluation.
-Committed and pushed on `office/um-core-platform-flag-evaluator-foundation-p14`.
-Do not start P15 from this handoff.
+Pure deterministic `createInMemoryCapabilityAsserter` composing P5 + P14 with
+fail-closed unknown/unresolved cases and catalog-enabled ungated capabilities.
+Committed and pushed on `office/um-core-platform-capability-asserter-foundation-p15`.
+Do not start P16 from this handoff.

@@ -1,26 +1,26 @@
-# CURSOR_REPORT — UM Core Flag Evaluator Foundation P14
+# CURSOR_REPORT — UM Core Capability Asserter Foundation P15
 
 ## Summary
 
-**READY** — Flag Evaluator Foundation P14 closed on
-`office/um-core-platform-flag-evaluator-foundation-p14`
-(base P13 tip `a16d2cc`).
+**READY** — Capability Asserter Foundation P15 closed on
+`office/um-core-platform-capability-asserter-foundation-p15`
+(base P14 tip `7fd4f8e`).
 
-Pure deterministic catalog-backed evaluation. Unknown flags fail closed;
-known flags use P8 `defaultState` only. No overrides, cohorts, kill-switch
-execution, capability asserter, SDK, or migrations.
+Pure deterministic availability assertion over P5 + P14. Unknown/unresolved
+fail closed; ungated catalog capabilities may be enabled. No RBAC, SDK,
+publisher, health reporter, or migrations.
 
 ## Exact files changed
 
-- `platforms/core/flag/flagEvaluator.ts` (new)
-- `platforms/core/flag/flagEvaluator.test.ts` (new)
-- `platforms/core/flag/evaluatorCodes.ts` (new)
-- `platforms/core/flag/types.ts`
-- `platforms/core/flag/index.ts`
+- `platforms/core/capability/capabilityAsserter.ts` (new)
+- `platforms/core/capability/capabilityAsserter.test.ts` (new)
+- `platforms/core/capability/asserterCodes.ts` (new)
+- `platforms/core/capability/types.ts`
+- `platforms/core/capability/index.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_FLAG_EVALUATOR_FOUNDATION_P14.md` (new)
+- `docs/core/UM_CORE_PLATFORM_CAPABILITY_ASSERTER_FOUNDATION_P15.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -30,16 +30,17 @@ None.
 
 ## Security review
 
-- Heap-only evaluation over injected catalog; no DB / network / secrets
-- Does not mutate flag registry
-- Fail closed on unknown
+- Heap-only composition of injected catalogs/evaluator; no DB / network / secrets
+- Does not mutate capability or flag registries
+- Fail closed on unknown/unresolved
+- authClass never treated as authorization
 - No product imports
 - No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
-- `npx vitest run platforms/core/flag/flagEvaluator.test.ts` — **PASS** (10)
-- `npx vitest run platforms/core` — **PASS** (140)
+- `npx vitest run platforms/core/capability/capabilityAsserter.test.ts` — **PASS** (9)
+- `npx vitest run platforms/core` — **PASS** (149)
 
 ## TypeScript
 
@@ -47,7 +48,7 @@ None.
 
 ## Build
 
-Not required for this flag-evaluator-foundation milestone.
+Not required for this capability-asserter-foundation milestone.
 
 ## git diff --check
 
@@ -59,5 +60,5 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Do not start P15 from this close.
-- Recommended next: `UmCapabilityAsserter` Foundation P15.
+- Do not start P16 from this close.
+- Recommended next: `UmEventPublisher` Foundation.
