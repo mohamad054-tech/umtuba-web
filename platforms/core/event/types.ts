@@ -167,3 +167,83 @@ export interface UmEventConsumer<TPayload = unknown> {
   readonly eventType: UmEventTypeId;
   onEvent(event: UmPlatformEventEnvelope<TPayload>): void;
 }
+
+/* -------------------------------------------------------------------------- */
+/* P7 — Event routing catalog (rules only; no delivery runtime)               */
+/* -------------------------------------------------------------------------- */
+
+export type UmEventRoutingFindingSeverity = "error" | "warning" | "info";
+
+export interface UmEventRoutingFinding {
+  readonly code: string;
+  readonly severity: UmEventRoutingFindingSeverity;
+  readonly message: string;
+  readonly path?: string;
+  readonly standardRef?: string;
+}
+
+export type UmEventRouteMetadata = Readonly<Record<string, string>>;
+
+/**
+ * Deterministic route identity: `${eventType}=>${destinationPlatformId}`.
+ */
+export type UmEventRouteId = string;
+
+/**
+ * Declared route from an event type to a destination platform.
+ * Catalog only — does not deliver or authorize consumption.
+ */
+export interface UmEventRouteRecord {
+  readonly routeId: UmEventRouteId;
+  readonly eventType: UmEventTypeId;
+  readonly producerPlatformId: UmPlatformId;
+  readonly destinationPlatformId: UmPlatformId;
+  readonly metadata?: UmEventRouteMetadata;
+  readonly notes?: string;
+  readonly registeredAt?: string;
+}
+
+export interface UmEventRouteDeclaration {
+  readonly eventType: UmEventTypeId;
+  readonly destinationPlatformId: UmPlatformId;
+  readonly metadata?: UmEventRouteMetadata;
+  readonly notes?: string;
+}
+
+export interface UmEventRouteRegistrationMetadata {
+  readonly registeredAt?: string;
+}
+
+export interface UmEventRouteRegistrationInput {
+  readonly route: UmEventRouteDeclaration;
+  readonly registration?: UmEventRouteRegistrationMetadata;
+}
+
+export interface UmEventRouteRegistrationResult {
+  readonly ok: boolean;
+  readonly routeId: UmEventRouteId;
+  readonly record?: UmEventRouteRecord;
+  readonly findings: readonly UmEventRoutingFinding[];
+}
+
+/**
+ * Event routing catalog (P7) — rule lookup only.
+ */
+export interface UmEventRoutingRegistry {
+  get(routeId: UmEventRouteId): UmEventRouteRecord | undefined;
+  list(): readonly UmEventRouteRecord[];
+  listByEventType(eventType: UmEventTypeId): readonly UmEventRouteRecord[];
+  listByProducer(platformId: UmPlatformId): readonly UmEventRouteRecord[];
+  listByDestination(platformId: UmPlatformId): readonly UmEventRouteRecord[];
+  has(routeId: UmEventRouteId): boolean;
+  size(): number;
+}
+
+/**
+ * P7 writable in-memory event routing registry.
+ * No bus, publish, consume, transport, outbox, or retry.
+ */
+export interface UmInMemoryEventRoutingRegistry extends UmEventRoutingRegistry {
+  register(input: UmEventRouteRegistrationInput): UmEventRouteRegistrationResult;
+  clear(): void;
+}

@@ -28,5 +28,8 @@ export const UM_CORE_CAPABILITY_REGISTRY_PHASE = "P5" as const;
 /** Event type registry foundation phase. */
 export const UM_CORE_EVENT_TYPE_REGISTRY_PHASE = "P6" as const;
 
+/** Event routing foundation phase. */
+export const UM_CORE_EVENT_ROUTING_PHASE = "P7" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;
