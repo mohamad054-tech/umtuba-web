@@ -1,31 +1,27 @@
-# CURSOR_REPORT — Member Role Management UI V1
+# CURSOR_REPORT — Member Role Management SoT integration V1
 
 ## Summary
 
-**CLOSED** — Member role updates via existing spine RPC
-`update_collaboration_workspace_member_role`. No new migration. Platform flag
-remains default `false`.
+**CLOSED** — Fast-forwarded Member Role Management UI V1 (`2f6516f`) into
+canonical Collaboration SoT. No merge commit. No migration. Flag remains
+default `false`.
 
-## Files changed
+## Integration
 
-- `lib/collaboration/workspaceMembershipRuntime.ts`
-- `lib/collaboration/workspaceMembershipRuntime.test.ts`
-- `lib/collaboration/workspaceUi.ts`
-- `lib/collaboration/workspaceUi.test.ts`
-- `app/actions/collaboration.ts`
-- `app/components/collaboration/MembersList.tsx`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+- Method: **fast-forward only**
+- Source: `office/collaboration-workspace-member-role-management-ui-v1` @ `2f6516f`
+- SoT before: `024e690`
+- SoT after FF: `2f6516f` (+ docs closeout commit if present)
 
-## Tests
+## Validation
 
-- focused collaboration runtime/UI/gate — PASS
-- `tsc --noEmit` — PASS
+- Focused Collaboration tests 24/24 PASS
+- `tsc --noEmit` PASS
+- Trailer/secret scan PASS
+- Scope review: no migrations / Learning / Commerce / UM Core / 20260898 / smoke-keepalive
 
-## Migrations
+## Deferred
 
-None added. None applied.
-
-## Next
-
-Resource-link product bindings remain deferred; invite expansion deferred.
+- Resource-link product bindings
+- Invite expansion
+- Credentialed E2E role-update smoke
