@@ -70,6 +70,8 @@ export type AssessmentDeliveryView = {
   slug: string;
   type: string;
   description: string | null;
+  /** Nullable ISO timestamptz from settings.due_at; absent/null => null. */
+  due_at: string | null;
   hints: LearningLearnerActivityHints;
   questions: AssessmentDeliveryQuestion[];
   question_count: number;
@@ -206,6 +208,18 @@ export function parseAssessmentDeliveryView(
   const question_count =
     asNumberOrNull(row.question_count) ?? questions.length;
 
+  let due_at: string | null = null;
+  if ("due_at" in row) {
+    const dueRaw = row.due_at;
+    if (dueRaw === null) {
+      due_at = null;
+    } else if (typeof dueRaw === "string") {
+      due_at = dueRaw.length > 0 ? dueRaw : null;
+    } else {
+      return null;
+    }
+  }
+
   return {
     activity_id,
     lesson_id,
@@ -214,6 +228,7 @@ export function parseAssessmentDeliveryView(
     slug,
     type,
     description: asString(row.description),
+    due_at,
     hints: toLearnerActivityHints(asRecord(row.hints)),
     questions,
     question_count,

@@ -20,7 +20,11 @@ import { LEARNING_SCORING_RPCS } from "./scoringFoundation";
 const ROOT = join(__dirname, "../..");
 const MIGRATION =
   "supabase/migrations/20260848_learning_assessment_delivery_minimal_v1.sql";
+const DUE_UX_MIGRATION =
+  "supabase/migrations/20260909_learning_assessment_due_ux_followthrough_v1.sql";
 const DOC = "docs/learning/implementation/ASSESSMENT_DELIVERY_MINIMAL_V1.md";
+const DUE_UX_DOC =
+  "docs/learning/implementation/LEARNING_ASSESSMENT_DUE_UX_FOLLOWTHROUGH_V1.md";
 const SRC = readFileSync(
   join(ROOT, "lib/learning/assessmentDelivery.ts"),
   "utf8"
@@ -305,5 +309,105 @@ describe("Assessment Delivery Minimal V1 — adapter", () => {
     expect(LEARNING_ASSESSMENT_DELIVERY_ROUTES.assessment(ACTIVITY_ID)).toBe(
       `/learning/activities/${ACTIVITY_ID}/assessment`
     );
+  });
+});
+
+describe("Assessment Due UX Follow-through V1 — delivery due_at", () => {
+  const dueSql = read(DUE_UX_MIGRATION);
+  const dueFn = fnBody(dueSql, "get_my_learning_activity_assessment");
+  const dueCode = stripSqlComments(dueFn);
+
+  it("ships unique 20260909 migration and docs", () => {
+    expect(existsSync(join(ROOT, DUE_UX_MIGRATION))).toBe(true);
+    expect(existsSync(join(ROOT, DUE_UX_DOC))).toBe(true);
+    const names = readdirSync(join(ROOT, "supabase/migrations"));
+    expect(names).toContain(
+      "20260909_learning_assessment_due_ux_followthrough_v1.sql"
+    );
+    expect(names.filter((f) => f.startsWith("20260909_"))).toEqual([
+      "20260909_learning_assessment_due_ux_followthrough_v1.sql",
+    ]);
+  });
+
+  it("CREATE OR REPLACE preserves security, auth, access, and grants", () => {
+    expect(dueFn).toMatch(/security definer/i);
+    expect(dueFn).toMatch(/set search_path\s*=\s*public/i);
+    expect(dueCode).toMatch(/auth\.uid\(\)/);
+    expect(dueCode).toMatch(/has_learning_course_access\(v_course\.id, v_uid\)/);
+    expect(dueCode).toMatch(/v_activity\.status is distinct from 'published'/);
+    expect(dueCode).toMatch(/learning_attempt_build_questions_snapshot/);
+    expect(dueSql).toMatch(
+      /revoke all on function public\.get_my_learning_activity_assessment\(uuid\)\s+from public, anon/
+    );
+    expect(dueSql).toMatch(
+      /grant execute on function public\.get_my_learning_activity_assessment\(uuid\)\s+to authenticated/
+    );
+    expect(dueSql).toMatch(
+      /grant execute on function public\.get_my_learning_activity_assessment\(uuid\)\s+to service_role/
+    );
+  });
+
+  it("adds top-level due_at and keeps hints fields; no attempt gating RPCs", () => {
+    expect(dueCode).toMatch(/'due_at',\s*v_settings\.due_at/);
+    expect(dueCode).toMatch(/'is_required'/);
+    expect(dueCode).toMatch(/'max_attempts'/);
+    expect(dueCode).toMatch(/'time_limit_seconds'/);
+    expect(dueCode).not.toMatch(/\binsert\b/i);
+    expect(dueCode).not.toMatch(/start_learning_attempt/);
+    expect(dueCode).not.toMatch(/score_learning_attempt/);
+    expect(dueSql).not.toMatch(/start_my_learning_assessment_attempt/);
+    expect(dueSql).not.toMatch(/set_learning_assessment_due_at/);
+  });
+
+  it("parses due_at string, null, and absent; rejects malformed", () => {
+    const base = {
+      activity_id: ACTIVITY_ID,
+      lesson_id: "33333333-3333-4333-8333-333333333333",
+      course_id: "11111111-1111-4111-8111-111111111111",
+      name: "Quiz",
+      slug: "quiz",
+      type: "quiz",
+      description: null,
+      hints: { is_required: true, max_attempts: null, time_limit_seconds: null },
+      question_count: 1,
+      questions: [
+        {
+          question_id: QUESTION_ID,
+          question_type: "true_false",
+          position: 0,
+          content: { prompt: "OK?" },
+          points: null,
+        },
+      ],
+    };
+    const withDue = parseAssessmentDeliveryView({
+      ...base,
+      due_at: "2026-09-01T12:00:00.000Z",
+    });
+    expect(withDue?.due_at).toBe("2026-09-01T12:00:00.000Z");
+    expect(withDue?.name).toBe("Quiz");
+    expect(withDue?.hints.is_required).toBe(true);
+
+    const withNull = parseAssessmentDeliveryView({ ...base, due_at: null });
+    expect(withNull?.due_at).toBeNull();
+
+    const absent = parseAssessmentDeliveryView({ ...base });
+    expect(absent?.due_at).toBeNull();
+
+    expect(
+      parseAssessmentDeliveryView({ ...base, due_at: 123 as unknown as string })
+    ).toBeNull();
+  });
+
+  it("learner page shows Due/Overdue presentationally without gating start", () => {
+    expect(PAGE).toMatch(/classifyAssessmentDueStatus/);
+    expect(PAGE).toMatch(/formatAssessmentDueDisplay/);
+    expect(PAGE).toMatch(/assessment-due/);
+    expect(PAGE).toMatch(/assessment-due-overdue/);
+    expect(PAGE).toMatch(/Overdue/);
+    expect(PAGE).toMatch(/data-testid="start-assessment-attempt"/);
+    expect(PAGE).toMatch(/Start assessment attempt/);
+    expect(PAGE).not.toMatch(/disabled=\{[^}]*due/i);
+    expect(PAGE).not.toMatch(/dueStatus === \"overdue\" \? [\s\S]*disabled/);
   });
 });

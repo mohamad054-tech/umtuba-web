@@ -2,42 +2,40 @@
 
 ## Task title
 
-UM Learning — Personal Notes Hub history reallocation (`20260907` → `20260908`)
+UM Learning — Learner Assessment Due UX Follow-through V1
 
 ## Status
 
-`git-correction-in-progress` — rename only; **no SQL apply**; **no migration repair** in this step.
+`implementation-complete` — local commit pending validation; **no remote apply**.
 
 ## Milestone
 
-`learning.learner.personal_notes_hub_v1` (history alignment)
+`learning.learner.assessment_due_ux_followthrough_v1`
 
-## Version map (Learning SoT)
+## Migration
 
-- `20260908` — Learning Personal Notes Hub (active migration filename)
-- `20260909` — reserved next candidate for Learner Assessment Due UX Follow-through (**not created**)
-- `20260910–12` — Translation (untouched)
-- `20260907` — Commerce remote owner (untouched)
+`supabase/migrations/20260909_learning_assessment_due_ux_followthrough_v1.sql`
 
-## Scope
+## Scope landed
 
-- Rename Hub migration file to `20260908_learning_personal_notes_hub_v1.sql`
-- Update tests/docs/version references
-- No Hub SQL semantic changes
-- No remote schema / repair in this GO
+- Delivery RPC exposes top-level nullable `due_at`
+- Adapter + Due/Overdue presentation helpers
+- Learner assessment page Due/Overdue display (no attempt gating)
+- Docs + focused tests
 
 ## Branch / worktree
 
-`office/learning-resume-accessible-target-hardening-v1`  
-`D:\umtuba-central\repos\umtuba-web-learning-sot-ff-merge-v1`
+`office/learning-assessment-due-ux-followthrough-v1`  
+`D:\umtuba-central\repos\umtuba-web-learning-assessment-due-ux-followthrough-v1`  
+Base: `ce221d37a1200b4380aa84179680ad7dcce99bea`
 
 ## Explicitly out of scope
 
-- Migration repair of `20260908`
-- SQL replay / `db push`
-- Commerce / Translation / Due UX implementation
-- Creating `20260909`
+- Remote apply / migration repair
+- Attempt eligibility / save / submit / scoring / completion
+- Instructor due authoring / calendar changes
+- Commerce / Translation / Collaboration / Billing / UEOS / Guardian
 
 ## Recommended next
 
-After this commit is pushed: explicit GO for `migration repair 20260908 --status applied` only.
+Feature branch push + SoT FF when validation PASS; remote apply of `20260909` only on explicit GO.

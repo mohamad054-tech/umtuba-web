@@ -7,6 +7,10 @@ import {
   LEARNING_ASSESSMENT_DELIVERY_ROUTES,
   loadAssessmentDelivery,
 } from "../../../../../lib/learning/assessmentDelivery";
+import {
+  classifyAssessmentDueStatus,
+  formatAssessmentDueDisplay,
+} from "../../../../../lib/learning/assessmentDueDates";
 import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
 import { requireLessonUnlockedForLearner } from "../../../../../lib/learning/lessonUnlockFoundation";
 import { startAssessmentAttemptAction } from "../../../assessmentAttemptActions";
@@ -81,6 +85,8 @@ export default async function LearningAssessmentDeliveryPage({
   }
 
   const view = loaded.data;
+  const dueStatus = classifyAssessmentDueStatus(view.due_at);
+  const dueLabel = formatAssessmentDueDisplay(view.due_at);
 
   return (
     <LearningShell
@@ -109,6 +115,29 @@ export default async function LearningAssessmentDeliveryPage({
             view.question_count === 1 ? "" : "s"
           }`}
         </p>
+        {dueStatus !== "none" && dueLabel ? (
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2 text-sm text-white/70">
+            <div>
+              <dt className="text-white/40">
+                {dueStatus === "overdue" ? "Overdue" : "Due"}
+              </dt>
+              <dd
+                data-testid={
+                  dueStatus === "overdue"
+                    ? "assessment-due-overdue"
+                    : "assessment-due"
+                }
+                className={
+                  dueStatus === "overdue"
+                    ? "font-bold text-rose-100"
+                    : "font-bold text-white"
+                }
+              >
+                {dueLabel}
+              </dd>
+            </div>
+          </dl>
+        ) : null}
         <p className="mt-4 text-sm text-white/55">
           Review the published questions below, then start or resume an attempt
           to answer, submit, and view graded results when your course policy
@@ -138,6 +167,7 @@ export default async function LearningAssessmentDeliveryPage({
             <input type="hidden" name="activityId" value={view.activity_id} />
             <button
               type="submit"
+              data-testid="start-assessment-attempt"
               className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
               Start assessment attempt

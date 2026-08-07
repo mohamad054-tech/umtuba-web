@@ -5,7 +5,9 @@ import {
   LEARNING_ASSESSMENT_DUE_MIGRATION,
   LEARNING_ASSESSMENT_DUE_RPCS,
   LEARNING_CALENDAR_ITEM_KINDS,
+  classifyAssessmentDueStatus,
   clearLearningAssessmentDueAt,
+  formatAssessmentDueDisplay,
   formatAssessmentDueLocalInput,
   instructorCalendarItemHref,
   isAssessmentDueUuid,
@@ -273,5 +275,32 @@ describe("Assessment Due Dates Calendar V1 — UI source contracts", () => {
     expect(src).toMatch(/LEARNING_ASSESSMENT_DUE_RPCS\.set/);
     expect(src).not.toMatch(/SERVICE_ROLE|service_role/);
     expect(src).not.toMatch(/\.insert\(|\.update\(|\.delete\(/);
+  });
+});
+
+describe("Assessment Due UX Follow-through V1 — presentation helpers", () => {
+  const now = new Date("2026-08-07T12:00:00.000Z");
+
+  it("classifies none / due / overdue with injectable now", () => {
+    expect(classifyAssessmentDueStatus(null, now)).toBe("none");
+    expect(classifyAssessmentDueStatus(undefined, now)).toBe("none");
+    expect(classifyAssessmentDueStatus("", now)).toBe("none");
+    expect(classifyAssessmentDueStatus("not-a-date", now)).toBe("none");
+    expect(
+      classifyAssessmentDueStatus("2026-08-07T12:00:01.000Z", now)
+    ).toBe("due");
+    expect(
+      classifyAssessmentDueStatus("2026-08-07T11:59:59.000Z", now)
+    ).toBe("overdue");
+    expect(
+      classifyAssessmentDueStatus("2026-08-07T12:00:00.000Z", now)
+    ).toBe("overdue");
+  });
+
+  it("formats display timestamps or returns empty for null", () => {
+    expect(formatAssessmentDueDisplay(null)).toBe("");
+    expect(formatAssessmentDueDisplay("2026-08-07T12:00:00.000Z")).toMatch(
+      /2026/
+    );
   });
 });
