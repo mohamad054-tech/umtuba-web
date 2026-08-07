@@ -44,7 +44,7 @@ describe("Partial refund ledger RPC readiness — contracts", () => {
       "commerce.payments.partial_refund_ledger_rpc_remote_apply_readiness_v1"
     );
     expect(PARTIAL_REFUND_LEDGER_RPC_MIGRATION_VERSION).toBe("20260900");
-    // 8 core ledger RPCs in 20260900 + listCommitting in local draft 20260901.
+    // 8 core ledger RPCs in 20260900 + listCommitting in local draft 20260905.
     expect(PARTIAL_REFUND_LEDGER_RPC_NAME_LIST).toHaveLength(9);
     expect(PARTIAL_REFUND_LEDGER_RPCS.listCommitting).toBe(
       "list_store_partial_refund_ledger_committing"

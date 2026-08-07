@@ -33,10 +33,11 @@ A privileged read-only RPC was required so platform admins can discover in-fligh
 | Local max prior Store/partial-refund migration | `20260900_store_partial_refund_ledger_rpc_v1.sql` |
 | Documented remote tip (`PROJECT_STATE` / partial-refund closeout) | **`20260900`** |
 | Historical migrations left untouched | `20260898`, `20260899`, `20260900` |
-| Learning versions (not colliding) | `20260896–97` |
-| Next free local draft | **`20260901`** |
+| Cross-domain claims (do not use) | `20260901` Learning; `20260902–04` Translation; `20260910` Translation studio |
+| Next free local draft (corrective) | **`20260905`** |
 
-**Selected file:** `supabase/migrations/20260901_store_partial_refund_ledger_list_committing_v1.sql`
+**Selected file:** `supabase/migrations/20260905_store_partial_refund_ledger_list_committing_v1.sql`
+(Corrective renumber from invalid draft `20260901`.)
 
 ## RPC security model
 
@@ -135,10 +136,10 @@ Admin refunds page section **“In-flight committing reservations”**:
 
 | Item | Value |
 | --- | --- |
-| Migration created | **yes** (`20260901`) |
-| Migration applied remotely | **no** |
+| Migration created | **yes** (`20260905`; was invalidly `20260901`) |
+| Migration applied remotely | **no** (orphan RPC may exist from interrupted SQL; history absent) |
 | `supabase db push` | **not run** |
-| Remote DB mutated | **no** |
+| Remote history for this version | **not registered** |
 
 ## Test results (this GO)
 
@@ -150,9 +151,9 @@ Admin refunds page section **“In-flight committing reservations”**:
 
 ## Deferred capabilities
 
-Provider refund execution · money movement · committed cancel/compensation · seller/buyer visibility · restock / entitlement / settlement / commission · payout · `commerce_confirm` · remote apply of `20260901` · automatic recovery
+Provider refund execution · money movement · committed cancel/compensation · seller/buyer visibility · restock / entitlement / settlement / commission · payout · `commerce_confirm` · remote apply/register of `20260905` · automatic recovery
 
 ## Related closed milestones
 
 - Stuck-committing recovery V1: **CLOSED** @ `8e16c8c` (`committing → failed` lock release only)
-- Remote ledger tip remains **`20260900`** until a separate apply GO for `20260901`
+- Remote ledger tip remains **`20260900`** until a separate apply GO for `20260905`

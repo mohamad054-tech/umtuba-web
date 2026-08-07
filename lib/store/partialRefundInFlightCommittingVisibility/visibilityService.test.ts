@@ -349,7 +349,7 @@ describe("partialRefundInFlightCommittingVisibility service", () => {
 });
 
 describe("list_committing RPC SQL contracts", () => {
-  it("ships 20260901 with service_role-only committing filter and no mutation", () => {
+  it("ships 20260905 with service_role-only committing filter and no mutation", () => {
     const sql = readFileSync(
       join(ROOT, "supabase/migrations", PARTIAL_REFUND_LIST_COMMITTING_MIGRATION_FILE),
       "utf8"

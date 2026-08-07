@@ -1,17 +1,20 @@
 -- =============================================================================
 -- Commerce Partial Refund In-Flight Committing Visibility RPC Foundation V1
--- LOCAL ONLY — do not remote-apply in this GO.
+-- Corrective renumber: was wrongly drafted as 20260901 (Learning-owned).
+-- LOCAL ONLY until a separate remote-apply GO for 20260905.
 --
 -- Read-only privileged list of ledger commits with status = 'committing'.
 -- Does NOT: mutate rows, fail/complete/plan/begin, release locks, money,
 --           provider refunds, compensation, payout, commerce_confirm.
 --
--- Version selection proof:
---   Local max partial-refund / store migration present: 20260900
---   Documented remote tip (PROJECT_STATE / partial-refund closeout): 20260900
---   No local 20260901+ files; Learning occupies 20260896–97 (not 20260901)
---   => 20260901 free for local draft only
+-- Version selection proof (2026-08-07 resume):
+--   Remote tip: 20260900
+--   Claimed in git: 20260901 Learning (+ Commerce collision), 20260902–04 Translation,
+--                   20260910 Translation studio reallocation
+--   => 20260905 first collision-free Commerce draft
 -- Depends on: 20260899 tables + 20260900 helper/RPC grants pattern
+-- Note: live orphan RPC may already exist from interrupted 20260901 SQL apply;
+--       CREATE OR REPLACE rebinds safely under this version on apply GO.
 -- =============================================================================
 
 create or replace function public.list_store_partial_refund_ledger_committing(
