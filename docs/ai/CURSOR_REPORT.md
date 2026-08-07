@@ -1,26 +1,26 @@
-# CURSOR_REPORT — UM Core Aggregate Registry Facade Foundation P12
+# CURSOR_REPORT — UM Core Validator Composition Foundation P13
 
 ## Summary
 
-**READY** — Aggregate Registry Facade Foundation P12 closed on
-`office/um-core-platform-aggregate-registry-facade-foundation-p12`
-(base P11 tip `0516ece`).
+**READY** — Validator Composition Foundation P13 closed on
+`office/um-core-platform-validator-composition-foundation-p13`
+(base P12 tip `6a7c0d6`).
 
-Model A pure composition only. Caller owns specialized registries; facade
-borrows exact object references for the seven existing `UmCoreRegistry` slots.
-No mega-wire factory, routing slot, validator completion, SDK, runtime ports,
-or migrations.
+Model C: `createUmCoreValidator` + `validatePlatformDependencies` for
+manifest↔catalog completeness and referential drift. P2/P9 law unchanged.
+No `UmDependencyValidator`, resolver, SDK, runtime ports, or migrations.
 
 ## Exact files changed
 
-- `platforms/core/registry/coreRegistry.ts` (new)
-- `platforms/core/registry/coreRegistry.test.ts` (new)
-- `platforms/core/registry/interfaces.ts`
-- `platforms/core/registry/index.ts`
+- `platforms/core/validation/coreValidator.ts` (new)
+- `platforms/core/validation/coreValidator.test.ts` (new)
+- `platforms/core/validation/dependencyValidation.ts` (new)
+- `platforms/core/validation/dependencyValidationCodes.ts` (new)
+- `platforms/core/validation/interfaces.ts`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_AGGREGATE_REGISTRY_FACADE_FOUNDATION_P12.md` (new)
+- `docs/core/UM_CORE_PLATFORM_VALIDATOR_COMPOSITION_FOUNDATION_P13.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -30,15 +30,15 @@ None.
 
 ## Security review
 
-- Heap-only composition of caller-owned registries; no DB / network / secrets
-- Does not mutate specialized registries
+- Read-only registry review; no DB / network / secrets
+- Does not mutate platforms/dependencies/capabilities
 - No product imports
 - No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
-- `npx vitest run platforms/core/registry/coreRegistry.test.ts` — **PASS** (6)
-- `npx vitest run platforms/core` — **PASS** (115)
+- `npx vitest run platforms/core/validation/coreValidator.test.ts` — **PASS** (15)
+- `npx vitest run platforms/core` — **PASS** (130)
 
 ## TypeScript
 
@@ -46,7 +46,7 @@ None.
 
 ## Build
 
-Not required for this aggregate-facade-foundation milestone.
+Not required for this validator-composition-foundation milestone.
 
 ## git diff --check
 
@@ -58,6 +58,6 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Do not start P13 from this close.
-- Recommended next: Core Validator composition —
-  `UmCoreValidator.validateDependencies(platformId)`.
+- Do not start P14 from this close.
+- Recommended next: `UmDependencyValidator` foundation **or** first runtime port
+  (SDK still deferred until ports exist).

@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Aggregate Registry Facade Foundation P12
+UM Core Validator Composition Foundation P13
 
 ## Status
 
@@ -10,23 +10,23 @@ UM Core Aggregate Registry Facade Foundation P12
 
 ## Branch
 
-`office/um-core-platform-aggregate-registry-facade-foundation-p12`
+`office/um-core-platform-validator-composition-foundation-p13`
 
 ## Base HEAD
 
-`0516eceff8e62c5af6b1a446889f4282d21cef3b` (Naming Registry Foundation P11 close)
+`6a7c0d60cfe895f5ca374e7524fcb859f6edb001` (Aggregate Registry Facade Foundation P12 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-aggregate-registry-facade-foundation-p12`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-validator-composition-foundation-p13`
 
 ## Milestone
 
-`um.core.aggregate_registry_facade_foundation_p12`
+`um.core.validator_composition_foundation_p13`
 
 ## Allowed scope
 
-- `platforms/core/registry/**`
+- `platforms/core/validation/**`
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,16 +36,15 @@ UM Core Aggregate Registry Facade Foundation P12
 
 ## Forbidden scope
 
-- Model B/C mega-wire factory / DI / startup orchestration
-- Event routing slot on `UmCoreRegistry`
-- Validator completion / SDK / runtime ports
-- Persistence / networking / product integration / migrations
-- P13 and later milestones
+- `UmDependencyValidator` / dependency resolver / second dependency registry
+- P9 behavior changes / P12 facade changes
+- SDK / runtime ports / networking / persistence / migrations / product wiring
+- P14 and later milestones
 
 ## Delivered
 
-Model A pure composition facade `createUmCoreRegistry(deps)` exposing the
-existing seven `UmCoreRegistry` slots by borrowed reference. Caller retains
-ownership. No runtime orchestration, SDK, or validator completion.
-Committed and pushed on `office/um-core-platform-aggregate-registry-facade-foundation-p12`.
-Do not start P13 from this handoff.
+Model C `createUmCoreValidator` composing P2 validators with pure
+registry-backed dependency completeness/drift review. No resolution, no
+second registry, no SDK/runtime.
+Committed and pushed on `office/um-core-platform-validator-composition-foundation-p13`.
+Do not start P14 from this handoff.

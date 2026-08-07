@@ -1,8 +1,9 @@
 /**
- * Validation interfaces and P2 engines.
+ * Validation interfaces and P2/P13 engines.
  *
  * P1: contracts only.
  * P2: manifest + admission validators (pure; no registry/runtime).
+ * P13: composed UmCoreValidator + registry-backed dependency review.
  */
 
 import type { UmDependencyValidationResult } from "../dependency/types";
@@ -40,21 +41,27 @@ export interface UmRegistrationValidator {
 
 /**
  * Composite Core validator surface.
- * P2 implements manifests + registration only.
- * `validateDependencies(platformId)` remains unimplemented (needs registry).
+ * P2: manifests + registration.
+ * P13: registry-backed validateDependencies(platformId) completeness/drift review.
  */
 export interface UmCoreValidator {
   readonly manifests: UmManifestValidator;
   readonly registration: UmRegistrationValidator;
-  validateDependencies(
-    platformId: UmPlatformId,
-  ): UmDependencyValidationResult | UmValidationResult;
+  /**
+   * Post-admission platform-scoped dependency review.
+   * Returns UmDependencyValidationResult (completeness / drift only).
+   */
+  validateDependencies(platformId: UmPlatformId): UmDependencyValidationResult;
 }
 
 export {
   UmManifestValidationCode,
   type UmManifestValidationCodeName,
 } from "./codes";
+export {
+  UmDependencyValidationCode,
+  type UmDependencyValidationCodeName,
+} from "./dependencyValidationCodes";
 export {
   isNonEmptyTrimmed,
   isScopedUnderPlatform,
@@ -69,3 +76,11 @@ export {
   createRegistrationValidator,
   validateManifestAdmission,
 } from "./registrationValidator";
+export {
+  validatePlatformDependencies,
+  type UmPlatformDependencyValidationDeps,
+} from "./dependencyValidation";
+export {
+  createUmCoreValidator,
+  type UmCoreValidatorDeps,
+} from "./coreValidator";
