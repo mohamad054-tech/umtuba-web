@@ -56,7 +56,7 @@ function validManifest(
     ],
     requires: [
       {
-        targetKind: "platform",
+        targetKind: "peer_kernel",
         targetId: "um.core",
         strength: "required",
         reason: "Core contracts",
