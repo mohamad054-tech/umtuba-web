@@ -1,44 +1,47 @@
-# Laptop Reboot Savepoint — 2026-08-03
+# Laptop Central Handoff Savepoint — 2026-08-07
 
-**Machine:** `DESKTOP-EE4G99N` / user `desktop-ee4g99n\admin`  
-**Purpose:** Survive reboot; resume Collaboration without loss of pushed tip.
+**Purpose:** Clear Collaboration SoT ambiguity before central coordination / laptop restart.
 
-## Collaboration SoT (pushed)
+## Collaboration SoT (canonical)
 
 | Item | Value |
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Commit | `6b60205dfb01168552ff6344523ec3e8b22eb70e` |
+| Tip | `1d05d92` + SoT-clarify docs commit on same branch |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
-| Sync | `0 0` with origin at feature closeout |
-| Migration `20260917` | In git; **remote DB NOT APPLIED** |
+| Migration `20260917` | In git on SoT; **remote DB NOT APPLIED** |
 | Flag | `COLLABORATION_PLATFORM_ENABLED` default false |
 
-## Do NOT on resume without GO
+## Not SoT (accounted)
 
-- Apply `20260917` remotely
+| Ref | SHA | Notes |
+| --- | --- | --- |
+| smoke-e2e branch | `850421d` | Ops only; stale `20260898` |
+| keepalive branch | `807550e` | Ops only; local tracking `0 0` |
+| gate-docs local branch | `807550e` | Duplicate of keepalive tip |
+| `collaboration-settings-lifecycle-ui-v1` (no workspace) | `f5ab724` | Superseded divergent — unsafe |
+
+## UM Core
+
+| Item | Value |
+| --- | --- |
+| Branch | `office/um-core-platform-event-publisher-foundation-p16` |
+| Tip | `3120432` |
+| Status | CLOSED / READY; P17 not started |
+
+## Do NOT without GO
+
+- Apply `20260917` (or stale `20260898`) remotely
 - Touch Commerce worktrees
-- Merge unrelated branches
+- Merge smoke/keepalive into SoT
+- Start UM Core P17
 
-## Laptop-only loss risks (unpushed / dirty)
-
-1. `umtuba-web-collaboration-workspace-ui-foundation-v1` — dirty `app/workspaces/layout.tsx` (tip `b002402` otherwise synced)
-2. `umtuba-mobile` — dirty/untracked docs + `build.json*` (`master` @ `fe14a34`)
-3. `umtuba-web` — `office/learning-ai-tutor-thread-lesson-binding-v1` @ `b85081b` **no upstream**
-4. Local `.env` / `.env.local` secret files (never commit)
-5. Local `node_modules` / `supabase/.temp` (reinstallable)
-
-## After reboot
+## After resume
 
 ```powershell
 Set-Location "C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1"
 git fetch origin
 git status -sb
 git rev-parse HEAD
-# expect 6b60205… or newer docs handoff on same branch
+# expect SoT clarify tip on settings-lifecycle branch; ahead/behind 0 0
 ```
-
-## Verdict
-
-**SAFE_TO_REBOOT** for Collaboration feature tip.  
-Central Brain full inventory pack was **incomplete** (shell harness limits); use this savepoint + git remotes as authority.

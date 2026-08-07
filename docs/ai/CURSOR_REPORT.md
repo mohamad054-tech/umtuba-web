@@ -1,26 +1,45 @@
-# CURSOR_REPORT — Pre-reboot Collaboration Save
+# CURSOR_REPORT — Collaboration SoT clarify for central handoff
 
 ## Summary
 
-Collaboration Settings & Lifecycle UI V1 closed and pushed. Laptop reboot save point recorded. Migration `20260917` is in git and **not** applied to remote DB.
+Clarified Collaboration canonical tip after central migration reallocation
+`20260898` → `20260917` (`1d05d92`). Classified smoke/keepalive as ops
+non-SoT forks. Local keepalive fast-forwarded + upstream set. No migration
+apply. No Commerce touch. No UM Core P17.
 
-## CURRENT LAPTOP SOURCE OF TRUTH
+## CURRENT COLLABORATION SOURCE OF TRUTH
 
 - Branch: `office/collaboration-workspace-settings-lifecycle-ui-v1`
 - Remote: `origin/office/collaboration-workspace-settings-lifecycle-ui-v1`
-- Commit: `6b60205dfb01168552ff6344523ec3e8b22eb70e`
+- Commit: `1d05d92cfc1e207124c56479127e09ba3275109f` (after this docs commit: newer)
 - Worktree: `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
-- Sync: `0 0`
+- Sync target: `0 0` after push
 
-## CLOSED
+## Tip chain
 
-| Milestone | Commit |
+| SHA | Meaning |
 | --- | --- |
-| Spine Foundation V1 | `321e7e8` + remote `20260896` |
-| Membership Runtime V1 | `c3bf87e` + remote `20260897` |
-| UI Foundation V1 | `cfd8a28` |
-| Handoff docs | `b002402` |
-| Settings & Lifecycle UI V1 | `6b60205` + local migration `20260917` (**DB NOT APPLIED**) |
+| `6b60205` | Settings & Lifecycle UI V1 feature close |
+| `6ea0634` | Reboot handoff docs |
+| `1d05d92` | Migration reallocation to `20260917` (canonical pre-clarify tip) |
+
+## Non-SoT classifications
+
+- Smoke `850421d` — ops readiness; NOT SoT; stale `20260898` filename
+- Keepalive `807550e` — gate keepalive; NOT SoT; stale `20260898` filename
+- Local gate-docs branch @ `807550e` — duplicate of keepalive tip; NOT SoT
+- `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724` — SUPERSEDED divergent alternate
+
+## Migrations
+
+- Applied remote: `20260896`, `20260897`
+- Pending (SoT): `20260917` — **NOT APPLIED**
+- Do not apply stale `20260898` from smoke/keepalive forks
+
+## UM Core
+
+- P16 closed @ `3120432` on `office/um-core-platform-event-publisher-foundation-p16`
+- P17 not started
 
 ## FLAG
 
@@ -32,15 +51,6 @@ desktop-owned — do not touch
 
 ## NEXT
 
-1. Optional: apply `20260917` with explicit GO  
+1. Optional: apply `20260917` with explicit GO
 2. Else: next Collaboration milestone gate (TBD)
-
-## Pre-reboot residuals (not pushed as part of this save unless separately handled)
-
-- `umtuba-web-collaboration-workspace-ui-foundation-v1`: dirty `app/workspaces/layout.tsx`
-- `umtuba-mobile`: dirty/untracked docs + build.json files
-- `umtuba-web`: branch without upstream (`office/learning-ai-tutor-thread-lesson-binding-v1` @ `b85081b`)
-
-## Shutdown
-
-Collaboration feature tip is **SAFE_TO_REBOOT** (pushed). Do not apply `20260917` without GO.
+3. Do not integrate smoke/keepalive into SoT without explicit GO

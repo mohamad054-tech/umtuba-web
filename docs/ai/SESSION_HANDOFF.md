@@ -1,34 +1,45 @@
 # Session Handoff — UMTUBA Laptop Collaboration Platform
 
-**Updated:** 2026-08-03 (pre-reboot save)
+**Updated:** 2026-08-07 (central handoff SoT clarify)
 
-## CURRENT LAPTOP SOURCE OF TRUTH
+## CURRENT COLLABORATION SOURCE OF TRUTH
 
 | Item | Value |
 | --- | --- |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Commit | `6b60205dfb01168552ff6344523ec3e8b22eb70e` |
+| Tip base | `1d05d92` + this clarify docs commit |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Sync | `0 0` at feature closeout |
+| Sync | expect `0 0` after push |
 
 ## CLOSED MILESTONES
 
-1. Learning AI Tutor Learner UI Integration V1 — `c3168ef`
-2. Collaboration Workspace Spine Foundation V1 — `321e7e8` (migration `20260896` applied remote)
-3. Collaboration Workspace Membership & Invitation Runtime V1 — `c3bf87e` (migration `20260897` applied remote)
-4. Collaboration Workspace UI Foundation V1 — `cfd8a28` (flag default=false; exposure gate)
-5. Collaboration laptop handoff docs — `b002402`
-6. Collaboration Workspace Settings & Lifecycle UI V1 — `6b60205` (migration file `20260917` in repo; **DB NOT APPLIED**)
+1. Spine Foundation V1 — `321e7e8` (`20260896` applied remote)
+2. Membership & Invitation Runtime V1 — `c3bf87e` (`20260897` applied remote)
+3. UI Foundation V1 — `cfd8a28` (flag default=false)
+4. Laptop handoff docs — `b002402`
+5. Settings & Lifecycle UI V1 — `6b60205`
+6. Migration reallocation to `20260917` — `1d05d92`
+
+## OPS FORKS (NOT SoT)
+
+- Smoke E2E readiness — `office/collaboration-smoke-e2e-on-settings-tip-v1` @ `850421d`
+- Platform gate keepalive — `office/collaboration-platform-gate-keepalive-v1` @ `807550e` (local upstream set; `0 0`)
+- Superseded alternate: `origin/office/collaboration-settings-lifecycle-ui-v1` @ `f5ab724` — **DO NOT USE**
 
 ## REMOTE MIGRATIONS
 
 - Applied: `20260896`, `20260897`
-- **NOT APPLIED:** `20260917`
+- **NOT APPLIED (canonical):** `20260917`
+- Stale name on ops forks only: `20260898` — do not apply
 
 ## COLLABORATION FLAG
 
 default = **false**
+
+## UM CORE
+
+P16 @ `3120432` closed. P17 not started.
 
 ## COMMERCE
 
@@ -36,10 +47,9 @@ default = **false**
 
 ## NEXT TASK
 
-Human decision after reboot:
-
 - Apply `20260917` remotely (explicit GO), **or**
 - Gate/start next Collaboration milestone (TBD)
+- Do not merge smoke/keepalive into SoT without explicit integration GO
 
 ## Resume commands
 
@@ -48,19 +58,5 @@ Set-Location "C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-s
 git fetch origin
 git status -sb
 git rev-parse HEAD
-# expect 6b60205dfb01168552ff6344523ec3e8b22eb70e (or newer handoff tip on same branch)
-git rev-list --left-right --count HEAD...@{u}
-# expect 0 0
+git rev-list --left-right --count HEAD...origin/office/collaboration-workspace-settings-lifecycle-ui-v1
 ```
-
-## Machine
-
-- Host: `DESKTOP-EE4G99N`
-- User: `desktop-ee4g99n\admin`
-
-## Pre-reboot non-SoT leftovers
-
-- UI foundation worktree: dirty `layout.tsx` at `b002402` (synced otherwise)
-- `umtuba-mobile`: dirty docs / `build.json*` on `master` @ `fe14a34`
-- `umtuba-web`: no upstream on `office/learning-ai-tutor-thread-lesson-binding-v1` @ `b85081b`
-- Perf home JS worktree: clean @ `d489de5`
