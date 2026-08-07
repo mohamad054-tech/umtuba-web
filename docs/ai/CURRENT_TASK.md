@@ -2,7 +2,7 @@
 
 ## Task title
 
-UM Core Capability Asserter Foundation P15
+UM Core Event Publisher Foundation P16
 
 ## Status
 
@@ -10,23 +10,24 @@ UM Core Capability Asserter Foundation P15
 
 ## Branch
 
-`office/um-core-platform-capability-asserter-foundation-p15`
+`office/um-core-platform-event-publisher-foundation-p16`
 
 ## Base HEAD
 
-`7fd4f8e56a533f49e152901a2705b2c41fbe5a0f` (Flag Evaluator Foundation P14 close)
+`8302dcca372734a33ed570fc75d4597d2686d5de` (Capability Asserter Foundation P15 close)
 
 ## Worktree
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-capability-asserter-foundation-p15`
+`C:\Users\Admin\Desktop\umtuba\umtuba-web-um-core-platform-event-publisher-foundation-p16`
 
 ## Milestone
 
-`um.core.capability_asserter_foundation_p15`
+`um.core.event_publisher_foundation_p16`
 
 ## Allowed scope
 
-- `platforms/core/capability/**`
+- `platforms/core/event/**` (publisher + publish codes + type/result alignment)
+- `platforms/core/sdk/interfaces.ts` (publish return type alignment only)
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
@@ -36,15 +37,17 @@ UM Core Capability Asserter Foundation P15
 
 ## Forbidden scope
 
-- User/RBAC/permissions authorization
-- SDK / Event Publisher / Health Reporter / Dependency Validator
-- P14 evaluator behavior changes / P8 registry changes
+- Event delivery / bus / consumer dispatch
+- P7 routing execution
+- Queue / outbox / retry / DLQ
+- Payload JSON-schema execution
+- HealthReporter / DependencyValidator / SDK client-factory
 - Persistence / networking / migrations / product wiring
-- P16 and later milestones
+- P17 and later milestones
 
 ## Delivered
 
-Pure deterministic `createInMemoryCapabilityAsserter` composing P5 + P14 with
-fail-closed unknown/unresolved cases and catalog-enabled ungated capabilities.
-Committed and pushed on `office/um-core-platform-capability-asserter-foundation-p15`.
-Do not start P16 from this handoff.
+Pure deterministic `createInMemoryEventPublisher` over P6 with fail-closed
+unknown/mismatch/envelope cases. Publish acceptance independent of P7 routes.
+Committed and pushed on `office/um-core-platform-event-publisher-foundation-p16`.
+Do not start P17 from this handoff.

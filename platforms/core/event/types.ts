@@ -3,6 +3,10 @@
  *
  * P1: interfaces only (transport-agnostic).
  * P6: pure in-memory event TYPE catalog (no bus, publish, or consume).
+ * P16: pure deterministic P6-backed UmEventPublisher (admission only).
+ *
+ * EVENT PUBLISHING IS NOT EVENT DELIVERY.
+ * EVENT PUBLISHING IS NOT AN EVENT BUS.
  */
 
 import type { UmComplianceStatus } from "../compliance/types";
@@ -152,15 +156,46 @@ export interface UmPlatformEventEnvelope<TPayload = unknown> {
 }
 
 /**
- * Event publisher port — interface only (no bus). Not implemented in P6.
+ * Deterministic finding for publish admission (P16).
+ */
+export interface UmEventPublishFinding {
+  readonly code: string;
+  readonly message: string;
+  readonly path?: string;
+}
+
+/**
+ * Result of a publish admission attempt (P16).
+ * Valid publish → ok: true with empty findings.
+ */
+export interface UmEventPublishResult {
+  readonly ok: boolean;
+  readonly eventId: string;
+  readonly eventType: string;
+  readonly findings: readonly UmEventPublishFinding[];
+}
+
+/**
+ * Dependencies for the in-memory event publisher (P16).
+ * P7 routing is intentionally excluded from the publish path.
+ */
+export interface UmEventPublisherDeps {
+  readonly eventTypes: UmEventTypeRegistry;
+}
+
+/**
+ * Event publisher port — P6-backed admission only (no bus/delivery).
+ * P16 returns a deterministic result instead of void.
  */
 export interface UmEventPublisher {
-  publish<TPayload>(event: UmPlatformEventEnvelope<TPayload>): void;
+  publish<TPayload>(
+    event: UmPlatformEventEnvelope<TPayload>,
+  ): UmEventPublishResult;
 }
 
 /**
  * Event consumer handler contract — interface only.
- * Consumers MUST be idempotent (Standards §5.3). Not implemented in P6.
+ * Consumers MUST be idempotent (Standards §5.3). Not implemented in P16.
  */
 export interface UmEventConsumer<TPayload = unknown> {
   readonly consumerId: string;

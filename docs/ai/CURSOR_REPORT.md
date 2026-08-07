@@ -1,26 +1,27 @@
-# CURSOR_REPORT — UM Core Capability Asserter Foundation P15
+# CURSOR_REPORT — UM Core Event Publisher Foundation P16
 
 ## Summary
 
-**READY** — Capability Asserter Foundation P15 closed on
-`office/um-core-platform-capability-asserter-foundation-p15`
-(base P14 tip `7fd4f8e`).
+**READY** — Event Publisher Foundation P16 closed on
+`office/um-core-platform-event-publisher-foundation-p16`
+(base P15 tip `8302dcc`).
 
-Pure deterministic availability assertion over P5 + P14. Unknown/unresolved
-fail closed; ungated catalog capabilities may be enabled. No RBAC, SDK,
-publisher, health reporter, or migrations.
+Pure deterministic P6-backed publish admission. Publishing is not delivery/bus.
+No P7 routing execution, consumer dispatch, networking, persistence, or
+migrations.
 
 ## Exact files changed
 
-- `platforms/core/capability/capabilityAsserter.ts` (new)
-- `platforms/core/capability/capabilityAsserter.test.ts` (new)
-- `platforms/core/capability/asserterCodes.ts` (new)
-- `platforms/core/capability/types.ts`
-- `platforms/core/capability/index.ts`
+- `platforms/core/event/eventPublisher.ts` (new)
+- `platforms/core/event/eventPublisher.test.ts` (new)
+- `platforms/core/event/publishCodes.ts` (new)
+- `platforms/core/event/types.ts`
+- `platforms/core/event/index.ts`
+- `platforms/core/sdk/interfaces.ts` (publish return type alignment only)
 - `platforms/core/packageIdentity.ts`
 - `platforms/core/coreFoundationContracts.test.ts`
 - `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_CAPABILITY_ASSERTER_FOUNDATION_P15.md` (new)
+- `docs/core/UM_CORE_PLATFORM_EVENT_PUBLISHER_FOUNDATION_P16.md` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -30,17 +31,17 @@ None.
 
 ## Security review
 
-- Heap-only composition of injected catalogs/evaluator; no DB / network / secrets
-- Does not mutate capability or flag registries
-- Fail closed on unknown/unresolved
-- authClass never treated as authorization
+- Heap-only admission over injected P6 catalog; no DB / network / secrets
+- Does not mutate event type or routing registries
+- Fail closed on unknown/mismatch/envelope invalid
+- Payload opaque; no schema fetch/execution
 - No product imports
 - No Co-authored-by / Signed-off-by trailers
 
 ## Tests
 
-- `npx vitest run platforms/core/capability/capabilityAsserter.test.ts` — **PASS** (9)
-- `npx vitest run platforms/core` — **PASS** (149)
+- `npx vitest run platforms/core/event/eventPublisher.test.ts` — **PASS** (13)
+- `npx vitest run platforms/core` — **PASS** (162)
 
 ## TypeScript
 
@@ -48,7 +49,7 @@ None.
 
 ## Build
 
-Not required for this capability-asserter-foundation milestone.
+Not required for this event-publisher-foundation milestone.
 
 ## git diff --check
 
@@ -60,5 +61,5 @@ Clean after commit/push (see final report).
 
 ## Open issues
 
-- Do not start P16 from this close.
-- Recommended next: `UmEventPublisher` Foundation.
+- Do not start P17 from this close.
+- Recommended next: Health Reporter Foundation (or next approved runtime port).
