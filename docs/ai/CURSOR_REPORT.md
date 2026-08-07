@@ -2,59 +2,53 @@
 
 ## Summary
 
-**`COMMERCE_IN_FLIGHT_VISIBILITY_MIGRATION_RENUMBER_LOCAL_DONE`**
+**`COMMERCE_PARTIAL_REFUND_20260905_CONTROLLED_TARGETED_APPLY_FINAL_REPORT`**
 
-Resumed after collision stop. Feature tip remains
-`a3c155be99722b5ef2734f33ba98676c140c2d7c`. Local corrective renumber applied:
-Commerce migration **`20260901` → `20260905`** (not `20260903` — Translation
-claimed 03/04 overnight). No commit, push, or remote history registration.
+Verdict: **CLOSED**
+
+Controlled targeted apply of Commerce `20260905` succeeded against legitimate remote tip Learning `20260901`. Orphan committing-list RPC rebound via `CREATE OR REPLACE`. History registered once. No `db push`. Learning/Translation history not modified by this operation.
 
 ## Exact files changed
 
-- `supabase/migrations/20260905_store_partial_refund_ledger_list_committing_v1.sql` **(added)**
-- `supabase/migrations/20260901_store_partial_refund_ledger_list_committing_v1.sql` **(deleted)**
-- `lib/store/partialRefundLedger/rpcContracts.ts`
-- `lib/store/partialRefundLedger/rpcReadiness.test.ts`
-- `lib/store/partialRefundInFlightCommittingVisibility/visibilityService.test.ts`
-- `docs/store/implementation/PARTIAL_REFUND_IN_FLIGHT_COMMITTING_VISIBILITY_V1.md`
+Closure handoff only (this commit):
+
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
 
+Prior corrective commit `ddfc013` already holds migration renumber + contracts/tests/impl doc.
+
 ## Migrations created
 
-Corrective local draft: **`20260905_store_partial_refund_ledger_list_committing_v1.sql`**
-Same RPC DDL (`CREATE OR REPLACE`); version comment updated for collision proof.
+None in this closure commit. Applied remotely: `20260905_store_partial_refund_ledger_list_committing_v1.sql`.
 
 ## Security review
 
-- Orphan live RPC may still exist without history — `service_role` only; no money/provider.
-- Do **not** register `20260901`.
-- Apply/register only **`20260905`** on explicit GO.
+- RPC remains `SECURITY DEFINER`, `service_role` EXECUTE only (anon/authenticated revoked).
+- Read-only committing discovery; no money/provider/lock release.
+- Learning `20260901` row unchanged.
 
 ## Tests
 
-`npx vitest run` focused: **18 passed** (`rpcReadiness` 4 + `visibilityService` 18).
+Focused: **18 passed**.
 
 ## TypeScript
 
-Not re-run this pass (renumber/contracts only); run before commit GO if desired.
+N/A for apply/docs closure.
 
 ## Build
 
-Not required for renumber-only local change unless commit GO asks full gate.
+N/A
 
 ## git diff --check
 
-Trailing whitespace fixed after first fail; re-check clean expected.
+PASS (closure docs).
 
 ## git status --short
 
-Deleted `20260901_…`, added `20260905_…`, contract/test/doc + AI handoff dirty. Uncommitted. Upstream `0 0`.
+Expect clean after push.
 
-## Open issues / next GO
+## Open issues
 
-1. **Commit GO** — corrective renumber commit.
-2. **Apply GO** — controlled per-file apply + register **`20260905` only** (rebinds orphan).
-3. Never `db push` / never register `20260901`.
+None for this milestone. Concurrent remote Translation rows (`20260902`, `20260910`) observed at verify time were **not** applied by this operation.

@@ -1,53 +1,35 @@
 # SESSION_HANDOFF
 
-## Branch / worktree
+## Closed milestone
 
-- Branch: `office/commerce-partial-refund-in-flight-committing-visibility-v1`
-- Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1`
-- Closed feature tip: `a3c155be99722b5ef2734f33ba98676c140c2d7c`
-- Parent: `8e16c8c` (stuck-committing recovery)
+**Commerce Partial Refund In-Flight Committing Visibility V1** — code + corrective renumber + controlled remote apply of **`20260905`**.
 
-## Where we stopped yesterday
-
-1. Feature closed; remote preflight READY for tip `20260900`.
-2. Blind `db push` **BLOCKED** (remote-only Learning versions + local-only older migrations).
-3. Controlled path: SQL file apply **succeeded** (`APPLY_OK`) → orphan live RPC.
-4. History registration **interrupted** when Learning/Translation ownership of `20260901`/`20260902` was confirmed.
-5. Collision verdict: `COMMERCE_IN_FLIGHT_VISIBILITY_MIGRATION_VERSION_COLLISION_CONFIRMED`.
-
-## Live remote (last known)
+## Branch / commits
 
 | Item | Value |
 | --- | --- |
-| Project | umtuba / `tgucwnjwoyeqoxqaxmew` |
-| Migration tip | **`20260900`** |
-| History `20260901` | **absent** (never register Commerce here) |
-| RPC `list_store_partial_refund_ledger_committing` | **exists (orphan)** — DDL applied, unregistered |
+| Branch | `office/commerce-partial-refund-in-flight-committing-visibility-v1` |
+| Feature tip | `a3c155be99722b5ef2734f33ba98676c140c2d7c` |
+| Corrective renumber | `ddfc0130d12323d2549eca01527cc0d309c30bd6` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1` |
 
-## Cross-domain claims (refreshed 2026-08-07)
+## Remote after apply (2026-08-07)
 
-| Version | Owner |
-| --- | --- |
-| 20260900 | Commerce partial-refund RPCs (remote tip) |
-| 20260901 | Learning lesson notes |
-| 20260902 | Translation intelligence |
-| 20260903 | Translation studio persistence |
-| 20260904 | Translation intelligence |
-| 20260910 | Translation studio (reallocated) |
-| **20260905+** (except 10) | **Commerce candidate; `20260905` used for renumber** |
+| Version | Name | Notes |
+| --- | --- | --- |
+| 20260900 | `store_partial_refund_ledger_rpc_v1` | Commerce (prior) |
+| 20260901 | `learning_lesson_notes_foundation_v1` | Learning — untouched |
+| 20260902 | `translation_intelligence_foundation_v1` | Present after concurrent remote activity (not this op) |
+| 20260905 | `store_partial_refund_ledger_list_committing_v1` | **This operation** |
+| 20260910 | `translation_studio_persistence_workflow_v1` | Present after concurrent remote activity (not this op) |
 
-**Stale advice:** do **not** renumber to `20260903` — Translation took it overnight.
+## Execution
 
-## Done this resume (2026-08-07)
+1. Phase 1 gate PASS against tip `20260901` (Learning).
+2. Targeted SQL apply of `20260905` via `db query --linked -f` (`CREATE OR REPLACE` rebind of orphan RPC).
+3. History register `20260905` only.
+4. Verify: one history row, RPC signature/jsonb/SECURITY DEFINER/committing filter, grants service_role.
 
-Local corrective renumber **without commit/apply**:
+## Verdict
 
-- Deleted `20260901_store_partial_refund_ledger_list_committing_v1.sql`
-- Added `20260905_store_partial_refund_ledger_list_committing_v1.sql` (`CREATE OR REPLACE` same RPC)
-- Updated `rpcContracts.ts`, tests, implementation doc, AI handoff
-
-## Still waiting for GO
-
-1. **Commit** corrective renumber.
-2. **Controlled apply + register `20260905` only** (rebinds orphan via `CREATE OR REPLACE`).
-3. Never register `20260901`. Never `db push`.
+`COMMERCE_PARTIAL_REFUND_20260905_CONTROLLED_TARGETED_APPLY` → **CLOSED**
