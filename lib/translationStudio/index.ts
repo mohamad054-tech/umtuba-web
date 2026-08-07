@@ -89,7 +89,10 @@ export type { StudioPersistencePort } from "./persistence/studioPersistencePort"
 
 export {
   TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV,
+  TRANSLATION_STUDIO_DUAL_READ_OBSERVE_ENV,
   TRANSLATION_STUDIO_PERSISTENCE_MODES,
+  isDualReadObserveEnabled,
+  isExecutableDualReadMode,
   isExecutableJsonPersistenceMode,
   isExecutableShadowDualWriteMode,
   requestsDbBackedPersistence,
@@ -157,6 +160,44 @@ export {
   runWithStudioShadowWriteTransportAsync,
   type StudioShadowWriteContext,
 } from "./persistence/shadowWriteContext";
+
+export {
+  getStudioDualReadTransport,
+  runWithStudioDualReadTransport,
+  runWithStudioDualReadTransportAsync,
+  type StudioDualReadContext,
+} from "./persistence/dualReadContext";
+
+export {
+  composeStudioDualReadObservers,
+  noopStudioDualReadObserver,
+  type DualReadCompareStatus,
+  type DualReadCountSummary,
+  type DualReadErrorCategory,
+  type DualReadObserveEvent,
+  type StudioDualReadObserver,
+} from "./persistence/dualReadObserver";
+
+export {
+  DUAL_READ_JOURNAL_EVENT_FAMILY,
+  isDualReadJournalEntry,
+  type DualReadJournalEntryV1,
+  type DualReadJournalOutcome,
+} from "./persistence/dualReadJournal";
+
+export {
+  hasActionableDualReadDrift,
+  runStudioDualReadCompare,
+  shadowPendingForHash,
+  type DualReadCompareResult,
+  type RunStudioDualReadCompareOptions,
+} from "./persistence/dualReadCompare";
+
+export {
+  createDualReadStudioPersistence,
+  type CreateDualReadStudioPersistenceOptions,
+  type DualReadStudioPersistence,
+} from "./persistence/dualReadStudioPersistence";
 
 export {
   classifyStudioShadowError,

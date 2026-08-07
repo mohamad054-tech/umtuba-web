@@ -7,8 +7,11 @@ import {
   assertPlatformAdminDb,
 } from "../../lib/store/adminAuth";
 import {
+  createSupabaseReadRpcTransport,
   createSupabaseWriteRpcTransport,
   getTranslationStudioWorkflow,
+  runWithStudioDualReadTransport,
+  runWithStudioDualReadTransportAsync,
   runWithStudioShadowWriteTransport,
   runWithStudioShadowWriteTransportAsync,
 } from "../../lib/translationStudio";
@@ -58,14 +61,15 @@ function safeReturnTo(formData: FormData, fallback: string): string {
   return fallback;
 }
 
-/** Bind request-scoped authenticated RPC transport for shadow dual-write. */
+/** Bind request-scoped authenticated write+read transports for Studio actions. */
 function withShadowTransport<T>(
   supabase: SupabaseClient,
   fn: () => T
 ): T {
-  return runWithStudioShadowWriteTransport(
-    createSupabaseWriteRpcTransport(supabase),
-    fn
+  const write = createSupabaseWriteRpcTransport(supabase);
+  const read = createSupabaseReadRpcTransport(supabase);
+  return runWithStudioDualReadTransport(read, () =>
+    runWithStudioShadowWriteTransport(write, fn)
   );
 }
 
@@ -73,9 +77,10 @@ async function withShadowTransportAsync<T>(
   supabase: SupabaseClient,
   fn: () => Promise<T>
 ): Promise<T> {
-  return runWithStudioShadowWriteTransportAsync(
-    createSupabaseWriteRpcTransport(supabase),
-    fn
+  const write = createSupabaseWriteRpcTransport(supabase);
+  const read = createSupabaseReadRpcTransport(supabase);
+  return runWithStudioDualReadTransportAsync(read, () =>
+    runWithStudioShadowWriteTransportAsync(write, fn)
   );
 }
 

@@ -362,14 +362,17 @@ describe("Translation Studio remote read adapter V1", () => {
     expect(mode.mode).toBe("shadow_dual_write");
   });
 
-  it("dual_read and db_primary remain unsupported", () => {
-    for (const mode of ["dual_read", "db_primary_json_fallback"] as const) {
-      const resolution = resolveTranslationStudioPersistenceMode({
-        [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode,
-      });
-      expect(resolution.kind).toBe("unsupported");
-      expect(resolution.implementation).toBe("json");
-    }
+  it("dual_read is executable; db_primary remains unsupported", () => {
+    const dual = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "dual_read",
+    });
+    expect(dual.kind).toBe("executable");
+    expect(dual.mode).toBe("dual_read");
+
+    const primary = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback",
+    });
+    expect(primary.kind).toBe("unsupported");
   });
 
   it("write API unchanged: saveAsync still works with write transport only", async () => {

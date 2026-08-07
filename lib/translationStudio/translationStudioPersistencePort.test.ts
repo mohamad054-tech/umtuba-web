@@ -56,25 +56,35 @@ describe("Translation Studio persistence mode gate", () => {
     });
   });
 
-  it("unsupported future modes cannot activate DB behavior", () => {
-    for (const mode of ["dual_read", "db_primary_json_fallback"] as const) {
-      const resolution = resolveTranslationStudioPersistenceMode({
-        [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode,
-      });
-      expect(resolution.kind).toBe("unsupported");
-      expect(resolution.implementation).toBe("json");
-      expect(isExecutableJsonPersistenceMode(resolution)).toBe(false);
-      expect(requestsDbBackedPersistence(resolution)).toBe(true);
+  it("db_primary remains unsupported; dual_read is executable", () => {
+    const dual = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "dual_read",
+    });
+    expect(dual.kind).toBe("executable");
+    expect(dual.mode).toBe("dual_read");
+    expect(requestsDbBackedPersistence(dual)).toBe(true);
 
-      const selected = createDefaultStudioPersistence({
-        env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode },
-        dataDir: tempDataDir(),
-      });
-      expect(selected.implementation).toBe("json");
-      expect(selected.resolution.kind).toBe("unsupported");
-      // JSON adapter only — load returns null on empty dir (seed path).
-      expect(selected.persistence.load()).toBeNull();
-    }
+    const selectedDual = createDefaultStudioPersistence({
+      env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "dual_read" },
+      dataDir: tempDataDir(),
+    });
+    expect(selectedDual.implementation).toBe("dual_read");
+    expect(selectedDual.dualReadEnabled).toBe(true);
+    expect(selectedDual.persistence.load()).toBeNull();
+
+    const primary = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback",
+    });
+    expect(primary.kind).toBe("unsupported");
+    expect(primary.implementation).toBe("json");
+    expect(requestsDbBackedPersistence(primary)).toBe(true);
+
+    const selectedPrimary = createDefaultStudioPersistence({
+      env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback" },
+      dataDir: tempDataDir(),
+    });
+    expect(selectedPrimary.implementation).toBe("json");
+    expect(selectedPrimary.persistence.load()).toBeNull();
   });
 
   it("shadow_dual_write is executable composition (JSON authoritative)", () => {

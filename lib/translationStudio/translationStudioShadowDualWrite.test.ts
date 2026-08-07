@@ -472,7 +472,7 @@ describe("Translation Studio shadow dual-write V1", () => {
     expect(blob).not.toMatch(/eyJ/);
   });
 
-  it("mode gate: json default; shadow executable; dual_read/db_primary unsupported", () => {
+  it("mode gate: json default; shadow + dual_read executable; db_primary unsupported", () => {
     expect(resolveTranslationStudioPersistenceMode({}).mode).toBe("json");
     expect(
       resolveTranslationStudioPersistenceMode({
@@ -483,7 +483,7 @@ describe("Translation Studio shadow dual-write V1", () => {
       resolveTranslationStudioPersistenceMode({
         [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "dual_read",
       }).kind
-    ).toBe("unsupported");
+    ).toBe("executable");
     expect(
       resolveTranslationStudioPersistenceMode({
         [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback",
@@ -496,6 +496,7 @@ describe("Translation Studio shadow dual-write V1", () => {
     });
     // ephemeral forces non-durable json for tests
     expect(selected.implementation).toBe("json");
+    expect(selected.dualReadEnabled).toBe(false);
   });
 
   it("queue unit: older completion cannot start after newer pending supersede", async () => {

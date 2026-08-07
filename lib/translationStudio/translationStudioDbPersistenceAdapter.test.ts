@@ -313,24 +313,25 @@ describe("Translation Studio DB persistence adapter V1", () => {
     expect(src).toMatch(/fromTranslationStudioReadSnapshot/);
   });
 
-  it("JSON remains the only default; dual_read/db_primary stay closed; shadow is opt-in", () => {
+  it("JSON default; dual_read executable; db_primary stays closed; shadow is opt-in", () => {
     resetTranslationStudioWorkflowForTests();
-    for (const mode of ["dual_read", "db_primary_json_fallback"] as const) {
-      const resolution = resolveTranslationStudioPersistenceMode({
-        [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode,
-      });
-      expect(resolution.kind).toBe("unsupported");
-      expect(resolution.implementation).toBe("json");
-      if (resolution.kind === "unsupported") {
-        expect(resolution.message).toMatch(/not executable/i);
-      }
+    const dual = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "dual_read",
+    });
+    expect(dual.kind).toBe("executable");
+    expect(dual.mode).toBe("dual_read");
 
-      const selected = createDefaultStudioPersistence({
-        env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: mode },
-        ephemeral: true,
-      });
-      expect(selected.implementation).toBe("json");
-    }
+    const primary = resolveTranslationStudioPersistenceMode({
+      [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback",
+    });
+    expect(primary.kind).toBe("unsupported");
+    expect(primary.implementation).toBe("json");
+
+    const selectedPrimary = createDefaultStudioPersistence({
+      env: { [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "db_primary_json_fallback" },
+      ephemeral: true,
+    });
+    expect(selectedPrimary.implementation).toBe("json");
 
     const shadow = resolveTranslationStudioPersistenceMode({
       [TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV]: "shadow_dual_write",
@@ -341,6 +342,7 @@ describe("Translation Studio DB persistence adapter V1", () => {
     const jsonDefault = createDefaultStudioPersistence({ ephemeral: true });
     expect(jsonDefault.implementation).toBe("json");
     expect(jsonDefault.resolution.kind).toBe("executable");
+    expect(jsonDefault.dualReadEnabled).toBe(false);
 
     // Workflow still works with JSON/ephemeral — public API compatibility.
     const wf = createTranslationStudioWorkflow({ ephemeral: true });

@@ -3,11 +3,21 @@
  * - `json`: executable, JSON only (default)
  * - `shadow_dual_write`: executable composition (JSON authoritative + DB shadow);
  *   DB calls require request-scoped transport at save time or shadow is skipped
- * - `dual_read` / `db_primary_json_fallback`: unsupported (fail closed to JSON)
+ * - `dual_read`: executable composition (JSON authoritative + secondary remote compare);
+ *   does not enable DB writes by itself
+ * - `db_primary_json_fallback`: unsupported (fail closed to JSON)
+ *
+ * Optional observe flag (does not change mode):
+ * UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE=1 wraps dual-read over current mode
+ * (e.g. shadow + dual-read) without switching persistence mode.
  */
 
 export const TRANSLATION_STUDIO_PERSISTENCE_MODE_ENV =
   "UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE";
+
+/** When "1"/"true", nest dual-read observe over the selected mode implementation. */
+export const TRANSLATION_STUDIO_DUAL_READ_OBSERVE_ENV =
+  "UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE";
 
 export const TRANSLATION_STUDIO_PERSISTENCE_MODES = [
   "json",
@@ -33,8 +43,14 @@ export type PersistenceModeResolution =
       implementation: "shadow_dual_write";
     }
   | {
+      kind: "executable";
+      mode: "dual_read";
+      envRaw: string;
+      implementation: "dual_read";
+    }
+  | {
       kind: "unsupported";
-      mode: "dual_read" | "db_primary_json_fallback";
+      mode: "db_primary_json_fallback";
       envRaw: string;
       implementation: "json";
       message: string;
@@ -47,11 +63,6 @@ export type PersistenceModeResolution =
       message: string;
     };
 
-const UNSUPPORTED_MODES = new Set<string>([
-  "dual_read",
-  "db_primary_json_fallback",
-]);
-
 function normalizeModeToken(raw: string): string {
   return raw.trim().toLowerCase();
 }
@@ -59,8 +70,9 @@ function normalizeModeToken(raw: string): string {
 /**
  * Resolve persistence mode from env.
  * Unset / blank / explicit `json` → executable JSON.
- * `shadow_dual_write` → executable shadow composition (transport still required at save).
- * Other known future modes → unsupported (JSON).
+ * `shadow_dual_write` → executable shadow composition.
+ * `dual_read` → executable dual-read composition (JSON + compare; no writes).
+ * `db_primary_json_fallback` → unsupported (JSON).
  * Anything else → invalid (JSON).
  */
 export function resolveTranslationStudioPersistenceMode(
@@ -95,10 +107,19 @@ export function resolveTranslationStudioPersistenceMode(
     };
   }
 
-  if (UNSUPPORTED_MODES.has(token)) {
+  if (token === "dual_read") {
+    return {
+      kind: "executable",
+      mode: "dual_read",
+      envRaw,
+      implementation: "dual_read",
+    };
+  }
+
+  if (token === "db_primary_json_fallback") {
     return {
       kind: "unsupported",
-      mode: token as "dual_read" | "db_primary_json_fallback",
+      mode: "db_primary_json_fallback",
       envRaw,
       implementation: "json",
       message:
@@ -132,19 +153,33 @@ export function isExecutableShadowDualWriteMode(
   );
 }
 
-/** True when mode implies DB participation (shadow executable or future unsupported). */
+export function isExecutableDualReadMode(
+  resolution: PersistenceModeResolution
+): boolean {
+  return resolution.kind === "executable" && resolution.mode === "dual_read";
+}
+
+/** Opt-in dual-read observe nest without changing primary mode. */
+export function isDualReadObserveEnabled(
+  env: Record<string, string | undefined> = process.env
+): boolean {
+  const raw = env[TRANSLATION_STUDIO_DUAL_READ_OBSERVE_ENV];
+  if (raw == null) return false;
+  const t = raw.trim().toLowerCase();
+  return t === "1" || t === "true" || t === "yes";
+}
+
+/** True when mode implies DB participation (writes and/or dual-read). */
 export function requestsDbBackedPersistence(
   resolution: PersistenceModeResolution
 ): boolean {
-  if (
-    resolution.kind === "executable" &&
-    resolution.mode === "shadow_dual_write"
-  ) {
-    return true;
+  if (resolution.kind !== "executable") {
+    return (
+      resolution.kind === "unsupported" &&
+      resolution.mode === "db_primary_json_fallback"
+    );
   }
   return (
-    resolution.kind === "unsupported" &&
-    (resolution.mode === "dual_read" ||
-      resolution.mode === "db_primary_json_fallback")
+    resolution.mode === "shadow_dual_write" || resolution.mode === "dual_read"
   );
 }

@@ -26,14 +26,22 @@ export type ShadowJournalOutcome =
   | "succeeded"
   | "failed"
   | "skipped"
-  | "journal_error";
+  | "journal_error"
+  | "dual_read_succeeded"
+  | "dual_read_drift_detected"
+  | "dual_read_transient_lag"
+  | "dual_read_failed"
+  | "dual_read_unavailable"
+  | "dual_read_stale_discarded";
 
 export type ShadowReconciliationJournalEntryV1 = {
   schemaVersion: typeof SHADOW_RECONCILIATION_JOURNAL_SCHEMA_VERSION;
   timestamp: string;
   save_seq_local: number;
   outcome: ShadowJournalOutcome;
-  category?: StudioShadowErrorCategory;
+  /** Discriminator for dual-read journal rows. Absent on shadow write rows. */
+  event_family?: "dual_read";
+  category?: StudioShadowErrorCategory | "unavailable";
   attempt?: number;
   duration_ms?: number;
   entity_counts?: StudioShadowEntityCounts;
@@ -41,6 +49,8 @@ export type ShadowReconciliationJournalEntryV1 = {
   correlation_id?: string;
   superseded_by?: number;
   message?: string;
+  compare_status?: string;
+  counts?: Record<string, number>;
 };
 
 export type ShadowReconciliationJournal = {
@@ -76,9 +86,17 @@ export function parseShadowReconciliationJournalLine(
   if (!isPlainObject(parsed)) return null;
   if (parsed.schemaVersion !== 1) return null;
   if (typeof parsed.timestamp !== "string" || !parsed.timestamp) return null;
-  if (typeof parsed.save_seq_local !== "number") return null;
   if (typeof parsed.outcome !== "string") return null;
   if (typeof parsed.snapshot_hash !== "string") return null;
+
+  // Dual-read entries use save_seq_local=0; still require a number for compat.
+  if (typeof parsed.save_seq_local !== "number") {
+    if (parsed.event_family === "dual_read") {
+      parsed.save_seq_local = 0;
+    } else {
+      return null;
+    }
+  }
 
   // Reject obvious secret-bearing keys if ever present
   for (const banned of [

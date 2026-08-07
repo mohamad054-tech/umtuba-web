@@ -14,6 +14,7 @@ import {
   buildStudioReconciliationReport,
   createSupabaseReadRpcTransport,
   getTranslationStudioWorkflow,
+  runWithStudioDualReadTransportAsync,
   type BuildReconciliationReportResult,
 } from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
@@ -44,5 +45,7 @@ export async function generateTranslationStudioReconciliationReportAction(): Pro
     ...snap,
   };
   const readTransport = createSupabaseReadRpcTransport(supabase);
-  return buildStudioReconciliationReport({ local, readTransport });
+  return runWithStudioDualReadTransportAsync(readTransport, () =>
+    buildStudioReconciliationReport({ local, readTransport })
+  );
 }
