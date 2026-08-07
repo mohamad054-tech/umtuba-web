@@ -5,11 +5,14 @@ import { COLLABORATION_PLATFORM_ENABLED } from "./workspaceSpineFoundation";
 import {
   COLLABORATION_UI_COPY,
   COLLABORATION_UI_ROUTES,
+  canChangeCollaborationMemberRole,
   canManageCollaborationInvites,
   canViewCollaborationInvites,
+  collaborationAssignableMemberRolesForActor,
   collaborationKindLabel,
   collaborationRoleLabel,
   collaborationStatusLabel,
+  isCollaborationAssignableMemberRole,
   isCollaborationInviteRole,
   shortenCollaborationId,
 } from "./workspaceUi";
@@ -36,6 +39,32 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(collaborationStatusLabel("active")).toBe("نشطة");
     expect(isCollaborationInviteRole("member")).toBe(true);
     expect(isCollaborationInviteRole("owner")).toBe(false);
+    expect(isCollaborationAssignableMemberRole("admin")).toBe(true);
+    expect(isCollaborationAssignableMemberRole("owner")).toBe(false);
+    expect(collaborationAssignableMemberRolesForActor("manager")).toEqual([
+      "manager",
+      "billing_manager",
+      "member",
+      "auditor",
+    ]);
+    expect(
+      canChangeCollaborationMemberRole(
+        "admin",
+        "member",
+        "22222222-2222-4222-8222-222222222222",
+        "11111111-1111-4111-8111-111111111111",
+        "active"
+      )
+    ).toBe(true);
+    expect(
+      canChangeCollaborationMemberRole(
+        "admin",
+        "owner",
+        "22222222-2222-4222-8222-222222222222",
+        "11111111-1111-4111-8111-111111111111",
+        "active"
+      )
+    ).toBe(false);
     expect(canManageCollaborationInvites("manager")).toBe(true);
     expect(canViewCollaborationInvites("member")).toBe(false);
     expect(
@@ -91,8 +120,16 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(actions).toMatch(/inviteCollaborationWorkspaceMember/);
     expect(actions).toMatch(/revokeCollaborationWorkspaceInvite/);
     expect(actions).toMatch(/updateCollaborationWorkspaceSettings/);
+    expect(actions).toMatch(/updateCollaborationWorkspaceMemberRole/);
     expect(actions).toMatch(/leaveCollaborationWorkspace/);
     expect(actions).not.toMatch(/learning_/);
     expect(actions).not.toMatch(/from\("stores"\)/);
+
+    const membersList = readFileSync(
+      join(ROOT, "app/components/collaboration/MembersList.tsx"),
+      "utf8"
+    );
+    expect(membersList).toMatch(/updateCollaborationWorkspaceMemberRoleAction/);
+    expect(membersList).toMatch(/collaborationAssignableMemberRolesForActor/);
   });
 });

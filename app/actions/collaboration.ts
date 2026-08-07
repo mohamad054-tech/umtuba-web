@@ -17,11 +17,13 @@ import {
   revokeCollaborationWorkspaceInvite,
   suspendCollaborationWorkspaceMember,
   transferCollaborationWorkspaceOwnership,
+  updateCollaborationWorkspaceMemberRole,
   updateCollaborationWorkspaceSettings,
 } from "../../lib/collaboration/workspaceMembershipRuntime";
 import {
   COLLABORATION_UI_COPY,
   COLLABORATION_UI_ROUTES,
+  isCollaborationAssignableMemberRole,
   isCollaborationInviteRole,
 } from "../../lib/collaboration/workspaceUi";
 import { COLLABORATION_WORKSPACE_KINDS } from "../../lib/collaboration/workspaceSpineFoundation";
@@ -383,6 +385,45 @@ export async function removeCollaborationWorkspaceMemberAction(
 
   revalidateWorkspaces(workspaceId);
   return { ok: true, message: "تم إزالة العضو.", workspaceId };
+}
+
+export async function updateCollaborationWorkspaceMemberRoleAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const targetUserId = String(formData.get("userId") ?? "");
+  const role = String(formData.get("role") ?? "");
+
+  if (!isCollaborationAssignableMemberRole(role)) {
+    return { ok: false, message: "Invalid role" };
+  }
+
+  const supabase = await createClient();
+  const result = await updateCollaborationWorkspaceMemberRole(
+    supabase,
+    workspaceId,
+    targetUserId,
+    role
+  );
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: COLLABORATION_UI_COPY.roleUpdated,
+    workspaceId,
+  };
 }
 
 /** Exported for tests — must stay aligned with action fail-closed copy. */

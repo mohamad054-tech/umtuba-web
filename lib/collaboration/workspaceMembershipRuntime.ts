@@ -56,9 +56,17 @@ export function sanitizeCollaborationMembershipError(
     lower.includes("transfer ownership before leaving") ||
     lower.includes("cannot remove the active owner") ||
     lower.includes("cannot suspend the active owner") ||
-    lower.includes("cannot change the active owner")
+    lower.includes("cannot change the active owner") ||
+    lower.includes("use transfer ownership to assign owner")
   ) {
     return "Ownership must be transferred before this membership change.";
+  }
+  if (
+    lower.includes("cannot assign a role above") ||
+    lower.includes("invalid role") ||
+    lower.includes("not allowed to update member roles")
+  ) {
+    return "You are not allowed to perform this workspace action.";
   }
   if (
     lower.includes("not allowed to update workspace settings") ||
@@ -429,6 +437,50 @@ export async function removeCollaborationWorkspaceMember(
       workspace_id: workspace.data,
       user_id: user.data,
       status: asString(result.data.status) ?? "removed",
+    },
+  };
+}
+
+export async function updateCollaborationWorkspaceMemberRole(
+  supabase: AnyClient,
+  workspaceId: string,
+  userId: string,
+  role: CollaborationWorkspaceInviteRole | string
+): Promise<
+  CollaborationMembershipResult<{
+    workspace_id: string;
+    user_id: string;
+    role: string;
+  }>
+> {
+  const workspace = requireUuid(workspaceId, "workspace_id");
+  if (!workspace.ok) return workspace;
+  const user = requireUuid(userId, "user_id");
+  if (!user.ok) return user;
+
+  if (
+    !(COLLABORATION_WORKSPACE_INVITE_ROLES as readonly string[]).includes(role)
+  ) {
+    return { ok: false, message: "Invalid role" };
+  }
+
+  const result = await callRpc(
+    supabase,
+    COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateMemberRole,
+    {
+      p_workspace_id: workspace.data,
+      p_user_id: user.data,
+      p_role: role,
+    }
+  );
+  if (!result.ok) return result;
+
+  return {
+    ok: true,
+    data: {
+      workspace_id: workspace.data,
+      user_id: user.data,
+      role: asString(result.data.role) ?? role,
     },
   };
 }

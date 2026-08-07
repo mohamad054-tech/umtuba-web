@@ -19,6 +19,7 @@ import {
   sanitizeCollaborationMembershipError,
   suspendCollaborationWorkspaceMember,
   transferCollaborationWorkspaceOwnership,
+  updateCollaborationWorkspaceMemberRole,
 } from "./workspaceMembershipRuntime";
 
 const ROOT = process.cwd();
@@ -83,12 +84,16 @@ describe("Collaboration Membership Runtime — RPC catalog", () => {
       leaveWorkspace: "leave_collaboration_workspace",
       archive: "archive_collaboration_workspace",
       updateSettings: "update_collaboration_workspace_settings",
+      updateMemberRole: "update_collaboration_workspace_member_role",
     });
     expect(COLLABORATION_WORKSPACE_RPCS.revokeInvite).toBe(
       COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.revokeInvite
     );
     expect(COLLABORATION_WORKSPACE_RPCS.updateSettings).toBe(
       COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateSettings
+    );
+    expect(COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateMemberRole).toBe(
+      COLLABORATION_WORKSPACE_RPCS.updateMemberRole
     );
     expect(Object.keys(COLLABORATION_WORKSPACE_SPINE_RPCS)).not.toContain(
       "revokeInvite"
@@ -341,6 +346,70 @@ describe("Collaboration Membership Runtime — client guards", () => {
     ).toEqual({
       ok: true,
       data: { workspace_id: WS, owner_user_id: USER },
+    });
+  });
+
+  it("updates member role via spine RPC with assignable roles only", async () => {
+    const supabase = mockClient({
+      [COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateMemberRole]: {
+        data: { workspace_id: WS, user_id: USER, role: "manager" },
+        error: null,
+      },
+    });
+
+    expect(
+      await updateCollaborationWorkspaceMemberRole(
+        supabase,
+        WS,
+        USER,
+        "manager"
+      )
+    ).toEqual({
+      ok: true,
+      data: { workspace_id: WS, user_id: USER, role: "manager" },
+    });
+
+    expect(
+      await updateCollaborationWorkspaceMemberRole(supabase, WS, USER, "owner")
+    ).toEqual({ ok: false, message: "Invalid role" });
+
+    expect(
+      await updateCollaborationWorkspaceMemberRole(
+        supabase,
+        "not-a-uuid",
+        USER,
+        "member"
+      )
+    ).toEqual({ ok: false, message: "workspace_id must be a valid UUID" });
+
+    expect(
+      await updateCollaborationWorkspaceMemberRole(
+        supabase,
+        WS,
+        "not-a-uuid",
+        "member"
+      )
+    ).toEqual({ ok: false, message: "user_id must be a valid UUID" });
+  });
+
+  it("surfaces role-update denial through sanitizer", async () => {
+    const supabase = mockClient({
+      [COLLABORATION_MEMBERSHIP_RUNTIME_RPCS.updateMemberRole]: {
+        data: null,
+        error: { message: "Peer-admin protection: cannot mutate equal or higher rank" },
+      },
+    });
+
+    expect(
+      await updateCollaborationWorkspaceMemberRole(
+        supabase,
+        WS,
+        USER,
+        "admin"
+      )
+    ).toEqual({
+      ok: false,
+      message: "You are not allowed to perform this workspace action.",
     });
   });
 

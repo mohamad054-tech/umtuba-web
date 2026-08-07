@@ -9,6 +9,7 @@ import {
   COLLABORATION_WORKSPACE_KINDS,
   collaborationWorkspaceAllows,
   collaborationWorkspaceCanMutatePeer,
+  collaborationWorkspaceRoleRank,
   type CollaborationWorkspaceInviteRole,
   type CollaborationWorkspaceKind,
   type CollaborationWorkspaceRole,
@@ -75,6 +76,9 @@ export const COLLABORATION_UI_COPY = {
   suspendMember: "تعليق",
   removeMember: "إزالة",
   removeConfirm: "إزالة هذا العضو من المساحة؟",
+  updateMemberRole: "تحديث الدور",
+  roleUpdated: "تم تحديث دور العضو.",
+  roleSelectLabel: "الدور",
   lastOwnerProtectionTitle: "حماية المالك الأخير",
   lastOwnerProtectionBody:
     "المالك النشط لا يُعلَّق ولا يُزال ولا يغادر قبل نقل الملكية.",
@@ -200,6 +204,43 @@ export function isCollaborationInviteRole(
 ): role is CollaborationWorkspaceInviteRole {
   return (COLLABORATION_WORKSPACE_INVITE_ROLES as readonly string[]).includes(
     role
+  );
+}
+
+/** Roles assignable via update_collaboration_workspace_member_role (owner excluded). */
+export function isCollaborationAssignableMemberRole(
+  role: string
+): role is CollaborationWorkspaceInviteRole {
+  return isCollaborationInviteRole(role);
+}
+
+/**
+ * Defensive UI filter: only roles at or below the actor rank (RPC still enforces).
+ */
+export function collaborationAssignableMemberRolesForActor(
+  actorRole: CollaborationWorkspaceRole | string
+): readonly CollaborationWorkspaceInviteRole[] {
+  const actorRank = collaborationWorkspaceRoleRank(String(actorRole));
+  if (actorRank == null) return [];
+  return COLLABORATION_WORKSPACE_INVITE_ROLES.filter((role) => {
+    const rank = collaborationWorkspaceRoleRank(role);
+    return rank != null && rank <= actorRank;
+  });
+}
+
+export function canChangeCollaborationMemberRole(
+  actorRole: CollaborationWorkspaceRole | string,
+  targetRole: CollaborationWorkspaceRole | string,
+  targetUserId: string,
+  actorUserId: string,
+  targetStatus: string
+): boolean {
+  if (targetStatus !== "active") return false;
+  return canMutateCollaborationMember(
+    actorRole,
+    targetRole,
+    targetUserId,
+    actorUserId
   );
 }
 
