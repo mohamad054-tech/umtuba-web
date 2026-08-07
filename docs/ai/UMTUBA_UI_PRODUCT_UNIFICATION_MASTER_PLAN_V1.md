@@ -2,7 +2,8 @@
 
 **Program:** `UMTUBA_UI_PRODUCT_UNIFICATION`  
 **Owner:** Central Server  
-**Status:** U1 INTEGRATED · U2 IMPLEMENTED_PENDING_REVIEW  
+**Status:** U1 INTEGRATED · U2 INTEGRATED · U3 IMPLEMENTED_PENDING_REVIEW  
+**Central UI SoT tip:** `office/central-ui-product-integration-v1` @ `b330e5f142262c07a1a12a8fc2a064e7bca8c8b1`  
 **Baseline tip for first wave:** `origin/office/platform-commerce-learning-chrome-wiring-v1` @ `3b7315667ab6824062e89126b1f94bd729376082`  
 **Inventory:** `docs/ai/UMTUBA_FULL_PRODUCT_SURFACE_INVENTORY_V1.md`  
 **Migration required:** NO  
@@ -103,24 +104,42 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 
 | Workstream | Owner | Status |
 |------------|-------|--------|
-| UMTUBA_UI_PRODUCT_UNIFICATION | Central Server | **U1 INTEGRATED** · **U2 IMPLEMENTED_PENDING_REVIEW** |
-| Learning Bookmarks | Ã¢â‚¬â€ | COMPLETE (HISTORY_ALIGNED) |
-| Collaboration 20260917 | Agent4 lineage | GIT_LANDED_PENDING_REMOTE (SoT FF done) |
-| Commerce P6R2 | Desktop | WAITING_DEPENDENCY |
+| UMTUBA_UI_PRODUCT_UNIFICATION | Central Server | **U1 INTEGRATED** · **U2 INTEGRATED** · **U3 IMPLEMENTED_PENDING_REVIEW** |
+| Learning Bookmarks | — | COMPLETE (HISTORY_ALIGNED) |
+| Collaboration 20260917 | Agent4 lineage | HISTORY_ALIGNED / APPLIED |
+| Commerce P6R2 | Desktop | WAITING_TEST_ENV |
 | Translation | Computer 2 | FROZEN |
 
 ---
 
-## U2 Home Organization (this wave)
+## U2 Home Organization
 
 | Field | Value |
 |-------|-------|
-| State | **IMPLEMENTED_PENDING_REVIEW** |
+| State | **INTEGRATED** into central UI SoT |
 | Branch | `office/central-ui-home-organization-v1` |
-| Base | Central UI integration `office/central-ui-product-integration-v1` @ `5acb0a0…` |
+| Tip | `b330e5f142262c07a1a12a8fc2a064e7bca8c8b1` |
 | Preserves | video-first DiscoverExperience; U1 chrome; World internals untouched |
 | Platform entries | Section circles + arc portals wire real hrefs via `homePlatformEntryContract` |
 | Flags | `HOME_CIRCULAR_ARC_FOUNDATION_ENABLED=false`; preview gate unchanged |
 | Collaboration entry | DEFERRED (no `/workspaces` on baseline) |
 | Migration | NONE |
-| U3 Map | **NOT STARTED** |
+
+---
+
+## U3 World / Map consolidation (this wave)
+
+| Field | Value |
+|-------|-------|
+| State | **IMPLEMENTED_PENDING_REVIEW** (not auto-integrated) |
+| Branch | `office/central-ui-world-map-consolidation-v1` |
+| Worktree | `D:\umtuba-central\repos\umtuba-web-central-ui-world-map-consolidation-v1` |
+| Base | Central UI SoT @ `b330e5f…` (post-U2) |
+| Canonical World hub | `/world` |
+| Canonical city | `/world/city/[citySlug]` |
+| Legacy city | `/city/[citySlug]` → App Router alias redirect (route not deleted) |
+| Map internals | Preserved (`lib/world/**` not rewritten) |
+| Mobile | Affordance V1 unchanged — World not added to bottom nav; hub tip only |
+| Migration | NONE |
+| Remote DB | NONE |
+| U4 Platform hubs | **NOT STARTED** |

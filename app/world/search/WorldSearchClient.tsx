@@ -73,7 +73,10 @@ export default function WorldSearchClient({
 
   if (!enabled) {
     return (
-      <p className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100">
+      <p
+        role="status"
+        className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100"
+      >
         World Search is prepared but disabled pending platform approval.
       </p>
     );
@@ -81,7 +84,10 @@ export default function WorldSearchClient({
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
+      <section
+        aria-label="World search filters"
+        className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5"
+      >
         <div className="grid gap-3 md:grid-cols-4">
           <label className="md:col-span-2">
             <span className="text-xs font-bold text-white/45">Search World</span>
@@ -156,8 +162,15 @@ export default function WorldSearchClient({
         </div>
       </section>
 
-      {message ? <p className="text-sm text-white/50">{message}</p> : null}
-      <section className="grid gap-3 md:grid-cols-2">
+      {message ? (
+        <p role="status" className="text-sm text-white/50">
+          {message}
+        </p>
+      ) : null}
+      <section
+        aria-label="World search results"
+        className="grid gap-3 md:grid-cols-2"
+      >
         {results.map((result) => {
           const href =
             result.entity_type === "city"

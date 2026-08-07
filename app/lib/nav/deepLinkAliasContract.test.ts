@@ -10,6 +10,9 @@ import {
   PROFILE_INDEX_RESOLVER_PATH,
   buildPostFocusDeepLink,
   isDiscoverHomeAliasPath,
+  isLegacyCityAliasPath,
+  CITY_WORLD_ALIAS_CANONICAL_PREFIX,
+  CITY_WORLD_ALIAS_LEGACY_PREFIX,
 } from "./deepLinkAliasContract";
 import {
   APP_ROUTES,
@@ -104,6 +107,19 @@ describe("Deep-link & Alias Clarity V1", () => {
       const redirectSrc = read("lib/supabase/redirect.ts");
       expect(redirectSrc).toMatch(/fallback = "\/discover"/);
       expect(redirectSrc).toMatch(/Deep-link & Alias Clarity V1/);
+    });
+  });
+
+  describe("U3 /city → /world/city alias", () => {
+    it("documents legacy city alias without deleting the route", () => {
+      expect(CITY_WORLD_ALIAS_LEGACY_PREFIX).toBe("/city");
+      expect(CITY_WORLD_ALIAS_CANONICAL_PREFIX).toBe("/world/city");
+      expect(isLegacyCityAliasPath("/city/amman")).toBe(true);
+      expect(isLegacyCityAliasPath("/world/city/amman")).toBe(false);
+      const cityPage = read("app/city/[citySlug]/page.tsx");
+      expect(cityPage).toMatch(/redirect\(/);
+      expect(cityPage).toMatch(/buildWorldCityHref/);
+      expect(cityPage).not.toMatch(/CityExperience/);
     });
   });
 });

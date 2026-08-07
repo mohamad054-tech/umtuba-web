@@ -38,6 +38,10 @@ export default async function WorldDiscoveryPage({ searchParams }: Props) {
             local services. GPS is provided by your device and is always
             optional; UMTUBA does not store precise user location here.
           </p>
+          <p className="mt-4 text-xs text-white/40 md:hidden">
+            Tip: open World from Home shortcuts or your account menu on mobile —
+            it is not a permanent bottom-nav tab.
+          </p>
         </header>
         <Suspense
           fallback={

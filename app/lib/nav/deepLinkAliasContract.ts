@@ -62,3 +62,15 @@ export function isDiscoverHomeAliasPath(pathname: string): boolean {
     path.startsWith(`${DISCOVER_HOME_ALIAS_PATH}/`)
   );
 }
+
+/**
+ * U3 — Legacy city prototype alias.
+ * `/city/[slug]` → `/world/city/[slug]` (App Router redirect; route not deleted).
+ */
+export const CITY_WORLD_ALIAS_LEGACY_PREFIX = "/city";
+export const CITY_WORLD_ALIAS_CANONICAL_PREFIX = `${APP_ROUTES.worldDiscovery}/city`;
+
+export function isLegacyCityAliasPath(pathname: string): boolean {
+  const path = pathname.split("?")[0] || "";
+  return path === "/city" || path.startsWith("/city/");
+}

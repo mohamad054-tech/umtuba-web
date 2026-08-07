@@ -51,11 +51,17 @@ export default function WorldLayerTabs({
 
   return (
     <section>
-      <div className="flex gap-2 overflow-x-auto pb-3" aria-label="Profile layers">
+      <div
+        className="flex gap-2 overflow-x-auto pb-3"
+        role="tablist"
+        aria-label="Profile layers"
+      >
         {enabledTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
+            role="tab"
+            aria-selected={selected.id === tab.id}
             onClick={() => {
               setActive(tab.id);
               const params = new URLSearchParams(window.location.search);
@@ -64,7 +70,6 @@ export default function WorldLayerTabs({
                 scroll: false,
               });
             }}
-            aria-pressed={selected.id === tab.id}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold ${
               selected.id === tab.id
                 ? "bg-white text-black"
@@ -75,7 +80,9 @@ export default function WorldLayerTabs({
           </button>
         ))}
       </div>
-      <div className="mt-3">{selected.content}</div>
+      <div className="mt-3" role="tabpanel" aria-label={selected.label}>
+        {selected.content}
+      </div>
     </section>
   );
 }

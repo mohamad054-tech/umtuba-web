@@ -70,6 +70,9 @@ export {
   PROFILE_INDEX_RESOLVER_PATH,
   buildPostFocusDeepLink,
   isDiscoverHomeAliasPath,
+  isLegacyCityAliasPath,
+  CITY_WORLD_ALIAS_CANONICAL_PREFIX,
+  CITY_WORLD_ALIAS_LEGACY_PREFIX,
 } from "./deepLinkAliasContract";
 
 export {
@@ -134,3 +137,12 @@ export {
   assertHomeCircleHrefContract,
   resolveHomeArcPortalHref,
 } from "./homePlatformEntryContract";
+
+export {
+  WORLD_CANONICAL_HUB_PATH,
+  WORLD_CITY_LEGACY_PREFIX,
+  WORLD_CITY_ROUTE_CLASSIFICATION,
+  canonicalWorldCityPath,
+  isLegacyCityPath,
+  resolveLegacyCityAliasTarget,
+} from "./worldRouteContract";

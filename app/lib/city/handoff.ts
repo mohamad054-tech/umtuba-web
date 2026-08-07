@@ -247,8 +247,14 @@ export function buildCityHandoffQuery(payload: CityHandoffPayload) {
   return params.toString();
 }
 
+/**
+ * Globe → city handoff href.
+ * U3: emit canonical World city path (`/world/city/…`).
+ * Legacy `/city/…` remains an App Router alias that redirects here.
+ */
 export function buildCityHref(payload: CityHandoffPayload) {
-  return `/city/${encodeURIComponent(payload.citySlug)}?${buildCityHandoffQuery(payload)}`;
+  const slug = encodeURIComponent(payload.citySlug);
+  return `/world/city/${slug}?${buildCityHandoffQuery(payload)}`;
 }
 
 export function shouldUseRouterBackForCity(handoff: CityHandoffPayload | null) {

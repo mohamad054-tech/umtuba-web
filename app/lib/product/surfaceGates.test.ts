@@ -114,13 +114,16 @@ describe("production source contracts", () => {
     expect(journey).toMatch(/isExperimentalRouteAvailable/);
   });
 
-  it("keeps city production path free of placeholder experience", () => {
+  it("aliases legacy city prototype to canonical World city", () => {
     const city = readFileSync(
       join(ROOT, "app/city/[citySlug]/page.tsx"),
       "utf8"
     );
-    expect(city).toMatch(/City experience is being prepared/);
-    expect(city).toMatch(/isExperimentalRouteAvailable/);
+    expect(city).toMatch(/legacy city prototype alias/i);
+    expect(city).toMatch(/buildWorldCityHref|redirect/);
+    expect(city).toMatch(/redirect\(/);
+    expect(city).not.toMatch(/CityExperience/);
+    expect(city).not.toMatch(/isExperimentalRouteAvailable/);
   });
 
   it("does not point normal nav at gated labs", () => {

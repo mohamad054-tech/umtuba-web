@@ -151,10 +151,10 @@ describe("globe-to-city motion helpers", () => {
     });
 
     const href = buildCityHref(handoff);
-    expect(href).toContain("/city/istanbul");
+    expect(href).toContain("/world/city/istanbul");
     expect(href).toContain("from=globe");
-    expect(resolveCityNavigationHref(handoff, "/city/istanbul")).toContain(
-      "/city/istanbul"
+    expect(resolveCityNavigationHref(handoff, "/world/city/istanbul")).toContain(
+      "/world/city/istanbul"
     );
     expect(shouldUseRouterBackForCity(handoff)).toBe(true);
   });

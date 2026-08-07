@@ -1,47 +1,44 @@
-import { Suspense } from "react";
-import ProductEmptyState from "../../components/product/ProductEmptyState";
-import { APP_ROUTES, buildDiscoverCityHref } from "../../lib/nav";
-import { isExperimentalRouteAvailable } from "../../lib/product/surfaceGates";
-import CityExperience from "./CityExperience";
+import { redirect } from "next/navigation";
+import { buildWorldCityHref } from "../../lib/nav";
+
+export const dynamic = "force-dynamic";
 
 type CityPageProps = {
   params: Promise<{ citySlug: string }>;
+  searchParams?:
+    | Promise<Record<string, string | string[] | undefined>>
+    | Record<string, string | string[] | undefined>;
 };
 
-function CityFallback() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-[#050510] text-white">
-      <p className="text-sm text-white/50">Opening city...</p>
-    </main>
-  );
-}
-
 /**
- * City prototype — full placeholder UI in development only.
- * Production: transparent “being prepared” state (no fake city data).
+ * U3 World/Map consolidation — legacy city prototype alias.
+ * Canonical city experience: `/world/city/[citySlug]`.
+ * Preserves query string for handoff (`from`, `city`, `vid`, …).
+ * Route file kept (not deleted) for backward compatibility.
  */
-export default async function CityPage({ params }: CityPageProps) {
+export default async function CityLegacyAliasPage({
+  params,
+  searchParams,
+}: CityPageProps) {
   const { citySlug } = await params;
-  const slug = decodeURIComponent(citySlug || "city");
-
-  if (!isExperimentalRouteAvailable()) {
-    const label = slug.replace(/-/g, " ");
-    return (
-      <ProductEmptyState
-        eyebrow="City"
-        title="City experience is being prepared"
-        description={`We’re building a real city view for ${label}. Meanwhile, explore creators and videos in Discover.`}
-        primaryHref={buildDiscoverCityHref(label)}
-        primaryLabel="Explore in Discover"
-        secondaryHref={APP_ROUTES.live}
-        secondaryLabel="Browse Live"
-      />
-    );
+  const slug = decodeURIComponent(citySlug || "").trim();
+  const targetBase = buildWorldCityHref(slug);
+  // Invalid slug → World hub (safe fallback; do not 404 prototype callers).
+  if (!targetBase || targetBase.endsWith("/city/")) {
+    redirect("/world");
   }
 
-  return (
-    <Suspense fallback={<CityFallback />}>
-      <CityExperience citySlug={slug} />
-    </Suspense>
-  );
+  const raw = await Promise.resolve(searchParams ?? {});
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(raw)) {
+    if (typeof value === "string" && value.trim()) {
+      qs.set(key, value.trim());
+    } else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === "string" && item.trim()) qs.append(key, item.trim());
+      }
+    }
+  }
+  const suffix = qs.toString();
+  redirect(suffix ? `${targetBase}?${suffix}` : targetBase);
 }
