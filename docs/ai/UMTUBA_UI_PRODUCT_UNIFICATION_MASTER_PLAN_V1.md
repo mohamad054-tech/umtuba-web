@@ -1,25 +1,25 @@
 # UMTUBA UI / Product Unification Master Plan V1
 
-**Program:** `UMTUBA_UI_PRODUCT_UNIFICATION`  
-**Owner:** Central Server  
-**Status:** U1 INTEGRATED · U2 INTEGRATED · U3 IMPLEMENTED_PENDING_REVIEW  
-**Central UI SoT tip:** `office/central-ui-product-integration-v1` @ `b330e5f142262c07a1a12a8fc2a064e7bca8c8b1`  
-**Baseline tip for first wave:** `origin/office/platform-commerce-learning-chrome-wiring-v1` @ `3b7315667ab6824062e89126b1f94bd729376082`  
-**Inventory:** `docs/ai/UMTUBA_FULL_PRODUCT_SURFACE_INVENTORY_V1.md`  
-**Migration required:** NO  
-**Remote DB required:** NO  
+**Program:** `UMTUBA_UI_PRODUCT_UNIFICATION`
+**Owner:** Central Server
+**Status:** U1 INTEGRATED · U2 INTEGRATED · U3 IMPLEMENTED_PENDING_REVIEW
+**Central UI SoT tip:** `office/central-ui-product-integration-v1` @ `b330e5f142262c07a1a12a8fc2a064e7bca8c8b1`
+**Baseline tip for first wave:** `origin/office/platform-commerce-learning-chrome-wiring-v1` @ `3b7315667ab6824062e89126b1f94bd729376082`
+**Inventory:** `docs/ai/UMTUBA_FULL_PRODUCT_SURFACE_INVENTORY_V1.md`
+**Migration required:** NO
+**Remote DB required:** NO
 
 ## Canonical experience (from what already exists)
 
-1. **Home role:** Video-first social/discovery feed (`DiscoverExperience`), not a marketing landing.  
-2. **Platform entry:** Desktop primary = Home / World / Learning / Store / Live / Messages; mobile primary unchanged (Home/Live/Messages/Profile); Store+World also in user-menu You group for mobile discovery; Collaboration entry DEFERRED (no `/workspaces` on chrome baseline).  
-3. **Global nav:** `AppTopNav` + `AppMobileBottomNav` + `AppChrome`.  
-4. **Platform-local nav:** LearningShell / StoreShell / SellerOpsShell / AiHubShell.  
-5. **Account:** UserMenu + `/profile` + `/settings`.  
-6. **Search:** Top-nav Search Ã¢â€ â€™ `/search`.  
-7. **Map:** World Discovery `/world` (desktop-primary; mobile policy excludes World from bottom nav).  
-8. **Notifications:** NotificationBell Ã¢â€ â€™ `/notifications`.  
-9. **Return Home:** UMTUBA mark Ã¢â€ â€™ `/`.  
+1. **Home role:** Video-first social/discovery feed (`DiscoverExperience`), not a marketing landing.
+2. **Platform entry:** Desktop primary = Home / World / Learning / Store / Live / Messages; mobile primary unchanged (Home/Live/Messages/Profile); Store+World also in user-menu You group for mobile discovery; Collaboration entry DEFERRED (no `/workspaces` on chrome baseline).
+3. **Global nav:** `AppTopNav` + `AppMobileBottomNav` + `AppChrome`.
+4. **Platform-local nav:** LearningShell / StoreShell / SellerOpsShell / AiHubShell.
+5. **Account:** UserMenu + `/profile` + `/settings`.
+6. **Search:** Top-nav Search Ã¢â€ â€™ `/search`.
+7. **Map:** World Discovery `/world` (desktop-primary; mobile policy excludes World from bottom nav).
+8. **Notifications:** NotificationBell Ã¢â€ â€™ `/notifications`.
+9. **Return Home:** UMTUBA mark Ã¢â€ â€™ `/`.
 
 Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live feed Home without replacing either blindly.
 
@@ -40,17 +40,17 @@ Do **not** invent a greenfield IA. Reconcile circular-arc foundation with live f
 | P1-5 | Learning tip drift | `/learning/saved` on Learning SoT not on chrome tip | Later FF/port Learning UI onto UI baseline | Learning IDLE ok for inventory | M | after assign |
 
 ### P2
-- Token/spacing unification across shells  
-- Seller/admin table mobile layouts  
-- AI hub discoverability  
+- Token/spacing unification across shells
+- Seller/admin table mobile layouts
+- AI hub discoverability
 
 ### P3
-- Home perf follow-through (`perf-home-javascript-optimization-v1`)  
-- Living-nav prototype containment  
+- Home perf follow-through (`perf-home-javascript-optimization-v1`)
+- Living-nav prototype containment
 
 ### P4
-- Divergent Collab branch cleanup (docs only until GO)  
-- Dead secondary surface catalog enforcement  
+- Divergent Collab branch cleanup (docs only until GO)
+- Dead secondary surface catalog enforcement
 
 ---
 
