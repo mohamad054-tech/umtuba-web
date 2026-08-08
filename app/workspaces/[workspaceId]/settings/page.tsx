@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
 import CollaborationShell from "../../../components/collaboration/CollaborationShell";
+import LearningResourceLinksPanel from "../../../components/collaboration/LearningResourceLinksPanel";
 import WorkspaceLifecyclePanel from "../../../components/collaboration/WorkspaceLifecyclePanel";
 import WorkspaceSettingsForm from "../../../components/collaboration/WorkspaceSettingsForm";
 import ProductErrorState from "../../../components/product/ProductErrorState";
+import {
+  listEligibleLearningSpacesForBinding,
+  listLinkedLearningWorkspaceResources,
+} from "../../../../lib/collaboration/learningWorkspaceResourceBinding";
 import {
   getCollaborationWorkspaceDetail,
   listCollaborationWorkspaceMembers,
@@ -10,6 +15,7 @@ import {
 import {
   COLLABORATION_UI_COPY,
   COLLABORATION_UI_ROUTES,
+  canManageCollaborationResourceLinks,
   canManageCollaborationWorkspaceSettings,
 } from "../../../../lib/collaboration/workspaceUi";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
@@ -56,10 +62,28 @@ export default async function WorkspaceSettingsPage({ params }: PageProps) {
     );
   }
 
-  const members = await listCollaborationWorkspaceMembers(supabase, workspaceId);
+  const [members, linked, eligible] = await Promise.all([
+    listCollaborationWorkspaceMembers(supabase, workspaceId),
+    listLinkedLearningWorkspaceResources(supabase, workspaceId),
+    listEligibleLearningSpacesForBinding(supabase, {
+      userId: user.id,
+      workspaceId,
+    }),
+  ]);
+
   const canEditSettings = canManageCollaborationWorkspaceSettings(
     detail.data.myRole
   );
+  const canManageLinks = canManageCollaborationResourceLinks(
+    detail.data.myRole
+  );
+
+  const learningLoadError =
+    !linked.ok
+      ? linked.message
+      : !eligible.ok
+        ? eligible.message
+        : null;
 
   return (
     <CollaborationShell
@@ -101,6 +125,14 @@ export default async function WorkspaceSettingsPage({ params }: PageProps) {
             </dl>
           </section>
         )}
+
+        <LearningResourceLinksPanel
+          workspaceId={workspaceId}
+          linked={linked.ok ? linked.data : []}
+          eligible={eligible.ok ? eligible.data : []}
+          canManage={canManageLinks}
+          loadError={learningLoadError}
+        />
 
         <WorkspaceLifecyclePanel
           workspaceId={workspaceId}

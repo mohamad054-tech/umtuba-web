@@ -1,37 +1,37 @@
 # Current Task
 
-## COLLABORATION SoT — Learning Resource Binding INTEGRATED
+## COLLABORATION SoT — Learning Resource Link/Unlink UI V1
 
-- **Milestone closed:** `COLLABORATION_WORKSPACE_RESOURCE_LINK_LEARNING_BINDING_SOT_INTEGRATION_V1`
+- **Milestone:** `COLLABORATION_WORKSPACE_LEARNING_RESOURCE_LINK_UNLINK_UI_V1`
 - **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Integrated feature:** `office/collaboration-workspace-resource-link-learning-binding-v1` @ `298d91c`
-- **Method:** fast-forward only (`fd1ff04` → `298d91c`)
+- **Base HEAD:** `f687641e0147a29feb50f0a912cdfb0280da9b30`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
 
 ## Status
 
-- Learning Binding V1 = **INTEGRATED / CLOSED**
-- Canonical binding target = Learning Space (`learning_spaces.id` → `learning_space`)
-- No migration required / no migration applied
-- No Learning lifecycle mutation
-- Platform flag remains default `false`
-- Minimal workspace UI for Learning link/unlink remains a separate gap
-- Commerce and advertiser bindings remain deferred
+- Implementing / closing Learning link/unlink UI on workspace settings
+- Reuses Learning Resource Binding V1 contracts (no backend redesign)
+- No migration; platform flag remains default `false`
+- Commerce / advertiser bindings remain deferred
 
-## Do NOT start automatically
+## Allowed scope
 
-- Learning link/unlink UI
-- Commerce / advertiser bindings
+- Collaboration Learning link/unlink UI surface + wiring
+- Binding list helpers needed by the UI
+- Focused tests + AI handoff docs
+
+## Forbidden scope
+
+- New Commerce / advertiser bindings
+- Speculative schema / migrations (unless contract-required — STOP first)
+- Learning lifecycle mutation / Learning internals beyond existing boundary
 - Platform flag enablement
-- UM Core P17
+- Unrelated Collaboration features
 
 ## CLOSED ON SoT (do not redo)
 
 - Workspace Spine / Membership / Settings Lifecycle UI
-- `20260917` APPLIED + VERIFIED
 - Member Role Management UI V1
 - Resource Link Foundation V1
 - Resource Link Mutation Runtime V1 + `20260919`
 - Learning Resource Binding V1
-- stale `20260898` NON-SOT; remote Commerce only
-- smoke/keepalive NOT SoT

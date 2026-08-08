@@ -7,6 +7,8 @@ import {
   createLearningWorkspaceResourceReference,
   createLearningWorkspaceResourceReferenceModel,
   learningSpaceResourceHref,
+  listEligibleLearningSpacesForBinding,
+  listLinkedLearningWorkspaceResources,
   resolveLearningWorkspaceResourceFromLink,
   resolveLearningWorkspaceResourceReference,
   unlinkLearningWorkspaceResourceReference,
@@ -354,5 +356,173 @@ describe("learningWorkspaceResourceBinding", () => {
       ok: false,
       message: "Unsupported collaboration resource type.",
     });
+  });
+
+  it("lists only Learning links for a workspace and skips other types", async () => {
+    const supabase = {
+      from: vi.fn(() => ({
+        select: () => ({
+          eq: () => ({
+            eq: () => ({
+              order: async () => ({
+                data: [
+                  {
+                    id: LINK,
+                    workspace_id: WS,
+                    resource_type: "learning_space",
+                    resource_id: SPACE,
+                    relationship_type: "linked",
+                    status: "active",
+                    linked_by: null,
+                    linked_at: "2026-01-02T00:00:00Z",
+                    metadata: {
+                      platform: "learning",
+                      product: "learning_space",
+                      display_name: "UM Academy",
+                      slug: "um-academy",
+                      status: "active",
+                      mode: "creator_academy",
+                      href: learningSpaceResourceHref(SPACE),
+                    },
+                    created_at: "2026-01-02T00:00:00Z",
+                    updated_at: "2026-01-02T00:00:00Z",
+                  },
+                  {
+                    id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+                    workspace_id: WS,
+                    resource_type: "store",
+                    resource_id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+                    relationship_type: "linked",
+                    status: "active",
+                    linked_by: null,
+                    linked_at: "2026-01-03T00:00:00Z",
+                    metadata: {},
+                    created_at: "2026-01-03T00:00:00Z",
+                    updated_at: "2026-01-03T00:00:00Z",
+                  },
+                ],
+                error: null,
+              }),
+            }),
+            order: async () => ({ data: [], error: null }),
+          }),
+        }),
+      })),
+    } as unknown as import("@supabase/supabase-js").SupabaseClient;
+
+    const result = await listLinkedLearningWorkspaceResources(supabase, WS);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0]?.resource.resourceId).toBe(SPACE);
+      expect(result.data[0]?.resource.displayLabel).toBe("UM Academy");
+    }
+  });
+
+  it("lists eligible Learning spaces excluding ones already linked here", async () => {
+    const SPACE_B = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
+    const supabase = {
+      from: vi.fn((table: string) => {
+        if (table === "learning_space_members") {
+          return {
+            select: () => ({
+              eq: () => ({
+                eq: () => ({
+                  in: async () => ({
+                    data: [
+                      { space_id: SPACE, role: "owner" },
+                      { space_id: SPACE_B, role: "admin" },
+                    ],
+                    error: null,
+                  }),
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === "learning_spaces") {
+          return {
+            select: () => ({
+              in: () => ({
+                order: async () => ({
+                  data: [
+                    spaceRow(),
+                    {
+                      id: SPACE_B,
+                      name: "Second Academy",
+                      slug: "second-academy",
+                      status: "active",
+                      mode: "bootcamp",
+                    },
+                  ],
+                  error: null,
+                }),
+              }),
+            }),
+          };
+        }
+        if (table === "collaboration_workspace_resource_links") {
+          return {
+            select: () => ({
+              eq: () => ({
+                eq: () => ({
+                  order: async () => ({
+                    data: [
+                      {
+                        id: LINK,
+                        workspace_id: WS,
+                        resource_type: "learning_space",
+                        resource_id: SPACE,
+                        relationship_type: "linked",
+                        status: "active",
+                        linked_by: null,
+                        linked_at: "2026-01-02T00:00:00Z",
+                        metadata: {
+                          display_name: "UM Academy",
+                          slug: "um-academy",
+                          status: "active",
+                          mode: "creator_academy",
+                          href: learningSpaceResourceHref(SPACE),
+                        },
+                        created_at: "2026-01-02T00:00:00Z",
+                        updated_at: "2026-01-02T00:00:00Z",
+                      },
+                    ],
+                    error: null,
+                  }),
+                }),
+                order: async () => ({ data: [], error: null }),
+              }),
+            }),
+          };
+        }
+        throw new Error(`unexpected table ${table}`);
+      }),
+    } as unknown as import("@supabase/supabase-js").SupabaseClient;
+
+    const result = await listEligibleLearningSpacesForBinding(supabase, {
+      userId: "11111111-1111-4111-8111-111111111111",
+      workspaceId: WS,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.map((s) => s.resourceId)).toEqual([SPACE_B]);
+      expect(result.data[0]?.displayLabel).toBe("Second Academy");
+    }
+  });
+
+  it("fail-closes eligible listing on invalid workspace id", async () => {
+    const supabase = {
+      from: vi.fn(),
+    } as unknown as import("@supabase/supabase-js").SupabaseClient;
+    const result = await listEligibleLearningSpacesForBinding(supabase, {
+      userId: "11111111-1111-4111-8111-111111111111",
+      workspaceId: "bad",
+    });
+    expect(result).toEqual({
+      ok: false,
+      message: "workspace_id must be a valid UUID.",
+    });
+    expect(supabase.from).not.toHaveBeenCalled();
   });
 });

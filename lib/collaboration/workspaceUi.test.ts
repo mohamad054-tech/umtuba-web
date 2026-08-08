@@ -7,6 +7,7 @@ import {
   COLLABORATION_UI_ROUTES,
   canChangeCollaborationMemberRole,
   canManageCollaborationInvites,
+  canManageCollaborationResourceLinks,
   canViewCollaborationInvites,
   collaborationAssignableMemberRolesForActor,
   collaborationKindLabel,
@@ -67,6 +68,11 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     ).toBe(false);
     expect(canManageCollaborationInvites("manager")).toBe(true);
     expect(canViewCollaborationInvites("member")).toBe(false);
+    expect(canManageCollaborationResourceLinks("owner")).toBe(true);
+    expect(canManageCollaborationResourceLinks("admin")).toBe(true);
+    expect(canManageCollaborationResourceLinks("manager")).toBe(false);
+    expect(canManageCollaborationResourceLinks("member")).toBe(false);
+    expect(COLLABORATION_UI_COPY.learningLinksTitle).toMatch(/تعلّم/);
     expect(
       shortenCollaborationId("11111111-1111-4111-8111-111111111111")
     ).toMatch(/…/);
@@ -89,8 +95,10 @@ describe("Collaboration Workspace UI Foundation V1", () => {
       "app/components/collaboration/CreateWorkspaceDialog.tsx",
       "app/components/collaboration/WorkspaceSettingsForm.tsx",
       "app/components/collaboration/WorkspaceLifecyclePanel.tsx",
+      "app/components/collaboration/LearningResourceLinksPanel.tsx",
       "app/actions/collaboration.ts",
       "lib/collaboration/workspaceQueries.ts",
+      "lib/collaboration/learningWorkspaceResourceBinding.ts",
     ];
     for (const rel of files) {
       expect(existsSync(join(ROOT, rel))).toBe(true);
@@ -122,8 +130,12 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     expect(actions).toMatch(/updateCollaborationWorkspaceSettings/);
     expect(actions).toMatch(/updateCollaborationWorkspaceMemberRole/);
     expect(actions).toMatch(/leaveCollaborationWorkspace/);
-    expect(actions).not.toMatch(/learning_/);
+    expect(actions).toMatch(/createLearningWorkspaceResourceReference/);
+    expect(actions).toMatch(/unlinkLearningWorkspaceResourceReference/);
+    expect(actions).toMatch(/linkLearningWorkspaceResourceAction/);
+    expect(actions).toMatch(/unlinkLearningWorkspaceResourceAction/);
     expect(actions).not.toMatch(/from\("stores"\)/);
+    expect(actions).not.toMatch(/advertiser/);
 
     const membersList = readFileSync(
       join(ROOT, "app/components/collaboration/MembersList.tsx"),
@@ -131,5 +143,22 @@ describe("Collaboration Workspace UI Foundation V1", () => {
     );
     expect(membersList).toMatch(/updateCollaborationWorkspaceMemberRoleAction/);
     expect(membersList).toMatch(/collaborationAssignableMemberRolesForActor/);
+
+    const learningPanel = readFileSync(
+      join(ROOT, "app/components/collaboration/LearningResourceLinksPanel.tsx"),
+      "utf8"
+    );
+    expect(learningPanel).toMatch(/linkLearningWorkspaceResourceAction/);
+    expect(learningPanel).toMatch(/unlinkLearningWorkspaceResourceAction/);
+    expect(learningPanel).toMatch(/learningLinksEmpty/);
+
+    const settingsPage = readFileSync(
+      join(ROOT, "app/workspaces/[workspaceId]/settings/page.tsx"),
+      "utf8"
+    );
+    expect(settingsPage).toMatch(/LearningResourceLinksPanel/);
+    expect(settingsPage).toMatch(/listLinkedLearningWorkspaceResources/);
+    expect(settingsPage).toMatch(/listEligibleLearningSpacesForBinding/);
+    expect(settingsPage).toMatch(/canManageCollaborationResourceLinks/);
   });
 });

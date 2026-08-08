@@ -7,6 +7,10 @@ import {
   rejectIfCollaborationPlatformDisabled,
 } from "../../lib/collaboration/collaborationPlatformGate";
 import {
+  createLearningWorkspaceResourceReference,
+  unlinkLearningWorkspaceResourceReference,
+} from "../../lib/collaboration/learningWorkspaceResourceBinding";
+import {
   acceptCollaborationWorkspaceInvite,
   archiveCollaborationWorkspace,
   createCollaborationWorkspace,
@@ -422,6 +426,70 @@ export async function updateCollaborationWorkspaceMemberRoleAction(
   return {
     ok: true,
     message: COLLABORATION_UI_COPY.roleUpdated,
+    workspaceId,
+  };
+}
+
+export async function linkLearningWorkspaceResourceAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const spaceId = String(formData.get("spaceId") ?? "");
+  const supabase = await createClient();
+  const result = await createLearningWorkspaceResourceReference(supabase, {
+    workspaceId,
+    spaceId,
+  });
+
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: COLLABORATION_UI_COPY.learningLinkedSuccess,
+    workspaceId,
+  };
+}
+
+export async function unlinkLearningWorkspaceResourceAction(
+  _prev: CollaborationActionState | null,
+  formData: FormData
+): Promise<CollaborationActionState> {
+  const disabled = rejectIfCollaborationPlatformDisabled();
+  if (disabled) return disabled;
+
+  const user = await requireUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${COLLABORATION_UI_ROUTES.root}`);
+  }
+
+  const workspaceId = String(formData.get("workspaceId") ?? "");
+  const spaceId = String(formData.get("spaceId") ?? "");
+  const supabase = await createClient();
+  const result = await unlinkLearningWorkspaceResourceReference(supabase, {
+    workspaceId,
+    spaceId,
+  });
+
+  if (!result.ok) {
+    return { ok: false, message: result.message };
+  }
+
+  revalidateWorkspaces(workspaceId);
+  return {
+    ok: true,
+    message: COLLABORATION_UI_COPY.learningUnlinkedSuccess,
     workspaceId,
   };
 }

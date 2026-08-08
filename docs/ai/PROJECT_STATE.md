@@ -6,7 +6,7 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Learning Resource Binding V1 INTEGRATED (`298d91c` + docs closeout) |
+| Tip | Learning Resource Link/Unlink UI V1 (on Learning Binding SoT) |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
@@ -18,6 +18,8 @@
 - Learning Resource Binding V1 INTEGRATED / CLOSED on SoT
   - Canonical target: Learning Space (`learning_spaces.id` → `learning_space`)
   - No migration; no Learning lifecycle mutation
+- Learning Resource Link/Unlink UI V1 CLOSED on SoT
+  - Settings panel: view / link / unlink via binding contracts
 
 ### Ops forks (NOT SoT)
 
@@ -26,10 +28,9 @@
 
 ### Deferred
 
-- Minimal workspace UI for Learning link/unlink
 - Commerce / advertiser resource-link bindings
 - Invite expansion
-- Credentialed E2E role-update / mutation smoke
+- Credentialed E2E role-update / mutation / link-unlink smoke
 
 ### Flag
 

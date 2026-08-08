@@ -20,6 +20,7 @@ import {
   type CollaborationResourceReference,
   type CollaborationWorkspaceResourceLinkRecord,
   getCollaborationWorkspaceResourceLinkByResource,
+  listCollaborationWorkspaceResourceLinks,
   validateCollaborationResourceReference,
 } from "./workspaceResourceLinkFoundation";
 import {
@@ -63,6 +64,18 @@ export type CreateLearningWorkspaceResourceReferenceInput = {
   readonly spaceId: string;
   readonly relationshipType?: CollaborationResourceLinkCreateIntent["relationshipType"];
 };
+
+export type LinkedLearningWorkspaceResource = {
+  readonly linkId: string;
+  readonly workspaceId: string;
+  readonly relationshipType: CollaborationWorkspaceResourceLinkRecord["relationshipType"];
+  readonly status: CollaborationWorkspaceResourceLinkRecord["status"];
+  readonly linkedAt: string;
+  readonly resource: LearningWorkspaceResourceResolved;
+};
+
+/** Learning Space roles that satisfy `can_manage_learning_space`. */
+const LEARNING_SPACE_MANAGE_ROLES = ["owner", "admin"] as const;
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)
@@ -364,4 +377,126 @@ export function resolveLearningWorkspaceResourceFromLink(
       href,
     },
   };
+}
+
+/**
+ * List Learning Space links currently bound to a Collaboration workspace.
+ * Non-Learning resource types are ignored (Commerce/advertiser stay deferred).
+ */
+export async function listLinkedLearningWorkspaceResources(
+  supabase: AnyClient,
+  workspaceId: string
+): Promise<
+  CollaborationResourceLinkResult<readonly LinkedLearningWorkspaceResource[]>
+> {
+  const listed = await listCollaborationWorkspaceResourceLinks(
+    supabase,
+    workspaceId,
+    { status: "active" }
+  );
+  if (!listed.ok) return { ok: false, message: listed.message };
+
+  const linked: LinkedLearningWorkspaceResource[] = [];
+  for (const link of listed.data) {
+    if (link.resourceType !== LEARNING_WORKSPACE_RESOURCE_TYPE) continue;
+    const resolved = resolveLearningWorkspaceResourceFromLink(link);
+    if (!resolved.ok) return { ok: false, message: resolved.message };
+    linked.push({
+      linkId: link.id,
+      workspaceId: link.workspaceId,
+      relationshipType: link.relationshipType,
+      status: link.status,
+      linkedAt: link.linkedAt,
+      resource: resolved.data,
+    });
+  }
+  return { ok: true, data: linked };
+}
+
+/**
+ * Learning Spaces the actor can manage that are not already linked on this
+ * workspace. Cross-workspace uniqueness remains enforced by mutation RPCs.
+ */
+export async function listEligibleLearningSpacesForBinding(
+  supabase: AnyClient,
+  input: { userId: string; workspaceId: string }
+): Promise<
+  CollaborationResourceLinkResult<readonly LearningWorkspaceResourceResolved[]>
+> {
+  if (!isCollaborationUuid(input.userId)) {
+    return { ok: false, message: "user_id must be a valid UUID." };
+  }
+  if (!isCollaborationUuid(input.workspaceId)) {
+    return { ok: false, message: "workspace_id must be a valid UUID." };
+  }
+
+  const { data: memberships, error: memErr } = await supabase
+    .from("learning_space_members")
+    .select("space_id, role")
+    .eq("user_id", input.userId)
+    .eq("status", "active")
+    .in("role", [...LEARNING_SPACE_MANAGE_ROLES]);
+
+  if (memErr) {
+    return {
+      ok: false,
+      message: sanitizeLearningWorkspaceBindingError(memErr.message),
+    };
+  }
+
+  const spaceIds = new Set<string>();
+  for (const row of memberships ?? []) {
+    const rec = asRecord(row);
+    const spaceId = asString(rec?.space_id);
+    if (spaceId && isCollaborationUuid(spaceId)) spaceIds.add(spaceId);
+  }
+  if (spaceIds.size === 0) return { ok: true, data: [] };
+
+  const ids = [...spaceIds];
+  const { data: spaces, error: spaceErr } = await supabase
+    .from("learning_spaces")
+    .select("id, name, slug, status, mode")
+    .in("id", ids)
+    .order("name", { ascending: true });
+
+  if (spaceErr) {
+    return {
+      ok: false,
+      message: sanitizeLearningWorkspaceBindingError(spaceErr.message),
+    };
+  }
+
+  const alreadyLinked = await listLinkedLearningWorkspaceResources(
+    supabase,
+    input.workspaceId
+  );
+  if (!alreadyLinked.ok) {
+    return { ok: false, message: alreadyLinked.message };
+  }
+  const linkedIds = new Set(
+    alreadyLinked.data.map((item) => item.resource.resourceId)
+  );
+
+  const eligible: LearningWorkspaceResourceResolved[] = [];
+  for (const row of spaces ?? []) {
+    const rec = asRecord(row);
+    if (!rec) continue;
+    const id = asString(rec.id);
+    const name = asString(rec.name);
+    const slug = asString(rec.slug);
+    if (!id || !name || !slug) continue;
+    if (linkedIds.has(id)) continue;
+    eligible.push({
+      resourceType: LEARNING_WORKSPACE_RESOURCE_TYPE,
+      resourceId: id,
+      platform: LEARNING_WORKSPACE_RESOURCE_PLATFORM,
+      displayLabel: name,
+      slug,
+      status: asString(rec.status) ?? "draft",
+      mode: asString(rec.mode) ?? "general_academy",
+      href: learningSpaceResourceHref(id),
+    });
+  }
+
+  return { ok: true, data: eligible };
 }

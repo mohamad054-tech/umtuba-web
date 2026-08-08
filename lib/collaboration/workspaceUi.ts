@@ -1,7 +1,7 @@
 /**
  * Collaboration Workspace UI — routes, copy, and presentation helpers.
- * Arabic-first surface (RTL). Overlay only — no Learning/Commerce bindings.
- * Settings & Lifecycle UI V1 extends Foundation V1 routes/capabilities.
+ * Arabic-first surface (RTL). Settings hosts Learning Space link/unlink UI.
+ * Commerce / advertiser bindings remain deferred.
  */
 
 import {
@@ -84,6 +84,19 @@ export const COLLABORATION_UI_COPY = {
     "المالك النشط لا يُعلَّق ولا يُزال ولا يغادر قبل نقل الملكية.",
   unauthorizedAction: "ليست لديك صلاحية لهذا الإجراء.",
   transferTargetLabel: "المالك الجديد",
+  learningLinksTitle: "موارد التعلّم المرتبطة",
+  learningLinksSubtitle:
+    "اربط مساحة تعلّم تديرها بمساحة العمل هذه (مرجع فقط).",
+  learningLinksEmpty: "لا توجد مساحات تعلّم مرتبطة حالياً.",
+  learningLinksLoadError: "تعذّر تحميل روابط موارد التعلّم.",
+  learningEligibleEmpty:
+    "لا توجد مساحات تعلّم مؤهّلة للربط (يلزم دور مالك/مشرف في مساحة التعلّم).",
+  learningLinkCta: "ربط مساحة تعلّم",
+  learningUnlinkCta: "إلغاء الربط",
+  learningLinkSelectLabel: "مساحة التعلّم",
+  learningLinkedSuccess: "تم ربط مساحة التعلّم.",
+  learningUnlinkedSuccess: "تم إلغاء ربط مساحة التعلّم.",
+  learningOpenResource: "فتح مساحة التعلّم",
 } as const;
 
 export const COLLABORATION_KIND_LABELS: Record<
@@ -157,6 +170,13 @@ export function canViewCollaborationInvites(
 }
 
 export function canManageCollaborationWorkspaceSettings(
+  role: CollaborationWorkspaceRole | string
+): boolean {
+  return collaborationWorkspaceAllows(role, "manage_workspace");
+}
+
+/** Resource-link mutations require the same manage_workspace capability as settings. */
+export function canManageCollaborationResourceLinks(
   role: CollaborationWorkspaceRole | string
 ): boolean {
   return collaborationWorkspaceAllows(role, "manage_workspace");
