@@ -24,6 +24,10 @@ import {
   type DualReadObservationBreakerSnapshot,
 } from "./dualReadObservationBreaker";
 import type { DualReadJournalOutcome } from "./dualReadJournal";
+import {
+  evaluateDualReadObserveScheduleGate,
+  type DualReadObserveReadinessReport,
+} from "./dualReadObserveReadiness";
 
 export type DualReadObservationSurface =
   | "landing"
@@ -37,11 +41,13 @@ export type DualReadObservationRunResult = {
     | "observe_disabled"
     | "breaker_open"
     | "no_local"
-    | "deduped";
+    | "deduped"
+    | "activation_unsafe";
   result?: DualReadCompareResult;
   breaker: DualReadObservationBreakerSnapshot;
   correlation_id: string;
   surface: string;
+  readiness?: DualReadObserveReadinessReport;
 };
 
 const pendingKeys = new Set<string>();
@@ -95,6 +101,11 @@ export async function runTranslationStudioDualReadObservation(options: {
   surface: DualReadObservationSurface;
   ignoreObserveFlag?: boolean;
   bypassBreaker?: boolean;
+  /**
+   * Bypass composition activation gate (tests / explicit diagnostics only).
+   * Does not weaken actionable drift detection when compare runs.
+   */
+  ignoreActivationGate?: boolean;
   getCurrentLocalHash?: () => string;
   journal?: ShadowReconciliationJournal;
   correlationId?: string;
@@ -106,17 +117,43 @@ export async function runTranslationStudioDualReadObservation(options: {
   const breaker = getDualReadObservationBreaker();
   const local_hash = fingerprintStudioSnapshot(options.local);
 
-  if (
-    !options.ignoreObserveFlag &&
-    !isDualReadObserveEnabled(options.env ?? process.env)
-  ) {
+  const env = options.env ?? process.env;
+  if (!options.ignoreObserveFlag && !isDualReadObserveEnabled(env)) {
     return {
       skipped: true,
       skip_reason: "observe_disabled",
       breaker,
       correlation_id,
       surface: options.surface,
+      readiness: evaluateDualReadObserveScheduleGate({
+        env,
+        readTransportAvailable: Boolean(options.readTransport),
+      }).report,
     };
+  }
+
+  // Activation-safety gate: prefer shadow_dual_write + observe; refuse JSON-only.
+  // Tests may pass ignoreObserveFlag + bypass composition via ignoreActivationGate.
+  if (!options.ignoreActivationGate) {
+    const gate = evaluateDualReadObserveScheduleGate({
+      env,
+      readTransportAvailable: Boolean(options.readTransport),
+    });
+    if (!gate.maySchedule) {
+      return {
+        skipped: true,
+        skip_reason:
+          gate.reason === "breaker_open"
+            ? "breaker_open"
+            : gate.reason === "observe_flag_off"
+              ? "observe_disabled"
+              : "activation_unsafe",
+        breaker: getDualReadObservationBreaker(),
+        correlation_id,
+        surface: options.surface,
+        readiness: gate.report,
+      };
+    }
   }
 
   const journal =
@@ -141,6 +178,10 @@ export async function runTranslationStudioDualReadObservation(options: {
       breaker: getDualReadObservationBreaker(),
       correlation_id,
       surface: options.surface,
+      readiness: evaluateDualReadObserveScheduleGate({
+        env,
+        readTransportAvailable: Boolean(options.readTransport),
+      }).report,
     };
   }
 

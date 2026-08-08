@@ -181,6 +181,7 @@ function emptyCounts(): Record<ReconciliationMismatchCategory, number> {
 }
 
 export function isReservedShadowSmokeIdentity(identity: string): boolean {
+  if (typeof identity !== "string" || identity.length === 0) return false;
   return identity.startsWith(SHADOW_SMOKE_V1_PREFIX);
 }
 
@@ -477,6 +478,7 @@ function normalizeRemote(remote: TranslationStudioReadSnapshotV1): LocalNorm {
   }
   const namespaces = new Map<string, Record<string, unknown>>();
   for (const n of remote.namespaces) {
+    if (typeof n.stable_id !== "string" || !n.stable_id) continue;
     namespaces.set(n.stable_id, {
       name: n.name,
       description: n.description ?? "",
@@ -484,6 +486,7 @@ function normalizeRemote(remote: TranslationStudioReadSnapshotV1): LocalNorm {
   }
   const keys = new Map<string, Record<string, unknown>>();
   for (const k of remote.keys) {
+    if (typeof k.stable_id !== "string" || !k.stable_id) continue;
     keys.set(k.stable_id, {
       namespaceStableId: k.namespaceStableId,
       key: k.key,

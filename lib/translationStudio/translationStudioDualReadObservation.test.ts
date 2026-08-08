@@ -289,6 +289,7 @@ describe("dual-read observation breaker", () => {
       local,
       surface: "landing",
       ignoreObserveFlag: true,
+      ignoreActivationGate: true,
       journal,
       readTransport: {
         async readSnapshot() {
@@ -339,6 +340,7 @@ describe("dual-read observation runner + page wiring", () => {
       local,
       surface: "landing",
       ignoreObserveFlag: true,
+      ignoreActivationGate: true,
       journal,
       readTransport: {
         async readSnapshot() {
@@ -369,6 +371,7 @@ describe("dual-read observation runner + page wiring", () => {
       local,
       surface: "key_detail",
       ignoreObserveFlag: true,
+      ignoreActivationGate: true,
       journal: createShadowReconciliationJournal({ dataDir: dir }),
       readTransport: {
         async readSnapshot() {
@@ -404,6 +407,7 @@ describe("dual-read observation runner + page wiring", () => {
     expect(key).toMatch(/surface:\s*"key_detail"/);
     expect(schedule).toMatch(/from "next\/server"/);
     expect(schedule).toMatch(/\bafter\b/);
+    expect(schedule).toMatch(/evaluateDualReadObserveScheduleGate/);
     expect(landing).not.toMatch(/upsert_snapshot/);
     expect(key).not.toMatch(/upsert_snapshot/);
     expect(schedule).not.toMatch(/upsert_snapshot/);

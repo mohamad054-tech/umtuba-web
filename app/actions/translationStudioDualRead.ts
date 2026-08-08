@@ -17,12 +17,14 @@ import {
   fingerprintStudioSnapshot,
   getDualReadObservationBreaker,
   getTranslationStudioWorkflow,
+  buildDualReadObserveReadinessReport,
   resolveShadowReconciliationJournalPath,
   resetDualReadObservationBreaker,
   runStudioDualReadCompare,
   runWithStudioDualReadTransportAsync,
   type DualReadCompareResult,
   type DualReadObservationBreakerSnapshot,
+  type DualReadObserveReadinessReport,
 } from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
@@ -38,6 +40,7 @@ export type DualReadDiagnosticsResult = {
   category?: DualReadCompareResult["category"];
   message?: string;
   breaker: DualReadObservationBreakerSnapshot;
+  readiness: DualReadObserveReadinessReport;
 };
 
 function authoritativeLocalFromWorkflow() {
@@ -94,6 +97,10 @@ export async function runTranslationStudioDualReadCompareAction(): Promise<DualR
     category: result.category,
     message: result.message,
     breaker: getDualReadObservationBreaker(),
+    readiness: buildDualReadObserveReadinessReport({
+      readTransportAvailable: true,
+      breaker: getDualReadObservationBreaker(),
+    }),
   };
 }
 
@@ -114,4 +121,23 @@ export async function resetTranslationStudioDualReadObservationBreakerAction(): 
     );
   }
   return resetDualReadObservationBreaker();
+}
+
+/** Sanitized readiness/preflight for admin diagnostics (zero writes). */
+export async function getTranslationStudioDualReadObserveReadinessAction(): Promise<DualReadObserveReadinessReport> {
+  const user = await getServerUser();
+  if (!user) {
+    redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(STUDIO_BASE)}`);
+  }
+  const supabase = await createClient();
+  const isAdmin = await assertPlatformAdminDb(supabase);
+  if (!isAdmin) {
+    redirect(
+      `${APP_ROUTES.home}?error=${encodeURIComponent(ADMIN_STORE_UNAUTHORIZED)}`
+    );
+  }
+  return buildDualReadObserveReadinessReport({
+    readTransportAvailable: Boolean(supabase),
+    breaker: getDualReadObservationBreaker(),
+  });
 }

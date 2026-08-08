@@ -80,12 +80,21 @@ Includes (non-exhaustive evidence via `git log`):
 | Concern | State |
 | --- | --- |
 | Authoritative runtime | **JSON** (default) |
-| Persistent shadow mode | **DISABLED** |
-| `dual_read` | unsupported (fail closed) |
+| Persistent shadow mode | Executable via `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE=shadow_dual_write` (ops may keep disabled) |
+| `dual_read` observe | Executable composition; **default OFF** (`UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` unset). Preferred nest: shadow + observe. JSON-only observe refused. |
 | `db_primary_json_fallback` | unsupported (fail closed) |
 | Request transport | authenticated Supabase client; **no service_role** |
 | Write path | `translation_studio_upsert_snapshot` (platform admin) |
 | Read path | `translation_studio_read_snapshot` (platform admin) |
+
+### Dual-read observe rollback
+
+1. Unset `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` (or set `0`/`false`)
+2. Optionally set `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE=json`
+3. Restart process (clears breaker) **or** explicit admin breaker reset
+4. JSON file store unchanged (authority never moved)
+
+Zero-write preflight: `npm run translation:dual-read-preflight`
 
 ### Remote migrations (Translation Studio)
 

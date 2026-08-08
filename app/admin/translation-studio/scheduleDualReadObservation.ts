@@ -3,6 +3,9 @@ import "server-only";
 /**
  * Non-blocking dual-read observation schedule for authenticated Studio admin pages.
  * Uses next/server `after()` so page render is not blocked on remote compare.
+ *
+ * Fail-closed: schedules only when activation-safety gate permits
+ * (prefer shadow_dual_write + observe). Unsafe/OFF → sanitized no-op.
  */
 
 import { after } from "next/server";
@@ -10,9 +13,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   claimDualReadObservationSlot,
   createSupabaseReadRpcTransport,
+  evaluateDualReadObserveScheduleGate,
   fingerprintStudioSnapshot,
   getTranslationStudioWorkflow,
-  isDualReadObserveEnabled,
   releaseDualReadObservationSlot,
   runTranslationStudioDualReadObservation,
   type DualReadObservationSurface,
@@ -29,7 +32,7 @@ function authoritativeLocalFromWorkflow() {
 
 /**
  * Schedule at most one dual-read observation for this page/request.
- * No-op when observe flag is off. Never throws into the page.
+ * No-op when observe flag is off or activation gate refuses. Never throws into the page.
  */
 export function scheduleTranslationStudioDualReadObservation(input: {
   supabase: SupabaseClient;
@@ -40,7 +43,14 @@ export function scheduleTranslationStudioDualReadObservation(input: {
 }): void {
   try {
     const env = input.env ?? process.env;
-    if (!isDualReadObserveEnabled(env)) return;
+    const gate = evaluateDualReadObserveScheduleGate({
+      env,
+      // Transport is created only after gate passes — mark available when supabase present.
+      readTransportAvailable: Boolean(input.supabase),
+    });
+    if (!gate.maySchedule) {
+      return;
+    }
 
     const local = authoritativeLocalFromWorkflow();
     const localHash = fingerprintStudioSnapshot(local);

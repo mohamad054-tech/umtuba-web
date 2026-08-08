@@ -209,6 +209,24 @@ export {
 } from "./persistence/dualReadObservation";
 
 export {
+  buildDualReadObserveReadinessReport,
+  evaluateDualReadObserveScheduleGate,
+  mayNestDualReadObserveOverImplementation,
+  DUAL_READ_OBSERVE_ROLLBACK_STEPS,
+  type BuildDualReadObserveReadinessInput,
+  type DualReadObserveBaselineParityStatus,
+  type DualReadObserveBlockerCode,
+  type DualReadObserveCompositionKind,
+  type DualReadObserveReadinessReport,
+} from "./persistence/dualReadObserveReadiness";
+
+export {
+  runDualReadObserveZeroWriteHarness,
+  type DualReadObserveHarnessCaseResult,
+  type DualReadObserveZeroWriteHarnessReport,
+} from "./persistence/dualReadObserveZeroWriteHarness";
+
+export {
   getDualReadObservationBreaker,
   isDualReadObservationBreakerOpen,
   recordDualReadObservationResult,

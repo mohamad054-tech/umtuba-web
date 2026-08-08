@@ -81,11 +81,17 @@ Runtime remains JSON file store — no JSON→DB switch.
 ## Persistence activation progress
 
 - Readiness: `TRANSLATION_RUNTIME_PERSISTENCE_ACTIVATION_READINESS_V1` complete (NOT_READY for DB activation)
-- Phase 1 in progress / landed: `TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1`
+- Phase 1 landed: `TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1`
   - `StudioPersistencePort` + JSON adapter
-  - `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE` (only `json` executable; future modes fail closed to JSON)
-  - Runtime remains JSON-only — no DB reads/writes
+  - `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE`
+  - Executable modes: `json` (default), `shadow_dual_write`, `dual_read` (JSON + compare, no writes)
+  - Unsupported: `db_primary_json_fallback` (fail closed to JSON)
+  - Runtime remains **JSON-authoritative** — no DB-primary
+- Dual-read observe: `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` defaults **OFF**
+  - Preferred safe composition: `shadow_dual_write` + observe nest
+  - Observe over plain JSON-only is refused (activation-unsafe)
+  - Preflight: `npm run translation:dual-read-preflight` (zero remote writes)
 
 ## Next milestone
 
-`TRANSLATION_STUDIO_STABLE_ID_AND_WRITE_RPC_DESIGN_V1` (or equivalent ID strategy + RPC design) — **not started**. Do **not** create SQL/RPCs/importers without a separate GO.
+`TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1` (retry) then separate **activation GO** for observe — do **not** enable observe / flip authority without GO.

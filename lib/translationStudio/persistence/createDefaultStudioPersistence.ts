@@ -7,9 +7,13 @@
  *
  * Composition (no mode explosion):
  *   json → optional shadow_dual_write → optional dual_read observe nest
- * Mode `dual_read` alone = JSON + compare (no shadow writes).
+ * Mode `dual_read` alone = JSON + compare (no shadow writes) — executable but
+ *   NOT preferred / NOT activation-safe for automatic observe.
  * Mode `shadow_dual_write` alone does NOT activate dual_read unless
  * UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE is set or enableDualRead option.
+ *
+ * Observe nest over plain JSON-only is refused (fail closed) unless tests force
+ * enableDualRead=true. Preferred: shadow_dual_write + observe.
  */
 
 import {
@@ -31,6 +35,7 @@ import type { StudioShadowObserver } from "./shadowObserver";
 import type { StudioDualReadObserver } from "./dualReadObserver";
 import type { TranslationStudioWriteRpcTransport } from "./writeRpcTransport";
 import type { TranslationStudioReadRpcTransport } from "./readRpcTransport";
+import { mayNestDualReadObserveOverImplementation } from "./dualReadObserveReadiness";
 
 export type StudioPersistenceSelection = {
   resolution: PersistenceModeResolution;
@@ -38,6 +43,12 @@ export type StudioPersistenceSelection = {
   persistence: StudioPersistencePort;
   /** True when dual-read wrapper is nested (mode dual_read or observe flag). */
   dualReadEnabled: boolean;
+  /**
+   * True when observe flag requested nest over JSON-only and was refused.
+   * Mode dual_read alone is tracked separately via implementation.
+   */
+  observeNestRefused?: boolean;
+  observeNestRefuseReason?: string;
 };
 
 export function createDefaultStudioPersistence(options?: {
@@ -54,7 +65,7 @@ export function createDefaultStudioPersistence(options?: {
   getDualReadTransport?: () => TranslationStudioReadRpcTransport | null;
   /**
    * Force dual-read nest (tests). When unset, uses mode=dual_read or
-   * UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE.
+   * UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE (shadow-only for observe flag).
    */
   enableDualRead?: boolean;
 }): StudioPersistenceSelection {
@@ -87,12 +98,14 @@ export function createDefaultStudioPersistence(options?: {
     implementation = "shadow_dual_write";
   }
 
-  const wantDualRead =
-    options?.enableDualRead === true ||
-    isExecutableDualReadMode(resolution) ||
-    (options?.enableDualRead !== false && isDualReadObserveEnabled(env));
+  const observeFlag = isDualReadObserveEnabled(env);
+  const forceEnable = options?.enableDualRead === true;
+  const wantDualReadFromFlag =
+    forceEnable ||
+    (options?.enableDualRead !== false && observeFlag);
 
-  // Mode dual_read alone (no shadow): wrap JSON with dual-read.
+  // Mode dual_read alone (no shadow): wrap JSON with dual-read for explicit mode.
+  // Activation-safe automatic observe still requires shadow (see readiness gate).
   if (isExecutableDualReadMode(resolution) && implementation === "json") {
     persistence = createDualReadStudioPersistence({
       authoritative: persistence,
@@ -110,8 +123,23 @@ export function createDefaultStudioPersistence(options?: {
     };
   }
 
-  // Optional nest over shadow (or json) when observe flag / enableDualRead.
-  if (wantDualRead && !isExecutableDualReadMode(resolution)) {
+  // Optional nest over shadow when observe flag / enableDualRead.
+  // Fail closed: refuse silent nest over plain JSON-only.
+  if (wantDualReadFromFlag && !isExecutableDualReadMode(resolution)) {
+    const nestGate = mayNestDualReadObserveOverImplementation({
+      implementation,
+      forceEnableDualRead: forceEnable,
+    });
+    if (!nestGate.allowed) {
+      return {
+        resolution,
+        implementation,
+        persistence,
+        dualReadEnabled: false,
+        observeNestRefused: true,
+        observeNestRefuseReason: nestGate.reason,
+      };
+    }
     persistence = createDualReadStudioPersistence({
       authoritative: persistence,
       getReadTransport: options?.getDualReadTransport,
@@ -128,10 +156,7 @@ export function createDefaultStudioPersistence(options?: {
   }
 
   // unsupported/invalid → JSON fail-closed (already json unless shadow above)
-  if (
-    resolution.kind === "unsupported" ||
-    resolution.kind === "invalid"
-  ) {
+  if (resolution.kind === "unsupported" || resolution.kind === "invalid") {
     return {
       resolution,
       implementation: "json",
