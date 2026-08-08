@@ -6,7 +6,7 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Learning link/unlink credentialed E2E smoke CLOSED (Desktop LOCAL RPC evidence) |
+| Tip | Playwright login-navigation residual fix prepared; Desktop browser verify pending |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
@@ -17,13 +17,12 @@
 - Learning Resource Binding V1
 - Learning Resource Link/Unlink UI V1
 - Learning Link/Unlink E2E Provisioning V1 (harness/templates)
-- Learning Link/Unlink Credentialed E2E Smoke V1 (Desktop LOCAL RPC smoke PASS;
-  laptop consumed external evidence; no laptop Docker)
+- Learning Link/Unlink Credentialed E2E Smoke V1 (Desktop LOCAL RPC smoke PASS)
 
-### Residual / follow-up (non-blocking)
+### In progress / prepared
 
-- Playwright browser UI login client-navigation after `/login` — does not
-  invalidate credentialed RPC smoke; do not claim UI E2E PASS
+- Playwright Login Navigation Residual Fix V1 — code+harness on SoT;
+  `DESKTOP_LOCAL_RUNTIME_VERIFICATION_REQUIRED` for browser UI E2E
 
 ### Ops forks (NOT SoT)
 
@@ -34,7 +33,6 @@
 
 - Commerce / advertiser resource-link bindings
 - Production Auth user creation (requires explicit approval)
-- Playwright login-navigation residual (explicit schedule only)
 
 ### Flag
 

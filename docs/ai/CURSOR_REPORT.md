@@ -1,22 +1,24 @@
-# CURSOR_REPORT — Learning Link/Unlink Credentialed E2E Smoke V1 Closeout
+# CURSOR_REPORT — Playwright Login Navigation Residual Fix V1
 
 ## Summary
 
-**CLOSED** — Canonical Collaboration SoT already at harness tip `be5d836`
-(matching Desktop). Laptop ran safe Vitest + `tsc` only. Credentialed LOCAL
-RPC smoke accepted from Desktop external verified report
-(`COLLABORATION_LOCAL_E2E_ENVIRONMENT_TAKEOVER_V1` / `RPC_SMOKE_PASS`).
-Desktop raw log is not on this laptop. Playwright UI login-navigation residual
-is **non-blocking**. No migrations. No Docker/BIOS/reboot on laptop. No
-production Supabase. No Commerce/Translation changes.
+**PREPARED_FOR_DESKTOP_VERIFICATION** — Minimal product + harness fix for the
+Collaboration Playwright login-navigation residual. Laptop-safe Vitest/tsc PASS.
+Credentialed browser Playwright cannot run on this laptop (no Docker/local
+Supabase). No migrations. No production target. Auth still uses real login form.
 
 ## Exact files changed
 
+- `app/login/page.tsx` — hard navigate via `window.location.assign` after sign-in
+- `e2e/collaboration/helpers/loginAs.ts` (new)
+- `e2e/collaboration/smoke/learning-link-unlink.spec.ts`
+- `lib/supabase/authSession.harden.test.ts`
+- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.ts`
+- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.test.ts`
+- `scripts/collaboration-e2e/OPERATOR_PROVISIONING.md`
 - `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/collaboration/operations/COLLABORATION_LEARNING_LINK_UNLINK_E2E_PROVISIONING_V1.md`
-  (closeout status note only)
+- `docs/ai/PROJECT_STATE.md`
 
 ## Migrations created
 
@@ -24,20 +26,16 @@ NO
 
 ## Security review
 
-- Production project `tgucwnjwoyeqoxqaxmew` not used (Desktop report + laptop policy)
-- No secrets committed; no Auth users created on laptop
-- No RLS/auth weakening; platform gate remains fail-closed
-- No production / remote migration apply
+- No auth bypass / no storageState / no service-role browser path
+- Still `signInWithEmail` + safe `next` via `getSafeRedirectPath`
+- Middleware/auth guards unchanged
+- No production credentials; no secrets committed
 
 ## Tests
 
-- Laptop focused Collaboration Vitest (6 files): **53/53 PASS**
-- Laptop `npx tsc --noEmit`: **PASS**
-- Laptop Playwright credentialed UI: **NOT RUN** (Docker/local Supabase
-  forbidden on laptop); residual browser login-navigation classified
-  **non-blocking** per Desktop report
-- Desktop external: RPC LINK → readback → peer deny → UNLINK = **PASS**;
-  Vitest 28/28; `tsc` PASS (operator-supplied verified report)
+- Targeted auth + Collaboration Vitest: **48/48 PASS**
+- Credentialed Playwright browser: **NOT RUN on laptop** →
+  `DESKTOP_LOCAL_RUNTIME_VERIFICATION_REQUIRED`
 
 ## TypeScript
 
@@ -45,7 +43,7 @@ NO
 
 ## Build
 
-N/A (docs closeout; no app entry/UI code change)
+N/A (login navigation + e2e helper; no new app entry surface beyond login)
 
 ## git diff --check
 
@@ -53,10 +51,9 @@ PASS
 
 ## git status --short
 
-(see closeout push verification)
+(see closeout)
 
 ## Open issues
 
-- Playwright `/login` client-navigation residual — follow-up only; not a
-  milestone blocker
-- Commerce / advertiser bindings remain deferred pending explicit GO
+Desktop must re-run credentialed Playwright against local Supabase to confirm
+browser UI smoke progresses past `/login`.

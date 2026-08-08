@@ -70,6 +70,7 @@ export const COLLABORATION_LEARNING_LINK_E2E_MODULES = {
   opsDoc:
     "docs/collaboration/operations/COLLABORATION_LEARNING_LINK_UNLINK_E2E_PROVISIONING_V1.md",
   playwrightConfig: "e2e/collaboration/playwright.config.ts",
+  playwrightLoginHelper: "e2e/collaboration/helpers/loginAs.ts",
   platformGateSpec: "e2e/collaboration/smoke/platform-gate.spec.ts",
   linkUnlinkSpec: "e2e/collaboration/smoke/learning-link-unlink.spec.ts",
 } as const;

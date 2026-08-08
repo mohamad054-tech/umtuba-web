@@ -190,7 +190,17 @@ describe("Collaboration Learning Link/Unlink E2E Provisioning V1", () => {
     expect(spec).toMatch(/test\.skip/);
     expect(spec).toContain("learningLinksPanel");
     expect(spec).toContain("COLLABORATION_LEARNING_LINK_E2E_TESTIDS");
+    expect(spec).toContain("collaborationE2eLoginAs");
     expect(spec).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+    expect(spec).not.toMatch(/storageState/);
+
+    const loginHelper = read(
+      COLLABORATION_LEARNING_LINK_E2E_MODULES.playwrightLoginHelper
+    );
+    expect(loginHelper).toMatch(/Promise\.all/);
+    expect(loginHelper).toMatch(/waitForURL/);
+    expect(loginHelper).toMatch(/\/login\?next=/);
+    expect(loginHelper).not.toMatch(/storageState|service.?role|createBrowserClient/i);
   });
 
   it("gitignore protects local collaboration E2E config", () => {

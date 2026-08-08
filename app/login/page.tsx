@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   AuthAlert,
   AuthField,
@@ -23,7 +23,6 @@ type FieldErrors = {
 };
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
   const linkError = sanitizeUserFacingMessage(
@@ -84,8 +83,9 @@ function LoginForm() {
         searchParams.get("next"),
         APP_ROUTES.discover
       );
-      router.push(nextPath);
-      router.refresh();
+      // Full document navigation so auth cookies are visible to middleware and
+      // Playwright waitForURL observes a real URL change (soft router.push is flaky).
+      window.location.assign(nextPath);
     } catch (error) {
       setFormError(
         toAuthUserFacingMessage(

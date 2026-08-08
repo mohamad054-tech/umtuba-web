@@ -5,6 +5,7 @@ import {
   collaborationLearningLinkUnlinkFullCredentialsPresent,
   collaborationLearningLinkUnlinkOwnerCredentialsPresent,
 } from "../../../lib/collaboration/learningResourceLinkUnlinkE2eProvisioning";
+import { collaborationE2eLoginAs } from "../helpers/loginAs";
 
 /**
  * Credentialed Learning link/unlink smoke.
@@ -27,16 +28,7 @@ async function loginAs(
   password: string,
   nextPath: string
 ) {
-  await page.goto(
-    `/login?next=${encodeURIComponent(nextPath)}`,
-    { waitUntil: "domcontentloaded" }
-  );
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(password);
-  await page.locator('form button[type="submit"]').click();
-  await page.waitForURL((url) => !url.pathname.startsWith("/login"), {
-    timeout: 30_000,
-  });
+  await collaborationE2eLoginAs(page, email, password, nextPath);
 }
 
 test.describe("learning link/unlink credentialed smoke", () => {

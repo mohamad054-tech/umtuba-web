@@ -72,6 +72,10 @@ COLLABORATION_PLATFORM_ENABLED=1 npm run dev
 npx playwright test -c e2e/collaboration/playwright.config.ts
 ```
 
+Login uses real `/login` form + full document navigation after sign-in
+(`window.location.assign`). Specs race submit with `waitForURL` via
+`e2e/collaboration/helpers/loginAs.ts`. No session injection.
+
 Gate-off proof: run app with `COLLABORATION_PLATFORM_ENABLED` unset/false and execute
 `e2e/collaboration/smoke/platform-gate.spec.ts`.
 

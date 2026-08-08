@@ -93,4 +93,13 @@ describe("auth session harden contracts", () => {
     expect(login).toMatch(/toAuthUserFacingMessage/);
     expect(login).toMatch(/searchParams\.get\("error"\)/);
   });
+
+  it("login uses full document navigation after successful sign-in", () => {
+    const login = read("app/login/page.tsx");
+    expect(login).toMatch(/window\.location\.assign\(nextPath\)/);
+    expect(login).not.toMatch(/router\.push\(nextPath\)/);
+    expect(login).not.toMatch(/router\.refresh\(\)/);
+    expect(login).toMatch(/signInWithEmail/);
+    expect(login).toMatch(/getSafeRedirectPath/);
+  });
 });
