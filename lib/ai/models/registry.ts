@@ -52,7 +52,10 @@ export function buildProviderRegistry(input: {
   anthropicDefaultModel: string;
   localDefaultModel: string | null;
   defaultTimeoutMs: number;
+  /** Operator streaming gate (UMTUBA_AI_STREAMING). Default false. */
+  streamingEnabled?: boolean;
 }): AiProviderDefinition[] {
+  const streamingSupport = Boolean(input.streamingEnabled);
   const providers: AiProviderDefinition[] = [];
 
   if (input.stubEligible) {
@@ -71,7 +74,7 @@ export function buildProviderRegistry(input: {
           contextLimitTokens: 32_000,
           structuredOutputSupport: true,
           toolCallSupport: false,
-          streamingSupport: false,
+          streamingSupport,
           available: true,
           costClass: "economy",
           inputCostPer1M: 0,
@@ -100,7 +103,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 128_000,
         structuredOutputSupport: true,
         toolCallSupport: true,
-        streamingSupport: false,
+        streamingSupport,
         available: input.openaiConfigured,
         costClass: "economy",
         inputCostPer1M: 0.15,
@@ -120,7 +123,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 128_000,
         structuredOutputSupport: true,
         toolCallSupport: true,
-        streamingSupport: false,
+        streamingSupport,
         available: input.openaiConfigured,
         costClass: "premium",
         inputCostPer1M: 2.5,
@@ -148,7 +151,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 128_000,
         structuredOutputSupport: true,
         toolCallSupport: false,
-        streamingSupport: false,
+        streamingSupport,
         available: input.geminiConfigured,
         costClass: "economy",
         inputCostPer1M: 0.1,
@@ -168,7 +171,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 1_000_000,
         structuredOutputSupport: true,
         toolCallSupport: false,
-        streamingSupport: false,
+        streamingSupport,
         available: input.geminiConfigured,
         costClass: "premium",
         inputCostPer1M: 1.25,
@@ -196,7 +199,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 200_000,
         structuredOutputSupport: true,
         toolCallSupport: false,
-        streamingSupport: false,
+        streamingSupport,
         available: input.anthropicConfigured,
         costClass: "economy",
         inputCostPer1M: 1,
@@ -216,7 +219,7 @@ export function buildProviderRegistry(input: {
         contextLimitTokens: 200_000,
         structuredOutputSupport: true,
         toolCallSupport: false,
-        streamingSupport: false,
+        streamingSupport,
         available: input.anthropicConfigured,
         costClass: "premium",
         inputCostPer1M: 3,
@@ -245,7 +248,7 @@ export function buildProviderRegistry(input: {
           contextLimitTokens: 32_000,
           structuredOutputSupport: true,
           toolCallSupport: false,
-          streamingSupport: false,
+          streamingSupport,
           available: input.localConfigured,
           costClass: "economy",
           inputCostPer1M: 0,

@@ -1,39 +1,36 @@
-# CURSOR_REPORT — AI Creator Studio Foundation V1
+# CURSOR_REPORT — AI Streaming Foundation Port to Creator Tip V1
 
 ## Summary
 
-Creator Studio Foundation under `lib/ai/creatorStudio/` provides contracts, template registry, sessions/drafts/history/versions, and mock content results. Every generation request enters only via `executeUnifiedCapability` for capability `creator.studio.assist`. Creator UI `/creator/studio` and Admin `/admin/ai/creator-studio`. No live inference, no provider/network calls.
+Manual semantic port of existing Provider Streaming Foundation V1
+(`origin/office/ai-core-provider-streaming-foundation-v1` @ `0a04d59`) onto
+Creator Studio tip `aaccac3`. No second streaming architecture. Feature flag
+`UMTUBA_AI_STREAMING` remains default OFF. No DB/migrations/live activation.
+
+Port strategy: **C — manual semantic port** (lineages diverged 51/38; adapters
+layout differs — tip keeps separate gemini/anthropic/local modules).
 
 ## Exact files changed
 
-### New
-
-- `lib/ai/creatorStudio/types.ts`
-- `lib/ai/creatorStudio/templates.ts`
-- `lib/ai/creatorStudio/registry.ts`
-- `lib/ai/creatorStudio/service.ts`
-- `lib/ai/creatorStudio/index.ts`
-- `lib/ai/creatorStudio/creatorStudioFoundation.test.ts`
-- `app/creator/studio/page.tsx`
-- `app/creator/studio/actions.ts`
-- `app/creator/studio/CreatorStudioClient.tsx`
-- `app/admin/ai/creator-studio/page.tsx`
-
-### Modified
-
-- `app/lib/nav/routes.ts` — `creatorStudio` route
-- `lib/ai/catalog/definitions.ts` — `creator.studio.assist` executable capability
-- `lib/ai/policy/fixtures.ts` — policy binding for `creator.studio.assist`
-- `lib/ai/index.ts` — Creator Studio exports
-- `app/admin/ai/page.tsx` — nav link
-- `app/admin/ai/capabilities/page.tsx` — nav link
-- `app/admin/ai/usage/page.tsx` — nav link
-- `app/admin/ai/policies/page.tsx` — nav link
-- `app/admin/ai/orchestration/page.tsx` — nav link
-- `app/admin/ai/execution-pipeline/page.tsx` — nav link
+- `.env.example`
 - `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/SESSION_HANDOFF.md`
+- `docs/ai/workstreams/AI_PLATFORM.md`
+- `lib/ai/capabilities/admin/diagnostics.ts`
+- `lib/ai/config.ts`
+- `lib/ai/contracts/types.ts`
+- `lib/ai/models/registry.ts`
+- `lib/ai/providers/adapters.ts`
+- `lib/ai/providers/anthropicAdapter.ts`
+- `lib/ai/providers/foundation.ts`
+- `lib/ai/providers/foundation.test.ts`
+- `lib/ai/providers/geminiAdapter.ts`
+- `lib/ai/providers/localAdapter.ts`
+- `lib/ai/providers/streaming.ts` (added from source)
+- `lib/ai/providers/streaming.test.ts` (added; registry seed adapted for tip)
+- `lib/ai/routing/policyEngine.test.ts`
 
 ## Migrations created
 
@@ -41,34 +38,39 @@ None.
 
 ## Security review
 
-- No secrets / `.env.local` changes
-- Admin route gated by platform admin
-- Creator route requires authenticated user
-- No Gemini / OpenAI / provider imports in Creator Studio modules
-- Results are mock/contracts only; Unified Execution stops at planning readiness
+- Streaming opt-in only; default OFF
+- No secrets / `.env` values committed
+- No live provider activation
+- Structured streaming remains fail-closed
+- Creator Studio source worktree not mutated
 
 ## Tests
 
-`vitest run` focused suites: **4 files / 44 tests passed**  
-(`creatorStudioFoundation` 13, `unifiedCapabilityExecution` 8, `capabilityCatalogRegistry` 10, `policyGovernanceFoundation` 13).
+- `streaming.test.ts`: 14/14 pass
+- Provider adapter + foundation + policyEngine: pass
+- Creator Studio foundation: 13/13 pass
+- Pre-existing tip failures (also fail on `aaccac3` baseline):
+  - `aiPlatformFoundation.test.ts` diagnostics probe service entry
+  - `sharedAiSurfaceIntegration.test.ts` unknown-capability message regex
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS** (exit 0).
+`npx tsc --noEmit` — pass
 
 ## Build
 
-Not required for this foundation task (no app entry/shell redesign).
+Not required for this provider-port milestone (no app UI/entry changes).
 
 ## git diff --check
 
-**PASS** (exit 0).
+Pass (after trailing-whitespace cleanup on docs).
 
 ## git status --short
 
-Uncommitted on `office/platform-ai-creator-studio-foundation-v1` (pending GO).
+See commit on `office/platform-ai-streaming-port-to-creator-v1`.
 
 ## Open issues
 
-- Process-local in-memory store (sessions/drafts/history) is foundation-only; not durable across workers
-- Live inference / provider invocation intentionally deferred to later tasks
+- Pre-existing Creator tip test flakes/mismatches noted above (nonblocking for port)
+- Gateway HTTP SSE product surface still deferred
+- Structured-output streaming still deferred

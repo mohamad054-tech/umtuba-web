@@ -2,7 +2,8 @@
  * Anthropic Claude provider adapter (Shared AI Core).
  *
  * Implements AiProviderAdapter via Anthropic Messages REST API.
- * No streaming. Structured JSON via prompt-steered JSON + fail-closed parse
+ * Streaming via Messages SSE when UMTUBA_AI_STREAMING is enabled.
+ * Structured JSON via prompt-steered JSON + fail-closed parse
  * (open-object output_config schemas are rejected by Anthropic).
  * Fail-closed: missing key / HTTP errors map to AiPlatformError codes.
  */
@@ -15,6 +16,10 @@ import type {
   ProviderExecuteInput,
   ProviderExecuteResult,
 } from "./adapters";
+import {
+  assertStreamingAllowed,
+  iterateAnthropicSse,
+} from "./streaming";
 
 type AnthropicContentBlock = {
   type?: string;
@@ -67,8 +72,10 @@ function extractText(response: AnthropicMessagesResponse): string {
 export function createAnthropicAdapter(
   config: AiPlatformConfig
 ): AiProviderAdapter {
+  const streamingEnabled = Boolean(config.streamingEnabled);
   return {
     providerId: "anthropic",
+    streamingSupport: streamingEnabled,
     async execute(input: ProviderExecuteInput): Promise<ProviderExecuteResult> {
       if (!config.anthropicApiKey) {
         throw new AiPlatformError(
@@ -171,6 +178,87 @@ export function createAnthropicAdapter(
             costStatus: "unavailable",
             modelId: input.modelId,
             providerId: "anthropic",
+          },
+        };
+      } catch (error) {
+        if (error instanceof AiPlatformError) throw error;
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new AiPlatformError("timeout", "AI provider timed out.");
+        }
+        throw new AiPlatformError(
+          "provider_unavailable",
+          sanitizeAiErrorMessage(
+            error instanceof Error ? error.message : "Provider unavailable"
+          )
+        );
+      } finally {
+        clearTimeout(timer);
+      }
+    },
+    async *stream(input: ProviderExecuteInput) {
+      assertStreamingAllowed({
+        streamingEnabled,
+        structured: input.structured,
+      });
+      if (!config.anthropicApiKey) {
+        throw new AiPlatformError(
+          "no_provider_configured",
+          "ANTHROPIC_API_KEY is not configured."
+        );
+      }
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs);
+      let assembled = "";
+      try {
+        const mapped = mapChatMessages(input.messages);
+        if (mapped.messages.length === 0) {
+          throw new AiPlatformError(
+            "invalid_input",
+            "Anthropic request requires at least one user or assistant message."
+          );
+        }
+        const body: Record<string, unknown> = {
+          model: input.modelId,
+          max_tokens: 4096,
+          messages: mapped.messages,
+          stream: true,
+        };
+        if (mapped.system) body.system = mapped.system;
+        const base = config.anthropicBaseUrl.replace(/\/$/, "");
+        const res = await fetch(`${base}/messages`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": config.anthropicApiKey,
+            "anthropic-version": "2023-06-01",
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          if (res.status === 429) {
+            throw new AiPlatformError("rate_limited", "Provider rate limited.");
+          }
+          throw new AiPlatformError(
+            "provider_error",
+            sanitizeAiErrorMessage(errText || `Provider HTTP ${res.status}`)
+          );
+        }
+        for await (const delta of iterateAnthropicSse(
+          res.body,
+          controller.signal
+        )) {
+          assembled += delta;
+          yield { type: "delta", text: delta };
+        }
+        yield {
+          type: "completed",
+          text: assembled,
+          usage: {
+            inputTokens: null,
+            outputTokens: null,
+            cachedTokens: null,
           },
         };
       } catch (error) {

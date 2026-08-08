@@ -62,6 +62,7 @@ export function loadAiPlatformDiagnostics(): AiPlatformDiagnostics {
     anthropicDefaultModel: config.anthropicDefaultModel,
     localDefaultModel: config.localDefaultModel,
     defaultTimeoutMs: config.defaultTimeoutMs,
+    streamingEnabled: config.streamingEnabled,
   });
 
   return {

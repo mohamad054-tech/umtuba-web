@@ -1,47 +1,50 @@
-﻿# Current Task
+# Current Task
 
 ## Task title
 
-AI Creator Studio Foundation V1
+AI Streaming Foundation Port to Creator Tip V1
 
 ## Status
 
-`implementation-complete` — awaiting GO for commit/push
+`implementation-complete` — port/integration onto Creator Studio tip
 
 ## Branch
 
-`office/platform-ai-creator-studio-foundation-v1`
+`office/platform-ai-streaming-port-to-creator-v1`
 
 ## Worktree
 
-`C:\Users\1\Desktop\umtuba\umtuba-web-ai-creator-studio-foundation-v1`
+`C:\Users\1\Desktop\umtuba\umtuba-web-ai-streaming-port-to-creator-v1`
 
 ## Base
 
-`origin/office/platform-ai-unified-capability-execution-v1` @ `1c504ff`
+Creator Studio tip `aaccac3fd445de1c92e2e916dc081eeeddd7370b`
+(`office/platform-ai-creator-studio-foundation-v1`)
+
+## Streaming source (ported, not reinvented)
+
+`origin/office/ai-core-provider-streaming-foundation-v1` @ `0a04d59600dfe8e7296a47068ff23f09fdfbadd8`
+Single feature commit on prior AI-core lineage (diverged from Creator tip).
 
 ## Allowed scope
 
-- `lib/ai/creatorStudio/**`
-- `app/creator/studio/**`
-- `app/admin/ai/creator-studio/**`
-- `app/admin/ai/**` nav links only
-- `app/lib/nav/routes.ts` Creator Studio route only
-- `lib/ai/catalog/definitions.ts` capability binding only
-- `lib/ai/policy/fixtures.ts` policy binding only
-- `lib/ai/index.ts` exports only
-- `docs/ai/**`
+- Shared AI provider streaming foundation (`lib/ai/providers/streaming*`, adapters, config/registry/types wiring)
+- Docs lineage updates under `docs/ai/**`
+- `.env.example` streaming flag comment only
 
 ## Forbidden
 
-- Commit / push / merge
-- Live inference / network / Gemini / OpenAI
-- Commerce / Learning / Home / Private AI rewrites
-- `.env.local` / secrets
+- Second streaming architecture / event model
+- Streaming UI / gateway HTTP SSE product surface redesign
+- DB / migrations / persistence
+- Live provider activation / production enablement
+- Mutating Creator Studio source worktree
+- Alpha merge
+- Commerce / Collaboration / Learning product work
 
 ## Done
 
-- Creator Studio contracts, templates, sessions, drafts, history, versions
-- Unified Capability Execution integration (mock results only)
-- Creator UI `/creator/studio` + Admin `/admin/ai/creator-studio`
-- Tests + docs handoff
+- Semantic port of existing Streaming Foundation V1 onto Creator tip
+- `UMTUBA_AI_STREAMING` default OFF; opt-in `adapter.stream()`
+- Creator Studio tip behavior preserved when flag OFF
+- Mocked streaming tests adapted only for tip registry signature

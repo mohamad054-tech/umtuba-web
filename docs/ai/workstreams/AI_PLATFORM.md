@@ -1,28 +1,29 @@
 # AI Platform Workstream (Desktop-owned)
 
-## SAVE POINT — 2026-07-30 (Desktop)
+## SAVE POINT — 2026-08-08 (Desktop)
 
-**Machine:** Desktop  
-**Active work:** AI Core Local / Self-hosted Adapter V1
+**Machine:** Desktop
+**Active work:** AI Streaming Foundation Port to Creator Tip V1
 
 | Item | Value |
 | --- | --- |
-| Active branch | `office/ai-core-local-adapter-v1` |
-| Base | `fe07a1c` — Anthropic Adapter V1 |
-| Remote | Local implementation staged; **no commit/push until verification GO** |
-| Do not merge / no PR unless asked | Yes |
+| Active branch | `office/platform-ai-streaming-port-to-creator-v1` |
+| Base | Creator Studio tip `aaccac3` |
+| Streaming source | `origin/office/ai-core-provider-streaming-foundation-v1` @ `0a04d59` |
+| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-ai-streaming-port-to-creator-v1` |
 
-**Done this session (Desktop):**
-1. Local OpenAI-compatible provider adapter behind `AiProviderAdapter`
-2. Config + model registry + foundation selection (OpenAI/Gemini/Anthropic/Local interchangeable)
-3. Normalized error mapping + structured JSON (prompt-steered; no `response_format`)
-4. Streaming left disabled; fail-closed without both `LOCAL_AI_BASE_URL` and `LOCAL_AI_MODEL`
-5. Optional `LOCAL_AI_API_KEY`; unit tests + focused AI suite + `tsc`
+**Lineage:** Streaming Foundation V1 already existed on the prior AI-core lineage. This milestone ports it onto the Creator Studio tip (integration only — no second streaming architecture). Older docs that said “streaming next” after Creator Studio were stale.
+
+**Done on this tip:**
+1. Opt-in `adapter.stream()` (SSE deltas) for stub / OpenAI / Gemini / Anthropic / Local
+2. `UMTUBA_AI_STREAMING` gate (default OFF)
+3. Registry `streamingSupport` mirrors the gate
+4. Mocked streaming tests; `execute()` path unchanged when flag OFF
 
 **NOT done / do not touch by mistake:**
-- Live local/Ollama smoke (optional next)
-- Streaming enablement
-- Product Home / Navigation / Creator / App Shell
+- Gateway HTTP SSE product surface / streaming UI
+- Structured-output streaming
+- Live provider activation
 - Alpha merge
 - Remote migration apply without explicit GO
 
@@ -166,9 +167,9 @@ Milestone: `learning.tutor.thread_metadata_read_v1`
 - Tutor lean thread metadata: `20260873` — treat remote apply status as operator-known; do not re-apply without GO
 - Provider / Hub path: no new migration in this reconciliation
 
-## Next (after commit approval)
+## Next (after this port)
 
-1. Manual commit (no trailers) + push when approved
+1. Optional: gateway/HTTP SSE product surface (explicit GO) — do **not** redesign provider streaming contracts
 2. Optional live smoke against operator-hosted OpenAI-compatible endpoint
-3. Next implementation candidate: streaming (if GO) or alpha merge GO
-4. Do not merge into alpha without explicit GO
+3. Alpha merge only with explicit GO
+4. Do not re-implement Streaming Foundation V1 from the old AI-core branch
