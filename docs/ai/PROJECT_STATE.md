@@ -6,7 +6,7 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Playwright login-navigation residual fix prepared; Desktop browser verify pending |
+| Tip | Login client-nav fix: non-blocking referral claim + hard assign; Desktop re-verify required |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
@@ -16,13 +16,13 @@
 - Resource Link Foundation / Mutation Runtime (`20260919`)
 - Learning Resource Binding V1
 - Learning Resource Link/Unlink UI V1
-- Learning Link/Unlink E2E Provisioning V1 (harness/templates)
-- Learning Link/Unlink Credentialed E2E Smoke V1 (Desktop LOCAL RPC smoke PASS)
+- Learning Link/Unlink E2E Provisioning V1
+- Learning Link/Unlink Credentialed E2E Smoke V1 (Desktop LOCAL RPC PASS)
 
-### In progress / prepared
+### In progress
 
-- Playwright Login Navigation Residual Fix V1 — code+harness on SoT;
-  `DESKTOP_LOCAL_RUNTIME_VERIFICATION_REQUIRED` for browser UI E2E
+- Login Client Navigation Fix V1 — code on SoT;
+  `DESKTOP_LOCAL_RUNTIME_REVERIFICATION_REQUIRED`
 
 ### Ops forks (NOT SoT)
 

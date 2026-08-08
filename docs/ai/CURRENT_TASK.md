@@ -1,33 +1,38 @@
 # Current Task
 
-## COLLABORATION SoT — Playwright Login Navigation Residual Fix V1
+## COLLABORATION SoT — Login Client Navigation Fix V1
 
-- **Milestone:** `COLLABORATION_PLAYWRIGHT_LOGIN_NAVIGATION_RESIDUAL_FIX_V1`
+- **Milestone:** `COLLABORATION_LOGIN_CLIENT_NAVIGATION_FIX_V1`
 - **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Base HEAD:** `f2e35475d9edcad8b26c4ad3d88766b7573ec955`
+- **Base HEAD:** `47e8251b61819574ac640c2047d6996f9539951b`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
 
 ## Status
 
-**PREPARED_FOR_DESKTOP_VERIFICATION** — root cause addressed in product + harness;
-credentialed Playwright browser runtime requires Desktop LOCAL Supabase (laptop
-VT-x/Docker unavailable).
+**DESKTOP_LOCAL_RUNTIME_REVERIFICATION_REQUIRED**
 
-### Root cause (mixed)
+### Desktop runtime evidence consumed
 
-1. Product: post-login soft `router.push` + `router.refresh` after cookie write
-   is non-deterministic for middleware + Playwright URL observation.
-2. Harness: submit then `waitForURL` without racing the click missed full-doc
-   navigation readiness.
+`LOGIN_NAV_FAIL_RUNTIME_AUTH_HARD_NAV_PASS`:
+- Auth password grant 200 · cookie present · session PASS
+- Soft client leave-/login FAIL · URL stayed `/login`
+- Hard goto settings with same session PASS · learning UI visible
+- Playwright official spec FAIL only at `waitForURL` leaving `/login`
+
+### Root cause
+
+After `signInWithEmail`, login **awaited** `claimPendingReferralAction()` before
+`window.location.assign`. Auth was already healthy; a blocking/hung claim
+prevented leave-/login. `47e8251` hard-nav alone was insufficient.
 
 ### Fix
 
-- Login success → `window.location.assign(nextPath)` (real credentials still via
-  `signInWithEmail`; no auth bypass)
-- Playwright helper races submit + `waitForURL`; surfaces login alert on bounce
+- Keep full-document `window.location.assign(nextPath)` after auth
+- Kick off referral claim with `void` (non-blocking); bootstrap remains backstop
+- No auth bypass; middleware unchanged
 
 ## Do NOT start automatically
 
 - Commerce / advertiser bindings
-- Docker / BIOS / reboot on laptop
-- Production Auth / production Supabase
+- Docker / BIOS on laptop
+- Production Supabase

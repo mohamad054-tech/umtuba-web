@@ -69,22 +69,25 @@ function LoginForm() {
     try {
       await signInWithEmail(email, password);
 
-      // Idempotent referral claim — never blocks login on failure.
-      try {
-        await claimPendingReferralAction();
-      } catch (claimError) {
-        console.error(
-          "[referral-claim] login",
-          claimError instanceof Error ? claimError.name : "Error"
-        );
-      }
-
       const nextPath = getSafeRedirectPath(
         searchParams.get("next"),
         APP_ROUTES.discover
       );
-      // Full document navigation so auth cookies are visible to middleware and
-      // Playwright waitForURL observes a real URL change (soft router.push is flaky).
+
+      // Best-effort referral claim — must NOT block leave-/login.
+      // Desktop LOCAL evidence: auth cookie + session were already valid while
+      // the URL stayed on /login; awaiting this server action after sign-in can
+      // hang and trap navigation. ReferralClaimBootstrap covers first session.
+      void claimPendingReferralAction().catch((claimError) => {
+        console.error(
+          "[referral-claim] login",
+          claimError instanceof Error ? claimError.name : "Error"
+        );
+      });
+
+      // Full document navigation so middleware/server re-read auth cookies.
+      // Soft App Router push cannot reliably leave /login after cookie write
+      // (Desktop: router.push FAIL; hard navigation with same session PASS).
       window.location.assign(nextPath);
     } catch (error) {
       setFormError(

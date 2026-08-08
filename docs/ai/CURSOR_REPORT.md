@@ -1,21 +1,15 @@
-# CURSOR_REPORT — Playwright Login Navigation Residual Fix V1
+# CURSOR_REPORT — Login Client Navigation Fix V1
 
 ## Summary
 
-**PREPARED_FOR_DESKTOP_VERIFICATION** — Minimal product + harness fix for the
-Collaboration Playwright login-navigation residual. Laptop-safe Vitest/tsc PASS.
-Credentialed browser Playwright cannot run on this laptop (no Docker/local
-Supabase). No migrations. No production target. Auth still uses real login form.
+**DESKTOP_LOCAL_RUNTIME_REVERIFICATION_REQUIRED** — Product login no longer awaits
+referral claim before full-document navigation after successful sign-in. Matches
+Desktop evidence: session/cookie healthy while URL remained `/login`.
 
 ## Exact files changed
 
-- `app/login/page.tsx` — hard navigate via `window.location.assign` after sign-in
-- `e2e/collaboration/helpers/loginAs.ts` (new)
-- `e2e/collaboration/smoke/learning-link-unlink.spec.ts`
+- `app/login/page.tsx`
 - `lib/supabase/authSession.harden.test.ts`
-- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.ts`
-- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.test.ts`
-- `scripts/collaboration-e2e/OPERATOR_PROVISIONING.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -26,16 +20,15 @@ NO
 
 ## Security review
 
-- No auth bypass / no storageState / no service-role browser path
-- Still `signInWithEmail` + safe `next` via `getSafeRedirectPath`
+- Still real `signInWithEmail` + `getSafeRedirectPath`
+- No auth bypass / no storageState / no privileged test branch
 - Middleware/auth guards unchanged
-- No production credentials; no secrets committed
+- Referral claim still attempted (non-blocking) + ReferralClaimBootstrap
 
 ## Tests
 
-- Targeted auth + Collaboration Vitest: **48/48 PASS**
-- Credentialed Playwright browser: **NOT RUN on laptop** →
-  `DESKTOP_LOCAL_RUNTIME_VERIFICATION_REQUIRED`
+- Focused auth/harden + referral + Collaboration Vitest: **49/49 PASS**
+- Credentialed Playwright: **NOT RUN on laptop**
 
 ## TypeScript
 
@@ -43,7 +36,7 @@ NO
 
 ## Build
 
-N/A (login navigation + e2e helper; no new app entry surface beyond login)
+N/A
 
 ## git diff --check
 
@@ -55,5 +48,4 @@ PASS
 
 ## Open issues
 
-Desktop must re-run credentialed Playwright against local Supabase to confirm
-browser UI smoke progresses past `/login`.
+Desktop must re-verify Playwright learning-link-unlink smoke leaves `/login`.

@@ -102,4 +102,16 @@ describe("auth session harden contracts", () => {
     expect(login).toMatch(/signInWithEmail/);
     expect(login).toMatch(/getSafeRedirectPath/);
   });
+
+  it("login does not await referral claim before leaving /login", () => {
+    const login = read("app/login/page.tsx");
+    expect(login).toMatch(/void claimPendingReferralAction\(\)/);
+    expect(login).not.toMatch(/await claimPendingReferralAction/);
+    const assignIdx = login.indexOf("window.location.assign(nextPath)");
+    const voidClaimIdx = login.indexOf("void claimPendingReferralAction()");
+    expect(assignIdx).toBeGreaterThan(-1);
+    expect(voidClaimIdx).toBeGreaterThan(-1);
+    // Claim kickoff may precede assign, but must not be awaited before it.
+    expect(assignIdx).toBeGreaterThan(voidClaimIdx);
+  });
 });
