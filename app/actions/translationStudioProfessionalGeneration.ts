@@ -26,6 +26,9 @@ import {
   seedUmtubaOfficialTerminologyCatalog,
   buildProfessionalTranslationRequestContext,
   PROFESSIONAL_AI_AUTHORITY,
+  applyProfessionalCandidateToDraft,
+  buildProfessionalAiUxReadinessSummary,
+  assessLiveProfessionalProviderReadiness,
   type StudioLanguageCode,
 } from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
@@ -33,6 +36,11 @@ import { APP_ROUTES } from "../lib/nav";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 const STUDIO_BASE = "/admin/translation-studio";
+
+/** Never redirect with raw Error.message (may contain provider bodies). */
+function sanitizeCaughtProfessionalError(): string {
+  return "professional_failed";
+}
 
 function revalidateStudio(keyId?: string) {
   revalidatePath(STUDIO_BASE);
@@ -197,8 +205,7 @@ export async function generateProfessionalTranslationSuggestionAction(
     ) {
       throw error;
     }
-    const message =
-      error instanceof Error ? error.message : "professional_generate_failed";
+    const message = sanitizeCaughtProfessionalError();
     redirect(`${back}?error=${encodeURIComponent(message)}`);
   }
 }
@@ -255,13 +262,58 @@ export async function reviewCurrentTranslationProfessionallyAction(
     ) {
       throw error;
     }
-    const message =
-      error instanceof Error ? error.message : "professional_review_failed";
+    const message = sanitizeCaughtProfessionalError();
     redirect(`${back}?error=${encodeURIComponent(message)}`);
   }
 }
 
-/** JSON diagnostic (admin) — no secrets. */
+/**
+ * Apply professional candidate text into draft only.
+ * Uses workflow.saveDraft — never approve / submit / publish.
+ */
+export async function applyProfessionalCandidateToDraftAction(
+  formData: FormData
+): Promise<void> {
+  const { user, supabase } = await requireStudioAdmin();
+  const suggestionId = formString(formData, "suggestionId");
+  const keyId = formString(formData, "keyId");
+  const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
+
+  try {
+    const result = await withShadowTransportAsync(supabase, async () =>
+      applyProfessionalCandidateToDraft({
+        workflow: getTranslationStudioWorkflow(),
+        suggestionId,
+        actorUserId: user.id,
+      })
+    );
+
+    if (!result.ok) {
+      redirect(
+        `${back}?error=${encodeURIComponent(`professional_apply_${result.reason}`)}`
+      );
+    }
+
+    revalidateStudio(keyId);
+    redirect(
+      `${back}?professional_applied=1&valueId=${encodeURIComponent(result.valueId)}&status=draft`
+    );
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "digest" in error &&
+      String((error as { digest?: string }).digest ?? "").startsWith("NEXT_REDIRECT")
+    ) {
+      throw error;
+    }
+    redirect(
+      `${back}?error=${encodeURIComponent(sanitizeCaughtProfessionalError())}`
+    );
+  }
+}
+
+/** JSON diagnostic (admin) — no secrets / no raw env values. */
 export async function getProfessionalGenerationRuntimeStatusAction(): Promise<{
   offlinePipelineReady: true;
   liveProviderConfigured: boolean;
@@ -269,6 +321,7 @@ export async function getProfessionalGenerationRuntimeStatusAction(): Promise<{
   note: string;
   authority: typeof PROFESSIONAL_AI_AUTHORITY;
   requiredEnvNames: string[];
+  uxReadiness: ReturnType<typeof buildProfessionalAiUxReadinessSummary>;
 }> {
   await requireStudioAdmin();
   let mode: string | null = null;
@@ -281,6 +334,11 @@ export async function getProfessionalGenerationRuntimeStatusAction(): Promise<{
   } catch {
     mode = null;
   }
+  const readiness = assessLiveProfessionalProviderReadiness();
+  const uxReadiness = buildProfessionalAiUxReadinessSummary({
+    readiness,
+    aiMode: mode,
+  });
   return {
     offlinePipelineReady: true,
     liveProviderConfigured: live,
@@ -289,15 +347,7 @@ export async function getProfessionalGenerationRuntimeStatusAction(): Promise<{
       ? "Live AI mode available for professional adapters"
       : "OFFLINE_PIPELINE_READY / LIVE_PROVIDER_NOT_CONFIGURED",
     authority: PROFESSIONAL_AI_AUTHORITY,
-    requiredEnvNames: [
-      "UMTUBA_AI_MODE",
-      "OPENAI_API_KEY",
-      "GEMINI_API_KEY",
-      "ANTHROPIC_API_KEY",
-      "LOCAL_AI_BASE_URL",
-      "LOCAL_AI_MODEL",
-      "UMTUBA_AI_ALLOW_STUB",
-      "UMTUBA_AI_TIMEOUT_MS",
-    ],
+    requiredEnvNames: [...uxReadiness.configVariableNames],
+    uxReadiness,
   };
 }
