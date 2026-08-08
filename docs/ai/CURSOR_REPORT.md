@@ -1,35 +1,23 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_EXECUTION_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_GENERATOR_REVIEWER_MATRIX_EVALUATION_V1
 
 ## Summary
 
-**Verdict: SMOKE_PASS — CLOSED**
+**Verdict: VALIDATED_AND_CLOSED**
 
-Live professional small-smoke execution path is implemented and operator-validated
-(`SMOKE_PASS`, 5/5 generate+review, 10 calls within ceiling 20, `mutatedStudio:
-false`). Includes provider/model routing hints, sanitized reviewer failure
-diagnostics, attribution fix, and reviewer schema alignment to all 10
-authoritative quality dimensions.
+Bounded generator × reviewer matrix evaluation foundation validated offline
+(default + comparison CLIs), budget edges confirmed with fakes only, tests +
+`tsc` PASS. No paid/live provider calls. Commit + push on closeout GO.
 
-JSON remains authoritative. Persistence mode / shadow_dual_write / dual_read
-were not changed by this milestone. No secrets committed.
+Base SHA: `d89eebdab534c3466b5ae368c380420a50d4d7f2`
 
 ## Exact files changed
 
-- `lib/translationStudio/professionalQuality/smallSmokeRunner.ts`
-- `lib/translationStudio/professionalQuality/smallSmokeReviewDiagnostics.ts` (new)
-- `lib/translationStudio/professionalQuality/providerTransport.ts`
-- `lib/translationStudio/professionalQuality/transportAdapters.ts`
-- `lib/translationStudio/professionalQuality/reviewerPrompt.ts`
+- `lib/translationStudio/professionalQuality/generatorReviewerMatrix.ts` (new)
+- `lib/translationStudio/professionalQuality/generatorReviewerMatrixRunner.ts` (new)
 - `lib/translationStudio/professionalQuality/index.ts`
-- `scripts/translation/professionalProviderSmoke.ts`
-- `lib/ai/contracts/public.ts`
-- `lib/ai/services/aiService.ts`
-- `lib/ai/prompts/registry.ts`
-- `lib/translationStudio/translationStudioLiveAiProviderSmallSmokePrep.test.ts`
-- `lib/translationStudio/translationStudioLiveAiProviderSmallSmokeExecution.test.ts` (new)
-- `lib/translationStudio/translationStudioLiveAiProviderSmallSmokeReviewDiagnostics.test.ts` (new)
-- `lib/translationStudio/translationStudioLiveAiProviderReviewSchemaAlignment.test.ts` (new)
-- `lib/translationStudio/translationStudioProfessionalAiReviewPipeline.test.ts`
+- `scripts/translation/professionalMatrixEval.ts` (new)
+- `lib/translationStudio/translationStudioGeneratorReviewerMatrixEvaluation.test.ts` (new)
+- `package.json` (`translation:matrix-eval`)
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -38,17 +26,21 @@ were not changed by this milestone. No secrets committed.
 
 ## Security review
 
-- No API keys / Authorization headers / raw provider bodies in tree
-- Smoke CLI emits sanitized categorical diagnostics only
-- Explicit GO + LIVE_BENCHMARK_READY + call ceiling gates preserved
+- No `OPENAI_API_KEY` inspection/exposure; config names only
+- Offline/fake default; live gated by explicit GO + readiness
+- Sanitized reports omit source/candidate text
+- No `.env.local` modification; no secret-bearing artifacts
+- Persistence / dual_read / shadow_dual_write untouched by this milestone
 
 ## Tests
 
-Focused live-smoke / diagnostics / schema-alignment suites — see closeout report.
+- Matrix suite + professional gen/review + small-smoke regression: **54/54 PASS**
+- Default offline CLI: `MATRIX_PASS` (1 cell, 10 calls)
+- Comparison offline CLI: `MATRIX_PASS` (2 cells, 20 calls)
 
 ## TypeScript
 
-`npx tsc --noEmit` required PASS before commit.
+`npx tsc --noEmit` → PASS
 
 ## Build
 
@@ -56,16 +48,15 @@ Not required (CLI/lib only).
 
 ## git diff --check
 
-Required PASS before commit.
+PASS
 
 ## git status --short
 
-Clean after commit + push (closeout).
+Clean after closeout commit + push (expected).
 
-## Open issues
+## Open issues / NEXT
 
-1. Optional follow-up: live sensitive reviewer for commerce_refund (currently
-   heuristic_sensitive when sensitive readiness is READY).
-2. Recommended next (not started): professional live provider evaluation /
-   independent generator×reviewer matrix, or Studio UX integration — only with
-   a separate GO.
+1. Live CLI currently uses a single env-configured pair; no explicit CLI flags for
+   multi-cell generator/reviewer selection — recommended NEXT paid matrix milestone
+   (selection ergonomics + authorized live run), not a blocker for this foundation.
+2. Do not start paid/live matrix without a separate GO.

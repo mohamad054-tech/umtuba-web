@@ -52,3 +52,5 @@ export * from "./smallSmokePackage";
 export * from "./smallSmokeEligibility";
 export * from "./smallSmokeReviewDiagnostics";
 export * from "./smallSmokeRunner";
+export * from "./generatorReviewerMatrix";
+export * from "./generatorReviewerMatrixRunner";
