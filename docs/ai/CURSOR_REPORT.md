@@ -1,29 +1,32 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1_CLOSEOUT
+# CURSOR_REPORT — TRANSLATION_STUDIO_PERSISTENCE_ACCEPTANCE_CLOSEOUT_V1
 
 ## Summary
 
-**Verdict: CLOSEOUT_COMPLETE — SUCCESS**
+**Verdict: ACCEPTANCE_CLOSEOUT_COMPLETE — SUCCESS**
 
-Operational Limited Shadow Observation V1 closed cleanly on base
-`919715505c220b3ae6389005e99de13681db39e6`.
+`TRANSLATION_STUDIO_PERSISTENCE_V1` is **ACCEPTED** on base
+`5f8dc5efc46fd605a43b18b8c7eda8fc1b964c49`.
 
-Authoritative execution result retained:
-`OBSERVATION_COMPLETE — SUCCESS` with authenticated Platform Admin transport,
-isolated `__shadow_smoke_v1__` mutation, shadow succeed, IN_SYNC readback,
-`actionableDrift=false`, breaker CLOSED→CLOSED, observe OFF.
+Accepted architecture boundary (JSON-authoritative):
 
-Temporary execution-only helpers **removed** (not committed):
-- `app/admin/translation-studio/limited-shadow-observation/`
-- `app/admin/translation-studio/limitedShadowObservationOnce.ts`
-- `scripts/translation/_limitedShadowPreCapture.ts`
-- local capture/arm/probe/report JSON artifacts
+- Persistence mode: `shadow_dual_write`
+- Dual-read observe: **ON** operationally (`UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE=1`)
+- JSON file store remains authoritative for caller-visible Studio writes
+- Shadow DB writes are best-effort / isolated from JSON save success
+- Authenticated Platform Admin readback proven (`translation_studio_read_snapshot`)
+- Dual-read observe is fail-closed (unsafe composition refused; breaker gates scheduling)
+- Stability: 6/6 automatic observe cycles **IN_SYNC**, `actionableDrift=false`, breaker **CLOSED**
+- `baselineParityProven`: **true** (Limited Shadow Observation + observe window)
+- `db_primary_json_fallback`: **unsupported / deferred** (not accepted; no authority cutover)
 
-Closeout commit preserves sanitized evidence only in this report file.
-No observe enable. No remote writes during closeout.
+Rollback (observe): unset `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` (or `0`/`false`),
+reload app process; JSON authority unchanged.
 
 ## Exact files changed
 
-- `docs/ai/CURSOR_REPORT.md` — sanitized closeout + observation evidence summary
+- `docs/ai/CURSOR_REPORT.md` — this acceptance closeout
+- `docs/ai/CURRENT_TASK.md` — persistence accepted + observe ON boundary
+- `docs/ai/COMPUTER_2_CENTRAL_SERVER_HANDOFF_V1.md` — persistence/observe acceptance note
 
 ## Migrations created
 
@@ -31,37 +34,34 @@ No observe enable. No remote writes during closeout.
 
 ## Security review
 
-- No auth/session/cookie/token material in committed files
-- No service-role / API secrets
-- `ALLOW_SHADOW_SMOKE` absent; observe absent/OFF
-- Local `shadow-smoke-v1.json` absent; arm absent; probe removed
-- Commit trailers: no Co-authored-by / Signed-off-by
+- No secrets / tokens / cookies / raw RPC payloads in docs
+- No `.env.local` secret changes in this closeout commit
+- No paid AI; no Studio mutations; no DB-primary enable
 
-## Shadow observation evidence (sanitized)
+## Evidence chain (sanitized)
 
-- Transport: authenticated Platform Admin (`actorPresent=true`)
-- Mutation: one isolated `__shadow_smoke_v1__` smoke path
-- Local smoke save: success; `store.json` untouched
-- Shadow write: success (`queued`→`started`→`succeeded`)
-- Ordering: local smoke first, shadow second
-- Readback: authenticated compare **IN_SYNC**
-- Counts: missing_remote=0, field_mismatch=0, extra_remote=3, audit_extra=1
-  (known non-actionable smoke residue)
-- Breaker: CLOSED → CLOSED
-- Fingerprint (before observation & after closeout verify):
-  `ac7bb9aebaf8ad2985df7ea30ab0bee98ac7b57e6a9b4832d29c07d869a52451`
-- `baselineParityProven`: **true (operator-attestable)**
-- `READY_FOR_DUAL_READ_OBSERVE_ACTIVATION`: **YES** (separate GO; observe still OFF)
+1. `LIMITED_SHADOW_OBSERVATION_V1` — SUCCESS (isolated `__shadow_smoke_v1__`, IN_SYNC)
+2. `DUAL_READ_OBSERVE_ACTIVATION_V1` — ACTIVATION_PASS
+3. `DUAL_READ_OBSERVE_STABILITY_WINDOW_V1` — STABILITY_PASS (6/6 landing cycles)
+
+Fingerprint retained:
+`ac7bb9aebaf8ad2985df7ea30ab0bee98ac7b57e6a9b4832d29c07d869a52451`
+
+## Known non-blocking debt
+
+- Append-only observe journal growth
+- Duplicate observation noise on rapid landing refresh
+- Known non-actionable `__shadow_smoke_v1__` remote residue
+- Unsupported `db_primary_json_fallback`
+- No prune
 
 ## Tests
 
-PASS — 6 files / 65 tests:
-- `translationStudioIsolatedShadowSmokeV1.test.ts` (14)
-- `translationStudioShadowDualWrite.test.ts` (13)
-- `translationStudioDualRead.test.ts` (9)
-- `translationStudioDualReadObservation.test.ts` (9)
-- `translationStudioDualReadObserveReadiness.test.ts` (7)
-- `translationStudioReconciliationRepresentationAlign.test.ts` (13)
+PASS — 9 files / 93 tests:
+- persistence port / workflow / DB adapter
+- shadow dual-write + isolated shadow smoke
+- dual-read compare / observation / observe readiness
+- reconciliation representation align
 
 ## TypeScript
 
@@ -69,7 +69,7 @@ PASS — `npx tsc --noEmit`
 
 ## Build
 
-N/A (docs-only closeout commit; no UI entry change retained)
+N/A (docs-only)
 
 ## git diff --check
 
@@ -77,10 +77,11 @@ PASS
 
 ## git status --short
 
-(filled after commit/push)
+(filled after push)
 
 ## Open issues / NEXT
 
-1. Separate GO only: dual-read observe activation (do not start here).
-2. When activating, pass `baselineParityProven: true` from this observation.
-3. Keep JSON authoritative; keep observe OFF until that GO.
+1. DB-primary authority cutover remains **deferred** (separate future GO only).
+2. Recommended next Translation milestone: operational soak / productization of
+   Studio workflows under accepted JSON+shadow+observe — **not** DB-primary.
+3. Optional later: journal retention/dedupe hygiene (non-correctness).

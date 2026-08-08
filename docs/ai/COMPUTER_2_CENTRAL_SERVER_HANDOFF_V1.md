@@ -79,13 +79,14 @@ Includes (non-exhaustive evidence via `git log`):
 
 | Concern | State |
 | --- | --- |
-| Authoritative runtime | **JSON** (default) |
-| Persistent shadow mode | Executable via `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE=shadow_dual_write` (ops may keep disabled) |
-| `dual_read` observe | Executable composition; **default OFF** (`UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` unset). Preferred nest: shadow + observe. JSON-only observe refused. |
-| `db_primary_json_fallback` | unsupported (fail closed) |
+| Authoritative runtime | **JSON** (accepted) |
+| Persistent shadow mode | Executable via `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE=shadow_dual_write` |
+| `dual_read` observe | **ACCEPTED ON** operationally (`UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE=1`) under shadow composition. JSON-only observe refused. |
+| `db_primary_json_fallback` | unsupported / **deferred** (fail closed) — not accepted |
 | Request transport | authenticated Supabase client; **no service_role** |
-| Write path | `translation_studio_upsert_snapshot` (platform admin) |
+| Write path | JSON first; shadow via `translation_studio_upsert_snapshot` (platform admin) |
 | Read path | `translation_studio_read_snapshot` (platform admin) |
+| Persistence acceptance | `TRANSLATION_STUDIO_PERSISTENCE_V1` = **ACCEPTED** (JSON-authoritative + shadow + observe) |
 
 ### Dual-read observe rollback
 
@@ -128,20 +129,16 @@ Global remote tip at handoff time: **20260915** (`store_partial_refund_provider_
 
 ### Shadow / observation
 
-- Last task: `TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1` = **NOT_READY**
-- Reason: intended **normal** Studio admin mutation did **not** execute (agent could not drive the authenticated platform-admin browser session; default browser hit non-admin)
-- `store.json` never appeared; no observation shadow write; JSON/default restored; shadow disabled
+- `TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1` = **SUCCESS**
+- `TRANSLATION_STUDIO_DUAL_READ_OBSERVE_ACTIVATION_V1` = **ACTIVATION_PASS**
+- `TRANSLATION_STUDIO_DUAL_READ_OBSERVE_STABILITY_WINDOW_V1` = **STABILITY_PASS** (6/6 IN_SYNC)
+- `TRANSLATION_STUDIO_PERSISTENCE_V1` = **ACCEPTED** (JSON-authoritative; observe ON; DB-primary deferred)
 
 ### Exact current blocker / next decision
 
-**Blocker:** Computer-2 limited shadow observation requires one real platform-admin Save-draft mutation in the authenticated admin browser session; that step did not complete.
+**Blocker for DB-primary:** none claimed ready — authority cutover remains **out of scope** until a dedicated future GO.
 
-**Next Translation recommendation (DO NOT auto-start on Computer 2):**
-
-- Retry: `TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1`  
-  only after central server assigns it and an admin session can perform the single controlled EN draft mutation on `val_appshell_actions__back_en` (or equivalent safe value).
-
-Do **not** start Cycle 2 or operational readiness until observation PASSes.
+**Next Translation recommendation:** operational soak / Studio workflow productization under accepted JSON + shadow + observe. Do **not** auto-start DB-primary.
 
 ---
 

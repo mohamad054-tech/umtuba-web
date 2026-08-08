@@ -87,11 +87,19 @@ Runtime remains JSON file store — no JSON→DB switch.
   - Executable modes: `json` (default), `shadow_dual_write`, `dual_read` (JSON + compare, no writes)
   - Unsupported: `db_primary_json_fallback` (fail closed to JSON)
   - Runtime remains **JSON-authoritative** — no DB-primary
-- Dual-read observe: `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` defaults **OFF**
+- **ACCEPTED:** `TRANSLATION_STUDIO_PERSISTENCE_V1` (JSON-authoritative architecture)
+  - Operational composition: `shadow_dual_write` + dual-read observe **ON**
+  - Evidence: Limited Shadow Observation SUCCESS → Observe ACTIVATION_PASS → Stability STABILITY_PASS (6/6 IN_SYNC)
+  - `baselineParityProven=true`; breaker CLOSED; known `__shadow_smoke_v1__` extras non-actionable
+  - DB-primary / prune / authority cutover: **explicitly deferred**
+- Dual-read observe: `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE`
   - Preferred safe composition: `shadow_dual_write` + observe nest
   - Observe over plain JSON-only is refused (activation-unsafe)
+  - Rollback: unset observe flag (or `0`/`false`) and reload process; JSON unchanged
   - Preflight: `npm run translation:dual-read-preflight` (zero remote writes)
 
 ## Next milestone
 
-`TRANSLATION_STUDIO_LIMITED_SHADOW_OBSERVATION_V1` (retry) then separate **activation GO** for observe — do **not** enable observe / flip authority without GO.
+Do **not** start DB-primary. Recommended: Translation Studio operational soak /
+workflow productization under accepted JSON + shadow + observe. Any authority
+cutover requires a separate dedicated GO.
