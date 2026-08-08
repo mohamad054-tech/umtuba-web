@@ -14,6 +14,11 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: "list",
+  // Credentialed smoke budgets: login leave-/login (45s) + panel/link/unlink waits.
+  timeout: 120_000,
+  expect: {
+    timeout: 20_000,
+  },
   use: {
     baseURL,
     trace: "off",

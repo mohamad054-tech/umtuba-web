@@ -2,10 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import {
-  COLLABORATION_PLATFORM_DISABLED_MESSAGE,
-  rejectIfCollaborationPlatformDisabled,
-} from "../../lib/collaboration/collaborationPlatformGate";
+import { rejectIfCollaborationPlatformDisabled } from "../../lib/collaboration/collaborationPlatformGate";
 import {
   createLearningWorkspaceResourceReference,
   unlinkLearningWorkspaceResourceReference,
@@ -494,6 +491,6 @@ export async function unlinkLearningWorkspaceResourceAction(
   };
 }
 
-/** Exported for tests — must stay aligned with action fail-closed copy. */
-export const COLLABORATION_ACTION_DISABLED_MESSAGE =
-  COLLABORATION_PLATFORM_DISABLED_MESSAGE;
+/* Next.js "use server" modules may only export async functions.
+ * Fail-closed copy for tests: import COLLABORATION_PLATFORM_DISABLED_MESSAGE
+ * from lib/collaboration/collaborationPlatformGate. */
