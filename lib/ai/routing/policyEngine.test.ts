@@ -299,8 +299,13 @@ describe("gateway + aiService use Routing Policy", () => {
     );
     expect(src).toMatch(/createRoutingPolicyEngine/);
     expect(src).toMatch(/routingPolicy\.resolve/);
+    expect(src).toMatch(/preferredProviderHint/);
+    expect(src).toMatch(/preferredModelHint/);
+    expect(src).toMatch(/preferredModel:/);
     expect(src).not.toMatch(/foundation\.resolveRoute/);
     expect(src).not.toMatch(/routeModel\(/);
+    expect(src).not.toMatch(/preferredModelId/);
+    expect(src).not.toMatch(/preferredProviderId/);
   });
 
   it("aiService does not import router or model selection", () => {
@@ -309,7 +314,11 @@ describe("gateway + aiService use Routing Policy", () => {
       "utf8"
     );
     expect(src).toMatch(/executeAiGateway/);
+    expect(src).toMatch(/preferredModelHint/);
+    expect(src).toMatch(/preferredProviderHint/);
     expect(src).not.toMatch(/routeModel|createRoutingPolicyEngine|preferredModelId/);
+    expect(src).not.toMatch(/preferredProviderId/);
+    expect(src).not.toMatch(/from ["'].*routing\//);
   });
 
   it("runs gateway stub via policy-backed selection", async () => {
@@ -342,6 +351,80 @@ describe("gateway + aiService use Routing Policy", () => {
     if (!result.ok) return;
     expect(result.data.providerId).toBe("stub");
     expect(result.data.route.reason).toMatch(/policy_/);
+  });
+
+  it("maps public provider/model hints into preferred routing without aiService owning selection", async () => {
+    const result = await executeAiGateway(
+      USER,
+      {
+        capabilityId: "platform.translation_professional_generate",
+        promptId: "platform.translation_professional_generate",
+        userInput: JSON.stringify({
+          sourceText: "Back",
+          targetLocale: "ar",
+        }),
+        outputMode: "structured_json",
+        context: {
+          productDomain: "platform",
+          surface: "admin.translation_studio.professional",
+          dataClassification: "internal",
+          allowedCapabilities: ["platform.translation_professional_generate"],
+          allowedToolIds: [],
+        },
+        preferredProviderHint: "stub",
+        preferredModelHint: "stub-structured-v1",
+        _test: { forceStub: true, bypassRateLimit: true },
+      },
+      {
+        config: loadAiPlatformConfig({
+          mode: "stub",
+          allowStub: true,
+          openaiApiKey: null,
+        }),
+        capabilityEligible: true,
+      }
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.providerId).toBe("stub");
+    expect(result.data.modelId).toBe("stub-structured-v1");
+    expect(result.data.route.reason).toBe("policy_preferred_model");
+  });
+
+  it("defaults routing when provider/model hints are absent", async () => {
+    const result = await executeAiGateway(
+      USER,
+      {
+        capabilityId: "platform.translation_professional_review",
+        promptId: "platform.translation_professional_review",
+        userInput: JSON.stringify({
+          sourceText: "Back",
+          candidateText: "رجوع",
+          targetLocale: "ar",
+        }),
+        outputMode: "structured_json",
+        context: {
+          productDomain: "platform",
+          surface: "admin.translation_studio.professional",
+          dataClassification: "internal",
+          allowedCapabilities: ["platform.translation_professional_review"],
+          allowedToolIds: [],
+        },
+        _test: { forceStub: true, bypassRateLimit: true },
+      },
+      {
+        config: loadAiPlatformConfig({
+          mode: "stub",
+          allowStub: true,
+          openaiApiKey: null,
+        }),
+        capabilityEligible: true,
+      }
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.providerId).toBe("stub");
+    expect(result.data.route.reason).toMatch(/policy_deterministic/);
   });
 });
 

@@ -121,8 +121,16 @@ export type AiGatewayRequest = {
   };
   outputMode: AiOutputMode;
   allowedToolIds?: string[];
-  preferredProviderId?: string;
-  preferredModelId?: string;
+  /**
+   * High-level allowlisted provider preference from the public AI service contract.
+   * Gateway maps this into Routing Policy — callers must not import router internals.
+   */
+  preferredProviderHint?: string;
+  /**
+   * High-level allowlisted model preference from the public AI service contract.
+   * Gateway maps this into Routing Policy — callers must not import router internals.
+   */
+  preferredModelHint?: string;
   sessionId?: string;
   metadata?: Record<string, string | number | boolean | null>;
   /** Test/injected override — never from clients. */

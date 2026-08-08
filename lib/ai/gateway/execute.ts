@@ -203,10 +203,10 @@ export async function executeAiGateway(
       requiredCapabilityClass:
         request.outputMode === "structured_json" ? "structured" : undefined,
       preferredModel:
-        request.preferredProviderId && request.preferredModelId
+        request.preferredProviderHint && request.preferredModelHint
           ? {
-              providerId: request.preferredProviderId,
-              modelId: request.preferredModelId,
+              providerId: request.preferredProviderHint,
+              modelId: request.preferredModelHint,
             }
           : undefined,
       allowFallback: true,

@@ -300,7 +300,7 @@ async function runCapabilityInner(
           allowedCapabilities: ["platform.translation_suggest"],
           allowedToolIds: [],
         },
-        preferredModelId: request.preferredModelHint,
+        preferredModelHint: request.preferredModelHint,
         _test: deps.forceStub
           ? { forceStub: true, bypassRateLimit: true }
           : undefined,
@@ -369,8 +369,8 @@ async function runCapabilityInner(
           allowedCapabilities: [capabilityId],
           allowedToolIds: [],
         },
-        preferredProviderId: request.preferredProviderHint,
-        preferredModelId: request.preferredModelHint,
+        preferredProviderHint: request.preferredProviderHint,
+        preferredModelHint: request.preferredModelHint,
         _test: deps.forceStub
           ? { forceStub: true, bypassRateLimit: true }
           : undefined,
