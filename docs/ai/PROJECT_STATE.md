@@ -6,7 +6,7 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Learning Resource Link/Unlink UI V1 (on Learning Binding SoT) |
+| Tip | Learning Link/Unlink UI closed; credentialed E2E smoke **BLOCKED** |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
@@ -16,21 +16,24 @@
 - Resource Link Foundation V1 INTEGRATED / CLOSED on SoT
 - Resource Link Mutation Runtime V1 INTEGRATED / CLOSED on SoT (`20260919` APPLIED + VERIFIED)
 - Learning Resource Binding V1 INTEGRATED / CLOSED on SoT
-  - Canonical target: Learning Space (`learning_spaces.id` → `learning_space`)
-  - No migration; no Learning lifecycle mutation
 - Learning Resource Link/Unlink UI V1 CLOSED on SoT
-  - Settings panel: view / link / unlink via binding contracts
+
+### Blocked
+
+- Learning Resource Link/Unlink Credentialed E2E Smoke V1
+  - Missing dedicated E2E identities + SoT credentialed harness + opt-in env
 
 ### Ops forks (NOT SoT)
 
-- Smoke / keepalive — NOT SoT; stale Collaboration `20260898` = DO NOT APPLY
+- Smoke / keepalive — NOT SoT; readiness-only; credentialed E2E still deferred there
+- stale Collaboration `20260898` = DO NOT APPLY
 - Remote `20260898` = Commerce
 
 ### Deferred
 
 - Commerce / advertiser resource-link bindings
 - Invite expansion
-- Credentialed E2E role-update / mutation / link-unlink smoke
+- Credentialed E2E (role-update / mutation / link-unlink) pending identities
 
 ### Flag
 
