@@ -1,32 +1,29 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_PERSISTENCE_ACCEPTANCE_CLOSEOUT_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_DUAL_READ_SHADOW_RACE_FIX_V1_CLOSEOUT
 
 ## Summary
 
-**Verdict: ACCEPTANCE_CLOSEOUT_COMPLETE — SUCCESS**
+**Verdict: CLOSEOUT_COMPLETE — SUCCESS**
 
-`TRANSLATION_STUDIO_PERSISTENCE_V1` is **ACCEPTED** on base
-`5f8dc5efc46fd605a43b18b8c7eda8fc1b964c49`.
+Race-fix V1 closed on base `fedd30b9dfd9f29efd8e9954ec6b85f72fbcb3cc`.
+Overlapping / recently completed shadow writes on the same snapshot-hash
+lineage classify as `TRANSIENT_LAG`; observation performs one bounded settle
+re-read before breaker open. Real durable drift outside the settle window
+still opens the breaker.
 
-Accepted architecture boundary (JSON-authoritative):
-
-- Persistence mode: `shadow_dual_write`
-- Dual-read observe: **ON** operationally (`UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE=1`)
-- JSON file store remains authoritative for caller-visible Studio writes
-- Shadow DB writes are best-effort / isolated from JSON save success
-- Authenticated Platform Admin readback proven (`translation_studio_read_snapshot`)
-- Dual-read observe is fail-closed (unsafe composition refused; breaker gates scheduling)
-- Stability: 6/6 automatic observe cycles **IN_SYNC**, `actionableDrift=false`, breaker **CLOSED**
-- `baselineParityProven`: **true** (Limited Shadow Observation + observe window)
-- `db_primary_json_fallback`: **unsupported / deferred** (not accepted; no authority cutover)
-
-Rollback (observe): unset `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE` (or `0`/`false`),
-reload app process; JSON authority unchanged.
+Runtime boundary unchanged: JSON authoritative, `shadow_dual_write`, observe
+ON, breaker CLOSED after post-fix parity proof. No DB-primary, no migration,
+no remote writes for closeout.
 
 ## Exact files changed
 
-- `docs/ai/CURSOR_REPORT.md` — this acceptance closeout
-- `docs/ai/CURRENT_TASK.md` — persistence accepted + observe ON boundary
-- `docs/ai/COMPUTER_2_CENTRAL_SERVER_HANDOFF_V1.md` — persistence/observe acceptance note
+- `lib/translationStudio/persistence/shadowLagClassification.ts` (new)
+- `lib/translationStudio/persistence/dualReadCompare.ts`
+- `lib/translationStudio/persistence/dualReadObservation.ts`
+- `lib/translationStudio/persistence/dualReadJournal.ts`
+- `lib/translationStudio/persistence/shadowReconciliationJournal.ts`
+- `lib/translationStudio/index.ts`
+- `lib/translationStudio/translationStudioDualReadShadowRaceFix.test.ts` (new)
+- `docs/ai/CURSOR_REPORT.md` (this closeout)
 
 ## Migrations created
 
@@ -34,54 +31,54 @@ reload app process; JSON authority unchanged.
 
 ## Security review
 
-- No secrets / tokens / cookies / raw RPC payloads in docs
-- No `.env.local` secret changes in this closeout commit
-- No paid AI; no Studio mutations; no DB-primary enable
+- No secrets / tokens / cookies / raw RPC payloads in committed diff
+- Temporary proof scripts and local parity artifacts removed before commit
+- Journal fields: sanitized finding identities + RPC counts only
+- Secret/trailer scan: CLEAN (no commit trailers; no credential material)
 
-## Evidence chain (sanitized)
+## Race semantics (final)
 
-1. `LIMITED_SHADOW_OBSERVATION_V1` — SUCCESS (isolated `__shadow_smoke_v1__`, IN_SYNC)
-2. `DUAL_READ_OBSERVE_ACTIVATION_V1` — ACTIVATION_PASS
-3. `DUAL_READ_OBSERVE_STABILITY_WINDOW_V1` — STABILITY_PASS (6/6 landing cycles)
+- Lag tied to same `snapshot_hash` lineage only:
+  - shadow still `queued` (`pending`), OR
+  - compare started before same-hash `succeeded` (`overlap_in_flight`), OR
+  - compare started within **3000ms** after same-hash success (`post_success_settle`)
+- Observation: on first-pass `TRANSIENT_LAG`, one bounded wait + one re-read
+  with `shadowSettleWindowMs: 0` (settle-before-breaker)
+- Smoke residue remains non-actionable; durable drift without lag evidence
+  still opens breaker
 
-Fingerprint retained:
-`ac7bb9aebaf8ad2985df7ea30ab0bee98ac7b57e6a9b4832d29c07d869a52451`
+## Proof evidence summary
 
-## Known non-blocking debt
+Authoritative: `TRANSLATION_STUDIO_DUAL_READ_SHADOW_RACE_FIX_V1_POST_FIX_PARITY_PROOF = PASS`
 
-- Append-only observe journal growth
-- Duplicate observation noise on rapid landing refresh
-- Known non-actionable `__shadow_smoke_v1__` remote residue
-- Unsupported `db_primary_json_fallback`
-- No prune
+- Controlled: Retour / needs_review / v3; lineage `ver_1561` / `audit_1562`
+- Pre-reset + post-reset observe IN_SYNC; soak 3/3 IN_SYNC
+- Explicit breaker reset; final CLOSED; mutation count 0
 
 ## Tests
 
-PASS — 9 files / 93 tests:
-- persistence port / workflow / DB adapter
-- shadow dual-write + isolated shadow smoke
-- dual-read compare / observation / observe readiness
-- reconciliation representation align
+80 PASS / 8 files (race + dual-read + observation + readiness + shadow
+dual-write + reconciliation + persistence workflow) — re-run at closeout.
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit`
+`npx tsc --noEmit` — PASS (closeout re-run)
 
 ## Build
 
-N/A (docs-only)
+Not required (library/observation internals).
 
 ## git diff --check
 
-PASS
+PASS (LF/CRLF warning only on `dualReadCompare.ts` if present)
 
 ## git status --short
 
 (filled after push)
 
-## Open issues / NEXT
+## Open issues
 
-1. DB-primary authority cutover remains **deferred** (separate future GO only).
-2. Recommended next Translation milestone: operational soak / productization of
-   Studio workflows under accepted JSON+shadow+observe — **not** DB-primary.
-3. Optional later: journal retention/dedupe hygiene (non-correctness).
+1. `READY_TO_RESUME_PRODUCTION_ACCEPTANCE_SOAK` = **YES** — do not auto-start;
+   wait for separate GO.
+2. Known non-actionable `__shadow_smoke_v1__` remote residue remains.
+3. DB-primary remains deferred.

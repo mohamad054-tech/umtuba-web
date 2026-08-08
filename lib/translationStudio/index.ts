@@ -189,9 +189,17 @@ export {
   hasActionableDualReadDrift,
   runStudioDualReadCompare,
   shadowPendingForHash,
+  SHADOW_DUAL_READ_SETTLE_WINDOW_MS,
   type DualReadCompareResult,
   type RunStudioDualReadCompareOptions,
+  type ShadowLagEvidence,
+  type ShadowLagOverlapClass,
 } from "./persistence/dualReadCompare";
+
+export {
+  classifyShadowLagForCompare,
+  sanitizeActionableFindingsForJournal,
+} from "./persistence/shadowLagClassification";
 
 export {
   createDualReadStudioPersistence,

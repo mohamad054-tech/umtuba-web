@@ -19,7 +19,8 @@ export type DualReadJournalOutcome =
   | "dual_read_auto_compare_succeeded"
   | "dual_read_auto_compare_failed"
   | "dual_read_breaker_opened"
-  | "dual_read_breaker_skipped";
+  | "dual_read_breaker_skipped"
+  | "dual_read_settle_reread";
 
 export type DualReadJournalEntryV1 = {
   schemaVersion: 1;
@@ -35,6 +36,30 @@ export type DualReadJournalEntryV1 = {
   category?: StudioShadowErrorCategory | "unavailable";
   correlation_id?: string;
   message?: string;
+  overlap_class?:
+    | "pending"
+    | "overlap_in_flight"
+    | "post_success_settle"
+    | "none";
+  shadow_save_seq?: number;
+  shadow_hash?: string;
+  settle_outcome?:
+    | "skipped"
+    | "in_sync"
+    | "transient_lag"
+    | "drift_detected"
+    | "failed"
+    | "stale_discarded"
+    | "unavailable";
+  rpc_inserted?: number;
+  rpc_updated?: number;
+  rpc_skipped?: number;
+  actionable_findings?: Array<{
+    category: string;
+    entityType: string;
+    identity: string;
+    fields?: string[];
+  }>;
 };
 
 export function isDualReadJournalEntry(

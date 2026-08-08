@@ -24,6 +24,14 @@ import type {
   ShadowReconciliationJournalEntryV1,
 } from "./shadowReconciliationJournal";
 import type { DualReadJournalEntryV1 } from "./dualReadJournal";
+import {
+  SHADOW_DUAL_READ_SETTLE_WINDOW_MS,
+  classifyShadowLagForCompare,
+  sanitizeActionableFindingsForJournal,
+  shadowPendingForHash,
+  type ShadowLagEvidence,
+  type ShadowLagOverlapClass,
+} from "./shadowLagClassification";
 
 export type DualReadCompareResult = {
   status: DualReadCompareStatus;
@@ -35,6 +43,9 @@ export type DualReadCompareResult = {
   message?: string;
   correlation_id?: string;
   report?: ReconciliationReport;
+  /** Present when lag classification ran. */
+  shadow_lag?: ShadowLagEvidence;
+  overlap_class?: ShadowLagOverlapClass;
 };
 
 export type RunStudioDualReadCompareOptions = {
@@ -49,14 +60,12 @@ export type RunStudioDualReadCompareOptions = {
   observer?: StudioDualReadObserver;
   correlationId?: string;
   now?: () => number;
+  /** Override settle window (tests). Default SHADOW_DUAL_READ_SETTLE_WINDOW_MS. */
+  shadowSettleWindowMs?: number;
 };
 
-const TERMINAL_SHADOW = new Set([
-  "succeeded",
-  "failed",
-  "skipped",
-  "superseded",
-]);
+export { shadowPendingForHash, SHADOW_DUAL_READ_SETTLE_WINDOW_MS };
+export type { ShadowLagEvidence, ShadowLagOverlapClass };
 
 /** Actionable findings under dual-read policy (smoke extras accepted). */
 export function hasActionableDualReadDrift(
@@ -80,31 +89,13 @@ export function hasActionableDualReadDrift(
   });
 }
 
-export function shadowPendingForHash(
-  entries: ShadowReconciliationJournalEntryV1[],
-  hash: string
-): boolean {
-  const shadow = entries.filter(
-    (e) =>
-      e.snapshot_hash === hash &&
-      (e as { event_family?: string }).event_family !== "dual_read"
-  );
-  if (shadow.length === 0) return false;
-  for (let i = shadow.length - 1; i >= 0; i--) {
-    const o = shadow[i]!.outcome;
-    if (TERMINAL_SHADOW.has(o)) return false;
-    if (o === "queued") return true;
-  }
-  return false;
-}
-
 function countsFromReport(report: ReconciliationReport): DualReadCountSummary {
   return { ...report.counts };
 }
 
 function appendDualReadJournal(
   journal: ShadowReconciliationJournal | undefined,
-  entry: DualReadJournalEntryV1
+  entry: DualReadJournalEntryV1 & Partial<ShadowReconciliationJournalEntryV1>
 ): void {
   if (!journal) return;
   try {
@@ -253,19 +244,28 @@ export async function runStudioDualReadCompare(
     remote: remoteSnap,
   });
 
-  const duration_ms = nowMs() - started;
+  const compareEndedAtMs = nowMs();
+  const duration_ms = compareEndedAtMs - started;
   const counts = countsFromReport(report);
   let status: DualReadCompareStatus = hasActionableDualReadDrift(report)
     ? "DRIFT_DETECTED"
     : "IN_SYNC";
 
-  if (
-    status === "DRIFT_DETECTED" &&
-    options.getShadowJournalEntries &&
-    shadowPendingForHash(options.getShadowJournalEntries(), local_hash)
-  ) {
-    status = "TRANSIENT_LAG";
+  let shadow_lag: ShadowLagEvidence | undefined;
+  if (options.getShadowJournalEntries) {
+    shadow_lag = classifyShadowLagForCompare({
+      entries: options.getShadowJournalEntries(),
+      snapshotHash: local_hash,
+      compareStartedAtMs: started,
+      compareEndedAtMs,
+      settleWindowMs: options.shadowSettleWindowMs,
+    });
+    if (status === "DRIFT_DETECTED" && shadow_lag.qualifies) {
+      status = "TRANSIENT_LAG";
+    }
   }
+
+  const actionable_findings = sanitizeActionableFindingsForJournal(report);
 
   const result: DualReadCompareResult = {
     status,
@@ -275,6 +275,8 @@ export async function runStudioDualReadCompare(
     counts,
     correlation_id,
     report,
+    shadow_lag,
+    overlap_class: shadow_lag?.overlap_class,
   };
 
   observer.onEvent({
@@ -302,6 +304,20 @@ export async function runStudioDualReadCompare(
     duration_ms,
     counts,
     correlation_id,
+    overlap_class: shadow_lag?.overlap_class ?? "none",
+    shadow_save_seq: shadow_lag?.shadow_save_seq ?? undefined,
+    shadow_hash: shadow_lag?.shadow_hash ?? undefined,
+    rpc_inserted: shadow_lag?.rpc_inserted ?? undefined,
+    rpc_updated: shadow_lag?.rpc_updated ?? undefined,
+    rpc_skipped: shadow_lag?.rpc_skipped ?? undefined,
+    actionable_findings:
+      status === "DRIFT_DETECTED" || status === "TRANSIENT_LAG"
+        ? actionable_findings
+        : undefined,
+    message:
+      shadow_lag && shadow_lag.overlap_class !== "none"
+        ? `overlap=${shadow_lag.overlap_class}`
+        : undefined,
   });
   return result;
 }
