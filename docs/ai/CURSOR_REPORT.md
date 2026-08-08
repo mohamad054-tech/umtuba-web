@@ -1,23 +1,26 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_V1_FINAL_CLOSEOUT
+# CURSOR_REPORT — COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1
 
 ## Summary
 
-**Verdict: CLOSEOUT_COMPLETE — SUCCESS**
+**Verdict: HANDOFF_PUSH_COMPLETE — SUCCESS**
 
-`TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED** on base
-`0d66bb92efb83d954dacbe770ef5f3e169f40c50`.
+All legitimate Computer-2 Translation durable handoff evidence for Central
+Server alpha integration is recorded and pushed on
+`office/platform-translation-trunk-port-v1`.
 
-Final architecture: JSON authoritative, `shadow_dual_write`, dual-read observe
-ON, breaker CLOSED, parity proven, publish dry-run/non-auto, DB-primary
-deferred. No Studio mutation, no paid AI, no migrations in this closeout.
+- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED / COMPLETE**
+- Source tip for Central integration: `c061c0a593662d03569c489246996bf2a3e034aa`
+  (implementation already on origin; this commit adds durable handoff docs)
+- Alpha observed: `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
+- FF-eligible; textual conflicts none; Computer 2 does **not** merge alpha
+
+Canonical handoff:
+[`docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md`](../translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md)
 
 ## Exact files changed
 
-- `docs/translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md` (new)
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/COMPUTER_2_CENTRAL_SERVER_HANDOFF_V1.md`
-- `docs/architecture/TRANSLATION_STUDIO_FOUNDATION_V1.md`
-- `docs/ai/CURSOR_REPORT.md` (this closeout)
+- `docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md` (new)
+- `docs/ai/CURSOR_REPORT.md` (this handoff)
 
 ## Migrations created
 
@@ -25,35 +28,31 @@ deferred. No Studio mutation, no paid AI, no migrations in this closeout.
 
 ## Security review
 
-- Docs-only closeout; no secrets / tokens / cookies / raw payloads
-- No Co-authored-by / Signed-off-by on final commit
-- Temporary acceptance artifacts removed from `data/translation-studio/`
-  (runtime `store.json` + observe journal retained)
+- Docs-only; no secrets / tokens / cookies / `.env` / runtime journals
+- No Co-authored-by / Signed-off-by on handoff commit
 
 ## Tests
 
-Final V1 regression gate: **170 PASS / 17 files** (workflow, Professional AI UX /
-generation/review, live-smoke/matrix offline fakes, shadow, dual-read readiness /
-observation / race / compare, reconciliation, app-shell ingestion, write/read RPC
-auth contracts, publish dry-run coverage via ingestion/workflow suites).
+Docs handoff only — no paid AI; no Studio/DB mutation.
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS (closeout re-run)
+N/A (docs-only)
 
 ## Build
 
-N/A (docs closeout)
+N/A
 
 ## git diff --check
 
-PASS
+PASS (handoff commit)
 
 ## git status --short
 
-(filled after push)
+(filled after push — expect clean)
 
 ## Open issues
 
-Deferred V2 only (see `docs/translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md`).
-Do **not** start V2 / DB-primary from this closeout.
+1. Central Server owns alpha FF/integration + migration history re-verify.
+2. Translation V2 / DB-primary / live publish remain deferred — do not start.
+3. Alpha SoT worktree on Computer 2 must remain untouched by this handoff.
