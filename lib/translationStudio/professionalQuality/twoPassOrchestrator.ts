@@ -50,6 +50,10 @@ export type RunProfessionalGenerateAndReviewResult = {
   authority: typeof PROFESSIONAL_AI_AUTHORITY;
   failure?: ProfessionalReviewFailure;
   status?: typeof PROFESSIONAL_REVIEW_UNAVAILABLE;
+  /** Generate capability was invoked. */
+  generatorAttempted: true;
+  /** Review capability was invoked (false when generate failed closed). */
+  reviewerAttempted: boolean;
 };
 
 export async function runProfessionalGenerateAndReview(
@@ -76,6 +80,8 @@ export async function runProfessionalGenerateAndReview(
       authority: PROFESSIONAL_AI_AUTHORITY,
       failure: gen.failure,
       status: PROFESSIONAL_REVIEW_UNAVAILABLE,
+      generatorAttempted: true,
+      reviewerAttempted: false,
     };
   }
 
@@ -119,6 +125,8 @@ export async function runProfessionalGenerateAndReview(
       review.availability.available === false
         ? PROFESSIONAL_REVIEW_UNAVAILABLE
         : undefined,
+    generatorAttempted: true,
+    reviewerAttempted: true,
   };
 }
 

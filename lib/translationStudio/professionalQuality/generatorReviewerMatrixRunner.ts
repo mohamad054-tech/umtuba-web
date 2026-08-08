@@ -57,7 +57,14 @@ export type MatrixCaseEvalResult = {
   disqualifiers: string[];
   generatorAttribution: { providerId: string; modelId: string };
   reviewerAttribution: { providerId: string; modelId: string };
-  providerCalls: 2 | 0;
+  /** Whether generate capability was invoked for this case. */
+  generatorAttempted: boolean;
+  /** Whether review capability was invoked for this case. */
+  reviewerAttempted: boolean;
+  /** Actual provider calls for this case (1 = gen only, 2 = gen+review). */
+  providerCalls: number;
+  generatorFailureDiagnostics?: SmallSmokeReviewerFailureDiagnostics;
+  /** Present only when reviewer was actually attempted and failed. */
   reviewerFailureDiagnostics?: SmallSmokeReviewerFailureDiagnostics;
 };
 
@@ -162,10 +169,10 @@ async function evaluateCell(input: {
   let scoreN = 0;
 
   for (const policy of pkg.cases) {
+    // Reserve room for a full generate+review pair (review may be skipped if gen fails).
     if (providerCalls + 2 > input.callCeilingRemaining) {
       break;
     }
-    providerCalls += 2;
 
     let structuredGenerateValid = true;
     let structuredReviewValid = true;
@@ -178,9 +185,15 @@ async function evaluateCell(input: {
         dimension: d,
         score: null,
       }));
+    let generatorFailureDiagnostics:
+      | SmallSmokeReviewerFailureDiagnostics
+      | undefined;
     let reviewerFailureDiagnostics:
       | SmallSmokeReviewerFailureDiagnostics
       | undefined;
+    let generatorAttempted = false;
+    let reviewerAttempted = false;
+    let caseCalls = 0;
     let genAttr: { providerId: string; modelId: string } = {
       providerId: input.cell.generator.providerId,
       modelId: input.cell.generator.modelId,
@@ -205,6 +218,10 @@ async function evaluateCell(input: {
         reviewer: input.reviewer,
       });
 
+      generatorAttempted = out.generatorAttempted;
+      reviewerAttempted = out.reviewerAttempted;
+      caseCalls = (generatorAttempted ? 1 : 0) + (reviewerAttempted ? 1 : 0);
+
       candidateText = out.candidateText;
       recommendation = out.recommendation;
       overallScore = out.report?.overallScore ?? null;
@@ -221,17 +238,37 @@ async function evaluateCell(input: {
 
       const parts = (out.observation.providerId ?? "").split("+");
       const models = (out.observation.modelId ?? "").split("+");
-      if (parts[0]) genAttr = { providerId: parts[0], modelId: models[0] || genAttr.modelId };
-      if (parts[1]) revAttr = { providerId: parts[1], modelId: models[1] || revAttr.modelId };
-      else if (parts[0] && models[0]) {
-        // single attribution — keep planned reviewer labels
+      if (parts[0]) {
+        genAttr = {
+          providerId: parts[0],
+          modelId: models[0] || genAttr.modelId,
+        };
+      }
+      if (parts[1]) {
+        revAttr = {
+          providerId: parts[1],
+          modelId: models[1] || revAttr.modelId,
+        };
       }
 
       if (!out.candidateText.trim()) {
         structuredGenerateValid = false;
         disqualifiers.push("empty_candidate");
       }
-      if (!out.reviewerResultAvailable) {
+
+      if (!reviewerAttempted) {
+        // Generate failed closed — reviewer never called.
+        structuredReviewValid = false;
+        if (!structuredGenerateValid) {
+          disqualifiers.push("generator_unavailable");
+          generatorFailureDiagnostics = classifySmallSmokeReviewerFailure({
+            failure: out.failure ?? null,
+            providerId: genAttr.providerId,
+            modelId: genAttr.modelId,
+            reviewerPath: "live_transport",
+          });
+        }
+      } else if (!out.reviewerResultAvailable) {
         structuredReviewValid = false;
         disqualifiers.push("reviewer_unavailable");
         reviewerFailureDiagnostics = classifySmallSmokeReviewerFailure({
@@ -244,8 +281,14 @@ async function evaluateCell(input: {
     } catch {
       structuredGenerateValid = false;
       structuredReviewValid = false;
+      generatorAttempted = true;
+      reviewerAttempted = false;
+      caseCalls = 1;
       disqualifiers.push("transport_or_parse_failure");
+      disqualifiers.push("generator_unavailable");
     }
+
+    providerCalls += caseCalls;
 
     let humanReviewEnforced = policy.humanReviewRequired;
     if (policy.humanReviewRequired) {
@@ -290,7 +333,10 @@ async function evaluateCell(input: {
       disqualifiers,
       generatorAttribution: genAttr,
       reviewerAttribution: revAttr,
-      providerCalls: 2,
+      generatorAttempted,
+      reviewerAttempted,
+      providerCalls: caseCalls,
+      generatorFailureDiagnostics,
       reviewerFailureDiagnostics,
     });
   }
@@ -569,7 +615,10 @@ export function toSanitizedMatrixEvalReport(
         disqualifiers: c.disqualifiers,
         generatorAttribution: c.generatorAttribution,
         reviewerAttribution: c.reviewerAttribution,
+        generatorAttempted: c.generatorAttempted,
+        reviewerAttempted: c.reviewerAttempted,
         providerCalls: c.providerCalls,
+        generatorFailureDiagnostics: c.generatorFailureDiagnostics,
         reviewerFailureDiagnostics: c.reviewerFailureDiagnostics,
       })),
     })),

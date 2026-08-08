@@ -76,6 +76,13 @@ export function createBoundedProfessionalAiTransport(deps: {
   complete: (
     request: ProfessionalAiTransportRequest
   ) => Promise<unknown>;
+  /**
+   * Optional per-request routing attribution (never trust model-claimed labels).
+   * Used for independent generator×reviewer provider pairs.
+   */
+  resolveProvider?: (
+    request: ProfessionalAiTransportRequest
+  ) => ProfessionalAiProviderMetadata;
 }): ProfessionalAiTransport {
   return {
     kind: deps.kind,
@@ -93,7 +100,7 @@ export function createBoundedProfessionalAiTransport(deps: {
           return {
             ok: true,
             json,
-            provider: deps.provider,
+            provider: deps.resolveProvider?.(request) ?? deps.provider,
             durationMs: Date.now() - started,
             attempts,
           };
@@ -238,6 +245,9 @@ export type AiServiceJsonRunner = (request: {
 export function createAiServiceProfessionalTransport(deps: {
   runCapability: AiServiceJsonRunner;
   providerId?: string;
+  /** Optional role-specific provider routing for independent gen×rev cells. */
+  generatorProviderId?: string;
+  reviewerProviderId?: string;
   generatorModelId?: string;
   reviewerModelId?: string;
 }): ProfessionalAiTransport {
@@ -251,6 +261,24 @@ export function createAiServiceProfessionalTransport(deps: {
   return createBoundedProfessionalAiTransport({
     kind: "ai_service",
     provider,
+    resolveProvider: (request) => {
+      const modelId =
+        request.role === "reviewer"
+          ? deps.reviewerModelId ?? provider.modelId
+          : deps.generatorModelId ?? provider.modelId;
+      const roleProviderRaw =
+        request.role === "reviewer"
+          ? deps.reviewerProviderId ?? deps.providerId
+          : deps.generatorProviderId ?? deps.providerId;
+      const preferredProviderId =
+        roleProviderRaw && roleProviderRaw !== "ai_service"
+          ? roleProviderRaw
+          : provider.providerId;
+      return {
+        providerId: preferredProviderId,
+        modelId,
+      };
+    },
     async complete(request) {
       const capabilityId =
         request.role === "reviewer"
@@ -260,9 +288,13 @@ export function createAiServiceProfessionalTransport(deps: {
         request.role === "reviewer"
           ? deps.reviewerModelId ?? provider.modelId
           : deps.generatorModelId ?? provider.modelId;
+      const roleProviderRaw =
+        request.role === "reviewer"
+          ? deps.reviewerProviderId ?? deps.providerId
+          : deps.generatorProviderId ?? deps.providerId;
       const preferredProviderId =
-        deps.providerId && deps.providerId !== "ai_service"
-          ? deps.providerId
+        roleProviderRaw && roleProviderRaw !== "ai_service"
+          ? roleProviderRaw
           : undefined;
 
       const result = await deps.runCapability({
@@ -303,12 +335,8 @@ export function createAiServiceProfessionalTransport(deps: {
         ...payload,
         provider: {
           providerId: preferredProviderId ?? provider.providerId,
-          modelId:
-            typeof (payload.provider as { modelId?: string } | undefined)
-              ?.modelId === "string" &&
-            (payload.provider as { modelId: string }).modelId.trim()
-              ? (payload.provider as { modelId: string }).modelId
-              : modelId,
+          // Prefer operator/routing model id for exact matrix attribution.
+          modelId,
           requestId: result.data.runId,
         },
       };

@@ -59,6 +59,24 @@ import {
 export const SMALL_SMOKE_OPERATOR_USER_ID =
   "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
 
+/**
+ * Authoritative live professional CLI operator identity.
+ * Shared by small-smoke and matrix so gateway context stays identical.
+ */
+export function resolveLiveProfessionalOperatorUserId(
+  explicit?: string | null
+): string {
+  const fromArg = explicit?.trim();
+  if (fromArg) return fromArg;
+  const fromMatrixEnv =
+    process.env.UMTUBA_PROFESSIONAL_MATRIX_OPERATOR_USER_ID?.trim();
+  if (fromMatrixEnv) return fromMatrixEnv;
+  const fromSmokeEnv =
+    process.env.UMTUBA_PROFESSIONAL_SMOKE_OPERATOR_USER_ID?.trim();
+  if (fromSmokeEnv) return fromSmokeEnv;
+  return SMALL_SMOKE_OPERATOR_USER_ID;
+}
+
 export type SmallSmokeVerdict = "SMOKE_PASS" | "SMOKE_PARTIAL" | "SMOKE_FAIL";
 
 export type SmallSmokeResolvedRoute = {
@@ -589,6 +607,7 @@ export async function runSmallSmokeOffline(input?: {
 /**
  * Build live AI-service transport from professional policy + aiService gateway.
  * Never prints secrets. Injectable runner used by tests/CLI.
+ * Shared by small-smoke and matrix live cells (same operator/gateway context).
  */
 export async function createDefaultLiveProfessionalSmokeTransport(input?: {
   resolvedRoute?: SmallSmokeResolvedRoute;
@@ -596,28 +615,35 @@ export async function createDefaultLiveProfessionalSmokeTransport(input?: {
   operatorUserId?: string;
 }): Promise<ProfessionalAiTransport> {
   const resolved = input?.resolvedRoute ?? resolveSmallSmokeProviderModels();
-  const providerId =
+  const generatorProviderId =
     resolved.generatorProviderId !== "unset"
       ? resolved.generatorProviderId
       : "openai";
+  const reviewerProviderId =
+    resolved.reviewerProviderId !== "unset"
+      ? resolved.reviewerProviderId
+      : generatorProviderId;
 
   if (input?.runCapability) {
     return createAiServiceProfessionalTransport({
       runCapability: input.runCapability,
-      providerId,
+      providerId: generatorProviderId,
+      generatorProviderId,
+      reviewerProviderId,
       generatorModelId: resolved.generatorModelId,
       reviewerModelId: resolved.reviewerModelId,
     });
   }
 
   const { runCapability } = await import("../../ai/services/aiService");
-  const operatorUserId =
-    input?.operatorUserId?.trim() ||
-    process.env.UMTUBA_PROFESSIONAL_SMOKE_OPERATOR_USER_ID?.trim() ||
-    SMALL_SMOKE_OPERATOR_USER_ID;
+  const operatorUserId = resolveLiveProfessionalOperatorUserId(
+    input?.operatorUserId
+  );
 
   return createAiServiceProfessionalTransport({
-    providerId,
+    providerId: generatorProviderId,
+    generatorProviderId,
+    reviewerProviderId,
     generatorModelId: resolved.generatorModelId,
     reviewerModelId: resolved.reviewerModelId,
     runCapability: async (req) => {

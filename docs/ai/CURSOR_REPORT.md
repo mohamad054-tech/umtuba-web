@@ -1,23 +1,33 @@
-# CURSOR_REPORT — TRANSLATION_STUDIO_GENERATOR_REVIEWER_MATRIX_EVALUATION_V1
+# CURSOR_REPORT — TRANSLATION_STUDIO_LIVE_GENERATOR_REVIEWER_MATRIX_EVALUATION_V1
 
 ## Summary
 
-**Verdict: VALIDATED_AND_CLOSED**
+**Verdict: CLOSED — MATRIX_PASS (paid 1-cell operator validation)**
 
-Bounded generator × reviewer matrix evaluation foundation validated offline
-(default + comparison CLIs), budget edges confirmed with fakes only, tests +
-`tsc` PASS. No paid/live provider calls. Commit + push on closeout GO.
+Explicit bounded live generator×reviewer matrix evaluation is implemented and
+operator-validated (`MATRIX_PASS`, 1 cell `openai/gpt-4o-mini × openai/gpt-4o-mini`,
+5/5 generate+review, 10 calls within ceiling 20, `mutatedStudio: false`).
 
-Base SHA: `d89eebdab534c3466b5ae368c380420a50d4d7f2`
+Includes: explicit live cell plan/preflight, role-specific provider/model routing,
+CLI support, transport parity with proven small-smoke execution context, correct
+generator-vs-reviewer failure diagnostics, and actual per-case call accounting.
+
+JSON remains authoritative. Persistence / shadow_dual_write / dual_read were not
+changed. No secrets committed.
+
+Base SHA: `59cc95504caebd05dd83c5d4141adffbc4aff026`
 
 ## Exact files changed
 
-- `lib/translationStudio/professionalQuality/generatorReviewerMatrix.ts` (new)
-- `lib/translationStudio/professionalQuality/generatorReviewerMatrixRunner.ts` (new)
+- `lib/translationStudio/professionalQuality/generatorReviewerMatrixLivePlan.ts` (new)
+- `lib/translationStudio/professionalQuality/generatorReviewerMatrixRunner.ts`
+- `lib/translationStudio/professionalQuality/providerTransport.ts`
+- `lib/translationStudio/professionalQuality/smallSmokeRunner.ts`
+- `lib/translationStudio/professionalQuality/twoPassOrchestrator.ts`
 - `lib/translationStudio/professionalQuality/index.ts`
-- `scripts/translation/professionalMatrixEval.ts` (new)
-- `lib/translationStudio/translationStudioGeneratorReviewerMatrixEvaluation.test.ts` (new)
-- `package.json` (`translation:matrix-eval`)
+- `scripts/translation/professionalMatrixEval.ts`
+- `lib/translationStudio/translationStudioLiveGeneratorReviewerMatrixEvaluation.test.ts` (new)
+- `lib/translationStudio/translationStudioLiveMatrixTransportParity.test.ts` (new)
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -26,17 +36,15 @@ Base SHA: `d89eebdab534c3466b5ae368c380420a50d4d7f2`
 
 ## Security review
 
-- No `OPENAI_API_KEY` inspection/exposure; config names only
-- Offline/fake default; live gated by explicit GO + readiness
-- Sanitized reports omit source/candidate text
-- No `.env.local` modification; no secret-bearing artifacts
-- Persistence / dual_read / shadow_dual_write untouched by this milestone
+- No API keys / Authorization headers / raw provider bodies in tree
+- Sanitized categorical diagnostics only
+- Explicit GO + readiness + call ceiling gates preserved
+- Preflight remains zero-call
 
 ## Tests
 
-- Matrix suite + professional gen/review + small-smoke regression: **54/54 PASS**
-- Default offline CLI: `MATRIX_PASS` (1 cell, 10 calls)
-- Comparison offline CLI: `MATRIX_PASS` (2 cells, 20 calls)
+Live-matrix, foundation matrix, transport-parity, small-smoke, and professional
+generation/review regression suites — PASS (67 focused tests).
 
 ## TypeScript
 
@@ -52,11 +60,11 @@ PASS
 
 ## git status --short
 
-Clean after closeout commit + push (expected).
+Clean after commit + push (closeout).
 
 ## Open issues / NEXT
 
-1. Live CLI currently uses a single env-configured pair; no explicit CLI flags for
-   multi-cell generator/reviewer selection — recommended NEXT paid matrix milestone
-   (selection ergonomics + authorized live run), not a blocker for this foundation.
-2. Do not start paid/live matrix without a separate GO.
+1. Multi-cell paid matrix (e.g. independent openai×gemini) remains optional follow-up
+   with a separate GO.
+2. Recommended next Translation milestone: Studio UX integration of professional
+   generate/review signals, or persistence ID/RPC design — only with a separate GO.
