@@ -1,36 +1,26 @@
 # Current Task
 
-## COLLABORATION SoT — Learning Link/Unlink Credentialed E2E Smoke V1
+## COLLABORATION SoT — Learning Link/Unlink E2E Provisioning V1
 
-- **Milestone:** `COLLABORATION_WORKSPACE_LEARNING_RESOURCE_LINK_UNLINK_CREDENTIALED_E2E_SMOKE_V1`
+- **Milestone:** `COLLABORATION_WORKSPACE_LEARNING_RESOURCE_LINK_UNLINK_E2E_PROVISIONING_V1`
 - **SoT branch:** `office/collaboration-workspace-settings-lifecycle-ui-v1`
-- **Starting HEAD:** `4254afa233ac51863be58c44c5bfb0219cb235ab`
+- **Starting HEAD:** `50fc34e8e0270f7e2ee46e0b710f670d51a044ae`
 - **Worktree:** `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1`
 
 ## Status
 
-**BLOCKED** — credentialed environment prerequisites absent.
+**HARNESS SHIPPED · BLOCKED_FOR_OPERATOR_PROVISIONING**
 
-### Missing prerequisites (exact)
+SoT now owns an opt-in Learning link/unlink E2E foundation (templates,
+Playwright specs, structural tests, operator checklist).
 
-1. SoT has no approved credentialed Collaboration E2E harness for Learning link/unlink
-   (ops fork readiness-only is NOT SoT; credentialed runs remain deferred there)
-2. `COLLABORATION_E2E` unset
-3. `PLAYWRIGHT_BASE_URL` unset
-4. `COLLABORATION_E2E_OWNER_EMAIL` / `COLLABORATION_E2E_OWNER_PASSWORD` unset
-5. `COLLABORATION_E2E_PEER_EMAIL` / `COLLABORATION_E2E_PEER_PASSWORD` unset
-6. `scripts/collaboration-e2e/config.local.sql` absent (dedicated Auth UUIDs)
-7. SoT worktree has no local Supabase public env (`.env.local` absent)
-
-Did **not** fabricate credentials, weaken auth/RLS, or use service-role to fake user path.
-Did **not** start Commerce/advertiser binding.
-
-## Non-credentialed evidence retained
-
-- Platform gate + Learning binding + UI wiring unit tests: PASS (34/34 focused)
+Credentialed smoke was **not** executed: dedicated Auth identities and
+SoT-local credentials remain operator-provisioned. Automatic Auth creation
+against the only available remote Supabase host is blocked by the production
+safety gate.
 
 ## Do NOT start automatically
 
 - Commerce / advertiser bindings
-- Platform flag enablement in production
-- Fabricating smoke identities
+- Creating Auth users on production
+- Fabricating passwords / JWTs

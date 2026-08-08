@@ -1,14 +1,30 @@
-# CURSOR_REPORT — Learning Link/Unlink Credentialed E2E Smoke V1
+# CURSOR_REPORT — Learning Link/Unlink E2E Provisioning V1
 
 ## Summary
 
-**BLOCKED** — Preflight verified SoT tip `4254afa` clean/synced. Credentialed
-Learning link/unlink E2E cannot run: no SoT harness for credentialed mutation,
-and required opt-in E2E identity/env keys are absent. No secrets fabricated.
-No Commerce/advertiser work. No migrations. No production auth/RLS weakening.
+**CLOSED as BLOCKED_FOR_OPERATOR_PROVISIONING** — SoT-owned opt-in E2E harness
+and templates shipped. No Auth users created. No credentialed smoke executed.
+No migrations. No Commerce/advertiser work. Platform gate remains fail-closed.
 
 ## Exact files changed
 
+- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.ts` (new)
+- `lib/collaboration/learningResourceLinkUnlinkE2eProvisioning.test.ts` (new)
+- `scripts/collaboration-e2e/config.example.sql` (new)
+- `scripts/collaboration-e2e/seed-learning-link-unlink-sandbox.example.sql` (new)
+- `scripts/collaboration-e2e/cleanup-learning-link-unlink-sandbox.example.sql` (new)
+- `scripts/collaboration-e2e/OPERATOR_PROVISIONING.md` (new)
+- `scripts/collaboration-e2e/run-gate-off-checks.md` (new)
+- `docs/collaboration/operations/COLLABORATION_LEARNING_LINK_UNLINK_E2E_PROVISIONING_V1.md` (new)
+- `e2e/collaboration/playwright.config.ts` (new)
+- `e2e/collaboration/smoke/platform-gate.spec.ts` (new)
+- `e2e/collaboration/smoke/learning-link-unlink.spec.ts` (new)
+- `app/components/collaboration/CollaborationShell.tsx` (testid anchors)
+- `app/components/collaboration/WorkspaceList.tsx` (testid)
+- `app/components/collaboration/MembersList.tsx` (testid)
+- `.gitignore`
+- `.env.example` (env key names only)
+- `package.json` (`test:collaboration-e2e` script)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 - `docs/ai/PROJECT_STATE.md`
@@ -19,28 +35,28 @@ NO
 
 ## Security review
 
-- Did not print/commit credentials
-- Did not use service-role to simulate authenticated user path
-- Did not enable platform flag
-- Did not bypass RLS
+- No secrets committed; config.local.sql gitignored
+- No Auth users created on remote/production
+- No RLS/auth weakening
+- Playwright uses real `/login` form when opted in; skips without credentials
+- Seed templates raise ACCOUNT_BLOCKER on placeholder UUIDs
 
 ## Tests
 
-- Focused non-credentialed: platform gate + binding + UI + mutation runtime
-  **34/34 PASS**
-- Credentialed smoke: **NOT RUN** (blocked)
+- Focused Collaboration suite including provisioning structural tests: **42/42 PASS**
+- Credentialed Playwright smoke: **NOT RUN** (operator credentials absent)
 
 ## TypeScript
 
-- `npx tsc --noEmit` → (run at closeout)
+- `npx tsc --noEmit` → PASS
 
 ## Build
 
-N/A (validation-only / blocked)
+N/A
 
 ## git diff --check
 
-(run at closeout)
+PASS
 
 ## git status --short
 
@@ -48,19 +64,5 @@ N/A (validation-only / blocked)
 
 ## Open issues
 
-### Exact missing prerequisites
-
-1. Approved SoT credentialed Learning link/unlink E2E harness
-2. `COLLABORATION_E2E=1`
-3. `PLAYWRIGHT_BASE_URL`
-4. Dedicated manager identity env:
-   `COLLABORATION_E2E_OWNER_EMAIL` / `COLLABORATION_E2E_OWNER_PASSWORD`
-5. Dedicated read-only peer identity env:
-   `COLLABORATION_E2E_PEER_EMAIL` / `COLLABORATION_E2E_PEER_PASSWORD`
-6. `config.local.sql` with dedicated Auth user UUIDs (never SQL-insert Auth users)
-7. SoT-local Supabase public client env for authenticated app path
-
-### Deferred
-
-- Commerce / advertiser bindings
-- Credentialed matrix A–D once identities exist
+Operator must provision dedicated Auth identities + SoT `.env.local` +
+`config.local.sql`, prefer LOCAL/non-prod, then re-run credentialed smoke.

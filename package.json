@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:collaboration-e2e": "playwright test -c e2e/collaboration/playwright.config.ts",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once"
   },

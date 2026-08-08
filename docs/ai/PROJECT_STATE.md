@@ -6,42 +6,36 @@
 | --- | --- |
 | Branch | `office/collaboration-workspace-settings-lifecycle-ui-v1` |
 | Remote | `origin/office/collaboration-workspace-settings-lifecycle-ui-v1` |
-| Tip | Learning Link/Unlink UI closed; credentialed E2E smoke **BLOCKED** |
+| Tip | Learning link/unlink E2E provisioning harness shipped; credentialed run blocked for operator |
 | Worktree | `C:\Users\Admin\Desktop\umtuba\umtuba-web-collaboration-workspace-settings-lifecycle-ui-v1` |
 
 ### Closed (Collaboration)
 
 - Settings & Lifecycle UI V1 + `20260917` APPLIED + VERIFIED
-- Member Role Management UI V1 INTEGRATED / CLOSED on SoT
-- Resource Link Foundation V1 INTEGRATED / CLOSED on SoT
-- Resource Link Mutation Runtime V1 INTEGRATED / CLOSED on SoT (`20260919` APPLIED + VERIFIED)
-- Learning Resource Binding V1 INTEGRATED / CLOSED on SoT
-- Learning Resource Link/Unlink UI V1 CLOSED on SoT
+- Member Role Management UI V1
+- Resource Link Foundation / Mutation Runtime (`20260919`)
+- Learning Resource Binding V1
+- Learning Resource Link/Unlink UI V1
+- Learning Link/Unlink E2E Provisioning V1 (harness/templates only)
 
-### Blocked
+### Blocked pending operator
 
-- Learning Resource Link/Unlink Credentialed E2E Smoke V1
-  - Missing dedicated E2E identities + SoT credentialed harness + opt-in env
+- Credentialed Learning link/unlink E2E smoke execution
+  - Needs dedicated Auth identities + local env + seed against LOCAL/non-prod
 
 ### Ops forks (NOT SoT)
 
-- Smoke / keepalive — NOT SoT; readiness-only; credentialed E2E still deferred there
+- Smoke / keepalive readiness forks — NOT SoT
 - stale Collaboration `20260898` = DO NOT APPLY
-- Remote `20260898` = Commerce
 
 ### Deferred
 
 - Commerce / advertiser resource-link bindings
-- Invite expansion
-- Credentialed E2E (role-update / mutation / link-unlink) pending identities
+- Production Auth user creation (requires explicit approval)
 
 ### Flag
 
 default `false`
-
-### UM Core (separate)
-
-P16 @ `3120432` closed. Do not start P17 from this handoff.
 
 ### Commerce
 

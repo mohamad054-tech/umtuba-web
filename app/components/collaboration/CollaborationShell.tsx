@@ -61,6 +61,7 @@ export default function CollaborationShell({
       dir="rtl"
       lang="ar"
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      data-testid="collaboration-shell"
     >
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <AppTopNav title={title} subtitle={subtitle} />
@@ -68,6 +69,7 @@ export default function CollaborationShell({
           <nav
             aria-label={COLLABORATION_UI_COPY.brand}
             className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+            data-testid="collaboration-nav"
           >
             {links.map((link) => (
               <Link

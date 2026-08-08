@@ -30,7 +30,11 @@ export default function WorkspaceList({
   }
 
   return (
-    <ul className="grid gap-4" aria-label={COLLABORATION_UI_COPY.workspacesTitle}>
+    <ul
+      className="grid gap-4"
+      aria-label={COLLABORATION_UI_COPY.workspacesTitle}
+      data-testid="collaboration-workspace-list"
+    >
       {workspaces.map((workspace) => (
         <li key={workspace.id}>
           <WorkspaceCard workspace={workspace} />
