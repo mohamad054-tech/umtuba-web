@@ -88,6 +88,19 @@ npx playwright test -c e2e/collaboration/playwright.config.ts
 
 Until credentials exist, Playwright specs remain **SKIPPED_NO_CREDENTIALS**.
 
+## Closeout status (2026-08-08)
+
+`COLLABORATION_WORKSPACE_LEARNING_RESOURCE_LINK_UNLINK_CREDENTIALED_E2E_SMOKE_V1`
+is **CLOSED** on Collaboration SoT.
+
+- Credentialed **RPC** smoke (LINK → readback → peer deny → UNLINK) accepted
+  from Desktop LOCAL external evidence (`RPC_SMOKE_PASS` on local project
+  `umtuba-collab-learning-link-e2e-local`). Desktop raw log is not stored on
+  the laptop SoT; use the verified operator report.
+- Production Supabase was not used. No migrations.
+- Playwright browser UI login client-navigation residual remains
+  **non-blocking**; do not claim browser UI E2E PASS.
+
 ## Out of scope
 
 - Commerce / advertiser bindings
