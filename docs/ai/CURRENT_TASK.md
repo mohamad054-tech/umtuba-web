@@ -2,73 +2,63 @@
 
 ## Task title
 
-UMTUBA Translation Trunk Port V1 — remote migration apply + history CLOSED
+UMTUBA Translation Studio V1 — **PRODUCTION_ACCEPTED** (FINAL CLOSEOUT)
 
 ## Milestone status
 
-`TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1` — Phase 1 persistence port + mode gate (JSON-only)
+`TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED**
 
-Previously closed: `TRANSLATION_REMOTE_MIGRATION_APPLY_AND_HISTORY_V1_CLOSED`
+Previously closed lineage includes:
+
+- `TRANSLATION_REMOTE_MIGRATION_APPLY_AND_HISTORY_V1_CLOSED`
+- `TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1`
+- `TRANSLATION_STUDIO_PERSISTENCE_V1` (JSON-authoritative architecture accepted)
+- Race-safe dual-read observation V1
+- Production acceptance + operational soak V1 = **ACCEPTANCE_PASS**
 
 ## Status
 
-Closed on 2026-08-07. Schema applied and history registered on linked Supabase.
-Runtime remains JSON file store — no JSON→DB switch.
+Closed on 2026-08-08 (Computer 2). Translation Studio V1 product/operational
+acceptance is complete under JSON-authoritative + shadow dual-write + dual-read
+observe. **DB-primary is not enabled and remains deferred.**
 
 ## Device / worktree
 
 - Device: كمبيوتر 2 — Translation & Internationalization only
 - Worktree: `C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1`
 - Branch: `office/platform-translation-trunk-port-v1`
-- Pre-closure HEAD: `e861ef997631454f9584807dd03b723e61fed629`
+- V1 closeout base: `0d66bb92efb83d954dacbe770ef5f3e169f40c50`
 - Linked Supabase: `umtuba` / `tgucwnjwoyeqoxqaxmew` (eu-west-1)
+
+## Final accepted architecture
+
+| Concern | State |
+| --- | --- |
+| Authority | **JSON** authoritative |
+| Mode | `shadow_dual_write` |
+| Dual-read observe | **ON** |
+| Breaker | **CLOSED** |
+| Parity | Proven / stable |
+| DB-primary | Deferred (not enabled) |
+| Publish | Dry-run / non-auto (`writesCatalogFiles=false`, `autoPublish=false`) |
+| AI workflow | Human Apply-to-draft boundary; no auto-approve/publish |
+
+Canonical closeout doc:
+[`docs/translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md`](../translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md)
 
 ## Translation migrations (final)
 
 | Role | File | Remote schema | Remote history |
 | --- | --- | --- | --- |
-| Intelligence | `20260902_translation_intelligence_foundation_v1.sql` | APPLIED | REGISTERED (`translation_intelligence_foundation_v1`) |
-| Persistence & Workflow | `20260910_translation_studio_persistence_workflow_v1.sql` | APPLIED | REGISTERED (`translation_studio_persistence_workflow_v1`) |
+| Intelligence | `20260902_translation_intelligence_foundation_v1.sql` | APPLIED | REGISTERED |
+| Persistence & Workflow | `20260910_translation_studio_persistence_workflow_v1.sql` | APPLIED | REGISTERED |
 
-- `20260901` remains **Learning-owned** (`learning_lesson_notes_foundation_v1`) — not reclaimed
-- Forbidden/collision numbers retired: `20260874_*`, `20260875_*`, Learning-reserved `20260901`
+Additional Studio lineage applied/registered on linked project includes stable
+identity, write RPC, read snapshot RPC, and memory identity align migrations
+(`20260911`–`20260914`) — see Computer-2 handoff.
 
-## Remote closure facts (verified)
-
-- Project: `umtuba` / `tgucwnjwoyeqoxqaxmew`
-- Apply order used: `20260902` → `20260910` (targeted `db query --file` only; no `db push` / `--include-all`)
-- History registration: `supabase migration repair <version> --status applied --linked` for `20260902` then `20260910`
-- Translation tables present: **12** (3 `translation_intelligence_*` + 9 `translation_studio_*`)
-- RLS + FORCE RLS on all 12
-- Policies: 3 intelligence + 9 studio admin SELECT (`is_platform_admin()`)
-- Grants: authenticated SELECT only (12); anon grants = 0
-- Runtime remains JSON store (`data/translation-studio/`); publish stays dry-run / `writesCatalogFiles: false` / `autoPublish: false`
-- No JSON→DB runtime switch performed
-- No Translation migration collision remains against Learning `20260901`
-
-## Concurrent remote note (OUT OF SCOPE)
-
-- Remote history also contains `20260905` = `store_partial_refund_ledger_list_committing_v1` (Store/Commerce)
-- Observed during history registration window; **not** Translation-owned; do not repair or alter
-
-## Prior gate notes (retained)
-
-- SHA256 `20260910`: `D7044A5FD97CE159A0C57BF515D2D0125E4D7EFE6F6D571CEEB9A638102A8D01`
-- SHA256 `20260902`: `F0ECE0EFBA023886E8D226682F9427DF33DF44A19EB6E5A565D4977BA435674C`
-- `is_platform_admin()` zero-arg OK via `DEFAULT auth.uid()` — false blocker cleared before apply
-
-## Ported commits (platform only)
-
-1. `6528202` → i18n Foundation V1
-2. `0d18160` → App Shell Translation V1
-3. `aced43c` → Translation Studio Foundation V1
-4. `189ec08` → Persistence & Workflow V1 (migration → `20260910`)
-5. `e12cd6d` → App Shell Ingestion V1
-6. `7296ac3` → Translation Intelligence Foundation V1 (migration → `20260902`)
-
-## Excluded
-
-- `6a3cb3d` Learning Translation Foundation — not cherry-picked
+- `20260901` remains **Learning-owned** — not reclaimed
+- Runtime remains JSON store (`data/translation-studio/`)
 
 ## Hard rules (still in force)
 
@@ -76,30 +66,21 @@ Runtime remains JSON file store — no JSON→DB switch.
 - Do not reclaim `20260901`
 - Do not port Learning Translation Foundation `6a3cb3d`
 - Never touch Learning / Commerce / Collaboration / Billing
-- Do not switch runtime off JSON store without a dedicated readiness + GO milestone
+- Do **not** enable DB-primary without a dedicated future GO
+- Do **not** treat this closeout as permission to start Translation Studio V2
 
-## Persistence activation progress
+## Deferred V2 debt (non-blocking)
 
-- Readiness: `TRANSLATION_RUNTIME_PERSISTENCE_ACTIVATION_READINESS_V1` complete (NOT_READY for DB activation)
-- Phase 1 landed: `TRANSLATION_STUDIO_PERSISTENCE_PORT_AND_FLAG_V1`
-  - `StudioPersistencePort` + JSON adapter
-  - `UMTUBA_TRANSLATION_STUDIO_PERSISTENCE_MODE`
-  - Executable modes: `json` (default), `shadow_dual_write`, `dual_read` (JSON + compare, no writes)
-  - Unsupported: `db_primary_json_fallback` (fail closed to JSON)
-  - Runtime remains **JSON-authoritative** — no DB-primary
-- **ACCEPTED:** `TRANSLATION_STUDIO_PERSISTENCE_V1` (JSON-authoritative architecture)
-  - Operational composition: `shadow_dual_write` + dual-read observe **ON**
-  - Evidence: Limited Shadow Observation SUCCESS → Observe ACTIVATION_PASS → Stability STABILITY_PASS (6/6 IN_SYNC)
-  - `baselineParityProven=true`; breaker CLOSED; known `__shadow_smoke_v1__` extras non-actionable
-  - DB-primary / prune / authority cutover: **explicitly deferred**
-- Dual-read observe: `UMTUBA_TRANSLATION_STUDIO_DUAL_READ_OBSERVE`
-  - Preferred safe composition: `shadow_dual_write` + observe nest
-  - Observe over plain JSON-only is refused (activation-unsafe)
-  - Rollback: unset observe flag (or `0`/`false`) and reload process; JSON unchanged
-  - Preflight: `npm run translation:dual-read-preflight` (zero remote writes)
+1. DB-primary authority cutover
+2. Prune / delete reconciliation
+3. Observe journal retention / rotation
+4. Duplicate observe scheduling / noise
+5. Cleanup of known `__shadow_smoke_v1__` remote residue
+6. Optional multi-provider paid matrix
+7. Catalog publish non-dry-run activation
 
 ## Next milestone
 
-Do **not** start DB-primary. Recommended: Translation Studio operational soak /
-workflow productization under accepted JSON + shadow + observe. Any authority
-cutover requires a separate dedicated GO.
+**Translation Studio V1 is COMPLETE.**
+Do **not** start V2 / DB-primary / prune from this task. Next platform work
+requires a separate GO outside Translation Studio V1.

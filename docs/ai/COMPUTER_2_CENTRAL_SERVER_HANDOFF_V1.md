@@ -87,6 +87,7 @@ Includes (non-exhaustive evidence via `git log`):
 | Write path | JSON first; shadow via `translation_studio_upsert_snapshot` (platform admin) |
 | Read path | `translation_studio_read_snapshot` (platform admin) |
 | Persistence acceptance | `TRANSLATION_STUDIO_PERSISTENCE_V1` = **ACCEPTED** (JSON-authoritative + shadow + observe) |
+| Translation Studio V1 | **PRODUCTION_ACCEPTED** (final closeout; DB-primary deferred) |
 
 ### Dual-read observe rollback
 
@@ -133,12 +134,16 @@ Global remote tip at handoff time: **20260915** (`store_partial_refund_provider_
 - `TRANSLATION_STUDIO_DUAL_READ_OBSERVE_ACTIVATION_V1` = **ACTIVATION_PASS**
 - `TRANSLATION_STUDIO_DUAL_READ_OBSERVE_STABILITY_WINDOW_V1` = **STABILITY_PASS** (6/6 IN_SYNC)
 - `TRANSLATION_STUDIO_PERSISTENCE_V1` = **ACCEPTED** (JSON-authoritative; observe ON; DB-primary deferred)
+- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED** (final closeout after race-fix + soak)
+- Canonical record: `docs/translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md`
 
 ### Exact current blocker / next decision
 
 **Blocker for DB-primary:** none claimed ready — authority cutover remains **out of scope** until a dedicated future GO.
 
-**Next Translation recommendation:** operational soak / Studio workflow productization under accepted JSON + shadow + observe. Do **not** auto-start DB-primary.
+**Next Translation recommendation:** Translation Studio V1 is **COMPLETE**. Do **not**
+auto-start V2, DB-primary, prune, or live catalog publish. Any further Translation
+work requires a separate GO.
 
 ---
 

@@ -2,9 +2,13 @@
 
 ## Status
 
-Catalog Ingestion & App Shell Review V1 on
-`office/platform-translation-studio-app-shell-ingestion-v1`
-(base Persistence `189ec08`). Migration `20260910` remains **not applied**.
+`TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED** on
+`office/platform-translation-trunk-port-v1`.
+
+Runtime remains **JSON-authoritative** with `shadow_dual_write` + dual-read
+observe ON. Publish remains dry-run / non-auto. DB-primary is deferred.
+
+See: `docs/translation/TRANSLATION_STUDIO_V1_PRODUCTION_ACCEPTED.md`
 
 ## Goal
 
@@ -19,11 +23,13 @@ Admin UI (overview / app-shell / keys filters / editor / review / publish)
   → server actions (platform-admin gated)
   → lib/translationStudio
       ├─ ingestion/ingestAppShellCatalog (idempotent, stable key ids)
-      ├─ Durable JSON file store — runtime V1
-      ├─ Additive SQL schema (20260910) — future; not applied this task
+      ├─ Durable JSON file store — authoritative runtime V1
+      ├─ Shadow dual-write + race-safe dual-read observe (DB mirror; not authority)
+      ├─ Additive SQL schema + RPCs (applied on linked project; JSON still authoritative)
       ├─ Workflow (draft → review → approve → ready_for_publish)
       ├─ Translation Memory (AR App Shell seed; fingerprint uniqueness)
       ├─ Terminology findings (warnings only; never silent replace)
+      ├─ Professional AI generate/review + Apply-to-draft (human boundary)
       ├─ App Shell publish batch (dryRun, writesCatalogFiles: false)
       └─ Legacy publish contract (autoPublish: false)
 ```
