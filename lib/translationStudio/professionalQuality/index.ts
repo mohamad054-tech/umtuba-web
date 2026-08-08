@@ -50,4 +50,5 @@ export * from "./benchmarkPreflight";
 export * from "./humanBlindReview";
 export * from "./smallSmokePackage";
 export * from "./smallSmokeEligibility";
+export * from "./smallSmokeReviewDiagnostics";
 export * from "./smallSmokeRunner";

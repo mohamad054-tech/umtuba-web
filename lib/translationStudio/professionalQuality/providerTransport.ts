@@ -114,6 +114,23 @@ export function createBoundedProfessionalAiTransport(deps: {
               "provider_unavailable",
               "Professional AI provider unavailable"
             );
+          } else if (message === "invalid_json") {
+            lastFailure = reviewFailure(
+              "invalid_json",
+              "Provider returned invalid JSON",
+              { responsePresent: true, jsonParseSucceeded: false }
+            );
+          } else if (message === "schema_mismatch" || message === "empty_response") {
+            lastFailure = reviewFailure(
+              message === "empty_response" ? "invalid_json" : "schema_mismatch",
+              message === "empty_response"
+                ? "Provider returned empty response"
+                : "Provider response failed schema validation",
+              {
+                responsePresent: message !== "empty_response",
+                jsonParseSucceeded: message === "schema_mismatch",
+              }
+            );
           } else {
             lastFailure = reviewFailure("transport_error", message.slice(0, 200));
           }
@@ -199,6 +216,10 @@ export type AiServiceJsonRunner = (request: {
     productDomain: string;
     locale?: string;
   };
+  /** Allowlisted model preference for gateway routing. */
+  preferredModelHint?: string;
+  /** Allowlisted provider preference paired with preferredModelHint. */
+  preferredProviderId?: string;
 }) => Promise<
   | {
       ok: true;
@@ -239,6 +260,10 @@ export function createAiServiceProfessionalTransport(deps: {
         request.role === "reviewer"
           ? deps.reviewerModelId ?? provider.modelId
           : deps.generatorModelId ?? provider.modelId;
+      const preferredProviderId =
+        deps.providerId && deps.providerId !== "ai_service"
+          ? deps.providerId
+          : undefined;
 
       const result = await deps.runCapability({
         capabilityId,
@@ -259,26 +284,29 @@ export function createAiServiceProfessionalTransport(deps: {
               ? request.userPayload.targetLocale
               : undefined,
         },
+        preferredModelHint: modelId,
+        preferredProviderId,
       });
       if (!result.ok) {
-        throw new Error(result.error.message || "transport_error");
+        throw new Error("provider_unavailable");
       }
       const payload = result.data.result;
-      if (!payload || typeof payload !== "object") {
-        throw new Error("schema_mismatch");
+      if (payload == null) {
+        throw new Error("empty_response");
       }
-      // Full structured payload preserved by aiService for professional caps.
+      if (typeof payload !== "object") {
+        throw new Error("invalid_json");
+      }
+      // Preserve structured payload. Attribution uses configured/routing provider —
+      // never trust model-claimed providerId labels (e.g. product name "umtuba").
       return {
         ...payload,
         provider: {
-          providerId:
-            typeof (payload.provider as { providerId?: string } | undefined)
-              ?.providerId === "string"
-              ? (payload.provider as { providerId: string }).providerId
-              : provider.providerId,
+          providerId: preferredProviderId ?? provider.providerId,
           modelId:
             typeof (payload.provider as { modelId?: string } | undefined)
-              ?.modelId === "string"
+              ?.modelId === "string" &&
+            (payload.provider as { modelId: string }).modelId.trim()
               ? (payload.provider as { modelId: string }).modelId
               : modelId,
           requestId: result.data.runId,

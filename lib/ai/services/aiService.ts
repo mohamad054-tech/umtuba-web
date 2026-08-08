@@ -369,6 +369,7 @@ async function runCapabilityInner(
           allowedCapabilities: [capabilityId],
           allowedToolIds: [],
         },
+        preferredProviderId: request.preferredProviderHint,
         preferredModelId: request.preferredModelHint,
         _test: deps.forceStub
           ? { forceStub: true, bypassRateLimit: true }

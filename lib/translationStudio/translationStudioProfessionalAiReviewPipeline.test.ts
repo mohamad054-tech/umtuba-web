@@ -323,15 +323,18 @@ describe("professional AI review pipeline", () => {
 
   it("independent generator/reviewer + two-pass orchestrator", async () => {
     const genTransport = createScriptedProfessionalAiTransport({
+      provider: { providerId: "gen-provider", modelId: "gen-model" },
       generator: {
         candidateText: "إلغاء",
         confidence: 0.5,
-        provider: { providerId: "gen-provider", modelId: "gen-model" },
+        // Model-claimed label must not override transport attribution.
+        provider: { providerId: "umtuba", modelId: "claimed" },
       },
     });
     const revTransport = createScriptedProfessionalAiTransport({
+      provider: { providerId: "rev-provider", modelId: "rev-model" },
       reviewer: cleanReviewerJson({
-        provider: { providerId: "rev-provider", modelId: "rev-model" },
+        provider: { providerId: "umtuba", modelId: "claimed" },
       }),
     });
     const generator = createTransportBackedProfessionalGenerator(genTransport);

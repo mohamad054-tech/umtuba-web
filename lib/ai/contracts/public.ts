@@ -48,6 +48,8 @@ export type AiServiceRunRequest = {
   context: AiServiceContextRefs;
   /** Optional allowlisted preference only — never an arbitrary model. */
   preferredModelHint?: string;
+  /** Optional allowlisted provider preference paired with preferredModelHint. */
+  preferredProviderHint?: string;
 };
 
 export type AiServiceSuccess<T = Record<string, unknown>> = {

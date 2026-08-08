@@ -209,7 +209,7 @@ const TRANSLATION_PROFESSIONAL_GENERATE_V1: AiPromptDefinition = {
 
 const TRANSLATION_PROFESSIONAL_REVIEW_V1: AiPromptDefinition = {
   promptId: "platform.translation_professional_review",
-  version: "1.0.0",
+  version: "1.0.1",
   capabilityId: "platform.translation_professional_review",
   systemInstructions: [
     "You are an INDEPENDENT UMTUBA professional translation REVIEWER.",
@@ -217,6 +217,13 @@ const TRANSLATION_PROFESSIONAL_REVIEW_V1: AiPromptDefinition = {
     "Return STRICT JSON with schemaVersion=1, dimensionScores (0-100), findings array,",
     "optional suggestedRevision, optional terminologyDecisions, optional confidence (0-1),",
     "and provider {providerId,modelId}.",
+    "dimensionScores MUST include ALL of these keys as 0-100 numbers:",
+    "semantic_accuracy, terminology_compliance, contextual_fit, fluency_naturalness,",
+    "ui_conciseness, consistency, grammar_spelling, locale_conventions,",
+    "placeholder_integrity, formatting_integrity.",
+    "placeholder_integrity is always required: use 100 when source/target have no placeholders",
+    "and none were introduced; otherwise score placeholder token integrity.",
+    "formatting_integrity is always required: use 100 when markup/whitespace/structure is intact.",
     "Forbidden fields: approve, publish, authority, chainOfThought, reasoning, scratchpad.",
     "AI confidence is not correctness.",
   ].join(" "),
@@ -245,7 +252,7 @@ const TRANSLATION_PROFESSIONAL_REVIEW_V1: AiPromptDefinition = {
   status: "active",
   owner: "platform",
   changeNotes:
-    "Professional review capability V1 — rich structured evaluation; no approve/publish.",
+    "Professional review V1.0.1 — require full dimensionScores including placeholder_integrity and formatting_integrity.",
 };
 
 const PROMPTS: AiPromptDefinition[] = [
@@ -390,6 +397,28 @@ export function validateStructuredAgainstPrompt(
     }
     if (!data.provider || typeof data.provider !== "object") {
       return { ok: false, message: "provider object required." };
+    }
+    const scores = data.dimensionScores as Record<string, unknown>;
+    const requiredDims = [
+      "semantic_accuracy",
+      "terminology_compliance",
+      "contextual_fit",
+      "fluency_naturalness",
+      "ui_conciseness",
+      "consistency",
+      "grammar_spelling",
+      "locale_conventions",
+      "placeholder_integrity",
+      "formatting_integrity",
+    ];
+    for (const dim of requiredDims) {
+      const v = scores[dim];
+      if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100) {
+        return {
+          ok: false,
+          message: `dimensionScores.${dim} must be a 0-100 number.`,
+        };
+      }
     }
     for (const forbidden of [
       "approve",

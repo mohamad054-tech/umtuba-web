@@ -70,11 +70,12 @@ describe("live AI provider small smoke prep V1", () => {
     expect(privacy.errors).toEqual([]);
   });
 
-  it("prep snapshot refuses live and exposes config names only", () => {
+  it("prep snapshot requires GO and exposes config names only", () => {
     const prep = prepareSmallSmokeExecution();
     expect(prep.liveExecutionAllowed).toBe(false);
     expect(prep.requiresExplicitGo).toBe(true);
     expect(prep.privacy.status).toBe("PASS");
+    expect(prep.resolvedRoute).toBeTruthy();
     expect(prep.configVariableNames).toContain("UMTUBA_AI_MODE");
     expect(prep.configVariableNames).toContain(
       "PROFESSIONAL_TRANSLATION_GENERATOR_MODEL"

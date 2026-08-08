@@ -4,18 +4,28 @@
  */
 
 import type { ProfessionalTranslationRequestContext } from "./contextBuilder";
-import type { TranslationQualityFinding } from "./types";
+import {
+  TRANSLATION_QUALITY_DIMENSIONS,
+  type TranslationQualityFinding,
+} from "./types";
 import type { LocaleStyleGuide } from "./styleGuides";
 
 export const PROFESSIONAL_REVIEWER_SYSTEM_ROLE =
   "You are an independent professional translation reviewer for UMTUBA. " +
   "Evaluate quality only. You MUST NOT approve, publish, or claim authority to change workflow state. " +
-  "AI confidence is not correctness. Return strict JSON only (schemaVersion=1).";
+  "AI confidence is not correctness. Return strict JSON only (schemaVersion=1). " +
+  "dimensionScores MUST include every required dimension key with a 0-100 number " +
+  "(including placeholder_integrity and formatting_integrity on every review).";
 
 export const PROFESSIONAL_GENERATOR_SYSTEM_ROLE =
   "You are a professional translation generator for UMTUBA. " +
   "Produce a candidate translation only. You MUST NOT approve or publish. " +
   "Respect glossary, style guide, and context pack. Return strict JSON only.";
+
+/** Authoritative required dimension keys for provider-facing review contracts. */
+export const PROFESSIONAL_REVIEW_REQUIRED_DIMENSIONS = [
+  ...TRANSLATION_QUALITY_DIMENSIONS,
+] as const;
 
 function arabicSpecializationNotes(style: LocaleStyleGuide): string[] {
   if (style.locale !== "ar") return [];
@@ -104,23 +114,24 @@ export function buildProfessionalReviewerPromptPayload(input: {
         dimension: f.dimension,
         message: f.message,
       })),
-      evaluateDimensions: [
-        "semantic_accuracy",
-        "terminology_compliance",
-        "contextual_fit",
-        "fluency_naturalness",
-        "ui_conciseness",
-        "consistency",
-        "grammar_spelling",
-        "locale_conventions",
-      ],
+      // Must match TRANSLATION_QUALITY_DIMENSIONS / strict parser (all required).
+      evaluateDimensions: [...PROFESSIONAL_REVIEW_REQUIRED_DIMENSIONS],
+      dimensionScoreRules: {
+        allKeysRequired: true,
+        scoreRange: "0-100",
+        placeholder_integrity:
+          "Always required. Score 100 when no placeholders exist in source/target and none were introduced; otherwise score integrity of {name}-style tokens.",
+        formatting_integrity:
+          "Always required. Score 100 when markup/whitespace/structure is intact; otherwise lower.",
+      },
       authority: {
         canApprove: false,
         canPublish: false,
       },
       requiredOutput: {
         schemaVersion: 1,
-        dimensionScores: "0-100 per evaluated dimension",
+        dimensionScores:
+          "object with ALL evaluateDimensions keys, each a 0-100 number",
         findings: "array of {severity,dimension,message}",
         suggestedRevision: "optional string",
         terminologyDecisions: "optional",

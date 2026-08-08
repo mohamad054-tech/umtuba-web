@@ -5,10 +5,10 @@
  * Usage:
  *   npx tsx scripts/translation/professionalProviderSmoke.ts --phase small
  *   npx tsx scripts/translation/professionalProviderSmoke.ts --phase small --offline
+ *   npx tsx scripts/translation/professionalProviderSmoke.ts --phase small --go
  *
- * Live paid execution requires UMTUBA_PROFESSIONAL_SMOKE_EXPLICIT_GO=1 AND
- * LIVE_BENCHMARK_READY — deferred to execution milestone. Never mutates Studio.
- * Never prints secret values.
+ * Live paid execution requires --go (or UMTUBA_PROFESSIONAL_SMOKE_EXPLICIT_GO=1)
+ * AND LIVE_BENCHMARK_READY. Never mutates Studio. Never prints secret values.
  */
 
 import {
@@ -30,6 +30,41 @@ function parseArgs(argv: string[]) {
   const maxCallsRaw = process.env.UMTUBA_PROFESSIONAL_SMOKE_MAX_CALLS;
   const maxCalls = maxCallsRaw ? Number(maxCallsRaw) : undefined;
   return { phase, offline, explicitGo, maxCalls };
+}
+
+function sanitizeCase(c: {
+  smokeIndex: number;
+  caseId: string;
+  locale: string;
+  recommendation: string;
+  humanReviewEnforced: boolean;
+  placeholderIntact: boolean | null;
+  structuredGenerateValid: boolean;
+  structuredReviewValid: boolean;
+  blindHumanReview: { blindId: string };
+  observedProvider?: { providerId: string; modelId: string };
+  disqualifiers: string[];
+  reviewerFailureDiagnostics?: Record<string, unknown>;
+}) {
+  return {
+    smokeIndex: c.smokeIndex,
+    caseId: c.caseId,
+    locale: c.locale,
+    recommendation: c.recommendation,
+    humanReviewEnforced: c.humanReviewEnforced,
+    placeholderIntact: c.placeholderIntact,
+    structuredGenerateValid: c.structuredGenerateValid,
+    structuredReviewValid: c.structuredReviewValid,
+    blindId: c.blindHumanReview.blindId,
+    observedProvider: c.observedProvider
+      ? {
+          providerId: c.observedProvider.providerId,
+          modelId: c.observedProvider.modelId,
+        }
+      : undefined,
+    disqualifiers: c.disqualifiers,
+    reviewerFailureDiagnostics: c.reviewerFailureDiagnostics,
+  };
 }
 
 async function main() {
@@ -65,6 +100,7 @@ async function main() {
         privacy: prep.privacy.status,
         liveExecutionAllowed: prep.liveExecutionAllowed,
         requiresExplicitGo: prep.requiresExplicitGo,
+        resolvedRoute: prep.resolvedRoute,
         configVariableNames: prep.configVariableNames,
       },
       null,
@@ -87,16 +123,7 @@ async function main() {
           secretsPresent: report.secretsPresent,
           providerCallsAttempted: report.providerCallsAttempted,
           successCriteria: report.successCriteria,
-          cases: report.cases.map((c) => ({
-            smokeIndex: c.smokeIndex,
-            caseId: c.caseId,
-            locale: c.locale,
-            recommendation: c.recommendation,
-            humanReviewEnforced: c.humanReviewEnforced,
-            placeholderIntact: c.placeholderIntact,
-            blindId: c.blindHumanReview.blindId,
-            // provider labels omitted from default CLI surface
-          })),
+          cases: report.cases.map(sanitizeCase),
         },
         null,
         2
@@ -111,6 +138,7 @@ async function main() {
     explicitGo: args.explicitGo,
     maxCalls: args.maxCalls ?? prep.callBudget.normalCalls,
     callCeiling: prep.callBudget.totalCallCeiling,
+    privacyOk: prep.privacy.status === "PASS",
   });
   if (!gate.ok) {
     console.log(
@@ -118,26 +146,52 @@ async function main() {
         type: "small_smoke_live_refused",
         reason: gate.reason,
         readinessOverall: prep.readiness.overall,
+        resolvedRoute: prep.resolvedRoute,
       })
     );
     process.exitCode = 2;
     return;
   }
 
-  const deferred = await runSmallSmokePhase({
+  const report = await runSmallSmokePhase({
     explicitGo: true,
     forceOffline: false,
     maxCalls: args.maxCalls,
   });
+
+  if (report.mode === "live_refused") {
+    console.log(
+      JSON.stringify({
+        type: "small_smoke_live_refused",
+        reason: report.refusalReason,
+        readinessOverall: report.readiness.overall,
+        resolvedRoute: report.resolvedRoute,
+      })
+    );
+    process.exitCode = 2;
+    return;
+  }
+
   console.log(
-    JSON.stringify({
-      type: "small_smoke_live_deferred",
-      refusalReason: deferred.refusalReason,
-      message:
-        "Live paid smoke is deferred to TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_EXECUTION_V1",
-    })
+    JSON.stringify(
+      {
+        type: "small_smoke_live_report",
+        verdict: report.verdict,
+        mode: report.mode,
+        mutatedStudio: report.mutatedStudio,
+        secretsPresent: report.secretsPresent,
+        providerCallsAttempted: report.providerCallsAttempted,
+        callBudget: report.callBudget,
+        resolvedRoute: report.resolvedRoute,
+        observedProviderModels: report.observedProviderModels,
+        successCriteria: report.successCriteria,
+        cases: report.cases.map(sanitizeCase),
+      },
+      null,
+      2
+    )
   );
-  process.exitCode = 3;
+  process.exitCode = report.verdict === "SMOKE_PASS" ? 0 : 1;
 }
 
 main().catch((err) => {
