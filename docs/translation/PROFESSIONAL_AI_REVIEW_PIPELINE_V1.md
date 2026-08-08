@@ -11,10 +11,10 @@ switch to DB-primary, or disable persistent shadow dual-write.
 
 ## Two-pass architecture
 
-1. **Generator** (optional): produces a candidate only  
-2. **Deterministic QA**: placeholders, glossary, formatting, Arabic heuristics  
-3. **Independent Reviewer**: evaluates semantics / fluency / context / etc.  
-4. **Strict schema validation** (fail-closed)  
+1. **Generator** (optional): produces a candidate only
+2. **Deterministic QA**: placeholders, glossary, formatting, Arabic heuristics
+3. **Independent Reviewer**: evaluates semantics / fluency / context / etc.
+4. **Strict schema validation** (fail-closed)
 5. **Aggregation + human policy** → `PASS` | `HUMAN_REVIEW` | `BLOCK`
 
 Generator and reviewer remain logically independent (`kind` differs; providers
@@ -94,5 +94,6 @@ No external cache required in V1.
 
 ## Code map
 
-`lib/translationStudio/professionalQuality/{reviewPipeline,generateCandidate,twoPassOrchestrator,providerTransport,reviewSchema,reviewerPrompt,...}`  
+`lib/translationStudio/professionalQuality/{reviewPipeline,generateCandidate,twoPassOrchestrator,providerTransport,reviewSchema,reviewerPrompt,...}`
+
 `app/actions/translationStudioProfessionalReview.ts`

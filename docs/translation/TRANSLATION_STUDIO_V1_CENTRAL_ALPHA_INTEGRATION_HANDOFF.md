@@ -1,7 +1,9 @@
 # Translation Studio V1 — Central Alpha Integration Handoff
 
-**Milestone:** `COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1`  
-**Device:** Computer 2 (Translation & Internationalization)  
+**Milestone:** `COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1`
+
+**Device:** Computer 2 (Translation & Internationalization)
+
 **Status:** Durable sanitized evidence for **Central Server** integration only.
 
 ## Translation Studio V1
@@ -77,10 +79,10 @@ Merge must **not** rewrite Computer-2 or server `.env.local` automatically.
 
 ## Central post-integration gate (summary)
 
-1. Confirm FF/clean merge  
-2. Translation workflow / Studio tests  
-3. Professional AI offline/fake tests (**no paid calls**)  
-4. Persistence / shadow / dual-read race / reconciliation / auth / publish dry-run  
-5. Shared AI Core regressions  
-6. `npx tsc --noEmit` · `git diff --check` · secret/trailer scan  
+1. Confirm FF/clean merge
+2. Translation workflow / Studio tests
+3. Professional AI offline/fake tests (**no paid calls**)
+4. Persistence / shadow / dual-read race / reconciliation / auth / publish dry-run
+5. Shared AI Core regressions
+6. `npx tsc --noEmit` · `git diff --check` · secret/trailer scan
 7. Read-only remote migration history verify for the six versions above

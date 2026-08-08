@@ -5,7 +5,8 @@
 Operator-ready **5-case** first live professional AI smoke package.
 This document is **PREP ONLY** — no credentials, no paid calls, no Studio mutation.
 
-Next milestone (credentials may be required):  
+Next milestone (credentials may be required):
+
 `TRANSLATION_STUDIO_LIVE_AI_PROVIDER_SMALL_SMOKE_EXECUTION_V1`
 
 ## Locked five cases
@@ -91,7 +92,8 @@ Same five cases × matrix slots (Generator A×Reviewer B/C…). Labels server-si
 
 ## Recommended first-smoke pattern
 
-Independent pair among OpenAI/Gemini for strongest structured reliability.  
+Independent pair among OpenAI/Gemini for strongest structured reliability.
+
 Example: `openai(generator) × gemini(reviewer)`. Not a permanent winner.
 
 ## Smoke helper
@@ -112,7 +114,8 @@ Behavior:
 
 ## Blind human-review artifacts
 
-Each case emits `blindHumanReview` + `blindSurface` (labels only under `_reveal`).  
+Each case emits `blindHumanReview` + `blindSurface` (labels only under `_reveal`).
+
 Ratings: excellent | acceptable | needs_edit | wrong.
 
 ## Rollback

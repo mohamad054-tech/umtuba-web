@@ -1,15 +1,19 @@
 # Computer 2 — Central Server Handoff V1
 
-**Device:** Computer 2 (Translation & Internationalization)  
-**Generated:** 2026-08-07  
-**Purpose:** Freeze independent Computer-2 milestone work and hand control to the central server for cross-agent orchestration.  
+**Device:** Computer 2 (Translation & Internationalization)
+
+**Generated:** 2026-08-07
+
+**Purpose:** Freeze independent Computer-2 milestone work and hand control to the central server for cross-agent orchestration.
+
 **Contains:** No secrets, tokens, cookies, or runtime payloads.
 
 ---
 
 ## A. Device / worktree inventory
 
-Shared git repository: `https://github.com/mohamad054-tech/umtuba-web.git`  
+Shared git repository: `https://github.com/mohamad054-tech/umtuba-web.git`
+
 Linked Supabase (shared): `umtuba` / `tgucwnjwoyeqoxqaxmew` (eu-west-1) — **not** Translation-isolated.
 
 | Worktree path | Branch | HEAD | Upstream | Sync | Tree | Ownership |
@@ -17,7 +21,8 @@ Linked Supabase (shared): `umtuba` / `tgucwnjwoyeqoxqaxmew` (eu-west-1) — **no
 | `C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-trunk-port-v1` | `office/platform-translation-trunk-port-v1` | `0958533963832de6677b35258413cc7ca90994eb` | `origin/office/platform-translation-trunk-port-v1` | **0/0** | **clean** | **Translation** (primary) |
 | `C:\Users\Giga store\Desktop\umtuba\umtuba-web-translation-sot` | `alpha-0.2` | `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36` | `origin/alpha-0.2` | **0/0** | **clean** | **SoT / Alpha checkout** (read baseline; not active Translation milestone work) |
 
-`git worktree list` on this device shows **only** the two worktrees above.  
+`git worktree list` on this device shows **only** the two worktrees above.
+
 Under `Desktop\umtuba\` only those two directories exist. No other local UMTUBA worktrees were found on Computer 2 for this handoff.
 
 Latest subjects:

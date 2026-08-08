@@ -1,8 +1,11 @@
 # Translation Studio V1 — PRODUCTION_ACCEPTED
 
-**Status:** `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED**  
-**Closeout base:** `0d66bb92efb83d954dacbe770ef5f3e169f40c50`  
-**Branch:** `office/platform-translation-trunk-port-v1`  
+**Status:** `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED**
+
+**Closeout base:** `0d66bb92efb83d954dacbe770ef5f3e169f40c50`
+
+**Branch:** `office/platform-translation-trunk-port-v1`
+
 **Acceptance:** `TRANSLATION_STUDIO_PRODUCTION_ACCEPTANCE_AND_OPERATIONAL_SOAK_V1` = **ACCEPTANCE_PASS**
 
 ## Final accepted architecture
@@ -66,5 +69,6 @@ Recorded separately; **must not** reopen V1:
 
 ## Recommended next action (outside Translation Studio V1)
 
-Do **not** start Translation Studio V2 or DB-primary from this closeout.  
+Do **not** start Translation Studio V2 or DB-primary from this closeout.
+
 Computer-2 / platform next work should be chosen by a separate GO outside this V1 milestone.
