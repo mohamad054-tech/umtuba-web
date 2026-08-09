@@ -230,6 +230,13 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmEventRouteRecord): UmEventRouteRecord {
+  return {
+    ...record,
+    ...(record.metadata !== undefined ? { metadata: { ...record.metadata } } : {}),
+  };
+}
+
 /**
  * Create a pure in-memory event routing registry.
  */
@@ -246,31 +253,38 @@ export function createInMemoryEventRoutingRegistry(
     register(input: UmEventRouteRegistrationInput): UmEventRouteRegistrationResult {
       const result = evaluateRegistration(input, platforms, eventTypes, store);
       if (result.ok && result.record) {
-        store.set(result.routeId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.routeId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(routeId) {
-      return store.get(routeId);
+      const stored = store.get(routeId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listByEventType(eventType) {
-      return sortedValues().filter((r) => r.eventType === eventType);
+      return sortedValues()
+        .filter((r) => r.eventType === eventType)
+        .map(cloneRecord);
     },
 
     listByProducer(platformId) {
-      return sortedValues().filter((r) => r.producerPlatformId === platformId);
+      return sortedValues()
+        .filter((r) => r.producerPlatformId === platformId)
+        .map(cloneRecord);
     },
 
     listByDestination(platformId) {
-      return sortedValues().filter(
-        (r) => r.destinationPlatformId === platformId,
-      );
+      return sortedValues()
+        .filter((r) => r.destinationPlatformId === platformId)
+        .map(cloneRecord);
     },
 
     has(routeId) {

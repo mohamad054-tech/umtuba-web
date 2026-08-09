@@ -48,6 +48,10 @@ function compareById(a: UmNamedArtifact, b: UmNamedArtifact): number {
   return a.id.localeCompare(b.id);
 }
 
+function cloneArtifact(artifact: UmNamedArtifact): UmNamedArtifact {
+  return { ...artifact };
+}
+
 function buildIndex(deps: UmNamingRegistryDeps): Map<string, UmNamedArtifact> {
   const index = new Map<string, UmNamedArtifact>();
   const { platforms, capabilities, eventTypes, flags } = deps;
@@ -142,23 +146,26 @@ export function createInMemoryNamingRegistry(
     },
 
     get(kind, id) {
-      return store.get(artifactKey(kind, id));
+      const stored = store.get(artifactKey(kind, id));
+      return stored === undefined ? undefined : cloneArtifact(stored);
     },
 
     listByKind(kind) {
       return [...store.values()]
         .filter((a) => a.kind === kind)
-        .sort(compareById);
+        .sort(compareById)
+        .map(cloneArtifact);
     },
 
     list() {
-      return sortedAll();
+      return sortedAll().map(cloneArtifact);
     },
 
     listByPlatform(platformId) {
       return [...store.values()]
         .filter((a) => a.ownerPlatformId === platformId)
-        .sort(compareArtifacts);
+        .sort(compareArtifacts)
+        .map(cloneArtifact);
     },
 
     has(kind, id) {

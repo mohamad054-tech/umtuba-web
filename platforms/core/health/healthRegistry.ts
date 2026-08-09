@@ -213,9 +213,14 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmHealthRecord): UmHealthRecord {
+  return { ...record };
+}
+
 /**
  * Create a pure in-memory health declaration catalog.
  * Does not monitor, probe, or evaluate live health.
+ * Catalog records are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryHealthRegistry(
   deps: UmHealthRegistryDeps,
@@ -230,21 +235,26 @@ export function createInMemoryHealthRegistry(
     register(input: UmHealthRegistrationInput): UmHealthRegistrationResult {
       const result = evaluateRegistration(input, platforms, store);
       if (result.ok && result.record) {
-        store.set(result.platformId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.platformId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(platformId) {
-      return store.get(platformId);
+      const stored = store.get(platformId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listByReportsStatus(reportsStatus) {
-      return sortedValues().filter((r) => r.reportsStatus === reportsStatus);
+      return sortedValues()
+        .filter((r) => r.reportsStatus === reportsStatus)
+        .map(cloneRecord);
     },
 
     has(platformId) {

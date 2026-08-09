@@ -88,6 +88,11 @@ function buildCapabilityCatalog(
   }));
 }
 
+/** Defensive deep clone for external catalog consumption (plain data only). */
+function cloneRecord(record: UmPlatformRecord): UmPlatformRecord {
+  return structuredClone(record);
+}
+
 function resolveValidation(
   manifest: UmPlatformManifest,
   provided?: UmValidationResult,
@@ -235,12 +240,12 @@ function evaluateRegistration(
     platformVersion: manifest.platformVersion,
     maturityLevel: manifest.maturityLevel,
     complianceStatus: compliance.status,
-    manifest,
-    validation,
-    compliance,
+    manifest: structuredClone(manifest),
+    validation: structuredClone(validation),
+    compliance: structuredClone(compliance),
     modules: buildModuleCatalog(manifest),
     capabilities: buildCapabilityCatalog(manifest),
-    registration,
+    registration: { ...registration },
     ...(registration.registeredAt !== undefined
       ? { registeredAt: registration.registeredAt }
       : {}),
@@ -267,6 +272,7 @@ function evaluateRegistration(
 /**
  * Create a pure in-memory platform registry.
  * State lives only in this process heap — never persisted.
+ * Catalog records are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryPlatformRegistry(): UmInMemoryPlatformRegistry {
   const store = new Map<string, UmPlatformRecord>();
@@ -275,19 +281,22 @@ export function createInMemoryPlatformRegistry(): UmInMemoryPlatformRegistry {
     register(input: UmPlatformRegistrationInput): UmPlatformRegistrationResult {
       const result = evaluateRegistration(input, store);
       if (result.ok && result.record) {
-        store.set(result.platformId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.platformId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(platformId) {
-      return store.get(platformId);
+      const stored = store.get(platformId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return [...store.values()].sort((a, b) =>
-        a.platformId.localeCompare(b.platformId),
-      );
+      return [...store.values()]
+        .sort((a, b) => a.platformId.localeCompare(b.platformId))
+        .map(cloneRecord);
     },
 
     has(platformId) {

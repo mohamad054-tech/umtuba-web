@@ -339,9 +339,17 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmFlagRecord): UmFlagRecord {
+  return {
+    ...record,
+    linkedCapabilityIds: [...record.linkedCapabilityIds],
+  };
+}
+
 /**
  * Create a pure in-memory feature flag registry.
  * Does not evaluate flags.
+ * Catalog records are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryFlagRegistry(
   deps: UmFlagRegistryDeps,
@@ -361,31 +369,38 @@ export function createInMemoryFlagRegistry(
         store,
       );
       if (result.ok && result.record) {
-        store.set(result.flagId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.flagId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(flagId) {
-      return store.get(flagId);
+      const stored = store.get(flagId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listByPlatform(platformId) {
-      return sortedValues().filter((r) => r.ownerPlatformId === platformId);
+      return sortedValues()
+        .filter((r) => r.ownerPlatformId === platformId)
+        .map(cloneRecord);
     },
 
     listByLinkedCapability(capabilityId) {
-      return sortedValues().filter((r) =>
-        r.linkedCapabilityIds.includes(capabilityId),
-      );
+      return sortedValues()
+        .filter((r) => r.linkedCapabilityIds.includes(capabilityId))
+        .map(cloneRecord);
     },
 
     listByDangerElevated(dangerElevated) {
-      return sortedValues().filter((r) => r.dangerElevated === dangerElevated);
+      return sortedValues()
+        .filter((r) => r.dangerElevated === dangerElevated)
+        .map(cloneRecord);
     },
 
     has(flagId) {

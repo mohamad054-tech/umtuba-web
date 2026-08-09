@@ -438,9 +438,14 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmDependencyRecord): UmDependencyRecord {
+  return { ...record };
+}
+
 /**
  * Create a pure in-memory dependency registry.
  * Does not resolve dependencies at runtime.
+ * Catalog records are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryDependencyRegistry(
   deps: UmDependencyRegistryDeps,
@@ -460,17 +465,20 @@ export function createInMemoryDependencyRegistry(
         store,
       );
       if (result.ok && result.record) {
-        store.set(result.edgeId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.edgeId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(edgeId) {
-      return store.get(edgeId);
+      const stored = store.get(edgeId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listRequirements(platformId) {
@@ -486,11 +494,15 @@ export function createInMemoryDependencyRegistry(
     },
 
     listByTargetKind(targetKind) {
-      return sortedValues().filter((r) => r.targetKind === targetKind);
+      return sortedValues()
+        .filter((r) => r.targetKind === targetKind)
+        .map(cloneRecord);
     },
 
     listByStrength(strength) {
-      return sortedValues().filter((r) => r.strength === strength);
+      return sortedValues()
+        .filter((r) => r.strength === strength)
+        .map(cloneRecord);
     },
 
     has(edgeId) {

@@ -388,8 +388,18 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmEventTypeRecord): UmEventTypeRecord {
+  return {
+    ...record,
+    subjectRefExpectations: [...record.subjectRefExpectations],
+    documentationRefs: [...record.documentationRefs],
+    ...(record.metadata !== undefined ? { metadata: { ...record.metadata } } : {}),
+  };
+}
+
 /**
  * Create a pure in-memory event type registry bound to a platform catalog.
+ * Catalog records are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryEventTypeRegistry(
   deps: UmEventTypeRegistryDeps,
@@ -404,39 +414,50 @@ export function createInMemoryEventTypeRegistry(
     register(input: UmEventTypeRegistrationInput): UmEventTypeRegistrationResult {
       const result = evaluateRegistration(input, platforms, store);
       if (result.ok && result.record) {
-        store.set(result.eventType, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.eventType, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(eventType) {
-      return store.get(eventType);
+      const stored = store.get(eventType);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listByProducer(platformId) {
-      return sortedValues().filter((r) => r.producerPlatformId === platformId);
+      return sortedValues()
+        .filter((r) => r.producerPlatformId === platformId)
+        .map(cloneRecord);
     },
 
     listBySchemaVersion(schemaVersion) {
-      return sortedValues().filter((r) => r.schemaVersion === schemaVersion);
+      return sortedValues()
+        .filter((r) => r.schemaVersion === schemaVersion)
+        .map(cloneRecord);
     },
 
     listByStability(stability) {
-      return sortedValues().filter((r) => r.stability === stability);
+      return sortedValues()
+        .filter((r) => r.stability === stability)
+        .map(cloneRecord);
     },
 
     listByPiiClass(piiClass) {
-      return sortedValues().filter((r) => r.piiClass === piiClass);
+      return sortedValues()
+        .filter((r) => r.piiClass === piiClass)
+        .map(cloneRecord);
     },
 
     listByDeliveryExpectation(deliveryExpectation) {
-      return sortedValues().filter(
-        (r) => r.deliveryExpectation === deliveryExpectation,
-      );
+      return sortedValues()
+        .filter((r) => r.deliveryExpectation === deliveryExpectation)
+        .map(cloneRecord);
     },
 
     has(eventType) {

@@ -366,6 +366,14 @@ function buildRecord(
   };
 }
 
+function cloneRecord(record: UmCapabilityRecord): UmCapabilityRecord {
+  return {
+    ...record,
+    sideEffectClasses: [...record.sideEffectClasses],
+    ...(record.metadata !== undefined ? { metadata: { ...record.metadata } } : {}),
+  };
+}
+
 /**
  * Create a pure in-memory capability registry bound to a platform catalog.
  */
@@ -382,35 +390,44 @@ export function createInMemoryCapabilityRegistry(
     register(input: UmCapabilityRegistrationInput): UmCapabilityRegistrationResult {
       const result = evaluateRegistration(input, platforms, store);
       if (result.ok && result.record) {
-        store.set(result.capabilityId, result.record);
+        const stored = cloneRecord(result.record);
+        store.set(result.capabilityId, stored);
+        return { ...result, record: cloneRecord(stored) };
       }
       return result;
     },
 
     get(capabilityId) {
-      return store.get(capabilityId);
+      const stored = store.get(capabilityId);
+      return stored === undefined ? undefined : cloneRecord(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneRecord);
     },
 
     listByPlatform(platformId) {
-      return sortedValues().filter((r) => r.platformId === platformId);
+      return sortedValues()
+        .filter((r) => r.platformId === platformId)
+        .map(cloneRecord);
     },
 
     listByModule(moduleId) {
-      return sortedValues().filter((r) => r.moduleId === moduleId);
+      return sortedValues()
+        .filter((r) => r.moduleId === moduleId)
+        .map(cloneRecord);
     },
 
     listBySideEffectClass(sideEffectClass) {
-      return sortedValues().filter((r) =>
-        r.sideEffectClasses.includes(sideEffectClass),
-      );
+      return sortedValues()
+        .filter((r) => r.sideEffectClasses.includes(sideEffectClass))
+        .map(cloneRecord);
     },
 
     listByStability(stability) {
-      return sortedValues().filter((r) => r.stability === stability);
+      return sortedValues()
+        .filter((r) => r.stability === stability)
+        .map(cloneRecord);
     },
 
     has(capabilityId) {
