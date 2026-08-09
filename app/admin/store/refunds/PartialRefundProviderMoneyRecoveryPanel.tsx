@@ -2,6 +2,7 @@ import { adminRecoverPartialRefundProviderMoneyLookupAction } from "../../../act
 import type { PartialRefundProviderExecutionRecord } from "../../../../lib/store/partialRefundProviderMoneyExecution";
 import {
   buildProviderMoneyOperatorObservability,
+  buildRefundProviderReconciliation,
   isRecoveryEligibleProviderExecution,
   PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
   toProviderMoneyAuditView,
@@ -109,6 +110,11 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
               nowMs: now,
               staleAfterMs: PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
             });
+            const recon = buildRefundProviderReconciliation({
+              execution: e,
+              nowMs: now,
+              staleAfterMs: PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
+            });
             return (
               <li
                 key={e.executionId}
@@ -122,6 +128,11 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                 data-execution-stuck={obs.executionStuck ? "1" : "0"}
                 data-duplicate-ruled-out={
                   obs.duplicateExecutionRuledOut ? "1" : "0"
+                }
+                data-recon-match={recon.MATCH_STATUS}
+                data-recon-required={recon.RECONCILIATION_REQUIRED ? "1" : "0"}
+                data-operator-action-required={
+                  recon.OPERATOR_ACTION_REQUIRED ? "1" : "0"
                 }
               >
                 <div className="flex flex-wrap items-center gap-2">
@@ -214,6 +225,42 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                       {obs.recoveryEvidence.failureCode
                         ? ` · ${obs.recoveryEvidence.failureCode}`
                         : ""}
+                    </dd>
+                  </div>
+                </dl>
+                <dl
+                  className="mt-2 grid gap-1 text-[11px] text-amber-100/70 sm:grid-cols-2"
+                  data-testid="pr-prov-reconciliation"
+                >
+                  <div>
+                    <dt className="text-white/35">LOCAL_STATE</dt>
+                    <dd className="text-white/70">{recon.LOCAL_STATE}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">PROVIDER_STATE</dt>
+                    <dd className="text-white/70">{recon.PROVIDER_STATE}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">MATCH_STATUS</dt>
+                    <dd className="text-white/70">{recon.MATCH_STATUS}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">RECONCILIATION_REQUIRED</dt>
+                    <dd className="text-white/70">
+                      {recon.RECONCILIATION_REQUIRED ? "yes" : "no"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">RETRY_SAFE</dt>
+                    <dd className="text-white/70">
+                      {recon.RETRY_SAFE ? "yes" : "no"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">OPERATOR_ACTION_REQUIRED</dt>
+                    <dd className="text-white/70">
+                      {recon.OPERATOR_ACTION_REQUIRED ? "yes" : "no"} ·{" "}
+                      {recon.operatorAction}
                     </dd>
                   </div>
                 </dl>
