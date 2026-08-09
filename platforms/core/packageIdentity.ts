@@ -64,5 +64,8 @@ export const UM_CORE_HEALTH_REPORTER_PHASE = "P17" as const;
 /** Health diagnostics join foundation phase. */
 export const UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE = "P18" as const;
 
+/** Fleet health aggregation foundation phase. */
+export const UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE = "P20" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;
