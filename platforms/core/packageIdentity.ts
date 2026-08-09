@@ -66,8 +66,12 @@ export const UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE = "P18" as const;
 
 /** Fleet health aggregation foundation phase. */
 export const UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE = "P20" as const;
+
 /** SDK client factory foundation phase. */
 export const UM_CORE_SDK_CLIENT_FACTORY_PHASE = "P21" as const;
+
+/** Bounded health observation history foundation phase. */
+export const UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE = "P22" as const;
 
 
 /** Human-readable package label (not a machine ID). */

@@ -11,3 +11,12 @@ export {
   createFleetHealthAggregation,
   type UmFleetHealthBagOptions,
 } from "./fleetHealthAggregation";
+export * from "./healthHistoryCodes";
+export {
+  createInMemoryHealthObservationHistory,
+  type UmHealthHistoryFinding,
+  type UmHealthHistoryRecordResult,
+  type UmHealthObservationHistoryDeps,
+  type UmInMemoryHealthObservationHistory,
+  type UmHealthObservationHistoryCreateResult,
+} from "./healthHistory";
