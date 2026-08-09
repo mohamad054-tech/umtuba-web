@@ -1,22 +1,15 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
+# CURSOR_REPORT — PC2-A3 / UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1
 
 ## Summary
 
-Implemented pure in-memory `UmDependencyValidator.validateRequirements` as Core P19 on branch `office/um-core-platform-dependency-validator-foundation-p19` from exact `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`. Fail-closed, result-returning, deterministic; codes under `dependency.validator.*`; unused-by-default vs P14–P17/SDK. Branch tip pushed at `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1` (feat `bf5e66d4cc321f913ca98d6c6d3913a3416fa955`).
+TEST-ONLY contract coherence matrix for UM Core foundations on `origin/alpha-0.2` @ `32a76207b149e68a27dc1e932d2c16aa47c9586e`. Added isolated `platforms/core/p1P19ContractCoherence.matrix.test.ts` covering critical negative boundaries (P13≠P19, P19≠RI, Health≠Lifecycle Readiness, Capability Compatibility≠Health/Readiness), rematerialization non-side-effects, deterministic ordering, and store non-mutation. **OVERALL_VERDICT = PASS**. No production changes. No semantic defects found.
 
 ## Exact files changed
 
-- `platforms/core/validation/dependencyValidator.ts`
-- `platforms/core/validation/dependencyValidatorCodes.ts`
-- `platforms/core/validation/dependencyValidator.test.ts`
-- `platforms/core/validation/interfaces.ts`
-- `platforms/core/dependency/types.ts`
-- `platforms/core/packageIdentity.ts`
-- `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19.md`
-- `UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
-- `docs/ai/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
-- `docs/ai/CURSOR_REPORT.md`
+- `platforms/core/p1P19ContractCoherence.matrix.test.ts` (new)
+- `UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1_REPORT.md` (new)
+- `docs/ai/UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1_REPORT.md` (new)
+- `docs/ai/CURSOR_REPORT.md` (this file)
 
 ## Migrations created
 
@@ -24,20 +17,20 @@ None.
 
 ## Security review
 
-No secrets introduced. No network/DB/product wiring. Fail-closed unknown platform / unknown targets. Secret scan PASS on changed files.
+Tests/docs only. No secrets, network, DB, or remote migration activity.
 
 ## Tests
 
-- Focused: `npx.cmd vitest run platforms/core/validation/dependencyValidator.test.ts` PASS (14)
-- Full core: `npx.cmd vitest run platforms/core` PASS (33 files / 347 tests)
+- Matrix: 12/12 PASS
+- Full `platforms/core`: 36 files / 370 tests PASS
 
 ## TypeScript
 
-`npx.cmd tsc --noEmit` PASS
+`npx tsc --noEmit` → exit 0
 
 ## Build
 
-Not required by task (no app UI/entry-point changes).
+Skipped (tests/docs only).
 
 ## git diff --check
 
@@ -45,8 +38,9 @@ PASS
 
 ## git status --short
 
-Clean after handoff commit (see report).
+Clean after commit/push of own branch (see final agent message).
 
 ## Open issues
 
-None for P19 scope. Ready for integration; do not self-assign next work.
+- Public API inventory lag (P19 omitted from some smoke/BC/matrix lists) — non-blocking, out of scope.
+- OUTBOX path unavailable on PC2 for this run.
