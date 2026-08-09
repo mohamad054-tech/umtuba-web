@@ -1,26 +1,31 @@
-# CURSOR_REPORT — COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1
 
 ## Summary
 
-**Verdict: HANDOFF_PUSH_COMPLETE — SUCCESS**
+**Verdict: IMPLEMENTED_AND_PUSHED — SUCCESS**
 
-All legitimate Computer-2 Translation durable handoff evidence for Central
-Server alpha integration is recorded and pushed on
-`office/platform-translation-trunk-port-v1`.
+PC2-A2 delivered an in-memory bounded per-platform health observation history
+ring (P22) on
+`office/um-core-platform-bounded-health-history-foundation-v1` @
+`9b35ddc32db4cec24757aa97d90a31975056329b`, based on
+`origin/alpha-0.2` @ `c8f5c9657ab4670d676f7ce6640ea30fd837890d`.
 
-- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED / COMPLETE**
-- Source tip for Central integration: `c061c0a593662d03569c489246996bf2a3e034aa`
-  (implementation already on origin; this commit adds durable handoff docs)
-- Alpha observed: `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
-- FF-eligible; textual conflicts none; Computer 2 does **not** merge alpha
+Previous P19 A2 lane (fleet aggregation `49ec529`) verified COMPLETE; report
+re-delivered to OUTBOX (SHA256 match). No accepted bounded-history contract
+file found — `CONTRACT_SOURCE=derived_from_central_assignment_plus_gap_audit`.
+Shared Core export/`types`/`packageIdentity` wiring deferred to avoid A1
+collision.
 
-Canonical handoff:
-[`docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md`](../translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md)
+Canonical Central report:
+`UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1_REPORT.md`
 
 ## Exact files changed
 
-- `docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `docs/core/UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1.md` (new)
+- `platforms/core/health/healthHistory.ts` (new)
+- `platforms/core/health/healthHistoryCodes.ts` (new)
+- `platforms/core/health/healthHistory.test.ts` (new)
+- `docs/ai/CURSOR_REPORT.md` (this handoff; local only if uncommitted)
 
 ## Migrations created
 
@@ -28,31 +33,32 @@ Canonical handoff:
 
 ## Security review
 
-- Docs-only; no secrets / tokens / cookies / `.env` / runtime journals
-- No Co-authored-by / Signed-off-by on handoff commit
+- In-memory only; no network/DB/secrets/product domains
+- Fail-closed capacity + admission; defensive query clones
+- No Co-authored-by / Signed-off-by on product commit
 
 ## Tests
 
-Docs handoff only — no paid AI; no Studio/DB mutation.
+- Focused history: **PASS** (12)
+- Full `platforms/core`: **PASS** (19 files / 194 tests)
 
 ## TypeScript
 
-N/A (docs-only)
+`npx tsc --noEmit` → **PASS**
 
 ## Build
 
-N/A
+N/A (Core library foundation; gates did not require `npm run build`)
 
 ## git diff --check
 
-PASS (handoff commit)
+**PASS**
 
 ## git status --short
 
-(filled after push — expect clean)
+clean (product commit pushed; 0/0)
 
 ## Open issues
 
-1. Central Server owns alpha FF/integration + migration history re-verify.
-2. Translation V2 / DB-primary / live publish remain deferred — do not start.
-3. Alpha SoT worktree on Computer 2 must remain untouched by this handoff.
+1. Central may wire `health/index.ts` / phase label after A1 SDK factory settles.
+2. Do not start next work from this lane — STOP.
