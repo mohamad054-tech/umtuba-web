@@ -30,6 +30,7 @@ export default defineConfig({
       "lib/search/**/*.test.ts",
       "lib/ads/**/*.test.ts",
       "lib/learning/**/*.test.ts",
+      "app/components/learning/ds/**/*.test.ts",
       "lib/ai/**/*.test.ts",
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
