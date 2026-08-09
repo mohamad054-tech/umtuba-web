@@ -1,14 +1,14 @@
-# CURSOR_REPORT — PC2-A3 / UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1
+# CURSOR_REPORT — PC2-A2 / UM_CORE_PLATFORM_VALIDATION_FUZZ_PROPERTY_REGRESSION_V1
 
 ## Summary
 
-TEST-ONLY contract coherence matrix for UM Core foundations on `origin/alpha-0.2` @ `32a76207b149e68a27dc1e932d2c16aa47c9586e`. Added isolated `platforms/core/p1P19ContractCoherence.matrix.test.ts` covering critical negative boundaries (P13≠P19, P19≠RI, Health≠Lifecycle Readiness, Capability Compatibility≠Health/Readiness), rematerialization non-side-effects, deterministic ordering, and store non-mutation. **OVERALL_VERDICT = PASS**. No production changes. No semantic defects found.
+TEST-ONLY bounded deterministic property-style regression for pure Core validators (manifest, P13, P19, RI) on `origin/alpha-0.2` @ `af1d8247d3af7a74210c2e187e11908d91fdb281`. Added isolated `platforms/core/validation/validationProperty.regression.test.ts`. **SEMANTIC_DEFECT_FOUND = NO**. No production changes. No external fuzz package.
 
 ## Exact files changed
 
-- `platforms/core/p1P19ContractCoherence.matrix.test.ts` (new)
-- `UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1_REPORT.md` (new)
-- `docs/ai/UM_CORE_PLATFORM_P1_P19_CONTRACT_COHERENCE_MATRIX_V1_REPORT.md` (new)
+- `platforms/core/validation/validationProperty.regression.test.ts` (new)
+- `UM_CORE_PLATFORM_VALIDATION_FUZZ_PROPERTY_REGRESSION_V1_REPORT.md` (new)
+- `docs/ai/UM_CORE_PLATFORM_VALIDATION_FUZZ_PROPERTY_REGRESSION_V1_REPORT.md` (new)
 - `docs/ai/CURSOR_REPORT.md` (this file)
 
 ## Migrations created
@@ -21,8 +21,8 @@ Tests/docs only. No secrets, network, DB, or remote migration activity.
 
 ## Tests
 
-- Matrix: 12/12 PASS
-- Full `platforms/core`: 36 files / 370 tests PASS
+- Property suite: 15/15 PASS (2× repeated-run PASS)
+- Full `platforms/core`: 38 files / 391 tests PASS
 
 ## TypeScript
 
@@ -42,5 +42,4 @@ Clean after commit/push of own branch (see final agent message).
 
 ## Open issues
 
-- Public API inventory lag (P19 omitted from some smoke/BC/matrix lists) — non-blocking, out of scope.
-- OUTBOX path unavailable on PC2 for this run.
+None blocking. Did not wait for A1; did not self-assign next.
