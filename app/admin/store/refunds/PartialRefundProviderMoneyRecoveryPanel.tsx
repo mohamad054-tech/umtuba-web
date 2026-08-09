@@ -1,6 +1,7 @@
 import { adminRecoverPartialRefundProviderMoneyLookupAction } from "../../../actions/storePartialRefundProviderMoneyExecution";
 import type { PartialRefundProviderExecutionRecord } from "../../../../lib/store/partialRefundProviderMoneyExecution";
 import {
+  buildProviderMoneyOperatorObservability,
   isRecoveryEligibleProviderExecution,
   PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
   toProviderMoneyAuditView,
@@ -103,6 +104,11 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
               PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS
             );
             const audit = toProviderMoneyAuditView(e);
+            const obs = buildProviderMoneyOperatorObservability({
+              execution: e,
+              nowMs: now,
+              staleAfterMs: PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
+            });
             return (
               <li
                 key={e.executionId}
@@ -111,6 +117,12 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                 data-status={e.status}
                 data-recovery-eligible={eligible ? "1" : "0"}
                 data-latest-operation={audit.latestOperation}
+                data-money-occurrence={obs.moneyExecutionOccurrence}
+                data-retry-safe={obs.retrySafe ? "1" : "0"}
+                data-execution-stuck={obs.executionStuck ? "1" : "0"}
+                data-duplicate-ruled-out={
+                  obs.duplicateExecutionRuledOut ? "1" : "0"
+                }
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-bold text-white">
@@ -126,6 +138,9 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                     <span className="text-xs text-amber-200">
                       recovery-required
                     </span>
+                  ) : null}
+                  {obs.executionStuck ? (
+                    <span className="text-xs text-rose-200">stuck executing</span>
                   ) : null}
                 </div>
                 <p className="mt-1 text-xs text-white/45">
@@ -153,6 +168,55 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                     ? ` · last lookup ${audit.lastLookupAtIso}`
                     : ""}
                 </p>
+                <dl
+                  className="mt-2 grid gap-1 text-[11px] text-white/45 sm:grid-cols-2"
+                  data-testid="pr-prov-operator-observability"
+                >
+                  <div>
+                    <dt className="text-white/35">Submit attempted</dt>
+                    <dd className="text-white/70">
+                      {obs.providerSubmissionAttempted ? "yes" : "no"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Money occurrence</dt>
+                    <dd className="text-white/70">
+                      {obs.moneyExecutionOccurrence}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Retry safe (V1)</dt>
+                    <dd className="text-white/70">
+                      {obs.retrySafe ? "yes" : "no"} · {obs.retrySafety}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Reconciliation</dt>
+                    <dd className="text-white/70">
+                      {obs.reconciliationRequired
+                        ? "required"
+                        : "not required"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Duplicate ruled out</dt>
+                    <dd className="text-white/70">
+                      {obs.duplicateExecutionRuledOut ? "yes" : "no"} ·{" "}
+                      {obs.duplicateExecutionRuling}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Recovery evidence</dt>
+                    <dd className="text-white/70">
+                      {obs.recoveryEvidence.recoveryEligible
+                        ? "lookup eligible"
+                        : "not eligible"}
+                      {obs.recoveryEvidence.failureCode
+                        ? ` · ${obs.recoveryEvidence.failureCode}`
+                        : ""}
+                    </dd>
+                  </div>
+                </dl>
                 {eligible ? (
                   <form
                     action={adminRecoverPartialRefundProviderMoneyLookupAction}

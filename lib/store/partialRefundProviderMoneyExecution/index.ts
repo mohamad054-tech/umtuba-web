@@ -162,3 +162,12 @@ export {
   type ProviderMoneyAuditView,
   type ProviderMoneyLatestOperation,
 } from "./observability";
+export {
+  buildProviderMoneyOperatorObservability,
+  buildProviderMoneyOperatorObservabilityAbsent,
+  type BuildProviderMoneyOperatorObservabilityInput,
+  type ProviderMoneyDuplicateRuling,
+  type ProviderMoneyOccurrenceConfidence,
+  type ProviderMoneyOperatorObservabilitySnapshot,
+  type ProviderMoneyRetrySafety,
+} from "./operatorObservability";

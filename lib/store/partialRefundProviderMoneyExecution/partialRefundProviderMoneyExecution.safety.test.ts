@@ -481,6 +481,12 @@ describe("safety — admin visibility + unauthorized denial contracts", () => {
     expect(read(RECOVERY_PANEL)).toMatch(
       /data-testid="partial-refund-provider-money-recovery-panel"/
     );
+    expect(read(RECOVERY_PANEL)).toMatch(
+      /data-testid="pr-prov-operator-observability"/
+    );
+    expect(read(RECOVERY_PANEL)).toMatch(
+      /buildProviderMoneyOperatorObservability/
+    );
     expect(read(EXECUTE_PANEL)).toMatch(/prior failed \(no V1 retry\)/);
     expect(read(EXECUTE_PANEL)).toMatch(/recovery required/);
   });
