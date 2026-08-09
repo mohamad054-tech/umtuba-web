@@ -95,6 +95,14 @@ export {
 } from "./stateMachine";
 export { createStripePartialRefundProviderPort } from "./stripeAdapter";
 export {
+  STRIPE_TEST_FIXTURE_ENV_READINESS_VERSION,
+  buildStripeTestFixtureEnvReadinessReport,
+  isStripeTestFixtureEnvReadyForIsolatedPrep,
+  type StripeTestFixtureEnvReadinessReport,
+  type StripeTestFixtureEnvReadinessVerdict,
+  type StripeTestFixtureOperatorInput,
+} from "./stripeTestFixtureEnvReadiness";
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
