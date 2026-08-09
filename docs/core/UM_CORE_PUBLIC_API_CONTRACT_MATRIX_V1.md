@@ -7,6 +7,12 @@
 **PUBLIC BARREL:** `platforms/core/index.ts` (and sub-barrels it re-exports)
 **MODE:** Documentation + contract verification (no production API refactor; no P23 root magnet wire)
 
+> **PACKAGING CROSS-LINK (PC2-A2 / `UM_CORE_PLATFORM_SPEC_STANDARDS_RELEASE_CONTRACT_CLOSEOUT_V1`):**
+> Inventory rows here remain the export matrix. Normative Spec / Standards /
+> release packaging (including **P19 = UNUSED_BY_DEFAULT** and **P23 = NOT
+> root-public**) lives in `UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md`,
+> `UM_CORE_SPECIFICATION_V1.md`, and `UM_CORE_ENGINEERING_STANDARDS_V1.md`.
+
 ## Law
 
 - Public API = symbols reachable from `platforms/core/index.ts`.
