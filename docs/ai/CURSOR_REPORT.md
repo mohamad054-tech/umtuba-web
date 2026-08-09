@@ -2,7 +2,7 @@
 
 ## Summary
 
-Implemented pure in-memory `UmDependencyValidator.validateRequirements` as Core P19 on branch `office/um-core-platform-dependency-validator-foundation-p19` from exact `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`. Fail-closed, result-returning, deterministic; codes under `dependency.validator.*`; unused-by-default vs P14–P17/SDK. Tip pushed at `bf5e66d4cc321f913ca98d6c6d3913a3416fa955` (report docs may add a follow-up tip).
+Implemented pure in-memory `UmDependencyValidator.validateRequirements` as Core P19 on branch `office/um-core-platform-dependency-validator-foundation-p19` from exact `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`. Fail-closed, result-returning, deterministic; codes under `dependency.validator.*`; unused-by-default vs P14–P17/SDK. Branch tip pushed at `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1` (feat `bf5e66d4cc321f913ca98d6c6d3913a3416fa955`).
 
 ## Exact files changed
 

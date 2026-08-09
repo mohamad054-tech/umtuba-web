@@ -19,7 +19,8 @@ TASK_ID=UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
 
 ## FINAL_SHA
 
-`bf5e66d4cc321f913ca98d6c6d3913a3416fa955`
+`bf5e66d4cc321f913ca98d6c6d3913a3416fa955` (implementation)  
+BRANCH_TIP after docs handoff: see git status at delivery (docs commit follows).
 
 ## FILES_CHANGED
 
@@ -103,7 +104,7 @@ PASS — no secret-like patterns in changed files
 
 ## PUSH_STATUS
 
-PUSHED — `origin/office/um-core-platform-dependency-validator-foundation-p19` @ `bf5e66d4cc321f913ca98d6c6d3913a3416fa955`
+PUSHED — `origin/office/um-core-platform-dependency-validator-foundation-p19` @ `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1`
 
 ## AHEAD_BEHIND
 
@@ -111,7 +112,7 @@ PUSHED — `origin/office/um-core-platform-dependency-validator-foundation-p19` 
 
 ## WORKING_TREE
 
-Clean after report commit (see FINAL_SHA / tip after docs handoff commit if any).
+Clean.
 
 ## READY_FOR_INTEGRATION
 
