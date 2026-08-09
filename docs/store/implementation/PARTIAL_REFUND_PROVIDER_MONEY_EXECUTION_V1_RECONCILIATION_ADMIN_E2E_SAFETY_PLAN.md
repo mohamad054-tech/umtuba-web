@@ -1,9 +1,9 @@
 # Partial Refund Provider Money Execution V1 — Reconciliation / Admin / E2E Safety Plan
 
-**Task:** `COMMERCE_PROVIDER_EXEC_RECONCILIATION_ADMIN_E2E_SAFETY_PLAN_V1`  
-**Owner device:** DESKTOP-A3  
-**Base tip:** `4291bdbfb395b00a9c9cc5aa0d05d560a1e672ab`  
-**Status:** Safety pack design + non-provider-live regression contracts  
+**Task:** `COMMERCE_PROVIDER_EXEC_RECONCILIATION_ADMIN_E2E_SAFETY_PLAN_V1`
+**Owner device:** DESKTOP-A3
+**Base tip:** `4291bdbfb395b00a9c9cc5aa0d05d560a1e672ab`
+**Status:** Safety pack design + non-provider-live regression contracts
 **Provider activation:** **NOT** in scope. Gates remain OFF. Mode remains `off`.
 
 ---
@@ -168,6 +168,6 @@ Covers: transition matrix, reservation coupling, idempotency key contracts, fail
 
 ## 13. Disjointness vs DESKTOP-A2
 
-A2 owns Stripe TEST fixture/env readiness (`.env.example`, fixture helpers, gate/env templates).  
-A3 owns reconciliation/admin/E2E **safety plan + non-live safety tests**.  
+A2 owns Stripe TEST fixture/env readiness (`.env.example`, fixture helpers, gate/env templates).
+A3 owns reconciliation/admin/E2E **safety plan + non-live safety tests**.
 A3 does **not** edit `gate.ts` / `executionMode.ts` / `.env.example` / Stripe fixture helpers.
