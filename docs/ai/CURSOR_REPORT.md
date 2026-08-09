@@ -1,65 +1,52 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
 
 ## Summary
 
-**Verdict: HARDENED_AND_PUSHED — SUCCESS** · **IMPLEMENTED=YES**
-
-PC2-A2 audited Core snapshots/read models for deterministic serialization and
-safe external consumption. P17/P22/join/fleet already safe. Proven P1 residual:
-registry/catalog `get`/`list` returned live store aliases — hardened with local
-defensive clones on admit + read surfaces. Added focused serialization/safety
-tests. No DTO framework, DB, A1 compat/readiness edits, or alpha merge.
-
-Canonical Central report:
-`UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1_REPORT.md`
+Implemented pure in-memory `UmDependencyValidator.validateRequirements` as Core P19 on branch `office/um-core-platform-dependency-validator-foundation-p19` from exact `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`. Fail-closed, result-returning, deterministic; codes under `dependency.validator.*`; unused-by-default vs P14–P17/SDK. Tip pushed at `bf5e66d4cc321f913ca98d6c6d3913a3416fa955` (report docs may add a follow-up tip).
 
 ## Exact files changed
 
-- `platforms/core/registry/platformRegistry.ts`
-- `platforms/core/capability/capabilityRegistry.ts`
-- `platforms/core/event/eventTypeRegistry.ts`
-- `platforms/core/event/eventRouting.ts`
-- `platforms/core/flag/flagRegistry.ts`
-- `platforms/core/dependency/dependencyRegistry.ts`
-- `platforms/core/health/healthRegistry.ts`
-- `platforms/core/naming/namingRegistry.ts`
-- `platforms/core/snapshotSerialization.safety.test.ts` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
-- `UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1_REPORT.md`
+- `platforms/core/validation/dependencyValidator.ts`
+- `platforms/core/validation/dependencyValidatorCodes.ts`
+- `platforms/core/validation/dependencyValidator.test.ts`
+- `platforms/core/validation/interfaces.ts`
+- `platforms/core/dependency/types.ts`
+- `platforms/core/packageIdentity.ts`
+- `platforms/core/README.md`
+- `docs/core/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19.md`
+- `UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
+- `docs/ai/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-**NONE.**
+None.
 
 ## Security review
 
-- Narrow catalog defensive-copy hardening only
-- No network/DB/secrets/product domains
-- A1 capability-compat + lifecycle readiness untouched
+No secrets introduced. No network/DB/product wiring. Fail-closed unknown platform / unknown targets. Secret scan PASS on changed files.
 
 ## Tests
 
-- Focused serialization/safety: **PASS** (5)
-- Full `platforms/core`: **PASS** (29 files / 287 tests)
+- Focused: `npx.cmd vitest run platforms/core/validation/dependencyValidator.test.ts` PASS (14)
+- Full core: `npx.cmd vitest run platforms/core` PASS (33 files / 347 tests)
 
 ## TypeScript
 
-`npx tsc --noEmit` → **PASS**
+`npx.cmd tsc --noEmit` PASS
 
 ## Build
 
-N/A (Core library lane)
+Not required by task (no app UI/entry-point changes).
 
 ## git diff --check
 
-**PASS**
+PASS
 
 ## git status --short
 
-Expected clean after push (0/0)
+Clean after handoff commit (see report).
 
 ## Open issues
 
-1. Aggregate registry facade still borrows specialized registry object refs (by design).
-2. SDK still borrows port object refs (documented); ports clone on catalog/health reads.
-3. Stop — no next self-assignment; no alpha merge.
+None for P19 scope. Ready for integration; do not self-assign next work.
