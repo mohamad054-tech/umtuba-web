@@ -1,58 +1,57 @@
-# CURSOR_REPORT — COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1
+# CURSOR_REPORT — PC2-A3 / UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1
 
 ## Summary
 
-**Verdict: HANDOFF_PUSH_COMPLETE — SUCCESS**
-
-All legitimate Computer-2 Translation durable handoff evidence for Central
-Server alpha integration is recorded and pushed on
-`office/platform-translation-trunk-port-v1`.
-
-- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED / COMPLETE**
-- Source tip for Central integration: `c061c0a593662d03569c489246996bf2a3e034aa`
-  (implementation already on origin; this commit adds durable handoff docs)
-- Alpha observed: `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
-- FF-eligible; textual conflicts none; Computer 2 does **not** merge alpha
-
-Canonical handoff:
-[`docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md`](../translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md)
+Consolidated UM Core operational/error-contract evidence on current
+`origin/alpha-0.2` @ `a93f52235fee11e73ad9953993e109a894f99aac` (post Central
+integrate of A1 inventory sync + A2 RC pack). Added
+`docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md` + lock tests.
+Resolved `CENTRAL_CONSUMER_GO_NOT_REQUIRED_FOR_CURRENT_RELEASE=YES`.
+**VERDICT=`PRODUCTION_SIGNOFF_BLOCKED`** — remaining exact blockers: P23
+packaging, Spec/Standards (A2 WIP not on alpha), perf/scale assumptions not on
+alpha.
 
 ## Exact files changed
 
-- `docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md` (new)
+- `platforms/core/operationalErrorContract.lock.test.ts` (new)
+- `UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1_REPORT.md` (new)
+- `docs/ai/UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1_REPORT.md` (new)
+- `docs/ai/CURSOR_REPORT.md` (this file)
 
 ## Migrations created
 
-**NONE.**
+None.
 
 ## Security review
 
-- Docs-only; no secrets / tokens / cookies / `.env` / runtime journals
-- No Co-authored-by / Signed-off-by on handoff commit
+Docs/tests only. No secrets, network, DB, or remote migration activity. P19
+remains unused-by-default (no consumer invented).
 
 ## Tests
 
-Docs handoff only — no paid AI; no Studio/DB mutation.
+- Lock suite: 4/4 PASS (re-run after alpha FF)
+- Full `platforms/core`: re-run after alpha FF (see task report)
 
 ## TypeScript
 
-N/A (docs-only)
+`npx tsc --noEmit` → re-run after alpha FF
 
 ## Build
 
-N/A
+Skipped (docs/tests only; no app UI/entry change).
 
 ## git diff --check
 
-PASS (handoff commit)
+PASS (pre-commit)
 
 ## git status --short
 
-(filled after push — expect clean)
+See post-commit status in task report.
 
 ## Open issues
 
-1. Central Server owns alpha FF/integration + migration history re-verify.
-2. Translation V2 / DB-primary / live publish remain deferred — do not start.
-3. Alpha SoT worktree on Computer 2 must remain untouched by this handoff.
+Central production signoff blocked until P23 packaging, Spec/Standards, and
+perf/scale assumptions evidence are on alpha (or explicitly waived). Ops/error
+closeout ready for Central integrate from this office branch. RC pack + public
+API inventory sync already on alpha as of `a93f522`.
