@@ -80,10 +80,10 @@ pending closeouts as blockers where still absent from alpha.
 
 ### Deliverables
 
-1. `docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md`  
+1. `docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md`
    Consolidates operational readiness boundary + throw-vs-result / diagnostic
    failure law. Explicitly states no universal error framework.
-2. `platforms/core/operationalErrorContract.lock.test.ts`  
+2. `platforms/core/operationalErrorContract.lock.test.ts`
    Locks: doc presence; SDK construction throws vs history Result; P19
    fail-closed + unused by P13/RI; root barrel still omits P23 readiness.
 
@@ -210,8 +210,8 @@ file, product domains.
 | --- | --- |
 | Branch | `office/um-core-platform-operational-error-and-release-signoff-closeout-v1` |
 | BASE_SHA | `a93f52235fee11e73ad9953993e109a894f99aac` |
-| FINAL_SHA | *(set after commit)* |
-| Push | *(set after push)* |
+| FINAL_SHA | ace4204b64f998420e434333069c67f7452fc972 |
+| Push | PENDING_PUSH |
 | Ahead/behind vs `origin/alpha-0.2` after push | expected ahead 1 / behind 0 |
 
 ---

@@ -9,7 +9,7 @@ PRODUCT_SEMANTICS_CHANGED=NO
 UNIVERSAL_ERROR_FRAMEWORK=NO
 ```
 
-**Status:** Closed as operational/error evidence freeze (docs + lock tests).  
+**Status:** Closed as operational/error evidence freeze (docs + lock tests).
 **Base tip at authorship:** `origin/alpha-0.2` @ `a93f52235fee11e73ad9953993e109a894f99aac`
 **Does not reopen:** `UM_CORE_PLATFORM_API_STABILITY_AND_ERROR_CONTRACT_HARDENING_V1` (`NO_CHANGE_REQUIRED`).
 
