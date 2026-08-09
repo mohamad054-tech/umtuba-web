@@ -195,6 +195,27 @@ export {
   type StripeTestActivationDryRunVerification,
 } from "./stripeTestActivationDryRunOrchestration";
 export {
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_ACTIVATION_PERFORMED,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_DEFAULT_OPERATOR_FIXTURES,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_DEFAULT_SOT,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_ENVIRONMENT,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_GATES,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_PROVIDER_EXECUTION_ENTRYPOINTS,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_REQUIRED_ENV_NAMES,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_VERDICTS,
+  STRIPE_TEST_CONTROLLED_EXECUTION_FINAL_PRECHECK_VERSION,
+  buildFutureOperatorControlledStripeTestExecutionChecklist,
+  buildStripeTestControlledExecutionFinalPrecheckReport,
+  isReadyForControlledStripeTestExecution,
+  type StripeTestControlledExecutionFinalPrecheckGate,
+  type StripeTestControlledExecutionFinalPrecheckGateResult,
+  type StripeTestControlledExecutionFinalPrecheckInput,
+  type StripeTestControlledExecutionFinalPrecheckOperatorFixtures,
+  type StripeTestControlledExecutionFinalPrecheckReport,
+  type StripeTestControlledExecutionFinalPrecheckSotIntegration,
+  type StripeTestControlledExecutionFinalPrecheckVerdict,
+} from "./stripeTestControlledExecutionFinalPrecheck";
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
