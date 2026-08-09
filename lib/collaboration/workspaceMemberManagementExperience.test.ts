@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 
 describe("collaboration workspace member management experience", () => {
   it("denies unauthorized membership actions", () => {
@@ -18,11 +18,7 @@ describe("collaboration workspace member management experience", () => {
     try {
       mod = await import("./memberRoleUpdateE2eProvisioning");
     } catch {
-      try {
-        mod = await import("./membershipRolesPermissionsHardening.test");
-      } catch {
-        mod = null;
-      }
+      mod = null;
     }
     expect(mod === null || typeof mod === "object").toBe(true);
   });
