@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P16` (… → capability asserter → event publisher)
+- Phase: `P1`–`P18` (… → health reporter → diagnostics join)
 
 ## Phase P3 scope
 
@@ -216,4 +216,19 @@ Pure **in-memory health observation reporter** under `platforms/core/health/`.
 
 Out of scope for P17: probe execution, polling, scheduling, networking,
 alerting, remediation, DependencyValidator, SDK client/factory, persistence,
+product integration, migrations.
+
+## Phase P18 scope
+
+Pure **diagnostics join read-model** under `platforms/core/health/`.
+
+- `createHealthDiagnosticsJoin({ platforms, declarations, observations })`
+- Deterministic composition of P4 + P10 + P17 only
+- Join classes for declared/observed/unobserved/silent/orphan rows
+- Status tallies + unobserved-reporter id lists
+- Side-effect free `evaluate()` — no store mutation
+
+Out of scope for P18: probe execution, polling, scheduling, networking,
+service discovery, distributed/DB join, fleet aggregation, alerting,
+freshness/TTL clocks, history ring, SDK client/factory, persistence,
 product integration, migrations.

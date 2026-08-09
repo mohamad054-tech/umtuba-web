@@ -4,10 +4,12 @@
  * P1: interfaces/types.
  * P10: pure in-memory health declaration catalog (no monitoring runtime).
  * P17: pure deterministic in-memory UmHealthReporter (observation admission/store).
+ * P18: pure deterministic diagnostics join over P4 + P10 + P17 (read-only).
  *
  * HEALTH DECLARATION REGISTRATION IS NOT HEALTH MONITORING.
  * HEALTH REPORTING IS NOT HEALTH DECLARATION REGISTRATION.
  * HEALTH REPORTING IS NOT PROBE EXECUTION.
+ * DIAGNOSTICS JOIN IS NOT PROBE EXECUTION / NETWORK DISCOVERY.
  *
  * P1 originally shaped `UmHealthRegistry` toward snapshots/probes. P10 evolves
  * that registry surface into a declaration catalog for `UmCoreRegistry.health`.
@@ -180,4 +182,80 @@ export interface UmInMemoryHealthReporter extends UmHealthReporter {
   has(platformId: UmPlatformId): boolean;
   size(): number;
   clear(): void;
+}
+
+/**
+ * Observation read surface required by diagnostics join (P18 / DJ1).
+ * Satisfied by P17 `UmInMemoryHealthReporter` (`getSnapshot` + `list`).
+ */
+export interface UmHealthObservationReadSource {
+  getSnapshot(platformId: UmPlatformId): UmHealthSnapshot | undefined;
+  list(): readonly UmHealthSnapshot[];
+}
+
+/**
+ * Deterministic join class for one platform across P4 + P10 + P17.
+ * Absence of observation is never remapped to `unavailable` / `degraded`.
+ */
+export type UmHealthDiagnosticsJoinClass =
+  | "declared_and_observed"
+  | "declared_unobserved"
+  | "declared_silent"
+  | "declared_silent_but_observed"
+  | "observed_undeclared"
+  | "registered_only"
+  | "orphan_observation";
+
+/**
+ * One deterministic diagnostics row (read-only composition result).
+ */
+export interface UmHealthDiagnosticsJoinRow {
+  readonly platformId: UmPlatformId;
+  readonly registered: boolean;
+  readonly hasDeclaration: boolean;
+  readonly reportsStatus: boolean | null;
+  readonly hasObservation: boolean;
+  readonly status: UmHealthStatus | null;
+  readonly joinClass: UmHealthDiagnosticsJoinClass;
+  readonly checkedAt: string | null;
+}
+
+/**
+ * Status tallies over the join view.
+ * `unobservedReporters` counts `reportsStatus:true` with no observation.
+ */
+export interface UmHealthDiagnosticsStatusTally {
+  readonly ready: number;
+  readonly degraded: number;
+  readonly unavailable: number;
+  readonly unobservedReporters: number;
+}
+
+/**
+ * Pure diagnostics join view — no store mutation, no probes, no clock.
+ */
+export interface UmHealthDiagnosticsJoinView {
+  readonly rows: readonly UmHealthDiagnosticsJoinRow[];
+  readonly statusTally: UmHealthDiagnosticsStatusTally;
+  readonly unobservedReporterPlatformIds: readonly UmPlatformId[];
+  readonly observedUndeclaredPlatformIds: readonly UmPlatformId[];
+  readonly declaredAndObservedPlatformIds: readonly UmPlatformId[];
+  readonly orphanObservationPlatformIds: readonly UmPlatformId[];
+}
+
+/**
+ * Dependencies for diagnostics join (P4 + P10 + P17 observation reads).
+ */
+export interface UmHealthDiagnosticsJoinDeps {
+  readonly platforms: UmPlatformRegistry;
+  readonly declarations: UmHealthRegistry;
+  readonly observations: UmHealthObservationReadSource;
+}
+
+/**
+ * Pure in-process diagnostics join port.
+ * Side-effect free: `evaluate()` only reads injected catalogs/stores.
+ */
+export interface UmHealthDiagnosticsJoin {
+  evaluate(): UmHealthDiagnosticsJoinView;
 }
