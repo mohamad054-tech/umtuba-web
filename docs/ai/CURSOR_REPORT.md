@@ -1,26 +1,25 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_HEALTH_HISTORY_REGRESSION_AND_EDGE_CASE_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1
 
 ## Summary
 
-**Verdict: REGRESSION_COVERAGE_ADDED_AND_PUSHED — SUCCESS**
+**Verdict: HARDENED_AND_PUSHED — SUCCESS**
 
-PC2-A2 (ROLE=`REGRESSION_AND_TEST_OWNER_ONLY`) reviewed bounded health history
-product tip `9b35ddc32db4cec24757aa97d90a31975056329b` on completed branch
-`office/um-core-platform-bounded-health-history-foundation-v1` @
-`0b88be1a9fbb8a3c68b87dec5887c300950531b1`. No semantic defects found.
-
-Added **tests only** on
-`office/um-core-platform-health-history-regression-and-edge-case-v1` @
-`48a4456edea99dee3c989685b8bd45e9d508f45f`. Production `.ts` impl untouched.
-No A1 SDK edits. No alpha merge.
+PC2-A2 audited in-memory Core state holders on `origin/alpha-0.2` and fixed a
+proven P17 health-reporter read-path aliasing defect: `getSnapshot` / `list`
+now return defensive clones (aligned with P22 history). Added focused
+regression + cross-cutting hardening tests. No locks, persistence, architecture
+redesign, A1 error-contract edits, or alpha merge.
 
 Canonical Central report:
-`UM_CORE_PLATFORM_HEALTH_HISTORY_REGRESSION_AND_EDGE_CASE_V1_REPORT.md`
+`UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
 
 ## Exact files changed
 
-- `platforms/core/health/healthHistory.regression.test.ts` (new — tests only)
+- `platforms/core/health/healthReporter.ts`
+- `platforms/core/health/healthReporter.test.ts`
+- `platforms/core/health/stateImmutability.hardening.test.ts` (new)
 - `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
 
 ## Migrations created
 
@@ -28,15 +27,15 @@ Canonical Central report:
 
 ## Security review
 
-- Tests only; no product semantic changes
+- Narrow defensive-copy fix only
 - No network/DB/secrets/product domains
-- Explicit surface assertion: no persist/DB/network/scheduler APIs
-- No Co-authored-by / Signed-off-by on test commit
+- No distributed locks / persistence
+- A1 shared error-contract files untouched
 
 ## Tests
 
-- Focused history + regression: **PASS** (24 = 12 + 12)
-- Full `platforms/core`: **PASS** (20 files / 206 tests)
+- Focused state-safety: **PASS**
+- Full `platforms/core`: **PASS** (25 files / 263 tests)
 
 ## TypeScript
 
@@ -44,7 +43,7 @@ Canonical Central report:
 
 ## Build
 
-N/A (tests-only Core library lane; gates did not require `npm run build`)
+N/A (Core library lane; gates did not require `npm run build`)
 
 ## git diff --check
 
@@ -56,5 +55,6 @@ clean after push (0/0)
 
 ## Open issues
 
-1. Do not start next work from this lane — STOP.
-2. Do not wait for A1.
+1. Residual catalog/registry returned-record identity aliasing deferred (not reporter nested-snapshot class).
+2. Platform registry stores manifest by reference — residual; out of this lane.
+3. STOP — do not wait for A1; do not self-assign next work.

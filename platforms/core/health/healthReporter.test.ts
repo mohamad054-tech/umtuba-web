@@ -389,6 +389,175 @@ describe("um.core P17 in-memory health reporter", () => {
     expect(a.ok).toBe(true);
   });
 
+  it("isolates stored snapshots from caller input mutation after report", () => {
+    const { reporter } = assembleReporter();
+    const snapshot = validSnapshot({
+      affectedCapabilityIds: ["example.core.ping"],
+      dependencyStatuses: [{ targetId: "um.core", status: "ready" }],
+      detail: "original",
+    });
+    expect(reporter.report(snapshot).ok).toBe(true);
+
+    const mutableInput = snapshot as unknown as {
+      checkedAt: string;
+      detail?: string;
+      affectedCapabilityIds: string[];
+      dependencyStatuses: Array<{ targetId: string; status: string }>;
+    };
+    mutableInput.checkedAt = "mutated-input";
+    mutableInput.affectedCapabilityIds.push("example.core.extra");
+    mutableInput.dependencyStatuses[0]!.status = "unavailable";
+    mutableInput.detail = "mutated-input";
+
+    const stored = reporter.getSnapshot("example");
+    expect(stored?.checkedAt).toBe("2026-08-09T12:00:00.000Z");
+    expect(stored?.affectedCapabilityIds).toEqual(["example.core.ping"]);
+    expect(stored?.dependencyStatuses).toEqual([
+      { targetId: "um.core", status: "ready" },
+    ]);
+    expect(stored?.detail).toBe("original");
+  });
+
+  it("returns defensive clones from getSnapshot/list (store not mutated by caller)", () => {
+    const { reporter } = assembleReporter();
+    expect(
+      reporter.report(
+        validSnapshot({
+          checkedAt: "t1",
+          affectedCapabilityIds: ["example.core.ping"],
+          dependencyStatuses: [{ targetId: "um.core", status: "ready" }],
+          detail: "ok",
+        }),
+      ).ok,
+    ).toBe(true);
+
+    const got = reporter.getSnapshot("example");
+    const listed = reporter.list();
+    expect(got).toBeDefined();
+    expect(listed).toHaveLength(1);
+
+    const mutableGot = got as unknown as {
+      checkedAt: string;
+      detail?: string;
+      affectedCapabilityIds: string[];
+      dependencyStatuses: Array<{ targetId: string; status: string }>;
+    };
+    mutableGot.checkedAt = "mutated-get";
+    mutableGot.detail = "mutated-get";
+    mutableGot.affectedCapabilityIds.push("example.core.extra");
+    mutableGot.dependencyStatuses[0]!.status = "unavailable";
+
+    const mutableListed = listed[0] as unknown as {
+      checkedAt: string;
+      affectedCapabilityIds: string[];
+      dependencyStatuses: Array<{ targetId: string; status: string }>;
+    };
+    mutableListed.checkedAt = "mutated-list";
+    mutableListed.affectedCapabilityIds.push("example.core.list");
+    mutableListed.dependencyStatuses[0]!.status = "degraded";
+
+    const again = reporter.getSnapshot("example");
+    expect(again?.checkedAt).toBe("t1");
+    expect(again?.detail).toBe("ok");
+    expect(again?.affectedCapabilityIds).toEqual(["example.core.ping"]);
+    expect(again?.dependencyStatuses).toEqual([
+      { targetId: "um.core", status: "ready" },
+    ]);
+    expect(reporter.list()[0]?.checkedAt).toBe("t1");
+    expect(reporter.list()[0]?.affectedCapabilityIds).toEqual([
+      "example.core.ping",
+    ]);
+  });
+
+  it("keeps independent reporter instances isolated", () => {
+    const platforms = createInMemoryPlatformRegistry();
+    expect(platforms.register({ manifest: validManifest() }).ok).toBe(true);
+    const a = createInMemoryHealthReporter({ platforms });
+    const b = createInMemoryHealthReporter({ platforms });
+
+    expect(a.report(validSnapshot({ checkedAt: "a1", detail: "a" })).ok).toBe(
+      true,
+    );
+    expect(b.report(validSnapshot({ checkedAt: "b1", detail: "b" })).ok).toBe(
+      true,
+    );
+
+    expect(a.getSnapshot("example")?.detail).toBe("a");
+    expect(b.getSnapshot("example")?.detail).toBe("b");
+    a.clear();
+    expect(a.size()).toBe(0);
+    expect(b.size()).toBe(1);
+    expect(b.getSnapshot("example")?.checkedAt).toBe("b1");
+  });
+
+  it("repeated reads are deep-equal and list ordering is stable", () => {
+    const platforms = createInMemoryPlatformRegistry();
+    expect(platforms.register({ manifest: validManifest() }).ok).toBe(true);
+    expect(
+      platforms.register({
+        manifest: validManifest({
+          platformId: "other",
+          modules: [
+            {
+              moduleId: "other.core",
+              displayName: "Other",
+              capabilityIds: ["other.core.ping"],
+            },
+          ],
+          capabilities: [
+            {
+              capabilityId: "other.core.ping",
+              moduleId: "other.core",
+              displayName: "Ping",
+              sideEffectClasses: ["read"],
+              stability: "stable",
+              version: "1.0.0",
+            },
+          ],
+          providesEvents: [
+            {
+              eventType: "other.core.pinged",
+              schemaVersion: "1.0.0",
+              stability: "stable",
+            },
+          ],
+          flags: [
+            {
+              flagId: "other.core.enabled",
+              defaultState: "off",
+              linkedCapabilityIds: ["other.core.ping"],
+              dangerElevated: false,
+            },
+          ],
+          health: { reportsStatus: true, probeRef: "probe.other.health" },
+        }),
+      }).ok,
+    ).toBe(true);
+    const reporter = createInMemoryHealthReporter({ platforms });
+
+    expect(
+      reporter.report(
+        validSnapshot({
+          platformId: "other",
+          checkedAt: "o1",
+          affectedCapabilityIds: ["other.core.ping"],
+        }),
+      ).ok,
+    ).toBe(true);
+    expect(
+      reporter.report(validSnapshot({ platformId: "example", checkedAt: "e1" }))
+        .ok,
+    ).toBe(true);
+
+    const first = reporter.list();
+    const second = reporter.list();
+    expect(first.map((s) => s.platformId)).toEqual(["example", "other"]);
+    expect(second).toEqual(first);
+    expect(reporter.getSnapshot("example")).toEqual(
+      reporter.getSnapshot("example"),
+    );
+  });
+
   it("clear empties observations and exposes no probe/poll surface", () => {
     const { reporter } = assembleReporter();
     expect(reporter.report(validSnapshot()).ok).toBe(true);

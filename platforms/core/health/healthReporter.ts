@@ -244,6 +244,7 @@ function reportOne(
 /**
  * Create a pure in-memory health reporter over registered platforms.
  * Admits/stores snapshots only — no probes, polling, networking, or alerts.
+ * Snapshots are defensively cloned on admit and on every read surface.
  */
 export function createInMemoryHealthReporter(
   deps: UmHealthReporterDeps,
@@ -264,11 +265,12 @@ export function createInMemoryHealthReporter(
     },
 
     getSnapshot(platformId) {
-      return store.get(platformId);
+      const stored = store.get(platformId);
+      return stored === undefined ? undefined : cloneSnapshot(stored);
     },
 
     list() {
-      return sortedValues();
+      return sortedValues().map(cloneSnapshot);
     },
 
     has(platformId) {
