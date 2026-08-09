@@ -217,3 +217,17 @@ export {
   type ProviderMoneyOperatorObservabilitySnapshot,
   type ProviderMoneyRetrySafety,
 } from "./operatorObservability";
+export {
+  REFUND_PROVIDER_TERMINAL_STATE_REPLAY_INVARIANTS_VERSION,
+  TERMINAL_INVARIANT_LEDGER_STATUSES,
+  TERMINAL_INVARIANT_PROVIDER_STATUSES,
+  TERMINAL_INVARIANT_SCENARIOS,
+  TERMINAL_INVARIANT_TASK_ALIAS_MAP,
+  assertRefundProviderTerminalStateReplayInvariants,
+  buildRefundProviderTerminalStateReplayInvariants,
+  classifyRepeatedRecoveryAction,
+  type BuildTerminalStateReplayInvariantsInput,
+  type TerminalInvariantDisposition,
+  type TerminalInvariantScenario,
+  type TerminalStateReplayInvariantsSnapshot,
+} from "./refundProviderTerminalStateReplayInvariants";
