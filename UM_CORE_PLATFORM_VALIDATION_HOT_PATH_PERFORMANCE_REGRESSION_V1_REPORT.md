@@ -29,7 +29,7 @@ MODE=AUDIT / TEST FIRST
 | SEMANTIC_EQUIVALENCE | **PASS** — repeated runs equal; RI observation unknowns match naive per-obs oracle |
 | RI_SEMANTICS_UNCHANGED | **YES** — prior A2 dep-index is on alpha; list() bound preserved; oracle match |
 | PRODUCT_CODE_CHANGED | **NO** (tests + report only) |
-| COMMIT | `07acf953ed17e426e0a23ba86f124d5e85661528` |
+| COMMIT | `e15551a` (tip; evidence `07acf95`) |
 | REMOTE_BRANCH | `origin/office/um-core-platform-validation-hot-path-performance-regression-v1` |
 | PUSH | **DONE** — ahead/behind **0/0** clean |
 | VERDICT | **AUDIT_TEST_EVIDENCE_PUSHED — SUCCESS** |
