@@ -15,7 +15,7 @@ SOURCE_DEVICE=PC2 · DEVICE_ROLE=PLATFORM_CORE_PRIMARY · AGENT_ID=PC2-A1
 | BASE | `origin/alpha-0.2` @ `947706712fcb5ba4af495a96fa8ac3879af8db17` |
 | BRANCH | `office/um-core-platform-capability-compatibility-matrix-foundation-v1` |
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A1-UM-CORE-CAPABILITY-COMPAT-V1` |
-| BRANCH_TIP | _(set after push)_ |
+| BRANCH_TIP | `d4fa74920231898da7b4a8e953365c44a616b81b` |
 | VERDICT | `IMPLEMENTED_AND_PUSHED` |
 | IMPLEMENTED | `YES` |
 | REMOTE_SYNC | `0/0` clean (post-push) |
@@ -113,7 +113,7 @@ N/A (Core library foundation only; no app UI/entry change)
 
 ## git status --short
 
-clean (0/0) after push (see BRANCH_TIP).
+clean (0/0) after push of tip `d4fa749`.
 
 ## OUTBOX_DROP
 
