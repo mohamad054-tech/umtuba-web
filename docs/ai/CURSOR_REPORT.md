@@ -1,58 +1,47 @@
-# CURSOR_REPORT — COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_REFERENTIAL_INTEGRITY_CONTRACT_V1
 
 ## Summary
 
-**Verdict: HANDOFF_PUSH_COMPLETE — SUCCESS**
-
-All legitimate Computer-2 Translation durable handoff evidence for Central
-Server alpha integration is recorded and pushed on
-`office/platform-translation-trunk-port-v1`.
-
-- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED / COMPLETE**
-- Source tip for Central integration: `c061c0a593662d03569c489246996bf2a3e034aa`
-  (implementation already on origin; this commit adds durable handoff docs)
-- Alpha observed: `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
-- FF-eligible; textual conflicts none; Computer 2 does **not** merge alpha
-
-Canonical handoff:
-[`docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md`](../translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md)
+Derived the Core referential-integrity contract from actual P4–P10 + P17 entities on verified alpha (`dc6797e`, P17 integrated). Implemented a pure deterministic `validateReferentialIntegrity` helper under `platforms/core/validation/**` with missing-reference rejection, no mutation, and no P17 admission changes. Avoided A1 `health/` diagnostics lane. Pushed own branch at `a8795d2` (0/0).
 
 ## Exact files changed
 
-- `docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `docs/core/UM_CORE_PLATFORM_REFERENTIAL_INTEGRITY_CONTRACT_V1.md` (new)
+- `platforms/core/validation/referentialIntegrity.ts` (new)
+- `platforms/core/validation/referentialIntegrityCodes.ts` (new)
+- `platforms/core/validation/referentialIntegrity.test.ts` (new)
+- `platforms/core/validation/interfaces.ts` (export wiring)
 
 ## Migrations created
 
-**NONE.**
+None.
 
 ## Security review
 
-- Docs-only; no secrets / tokens / cookies / `.env` / runtime journals
-- No Co-authored-by / Signed-off-by on handoff commit
+No secrets, network, DB, or product-domain wiring. Pure in-memory catalog review only.
 
 ## Tests
 
-Docs handoff only — no paid AI; no Studio/DB mutation.
+- Focused: `platforms/core/validation/referentialIntegrity.test.ts` — PASS (10/10)
+- Full: `npx.cmd vitest run platforms/core` — PASS (18 files / 183 tests)
 
 ## TypeScript
 
-N/A (docs-only)
+`npx.cmd tsc --noEmit` — PASS
 
 ## Build
 
-N/A
+Not required (validation helper only; no app UI/entry change).
 
 ## git diff --check
 
-PASS (handoff commit)
+PASS
 
 ## git status --short
 
-(filled after push — expect clean)
+Task files committed/pushed. Unrelated local untracked audit markdown leftovers remain in worktree root (not part of this task).
 
 ## Open issues
 
-1. Central Server owns alpha FF/integration + migration history re-verify.
-2. Translation V2 / DB-primary / live publish remain deferred — do not start.
-3. Alpha SoT worktree on Computer 2 must remain untouched by this handoff.
+1. Hard P17 `report()` referential admission gate still deferred (review helper only).
+2. Prior sibling gap audit “P17 off-alpha” claim is stale vs current `origin/alpha-0.2` = `dc6797e`.
