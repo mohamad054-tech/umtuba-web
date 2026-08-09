@@ -164,11 +164,14 @@ Lifecycle readiness foundation under `platforms/core/readiness/**` is **implemen
 | Field | Value |
 | --- | --- |
 | Branch | `office/um-core-platform-p23-wiring-closeout-v1` |
-| BASE_SHA | `26995e989d6aa78a2fdcaf885d1b6a7d030a2c01` |
-| FINAL_SHA | *(filled after commit)* |
+| BASE_SHA (alpha tip at branch start) | `26995e989d6aa78a2fdcaf885d1b6a7d030a2c01` |
+| FINAL_SHA (product closeout commit) | `8cb6e7d0247d9afe8cb604b8fb9f74148b7d297f` |
 | Push | `origin/office/um-core-platform-p23-wiring-closeout-v1` |
-| Ahead/behind vs `origin/alpha-0.2` after push | ahead 1 / behind 0 |
-| Tracking remote after push | 0 ahead / 0 behind (clean) |
+| Tracking remote after push | **0 ahead / 0 behind** (clean) |
+| vs `origin/alpha-0.2` after alpha moved during push | ahead 1 / behind 3 (alpha absorbed blocker closeout + RC pack @ `a93f522`) |
+| Product-file conflict vs new alpha | **NONE** — our product paths untouched on alpha; only `docs/ai/CURSOR_REPORT.md` overlaps (handoff doc) |
+
+Did **not** rebase/merge onto moved alpha (sync rule: stop on divergence; report for Central integrate).
 
 ---
 
@@ -180,6 +183,8 @@ TASK_ID=UM_CORE_PLATFORM_P23_WIRING_CLOSEOUT_V1
 SOURCE_DEVICE=PC2
 DEVICE_ROLE=PLATFORM_CORE_PRIMARY
 BASE_SHA=26995e989d6aa78a2fdcaf885d1b6a7d030a2c01
+FINAL_SHA=8cb6e7d0247d9afe8cb604b8fb9f74148b7d297f
+BRANCH=office/um-core-platform-p23-wiring-closeout-v1
 P23_CURRENT_STATUS=IMPLEMENTED_LOCAL_BARREL_NOT_ROOT_PUBLIC
 P23_ROOT_PUBLIC=NO
 WIRING_CLASSIFICATION=TEST_WIRING
@@ -196,6 +201,6 @@ PACKAGE_IDENTITY_TOUCHED=NO
 
 ## STOP
 
-Did not self-assign follow-up. Did not root-export P23. Did not alter `packageIdentity`. Did not invent Dependency Graph / Configuration Validation / P19 automatic consumer. Did not alpha-merge.
+Did not self-assign follow-up. Did not root-export P23. Did not alter `packageIdentity`. Did not invent Dependency Graph / Configuration Validation / P19 automatic consumer. Did not alpha-merge. Did not rebase onto alpha tip that moved during push.
 
-AGENT_ID=`PC2-A1` · TASK_ID=`UM_CORE_PLATFORM_P23_WIRING_CLOSEOUT_V1` · SOURCE_DEVICE=`PC2` · BASE_SHA=`26995e989d6aa78a2fdcaf885d1b6a7d030a2c01`
+AGENT_ID=`PC2-A1` · TASK_ID=`UM_CORE_PLATFORM_P23_WIRING_CLOSEOUT_V1` · SOURCE_DEVICE=`PC2` · BASE_SHA=`26995e989d6aa78a2fdcaf885d1b6a7d030a2c01` · FINAL_SHA=`8cb6e7d0247d9afe8cb604b8fb9f74148b7d297f`
