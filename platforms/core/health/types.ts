@@ -5,11 +5,13 @@
  * P10: pure in-memory health declaration catalog (no monitoring runtime).
  * P17: pure deterministic in-memory UmHealthReporter (observation admission/store).
  * P18: pure deterministic diagnostics join over P4 + P10 + P17 (read-only).
+ * P20: pure deterministic fleet health aggregation over supplied Core state.
  *
  * HEALTH DECLARATION REGISTRATION IS NOT HEALTH MONITORING.
  * HEALTH REPORTING IS NOT HEALTH DECLARATION REGISTRATION.
  * HEALTH REPORTING IS NOT PROBE EXECUTION.
  * DIAGNOSTICS JOIN IS NOT PROBE EXECUTION / NETWORK DISCOVERY.
+ * FLEET AGGREGATION IS NOT HEALTH MONITORING / PROBE EXECUTION.
  *
  * P1 originally shaped `UmHealthRegistry` toward snapshots/probes. P10 evolves
  * that registry surface into a declaration catalog for `UmCoreRegistry.health`.
@@ -258,4 +260,104 @@ export interface UmHealthDiagnosticsJoinDeps {
  */
 export interface UmHealthDiagnosticsJoin {
   evaluate(): UmHealthDiagnosticsJoinView;
+}
+
+/**
+ * Observation read surface for fleet aggregation (P20).
+ * Satisfied by P17 `UmInMemoryHealthReporter`.
+ */
+export interface UmFleetHealthObservationSource {
+  getSnapshot(platformId: UmPlatformId): UmHealthSnapshot | undefined;
+  list(): readonly UmHealthSnapshot[];
+  has?(platformId: UmPlatformId): boolean;
+  size?(): number;
+}
+
+/**
+ * Optional declaration read surface for fleet aggregation coverage lists.
+ */
+export interface UmFleetHealthDeclarationSource {
+  get(platformId: UmPlatformId): UmHealthRecord | undefined;
+  list(): readonly UmHealthRecord[];
+  listByReportsStatus?(reportsStatus: boolean): readonly UmHealthRecord[];
+  has?(platformId: UmPlatformId): boolean;
+}
+
+/**
+ * Finding emitted by fleet aggregation (fail-closed path).
+ */
+export interface UmFleetHealthAggregationFinding {
+  readonly code: string;
+  readonly message: string;
+  readonly path?: string;
+}
+
+/**
+ * One deterministic fleet member row (read-only rollup view).
+ * `observationStatus: undefined` means unobserved — not a §18.3 status token.
+ */
+export interface UmFleetHealthMemberView {
+  readonly platformId: UmPlatformId;
+  readonly observationStatus: UmHealthStatus | undefined;
+  readonly reportsStatus?: boolean;
+  readonly checkedAt?: string;
+  readonly probeRef?: string;
+}
+
+/**
+ * Normalized bag input member for pure aggregation (testability / injection).
+ */
+export interface UmFleetHealthMemberInput {
+  readonly platformId: string;
+  readonly observation?: UmHealthSnapshot;
+  readonly declaration?: Pick<UmHealthRecord, "reportsStatus" | "probeRef">;
+}
+
+/**
+ * Status tallies over OBSERVED members only (Standards §18.3).
+ */
+export interface UmFleetHealthStatusCounts {
+  readonly ready: number;
+  readonly degraded: number;
+  readonly unavailable: number;
+}
+
+/** Observation coverage vs fleet membership (orthogonal to worst status). */
+export type UmFleetHealthCoverage = "none" | "partial" | "full";
+
+/**
+ * Deterministic fleet health aggregation result.
+ * Never invents §18.3 status from absence / declaration / probeRef.
+ */
+export interface UmFleetHealthAggregationResult {
+  readonly ok: boolean;
+  readonly fleetSize: number;
+  readonly observedCount: number;
+  readonly unobservedCount: number;
+  readonly statusCounts: UmFleetHealthStatusCounts;
+  readonly expectedReporterUnobservedIds: readonly UmPlatformId[];
+  readonly undeclaredObservationIds: readonly UmPlatformId[];
+  readonly observedWorstStatus: UmHealthStatus | undefined;
+  readonly coverage: UmFleetHealthCoverage;
+  readonly members: readonly UmFleetHealthMemberView[];
+  readonly findings: readonly UmFleetHealthAggregationFinding[];
+}
+
+/**
+ * Dependencies for port-backed fleet aggregation (P4 + P17 + optional P10/A1).
+ * Aggregation only reads; never mutates stores or calls `report` / `register`.
+ */
+export interface UmFleetHealthAggregationDeps {
+  readonly platforms: UmPlatformRegistry;
+  readonly observations: UmFleetHealthObservationSource;
+  readonly declarations?: UmFleetHealthDeclarationSource;
+  readonly diagnostics?: UmHealthDiagnosticsJoinView;
+}
+
+/**
+ * Pure in-process fleet health aggregation port.
+ * Side-effect free: `evaluate()` only reads injected state.
+ */
+export interface UmFleetHealthAggregation {
+  evaluate(): UmFleetHealthAggregationResult;
 }

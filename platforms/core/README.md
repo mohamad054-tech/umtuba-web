@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P18` (… → health reporter → diagnostics join)
+- Phase: `P1`–`P20` (… → health reporter → diagnostics join → fleet aggregation)
 
 ## Phase P3 scope
 
@@ -232,3 +232,17 @@ Out of scope for P18: probe execution, polling, scheduling, networking,
 service discovery, distributed/DB join, fleet aggregation, alerting,
 freshness/TTL clocks, history ring, SDK client/factory, persistence,
 product integration, migrations.
+
+## Phase P20 scope
+
+Pure **fleet health aggregation** under `platforms/core/health/`.
+
+- `createFleetHealthAggregation({ platforms, observations, declarations?, diagnostics? })`
+- Pure bag path: `aggregateFleetHealthFromMembers(members)`
+- Deterministic membership-ordered rollup over P4 + P17 (+ optional P10/A1)
+- Coverage / unobserved sets orthogonal to `observedWorstStatus`
+- Absence of observation ≠ `unavailable`; no foreign status coercion
+
+Out of scope for P20: probe execution, polling, scheduling, networking,
+monitoring runtime, alerting, history storage, P12 facade slot changes,
+SDK client/factory, persistence, product integration, migrations.
