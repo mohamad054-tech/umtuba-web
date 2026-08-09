@@ -268,3 +268,19 @@ Public API matrix + BC fixture on current tip already list P19/P24 as root-publi
 | P23 visibility | Root must **not** export readiness symbols |
 | P19 unused-by-default | Documented here + foundation P19 doc; no auto-wire claims |
 | Coherence | Existing `p1P19ContractCoherence.matrix.test.ts` |
+
+---
+
+## 17. Central production signoff stamp
+
+| Field | Value |
+| --- | --- |
+| `TASK_ID` | `UM_CORE_PLATFORM_FINAL_CENTRAL_PRODUCTION_SIGNOFF_V1` |
+| `PRODUCTION_READY` | **YES** |
+| `CENTRAL_SIGNOFF_COMPLETE` | **YES** |
+| `CAN_DECLARE_UM_CORE_PRODUCTION_READY` | **YES** |
+| `P23_ROOT_PUBLIC` | **NO** |
+| `P19_UNUSED_BY_DEFAULT` | **YES** |
+| `CENTRAL_CONSUMER_GO_NOT_REQUIRED` | **YES** |
+
+Canonical stamp: `docs/core/UM_CORE_PLATFORM_CENTRAL_PRODUCTION_SIGNOFF_V1.md`

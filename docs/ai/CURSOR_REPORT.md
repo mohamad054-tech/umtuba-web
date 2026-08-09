@@ -2,21 +2,20 @@
 
 ## Summary
 
-Central integration of PC2 final closeout wave onto `alpha-0.2`:
+Central final production signoff for UM Core on `alpha-0.2`:
 
-- **A2** Spec/Standards release-contract closeout (`0955fad0`) — FF-integrated
-- **A3** Operational error + release signoff closeout (`48b92da7`) — merge-integrated
-- **A1** P23 wiring closeout (`8cb6e7d0` cherry-pick) — P23 intentionally **NOT ROOT-PUBLIC** lock + docs
-
-P23 remains **not root-public** (absolute). P19 remains **UNUSED_BY_DEFAULT**.
-`CENTRAL_CONSUMER_GO_NOT_REQUIRED_FOR_CURRENT_RELEASE=YES`.
+- Integrated PC2-A2 Spec/Standards closeout (FF)
+- Integrated PC2-A3 ops/error signoff closeout (merge + magnet resolve)
+- Integrated PC2-A1 P23 not-root-public wiring closeout (cherry-pick reconcile)
+- Packaged existing perf/scale assumptions evidence (smallest Central packaging)
+- Declared `PRODUCTION_READY=YES` + `CENTRAL_SIGNOFF_COMPLETE=YES`
 
 ## Exact files changed
 
-- A1: P23 not-root-public test locks + readiness visibility docs
-- A2: Spec / Standards / Release Contract docs + alignment tests
-- A3: Operational error contract doc + lock tests
-- `docs/ai/CURSOR_REPORT.md` (Central magnet resolve)
+See Central signoff report. Key normative stamps:
+
+- `docs/core/UM_CORE_PLATFORM_CENTRAL_PRODUCTION_SIGNOFF_V1.md`
+- `docs/core/UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md` §17
 
 ## Migrations created
 
@@ -24,30 +23,31 @@ None.
 
 ## Security review
 
-Docs/tests only. No credentials/env exposure. No speculative P23 root export.
+Docs/tests/evidence packaging only. No secrets. P19 unused-by-default preserved. P23 not root-public absolute.
 
 ## Tests
 
-- A2 focused: PASS 25/25
-- A3 + A2 focused: PASS 25/25
-- A1 focused: pending post-cherry-pick
+- Focused closeout: PASS
+- Full `platforms/core`: PASS 42 files / 426 tests
+- `npx tsc --noEmit`: PASS
+- `git diff --check`: PASS
 
 ## TypeScript
 
-Pending final tip gates.
+PASS
 
 ## Build
 
-Not required (docs/tests only).
+Not required.
 
 ## git diff --check
 
-Pending final tip gates.
+PASS
 
 ## git status --short
 
-Central signoff worktree in progress (A1 cherry-pick).
+See Central signoff report after push.
 
 ## Open issues
 
-Smallest perf/scale assumptions packaging if still absent, then final gates for `CAN_DECLARE_UM_CORE_PRODUCTION_READY`.
+None for UM Core foundation production signoff. Do **not** issue another UM Core foundation.
