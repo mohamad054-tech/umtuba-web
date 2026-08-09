@@ -144,9 +144,10 @@ No product-semantic API redesign. No new foundation. No P23 root magnet wire. Do
 | --- | --- |
 | Branch | `office/um-core-platform-production-readiness-blocker-closeout-v1` |
 | BASE_SHA | `26995e989d6aa78a2fdcaf885d1b6a7d030a2c01` |
-| Commit | *(filled after commit)* |
-| Push | *(filled after push)* |
-| Ahead/behind vs `origin/alpha-0.2` after push | *(filled — expect ahead 1 / behind 0)* |
+| Commit | `bf0e50532cfa2154a4f61b740db2eecb82dcc782` |
+| Push | `origin/office/um-core-platform-production-readiness-blocker-closeout-v1` |
+| Ahead/behind vs `origin/alpha-0.2` after push | ahead 1 / behind 0 |
+| Tracking remote after push | 0 ahead / 0 behind (clean) |
 
 ---
 
