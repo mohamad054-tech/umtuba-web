@@ -15,7 +15,9 @@ SOURCE_DEVICE=PC2 · DEVICE_ROLE=PLATFORM_CORE_PRIMARY · AGENT_ID=PC2-A3
 | BASE | `origin/alpha-0.2` @ `0011fe6cf2a66b997ebe0d993ed92cdd7ca47754` |
 | BRANCH | `office/um-core-platform-public-api-documentation-and-contract-matrix-v1` |
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A3-UM-CORE-PUBLIC-API-MATRIX-V1` |
-| VERDICT | `DOCUMENTED_TESTED_AND_PUSHED` (pending push at write time) |
+| BRANCH_TIP | `82d2eff8db3dfca987d82e7ddd88b3eb6fe54f68` |
+| VERDICT | `DOCUMENTED_TESTED_AND_PUSHED` |
+| REMOTE_SYNC | `0/0` clean |
 | OUTBOX | Not present in worktree; report written to worktree root + `docs/ai/` |
 
 ## Summary
