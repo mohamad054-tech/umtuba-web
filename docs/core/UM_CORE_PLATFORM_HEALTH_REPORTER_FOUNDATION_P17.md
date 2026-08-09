@@ -1,9 +1,9 @@
 # UM Core — Health Reporter Foundation P17
 
-**Status:** Closed (in-memory observation admission/store only)  
-**Branch:** `office/um-core-platform-health-reporter-foundation-p17`  
-**Base:** `origin/alpha-0.2` @ `0999fc1d5f1ec5a7db0c3c2e614bd10e67bc87a2`  
-**Normative base:** UM_CORE_SPECIFICATION_V1 · UM_CORE_ENGINEERING_STANDARDS_V1  
+**Status:** Closed (in-memory observation admission/store only)
+**Branch:** `office/um-core-platform-health-reporter-foundation-p17`
+**Base:** `origin/alpha-0.2` @ `0999fc1d5f1ec5a7db0c3c2e614bd10e67bc87a2`
+**Normative base:** UM_CORE_SPECIFICATION_V1 · UM_CORE_ENGINEERING_STANDARDS_V1
 **Canonical identity:** `um.core.health_reporter_foundation_p17`
 
 ## Goal
@@ -14,7 +14,7 @@ registered in P4.
 
 ## Architectural rules
 
-**HEALTH REPORTING IS NOT HEALTH DECLARATION REGISTRATION.**  
+**HEALTH REPORTING IS NOT HEALTH DECLARATION REGISTRATION.**
 **HEALTH REPORTING IS NOT PROBE EXECUTION.**
 
 P10 remains the declaration catalog Source of Truth. P17 never mutates it and
