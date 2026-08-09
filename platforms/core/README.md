@@ -241,7 +241,7 @@ Pure **fleet health aggregation** under `platforms/core/health/`.
 - Pure bag path: `aggregateFleetHealthFromMembers(members)`
 - Deterministic membership-ordered rollup over P4 + P17 (+ optional P10/A1)
 - Coverage / unobserved sets orthogonal to `observedWorstStatus`
-- Absence of observation â‰  `unavailable`; no foreign status coercion
+- Absence of observation ≠ `unavailable`; no foreign status coercion
 
 Out of scope for P20: probe execution, polling, scheduling, networking,
 monitoring runtime, alerting, history storage, P12 facade slot changes,
@@ -252,7 +252,7 @@ SDK client/factory, persistence, product integration, migrations.
 Pure **in-memory SDK / client factory** under `platforms/core/sdk/`.
 
 - `createInMemoryUmCoreSdkFactory(deps)` implements `UmCoreSdkFactory`
-- Borrows caller-owned P14â€“P17 ports + P4 `register` (exact refs)
+- Borrows caller-owned P14–P17 ports + P4 `register` (exact refs)
 - `createClient(identity)` returns a frozen thin facade
 - Fail-closed invalid deps / identity; result-returning port delegation
 - `register(manifest)` is P4 pass-through (`UmPlatformRegistrationResult`)
@@ -260,3 +260,16 @@ Pure **in-memory SDK / client factory** under `platforms/core/sdk/`.
 Out of scope for P21: catalog construction, P12 mega-wire, P13/RI validators,
 P18 diagnostics join, fleet aggregation, networking, persistence, polling,
 scheduler, probe execution, product-domain SDKs, migrations.
+
+## Phase P22 scope
+
+Pure **bounded in-memory health observation history** under `platforms/core/health/`.
+
+- `createInMemoryHealthObservationHistory({ platforms, capacity })`
+- Per-platform finite ring (append-on-success; FIFO eviction when full)
+- Companion to P17 last-snapshot SoT; duplicates retained as distinct entries
+- Query oldest→newest clones; empty-state for unknown/never-recorded
+
+Out of scope for P22: probe execution, polling, scheduling, networking,
+durable telemetry/DB/event store, alerting, P17 reporter mutation,
+fleet aggregation, SDK client/factory, product integration, migrations.
