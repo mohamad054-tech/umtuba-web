@@ -262,17 +262,25 @@ function reviewHealthDeclarations(
   }
 }
 
-function declaredDependencyTargets(
+const EMPTY_DECLARED_TARGETS: ReadonlySet<string> = new Set();
+
+/**
+ * Build once-per-review index: fromPlatformId → declared dependency targetIds.
+ * Avoids O(observations × dependency edges) rescans of dependencies.list().
+ */
+function indexDependencyTargetsByFromPlatform(
   dependencies: UmDependencyRegistry,
-  platformId: string,
-): Set<string> {
-  const targets = new Set<string>();
+): ReadonlyMap<string, ReadonlySet<string>> {
+  const index = new Map<string, Set<string>>();
   for (const record of dependencies.list()) {
-    if (record.fromPlatformId === platformId) {
-      targets.add(record.targetId);
+    let targets = index.get(record.fromPlatformId);
+    if (!targets) {
+      targets = new Set<string>();
+      index.set(record.fromPlatformId, targets);
     }
+    targets.add(record.targetId);
   }
-  return targets;
+  return index;
 }
 
 function reviewHealthObservations(
@@ -281,6 +289,10 @@ function reviewHealthObservations(
 ): void {
   const { platforms, capabilities, dependencies, healthObservations } = deps;
   if (!healthObservations) return;
+
+  const declaredByFromPlatform = dependencies
+    ? indexDependencyTargetsByFromPlatform(dependencies)
+    : undefined;
 
   for (const snapshot of healthObservations.list()) {
     if (!platforms.get(snapshot.platformId)) {
@@ -307,11 +319,10 @@ function reviewHealthObservations(
       }
     }
 
-    if (dependencies) {
-      const declared = declaredDependencyTargets(
-        dependencies,
-        snapshot.platformId,
-      );
+    if (declaredByFromPlatform) {
+      const declared =
+        declaredByFromPlatform.get(snapshot.platformId) ??
+        EMPTY_DECLARED_TARGETS;
       for (const dep of snapshot.dependencyStatuses) {
         const known =
           declared.has(dep.targetId) ||
