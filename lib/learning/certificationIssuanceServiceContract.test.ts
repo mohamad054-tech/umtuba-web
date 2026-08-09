@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import {
   InMemoryCertificatePersistence,
   MissingCertificatePersistence,
@@ -7,38 +7,54 @@ import {
   verifyCertificate,
 } from "./certificationIssuanceServiceContract";
 
+function failReason(
+  r: ReturnType<typeof issueCertificate>,
+): string | undefined {
+  return r.ok ? undefined : r.reason;
+}
+
 describe("certification issuance service contract and test pack", () => {
   it("fails closed for unauthorized / invalid / ineligible / missing persistence", () => {
     const mem = new InMemoryCertificatePersistence();
     expect(
-      issueCertificate(
-        { actorAuthorized: false, learnerId: "L1", courseId: "C1", eligible: true },
-        mem,
-      ).reason,
+      failReason(
+        issueCertificate(
+          { actorAuthorized: false, learnerId: "L1", courseId: "C1", eligible: true },
+          mem,
+        ),
+      ),
     ).toBe("UNAUTHORIZED");
     expect(
-      issueCertificate(
-        { actorAuthorized: true, learnerId: "", courseId: "C1", eligible: true },
-        mem,
-      ).reason,
+      failReason(
+        issueCertificate(
+          { actorAuthorized: true, learnerId: "", courseId: "C1", eligible: true },
+          mem,
+        ),
+      ),
     ).toBe("INVALID_LEARNER");
     expect(
-      issueCertificate(
-        { actorAuthorized: true, learnerId: "L1", courseId: "", eligible: true },
-        mem,
-      ).reason,
+      failReason(
+        issueCertificate(
+          { actorAuthorized: true, learnerId: "L1", courseId: "", eligible: true },
+          mem,
+        ),
+      ),
     ).toBe("INVALID_COURSE");
     expect(
-      issueCertificate(
-        { actorAuthorized: true, learnerId: "L1", courseId: "C1", eligible: false },
-        mem,
-      ).reason,
+      failReason(
+        issueCertificate(
+          { actorAuthorized: true, learnerId: "L1", courseId: "C1", eligible: false },
+          mem,
+        ),
+      ),
     ).toBe("NOT_ELIGIBLE");
     expect(
-      issueCertificate(
-        { actorAuthorized: true, learnerId: "L1", courseId: "C1", eligible: true },
-        new MissingCertificatePersistence(),
-      ).reason,
+      failReason(
+        issueCertificate(
+          { actorAuthorized: true, learnerId: "L1", courseId: "C1", eligible: true },
+          new MissingCertificatePersistence(),
+        ),
+      ),
     ).toBe("MISSING_PERSISTENCE");
   });
 
@@ -54,7 +70,7 @@ describe("certification issuance service contract and test pack", () => {
     );
     expect(first.ok).toBe(true);
     expect(second.ok).toBe(false);
-    if (!second.ok) expect(second.reason).toBe("ALREADY_ISSUED");
+    expect(failReason(second)).toBe("ALREADY_ISSUED");
     expect(getCertificate("L1", "C1", mem)?.certificateId).toBe(
       first.ok ? first.certificateId : "",
     );
