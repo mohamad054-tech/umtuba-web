@@ -233,6 +233,23 @@ service discovery, distributed/DB join, fleet aggregation, alerting,
 freshness/TTL clocks, history ring, SDK client/factory, persistence,
 product integration, migrations.
 
+## Phase P19 scope
+
+Pure **in-memory dependency requirement validator** under
+`platforms/core/validation/`.
+
+- `createInMemoryDependencyValidator({ platforms, capabilities?, dependencies? })`
+- Implements `UmDependencyValidator.validateRequirements(platformId, requirements)`
+- Fail-closed, result-returning, deterministic — structure + referential targets
+  + required-platform cycle SoT
+- Distinct from P13 completeness/drift (`dependency.validation.*`)
+- Distinct from catalog referential integrity (`referential.*`)
+- Codes use `dependency.validator.*` namespace
+
+Out of scope for P19: dependency injection frameworks, resolver, version
+solver, network behavior, Dependency Graph, Configuration Validation,
+auto-wiring into P14–P17 / SDK, persistence, product integration, migrations.
+
 ## Phase P20 scope
 
 Pure **fleet health aggregation** under `platforms/core/health/`.

@@ -123,12 +123,31 @@ export interface UmDependencyRegistryDeps {
 }
 
 /**
- * Validator surface for dependency law — interface only (not wired in P9).
+ * Explicit DI bag for the in-memory dependency validator (P19).
+ * Caller owns registries; validator borrows read-only references.
+ */
+export interface UmDependencyValidatorDeps {
+  readonly platforms: UmPlatformRegistry;
+  /** Optional P5 capability catalog for capability-target integrity. */
+  readonly capabilities?: UmCapabilityRegistry;
+  /**
+   * Optional P9 edge catalog for required-platform cycle SoT against
+   * already-admitted edges. Omitted → cycle check uses only the candidate
+   * requirements (self-edges / intra-list prospective edges from this owner).
+   */
+  readonly dependencies?: UmDependencyRegistry;
+}
+
+/**
+ * Validator surface for dependency requirement law (P19).
+ *
+ * Pure in-memory requirement review — not P13 completeness/drift, not catalog RI,
+ * not registration mutation, not resolution / version solving.
  */
 export interface UmDependencyValidator {
   /**
-   * Validate requires[] referential integrity and SoT cycle policy.
-   * Implementations belong to later composition phases.
+   * Validate a candidate requires[] for referential integrity and SoT
+   * required-platform cycle policy. Result-returning; never throws.
    */
   validateRequirements(
     platformId: UmPlatformId,

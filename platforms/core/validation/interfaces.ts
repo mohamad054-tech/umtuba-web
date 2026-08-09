@@ -1,9 +1,10 @@
 /**
- * Validation interfaces and P2/P13 engines.
+ * Validation interfaces and P2/P13/P19 engines.
  *
  * P1: contracts only.
  * P2: manifest + admission validators (pure; no registry/runtime).
  * P13: composed UmCoreValidator + registry-backed dependency review.
+ * P19: UmDependencyValidator requirement review (distinct from P13 / RI).
  */
 
 import type { UmDependencyValidationResult } from "../dependency/types";
@@ -93,3 +94,11 @@ export {
   type UmHealthObservationList,
   type UmReferentialIntegrityDeps,
 } from "./referentialIntegrity";
+export {
+  UmDependencyValidatorCode,
+  type UmDependencyValidatorCodeName,
+} from "./dependencyValidatorCodes";
+export {
+  createInMemoryDependencyValidator,
+  validateDependencyRequirements,
+} from "./dependencyValidator";
