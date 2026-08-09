@@ -1,6 +1,6 @@
 # Partial Refund Provider Money — Stripe TEST Controlled Test Pre-Activation Safety V1
 
-**Purpose:** Migration-independent **ZERO-MONEY** pre-activation safety for a future controlled Stripe **TEST** activation window.  
+**Purpose:** Migration-independent **ZERO-MONEY** pre-activation safety for a future controlled Stripe **TEST** activation window.
 **Does not** contact Stripe. **Does not** activate provider gates/modes. **Does not** start provider execution. **Does not** write DB. **Does not** authorize activation.
 
 Related code:
