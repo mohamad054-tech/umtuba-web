@@ -31,6 +31,7 @@ export default defineConfig({
       "lib/search/**/*.test.ts",
       "lib/ads/**/*.test.ts",
       "lib/learning/**/*.test.ts",
+      "lib/jinnMedia/**/*.test.ts",
       "lib/ai/**/*.test.ts",
       "lib/privateAi/**/*.test.ts",
       "lib/aiDataPlatform/**/*.test.ts",

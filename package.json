@@ -12,6 +12,7 @@
     "translation:provider-smoke": "npx tsx scripts/translation/professionalProviderSmoke.ts --phase small --offline",
     "translation:matrix-eval": "npx tsx scripts/translation/professionalMatrixEval.ts --offline",
     "translation:dual-read-preflight": "npx tsx scripts/translation/dualReadObservePreflight.ts --offline",
+    "jinn:video-pilot-ingest-precheck": "npx tsx scripts/jinn/videoPilotIngestPrecheck.ts --offline",
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once",
     "media:worker": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser",
