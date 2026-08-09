@@ -29,6 +29,9 @@ MODE=AUDIT / TEST FIRST
 | SEMANTIC_EQUIVALENCE | **PASS** — repeated runs equal; RI observation unknowns match naive per-obs oracle |
 | RI_SEMANTICS_UNCHANGED | **YES** — prior A2 dep-index is on alpha; list() bound preserved; oracle match |
 | PRODUCT_CODE_CHANGED | **NO** (tests + report only) |
+| COMMIT | `07acf953ed17e426e0a23ba86f124d5e85661528` |
+| REMOTE_BRANCH | `origin/office/um-core-platform-validation-hot-path-performance-regression-v1` |
+| PUSH | **DONE** — ahead/behind **0/0** clean |
 | VERDICT | **AUDIT_TEST_EVIDENCE_PUSHED — SUCCESS** |
 
 ## FILES_AREAS_RESERVED (declared before edit)
@@ -148,7 +151,12 @@ Changed files limited to reserved NEW test + report. No overlap with A1 barrel/`
 
 ## git status --short (post-push)
 
-See commit/push section after push completes.
+```
+## office/um-core-platform-validation-hot-path-performance-regression-v1...origin/office/um-core-platform-validation-hot-path-performance-regression-v1
+```
+
+Pushed commit `07acf95` — ahead/behind **0/0**.  
+OUTBOX: `worktrees/OUTBOX_DROP/UM_CORE_PLATFORM_VALIDATION_HOT_PATH_PERFORMANCE_REGRESSION_V1_REPORT.md`
 
 ## Open issues
 
