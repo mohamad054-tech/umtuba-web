@@ -84,3 +84,12 @@ export {
   createUmCoreValidator,
   type UmCoreValidatorDeps,
 } from "./coreValidator";
+export {
+  UmReferentialIntegrityCode,
+  type UmReferentialIntegrityCodeName,
+} from "./referentialIntegrityCodes";
+export {
+  validateReferentialIntegrity,
+  type UmHealthObservationList,
+  type UmReferentialIntegrityDeps,
+} from "./referentialIntegrity";
