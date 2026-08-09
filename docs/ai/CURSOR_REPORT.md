@@ -1,60 +1,49 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_CONFIGURATION_VALIDATION_FOUNDATION_V1
 
 ## Summary
 
-**Verdict: HARDENED_AND_PUSHED — SUCCESS**
+`VERDICT=CANDIDATE_NOT_SUPPORTED`, `IMPLEMENTED=NO`.
 
-PC2-A2 audited in-memory Core state holders on `origin/alpha-0.2` and fixed a
-proven P17 health-reporter read-path aliasing defect: `getSnapshot` / `list`
-now return defensive clones (aligned with P22 history). Added focused
-regression + cross-cutting hardening tests. No locks, persistence, architecture
-redesign, A1 error-contract edits, or alpha merge.
-
-Canonical Central report:
-`UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
+On `origin/alpha-0.2` @ `b6d48f915f97c5d20a3b5ca42ec32e83b58f1a57`, UM Core already has construction/config-shaped DI bags (SDK deps, history capacity, fleet members/options, registry deps, readiness deps, etc.). Each proven bag already fail-closes at factory create, create-result, or first evaluate/admit. There is no first-class platform configuration document missing a validator. Adding `platforms/core/configuration/` would invent a generic config layer (forbidden) and duplicate existing per-factory validation. Boundaries exclude health / readiness / capability compatibility.
 
 ## Exact files changed
 
-- `platforms/core/health/healthReporter.ts`
-- `platforms/core/health/healthReporter.test.ts`
-- `platforms/core/health/stateImmutability.hardening.test.ts` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
-- `UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
+Report artifacts only (no product code):
+
+- `UM_CORE_PLATFORM_CONFIGURATION_VALIDATION_FOUNDATION_V1_REPORT.md` (worktree root)
+- copies under `worktrees/` and `worktrees/OUTBOX_DROP/`
+- `docs/ai/CURSOR_REPORT.md` (this file)
+
+Zero edits under `platforms/core/**`.
 
 ## Migrations created
 
-**NONE.**
+NONE
 
 ## Security review
 
-- Narrow defensive-copy fix only
-- No network/DB/secrets/product domains
-- No distributed locks / persistence
-- A1 shared error-contract files untouched
+Report-only. No secrets, env mutation, network, DB, or probes. No error surfaces that could leak secrets (no implementation).
 
 ## Tests
 
-- Focused state-safety: **PASS**
-- Full `platforms/core`: **PASS** (25 files / 263 tests)
+NOT_RUN — no product change; gate closed.
 
 ## TypeScript
 
-`tsc --noEmit` → **PASS**
+NOT_RUN — no product change.
 
 ## Build
 
-N/A (Core library lane; gates did not require `npm run build`)
+NOT_RUN — no product change.
 
 ## git diff --check
 
-**PASS**
+N/A — no product diff.
 
 ## git status --short
 
-clean after push (0/0)
+Branch `office/um-core-platform-configuration-validation-foundation-v1` at alpha tip `b6d48f9` (`0/0` vs `origin/alpha-0.2`). Product tree clean; report files may appear as untracked local artifacts.
 
 ## Open issues
 
-1. Residual catalog/registry returned-record identity aliasing deferred (not reporter nested-snapshot class).
-2. Platform registry stores manifest by reference — residual; out of this lane.
-3. STOP — do not wait for A1; do not self-assign next work.
+None for this TASK_ID. Candidate declined; Central owns next GO. Do not self-assign follow-up.
