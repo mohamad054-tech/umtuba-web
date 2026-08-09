@@ -54,7 +54,9 @@ export type UmSdkPublishEvent = <TPayload>(
   event: UmPlatformEventEnvelope<TPayload>,
 ) => ReturnType<UmEventPublisher["publish"]>;
 
-export type UmSdkReportHealth = (snapshot: UmHealthSnapshot) => void;
+export type UmSdkReportHealth = (
+  snapshot: UmHealthSnapshot,
+) => ReturnType<UmHealthReporter["report"]>;
 
 export type UmSdkAssertCapability = (
   capabilityId: UmCapabilityId,

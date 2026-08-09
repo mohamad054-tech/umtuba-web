@@ -203,3 +203,17 @@ Out of scope for P16: event delivery/bus, P7 routing execution, consumer
 dispatch, queue/outbox/retry/DLQ, schema runtime, HealthReporter,
 DependencyValidator, SDK client/factory, networking, persistence, product
 integration, migrations.
+
+## Phase P17 scope
+
+Pure **in-memory health observation reporter** under `platforms/core/health/`.
+
+- `createInMemoryHealthReporter({ platforms })` implements `UmHealthReporter`
+- Admits caller-supplied snapshots for P4-registered platforms only
+- Status taxonomy: `ready` | `degraded` | `unavailable`
+- Result-returning, fail-closed; stores last snapshot per platform
+- P10 declaration catalog remains orthogonal (declaration ≠ healthy)
+
+Out of scope for P17: probe execution, polling, scheduling, networking,
+alerting, remediation, DependencyValidator, SDK client/factory, persistence,
+product integration, migrations.

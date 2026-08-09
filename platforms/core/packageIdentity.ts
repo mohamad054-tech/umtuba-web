@@ -58,5 +58,8 @@ export const UM_CORE_CAPABILITY_ASSERTER_PHASE = "P15" as const;
 /** Event publisher foundation phase. */
 export const UM_CORE_EVENT_PUBLISHER_PHASE = "P16" as const;
 
+/** Health reporter foundation phase. */
+export const UM_CORE_HEALTH_REPORTER_PHASE = "P17" as const;
+
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;
