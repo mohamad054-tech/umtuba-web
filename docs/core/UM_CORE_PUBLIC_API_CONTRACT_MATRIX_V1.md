@@ -1,10 +1,11 @@
 # UM Core Public API Contract Matrix V1
 
-**TASK_ID:** `UM_CORE_PLATFORM_PUBLIC_API_DOCUMENTATION_AND_CONTRACT_MATRIX_V1`
-**AGENT:** `PC2-A3` · **DEVICE:** `PC2`
-**BASE:** `origin/alpha-0.2` @ `0011fe6cf2a66b997ebe0d993ed92cdd7ca47754`
+**TASK_ID:** `UM_CORE_PLATFORM_PUBLIC_API_INVENTORY_AND_BC_FIXTURE_SYNC_V1`
+*(extends original `UM_CORE_PLATFORM_PUBLIC_API_DOCUMENTATION_AND_CONTRACT_MATRIX_V1`)*
+**AGENT:** `PC2-A1` · **DEVICE:** `PC2`
+**BASE:** `origin/alpha-0.2` @ `26995e989d6aa78a2fdcaf885d1b6a7d030a2c01`
 **PUBLIC BARREL:** `platforms/core/index.ts` (and sub-barrels it re-exports)
-**MODE:** Documentation + contract verification (no production API refactor)
+**MODE:** Documentation + contract verification (no production API refactor; no P23 root magnet wire)
 
 ## Law
 
@@ -36,12 +37,18 @@
 | P16 | Event publisher (admission) | `event/eventPublisher` |
 | P17 | Health reporter | `health/healthReporter` |
 | P18 | Health diagnostics join | `health/healthDiagnosticsJoin` |
+| P19 | Dependency requirement validator | `validation/dependencyValidator` |
 | — | Referential integrity review | `validation/referentialIntegrity` |
 | P20 | Fleet health aggregation | `health/fleetHealthAggregation` |
 | P21 | SDK / client factory | `sdk/sdkFactory` |
 | P22 | Bounded health observation history | `health/healthHistory` |
+| P24 | Capability compatibility evaluator | `capability/capabilityCompatibility` |
 
-**Phase gap:** no `P19` constant or module on this tip (P18 → P20).
+**Not yet root-public (implemented, local barrel only):**
+
+| Phase | Foundation | Status |
+| --- | --- | --- |
+| P23 | Lifecycle readiness (`readiness/**`) | Present on alpha under `platforms/core/readiness/**`; **not** re-exported from `platforms/core/index.ts`; phase marker is local (`UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE`), not on `packageIdentity` root set. Do not treat as public until root magnet wire. |
 
 ---
 
@@ -76,7 +83,8 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | P1 | `UM_CORE_PACKAGE_ID` | — | `"um.core"` | No | N/A | Yes | — | None | Immutable literal | `coreFoundationContracts.test.ts` | CONTRACT_ONLY |
 | P1 | `UM_CORE_PACKAGE_LABEL` | — | `"UM Core Platform"` | No | N/A | Yes | — | None | Immutable literal | `coreFoundationContracts.test.ts` | CONTRACT_ONLY |
-| P1 | `UM_CORE_FOUNDATION_PHASE` … `UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE` | — | `"P1"`…`"P22"` (no P19) | No | N/A | Yes | — | None | Phase markers; `UM_CORE_FOUNDATION_PHASE` remains `"P1"` by design | `coreFoundationContracts.test.ts`, `publicApiContractMatrix.test.ts` | CONTRACT_ONLY |
+| P1 | `UM_CORE_FOUNDATION_PHASE` … `UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE` + `UM_CORE_DEPENDENCY_VALIDATOR_PHASE` | — | `"P1"`…`"P22"` incl. `"P19"` | No | N/A | Yes | — | None | Phase markers on `packageIdentity`; `UM_CORE_FOUNDATION_PHASE` remains `"P1"` by design | `coreFoundationContracts.test.ts`, `publicApiContractMatrix.test.ts` | CONTRACT_ONLY |
+| P24 | `UM_CORE_PLATFORM_CAPABILITY_COMPATIBILITY_PHASE` | — | `"P24"` | No | N/A | Yes | — | None | Exported via capability barrel (not duplicated in `packageIdentity`) | `capabilityCompatibility.test.ts`, public API matrix/BC tests | CONTRACT_ONLY |
 
 ---
 
@@ -103,11 +111,16 @@
 | P13 | `validatePlatformDependencies` | `platformId`, deps | `UmDependencyValidationResult` | No | `ok:false` on missing/stale/drift | Yes | P4 + P9 (+ optional P5) | None | Read-only | `coreValidator.test.ts` | FOUNDATION_READY |
 | P13 | `createUmCoreValidator` | `UmCoreValidatorDeps` | `UmCoreValidator` | No (does not mutate deps) | Review returns `ok:false` | Yes | P4 + P9 (+ optional P5 / P2 ports) | None | Composed port; no store | `coreValidator.test.ts` | FOUNDATION_READY |
 | P13 | `UmDependencyValidationCode` | — | Code constants | No | N/A | Yes | — | None | Immutable | `coreValidator.test.ts` | CONTRACT_ONLY |
+| P19 | `validateDependencyRequirements` | platformId, requirements, deps | `UmDependencyValidationResult` (P19 codes) | No | `ok:false` + findings | Yes (sorted) | P4 (+ optional P5/P9) | None | Stateless; **not** P13 drift / **not** RI / **not** resolver | `dependencyValidator.test.ts` | FOUNDATION_READY |
+| P19 | `createInMemoryDependencyValidator` | `UmDependencyValidatorDeps` | `UmDependencyValidator` | No | Delegates to validateRequirements | Yes | Same | None | Unused-by-default; no automatic P4/P13/RI consumer | `dependencyValidator.test.ts` | FOUNDATION_READY |
+| P19 | `UmDependencyValidatorCode` (+ types) | — | Code constants (`dependency.validator.*`) | No | N/A | Yes | — | None | Distinct from `dependency.validation.*` (P13) | `dependencyValidator.test.ts` | CONTRACT_ONLY |
 | RI | `validateReferentialIntegrity` | `UmReferentialIntegrityDeps` | `UmValidationResult` | No | `ok:false` on missing refs; optional catalogs skipped if absent | Yes (sorted findings) | P4 + optional P5–P10 + optional P17 list | None | Read-only; not join | `referentialIntegrity.test.ts` | FOUNDATION_READY |
 | RI | `UmReferentialIntegrityCode` | — | Code constants | No | N/A | Yes | — | None | Immutable | `referentialIntegrity.test.ts` | CONTRACT_ONLY |
 | P2/P13 | Interfaces `UmManifestValidator`, `UmRegistrationValidator`, `UmCoreValidator`, finding/result types | — | Port contracts | No | N/A | Yes | — | None | Pure types | Via impl tests | CONTRACT_ONLY |
 
 **Duplicate surface (documented, intentional):** free functions (`validatePlatformManifest`, `validateManifestAdmission`) and factory ports (`createManifestValidator`, `createRegistrationValidator`) expose the same semantics.
+
+**P19 duplicate surface:** `validateDependencyRequirements` ≡ `createInMemoryDependencyValidator(deps).validateRequirements`.
 
 ---
 
@@ -147,6 +160,10 @@
 | P5 | `UmCapabilityRegistryCode` + types | — | Codes / types | No | N/A | Yes | — | None | — | tests | CONTRACT_ONLY |
 | P15 | `createInMemoryCapabilityAsserter` | `{ capabilities, flags }` | `UmCapabilityAsserter` | No | Result `enabled:false` + reasonCode | Yes | P5 + P14 | None | Stateless over injected ports | `capabilityAsserter.test.ts` | FOUNDATION_READY |
 | P15 | `UmCapabilityAssertionCode` | — | Codes | No | N/A | Yes | — | None | — | `capabilityAsserter.test.ts` | CONTRACT_ONLY |
+| P24 | `createCapabilityCompatibilityEvaluator` | `{ platforms, capabilities?, dependencies? }` | `UmCapabilityCompatibilityEvaluator` | No | Result `INCOMPATIBLE` + findings (no throw) | Yes | P4 (+ optional P5/P9) | None | Pure catalog compatibility; **not** health / readiness / discovery / P15 assertion | `capabilityCompatibility.test.ts` | FOUNDATION_READY |
+| P24 | `UmCapabilityCompatibilityCode` + compatibility types / phase marker | — | Codes / types / `"P24"` | No | N/A | Yes | — | None | Immutable | `capabilityCompatibility.test.ts` | CONTRACT_ONLY |
+
+**P24 methods (port shape):** `platformDeclaresCapability`, `requiredCapabilityExists`, `evaluatePlatformProvides`, `evaluatePlatformRequirements`, `evaluateMatrix`.
 
 ---
 
@@ -228,6 +245,18 @@
 
 ---
 
+## 13. Lifecycle readiness (P23) — NOT root-public yet
+
+| FOUNDATION | EXPORT | STATUS |
+| --- | --- | --- |
+| P23 | `createPlatformReadinessEvaluator` | **Not** on `platforms/core/index.ts` |
+| P23 | `UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE` | Local module constant only |
+| P23 | `UmPlatformReadinessCode` | Local to `readiness/` barrel |
+
+Implementation + focused tests exist under `platforms/core/readiness/**`. Production consumers must not deep-import until Central magnet wire lands. Inventory/BC guards assert absence from the root barrel so accidental private exposure is not mistaken for public freeze.
+
+---
+
 ## Findings (inventory analysis)
 
 ### Undocumented / under-documented vs phase docs
@@ -281,14 +310,24 @@
 1. **Failure-model split:** SDK factory throws; most other foundations return results.
 2. **Test helpers on public interfaces:** widespread `clear()` mutators.
 3. **Stale README framing** at package root (P1-only language).
-4. **Phase numbering gap** P19 absent (documented intentional omission on tip).
+4. **P23 packaging lag:** readiness foundation implemented but not root-exported (tracked as separate magnet task; intentionally **not** closed by this inventory sync).
 
-No broad production API fixes applied.
+### Inventory sync closeout (this revision)
+
+| Gap closed | Evidence |
+| --- | --- |
+| P19 missing from PUBLIC_CALLABLES / BC fixture / foundation smoke | Added callables, `UmDependencyValidatorCode`, `UM_CORE_DEPENDENCY_VALIDATOR_PHASE` |
+| P24 missing from public inventory | Added `createCapabilityCompatibilityEvaluator`, code table, phase marker |
+| Stale “no P19” matrix claim | Corrected; P19 is root-reachable via `validation` barrel |
+| P23 false advertising | Explicit not-yet-root-public section + negative root-barrel assertions |
+
+No production API redesign. No P23 root wire. No new foundation.
 
 ---
 
 ## Verification references
 
 - Public barrel: `platforms/core/index.ts`
-- Contract tests: `platforms/core/publicApiContractMatrix.test.ts`, `platforms/core/coreFoundationContracts.test.ts`
-- Avoid collision: this artifact is **not** A1 lifecycle/readiness and **not** A2 findings-normalization.
+- Contract tests: `platforms/core/publicApiContractMatrix.test.ts`, `platforms/core/coreFoundationContracts.test.ts`, `platforms/core/publicApiBackwardCompatibility.guard.test.ts`
+- BC fixture: `platforms/core/test/publicApiBackwardCompatibility.fixture.json`
+- Avoid collision: this sync does **not** perform A1 P23 root magnet wire and does **not** touch A2 property/fuzz suites.

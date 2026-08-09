@@ -38,9 +38,11 @@
     "UM_CORE_EVENT_PUBLISHER_PHASE": "P16",
     "UM_CORE_HEALTH_REPORTER_PHASE": "P17",
     "UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE": "P18",
+    "UM_CORE_DEPENDENCY_VALIDATOR_PHASE": "P19",
     "UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE": "P20",
     "UM_CORE_SDK_CLIENT_FACTORY_PHASE": "P21",
-    "UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE": "P22"
+    "UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE": "P22",
+    "UM_CORE_PLATFORM_CAPABILITY_COMPATIBILITY_PHASE": "P24"
   },
   "maturityLevels": [
     0,
@@ -122,6 +124,18 @@
       "UNKNOWN_PLATFORM_TARGET": "dependency.validation.unknown_platform_target",
       "UNKNOWN_CAPABILITY_TARGET": "dependency.validation.unknown_capability_target"
     },
+    "UmDependencyValidatorCode": {
+      "UNKNOWN_PLATFORM": "dependency.validator.unknown_platform",
+      "TARGET_KIND_INVALID": "dependency.validator.target_kind_invalid",
+      "TARGET_ID_REQUIRED": "dependency.validator.target_id_required",
+      "TARGET_ID_NAMING": "dependency.validator.target_id_naming",
+      "STRENGTH_INVALID": "dependency.validator.strength_invalid",
+      "REASON_REQUIRED": "dependency.validator.reason_required",
+      "DUPLICATE_REQUIREMENT": "dependency.validator.duplicate_requirement",
+      "UNKNOWN_PLATFORM_TARGET": "dependency.validator.unknown_platform_target",
+      "UNKNOWN_CAPABILITY_TARGET": "dependency.validator.unknown_capability_target",
+      "REQUIRED_PLATFORM_CYCLE": "dependency.validator.required_platform_cycle"
+    },
     "UmReferentialIntegrityCode": {
       "CAPABILITY_UNKNOWN_PLATFORM": "referential.capability.unknown_platform",
       "CAPABILITY_UNKNOWN_FLAG": "referential.capability.unknown_flag",
@@ -200,6 +214,19 @@
       "FLAG_DISABLED": "capability.assertion.flag_disabled",
       "FLAG_UNRESOLVED": "capability.assertion.flag_unresolved",
       "ELEVATED_UNGATED": "capability.assertion.elevated_ungated"
+    },
+    "UmCapabilityCompatibilityCode": {
+      "PLATFORM_ID_REQUIRED": "capability.compat.platform_id_required",
+      "PLATFORM_ID_NAMING": "capability.compat.platform_id_naming",
+      "CAPABILITY_ID_REQUIRED": "capability.compat.capability_id_required",
+      "CAPABILITY_ID_NAMING": "capability.compat.capability_id_naming",
+      "UNKNOWN_PLATFORM": "capability.compat.unknown_platform",
+      "REQUIRED_CAPABILITY_MISSING": "capability.compat.required_capability_missing",
+      "REQUIRED_CAPABILITY_UNDECLARED": "capability.compat.required_capability_undeclared",
+      "REQUIRED_CAPABILITY_EXISTS": "capability.compat.required_capability_exists",
+      "PLATFORM_DECLARES_CAPABILITY": "capability.compat.platform_declares_capability",
+      "COMPATIBLE": "capability.compat.compatible",
+      "INPUT_INVALID": "capability.compat.input_invalid"
     },
     "UmEventTypeRegistryCode": {
       "UNKNOWN_PRODUCER": "event_type.registry.unknown_producer",
@@ -430,6 +457,16 @@
       "manifests",
       "registration",
       "validateDependencies"
+    ],
+    "createInMemoryDependencyValidator": [
+      "validateRequirements"
+    ],
+    "createCapabilityCompatibilityEvaluator": [
+      "platformDeclaresCapability",
+      "requiredCapabilityExists",
+      "evaluatePlatformProvides",
+      "evaluatePlatformRequirements",
+      "evaluateMatrix"
     ]
   },
   "publicCallables": [
@@ -458,6 +495,8 @@
     "createInMemoryFlagEvaluator",
     "buildDependencyEdgeId",
     "createInMemoryDependencyRegistry",
+    "createInMemoryDependencyValidator",
+    "validateDependencyRequirements",
     "createInMemoryHealthRegistry",
     "createInMemoryHealthReporter",
     "createHealthDiagnosticsJoin",
@@ -466,6 +505,15 @@
     "createFleetHealthAggregation",
     "createInMemoryHealthObservationHistory",
     "createInMemoryNamingRegistry",
-    "createInMemoryUmCoreSdkFactory"
-  ]
+    "createInMemoryUmCoreSdkFactory",
+    "createCapabilityCompatibilityEvaluator"
+  ],
+  "notYetRootPublic": {
+    "note": "P23 lifecycle readiness is implemented under platforms/core/readiness/** but is not re-exported from platforms/core/index.ts. Do not list createPlatformReadinessEvaluator as public until root magnet wire lands.",
+    "symbols": [
+      "createPlatformReadinessEvaluator",
+      "UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE",
+      "UmPlatformReadinessCode"
+    ]
+  }
 }

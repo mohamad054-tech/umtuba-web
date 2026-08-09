@@ -323,6 +323,35 @@ describe("UM Core public API backward-compatibility guard", () => {
       fixture.factoryMethods.createInMemoryUmCoreSdkFactory,
       "sdkFactory",
     );
+
+    const dependencyValidator = UmCore.createInMemoryDependencyValidator({
+      platforms,
+    });
+    expectMethods(
+      dependencyValidator,
+      fixture.factoryMethods.createInMemoryDependencyValidator,
+      "dependencyValidator",
+    );
+
+    const capabilityCompat = UmCore.createCapabilityCompatibilityEvaluator({
+      platforms,
+      capabilities,
+      dependencies,
+    });
+    expectMethods(
+      capabilityCompat,
+      fixture.factoryMethods.createCapabilityCompatibilityEvaluator,
+      "capabilityCompatibility",
+    );
+  });
+
+  it("keeps P23 lifecycle readiness off the root barrel until magnet wire", () => {
+    expect(
+      typeof (UmCore as Record<string, unknown>).createPlatformReadinessEvaluator,
+    ).toBe("undefined");
+    expect(
+      (UmCore as Record<string, unknown>).UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE,
+    ).toBeUndefined();
   });
 
   it("keeps P12 aggregate facade on the seven-slot frozen shape", () => {

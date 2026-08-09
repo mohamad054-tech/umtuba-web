@@ -44,6 +44,9 @@ const PUBLIC_CALLABLES = [
   // P9
   "buildDependencyEdgeId",
   "createInMemoryDependencyRegistry",
+  // P19 (requirement validator — distinct from P13 completeness/drift)
+  "createInMemoryDependencyValidator",
+  "validateDependencyRequirements",
   // P10 / P17 / P18 / P20 / P22
   "createInMemoryHealthRegistry",
   "createInMemoryHealthReporter",
@@ -56,16 +59,20 @@ const PUBLIC_CALLABLES = [
   "createInMemoryNamingRegistry",
   // P21
   "createInMemoryUmCoreSdkFactory",
+  // P24 (via capability barrel → root)
+  "createCapabilityCompatibilityEvaluator",
 ] as const;
 
 const PUBLIC_CODE_TABLES = [
   "UmManifestValidationCode",
   "UmDependencyValidationCode",
+  "UmDependencyValidatorCode",
   "UmReferentialIntegrityCode",
   "UmComplianceCode",
   "UmRegistryCode",
   "UmCapabilityRegistryCode",
   "UmCapabilityAssertionCode",
+  "UmCapabilityCompatibilityCode",
   "UmEventTypeRegistryCode",
   "UmEventRoutingCode",
   "UmEventPublishCode",
@@ -99,8 +106,21 @@ describe("UM Core public API contract matrix (root barrel)", () => {
     expect(UmCore.UM_CORE_PACKAGE_ID).toBe("um.core");
     expect(UmCore.UM_CORE_HEALTH_REPORTER_PHASE).toBe("P17");
     expect(UmCore.UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE).toBe("P18");
+    expect(UmCore.UM_CORE_DEPENDENCY_VALIDATOR_PHASE).toBe("P19");
     expect(UmCore.UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE).toBe("P20");
     expect(UmCore.UM_CORE_SDK_CLIENT_FACTORY_PHASE).toBe("P21");
     expect(UmCore.UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE).toBe("P22");
+    expect(UmCore.UM_CORE_PLATFORM_CAPABILITY_COMPATIBILITY_PHASE).toBe("P24");
+  });
+
+  it("does not advertise P23 lifecycle readiness on the root barrel yet", () => {
+    // Implemented under platforms/core/readiness/** but not re-exported from
+    // platforms/core/index.ts (root magnet wire is a separate packaging task).
+    expect(
+      typeof (UmCore as Record<string, unknown>).createPlatformReadinessEvaluator,
+    ).toBe("undefined");
+    expect(
+      (UmCore as Record<string, unknown>).UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE,
+    ).toBeUndefined();
   });
 });
