@@ -1,7 +1,7 @@
 # Partial Refund Provider Money — Terminal State & Replay Invariants V1
 
-**Task:** `COMMERCE_REFUND_PROVIDER_TERMINAL_STATE_AND_REPLAY_INVARIANTS_V1`  
-**Module:** `lib/store/partialRefundProviderMoneyExecution/refundProviderTerminalStateReplayInvariants.ts`  
+**Task:** `COMMERCE_REFUND_PROVIDER_TERMINAL_STATE_AND_REPLAY_INVARIANTS_V1`
+**Module:** `lib/store/partialRefundProviderMoneyExecution/refundProviderTerminalStateReplayInvariants.ts`
 **Constraints:** `STRIPE_CALLS=0` · `MONEY_MOVEMENT=0` · `DB_WRITES=0` · `PROVIDER_GATES=OFF`
 
 ## Purpose
@@ -35,19 +35,19 @@ Task vocabulary aliases (`SUCCESS`→`succeeded`, `FAILED`→`failed`, `UNKNOWN`
 
 ## Proven invariants
 
-1. Successful money execution (`succeeded`) cannot execute again  
-2. Compensated ledger cannot silently replay provider money  
-3. Reconciled terminal class (`succeeded`/`failed` after recovery claim) cannot silently replay  
-4. `uncertain` cannot become `retrySafe` without evidence  
-5. Stuck `committing` requires explicit recovery path (`RECOVERY_REQUIRED`)  
-6. Duplicate command cannot create second provider execution  
-7. Stale UI/action cannot bypass terminal-state protection  
+1. Successful money execution (`succeeded`) cannot execute again
+2. Compensated ledger cannot silently replay provider money
+3. Reconciled terminal class (`succeeded`/`failed` after recovery claim) cannot silently replay
+4. `uncertain` cannot become `retrySafe` without evidence
+5. Stuck `committing` requires explicit recovery path (`RECOVERY_REQUIRED`)
+6. Duplicate command cannot create second provider execution
+7. Stale UI/action cannot bypass terminal-state protection
 8. Repeated recovery action is idempotent (`classifyRepeatedRecoveryAction`)
 
 ## Out of scope
 
-- Stripe API calls / invented provider truth  
-- Migrations / DB writes / gate activation  
-- Rewriting Central-review branches (`df10121`, `7681a01`, `b9d4348`)  
-- A2 Stripe TEST activation state machine files  
-- Canonical / alpha merge  
+- Stripe API calls / invented provider truth
+- Migrations / DB writes / gate activation
+- Rewriting Central-review branches (`df10121`, `7681a01`, `b9d4348`)
+- A2 Stripe TEST activation state machine files
+- Canonical / alpha merge
