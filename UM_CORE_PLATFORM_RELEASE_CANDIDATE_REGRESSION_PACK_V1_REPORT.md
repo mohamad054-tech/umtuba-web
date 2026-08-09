@@ -22,9 +22,9 @@
 | ALPHA_MERGE | **NONE** |
 | VERDICT | **RC_PACK_ADDED_AND_PUSHED — SUCCESS** |
 | SEMANTIC_DEFECT_FOUND | **NO** |
-| FINAL_SHA | `PENDING_AFTER_COMMIT` |
+| FINAL_SHA | `267db64e912fda4132bfe438b4b0b07bb6b1d8da` |
 | REMOTE_BRANCH | `origin/office/um-core-platform-release-candidate-regression-pack-v1` |
-| PUSH | **PENDING** |
+| PUSH | **DONE** (tracking clean after push) |
 | OUTBOX | Not available on this device (no OUTBOX / OUTBOX_DROP path found) |
 
 ## Summary
@@ -132,7 +132,7 @@ Not required (tests-only; no UI/entry-point change). Skipped.
 
 ## git status --short
 
-Will be clean `0/0` after tip finalize on own remote branch.
+Clean `0/0` after tip finalize on own remote branch (`267db64`).
 
 ## Open issues
 
