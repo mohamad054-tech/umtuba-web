@@ -13,10 +13,12 @@ import {
   createInMemoryHealthReporter,
   type UmHealthSnapshot,
 } from "../health";
+import * as UmCoreRoot from "../index";
 import {
   UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE,
   UmPlatformReadinessCode,
   createPlatformReadinessEvaluator,
+  derivePlatformReadiness,
 } from "./index";
 
 function validManifest(
@@ -106,6 +108,19 @@ function harness() {
 describe("UM Core platform lifecycle readiness foundation P23", () => {
   it("exports local phase constant P23", () => {
     expect(UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE).toBe("P23");
+  });
+
+  it("keeps P23 off the root public barrel (intentional non-root-public)", () => {
+    // Accepted architecture: local readiness barrel only. Do not root-export
+    // for checklist symmetry. Deep import platforms/core/readiness remains valid.
+    const root = UmCoreRoot as Record<string, unknown>;
+    expect(typeof root.createPlatformReadinessEvaluator).toBe("undefined");
+    expect(typeof root.derivePlatformReadiness).toBe("undefined");
+    expect(root.UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE).toBeUndefined();
+    expect(root.UmPlatformReadinessCode).toBeUndefined();
+    // Local barrel remains callable.
+    expect(typeof createPlatformReadinessEvaluator).toBe("function");
+    expect(typeof derivePlatformReadiness).toBe("function");
   });
 
   it("R1: registered + compliant + declared reporter + health ready → READY", () => {

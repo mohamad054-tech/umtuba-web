@@ -164,13 +164,17 @@ describe("um.core production-contract regression suite", () => {
     expect(UM_CORE_SDK_CLIENT_FACTORY_PHASE).toBe("P21");
     expect(UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE).toBe("P22");
 
-    // Lifecycle readiness is NOT integrated on alpha tip — do not invent
-    // health-ready ≠ lifecycle-ready expectations.
+    // P23 lifecycle readiness is intentionally NOT root-public (local barrel
+    // only under platforms/core/readiness/**). Assert real symbol names so an
+    // accidental root magnet wire fails this suite. Health token "ready" ≠
+    // lifecycle READY/NOT_READY.
     const publicKeys = Object.keys(corePublic);
     expect(publicKeys.some((k) => /lifecycle/i.test(k))).toBe(false);
     expect(
-      "UM_CORE_LIFECYCLE_READINESS_PHASE" in corePublic ||
-        "createLifecycleReadiness" in corePublic,
+      "UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE" in corePublic ||
+        "createPlatformReadinessEvaluator" in corePublic ||
+        "derivePlatformReadiness" in corePublic ||
+        "UmPlatformReadinessCode" in corePublic,
     ).toBe(false);
   });
 

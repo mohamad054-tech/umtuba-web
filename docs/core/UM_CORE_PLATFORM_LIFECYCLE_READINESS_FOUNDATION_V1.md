@@ -65,11 +65,18 @@ evaluatePlatform(platformId): UmPlatformReadinessRow
 
 Silent declarers (`reportsStatus: false`) do not require an observation.
 
-## Shared wiring deferred
+## Public visibility (accepted architecture)
 
-- Root `platforms/core/index.ts` barrel export
-- `packageIdentity.ts` phase constant (local `UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE = "P23"`)
-- SDK / aggregate facade slots
+P23 is intentionally **not root-public**:
+
+- Root `platforms/core/index.ts` does **not** re-export `./readiness`
+- `packageIdentity.ts` does **not** carry a P23 phase constant
+  (local `UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE = "P23"` only)
+- SDK / aggregate facade slots remain untouched
+
+Central production-readiness closeout treats this as the accepted packaging
+posture (not a missing foundation). Root magnet wire requires a separate
+Central GO and must not be done for checklist symmetry.
 
 ## Non-goals
 
