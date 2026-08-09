@@ -1,10 +1,10 @@
 # UM Core — Dependency Validator Foundation P19
 
-**Status:** Closed (pure in-memory requirement validation only)  
-**Branch:** `office/um-core-platform-dependency-validator-foundation-p19`  
-**Base:** `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`  
-**Normative base:** UM_CORE_SPECIFICATION_V1 · UM_CORE_ENGINEERING_STANDARDS_V1  
-**Canonical identity:** `um.core.dependency_validator_foundation_p19`  
+**Status:** Closed (pure in-memory requirement validation only)
+**Branch:** `office/um-core-platform-dependency-validator-foundation-p19`
+**Base:** `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`
+**Normative base:** UM_CORE_SPECIFICATION_V1 · UM_CORE_ENGINEERING_STANDARDS_V1
+**Canonical identity:** `um.core.dependency_validator_foundation_p19`
 **TASK_ID:** `UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19`
 
 ## Goal
@@ -15,8 +15,8 @@ integrity and required-platform cycle SoT policy.
 
 ## Architectural rules
 
-**DEPENDENCY VALIDATION IS NOT DEPENDENCY RESOLUTION.**  
-**DEPENDENCY VALIDATION IS NOT P13 COMPLETENESS/DRIFT REVIEW.**  
+**DEPENDENCY VALIDATION IS NOT DEPENDENCY RESOLUTION.**
+**DEPENDENCY VALIDATION IS NOT P13 COMPLETENESS/DRIFT REVIEW.**
 **DEPENDENCY VALIDATION IS NOT CATALOG REFERENTIAL INTEGRITY.**
 
 ## Responsibility split
