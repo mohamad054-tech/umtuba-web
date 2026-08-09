@@ -1,25 +1,24 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_PRODUCTION_CONTRACT_REGRESSION_SUITE_V1
 
 ## Summary
 
-**Verdict: HARDENED_AND_PUSHED — SUCCESS**
+**Verdict: CONTRACT_SUITE_ADDED_AND_PUSHED — SUCCESS**
 
-PC2-A2 audited in-memory Core state holders on `origin/alpha-0.2` and fixed a
-proven P17 health-reporter read-path aliasing defect: `getSnapshot` / `list`
-now return defensive clones (aligned with P22 history). Added focused
-regression + cross-cutting hardening tests. No locks, persistence, architecture
-redesign, A1 error-contract edits, or alpha merge.
+PC2-A3 added an isolated production-contract regression suite
+(`platforms/core/productionContractRegression.suite.test.ts`) complementary to
+the golden-path integration suite. Expectations were taken from actual alpha
+public Core behavior (matrix evidence verified against alpha tip only). Tests
+only — no production semantic edits, no A1/A2 production file collision, no
+alpha merge. Lifecycle not on alpha → health≠lifecycle assertions omitted.
 
 Canonical Central report:
-`UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
+`docs/ai/UM_CORE_PLATFORM_PRODUCTION_CONTRACT_REGRESSION_SUITE_V1_REPORT.md`
 
 ## Exact files changed
 
-- `platforms/core/health/healthReporter.ts`
-- `platforms/core/health/healthReporter.test.ts`
-- `platforms/core/health/stateImmutability.hardening.test.ts` (new)
+- `platforms/core/productionContractRegression.suite.test.ts` (new)
+- `docs/ai/UM_CORE_PLATFORM_PRODUCTION_CONTRACT_REGRESSION_SUITE_V1_REPORT.md` (new)
 - `docs/ai/CURSOR_REPORT.md` (this handoff)
-- `UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
 
 ## Migrations created
 
@@ -27,23 +26,24 @@ Canonical Central report:
 
 ## Security review
 
-- Narrow defensive-copy fix only
-- No network/DB/secrets/product domains
-- No distributed locks / persistence
-- A1 shared error-contract files untouched
+- Tests-only / no production semantic refactor
+- No DB / migrations / network / probes / product domains
+- No secrets or `.env` access
+- Secret + conflict scans clean on changed files
 
 ## Tests
 
-- Focused state-safety: **PASS**
-- Full `platforms/core`: **PASS** (25 files / 263 tests)
+- New contract suite: **20/20 PASS**
+- Negative-path matrix: **PASS**
+- Full `platforms/core`: **27 files / 288 tests PASS**
 
 ## TypeScript
 
-`tsc --noEmit` → **PASS**
+`npx tsc --noEmit` → **PASS**
 
 ## Build
 
-N/A (Core library lane; gates did not require `npm run build`)
+Skipped (tests-only; no UI/entry-point change).
 
 ## git diff --check
 
@@ -51,10 +51,10 @@ N/A (Core library lane; gates did not require `npm run build`)
 
 ## git status --short
 
-clean after push (0/0)
+Post-commit/push: expected clean (`0/0`) on
+`office/um-core-platform-production-contract-regression-suite-v1`.
 
 ## Open issues
 
-1. Residual catalog/registry returned-record identity aliasing deferred (not reporter nested-snapshot class).
-2. Platform registry stores manifest by reference — residual; out of this lane.
-3. STOP — do not wait for A1; do not self-assign next work.
+- Lifecycle readiness still absent on alpha.
+- Contract matrix markdown remains on documentation branch (not required in-tree for suite).
