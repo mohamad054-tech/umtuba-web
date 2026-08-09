@@ -1,14 +1,23 @@
-# CURSOR_REPORT — CENTRAL / PC2_PRODUCTION_READINESS_CLOSEOUT_CENTRAL_DECISION_V2
+# CURSOR_REPORT — PC2-A3 / UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1
 
 ## Summary
 
-Central integrated PC2-A1 blocker closeout (public API inventory + BC fixture sync for P19/P24; P23 intentionally not root-public) and PC2-A2 release-candidate regression pack (TEST_ONLY) onto `alpha-0.2`. Magnet conflict on this file resolved by Central. No production semantic redesign. No P23 root magnet wire. No manufactured P19 consumer.
+Consolidated UM Core operational/error-contract evidence on current
+`origin/alpha-0.2` @ `a93f52235fee11e73ad9953993e109a894f99aac` (post Central
+integrate of A1 inventory sync + A2 RC pack). Added
+`docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md` + lock tests.
+Resolved `CENTRAL_CONSUMER_GO_NOT_REQUIRED_FOR_CURRENT_RELEASE=YES`.
+**VERDICT=`PRODUCTION_SIGNOFF_BLOCKED`** — remaining exact blockers: P23
+packaging, Spec/Standards (A2 WIP not on alpha), perf/scale assumptions not on
+alpha.
 
-## Exact files changed (this integration wave)
+## Exact files changed
 
-- A1: `docs/core/UM_CORE_PUBLIC_API_CONTRACT_MATRIX_V1.md`; `platforms/core/publicApiContractMatrix.test.ts`; `platforms/core/test/publicApiBackwardCompatibility.fixture.json`; `platforms/core/publicApiBackwardCompatibility.guard.test.ts`; `platforms/core/coreFoundationContracts.test.ts`; A1 reports
-- A2: `platforms/core/releaseCandidate.regression.pack.test.ts` (new); A2 reports
-- `docs/ai/CURSOR_REPORT.md` (this file; Central magnet resolve)
+- `docs/core/UM_CORE_PLATFORM_OPERATIONAL_ERROR_CONTRACT_V1.md` (new)
+- `platforms/core/operationalErrorContract.lock.test.ts` (new)
+- `UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1_REPORT.md` (new)
+- `docs/ai/UM_CORE_PLATFORM_OPERATIONAL_ERROR_AND_RELEASE_SIGNOFF_CLOSEOUT_V1_REPORT.md` (new)
+- `docs/ai/CURSOR_REPORT.md` (this file)
 
 ## Migrations created
 
@@ -16,35 +25,33 @@ None.
 
 ## Security review
 
-Docs/tests/fixture only. No secrets, network, DB, auth, or remote migration activity. P19 remains unused-by-default. P23 remains not root-public by design.
+Docs/tests only. No secrets, network, DB, or remote migration activity. P19
+remains unused-by-default (no consumer invented).
 
 ## Tests
 
-- A1 focused public API / BC / foundation: 22/22 PASS (agent)
-- A2 RC pack: 22/22 PASS (agent)
-- Full `platforms/core`: revalidated by Central after integrate (see decision report)
+- Lock suite: 4/4 PASS
+- Full `platforms/core`: 40 files / 419 tests PASS
 
 ## TypeScript
 
-`npx tsc --noEmit` → revalidated by Central after integrate
+`npx tsc --noEmit` → exit 0
 
 ## Build
 
-Skipped (docs/tests only; no UI/entry change).
+Skipped (docs/tests only; no app UI/entry change).
 
 ## git diff --check
 
-PASS (Central)
+PASS (pre-commit)
 
 ## git status --short
 
-See Central decision report after push.
+See post-commit status in task report.
 
 ## Open issues
 
-- Normative Spec + Engineering Standards still missing
-- Operational readiness boundary doc still missing
-- A3 `UM_CORE_PLATFORM_PRODUCTION_RELEASE_READINESS_AUDIT_V2` full report ABSENT on Server share (INPUT flags consumed)
-- PRODUCTION_READY / CAN_DECLARE remain NO until remaining evidence closeout + Central declare
-- P23 root-public intentionally NO — do not assign inventory-symmetry wire
-- P19 consumer not approved — do not manufacture consumer
+Central production signoff blocked until P23 packaging, Spec/Standards, and
+perf/scale assumptions evidence are on alpha (or explicitly waived). Ops/error
+closeout ready for Central integrate from this office branch. RC pack + public
+API inventory sync already on alpha as of `a93f522`.
