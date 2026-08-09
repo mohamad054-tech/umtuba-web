@@ -231,3 +231,18 @@ export {
   type TerminalInvariantScenario,
   type TerminalStateReplayInvariantsSnapshot,
 } from "./refundProviderTerminalStateReplayInvariants";
+export {
+  E2E_MATRIX_CHAIN_PHASES,
+  E2E_MATRIX_SCENARIOS,
+  REFUND_PROVIDER_RECONCILIATION_TERMINAL_E2E_MATRIX_VERSION,
+  assertE2eMatrixScenarioContract,
+  buildE2eMatrixPhaseFixtures,
+  runFullRefundProviderReconciliationTerminalE2eMatrix,
+  runRefundProviderReconciliationTerminalE2eMatrix,
+  type E2eMatrixChainPhase,
+  type E2eMatrixDecisionFields,
+  type E2eMatrixPhaseObservation,
+  type E2eMatrixRunResult,
+  type E2eMatrixSafetyCounters,
+  type E2eMatrixScenarioId,
+} from "./refundProviderReconciliationTerminalE2eMatrix";
