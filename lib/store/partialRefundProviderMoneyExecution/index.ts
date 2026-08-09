@@ -146,6 +146,20 @@ export {
   type StripeTestControlledTestPreActivationVerdict,
 } from "./stripeTestControlledTestPreActivationSafety";
 export {
+  STRIPE_TEST_CONTROL_PLANE_ACTIVATION_PERFORMED,
+  STRIPE_TEST_CONTROL_PLANE_ENVIRONMENT,
+  STRIPE_TEST_CONTROL_PLANE_HARDENING_VERSION,
+  STRIPE_TEST_CONTROL_PLANE_PROVIDER_EXECUTION_ENTRYPOINTS,
+  buildStripeTestControlPlaneReport,
+  getStripeTestControlPlaneBlockReasons,
+  isStripeTestControlPlaneReady,
+  type StripeTestControlPlaneAcceptanceMatrix,
+  type StripeTestControlPlaneAnswers,
+  type StripeTestControlPlaneMissingPrerequisite,
+  type StripeTestControlPlaneReport,
+  type StripeTestControlPlaneStatus,
+} from "./stripeTestControlPlaneHardening";
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
