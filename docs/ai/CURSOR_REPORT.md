@@ -1,60 +1,46 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1
+# CURSOR_REPORT — PC2-A3 UM Core perf/scale audit V1
 
 ## Summary
 
-**Verdict: HARDENED_AND_PUSHED — SUCCESS**
-
-PC2-A2 audited in-memory Core state holders on `origin/alpha-0.2` and fixed a
-proven P17 health-reporter read-path aliasing defect: `getSnapshot` / `list`
-now return defensive clones (aligned with P22 history). Added focused
-regression + cross-cutting hardening tests. No locks, persistence, architecture
-redesign, A1 error-contract edits, or alpha merge.
-
-Canonical Central report:
-`UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
+Completed AUDIT FIRST for `UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1` on `origin/alpha-0.2` @ `b6d48f915f97c5d20a3b5ca42ec32e83b58f1a57`. No production semantic changes. P0 none; one P1 (RI observation×deps rescans); several P2 catalog LIST/clone assumptions. Added audit doc + scale-smoke test; full gates green; branch pushed.
 
 ## Exact files changed
 
-- `platforms/core/health/healthReporter.ts`
-- `platforms/core/health/healthReporter.test.ts`
-- `platforms/core/health/stateImmutability.hardening.test.ts` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
-- `UM_CORE_PLATFORM_STATE_CONCURRENCY_AND_IMMUTABILITY_HARDENING_V1_REPORT.md`
+- `docs/core/UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1.md`
+- `platforms/core/umCoreScaleAssumptions.smoke.test.ts`
+- `UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1_REPORT.md`
+- `docs/ai/CURSOR_REPORT.md` (this file)
 
 ## Migrations created
 
-**NONE.**
+None.
 
 ## Security review
 
-- Narrow defensive-copy fix only
-- No network/DB/secrets/product domains
-- No distributed locks / persistence
-- A1 shared error-contract files untouched
+No secrets, auth, network, or DB changes. Docs + pure in-memory Vitest smoke only.
 
 ## Tests
 
-- Focused state-safety: **PASS**
-- Full `platforms/core`: **PASS** (25 files / 263 tests)
+- Scale smoke: PASS (1)
+- `platforms/core`: PASS (283)
 
 ## TypeScript
 
-`tsc --noEmit` → **PASS**
+`npx tsc --noEmit`: PASS
 
 ## Build
 
-N/A (Core library lane; gates did not require `npm run build`)
+`npm run build`: PASS
 
 ## git diff --check
 
-**PASS**
+PASS
 
 ## git status --short
 
-clean after push (0/0)
+Clean after commit/push (see agent report).
 
 ## Open issues
 
-1. Residual catalog/registry returned-record identity aliasing deferred (not reporter nested-snapshot class).
-2. Platform registry stores manifest by reference — residual; out of this lane.
-3. STOP — do not wait for A1; do not self-assign next work.
+- P1 RI index not implemented (report-only per audit lane)
+- Capability compat not on alpha — re-audit when integrated
