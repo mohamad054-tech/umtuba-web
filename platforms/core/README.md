@@ -232,3 +232,17 @@ Out of scope for P18: probe execution, polling, scheduling, networking,
 service discovery, distributed/DB join, fleet aggregation, alerting,
 freshness/TTL clocks, history ring, SDK client/factory, persistence,
 product integration, migrations.
+
+## Phase P21 scope
+
+Pure **in-memory SDK / client factory** under `platforms/core/sdk/`.
+
+- `createInMemoryUmCoreSdkFactory(deps)` implements `UmCoreSdkFactory`
+- Borrows caller-owned P14–P17 ports + P4 `register` (exact refs)
+- `createClient(identity)` returns a frozen thin facade
+- Fail-closed invalid deps / identity; result-returning port delegation
+- `register(manifest)` is P4 pass-through (`UmPlatformRegistrationResult`)
+
+Out of scope for P21: catalog construction, P12 mega-wire, P13/RI validators,
+P18 diagnostics join, fleet aggregation, networking, persistence, polling,
+scheduler, probe execution, product-domain SDKs, migrations.
