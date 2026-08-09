@@ -16,7 +16,7 @@ SOURCE_DEVICE=PC2 · DEVICE_ROLE=PLATFORM_CORE_PRIMARY · AGENT_ID=PC2-A3
 | VERDICT | `DRIFT_MATRIX_ADDED_AND_PUSHED — SUCCESS` |
 | BASE_SHA | `ffce2c084c99546c07c3a1067c07c3cd107aac2c` (`origin/alpha-0.2` exact match) |
 | BRANCH | `office/um-core-platform-catalog-drift-regression-matrix-v1` |
-| FINAL_SHA | 610ea234dd89d7f7fbbdc8d00c31bdb70cb80b54 |
+| FINAL_SHA | c80d551cdda6e85669aec693385f9a2bd1e5d777 |
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A3-UM-CORE-CATALOG-DRIFT-V1` |
 | ALPHA_MERGE | **NONE** |
 | OUTBOX | `C:\Users\Giga store\Desktop\umtuba\worktrees\OUTBOX_DROP\` |
