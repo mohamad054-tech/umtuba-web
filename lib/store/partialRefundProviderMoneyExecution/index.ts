@@ -246,3 +246,16 @@ export {
   type E2eMatrixSafetyCounters,
   type E2eMatrixScenarioId,
 } from "./refundProviderReconciliationTerminalE2eMatrix";
+export {
+  RC_SAFETY_MATRIX_PHASES,
+  RC_SAFETY_MATRIX_SCENARIOS,
+  REFUND_PROVIDER_RELEASE_CANDIDATE_SAFETY_MATRIX_VERSION,
+  assertRcSafetyMatrixRowContract,
+  buildRcSafetyMatrixFixtures,
+  runFullRefundProviderReleaseCandidateSafetyMatrix,
+  type RcSafetyMatrixPhase,
+  type RcSafetyMatrixRow,
+  type RcSafetyMatrixRunResult,
+  type RcSafetyMatrixSafetyCounters,
+  type RcSafetyMatrixScenarioId,
+} from "./refundProviderReleaseCandidateSafetyMatrix";
