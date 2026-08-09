@@ -1,31 +1,25 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_CATALOG_DRIFT_REGRESSION_MATRIX_V1
 
 ## Summary
 
-**Verdict: HARDENED_AND_PUSHED — SUCCESS** · **IMPLEMENTED=YES**
+**Verdict: DRIFT_MATRIX_ADDED_AND_PUSHED — SUCCESS** · **IMPLEMENTED=YES** (TEST-ONLY)
 
-PC2-A2 audited Core snapshots/read models for deterministic serialization and
-safe external consumption. P17/P22/join/fleet already safe. Proven P1 residual:
-registry/catalog `get`/`list` returned live store aliases — hardened with local
-defensive clones on admit + read surfaces. Added focused serialization/safety
-tests. No DTO framework, DB, A1 compat/readiness edits, or alpha merge.
+PC2-A3 added a consolidated deterministic catalog/stale-catalog drift regression
+matrix covering re-register without rematerializing dependents, publisher ×
+routing independence, declaration vs observation drift, and P13/RI coexistence.
+No production semantic changes. Alpha tip base
+`ffce2c084c99546c07c3a1067c07c3cd107aac2c` verified.
 
 Canonical Central report:
-`UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1_REPORT.md`
+`UM_CORE_PLATFORM_CATALOG_DRIFT_REGRESSION_MATRIX_V1_REPORT.md`
 
 ## Exact files changed
 
-- `platforms/core/registry/platformRegistry.ts`
-- `platforms/core/capability/capabilityRegistry.ts`
-- `platforms/core/event/eventTypeRegistry.ts`
-- `platforms/core/event/eventRouting.ts`
-- `platforms/core/flag/flagRegistry.ts`
-- `platforms/core/dependency/dependencyRegistry.ts`
-- `platforms/core/health/healthRegistry.ts`
-- `platforms/core/naming/namingRegistry.ts`
-- `platforms/core/snapshotSerialization.safety.test.ts` (new)
+- `platforms/core/catalogDrift.regression.test.ts` (new)
+- `UM_CORE_PLATFORM_CATALOG_DRIFT_REGRESSION_MATRIX_V1_REPORT.md`
+- `docs/ai/UM_CORE_PLATFORM_CATALOG_DRIFT_REGRESSION_MATRIX_V1_REPORT.md`
 - `docs/ai/CURSOR_REPORT.md` (this handoff)
-- `UM_CORE_PLATFORM_DETERMINISTIC_SERIALIZATION_AND_SNAPSHOT_SAFETY_V1_REPORT.md`
+- OUTBOX drop copy under `worktrees/OUTBOX_DROP/`
 
 ## Migrations created
 
@@ -33,14 +27,14 @@ Canonical Central report:
 
 ## Security review
 
-- Narrow catalog defensive-copy hardening only
-- No network/DB/secrets/product domains
-- A1 capability-compat + lifecycle readiness untouched
+- Tests only; public alpha APIs only
+- No A1/A2 production edits; no DB/network/secrets/product domains
+- Conflict + secret scans PASS
 
 ## Tests
 
-- Focused serialization/safety: **PASS** (5)
-- Full `platforms/core`: **PASS** (29 files / 287 tests)
+- Focused drift matrix: **9/9 PASS**
+- Full `platforms/core`: **33 files / 342 tests PASS**
 
 ## TypeScript
 
@@ -48,7 +42,7 @@ Canonical Central report:
 
 ## Build
 
-N/A (Core library lane)
+N/A (Core library / tests-only lane)
 
 ## git diff --check
 
@@ -60,6 +54,5 @@ Expected clean after push (0/0)
 
 ## Open issues
 
-1. Aggregate registry facade still borrows specialized registry object refs (by design).
-2. SDK still borrows port object refs (documented); ports clone on catalog/health reads.
-3. Stop — no next self-assignment; no alpha merge.
+1. Stop — no next self-assignment; no alpha merge.
+2. Integration remains Central-owned.
