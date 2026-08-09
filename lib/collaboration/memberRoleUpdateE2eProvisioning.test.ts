@@ -14,7 +14,7 @@ describe("memberRoleUpdateE2eProvisioning", () => {
 
   it("fails closed without env gate", () => {
     expect(
-      collaborationMemberRoleE2eOwnerCredentialsPresent({} as NodeJS.ProcessEnv)
+      collaborationMemberRoleE2eOwnerCredentialsPresent({} as unknown as NodeJS.ProcessEnv)
     ).toBe(false);
   });
 
@@ -26,7 +26,7 @@ describe("memberRoleUpdateE2eProvisioning", () => {
         COLLABORATION_E2E_OWNER_EMAIL: "owner@example.com",
         COLLABORATION_E2E_OWNER_PASSWORD: "x",
         COLLABORATION_E2E_WORKSPACE_ID: "ws-1",
-      } as NodeJS.ProcessEnv)
+      } as unknown as NodeJS.ProcessEnv)
     ).toBe(true);
   });
 
@@ -34,7 +34,7 @@ describe("memberRoleUpdateE2eProvisioning", () => {
     const f = collaborationMemberRoleE2eFixtureIds({
       COLLABORATION_E2E_WORKSPACE_ID: " ws-9 ",
       COLLABORATION_E2E_MEMBER_USER_ID: " u-2 ",
-    } as NodeJS.ProcessEnv);
+    } as unknown as NodeJS.ProcessEnv);
     expect(f.workspaceId).toBe("ws-9");
     expect(f.memberUserId).toBe("u-2");
   });
