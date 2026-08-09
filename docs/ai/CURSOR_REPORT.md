@@ -1,22 +1,24 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
+# CURSOR_REPORT
 
 ## Summary
 
-Implemented pure in-memory `UmDependencyValidator.validateRequirements` as Core P19 on branch `office/um-core-platform-dependency-validator-foundation-p19` from exact `origin/alpha-0.2` @ `ffce2c084c99546c07c3a1067c07c3cd107aac2c`. Fail-closed, result-returning, deterministic; codes under `dependency.validator.*`; unused-by-default vs P14–P17/SDK. Branch tip pushed at `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1` (feat `bf5e66d4cc321f913ca98d6c6d3913a3416fa955`).
+PC2-A1 consumer readiness audit for P19 Dependency Validator on
+`origin/alpha-0.2` @ `32a76207b149e68a27dc1e932d2c16aa47c9586e`.
+
+**VERDICT=`NO_CONSUMER_APPROVED` · IMPLEMENTED=`NO` · APPROVED_CONSUMER=`NONE`.**
+
+P19 remains unused-by-default. No existing Core boundary (registration,
+manifest, compliance, readiness, SDK, P9, P13, RI, or other) has a strong
+evidence-supported reason to consume `validateRequirements` without inventing
+duplication or semantic collision. No product wiring performed.
 
 ## Exact files changed
 
-- `platforms/core/validation/dependencyValidator.ts`
-- `platforms/core/validation/dependencyValidatorCodes.ts`
-- `platforms/core/validation/dependencyValidator.test.ts`
-- `platforms/core/validation/interfaces.ts`
-- `platforms/core/dependency/types.ts`
-- `platforms/core/packageIdentity.ts`
-- `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19.md`
-- `UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
-- `docs/ai/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT.md`
-- `docs/ai/CURSOR_REPORT.md`
+- `UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_CONSUMER_READINESS_AUDIT_V1_REPORT.md` (worktree root; report-only)
+- `docs/ai/UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_CONSUMER_READINESS_AUDIT_V1_REPORT.md` (handoff copy)
+- `docs/ai/CURSOR_REPORT.md` (this handoff)
+
+No production TypeScript / Core module edits.
 
 ## Migrations created
 
@@ -24,29 +26,33 @@ None.
 
 ## Security review
 
-No secrets introduced. No network/DB/product wiring. Fail-closed unknown platform / unknown targets. Secret scan PASS on changed files.
+No secrets, keys, `.env`, network, DB, or migrations touched. Report-only.
 
 ## Tests
 
-- Focused: `npx.cmd vitest run platforms/core/validation/dependencyValidator.test.ts` PASS (14)
-- Full core: `npx.cmd vitest run platforms/core` PASS (33 files / 347 tests)
+- Focused: `dependencyValidator` + `coreValidator` + `referentialIntegrity` — **39/39 PASS**
+- Full Core: `npx vitest run platforms/core` — **35 files / 358 tests PASS**
 
 ## TypeScript
 
-`npx.cmd tsc --noEmit` PASS
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-Not required by task (no app UI/entry-point changes).
+Not required (no UI/entry-point product change; audit-only).
 
 ## git diff --check
 
-PASS
+**PASS** (no product diff / clean)
 
 ## git status --short
 
-Clean after handoff commit (see report).
+Report artifacts only on audit branch; product tree at alpha tip
+`32a76207b149e68a27dc1e932d2c16aa47c9586e`; ahead/behind vs
+`origin/alpha-0.2` = `0/0`.
 
 ## Open issues
 
-None for P19 scope. Ready for integration; do not self-assign next work.
+None for this task. Future P19 consumer wiring requires a separate Central GO
+naming exactly one justified consumer and an integration contract before any
+shared-file reservation.
