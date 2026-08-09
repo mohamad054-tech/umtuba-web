@@ -58,6 +58,17 @@ export {
   buildPartialRefundProviderIdempotencyKey,
 } from "./idempotency";
 export {
+  REFUND_PROVIDER_IDEMPOTENCY_REPLAY_SAFETY_VERSION,
+  REFUND_PROVIDER_IDEMPOTENCY_REPLAY_SCENARIOS,
+  assertRefundProviderIdempotencyReplaySafety,
+  buildRefundProviderIdempotencyReplaySafety,
+  classifyRefundProviderReplayAttempt,
+  type BuildRefundProviderIdempotencyReplaySafetyInput,
+  type RefundProviderIdempotencyReplayDisposition,
+  type RefundProviderIdempotencyReplaySafetySnapshot,
+  type RefundProviderIdempotencyReplayScenario,
+} from "./refundProviderIdempotencyReplaySafety";
+export {
   assertPartialRefundProviderMoneyExecutionGates,
   executeCommittedPartialRefundProviderMoney,
   executePartialRefundProviderMoney,
