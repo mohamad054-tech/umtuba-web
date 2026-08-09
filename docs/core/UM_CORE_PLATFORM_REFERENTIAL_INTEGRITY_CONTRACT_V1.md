@@ -1,7 +1,7 @@
 # UM Core Platform Referential Integrity Contract V1
 
-**TASK_ID:** `UM_CORE_PLATFORM_REFERENTIAL_INTEGRITY_CONTRACT_V1`  
-**Phase surface:** pure review helper under `platforms/core/validation/`  
+**TASK_ID:** `UM_CORE_PLATFORM_REFERENTIAL_INTEGRITY_CONTRACT_V1`
+**Phase surface:** pure review helper under `platforms/core/validation/`
 **Base:** verified `origin/alpha-0.2` (includes P1–P17)
 
 ## Law
