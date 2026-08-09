@@ -33,8 +33,8 @@ import type {
 export type UmPlatformReadinessStatus = "READY" | "NOT_READY";
 
 /**
- * Foundation phase for this module (local constant — root packageIdentity
- * wiring deferred to avoid shared-export collisions).
+ * Foundation phase for this module (local constant only).
+ * Not mirrored into packageIdentity — P23 remains intentionally not root-public.
  */
 export const UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE = "P23" as const;
 

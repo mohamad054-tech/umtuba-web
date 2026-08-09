@@ -1,8 +1,8 @@
 /**
  * UM Core platform lifecycle readiness foundation (P23) — local barrel.
  *
- * Not re-exported from platforms/core/index.ts in this milestone
- * (shared barrel wiring deferred to avoid export collisions).
+ * Intentionally not re-exported from platforms/core/index.ts.
+ * Accepted architecture: not root-public until a separate Central magnet GO.
  */
 
 export * from "./codes";

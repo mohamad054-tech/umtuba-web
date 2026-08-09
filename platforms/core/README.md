@@ -290,3 +290,18 @@ Pure **bounded in-memory health observation history** under `platforms/core/heal
 Out of scope for P22: probe execution, polling, scheduling, networking,
 durable telemetry/DB/event store, alerting, P17 reporter mutation,
 fleet aggregation, SDK client/factory, product integration, migrations.
+
+## Phase P23 scope (local barrel — not root-public)
+
+Pure **platform lifecycle readiness** under `platforms/core/readiness/`.
+
+- `createPlatformReadinessEvaluator({ platforms, declarations, observations })`
+- Fail-closed `READY` / `NOT_READY` over supplied P4 + P10 + P17 state
+- Local phase marker: `UM_CORE_PLATFORM_LIFECYCLE_READINESS_PHASE = "P23"`
+- **Visibility:** local barrel only — **not** re-exported from
+  `platforms/core/index.ts`; **not** mirrored into `packageIdentity.ts`
+- Consumers that need P23 must deep-import `platforms/core/readiness` until a
+  future Central root-magnet GO (not required for production-readiness closeout)
+
+Out of scope for P23: probes, polling, networking, DB/migrations, schedulers,
+deployment orchestration, product-domain wiring, automatic root public export.
