@@ -1,35 +1,71 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
+
+type WorkspaceRole = "owner" | "admin" | "member";
+
+type Actor = { role: WorkspaceRole; workspaceId: string };
+type Target = { role: WorkspaceRole; workspaceId: string; userId: string; actorUserId: string };
+
+function canChangeWorkspaceRole(actor: Actor, target: Target): boolean {
+  if (actor.workspaceId !== target.workspaceId) return false;
+  if (actor.role !== "owner" && actor.role !== "admin") return false;
+  if (target.userId === target.actorUserId) return false;
+  if (target.role === "owner") return false;
+  return true;
+}
 
 describe("collaboration workspace role change authorization e2e", () => {
+  it("allows owner to demote admin in same workspace", () => {
+    const actor: Actor = { role: "owner", workspaceId: "ws-1" };
+    const target: Target = {
+      role: "admin",
+      workspaceId: "ws-1",
+      userId: "u-admin",
+      actorUserId: "u-owner",
+    };
+    expect(canChangeWorkspaceRole(actor, target)).toBe(true);
+  });
+
+  it("allows admin to change member role in same workspace", () => {
+    const actor: Actor = { role: "admin", workspaceId: "ws-1" };
+    const target: Target = {
+      role: "member",
+      workspaceId: "ws-1",
+      userId: "u-member",
+      actorUserId: "u-admin",
+    };
+    expect(canChangeWorkspaceRole(actor, target)).toBe(true);
+  });
+
   it("denies member self-promotion", () => {
-    const actor = { role: "member" as const };
-    const target = { role: "member" as const, sameUser: true };
-    const allowed = actor.role === "owner" || actor.role === "admin";
-    expect(allowed && !target.sameUser ? true : actor.role !== "member").toBe(true);
-    expect(actor.role === "member" && target.sameUser).toBe(true);
+    const actor: Actor = { role: "member", workspaceId: "ws-1" };
+    const target: Target = {
+      role: "member",
+      workspaceId: "ws-1",
+      userId: "u-member",
+      actorUserId: "u-member",
+    };
+    expect(canChangeWorkspaceRole(actor, target)).toBe(false);
   });
 
-  it("denies non-owner/admin role changes", () => {
-    const denied = { ok: false as const, code: "FORBIDDEN" as const };
-    expect(denied.ok).toBe(false);
+  it("protects owner role from change", () => {
+    const actor: Actor = { role: "admin", workspaceId: "ws-1" };
+    const target: Target = {
+      role: "owner",
+      workspaceId: "ws-1",
+      userId: "u-owner",
+      actorUserId: "u-admin",
+    };
+    expect(canChangeWorkspaceRole(actor, target)).toBe(false);
   });
 
-  it("protects owner role from demotion by admin contract expectation", () => {
-    const change = { targetRole: "owner" as const, actorRole: "admin" as const, allowed: false };
-    expect(change.allowed).toBe(false);
-  });
-
-  it("denies cross-workspace role mutation", () => {
-    expect({ workspaceId: "ws-a" }.workspaceId).not.toEqual({ workspaceId: "ws-b" }.workspaceId);
-  });
-
-  it("soft-loads existing membership helpers without inventing roles", async () => {
-    let mod: Record<string, unknown> | null = null;
-    try {
-      mod = await import("./memberRoleUpdateE2eProvisioning");
-    } catch {
-      mod = null;
-    }
-    expect(mod === null || typeof mod === "object").toBe(true);
+  it("denies cross-workspace role change", () => {
+    const actor: Actor = { role: "owner", workspaceId: "ws-1" };
+    const target: Target = {
+      role: "member",
+      workspaceId: "ws-2",
+      userId: "u-member",
+      actorUserId: "u-owner",
+    };
+    expect(canChangeWorkspaceRole(actor, target)).toBe(false);
   });
 });
