@@ -23,7 +23,7 @@
 | VERDICT | **RC_PACK_ADDED_AND_PUSHED — SUCCESS** |
 | SEMANTIC_DEFECT_FOUND | **NO** |
 | PACK_COMMIT | `267db64e912fda4132bfe438b4b0b07bb6b1d8da` (test pack) |
-| FINAL_SHA | branch tip after finalize push (see agent RETURN / `git rev-parse HEAD`) |
+| FINAL_SHA | `8b8b9b1dbfbc3770b38f0bc160198118ba20c853` |
 | REMOTE_BRANCH | `origin/office/um-core-platform-release-candidate-regression-pack-v1` |
 | PUSH | **DONE** (tracking clean after push) |
 | OUTBOX | Not available on this device (no OUTBOX / OUTBOX_DROP path found) |
