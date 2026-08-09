@@ -1,6 +1,6 @@
 # Partial Refund Provider Money — Stripe TEST Fixture Env Readiness V1
 
-**Purpose:** Operator checklist for isolated Stripe **TEST** prerequisites.  
+**Purpose:** Operator checklist for isolated Stripe **TEST** prerequisites.
 **Does not** activate provider gate/mode. **Does not** move money. **Does not** use live Stripe.
 
 Related code (audit helper, no network):
@@ -38,7 +38,7 @@ Place **TEST-only** values in the isolated worktree local env file (recommended:
 | `STRIPE_WEBHOOK_SECRET` | prefix `whsec_` |
 | `NEXT_PUBLIC_APP_URL` | valid local/test app origin |
 
-Optional alias for publishable: `STRIPE_PUBLISHABLE_KEY` (same `pk_test_` rule).  
+Optional alias for publishable: `STRIPE_PUBLISHABLE_KEY` (same `pk_test_` rule).
 Origin aliases: `APP_ORIGIN` / `NEXT_PUBLIC_SITE_URL` (prefer `NEXT_PUBLIC_APP_URL`).
 
 ### Future temporary TEST activation GO only (keep unset during readiness)
