@@ -15,9 +15,10 @@ SOURCE_DEVICE=PC2 · DEVICE_ROLE=PLATFORM_CORE_PRIMARY · AGENT_ID=PC2-A2
 | BASE | `origin/alpha-0.2` @ `b6d48f915f97c5d20a3b5ca42ec32e83b58f1a57` |
 | BRANCH | `office/um-core-platform-public-api-backward-compatibility-guard-v1` |
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A2-UM-CORE-PUBLIC-API-COMPAT-GUARD-V1` |
+| BRANCH_TIP | `3183dd048a5dcde94a86ec67b86601511ab9c504` |
 | VERDICT | `IMPLEMENTED_TESTED_AND_PUSHED` |
 | IMPLEMENTED | `YES` |
-| REMOTE_SYNC | pending push (see tip after push) |
+| REMOTE_SYNC | `0/0` clean |
 | OUTBOX | Not present on PC2; report written to worktree root + `docs/ai/` |
 
 ## Decision
