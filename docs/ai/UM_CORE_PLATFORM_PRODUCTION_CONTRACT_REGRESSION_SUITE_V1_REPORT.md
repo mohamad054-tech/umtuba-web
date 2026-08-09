@@ -22,6 +22,9 @@
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A3-UM-CORE-PRODUCTION-CONTRACT-SUITE-V1` |
 | ALPHA_MERGE | **NONE** |
 | VERDICT | **CONTRACT_SUITE_ADDED_AND_PUSHED — SUCCESS** |
+| COMMIT | `d052e5bfbd820b8e8bc706ae65e1f2e44cc32a19` |
+| REMOTE_BRANCH | `origin/office/um-core-platform-production-contract-regression-suite-v1` |
+| PUSH | **DONE** (tracking clean) |
 
 ## Summary
 
@@ -108,7 +111,7 @@ Not required (tests-only; no UI/entry-point change). Skipped.
 
 ## git status --short
 
-Post-push expected: clean working tree on own branch (see commit/push section).
+Clean after tip finalize (`0/0` on own remote branch).
 
 ## Open issues
 
@@ -120,10 +123,10 @@ Post-push expected: clean working tree on own branch (see commit/push section).
 
 | Field | Value |
 | --- | --- |
-| COMMIT | *(filled after commit)* |
+| COMMIT (suite) | `d052e5bfbd820b8e8bc706ae65e1f2e44cc32a19` |
 | REMOTE_BRANCH | `origin/office/um-core-platform-production-contract-regression-suite-v1` |
-| PUSH | *(filled after push)* |
-| WORKING_TREE | expected `0/0` clean after push |
+| PUSH | **DONE** |
+| WORKING_TREE | `0/0` clean |
 
 ## STOP
 
