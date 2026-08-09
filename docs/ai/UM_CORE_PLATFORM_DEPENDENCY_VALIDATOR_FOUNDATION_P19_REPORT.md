@@ -1,4 +1,4 @@
-# UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT
+﻿# UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19_REPORT
 
 SOURCE_DEVICE=PC2  
 DEVICE_ROLE=PLATFORM_CORE_PRIMARY  
@@ -7,7 +7,7 @@ TASK_ID=UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
 
 ## VERDICT
 
-**PASS** — Pure in-memory `UmDependencyValidator.validateRequirements` foundation P19 implemented, tested, committed, and pushed. Upstream tracking clean `0/0`.
+**PASS** â€” Pure in-memory `UmDependencyValidator.validateRequirements` foundation P19 implemented, tested, committed, and pushed. Upstream tracking clean `0/0`.
 
 ## BASE_SHA
 
@@ -20,7 +20,7 @@ TASK_ID=UM_CORE_PLATFORM_DEPENDENCY_VALIDATOR_FOUNDATION_P19
 ## FINAL_SHA
 
 `bf5e66d4cc321f913ca98d6c6d3913a3416fa955` (implementation)  
-BRANCH_TIP after docs handoff: see git status at delivery (docs commit follows).
+BRANCH_TIP=$tip
 
 ## FILES_CHANGED
 
@@ -47,7 +47,7 @@ validator.validateRequirements(platformId, requirements): UmDependencyValidation
 validateDependencyRequirements(platformId, requirements, deps) // free function, same semantics
 ```
 
-Properties: fail-closed · result-returning · deterministic · pure in-memory · no throw · no mutation · no network · no resolver / version solver / DI / Dependency Graph / Configuration Validation.
+Properties: fail-closed آ· result-returning آ· deterministic آ· pure in-memory آ· no throw آ· no mutation آ· no network آ· no resolver / version solver / DI / Dependency Graph / Configuration Validation.
 
 ## CODES_ADDED
 
@@ -68,43 +68,43 @@ Distinct from `dependency.validation.*` (P13) and `referential.*` (RI).
 
 ## P13_SEMANTICS_UNCHANGED
 
-YES — `validatePlatformDependencies` / `UmDependencyValidationCode` untouched; focused suite asserts P13 still emits `dependency.validation.*` completeness findings and P19 does not.
+YES â€” `validatePlatformDependencies` / `UmDependencyValidationCode` untouched; focused suite asserts P13 still emits `dependency.validation.*` completeness findings and P19 does not.
 
 ## RI_SEMANTICS_UNCHANGED
 
-YES — `validateReferentialIntegrity` / `UmReferentialIntegrityCode` untouched; P19 codes proven disjoint from RI namespace.
+YES â€” `validateReferentialIntegrity` / `UmReferentialIntegrityCode` untouched; P19 codes proven disjoint from RI namespace.
 
 ## UNUSED_BY_DEFAULT_P14_P17
 
-YES — No auto-wire into P14 flag evaluator, P15 capability asserter, P16 event publisher, P17 health reporter, or P21 SDK factory deps/client. Optional explicit composition only.
+YES â€” No auto-wire into P14 flag evaluator, P15 capability asserter, P16 event publisher, P17 health reporter, or P21 SDK factory deps/client. Optional explicit composition only.
 
 ## FOCUSED_TESTS
 
-PASS — `npx.cmd vitest run platforms/core/validation/dependencyValidator.test.ts` → 14/14
+PASS â€” `npx.cmd vitest run platforms/core/validation/dependencyValidator.test.ts` â†’ 14/14
 
 ## FULL_CORE_REGRESSION
 
-PASS — `npx.cmd vitest run platforms/core` → 33 files / 347 tests passed
+PASS â€” `npx.cmd vitest run platforms/core` â†’ 33 files / 347 tests passed
 
 ## TSC
 
-PASS — `npx.cmd tsc --noEmit`
+PASS â€” `npx.cmd tsc --noEmit`
 
 ## DIFF_CHECK
 
-PASS — `git diff --check`
+PASS â€” `git diff --check`
 
 ## CONFLICT_SCAN
 
-PASS — no `<<<<<<<` / `=======` / `>>>>>>>` in changed files
+PASS â€” no `<<<<<<<` / `=======` / `>>>>>>>` in changed files
 
 ## SECRET_SCAN
 
-PASS — no secret-like patterns in changed files
+PASS â€” no secret-like patterns in changed files
 
 ## PUSH_STATUS
 
-PUSHED — `origin/office/um-core-platform-dependency-validator-foundation-p19` @ `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1`
+PUSHED â€” `origin/office/um-core-platform-dependency-validator-foundation-p19` @ `ac0a43a2e0bf35e178d6f7047054ee2f9457a0c1`
 
 ## AHEAD_BEHIND
 
@@ -116,7 +116,7 @@ Clean.
 
 ## READY_FOR_INTEGRATION
 
-YES — branch tip pushed, checks green, scope limited to reserved P19 areas, unused-by-default vs P14–P17/SDK preserved.
+YES â€” branch tip pushed, checks green, scope limited to reserved P19 areas, unused-by-default vs P14â€“P17/SDK preserved.
 
 ## WORKTREE
 
