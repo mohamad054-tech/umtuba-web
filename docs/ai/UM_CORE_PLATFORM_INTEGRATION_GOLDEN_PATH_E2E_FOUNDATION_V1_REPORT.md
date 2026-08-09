@@ -15,7 +15,10 @@ SOURCE_DEVICE=PC2 · DEVICE_ROLE=PLATFORM_CORE_PRIMARY · AGENT_ID=PC2-A3
 | BASE | `origin/alpha-0.2` @ `7bb13f0185a2676aa15182e463292a1c9617d282` |
 | BRANCH | `office/um-core-platform-integration-golden-path-e2e-foundation-v1` |
 | WORKTREE | `C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-A3-UM-CORE-GOLDEN-PATH-V1` |
+| BRANCH_TIP | `68221de07a220e1bf0f692fda7753fdcddb5610e` |
+| PRODUCT_COMMIT | `97be46ac7dfd51395d0f7e77565fe0c652db618d` |
 | VERDICT | `IMPLEMENTED_AND_PUSHED` |
+| REMOTE_SYNC | `0/0` clean |
 
 ## Summary
 
@@ -103,7 +106,7 @@ N/A (integration-test-only; no app UI/entry change)
 
 ## git status --short
 
-Expected clean after push (0/0).
+clean (0/0) after push of tip `68221de`.
 
 ## OUTBOX_DROP
 
