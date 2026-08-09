@@ -1,0 +1,471 @@
+{
+  "schemaVersion": 1,
+  "taskId": "UM_CORE_PLATFORM_PUBLIC_API_BACKWARD_COMPATIBILITY_GUARD_V1",
+  "publicBarrel": "platforms/core/index.ts",
+  "law": "Public API = symbols reachable from platforms/core/index.ts. Freeze practical contracts only.",
+  "healthStatuses": [
+    "ready",
+    "degraded",
+    "unavailable"
+  ],
+  "p12FacadeSlots": [
+    "platforms",
+    "capabilities",
+    "events",
+    "flags",
+    "health",
+    "dependencies",
+    "naming"
+  ],
+  "constants": {
+    "UM_CORE_PACKAGE_ID": "um.core",
+    "UM_CORE_PACKAGE_LABEL": "UM Core Platform",
+    "UM_CORE_FOUNDATION_PHASE": "P1",
+    "UM_CORE_MANIFEST_VALIDATION_PHASE": "P2",
+    "UM_CORE_COMPLIANCE_ENGINE_PHASE": "P3",
+    "UM_CORE_REGISTRY_FOUNDATION_PHASE": "P4",
+    "UM_CORE_CAPABILITY_REGISTRY_PHASE": "P5",
+    "UM_CORE_EVENT_TYPE_REGISTRY_PHASE": "P6",
+    "UM_CORE_EVENT_ROUTING_PHASE": "P7",
+    "UM_CORE_FEATURE_FLAG_REGISTRY_PHASE": "P8",
+    "UM_CORE_DEPENDENCY_REGISTRY_PHASE": "P9",
+    "UM_CORE_HEALTH_DECLARATION_CATALOG_PHASE": "P10",
+    "UM_CORE_NAMING_REGISTRY_PHASE": "P11",
+    "UM_CORE_AGGREGATE_REGISTRY_FACADE_PHASE": "P12",
+    "UM_CORE_VALIDATOR_COMPOSITION_PHASE": "P13",
+    "UM_CORE_FLAG_EVALUATOR_PHASE": "P14",
+    "UM_CORE_CAPABILITY_ASSERTER_PHASE": "P15",
+    "UM_CORE_EVENT_PUBLISHER_PHASE": "P16",
+    "UM_CORE_HEALTH_REPORTER_PHASE": "P17",
+    "UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE": "P18",
+    "UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE": "P20",
+    "UM_CORE_SDK_CLIENT_FACTORY_PHASE": "P21",
+    "UM_CORE_BOUNDED_HEALTH_HISTORY_PHASE": "P22"
+  },
+  "maturityLevels": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "codeTables": {
+    "UmManifestValidationCode": {
+      "PLATFORM_ID_REQUIRED": "manifest.platform_id.required",
+      "PLATFORM_ID_NAMING": "manifest.platform_id.naming",
+      "PLATFORM_VERSION_REQUIRED": "manifest.platform_version.required",
+      "PLATFORM_VERSION_FORMAT": "manifest.platform_version.format",
+      "PLATFORM_DISPLAY_NAME_REQUIRED": "manifest.display_name.required",
+      "OWNERS_REQUIRED": "manifest.owners.required",
+      "OWNER_ID_REQUIRED": "manifest.owners.id.required",
+      "OWNER_DISPLAY_NAME_REQUIRED": "manifest.owners.display_name.required",
+      "SOT_STATEMENT_REQUIRED": "manifest.sot_statement.required",
+      "NON_OWNERSHIP_STATEMENT_REQUIRED": "manifest.non_ownership_statement.required",
+      "DOCUMENTATION_REFS_REQUIRED": "manifest.documentation_refs.required",
+      "MATURITY_LEVEL_INVALID": "manifest.maturity_level.invalid",
+      "HEALTH_REQUIRED": "manifest.health.required",
+      "HEALTH_REPORTS_STATUS_REQUIRED": "manifest.health.reports_status.required",
+      "MODULE_ID_REQUIRED": "manifest.modules.id.required",
+      "MODULE_ID_NAMING": "manifest.modules.id.naming",
+      "MODULE_ID_DUPLICATE": "manifest.modules.id.duplicate",
+      "MODULE_DISPLAY_NAME_REQUIRED": "manifest.modules.display_name.required",
+      "MODULE_CAPABILITY_REF_UNKNOWN": "manifest.modules.capability_ref.unknown",
+      "MODULE_CAPABILITY_REF_MISMATCH": "manifest.modules.capability_ref.mismatch",
+      "CAPABILITY_ID_REQUIRED": "manifest.capabilities.id.required",
+      "CAPABILITY_ID_NAMING": "manifest.capabilities.id.naming",
+      "CAPABILITY_ID_DUPLICATE": "manifest.capabilities.id.duplicate",
+      "CAPABILITY_DISPLAY_NAME_REQUIRED": "manifest.capabilities.display_name.required",
+      "CAPABILITY_MODULE_REQUIRED": "manifest.capabilities.module_id.required",
+      "CAPABILITY_MODULE_UNKNOWN": "manifest.capabilities.module_id.unknown",
+      "CAPABILITY_VERSION_REQUIRED": "manifest.capabilities.version.required",
+      "CAPABILITY_VERSION_FORMAT": "manifest.capabilities.version.format",
+      "CAPABILITY_STABILITY_INVALID": "manifest.capabilities.stability.invalid",
+      "CAPABILITY_SIDE_EFFECTS_REQUIRED": "manifest.capabilities.side_effects.required",
+      "CAPABILITY_SIDE_EFFECT_INVALID": "manifest.capabilities.side_effects.invalid",
+      "CAPABILITY_SIDE_EFFECT_DUPLICATE": "manifest.capabilities.side_effects.duplicate",
+      "CAPABILITY_ELEVATED_FLAG_REQUIRED": "manifest.capabilities.elevated_flag.required",
+      "CAPABILITY_FLAG_UNKNOWN": "manifest.capabilities.flag_id.unknown",
+      "CAPABILITY_PLATFORM_SCOPE": "manifest.capabilities.id.platform_scope",
+      "EVENT_TYPE_REQUIRED": "manifest.events.type.required",
+      "EVENT_TYPE_NAMING": "manifest.events.type.naming",
+      "EVENT_TYPE_DUPLICATE": "manifest.events.type.duplicate",
+      "EVENT_SCHEMA_VERSION_REQUIRED": "manifest.events.schema_version.required",
+      "EVENT_SCHEMA_VERSION_FORMAT": "manifest.events.schema_version.format",
+      "EVENT_STABILITY_INVALID": "manifest.events.stability.invalid",
+      "FLAG_ID_REQUIRED": "manifest.flags.id.required",
+      "FLAG_ID_NAMING": "manifest.flags.id.naming",
+      "FLAG_ID_DUPLICATE": "manifest.flags.id.duplicate",
+      "FLAG_DEFAULT_STATE_INVALID": "manifest.flags.default_state.invalid",
+      "FLAG_LINKED_CAPABILITY_UNKNOWN": "manifest.flags.linked_capability.unknown",
+      "DEPENDENCY_TARGET_KIND_INVALID": "manifest.requires.target_kind.invalid",
+      "DEPENDENCY_TARGET_ID_REQUIRED": "manifest.requires.target_id.required",
+      "DEPENDENCY_TARGET_ID_NAMING": "manifest.requires.target_id.naming",
+      "DEPENDENCY_STRENGTH_INVALID": "manifest.requires.strength.invalid",
+      "DEPENDENCY_REASON_REQUIRED": "manifest.requires.reason.required",
+      "DEPENDENCY_SELF_PLATFORM_CYCLE": "manifest.requires.self_platform_cycle",
+      "DEPENDENCY_DUPLICATE": "manifest.requires.duplicate",
+      "DEPENDENCY_CAPABILITY_UNKNOWN": "manifest.requires.capability_unknown",
+      "SIDE_EFFECT_SUMMARY_INVALID": "manifest.side_effect_summary.invalid",
+      "SIDE_EFFECT_SUMMARY_INCOMPLETE": "manifest.side_effect_summary.incomplete",
+      "SIDE_EFFECT_SUMMARY_EXTRA": "manifest.side_effect_summary.extra",
+      "NAV_CONTRIBUTION_ID_REQUIRED": "manifest.nav.id.required",
+      "NAV_CONTRIBUTION_ID_DUPLICATE": "manifest.nav.id.duplicate",
+      "NAV_CLASS_INVALID": "manifest.nav.class.invalid",
+      "NAV_CAPABILITY_UNKNOWN": "manifest.nav.capability_unknown",
+      "ADMISSION_MANIFEST_INVALID": "admission.manifest.invalid",
+      "ADMISSION_MATURITY_TOO_LOW": "admission.maturity.too_low"
+    },
+    "UmDependencyValidationCode": {
+      "UNKNOWN_PLATFORM": "dependency.validation.unknown_platform",
+      "MISSING_CATALOG_EDGE": "dependency.validation.missing_catalog_edge",
+      "STALE_CATALOG_EDGE": "dependency.validation.stale_catalog_edge",
+      "UNKNOWN_PLATFORM_TARGET": "dependency.validation.unknown_platform_target",
+      "UNKNOWN_CAPABILITY_TARGET": "dependency.validation.unknown_capability_target"
+    },
+    "UmReferentialIntegrityCode": {
+      "CAPABILITY_UNKNOWN_PLATFORM": "referential.capability.unknown_platform",
+      "CAPABILITY_UNKNOWN_FLAG": "referential.capability.unknown_flag",
+      "EVENT_TYPE_UNKNOWN_PRODUCER": "referential.event_type.unknown_producer",
+      "ROUTE_UNKNOWN_EVENT_TYPE": "referential.route.unknown_event_type",
+      "ROUTE_UNKNOWN_DESTINATION": "referential.route.unknown_destination",
+      "ROUTE_UNKNOWN_PRODUCER": "referential.route.unknown_producer",
+      "FLAG_UNKNOWN_PLATFORM": "referential.flag.unknown_platform",
+      "FLAG_UNKNOWN_LINKED_CAPABILITY": "referential.flag.unknown_linked_capability",
+      "DEPENDENCY_UNKNOWN_OWNER": "referential.dependency.unknown_owner",
+      "DEPENDENCY_UNKNOWN_PLATFORM_TARGET": "referential.dependency.unknown_platform_target",
+      "DEPENDENCY_UNKNOWN_CAPABILITY_TARGET": "referential.dependency.unknown_capability_target",
+      "HEALTH_DECLARATION_UNKNOWN_PLATFORM": "referential.health_declaration.unknown_platform",
+      "HEALTH_OBSERVATION_UNKNOWN_PLATFORM": "referential.health_observation.unknown_platform",
+      "HEALTH_OBSERVATION_UNKNOWN_CAPABILITY": "referential.health_observation.unknown_capability",
+      "HEALTH_OBSERVATION_UNKNOWN_DEPENDENCY_TARGET": "referential.health_observation.unknown_dependency_target"
+    },
+    "UmComplianceCode": {
+      "VALIDATION_UPSTREAM_ERROR": "compliance.validation.upstream_error",
+      "ADMISSION_UPSTREAM_ERROR": "compliance.admission.upstream_error",
+      "MATURITY_LEVEL_INVALID": "compliance.maturity.level_invalid",
+      "MATURITY_PROTOTYPE_NOT_CERTIFIABLE": "compliance.maturity.prototype_not_certifiable",
+      "MATURITY_PRODUCTION_REQUIRED": "compliance.maturity.production_required",
+      "MATURITY_ECOSYSTEM_REQUIRED": "compliance.maturity.ecosystem_required",
+      "MATURITY_EXPERIMENTAL_SURFACE": "compliance.maturity.experimental_surface",
+      "OWNERSHIP_MISSING": "compliance.ownership.missing",
+      "SOT_MISSING": "compliance.ownership.sot_missing",
+      "NON_OWNERSHIP_MISSING": "compliance.ownership.non_ownership_missing",
+      "DOCUMENTATION_MISSING": "compliance.evidence.documentation_missing",
+      "HEALTH_REPORTING_REQUIRED": "compliance.health.reporting_required",
+      "HEALTH_PROBE_EVIDENCE_MISSING": "compliance.evidence.health_probe_missing",
+      "ELEVATED_FLAG_DEFAULT_ON": "compliance.flags.elevated_default_on",
+      "ELEVATED_FLAG_REQUIRED": "compliance.flags.elevated_required",
+      "EVIDENCE_BUNDLE_THIN": "compliance.evidence.bundle_thin",
+      "WAIVER_INCOMPLETE": "compliance.waiver.incomplete",
+      "WAIVER_EXPIRED": "compliance.waiver.expired",
+      "WAIVER_APPLIED": "compliance.waiver.applied",
+      "CERT_CORE_BLOCKED": "compliance.certification.core_blocked",
+      "CERT_PRODUCTION_BLOCKED": "compliance.certification.production_blocked",
+      "CERT_ENTERPRISE_BLOCKED": "compliance.certification.enterprise_blocked",
+      "CERT_LTS_BLOCKED": "compliance.certification.lts_blocked"
+    },
+    "UmRegistryCode": {
+      "DUPLICATE_PLATFORM_ID": "registry.platform.duplicate_id",
+      "MANIFEST_INVALID": "registry.manifest.invalid",
+      "VALIDATION_FAILED": "registry.validation.failed",
+      "COMPLIANCE_FAILED": "registry.compliance.failed",
+      "OWNERSHIP_MISSING": "registry.ownership.missing",
+      "CERTIFICATION_INELIGIBLE": "registry.certification.ineligible",
+      "MATURITY_TOO_LOW": "registry.maturity.too_low",
+      "REGISTERED": "registry.platform.registered"
+    },
+    "UmCapabilityRegistryCode": {
+      "UNKNOWN_PLATFORM": "capability.registry.unknown_platform",
+      "UNKNOWN_MODULE": "capability.registry.unknown_module",
+      "DUPLICATE_CAPABILITY_ID": "capability.registry.duplicate_id",
+      "PLATFORM_NAMESPACE": "capability.registry.platform_namespace",
+      "SIDE_EFFECT_INVALID": "capability.registry.side_effect_invalid",
+      "SIDE_EFFECT_REQUIRED": "capability.registry.side_effect_required",
+      "SIDE_EFFECT_DUPLICATE": "capability.registry.side_effect_duplicate",
+      "VERSION_INVALID": "capability.registry.version_invalid",
+      "VERSION_REQUIRED": "capability.registry.version_required",
+      "OWNERSHIP_INVALID": "capability.registry.ownership_invalid",
+      "AUTH_CLASS_INVALID": "capability.registry.auth_class_invalid",
+      "STABILITY_INVALID": "capability.registry.stability_invalid",
+      "DISPLAY_NAME_REQUIRED": "capability.registry.display_name_required",
+      "CAPABILITY_ID_REQUIRED": "capability.registry.id_required",
+      "CAPABILITY_ID_NAMING": "capability.registry.id_naming",
+      "MODULE_CAPABILITY_REF_MISMATCH": "capability.registry.module_capability_ref_mismatch",
+      "REGISTERED": "capability.registry.registered"
+    },
+    "UmCapabilityAssertionCode": {
+      "UNKNOWN": "capability.assertion.unknown",
+      "CATALOG_ENABLED": "capability.assertion.catalog_enabled",
+      "FLAG_ENABLED": "capability.assertion.flag_enabled",
+      "FLAG_DISABLED": "capability.assertion.flag_disabled",
+      "FLAG_UNRESOLVED": "capability.assertion.flag_unresolved",
+      "ELEVATED_UNGATED": "capability.assertion.elevated_ungated"
+    },
+    "UmEventTypeRegistryCode": {
+      "UNKNOWN_PRODUCER": "event_type.registry.unknown_producer",
+      "DUPLICATE_EVENT_TYPE": "event_type.registry.duplicate_id",
+      "PLATFORM_NAMESPACE": "event_type.registry.platform_namespace",
+      "SCHEMA_VERSION_REQUIRED": "event_type.registry.schema_version_required",
+      "SCHEMA_VERSION_INVALID": "event_type.registry.schema_version_invalid",
+      "STABILITY_INVALID": "event_type.registry.stability_invalid",
+      "COMPATIBILITY_INVALID": "event_type.registry.compatibility_invalid",
+      "PII_CLASS_INVALID": "event_type.registry.pii_class_invalid",
+      "DELIVERY_EXPECTATION_INVALID": "event_type.registry.delivery_expectation_invalid",
+      "PAYLOAD_SCHEMA_REF_REQUIRED": "event_type.registry.payload_schema_ref_required",
+      "OWNERSHIP_MISSING": "event_type.registry.ownership_missing",
+      "MANIFEST_MISMATCH": "event_type.registry.manifest_mismatch",
+      "EVENT_TYPE_REQUIRED": "event_type.registry.id_required",
+      "EVENT_TYPE_NAMING": "event_type.registry.id_naming",
+      "SUBJECT_REF_EXPECTATIONS_REQUIRED": "event_type.registry.subject_ref_expectations_required",
+      "SUBJECT_REF_EXPECTATION_INVALID": "event_type.registry.subject_ref_expectation_invalid",
+      "REGISTERED": "event_type.registry.registered"
+    },
+    "UmEventRoutingCode": {
+      "UNKNOWN_EVENT_TYPE": "event_routing.unknown_event_type",
+      "PRODUCER_INVALID": "event_routing.producer_invalid",
+      "UNKNOWN_DESTINATION": "event_routing.unknown_destination",
+      "DESTINATION_REQUIRED": "event_routing.destination_required",
+      "DESTINATION_NAMING": "event_routing.destination_naming",
+      "EVENT_TYPE_REQUIRED": "event_routing.event_type_required",
+      "DUPLICATE_ROUTE": "event_routing.duplicate_route",
+      "REGISTERED": "event_routing.registered"
+    },
+    "UmEventPublishCode": {
+      "UNKNOWN_TYPE": "event.publish.unknown_type",
+      "PRODUCER_MISMATCH": "event.publish.producer_mismatch",
+      "SCHEMA_VERSION_MISMATCH": "event.publish.schema_version_mismatch",
+      "ENVELOPE_INVALID": "event.publish.envelope_invalid",
+      "SUBJECT_KIND_UNEXPECTED": "event.publish.subject_kind_unexpected"
+    },
+    "UmFlagRegistryCode": {
+      "UNKNOWN_PLATFORM": "flag.registry.unknown_platform",
+      "MANIFEST_MISMATCH": "flag.registry.manifest_mismatch",
+      "DUPLICATE_FLAG_ID": "flag.registry.duplicate_id",
+      "PLATFORM_NAMESPACE": "flag.registry.platform_namespace",
+      "FLAG_ID_REQUIRED": "flag.registry.id_required",
+      "FLAG_ID_NAMING": "flag.registry.id_naming",
+      "OWNER_REF_REQUIRED": "flag.registry.owner_ref_required",
+      "DEFAULT_STATE_INVALID": "flag.registry.default_state_invalid",
+      "LINKED_CAPABILITY_UNKNOWN": "flag.registry.linked_capability_unknown",
+      "LINKED_CAPABILITY_OWNERSHIP": "flag.registry.linked_capability_ownership",
+      "ELEVATED_DEFAULT_ON": "flag.registry.elevated_default_on",
+      "ELEVATED_AUDIT_REQUIRED": "flag.registry.elevated_audit_required",
+      "REGISTERED": "flag.registry.registered"
+    },
+    "UmFlagEvaluationCode": {
+      "UNKNOWN": "flag.evaluation.unknown",
+      "DEFAULT_ON": "flag.evaluation.default_on",
+      "DEFAULT_OFF": "flag.evaluation.default_off"
+    },
+    "UmDependencyRegistryCode": {
+      "UNKNOWN_OWNER_PLATFORM": "dependency.registry.unknown_owner_platform",
+      "UNKNOWN_PLATFORM_TARGET": "dependency.registry.unknown_platform_target",
+      "UNKNOWN_CAPABILITY_TARGET": "dependency.registry.unknown_capability_target",
+      "MANIFEST_MISMATCH": "dependency.registry.manifest_mismatch",
+      "DUPLICATE_EDGE": "dependency.registry.duplicate_edge",
+      "FROM_PLATFORM_REQUIRED": "dependency.registry.from_platform_required",
+      "FROM_PLATFORM_NAMING": "dependency.registry.from_platform_naming",
+      "TARGET_KIND_INVALID": "dependency.registry.target_kind_invalid",
+      "TARGET_ID_REQUIRED": "dependency.registry.target_id_required",
+      "TARGET_ID_NAMING": "dependency.registry.target_id_naming",
+      "STRENGTH_INVALID": "dependency.registry.strength_invalid",
+      "REASON_REQUIRED": "dependency.registry.reason_required",
+      "REQUIRED_PLATFORM_CYCLE": "dependency.registry.required_platform_cycle",
+      "REGISTERED": "dependency.registry.registered"
+    },
+    "UmHealthRegistryCode": {
+      "UNKNOWN_PLATFORM": "health.registry.unknown_platform",
+      "MANIFEST_MISMATCH": "health.registry.manifest_mismatch",
+      "DUPLICATE_PLATFORM": "health.registry.duplicate_platform",
+      "PLATFORM_ID_REQUIRED": "health.registry.platform_id_required",
+      "PLATFORM_ID_NAMING": "health.registry.platform_id_naming",
+      "REPORTS_STATUS_INVALID": "health.registry.reports_status_invalid",
+      "REGISTERED": "health.registry.registered"
+    },
+    "UmHealthReportCode": {
+      "PLATFORM_ID_REQUIRED": "health.report.platform_id_required",
+      "PLATFORM_ID_NAMING": "health.report.platform_id_naming",
+      "UNKNOWN_PLATFORM": "health.report.unknown_platform",
+      "STATUS_INVALID": "health.report.status_invalid",
+      "SNAPSHOT_INVALID": "health.report.snapshot_invalid"
+    },
+    "UmFleetHealthAggregationCode": {
+      "PLATFORM_ID_REQUIRED": "health.fleet.platform_id_required",
+      "PLATFORM_ID_NAMING": "health.fleet.platform_id_naming",
+      "DUPLICATE_PLATFORM": "health.fleet.duplicate_platform",
+      "UNKNOWN_PLATFORM": "health.fleet.unknown_platform",
+      "STATUS_INVALID": "health.fleet.status_invalid",
+      "INPUT_INVALID": "health.fleet.input_invalid"
+    },
+    "UmHealthHistoryCode": {
+      "CAPACITY_INVALID": "health.history.capacity_invalid",
+      "PLATFORM_ID_REQUIRED": "health.history.platform_id_required",
+      "PLATFORM_ID_NAMING": "health.history.platform_id_naming",
+      "UNKNOWN_PLATFORM": "health.history.unknown_platform",
+      "STATUS_INVALID": "health.history.status_invalid",
+      "SNAPSHOT_INVALID": "health.history.snapshot_invalid"
+    }
+  },
+  "deterministicIds": {
+    "buildEventRouteId": {
+      "args": [
+        "producer.core.pinged",
+        "consumer"
+      ],
+      "result": "producer.core.pinged=>consumer"
+    },
+    "buildDependencyEdgeId": {
+      "args": [
+        "example",
+        "peer_kernel",
+        "um.core",
+        "required"
+      ],
+      "result": "example=>peer_kernel:um.core:required"
+    }
+  },
+  "factoryMethods": {
+    "createInMemoryPlatformRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryCapabilityRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryEventTypeRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryEventRoutingRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryFlagRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryDependencyRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryHealthRegistry": [
+      "register",
+      "get",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryHealthReporter": [
+      "report",
+      "getSnapshot",
+      "list",
+      "has",
+      "size",
+      "clear"
+    ],
+    "createInMemoryNamingRegistry": [
+      "get",
+      "list",
+      "listByKind",
+      "listByPlatform",
+      "has",
+      "size",
+      "rebuild"
+    ],
+    "createManifestValidator": [
+      "validate"
+    ],
+    "createRegistrationValidator": [
+      "validateAdmission"
+    ],
+    "createComplianceEngine": [
+      "assess"
+    ],
+    "createInMemoryFlagEvaluator": [
+      "evaluate",
+      "evaluateBatch"
+    ],
+    "createInMemoryCapabilityAsserter": [
+      "assertEnabled"
+    ],
+    "createInMemoryEventPublisher": [
+      "publish"
+    ],
+    "createHealthDiagnosticsJoin": [
+      "evaluate"
+    ],
+    "createFleetHealthAggregation": [
+      "evaluate"
+    ],
+    "createInMemoryUmCoreSdkFactory": [
+      "createClient"
+    ],
+    "createUmCoreValidator": [
+      "manifests",
+      "registration",
+      "validateDependencies"
+    ]
+  },
+  "publicCallables": [
+    "validatePlatformManifest",
+    "createManifestValidator",
+    "validateManifestAdmission",
+    "createRegistrationValidator",
+    "isNonEmptyTrimmed",
+    "isUmMachineId",
+    "isUmVersionToken",
+    "isScopedUnderPlatform",
+    "validatePlatformDependencies",
+    "createUmCoreValidator",
+    "validateReferentialIntegrity",
+    "assessPlatformCompliance",
+    "createComplianceEngine",
+    "createInMemoryPlatformRegistry",
+    "createUmCoreRegistry",
+    "createInMemoryCapabilityRegistry",
+    "createInMemoryCapabilityAsserter",
+    "createInMemoryEventTypeRegistry",
+    "buildEventRouteId",
+    "createInMemoryEventRoutingRegistry",
+    "createInMemoryEventPublisher",
+    "createInMemoryFlagRegistry",
+    "createInMemoryFlagEvaluator",
+    "buildDependencyEdgeId",
+    "createInMemoryDependencyRegistry",
+    "createInMemoryHealthRegistry",
+    "createInMemoryHealthReporter",
+    "createHealthDiagnosticsJoin",
+    "aggregateFleetHealthFromMembers",
+    "aggregateFleetHealth",
+    "createFleetHealthAggregation",
+    "createInMemoryHealthObservationHistory",
+    "createInMemoryNamingRegistry",
+    "createInMemoryUmCoreSdkFactory"
+  ]
+}
