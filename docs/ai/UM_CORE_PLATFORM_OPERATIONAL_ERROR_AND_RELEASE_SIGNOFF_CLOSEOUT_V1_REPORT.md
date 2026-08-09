@@ -210,9 +210,10 @@ file, product domains.
 | --- | --- |
 | Branch | `office/um-core-platform-operational-error-and-release-signoff-closeout-v1` |
 | BASE_SHA | `a93f52235fee11e73ad9953993e109a894f99aac` |
-| FINAL_SHA | ace4204b64f998420e434333069c67f7452fc972 |
-| Push | PENDING_PUSH |
-| Ahead/behind vs `origin/alpha-0.2` after push | expected ahead 1 / behind 0 |
+| FINAL_SHA | `7e9e7afc2a9fc7bab4c69712ddd4477bfb0ce4e8` |
+| Push | `origin/office/um-core-platform-operational-error-and-release-signoff-closeout-v1` (DONE) |
+| Ahead/behind vs tracking after push | `0/0` clean |
+| Ahead/behind vs `origin/alpha-0.2` | ahead 3 / behind 0 |
 
 ---
 
@@ -246,6 +247,7 @@ TESTS=PASS_4_LOCK
 FULL_CORE_REGRESSION=PASS_40_FILES_419_TESTS
 READY_FOR_INTEGRATION=YES
 VERDICT=PRODUCTION_SIGNOFF_BLOCKED
+FINAL_SHA=7e9e7afc2a9fc7bab4c69712ddd4477bfb0ce4e8
 PRODUCT_CODE_CHANGED=NO
 UNIVERSAL_ERROR_FRAMEWORK=NO
 API_HARDENING_REOPENED=NO
