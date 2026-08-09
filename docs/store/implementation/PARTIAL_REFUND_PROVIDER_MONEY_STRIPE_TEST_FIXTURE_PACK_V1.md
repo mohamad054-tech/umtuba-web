@@ -1,6 +1,6 @@
 # Partial Refund Provider Money — Stripe TEST Fixture Pack V1
 
-**Purpose:** Deterministic NON-SECRET isolated Stripe **TEST** fixture pack for future controlled validation.  
+**Purpose:** Deterministic NON-SECRET isolated Stripe **TEST** fixture pack for future controlled validation.
 **Does not** activate provider gate/mode. **Does not** move money. **Does not** call Stripe. **Does not** write production DB.
 
 Related code:
