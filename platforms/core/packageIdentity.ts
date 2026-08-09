@@ -1,8 +1,8 @@
 /**
  * UM Core package identity constants.
  *
- * Spec: UM_CORE_SPECIFICATION_V1 — Core identity kernel.
- * Standards: UM_CORE_ENGINEERING_STANDARDS_V1 — naming / registration.
+ * Spec: UM_CORE_SPECIFICATION_V1 â€” Core identity kernel.
+ * Standards: UM_CORE_ENGINEERING_STANDARDS_V1 â€” naming / registration.
  *
  * No runtime behavior beyond immutable identity literals.
  */
@@ -66,6 +66,9 @@ export const UM_CORE_HEALTH_DIAGNOSTICS_JOIN_PHASE = "P18" as const;
 
 /** Fleet health aggregation foundation phase. */
 export const UM_CORE_FLEET_HEALTH_AGGREGATION_PHASE = "P20" as const;
+/** SDK client factory foundation phase. */
+export const UM_CORE_SDK_CLIENT_FACTORY_PHASE = "P21" as const;
+
 
 /** Human-readable package label (not a machine ID). */
 export const UM_CORE_PACKAGE_LABEL = "UM Core Platform" as const;

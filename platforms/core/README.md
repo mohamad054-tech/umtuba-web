@@ -1,4 +1,4 @@
-# UM Core — Foundation P1 (contracts only)
+# UM Core â€” Foundation P1 (contracts only)
 
 Isolated engineering skeleton for **UM Core Platform**.
 
@@ -30,7 +30,7 @@ Product platforms MAY later depend on `platforms/core` (not in P1).
 ## Package identity
 
 - Package id: `um.core`
-- Phase: `P1`–`P20` (… → health reporter → diagnostics join → fleet aggregation)
+- Phase: `P1`â€“`P20` (â€¦ â†’ health reporter â†’ diagnostics join â†’ fleet aggregation)
 
 ## Phase P3 scope
 
@@ -83,7 +83,7 @@ transport, persistence, networking, product integration.
 
 Pure **in-memory event routing catalog** under `platforms/core/event/`.
 
-- Rules from registered event type → destination platform(s)
+- Rules from registered event type â†’ destination platform(s)
 - Validates event type + producer + destination against P4/P6 catalogs
 - Lookups by event type, producer, destination
 
@@ -108,7 +108,7 @@ Pure **in-memory dependency edge catalog** under `platforms/core/dependency/`.
 - Materializes platform manifest `requires[]` as direct declared edges
 - Binds owner platforms to P4; optional P5 capability-target integrity
 - Lookups by edge id, requirements, dependents, target kind, strength
-- Catalog integrity cycles only among required platform→platform edges
+- Catalog integrity cycles only among required platformâ†’platform edges
 
 Out of scope for P9: runtime resolution, DI, discovery, startup orchestration,
 health/SDK/naming registries, aggregate `UmCoreRegistry`, persistence,
@@ -118,8 +118,8 @@ networking, product integration, migrations.
 
 Pure **in-memory health declaration catalog** under `platforms/core/health/`.
 
-- Materializes each registered platform’s `manifest.health` (one row per platform)
-- Opaque `probeRef` metadata only — never fetched or executed
+- Materializes each registered platformâ€™s `manifest.health` (one row per platform)
+- Opaque `probeRef` metadata only â€” never fetched or executed
 - Lookups by platform id and `reportsStatus`
 
 Out of scope for P10: probe execution, polling, scheduling, live snapshots,
@@ -212,7 +212,7 @@ Pure **in-memory health observation reporter** under `platforms/core/health/`.
 - Admits caller-supplied snapshots for P4-registered platforms only
 - Status taxonomy: `ready` | `degraded` | `unavailable`
 - Result-returning, fail-closed; stores last snapshot per platform
-- P10 declaration catalog remains orthogonal (declaration ≠ healthy)
+- P10 declaration catalog remains orthogonal (declaration â‰  healthy)
 
 Out of scope for P17: probe execution, polling, scheduling, networking,
 alerting, remediation, DependencyValidator, SDK client/factory, persistence,
@@ -226,7 +226,7 @@ Pure **diagnostics join read-model** under `platforms/core/health/`.
 - Deterministic composition of P4 + P10 + P17 only
 - Join classes for declared/observed/unobserved/silent/orphan rows
 - Status tallies + unobserved-reporter id lists
-- Side-effect free `evaluate()` — no store mutation
+- Side-effect free `evaluate()` â€” no store mutation
 
 Out of scope for P18: probe execution, polling, scheduling, networking,
 service discovery, distributed/DB join, fleet aggregation, alerting,
@@ -241,8 +241,22 @@ Pure **fleet health aggregation** under `platforms/core/health/`.
 - Pure bag path: `aggregateFleetHealthFromMembers(members)`
 - Deterministic membership-ordered rollup over P4 + P17 (+ optional P10/A1)
 - Coverage / unobserved sets orthogonal to `observedWorstStatus`
-- Absence of observation ≠ `unavailable`; no foreign status coercion
+- Absence of observation â‰  `unavailable`; no foreign status coercion
 
 Out of scope for P20: probe execution, polling, scheduling, networking,
 monitoring runtime, alerting, history storage, P12 facade slot changes,
 SDK client/factory, persistence, product integration, migrations.
+
+## Phase P21 scope
+
+Pure **in-memory SDK / client factory** under `platforms/core/sdk/`.
+
+- `createInMemoryUmCoreSdkFactory(deps)` implements `UmCoreSdkFactory`
+- Borrows caller-owned P14â€“P17 ports + P4 `register` (exact refs)
+- `createClient(identity)` returns a frozen thin facade
+- Fail-closed invalid deps / identity; result-returning port delegation
+- `register(manifest)` is P4 pass-through (`UmPlatformRegistrationResult`)
+
+Out of scope for P21: catalog construction, P12 mega-wire, P13/RI validators,
+P18 diagnostics join, fleet aggregation, networking, persistence, polling,
+scheduler, probe execution, product-domain SDKs, migrations.

@@ -1,7 +1,8 @@
 /**
  * Core SDK contracts (Standards §16 / Spec SDK surface).
  *
- * Semantic operations only — no client implementation in P1.
+ * P1: interfaces only.
+ * SDK factory foundation: thin in-process client composition over P14–P17 + P4.
  * Language-agnostic intent expressed as TypeScript interfaces in this repo.
  */
 
@@ -11,6 +12,10 @@ import type { UmEventPublisher, UmPlatformEventEnvelope } from "../event/types";
 import type { UmHealthReporter, UmHealthSnapshot } from "../health/types";
 import type { UmPlatformManifest } from "../manifest/types";
 import type { UmCapabilityId } from "../identity/types";
+import type {
+  UmPlatformRegistrationResult,
+  UmInMemoryPlatformRegistry,
+} from "../registry/interfaces";
 
 /**
  * Service identity presented by a runtime to Core (opaque).
@@ -22,13 +27,26 @@ export interface UmServiceIdentityContext {
 }
 
 /**
- * Core SDK client — interface only.
+ * Explicit DI bag for the in-memory SDK factory.
+ * Caller owns port construction; factory borrows exact object references.
+ */
+export interface UmCoreSdkFactoryDeps {
+  readonly flags: UmFlagEvaluator;
+  readonly capabilities: UmCapabilityAsserter;
+  readonly events: Pick<UmEventPublisher, "publish">;
+  readonly health: UmHealthReporter;
+  /** P4 register surface — required so client.register is fully implementable. */
+  readonly platforms: Pick<UmInMemoryPlatformRegistry, "register">;
+}
+
+/**
+ * Core SDK client — thin facade over borrowed runtime ports.
  */
 export interface UmCoreSdkClient {
   readonly identity: UmServiceIdentityContext;
 
-  /** Register or refresh a platform/module manifest contribution. */
-  register(manifest: UmPlatformManifest): void;
+  /** Pass-through P4 registration (result-returning; does not invent modules). */
+  register(manifest: UmPlatformManifest): UmPlatformRegistrationResult;
 
   readonly flags: UmFlagEvaluator;
   readonly events: Pick<UmEventPublisher, "publish">;
@@ -37,7 +55,7 @@ export interface UmCoreSdkClient {
 }
 
 /**
- * Factory port for SDK clients — interface only.
+ * Factory port for SDK clients.
  */
 export interface UmCoreSdkFactory {
   createClient(identity: UmServiceIdentityContext): UmCoreSdkClient;
