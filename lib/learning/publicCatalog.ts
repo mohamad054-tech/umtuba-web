@@ -595,3 +595,42 @@ export async function isUserEnrolledInCourse(
   if (error) return false;
   return (data?.length ?? 0) > 0;
 }
+
+
+/** Prefer JA-prefixed catalog entries when twins share normalized title. */
+export function dedupePublicCatalogCourses<T extends { title?: string; slug?: string; name?: string }>(
+  courses: readonly T[]
+): T[] {
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/^ja-?\d+\s*[—\-:]?\s*/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  const score = (c: T) => {
+    const slug = (c.slug ?? "").toLowerCase();
+    const title = (c.title ?? c.name ?? "").toLowerCase();
+    if (/^ja-\d+/.test(slug) || /^ja-\d+/.test(title)) return 2;
+    if (/^ja\d+/.test(slug) || /^ja\d+/.test(title)) return 1;
+    return 0;
+  };
+  const best = new Map<string, T>();
+  for (const c of courses) {
+    const key = norm(String(c.title ?? c.name ?? c.slug ?? ""));
+    if (!key) continue;
+    const prev = best.get(key);
+    if (!prev || score(c) > score(prev)) best.set(key, c);
+  }
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const c of courses) {
+    const key = norm(String(c.title ?? c.name ?? c.slug ?? ""));
+    if (!key || seen.has(key)) continue;
+    const winner = best.get(key);
+    if (winner) {
+      out.push(winner);
+      seen.add(key);
+    }
+  }
+  return out;
+}
