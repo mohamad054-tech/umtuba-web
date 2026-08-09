@@ -1,7 +1,7 @@
 # Partial Refund Provider — RELEASE-CANDIDATE Safety Matrix V1
 
-**Task:** `COMMERCE_REFUND_PROVIDER_RELEASE_CANDIDATE_SAFETY_MATRIX_V1`  
-**Agent:** DESKTOP-A3  
+**Task:** `COMMERCE_REFUND_PROVIDER_RELEASE_CANDIDATE_SAFETY_MATRIX_V1`
+**Agent:** DESKTOP-A3
 **Mode:** TEST-ONLY consolidation (no new provider architecture)
 
 ## Purpose

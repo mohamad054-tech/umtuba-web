@@ -1,7 +1,7 @@
 # Partial Refund Provider — Reconciliation → Terminal E2E Matrix V1
 
-**Task:** `COMMERCE_REFUND_PROVIDER_RECONCILIATION_TERMINAL_E2E_MATRIX_V1`  
-**Module:** `lib/store/partialRefundProviderMoneyExecution/refundProviderReconciliationTerminalE2eMatrix.ts`  
+**Task:** `COMMERCE_REFUND_PROVIDER_RECONCILIATION_TERMINAL_E2E_MATRIX_V1`
+**Module:** `lib/store/partialRefundProviderMoneyExecution/refundProviderReconciliationTerminalE2eMatrix.ts`
 **Constraints:** `STRIPE_CALLS=0` · `MONEY_MOVEMENT=0` · `DB_WRITES=0` · `MIGRATIONS=0` · `PROVIDER_GATES=OFF`
 
 ## Purpose
