@@ -180,6 +180,21 @@ export {
   type StripeTestActivationTransitionResult,
 } from "./stripeTestActivationStateMachine";
 export {
+  STRIPE_TEST_ACTIVATION_DRY_RUN_ACTIVATION_PERFORMED,
+  STRIPE_TEST_ACTIVATION_DRY_RUN_ENVIRONMENT,
+  STRIPE_TEST_ACTIVATION_DRY_RUN_ORCHESTRATION_VERSION,
+  STRIPE_TEST_ACTIVATION_DRY_RUN_PHASES,
+  STRIPE_TEST_ACTIVATION_DRY_RUN_PROVIDER_EXECUTION_ENTRYPOINTS,
+  buildStripeTestActivationDryRunReport,
+  isStripeTestActivationDryRunReady,
+  runStripeTestActivationDryRunHappyPath,
+  verifyStripeTestActivationDryRunGuards,
+  type StripeTestActivationDryRunPhase,
+  type StripeTestActivationDryRunPhaseRecord,
+  type StripeTestActivationDryRunReport,
+  type StripeTestActivationDryRunVerification,
+} from "./stripeTestActivationDryRunOrchestration";
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
