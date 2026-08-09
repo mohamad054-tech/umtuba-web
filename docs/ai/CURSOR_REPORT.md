@@ -1,31 +1,26 @@
-# CURSOR_REPORT — UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1
+# CURSOR_REPORT — UM_CORE_PLATFORM_HEALTH_HISTORY_REGRESSION_AND_EDGE_CASE_V1
 
 ## Summary
 
-**Verdict: IMPLEMENTED_AND_PUSHED — SUCCESS**
+**Verdict: REGRESSION_COVERAGE_ADDED_AND_PUSHED — SUCCESS**
 
-PC2-A2 delivered an in-memory bounded per-platform health observation history
-ring (P22) on
+PC2-A2 (ROLE=`REGRESSION_AND_TEST_OWNER_ONLY`) reviewed bounded health history
+product tip `9b35ddc32db4cec24757aa97d90a31975056329b` on completed branch
 `office/um-core-platform-bounded-health-history-foundation-v1` @
-`9b35ddc32db4cec24757aa97d90a31975056329b`, based on
-`origin/alpha-0.2` @ `c8f5c9657ab4670d676f7ce6640ea30fd837890d`.
+`0b88be1a9fbb8a3c68b87dec5887c300950531b1`. No semantic defects found.
 
-Previous P19 A2 lane (fleet aggregation `49ec529`) verified COMPLETE; report
-re-delivered to OUTBOX (SHA256 match). No accepted bounded-history contract
-file found — `CONTRACT_SOURCE=derived_from_central_assignment_plus_gap_audit`.
-Shared Core export/`types`/`packageIdentity` wiring deferred to avoid A1
-collision.
+Added **tests only** on
+`office/um-core-platform-health-history-regression-and-edge-case-v1` @
+`48a4456edea99dee3c989685b8bd45e9d508f45f`. Production `.ts` impl untouched.
+No A1 SDK edits. No alpha merge.
 
 Canonical Central report:
-`UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1_REPORT.md`
+`UM_CORE_PLATFORM_HEALTH_HISTORY_REGRESSION_AND_EDGE_CASE_V1_REPORT.md`
 
 ## Exact files changed
 
-- `docs/core/UM_CORE_PLATFORM_BOUNDED_HEALTH_HISTORY_FOUNDATION_V1.md` (new)
-- `platforms/core/health/healthHistory.ts` (new)
-- `platforms/core/health/healthHistoryCodes.ts` (new)
-- `platforms/core/health/healthHistory.test.ts` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff; local only if uncommitted)
+- `platforms/core/health/healthHistory.regression.test.ts` (new — tests only)
+- `docs/ai/CURSOR_REPORT.md` (this handoff)
 
 ## Migrations created
 
@@ -33,22 +28,23 @@ Canonical Central report:
 
 ## Security review
 
-- In-memory only; no network/DB/secrets/product domains
-- Fail-closed capacity + admission; defensive query clones
-- No Co-authored-by / Signed-off-by on product commit
+- Tests only; no product semantic changes
+- No network/DB/secrets/product domains
+- Explicit surface assertion: no persist/DB/network/scheduler APIs
+- No Co-authored-by / Signed-off-by on test commit
 
 ## Tests
 
-- Focused history: **PASS** (12)
-- Full `platforms/core`: **PASS** (19 files / 194 tests)
+- Focused history + regression: **PASS** (24 = 12 + 12)
+- Full `platforms/core`: **PASS** (20 files / 206 tests)
 
 ## TypeScript
 
-`npx tsc --noEmit` → **PASS**
+`tsc --noEmit` → **PASS**
 
 ## Build
 
-N/A (Core library foundation; gates did not require `npm run build`)
+N/A (tests-only Core library lane; gates did not require `npm run build`)
 
 ## git diff --check
 
@@ -56,9 +52,9 @@ N/A (Core library foundation; gates did not require `npm run build`)
 
 ## git status --short
 
-clean (product commit pushed; 0/0)
+clean after push (0/0)
 
 ## Open issues
 
-1. Central may wire `health/index.ts` / phase label after A1 SDK factory settles.
-2. Do not start next work from this lane — STOP.
+1. Do not start next work from this lane — STOP.
+2. Do not wait for A1.
