@@ -114,6 +114,23 @@ export {
   type StripeTestFixturePersistedFactShapes,
 } from "./stripeTestFixturePack";
 export {
+  STRIPE_TEST_OFFLINE_PREFLIGHT_ALTERNATE_ENV_NAMES,
+  STRIPE_TEST_OFFLINE_PREFLIGHT_ENVIRONMENT,
+  STRIPE_TEST_OFFLINE_PREFLIGHT_GATE_STARTING_STATE_ENV_NAMES,
+  STRIPE_TEST_OFFLINE_PREFLIGHT_PROVIDER_EXECUTION_ENTRYPOINTS,
+  STRIPE_TEST_OFFLINE_PREFLIGHT_REQUIRED_ENV_NAMES,
+  STRIPE_TEST_OFFLINE_PREFLIGHT_VALIDATOR_VERSION,
+  buildStripeTestOfflinePreflightReport,
+  isStripeTestOfflinePreflightSafeToStart,
+  type StripeTestOfflinePreflightCredentialPresence,
+  type StripeTestOfflinePreflightFixtureChecks,
+  type StripeTestOfflinePreflightGateStartingState,
+  type StripeTestOfflinePreflightModeChecks,
+  type StripeTestOfflinePreflightReport,
+  type StripeTestOfflinePreflightVerdict,
+} from "./stripeTestOfflinePreflightValidator";
+
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
