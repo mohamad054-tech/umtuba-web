@@ -18,9 +18,9 @@ DATE=2026-08-09
 
 Audited in-memory UM Core foundations on full `origin/alpha-0.2` tip `b6d48f9…`. Hot LOOKUP paths (flag evaluate, capability assert, event publish) are O(1). History is explicitly capacity-bounded. Deterministic LIST sorts and defensive clones are intentional and not classified as defects at realistic catalog scale (tens–hundreds of platforms).
 
-**P0_GAPS:** none  
-**P1_GAPS:** 1 (referential-integrity observation path rescans `dependencies.list()` per snapshot → O(O×D))  
-**P2_GAPS:** filtered `listBy*` sort-all-then-filter; fleet/diagnostics clone amplification; history `shift()` eviction; undocumented registry growth budgets; heavyweight P4 record retention  
+**P0_GAPS:** none
+**P1_GAPS:** 1 (referential-integrity observation path rescans `dependencies.list()` per snapshot → O(O×D))
+**P2_GAPS:** filtered `listBy*` sort-all-then-filter; fleet/diagnostics clone amplification; history `shift()` eviction; undocumented registry growth budgets; heavyweight P4 record retention
 
 Capability compatibility matrix is **not integrated** on BASE_SHA (off-alpha A1 tip only). Lifecycle readiness is present (local P23 barrel).
 
@@ -90,11 +90,11 @@ N/A for audit docs + pure in-memory scale smoke. No secrets, network, or auth ch
 ## office/um-core-platform-performance-and-scale-assumptions-audit-v1...origin/office/um-core-platform-performance-and-scale-assumptions-audit-v1
 ```
 
-Pushed commit `a675014` to `origin/office/um-core-platform-performance-and-scale-assumptions-audit-v1`.  
+Pushed commit `a675014` to `origin/office/um-core-platform-performance-and-scale-assumptions-audit-v1`.
 OUTBOX: `worktrees/OUTBOX_DROP/UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1_REPORT.md`
 
 ## Open issues
 
-1. P1 RI index fix is **reported, not implemented** (architectural micro-fix; avoid drive-by semantic risk in audit lane).  
-2. Capability compatibility off-alpha — re-audit matrix cost when integrated.  
+1. P1 RI index fix is **reported, not implemented** (architectural micro-fix; avoid drive-by semantic risk in audit lane).
+2. Capability compatibility off-alpha — re-audit matrix cost when integrated.
 3. Readiness not on root barrel — out of perf scope.

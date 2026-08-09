@@ -1,10 +1,10 @@
 # UM Core Specification V1
 
-**Status:** Normative Spec capture for landed UM Core on `origin/alpha-0.2`  
-**Canonical file:** `docs/core/UM_CORE_SPECIFICATION_V1.md`  
-**Cited as:** `UM_CORE_SPECIFICATION_V1`  
-**Companion:** `docs/core/UM_CORE_ENGINEERING_STANDARDS_V1.md`  
-**Release umbrella:** `docs/core/UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md`  
+**Status:** Normative Spec capture for landed UM Core on `origin/alpha-0.2`
+**Canonical file:** `docs/core/UM_CORE_SPECIFICATION_V1.md`
+**Cited as:** `UM_CORE_SPECIFICATION_V1`
+**Companion:** `docs/core/UM_CORE_ENGINEERING_STANDARDS_V1.md`
+**Release umbrella:** `docs/core/UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md`
 **Public barrel:** `platforms/core/index.ts`
 
 This file closes the production-readiness packaging gap for the Spec name referenced throughout `platforms/core`. It records **existing** contracts only — it does not invent runtime semantics or redesign APIs.

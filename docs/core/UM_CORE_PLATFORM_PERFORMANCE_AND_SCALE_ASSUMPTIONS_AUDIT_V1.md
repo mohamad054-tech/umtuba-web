@@ -1,10 +1,10 @@
 # UM Core — Performance & Scale Assumptions Audit V1
 
-**Status:** Audit complete (evidence-based; no production semantic changes)  
-**Task:** `UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1`  
-**Agent:** `PC2-A3` · Device `PC2`  
-**Base:** `origin/alpha-0.2` @ `b6d48f915f97c5d20a3b5ca42ec32e83b58f1a57`  
-**Branch:** `office/um-core-platform-performance-and-scale-assumptions-audit-v1`  
+**Status:** Audit complete (evidence-based; no production semantic changes)
+**Task:** `UM_CORE_PLATFORM_PERFORMANCE_AND_SCALE_ASSUMPTIONS_AUDIT_V1`
+**Agent:** `PC2-A3` · Device `PC2`
+**Base:** `origin/alpha-0.2` @ `b6d48f915f97c5d20a3b5ca42ec32e83b58f1a57`
+**Branch:** `office/um-core-platform-performance-and-scale-assumptions-audit-v1`
 **Mode:** AUDIT FIRST
 
 ## Scope inspected (on BASE_SHA)
@@ -63,41 +63,41 @@ Ordinary **O(n)** / **O(n log n)** list sorts for determinism are **not** defect
 
 ### P1
 
-1. **Referential integrity observation×dependency rescans**  
-   - Evidence: `declaredDependencyTargets()` in `validation/referentialIntegrity.ts` calls `dependencies.list()` for **each** health observation.  
-   - Effect: VALIDATE becomes **O(observations × dependency edges)** (+ each `list()` also sorts).  
-   - Credible when RI is run as a routine gate over growing catalogs (hundreds of platforms / edges).  
+1. **Referential integrity observation×dependency rescans**
+   - Evidence: `declaredDependencyTargets()` in `validation/referentialIntegrity.ts` calls `dependencies.list()` for **each** health observation.
+   - Effect: VALIDATE becomes **O(observations × dependency edges)** (+ each `list()` also sorts).
+   - Credible when RI is run as a routine gate over growing catalogs (hundreds of platforms / edges).
    - Action: build `Map<fromPlatformId, Set<targetId>>` once; do not change finding semantics.
 
 ### P2 (deferred / non-blocking)
 
-1. Filtered `listBy*` APIs sort the entire store before filtering (routing, capabilities, dependencies, health declarations, naming).  
-2. Fleet / diagnostics / readiness call P17 `list()` which deep-clones all snapshots; fleet then clones again via `getSnapshot`.  
-3. History eviction uses `shift()` (O(C)); fine for small C.  
-4. No documented soft caps / memory budget for registry growth (by design unlimited catalog Map growth).  
-5. Platform REGISTER retains heavyweight embedded validation/compliance objects.  
+1. Filtered `listBy*` APIs sort the entire store before filtering (routing, capabilities, dependencies, health declarations, naming).
+2. Fleet / diagnostics / readiness call P17 `list()` which deep-clones all snapshots; fleet then clones again via `getSnapshot`.
+3. History eviction uses `shift()` (O(C)); fine for small C.
+4. No documented soft caps / memory budget for registry growth (by design unlimited catalog Map growth).
+5. Platform REGISTER retains heavyweight embedded validation/compliance objects.
 6. Capability compatibility matrix **not on BASE_SHA**; off-alpha tip builds matrices over platform×capability requirement sets — re-audit when integrated (do not treat as alpha debt until merge).
 
 ### Explicit non-defects
 
-- Deterministic `localeCompare` sorts on LIST/VALIDATE findings.  
-- Defensive snapshot cloning (immutability contract; covered by hardening tests).  
-- Ordinary O(n) scans over catalog membership during VALIDATE/AGGREGATE.  
-- `minCompatibility` stored but **never evaluated** (by law) — not a perf bug.  
+- Deterministic `localeCompare` sorts on LIST/VALIDATE findings.
+- Defensive snapshot cloning (immutability contract; covered by hardening tests).
+- Ordinary O(n) scans over catalog membership during VALIDATE/AGGREGATE.
+- `minCompatibility` stored but **never evaluated** (by law) — not a perf bug.
 - P12 aggregate facade is reference composition only (no extra copies).
 
 ## NO_CHANGE_AREAS
 
-- LOOKUP hot paths (flag evaluate, capability assert, event publish admission).  
-- Bounded history capacity / eviction **semantics**.  
-- Deterministic ordering contracts.  
-- Immutability clone-on-read contracts (unless a trusted internal read API is added carefully).  
+- LOOKUP hot paths (flag evaluate, capability assert, event publish admission).
+- Bounded history capacity / eviction **semantics**.
+- Deterministic ordering contracts.
+- Immutability clone-on-read contracts (unless a trusted internal read API is added carefully).
 - Product domains / DB / network / alpha merge.
 
 ## NEXT_PERFORMANCE_PRIORITY
 
-1. **Index dependency targets by owner once** inside `validateReferentialIntegrity` observation review (P1).  
-2. Re-audit filtered `listBy*` + clone amplification only after a real high-frequency consumer appears.  
+1. **Index dependency targets by owner once** inside `validateReferentialIntegrity` observation review (P1).
+2. Re-audit filtered `listBy*` + clone amplification only after a real high-frequency consumer appears.
 3. When capability compatibility lands on alpha, score matrix construction separately (platform×requirement cardinality).
 
 ## Test note
@@ -109,4 +109,3 @@ A small Vitest scale-smoke (`platforms/core/umCoreScaleAssumptions.smoke.test.ts
 Landed onto lpha-0.2 by Central during `UM_CORE_PLATFORM_FINAL_CENTRAL_PRODUCTION_SIGNOFF_V1` as smallest packaging of existing office evidence (no new perf implementation).
 
 **Subsequent alpha note:** the documented P1 RI observation×deps full-scan gap was later addressed on the integration line by `perf(core): pre-index RI observation dependency targets by fromPlatformId` (`84343fdd`) and hot-path scale regression evidence (`af1d8247`). Treat the historical P1 row as closed on current alpha; remaining items stay P2 documentation/scale assumptions.
-

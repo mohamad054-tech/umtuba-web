@@ -1,11 +1,11 @@
 # UM Core Platform — Release Contract V1
 
-**Status:** Authoritative release-contract closeout (docs + evidence alignment)  
-**TASK_ID:** `UM_CORE_PLATFORM_SPEC_STANDARDS_RELEASE_CONTRACT_CLOSEOUT_V1`  
-**AGENT:** `PC2-A2` · **DEVICE:** `PC2` · **ROLE:** `PLATFORM_CORE_PRIMARY`  
-**BASE:** `origin/alpha-0.2` @ `a93f52235fee11e73ad9953993e109a894f99aac`  
-**PUBLIC BARREL:** `platforms/core/index.ts`  
-**CLOSEOUT_CLASSIFICATION:** `DOCS_ONLY` + `CONTRACT_MATRIX` + `RELEASE_STANDARD` + `TEST_EVIDENCE`  
+**Status:** Authoritative release-contract closeout (docs + evidence alignment)
+**TASK_ID:** `UM_CORE_PLATFORM_SPEC_STANDARDS_RELEASE_CONTRACT_CLOSEOUT_V1`
+**AGENT:** `PC2-A2` · **DEVICE:** `PC2` · **ROLE:** `PLATFORM_CORE_PRIMARY`
+**BASE:** `origin/alpha-0.2` @ `a93f52235fee11e73ad9953993e109a894f99aac`
+**PUBLIC BARREL:** `platforms/core/index.ts`
+**CLOSEOUT_CLASSIFICATION:** `DOCS_ONLY` + `CONTRACT_MATRIX` + `RELEASE_STANDARD` + `TEST_EVIDENCE`
 **MODE:** Capture landed law only — **no new foundation**, **no production API redesign**, **no invented runtime semantics**
 
 ## 1. Authority and evidence sources
@@ -62,7 +62,7 @@ Root-reachable integrated foundations on this tip:
 
 The BC fixture `publicCallables` list is the **compatibility floor**. Every listed callable remains on the root barrel. Additive root exports (including P19 / P24 callables) are allowed without breaking that floor.
 
-Frozen floor includes (non-exhaustive summary; fixture is SoT):  
+Frozen floor includes (non-exhaustive summary; fixture is SoT):
 `validatePlatformManifest`, `createManifestValidator`, `validateManifestAdmission`, `createRegistrationValidator`, naming predicates, `validatePlatformDependencies`, `createUmCoreValidator`, `validateReferentialIntegrity`, compliance factories, `createInMemory*` registries/reporter/history, P12 `createUmCoreRegistry`, P14–P16 evaluators/asserter/publisher, P18/P20 join/fleet helpers, P21 SDK factory, deterministic id helpers.
 
 ### 2.2 Root-public surfaces synced into BC floor (post inventory sync)
@@ -74,7 +74,7 @@ On current tip, P19 and P24 practical contracts are included in the BC fixture /
 | P19 | `createInMemoryDependencyValidator`, `validateDependencyRequirements`, `UmDependencyValidatorCode`, `UM_CORE_DEPENDENCY_VALIDATOR_PHASE` |
 | P24 | `createCapabilityCompatibilityEvaluator`, `UmCapabilityCompatibilityCode`, `UM_CORE_PLATFORM_CAPABILITY_COMPATIBILITY_PHASE` |
 
-**Still unused-by-default:** P19 must not be auto-wired into P14–P17 / P21 despite BC freeze of its public symbols.  
+**Still unused-by-default:** P19 must not be auto-wired into P14–P17 / P21 despite BC freeze of its public symbols.
 **Still not root-public:** P23 readiness symbols remain absent from root barrel and BC fixture.
 
 ---

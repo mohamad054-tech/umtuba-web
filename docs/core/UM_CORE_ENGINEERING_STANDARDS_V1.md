@@ -1,9 +1,9 @@
 # UM Core Engineering Standards V1
 
-**Status:** Normative engineering standards capture for landed UM Core  
-**Canonical file:** `docs/core/UM_CORE_ENGINEERING_STANDARDS_V1.md`  
-**Cited as:** `UM_CORE_ENGINEERING_STANDARDS_V1`  
-**Companion:** `docs/core/UM_CORE_SPECIFICATION_V1.md`  
+**Status:** Normative engineering standards capture for landed UM Core
+**Canonical file:** `docs/core/UM_CORE_ENGINEERING_STANDARDS_V1.md`
+**Cited as:** `UM_CORE_ENGINEERING_STANDARDS_V1`
+**Companion:** `docs/core/UM_CORE_SPECIFICATION_V1.md`
 **Release umbrella:** `docs/core/UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md`
 
 Standards below are distilled from existing foundations, the public API matrix, the BC guard fixture, and coherence evidence. No new runtime rules are invented here.
