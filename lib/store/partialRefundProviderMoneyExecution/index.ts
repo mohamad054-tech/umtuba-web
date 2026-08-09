@@ -95,6 +95,25 @@ export {
 } from "./stateMachine";
 export { createStripePartialRefundProviderPort } from "./stripeAdapter";
 export {
+  STRIPE_TEST_FIXTURE_PACK_CAPTURED_AMOUNT_MINOR,
+  STRIPE_TEST_FIXTURE_PACK_CURRENCY,
+  STRIPE_TEST_FIXTURE_PACK_ENVIRONMENT,
+  STRIPE_TEST_FIXTURE_PACK_IDS,
+  STRIPE_TEST_FIXTURE_PACK_PAYMENT_INTENT_REF,
+  STRIPE_TEST_FIXTURE_PACK_REFUND_AMOUNT_MINOR,
+  STRIPE_TEST_FIXTURE_PACK_VERSION,
+  buildStripeTestFixtureCommittedLedgerFacts,
+  buildStripeTestFixtureP6Manifest,
+  buildStripeTestFixturePackReport,
+  buildStripeTestFixturePersistedFactShapes,
+  getStripeTestFixturePackDefinitions,
+  isStripeTestFixturePackReadyForControlledValidation,
+  type StripeTestFixtureP6Manifest,
+  type StripeTestFixturePackReport,
+  type StripeTestFixturePackVerdict,
+  type StripeTestFixturePersistedFactShapes,
+} from "./stripeTestFixturePack";
+export {
   PARTIAL_REFUND_PROVIDER_EXECUTION_STATUSES,
   PARTIAL_REFUND_PROVIDER_KINDS,
   PROVIDER_MONEY_NON_EVENTS,
