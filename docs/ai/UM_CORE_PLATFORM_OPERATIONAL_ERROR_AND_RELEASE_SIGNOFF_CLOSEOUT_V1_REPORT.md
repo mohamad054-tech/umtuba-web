@@ -187,8 +187,8 @@ file, product domains.
 
 | Gate | Result |
 | --- | --- |
-| Focused lock tests | **PASS** — 4/4 (pre-FF; re-run after FF) |
-| Full `platforms/core` | **PASS** — see post-FF counts below |
+| Focused lock tests | **PASS** — 4/4 |
+| Full `platforms/core` | **PASS** — 40 files / **419** tests |
 | `npx tsc --noEmit` | **PASS** (exit 0) |
 | `git diff --check` | **PASS** |
 | Secret scan (changed paths) | **PASS** — no `.env` / keys / service-role |
@@ -243,7 +243,7 @@ CENTRAL_CONSUMER_GO_NOT_REQUIRED_FOR_CURRENT_RELEASE=YES
 PRODUCTION_READY_CANDIDATE=YES
 REMAINING_BLOCKERS=RB1_P23_PACKAGING;RB2_SPEC_STANDARDS;RB3_PERF_SCALE_ASSUMPTIONS
 TESTS=PASS_4_LOCK
-FULL_CORE_REGRESSION=SEE_POST_FF
+FULL_CORE_REGRESSION=PASS_40_FILES_419_TESTS
 READY_FOR_INTEGRATION=YES
 VERDICT=PRODUCTION_SIGNOFF_BLOCKED
 PRODUCT_CODE_CHANGED=NO
