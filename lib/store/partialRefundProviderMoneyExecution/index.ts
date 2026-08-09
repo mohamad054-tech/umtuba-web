@@ -184,3 +184,17 @@ export {
   type RefundProviderReconciliationProviderState,
   type RefundProviderReconciliationSnapshot,
 } from "./refundProviderReconciliation";
+export {
+  RECOVERY_LOCAL_LEDGER_STATES,
+  RECOVERY_PROVIDER_EXECUTION_STATES,
+  RECOVERY_PROVIDER_OUTCOME_CONFIDENCE,
+  RECOVERY_RESERVATION_STATES,
+  assertRefundProviderRecoveryDecisionSafety,
+  buildRefundProviderRecoveryDecision,
+  type BuildRefundProviderRecoveryDecisionInput,
+  type RecoveryLocalLedgerState,
+  type RecoveryProviderExecutionState,
+  type RecoveryProviderOutcomeConfidence,
+  type RecoveryReservationState,
+  type RefundProviderRecoveryDecisionSnapshot,
+} from "./refundProviderRecoveryDecision";

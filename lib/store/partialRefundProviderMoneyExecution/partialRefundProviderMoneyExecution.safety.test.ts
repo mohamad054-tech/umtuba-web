@@ -490,11 +490,18 @@ describe("safety — admin visibility + unauthorized denial contracts", () => {
     expect(read(RECOVERY_PANEL)).toMatch(
       /data-testid="pr-prov-reconciliation"/
     );
-    expect(read(RECOVERY_PANEL)).toMatch(/buildRefundProviderReconciliation/);
+    expect(read(RECOVERY_PANEL)).toMatch(
+      /data-testid="pr-prov-recovery-decision"/
+    );
+    expect(read(RECOVERY_PANEL)).toMatch(/buildRefundProviderRecoveryDecision/);
     expect(read(RECOVERY_PANEL)).toMatch(/LOCAL_STATE/);
     expect(read(RECOVERY_PANEL)).toMatch(/MATCH_STATUS/);
     expect(read(RECOVERY_PANEL)).toMatch(/RETRY_SAFE/);
     expect(read(RECOVERY_PANEL)).toMatch(/OPERATOR_ACTION_REQUIRED/);
+    expect(read(RECOVERY_PANEL)).toMatch(/LOCAL_LEDGER_STATE/);
+    expect(read(RECOVERY_PANEL)).toMatch(/PROVIDER_OUTCOME_CONFIDENCE/);
+    expect(read(RECOVERY_PANEL)).toMatch(/RECOVERY_REQUIRED/);
+    expect(read(RECOVERY_PANEL)).toMatch(/OPERATOR_ESCALATION_REQUIRED/);
     expect(read(EXECUTE_PANEL)).toMatch(/prior failed \(no V1 retry\)/);
     expect(read(EXECUTE_PANEL)).toMatch(/recovery required/);
   });

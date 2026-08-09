@@ -2,7 +2,7 @@ import { adminRecoverPartialRefundProviderMoneyLookupAction } from "../../../act
 import type { PartialRefundProviderExecutionRecord } from "../../../../lib/store/partialRefundProviderMoneyExecution";
 import {
   buildProviderMoneyOperatorObservability,
-  buildRefundProviderReconciliation,
+  buildRefundProviderRecoveryDecision,
   isRecoveryEligibleProviderExecution,
   PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
   toProviderMoneyAuditView,
@@ -110,11 +110,12 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
               nowMs: now,
               staleAfterMs: PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
             });
-            const recon = buildRefundProviderReconciliation({
+            const recovery = buildRefundProviderRecoveryDecision({
               execution: e,
               nowMs: now,
               staleAfterMs: PARTIAL_REFUND_PROVIDER_STALE_EXECUTING_MS,
             });
+            const recon = recovery.reconciliation;
             return (
               <li
                 key={e.executionId}
@@ -133,6 +134,11 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                 data-recon-required={recon.RECONCILIATION_REQUIRED ? "1" : "0"}
                 data-operator-action-required={
                   recon.OPERATOR_ACTION_REQUIRED ? "1" : "0"
+                }
+                data-recovery-required={recovery.RECOVERY_REQUIRED ? "1" : "0"}
+                data-outcome-confidence={recovery.PROVIDER_OUTCOME_CONFIDENCE}
+                data-escalation-required={
+                  recovery.OPERATOR_ESCALATION_REQUIRED ? "1" : "0"
                 }
               >
                 <div className="flex flex-wrap items-center gap-2">
@@ -253,7 +259,7 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                   <div>
                     <dt className="text-white/35">RETRY_SAFE</dt>
                     <dd className="text-white/70">
-                      {recon.RETRY_SAFE ? "yes" : "no"}
+                      {recovery.RETRY_SAFE ? "yes" : "no"}
                     </dd>
                   </div>
                   <div>
@@ -261,6 +267,49 @@ export default function PartialRefundProviderMoneyRecoveryPanel({
                     <dd className="text-white/70">
                       {recon.OPERATOR_ACTION_REQUIRED ? "yes" : "no"} ·{" "}
                       {recon.operatorAction}
+                    </dd>
+                  </div>
+                </dl>
+                <dl
+                  className="mt-2 grid gap-1 text-[11px] text-amber-100/70 sm:grid-cols-2"
+                  data-testid="pr-prov-recovery-decision"
+                >
+                  <div>
+                    <dt className="text-white/35">LOCAL_LEDGER_STATE</dt>
+                    <dd className="text-white/70">
+                      {recovery.LOCAL_LEDGER_STATE}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">RESERVATION_STATE</dt>
+                    <dd className="text-white/70">
+                      {recovery.RESERVATION_STATE}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">PROVIDER_EXECUTION_STATE</dt>
+                    <dd className="text-white/70">
+                      {recovery.PROVIDER_EXECUTION_STATE}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">PROVIDER_OUTCOME_CONFIDENCE</dt>
+                    <dd className="text-white/70">
+                      {recovery.PROVIDER_OUTCOME_CONFIDENCE}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">RECOVERY_REQUIRED</dt>
+                    <dd className="text-white/70">
+                      {recovery.RECOVERY_REQUIRED ? "yes" : "no"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">
+                      OPERATOR_ESCALATION_REQUIRED
+                    </dt>
+                    <dd className="text-white/70">
+                      {recovery.OPERATOR_ESCALATION_REQUIRED ? "yes" : "no"}
                     </dd>
                   </div>
                 </dl>
