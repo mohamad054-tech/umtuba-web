@@ -53,6 +53,31 @@ export type { AiErrorCode, AiResult } from "./contracts/types";
 export { AiPlatformError, sanitizeAiErrorMessage } from "./contracts/errors";
 export { loadAiPlatformConfig, describeAiConfigStatus } from "./config";
 
+/** Central AI Capability Catalog & Service Registry V1 (no inference). */
+export {
+  AiCapabilityServiceRegistry,
+  buildBuiltinCapabilityCatalogEntries,
+  checkCapabilityCompatibility,
+  createCapabilityCatalogRegistry,
+  getCapabilityCatalogRegistry,
+  listExecutableSharedCapabilityIds,
+  resetCapabilityCatalogRegistryForTests,
+  validateCapabilityEntry,
+  versionsCompatible,
+} from "./catalog";
+export type {
+  AiCapabilityCatalogEntry,
+  AiCapabilityCategory,
+  AiCapabilityExecutionSurface,
+  AiCapabilityLifecycle,
+  AiCapabilityStability,
+  AiCapabilityVisibility,
+  CapabilityCompatibilityResult,
+  CapabilityLookupQuery,
+  CapabilityValidationResult,
+  CapabilityVersionNegotiation,
+} from "./catalog";
+
 /** Domain capability (server-side only; no UI). */
 export { runProductDraftAssistant } from "./capabilities/commerce/productDraftAssistant";
 export { loadAiPlatformDiagnostics } from "./capabilities/admin/diagnostics";
@@ -118,6 +143,42 @@ export type {
   AiUsagePublicAggregate,
 } from "./usage/trackingTypes";
 export { createNoopUsageTrackingExtensionHooks } from "./usage/trackingTypes";
+
+/** AI Usage, Quotas & Billing Foundation V1 (estimated only; no real charges). */
+export {
+  AI_USAGE_FOUNDATION_SCHEMA_VERSION,
+  AI_USAGE_POLICY_VERSION,
+  AI_USAGE_UNIT_TYPES,
+  DEFAULT_BUDGET_POLICY_ID,
+  DEFAULT_COST_POLICY_ID,
+  DEFAULT_QUOTA_POLICY_ID,
+  AiUsageQuotasBillingFoundation,
+  aiUsageQuotasBillingFoundation,
+  aiUsageFoundationStore,
+  resetUsageQuotasBillingFoundation,
+  resolveMeteringOrDefault,
+  defaultMeteringBinding,
+  estimateUsageCost,
+  createDisabledUsageChargeIntent,
+  executeUsageChargeIntent,
+  isRevenueBridgeAllowed,
+  adminUsageActor,
+  redactUsageMetadata,
+} from "./usage/usageFoundationIndex";
+export type {
+  AiBudgetPolicy,
+  AiCapabilityMeteringBinding,
+  AiCostEstimationPolicy,
+  AiPreflightGateResult,
+  AiQuotaPolicy,
+  AiUsageAggregationReport,
+  AiUsageActor,
+  AiUsageChargeIntent,
+  AiUsageEvent,
+  AiUsagePermission,
+  AiUsageUnitType,
+  AiUserUsageViewModel,
+} from "./usage/usageFoundationIndex";
 export {
   AiPersonalizationEngine,
   aiPersonalizationEngine,
