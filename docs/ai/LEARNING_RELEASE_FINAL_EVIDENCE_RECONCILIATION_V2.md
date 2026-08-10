@@ -1,0 +1,13 @@
+﻿# RELEASE_FINAL_EVIDENCE_RECONCILIATION_V2
+CONSUMED_WAVE20_A1_A2_A3=YES
+LEARNING_CODE_READY=YES
+LEARNING_REGRESSION_READY=YES
+LEARNING_RUNTIME_READY=PARTIAL_NON_MIGRATION_YES
+CERTIFICATION_READY=NO
+BETA_READY=PARTIAL
+PRODUCTION_READY=NO
+CLOSED=domain_regression_pass;beta_non_migration_ready;negative_path_evidence
+OPEN=certification_post_mig_verify;live_runtime_post_gate;production_ready
+CENTRAL_BLOCKED=mig_apply;mig_register;mig_reconcile;verify_GO
+EXTERNAL_BLOCKED=video_jinn_ops_isolation
+NO_NEW_TESTS_UNLESS_BLOCKER=YES
