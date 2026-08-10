@@ -1,49 +1,26 @@
-import Link from "next/link";
-import AppTopNav from "../components/AppTopNav";
-import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
+import GamesHub from "../components/games/GamesHub";
+import GamesHubShell from "../components/games/GamesHubShell";
+import { APP_ROUTES } from "../lib/nav";
+import { adaptGamesCatalogToHubExperience } from "../../lib/games/gamesHubExperience";
 import { gamesMetadata } from "../../lib/site/routeMetadata";
 
 export const metadata = gamesMetadata;
 
 /**
- * Public Games entry for Home section circles.
- * Does not implement gameplay — honest hub shell only (Games internals untouched).
+ * Public Games entry — Option A empty-foundation Shell→Hub.
+ * Authority closed: grantsRewards=false; no runtime/playable activation.
  */
 export default function GamesHubPage() {
+  const experience = adaptGamesCatalogToHubExperience([]);
+
   return (
-    <main
-      className={`relative min-h-screen overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+    <GamesHubShell
+      title="Games"
+      subtitle="UMTUBA Games hub"
+      backHref={APP_ROUTES.home}
+      backLabel="Back to Home"
     >
-      <AppTopNav title="Games" subtitle="UMTUBA Games hub" sticky />
-      <div className="mx-auto max-w-3xl px-5 py-12 md:px-8">
-        <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-6 md:p-8">
-          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Games
-          </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">
-            Unavailable in this Beta
-          </h1>
-          <p className="mt-3 text-sm leading-7 text-white/55">
-            The Games route exists so Home shortcuts stay stable, but playable
-            catalog and sessions are not part of Alpha Beta Productization.
-            Nothing here can be played, purchased, or ranked yet.
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href={APP_ROUTES.home}
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-            >
-              Back to Home
-            </Link>
-            <Link
-              href={APP_ROUTES.live}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
-            >
-              Open Live
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <GamesHub experience={experience} />
+    </GamesHubShell>
   );
 }
