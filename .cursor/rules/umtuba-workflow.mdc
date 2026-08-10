@@ -21,6 +21,10 @@ Before starting any implementation or review task:
 - Never expose secrets, API keys, service-role keys, or `.env` contents.
 - Never modify modules outside the allowed scope of the current task.
 - Never let undocumented process rules override `docs/DEVELOPMENT_WORKFLOW.md`.
+- NEVER WRITE UMTUBA TASK OUTPUTS TO THE WINDOWS DESKTOP.
+  Reports, packets, handoffs, inventories, temporary scripts, logs, generated markdown/text/json files, smoke outputs, and agent artifacts MUST be written inside the relevant repository/worktree under a dedicated artifacts or docs/ops directory, or under the approved UMTUBA archive directory.
+  The Windows Desktop is not an UMTUBA workspace or artifact destination.
+  `_port_extract` is permanently protected and must never be touched.
 
 ## Sync before work
 
