@@ -13,6 +13,9 @@ const MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
 const PROJECT_REVIEW_MIGRATION =
   "supabase/migrations/20260864_learning_project_instructor_review_v1.sql";
+/** Lifecycle RPCs (ensure/archive/resume active thread) ship in 20260876, not 63/64. */
+const TUTOR_LIFECYCLE_MIGRATION =
+  "supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
@@ -26,17 +29,26 @@ describe("First Course Readiness V1 — migration presence", () => {
   it("ships 20260863 + project instructor review migration", () => {
     expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
     expect(existsSync(join(ROOT, PROJECT_REVIEW_MIGRATION))).toBe(true);
+    expect(existsSync(join(ROOT, TUTOR_LIFECYCLE_MIGRATION))).toBe(true);
     expect(
       readdirSync(join(ROOT, "supabase/migrations"))
     ).toContain("20260863_learning_first_course_readiness_v1.sql");
     expect(
       readdirSync(join(ROOT, "supabase/migrations"))
     ).toContain("20260864_learning_project_instructor_review_v1.sql");
+    expect(
+      readdirSync(join(ROOT, "supabase/migrations"))
+    ).toContain(
+      "20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql"
+    );
   });
 });
 
 describe("First Course Readiness V1 — tables & functions", () => {
-  const sql = `${read(MIGRATION)}\n${read(PROJECT_REVIEW_MIGRATION)}`;
+  // Tables remain in 63/64; tutor lifecycle RPCs (ensure/archive/resume) in 76.
+  const sql = `${read(MIGRATION)}\n${read(PROJECT_REVIEW_MIGRATION)}\n${read(
+    TUTOR_LIFECYCLE_MIGRATION
+  )}`;
   const body = stripSqlComments(sql);
 
   it("creates major domain tables", () => {
