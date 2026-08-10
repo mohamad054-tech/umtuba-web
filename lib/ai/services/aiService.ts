@@ -21,8 +21,14 @@ import {
   runLearningTutorCapability,
   type LearningTutorCapabilityId,
 } from "../capabilities/learning/tutorRunner";
+import { getCapabilityCatalogRegistry } from "../catalog";
 import { loadAiPlatformConfig } from "../config";
 import { recordAiServiceUsageAfterExecution } from "../usage/trackingFoundation";
+import {
+  aiUsageQuotasBillingFoundation,
+  resolveMeteringOrDefault,
+} from "../usage/usageFoundation";
+import type { AiUsageActor } from "../usage/quotasBillingTypes";
 
 export type AiServiceDeps = {
   supabase: SupabaseClient;
@@ -45,6 +51,23 @@ function asFailure(
       retryable: AI_RETRYABLE_CODES.has(code),
     },
   };
+}
+
+function usageActorFor(deps: AiServiceDeps, tenantId: string): AiUsageActor {
+  return {
+    userId: deps.userId,
+    tenantId,
+    permissions: ["usage_record", "usage_read_self"],
+  };
+}
+
+function resolveTenantId(request: AiServiceRunRequest, userId: string): string {
+  return (
+    request.context.storeId ??
+    request.context.courseId ??
+    request.context.workspaceId ??
+    `user:${userId}`
+  );
 }
 
 function trackAfterServiceExecution(
@@ -84,6 +107,39 @@ function trackAfterServiceExecution(
   } catch {
     // Tracking must not break the service response.
   }
+
+  try {
+    const entry = getCapabilityCatalogRegistry().lookup(request.capabilityId);
+    const metering = resolveMeteringOrDefault(entry?.metering);
+    const tenantId = resolveTenantId(request, deps.userId);
+    const status =
+      result.ok
+        ? "success"
+        : result.error.code === "safety_block" ||
+            result.error.code === "permission_denied" ||
+            result.error.code === "rate_limited"
+          ? "blocked"
+          : result.error.code === "cancelled"
+            ? "cancelled"
+            : result.error.code === "timeout"
+              ? "timed_out"
+              : "failed";
+    aiUsageQuotasBillingFoundation.recordUsage({
+      actor: usageActorFor(deps, tenantId),
+      metering,
+      requestId,
+      capabilityId: request.capabilityId,
+      tenantId,
+      userId: deps.userId,
+      status,
+      source: "shared_ai_service",
+      latencyMs: Math.max(0, Date.now() - startedMs),
+      correlationId: requestId,
+      auditEventId: requestId,
+    });
+  } catch {
+    // Foundation recording must not break the service response.
+  }
 }
 
 /**
@@ -105,6 +161,59 @@ async function runCapabilityInner(
 ): Promise<AiServiceResult> {
   if (!deps.userId) {
     return asFailure("unauthenticated", "Authentication required.");
+  }
+
+  // Soft catalog gate: enforce executable only when catalogued.
+  // Uncatalogued alpha handlers (e.g. translation professional) remain reachable.
+  let metering = resolveMeteringOrDefault(null);
+  const catalogEntry = getCapabilityCatalogRegistry().lookup(
+    request.capabilityId
+  );
+  if (catalogEntry) {
+    try {
+      const entry =
+        getCapabilityCatalogRegistry().requireExecutable(request.capabilityId);
+      metering = resolveMeteringOrDefault(entry.metering);
+    } catch {
+      return asFailure("invalid_input", "Unknown capability.");
+    }
+  }
+
+  const tenantId = resolveTenantId(request, deps.userId);
+  try {
+    const gate = aiUsageQuotasBillingFoundation.preflight({
+      actor: usageActorFor(deps, tenantId),
+      capabilityId: request.capabilityId,
+      metering,
+      tenantId,
+      userId: deps.userId,
+      correlationId: request.context.workspaceId ?? null,
+    });
+    if (!gate.allowed) {
+      try {
+        aiUsageQuotasBillingFoundation.recordUsage({
+          actor: usageActorFor(deps, tenantId),
+          metering,
+          requestId: `rejected_${Date.now().toString(36)}`,
+          capabilityId: request.capabilityId,
+          tenantId,
+          userId: deps.userId,
+          status: "rejected",
+          source: "shared_ai_service",
+          correlationId: request.context.workspaceId ?? null,
+        });
+      } catch {
+        /* ignore */
+      }
+      return asFailure(
+        "rate_limited",
+        gate.denialReason ?? "Usage quota or budget denied."
+      );
+    }
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Usage preflight failed.";
+    return asFailure("configuration_invalid", message);
   }
 
   if (request.capabilityId === "commerce.product_draft_assistant") {
