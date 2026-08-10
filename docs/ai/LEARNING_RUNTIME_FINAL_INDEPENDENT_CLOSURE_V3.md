@@ -1,0 +1,12 @@
+﻿# RUNTIME_FINAL_INDEPENDENT_CLOSURE_V3
+BASE=a2100edd53c43d93f88cf3b06136f25e72694c52
+FOCUS=Close anything not requiring migration
+VITEST_EXIT=0
+learner=READY
+lesson=READY
+assessment=READY_NON_MIG
+progress=READY
+completion=READY_NON_MIG
+authorization=READY
+OVERALL=READY
+NO_MIGRATION_APPLY=YES
