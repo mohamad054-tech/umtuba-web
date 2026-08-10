@@ -1,0 +1,8 @@
+﻿# RUNTIME_FINAL_RELEASE_CLOSURE_V2
+CONSUMED_WAVE20_A2=YES BETA_NON_MIGRATION_READY_WAS=YES
+VITEST_EXIT=0
+PASS_NOW=learner_flow|assessment_contract|progress|completion_contract|instructor|authorization_contract
+LAPTOP_FIXABLE=NONE
+MIGRATION_BLOCKED=live_assessment_or_completion_if_persistence_gate
+EXTERNAL_BLOCKED=full_isolation_ops
+NO_REPEAT_FULL_HARDENING=YES
