@@ -259,3 +259,14 @@ export {
   type RcSafetyMatrixSafetyCounters,
   type RcSafetyMatrixScenarioId,
 } from "./refundProviderReleaseCandidateSafetyMatrix";
+export {
+  COMMERCE_RELEASE_CANDIDATE_FINAL_REGRESSION_PACK_ENVIRONMENT,
+  COMMERCE_RELEASE_CANDIDATE_FINAL_REGRESSION_PACK_VERSION,
+  FINAL_REGRESSION_COVERAGE_DOMAINS,
+  runCommerceReleaseCandidateFinalRegressionPack,
+  type FinalRegressionCoverageDomain,
+  type FinalRegressionPackRunResult,
+  type FinalRegressionSafetyCounters,
+  type FinalRegressionSuiteId,
+  type FinalRegressionSuiteResult,
+} from "./commerceReleaseCandidateFinalRegressionPack";
