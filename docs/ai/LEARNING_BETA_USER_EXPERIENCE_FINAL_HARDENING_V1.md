@@ -1,0 +1,8 @@
+﻿# BETA_USER_EXPERIENCE_FINAL_HARDENING_V1
+BASE=a2100edd53c43d93f88cf3b06136f25e72694c52
+VITEST_EXIT=0
+REVIEWED=learner_navigation|course_browsing|lesson_flow|empty_states|error_states|authorization_messages|instructor_experience
+FIX_NOW=NONE_PROVEN
+MIGRATION_BLOCKED=cert_persistence_ux|post_gate_live_flows
+CENTRAL_DEPENDENT=migration_gate_for_cert_surfaces
+POLICY=No broad refactor; no invent credentials; no cert schema touch
