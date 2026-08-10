@@ -1,0 +1,8 @@
+﻿# BETA_RUNTIME_NON_MIGRATION_HARDENING_V1
+SHA=a2100edd53c43d93f88cf3b06136f25e72694c52
+VITEST_EXIT=0
+TARGETS=lib/learning/learnerDelivery.test.ts lib/learning/lessonContentAccess.test.ts lib/learning/instructorExperience.test.ts lib/learning/completionFoundation.test.ts lib/learning/progressMutations.test.ts lib/learning/assessmentDelivery.test.ts lib/learning/betaReadiness.test.ts
+PASS_NOW=learner_login_navigation|course_access|lesson_navigation|instructor_navigation|authorization_negatives_contract
+MIGRATION_BLOCKED=assessment_or_completion_if_persistence
+EXTERNAL_BLOCKED=stale_session|full_isolation_ops
+NO_CERT_SCHEMA_TOUCH=YES
