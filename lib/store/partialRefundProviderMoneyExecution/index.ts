@@ -114,6 +114,14 @@ export {
   type StripeTestFixturePersistedFactShapes,
 } from "./stripeTestFixturePack";
 export {
+  STRIPE_TEST_FIXTURE_ENV_READINESS_VERSION,
+  buildStripeTestFixtureEnvReadinessReport,
+  isStripeTestFixtureEnvReadyForIsolatedPrep,
+  type StripeTestFixtureEnvReadinessReport,
+  type StripeTestFixtureEnvReadinessVerdict,
+  type StripeTestFixtureOperatorInput,
+} from "./stripeTestFixtureEnvReadiness";
+export {
   STRIPE_TEST_OFFLINE_PREFLIGHT_ALTERNATE_ENV_NAMES,
   STRIPE_TEST_OFFLINE_PREFLIGHT_ENVIRONMENT,
   STRIPE_TEST_OFFLINE_PREFLIGHT_GATE_STARTING_STATE_ENV_NAMES,
