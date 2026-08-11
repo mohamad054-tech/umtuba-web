@@ -60,70 +60,81 @@ export default async function LearningPublicCatalogPage() {
       )}
 
       {courses.length === 0 ? (
-        <p className="mt-8 rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-sm text-white/70">
+        <p
+          className="mt-8 rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-sm text-white/70"
+          role="status"
+          data-testid="learning-catalog-empty"
+        >
           No public courses are available yet.
         </p>
       ) : (
-        <ul className="mt-8 space-y-4">
+        <ul
+          className="mt-8 space-y-4"
+          aria-label="Public courses"
+          data-testid="learning-catalog-list"
+        >
           {courses.map((course) => {
             const imageUrl = course.thumbnail_url ?? course.cover_url;
             return (
-              <li
-                key={course.id}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]"
-              >
-                {imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={imageUrl}
-                    alt=""
-                    className="h-36 w-full object-cover"
-                  />
-                ) : null}
-                <div className="px-4 py-4">
-                  <h2 className="text-lg font-bold text-white">{course.name}</h2>
-                  {course.description ? (
-                    <p className="mt-2 line-clamp-3 text-sm text-white/70">
-                      {course.description}
-                    </p>
+              <li key={course.id}>
+                <Link
+                  href={LEARNING_PUBLIC_ROUTES.course(course.slug)}
+                  className="watch-focus-ring block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] transition hover:border-white/20 hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  aria-label={`View course: ${course.name}`}
+                  data-testid="learning-catalog-card-link"
+                >
+                  {imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imageUrl}
+                      alt={`Cover for ${course.name}`}
+                      className="h-36 w-full object-cover"
+                    />
                   ) : null}
-                  <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/55">
-                    {course.difficulty ? (
+                  <div className="px-4 py-4">
+                    <h2 className="text-lg font-bold text-white">
+                      {course.name}
+                    </h2>
+                    {course.description ? (
+                      <p className="mt-2 line-clamp-3 text-sm text-white/70">
+                        {course.description}
+                      </p>
+                    ) : null}
+                    <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/55">
+                      {course.difficulty ? (
+                        <div>
+                          <dt className="inline">Level: </dt>
+                          <dd className="inline capitalize text-white/80">
+                            {course.difficulty}
+                          </dd>
+                        </div>
+                      ) : null}
                       <div>
-                        <dt className="inline">Level: </dt>
-                        <dd className="inline capitalize text-white/80">
-                          {course.difficulty}
+                        <dt className="inline">Modules: </dt>
+                        <dd className="inline text-white/80">
+                          {course.module_count}
                         </dd>
                       </div>
-                    ) : null}
-                    <div>
-                      <dt className="inline">Modules: </dt>
-                      <dd className="inline text-white/80">
-                        {course.module_count}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="inline">Lessons: </dt>
-                      <dd className="inline text-white/80">
-                        {course.lesson_count}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="sr-only">Price</dt>
-                      <dd className="inline font-semibold text-emerald-300">
-                        {course.is_free ? "Free" : "Paid"}
-                      </dd>
-                    </div>
-                  </dl>
-                  <p className="mt-4">
-                    <Link
-                      href={LEARNING_PUBLIC_ROUTES.course(course.slug)}
-                      className="watch-focus-ring inline-flex rounded-xl bg-white px-4 py-2 text-sm font-bold text-black hover:bg-white/90"
-                    >
-                      View Course
-                    </Link>
-                  </p>
-                </div>
+                      <div>
+                        <dt className="inline">Lessons: </dt>
+                        <dd className="inline text-white/80">
+                          {course.lesson_count}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="sr-only">Price</dt>
+                        <dd className="inline font-semibold text-emerald-300">
+                          {course.is_free ? "Free" : "Paid"}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="mt-4">
+                      <span className="inline-flex rounded-xl bg-white px-4 py-2 text-sm font-bold text-black">
+                        View Course
+                      </span>
+                    </p>
+                  </div>
+                </Link>
               </li>
             );
           })}
