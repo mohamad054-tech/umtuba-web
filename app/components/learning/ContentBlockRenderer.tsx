@@ -123,14 +123,15 @@ export default function ContentBlockRenderer({
           <video
             controls
             preload="metadata"
-            className="w-full rounded-2xl bg-black"
+            className="watch-focus-ring w-full rounded-2xl bg-black"
             src={url}
             data-provider={provider ?? undefined}
+            aria-label={caption || "Lesson video"}
           >
             Your browser does not support video playback.
           </video>
           {caption ? (
-            <figcaption className="mt-2 text-xs text-white/45">{caption}</figcaption>
+            <figcaption className="mt-2 text-xs text-white/60">{caption}</figcaption>
           ) : null}
         </figure>
       );
@@ -141,11 +142,17 @@ export default function ContentBlockRenderer({
       const caption = asPlainString(content.caption, 1000);
       return (
         <figure>
-          <audio controls preload="metadata" className="w-full" src={url}>
+          <audio
+            controls
+            preload="metadata"
+            className="watch-focus-ring w-full"
+            src={url}
+            aria-label={caption || "Lesson audio"}
+          >
             Your browser does not support audio playback.
           </audio>
           {caption ? (
-            <figcaption className="mt-2 text-xs text-white/45">{caption}</figcaption>
+            <figcaption className="mt-2 text-xs text-white/60">{caption}</figcaption>
           ) : null}
         </figure>
       );

@@ -37,15 +37,18 @@ export default function ContinueWatchingVideo({
     else el.addEventListener("loadedmetadata", seek, { once: true });
   }, [initialSeconds]);
 
+  const label = caption?.trim() || "Lesson video";
+
   return (
     <figure>
       <video
         ref={videoRef}
         controls
         preload="metadata"
-        className="w-full rounded-2xl bg-black"
+        className="watch-focus-ring w-full rounded-2xl bg-black"
         src={src}
         data-provider={provider ?? undefined}
+        aria-label={label}
         onTimeUpdate={() => {
           const el = videoRef.current;
           if (!el) return;
@@ -62,7 +65,7 @@ export default function ContinueWatchingVideo({
         Your browser does not support video playback.
       </video>
       {caption ? (
-        <figcaption className="mt-2 text-xs text-white/45">{caption}</figcaption>
+        <figcaption className="mt-2 text-xs text-white/60">{caption}</figcaption>
       ) : null}
     </figure>
   );

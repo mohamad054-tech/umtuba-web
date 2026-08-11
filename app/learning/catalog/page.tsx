@@ -76,7 +76,7 @@ export default async function LearningPublicCatalogPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={imageUrl}
-                    alt=""
+                    alt={`${course.name} course cover`}
                     className="h-36 w-full object-cover"
                   />
                 ) : null}

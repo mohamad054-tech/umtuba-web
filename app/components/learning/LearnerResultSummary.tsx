@@ -20,13 +20,16 @@ export default function LearnerResultSummary({
     <div
       className="mt-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-50"
       data-testid="learner-result-summary"
+      role="status"
+      aria-live="polite"
+      aria-label="Assessment result"
     >
-      <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-200/70">
+      <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-200/80">
         Result
       </p>
       <p className="mt-1 text-lg font-black tracking-tight">
         {formatScore(score_earned)} / {formatScore(score_max)}
-        <span className="ml-2 text-base font-bold text-emerald-100/80">
+        <span className="ml-2 text-base font-bold text-emerald-100/90">
           ({formatPercentage(percentage)}%)
         </span>
       </p>
@@ -37,7 +40,7 @@ export default function LearnerResultSummary({
         <p className="mt-1 text-sm font-semibold text-amber-200">Not passed</p>
       ) : null}
       {scored_at ? (
-        <p className="mt-1 text-xs text-emerald-100/50">
+        <p className="mt-1 text-xs text-emerald-100/70">
           Scored {formatScoredAt(scored_at)}
         </p>
       ) : null}

@@ -42,10 +42,10 @@ export default function AssessmentSubmitForm({
         and you cannot cancel the attempt afterward.
       </p>
 
-      <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-white/70">
+      <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-white/80">
         <input
           type="checkbox"
-          className="mt-1"
+          className="watch-focus-ring mt-1 h-4 w-4 accent-white"
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
           aria-describedby="submit-confirm-help"

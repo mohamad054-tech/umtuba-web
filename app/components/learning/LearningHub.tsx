@@ -46,11 +46,11 @@ export default function LearningHub({ hub }: LearningHubProps) {
   return (
     <div className="mt-6 space-y-6">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/55">
           My Learning
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">Continue learning</h1>
-        <p className="mt-2 text-sm text-white/50">
+        <p className="mt-2 text-sm text-white/65">
           Programs and courses you can access through your enrollments.
         </p>
       </section>

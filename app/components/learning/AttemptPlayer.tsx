@@ -264,12 +264,18 @@ export default function AttemptPlayer({
   }
 
   return (
-    <div className="mt-6 space-y-4">
-      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+    <div className="mt-6 space-y-4" aria-label="Assessment attempt">
+      <section
+        className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7"
+        aria-labelledby="attempt-heading"
+      >
+        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/55">
           Attempt #{view.attempt_number}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        <h1
+          id="attempt-heading"
+          className="mt-1 text-3xl font-black tracking-tight"
+        >
           {activityName ?? "Activity attempt"}
         </h1>
         <div className="mt-4">
@@ -279,7 +285,7 @@ export default function AttemptPlayer({
             resultView={resultView}
           />
         </div>
-        <p className="mt-3 text-xs text-white/40" aria-live="polite">
+        <p className="mt-3 text-xs text-white/60" aria-live="polite">
           {saveState === "saving"
             ? "Saving…"
             : saveState === "saved"
@@ -290,7 +296,7 @@ export default function AttemptPlayer({
         </p>
       </section>
 
-      <div className="space-y-3">
+      <div className="space-y-3" aria-label="Attempt questions">
         {view.questions_snapshot.map((q) => (
           <AttemptQuestion
             key={q.question_id}
