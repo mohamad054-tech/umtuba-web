@@ -40,9 +40,9 @@ export default async function TranslationStudioReviewPage({
             {query.error}
           </p>
         ) : null}
-        <h1 className="text-xl font-black">
+        <h2 className="text-xl font-black">
           Review queue · {queue.length}
-        </h1>
+        </h2>
         <p className="mt-1 text-sm text-white/55">
           Human approval required. AI never auto-approves.
         </p>

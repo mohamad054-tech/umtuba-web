@@ -54,9 +54,9 @@ export default async function AdvertiseSettingsPage({
       ) : null}
 
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">
+        <h2 className="text-2xl font-black tracking-tight">
           Advertiser profile
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Contact details stay inside the advertiser workspace. Status:{" "}
           <span className="text-white/80">{account.status}</span>

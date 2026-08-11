@@ -11,7 +11,7 @@ export default async function AiPromotionQueuePage() {
   return (
     <AiDataPlatformShell title="Promotion Queue">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Promotion gates</h1>
+        <h2 className="text-lg font-black">Promotion gates</h2>
         <p className="mt-2 text-sm text-white/50">
           Never automatic — dataset, rights, quality, evaluation, and human
           approval required.

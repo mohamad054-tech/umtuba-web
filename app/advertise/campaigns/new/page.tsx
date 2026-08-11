@@ -36,9 +36,9 @@ export default async function NewCampaignPage({ searchParams }: PageProps) {
   return (
     <AdvertiseShell title="New campaign">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">
+        <h2 className="text-2xl font-black tracking-tight">
           Create a campaign
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Budgets use integer minor units (e.g. 1000 = $10.00). Spend is not
           charged in V1 — figures are for planning only.

@@ -17,7 +17,7 @@ export default async function TranslationStudioNamespacesPage() {
   return (
     <TranslationStudioShell title="Namespaces" subtitle="Key groupings">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Namespaces</h1>
+        <h2 className="text-xl font-black">Namespaces</h2>
         <ul className="mt-4 space-y-3">
           {namespaces.map((ns) => {
             const count = studio.listKeys(ns.id).length;

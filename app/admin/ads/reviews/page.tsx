@@ -36,7 +36,7 @@ export default async function AdminAdsReviewsPage({ searchParams }: PageProps) {
       <FlashMessages error={params.error} />
 
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-6">
-        <h1 className="text-2xl font-black tracking-tight">Audit trail</h1>
+        <h2 className="text-2xl font-black tracking-tight">Audit trail</h2>
         <p className="mt-2 text-sm text-white/50">
           Immutable review history. Admins cannot edit or delete past events.
         </p>

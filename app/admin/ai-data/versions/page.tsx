@@ -11,7 +11,7 @@ export default async function AiDatasetVersionsPage() {
   return (
     <AiDataPlatformShell title="Dataset Versions">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Version lineage</h1>
+        <h2 className="text-lg font-black">Version lineage</h2>
         <ul className="mt-4 divide-y divide-white/10">
           {versions.map((v) => (
             <li key={v.id} className="py-3">

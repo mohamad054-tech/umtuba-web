@@ -464,9 +464,9 @@ export default function CreateVideoForm() {
     >
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl font-black tracking-tight text-white">
+          <h2 className="text-2xl font-black tracking-tight text-white">
             Upload a video
-          </h1>
+          </h2>
           {pipelineStatus ? (
             <MediaPipelineStatusBadge status={pipelineStatus} />
           ) : null}

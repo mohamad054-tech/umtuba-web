@@ -47,7 +47,7 @@ export default async function AdvertiseDashboardPage({
     return (
       <AdvertiseShell title="Dashboard">
         <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-6">
-          <h1 className="text-2xl font-black">No advertiser account yet</h1>
+          <h2 className="text-2xl font-black">No advertiser account yet</h2>
           <p className="mt-2 text-sm text-white/50">
             Apply to create an advertiser account before drafting campaigns.
           </p>
@@ -85,9 +85,9 @@ export default async function AdvertiseDashboardPage({
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               Advertiser
             </p>
-            <h1 className="mt-1 text-2xl font-black tracking-tight">
+            <h2 className="mt-1 text-2xl font-black tracking-tight">
               {account.businessName}
-            </h1>
+            </h2>
             <p className="mt-1 text-sm text-white/50">
               Status: <span className="text-white/80">{account.status}</span> · Role:{" "}
               {account.myRole}

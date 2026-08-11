@@ -58,9 +58,9 @@ export default async function TranslationStudioKeysPage({
   return (
     <TranslationStudioShell title="Keys" subtitle="App Shell inventory">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">
+        <h2 className="text-xl font-black">
           Keys{namespaceId ? ` · ${namespaceId}` : ""}
-        </h1>
+        </h2>
         <p className="mt-1 text-sm text-white/55">
           {approvedTotal} approved · {needsReviewTotal} needs review ·{" "}
           {missingTotal} missing

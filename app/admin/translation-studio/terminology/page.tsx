@@ -13,7 +13,7 @@ export default async function TranslationStudioTerminologyPage() {
   return (
     <TranslationStudioShell title="Terminology" subtitle="Approved terms">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Terminology database</h1>
+        <h2 className="text-xl font-black">Terminology database</h2>
         <ul className="mt-4 space-y-4">
           {terms.map((term) => (
             <li

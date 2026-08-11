@@ -17,6 +17,9 @@ const NAV = [
   { href: `${TRANSLATION_STUDIO_BASE}/intelligence`, label: "Intelligence" },
 ] as const;
 
+/**
+ * Translation Studio admin chrome — AppTopNav stays full-bleed.
+ */
 export default function TranslationStudioShell({
   children,
   title,
@@ -28,14 +31,15 @@ export default function TranslationStudioShell({
 }) {
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
+      <AppTopNav
+        title={title}
+        subtitle={subtitle ?? "Internal Translation Studio"}
+        sticky
+      />
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <AppTopNav
-          title={title}
-          subtitle={subtitle ?? "Internal Translation Studio"}
-        />
         <nav
           aria-label="Translation Studio"
-          className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+          className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
         >
           <Link
             href={APP_ROUTES.adminStore}

@@ -13,9 +13,9 @@ export default function AdvertiseLandingPage() {
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           UMTUBA Ads
         </p>
-        <h1 className="mt-2 max-w-xl text-3xl font-black tracking-tight md:text-4xl">
+        <h2 className="mt-2 max-w-xl text-3xl font-black tracking-tight md:text-4xl">
           Reach people where they discover, watch, and shop.
-        </h1>
+        </h2>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/55">
           Create an advertiser account, draft campaigns, and submit creatives for
           review. Delivery to Watch, Discover, Stories, and Store is not live in

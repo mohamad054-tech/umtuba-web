@@ -13,7 +13,7 @@ export default async function KnowledgeDatasetsPage() {
   return (
     <KnowledgeAcquisitionShell title="Datasets">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Dataset registry</h1>
+        <h2 className="text-lg font-black">Dataset registry</h2>
         <p className="mt-2 text-sm text-white/50">
           Dataset eligibility is governance metadata only — no training runs.
         </p>

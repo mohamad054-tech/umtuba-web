@@ -16,6 +16,9 @@ const NAV = [
   { href: `${PRIVATE_AI_BASE}/runtime`, label: "Runtime" },
 ] as const;
 
+/**
+ * Private AI admin chrome — AppTopNav stays full-bleed.
+ */
 export default function PrivateAiShell({
   children,
   title,
@@ -27,14 +30,15 @@ export default function PrivateAiShell({
 }) {
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
+      <AppTopNav
+        title={title}
+        subtitle={subtitle ?? "Private AI Deployment & Runtime"}
+        sticky
+      />
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <AppTopNav
-          title={title}
-          subtitle={subtitle ?? "Private AI Deployment & Runtime"}
-        />
         <nav
           aria-label="Private AI"
-          className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+          className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
         >
           <Link
             href={APP_ROUTES.adminStore}

@@ -20,6 +20,10 @@ type AdvertiseShellProps = {
   showNav?: boolean;
 };
 
+/**
+ * Platform Advertise chrome — AppTopNav stays full-bleed.
+ * Page content is constrained; do not nest primary nav in max-w-*.
+ */
 export default function AdvertiseShell({
   title,
   subtitle = "UMTUBA Ads",
@@ -30,12 +34,12 @@ export default function AdvertiseShell({
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      <AppTopNav title={title} subtitle={subtitle} sticky />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title={title} subtitle={subtitle} />
         {showNav ? (
           <nav
             aria-label="Advertise"
-            className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+            className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
           >
             {LINKS.map((link) => (
               <Link
@@ -48,7 +52,7 @@ export default function AdvertiseShell({
             ))}
           </nav>
         ) : null}
-        <div className="mt-6">{children}</div>
+        <div className={showNav ? "mt-6" : undefined}>{children}</div>
       </div>
     </main>
   );

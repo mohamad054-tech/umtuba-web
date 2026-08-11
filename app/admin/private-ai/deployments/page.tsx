@@ -11,7 +11,7 @@ export default async function PrivateAiDeploymentsPage() {
   return (
     <PrivateAiShell title="Deployments">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Deployment profiles</h1>
+        <h2 className="text-lg font-black">Deployment profiles</h2>
         <p className="mt-2 text-sm text-white/50">
           Contracts only — no infrastructure provisioning.
         </p>

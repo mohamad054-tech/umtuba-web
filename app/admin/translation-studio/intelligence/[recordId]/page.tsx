@@ -39,7 +39,7 @@ export default async function TranslationIntelligenceRecordPage({
     <TranslationStudioShell title="Intelligence record" subtitle={record.id}>
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-xl font-black">{record.sourceText}</h1>
+          <h2 className="text-xl font-black">{record.sourceText}</h2>
           <p className="mt-2 text-lg" dir="auto">
             {record.approvedTargetText}
           </p>

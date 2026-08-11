@@ -13,7 +13,7 @@ export default async function KnowledgeQualityPage() {
   return (
     <KnowledgeAcquisitionShell title="Quality">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Quality evaluation</h1>
+        <h2 className="text-lg font-black">Quality evaluation</h2>
         <ul className="mt-4 space-y-4">
           {assets.map((a) => (
             <li

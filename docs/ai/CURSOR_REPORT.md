@@ -1,21 +1,27 @@
-# CURSOR_REPORT — CENTRAL / UM_CORE_PLATFORM_FINAL_CENTRAL_PRODUCTION_SIGNOFF_V1
+# CURSOR_REPORT — ZERO_WAIT_CENTRAL_CONTINUOUS_V3
 
 ## Summary
 
-Central final production signoff for UM Core on `alpha-0.2`:
+Central Continuous Zero-Wait V3 on alpha tip `e84475a769c731bb7e1ad511b3543ee714d2feea` (worktree `_tmp-translation-alpha-integrate-68dd8c74`), **2 cycles / 6 local fixes**, no commit. Did not redo V1/V2 FIXED tasks. Did not steal Desktop/Laptop/PC2 active scopes. FROM-* device reports ABSENT — no Games land.
 
-- Integrated PC2-A2 Spec/Standards closeout (FF)
-- Integrated PC2-A3 ops/error signoff closeout (merge + magnet resolve)
-- Integrated PC2-A1 P23 not-root-public wiring closeout (cherry-pick reconcile)
-- Packaged existing perf/scale assumptions evidence (smallest Central packaging)
-- Declared `PRODUCTION_READY=YES` + `CENTRAL_SIGNOFF_COMPLETE=YES`
+**Cycle 1:** AdvertiseShell, PrivateAiShell, KnowledgeAcquisitionShell + AiDataPlatformShell — full-bleed AppTopNav + page single-H1.
 
-## Exact files changed
+**Cycle 2:** CreateVideoForm single-H1; TranslationStudioShell; AdminAdsShell + AdminStoreShell — full-bleed AppTopNav + page single-H1.
 
-See Central signoff report. Key normative stamps:
+## Exact files changed (V3 highlights)
 
-- `docs/core/UM_CORE_PLATFORM_CENTRAL_PRODUCTION_SIGNOFF_V1.md`
-- `docs/core/UM_CORE_PLATFORM_RELEASE_CONTRACT_V1.md` §17
+- `app/advertise/AdvertiseShell.tsx` + advertise pages (h1→h2)
+- `app/admin/private-ai/PrivateAiShell.tsx` + private-ai pages
+- `app/admin/knowledge/KnowledgeAcquisitionShell.tsx` + knowledge pages
+- `app/admin/ai-data/AiDataPlatformShell.tsx` + ai-data pages
+- `app/admin/translation-studio/TranslationStudioShell.tsx` + studio pages
+- `app/admin/ads/AdminAdsShell.tsx` + ads admin pages
+- `app/admin/store/AdminStoreShell.tsx` + store admin pages
+- `app/create/video/CreateVideoForm.tsx`
+- `lib/site/adminAndAdvertiseShellChromeContract.test.ts` (new/extended)
+- `docs/ai/CURSOR_REPORT.md` (this file)
+
+Plus retained dirty V1+V2 pack (GamesHubShell, referral siteUrl, Learning/World/Seller/Rewards/AppTopNav titleIsHeading, next.config headers, etc.).
 
 ## Migrations created
 
@@ -23,22 +29,25 @@ None.
 
 ## Security review
 
-Docs/tests/evidence packaging only. No secrets. P19 unused-by-default preserved. P23 not root-public absolute.
+No secrets / `.env` reads. No credential paths. No remote mutations. Admin chrome only; no Permissions-Policy/CSP invent beyond prior V2 baseline headers.
 
 ## Tests
 
-- Focused closeout: PASS
-- Full `platforms/core`: PASS 42 files / 426 tests
-- `npx tsc --noEmit`: PASS
-- `git diff --check`: PASS
+```
+npx vitest run lib/site/adminAndAdvertiseShellChromeContract.test.ts \
+  lib/site/appTopNavHeadingAndSecurityHeadersContract.test.ts \
+  lib/site/platformShellSingleH1Contract.test.ts
+```
+
+PASS (14).
 
 ## TypeScript
 
-PASS
+`npx tsc --noEmit` — PASS
 
 ## Build
 
-Not required.
+Not run (policy; shell/a11y only).
 
 ## git diff --check
 
@@ -46,8 +55,10 @@ PASS
 
 ## git status --short
 
-See Central signoff report after push.
+Dirty uncommitted V1+V2+V3 pack on alpha worktree. COMMITS=NONE.
 
 ## Open issues
 
-None for UM Core foundation production signoff. Do **not** issue another UM Core foundation.
+- Games Option A land waits Desktop OUTBOX COMPLETE.
+- Explicit commit GO required for dirty alpha pack.
+- Device FROM-* still empty at session end.

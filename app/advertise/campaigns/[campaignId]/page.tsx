@@ -122,7 +122,7 @@ export default async function CampaignDetailPage({
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               {campaign.objective.replace(/_/g, " ")}
             </p>
-            <h1 className="mt-1 text-2xl font-black">{campaign.name}</h1>
+            <h2 className="mt-1 text-2xl font-black">{campaign.name}</h2>
             <p className="mt-1 text-sm text-white/50">
               Status: {campaign.status} · Spent{" "}
               {formatMinorUnits(campaign.spentMinor, campaign.currencyCode)}{" "}

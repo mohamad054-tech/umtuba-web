@@ -33,9 +33,9 @@ export default async function AdvertiseApplyPage({
   return (
     <AdvertiseShell title="Apply" subtitle="Advertiser account" showNav={false}>
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">
+        <h2 className="text-2xl font-black tracking-tight">
           Create your advertiser account
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Submit business details for review. You can draft campaigns after
           creating the account; ads will not deliver until approvals and a later

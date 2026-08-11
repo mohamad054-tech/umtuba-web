@@ -19,9 +19,9 @@ export default async function AdminStoreOverviewPage() {
   return (
     <AdminStoreShell title="Store admin">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">
+        <h2 className="text-2xl font-black tracking-tight">
           Moderation queue overview
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Internal console for seller applications and product review. Checkout,
           payments, and shipping remain outside this slice.

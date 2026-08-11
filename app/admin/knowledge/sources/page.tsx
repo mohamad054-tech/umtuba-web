@@ -13,7 +13,7 @@ export default async function KnowledgeSourcesPage() {
   return (
     <KnowledgeAcquisitionShell title="Knowledge Sources">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Source registry</h1>
+        <h2 className="text-lg font-black">Source registry</h2>
         <ul className="mt-4 divide-y divide-white/10">
           {sources.map((s) => (
             <li key={s.id} className="py-3">

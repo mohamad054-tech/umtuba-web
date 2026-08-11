@@ -30,7 +30,7 @@ export default async function TranslationStudioPublishPage() {
     >
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-xl font-black">App Shell publish batch</h1>
+          <h2 className="text-xl font-black">App Shell publish batch</h2>
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">

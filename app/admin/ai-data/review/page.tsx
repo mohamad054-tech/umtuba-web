@@ -43,7 +43,7 @@ export default async function AiDataReviewPage() {
     <AiDataPlatformShell title="Review Dashboard">
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-lg font-black">Workflow review</h1>
+          <h2 className="text-lg font-black">Workflow review</h2>
           <p className="mt-2 text-sm text-white/50">
             End-to-end governed dataset lifecycle — no training executed.
           </p>

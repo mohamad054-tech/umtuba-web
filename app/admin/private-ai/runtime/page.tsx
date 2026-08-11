@@ -17,7 +17,7 @@ export default async function PrivateAiRuntimeDiagnosticsPage() {
     >
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-lg font-black">Runtime diagnostics</h1>
+          <h2 className="text-lg font-black">Runtime diagnostics</h2>
           <p className="mt-2 text-sm text-white/50">
             Contract status only — no live pings, training, fine-tuning, or
             inference. {runtimes.length} runtime endpoint

@@ -32,7 +32,7 @@ export default async function TranslationStudioAppShellPage() {
     >
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-xl font-black">Findings summary</h1>
+          <h2 className="text-xl font-black">Findings summary</h2>
           <ul className="mt-3 grid gap-2 text-sm text-white/70 sm:grid-cols-2">
             <li>Terminology conflicts: {summary.conflictCount}</li>
             <li>English leakage in Arabic: {summary.leakageCount}</li>

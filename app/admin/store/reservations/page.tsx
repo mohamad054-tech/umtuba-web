@@ -46,9 +46,9 @@ export default async function AdminStoreReservationsPage({
   return (
     <AdminStoreShell title="Reservations">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">
+        <h2 className="text-2xl font-black tracking-tight">
           Inventory reservations
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Operational visibility only. No buyer contact or payment metadata.
           Stuck = active/pending_capture past expiry (conservative, read-only).

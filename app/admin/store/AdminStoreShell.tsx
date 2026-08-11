@@ -18,16 +18,19 @@ type Props = {
   children: ReactNode;
 };
 
+/**
+ * Store admin chrome — AppTopNav stays full-bleed.
+ */
 export default function AdminStoreShell({ title, children }: Props) {
   return (
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      <AppTopNav title={title} subtitle="Store moderation" sticky />
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <AppTopNav title={title} subtitle="Store moderation" />
         <nav
           aria-label="Store admin"
-          className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+          className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
         >
           {LINKS.map((link) => (
             <Link

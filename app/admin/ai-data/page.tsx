@@ -22,7 +22,7 @@ export default async function AiDataPlatformOverviewPage() {
     >
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-xl font-black">Foundation V1</h1>
+          <h2 className="text-xl font-black">Foundation V1</h2>
           <p className="mt-2 text-sm text-white/55">
             Dataset → Builder → Evaluation → Experiment → Model → Promotion →
             Production. Registry only — no training or inference changes.

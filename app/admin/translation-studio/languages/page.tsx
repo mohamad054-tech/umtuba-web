@@ -13,7 +13,7 @@ export default async function TranslationStudioLanguagesPage() {
   return (
     <TranslationStudioShell title="Languages" subtitle="Studio locales">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Supported languages</h1>
+        <h2 className="text-xl font-black">Supported languages</h2>
         <ul className="mt-4 divide-y divide-white/10">
           {languages.map((lang) => (
             <li

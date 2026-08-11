@@ -14,7 +14,7 @@ export default async function KnowledgeRightsPage() {
     <KnowledgeAcquisitionShell title="Rights">
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-lg font-black">Rights engine (fail closed)</h1>
+          <h2 className="text-lg font-black">Rights engine (fail closed)</h2>
           <p className="mt-2 text-sm text-white/50">
             Unknown or restricted rights never become training eligible.
           </p>

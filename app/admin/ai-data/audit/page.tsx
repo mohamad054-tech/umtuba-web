@@ -11,7 +11,7 @@ export default async function AiDataAuditPage() {
   return (
     <AiDataPlatformShell title="Audit Trail">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Workflow audit</h1>
+        <h2 className="text-lg font-black">Workflow audit</h2>
         <p className="mt-2 text-sm text-white/50">
           Every state transition is recorded. Never automatic.
         </p>

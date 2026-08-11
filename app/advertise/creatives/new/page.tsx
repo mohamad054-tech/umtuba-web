@@ -37,7 +37,7 @@ export default async function NewCreativePage({ searchParams }: PageProps) {
   return (
     <AdvertiseShell title="New creative">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-2xl font-black tracking-tight">Upload a creative</h1>
+        <h2 className="text-2xl font-black tracking-tight">Upload a creative</h2>
         <p className="mt-2 text-sm text-white/50">
           Media stays in the private ad-creatives bucket. Use https destinations
           only. Approved creatives cannot be edited — create a new draft instead.

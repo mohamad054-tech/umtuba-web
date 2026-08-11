@@ -128,7 +128,7 @@ export default async function TranslationStudioKeyDetailPage({
 
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
           <p className="font-mono text-xs text-white/45">{key.id}</p>
-          <h1 className="mt-1 text-2xl font-black tracking-tight">{key.key}</h1>
+          <h2 className="mt-1 text-2xl font-black tracking-tight">{key.key}</h2>
           <p className="mt-2 text-sm text-white/70">{key.sourceText}</p>
         </div>
 

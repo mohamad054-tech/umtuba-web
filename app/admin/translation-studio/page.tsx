@@ -90,9 +90,9 @@ export default async function TranslationStudioOverviewPage() {
     <TranslationStudioShell title="Translation Studio">
       <section className="space-y-4">
         <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-2xl font-black tracking-tight">
+          <h2 className="text-2xl font-black tracking-tight">
             App Shell catalog review
-          </h1>
+          </h2>
           <p className="mt-2 max-w-2xl text-sm text-white/55">
             First real platform batch: ingested App Shell namespaces (
             {APP_SHELL_NAMESPACES.join(", ")}). English approved as source;

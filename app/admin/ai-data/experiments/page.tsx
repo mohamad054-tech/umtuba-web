@@ -11,7 +11,7 @@ export default async function AiExperimentsPage() {
   return (
     <AiDataPlatformShell title="Experiments">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Experiment registry</h1>
+        <h2 className="text-lg font-black">Experiment registry</h2>
         <p className="mt-2 text-sm text-white/50">
           Records only — no training runs are executed in V1.
         </p>

@@ -15,7 +15,7 @@ export default async function PrivateAiOverviewPage() {
       subtitle="Deployment & Runtime V1"
     >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Private AI platform</h1>
+        <h2 className="text-xl font-black">Private AI platform</h2>
         <p className="mt-2 text-sm text-white/55">
           Registry, lifecycle, and deployment/runtime contracts — no training,
           fine-tuning, inference, or weights.

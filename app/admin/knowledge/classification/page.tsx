@@ -13,7 +13,7 @@ export default async function KnowledgeClassificationPage() {
   return (
     <KnowledgeAcquisitionShell title="Classification">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-lg font-black">Domain classification</h1>
+        <h2 className="text-lg font-black">Domain classification</h2>
         <ul className="mt-4 divide-y divide-white/10">
           {assets.map((a) => (
             <li key={a.id} className="py-3">
