@@ -62,7 +62,15 @@ export default function CollaborationShell({
       lang="ar"
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
       data-testid="collaboration-shell"
+      aria-label={COLLABORATION_UI_COPY.brand}
     >
+      <a
+        href="#collaboration-main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:font-bold focus:text-black"
+        data-testid="collaboration-skip-link"
+      >
+        تخطي إلى المحتوى
+      </a>
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <AppTopNav title={title} subtitle={subtitle} />
         {showWorkspaceNav || !workspaceId ? (
@@ -82,7 +90,13 @@ export default function CollaborationShell({
             ))}
           </nav>
         ) : null}
-        <div className="mt-6">{children}</div>
+        <div
+          id="collaboration-main-content"
+          tabIndex={-1}
+          className="mt-6 outline-none"
+        >
+          {children}
+        </div>
       </div>
     </main>
   );

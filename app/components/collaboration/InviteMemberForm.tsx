@@ -25,10 +25,15 @@ export default function InviteMemberForm({
     initialState
   );
 
+  const showError = Boolean(state?.message && !state.ok);
+  const messageId = "invite-member-message";
+
   return (
     <form
       action={formAction}
       className="space-y-3 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5"
+      aria-busy={pending}
+      data-testid="collaboration-invite-member-form"
     >
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <h2 className="text-sm font-black">{COLLABORATION_UI_COPY.inviteCreate}</h2>
@@ -36,7 +41,7 @@ export default function InviteMemberForm({
       <div>
         <label
           htmlFor="invite-email"
-          className="text-[11px] font-bold text-white/45"
+          className="text-[11px] font-bold text-white/60"
         >
           {COLLABORATION_UI_COPY.emailLabel}
         </label>
@@ -46,6 +51,8 @@ export default function InviteMemberForm({
           type="email"
           required
           dir="ltr"
+          aria-invalid={showError || undefined}
+          aria-describedby={state?.message ? messageId : undefined}
           className="watch-focus-ring mt-1 w-full rounded-xl border border-white/10 bg-[#050510] px-3 py-2.5 text-sm"
         />
       </div>
@@ -53,7 +60,7 @@ export default function InviteMemberForm({
       <div>
         <label
           htmlFor="invite-role"
-          className="text-[11px] font-bold text-white/45"
+          className="text-[11px] font-bold text-white/60"
         >
           {COLLABORATION_UI_COPY.roleLabel}
         </label>
@@ -73,6 +80,7 @@ export default function InviteMemberForm({
 
       {state?.message ? (
         <p
+          id={messageId}
           className={`rounded-xl border px-3 py-2 text-xs ${
             state.ok
               ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-100"
@@ -88,6 +96,9 @@ export default function InviteMemberForm({
         <p
           className="break-all rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs text-white/80"
           dir="ltr"
+          role="status"
+          aria-label={COLLABORATION_UI_COPY.inviteCreate}
+          data-testid="collaboration-invite-token"
         >
           {state.inviteToken}
         </p>
