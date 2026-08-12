@@ -13,9 +13,9 @@ const MIGRATION =
   "supabase/migrations/20260863_learning_first_course_readiness_v1.sql";
 const PROJECT_REVIEW_MIGRATION =
   "supabase/migrations/20260864_learning_project_instructor_review_v1.sql";
-/** Lifecycle RPCs (ensure/archive/resume active thread) ship in 20260876, not 63/64. */
+/** Lifecycle RPCs (ensure/archive/resume active thread) ship in 20260897, not 63/64. */
 const TUTOR_LIFECYCLE_MIGRATION =
-  "supabase/migrations/20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql";
+  "supabase/migrations/20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");
@@ -39,7 +39,7 @@ describe("First Course Readiness V1 — migration presence", () => {
     expect(
       readdirSync(join(ROOT, "supabase/migrations"))
     ).toContain(
-      "20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql"
+      "20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql"
     );
   });
 });

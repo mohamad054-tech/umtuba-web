@@ -1,6 +1,6 @@
 -- =============================================================================
 -- UMTUBA Learning AI Tutor — Thread Lifecycle Foundation V1
--- Migration: 20260876_learning_ai_tutor_thread_lifecycle_foundation_v1.sql
+-- Migration: 20260897_learning_ai_tutor_thread_lifecycle_foundation_v1.sql
 --
 -- Adds lifecycle_status (active|archived), one-active-thread uniqueness per
 -- learner+course+lesson, ensure (get-or-create) + archive RPCs.

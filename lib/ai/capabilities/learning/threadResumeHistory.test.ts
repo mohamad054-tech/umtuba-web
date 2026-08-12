@@ -13,7 +13,7 @@ const ROOT = join(__dirname, "../../../..");
 const BINDING_MIGRATION =
   "supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql";
 const RESUME_MIGRATION =
-  "supabase/migrations/20260875_learning_ai_tutor_thread_resume_history_read_v1.sql";
+  "supabase/migrations/20260896_learning_ai_tutor_thread_resume_history_read_v1.sql";
 
 const THREAD = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const COURSE = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
@@ -53,7 +53,7 @@ describe("Thread Resume / History Read — migration SQL", () => {
     expect(existsSync(join(ROOT, BINDING_MIGRATION))).toBe(true);
     expect(existsSync(join(ROOT, RESUME_MIGRATION))).toBe(true);
     expect(readdirSync(join(ROOT, "supabase/migrations"))).toContain(
-      "20260875_learning_ai_tutor_thread_resume_history_read_v1.sql"
+      "20260896_learning_ai_tutor_thread_resume_history_read_v1.sql"
     );
   });
 
