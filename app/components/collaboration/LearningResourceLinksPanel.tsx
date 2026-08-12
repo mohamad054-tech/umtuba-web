@@ -37,18 +37,26 @@ function LinkLearningForm({
 
   if (eligible.length === 0) {
     return (
-      <p className="text-xs text-white/45" role="status">
+      <p className="text-xs text-white/55" role="status">
         {COLLABORATION_UI_COPY.learningEligibleEmpty}
       </p>
     );
   }
 
+  const showError = Boolean(state?.message && !state.ok);
+  const messageId = "learning-link-form-message";
+
   return (
-    <form action={formAction} className="space-y-3 border-t border-white/10 pt-4">
+    <form
+      action={formAction}
+      className="space-y-3 border-t border-white/10 pt-4"
+      aria-busy={pending}
+      data-testid="collaboration-learning-link-form"
+    >
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <label
         htmlFor="learning-space-select"
-        className="text-[11px] font-bold text-white/45"
+        className="text-[11px] font-bold text-white/60"
       >
         {COLLABORATION_UI_COPY.learningLinkSelectLabel}
       </label>
@@ -58,6 +66,8 @@ function LinkLearningForm({
         required
         disabled={pending}
         defaultValue={eligible[0]?.resourceId}
+        aria-invalid={showError || undefined}
+        aria-describedby={state?.message ? messageId : undefined}
         className="watch-focus-ring mt-1 w-full rounded-xl border border-white/10 bg-[#050510] px-3 py-2.5 text-sm disabled:opacity-50"
       >
         {eligible.map((space) => (
@@ -78,6 +88,7 @@ function LinkLearningForm({
       </button>
       {state?.message ? (
         <p
+          id={messageId}
           className={`text-[11px] ${
             state.ok ? "text-emerald-200" : "text-rose-200"
           }`}
@@ -103,7 +114,12 @@ function UnlinkLearningForm({
   );
 
   return (
-    <form action={formAction} className="flex flex-col items-end gap-1">
+    <form
+      action={formAction}
+      className="flex flex-col items-end gap-1"
+      aria-busy={pending}
+      data-testid="collaboration-learning-unlink-form"
+    >
       <input type="hidden" name="workspaceId" value={workspaceId} />
       <input type="hidden" name="spaceId" value={spaceId} />
       <button
@@ -111,6 +127,7 @@ function UnlinkLearningForm({
         disabled={pending}
         className="watch-focus-ring rounded-full border border-rose-300/30 bg-rose-400/10 px-3 py-1 text-[11px] font-bold text-rose-100 disabled:opacity-50"
         data-testid="collaboration-learning-unlink-submit"
+        aria-label={COLLABORATION_UI_COPY.learningUnlinkCta}
       >
         {pending
           ? COLLABORATION_UI_COPY.loading
@@ -137,28 +154,36 @@ export default function LearningResourceLinksPanel({
   canManage,
   loadError = null,
 }: LearningResourceLinksPanelProps) {
+  const headingId = "collaboration-learning-links-heading";
+
   return (
     <section
       className="space-y-4 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5"
       data-testid="collaboration-learning-links-panel"
+      aria-labelledby={headingId}
     >
       <div>
-        <h2 className="text-sm font-black">
+        <h2 id={headingId} className="text-sm font-black">
           {COLLABORATION_UI_COPY.learningLinksTitle}
         </h2>
-        <p className="mt-2 text-xs leading-6 text-white/50">
+        <p className="mt-2 text-xs leading-6 text-white/55">
           {COLLABORATION_UI_COPY.learningLinksSubtitle}
         </p>
       </div>
 
       {loadError ? (
-        <p className="text-xs text-rose-200" role="alert">
+        <p
+          className="text-xs text-rose-200"
+          role="alert"
+          data-testid="collaboration-learning-links-error"
+        >
           {loadError}
         </p>
       ) : linked.length === 0 ? (
         <div
           className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-4 py-6 text-center"
           role="status"
+          data-testid="collaboration-learning-links-empty"
         >
           <p className="text-sm font-bold text-white/80">
             {COLLABORATION_UI_COPY.learningLinksEmpty}
@@ -168,6 +193,7 @@ export default function LearningResourceLinksPanel({
         <ul
           className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10"
           aria-label={COLLABORATION_UI_COPY.learningLinksTitle}
+          data-testid="collaboration-learning-links-list"
         >
           {linked.map((item) => (
             <li
@@ -177,12 +203,12 @@ export default function LearningResourceLinksPanel({
             >
               <div>
                 <p className="text-sm font-bold">{item.resource.displayLabel}</p>
-                <p className="mt-1 text-xs text-white/45" dir="ltr">
+                <p className="mt-1 text-xs text-white/55" dir="ltr">
                   @{item.resource.slug} · {item.resource.status}
                 </p>
                 <Link
                   href={item.resource.href}
-                  className="mt-2 inline-block text-[11px] font-bold text-cyan-200/90 underline-offset-2 hover:underline"
+                  className="watch-focus-ring mt-2 inline-block rounded text-[11px] font-bold text-cyan-200/90 underline-offset-2 hover:underline"
                 >
                   {COLLABORATION_UI_COPY.learningOpenResource}
                 </Link>
@@ -201,7 +227,11 @@ export default function LearningResourceLinksPanel({
       {canManage ? (
         <LinkLearningForm workspaceId={workspaceId} eligible={eligible} />
       ) : (
-        <p className="border-t border-white/10 pt-4 text-xs text-white/45">
+        <p
+          className="border-t border-white/10 pt-4 text-xs text-white/55"
+          role="status"
+          data-testid="collaboration-learning-links-unauthorized"
+        >
           {COLLABORATION_UI_COPY.unauthorizedAction}
         </p>
       )}
