@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   deriveSellerOrderAttention,
   sellerListBuyerLabel,
+  sellerOrderAttentionBadgeLabel,
 } from "../../../lib/store/sellerOrdersPresentation";
 import { formatOrderMoney } from "../../../lib/store/orderRules";
 import type { SellerOrderListItem } from "../../../lib/store/orders";
@@ -46,19 +47,23 @@ export default function SellerOrderList({ orders }: SellerOrderListProps) {
           fulfillmentStatus: order.fulfillmentStatus,
         });
         const buyerLabel = sellerListBuyerLabel(order.buyerDisplayName);
+        const attentionBadgeLabel = sellerOrderAttentionBadgeLabel(attention);
 
         return (
           <li key={order.id}>
             <Link
               href={buildSellerOrderHref(order.id)}
+              aria-label={`Open operations for order ${order.orderNumber}, ${buyerLabel}`}
               className="watch-focus-ring group block rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)] md:p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="sf-eyebrow">{order.orderNumber}</p>
-                    {attention.level !== "none" ? (
+                    {attentionBadgeLabel ? (
                       <span
+                        role="status"
+                        aria-label={attentionBadgeLabel}
                         className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                           attention.level === "critical"
                             ? "border-[rgba(240,168,168,0.4)] text-[var(--sf-danger)]"
@@ -84,7 +89,7 @@ export default function SellerOrderList({ orders }: SellerOrderListProps) {
                     </p>
                   ) : null}
                   {attention.message ? (
-                    <p className="mt-2 text-xs text-[var(--sf-accent)]">
+                    <p role="status" className="mt-2 text-xs text-[var(--sf-accent)]">
                       {attention.message}
                     </p>
                   ) : null}

@@ -193,6 +193,24 @@ export function deriveSellerOrderAttention(input: {
   return { level: "none", message: null };
 }
 
+/** Accessible name for seller order-list attention chips (visible text stays short). */
+export function sellerOrderAttentionBadgeLabel(attention: {
+  level: SellerAttentionLevel;
+  message: string | null;
+}): string | null {
+  if (attention.level === "none") return null;
+  const levelWord =
+    attention.level === "critical"
+      ? "Critical"
+      : attention.level === "warn"
+        ? "Warning"
+        : "Info";
+  if (attention.message) {
+    return `${levelWord}: ${attention.message}`;
+  }
+  return `${levelWord}: Needs attention`;
+}
+
 export function sellerOrderStatusOptions(input: {
   status: OrderStatus;
   paymentStatus: unknown;
