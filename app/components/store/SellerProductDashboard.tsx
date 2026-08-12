@@ -440,6 +440,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
+              aria-pressed={applied.status === filter.id}
               onClick={() => navigateFilters({ status: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.status === filter.id
@@ -461,6 +462,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
+              aria-pressed={applied.health === filter.id}
               onClick={() => navigateFilters({ health: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.health === filter.id
@@ -482,6 +484,7 @@ export default function SellerProductDashboard({
             <button
               key={filter.id}
               type="button"
+              aria-pressed={applied.productType === filter.id}
               onClick={() => navigateFilters({ productType: filter.id })}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 applied.productType === filter.id

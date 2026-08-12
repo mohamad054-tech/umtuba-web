@@ -112,6 +112,7 @@ export default function SellerInventoryWorkspace({
             <button
               key={filter.id}
               type="button"
+              aria-pressed={bucket === filter.id}
               onClick={() => setBucket(filter.id)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 bucket === filter.id
@@ -141,7 +142,10 @@ export default function SellerInventoryWorkspace({
       ) : null}
 
       {filtered.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[var(--sf-line)] px-4 py-10 text-center text-sm text-[var(--sf-faint)]">
+        <p
+          role="status"
+          className="rounded-2xl border border-dashed border-[var(--sf-line)] px-4 py-10 text-center text-sm text-[var(--sf-faint)]"
+        >
           No inventory rows match this search or filter.
         </p>
       ) : (

@@ -5,6 +5,7 @@ import {
   deriveSellerOrderAttention,
   isPaymentBlockingFulfillmentProgress,
   sellerListBuyerLabel,
+  sellerOrderAttentionBadgeLabel,
   sellerOrderStatusOptions,
   sellerTransitionPaymentBlocked,
   validateSellerStatusFormSelection,
@@ -32,6 +33,27 @@ describe("sellerOrdersPresentation — privacy and attention", () => {
         fulfillmentStatus: "unfulfilled",
       }).level
     ).toBe("critical");
+  });
+
+  it("builds accessible attention badge labels with severity + message", () => {
+    expect(sellerOrderAttentionBadgeLabel({ level: "none", message: null })).toBe(
+      null
+    );
+    expect(
+      sellerOrderAttentionBadgeLabel({
+        level: "critical",
+        message: "Payment failed — do not fulfill as paid.",
+      })
+    ).toBe("Critical: Payment failed — do not fulfill as paid.");
+    expect(
+      sellerOrderAttentionBadgeLabel({
+        level: "warn",
+        message: "Ready for shipping, but payment is still pending.",
+      })
+    ).toBe("Warning: Ready for shipping, but payment is still pending.");
+    expect(
+      sellerOrderAttentionBadgeLabel({ level: "info", message: null })
+    ).toBe("Info: Needs attention");
   });
 });
 

@@ -22,6 +22,7 @@ export default function SellerOpsShell({
 }: SellerOpsShellProps) {
   return (
     <main
+      aria-label={subtitle ? `Seller ${title} — ${subtitle}` : `Seller ${title}`}
       className={`storefront-premium relative min-h-screen overflow-hidden bg-[var(--sf-bg)] text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>

@@ -88,6 +88,7 @@ export default async function SellerStoreOrdersPage({
         >
           <Link
             href={APP_ROUTES.sellerOrders}
+            aria-current={statusFilter === "all" ? "page" : undefined}
             className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
               statusFilter === "all"
                 ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
@@ -100,6 +101,7 @@ export default async function SellerStoreOrdersPage({
             <Link
               key={status}
               href={`${APP_ROUTES.sellerOrders}?status=${status}`}
+              aria-current={statusFilter === status ? "page" : undefined}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${
                 statusFilter === status
                   ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
