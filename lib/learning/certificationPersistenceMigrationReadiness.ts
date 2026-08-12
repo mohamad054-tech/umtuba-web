@@ -1,4 +1,4 @@
-/** Wave8 A1 — certification persistence migration-readiness contract (NO migration create/apply). */
+/** Certification persistence readiness — re-verified against live linked DB 2026-08-12. */
 export type PersistenceReadiness = {
   PERSISTENCE_EXISTS: "YES" | "NO" | "PARTIAL";
   STABLE_CERTIFICATE_ID_EXISTS: "YES" | "NO" | "PARTIAL";
@@ -9,15 +9,22 @@ export type PersistenceReadiness = {
   MIGRATION_REQUIRED: "YES" | "NO";
 };
 
-/** Evidence-backed defaults for current SoT without inventing DB tables. */
+/** Live evidence: remote schema_migrations has 20260921_learning_certification_persistence_v1. */
+export const REMOTE_CERTIFICATION_MIGRATION = {
+  version: "20260921",
+  name: "learning_certification_persistence_v1",
+  localSqlPresentOnLearningTip: false,
+} as const;
+
+/** Evidence-backed defaults after remote apply of 20260921 (probed via linked db query). */
 export const WAVE8_A1_PERSISTENCE: PersistenceReadiness = {
-  PERSISTENCE_EXISTS: "NO",
-  STABLE_CERTIFICATE_ID_EXISTS: "PARTIAL",
-  ISSUANCE_HISTORY_EXISTS: "NO",
-  VERIFICATION_STORAGE_EXISTS: "NO",
-  REVOCATION_STATE_EXISTS: "PARTIAL",
-  DURABLE_DUPLICATE_PROTECTION_EXISTS: "PARTIAL",
-  MIGRATION_REQUIRED: "YES",
+  PERSISTENCE_EXISTS: "YES",
+  STABLE_CERTIFICATE_ID_EXISTS: "YES",
+  ISSUANCE_HISTORY_EXISTS: "YES",
+  VERIFICATION_STORAGE_EXISTS: "YES",
+  REVOCATION_STATE_EXISTS: "YES",
+  DURABLE_DUPLICATE_PROTECTION_EXISTS: "YES",
+  MIGRATION_REQUIRED: "NO",
 };
 
 export const PROPOSED_SCHEMA_BOUNDARY = {
@@ -47,4 +54,6 @@ export const REVOCATION_BOUNDARY =
 export const AUTHORIZATION_BOUNDARY =
   "issue service/instructor after ELIGIBLE; verify public; revoke admin/instructor";
 
-export const READY_FOR_CENTRAL_MIGRATION_ALLOCATION = true as const;
+/** Historical flag — allocation already consumed by remote 20260921. */
+export const READY_FOR_CENTRAL_MIGRATION_ALLOCATION = false as const;
+export const REMOTE_CERTIFICATION_PERSISTENCE_APPLIED = true as const;
