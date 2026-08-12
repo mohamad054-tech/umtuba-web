@@ -3,6 +3,7 @@ import { BRAND } from "./brand";
 import {
   absoluteUrl,
   getSiteUrl,
+  resolveAuthRedirectOrigin,
   resolveSiteUrl,
   validateSiteUrl,
 } from "./siteUrl";
@@ -100,5 +101,50 @@ describe("getSiteUrl / absoluteUrl", () => {
     expect(
       getSiteUrl({ NEXT_PUBLIC_SITE_URL: "https://umtuba.com/" })
     ).toBe("https://umtuba.com");
+  });
+});
+
+describe("resolveAuthRedirectOrigin", () => {
+  it("keeps public request origins unchanged", () => {
+    expect(
+      resolveAuthRedirectOrigin("https://umtuba.com", {
+        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
+        NODE_ENV: "production",
+      })
+    ).toBe("https://umtuba.com");
+    expect(
+      resolveAuthRedirectOrigin("https://staging.umtuba.com", {
+        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
+        NODE_ENV: "production",
+      })
+    ).toBe("https://staging.umtuba.com");
+  });
+
+  it("replaces production loopback Host with configured public origin", () => {
+    expect(
+      resolveAuthRedirectOrigin("https://localhost:3001", {
+        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
+        NODE_ENV: "production",
+      })
+    ).toBe("https://umtuba.com");
+    expect(
+      resolveAuthRedirectOrigin("http://127.0.0.1:3001", {
+        NODE_ENV: "production",
+      })
+    ).toBe(BRAND.productionOrigin);
+  });
+
+  it("preserves intentional local-dev loopback (including non-default ports)", () => {
+    expect(
+      resolveAuthRedirectOrigin("http://localhost:3001", {
+        NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+        NODE_ENV: "development",
+      })
+    ).toBe("http://localhost:3001");
+    expect(
+      resolveAuthRedirectOrigin("http://localhost:3000", {
+        NODE_ENV: "development",
+      })
+    ).toBe("http://localhost:3000");
   });
 });

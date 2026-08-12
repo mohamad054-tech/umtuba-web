@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { APP_ROUTES } from "../../lib/nav";
 import { runReferralClaimCoordinator } from "../../../lib/referral/claimCoordinator";
+import { resolveAuthRedirectOrigin } from "../../../lib/site/siteUrl";
 import {
   FORGOT_PASSWORD_PATH,
   mapPasswordResetLinkError,
@@ -50,7 +51,9 @@ function failureRedirect(
  * Never logs or echoes tokens/codes into the response body.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams, origin: requestOrigin } = new URL(request.url);
+  // Public origin when reverse-proxy Host is loopback; keep local-dev loopback.
+  const origin = resolveAuthRedirectOrigin(requestOrigin);
   const code = searchParams.get("code");
   const next = getSafeRedirectPath(
     searchParams.get("next"),

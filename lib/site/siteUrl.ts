@@ -124,6 +124,55 @@ export function getSiteUrl(
   return resolveSiteUrl(source).origin;
 }
 
+function isLoopbackHostname(hostname: string): boolean {
+  const host = hostname.trim().toLowerCase();
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host === "[::1]"
+  );
+}
+
+/**
+ * Origin for auth-callback redirects after PKCE exchange / link errors.
+ *
+ * Prefer the request origin when Host is a public hostname. When a reverse
+ * proxy leaves a loopback Host (e.g. nginx → localhost:3001) while
+ * NEXT_PUBLIC_SITE_URL / production fallback already advertises the public
+ * site (metadataBase), substitute getSiteUrl(). Intentional local-dev
+ * loopback is preserved when the configured site URL is also loopback.
+ */
+export function resolveAuthRedirectOrigin(
+  requestOrigin: string,
+  source: Record<string, string | undefined> = process.env
+): string {
+  let requestUrl: URL;
+  try {
+    requestUrl = new URL(requestOrigin);
+  } catch {
+    return getSiteUrl(source);
+  }
+
+  if (!isLoopbackHostname(requestUrl.hostname)) {
+    return requestUrl.origin;
+  }
+
+  const configured = getSiteUrl(source);
+  let configuredUrl: URL;
+  try {
+    configuredUrl = new URL(configured);
+  } catch {
+    return requestUrl.origin;
+  }
+
+  if (isLoopbackHostname(configuredUrl.hostname)) {
+    return requestUrl.origin;
+  }
+
+  return configuredUrl.origin;
+}
+
 /** Absolute URL for a site path (leading slash optional). */
 export function absoluteUrl(
   path: string,

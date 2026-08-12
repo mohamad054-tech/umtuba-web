@@ -62,6 +62,8 @@ describe("auth session harden contracts", () => {
     expect(callback).toMatch(/APP_ROUTES\.login/);
     expect(callback).toMatch(/isPasswordResetNext/);
     expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);
+    expect(callback).toMatch(/resolveAuthRedirectOrigin/);
+    expect(callback).not.toMatch(/localhost:3001/);
   });
 
   it("chrome uses soft client factory when env may be missing", () => {
