@@ -35,6 +35,7 @@ export default function WishlistButton({
   const router = useRouter();
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   return (
@@ -42,12 +43,14 @@ export default function WishlistButton({
       <button
         type="button"
         aria-pressed={wishlisted}
+        aria-busy={pending || undefined}
         aria-label={wishlisted ? "Remove from favorites" : "Save to favorites"}
         disabled={pending}
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
           setError(null);
+          setStatus(null);
           startTransition(async () => {
             const result = await toggleWishlistAction({
               productId,
@@ -66,6 +69,11 @@ export default function WishlistButton({
               return;
             }
             setWishlisted(result.wishlisted);
+            setStatus(
+              result.wishlisted
+                ? "Saved to favorites"
+                : "Removed from favorites"
+            );
             onToggled?.(result.wishlisted);
           });
         }}
@@ -76,6 +84,11 @@ export default function WishlistButton({
       {error ? (
         <p role="alert" className="mt-2 text-xs text-red-300">
           {error}
+        </p>
+      ) : null}
+      {status && !error ? (
+        <p role="status" aria-live="polite" className="sr-only">
+          {status}
         </p>
       ) : null}
     </div>

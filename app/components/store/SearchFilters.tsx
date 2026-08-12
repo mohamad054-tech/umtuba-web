@@ -108,16 +108,27 @@ export default function SearchFilters({
     </div>
   );
 
+  const resultsLabel = pending ? "Updating…" : `${resultCount} results`;
+
   return (
-    <aside className="lg:sticky lg:top-20" aria-label="Search filters">
+    <aside
+      className="lg:sticky lg:top-20"
+      aria-label="Search filters"
+      aria-busy={pending || undefined}
+    >
       <div className="mb-3 flex items-center justify-between lg:hidden">
-        <p className="text-sm text-[var(--sf-muted)]">
-          {pending ? "Updating…" : `${resultCount} results`}
+        <p
+          className="text-sm text-[var(--sf-muted)]"
+          role="status"
+          aria-live="polite"
+        >
+          {resultsLabel}
         </p>
         <button
           type="button"
           className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] px-4 py-2 text-xs font-semibold text-[var(--sf-accent-strong)]"
           aria-expanded={mobileOpen}
+          aria-controls="store-search-filters-panel"
           onClick={() => setMobileOpen((v) => !v)}
         >
           {mobileOpen ? "Hide filters" : "Filters"}
@@ -125,12 +136,17 @@ export default function SearchFilters({
       </div>
 
       <div
+        id="store-search-filters-panel"
         className={`rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 backdrop-blur-xl ${
           mobileOpen ? "block" : "hidden lg:block"
         }`}
       >
-        <p className="mb-4 hidden text-sm text-[var(--sf-muted)] lg:block">
-          {pending ? "Updating…" : `${resultCount} results`}
+        <p
+          className="mb-4 hidden text-sm text-[var(--sf-muted)] lg:block"
+          role="status"
+          aria-live="polite"
+        >
+          {resultsLabel}
         </p>
         {filters}
       </div>

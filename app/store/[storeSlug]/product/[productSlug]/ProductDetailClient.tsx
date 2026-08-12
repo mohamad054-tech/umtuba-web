@@ -296,6 +296,8 @@ export default function ProductDetailClient({
             ) : null}
           </div>
           <p
+            role="status"
+            aria-live="polite"
             className={`mt-1 text-sm ${
               inStock ? "text-[var(--sf-ok)]" : "text-[var(--sf-faint)]"
             }`}

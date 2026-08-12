@@ -46,24 +46,32 @@ export default async function StoreWishlistPage() {
           <StoreEmptyState
             title="No favorites yet"
             description="Save products from the store to find them here later."
+            actionHref={APP_ROUTES.store}
+            actionLabel="Browse the Store"
           />
         </div>
       ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((entry) => (
-            <div key={entry.wishlistItemId} className="relative">
-              <ProductCard item={entry.item} />
-              <div className="absolute right-3 top-3">
-                <WishlistButton
-                  productId={entry.item.product.id}
-                  sellerListingId={entry.item.sellerListingId ?? null}
-                  initialWishlisted={true}
-                  nextHref={APP_ROUTES.storeWishlist}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+        <section
+          className="mt-6"
+          aria-label="Saved favorites"
+          aria-live="polite"
+        >
+          <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((entry) => (
+              <li key={entry.wishlistItemId} className="relative">
+                <ProductCard item={entry.item} />
+                <div className="absolute right-3 top-3 z-20">
+                  <WishlistButton
+                    productId={entry.item.product.id}
+                    sellerListingId={entry.item.sellerListingId ?? null}
+                    initialWishlisted={true}
+                    nextHref={APP_ROUTES.storeWishlist}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </StoreShell>
   );

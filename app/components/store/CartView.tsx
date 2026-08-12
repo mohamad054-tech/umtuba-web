@@ -135,7 +135,11 @@ export default function CartView({ initialSummary }: CartViewProps) {
       <div className="space-y-4" aria-busy={pending || undefined}>
         {error ? <StoreErrorState message={error} /> : null}
         {status && !error ? (
-          <p role="status" className="text-sm text-[var(--sf-muted)]">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-[var(--sf-muted)]"
+          >
             {status}
           </p>
         ) : null}
@@ -299,6 +303,7 @@ export default function CartView({ initialSummary }: CartViewProps) {
                         <button
                           type="button"
                           disabled={pending}
+                          aria-label={`Remove ${item.productTitle} from cart`}
                           onClick={() => onRemove(item.id)}
                           className="watch-focus-ring rounded-full border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-3 py-2 text-xs font-semibold text-[var(--sf-danger)]"
                         >
@@ -320,6 +325,7 @@ export default function CartView({ initialSummary }: CartViewProps) {
         <button
           type="button"
           disabled={pending}
+          aria-label="Clear entire cart"
           onClick={onClear}
           className="watch-focus-ring text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-ink)]"
         >
@@ -327,7 +333,10 @@ export default function CartView({ initialSummary }: CartViewProps) {
         </button>
       </div>
 
-      <aside className="h-fit rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 lg:sticky lg:top-20">
+      <aside
+        className="h-fit rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 lg:sticky lg:top-20"
+        aria-label="Cart summary"
+      >
         <p className="sf-eyebrow">Summary</p>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-3">
