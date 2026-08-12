@@ -1,20 +1,17 @@
 # UMTUBA Project State (AI Handoff)
 
-## Active feature
+## Performance QA V4
 
-- **Branch:** `office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-- **Task:** Private AI Deployment & Runtime onto Alpha V1
-- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
+- Wave `LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4` **closed**
+- Prefetch patch still Central-owned; **not live** (RSC ~35 on home)
+- Next priority after prefetch validate: Store N+1 batch enrich → Home feed waterfall
+- `LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO`
+- `NEW_PRODUCTION_CRITICAL_BLOCKER = NO`
 
-## Lineage tip chain (awaiting alpha GO)
+## Domain locks
 
-1. `4690bb7` providers on alpha (merged)
-2. … streaming → private AI → data platform → KA → workflow → lifecycle `6219633`
-3. (this) private AI deployment runtime
+Learning CLOSED · Collaboration CLOSED · LB003 CLOSED
 
-## Safety
+## Prefetch handoff (unchanged)
 
-- No live provider / real deployment
-- No alpha merge without GO
-- No Commerce / Learning / Collaboration / Mobile / Guardian
-- Migrations local-only (none new this milestone)
+`docs/ai/PREFETCH_FALSE_NAV_V1.patch` — do not recreate

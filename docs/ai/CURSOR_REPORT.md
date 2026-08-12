@@ -1,26 +1,17 @@
-# CURSOR_REPORT — UM Core Manifest Validation P2
+# CURSOR_REPORT — LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4
 
 ## Summary
 
-**READY** — Manifest Validation Foundation P2 closed on
-`office/um-core-platform-manifest-validation-p2` (base P1 tip `c80b15e`).
-
-Pure in-process validation only. No registry/runtime/product integration.
-No migrations. Unrelated full-suite media test failure is pre-existing on P1 tip.
+Three-way performance closeout without redeploying or touching the prefetch patch. Home SSR latency is force-dynamic + sequential feed enrichment (with duplicate auth). Store SSR latency is dominated by sequential per-product catalog enrichment (N+1). Production monitor shows prefetch deploy **not** observable (still ~35 RSC). No new critical blocker. Ready for next performance GO.
 
 ## Exact files changed
 
-- `platforms/core/validation/codes.ts` (new)
-- `platforms/core/validation/naming.ts` (new)
-- `platforms/core/validation/manifestValidator.ts` (new)
-- `platforms/core/validation/registrationValidator.ts` (new)
-- `platforms/core/validation/manifestValidation.test.ts` (new)
-- `platforms/core/validation/interfaces.ts`
-- `platforms/core/packageIdentity.ts`
-- `platforms/core/coreFoundationContracts.test.ts`
-- `platforms/core/README.md`
-- `docs/core/UM_CORE_PLATFORM_MANIFEST_VALIDATION_P2.md` (new)
+- `docs/ai/LAPTOP_HOME_SSR_LATENCY_ROOT_CAUSE_V1.md`
+- `docs/ai/LAPTOP_STORE_SSR_LATENCY_ROOT_CAUSE_V1.md`
+- `docs/ai/LAPTOP_PRODUCTION_PERFORMANCE_INDEPENDENT_MONITOR_V1.md`
+- `docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`
 - `docs/ai/CURRENT_TASK.md`
+- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -29,37 +20,39 @@ None.
 
 ## Security review
 
-- Validation is pure and in-process only
-- No product imports from Core
-- No secrets / service-role / env leakage
-- No networking / persistence / registry runtime
+Read-only code analysis + public production probes. No payments/Commerce mutations. Prefetch patch untouched. Domains locked.
 
 ## Tests
 
-- `npx vitest run platforms/core` — **PASS** (15 tests)
-- `npx vitest run` — 1 unrelated fail:
-  `lib/media/processing/mediaProcessing.foundation.test.ts`
-  (`20260869` migration present at P1 tip; P2 does not touch media/migrations)
+Not applicable (analysis/monitor wave).
 
 ## TypeScript
 
-`npx tsc --noEmit` — **PASS**
+Not run (docs-only).
 
 ## Build
 
-Not required for this contracts/validation milestone (no app UI/entry change).
+Not run.
 
 ## git diff --check
 
-**PASS**
+N/A for product code (docs-only this wave).
 
 ## git status --short
 
-Clean after commit/push (see final report).
+Docs/ai artifacts added/updated; prior uncommitted prefetch nav files remain for Central handoff (unchanged this wave).
 
 ## Open issues
 
-- Cross-platform dependency graph validation remains future (needs registry).
-- Do not start P3 from this close.
-- Unrelated media foundation test expects absence of `20260869` migration
-  that already exists on base `c80b15e` — out of P2 scope.
+- Central: deploy prefetch + Laptop auto-remeasure
+- Next GO candidates: store batch enrich; home auth dedupe / defer enrichment
+
+## Final fields
+
+```
+HOME_SSR_NEXT_ACTION = [auth dedupe, defer viewer enrichment, above-fold signed URLs]
+STORE_SSR_NEXT_ACTION = [batch enrich N+1, lower first-paint limit/Suspense, optional anon cache]
+PERFORMANCE_PRIORITY_ORDER = [prefetch validate, store N+1, home waterfall, anon cache]
+NEW_PRODUCTION_CRITICAL_BLOCKER = NO
+LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO
+```

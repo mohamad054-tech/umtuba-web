@@ -2,45 +2,19 @@
 
 ## Task title
 
-UM Core Platform Manifest Validation P2
+LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4
 
 ## Status
 
-`closed` — committed and pushed on milestone branch.
+`closed` — LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO · NEW_PRODUCTION_CRITICAL_BLOCKER = NO  
+DEPLOYMENT_CHANGE_OBSERVED = NO · MEASURED_IMPROVEMENT = NO
 
-## Branch
+## A1/A2/A3
 
-`office/um-core-platform-manifest-validation-p2`
+- Home SSR: force-dynamic + feed enrichment waterfall + duplicate auth
+- Store SSR: catalog N+1 enrichPublicCatalogRow (dominant)
+- Monitor: home RSC still ~35; prefetch deploy not live
 
-## Base HEAD
+## Evidence
 
-`c80b15e0c2822c91e0e6f43ee228fe80a79f0ea5` (Foundation P1 close)
-
-## Worktree
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web`
-
-## Milestone
-
-`um.core.manifest_validation_p2`
-
-## Allowed scope
-
-- `platforms/core/validation/**`
-- `platforms/core/packageIdentity.ts`
-- `platforms/core/coreFoundationContracts.test.ts`
-- `docs/core/**`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-## Forbidden scope
-
-- Registry / runtime / event bus / SDK behavior / health engine
-- Product-platform integration
-- Migrations / database
-
-## Delivered
-
-Pure manifest + admission validation engine with deterministic diagnostics and focused tests.
-Committed and pushed on `office/um-core-platform-manifest-validation-p2`.
-Do not start P3 from this handoff.
+`docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`

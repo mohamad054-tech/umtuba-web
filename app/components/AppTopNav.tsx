@@ -66,6 +66,7 @@ export default function AppTopNav({
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 aria-current={active ? "page" : undefined}
                 className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
                   active
@@ -88,6 +89,7 @@ export default function AppTopNav({
           ) : null}
           <Link
             href={APP_ROUTES.search}
+            prefetch={false}
             aria-label="Search"
             aria-current={
               pathname === APP_ROUTES.search ||

@@ -1,0 +1,20 @@
+# LAPTOP_LEARNING_POST_RELEASE_BACKLOG_FREEZE_V1
+
+WAVE = LAPTOP_FINAL_CLOSEOUT_SWEEP_V5  
+Date = 2026-08-12 · FEATURE_DEVELOPMENT = FORBIDDEN
+
+| Item | Class |
+| --- | --- |
+| Learning bookmarks | **FROZEN** / POST_RELEASE |
+| Course import / Jinn package importer | **FROZEN** / POST_RELEASE |
+| Optional commit of Learning readiness evidence edits | **OPTIONAL** (hygiene only) |
+| Central `20260921` SQL git sync | EXTERNAL / CENTRAL (not Laptop feature) |
+
+None promoted to ACTUALLY_RELEASE_BLOCKING (no new direct evidence).
+
+```text
+LEARNING_POST_RELEASE_BACKLOG = [LEARNING_BOOKMARKS_FROZEN, COURSE_IMPORT_OR_JINN_PACKAGE_IMPORTER_FROZEN, OPTIONAL_TIP_READINESS_EVIDENCE_HYGIENE]
+NEW_HIDDEN_LEARNING_BLOCKER = NO
+LAPTOP_RETURN_TO_FEATURE_WORK_REQUIRED = NO
+A3_STATUS = COMPLETE
+```

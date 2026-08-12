@@ -1,0 +1,44 @@
+diff --git a/app/components/AppMobileBottomNav.tsx b/app/components/AppMobileBottomNav.tsx
+index 9a99cb1..1372f02 100644
+--- a/app/components/AppMobileBottomNav.tsx
++++ b/app/components/AppMobileBottomNav.tsx
+@@ -149,6 +149,7 @@ export default function AppMobileBottomNav() {
+             <li key={item.id} className="min-w-0 flex-1">
+               <Link
+                 href={href}
++                prefetch={false}
+                 aria-current={active ? "page" : undefined}
+                 aria-label={item.label}
+                 className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${
+diff --git a/app/components/AppTopNav.tsx b/app/components/AppTopNav.tsx
+index 89dbe33..ee83197 100644
+--- a/app/components/AppTopNav.tsx
++++ b/app/components/AppTopNav.tsx
+@@ -66,6 +66,7 @@ export default function AppTopNav({
+               <Link
+                 key={item.href}
+                 href={item.href}
++                prefetch={false}
+                 aria-current={active ? "page" : undefined}
+                 className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
+                   active
+@@ -88,6 +89,7 @@ export default function AppTopNav({
+           ) : null}
+           <Link
+             href={APP_ROUTES.search}
++            prefetch={false}
+             aria-label="Search"
+             aria-current={
+               pathname === APP_ROUTES.search ||
+diff --git a/app/discover/components/HomeSectionCircles.tsx b/app/discover/components/HomeSectionCircles.tsx
+index 3aad761..d351005 100644
+--- a/app/discover/components/HomeSectionCircles.tsx
++++ b/app/discover/components/HomeSectionCircles.tsx
+@@ -23,6 +23,7 @@ export default function HomeSectionCircles() {
+           <li key={section.href} className="shrink-0">
+             <Link
+               href={section.href}
++              prefetch={false}
+               className="watch-focus-ring group flex w-[4.5rem] flex-col items-center gap-1.5"
+             >
+               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-lg shadow-[0_0_20px_rgba(59,130,246,0.12)] transition group-hover:border-white/25 group-hover:bg-white/[0.1]">

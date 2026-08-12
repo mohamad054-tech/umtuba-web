@@ -1,0 +1,1 @@
+select version, name from supabase_migrations.schema_migrations where coalesce(name,'') ilike '%cert%' or coalesce(name,'') ilike '%certificate%' order by version;

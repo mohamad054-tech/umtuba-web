@@ -149,6 +149,7 @@ export default function AppMobileBottomNav() {
             <li key={item.id} className="min-w-0 flex-1">
               <Link
                 href={href}
+                prefetch={false}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.label}
                 className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${

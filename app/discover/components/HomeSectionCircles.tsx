@@ -23,6 +23,7 @@ export default function HomeSectionCircles() {
           <li key={section.href} className="shrink-0">
             <Link
               href={section.href}
+              prefetch={false}
               className="watch-focus-ring group flex w-[4.5rem] flex-col items-center gap-1.5"
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-lg shadow-[0_0_20px_rgba(59,130,246,0.12)] transition group-hover:border-white/25 group-hover:bg-white/[0.1]">
