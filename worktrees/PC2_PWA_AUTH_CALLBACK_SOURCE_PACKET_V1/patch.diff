@@ -1,0 +1,157 @@
+﻿diff --git a/app/auth/callback/route.ts b/app/auth/callback/route.ts
+index 9f0878c..c9d118d 100644
+--- a/app/auth/callback/route.ts
++++ b/app/auth/callback/route.ts
+@@ -1,6 +1,7 @@
+ import { NextResponse, type NextRequest } from "next/server";
+ import { APP_ROUTES } from "../../lib/nav";
+ import { runReferralClaimCoordinator } from "../../../lib/referral/claimCoordinator";
++import { resolveAuthRedirectOrigin } from "../../../lib/site/siteUrl";
+ import {
+   FORGOT_PASSWORD_PATH,
+   mapPasswordResetLinkError,
+@@ -50,7 +51,9 @@ function failureRedirect(
+  * Never logs or echoes tokens/codes into the response body.
+  */
+ export async function GET(request: NextRequest) {
+-  const { searchParams, origin } = new URL(request.url);
++  const { searchParams, origin: requestOrigin } = new URL(request.url);
++  // Public origin when reverse-proxy Host is loopback; keep local-dev loopback.
++  const origin = resolveAuthRedirectOrigin(requestOrigin);
+   const code = searchParams.get("code");
+   const next = getSafeRedirectPath(
+     searchParams.get("next"),
+diff --git a/lib/site/siteUrl.test.ts b/lib/site/siteUrl.test.ts
+index 3a701f5..294b217 100644
+--- a/lib/site/siteUrl.test.ts
++++ b/lib/site/siteUrl.test.ts
+@@ -3,6 +3,7 @@ import { BRAND } from "./brand";
+ import {
+   absoluteUrl,
+   getSiteUrl,
++  resolveAuthRedirectOrigin,
+   resolveSiteUrl,
+   validateSiteUrl,
+ } from "./siteUrl";
+@@ -102,3 +103,48 @@ describe("getSiteUrl / absoluteUrl", () => {
+     ).toBe("https://umtuba.com");
+   });
+ });
++
++describe("resolveAuthRedirectOrigin", () => {
++  it("keeps public request origins unchanged", () => {
++    expect(
++      resolveAuthRedirectOrigin("https://umtuba.com", {
++        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
++        NODE_ENV: "production",
++      })
++    ).toBe("https://umtuba.com");
++    expect(
++      resolveAuthRedirectOrigin("https://staging.umtuba.com", {
++        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
++        NODE_ENV: "production",
++      })
++    ).toBe("https://staging.umtuba.com");
++  });
++
++  it("replaces production loopback Host with configured public origin", () => {
++    expect(
++      resolveAuthRedirectOrigin("https://localhost:3001", {
++        NEXT_PUBLIC_SITE_URL: "https://umtuba.com",
++        NODE_ENV: "production",
++      })
++    ).toBe("https://umtuba.com");
++    expect(
++      resolveAuthRedirectOrigin("http://127.0.0.1:3001", {
++        NODE_ENV: "production",
++      })
++    ).toBe(BRAND.productionOrigin);
++  });
++
++  it("preserves intentional local-dev loopback (including non-default ports)", () => {
++    expect(
++      resolveAuthRedirectOrigin("http://localhost:3001", {
++        NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
++        NODE_ENV: "development",
++      })
++    ).toBe("http://localhost:3001");
++    expect(
++      resolveAuthRedirectOrigin("http://localhost:3000", {
++        NODE_ENV: "development",
++      })
++    ).toBe("http://localhost:3000");
++  });
++});
+diff --git a/lib/site/siteUrl.ts b/lib/site/siteUrl.ts
+index 2688435..c774295 100644
+--- a/lib/site/siteUrl.ts
++++ b/lib/site/siteUrl.ts
+@@ -124,6 +124,55 @@ export function getSiteUrl(
+   return resolveSiteUrl(source).origin;
+ }
+ 
++function isLoopbackHostname(hostname: string): boolean {
++  const host = hostname.trim().toLowerCase();
++  return (
++    host === "localhost" ||
++    host === "127.0.0.1" ||
++    host === "::1" ||
++    host === "[::1]"
++  );
++}
++
++/**
++ * Origin for auth-callback redirects after PKCE exchange / link errors.
++ *
++ * Prefer the request origin when Host is a public hostname. When a reverse
++ * proxy leaves a loopback Host (e.g. nginx ظْ localhost:3001) while
++ * NEXT_PUBLIC_SITE_URL / production fallback already advertises the public
++ * site (metadataBase), substitute getSiteUrl(). Intentional local-dev
++ * loopback is preserved when the configured site URL is also loopback.
++ */
++export function resolveAuthRedirectOrigin(
++  requestOrigin: string,
++  source: Record<string, string | undefined> = process.env
++): string {
++  let requestUrl: URL;
++  try {
++    requestUrl = new URL(requestOrigin);
++  } catch {
++    return getSiteUrl(source);
++  }
++
++  if (!isLoopbackHostname(requestUrl.hostname)) {
++    return requestUrl.origin;
++  }
++
++  const configured = getSiteUrl(source);
++  let configuredUrl: URL;
++  try {
++    configuredUrl = new URL(configured);
++  } catch {
++    return requestUrl.origin;
++  }
++
++  if (isLoopbackHostname(configuredUrl.hostname)) {
++    return requestUrl.origin;
++  }
++
++  return configuredUrl.origin;
++}
++
+ /** Absolute URL for a site path (leading slash optional). */
+ export function absoluteUrl(
+   path: string,
+diff --git a/lib/supabase/authSession.harden.test.ts b/lib/supabase/authSession.harden.test.ts
+index 5f7168c..b6ab06d 100644
+--- a/lib/supabase/authSession.harden.test.ts
++++ b/lib/supabase/authSession.harden.test.ts
+@@ -62,6 +62,8 @@ describe("auth session harden contracts", () => {
+     expect(callback).toMatch(/APP_ROUTES\.login/);
+     expect(callback).toMatch(/isPasswordResetNext/);
+     expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);
++    expect(callback).toMatch(/resolveAuthRedirectOrigin/);
++    expect(callback).not.toMatch(/localhost:3001/);
+   });
+ 
+   it("chrome uses soft client factory when env may be missing", () => {

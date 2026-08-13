@@ -1,0 +1,105 @@
+{
+  "TASK_ID": "PC2_LB003_END_TO_END_FINAL_EXECUTION_V2",
+  "PROJECT_REF_EXPECTED": "tgucwnjwoyeqoxqaxmew",
+  "RAW_SECRETS_EXPOSED": "NO",
+  "SECRET_VALUES_PRINTED": "NO",
+  "LOOKUP_PATH_USED": "P:\\secrets\\lb003_learner_auth.env",
+  "steps": {
+    "fixture_lookup": {
+      "ok": true,
+      "email_length_gt_zero": true,
+      "password_length_gt_zero": true,
+      "email_e2e_learner_pattern": true,
+      "project_ref_in_file": "tgucwnjwoyeqoxqaxmew",
+      "fixture_project_match": true,
+      "teacher_keys_present": false,
+      "at": "2026-08-12T21:58:40.301Z"
+    },
+    "public_client_config": {
+      "ok": true,
+      "url_present": true,
+      "publishable_or_anon_key_present": true,
+      "url_host_has_project_ref": true,
+      "at": "2026-08-12T21:58:40.302Z"
+    },
+    "auth_login": {
+      "ok": true,
+      "auth_user_id": "967e5e69-f71e-4a16-9add-7858a5ebf8db",
+      "supabase_role": "authenticated",
+      "email_confirmed_at_present": true,
+      "at": "2026-08-12T21:58:41.465Z"
+    },
+    "auth_fail_closed": {
+      "ok": true,
+      "anon_certs_error": true,
+      "anon_transcript_error": true,
+      "anon_certs_error_class": "permission denied for function get_my_learning_certificates",
+      "at": "2026-08-12T21:58:41.966Z"
+    },
+    "learner_enrollments": {
+      "ok": true,
+      "total_count": 0,
+      "active_count": 0,
+      "statuses": [],
+      "target_types": [],
+      "course_ids_present": 0,
+      "program_ids_present": 0,
+      "at": "2026-08-12T21:58:42.198Z"
+    },
+    "transcript_read_1": {
+      "ok": true,
+      "error": null,
+      "entry_count": 0,
+      "has_data": true,
+      "at": "2026-08-12T21:58:42.531Z"
+    },
+    "certificates_read_1": {
+      "ok": true,
+      "error": null,
+      "row_count": null,
+      "has_data": true,
+      "at": "2026-08-12T21:58:42.531Z"
+    },
+    "course_progress_bundle": {
+      "ok": false,
+      "class": "NO_ACTIVE_COURSE_ENROLLMENT",
+      "skipped": true,
+      "at": "2026-08-12T21:58:42.531Z"
+    },
+    "finalize_completion": {
+      "ok": false,
+      "class": "NO_ACTIVE_COURSE_ENROLLMENT",
+      "skipped": true,
+      "at": "2026-08-12T21:58:42.531Z"
+    },
+    "finalize_idempotent": {
+      "ok": false,
+      "class": "NO_ACTIVE_COURSE_ENROLLMENT",
+      "skipped": true,
+      "at": "2026-08-12T21:58:42.532Z"
+    },
+    "persistence_reread": {
+      "ok": true,
+      "transcript_stable": true,
+      "certificates_stable": true,
+      "enrollments_stable": true,
+      "transcript_error": null,
+      "certificates_error": null,
+      "enrollments_error": null,
+      "at": "2026-08-12T21:58:42.843Z"
+    },
+    "sign_out": {
+      "ok": true,
+      "at": "2026-08-12T21:58:43.006Z"
+    }
+  },
+  "AUTH_USER_ID": "967e5e69-f71e-4a16-9add-7858a5ebf8db",
+  "SAMPLE_COURSE_ID": null,
+  "AUTHENTICATED_LEARNER_E2E": "PASS",
+  "LEARNER_ROLE_PATH": "PASS",
+  "RUNTIME_SMOKE_LEARNER_CORE": "PASS_AUTH_EMPTY_ENROLLMENT",
+  "PERSISTENCE": "PASS",
+  "CERTIFICATION": "BLOCKED_NO_ACTIVE_COURSE_ENROLLMENT",
+  "TEACHER_PATH": "NOT_REQUIRED",
+  "HAS_ACTIVE_COURSE_ENROLLMENT": false
+}

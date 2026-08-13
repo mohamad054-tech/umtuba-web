@@ -1,0 +1,124 @@
+{
+  "auth_user_id": "967e5e69-f71e-4a16-9add-7858a5ebf8db",
+  "can_enroll": [
+    {
+      "id": "25c16cef-67c9-42e3-9482-e32b8d79c9ba",
+      "slug": "python-for-ai-applications",
+      "err": null,
+      "data": true
+    },
+    {
+      "id": "c86fa8b9-1329-48cb-b7b8-26582f9c32a2",
+      "slug": "ja-01",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "f8ecde63-818c-49ac-a350-0a4008f20d5f",
+      "slug": "ai-applications-master-course",
+      "err": null,
+      "data": true
+    },
+    {
+      "id": "8c0685f3-29c0-45b6-8e5f-2b772efbff1f",
+      "slug": "ai-foundations-for-builders",
+      "err": null,
+      "data": true
+    },
+    {
+      "id": "cac2cb26-cd68-4034-bb9b-927640798313",
+      "slug": "ja-02",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "3a5736af-f780-4758-af00-27f4a768ecdb",
+      "slug": "ja-03",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "5fe5a42f-d3a9-4731-974a-624a6b08bbfc",
+      "slug": "ja-05",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "2dc7b194-f829-40b4-90e6-f63abb5bd0e0",
+      "slug": "ja-23",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "8921eadb-386f-4e68-b22b-e1f61e86f7ca",
+      "slug": "professional-developer-workflow-for-ai",
+      "err": null,
+      "data": true
+    },
+    {
+      "id": "b99dca81-dfc1-436a-a9aa-1a99548caedb",
+      "slug": "ja-06",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "eb65d044-d482-4d79-9485-497f8d42eea2",
+      "slug": "ja-07",
+      "err": null,
+      "data": false
+    },
+    {
+      "id": "feae8a4b-9990-4658-9246-359b6a3166ce",
+      "slug": "ja-08",
+      "err": null,
+      "data": false
+    }
+  ],
+  "enroll": {
+    "course_id": "25c16cef-67c9-42e3-9482-e32b8d79c9ba",
+    "slug": "python-for-ai-applications",
+    "ok": true,
+    "err": null,
+    "data_type": "object",
+    "data_status": "active"
+  },
+  "post": {
+    "enrollments": [
+      {
+        "status": "active",
+        "course_id": "25c16cef-67c9-42e3-9482-e32b8d79c9ba",
+        "target_type": "course"
+      }
+    ],
+    "progress_ok": true,
+    "progress_err": null,
+    "sections_count": 3,
+    "lesson": {
+      "id": "4d649523-46f6-4095-a9c5-775e9a7f2970",
+      "status": "published"
+    },
+    "activity": null,
+    "engine": {
+      "ok": true,
+      "err": null
+    },
+    "assessment": null,
+    "progressMut": null,
+    "finalize": {
+      "ok": true,
+      "status": "skipped",
+      "reason": "course_progress_not_completed",
+      "cert": false,
+      "err": null
+    },
+    "finalize2": {
+      "ok": true,
+      "status": "skipped",
+      "reason": "course_progress_not_completed"
+    },
+    "certs_ok": true,
+    "certs_count": 1,
+    "transcript_ok": true,
+    "transcript_entries": 0
+  }
+}

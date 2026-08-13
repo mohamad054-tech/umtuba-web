@@ -1,0 +1,38 @@
+{
+  "auth_user_id": "967e5e69-f71e-4a16-9add-7858a5ebf8db",
+  "course_id": "25c16cef-67c9-42e3-9482-e32b8d79c9ba",
+  "lessons_total": 21,
+  "lessons_complete_ok": 21,
+  "lessons_complete_fail": 0,
+  "lesson_errors": [],
+  "recompute_ok": true,
+  "recompute_err": null,
+  "bundle_ok": true,
+  "course_progress_ok": true,
+  "course_progress_status": "completed",
+  "course_percent": 100,
+  "assessmentPath": null,
+  "finalize": {
+    "ok": true,
+    "status": "idempotent",
+    "reason": null,
+    "certificate_issued": true,
+    "certificate_code_present": true,
+    "err": null
+  },
+  "finalize_idempotent": {
+    "ok": true,
+    "status": "idempotent",
+    "reason": null,
+    "certificate_issued": true
+  },
+  "certs_ok": true,
+  "certs_count": "non_array",
+  "certs_has_rows": true,
+  "transcript_ok": true,
+  "transcript_entries": 1,
+  "persistence": {
+    "enrollment_stable": true,
+    "bundle2_ok": true
+  }
+}

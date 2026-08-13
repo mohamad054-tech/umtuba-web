@@ -1,0 +1,380 @@
+﻿{
+    "stamp":  "2026-08-12T14:00:13+03:00",
+    "branch":  "office/platform-translation-trunk-port-v1",
+    "head":  "1c5ae0bd0266029f264cab866744c7fcde25cc2e",
+    "alpha":  "e84475a769c731bb7e1ad511b3543ee714d2feea",
+    "learning_count":  34,
+    "range_slots_28_66":  39,
+    "learning_in_range":  34,
+    "rows":  [
+                 {
+                     "ID":  "20260828",
+                     "NAME":  "learning_spaces_membership_foundation_v1",
+                     "FILE":  "20260828_learning_spaces_membership_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "6031ec2|2026-07-22 12:00:38 +0300|feat(learning): add spaces and membership foundation",
+                     "SHA16":  "53d2a7e65ce3f84c",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Spaces \u0026 Membership Foundation V1; tables=learning_spaces,learning_space_members,learning_space_invites,learning_space_settings,learning_audit_events; fns=learning_spaces_guard_owner_transfer,learning_audit_events_forbid_mutation,learning_space_role_rank,learning_space_role_at_least,is_learning_space_member; token=learning_"
+                 },
+                 {
+                     "ID":  "20260829",
+                     "NAME":  "learning_programs_foundation_v1",
+                     "FILE":  "20260829_learning_programs_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "a22ec6e|2026-07-22 13:19:44 +0300|feat(learning): add programs foundation v1",
+                     "SHA16":  "c928d685cdecd26b",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Programs Foundation V1; tables=learning_programs,learning_program_staff,learning_program_settings; fns=learning_program_staff_role_rank,is_learning_program_staff,learning_program_staff_role,can_manage_learning_program,can_create_learning_program; token=learning_"
+                 },
+                 {
+                     "ID":  "20260830",
+                     "NAME":  "learning_courses_foundation_v1",
+                     "FILE":  "20260830_learning_courses_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "785d958|2026-07-22 15:02:48 +0300|feat(learning): add courses foundation v1",
+                     "SHA16":  "e5f1125df9d33efb",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Courses Foundation V1; tables=learning_courses,learning_course_staff,learning_course_settings; fns=learning_course_staff_role_rank,is_learning_course_staff,learning_course_staff_role,can_manage_learning_course,can_create_learning_course; token=learning_"
+                 },
+                 {
+                     "ID":  "20260831",
+                     "NAME":  "learning_sections_foundation_v1",
+                     "FILE":  "20260831_learning_sections_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "887f2c2|2026-07-22 16:56:38 +0300|feat(learning): add sections foundation v1",
+                     "SHA16":  "c2a2c9244209919d",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Sections Foundation V1; tables=learning_sections,learning_section_settings; fns=can_manage_learning_section,can_create_learning_section,learning_section_validate_supported_languages,learning_section_validate_metadata_object,learning_section_require_mutable_status; token=learning_"
+                 },
+                 {
+                     "ID":  "20260832",
+                     "NAME":  "learning_lessons_foundation_v1",
+                     "FILE":  "20260832_learning_lessons_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "734e782|2026-07-22 17:44:39 +0300|feat(learning): add lessons foundation v1",
+                     "SHA16":  "50fcf8b9d56ce295",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Lessons Foundation V1; tables=learning_lessons,learning_lesson_settings; fns=can_manage_learning_lesson,can_create_learning_lesson,learning_lesson_validate_supported_languages,learning_lesson_validate_metadata_object,learning_lesson_require_mutable_status; token=learning_"
+                 },
+                 {
+                     "ID":  "20260833",
+                     "NAME":  "learning_activities_foundation_v1",
+                     "FILE":  "20260833_learning_activities_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "d397b02|2026-07-22 19:40:35 +0300|feat(learning): add activities foundation v1",
+                     "SHA16":  "fbb0f4aad6b52514",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Activities Foundation V1; tables=learning_activities,learning_activity_settings; fns=can_manage_learning_activity,can_create_learning_activity,learning_activity_validate_type,learning_activity_validate_ai_metadata,learning_activity_validate_config; token=learning_"
+                 },
+                 {
+                     "ID":  "20260834",
+                     "NAME":  "learning_enrollments_foundation_v1",
+                     "FILE":  "20260834_learning_enrollments_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "9d3c2ac|2026-07-22 23:46:37 +0300|feat(learning): add enrollments foundation v1",
+                     "SHA16":  "f9876078f854e157",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Enrollments Foundation V1; tables=learning_enrollments,learning_enrollment_events; fns=learning_enrollments_guard_immutable,learning_enrollment_events_forbid_mutation,learning_enrollment_validate_metadata,learning_enrollment_validate_source,learning_enrollment_event_write; token=learning_"
+                 },
+                 {
+                     "ID":  "20260835",
+                     "NAME":  "learning_progress_foundation_v1",
+                     "FILE":  "20260835_learning_progress_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "ad0a1e1|2026-07-22 21:46:32 +0300|feat(learning): add progress foundation v1",
+                     "SHA16":  "b87c6bc0bd188b69",
+                     "SIGS":  "header=UM Learning OS â€” Progress Foundation V1; tables=learning_lesson_progress,learning_course_progress,learning_progress_events; fns=has_learning_course_access,learning_lesson_progress_guard_immutable,learning_course_progress_guard_immutable,learning_progress_events_forbid_mutation,learning_progress_event_write; token=learning_"
+                 },
+                 {
+                     "ID":  "20260836",
+                     "NAME":  "learning_lesson_content_blocks_foundation_v1",
+                     "FILE":  "20260836_learning_lesson_content_blocks_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "9dac656|2026-07-22 22:35:58 +0300|feat(learning): add lesson content blocks foundation v1",
+                     "SHA16":  "c5144ce182fe59a1",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Lesson Content Blocks Foundation V1; tables=learning_lesson_content_blocks; fns=learning_lesson_content_block_guard_immutable,can_manage_learning_lesson_content_block,can_create_learning_lesson_content_block,learning_lesson_content_block_assert_safe_text,learning_lesson_content_block_assert_safe_url; token=learning_"
+                 },
+                 {
+                     "ID":  "20260837",
+                     "NAME":  "learning_questions_foundation_v1",
+                     "FILE":  "20260837_learning_questions_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "bdf6de2|2026-07-22 23:33:32 +0300|feat(learning): add questions foundation v1",
+                     "SHA16":  "e90779d468e46279",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Questions Foundation V1; tables=learning_questions,learning_question_answer_keys; fns=learning_question_guard_immutable,can_manage_learning_question,can_create_learning_question,learning_question_assert_safe_text,learning_question_validate_type; token=learning_"
+                 },
+                 {
+                     "ID":  "20260838",
+                     "NAME":  "learning_attempts_foundation_v1",
+                     "FILE":  "20260838_learning_attempts_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "0a36adc|2026-07-23 10:21:34 +0300|feat(learning): add attempts foundation v1",
+                     "SHA16":  "2646d92d036eb66d",
+                     "SIGS":  "header=UM Learning OS â€” Attempts Foundation V1; tables=learning_attempts,learning_attempt_answers; fns=learning_attempt_guard_immutable,learning_attempt_answer_guard_immutable,learning_attempt_assert_safe_text,learning_attempt_build_questions_snapshot,learning_attempt_snapshot_option_keys; token=learning_"
+                 },
+                 {
+                     "ID":  "20260839",
+                     "NAME":  "learning_scoring_foundation_v1",
+                     "FILE":  "20260839_learning_scoring_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "23f2728|2026-07-23 13:03:05 +0300|feat(learning): add scoring foundation v1",
+                     "SHA16":  "6076d00e25ce4409",
+                     "SIGS":  "header=UM Learning OS â€” Scoring Foundation V1; tables=learning_attempt_results,learning_attempt_answer_results; fns=learning_attempt_build_questions_snapshot,learning_attempt_result_guard_immutable,learning_attempt_answer_result_guard_immutable,learning_scoring_normalize_short_answer,learning_scoring_evaluate_answer; token=learning_"
+                 },
+                 {
+                     "ID":  "20260840",
+                     "NAME":  "learning_read_model_hardening_v1",
+                     "FILE":  "20260840_learning_read_model_hardening_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "de40a5d|2026-07-23 13:50:05 +0300|feat(learning): harden learner read model v1",
+                     "SHA16":  "babfe43d21aebdc2",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Read Model Hardening V1; token=learning_"
+                 },
+                 {
+                     "ID":  "20260841",
+                     "NAME":  "learning_learner_result_delivery_v1",
+                     "FILE":  "20260841_learning_learner_result_delivery_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "9cf3e3d|2026-07-23 20:52:09 +0300|feat(learning): add learner result delivery v1",
+                     "SHA16":  "4ba74853e3b36129",
+                     "SIGS":  "header=UM Learning OS â€” Learner Result Delivery V1; fns=learning_scoring_apply_attempt_result,score_learning_attempt,learning_scoring_try_auto_score_submitted_attempt,submit_learning_attempt,get_my_learning_attempt_result; token=learning_"
+                 },
+                 {
+                     "ID":  "20260844",
+                     "NAME":  "learning_result_policy_completion_v1",
+                     "FILE":  "20260844_learning_result_policy_completion_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "1c82b71|2026-07-24 14:43:28 +0300|feat(learning): complete learner result release policies",
+                     "SHA16":  "e7fb4223348e9a23",
+                     "SIGS":  "header=UM Learning OS â€” Result Policy Completion V1; tables=learning_attempt_result_releases; fns=learning_attempt_result_release_guard_immutable,set_learning_activity_results_available_at,release_learning_attempt_result,get_my_learning_attempt_result; token=learning_"
+                 },
+                 {
+                     "ID":  "20260845",
+                     "NAME":  "learning_progress_mutations_v1",
+                     "FILE":  "20260845_learning_progress_mutations_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "7de94be|2026-07-24 14:43:29 +0300|feat(learning): apply progress from scored attempts",
+                     "SHA16":  "8f3d66d01e06562c",
+                     "SIGS":  "header=UM Learning OS â€” Progress Mutations After Scored Attempts V1; tables=learning_attempt_progress_applications; fns=learning_attempt_progress_application_guard_immutable,learning_progress_complete_lesson_from_scored_attempt,learning_progress_try_apply_from_scored_attempt,learning_scoring_apply_attempt_result; token=learning_"
+                 },
+                 {
+                     "ID":  "20260848",
+                     "NAME":  "learning_assessment_delivery_minimal_v1",
+                     "FILE":  "20260848_learning_assessment_delivery_minimal_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "32efed4|2026-07-24 14:43:29 +0300|feat(learning): add assessment delivery minimal v1",
+                     "SHA16":  "7b4df7a09220202c",
+                     "SIGS":  "header==============================================================================; fns=get_my_learning_activity_assessment; token=learning_"
+                 },
+                 {
+                     "ID":  "20260849",
+                     "NAME":  "learning_assessment_attempt_foundation_v1",
+                     "FILE":  "20260849_learning_assessment_attempt_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "f4ecbad|2026-07-24 14:43:29 +0300|feat(learning): add assessment attempt foundation v1",
+                     "SHA16":  "f06d0bfd88c041aa",
+                     "SIGS":  "header==============================================================================; fns=start_my_learning_assessment_attempt,get_my_learning_assessment_attempt,cancel_my_learning_assessment_attempt; token=learning_"
+                 },
+                 {
+                     "ID":  "20260850",
+                     "NAME":  "learning_assessment_answer_persistence_v1",
+                     "FILE":  "20260850_learning_assessment_answer_persistence_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "1c02728|2026-07-24 14:43:29 +0300|feat(learning): add assessment answer persistence v1",
+                     "SHA16":  "2f7f0fdc05e915e0",
+                     "SIGS":  "header==============================================================================; fns=save_my_learning_assessment_answer,get_my_learning_assessment_answers; token=learning_"
+                 },
+                 {
+                     "ID":  "20260851",
+                     "NAME":  "learning_assessment_submission_foundation_v1",
+                     "FILE":  "20260851_learning_assessment_submission_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "b5d29e0|2026-07-24 14:43:30 +0300|feat(learning): add assessment submission foundation v1",
+                     "SHA16":  "d4c73cf623bd26ac",
+                     "SIGS":  "header==============================================================================; fns=submit_my_learning_assessment_attempt,get_my_learning_assessment_submission; token=learning_"
+                 },
+                 {
+                     "ID":  "20260852",
+                     "NAME":  "learning_assessment_objective_grading_foundation_v1",
+                     "FILE":  "20260852_learning_assessment_objective_grading_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "caf96aa|2026-07-24 14:43:30 +0300|feat(learning): add assessment objective grading foundation v1",
+                     "SHA16":  "1219b785ff0fe6c6",
+                     "SIGS":  "header==============================================================================; fns=learning_assessment_is_objective_type,learning_assessment_is_subjective_type,learning_assessment_objective_key_is_valid,learning_assessment_grade_apply_attempt,grade_my_learning_assessment_attempt; token=learning_"
+                 },
+                 {
+                     "ID":  "20260853",
+                     "NAME":  "learning_assessment_manual_review_foundation_v1",
+                     "FILE":  "20260853_learning_assessment_manual_review_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "7911199|2026-07-24 14:43:30 +0300|feat(learning): add assessment manual review foundation v1",
+                     "SHA16":  "9375b4f4d68c8ec0",
+                     "SIGS":  "header==============================================================================; fns=learning_assessment_is_manual_review_type,learning_assessment_recalculate_manual_review_totals,get_learning_assessment_manual_review_queue,get_learning_assessment_attempt_for_review,review_learning_assessment_answer; token=learning_"
+                 },
+                 {
+                     "ID":  "20260854",
+                     "NAME":  "learning_assessment_progress_integration_v1",
+                     "FILE":  "20260854_learning_assessment_progress_integration_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "5762092|2026-07-24 14:43:30 +0300|feat(learning): integrate graded assessments with progress",
+                     "SHA16":  "6b6f6159454077b8",
+                     "SIGS":  "header==============================================================================; fns=learning_progress_try_apply_from_graded_assessment,apply_my_learning_assessment_progress,get_my_learning_assessment_progress_status; token=learning_"
+                 },
+                 {
+                     "ID":  "20260855",
+                     "NAME":  "learning_completion_foundation_v1",
+                     "FILE":  "20260855_learning_completion_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "e16435b|2026-07-24 14:43:30 +0300|feat(learning): add completion foundation v1",
+                     "SHA16":  "4bf6b72f37226d28",
+                     "SIGS":  "header==============================================================================; tables=learning_certificates; fns=learning_completion_generate_certificate_code,learning_completion_event_write_once,learning_completion_assessment_gate_ok,learning_completion_best_passed_attempt,learning_completion_try_finalize_course; token=learning_"
+                 },
+                 {
+                     "ID":  "20260856",
+                     "NAME":  "learning_instructor_experience_foundation_v1",
+                     "FILE":  "20260856_learning_instructor_experience_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "fae27fb|2026-07-24 14:43:30 +0300|feat(learning): add instructor experience foundation v1",
+                     "SHA16":  "8a882f0ff0717a38",
+                     "SIGS":  "header==============================================================================; fns=learning_instructor_assert_course_manage,learning_instructor_learner_label,learning_instructor_course_learners,learning_instructor_pending_review_count,get_instructor_learning_dashboard; token=learning_"
+                 },
+                 {
+                     "ID":  "20260857",
+                     "NAME":  "learning_assignments_coursework_foundation_v1",
+                     "FILE":  "20260857_learning_assignments_coursework_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "b68e0bd|2026-07-24 14:43:31 +0300|feat(learning): add assignments coursework foundation v1",
+                     "SHA16":  "1dd4588f40dab20f",
+                     "SIGS":  "header==============================================================================; tables=learning_assignment_specs,learning_assignment_resources,learning_assignment_submissions,learning_assignment_artifacts,learning_assignment_reviews,learning_assignment_progress_applications; fns=learning_assignment_require_activity,learning_assignment_load_context,learning_assignment_assert_manage,learning_progress_complete_lesson_from_assignment,learning_assignment_try_apply_progress; token=learning_"
+                 },
+                 {
+                     "ID":  "20260858",
+                     "NAME":  "learning_discussions_community_foundation_v1",
+                     "FILE":  "20260858_learning_discussions_community_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "51f8477|2026-07-24 14:43:31 +0300|feat(learning): add discussions community foundation v1",
+                     "SHA16":  "55ecec04e3705fc5",
+                     "SIGS":  "header==============================================================================; tables=learning_discussion_threads,learning_discussion_replies,learning_qa_questions,learning_qa_answers,learning_announcements; fns=learning_community_course_space_id,learning_community_assert_access,learning_community_assert_staff,learning_community_author_label,create_learning_discussion_thread; token=learning_"
+                 },
+                 {
+                     "ID":  "20260859",
+                     "NAME":  "learning_live_calendar_foundation_v1",
+                     "FILE":  "20260859_learning_live_calendar_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "b25431f|2026-07-24 14:43:31 +0300|feat(learning): add live calendar foundation v1",
+                     "SHA16":  "d9e2922ea28535da",
+                     "SIGS":  "header==============================================================================; tables=learning_live_sessions,learning_live_attendance; fns=learning_live_course_space_id,learning_live_assert_access,learning_live_assert_manage,learning_live_sfu_room_name,learning_live_in_join_window; token=learning_"
+                 },
+                 {
+                     "ID":  "20260860",
+                     "NAME":  "learning_beta_readiness_auth_alignment_v1",
+                     "FILE":  "20260860_learning_beta_readiness_auth_alignment_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "0debf03|2026-07-24 14:43:31 +0300|chore(learning): harden beta readiness v1",
+                     "SHA16":  "2db9f270756f5910",
+                     "SIGS":  "header==============================================================================; fns=learning_course_space_id,learning_community_course_space_id,learning_live_course_space_id,learning_community_assert_access; token=learning_"
+                 },
+                 {
+                     "ID":  "20260861",
+                     "NAME":  "learning_instructor_course_tree_read_v1",
+                     "FILE":  "20260861_learning_instructor_course_tree_read_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "7d7fa23|2026-07-25 17:41:58 +0300|feat(learning): add instructor course tree read RPC",
+                     "SHA16":  "656c8c8585dd4400",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Instructor Course Tree Read RPC optimization V1; fns=get_instructor_learning_course_tree; token=learning_"
+                 },
+                 {
+                     "ID":  "20260862",
+                     "NAME":  "learning_instructor_lesson_blocks_read_v1",
+                     "FILE":  "20260862_learning_instructor_lesson_blocks_read_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "f92dd39|2026-07-25 18:21:07 +0300|feat(learning): add instructor lesson blocks read RPC",
+                     "SHA16":  "6d9b022d5cb4faf1",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Instructor Lesson Blocks Read RPC optimization V1; fns=get_instructor_learning_lesson_blocks; token=learning_"
+                 },
+                 {
+                     "ID":  "20260863",
+                     "NAME":  "learning_first_course_readiness_v1",
+                     "FILE":  "20260863_learning_first_course_readiness_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "6a2897f|2026-07-26 16:18:29 +0300|ي╗┐feat(learning): first-course readiness engine, progress, projects, labs",
+                     "SHA16":  "02f555da099a0596",
+                     "SIGS":  "header==============================================================================; tables=learning_lesson_objectives,learning_lesson_prerequisites,learning_section_progress,learning_course_resources,learning_course_resource_downloads,learning_project_specs; fns=learning_lesson_content_block_validate_type,learning_lesson_content_block_validate_content,set_learning_lesson_objectives,learning_lesson_prerequisites_satisfied,set_learning_lesson_prerequisites; token=learning_"
+                 },
+                 {
+                     "ID":  "20260864",
+                     "NAME":  "learning_project_instructor_review_v1",
+                     "FILE":  "20260864_learning_project_instructor_review_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "cf04a0c|2026-07-26 17:39:12 +0300|fix(learning): enforce unlock gating and add project review queue",
+                     "SHA16":  "b1d01b2ad40f7065",
+                     "SIGS":  "header=UM Learning OS â€” Project instructor review queue (First Course Readiness gap close); fns=get_learning_project_submission_queue,get_learning_project_submission_for_review; token=learning_"
+                 },
+                 {
+                     "ID":  "20260866",
+                     "NAME":  "learning_public_course_preview_foundation_v1",
+                     "FILE":  "20260866_learning_public_course_preview_foundation_v1.sql",
+                     "OWNER":  "LEARNING",
+                     "WHY":  "Filename matches *learning_*; present on HEAD+e84475a769c731bb7e1ad511b3543ee714d2feea tip; SQL Learning-domain objects; Learning release acceptance inventory.",
+                     "INTRO":  "d7c6669|2026-07-27 14:39:29 +0300|feat(learning): add public catalog and course preview foundation v1",
+                     "SHA16":  "c97d1e1805c2f178",
+                     "SIGS":  "header=UMTUBA Learning OS â€” Public Course Preview Foundation V1; tables=learning_course_public_previews; fns=upsert_learning_course_public_preview,get_learning_course_public_preview; token=learning_"
+                 }
+             ],
+    "cls":  [
+                {
+                    "ID":  "20260842",
+                    "CLAIM":  "ADS",
+                    "FILE":  "supabase/migrations/20260842_ads_deliverable_binding_database_authority_v1.sql",
+                    "INTRO":  "d84b880|2026-07-23 23:44:28 +0300|feat(ads): bridge persisted deliverables to canonical inventory",
+                    "SHA16":  "846c46c13b824fb7",
+                    "SIGS":  "header=Ads Deliverable Binding Database Authority Hardening V1; fns=ads_deliverable_binding_placement_supported,ads_deliverable_binding_selection_format,ads_deliverable_binding_format_compatible,bind_ad_deliverable,activate_ad_campaign; token=ads",
+                    "NAME_HAS_LEARNING":  false
+                },
+                {
+                    "ID":  "20260846",
+                    "CLAIM":  "GAMES",
+                    "FILE":  "supabase/migrations/20260846_games_platform_foundation_v1.sql",
+                    "INTRO":  "a98f4f8|2026-07-24 02:15:36 +0300|chore(games): renumber games migrations",
+                    "SHA16":  "b8a28f5d8ee0195d",
+                    "SIGS":  "header=UM Games Platform Foundation V1; tables=games,game_player_profiles,game_privacy_settings,game_sessions,game_session_results,game_player_progress; fns=game_session_guard_immutable,game_ensure_player_profile,game_ensure_privacy_settings,game_session_expire_if_due,game_validate_client_result_claim; token=games",
+                    "NAME_HAS_LEARNING":  false
+                },
+                {
+                    "ID":  "20260847",
+                    "CLAIM":  "GAMES",
+                    "FILE":  "supabase/migrations/20260847_games_catalog_foundation_v1.sql",
+                    "INTRO":  "a98f4f8|2026-07-24 02:15:36 +0300|chore(games): renumber games migrations",
+                    "SHA16":  "1f05e1bd7f92e1ae",
+                    "SIGS":  "header=UM Games Catalog Foundation V1; fns=game_catalog_validate_definition,game_catalog_row_to_json,list_games_catalog,get_game_catalog_by_key,get_game_catalog_by_id; token=games",
+                    "NAME_HAS_LEARNING":  false
+                }
+            ]
+}

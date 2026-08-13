@@ -1,0 +1,98 @@
+PC2 REPORT
+SOURCE_DEVICE = PC2
+DEVICE_ROLE = INDEPENDENT_RELEASE_QA / PLATFORM_CORE
+TASK_ID = PC2_SMB_TRANSPORT_REMOUNT_FROM_VERIFIED_ENDPOINT_V1
+REPORT_TYPE = SMB_TRANSPORT_REMOUNT_VERIFIED_ENDPOINT
+DELIVERY_ID = LB003-20260812T200300Z
+TIMESTAMP_LOCAL = 2026-08-12 23:48 +03
+CENTRAL_HOSTNAME = WIN-MJRKAKK2MEH
+CENTRAL_LAN_IP = 192.168.88.11
+SHARE_NAME = UMTUBA-SHARE
+AUTHORITATIVE_UNC = \\192.168.88.11\UMTUBA-SHARE
+CENTRAL_SIDE_TRANSPORT_READY = YES
+RAW_SECRETS_EXPOSED = NO
+LB003_EXECUTED = NO
+
+## Verdict
+
+HANDSHAKE_PHASE_2_ACK = FAIL  
+END_TO_END_INTAKE_DELIVERY_VERIFIED = NO  
+NEXT_TASK = BLOCKED  
+
+Host + TCP 445 reachable. Authenticated UNC / P: remount failed (guest blocked; no stored SMB session; net use password invalid). Marker/GO/fixtures not observable on share.
+
+## Phase matrix
+
+| Phase | Result | Notes |
+| --- | --- | --- |
+| 1 Connectivity | PASS | ping 4/4; TCP 445 True |
+| 2 UNC access | FAIL | guest policy block; UNC path not accessible |
+| 3 Remount | FAIL | net use empty; P: absent; no persistent map |
+| 4 Marker ACK | FAIL | DELIVERY_MARKER_PRESENT=NO |
+| 5 GO / fixtures | FAIL | not present/readable/consumable |
+
+## Path matrix (presence only)
+
+| Path | Reachable |
+| --- | --- |
+| `\\192.168.88.11\UMTUBA-SHARE` | NO |
+| `\\WIN-MJRKAKK2MEH\UMTUBA-SHARE` | NO |
+| `P:\` / `P:\FROM-SERVER` / `P:\TO-PC2` | NO |
+| `D:\UMTUBA-SHARE` / `TO-PC2` | NO |
+| Desktop `umtuba\worktrees` | YES |
+| Desktop `umtuba\worktrees\OUTBOX_DROP` | YES (no delivery-id marker filename) |
+| Desktop `FROM-SERVER` / `TO-PC2` | NO |
+
+## Network evidence (non-secret)
+
+- ping `192.168.88.11`: 4/4, 0% loss
+- Test-NetConnection port 445: TcpTestSucceeded=True
+- net use: EMPTY
+- Persistent HKCU:\Network maps: 0
+- cmdkey SMB Domain target for share host: ABSENT
+- UNC guest: blocked by organization security policy
+- net use P: attempt: password invalid → interactive username prompt (aborted; no credentials invented)
+
+## OPERATOR (names only)
+
+OPERATOR_PC2_SECRET_ENTRY_REQUIRED = YES  
+OPERATOR_SECRET_ENTRY_TOOL = Windows Credential Manager / cmdkey / net use  
+OPERATOR_SECRET_ENTRY_PATH = `\\192.168.88.11\UMTUBA-SHARE` → `P:\`  
+EXACT_OPERATOR_ACTION = Restore authorized SMB credentials + map P:; confirm marker `LB003-20260812T200300Z`; re-ACK Phase-2 only
+
+## FINAL REPORT STAMPS
+
+```
+TASK_ID = PC2_SMB_TRANSPORT_REMOUNT_FROM_VERIFIED_ENDPOINT_V1
+REPORT_TYPE = SMB_TRANSPORT_REMOUNT_VERIFIED_ENDPOINT
+SOURCE_DEVICE = PC2
+DEVICE_ROLE = INDEPENDENT_RELEASE_QA / PLATFORM_CORE
+CENTRAL_HOSTNAME = WIN-MJRKAKK2MEH
+CENTRAL_LAN_IP = 192.168.88.11
+SHARE_NAME = UMTUBA-SHARE
+AUTHORITATIVE_UNC = \\192.168.88.11\UMTUBA-SHARE
+CENTRAL_SIDE_TRANSPORT_READY = YES
+DELIVERY_ID = LB003-20260812T200300Z
+PC2_SHARE_HOST_REACHABLE = YES
+PC2_SMB_445_REACHABLE = YES
+PC2_UNC_ACCESS = FAIL
+PC2_TRANSPORT_REMOUNTED = NO
+PC2_MAPPED_PATH = ABSENT
+PC2_INTAKE_PATH_REACHABLE = NO
+DELIVERY_MARKER_PRESENT = NO
+DELIVERY_MARKER_MATCH = NO
+GO_PACKET_PRESENT = NO
+GO_PACKET_READABLE = NO
+FIXTURE_REFERENCES_PRESENT = NO
+PC2_CAN_CONSUME_FIXTURES = NO
+OPERATOR_PC2_SECRET_ENTRY_REQUIRED = YES
+OPERATOR_SECRET_ENTRY_TOOL = Windows Credential Manager / cmdkey / net use
+OPERATOR_SECRET_ENTRY_PATH = \\192.168.88.11\UMTUBA-SHARE → P:\
+HANDSHAKE_PHASE_2_ACK = FAIL
+PC2_OBSERVED = NO
+END_TO_END_INTAKE_DELIVERY_VERIFIED = NO
+NEXT_TASK = BLOCKED
+LB003_EXECUTED = NO
+RAW_SECRETS_EXPOSED = NO
+REMOUNT_FAILURE_CLASS = AUTH_SESSION_ABSENT + GUEST_BLOCKED + NET_USE_PASSWORD_INVALID + NO_PERSISTENT_MAP
+```

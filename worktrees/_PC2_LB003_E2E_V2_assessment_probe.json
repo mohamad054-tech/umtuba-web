@@ -1,0 +1,31 @@
+{
+  "findings": [
+    {
+      "courseId": "f8ecde63-818c-49ac-a350-0a4008f20d5f",
+      "can": true,
+      "actCount": 0,
+      "sample": null
+    },
+    {
+      "courseId": "8c0685f3-29c0-45b6-8e5f-2b772efbff1f",
+      "can": true,
+      "actCount": 0,
+      "sample": null
+    },
+    {
+      "courseId": "8921eadb-386f-4e68-b22b-e1f61e86f7ca",
+      "can": true,
+      "actCount": 0,
+      "sample": null
+    }
+  ],
+  "enrolled_course_activity_count": 0,
+  "assessment_fail_closed": {
+    "err": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]-->\n<!--[if IE 7]>    <html class=\"no-js ie7 oldie\" l"
+  },
+  "site": {
+    "origin": "https://umtuba.com",
+    "path": "/learning",
+    "status": 200
+  }
+}
