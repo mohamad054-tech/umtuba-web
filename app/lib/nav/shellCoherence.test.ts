@@ -34,6 +34,14 @@ describe("shell coherence", () => {
     expect(top).toMatch(/APP_ROUTES\.search/);
     expect(top).toMatch(/actions\.search|nav\.search/);
     expect(top).toMatch(/watch-focus-ring/);
+    expect(top).toMatch(/LanguageSelector/);
+    expect(top).toMatch(/variant="compact"/);
+  });
+
+  it("AuthShell exposes compact language control for guests", () => {
+    const auth = read("app/components/auth/AuthShell.tsx");
+    expect(auth).toMatch(/LanguageSelector/);
+    expect(auth).toMatch(/variant="compact"/);
   });
 
   it("removes prototype version badges from product shells", () => {

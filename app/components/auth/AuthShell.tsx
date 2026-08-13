@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import { LanguageSelector } from "../i18n";
 
 type AuthShellProps = {
   title: string;
@@ -50,12 +51,21 @@ export default function AuthShell({
           </section>
 
           <section className="p-6 sm:p-10">
-            <Link
-              href={APP_ROUTES.home}
-              className="mb-8 inline-block text-xl font-black tracking-tight lg:hidden"
-            >
-              UMTUBA
-            </Link>
+            <div className="mb-8 flex items-center justify-between gap-3">
+              <Link
+                href={APP_ROUTES.home}
+                className="inline-block text-xl font-black tracking-tight lg:hidden"
+              >
+                UMTUBA
+              </Link>
+              <div className="ms-auto">
+                <LanguageSelector
+                  id="umtuba-language-auth"
+                  tone="dark"
+                  variant="compact"
+                />
+              </div>
+            </div>
 
             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
               {title}

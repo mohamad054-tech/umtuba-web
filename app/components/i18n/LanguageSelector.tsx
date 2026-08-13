@@ -14,6 +14,8 @@ type LanguageSelectorProps = {
   className?: string;
   /** Visual tone for Settings (dark) vs light surfaces. */
   tone?: "light" | "dark";
+  /** `full` = settings block; `compact` = chrome/auth control (label sr-only). */
+  variant?: "full" | "compact";
   /**
    * Optional controlled change handler. When omitted, persists cookie and refreshes.
    */
@@ -28,6 +30,7 @@ export default function LanguageSelector({
   id = "umtuba-language",
   className,
   tone = "light",
+  variant = "full",
   onLocaleChange,
 }: LanguageSelectorProps) {
   const router = useRouter();
@@ -51,6 +54,38 @@ export default function LanguageSelector({
   }
 
   const isDark = tone === "dark";
+  const isCompact = variant === "compact";
+
+  if (isCompact) {
+    return (
+      <label
+        className={
+          className ??
+          "inline-flex items-center gap-1.5 text-xs font-bold text-white/70"
+        }
+      >
+        <span className="sr-only">{t("settings.language")}</span>
+        <select
+          id={id}
+          name="locale"
+          value={locale}
+          aria-label={t("settings.language")}
+          className={
+            isDark
+              ? "watch-focus-ring max-w-[7.5rem] rounded-full border border-white/15 bg-white/5 px-2 py-1.5 text-[11px] font-bold text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
+              : "watch-focus-ring max-w-[7.5rem] rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-[11px] font-bold text-zinc-900"
+          }
+          onChange={(event) => handleChange(event.target.value)}
+        >
+          {options.map((entry) => (
+            <option key={entry.code} value={entry.code} dir={entry.direction}>
+              {entry.nativeName}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
 
   return (
     <label

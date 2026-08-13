@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { desktopNavLabelKey } from "../../lib/i18n";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
 import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
-import { useTranslation } from "./i18n";
+import { LanguageSelector, useTranslation } from "./i18n";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
 import WalletBalanceIndicator from "./wallet/WalletBalanceIndicator";
@@ -107,6 +107,11 @@ export default function AppTopNav({
           >
             {t("nav.search")}
           </Link>
+          <LanguageSelector
+            id="umtuba-language-shell"
+            tone="dark"
+            variant="compact"
+          />
           <ActivityTierIndicator />
           <WalletBalanceIndicator />
           <NotificationBell />
