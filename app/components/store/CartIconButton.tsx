@@ -81,7 +81,7 @@ export default function CartIconButton() {
       aria-label={
         count > 0 ? `Cart, ${count} items` : "Cart"
       }
-      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-violet-400/25 bg-violet-500/10 text-violet-100 transition hover:bg-violet-500/20"
+      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)] transition hover:bg-[rgba(214,196,161,0.22)]"
     >
       <svg
         viewBox="0 0 24 24"

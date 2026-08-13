@@ -31,7 +31,7 @@ export default function CategoryRail({
         <li key={category.id} className="shrink-0">
           <Link
             href={categoryHref(category)}
-            className="watch-focus-ring group relative flex h-28 w-44 flex-col justify-end overflow-hidden rounded-[1.25rem] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)]"
+            className="watch-focus-ring group relative flex h-28 w-44 flex-col justify-end overflow-hidden rounded-[1.25rem] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)] hover:shadow-[var(--sf-shadow)]"
           >
             <div
               className="pointer-events-none absolute inset-0 opacity-80 transition group-hover:opacity-100"

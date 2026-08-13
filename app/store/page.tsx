@@ -10,6 +10,7 @@ import StoreEmptyState from "../components/store/StoreEmptyState";
 import StoreErrorState from "../components/store/StoreErrorState";
 import StoreSection from "../components/store/StoreSection";
 import StoreShell from "../components/store/StoreShell";
+import StoreTrustStrip from "../components/store/StoreTrustStrip";
 import { APP_ROUTES } from "../lib/nav";
 import {
   deriveCuratedCollections,
@@ -49,19 +50,9 @@ export default async function StoreHomePage() {
   const catalogEmpty = !catalog.error && items.length === 0;
 
   return (
-    <StoreShell
-      title="Store"
-      subtitle="Commerce"
-      actions={
-        <Link
-          href="/store/search"
-          className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:bg-[rgba(214,196,161,0.2)]"
-        >
-          Browse
-        </Link>
-      }
-    >
+    <StoreShell title="Store" subtitle="Commerce">
       <HeroCarousel slides={heroSlides} />
+      <StoreTrustStrip />
 
       {catalog.error ? (
         <div className="mt-6">

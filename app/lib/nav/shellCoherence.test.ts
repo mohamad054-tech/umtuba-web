@@ -36,6 +36,18 @@ describe("shell coherence", () => {
     expect(top).toMatch(/watch-focus-ring/);
   });
 
+  it("StoreShell keeps AppTopNav as shared chrome with a store appearance", () => {
+    const shell = read("app/components/store/StoreShell.tsx");
+    const top = read("app/components/AppTopNav.tsx");
+    expect(shell).toMatch(/AppTopNav/);
+    expect(shell).toMatch(/appearance="store"/);
+    expect(shell).not.toMatch(/StoreTopNav/);
+    expect(top).toMatch(/appearance\?: "default" \| "store"/);
+    expect(top).toMatch(/APP_NAV_ITEMS/);
+    expect(top).toMatch(/UserMenu/);
+    expect(top).toMatch(/NotificationBell/);
+  });
+
   it("removes prototype version badges from product shells", () => {
     const discover = read("app/discover/components/DiscoverShell.tsx");
     const create = read("app/create/video/page.tsx");

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import CheckoutClient from "../../components/store/CheckoutClient";
 import StoreErrorState from "../../components/store/StoreErrorState";
+import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
@@ -43,16 +44,11 @@ export default async function StoreCheckoutPage() {
 
   return (
     <StoreShell title="Checkout" subtitle="Store" wide>
-      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
-        <p className="sf-eyebrow">Checkout</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-          Review & place order
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
-          Totals are calculated server-side. Payment collection is not enabled —
-          placing an order creates a pending-payment order only. Multi-seller
-          carts create one order per seller atomically.
-        </p>
+      <StorePageHeader
+        eyebrow="Checkout"
+        title="Review & place order"
+        description="Totals are calculated server-side. Payment collection is not enabled — placing an order creates a pending-payment order only. Multi-seller carts create one order per seller atomically."
+      >
         {!commerceGate.purchasesAvailable ? (
           <p
             role="status"
@@ -70,7 +66,7 @@ export default async function StoreCheckoutPage() {
             and resolve them before placing an order.
           </p>
         ) : null}
-      </header>
+      </StorePageHeader>
 
       {!addresses.ok || !shipping.ok ? (
         <div className="mt-6">

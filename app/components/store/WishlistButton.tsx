@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toggleWishlistAction } from "../../actions/storeWishlist";
 import { APP_ROUTES } from "../../lib/nav";
 
@@ -34,6 +34,10 @@ export default function WishlistButton({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  useEffect(() => {
+    setWishlisted(initialWishlisted);
+  }, [initialWishlisted]);
+
   return (
     <div>
       <button
@@ -65,7 +69,12 @@ export default function WishlistButton({
         }}
         className={className ?? DEFAULT_CLASS}
       >
-        <span aria-hidden>{wishlisted ? "♥" : "♡"}</span>
+        <span
+          aria-hidden
+          className={wishlisted ? "text-[var(--sf-accent-strong,#e8d7b5)]" : undefined}
+        >
+          {wishlisted ? "♥" : "♡"}
+        </span>
       </button>
       {error ? (
         <p role="alert" className="mt-2 text-xs text-red-300">

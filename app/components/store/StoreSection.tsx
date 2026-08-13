@@ -44,7 +44,7 @@ export default function StoreSection({
         {href ? (
           <Link
             href={href}
-            className="watch-focus-ring shrink-0 rounded-full border border-[var(--sf-line)] bg-white/5 px-4 py-2 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:border-[rgba(214,196,161,0.35)] hover:bg-white/8"
+            className="sf-btn sf-btn-ghost shrink-0"
           >
             {linkLabel}
           </Link>
