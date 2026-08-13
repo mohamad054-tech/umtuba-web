@@ -3,11 +3,13 @@
 import { useCallback, useState } from "react";
 import type { ProfilePost } from "../types";
 import ProfilePhotosLightbox from "./ProfilePhotosLightbox";
+import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
 
 type ProfilePhotosPanelProps = {
   posts: ProfilePost[];
   loadFailed?: boolean;
   isOwner?: boolean;
+  onPostDeleted?: (postId: number) => void;
 };
 
 function isPhotoPost(post: ProfilePost): boolean {
@@ -23,6 +25,7 @@ export default function ProfilePhotosPanel({
   posts,
   loadFailed = false,
   isOwner = false,
+  onPostDeleted,
 }: ProfilePhotosPanelProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -62,7 +65,7 @@ export default function ProfilePhotosPanel({
         {photos.map((post, index) => (
           <li
             key={post.id}
-            className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
+            className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03]"
           >
             <button
               type="button"
@@ -83,6 +86,20 @@ export default function ProfilePhotosPanel({
                 </div>
               )}
             </button>
+            {isOwner ? (
+              <div className="absolute right-1 top-1">
+                <OwnerContentDeleteControl
+                  postId={post.id}
+                  kind="post"
+                  isOwner={isOwner}
+                  variant="overlay"
+                  onDeleted={(postId) => {
+                    setOpenIndex(null);
+                    onPostDeleted?.(postId);
+                  }}
+                />
+              </div>
+            ) : null}
           </li>
         ))}
       </ul>

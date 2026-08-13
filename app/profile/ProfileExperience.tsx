@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import FollowButton from "../components/social/FollowButton";
 import {
@@ -54,6 +54,7 @@ export default function ProfileExperience({
   isOwner,
   viewerId = null,
 }: ProfileExperienceProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const showLiveTab =
     profile.liveSessions.length > 0 || Boolean(profile.isLive);
@@ -96,6 +97,8 @@ export default function ProfileExperience({
   const [followersLabel, setFollowersLabel] = useState(profile.followersLabel);
   const [followingLabel, setFollowingLabel] = useState(profile.followingLabel);
   const [isHeroCollapsed, setIsHeroCollapsed] = useState(false);
+  const [hiddenPostIds, setHiddenPostIds] = useState<number[]>([]);
+  const [hiddenVideoIds, setHiddenVideoIds] = useState<string[]>([]);
   const linkedArticleIdRaw = searchParams.get("article");
   const linkedArticleId =
     linkedArticleIdRaw && isUuid(linkedArticleIdRaw)
@@ -131,6 +134,36 @@ export default function ProfileExperience({
 
   const canFollow =
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
+
+  const visibleVideos = profile.videos.filter(
+    (video) => !hiddenVideoIds.includes(video.id)
+  );
+  const visiblePosts = profile.posts.filter(
+    (post) => !hiddenPostIds.includes(post.id)
+  );
+  const visibleContentCards = (profile.contentCards ?? []).filter((card) => {
+    if (card.discoveryPostId != null && hiddenPostIds.includes(card.discoveryPostId)) {
+      return false;
+    }
+    return !hiddenVideoIds.includes(card.sourceEntityId);
+  });
+
+  function handleOwnedVideoDeleted(videoId: string, postId: number) {
+    setHiddenVideoIds((current) =>
+      current.includes(videoId) ? current : [...current, videoId]
+    );
+    setHiddenPostIds((current) =>
+      current.includes(postId) ? current : [...current, postId]
+    );
+    router.refresh();
+  }
+
+  function handleOwnedPostDeleted(postId: number) {
+    setHiddenPostIds((current) =>
+      current.includes(postId) ? current : [...current, postId]
+    );
+    router.refresh();
+  }
 
   return (
     <ProfileShell>
@@ -258,7 +291,7 @@ export default function ProfileExperience({
         >
           {activeTab === "all" ? (
             <ProfileAllPanel
-              cards={profile.contentCards ?? []}
+              cards={visibleContentCards}
               pinnedCards={profile.pinnedContentCards}
               loadFailed={Boolean(profile.registryLoadFailed)}
             />
@@ -272,9 +305,11 @@ export default function ProfileExperience({
           ) : null}
           {activeTab === "videos" ? (
             <ProfileVideoGrid
-              videos={profile.videos}
+              videos={visibleVideos}
               hasMore={Boolean(profile.hasMoreVideos)}
               loadFailed={Boolean(profile.videosLoadFailed)}
+              isOwner={isOwner}
+              onVideoDeleted={handleOwnedVideoDeleted}
             />
           ) : null}
           {activeTab === "courses" ? (
@@ -291,9 +326,10 @@ export default function ProfileExperience({
           ) : null}
           {activeTab === "photos" ? (
             <ProfilePhotosPanel
-              posts={profile.posts}
+              posts={visiblePosts}
               loadFailed={Boolean(profile.postsLoadFailed)}
               isOwner={isOwner}
+              onPostDeleted={handleOwnedPostDeleted}
             />
           ) : null}
           {activeTab === "live" && showLiveTab ? (

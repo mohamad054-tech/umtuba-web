@@ -2,17 +2,22 @@ import Link from "next/link";
 import type { ProfileVideo } from "../types";
 import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
+import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
   hasMore?: boolean;
   loadFailed?: boolean;
+  isOwner?: boolean;
+  onVideoDeleted?: (videoId: string, postId: number) => void;
 };
 
 export default function ProfileVideoGrid({
   videos,
   hasMore = false,
   loadFailed = false,
+  isOwner = false,
+  onVideoDeleted,
 }: ProfileVideoGridProps) {
   if (loadFailed) {
     return (
@@ -84,7 +89,7 @@ export default function ProfileVideoGrid({
           );
 
           return (
-            <li key={video.id}>
+            <li key={video.id} className="relative">
               {video.href ? (
                 <Link
                   href={video.href}
@@ -96,6 +101,17 @@ export default function ProfileVideoGrid({
               ) : (
                 card
               )}
+              {isOwner && video.postId ? (
+                <div className="absolute right-2 top-2">
+                  <OwnerContentDeleteControl
+                    postId={video.postId}
+                    kind="video"
+                    isOwner={isOwner}
+                    variant="overlay"
+                    onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
+                  />
+                </div>
+              ) : null}
             </li>
           );
         })}

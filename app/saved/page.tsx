@@ -74,6 +74,7 @@ export default async function SavedPage() {
 
           return {
             id: databasePost.id,
+            ownerUserId: databasePost.user_id,
             author: {
               name: databasePost.author_name,
               username: databasePost.author_username,
@@ -111,7 +112,11 @@ export default async function SavedPage() {
           </Link>
         }
       />
-      <SavedExperience initialPosts={initialPosts} loadError={loadError} />
+      <SavedExperience
+        initialPosts={initialPosts}
+        viewerId={userId}
+        loadError={loadError}
+      />
     </main>
   );
 }

@@ -10,14 +10,20 @@ import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 
 type SavedExperienceProps = {
   initialPosts: Post[];
+  viewerId?: string | null;
   loadError?: string | null;
 };
 
 export default function SavedExperience({
   initialPosts,
+  viewerId = null,
   loadError = null,
 }: SavedExperienceProps) {
   const [posts, setPosts] = useState(initialPosts);
+
+  function handlePostDeleted(postId: number) {
+    setPosts((current) => current.filter((post) => post.id !== postId));
+  }
 
   function handlePostChange(postId: number, patch: Partial<Post>) {
     setPosts((current) => {
@@ -61,7 +67,9 @@ export default function SavedExperience({
             <ContentCard
               key={post.id}
               post={post}
+              viewerId={viewerId}
               onPostChange={handlePostChange}
+              onPostDeleted={handlePostDeleted}
             />
           ))}
         </div>

@@ -21,6 +21,7 @@ type VideoOverlayProps = {
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
+  onDeleted?: (postId: number) => void;
 };
 
 export default function VideoOverlay({
@@ -34,6 +35,7 @@ export default function VideoOverlay({
   onStatsChange,
   onFlagsChange,
   onFollowChange,
+  onDeleted,
 }: VideoOverlayProps) {
   const prototypePanelsAllowed = allowWatchPrototypePanels();
   const peerUserId = video.author.id;
@@ -172,11 +174,14 @@ export default function VideoOverlay({
             likedByMe={video.likedByMe}
             savedByMe={video.savedByMe}
             caption={video.caption}
+            viewerId={viewerId}
+            ownerUserId={video.author.id}
             persist={video.source === "supabase"}
             returnPath={returnPath}
             onOpenPanel={onOpenPanel}
             onStatsChange={onStatsChange}
             onFlagsChange={onFlagsChange}
+            onDeleted={onDeleted}
           />
         </div>
       </div>
