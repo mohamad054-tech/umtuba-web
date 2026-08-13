@@ -38,6 +38,8 @@ type SearchExperienceProps = {
 };
 
 const SUGGEST_DEBOUNCE_MS = 280;
+/** Client recovery when the server action never resolves (hung query / network). */
+const SEARCH_ACTION_TIMEOUT_MS = 12_000;
 
 function ResultRow({ item }: { item: SearchResultItem }) {
   return (
@@ -99,25 +101,47 @@ export default function SearchExperience({
       setLoading(true);
       setError(null);
 
-      const res = await globalSearchAction({
-        query: nextQuery,
-        tab: nextTab,
-        remember,
-      });
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      try {
+        const res = await Promise.race([
+          globalSearchAction({
+            query: nextQuery,
+            tab: nextTab,
+            remember,
+          }),
+          new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => {
+              reject(new Error(SEARCH_ERRORS.loadFailed));
+            }, SEARCH_ACTION_TIMEOUT_MS);
+          }),
+        ]);
 
-      if (generation !== generationRef.current) return;
+        if (generation !== generationRef.current) return;
 
-      if (!res.ok) {
-        setResult(null);
-        setError(searchUserMessage(res.message, SEARCH_ERRORS.loadFailed));
+        if (!res.ok) {
+          setResult(null);
+          setError(searchUserMessage(res.message, SEARCH_ERRORS.loadFailed));
+          setLoading(false);
+          return;
+        }
+
+        setResult(res.result);
         setLoading(false);
-        return;
-      }
-
-      setResult(res.result);
-      setLoading(false);
-      if (remember) {
-        void loadRecent();
+        if (remember) {
+          void loadRecent();
+        }
+      } catch (error) {
+        if (generation !== generationRef.current) return;
+        setResult(null);
+        setError(
+          searchUserMessage(
+            error instanceof Error ? error.message : null,
+            SEARCH_ERRORS.loadFailed
+          )
+        );
+        setLoading(false);
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
     },
     []
