@@ -130,6 +130,7 @@ describe("route robots / sitemap policy", () => {
       "/post-journey",
       "/terms",
       "/privacy",
+      "/account-deletion",
     ]);
     const blocked = [
       "/login",

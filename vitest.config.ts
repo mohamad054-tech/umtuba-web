@@ -24,6 +24,7 @@ export default defineConfig({
       "lib/revenue/**/*.test.ts",
       "lib/ueos/**/*.test.ts",
       "lib/activity-tiers/**/*.test.ts",
+      "lib/accountDeletion/**/*.test.ts",
       "lib/media/**/*.test.ts",
       "lib/supabase/**/*.test.ts",
       "lib/store/**/*.test.ts",
