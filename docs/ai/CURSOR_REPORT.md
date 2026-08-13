@@ -204,3 +204,14 @@ Expected dirty (pre-existing uncommitted callback closeout + workspace evidence 
 4. Mobile/Android/Play remains **POST_RELEASE** and does not reopen web platform release validity.
 
 END PWA_AUTH_CALLBACK_CENTRAL_INTEGRATION_HANDOFF
+
+---
+
+## SAVE_ALL (PC2 user request: احفظ كلشي)
+
+- SAVE_ALL_COMMITTED=YES
+- COMMIT_SHA=eae76d456b5ca9f89489646ecfbe03683347d8d1 (eae76d4)
+- PUSH_STATUS=NOT_PUSHED
+- FILES_IN_COMMIT=75
+- EXCLUDED_UNTRACKED=`_a2_inventory_vitest.log`, `_d1_money_locale_vitest.log`, `_pc2_a1_d1_money_locale_v2.log`, `_pc2_a1_d2_media_foundation_v2.log` (ephemeral vitest logs; no secrets staged)
+- BRANCH=`office/platform-translation-trunk-port-v1` (ahead 1 after save; ahead 2 after this report note if committed)
