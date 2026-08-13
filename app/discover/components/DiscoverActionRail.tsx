@@ -9,6 +9,7 @@ import {
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../../components/social/ShareMenu";
+import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -28,11 +29,14 @@ type DiscoverActionRailProps = {
   likedByMe: boolean;
   savedByMe: boolean;
   caption?: string;
+  viewerId?: string | null;
+  ownerUserId?: string | null;
   /** Safe path for login `?next=` (defaults to Discover). */
   returnPath?: string;
   onComment?: () => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onDeleted?: (postId: number) => void;
 };
 
 /**
@@ -45,10 +49,13 @@ export default function DiscoverActionRail({
   likedByMe,
   savedByMe,
   caption,
+  viewerId = null,
+  ownerUserId = null,
   returnPath = APP_ROUTES.home,
   onComment,
   onStatsChange,
   onFlagsChange,
+  onDeleted,
 }: DiscoverActionRailProps) {
   const router = useRouter();
   const [sharedPulse, setSharedPulse] = useState(false);
@@ -389,6 +396,15 @@ export default function DiscoverActionRail({
           onSelect={(target) => void handleShareTarget(target)}
         />
       </div>
+
+      <OwnerContentDeleteControl
+        postId={postId}
+        kind="video"
+        viewerId={viewerId}
+        ownerUserId={ownerUserId}
+        variant="rail"
+        onDeleted={onDeleted}
+      />
     </div>
   );
 }

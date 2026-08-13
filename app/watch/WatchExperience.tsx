@@ -342,6 +342,12 @@ export default function WatchExperience({
     []
   );
 
+  const handleVideoDeleted = useCallback((videoId: string) => {
+    setVideos((current) => current.filter((video) => video.id !== videoId));
+    setActiveVideo((current) => (current?.id === videoId ? null : current));
+    setActivePanel(null);
+  }, []);
+
   const handleFollowChange = useCallback(
     (authorId: string, following: boolean) => {
       setVideos((current) =>
@@ -535,6 +541,7 @@ export default function WatchExperience({
             onPostJourney={handlePostJourney}
             onNearEnd={handleNearEnd}
             onVideoPatch={handleVideoPatch}
+            onVideoDeleted={handleVideoDeleted}
             onFollowChange={handleFollowChange}
             onPlaybackTime={setPlaybackTimeMs}
             restoreState={restoreVideoState}

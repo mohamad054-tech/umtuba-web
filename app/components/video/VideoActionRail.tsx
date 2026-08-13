@@ -15,6 +15,7 @@ import {
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../social/ShareMenu";
+import OwnerContentDeleteControl from "../social/OwnerContentDeleteControl";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -36,6 +37,8 @@ type VideoActionRailProps = {
   likedByMe: boolean;
   savedByMe: boolean;
   caption?: string;
+  viewerId?: string | null;
+  ownerUserId?: string | null;
   /** When false, interactions stay local (demo fallback). */
   persist?: boolean;
   /** Safe path for login `?next=` (defaults to Watch). */
@@ -43,6 +46,7 @@ type VideoActionRailProps = {
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
+  onDeleted?: (postId: number) => void;
 };
 
 export default function VideoActionRail({
@@ -51,11 +55,14 @@ export default function VideoActionRail({
   likedByMe,
   savedByMe,
   caption,
+  viewerId = null,
+  ownerUserId = null,
   persist = Boolean(postId),
   returnPath = APP_ROUTES.watch,
   onOpenPanel,
   onStatsChange,
   onFlagsChange,
+  onDeleted,
 }: VideoActionRailProps) {
   const router = useRouter();
   const [sharedPulse, setSharedPulse] = useState(false);
@@ -368,6 +375,17 @@ export default function VideoActionRail({
               />
             </svg>
           }
+        />
+      ) : null}
+
+      {persist && postId ? (
+        <OwnerContentDeleteControl
+          postId={postId}
+          kind="video"
+          viewerId={viewerId}
+          ownerUserId={ownerUserId}
+          variant="rail"
+          onDeleted={onDeleted}
         />
       ) : null}
     </div>

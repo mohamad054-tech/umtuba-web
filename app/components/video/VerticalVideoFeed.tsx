@@ -31,6 +31,7 @@ type VerticalVideoFeedProps = {
   ) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
   onPlaybackTime?: (currentTimeMs: number) => void;
+  onVideoDeleted?: (videoId: string, postId: number) => void;
   restoreState?: {
     videoId: string;
     playbackTimeSeconds: number;
@@ -58,6 +59,7 @@ export default function VerticalVideoFeed({
   onVideoPatch,
   onFollowChange,
   onPlaybackTime,
+  onVideoDeleted,
   restoreState = null,
   loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
@@ -96,6 +98,13 @@ export default function VerticalVideoFeed({
 
     slideNodesRef.current.delete(id);
   }, []);
+
+  useEffect(() => {
+    if (videos.length === 0) {
+      return;
+    }
+    setActiveIndex((current) => Math.min(current, videos.length - 1));
+  }, [videos.length]);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -293,6 +302,7 @@ export default function VerticalVideoFeed({
                 onFlagsChange={(flags) => onVideoPatch?.(video.id, flags)}
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
+                onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
                 onPlaybackTime={
                   index === activeIndex ? onPlaybackTime : undefined
                 }

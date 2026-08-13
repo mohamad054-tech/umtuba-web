@@ -16,6 +16,7 @@ export type PostAuthor = {
 
 export type Post = {
   id: number;
+  ownerUserId?: string | null;
   author: PostAuthor;
   type: PostType;
   content: string;

@@ -158,6 +158,12 @@ export default function DiscoverExperience({
     []
   );
 
+  const handleVideoDeleted = useCallback((videoId: string) => {
+    setVideos((current) => current.filter((video) => video.id !== videoId));
+    setActiveVideo((current) => (current?.id === videoId ? null : current));
+    setCommentsOpen(false);
+  }, []);
+
   const handleSrcChange = useCallback((videoId: string, src: string) => {
     setVideos((current) =>
       current.map((video) =>
@@ -284,6 +290,7 @@ export default function DiscoverExperience({
               onFollowChange={handleFollowChange}
               onSrcChange={handleSrcChange}
               onNearEnd={handleNearEnd}
+              onVideoDeleted={handleVideoDeleted}
               loadMoreEpoch={loadMoreEpoch}
             />
 

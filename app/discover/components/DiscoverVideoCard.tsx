@@ -32,6 +32,7 @@ type DiscoverVideoCardProps = {
   onFollowChange?: (creatorId: string, following: boolean) => void;
   onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
+  onDeleted?: (postId: number) => void;
 };
 
 export default function DiscoverVideoCard({
@@ -45,6 +46,7 @@ export default function DiscoverVideoCard({
   onFollowChange,
   onSrcChange,
   slideRef,
+  onDeleted,
 }: DiscoverVideoCardProps) {
   const router = useRouter();
   const [localViews] = useState(() => new Set<number>());
@@ -255,10 +257,13 @@ export default function DiscoverVideoCard({
               likedByMe={video.likedByMe}
               savedByMe={video.savedByMe}
               caption={video.caption}
+              viewerId={viewerId}
+              ownerUserId={video.creator.id}
               returnPath={`${APP_ROUTES.home}?post=${video.id}`}
               onComment={handleComment}
               onStatsChange={onStatsChange}
               onFlagsChange={handleFlagsChange}
+              onDeleted={onDeleted}
             />
           </div>
         </div>

@@ -21,10 +21,13 @@ import {
 } from "../lib/social/shareAndViews";
 import CommentsPanel from "./social/CommentsPanel";
 import ShareMenu from "./social/ShareMenu";
+import OwnerContentDeleteControl from "./social/OwnerContentDeleteControl";
 
 type ContentCardProps = {
   post: Post;
+  viewerId?: string | null;
   onPostChange?: (postId: number, patch: Partial<Post>) => void;
+  onPostDeleted?: (postId: number) => void;
 };
 
 const postTypeLabels: Record<Post["type"], string> = {
@@ -38,7 +41,12 @@ const postTypeLabels: Record<Post["type"], string> = {
   opportunity: "Opportunity",
 };
 
-export default function ContentCard({ post, onPostChange }: ContentCardProps) {
+export default function ContentCard({
+  post,
+  viewerId = null,
+  onPostChange,
+  onPostDeleted,
+}: ContentCardProps) {
   const router = useRouter();
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
@@ -252,6 +260,14 @@ export default function ContentCard({ post, onPostChange }: ContentCardProps) {
           <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/70">
             {postTypeLabels[post.type]}
           </span>
+          <OwnerContentDeleteControl
+            postId={post.id}
+            kind={post.type === "video" ? "video" : "post"}
+            viewerId={viewerId}
+            ownerUserId={post.ownerUserId}
+            variant="header"
+            onDeleted={onPostDeleted}
+          />
         </div>
 
         {post.content ? (

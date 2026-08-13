@@ -25,6 +25,7 @@ type DiscoverFeedProps = {
   onFollowChange?: (creatorId: string, following: boolean) => void;
   onSrcChange?: (videoId: string, src: string) => void;
   onNearEnd?: () => void;
+  onVideoDeleted?: (videoId: string, postId: number) => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
 };
@@ -59,6 +60,7 @@ export default function DiscoverFeed({
   onFollowChange,
   onSrcChange,
   onNearEnd,
+  onVideoDeleted,
   loadMoreEpoch = 0,
 }: DiscoverFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -80,6 +82,13 @@ export default function DiscoverFeed({
   useEffect(() => {
     nearEndRequestedRef.current = false;
   }, [videos.length, loadMoreEpoch]);
+
+  useEffect(() => {
+    if (videos.length === 0) {
+      return;
+    }
+    setActiveIndex((current) => Math.min(current, videos.length - 1));
+  }, [videos.length]);
 
   useEffect(() => {
     if (activeIndex >= videos.length - 3) {
@@ -294,6 +303,7 @@ export default function DiscoverFeed({
                 onFlagsChange={(flags) => onFlagsChange?.(video.id, flags)}
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onSrcChange?.(video.id, src)}
+                onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">

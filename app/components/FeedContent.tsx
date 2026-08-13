@@ -5,6 +5,7 @@ import ContentCard from "./ContentCard";
 import { loadFeedPostsAction } from "../actions/loadPosts";
 import type { PublicPostDTO } from "../../lib/supabase/videoPosts";
 import type { Post, PostType } from "../data/types/post";
+import { createClient } from "../../lib/supabase/client";
 
 type FilterOption = {
   label: string;
@@ -67,6 +68,7 @@ function convertFeedPost(databasePost: PublicPostDTO): Post {
 
   return {
     id: databasePost.id,
+    ownerUserId: databasePost.user_id,
     author: {
       name: databasePost.author_name,
       username: databasePost.author_username,
@@ -92,6 +94,7 @@ export default function FeedContent() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [viewerId, setViewerId] = useState<string | null>(null);
 
   const loadPosts = useCallback(async () => {
     try {
@@ -113,6 +116,20 @@ export default function FeedContent() {
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void createClient()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (!cancelled) {
+          setViewerId(data.user?.id ?? null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -149,6 +166,10 @@ export default function FeedContent() {
     setPosts((current) =>
       current.map((post) => (post.id === postId ? { ...post, ...patch } : post))
     );
+  }
+
+  function handlePostDeleted(postId: number) {
+    setPosts((current) => current.filter((post) => post.id !== postId));
   }
 
   return (
@@ -188,7 +209,9 @@ export default function FeedContent() {
             <ContentCard
               key={post.id}
               post={post}
+              viewerId={viewerId}
               onPostChange={handlePostChange}
+              onPostDeleted={handlePostDeleted}
             />
           ))}
         </div>
