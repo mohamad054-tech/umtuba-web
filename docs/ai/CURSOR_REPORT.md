@@ -10,7 +10,7 @@ COMMIT_CREATED = YES (closeout; no push)
 SECRET_VALUES_PRINTED = NO
 BRANCH = office/platform-translation-trunk-port-v1
 BASE_SHA = 3ffa2a8e2ebf96e08a009b62e42ef6fce6097c51
-FINAL_SHA = TO_BE_STAMPED_AFTER_COMMIT
+FINAL_SHA = dad5eb5d8a602ced6d033fc36d060e112805e822
 ```
 
 ## Summary
@@ -40,6 +40,7 @@ None.
 ## Tests
 
 - storefrontDeriveSections + cartCheckoutExperience + shellCoherence: **31/31 PASS**
+- wishlist + cartFoundation + buyerOrdersExperience: **27/27 PASS**
 - Pre-existing Arabic-locale money format vitest failures not re-opened (money helpers untouched)
 
 ## TypeScript
@@ -56,7 +57,7 @@ Clean
 
 ## git status --short
 
-After commit: expected clean except untracked `_*.log` vitest files and local `_store_visual_qa*` artifacts (not part of the task commit).
+Clean product tree at `dad5eb5`. Untracked leftovers (not part of this task): `_a2_inventory_vitest.log`, `_d1_money_locale_vitest.log`, `_pc2_a1_d1_money_locale_v2.log`, `_pc2_a1_d2_media_foundation_v2.log`, `worktrees/_store_visual_qa/`, `worktrees/_store_visual_qa_*.cjs|.mjs`.
 
 ## Open issues
 

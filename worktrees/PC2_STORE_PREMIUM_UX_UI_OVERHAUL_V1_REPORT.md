@@ -10,9 +10,9 @@ SECRET_VALUES_PRINTED = NO
 RAW_SECRETS_EXPOSED = NO
 
 BASE_SHA = 3ffa2a8e2ebf96e08a009b62e42ef6fce6097c51
-FINAL_SHA = TO_BE_STAMPED_AFTER_COMMIT
+FINAL_SHA = dad5eb5d8a602ced6d033fc36d060e112805e822
 BRANCH = office/platform-translation-trunk-port-v1
-GIT_STATUS = closeout commit on office/platform-translation-trunk-port-v1; no push; vitest logs and local QA screenshots left untracked
+GIT_STATUS = closeout commit dad5eb5 on office/platform-translation-trunk-port-v1 (ahead of origin, no push); vitest logs and local Playwright QA artifacts left untracked
 
 ## FILES_CHANGED
 
@@ -93,7 +93,7 @@ SAFEST_STORE_CONTEXT_TREATMENT
 
 ## MOBILE_QA
 
-PASS after polish (360/390/430). Recheck overflowX=0 on /store and /store/search. Header gold rgb(232,215,181). Cart/checkout/orders = login redirect (no session). Seeded PDP `/store/umtuba-e2e-20260721/product/e2e-simple-mug` inspected; sticky add-to-cart visible.
+PASS after polish (360/390/430). Recheck overflowX=0 on /store, /store/search, shop profile, and PDP. Header gold rgb(232,215,181). PDP 360 sticky add-to-cart sits above Primary mobile nav (sticky bottom 728 vs nav top 736 at 800vh; offset `calc(3.75rem + 0px)`). Cart/checkout/orders = login redirect (no session).
 
 ## DESKTOP_QA
 
@@ -110,13 +110,14 @@ PARTIAL / basics. Skip link, labeled search, store nav aria-current, carousel pa
 ## TEST_RESULTS
 
 - vitest storefront + checkout presentation + shellCoherence: 31/31 PASS
+- vitest wishlist + cartFoundation + buyerOrdersExperience: 27/27 PASS
 - npx tsc --noEmit PASS
-- npm run build PASS
+- npm run build PASS (pre-existing Translation Studio NFT warning unrelated)
 - git diff --check PASS
 
 ## REGRESSION_RESULTS
 
-cartCheckoutExperience still PASS (quote money unknown-until-server, proceed blocking, step gates). No B1/B2 reopen. Arabic-locale money format vitest failures remain environmental; money helpers not touched.
+cartCheckoutExperience, cartFoundation, wishlist, buyerOrdersExperience PASS. No B1/B2 reopen. Arabic-locale money format vitest failures remain environmental; money helpers not touched.
 
 ## COMMERCE_LOGIC_PRESERVED
 
@@ -159,7 +160,7 @@ Buyer Store chrome is cohesive and the AppTopNav conflict is resolved without a 
    - docs/ai/CURSOR_REPORT.md
    - worktrees/PC2_STORE_PREMIUM_UX_UI_OVERHAUL_V1_REPORT.md
    - C:\Users\Giga store\Desktop\umtuba\worktrees\OUTBOX_DROP\PC2_STORE_PREMIUM_UX_UI_OVERHAUL_V1_REPORT.md
-2. Review closeout commit at FINAL_SHA (no push performed).
+2. Review closeout commit `dad5eb5d8a602ced6d033fc36d060e112805e822` (no push performed).
 3. Optional: authenticated visual QA GO — do not self-start.
 4. Restore SMB if Central still expects P: intake.
 
