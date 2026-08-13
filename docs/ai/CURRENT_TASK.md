@@ -39,4 +39,8 @@ STOP. Central can fetch `72190b6`. Do not start another Social wave.
 
 ## SAVE_ALL closeout (2026-08-14)
 
-Local preservation of leftover operator reports and AI handoff docs. **PUSH = NO.** Do not start a new feature wave.
+Local preservation of leftover operator reports and AI handoff docs.
+
+- **SAVE_ALL_SHA** = `81857788f511b5b98b09c37e6516a56190d0e4b2`
+- **PUSH** = NO
+- Do not start a new feature wave.

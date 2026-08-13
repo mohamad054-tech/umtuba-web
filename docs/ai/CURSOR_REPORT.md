@@ -14,15 +14,18 @@ PUSH = NO
 PRODUCTION_MUTATED = NO
 SECRETS_EXPOSED = NO
 REMOTE_MIGRATION_APPLIED = NO
+SAVE_ALL_SHA = 81857788f511b5b98b09c37e6516a56190d0e4b2
 ```
 
 ## Summary
 
 SAVE_ALL on PC2 committed leftover valid docs and operator reports locally so shutdown does not drop them. UAF-12 source `72190b6`, Store `dad5eb5`/`8204c0c`, and iOS `3b33561`/`db7f927` were already pushed and were not rewritten. **PUSH = NO.** Mobile `umtuba-mobile` was already clean on `origin/master`. No new feature wave.
 
+Web SAVE_ALL commit: `81857788f511b5b98b09c37e6516a56190d0e4b2` on `office/platform-translation-trunk-port-v1`, plus this SHA-stamp docs commit. Local is ahead of origin; **PUSH = NO**.
+
 ## Exact files changed
 
-Web repo `office/platform-translation-trunk-port-v1` (this SAVE_ALL commit):
+Web repo `office/platform-translation-trunk-port-v1`:
 
 - `docs/ai/CURRENT_TASK.md` — UAF-12 delivery remains COMPLETE; SAVE_ALL stamp added
 - `docs/ai/CURSOR_REPORT.md` — this closeout report
@@ -32,7 +35,7 @@ Web repo `office/platform-translation-trunk-port-v1` (this SAVE_ALL commit):
 - `worktrees/PC2_IOS_READINESS_CHANGES_PRESERVE_HANDOFF_V1_REPORT.md`
 - `worktrees/PC2_STORE_PREMIUM_COMMIT_DEPOSIT_V1_REPORT.md`
 
-Mobile repo: none (working tree already clean).
+Mobile repo: none (working tree already clean at `db7f927`).
 
 ## Migrations created
 
@@ -59,11 +62,32 @@ Not re-run (docs-only).
 
 ## git diff --check
 
-Recorded after staging/commit.
+PASS after stripping leftover trailing whitespace in `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md` (content unchanged).
 
 ## git status --short
 
-Recorded after commit.
+After SAVE_ALL + SHA stamp (local ahead of origin; uncommitted leftovers only):
+
+```text
+## office/platform-translation-trunk-port-v1...origin/office/platform-translation-trunk-port-v1 [ahead 2]
+?? _a2_inventory_vitest.log
+?? _d1_money_locale_vitest.log
+?? _pc2_a1_d1_money_locale_v2.log
+?? _pc2_a1_d2_media_foundation_v2.log
+?? worktrees/_store_visual_qa/
+?? worktrees/_store_visual_qa_pdp.cjs
+?? worktrees/_store_visual_qa_recheck.cjs
+?? worktrees/_store_visual_qa_run.cjs
+?? worktrees/_store_visual_qa_run.mjs
+```
+
+Mobile:
+
+```text
+## master...origin/master
+```
+
+(clean)
 
 ## Open issues
 
