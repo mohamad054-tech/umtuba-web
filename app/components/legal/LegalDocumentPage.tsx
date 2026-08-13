@@ -47,6 +47,12 @@ export default function LegalDocumentPage({
           >
             Privacy
           </Link>
+          <Link
+            href={APP_ROUTES.accountDeletion}
+            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Delete account
+          </Link>
         </nav>
 
         <header className="space-y-4 border-b border-white/10 pb-8">
@@ -130,6 +136,13 @@ export default function LegalDocumentPage({
               className="watch-focus-ring rounded text-white/75 underline-offset-4 hover:underline"
             >
               Privacy Policy
+            </Link>
+            {" · "}
+            <Link
+              href={APP_ROUTES.accountDeletion}
+              className="watch-focus-ring rounded text-white/75 underline-offset-4 hover:underline"
+            >
+              Delete your account
             </Link>
           </p>
         </footer>

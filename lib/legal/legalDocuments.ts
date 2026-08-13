@@ -4,7 +4,7 @@
  */
 
 export const LEGAL_EFFECTIVE_DATE = "19 July 2026";
-export const LEGAL_LAST_UPDATED = "19 July 2026";
+export const LEGAL_LAST_UPDATED = "13 August 2026";
 
 export const LEGAL_BETA_NOTICE =
   "This document is a general Beta soft-launch statement for UMTUBA. It is not a substitute for specialized legal counsel. Before a wider commercial launch, have qualified counsel review and adapt these terms for your jurisdictions and operating model.";
@@ -120,7 +120,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     id: "suspension",
     title: "Suspension and termination",
     paragraphs: [
-      "You may stop using UMTUBA at any time. Where account deletion is available, follow in-product controls or contact us through the contact method provided on UMTUBA.",
+      "You may stop using UMTUBA at any time. To request deletion of your account and associated personal data, use the public account-deletion page at /account-deletion (also linked from Settings). You must sign in so we can verify the request is yours. Deletion is queued for processing and is not immediate.",
       "We may suspend or terminate access, remove content, or limit features if we reasonably believe you violated these Terms, created risk for others, or harmed the Service—subject to rights that cannot be waived under applicable law.",
     ],
   },
@@ -252,7 +252,16 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Retention and deletion",
     paragraphs: [
       "We retain information as long as needed to provide the Service, meet security and legal requirements, resolve disputes, and maintain backups.",
-      "When you delete content or an account (where supported), we aim to remove or de-identify associated personal data from active systems within a reasonable period, except where retention is required or permitted by law, or where residual copies remain temporarily in backups.",
+      "When you delete content or submit an account-deletion request, we aim to remove or de-identify associated personal data from active systems within a reasonable period after the request is processed, except where retention is required or permitted by law, or where residual copies remain temporarily in backups.",
+    ],
+  },
+  {
+    id: "account-deletion",
+    title: "Account deletion",
+    paragraphs: [
+      "You can request deletion of your UMTUBA account and associated personal data on the public web page at /account-deletion. You do not need the Android app. You must sign in so we can verify that the request belongs to your account.",
+      "Submitting the form queues a deletion request. It does not delete the account immediately. After verification, we process the request: authentication and profile data, User Content you published and still control, engagement records, and similar personal data are removed or de-identified from active systems, except where retention is required.",
+      "We may retain store/order and other financial records as required for tax, accounting, disputes, and law; limited security and abuse-prevention logs; copies of messages already delivered to other users (with your sender identity detached where the architecture supports it); and residual backup copies until those systems rotate.",
     ],
   },
   {
@@ -267,7 +276,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Your rights and requests",
     paragraphs: [
       "Depending on where you live, you may have rights to access, correct, delete, or restrict certain personal data, or to object to certain processing.",
-      "To make a request, use the contact method provided on UMTUBA. We may need to verify your identity before fulfilling a request. Some rights are limited by law or by the need to keep the Service secure and lawful.",
+      "To make a request, use the account-deletion page at /account-deletion for account erasure, or the contact method provided on UMTUBA for other rights. We verify your identity before fulfilling a request. Some rights are limited by law or by the need to keep the Service secure and lawful.",
     ],
   },
   {

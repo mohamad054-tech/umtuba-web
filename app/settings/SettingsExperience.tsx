@@ -59,7 +59,7 @@ const SECTIONS: { id: SettingsSection; label: string; description: string }[] =
     {
       id: "account",
       label: "Account",
-      description: "Saved, rewards, and sign out",
+      description: "Saved, rewards, sign out, and account deletion",
     },
   ];
 
@@ -461,6 +461,17 @@ export default function SettingsExperience({
                   <p className="text-sm font-black">Advertise</p>
                   <p className="mt-1 text-xs text-white/45">
                     Reach audiences on UMTUBA
+                  </p>
+                </Link>
+                <Link
+                  href={APP_ROUTES.accountDeletion}
+                  className="watch-focus-ring rounded-2xl border border-red-400/20 bg-red-500/[0.07] px-4 py-4 transition hover:bg-red-500/10"
+                >
+                  <p className="text-sm font-black text-red-100">
+                    Delete account
+                  </p>
+                  <p className="mt-1 text-xs text-white/45">
+                    Request deletion of your account and data
                   </p>
                 </Link>
               </div>

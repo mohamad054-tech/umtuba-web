@@ -98,6 +98,12 @@ export default function WelcomePage() {
           >
             Privacy Policy
           </Link>
+          <Link
+            href={APP_ROUTES.accountDeletion}
+            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
+          >
+            Delete account
+          </Link>
         </p>
       </footer>
     </main>

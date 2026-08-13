@@ -18,6 +18,7 @@ export const APP_ROUTES = {
   authCallback: "/auth/callback",
   terms: "/terms",
   privacy: "/privacy",
+  accountDeletion: "/account-deletion",
   profile: "/profile",
   createVideo: "/create/video",
   createArticle: "/create/article",

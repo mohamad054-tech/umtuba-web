@@ -13,7 +13,7 @@ import {
   TERMS_SECTIONS,
 } from "../legal/legalDocuments";
 import { SITEMAP_STATIC_ROUTES } from "./indexing";
-import { privacyMetadata, termsMetadata } from "./routeMetadata";
+import { privacyMetadata, termsMetadata, accountDeletionMetadata } from "./routeMetadata";
 
 const ROOT = process.cwd();
 
@@ -22,27 +22,39 @@ function readRepo(relativePath: string): string {
 }
 
 describe("Legal Pages V1 routes and public access", () => {
-  it("exposes /terms and /privacy app routes", () => {
+  it("exposes /terms, /privacy, and /account-deletion app routes", () => {
     expect(APP_ROUTES.terms).toBe("/terms");
     expect(APP_ROUTES.privacy).toBe("/privacy");
+    expect(APP_ROUTES.accountDeletion).toBe("/account-deletion");
     expect(existsSync(join(ROOT, "app/terms/page.tsx"))).toBe(true);
     expect(existsSync(join(ROOT, "app/privacy/page.tsx"))).toBe(true);
+    expect(existsSync(join(ROOT, "app/account-deletion/page.tsx"))).toBe(true);
   });
 
   it("keeps legal pages outside auth-protected prefixes", () => {
     expect(isProtectedPath("/terms")).toBe(false);
     expect(isProtectedPath("/privacy")).toBe(false);
+    expect(isProtectedPath("/account-deletion")).toBe(false);
     expect(PROTECTED_PREFIXES).not.toContain("/terms");
     expect(PROTECTED_PREFIXES).not.toContain("/privacy");
+    expect(PROTECTED_PREFIXES).not.toContain("/account-deletion");
   });
 
   it("indexes legal pages in sitemap and route metadata", () => {
     expect(SITEMAP_STATIC_ROUTES).toContain("/terms");
     expect(SITEMAP_STATIC_ROUTES).toContain("/privacy");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/account-deletion");
     expect(termsMetadata.alternates?.canonical).toBe("/terms");
     expect(privacyMetadata.alternates?.canonical).toBe("/privacy");
+    expect(accountDeletionMetadata.alternates?.canonical).toBe(
+      "/account-deletion"
+    );
     expect(termsMetadata.robots).toMatchObject({ index: true, follow: true });
     expect(privacyMetadata.robots).toMatchObject({ index: true, follow: true });
+    expect(accountDeletionMetadata.robots).toMatchObject({
+      index: true,
+      follow: true,
+    });
   });
 });
 
@@ -73,6 +85,9 @@ describe("Legal Pages V1 signup and document contracts", () => {
     expect(privacyBlob.toLowerCase()).not.toMatch(/end-to-end encrypted/);
     expect(privacyBlob).toMatch(/Supabase/);
     expect(privacyBlob).toMatch(/LiveKit/);
+    expect(privacyBlob).toMatch(/\/account-deletion/);
+    expect(privacyBlob.toLowerCase()).toMatch(/does not delete the account immediately/);
+    expect(termsBlob).toMatch(/\/account-deletion/);
   });
 
   it("covers required Terms and Privacy topic anchors", () => {
@@ -108,6 +123,7 @@ describe("Legal Pages V1 signup and document contracts", () => {
       "processors",
       "sharing",
       "retention",
+      "account-deletion",
       "security",
       "rights",
       "children",

@@ -166,6 +166,13 @@ export const privacyMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const accountDeletionMetadata = buildPageMetadata({
+  title: "Delete your UMTUBA account",
+  description: `Request deletion of your ${BRAND.name} account and associated personal data on the web. Sign in is required. Deletion is queued, not immediate.`,
+  path: "/account-deletion",
+  index: "index",
+});
+
 export const inviteMetadataBase = {
   titlePrefix: `Join ${BRAND.name}`,
   description: `Create your ${BRAND.name} account with an invite. ${BRAND.tagline}. ${BRAND.mission}`,
