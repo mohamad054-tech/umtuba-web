@@ -1,99 +1,72 @@
-# CURSOR_REPORT — PC2 User Own Content Delete Fix Verification V1 (UAF-12)
+# CURSOR_REPORT — PC2 SAVE_ALL closeout 2026-08-14
 
 ```text
 SOURCE_DEVICE = PC2
 DEVICE_ROLE = PLATFORM_SOCIAL_CONTENT_OWNER
-TASK_ID = PC2_USER_OWN_CONTENT_DELETE_FIX_VERIFICATION_V1
-PARENT_FINDING = UAF-12
+TASK_ID = PC2_SAVE_ALL_2026-08-14
+PARENT_TASK = PC2_UAF12_SOURCE_DELIVERY_V1
 CENTRAL_COORDINATOR = SERVER
-REPORT_TYPE = UAF12_FIX_VERIFICATION
-TIMESTAMP_LOCAL = 2026-08-13 ~21:35 +03
-AUTHORITATIVE_BASE_SHA = 5dbd77910b3e5f75f0f57e908af3599474ea8a41
-BRANCH = office/platform-translation-trunk-port-v1
+REPORT_TYPE = SAVE_ALL
+TIMESTAMP_LOCAL = 2026-08-14 ~00:39 +03
 SECRET_VALUES_PRINTED = NO
 FORCE_PUSH = NO
+PUSH = NO
+PRODUCTION_MUTATED = NO
+SECRETS_EXPOSED = NO
 REMOTE_MIGRATION_APPLIED = NO
-UAF11_TOUCHED = NO
 ```
 
 ## Summary
 
-Users could not delete their own published videos/posts because there was **no application delete path**. Posts RLS already allowed `DELETE` for `auth.uid() = user_id`, but there was no server action, no owner confirmation UI, and no storage/registry cleanup. Hiding a button was never the fix.
-
-This change adds `deletePostAction` → `deletePostForOwner`: owner-only, RLS still on, DB row deleted first, then best-effort owned media cleanup and video registry deactivate. Delete appears only for the owner, with confirmation, loading, double-submit guard, and list/feed removal only after success.
-
-**UAF12_STATUS = FIXED_IMPLEMENTED_RUNTIME_PARTIAL.** Authorization tests PASS. Owner live persistence (refresh / session reload as a signed-in owner) was not executed because no seeded ordinary-user session was available. Anonymous Watch/Home/Feed at 390 and 1280 correctly show **no** Delete control.
+SAVE_ALL on PC2 committed leftover valid docs and operator reports locally so shutdown does not drop them. UAF-12 source `72190b6`, Store `dad5eb5`/`8204c0c`, and iOS `3b33561`/`db7f927` were already pushed and were not rewritten. **PUSH = NO.** Mobile `umtuba-mobile` was already clean on `origin/master`. No new feature wave.
 
 ## Exact files changed
 
-- `lib/supabase/deleteOwnedPost.ts`
-- `lib/supabase/deleteOwnedPostShared.ts`
-- `lib/supabase/deleteOwnedPost.test.ts`
-- `app/actions/deletePost.ts`
-- `app/actions/deletePost.test.ts`
-- `app/components/social/OwnerContentDeleteControl.tsx`
-- `app/discover/components/DiscoverActionRail.tsx`
-- `app/discover/components/DiscoverVideoCard.tsx`
-- `app/discover/components/DiscoverFeed.tsx`
-- `app/discover/DiscoverExperience.tsx`
-- `app/components/video/VideoActionRail.tsx`
-- `app/components/video/VideoOverlay.tsx`
-- `app/components/video/VideoSlide.tsx`
-- `app/components/video/VerticalVideoFeed.tsx`
-- `app/watch/WatchExperience.tsx`
-- `app/components/ContentCard.tsx`
-- `app/components/FeedContent.tsx`
-- `app/data/types/post.ts`
-- `app/saved/SavedExperience.tsx`
-- `app/saved/page.tsx`
-- `app/profile/components/ProfileVideoGrid.tsx`
-- `app/profile/components/ProfilePhotosPanel.tsx`
-- `app/profile/ProfileExperience.tsx`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `worktrees/PC2_USER_OWN_CONTENT_DELETE_FIX_VERIFICATION_V1_REPORT.md`
+Web repo `office/platform-translation-trunk-port-v1` (this SAVE_ALL commit):
+
+- `docs/ai/CURRENT_TASK.md` — UAF-12 delivery remains COMPLETE; SAVE_ALL stamp added
+- `docs/ai/CURSOR_REPORT.md` — this closeout report
+- `worktrees/PC2_UAF12_SOURCE_DELIVERY_V1_REPORT.md`
+- `worktrees/PC2_IOS_APP_STORE_OPERATOR_MODE_V1_REPORT.md`
+- `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md`
+- `worktrees/PC2_IOS_READINESS_CHANGES_PRESERVE_HANDOFF_V1_REPORT.md`
+- `worktrees/PC2_STORE_PREMIUM_COMMIT_DEPOSIT_V1_REPORT.md`
+
+Mobile repo: none (working tree already clean).
 
 ## Migrations created
 
-None. Existing policy `"Users can delete their own posts"` in `20260712_auth_profiles_posts_rls.sql` is sufficient. No remote apply.
+None. None applied remotely.
 
 ## Security review
 
-- Server action uses `getServerUser()` (JWT), never `getSession()` alone, never service-role.
-- Non-owner is denied in application code (`user_id` mismatch) **and** by RLS (`auth.uid() = user_id`).
-- Unauthenticated is denied before any delete.
-- Storage remove only for `{userId}/…` paths (`isOwnedVideoPath`). Shared/foreign objects are refused.
-- DB delete is committed before storage cleanup. Storage failure does not resurrect the row and does not fake-hide content.
-- Failed delete does not remove the item from UI lists.
-- No RLS disabled. No client-only fake deletion.
+- New local commits only. No push, no force, no amend.
+- No secrets, `.env`, credentials, or Apple keys committed.
+- Vitest logs and Store visual QA artifacts left uncommitted on purpose.
+- Already-pushed source SHAs were not rewritten.
 
 ## Tests
 
-- `npx vitest run lib/supabase/deleteOwnedPost.test.ts app/actions/deletePost.test.ts` PASS
-- OWNER_DELETE = PASS
-- NON_OWNER_DELETE_BLOCKED = PASS (backend, not missing button)
-- UNAUTHENTICATED_DELETE_BLOCKED = PASS
-- Failed row delete does not call storage remove = PASS
-- Regression: stories/content foundation/services + signed playback + photos lightbox + creator hub = PASS (51 tests)
+Not re-run. Docs/reports only; no source change in this closeout.
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS
+Not re-run (docs-only).
 
 ## Build
 
-`npm run build` PASS (Next.js 16.2.10)
+Not re-run (docs-only).
 
 ## git diff --check
 
-PASS on UAF-12 files. Pre-existing trailing whitespace in the previous `CURSOR_REPORT.md` is replaced by this report.
+Recorded after staging/commit.
 
 ## git status --short
 
-UAF-12 implementation files staged/committed for this task only. Store visual QA, vitest logs, and unrelated iOS/Store reports left untracked.
+Recorded after commit.
 
 ## Open issues
 
-- Owner-account runtime persistence (refresh, Watch/Discover/Profile/search, logout/login) not executed: no seeded ordinary user in this session. Browser MCP tab create was unreliable; Playwright anonymous probe used instead.
-- UAF-11 username/cache not addressed (different root cause).
-- STOP. Do not start another Social wave. Local commit + OUTBOX packet. No push until Central GO.
+- Owner live persistence QA from UAF-12 remains PARTIAL (no seeded login).
+- Store visual QA scripts/artifacts and pre-existing vitest logs remain uncommitted by design.
+- **PUSH = NO.** Central already has UAF-12 `72190b6` and mobile `db7f927`. Do not start a new feature wave.
