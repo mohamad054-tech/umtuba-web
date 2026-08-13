@@ -17,6 +17,7 @@ export default defineConfig({
       "lib/recommendations/**/*.test.ts",
       "lib/live/**/*.test.ts",
       "lib/env/**/*.test.ts",
+      "lib/ios/**/*.test.ts",
       "lib/site/**/*.test.ts",
       "lib/geo/**/*.test.ts",
       "lib/world/**/*.test.ts",
