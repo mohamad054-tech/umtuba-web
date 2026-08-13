@@ -2,34 +2,24 @@
 
 ## Task title
 
-LAPTOP_TOMORROW_FIRST_PERFORMANCE_RESUME_V1
+LAPTOP_WHOLE_PLATFORM_UX_FUNCTIONAL_QA_SWEEP_V1
 
 ## Status
 
-`parked_until_tomorrow` — **FIRST thing on next Laptop resume**
+`handed_off_to_central` — Laptop QA sweep complete. **Do not start a new wave from Laptop.**
 
-## FIRST tomorrow (do this before anything else)
+## This wave (done)
 
-1. **Check if Central deployed prefetch** (`prefetch={false}` from `6b4e544` / `docs/ai/PREFETCH_FALSE_NAV_V1.patch`).
-2. **Remeasure production** `https://umtuba.com` (same A3 protocol):
-   - HOME TTFB, HOME load, HOME `rscCount` / fetchCount
-   - `/store` TTFB
-3. Set:
-   - `DEPLOYMENT_CHANGE_OBSERVED = YES/NO`
-   - `MEASURED_IMPROVEMENT = YES/NO`
-4. If **not** deployed yet → ping Central with patch + commit `6b4e544` (do not recreate patch).
-5. Only after that → next performance GO candidates:
-   - Store catalog N+1 batch enrich
-   - Home SSR auth dedupe / defer enrichment
+Real-user whole-platform UX/functional QA (guest production + local source). No product-code fixes. Full report: `docs/ai/CURSOR_REPORT.md` and `docs/ai/LAPTOP_WHOLE_PLATFORM_UX_FUNCTIONAL_QA_SWEEP_V1.md`.
 
-## Parked context
+## Prior wave still uncommitted (do not mix)
 
-- Branch: `office/um-core-platform-manifest-validation-p2`
-- Local commits (may need push): `6b4e544`, `ddc7f16`
-- Prefetch: HANDED_OFF_TO_CENTRAL · not verified live (last monitor: ~35 RSC)
-- Learning / Collaboration / LB003 = CLOSED
-- Evidence: `docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`
+`LAPTOP_LEARNING_PREMIUM_UX_UI_OVERHAUL_V1` — presentation-only Learning UX still in the working tree; not on production.
+
+## Still parked (separate queue)
+
+`LAPTOP_TOMORROW_FIRST_PERFORMANCE_RESUME_V1` — prefetch deploy check + production remeasure.
 
 ## Locks
 
-No Learning/Collaboration reopen · No LB003 · No migrations · No deploy from Laptop unless Central GO
+No Learning domain/migrations/certification reopen · No Home-lock edits · No Store edits · No deploy from Laptop unless Central GO · No next QA wave until Central GO

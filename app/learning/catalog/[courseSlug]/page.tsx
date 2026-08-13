@@ -63,6 +63,7 @@ export default async function LearningPublicCourseLandingPage({
     <LearningShell
       title="Course"
       subtitle={course.name}
+      layout="wide"
       backHref={LEARNING_PUBLIC_ROUTES.catalog}
       backLabel="Catalog"
     >
@@ -80,12 +81,12 @@ export default async function LearningPublicCourseLandingPage({
         <img
           src={imageUrl}
           alt=""
-          className="mt-6 h-44 w-full rounded-2xl object-cover"
+          className="mt-4 h-48 w-full rounded-[24px] object-cover md:h-64"
         />
       ) : null}
 
       <header className="mt-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
+        <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl">
           {course.name}
         </h1>
         {course.description ? (
@@ -191,27 +192,21 @@ export default async function LearningPublicCourseLandingPage({
             <>
               <Link
                 href={`${APP_ROUTES.signup}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
+                className="watch-focus-ring inline-flex min-h-11 justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black hover:bg-white/90"
               >
                 Create Account
               </Link>
               <Link
                 href={`${APP_ROUTES.login}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/10"
+                className="watch-focus-ring inline-flex min-h-11 justify-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white hover:bg-white/10"
               >
-                Log In
-              </Link>
-              <Link
-                href={`${APP_ROUTES.login}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/15 px-4 py-2.5 text-sm font-bold text-emerald-100 hover:bg-emerald-500/25"
-              >
-                Start Course
+                Log In to start
               </Link>
             </>
           ) : enrolled ? (
             <Link
               href={LEARNING_LEARNER_ROUTES.course(course.id)}
-              className="watch-focus-ring inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
+              className="watch-focus-ring inline-flex min-h-11 justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black hover:bg-white/90"
             >
               Continue Course
             </Link>
@@ -221,29 +216,13 @@ export default async function LearningPublicCourseLandingPage({
               <input type="hidden" name="courseSlug" value={course.slug} />
               <button
                 type="submit"
-                className="watch-focus-ring inline-flex w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90 sm:w-auto"
+                className="watch-focus-ring inline-flex min-h-11 w-full justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black hover:bg-white/90 sm:w-auto"
               >
                 Start Course
               </button>
             </form>
           )}
-          <Link
-            href={APP_ROUTES.welcome}
-            className="watch-focus-ring inline-flex justify-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/80 hover:bg-white/5"
-          >
-            Download App
-          </Link>
         </div>
-        {user ? (
-          <p className="text-sm text-white/55">
-            <Link
-              href={LEARNING_LEARNER_ROUTES.hub}
-              className="underline underline-offset-2 hover:text-white"
-            >
-              My Learning
-            </Link>
-          </p>
-        ) : null}
       </section>
     </LearningShell>
   );

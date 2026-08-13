@@ -52,6 +52,7 @@ export default async function LearningAttemptPage({ params }: PageProps) {
     <LearningShell
       title="Attempt"
       subtitle={activity?.name ?? "Activity"}
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.activity(attempt.data.activity_id)}
       backLabel="Activity"
     >

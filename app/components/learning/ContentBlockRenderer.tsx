@@ -47,7 +47,7 @@ export default function ContentBlockRenderer({
       const text = asPlainString(content.text, 10000);
       const format = asRichTextFormat(content.format);
       return (
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-white/80">
+        <p className="whitespace-pre-wrap text-base leading-7 text-white/80">
           {text}
           {format === "markdown" ? (
             <span className="sr-only"> (markdown source)</span>
@@ -122,8 +122,9 @@ export default function ContentBlockRenderer({
         <figure>
           <video
             controls
+            playsInline
             preload="metadata"
-            className="w-full rounded-2xl bg-black"
+            className="aspect-video w-full rounded-2xl bg-black"
             src={url}
             data-provider={provider ?? undefined}
           >

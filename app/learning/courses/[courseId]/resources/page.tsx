@@ -41,6 +41,7 @@ export default async function CourseResourcesPage({
     <LearningShell
       title="Course resources"
       subtitle="Downloads and links"
+      layout="wide"
       backHref={LEARNING_LEARNER_ROUTES.course(courseId)}
       backLabel="Course"
     >

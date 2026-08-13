@@ -4,6 +4,17 @@ import {
   type LearningLearnerHub,
   type LearningLearnerHubCourse,
 } from "../../../lib/learning/learnerDelivery";
+import { LEARNING_PUBLIC_ROUTES } from "../../../lib/learning/publicCatalog";
+import { LEARNING_COMPLETION_ROUTES } from "../../../lib/learning/completionFoundation";
+import LearningProgressBar from "./ui/LearningProgressBar";
+import LearningEmptyState from "./ui/LearningEmptyState";
+import {
+  learningBtnPrimary,
+  learningBtnSecondary,
+  learningCard,
+  learningCardQuiet,
+  learningEyebrow,
+} from "./ui/tokens";
 
 type LearningHubProps = {
   hub: LearningLearnerHub;
@@ -44,20 +55,31 @@ export default function LearningHub({ hub }: LearningHubProps) {
   const continueCourse = pickContinueCourse(hub.courses);
 
   return (
-    <div className="mt-6 space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          My Learning
-        </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Continue learning</h1>
-        <p className="mt-2 text-sm text-white/50">
+    <div className="mt-4 space-y-6">
+      <section className={`${learningCard} p-5 md:p-7`}>
+        <p className={learningEyebrow}>My Learning</p>
+        <h1 className="mt-1 text-3xl font-black tracking-tight">
+          Pick up where you left off
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/55">
           Programs and courses you can access through your enrollments.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link href={LEARNING_PUBLIC_ROUTES.catalog} className={learningBtnSecondary}>
+            Browse catalog
+          </Link>
+          <Link
+            href={LEARNING_COMPLETION_ROUTES.transcript}
+            className={learningBtnSecondary}
+          >
+            Transcript &amp; certificates
+          </Link>
+        </div>
       </section>
 
       {continueCourse && continueCourse.continue_href ? (
         <section
-          className="rounded-[28px] border border-sky-400/20 bg-sky-500/10 p-5 backdrop-blur-xl md:p-7"
+          className="rounded-[24px] border border-sky-400/25 bg-gradient-to-br from-sky-500/15 to-indigo-500/10 p-5 backdrop-blur-xl md:p-7"
           aria-label="Continue learning"
         >
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-100/70">
@@ -71,21 +93,28 @@ export default function LearningHub({ hub }: LearningHubProps) {
               {continueCourse.program_name}
             </p>
           ) : null}
-          <p className="mt-2 text-sm text-white/70">
-            {continueCourse.progress
-              ? `${Math.round(continueCourse.progress.percent_complete)}% · ${progressLabel(continueCourse.progress.status)}`
-              : "Resume where you left off"}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3">
+          {continueCourse.progress ? (
+            <div className="mt-4 max-w-md">
+              <LearningProgressBar
+                percent={continueCourse.progress.percent_complete}
+                label={`${progressLabel(continueCourse.progress.status)} · ${continueCourse.progress.completed_lessons_count}/${continueCourse.progress.total_lessons_count} lessons`}
+              />
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-white/70">
+              Resume where you left off
+            </p>
+          )}
+          <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href={continueCourse.continue_href}
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              className={learningBtnPrimary}
             >
               Resume
             </Link>
             <Link
               href={LEARNING_LEARNER_ROUTES.course(continueCourse.id)}
-              className="watch-focus-ring rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
+              className={learningBtnSecondary}
             >
               Course outline
             </Link>
@@ -94,26 +123,20 @@ export default function LearningHub({ hub }: LearningHubProps) {
       ) : null}
 
       {empty ? (
-        <p
-          role="status"
-          className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-6 text-sm text-white/55"
-        >
-          No accessible programs or courses yet. Once you are enrolled, they will
-          appear here.
-        </p>
+        <LearningEmptyState
+          title="No courses yet"
+          body="No accessible programs or courses yet. Once you are enrolled, they will appear here. Browse the catalog to find a course and start learning."
+          actionHref={LEARNING_PUBLIC_ROUTES.catalog}
+          actionLabel="Browse catalog"
+        />
       ) : null}
 
       {hub.programs.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Programs
-          </h2>
-          <ul className="space-y-3">
+          <h2 className={learningEyebrow}>Programs</h2>
+          <ul className="grid gap-3 md:grid-cols-2">
             {hub.programs.map((program) => (
-              <li
-                key={program.id}
-                className="rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-4"
-              >
+              <li key={program.id} className={`${learningCardQuiet} px-4 py-4`}>
                 <p className="text-lg font-black tracking-tight">{program.name}</p>
                 {program.description ? (
                   <p className="mt-1 text-sm text-white/50">{program.description}</p>
@@ -129,15 +152,10 @@ export default function LearningHub({ hub }: LearningHubProps) {
 
       {hub.courses.length > 0 ? (
         <section className="space-y-3">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Courses
-          </h2>
-          <ul className="space-y-3">
+          <h2 className={learningEyebrow}>Courses</h2>
+          <ul className="grid gap-3 md:grid-cols-2">
             {hub.courses.map((course) => (
-              <li
-                key={course.id}
-                className="rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-4"
-              >
+              <li key={course.id} className={`${learningCardQuiet} px-4 py-4`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <Link
@@ -153,21 +171,28 @@ export default function LearningHub({ hub }: LearningHubProps) {
                         </p>
                       ) : null}
                       {course.description ? (
-                        <p className="mt-1 text-sm text-white/50">
+                        <p className="mt-1 line-clamp-2 text-sm text-white/50">
                           {course.description}
                         </p>
                       ) : null}
                     </Link>
-                    <p className="mt-2 text-xs text-white/45">
-                      {course.progress
-                        ? `${Math.round(course.progress.percent_complete)}% complete · ${progressLabel(course.progress.status)} · ${course.progress.completed_lessons_count}/${course.progress.total_lessons_count} lessons`
-                        : "Progress unavailable"}
-                    </p>
+                    {course.progress ? (
+                      <div className="mt-3">
+                        <LearningProgressBar
+                          percent={course.progress.percent_complete}
+                          label={`${progressLabel(course.progress.status)} · ${course.progress.completed_lessons_count}/${course.progress.total_lessons_count} lessons`}
+                        />
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-xs text-white/45">
+                        Progress unavailable
+                      </p>
+                    )}
                   </div>
                   {course.continue_href ? (
                     <Link
                       href={course.continue_href}
-                      className="watch-focus-ring shrink-0 rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                      className={`${learningBtnPrimary} shrink-0`}
                     >
                       Resume
                     </Link>

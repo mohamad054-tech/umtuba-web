@@ -49,6 +49,7 @@ export default async function CourseProgressPage({ params }: PageProps) {
     <LearningShell
       title="Course progress"
       subtitle="Lesson, module, and resume state"
+      layout="wide"
       backHref={LEARNING_LEARNER_ROUTES.course(courseId)}
       backLabel="Course"
     >
@@ -77,7 +78,7 @@ export default async function CourseProgressPage({ params }: PageProps) {
               <p className="mt-3">
                 <Link
                   href={LEARNING_LEARNER_ROUTES.lesson(resumeLessonId)}
-                  className="watch-focus-ring inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                  className="watch-focus-ring inline-flex min-h-11 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
                 >
                   {continueTarget?.last_media_position_seconds != null
                     ? "Continue watching"

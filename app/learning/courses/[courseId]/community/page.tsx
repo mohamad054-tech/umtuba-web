@@ -65,6 +65,7 @@ export default async function CourseCommunityFeedPage({ params }: PageProps) {
     <LearningShell
       title="Course community"
       subtitle="Discussions, Q&A, and announcements"
+      layout="wide"
       backHref={LEARNING_LEARNER_ROUTES.course(courseId)}
       backLabel="Course"
     >

@@ -73,6 +73,7 @@ export default async function LearnerAssignmentPage({
           : "Assignment"
       }
       subtitle="Coursework submission"
+      layout="focus"
       backHref={backHref}
       backLabel={backLabel}
     >

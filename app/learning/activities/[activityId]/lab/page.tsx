@@ -68,6 +68,7 @@ export default async function LearnerLabPage({ params, searchParams }: PageProps
         loaded.ok ? String(loaded.data.activity_name ?? "Lab") : "Lab"
       }
       subtitle="Hands-on lab"
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.hub}
       backLabel="Learning"
     >

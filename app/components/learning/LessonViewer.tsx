@@ -22,6 +22,14 @@ import type {
 import { completeLearningLessonAction } from "../../learning/progressActions";
 import { unlockLessonWithUmPointsAction } from "../../learning/firstCourseActions";
 import { isAiProductExperienceEnabled } from "../../../lib/ai/betaProductSurfaces";
+import {
+  learningBtnPrimary,
+  learningBtnSecondary,
+  learningCard,
+  learningCardQuiet,
+  learningChip,
+  learningEyebrow,
+} from "./ui/tokens";
 
 type LessonViewerProps = {
   delivery: LearningLearnerLessonDelivery;
@@ -78,6 +86,12 @@ function toActivitySummaries(
   }));
 }
 
+function progressChip(status: string) {
+  if (status === "completed") return "Completed";
+  if (status === "in_progress") return "In progress";
+  return status.replaceAll("_", " ");
+}
+
 export default function LessonViewer({
   delivery,
   engine = null,
@@ -122,47 +136,55 @@ export default function LessonViewer({
       ? toActivitySummaries(engine.activities)
       : delivery.activities;
 
+  const showAiTutor =
+    Boolean(engine?.ai_tutor_enabled) &&
+    !locked &&
+    isAiProductExperienceEnabled();
+
   return (
-    <div className="mt-6 space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+    <div className="mt-2 space-y-6 max-sm:pb-28">
+      <header className={`${learningCard} p-4 md:p-6`}>
+        <Link
+          href={LEARNING_LEARNER_ROUTES.course(delivery.lesson.course_id)}
+          className="watch-focus-ring text-xs font-semibold text-white/45 hover:text-white"
+        >
           {delivery.lesson.course_name}
-        </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        </Link>
+        <h1 className="mt-1 text-2xl font-black tracking-tight md:text-3xl">
           {delivery.lesson.name}
         </h1>
         {delivery.lesson.description ? (
-          <p className="mt-2 text-sm text-white/50">{delivery.lesson.description}</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/50">
+            {delivery.lesson.description}
+          </p>
         ) : null}
-        <p className="mt-3 text-xs text-white/40">
-          Progress: {delivery.progress_status.replaceAll("_", " ")}
-          {engine?.lesson.difficulty
-            ? ` · ${engine.lesson.difficulty}`
-            : ""}
-          {engine?.lesson.estimated_duration_minutes != null
-            ? ` · ~${engine.lesson.estimated_duration_minutes} min`
-            : ""}
-        </p>
-        {engine?.ai_tutor_enabled &&
-        !locked &&
-        isAiProductExperienceEnabled() ? (
-          <p className="mt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className={learningChip}>
+            Progress: {progressChip(delivery.progress_status)}
+          </span>
+          {engine?.lesson.difficulty ? (
+            <span className={learningChip}>{engine.lesson.difficulty}</span>
+          ) : null}
+          {engine?.lesson.estimated_duration_minutes != null ? (
+            <span className={learningChip}>
+              ~{engine.lesson.estimated_duration_minutes} min
+            </span>
+          ) : null}
+          {showAiTutor ? (
             <Link
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
-              className="text-sm font-bold text-sky-300 underline underline-offset-2"
+              className="watch-focus-ring inline-flex min-h-8 items-center rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1 text-xs font-bold text-sky-100"
             >
               AI Tutor
             </Link>
-          </p>
-        ) : null}
-      </section>
+          ) : null}
+        </div>
+      </header>
 
       {engine && engine.objectives.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Learning objectives
-          </h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">
+        <section className={`${learningCardQuiet} px-4 py-4`}>
+          <h2 className={learningEyebrow}>Learning objectives</h2>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-white/75">
             {engine.objectives.map((o) => (
               <li key={o.id}>{o.objective_text}</li>
             ))}
@@ -171,11 +193,9 @@ export default function LessonViewer({
       ) : null}
 
       {engine && engine.prerequisites.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Prerequisites
-          </h2>
-          <ul className="space-y-1 text-sm">
+        <section className={`${learningCardQuiet} px-4 py-4`}>
+          <h2 className={learningEyebrow}>Prerequisites</h2>
+          <ul className="mt-3 space-y-1.5 text-sm">
             {engine.prerequisites.map((p) => (
               <li key={p.prerequisite_lesson_id} className="text-white/75">
                 {p.satisfied ? "✓" : "○"} {p.name}
@@ -193,10 +213,7 @@ export default function LessonViewer({
           </p>
           <form action={unlockLessonWithUmPointsAction} className="mt-3">
             <input type="hidden" name="lessonId" value={delivery.lesson.id} />
-            <button
-              type="submit"
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-            >
+            <button type="submit" className={learningBtnPrimary}>
               Unlock lesson
             </button>
           </form>
@@ -205,10 +222,8 @@ export default function LessonViewer({
 
       {!locked ? (
         <>
-          <section className="space-y-4">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Content
-            </h2>
+          <section className="space-y-5" aria-label="Lesson content">
+            <h2 className="sr-only">Content</h2>
             {blocks.length === 0 ? (
               <p className="text-sm text-white/45">No published content blocks.</p>
             ) : (
@@ -222,7 +237,7 @@ export default function LessonViewer({
                         blocks.find((b) => b.block_type === "video")?.id ===
                           block.id);
                     return (
-                      <div key={block.id}>
+                      <div key={block.id} className="-mx-1 sm:mx-0">
                         <ContinueWatchingVideo
                           src={url}
                           lessonId={delivery.lesson.id}
@@ -244,12 +259,14 @@ export default function LessonViewer({
             )}
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Activities
-            </h2>
+          {activities.length > 0 ? (
+            <section className="space-y-3">
+              <h2 className={learningEyebrow}>Activities</h2>
+              <ActivityList activities={activities} />
+            </section>
+          ) : (
             <ActivityList activities={activities} />
-          </section>
+          )}
         </>
       ) : (
         <p className="text-sm text-white/55">
@@ -258,23 +275,17 @@ export default function LessonViewer({
       )}
 
       {handoff?.kind === "mark_complete" ? (
-        <form action={completeLearningLessonAction} className="pt-2">
+        <form action={completeLearningLessonAction} className="pt-2 max-sm:hidden">
           <input type="hidden" name="lessonId" value={delivery.lesson.id} />
-          <button
-            type="submit"
-            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-          >
+          <button type="submit" className={learningBtnPrimary}>
             Mark lesson complete
           </button>
         </form>
       ) : null}
 
       {handoff?.kind === "continue_next" ? (
-        <div className="pt-2">
-          <Link
-            href={handoff.next_lesson.href}
-            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-          >
+        <div className="pt-2 max-sm:hidden">
+          <Link href={handoff.next_lesson.href} className={learningBtnPrimary}>
             Continue
           </Link>
         </div>
@@ -282,16 +293,10 @@ export default function LessonViewer({
 
       {handoff?.kind === "course_complete" ? (
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          <Link
-            href={handoff.course_href}
-            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
-          >
+          <Link href={handoff.course_href} className={learningBtnPrimary}>
             Back to course
           </Link>
-          <Link
-            href={handoff.transcript_href}
-            className="watch-focus-ring inline-flex rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
-          >
+          <Link href={handoff.transcript_href} className={learningBtnSecondary}>
             Transcript
           </Link>
         </div>
@@ -300,12 +305,12 @@ export default function LessonViewer({
       {hasNav ? (
         <nav
           aria-label="Lesson navigation"
-          className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4"
+          className="hidden items-center justify-between gap-4 border-t border-white/10 pt-4 sm:flex"
         >
           {delivery.previous_lesson ? (
             <Link
               href={delivery.previous_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              className={learningBtnSecondary}
             >
               ← Previous
             </Link>
@@ -313,15 +318,62 @@ export default function LessonViewer({
             <span aria-hidden="true" />
           )}
           {delivery.next_lesson ? (
-            <Link
-              href={delivery.next_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
-            >
+            <Link href={delivery.next_lesson.href} className={learningBtnSecondary}>
               Next →
             </Link>
           ) : null}
         </nav>
       ) : null}
+
+      <nav
+        aria-label="Lesson actions"
+        className="fixed inset-x-0 z-40 border-t border-white/10 bg-[#050510]/95 px-3 py-2 backdrop-blur-xl sm:hidden"
+        style={{
+          bottom: "var(--app-mobile-bottom-nav-offset, 0px)",
+        }}
+      >
+        <div className="mx-auto flex max-w-3xl items-center gap-2">
+          {delivery.previous_lesson ? (
+            <Link
+              href={delivery.previous_lesson.href}
+              className={`${learningBtnSecondary} flex-1 px-3`}
+            >
+              ← Previous
+            </Link>
+          ) : (
+            <span className="flex-1" aria-hidden="true" />
+          )}
+          {handoff?.kind === "mark_complete" ? (
+            <form action={completeLearningLessonAction} className="flex-[1.4]">
+              <input type="hidden" name="lessonId" value={delivery.lesson.id} />
+              <button type="submit" className={`${learningBtnPrimary} w-full px-3`}>
+                Mark lesson complete
+              </button>
+            </form>
+          ) : handoff?.kind === "continue_next" ? (
+            <Link
+              href={handoff.next_lesson.href}
+              className={`${learningBtnPrimary} flex-[1.4] px-3`}
+            >
+              Continue
+            </Link>
+          ) : delivery.next_lesson ? (
+            <Link
+              href={delivery.next_lesson.href}
+              className={`${learningBtnPrimary} flex-[1.4] px-3`}
+            >
+              Next →
+            </Link>
+          ) : (
+            <Link
+              href={LEARNING_LEARNER_ROUTES.course(delivery.lesson.course_id)}
+              className={`${learningBtnPrimary} flex-[1.4] px-3`}
+            >
+              Back to course
+            </Link>
+          )}
+        </div>
+      </nav>
     </div>
   );
 }

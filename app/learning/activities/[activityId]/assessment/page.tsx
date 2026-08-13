@@ -67,6 +67,7 @@ export default async function LearningAssessmentDeliveryPage({
       <LearningShell
         title="Assessment"
         subtitle="Read-only preview"
+        layout="focus"
         backHref={LEARNING_LEARNER_ROUTES.hub}
         backLabel="Learning"
       >
@@ -86,6 +87,7 @@ export default async function LearningAssessmentDeliveryPage({
     <LearningShell
       title="Assessment"
       subtitle={view.name}
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.lesson(view.lesson_id)}
       backLabel="Back to lesson"
     >
@@ -138,7 +140,7 @@ export default async function LearningAssessmentDeliveryPage({
             <input type="hidden" name="activityId" value={view.activity_id} />
             <button
               type="submit"
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              className="watch-focus-ring inline-flex min-h-11 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
             >
               Start assessment attempt
             </button>

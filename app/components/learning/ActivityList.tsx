@@ -12,7 +12,7 @@ type ActivityListProps = {
 export default function ActivityList({ activities }: ActivityListProps) {
   if (activities.length === 0) {
     return (
-      <p className="text-sm text-white/45">No published activities in this lesson.</p>
+      <p className="sr-only">No published activities in this lesson.</p>
     );
   }
 
@@ -30,7 +30,7 @@ export default function ActivityList({ activities }: ActivityListProps) {
           <li key={activity.id}>
             <Link
               href={href}
-              className="watch-focus-ring block rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3 transition hover:border-white/25"
+              className="watch-focus-ring block min-h-11 rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3.5 transition hover:border-white/25"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="font-bold text-white/90">{activity.name}</p>

@@ -71,6 +71,7 @@ export default async function LearnerProjectPage({
           : "Project"
       }
       subtitle="Project submission"
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.hub}
       backLabel="Learning"
     >

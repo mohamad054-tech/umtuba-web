@@ -38,12 +38,13 @@ export default function ContinueWatchingVideo({
   }, [initialSeconds]);
 
   return (
-    <figure>
+    <figure className="overflow-hidden rounded-2xl border border-white/10 bg-black">
       <video
         ref={videoRef}
         controls
+        playsInline
         preload="metadata"
-        className="w-full rounded-2xl bg-black"
+        className="aspect-video w-full bg-black"
         src={src}
         data-provider={provider ?? undefined}
         onTimeUpdate={() => {
@@ -62,7 +63,9 @@ export default function ContinueWatchingVideo({
         Your browser does not support video playback.
       </video>
       {caption ? (
-        <figcaption className="mt-2 text-xs text-white/45">{caption}</figcaption>
+        <figcaption className="px-3 py-2 text-xs leading-relaxed text-white/55">
+          {caption}
+        </figcaption>
       ) : null}
     </figure>
   );

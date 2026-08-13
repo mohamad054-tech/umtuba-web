@@ -53,7 +53,8 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
     return (
       <LearningShell
         title="Tutor unavailable"
-        subtitle="AI product surfaces are offline for this Beta"
+        subtitle="Study assistant"
+        layout="focus"
         backHref={LEARNING_LEARNER_ROUTES.lesson(lessonId)}
         backLabel="Back to lesson"
       >
@@ -94,43 +95,44 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
   return (
     <LearningShell
       title="AI Tutor"
-      subtitle="Integration layer (stub responses)"
+      subtitle={delivery.data.lesson.name}
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.lesson(lessonId)}
       backLabel="Back to lesson"
     >
       {query.error ? (
-        <p role="alert" className="mt-4 text-sm text-rose-100">
+        <p role="alert" className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
           {query.error}
         </p>
       ) : null}
 
-      <div className="mt-6 space-y-6">
-        <form action={createAiTutorThreadAction} className="flex flex-wrap gap-2">
+      <div className="mt-4 space-y-5">
+        <form action={createAiTutorThreadAction} className="flex flex-col gap-2 sm:flex-row">
           <input type="hidden" name="courseId" value={courseId} />
           <input type="hidden" name="lessonId" value={lessonId} />
           <input
             name="title"
-            placeholder="Thread title"
-            className="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
+            placeholder="Name this study thread"
+            className="min-h-11 flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-white/35"
           />
           <button
             type="submit"
-            className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+            className="watch-focus-ring inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
           >
             New thread
           </button>
         </form>
 
         {threads.length > 0 ? (
-          <ul className="flex flex-wrap gap-2 text-sm">
+          <ul className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {threads.map((t) => (
               <li key={String(t.id)}>
                 <a
                   href={`${LEARNING_AI_TUTOR_ROUTES.lesson(lessonId)}?thread=${String(t.id)}`}
                   className={
                     String(t.id) === threadId
-                      ? "font-bold text-white"
-                      : "text-white/50 underline"
+                      ? "watch-focus-ring inline-flex min-h-9 shrink-0 items-center rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1.5 text-sm font-bold text-sky-100"
+                      : "watch-focus-ring inline-flex min-h-9 shrink-0 items-center rounded-full border border-white/15 px-3 py-1.5 text-sm font-semibold text-white/60 hover:text-white"
                   }
                 >
                   {String(t.title ?? t.id)}
@@ -142,21 +144,42 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
 
         {threadId ? (
           <>
-            <section className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-sm font-bold text-white/70">Conversation</h2>
+            <section
+              className="space-y-3 rounded-[24px] border border-white/10 bg-[#080816]/70 p-4"
+              aria-label="Conversation"
+            >
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Conversation
+              </h2>
               {messages.length === 0 ? (
-                <p className="text-sm text-white/45">No messages yet.</p>
+                <p className="text-sm text-white/45">
+                  Ask a question about this lesson to get started.
+                </p>
               ) : (
-                messages.map((m) => (
-                  <div key={String(m.id)} className="text-sm">
-                    <p className="text-[10px] uppercase tracking-wider text-white/35">
-                      {String(m.role ?? "user")} · {String(m.message_kind ?? m.kind ?? "")}
-                    </p>
-                    <p className="mt-1 whitespace-pre-wrap text-white/80">
-                      {String(m.content ?? "")}
-                    </p>
-                  </div>
-                ))
+                messages.map((m) => {
+                  const role = String(m.role ?? "user");
+                  const isUser = role === "user";
+                  return (
+                    <div
+                      key={String(m.id)}
+                      className={`max-w-[92%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
+                        isUser
+                          ? "ml-auto bg-sky-500/15 text-sky-50"
+                          : "bg-white/[0.06] text-white/85"
+                      }`}
+                    >
+                      <p className="text-[10px] uppercase tracking-wider text-white/35">
+                        {role}
+                        {m.message_kind || m.kind
+                          ? ` · ${String(m.message_kind ?? m.kind ?? "")}`
+                          : ""}
+                      </p>
+                      <p className="mt-1 whitespace-pre-wrap">
+                        {String(m.content ?? "")}
+                      </p>
+                    </div>
+                  );
+                })
               )}
             </section>
 
@@ -167,7 +190,7 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
                 Kind
                 <select
                   name="kind"
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-white"
+                  className="mt-1 min-h-11 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-white"
                   defaultValue="ask_question"
                 >
                   {LEARNING_AI_TUTOR_MESSAGE_KINDS.map((k) => (
@@ -183,19 +206,20 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
                   name="content"
                   rows={4}
                   required
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-white"
+                  placeholder="Ask about this lesson…"
+                  className="mt-1 min-h-24 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-base text-white placeholder:text-white/35"
                 />
               </label>
               <button
                 type="submit"
-                className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
               >
                 Send
               </button>
             </form>
           </>
         ) : (
-          <p className="text-sm text-white/50">
+          <p className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-6 text-sm text-white/55">
             Create a thread to start asking questions. No AI provider is connected yet.
           </p>
         )}

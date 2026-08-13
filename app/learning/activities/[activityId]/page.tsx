@@ -60,6 +60,7 @@ export default async function LearningActivityPage({
     <LearningShell
       title="Activity"
       subtitle={activity.name}
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.lesson(lesson_id)}
       backLabel="Back to lesson"
     >
@@ -94,7 +95,7 @@ export default async function LearningActivityPage({
           <input type="hidden" name="activityId" value={activity.id} />
           <button
             type="submit"
-            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            className="watch-focus-ring inline-flex min-h-11 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
           >
             {active_attempt_id ? "Resume attempt" : "Start attempt"}
           </button>

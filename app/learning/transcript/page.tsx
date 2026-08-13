@@ -34,6 +34,7 @@ export default async function LearningTranscriptPage({
     <LearningShell
       title="Learning transcript"
       subtitle="Completed courses and certificates"
+      layout="wide"
       backHref="/learning"
       backLabel="Learning"
     >
@@ -63,15 +64,18 @@ export default async function LearningTranscriptPage({
           {loaded.message}
         </p>
       ) : loaded.data.entries.length === 0 ? (
-        <p className="mt-6 text-sm text-white/55">
+        <p
+          role="status"
+          className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-8 text-center text-sm text-white/55"
+        >
           No completed courses yet. Finish a course to see it on your transcript.
         </p>
       ) : (
-        <ul className="mt-6 space-y-4">
+        <ul className="mt-6 grid gap-4 md:grid-cols-2">
           {loaded.data.entries.map((entry) => (
             <li
               key={entry.course_id}
-              className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
+              className="rounded-[24px] border border-white/10 bg-[#080816]/70 p-5"
             >
               <h2 className="text-lg font-bold text-white">{entry.course_name}</h2>
               <dl className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
@@ -89,7 +93,7 @@ export default async function LearningTranscriptPage({
                 </div>
                 <div>
                   <dt className="text-white/35">Certificate</dt>
-                  <dd>
+                  <dd className={entry.certificate_status === "issued" ? "font-semibold text-emerald-200" : ""}>
                     {entry.certificate_status === "issued"
                       ? entry.certificate_code ?? "issued"
                       : "Not issued"}
@@ -105,12 +109,16 @@ export default async function LearningTranscriptPage({
                   <input type="hidden" name="courseId" value={entry.course_id} />
                   <button
                     type="submit"
-                    className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                    className="watch-focus-ring inline-flex min-h-11 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-black"
                   >
                     Finalize completion / certificate
                   </button>
                 </form>
-              ) : null}
+              ) : (
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200/80">
+                  Certificate issued
+                </p>
+              )}
             </li>
           ))}
         </ul>

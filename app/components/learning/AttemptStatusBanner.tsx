@@ -43,7 +43,7 @@ export default function AttemptStatusBanner({
     <div role="status" className={`rounded-2xl border px-4 py-3 text-sm ${tone}`}>
       <p>{message}</p>
       {status === "active" && remainingSeconds != null ? (
-        <p className="mt-1 text-xs opacity-80">
+        <p className="mt-1 text-sm font-semibold tabular-nums opacity-90">
           Time remaining: {formatSeconds(remainingSeconds)}
         </p>
       ) : null}

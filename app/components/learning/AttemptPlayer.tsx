@@ -18,6 +18,12 @@ import {
 } from "../../../lib/learning/learnerResultDelivery";
 import AttemptQuestion from "./AttemptQuestion";
 import AttemptStatusBanner from "./AttemptStatusBanner";
+import {
+  learningBtnPrimary,
+  learningBtnSecondary,
+  learningCard,
+  learningEyebrow,
+} from "./ui/tokens";
 
 type AttemptPlayerProps = {
   initial: LearningLearnerAttemptView;
@@ -264,11 +270,9 @@ export default function AttemptPlayer({
   }
 
   return (
-    <div className="mt-6 space-y-4">
-      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
-        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Attempt #{view.attempt_number}
-        </p>
+    <div className="mt-2 space-y-4 max-sm:pb-28">
+      <section className={`${learningCard} p-5 md:p-7`}>
+        <p className={learningEyebrow}>Attempt #{view.attempt_number}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
           {activityName ?? "Activity attempt"}
         </h1>
@@ -303,18 +307,18 @@ export default function AttemptPlayer({
       </div>
 
       {actionError ? (
-        <p role="alert" className="text-sm text-rose-300">
+        <p role="alert" className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
           {actionError}
         </p>
       ) : null}
 
       {view.status === "active" ? (
-        <div className="flex flex-wrap gap-3 pt-2">
+        <div className="hidden flex-wrap gap-3 pt-2 sm:flex">
           <button
             type="button"
             onClick={() => void onSubmit()}
             disabled={locked || busy}
-            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"
+            className={learningBtnPrimary}
           >
             Submit attempt
           </button>
@@ -322,13 +326,13 @@ export default function AttemptPlayer({
             type="button"
             onClick={() => void onCancel()}
             disabled={locked || busy}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 disabled:opacity-40"
+            className={learningBtnSecondary}
           >
             Cancel attempt
           </button>
           <a
             href={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+            className={learningBtnSecondary}
           >
             Back to activity
           </a>
@@ -337,12 +341,38 @@ export default function AttemptPlayer({
         <div className="pt-2">
           <a
             href={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+            className={learningBtnSecondary}
           >
             Back to activity
           </a>
         </div>
       )}
+
+      {view.status === "active" ? (
+        <div
+          className="fixed inset-x-0 z-40 border-t border-white/10 bg-[#050510]/95 px-3 py-2 backdrop-blur-xl sm:hidden"
+          style={{ bottom: "var(--app-mobile-bottom-nav-offset, 0px)" }}
+        >
+          <div className="mx-auto flex max-w-3xl gap-2">
+            <button
+              type="button"
+              onClick={() => void onSubmit()}
+              disabled={locked || busy}
+              className={`${learningBtnPrimary} flex-1`}
+            >
+              Submit attempt
+            </button>
+            <button
+              type="button"
+              onClick={() => void onCancel()}
+              disabled={locked || busy}
+              className={learningBtnSecondary}
+            >
+              Cancel attempt
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

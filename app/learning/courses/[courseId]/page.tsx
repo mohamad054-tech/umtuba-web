@@ -37,6 +37,7 @@ export default async function LearningCoursePage({ params }: PageProps) {
     <LearningShell
       title="Course"
       subtitle={outline.data.course.name}
+      layout="wide"
       backHref={LEARNING_LEARNER_ROUTES.hub}
       backLabel="My Learning"
     >

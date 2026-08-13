@@ -8,6 +8,7 @@ import {
 } from "../../../../lib/learning/learnerDelivery";
 import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
+import LearningAlert from "../../../components/learning/ui/LearningAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -52,34 +53,22 @@ export default async function LearningLessonPage({
     <LearningShell
       title="Lesson"
       subtitle={delivery.data.lesson.name}
+      layout="focus"
       backHref={LEARNING_LEARNER_ROUTES.course(delivery.data.lesson.course_id)}
       backLabel="Course outline"
     >
       {query.completed === "1" ? (
-        <p
-          role="status"
-          className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
-        >
-          Lesson marked complete.
-        </p>
+        <LearningAlert tone="success">Lesson marked complete.</LearningAlert>
       ) : null}
 
       {query.unlocked === "1" ? (
-        <p
-          role="status"
-          className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-50"
-        >
+        <LearningAlert tone="success">
           Lesson unlocked with UM Points.
-        </p>
+        </LearningAlert>
       ) : null}
 
       {query.error ? (
-        <p
-          role="alert"
-          className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
-        >
-          {query.error}
-        </p>
+        <LearningAlert tone="error">{query.error}</LearningAlert>
       ) : null}
 
       <LessonViewer

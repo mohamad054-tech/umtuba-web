@@ -72,6 +72,7 @@ export default async function AssessmentAttemptFoundationPage({
       <LearningShell
         title="Assessment attempt"
         subtitle="Session"
+        layout="focus"
         backHref={LEARNING_ASSESSMENT_DELIVERY_ROUTES.assessment(activityId)}
         backLabel="Back to assessment"
       >
@@ -112,6 +113,7 @@ export default async function AssessmentAttemptFoundationPage({
     <LearningShell
       title="Assessment attempt"
       subtitle={`Attempt #${view.attempt_number}`}
+      layout="focus"
       backHref={LEARNING_ASSESSMENT_DELIVERY_ROUTES.assessment(view.activity_id)}
       backLabel="Back to assessment"
     >

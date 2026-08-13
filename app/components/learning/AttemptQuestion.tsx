@@ -30,7 +30,7 @@ export default function AttemptQuestion({
       disabled={disabled}
       className="rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-4"
     >
-      <legend className="px-1 text-sm font-bold text-white/90">
+      <legend className="px-1 text-base font-bold leading-snug text-white/90">
         Q{question.position + 1}. {prompt || "Question"}
       </legend>
 
@@ -47,7 +47,11 @@ export default function AttemptQuestion({
             return (
               <label
                 key={key}
-                className="flex cursor-pointer items-start gap-2 text-sm text-white/80"
+                className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border px-3 py-2.5 text-sm text-white/80 ${
+                  value?.selected_key === key
+                    ? "border-sky-400/40 bg-sky-500/10"
+                    : "border-white/10 bg-black/20"
+                }`}
               >
                 <input
                   type="radio"
@@ -60,7 +64,7 @@ export default function AttemptQuestion({
                         key,
                     })
                   }
-                  className="mt-1"
+                  className="mt-1 h-4 w-4"
                 />
                 <span>{text}</span>
               </label>
@@ -86,7 +90,11 @@ export default function AttemptQuestion({
             return (
               <label
                 key={key}
-                className="flex cursor-pointer items-start gap-2 text-sm text-white/80"
+                className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border px-3 py-2.5 text-sm text-white/80 ${
+                  checked
+                    ? "border-sky-400/40 bg-sky-500/10"
+                    : "border-white/10 bg-black/20"
+                }`}
               >
                 <input
                   type="checkbox"
@@ -111,7 +119,11 @@ export default function AttemptQuestion({
           {[true, false].map((boolVal) => (
             <label
               key={String(boolVal)}
-              className="flex cursor-pointer items-center gap-2 text-sm text-white/80"
+              className={`flex min-h-11 min-w-24 cursor-pointer items-center gap-2 rounded-xl border px-4 text-sm text-white/80 ${
+                value?.value === boolVal
+                  ? "border-sky-400/40 bg-sky-500/10"
+                  : "border-white/10 bg-black/20"
+              }`}
             >
               <input
                 type="radio"
@@ -127,7 +139,7 @@ export default function AttemptQuestion({
 
       {question.question_type === "short_answer" ? (
         <textarea
-          className="mt-3 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+          className="mt-3 min-h-24 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2.5 text-base text-white"
           rows={3}
           maxLength={5000}
           value={asPlainString(value?.text)}
@@ -139,7 +151,7 @@ export default function AttemptQuestion({
       {question.question_type === "numeric" ? (
         <input
           type="number"
-          className="mt-3 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+          className="mt-3 min-h-11 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2.5 text-base text-white"
           value={
             typeof value?.value === "number" || typeof value?.value === "string"
               ? String(value.value)
@@ -179,7 +191,7 @@ export default function AttemptQuestion({
                 <input
                   type="text"
                   maxLength={1000}
-                  className="mt-1 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm text-white"
+                  className="mt-1 min-h-11 w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2.5 text-base text-white"
                   value={blanksMap[key] ?? ""}
                   onChange={(e) =>
                     onChange({

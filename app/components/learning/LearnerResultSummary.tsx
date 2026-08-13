@@ -24,7 +24,7 @@ export default function LearnerResultSummary({
       <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-emerald-200/70">
         Result
       </p>
-      <p className="mt-1 text-lg font-black tracking-tight">
+      <p className="mt-1 text-2xl font-black tracking-tight">
         {formatScore(score_earned)} / {formatScore(score_max)}
         <span className="ml-2 text-base font-bold text-emerald-100/80">
           ({formatPercentage(percentage)}%)

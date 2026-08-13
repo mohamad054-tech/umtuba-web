@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import LearningShell from "../components/learning/LearningShell";
 import LearningHub from "../components/learning/LearningHub";
 import { createClient, getServerUser } from "../../lib/supabase/server";
@@ -12,7 +11,6 @@ import {
   listInstructorAuthorableCourses,
   type InstructorAuthorableCourse,
 } from "../../lib/learning/instructorAuthoring";
-import { LEARNING_COMPLETION_ROUTES } from "../../lib/learning/completionFoundation";
 
 export const metadata = {
   title: "My Learning | UMTUBA",
@@ -39,18 +37,11 @@ export default async function LearningHubPage() {
     <LearningShell
       title="Learning"
       subtitle="My Learning"
+      layout="wide"
       instructorHref={
         showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
       }
     >
-      <p className="mt-3 text-sm">
-        <Link
-          href={LEARNING_COMPLETION_ROUTES.transcript}
-          className="font-bold text-white underline underline-offset-2"
-        >
-          View transcript &amp; certificates
-        </Link>
-      </p>
       {hub.ok ? (
         <LearningHub hub={hub.data} />
       ) : (
