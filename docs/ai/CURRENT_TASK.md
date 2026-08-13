@@ -2,19 +2,34 @@
 
 ## Task title
 
-LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4
+LAPTOP_TOMORROW_FIRST_PERFORMANCE_RESUME_V1
 
 ## Status
 
-`closed` — LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO · NEW_PRODUCTION_CRITICAL_BLOCKER = NO  
-DEPLOYMENT_CHANGE_OBSERVED = NO · MEASURED_IMPROVEMENT = NO
+`parked_until_tomorrow` — **FIRST thing on next Laptop resume**
 
-## A1/A2/A3
+## FIRST tomorrow (do this before anything else)
 
-- Home SSR: force-dynamic + feed enrichment waterfall + duplicate auth
-- Store SSR: catalog N+1 enrichPublicCatalogRow (dominant)
-- Monitor: home RSC still ~35; prefetch deploy not live
+1. **Check if Central deployed prefetch** (`prefetch={false}` from `6b4e544` / `docs/ai/PREFETCH_FALSE_NAV_V1.patch`).
+2. **Remeasure production** `https://umtuba.com` (same A3 protocol):
+   - HOME TTFB, HOME load, HOME `rscCount` / fetchCount
+   - `/store` TTFB
+3. Set:
+   - `DEPLOYMENT_CHANGE_OBSERVED = YES/NO`
+   - `MEASURED_IMPROVEMENT = YES/NO`
+4. If **not** deployed yet → ping Central with patch + commit `6b4e544` (do not recreate patch).
+5. Only after that → next performance GO candidates:
+   - Store catalog N+1 batch enrich
+   - Home SSR auth dedupe / defer enrichment
 
-## Evidence
+## Parked context
 
-`docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`
+- Branch: `office/um-core-platform-manifest-validation-p2`
+- Local commits (may need push): `6b4e544`, `ddc7f16`
+- Prefetch: HANDED_OFF_TO_CENTRAL · not verified live (last monitor: ~35 RSC)
+- Learning / Collaboration / LB003 = CLOSED
+- Evidence: `docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`
+
+## Locks
+
+No Learning/Collaboration reopen · No LB003 · No migrations · No deploy from Laptop unless Central GO

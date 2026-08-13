@@ -1,17 +1,19 @@
 # UMTUBA Project State (AI Handoff)
 
-## Performance QA V4
+## TOMORROW — FIRST
 
-- Wave `LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4` **closed**
-- Prefetch patch still Central-owned; **not live** (RSC ~35 on home)
-- Next priority after prefetch validate: Store N+1 batch enrich → Home feed waterfall
-- `LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO`
-- `NEW_PRODUCTION_CRITICAL_BLOCKER = NO`
+**Resume task:** `LAPTOP_TOMORROW_FIRST_PERFORMANCE_RESUME_V1`  
+**Priority:** FIRST on next session — prefetch deploy check + production remeasure, then Store/Home SSR opts.
+
+See `docs/ai/CURRENT_TASK.md`.
+
+## Parked performance state
+
+- Prefetch patch Central-owned; last live check: RSC ~35 (not deployed)
+- Commits local: `6b4e544` (prefetch + QA docs), `ddc7f16` (report)
+- Branch: `office/um-core-platform-manifest-validation-p2`
+- Next after validate: Store N+1 → Home SSR waterfall
 
 ## Domain locks
 
 Learning CLOSED · Collaboration CLOSED · LB003 CLOSED
-
-## Prefetch handoff (unchanged)
-
-`docs/ai/PREFETCH_FALSE_NAV_V1.patch` — do not recreate
