@@ -1,18 +1,19 @@
-# CURSOR_REPORT — LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4
+# CURSOR_REPORT — save-all commit
 
 ## Summary
 
-Three-way performance closeout without redeploying or touching the prefetch patch. Home SSR latency is force-dynamic + sequential feed enrichment (with duplicate auth). Store SSR latency is dominated by sequential per-product catalog enrichment (N+1). Production monitor shows prefetch deploy **not** observable (still ~35 RSC). No new critical blocker. Ready for next performance GO.
+User asked to save everything. Committed locally on `office/um-core-platform-manifest-validation-p2`: prefetch={false} nav + all pending `docs/ai` Laptop QA/closeout handoffs. Not pushed.
+
+## Commit
+
+- SHA: `6b4e5443c88c8069e33cef19dbbc6037ab362ea6`
+- Message: `perf(nav): disable Link prefetch and archive Laptop post-release QA handoffs`
+- 51 files, +2621 / −80
+- Branch ahead of origin by 1
 
 ## Exact files changed
 
-- `docs/ai/LAPTOP_HOME_SSR_LATENCY_ROOT_CAUSE_V1.md`
-- `docs/ai/LAPTOP_STORE_SSR_LATENCY_ROOT_CAUSE_V1.md`
-- `docs/ai/LAPTOP_PRODUCTION_PERFORMANCE_INDEPENDENT_MONITOR_V1.md`
-- `docs/ai/LAPTOP_POST_RELEASE_PERFORMANCE_QA_V4.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/CURSOR_REPORT.md`
+Included in commit: 3 nav files + docs/ai handoffs/patch/SQL probes (see git show --stat).
 
 ## Migrations created
 
@@ -20,15 +21,15 @@ None.
 
 ## Security review
 
-Read-only code analysis + public production probes. No payments/Commerce mutations. Prefetch patch untouched. Domains locked.
+No .env/secrets committed. SQL probe stubs only.
 
 ## Tests
 
-Not applicable (analysis/monitor wave).
+Not re-run on save.
 
 ## TypeScript
 
-Not run (docs-only).
+Not re-run on save.
 
 ## Build
 
@@ -36,23 +37,12 @@ Not run.
 
 ## git diff --check
 
-N/A for product code (docs-only this wave).
+Clean commit created successfully.
 
 ## git status --short
 
-Docs/ai artifacts added/updated; prior uncommitted prefetch nav files remain for Central handoff (unchanged this wave).
+Clean working tree; `[ahead 1]`.
 
 ## Open issues
 
-- Central: deploy prefetch + Laptop auto-remeasure
-- Next GO candidates: store batch enrich; home auth dedupe / defer enrichment
-
-## Final fields
-
-```
-HOME_SSR_NEXT_ACTION = [auth dedupe, defer viewer enrichment, above-fold signed URLs]
-STORE_SSR_NEXT_ACTION = [batch enrich N+1, lower first-paint limit/Suspense, optional anon cache]
-PERFORMANCE_PRIORITY_ORDER = [prefetch validate, store N+1, home waterfall, anon cache]
-NEW_PRODUCTION_CRITICAL_BLOCKER = NO
-LAPTOP_STATUS = READY_FOR_NEXT_PERFORMANCE_GO
-```
+Push only if Central/user requests. Production deploy still Central-owned for prefetch validation.
