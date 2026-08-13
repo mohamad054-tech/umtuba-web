@@ -42,7 +42,7 @@ describe("email confirm redirect", () => {
     );
     expect(
       buildEmailConfirmRedirectTo("https://umtuba.example", "//evil")
-    ).toContain("next=%2Fdiscover");
+    ).toContain("next=%2Fprofile");
   });
 });
 
@@ -56,9 +56,9 @@ describe("auth session harden contracts", () => {
     expect(signup).toMatch(/Continue where you left off|continueHref/);
   });
 
-  it("callback defaults to discover and routes failures by intent", () => {
+  it("callback defaults to profile and routes failures by intent", () => {
     const callback = read("app/auth/callback/route.ts");
-    expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/discover["']/);
+    expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/profile["']/);
     expect(callback).toMatch(/APP_ROUTES\.login/);
     expect(callback).toMatch(/isPasswordResetNext/);
     expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);

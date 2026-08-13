@@ -92,18 +92,19 @@ describe("Deep-link & Alias Clarity V1", () => {
   });
 
   describe("Auth ?next= default", () => {
-    it("keeps /discover as default (Home via alias) — change to / deferred", () => {
-      expect(AUTH_SAFE_REDIRECT_DEFAULT_PATH).toBe("/discover");
+    it("defaults to /profile (UAF-08) while preserving explicit next/deep links", () => {
+      expect(AUTH_SAFE_REDIRECT_DEFAULT_PATH).toBe("/profile");
       expect(AUTH_DEFAULT_NEXT_PATH).toBe(AUTH_SAFE_REDIRECT_DEFAULT_PATH);
-      expect(getSafeRedirectPath(null)).toBe("/discover");
-      expect(getSafeRedirectPath(undefined)).toBe("/discover");
-      expect(getSafeRedirectPath("")).toBe("/discover");
+      expect(getSafeRedirectPath(null)).toBe("/profile");
+      expect(getSafeRedirectPath(undefined)).toBe("/profile");
+      expect(getSafeRedirectPath("")).toBe("/profile");
       expect(getSafeRedirectPath("/messages")).toBe("/messages");
-      expect(getSafeRedirectPath("//evil.example")).toBe("/discover");
+      expect(getSafeRedirectPath("/discover?post=42")).toBe("/discover?post=42");
+      expect(getSafeRedirectPath("//evil.example")).toBe("/profile");
 
       const redirectSrc = read("lib/supabase/redirect.ts");
-      expect(redirectSrc).toMatch(/fallback = "\/discover"/);
-      expect(redirectSrc).toMatch(/Deep-link & Alias Clarity V1/);
+      expect(redirectSrc).toMatch(/fallback = "\/profile"/);
+      expect(redirectSrc).toMatch(/UAF-08/);
     });
   });
 });

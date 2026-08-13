@@ -3,7 +3,9 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { desktopNavLabelKey } from "../../../lib/i18n/shellLabels";
 import { APP_NAV_ITEMS, APP_ROUTES, citiesMatch, isNavActive } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 import { LIVING_CITIES } from "./living-earth/livingEarthData";
 import HeroCTAButton from "./HeroCTAButton";
 import JoinBetaLink from "./JoinBetaLink";
@@ -22,6 +24,7 @@ export default function LandingHero() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const focusParam = searchParams.get("focus");
 
   const focusedCity =
@@ -60,23 +63,25 @@ export default function LandingHero() {
                   active ? "text-white" : ""
                 }`}
               >
-                {item.label}
+                {t(desktopNavLabelKey(item.href))}
               </Link>
             );
           })}
         </div>
 
-        <JoinBetaLink className="landing-nav-chip rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm font-medium text-white/90 backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/[0.12] hover:text-white">
-          Join Beta
-        </JoinBetaLink>
+        <JoinBetaLink className="landing-nav-chip rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm font-medium text-white/90 backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/[0.12] hover:text-white" />
       </nav>
 
       {focusParam ? (
         <div className="relative z-20 mx-auto max-w-7xl px-6 md:px-12">
           <p className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sky-100">
             {focusedCity
-              ? `Living Earth · focused on ${focusedCity.name}`
-              : `Living Earth · exploring ${focusParam}`}
+              ? t("landing.focusLivingEarth", {
+                  values: { city: focusedCity.name },
+                })
+              : t("landing.focusExploring", {
+                  values: { city: focusParam },
+                })}
           </p>
         </div>
       ) : null}
@@ -85,7 +90,7 @@ export default function LandingHero() {
         <div className="landing-hero-copy relative z-10 max-w-xl lg:max-w-2xl">
           <div className="landing-hero-badge mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-[12px] font-medium tracking-wide text-white/70 backdrop-blur-xl md:mb-10">
             <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.9)]" />
-            Alpha 0.2 · Built for a new generation
+            {t("landing.badge")}
           </div>
 
           <p className="landing-hero-brand mb-5 text-[clamp(2.75rem,7vw,5.5rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-white">
@@ -93,15 +98,14 @@ export default function LandingHero() {
           </p>
 
           <h1 className="max-w-[14ch] text-[clamp(2.1rem,4.6vw,3.75rem)] font-medium leading-[1.08] tracking-[-0.03em] text-white/92">
-            The World Lives{" "}
+            {t("landing.headline")}{" "}
             <span className="bg-gradient-to-r from-sky-200 via-blue-100 to-indigo-200 bg-clip-text text-transparent">
-              Here.
+              {t("landing.headlineAccent")}
             </span>
           </h1>
 
           <p className="mt-7 max-w-lg text-[15px] leading-7 text-white/55 md:mt-8 md:text-base md:leading-8">
-            Discover authentic videos, cultures, people, ideas, and opportunities
-            from every corner of the world.
+            {t("landing.subhead")}
           </p>
 
           <div className="mt-11 flex flex-col gap-3.5 sm:flex-row sm:items-center sm:gap-4 md:mt-12">
@@ -109,13 +113,13 @@ export default function LandingHero() {
               variant="primary"
               onClick={() => router.push(APP_ROUTES.discover)}
             >
-              Start Exploring
+              {t("landing.startExploring")}
             </HeroCTAButton>
             <HeroCTAButton
               variant="secondary"
               onClick={() => router.push(APP_ROUTES.live)}
             >
-              Go Live
+              {t("landing.goLive")}
             </HeroCTAButton>
           </div>
         </div>

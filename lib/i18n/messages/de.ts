@@ -22,4 +22,7 @@ export const deMessages: FoundationMessages = {
   "settings.language": "Sprache",
   "settings.languageDescription":
     "Wähle die Sprache, die in UMTUBA verwendet wird.",
+  "landing.joinCta": "UMTUBA beitreten",
+  "landing.startExploring": "Entdecken starten",
+  "landing.goLive": "Live gehen",
 };

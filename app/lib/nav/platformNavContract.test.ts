@@ -159,15 +159,15 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("auth ?next= behavior", () => {
-    it("keeps default next as /discover (Home alias) and blocks open redirects", () => {
-      // Clarity V1: Auth default stays `/discover` (equals Home via forever alias).
-      expect(AUTH_DEFAULT_NEXT_PATH).toBe("/discover");
-      expect(getSafeRedirectPath(null)).toBe("/discover");
-      expect(getSafeRedirectPath(undefined)).toBe("/discover");
-      expect(getSafeRedirectPath("")).toBe("/discover");
+    it("defaults next to /profile (UAF-08) and blocks open redirects", () => {
+      expect(AUTH_DEFAULT_NEXT_PATH).toBe("/profile");
+      expect(getSafeRedirectPath(null)).toBe("/profile");
+      expect(getSafeRedirectPath(undefined)).toBe("/profile");
+      expect(getSafeRedirectPath("")).toBe("/profile");
       expect(getSafeRedirectPath("/messages")).toBe("/messages");
-      expect(getSafeRedirectPath("//evil.example")).toBe("/discover");
-      expect(getSafeRedirectPath("https://evil.example")).toBe("/discover");
+      expect(getSafeRedirectPath("/discover?post=1")).toBe("/discover?post=1");
+      expect(getSafeRedirectPath("//evil.example")).toBe("/profile");
+      expect(getSafeRedirectPath("https://evil.example")).toBe("/profile");
     });
   });
 

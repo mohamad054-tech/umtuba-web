@@ -83,7 +83,7 @@ describe("password reset architecture", () => {
     expect(callback).toMatch(/exchangeCodeForSession/);
     expect(callback).not.toMatch(/console\.(log|info|debug).*code/);
     expect(callback).toMatch(/PASSWORD_RESET_UPDATE_PATH/);
-    expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/discover["']/);
+    expect(callback).toMatch(/DEFAULT_POST_AUTH_PATH\s*=\s*["']\/profile["']/);
     expect(callback).toMatch(/isPasswordResetNext/);
     expect(callback).toMatch(/mapSignInLinkError|mapCallbackLinkError/);
     expect(callback).not.toMatch(

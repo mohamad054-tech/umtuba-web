@@ -82,11 +82,11 @@ export const USER_MENU_ITEM_LABELS = USER_MENU_BASE_ITEM_LABELS;
 export const DISCOVER_HOME_ALIAS = APP_ROUTES.discover;
 
 /**
- * Auth post-login default next path.
- * Clarity V1: keep `/discover` (Home via forever alias). Do not flip to `/`
- * without an explicit GO — deeplink builders and redirect tests share this path.
+ * Auth post-login default next path (UAF-08).
+ * Bare `/profile` resolves to the signed-in user's public profile (or Settings).
+ * Explicit `?next=` / protected-route / deep-link overrides remain honored.
  */
-export const AUTH_DEFAULT_NEXT_PATH = APP_ROUTES.discover;
+export const AUTH_DEFAULT_NEXT_PATH = APP_ROUTES.profile;
 
 /** Bare profile resolver path. */
 export const PROFILE_INDEX_PATH = APP_ROUTES.profile;

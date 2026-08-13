@@ -176,11 +176,11 @@ export async function updateSession(request: NextRequest) {
     }
 
     const nextParam = request.nextUrl.searchParams.get("next");
-    const destination = getSafeRedirectPath(nextParam, "/discover");
+    const destination = getSafeRedirectPath(nextParam, "/profile");
     // Parse path + query explicitly so ?creatorId= / ?conversation= survive.
     const redirectUrl = request.nextUrl.clone();
     const [destPath, destQuery = ""] = destination.split("?");
-    redirectUrl.pathname = destPath || "/discover";
+    redirectUrl.pathname = destPath || "/profile";
     redirectUrl.search = destQuery ? `?${destQuery}` : "";
     return applyReferralAttribution(
       request,

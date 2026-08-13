@@ -82,7 +82,7 @@ function LoginForm() {
 
       const nextPath = getSafeRedirectPath(
         searchParams.get("next"),
-        APP_ROUTES.discover
+        APP_ROUTES.profile
       );
       router.push(nextPath);
       router.refresh();
@@ -103,7 +103,7 @@ function LoginForm() {
       title="Welcome back"
       subtitle="Sign in to continue to UMTUBA."
       panelTitle="Your world is waiting."
-      panelBody="Pick up Discover, Live, and Messages where you left off."
+      panelBody="Continue to your Profile, or wherever you left off."
       footer={
         <p className="text-center text-sm text-white/50">
           Don&apos;t have an account?{" "}
@@ -191,7 +191,7 @@ function LoginFallback() {
       title="Welcome back"
       subtitle="Sign in to continue to UMTUBA."
       panelTitle="Your world is waiting."
-      panelBody="Pick up Discover, Live, and Messages where you left off."
+      panelBody="Continue to your Profile, or wherever you left off."
     >
       <p className="text-sm text-white/55" role="status">
         Loading sign-in...

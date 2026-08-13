@@ -3,23 +3,26 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { tryCreateClient } from "../../../lib/supabase/client";
+import { useTranslation } from "../i18n";
 import { APP_ROUTES } from "../../lib/nav";
 
-type JoinBetaLinkProps = {
+type JoinUmtubaLinkProps = {
   className?: string;
-  children: ReactNode;
+  /** Optional override; defaults to localized Join UMTUBA CTA (UAF-06). */
+  children?: ReactNode;
 };
 
 /**
- * Landing "Join Beta" CTA.
- * - Signed out → /signup (beta registration; /register redirects here)
+ * Landing join CTA (UAF-06).
+ * - Signed out → /signup
  * - Signed in → /discover (already in the product)
- * Preserves caller styles; does not alter landing design.
+ * Label via i18n (`landing.joinCta`); Arabic: انضم إلى أم طوبا.
  */
 export default function JoinBetaLink({
   className,
   children,
-}: JoinBetaLinkProps) {
+}: JoinUmtubaLinkProps) {
+  const { t } = useTranslation();
   const [href, setHref] = useState<string>(APP_ROUTES.signup);
 
   useEffect(() => {
@@ -46,7 +49,7 @@ export default function JoinBetaLink({
 
   return (
     <Link href={href} className={className}>
-      {children}
+      {children ?? t("landing.joinCta")}
     </Link>
   );
 }

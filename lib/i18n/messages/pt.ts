@@ -21,4 +21,7 @@ export const ptMessages: FoundationMessages = {
   "status.error": "Algo deu errado. Tente novamente.",
   "settings.language": "Idioma",
   "settings.languageDescription": "Escolha o idioma usado no UMTUBA.",
+  "landing.joinCta": "Entrar na UMTUBA",
+  "landing.startExploring": "Começar a explorar",
+  "landing.goLive": "Ir ao vivo",
 };

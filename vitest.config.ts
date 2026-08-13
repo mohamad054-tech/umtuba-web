@@ -51,6 +51,8 @@ export default defineConfig({
       "app/components/home/**/*.test.ts",
       "app/create/video/**/*.test.ts",
       "app/components/social/**/*.test.ts",
+      "app/signup/**/*.test.ts",
+      "app/components/landing/**/*.test.ts",
     ],
   },
 });

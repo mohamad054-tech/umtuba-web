@@ -66,6 +66,14 @@ describe("App Shell translation V1", () => {
     expect(getLocaleDirection("en")).toBe("ltr");
   });
 
+  it("localizes landing join CTA (UAF-06) without hardcoding Arabic globally", () => {
+    expect(translate("en", "landing.joinCta")).toBe("Join UMTUBA");
+    expect(translate("ar", "landing.joinCta")).toBe("انضم إلى أم طوبا");
+    expect(translate("fr", "landing.joinCta")).toBe("Rejoindre UMTUBA");
+    expect(translate("en", "landing.startExploring")).toBe("Start Exploring");
+    expect(translate("ar", "landing.startExploring")).toBe("ابدأ الاستكشاف");
+  });
+
   it("persists locale via cookie helpers", () => {
     const cookie = buildLocaleDocumentCookie("ar");
     expect(cookie).toContain("umtuba_locale=ar");

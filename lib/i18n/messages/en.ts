@@ -98,4 +98,38 @@ export const enMessages: FoundationMessages = {
   "error.tryAgain": "Try again",
 
   "success.generic": "Done.",
+
+  "landing.joinCta": "Join UMTUBA",
+  "landing.startExploring": "Start Exploring",
+  "landing.goLive": "Go Live",
+  "landing.badge": "Alpha 0.2 · Built for a new generation",
+  "landing.headline": "The World Lives",
+  "landing.headlineAccent": "Here.",
+  "landing.subhead":
+    "Discover authentic videos, cultures, people, ideas, and opportunities from every corner of the world.",
+  "landing.worldsEyebrow": "The UMTUBA World",
+  "landing.worldsTitle": "More than watching.",
+  "landing.worldsTitleLine2": "A place to grow.",
+  "landing.openHomeFeed": "Open Home Feed",
+  "landing.missionEyebrow": "Our Mission",
+  "landing.missionTitle":
+    "Build the first social platform where every talent gets a chance.",
+  "landing.missionBody":
+    "UMTUBA starts with fun, discovery, and social energy — then gradually helps users discover ideas, collaborators, learning paths, and real opportunities.",
+  "landing.world.videos.title": "Videos",
+  "landing.world.videos.text": "Fast, creative moments built for discovery.",
+  "landing.world.challenges.title": "Challenges",
+  "landing.world.challenges.text": "Daily missions that make users come back.",
+  "landing.world.ai.title": "AI Companion",
+  "landing.world.ai.text": "A trusted guide that helps every talent grow.",
+  "landing.world.ideas.title": "Ideas",
+  "landing.world.ideas.text":
+    "Turn thoughts into projects, teams, and opportunities.",
+  "landing.world.global.title": "Global",
+  "landing.world.global.text": "A platform for creators without borders.",
+  "landing.world.opportunities.title": "Opportunities",
+  "landing.world.opportunities.text":
+    "Connect talent with real chances to move forward.",
+  "landing.focusLivingEarth": "Living Earth · focused on {city}",
+  "landing.focusExploring": "Living Earth · exploring {city}",
 };

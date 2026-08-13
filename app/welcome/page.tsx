@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { welcomeMetadata } from "../../lib/site/routeMetadata";
 import { APP_ROUTES } from "../lib/nav";
 import JoinBetaLink from "../components/landing/JoinBetaLink";
@@ -14,14 +16,41 @@ function LandingHeroFallback() {
 }
 
 /** Marketing landing — moved from `/` so Home can be the video feed. */
-export default function WelcomePage() {
+export default async function WelcomePage() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
+
   const worlds = [
-    { icon: "🎬", title: "Videos", text: "Fast, creative moments built for discovery." },
-    { icon: "🔥", title: "Challenges", text: "Daily missions that make users come back." },
-    { icon: "🤖", title: "AI Companion", text: "A trusted guide that helps every talent grow." },
-    { icon: "💡", title: "Ideas", text: "Turn thoughts into projects, teams, and opportunities." },
-    { icon: "🌍", title: "Global", text: "A platform for creators without borders." },
-    { icon: "🚀", title: "Opportunities", text: "Connect talent with real chances to move forward." },
+    {
+      icon: "🎬",
+      title: t("landing.world.videos.title"),
+      text: t("landing.world.videos.text"),
+    },
+    {
+      icon: "🔥",
+      title: t("landing.world.challenges.title"),
+      text: t("landing.world.challenges.text"),
+    },
+    {
+      icon: "🤖",
+      title: t("landing.world.ai.title"),
+      text: t("landing.world.ai.text"),
+    },
+    {
+      icon: "💡",
+      title: t("landing.world.ideas.title"),
+      text: t("landing.world.ideas.text"),
+    },
+    {
+      icon: "🌍",
+      title: t("landing.world.global.title"),
+      text: t("landing.world.global.text"),
+    },
+    {
+      icon: "🚀",
+      title: t("landing.world.opportunities.title"),
+      text: t("landing.world.opportunities.text"),
+    },
   ];
 
   return (
@@ -34,19 +63,19 @@ export default function WelcomePage() {
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.3em] text-blue-300">
-              The UMTUBA World
+              {t("landing.worldsEyebrow")}
             </p>
             <h2 className="mt-4 text-4xl font-black md:text-6xl">
-              More than watching.
+              {t("landing.worldsTitle")}
               <br />
-              A place to grow.
+              {t("landing.worldsTitleLine2")}
             </h2>
           </div>
           <Link
             href={APP_ROUTES.home}
             className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10"
           >
-            Open Home Feed
+            {t("landing.openHomeFeed")}
           </Link>
         </div>
 
@@ -67,19 +96,15 @@ export default function WelcomePage() {
       <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 md:px-12">
         <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.05] p-8 text-center backdrop-blur md:p-14">
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-emerald-300">
-            Beta Mission
+            {t("landing.missionEyebrow")}
           </p>
           <h2 className="mt-5 text-4xl font-black md:text-6xl">
-            Build the first social platform where every talent gets a chance.
+            {t("landing.missionTitle")}
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/60">
-            UMTUBA starts with fun, discovery, and social energy — then gradually
-            helps users discover ideas, collaborators, learning paths, and real
-            opportunities.
+            {t("landing.missionBody")}
           </p>
-          <JoinBetaLink className="mt-10 inline-flex rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]">
-            Join the Beta
-          </JoinBetaLink>
+          <JoinBetaLink className="mt-10 inline-flex rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]" />
         </div>
       </section>
 

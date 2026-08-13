@@ -98,4 +98,37 @@ export const arMessages: FoundationMessages = {
   "error.tryAgain": "حاول مرة أخرى",
 
   "success.generic": "تم.",
+
+  "landing.joinCta": "انضم إلى أم طوبا",
+  "landing.startExploring": "ابدأ الاستكشاف",
+  "landing.goLive": "البث المباشر",
+  "landing.badge": "ألفا 0.2 · مبني لجيل جديد",
+  "landing.headline": "العالم يعيش",
+  "landing.headlineAccent": "هنا.",
+  "landing.subhead":
+    "اكتشف فيديوهات وثقافات وأشخاصًا وأفكارًا وفرصًا حقيقية من كل مكان في العالم.",
+  "landing.worldsEyebrow": "عالم أم طوبا",
+  "landing.worldsTitle": "أكثر من مشاهدة.",
+  "landing.worldsTitleLine2": "مكان للنمو.",
+  "landing.openHomeFeed": "افتح الصفحة الرئيسية",
+  "landing.missionEyebrow": "مهمتنا",
+  "landing.missionTitle":
+    "ابنِ أول منصة اجتماعية يحصل فيها كل موهبة على فرصتها.",
+  "landing.missionBody":
+    "تبدأ أم طوبا بالمتعة والاكتشاف والطاقة الاجتماعية — ثم تساعد المستخدمين تدريجيًا على اكتشاف الأفكار والشركاء ومسارات التعلم والفرص الحقيقية.",
+  "landing.world.videos.title": "فيديوهات",
+  "landing.world.videos.text": "لحظات سريعة وإبداعية مصممة للاكتشاف.",
+  "landing.world.challenges.title": "تحديات",
+  "landing.world.challenges.text": "مهام يومية تجعل المستخدمين يعودون.",
+  "landing.world.ai.title": "رفيق الذكاء الاصطناعي",
+  "landing.world.ai.text": "دليل موثوق يساعد كل موهبة على النمو.",
+  "landing.world.ideas.title": "أفكار",
+  "landing.world.ideas.text": "حوّل الأفكار إلى مشاريع وفرق وفرص.",
+  "landing.world.global.title": "عالمي",
+  "landing.world.global.text": "منصة لصنّاع المحتوى بلا حدود.",
+  "landing.world.opportunities.title": "فرص",
+  "landing.world.opportunities.text":
+    "اربط المواهب بفرص حقيقية للمضي قدمًا.",
+  "landing.focusLivingEarth": "الأرض الحية · التركيز على {city}",
+  "landing.focusExploring": "الأرض الحية · استكشاف {city}",
 };

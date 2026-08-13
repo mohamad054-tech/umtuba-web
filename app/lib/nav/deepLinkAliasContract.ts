@@ -4,11 +4,9 @@
  * Frozen alias / deep-link contracts for Platform Navigation only.
  * No new routers, no canonical path renames — documents and tests the live behavior.
  *
- * Auth default decision (Clarity V1): keep `getSafeRedirectPath` fallback as
- * `/discover`. That path forever redirects to Home (`/`), so post-login already
- * lands on Discovery without rewriting callers, notification hrefs
- * (`/discover?post=`), or open-redirect tests. Changing the fallback to `/`
- * was evaluated as unnecessary (same destination after one redirect hop).
+ * Auth default decision (UAF-08): `getSafeRedirectPath` fallback is `/profile`
+ * (personal Profile). Discover forever-alias and `/discover?post=` deep links
+ * remain supported when explicitly requested via `?next=` or builders.
  *
  * @see docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md §2.5
  */
@@ -33,10 +31,10 @@ export const DISCOVER_ALIAS_QUERY_KEYS = [
 ] as const;
 
 /**
- * Auth `?next=` default — intentional Discover alias (equals Home after redirect).
+ * Auth `?next=` default — personal Profile resolver (UAF-08).
  * Must stay aligned with `getSafeRedirectPath` default in `lib/supabase/redirect.ts`.
  */
-export const AUTH_SAFE_REDIRECT_DEFAULT_PATH = APP_ROUTES.discover;
+export const AUTH_SAFE_REDIRECT_DEFAULT_PATH = APP_ROUTES.profile;
 
 /** Bare `/profile` index resolver path. */
 export const PROFILE_INDEX_RESOLVER_PATH = APP_ROUTES.profile;

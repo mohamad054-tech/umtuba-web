@@ -11,7 +11,7 @@ import {
 import { getSafeRedirectPath } from "../../../lib/supabase/redirect";
 import { createClient } from "../../../lib/supabase/server";
 
-const DEFAULT_POST_AUTH_PATH = "/discover";
+const DEFAULT_POST_AUTH_PATH = "/profile";
 
 function isPasswordResetNext(path: string): boolean {
   return (

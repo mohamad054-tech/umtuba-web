@@ -21,4 +21,7 @@ export const esMessages: FoundationMessages = {
   "status.error": "Algo salió mal. Inténtalo de nuevo.",
   "settings.language": "Idioma",
   "settings.languageDescription": "Elige el idioma usado en UMTUBA.",
+  "landing.joinCta": "Únete a UMTUBA",
+  "landing.startExploring": "Empezar a explorar",
+  "landing.goLive": "Salir en vivo",
 };

@@ -101,6 +101,36 @@ export type FoundationMessages = {
   "error.tryAgain": string;
 
   "success.generic": string;
+
+  /** Landing / welcome join + hero (UAF-03 / UAF-06). */
+  "landing.joinCta": string;
+  "landing.startExploring": string;
+  "landing.goLive": string;
+  "landing.badge": string;
+  "landing.headline": string;
+  "landing.headlineAccent": string;
+  "landing.subhead": string;
+  "landing.worldsEyebrow": string;
+  "landing.worldsTitle": string;
+  "landing.worldsTitleLine2": string;
+  "landing.openHomeFeed": string;
+  "landing.missionEyebrow": string;
+  "landing.missionTitle": string;
+  "landing.missionBody": string;
+  "landing.world.videos.title": string;
+  "landing.world.videos.text": string;
+  "landing.world.challenges.title": string;
+  "landing.world.challenges.text": string;
+  "landing.world.ai.title": string;
+  "landing.world.ai.text": string;
+  "landing.world.ideas.title": string;
+  "landing.world.ideas.text": string;
+  "landing.world.global.title": string;
+  "landing.world.global.text": string;
+  "landing.world.opportunities.title": string;
+  "landing.world.opportunities.text": string;
+  "landing.focusLivingEarth": string;
+  "landing.focusExploring": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

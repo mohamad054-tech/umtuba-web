@@ -27,10 +27,10 @@ const PROFILE_COLUMNS =
 /** PKCE email-confirm redirect — mirrors password-reset callback pattern. */
 export function buildEmailConfirmRedirectTo(
   origin: string,
-  nextPath = "/discover"
+  nextPath = "/profile"
 ): string {
   const base = origin.replace(/\/$/, "");
-  const next = encodeURIComponent(getSafeRedirectPath(nextPath, "/discover"));
+  const next = encodeURIComponent(getSafeRedirectPath(nextPath, "/profile"));
   return `${base}/auth/callback?next=${next}`;
 }
 
@@ -101,7 +101,7 @@ export async function signUpWithEmail(input: {
     typeof input.referralCode === "string"
       ? input.referralCode.trim().toUpperCase()
       : "";
-  const nextPath = getSafeRedirectPath(input.nextPath, "/discover");
+  const nextPath = getSafeRedirectPath(input.nextPath, "/profile");
 
   if (!fullName) {
     throw new Error("Please enter your full name.");
