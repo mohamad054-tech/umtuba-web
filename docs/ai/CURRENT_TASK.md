@@ -2,35 +2,32 @@
 
 ## Task title
 
-PC2 Remaining User Findings Implementation V1
-
-## Identity
-
-- **DEVICE** = PC2
-- **DEVICE_ROLE** = PLATFORM_USER_FINDINGS_PRIMARY
-- **TASK_ID** = `PC2_REMAINING_USER_FINDINGS_IMPLEMENTATION_V1`
-- **CENTRAL_COORDINATOR** = SERVER
-- **PRIORITY** = HIGH
+CENTRAL_IOS_PREBUILD_ENGINEERING_BLOCKERS_CLOSEOUT_V1 — STOP
 
 ## Status
 
-COMPLETE / STOP. Implementation on a fresh alpha-based branch. Awaiting Central fetch/review/deploy. Do not start another wave.
+`stop` — Phases 2–5 complete. Phase 1 `/support` deferred to auth-locale sibling (still 404; not shipped by this lane).
 
-## Authoritative base
-
-- **AUTHORITATIVE_BASE_SHA** = `4e075f996cdb4b86835b96ab57987aed924d2dc6` (`origin/alpha-0.2` / `origin/HEAD` after `git fetch --all --prune`)
-- **TASK_BRANCH** = `pc2/wp-qa-user-findings-v1`
-- **TASK_WORKTREE** = `worktrees/_pc2_wp_qa_user_findings`
-- **STALE_OFFICE_WORKTREE** = `office/platform-translation-trunk-port-v1` @ `2a146bb` — not used as integration base; SAVE_ALL / visual QA artifacts preserved
+```text
+TASK_ID=CENTRAL_IOS_PREBUILD_ENGINEERING_BLOCKERS_CLOSEOUT_V1
+SUPPORT=SKIPPED_COORDINATION__HTTP_404
+UGC_SOURCE_PARITY=YES @ 98819e33
+IOS_NEW_BINDING_SHA=eb0267a5d1cb6ef586184cc3d996449ea1842485
+IOS_ENGINEERING_READY_FOR_BUILD=YES
+IOS_BUILD_GO=NO_OPERATOR_CREDENTIALS
+DUPLICATE_MIGRATION_APPLY=NO
+64A2FDD_REWRITTEN=NO
+STOP=YES
+```
 
 ## Allowed scope
 
-WP-QA-01 / UAF-07 Explore This City; WP-QA-02 / UAF-09 World destination handoff (no fake hide); WP-QA-13 / UAF-01 Create chooser for supported types; UAF-11 live identity overlay (no bulk username migration). Docs for this TASK_ID.
+- Closeout report / mirrors / docs only (implementation closed)
 
 ## Forbidden scope
 
-Merge stale office into alpha. Reimplement UAF-02/03/05/06/08/12, i18n/search, AASA, Store financial, Android/iOS release. Remote migrations. AUTH_ENV fabrication. Push unless Central later requests it. Force-push / reset / clean preserved artifacts.
+- Re-apply 20260928 · amend/repush 64a2fdd · invent EAS READY · TestFlight/ASC · Play upload · Search reopen · Laptop wipe · live Stripe
 
-## Next
+## Canonical
 
-STOP. Central reviews `pc2/wp-qa-user-findings-v1`, fetches when ready, applies World migrations remotely if World runtime should leave the honest empty state, then deploys. PC2 does not self-select another wave.
+- `D:\umtuba-central\reports\UMTUBA_CENTRAL_IOS_PREBUILD_ENGINEERING_BLOCKERS_CLOSEOUT_V1.md`
