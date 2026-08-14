@@ -21,6 +21,7 @@ export {
   wrapSupabaseRpc,
   describeDraftImportRollbackContract,
   extractId,
+  mapQuestionPayload,
   type CourseImportRpcPort,
   type DraftCourseImportResult,
 } from "./executeDraftCourseImport";

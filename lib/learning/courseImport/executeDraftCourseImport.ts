@@ -4,10 +4,12 @@ import { LEARNING_LESSON_RPCS } from "../lessonsFoundation";
 import { LEARNING_LESSON_CONTENT_BLOCK_RPCS } from "../lessonContentBlocksFoundation";
 import { LEARNING_ACTIVITY_RPCS } from "../activitiesFoundation";
 import { LEARNING_COURSE_RESOURCE_RPCS } from "../courseResourcesFoundation";
+import { LEARNING_QUESTION_RPCS } from "../questionsFoundation";
 import { planCourseImport } from "./planCourseImport";
 import type {
   CourseImportFinding,
   CourseImportPlan,
+  CourseManifestQuestion,
   LearningCourseManifestV1,
 } from "./manifestTypes";
 
@@ -86,6 +88,7 @@ export async function executeDraftCourseImport(input: {
   let importRunId: string | null = null;
 
   for (const entity of plan.entities) {
+    // Question rows are created under activities but not yet in entity-map allowlist (20260918).
     if (entity.kind === "question") continue;
     const lookup = await input.rpc.rpc("lookup_learning_course_import_entity", {
       p_program_id: programId,
@@ -300,15 +303,71 @@ export async function executeDraftCourseImport(input: {
             activityId,
             importRunId
           );
-        }
-        if ((activity.questions ?? []).length > 0) {
+          // Persist READY graded questions into the activity (required for course import).
+          for (const [qIdx, question] of (activity.questions ?? []).entries()) {
+            const qPath = `course.sections[${sIdx}].lessons[${lIdx}].activities[${aIdx}].questions[${qIdx}]`;
+            const mapped = mapQuestionPayload(question);
+            if (!mapped.ok) {
+              findings.push({
+                severity: "ERROR",
+                code: "QUESTION_PAYLOAD_INVALID",
+                path: qPath,
+                message: mapped.message || "Invalid question payload",
+              });
+              return fail(plan, findings, created, mutationCount, courseId);
+            }
+            const questionRes = await input.rpc.rpc(LEARNING_QUESTION_RPCS.create, {
+              p_activity_id: activityId,
+              p_question_type: mapped.dbType,
+              p_content: mapped.content,
+              p_points: question.points ?? 1,
+            });
+            mutationCount += 1;
+            if (questionRes.error) {
+              findings.push({
+                severity: "ERROR",
+                code: "QUESTION_CREATE_FAILED",
+                path: qPath,
+                message: questionRes.error.message,
+              });
+              return fail(plan, findings, created, mutationCount, courseId);
+            }
+            const questionId = extractId(questionRes.data);
+            if (!questionId) {
+              findings.push({
+                severity: "ERROR",
+                code: "QUESTION_ID_MISSING",
+                path: qPath,
+                message: "create_learning_question returned no id",
+              });
+              return fail(plan, findings, created, mutationCount, courseId);
+            }
+            created[question.external_id] = questionId;
+            // Entity-map kind allowlist (20260918) is course…resource only — no 'question' yet.
+            // Persist questions + answer keys; remap/conflict for questions deferred to a later migration.
+            const keyRes = await input.rpc.rpc(LEARNING_QUESTION_RPCS.setAnswerKey, {
+              p_question_id: questionId,
+              p_answer_key: mapped.answerKey,
+            });
+            mutationCount += 1;
+            if (keyRes.error) {
+              findings.push({
+                severity: "ERROR",
+                code: "ANSWER_KEY_SET_FAILED",
+                path: qPath,
+                message: keyRes.error.message,
+              });
+              return fail(plan, findings, created, mutationCount, courseId);
+            }
+          }
+        } else if ((activity.questions ?? []).length > 0) {
           findings.push({
-            severity: "WARNING",
-            code: "QUESTIONS_DEFERRED",
-            path: `course.sections[${sIdx}].lessons[${lIdx}].activities[${aIdx}].questions`,
-            message:
-              "Activity created as draft; question persistence uses assessment authoring RPCs (follow-up)",
+            severity: "ERROR",
+            code: "ACTIVITY_ID_MISSING_FOR_QUESTIONS",
+            path: `course.sections[${sIdx}].lessons[${lIdx}].activities[${aIdx}]`,
+            message: "Cannot attach questions without activity id",
           });
+          return fail(plan, findings, created, mutationCount, courseId);
         }
       }
     }
@@ -410,12 +469,149 @@ function fail(
   };
 }
 
+type MappedQuestionPayload =
+  | {
+      ok: true;
+      dbType:
+        | "multiple_choice_single"
+        | "multiple_choice_multiple"
+        | "true_false"
+        | "short_answer";
+      content: Record<string, unknown>;
+      answerKey: Record<string, unknown>;
+    }
+  | { ok: false; message: string };
+
+/**
+ * Map Course Manifest V1 question shapes onto Learning Questions Foundation
+ * create + answer-key contracts. Correctness never lives in `content`.
+ */
+export function mapQuestionPayload(
+  question: CourseManifestQuestion & { correct_boolean?: boolean }
+): MappedQuestionPayload {
+  const prompt = question.prompt?.trim();
+  if (!prompt) {
+    return { ok: false, message: "question prompt is required" };
+  }
+
+  if (question.question_type === "single_choice") {
+    const choices = question.choices ?? [];
+    if (choices.length < 2) {
+      return { ok: false, message: "single_choice requires at least 2 choices" };
+    }
+    const correctIds = question.answer_key?.correct_choice_ids ?? [];
+    if (correctIds.length !== 1) {
+      return {
+        ok: false,
+        message: "single_choice requires exactly one correct_choice_id",
+      };
+    }
+    const correct = correctIds[0];
+    if (!choices.some((c) => c.id === correct)) {
+      return { ok: false, message: `unknown correct choice id ${correct}` };
+    }
+    return {
+      ok: true,
+      dbType: "multiple_choice_single",
+      content: {
+        prompt,
+        options: choices.map((c) => ({ key: c.id, text: c.label })),
+      },
+      answerKey: { correct_key: correct },
+    };
+  }
+
+  if (question.question_type === "multiple_choice") {
+    const choices = question.choices ?? [];
+    if (choices.length < 2) {
+      return {
+        ok: false,
+        message: "multiple_choice requires at least 2 choices",
+      };
+    }
+    const correctIds = question.answer_key?.correct_choice_ids ?? [];
+    if (correctIds.length < 1) {
+      return {
+        ok: false,
+        message: "multiple_choice requires correct_choice_ids",
+      };
+    }
+    for (const id of correctIds) {
+      if (!choices.some((c) => c.id === id)) {
+        return { ok: false, message: `unknown correct choice id ${id}` };
+      }
+    }
+    return {
+      ok: true,
+      dbType: "multiple_choice_multiple",
+      content: {
+        prompt,
+        options: choices.map((c) => ({ key: c.id, text: c.label })),
+      },
+      answerKey: { correct_keys: correctIds },
+    };
+  }
+
+  if (question.question_type === "true_false") {
+    let correct: boolean | null = null;
+    if (typeof question.correct_boolean === "boolean") {
+      correct = question.correct_boolean;
+    } else {
+      const texts = question.answer_key?.expected_texts ?? [];
+      const raw = texts[0]?.trim().toLowerCase();
+      if (raw === "true" || raw === "false") {
+        correct = raw === "true";
+      }
+    }
+    if (correct === null) {
+      return {
+        ok: false,
+        message: "true_false requires correct_boolean or expected_texts true/false",
+      };
+    }
+    return {
+      ok: true,
+      dbType: "true_false",
+      content: { prompt },
+      answerKey: { correct },
+    };
+  }
+
+  if (question.question_type === "short_text") {
+    const accepted = (question.answer_key?.expected_texts ?? [])
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (accepted.length < 1) {
+      return {
+        ok: false,
+        message: "short_text requires expected_texts for graded import",
+      };
+    }
+    return {
+      ok: true,
+      dbType: "short_answer",
+      content: { prompt },
+      answerKey: { accepted, normalization: { trim: true, case_sensitive: false } },
+    };
+  }
+
+  return { ok: false, message: `unsupported question_type` };
+}
+
 export function extractId(data: unknown): string | null {
   if (!data) return null;
   if (typeof data === "string") return data;
   if (typeof data === "object" && data !== null) {
     const row = data as Record<string, unknown>;
-    for (const key of ["id", "course_id", "section_id", "lesson_id", "block_id", "activity_id"]) {
+    for (const key of [
+      "id",
+      "course_id",
+      "section_id",
+      "lesson_id",
+      "block_id",
+      "activity_id",
+      "question_id",
+    ]) {
       if (typeof row[key] === "string") return row[key] as string;
     }
   }

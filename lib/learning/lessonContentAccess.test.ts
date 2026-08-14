@@ -318,6 +318,7 @@ describe("LessonViewer + lesson page wiring — no delivery bypass", () => {
     expect(src).toMatch(/delivery_kind:\s*"verified_full"/);
     expect(src).toMatch(/isVerifiedUnlockedLessonAccess/);
     expect(src).toMatch(/loadLessonDeliveryMetadata/);
+    expect(src).toMatch(/loadLessonDeliveryVerifiedFromEngine/);
     expect(src).toMatch(/loadLessonDeliveryProtected/);
     expect(src).toMatch(/loadLessonDeliveryForAccess/);
   });

@@ -1301,7 +1301,10 @@ async function loadLessonShellFields(
  */
 export function isVerifiedUnlockedLessonAccess(
   access: LearningLessonContentAccess
-): boolean {
+): access is Extract<
+  LearningLessonContentAccess,
+  { state: "verified_unlocked" }
+> {
   return (
     access.state === "verified_unlocked" && access.canRenderProtectedContent
   );
@@ -1331,6 +1334,10 @@ export async function loadLessonDeliveryMetadata(
 /**
  * Protected/full lesson delivery — call only after `verified_unlocked`.
  * Loads content blocks + activities and runs progress start/touch.
+ *
+ * Prefer `loadLessonDeliveryForAccess` on the learner lesson page: the viewer
+ * is engine-authoritative, and a second protected SELECT has timed out under
+ * PostgREST statement_timeout (mapped to a false Next.js 404).
  */
 export async function loadLessonDeliveryProtected(
   supabase: AnyClient,
@@ -1437,8 +1444,99 @@ export async function loadLessonDeliveryProtected(
 }
 
 /**
+ * Verified lesson shell for the learner page.
+ * Content comes from the already-authorized engine payload (LessonViewer
+ * contract). Avoids a second protected blocks/activities SELECT that can hit
+ * statement_timeout and was incorrectly surfaced as Next.js `notFound()`.
+ * Progress heartbeats are best-effort and never fail delivery.
+ */
+export async function loadLessonDeliveryVerifiedFromEngine(
+  supabase: AnyClient,
+  lessonId: string,
+  engine: LearningLessonEnginePayload
+): Promise<LearningDeliveryResult<LearningLearnerLessonProtectedDelivery>> {
+  const ctxResult = await loadLessonShellContext(supabase, lessonId);
+  if (!ctxResult.ok) return ctxResult;
+
+  const { lessonId: resolvedLessonId } = ctxResult.data;
+
+  // Best-effort heartbeats — never block render on statement_timeout.
+  void supabase
+    .rpc(LEARNING_PROGRESS_RPCS.startLesson, {
+      p_lesson_id: resolvedLessonId,
+    })
+    .then(({ error }) => {
+      if (error) {
+        console.error(
+          "[learning] startLesson heartbeat failed:",
+          error.message
+        );
+      }
+    });
+  void supabase
+    .rpc(LEARNING_PROGRESS_RPCS.touchLesson, {
+      p_lesson_id: resolvedLessonId,
+    })
+    .then(({ error }) => {
+      if (error) {
+        console.error(
+          "[learning] touchLesson heartbeat failed:",
+          error.message
+        );
+      }
+    });
+
+  const shell = await loadLessonShellFields(supabase, ctxResult.data);
+
+  const blocks = filterPublishedCreatableBlocks(
+    engine.blocks.map((block) => ({
+      id: block.id,
+      lesson_id: resolvedLessonId,
+      block_type: block.block_type,
+      status: block.status,
+      position: block.position,
+      content: block.content ?? {},
+      created_by: "",
+      updated_by: null,
+      created_at: "",
+      updated_at: "",
+      published_at: null,
+      suspended_at: null,
+      archived_at: null,
+    })) as LearningLessonContentBlock[]
+  );
+
+  const activities: LearningLearnerActivitySummary[] = engine.activities.map(
+    (activity, index) => ({
+      id: activity.id,
+      name: activity.name,
+      slug: activity.id,
+      type: activity.type,
+      description: null,
+      position: index,
+      hints: toLearnerActivityHints({
+        is_required: true,
+        max_attempts: null,
+        time_limit_seconds: null,
+      }),
+    })
+  );
+
+  return {
+    ok: true,
+    data: {
+      delivery_kind: "verified_full",
+      ...shell,
+      blocks,
+      activities,
+    },
+  };
+}
+
+/**
  * Engine-gated delivery loader.
- * Protected SELECTs + progress mutations only when access is verified_unlocked.
+ * Verified path: shell + best-effort progress from engine payload (no second
+ * protected content SELECT). Other access states: metadata-only.
  */
 export async function loadLessonDeliveryForAccess(
   supabase: AnyClient,
@@ -1446,7 +1544,11 @@ export async function loadLessonDeliveryForAccess(
   access: LearningLessonContentAccess
 ): Promise<LearningDeliveryResult<LearningLearnerLessonDelivery>> {
   if (isVerifiedUnlockedLessonAccess(access)) {
-    return loadLessonDeliveryProtected(supabase, lessonId);
+    return loadLessonDeliveryVerifiedFromEngine(
+      supabase,
+      lessonId,
+      access.engine
+    );
   }
   return loadLessonDeliveryMetadata(supabase, lessonId);
 }

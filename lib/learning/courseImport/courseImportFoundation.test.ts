@@ -134,6 +134,12 @@ describe("Learning Course Manifest Import Foundation V1", () => {
         if (fn === "create_learning_activity") {
           return { data: { id: "activity-1" }, error: null };
         }
+        if (fn === "create_learning_question") {
+          return { data: { question_id: `question-${calls.length}` }, error: null };
+        }
+        if (fn === "set_learning_question_answer_key") {
+          return { data: { ok: true }, error: null };
+        }
         if (fn === "create_learning_course_resource") {
           return { data: { id: "resource-1" }, error: null };
         }
@@ -159,8 +165,13 @@ describe("Learning Course Manifest Import Foundation V1", () => {
     expect(ok.course_id).toBe("course-1");
     expect(ok.mutation_count).toBeGreaterThan(0);
     expect(calls).toContain("create_learning_course");
+    expect(calls).toContain("create_learning_question");
+    expect(calls).toContain("set_learning_question_answer_key");
     expect(calls.some((c) => c.startsWith("publish_"))).toBe(false);
     expect(ok.findings.some((f) => f.code === "DRAFT_ONLY")).toBe(true);
+    expect(Object.keys(ok.created).some((k) => k.includes("question") || k.includes("quiz"))).toBe(
+      true
+    );
 
     // second import hits conflict
     const conflict = await executeDraftCourseImport({

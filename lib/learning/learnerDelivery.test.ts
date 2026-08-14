@@ -1525,6 +1525,46 @@ describe("Learner Delivery — defense-in-depth load paths", () => {
     ]);
   });
 
+  it("forAccess verified path uses engine payload — no second content SELECT", async () => {
+    const { client, tables, rpcs } = createTrackingClient();
+    const access = verifiedAccess();
+    access.engine!.blocks = [
+      {
+        id: BLOCK_ID,
+        block_type: "rich_text",
+        status: "published",
+        position: 0,
+        content: { body: "from engine" },
+      },
+    ];
+    access.engine!.activities = [
+      {
+        id: ACTIVITY_ID,
+        type: "quiz",
+        name: "Quiz",
+        status: "published",
+      },
+    ];
+    const result = await loadLessonDeliveryForAccess(
+      client as never,
+      LESSON_ID,
+      access
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.delivery_kind).toBe("verified_full");
+    if (result.data.delivery_kind !== "verified_full") return;
+    expect(result.data.blocks).toHaveLength(1);
+    expect(result.data.blocks[0]?.content).toEqual({ body: "from engine" });
+    expect(result.data.activities).toHaveLength(1);
+    expect(tables).not.toContain("learning_lesson_content_blocks");
+    expect(tables).not.toContain("learning_activities");
+    expect(rpcs).toEqual([
+      LEARNING_PROGRESS_RPCS.startLesson,
+      LEARNING_PROGRESS_RPCS.touchLesson,
+    ]);
+  });
+
   it("forAccess returns verified_full only for verified_unlocked", async () => {
     const { client, tables, rpcs } = createTrackingClient();
     const result = await loadLessonDeliveryForAccess(
@@ -1535,7 +1575,7 @@ describe("Learner Delivery — defense-in-depth load paths", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.delivery_kind).toBe("verified_full");
-    expect(tables).toContain("learning_lesson_content_blocks");
+    expect(tables).not.toContain("learning_lesson_content_blocks");
     expect(rpcs).toContain(LEARNING_PROGRESS_RPCS.startLesson);
   });
 

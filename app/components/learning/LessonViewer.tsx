@@ -1,7 +1,6 @@
 import Link from "next/link";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 import ContinueWatchingVideo from "./ContinueWatchingVideo";
-import ActivityList from "./ActivityList";
 import LessonNotesPanel from "./LessonNotesPanel";
 import LessonBookmarkControl from "./LessonBookmarkControl";
 import {
@@ -9,6 +8,12 @@ import {
   asVideoProvider,
   isSafeHttpUrl,
 } from "../../../lib/learning/contentBlockRender";
+import {
+  partitionLessonExperienceBlocks,
+  resolveLessonLabCards,
+  resolveLessonQuizCtas,
+  resolveLessonVideoSlot,
+} from "../../../lib/learning/lessonExperienceLayout";
 import {
   resolveLessonCompletionHandoff,
   LEARNING_LEARNER_ROUTES,
@@ -45,6 +50,8 @@ type LessonViewerProps = {
   engine?: LearningLessonEnginePayload | null;
   /** Initial bookmark state for verified canRender lessons only. */
   initialBookmarkSaved?: boolean;
+  /** Published question counts by quiz activity id (count-only). */
+  questionCountByActivityId?: Readonly<Record<string, number>>;
 };
 
 function toRenderableBlocks(
@@ -86,11 +93,58 @@ function toActivitySummaries(
   }));
 }
 
+function BlockStack({
+  blocks,
+  resumeSeconds,
+  resumeBlockId,
+  lessonId,
+}: {
+  blocks: LearningLessonContentBlock[];
+  resumeSeconds: number | null;
+  resumeBlockId: string | null;
+  lessonId: string;
+}) {
+  if (blocks.length === 0) return null;
+  const firstVideoId = blocks.find((b) => b.block_type === "video")?.id;
+  return (
+    <div className="space-y-4">
+      {blocks.map((block) => {
+        if (block.block_type === "video" && block.status === "published") {
+          const url = block.content?.url;
+          if (isSafeHttpUrl(url)) {
+            const useResume =
+              resumeBlockId === block.id ||
+              (!resumeBlockId && firstVideoId === block.id);
+            return (
+              <div key={block.id}>
+                <ContinueWatchingVideo
+                  src={url}
+                  lessonId={lessonId}
+                  contentBlockId={block.id}
+                  initialSeconds={useResume ? resumeSeconds : null}
+                  caption={asPlainString(block.content?.caption, 1000)}
+                  provider={asVideoProvider(block.content?.provider)}
+                />
+              </div>
+            );
+          }
+        }
+        return (
+          <div key={block.id}>
+            <ContentBlockRenderer block={block} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function LessonViewer({
   delivery,
   access: accessProp,
   engine = null,
   initialBookmarkSaved = false,
+  questionCountByActivityId,
 }: LessonViewerProps) {
   const access =
     accessProp ??
@@ -140,6 +194,14 @@ export default function LessonViewer({
     ? toActivitySummaries(verifiedEngine.activities)
     : [];
 
+  const layout = partitionLessonExperienceBlocks(blocks);
+  const videoSlot = resolveLessonVideoSlot(blocks);
+  const quizCtas = resolveLessonQuizCtas({
+    activities,
+    questionCountByActivityId,
+  });
+  const labCards = resolveLessonLabCards(activities);
+
   const gateMessage = locked
     ? access.message || LEARNING_LESSON_LOCKED_MESSAGE
     : verificationFailed
@@ -147,16 +209,21 @@ export default function LessonViewer({
       : null;
 
   return (
-    <div className="mt-6 space-y-6" data-testid="learning-lesson-viewer">
+    <div
+      className="mx-auto mt-6 w-full max-w-3xl space-y-8"
+      data-testid="learning-lesson-viewer"
+    >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {delivery.lesson.course_name}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        <h1 className="mt-1 text-3xl font-black tracking-tight md:text-4xl">
           {delivery.lesson.name}
         </h1>
         {delivery.lesson.description ? (
-          <p className="mt-2 text-sm text-white/50">{delivery.lesson.description}</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/50">
+            {delivery.lesson.description}
+          </p>
         ) : null}
         <p className="mt-3 text-xs text-white/40">
           Progress: {delivery.progress_status.replaceAll("_", " ")}
@@ -244,50 +311,200 @@ export default function LessonViewer({
 
       {canRender ? (
         <>
-          <section className="space-y-4" data-testid="learning-lesson-content">
+          <section
+            className="space-y-3"
+            data-testid="learning-lesson-video-slot"
+            aria-label="Lesson video"
+          >
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Content
+              Video
             </h2>
-            {blocks.length === 0 ? (
-              <p className="text-sm text-white/45">No published content blocks.</p>
-            ) : (
-              blocks.map((block) => {
-                if (block.block_type === "video" && block.status === "published") {
-                  const url = block.content?.url;
-                  if (isSafeHttpUrl(url)) {
-                    const useResume =
-                      resumeBlockId === block.id ||
-                      (!resumeBlockId &&
-                        blocks.find((b) => b.block_type === "video")?.id ===
-                          block.id);
-                    return (
-                      <div key={block.id}>
-                        <ContinueWatchingVideo
-                          src={url}
-                          lessonId={delivery.lesson.id}
-                          contentBlockId={block.id}
-                          initialSeconds={useResume ? resumeSeconds : null}
-                          caption={asPlainString(block.content?.caption, 1000)}
-                          provider={asVideoProvider(block.content?.provider)}
-                        />
-                      </div>
-                    );
-                  }
+            {videoSlot.kind === "playable" ? (
+              <ContinueWatchingVideo
+                src={videoSlot.url}
+                lessonId={delivery.lesson.id}
+                contentBlockId={videoSlot.block.id}
+                initialSeconds={
+                  resumeBlockId === videoSlot.block.id || !resumeBlockId
+                    ? resumeSeconds
+                    : null
                 }
-                return (
-                  <div key={block.id}>
-                    <ContentBlockRenderer block={block} />
-                  </div>
-                );
-              })
+                caption={videoSlot.caption ?? undefined}
+                provider={asVideoProvider(videoSlot.provider)}
+              />
+            ) : (
+              <div
+                className="flex aspect-video w-full flex-col items-center justify-center rounded-[24px] border border-dashed border-white/20 bg-gradient-to-b from-white/[0.06] to-transparent px-6 text-center"
+                data-testid="learning-lesson-video-coming-soon"
+                role="status"
+              >
+                <p className="text-lg font-black tracking-tight text-white/90">
+                  Video lesson coming soon
+                </p>
+                <p className="mt-2 max-w-md text-sm text-white/50">
+                  Narration script and visual plan are ready. A playable video
+                  will appear here when the media asset is published.
+                </p>
+              </div>
             )}
           </section>
 
-          <section className="space-y-3">
+          <section
+            className="space-y-4"
+            data-testid="learning-lesson-content"
+            aria-label="Lesson content"
+          >
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Activities
+              Lesson content
             </h2>
-            <ActivityList activities={activities} />
+            {layout.main.length === 0 ? (
+              <p className="text-sm text-white/45">No published lesson body yet.</p>
+            ) : (
+              <BlockStack
+                blocks={layout.main}
+                resumeSeconds={resumeSeconds}
+                resumeBlockId={resumeBlockId}
+                lessonId={delivery.lesson.id}
+              />
+            )}
+          </section>
+
+          {layout.transcripts.length > 0 ||
+          layout.supporting.length > 0 ||
+          layout.resources.length > 0 ? (
+            <section className="space-y-3" aria-label="Supporting materials">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Supporting materials
+              </h2>
+              {layout.transcripts.map((block) => (
+                <details
+                  key={block.id}
+                  className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3"
+                  data-testid="learning-lesson-transcript"
+                >
+                  <summary className="cursor-pointer text-sm font-bold text-white/80">
+                    Transcript / narration script
+                  </summary>
+                  <div className="mt-3">
+                    <ContentBlockRenderer block={block} />
+                  </div>
+                </details>
+              ))}
+              {layout.supporting.length > 0 ? (
+                <details className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  <summary className="cursor-pointer text-sm font-bold text-white/80">
+                    Checkpoints & production notes
+                  </summary>
+                  <div className="mt-3 space-y-4">
+                    <BlockStack
+                      blocks={layout.supporting}
+                      resumeSeconds={null}
+                      resumeBlockId={null}
+                      lessonId={delivery.lesson.id}
+                    />
+                  </div>
+                </details>
+              ) : null}
+              {layout.resources.length > 0 ? (
+                <div className="space-y-3" data-testid="learning-lesson-resources">
+                  <h3 className="text-sm font-bold text-white/70">Resources</h3>
+                  <BlockStack
+                    blocks={layout.resources}
+                    resumeSeconds={null}
+                    resumeBlockId={null}
+                    lessonId={delivery.lesson.id}
+                  />
+                </div>
+              ) : null}
+            </section>
+          ) : null}
+
+          <section
+            className="space-y-3"
+            data-testid="learning-lesson-lab"
+            aria-label="Lab"
+          >
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Lab
+            </h2>
+            {layout.labContent.length > 0 ? (
+              <BlockStack
+                blocks={layout.labContent}
+                resumeSeconds={null}
+                resumeBlockId={null}
+                lessonId={delivery.lesson.id}
+              />
+            ) : null}
+            {labCards.length === 0 ? (
+              <p className="text-sm text-white/45">No lab activity for this lesson.</p>
+            ) : (
+              <ul className="space-y-2">
+                {labCards.map((lab) => (
+                  <li key={lab.activity_id}>
+                    <Link
+                      href={lab.href}
+                      className="watch-focus-ring block rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-4 transition hover:border-sky-300/40"
+                      data-testid={`learning-lesson-lab-cta-${lab.activity_id}`}
+                    >
+                      <p className="font-bold text-white/90">{lab.name}</p>
+                      {lab.description ? (
+                        <p className="mt-1 text-sm text-white/50">{lab.description}</p>
+                      ) : (
+                        <p className="mt-1 text-sm text-white/50">
+                          Open the lab workspace for this lesson.
+                        </p>
+                      )}
+                      <p className="mt-3 text-sm font-bold text-sky-300">Open lab →</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section
+            className="space-y-3"
+            data-testid="learning-lesson-quiz"
+            aria-label="Quiz"
+          >
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Quiz / assessment
+            </h2>
+            {quizCtas.length === 0 ? (
+              <p className="text-sm text-white/45">No quiz for this lesson yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {quizCtas.map((quiz) => (
+                  <li key={quiz.activity_id}>
+                    <div
+                      className="rounded-[24px] border border-sky-400/25 bg-sky-500/10 px-5 py-5"
+                      data-testid={`learning-lesson-quiz-card-${quiz.activity_id}`}
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-sky-100/70">
+                        Lesson quiz
+                      </p>
+                      <p className="mt-1 text-lg font-black text-white">{quiz.name}</p>
+                      <p className="mt-2 text-sm text-white/60">
+                        {quiz.question_count != null
+                          ? `${quiz.question_count} question${
+                              quiz.question_count === 1 ? "" : "s"
+                            }`
+                          : "Questions available"}
+                        {" · "}
+                        {quiz.attempt_label}
+                      </p>
+                      <Link
+                        href={quiz.href}
+                        className="watch-focus-ring mt-4 inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+                        data-testid={`learning-lesson-quiz-cta-${quiz.activity_id}`}
+                      >
+                        {quiz.cta_label}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           <LessonNotesPanel lessonId={delivery.lesson.id} />
@@ -345,13 +562,13 @@ export default function LessonViewer({
       {hasNav ? (
         <nav
           aria-label="Lesson navigation"
-          className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4"
+          className="sticky bottom-4 z-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/10 bg-[#080816]/95 px-4 py-3 backdrop-blur-xl md:static md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none md:border-t md:border-white/10 md:pt-4"
           data-testid="learning-lesson-nav"
         >
           {delivery.previous_lesson ? (
             <Link
               href={delivery.previous_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              className="watch-focus-ring text-sm font-bold text-white/70 hover:text-white"
               data-testid="learning-lesson-nav-prev"
             >
               ← Previous
@@ -362,7 +579,7 @@ export default function LessonViewer({
           {delivery.next_lesson ? (
             <Link
               href={delivery.next_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              className="watch-focus-ring text-sm font-bold text-white/70 hover:text-white"
               data-testid="learning-lesson-nav-next"
             >
               Next →

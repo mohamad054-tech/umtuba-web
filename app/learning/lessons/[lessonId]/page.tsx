@@ -9,6 +9,7 @@ import {
 } from "../../../../lib/learning/learnerDelivery";
 import { loadMyLearningLessonEngine } from "../../../../lib/learning/lessonEngineFoundation";
 import { getMyLearningLessonBookmarkState } from "../../../../lib/learning/lessonBookmarksFoundation";
+import { loadPublishedQuestionCountsByActivityIds } from "../../../../lib/learning/learnerQuizQuestionCounts";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 
 export const dynamic = "force-dynamic";
@@ -57,10 +58,20 @@ export default async function LearningLessonPage({
     access
   );
   if (!delivery.ok) {
+    console.error(
+      "[learning/lessons] delivery failed → notFound()",
+      JSON.stringify({
+        lessonId,
+        accessState: access.state,
+        deliveryMessage: delivery.message,
+        canRenderProtectedContent: access.canRenderProtectedContent,
+      })
+    );
     notFound();
   }
 
   let initialBookmarkSaved = false;
+  const questionCountByActivityId: Record<string, number> = {};
   if (access.canRenderProtectedContent) {
     const bookmarkState = await getMyLearningLessonBookmarkState(
       supabase,
@@ -68,6 +79,22 @@ export default async function LearningLessonPage({
     );
     if (bookmarkState.ok) {
       initialBookmarkSaved = bookmarkState.data.saved;
+    }
+
+    const quizIds =
+      access.state === "verified_unlocked"
+        ? access.engine.activities
+            .filter((a) => a.type === "quiz")
+            .map((a) => a.id)
+        : [];
+    if (quizIds.length > 0) {
+      const counts = await loadPublishedQuestionCountsByActivityIds(
+        supabase,
+        quizIds
+      );
+      for (const [id, n] of counts) {
+        questionCountByActivityId[id] = n;
+      }
     }
   }
 
@@ -109,6 +136,7 @@ export default async function LearningLessonPage({
         delivery={delivery.data}
         access={access}
         initialBookmarkSaved={initialBookmarkSaved}
+        questionCountByActivityId={questionCountByActivityId}
       />
     </LearningShell>
   );

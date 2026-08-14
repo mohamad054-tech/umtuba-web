@@ -117,6 +117,8 @@ describe("Learner UI contract — LessonViewer", () => {
     expect(VIEWER).toMatch(/data-testid="learning-lesson-nav"/);
     expect(VIEWER).toMatch(/data-testid="learning-lesson-nav-prev"/);
     expect(VIEWER).toMatch(/data-testid="learning-lesson-nav-next"/);
+    expect(VIEWER).toMatch(/data-testid="learning-lesson-video-slot"/);
+    expect(VIEWER).toMatch(/data-testid="learning-lesson-quiz"/);
   });
 
   it("renders protected content only from verified unlocked engine blocks", () => {
@@ -128,6 +130,7 @@ describe("Learner UI contract — LessonViewer", () => {
     );
     expect(VIEWER).toMatch(/ContentBlockRenderer block=\{block\}/);
     expect(VIEWER).toMatch(/Never fall back to delivery SELECT/);
+    expect(VIEWER).toMatch(/partitionLessonExperienceBlocks/);
   });
 
   it("presents progress/current state and completion handoff rules", () => {
