@@ -39,7 +39,7 @@ export function buildUserMenuGroups(
     youItems.push({
       id: "create",
       label: "Create",
-      href: APP_ROUTES.createVideo,
+      href: APP_ROUTES.create,
     });
   }
 

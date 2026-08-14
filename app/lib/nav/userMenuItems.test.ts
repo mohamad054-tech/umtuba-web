@@ -37,7 +37,7 @@ describe("userMenuItems — Capability Links V1", () => {
       "/profile/demo_user",
       USER_MENU_CAPABILITIES_SIGNED_IN_BASE
     );
-    expect(hrefs).toContain(APP_ROUTES.createVideo);
+    expect(hrefs).toContain(APP_ROUTES.create);
     expect(hrefs).toContain(APP_ROUTES.advertise);
     expect(hrefs).not.toContain(APP_ROUTES.seller);
     expect(hrefs).not.toContain(LEARNING_INSTRUCTOR_ROUTES.hub);

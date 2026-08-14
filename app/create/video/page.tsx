@@ -30,10 +30,10 @@ export default async function CreateVideoPage() {
         subtitle="Upload to Discover"
         actions={
           <Link
-            href={APP_ROUTES.discover}
+            href={APP_ROUTES.create}
             className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
           >
-            Back to Discover
+            Back to Create
           </Link>
         }
       />

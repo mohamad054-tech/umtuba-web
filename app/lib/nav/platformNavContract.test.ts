@@ -86,7 +86,7 @@ describe("Platform Navigation Contract Sync V1", () => {
         "/profile/contract_user",
         USER_MENU_CAPABILITIES_SIGNED_IN_BASE
       );
-      expect(hrefs).toContain(APP_ROUTES.createVideo);
+      expect(hrefs).toContain(APP_ROUTES.create);
       expect(hrefs).toContain(APP_ROUTES.store);
       expect(hrefs).toContain(APP_ROUTES.advertise);
       expect(hrefs).not.toContain(APP_ROUTES.seller);
@@ -106,7 +106,7 @@ describe("Platform Navigation Contract Sync V1", () => {
         APP_ROUTES.worldDiscovery,
         APP_ROUTES.search,
         APP_ROUTES.messages,
-        APP_ROUTES.createVideo,
+        APP_ROUTES.create,
       ]);
       const circles = read("app/discover/components/HomeSectionCircles.tsx");
       expect(circles).toMatch(/aria-label="Section shortcuts"/);
@@ -118,7 +118,7 @@ describe("Platform Navigation Contract Sync V1", () => {
       const worldIdx = circles.indexOf("APP_ROUTES.worldDiscovery");
       const searchIdx = circles.indexOf("APP_ROUTES.search");
       const messagesIdx = circles.indexOf("APP_ROUTES.messages");
-      const createIdx = circles.indexOf("APP_ROUTES.createVideo");
+      const createIdx = circles.indexOf("APP_ROUTES.create");
       expect(learningIdx).toBeGreaterThan(-1);
       expect(storeIdx).toBeGreaterThan(learningIdx);
       expect(gamesIdx).toBeGreaterThan(storeIdx);

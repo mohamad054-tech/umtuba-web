@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { discoverWorldPlacesAction } from "../actions/worldDiscovery";
 import ExternalDirectionsLink from "../components/world/ExternalDirectionsLink";
 import {
@@ -185,7 +185,17 @@ export default function WorldDiscoveryClient({
     );
   }
 
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (autoStarted.current) return;
+    if (!databaseReady || !flags.worldDiscoveryEnabled) return;
+    if (!initialCitySlug || !cityId) return;
+    autoStarted.current = true;
+    runDestinationDiscovery();
+  }, [databaseReady, flags.worldDiscoveryEnabled, initialCitySlug, cityId]);
+
   if (!databaseReady || !flags.worldDiscoveryEnabled) {
+    const requestedCity = initialCitySlug?.trim() || null;
     return (
       <div className="space-y-4">
         <p
@@ -196,9 +206,24 @@ export default function WorldDiscoveryClient({
             ? "World Discovery is prepared but disabled pending platform approval."
             : "World Discovery database migrations are not available in this environment yet."}
         </p>
+        {requestedCity ? (
+          <p className="text-sm text-white/70">
+            Requested destination:{" "}
+            <span className="font-bold text-white">{requestedCity}</span>. City
+            explorer controls stay hidden until World data is available.
+          </p>
+        ) : null}
         <p className="text-sm text-white/45">
           No location permission is requested while Discovery is unavailable.
         </p>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/"
+            className="watch-focus-ring rounded-full border border-white/15 px-4 py-2 text-sm font-bold"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
     );
   }

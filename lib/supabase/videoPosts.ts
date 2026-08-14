@@ -367,6 +367,87 @@ export async function enrichAuthorUserIdsFromProfiles(
   });
 }
 
+export type LiveAuthorProfile = {
+  id: string;
+  username: string | null;
+  display_name?: string | null;
+  full_name?: string | null;
+  avatar_initial?: string | null;
+};
+
+/** Overlay live profile identity onto snapshotted post author fields. */
+export function applyLiveAuthorIdentity(
+  posts: PublicPostDTO[],
+  profiles: LiveAuthorProfile[]
+): PublicPostDTO[] {
+  const byId = new Map<string, LiveAuthorProfile>();
+  for (const row of profiles) {
+    if (isUuid(row.id) && row.username?.trim()) {
+      byId.set(row.id.trim(), row);
+    }
+  }
+
+  return posts.map((post) => {
+    const rawUserId = post.user_id;
+    const userId = rawUserId && isUuid(rawUserId) ? rawUserId.trim() : "";
+    if (!userId) {
+      return post;
+    }
+    const live = byId.get(userId);
+    if (!live?.username?.trim()) {
+      return post;
+    }
+    const username = live.username.startsWith("@")
+      ? live.username
+      : `@${live.username}`;
+    const name =
+      (live.display_name || live.full_name || post.author_name || "").trim() ||
+      post.author_name;
+    return {
+      ...post,
+      author_username: username,
+      author_name: name,
+      author_avatar: live.avatar_initial || post.author_avatar,
+    };
+  });
+}
+
+/**
+ * Prefer current profiles.username / display name over post snapshots.
+ * Does not rewrite stored post rows (no bulk migration).
+ */
+export async function enrichAuthorIdentityFromProfiles(
+  supabase: SupabaseClient,
+  posts: PublicPostDTO[]
+): Promise<PublicPostDTO[]> {
+  const ids = Array.from(
+    new Set(
+      posts
+        .map((post) => {
+          const userId = post.user_id;
+          return userId && isUuid(userId) ? userId.trim() : "";
+        })
+        .filter(Boolean)
+    )
+  );
+
+  if (ids.length === 0) {
+    return posts;
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, full_name, avatar_initial")
+    .in("id", ids);
+
+  if (error) {
+    console.error("Unable to overlay live author identity:", error);
+    return posts;
+  }
+
+  return applyLiveAuthorIdentity(posts, (data ?? []) as LiveAuthorProfile[]);
+}
+
 export function applyViewerStateToPosts(
   posts: PublicPostDTO[],
   viewerState: Map<number, { likedByMe: boolean; savedByMe: boolean }>

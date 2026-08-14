@@ -20,6 +20,7 @@ export const APP_ROUTES = {
   privacy: "/privacy",
   accountDeletion: "/account-deletion",
   profile: "/profile",
+  create: "/create",
   createVideo: "/create/video",
   createArticle: "/create/article",
   postJourney: "/post-journey",
@@ -136,13 +137,17 @@ export function buildDiscoverCityHref(city: string, country?: string): string {
   return `${APP_ROUTES.discover}?${params.toString()}`;
 }
 
-/** Discover / Live → Living Earth focused on a city (mock). */
+/**
+ * Home "Explore this city" / leftover `?focus=` → World destination explorer.
+ * World already accepts `?city=`; Home historically ignored `?focus=`.
+ */
 export function buildHomeCityFocusHref(city: string): string {
-  const params = new URLSearchParams({
-    focus: normalizeCityKey(city) || city.trim(),
-  });
-
-  return `${APP_ROUTES.home}?${params.toString()}`;
+  const slug = normalizeCityKey(city) || city.trim();
+  if (!slug) {
+    return APP_ROUTES.worldDiscovery;
+  }
+  const params = new URLSearchParams({ city: slug });
+  return `${APP_ROUTES.worldDiscovery}?${params.toString()}`;
 }
 
 /** Normalize a creator handle/username for `/profile/[username]`. */

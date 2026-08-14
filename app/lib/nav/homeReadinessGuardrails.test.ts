@@ -89,7 +89,7 @@ describe("Home Readiness Guardrails V1", () => {
       APP_ROUTES.worldDiscovery,
       APP_ROUTES.search,
       APP_ROUTES.messages,
-      APP_ROUTES.createVideo,
+      APP_ROUTES.create,
     ]);
   });
 

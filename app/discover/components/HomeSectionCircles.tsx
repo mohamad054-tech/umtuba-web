@@ -9,7 +9,7 @@ const SECTIONS = [
   { label: "World", href: APP_ROUTES.worldDiscovery, emoji: "🌍" },
   { label: "Search", href: APP_ROUTES.search, emoji: "🔎" },
   { label: "Messages", href: APP_ROUTES.messages, emoji: "💬" },
-  { label: "Create", href: APP_ROUTES.createVideo, emoji: "➕" },
+  { label: "Create", href: APP_ROUTES.create, emoji: "➕" },
 ] as const;
 
 export default function HomeSectionCircles() {

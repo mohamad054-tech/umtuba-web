@@ -48,10 +48,10 @@ export default async function CreateArticlePage({ searchParams }: PageProps) {
         sticky
         actions={
           <Link
-            href={APP_ROUTES.createVideo}
+            href={APP_ROUTES.create}
             className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold"
           >
-            Upload video first
+            Back to Create
           </Link>
         }
       />

@@ -21,6 +21,7 @@ import {
   applyViewerStateToPosts,
   attachPlaybackUrls,
   createVideoSignedUrl,
+  enrichAuthorIdentityFromProfiles,
   enrichAuthorUserIdsFromProfiles,
   isMissingArticleIdColumnError,
   mapVideoPostToDiscover,
@@ -138,9 +139,13 @@ export async function loadCanonicalVideoFeedPage(input?: {
     const hasMore = rows.length > limit;
     const pageRows = hasMore ? rows.slice(0, limit) : rows;
     const withUrls = await attachPlaybackUrls(supabase, pageRows);
-    const withAuthors = await enrichAuthorUserIdsFromProfiles(
+    const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
       supabase,
       withUrls
+    );
+    const withAuthors = await enrichAuthorIdentityFromProfiles(
+      supabase,
+      withAuthorIds
     );
     const viewerState = await loadViewerInteractionState(
       supabase,
@@ -335,9 +340,13 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
       });
     });
     const withUrls = await attachPlaybackUrls(supabase, rows);
-    const withAuthors = await enrichAuthorUserIdsFromProfiles(
+    const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
       supabase,
       withUrls
+    );
+    const withAuthors = await enrichAuthorIdentityFromProfiles(
+      supabase,
+      withAuthorIds
     );
     const viewerState = await loadViewerInteractionState(
       supabase,
