@@ -19,6 +19,7 @@ export const APP_ROUTES = {
   terms: "/terms",
   privacy: "/privacy",
   accountDeletion: "/account-deletion",
+  support: "/support",
   profile: "/profile",
   create: "/create",
   createVideo: "/create/video",

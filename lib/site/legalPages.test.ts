@@ -13,7 +13,7 @@ import {
   TERMS_SECTIONS,
 } from "../legal/legalDocuments";
 import { SITEMAP_STATIC_ROUTES } from "./indexing";
-import { privacyMetadata, termsMetadata, accountDeletionMetadata } from "./routeMetadata";
+import { privacyMetadata, termsMetadata, accountDeletionMetadata, supportMetadata } from "./routeMetadata";
 
 const ROOT = process.cwd();
 
@@ -22,36 +22,46 @@ function readRepo(relativePath: string): string {
 }
 
 describe("Legal Pages V1 routes and public access", () => {
-  it("exposes /terms, /privacy, and /account-deletion app routes", () => {
+  it("exposes /terms, /privacy, /account-deletion, and /support app routes", () => {
     expect(APP_ROUTES.terms).toBe("/terms");
     expect(APP_ROUTES.privacy).toBe("/privacy");
     expect(APP_ROUTES.accountDeletion).toBe("/account-deletion");
+    expect(APP_ROUTES.support).toBe("/support");
     expect(existsSync(join(ROOT, "app/terms/page.tsx"))).toBe(true);
     expect(existsSync(join(ROOT, "app/privacy/page.tsx"))).toBe(true);
     expect(existsSync(join(ROOT, "app/account-deletion/page.tsx"))).toBe(true);
+    expect(existsSync(join(ROOT, "app/support/page.tsx"))).toBe(true);
   });
 
   it("keeps legal pages outside auth-protected prefixes", () => {
     expect(isProtectedPath("/terms")).toBe(false);
     expect(isProtectedPath("/privacy")).toBe(false);
     expect(isProtectedPath("/account-deletion")).toBe(false);
+    expect(isProtectedPath("/support")).toBe(false);
     expect(PROTECTED_PREFIXES).not.toContain("/terms");
     expect(PROTECTED_PREFIXES).not.toContain("/privacy");
     expect(PROTECTED_PREFIXES).not.toContain("/account-deletion");
+    expect(PROTECTED_PREFIXES).not.toContain("/support");
   });
 
   it("indexes legal pages in sitemap and route metadata", () => {
     expect(SITEMAP_STATIC_ROUTES).toContain("/terms");
     expect(SITEMAP_STATIC_ROUTES).toContain("/privacy");
     expect(SITEMAP_STATIC_ROUTES).toContain("/account-deletion");
+    expect(SITEMAP_STATIC_ROUTES).toContain("/support");
     expect(termsMetadata.alternates?.canonical).toBe("/terms");
     expect(privacyMetadata.alternates?.canonical).toBe("/privacy");
     expect(accountDeletionMetadata.alternates?.canonical).toBe(
       "/account-deletion"
     );
+    expect(supportMetadata.alternates?.canonical).toBe("/support");
     expect(termsMetadata.robots).toMatchObject({ index: true, follow: true });
     expect(privacyMetadata.robots).toMatchObject({ index: true, follow: true });
     expect(accountDeletionMetadata.robots).toMatchObject({
+      index: true,
+      follow: true,
+    });
+    expect(supportMetadata.robots).toMatchObject({
       index: true,
       follow: true,
     });
@@ -63,8 +73,8 @@ describe("Legal Pages V1 signup and document contracts", () => {
     const signup = readRepo("app/signup/SignupForm.tsx");
     expect(signup).toMatch(/APP_ROUTES\.terms/);
     expect(signup).toMatch(/APP_ROUTES\.privacy/);
-    expect(signup).toMatch(/Terms of Use/);
-    expect(signup).toMatch(/Privacy Policy/);
+    expect(signup).toMatch(/auth\.signup\.termsOfUse/);
+    expect(signup).toMatch(/auth\.signup\.privacyPolicy/);
     expect(signup).not.toMatch(
       /I accept UMTUBA's terms of use and privacy practices\./
     );
@@ -72,7 +82,7 @@ describe("Legal Pages V1 signup and document contracts", () => {
 
   it("keeps beta notice and avoids invented legal contact or E2E claims", () => {
     expect(LEGAL_BETA_NOTICE.toLowerCase()).toContain("beta");
-    expect(LEGAL_CONTACT_LINE).toMatch(/contact method provided on UMTUBA/i);
+    expect(LEGAL_CONTACT_LINE).toMatch(/\/support/i);
     const termsBlob = TERMS_SECTIONS.map((s) => s.paragraphs.join(" ")).join(
       " "
     );

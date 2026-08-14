@@ -15,7 +15,7 @@ describe("SignupForm UX contract (UAF-02)", () => {
     expect(signupSrc).toMatch(/validatePassword/);
     expect(signupSrc).toMatch(/acceptTerms/);
     expect(signupSrc).toMatch(/revealable/);
-    expect(signupSrc).toMatch(/Check your email/);
+    expect(signupSrc).toMatch(/auth\.signup\.checkEmailTitle/);
     expect(signupSrc).toMatch(/APP_ROUTES\.profile/);
     // Must not weaken uniqueness / password / terms gates.
     expect(signupSrc).toMatch(/isValidUsername/);

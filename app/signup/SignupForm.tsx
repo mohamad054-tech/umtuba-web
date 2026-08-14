@@ -9,6 +9,7 @@ import {
   AuthField,
   AuthShell,
 } from "../components/auth";
+import { useTranslation } from "../components/i18n";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signUpWithEmail } from "../../lib/supabase/auth";
@@ -45,6 +46,7 @@ export default function SignupForm({
 }: SignupFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const referralCode =
     normalizeReferralCode(
       searchParams.get("ref") || searchParams.get("invite")
@@ -204,13 +206,13 @@ export default function SignupForm({
   if (pendingEmailConfirm) {
     return (
       <AuthShell
-        title="Check your email"
-        subtitle="Confirm your address to finish creating your account."
-        panelTitle="One more step."
-        panelBody="We sent a confirmation link. Open it on this device to sign in securely — your password stays private."
+        title={t("auth.signup.checkEmailTitle")}
+        subtitle={t("auth.signup.checkEmailSubtitle")}
+        panelTitle={t("auth.signup.checkEmailPanelTitle")}
+        panelBody={t("auth.signup.checkEmailPanelBody")}
         footer={
           <p className="text-center text-sm text-white/50">
-            Wrong email?{" "}
+            {t("auth.signup.wrongEmail")}{" "}
             <button
               type="button"
               className="font-bold text-blue-200 transition hover:text-blue-100"
@@ -220,7 +222,7 @@ export default function SignupForm({
                 setStep(1);
               }}
             >
-              Edit signup details
+              {t("auth.signup.editDetails")}
             </button>
           </p>
         }
@@ -228,8 +230,8 @@ export default function SignupForm({
         <div className="space-y-4">
           <AuthAlert tone="info">
             Account reserved{successUsername ? ` for @${successUsername}` : ""}.
-            Confirm the email sent to <span className="font-semibold">{email.trim()}</span>,
-            then sign in.
+            Confirm the email sent to{" "}
+            <span className="font-semibold">{email.trim()}</span>, then sign in.
           </AuthAlert>
 
           <Link
@@ -240,7 +242,7 @@ export default function SignupForm({
             }
             className="watch-focus-ring flex w-full items-center justify-center rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90"
           >
-            Go to sign in
+            {t("auth.signup.goToSignIn")}
           </Link>
         </div>
       </AuthShell>
@@ -252,23 +254,23 @@ export default function SignupForm({
     const continueHref = nextPath;
     const continueLabel =
       nextPath === APP_ROUTES.profile
-        ? "Continue to Profile"
-        : "Continue where you left off";
+        ? t("auth.signup.continueProfile")
+        : t("auth.signup.continueLeftOff");
 
     return (
       <AuthShell
-        title="You're in"
-        subtitle="Your UMTUBA account is ready."
-        panelTitle="Welcome to UMTUBA."
-        panelBody="Your profile was created. Continue to your destination or open your profile."
+        title={t("auth.signup.youreInTitle")}
+        subtitle={t("auth.signup.youreInSubtitle")}
+        panelTitle={t("auth.signup.welcomePanelTitle")}
+        panelBody={t("auth.signup.welcomePanelBody")}
         footer={
           <p className="text-center text-sm text-white/50">
-            Prefer the feed?{" "}
+            {t("auth.signup.preferFeed")}{" "}
             <Link
               href={APP_ROUTES.discover}
               className="font-bold text-blue-200 transition hover:text-blue-100"
             >
-              Open Home
+              {t("auth.signup.openHome")}
             </Link>
           </p>
         }
@@ -290,7 +292,7 @@ export default function SignupForm({
             href={profileHref}
             className="watch-focus-ring flex w-full items-center justify-center rounded-2xl border border-white/10 py-4 font-bold transition hover:bg-white/10"
           >
-            View profile
+            {t("auth.signup.viewProfile")}
           </Link>
         </div>
       </AuthShell>
@@ -304,30 +306,30 @@ export default function SignupForm({
 
   return (
     <AuthShell
-      title="Create account"
-      subtitle="Two quick steps — credentials first, then your profile."
+      title={t("auth.signup.title")}
+      subtitle={t("auth.signup.subtitle")}
       footer={
         <p className="text-center text-sm text-white/50">
-          Already have an account?{" "}
+          {t("auth.signup.haveAccount")}{" "}
           <Link
             href={loginHref}
             className="font-bold text-blue-200 transition hover:text-blue-100"
           >
-            Sign in
+            {t("auth.signup.signIn")}
           </Link>
         </p>
       }
     >
       <div
         className="mb-5 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-white/45"
-        aria-label={`Signup step ${step} of 2`}
+        aria-label={t("auth.signup.stepAria", { values: { step } })}
       >
         <span
           className={`rounded-full px-3 py-1 ${
             step === 1 ? "bg-white text-black" : "bg-white/10 text-white/70"
           }`}
         >
-          1 · Account
+          {t("auth.signup.stepAccount")}
         </span>
         <span className="text-white/25" aria-hidden>
           →
@@ -337,23 +339,23 @@ export default function SignupForm({
             step === 2 ? "bg-white text-black" : "bg-white/10 text-white/70"
           }`}
         >
-          2 · Profile
+          {t("auth.signup.stepProfile")}
         </span>
       </div>
 
       {step === 1 ? (
         <form className="space-y-4" onSubmit={handleContinueToProfile} noValidate>
           <AuthField
-            label="Email"
+            label={t("auth.signup.email")}
             name="email"
             type="email"
             autoComplete="email"
             inputMode="email"
             value={email}
             disabled={isSubmitting}
-            placeholder="you@email.com"
+            placeholder={t("auth.login.emailPlaceholder")}
             error={fieldErrors.email}
-            hint="We'll send a confirmation link if required."
+            hint={t("auth.signup.emailHint")}
             onChange={(event) => {
               setEmail(event.target.value);
               setFieldErrors((prev) => ({ ...prev, email: undefined }));
@@ -362,16 +364,16 @@ export default function SignupForm({
           />
 
           <AuthField
-            label="Password"
+            label={t("auth.signup.password")}
             name="password"
             type="password"
             autoComplete="new-password"
             value={password}
             disabled={isSubmitting}
-            placeholder="At least 6 characters"
+            placeholder={t("auth.signup.passwordPlaceholder")}
             revealable
             error={fieldErrors.password}
-            hint="Use at least 6 characters. You'll confirm it next."
+            hint={t("auth.signup.passwordHint")}
             onChange={(event) => {
               setPassword(event.target.value);
               setFieldErrors((prev) => ({ ...prev, password: undefined }));
@@ -380,13 +382,13 @@ export default function SignupForm({
           />
 
           <AuthField
-            label="Confirm password"
+            label={t("auth.signup.confirmPassword")}
             name="confirmPassword"
             type="password"
             autoComplete="new-password"
             value={confirmPassword}
             disabled={isSubmitting}
-            placeholder="Repeat password"
+            placeholder={t("auth.signup.confirmPlaceholder")}
             revealable
             error={fieldErrors.confirmPassword}
             onChange={(event) => {
@@ -406,21 +408,21 @@ export default function SignupForm({
             disabled={isSubmitting}
             className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Continue
+            {t("auth.signup.continue")}
           </button>
         </form>
       ) : (
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <AuthField
-            label="Full name"
+            label={t("auth.signup.fullName")}
             name="fullName"
             type="text"
             autoComplete="name"
             value={fullName}
             disabled={isSubmitting}
-            placeholder="Your name"
+            placeholder={t("auth.signup.fullNamePlaceholder")}
             error={fieldErrors.fullName}
-            hint="Shown on your public profile."
+            hint={t("auth.signup.fullNameHint")}
             onChange={(event) => {
               setFullName(event.target.value);
               setFieldErrors((prev) => ({ ...prev, fullName: undefined }));
@@ -429,13 +431,13 @@ export default function SignupForm({
           />
 
           <AuthField
-            label="Username"
+            label={t("auth.signup.username")}
             name="username"
             type="text"
             autoComplete="username"
             value={username}
             disabled={isSubmitting}
-            placeholder="your.name"
+            placeholder={t("auth.signup.usernamePlaceholder")}
             error={fieldErrors.username}
             hint={USERNAME_HINT}
             onChange={(event) => {
@@ -452,21 +454,21 @@ export default function SignupForm({
             error={fieldErrors.acceptTerms}
             label={
               <>
-                I accept UMTUBA&apos;s{" "}
+                {t("auth.signup.acceptBefore")}{" "}
                 <Link
                   href={APP_ROUTES.terms}
                   className="watch-focus-ring rounded text-white underline decoration-white/35 underline-offset-2 transition hover:decoration-white"
                 >
-                  Terms of Use
+                  {t("auth.signup.termsOfUse")}
                 </Link>{" "}
-                and{" "}
+                {t("auth.signup.acceptAnd")}{" "}
                 <Link
                   href={APP_ROUTES.privacy}
                   className="watch-focus-ring rounded text-white underline decoration-white/35 underline-offset-2 transition hover:decoration-white"
                 >
-                  Privacy Policy
+                  {t("auth.signup.privacyPolicy")}
                 </Link>
-                .
+                {t("auth.signup.acceptAfter")}
               </>
             }
             onChange={(event) => {
@@ -488,7 +490,7 @@ export default function SignupForm({
               }}
               className="watch-focus-ring w-full rounded-2xl border border-white/15 py-4 font-bold transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:min-w-[8rem]"
             >
-              Back
+              {t("auth.signup.back")}
             </button>
             <button
               type="submit"
@@ -496,7 +498,9 @@ export default function SignupForm({
               aria-busy={isSubmitting}
               className="watch-focus-ring w-full flex-1 rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {isSubmitting
+                ? t("auth.signup.creating")
+                : t("auth.signup.create")}
             </button>
           </div>
         </form>

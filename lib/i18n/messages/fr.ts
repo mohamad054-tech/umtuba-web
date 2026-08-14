@@ -25,4 +25,19 @@ export const frMessages: FoundationMessages = {
   "landing.joinCta": "Rejoindre UMTUBA",
   "landing.startExploring": "Commencer à explorer",
   "landing.goLive": "Passer en direct",
+  "auth.login.title": "Bon retour",
+  "auth.login.subtitle": "Connectez-vous pour continuer sur UMTUBA.",
+  "auth.login.panelTitle": "Votre monde vous attend.",
+  "auth.login.panelBody":
+    "Continuez vers votre profil, ou là où vous vous étiez arrêté.",
+  "auth.login.submit": "Se connecter",
+  "auth.login.createOne": "Créer un compte",
+  "auth.signup.title": "Créer un compte",
+  "auth.signup.subtitle":
+    "Deux étapes rapides — identifiants d’abord, puis votre profil.",
+  "auth.signup.create": "Créer un compte",
+  "auth.signup.signIn": "Se connecter",
+  "auth.shell.panelTitle": "Créer. Découvrir. Grandir.",
+  "auth.shell.panelBody":
+    "Rejoignez UMTUBA pour des vidéos, la découverte en direct et des créateurs du monde entier.",
 };

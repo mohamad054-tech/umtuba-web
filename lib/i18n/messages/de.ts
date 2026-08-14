@@ -25,4 +25,19 @@ export const deMessages: FoundationMessages = {
   "landing.joinCta": "UMTUBA beitreten",
   "landing.startExploring": "Entdecken starten",
   "landing.goLive": "Live gehen",
+  "auth.login.title": "Willkommen zurück",
+  "auth.login.subtitle": "Melde dich an, um bei UMTUBA weiterzumachen.",
+  "auth.login.panelTitle": "Deine Welt wartet.",
+  "auth.login.panelBody":
+    "Weiter zu deinem Profil oder dorthin, wo du aufgehört hast.",
+  "auth.login.submit": "Anmelden",
+  "auth.login.createOne": "Konto erstellen",
+  "auth.signup.title": "Konto erstellen",
+  "auth.signup.subtitle":
+    "Zwei kurze Schritte — zuerst Zugangsdaten, dann dein Profil.",
+  "auth.signup.create": "Konto erstellen",
+  "auth.signup.signIn": "Anmelden",
+  "auth.shell.panelTitle": "Erstellen. Entdecken. Wachsen.",
+  "auth.shell.panelBody":
+    "Komm zu UMTUBA für Videos, Live-Entdeckung und Creator weltweit.",
 };

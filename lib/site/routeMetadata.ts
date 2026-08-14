@@ -180,6 +180,13 @@ export const accountDeletionMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const supportMetadata = buildPageMetadata({
+  title: "Support",
+  description: `Contact ${BRAND.name} for account help, privacy requests, and product support. Public Support URL for the UMTUBA apps and website.`,
+  path: "/support",
+  index: "index",
+});
+
 export const inviteMetadataBase = {
   titlePrefix: `Join ${BRAND.name}`,
   description: `Create your ${BRAND.name} account with an invite. ${BRAND.tagline}. ${BRAND.mission}`,

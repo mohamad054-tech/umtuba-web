@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
-import { LanguageSelector } from "../i18n";
+import { LanguageSelector, useTranslation } from "../i18n";
 
 type AuthShellProps = {
   title: string;
@@ -17,9 +19,13 @@ export default function AuthShell({
   subtitle,
   children,
   footer,
-  panelTitle = "Create. Discover. Grow.",
-  panelBody = "Join UMTUBA for videos, live discovery, and creators around the world.",
+  panelTitle,
+  panelBody,
 }: AuthShellProps) {
+  const { t } = useTranslation();
+  const resolvedPanelTitle = panelTitle ?? t("auth.shell.panelTitle");
+  const resolvedPanelBody = panelBody ?? t("auth.shell.panelBody");
+
   return (
     <main
       className={`relative min-h-screen overflow-hidden bg-[#050510] px-4 py-10 text-white sm:px-6 ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -42,10 +48,10 @@ export default function AuthShell({
 
             <div className="mt-24">
               <h1 className="text-5xl font-black leading-none tracking-tight">
-                {panelTitle}
+                {resolvedPanelTitle}
               </h1>
               <p className="mt-6 max-w-md text-base leading-7 text-white/65">
-                {panelBody}
+                {resolvedPanelBody}
               </p>
             </div>
           </section>

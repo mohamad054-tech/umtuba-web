@@ -1,9 +1,7 @@
 import { Suspense } from "react";
-import {
-  AuthShell,
-} from "../components/auth";
 import { readReferralAttributionCookie } from "../../lib/referral/cookies";
 import SignupForm from "./SignupForm";
+import SignupLoadingFallback from "./SignupLoadingFallback";
 
 export default async function SignupPage() {
   // httpOnly cookie survives invite → confirm; seed the form so metadata
@@ -11,18 +9,7 @@ export default async function SignupPage() {
   const cookieReferralCode = await readReferralAttributionCookie();
 
   return (
-    <Suspense
-      fallback={
-        <AuthShell
-          title="Create your account"
-          subtitle="Loading sign-up…"
-          panelTitle="Create. Discover. Grow."
-          panelBody="Join UMTUBA for videos, live discovery, and creators around the world."
-        >
-          <p className="text-sm text-white/50">Preparing the form…</p>
-        </AuthShell>
-      }
-    >
+    <Suspense fallback={<SignupLoadingFallback />}>
       <SignupForm initialReferralCode={cookieReferralCode} />
     </Suspense>
   );

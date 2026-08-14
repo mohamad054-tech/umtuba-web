@@ -10,7 +10,7 @@ export const LEGAL_BETA_NOTICE =
   "This document is a general Beta soft-launch statement for UMTUBA. It is not a substitute for specialized legal counsel. Before a wider commercial launch, have qualified counsel review and adapt these terms for your jurisdictions and operating model.";
 
 export const LEGAL_CONTACT_LINE =
-  "Questions about these documents may be sent through the contact method provided on UMTUBA.";
+  "Questions about these documents may be sent through the UMTUBA Support page at /support.";
 
 export type LegalSection = {
   id: string;
@@ -45,7 +45,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     title: "Accounts and security",
     paragraphs: [
       "You are responsible for the accuracy of information you provide and for keeping your login credentials confidential.",
-      "Notify us promptly through the contact method provided on UMTUBA if you believe your account has been compromised.",
+      "Notify us promptly through the Support page at /support if you believe your account has been compromised.",
       "We may refuse, suspend, or limit accounts that appear abusive, unsafe, fraudulent, or in violation of these Terms.",
     ],
   },
@@ -113,7 +113,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
     title: "Intellectual property and infringement reports",
     paragraphs: [
       "UMTUBA branding, software, design, and original platform materials are owned by their respective rights holders and are protected by intellectual property laws.",
-      "If you believe content on UMTUBA infringes your rights, contact us through the contact method provided on UMTUBA with enough detail to identify the material and your claim. We may remove or restrict content while reviewing reports.",
+      "If you believe content on UMTUBA infringes your rights, contact us through the Support page at /support with enough detail to identify the material and your claim. We may remove or restrict content while reviewing reports.",
     ],
   },
   {
@@ -176,7 +176,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       "User Content: videos, images, audio, captions, comments, reactions, stories, and similar uploads",
       "Messages and live chat text you send to others",
       "Store or seller information you choose to submit when those features are available",
-      "Support or feedback you send through the contact method provided on UMTUBA",
+      "Support or feedback you send through the Support page at /support",
     ],
   },
   {
@@ -276,7 +276,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Your rights and requests",
     paragraphs: [
       "Depending on where you live, you may have rights to access, correct, delete, or restrict certain personal data, or to object to certain processing.",
-      "To make a request, use the account-deletion page at /account-deletion for account erasure, or the contact method provided on UMTUBA for other rights. We verify your identity before fulfilling a request. Some rights are limited by law or by the need to keep the Service secure and lawful.",
+      "To make a request, use the account-deletion page at /account-deletion for account erasure, or the Support page at /support for other rights. We verify your identity before fulfilling a request. Some rights are limited by law or by the need to keep the Service secure and lawful.",
     ],
   },
   {
@@ -284,7 +284,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Children and teens",
     paragraphs: [
       "UMTUBA is not directed at children who are too young to use social platforms under applicable law. Do not create an account for a child below the minimum age required where you live.",
-      "If you believe we have collected personal information from a child in violation of applicable law, contact us through the contact method provided on UMTUBA so we can take appropriate steps.",
+      "If you believe we have collected personal information from a child in violation of applicable law, contact us through the Support page at /support so we can take appropriate steps.",
     ],
   },
   {

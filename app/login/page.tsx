@@ -8,6 +8,7 @@ import {
   AuthField,
   AuthShell,
 } from "../components/auth";
+import { useTranslation } from "../components/i18n";
 import { APP_ROUTES } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { claimPendingReferralAction } from "../actions/referral";
@@ -25,6 +26,7 @@ type FieldErrors = {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const resetSuccess = searchParams.get("reset") === "success";
   const linkError = sanitizeUserFacingMessage(
     searchParams.get("error"),
@@ -100,13 +102,13 @@ function LoginForm() {
 
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to continue to UMTUBA."
-      panelTitle="Your world is waiting."
-      panelBody="Continue to your Profile, or wherever you left off."
+      title={t("auth.login.title")}
+      subtitle={t("auth.login.subtitle")}
+      panelTitle={t("auth.login.panelTitle")}
+      panelBody={t("auth.login.panelBody")}
       footer={
         <p className="text-center text-sm text-white/50">
-          Don&apos;t have an account?{" "}
+          {t("auth.login.noAccount")}{" "}
           <Link
             href={
               searchParams.get("next")
@@ -117,20 +119,20 @@ function LoginForm() {
             }
             className="font-bold text-blue-200 transition hover:text-blue-100"
           >
-            Create one
+            {t("auth.login.createOne")}
           </Link>
         </p>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         <AuthField
-          label="Email"
+          label={t("auth.login.email")}
           name="email"
           type="email"
           autoComplete="email"
           value={email}
           disabled={isSubmitting}
-          placeholder="you@email.com"
+          placeholder={t("auth.login.emailPlaceholder")}
           error={fieldErrors.email}
           onChange={(event) => {
             setEmail(event.target.value);
@@ -140,13 +142,13 @@ function LoginForm() {
         />
 
         <AuthField
-          label="Password"
+          label={t("auth.login.password")}
           name="password"
           type="password"
           autoComplete="current-password"
           value={password}
           disabled={isSubmitting}
-          placeholder="Enter your password"
+          placeholder={t("auth.login.passwordPlaceholder")}
           error={fieldErrors.password}
           onChange={(event) => {
             setPassword(event.target.value);
@@ -160,14 +162,12 @@ function LoginForm() {
             href={FORGOT_PASSWORD_PATH}
             className="text-sm font-bold text-blue-200 transition hover:text-blue-100"
           >
-            Forgot password?
+            {t("auth.login.forgotPassword")}
           </Link>
         </div>
 
         {resetSuccess ? (
-          <AuthAlert tone="info">
-            Password updated. Sign in with your new password.
-          </AuthAlert>
+          <AuthAlert tone="info">{t("auth.login.resetSuccess")}</AuthAlert>
         ) : null}
 
         {formError ? <AuthAlert tone="error">{formError}</AuthAlert> : null}
@@ -178,7 +178,7 @@ function LoginForm() {
           aria-busy={isSubmitting}
           className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "Signing in..." : "Sign in"}
+          {isSubmitting ? t("auth.login.submitting") : t("auth.login.submit")}
         </button>
       </form>
     </AuthShell>
@@ -186,15 +186,16 @@ function LoginForm() {
 }
 
 function LoginFallback() {
+  const { t } = useTranslation();
   return (
     <AuthShell
-      title="Welcome back"
-      subtitle="Sign in to continue to UMTUBA."
-      panelTitle="Your world is waiting."
-      panelBody="Continue to your Profile, or wherever you left off."
+      title={t("auth.login.title")}
+      subtitle={t("auth.login.subtitle")}
+      panelTitle={t("auth.login.panelTitle")}
+      panelBody={t("auth.login.panelBody")}
     >
       <p className="text-sm text-white/55" role="status">
-        Loading sign-in...
+        {t("auth.login.loading")}
       </p>
     </AuthShell>
   );
