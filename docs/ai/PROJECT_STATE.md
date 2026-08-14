@@ -8,72 +8,46 @@
 
 `alpha-0.2`
 
+## Coordinator resume pointer (20260814)
+
+Web platform declare **PRODUCTION_READY** retained (do not reopen Learning cert).
+
+**UAF-12 on alpha + production (authoritative):**
+
+- `origin/alpha-0.2` tip = `d7b6504f` (integrate `6e494df6` + vitest include)
+- `UAF12_ON_ALPHA=YES` — **not** `PENDING_INTEGRATE`
+- Production SSH deploy **PASS** → `DEPLOYED_SHA=d7b6504f` · `RELEASE_PATH=/opt/umtuba/production/releases/d7b6504-20260814075002`
+- `UAF12_STATUS=FIXED_IMPLEMENTED_RUNTIME_PARTIAL` · `FIXED_VERIFIED=NO` (AUTH_ENV ABSENT)
+- Live Priority A auth-callback smoke (20260814 ACK): **PASS** · `AUTH_CALLBACK_LOCALHOST=NO` · UAF-05 retained
+- Report deploy: `D:\umtuba-central\reports\UMTUBA_CENTRAL_UAF12_PRODUCTION_DEPLOY_V1.md`
+- Report ACK: `D:\umtuba-central\reports\UMTUBA_CENTRAL_PC2_INDEPENDENT_QA_ACK_AND_NEXT_GO_V1.md`
+
+**PC2 independent QA (platform-core audit V1):** ACCEPTED. `STALE_WORKTREE=YES` (office ahead/behind alpha) — **PRESERVE**; no reset/clean/force/merge into alpha. `NEW_FINDINGS=NONE` · `HIDDEN_RELEASE_BLOCKER=NO` · `PC2_NEXT=STOP` · `NEW_WAVE_AUTHORIZED=NO`.
+
+Known leftovers (not new): D1 locale-unpinned · UAF-12 runtime PARTIAL · PWA Location smoke not probed this audit · Store premium + iOS AASA = office-only / Central DECISION_REQUIRED.
+
+`CENTRAL_STORE_AUTH_ENV_READY=NO` · `WHOLE_PLATFORM_UX_READY=NO`
+
+**NEXT_CENTRAL_GO_ID** = `CENTRAL_UAF12_SEEDED_RUNTIME_QA_V1` (gate: AUTH_ENV PRESENT). Optional packet: D1 locale pin. Do not reopen closed UM Core/Learning/Translation/PWA/UAF closed set.
+
+See `docs/ai/CURRENT_TASK.md`.
+
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
 
 Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
+
 Session continuity: `docs/ai/SESSION_HANDOFF.md`
-
-Frozen baselines (extend, do not replace):
-
-- Wave A production baseline (JA-01 / JA-02 / JA-03)
-- Nexus Learning Architecture
-- Nexus Design System
-- Nexus V2 Premium Experience
-- Portfolio / Certification / AI Assistant integration models
 
 ## Active academy priority
 
-**Save point 2026-07-28 (Cursor Pro → Ultra restart).** Full state: `docs/ai/SESSION_HANDOFF.md`.
-
-| Track | Status |
-| --- | --- |
-| Wave B content | CLOSED |
-| Learning UX / Nexus | FROZEN |
-| Course Import & E2E V1 | PAUSED |
-| Commerce Research V1.1 | APPROVED |
-| Commerce Experience Architecture V1.1 | FROZEN |
-| Commerce Visual Design Foundation V1 | FROZEN |
-| Commerce Information Architecture V1 | FROZEN |
-| Commerce Design System Foundation V1 | FROZEN |
-| Commerce Product Architecture Foundation V1 | FROZEN |
-| Commerce Business Architecture Foundation V1 | **FROZEN** |
-| Commerce Domain Model Foundation V1 | **FROZEN** |
-| Commerce Technical Architecture Foundation V1 | **FROZEN** |
-| Commerce Data Architecture Foundation V1 | **FROZEN** |
-| Commerce Application Architecture Foundation V1 | **FROZEN** |
-| Commerce Integration Architecture Foundation V1 | **FROZEN** |
-| Commerce Security Architecture Foundation V1 | **FROZEN** |
-| Commerce Operational Architecture Foundation V1 | **FROZEN** |
-| Commerce Platform Architecture Foundation V1 | **FROZEN** |
-| Commerce Enterprise Architecture Foundation V1 | **FROZEN** |
-| Commerce Reference Architecture Foundation V1 | **FROZEN** |
-| Commerce Architecture Manifesto V1 | **FROZEN** |
-| Commerce Architecture Program | **COMPLETE** |
-| Physical Commerce Inventory Solution Architecture V1 | **FROZEN** |
-| Physical Commerce Warehouse & Fulfillment Solution Architecture V1 | **FROZEN** |
-| Physical Commerce Order Fulfillment Solution Architecture V1 | **FROZEN** |
-| Commerce Consolidation Report V1 | **COMPLETE** |
-| Commerce Premium Storefront Experience Foundation V1 | **COMPLETE** (branch `office/commerce-premium-storefront-experience-foundation-v1`) |
-| Commerce Premium Cart and Checkout Experience V1 | **COMPLETE** (branch `office/commerce-premium-cart-checkout-experience-v1`) |
-| Commerce Premium Buyer Orders Experience V1 | **COMPLETE** (branch `office/commerce-premium-buyer-orders-experience-v1`) |
-| Commerce Premium Seller Orders Operations Experience V1 | **COMPLETE** (branch `office/commerce-premium-seller-orders-operations-v1`) |
-| Commerce Premium Seller Catalog & Product Management V1 | **COMPLETE** (branch `office/commerce-premium-seller-catalog-product-management-v1`) |
-| Commerce Premium Seller Inventory & Reservation Visibility V1 | **COMPLETE** (branch `office/commerce-premium-seller-inventory-reservation-visibility-v1`) |
-| Commerce Premium Seller Dashboard & Operational Insights V1 | **COMPLETE** (branch `office/commerce-premium-seller-dashboard-insights-v1`) |
-| Commerce Trading Domain Alignment & Integrity V1 | **COMPLETE** (branch `office/commerce-trading-domain-alignment-integrity-v1`) |
-| Commerce Revenue Ledger Bridge Foundation V1 | **COMPLETE** (branch `office/commerce-revenue-ledger-bridge-foundation-v1`) |
-| Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
-| Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
-| Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
-| UMTUBA AI Core Platform Foundation V1 | **COMPLETE** (branch `office/ai-core-platform-foundation-v1`) |
-
-Default: Consolidation complete. Commerce beta-ready on dedicated branches (not merged). Shared AI Core Platform Foundation landed on `office/ai-core-platform-foundation-v1` (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
+Default: Consolidation complete. Commerce beta-ready on dedicated branches (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
 
 ### Autonomy (standing)
 
 Routine in-scope create/update/run/mirror/report work may proceed without per-step approval **only inside the explicitly active phase**.
+
 Paused phases must not auto-resume. Still ask before: destructive data loss, destructive prod DB, push/force-push, merge/delete branches, system-wide installs, credentials/payments, irreversible out-of-scope actions.
 
 ## Source of truth
@@ -89,6 +63,7 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 | --- | --- |
 | **Laptop** | Primary development and integration machine |
 | **Desktop** | May perform isolated review / testing tasks only |
+| **Server / Central** | Production integration authority |
 
 ## Multi-machine rules
 
@@ -107,4 +82,3 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 - Follow `docs/DEVELOPMENT_WORKFLOW.md` for Git, migrations, and push policy.
 - Follow `docs/ai/CURRENT_TASK.md` for the active handoff scope.
 - Write execution results to `docs/ai/CURSOR_REPORT.md`.
-- Prefer `docs/ai/SESSION_HANDOFF.md` for Learning continuity after V1 close-out.

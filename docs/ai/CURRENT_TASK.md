@@ -2,64 +2,49 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — Thread Lesson Binding Hardening V1
+CENTRAL_IOS_AASA_CHERRY_PICK_INTEGRATION_V1
 
 ## Status
 
-`verification-pass` — **COMMITTED + PUSHED** @ `b85081b` — branch synced `0 0` with `origin/office/learning-ai-tutor-thread-lesson-binding-v1`. Awaiting separate apply GO for `20260874` only.
+`in_progress` — Conditional cherry-pick of AASA_SOURCE_SHA `5dbd77910b3e5f75f0f57e908af3599474ea8a41` onto current `origin/alpha-0.2`. Do NOT merge stale office branch. Do NOT invent Apple Team ID. Deploy only if AASA can be correct with real Team ID or safely returns config-missing without wrong Team ID.
 
-## Branch
+## Scoreboard
 
-`office/learning-ai-tutor-thread-lesson-binding-v1`
+```text
+TASK_ID=CENTRAL_IOS_AASA_CHERRY_PICK_INTEGRATION_V1
+SOURCE=PC2_IOS_AASA_PROVENANCE_CENTRAL_HANDOFF_V1
+AASA_SOURCE_SHA=5dbd77910b3e5f75f0f57e908af3599474ea8a41
+STALE_OFFICE_BRANCH=office/platform-translation-trunk-port-v1 (DO NOT MERGE/FF)
+AUTHORITATIVE_ALPHA=origin/alpha-0.2 (re-fetch)
+APPLE_TEAM_ID_REQUIRED=YES
+APPLE_TEAM_ID_STATUS=PENDING_VERIFY
+PUSH_REQUIRED=YES_IF_INTEGRATE_AND_TESTS_PASS
+DEPLOY_POLICY=ONLY_IF_REAL_TEAM_ID_OR_SAFE_CONFIG_MISSING
+UNIVERSAL_LINKS_LIVE_READY=NO_UNTIL_HTTPS_AASA_WITH_REAL_TEAM_ID
+PC2_WAIT_STATE=STOP_UNTIL_NEXT_GO
+```
 
-## Base
+## Allowed scope (this pass)
 
-`office/learning-ai-tutor-thread-metadata-read-v1` @ `9e90448ce8e4566fd369476a2571844378b0950c`
+- Fetch/review exact `5dbd779`
+- Compare vs current alpha tip
+- CONDITIONAL_CHERRY_PICK_ONLY that commit onto current alpha (no stale office merge)
+- Reconcile `.env.example` / `vitest.config.ts` conflicts with intended delta only
+- Typecheck + AASA/vitest + relevant regression
+- Push alpha if integrate+tests PASS (no force)
+- Request real Apple Team ID operator packet if ABSENT
+- Deploy AASA to production ONLY per Team ID rules (no fake Team ID)
+- Report + TO-SERVER / TO-PC2 / TO-DESKTOP mirrors
+- Update CURRENT_TASK / CURSOR_REPORT / PROJECT_STATE
 
-## Worktree
+## Forbidden
 
-`C:\Users\Admin\Desktop\umtuba\umtuba-web` (no alternate worktree)
+- Force push · merge stale office → alpha · invent/placeholder Apple Team ID
+- Reopen PWA callback or UAF-12
+- Play/Android mutate · expose secrets
+- Publish fake Team ID in live AASA
+- Wholesale overwrite alpha on conflict files
 
-## Milestone
+## Canonical report
 
-`learning.tutor.thread_lesson_binding_hardening_v1`
-
-## Delivered
-
-- Migration (local only): `20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- Drops 4-arg `append_my_learning_ai_tutor_exchange(uuid, text, text, text)`
-- Creates 5-arg RPC with SQL `thread.lesson_id = p_lesson_id` + lesson∈course + course membership + auth.uid ownership
-- Foundation + bridge + integration pass `lessonId` / `p_lesson_id`
-- Bridge maps mismatch / auth / entitlement fail-closed; validates threadId+lessonId UUIDs
-- Lean metadata validation retained as defense in depth
-
-## Verification (local)
-
-- Narrow + affected Tutor suites: **115 passed**
-- `npx tsc --noEmit`: PASS
-- `git diff --check`: PASS
-- `npm run build`: not run (policy)
-- Migration: **not applied** remotely
-
-## Machine policy
-
-AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI / Provider / Gemini. No `npm run build`. Do not apply migration remotely without explicit GO.
-
-## Allowed scope
-
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- `lib/learning/aiTutorFoundation.ts` (+ tests)
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts` (+ tests)
-- `lib/ai/services/learningTutorIntegration.ts` (pass lessonId only)
-- `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
-
-## Forbidden scope
-
-- Provider Foundation / Gemini
-- alpha-0.2 / Web UI
-- New Tutor capabilities
-- Commit / push / remote migration apply without GO
-
-## Next
-
-Separate apply GO for migration `20260874` only (do not re-commit feature work).
+`D:\umtuba-central\reports\UMTUBA_CENTRAL_IOS_AASA_CHERRY_PICK_INTEGRATION_V1.md`
