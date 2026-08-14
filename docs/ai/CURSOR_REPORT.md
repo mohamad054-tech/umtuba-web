@@ -2,11 +2,11 @@
 
 ## Summary
 
-Integrating PC2 UAF-12 source `72190b62149a7bcc03356dab8f9f84ab5379a59d` onto `alpha-0.2` via cherry-pick. Product files applied; handoff docs resolved for Central. Static/runtime results and final status follow in the canonical Central report after gates.
+Source `72190b62` found on origin office tip; cherry-picked to alpha as `6e494df6` + vitest include `d7b6504f` (pushed ff). Static 14/14 + tsc PASS. AUTH_ENV ABSENT → runtime NOT_RUN; FIXED_VERIFIED=NO; FIXED_IMPLEMENTED_RUNTIME_PARTIAL.
 
 ## Exact files changed
 
-See integrate commit (UAF-12 owner delete: actions, `deleteOwnedPost*`, social/video/discover/profile/saved/watch wiring, unit tests, PC2 verification report).
+See integrate commits `6e494df6` / `d7b6504f` on `origin/alpha-0.2`.
 
 ## Migrations created
 
@@ -14,29 +14,28 @@ None.
 
 ## Security review
 
-Owner check in server action + `deletePostForOwner` (user_id match + RLS). UI visibility helper is not authorization. No secrets.
+Server-side owner check + RLS; UI visibility-only; no secrets; no force push.
 
 ## Tests
 
-Pending this pass.
+14/14 PASS (deletePost + deleteOwnedPost).
 
 ## TypeScript
 
-Pending this pass.
+PASS (`npx tsc --noEmit`).
 
 ## Build
 
-Pending / as required.
+NOT_RUN.
 
 ## git diff --check
 
-Pending this pass.
+PASS.
 
 ## git status --short
 
-Pending this pass.
+Clean on integrate branch after push to origin/alpha-0.2 @ d7b6504f.
 
 ## Open issues
 
-- `FIXED_VERIFIED=NO` until authenticated runtime QA
-- AUTH_ENV for social users previously ABSENT on Central
+AUTH_ENV_ABSENT blocks FIXED_VERIFIED; prod deploy deferred.
