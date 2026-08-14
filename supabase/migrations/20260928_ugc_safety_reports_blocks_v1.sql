@@ -5,8 +5,54 @@
 -- for public social UGC and 1:1 Messages. This is the smallest server contract
 -- for Android versionCode 4.
 --
+-- Version history (Desktop; do not reuse rejected IDs as UGC):
+--   20260873 — REJECTED (Learning tutor collision)
+--   20260922 — REJECTED (number already used: knowledge_acquisition_foundation_v1)
+--   20260928 — this file (unique; >= 20260928)
+--
 -- Do NOT apply to the remote Supabase project from Desktop.
 -- Apply per docs/DEVELOPMENT_WORKFLOW.md (targeted migration; never supabase db push).
+-- Never apply 20260873 or 20260922 as UGC. Never overwrite Learning migrations.
+
+-- ---------------------------------------------------------------------------
+-- 0. is_platform_admin() — ensure ads-foundation contract for targeted apply
+-- ---------------------------------------------------------------------------
+-- Targeted apply of this file must succeed even if 20260806 is not in the
+-- same apply set. Contract matches 20260806_ads_admin_review_foundation_v1:
+-- SECURITY DEFINER, search_path = public, uuid default auth.uid(),
+-- EXECUTE revoked from public/anon. Does not weaken RLS. No service-role client.
+
+create table if not exists public.platform_admins (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  note text
+    check (note is null or char_length(note) <= 200),
+  created_at timestamptz not null default now(),
+  created_by uuid references auth.users (id)
+);
+
+alter table public.platform_admins enable row level security;
+alter table public.platform_admins force row level security;
+
+create or replace function public.is_platform_admin(
+  p_user_id uuid default auth.uid()
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    p_user_id is not null
+    and exists (
+      select 1
+      from public.platform_admins a
+      where a.user_id = p_user_id
+    );
+$$;
+
+revoke all on function public.is_platform_admin(uuid) from public, anon;
+grant execute on function public.is_platform_admin(uuid) to authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
 -- 1. user_blocks
@@ -136,7 +182,7 @@ create policy "Users read own ugc reports"
   to authenticated
   using (
     reporter_id = (select auth.uid())
-    or public.is_platform_admin()
+    or public.is_platform_admin((select auth.uid()))
   );
 
 drop policy if exists "Users insert own ugc reports" on public.ugc_reports;
