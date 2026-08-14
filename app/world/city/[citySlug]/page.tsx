@@ -243,7 +243,8 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
           <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-200/70">
             {city.countryName} · {city.verificationStatus}
           </p>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">{city.name}</h1>
+          {/* AppTopNav already titles the city; keep a single document H1. */}
+          <h2 className="mt-2 text-3xl font-black md:text-5xl">{city.name}</h2>
           <p className="mt-3 text-sm text-white/45">
             {city.region ? `${city.region} · ` : ""}
             {city.countryCode}

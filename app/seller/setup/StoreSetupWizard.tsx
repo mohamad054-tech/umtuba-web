@@ -207,12 +207,12 @@ export default function StoreSetupWizard({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           Step {step} of {STORE_SETUP_STEPS.length}
         </p>
-        <h1
+        <h2
           id="setup-step-title"
           className="mt-1 text-2xl font-black tracking-tight md:text-3xl"
         >
           {STORE_SETUP_STEPS[step - 1]?.label}
-        </h1>
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Configure your storefront, save a draft anytime, then submit for
           operator approval. Checkout is not available in this phase.

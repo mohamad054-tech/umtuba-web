@@ -43,14 +43,15 @@ export default async function AdminAiUsagePage() {
 
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
+      <AppTopNav
+        title="AI Usage & Quotas"
+        subtitle="Billing Foundation V1 (estimated only)"
+        sticky
+      />
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <AppTopNav
-          title="AI Usage & Quotas"
-          subtitle="Billing Foundation V1 (estimated only)"
-        />
         <nav
           aria-label="AI admin"
-          className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+          className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
         >
           <Link
             href={APP_ROUTES.adminStore}
@@ -71,9 +72,9 @@ export default async function AdminAiUsagePage() {
 
         <section className="mt-6 space-y-4">
           <div className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-            <h1 className="text-2xl font-black tracking-tight">
+            <h2 className="text-2xl font-black tracking-tight">
               Usage, quotas & estimated cost
-            </h1>
+            </h2>
             <p className="mt-2 text-sm text-white/50">
               Foundation only — no Stripe, wallet deduction, invoices, or live
               provider pricing. Safe metadata only; prompts and secrets are

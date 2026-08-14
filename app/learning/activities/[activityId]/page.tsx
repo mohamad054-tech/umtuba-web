@@ -67,7 +67,7 @@ export default async function LearningActivityPage({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {activity.type}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">{activity.name}</h1>
+        <h2 className="mt-1 text-3xl font-black tracking-tight">{activity.name}</h2>
         {activity.description ? (
           <p className="mt-2 text-sm text-white/50">{activity.description}</p>
         ) : null}

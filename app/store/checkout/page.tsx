@@ -45,9 +45,9 @@ export default async function StoreCheckoutPage() {
     <StoreShell title="Checkout" subtitle="Store" wide>
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">Checkout</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Review & place order
-        </h1>
+        </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Totals are calculated server-side. Payment collection is not enabled —
           placing an order creates a pending-payment order only. Multi-seller

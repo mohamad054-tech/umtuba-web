@@ -29,9 +29,9 @@ export default async function StoreCartPage() {
     <StoreShell title="Cart" subtitle="Store" wide>
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">Bag</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Your cart
-        </h1>
+        </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Prices are snapshotted server-side when items are added. Live
           availability and price changes are verified before checkout. Tax,

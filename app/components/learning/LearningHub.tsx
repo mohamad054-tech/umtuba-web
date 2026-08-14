@@ -49,7 +49,10 @@ export default function LearningHub({ hub }: LearningHubProps) {
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           My Learning
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Continue learning</h1>
+        {/* AppTopNav (via LearningShell) owns the page H1; keep a single document H1. */}
+        <h2 className="mt-1 text-3xl font-black tracking-tight">
+          Continue learning
+        </h2>
         <p className="mt-2 text-sm text-white/50">
           Programs and courses you can access through your enrollments.
         </p>

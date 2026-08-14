@@ -12,6 +12,10 @@ type StoreShellProps = {
   wide?: boolean;
 };
 
+/**
+ * Platform Store chrome — AppTopNav stays full-bleed.
+ * Page content is constrained; do not nest primary nav in max-w-*.
+ */
 export default function StoreShell({
   title,
   subtitle,
@@ -28,21 +32,22 @@ export default function StoreShell({
         <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:48px_48px]" />
       </div>
 
+      <AppTopNav
+        title={title}
+        subtitle={subtitle}
+        sticky
+        actions={
+          <>
+            {actions}
+            <CartIconButton />
+          </>
+        }
+      />
       <div
         className={`relative z-10 mx-auto px-4 py-6 sm:px-5 md:px-8 ${
           wide ? "max-w-7xl" : "max-w-3xl"
         }`}
       >
-        <AppTopNav
-          title={title}
-          subtitle={subtitle}
-          actions={
-            <>
-              {actions}
-              <CartIconButton />
-            </>
-          }
-        />
         <div className="sf-enter">{children}</div>
       </div>
     </main>

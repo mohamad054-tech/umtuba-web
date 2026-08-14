@@ -56,8 +56,8 @@ export default async function SellerStoreAnalyticsPage({
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      <AppTopNav title="Analytics" subtitle={membership.store.name} sticky />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="Analytics" subtitle={membership.store.name} />
         <p className="mt-4 text-sm text-white/45">
           Reporting and accounting groundwork only — not tax advice, payouts, or
           gateway settlement.

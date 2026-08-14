@@ -52,13 +52,13 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      {/* AppTopNav stays full-bleed; content column is constrained. */}
+      <AppTopNav title="Seller" subtitle="UMTUBA Marketplace" sticky />
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
-        <AppTopNav title="Seller" subtitle="UMTUBA Marketplace" />
-
         {params.submitted === "1" || params.applied === "1" ? (
           <p
             role="status"
-            className="mt-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
+            className="mt-0 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
           >
             Store setup submitted for operator review.
           </p>
@@ -69,9 +69,9 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               @{membership.store.slug}
             </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight">
+            <h2 className="mt-1 text-3xl font-black tracking-tight">
               {membership.store.name}
-            </h1>
+            </h2>
             <p className="mt-2 text-sm text-white/50">
               Role: {membership.role} · Verification:{" "}
               {membership.store.verification_status}
@@ -108,9 +108,9 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               @{application.proposed_store_slug}
             </p>
-            <h1 className="mt-1 text-2xl font-black tracking-tight">
+            <h2 className="mt-1 text-2xl font-black tracking-tight">
               {STATUS_COPY[application.status].title}
-            </h1>
+            </h2>
             <p className="mt-2 text-sm text-white/50">
               {STATUS_COPY[application.status].body}
             </p>
@@ -141,9 +141,9 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               Sell on UMTUBA
             </p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight">
+            <h2 className="mt-1 text-3xl font-black tracking-tight">
               Set up your store
-            </h1>
+            </h2>
             <p className="mt-2 text-sm text-white/50">
               Complete the store setup wizard, save a draft anytime, then submit
               for operator approval. Catalog management unlocks after

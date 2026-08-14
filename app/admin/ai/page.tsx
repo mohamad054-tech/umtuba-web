@@ -36,11 +36,11 @@ export default async function AdminAiPlatformPage() {
 
   return (
     <main className="min-h-screen bg-[#050510] pb-16 text-white">
+      <AppTopNav title="AI platform" subtitle="Internal diagnostics" sticky />
       <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
-        <AppTopNav title="AI platform" subtitle="Internal diagnostics" />
         <nav
           aria-label="AI admin"
-          className="mt-4 flex flex-wrap gap-2 border-b border-white/10 pb-4"
+          className="flex flex-wrap gap-2 border-b border-white/10 pb-4"
         >
           <Link
             href={APP_ROUTES.adminStore}
@@ -60,9 +60,9 @@ export default async function AdminAiPlatformPage() {
         </nav>
 
         <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-          <h1 className="text-2xl font-black tracking-tight">
+          <h2 className="text-2xl font-black tracking-tight">
             AI Core Platform diagnostics
-          </h1>
+          </h2>
           <p className="mt-2 text-sm text-white/50">
             Bounded operator view. Provider secrets, raw prompts, and private
             outputs are never shown.

@@ -18,6 +18,11 @@ type AppTopNavProps = {
   actions?: ReactNode;
   /** Sticky chrome (default). Pass false for surfaces that manage their own sticky wrapper. */
   sticky?: boolean;
+  /**
+   * When true (default), the nav title is the document H1.
+   * Pass false when page content owns the real H1 (e.g. article title).
+   */
+  titleIsHeading?: boolean;
 };
 
 export default function AppTopNav({
@@ -26,9 +31,11 @@ export default function AppTopNav({
   subtitle,
   actions,
   sticky = true,
+  titleIsHeading = true,
 }: AppTopNavProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const titleClassName = "truncate text-lg font-black tracking-tight";
 
   return (
     <header
@@ -50,9 +57,11 @@ export default function AppTopNav({
               UMTUBA
             </p>
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-black tracking-tight">
-                {title}
-              </h1>
+              {titleIsHeading ? (
+                <h1 className={titleClassName}>{title}</h1>
+              ) : (
+                <p className={titleClassName}>{title}</p>
+              )}
               {badge}
             </div>
           </div>

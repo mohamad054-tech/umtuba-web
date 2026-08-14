@@ -79,12 +79,13 @@ export default function GamesHub({ experience }: GamesHubProps) {
 }
 
 function HubIntro() {
+  // AppTopNav (via GamesHubShell) owns the page H1; keep a single document H1.
   return (
     <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
       <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
         UM Games
       </p>
-      <h1 className="mt-1 text-3xl font-black tracking-tight">Games Hub</h1>
+      <h2 className="mt-1 text-3xl font-black tracking-tight">Games Hub</h2>
       <p className="mt-2 max-w-xl text-sm text-white/50">
         Browse available games. Play uses Runtime eligibility only — no live
         game server or rewards in this foundation.

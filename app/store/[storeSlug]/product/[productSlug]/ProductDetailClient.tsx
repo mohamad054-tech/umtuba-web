@@ -256,9 +256,9 @@ export default function ProductDetailClient({
             ) : null}
           </Link>
 
-          <h1 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h2 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
             {detail.displayTitle?.trim() || detail.product.title}
-          </h1>
+          </h2>
           {detail.marketplaceSourceType === "supplier_listing" ? (
             <p
               role="status"

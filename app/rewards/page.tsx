@@ -66,7 +66,7 @@ export default async function RewardsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Rewards
           </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">UM Points</h1>
+          <h2 className="mt-1 text-3xl font-black tracking-tight">UM Points</h2>
           <p className="mt-2 text-sm text-white/50">
             Earn points for meaningful actions — not unlimited likes or passive
             watch time.

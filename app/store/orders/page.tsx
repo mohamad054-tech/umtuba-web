@@ -54,9 +54,9 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
     <StoreShell title="My Orders" subtitle="Store" wide>
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">Orders</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           My orders
-        </h1>
+        </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Each card is one seller order with separate order, payment,
           fulfillment, and delivery states. Multi-seller checkouts appear as

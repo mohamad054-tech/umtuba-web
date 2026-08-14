@@ -77,9 +77,9 @@ export default async function SellerMarketplaceProductPage({ params }: PageProps
         </div>
         <div className="rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
           <p className="sf-eyebrow">Supplier ֲ· {item.supplier.name}</p>
-          <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight">
+          <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight">
             {item.title}
-          </h1>
+          </h2>
           {item.shortDescription ? (
             <p className="mt-3 text-sm leading-relaxed text-[var(--sf-muted)]">
               {item.shortDescription}

@@ -28,7 +28,8 @@ export default async function WorldSearchPage({ searchParams }: Props) {
       <AppTopNav title="World Search" subtitle="Cities, places & categories" />
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
         <header className="mb-6">
-          <h1 className="text-3xl font-black">Search the World domain</h1>
+          {/* AppTopNav owns the page H1; keep a single document H1. */}
+          <h2 className="text-3xl font-black">Search the World domain</h2>
           <p className="mt-2 text-sm text-white/50">
             Database-backed search across approved public cities, places,
             businesses, attractions, hotels, restaurants and categories.

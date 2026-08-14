@@ -30,9 +30,10 @@ export default async function WorldDiscoveryPage({ searchParams }: Props) {
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/70">
             UMTUBA World
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-5xl">
+          {/* AppTopNav owns the page H1; keep a single document H1. */}
+          <h2 className="mt-2 text-3xl font-black tracking-tight md:text-5xl">
             Explore a destination, your way
-          </h1>
+          </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
             Discover approved public stores, restaurants, hotels, cafes and
             local services. GPS is provided by your device and is always

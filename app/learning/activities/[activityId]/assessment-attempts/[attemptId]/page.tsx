@@ -119,9 +119,9 @@ export default async function AssessmentAttemptFoundationPage({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           Submission foundation · no grading in this foundation
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        <h2 className="mt-1 text-3xl font-black tracking-tight">
           Status: {view.status}
-        </h1>
+        </h2>
         <dl className="mt-4 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
           <div>
             <dt className="text-white/35">Started</dt>

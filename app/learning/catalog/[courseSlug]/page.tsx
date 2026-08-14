@@ -85,9 +85,9 @@ export default async function LearningPublicCourseLandingPage({
       ) : null}
 
       <header className="mt-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
+        <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
           {course.name}
-        </h1>
+        </h2>
         {course.description ? (
           <p className="mt-3 text-sm leading-relaxed text-white/75">
             {course.description}

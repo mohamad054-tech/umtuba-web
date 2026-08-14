@@ -8,6 +8,8 @@
  * Clear umtuba_ref only after claim coordinator success / final invalid result.
  */
 
+import { getSiteUrl } from "../site/siteUrl";
+
 export const REFERRAL_COOKIE_NAME = "umtuba_ref";
 export const REFERRAL_VISITOR_COOKIE = "umtuba_vid";
 
@@ -44,15 +46,20 @@ export function buildSignupRefPath(code: string): string {
   return `/signup?ref=${encodeURIComponent(code)}`;
 }
 
-/** Absolute invite URL for sharing (uses window origin when available). */
+/**
+ * Absolute invite URL for sharing.
+ * Priority: explicit origin → browser origin → shared `getSiteUrl()` (env/fallback).
+ * Do not hardcode a public apex distinct from `lib/site/siteUrl` resolution.
+ */
 export function buildInviteAbsoluteUrl(
   code: string,
-  origin?: string | null
+  origin?: string | null,
+  env: Record<string, string | undefined> = process.env
 ): string {
   const path = buildInvitePath(code);
   if (origin) return `${origin.replace(/\/$/, "")}${path}`;
   if (typeof window !== "undefined" && window.location?.origin) {
     return `${window.location.origin}${path}`;
   }
-  return `https://umtuba.com${path}`;
+  return `${getSiteUrl(env)}${path}`;
 }

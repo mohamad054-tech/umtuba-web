@@ -65,9 +65,9 @@ export default async function SellerProductsPage() {
         <p className="sf-eyebrow">Catalog workspace</p>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="sf-display text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="sf-display text-3xl font-semibold tracking-tight md:text-4xl">
               Products
-            </h1>
+            </h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
               Manage drafts, review submissions, and live catalog items for @
               {membership.store.slug}. Publishing still requires operator

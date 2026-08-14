@@ -39,7 +39,8 @@ export default function SavedExperience({
         <p className="text-sm font-bold uppercase tracking-[0.3em] text-blue-300">
           Your collection
         </p>
-        <h1 className="mt-3 text-4xl font-black md:text-5xl">Saved posts</h1>
+        {/* AppTopNav owns the page H1; keep a single document H1. */}
+        <h2 className="mt-3 text-4xl font-black md:text-5xl">Saved posts</h2>
         <p className="mt-4 max-w-2xl text-white/60">
           Posts you bookmark appear here. Unsave anytime from the post card.
         </p>

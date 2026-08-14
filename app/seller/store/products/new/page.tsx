@@ -52,9 +52,9 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
 
       <section className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">Create</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight">
           New product draft
-        </h1>
+        </h2>
         <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
           Starts as draft with a default variant, price, and inventory row.
           Submit for review from the editor when ready — sellers cannot

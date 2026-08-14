@@ -25,9 +25,9 @@ export default async function CreatorInsightsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Creator
           </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">
+          <h2 className="mt-1 text-3xl font-black tracking-tight">
             Creator Insights
-          </h1>
+          </h2>
           <p className="mt-2 text-sm text-white/50">
             Stored performance notes about your content. These are account
             insights records — not a live AI assistant session.

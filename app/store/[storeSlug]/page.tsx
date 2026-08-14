@@ -158,9 +158,9 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
               </div>
               <div className="pb-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="sf-display text-2xl font-semibold tracking-tight md:text-3xl">
+                  <h2 className="sf-display text-2xl font-semibold tracking-tight md:text-3xl">
                     {store.name}
-                  </h1>
+                  </h2>
                   <span
                     className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       verified

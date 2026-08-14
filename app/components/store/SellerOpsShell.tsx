@@ -12,7 +12,10 @@ type SellerOpsShellProps = {
   wide?: boolean;
 };
 
-/** Seller-private operational shell using Commerce premium tokens (no buyer cart). */
+/**
+ * Seller-private operational shell using Commerce premium tokens (no buyer cart).
+ * AppTopNav stays full-bleed; page content is constrained.
+ */
 export default function SellerOpsShell({
   title,
   subtitle,
@@ -28,12 +31,12 @@ export default function SellerOpsShell({
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(214,196,161,0.07),_transparent_55%)]" />
         <div className="absolute inset-0 opacity-[0.03] [background-image:linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:48px_48px]" />
       </div>
+      <AppTopNav title={title} subtitle={subtitle} actions={actions} sticky />
       <div
         className={`relative z-10 mx-auto px-4 py-6 sm:px-5 md:px-6 ${
           wide ? "max-w-5xl" : "max-w-3xl"
         }`}
       >
-        <AppTopNav title={title} subtitle={subtitle} actions={actions} />
         <div className="sf-enter">{children}</div>
       </div>
     </main>

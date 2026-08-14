@@ -209,7 +209,8 @@ export default async function WorldPlacePage({ params, searchParams }: Props) {
           <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-200/70">
             {place.kind.replace(/_/g, " ")} · {place.verificationStatus}
           </p>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">{place.name}</h1>
+          {/* AppTopNav already titles the place; keep a single document H1. */}
+          <h2 className="mt-2 text-3xl font-black md:text-5xl">{place.name}</h2>
           {place.tagline ? (
             <p className="mt-3 max-w-2xl text-white/60">{place.tagline}</p>
           ) : null}

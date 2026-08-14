@@ -94,9 +94,9 @@ export default async function PostJourneyPage({
                   UMTUBA Global Discovery
                 </p>
 
-                <h1 className="mt-3 text-4xl font-black sm:text-5xl">
+                <h2 className="mt-3 text-4xl font-black sm:text-5xl">
                   Post Journey
-                </h1>
+                </h2>
 
                 <p className="mt-4 max-w-2xl text-base leading-7 text-white/60">
                   {hasPost && journey

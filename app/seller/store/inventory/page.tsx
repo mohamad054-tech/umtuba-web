@@ -69,9 +69,9 @@ export default async function SellerStoreInventoryPage({
     <SellerOpsShell title="Inventory" subtitle={membership.store.name} wide>
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">@{membership.store.slug}</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Inventory & reservations
-        </h1>
+        </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Visibility into trusted on-hand, reserved, safety stock, and
           available-to-sell. This workspace does not edit authoritative stock

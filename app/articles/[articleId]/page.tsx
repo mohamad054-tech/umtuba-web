@@ -63,7 +63,12 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
     <main
       className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
-      <AppTopNav title="Article" subtitle="Full story" sticky />
+      <AppTopNav
+        title="Article"
+        subtitle="Full story"
+        sticky
+        titleIsHeading={false}
+      />
       <article className="mx-auto max-w-2xl px-5 py-8 md:px-8">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           Article

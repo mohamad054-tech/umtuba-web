@@ -269,9 +269,10 @@ export default function AttemptPlayer({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           Attempt #{view.attempt_number}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        {/* AppTopNav (via LearningShell) owns the page H1. */}
+        <h2 className="mt-1 text-3xl font-black tracking-tight">
           {activityName ?? "Activity attempt"}
-        </h1>
+        </h2>
         <div className="mt-4">
           <AttemptStatusBanner
             status={view.status}

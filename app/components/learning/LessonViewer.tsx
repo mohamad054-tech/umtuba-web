@@ -128,9 +128,10 @@ export default function LessonViewer({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {delivery.lesson.course_name}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        {/* AppTopNav (via LearningShell) owns the page H1. */}
+        <h2 className="mt-1 text-3xl font-black tracking-tight">
           {delivery.lesson.name}
-        </h1>
+        </h2>
         {delivery.lesson.description ? (
           <p className="mt-2 text-sm text-white/50">{delivery.lesson.description}</p>
         ) : null}

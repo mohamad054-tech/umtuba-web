@@ -93,7 +93,7 @@ export default async function LearningAssessmentDeliveryPage({
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {view.type} · assessment
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">{view.name}</h1>
+        <h2 className="mt-1 text-3xl font-black tracking-tight">{view.name}</h2>
         {view.description ? (
           <p className="mt-2 text-sm text-white/50">{view.description}</p>
         ) : null}

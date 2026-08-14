@@ -64,8 +64,8 @@ export default async function SellerStorePromotionsPage() {
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
+      <AppTopNav title="Promotions" subtitle={membership.store.name} sticky />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
-        <AppTopNav title="Promotions" subtitle={membership.store.name} />
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <Link
             href={APP_ROUTES.sellerStore}

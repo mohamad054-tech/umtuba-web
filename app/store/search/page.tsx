@@ -61,9 +61,9 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
     >
       <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
         <p className="sf-eyebrow">Browse</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+        <h2 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Search & categories
-        </h1>
+        </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
           Filter active catalog products by keyword, category, and sort. Search
           uses the existing store catalog contract — no fabricated matches.

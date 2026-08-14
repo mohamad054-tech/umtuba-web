@@ -20,9 +20,10 @@ export default function GamesHubPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
             Games
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">
+          {/* AppTopNav owns the page H1; keep a single document H1. */}
+          <h2 className="mt-2 text-3xl font-black tracking-tight">
             Unavailable in this Beta
-          </h1>
+          </h2>
           <p className="mt-3 text-sm leading-7 text-white/55">
             The Games route exists so Home shortcuts stay stable, but playable
             catalog and sessions are not part of Alpha Beta Productization.
