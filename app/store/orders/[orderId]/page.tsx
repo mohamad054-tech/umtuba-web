@@ -38,7 +38,7 @@ export default async function StoreOrderDetailPage({ params }: PageProps) {
       <div className="mt-4">
         <Link
           href={APP_ROUTES.storeOrders}
-          className="text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-accent-strong)]"
+          className="sf-btn sf-btn-ghost"
         >
           ← Back to my orders
         </Link>

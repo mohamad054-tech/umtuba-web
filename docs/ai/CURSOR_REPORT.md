@@ -1,27 +1,31 @@
-# CURSOR_REPORT — ZERO_WAIT_CENTRAL_CONTINUOUS_V3
+# CURSOR_REPORT — PC2 Store Premium UX/UI Overhaul V1 (FINAL_POLISH_CLOSEOUT)
+
+```text
+SOURCE_DEVICE = PC2
+DEVICE_ROLE = STORE_PREMIUM_UX_UI_PRIMARY
+TASK_ID = PC2_STORE_PREMIUM_UX_UI_OVERHAUL_V1
+REPORT_TYPE = FINAL_POLISH_CLOSEOUT
+TIMESTAMP_LOCAL = 2026-08-13 ~14:00 +03
+COMMIT_CREATED = YES (closeout; no push)
+SECRET_VALUES_PRINTED = NO
+BRANCH = office/platform-translation-trunk-port-v1
+BASE_SHA = 3ffa2a8e2ebf96e08a009b62e42ef6fce6097c51
+FINAL_SHA = TO_BE_STAMPED_AFTER_COMMIT
+```
 
 ## Summary
 
-Central Continuous Zero-Wait V3 on alpha tip `e84475a769c731bb7e1ad511b3543ee714d2feea` (worktree `_tmp-translation-alpha-integrate-68dd8c74`), **2 cycles / 6 local fixes**, no commit. Did not redo V1/V2 FIXED tasks. Did not steal Desktop/Laptop/PC2 active scopes. FROM-* device reports ABSENT — no Games land.
+Closed the existing Store Premium UX overhaul (not a new wave). Preserved the prior dirty UX work at HEAD `3ffa2a8`. Added a **Store-context AppTopNav appearance** so global UMTUBA nav stays the same component/routes/auth, while Store pages use gold contrast instead of platform blue. Ran live visual QA against the local Next server and seeded E2E catalog (`Simple Mug`). Fixed 360px header collision and 768px horizontal overflow. Authenticated cart/checkout/orders still redirect to login (no session on this QA pass).
 
-**Cycle 1:** AdvertiseShell, PrivateAiShell, KnowledgeAcquisitionShell + AiDataPlatformShell — full-bleed AppTopNav + page single-H1.
+**STORE_PREMIUM_UX_READY = partial.** Visual language is cohesive and AppTopNav conflict is resolved safely, but authenticated purchase surfaces were not pixel-checked, and cursor-ide-browser MCP could not open tabs (Playwright used instead).
 
-**Cycle 2:** CreateVideoForm single-H1; TranslationStudioShell; AdminAdsShell + AdminStoreShell — full-bleed AppTopNav + page single-H1.
+## Exact files changed
 
-## Exact files changed (V3 highlights)
+New: `StoreChrome.tsx`, `StorePageHeader.tsx`, `StoreQtyStepper.tsx`, `StoreTrustStrip.tsx`
 
-- `app/advertise/AdvertiseShell.tsx` + advertise pages (h1→h2)
-- `app/admin/private-ai/PrivateAiShell.tsx` + private-ai pages
-- `app/admin/knowledge/KnowledgeAcquisitionShell.tsx` + knowledge pages
-- `app/admin/ai-data/AiDataPlatformShell.tsx` + ai-data pages
-- `app/admin/translation-studio/TranslationStudioShell.tsx` + studio pages
-- `app/admin/ads/AdminAdsShell.tsx` + ads admin pages
-- `app/admin/store/AdminStoreShell.tsx` + store admin pages
-- `app/create/video/CreateVideoForm.tsx`
-- `lib/site/adminAndAdvertiseShellChromeContract.test.ts` (new/extended)
-- `docs/ai/CURSOR_REPORT.md` (this file)
+Modified: `AppTopNav.tsx` (store appearance + embedded), StoreShell, storefront.css, ProductCard, ProductDetailClient, HeroCarousel, SearchFilters, Cart/Checkout/Empty/Error/Skeleton/Wishlist, buyer pages, `shellCoherence.test.ts`, `deriveSections.ts`, tests, this report.
 
-Plus retained dirty V1+V2 pack (GamesHubShell, referral siteUrl, Learning/World/Seller/Rewards/AppTopNav titleIsHeading, next.config headers, etc.).
+Not committed: untracked vitest logs; local Playwright QA screenshots/scripts under `worktrees/_store_visual_qa*`.
 
 ## Migrations created
 
@@ -29,17 +33,14 @@ None.
 
 ## Security review
 
-No secrets / `.env` reads. No credential paths. No remote mutations. Admin chrome only; no Permissions-Policy/CSP invent beyond prior V2 baseline headers.
+- UI/UX only. No RLS/RPC/payment-contract edits.
+- AppTopNav store appearance does not change routes, auth, UserMenu, or search href (`APP_ROUTES.search` preserved).
+- No secrets committed.
 
 ## Tests
 
-```
-npx vitest run lib/site/adminAndAdvertiseShellChromeContract.test.ts \
-  lib/site/appTopNavHeadingAndSecurityHeadersContract.test.ts \
-  lib/site/platformShellSingleH1Contract.test.ts
-```
-
-PASS (14).
+- storefrontDeriveSections + cartCheckoutExperience + shellCoherence: **31/31 PASS**
+- Pre-existing Arabic-locale money format vitest failures not re-opened (money helpers untouched)
 
 ## TypeScript
 
@@ -47,18 +48,20 @@ PASS (14).
 
 ## Build
 
-Not run (policy; shell/a11y only).
+`npm run build` — PASS (pre-existing Translation Studio NFT warning unrelated)
 
 ## git diff --check
 
-PASS
+Clean
 
 ## git status --short
 
-Dirty uncommitted V1+V2+V3 pack on alpha worktree. COMMITS=NONE.
+After commit: expected clean except untracked `_*.log` vitest files and local `_store_visual_qa*` artifacts (not part of the task commit).
 
 ## Open issues
 
-- Games Option A land waits Desktop OUTBOX COMPLETE.
-- Explicit commit GO required for dirty alpha pack.
-- Device FROM-* still empty at session end.
+1. STORE_PREMIUM_UX_READY = partial — login-gated cart/checkout/orders/wishlist not visually QA’d with a session.
+2. cursor-ide-browser MCP failed to create tabs; Playwright against localhost used for visual QA.
+3. Next.js dev “1 Issue” overlay from unauthenticated `UserMenu getUser` (pre-existing; not Store logic).
+4. P: / UMTUBA-SHARE still down — Central must pull local outbox.
+5. Do not start a new wave.

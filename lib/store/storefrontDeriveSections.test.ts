@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   categoryHref,
+  compareAtSavePercent,
   deriveCuratedCollections,
   deriveFeaturedStores,
   hasLegitimateCompareAt,
@@ -221,6 +222,7 @@ describe("storefront deriveSections", () => {
     expect(slides).toHaveLength(1);
     expect(slides[0]?.id).toBe("welcome");
     expect(slides[0]?.href).toBe("/store/search");
+    expect(slides[0]?.title).toBe("Shop UMTUBA");
   });
 
   it("sorts catalog by price and title without inventing prices", () => {
@@ -269,5 +271,11 @@ describe("storefront deriveSections", () => {
         })
       )
     ).toBe(false);
+  });
+
+  it("computes compare-at save percent only for legitimate discounts", () => {
+    expect(compareAtSavePercent(800, 1000)).toBe(20);
+    expect(compareAtSavePercent(100, 100)).toBe(null);
+    expect(compareAtSavePercent(null, 1500)).toBe(null);
   });
 });

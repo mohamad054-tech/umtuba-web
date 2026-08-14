@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { compareAtSavePercent } from "../../lib/storefront/deriveSections";
 import { formatMinorUnits } from "../../../lib/store/money";
 import type { PublicCatalogItem } from "../../../lib/store/types";
 import WishlistButton from "./WishlistButton";
@@ -7,6 +8,7 @@ type ProductCardProps = {
   item: PublicCatalogItem;
   badge?: string;
   showWishlist?: boolean;
+  initialWishlisted?: boolean;
 };
 
 function availabilityLabel(available: number | null): {
@@ -23,6 +25,7 @@ export default function ProductCard({
   item,
   badge,
   showWishlist = true,
+  initialWishlisted = false,
 }: ProductCardProps) {
   const href = `/store/${item.store.slug}/product/${item.product.slug}`;
   const price =
@@ -36,12 +39,13 @@ export default function ProductCard({
     item.compareAtMinor > item.priceMinor
       ? formatMinorUnits(item.compareAtMinor, item.currency)
       : null;
+  const savePct = compareAtSavePercent(item.priceMinor, item.compareAtMinor);
   const coverUrl = item.coverUrl ?? null;
   const availability = availabilityLabel(item.available);
   const productType = item.product.product_type;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)] hover:shadow-[0_24px_60px_-36px_rgba(0,0,0,0.85)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)] hover:shadow-[var(--sf-shadow)]">
       <Link href={href} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
         <span className="sr-only">View {item.product.title}</span>
       </Link>
@@ -67,6 +71,7 @@ export default function ProductCard({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
 
         <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
+          {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
           {badge ? (
             <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
               {badge}
@@ -88,7 +93,7 @@ export default function ProductCard({
           <div className="pointer-events-auto absolute right-3 top-3 z-20">
             <WishlistButton
               productId={item.product.id}
-              initialWishlisted={false}
+              initialWishlisted={initialWishlisted}
               nextHref={href}
               className="watch-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40 text-base text-white backdrop-blur-sm transition hover:bg-black/55"
             />
@@ -99,7 +104,11 @@ export default function ProductCard({
           <p className="absolute inset-x-3 bottom-3 z-10 truncate rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/65 backdrop-blur-sm">
             Media coming soon
           </p>
-        ) : null}
+        ) : (
+          <p className="pointer-events-none absolute inset-x-3 bottom-3 z-10 translate-y-2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-white/0 opacity-0 backdrop-blur-sm transition group-hover:translate-y-0 group-hover:text-white/80 group-hover:opacity-100">
+            View product
+          </p>
+        )}
       </div>
 
       <div className="relative z-20 flex flex-1 flex-col gap-2 p-4 pointer-events-none">
@@ -119,7 +128,7 @@ export default function ProductCard({
           <div className="min-w-0">
             {price ? (
               <div className="flex flex-wrap items-baseline gap-2">
-                <span className="text-sm font-semibold text-[var(--sf-ink)]">
+                <span className="text-base font-semibold tracking-tight text-[var(--sf-accent-strong)]">
                   {price}
                 </span>
                 {compareAt ? (

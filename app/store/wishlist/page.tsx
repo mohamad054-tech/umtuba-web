@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import ProductCard from "../../components/store/ProductCard";
 import StoreEmptyState from "../../components/store/StoreEmptyState";
 import StoreErrorState from "../../components/store/StoreErrorState";
 import StoreShell from "../../components/store/StoreShell";
-import WishlistButton from "../../components/store/WishlistButton";
 import { APP_ROUTES } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { listWishlist } from "../../../lib/store/wishlist";
@@ -25,18 +23,7 @@ export default async function StoreWishlistPage() {
   const { items, error } = await listWishlist(supabase, user.id);
 
   return (
-    <StoreShell
-      title="Favorites"
-      subtitle="Store"
-      actions={
-        <Link
-          href={APP_ROUTES.store}
-          className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70"
-        >
-          Store home
-        </Link>
-      }
-    >
+    <StoreShell title="Favorites" subtitle="Store">
       {error ? (
         <div className="mt-6">
           <StoreErrorState message={error} />
@@ -46,21 +33,18 @@ export default async function StoreWishlistPage() {
           <StoreEmptyState
             title="No favorites yet"
             description="Save products from the store to find them here later."
+            actionHref={APP_ROUTES.store}
+            actionLabel="Browse the Store"
           />
         </div>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((entry) => (
-            <div key={entry.wishlistItemId} className="relative">
-              <ProductCard item={entry.item} />
-              <div className="absolute right-3 top-3">
-                <WishlistButton
-                  productId={entry.item.product.id}
-                  initialWishlisted={true}
-                  nextHref={APP_ROUTES.storeWishlist}
-                />
-              </div>
-            </div>
+            <ProductCard
+              key={entry.wishlistItemId}
+              item={entry.item}
+              initialWishlisted
+            />
           ))}
         </div>
       )}

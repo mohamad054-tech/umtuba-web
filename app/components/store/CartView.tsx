@@ -306,7 +306,7 @@ export default function CartView({
                           type="button"
                           disabled={pending}
                           onClick={() => onRemove(item.id)}
-                          className="watch-focus-ring rounded-full border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-3 py-2 text-xs font-semibold text-[var(--sf-danger)]"
+                          className="sf-btn sf-btn-danger"
                         >
                           Remove
                         </button>
@@ -383,7 +383,7 @@ export default function CartView({
         {proceed.ok ? (
           <Link
             href={APP_ROUTES.storeCheckout}
-            className="mt-5 flex w-full items-center justify-center rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] transition hover:bg-[var(--sf-accent-strong)]"
+            className="sf-btn sf-btn-primary mt-5 w-full"
           >
             {purchasesAvailable
               ? "Continue to checkout"
@@ -394,7 +394,7 @@ export default function CartView({
             type="button"
             disabled
             aria-disabled="true"
-            className="mt-5 flex w-full cursor-not-allowed items-center justify-center rounded-full bg-white/10 px-5 py-3 text-sm font-bold text-white/35"
+            className="sf-btn sf-btn-primary mt-5 w-full"
           >
             Checkout unavailable
           </button>
@@ -410,6 +410,23 @@ export default function CartView({
           Continue shopping
         </Link>
       </aside>
+
+      {proceed.ok ? (
+        <div className="sf-sticky-actions lg:hidden">
+          <Link
+            href={APP_ROUTES.store}
+            className="sf-btn sf-btn-secondary"
+          >
+            Shop
+          </Link>
+          <Link
+            href={APP_ROUTES.storeCheckout}
+            className="sf-btn sf-btn-primary min-w-0 flex-1"
+          >
+            {purchasesAvailable ? "Checkout" : "Review checkout"}
+          </Link>
+        </div>
+      ) : null}
     </div>
   );
 }
