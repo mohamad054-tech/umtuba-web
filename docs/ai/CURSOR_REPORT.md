@@ -1,71 +1,69 @@
-﻿# CURSOR_REPORT — Learning Tutor thread lesson binding hardening
+﻿# CURSOR_REPORT
 
 ## Summary
 
-**PASS** — Completed and verified **`learning.tutor.thread_lesson_binding_hardening_v1`** on
-`office/learning-ai-tutor-thread-lesson-binding-v1` from metadata-read tip `9e90448`.
+SERVER_A2_IOS_BUILD_PREREQUISITES_OPERATOR_HANDOFF_V1 **DONE · STOP**. Live inventory: engineering source READY at exact `64a2fdd`; EAS auth / Apple signing / Supabase public env ABSENT → prerequisites **NO** → first-build GO recommended **NO**. Operator deposits required under `control\secrets` (filenames only). `/support` live **404**. UGC `20260928` DB APPLIED; alpha source-parity NO; iOS UGC bind UNBOUND_FAIL_CLOSED. No EAS build. No secrets exposed. Android A1 not duplicated.
 
-- Local migration `20260874` drops 4-arg exchange overload and creates 5-arg RPC with SQL lesson binding.
-- Foundation / bridge / integration pass `lessonId` → `p_lesson_id`.
-- Bridge fail-closed for mismatch, auth, entitlement, and invalid ids; metadata validation retained.
-- Migration **not** applied remotely.
-- Feature commit **pushed**: `b85081b` on `office/learning-ai-tutor-thread-lesson-binding-v1` (synced `0 0`).
+```text
+EAS_AUTH_PRESENT=NO
+APPLE_SIGNING_PRESENT=NO
+SUPABASE_PUBLIC_ENV_PRESENT=NO
+IOS_BUNDLE_ID=com.umtuba.app
+IOS_VERSION=1.0.0
+IOS_BUILD_NUMBER=1
+EAS_PROJECT_LINKED=YES
+IOS_SOURCE_SHA_TO_BUILD=64a2fdd75a73599a3be2820f6d46dab30bb338d8
+IOS_ENGINEERING_SOURCE_READY=YES
+EAS_AUTH_READY=NO
+APPLE_SIGNING_READY=NO
+IOS_ENV_READY=NO
+IOS_BUILD_PREREQUISITES_READY=NO
+FIRST_REAL_IOS_EAS_BUILD_GO_RECOMMENDED=NO
+OPERATOR_DEPOSITS_REQUIRED=YES
+STOP=YES
+```
+
+Canonical: `D:\umtuba-central\reports\UMTUBA_CENTRAL_SERVER_A2_IOS_BUILD_PREREQUISITES_OPERATOR_HANDOFF_V1.md`
 
 ## Exact files changed
 
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (new)
-- `lib/learning/aiTutorFoundation.ts`
-- `lib/learning/aiTutorFoundation.test.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.test.ts`
-- `lib/ai/services/learningTutorIntegration.ts`
 - `docs/ai/CURRENT_TASK.md`
+- `docs/ai/PROJECT_STATE.md`
 - `docs/ai/CURSOR_REPORT.md`
+- Outside repo: canonical report + handoff notice + PC2/SERVER ACKs; TO-PC2 / TO-SERVER (+ share) mirrors
 
 ## Migrations created
 
-`supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (local only; **not** applied).
-
-## Behavior implemented
-
-- Exchange persistence requires `lessonId` end-to-end (integration → bridge → foundation → RPC `p_lesson_id`).
-- SQL enforces `auth.uid` ownership, live course entitlement, exact `thread.lesson_id = p_lesson_id`, and lesson belongs to `thread.course_id`.
-- Old 4-arg overload dropped so callers cannot bypass binding.
-- App maps lesson mismatch → `invalid_input`; auth/entitlement/not-found → `permission_denied`.
+None.
 
 ## Security review
 
-- `SECURITY DEFINER` + `search_path = public`
-- `auth.uid()` ownership; course entitlement re-check
-- Exact `thread.lesson_id = p_lesson_id`; lesson must belong to `thread.course_id`
-- Old 4-arg overload dropped (cannot bypass binding)
-- Revoke public/anon; grant authenticated (+ service_role convention)
-- App path: authenticated client only; no service-role client
-- Idempotent function replace + drop-if-exists; no table/column create/drop; stub append preserved
+Presence-only credential inventory. No secret values printed. No invent READY/GO. No EAS build / TestFlight / ASC. `64a2fdd` not modified. Android A1 not touched.
 
 ## Tests
 
-- Narrow: foundation + bridge — **56 passed**
-- Affected Tutor surface (`lib/ai/capabilities/learning` + foundation + integration + server actions): **115 passed**
-- Includes: correct binding, mismatch rejection, unauthorized/auth rejection, missing/invalid ids, valid persist, no capability regression
+N/A (inventory / handoff / mirrors / docs).
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS (exit 0)
+N/A.
 
 ## Build
 
-Not run (policy).
+N/A — no product code change; first iOS EAS build explicitly not recommended.
 
 ## git diff --check
 
-PASS (exit 0)
+Not required for docs/report handoff.
 
 ## git status --short
 
-Clean on branch after docs handoff sync (feature already at `b85081b`).
+Docs/ai triad updated; no commit per standing prohibition.
 
 ## Open issues
 
-- Do not remote-apply `20260874` without explicit GO
-- Do not touch Provider / Gemini / alpha / Web UI from this laptop
+- Operator deposit: `expo_token.env`, `AuthKey_<KEYID>.p8`, `expo_public_supabase.env` under `control\secrets`
+- Then `CENTRAL_GO_IOS_EAS_AUTH_COMPLETE_V1` (build still requires separate GO)
+- `/support` still 404 (App Store ladder residual)
+- iOS UGC server bind still UNBOUND_FAIL_CLOSED
+- UGC `20260928` alpha source-parity still NO (DB APPLIED; do not re-apply)

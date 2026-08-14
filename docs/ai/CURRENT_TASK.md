@@ -2,64 +2,38 @@
 
 ## Task title
 
-UM Learning AI Tutor Backend — Thread Lesson Binding Hardening V1
+SERVER_A2_IOS_BUILD_PREREQUISITES_OPERATOR_HANDOFF_V1 — STOP (prereqs NO · GO recommended NO)
 
 ## Status
 
-`verification-pass` — **COMMITTED + PUSHED** @ `b85081b` — branch synced `0 0` with `origin/office/learning-ai-tutor-thread-lesson-binding-v1`. Awaiting separate apply GO for `20260874` only.
+`stop` — Operator handoff for first-real iOS EAS build credentials/env **COMPLETE**. No EAS build. No modify/`repush` of `64a2fdd`. Android A1 not touched.
 
-## Branch
+```text
+IOS_ENGINEERING_SOURCE_READY=YES
+EAS_AUTH_READY=NO
+APPLE_SIGNING_READY=NO
+IOS_ENV_READY=NO
+IOS_BUILD_PREREQUISITES_READY=NO
+FIRST_REAL_IOS_EAS_BUILD_GO_RECOMMENDED=NO
+OPERATOR_DEPOSITS_REQUIRED=YES
+SUPPORT_CURRENT_STATUS=404
+UGC_20260928_DB_APPLIED=YES
+UGC_20260928_SOURCE_PARITY_ON_ALPHA=NO
+IOS_UGC_BINDING_STATE=UNBOUND_FAIL_CLOSED
+NEXT_GO_REQUIRED=CENTRAL_GO_IOS_EAS_AUTH_COMPLETE_V1
+STOP=YES
+```
 
-`office/learning-ai-tutor-thread-lesson-binding-v1`
-
-## Base
-
-`office/learning-ai-tutor-thread-metadata-read-v1` @ `9e90448ce8e4566fd369476a2571844378b0950c`
-
-## Worktree
-
-`C:\Users\Admin\Desktop\umtuba\umtuba-web` (no alternate worktree)
-
-## Milestone
-
-`learning.tutor.thread_lesson_binding_hardening_v1`
-
-## Delivered
-
-- Migration (local only): `20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- Drops 4-arg `append_my_learning_ai_tutor_exchange(uuid, text, text, text)`
-- Creates 5-arg RPC with SQL `thread.lesson_id = p_lesson_id` + lesson∈course + course membership + auth.uid ownership
-- Foundation + bridge + integration pass `lessonId` / `p_lesson_id`
-- Bridge maps mismatch / auth / entitlement fail-closed; validates threadId+lessonId UUIDs
-- Lean metadata validation retained as defense in depth
-
-## Verification (local)
-
-- Narrow + affected Tutor suites: **115 passed**
-- `npx tsc --noEmit`: PASS
-- `git diff --check`: PASS
-- `npm run build`: not run (policy)
-- Migration: **not applied** remotely
-
-## Machine policy
-
-AI Tutor Backend laptop only. Do **not** touch `alpha-0.2` / Web UI / Provider / Gemini. No `npm run build`. Do not apply migration remotely without explicit GO.
+**Next (operator only):** deposit under `D:\umtuba-central\control\secrets\` → `expo_token.env`, `AuthKey_<KEYID>.p8`, `expo_public_supabase.env` (Team ID already present) → then `CENTRAL_GO_IOS_EAS_AUTH_COMPLETE_V1`.
 
 ## Allowed scope
 
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql`
-- `lib/learning/aiTutorFoundation.ts` (+ tests)
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts` (+ tests)
-- `lib/ai/services/learningTutorIntegration.ts` (pass lessonId only)
-- `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
+- iOS build-prerequisites inventory + operator handoff report/mirrors/docs only
 
 ## Forbidden scope
 
-- Provider Foundation / Gemini
-- alpha-0.2 / Web UI
-- New Tutor capabilities
-- Commit / push / remote migration apply without GO
+- EAS build · TestFlight/ASC · modify/repush `64a2fdd` · invent credentials/READY/GO · Desktop Android A1 duplicate · secrets print
 
-## Next
+## Canonical
 
-Separate apply GO for migration `20260874` only (do not re-commit feature work).
+- `D:\umtuba-central\reports\UMTUBA_CENTRAL_SERVER_A2_IOS_BUILD_PREREQUISITES_OPERATOR_HANDOFF_V1.md`
