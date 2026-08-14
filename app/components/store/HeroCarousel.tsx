@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type HeroSlide = {
   id: string;
@@ -20,6 +20,15 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const safeSlides = slides.length > 0 ? slides : [];
+
+  const go = useCallback(
+    (next: number) => {
+      if (safeSlides.length === 0) return;
+      const len = safeSlides.length;
+      setIndex(((next % len) + len) % len);
+    },
+    [safeSlides.length]
+  );
 
   useEffect(() => {
     if (safeSlides.length <= 1 || paused) return;
@@ -44,6 +53,12 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
       aria-label="Featured storefront"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setPaused(false);
+        }
+      }}
     >
       <div className="relative min-h-[280px] md:min-h-[420px] lg:min-h-[480px]">
         {slide.imageUrl ? (
@@ -69,23 +84,17 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
 
         <div className="relative z-10 flex min-h-[280px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 lg:min-h-[480px] lg:p-14">
           <p className="sf-eyebrow">UMTUBA Store</p>
-          <h1 className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] md:text-5xl lg:text-6xl">
+          <h1 className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl">
             {slide.title}
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">
             {slide.subtitle}
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link
-              href={slide.href}
-              className="watch-focus-ring inline-flex rounded-full bg-[var(--sf-accent-strong)] px-5 py-2.5 text-sm font-bold text-[#14110c] transition hover:brightness-105"
-            >
+            <Link href={slide.href} className="sf-btn sf-btn-primary">
               {slide.ctaLabel ?? "Explore"}
             </Link>
-            <Link
-              href="/store/search"
-              className="watch-focus-ring inline-flex rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white/85 backdrop-blur-sm transition hover:bg-white/10"
-            >
+            <Link href="/store/search" className="sf-btn sf-btn-secondary text-white">
               Browse catalog
             </Link>
           </div>
@@ -93,27 +102,53 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
       </div>
 
       {safeSlides.length > 1 ? (
-        <div
-          className="absolute bottom-4 right-4 z-20 flex gap-2 md:bottom-6 md:right-6"
-          role="tablist"
-          aria-label="Featured slides"
-        >
-          {safeSlides.map((s, i) => (
+        <>
+          <button
+            type="button"
+            className="sf-gallery-nav watch-focus-ring left-3 md:left-5"
+            aria-label="Previous featured slide"
+            onClick={() => go(index - 1)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="sf-gallery-nav watch-focus-ring right-3 md:right-5"
+            aria-label="Next featured slide"
+            onClick={() => go(index + 1)}
+          >
+            ›
+          </button>
+          <div
+            className="absolute bottom-4 right-4 z-20 flex items-center gap-2 md:bottom-6 md:right-6"
+            role="tablist"
+            aria-label="Featured slides"
+          >
+            {safeSlides.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={i === index}
+                aria-label={`Show slide ${i + 1}: ${s.title}`}
+                onClick={() => setIndex(i)}
+                className={`watch-focus-ring h-2.5 rounded-full transition-all ${
+                  i === index
+                    ? "w-7 bg-[var(--sf-accent-strong)]"
+                    : "w-2.5 bg-white/35 hover:bg-white/55"
+                }`}
+              />
+            ))}
             <button
-              key={s.id}
               type="button"
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Show slide ${i + 1}: ${s.title}`}
-              onClick={() => setIndex(i)}
-              className={`watch-focus-ring h-2.5 rounded-full transition-all ${
-                i === index
-                  ? "w-7 bg-[var(--sf-accent-strong)]"
-                  : "w-2.5 bg-white/35 hover:bg-white/55"
-              }`}
-            />
-          ))}
-        </div>
+              className="watch-focus-ring ml-1 rounded-full border border-white/20 bg-black/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80"
+              aria-pressed={paused}
+              onClick={() => setPaused((v) => !v)}
+            >
+              {paused ? "Play" : "Pause"}
+            </button>
+          </div>
+        </>
       ) : null}
     </section>
   );
