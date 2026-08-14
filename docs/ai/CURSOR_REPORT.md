@@ -1,27 +1,29 @@
-# CURSOR_REPORT — ZERO_WAIT_CENTRAL_CONTINUOUS_V3
+# CURSOR_REPORT — CENTRAL_AUTH_I18N_ALPHA_INTEGRATION_V1
 
 ## Summary
 
-Central Continuous Zero-Wait V3 on alpha tip `e84475a769c731bb7e1ad511b3543ee714d2feea` (worktree `_tmp-translation-alpha-integrate-68dd8c74`), **2 cycles / 6 local fixes**, no commit. Did not redo V1/V2 FIXED tasks. Did not steal Desktop/Laptop/PC2 active scopes. FROM-* device reports ABSENT — no Games land.
+FF-only integrated `office/central-auth-i18n-uaf-implementation-v1` @ `2df90a29` into authoritative `origin/alpha-0.2`. Store Premium left PARTIAL / AUTH_ENV_ABSENT (not included). UAF-05 still BLOCKED_PENDING_SSH pending Desktop deploy of alpha tip.
 
-**Cycle 1:** AdvertiseShell, PrivateAiShell, KnowledgeAcquisitionShell + AiDataPlatformShell — full-bleed AppTopNav + page single-H1.
+```text
+START_ALPHA_SHA = 0f0fb0a1242ad597eb37f25100af38b75ce4753c
+END_ALPHA_SHA   = 2df90a29c338466e81e85e1685c3c6e9e0758fd3
+MERGE_METHOD    = FF_ONLY
+PUSHED          = YES (0f0fb0a1..2df90a29 → origin/alpha-0.2)
+STORE_INCLUDED  = NO
+```
 
-**Cycle 2:** CreateVideoForm single-H1; TranslationStudioShell; AdminAdsShell + AdminStoreShell — full-bleed AppTopNav + page single-H1.
+Canonical: `D:\umtuba-central\reports\UMTUBA_CENTRAL_AUTH_I18N_ALPHA_INTEGRATION_V1.md`
 
-## Exact files changed (V3 highlights)
+## Exact files changed
 
-- `app/advertise/AdvertiseShell.tsx` + advertise pages (h1→h2)
-- `app/admin/private-ai/PrivateAiShell.tsx` + private-ai pages
-- `app/admin/knowledge/KnowledgeAcquisitionShell.tsx` + knowledge pages
-- `app/admin/ai-data/AiDataPlatformShell.tsx` + ai-data pages
-- `app/admin/translation-studio/TranslationStudioShell.tsx` + studio pages
-- `app/admin/ads/AdminAdsShell.tsx` + ads admin pages
-- `app/admin/store/AdminStoreShell.tsx` + store admin pages
-- `app/create/video/CreateVideoForm.tsx`
-- `lib/site/adminAndAdvertiseShellChromeContract.test.ts` (new/extended)
-- `docs/ai/CURSOR_REPORT.md` (this file)
+Product tree: none new this turn (auth land already at `2df90a29`). Integration via clean detached worktree `_tmp-central-auth-i18n-alpha-integrate-v1` + FF push.
 
-Plus retained dirty V1+V2 pack (GamesHubShell, referral siteUrl, Learning/World/Seller/Rewards/AppTopNav titleIsHeading, next.config headers, etc.).
+Handoff / coordination (outside product commit):
+
+- `D:\umtuba-central\reports\UMTUBA_CENTRAL_AUTH_I18N_ALPHA_INTEGRATION_V1.md`
+- `D:\umtuba-central\TO-SERVER\` mirrors + handoff notice
+- `D:\umtuba-central\TO-PC2\HANDOFF_NOTICE_STORE_PREMIUM_AUTH_ENV_RESUME_V1.txt` (+ SHARE)
+- this `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
@@ -29,36 +31,38 @@ None.
 
 ## Security review
 
-No secrets / `.env` reads. No credential paths. No remote mutations. Admin chrome only; no Permissions-Policy/CSP invent beyond prior V2 baseline headers.
+No secrets. No force push. Auth security preserved (prior UAF land). Store Premium not force-committed. Dirty local alpha chrome WT and Store Premium tmp left untouched.
 
 ## Tests
 
-```
-npx vitest run lib/site/adminAndAdvertiseShellChromeContract.test.ts \
-  lib/site/appTopNavHeadingAndSecurityHeadersContract.test.ts \
-  lib/site/platformShellSingleH1Contract.test.ts
-```
-
-PASS (14).
+Post-tip vitest (auth/i18n/nav/redirect): **PASS** — 8 files / 45 tests.
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS
+`.\node_modules\.bin\tsc --noEmit`: **PASS** (at tip `2df90a29`).
 
 ## Build
 
-Not run (policy; shell/a11y only).
+Not required for FF integrate of already-verified auth tip.
 
 ## git diff --check
 
-PASS
+N/A for remote FF publish (no new commit authored). Prior auth tip clean.
 
 ## git status --short
 
-Dirty uncommitted V1+V2+V3 pack on alpha worktree. COMMITS=NONE.
+```text
+origin/alpha-0.2 = 2df90a29
+office/central-auth-i18n-uaf-implementation-v1 = 2df90a29 (tracks origin)
+Local leftovers on auth branch (excluded from UAF/alpha tip):
+ M app/components/auth/AuthShell.tsx
+ M app/globals.css
+?? docs/architecture/PLATFORM_CHROME_AND_TOKEN_SOT_V1.md
+?? docs/architecture/PREMIUM_EXPERIENCE_QA_CHECKLIST_V1.md
+```
 
 ## Open issues
 
-- Games Option A land waits Desktop OUTBOX COMPLETE.
-- Explicit commit GO required for dirty alpha pack.
-- Device FROM-* still empty at session end.
+1. **UAF-05 = BLOCKED_PENDING_SSH** — Desktop SSH → deploy `origin/alpha-0.2` @ `2df90a29` → live+PC2 reprobe.
+2. **Store Premium = PARTIAL / AUTH_ENV_ABSENT** — need Central AUTH_ENV fixture for Phase 5 resume; do not declare STORE_PREMIUM_UX_READY=YES; no new Store wave.
+3. Dirty local WTs behind origin by 1 — reconcile separately (no blind reset).

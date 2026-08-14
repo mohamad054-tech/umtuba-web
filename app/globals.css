@@ -5,6 +5,16 @@
   --foreground: #171717;
   /* Set by AppMobileBottomNav while visible on small viewports */
   --app-mobile-bottom-nav-offset: 0px;
+  /*
+   * Platform chrome tokens (additive SoT).
+   * Domains may fork (e.g. Store --sf-*); do not remap Store/Learning here.
+   * Consumers may adopt gradually; hardcoded #050510 remains valid until migrated.
+   */
+  --platform-void: #050510;
+  --platform-focus-ring: rgba(255, 255, 255, 0.85);
+  --platform-eyebrow-tracking: 0.28em;
+  --platform-radius-card: 1.75rem; /* ~28px */
+  --platform-radius-panel: 2rem; /* ~32px */
 }
 
 @media (min-width: 640px) {
@@ -381,7 +391,7 @@ body {
 }
 
 .watch-focus-ring:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline: 2px solid var(--platform-focus-ring, rgba(255, 255, 255, 0.85));
   outline-offset: 3px;
 }
 

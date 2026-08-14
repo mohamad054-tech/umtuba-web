@@ -52,7 +52,7 @@ export default function AuthShell({
           <section className="p-6 sm:p-10">
             <Link
               href={APP_ROUTES.home}
-              className="mb-8 inline-block text-xl font-black tracking-tight lg:hidden"
+              className="watch-focus-ring mb-8 inline-block rounded-sm text-xl font-black tracking-tight lg:hidden"
             >
               UMTUBA
             </Link>
