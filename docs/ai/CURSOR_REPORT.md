@@ -1,23 +1,18 @@
-﻿# CURSOR_REPORT — Learner Lesson Delivery Defense-in-Depth V1
+﻿# CURSOR_REPORT
 
 ## Summary
 
-Closed the Learning-owned data-plane hole where `/learning/lessons/[lessonId]`
-loaded protected content blocks / activities and mutated progress
-(`start`/`touch`) in parallel with the lesson engine — before unlock was
-positively proven. Delivery is now engine-first and split into metadata-only
-vs verified-full paths.
+Milestone `JINN_AI_ACADEMY_CURRENT_USER_CONTROLLED_ENROLLMENT_V1` completed.
+
+**Verdict:** `CURRENT_USER_JINN_AI_ACADEMY_ACCESS_READY`
+
+Assigned real browser user `mohamad` / `mohamad054@gmail.com` to Jinn AI Academy via one program-level `create_learning_enrollment` (`admin_assignment`, active). e2e-buyer enrollment untouched. Content/publish/self-enroll unchanged.
+
+Confirmations: `NO_CONTENT_MUTATION` · `NO_PUBLISH_STATE_CHANGE` · `NO_SELF_ENROLL_CHANGE` · `NO_UNRELATED_USER_MUTATION`
 
 ## Exact files changed
 
-- `lib/learning/learnerDelivery.ts`
-- `lib/learning/learnerDelivery.test.ts`
-- `lib/learning/lessonContentAccess.test.ts`
-- `app/learning/lessons/[lessonId]/page.tsx`
-- `app/learning/lessons/[lessonId]/ai-tutor/page.tsx`
-- `app/components/learning/LessonViewer.tsx`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+- `docs/ai/CURSOR_REPORT.md` (this report only)
 
 ## Migrations created
 
@@ -25,47 +20,19 @@ None.
 
 ## Security review
 
-- Protected SELECTs (`learning_lesson_content_blocks`, `learning_activities`)
-  and progress mutations only run after `verified_unlocked`.
-- Metadata-only type has no `blocks`/`activities` fields (no accidental
-  fallback).
-- LessonViewer still renders protected content only from verified engine.
-- AI Tutor keeps unlock gate; uses metadata-only (no delivery progress mutation).
+- Enrollment via approved SECURITY DEFINER RPC under space-owner JWT.
+- Learner verification used target user JWT claim only (no RLS weaken).
+- Assessment strips answer keys.
+- No self-enroll / visibility / publish changes.
 
 ## Tests
 
-```
-npx vitest run lib/learning/learnerDelivery.test.ts
-npx vitest run lib/learning/lessonContentAccess.test.ts
-```
+Linked DB learner RPC smoke for assigned user: engine/unlock/bundle/assessment PASS.
 
-69 passed (55 + 14). Also ran AI Tutor regression suites (36 passed).
+## TypeScript / Build / git diff --check
 
-## TypeScript
-
-`npx tsc --noEmit` — PASS
-
-## Build
-
-Not required (no app entry / package change beyond Learning routes).
-
-## git diff --check
-
-PASS
-
-## git status --short
-
-```
- M app/components/learning/LessonViewer.tsx
- M app/learning/lessons/[lessonId]/ai-tutor/page.tsx
- M app/learning/lessons/[lessonId]/page.tsx
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/learning/learnerDelivery.test.ts
- M lib/learning/learnerDelivery.ts
- M lib/learning/lessonContentAccess.test.ts
-```
+N/A (no code changes).
 
 ## Open issues
 
-- Awaiting commit GO (no commit/push performed)
+Refresh `/learning` in the browser to see hub enrollment (server entitlement already PASS).

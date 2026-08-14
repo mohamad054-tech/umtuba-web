@@ -2,42 +2,37 @@
 
 ## Task
 
-LEARNING_STRUCTURED_COURSE_IMPORT_FOUNDATION_V1
+LEARNING_LESSON_ENGINE_O_COURSE_RPC_HOTFIX_V1
 
 ## Status
 
-`implementation-complete-pending-review`
+`implementation-complete-remote-applied-smoke-pass`
 
 ## Branch
 
-`office/learning-structured-course-import-foundation-v1`
+`office/learning-lesson-engine-o-course-rpc-hotfix-v1`
 
 ## Worktree
 
-`D:\umtuba-central\repos\umtuba-web-learning-structured-course-import-foundation-v1`
+`D:\umtuba-central\repos\umtuba-web-learning-lesson-engine-o-course-rpc-hotfix-v1`
 
 ## Base
 
-Learning SoT `office/learning-resume-accessible-target-hardening-v1` @ `da676abda659b8de6caae8a7ddf4c3835c0c79ea`
+Learning SoT `office/learning-resume-accessible-target-hardening-v1` @ `9461b30a453ec9eb6a6a90683bb6913015ddc5bc`
 
 ## Migration
 
-`20260918_learning_structured_course_import_foundation_v1.sql`
-**Centrally reserved.** **NOT remote-applied.**
+`20260920_learning_lesson_engine_o_course_rpc_hotfix_v1.sql`
+**Remote applied.** History registered as `20260920` / `learning_lesson_engine_o_course_rpc_hotfix_v1`.
 
 ## Scope
 
-- Course Manifest V1 types + validation + dry-run planner
-- Draft-first importer via existing create_* RPCs
-- Import run ledger + external-id map (migration)
-- Operator CLI validate/dry-run/import-draft
-- Synthetic fixture + docs
-- Tests
+- Fix PL/pgSQL nested composite `v_ctx.o_course.*` access bug
+- Targeted remote apply + learner re-smoke
 
 ## Forbidden / not done
 
-- Real course ingestion
-- Auto-publish / catalog public
-- Learning SoT FF
-- Remote migration apply
-- ≥20260919 allocation
+- Jinn content mutation / reimport
+- Unrelated schema / RLS weakening
+- Extra migrations / repair
+- Commit/push unless explicitly requested
