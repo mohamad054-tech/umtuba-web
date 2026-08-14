@@ -27,6 +27,7 @@ export default defineConfig({
       "lib/accountDeletion/**/*.test.ts",
       "lib/media/**/*.test.ts",
       "lib/supabase/**/*.test.ts",
+      "app/actions/**/*.test.ts",
       "lib/store/**/*.test.ts",
       "lib/stories/**/*.test.ts",
       "lib/search/**/*.test.ts",
