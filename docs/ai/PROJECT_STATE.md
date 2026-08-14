@@ -1,4 +1,4 @@
-# UMTUBA Project State (AI Handoff)
+﻿# UMTUBA Project State (AI Handoff)
 
 ## Project
 
@@ -8,103 +8,68 @@
 
 `alpha-0.2`
 
+## Coordinator resume pointer (20260814)
+
+**CENTRAL_AUTH_LOCALE_P1_SUPPORT_CLOSEOUT_V2 (20260814) — DONE · STOP · FIXED_VERIFIED:**
+- Login/Signup body locale **FIXED_VERIFIED** · `/support` **200** apex+www · App Store Support URL ready
+- Search regression **PASS** (not reopened) · AASA/World not touched
+- Production `3bc0b955` · release `3bc0b95-20260814203544` · rollback `c6a7521-20260814145703`
+- Canonical: `D:\umtuba-central\reports\UMTUBA_CENTRAL_AUTH_LOCALE_P1_SUPPORT_CLOSEOUT_V2.md`
+
+**CENTRAL_IOS_PREBUILD_ENGINEERING_BLOCKERS_CLOSEOUT_V1 (20260814) — DONE · STOP (retained):**
+- UGC `20260928` source on alpha · iOS bind `eb0267a` · `IOS_BUILD_GO=NO_OPERATOR_CREDENTIALS`
+- `/support` residual from that lane **closed by V2 above**
+
+**Open Central decisions (remaining — operator tracks):**
+
+- Operator secure Expo + Apple signing + public Supabase mobile env → `CENTRAL_GO_IOS_EAS_AUTH_COMPLETE_V1`
+- Operator deposit real Desktop Android v5 packet bytes
+- Operator AUTH_ENV Path A/B
+- Operator Laptop evacuation packet
+- Store Premium `dad5eb5` cherry-pick-or-leave
+- World migrations 20260825–27 + flag (**HOLD**)
+
+**Production tip (live):**
+
+- `origin/alpha-0.2` tip = `3bc0b95554f7c59ed174903c448011632faaf4d9`
+- **Production deployed** exact `3bc0b955` · release `3bc0b95-20260814203544`
+- Guest Search **FIXED_VERIFIED** · `/support` **LIVE_200**
+
+**NEXT:** `CENTRAL_NEXT=STOP` — this GO complete. No Search reopen. No EAS build without separate GO.
+
+See `docs/ai/CURRENT_TASK.md`.
+
 ## Learning chapter status
 
 **Learning V1 is officially APPROVED and FROZEN** (2026-07-27).
 
-Official close-out document: `docs/learning/UMTUBA_LEARNING_V1_FINAL.md`
-Session continuity: `docs/ai/SESSION_HANDOFF.md`
-
-Frozen baselines (extend, do not replace):
-
-- Wave A production baseline (JA-01 / JA-02 / JA-03)
-- Nexus Learning Architecture
-- Nexus Design System
-- Nexus V2 Premium Experience
-- Portfolio / Certification / AI Assistant integration models
-
 ## Active academy priority
 
-**Save point 2026-07-28 (Cursor Pro → Ultra restart).** Full state: `docs/ai/SESSION_HANDOFF.md`.
-
-| Track | Status |
-| --- | --- |
-| Wave B content | CLOSED |
-| Learning UX / Nexus | FROZEN |
-| Course Import & E2E V1 | PAUSED |
-| Commerce Research V1.1 | APPROVED |
-| Commerce Experience Architecture V1.1 | FROZEN |
-| Commerce Visual Design Foundation V1 | FROZEN |
-| Commerce Information Architecture V1 | FROZEN |
-| Commerce Design System Foundation V1 | FROZEN |
-| Commerce Product Architecture Foundation V1 | FROZEN |
-| Commerce Business Architecture Foundation V1 | **FROZEN** |
-| Commerce Domain Model Foundation V1 | **FROZEN** |
-| Commerce Technical Architecture Foundation V1 | **FROZEN** |
-| Commerce Data Architecture Foundation V1 | **FROZEN** |
-| Commerce Application Architecture Foundation V1 | **FROZEN** |
-| Commerce Integration Architecture Foundation V1 | **FROZEN** |
-| Commerce Security Architecture Foundation V1 | **FROZEN** |
-| Commerce Operational Architecture Foundation V1 | **FROZEN** |
-| Commerce Platform Architecture Foundation V1 | **FROZEN** |
-| Commerce Enterprise Architecture Foundation V1 | **FROZEN** |
-| Commerce Reference Architecture Foundation V1 | **FROZEN** |
-| Commerce Architecture Manifesto V1 | **FROZEN** |
-| Commerce Architecture Program | **COMPLETE** |
-| Physical Commerce Inventory Solution Architecture V1 | **FROZEN** |
-| Physical Commerce Warehouse & Fulfillment Solution Architecture V1 | **FROZEN** |
-| Physical Commerce Order Fulfillment Solution Architecture V1 | **FROZEN** |
-| Commerce Consolidation Report V1 | **COMPLETE** |
-| Commerce Premium Storefront Experience Foundation V1 | **COMPLETE** (branch `office/commerce-premium-storefront-experience-foundation-v1`) |
-| Commerce Premium Cart and Checkout Experience V1 | **COMPLETE** (branch `office/commerce-premium-cart-checkout-experience-v1`) |
-| Commerce Premium Buyer Orders Experience V1 | **COMPLETE** (branch `office/commerce-premium-buyer-orders-experience-v1`) |
-| Commerce Premium Seller Orders Operations Experience V1 | **COMPLETE** (branch `office/commerce-premium-seller-orders-operations-v1`) |
-| Commerce Premium Seller Catalog & Product Management V1 | **COMPLETE** (branch `office/commerce-premium-seller-catalog-product-management-v1`) |
-| Commerce Premium Seller Inventory & Reservation Visibility V1 | **COMPLETE** (branch `office/commerce-premium-seller-inventory-reservation-visibility-v1`) |
-| Commerce Premium Seller Dashboard & Operational Insights V1 | **COMPLETE** (branch `office/commerce-premium-seller-dashboard-insights-v1`) |
-| Commerce Trading Domain Alignment & Integrity V1 | **COMPLETE** (branch `office/commerce-trading-domain-alignment-integrity-v1`) |
-| Commerce Revenue Ledger Bridge Foundation V1 | **COMPLETE** (branch `office/commerce-revenue-ledger-bridge-foundation-v1`) |
-| Commerce Marketplace Supplier-to-Seller Foundation V1 | **COMPLETE** (branch `office/commerce-marketplace-supplier-seller-foundation-v1`) |
-| Commerce Marketplace Eligibility & Listing Storefront Resolution V1 | **COMPLETE** (branch `office/commerce-marketplace-eligibility-listing-storefront-v1`) |
-| Commerce End-to-End Beta Readiness V1 | **COMPLETE** (branch `office/commerce-end-to-end-beta-readiness-v1`) — **Ready for Beta** @ 90% implemented scope |
-| UMTUBA AI Core Platform Foundation V1 | **COMPLETE** (branch `office/ai-core-platform-foundation-v1`) |
-
-Default: Consolidation complete. Commerce beta-ready on dedicated branches (not merged). Shared AI Core Platform Foundation landed on `office/ai-core-platform-foundation-v1` (not merged). Do not modify frozen Commerce architecture documents. Do not delete Store docs.
-
-### Autonomy (standing)
-
-Routine in-scope create/update/run/mirror/report work may proceed without per-step approval **only inside the explicitly active phase**.
-Paused phases must not auto-resume. Still ask before: destructive data loss, destructive prod DB, push/force-push, merge/delete branches, system-wide installs, credentials/payments, irreversible out-of-scope actions.
+Default: Consolidation complete. Commerce beta-ready on dedicated branches (not merged).
 
 ## Source of truth
 
 - **GitHub origin** is the source of truth for the repository.
 - Always synchronize with origin before starting work.
-- Learning curriculum packages: Bootcamp / Jinn Wave path + dist importers (see Learning V1 final doc).
-- Learner runtime state: UMTUBA Learning DB.
 
 ## Machines
 
 | Machine | Role |
 | --- | --- |
-| **Laptop** | Primary development and integration machine |
+| **Laptop** | Primary development and integration machine (**retirement NOT approved**) |
 | **Desktop** | May perform isolated review / testing tasks only |
+| **Server / Central** | Production integration authority |
 
 ## Multi-machine rules
 
-1. Always run before starting:
-   - `git fetch --prune`
-   - `git pull --ff-only` (on the current branch when behind and fast-forward is possible)
+1. Always run before starting: `git fetch --prune` then `git pull --ff-only` when behind.
 2. Never let two machines modify the **same feature** simultaneously.
-3. If `origin` has diverged and fast-forward is impossible: **stop** — do not merge, rebase, reset, stash, or force push without explicit human instructions.
+3. If `origin` has diverged and fast-forward is impossible: **stop**.
 
 ## Safety defaults
 
 - **No commit** without explicit approval in the user request.
 - **No push** without explicit approval in the user request.
 - **No remote Supabase migration apply** without explicit approval.
-- **No destructive Git actions** (force push, hard reset, etc.) without explicit approval.
-- Follow `docs/DEVELOPMENT_WORKFLOW.md` for Git, migrations, and push policy.
-- Follow `docs/ai/CURRENT_TASK.md` for the active handoff scope.
+- Follow `docs/DEVELOPMENT_WORKFLOW.md` and `docs/ai/CURRENT_TASK.md`.
 - Write execution results to `docs/ai/CURSOR_REPORT.md`.
-- Prefer `docs/ai/SESSION_HANDOFF.md` for Learning continuity after V1 close-out.

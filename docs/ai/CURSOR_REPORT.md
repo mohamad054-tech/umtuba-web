@@ -1,71 +1,56 @@
-﻿# CURSOR_REPORT — Learning Tutor thread lesson binding hardening
+﻿# CURSOR_REPORT — CENTRAL_AUTH_LOCALE_P1_SUPPORT_CLOSEOUT_V2
 
 ## Summary
 
-**PASS** — Completed and verified **`learning.tutor.thread_lesson_binding_hardening_v1`** on
-`office/learning-ai-tutor-thread-lesson-binding-v1` from metadata-read tip `9e90448`.
-
-- Local migration `20260874` drops 4-arg exchange overload and creates 5-arg RPC with SQL lesson binding.
-- Foundation / bridge / integration pass `lessonId` → `p_lesson_id`.
-- Bridge fail-closed for mismatch, auth, entitlement, and invalid ids; metadata validation retained.
-- Migration **not** applied remotely.
-- Feature commit **pushed**: `b85081b` on `office/learning-ai-tutor-thread-lesson-binding-v1` (synced `0 0`).
+Surgical P1 closeout: Login/Signup body now follows locale via `useTranslation` + `auth.*` keys; public `/support` shipped and deployed. Production verified FIXED_VERIFIED. STOP.
 
 ## Exact files changed
 
-- `supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (new)
-- `lib/learning/aiTutorFoundation.ts`
-- `lib/learning/aiTutorFoundation.test.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.ts`
-- `lib/ai/capabilities/learning/threadPersistenceBridge.test.ts`
-- `lib/ai/services/learningTutorIntegration.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+- `app/components/auth/AuthShell.tsx`
+- `app/login/page.tsx`
+- `app/signup/SignupForm.tsx`
+- `app/signup/SignupLoadingFallback.tsx` (new)
+- `app/signup/page.tsx`
+- `app/signup/SignupForm.contract.test.ts`
+- `app/support/page.tsx` (new)
+- `app/lib/nav/routes.ts`
+- `lib/i18n/messages/{types,en,ar,fr,es,de,pt}.ts`
+- `lib/i18n/authLocaleBody.test.ts` (new)
+- `lib/support/supportPage.ts` (new)
+- `lib/legal/legalDocuments.ts`
+- `lib/site/{indexing,routeMetadata,legalPages.test}.ts`
 
 ## Migrations created
 
-`supabase/migrations/20260874_learning_ai_tutor_thread_lesson_binding_v1.sql` (local only; **not** applied).
-
-## Behavior implemented
-
-- Exchange persistence requires `lessonId` end-to-end (integration → bridge → foundation → RPC `p_lesson_id`).
-- SQL enforces `auth.uid` ownership, live course entitlement, exact `thread.lesson_id = p_lesson_id`, and lesson belongs to `thread.course_id`.
-- Old 4-arg overload dropped so callers cannot bypass binding.
-- App maps lesson mismatch → `invalid_input`; auth/entitlement/not-found → `permission_denied`.
+None.
 
 ## Security review
 
-- `SECURITY DEFINER` + `search_path = public`
-- `auth.uid()` ownership; course entitlement re-check
-- Exact `thread.lesson_id = p_lesson_id`; lesson must belong to `thread.course_id`
-- Old 4-arg overload dropped (cannot bypass binding)
-- Revoke public/anon; grant authenticated (+ service_role convention)
-- App path: authenticated client only; no service-role client
-- Idempotent function replace + drop-if-exists; no table/column create/drop; stub append preserved
+- No secrets committed.
+- `/support` public by design; no invented mailbox; uses live `/account-deletion`, `/privacy`, `/terms`, `/login`.
+- Auth validation error strings left English (not in this P1 body scope).
 
 ## Tests
 
-- Narrow: foundation + bridge — **56 passed**
-- Affected Tutor surface (`lib/ai/capabilities/learning` + foundation + integration + server actions): **115 passed**
-- Includes: correct binding, mismatch rejection, unauthorized/auth rejection, missing/invalid ids, valid persist, no capability regression
+`npx vitest run` targeted: **37/37 PASS** (authLocaleBody, i18nFoundation, appShellTranslation, legalPages, SignupForm.contract).
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS (exit 0)
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-Not run (policy).
+`npm run build` — **PASS** (route `/support` present)
 
 ## git diff --check
 
-PASS (exit 0)
+**PASS**
 
 ## git status --short
 
-Clean on branch after docs handoff sync (feature already at `b85081b`).
+Clean on branch after commit `3bc0b955` pushed to `origin/alpha-0.2`.
 
 ## Open issues
 
-- Do not remote-apply `20260874` without explicit GO
-- Do not touch Provider / Gemini / alpha / Web UI from this laptop
+- Unrelated retained: AUTH_ENV=NO; Android v5 deposit absent; iOS EAS_AUTH absent; World HOLD.
+- Do not reopen Search/AASA/World/general Translation.
