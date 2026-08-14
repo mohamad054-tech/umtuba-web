@@ -9,7 +9,7 @@ import {
   type RunGlobalSearchResult,
 } from "../../lib/search/queries";
 import { SEARCH_ERRORS } from "../../lib/search/errors";
-import { parseSearchTab, type SearchTab } from "../../lib/search";
+import { parseSearchTab } from "../../lib/search";
 import type { RecentSearchItem } from "../../lib/search/types";
 
 export type GlobalSearchActionInput = {
@@ -75,5 +75,3 @@ export async function clearRecentSearchesAction(): Promise<ClearRecentSearchesAc
   const supabase = await createClient();
   return clearRecentSearches(supabase, user.id);
 }
-
-export type { SearchTab };

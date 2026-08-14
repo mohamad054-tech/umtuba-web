@@ -238,6 +238,9 @@ describe("search application contracts", () => {
     expect(actions).toMatch(/export async function clearRecentSearchesAction/);
     expect(actions).toMatch(/getServerUser/);
     expect(actions).not.toMatch(/service_role/);
+    // "use server" files must not re-export types: Next registers them as
+    // runtime server references (ReferenceError: SearchTab is not defined).
+    expect(actions).not.toMatch(/export type \{\s*SearchTab\s*\}/);
   });
 
   it("does not select story media_path or video_path in queries", () => {
