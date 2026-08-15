@@ -79,15 +79,21 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
             }}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20 rtl:bg-gradient-to-l" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
 
         <div className="relative z-10 flex min-h-[280px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 lg:min-h-[480px] lg:p-14">
           <p className="sf-eyebrow">UMTUBA Store</p>
-          <h1 className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl">
+          <h1
+            dir="auto"
+            className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl"
+          >
             {slide.title}
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">
+          <p
+            dir="auto"
+            className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base"
+          >
             {slide.subtitle}
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -105,7 +111,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
         <>
           <button
             type="button"
-            className="sf-gallery-nav watch-focus-ring left-3 md:left-5"
+            className="sf-gallery-nav watch-focus-ring start-3 md:start-5"
             aria-label="Previous featured slide"
             onClick={() => go(index - 1)}
           >
@@ -113,14 +119,14 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           </button>
           <button
             type="button"
-            className="sf-gallery-nav watch-focus-ring right-3 md:right-5"
+            className="sf-gallery-nav watch-focus-ring end-3 md:end-5"
             aria-label="Next featured slide"
             onClick={() => go(index + 1)}
           >
             ›
           </button>
           <div
-            className="absolute bottom-4 right-4 z-20 flex items-center gap-2 md:bottom-6 md:right-6"
+            className="absolute bottom-4 end-4 z-20 flex items-center gap-2 md:bottom-6 md:end-6"
             role="tablist"
             aria-label="Featured slides"
           >
@@ -141,7 +147,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
             ))}
             <button
               type="button"
-              className="watch-focus-ring ml-1 rounded-full border border-white/20 bg-black/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80"
+              className="watch-focus-ring ms-1 rounded-full border border-white/20 bg-black/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80"
               aria-pressed={paused}
               onClick={() => setPaused((v) => !v)}
             >

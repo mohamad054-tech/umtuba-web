@@ -22,16 +22,20 @@ export default function SearchFilters({
   const q = params.get("q") ?? "";
   const category = params.get("category") ?? "";
   const sort = params.get("sort") ?? "newest";
+  const availability = params.get("availability") ?? "";
 
   const queryString = useMemo(() => {
     const next = new URLSearchParams();
     if (q.trim()) next.set("q", q.trim());
     if (category) next.set("category", category);
     if (sort && sort !== "newest") next.set("sort", sort);
+    if (availability === "in_stock") next.set("availability", "in_stock");
     return next.toString();
-  }, [q, category, sort]);
+  }, [q, category, sort, availability]);
 
-  const hasFilters = Boolean(q.trim() || category || (sort && sort !== "newest"));
+  const hasFilters = Boolean(
+    q.trim() || category || (sort && sort !== "newest") || availability === "in_stock"
+  );
 
   function push(updates: Record<string, string>) {
     const next = new URLSearchParams(queryString);
@@ -72,6 +76,24 @@ export default function SearchFilters({
               onClick={() => push({ category: c.id })}
             />
           ))}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+          Availability
+        </legend>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          <FilterChip
+            label="All"
+            selected={availability !== "in_stock"}
+            onClick={() => push({ availability: "" })}
+          />
+          <FilterChip
+            label="In stock"
+            selected={availability === "in_stock"}
+            onClick={() => push({ availability: "in_stock" })}
+          />
         </div>
       </fieldset>
 
@@ -119,6 +141,7 @@ export default function SearchFilters({
           type="button"
           className="sf-btn sf-btn-ghost"
           aria-expanded={mobileOpen}
+          aria-controls="store-search-filters"
           onClick={() => setMobileOpen((v) => !v)}
         >
           {mobileOpen ? "Hide filters" : "Filters"}
@@ -126,6 +149,7 @@ export default function SearchFilters({
       </div>
 
       <div
+        id="store-search-filters"
         className={`rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 backdrop-blur-xl ${
           mobileOpen ? "block" : "hidden lg:block"
         }`}

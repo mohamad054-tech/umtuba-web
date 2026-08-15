@@ -7,7 +7,10 @@ import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { ProductGridSkeleton } from "../../components/store/StoreSkeleton";
 import { APP_ROUTES } from "../../lib/nav";
-import { sortCatalogItems } from "../../lib/storefront/deriveSections";
+import {
+  filterCatalogByAvailability,
+  sortCatalogItems,
+} from "../../lib/storefront/deriveSections";
 import { createClient } from "../../../lib/supabase/server";
 import {
   listActiveCategories,
@@ -19,6 +22,7 @@ type SearchPageProps = {
     q?: string;
     category?: string;
     sort?: string;
+    availability?: string;
   }>;
 };
 
@@ -33,6 +37,8 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
   const categoryId =
     typeof params.category === "string" ? params.category : undefined;
   const sort = typeof params.sort === "string" ? params.sort : "newest";
+  const availability =
+    typeof params.availability === "string" ? params.availability : "";
 
   const supabase = await createClient();
   const [categories, catalog] = await Promise.all([
@@ -44,7 +50,10 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
     }),
   ]);
 
-  const items = sortCatalogItems(catalog.items, sort);
+  const items = sortCatalogItems(
+    filterCatalogByAvailability(catalog.items, availability),
+    sort
+  );
 
   return (
     <StoreShell title="Search" subtitle="Store">

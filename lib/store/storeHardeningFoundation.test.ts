@@ -279,6 +279,7 @@ describe("store hardening domain contracts", () => {
     expect(STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB).toBe(false);
     expect(STOREFRONT_FLAGS.SHOW_PDP_REVIEWS_PLACEHOLDER).toBe(false);
     expect(STOREFRONT_FLAGS.SHOW_STORE_FOLLOW_UI).toBe(false);
+    expect(STOREFRONT_FLAGS.SHOW_SANDBOX_CATALOG).toBe(false);
   });
 
   it("wires hardening RPCs into admin review registry and actions", () => {

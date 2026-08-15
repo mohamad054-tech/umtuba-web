@@ -70,7 +70,7 @@ export default function ProductCard({
         )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
 
-        <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
+        <div className="absolute start-3 top-3 z-20 flex flex-wrap gap-2">
           {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
           {badge ? (
             <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
@@ -90,7 +90,7 @@ export default function ProductCard({
         </div>
 
         {showWishlist ? (
-          <div className="pointer-events-auto absolute right-3 top-3 z-20">
+          <div className="pointer-events-auto absolute end-3 top-3 z-20">
             <WishlistButton
               productId={item.product.id}
               initialWishlisted={initialWishlisted}
@@ -112,14 +112,23 @@ export default function ProductCard({
       </div>
 
       <div className="relative z-20 flex flex-1 flex-col gap-2 p-4 pointer-events-none">
-        <p className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--sf-faint)]">
+        <p
+          dir="auto"
+          className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--sf-faint)]"
+        >
           {item.store.name}
         </p>
-        <h3 className="sf-display text-base font-semibold leading-snug text-[var(--sf-ink)] md:text-[1.05rem]">
+        <h3
+          dir="auto"
+          className="sf-display text-base font-semibold leading-snug text-[var(--sf-ink)] md:text-[1.05rem]"
+        >
           {item.product.title}
         </h3>
         {item.product.short_description ? (
-          <p className="line-clamp-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+          <p
+            dir="auto"
+            className="line-clamp-2 text-sm leading-relaxed text-[var(--sf-muted)]"
+          >
             {item.product.short_description}
           </p>
         ) : null}

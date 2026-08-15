@@ -4,6 +4,7 @@ import {
   compareAtSavePercent,
   deriveCuratedCollections,
   deriveFeaturedStores,
+  filterCatalogByAvailability,
   hasLegitimateCompareAt,
   heroSlidesFromCatalog,
   pickNewArrivals,
@@ -223,6 +224,25 @@ describe("storefront deriveSections", () => {
     expect(slides[0]?.id).toBe("welcome");
     expect(slides[0]?.href).toBe("/store/search");
     expect(slides[0]?.title).toBe("Shop UMTUBA");
+  });
+
+  it("filters in-stock catalog items without inventing availability", () => {
+    const items = [
+      item({ product: product({ id: "in", title: "In" }), available: 2 }),
+      item({ product: product({ id: "out", title: "Out" }), available: 0 }),
+      item({
+        product: product({ id: "unknown", title: "Unknown" }),
+        available: null,
+      }),
+    ];
+    expect(
+      filterCatalogByAvailability(items, "in_stock").map((i) => i.product.id)
+    ).toEqual(["in"]);
+    expect(filterCatalogByAvailability(items, "").map((i) => i.product.id)).toEqual([
+      "in",
+      "out",
+      "unknown",
+    ]);
   });
 
   it("sorts catalog by price and title without inventing prices", () => {

@@ -97,7 +97,7 @@ export default function CartIconButton() {
           d="M3 3h2l.4 2M7 13h10l3-8H6.4M7 13l-1.2 6h12.4M7 13l-.6-3M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
         />
       </svg>
-      <span className="absolute -right-1 -top-1">
+      <span className="absolute -end-1 -top-1">
         <UnreadBadge count={count} />
       </span>
     </Link>

@@ -89,6 +89,16 @@ export function deriveCuratedCollections(
     .slice(0, limit);
 }
 
+export function filterCatalogByAvailability(
+  items: PublicCatalogItem[],
+  availability: string
+): PublicCatalogItem[] {
+  if (availability === "in_stock") {
+    return items.filter((item) => (item.available ?? 0) > 0);
+  }
+  return items;
+}
+
 export function sortCatalogItems(
   items: PublicCatalogItem[],
   sort: string

@@ -42,7 +42,7 @@
 
 .storefront-premium .sf-skip-link {
   position: absolute;
-  left: 1rem;
+  inset-inline-start: 1rem;
   top: -4rem;
   z-index: 80;
   border-radius: 9999px;

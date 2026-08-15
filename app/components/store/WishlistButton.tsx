@@ -69,12 +69,7 @@ export default function WishlistButton({
         }}
         className={className ?? DEFAULT_CLASS}
       >
-        <span
-          aria-hidden
-          className={wishlisted ? "text-[var(--sf-accent-strong,#e8d7b5)]" : undefined}
-        >
-          {wishlisted ? "♥" : "♡"}
-        </span>
+        <HeartIcon filled={wishlisted} />
       </button>
       {error ? (
         <p role="alert" className="mt-2 text-xs text-red-300">
@@ -82,5 +77,26 @@ export default function WishlistButton({
         </p>
       ) : null}
     </div>
+  );
+}
+
+function HeartIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`h-5 w-5 ${
+        filled ? "text-[var(--sf-accent-strong,#e8d7b5)]" : "text-current"
+      }`}
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth="1.8"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 20s-7.15-4.28-9.28-8.08C1.18 9.22 2.12 6.28 4.9 5.28c1.72-.62 3.56.08 4.66 1.5L12 9.28l2.44-2.5c1.1-1.42 2.94-2.12 4.66-1.5 2.78 1 3.72 3.94 2.18 6.64C19.15 15.72 12 20 12 20Z"
+      />
+    </svg>
   );
 }

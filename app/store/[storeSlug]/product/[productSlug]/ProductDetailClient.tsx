@@ -244,7 +244,7 @@ export default function ProductDetailClient({
                 <>
                   <button
                     type="button"
-                    className="sf-gallery-nav watch-focus-ring left-3"
+                    className="sf-gallery-nav watch-focus-ring start-3"
                     aria-label="Previous image"
                     onClick={() => stepMedia(-1)}
                   >
@@ -252,7 +252,7 @@ export default function ProductDetailClient({
                   </button>
                   <button
                     type="button"
-                    className="sf-gallery-nav watch-focus-ring right-3"
+                    className="sf-gallery-nav watch-focus-ring end-3"
                     aria-label="Next image"
                     onClick={() => stepMedia(1)}
                   >
@@ -333,7 +333,10 @@ export default function ProductDetailClient({
             ) : null}
           </Link>
 
-          <h1 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1
+            dir="auto"
+            className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl"
+          >
             {detail.displayTitle?.trim() || detail.product.title}
           </h1>
           {detail.marketplaceSourceType === "supplier_listing" ? (
@@ -348,7 +351,10 @@ export default function ProductDetailClient({
             </p>
           ) : null}
           {detail.product.short_description ? (
-            <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+            <p
+              dir="auto"
+              className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]"
+            >
               {detail.product.short_description}
             </p>
           ) : null}
