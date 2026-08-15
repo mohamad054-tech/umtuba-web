@@ -2,6 +2,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { availableUnits } from "./inventory";
 import { isPubliclyVisibleProduct } from "./permissions";
 import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
+import {
+  isSandboxCategoryIdentity,
+  isSandboxProductIdentity,
+  isSandboxStoreIdentity,
+  shouldHideSandboxFromStorefront,
+} from "./sandboxCatalog";
 import { isLegitimateCompareAt } from "./tradingContracts";
 import type {
   ProductCategoryRow,
@@ -26,7 +32,9 @@ export async function listActiveCategories(
     .eq("status", "active")
     .order("sort_order", { ascending: true })
     .order("name", { ascending: true });
-  return (data ?? []) as ProductCategoryRow[];
+  const rows = (data ?? []) as ProductCategoryRow[];
+  if (!shouldHideSandboxFromStorefront()) return rows;
+  return rows.filter((category) => !isSandboxCategoryIdentity(category));
 }
 
 /**
@@ -192,6 +200,13 @@ export async function listPublicCatalog(
       continue;
     }
 
+    if (
+      shouldHideSandboxFromStorefront() &&
+      (isSandboxStoreIdentity(row.stores) || isSandboxProductIdentity(row))
+    ) {
+      continue;
+    }
+
     items.push(await enrichPublicCatalogRow(supabase, row));
   }
 
@@ -220,6 +235,13 @@ export async function listPublicCatalog(
           .eq("moderation_status", "approved")
           .maybeSingle();
         if (!product) continue;
+        if (
+          shouldHideSandboxFromStorefront() &&
+          (isSandboxStoreIdentity(sellerStore) ||
+            isSandboxProductIdentity(product as StoreProductRow))
+        ) {
+          continue;
+        }
 
         const { data: allowed } = await supabase.rpc(
           "store_listing_allows_seller_sale",
@@ -269,7 +291,15 @@ export async function getPublicStoreBySlug(
     .eq("slug", storeSlug.toLowerCase())
     .eq("status", "active")
     .maybeSingle();
-  return (data as StoreRow | null) ?? null;
+  const store = (data as StoreRow | null) ?? null;
+  if (
+    store &&
+    shouldHideSandboxFromStorefront() &&
+    isSandboxStoreIdentity(store)
+  ) {
+    return null;
+  }
+  return store;
 }
 
 export async function getPublicProductDetail(
@@ -307,6 +337,12 @@ export async function getPublicProductDetail(
         moderationStatus: productRow.moderation_status,
         storeStatus: store.status,
       })
+    ) {
+      return { detail: null, error: null };
+    }
+    if (
+      shouldHideSandboxFromStorefront() &&
+      isSandboxProductIdentity(productRow)
     ) {
       return { detail: null, error: null };
     }
@@ -355,6 +391,12 @@ export async function getPublicProductDetail(
       .eq("moderation_status", "approved")
       .maybeSingle();
     if (!source) continue;
+    if (
+      shouldHideSandboxFromStorefront() &&
+      isSandboxProductIdentity(source as StoreProductRow)
+    ) {
+      continue;
+    }
 
     const { data: supplier } = await supabase
       .from("stores")
@@ -566,6 +608,17 @@ export async function getPublicProductById(
     return null;
   }
 
+  if (
+    shouldHideSandboxFromStorefront() &&
+    (isSandboxStoreIdentity(store) ||
+      isSandboxProductIdentity({
+        id: data.id as string,
+        slug: data.slug as string,
+      }))
+  ) {
+    return null;
+  }
+
   return { storeSlug: store.slug, productSlug: data.slug as string };
 }
 
@@ -579,11 +632,20 @@ export async function getPublicStoreById(
 ): Promise<{ storeSlug: string } | null> {
   const { data } = await supabase
     .from("stores")
-    .select("slug, status")
+    .select("id, slug, status")
     .eq("id", storeId)
     .eq("status", "active")
     .maybeSingle();
 
   if (!data) return null;
+  if (
+    shouldHideSandboxFromStorefront() &&
+    isSandboxStoreIdentity({
+      id: data.id as string,
+      slug: data.slug as string,
+    })
+  ) {
+    return null;
+  }
   return { storeSlug: data.slug as string };
 }

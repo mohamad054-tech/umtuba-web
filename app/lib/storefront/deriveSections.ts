@@ -89,6 +89,16 @@ export function deriveCuratedCollections(
     .slice(0, limit);
 }
 
+export function filterCatalogByAvailability(
+  items: PublicCatalogItem[],
+  availability: string
+): PublicCatalogItem[] {
+  if (availability === "in_stock") {
+    return items.filter((item) => (item.available ?? 0) > 0);
+  }
+  return items;
+}
+
 export function sortCatalogItems(
   items: PublicCatalogItem[],
   sort: string
@@ -129,9 +139,9 @@ export function heroSlidesFromCatalog(items: PublicCatalogItem[]): Array<{
     return [
       {
         id: "welcome",
-        title: "Presence Commerce",
+        title: "Shop UMTUBA",
         subtitle:
-          "Discover active products from UMTUBA sellers and creators — no fabricated claims, only catalog truth.",
+          "Discover active products from UMTUBA sellers and creators — catalog prices only, no invented deals.",
         href: "/store/search",
         imageUrl: null,
         ctaLabel: "Browse products",
@@ -158,4 +168,16 @@ export function categoryHref(category: ProductCategoryRow): string {
 
 export function hasLegitimateCompareAt(item: PublicCatalogItem): boolean {
   return isLegitimateCompareAt(item.priceMinor, item.compareAtMinor);
+}
+
+/** UI-only percent off. Null when compare-at is not a legitimate catalog discount. */
+export function compareAtSavePercent(
+  priceMinor: number | null | undefined,
+  compareAtMinor: number | null | undefined
+): number | null {
+  if (!isLegitimateCompareAt(priceMinor, compareAtMinor)) return null;
+  const price = priceMinor as number;
+  const compareAt = compareAtMinor as number;
+  const pct = Math.round(((compareAt - price) / compareAt) * 100);
+  return pct > 0 ? pct : null;
 }

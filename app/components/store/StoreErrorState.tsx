@@ -1,14 +1,27 @@
+"use client";
+
 type StoreErrorStateProps = {
   message: string;
+  retryLabel?: string;
 };
 
-export default function StoreErrorState({ message }: StoreErrorStateProps) {
+export default function StoreErrorState({
+  message,
+  retryLabel = "Try again",
+}: StoreErrorStateProps) {
   return (
     <div
       role="alert"
-      className="rounded-[var(--sf-radius)] border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-5 py-8 text-sm text-[var(--sf-danger)]"
+      className="rounded-[var(--sf-radius)] border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-5 py-8"
     >
-      {message}
+      <p className="text-sm leading-6 text-[var(--sf-danger)]">{message}</p>
+      <button
+        type="button"
+        className="sf-btn sf-btn-secondary mt-4 text-[var(--sf-ink)]"
+        onClick={() => window.location.reload()}
+      >
+        {retryLabel}
+      </button>
     </div>
   );
 }

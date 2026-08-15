@@ -81,7 +81,7 @@ export default function CartIconButton() {
       aria-label={
         count > 0 ? `Cart, ${count} items` : "Cart"
       }
-      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-violet-400/25 bg-violet-500/10 text-violet-100 transition hover:bg-violet-500/20"
+      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)] transition hover:bg-[rgba(214,196,161,0.22)]"
     >
       <svg
         viewBox="0 0 24 24"
@@ -97,7 +97,7 @@ export default function CartIconButton() {
           d="M3 3h2l.4 2M7 13h10l3-8H6.4M7 13l-1.2 6h12.4M7 13l-.6-3M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
         />
       </svg>
-      <span className="absolute -right-1 -top-1">
+      <span className="absolute -end-1 -top-1">
         <UnreadBadge count={count} />
       </span>
     </Link>

@@ -38,6 +38,19 @@ describe("shell coherence", () => {
     expect(top).toMatch(/variant="compact"/);
   });
 
+  it("StoreShell keeps AppTopNav as shared chrome with a store appearance", () => {
+    const shell = read("app/components/store/StoreShell.tsx");
+    const top = read("app/components/AppTopNav.tsx");
+    expect(shell).toMatch(/AppTopNav/);
+    expect(shell).toMatch(/appearance="store"/);
+    expect(shell).not.toMatch(/StoreTopNav/);
+    expect(top).toMatch(/appearance\?: "default" \| "store"/);
+    expect(top).toMatch(/APP_NAV_ITEMS/);
+    expect(top).toMatch(/UserMenu/);
+    expect(top).toMatch(/NotificationBell/);
+    expect(top).toMatch(/LanguageSelector/);
+  });
+
   it("AuthShell exposes compact language control for guests", () => {
     const auth = read("app/components/auth/AuthShell.tsx");
     expect(auth).toMatch(/LanguageSelector/);

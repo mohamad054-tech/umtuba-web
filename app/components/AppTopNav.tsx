@@ -18,6 +18,13 @@ type AppTopNavProps = {
   actions?: ReactNode;
   /** Sticky chrome (default). Pass false for surfaces that manage their own sticky wrapper. */
   sticky?: boolean;
+  /**
+   * Visual treatment only. `store` keeps the same routes, auth, and account
+   * chrome while aligning contrast with the storefront gold identity.
+   */
+  appearance?: "default" | "store";
+  /** Skip inner max-width/padding when a parent already frames the chrome. */
+  embedded?: boolean;
 };
 
 export default function AppTopNav({
@@ -26,27 +33,55 @@ export default function AppTopNav({
   subtitle,
   actions,
   sticky = true,
+  appearance = "default",
+  embedded = false,
 }: AppTopNavProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const store = appearance === "store";
+  const searchActive =
+    pathname === APP_ROUTES.search ||
+    pathname.startsWith(`${APP_ROUTES.search}/`);
+
+  const focusRing = store
+    ? "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(232,215,181,0.7)]"
+    : "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60";
 
   return (
     <header
-      className={`relative z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur-xl ${
-        sticky ? "sticky top-0" : ""
-      }`}
+      className={`relative z-50 border-b backdrop-blur-xl ${
+        store
+          ? "border-b-0 bg-transparent"
+          : "border-white/10 bg-[#050510]/90"
+      } ${sticky ? "sticky top-0" : ""}`}
     >
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between gap-2 px-3 md:gap-4 md:px-6">
+      <div
+        className={`flex min-h-16 items-center justify-between gap-2 md:gap-4 ${
+          store ? "h-auto min-h-16 py-1.5" : "h-16"
+        } ${
+          embedded
+            ? "w-full min-w-0 px-0"
+            : "mx-auto max-w-[1400px] px-3 md:px-6"
+        }`}
+      >
         <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <Link
             href={APP_ROUTES.home}
             aria-label={t("nav.homeAria")}
-            className="watch-focus-ring shrink-0 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
+            className={`watch-focus-ring shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${focusRing} ${
+              store
+                ? "border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] text-[var(--sf-accent-strong,#e8d7b5)] hover:bg-[rgba(214,196,161,0.16)]"
+                : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+            }`}
           >
             UMTUBA
           </Link>
-          <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-300">
+          <div className={`min-w-0 ${store ? "hidden sm:block" : ""}`}>
+            <p
+              className={`text-[10px] font-bold uppercase tracking-[0.3em] ${
+                store ? "text-[var(--sf-accent,#d6c4a1)]" : "text-blue-300"
+              }`}
+            >
               UMTUBA
             </p>
             <div className="flex items-center gap-2">
@@ -60,7 +95,9 @@ export default function AppTopNav({
 
         <nav
           aria-label={t("nav.primary")}
-          className="hidden items-center gap-1 sm:flex sm:gap-2"
+          className={`hidden items-center gap-1 ${
+            store ? "lg:flex lg:gap-2" : "sm:flex sm:gap-2"
+          }`}
         >
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
@@ -70,10 +107,14 @@ export default function AppTopNav({
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
+                className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs ${focusRing} ${
                   active
-                    ? "border border-blue-400/30 bg-blue-500/15 text-blue-100"
-                    : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
+                    ? store
+                      ? "border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)]"
+                      : "border border-blue-400/30 bg-blue-500/15 text-blue-100"
+                    : store
+                      ? "border border-transparent text-white/50 hover:border-[rgba(214,196,161,0.2)] hover:bg-white/5 hover:text-[var(--sf-ink,#f4f1ea)]"
+                      : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 {t(desktopNavLabelKey(item.href))}
@@ -92,17 +133,17 @@ export default function AppTopNav({
           <Link
             href={APP_ROUTES.search}
             aria-label={t("actions.search")}
-            aria-current={
-              pathname === APP_ROUTES.search ||
-              pathname.startsWith(`${APP_ROUTES.search}/`)
-                ? "page"
-                : undefined
-            }
-            className={`watch-focus-ring rounded-full border px-2.5 py-1.5 text-xs font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
-              pathname === APP_ROUTES.search ||
-              pathname.startsWith(`${APP_ROUTES.search}/`)
-                ? "border-sky-400/35 bg-sky-500/15 text-sky-50"
-                : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
+            aria-current={searchActive ? "page" : undefined}
+            className={`watch-focus-ring rounded-full border px-2.5 py-1.5 text-xs font-bold transition ${focusRing} ${
+              store ? "hidden md:inline-flex" : ""
+            } ${
+              searchActive
+                ? store
+                  ? "border-[rgba(214,196,161,0.4)] bg-[rgba(214,196,161,0.14)] text-[var(--sf-accent-strong,#e8d7b5)]"
+                  : "border-sky-400/35 bg-sky-500/15 text-sky-50"
+                : store
+                  ? "border-[rgba(214,196,161,0.18)] bg-white/5 text-white/65 hover:bg-white/10 hover:text-[var(--sf-ink,#f4f1ea)]"
+                  : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
             }`}
           >
             {t("nav.search")}
@@ -112,8 +153,10 @@ export default function AppTopNav({
             tone="dark"
             variant="compact"
           />
-          <ActivityTierIndicator />
-          <WalletBalanceIndicator />
+          <span className={store ? "hidden sm:contents" : undefined}>
+            <ActivityTierIndicator />
+            <WalletBalanceIndicator />
+          </span>
           <NotificationBell />
           <UserMenu />
         </div>

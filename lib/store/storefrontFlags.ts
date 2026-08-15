@@ -25,4 +25,9 @@ export const STOREFRONT_FLAGS = {
   ),
   /** Follow / follower social chrome — unfinished for this stage. */
   SHOW_STORE_FOLLOW_UI: envFlag("NEXT_PUBLIC_STORE_SHOW_FOLLOW_UI"),
+  /**
+   * Show remote E2E sandbox catalog (UMTUBA_E2E_*) on public storefront.
+   * Default off so demo products cannot merchandize in production.
+   */
+  SHOW_SANDBOX_CATALOG: envFlag("NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG"),
 } as const;

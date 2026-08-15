@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   categoryHref,
+  compareAtSavePercent,
   deriveCuratedCollections,
   deriveFeaturedStores,
+  filterCatalogByAvailability,
   hasLegitimateCompareAt,
   heroSlidesFromCatalog,
   pickNewArrivals,
@@ -221,6 +223,26 @@ describe("storefront deriveSections", () => {
     expect(slides).toHaveLength(1);
     expect(slides[0]?.id).toBe("welcome");
     expect(slides[0]?.href).toBe("/store/search");
+    expect(slides[0]?.title).toBe("Shop UMTUBA");
+  });
+
+  it("filters in-stock catalog items without inventing availability", () => {
+    const items = [
+      item({ product: product({ id: "in", title: "In" }), available: 2 }),
+      item({ product: product({ id: "out", title: "Out" }), available: 0 }),
+      item({
+        product: product({ id: "unknown", title: "Unknown" }),
+        available: null,
+      }),
+    ];
+    expect(
+      filterCatalogByAvailability(items, "in_stock").map((i) => i.product.id)
+    ).toEqual(["in"]);
+    expect(filterCatalogByAvailability(items, "").map((i) => i.product.id)).toEqual([
+      "in",
+      "out",
+      "unknown",
+    ]);
   });
 
   it("sorts catalog by price and title without inventing prices", () => {
@@ -269,5 +291,11 @@ describe("storefront deriveSections", () => {
         })
       )
     ).toBe(false);
+  });
+
+  it("computes compare-at save percent only for legitimate discounts", () => {
+    expect(compareAtSavePercent(800, 1000)).toBe(20);
+    expect(compareAtSavePercent(100, 100)).toBe(null);
+    expect(compareAtSavePercent(null, 1500)).toBe(null);
   });
 });

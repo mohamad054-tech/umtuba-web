@@ -205,6 +205,9 @@ export default function CheckoutClient({
           {(typeof result.payment_note === "string" && result.payment_note) ||
             "No payment was collected. Your order is recorded as pending payment with a deferred payment attempt — not a live charge."}
         </p>
+        <p className="text-sm text-[var(--sf-ok)]">
+          Next: open an order to track status, or return to the store.
+        </p>
         {incomplete ? (
           <div
             className="rounded-xl border border-amber-400/30 bg-amber-500/10 p-3 text-sm text-amber-100"
@@ -271,16 +274,19 @@ export default function CheckoutClient({
           {typeof orders[0]?.order_id === "string" ? (
             <Link
               href={buildStoreOrderHref(String(orders[0].order_id))}
-              className="watch-focus-ring inline-flex rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
+              className="sf-btn sf-btn-primary"
             >
               View first order
             </Link>
           ) : null}
           <Link
             href={APP_ROUTES.storeOrders}
-            className="watch-focus-ring inline-flex rounded-full border border-[var(--sf-line)] px-5 py-2.5 text-sm font-bold text-[var(--sf-ink)]"
+            className="sf-btn sf-btn-secondary"
           >
             View my orders
+          </Link>
+          <Link href={APP_ROUTES.store} className="sf-btn sf-btn-ghost">
+            Continue shopping
           </Link>
         </div>
       </div>
@@ -413,23 +419,45 @@ export default function CheckoutClient({
     <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
       <div className="space-y-5" aria-busy={busy || undefined}>
         <nav aria-label="Checkout steps" className="overflow-x-auto">
-          <ol className="flex min-w-max gap-2">
+          <ol className="flex min-w-max items-center gap-1">
             {STEPS.map((step, index) => {
               const current = index === activeStepIndex;
               const done = index < activeStepIndex;
               return (
-                <li
-                  key={step.id}
-                  className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] ${
-                    current
-                      ? "border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong)]"
-                      : done
-                        ? "border-[var(--sf-line)] text-[var(--sf-muted)]"
-                        : "border-transparent text-[var(--sf-faint)]"
-                  }`}
-                  aria-current={current ? "step" : undefined}
-                >
-                  {index + 1}. {step.label}
+                <li key={step.id} className="flex items-center gap-1">
+                  {index > 0 ? (
+                    <span
+                      className={`mx-1 h-px w-6 ${
+                        done || current
+                          ? "bg-[rgba(214,196,161,0.45)]"
+                          : "bg-[var(--sf-line)]"
+                      }`}
+                      aria-hidden
+                    />
+                  ) : null}
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] ${
+                      current
+                        ? "border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong)]"
+                        : done
+                          ? "border-[rgba(159,214,184,0.35)] text-[var(--sf-ok)]"
+                          : "border-transparent text-[var(--sf-faint)]"
+                    }`}
+                    aria-current={current ? "step" : undefined}
+                  >
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
+                        current
+                          ? "bg-[var(--sf-accent)] text-[#1a1712]"
+                          : done
+                            ? "bg-[rgba(159,214,184,0.25)]"
+                            : "bg-white/5"
+                      }`}
+                    >
+                      {done ? "✓" : index + 1}
+                    </span>
+                    {step.label}
+                  </span>
                 </li>
               );
             })}
@@ -505,7 +533,7 @@ export default function CheckoutClient({
                 </label>
                 <select
                   id={`ship-${group.storeId}`}
-                  className="watch-focus-ring mt-1 w-full rounded-xl border border-[var(--sf-line)] bg-black/40 px-3 py-2 text-sm"
+                  className="sf-select mt-1"
                   value={shippingByStore[group.storeId] ?? "standard"}
                   disabled={busy}
                   onChange={(e) => {
@@ -628,11 +656,8 @@ export default function CheckoutClient({
                         : undefined
                   }
                   maxLength={name === "country_code" ? 2 : undefined}
-                  className="watch-focus-ring mt-1 w-full rounded-xl border border-[var(--sf-line)] bg-black/40 px-3 py-2 text-sm"
+                  className="sf-input mt-1"
                   disabled={busy}
-                  placeholder={
-                    name === "country_code" ? "US" : undefined
-                  }
                 />
               </label>
             ))}
@@ -641,7 +666,7 @@ export default function CheckoutClient({
               <textarea
                 name="delivery_instructions"
                 rows={2}
-                className="watch-focus-ring mt-1 w-full rounded-xl border border-[var(--sf-line)] bg-black/40 px-3 py-2 text-sm"
+                className="sf-textarea mt-1"
                 disabled={busy}
               />
             </label>
@@ -668,7 +693,7 @@ export default function CheckoutClient({
             <button
               type="submit"
               disabled={busy}
-              className="watch-focus-ring rounded-full border border-[var(--sf-line)] px-4 py-2 text-sm font-semibold disabled:opacity-50"
+              className="sf-btn sf-btn-secondary disabled:opacity-50"
             >
               Save address
             </button>
@@ -720,7 +745,7 @@ export default function CheckoutClient({
               setQuote(null);
             }}
             disabled={busy}
-            className="watch-focus-ring mt-2 w-full rounded-xl border border-[var(--sf-line)] bg-black/40 px-3 py-2 text-sm"
+            className="sf-input mt-2"
             placeholder="Optional"
             autoComplete="off"
           />
@@ -793,7 +818,7 @@ export default function CheckoutClient({
           disabled={busy || !readiness.canQuote}
           onClick={onCreateQuote}
           aria-disabled={busy || !readiness.canQuote}
-          className="watch-focus-ring mt-5 w-full rounded-full border border-[var(--sf-line)] bg-white/5 px-5 py-3 text-sm font-bold disabled:opacity-50"
+          className="sf-btn sf-btn-secondary mt-5 w-full"
         >
           {pending ? "Working…" : quote ? "Refresh quote" : "Calculate quote"}
         </button>
@@ -802,7 +827,7 @@ export default function CheckoutClient({
           disabled={busy || !readiness.canSubmit}
           onClick={onConfirm}
           aria-disabled={busy || !readiness.canSubmit}
-          className="watch-focus-ring mt-3 w-full rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/35"
+          className="sf-btn sf-btn-primary mt-3 w-full"
         >
           {pending ? "Recording order…" : "Record order (no charge)"}
         </button>
@@ -826,6 +851,27 @@ export default function CheckoutClient({
           Back to cart
         </Link>
       </aside>
+
+      <div className="sf-sticky-actions lg:hidden">
+        <button
+          type="button"
+          disabled={busy || !readiness.canQuote}
+          onClick={onCreateQuote}
+          aria-disabled={busy || !readiness.canQuote}
+          className="sf-btn sf-btn-secondary"
+        >
+          {quote ? "Refresh" : "Quote"}
+        </button>
+        <button
+          type="button"
+          disabled={busy || !readiness.canSubmit}
+          onClick={onConfirm}
+          aria-disabled={busy || !readiness.canSubmit}
+          className="sf-btn sf-btn-primary min-w-0 flex-1"
+        >
+          {pending ? "Recording…" : "Record order"}
+        </button>
+      </div>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import BuyerOrderList from "../../components/store/BuyerOrderList";
 import StoreErrorState from "../../components/store/StoreErrorState";
+import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
@@ -52,25 +53,18 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
 
   return (
     <StoreShell title="My Orders" subtitle="Store" wide>
-      <header className="mt-6 rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
-        <p className="sf-eyebrow">Orders</p>
-        <h1 className="sf-display mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-          My orders
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--sf-muted)]">
-          Each card is one seller order with separate order, payment,
-          fulfillment, and delivery states. Multi-seller checkouts appear as
-          multiple orders — not one shared shipment. Payment collection remains
-          deferred.
-        </p>
+      <StorePageHeader
+        eyebrow="Orders"
+        title="My orders"
+        description="Each card is one seller order with separate order, payment, fulfillment, and delivery states. Multi-seller checkouts appear as multiple orders — not one shared shipment. Payment collection remains deferred."
+      >
         <div className="mt-4 flex flex-wrap gap-2" role="navigation" aria-label="Filter orders">
           <Link
             href={APP_ROUTES.storeOrders}
-            className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
-              statusFilter === "all"
-                ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
-                : "border-[var(--sf-line)] text-[var(--sf-muted)]"
+            className={`sf-chip watch-focus-ring ${
+              statusFilter === "all" ? "is-active" : ""
             }`}
+            aria-current={statusFilter === "all" ? "page" : undefined}
           >
             All
           </Link>
@@ -78,17 +72,16 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
             <Link
               key={status}
               href={`${APP_ROUTES.storeOrders}?status=${status}`}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${
-                statusFilter === status
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
-                  : "border-[var(--sf-line)] text-[var(--sf-muted)]"
+              className={`sf-chip watch-focus-ring capitalize ${
+                statusFilter === status ? "is-active" : ""
               }`}
+              aria-current={statusFilter === status ? "page" : undefined}
             >
               {status}
             </Link>
           ))}
         </div>
-      </header>
+      </StorePageHeader>
 
       <div className="mt-6">
         {!result.ok ? (

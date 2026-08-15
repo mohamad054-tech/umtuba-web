@@ -7,8 +7,10 @@ import { addToCartAction } from "../../../../actions/storeCart";
 import ProductCard from "../../../../components/store/ProductCard";
 import PlaceholderPanel from "../../../../components/store/PlaceholderPanel";
 import StoreSection from "../../../../components/store/StoreSection";
+import StoreQtyStepper from "../../../../components/store/StoreQtyStepper";
 import WishlistButton from "../../../../components/store/WishlistButton";
 import { APP_ROUTES } from "../../../../lib/nav";
+import { compareAtSavePercent } from "../../../../lib/storefront/deriveSections";
 import { formatMinorUnits } from "../../../../../lib/store/money";
 import { STOREFRONT_FLAGS } from "../../../../../lib/store/storefrontFlags";
 import type { PublicProductVideoItem } from "../../../../../lib/store/videoCommerceQueries";
@@ -65,6 +67,15 @@ export default function ProductDetailClient({
       ? formatMinorUnits(
           Number(selected.price.compare_at_amount_minor),
           selected.price.currency
+        )
+      : null;
+  const savePct =
+    selected?.price != null
+      ? compareAtSavePercent(
+          Number(selected.price.amount_minor),
+          selected.price.compare_at_amount_minor != null
+            ? Number(selected.price.compare_at_amount_minor)
+            : null
         )
       : null;
 
@@ -159,11 +170,57 @@ export default function ProductDetailClient({
     price != null &&
     !pending &&
     !purchaseBlocked;
+  const productHref = `/store/${detail.store.slug}/product/${detail.product.slug}`;
+  const useVariantChips = detail.variants.length > 1 && detail.variants.length <= 8;
+
+  function stepMedia(delta: number) {
+    if (media.length <= 1) return;
+    setMediaIndex((i) => (i + delta + media.length) % media.length);
+  }
+
+  function addToCart() {
+    if (!selected || !canAdd) return;
+    setCartError(null);
+    setCartMessage(null);
+    startTransition(async () => {
+      const result = await addToCartAction({
+        variantId: selected.variant.id,
+        quantity,
+        sellerListingId: detail.sellerListingId ?? null,
+      });
+      if (!result.ok) {
+        if (result.requiresAuth) {
+          router.push(
+            `${APP_ROUTES.login}?next=${encodeURIComponent(productHref)}`
+          );
+          return;
+        }
+        setCartError(result.message);
+        return;
+      }
+      setCartMessage("Added to cart");
+      window.dispatchEvent(
+        new CustomEvent("umtuba:cart-updated", {
+          detail: { count: result.itemCount },
+        })
+      );
+    });
+  }
+
+  const addLabel = pending
+    ? "Adding…"
+    : purchaseBlocked
+      ? "Unavailable"
+      : !price
+        ? "Price unavailable"
+        : !inStock
+          ? "Out of stock"
+          : "Add to cart";
 
   return (
     <div className="mt-6">
-      <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <section aria-label="Product gallery">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <section aria-label="Product gallery" className="min-w-0">
           <div className="overflow-hidden rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)]">
             <div className="relative aspect-[4/5] bg-[var(--sf-surface-2)] sm:aspect-[4/3]">
               {activeMediaUrl ? (
@@ -183,7 +240,27 @@ export default function ProductDetailClient({
                   }}
                 />
               )}
-              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-5">
+              {media.length > 1 ? (
+                <>
+                  <button
+                    type="button"
+                    className="sf-gallery-nav watch-focus-ring start-3"
+                    aria-label="Previous image"
+                    onClick={() => stepMedia(-1)}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    className="sf-gallery-nav watch-focus-ring end-3"
+                    aria-label="Next image"
+                    onClick={() => stepMedia(1)}
+                  >
+                    ›
+                  </button>
+                </>
+              ) : null}
+              <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/60 via-transparent to-transparent p-5 pointer-events-none">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--sf-accent)]">
                   {activeMedia.role} · {activeMedia.media_type}
                 </p>
@@ -197,7 +274,7 @@ export default function ProductDetailClient({
           </div>
 
           <ul
-            className="mt-3 flex gap-2 overflow-x-auto pb-1"
+            className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1"
             aria-label="Media thumbnails"
           >
             {media.map((m, i) => {
@@ -256,7 +333,10 @@ export default function ProductDetailClient({
             ) : null}
           </Link>
 
-          <h1 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1
+            dir="auto"
+            className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl"
+          >
             {detail.displayTitle?.trim() || detail.product.title}
           </h1>
           {detail.marketplaceSourceType === "supplier_listing" ? (
@@ -271,7 +351,10 @@ export default function ProductDetailClient({
             </p>
           ) : null}
           {detail.product.short_description ? (
-            <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
+            <p
+              dir="auto"
+              className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]"
+            >
               {detail.product.short_description}
             </p>
           ) : null}
@@ -294,6 +377,7 @@ export default function ProductDetailClient({
                 {compareAt}
               </p>
             ) : null}
+            {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
           </div>
           <p
             className={`mt-1 text-sm ${
@@ -321,25 +405,51 @@ export default function ProductDetailClient({
           ) : null}
 
           {detail.variants.length > 0 ? (
-            <label className="mt-6 block space-y-2">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
+            <div className="mt-6 space-y-2">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
                 Variant
-              </span>
-              <select
-                value={selected?.variant.id ?? ""}
-                onChange={(e) => {
-                  setVariantId(e.target.value);
-                  setQuantity(1);
-                }}
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
-              >
-                {detail.variants.map((v) => (
-                  <option key={v.variant.id} value={v.variant.id}>
-                    {v.variant.title} ({v.variant.sku})
-                  </option>
-                ))}
-              </select>
-            </label>
+              </p>
+              {useVariantChips ? (
+                <div className="flex flex-wrap gap-2" role="listbox" aria-label="Product variant">
+                  {detail.variants.map((v) => {
+                    const selectedVariant = selected?.variant.id === v.variant.id;
+                    return (
+                      <button
+                        key={v.variant.id}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedVariant}
+                        onClick={() => {
+                          setVariantId(v.variant.id);
+                          setQuantity(1);
+                        }}
+                        className={`sf-chip watch-focus-ring ${selectedVariant ? "is-active" : ""}`}
+                      >
+                        {v.variant.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <label className="block">
+                  <span className="sr-only">Variant</span>
+                  <select
+                    value={selected?.variant.id ?? ""}
+                    onChange={(e) => {
+                      setVariantId(e.target.value);
+                      setQuantity(1);
+                    }}
+                    className="sf-select"
+                  >
+                    {detail.variants.map((v) => (
+                      <option key={v.variant.id} value={v.variant.id}>
+                        {v.variant.title} ({v.variant.sku})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
           ) : null}
 
           {optionKeys.length > 0 && selected ? (
@@ -359,76 +469,27 @@ export default function ProductDetailClient({
           ) : null}
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 rounded-full border border-[var(--sf-line)] bg-black/30 px-3 py-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
-                Qty
-              </span>
-              <input
-                type="number"
-                min={1}
-                max={maxQty}
-                value={quantity}
-                disabled={!selected || !inStock}
-                onChange={(e) => {
-                  const next = Number(e.target.value);
-                  if (!Number.isFinite(next)) return;
-                  setQuantity(Math.min(maxQty, Math.max(1, Math.floor(next))));
-                }}
-                aria-label="Quantity"
-                className="w-14 bg-transparent text-center text-sm font-semibold outline-none disabled:opacity-40"
-              />
-            </label>
+            <StoreQtyStepper
+              value={quantity}
+              max={maxQty}
+              disabled={!selected || !inStock}
+              label="Quantity"
+              onChange={setQuantity}
+            />
 
             <button
               type="button"
               disabled={!canAdd}
               aria-disabled={!canAdd}
-              onClick={() => {
-                if (!selected || !canAdd) return;
-                setCartError(null);
-                setCartMessage(null);
-                startTransition(async () => {
-                  const result = await addToCartAction({
-                    variantId: selected.variant.id,
-                    quantity,
-                    sellerListingId: detail.sellerListingId ?? null,
-                  });
-                  if (!result.ok) {
-                    if (result.requiresAuth) {
-                      router.push(
-                        `${APP_ROUTES.login}?next=${encodeURIComponent(
-                          `/store/${detail.store.slug}/product/${detail.product.slug}`
-                        )}`
-                      );
-                      return;
-                    }
-                    setCartError(result.message);
-                    return;
-                  }
-                  setCartMessage("Added to cart");
-                  window.dispatchEvent(
-                    new CustomEvent("umtuba:cart-updated", {
-                      detail: { count: result.itemCount },
-                    })
-                  );
-                });
-              }}
-              className="watch-focus-ring flex-1 rounded-full bg-[var(--sf-accent)] px-5 py-3.5 text-sm font-bold text-[#1a1712] transition hover:bg-[var(--sf-accent-strong)] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/40"
+              onClick={addToCart}
+              className="sf-btn sf-btn-primary flex-1 py-3.5"
             >
-              {pending
-                ? "Adding…"
-                : purchaseBlocked
-                  ? "Unavailable"
-                  : !price
-                  ? "Price unavailable"
-                  : !inStock
-                    ? "Out of stock"
-                    : "Add to cart"}
+              {addLabel}
             </button>
             <WishlistButton
               productId={detail.product.id}
               initialWishlisted={initialWishlisted}
-              nextHref={`/store/${detail.store.slug}/product/${detail.product.slug}`}
+              nextHref={productHref}
               className="watch-focus-ring flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border border-[var(--sf-line)] bg-white/5 text-xl text-white transition hover:bg-white/10"
             />
           </div>
@@ -445,6 +506,13 @@ export default function ProductDetailClient({
                 className="font-bold underline underline-offset-2"
               >
                 View cart
+              </Link>
+              {" · "}
+              <Link
+                href={APP_ROUTES.storeCheckout}
+                className="font-bold underline underline-offset-2"
+              >
+                Checkout
               </Link>
             </p>
           ) : null}
@@ -587,6 +655,25 @@ export default function ProductDetailClient({
           </div>
         </StoreSection>
       ) : null}
+
+      <div className="sf-sticky-actions mt-6 lg:hidden">
+        <StoreQtyStepper
+          value={quantity}
+          max={maxQty}
+          disabled={!selected || !inStock}
+          label="Quantity"
+          onChange={setQuantity}
+        />
+        <button
+          type="button"
+          disabled={!canAdd}
+          aria-disabled={!canAdd}
+          onClick={addToCart}
+          className="sf-btn sf-btn-primary min-w-0 flex-1"
+        >
+          {addLabel}
+        </button>
+      </div>
     </div>
   );
 }

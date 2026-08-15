@@ -61,7 +61,10 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
   const aboutPanel = (
     <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
       <h2 className="sf-display text-lg font-semibold tracking-tight">About</h2>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]">
+      <p
+        dir="auto"
+        className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]"
+      >
         {store.description || "This store has not added an about section yet."}
       </p>
       <dl className="mt-5 grid gap-3 sm:grid-cols-2 text-sm">
@@ -158,7 +161,10 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
               </div>
               <div className="pb-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="sf-display text-2xl font-semibold tracking-tight md:text-3xl">
+                  <h1
+                    dir="auto"
+                    className="sf-display text-2xl font-semibold tracking-tight md:text-3xl"
+                  >
                     {store.name}
                   </h1>
                   <span
@@ -173,7 +179,9 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
                 </div>
                 <p className="mt-1 text-sm text-[var(--sf-faint)]">@{store.slug}</p>
                 {store.tagline ? (
-                  <p className="mt-2 text-sm text-[var(--sf-muted)]">{store.tagline}</p>
+                  <p dir="auto" className="mt-2 text-sm text-[var(--sf-muted)]">
+                    {store.tagline}
+                  </p>
                 ) : null}
                 {STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB ? (
                   <p className="mt-2 text-xs text-[var(--sf-faint)]">
