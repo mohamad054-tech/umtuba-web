@@ -193,7 +193,8 @@ export default function VideoOverlayEditor({
         {/* Editing stage: video preview + interactive overlay layer. */}
         <div
           ref={stageRef}
-          className="relative aspect-[9/16] max-h-[70vh] w-full bg-black"
+          dir="ltr"
+          className="relative aspect-[9/16] max-h-[70vh] w-full bg-black max-sm:aspect-auto max-sm:h-[min(52vh,calc(100dvh-18rem))] max-sm:max-h-none"
           style={{ containerType: "size" }}
         >
           <video

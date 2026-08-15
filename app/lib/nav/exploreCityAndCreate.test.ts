@@ -37,13 +37,19 @@ describe("WP-QA-01 Explore This City → World", () => {
 describe("WP-QA-13 Create chooser", () => {
   it("exposes a generic /create entry for supported types", () => {
     expect(APP_ROUTES.create).toBe("/create");
+    expect(APP_ROUTES.createPost).toBe("/create/post");
     expect(existsSync(join(ROOT, "app/create/page.tsx"))).toBe(true);
     expect(existsSync(join(ROOT, "app/create/CreateChooser.tsx"))).toBe(true);
+    expect(existsSync(join(ROOT, "app/create/post/page.tsx"))).toBe(true);
     const chooser = read("app/create/CreateChooser.tsx");
     expect(chooser).toMatch(/APP_ROUTES\.createVideo/);
+    expect(chooser).toMatch(/APP_ROUTES\.createPost/);
     expect(chooser).toMatch(/APP_ROUTES\.createArticle/);
-    expect(chooser).toMatch(/Text or image/);
-    expect(chooser).toMatch(/CreatePostModal/);
+    expect(chooser).toMatch(/Write Post/);
+    expect(chooser).toMatch(/title: "Image"/);
+    expect(chooser).not.toMatch(/CreatePostModal/);
+    const page = read("app/create/page.tsx");
+    expect(page).not.toMatch(/redirect\(.*createVideo/);
   });
 
   it("gates /create and points Home/UserMenu Create at the chooser", () => {

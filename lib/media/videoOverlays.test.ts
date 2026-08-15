@@ -212,6 +212,11 @@ describe("create/publish wiring contracts", () => {
     expect(editor).toMatch(/createTextOverlay/);
     expect(editor).toMatch(/createStickerOverlay/);
     expect(editor).toMatch(/Add text/i);
+    expect(editor).toMatch(/Stickers/);
+    expect(editor).toMatch(/handleDeleteSelected/);
+    expect(editor).toMatch(/updateOverlay/);
+    expect(editor).toMatch(/dir="ltr"/);
+    expect(editor).toMatch(/max-sm:h-\[min\(52vh/);
   });
 
   it("overlays persist through the create action into media_pipeline", () => {

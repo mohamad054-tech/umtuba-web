@@ -28,6 +28,7 @@ export default function VideoOverlayLayer({
   return (
     <div
       aria-hidden
+      dir="ltr"
       className={`pointer-events-none absolute inset-0 z-10 overflow-hidden ${className ?? ""}`}
       style={{ containerType: "size" }}
     >

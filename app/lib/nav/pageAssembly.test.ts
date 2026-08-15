@@ -16,6 +16,7 @@ describe("Page Assembly V1 — routes", () => {
     expect(APP_ROUTES.welcome).toBe("/welcome");
     expect(APP_ROUTES.games).toBe("/games");
     expect(APP_ROUTES.createArticle).toBe("/create/article");
+    expect(APP_ROUTES.createPost).toBe("/create/post");
     expect(buildArticleHref("11111111-1111-4111-8111-111111111111")).toBe(
       "/articles/11111111-1111-4111-8111-111111111111"
     );
