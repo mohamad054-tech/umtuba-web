@@ -16,6 +16,7 @@ import {
 } from "../../lib/video/signedPlaybackRetry";
 import type { WatchPanelId } from "./watchTypes";
 import VideoOverlay from "./VideoOverlay";
+import VideoOverlayLayer from "./VideoOverlayLayer";
 import VideoPlayer, { type WatchProgressEvent } from "./VideoPlayer";
 
 type VideoSlideProps = {
@@ -202,6 +203,7 @@ export default function VideoSlide({
         restorePlaybackTimeSeconds={restorePlaybackTimeSeconds}
         restorePlaybackToken={restorePlaybackToken}
       />
+      <VideoOverlayLayer elements={video.overlays} />
       <VideoOverlay
         video={video}
         viewerId={viewerId}

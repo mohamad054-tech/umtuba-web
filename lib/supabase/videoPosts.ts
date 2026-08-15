@@ -10,6 +10,12 @@ import {
   type MediaMetadata,
 } from "../media/pipelineTypes";
 import {
+  overlaysFromMediaPipeline,
+  sanitizeOverlayElements,
+  serializeOverlays,
+  type VideoOverlayElement,
+} from "../media/videoOverlays";
+import {
   isOwnedVideoPath,
   POST_VIDEOS_BUCKET,
   validateCaption,
@@ -139,6 +145,8 @@ export type PublicPostDTO = {
   /** When set, this ready video is an Article Teaser. */
   article_id: string | null;
   article_title?: string | null;
+  /** Pre-publish overlays (text + stickers) to render over playback. */
+  overlays?: VideoOverlayElement[];
   likes: number;
   comments: number;
   shares: number;
@@ -156,6 +164,8 @@ export type CreateVideoPostInput = {
   byteSize: number;
   /** Client-probed metadata (optional; server clamps / ignores invalid). */
   metadata?: Partial<MediaMetadata> | null;
+  /** Pre-publish overlays (text + stickers); server sanitizes and caps. */
+  overlays?: VideoOverlayElement[] | null;
   uploadStartedAt?: string | null;
 };
 
@@ -301,6 +311,7 @@ export async function attachPlaybackUrls(
             ? post.article_id.trim()
             : null,
         article_title: null,
+        overlays: overlaysFromMediaPipeline(post.media_pipeline),
         likes: post.likes,
         comments: post.comments,
         shares: post.shares,
@@ -499,6 +510,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     articleId,
     articleTitle,
     articleHref: articleId ? `/articles/${articleId}` : null,
+    overlays: post.overlays ?? [],
     stats: {
       likes: post.likes,
       comments: post.comments,
@@ -584,6 +596,15 @@ export async function insertVideoPostForUser(
       : `t-${Date.now()}`;
   const thumbnailPath = buildMockThumbnailPath(userId, thumbAssetId);
 
+  const sanitizedOverlays = sanitizeOverlayElements(input.overlays);
+  const mediaPipeline =
+    sanitizedOverlays.length > 0
+      ? {
+          ...EMPTY_MEDIA_PIPELINE_EXTENSIONS,
+          overlays: serializeOverlays(sanitizedOverlays),
+        }
+      : EMPTY_MEDIA_PIPELINE_EXTENSIONS;
+
   const { data: queued, error: insertError } = await supabase
     .from("posts")
     .insert({
@@ -614,7 +635,7 @@ export async function insertVideoPostForUser(
       media_file_size: meta.fileSize,
       media_aspect_ratio: meta.aspectRatio,
       thumbnail_path: thumbnailPath,
-      media_pipeline: EMPTY_MEDIA_PIPELINE_EXTENSIONS,
+      media_pipeline: mediaPipeline,
       likes: 0,
       comments: 0,
       shares: 0,

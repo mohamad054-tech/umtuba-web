@@ -29,8 +29,8 @@ export default function CreateChooser() {
         What do you want to create?
       </h1>
       <p className="mt-3 text-sm leading-7 text-white/55">
-        Video, article, and text or image posts are supported. Pick one to
-        continue.
+        Video, Write Post, and article are supported — Write Post handles text
+        or image. Pick one to continue.
       </p>
 
       <ul className="mt-8 grid gap-3">
@@ -51,9 +51,9 @@ export default function CreateChooser() {
             onClick={() => setPostOpen(true)}
             className="watch-focus-ring w-full rounded-[24px] border border-white/10 bg-white/[0.04] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.07]"
           >
-            <p className="text-lg font-black">Text or image</p>
+            <p className="text-lg font-black">Write Post</p>
             <p className="mt-1 text-sm text-white/55">
-              Publish a short post with optional photo.
+              Text or image — share a quick update with an optional photo.
             </p>
           </button>
         </li>

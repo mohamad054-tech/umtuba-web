@@ -32,6 +32,7 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
     likedByMe: video.likedByMe,
     savedByMe: video.savedByMe,
     source: "supabase",
+    overlays: video.overlays ?? [],
     articleId: video.articleId ?? null,
     articleTitle: video.articleTitle ?? null,
     articleHref: video.articleHref ?? null,
