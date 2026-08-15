@@ -33,6 +33,8 @@ import type {
   MediaMetadata,
   MediaPipelineStatus,
 } from "../../../lib/media/pipelineTypes";
+import type { VideoOverlayElement } from "../../../lib/media/videoOverlays";
+import VideoOverlayEditor from "./VideoOverlayEditor";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   CREATE_PROCESSING_MESSAGE,
@@ -152,6 +154,7 @@ export default function CreateVideoForm() {
     null
   );
   const [probedMeta, setProbedMeta] = useState<MediaMetadata | null>(null);
+  const [overlays, setOverlays] = useState<VideoOverlayElement[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -216,6 +219,7 @@ export default function CreateVideoForm() {
     setSelectedFile(null);
     setPreviewUrl("");
     setProbedMeta(null);
+    setOverlays([]);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -359,6 +363,7 @@ export default function CreateVideoForm() {
         mimeType: uploaded.mimeType,
         byteSize: uploaded.byteSize,
         metadata: probedMeta,
+        overlays,
         uploadStartedAt,
       });
 
@@ -528,38 +533,25 @@ export default function CreateVideoForm() {
       </div>
 
       {previewUrl && selectedFile ? (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
-          <video
-            src={previewUrl}
-            controls
-            playsInline
-            preload="metadata"
-            className="max-h-80 w-full bg-black"
-            aria-label={`Preview of ${selectedFile.name}`}
-          />
-          <div className="flex items-center justify-between gap-3 border-t border-white/10 px-4 py-3 text-sm">
-            <div className="min-w-0">
-              <p className="truncate text-white/60">{selectedFile.name}</p>
-              {probedMeta?.width && probedMeta?.height ? (
-                <p className="text-xs text-white/35">
-                  {probedMeta.width}×{probedMeta.height}
-                  {probedMeta.aspectRatio ? ` · ${probedMeta.aspectRatio}` : ""}
-                  {probedMeta.durationMs
-                    ? ` · ${Math.round(probedMeta.durationMs / 1000)}s`
-                    : ""}
-                </p>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              onClick={clearSelectedFile}
-              disabled={busy}
-              className="watch-focus-ring shrink-0 rounded-full border border-white/15 px-3 py-1.5 font-bold text-white/80 hover:bg-white/10 disabled:opacity-50"
-            >
-              Remove
-            </button>
-          </div>
-        </div>
+        <VideoOverlayEditor
+          videoSrc={previewUrl}
+          fileName={selectedFile.name}
+          metaLabel={
+            probedMeta?.width && probedMeta?.height ? (
+              <>
+                {probedMeta.width}×{probedMeta.height}
+                {probedMeta.aspectRatio ? ` · ${probedMeta.aspectRatio}` : ""}
+                {probedMeta.durationMs
+                  ? ` · ${Math.round(probedMeta.durationMs / 1000)}s`
+                  : ""}
+              </>
+            ) : null
+          }
+          elements={overlays}
+          onChange={setOverlays}
+          onRemoveFile={clearSelectedFile}
+          disabled={busy}
+        />
       ) : null}
 
       <div className="mt-6 space-y-2">

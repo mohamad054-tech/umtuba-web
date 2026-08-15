@@ -20,10 +20,14 @@ export type DiscoverStats = {
   views: number;
 };
 
+import type { VideoOverlayElement } from "../../lib/media/videoOverlays";
+
 export type DiscoverVideo = {
   id: string;
   src: string;
   poster?: string;
+  /** Pre-publish overlays (text + stickers) rendered over playback. */
+  overlays?: VideoOverlayElement[];
   /** Short title shown on the card (article title when teaser). */
   title: string;
   caption: string;

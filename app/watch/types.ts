@@ -1,4 +1,5 @@
 import type { DiscoverStats } from "../discover/types";
+import type { VideoOverlayElement } from "../../lib/media/videoOverlays";
 import { VIDEO_FEED_PAGE_SIZE } from "../lib/video/feedPolicy";
 
 export type WatchVideoSource = "supabase" | "demo";
@@ -29,6 +30,8 @@ export type WatchVideo = {
   likedByMe: boolean;
   savedByMe: boolean;
   source: WatchVideoSource;
+  /** Pre-publish overlays (text + stickers) rendered over playback. */
+  overlays?: VideoOverlayElement[];
   /** Linked published article (teaser video). */
   articleId?: string | null;
   articleTitle?: string | null;
