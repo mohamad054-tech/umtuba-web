@@ -205,6 +205,12 @@ export default function ProfileExperience({
           {isOwner ? (
             <div className="flex flex-wrap gap-2">
               <Link
+                href={APP_ROUTES.createPost}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
+              >
+                Write Post
+              </Link>
+              <Link
                 href={APP_ROUTES.createArticle}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
               >

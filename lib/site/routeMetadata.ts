@@ -105,8 +105,15 @@ export const savedMetadata = buildPageMetadata({
 
 export const createChooserMetadata = buildPageMetadata({
   title: "Create",
-  description: `Create a video, article, or text/image post on ${BRAND.name}.`,
+  description: `Create a video, Write Post, image, or article on ${BRAND.name}.`,
   path: "/create",
+  index: "noindex",
+});
+
+export const createPostMetadata = buildPageMetadata({
+  title: "Write Post",
+  description: `Write a text post or share an optional image on ${BRAND.name}.`,
+  path: "/create/post",
   index: "noindex",
 });
 

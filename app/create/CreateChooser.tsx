@@ -1,9 +1,5 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import CreatePostModal from "../components/CreatePostModal";
-import { APP_ROUTES } from "../lib/nav";
+import { APP_ROUTES, buildCreatePostHref } from "../lib/nav";
 
 const OPTIONS = [
   {
@@ -11,6 +7,18 @@ const OPTIONS = [
     href: APP_ROUTES.createVideo,
     title: "Video",
     description: "Upload a clip to Home and Watch.",
+  },
+  {
+    id: "post",
+    href: APP_ROUTES.createPost,
+    title: "Write Post",
+    description: "Text-only, or add an optional image.",
+  },
+  {
+    id: "image",
+    href: buildCreatePostHref({ image: true }),
+    title: "Image",
+    description: "Share a photo with an optional caption.",
   },
   {
     id: "article",
@@ -21,16 +29,14 @@ const OPTIONS = [
 ] as const;
 
 export default function CreateChooser() {
-  const [postOpen, setPostOpen] = useState(false);
-
   return (
     <>
       <h1 className="text-3xl font-black tracking-tight">
         What do you want to create?
       </h1>
       <p className="mt-3 text-sm leading-7 text-white/55">
-        Video, Write Post, and article are supported — Write Post handles text
-        or image. Pick one to continue.
+        Video, Write Post, Image, and Article are supported. Create is not
+        video-only — pick one to continue.
       </p>
 
       <ul className="mt-8 grid gap-3">
@@ -45,21 +51,7 @@ export default function CreateChooser() {
             </Link>
           </li>
         ))}
-        <li>
-          <button
-            type="button"
-            onClick={() => setPostOpen(true)}
-            className="watch-focus-ring w-full rounded-[24px] border border-white/10 bg-white/[0.04] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.07]"
-          >
-            <p className="text-lg font-black">Write Post</p>
-            <p className="mt-1 text-sm text-white/55">
-              Text or image — share a quick update with an optional photo.
-            </p>
-          </button>
-        </li>
       </ul>
-
-      <CreatePostModal open={postOpen} onClose={() => setPostOpen(false)} />
     </>
   );
 }

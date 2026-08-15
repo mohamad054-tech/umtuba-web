@@ -29,6 +29,7 @@ export {
   type AppNavItem,
   type AppRouteHref,
   buildArticleHref,
+  buildCreatePostHref,
   buildProfileArticlesHref,
 } from "./routes";
 

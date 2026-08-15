@@ -23,6 +23,7 @@ export const APP_ROUTES = {
   profile: "/profile",
   create: "/create",
   createVideo: "/create/video",
+  createPost: "/create/post",
   createArticle: "/create/article",
   postJourney: "/post-journey",
   worldDiscovery: "/world",
@@ -173,6 +174,13 @@ export function buildCreatorProfileHref(input: {
   }
   const params = new URLSearchParams({ article: articleId });
   return `${base}?${params.toString()}`;
+}
+
+/** Write Post page; `image: true` emphasizes the optional photo path. */
+export function buildCreatePostHref(options?: { image?: boolean }): string {
+  return options?.image
+    ? `${APP_ROUTES.createPost}?image=1`
+    : APP_ROUTES.createPost;
 }
 
 /** Full article page (public). */
