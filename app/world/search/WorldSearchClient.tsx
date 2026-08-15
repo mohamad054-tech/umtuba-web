@@ -13,16 +13,19 @@ import {
   type ExactReturnContext,
 } from "../../../lib/world/exactContext";
 import type { WorldCategory, WorldCity } from "../../../lib/world/discovery";
+import { worldSearchHoldMessage } from "../../../lib/world/holdUi";
 
 export default function WorldSearchClient({
   cities,
   categories,
   enabled,
+  databaseReady,
   initialQuery,
 }: {
   cities: WorldCity[];
   categories: WorldCategory[];
   enabled: boolean;
+  databaseReady: boolean;
   initialQuery: string;
 }) {
   const [query, setQuery] = useState(initialQuery);
@@ -73,8 +76,11 @@ export default function WorldSearchClient({
 
   if (!enabled) {
     return (
-      <p className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100">
-        World Search is prepared but disabled pending platform approval.
+      <p
+        role="status"
+        className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100"
+      >
+        {worldSearchHoldMessage(databaseReady)}
       </p>
     );
   }

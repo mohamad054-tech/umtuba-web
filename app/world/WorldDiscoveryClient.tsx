@@ -15,6 +15,7 @@ import {
   type WorldCity,
   type WorldFeatureFlags,
 } from "../../lib/world/discovery";
+import { worldDiscoveryHoldMessage } from "../../lib/world/holdUi";
 
 type LocationPermissionState =
   | "not_requested"
@@ -202,9 +203,7 @@ export default function WorldDiscoveryClient({
           role="status"
           className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100"
         >
-          {databaseReady
-            ? "World Discovery is prepared but disabled pending platform approval."
-            : "World Discovery database migrations are not available in this environment yet."}
+          {worldDiscoveryHoldMessage(databaseReady)}
         </p>
         {requestedCity ? (
           <p className="text-sm text-white/70">

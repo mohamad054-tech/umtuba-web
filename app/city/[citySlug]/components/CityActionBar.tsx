@@ -53,7 +53,7 @@ export default function CityActionBar({
         href={APP_ROUTES.worldDiscovery}
         className="rounded-full border border-cyan-400/25 bg-cyan-500/10 px-5 py-3 text-center text-sm font-bold text-cyan-100 hover:bg-cyan-500/15"
       >
-        Explore places
+        World
       </Link>
 
       <button
