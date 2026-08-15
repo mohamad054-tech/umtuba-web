@@ -166,10 +166,10 @@ export default function OwnerContentDeleteControl({
           <div
             ref={menuRef}
             role="menu"
-            className={`absolute z-50 w-48 overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${
+            className={`absolute z-50 w-48 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${
               variant === "rail"
-                ? "bottom-[calc(100%+0.75rem)] right-0"
-                : "right-0 top-[calc(100%+0.4rem)]"
+                ? "bottom-[calc(100%+0.75rem)] end-0"
+                : "end-0 top-[calc(100%+0.4rem)]"
             }`}
           >
             <button

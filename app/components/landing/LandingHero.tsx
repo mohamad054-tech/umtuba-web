@@ -111,7 +111,7 @@ export default function LandingHero() {
           <div className="mt-11 flex flex-col gap-3.5 sm:flex-row sm:items-center sm:gap-4 md:mt-12">
             <HeroCTAButton
               variant="primary"
-              onClick={() => router.push(APP_ROUTES.discover)}
+              onClick={() => router.push(APP_ROUTES.watch)}
             >
               {t("landing.startExploring")}
             </HeroCTAButton>

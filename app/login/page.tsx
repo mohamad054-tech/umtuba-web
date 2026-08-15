@@ -82,11 +82,14 @@ function LoginForm() {
         );
       }
 
+      // LOGIN_SUCCESS → SESSION_READY: navigate straight to the user's Profile
+      // (or an explicit safe `next`). Use replace so the login page is not left
+      // in history — the user must never be stuck on / bounced back to login.
       const nextPath = getSafeRedirectPath(
         searchParams.get("next"),
         APP_ROUTES.profile
       );
-      router.push(nextPath);
+      router.replace(nextPath);
       router.refresh();
     } catch (error) {
       setFormError(

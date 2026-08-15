@@ -57,7 +57,7 @@ export default function LegalDocumentPage({
 
         <header className="space-y-4 border-b border-white/10 pb-8">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-blue-300/90">
-            Legal · Beta
+            Legal
           </p>
           <h1 className="font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             {title}

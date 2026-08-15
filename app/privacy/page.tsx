@@ -8,7 +8,7 @@ export default function PrivacyPage() {
   return (
     <LegalDocumentPage
       title="Privacy Policy"
-      description="How UMTUBA processes account, content, usage, and device information during Beta — and the choices available to you."
+      description="How UMTUBA processes account, content, usage, and device information — and the choices available to you."
       sections={PRIVACY_SECTIONS}
     />
   );
