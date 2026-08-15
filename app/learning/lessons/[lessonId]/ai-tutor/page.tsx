@@ -53,7 +53,7 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
     return (
       <LearningShell
         title="Tutor unavailable"
-        subtitle="AI product surfaces are offline for this Beta"
+        subtitle="AI product surfaces are currently offline"
         backHref={LEARNING_LEARNER_ROUTES.lesson(lessonId)}
         backLabel="Back to lesson"
       >

@@ -161,14 +161,14 @@ export const updatePasswordMetadata = buildPageMetadata({
 
 export const termsMetadata = buildPageMetadata({
   title: "Terms of Use",
-  description: `${BRAND.name} Terms of Use for the Beta soft launch — accounts, content, community rules, and service limits.`,
+  description: `${BRAND.name} Terms of Use — accounts, content, community rules, and service limits.`,
   path: "/terms",
   index: "index",
 });
 
 export const privacyMetadata = buildPageMetadata({
   title: "Privacy Policy",
-  description: `${BRAND.name} Privacy Policy for the Beta soft launch — how we process account, content, and usage information.`,
+  description: `${BRAND.name} Privacy Policy — how we process account, content, and usage information.`,
   path: "/privacy",
   index: "index",
 });
