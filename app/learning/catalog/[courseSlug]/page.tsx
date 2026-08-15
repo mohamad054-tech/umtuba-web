@@ -191,19 +191,19 @@ export default async function LearningPublicCourseLandingPage({
             <>
               <Link
                 href={`${APP_ROUTES.signup}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
+                className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
               >
                 Create Account
               </Link>
               <Link
                 href={`${APP_ROUTES.login}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/10"
+                className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/10"
               >
                 Log In
               </Link>
               <Link
                 href={`${APP_ROUTES.login}?next=${encodeURIComponent(loginNext)}`}
-                className="watch-focus-ring inline-flex justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/15 px-4 py-2.5 text-sm font-bold text-emerald-100 hover:bg-emerald-500/25"
+                className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-xl border border-emerald-400/30 bg-emerald-500/15 px-4 py-2.5 text-sm font-bold text-emerald-100 hover:bg-emerald-500/25"
               >
                 Start Course
               </Link>
@@ -211,7 +211,7 @@ export default async function LearningPublicCourseLandingPage({
           ) : enrolled ? (
             <Link
               href={LEARNING_LEARNER_ROUTES.course(course.id)}
-              className="watch-focus-ring inline-flex justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
+              className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90"
             >
               Continue Course
             </Link>
@@ -221,7 +221,7 @@ export default async function LearningPublicCourseLandingPage({
               <input type="hidden" name="courseSlug" value={course.slug} />
               <button
                 type="submit"
-                className="watch-focus-ring inline-flex w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90 sm:w-auto"
+                className="watch-focus-ring inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-black hover:bg-white/90 sm:w-auto"
               >
                 Start Course
               </button>
@@ -229,7 +229,7 @@ export default async function LearningPublicCourseLandingPage({
           )}
           <Link
             href={APP_ROUTES.welcome}
-            className="watch-focus-ring inline-flex justify-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/80 hover:bg-white/5"
+            className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/80 hover:bg-white/5"
           >
             Download App
           </Link>

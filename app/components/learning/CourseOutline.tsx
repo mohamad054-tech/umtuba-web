@@ -17,7 +17,28 @@ function progressLabel(status: string) {
   return "Not started";
 }
 
+function pickOutlineContinueLesson(
+  outline: LearningLearnerCourseOutline
+): LearningLearnerCourseOutline["sections"][number]["lessons"][number] | null {
+  const lessons = outline.sections.flatMap((section) => section.lessons);
+  const lastId = outline.progress?.last_lesson_id;
+  if (lastId) {
+    const last = lessons.find((lesson) => lesson.id === lastId);
+    if (last && last.progress_status !== "completed") return last;
+    const idx = lessons.findIndex((lesson) => lesson.id === lastId);
+    const following = lessons
+      .slice(idx + 1)
+      .find((lesson) => lesson.progress_status !== "completed");
+    if (following) return following;
+  }
+  return (
+    lessons.find((lesson) => lesson.progress_status !== "completed") ?? null
+  );
+}
+
 export default function CourseOutline({ outline }: CourseOutlineProps) {
+  const continueLesson = pickOutlineContinueLesson(outline);
+
   return (
     <div className="mt-6 space-y-6">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
@@ -33,6 +54,18 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
         <div className="mt-4">
           <ProgressSummary progress={outline.progress} />
         </div>
+        {continueLesson ? (
+          <p className="mt-4">
+            <Link
+              href={LEARNING_LEARNER_ROUTES.lesson(continueLesson.id)}
+              className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            >
+              {continueLesson.progress_status === "not_started"
+                ? "Start lesson"
+                : "Continue"}
+            </Link>
+          </p>
+        ) : null}
         <p className="mt-4 flex flex-wrap gap-4">
           <Link
             href={LEARNING_COMMUNITY_ROUTES.hub(outline.course.id)}
@@ -86,7 +119,14 @@ export default function CourseOutline({ outline }: CourseOutlineProps) {
                   <li key={lesson.id}>
                     <Link
                       href={LEARNING_LEARNER_ROUTES.lesson(lesson.id)}
-                      className="watch-focus-ring flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3 transition hover:border-white/25"
+                      aria-current={
+                        continueLesson?.id === lesson.id ? "page" : undefined
+                      }
+                      className={
+                        continueLesson?.id === lesson.id
+                          ? "watch-focus-ring flex min-h-11 items-center justify-between gap-3 rounded-2xl border border-sky-400/30 bg-sky-500/10 px-4 py-3 transition hover:border-sky-300/40"
+                          : "watch-focus-ring flex min-h-11 items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#080816]/60 px-4 py-3 transition hover:border-white/25"
+                      }
                     >
                       <span className="font-bold text-white/90">{lesson.name}</span>
                       <span className="text-xs text-white/40">

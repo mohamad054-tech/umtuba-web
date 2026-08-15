@@ -138,7 +138,7 @@ export default async function LearningAssessmentDeliveryPage({
             <input type="hidden" name="activityId" value={view.activity_id} />
             <button
               type="submit"
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
               Start assessment attempt
             </button>
