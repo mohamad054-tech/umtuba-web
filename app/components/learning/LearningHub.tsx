@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { LEARNING_COMPLETION_ROUTES } from "../../../lib/learning/completionFoundation";
 import {
   LEARNING_LEARNER_ROUTES,
   type LearningLearnerHub,
   type LearningLearnerHubCourse,
 } from "../../../lib/learning/learnerDelivery";
+import { LEARNING_PUBLIC_ROUTES } from "../../../lib/learning/publicCatalog";
 import {
   LearningProgressBar,
   LearningStatePanel,
@@ -63,11 +65,31 @@ export default function LearningHub({ hub }: LearningHubProps) {
           My Learning
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
-          Continue learning
+          {empty
+            ? "Start learning"
+            : continueCourse
+              ? "Continue learning"
+              : "My Learning"}
         </h1>
         <p className="mt-2 text-sm text-white/50">
-          Programs and courses you can access through your enrollments.
+          {empty
+            ? "Browse the catalog to find a course, then pick up here."
+            : "Programs and courses you can access through your enrollments."}
         </p>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link
+            href={LEARNING_PUBLIC_ROUTES.catalog}
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
+          >
+            Browse catalog
+          </Link>
+          <Link
+            href={LEARNING_COMPLETION_ROUTES.transcript}
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
+          >
+            Transcript &amp; certificates
+          </Link>
+        </div>
       </section>
 
       {continueCourse && continueCourse.continue_href ? (
@@ -125,9 +147,19 @@ export default function LearningHub({ hub }: LearningHubProps) {
       ) : null}
 
       {empty ? (
-        <LearningStatePanel title="Nothing enrolled yet">
-          No accessible programs or courses yet. Once you are enrolled, they
-          will appear here.
+        <LearningStatePanel
+          title="Nothing enrolled yet"
+          action={
+            <Link
+              href={LEARNING_PUBLIC_ROUTES.catalog}
+              className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            >
+              Browse catalog
+            </Link>
+          }
+        >
+          No accessible programs or courses yet. Browse public courses to
+          enroll, then continue from this hub.
         </LearningStatePanel>
       ) : null}
 

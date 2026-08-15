@@ -124,17 +124,17 @@ export default function LessonViewer({
 
   return (
     <div className="mt-6 space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
+      <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-6">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
           {delivery.lesson.course_name}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">
+        <h1 className="mt-1 text-2xl font-black tracking-tight md:text-3xl">
           {delivery.lesson.name}
         </h1>
         {delivery.lesson.description ? (
           <p className="mt-2 text-sm text-white/50">{delivery.lesson.description}</p>
         ) : null}
-        <p className="mt-3 text-xs text-white/40">
+        <p className="mt-2 text-xs text-white/40">
           Progress: {delivery.progress_status.replaceAll("_", " ")}
           {engine?.lesson.difficulty
             ? ` · ${engine.lesson.difficulty}`
@@ -149,41 +149,13 @@ export default function LessonViewer({
           <p className="mt-3">
             <Link
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
-              className="text-sm font-bold text-sky-300 underline underline-offset-2"
+              className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm font-bold text-sky-100"
             >
-              AI Tutor
+              Ask AI Tutor
             </Link>
           </p>
         ) : null}
       </section>
-
-      {engine && engine.objectives.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Learning objectives
-          </h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">
-            {engine.objectives.map((o) => (
-              <li key={o.id}>{o.objective_text}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {engine && engine.prerequisites.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Prerequisites
-          </h2>
-          <ul className="space-y-1 text-sm">
-            {engine.prerequisites.map((p) => (
-              <li key={p.prerequisite_lesson_id} className="text-white/75">
-                {p.satisfied ? "✓" : "○"} {p.name}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       {unlock && unlock.locked ? (
         <section className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-4">
@@ -195,7 +167,7 @@ export default function LessonViewer({
             <input type="hidden" name="lessonId" value={delivery.lesson.id} />
             <button
               type="submit"
-              className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
               Unlock lesson
             </button>
@@ -250,6 +222,34 @@ export default function LessonViewer({
             </h2>
             <ActivityList activities={activities} />
           </section>
+
+          {engine && engine.objectives.length > 0 ? (
+            <section className="space-y-2">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Learning objectives
+              </h2>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">
+                {engine.objectives.map((o) => (
+                  <li key={o.id}>{o.objective_text}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {engine && engine.prerequisites.length > 0 ? (
+            <section className="space-y-2">
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Prerequisites
+              </h2>
+              <ul className="space-y-1 text-sm">
+                {engine.prerequisites.map((p) => (
+                  <li key={p.prerequisite_lesson_id} className="text-white/75">
+                    {p.satisfied ? "✓" : "○"} {p.name}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </>
       ) : (
         <p className="text-sm text-white/55">
@@ -262,7 +262,7 @@ export default function LessonViewer({
           <input type="hidden" name="lessonId" value={delivery.lesson.id} />
           <button
             type="submit"
-            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
             Mark lesson complete
           </button>
@@ -273,7 +273,7 @@ export default function LessonViewer({
         <div className="pt-2">
           <Link
             href={handoff.next_lesson.href}
-            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
             Continue
           </Link>
@@ -284,13 +284,13 @@ export default function LessonViewer({
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <Link
             href={handoff.course_href}
-            className="watch-focus-ring inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
             Back to course
           </Link>
           <Link
             href={handoff.transcript_href}
-            className="watch-focus-ring inline-flex rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
           >
             Transcript
           </Link>

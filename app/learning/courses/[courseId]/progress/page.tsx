@@ -7,7 +7,10 @@ import {
   LearningStatusBadge,
 } from "../../../../components/learning/ds";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
-import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
+import {
+  LEARNING_LEARNER_ROUTES,
+  loadCourseOutline,
+} from "../../../../../lib/learning/learnerDelivery";
 import { loadMyLearningCourseProgressBundle } from "../../../../../lib/learning/lessonEngineFoundation";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +37,16 @@ export default async function CourseProgressPage({ params }: PageProps) {
   }
 
   const supabase = await createClient();
-  const loaded = await loadMyLearningCourseProgressBundle(supabase, courseId);
+  const [loaded, outline] = await Promise.all([
+    loadMyLearningCourseProgressBundle(supabase, courseId),
+    loadCourseOutline(supabase, courseId),
+  ]);
+  const sectionNames = new Map<string, string>();
+  if (outline.ok) {
+    for (const section of outline.data.sections) {
+      sectionNames.set(section.id, section.name);
+    }
+  }
   const courseProgress =
     loaded.ok &&
     loaded.data.course_progress &&
@@ -123,15 +135,19 @@ export default async function CourseProgressPage({ params }: PageProps) {
                   const sectionPercent = Number(
                     section.percent_complete ?? 0
                   );
+                  const sectionId = String(section.section_id ?? "");
+                  const sectionName =
+                    sectionNames.get(sectionId) ??
+                    (typeof section.section_name === "string"
+                      ? section.section_name
+                      : "Module");
                   return (
                     <li
-                      key={String(section.section_id)}
+                      key={sectionId || String(section.section_id)}
                       className="rounded-2xl border border-white/10 px-4 py-3"
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-white/75">
-                        <span>
-                          Section {String(section.section_id).slice(0, 8)}…
-                        </span>
+                        <span>{sectionName}</span>
                         <LearningStatusBadge
                           tone={statusTone(String(section.status ?? ""))}
                         >

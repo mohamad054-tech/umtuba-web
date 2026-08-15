@@ -8,8 +8,8 @@ export default function LearningLoading() {
       aria-busy="true"
       aria-live="polite"
     >
+      <AppTopNav title="Learning" subtitle="Loading" />
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
-        <AppTopNav title="Learning" subtitle="Loading" />
         <div className="mt-6 space-y-4">
           <div className="h-28 animate-pulse rounded-[28px] border border-white/10 bg-white/[0.04]" />
           <div className="h-16 animate-pulse rounded-2xl border border-white/10 bg-white/[0.03]" />

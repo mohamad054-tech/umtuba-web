@@ -225,7 +225,7 @@ export default async function AssessmentAttemptFoundationPage({
               <input type="hidden" name="attemptId" value={view.attempt_id} />
               <button
                 type="submit"
-                className="watch-focus-ring rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
+                className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
               >
                 Cancel attempt
               </button>

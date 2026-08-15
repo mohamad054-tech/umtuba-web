@@ -68,7 +68,17 @@ export default async function LearningTranscriptPage({
         </div>
       ) : loaded.data.entries.length === 0 ? (
         <div className="mt-6">
-          <LearningStatePanel title="No completed courses yet">
+          <LearningStatePanel
+            title="No completed courses yet"
+            action={
+              <Link
+                href="/learning"
+                className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+              >
+                Continue learning
+              </Link>
+            }
+          >
             Finish a course to see it on your transcript and request a
             certificate.
           </LearningStatePanel>

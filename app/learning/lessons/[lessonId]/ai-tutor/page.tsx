@@ -20,6 +20,20 @@ import { isAiProductExperienceEnabled } from "../../../../../lib/ai/betaProductS
 
 export const dynamic = "force-dynamic";
 
+const TUTOR_KIND_LABELS: Record<string, string> = {
+  ask_question: "Ask a question",
+  explain_again: "Explain again",
+  code_review: "Code review",
+  hint: "Hint",
+  other: "Other",
+};
+
+function tutorRoleLabel(role: string) {
+  if (role === "assistant" || role === "tutor") return "Tutor";
+  if (role === "system") return "System";
+  return "You";
+}
+
 type PageProps = {
   params: Promise<{ lessonId: string }> | { lessonId: string };
   searchParams?:
@@ -185,8 +199,13 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
                     className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3 text-sm"
                   >
                     <p className="text-[10px] uppercase tracking-wider text-white/35">
-                      {String(m.role ?? "user")} ·{" "}
-                      {String(m.message_kind ?? m.kind ?? "")}
+                      {tutorRoleLabel(String(m.role ?? "user"))}
+                      {m.message_kind || m.kind
+                        ? ` · ${
+                            TUTOR_KIND_LABELS[String(m.message_kind ?? m.kind)] ??
+                            String(m.message_kind ?? m.kind)
+                          }`
+                        : ""}
                     </p>
                     <p className="mt-1 whitespace-pre-wrap text-white/85">
                       {String(m.content ?? "")}
@@ -206,12 +225,12 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
                 Kind
                 <select
                   name="kind"
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-white"
+                  className="mt-1.5 min-h-11 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-white"
                   defaultValue="ask_question"
                 >
                   {LEARNING_AI_TUTOR_MESSAGE_KINDS.map((k) => (
                     <option key={k} value={k}>
-                      {k}
+                      {TUTOR_KIND_LABELS[k] ?? k}
                     </option>
                   ))}
                 </select>

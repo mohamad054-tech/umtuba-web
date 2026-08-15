@@ -58,7 +58,7 @@ export default function AssessmentSubmitForm({
       <button
         type="submit"
         disabled={!confirmed}
-        className="watch-focus-ring mt-4 rounded-full bg-white px-5 py-2.5 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-40"
+        className="watch-focus-ring mt-4 inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black disabled:cursor-not-allowed disabled:opacity-40"
       >
         Submit final answers
       </button>

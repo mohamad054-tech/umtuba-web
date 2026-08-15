@@ -314,7 +314,7 @@ export default function AttemptPlayer({
             type="button"
             onClick={() => void onSubmit()}
             disabled={locked || busy}
-            className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"
           >
             Submit attempt
           </button>
@@ -322,13 +322,13 @@ export default function AttemptPlayer({
             type="button"
             onClick={() => void onCancel()}
             disabled={locked || busy}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 disabled:opacity-40"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 disabled:opacity-40"
           >
             Cancel attempt
           </button>
           <a
             href={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
           >
             Back to activity
           </a>
@@ -337,7 +337,7 @@ export default function AttemptPlayer({
         <div className="pt-2">
           <a
             href={LEARNING_LEARNER_ROUTES.activity(view.activity_id)}
-            className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
           >
             Back to activity
           </a>
