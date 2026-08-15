@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LearningShell from "../../../../components/learning/LearningShell";
+import {
+  LearningProgressBar,
+  LearningStatePanel,
+  LearningStatusBadge,
+} from "../../../../components/learning/ds";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import { LEARNING_LEARNER_ROUTES } from "../../../../../lib/learning/learnerDelivery";
 import { loadMyLearningCourseProgressBundle } from "../../../../../lib/learning/lessonEngineFoundation";
@@ -10,6 +15,14 @@ export const dynamic = "force-dynamic";
 type PageProps = {
   params: Promise<{ courseId: string }> | { courseId: string };
 };
+
+function statusTone(
+  status: string
+): "neutral" | "success" | "warning" {
+  if (status === "completed") return "success";
+  if (status === "in_progress") return "warning";
+  return "neutral";
+}
 
 export default async function CourseProgressPage({ params }: PageProps) {
   const { courseId } = await Promise.resolve(params);
@@ -44,6 +57,8 @@ export default async function CourseProgressPage({ params }: PageProps) {
       : typeof courseProgress?.last_lesson_id === "string"
         ? courseProgress.last_lesson_id
         : null;
+  const percent = Number(courseProgress?.percent_complete ?? 0);
+  const status = String(courseProgress?.status ?? "not_started");
 
   return (
     <LearningShell
@@ -53,31 +68,40 @@ export default async function CourseProgressPage({ params }: PageProps) {
       backLabel="Course"
     >
       {!loaded.ok ? (
-        <p role="alert" className="mt-6 text-sm text-rose-100">
-          {loaded.message}
-        </p>
+        <div className="mt-6">
+          <LearningStatePanel title="Progress unavailable" tone="danger">
+            {loaded.message}
+          </LearningStatePanel>
+        </div>
       ) : (
         <div className="mt-6 space-y-6">
-          <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <section className="rounded-[28px] border border-white/10 bg-white/[0.03] p-5">
             {courseProgress ? (
               <>
-                <p className="text-sm text-white/70">
-                  Status: {String(courseProgress.status ?? "—")}
-                </p>
-                <p className="mt-1 text-sm text-white/70">
-                  Complete: {String(courseProgress.percent_complete ?? 0)}% (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                    Overall
+                  </p>
+                  <LearningStatusBadge tone={statusTone(status)}>
+                    {status.replaceAll("_", " ")}
+                  </LearningStatusBadge>
+                </div>
+                <div className="mt-4">
+                  <LearningProgressBar percent={percent} />
+                </div>
+                <p className="mt-2 text-sm text-white/70">
                   {String(courseProgress.completed_lessons_count ?? 0)}/
-                  {String(courseProgress.total_lessons_count ?? 0)} lessons)
+                  {String(courseProgress.total_lessons_count ?? 0)} lessons
                 </p>
               </>
             ) : (
               <p className="text-sm text-white/50">No course progress yet.</p>
             )}
             {resumeLessonId ? (
-              <p className="mt-3">
+              <p className="mt-4">
                 <Link
                   href={LEARNING_LEARNER_ROUTES.lesson(resumeLessonId)}
-                  className="watch-focus-ring inline-flex rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                  className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
                 >
                   {continueTarget?.last_media_position_seconds != null
                     ? "Continue watching"
@@ -87,37 +111,51 @@ export default async function CourseProgressPage({ params }: PageProps) {
             ) : null}
           </section>
 
-          <section className="space-y-2">
-            <h2 className="text-lg font-bold text-white">Module progress</h2>
+          <section className="space-y-3">
+            <h2 className="text-lg font-black tracking-tight text-white">
+              Module progress
+            </h2>
             {sections.length === 0 ? (
               <p className="text-sm text-white/45">No section progress yet.</p>
             ) : (
               <ul className="space-y-2">
-                {sections.map((section) => (
-                  <li
-                    key={String(section.section_id)}
-                    className="rounded-xl border border-white/10 px-4 py-3 text-sm text-white/75"
-                  >
-                    Section {String(section.section_id).slice(0, 8)}… ·{" "}
-                    {String(section.status ?? "—")} ·{" "}
-                    {String(section.percent_complete ?? 0)}% (
-                    {String(section.completed_lessons_count ?? 0)}/
-                    {String(section.total_lessons_count ?? 0)})
-                    {typeof section.last_lesson_id === "string" ? (
-                      <>
-                        {" · "}
-                        <Link
-                          href={LEARNING_LEARNER_ROUTES.lesson(
-                            section.last_lesson_id
-                          )}
-                          className="underline underline-offset-2"
+                {sections.map((section) => {
+                  const sectionPercent = Number(
+                    section.percent_complete ?? 0
+                  );
+                  return (
+                    <li
+                      key={String(section.section_id)}
+                      className="rounded-2xl border border-white/10 px-4 py-3"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-white/75">
+                        <span>
+                          Section {String(section.section_id).slice(0, 8)}…
+                        </span>
+                        <LearningStatusBadge
+                          tone={statusTone(String(section.status ?? ""))}
                         >
-                          last lesson
-                        </Link>
-                      </>
-                    ) : null}
-                  </li>
-                ))}
+                          {String(section.status ?? "—").replaceAll("_", " ")}
+                        </LearningStatusBadge>
+                      </div>
+                      <div className="mt-3">
+                        <LearningProgressBar percent={sectionPercent} />
+                      </div>
+                      {typeof section.last_lesson_id === "string" ? (
+                        <p className="mt-2 text-sm">
+                          <Link
+                            href={LEARNING_LEARNER_ROUTES.lesson(
+                              section.last_lesson_id
+                            )}
+                            className="underline underline-offset-2"
+                          >
+                            Last lesson
+                          </Link>
+                        </p>
+                      ) : null}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </section>

@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import LearningShell from "../../components/learning/LearningShell";
+import {
+  LearningCardShell,
+  LearningStatePanel,
+  LearningStatusBadge,
+} from "../../components/learning/ds";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import {
   LEARNING_COMPLETION_ROUTES,
@@ -56,61 +61,81 @@ export default async function LearningTranscriptPage({
       ) : null}
 
       {!loaded.ok ? (
-        <p
-          role="alert"
-          className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100"
-        >
-          {loaded.message}
-        </p>
+        <div className="mt-6">
+          <LearningStatePanel title="Transcript unavailable" tone="danger">
+            {loaded.message}
+          </LearningStatePanel>
+        </div>
       ) : loaded.data.entries.length === 0 ? (
-        <p className="mt-6 text-sm text-white/55">
-          No completed courses yet. Finish a course to see it on your transcript.
-        </p>
+        <div className="mt-6">
+          <LearningStatePanel title="No completed courses yet">
+            Finish a course to see it on your transcript and request a
+            certificate.
+          </LearningStatePanel>
+        </div>
       ) : (
         <ul className="mt-6 space-y-4">
           {loaded.data.entries.map((entry) => (
-            <li
-              key={entry.course_id}
-              className="rounded-xl border border-white/10 bg-white/[0.03] p-4"
-            >
-              <h2 className="text-lg font-bold text-white">{entry.course_name}</h2>
-              <dl className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
-                <div>
-                  <dt className="text-white/35">Completed</dt>
-                  <dd>{entry.completed_at ?? "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-white/35">Final score</dt>
-                  <dd>
-                    {entry.final_score != null
-                      ? `${entry.final_score}%`
-                      : "—"}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-white/35">Certificate</dt>
-                  <dd>
-                    {entry.certificate_status === "issued"
-                      ? entry.certificate_code ?? "issued"
-                      : "Not issued"}
-                  </dd>
-                </div>
-              </dl>
-
-              {entry.certificate_status !== "issued" ? (
-                <form
-                  action={finalizeCourseCompletionAction}
-                  className="mt-4"
-                >
-                  <input type="hidden" name="courseId" value={entry.course_id} />
-                  <button
-                    type="submit"
-                    className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+            <li key={entry.course_id}>
+              <LearningCardShell>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <h2 className="text-lg font-black tracking-tight text-white">
+                    {entry.course_name}
+                  </h2>
+                  <LearningStatusBadge
+                    tone={
+                      entry.certificate_status === "issued"
+                        ? "success"
+                        : "warning"
+                    }
                   >
-                    Finalize completion / certificate
-                  </button>
-                </form>
-              ) : null}
+                    {entry.certificate_status === "issued"
+                      ? "Certificate issued"
+                      : "Certificate pending"}
+                  </LearningStatusBadge>
+                </div>
+                <dl className="mt-3 grid gap-2 text-sm text-white/60 sm:grid-cols-2">
+                  <div>
+                    <dt className="text-white/35">Completed</dt>
+                    <dd>{entry.completed_at ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Final score</dt>
+                    <dd>
+                      {entry.final_score != null
+                        ? `${entry.final_score}%`
+                        : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-white/35">Certificate code</dt>
+                    <dd>
+                      {entry.certificate_status === "issued"
+                        ? entry.certificate_code ?? "issued"
+                        : "Not issued"}
+                    </dd>
+                  </div>
+                </dl>
+
+                {entry.certificate_status !== "issued" ? (
+                  <form
+                    action={finalizeCourseCompletionAction}
+                    className="mt-4"
+                  >
+                    <input
+                      type="hidden"
+                      name="courseId"
+                      value={entry.course_id}
+                    />
+                    <button
+                      type="submit"
+                      className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                    >
+                      Finalize completion / certificate
+                    </button>
+                  </form>
+                ) : null}
+              </LearningCardShell>
             </li>
           ))}
         </ul>

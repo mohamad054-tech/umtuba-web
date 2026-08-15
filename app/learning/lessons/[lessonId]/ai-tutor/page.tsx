@@ -94,65 +94,101 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
   return (
     <LearningShell
       title="AI Tutor"
-      subtitle="Integration layer (stub responses)"
+      subtitle={delivery.data.lesson.name}
       backHref={LEARNING_LEARNER_ROUTES.lesson(lessonId)}
       backLabel="Back to lesson"
     >
       {query.error ? (
-        <p role="alert" className="mt-4 text-sm text-rose-100">
+        <p
+          role="alert"
+          className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+        >
           {query.error}
         </p>
       ) : null}
 
       <div className="mt-6 space-y-6">
-        <form action={createAiTutorThreadAction} className="flex flex-wrap gap-2">
-          <input type="hidden" name="courseId" value={courseId} />
-          <input type="hidden" name="lessonId" value={lessonId} />
-          <input
-            name="title"
-            placeholder="Thread title"
-            className="rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm text-white"
-          />
-          <button
-            type="submit"
-            className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+        <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+            Study with tutor
+          </p>
+          <h2 className="mt-1 text-xl font-black tracking-tight">
+            Ask about this lesson
+          </h2>
+          <p className="mt-2 text-sm text-white/55">
+            Start a thread, ask a question, and keep context next to the lesson
+            content.
+          </p>
+          <form
+            action={createAiTutorThreadAction}
+            className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
           >
-            New thread
-          </button>
-        </form>
+            <input type="hidden" name="courseId" value={courseId} />
+            <input type="hidden" name="lessonId" value={lessonId} />
+            <input
+              name="title"
+              placeholder="Thread title"
+              aria-label="Thread title"
+              className="min-h-11 flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white"
+            />
+            <button
+              type="submit"
+              className="watch-focus-ring inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
+            >
+              New thread
+            </button>
+          </form>
+        </section>
 
         {threads.length > 0 ? (
-          <ul className="flex flex-wrap gap-2 text-sm">
-            {threads.map((t) => (
-              <li key={String(t.id)}>
-                <a
-                  href={`${LEARNING_AI_TUTOR_ROUTES.lesson(lessonId)}?thread=${String(t.id)}`}
-                  className={
-                    String(t.id) === threadId
-                      ? "font-bold text-white"
-                      : "text-white/50 underline"
-                  }
-                >
-                  {String(t.title ?? t.id)}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <nav aria-label="Tutor threads">
+            <ul className="flex flex-wrap gap-2 text-sm">
+              {threads.map((t) => {
+                const active = String(t.id) === threadId;
+                return (
+                  <li key={String(t.id)}>
+                    <a
+                      href={`${LEARNING_AI_TUTOR_ROUTES.lesson(lessonId)}?thread=${String(t.id)}`}
+                      aria-current={active ? "page" : undefined}
+                      className={
+                        active
+                          ? "watch-focus-ring inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1.5 font-bold text-sky-100"
+                          : "watch-focus-ring inline-flex rounded-full border border-white/10 px-3 py-1.5 text-white/55 hover:border-white/25 hover:text-white"
+                      }
+                    >
+                      {String(t.title ?? t.id)}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         ) : null}
 
         {threadId ? (
           <>
-            <section className="space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              <h2 className="text-sm font-bold text-white/70">Conversation</h2>
+            <section
+              className="space-y-3 rounded-[28px] border border-white/10 bg-white/[0.03] p-4 md:p-5"
+              aria-live="polite"
+            >
+              <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+                Conversation
+              </h2>
               {messages.length === 0 ? (
-                <p className="text-sm text-white/45">No messages yet.</p>
+                <p className="text-sm text-white/45">
+                  No messages yet. Ask your first question below.
+                </p>
               ) : (
                 messages.map((m) => (
-                  <div key={String(m.id)} className="text-sm">
+                  <div
+                    key={String(m.id)}
+                    className="rounded-2xl border border-white/10 bg-black/20 px-3 py-3 text-sm"
+                  >
                     <p className="text-[10px] uppercase tracking-wider text-white/35">
-                      {String(m.role ?? "user")} · {String(m.message_kind ?? m.kind ?? "")}
+                      {String(m.role ?? "user")} ·{" "}
+                      {String(m.message_kind ?? m.kind ?? "")}
                     </p>
-                    <p className="mt-1 whitespace-pre-wrap text-white/80">
+                    <p className="mt-1 whitespace-pre-wrap text-white/85">
                       {String(m.content ?? "")}
                     </p>
                   </div>
@@ -160,14 +196,17 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
               )}
             </section>
 
-            <form action={appendAiTutorMessageAction} className="space-y-3">
+            <form
+              action={appendAiTutorMessageAction}
+              className="space-y-3 rounded-[28px] border border-white/10 bg-[#080816]/60 p-4 md:p-5"
+            >
               <input type="hidden" name="lessonId" value={lessonId} />
               <input type="hidden" name="threadId" value={threadId} />
               <label className="block text-sm text-white/70">
                 Kind
                 <select
                   name="kind"
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-white"
+                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-white"
                   defaultValue="ask_question"
                 >
                   {LEARNING_AI_TUTOR_MESSAGE_KINDS.map((k) => (
@@ -183,20 +222,21 @@ export default async function AiTutorPage({ params, searchParams }: PageProps) {
                   name="content"
                   rows={4}
                   required
-                  className="mt-1 w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-white"
+                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-white"
                 />
               </label>
               <button
                 type="submit"
-                className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+                className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
               >
                 Send
               </button>
             </form>
           </>
         ) : (
-          <p className="text-sm text-white/50">
-            Create a thread to start asking questions. No AI provider is connected yet.
+          <p className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-5 text-sm text-white/55">
+            Create a thread to start asking questions. No AI provider is
+            connected yet.
           </p>
         )}
       </div>

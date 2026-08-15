@@ -54,12 +54,13 @@ export default async function LearningHubPage() {
       {hub.ok ? (
         <LearningHub hub={hub.data} />
       ) : (
-        <p
+        <div
           role="alert"
-          className="mt-6 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100"
+          className="mt-6 rounded-[28px] border border-rose-400/25 bg-rose-500/10 px-4 py-5 text-sm text-rose-100"
         >
-          {hub.message}
-        </p>
+          <p className="font-black">Could not load My Learning</p>
+          <p className="mt-2 text-rose-50/85">{hub.message}</p>
+        </div>
       )}
     </LearningShell>
   );

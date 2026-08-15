@@ -305,9 +305,12 @@ export default function LessonViewer({
           {delivery.previous_lesson ? (
             <Link
               href={delivery.previous_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              className="watch-focus-ring inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-white/60 hover:text-white"
             >
-              ← Previous
+              <span aria-hidden="true" className="inline-block rtl:rotate-180">
+                ←
+              </span>
+              Previous
             </Link>
           ) : (
             <span aria-hidden="true" />
@@ -315,9 +318,12 @@ export default function LessonViewer({
           {delivery.next_lesson ? (
             <Link
               href={delivery.next_lesson.href}
-              className="watch-focus-ring text-sm font-bold text-white/60 hover:text-white"
+              className="watch-focus-ring inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-white/60 hover:text-white"
             >
-              Next →
+              Next
+              <span aria-hidden="true" className="inline-block rtl:rotate-180">
+                →
+              </span>
             </Link>
           ) : null}
         </nav>
