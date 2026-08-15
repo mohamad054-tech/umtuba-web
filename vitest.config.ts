@@ -18,6 +18,7 @@ export default defineConfig({
       "lib/live/**/*.test.ts",
       "lib/env/**/*.test.ts",
       "lib/ios/**/*.test.ts",
+      "lib/android/**/*.test.ts",
       "lib/site/**/*.test.ts",
       "lib/geo/**/*.test.ts",
       "lib/world/**/*.test.ts",
