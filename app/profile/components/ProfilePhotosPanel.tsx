@@ -87,7 +87,7 @@ export default function ProfilePhotosPanel({
               )}
             </button>
             {isOwner ? (
-              <div className="absolute right-1 top-1">
+              <div className="absolute end-1 top-1">
                 <OwnerContentDeleteControl
                   postId={post.id}
                   kind="post"

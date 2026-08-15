@@ -21,11 +21,11 @@ export default function GamesHubPage() {
             Games
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight">
-            Unavailable in this Beta
+            Not available yet
           </h1>
           <p className="mt-3 text-sm leading-7 text-white/55">
             The Games route exists so Home shortcuts stay stable, but playable
-            catalog and sessions are not part of Alpha Beta Productization.
+            catalog and sessions are not part of the current Alpha 0.2 product.
             Nothing here can be played, purchased, or ranked yet.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
