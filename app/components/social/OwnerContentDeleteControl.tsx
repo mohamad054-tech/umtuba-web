@@ -1,11 +1,12 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { deletePostAction } from "../../actions/deletePost";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { viewerMaySeeDeleteControl } from "../../../lib/supabase/deleteOwnedPostShared";
+import { clampDeleteMenuBox } from "./clampDeleteMenuBox";
 
 export type OwnerContentDeleteKind = "video" | "post";
 
@@ -58,10 +59,16 @@ export default function OwnerContentDeleteControl({
   const [pending, setPending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const confirmRef = useRef<HTMLButtonElement | null>(null);
   const firstMenuRef = useRef<HTMLButtonElement | null>(null);
+  const [menuBox, setMenuBox] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
 
   const ownerVisible =
     isOwner === true || viewerMaySeeDeleteControl(viewerId, ownerUserId);
@@ -87,6 +94,43 @@ export default function OwnerContentDeleteControl({
     containerRef: dialogRef,
     initialFocusRef: confirmRef,
   });
+
+  useLayoutEffect(() => {
+    if (!menuOpen) {
+      setMenuBox(null);
+      return;
+    }
+
+    function syncMenuBox() {
+      const trigger = triggerRef.current;
+      if (!trigger) {
+        return;
+      }
+      const rect = trigger.getBoundingClientRect();
+      const dir =
+        document.documentElement.dir === "rtl" ? "rtl" : "ltr";
+      setMenuBox(
+        clampDeleteMenuBox({
+          trigger: {
+            top: rect.top,
+            left: rect.left,
+            right: rect.right,
+            bottom: rect.bottom,
+          },
+          viewport: { width: window.innerWidth, height: window.innerHeight },
+          dir,
+        })
+      );
+    }
+
+    syncMenuBox();
+    window.addEventListener("resize", syncMenuBox);
+    window.addEventListener("scroll", syncMenuBox, true);
+    return () => {
+      window.removeEventListener("resize", syncMenuBox);
+      window.removeEventListener("scroll", syncMenuBox, true);
+    };
+  }, [menuOpen]);
 
   if (!ownerVisible || !Number.isInteger(postId) || postId <= 0) {
     return null;
@@ -130,6 +174,7 @@ export default function OwnerContentDeleteControl({
   return (
     <div className={variant === "rail" ? "relative" : "relative z-10"}>
       <button
+        ref={triggerRef}
         type="button"
         className={triggerClass}
         aria-label={copy.moreLabel}
@@ -155,39 +200,47 @@ export default function OwnerContentDeleteControl({
         )}
       </button>
 
-      {menuOpen ? (
-        <>
-          <button
-            type="button"
-            className="fixed inset-0 z-40 cursor-default bg-transparent"
-            aria-label="Close actions menu"
-            onClick={() => setMenuOpen(false)}
-          />
-          <div
-            ref={menuRef}
-            role="menu"
-            className={`absolute z-50 w-48 max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${
-              variant === "rail"
-                ? "bottom-[calc(100%+0.75rem)] end-0"
-                : "end-0 top-[calc(100%+0.4rem)]"
-            }`}
-          >
-            <button
-              ref={firstMenuRef}
-              type="button"
-              role="menuitem"
-              className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-left text-sm font-bold text-red-200 transition hover:bg-red-500/15"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                openConfirm();
-              }}
-            >
-              {copy.deleteLabel}
-            </button>
-          </div>
-        </>
-      ) : null}
+      {menuOpen && typeof document !== "undefined"
+        ? createPortal(
+            <>
+              <button
+                type="button"
+                className="fixed inset-0 z-[130] cursor-default bg-transparent"
+                aria-label="Close actions menu"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div
+                ref={menuRef}
+                role="menu"
+                style={
+                  menuBox
+                    ? {
+                        top: menuBox.top,
+                        left: menuBox.left,
+                        width: menuBox.width,
+                      }
+                    : { visibility: "hidden" }
+                }
+                className="fixed z-[131] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
+              >
+                <button
+                  ref={firstMenuRef}
+                  type="button"
+                  role="menuitem"
+                  className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-start text-sm font-bold text-red-200 transition hover:bg-red-500/15"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openConfirm();
+                  }}
+                >
+                  {copy.deleteLabel}
+                </button>
+              </div>
+            </>,
+            document.body
+          )
+        : null}
 
       {statusMessage ? (
         <p className="sr-only" role="status">

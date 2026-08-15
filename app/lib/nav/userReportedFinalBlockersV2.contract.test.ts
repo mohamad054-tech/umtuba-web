@@ -59,6 +59,11 @@ describe("A1 user-reported final blockers V2", () => {
     ).not.toMatch(/for this Beta/);
     const meta = read("lib/site/routeMetadata.ts");
     expect(meta).not.toMatch(/Beta soft launch/);
+    const games = read("app/games/page.tsx");
+    expect(games).not.toMatch(/Unavailable in this Beta/);
+    expect(games).not.toMatch(/Alpha Beta Productization/);
+    expect(games).not.toMatch(/\bBeta\b/);
+    expect(games).not.toMatch(/\btrial\b/i);
   });
 
   it("START EXPLORING goes to a content-exploration surface, not Home", () => {
@@ -73,13 +78,19 @@ describe("A1 user-reported final blockers V2", () => {
 
   it("VIDEO DELETE menu is edge-safe and RTL/LTR safe", () => {
     const control = read("app/components/social/OwnerContentDeleteControl.tsx");
-    // Logical inset (inset-inline-end) flips with dir=rtl so the menu opens
-    // inward on both LTR and RTL instead of clipping off-screen.
-    expect(control).toMatch(/end-0/);
+    // Portaled + viewport-clamped so overflow-hidden parents cannot clip it.
+    expect(control).toMatch(/clampDeleteMenuBox/);
+    expect(control).toMatch(/createPortal/);
     expect(control).not.toMatch(/\bright-0\b/);
     // Never exceed the viewport on 360/390/430 widths.
     expect(control).toMatch(/max-w-\[calc\(100vw-1\.5rem\)\]/);
     // Destructive action keeps a full 44px touch target (not clipped/tiny).
     expect(control).toMatch(/min-h-\[44px\][^]*?Delete/);
+    const videos = read("app/profile/components/ProfileVideoGrid.tsx");
+    const photos = read("app/profile/components/ProfilePhotosPanel.tsx");
+    expect(videos).toMatch(/absolute end-2 top-2/);
+    expect(videos).not.toMatch(/\bright-2\b/);
+    expect(photos).toMatch(/absolute end-1 top-1/);
+    expect(photos).not.toMatch(/\bright-1\b/);
   });
 });

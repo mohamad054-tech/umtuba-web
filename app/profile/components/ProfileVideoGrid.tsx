@@ -71,7 +71,7 @@ export default function ProfileVideoGrid({
                   />
                 )}
                 {video.durationLabel ? (
-                  <span className="absolute right-2 top-2 rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[10px] font-bold text-white/80 backdrop-blur-sm">
+                  <span className="absolute end-2 top-2 rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[10px] font-bold text-white/80 backdrop-blur-sm">
                     {video.durationLabel}
                   </span>
                 ) : null}
@@ -102,7 +102,7 @@ export default function ProfileVideoGrid({
                 card
               )}
               {isOwner && video.postId ? (
-                <div className="absolute right-2 top-2">
+                <div className="absolute end-2 top-2">
                   <OwnerContentDeleteControl
                     postId={video.postId}
                     kind="video"
