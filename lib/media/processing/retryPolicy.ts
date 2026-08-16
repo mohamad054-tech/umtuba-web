@@ -23,6 +23,7 @@ const PERMANENT_CODES = new Set([
   "invalid_job",
   "unsupported_processor",
   "ffmpeg_missing_font",
+  "ffprobe_missing",
 ]);
 
 export function classifyFailureKind(errorCode: string): MediaFailureKind {

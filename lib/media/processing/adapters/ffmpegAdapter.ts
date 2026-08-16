@@ -56,7 +56,11 @@ export async function runFfmpeg(input: FfmpegRunInput): Promise<FfmpegRunResult>
     };
   }
 
-  const binary = input.binary ?? "ffmpeg";
+  const binary =
+    input.binary ??
+    process.env.FFMPEG_PATH?.trim() ??
+    process.env.UMTUBA_FFMPEG?.trim() ??
+    "ffmpeg";
   const timeoutMs = input.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 
   return await new Promise<FfmpegRunResult>((resolve) => {

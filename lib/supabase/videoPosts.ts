@@ -23,6 +23,11 @@ import {
   VIDEO_SIGNED_URL_TTL_SECONDS,
 } from "./videoPostsShared";
 import { normalizeUsername } from "./validation";
+import { isUgcVideoTranscodeEnabled } from "../media/ugc/ugcVideoFlag";
+import {
+  emptyUgcTranscodeState,
+  mergeUgcTranscodeState,
+} from "../media/ugc/ugcVideoPipeline";
 
 /**
  * Auth user id for messaging. Never use post id / username as a stand-in.
@@ -167,6 +172,8 @@ export type CreateVideoPostInput = {
   /** Pre-publish overlays (text + stickers); server sanitizes and caps. */
   overlays?: VideoOverlayElement[] | null;
   uploadStartedAt?: string | null;
+  /** Test override. Production reads UGC_VIDEO_TRANSCODE. */
+  transcodeEnabled?: boolean;
 };
 
 function sanitizeMetadata(
@@ -597,13 +604,18 @@ export async function insertVideoPostForUser(
   const thumbnailPath = buildMockThumbnailPath(userId, thumbAssetId);
 
   const sanitizedOverlays = sanitizeOverlayElements(input.overlays);
-  const mediaPipeline =
+  const transcodeEnabled =
+    input.transcodeEnabled ?? isUgcVideoTranscodeEnabled();
+  const mediaPipelineBase =
     sanitizedOverlays.length > 0
       ? {
           ...EMPTY_MEDIA_PIPELINE_EXTENSIONS,
           overlays: serializeOverlays(sanitizedOverlays),
         }
-      : EMPTY_MEDIA_PIPELINE_EXTENSIONS;
+      : { ...EMPTY_MEDIA_PIPELINE_EXTENSIONS };
+  const mediaPipeline = transcodeEnabled
+    ? mergeUgcTranscodeState(mediaPipelineBase, emptyUgcTranscodeState(videoPath))
+    : mediaPipelineBase;
 
   const { data: queued, error: insertError } = await supabase
     .from("posts")
@@ -672,10 +684,31 @@ export async function insertVideoPostForUser(
     .update({
       media_status: "processing",
       processing_started_at: processingStarted,
-      processing_progress: clampProcessingProgress(35),
+      processing_progress: clampProcessingProgress(transcodeEnabled ? 15 : 35),
     })
     .eq("id", queuedRow.id)
     .eq("user_id", userId);
+
+  if (transcodeEnabled) {
+    const { data: processingRow, error: processingError } = await supabase
+      .from("posts")
+      .select(postColumns)
+      .eq("id", queuedRow.id)
+      .eq("user_id", userId)
+      .single();
+    if (processingError || !processingRow) {
+      console.error("Unable to load queued UGC video post:", processingError);
+      await supabase
+        .from("posts")
+        .delete()
+        .eq("id", queuedRow.id)
+        .eq("user_id", userId);
+      await failAndCleanup(
+        "Unable to finish processing the video. Please try again."
+      );
+    }
+    return processingRow as VideoPostRow;
+  }
 
   const processingCompleted = new Date().toISOString();
   const { data: ready, error: readyError } = await supabase

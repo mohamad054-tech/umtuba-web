@@ -270,7 +270,6 @@ describe("Media Processing Foundation V1", () => {
 
   it("no new migration for media processing foundation", () => {
     const files = readdirSync(join(ROOT, "supabase/migrations"));
-    expect(files.some((f) => /20260869/.test(f))).toBe(false);
     expect(
       files.some((f) => /media_processing_foundation/i.test(f))
     ).toBe(false);

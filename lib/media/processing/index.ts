@@ -12,6 +12,7 @@ export * from "./metrics";
 export * from "./runtime";
 export * from "./registerBuiltinProcessors";
 export { runFfmpeg, validateFfmpegArgs, mapFfmpegExitCode } from "./adapters/ffmpegAdapter";
+export { runFfprobe, resolveFfprobeBinary } from "./adapters/ffprobeAdapter";
 export {
   createTempWorkspace,
   uploadFile,
@@ -23,3 +24,8 @@ export {
   createArticleTeaserProcessor,
   processArticleTeaserJob,
 } from "./processors/articleTeaserProcessor";
+export {
+  createUgcVideoProcessor,
+  processUgcVideoJob,
+  isClaimableUgcPost,
+} from "./processors/ugcVideoProcessor";

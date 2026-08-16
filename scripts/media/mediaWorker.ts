@@ -2,7 +2,7 @@
  * Generic Media Processing worker entry.
  *
  *   npx tsx scripts/media/mediaWorker.ts --processor=article_teaser
- *   npx tsx scripts/media/mediaWorker.ts --processor=article_teaser --once
+ *   npx tsx scripts/media/mediaWorker.ts --processor=ugc_video --once
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -25,9 +25,8 @@ function parseProcessorKind(): MediaProcessorKind {
   if (!isMediaProcessorKind(raw)) {
     throw new Error(`Unsupported processor: ${raw}`);
   }
-  // Only article_teaser is registered in V1.
-  if (raw !== "article_teaser") {
-    throw new Error(`Processor not enabled in V1: ${raw}`);
+  if (raw !== "article_teaser" && raw !== "ugc_video") {
+    throw new Error(`Processor not enabled: ${raw}`);
   }
   return raw;
 }

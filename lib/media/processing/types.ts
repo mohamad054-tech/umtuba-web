@@ -5,6 +5,7 @@
 
 export const MEDIA_PROCESSOR_KINDS = [
   "article_teaser",
+  "ugc_video",
   "course_teaser",
   "product_teaser",
   "thumbnail_generator",

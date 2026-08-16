@@ -10,6 +10,8 @@ import { sourceEntityIdFromPostId } from "../content/contentRegistry";
 import { sanitizeUserFacingMessage } from "../../app/lib/product/userFacingMessage";
 import { isOwnedVideoPath } from "./videoPostsShared";
 import { deleteOwnedVideoObject } from "./videoPosts";
+import { collectOwnedMediaPaths } from "../media/ugc/ugcVideoPaths";
+import { referencedUgcPaths } from "../media/ugc/ugcVideoPipeline";
 import {
   OWN_CONTENT_DELETE_ERRORS,
   POST_IMAGES_BUCKET,
@@ -34,6 +36,7 @@ type LoadedPost = {
   video_path: string | null;
   thumbnail_path: string | null;
   image_url: string | null;
+  media_pipeline?: unknown;
 };
 
 async function deleteOwnedImageObject(
@@ -63,14 +66,16 @@ async function cleanupOwnedMedia(
   userId: string,
   post: LoadedPost
 ): Promise<void> {
-  const videoPath = post.video_path?.trim() || "";
-  if (videoPath) {
-    await deleteOwnedVideoObject(supabase, userId, videoPath);
-  }
-
-  const thumbnailPath = post.thumbnail_path?.trim() || "";
-  if (thumbnailPath && thumbnailPath !== videoPath) {
-    await deleteOwnedVideoObject(supabase, userId, thumbnailPath);
+  const mediaPaths = collectOwnedMediaPaths(
+    userId,
+    referencedUgcPaths({
+      videoPath: post.video_path,
+      thumbnailPath: post.thumbnail_path,
+      pipeline: post.media_pipeline,
+    })
+  );
+  for (const path of mediaPaths) {
+    await deleteOwnedVideoObject(supabase, userId, path);
   }
 
   const imagePath = parseOwnedPostImageObjectPath(userId, post.image_url);
@@ -124,7 +129,7 @@ export async function deletePostForOwner(
 
   const { data: existing, error: loadError } = await supabase
     .from("posts")
-    .select("id, user_id, post_type, video_path, thumbnail_path, image_url")
+    .select("id, user_id, post_type, video_path, thumbnail_path, image_url, media_pipeline")
     .eq("id", postId)
     .maybeSingle();
 
