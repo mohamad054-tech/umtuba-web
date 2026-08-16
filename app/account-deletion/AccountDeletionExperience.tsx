@@ -114,8 +114,9 @@ export default function AccountDeletionExperience({
           </h1>
           <p className="max-w-2xl text-base leading-7 text-white/65">
             This page is the public web way to request deletion of your UMTUBA
-            account and associated personal data. You do not need the Android
-            app. UMTUBA is the service operated at umtuba.com.
+            account and associated personal data. You can do this from any web
+            browser. You do not need a mobile app. UMTUBA is the service
+            operated at umtuba.com.
           </p>
           <p className="text-sm text-white/50">
             Last updated: {LEGAL_LAST_UPDATED}

@@ -259,7 +259,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     id: "account-deletion",
     title: "Account deletion",
     paragraphs: [
-      "You can request deletion of your UMTUBA account and associated personal data on the public web page at /account-deletion. You do not need the Android app. You must sign in so we can verify that the request belongs to your account.",
+      "You can request deletion of your UMTUBA account and associated personal data on the public web page at /account-deletion. You can do this from any web browser. You do not need a mobile app. You must sign in so we can verify that the request belongs to your account.",
       "Submitting the form queues a deletion request. It does not delete the account immediately. After verification, we process the request: authentication and profile data, User Content you published and still control, engagement records, and similar personal data are removed or de-identified from active systems, except where retention is required.",
       "We may retain store/order and other financial records as required for tax, accounting, disputes, and law; limited security and abuse-prevention logs; copies of messages already delivered to other users (with your sender identity detached where the architecture supports it); and residual backup copies until those systems rotate.",
     ],
