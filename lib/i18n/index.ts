@@ -1,14 +1,18 @@
 export {
   DEFAULT_LOCALE,
+  FUTURE_LOCALE_CODES,
   LOCALE_DEFINITIONS,
   SUPPORTED_LOCALES,
   getLocaleDefinition,
   getLocaleDirection,
   isAppLocale,
   listSupportedLocales,
+  matchSupportedLocale,
   normalizeToAppLocale,
   resolveLocaleOrFallback,
+  toWorldCatalogLocaleKey,
   type AppLocale,
+  type FutureAppLocale,
   type LocaleDefinition,
   type TextDirection,
 } from "./locales";

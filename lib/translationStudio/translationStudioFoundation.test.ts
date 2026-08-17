@@ -192,6 +192,12 @@ describe("Studio seed", () => {
       "es",
       "de",
       "pt",
+      "tr",
+      "id",
+      "hi",
+      "ja",
+      "ru",
+      "zh-CN",
     ]);
     expect(snap.namespaces.length).toBeGreaterThan(0);
     expect(snap.keys.length).toBeGreaterThan(10);

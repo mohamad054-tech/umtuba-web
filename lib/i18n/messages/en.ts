@@ -7,6 +7,12 @@ export const enMessages: FoundationMessages = {
   "languages.es": "Spanish",
   "languages.de": "German",
   "languages.pt": "Portuguese",
+  "languages.tr": "Turkish",
+  "languages.id": "Indonesian",
+  "languages.hi": "Hindi",
+  "languages.ja": "Japanese",
+  "languages.ru": "Russian",
+  "languages.zh-CN": "Chinese (Simplified)",
 
   "actions.save": "Save",
   "actions.cancel": "Cancel",

@@ -10,6 +10,12 @@ export type FoundationMessages = {
   "languages.es": string;
   "languages.de": string;
   "languages.pt": string;
+  "languages.tr": string;
+  "languages.id": string;
+  "languages.hi": string;
+  "languages.ja": string;
+  "languages.ru": string;
+  "languages.zh-CN": string;
 
   "actions.save": string;
   "actions.cancel": string;

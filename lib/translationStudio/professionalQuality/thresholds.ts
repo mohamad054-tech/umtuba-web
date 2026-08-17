@@ -2,6 +2,7 @@
  * Professional quality gates + domain profiles (configurable policy objects).
  */
 
+import { isAppLocale } from "../../i18n/locales";
 import type { StudioLanguageCode } from "../types";
 import {
   clampScore100,
@@ -264,5 +265,5 @@ export function resolveQualityProfileForDomain(
 export function isSupportedQualityLocale(
   code: string
 ): code is StudioLanguageCode {
-  return ["ar", "en", "fr", "es", "de", "pt"].includes(code);
+  return isAppLocale(code);
 }

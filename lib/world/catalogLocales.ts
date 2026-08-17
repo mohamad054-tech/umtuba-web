@@ -1,4 +1,7 @@
-import type { AppLocale } from "../i18n/locales";
+import {
+  toWorldCatalogLocaleKey,
+  type AppLocale,
+} from "../i18n/locales";
 
 export const PRODUCT_CATALOG_LOCALES = [
   "ar",
@@ -36,7 +39,10 @@ export function resolveCatalogLocaleText(
   localized: CatalogLocaleMap | undefined,
   fallback: string | null | undefined
 ): string | null {
-  const fromLocale = localized?.[locale]?.trim();
+  const catalogKey = toWorldCatalogLocaleKey(locale);
+  const fromLocale = isCatalogLocale(catalogKey)
+    ? localized?.[catalogKey]?.trim()
+    : undefined;
   if (fromLocale) return fromLocale;
   const fromEnglish = localized?.en?.trim();
   if (fromEnglish) return fromEnglish;

@@ -19,11 +19,26 @@ import { MESSAGE_CATALOGS } from "./messages/catalogs";
 import type { TranslationKey } from "./messages/types";
 
 describe("locale contract", () => {
-  it("supports the six platform locales", () => {
-    expect([...SUPPORTED_LOCALES]).toEqual(["ar", "en", "fr", "es", "de", "pt"]);
+  it("supports Wave 1 + Wave 2 locales with zh-CN distinct from zh-TW", () => {
+    expect([...SUPPORTED_LOCALES]).toEqual([
+      "ar",
+      "en",
+      "fr",
+      "es",
+      "de",
+      "pt",
+      "tr",
+      "id",
+      "hi",
+      "ja",
+      "ru",
+      "zh-CN",
+    ]);
     for (const code of SUPPORTED_LOCALES) {
       expect(isAppLocale(code)).toBe(true);
     }
+    expect(isAppLocale("zh-cn")).toBe(true);
+    expect(isAppLocale("zh-TW")).toBe(false);
   });
 
   it("rejects unsupported locales", () => {
@@ -34,7 +49,7 @@ describe("locale contract", () => {
   });
 
   it("falls back safely for unsupported tags", () => {
-    expect(resolveLocaleOrFallback("zh-CN")).toBe(DEFAULT_LOCALE);
+    expect(resolveLocaleOrFallback("zh-TW")).toBe(DEFAULT_LOCALE);
     expect(resolveLocaleOrFallback("")).toBe("en");
     expect(resolveLocaleOrFallback(undefined)).toBe("en");
   });
@@ -58,9 +73,15 @@ describe("browser language normalization", () => {
     expect(normalizeToAppLocale("pt-BR")).toBe("pt");
   });
 
-  it("returns null for unknown primary languages", () => {
-    expect(normalizeToAppLocale("zh-Hans")).toBeNull();
-    expect(normalizeToAppLocale("ja")).toBeNull();
+  it("maps Simplified Chinese and leaves Traditional unmapped", () => {
+    expect(normalizeToAppLocale("zh-Hans")).toBe("zh-CN");
+    expect(normalizeToAppLocale("zh-CN")).toBe("zh-CN");
+    expect(normalizeToAppLocale("zh")).toBe("zh-CN");
+    expect(normalizeToAppLocale("zh-TW")).toBeNull();
+    expect(normalizeToAppLocale("zh-Hant")).toBeNull();
+    expect(normalizeToAppLocale("zh-HK")).toBeNull();
+    expect(normalizeToAppLocale("ja")).toBe("ja");
+    expect(normalizeToAppLocale("tr-TR")).toBe("tr");
   });
 });
 
@@ -102,9 +123,14 @@ describe("locale resolution order", () => {
     ]);
     expect(
       resolveAppLocale({
-        browserLanguages: "zh-CN,fr-FR;q=0.8,en;q=0.5",
+        browserLanguages: "zh-TW,fr-FR;q=0.8,en;q=0.5",
       })
     ).toBe("fr");
+    expect(
+      resolveAppLocale({
+        browserLanguages: "zh-CN,fr-FR;q=0.8,en;q=0.5",
+      })
+    ).toBe("zh-CN");
   });
 
   it("falls back to default when nothing matches", () => {
@@ -112,7 +138,7 @@ describe("locale resolution order", () => {
       resolveAppLocale({
         explicit: "nope",
         cookiePreference: "xx",
-        browserLanguages: "ja,zh",
+        browserLanguages: "zh-TW,zh-Hant",
       })
     ).toBe("en");
   });

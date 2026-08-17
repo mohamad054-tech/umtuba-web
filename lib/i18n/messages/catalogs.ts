@@ -4,7 +4,13 @@ import { deMessages } from "./de";
 import { enMessages } from "./en";
 import { esMessages } from "./es";
 import { frMessages } from "./fr";
+import { hiMessages } from "./hi";
+import { idMessages } from "./id";
+import { jaMessages } from "./ja";
 import { ptMessages } from "./pt";
+import { ruMessages } from "./ru";
+import { trMessages } from "./tr";
+import { zhCNMessages } from "./zh-CN";
 import type { FoundationMessages } from "./types";
 
 export const MESSAGE_CATALOGS: Record<AppLocale, FoundationMessages> = {
@@ -14,6 +20,12 @@ export const MESSAGE_CATALOGS: Record<AppLocale, FoundationMessages> = {
   es: esMessages,
   de: deMessages,
   pt: ptMessages,
+  tr: trMessages,
+  id: idMessages,
+  hi: hiMessages,
+  ja: jaMessages,
+  ru: ruMessages,
+  "zh-CN": zhCNMessages,
 };
 
 export function getMessageCatalog(locale: AppLocale): FoundationMessages {

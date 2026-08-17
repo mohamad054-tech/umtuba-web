@@ -30,7 +30,21 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* Geist is Latin-only. System CJK / Devanagari / Cyrillic fallbacks for Wave 2. */
+  font-family: var(--font-geist-sans), "Segoe UI", "Noto Sans",
+    "Noto Sans Devanagari", "Nirmala UI", "Noto Sans CJK SC", "PingFang SC",
+    "Microsoft YaHei", "Noto Sans JP", "Hiragino Sans", "Yu Gothic",
+    "Noto Sans", Arial, Helvetica, sans-serif;
+}
+
+html[lang="hi"] body {
+  line-height: 1.5;
+}
+
+html[lang="ja"] body,
+html[lang="zh-CN"] body {
+  line-height: 1.55;
+  word-break: break-word;
 }
 
 /* —— Landing hero —— */
