@@ -1,11 +1,23 @@
 "use client";
 
-import { useId, useRef, type ReactNode } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
 import {
   canUseNativeShare,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
+import {
+  SHARE_MENU_WIDTH_PX,
+  placeShareMenu,
+  readDocumentDir,
+} from "../../lib/social/shareMenuViewport";
 
 type ShareMenuProps = {
   open: boolean;
@@ -25,7 +37,11 @@ export default function ShareMenu({
   const titleId = useId();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const firstButtonRef = useRef<HTMLButtonElement | null>(null);
+  const anchorRef = useRef<HTMLSpanElement | null>(null);
   const nativeAvailable = canUseNativeShare();
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(
+    null
+  );
 
   useDialogA11y({
     open,
@@ -34,18 +50,54 @@ export default function ShareMenu({
     initialFocusRef: firstButtonRef,
   });
 
+  useLayoutEffect(() => {
+    if (!open) {
+      setCoords(null);
+      return;
+    }
+
+    function updatePosition() {
+      const anchor = anchorRef.current?.getBoundingClientRect();
+      if (!anchor) {
+        return;
+      }
+
+      const measured = menuRef.current?.getBoundingClientRect();
+      const dir = readDocumentDir(
+        document.documentElement.getAttribute("dir")
+      );
+      const placed = placeShareMenu({
+        anchor: {
+          top: anchor.top,
+          left: anchor.left,
+          width: anchor.width,
+          height: anchor.height,
+        },
+        menu: {
+          width: measured?.width || SHARE_MENU_WIDTH_PX,
+          height: measured?.height || 188,
+        },
+        viewport: { width: window.innerWidth, height: window.innerHeight },
+        align,
+        dir,
+      });
+      setCoords({ top: placed.top, left: placed.left });
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open, align, nativeAvailable]);
+
   if (!open) {
     return null;
   }
 
-  const alignClass =
-    align === "left"
-      ? "left-0"
-      : align === "center"
-        ? "left-1/2 -translate-x-1/2"
-        : "right-0";
-
-  return (
+  const menu = (
     <>
       <button
         type="button"
@@ -58,7 +110,12 @@ export default function ShareMenu({
         ref={menuRef}
         role="menu"
         aria-labelledby={titleId}
-        className={`absolute bottom-[calc(100%+0.75rem)] z-50 w-52 overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${alignClass}`}
+        data-share-menu="viewport"
+        className="fixed z-50 w-52 rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
+        style={{
+          top: coords?.top ?? -9999,
+          left: coords?.left ?? 0,
+        }}
       >
         <p
           id={titleId}
@@ -126,6 +183,19 @@ export default function ShareMenu({
           </button>
         ) : null}
       </div>
+    </>
+  );
+
+  return (
+    <>
+      <span
+        ref={anchorRef}
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+      />
+      {typeof document !== "undefined"
+        ? createPortal(menu, document.body)
+        : menu}
     </>
   );
 }

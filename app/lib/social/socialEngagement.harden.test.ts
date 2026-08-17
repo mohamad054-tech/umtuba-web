@@ -71,6 +71,18 @@ describe("social engagement harden contracts", () => {
     );
   });
 
+  it("share menu portals with viewport collision and does not clip actions", () => {
+    const menu = read("app/components/social/ShareMenu.tsx");
+    expect(menu).toMatch(/placeShareMenu/);
+    expect(menu).toMatch(/createPortal/);
+    expect(menu).toMatch(/data-share-menu="viewport"/);
+    expect(menu).toMatch(/useDialogA11y/);
+    expect(menu).not.toMatch(/overflow-hidden/);
+    expect(read("app/components/video/VideoActionRail.tsx")).not.toMatch(
+      /right-14/
+    );
+  });
+
   it("notification items do not navigate to hash when href is missing", () => {
     const item = read(
       "app/notifications/components/NotificationListItem.tsx"
