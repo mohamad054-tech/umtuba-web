@@ -161,7 +161,7 @@ describe("route robots / sitemap policy", () => {
     if (!first || typeof first === "string" || first instanceof URL) {
       throw new Error("expected OG image object");
     }
-    expect(first.url).toBe("/opengraph-image");
+    expect(first.url).toBe("/opengraph-image.png");
     expect(first.width).toBe(1200);
     expect(first.height).toBe(630);
     expect(first.alt).toContain(BRAND.name);
@@ -225,7 +225,7 @@ describe("public profile metadata", () => {
     if (!first || typeof first === "string" || first instanceof URL) {
       throw new Error("expected OG image object");
     }
-    expect(first.url).toBe("/opengraph-image");
+    expect(first.url).toBe("/opengraph-image.png");
   });
 });
 

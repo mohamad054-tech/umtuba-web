@@ -8,7 +8,7 @@ import {
 } from "./brand";
 import { getSiteUrl } from "./siteUrl";
 
-const OG_IMAGE_PATH = "/opengraph-image";
+const OG_IMAGE_PATH = "/opengraph-image.png";
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630;
 const OG_ALT = `${BRAND.name} — ${BRAND.tagline}`;
