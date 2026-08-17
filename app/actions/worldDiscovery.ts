@@ -1,10 +1,13 @@
 "use server";
 
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { createClient } from "../../lib/supabase/server";
 import {
   sanitizeDiscoveryRequest,
   type DiscoveredPlace,
 } from "../../lib/world/discovery";
+import { localizeWorldDiscoveryError } from "../../lib/world/holdUi";
 
 export async function discoverWorldPlacesAction(input: {
   latitude?: number;
@@ -18,11 +21,18 @@ export async function discoverWorldPlacesAction(input: {
   | { ok: true; places: DiscoveredPlace[] }
   | { ok: false; message: string }
 > {
+  const { locale } = await resolveRequestLocale();
   const validated = sanitizeDiscoveryRequest(input);
-  if (!validated.ok) return validated;
+  if (!validated.ok) {
+    return {
+      ok: false,
+      message: localizeWorldDiscoveryError(locale, validated.message),
+    };
+  }
 
   const supabase = await createClient();
   const { value } = validated;
+  const t = createTranslator(locale);
   const { data, error } = await supabase.rpc("discover_world_places_v2", {
     p_latitude: value.latitude,
     p_longitude: value.longitude,
@@ -37,12 +47,12 @@ export async function discoverWorldPlacesAction(input: {
   if (error) {
     const raw = (error.message || "").toLowerCase();
     if (raw.includes("disabled")) {
-      return { ok: false, message: "World Discovery is not available yet." };
+      return { ok: false, message: t("world.error.unavailable") };
     }
     if (raw.includes("destination")) {
-      return { ok: false, message: "Choose a valid destination." };
+      return { ok: false, message: t("world.error.invalidDestination") };
     }
-    return { ok: false, message: "Places could not be loaded." };
+    return { ok: false, message: t("world.error.loadPlaces") };
   }
 
   return { ok: true, places: (data ?? []) as DiscoveredPlace[] };

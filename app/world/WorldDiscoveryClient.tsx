@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { discoverWorldPlacesAction } from "../actions/worldDiscovery";
+import { useTranslation } from "../components/i18n";
 import ExternalDirectionsLink from "../components/world/ExternalDirectionsLink";
 import {
   EXACT_CONTEXT_RESTORE_EVENT,
@@ -34,14 +35,6 @@ type Props = {
   initialRadius?: number | null;
 };
 
-const PERMISSION_COPY: Record<LocationPermissionState, string> = {
-  not_requested: "Location has not been requested.",
-  granted: "One-time location granted. It is not stored.",
-  denied: "Location denied. Choose a destination instead.",
-  unavailable: "Location is unavailable. Choose a destination instead.",
-  destination_only: "Destination-only discovery — no device location used.",
-};
-
 export default function WorldDiscoveryClient({
   cities,
   categories,
@@ -51,6 +44,14 @@ export default function WorldDiscoveryClient({
   initialCategoryId,
   initialRadius,
 }: Props) {
+  const { locale, t } = useTranslation();
+  const permissionCopy: Record<LocationPermissionState, string> = {
+    not_requested: t("world.location.notRequested"),
+    granted: t("world.location.granted"),
+    denied: t("world.location.denied"),
+    unavailable: t("world.location.unavailable"),
+    destination_only: t("world.location.destinationOnly"),
+  };
   const [permission, setPermission] =
     useState<LocationPermissionState>("not_requested");
   const [cityId, setCityId] = useState(
@@ -135,9 +136,7 @@ export default function WorldDiscoveryClient({
       }
       setPlaces(result.places);
       setMessage(
-        result.places.length
-          ? null
-          : "No approved public places match this destination."
+        result.places.length ? null : t("world.empty.destination")
       );
     });
   }
@@ -173,9 +172,7 @@ export default function WorldDiscoveryClient({
           }
           setPlaces(result.places);
           setMessage(
-            result.places.length
-              ? null
-              : "No approved public places are nearby."
+            result.places.length ? null : t("world.empty.nearby")
           );
         });
       },
@@ -203,24 +200,22 @@ export default function WorldDiscoveryClient({
           role="status"
           className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100"
         >
-          {worldDiscoveryHoldMessage(databaseReady)}
+          {worldDiscoveryHoldMessage(databaseReady, locale)}
         </p>
         {requestedCity ? (
           <p className="text-sm text-white/70">
-            Requested destination:{" "}
-            <span className="font-bold text-white">{requestedCity}</span>. City
-            explorer controls stay hidden until World data is available.
+            {t("world.requestedDestination", { values: { city: requestedCity } })}
           </p>
         ) : null}
         <p className="text-sm text-white/45">
-          No location permission is requested while Discovery is unavailable.
+          {t("world.location.holdNoPermission")}
         </p>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/"
             className="watch-focus-ring rounded-full border border-white/15 px-4 py-2 text-sm font-bold"
           >
-            Back to Home
+            {t("world.backHome")}
           </Link>
         </div>
       </div>
@@ -230,22 +225,21 @@ export default function WorldDiscoveryClient({
   return (
     <div className="space-y-5">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5">
-        <h2 className="text-xl font-black">Choose where to explore</h2>
+        <h2 className="text-xl font-black">{t("world.chooseWhere")}</h2>
         <p className="mt-2 text-sm text-white/50">
-          Device location is optional. Manual country/city discovery always
-          remains available when World Discovery is enabled.
+          {t("world.chooseWhereHelp")}
         </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <label className="text-xs font-bold text-white/55">
-            Destination
+            {t("world.destination")}
             <select
               value={cityId}
               onChange={(event) => setCityId(event.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
               {cities.length === 0 ? (
-                <option value="">No curated destinations yet</option>
+                <option value="">{t("world.empty.cities")}</option>
               ) : null}
               {cities.map((city) => (
                 <option key={city.id} value={city.id}>
@@ -256,13 +250,13 @@ export default function WorldDiscoveryClient({
           </label>
 
           <label className="text-xs font-bold text-white/55">
-            Category
+            {t("world.category")}
             <select
               value={categoryId}
               onChange={(event) => setCategoryId(event.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
-              <option value="">All categories</option>
+              <option value="">{t("world.allCategories")}</option>
               {categoryOptions.map((item) => (
                 <option key={item.id} value={item.id}>
                   {item.depth ? `— ${item.name}` : item.name}
@@ -272,7 +266,7 @@ export default function WorldDiscoveryClient({
           </label>
 
           <label className="text-xs font-bold text-white/55">
-            Radius: {radius} km
+            {t("world.radiusKm", { values: { radius } })}
             <input
               type="range"
               min={1}
@@ -296,7 +290,7 @@ export default function WorldDiscoveryClient({
             onClick={runDestinationDiscovery}
             className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black disabled:opacity-40"
           >
-            {pending ? "Searching…" : "Explore destination"}
+            {pending ? t("world.searching") : t("world.exploreDestination")}
           </button>
           {flags.nearbyPlacesEnabled ? (
             <button
@@ -305,7 +299,7 @@ export default function WorldDiscoveryClient({
               onClick={runNearbyDiscovery}
               className="watch-focus-ring rounded-full border border-white/15 px-4 py-2 text-sm font-bold disabled:opacity-40"
             >
-              Use my location once
+              {t("world.useLocationOnce")}
             </button>
           ) : null}
           {selectedCity ? (
@@ -313,19 +307,19 @@ export default function WorldDiscoveryClient({
               href={`/world/city/${encodeURIComponent(selectedCity.slug)}`}
               className="watch-focus-ring rounded-full border border-cyan-400/25 bg-cyan-500/10 px-4 py-2 text-sm font-bold text-cyan-100"
             >
-              Open city profile
+              {t("world.openCity")}
             </Link>
           ) : null}
           <Link
             href="/world/search"
             className="watch-focus-ring rounded-full border border-white/15 px-4 py-2 text-sm font-bold"
           >
-            Search World
+            {t("world.searchWorld")}
           </Link>
         </div>
 
         <p className="mt-3 text-xs text-white/45">
-          {PERMISSION_COPY[permission]} No continuous tracking is used.
+          {permissionCopy[permission]} {t("world.location.noTracking")}
         </p>
       </section>
 
@@ -345,7 +339,7 @@ export default function WorldDiscoveryClient({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-200/70">
-                    {place.category} · verified
+                    {place.category} · {t("world.verified")}
                   </p>
                   <h3 className="mt-1 text-lg font-black">
                     <Link
@@ -389,9 +383,9 @@ export default function WorldDiscoveryClient({
 
       {flags.helloCityEnabled ? (
         <section className="rounded-[28px] border border-violet-400/20 bg-violet-500/5 p-5">
-          <h2 className="text-xl font-black">Hello City</h2>
+          <h2 className="text-xl font-black">{t("world.helloCity")}</h2>
           <p className="mt-2 text-sm text-white/55">
-            Publishing is explicit, moderated and city-level only.
+            {t("world.helloCityHelp")}
           </p>
         </section>
       ) : null}

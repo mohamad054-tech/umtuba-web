@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import AppTopNav from "../../components/AppTopNav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient } from "../../../lib/supabase/server";
 import { loadWorldDiscoveryBootstrap } from "../../../lib/world/discovery";
 import {
@@ -19,10 +21,12 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function WorldSearchPage({ searchParams }: Props) {
-  const [query, supabase] = await Promise.all([
+  const [query, localeInfo, supabase] = await Promise.all([
     searchParams,
+    resolveRequestLocale(),
     createClient(),
   ]);
+  const t = createTranslator(localeInfo.locale);
   const bootstrap = await loadWorldDiscoveryBootstrap(supabase);
   const publiclyLive = isWorldDiscoveryPubliclyLive(bootstrap);
   const initialQuery =
@@ -31,21 +35,34 @@ export default async function WorldSearchPage({ searchParams }: Props) {
   return (
     <main className="min-h-screen bg-[#050510] text-white">
       <AppTopNav
-        title="World Search"
-        subtitle={publiclyLive ? "Cities, places & categories" : "Not live yet"}
+        title={t("world.search.navTitle")}
+        subtitle={
+          publiclyLive
+            ? t("world.search.navSubtitleLive")
+            : t("world.search.navSubtitleHold")
+        }
       />
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
         <header className="mb-6">
           <h1 className="text-3xl font-black">
-            {publiclyLive ? "Search the World domain" : "World Search is on hold"}
+            {publiclyLive
+              ? t("world.search.titleLive")
+              : t("world.search.titleHold")}
           </h1>
           <p className="mt-2 text-sm text-white/50">
             {publiclyLive
-              ? "Database-backed search across approved public cities, places, businesses, attractions, hotels, restaurants and categories."
-              : worldSearchHoldMessage(bootstrap.databaseReady)}
+              ? t("world.search.introLive")
+              : worldSearchHoldMessage(
+                  bootstrap.databaseReady,
+                  localeInfo.locale
+                )}
           </p>
         </header>
-        <Suspense fallback={<p className="text-sm text-white/45">Loading search…</p>}>
+        <Suspense
+          fallback={
+            <p className="text-sm text-white/45">{t("world.search.loading")}</p>
+          }
+        >
           <WorldSearchClient
             cities={bootstrap.cities}
             categories={bootstrap.categories}

@@ -205,4 +205,87 @@ export const enMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Continue to Profile",
   "auth.signup.continueLeftOff": "Continue where you left off",
   "auth.signup.viewProfile": "View profile",
+
+  "world.eyebrow": "UMTUBA World",
+  "world.navTitle": "World Discovery",
+  "world.navSubtitleLive": "Places & destinations",
+  "world.navSubtitleHold": "Not live yet",
+  "world.titleLive": "Explore a destination, your way",
+  "world.titleHold": "World Discovery is on hold",
+  "world.introLive":
+    "Discover approved public stores, restaurants, hotels, cafes and local services. GPS is provided by your device and is always optional; UMTUBA does not store precise user location here.",
+  "world.hold.migrations":
+    "World Discovery database migrations are not available in this environment yet.",
+  "world.hold.flagOff":
+    "World Discovery is prepared but disabled pending platform approval.",
+  "world.preparing": "Preparing World Discovery…",
+  "world.requestedDestination":
+    "Requested destination: {city}. City explorer controls stay hidden until World data is available.",
+  "world.location.holdNoPermission":
+    "No location permission is requested while Discovery is unavailable.",
+  "world.backHome": "Back to Home",
+  "world.chooseWhere": "Choose where to explore",
+  "world.chooseWhereHelp":
+    "Device location is optional. Manual country/city discovery always remains available when World Discovery is enabled.",
+  "world.destination": "Destination",
+  "world.category": "Category",
+  "world.allCategories": "All categories",
+  "world.radiusKm": "Radius: {radius} km",
+  "world.exploreDestination": "Explore destination",
+  "world.searching": "Searching…",
+  "world.useLocationOnce": "Use my location once",
+  "world.openCity": "Open city profile",
+  "world.searchWorld": "Search World",
+  "world.location.notRequested": "Location has not been requested.",
+  "world.location.granted": "One-time location granted. It is not stored.",
+  "world.location.denied": "Location denied. Choose a destination instead.",
+  "world.location.unavailable":
+    "Location is unavailable. Choose a destination instead.",
+  "world.location.destinationOnly":
+    "Destination-only discovery — no device location used.",
+  "world.location.noTracking": "No continuous tracking is used.",
+  "world.empty.destination":
+    "No approved public places match this destination.",
+  "world.empty.nearby": "No approved public places are nearby.",
+  "world.empty.cities": "No curated destinations yet",
+  "world.verified": "verified",
+  "world.helloCity": "Hello City",
+  "world.helloCityHelp":
+    "Publishing is explicit, moderated and city-level only.",
+  "world.search.navTitle": "World Search",
+  "world.search.navSubtitleLive": "Cities, places & categories",
+  "world.search.navSubtitleHold": "Not live yet",
+  "world.search.titleLive": "Search the World domain",
+  "world.search.titleHold": "World Search is on hold",
+  "world.search.introLive":
+    "Database-backed search across approved public cities, places, businesses, attractions, hotels, restaurants and categories.",
+  "world.search.hold.migrations":
+    "World Search database migrations are not available in this environment yet.",
+  "world.search.hold.flagOff":
+    "World Search is prepared but disabled pending platform approval.",
+  "world.search.loading": "Loading search…",
+  "world.search.placeholder": "City, place, hotel, restaurant…",
+  "world.search.type": "Type",
+  "world.search.everything": "Everything",
+  "world.search.city": "City",
+  "world.search.allCities": "All cities",
+  "world.search.empty": "No matching World results.",
+  "world.error.unavailable": "World Discovery is not available yet.",
+  "world.error.invalidDestination": "Choose a valid destination.",
+  "world.error.loadPlaces": "Places could not be loaded.",
+  "world.error.searchFailed": "World search could not be completed.",
+  "world.error.coordsTogether":
+    "Location coordinates must be provided together.",
+  "world.error.coordsInvalid": "Location coordinates are invalid.",
+  "world.error.chooseDestination":
+    "Choose a destination or share one-time location.",
+  "world.error.invalidCategory": "Place category is invalid.",
+  "world.error.searchLength": "Search must contain 2 to 80 characters.",
+  "world.error.searchType": "Search type is invalid.",
+  "world.error.searchFilter": "Search filter is invalid.",
+  "world.city.unavailableTitle": "City profile is not available yet",
+  "world.city.unavailableBody": "This city is being prepared.",
+  "world.place.unavailableTitle": "Place profile is not available yet",
+  "world.place.unavailableBody": "This place is being prepared.",
+  "world.backToWorld": "Back to World",
 };

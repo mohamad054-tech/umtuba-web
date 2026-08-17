@@ -136,6 +136,9 @@ describe("translation catalogs", () => {
     "languages.ar",
     "nav.home",
     "settings.title",
+    "world.titleHold",
+    "world.hold.migrations",
+    "world.error.unavailable",
   ];
 
   it("provides foundation keys for every supported locale", () => {

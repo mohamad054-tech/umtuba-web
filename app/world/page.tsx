@@ -1,5 +1,7 @@
 import AppTopNav from "../components/AppTopNav";
 import { Suspense } from "react";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { createClient } from "../../lib/supabase/server";
 import { loadWorldDiscoveryBootstrap } from "../../lib/world/discovery";
 import {
@@ -23,35 +25,39 @@ type Props = {
 
 export default async function WorldDiscoveryPage({ searchParams }: Props) {
   const query = await searchParams;
-  const supabase = await createClient();
+  const [{ locale }, supabase] = await Promise.all([
+    resolveRequestLocale(),
+    createClient(),
+  ]);
+  const t = createTranslator(locale);
   const bootstrap = await loadWorldDiscoveryBootstrap(supabase);
   const publiclyLive = isWorldDiscoveryPubliclyLive(bootstrap);
 
   return (
     <main className="min-h-screen bg-[#050510] text-white">
       <AppTopNav
-        title="World Discovery"
-        subtitle={publiclyLive ? "Places & destinations" : "Not live yet"}
+        title={t("world.navTitle")}
+        subtitle={
+          publiclyLive ? t("world.navSubtitleLive") : t("world.navSubtitleHold")
+        }
       />
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
         <header className="mb-6 rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 via-[#0a1022] to-violet-500/10 p-6">
           <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200/70">
-            UMTUBA World
+            {t("world.eyebrow")}
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight md:text-5xl">
-            {publiclyLive
-              ? "Explore a destination, your way"
-              : "World Discovery is on hold"}
+            {publiclyLive ? t("world.titleLive") : t("world.titleHold")}
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-white/55">
             {publiclyLive
-              ? "Discover approved public stores, restaurants, hotels, cafes and local services. GPS is provided by your device and is always optional; UMTUBA does not store precise user location here."
-              : worldDiscoveryHoldMessage(bootstrap.databaseReady)}
+              ? t("world.introLive")
+              : worldDiscoveryHoldMessage(bootstrap.databaseReady, locale)}
           </p>
         </header>
         <Suspense
           fallback={
-            <p className="text-sm text-white/50">Preparing World Discovery…</p>
+            <p className="text-sm text-white/50">{t("world.preparing")}</p>
           }
         >
           <WorldDiscoveryClient

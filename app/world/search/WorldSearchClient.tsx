@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { searchWorldAction } from "../../actions/worldSearch";
+import { useTranslation } from "../../components/i18n";
 import {
   WORLD_SEARCH_ENTITY_TYPES,
   type WorldSearchEntityType,
@@ -35,6 +36,7 @@ export default function WorldSearchClient({
   const [results, setResults] = useState<WorldSearchResult[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const { locale, t } = useTranslation();
 
   useEffect(() => {
     function restore(event: Event) {
@@ -70,7 +72,7 @@ export default function WorldSearchClient({
         return;
       }
       setResults(response.results);
-      setMessage(response.results.length ? null : "No matching World results.");
+      setMessage(response.results.length ? null : t("world.search.empty"));
     });
   }
 
@@ -80,7 +82,7 @@ export default function WorldSearchClient({
         role="status"
         className="rounded-2xl border border-blue-400/25 bg-blue-500/10 p-4 text-sm text-blue-100"
       >
-        {worldSearchHoldMessage(databaseReady)}
+        {worldSearchHoldMessage(databaseReady, locale)}
       </p>
     );
   }
@@ -90,7 +92,9 @@ export default function WorldSearchClient({
       <section className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5">
         <div className="grid gap-3 md:grid-cols-4">
           <label className="md:col-span-2">
-            <span className="text-xs font-bold text-white/45">Search World</span>
+            <span className="text-xs font-bold text-white/45">
+              {t("world.searchWorld")}
+            </span>
             <input
               value={query}
               maxLength={80}
@@ -98,12 +102,14 @@ export default function WorldSearchClient({
               onKeyDown={(event) => {
                 if (event.key === "Enter") runSearch();
               }}
-              placeholder="City, place, hotel, restaurant…"
+              placeholder={t("world.search.placeholder")}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             />
           </label>
           <label>
-            <span className="text-xs font-bold text-white/45">Type</span>
+            <span className="text-xs font-bold text-white/45">
+              {t("world.search.type")}
+            </span>
             <select
               value={entityType}
               onChange={(event) =>
@@ -111,7 +117,7 @@ export default function WorldSearchClient({
               }
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
-              <option value="">Everything</option>
+              <option value="">{t("world.search.everything")}</option>
               {WORLD_SEARCH_ENTITY_TYPES.map((type) => (
                 <option key={type} value={type}>
                   {type.replace(/_/g, " ")}
@@ -120,13 +126,15 @@ export default function WorldSearchClient({
             </select>
           </label>
           <label>
-            <span className="text-xs font-bold text-white/45">City</span>
+            <span className="text-xs font-bold text-white/45">
+              {t("world.search.city")}
+            </span>
             <select
               value={cityId}
               onChange={(event) => setCityId(event.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
-              <option value="">All cities</option>
+              <option value="">{t("world.search.allCities")}</option>
               {cities.map((city) => (
                 <option key={city.id} value={city.id}>
                   {city.city_name}
@@ -137,13 +145,15 @@ export default function WorldSearchClient({
         </div>
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <label className="min-w-56">
-            <span className="text-xs font-bold text-white/45">Category</span>
+            <span className="text-xs font-bold text-white/45">
+              {t("world.category")}
+            </span>
             <select
               value={categoryId}
               onChange={(event) => setCategoryId(event.target.value)}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
-              <option value="">All categories</option>
+              <option value="">{t("world.allCategories")}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -157,7 +167,7 @@ export default function WorldSearchClient({
             disabled={!enabled || pending || query.trim().length < 2}
             className="rounded-full bg-white px-5 py-3 text-sm font-black text-black disabled:opacity-40"
           >
-            {pending ? "Searching…" : "Search"}
+            {pending ? t("world.searching") : t("actions.search")}
           </button>
         </div>
       </section>

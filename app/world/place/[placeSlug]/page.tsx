@@ -6,6 +6,8 @@ import WorldLayerTabs, {
   type WorldLayerTab,
 } from "../../../components/world/WorldLayerTabs";
 import ProductEmptyState from "../../../components/product/ProductEmptyState";
+import { createTranslator } from "../../../../lib/i18n";
+import { resolveRequestLocale } from "../../../../lib/i18n/server";
 import { APP_ROUTES, buildStoreShopIdHref } from "../../../lib/nav";
 import { createClient } from "../../../../lib/supabase/server";
 import { sanitizeWorldSlug } from "../../../../lib/world/domain";
@@ -49,19 +51,21 @@ export default async function WorldPlacePage({ params, searchParams }: Props) {
   if (!slug) notFound();
 
   const supabase = await createClient();
-  const [result, bootstrap] = await Promise.all([
+  const [{ locale }, result, bootstrap] = await Promise.all([
+    resolveRequestLocale(),
     loadWorldPlaceProfile(supabase, slug),
     loadWorldDiscoveryBootstrap(supabase),
   ]);
+  const t = createTranslator(locale);
   if (!result.data) {
     if (!result.databaseReady || result.error) {
       return (
         <ProductEmptyState
-          eyebrow="World Place"
-          title="Place profile is not available yet"
-          description={result.error ?? "This place is being prepared."}
+          eyebrow={t("world.navTitle")}
+          title={t("world.place.unavailableTitle")}
+          description={result.error ?? t("world.place.unavailableBody")}
           primaryHref={APP_ROUTES.worldDiscovery}
-          primaryLabel="Back to World"
+          primaryLabel={t("world.backToWorld")}
         />
       );
     }
