@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 import { BRAND, BRAND_COLORS } from "../lib/site/brand";
 
-export const runtime = "edge";
+// Node runtime: edge ImageResponse crashes next start (nginx 502 / upstream closed).
+export const runtime = "nodejs";
 export const alt = `${BRAND.name} — ${BRAND.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
