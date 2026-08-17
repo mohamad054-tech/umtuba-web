@@ -128,4 +128,16 @@ export const deMessages: FoundationMessages = {
   "world.place.unavailableTitle": "Das Ortsprofil ist noch nicht verfügbar",
   "world.place.unavailableBody": "Dieser Ort wird vorbereitet.",
   "world.backToWorld": "Zurück zu World",
+  "nav.following": "Folge ich",
+  "menu.following": "Folge ich",
+  "following.title": "Folge ich",
+  "following.subtitle": "Beiträge von Creatorn, denen du folgst",
+  "following.loading": "Folge ich wird geöffnet…",
+  "following.emptyTitle": "Keine Beiträge von Personen, denen du folgst",
+  "following.emptyDescription":
+    "Folge Creatorn, um ihre neuesten Videos hier zu sehen — zuerst die neuesten.",
+  "following.emptyNoPosts":
+    "Creator, denen du folgst, haben noch kein fertiges Video veröffentlicht.",
+  "following.emptyCta": "Creator auf der Startseite finden",
+  "following.errorTitle": "Folge ich konnte nicht geladen werden",
 };

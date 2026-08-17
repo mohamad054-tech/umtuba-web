@@ -1,19 +1,61 @@
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import {
   encodeWatchPageCursor,
   getWatchVideosPageServer,
 } from "../../lib/supabase/videoPostsServer";
 import { getServerUser } from "../../lib/supabase/server";
 import { watchMetadata } from "../../lib/site/routeMetadata";
+import { getSiteUrl } from "../../lib/site/siteUrl";
+import {
+  buildVideoObjectJsonLd,
+  buildWatchPostMetadata,
+  parsePublicPostId,
+} from "../../lib/site/videoSeo";
+import { loadPublicVideoSeoById } from "../../lib/supabase/publicVideoSeo";
 import ProductEmptyState from "../components/product/ProductEmptyState";
 import { demoVideos } from "../data/videos";
 import { APP_ROUTES } from "../lib/nav";
 import { allowWatchDemoFallback } from "../lib/product/surfaceGates";
 import { demoVideoToWatchVideo } from "./lib/mapWatchVideo";
+import VideoObjectJsonLdScript from "./VideoObjectJsonLd";
 import WatchExperience from "./WatchExperience";
 
-export const metadata = watchMetadata;
 export const dynamic = "force-dynamic";
+
+type WatchSearchParams = {
+  post?: string;
+  id?: string;
+  hl?: string;
+};
+
+type WatchPageProps = {
+  searchParams?: Promise<WatchSearchParams> | WatchSearchParams;
+};
+
+export async function generateMetadata({
+  searchParams,
+}: WatchPageProps): Promise<Metadata> {
+  const params = await Promise.resolve(searchParams ?? {});
+  const postId = parsePublicPostId(params.post ?? params.id ?? null);
+  if (!postId) {
+    return watchMetadata;
+  }
+
+  const video = await loadPublicVideoSeoById(postId);
+  if (!video) {
+    return {
+      ...watchMetadata,
+      robots: {
+        index: false,
+        follow: false,
+        googleBot: { index: false, follow: false },
+      },
+    };
+  }
+
+  return buildWatchPostMetadata(video);
+}
 
 function WatchFallback() {
   return (
@@ -28,10 +70,6 @@ function WatchFallback() {
     </main>
   );
 }
-
-type WatchPageProps = {
-  searchParams?: Promise<{ post?: string; id?: string }> | { post?: string; id?: string };
-};
 
 async function WatchLoader({ searchParams }: WatchPageProps) {
   const params = await Promise.resolve(searchParams ?? {});
@@ -108,10 +146,26 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
   );
 }
 
+async function WatchSeo({ searchParams }: WatchPageProps) {
+  const params = await Promise.resolve(searchParams ?? {});
+  const postId = parsePublicPostId(params.post ?? params.id ?? null);
+  if (!postId) return null;
+  const video = await loadPublicVideoSeoById(postId);
+  if (!video) return null;
+  return (
+    <VideoObjectJsonLdScript
+      data={buildVideoObjectJsonLd(video, getSiteUrl())}
+    />
+  );
+}
+
 export default function WatchPage(props: WatchPageProps) {
   return (
-    <Suspense fallback={<WatchFallback />}>
-      <WatchLoader searchParams={props.searchParams} />
-    </Suspense>
+    <>
+      <WatchSeo searchParams={props.searchParams} />
+      <Suspense fallback={<WatchFallback />}>
+        <WatchLoader searchParams={props.searchParams} />
+      </Suspense>
+    </>
   );
 }

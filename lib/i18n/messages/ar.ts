@@ -36,6 +36,7 @@ export const arMessages: FoundationMessages = {
   "nav.messages": "الرسائل",
   "nav.profile": "الملف",
   "nav.search": "بحث",
+  "nav.following": "المتابَعون",
   "nav.primary": "التنقل الرئيسي",
   "nav.primaryMobile": "التنقل الرئيسي للجوّال",
   "nav.homeAria": "الصفحة الرئيسية لأمتوبة",
@@ -70,6 +71,7 @@ export const arMessages: FoundationMessages = {
   "menu.profile": "الملف",
   "menu.create": "إنشاء",
   "menu.saved": "المحفوظات",
+  "menu.following": "المتابَعون",
   "menu.learning": "التعلّم",
   "menu.instructor": "المعلّم",
   "menu.rewards": "المكافآت",
@@ -98,6 +100,17 @@ export const arMessages: FoundationMessages = {
   "error.tryAgain": "حاول مرة أخرى",
 
   "success.generic": "تم.",
+
+  "following.title": "المتابَعون",
+  "following.subtitle": "منشورات من صنّاع تتابعهم",
+  "following.loading": "جارٍ فتح المتابَعين…",
+  "following.emptyTitle": "لا توجد منشورات ممن تتابعهم",
+  "following.emptyDescription":
+    "تابع صنّاع المحتوى لترى أحدث فيديوهاتهم هنا، من الأحدث إلى الأقدم.",
+  "following.emptyNoPosts":
+    "الصنّاع الذين تتابعهم لم ينشروا فيديو جاهزًا بعد.",
+  "following.emptyCta": "اعثر على صنّاع في الرئيسية",
+  "following.errorTitle": "تعذّر تحميل المتابَعين",
 
   "landing.joinCta": "انضم إلى أم طوبا",
   "landing.startExploring": "ابدأ الاستكشاف",

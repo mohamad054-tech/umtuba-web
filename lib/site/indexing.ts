@@ -25,6 +25,7 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/notifications",
   "/create",
   "/saved",
+  "/following",
   "/rewards",
   "/creator",
   "/feed",

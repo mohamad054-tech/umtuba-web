@@ -127,4 +127,16 @@ export const esMessages: FoundationMessages = {
   "world.place.unavailableTitle": "El perfil del lugar aún no está disponible",
   "world.place.unavailableBody": "Este lugar se está preparando.",
   "world.backToWorld": "Volver a World",
+  "nav.following": "Siguiendo",
+  "menu.following": "Siguiendo",
+  "following.title": "Siguiendo",
+  "following.subtitle": "Publicaciones de creadores que sigues",
+  "following.loading": "Abriendo Siguiendo…",
+  "following.emptyTitle": "No hay publicaciones de quienes sigues",
+  "following.emptyDescription":
+    "Sigue a creadores para ver aquí sus últimos videos, los más recientes primero.",
+  "following.emptyNoPosts":
+    "Los creadores que sigues aún no han publicado un video listo.",
+  "following.emptyCta": "Encuentra creadores en Inicio",
+  "following.errorTitle": "No se pudo cargar Siguiendo",
 };

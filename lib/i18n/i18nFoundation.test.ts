@@ -135,6 +135,8 @@ describe("translation catalogs", () => {
     "settings.language",
     "languages.ar",
     "nav.home",
+    "nav.following",
+    "following.title",
     "settings.title",
     "world.titleHold",
     "world.hold.migrations",

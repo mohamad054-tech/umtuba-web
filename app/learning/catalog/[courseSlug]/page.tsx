@@ -10,6 +10,8 @@ import {
 import { LEARNING_LEARNER_ROUTES } from "../../../../lib/learning/learnerDelivery";
 import { APP_ROUTES } from "../../../lib/nav/routes";
 import { enrollInPublicCourseAction } from "../actions";
+import { buildPageMetadata } from "../../../../lib/site/metadata";
+import { BRAND } from "../../../../lib/site/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -24,13 +26,23 @@ export async function generateMetadata({ params }: PageProps) {
   const { courseSlug } = await Promise.resolve(params);
   const supabase = await createClient();
   const landing = await loadPublicCourseBySlug(supabase, courseSlug);
+  const path = `/learning/catalog/${courseSlug}`;
   if (!landing) {
-    return { title: "Course | Learning Catalog | UMTUBA" };
+    return buildPageMetadata({
+      title: "Course",
+      description: `A ${BRAND.name} Learning course.`,
+      path,
+      index: "noindex",
+    });
   }
-  return {
-    title: `${landing.course.name} | Learning Catalog | UMTUBA`,
-    description: landing.course.description ?? undefined,
-  };
+  return buildPageMetadata({
+    title: landing.course.name,
+    description:
+      landing.course.description?.trim() ||
+      `A public course on ${BRAND.name} Learning.`,
+    path,
+    index: "index",
+  });
 }
 
 export default async function LearningPublicCourseLandingPage({

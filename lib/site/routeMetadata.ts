@@ -68,6 +68,41 @@ export const watchMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const followingMetadata = buildPageMetadata({
+  title: "Following",
+  description: `Posts from creators you follow on ${BRAND.name}.`,
+  path: "/following",
+  index: "noindex",
+});
+
+export const storeMetadata = buildPageMetadata({
+  title: "Store",
+  description: `Premium ${BRAND.name} storefront — discover products, collections, and creators.`,
+  path: "/store",
+  index: "index",
+});
+
+export const learningHubMetadata = buildPageMetadata({
+  title: "My Learning",
+  description: `Your ${BRAND.name} Learning hub.`,
+  path: "/learning",
+  index: "noindex",
+});
+
+export const learningCatalogMetadata = buildPageMetadata({
+  title: "Learning Catalog",
+  description: `Browse free public courses on ${BRAND.name} Learning.`,
+  path: "/learning/catalog",
+  index: "index",
+});
+
+export const worldDiscoveryMetadata = buildPageMetadata({
+  title: "World Discovery",
+  description: `Discover approved public places by destination or optional one-time location.`,
+  path: "/world",
+  index: "noindex",
+});
+
 export const postJourneyMetadata = buildPageMetadata({
   title: "Post Journey",
   description: `See where a post travels on ${BRAND.name}. ${BRAND.tagline}.`,

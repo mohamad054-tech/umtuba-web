@@ -11,6 +11,7 @@ export const PROTECTED_PREFIXES = [
   "/settings",
   "/create",
   "/saved",
+  "/following",
   "/rewards",
   "/creator",
   "/seller",

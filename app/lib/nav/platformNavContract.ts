@@ -66,6 +66,7 @@ export const USER_MENU_BASE_ITEM_LABELS = [
   "Profile",
   "Create",
   "Saved",
+  "Following",
   "Learning",
   "Rewards",
   "Notifications",

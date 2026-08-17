@@ -12,9 +12,9 @@ import {
   type InstructorAuthorableCourse,
 } from "../../lib/learning/instructorAuthoring";
 
-export const metadata = {
-  title: "My Learning | UMTUBA",
-};
+import { learningHubMetadata } from "../../lib/site/routeMetadata";
+
+export const metadata = learningHubMetadata;
 
 export const dynamic = "force-dynamic";
 

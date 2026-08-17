@@ -111,6 +111,7 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/notifications") ||
           path.startsWith("/create") ||
           path.startsWith("/saved") ||
+          path.startsWith("/following") ||
           path.startsWith("/rewards") ||
           path.startsWith("/creator") ||
           path.startsWith("/feed") ||
@@ -131,7 +132,9 @@ describe("route robots / sitemap policy", () => {
       "/terms",
       "/privacy",
       "/account-deletion",
+      "/support",
     ]);
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/following");
     const blocked = [
       "/login",
       "/messages",
@@ -155,6 +158,9 @@ describe("route robots / sitemap policy", () => {
       index: "index",
     });
     expect(meta.alternates?.canonical).toBe("/discover");
+    expect(meta.alternates?.languages?.["x-default"]).toBe("/discover");
+    expect(meta.alternates?.languages?.ar).toBe("/discover?hl=ar");
+    expect(meta.alternates?.languages?.en).toBe("/discover?hl=en");
     const images = meta.openGraph?.images;
     expect(Array.isArray(images)).toBe(true);
     const first = Array.isArray(images) ? images[0] : null;

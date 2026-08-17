@@ -45,6 +45,7 @@ export function buildUserMenuGroups(
 
   youItems.push(
     { id: "saved", label: "Saved", href: APP_ROUTES.saved },
+    { id: "following", label: "Following", href: APP_ROUTES.following },
     { id: "learning", label: "Learning", href: APP_ROUTES.learning }
   );
 

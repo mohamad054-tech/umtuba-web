@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cookies, headers } from "next/headers";
+import { LOCALE_OVERRIDE_HEADER } from "../site/hreflang";
 import { LOCALE_COOKIE_NAME, parseLocaleCookieValue } from "./cookie";
 import {
   getLocaleDirection,
@@ -12,7 +13,7 @@ import { resolveAppLocale } from "./resolve";
 export type ResolvedRequestLocale = {
   locale: AppLocale;
   direction: TextDirection;
-  source: "cookie" | "accept-language" | "fallback";
+  source: "query" | "cookie" | "accept-language" | "fallback";
 };
 
 /**
@@ -25,15 +26,20 @@ export async function resolveRequestLocale(): Promise<ResolvedRequestLocale> {
     jar.get(LOCALE_COOKIE_NAME)?.value ?? null
   );
 
-  const acceptLanguage = (await headers()).get("accept-language");
+  const headerStore = await headers();
+  const acceptLanguage = headerStore.get("accept-language");
+  const queryLocale = headerStore.get(LOCALE_OVERRIDE_HEADER);
 
   const locale = resolveAppLocale({
+    explicit: queryLocale,
     cookiePreference,
     browserLanguages: acceptLanguage,
   });
 
   let source: ResolvedRequestLocale["source"] = "fallback";
-  if (cookiePreference) {
+  if (queryLocale) {
+    source = "query";
+  } else if (cookiePreference) {
     source = "cookie";
   } else {
     const fromBrowser = resolveAppLocale({

@@ -27,11 +27,9 @@ import {
 } from "../../lib/store/catalogQueries";
 import { STOREFRONT_FLAGS } from "../../lib/store/storefrontFlags";
 
-export const metadata = {
-  title: "Store | UMTUBA",
-  description:
-    "Premium UMTUBA storefront — discover products, collections, and creators.",
-};
+import { storeMetadata } from "../../lib/site/routeMetadata";
+
+export const metadata = storeMetadata;
 
 export default async function StoreHomePage() {
   const supabase = await createClient();

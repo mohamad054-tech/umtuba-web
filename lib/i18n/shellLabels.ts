@@ -22,6 +22,7 @@ const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
   profile: "menu.profile",
   create: "menu.create",
   saved: "menu.saved",
+  following: "menu.following",
   learning: "menu.learning",
   instructor: "menu.instructor",
   rewards: "menu.rewards",

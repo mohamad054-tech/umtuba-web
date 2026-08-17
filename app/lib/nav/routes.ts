@@ -10,6 +10,7 @@ export const APP_ROUTES = {
   notifications: "/notifications",
   settings: "/settings",
   saved: "/saved",
+  following: "/following",
   search: "/search",
   login: "/login",
   signup: "/signup",

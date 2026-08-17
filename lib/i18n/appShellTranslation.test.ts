@@ -100,5 +100,12 @@ describe("App Shell translation V1", () => {
     expect(userMenuGroupLabelKey("you")).toBe("menu.you");
     expect(translate("en", userMenuItemLabelKey("seller"))).toBe("Seller hub");
     expect(translate("ar", userMenuItemLabelKey("seller"))).toBe("مركز البائع");
+    expect(userMenuItemLabelKey("following")).toBe("menu.following");
+    expect(translate("en", "following.title")).toBe("Following");
+    expect(translate("ar", "following.title")).toBe("المتابَعون");
+    expect(translate("fr", "following.title")).toBe("Abonnements");
+    expect(translate("es", "following.title")).toBe("Siguiendo");
+    expect(translate("de", "following.title")).toBe("Folge ich");
+    expect(translate("pt", "following.title")).toBe("A seguir");
   });
 });

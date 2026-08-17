@@ -6,10 +6,9 @@ import { listPublicCatalogCourses } from "../../../lib/learning/publicCatalog";
 import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
 import { APP_ROUTES } from "../../lib/nav/routes";
 
-export const metadata = {
-  title: "Learning Catalog | UMTUBA",
-  description: "Browse free public courses on UMTUBA Learning.",
-};
+import { learningCatalogMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = learningCatalogMetadata;
 
 export const dynamic = "force-dynamic";
 

@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: [...ROBOTS_DISALLOW_PATHS],
     },
-    sitemap: `${origin}/sitemap.xml`,
+    sitemap: [`${origin}/sitemap.xml`, `${origin}/video-sitemap.xml`],
     host: new URL(origin).host,
   };
 }

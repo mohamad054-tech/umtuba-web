@@ -127,4 +127,16 @@ export const ptMessages: FoundationMessages = {
   "world.place.unavailableTitle": "O perfil do lugar ainda não está disponível",
   "world.place.unavailableBody": "Este lugar está a ser preparado.",
   "world.backToWorld": "Voltar a World",
+  "nav.following": "A seguir",
+  "menu.following": "A seguir",
+  "following.title": "A seguir",
+  "following.subtitle": "Publicações de criadores que segue",
+  "following.loading": "A abrir A seguir…",
+  "following.emptyTitle": "Sem publicações de quem segue",
+  "following.emptyDescription":
+    "Siga criadores para ver os vídeos mais recentes aqui, do mais novo para o mais antigo.",
+  "following.emptyNoPosts":
+    "Os criadores que segue ainda não publicaram um vídeo pronto.",
+  "following.emptyCta": "Encontrar criadores no Início",
+  "following.errorTitle": "Não foi possível carregar A seguir",
 };

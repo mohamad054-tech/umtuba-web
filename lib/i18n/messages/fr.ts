@@ -129,4 +129,16 @@ export const frMessages: FoundationMessages = {
   "world.place.unavailableTitle": "Le profil du lieu n’est pas encore disponible",
   "world.place.unavailableBody": "Ce lieu est en cours de préparation.",
   "world.backToWorld": "Retour à World",
+  "nav.following": "Abonnements",
+  "menu.following": "Abonnements",
+  "following.title": "Abonnements",
+  "following.subtitle": "Publications des créateurs que vous suivez",
+  "following.loading": "Ouverture des abonnements…",
+  "following.emptyTitle": "Aucune publication des personnes que vous suivez",
+  "following.emptyDescription":
+    "Suivez des créateurs pour voir leurs dernières vidéos ici, les plus récentes d’abord.",
+  "following.emptyNoPosts":
+    "Les créateurs que vous suivez n’ont pas encore publié de vidéo prête.",
+  "following.emptyCta": "Trouver des créateurs sur l’accueil",
+  "following.errorTitle": "Impossible de charger les abonnements",
 };

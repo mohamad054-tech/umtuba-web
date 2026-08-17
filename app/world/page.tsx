@@ -10,12 +10,9 @@ import {
 } from "../../lib/world/holdUi";
 import WorldDiscoveryClient from "./WorldDiscoveryClient";
 
-export const metadata = {
-  title: "World Discovery | UMTUBA",
-  description:
-    "Discover approved public places by destination or optional one-time location.",
-  robots: { index: false, follow: false },
-};
+import { worldDiscoveryMetadata } from "../../lib/site/routeMetadata";
+
+export const metadata = worldDiscoveryMetadata;
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LOCALE_OVERRIDE_HEADER, LOCALE_QUERY_PARAM } from "../site/hreflang";
+import { normalizeToAppLocale } from "../i18n/locales";
 import { createServiceUnavailableResponse } from "../env/serviceUnavailableResponse";
 import {
   decideAuthGate,
@@ -15,6 +17,23 @@ import {
   REFERRAL_VISITOR_COOKIE,
   normalizeReferralCode,
 } from "../referral/config";
+
+function requestHeadersWithLocaleOverride(request: NextRequest): Headers {
+  const headers = new Headers(request.headers);
+  const hl = normalizeToAppLocale(
+    request.nextUrl.searchParams.get(LOCALE_QUERY_PARAM)
+  );
+  if (hl) {
+    headers.set(LOCALE_OVERRIDE_HEADER, hl);
+  }
+  return headers;
+}
+
+function nextWithLocale(request: NextRequest): NextResponse {
+  return NextResponse.next({
+    request: { headers: requestHeadersWithLocaleOverride(request) },
+  });
+}
 
 function copyCookies(
   from: NextResponse,
@@ -88,9 +107,7 @@ function applyReferralAttribution(
 }
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let supabaseResponse = nextWithLocale(request);
 
   const { pathname, search } = request.nextUrl;
   const publicEnv = getSupabasePublicEnvResult();
@@ -135,9 +152,7 @@ export async function updateSession(request: NextRequest) {
           request.cookies.set(name, value);
         });
 
-        supabaseResponse = NextResponse.next({
-          request,
-        });
+        supabaseResponse = nextWithLocale(request);
 
         cookiesToSet.forEach(({ name, value, options }) => {
           supabaseResponse.cookies.set(name, value, options);

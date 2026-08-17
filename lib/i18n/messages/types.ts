@@ -39,6 +39,7 @@ export type FoundationMessages = {
   "nav.messages": string;
   "nav.profile": string;
   "nav.search": string;
+  "nav.following": string;
   "nav.primary": string;
   "nav.primaryMobile": string;
   "nav.homeAria": string;
@@ -73,6 +74,7 @@ export type FoundationMessages = {
   "menu.profile": string;
   "menu.create": string;
   "menu.saved": string;
+  "menu.following": string;
   "menu.learning": string;
   "menu.instructor": string;
   "menu.rewards": string;
@@ -101,6 +103,15 @@ export type FoundationMessages = {
   "error.tryAgain": string;
 
   "success.generic": string;
+
+  "following.title": string;
+  "following.subtitle": string;
+  "following.loading": string;
+  "following.emptyTitle": string;
+  "following.emptyDescription": string;
+  "following.emptyNoPosts": string;
+  "following.emptyCta": string;
+  "following.errorTitle": string;
 
   /** Landing / welcome join + hero (UAF-03 / UAF-06). */
   "landing.joinCta": string;

@@ -36,6 +36,7 @@ export const enMessages: FoundationMessages = {
   "nav.messages": "Messages",
   "nav.profile": "Profile",
   "nav.search": "Search",
+  "nav.following": "Following",
   "nav.primary": "Primary",
   "nav.primaryMobile": "Primary mobile",
   "nav.homeAria": "UMTUBA home",
@@ -70,6 +71,7 @@ export const enMessages: FoundationMessages = {
   "menu.profile": "Profile",
   "menu.create": "Create",
   "menu.saved": "Saved",
+  "menu.following": "Following",
   "menu.learning": "Learning",
   "menu.instructor": "Instructor",
   "menu.rewards": "Rewards",
@@ -98,6 +100,17 @@ export const enMessages: FoundationMessages = {
   "error.tryAgain": "Try again",
 
   "success.generic": "Done.",
+
+  "following.title": "Following",
+  "following.subtitle": "Posts from creators you follow",
+  "following.loading": "Opening Following…",
+  "following.emptyTitle": "No posts from people you follow",
+  "following.emptyDescription":
+    "Follow creators to see their latest videos here, newest first.",
+  "following.emptyNoPosts":
+    "Creators you follow have not published a ready video yet.",
+  "following.emptyCta": "Find creators on Home",
+  "following.errorTitle": "Could not load Following",
 
   "landing.joinCta": "Join UMTUBA",
   "landing.startExploring": "Start Exploring",

@@ -6,6 +6,7 @@ import {
   DEFAULT_TITLE,
   TITLE_TEMPLATE,
 } from "./brand";
+import { buildHreflangLanguages } from "./hreflang";
 import { getSiteUrl } from "./siteUrl";
 
 const OG_IMAGE_PATH = "/opengraph-image.png";
@@ -22,10 +23,12 @@ export type BuildPageMetadataInput = {
   path: string;
   index?: PageIndexPolicy;
   /** Override Open Graph type (default `website`). */
-  openGraphType?: "website" | "profile";
+  openGraphType?: "website" | "profile" | "video.other";
   /** Optional absolute image URL for OG/Twitter (e.g. public avatar). */
   imageUrl?: string | null;
   imageAlt?: string;
+  /** When false, skip hreflang (private / noindex surfaces). Default: index pages only. */
+  hreflang?: boolean;
 };
 
 function normalizePath(path: string): string {
@@ -70,12 +73,17 @@ export function buildPageMetadata(input: BuildPageMetadataInput): Metadata {
   const index = input.index ?? "index";
   const image = shareImages(input.imageUrl, input.imageAlt ?? OG_ALT);
   const ogType = input.openGraphType ?? "website";
+  const includeHreflang =
+    input.hreflang ?? index === "index";
 
   return {
     title: input.title,
     description: input.description,
     alternates: {
       canonical: path,
+      ...(includeHreflang
+        ? { languages: buildHreflangLanguages(path) }
+        : {}),
     },
     robots: robotsFor(index),
     openGraph: {
