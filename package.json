@@ -19,6 +19,7 @@
     "media:ugc-worker": "npx tsx scripts/media/mediaWorker.ts --processor=ugc_video",
     "media:ugc-worker:once": "npx tsx scripts/media/mediaWorker.ts --processor=ugc_video --once",
     "media:ugc-benchmark": "npx tsx scripts/media/ugcVideoBenchmark.ts",
+    "media:ugc-loudness-benchmark": "npx tsx scripts/media/ugcAudioLoudnessBenchmark.ts",
     "media:orphan-post-videos": "npx tsx scripts/media/orphanPostVideos.ts --dry-run",
     "media:account-purge": "npx tsx scripts/media/accountDeletionMediaPurge.ts --dry-run"
   },

@@ -290,6 +290,7 @@ describe("UGC wiring contracts", () => {
     expect(processor).toMatch(/deleteOwnedVideoObject/);
     expect(processor).toMatch(/createVideoSignedUrl/);
     expect(processor).toMatch(/playback_replaced/);
+    expect(processor).toMatch(/analyzeUgcLoudness/);
     expect(processor).not.toMatch(/hls/i);
   });
 

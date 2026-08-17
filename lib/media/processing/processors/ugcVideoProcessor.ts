@@ -16,6 +16,12 @@ import {
 } from "../adapters/storageAdapter";
 import type { MediaProcessor, ProcessorContext } from "../processor";
 import type { MediaJobRef, MediaProcessResult } from "../types";
+import {
+  analyzeUgcLoudness,
+  decideLoudnessPlan,
+  outputTruePeakClipped,
+  parseLoudnormJson,
+} from "../../ugc/ugcAudioLoudness";
 import { buildUgcFfmpegArgs, UGC_FFMPEG_TIMEOUT_MS, UGC_MAX_ATTEMPTS, UGC_STALE_PROCESSING_MS } from "../../ugc/ugcVideoPolicy";
 import { buildUgcPlaybackPath, buildUgcTempPlaybackPath, isUgcPlaybackPath } from "../../ugc/ugcVideoPaths";
 import {
@@ -234,6 +240,43 @@ export function createUgcVideoProcessor(
         };
       }
 
+      const ffmpegBinary =
+        process.env.FFMPEG_PATH?.trim() || process.env.UMTUBA_FFMPEG?.trim();
+      let loudnessApplied = false;
+      let audioFilter: string | null = null;
+
+      if (inputProbed.probe.hasAudio) {
+        ctx.reportProgress("processing", "loudnorm_analyze");
+        const analyzed = await analyzeUgcLoudness({
+          inputPath: inputFile,
+          signal: ctx.signal,
+          timeoutMs: UGC_FFMPEG_TIMEOUT_MS,
+          binary: ffmpegBinary,
+        });
+        if (!analyzed.ok) {
+          await safeCleanupPath(outputFile);
+          return {
+            ok: false,
+            error: {
+              code: analyzed.code,
+              kind: analyzed.code === "ffmpeg_missing" ? "permanent" : "retryable",
+            },
+          };
+        }
+        const plan = decideLoudnessPlan(true, analyzed.measurement);
+        if (plan.apply) {
+          audioFilter = plan.filter;
+          loudnessApplied = true;
+          ctx.log("ugc_loudnorm_plan", {
+            input_i: plan.measured.inputI,
+            target: plan.effectiveTargetLufs,
+            capped: plan.capped,
+          });
+        } else {
+          ctx.log("ugc_loudnorm_skip", { reason: plan.reason });
+        }
+      }
+
       ctx.reportProgress("processing", "ffmpeg");
       const args = buildUgcFfmpegArgs({
         inputPath: inputFile,
@@ -242,12 +285,14 @@ export function createUgcVideoProcessor(
         height: inputProbed.probe.height,
         fps: inputProbed.probe.fps,
         hasAudio: inputProbed.probe.hasAudio,
+        audioFilter,
       });
       const ffmpeg = await runFfmpeg({
         args,
         signal: ctx.signal,
         timeoutMs: UGC_FFMPEG_TIMEOUT_MS,
-        binary: process.env.FFMPEG_PATH?.trim() || process.env.UMTUBA_FFMPEG?.trim(),
+        binary: ffmpegBinary,
+        captureStderr: loudnessApplied,
       });
       if (!ffmpeg.ok) {
         await safeCleanupPath(outputFile);
@@ -258,6 +303,18 @@ export function createUgcVideoProcessor(
             kind: ffmpeg.code === "ffmpeg_missing" ? "permanent" : "retryable",
           },
         };
+      }
+
+      if (loudnessApplied) {
+        const applied = parseLoudnormJson(ffmpeg.stderr ?? "");
+        if (outputTruePeakClipped(applied?.outputTp)) {
+          await safeCleanupPath(outputFile);
+          ctx.log("ugc_loudnorm_clipping", { output_tp: applied?.outputTp });
+          return {
+            ok: false,
+            error: { code: "output_audio_clipping", kind: "retryable" },
+          };
+        }
       }
 
       const outputProbed = existsSync(outputFile)
@@ -287,7 +344,10 @@ export function createUgcVideoProcessor(
       }
 
       const inputBytes = inputProbed.probe.sizeBytes ?? p.video_byte_size ?? 0;
-      if (shouldKeepOriginalBecauseNoSaving(inputBytes, localGate.sizeBytes)) {
+      if (
+        shouldKeepOriginalBecauseNoSaving(inputBytes, localGate.sizeBytes) &&
+        !loudnessApplied
+      ) {
         await safeCleanupPath(outputFile);
         session.set(job.jobId, {
           playbackPath: originalPath,

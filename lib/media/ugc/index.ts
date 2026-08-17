@@ -1,5 +1,17 @@
 export { isUgcVideoTranscodeEnabled, UGC_VIDEO_TRANSCODE_ENV } from "./ugcVideoFlag";
 export {
+  analyzeUgcLoudness,
+  buildLoudnormAnalyzeArgs,
+  buildLoudnormApplyFilter,
+  decideLoudnessPlan,
+  outputTruePeakClipped,
+  parseLoudnormJson,
+  UGC_LOUDNORM_FILTER,
+  UGC_LOUDNESS_STANDARD,
+  UGC_TARGET_LUFS,
+  UGC_TRUE_PEAK_LIMIT_DBTP,
+} from "./ugcAudioLoudness";
+export {
   buildUgcFfmpegArgs,
   computeOutputSize,
   durationWithinTolerance,

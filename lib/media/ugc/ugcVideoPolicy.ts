@@ -102,6 +102,8 @@ export type UgcFfmpegArgsInput = {
   height?: number | null;
   fps?: number | null;
   hasAudio: boolean;
+  /** Two-pass loudnorm apply filter. Omitted when source has no audio. */
+  audioFilter?: string | null;
 };
 
 export function buildUgcFfmpegArgs(input: UgcFfmpegArgsInput): string[] {
@@ -133,6 +135,9 @@ export function buildUgcFfmpegArgs(input: UgcFfmpegArgsInput): string[] {
 
   if (input.hasAudio) {
     args.push("-map", "0:a:0?", "-c:a", UGC_AUDIO_CODEC, "-b:a", UGC_AUDIO_BITRATE, "-ac", "2");
+    if (input.audioFilter) {
+      args.push("-af", input.audioFilter);
+    }
   } else {
     args.push("-an");
   }

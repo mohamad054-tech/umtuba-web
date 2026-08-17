@@ -10,10 +10,12 @@ export type FfmpegRunInput = {
   timeoutMs?: number;
   signal?: AbortSignal;
   binary?: string;
+  /** Keep stderr on success (needed for loudnorm JSON). */
+  captureStderr?: boolean;
 };
 
 export type FfmpegRunResult =
-  | { ok: true; durationMs: number }
+  | { ok: true; durationMs: number; stderr?: string }
   | {
       ok: false;
       code: string;
@@ -101,7 +103,8 @@ export async function runFfmpeg(input: FfmpegRunInput): Promise<FfmpegRunResult>
 
     child.stderr?.on("data", (chunk) => {
       stderr += String(chunk);
-      if (stderr.length > 4000) stderr = stderr.slice(-4000);
+      const cap = input.captureStderr ? 32_000 : 4_000;
+      if (stderr.length > cap) stderr = stderr.slice(-cap);
     });
 
     child.on("error", (error) => {
@@ -121,7 +124,11 @@ export async function runFfmpeg(input: FfmpegRunInput): Promise<FfmpegRunResult>
       const durationMs = Date.now() - started;
       const code = mapFfmpegExitCode(exitCode, timedOut);
       if (code === "ok") {
-        finish({ ok: true, durationMs });
+        finish({
+          ok: true,
+          durationMs,
+          ...(input.captureStderr ? { stderr } : {}),
+        });
         return;
       }
       finish({
