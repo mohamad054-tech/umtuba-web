@@ -26,7 +26,7 @@ import {
   VIDEO_ACCEPT_ATTR,
   VIDEO_FILE_HINT,
   validateCaption,
-  validateVideoFile,
+  validateVideoDuration,
 } from "../../../lib/supabase/videoPostsShared";
 import { probeVideoFileMetadata } from "../../../lib/media/probeVideoMetadata";
 import type {
@@ -47,6 +47,15 @@ import {
   processingProgressOnReady,
   processingProgressWhilePublishing,
 } from "./createVideoProgress";
+import {
+  bindWebRetryToCurrentFile,
+  canSubmitWebCreate,
+  createWebFileFingerprint,
+  evaluateWebCreateFile,
+  isStaleWebCreateAttempt,
+  nextWebCreateAttemptId,
+  resetWebCreateAfterPublish,
+} from "./createVideoState";
 
 type UploadPhase =
   | "idle"
@@ -140,6 +149,9 @@ export default function CreateVideoForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitLockRef = useRef(false);
   const uploadAbortRef = useRef<AbortController | null>(null);
+  const pickGenerationRef = useRef(0);
+  const attemptNonceRef = useRef(0);
+  const activeAttemptRef = useRef<string | null>(null);
 
   const [phase, setPhase] = useState<UploadPhase>("checking-auth");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -229,6 +241,7 @@ export default function CreateVideoForm() {
   function resetToRetryableReady() {
     submitLockRef.current = false;
     uploadAbortRef.current = null;
+    activeAttemptRef.current = null;
     setPhase("ready");
     setStatusMessage("");
     setUploadPercent(0);
@@ -246,17 +259,15 @@ export default function CreateVideoForm() {
       return;
     }
 
+    const pickGeneration = ++pickGenerationRef.current;
+    activeAttemptRef.current = null;
     setErrorMessage("");
     setStatusMessage("");
 
-    const check = validateVideoFile({
-      mimeType: file.type,
-      byteSize: file.size,
-      fileName: file.name,
-    });
+    const check = evaluateWebCreateFile({ file, durationMs: null });
 
     if (!check.ok) {
-      setErrorMessage(check.message);
+      setErrorMessage(check.message ?? "Please select a video file.");
       event.target.value = "";
       clearSelectedFile();
       return;
@@ -268,11 +279,26 @@ export default function CreateVideoForm() {
 
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+    setProbedMeta(null);
+    setOverlays([]);
 
     try {
       const meta = await probeVideoFileMetadata(file);
+      if (pickGeneration !== pickGenerationRef.current) {
+        return;
+      }
+      const durationCheck = validateVideoDuration(meta.durationMs);
+      if (!durationCheck.ok) {
+        setErrorMessage(durationCheck.message);
+        event.target.value = "";
+        clearSelectedFile();
+        return;
+      }
       setProbedMeta(meta);
     } catch {
+      if (pickGeneration !== pickGenerationRef.current) {
+        return;
+      }
       setProbedMeta({
         durationMs: null,
         width: null,
@@ -313,17 +339,23 @@ export default function CreateVideoForm() {
       return;
     }
 
-    const fileCheck = validateVideoFile({
-      mimeType: selectedFile.type,
-      byteSize: selectedFile.size,
-      fileName: selectedFile.name,
+    const currentCheck = evaluateWebCreateFile({
+      file: selectedFile,
+      durationMs: probedMeta?.durationMs,
     });
 
-    if (!fileCheck.ok) {
-      setErrorMessage(fileCheck.message);
+    if (!currentCheck.ok) {
+      setErrorMessage(currentCheck.message ?? "Please select a video file.");
       setPhase("error");
+      clearSelectedFile();
       return;
     }
+
+    const attemptId = nextWebCreateAttemptId(
+      createWebFileFingerprint(selectedFile),
+      ++attemptNonceRef.current
+    );
+    activeAttemptRef.current = attemptId;
 
     submitLockRef.current = true;
     let uploadedPath: string | null = null;
@@ -341,10 +373,19 @@ export default function CreateVideoForm() {
       const uploaded = await uploadPostVideo(
         selectedFile,
         (progress) => {
+          if (isStaleWebCreateAttempt(activeAttemptRef.current, attemptId)) {
+            return;
+          }
           setUploadPercent(progress.percent);
         },
         { signal: abortController.signal }
       );
+
+      if (isStaleWebCreateAttempt(activeAttemptRef.current, attemptId)) {
+        await deleteUploadedPostVideo(uploaded.path);
+        return;
+      }
+
       uploadedPath = uploaded.path;
       const afterUpload = processingProgressAfterUpload();
       setUploadPercent(afterUpload.uploadPercent);
@@ -366,6 +407,13 @@ export default function CreateVideoForm() {
         overlays,
         uploadStartedAt,
       });
+
+      if (isStaleWebCreateAttempt(activeAttemptRef.current, attemptId)) {
+        if (!result.ok && result.code !== "auth_required") {
+          await deleteUploadedPostVideo(uploaded.path);
+        }
+        return;
+      }
 
       if (!result.ok) {
         if (result.code === "auth_required") {
@@ -397,14 +445,20 @@ export default function CreateVideoForm() {
         return;
       }
 
+      if (isStaleWebCreateAttempt(activeAttemptRef.current, attemptId)) {
+        return;
+      }
+
       const ready = processingProgressOnReady();
+      const cleared = resetWebCreateAfterPublish();
       setProcessingPercent(ready.processingPercent);
       setPhase(ready.phase);
       setStatusMessage(CREATE_SUCCESS_MESSAGE);
-      setCaption("");
+      setCaption(cleared.caption);
       clearSelectedFile();
-      setErrorMessage("");
-      setUploadPercent(0);
+      setErrorMessage(cleared.errorMessage);
+      setUploadPercent(cleared.uploadPercent);
+      activeAttemptRef.current = null;
 
       window.dispatchEvent(new Event("umtuba:post-created"));
 
@@ -414,6 +468,10 @@ export default function CreateVideoForm() {
       }, 700);
     } catch (error) {
       console.error(error);
+
+      if (isStaleWebCreateAttempt(activeAttemptRef.current, attemptId)) {
+        return;
+      }
 
       if (isAbortError(error)) {
         setPhase("error");
@@ -449,11 +507,14 @@ export default function CreateVideoForm() {
     phase === "queued" ||
     phase === "processing" ||
     phase === "success";
-  const canSubmit =
-    isAuthenticated &&
-    Boolean(selectedFile) &&
-    phase !== "checking-auth" &&
-    !busy;
+  const canSubmit = canSubmitWebCreate({
+    file: selectedFile,
+    durationMs: probedMeta?.durationMs,
+    caption,
+    isAuthenticated:
+      isAuthenticated && phase !== "checking-auth",
+    busy,
+  });
   const pipelineStatus = phaseToPipelineStatus(phase);
   const fileInvalid = Boolean(errorMessage && !selectedFile);
   const captionInvalid = Boolean(
@@ -627,6 +688,17 @@ export default function CreateVideoForm() {
             <button
               type="button"
               onClick={() => {
+                const bound = bindWebRetryToCurrentFile({
+                  file: selectedFile,
+                  durationMs: probedMeta?.durationMs,
+                  busy: false,
+                  nonce: attemptNonceRef.current + 1,
+                });
+                if (!bound.ok) {
+                  setErrorMessage("");
+                  resetToRetryableReady();
+                  return;
+                }
                 setErrorMessage("");
                 resetToRetryableReady();
               }}

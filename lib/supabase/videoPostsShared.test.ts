@@ -4,6 +4,7 @@ import { join } from "node:path";
 import {
   resolveVideoMimeType,
   validateCaption,
+  validateVideoDuration,
   validateVideoFile,
   VIDEO_ACCEPT_ATTR,
 } from "./videoPostsShared";
@@ -51,6 +52,13 @@ describe("resolveVideoMimeType / validateVideoFile", () => {
   it("validates caption length", () => {
     expect(validateCaption("hello").ok).toBe(true);
     expect(validateCaption("x".repeat(1001)).ok).toBe(false);
+  });
+
+  it("validates duration with the same rule the Create UI uses to disable Publish", () => {
+    expect(validateVideoDuration(null).ok).toBe(true);
+    expect(validateVideoDuration(0).ok).toBe(false);
+    expect(validateVideoDuration(1500).ok).toBe(true);
+    expect(validateVideoDuration(Number.NaN).ok).toBe(false);
   });
 
   it("accept attribute includes extension fallbacks for mobile pickers", () => {

@@ -74,6 +74,10 @@ export type CaptionValidationResult =
   | { ok: true }
   | { ok: false; message: string };
 
+export type DurationValidationResult =
+  | { ok: true }
+  | { ok: false; message: string };
+
 export function validateVideoFile(input: {
   mimeType: string;
   byteSize: number;
@@ -113,6 +117,26 @@ export function validateCaption(caption: string): CaptionValidationResult {
     };
   }
 
+  return { ok: true };
+}
+
+/**
+ * Duration is optional (some browsers omit it).
+ * When present, reject empty / invalid values. No hard max — matches mobile.
+ * The same message is the UI warning used to disable Publish / bind Retry.
+ */
+export function validateVideoDuration(
+  durationMs: number | null | undefined
+): DurationValidationResult {
+  if (durationMs == null) {
+    return { ok: true };
+  }
+  if (!Number.isFinite(durationMs) || durationMs <= 0) {
+    return {
+      ok: false,
+      message: "This video has invalid duration metadata. Try another clip.",
+    };
+  }
   return { ok: true };
 }
 

@@ -37,6 +37,10 @@ describe("createVideoProgress", () => {
     expect(form).toMatch(/CREATE_UPLOAD_COMPLETE_MESSAGE|Upload complete/);
     expect(form).toMatch(/Cancel upload/);
     expect(form).toMatch(/AbortController/);
+    expect(form).toMatch(/evaluateWebCreateFile|validateVideoDuration/);
+    expect(form).toMatch(/resetWebCreateAfterPublish/);
+    expect(form).toMatch(/bindWebRetryToCurrentFile/);
+    expect(form).toMatch(/isStaleWebCreateAttempt/);
   });
 
   it("exposes friendly failure copy", () => {
