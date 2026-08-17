@@ -13,17 +13,59 @@ export const WORLD_CATALOG_PILOT_MANIFEST =
 export const WORLD_CATALOG_EXPANSION_MANIFEST =
   "data/world/catalog/expansion-v2.json";
 
+export const WORLD_CATALOG_CURATED_PLACES_MANIFEST =
+  "data/world/catalog/curated-places-pilot-v1.json";
+
 export const DUPLICATE_POLICY =
-  "Natural keys: world_countries.country_code, world_cities.slug. Insert if missing. Countries never rename on conflict. Cities update coordinates/timezone/name/overview only while profile_status=draft and verification_status in (unverified, pending). Published or verified rows are left untouched unless an explicit publish/unpublish visibility command or null-only overview enrich is used.";
+  "Natural keys: world_countries.country_code, world_cities.slug, world_places.slug. Insert if missing. Countries never rename on conflict. Cities update coordinates/timezone/name/overview only while profile_status=draft and verification_status in (unverified, pending). Platform places update only while curated_by=platform, owner_user_id is null, and draft+unverified/pending. Published or verified rows are left untouched unless an explicit publish/unpublish visibility command or null-only overview enrich is used. Real user-owned places are never overwritten.";
 
 export const PROVENANCE_POLICY =
-  "Every city must cite umtuba_project_evidence or a public_geographic_fact with source + citation. Provenance lives in the versioned manifest (cities have no provenance columns). Do not invent businesses, ratings, hours, reviews, prices, or photos. world_places.owner_user_id is NOT NULL and references auth.users; platform landmarks stay out until a curated-place model is applied.";
+  "Every city must cite umtuba_project_evidence or a public_geographic_fact with source + citation. Provenance lives in the versioned manifest (cities have no provenance columns). Platform-curated places require the same provenance in both the manifest and world_places.provenance_* columns. Do not invent businesses, ratings, hours, reviews, prices, or photos. Do not invent auth.users. Platform places omit owner_user_id.";
 
 export const LOCALIZATION_MODEL =
   "English overview uses existing world_cities.overview. Localized city names and descriptions live in the versioned manifest locale map (ar,en,fr,es,de,pt required when overview is present; tr,id,zh,hi,ja,ru reserved). UI chrome stays on existing World i18n catalogs. Do not machine-translate proper nouns.";
 
 export const MEDIA_POLICY =
-  "No catalog media in V2. Cover paths stay null unless a later batch has documented rights, provenance, attribution, and a replaceable hosted asset. No hotlinked third-party images.";
+  "No catalog media in V2 or the curated-places pilot. Cover paths stay null unless a later batch has documented rights, provenance, attribution, and a replaceable hosted asset. No hotlinked third-party images.";
+
+export const PLACE_OWNERSHIP_POLICY =
+  "curated_by=owner requires a real owner_user_id. curated_by=platform requires source_type=platform, provenance, and a null owner_user_id. Catalog ingest never creates auth.users.";
+
+const PLACE_CATEGORIES = new Set([
+  "store",
+  "restaurant",
+  "hotel",
+  "clothing",
+  "cafe",
+  "service",
+  "attraction",
+  "other",
+]);
+
+const PLACE_KINDS = new Set([
+  "point_of_interest",
+  "business",
+  "attraction",
+  "hotel",
+  "restaurant",
+  "store",
+  "local_service",
+  "other",
+]);
+
+const FORBIDDEN_PLACE_FIELDS = [
+  "rating",
+  "ratings",
+  "hours",
+  "opening_hours",
+  "reviews",
+  "price",
+  "prices",
+  "image",
+  "images",
+  "cover_media_path",
+  "cover_media_id",
+];
 
 export type CatalogProvenanceKind =
   | "umtuba_project_evidence"
@@ -68,7 +110,9 @@ export type CatalogPlace = {
   place_kind: string;
   latitude: number;
   longitude: number;
-  owner_user_id: string;
+  curated_by: "owner" | "platform";
+  source_type: "business_owner" | "store" | "platform";
+  owner_user_id?: string;
   provenance: CatalogProvenance;
   description?: string;
 };
@@ -366,6 +410,8 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
     const latitude = asNumber(row.latitude);
     const longitude = asNumber(row.longitude);
     const owner = asString(row.owner_user_id);
+    const curatedBy = asString(row.curated_by);
+    const sourceType = asString(row.source_type);
     const description = asString(row.description) ?? undefined;
     if (!SLUG_RE.test(slug)) errors.push(`places[${index}].slug is invalid`);
     if (name.length < 2 || name.length > 160) {
@@ -374,17 +420,46 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
     if (!citySlugs.has(city_slug)) {
       errors.push(`places[${index}] city_slug ${city_slug} is unknown`);
     }
-    if (!category) errors.push(`places[${index}].category is required`);
-    if (!place_kind) errors.push(`places[${index}].place_kind is required`);
+    if (!PLACE_CATEGORIES.has(category)) {
+      errors.push(`places[${index}].category is invalid`);
+    }
+    if (!PLACE_KINDS.has(place_kind)) {
+      errors.push(`places[${index}].place_kind is invalid`);
+    }
     if (latitude == null || latitude < -90 || latitude > 90) {
       errors.push(`places[${index}].latitude is invalid`);
     }
     if (longitude == null || longitude < -180 || longitude > 180) {
       errors.push(`places[${index}].longitude is invalid`);
     }
-    if (!owner || !UUID_RE.test(owner)) {
+    for (const field of FORBIDDEN_PLACE_FIELDS) {
+      if (field in row) {
+        errors.push(
+          `places[${index}].${field} is forbidden; do not invent ratings, hours, reviews, prices, or media`
+        );
+      }
+    }
+    if (curatedBy === "platform") {
+      if (sourceType !== "platform") {
+        errors.push(`places[${index}] platform rows require source_type=platform`);
+      }
+      if (owner) {
+        errors.push(
+          `places[${index}] platform-curated places must omit owner_user_id; do not invent a catalog owner`
+        );
+      }
+    } else if (curatedBy === "owner") {
+      if (!owner || !UUID_RE.test(owner)) {
+        errors.push(
+          `places[${index}] owner-curated places require a real owner_user_id; do not invent a catalog owner`
+        );
+      }
+      if (sourceType === "platform") {
+        errors.push(`places[${index}] owner-curated places cannot use source_type=platform`);
+      }
+    } else {
       errors.push(
-        `places[${index}] requires a real owner_user_id; do not invent a catalog owner`
+        `places[${index}] requires curated_by=platform with no owner_user_id, or curated_by=owner with a real owner_user_id`
       );
     }
     if (description) {
@@ -395,12 +470,19 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
     if (placeSlugs.has(slug)) errors.push(`duplicate place slug ${slug}`);
     placeSlugs.add(slug);
     const provenance = parseProvenance(row.provenance, `places[${index}]`, errors);
+    const isPlatform =
+      curatedBy === "platform" && sourceType === "platform" && !owner;
+    const isOwner =
+      curatedBy === "owner" &&
+      Boolean(owner && UUID_RE.test(owner)) &&
+      sourceType !== "platform";
     if (
       provenance &&
-      owner &&
-      UUID_RE.test(owner) &&
+      (isPlatform || isOwner) &&
       SLUG_RE.test(slug) &&
       citySlugs.has(city_slug) &&
+      PLACE_CATEGORIES.has(category) &&
+      PLACE_KINDS.has(place_kind) &&
       latitude != null &&
       longitude != null &&
       !description
@@ -413,7 +495,9 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
         place_kind,
         latitude,
         longitude,
-        owner_user_id: owner,
+        curated_by: curatedBy,
+        source_type: isPlatform ? "platform" : (sourceType as CatalogPlace["source_type"]) || "business_owner",
+        owner_user_id: isOwner ? owner! : undefined,
         provenance,
       });
     }
@@ -444,6 +528,172 @@ export function loadWorldCatalogManifest(
 
 export function citySlugsSqlList(manifest: WorldCatalogManifest): string {
   return manifest.cities.map((city) => sqlLiteral(city.slug)).join(", ");
+}
+
+export function placeSlugsSqlList(manifest: WorldCatalogManifest): string {
+  return manifest.places.map((place) => sqlLiteral(place.slug)).join(", ");
+}
+
+function catalogIngestGucSql(): string {
+  return "select set_config('umtuba.world_catalog_ingest', 'on', true);";
+}
+
+function placeCategorySlug(placeKind: string): string {
+  return placeKind === "point_of_interest" ? "point-of-interest" : placeKind.replace(/_/g, "-");
+}
+
+export function buildPlaceDraftUpsertSql(manifest: WorldCatalogManifest): string {
+  if (!manifest.places.length) {
+    return `-- No platform-curated places in this manifest.\nselect 0 as curated_place_drafts;\n`;
+  }
+  const values = manifest.places
+    .map((place) => {
+      return `  (${sqlLiteral(place.slug)}, ${sqlLiteral(place.name)}, ${sqlLiteral(place.city_slug)}, ${sqlLiteral(place.category)}, ${sqlLiteral(place.place_kind)}, ${sqlNumber(place.latitude)}, ${sqlNumber(place.longitude)}, ${sqlLiteral(place.provenance.kind)}, ${sqlLiteral(place.provenance.source)}, ${sqlLiteral(place.provenance.citation)})`;
+    })
+    .join(",\n");
+  const assignmentValues = manifest.places
+    .map((place) => `  (${sqlLiteral(place.slug)}, ${sqlLiteral(placeCategorySlug(place.place_kind))})`)
+    .join(",\n");
+  return `-- UMTUBA World catalog ingest — PLATFORM curated places DRAFT upsert
+-- Idempotent. Does not overwrite published/verified platform places.
+-- Does not mutate real user-owned places. No fake auth.users.
+-- Rollback = unpublish, not DROP.
+
+begin;
+${catalogIngestGucSql()}
+
+insert into public.world_places (
+  owner_user_id,
+  city_id,
+  name,
+  slug,
+  category,
+  place_kind,
+  latitude,
+  longitude,
+  location_visibility,
+  verification_status,
+  moderation_status,
+  source_type,
+  curated_by,
+  profile_status,
+  provenance_kind,
+  provenance_source,
+  provenance_citation,
+  opening_hours_status,
+  reviews_status,
+  ai_summary_status
+)
+select
+  null,
+  c.id,
+  v.name,
+  v.slug,
+  v.category,
+  v.place_kind,
+  v.latitude,
+  v.longitude,
+  'public',
+  'unverified',
+  'pending',
+  'platform',
+  'platform',
+  'draft',
+  v.provenance_kind,
+  v.provenance_source,
+  v.provenance_citation,
+  'not_provided',
+  'not_enabled',
+  'not_requested'
+from (
+  values
+${values}
+) as v(slug, name, city_slug, category, place_kind, latitude, longitude, provenance_kind, provenance_source, provenance_citation)
+join public.world_cities c
+  on c.slug = v.city_slug
+ and c.is_active
+ and c.profile_status = 'published'
+on conflict (slug) do update
+set
+  name = excluded.name,
+  category = excluded.category,
+  place_kind = excluded.place_kind,
+  latitude = excluded.latitude,
+  longitude = excluded.longitude,
+  provenance_kind = excluded.provenance_kind,
+  provenance_source = excluded.provenance_source,
+  provenance_citation = excluded.provenance_citation,
+  updated_at = timezone('utc', now())
+where public.world_places.curated_by = 'platform'
+  and public.world_places.owner_user_id is null
+  and public.world_places.profile_status = 'draft'
+  and public.world_places.verification_status in ('unverified', 'pending');
+
+insert into public.world_place_category_assignments (
+  place_id, category_id, is_primary
+)
+select p.id, cat.id, true
+from (
+  values
+${assignmentValues}
+) as v(place_slug, category_slug)
+join public.world_places p on p.slug = v.place_slug
+join public.world_place_categories cat on cat.slug = v.category_slug
+where p.curated_by = 'platform'
+  and p.owner_user_id is null
+on conflict (place_id, category_id) do nothing;
+
+commit;
+`;
+}
+
+export function buildPlacePublishSql(manifest: WorldCatalogManifest): string {
+  if (!manifest.places.length) {
+    return `-- No platform-curated places to publish.\nselect 0 as curated_place_published;\n`;
+  }
+  return `-- UMTUBA World catalog ingest — PLATFORM curated places PUBLISH
+-- Visibility only. Does not DROP. Does not invent media or users.
+
+begin;
+${catalogIngestGucSql()}
+
+update public.world_places
+set
+  profile_status = 'published',
+  moderation_status = 'approved',
+  verification_status = 'verified',
+  location_visibility = 'public',
+  updated_at = timezone('utc', now())
+where slug in (${placeSlugsSqlList(manifest)})
+  and curated_by = 'platform'
+  and source_type = 'platform'
+  and owner_user_id is null
+  and profile_status in ('draft', 'published');
+
+commit;
+`;
+}
+
+export function buildPlaceUnpublishSql(manifest: WorldCatalogManifest): string {
+  if (!manifest.places.length) {
+    return `-- No platform-curated places to unpublish.\nselect 0 as curated_place_unpublished;\n`;
+  }
+  return `-- UMTUBA World catalog ingest — PLATFORM curated places UNPUBLISH
+-- Visibility only. Rows remain. No DROP. User-owned places are not touched.
+
+begin;
+${catalogIngestGucSql()}
+
+update public.world_places
+set
+  profile_status = 'draft',
+  updated_at = timezone('utc', now())
+where slug in (${placeSlugsSqlList(manifest)})
+  and curated_by = 'platform'
+  and owner_user_id is null;
+
+commit;
+`;
 }
 
 export function buildDraftUpsertSql(manifest: WorldCatalogManifest): string {

@@ -1,10 +1,14 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
+  WORLD_CATALOG_CURATED_PLACES_MANIFEST,
   WORLD_CATALOG_EXPANSION_MANIFEST,
   WORLD_CATALOG_PILOT_MANIFEST,
   buildDraftUpsertSql,
   buildOverviewEnrichSql,
+  buildPlaceDraftUpsertSql,
+  buildPlacePublishSql,
+  buildPlaceUnpublishSql,
   buildPublishSql,
   buildUnpublishSql,
   loadWorldCatalogManifest,
@@ -42,8 +46,9 @@ function parseManifestPath(argv: string[]): string {
 }
 
 function sqlPrefix(manifestId: string): string {
-  if (manifestId.includes("pilot")) return "pilot_v1";
+  if (manifestId.includes("curated-places")) return "curated_places_pilot_v1";
   if (manifestId.includes("expansion")) return "expansion_v2";
+  if (manifestId.includes("pilot")) return "pilot_v1";
   return manifestId.replace(/[^a-z0-9]+/g, "_");
 }
 
@@ -68,14 +73,21 @@ async function main() {
   }
 
   const prefix = sqlPrefix(parsed.manifest.id);
+  const isPlacesManifest = parsed.manifest.id.includes("curated-places");
   const copyBundle = loadCityCopyBundle(root, WORLD_CITY_COPY_V2);
-  const files = {
-    [`${prefix}_upsert_draft.sql`]: buildDraftUpsertSql(parsed.manifest),
-    [`${prefix}_publish.sql`]: buildPublishSql(parsed.manifest),
-    [`${prefix}_unpublish.sql`]: buildUnpublishSql(parsed.manifest),
-    [`${prefix}_overview_enrich.sql`]: buildOverviewEnrichSql(parsed.manifest),
-    "city_copy_v2_overview_enrich.sql": buildCityCopyEnrichSql(copyBundle),
-  };
+  const files = isPlacesManifest
+    ? {
+        [`${prefix}_upsert_draft.sql`]: buildPlaceDraftUpsertSql(parsed.manifest),
+        [`${prefix}_publish.sql`]: buildPlacePublishSql(parsed.manifest),
+        [`${prefix}_unpublish.sql`]: buildPlaceUnpublishSql(parsed.manifest),
+      }
+    : {
+        [`${prefix}_upsert_draft.sql`]: buildDraftUpsertSql(parsed.manifest),
+        [`${prefix}_publish.sql`]: buildPublishSql(parsed.manifest),
+        [`${prefix}_unpublish.sql`]: buildUnpublishSql(parsed.manifest),
+        [`${prefix}_overview_enrich.sql`]: buildOverviewEnrichSql(parsed.manifest),
+        "city_copy_v2_overview_enrich.sql": buildCityCopyEnrichSql(copyBundle),
+      };
   writeSqlFiles(root, files);
 
   const summary = summarizeCatalog(parsed.manifest);
@@ -86,6 +98,7 @@ async function main() {
         mode,
         manifest: manifestPath,
         fallbackPilotManifest: WORLD_CATALOG_PILOT_MANIFEST,
+        curatedPlacesManifest: WORLD_CATALOG_CURATED_PLACES_MANIFEST,
         ...summary,
         sqlFiles: Object.keys(files).map((name) => `supabase/world_catalog/${name}`),
         applyHint:

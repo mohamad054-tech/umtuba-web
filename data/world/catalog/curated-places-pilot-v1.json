@@ -1,0 +1,402 @@
+{
+  "id": "world-catalog-curated-places-pilot-v1",
+  "version": "1.0.0",
+  "publication": "draft",
+  "notes": "Small verified platform-curated public attractions. Coordinates from Wikipedia Geo or Wikidata P625 on 2026-08-17. No descriptions, ratings, hours, reviews, prices, or media. No fake auth.users. Parent cities already live.",
+  "countries": [
+    { "country_code": "JO", "name": "Jordan", "slug": "jordan" },
+    { "country_code": "TR", "name": "Türkiye", "slug": "turkiye" },
+    { "country_code": "DE", "name": "Germany", "slug": "germany" },
+    { "country_code": "AE", "name": "United Arab Emirates", "slug": "united-arab-emirates" },
+    { "country_code": "US", "name": "United States", "slug": "united-states" },
+    { "country_code": "JP", "name": "Japan", "slug": "japan" },
+    { "country_code": "EG", "name": "Egypt", "slug": "egypt" },
+    { "country_code": "GB", "name": "United Kingdom", "slug": "united-kingdom" },
+    { "country_code": "FR", "name": "France", "slug": "france" },
+    { "country_code": "IT", "name": "Italy", "slug": "italy" },
+    { "country_code": "GR", "name": "Greece", "slug": "greece" },
+    { "country_code": "AU", "name": "Australia", "slug": "australia" },
+    { "country_code": "MX", "name": "Mexico", "slug": "mexico" }
+  ],
+  "cities": [
+    {
+      "slug": "amman",
+      "city_name": "Amman",
+      "country_code": "JO",
+      "center_latitude": 31.9539,
+      "center_longitude": 35.9106,
+      "timezone_name": "Asia/Amman",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "istanbul",
+      "city_name": "Istanbul",
+      "country_code": "TR",
+      "center_latitude": 41.0082,
+      "center_longitude": 28.9784,
+      "timezone_name": "Europe/Istanbul",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "berlin",
+      "city_name": "Berlin",
+      "country_code": "DE",
+      "center_latitude": 52.52,
+      "center_longitude": 13.405,
+      "timezone_name": "Europe/Berlin",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "dubai",
+      "city_name": "Dubai",
+      "country_code": "AE",
+      "center_latitude": 25.2048,
+      "center_longitude": 55.2708,
+      "timezone_name": "Asia/Dubai",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "new-york",
+      "city_name": "New York",
+      "country_code": "US",
+      "center_latitude": 40.7128,
+      "center_longitude": -74.006,
+      "timezone_name": "America/New_York",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "tokyo",
+      "city_name": "Tokyo",
+      "country_code": "JP",
+      "center_latitude": 35.6762,
+      "center_longitude": 139.6503,
+      "timezone_name": "Asia/Tokyo",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "cairo",
+      "city_name": "Cairo",
+      "country_code": "EG",
+      "center_latitude": 30.0444,
+      "center_longitude": 31.2357,
+      "timezone_name": "Africa/Cairo",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/pilot-v1.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_POPULATION_V1"
+      }
+    },
+    {
+      "slug": "london",
+      "city_name": "London",
+      "country_code": "GB",
+      "center_latitude": 51.5072,
+      "center_longitude": -0.1275,
+      "timezone_name": "Europe/London",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    },
+    {
+      "slug": "paris",
+      "city_name": "Paris",
+      "country_code": "FR",
+      "center_latitude": 48.8567,
+      "center_longitude": 2.3522,
+      "timezone_name": "Europe/Paris",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    },
+    {
+      "slug": "rome",
+      "city_name": "Rome",
+      "country_code": "IT",
+      "center_latitude": 41.8933,
+      "center_longitude": 12.4828,
+      "timezone_name": "Europe/Rome",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    },
+    {
+      "slug": "athens",
+      "city_name": "Athens",
+      "country_code": "GR",
+      "center_latitude": 37.9842,
+      "center_longitude": 23.7281,
+      "timezone_name": "Europe/Athens",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    },
+    {
+      "slug": "sydney",
+      "city_name": "Sydney",
+      "country_code": "AU",
+      "center_latitude": -33.8678,
+      "center_longitude": 151.21,
+      "timezone_name": "Australia/Sydney",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    },
+    {
+      "slug": "mexico-city",
+      "city_name": "Mexico City",
+      "country_code": "MX",
+      "center_latitude": 19.4333,
+      "center_longitude": -99.1333,
+      "timezone_name": "America/Mexico_City",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "data/world/catalog/expansion-v2.json",
+        "citation": "Live published city from CENTRAL_WORLD_CATALOG_EXPANSION_V2"
+      }
+    }
+  ],
+  "places": [
+    {
+      "slug": "amman-citadel",
+      "name": "Amman Citadel",
+      "city_slug": "amman",
+      "category": "attraction",
+      "place_kind": "point_of_interest",
+      "latitude": 31.9547,
+      "longitude": 35.9343,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Amman_Citadel",
+        "citation": "Wikidata Q3157009 P625 31.9547, 35.9343 retrieved 2026-08-17; English Wikipedia sitelink Amman Citadel. Article Geo coordinates were absent."
+      }
+    },
+    {
+      "slug": "hagia-sophia",
+      "name": "Hagia Sophia",
+      "city_slug": "istanbul",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 41.00833333,
+      "longitude": 28.98,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Hagia_Sophia",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 42764)."
+      }
+    },
+    {
+      "slug": "brandenburg-gate",
+      "name": "Brandenburg Gate",
+      "city_slug": "berlin",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 52.5163,
+      "longitude": 13.3777,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Brandenburg_Gate",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 156604)."
+      }
+    },
+    {
+      "slug": "dubai-museum",
+      "name": "Dubai Museum",
+      "city_slug": "dubai",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 25.26305556,
+      "longitude": 55.29722222,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Dubai_Museum",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 34371004)."
+      }
+    },
+    {
+      "slug": "central-park",
+      "name": "Central Park",
+      "city_slug": "new-york",
+      "category": "attraction",
+      "place_kind": "point_of_interest",
+      "latitude": 40.78222222,
+      "longitude": -73.96527778,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Central_Park",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 37536)."
+      }
+    },
+    {
+      "slug": "senso-ji",
+      "name": "Sensō-ji",
+      "city_slug": "tokyo",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 35.71472222,
+      "longitude": 139.79675,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Sens%C5%8D-ji",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 871044)."
+      }
+    },
+    {
+      "slug": "egyptian-museum-cairo",
+      "name": "Egyptian Museum",
+      "city_slug": "cairo",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 30.047778,
+      "longitude": 31.233333,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Egyptian_Museum",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 187781)."
+      }
+    },
+    {
+      "slug": "british-museum",
+      "name": "British Museum",
+      "city_slug": "london",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 51.5194,
+      "longitude": -0.1269,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/British_Museum",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 4675)."
+      }
+    },
+    {
+      "slug": "louvre",
+      "name": "Louvre",
+      "city_slug": "paris",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 48.8611,
+      "longitude": 2.3358,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Louvre",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 17546)."
+      }
+    },
+    {
+      "slug": "colosseum",
+      "name": "Colosseum",
+      "city_slug": "rome",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": 41.8903,
+      "longitude": 12.4922,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Colosseum",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 49603)."
+      }
+    },
+    {
+      "slug": "acropolis-athens",
+      "name": "Acropolis of Athens",
+      "city_slug": "athens",
+      "category": "attraction",
+      "place_kind": "point_of_interest",
+      "latitude": 37.97166667,
+      "longitude": 23.72611111,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Acropolis_of_Athens",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 2076)."
+      }
+    },
+    {
+      "slug": "sydney-opera-house",
+      "name": "Sydney Opera House",
+      "city_slug": "sydney",
+      "category": "attraction",
+      "place_kind": "attraction",
+      "latitude": -33.85681,
+      "longitude": 151.21514,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Sydney_Opera_House",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 28222)."
+      }
+    },
+    {
+      "slug": "zocalo-mexico-city",
+      "name": "Zócalo",
+      "city_slug": "mexico-city",
+      "category": "attraction",
+      "place_kind": "point_of_interest",
+      "latitude": 19.43277778,
+      "longitude": -99.13305556,
+      "curated_by": "platform",
+      "source_type": "platform",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "https://en.wikipedia.org/wiki/Z%C3%B3calo",
+        "citation": "Wikipedia primary Geo coordinates retrieved 2026-08-17 via action=query&prop=coordinates (pageid 1566846)."
+      }
+    }
+  ]
+}

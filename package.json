@@ -17,6 +17,7 @@
     "media:worker": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser",
     "media:worker:once": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser --once",
     "world:catalog:ingest": "npx tsx scripts/world/ingestCatalog.ts --mode=write-sql --manifest=data/world/catalog/expansion-v2.json",
+    "world:catalog:ingest-places": "npx tsx scripts/world/ingestCatalog.ts --mode=write-sql --manifest=data/world/catalog/curated-places-pilot-v1.json",
     "world:catalog:write-expansion": "npx tsx scripts/world/writeExpansionV2.ts"
   },
   "dependencies": {

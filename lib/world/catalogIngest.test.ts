@@ -7,9 +7,15 @@ import { demoVideos } from "../../app/data/videos";
 import {
   DUPLICATE_POLICY,
   LOCALIZATION_MODEL,
+  MEDIA_POLICY,
+  PLACE_OWNERSHIP_POLICY,
   PROVENANCE_POLICY,
+  WORLD_CATALOG_CURATED_PLACES_MANIFEST,
   WORLD_CATALOG_PILOT_MANIFEST,
   buildDraftUpsertSql,
+  buildPlaceDraftUpsertSql,
+  buildPlacePublishSql,
+  buildPlaceUnpublishSql,
   buildPublishSql,
   buildUnpublishSql,
   loadWorldCatalogManifest,
@@ -77,7 +83,36 @@ describe("World catalog pilot ingest", () => {
     const result = parseWorldCatalogManifest(raw);
     expect(result.ok).toBe(false);
     if (result.ok) return;
-    expect(result.errors.join(" ")).toMatch(/owner_user_id/);
+    expect(result.errors.join(" ")).toMatch(/curated_by|owner_user_id/);
+  });
+
+  it("rejects a fake owner UUID on a platform place", () => {
+    const raw = JSON.parse(
+      readFileSync(join(ROOT, WORLD_CATALOG_PILOT_MANIFEST), "utf8")
+    );
+    raw.places = [
+      {
+        slug: "fake-owned-pyramid",
+        name: "Fake Owned Pyramid",
+        city_slug: "cairo",
+        category: "attraction",
+        place_kind: "attraction",
+        latitude: 29.9792,
+        longitude: 31.1342,
+        curated_by: "platform",
+        source_type: "platform",
+        owner_user_id: "00000000-0000-4000-8000-000000000001",
+        provenance: {
+          kind: "public_geographic_fact",
+          source: "https://en.wikipedia.org/wiki/Cairo",
+          citation: "invented owner",
+        },
+      },
+    ];
+    const result = parseWorldCatalogManifest(raw);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.errors.join(" ")).toMatch(/omit owner_user_id/);
   });
 
   it("generates idempotent draft SQL that will not overwrite published rows", () => {
@@ -134,5 +169,49 @@ describe("World catalog expansion v2", () => {
     for (const city of parsed.manifest.cities) {
       expect(city.slug).toBe(slugifyCity(city.city_name));
     }
+  });
+});
+
+describe("World curated places pilot v1", () => {
+  const parsed = loadWorldCatalogManifest(
+    ROOT,
+    WORLD_CATALOG_CURATED_PLACES_MANIFEST
+  );
+
+  it("loads 13 platform-curated places with provenance and no owners", () => {
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    expect(parsed.manifest.id).toBe("world-catalog-curated-places-pilot-v1");
+    expect(parsed.manifest.places).toHaveLength(13);
+    expect(
+      parsed.manifest.places.every(
+        (place) =>
+          place.curated_by === "platform" &&
+          place.source_type === "platform" &&
+          !place.owner_user_id &&
+          place.provenance.kind === "public_geographic_fact"
+      )
+    ).toBe(true);
+    expect(PLACE_OWNERSHIP_POLICY).toMatch(/never creates auth.users/i);
+    expect(MEDIA_POLICY).toMatch(/No catalog media/);
+  });
+
+  it("generates GUC-gated reversible place SQL without fake users or media", () => {
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const draft = buildPlaceDraftUpsertSql(parsed.manifest);
+    const publish = buildPlacePublishSql(parsed.manifest);
+    const unpublish = buildPlaceUnpublishSql(parsed.manifest);
+    expect(draft).toMatch(/umtuba\.world_catalog_ingest/);
+    expect(draft).toMatch(/curated_by = 'platform'/);
+    expect(draft).toMatch(/owner_user_id is null/);
+    expect(draft).not.toMatch(/insert into auth\.users/i);
+    expect(draft).not.toMatch(/cover_media/);
+    expect(publish).toMatch(/profile_status = 'published'/);
+    expect(publish).toMatch(/moderation_status = 'approved'/);
+    expect(unpublish).toMatch(/profile_status = 'draft'/);
+    expect(unpublish).not.toMatch(/delete from public\.world_places/i);
+    expect(unpublish).not.toMatch(/drop table/i);
+    expect(draft).not.toMatch(/nearby_places_enabled',\s*true/);
   });
 });
