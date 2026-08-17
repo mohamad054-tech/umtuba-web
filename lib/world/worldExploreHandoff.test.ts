@@ -14,9 +14,14 @@ describe("WP-QA-02 World destination handoff", () => {
       join(ROOT, "app/world/WorldDiscoveryClient.tsx"),
       "utf8"
     );
-    expect(client).toMatch(/Requested destination/);
+    expect(client).toMatch(/world\.requestedDestination/);
+    expect(client).toMatch(/world\.empty\.unknownDestination/);
+    expect(client).toMatch(/resolveWorldDestination/);
+    expect(client).not.toMatch(/cities\[0\]\?\.id \?\?/);
     expect(client).toMatch(/runDestinationDiscovery/);
     expect(client).toMatch(/initialCitySlug/);
+    expect(client).toMatch(/aria-label=\{t\("world.destination"\)\}/);
+    expect(client).toMatch(/\/world\/city\/\$\{encodeURIComponent\(city.slug\)\}/);
     expect(client).not.toMatch(/hide World/);
   });
 });

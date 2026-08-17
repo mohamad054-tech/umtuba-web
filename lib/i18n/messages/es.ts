@@ -83,6 +83,8 @@ export const esMessages: FoundationMessages = {
     "No hay lugares públicos aprobados que coincidan con este destino.",
   "world.empty.nearby": "No hay lugares públicos aprobados cerca.",
   "world.empty.cities": "Aún no hay destinos seleccionados",
+  "world.empty.unknownDestination":
+    "Este destino aún no está en el catálogo World: {city}. Elige una ciudad de la lista o explora sin un destino predefinido.",
   "world.verified": "verificado",
   "world.helloCity": "Hello City",
   "world.helloCityHelp":
@@ -120,6 +122,8 @@ export const esMessages: FoundationMessages = {
   "world.error.searchFilter": "El filtro de búsqueda no es válido.",
   "world.city.unavailableTitle": "El perfil de la ciudad aún no está disponible",
   "world.city.unavailableBody": "Esta ciudad se está preparando.",
+  "world.city.overviewPending": "Se está preparando una presentación verificada de la ciudad.",
+  "world.city.placesEmpty": "Aún no hay lugares públicos aprobados.",
   "world.place.unavailableTitle": "El perfil del lugar aún no está disponible",
   "world.place.unavailableBody": "Este lugar se está preparando.",
   "world.backToWorld": "Volver a World",

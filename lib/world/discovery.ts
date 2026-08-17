@@ -102,6 +102,7 @@ export async function loadWorldDiscoveryBootstrap(
       .from("world_cities")
       .select("id, country_code, country_name, region_name, city_name, slug")
       .eq("is_active", true)
+      .eq("profile_status", "published")
       .order("country_name")
       .order("city_name")
       .limit(200),

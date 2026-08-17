@@ -15,7 +15,9 @@
     "teaser:worker": "npx tsx scripts/media/articleTeaserWorker.ts",
     "teaser:worker:once": "npx tsx scripts/media/articleTeaserWorker.ts --once",
     "media:worker": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser",
-    "media:worker:once": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser --once"
+    "media:worker:once": "npx tsx scripts/media/mediaWorker.ts --processor=article_teaser --once",
+    "world:catalog:ingest": "npx tsx scripts/world/ingestCatalog.ts --mode=write-sql --manifest=data/world/catalog/expansion-v2.json",
+    "world:catalog:write-expansion": "npx tsx scripts/world/writeExpansionV2.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

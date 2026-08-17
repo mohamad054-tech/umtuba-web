@@ -1,0 +1,52 @@
+-- PROPOSAL ONLY — DO NOT APPLY
+-- TASK: CENTRAL_WORLD_CATALOG_EXPANSION_V2
+-- PLACE_INGESTION_READY = NO until this is reviewed and applied as a linked query
+-- (not supabase db push) after confirming no fake user is created.
+--
+-- ROOT CAUSE
+-- world_places.owner_user_id is NOT NULL and references auth.users(id)
+-- ON DELETE CASCADE. protect_world_place_authority() forces owner_user_id =
+-- auth.uid() on INSERT unless the caller is platform admin or service_role.
+-- Linked SQL (supabase db query --linked) is not service_role, so even a
+-- nullable-owner row cannot be inserted today without changing the trigger.
+-- There is no existing non-person platform catalog owner.
+--
+-- SMALLEST SAFE MODEL
+-- 1) Allow owner_user_id NULL only when curated_by = 'platform'
+--    and source_type = 'platform'.
+-- 2) Keep person-owned places unchanged (owner required).
+-- 3) Public read stays is_public_world_place()
+--    (public + published + approved + verified + published parent city).
+-- 4) Ingest only via service_role or a GUC-gated catalog ingest path.
+--    Do not invent a person account.
+--
+-- WHY THIS FILE IS NOT APPLIED IN V2
+-- Changing the authority trigger is security-sensitive. Applying it without
+-- a verified service_role ingest session would still block place inserts.
+-- Cities can ship without places.
+
+-- alter table public.world_places
+--   alter column owner_user_id drop not null;
+--
+-- alter table public.world_places
+--   add column if not exists curated_by text not null default 'owner'
+--     check (curated_by in ('owner', 'platform'));
+--
+-- alter table public.world_places
+--   drop constraint if exists world_places_owner_or_platform_check;
+--
+-- alter table public.world_places
+--   add constraint world_places_owner_or_platform_check
+--   check (
+--     (curated_by = 'owner' and owner_user_id is not null)
+--     or (curated_by = 'platform' and source_type = 'platform')
+--   );
+--
+-- Trigger change required (protect_world_place_authority):
+--   allow INSERT when
+--     auth.role() = 'service_role'
+--     OR current_setting('umtuba.world_catalog_ingest', true) = 'on'
+--        AND NEW.curated_by = 'platform'
+--        AND NEW.source_type = 'platform'
+--        AND NEW.owner_user_id is null;
+--   never create or assign a fake auth.users row.

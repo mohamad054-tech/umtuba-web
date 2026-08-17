@@ -84,6 +84,8 @@ export const deMessages: FoundationMessages = {
     "Keine genehmigten öffentlichen Orte passen zu diesem Ziel.",
   "world.empty.nearby": "Keine genehmigten öffentlichen Orte in der Nähe.",
   "world.empty.cities": "Noch keine kuratierten Ziele",
+  "world.empty.unknownDestination":
+    "Dieses Ziel ist noch nicht im World-Katalog: {city}. Wähle eine gelistete Stadt oder stöbere ohne voreingestelltes Ziel.",
   "world.verified": "verifiziert",
   "world.helloCity": "Hello City",
   "world.helloCityHelp":
@@ -121,6 +123,8 @@ export const deMessages: FoundationMessages = {
   "world.error.searchFilter": "Der Suchfilter ist ungültig.",
   "world.city.unavailableTitle": "Das Stadtprofil ist noch nicht verfügbar",
   "world.city.unavailableBody": "Diese Stadt wird vorbereitet.",
+  "world.city.overviewPending": "Eine geprüfte Stadtvorstellung wird vorbereitet.",
+  "world.city.placesEmpty": "Noch keine genehmigten öffentlichen Orte.",
   "world.place.unavailableTitle": "Das Ortsprofil ist noch nicht verfügbar",
   "world.place.unavailableBody": "Dieser Ort wird vorbereitet.",
   "world.backToWorld": "Zurück zu World",

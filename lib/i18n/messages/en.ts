@@ -248,6 +248,8 @@ export const enMessages: FoundationMessages = {
     "No approved public places match this destination.",
   "world.empty.nearby": "No approved public places are nearby.",
   "world.empty.cities": "No curated destinations yet",
+  "world.empty.unknownDestination":
+    "This destination is not in the World catalog yet: {city}. Choose a listed city, or browse without a preset destination.",
   "world.verified": "verified",
   "world.helloCity": "Hello City",
   "world.helloCityHelp":
@@ -285,6 +287,8 @@ export const enMessages: FoundationMessages = {
   "world.error.searchFilter": "Search filter is invalid.",
   "world.city.unavailableTitle": "City profile is not available yet",
   "world.city.unavailableBody": "This city is being prepared.",
+  "world.city.overviewPending": "A verified city overview is being prepared.",
+  "world.city.placesEmpty": "No approved public places yet.",
   "world.place.unavailableTitle": "Place profile is not available yet",
   "world.place.unavailableBody": "This place is being prepared.",
   "world.backToWorld": "Back to World",

@@ -241,6 +241,8 @@ export const arMessages: FoundationMessages = {
   "world.empty.destination": "لا توجد أماكن عامة معتمدة تطابق هذه الوجهة.",
   "world.empty.nearby": "لا توجد أماكن عامة معتمدة قريبة.",
   "world.empty.cities": "لا توجد وجهات منسّقة بعد",
+  "world.empty.unknownDestination":
+    "هذه الوجهة ليست في كتالوج العالم بعد: {city}. اختر مدينة مدرجة، أو تصفّح من دون وجهة مسبقة.",
   "world.verified": "موثّق",
   "world.helloCity": "مرحبًا بالمدينة",
   "world.helloCityHelp": "النشر صريح ومراجع وعلى مستوى المدينة فقط.",
@@ -275,6 +277,8 @@ export const arMessages: FoundationMessages = {
   "world.error.searchFilter": "عامل تصفية البحث غير صالح.",
   "world.city.unavailableTitle": "ملف المدينة غير متاح بعد",
   "world.city.unavailableBody": "هذه المدينة قيد التجهيز.",
+  "world.city.overviewPending": "يجري إعداد نظرة عامة موثّقة عن المدينة.",
+  "world.city.placesEmpty": "لا توجد أماكن عامة معتمدة بعد.",
   "world.place.unavailableTitle": "ملف المكان غير متاح بعد",
   "world.place.unavailableBody": "هذا المكان قيد التجهيز.",
   "world.backToWorld": "العودة إلى العالم",

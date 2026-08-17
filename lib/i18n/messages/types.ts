@@ -232,6 +232,7 @@ export type FoundationMessages = {
   "world.empty.destination": string;
   "world.empty.nearby": string;
   "world.empty.cities": string;
+  "world.empty.unknownDestination": string;
   "world.verified": string;
   "world.helloCity": string;
   "world.helloCityHelp": string;
@@ -263,6 +264,8 @@ export type FoundationMessages = {
   "world.error.searchFilter": string;
   "world.city.unavailableTitle": string;
   "world.city.unavailableBody": string;
+  "world.city.overviewPending": string;
+  "world.city.placesEmpty": string;
   "world.place.unavailableTitle": string;
   "world.place.unavailableBody": string;
   "world.backToWorld": string;

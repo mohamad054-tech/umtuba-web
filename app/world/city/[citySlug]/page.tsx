@@ -13,6 +13,11 @@ import { createClient } from "../../../../lib/supabase/server";
 import { sanitizeWorldSlug } from "../../../../lib/world/domain";
 import { loadWorldDiscoveryBootstrap } from "../../../../lib/world/discovery";
 import { loadWorldCityProfile } from "../../../../lib/world/profiles";
+import {
+  bundledCityCopy,
+  resolveCityDisplayName,
+  resolveCityOverview,
+} from "../../../../lib/world/cityCatalogCopy";
 
 type Props = {
   params: Promise<{ citySlug: string }>;
@@ -71,6 +76,19 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
     notFound();
   }
   const city = result.data;
+  const cityCopy = bundledCityCopy();
+  const displayName = resolveCityDisplayName(
+    cityCopy,
+    city.slug,
+    locale,
+    city.name
+  );
+  const overview = resolveCityOverview(
+    cityCopy,
+    city.slug,
+    locale,
+    city.overview
+  );
 
   const placesByKind = Object.entries(
     city.featuredPlaces.reduce<
@@ -86,8 +104,8 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
       label: "Overview",
       enabled: city.layers.discovery,
       content: (
-        <Panel title={`About ${city.name}`}>
-          <p>{city.overview || "A verified city overview is being prepared."}</p>
+        <Panel title={`About ${displayName}`}>
+          <p>{overview || t("world.city.overviewPending")}</p>
           <dl className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(city.placeCounts).map(([kind, count]) => (
               <div key={kind} className="rounded-xl border border-white/10 p-3">
@@ -124,7 +142,7 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
               </Panel>
             ))
           ) : (
-            <Panel title="Places">No approved public places yet.</Panel>
+            <Panel title="Places">{t("world.city.placesEmpty")}</Panel>
           )}
         </div>
       ),
@@ -241,13 +259,13 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
 
   return (
     <main className="min-h-screen bg-[#050510] text-white">
-      <AppTopNav title={city.name} subtitle="World City" />
+      <AppTopNav title={displayName} subtitle="World City" />
       <div className="mx-auto max-w-6xl px-4 py-6 md:px-6">
         <header className="rounded-[32px] border border-cyan-400/20 bg-gradient-to-br from-cyan-500/10 via-[#0a1022] to-violet-500/10 p-6">
           <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-200/70">
             {city.countryName} · {city.verificationStatus}
           </p>
-          <h1 className="mt-2 text-3xl font-black md:text-5xl">{city.name}</h1>
+          <h1 className="mt-2 text-3xl font-black md:text-5xl">{displayName}</h1>
           <p className="mt-3 text-sm text-white/45">
             {city.region ? `${city.region} · ` : ""}
             {city.countryCode}

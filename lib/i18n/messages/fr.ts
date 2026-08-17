@@ -84,6 +84,8 @@ export const frMessages: FoundationMessages = {
     "Aucun lieu public approuvé ne correspond à cette destination.",
   "world.empty.nearby": "Aucun lieu public approuvé à proximité.",
   "world.empty.cities": "Aucune destination sélectionnée pour le moment",
+  "world.empty.unknownDestination":
+    "Cette destination n’est pas encore dans le catalogue World : {city}. Choisissez une ville listée, ou parcourez sans destination prédéfinie.",
   "world.verified": "vérifié",
   "world.helloCity": "Hello City",
   "world.helloCityHelp":
@@ -122,6 +124,8 @@ export const frMessages: FoundationMessages = {
   "world.error.searchFilter": "Le filtre de recherche est invalide.",
   "world.city.unavailableTitle": "Le profil de la ville n’est pas encore disponible",
   "world.city.unavailableBody": "Cette ville est en cours de préparation.",
+  "world.city.overviewPending": "Une présentation vérifiée de la ville est en cours de préparation.",
+  "world.city.placesEmpty": "Aucun lieu public approuvé pour le moment.",
   "world.place.unavailableTitle": "Le profil du lieu n’est pas encore disponible",
   "world.place.unavailableBody": "Ce lieu est en cours de préparation.",
   "world.backToWorld": "Retour à World",

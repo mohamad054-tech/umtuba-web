@@ -1,0 +1,123 @@
+{
+  "id": "world-catalog-pilot-v1",
+  "version": "1.0.0",
+  "publication": "draft",
+  "notes": "Tiny first-wave destination skeleton. Names and coordinates come from UMTUBA project evidence. No invented descriptions, photos, or places. Places are omitted because world_places.owner_user_id is required and no platform catalog owner exists.",
+  "countries": [
+    { "country_code": "PS", "name": "Palestine", "slug": "palestine" },
+    { "country_code": "JO", "name": "Jordan", "slug": "jordan" },
+    { "country_code": "TR", "name": "Türkiye", "slug": "turkiye" },
+    { "country_code": "DE", "name": "Germany", "slug": "germany" },
+    { "country_code": "AE", "name": "United Arab Emirates", "slug": "united-arab-emirates" },
+    { "country_code": "US", "name": "United States", "slug": "united-states" },
+    { "country_code": "JP", "name": "Japan", "slug": "japan" },
+    { "country_code": "EG", "name": "Egypt", "slug": "egypt" }
+  ],
+  "cities": [
+    {
+      "slug": "jerusalem",
+      "city_name": "Jerusalem",
+      "country_code": "PS",
+      "center_latitude": 31.7683,
+      "center_longitude": 35.2137,
+      "timezone_name": "Asia/Jerusalem",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Jerusalem; also app/data/videos.ts v1 and app/components/journey/handoffArrival.ts"
+      }
+    },
+    {
+      "slug": "amman",
+      "city_name": "Amman",
+      "country_code": "JO",
+      "center_latitude": 31.9539,
+      "center_longitude": 35.9106,
+      "timezone_name": "Asia/Amman",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Amman; Explore This City fixture in app/lib/nav/exploreCityAndCreate.test.ts"
+      }
+    },
+    {
+      "slug": "istanbul",
+      "city_name": "Istanbul",
+      "country_code": "TR",
+      "center_latitude": 41.0082,
+      "center_longitude": 28.9784,
+      "timezone_name": "Europe/Istanbul",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Istanbul; also app/data/videos.ts v3"
+      }
+    },
+    {
+      "slug": "berlin",
+      "city_name": "Berlin",
+      "country_code": "DE",
+      "center_latitude": 52.52,
+      "center_longitude": 13.405,
+      "timezone_name": "Europe/Berlin",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Berlin; also app/data/videos.ts v4"
+      }
+    },
+    {
+      "slug": "dubai",
+      "city_name": "Dubai",
+      "country_code": "AE",
+      "center_latitude": 25.2048,
+      "center_longitude": 55.2708,
+      "timezone_name": "Asia/Dubai",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Dubai; also app/profile/data/mockProfiles.ts"
+      }
+    },
+    {
+      "slug": "new-york",
+      "city_name": "New York",
+      "country_code": "US",
+      "center_latitude": 40.7128,
+      "center_longitude": -74.006,
+      "timezone_name": "America/New_York",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES New York"
+      }
+    },
+    {
+      "slug": "tokyo",
+      "city_name": "Tokyo",
+      "country_code": "JP",
+      "center_latitude": 35.6762,
+      "center_longitude": 139.6503,
+      "timezone_name": "Asia/Tokyo",
+      "provenance": {
+        "kind": "umtuba_project_evidence",
+        "source": "app/components/landing/living-earth/livingEarthData.ts",
+        "citation": "LIVING_CITIES Tokyo"
+      }
+    },
+    {
+      "slug": "cairo",
+      "city_name": "Cairo",
+      "country_code": "EG",
+      "center_latitude": 30.0444,
+      "center_longitude": 31.2357,
+      "timezone_name": "Africa/Cairo",
+      "provenance": {
+        "kind": "public_geographic_fact",
+        "source": "app/data/videos.ts plus Wikipedia Cairo coordinates",
+        "citation": "City name/country from demoVideos v5. Center 30.0444, 31.2357 from https://en.wikipedia.org/wiki/Cairo (30°02′40″N 31°14′09″E)."
+      }
+    }
+  ],
+  "places": []
+}

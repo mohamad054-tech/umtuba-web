@@ -48,6 +48,7 @@ describe("World hold UX copy", () => {
       "world.titleHold",
       "world.error.unavailable",
       "world.empty.destination",
+      "world.empty.unknownDestination",
     ] as const;
     for (const locale of SUPPORTED_LOCALES) {
       if (locale === "en") continue;

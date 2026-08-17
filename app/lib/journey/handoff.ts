@@ -218,10 +218,38 @@ export function buildPostJourneyHref(payload: JourneyHandoffPayload) {
   return `/post-journey?${buildJourneyHandoffQuery(payload)}`;
 }
 
+const CITY_SLUG_DIACRITICS: Record<string, string> = {
+  á: "a",
+  à: "a",
+  ã: "a",
+  â: "a",
+  ä: "a",
+  é: "e",
+  è: "e",
+  ê: "e",
+  ë: "e",
+  í: "i",
+  ì: "i",
+  î: "i",
+  ï: "i",
+  ó: "o",
+  ò: "o",
+  õ: "o",
+  ô: "o",
+  ö: "o",
+  ú: "u",
+  ù: "u",
+  û: "u",
+  ü: "u",
+  ç: "c",
+  ñ: "n",
+};
+
 export function slugifyCity(city: string) {
   return city
     .trim()
     .toLowerCase()
+    .replace(/[áàãâäéèêëíìîïóòõôöúùûüçñ]/g, (ch) => CITY_SLUG_DIACRITICS[ch] ?? ch)
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }

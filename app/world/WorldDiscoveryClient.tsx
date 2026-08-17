@@ -17,6 +17,7 @@ import {
   type WorldFeatureFlags,
 } from "../../lib/world/discovery";
 import { worldDiscoveryHoldMessage } from "../../lib/world/holdUi";
+import { resolveWorldDestination } from "../../lib/world/worldDestination";
 
 type LocationPermissionState =
   | "not_requested"
@@ -54,12 +55,12 @@ export default function WorldDiscoveryClient({
   };
   const [permission, setPermission] =
     useState<LocationPermissionState>("not_requested");
-  const [cityId, setCityId] = useState(
-    () =>
-      cities.find((city) => city.slug === initialCitySlug)?.id ??
-      cities[0]?.id ??
-      ""
+  const initialDestination = resolveWorldDestination(cities, initialCitySlug);
+  const [cityId, setCityId] = useState(initialDestination.cityId);
+  const [unknownRequested, setUnknownRequested] = useState(
+    initialDestination.unknownRequested
   );
+  const requestedUnknownSlug = initialDestination.requestedSlug;
   const [categoryId, setCategoryId] = useState(
     () =>
       categories.some((category) => category.id === initialCategoryId)
@@ -187,7 +188,7 @@ export default function WorldDiscoveryClient({
   useEffect(() => {
     if (autoStarted.current) return;
     if (!databaseReady || !flags.worldDiscoveryEnabled) return;
-    if (!initialCitySlug || !cityId) return;
+    if (!initialCitySlug || !cityId || unknownRequested) return;
     autoStarted.current = true;
     runDestinationDiscovery();
   }, [databaseReady, flags.worldDiscoveryEnabled, initialCitySlug, cityId]);
@@ -229,13 +230,23 @@ export default function WorldDiscoveryClient({
         <p className="mt-2 text-sm text-white/50">
           {t("world.chooseWhereHelp")}
         </p>
+        {unknownRequested && requestedUnknownSlug ? (
+          <p role="status" className="mt-3 text-sm text-amber-100/90">
+            {t("world.empty.unknownDestination", {
+              values: { city: requestedUnknownSlug },
+            })}
+          </p>
+        ) : null}
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <label className="text-xs font-bold text-white/55">
             {t("world.destination")}
             <select
               value={cityId}
-              onChange={(event) => setCityId(event.target.value)}
+              onChange={(event) => {
+                setCityId(event.target.value);
+                setUnknownRequested(false);
+              }}
               className="mt-1 w-full rounded-xl border border-white/10 bg-black/40 p-3 text-sm"
             >
               {cities.length === 0 ? (
@@ -321,6 +332,46 @@ export default function WorldDiscoveryClient({
         <p className="mt-3 text-xs text-white/45">
           {permissionCopy[permission]} {t("world.location.noTracking")}
         </p>
+
+        {cities.length ? (
+          <ul
+            aria-label={t("world.destination")}
+            className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {cities.map((city) => {
+              const selected = city.id === cityId;
+              return (
+                <li key={city.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCityId(city.id);
+                      setUnknownRequested(false);
+                    }}
+                    className={`watch-focus-ring w-full rounded-2xl border p-4 text-left ${
+                      selected
+                        ? "border-cyan-400/40 bg-cyan-500/10"
+                        : "border-white/10 bg-white/[0.03] hover:bg-white/5"
+                    }`}
+                  >
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-200/70">
+                      {city.country_name}
+                    </p>
+                    <p className="mt-1 text-lg font-black text-white">
+                      {city.city_name}
+                    </p>
+                  </button>
+                  <Link
+                    href={`/world/city/${encodeURIComponent(city.slug)}`}
+                    className="mt-2 inline-flex text-xs font-bold text-cyan-100 hover:underline"
+                  >
+                    {t("world.openCity")}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
       </section>
 
       {message ? (
