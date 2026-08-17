@@ -21,6 +21,14 @@ export {
   safeCleanupPath,
 } from "./adapters/storageAdapter";
 export {
+  DEFAULT_MEDIA_WORK_DIR,
+  MEDIA_MIN_FREE_BYTES,
+  MEDIA_WORKER_CONCURRENCY,
+  acquireMediaWorkerLock,
+  assertMediaWorkFreeSpace,
+  resolveMediaWorkRoot,
+} from "./adapters/mediaWorkIsolation";
+export {
   createArticleTeaserProcessor,
   processArticleTeaserJob,
 } from "./processors/articleTeaserProcessor";

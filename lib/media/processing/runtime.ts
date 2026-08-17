@@ -5,6 +5,12 @@
 import type { MediaProcessor } from "./processor";
 import { getMediaProcessor } from "./processorRegistry";
 import { createTempWorkspace } from "./adapters/storageAdapter";
+import {
+  acquireMediaWorkerLock,
+  assertMediaWorkFreeSpace,
+  resolveMediaWorkRoot,
+  type MediaWorkerLock,
+} from "./adapters/mediaWorkIsolation";
 import { createMediaLogger } from "./logging";
 import {
   metricJobCompleted,
@@ -68,11 +74,30 @@ export class MediaWorkerRuntime {
       return { ok: false, errorCode: "unsupported_processor", retryable: false };
     }
     const processor = resolved.processor;
-    const job = await processor.claim();
-    if (!job) {
-      return { ok: true, idle: true };
+    let lock: MediaWorkerLock | null = null;
+    if (processor.kind === "ugc_video") {
+      const root = resolveMediaWorkRoot();
+      const space = await assertMediaWorkFreeSpace(root);
+      if (!space.ok) {
+        log("isolation_blocked", { processorKind: processor.kind, code: space.code });
+        return { ok: false, errorCode: space.code, retryable: true };
+      }
+      const locked = acquireMediaWorkerLock(root);
+      if (!locked.ok) {
+        log("isolation_blocked", { processorKind: processor.kind, code: locked.code });
+        return { ok: false, errorCode: locked.code, retryable: true };
+      }
+      lock = locked.lock;
     }
-    return this.runJob(processor, job);
+    try {
+      const job = await processor.claim();
+      if (!job) {
+        return { ok: true, idle: true };
+      }
+      return await this.runJob(processor, job);
+    } finally {
+      lock?.release();
+    }
   }
 
   async runJob(

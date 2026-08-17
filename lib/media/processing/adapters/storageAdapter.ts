@@ -3,9 +3,9 @@
  */
 
 import { promises as fs } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { resolveMediaWorkRoot } from "./mediaWorkIsolation";
 
 export type StorageDownloadInput = {
   bucket: string;
@@ -28,7 +28,9 @@ export type TempWorkspace = {
 };
 
 export async function createTempWorkspace(prefix = "umtuba-media-"): Promise<TempWorkspace> {
-  const workDir = await fs.mkdtemp(join(tmpdir(), prefix));
+  const root = resolveMediaWorkRoot();
+  await fs.mkdir(root, { recursive: true });
+  const workDir = await fs.mkdtemp(join(root, prefix));
   return {
     workDir,
     file: (...parts: string[]) => join(workDir, ...parts),
