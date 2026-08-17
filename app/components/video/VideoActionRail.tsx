@@ -336,14 +336,12 @@ export default function VideoActionRail({
             </svg>
           }
         />
-        {persist && postId && shareMenuOpen ? (
-          <div className="absolute right-14 top-0 z-30">
-            <ShareMenu
-              open={shareMenuOpen}
-              onClose={() => setShareMenuOpen(false)}
-              onSelect={(target) => void handleShareTarget(target)}
-            />
-          </div>
+        {persist && postId ? (
+          <ShareMenu
+            open={shareMenuOpen}
+            onClose={() => setShareMenuOpen(false)}
+            onSelect={(target) => void handleShareTarget(target)}
+          />
         ) : null}
       </div>
 
