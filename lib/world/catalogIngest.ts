@@ -237,7 +237,8 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
   const countries: CatalogCountry[] = [];
   const countryCodes = new Set<string>();
   const countrySlugs = new Set<string>();
-  for (const [index, row] of (value.countries ?? []).entries()) {
+  const countryRows = Array.isArray(value.countries) ? value.countries : [];
+  for (const [index, row] of countryRows.entries()) {
     if (!isRecord(row)) {
       errors.push(`countries[${index}] is invalid`);
       continue;
@@ -267,7 +268,8 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
 
   const cities: CatalogCity[] = [];
   const citySlugs = new Set<string>();
-  for (const [index, row] of (value.cities ?? []).entries()) {
+  const cityRows = Array.isArray(value.cities) ? value.cities : [];
+  for (const [index, row] of cityRows.entries()) {
     if (!isRecord(row)) {
       errors.push(`cities[${index}] is invalid`);
       continue;
@@ -350,7 +352,8 @@ export function parseWorldCatalogManifest(value: unknown): CatalogValidation {
 
   const places: CatalogPlace[] = [];
   const placeSlugs = new Set<string>();
-  for (const [index, row] of (value.places ?? []).entries()) {
+  const placeRows = Array.isArray(value.places) ? value.places : [];
+  for (const [index, row] of placeRows.entries()) {
     if (!isRecord(row)) {
       errors.push(`places[${index}] is invalid`);
       continue;
