@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import type { ProductCategoryRow } from "../../../lib/store/types";
 import { APP_ROUTES } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 
 type SearchFiltersProps = {
   categories: ProductCategoryRow[];
@@ -14,6 +15,7 @@ export default function SearchFilters({
   categories,
   resultCount,
 }: SearchFiltersProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const [pending, startTransition] = useTransition();
@@ -53,18 +55,18 @@ export default function SearchFilters({
     <div className="space-y-5">
       {q.trim() ? (
         <p className="text-sm text-[var(--sf-muted)]">
-          Searching for{" "}
+          {t("store.search.searchingFor")}{" "}
           <span className="font-semibold text-[var(--sf-ink)]">“{q.trim()}”</span>
         </p>
       ) : null}
 
       <fieldset>
         <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
-          Category
+          {t("store.search.category")}
         </legend>
         <div className="mt-2 flex flex-wrap gap-1.5">
           <FilterChip
-            label="All"
+            label={t("store.search.all")}
             selected={!category}
             onClick={() => push({ category: "" })}
           />
@@ -81,16 +83,16 @@ export default function SearchFilters({
 
       <fieldset>
         <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
-          Availability
+          {t("store.search.availability")}
         </legend>
         <div className="mt-2 flex flex-wrap gap-1.5">
           <FilterChip
-            label="All"
+            label={t("store.search.all")}
             selected={availability !== "in_stock"}
             onClick={() => push({ availability: "" })}
           />
           <FilterChip
-            label="In stock"
+            label={t("store.search.inStock")}
             selected={availability === "in_stock"}
             onClick={() => push({ availability: "in_stock" })}
           />
@@ -102,7 +104,7 @@ export default function SearchFilters({
           htmlFor="store-sort"
           className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]"
         >
-          Sort
+          {t("store.search.sort")}
         </label>
         <select
           id="store-sort"
@@ -110,10 +112,10 @@ export default function SearchFilters({
           onChange={(e) => push({ sort: e.target.value })}
           className="sf-select mt-2"
         >
-          <option value="newest">Newest</option>
-          <option value="price_asc">Price: low to high</option>
-          <option value="price_desc">Price: high to low</option>
-          <option value="title">Title A–Z</option>
+          <option value="newest">{t("store.search.sortNewest")}</option>
+          <option value="price_asc">{t("store.search.sortPriceAsc")}</option>
+          <option value="price_desc">{t("store.search.sortPriceDesc")}</option>
+          <option value="title">{t("store.search.sortTitle")}</option>
         </select>
       </div>
 
@@ -125,17 +127,19 @@ export default function SearchFilters({
             startTransition(() => router.push(APP_ROUTES.storeSearch));
           }}
         >
-          Clear filters
+          {t("store.search.clearFilters")}
         </button>
       ) : null}
     </div>
   );
 
   return (
-    <aside className="lg:sticky lg:top-28" aria-label="Search filters">
+    <aside className="lg:sticky lg:top-28" aria-label={t("store.search.filtersAria")}>
       <div className="mb-3 flex items-center justify-between lg:hidden">
         <p className="text-sm text-[var(--sf-muted)]">
-          {pending ? "Updating…" : `${resultCount} results`}
+          {pending
+            ? t("store.search.updating")
+            : t("store.search.results", { values: { count: resultCount } })}
         </p>
         <button
           type="button"
@@ -144,7 +148,7 @@ export default function SearchFilters({
           aria-controls="store-search-filters"
           onClick={() => setMobileOpen((v) => !v)}
         >
-          {mobileOpen ? "Hide filters" : "Filters"}
+          {mobileOpen ? t("store.search.hideFilters") : t("store.search.filters")}
         </button>
       </div>
 
@@ -155,7 +159,9 @@ export default function SearchFilters({
         }`}
       >
         <p className="mb-4 hidden text-sm text-[var(--sf-muted)] lg:block">
-          {pending ? "Updating…" : `${resultCount} results`}
+          {pending
+            ? t("store.search.updating")
+            : t("store.search.results", { values: { count: resultCount } })}
         </p>
         {filters}
       </div>

@@ -11,6 +11,8 @@ import {
   filterCatalogByAvailability,
   sortCatalogItems,
 } from "../../lib/storefront/deriveSections";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient } from "../../../lib/supabase/server";
 import {
   listActiveCategories,
@@ -40,6 +42,8 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
   const availability =
     typeof params.availability === "string" ? params.availability : "";
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const [categories, catalog] = await Promise.all([
     listActiveCategories(supabase),
@@ -56,11 +60,11 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
   );
 
   return (
-    <StoreShell title="Search" subtitle="Store">
+    <StoreShell title={t("store.search.navTitle")} subtitle={t("store.search.navSubtitle")}>
       <StorePageHeader
-        eyebrow="Browse"
-        title="Search & categories"
-        description="Filter active catalog products by keyword, category, and sort. Search uses the existing store catalog contract — no fabricated matches."
+        eyebrow={t("store.search.eyebrow")}
+        title={t("store.search.title")}
+        description={t("store.search.description")}
       />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[260px_1fr]">
@@ -77,10 +81,10 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
             <StoreErrorState message={catalog.error} />
           ) : items.length === 0 ? (
             <StoreEmptyState
-              title="No matches"
-              description="Try another search term or clear category filters."
+              title={t("store.search.noMatchesTitle")}
+              description={t("store.search.noMatchesDescription")}
               actionHref={APP_ROUTES.storeSearch}
-              actionLabel="Clear search"
+              actionLabel={t("store.search.clear")}
             />
           ) : (
             <Suspense fallback={<ProductGridSkeleton />}>

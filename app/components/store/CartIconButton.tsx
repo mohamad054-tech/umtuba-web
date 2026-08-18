@@ -6,8 +6,10 @@ import { getCartItemCountAction } from "../../actions/storeCart";
 import { createClient } from "../../../lib/supabase/client";
 import { APP_ROUTES } from "../../lib/nav";
 import UnreadBadge from "../../messages/components/UnreadBadge";
+import { useTranslation } from "../i18n";
 
 export default function CartIconButton() {
+  const { t } = useTranslation();
   const [count, setCount] = useState(0);
   const [authed, setAuthed] = useState(false);
   const [, startTransition] = useTransition();
@@ -79,7 +81,9 @@ export default function CartIconButton() {
     <Link
       href={href}
       aria-label={
-        count > 0 ? `Cart, ${count} items` : "Cart"
+        count > 0
+          ? t("store.cart.ariaWithCount", { values: { count } })
+          : t("store.cart.aria")
       }
       className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)] transition hover:bg-[rgba(214,196,161,0.22)]"
     >

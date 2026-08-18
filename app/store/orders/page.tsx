@@ -5,6 +5,9 @@ import StoreErrorState from "../../components/store/StoreErrorState";
 import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
+import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { isOrderStatus } from "../../../lib/store/orderRules";
 import { listBuyerOrders } from "../../../lib/store/orders";
@@ -31,6 +34,16 @@ const FILTERS = [
   "cancelled",
 ] as const;
 
+const STATUS_KEYS: Record<(typeof FILTERS)[number], TranslationKey> = {
+  pending: "store.orders.status.pending",
+  confirmed: "store.orders.status.confirmed",
+  processing: "store.orders.status.processing",
+  packed: "store.orders.status.packed",
+  shipped: "store.orders.status.shipped",
+  delivered: "store.orders.status.delivered",
+  cancelled: "store.orders.status.cancelled",
+};
+
 export default async function StoreOrdersPage({ searchParams }: PageProps) {
   const user = await getServerUser();
   if (!user) {
@@ -45,6 +58,8 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
       ? (params.status as OrderStatus)
       : "all";
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const result = await listBuyerOrders(supabase, user.id, {
     status: statusFilter,
@@ -52,13 +67,13 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
   });
 
   return (
-    <StoreShell title="My Orders" subtitle="Store" wide>
+    <StoreShell title={t("store.orders.navTitle")} subtitle={t("store.orders.navSubtitle")} wide>
       <StorePageHeader
-        eyebrow="Orders"
-        title="My orders"
-        description="Each card is one seller order with separate order, payment, fulfillment, and delivery states. Multi-seller checkouts appear as multiple orders — not one shared shipment. Payment collection remains deferred."
+        eyebrow={t("store.orders.eyebrow")}
+        title={t("store.orders.title")}
+        description={t("store.orders.description")}
       >
-        <div className="mt-4 flex flex-wrap gap-2" role="navigation" aria-label="Filter orders">
+        <div className="mt-4 flex flex-wrap gap-2" role="navigation" aria-label={t("store.orders.filterAria")}>
           <Link
             href={APP_ROUTES.storeOrders}
             className={`sf-chip watch-focus-ring ${
@@ -66,18 +81,18 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
             }`}
             aria-current={statusFilter === "all" ? "page" : undefined}
           >
-            All
+            {t("store.orders.all")}
           </Link>
           {FILTERS.map((status) => (
             <Link
               key={status}
               href={`${APP_ROUTES.storeOrders}?status=${status}`}
-              className={`sf-chip watch-focus-ring capitalize ${
+              className={`sf-chip watch-focus-ring ${
                 statusFilter === status ? "is-active" : ""
               }`}
               aria-current={statusFilter === status ? "page" : undefined}
             >
-              {status}
+              {t(STATUS_KEYS[status])}
             </Link>
           ))}
         </div>

@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { ProductCategoryRow } from "../../../lib/store/types";
 import { categoryHref } from "../../lib/storefront/deriveSections";
+import { useTranslation } from "../i18n";
 import StoreEmptyState from "./StoreEmptyState";
 
 type CategoryRailProps = {
@@ -12,15 +15,16 @@ export default function CategoryRail({
   categories,
   variant = "categories",
 }: CategoryRailProps) {
+  const { t } = useTranslation();
   if (categories.length === 0) {
     return (
       <StoreEmptyState
         title={
           variant === "collections"
-            ? "Collections arriving soon"
-            : "Categories arriving soon"
+            ? t("store.empty.collectionsTitle")
+            : t("store.empty.categoriesTitle")
         }
-        description="Active catalog categories will appear here once products are published."
+        description={t("store.empty.categoriesDescription")}
       />
     );
   }
@@ -46,7 +50,9 @@ export default function CategoryRail({
             </span>
             <span className="relative mt-1 text-[10px] uppercase tracking-[0.16em] text-[var(--sf-faint)]">
               {category.productCount != null && category.productCount > 0
-                ? `${category.productCount} products`
+                ? t("store.category.productCount", {
+                    values: { count: category.productCount },
+                  })
                 : category.slug}
             </span>
           </Link>

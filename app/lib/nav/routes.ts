@@ -39,6 +39,7 @@ export const APP_ROUTES = {
   storeCheckout: "/store/checkout",
   storeOrders: "/store/orders",
   storeWishlist: "/store/wishlist",
+  storeDemoPreview: "/store/demo-preview",
   seller: "/seller",
   sellerApply: "/seller/apply",
   sellerSetup: "/seller/setup",

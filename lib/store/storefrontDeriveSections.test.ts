@@ -218,12 +218,9 @@ describe("storefront deriveSections", () => {
     expect(slides[0]).not.toHaveProperty("tone");
   });
 
-  it("falls back to editorial welcome slide when catalog empty", () => {
+  it("returns no catalog slides when inventory is empty so the page can localize welcome copy", () => {
     const slides = heroSlidesFromCatalog([]);
-    expect(slides).toHaveLength(1);
-    expect(slides[0]?.id).toBe("welcome");
-    expect(slides[0]?.href).toBe("/store/search");
-    expect(slides[0]?.title).toBe("Shop UMTUBA");
+    expect(slides).toHaveLength(0);
   });
 
   it("filters in-stock catalog items without inventing availability", () => {

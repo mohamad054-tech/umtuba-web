@@ -20,6 +20,7 @@ import {
 import { CHECKOUT_PAYMENT_PLACEHOLDER_OPTIONS } from "../../../lib/store/payments";
 import { formatTrustedMoney } from "../../../lib/store/tradingContracts";
 import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
 
@@ -51,14 +52,6 @@ type ConfirmResult = {
   [key: string]: unknown;
 };
 
-const STEPS = [
-  { id: "review", label: "Review" },
-  { id: "address", label: "Address" },
-  { id: "delivery", label: "Delivery" },
-  { id: "quote", label: "Totals" },
-  { id: "place", label: "Place" },
-] as const;
-
 export default function CheckoutClient({
   cart,
   addresses,
@@ -66,6 +59,14 @@ export default function CheckoutClient({
   purchasesAvailable = true,
   purchasesUnavailableMessage = null,
 }: Props) {
+  const { t } = useTranslation();
+  const STEPS = [
+    { id: "review", label: t("store.checkout.step.review") },
+    { id: "address", label: t("store.checkout.step.address") },
+    { id: "delivery", label: t("store.checkout.step.delivery") },
+    { id: "quote", label: t("store.checkout.step.quote") },
+    { id: "place", label: t("store.checkout.step.place") },
+  ] as const;
   const [pending, startTransition] = useTransition();
   const submitLockRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
@@ -133,10 +134,10 @@ export default function CheckoutClient({
     return (
       <div className="mt-6 space-y-4">
         <StoreEmptyState
-          title="Nothing to checkout"
-          description="Add products to your cart before starting checkout. Cart is preserved until an order is recorded."
+          title={t("store.checkout.emptyTitle")}
+          description={t("store.checkout.emptyDescription")}
           actionHref={APP_ROUTES.storeCart}
-          actionLabel="Back to cart"
+          actionLabel={t("store.checkout.backToCart")}
         />
       </div>
     );
@@ -418,7 +419,7 @@ export default function CheckoutClient({
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
       <div className="space-y-5" aria-busy={busy || undefined}>
-        <nav aria-label="Checkout steps" className="overflow-x-auto">
+        <nav aria-label={t("store.checkout.stepsAria")} className="overflow-x-auto">
           <ol className="flex min-w-max items-center gap-1">
             {STEPS.map((step, index) => {
               const current = index === activeStepIndex;

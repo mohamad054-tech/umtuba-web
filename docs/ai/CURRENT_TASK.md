@@ -2,35 +2,25 @@
 
 ## Task title
 
-PC2 Remaining User Findings Implementation V1
+CENTRAL GO — STORE LIVE LOCALIZATION + SAFE DEMO PREVIEW
 
 ## Identity
 
-- **DEVICE** = PC2
-- **DEVICE_ROLE** = PLATFORM_USER_FINDINGS_PRIMARY
-- **TASK_ID** = `PC2_REMAINING_USER_FINDINGS_IMPLEMENTATION_V1`
-- **CENTRAL_COORDINATOR** = SERVER
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION
+- **TASK_ID** = `CENTRAL_STORE_LIVE_LOCALIZATION_DEMO_PREVIEW_V1`
 - **PRIORITY** = HIGH
-
-## Status
-
-COMPLETE / STOP. Implementation on a fresh alpha-based branch. Awaiting Central fetch/review/deploy. Do not start another wave.
 
 ## Authoritative base
 
-- **AUTHORITATIVE_BASE_SHA** = `4e075f996cdb4b86835b96ab57987aed924d2dc6` (`origin/alpha-0.2` / `origin/HEAD` after `git fetch --all --prune`)
-- **TASK_BRANCH** = `pc2/wp-qa-user-findings-v1`
-- **TASK_WORKTREE** = `worktrees/_pc2_wp_qa_user_findings`
-- **STALE_OFFICE_WORKTREE** = `office/platform-translation-trunk-port-v1` @ `2a146bb` — not used as integration base; SAVE_ALL / visual QA artifacts preserved
+- **AUTHORITATIVE_BASE_SHA** = `2400a37890152a8db9cb14c8a0bb2c0fe64cc2b8` (`origin/alpha-0.2` after `git fetch --prune`)
+- **TASK_BRANCH** = `central/store-live-localization-demo-preview-v1`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-live-localization-demo-preview-v1`
 
 ## Allowed scope
 
-WP-QA-01 / UAF-07 Explore This City; WP-QA-02 / UAF-09 World destination handoff (no fake hide); WP-QA-13 / UAF-01 Create chooser for supported types; UAF-11 live identity overlay (no bulk username migration). Docs for this TASK_ID.
+Store buyer chrome localization (ar,en,fr,es,de,pt). Honest empty catalog copy. Gated in-memory DEMO preview. Tests, tsc, lint, build, reports.
 
 ## Forbidden scope
 
-Merge stale office into alpha. Reimplement UAF-02/03/05/06/08/12, i18n/search, AASA, Store financial, Android/iOS release. Remote migrations. AUTH_ENV fabrication. Push unless Central later requests it. Force-push / reset / clean preserved artifacts.
-
-## Next
-
-STOP. Central reviews `pc2/wp-qa-user-findings-v1`, fetches when ready, applies World migrations remotely if World runtime should leave the honest empty state, then deploys. PC2 does not self-select another wave.
+Dirty `central/web-user-defects-final-v1` tree. Learning 404 files. SQL 20260929 apply. Mobile `7cf3960`. umtuba-mobile. Partner rights gates. Fake partnerships. Publishing demo as live inventory.

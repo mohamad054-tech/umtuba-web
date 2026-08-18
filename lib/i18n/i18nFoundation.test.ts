@@ -150,6 +150,9 @@ describe("translation catalogs", () => {
     "world.titleHold",
     "world.hold.migrations",
     "world.error.unavailable",
+    "store.chrome.orders",
+    "store.empty.catalogTitle",
+    "store.hero.shopTitle",
   ];
 
   it("provides foundation keys for every supported locale", () => {
