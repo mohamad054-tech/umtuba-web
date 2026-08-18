@@ -652,8 +652,8 @@ export async function loadPublicLessonAccessContext(
 export function resolvePublicLessonSafeHref(
   context: PublicLessonAccessContext | null
 ): string {
-  if (context) return LEARNING_PUBLIC_ROUTES.course(context.course_slug);
-  return LEARNING_PUBLIC_ROUTES.catalog;
+  if (!context) return LEARNING_PUBLIC_ROUTES.catalog;
+  return `${LEARNING_PUBLIC_ROUTES.course(context.course_slug)}?lesson=${encodeURIComponent(context.lesson_id)}`;
 }
 
 /**

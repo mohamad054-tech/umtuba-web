@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import LearningShell from "../components/learning/LearningShell";
 import LearningHub from "../components/learning/LearningHub";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import {
   LEARNING_LEARNER_ROUTES,
@@ -19,6 +21,8 @@ export const metadata = learningHubMetadata;
 export const dynamic = "force-dynamic";
 
 export default async function LearningHubPage() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const user = await getServerUser();
   if (!user) {
     redirect(
@@ -35,8 +39,8 @@ export default async function LearningHubPage() {
 
   return (
     <LearningShell
-      title="Learning"
-      subtitle="My Learning"
+      title={t("learning.hub.title")}
+      subtitle={t("learning.hub.subtitle")}
       instructorHref={
         showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
       }
@@ -48,7 +52,7 @@ export default async function LearningHubPage() {
           role="alert"
           className="mt-6 rounded-[28px] border border-rose-400/25 bg-rose-500/10 px-4 py-5 text-sm text-rose-100"
         >
-          <p className="font-black">Could not load My Learning</p>
+          <p className="font-black">{t("learning.hub.loadError")}</p>
           <p className="mt-2 text-rose-50/85">{hub.message}</p>
         </div>
       )}

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import {
   LEARNING_PUBLIC_ROUTES,
   type PublicCourseCard,
 } from "../../../lib/learning/publicCatalog";
+import { useTranslation } from "../i18n";
 import { LearningStatePanel, LearningStatusBadge } from "./ds";
 
 type CatalogBrowserProps = {
@@ -26,7 +28,16 @@ function matchesQuery(course: PublicCourseCard, q: string) {
   return hay.includes(q);
 }
 
+function difficultyLabelKey(difficulty: string): TranslationKey | null {
+  if (difficulty === "beginner") return "learning.difficulty.beginner";
+  if (difficulty === "intermediate") return "learning.difficulty.intermediate";
+  if (difficulty === "advanced") return "learning.difficulty.advanced";
+  if (difficulty === "expert") return "learning.difficulty.expert";
+  return null;
+}
+
 export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [difficulty, setDifficulty] = useState("all");
   const [price, setPrice] = useState("all");
@@ -62,8 +73,8 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
   if (courses.length === 0) {
     return (
       <div className="mt-8">
-        <LearningStatePanel title="No public courses yet">
-          Published courses will appear here when available.
+        <LearningStatePanel title={t("learning.catalog.emptyTitle")}>
+          {t("learning.catalog.emptyBody")}
         </LearningStatePanel>
       </div>
     );
@@ -74,51 +85,56 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
       <form
         className="space-y-3 rounded-[28px] border border-white/10 bg-[#080816]/60 p-4"
         role="search"
-        aria-label="Catalog filters"
+        aria-label={t("learning.catalog.filtersAria")}
         onSubmit={(e) => e.preventDefault()}
       >
         <label className="block text-sm text-white/70">
-          Search
+          {t("learning.catalog.search")}
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Course name, skill, or topic"
+            placeholder={t("learning.catalog.searchPlaceholder")}
             className="mt-1.5 min-h-11 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-sky-400/40 focus:outline-none"
           />
         </label>
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-2">
           <label className="block text-sm text-white/70">
-            Level
+            {t("learning.catalog.level")}
             <select
               value={difficulty}
               onChange={(e) => setDifficulty(e.target.value)}
               className="mt-1.5 min-h-11 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white"
             >
-              <option value="all">All levels</option>
-              {difficulties.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
+              <option value="all">{t("learning.catalog.allLevels")}</option>
+              {difficulties.map((d) => {
+                const key = difficultyLabelKey(d);
+                return (
+                  <option key={d} value={d}>
+                    {key ? t(key) : d}
+                  </option>
+                );
+              })}
             </select>
           </label>
           <label className="block text-sm text-white/70">
-            Price
+            {t("learning.catalog.price")}
             <select
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="mt-1.5 min-h-11 w-full rounded-xl border border-white/15 bg-black/40 px-3 py-2.5 text-sm text-white"
             >
-              <option value="all">All</option>
-              <option value="free">Free</option>
-              <option value="paid">Paid</option>
+              <option value="all">{t("learning.catalog.priceAll")}</option>
+              <option value="free">{t("learning.catalog.free")}</option>
+              <option value="paid">{t("learning.catalog.paid")}</option>
             </select>
           </label>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-white/45" aria-live="polite">
-            Showing {filtered.length} of {courses.length}
+            {t("learning.catalog.showing", {
+              values: { shown: filtered.length, total: courses.length },
+            })}
           </p>
           {filtersActive ? (
             <button
@@ -126,7 +142,7 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
               onClick={clearFilters}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-4 py-2 text-sm font-bold text-white/80 hover:border-white/40"
             >
-              Clear filters
+              {t("learning.catalog.clearFilters")}
             </button>
           ) : null}
         </div>
@@ -134,24 +150,27 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
 
       {filtered.length === 0 ? (
         <LearningStatePanel
-          title="No matches"
+          title={t("learning.catalog.noMatchesTitle")}
           action={
             <button
               type="button"
               onClick={clearFilters}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
-              Clear filters
+              {t("learning.catalog.clearFilters")}
             </button>
           }
         >
-          Try a different search or clear filters.
+          {t("learning.catalog.noMatchesBody")}
         </LearningStatePanel>
       ) : (
         <ul className="space-y-4">
           {filtered.map((course) => {
             const imageUrl = course.thumbnail_url ?? course.cover_url;
             const skills = course.skills.slice(0, 3);
+            const levelKey = course.difficulty
+              ? difficultyLabelKey(course.difficulty)
+              : null;
             return (
               <li
                 key={course.id}
@@ -173,7 +192,9 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
                     <LearningStatusBadge
                       tone={course.is_free ? "success" : "neutral"}
                     >
-                      {course.is_free ? "Free" : "Paid"}
+                      {course.is_free
+                        ? t("learning.catalog.free")
+                        : t("learning.catalog.paid")}
                     </LearningStatusBadge>
                   </div>
                   {course.description ? (
@@ -182,7 +203,10 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
                     </p>
                   ) : null}
                   {skills.length > 0 ? (
-                    <ul className="mt-3 flex flex-wrap gap-2" aria-label="Skills">
+                    <ul
+                      className="mt-3 flex flex-wrap gap-2"
+                      aria-label={t("learning.catalog.skills")}
+                    >
                       {skills.map((skill) => (
                         <li key={skill}>
                           <LearningStatusBadge tone="neutral">
@@ -195,20 +219,20 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
                   <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/55">
                     {course.difficulty ? (
                       <div>
-                        <dt className="inline">Level: </dt>
-                        <dd className="inline capitalize text-white/80">
-                          {course.difficulty}
+                        <dt className="inline">{t("learning.catalog.level")}: </dt>
+                        <dd className="inline text-white/80">
+                          {levelKey ? t(levelKey) : course.difficulty}
                         </dd>
                       </div>
                     ) : null}
                     <div>
-                      <dt className="inline">Modules: </dt>
+                      <dt className="inline">{t("learning.catalog.modules")}: </dt>
                       <dd className="inline text-white/80">
                         {course.module_count}
                       </dd>
                     </div>
                     <div>
-                      <dt className="inline">Lessons: </dt>
+                      <dt className="inline">{t("learning.catalog.lessons")}: </dt>
                       <dd className="inline text-white/80">
                         {course.lesson_count}
                       </dd>
@@ -219,7 +243,7 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
                       href={LEARNING_PUBLIC_ROUTES.course(course.slug)}
                       className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black hover:bg-white/90"
                     >
-                      View Course
+                      {t("learning.catalog.viewCourse")}
                     </Link>
                   </p>
                 </div>

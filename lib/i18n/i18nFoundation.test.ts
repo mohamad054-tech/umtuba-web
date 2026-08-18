@@ -152,6 +152,11 @@ describe("translation catalogs", () => {
     "world.error.unavailable",
     "learning.lesson.unavailableTitle",
     "learning.lesson.returnToCatalog",
+    "learning.catalog.title",
+    "learning.course.curriculum",
+    "learning.enroll.notEligible",
+    "learning.enroll.requiredTitle",
+    "learning.hub.subtitle",
     "store.chrome.orders",
     "store.empty.catalogTitle",
     "store.hero.shopTitle",
@@ -181,8 +186,18 @@ describe("translation catalogs", () => {
     expect(translate("ar", "learning.lesson.returnToCatalog")).toBe(
       "العودة إلى كتالوج التعلّم"
     );
+    expect(translate("ar", "learning.catalog.title")).toBe("كتالوج التعلّم");
+    expect(translate("ar", "learning.course.free")).toBe("مجاني");
+    expect(translate("ar", "learning.enroll.notEligible")).toBe(
+      "لست مؤهلًا للتسجيل الذاتي في هذه الدورة."
+    );
+    expect(translate("ar", "learning.enroll.requiredTitle")).toBe(
+      "التسجيل مطلوب"
+    );
+    expect(getLocaleDirection("ar")).toBe("rtl");
   });
 });
+
 
 describe("missing translation fallback", () => {
   beforeEach(() => {

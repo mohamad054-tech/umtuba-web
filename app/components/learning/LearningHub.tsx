@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../i18n";
 import { LEARNING_COMPLETION_ROUTES } from "../../../lib/learning/completionFoundation";
 import {
   LEARNING_LEARNER_ROUTES,
@@ -16,10 +19,13 @@ type LearningHubProps = {
   hub: LearningLearnerHub;
 };
 
-function progressLabel(status: string) {
-  if (status === "completed") return "Completed";
-  if (status === "in_progress") return "In progress";
-  return "Not started";
+function progressLabel(
+  status: string,
+  t: (key: "learning.hub.completed" | "learning.hub.inProgress" | "learning.hub.notStarted") => string
+) {
+  if (status === "completed") return t("learning.hub.completed");
+  if (status === "in_progress") return t("learning.hub.inProgress");
+  return t("learning.hub.notStarted");
 }
 
 function statusTone(
@@ -55,6 +61,7 @@ function pickContinueCourse(
 }
 
 export default function LearningHub({ hub }: LearningHubProps) {
+  const { t } = useTranslation();
   const empty = hub.programs.length === 0 && hub.courses.length === 0;
   const continueCourse = pickContinueCourse(hub.courses);
 
@@ -62,32 +69,32 @@ export default function LearningHub({ hub }: LearningHubProps) {
     <div className="mt-6 space-y-6">
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          My Learning
+          {t("learning.hub.subtitle")}
         </p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
           {empty
-            ? "Start learning"
+            ? t("learning.hub.startLearning")
             : continueCourse
-              ? "Continue learning"
-              : "My Learning"}
+              ? t("learning.hub.continueLearning")
+              : t("learning.hub.subtitle")}
         </h1>
         <p className="mt-2 text-sm text-white/50">
           {empty
-            ? "Browse the catalog to find a course, then pick up here."
-            : "Programs and courses you can access through your enrollments."}
+            ? t("learning.hub.emptyBody")
+            : t("learning.hub.enrolledBody")}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={LEARNING_PUBLIC_ROUTES.catalog}
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
           >
-            Browse catalog
+            {t("learning.hub.browseCatalog")}
           </Link>
           <Link
             href={LEARNING_COMPLETION_ROUTES.transcript}
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
           >
-            Transcript &amp; certificates
+            {t("learning.hub.transcript")}
           </Link>
         </div>
       </section>
@@ -95,17 +102,17 @@ export default function LearningHub({ hub }: LearningHubProps) {
       {continueCourse && continueCourse.continue_href ? (
         <section
           className="rounded-[28px] border border-sky-400/20 bg-sky-500/10 p-5 backdrop-blur-xl md:p-7"
-          aria-label="Continue learning"
+          aria-label={t("learning.hub.continueLearning")}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-sky-100/70">
-              Continue Learning
+              {t("learning.hub.continueLearning")}
             </p>
             {continueCourse.progress ? (
               <LearningStatusBadge
                 tone={statusTone(continueCourse.progress.status)}
               >
-                {progressLabel(continueCourse.progress.status)}
+                {progressLabel(continueCourse.progress.status, t)}
               </LearningStatusBadge>
             ) : null}
           </div>
@@ -121,12 +128,12 @@ export default function LearningHub({ hub }: LearningHubProps) {
             <div className="mt-4">
               <LearningProgressBar
                 percent={continueCourse.progress.percent_complete}
-                label="Course progress"
+                label={t("learning.outline.courseProgress")}
               />
             </div>
           ) : (
             <p className="mt-2 text-sm text-white/70">
-              Resume where you left off
+              {t("learning.hub.resumeWhereLeft")}
             </p>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
@@ -134,13 +141,13 @@ export default function LearningHub({ hub }: LearningHubProps) {
               href={continueCourse.continue_href}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
-              Resume
+              {t("learning.hub.resume")}
             </Link>
             <Link
               href={LEARNING_LEARNER_ROUTES.course(continueCourse.id)}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
             >
-              Course outline
+              {t("learning.hub.courseOutline")}
             </Link>
           </div>
         </section>
@@ -148,25 +155,24 @@ export default function LearningHub({ hub }: LearningHubProps) {
 
       {empty ? (
         <LearningStatePanel
-          title="Nothing enrolled yet"
+          title={t("learning.hub.nothingEnrolledTitle")}
           action={
             <Link
               href={LEARNING_PUBLIC_ROUTES.catalog}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
-              Browse catalog
+              {t("learning.hub.browseCatalog")}
             </Link>
           }
         >
-          No accessible programs or courses yet. Browse public courses to
-          enroll, then continue from this hub.
+          {t("learning.hub.nothingEnrolledBody")}
         </LearningStatePanel>
       ) : null}
 
       {hub.programs.length > 0 ? (
         <section className="space-y-3">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Programs
+            {t("learning.hub.programs")}
           </h2>
           <ul className="space-y-3">
             {hub.programs.map((program) => (
@@ -181,7 +187,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
                   </p>
                 ) : null}
                 <p className="mt-2 text-xs text-white/35">
-                  Open a course below to continue.
+                  {t("learning.hub.openCourseHint")}
                 </p>
               </li>
             ))}
@@ -192,7 +198,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
       {hub.courses.length > 0 ? (
         <section className="space-y-3">
           <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Courses
+            {t("learning.hub.courses")}
           </h2>
           <ul className="space-y-3">
             {hub.courses.map((course) => (
@@ -226,14 +232,18 @@ export default function LearningHub({ hub }: LearningHubProps) {
                           percent={course.progress.percent_complete}
                         />
                         <p className="mt-1 text-xs text-white/45">
-                          {course.progress.completed_lessons_count}/
-                          {course.progress.total_lessons_count} lessons ·{" "}
-                          {progressLabel(course.progress.status)}
+                          {t("learning.hub.lessonsCount", {
+                            values: {
+                              completed: course.progress.completed_lessons_count,
+                              total: course.progress.total_lessons_count,
+                              status: progressLabel(course.progress.status, t),
+                            },
+                          })}
                         </p>
                       </div>
                     ) : (
                       <p className="mt-2 text-xs text-white/45">
-                        Progress unavailable
+                        {t("learning.hub.progressUnavailable")}
                       </p>
                     )}
                   </div>
@@ -242,7 +252,7 @@ export default function LearningHub({ hub }: LearningHubProps) {
                       href={course.continue_href}
                       className="watch-focus-ring inline-flex min-h-11 shrink-0 items-center rounded-full bg-white px-4 py-2 text-sm font-black text-black"
                     >
-                      Resume
+                      {t("learning.hub.resume")}
                     </Link>
                   ) : null}
                 </div>

@@ -1,6 +1,9 @@
+"use client";
+
 import {
   type LearningLearnerCourseOutline,
 } from "../../../lib/learning/learnerDelivery";
+import { useTranslation } from "../i18n";
 import { LearningProgressBar, LearningStatusBadge } from "./ds";
 
 type ProgressSummaryProps = {
@@ -15,35 +18,43 @@ function statusTone(
   return "neutral";
 }
 
-function statusLabel(status: string) {
-  if (status === "completed") return "Completed";
-  if (status === "in_progress") return "In progress";
-  return "Not started";
-}
-
 export default function ProgressSummary({ progress }: ProgressSummaryProps) {
+  const { t } = useTranslation();
   if (!progress) {
     return (
-      <p className="text-sm text-white/45">Progress is not available yet.</p>
+      <p className="text-sm text-white/45">
+        {t("learning.outline.progressUnavailable")}
+      </p>
     );
   }
+
+  const statusLabel =
+    progress.status === "completed"
+      ? t("learning.hub.completed")
+      : progress.status === "in_progress"
+        ? t("learning.hub.inProgress")
+        : t("learning.hub.notStarted");
 
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-          Course progress
+          {t("learning.outline.courseProgress")}
         </p>
         <LearningStatusBadge tone={statusTone(progress.status)}>
-          {statusLabel(progress.status)}
+          {statusLabel}
         </LearningStatusBadge>
       </div>
       <div className="mt-3">
         <LearningProgressBar percent={progress.percent_complete} />
       </div>
       <p className="mt-2 text-sm text-white/70">
-        {progress.completed_lessons_count} of {progress.total_lessons_count}{" "}
-        lessons
+        {t("learning.outline.lessonsCount", {
+          values: {
+            completed: progress.completed_lessons_count,
+            total: progress.total_lessons_count,
+          },
+        })}
       </p>
     </div>
   );
