@@ -74,6 +74,7 @@ describe("business sandbox fixtures", () => {
     expect(UMTUBA_DEMO_PRODUCTS).toHaveLength(26);
     expect(SANDBOX_STORE_LISTINGS).toHaveLength(26);
     expect(SANDBOX_STORE_ACTORS.map((actor) => actor.displayName)).toEqual([
+      "UMTUBA",
       "Demo Supplier A",
       "Demo Supplier B",
       "Demo Marketplace Seller C",
@@ -90,9 +91,10 @@ describe("business sandbox fixtures", () => {
     expect(MOCK_PAYMENT_ADAPTER.storesCardNumbers).toBe(false);
     expect(SANDBOX_ORDERS.every((order) => order.realPayment === false)).toBe(true);
     expect(SANDBOX_ORDERS.some((order) => order.paymentOutcome === "SUCCESS")).toBe(true);
-    expect(SANDBOX_ORDERS.some((order) => order.paymentOutcome === "FAILURE")).toBe(true);
-    expect(SANDBOX_ORDERS.some((order) => order.paymentOutcome === "REFUND")).toBe(true);
+    expect(SANDBOX_ORDERS.some((order) => order.paymentOutcome === "DECLINED")).toBe(true);
+    expect(SANDBOX_ORDERS.some((order) => order.paymentOutcome === "REFUNDED_DEMO")).toBe(true);
     expect(simulateSandboxPayment("SUCCESS").realPayment).toBe(false);
+    expect(simulateSandboxPayment("SUCCESS").realProviderCall).toBe(false);
   });
 
   it("denies UNKNOWN rights and keeps commercial copy synthetic", () => {

@@ -1,52 +1,67 @@
 ﻿# Current Task
 
-## Task title
+## CENTRAL GO — STORE FULL SANDBOX PRODUCT IMPLEMENTATION V2
 
-CENTRAL GO — CHERRY-PICK PRIVATE STORE DEMO PREVIEW ONTO LIVE 8f39277b
+**TASK_ID** = `CENTRAL_STORE_FULL_SANDBOX_PRODUCT_V2`
+**PRIORITY** = HIGH
+**SCOPE** = PRIVATE WEB STORE SANDBOX ONLY
+**DATE** = 2026-08-18
+**MODE** = PRIVATE_SANDBOX_IMPLEMENTATION
+**PRODUCT_OWNER_DECISION** = IMPLEMENT_COMPLETE_REALISTIC_STORE_SANDBOX
 
-## Identity
+### Status
+
+IN PROGRESS on live tip `4b8dcb6d`. Deepen `/sandbox/business-preview` Store into a clickable marketplace. Preserve demo-preview access gate. Do not commercialize public `/store`. Do not deploy onto `8f39277b`. Do not wipe sandbox.
+
+### Identity
 
 - **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
 - **DEVICE_ROLE** = IMPLEMENTATION
-- **TASK_ID** = `CENTRAL_STORE_PRIVATE_DEMO_PREVIEW_CHERRYPICK_DEPLOY_V1`
-- **PRIORITY** = HIGH
-
-## Status
-
-IN PROGRESS — cherry-pick `04cb5fae` onto live sandbox `8f39277b`. Do not reset `8f39277b` backward. Preserve `/sandbox/business-preview`. Do not set `STORE_DEMO_PREVIEW=1`. Do not apply `20260929`. Do not re-apply `20260930`. Mobile `7cf3960` frozen.
-
-## Authoritative base
-
-- **PRODUCTION_SHA_BEFORE** = `8f39277bbe902dd202023379bff2fc25161d3168`
-- **LIVE_RELEASE** = `8f39277b-20260818204021`
+- **PRODUCTION_SHA_BEFORE** = `4b8dcb6ddb1d67b8e665def22440b527bc176f46`
+- **LIVE_RELEASE** = `4b8dcb6d-20260818210857`
 - **ROLLBACK_RELEASE** = `8f39277b-20260818204021`
-- **SOURCE_SHA** = `04cb5faeaceb8d8a8ad5aa7fcadeadc5c76ebbe4`
-- **TASK_BRANCH** = `central/store-private-demo-preview-on-8f39277b-v1`
-- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-private-demo-preview-on-8f39277b-v1`
+- **BASE_SANDBOX_SHA** = `8f39277bbe902dd202023379bff2fc25161d3168`
+- **LIVE_TIP** = `4b8dcb6ddb1d67b8e665def22440b527bc176f46`
+- **TASK_BRANCH** = `central/store-full-sandbox-product-v2`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-full-sandbox-product-v2`
 
-## Allowed scope
+### Allowed scope
 
-WEB STORE ONLY plus additive robots for both private surfaces. Cherry-pick private demo preview access onto current live sandbox tip. Same Hetzner path. Guest smoke. Reports.
+Private sandbox Store marketplace (P1–P18) under `/sandbox/business-preview`. Preserve `/store/demo-preview` auth/noindex. Learning sandbox intact. Tests + tsc + lint + build.
 
-## Forbidden scope
+### Forbidden scope
 
-`STORE_DEMO_PREVIEW=1` on production. SQL `20260929`. Re-apply `20260930`. Reset production / overwrite sandbox hub. Force-push. Mobile `7cf3960`. Token secrets in reports.
+- Mobile `7cf3960`
+- Commercialize production Store / public `/store`
+- Real third-party products, providers, payments, partners
+- SQL `20260929`; re-apply `20260930`
+- Weaken rights gates (UNKNOWN=DENY)
+- Public nav / sitemap / anonymous catalog
+- `STORE_DEMO_PREVIEW=1` globally on production
+- Force-push; git config --global
+- Print secrets
+- Deploy onto `8f39277b` or wipe the live sandbox hub
+
+---
+
+## Prior — CHERRY-PICK PRIVATE STORE DEMO PREVIEW ONTO LIVE 8f39277b
+
+**TASK_ID** = `CENTRAL_STORE_PRIVATE_DEMO_PREVIEW_CHERRYPICK_DEPLOY_V1`
+**STATUS** = DEPLOYED
+
+Live `4b8dcb6ddb1d67b8e665def22440b527bc176f46` (`4b8dcb6d-20260818210857`) = sandbox `8f39277b` + demo-preview access gate `04cb5fae`. Rollback of that cutover: `8f39277b-20260818204021`. `STORE_DEMO_PREVIEW` unset. Preserve this gate.
 
 ---
 
 ## Prior — Deploy private business sandbox
 
-**CENTRAL_DEPLOY_PRIVATE_BUSINESS_SANDBOX_V1** — DEPLOYED
-
-Live `8f39277bbe902dd202023379bff2fc25161d3168` (`8f39277b-20260818204021`). Rollback `a085f667-20260818193948`. Sandbox URL `https://umtuba.com/sandbox/business-preview`. `STORE_DEMO_PREVIEW` unset. `SANDBOX_BUSINESS_PREVIEW_TOKEN` unset.
+**CENTRAL_DEPLOY_PRIVATE_BUSINESS_SANDBOX_V1** — DEPLOYED then superseded as live tip by the demo-preview cherry-pick. Hub `/sandbox/business-preview` remains live.
 
 ---
 
 ## Prior — JA09 MIGRATION PREFLIGHT + CONTROLLED CUTOVER
 
-**CENTRAL_JA09_MIGRATION_PREFLIGHT_CUTOVER_V1** — IDLE / DEPLOYED
-
-Remote `20260930` applied. `20260929` not applied. SHA `a085f667` is the sandbox parent. Do not reset.
+**CENTRAL_JA09_MIGRATION_PREFLIGHT_CUTOVER_V1** — IDLE / DEPLOYED. Remote `20260930` applied. `20260929` not applied.
 
 ## Mobile freeze
 

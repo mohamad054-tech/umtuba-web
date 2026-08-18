@@ -16,11 +16,20 @@ export const SANDBOX_SECTIONS = [
   "learning/admin",
   "learning/partners",
   "store",
+  "store/catalog",
+  "store/favorites",
   "store/cart",
   "store/checkout",
   "store/orders",
+  "store/returns",
   "store/seller",
+  "store/seller/products",
+  "store/seller/analytics",
+  "store/seller/finance",
+  "store/admin",
+  "store/providers",
   "store/partners",
+  "store/economics",
   "commercial",
   "rights",
 ] as const;
@@ -38,7 +47,13 @@ export function isSandboxPath(pathname: string): boolean {
 
 export function parseSandboxSection(
   segments: string[] | undefined
-): { kind: "hub" } | { kind: "section"; section: SandboxSection } | { kind: "course"; slug: string } | { kind: "product"; slug: string } | { kind: "unknown" } {
+):
+  | { kind: "hub" }
+  | { kind: "section"; section: SandboxSection }
+  | { kind: "course"; slug: string }
+  | { kind: "product"; slug: string }
+  | { kind: "order"; id: string }
+  | { kind: "unknown" } {
   if (!segments || segments.length === 0) return { kind: "hub" };
   if (segments[0] === "enter") return { kind: "unknown" };
 
@@ -48,10 +63,17 @@ export function parseSandboxSection(
   if (segments[0] === "store" && segments[1] === "products" && segments[2] && segments.length === 3) {
     return { kind: "product", slug: segments[2] };
   }
+  if (segments[0] === "store" && segments[1] === "orders" && segments[2] && segments.length === 3) {
+    return { kind: "order", id: segments[2] };
+  }
 
   const joined = segments.join("/");
   if ((SANDBOX_SECTIONS as readonly string[]).includes(joined)) {
     return { kind: "section", section: joined as SandboxSection };
   }
   return { kind: "unknown" };
+}
+
+export function isSandboxStorePath(pathname: string): boolean {
+  return pathname === `${SANDBOX_PATH}/store` || pathname.startsWith(`${SANDBOX_PATH}/store/`);
 }

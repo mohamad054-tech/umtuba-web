@@ -1,11 +1,11 @@
-# CURSOR_REPORT — Cherry-pick private Store demo preview onto 8f39277b
+# CURSOR_REPORT — Store full sandbox product V2
 
 ```text
 SOURCE_DEVICE = CENTRAL / SERVER
 DEVICE_ROLE = IMPLEMENTATION
-TASK_ID = CENTRAL_STORE_PRIVATE_DEMO_PREVIEW_CHERRYPICK_DEPLOY_V1
-REPORT_TYPE = CHERRYPICK
-TIMESTAMP_LOCAL = 2026-08-18 ~21:05 +03
+TASK_ID = CENTRAL_STORE_FULL_SANDBOX_PRODUCT_V2
+REPORT_TYPE = IMPLEMENTATION
+TIMESTAMP_LOCAL = 2026-08-18 ~21:40 +03
 SECRET_VALUES_PRINTED = NO
 FORCE_PUSH = NO
 PUSH = NO
@@ -17,66 +17,65 @@ MOBILE_SOURCE_CHANGED = NO
 MOBILE_RELEASE_TRAIN_DISTURBED = NO
 STORE_DEMO_PREVIEW_SET = NO
 SANDBOX_HUB_PRESERVED = YES
-DEPLOY_ONTO_A085F667 = NO
+DEMO_PREVIEW_GATE_PRESERVED = YES
+DEPLOY_ONTO_8F39277B = NO
 ```
 
 ## Summary
 
-Did not deploy onto `a085f667`. Cherry-picked `04cb5fae` onto live sandbox `8f39277b`. Sandbox hub files kept. Indexing disallows both `/sandbox` and `/store/demo-preview`. Anonymous `/store/demo-preview` remains DENY. Public `/store` stays demo-free.
+Private `/sandbox/business-preview` Store is now a clickable marketplace on live tip `4b8dcb6d` (sandbox hub + demo-preview access gate). Shopper home, catalog search/filter/sort, PDP, favorites, cart, checkout, mock payment, orders, returns, seller, admin, providers, partners, and synthetic economics all work in-session. Learning sandbox is unchanged. Public `/store` is not commercialized. Prospective partners stay PROSPECTIVE. UNKNOWN rights remain DENY. Deploy skipped so this wave does not race the `4b8dcb6d-20260818210857` cutover.
 
 ## Exact files changed
 
-- `lib/store/demoPreviewGate.ts`
-- `lib/store/demoPreviewGate.test.ts`
-- `lib/store/demoPreviewAccess.ts`
-- `lib/store/demoPreviewSession.ts` (new)
-- `app/store/demo-preview/enter/route.ts` (new)
-- `app/store/demo-preview/page.tsx`
-- `app/store/demo-preview/[slug]/page.tsx`
-- `lib/site/indexing.ts` (additive: keep `/sandbox` and add `/store/demo-preview`)
-- `lib/site/metadata.test.ts` (same)
-- `lib/store/demo/catalog.test.ts`
-- `app/lib/nav/secondarySurfaceContract.test.ts`
-- `docs/store/DEMO_CATALOG_PREVIEW.md`
+- `lib/sandbox/fixtures/types.ts`
+- `lib/sandbox/fixtures/store.ts`
+- `lib/sandbox/fixtures/commerce.ts`
+- `lib/sandbox/fixtures/catalog.test.ts`
+- `lib/sandbox/paths.ts`
+- `lib/sandbox/containment.test.ts`
+- `lib/sandbox/store/*` (listings, query, payment, session, messages, titles, art, tests)
+- `app/components/sandbox/SandboxView.tsx`
+- `app/components/sandbox/sandbox.css`
+- `app/components/sandbox/store/*` (shopper shell + browse + checkout + ops)
+- `app/sandbox/business-preview/layout.tsx` (title without `| UMTUBA`)
+- `app/sandbox/business-preview/[...section]/page.tsx` (metadata + catalog query)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-Sandbox hub under `app/sandbox/**`, `app/components/sandbox/**`, `lib/sandbox/**` not rewritten.
-
 ## Migrations created
 
-None. SQL `20260929` not applied. `20260930` not re-applied.
+None.
 
 ## Security review
 
-- Anonymous `/store/demo-preview` = DENY.
-- Admin path re-checks `is_platform_admin` (DB).
-- Token path requires `STORE_DEMO_PREVIEW_TOKEN` length ≥ 16; SHA-256 + `timingSafeEqual`. Cookie is httpOnly, SameSite=strict, path-scoped hash.
-- `STORE_DEMO_PREVIEW=1` and non-production NODE_ENV are not grants.
-- Pages noindex; robots disallows `/store/demo-preview` and `/sandbox`.
-- Sandbox hub access policy unchanged.
-- Secret values never committed or printed.
+- Hub and `/store/demo-preview` stay auth/token gated, noindex, off public nav.
+- UNKNOWN rights still DENY.
+- Mock payment: `REAL_PROVIDER_CALL=NO`, no card fields, no real charge.
+- Prospective partners cannot become ACTIVE.
+- 26 DEMO products remain SOURCE_TYPE=DEMO, RIGHTS_STATUS=DEMO_ONLY, REAL_PROVIDER=NONE.
 
 ## Tests
 
-PASS — 8 files / 49 tests (demo preview gate, catalog, metadata, nav, sandbox fixtures/access/containment).
+Sandbox + demo-preview suites: PASS (56). Full `vitest run`: 4240 passed, 4 failed in unrelated pre-existing files on this tip (translationStudio memory contract, liveTrustHonesty, media processing foundation). Not caused by this Store work.
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS
+`npx tsc --noEmit` PASS.
 
 ## Build
 
-PENDING host/local build after cherry-pick commit.
+In progress / see closeout. Junction `node_modules` blocked Turbopack once; rebuilt with a real install.
 
 ## git diff --check
 
-PENDING after add.
+See closeout.
 
 ## git status --short
 
-Cherry-pick resolving on `central/store-private-demo-preview-on-8f39277b-v1`.
+See closeout.
 
 ## Open issues
 
-Deploy only this combined tip. Never reset `8f39277b` backward.
+- Live authenticated click-through BLOCKED (no platform_admins session in this agent).
+- PRIVATE_SANDBOX_DEPLOYED=NO to avoid racing live `4b8dcb6d`.
+- Pre-existing full-suite failures on the tip, outside Store sandbox.

@@ -3,11 +3,6 @@ import type { ReactNode } from "react";
 import type { AppLocale } from "../../../lib/i18n";
 import { SANDBOX_COMMERCIAL_MODEL } from "../../../lib/sandbox/fixtures/commercial";
 import {
-  MOCK_PAYMENT_ADAPTER,
-  SANDBOX_ORDERS,
-  SANDBOX_PAYMENT_FLOWS,
-} from "../../../lib/sandbox/fixtures/commerce";
-import {
   courseLessonCount,
   getSandboxCourse,
   SANDBOX_COURSES,
@@ -20,10 +15,6 @@ import {
 import { SANDBOX_INSTRUCTORS, SANDBOX_STUDENTS } from "../../../lib/sandbox/fixtures/people";
 import { FOCUS_STUDENT_ID, progressForStudent, SANDBOX_STUDENT_PROGRESS } from "../../../lib/sandbox/fixtures/progress";
 import {
-  getSandboxListing,
-  SANDBOX_CART_LINES,
-  SANDBOX_DISCOUNT_EXAMPLES,
-  SANDBOX_SHIPPING_EXAMPLES,
   SANDBOX_STORE_ACTORS,
   SANDBOX_STORE_LISTINGS,
 } from "../../../lib/sandbox/fixtures/store";
@@ -36,10 +27,9 @@ import {
 } from "../../../lib/sandbox/fixtures/types";
 import { sandboxT } from "../../../lib/sandbox/i18n";
 import { parseSandboxSection, sandboxHref } from "../../../lib/sandbox/paths";
-import { formatMinorUnits } from "../../../lib/store/money";
-import SandboxCheckout from "./SandboxCheckout";
 import SandboxDenied from "./SandboxDenied";
 import SandboxShell from "./SandboxShell";
+import StoreExperience from "./store/StoreExperience";
 
 function Card({
   title,
@@ -268,139 +258,6 @@ function LearningAdmin() {
   );
 }
 
-function StoreHome({ locale }: { locale: AppLocale }) {
-  return (
-    <>
-      <h2 className="text-xl font-semibold">{sandboxT(locale, "store")}</h2>
-      <p className="mt-2 text-sm text-[var(--sx-muted)]">
-        26 reused DEMO products. NOT REAL INVENTORY. NON-PURCHASABLE IN PRODUCTION.
-      </p>
-      <div className="sx-grid sx-grid-3 mt-4">
-        {SANDBOX_STORE_LISTINGS.map((listing) => (
-          <Card
-            key={listing.product.id}
-            title={listing.product.title}
-            href={sandboxHref(`store/products/${listing.product.slug}`)}
-            action={sandboxT(locale, "openProduct")}
-          >
-            <span className="sx-badge">DEMO</span> · {listing.commerceMode} ·{" "}
-            {formatMinorUnits(listing.product.variants[0]?.priceMinor ?? 0, "USD")}
-          </Card>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function ProductDetail({ slug }: { slug: string }) {
-  const listing = getSandboxListing(slug);
-  if (!listing) return <p>Unknown sandbox product.</p>;
-  const product = listing.product;
-  return (
-    <article className="sx-card">
-      <span className="sx-badge">DEMO</span>
-      <h2 className="mt-3 text-2xl font-semibold">{product.title}</h2>
-      <p className="mt-2 text-sm text-[var(--sx-muted)]">{product.description}</p>
-      <p className="mt-3 text-sm">
-        {formatMinorUnits(product.variants[0]?.priceMinor ?? 0, "USD")} · mode=
-        {listing.commerceMode} · actor={listing.actorId}
-      </p>
-      <ul className="mt-3 text-sm">
-        {product.variants.map((variant) => (
-          <li key={variant.id}>
-            {variant.title} · {formatMinorUnits(variant.priceMinor, variant.currency)} · onHand=
-            {variant.onHand} (synthetic)
-          </li>
-        ))}
-      </ul>
-      <p className="mt-4 text-xs">PURCHASABLE=NO · PRODUCTION_SELLABLE=NO · REAL_PROVIDER=NONE</p>
-    </article>
-  );
-}
-
-function Cart() {
-  const subtotal = SANDBOX_CART_LINES.reduce(
-    (sum, line) => sum + line.unitMinor * line.quantity,
-    0
-  );
-  return (
-    <>
-      <h2 className="text-xl font-semibold">Sandbox cart</h2>
-      <div className="sx-grid mt-4">
-        {SANDBOX_CART_LINES.map((line) => (
-          <Card key={line.productSlug} title={line.title}>
-            {line.quantity} × {formatMinorUnits(line.unitMinor, line.currency)} · {line.variantTitle}{" "}
-            · {line.commerceMode}
-          </Card>
-        ))}
-      </div>
-      <p className="mt-4 text-sm">
-        Subtotal {formatMinorUnits(subtotal, "USD")} · discount example{" "}
-        {SANDBOX_DISCOUNT_EXAMPLES[0]?.label} · shipping {SANDBOX_SHIPPING_EXAMPLES[0]?.label}
-      </p>
-    </>
-  );
-}
-
-function Checkout({ locale }: { locale: AppLocale }) {
-  return (
-    <>
-      <h2 className="text-xl font-semibold">{sandboxT(locale, "storeCheckout")}</h2>
-      <Cart />
-      <SandboxCheckout
-        successLabel={sandboxT(locale, "simulateSuccess")}
-        failureLabel={sandboxT(locale, "simulateFailure")}
-        refundLabel={sandboxT(locale, "simulateRefund")}
-        blockedLabel={sandboxT(locale, "checkoutBlocked")}
-      />
-    </>
-  );
-}
-
-function Orders() {
-  return (
-    <>
-      <h2 className="text-xl font-semibold">Sandbox orders</h2>
-      <div className="sx-grid mt-4">
-        {SANDBOX_ORDERS.map((order) => (
-          <Card key={order.id} title={order.id}>
-            {order.productTitle} · {formatMinorUnits(order.amountMinor, order.currency)} ·{" "}
-            {order.status} · {order.paymentOutcome} · {order.customerName}
-          </Card>
-        ))}
-      </div>
-      <ul className="mt-4 text-sm text-[var(--sx-muted)]">
-        {SANDBOX_PAYMENT_FLOWS.map((flow) => (
-          <li key={flow.id}>
-            {flow.label} → {flow.orderId}
-          </li>
-        ))}
-      </ul>
-      <p className="mt-3 text-xs">
-        Adapter {MOCK_PAYMENT_ADAPTER.id}. REAL_PAYMENTS=0.
-      </p>
-    </>
-  );
-}
-
-function Seller() {
-  return (
-    <>
-      <h2 className="text-xl font-semibold">Seller dashboard</h2>
-      <p className="mt-2 text-sm text-[var(--sx-muted)]">No actual payout. SANDBOX only.</p>
-      <div className="sx-grid mt-4">
-        {SANDBOX_STORE_ACTORS.map((actor) => (
-          <Card key={actor.id} title={actor.displayName}>
-            {actor.kind} · listings{" "}
-            {SANDBOX_STORE_LISTINGS.filter((listing) => listing.actorId === actor.id).length} ·
-            payout=OFF
-          </Card>
-        ))}
-      </div>
-    </>
-  );
-}
-
 function Commercial() {
   return (
     <>
@@ -463,21 +320,33 @@ export default function SandboxView({
   pathname,
   allowed,
   segments,
+  catalogQuery,
 }: {
   locale: AppLocale;
   pathname: string;
   allowed: boolean;
   segments?: string[];
+  catalogQuery?: { q?: string; category?: string; sort?: string };
 }) {
   if (!allowed) {
     return <SandboxDenied locale={locale} />;
   }
 
   const parsed = parseSandboxSection(segments);
+  if (parsed.kind === "product" || parsed.kind === "order") {
+    return (
+      <StoreExperience locale={locale} pathname={pathname} route={parsed} catalogQuery={catalogQuery} />
+    );
+  }
+  if (parsed.kind === "section" && parsed.section.startsWith("store")) {
+    return (
+      <StoreExperience locale={locale} pathname={pathname} route={parsed} catalogQuery={catalogQuery} />
+    );
+  }
+
   let body: ReactNode;
   if (parsed.kind === "hub") body = <Hub locale={locale} />;
   else if (parsed.kind === "course") body = <CourseDetail locale={locale} slug={parsed.slug} />;
-  else if (parsed.kind === "product") body = <ProductDetail slug={parsed.slug} />;
   else if (parsed.kind === "section") {
     switch (parsed.section) {
       case "learning":
@@ -498,33 +367,6 @@ export default function SandboxView({
             <h2 className="text-xl font-semibold">{sandboxT(locale, "learningPartners")}</h2>
             <div className="mt-4 space-y-3">
               {PROSPECTIVE_LEARNING_PARTNERS.map((partner) => (
-                <RightsTable key={partner.id} partner={partner} />
-              ))}
-            </div>
-          </>
-        );
-        break;
-      case "store":
-        body = <StoreHome locale={locale} />;
-        break;
-      case "store/cart":
-        body = <Cart />;
-        break;
-      case "store/checkout":
-        body = <Checkout locale={locale} />;
-        break;
-      case "store/orders":
-        body = <Orders />;
-        break;
-      case "store/seller":
-        body = <Seller />;
-        break;
-      case "store/partners":
-        body = (
-          <>
-            <h2 className="text-xl font-semibold">{sandboxT(locale, "storePartners")}</h2>
-            <div className="mt-4 space-y-3">
-              {PROSPECTIVE_COMMERCE_PARTNERS.map((partner) => (
                 <RightsTable key={partner.id} partner={partner} />
               ))}
             </div>
