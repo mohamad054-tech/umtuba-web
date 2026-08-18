@@ -40,6 +40,7 @@ export const APP_ROUTES = {
   storeOrders: "/store/orders",
   storeWishlist: "/store/wishlist",
   storeDemoPreview: "/store/demo-preview",
+  sandboxBusinessPreview: "/sandbox/business-preview",
   seller: "/seller",
   sellerApply: "/seller/apply",
   sellerSetup: "/seller/setup",

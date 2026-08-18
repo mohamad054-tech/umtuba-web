@@ -78,6 +78,7 @@ export const FORBIDDEN_OFFICIAL_CHROME_PATHS = [
   "/ai",
   "/uconnect",
   "/ideas",
+  "/sandbox",
 ] as const;
 
 /** Living Navigation feature ids — prototype overlay only. */

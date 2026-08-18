@@ -117,7 +117,8 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/feed") ||
           path.startsWith("/journey-pro") ||
           path.startsWith("/city") ||
-          path.startsWith("/live/media-lab")
+          path.startsWith("/live/media-lab") ||
+          path.startsWith("/sandbox")
       ).toBe(true);
     }
   });
