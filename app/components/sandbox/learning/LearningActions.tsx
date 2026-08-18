@@ -8,7 +8,8 @@ import {
   type CatalogKindFilter,
   type CatalogPriceFilter,
 } from "../../../../lib/sandbox/learning/catalog";
-import type { PaymentOutcome, QuizQuestion } from "../../../../lib/sandbox/fixtures/types";
+import type { QuizQuestion } from "../../../../lib/sandbox/fixtures/types";
+import type { LearningPaymentOutcome } from "../../../../lib/sandbox/learning/payments";
 import { LEARNING_SANDBOX_STATE_COOKIE } from "../../../../lib/sandbox/learning/routes";
 import {
   EMPTY_LEARNING_SANDBOX_STATE,
@@ -273,7 +274,7 @@ export function MockPayButtons({
 }) {
   const { state, dispatch, ready } = useLearningSandboxState();
   const payment = state.payments[`${studentId}::${courseSlug}`];
-  function run(outcome: PaymentOutcome) {
+  function run(outcome: LearningPaymentOutcome) {
     dispatch({ type: "pay", studentId, courseSlug, outcome });
   }
   return (

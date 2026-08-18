@@ -1,6 +1,5 @@
 import { getSandboxCourse } from "../fixtures/courses";
 import { FOCUS_STUDENT_ID } from "../fixtures/progress";
-import type { PaymentOutcome } from "../fixtures/types";
 import { findExercise, findLesson, flattenLessons, isPaidCourse, progressKey } from "./catalog";
 import { certificateDecision } from "./certificates";
 import { explainEnrollment } from "./enrollment";
@@ -9,7 +8,11 @@ import {
   createInstructorDraft,
   type InstructorDraft,
 } from "./instructor";
-import { applyLearningPayment, type LearningPaymentRecord } from "./payments";
+import {
+  applyLearningPayment,
+  type LearningPaymentOutcome,
+  type LearningPaymentRecord,
+} from "./payments";
 
 export type QuizResult = {
   studentId: string;
@@ -91,7 +94,7 @@ export type LearningSandboxAction =
       courseSlug: string;
       answers: Record<string, string>;
     }
-  | { type: "pay"; studentId: string; courseSlug: string; outcome: PaymentOutcome }
+  | { type: "pay"; studentId: string; courseSlug: string; outcome: LearningPaymentOutcome }
   | { type: "createDraft"; instructorId: string; title: string }
   | { type: "advanceDraft"; draftId: string };
 

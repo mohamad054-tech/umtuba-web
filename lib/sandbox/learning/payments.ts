@@ -1,7 +1,9 @@
 import { MOCK_PAYMENT_ADAPTER, simulateSandboxPayment } from "../fixtures/commerce";
-import type { PaymentOutcome } from "../fixtures/types";
 import type { SandboxCourse } from "../fixtures/types";
 import { isPaidCourse } from "./catalog";
+
+export const LEARNING_PAYMENT_OUTCOMES = ["SUCCESS", "FAILURE", "REFUND", "PENDING"] as const;
+export type LearningPaymentOutcome = (typeof LEARNING_PAYMENT_OUTCOMES)[number];
 
 export type LearningPaymentRecord = {
   id: string;
@@ -9,7 +11,7 @@ export type LearningPaymentRecord = {
   studentId: string;
   amountMinor: number;
   currency: "USD";
-  outcome: PaymentOutcome;
+  outcome: LearningPaymentOutcome;
   status: "CREATED" | "AUTHORIZED" | "CAPTURED" | "FAILED" | "REFUNDED";
   paymentMode: "SANDBOX";
   realPayment: false;
@@ -52,9 +54,9 @@ export function canMockPay(course: SandboxCourse): boolean {
 export function applyLearningPayment(
   course: SandboxCourse,
   studentId: string,
-  outcome: PaymentOutcome
+  outcome: LearningPaymentOutcome
 ): LearningPaymentRecord {
-  const simulated = simulateSandboxPayment(outcome);
+  simulateSandboxPayment(outcome);
   const status =
     outcome === "SUCCESS"
       ? "CAPTURED"
@@ -69,7 +71,7 @@ export function applyLearningPayment(
     studentId,
     amountMinor: course.listPriceMinor ?? 0,
     currency: "USD",
-    outcome: simulated.outcome,
+    outcome,
     status,
     paymentMode: "SANDBOX",
     realPayment: false,

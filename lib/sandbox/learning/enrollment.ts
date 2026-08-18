@@ -1,6 +1,7 @@
 import { getSandboxCourse } from "../fixtures/courses";
 import type { SandboxCourse } from "../fixtures/types";
 import { isPaidCourse } from "./catalog";
+import type { LearningPaymentOutcome } from "./payments";
 
 export const ENROLLMENT_MODES = [
   "HOSTED",
@@ -26,7 +27,7 @@ export type EnrollmentExplain = {
 
 export function explainEnrollment(
   course: SandboxCourse,
-  opts: { enrolled?: boolean; paymentOutcome?: "SUCCESS" | "FAILURE" | "REFUND" | "PENDING" | null }
+  opts: { enrolled?: boolean; paymentOutcome?: LearningPaymentOutcome | null }
 ): EnrollmentExplain {
   if (course.enrollmentMode === "EXTERNAL_CONTINUE") {
     return {
