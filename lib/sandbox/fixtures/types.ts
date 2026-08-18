@@ -99,6 +99,7 @@ export type SandboxCourse = {
   certificateOwner: string;
   aiTutorAllowed: boolean;
   enrollmentMode: "HOSTED" | "EXTERNAL_CONTINUE" | "SANDBOX_ENROLL";
+  listPriceMinor: number | null;
   revenueSharePercent: number | null;
   modules: SandboxModule[];
   exercises: { id: string; title: string; prompt: string }[];

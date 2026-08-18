@@ -164,6 +164,7 @@ export const SANDBOX_PARTNER_COURSES: readonly SandboxCourse[] = PARTNER_SEEDS.m
     certificateOwner: seed.providerId,
     aiTutorAllowed: false,
     enrollmentMode: "SANDBOX_ENROLL" as const,
+    listPriceMinor: 4900,
     revenueSharePercent: 20,
     modules: fourModules(seed.slug, seed.theme),
     exercises: [
@@ -194,6 +195,7 @@ export const SANDBOX_EXTERNAL_COURSES: readonly SandboxCourse[] = EXTERNAL_SEEDS
     certificateOwner: seed.providerId,
     aiTutorAllowed: false,
     enrollmentMode: "EXTERNAL_CONTINUE" as const,
+    listPriceMinor: null,
     revenueSharePercent: null,
     modules: [],
     exercises: [],

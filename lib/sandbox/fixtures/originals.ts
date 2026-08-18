@@ -27,6 +27,7 @@ const ORIGINAL_BASE = {
   publicCatalog: false as const,
   synthetic: true as const,
   enrollmentMode: "HOSTED" as const,
+  listPriceMinor: 0,
   revenueSharePercent: null,
   contentOwner: "UMTUBA",
   certificateOwner: "UMTUBA",

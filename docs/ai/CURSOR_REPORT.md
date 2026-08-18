@@ -1,11 +1,11 @@
-# CURSOR_REPORT — Cherry-pick private Store demo preview onto 8f39277b
+# CURSOR_REPORT — Learning executable business sandbox V2
 
 ```text
 SOURCE_DEVICE = CENTRAL / SERVER
 DEVICE_ROLE = IMPLEMENTATION
-TASK_ID = CENTRAL_STORE_PRIVATE_DEMO_PREVIEW_CHERRYPICK_DEPLOY_V1
-REPORT_TYPE = CHERRYPICK
-TIMESTAMP_LOCAL = 2026-08-18 ~21:05 +03
+TASK_ID = CENTRAL_LEARNING_EXECUTABLE_SANDBOX_V2
+REPORT_TYPE = IMPLEMENTATION
+TIMESTAMP_LOCAL = 2026-08-18 ~21:50 +03
 SECRET_VALUES_PRINTED = NO
 FORCE_PUSH = NO
 PUSH = NO
@@ -17,49 +17,42 @@ MOBILE_SOURCE_CHANGED = NO
 MOBILE_RELEASE_TRAIN_DISTURBED = NO
 STORE_DEMO_PREVIEW_SET = NO
 SANDBOX_HUB_PRESERVED = YES
-DEPLOY_ONTO_A085F667 = NO
+PRODUCTION_LEARNING_DISTURBED = NO
+PRIVATE_SANDBOX_DEPLOYED = NO
 ```
 
 ## Summary
 
-Did not deploy onto `a085f667`. Cherry-picked `04cb5fae` onto live sandbox `8f39277b`. Sandbox hub files kept. Indexing disallows both `/sandbox` and `/store/demo-preview`. Anonymous `/store/demo-preview` remains DENY. Public `/store` stays demo-free.
+Executable Learning slices were added under the private `/sandbox/business-preview` hub, branched from live `4b8dcb6d`. Production `/learning` was not rebuilt. Store demo-preview access and Store hub files were left for the in-flight Store V2 wave. Synthetic student/instructor/course state stays in sandbox-scoped local fixtures. Deploy was skipped so this wave does not race or wipe Store V2 or live `4b8dcb6d`.
 
 ## Exact files changed
 
-- `lib/store/demoPreviewGate.ts`
-- `lib/store/demoPreviewGate.test.ts`
-- `lib/store/demoPreviewAccess.ts`
-- `lib/store/demoPreviewSession.ts` (new)
-- `app/store/demo-preview/enter/route.ts` (new)
-- `app/store/demo-preview/page.tsx`
-- `app/store/demo-preview/[slug]/page.tsx`
-- `lib/site/indexing.ts` (additive: keep `/sandbox` and add `/store/demo-preview`)
-- `lib/site/metadata.test.ts` (same)
-- `lib/store/demo/catalog.test.ts`
-- `app/lib/nav/secondarySurfaceContract.test.ts`
-- `docs/store/DEMO_CATALOG_PREVIEW.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-
-Sandbox hub under `app/sandbox/**`, `app/components/sandbox/**`, `lib/sandbox/**` not rewritten.
+- `lib/sandbox/learning/**` — routes, catalog/search, enrollment WHY/WHAT NEXT, progress, tutor rights, certificates, mock payments, admin (prospective cannot activate), instructor lifecycle, click path, judgments, tests
+- `app/components/sandbox/learning/**` — executable Learning UI + local-state adapters
+- `app/components/sandbox/SandboxView.tsx` — Learning cases delegate to LearningSandbox; Store cases untouched
+- `app/components/sandbox/SandboxShell.tsx` — additive Learning nav links only
+- `app/components/sandbox/sandbox.css` — Learning controls + existing breakpoints
+- `lib/sandbox/paths.ts` — parse Learning deep routes so the catch-all does not 404
+- `lib/sandbox/i18n.ts` — Arabic+English Learning chrome
+- `lib/sandbox/fixtures/types.ts`, `courses.ts`, `originals.ts` — `listPriceMinor` for paid partner previews
+- `docs/ai/CURRENT_TASK.md`, `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None. SQL `20260929` not applied. `20260930` not re-applied.
+None.
 
 ## Security review
 
-- Anonymous `/store/demo-preview` = DENY.
-- Admin path re-checks `is_platform_admin` (DB).
-- Token path requires `STORE_DEMO_PREVIEW_TOKEN` length ≥ 16; SHA-256 + `timingSafeEqual`. Cookie is httpOnly, SameSite=strict, path-scoped hash.
-- `STORE_DEMO_PREVIEW=1` and non-production NODE_ENV are not grants.
-- Pages noindex; robots disallows `/store/demo-preview` and `/sandbox`.
-- Sandbox hub access policy unchanged.
-- Secret values never committed or printed.
+- Hub access policy unchanged (admin or configured token; anonymous denied; `STORE_DEMO_PREVIEW=1` is not a grant).
+- Layout remains noindex. Public nav/sitemap still omit `/sandbox`.
+- AI Tutor is local-only on UMTUBA Originals. Partner/external/UNKNOWN = DENY. Prospective content is not sent to external AI.
+- Certificates never issue Coursera/Udemy/edX credentials. External courses issue none.
+- Mock learning payment collects no card. `REAL_CHARGE_POSSIBLE=NO`.
+- Prospective admin ACTIVATE always fails. No production enrollment/progress/payment writes.
 
 ## Tests
 
-PASS — 8 files / 49 tests (demo preview gate, catalog, metadata, nav, sandbox fixtures/access/containment).
+PASS — 6 files / 45 tests (`lib/sandbox` including Learning executable, i18n, fixtures, containment, access).
 
 ## TypeScript
 
@@ -67,16 +60,18 @@ PASS — 8 files / 49 tests (demo preview gate, catalog, metadata, nav, sandbox 
 
 ## Build
 
-PENDING host/local build after cherry-pick commit.
+PASS. Routes include `/sandbox/business-preview`, `[...section]`, `enter`. `/learning` unchanged.
 
 ## git diff --check
 
-PENDING after add.
+PASS
 
 ## git status --short
 
-Cherry-pick resolving on `central/store-private-demo-preview-on-8f39277b-v1`.
+See worktree after commit. Branch `central/learning-executable-sandbox-v2`.
 
 ## Open issues
 
-Deploy only this combined tip. Never reset `8f39277b` backward.
+- Authorized browser walkthrough BLOCKED (no `platform_admins` session on this host).
+- `PRIVATE_SANDBOX_DEPLOYED=NO` until Store V2 is not racing a Hetzner cutover.
+- PC2 review of executable Learning slices is still required.
