@@ -64,18 +64,18 @@ Sandbox + demo-preview suites: PASS (56). Full `vitest run`: 4240 passed, 4 fail
 
 ## Build
 
-In progress / see closeout. Junction `node_modules` blocked Turbopack once; rebuilt with a real install.
+`npm run build` PASS.
 
 ## git diff --check
 
-See closeout.
+PASS (no whitespace errors).
 
 ## git status --short
 
-See closeout.
+Clean after commit `97b2f843` on `central/store-full-sandbox-product-v2`.
 
 ## Open issues
 
-- Live authenticated click-through BLOCKED (no platform_admins session in this agent).
-- PRIVATE_SANDBOX_DEPLOYED=NO to avoid racing live `4b8dcb6d`.
+- Live authenticated click-through BLOCKED (browser MCP had no tab; no platform_admins session; new marketplace not deployed).
+- PRIVATE_SANDBOX_DEPLOYED=NO to avoid racing live `4b8dcb6d-20260818210857`.
 - Pre-existing full-suite failures on the tip, outside Store sandbox.

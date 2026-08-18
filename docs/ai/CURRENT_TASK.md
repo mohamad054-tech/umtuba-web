@@ -11,7 +11,7 @@
 
 ### Status
 
-IN PROGRESS on live tip `4b8dcb6d`. Deepen `/sandbox/business-preview` Store into a clickable marketplace. Preserve demo-preview access gate. Do not commercialize public `/store`. Do not deploy onto `8f39277b`. Do not wipe sandbox.
+IMPLEMENTED_TESTED_NOT_DEPLOYED on live tip `4b8dcb6d`. Commit `97b2f843`. Private Store marketplace is clickable in-session. Demo-preview access gate preserved. Public `/store` not commercialized. Deploy skipped so this wave does not race `4b8dcb6d-20260818210857`.
 
 ### Identity
 
