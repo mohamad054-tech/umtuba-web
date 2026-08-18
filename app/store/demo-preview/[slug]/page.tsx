@@ -9,6 +9,7 @@ import {
   describeDemoPdp,
 } from "../../../../lib/store/demo/surface";
 import { formatMinorUnits } from "../../../../lib/store/money";
+import { demoPreviewTokenQuery } from "../../../../lib/store/demoPreviewGate";
 import { resolveDemoPreviewAccess } from "../../../../lib/store/demoPreviewAccess";
 import { APP_ROUTES } from "../../../lib/nav";
 
@@ -48,9 +49,8 @@ export default async function StoreDemoProductPreviewPage({
   const pdp = describeDemoPdp(slug);
   if (!pdp) notFound();
   const checkout = demoCheckoutSandbox();
-  const tokenQs = query.demo_token
-    ? `?demo_token=${encodeURIComponent(query.demo_token)}`
-    : "";
+  const tokenQuery = demoPreviewTokenQuery(access, query.demo_token);
+  const tokenQs = tokenQuery ? `?${tokenQuery}` : "";
 
   return (
     <StoreShell title={pdp.product.title} subtitle={t("store.demo.subtitle")}>

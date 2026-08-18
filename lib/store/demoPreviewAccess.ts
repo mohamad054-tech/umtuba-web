@@ -4,12 +4,13 @@ import { createClient, getServerUser } from "../supabase/server";
 import { requireStoreAdminDb } from "./adminAuth";
 import {
   evaluateStoreDemoPreviewAccess,
-  type DemoPreviewAccessInput,
+  type DemoPreviewAccessResult,
 } from "./demoPreviewGate";
+import { readDemoPreviewSessionCookie } from "./demoPreviewSession";
 
 export async function resolveDemoPreviewAccess(
   token?: string | null
-): Promise<ReturnType<typeof evaluateStoreDemoPreviewAccess>> {
+): Promise<DemoPreviewAccessResult> {
   let isPlatformAdmin = false;
   try {
     const user = await getServerUser();
@@ -20,6 +21,10 @@ export async function resolveDemoPreviewAccess(
   } catch {
     isPlatformAdmin = false;
   }
-  const input: DemoPreviewAccessInput = { token, isPlatformAdmin };
-  return evaluateStoreDemoPreviewAccess(input);
+  const cookieToken = await readDemoPreviewSessionCookie();
+  return evaluateStoreDemoPreviewAccess({
+    token,
+    cookieToken,
+    isPlatformAdmin,
+  });
 }

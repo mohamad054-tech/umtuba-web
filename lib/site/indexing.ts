@@ -7,7 +7,7 @@
  * Noindex (auth, account, private, gated labs):
  * - login, signup, register, password reset, auth callbacks
  * - settings, messages, notifications, create, saved, rewards, creator
- * - feed, journey-pro, city, live/media-lab, sandbox
+ * - feed, journey-pro, city, live/media-lab, sandbox, store/demo-preview
  *
  * Dynamic live rooms (/live/[roomId]) are allowlisted for crawling when linked
  * but are not enumerated in the sitemap.
@@ -33,6 +33,7 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/city",
   "/live/media-lab",
   "/sandbox",
+  "/store/demo-preview",
 ] as const;
 
 /**

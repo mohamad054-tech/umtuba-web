@@ -11,8 +11,7 @@ import {
 
 describe("Store DEMO catalog (fixture, not live inventory)", () => {
   it("ships 20–30 isolated demo products and never marks them purchasable", () => {
-    expect(UMTUBA_DEMO_PRODUCTS.length).toBeGreaterThanOrEqual(20);
-    expect(UMTUBA_DEMO_PRODUCTS.length).toBeLessThanOrEqual(30);
+    expect(UMTUBA_DEMO_PRODUCTS.length).toBe(26);
     const categories = new Set(UMTUBA_DEMO_PRODUCTS.map((product) => product.category));
     for (const slug of DEMO_CATEGORY_SLUGS) {
       expect(categories.has(slug)).toBe(true);
