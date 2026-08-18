@@ -23,6 +23,8 @@ describe("Store DEMO catalog", () => {
       expect(product.variants.length).toBeGreaterThanOrEqual(1);
       expect(product.title).toMatch(/UMTUBA (Demo|Concept)/);
       expect(product.purchasable).toBe(false);
+      expect(product.productionSellable).toBe(false);
+      expect(product.imagePolicy).toBe("UMTUBA_NEUTRAL_PLACEHOLDER");
     }
   });
 
@@ -53,6 +55,7 @@ describe("Store DEMO catalog", () => {
     expect(cart.ok).toBe(true);
     expect(demoCheckoutSandbox().allowed).toBe(false);
     expect(demoCheckoutSandbox().liveCheckoutInvented).toBe(false);
+    expect(ready.responsiveNotes.grid).toMatch(/1-col/);
   });
 });
 

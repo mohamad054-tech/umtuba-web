@@ -1,27 +1,43 @@
 import type { UmtubaOriginalPilotCourse } from "./types";
-import { UMTUBA_CERTIFICATE_STATEMENT, UMTUBA_PILOT_AUTHOR } from "./types";
+import {
+  PILOT_PASS_THRESHOLD_PERCENT,
+  PILOT_PROGRESS_RULES,
+  UMTUBA_CERTIFICATE_STATEMENT,
+  UMTUBA_PILOT_AUTHOR,
+} from "./types";
 
 export const AI_FUNDAMENTALS_FOR_EVERYONE: UmtubaOriginalPilotCourse = {
   id: "c1e33333-3333-4333-8333-333333333333",
   slug: "ai-fundamentals-for-everyone",
   title: "AI Fundamentals for Everyone",
   shortDescription:
-    "What general-purpose AI can and cannot do, how to prompt without leaking secrets, and how UMTUBA’s AI Tutor is allowed to use first-party course text.",
+    "What AI and machine learning are, how generative language models work in practice, and how to use UMTUBA AI Tutor only on owned originals.",
+  fullDescription:
+    "This UMTUBA Original explains AI in everyday language: what it is, a basic machine-learning picture, generative AI and language models, prompts, strengths and limits, hallucinations, verification, privacy, responsible use, everyday applications, and AI at work and in learning. It names no live AI vendor as an UMTUBA partner and makes no unsupported claims about a specific provider’s scores or safety. UMTUBA AI Tutor may use this owned text after an explicit publish. Partner content stays AI_USAGE_ALLOWED=false.",
   targetAudience: "Non-technical UMTUBA members who will meet AI Tutor on owned originals.",
   level: "beginner",
   language: "en",
   category: "ai-literacy",
-  learningObjectives: [
-    "Describe AI as a pattern-predicting tool, not a source of guaranteed facts.",
-    "Spot hallucinations and verify claims against the lesson you were assigned.",
-    "Write prompts that stay inside the course context and omit secrets.",
-    "Explain why AI_USAGE_ALLOWED defaults to false on partner and external content.",
-    "Use UMTUBA AI Tutor only on UMTUBA-owned published originals.",
+  prerequisites: [
+    "Comfort reading short lessons in English.",
+    "A personal UMTUBA account if you will try AI Tutor later.",
+    "Digital Safety & Privacy Fundamentals is helpful for prompt hygiene but not required.",
   ],
-  estimatedDurationMinutes: 70,
+  learningObjectives: [
+    "Describe AI and machine learning as pattern tools, not sources of guaranteed facts.",
+    "Explain generative AI and language models at a practical level, including prompts, strengths, and limits.",
+    "Spot hallucinations and verify claims against the assigned lesson or another source you already trust.",
+    "Use everyday and work/learning examples without leaking secrets or inventing vendor partnerships.",
+    "Explain why AI_USAGE_ALLOWED defaults to false on partner content and when UMTUBA AI Tutor may ingest owned originals.",
+  ],
+  estimatedDurationMinutes: 90,
+  passThresholdPercent: PILOT_PASS_THRESHOLD_PERCENT,
+  progressRules: PILOT_PROGRESS_RULES,
   authors: [UMTUBA_PILOT_AUTHOR],
   contentOwner: "UMTUBA",
   contentRights: "OWNED",
+  providerType: "UMTUBA_ORIGINAL",
+  publishState: "DRAFT",
   aiTutorAllowed: true,
   status: "draft",
   modules: [
@@ -33,15 +49,15 @@ export const AI_FUNDAMENTALS_FOR_EVERYONE: UmtubaOriginalPilotCourse = {
         {
           id: "ai-m1-l1",
           kind: "text",
-          title: "A predictor, not an authority",
-          estimatedMinutes: 8,
+          title: "What AI is, and a machine-learning picture",
+          estimatedMinutes: 9,
           resource: null,
           quiz: [],
-          body: `When people say “AI” in a product like UMTUBA, they usually mean a system that predicts the next useful span of text from a prompt and from allowed context. It can summarize a lesson you already have, suggest a practice question, or restate a definition in simpler words. It does not become an eyewitness, a lawyer, or a doctor because the sentences sound confident.
+          body: `When people say “AI” in a product like UMTUBA, they usually mean software that predicts a useful next step from examples and from the prompt you just gave it. Machine learning is the usual way those systems are built: instead of a person writing a rule for every sentence, the system adjusts internal weights by seeing many examples. You do not need the math. You need the picture: the system is a pattern tool. It is not an eyewitness, a lawyer, or a doctor because the sentences sound confident.
 
-This course will not invent a benchmark score, a parameter count, or a university study. You do not need those numbers to use the tool safely. You need a working rule: if a statement matters, check it against a source you already trust. In this course, that source is the lesson text. On the wider web, that source might be a primary document you opened yourself.
+This course will not invent a benchmark score, a parameter count, or a university study. It will not name a specific AI vendor as an UMTUBA partner and it will not claim that one named provider is “the safest” or “the most accurate.” You do not need those claims to use a tutor safely. You need a working rule: if a statement matters, check it against a source you already trust. In this course, that source is the lesson text.
 
-AI is also not a search engine with a citation guarantee. It may blend patterns from training with the text you pasted. If you paste nothing and ask about a private UMTUBA policy that is not in the allowed context, a fluent answer can still be wrong.
+Generative AI is the family of tools that produce new text, images, or audio that look like the examples they learned from. A language model is a generative system specialized for text: it predicts likely next words given a prompt and any allowed context. Strengths include summarizing a lesson you already have, suggesting a practice question, and restating a definition in simpler words. Limits include invented citations, outdated or blended facts, and fluent answers about topics that were never in context.
 
 Treat the tutor as a study aid for UMTUBA-owned material. Treat it as untrusted for medical, legal, financial, or partnership advice. UMTUBA is not using this course to authorize real partnerships or real medical guidance.`,
         },
@@ -258,15 +274,17 @@ If you are testing as staff, use the prepared context list from the draft. Confi
         {
           id: "ai-m4-l1",
           kind: "text",
-          title: "A verification habit",
-          estimatedMinutes: 6,
+          title: "Everyday use, work, learning, and safe tools",
+          estimatedMinutes: 8,
           resource: null,
           quiz: [],
-          body: `Before you reuse a tutor sentence, ask two questions. First: is this claim in the lesson I was assigned? Second: if it is not, do I have another source I already trust? If both answers are no, keep the sentence in the “unverified” bucket.
+          body: `Everyday applications that stay honest: ask a tutor to restate a definition from this lesson, draft a practice quiz from a module you already read, or turn a long paragraph into three bullets you will still check. Applications that leave this course: medical diagnosis, legal filings, live payout changes, and “list UMTUBA’s shopping partners.” Those need humans and official product flows.
 
-This habit is enough for this course. It does not require a published accuracy percentage. This course does not invent one.
+At work and in learning, AI can speed a first draft. It cannot own the grade, the rights decision, or the publish. On UMTUBA, grading stays in the assessment path. Certificate issuance stays on the UMTUBA-only policy after an explicit publish. A workplace that pastes customer data or a teammate’s personnel note into a prompt is doing a privacy failure, not a productivity trick.
 
-When you finish the final assessment, you may receive an UMTUBA certificate after an explicit publish and a passing score. That certificate says you completed an UMTUBA Original about AI fundamentals. It does not say you are a licensed engineer, and it does not say UMTUBA has live AI partnerships.`,
+Safe tools, in this course, means: use the UMTUBA AI Tutor only on UMTUBA-owned published originals; do not paste partner lessons into an owned prompt; do not paste secrets; do not treat a third-party chatbot as an UMTUBA policy desk. This course will not rank or endorse a named external AI provider. If you use another tool on your own, apply the same verification and privacy rules — and do not put UMTUBA secrets there either.
+
+Before you reuse a tutor sentence, ask two questions. First: is this claim in the lesson I was assigned? Second: if it is not, do I have another source I already trust? If both answers are no, keep the sentence unverified. When you finish the final assessment, you may receive an UMTUBA certificate after an explicit publish and a passing score. That certificate says you completed an UMTUBA Original about AI fundamentals. It does not say you are a licensed engineer, and it does not say UMTUBA has live AI partnerships.`,
         },
         {
           id: "ai-m4-r1",
@@ -335,6 +353,17 @@ If you cannot fill Allowed source, do not send the prompt.`,
         "The sentence is classified verified or unverified.",
         "A lesson line is quoted for verified claims.",
         "Unverified claims are not restated as policy.",
+      ],
+    },
+    {
+      id: "ai-ex-3",
+      title: "Everyday versus unsafe ask",
+      prompt:
+        "Write one everyday learning prompt that stays inside this course, and one ask you would refuse (medical, legal, secret, or invented partner). Say why the second is refused.",
+      successCriteria: [
+        "The allowed prompt names this course or lesson as the source.",
+        "The refused ask is medical, legal, secret, or a fake partnership.",
+        "No specific AI vendor is claimed as an UMTUBA partner.",
       ],
     },
   ],

@@ -9,7 +9,9 @@ Extends `PRECOMPANY_PROVIDER_FOUNDATION_V2.md`. No second provider stack.
 - SOURCE_TYPE=DEMO
 - RIGHTS_STATUS=DEMO_ONLY
 - PURCHASABLE=NO
+- PRODUCTION_SELLABLE=NO
 - REAL_PROVIDER=NONE
+- Images: UMTUBA_NEUTRAL_PLACEHOLDER only
 
 In-memory surface covers catalog, search, filters, PDP, variants, favorites, cart, checkout sandbox, empty/loading/error. No live checkout.
 

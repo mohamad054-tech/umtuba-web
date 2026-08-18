@@ -1,6 +1,8 @@
 import type { UmtubaStoreCategorySlug } from "../categories/taxonomy";
 import type { DemoProduct, DemoVariant } from "./types";
 import {
+  DEMO_IMAGE_POLICY,
+  DEMO_PRODUCTION_SELLABLE,
   DEMO_PURCHASABLE,
   DEMO_REAL_PROVIDER,
   DEMO_RIGHTS_STATUS,
@@ -297,18 +299,20 @@ function toProduct(seed: Seed, index: number): DemoProduct {
     slug: seed.slug,
     title: seed.title,
     shortDescription: seed.short,
-    description: `${seed.short} SOURCE_TYPE=DEMO. RIGHTS_STATUS=DEMO_ONLY. PURCHASABLE=NO. REAL_PROVIDER=NONE. This item cannot look like unauthorized marketplace inventory and cannot become a live checkout.`,
+    description: `${seed.short} SOURCE_TYPE=DEMO. RIGHTS_STATUS=DEMO_ONLY. PURCHASABLE=NO. PRODUCTION_SELLABLE=NO. REAL_PROVIDER=NONE. Neutral UMTUBA placeholder image only. This item cannot look like unauthorized marketplace inventory and cannot become a live checkout.`,
     category: seed.category,
     productType: seed.category === "digital-other" ? "digital" : "physical",
     sourceType: DEMO_SOURCE_TYPE,
     rightsStatus: DEMO_RIGHTS_STATUS,
     purchasable: DEMO_PURCHASABLE,
+    productionSellable: DEMO_PRODUCTION_SELLABLE,
     realProvider: DEMO_REAL_PROVIDER,
     conceptKind: seed.conceptKind,
     tags: seed.tags,
     variants: variantsFor(seed),
-    imageAlt: `${seed.title} (UMTUBA demo, not a partner product)`,
+    imageAlt: `${seed.title} (UMTUBA demo placeholder, not a partner product)`,
     imageRole: "cover",
+    imagePolicy: DEMO_IMAGE_POLICY,
   };
 }
 

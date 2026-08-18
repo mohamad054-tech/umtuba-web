@@ -15,6 +15,7 @@ import type {
   PilotQuizQuestion,
   UmtubaOriginalPilotCourse,
 } from "./types";
+import { PILOT_PASS_THRESHOLD_PERCENT } from "./types";
 
 export function countPilotLessons(course: UmtubaOriginalPilotCourse): number {
   return course.modules.reduce((sum, courseModule) => sum + courseModule.lessons.length, 0);
@@ -75,9 +76,9 @@ function toOriginalLesson(lesson: PilotLesson, position: number): OriginalLesson
 
 export function gradeQuiz(
   questions: readonly PilotQuizQuestion[],
-  answers: Record<string, string>
+  answers: Record<string, string>,
+  passingScorePercent: number = PILOT_PASS_THRESHOLD_PERCENT
 ): { total: number; correct: number; percent: number; passed: boolean; passingScorePercent: number } {
-  const passingScorePercent = 70;
   let correct = 0;
   for (const question of questions) {
     if (answers[question.id] === question.correctChoiceId) correct += 1;
@@ -206,16 +207,23 @@ export function evaluatePilotAiTutor(input: {
 export function buildLearnerOverview(course: UmtubaOriginalPilotCourse) {
   return {
     title: course.title,
+    slug: course.slug,
     shortDescription: course.shortDescription,
+    fullDescription: course.fullDescription,
     targetAudience: course.targetAudience,
     level: course.level,
+    prerequisites: course.prerequisites,
     learningObjectives: course.learningObjectives,
     moduleCount: course.modules.length,
     lessonCount: countPilotLessons(course),
     quizCount: countPilotQuizzes(course),
     exerciseCount: course.exercises.length,
     estimatedDurationMinutes: course.estimatedDurationMinutes,
+    passThresholdPercent: course.passThresholdPercent,
+    progressRules: course.progressRules,
     status: course.status,
+    publishState: course.publishState,
+    providerType: course.providerType,
     contentOwner: course.contentOwner,
     contentRights: course.contentRights,
     aiTutorAllowed: course.aiTutorAllowed,

@@ -1,27 +1,43 @@
 import type { UmtubaOriginalPilotCourse } from "./types";
-import { UMTUBA_CERTIFICATE_STATEMENT, UMTUBA_PILOT_AUTHOR } from "./types";
+import {
+  PILOT_PASS_THRESHOLD_PERCENT,
+  PILOT_PROGRESS_RULES,
+  UMTUBA_CERTIFICATE_STATEMENT,
+  UMTUBA_PILOT_AUTHOR,
+} from "./types";
 
 export const DIGITAL_SAFETY_PRIVACY_FUNDAMENTALS: UmtubaOriginalPilotCourse = {
   id: "c1e22222-2222-4222-8222-222222222222",
   slug: "digital-safety-privacy-fundamentals",
   title: "Digital Safety & Privacy Fundamentals",
   shortDescription:
-    "Practical account, phishing, permission, and data-minimization habits that apply on UMTUBA and on the wider web. No fabricated statistics.",
+    "Practical passwords, MFA, phishing, scams, privacy, device safety, and reporting habits. Educational and first-party. No fabricated statistics.",
+  fullDescription:
+    "This UMTUBA Original covers passwords and multi-factor authentication concepts, phishing and social-engineering scams, account security, privacy, device safety, safe sharing, public versus private information, suspicious links and files, reporting abuse, and a reusable checklist. It is educational. It does not invent industry breach rates, and it does not name any company as a live UMTUBA partner. Official recovery stays on the product’s account pages.",
   targetAudience: "Any UMTUBA member who uses passwords, email, and app permissions in daily work.",
   level: "beginner",
   language: "en",
   category: "digital-safety",
-  learningObjectives: [
-    "Build a password and recovery practice that does not rely on shared secrets.",
-    "Recognize common phishing and impersonation patterns, including fake partner or admin requests.",
-    "Grant the fewest permissions a task needs and review them later.",
-    "Minimize personal data you paste into tickets, chats, and AI tools.",
-    "Recover an account using official flows instead of informal workarounds.",
+  prerequisites: [
+    "A personal UMTUBA account you control.",
+    "Access to the email or authenticator you use for recovery.",
+    "UMTUBA Platform Essentials is helpful but not required.",
   ],
-  estimatedDurationMinutes: 75,
+  learningObjectives: [
+    "Build a unique-password and recovery practice that does not rely on shared secrets.",
+    "Explain MFA concepts and prefer an authenticator or hardware key over SMS when the product offers it.",
+    "Recognize phishing, scams, and social engineering, including fake partner or admin requests.",
+    "Separate public from private information and share the least data a task needs.",
+    "Treat suspicious links and files as untrusted, and report abuse through Support or an in-product control when it exists.",
+  ],
+  estimatedDurationMinutes: 90,
+  passThresholdPercent: PILOT_PASS_THRESHOLD_PERCENT,
+  progressRules: PILOT_PROGRESS_RULES,
   authors: [UMTUBA_PILOT_AUTHOR],
   contentOwner: "UMTUBA",
   contentRights: "OWNED",
+  providerType: "UMTUBA_ORIGINAL",
+  publishState: "DRAFT",
   aiTutorAllowed: true,
   status: "draft",
   modules: [
@@ -48,17 +64,17 @@ UMTUBA staff will not ask you to send a password. A message that asks for one is
         {
           id: "ds-m1-l2",
           kind: "text",
-          title: "Recovery is part of the account",
-          estimatedMinutes: 7,
+          title: "MFA concepts and recovery",
+          estimatedMinutes: 8,
           resource: null,
           quiz: [],
-          body: `If you lose the password, you need a recovery path you already set up. That usually means a verified email, an authenticator app, or recovery codes you stored offline. Set those up before you need them.
+          body: `Multi-factor authentication (MFA) means a second proof besides the password. Typical factors are something you know (password), something you have (authenticator app, hardware key, or a phone), and something you are (biometrics on a device you control). UMTUBA staff will not ask you to read an MFA code into chat.
 
-Print or write recovery codes and keep them somewhere you control. Do not photograph them into a cloud album that is shared with a family account. Do not paste them into Learning notes that another device might sync to a screenshot tool.
+A one-time SMS code is better than password-only and weaker than an authenticator app or a hardware key. Prefer the stronger option when the product offers it. Treat the second factor as a second secret. If you lose it, use the product’s official recovery — usually a verified email and recovery codes you stored offline. Set those up before you need them.
 
-If you use two-factor authentication, treat the second factor as a second secret. A one-time code in SMS is better than nothing and weaker than an authenticator app or a hardware key. Prefer the stronger option when the product offers it.
+Print or write recovery codes and keep them somewhere you control. Do not photograph them into a shared cloud album. Do not paste them into Learning notes. Do not ask a colleague to “approve the login from their phone.” That creates a shared account, which this course treats as a security incident, not a convenience.
 
-If you no longer have the second factor, use the product’s official recovery. Do not ask a colleague to “approve the login from their phone.” That creates a shared account, which this course treats as a security incident, not a convenience.`,
+Account security also means signing in only on devices you control, signing out on a shared computer, and changing the password if you see a session you do not recognize. Official recovery happens on the account pages of the product, not in a private chat and not in an unexpected email form.`,
         },
         {
           id: "ds-m1-q",
@@ -104,6 +120,18 @@ If you no longer have the second factor, use the product’s official recovery. 
               correctChoiceId: "b",
               explanation: "Codes and passwords are never sent in chat, even to people you know.",
             },
+            {
+              id: "ds-m1-q4",
+              prompt: "Which MFA picture is strongest when the product offers it?",
+              choices: [
+                { id: "a", text: "Password only, reused across sites." },
+                { id: "b", text: "Password plus an authenticator app or hardware key." },
+                { id: "c", text: "Sharing one phone authenticator across the office." },
+                { id: "d", text: "Emailing recovery codes to a fake partner helpdesk." },
+              ],
+              correctChoiceId: "b",
+              explanation: "SMS is better than nothing; authenticator or hardware key is stronger. Shared factors are not MFA.",
+            },
           ],
         },
       ],
@@ -116,17 +144,17 @@ If you no longer have the second factor, use the product’s official recovery. 
         {
           id: "ds-m2-l1",
           kind: "text",
-          title: "Unexpected urgency is a signal",
-          estimatedMinutes: 8,
+          title: "Phishing, scams, and social engineering",
+          estimatedMinutes: 9,
           resource: null,
           quiz: [],
-          body: `Phishing works by creating urgency and a trusted costume. The costume may be a bank, a shipping company, a workplace admin, or — on this project — a fake commerce or learning partner. The urgency is usually “confirm now or lose access.”
+          body: `Phishing works by creating urgency and a trusted costume. The costume may be a bank, a shipping company, a workplace admin, or a fake commerce or learning partner. The urgency is usually “confirm now or lose access.” Social engineering is the same idea without needing a perfect replica of a website: a person talks you into handing over a code, a password, or a file.
+
+Scams that show up around a product like UMTUBA include fake “your account will be closed,” fake refund or payout changes, fake job or creator-brand deals, and fake “activate the partner feed today” mail. In this pre-company phase UMTUBA is not sending outbound partnership mail. A message that claims you must finish a live marketplace or university partnership is not an official UMTUBA action. Do not click it to be helpful.
 
 Check the destination before you tap. Hover or long-press a link and read the host name. A look-alike domain is not the UMTUBA product. Do not sign in through a page that arrived in email if you can open the product yourself from a bookmark or the installed app.
 
-Attachments and QR codes can carry the same trap. If you did not expect a file, do not open it to be polite. If a QR code is on a poster you did not place, treat it as an untrusted URL.
-
-UMTUBA is not sending outbound partnership mail in this pre-company phase. A message that claims you must “activate the SHEIN feed” or “finish the university certificate partnership” is not an official UMTUBA action. Do not click it to be helpful. Report it.`,
+Attachments, unexpected installers, and QR codes can carry the same trap. If you did not expect a file, do not open it to be polite. If a QR code is on a poster you did not place, treat it as an untrusted URL. Suspicious links and files stay untrusted until you can open the real product without using the inbound link.`,
         },
         {
           id: "ds-m2-l2",
@@ -200,17 +228,17 @@ Do not install a browser extension to “unlock” a feature. Extensions can rea
         {
           id: "ds-m3-l2",
           kind: "text",
-          title: "Paste less than you think you need",
-          estimatedMinutes: 8,
+          title: "Public vs private info, safe sharing, and devices",
+          estimatedMinutes: 9,
           resource: null,
           quiz: [],
-          body: `Data minimization means you share the smallest set of facts that completes the task. A support ticket about a failed lesson load needs a timestamp and a course slug. It does not need your government ID, a full card number, or a service-role key.
+          body: `Public information is what you chose to show on a public profile: a display name, a username, an optional bio, city, or avatar. Private information is everything else: passwords, recovery codes, government identifiers, card numbers, exact home address, private messages, and other people’s data. Safe sharing means you publish only the public layer you intended and you keep the private layer off Home, Watch, Messages, Learning, and tickets.
 
-Never paste .env files, API keys, or vault secrets into Learning, Messages, or an AI Tutor prompt. The partner foundation stores credential presence and an opaque vault_ref. If a form asks for a raw secret, that form is wrong.
+Data minimization means you share the smallest set of facts that completes the task. A support ticket about a failed lesson load needs a timestamp and a course slug. It does not need your government ID, a full card number, or a service-role key. Never paste .env files, API keys, or vault secrets into Learning, Messages, or an AI Tutor prompt.
 
-When you use an UMTUBA AI Tutor on owned content, you may ask about a lesson you are taking. You should not paste another person’s personal data into the prompt to “make the example realistic.” Invented examples should stay invented. Real names, addresses, and identification numbers do not belong in a tutoring prompt.
+Device safety is part of the same habit. Keep the operating system and browser updated. Lock the screen. Do not install a random “unlocker” extension or an unexpected APK to “fix” UMTUBA. Prefer the product’s own settings. On a shared or borrowed device, use a browser you will sign out of, and do not save the password in a profile you do not control. If a device is lost, change the password from a device you still have.
 
-Logs and screenshots also leak. Crop a screenshot so it does not show a session token, an email inbox, or someone else’s profile. If you cannot crop it, do not attach it.`,
+Logs and screenshots leak. Crop a screenshot so it does not show a session token, an email inbox, or someone else’s profile. If you cannot crop it, do not attach it. When you use an UMTUBA AI Tutor on owned content, ask about the lesson — do not paste another person’s personal data to “make the example realistic.”`,
         },
         {
           id: "ds-m3-q",
@@ -256,13 +284,13 @@ Logs and screenshots also leak. Crop a screenshot so it does not show a session 
         {
           id: "ds-m4-l1",
           kind: "text",
-          title: "A monthly privacy pass",
-          estimatedMinutes: 6,
+          title: "Reporting abuse and a monthly pass",
+          estimatedMinutes: 7,
           resource: null,
           quiz: [],
-          body: `Once a month, run a short pass. Confirm the password manager is unlocking and that UMTUBA is still a unique entry. Confirm recovery codes still exist where you put them. Review browser site permissions. Sign out of sessions you do not recognize.
+          body: `Reporting abuse is a safety action, not a merchandising action. If a person harasses you, impersonates staff, sends malware, or tries to collect a password, use an in-product Report or Block control when it is visible on that post, profile, or conversation. If it is not visible, use Support. Do not amplify the abuse by resharing it. Do not email a company that is not a UMTUBA partner. Testers should also write the finding in the internal task report.
 
-On UMTUBA, confirm you have not stored a partner secret in a note. Confirm you have not favorited a demo product and then treated it as a real order. Confirm you have not forwarded a one-time code.
+Once a month, run a short pass. Confirm the password manager is unlocking and that UMTUBA is still a unique entry. Confirm recovery codes still exist where you put them. Review browser site permissions. Sign out of sessions you do not recognize. Confirm you have not stored a partner secret in a note, treated a demo product as a real order, or forwarded a one-time code.
 
 This pass is ordinary hygiene. It is not a claim that UMTUBA has measured a specific industry breach rate. This course does not invent those numbers. The habit is useful whether or not a statistic is attached.`,
         },
@@ -333,6 +361,17 @@ A “no” is a task, not a shame score. Fix the row, then continue.`,
         "The rewrite refuses the inbound request.",
         "Verification happens in a trusted channel, not by replying.",
         "No outbound partnership message is sent.",
+      ],
+    },
+    {
+      id: "ds-ex-3",
+      title: "Public versus private sort",
+      prompt:
+        "List three facts about yourself. Mark each public (OK on a profile) or private (never in Messages, tickets, or prompts). Include one reporting action you would take if someone asked for a private fact.",
+      successCriteria: [
+        "At least one public and one private item are labeled correctly.",
+        "No password, recovery code, or government identifier is written in full.",
+        "The reporting action uses Support or an in-product control, not outbound partner mail.",
       ],
     },
   ],

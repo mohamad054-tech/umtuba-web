@@ -9,7 +9,9 @@ import type { UmtubaStoreCategorySlug } from "../categories/taxonomy";
 export const DEMO_SOURCE_TYPE = "DEMO" as const;
 export const DEMO_RIGHTS_STATUS = "DEMO_ONLY" as const;
 export const DEMO_PURCHASABLE = false;
+export const DEMO_PRODUCTION_SELLABLE = false;
 export const DEMO_REAL_PROVIDER = "NONE" as const;
+export const DEMO_IMAGE_POLICY = "UMTUBA_NEUTRAL_PLACEHOLDER" as const;
 
 export type DemoVariant = {
   id: string;
@@ -32,12 +34,14 @@ export type DemoProduct = {
   sourceType: typeof DEMO_SOURCE_TYPE;
   rightsStatus: typeof DEMO_RIGHTS_STATUS;
   purchasable: typeof DEMO_PURCHASABLE;
+  productionSellable: typeof DEMO_PRODUCTION_SELLABLE;
   realProvider: typeof DEMO_REAL_PROVIDER;
   conceptKind: "UMTUBA_OWNED_FUTURE" | "SYNTHETIC_DEMO";
   tags: string[];
   variants: DemoVariant[];
   imageAlt: string;
   imageRole: "cover";
+  imagePolicy: typeof DEMO_IMAGE_POLICY;
 };
 
 export type DemoCatalogUiState = "ready" | "empty" | "loading" | "error";

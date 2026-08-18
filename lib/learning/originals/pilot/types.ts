@@ -8,6 +8,16 @@ import type { OriginalLessonKind } from "../types";
 
 export const PILOT_CONTENT_OWNER = "UMTUBA" as const;
 export const PILOT_CONTENT_RIGHTS = "OWNED" as const;
+export const PILOT_PROVIDER_TYPE = "UMTUBA_ORIGINAL" as const;
+export const PILOT_PUBLISH_STATE = "DRAFT" as const;
+export const PILOT_PASS_THRESHOLD_PERCENT = 70;
+export const PILOT_PROGRESS_RULES = [
+  "Every lesson in every module must be completed.",
+  "Every module quiz must be passed at the course pass threshold.",
+  "The final assessment must be passed at the course pass threshold.",
+  "Certificate issuance requires an explicit publish, completion, and the UMTUBA-only certificate policy.",
+  "Draft courses stay out of the public catalog until an explicit publish.",
+] as const;
 
 export type PilotQuizChoice = {
   id: string;
@@ -66,12 +76,16 @@ export type UmtubaOriginalPilotCourse = {
   slug: string;
   title: string;
   shortDescription: string;
+  fullDescription: string;
   targetAudience: string;
   level: LearningCourseDifficulty;
   language: string;
   category: string;
+  prerequisites: string[];
   learningObjectives: string[];
   estimatedDurationMinutes: number;
+  passThresholdPercent: typeof PILOT_PASS_THRESHOLD_PERCENT;
+  progressRules: readonly string[];
   authors: { userId: string; displayName: string; role: "author" | "instructor" }[];
   modules: PilotModule[];
   exercises: PilotExercise[];
@@ -79,6 +93,8 @@ export type UmtubaOriginalPilotCourse = {
   certificatePolicy: PilotCertificatePolicy;
   contentOwner: typeof PILOT_CONTENT_OWNER;
   contentRights: typeof PILOT_CONTENT_RIGHTS;
+  providerType: typeof PILOT_PROVIDER_TYPE;
+  publishState: typeof PILOT_PUBLISH_STATE;
   aiTutorAllowed: true;
   status: "draft";
 };

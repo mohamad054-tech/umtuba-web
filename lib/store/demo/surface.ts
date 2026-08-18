@@ -153,7 +153,11 @@ export function assertDemoIsolation(product: DemoProduct): { ok: boolean; reason
   if (product.sourceType !== "DEMO") reasons.push("SOURCE_TYPE must be DEMO.");
   if (product.rightsStatus !== "DEMO_ONLY") reasons.push("RIGHTS_STATUS must be DEMO_ONLY.");
   if (product.purchasable !== false) reasons.push("PURCHASABLE must be NO.");
+  if (product.productionSellable !== false) reasons.push("PRODUCTION_SELLABLE must be NO.");
   if (product.realProvider !== "NONE") reasons.push("REAL_PROVIDER must be NONE.");
+  if (product.imagePolicy !== "UMTUBA_NEUTRAL_PLACEHOLDER") {
+    reasons.push("Images must be UMTUBA/neutral placeholders.");
+  }
   const hay = `${product.title} ${product.description}`.toLowerCase();
   for (const token of ["shein", "temu", "amazon", "aliexpress", "alibaba", "trendyol", "ebay", "dhgate"]) {
     if (hay.includes(token)) reasons.push("Forbidden marketplace token.");

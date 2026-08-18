@@ -5,6 +5,7 @@ import type { UmtubaOriginalPilotCourse } from "./types";
 
 export * from "./types";
 export * from "./assemble";
+export * from "./learnerSurface";
 export { UMTUBA_PLATFORM_ESSENTIALS } from "./platformEssentials";
 export { DIGITAL_SAFETY_PRIVACY_FUNDAMENTALS } from "./digitalSafety";
 export { AI_FUNDAMENTALS_FOR_EVERYONE } from "./aiFundamentals";
