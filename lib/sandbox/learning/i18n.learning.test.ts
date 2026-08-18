@@ -15,6 +15,9 @@ const CHROME_KEYS = [
   "aiTutor",
   "certificate",
   "qualityJudgments",
+  "unknownExercise",
+  "exerciseUnavailable",
+  "returnToLesson",
 ] as const;
 
 describe("Learning sandbox Arabic chrome", () => {

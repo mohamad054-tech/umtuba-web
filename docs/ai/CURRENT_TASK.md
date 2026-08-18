@@ -1,6 +1,42 @@
 ﻿# Current Task
 
-## CENTRAL GO — INGEST UMTUBA ORIGINALS CONTENT INTO EXECUTABLE LEARNING SANDBOX V1
+## CENTRAL GO — LEARNING SANDBOX EXERCISE RUNTIME FIX V1
+
+**TASK_ID** = `CENTRAL_LEARNING_SANDBOX_EXERCISE_RUNTIME_FIX_V1`
+**PRIORITY** = HIGH
+**SCOPE** = PRIVATE LEARNING SANDBOX EXERCISE RUNTIME ONLY
+**DATE** = 2026-08-19
+**MODE** = PRIVATE_SANDBOX_RUNTIME_FIX
+**STATUS** = IMPLEMENTED
+
+### Status
+
+Fixed `pe-m1-l1-ex` crash. Root cause is unstable `useSyncExternalStore` snapshots, not a missing exercise ID. 24 lesson + 8 course exercises audited and routed. Content not rewritten. Locale auto-detection must wait for `EXERCISE_FINAL_BASE_SHA` after this cutover. Do not mix locale files.
+
+### Identity
+
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION + DEPLOY
+- **PARENT_LIVE** = `7f18629eef3cd9c4f484547f2ff0285212102420`
+- **LIVE_RELEASE_BEFORE** = `7f18629e-20260818231153`
+- **ROLLBACK_OF_THIS** = `7f18629e-20260818231153`
+- **TASK_BRANCH** = `central/learning-sandbox-exercise-runtime-fix-v1`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-learning-sandbox-exercise-runtime-fix-v1`
+- **SANDBOX_PATH** = `/sandbox/business-preview`
+
+### Allowed scope
+
+Sandbox Learning exercise runtime, routes, client store, unavailable UX, tests, private-sandbox deploy onto live `7f18629e`. Docs.
+
+### Forbidden scope
+
+- Production `/learning`; rewrite 36 lessons; Store 26-SKU; mobile; Rewards `20260931`
+- Publish Originals; make sandbox public; force-push; `git config --global`; print secrets
+- Mix locale auto-detection files; rebase onto the locale branch
+
+---
+
+## Prior — INGEST UMTUBA ORIGINALS CONTENT INTO EXECUTABLE LEARNING SANDBOX V1
 
 **TASK_ID** = `CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1`
 **PRIORITY** = HIGH

@@ -1,59 +1,56 @@
-# CURSOR_REPORT — Ingest UMTUBA Originals into executable Learning sandbox V1
+# CURSOR_REPORT — Learning sandbox exercise runtime fix V1
 
 ```text
-SOURCE_DEVICE = CENTRAL / SERVER
-DEVICE_ROLE = IMPLEMENTATION
-TASK_ID = CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1
-REPORT_TYPE = PRODUCT_INTEGRATION_ONLY
-TIMESTAMP_LOCAL = 2026-08-18 ~23:00 +03
-SECRET_VALUES_PRINTED = NO
-FORCE_PUSH = NO
-PUSH = NO
-PRODUCTION_MUTATED = NO
-REMOTE_MIGRATION_APPLIED = NO
-SQL_20260929_APPLIED = NO
-SQL_20260930_REAPPLIED = NO
-MOBILE_SOURCE_CHANGED = NO
-MOBILE_RELEASE_TRAIN_DISTURBED = NO
-STORE_DEMO_PREVIEW_SET = NO
-SANDBOX_HUB_PRESERVED = YES
-STORE_V2_PRESERVED = YES
-LEARNING_V2_PRESERVED = YES
-CATALOG_910fb3b8_PRESERVED = YES
-ACCESS_CONTROL_PRESERVED = YES
-NOINDEX_PRESERVED = YES
+TASK_ID = CENTRAL_LEARNING_SANDBOX_EXERCISE_RUNTIME_FIX_V1
+STATUS = IMPLEMENTED
+DEFECT_REPRODUCED = YES
+ROOT_CAUSE = useSyncExternalStore getSnapshot returned a new object on every localStorage read, so the first hydrated Learning action (pe-m1-l1-ex) infinite-looped into the generic page-load error. The exercise ID is valid.
+FAILED_EXERCISE_ID = pe-m1-l1-ex
+TOTAL_LESSON_EXERCISES = 24
+TOTAL_COURSE_EXERCISES = 8
+ALL_EXERCISE_IDS_VALID = YES
+ALL_EXERCISE_ROUTES_VALID = YES
 CONTENT_REWRITTEN = NO
-PRIVATE_SANDBOX_DEPLOYED = NO
+EXERCISE_RUNTIME = FIXED
+EXERCISE_COMPLETION = FIXED
+PROGRESS_UPDATE = YES
+PLATFORM_ESSENTIALS = PASS
+DIGITAL_SAFETY = PASS
+AI_FUNDAMENTALS = PASS
+TESTS = PASS
+TYPECHECK = PASS
+LINT = PASS
+BUILD = PASS
+SOURCE_SHA = (commit pending)
+DEPLOY_PERFORMED = NO
+SANDBOX_SHA_AFTER = (pending)
+PRODUCTION_LEARNING_DISTURBED = NO
+STORE_SANDBOX_DISTURBED = NO
+MOBILE_DISTURBED = NO
+ANONYMOUS_DENIED = YES
 ```
 
 ## Summary
 
-Ingested the three UMTUBA Originals draft courses into the private Learning sandbox without rewriting lesson bodies. PC2 packet `PC2_UMTUBA_ORIGINALS_CONTENT_BUILD_V1` was not on disk; authoritative bodies came from pre-company pilot `cd39b883`. Stacked onto Desktop catalog commit `910fb3b8` (parent live `fbb6b364`) so the 26-SKU productization is not dropped. `lib/store/demo` and `910fb3b8` catalog files were not modified. Live Hetzner remains `fbb6b364-20260818222318`. No deploy.
-
-Counts: COURSES=3 MODULES=12 LESSONS=36 MODULE_QUIZZES=12 FINALS=pe-final/ds-final/ai-final (4/5, unlimited, SCORE) LESSON_EXERCISES=24 COURSE_EXERCISES=8 (all authored; packet asked 6). Completion follows PC2 (lessons + module quizzes + final); exercises are not a silent extra gate for Originals. Partner AI stays blocked.
+Fixed the private Learning sandbox exercise crash. `pe-m1-l1-ex` is a real lesson exercise. The generic “This page couldn’t load” came from an unstable `useSyncExternalStore` snapshot, not a missing fixture. Cached the client store, completed lesson→exercise→save→progress→return, audited all 24+8 Originals exercise IDs/routes, and added Learning-specific unavailable UX for missing/invalid IDs without masking real exceptions.
 
 ## Exact files changed
 
 - `app/components/sandbox/learning/LearningActions.tsx`
 - `app/components/sandbox/learning/LearningSandbox.tsx`
-- `lib/sandbox/fixtures/courses.ts`
-- `lib/sandbox/fixtures/originals.ts` (deleted; replaced by directory)
-- `lib/sandbox/fixtures/originals/**` (pilot copy + adapt)
-- `lib/sandbox/fixtures/types.ts`
+- `app/sandbox/business-preview/error.tsx`
 - `lib/sandbox/i18n.ts`
-- `lib/sandbox/learning/catalog.ts`
-- `lib/sandbox/learning/certificates.ts`
-- `lib/sandbox/learning/completion.ts`
+- `lib/sandbox/learning/clickPath.ts`
+- `lib/sandbox/learning/clientStore.ts`
+- `lib/sandbox/learning/clientStore.test.ts`
+- `lib/sandbox/learning/exerciseRuntime.ts`
+- `lib/sandbox/learning/exercise.runtime.test.ts`
+- `lib/sandbox/learning/exercise.render.test.ts`
+- `lib/sandbox/learning/i18n.learning.test.ts`
 - `lib/sandbox/learning/index.ts`
-- `lib/sandbox/learning/learning.executable.test.ts`
-- `lib/sandbox/learning/originals.ingest.test.ts`
-- `lib/sandbox/learning/state.ts`
-- `lib/sandbox/learning/tutor.ts`
-- `scripts/verify-originals-ingest.mts`
+- `lib/sandbox/learning/routes.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-
-Not changed: `lib/store/demo/**`, `lib/sandbox/fixtures/store.ts`, `lib/sandbox/fixtures/catalog.test.ts`, Store shopper files, production `/learning`.
 
 ## Migrations created
 
@@ -61,41 +58,34 @@ None.
 
 ## Security review
 
-- Private sandbox only; public catalog flags remain false; drafts unpublished.
-- No production enrollments or certificates created.
-- Certificate preview marked SANDBOX/DEMO, ISSUER=UMTUBA, no accreditation/degree claims.
-- Partner `AI_USAGE_ALLOWED` stays denied; tutor is local and does not send to external AI.
-- Mock Learning payments remain isolated (`LearningPaymentOutcome`).
-- Catalog 26-SKU files from `910fb3b8` untouched.
-- No secrets printed. SQL 20260929/20260930 not applied. Mobile not touched.
+- Sandbox remains AUTH_REQUIRED / private
+- Guest deny unchanged
+- No production `/learning` persistence
+- No secrets printed
+- Store 26-SKU and mobile untouched
+- Rewards / locale branches not mixed
 
 ## Tests
 
-PASS — 78 tests / 14 files including `originals.ingest.test.ts`, `learning.executable.test.ts`, `catalog.test.ts`, `lib/store/demo/catalog.test.ts`, Store V2 shopper/payment/session tests, access/containment.
-
-Verifier: lessons=36 quizzes=12 lessonExercises=24 courseExercises=8 finals=pe-final,ds-final,ai-final. Failed final <4/5 covered. Three-course QA covered.
+`npx vitest run lib/sandbox` PASS (86). Exercise render tests PASS (`pe-m1-l1-ex` + unavailable).
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit`
+`npx tsc --noEmit` PASS.
 
 ## Build
 
-PASS — `npm run build` on `central/ingest-umtuba-originals-on-910fb3b8` (not deployed).
+`npm run build` PASS in a clean dependency tree (Next 16.2.10). Sandbox routes `/sandbox/business-preview`, `[...section]`, and `/enter` are in the route table.
 
 ## git diff --check
 
-PASS
+PASS.
 
 ## git status --short
 
-Local commit on `central/ingest-umtuba-originals-on-910fb3b8` stacked on `910fb3b8`. Live `origin/alpha-0.2` remains `fbb6b364`. `PUSHED=NO` `DEPLOYED=NO`.
+See live `git status` at commit time.
 
 ## Open issues
 
-- PC2 packet file missing; source is pre-company pilot `cd39b883`.
-- Course exercises wired = 8 (authored), packet asked 6.
-- Lesson exercises 24 are chrome/resource-derived practice slots, not a separate PC2 exercise packet.
-- Source finals are 8 questions / 70%; sandbox scores first 5 at 4/5 and keeps the rest in `reviewBank` (no new prose). Production `/learning` does not persist this contract (`PRODUCTION_COMPLETION_GAP`).
-- Browser MCP authorized walkthrough not claimed PASS (no platform_admins session fabricated).
-- Live combined SHA remains `fbb6b364` until an explicit deploy GO.
+- Authorized live browser walkthrough still needs the PO signed-in `platform_admins` session
+- Locale auto-detection waits for `EXERCISE_FINAL_BASE_SHA` after this cutover

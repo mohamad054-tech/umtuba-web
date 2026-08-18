@@ -22,6 +22,7 @@ import {
 import type { SandboxCourse } from "../../../../lib/sandbox/fixtures/types";
 import { sandboxT } from "../../../../lib/sandbox/i18n";
 import { catalogSummary, flattenLessons, isPaidCourse, lessonBodyState } from "../../../../lib/sandbox/learning/catalog";
+import { resolveLearningExercise } from "../../../../lib/sandbox/learning/exerciseRuntime";
 import { enrollmentModelsCatalog } from "../../../../lib/sandbox/learning/enrollment";
 import {
   instructorAnalytics,
@@ -45,6 +46,7 @@ import {
   DraftCreateForm,
   EnrollButton,
   ExerciseForm,
+  ExerciseProgress,
   LessonNotes,
   MockPayButtons,
   QuizForm,
@@ -642,26 +644,72 @@ export default function LearningSandbox({
       break;
     }
     case "exercise": {
-      const course = getSandboxCourse(route.slug);
-      const exercise =
-        course?.exercises.find((row) => row.id === route.exerciseId) ??
-        course?.modules
-          .flatMap((courseModule) => courseModule.lessons)
-          .map((lesson) => lesson.lessonExercise)
-          .find((row) => row?.id === route.exerciseId);
-      body = exercise ? (
+      const resolved = resolveLearningExercise(route.slug, route.exerciseId);
+      if (!resolved.ok) {
+        body = (
+          <div>
+            <LearningSectionHeader
+              title={sandboxT(locale, "exerciseUnavailable")}
+              description={sandboxT(locale, "unknownExercise")}
+            />
+            <p className="sx-card mt-4">{sandboxT(locale, "unknownExercise")}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {resolved.courseHref ? (
+                <Link className="sx-btn" href={resolved.courseHref}>
+                  {sandboxT(locale, "returnToCourse")}
+                </Link>
+              ) : (
+                <Link className="sx-btn" href={href({ surface: "catalog" })}>
+                  {sandboxT(locale, "catalog")}
+                </Link>
+              )}
+            </div>
+          </div>
+        );
+        break;
+      }
+      body = (
         <div>
-          <LearningSectionHeader title={exercise.title} />
-          <ExerciseForm
-            locale={locale}
-            studentId={studentId}
-            courseSlug={route.slug}
-            exerciseId={exercise.id}
-            prompt={exercise.prompt}
+          <LearningSectionHeader
+            eyebrow={
+              resolved.exercise.scope === "lesson"
+                ? sandboxT(locale, "lessonExercise")
+                : sandboxT(locale, "courseExercise")
+            }
+            title={resolved.exercise.title}
+            description={resolved.exercise.prompt}
           />
+          {resolved.exercise.successCriteria.length > 0 ? (
+            <article className="sx-card mt-4">
+              <h3 className="text-sm font-semibold">{sandboxT(locale, "successCriteria")}</h3>
+              <ul className="mt-2 list-disc ps-5 text-sm">
+                {resolved.exercise.successCriteria.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
+          <div className="mt-4">
+            <ExerciseForm
+              locale={locale}
+              studentId={studentId}
+              courseSlug={route.slug}
+              exerciseId={resolved.exercise.id}
+              prompt={resolved.exercise.prompt}
+            />
+          </div>
+          <ExerciseProgress locale={locale} studentId={studentId} courseSlug={route.slug} />
+          <div className="mt-4 flex flex-wrap gap-2">
+            {resolved.lessonHref ? (
+              <Link className="sx-btn" href={resolved.lessonHref}>
+                {sandboxT(locale, "returnToLesson")}
+              </Link>
+            ) : null}
+            <Link className="sx-btn sx-btn-ok" href={resolved.courseHref}>
+              {sandboxT(locale, "returnToCourse")}
+            </Link>
+          </div>
         </div>
-      ) : (
-        <p>{sandboxT(locale, "unknownLesson")}</p>
       );
       break;
     }

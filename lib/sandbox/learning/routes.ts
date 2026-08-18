@@ -31,10 +31,14 @@ export type LearningSandboxRoute =
   | { surface: "partners" }
   | { surface: "enrollmentModels" };
 
-const ID = /^[a-z0-9][a-z0-9-]{1,80}$/;
+export const LEARNING_SANDBOX_ID = /^[a-z0-9][a-z0-9-]{1,80}$/;
+
+export function isLearningSandboxId(value: string | undefined): value is string {
+  return Boolean(value && LEARNING_SANDBOX_ID.test(value));
+}
 
 function id(value: string | undefined): string | null {
-  return value && ID.test(value) ? value : null;
+  return isLearningSandboxId(value) ? value : null;
 }
 
 export function parseLearningSandboxRoute(
@@ -105,8 +109,9 @@ export function parseLearningSandboxRoute(
       return lessonId ? { surface: "quiz", slug, lessonId } : null;
     }
     if (rest.length === 4 && rest[2] === "exercise") {
-      const exerciseId = id(rest[3]);
-      return exerciseId ? { surface: "exercise", slug, exerciseId } : null;
+      // Keep the exercise surface even when the id is invalid so the Learning
+      // UI can show unavailable instead of a generic catch-all crash/404.
+      return { surface: "exercise", slug, exerciseId: rest[3] ?? "" };
     }
     if (rest.length === 4 && rest[2] === "tutor") {
       const lessonId = id(rest[3]);

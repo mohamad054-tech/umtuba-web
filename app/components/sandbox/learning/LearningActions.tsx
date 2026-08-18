@@ -10,52 +10,39 @@ import {
 } from "../../../../lib/sandbox/learning/catalog";
 import type { QuizQuestion } from "../../../../lib/sandbox/fixtures/types";
 import type { LearningPaymentOutcome } from "../../../../lib/sandbox/learning/payments";
-import { LEARNING_SANDBOX_STATE_COOKIE } from "../../../../lib/sandbox/learning/routes";
+import { learningSandboxHref } from "../../../../lib/sandbox/learning/routes";
 import {
-  EMPTY_LEARNING_SANDBOX_STATE,
+  dispatchLearningSandboxAction,
+  getLearningSandboxServerSnapshot,
+  readLearningSandboxClientState,
+  subscribeLearningSandboxClientStore,
+} from "../../../../lib/sandbox/learning/clientStore";
+import { liveProgress } from "../../../../lib/sandbox/learning/progress";
+import {
   certificateFor,
-  parseLearningSandboxState,
-  reduceLearningSandboxState,
+  isEnrolled,
   type LearningSandboxAction,
   type LearningSandboxState,
 } from "../../../../lib/sandbox/learning/state";
 import { sandboxTutorAnswer } from "../../../../lib/sandbox/learning/tutor";
 import { sandboxT, type SandboxMessageKey } from "../../../../lib/sandbox/i18n";
 
-const STORAGE_KEY = LEARNING_SANDBOX_STATE_COOKIE;
-
-const listeners = new Set<() => void>();
-
-function readStoredState(): LearningSandboxState {
-  if (typeof window === "undefined") return EMPTY_LEARNING_SANDBOX_STATE;
-  return parseLearningSandboxState(window.localStorage.getItem(STORAGE_KEY));
-}
-
-function persist(state: LearningSandboxState) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
 export function useLearningSandboxState(): {
   state: LearningSandboxState;
   dispatch: (action: LearningSandboxAction) => void;
   ready: boolean;
 } {
-  const state = useSyncExternalStore(subscribe, readStoredState, () => EMPTY_LEARNING_SANDBOX_STATE);
+  const state = useSyncExternalStore(
+    subscribeLearningSandboxClientStore,
+    readLearningSandboxClientState,
+    getLearningSandboxServerSnapshot
+  );
 
   return {
     state,
     ready: true,
     dispatch(action) {
-      persist(reduceLearningSandboxState(readStoredState(), action));
+      dispatchLearningSandboxAction(action);
     },
   };
 }
@@ -194,11 +181,13 @@ export function ExerciseForm({
   const { state, dispatch, ready } = useLearningSandboxState();
   const existing = state.exerciseAnswers[`${studentId}::${courseSlug}::${exerciseId}`];
   const [answer, setAnswer] = useState(existing?.answer ?? "");
+  const enrolled = isEnrolled(state, studentId, courseSlug);
   return (
     <form
       className="sx-card sx-learning-panel"
       onSubmit={(event) => {
         event.preventDefault();
+        if (!enrolled) return;
         dispatch({ type: "submitExercise", studentId, courseSlug, exerciseId, answer });
       }}
     >
@@ -210,15 +199,43 @@ export function ExerciseForm({
         onChange={(event) => setAnswer(event.target.value)}
         maxLength={400}
       />
-      <button type="submit" disabled={!ready} className="sx-btn sx-btn-ok mt-3">
-        {sandboxT(locale, "submitExercise")}
-      </button>
+      {enrolled ? (
+        <button type="submit" disabled={!ready} className="sx-btn sx-btn-ok mt-3">
+          {sandboxT(locale, "submitExercise")}
+        </button>
+      ) : (
+        <p className="mt-3">
+          <a className="sx-btn sx-btn-ok" href={learningSandboxHref({ surface: "enroll", slug: courseSlug })}>
+            {sandboxT(locale, "enrollToSaveExercise")}
+          </a>
+        </p>
+      )}
       {existing?.answer ? (
         <p role="status" className="mt-2 text-sm">
           {sandboxT(locale, "exerciseSaved")}
         </p>
       ) : null}
     </form>
+  );
+}
+
+export function ExerciseProgress({
+  locale,
+  studentId,
+  courseSlug,
+}: {
+  locale: AppLocale;
+  studentId: string;
+  courseSlug: string;
+}) {
+  const { state } = useLearningSandboxState();
+  const progress = liveProgress(state, studentId, courseSlug);
+  if (!progress) return null;
+  return (
+    <p role="status" className="mt-3 text-sm text-[var(--sx-muted)]">
+      {sandboxT(locale, "exerciseProgress")}: {progress.exercisesDone} · {progress.percent}% ·{" "}
+      {progress.lessonsCompleted}/{progress.lessonsTotal}
+    </p>
   );
 }
 

@@ -5,6 +5,7 @@ export const FOCUS_E2E_ORIGINAL = "umtuba-platform-essentials";
 export const FOCUS_E2E_LESSON = "pe-m1-l1";
 export const FOCUS_E2E_QUIZ = "pe-m1-q";
 export const FOCUS_E2E_EXERCISE = "pe-ex-1";
+export const FOCUS_E2E_LESSON_EXERCISE = "pe-m1-l1-ex";
 export const FOCUS_E2E_PAID = "demo-partner-structured-thinking";
 export const FOCUS_E2E_EXTERNAL = "demo-external-cloud-primer";
 export const FOCUS_E2E_INSTRUCTOR = "demo-instructor-01";
@@ -28,6 +29,7 @@ export function studentE2eClickPath(): ClickStep[] {
     { surface: "enroll", slug: FOCUS_E2E_ORIGINAL },
     { surface: "lesson", slug: FOCUS_E2E_ORIGINAL, lessonId: FOCUS_E2E_LESSON },
     { surface: "quiz", slug: FOCUS_E2E_ORIGINAL, lessonId: FOCUS_E2E_QUIZ },
+    { surface: "exercise", slug: FOCUS_E2E_ORIGINAL, exerciseId: FOCUS_E2E_LESSON_EXERCISE },
     { surface: "exercise", slug: FOCUS_E2E_ORIGINAL, exerciseId: FOCUS_E2E_EXERCISE },
     { surface: "assessment", slug: FOCUS_E2E_ORIGINAL },
     { surface: "tutor", slug: FOCUS_E2E_ORIGINAL, lessonId: FOCUS_E2E_LESSON },

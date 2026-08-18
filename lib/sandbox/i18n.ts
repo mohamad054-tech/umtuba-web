@@ -96,6 +96,13 @@ export type SandboxMessageKey =
   | "exercise"
   | "submitExercise"
   | "exerciseSaved"
+  | "exerciseUnavailable"
+  | "unknownExercise"
+  | "returnToLesson"
+  | "returnToCourse"
+  | "successCriteria"
+  | "exerciseProgress"
+  | "enrollToSaveExercise"
   | "finalAssessment"
   | "submitAssessment"
   | "assessmentPassed"
@@ -221,6 +228,14 @@ const en: Catalog = {
   exercise: "Exercise",
   submitExercise: "Save exercise",
   exerciseSaved: "Exercise saved in sandbox state.",
+  exerciseUnavailable: "This Learning exercise is unavailable",
+  unknownExercise:
+    "This Learning sandbox exercise is missing or invalid. It is not a generic page crash.",
+  returnToLesson: "Return to lesson",
+  returnToCourse: "Return to course",
+  successCriteria: "Success criteria",
+  exerciseProgress: "Sandbox progress",
+  enrollToSaveExercise: "Sandbox enroll to save this exercise",
   finalAssessment: "Final assessment",
   submitAssessment: "Submit assessment",
   assessmentPassed: "Passed this sandbox check.",
@@ -346,6 +361,13 @@ const ar: Catalog = {
   exercise: "تمرين",
   submitExercise: "حفظ التمرين",
   exerciseSaved: "حُفظ التمرين في حالة الصندوق.",
+  exerciseUnavailable: "تمرين التعلّم هذا غير متاح",
+  unknownExercise: "تمرين صندوق التعلّم هذا مفقود أو غير صالح. هذه ليست أعطالاً عامة للصفحة.",
+  returnToLesson: "العودة إلى الدرس",
+  returnToCourse: "العودة إلى الدورة",
+  successCriteria: "معايير النجاح",
+  exerciseProgress: "تقدّم الصندوق",
+  enrollToSaveExercise: "سجّل في الصندوق لحفظ هذا التمرين",
   finalAssessment: "التقييم النهائي",
   submitAssessment: "إرسال التقييم",
   assessmentPassed: "نجحت في فحص الصندوق.",
