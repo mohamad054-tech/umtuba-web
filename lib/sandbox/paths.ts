@@ -2,6 +2,8 @@
  * Private Product Owner sandbox. Never add these paths to public nav or sitemap.
  */
 
+import { parseLearningSandboxRoute, type LearningSandboxRoute } from "./learning/routes";
+
 export const SANDBOX_PATH = "/sandbox/business-preview";
 export const SANDBOX_ENTER_PATH = `${SANDBOX_PATH}/enter`;
 export const SANDBOX_SESSION_COOKIE = "umtuba_business_sandbox";
@@ -11,10 +13,15 @@ export const SANDBOX_TOKEN_QUERY = "sandbox_token";
 
 export const SANDBOX_SECTIONS = [
   "learning",
+  "learning/catalog",
+  "learning/search",
   "learning/student",
+  "learning/students",
   "learning/instructor",
+  "learning/instructors",
   "learning/admin",
   "learning/partners",
+  "learning/enrollment-models",
   "store",
   "store/catalog",
   "store/favorites",
@@ -45,21 +52,22 @@ export function isSandboxPath(pathname: string): boolean {
   return pathname === SANDBOX_PATH || pathname.startsWith(`${SANDBOX_PATH}/`);
 }
 
-export function parseSandboxSection(
-  segments: string[] | undefined
-):
+export type ParsedSandboxSection =
   | { kind: "hub" }
   | { kind: "section"; section: SandboxSection }
   | { kind: "course"; slug: string }
   | { kind: "product"; slug: string }
   | { kind: "order"; id: string }
-  | { kind: "unknown" } {
+  | { kind: "learning"; route: LearningSandboxRoute }
+  | { kind: "unknown" };
+
+export function parseSandboxSection(segments: string[] | undefined): ParsedSandboxSection {
   if (!segments || segments.length === 0) return { kind: "hub" };
   if (segments[0] === "enter") return { kind: "unknown" };
 
-  if (segments[0] === "learning" && segments[1] === "courses" && segments[2] && segments.length === 3) {
-    return { kind: "course", slug: segments[2] };
-  }
+  const learning = parseLearningSandboxRoute(segments);
+  if (learning) return { kind: "learning", route: learning };
+
   if (segments[0] === "store" && segments[1] === "products" && segments[2] && segments.length === 3) {
     return { kind: "product", slug: segments[2] };
   }

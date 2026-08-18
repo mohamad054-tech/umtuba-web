@@ -63,6 +63,56 @@
   color: var(--sx-accent);
 }
 
+.sandbox-preview .sx-btn {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid var(--sx-line);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  color: var(--sx-ink);
+  background: transparent;
+}
+
+.sandbox-preview .sx-btn:disabled {
+  opacity: 0.45;
+}
+
+.sandbox-preview .sx-btn-ok {
+  border-color: rgba(159, 214, 184, 0.45);
+  color: var(--sx-ok);
+}
+
+.sandbox-preview .sx-btn-danger {
+  border-color: rgba(240, 168, 168, 0.45);
+  color: var(--sx-danger);
+}
+
+.sandbox-preview .sx-input {
+  width: 100%;
+  border-radius: 0.85rem;
+  border: 1px solid var(--sx-line);
+  background: var(--sx-surface-2);
+  color: var(--sx-ink);
+  padding: 0.55rem 0.75rem;
+}
+
+.sandbox-preview .sx-learning-panel {
+  max-width: 46rem;
+}
+
+.sandbox-preview .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Fluid 360 / 390 / 430 phones share the single-column grid. */
 @media (min-width: 360px) {
   .sandbox-preview {
