@@ -38,12 +38,14 @@ import { studentE2eClickPath } from "../../../../lib/sandbox/learning/clickPath"
 import {
   AdminActivateDenied,
   AssessmentForm,
+  BookmarkButton,
   CatalogSearch,
   CertificateStatus,
   CompleteLessonButton,
   DraftCreateForm,
   EnrollButton,
   ExerciseForm,
+  LessonNotes,
   MockPayButtons,
   QuizForm,
   TutorForm,
@@ -238,11 +240,68 @@ function CourseDetail({ locale, slug }: { locale: AppLocale; slug: string }) {
   const tutor = resolveSandboxTutorAccess(course);
   const economics = learningPaymentEconomics(course);
   const first = flattenLessons(course)[0];
+  const lessonExercises = course.modules.flatMap((courseModule) =>
+    courseModule.lessons
+      .map((lesson) => lesson.lessonExercise)
+      .filter((exercise): exercise is NonNullable<typeof exercise> => Boolean(exercise))
+  );
   return (
     <div>
       <KindBadge kind={course.kind} />
       <h2 className="mt-3 text-2xl font-semibold">{course.title}</h2>
       <p className="mt-2 text-sm text-[var(--sx-muted)]">{course.shortDescription}</p>
+      {course.fullDescription ? (
+        <p className="mt-3 text-sm leading-7">{course.fullDescription}</p>
+      ) : null}
+      {course.targetAudience ? (
+        <p className="mt-3 text-sm">
+          <strong>{sandboxT(locale, "audience")}:</strong> {course.targetAudience}
+        </p>
+      ) : null}
+      {course.level ? <p className="mt-1 text-sm">Level: {course.level}</p> : null}
+      {course.estimatedDurationMinutes ? (
+        <p className="mt-1 text-sm">
+          {sandboxT(locale, "duration")}: {course.estimatedDurationMinutes}m
+        </p>
+      ) : null}
+      {course.prerequisites?.length ? (
+        <div className="mt-3">
+          <h3 className="text-sm font-semibold">{sandboxT(locale, "prerequisites")}</h3>
+          <ul className="mt-1 list-disc ps-5 text-sm">
+            {course.prerequisites.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {course.learningObjectives?.length ? (
+        <div className="mt-3">
+          <h3 className="text-sm font-semibold">{sandboxT(locale, "objectives")}</h3>
+          <ul className="mt-1 list-disc ps-5 text-sm">
+            {course.learningObjectives.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {course.progressRules?.length ? (
+        <div className="mt-3">
+          <h3 className="text-sm font-semibold">{sandboxT(locale, "completionRequirements")}</h3>
+          <ul className="mt-1 list-disc ps-5 text-sm">
+            {course.progressRules.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {course.finalAssessment ? (
+        <p className="mt-3 text-sm">
+          {sandboxT(locale, "assessmentInfo")} · {course.finalAssessment.id}
+        </p>
+      ) : null}
+      {course.certificatePolicy ? (
+        <p className="mt-2 text-xs">{course.certificatePolicy.statement}</p>
+      ) : null}
       <p className="mt-2 text-xs">
         owner={course.contentOwner} · certificate={course.certificateOwner} · AI Tutor=
         {tutor.allowed ? "OWNED" : "DENIED"} · enroll={course.enrollmentMode}
@@ -266,9 +325,14 @@ function CourseDetail({ locale, slug }: { locale: AppLocale; slug: string }) {
             {sandboxT(locale, "openLesson")}
           </Link>
         ) : null}
+        {lessonExercises[0] ? (
+          <Link className="sx-btn" href={href({ surface: "exercise", slug, exerciseId: lessonExercises[0].id })}>
+            {sandboxT(locale, "lessonExercise")}
+          </Link>
+        ) : null}
         {course.exercises[0] ? (
           <Link className="sx-btn" href={href({ surface: "exercise", slug, exerciseId: course.exercises[0].id })}>
-            {sandboxT(locale, "exercise")}
+            {sandboxT(locale, "courseExercise")}
           </Link>
         ) : null}
         {course.modules.length > 0 ? (
@@ -287,6 +351,20 @@ function CourseDetail({ locale, slug }: { locale: AppLocale; slug: string }) {
         <p className="sx-card mt-4">{sandboxT(locale, "continueProvider")}</p>
       ) : (
         <div className="mt-6 space-y-4">
+          {course.exercises.length > 0 ? (
+            <article className="sx-card">
+              <h3 className="font-semibold">{sandboxT(locale, "courseExercise")}</h3>
+              <ul className="mt-2 list-disc ps-5 text-sm">
+                {course.exercises.map((exercise) => (
+                  <li key={exercise.id}>
+                    <Link href={href({ surface: "exercise", slug, exerciseId: exercise.id })}>
+                      {exercise.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
           {course.modules.map((module) => (
             <article key={module.id} className="sx-card">
               <h3 className="font-semibold">{module.title}</h3>
@@ -299,12 +377,21 @@ function CourseDetail({ locale, slug }: { locale: AppLocale; slug: string }) {
                     </Link>{" "}
                     ({lesson.kind}
                     {lessonBodyState(lesson) === "MISSING" ? ` · ${sandboxT(locale, "bodyMissing")}` : ""})
-                    {lesson.quiz[0] ? (
+                    {lesson.kind === "quiz" || lesson.quiz[0] ? (
                       <span>
                         {" "}
                         ·{" "}
                         <Link href={href({ surface: "quiz", slug, lessonId: lesson.id })}>
-                          {sandboxT(locale, "quiz")}
+                          {sandboxT(locale, "moduleQuiz")}
+                        </Link>
+                      </span>
+                    ) : null}
+                    {lesson.lessonExercise ? (
+                      <span>
+                        {" "}
+                        ·{" "}
+                        <Link href={href({ surface: "exercise", slug, exerciseId: lesson.lessonExercise.id })}>
+                          {sandboxT(locale, "lessonExercise")}
                         </Link>
                       </span>
                     ) : null}
@@ -337,6 +424,7 @@ function LessonView({
   const rows = course ? flattenLessons(course) : [];
   const current = rows.find((row) => row.lesson.id === lessonId);
   if (!course || !current) return <p>{sandboxT(locale, "unknownLesson")}</p>;
+  const previous = rows[current.index - 1];
   const next = rows[current.index + 1];
   const missing = lessonBodyState(current.lesson) === "MISSING";
   return (
@@ -350,17 +438,37 @@ function LessonView({
       ) : (
         <p className="sx-card mt-4 whitespace-pre-wrap text-sm leading-7">{current.lesson.body}</p>
       )}
+      {current.lesson.resource ? (
+        <article className="sx-card mt-4 whitespace-pre-wrap text-sm leading-7">
+          <h3 className="font-semibold">{current.lesson.resource.title}</h3>
+          <p className="mt-2">{current.lesson.resource.body}</p>
+        </article>
+      ) : null}
       <p className="mt-3 text-xs">{sandboxT(locale, "authoredSourceLanguage")}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <CompleteLessonButton locale={locale} studentId={studentId} courseSlug={slug} lessonId={lessonId} />
-        {current.lesson.quiz[0] ? (
+        <BookmarkButton locale={locale} studentId={studentId} courseSlug={slug} lessonId={lessonId} />
+        {current.lesson.quiz.length > 0 ? (
           <Link className="sx-btn" href={href({ surface: "quiz", slug, lessonId })}>
-            {sandboxT(locale, "quiz")}
+            {sandboxT(locale, "moduleQuiz")}
+          </Link>
+        ) : null}
+        {current.lesson.lessonExercise ? (
+          <Link
+            className="sx-btn"
+            href={href({ surface: "exercise", slug, exerciseId: current.lesson.lessonExercise.id })}
+          >
+            {sandboxT(locale, "lessonExercise")}
           </Link>
         ) : null}
         <Link className="sx-btn" href={href({ surface: "tutor", slug, lessonId })}>
           {sandboxT(locale, "aiTutor")}
         </Link>
+        {previous ? (
+          <Link className="sx-btn" href={href({ surface: "lesson", slug, lessonId: previous.lesson.id })}>
+            {sandboxT(locale, "previousLesson")}
+          </Link>
+        ) : null}
         {next ? (
           <Link className="sx-btn sx-btn-ok" href={href({ surface: "lesson", slug, lessonId: next.lesson.id })}>
             {sandboxT(locale, "nextLesson")}
@@ -371,6 +479,7 @@ function LessonView({
           </Link>
         )}
       </div>
+      <LessonNotes locale={locale} studentId={studentId} courseSlug={slug} lessonId={lessonId} />
     </div>
   );
 }
@@ -516,15 +625,15 @@ export default function LearningSandbox({
     case "quiz": {
       const course = getSandboxCourse(route.slug);
       const lesson = course ? flattenLessons(course).find((row) => row.lesson.id === route.lessonId) : null;
-      body = lesson?.lesson.quiz[0] ? (
+      body = lesson?.lesson.quiz.length ? (
         <div>
-          <LearningSectionHeader title={sandboxT(locale, "quiz")} description={lesson.lesson.title} />
+          <LearningSectionHeader title={sandboxT(locale, "moduleQuiz")} description={lesson.lesson.title} />
           <QuizForm
             locale={locale}
             studentId={studentId}
             courseSlug={route.slug}
             lessonId={route.lessonId}
-            question={lesson.lesson.quiz[0]}
+            questions={lesson.lesson.quiz}
           />
         </div>
       ) : (
@@ -534,7 +643,12 @@ export default function LearningSandbox({
     }
     case "exercise": {
       const course = getSandboxCourse(route.slug);
-      const exercise = course?.exercises.find((row) => row.id === route.exerciseId);
+      const exercise =
+        course?.exercises.find((row) => row.id === route.exerciseId) ??
+        course?.modules
+          .flatMap((courseModule) => courseModule.lessons)
+          .map((lesson) => lesson.lessonExercise)
+          .find((row) => row?.id === route.exerciseId);
       body = exercise ? (
         <div>
           <LearningSectionHeader title={exercise.title} />
@@ -553,10 +667,15 @@ export default function LearningSandbox({
     }
     case "assessment": {
       const course = getSandboxCourse(route.slug);
-      const questions = course ? flattenLessons(course).flatMap((row) => row.lesson.quiz) : [];
+      const questions =
+        course?.finalAssessment?.questions ??
+        (course ? flattenLessons(course).flatMap((row) => row.lesson.quiz) : []);
       body = course ? (
         <div>
-          <LearningSectionHeader title={sandboxT(locale, "finalAssessment")} description={sandboxT(locale, "noAccreditation")} />
+          <LearningSectionHeader
+            title={sandboxT(locale, "finalAssessment")}
+            description={`${course.finalAssessment?.id ?? ""} · ${sandboxT(locale, "assessmentInfo")}`}
+          />
           <AssessmentForm locale={locale} studentId={studentId} courseSlug={route.slug} questions={questions} />
         </div>
       ) : (

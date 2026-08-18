@@ -1,6 +1,49 @@
 ﻿# Current Task
 
-## CENTRAL GO — CONSUME DESKTOP STORE CATALOG PRODUCTIZATION V1
+## CENTRAL GO — INGEST UMTUBA ORIGINALS CONTENT INTO EXECUTABLE LEARNING SANDBOX V1
+
+**TASK_ID** = `CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1`
+**PRIORITY** = HIGH
+**SCOPE** = PRIVATE WEB SANDBOX LEARNING SLICES ONLY
+**DATE** = 2026-08-18
+**MODE** = PRODUCT_INTEGRATION_ONLY
+**INPUT** = `PC2_UMTUBA_ORIGINALS_CONTENT_BUILD_V1` (packet not on disk; authoritative draft bodies from pre-company pilot `cd39b883`, no rewrite)
+
+### Status
+
+IMPLEMENTED locally. Stacked Originals ingest onto Desktop catalog tip `910fb3b8` (parent live `fbb6b364`) so the 26-SKU delta is not dropped. Store V2 + Learning V2 + catalog productization files left intact. `PRIVATE_SANDBOX_DEPLOYED=NO`. Live remains `fbb6b364-20260818222318`.
+
+### Identity
+
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION
+- **LIVE_COMBINED_SHA** = `fbb6b3646c91b287942da8aa8b1ce4527bfd8695`
+- **CATALOG_PARENT_SHA** = `910fb3b859b274b5342d9e8eb97153155632051e`
+- **LIVE_RELEASE** = `fbb6b364-20260818222318`
+- **ROLLBACK_RELEASE** = `4b8dcb6d-20260818210857`
+- **TASK_BRANCH** = `central/ingest-umtuba-originals-on-910fb3b8`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-ingest-umtuba-originals-on-910fb3b8`
+- **SANDBOX_PATH** = `/sandbox/business-preview`
+- **CONTENT_SOURCE** = `D:\umtuba-central\repos\umtuba-web-store-learning-precompany-foundation-v2` SHA `cd39b883`
+
+### Allowed scope
+
+Ingest PC2 / pre-company Originals into private Learning sandbox slices. Course detail, 36 lessons, 12 quizzes, exercises, finals, completion, certificate preview, AI tutor context, i18n chrome. Tests/docs.
+
+### Forbidden scope
+
+- Rewrite or regenerate the 36 authored lessons
+- Overwrite Store V2 shopper files
+- Overwrite `lib/store/demo` catalog productization or `910fb3b8` catalog files (`catalog.ts`, `catalogStates.ts`, `store.ts`, catalog tests)
+- Wipe Learning V2 executable slices
+- Race Hetzner; deploy without later GO
+- Publish production `/learning` or `/store`
+- SQL `20260929` / re-apply `20260930`; mobile `7cf3960`
+- Production enrollments/certificates; force-push; reset to `8f39277b`
+
+---
+
+## Parallel — CONSUME DESKTOP STORE CATALOG PRODUCTIZATION V1
 
 **TASK_ID** = `CENTRAL_CONSUME_DESKTOP_STORE_CATALOG_PRODUCTIZATION_V1`
 **PRIORITY** = HIGH
@@ -9,10 +52,11 @@
 **PRODUCT_OWNER_DECISION** = PRESERVE_AND_INTEGRATE_THIS_WORK
 **INPUT_TASK** = `DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1`
 **STATUS** = IMPLEMENTED_LOCAL — `PUSHED=NO` `DEPLOYED=NO`
+**CENTRAL_AUTHORITATIVE_SHA** = `910fb3b859b274b5342d9e8eb97153155632051e`
 
 ### Status
 
-Consumed Desktop intake from fallback UNC (requested `D:\UMTUBA-SHARE\FROM-DESKTOP` was Access Denied). Applied 26-SKU catalog delta onto live combined tip `fbb6b364` (Store V2 + Learning V2 already live). Did not overwrite Store V2 checkout/mock pay/orders/seller/admin/Arabic/RTL/containment. Did not wipe Learning V2. Did not race Hetzner. One local Central commit pending SHA after commit.
+Consumed Desktop intake. 26 DEMO SKUs with variants/specs/search/filter/related/inventory/PRICE_CHANGED on `central/store-catalog-productization-from-desktop-v1`. Parent live `fbb6b364`. Store V2 + Learning V2 preserved. Originals ingest stacked on this SHA without rewriting catalog files.
 
 ### Identity
 
@@ -23,7 +67,6 @@ Consumed Desktop intake from fallback UNC (requested `D:\UMTUBA-SHARE\FROM-DESKT
 - **ROLLBACK_RELEASE** = `4b8dcb6d-20260818210857`
 - **TASK_BRANCH** = `central/store-catalog-productization-from-desktop-v1`
 - **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-catalog-productization-from-desktop-v1`
-- **INTAKE_PATH_USED** = `\\192.168.88.11\umtuba-multi-agent-desktop\intake\Desktop\DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1\`
 
 ### Allowed scope
 
@@ -46,17 +89,17 @@ Overwrite Store V2 with Desktop base `4b8dcb6d`. Wipe Learning V2 or Originals i
 
 ### Status
 
-RECONCILE in progress. Dedicated branch from live `4b8dcb6d`. Integrating Store V2 `ffc1a47e` and Learning V2 `fbc6f340` without dropping either product.
+DEPLOYED. Combined Store V2 + Learning V2 is live on Hetzner at `fbb6b364-20260818222318` (`fbb6b3646c91b287942da8aa8b1ce4527bfd8695`). Guest anonymous denied. noindex. Not in public nav. `STORE_DEMO_PREVIEW` unset. Sandbox token unset. Rollback `4b8dcb6d-20260818210857`. Authorized walkthrough needs a platform_admins session. Originals ingest and Desktop catalog are **not** on this live tip.
 
 ### Identity
 
 - **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
 - **DEVICE_ROLE** = IMPLEMENTATION
-- **CURRENT_LIVE_BASE** = `4b8dcb6ddb1d67b8e665def22440b527bc176f46`
-- **LIVE_RELEASE** = `4b8dcb6d-20260818210857`
+- **WEB_SHA_BEFORE** = `4b8dcb6ddb1d67b8e665def22440b527bc176f46`
+- **COMBINED_SANDBOX_SHA** = `fbb6b3646c91b287942da8aa8b1ce4527bfd8695`
+- **WEB_SHA_AFTER** = `fbb6b3646c91b287942da8aa8b1ce4527bfd8695`
+- **LIVE_RELEASE** = `fbb6b364-20260818222318`
 - **ROLLBACK_RELEASE** = `4b8dcb6d-20260818210857`
-- **STORE_V2_SHA** = `ffc1a47ec7f5484167551049b6915258b0cd8623`
-- **LEARNING_V2_SHA** = `fbc6f340a07c130ee834544d411ddc9e3532e5e7`
 - **TASK_BRANCH** = `central/combined-sandbox-store-learning-v1`
 - **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-combined-sandbox-store-learning-v1`
 - **SANDBOX_PATH** = `/sandbox/business-preview`

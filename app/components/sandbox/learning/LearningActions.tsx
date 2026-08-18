@@ -116,51 +116,64 @@ export function QuizForm({
   studentId,
   courseSlug,
   lessonId,
-  question,
+  questions,
 }: {
   locale: AppLocale;
   studentId: string;
   courseSlug: string;
   lessonId: string;
-  question: QuizQuestion;
+  questions: QuizQuestion[];
 }) {
   const { state, dispatch, ready } = useLearningSandboxState();
-  const [choiceId, setChoiceId] = useState(question.choices[0]?.id ?? "");
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const result = state.quizResults[`${studentId}::${courseSlug}::${lessonId}`];
   return (
     <form
-      className="sx-card sx-learning-panel"
+      className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
-        dispatch({ type: "submitQuiz", studentId, courseSlug, lessonId, choiceId });
+        dispatch({
+          type: "submitQuiz",
+          studentId,
+          courseSlug,
+          lessonId,
+          choiceId: Object.values(answers)[0],
+          answers,
+        });
       }}
     >
-      <p className="font-semibold">{question.prompt}</p>
-      <fieldset className="mt-3 space-y-2">
-        <legend className="sr-only">{sandboxT(locale, "quiz")}</legend>
-        {question.choices.map((choice) => (
-          <label key={choice.id} className="flex items-start gap-2 text-sm">
-            <input
-              type="radio"
-              name={question.id}
-              value={choice.id}
-              checked={choiceId === choice.id}
-              onChange={() => setChoiceId(choice.id)}
-            />
-            <span>{choice.text}</span>
-          </label>
-        ))}
-      </fieldset>
-      <button type="submit" disabled={!ready} className="sx-btn sx-btn-ok mt-4">
+      {questions.map((question) => (
+        <fieldset key={question.id} className="sx-card sx-learning-panel">
+          <legend className="font-semibold">{question.prompt}</legend>
+          <div className="mt-3 space-y-2">
+            {question.choices.map((choice) => (
+              <label key={choice.id} className="flex items-start gap-2 text-sm">
+                <input
+                  type="radio"
+                  name={question.id}
+                  value={choice.id}
+                  checked={answers[question.id] === choice.id}
+                  onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: choice.id }))}
+                />
+                <span>{choice.text}</span>
+              </label>
+            ))}
+          </div>
+          {result ? (
+            <p className="mt-3 text-xs text-[var(--sx-muted)]">{question.explanation}</p>
+          ) : null}
+        </fieldset>
+      ))}
+      <button type="submit" disabled={!ready} className="sx-btn sx-btn-ok">
         {sandboxT(locale, "submitQuiz")}
       </button>
       {result ? (
-        <p role="status" className="mt-3 text-sm">
+        <p role="status" className="text-sm">
+          {sandboxT(locale, "quizScore")}: {result.correct}/{result.total} ·{" "}
           {result.passed ? sandboxT(locale, "quizPassed") : sandboxT(locale, "quizFailed")}
-          {result.passed ? ` ${question.explanation}` : ""}
         </p>
       ) : null}
-      <p className="mt-2 text-xs text-[var(--sx-faint)]">{sandboxT(locale, "noAccreditation")}</p>
+      <p className="text-xs text-[var(--sx-faint)]">{sandboxT(locale, "noAccreditation")}</p>
     </form>
   );
 }
@@ -256,9 +269,12 @@ export function AssessmentForm({
       {result ? (
         <p role="status" className="text-sm">
           {result.correct}/{result.total} · {result.passed ? sandboxT(locale, "assessmentPassed") : sandboxT(locale, "assessmentFailed")}
+          {result.attempts ? ` · attempts=${result.attempts}` : ""}
         </p>
       ) : null}
-      <p className="text-xs text-[var(--sx-faint)]">{sandboxT(locale, "noAccreditation")}</p>
+      <p className="text-xs text-[var(--sx-faint)]">
+        {sandboxT(locale, "passThreshold")} · {sandboxT(locale, "retryAllowed")}
+      </p>
     </form>
   );
 }
@@ -362,16 +378,101 @@ export function CertificateStatus({
 }) {
   const { state } = useLearningSandboxState();
   const decision = certificateFor(state, studentId, courseSlug);
-  if (!decision) return <p>{sandboxT(locale, "unknownCourse")}</p>;
+  const course = getSandboxCourse(courseSlug);
+  if (!decision || !course) return <p>{sandboxT(locale, "unknownCourse")}</p>;
+  const preview = {
+    issuer: "UMTUBA" as const,
+    studentName: studentId.replace("demo-student-", "Demo Student "),
+    courseTitle: course.title,
+    completionDate: decision.canIssue ? "2026-08-18" : "—",
+    certificateId: `SANDBOX-${courseSlug}-${studentId}`,
+    marking: "SANDBOX / DEMO",
+    statement:
+      course.certificatePolicy?.statement ??
+      "This certificate confirms completion of an UMTUBA Originals course. It is issued by UMTUBA and represents UMTUBA only. It is not a university degree, government license, or accredited professional credential.",
+  };
   return (
     <article className="sx-card mt-4">
-      <p>
-        {decision.kind} · owner={decision.owner} · issuer={decision.issuer} · canIssue=
-        {decision.canIssue ? "YES" : "NO"}
+      <p className="text-xs uppercase tracking-[0.16em] text-[var(--sx-warn)]">{preview.marking}</p>
+      <h3 className="mt-3 text-xl font-semibold">{preview.courseTitle}</h3>
+      <p className="mt-2 text-sm">{preview.studentName}</p>
+      <p className="mt-1 text-sm">
+        {sandboxT(locale, "certificateIssuer")} · {preview.completionDate} · {preview.certificateId}
+      </p>
+      <p className="mt-3 text-sm">{preview.statement}</p>
+      <p className="mt-3 text-xs">{sandboxT(locale, "certificateDemo")}</p>
+      <p className="mt-2 text-sm">
+        {decision.kind} · owner={decision.owner} · canIssue={decision.canIssue ? "YES" : "NO"}
       </p>
       <p className="mt-2 text-sm">{decision.reason}</p>
       <p className="mt-2 text-xs">{sandboxT(locale, "certificateRules")}</p>
     </article>
+  );
+}
+
+export function LessonNotes({
+  locale,
+  studentId,
+  courseSlug,
+  lessonId,
+}: {
+  locale: AppLocale;
+  studentId: string;
+  courseSlug: string;
+  lessonId: string;
+}) {
+  const { state, dispatch, ready } = useLearningSandboxState();
+  const key = `${studentId}::${courseSlug}::${lessonId}`;
+  const [note, setNote] = useState(state.notes[key] ?? "");
+  return (
+    <form
+      className="sx-card mt-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        dispatch({ type: "saveNote", studentId, courseSlug, lessonId, note });
+      }}
+    >
+      <label className="text-sm" htmlFor={`note-${lessonId}`}>
+        {sandboxT(locale, "notes")}
+      </label>
+      <textarea
+        id={`note-${lessonId}`}
+        className="sx-input mt-2"
+        rows={3}
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
+      />
+      <button type="submit" disabled={!ready} className="sx-btn mt-3">
+        {sandboxT(locale, "saveNote")}
+      </button>
+      {state.notes[key] ? <p className="mt-2 text-xs">{sandboxT(locale, "noteSaved")}</p> : null}
+    </form>
+  );
+}
+
+export function BookmarkButton({
+  locale,
+  studentId,
+  courseSlug,
+  lessonId,
+}: {
+  locale: AppLocale;
+  studentId: string;
+  courseSlug: string;
+  lessonId: string;
+}) {
+  const { state, dispatch, ready } = useLearningSandboxState();
+  const key = `${studentId}::${courseSlug}::${lessonId}`;
+  const on = Boolean(state.bookmarks[key]);
+  return (
+    <button
+      type="button"
+      disabled={!ready}
+      className="sx-btn"
+      onClick={() => dispatch({ type: "toggleBookmark", studentId, courseSlug, lessonId })}
+    >
+      {on ? sandboxT(locale, "bookmarked") : sandboxT(locale, "bookmark")}
+    </button>
   );
 }
 

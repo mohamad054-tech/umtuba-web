@@ -69,6 +69,35 @@ export type QuizQuestion = {
   explanation: string;
 };
 
+export type SandboxExercise = {
+  id: string;
+  title: string;
+  prompt: string;
+  successCriteria: string[];
+  scope: "lesson" | "course";
+  lessonId?: string;
+};
+
+export type SandboxFinalAssessment = {
+  id: "pe-final" | "ds-final" | "ai-final" | string;
+  title: string;
+  questions: QuizQuestion[];
+  reviewBank: QuizQuestion[];
+  passCorrect: number;
+  passTotal: number;
+  attempts: "UNLIMITED";
+  mode: "SCORE";
+};
+
+export type SandboxCertificatePolicy = {
+  issuer: "UMTUBA";
+  represents: "UMTUBA_ONLY";
+  requiresFinalAssessmentPass: true;
+  passingScoreLabel: "4/5";
+  notAnAccreditedCredential: true;
+  statement: string;
+};
+
 export type SandboxLesson = {
   id: string;
   title: string;
@@ -76,6 +105,9 @@ export type SandboxLesson = {
   estimatedMinutes: number;
   body: string;
   quiz: QuizQuestion[];
+  objectives?: string[];
+  resource?: { title: string; kind: string; body: string } | null;
+  lessonExercise?: SandboxExercise;
 };
 
 export type SandboxModule = {
@@ -93,16 +125,27 @@ export type SandboxCourse = {
   status: LifecycleStatus;
   publishState: "DRAFT" | "SANDBOX_ONLY" | "NOT_PUBLIC";
   shortDescription: string;
+  fullDescription?: string;
+  targetAudience?: string;
+  level?: string;
+  prerequisites?: string[];
+  learningObjectives?: string[];
+  estimatedDurationMinutes?: number;
+  progressRules?: readonly string[];
+  language?: string;
+  contentRights?: "OWNED" | "PARTNER" | "EXTERNAL";
   instructorId: string;
   providerId: string;
   contentOwner: string;
   certificateOwner: string;
+  certificatePolicy?: SandboxCertificatePolicy;
+  finalAssessment?: SandboxFinalAssessment;
   aiTutorAllowed: boolean;
   enrollmentMode: "HOSTED" | "EXTERNAL_CONTINUE" | "SANDBOX_ENROLL";
   listPriceMinor: number | null;
   revenueSharePercent: number | null;
   modules: SandboxModule[];
-  exercises: { id: string; title: string; prompt: string }[];
+  exercises: SandboxExercise[];
   publicCatalog: false;
   synthetic: true;
 };

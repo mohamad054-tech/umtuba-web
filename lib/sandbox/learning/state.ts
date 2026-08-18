@@ -2,6 +2,11 @@ import { getSandboxCourse } from "../fixtures/courses";
 import { FOCUS_STUDENT_ID } from "../fixtures/progress";
 import { findExercise, findLesson, flattenLessons, isPaidCourse, progressKey } from "./catalog";
 import { certificateDecision } from "./certificates";
+import {
+  evaluateOriginalsCompletion,
+  gradeAnswers,
+  gradeFinalAssessment,
+} from "./completion";
 import { explainEnrollment } from "./enrollment";
 import {
   advanceInstructorDraft,
@@ -19,6 +24,9 @@ export type QuizResult = {
   courseSlug: string;
   lessonId: string;
   choiceId: string;
+  answers: Record<string, string>;
+  correct: number;
+  total: number;
   passed: boolean;
 };
 
@@ -32,9 +40,11 @@ export type ExerciseAnswer = {
 export type AssessmentResult = {
   studentId: string;
   courseSlug: string;
+  assessmentId?: string;
   correct: number;
   total: number;
   passed: boolean;
+  attempts: number;
 };
 
 export type EnrollmentRecord = {
@@ -51,9 +61,11 @@ export type LearningSandboxState = {
   quizResults: Record<string, QuizResult>;
   exerciseAnswers: Record<string, ExerciseAnswer>;
   assessments: Record<string, AssessmentResult>;
+  notes: Record<string, string>;
+  bookmarks: Record<string, boolean>;
   payments: Record<string, LearningPaymentRecord>;
   drafts: InstructorDraft[];
-  version: 2;
+  version: 3;
 };
 
 export const EMPTY_LEARNING_SANDBOX_STATE: LearningSandboxState = {
@@ -64,9 +76,11 @@ export const EMPTY_LEARNING_SANDBOX_STATE: LearningSandboxState = {
   quizResults: {},
   exerciseAnswers: {},
   assessments: {},
+  notes: {},
+  bookmarks: {},
   payments: {},
   drafts: [],
-  version: 2,
+  version: 3,
 };
 
 export type LearningSandboxAction =
@@ -79,7 +93,8 @@ export type LearningSandboxAction =
       studentId: string;
       courseSlug: string;
       lessonId: string;
-      choiceId: string;
+      choiceId?: string;
+      answers?: Record<string, string>;
     }
   | {
       type: "submitExercise";
@@ -95,6 +110,19 @@ export type LearningSandboxAction =
       answers: Record<string, string>;
     }
   | { type: "pay"; studentId: string; courseSlug: string; outcome: LearningPaymentOutcome }
+  | {
+      type: "saveNote";
+      studentId: string;
+      courseSlug: string;
+      lessonId: string;
+      note: string;
+    }
+  | {
+      type: "toggleBookmark";
+      studentId: string;
+      courseSlug: string;
+      lessonId: string;
+    }
   | { type: "createDraft"; instructorId: string; title: string }
   | { type: "advanceDraft"; draftId: string };
 
@@ -102,7 +130,7 @@ export function parseLearningSandboxState(raw: string | null | undefined): Learn
   if (!raw) return { ...EMPTY_LEARNING_SANDBOX_STATE };
   try {
     const parsed = JSON.parse(raw) as Partial<LearningSandboxState>;
-    if (parsed.version !== 2) return { ...EMPTY_LEARNING_SANDBOX_STATE };
+    if (parsed.version !== 3) return { ...EMPTY_LEARNING_SANDBOX_STATE };
     return {
       ...EMPTY_LEARNING_SANDBOX_STATE,
       ...parsed,
@@ -111,9 +139,11 @@ export function parseLearningSandboxState(raw: string | null | undefined): Learn
       quizResults: parsed.quizResults ?? {},
       exerciseAnswers: parsed.exerciseAnswers ?? {},
       assessments: parsed.assessments ?? {},
+      notes: parsed.notes ?? {},
+      bookmarks: parsed.bookmarks ?? {},
       payments: parsed.payments ?? {},
       drafts: parsed.drafts ?? [],
-      version: 2,
+      version: 3,
     };
   } catch {
     return { ...EMPTY_LEARNING_SANDBOX_STATE };
@@ -180,8 +210,11 @@ export function reduceLearningSandboxState(
       if (!isEnrolled(state, action.studentId, action.courseSlug)) return state;
       const course = getSandboxCourse(action.courseSlug);
       const found = course ? findLesson(course, action.lessonId) : null;
-      const question = found?.lesson.quiz[0];
-      if (!question) return state;
+      if (!found || found.lesson.quiz.length === 0) return state;
+      const answers =
+        action.answers ??
+        (action.choiceId ? { [found.lesson.quiz[0]!.id]: action.choiceId } : {});
+      const graded = gradeAnswers(found.lesson.quiz, answers);
       const key = `${action.studentId}::${action.courseSlug}::${action.lessonId}`;
       return {
         ...state,
@@ -191,9 +224,21 @@ export function reduceLearningSandboxState(
             studentId: action.studentId,
             courseSlug: action.courseSlug,
             lessonId: action.lessonId,
-            choiceId: action.choiceId,
-            passed: action.choiceId === question.correctChoiceId,
+            choiceId: action.choiceId ?? Object.values(answers)[0] ?? "",
+            answers,
+            correct: graded.correct,
+            total: graded.total,
+            passed: graded.passed,
           },
+        },
+        completedLessons: {
+          ...state.completedLessons,
+          [progressKey(action.studentId, action.courseSlug)]: [
+            ...new Set([
+              ...(state.completedLessons[progressKey(action.studentId, action.courseSlug)] ?? []),
+              action.lessonId,
+            ]),
+          ],
         },
       };
     }
@@ -219,11 +264,29 @@ export function reduceLearningSandboxState(
       if (!isEnrolled(state, action.studentId, action.courseSlug)) return state;
       const course = getSandboxCourse(action.courseSlug);
       if (!course) return state;
+      const key = progressKey(action.studentId, action.courseSlug);
+      const previous = state.assessments[key];
+      const scored = course.finalAssessment ? gradeFinalAssessment(course, action.answers) : null;
+      if (scored) {
+        return {
+          ...state,
+          assessments: {
+            ...state.assessments,
+            [key]: {
+              studentId: action.studentId,
+              courseSlug: action.courseSlug,
+              assessmentId: scored.assessmentId,
+              correct: scored.correct,
+              total: scored.total,
+              passed: scored.passed,
+              attempts: (previous?.attempts ?? 0) + 1,
+            },
+          },
+        };
+      }
       const questions = flattenLessons(course).flatMap((row) => row.lesson.quiz);
       if (questions.length === 0) return state;
-      const correct = questions.filter((question) => action.answers[question.id] === question.correctChoiceId).length;
-      const passed = correct / questions.length >= 0.7;
-      const key = progressKey(action.studentId, action.courseSlug);
+      const graded = gradeAnswers(questions, action.answers);
       return {
         ...state,
         assessments: {
@@ -231,11 +294,28 @@ export function reduceLearningSandboxState(
           [key]: {
             studentId: action.studentId,
             courseSlug: action.courseSlug,
-            correct,
-            total: questions.length,
-            passed,
+            correct: graded.correct,
+            total: graded.total,
+            passed: graded.passed,
+            attempts: (previous?.attempts ?? 0) + 1,
           },
         },
+      };
+    }
+    case "saveNote": {
+      if (!isEnrolled(state, action.studentId, action.courseSlug)) return state;
+      const key = `${action.studentId}::${action.courseSlug}::${action.lessonId}`;
+      return {
+        ...state,
+        notes: { ...state.notes, [key]: action.note.trim().slice(0, 800) },
+      };
+    }
+    case "toggleBookmark": {
+      if (!isEnrolled(state, action.studentId, action.courseSlug)) return state;
+      const key = `${action.studentId}::${action.courseSlug}::${action.lessonId}`;
+      return {
+        ...state,
+        bookmarks: { ...state.bookmarks, [key]: !state.bookmarks[key] },
       };
     }
     case "pay": {
@@ -279,6 +359,13 @@ export function certificateFor(
   const course = getSandboxCourse(courseSlug);
   if (!course) return null;
   const enrolled = isEnrolled(state, studentId, courseSlug);
+  if (course.kind === "UMTUBA_ORIGINAL") {
+    const completion = evaluateOriginalsCompletion({ course, state, studentId });
+    return certificateDecision(course, {
+      enrolled,
+      complete: completion.courseComplete,
+    });
+  }
   const lessons = flattenLessons(course);
   const completed = new Set(state.completedLessons[progressKey(studentId, courseSlug)] ?? []);
   const lessonsDone = lessons.length > 0 && lessons.every((row) => completed.has(row.lesson.id));

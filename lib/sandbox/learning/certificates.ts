@@ -111,3 +111,36 @@ export function certificateDecision(
     reason: "No certificate path for this course kind.",
   };
 }
+
+export type SandboxCertificatePreview = {
+  issuer: "UMTUBA";
+  studentName: string;
+  courseTitle: string;
+  completionDate: string;
+  certificateId: string;
+  marking: "SANDBOX / DEMO";
+  statement: string;
+  accreditationClaim: "NONE";
+  realCredential: false;
+};
+
+export function renderSandboxCertificate(input: {
+  studentName: string;
+  courseTitle: string;
+  courseSlug: string;
+  studentId: string;
+  statement: string;
+  issued: boolean;
+}): SandboxCertificatePreview {
+  return {
+    issuer: "UMTUBA",
+    studentName: input.studentName,
+    courseTitle: input.courseTitle,
+    completionDate: input.issued ? "2026-08-18" : "—",
+    certificateId: `SANDBOX-${input.courseSlug}-${input.studentId}`,
+    marking: "SANDBOX / DEMO",
+    statement: input.statement,
+    accreditationClaim: "NONE",
+    realCredential: false,
+  };
+}

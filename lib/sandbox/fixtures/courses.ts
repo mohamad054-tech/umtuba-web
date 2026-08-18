@@ -172,6 +172,8 @@ export const SANDBOX_PARTNER_COURSES: readonly SandboxCourse[] = PARTNER_SEEDS.m
         id: `${seed.slug}-ex`,
         title: "Sandbox practice",
         prompt: "Describe one hosted lesson habit without naming a real partner catalog.",
+        successCriteria: ["Names a hosted sandbox habit.", "Does not claim a live partner catalog."],
+        scope: "course",
       },
     ],
     publicCatalog: false,

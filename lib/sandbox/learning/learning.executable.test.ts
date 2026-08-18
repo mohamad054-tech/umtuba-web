@@ -135,13 +135,13 @@ describe("Originals + executable lesson/quiz", () => {
         courseSlug: slug,
         lessonId: row.lesson.id,
       });
-      if (row.lesson.quiz[0]) {
+      if (row.lesson.quiz.length > 0) {
         state = reduceLearningSandboxState(state, {
           type: "submitQuiz",
           studentId,
           courseSlug: slug,
           lessonId: row.lesson.id,
-          choiceId: row.lesson.quiz[0].correctChoiceId,
+          answers: Object.fromEntries(row.lesson.quiz.map((question) => [question.id, question.correctChoiceId])),
         });
       }
     }
@@ -154,12 +154,9 @@ describe("Originals + executable lesson/quiz", () => {
         answer: "Sandbox exercise answer.",
       });
     }
-    const answers: Record<string, string> = {};
-    for (const row of flattenLessons(course)) {
-      for (const question of row.lesson.quiz) {
-        answers[question.id] = question.correctChoiceId;
-      }
-    }
+    const answers: Record<string, string> = Object.fromEntries(
+      (course.finalAssessment?.questions ?? []).map((question) => [question.id, question.correctChoiceId])
+    );
     state = reduceLearningSandboxState(state, { type: "submitAssessment", studentId, courseSlug: slug, answers });
     const cert = certificateFor(state, studentId, slug);
     expect(cert?.canIssue).toBe(true);

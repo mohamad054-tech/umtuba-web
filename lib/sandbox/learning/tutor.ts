@@ -57,10 +57,26 @@ export function resolveSandboxTutorAccess(course: SandboxCourse): TutorDecision 
   };
 }
 
+export function buildTutorContext(course: SandboxCourse, lesson: SandboxLesson): {
+  courseTitle: string;
+  moduleTitle: string;
+  lessonTitle: string;
+  excerpt: string;
+} {
+  const courseModule = course.modules.find((row) => row.lessons.some((item) => item.id === lesson.id));
+  return {
+    courseTitle: course.title,
+    moduleTitle: courseModule?.title ?? course.title,
+    lessonTitle: lesson.title,
+    excerpt: lesson.body.trim().slice(0, 400),
+  };
+}
+
 export function sandboxTutorAnswer(course: SandboxCourse, lesson: SandboxLesson, prompt: string): {
   allowed: boolean;
   answer: string;
   citation: string;
+  context: ReturnType<typeof buildTutorContext> | null;
   sendsToExternalAi: false;
 } {
   const access = resolveSandboxTutorAccess(course);
@@ -69,9 +85,11 @@ export function sandboxTutorAnswer(course: SandboxCourse, lesson: SandboxLesson,
       allowed: false,
       answer: access.reason,
       citation: course.slug,
+      context: null,
       sendsToExternalAi: false,
     };
   }
+  const context = buildTutorContext(course, lesson);
   const bodyState = lessonBodyState(lesson);
   if (bodyState === "MISSING") {
     return {
@@ -79,15 +97,16 @@ export function sandboxTutorAnswer(course: SandboxCourse, lesson: SandboxLesson,
       answer:
         "This lesson body is not authored yet. The sandbox will not invent missing content or send a placeholder to any external model.",
       citation: lesson.id,
+      context,
       sendsToExternalAi: false,
     };
   }
-  const clipped = lesson.body.slice(0, 280);
   const safePrompt = prompt.trim().slice(0, 160) || "Explain this lesson.";
   return {
     allowed: true,
-    answer: `Local sandbox tutor (no external AI). Prompt: “${safePrompt}”. From this owned lesson: ${clipped}`,
+    answer: `Local sandbox tutor (no external AI). Course: ${context.courseTitle}. Module: ${context.moduleTitle}. Lesson: ${context.lessonTitle}. Prompt: “${safePrompt}”. From this owned lesson: ${context.excerpt}`,
     citation: `${course.slug}/${lesson.id}`,
+    context,
     sendsToExternalAi: false,
   };
 }

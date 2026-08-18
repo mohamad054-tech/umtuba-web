@@ -1,98 +1,101 @@
-# CURSOR_REPORT — Consume Desktop Store catalog productization V1
+# CURSOR_REPORT — Ingest UMTUBA Originals into executable Learning sandbox V1
 
 ```text
 SOURCE_DEVICE = CENTRAL / SERVER
 DEVICE_ROLE = IMPLEMENTATION
-TASK_ID = CENTRAL_CONSUME_DESKTOP_STORE_CATALOG_PRODUCTIZATION_V1
-INPUT_TASK = DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1
-REPORT_TYPE = SURGICAL_INTEGRATION
-TIMESTAMP_LOCAL = 2026-08-18 ~22:40 +03
-DESKTOP_DELTA_RECOVERED = YES
-DIRTY_TREE_PRESERVED = YES
-FILE_HASH_MATCH = PASS
-AUTHORIZED_SCOPE_ONLY = YES
-CENTRAL_AUTHORITATIVE_SHA = PENDING_COMMIT
+TASK_ID = CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1
+REPORT_TYPE = PRODUCT_INTEGRATION_ONLY
+TIMESTAMP_LOCAL = 2026-08-18 ~23:00 +03
 SECRET_VALUES_PRINTED = NO
 FORCE_PUSH = NO
-PUSHED = NO
-DEPLOYED = NO
+PUSH = NO
 PRODUCTION_MUTATED = NO
 REMOTE_MIGRATION_APPLIED = NO
 SQL_20260929_APPLIED = NO
 SQL_20260930_REAPPLIED = NO
 MOBILE_SOURCE_CHANGED = NO
+MOBILE_RELEASE_TRAIN_DISTURBED = NO
 STORE_DEMO_PREVIEW_SET = NO
+SANDBOX_HUB_PRESERVED = YES
+STORE_V2_PRESERVED = YES
+LEARNING_V2_PRESERVED = YES
+CATALOG_910fb3b8_PRESERVED = YES
+ACCESS_CONTROL_PRESERVED = YES
+NOINDEX_PRESERVED = YES
+CONTENT_REWRITTEN = NO
+PRIVATE_SANDBOX_DEPLOYED = NO
 ```
 
 ## Summary
 
-Consumed Desktop catalog productization from fallback intake (UNC). Hashes 17/17 PASS. Integrated the 26 DEMO SKU delta onto live combined tip `fbb6b364` (Store V2 marketplace + Learning V2 + Learning payment isolation). Did not copy Desktop `SandboxView.tsx` (would have rolled back the hub). Did not overwrite fixture `types.ts` (would have dropped Store V2 payment outcomes and Learning `listPriceMinor`). `UMTUBA_OWNED` listings keep Store V2 actor `umtuba-owned` / display `UMTUBA` and set `ownership.productOwnerActorId=umtuba-demo-platform`. Digital SKUs keep `onHand=null`. Not pushed. Not deployed.
+Ingested the three UMTUBA Originals draft courses into the private Learning sandbox without rewriting lesson bodies. PC2 packet `PC2_UMTUBA_ORIGINALS_CONTENT_BUILD_V1` was not on disk; authoritative bodies came from pre-company pilot `cd39b883`. Stacked onto Desktop catalog commit `910fb3b8` (parent live `fbb6b364`) so the 26-SKU productization is not dropped. `lib/store/demo` and `910fb3b8` catalog files were not modified. Live Hetzner remains `fbb6b364-20260818222318`. No deploy.
+
+Counts: COURSES=3 MODULES=12 LESSONS=36 MODULE_QUIZZES=12 FINALS=pe-final/ds-final/ai-final (4/5, unlimited, SCORE) LESSON_EXERCISES=24 COURSE_EXERCISES=8 (all authored; packet asked 6). Completion follows PC2 (lessons + module quizzes + final); exercises are not a silent extra gate for Originals. Partner AI stays blocked.
 
 ## Exact files changed
 
-- `lib/store/demo/types.ts`
-- `lib/store/demo/catalog.ts`
-- `lib/store/demo/catalogStates.ts` (new)
-- `lib/store/demo/catalog.test.ts`
-- `lib/store/demo/surface.ts`
-- `lib/store/demo/index.ts`
-- `lib/sandbox/fixtures/store.ts` (ownership + conceptKind assignment; Store V2 actors/payments preserved)
-- `lib/sandbox/fixtures/catalog.test.ts` (ownership assertions; Store V2 payment assertions preserved)
-- `docs/ops/store-demo-catalog-productization-v1/DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1.md`
+- `app/components/sandbox/learning/LearningActions.tsx`
+- `app/components/sandbox/learning/LearningSandbox.tsx`
+- `lib/sandbox/fixtures/courses.ts`
+- `lib/sandbox/fixtures/originals.ts` (deleted; replaced by directory)
+- `lib/sandbox/fixtures/originals/**` (pilot copy + adapt)
+- `lib/sandbox/fixtures/types.ts`
+- `lib/sandbox/i18n.ts`
+- `lib/sandbox/learning/catalog.ts`
+- `lib/sandbox/learning/certificates.ts`
+- `lib/sandbox/learning/completion.ts`
+- `lib/sandbox/learning/index.ts`
+- `lib/sandbox/learning/learning.executable.test.ts`
+- `lib/sandbox/learning/originals.ingest.test.ts`
+- `lib/sandbox/learning/state.ts`
+- `lib/sandbox/learning/tutor.ts`
+- `scripts/verify-originals-ingest.mts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
-Unchanged on purpose:
-
-- `app/components/sandbox/SandboxView.tsx` (combined Store+Learning hub; digital stock honesty already in `StoreBrowse`)
-- `lib/sandbox/fixtures/types.ts` (Store V2 + Learning types)
-- Learning V2 / Originals ingest worktrees
+Not changed: `lib/store/demo/**`, `lib/sandbox/fixtures/store.ts`, `lib/sandbox/fixtures/catalog.test.ts`, Store shopper files, production `/learning`.
 
 ## Migrations created
 
-None. SQL `20260929` not applied.
+None.
 
 ## Security review
 
-- All 26 products remain `SOURCE_TYPE=DEMO`, `RIGHTS_STATUS=DEMO_ONLY`, `purchasable=false`, `productionSellable=false`, `REAL_PROVIDER=NONE`.
-- Digital SKUs: `onHand=null` / `DIGITAL_NOT_APPLICABLE`.
-- `UMTUBA_OWNED` is not attributed to `demo-supplier-a`. Provider identity is `umtuba-demo-platform`.
-- No real products, partners, or payments. Mock pay / `realProviderCall=false` preserved.
-- No secrets printed. `STORE_DEMO_PREVIEW` unset.
+- Private sandbox only; public catalog flags remain false; drafts unpublished.
+- No production enrollments or certificates created.
+- Certificate preview marked SANDBOX/DEMO, ISSUER=UMTUBA, no accreditation/degree claims.
+- Partner `AI_USAGE_ALLOWED` stays denied; tutor is local and does not send to external AI.
+- Mock Learning payments remain isolated (`LearningPaymentOutcome`).
+- Catalog 26-SKU files from `910fb3b8` untouched.
+- No secrets printed. SQL 20260929/20260930 not applied. Mobile not touched.
 
 ## Tests
 
-64/64 PASS:
+PASS — 78 tests / 14 files including `originals.ingest.test.ts`, `learning.executable.test.ts`, `catalog.test.ts`, `lib/store/demo/catalog.test.ts`, Store V2 shopper/payment/session tests, access/containment.
 
-- `lib/store/demo/catalog.test.ts` — 4/4
-- `lib/store/demoPreviewGate.test.ts` — 5/5
-- `lib/sandbox/fixtures/catalog.test.ts` — 9/9
-- `lib/sandbox/store/listings.test.ts` — 5/5
-- `lib/sandbox/store/catalogQuery.test.ts` — 4/4
-- `lib/sandbox/store/session.test.ts` — 5/5
-- `lib/sandbox/store/payment.test.ts` — 3/3
-- `lib/sandbox/store/messages.test.ts` — 3/3
-- `lib/sandbox/containment.test.ts` — 8/8
-- `lib/sandbox/learning/learning.executable.test.ts` — 18/18
+Verifier: lessons=36 quizzes=12 lessonExercises=24 courseExercises=8 finals=pe-final,ds-final,ai-final. Failed final <4/5 covered. Three-course QA covered.
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS (exit 0) on `fbb6b364` + catalog delta.
+PASS — `npx tsc --noEmit`
 
 ## Build
 
-`npm run build` — PASS (exit 0). Pre-existing Turbopack NFT warning in translation-studio import trace; not introduced by this delta.
+PASS — `npm run build` on `central/ingest-umtuba-originals-on-910fb3b8` (not deployed).
 
 ## git diff --check
 
-PASS.
+PASS
 
 ## git status --short
 
-Worktree `central/store-catalog-productization-from-desktop-v1` at parent `fbb6b364` plus this commit.
+Local commit on `central/ingest-umtuba-originals-on-910fb3b8` stacked on `910fb3b8`. Live `origin/alpha-0.2` remains `fbb6b364`. `PUSHED=NO` `DEPLOYED=NO`.
 
 ## Open issues
 
-- Catalog UX composition (public Store search/filter/related rails) remains Central follow-up; sandbox already browseable.
-- Originals ingest worktree left untouched (in-flight merge).
-- `PUSHED=NO`. `DEPLOYED=NO`. Do not race Hetzner.
+- PC2 packet file missing; source is pre-company pilot `cd39b883`.
+- Course exercises wired = 8 (authored), packet asked 6.
+- Lesson exercises 24 are chrome/resource-derived practice slots, not a separate PC2 exercise packet.
+- Source finals are 8 questions / 70%; sandbox scores first 5 at 4/5 and keeps the rest in `reviewBank` (no new prose). Production `/learning` does not persist this contract (`PRODUCTION_COMPLETION_GAP`).
+- Browser MCP authorized walkthrough not claimed PASS (no platform_admins session fabricated).
+- Live combined SHA remains `fbb6b364` until an explicit deploy GO.

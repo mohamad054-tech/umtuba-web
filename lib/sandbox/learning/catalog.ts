@@ -51,7 +51,23 @@ export function findLesson(
 }
 
 export function findExercise(course: SandboxCourse, exerciseId: string) {
-  return course.exercises.find((exercise) => exercise.id === exerciseId) ?? null;
+  const courseExercise = course.exercises.find((exercise) => exercise.id === exerciseId);
+  if (courseExercise) return courseExercise;
+  for (const courseModule of course.modules) {
+    for (const lesson of courseModule.lessons) {
+      if (lesson.lessonExercise?.id === exerciseId) return lesson.lessonExercise;
+    }
+  }
+  return null;
+}
+
+export function allExercises(course: SandboxCourse) {
+  const lessonOnes = course.modules.flatMap((courseModule) =>
+    courseModule.lessons
+      .map((lesson) => lesson.lessonExercise)
+      .filter((exercise): exercise is NonNullable<typeof exercise> => Boolean(exercise))
+  );
+  return [...lessonOnes, ...course.exercises];
 }
 
 export function lessonBodyState(lesson: SandboxLesson): "PRESENT" | "MISSING" {
@@ -71,6 +87,7 @@ export function filterSandboxCatalog(query: CatalogQuery = {}): SandboxCourse[] 
     const hay = [
       course.title,
       course.shortDescription,
+      course.fullDescription ?? "",
       course.slug,
       course.kind,
       instructor?.displayName ?? "",

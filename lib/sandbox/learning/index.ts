@@ -2,6 +2,7 @@ export * from "./admin";
 export * from "./catalog";
 export * from "./certificates";
 export * from "./clickPath";
+export * from "./completion";
 export * from "./enrollment";
 export * from "./instructor";
 export * from "./judgments";

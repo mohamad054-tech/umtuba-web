@@ -67,6 +67,26 @@ export type SandboxMessageKey =
   | "noCardFields"
   | "openLesson"
   | "nextLesson"
+  | "previousLesson"
+  | "notes"
+  | "saveNote"
+  | "noteSaved"
+  | "bookmark"
+  | "bookmarked"
+  | "objectives"
+  | "audience"
+  | "prerequisites"
+  | "duration"
+  | "completionRequirements"
+  | "assessmentInfo"
+  | "moduleQuiz"
+  | "lessonExercise"
+  | "courseExercise"
+  | "quizScore"
+  | "retryAllowed"
+  | "passThreshold"
+  | "certificateIssuer"
+  | "certificateDemo"
   | "markLessonComplete"
   | "lessonComplete"
   | "quiz"
@@ -172,6 +192,26 @@ const en: Catalog = {
   noCardFields: "No card number is requested or stored. REAL_CHARGE_POSSIBLE=NO.",
   openLesson: "Open lesson",
   nextLesson: "Next lesson",
+  previousLesson: "Previous lesson",
+  notes: "Lesson notes",
+  saveNote: "Save note",
+  noteSaved: "Note saved in sandbox state.",
+  bookmark: "Bookmark",
+  bookmarked: "Bookmarked",
+  objectives: "Learning objectives",
+  audience: "Target audience",
+  prerequisites: "Prerequisites",
+  duration: "Estimated duration",
+  completionRequirements: "Completion requirements",
+  assessmentInfo: "Final assessment: 4/5 · unlimited attempts · score mode",
+  moduleQuiz: "Module quiz",
+  lessonExercise: "Lesson exercise",
+  courseExercise: "Course exercise",
+  quizScore: "Score",
+  retryAllowed: "Retry allowed. This does not complete the course.",
+  passThreshold: "Pass threshold 4/5",
+  certificateIssuer: "Issuer: UMTUBA",
+  certificateDemo: "SANDBOX / DEMO · not a degree, license, or accreditation",
   markLessonComplete: "Mark lesson complete",
   lessonComplete: "Lesson complete",
   quiz: "Quiz",
@@ -184,7 +224,7 @@ const en: Catalog = {
   finalAssessment: "Final assessment",
   submitAssessment: "Submit assessment",
   assessmentPassed: "Passed this sandbox check.",
-  assessmentFailed: "Below 70%. Not accreditation.",
+  assessmentFailed: "Below 4/5. Retry allowed. Not accreditation.",
   noAccreditation: "Not accreditation. Not a professional license.",
   aiTutor: "AI Tutor (sandbox)",
   askTutor: "Ask the local tutor",
@@ -277,6 +317,26 @@ const ar: Catalog = {
   noCardFields: "لا يُطلب رقم بطاقة ولا يُحفظ. لا يمكن تحصيل حقيقي.",
   openLesson: "فتح الدرس",
   nextLesson: "الدرس التالي",
+  previousLesson: "الدرس السابق",
+  notes: "ملاحظات الدرس",
+  saveNote: "حفظ الملاحظة",
+  noteSaved: "حُفظت الملاحظة في حالة الصندوق.",
+  bookmark: "إشارة مرجعية",
+  bookmarked: "مُعلَّم",
+  objectives: "أهداف التعلّم",
+  audience: "الجمهور المستهدف",
+  prerequisites: "المتطلبات",
+  duration: "المدة التقديرية",
+  completionRequirements: "متطلبات الإكمال",
+  assessmentInfo: "التقييم النهائي: ٤/٥ · محاولات غير محدودة · وضع الدرجة",
+  moduleQuiz: "اختبار الوحدة",
+  lessonExercise: "تمرين الدرس",
+  courseExercise: "تمرين الدورة",
+  quizScore: "الدرجة",
+  retryAllowed: "إعادة المحاولة مسموحة. هذا لا يُكمل الدورة.",
+  passThreshold: "عتبة النجاح ٤/٥",
+  certificateIssuer: "المُصدِر: UMTUBA",
+  certificateDemo: "صندوق / تجريبي · ليست درجة ولا رخصة ولا اعتماداً",
   markLessonComplete: "تعليم الدرس مكتملاً",
   lessonComplete: "الدرس مكتمل",
   quiz: "اختبار قصير",
@@ -289,7 +349,7 @@ const ar: Catalog = {
   finalAssessment: "التقييم النهائي",
   submitAssessment: "إرسال التقييم",
   assessmentPassed: "نجحت في فحص الصندوق.",
-  assessmentFailed: "أقل من ٧٠٪. ليست اعتماداً مهنياً.",
+  assessmentFailed: "أقل من ٤/٥. إعادة المحاولة مسموحة. ليست اعتماداً.",
   noAccreditation: "ليست اعتماداً مهنياً وليست رخصة.",
   aiTutor: "المعلّم الذكي (صندوق)",
   askTutor: "اسأل المعلّم المحلي",
