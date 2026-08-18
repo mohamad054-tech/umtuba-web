@@ -3,38 +3,53 @@
 import { redirect } from "next/navigation";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { LEARNING_ENROLLMENT_RPCS } from "../../../lib/learning/enrollmentsFoundation";
-import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
+import {
+  LEARNING_LEARNER_ROUTES,
+  isLearningLessonDeliveryUuid,
+} from "../../../lib/learning/learnerDelivery";
 import { LEARNING_PUBLIC_ROUTES } from "../../../lib/learning/publicCatalog";
+import {
+  mapEnrollRpcError,
+  resolvePostEnrollHref,
+} from "../../../lib/learning/publicCatalogSelfEnroll";
 
 /**
  * Self-enroll via JWT client + enroll_in_learning_course RPC.
- * No service role. Redirects to course outline on success.
+ * No service role. Returns to the requested lesson when present.
  */
 export async function enrollInPublicCourseAction(
   formData: FormData
 ): Promise<void> {
   const courseId = String(formData.get("courseId") ?? "").trim();
   const courseSlug = String(formData.get("courseSlug") ?? "").trim();
+  const nextLessonId = String(formData.get("nextLessonId") ?? "").trim();
+  const safeLessonId = isLearningLessonDeliveryUuid(nextLessonId)
+    ? nextLessonId
+    : "";
 
   const landingPath = courseSlug
     ? LEARNING_PUBLIC_ROUTES.course(courseSlug)
     : LEARNING_PUBLIC_ROUTES.catalog;
+  const landingWithLesson = safeLessonId
+    ? `${landingPath}?lesson=${encodeURIComponent(safeLessonId)}`
+    : landingPath;
 
   const user = await getServerUser();
   if (!user) {
     redirect(
       `/login?next=${encodeURIComponent(
-        courseId
-          ? LEARNING_LEARNER_ROUTES.course(courseId)
-          : landingPath
+        safeLessonId
+          ? LEARNING_LEARNER_ROUTES.lesson(safeLessonId)
+          : courseId
+            ? LEARNING_LEARNER_ROUTES.course(courseId)
+            : landingPath
       )}`
     );
   }
 
   if (!courseId) {
-    redirect(
-      `${landingPath}?error=${encodeURIComponent("Course is required")}`
-    );
+    const sep = landingWithLesson.includes("?") ? "&" : "?";
+    redirect(`${landingWithLesson}${sep}error=course_required`);
   }
 
   const supabase = await createClient();
@@ -44,12 +59,13 @@ export async function enrollInPublicCourseAction(
   });
 
   if (error) {
-    redirect(
-      `${landingPath}?error=${encodeURIComponent(
-        error.message || "Unable to enroll in this course"
-      )}`
-    );
+    const code = mapEnrollRpcError(error.message);
+    if (code === "already_enrolled") {
+      redirect(resolvePostEnrollHref(courseId, safeLessonId || null));
+    }
+    const sep = landingWithLesson.includes("?") ? "&" : "?";
+    redirect(`${landingWithLesson}${sep}error=${encodeURIComponent(code)}`);
   }
 
-  redirect(LEARNING_LEARNER_ROUTES.course(courseId));
+  redirect(resolvePostEnrollHref(courseId, safeLessonId || null));
 }

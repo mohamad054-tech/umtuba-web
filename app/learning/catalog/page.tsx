@@ -1,6 +1,8 @@
 import Link from "next/link";
 import LearningShell from "../../components/learning/LearningShell";
 import CatalogBrowser from "../../components/learning/CatalogBrowser";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { listPublicCatalogCourses } from "../../../lib/learning/publicCatalog";
 import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
@@ -13,21 +15,20 @@ export const metadata = learningCatalogMetadata;
 export const dynamic = "force-dynamic";
 
 export default async function LearningPublicCatalogPage() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const user = await getServerUser();
   const supabase = await createClient();
   const courses = await listPublicCatalogCourses(supabase);
 
   return (
     <LearningShell
-      title="Learning Catalog"
-      subtitle="Public courses"
+      title={t("learning.catalog.title")}
+      subtitle={t("learning.catalog.subtitle")}
       backHref={user ? LEARNING_LEARNER_ROUTES.hub : APP_ROUTES.home}
-      backLabel={user ? "My Learning" : "Home"}
+      backLabel={user ? t("learning.catalog.myLearning") : t("learning.catalog.home")}
     >
-      <p className="mt-4 text-sm text-white/70">
-        Explore published courses. Full lessons require an account and
-        enrollment.
-      </p>
+      <p className="mt-4 text-sm text-white/70">{t("learning.catalog.intro")}</p>
 
       {user ? (
         <p className="mt-3 text-sm">
@@ -35,7 +36,7 @@ export default async function LearningPublicCatalogPage() {
             href={LEARNING_LEARNER_ROUTES.hub}
             className="font-bold text-sky-300 underline underline-offset-2 hover:text-sky-200"
           >
-            Go to My Learning
+            {t("learning.catalog.goToMyLearning")}
           </Link>
         </p>
       ) : (
@@ -44,14 +45,14 @@ export default async function LearningPublicCatalogPage() {
             href={APP_ROUTES.signup}
             className="font-bold text-white underline underline-offset-2"
           >
-            Create account
+            {t("learning.catalog.createAccount")}
           </Link>
           {" · "}
           <Link
             href={APP_ROUTES.login}
             className="font-bold text-white underline underline-offset-2"
           >
-            Log in
+            {t("learning.catalog.logIn")}
           </Link>
         </p>
       )}

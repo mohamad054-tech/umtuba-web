@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import AppTopNav from "../AppTopNav";
+import { useTranslation } from "../i18n";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import { LearningContainer } from "./ds";
 
@@ -22,14 +25,15 @@ export default function LearningShell({
   subtitle,
   children,
   backHref,
-  backLabel = "Back",
+  backLabel,
   instructorHref,
 }: LearningShellProps) {
+  const { t } = useTranslation();
   return (
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
-      <AppTopNav title={title} subtitle={subtitle ?? "UM Learning"} />
+      <AppTopNav title={title} subtitle={subtitle ?? t("nav.learning")} />
       <LearningContainer>
         <div className="flex flex-wrap items-center gap-4">
           {backHref ? (
@@ -40,7 +44,7 @@ export default function LearningShell({
               <span aria-hidden="true" className="inline-block rtl:rotate-180">
                 ←
               </span>
-              {backLabel}
+              {backLabel ?? t("actions.back")}
             </Link>
           ) : null}
           {instructorHref ? (
@@ -48,7 +52,7 @@ export default function LearningShell({
               href={instructorHref}
               className="watch-focus-ring text-sm font-bold text-sky-300 hover:text-sky-200"
             >
-              Instructor workspace
+              {t("learning.chrome.instructorWorkspace")}
             </Link>
           ) : null}
         </div>

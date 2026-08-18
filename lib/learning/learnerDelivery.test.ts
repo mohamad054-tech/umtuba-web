@@ -551,9 +551,9 @@ describe("Learner Experience V1 — hub progress enrichment", () => {
 
   it("LearningHub surfaces continue card, percent, and resume", () => {
     const hubUi = read("app/components/learning/LearningHub.tsx");
-    expect(hubUi).toMatch(/Continue Learning/);
+    expect(hubUi).toMatch(/learning\.hub\.continueLearning/);
     expect(hubUi).toMatch(/percent_complete/);
-    expect(hubUi).toMatch(/Resume/);
+    expect(hubUi).toMatch(/learning\.hub\.resume/);
     expect(hubUi).toMatch(/continue_href/);
   });
 });
@@ -678,8 +678,8 @@ describe("Learner Experience V1 — adjacent lesson navigation", () => {
     const ui = read("app/components/learning/LessonViewer.tsx");
     expect(ui).toMatch(/previous_lesson/);
     expect(ui).toMatch(/next_lesson/);
-    expect(ui).toMatch(/Previous/);
-    expect(ui).toMatch(/Next/);
+    expect(ui).toMatch(/learning\.lesson\.previous/);
+    expect(ui).toMatch(/learning\.lesson\.next/);
   });
 });
 
@@ -852,12 +852,12 @@ describe("Learner Experience V1 — lesson completion handoff", () => {
     const ui = read("app/components/learning/LessonViewer.tsx");
     expect(ui).toMatch(/resolveLessonCompletionHandoff/);
     expect(ui).toMatch(/completeLearningLessonAction/);
-    expect(ui).toMatch(/Mark lesson complete/);
-    expect(ui).toMatch(/Continue/);
-    expect(ui).toMatch(/Back to course/);
-    expect(ui).toMatch(/Transcript/);
-    expect(ui).toMatch(/Previous/);
-    expect(ui).toMatch(/Next/);
+    expect(ui).toMatch(/learning\.lesson\.markComplete/);
+    expect(ui).toMatch(/learning\.lesson\.continue/);
+    expect(ui).toMatch(/learning\.lesson\.backToCourse/);
+    expect(ui).toMatch(/learning\.lesson\.transcript/);
+    expect(ui).toMatch(/learning\.lesson\.previous/);
+    expect(ui).toMatch(/learning\.lesson\.next/);
     expect(ui).not.toMatch(/complete_learning_lesson/);
     expect(ui).not.toMatch(/reopen_learning_lesson/);
 

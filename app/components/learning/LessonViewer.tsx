@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../i18n";
 import ContentBlockRenderer from "./ContentBlockRenderer";
 import ContinueWatchingVideo from "./ContinueWatchingVideo";
 import ActivityList from "./ActivityList";
@@ -82,6 +85,7 @@ export default function LessonViewer({
   delivery,
   engine = null,
 }: LessonViewerProps) {
+  const { t } = useTranslation();
   const hasNav = Boolean(delivery.previous_lesson || delivery.next_lesson);
   const locked = isLessonPointLocked(engine);
   const handoff = locked
@@ -135,7 +139,9 @@ export default function LessonViewer({
           <p className="mt-2 text-sm text-white/50">{delivery.lesson.description}</p>
         ) : null}
         <p className="mt-2 text-xs text-white/40">
-          Progress: {delivery.progress_status.replaceAll("_", " ")}
+          {t("learning.lesson.progress", {
+            values: { status: delivery.progress_status.replaceAll("_", " ") },
+          })}
           {engine?.lesson.difficulty
             ? ` · ${engine.lesson.difficulty}`
             : ""}
@@ -151,7 +157,7 @@ export default function LessonViewer({
               href={LEARNING_LEARNER_ROUTES.aiTutor(delivery.lesson.id)}
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm font-bold text-sky-100"
             >
-              Ask AI Tutor
+              {t("learning.lesson.askAiTutor")}
             </Link>
           </p>
         ) : null}
@@ -159,9 +165,16 @@ export default function LessonViewer({
 
       {unlock && unlock.locked ? (
         <section className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-4">
-          <h2 className="text-sm font-bold text-amber-50">Unlock with UM Points</h2>
+          <h2 className="text-sm font-bold text-amber-50">
+            {t("learning.lesson.unlockTitle")}
+          </h2>
           <p className="mt-1 text-sm text-amber-50/80">
-            Cost: {unlock.cost ?? "—"} · Your balance: {unlock.balance}
+            {t("learning.lesson.unlockCost", {
+              values: {
+                cost: unlock.cost ?? "—",
+                balance: unlock.balance,
+              },
+            })}
           </p>
           <form action={unlockLessonWithUmPointsAction} className="mt-3">
             <input type="hidden" name="lessonId" value={delivery.lesson.id} />
@@ -169,7 +182,7 @@ export default function LessonViewer({
               type="submit"
               className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
             >
-              Unlock lesson
+              {t("learning.lesson.unlockAction")}
             </button>
           </form>
         </section>
@@ -179,10 +192,10 @@ export default function LessonViewer({
         <>
           <section className="space-y-4">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Content
+              {t("learning.lesson.content")}
             </h2>
             {blocks.length === 0 ? (
-              <p className="text-sm text-white/45">No published content blocks.</p>
+              <p className="text-sm text-white/45">{t("learning.lesson.noBlocks")}</p>
             ) : (
               blocks.map((block) => {
                 if (block.block_type === "video" && block.status === "published") {
@@ -218,7 +231,7 @@ export default function LessonViewer({
 
           <section className="space-y-3">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              Activities
+              {t("learning.lesson.activities")}
             </h2>
             <ActivityList activities={activities} />
           </section>
@@ -226,7 +239,7 @@ export default function LessonViewer({
           {engine && engine.objectives.length > 0 ? (
             <section className="space-y-2">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-                Learning objectives
+                {t("learning.lesson.objectives")}
               </h2>
               <ul className="list-disc space-y-1 pl-5 text-sm text-white/75">
                 {engine.objectives.map((o) => (
@@ -239,7 +252,7 @@ export default function LessonViewer({
           {engine && engine.prerequisites.length > 0 ? (
             <section className="space-y-2">
               <h2 className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-                Prerequisites
+                {t("learning.lesson.prerequisites")}
               </h2>
               <ul className="space-y-1 text-sm">
                 {engine.prerequisites.map((p) => (
@@ -253,7 +266,7 @@ export default function LessonViewer({
         </>
       ) : (
         <p className="text-sm text-white/55">
-          Content and activities stay hidden until this lesson is unlocked.
+          {t("learning.lesson.lockedUntilUnlock")}
         </p>
       )}
 
@@ -264,7 +277,7 @@ export default function LessonViewer({
             type="submit"
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
-            Mark lesson complete
+            {t("learning.lesson.markComplete")}
           </button>
         </form>
       ) : null}
@@ -275,7 +288,7 @@ export default function LessonViewer({
             href={handoff.next_lesson.href}
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
-            Continue
+            {t("learning.lesson.continue")}
           </Link>
         </div>
       ) : null}
@@ -286,20 +299,20 @@ export default function LessonViewer({
             href={handoff.course_href}
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
           >
-            Back to course
+            {t("learning.lesson.backToCourse")}
           </Link>
           <Link
             href={handoff.transcript_href}
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 bg-transparent px-5 py-2.5 text-sm font-bold text-white"
           >
-            Transcript
+            {t("learning.lesson.transcript")}
           </Link>
         </div>
       ) : null}
 
       {hasNav ? (
         <nav
-          aria-label="Lesson navigation"
+          aria-label={t("learning.lesson.navAria")}
           className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-4"
         >
           {delivery.previous_lesson ? (
@@ -310,7 +323,7 @@ export default function LessonViewer({
               <span aria-hidden="true" className="inline-block rtl:rotate-180">
                 ←
               </span>
-              Previous
+              {t("learning.lesson.previous")}
             </Link>
           ) : (
             <span aria-hidden="true" />
@@ -320,7 +333,7 @@ export default function LessonViewer({
               href={delivery.next_lesson.href}
               className="watch-focus-ring inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-white/60 hover:text-white"
             >
-              Next
+              {t("learning.lesson.next")}
               <span aria-hidden="true" className="inline-block rtl:rotate-180">
                 →
               </span>

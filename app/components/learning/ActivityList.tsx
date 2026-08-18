@@ -1,18 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import {
   LEARNING_LEARNER_ROUTES,
   resolveLearnerActivityTarget,
   type LearningLearnerActivitySummary,
 } from "../../../lib/learning/learnerDelivery";
+import { useTranslation } from "../i18n";
 
 type ActivityListProps = {
   activities: LearningLearnerActivitySummary[];
 };
 
 export default function ActivityList({ activities }: ActivityListProps) {
+  const { t } = useTranslation();
   if (activities.length === 0) {
     return (
-      <p className="text-sm text-white/45">No published activities in this lesson.</p>
+      <p className="text-sm text-white/45">{t("learning.lesson.noActivities")}</p>
     );
   }
 
@@ -42,12 +46,18 @@ export default function ActivityList({ activities }: ActivityListProps) {
                 <p className="mt-1 text-sm text-white/50">{activity.description}</p>
               ) : null}
               <p className="mt-2 text-xs text-white/40">
-                {activity.hints.is_required ? "Required" : "Optional"}
+                {activity.hints.is_required
+                  ? t("learning.lesson.required")
+                  : t("learning.lesson.optional")}
                 {activity.hints.max_attempts != null
-                  ? ` · max ${activity.hints.max_attempts} attempts`
+                  ? ` · ${t("learning.lesson.maxAttempts", {
+                      values: { count: activity.hints.max_attempts },
+                    })}`
                   : ""}
                 {activity.hints.time_limit_seconds != null
-                  ? ` · ${activity.hints.time_limit_seconds}s limit`
+                  ? ` · ${t("learning.lesson.timeLimit", {
+                      values: { seconds: activity.hints.time_limit_seconds },
+                    })}`
                   : ""}
               </p>
             </Link>

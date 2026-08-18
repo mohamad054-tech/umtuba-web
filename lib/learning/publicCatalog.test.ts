@@ -297,7 +297,9 @@ describe("Public lesson access context", () => {
         course_name: "Building AI Applications (Product Patterns)",
         course_slug: "ja-09",
       })
-    ).toBe("/learning/catalog/ja-09");
+    ).toBe(
+      "/learning/catalog/ja-09?lesson=8934ff00-6661-42bb-92c8-efe559e76ea1"
+    );
     expect(resolvePublicLessonSafeHref(null)).toBe("/learning/catalog");
   });
 
@@ -314,7 +316,8 @@ describe("Public lesson access context", () => {
   it("public course landing lists curriculum titles without lesson deep-links", () => {
     const landing = read("app/learning/catalog/[courseSlug]/page.tsx");
     expect(landing).toContain("{lesson.name}");
-    expect(landing).not.toMatch(/\/learning\/lessons\//);
-    expect(landing).not.toMatch(/LEARNING_LEARNER_ROUTES\.lesson/);
+    expect(landing).not.toMatch(/href=\{LEARNING_LEARNER_ROUTES\.lesson/);
+    expect(landing).toMatch(/LEARNING_LEARNER_ROUTES\.lesson\(nextLessonId\)/);
+    expect(landing).toContain("nextLessonId");
   });
 });

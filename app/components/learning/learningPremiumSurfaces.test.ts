@@ -13,9 +13,9 @@ describe("Learning premium surface wiring", () => {
     expect(page).toMatch(/CatalogBrowser/);
     expect(browser).toMatch(/role="search"/);
     expect(browser).toMatch(/type="search"/);
-    expect(browser).toMatch(/All levels/);
-    expect(browser).toMatch(/Clear filters/);
-    expect(browser).toMatch(/aria-label="Skills"/);
+    expect(browser).toMatch(/learning\.catalog\.allLevels/);
+    expect(browser).toMatch(/learning\.catalog\.clearFilters/);
+    expect(browser).toMatch(/learning\.catalog\.skills/);
     expect(browser).toMatch(/md:flex/);
   });
 
@@ -23,7 +23,7 @@ describe("Learning premium surface wiring", () => {
     const hub = read("app/components/learning/LearningHub.tsx");
     const summary = read("app/components/learning/ProgressSummary.tsx");
     expect(hub).toMatch(/LearningProgressBar/);
-    expect(hub).toMatch(/Continue Learning/);
+    expect(hub).toMatch(/learning\.hub\.continueLearning/);
     expect(summary).toMatch(/LearningProgressBar/);
     expect(summary).toMatch(/role|LearningStatusBadge/);
   });
@@ -31,30 +31,30 @@ describe("Learning premium surface wiring", () => {
   it("hub exposes catalog discovery and empty-state next action", () => {
     const hub = read("app/components/learning/LearningHub.tsx");
     expect(hub).toMatch(/LEARNING_PUBLIC_ROUTES/);
-    expect(hub).toMatch(/Browse catalog/);
-    expect(hub).toMatch(/Transcript &amp; certificates|Transcript/);
-    expect(hub).toMatch(/Nothing enrolled yet/);
-    expect(hub).toMatch(/Start learning/);
+    expect(hub).toMatch(/learning\.hub\.browseCatalog/);
+    expect(hub).toMatch(/learning\.hub\.transcript/);
+    expect(hub).toMatch(/learning\.hub\.nothingEnrolledTitle/);
+    expect(hub).toMatch(/learning\.hub\.startLearning/);
   });
 
   it("course outline has a continue CTA and highlights the next lesson", () => {
     const outline = read("app/components/learning/CourseOutline.tsx");
     expect(outline).toMatch(/pickOutlineContinueLesson/);
-    expect(outline).toMatch(/Start lesson/);
-    expect(outline).toMatch(/Continue/);
+    expect(outline).toMatch(/learning\.outline\.startLesson/);
+    expect(outline).toMatch(/learning\.outline\.continue/);
     expect(outline).toMatch(/aria-current/);
     expect(outline).toMatch(/min-h-11/);
   });
 
   it("lesson is content-first and keeps lesson nav RTL-safe", () => {
     const lesson = read("app/components/learning/LessonViewer.tsx");
-    const contentIdx = lesson.search(/>\s*Content\s*</);
-    const objectivesIdx = lesson.indexOf("Learning objectives");
+    const contentIdx = lesson.indexOf("learning.lesson.content");
+    const objectivesIdx = lesson.indexOf("learning.lesson.objectives");
     expect(contentIdx).toBeGreaterThan(-1);
     expect(objectivesIdx).toBeGreaterThan(contentIdx);
-    expect(lesson).toMatch(/Ask AI Tutor/);
+    expect(lesson).toMatch(/learning\.lesson\.askAiTutor/);
     expect(lesson).toMatch(/rtl:rotate-180/);
-    expect(lesson).toMatch(/Mark lesson complete/);
+    expect(lesson).toMatch(/learning\.lesson\.markComplete/);
     expect(lesson).toMatch(/min-h-11/);
   });
 
