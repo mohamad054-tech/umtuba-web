@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "../i18n";
+
 type StoreErrorStateProps = {
   message: string;
   retryLabel?: string;
@@ -7,8 +9,10 @@ type StoreErrorStateProps = {
 
 export default function StoreErrorState({
   message,
-  retryLabel = "Try again",
+  retryLabel,
 }: StoreErrorStateProps) {
+  const { t } = useTranslation();
+  const label = retryLabel ?? t("store.error.retry");
   return (
     <div
       role="alert"
@@ -20,7 +24,7 @@ export default function StoreErrorState({
         className="sf-btn sf-btn-secondary mt-4 text-[var(--sf-ink)]"
         onClick={() => window.location.reload()}
       >
-        {retryLabel}
+        {label}
       </button>
     </div>
   );

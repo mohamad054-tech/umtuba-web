@@ -20,6 +20,8 @@ import {
   pickRecommended,
   pickTrending,
 } from "../lib/storefront/deriveSections";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { createClient } from "../../lib/supabase/server";
 import {
   listActiveCategories,
@@ -32,7 +34,11 @@ import { storeMetadata } from "../../lib/site/routeMetadata";
 export const metadata = storeMetadata;
 
 export default async function StoreHomePage() {
-  const supabase = await createClient();
+  const [{ locale }, supabase] = await Promise.all([
+    resolveRequestLocale(),
+    createClient(),
+  ]);
+  const t = createTranslator(locale);
   const [categories, catalog] = await Promise.all([
     listActiveCategories(supabase),
     listPublicCatalog(supabase, { limit: 48 }),
@@ -44,11 +50,27 @@ export default async function StoreHomePage() {
   const recommended = pickRecommended(items, undefined, 8);
   const featuredStores = deriveFeaturedStores(items).slice(0, 8);
   const collections = deriveCuratedCollections(items, categories, 6);
-  const heroSlides = heroSlidesFromCatalog(items);
+  const catalogHero = heroSlidesFromCatalog(items);
+  const heroSlides =
+    catalogHero.length > 0
+      ? catalogHero.map((slide) => ({
+          ...slide,
+          ctaLabel: t("store.hero.viewProduct"),
+        }))
+      : [
+          {
+            id: "welcome",
+            title: t("store.hero.shopTitle"),
+            subtitle: t("store.hero.shopSubtitle"),
+            href: "/store/search",
+            imageUrl: null,
+            ctaLabel: t("store.hero.browseProducts"),
+          },
+        ];
   const catalogEmpty = !catalog.error && items.length === 0;
 
   return (
-    <StoreShell title="Store" subtitle="Commerce">
+    <StoreShell title={t("store.shell.title")} subtitle={t("store.shell.subtitle")}>
       <HeroCarousel slides={heroSlides} />
       <StoreTrustStrip />
 
@@ -61,51 +83,51 @@ export default async function StoreHomePage() {
       {catalogEmpty ? (
         <div className="mt-8">
           <StoreEmptyState
-            title="Catalog is quiet right now"
-            description="Active, approved products will appear here as sellers publish. Home stays Discovery — this Store surface is the commerce layer."
+            title={t("store.empty.catalogTitle")}
+            description={t("store.empty.catalogDescription")}
             actionHref="/store/search"
-            actionLabel="Open search"
+            actionLabel={t("store.empty.catalogAction")}
           />
         </div>
       ) : null}
 
       <StoreSection
         id="trending"
-        eyebrow="Featured"
-        title="Featured products"
-        description="Active listings ranked by availability and recency — no fabricated popularity scores."
+        eyebrow={t("store.home.featuredEyebrow")}
+        title={t("store.home.featuredTitle")}
+        description={t("store.home.featuredDescription")}
         href="/store/search?sort=newest"
-        linkLabel="See all"
+        linkLabel={t("store.home.seeAll")}
       >
         <ProductRail
           items={trending}
-          emptyTitle="No featured products yet"
-          emptyDescription="Publish approved active listings to populate this rail."
+          emptyTitle={t("store.empty.featuredTitle")}
+          emptyDescription={t("store.empty.featuredDescription")}
         />
       </StoreSection>
 
       <StoreSection
         id="collections"
-        eyebrow="Curated"
-        title="Collections"
-        description="Category collections derived from products currently in the public catalog."
+        eyebrow={t("store.home.collectionsEyebrow")}
+        title={t("store.home.collectionsTitle")}
+        description={t("store.home.collectionsDescription")}
         href="/store/search"
-        linkLabel="Browse categories"
+        linkLabel={t("store.home.browseCategories")}
       >
         <CategoryRail categories={collections} variant="collections" />
       </StoreSection>
 
       <StoreSection
         id="featured-stores"
-        eyebrow="Creators"
-        title="Featured sellers"
-        description="Sellers with active catalog presence on UMTUBA."
+        eyebrow={t("store.home.sellersEyebrow")}
+        title={t("store.home.sellersTitle")}
+        description={t("store.home.sellersDescription")}
         href="/store/search"
       >
         {featuredStores.length === 0 ? (
           <StoreEmptyState
-            title="No featured sellers yet"
-            description="Active stores with approved products will appear here."
+            title={t("store.empty.sellersTitle")}
+            description={t("store.empty.sellersDescription")}
           />
         ) : (
           <div className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2 [scrollbar-width:thin]">
@@ -159,19 +181,19 @@ export default async function StoreHomePage() {
 
       <StoreSection
         id="categories"
-        eyebrow="Browse"
-        title="Categories"
+        eyebrow={t("store.home.categoriesEyebrow")}
+        title={t("store.home.categoriesTitle")}
         href="/store/search"
-        linkLabel="Open filters"
+        linkLabel={t("store.home.openFilters")}
       >
         <CategoryRail categories={categories} />
       </StoreSection>
 
       <StoreSection
         id="new-arrivals"
-        eyebrow="New"
-        title="New arrivals"
-        description="Recently published active products."
+        eyebrow={t("store.home.newEyebrow")}
+        title={t("store.home.newTitle")}
+        description={t("store.home.newDescription")}
         href="/store/search?sort=newest"
       >
         <ProductRail items={arrivals} />
@@ -189,14 +211,14 @@ export default async function StoreHomePage() {
 
       <StoreSection
         id="recommended"
-        eyebrow="Explore"
-        title="More to discover"
-        description="Additional active catalog picks when inventory allows."
+        eyebrow={t("store.home.moreEyebrow")}
+        title={t("store.home.moreTitle")}
+        description={t("store.home.moreDescription")}
       >
         {recommended.length === 0 ? (
           <StoreEmptyState
-            title="Nothing extra to show"
-            description="Recommendations appear once there is an active catalog with available products."
+            title={t("store.empty.recommendedTitle")}
+            description={t("store.empty.recommendedDescription")}
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -218,26 +240,26 @@ export default async function StoreHomePage() {
           href="/store/search"
           className="text-sm font-semibold text-[var(--sf-accent-strong)] transition hover:text-[var(--sf-accent)]"
         >
-          Open full catalog →
+          {t("store.home.openCatalog")}
         </Link>
         <div className="flex flex-wrap items-center gap-4">
           <Link
             href={APP_ROUTES.storeWishlist}
             className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
           >
-            Favorites
+            {t("store.home.favorites")}
           </Link>
           <Link
             href={APP_ROUTES.storeCart}
             className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
           >
-            Cart
+            {t("store.home.cart")}
           </Link>
           <Link
             href={APP_ROUTES.seller}
             className="text-sm font-semibold text-[var(--sf-faint)] transition hover:text-[var(--sf-ink)]"
           >
-            Sell on UMTUBA
+            {t("store.home.sellOnUmtuba")}
           </Link>
         </div>
       </div>

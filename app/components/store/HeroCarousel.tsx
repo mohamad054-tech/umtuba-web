@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "../i18n";
 
 export type HeroSlide = {
   id: string;
@@ -17,6 +18,7 @@ type HeroCarouselProps = {
 };
 
 export default function HeroCarousel({ slides }: HeroCarouselProps) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const safeSlides = slides.length > 0 ? slides : [];
@@ -50,7 +52,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
     <section
       className="relative mt-6 overflow-hidden rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)]"
       aria-roledescription="carousel"
-      aria-label="Featured storefront"
+      aria-label={t("store.hero.carouselAria")}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -83,7 +85,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
 
         <div className="relative z-10 flex min-h-[280px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 lg:min-h-[480px] lg:p-14">
-          <p className="sf-eyebrow">UMTUBA Store</p>
+          <p className="sf-eyebrow">{t("store.hero.eyebrow")}</p>
           <h1
             dir="auto"
             className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl"
@@ -98,10 +100,10 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Link href={slide.href} className="sf-btn sf-btn-primary">
-              {slide.ctaLabel ?? "Explore"}
+              {slide.ctaLabel ?? t("store.hero.explore")}
             </Link>
             <Link href="/store/search" className="sf-btn sf-btn-secondary text-white">
-              Browse catalog
+              {t("store.hero.browseCatalog")}
             </Link>
           </div>
         </div>
@@ -112,7 +114,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           <button
             type="button"
             className="sf-gallery-nav watch-focus-ring start-3 md:start-5"
-            aria-label="Previous featured slide"
+            aria-label={t("store.hero.prevSlide")}
             onClick={() => go(index - 1)}
           >
             ‹
@@ -120,7 +122,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           <button
             type="button"
             className="sf-gallery-nav watch-focus-ring end-3 md:end-5"
-            aria-label="Next featured slide"
+            aria-label={t("store.hero.nextSlide")}
             onClick={() => go(index + 1)}
           >
             ›
@@ -128,7 +130,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           <div
             className="absolute bottom-4 end-4 z-20 flex items-center gap-2 md:bottom-6 md:end-6"
             role="tablist"
-            aria-label="Featured slides"
+            aria-label={t("store.hero.slidesAria")}
           >
             {safeSlides.map((s, i) => (
               <button
@@ -136,7 +138,9 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                 type="button"
                 role="tab"
                 aria-selected={i === index}
-                aria-label={`Show slide ${i + 1}: ${s.title}`}
+                aria-label={t("store.hero.showSlide", {
+                  values: { n: i + 1, title: s.title },
+                })}
                 onClick={() => setIndex(i)}
                 className={`watch-focus-ring h-2.5 rounded-full transition-all ${
                   i === index
@@ -151,7 +155,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               aria-pressed={paused}
               onClick={() => setPaused((v) => !v)}
             >
-              {paused ? "Play" : "Pause"}
+              {paused ? t("store.hero.play") : t("store.hero.pause")}
             </button>
           </div>
         </>

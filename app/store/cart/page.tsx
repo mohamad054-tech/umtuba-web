@@ -5,6 +5,8 @@ import StoreErrorState from "../../components/store/StoreErrorState";
 import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { getCartSummary } from "../../../lib/store/cart";
 import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
@@ -22,22 +24,24 @@ export default async function StoreCartPage() {
     );
   }
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const result = await getCartSummary(supabase, user.id);
   const commerceGate = await loadCommerceConfirmGate(supabase);
 
   return (
-    <StoreShell title="Cart" subtitle="Store" wide>
+    <StoreShell title={t("store.cart.navTitle")} subtitle={t("store.cart.navSubtitle")} wide>
       <StorePageHeader
-        eyebrow="Bag"
-        title="Your cart"
-        description="Prices are snapshotted server-side when items are added. Live availability and price changes are verified before checkout. Tax, delivery, and discounts appear only from trusted checkout quotes."
+        eyebrow={t("store.cart.eyebrow")}
+        title={t("store.cart.title")}
+        description={t("store.cart.description")}
       >
         <Link
           href={APP_ROUTES.storeOrders}
           className="mt-3 inline-flex text-sm font-semibold text-[var(--sf-accent-strong)] underline-offset-2 hover:underline"
         >
-          View my orders
+          {t("store.cart.viewOrders")}
         </Link>
         {!commerceGate.purchasesAvailable ? (
           <p

@@ -13,9 +13,9 @@ import type { CartSummary } from "../../../lib/store/cartRules";
 import {
   canProceedFromCart,
   cartMediaDisplayUrl,
-  multiSellerCheckoutNotice,
 } from "../../../lib/store/cartCheckoutPresentation";
 import { APP_ROUTES } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
 
@@ -30,6 +30,7 @@ export default function CartView({
   purchasesAvailable = true,
   purchasesUnavailableMessage = null,
 }: CartViewProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [summary, setSummary] = useState(initialSummary);
   const [error, setError] = useState<string | null>(null);
@@ -62,9 +63,9 @@ export default function CartView({
       if (result.summary) {
         applySummary(result.summary, result.itemCount);
         if (result.summary.hasBlockingIssues) {
-          setStatus("Cart updated. Review availability or price changes before checkout.");
+          setStatus(t("store.cart.reviewBeforeCheckout"));
         } else {
-          setStatus("Quantity updated.");
+          setStatus(t("store.cart.quantityUpdated"));
         }
         return;
       }
@@ -91,7 +92,7 @@ export default function CartView({
         },
         result.itemCount
       );
-      setStatus("Item removed.");
+      setStatus(t("store.cart.itemRemoved"));
     });
   }
 
@@ -114,7 +115,7 @@ export default function CartView({
         },
         0
       );
-      setStatus("Cart cleared.");
+      setStatus(t("store.cart.cleared"));
     });
   }
 
@@ -123,10 +124,10 @@ export default function CartView({
       <div className="mt-6 space-y-4">
         {error ? <StoreErrorState message={error} /> : null}
         <StoreEmptyState
-          title="Your cart is empty"
-          description="Browse the Store and add active products when you are ready. Snapshotted prices appear here after items are added."
+          title={t("store.cart.emptyTitle")}
+          description={t("store.cart.emptyDescription")}
           actionHref={APP_ROUTES.store}
-          actionLabel="Continue shopping"
+          actionLabel={t("store.cart.continueShopping")}
         />
       </div>
     );
@@ -134,7 +135,10 @@ export default function CartView({
 
   const currency = summary.currency ?? "USD";
   const proceed = canProceedFromCart(summary);
-  const multiNotice = multiSellerCheckoutNotice(summary.groups.length);
+  const multiNotice =
+    summary.groups.length > 1
+      ? t("store.cart.multiSeller", { values: { count: summary.groups.length } })
+      : null;
 
   return (
     <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -158,11 +162,11 @@ export default function CartView({
           <section
             key={group.storeId}
             className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 md:p-5"
-            aria-label={`Items from ${group.storeName}`}
+            aria-label={t("store.cart.itemsFrom", { values: { name: group.storeName } })}
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="sf-eyebrow">Seller</p>
+                <p className="sf-eyebrow">{t("store.cart.seller")}</p>
                 <h2 className="sf-display mt-1 text-lg font-semibold tracking-tight">
                   {group.storeName}
                 </h2>
@@ -175,13 +179,15 @@ export default function CartView({
                 }
                 className="text-xs font-semibold text-[var(--sf-accent-strong)] hover:text-[var(--sf-accent)]"
               >
-                View store
+                {t("store.cart.viewStore")}
               </Link>
             </div>
             <p className="mt-1 text-xs text-[var(--sf-faint)]">
-              Seller subtotal{" "}
-              {formatMinorUnits(group.storeSubtotalMinor, currency)} · fulfilled
-              separately
+              {t("store.cart.sellerSubtotal", {
+                values: {
+                  amount: formatMinorUnits(group.storeSubtotalMinor, currency),
+                },
+              })}
             </p>
 
             <ul className="mt-4 space-y-3">
@@ -221,19 +227,24 @@ export default function CartView({
                           </p>
                           {item.priceChanged && item.liveUnitPriceMinor != null ? (
                             <p className="text-xs text-[var(--sf-danger)]">
-                              Live price now{" "}
-                              {formatMinorUnits(
-                                item.liveUnitPriceMinor,
-                                item.currency
-                              )}
+                              {t("store.cart.livePrice", {
+                                values: {
+                                  amount: formatMinorUnits(
+                                    item.liveUnitPriceMinor,
+                                    item.currency
+                                  ),
+                                },
+                              })}
                             </p>
                           ) : null}
                         </div>
                         {item.available != null ? (
                           <p className="mt-1 text-xs text-[var(--sf-muted)]">
                             {item.available > 0
-                              ? `${item.available} available`
-                              : "Unavailable"}
+                              ? t("store.cart.availableCount", {
+                                  values: { count: item.available },
+                                })
+                              : t("store.cart.unavailable")}
                           </p>
                         ) : null}
                         {item.blockingIssue ? (
@@ -250,7 +261,9 @@ export default function CartView({
                         <div className="flex items-center gap-1 rounded-full border border-[var(--sf-line)] bg-black/30 p-1">
                           <button
                             type="button"
-                            aria-label={`Decrease quantity for ${item.productTitle}`}
+                            aria-label={t("store.cart.decreaseQty", {
+                              values: { title: item.productTitle },
+                            })}
                             disabled={pending || item.quantity <= 1}
                             onClick={() =>
                               onQuantity(item.id, Math.max(1, item.quantity - 1))
@@ -260,7 +273,9 @@ export default function CartView({
                             −
                           </button>
                           <label className="sr-only" htmlFor={`qty-${item.id}`}>
-                            Quantity for {item.productTitle}
+                            {t("store.cart.quantityFor", {
+                              values: { title: item.productTitle },
+                            })}
                           </label>
                           <input
                             id={`qty-${item.id}`}
@@ -277,7 +292,7 @@ export default function CartView({
                             onBlur={(e) => {
                               const next = Number(e.target.value);
                               if (!Number.isInteger(next)) {
-                                setError("Quantity must be a whole number.");
+                                setError(t("store.cart.qtyWhole"));
                                 e.target.value = String(item.quantity);
                                 return;
                               }
@@ -294,7 +309,9 @@ export default function CartView({
                           />
                           <button
                             type="button"
-                            aria-label={`Increase quantity for ${item.productTitle}`}
+                            aria-label={t("store.cart.increaseQty", {
+                              values: { title: item.productTitle },
+                            })}
                             disabled={pending}
                             onClick={() => onQuantity(item.id, item.quantity + 1)}
                             className="watch-focus-ring flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold disabled:opacity-40"
@@ -308,11 +325,17 @@ export default function CartView({
                           onClick={() => onRemove(item.id)}
                           className="sf-btn sf-btn-danger"
                         >
-                          Remove
+                          {t("store.cart.remove")}
                         </button>
                         <p className="text-xs text-[var(--sf-faint)]">
-                          Line{" "}
-                          {formatMinorUnits(item.lineTotalMinor, item.currency)}
+                          {t("store.cart.line", {
+                            values: {
+                              amount: formatMinorUnits(
+                                item.lineTotalMinor,
+                                item.currency
+                              ),
+                            },
+                          })}
                         </p>
                       </div>
                     </div>
@@ -329,38 +352,38 @@ export default function CartView({
           onClick={onClear}
           className="watch-focus-ring text-sm font-semibold text-[var(--sf-faint)] hover:text-[var(--sf-ink)]"
         >
-          Clear cart
+          {t("store.cart.clear")}
         </button>
       </div>
 
       <aside className="h-fit rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 lg:sticky lg:top-20">
-        <p className="sf-eyebrow">Summary</p>
+        <p className="sf-eyebrow">{t("store.cart.summary")}</p>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-3">
-            <dt className="text-[var(--sf-faint)]">Items</dt>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.items")}</dt>
             <dd className="font-semibold">{summary.itemCount}</dd>
           </div>
           <div className="flex justify-between gap-3">
-            <dt className="text-[var(--sf-faint)]">Sellers</dt>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.sellers")}</dt>
             <dd className="font-semibold">{summary.groups.length}</dd>
           </div>
           <div className="flex justify-between gap-3 border-t border-[var(--sf-line)] pt-3">
-            <dt className="text-[var(--sf-faint)]">Item subtotal</dt>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.itemSubtotal")}</dt>
             <dd className="text-lg font-semibold text-[var(--sf-accent-strong)]">
               {formatMinorUnits(summary.subtotalMinor, currency)}
             </dd>
           </div>
           <div className="flex justify-between gap-3 text-xs">
-            <dt className="text-[var(--sf-faint)]">Discount</dt>
-            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.discount")}</dt>
+            <dd className="text-[var(--sf-faint)]">{t("store.cart.calculatedAtCheckout")}</dd>
           </div>
           <div className="flex justify-between gap-3 text-xs">
-            <dt className="text-[var(--sf-faint)]">Tax</dt>
-            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.tax")}</dt>
+            <dd className="text-[var(--sf-faint)]">{t("store.cart.calculatedAtCheckout")}</dd>
           </div>
           <div className="flex justify-between gap-3 text-xs">
-            <dt className="text-[var(--sf-faint)]">Delivery</dt>
-            <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>
+            <dt className="text-[var(--sf-faint)]">{t("store.cart.delivery")}</dt>
+            <dd className="text-[var(--sf-faint)]">{t("store.cart.calculatedAtCheckout")}</dd>
           </div>
         </dl>
 
@@ -386,8 +409,8 @@ export default function CartView({
             className="sf-btn sf-btn-primary mt-5 w-full"
           >
             {purchasesAvailable
-              ? "Continue to checkout"
-              : "Review checkout (orders disabled)"}
+              ? t("store.cart.continueCheckout")
+              : t("store.cart.reviewCheckoutDisabled")}
           </Link>
         ) : (
           <button
@@ -396,18 +419,17 @@ export default function CartView({
             aria-disabled="true"
             className="sf-btn sf-btn-primary mt-5 w-full"
           >
-            Checkout unavailable
+            {t("store.cart.checkoutUnavailable")}
           </button>
         )}
         <p className="mt-2 text-center text-[11px] leading-relaxed text-[var(--sf-faint)]">
-          Payment collection is not enabled. Checkout creates pending-payment
-          orders only — no live charge.
+          {t("store.cart.paymentDeferred")}
         </p>
         <Link
           href={APP_ROUTES.store}
           className="mt-3 block text-center text-sm font-semibold text-[var(--sf-accent-strong)] hover:text-[var(--sf-accent)]"
         >
-          Continue shopping
+          {t("store.cart.continueShopping")}
         </Link>
       </aside>
 
@@ -417,13 +439,15 @@ export default function CartView({
             href={APP_ROUTES.store}
             className="sf-btn sf-btn-secondary"
           >
-            Shop
+            {t("store.chrome.shop")}
           </Link>
           <Link
             href={APP_ROUTES.storeCheckout}
             className="sf-btn sf-btn-primary min-w-0 flex-1"
           >
-            {purchasesAvailable ? "Checkout" : "Review checkout"}
+            {purchasesAvailable
+              ? t("store.cart.checkout")
+              : t("store.cart.reviewCheckout")}
           </Link>
         </div>
       ) : null}

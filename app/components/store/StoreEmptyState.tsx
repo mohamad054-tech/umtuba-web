@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../i18n";
 
 type StoreEmptyStateProps = {
   title: string;
@@ -11,8 +14,10 @@ export default function StoreEmptyState({
   title,
   description,
   actionHref,
-  actionLabel = "Continue",
+  actionLabel,
 }: StoreEmptyStateProps) {
+  const { t } = useTranslation();
+  const label = actionLabel ?? t("actions.continue");
   return (
     <div
       role="status"
@@ -38,7 +43,7 @@ export default function StoreEmptyState({
       </p>
       {actionHref ? (
         <Link href={actionHref} className="sf-btn sf-btn-ghost mt-5">
-          {actionLabel}
+          {label}
         </Link>
       ) : null}
     </div>

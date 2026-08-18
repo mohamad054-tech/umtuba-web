@@ -1,10 +1,10 @@
-import StoreShell from "../components/store/StoreShell";
+import StoreLocalizedLoading from "../components/store/StoreLocalizedLoading";
 import { StoreHomeSkeleton } from "../components/store/StoreSkeleton";
 
 export default function StoreLoading() {
   return (
-    <StoreShell title="Store" subtitle="Loading">
+    <StoreLocalizedLoading>
       <StoreHomeSkeleton />
-    </StoreShell>
+    </StoreLocalizedLoading>
   );
 }

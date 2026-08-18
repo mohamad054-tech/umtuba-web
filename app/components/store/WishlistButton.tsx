@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toggleWishlistAction } from "../../actions/storeWishlist";
 import { APP_ROUTES } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 
 type WishlistButtonProps = {
   productId: string;
@@ -29,6 +30,7 @@ export default function WishlistButton({
   onToggled,
   className,
 }: WishlistButtonProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [wishlisted, setWishlisted] = useState(initialWishlisted);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function WishlistButton({
       <button
         type="button"
         aria-pressed={wishlisted}
-        aria-label={wishlisted ? "Remove from favorites" : "Save to favorites"}
+        aria-label={wishlisted ? t("store.wishlist.remove") : t("store.wishlist.save")}
         disabled={pending}
         onClick={(event) => {
           event.preventDefault();

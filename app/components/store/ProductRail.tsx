@@ -1,6 +1,9 @@
+"use client";
+
 import ProductCard from "./ProductCard";
 import StoreEmptyState from "./StoreEmptyState";
 import type { PublicCatalogItem } from "../../../lib/store/types";
+import { useTranslation } from "../i18n";
 
 type ProductRailProps = {
   items: PublicCatalogItem[];
@@ -11,13 +14,16 @@ type ProductRailProps = {
 
 export default function ProductRail({
   items,
-  emptyTitle = "Nothing here yet",
-  emptyDescription = "Active products will appear when stores publish approved listings.",
+  emptyTitle,
+  emptyDescription,
   badge,
 }: ProductRailProps) {
+  const { t } = useTranslation();
+  const title = emptyTitle ?? t("store.empty.railTitle");
+  const description = emptyDescription ?? t("store.empty.railDescription");
   if (items.length === 0) {
     return (
-      <StoreEmptyState title={emptyTitle} description={emptyDescription} />
+      <StoreEmptyState title={title} description={description} />
     );
   }
 

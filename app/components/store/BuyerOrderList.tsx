@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { formatOrderMoney } from "../../../lib/store/orderRules";
 import type { BuyerOrderListItem } from "../../../lib/store/orders";
 import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
+import { useTranslation } from "../i18n";
 import { OrderStatusCluster } from "./OrderStatusBadges";
 import StoreEmptyState from "./StoreEmptyState";
 
@@ -22,13 +25,14 @@ function formatDate(iso: string): string {
 }
 
 export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
+  const { t } = useTranslation();
   if (orders.length === 0) {
     return (
       <StoreEmptyState
-        title="No orders yet"
-        description="When checkout confirms an order, it appears here with separate order, payment, fulfillment, and delivery states."
+        title={t("store.orders.emptyTitle")}
+        description={t("store.orders.emptyDescription")}
         actionHref={APP_ROUTES.store}
-        actionLabel="Browse the Store"
+        actionLabel={t("store.orders.browse")}
       />
     );
   }
@@ -48,8 +52,10 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
                   {order.storeName}
                 </h2>
                 <p className="mt-1 text-sm text-[var(--sf-faint)]">
-                  {formatDate(order.createdAt)} · {order.itemCount} item
-                  {order.itemCount === 1 ? "" : "s"}
+                  {formatDate(order.createdAt)} ·{" "}
+                  {order.itemCount === 1
+                    ? t("store.orders.itemOne", { values: { count: order.itemCount } })
+                    : t("store.orders.itemMany", { values: { count: order.itemCount } })}
                 </p>
                 {order.previewTitles.length > 0 ? (
                   <p className="mt-2 line-clamp-2 text-sm text-[var(--sf-muted)]">
@@ -62,7 +68,7 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
                   {formatOrderMoney(order.grandTotalMinor, order.currency)}
                 </p>
                 <p className="mt-1 text-xs font-semibold text-[var(--sf-faint)] transition group-hover:text-[var(--sf-accent)]">
-                  View details →
+                  {t("store.orders.viewDetails")}
                 </p>
               </div>
             </div>
@@ -75,8 +81,7 @@ export default function BuyerOrderList({ orders }: BuyerOrderListProps) {
               />
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-[var(--sf-faint)]">
-              This is one seller order. Multi-seller checkouts create separate
-              orders — not one shared shipment.
+              {t("store.orders.oneSellerNote")}
             </p>
           </Link>
         </li>

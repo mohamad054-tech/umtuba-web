@@ -152,6 +152,9 @@ describe("translation catalogs", () => {
     "world.error.unavailable",
     "learning.lesson.unavailableTitle",
     "learning.lesson.returnToCatalog",
+    "store.chrome.orders",
+    "store.empty.catalogTitle",
+    "store.hero.shopTitle",
   ];
 
   it("provides foundation keys for every supported locale", () => {
