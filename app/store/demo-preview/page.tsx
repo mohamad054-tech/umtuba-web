@@ -7,6 +7,7 @@ import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { DEMO_CATEGORY_SLUGS } from "../../../lib/store/demo/types";
 import { searchDemoCatalog } from "../../../lib/store/demo/surface";
 import { formatMinorUnits } from "../../../lib/store/money";
+import { demoPreviewTokenQuery } from "../../../lib/store/demoPreviewGate";
 import { resolveDemoPreviewAccess } from "../../../lib/store/demoPreviewAccess";
 import { APP_ROUTES } from "../../lib/nav";
 
@@ -51,9 +52,8 @@ export default async function StoreDemoPreviewPage({ searchParams }: PageProps) 
     q: typeof params.q === "string" ? params.q : "",
     category,
   });
-  const tokenQs = params.demo_token
-    ? `&demo_token=${encodeURIComponent(params.demo_token)}`
-    : "";
+  const tokenQuery = demoPreviewTokenQuery(access, params.demo_token);
+  const tokenQs = tokenQuery ? `&${tokenQuery}` : "";
 
   return (
     <StoreShell title={t("store.demo.title")} subtitle={t("store.demo.subtitle")}>
@@ -72,7 +72,7 @@ export default async function StoreDemoPreviewPage({ searchParams }: PageProps) 
         description={t("store.demo.notReal")}
       />
       <form className="mt-6 flex flex-wrap gap-3" method="get">
-        {params.demo_token ? (
+        {tokenQuery && params.demo_token ? (
           <input type="hidden" name="demo_token" value={params.demo_token} />
         ) : null}
         <input

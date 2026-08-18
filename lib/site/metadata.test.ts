@@ -117,7 +117,8 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/feed") ||
           path.startsWith("/journey-pro") ||
           path.startsWith("/city") ||
-          path.startsWith("/live/media-lab")
+          path.startsWith("/live/media-lab") ||
+          path.startsWith("/store/demo-preview")
       ).toBe(true);
     }
   });
@@ -144,10 +145,13 @@ describe("route robots / sitemap policy", () => {
       "/city",
       "/rewards",
       "/live/media-lab",
+      "/store/demo-preview",
+      "/store",
     ];
     for (const path of blocked) {
       expect(SITEMAP_STATIC_ROUTES).not.toContain(path);
     }
+    expect(ROBOTS_DISALLOW_PATHS).toContain("/store/demo-preview");
   });
 
   it("buildPageMetadata sets canonical and OG image dimensions", () => {
