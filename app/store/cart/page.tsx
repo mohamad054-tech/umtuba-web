@@ -11,6 +11,8 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { getCartSummary } from "../../../lib/store/cart";
 import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Cart | UMTUBA Store",
   description: "Your UMTUBA Store cart.",

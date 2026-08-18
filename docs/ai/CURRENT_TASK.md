@@ -1,6 +1,41 @@
 ﻿# Current Task
 
-## CENTRAL GO — INGEST UMTUBA ORIGINALS CONTENT INTO EXECUTABLE LEARNING SANDBOX V1
+## CENTRAL GO — UNIFIED WEB LOCALE AUTO-DETECTION V1
+
+**TASK_ID** = `CENTRAL_UNIFIED_WEB_LOCALE_AUTO_DETECTION_V1`
+**PRIORITY** = HIGH
+**SCOPE** = WEB + PRIVATE BUSINESS SANDBOX
+**DATE** = 2026-08-19
+**MODE** = IMPLEMENTATION
+**STATUS** = IMPLEMENTED_LOCAL — `PUSHED=NO` `DEPLOYED=NO`
+
+### Status
+
+Dedicated worktree from live `7f18629e`. One locale-resolution contract across public Web, Store, Learning, and Business Sandbox. Device `navigator.language` bridged when no saved preference. Exercise-runtime wave left untouched. Deploy deferred while that cutover is in flight.
+
+### Identity
+
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION
+- **CURRENT_LIVE** = `7f18629eef3cd9c4f484547f2ff0285212102420`
+- **TASK_BRANCH** = `central/unified-web-locale-auto-detection-v1`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-unified-web-locale-auto-detection-v1`
+- **SANDBOX_PATH** = `/sandbox/business-preview`
+
+### Allowed scope
+
+Unified locale contract. Device detection. Cookie persistence. RTL. Store/Learning/Sandbox chrome. Tests/tsc/lint/build. Docs.
+
+### Forbidden scope
+
+- Mobile `7cf3960`; Rewards `20260931`; Digital Asset Lab; real partner data
+- Rewrite production course content; blindly translate authored lessons/synthetic names
+- Force-push; `git config --global`; print secrets; `STORE_DEMO_PREVIEW=1`
+- Overwrite learning exercise-route fixes; race Hetzner cutover; reset live backward
+
+---
+
+## Prior — INGEST UMTUBA ORIGINALS CONTENT INTO EXECUTABLE LEARNING SANDBOX V1
 
 **TASK_ID** = `CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1`
 **PRIORITY** = HIGH

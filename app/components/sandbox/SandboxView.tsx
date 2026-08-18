@@ -85,13 +85,14 @@ function Hub({ locale }: { locale: AppLocale }) {
     <>
       <p className="text-sm text-[var(--sx-muted)]">{sandboxT(locale, "originalsDraft")}</p>
       <div className="sx-grid sx-grid-3 mt-4">
-        <Card title="LEARNING" href={sandboxHref("learning")}>
-          {SANDBOX_STUDENTS.length} students · {SANDBOX_INSTRUCTORS.length} instructors ·{" "}
-          {SANDBOX_COURSES.length} courses
+        <Card title={sandboxT(locale, "learning")} href={sandboxHref("learning")}>
+          {SANDBOX_STUDENTS.length} {sandboxT(locale, "learningStudent")} ·{" "}
+          {SANDBOX_INSTRUCTORS.length} {sandboxT(locale, "learningInstructor")} ·{" "}
+          {SANDBOX_COURSES.length} {sandboxT(locale, "catalog")}
         </Card>
-        <Card title="STORE" href={sandboxHref("store")}>
-          {SANDBOX_STORE_LISTINGS.length} DEMO products · {SANDBOX_STORE_ACTORS.length} synthetic
-          actors
+        <Card title={sandboxT(locale, "store")} href={sandboxHref("store")}>
+          {SANDBOX_STORE_LISTINGS.length} {sandboxT(locale, "store")} ·{" "}
+          {SANDBOX_STORE_ACTORS.length} {sandboxT(locale, "synthetic")}
         </Card>
         <Card title="PARTNERS / PROVIDERS" href={sandboxHref("rights")}>
           {PROSPECTIVE_LEARNING_PARTNERS.length} learning + {PROSPECTIVE_COMMERCE_PARTNERS.length}{" "}

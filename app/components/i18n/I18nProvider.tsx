@@ -17,6 +17,7 @@ import {
   type TranslateOptions,
 } from "../../../lib/i18n/translate";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
+import DeviceLocaleBridge from "./DeviceLocaleBridge";
 
 type I18nContextValue = {
   locale: AppLocale;
@@ -42,7 +43,12 @@ export function I18nProvider({
     };
   }, [locale]);
 
-  return createElement(I18nContext.Provider, { value }, children);
+  return createElement(
+    I18nContext.Provider,
+    { value },
+    createElement(DeviceLocaleBridge),
+    children
+  );
 }
 
 export function useI18n(): I18nContextValue {

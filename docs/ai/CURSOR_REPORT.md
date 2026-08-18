@@ -1,59 +1,62 @@
-# CURSOR_REPORT — Ingest UMTUBA Originals into executable Learning sandbox V1
+# CURSOR_REPORT — Unified Web Locale Auto-Detection V1
 
 ```text
 SOURCE_DEVICE = CENTRAL / SERVER
 DEVICE_ROLE = IMPLEMENTATION
-TASK_ID = CENTRAL_INGEST_UMTUBA_ORIGINALS_SANDBOX_V1
-REPORT_TYPE = PRODUCT_INTEGRATION_ONLY
-TIMESTAMP_LOCAL = 2026-08-18 ~23:00 +03
+TASK_ID = CENTRAL_UNIFIED_WEB_LOCALE_AUTO_DETECTION_V1
+REPORT_TYPE = IMPLEMENTATION
+TIMESTAMP_LOCAL = 2026-08-19 ~00:55 +03
 SECRET_VALUES_PRINTED = NO
 FORCE_PUSH = NO
 PUSH = NO
 PRODUCTION_MUTATED = NO
 REMOTE_MIGRATION_APPLIED = NO
-SQL_20260929_APPLIED = NO
-SQL_20260930_REAPPLIED = NO
 MOBILE_SOURCE_CHANGED = NO
-MOBILE_RELEASE_TRAIN_DISTURBED = NO
+MOBILE_DISTURBED = NO
+PRODUCTION_LEARNING_CONTENT_REWRITTEN = NO
 STORE_DEMO_PREVIEW_SET = NO
-SANDBOX_HUB_PRESERVED = YES
-STORE_V2_PRESERVED = YES
-LEARNING_V2_PRESERVED = YES
-CATALOG_910fb3b8_PRESERVED = YES
-ACCESS_CONTROL_PRESERVED = YES
-NOINDEX_PRESERVED = YES
-CONTENT_REWRITTEN = NO
-PRIVATE_SANDBOX_DEPLOYED = NO
+DEPLOY_PERFORMED = NO
 ```
 
 ## Summary
 
-Ingested the three UMTUBA Originals draft courses into the private Learning sandbox without rewriting lesson bodies. PC2 packet `PC2_UMTUBA_ORIGINALS_CONTENT_BUILD_V1` was not on disk; authoritative bodies came from pre-company pilot `cd39b883`. Stacked onto Desktop catalog commit `910fb3b8` (parent live `fbb6b364`) so the 26-SKU productization is not dropped. `lib/store/demo` and `910fb3b8` catalog files were not modified. Live Hetzner remains `fbb6b364-20260818222318`. No deploy.
+Store, Learning, and Business Sandbox already called `resolveRequestLocale()`, but they still opened in English when the device was Arabic. Root cause: the contract trusted cookie + Accept-Language + `?hl=` only. There was no `navigator.language` bridge, shopper Store routes were not `force-dynamic`, and a first-visit English HTML/cache path won over the device. Manual English already persisted via `umtuba_locale`; device locale never got a chance when Accept-Language was missing or the page was statically cached.
 
-Counts: COURSES=3 MODULES=12 LESSONS=36 MODULE_QUIZZES=12 FINALS=pe-final/ds-final/ai-final (4/5, unlimited, SCORE) LESSON_EXERCISES=24 COURSE_EXERCISES=8 (all authored; packet asked 6). Completion follows PC2 (lessons + module quizzes + final); exercises are not a silent extra gate for Originals. Partner AI stays blocked.
+This wave keeps the existing i18n system and implements one priority: saved preference → URL `hl`/`locale` → device languages → English. A client `DeviceLocaleBridge` persists a supported device locale only when no cookie exists. Arabic chrome is RTL via `html[dir]` plus sandbox containers. Authored lessons and synthetic product names are unchanged.
+
+Exercise-runtime worktree remains dirty; no Hetzner cutover.
 
 ## Exact files changed
 
-- `app/components/sandbox/learning/LearningActions.tsx`
-- `app/components/sandbox/learning/LearningSandbox.tsx`
-- `lib/sandbox/fixtures/courses.ts`
-- `lib/sandbox/fixtures/originals.ts` (deleted; replaced by directory)
-- `lib/sandbox/fixtures/originals/**` (pilot copy + adapt)
-- `lib/sandbox/fixtures/types.ts`
-- `lib/sandbox/i18n.ts`
-- `lib/sandbox/learning/catalog.ts`
-- `lib/sandbox/learning/certificates.ts`
-- `lib/sandbox/learning/completion.ts`
-- `lib/sandbox/learning/index.ts`
-- `lib/sandbox/learning/learning.executable.test.ts`
-- `lib/sandbox/learning/originals.ingest.test.ts`
-- `lib/sandbox/learning/state.ts`
-- `lib/sandbox/learning/tutor.ts`
-- `scripts/verify-originals-ingest.mts`
+- `lib/i18n/resolve.ts`
+- `lib/i18n/deviceLocale.ts` (new)
+- `lib/i18n/cookie.ts`
+- `lib/i18n/server.ts`
+- `lib/i18n/index.ts`
+- `lib/i18n/unifiedLocaleContract.test.ts` (new)
+- `lib/i18n/i18nFoundation.test.ts`
+- `lib/site/hreflang.ts`
+- `lib/supabase/middleware.ts`
+- `app/components/i18n/DeviceLocaleBridge.tsx` (new)
+- `app/components/i18n/I18nProvider.tsx`
+- `app/components/i18n/LanguageSelector.tsx`
+- `app/components/i18n/index.ts`
+- `app/layout.tsx`
+- `app/learning/loading.tsx`
+- `app/store/page.tsx`
+- `app/store/cart/page.tsx`
+- `app/store/checkout/page.tsx`
+- `app/store/orders/page.tsx`
+- `app/store/search/page.tsx`
+- `app/store/wishlist/page.tsx`
+- `app/store/[storeSlug]/page.tsx`
+- `app/sandbox/business-preview/page.tsx`
+- `app/sandbox/business-preview/[...section]/page.tsx`
+- `app/components/sandbox/SandboxView.tsx`
+- `app/components/sandbox/SandboxShell.tsx`
+- `app/components/sandbox/store/StoreShopperShell.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-
-Not changed: `lib/store/demo/**`, `lib/sandbox/fixtures/store.ts`, `lib/sandbox/fixtures/catalog.test.ts`, Store shopper files, production `/learning`.
 
 ## Migrations created
 
@@ -61,41 +64,30 @@ None.
 
 ## Security review
 
-- Private sandbox only; public catalog flags remain false; drafts unpublished.
-- No production enrollments or certificates created.
-- Certificate preview marked SANDBOX/DEMO, ISSUER=UMTUBA, no accreditation/degree claims.
-- Partner `AI_USAGE_ALLOWED` stays denied; tutor is local and does not send to external AI.
-- Mock Learning payments remain isolated (`LearningPaymentOutcome`).
-- Catalog 26-SKU files from `910fb3b8` untouched.
-- No secrets printed. SQL 20260929/20260930 not applied. Mobile not touched.
+No new auth, RLS, or secrets. Locale cookies stay non-httpOnly, path `/`, SameSite=lax, Secure in production. Device detection never overrides an explicit cookie. `?hl=` / `?locale=` only accept supported locales. Sandbox stays private; no public nav leak. `Vary: Accept-Language, Cookie` added so caches do not pin English HTML.
 
 ## Tests
 
-PASS — 78 tests / 14 files including `originals.ingest.test.ts`, `learning.executable.test.ts`, `catalog.test.ts`, `lib/store/demo/catalog.test.ts`, Store V2 shopper/payment/session tests, access/containment.
-
-Verifier: lessons=36 quizzes=12 lessonExercises=24 courseExercises=8 finals=pe-final,ds-final,ai-final. Failed final <4/5 covered. Three-course QA covered.
+PASS. `vitest` locale + containment + Learning chrome + hreflang suites: 89 passed. Re-run after lint helper: 40 passed.
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit`
+PASS. `npx tsc --noEmit` exit 0.
 
 ## Build
 
-PASS — `npm run build` on `central/ingest-umtuba-originals-on-910fb3b8` (not deployed).
+PASS. `npm run build` exit 0. `/store`, `/learning`, `/sandbox/business-preview` are dynamic (`ƒ`).
 
 ## git diff --check
 
-PASS
+PASS (no whitespace errors).
 
 ## git status --short
 
-Local commit on `central/ingest-umtuba-originals-on-910fb3b8` stacked on `910fb3b8`. Live `origin/alpha-0.2` remains `fbb6b364`. `PUSHED=NO` `DEPLOYED=NO`.
+See worktree `central/unified-web-locale-auto-detection-v1` (uncommitted). Exercise worktree still has local exercise-runtime edits — not mixed.
 
 ## Open issues
 
-- PC2 packet file missing; source is pre-company pilot `cd39b883`.
-- Course exercises wired = 8 (authored), packet asked 6.
-- Lesson exercises 24 are chrome/resource-derived practice slots, not a separate PC2 exercise packet.
-- Source finals are 8 questions / 70%; sandbox scores first 5 at 4/5 and keeps the rest in `reviewBank` (no new prose). Production `/learning` does not persist this contract (`PRODUCTION_COMPLETION_GAP`).
-- Browser MCP authorized walkthrough not claimed PASS (no platform_admins session fabricated).
-- Live combined SHA remains `fbb6b364` until an explicit deploy GO.
+- Residual English on some store-profile about/currency labels and sandbox commercial/rights internal copy. fr/es/de/pt sandbox catalogs remain partial by design.
+- Auth profile locale field does not exist; reserved passthrough only.
+- Deploy required to make live Arabic auto-detect. Not performed: learning exercise-runtime fix is in flight.

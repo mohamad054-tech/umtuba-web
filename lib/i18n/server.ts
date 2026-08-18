@@ -5,20 +5,22 @@ import { LOCALE_OVERRIDE_HEADER } from "../site/hreflang";
 import { LOCALE_COOKIE_NAME, parseLocaleCookieValue } from "./cookie";
 import {
   getLocaleDirection,
+  normalizeToAppLocale,
   type AppLocale,
   type TextDirection,
 } from "./locales";
-import { resolveAppLocale } from "./resolve";
+import { resolveAppLocale, resolveSupportedBrowserLocale } from "./resolve";
 
 export type ResolvedRequestLocale = {
   locale: AppLocale;
   direction: TextDirection;
-  source: "query" | "cookie" | "accept-language" | "fallback";
+  source: "preference" | "query" | "cookie" | "accept-language" | "fallback";
 };
 
 /**
  * Resolve locale for the current request (RSC / root layout).
- * No DB user preference in V1 — cookie → Accept-Language → fallback.
+ * Contract: saved preference → URL (`hl`/`locale`) → Accept-Language → en.
+ * Profile locale is a reserved passthrough — no DB field in this milestone.
  */
 export async function resolveRequestLocale(): Promise<ResolvedRequestLocale> {
   const jar = await cookies();
@@ -28,27 +30,23 @@ export async function resolveRequestLocale(): Promise<ResolvedRequestLocale> {
 
   const headerStore = await headers();
   const acceptLanguage = headerStore.get("accept-language");
-  const queryLocale = headerStore.get(LOCALE_OVERRIDE_HEADER);
+  const queryLocale = normalizeToAppLocale(
+    headerStore.get(LOCALE_OVERRIDE_HEADER)
+  );
 
   const locale = resolveAppLocale({
-    explicit: queryLocale,
     cookiePreference,
+    explicit: queryLocale,
     browserLanguages: acceptLanguage,
   });
 
   let source: ResolvedRequestLocale["source"] = "fallback";
-  if (queryLocale) {
-    source = "query";
-  } else if (cookiePreference) {
+  if (cookiePreference && cookiePreference === locale) {
     source = "cookie";
-  } else {
-    const fromBrowser = resolveAppLocale({
-      browserLanguages: acceptLanguage,
-    });
-    const fromFallback = resolveAppLocale({});
-    if (fromBrowser !== fromFallback) {
-      source = "accept-language";
-    }
+  } else if (queryLocale && queryLocale === locale) {
+    source = "query";
+  } else if (resolveSupportedBrowserLocale(acceptLanguage) === locale) {
+    source = "accept-language";
   }
 
   return {

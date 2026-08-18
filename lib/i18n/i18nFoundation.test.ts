@@ -74,11 +74,20 @@ describe("browser language normalization", () => {
 });
 
 describe("locale resolution order", () => {
-  it("prefers explicit over cookie and browser", () => {
+  it("prefers saved cookie over URL explicit and browser", () => {
     expect(
       resolveAppLocale({
         explicit: "ar",
         cookiePreference: "fr",
+        browserLanguages: "de",
+      })
+    ).toBe("fr");
+  });
+
+  it("uses URL explicit when no saved preference exists", () => {
+    expect(
+      resolveAppLocale({
+        explicit: "ar",
         browserLanguages: "de",
       })
     ).toBe("ar");

@@ -33,6 +33,8 @@ import { storeMetadata } from "../../lib/site/routeMetadata";
 
 export const metadata = storeMetadata;
 
+export const dynamic = "force-dynamic";
+
 export default async function StoreHomePage() {
   const [{ locale }, supabase] = await Promise.all([
     resolveRequestLocale(),

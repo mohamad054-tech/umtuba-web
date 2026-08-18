@@ -9,6 +9,8 @@ import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { listWishlist } from "../../../lib/store/wishlist";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Favorites | UMTUBA Store",
 };

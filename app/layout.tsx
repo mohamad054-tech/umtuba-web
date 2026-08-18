@@ -20,6 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = buildRootMetadata();
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{

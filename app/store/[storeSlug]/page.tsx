@@ -6,6 +6,8 @@ import StoreErrorState from "../../components/store/StoreErrorState";
 import StoreProfileTabs from "../../components/store/StoreProfileTabs";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient } from "../../../lib/supabase/server";
 import {
   getPublicStoreBySlug,
@@ -25,8 +27,12 @@ export async function generateMetadata({ params }: StoreProfilePageProps) {
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function StoreProfilePage({ params }: StoreProfilePageProps) {
   const { storeSlug } = await params;
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const store = await getPublicStoreBySlug(supabase, storeSlug);
   if (!store) notFound();
@@ -47,8 +53,8 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
     <StoreErrorState message={catalog.error} />
   ) : catalog.items.length === 0 ? (
     <StoreEmptyState
-      title="No active products"
-      description="This store has no approved active listings yet."
+      title={t("store.empty.railTitle")}
+      description={t("store.empty.railDescription")}
     />
   ) : (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,13 +118,13 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
   return (
     <StoreShell
       title={store.name}
-      subtitle="Store"
+      subtitle={t("store.shell.title")}
       actions={
         <Link
           href={APP_ROUTES.store}
           className="watch-focus-ring rounded-full border border-[var(--sf-line)] bg-white/5 px-3 py-1.5 text-xs font-semibold text-[var(--sf-muted)]"
         >
-          Store home
+          {t("store.chrome.shop")}
         </Link>
       }
     >

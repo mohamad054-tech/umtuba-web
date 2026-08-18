@@ -3,6 +3,8 @@ import { resolveBusinessSandboxAccess } from "../../../lib/sandbox/access/resolv
 import { SANDBOX_PATH } from "../../../lib/sandbox/paths";
 import { resolveRequestLocale } from "../../../lib/i18n/server";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   searchParams?: Promise<{ sandbox_token?: string }>;
 };
