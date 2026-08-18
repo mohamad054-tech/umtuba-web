@@ -4,6 +4,8 @@ import StoreErrorState from "../../components/store/StoreErrorState";
 import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { getCartSummary } from "../../../lib/store/cart";
 import {
@@ -25,11 +27,13 @@ export default async function StoreCheckoutPage() {
     );
   }
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const cart = await getCartSummary(supabase, user.id);
   if (!cart.ok) {
     return (
-      <StoreShell title="Checkout" subtitle="Store" wide>
+      <StoreShell title={t("store.checkout.navTitle")} subtitle={t("store.checkout.navSubtitle")} wide>
         <div className="mt-6">
           <StoreErrorState message={cart.message} />
         </div>
@@ -43,11 +47,11 @@ export default async function StoreCheckoutPage() {
   const commerceGate = await loadCommerceConfirmGate(supabase);
 
   return (
-    <StoreShell title="Checkout" subtitle="Store" wide>
+    <StoreShell title={t("store.checkout.navTitle")} subtitle={t("store.checkout.navSubtitle")} wide>
       <StorePageHeader
-        eyebrow="Checkout"
-        title="Review & place order"
-        description="Totals are calculated server-side. Payment collection is not enabled — placing an order creates a pending-payment order only. Multi-seller carts create one order per seller atomically."
+        eyebrow={t("store.checkout.eyebrow")}
+        title={t("store.checkout.title")}
+        description={t("store.checkout.description")}
       >
         {!commerceGate.purchasesAvailable ? (
           <p
@@ -62,8 +66,7 @@ export default async function StoreCheckoutPage() {
             role="alert"
             className="mt-4 rounded-2xl border border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.08)] px-4 py-3 text-sm text-[var(--sf-danger)]"
           >
-            Some cart items have price or availability issues. Return to the cart
-            and resolve them before placing an order.
+            {t("store.checkout.blocking")}
           </p>
         ) : null}
       </StorePageHeader>
@@ -74,7 +77,7 @@ export default async function StoreCheckoutPage() {
             message={
               (!addresses.ok && addresses.message) ||
               (!shipping.ok && shipping.message) ||
-              "Checkout unavailable."
+              t("store.checkout.unavailable")
             }
           />
         </div>
@@ -88,7 +91,7 @@ export default async function StoreCheckoutPage() {
           }
           purchasesUnavailableMessage={
             cart.data.hasBlockingIssues
-              ? "Resolve cart price or availability issues before placing an order."
+              ? t("store.checkout.resolveIssues")
               : commerceGate.message
           }
         />

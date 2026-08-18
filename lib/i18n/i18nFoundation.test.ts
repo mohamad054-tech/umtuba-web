@@ -157,6 +157,9 @@ describe("translation catalogs", () => {
     "learning.enroll.notEligible",
     "learning.enroll.requiredTitle",
     "learning.hub.subtitle",
+    "store.chrome.orders",
+    "store.empty.catalogTitle",
+    "store.hero.shopTitle",
   ];
 
   it("provides foundation keys for every supported locale", () => {

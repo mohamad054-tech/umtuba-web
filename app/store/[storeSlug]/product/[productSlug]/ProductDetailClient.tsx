@@ -13,6 +13,7 @@ import { APP_ROUTES } from "../../../../lib/nav";
 import { compareAtSavePercent } from "../../../../lib/storefront/deriveSections";
 import { formatMinorUnits } from "../../../../../lib/store/money";
 import { STOREFRONT_FLAGS } from "../../../../../lib/store/storefrontFlags";
+import { useTranslation } from "../../../../components/i18n";
 import type { PublicProductVideoItem } from "../../../../../lib/store/videoCommerceQueries";
 import type {
   PublicCatalogItem,
@@ -34,6 +35,7 @@ export default function ProductDetailClient({
   videos,
   initialWishlisted,
 }: ProductDetailClientProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [variantId, setVariantId] = useState(
     detail.variants[0]?.variant.id ?? ""
@@ -111,42 +113,42 @@ export default function ProductDetailClient({
       detail.product;
 
     if (weight_grams != null) {
-      rows.push({ label: "Weight", value: `${weight_grams} g` });
+      rows.push({ label: t("store.product.weight"), value: `${weight_grams} g` });
     }
     if (length_mm != null && width_mm != null && height_mm != null) {
       rows.push({
-        label: "Dimensions",
+        label: t("store.product.dimensions"),
         value: `${length_mm} × ${width_mm} × ${height_mm} mm`,
       });
     }
     if (origin_country_code) {
-      rows.push({ label: "Origin", value: origin_country_code });
+      rows.push({ label: t("store.product.origin"), value: origin_country_code });
     }
     return rows;
-  }, [detail.product]);
+  }, [detail.product, t]);
 
   const policyBlocks = useMemo(() => {
     const blocks: Array<{ title: string; body: string }> = [];
     if (detail.store.shipping_policy?.trim()) {
       blocks.push({
-        title: "Shipping policy",
+        title: t("store.product.shippingPolicy"),
         body: detail.store.shipping_policy.trim(),
       });
     }
     if (detail.store.return_policy?.trim()) {
       blocks.push({
-        title: "Return policy",
+        title: t("store.product.returnPolicy"),
         body: detail.store.return_policy.trim(),
       });
     }
     if (detail.store.privacy_policy?.trim()) {
       blocks.push({
-        title: "Privacy policy",
+        title: t("store.product.privacyPolicy"),
         body: detail.store.privacy_policy.trim(),
       });
     }
     return blocks;
-  }, [detail.store]);
+  }, [detail.store, t]);
 
   const activeMedia = media[mediaIndex] ?? media[0];
   const activeMediaUrl =
@@ -198,7 +200,7 @@ export default function ProductDetailClient({
         setCartError(result.message);
         return;
       }
-      setCartMessage("Added to cart");
+      setCartMessage(t("store.product.added"));
       window.dispatchEvent(
         new CustomEvent("umtuba:cart-updated", {
           detail: { count: result.itemCount },
@@ -208,19 +210,19 @@ export default function ProductDetailClient({
   }
 
   const addLabel = pending
-    ? "Adding…"
+    ? t("store.product.adding")
     : purchaseBlocked
-      ? "Unavailable"
+      ? t("store.product.unavailable")
       : !price
-        ? "Price unavailable"
+        ? t("store.product.priceUnavailable")
         : !inStock
-          ? "Out of stock"
-          : "Add to cart";
+          ? t("store.product.outOfStock")
+          : t("store.product.addToCart");
 
   return (
     <div className="mt-6">
       <div className="grid min-w-0 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <section aria-label="Product gallery" className="min-w-0">
+        <section aria-label={t("store.product.galleryAria")} className="min-w-0">
           <div className="overflow-hidden rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)]">
             <div className="relative aspect-[4/5] bg-[var(--sf-surface-2)] sm:aspect-[4/3]">
               {activeMediaUrl ? (
@@ -245,7 +247,7 @@ export default function ProductDetailClient({
                   <button
                     type="button"
                     className="sf-gallery-nav watch-focus-ring start-3"
-                    aria-label="Previous image"
+                    aria-label={t("store.product.prevImage")}
                     onClick={() => stepMedia(-1)}
                   >
                     ‹
@@ -253,7 +255,7 @@ export default function ProductDetailClient({
                   <button
                     type="button"
                     className="sf-gallery-nav watch-focus-ring end-3"
-                    aria-label="Next image"
+                    aria-label={t("store.product.nextImage")}
                     onClick={() => stepMedia(1)}
                   >
                     ›
@@ -266,7 +268,7 @@ export default function ProductDetailClient({
                 </p>
                 {!activeMediaUrl ? (
                   <p className="mt-2 text-sm font-semibold text-white/85">
-                    Product image coming soon
+                    {t("store.product.mediaSoon")}
                   </p>
                 ) : null}
               </div>
@@ -275,7 +277,7 @@ export default function ProductDetailClient({
 
           <ul
             className="mt-3 flex max-w-full gap-2 overflow-x-auto pb-1"
-            aria-label="Media thumbnails"
+            aria-label={t("store.product.thumbsAria")}
           >
             {media.map((m, i) => {
               const thumbUrl =
@@ -387,10 +389,12 @@ export default function ProductDetailClient({
             {selected
               ? inStock
                 ? selected.inventory?.allow_backorder && selected.available <= 0
-                  ? "Available on backorder"
-                  : `${selected.available} available`
-                : "Out of stock"
-              : "No variants"}
+                  ? t("store.product.backorder")
+                  : t("store.cart.availableCount", {
+                      values: { count: selected.available },
+                    })
+                : t("store.product.outOfStock")
+              : t("store.product.noVariants")}
           </p>
           {!price ? (
             <p className="mt-2 text-xs text-[var(--sf-faint)]">
@@ -410,7 +414,7 @@ export default function ProductDetailClient({
                 Variant
               </p>
               {useVariantChips ? (
-                <div className="flex flex-wrap gap-2" role="listbox" aria-label="Product variant">
+                <div className="flex flex-wrap gap-2" role="listbox" aria-label={t("store.product.variantAria")}>
                   {detail.variants.map((v) => {
                     const selectedVariant = selected?.variant.id === v.variant.id;
                     return (
@@ -473,7 +477,7 @@ export default function ProductDetailClient({
               value={quantity}
               max={maxQty}
               disabled={!selected || !inStock}
-              label="Quantity"
+              label={t("store.product.quantity")}
               onChange={setQuantity}
             />
 
@@ -523,8 +527,8 @@ export default function ProductDetailClient({
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
               {detail.store.shipping_policy?.trim()
-                ? "This seller publishes a shipping policy below. Delivery timing is determined at checkout — no estimated dates are invented here."
-                : "Fulfillment details are confirmed at checkout. No delivery dates or shipping fees are invented on this page."}
+                ? t("store.product.fulfillmentWithPolicy")
+                : t("store.product.fulfillmentDefault")}
             </p>
             {logisticsRows.length > 0 ? (
               <dl className="mt-3 space-y-1.5 text-sm">
@@ -551,7 +555,7 @@ export default function ProductDetailClient({
             Description
           </h2>
           <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]">
-            {detail.product.description || "No description provided."}
+            {detail.product.description || t("store.product.noDescription")}
           </p>
         </section>
         <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
@@ -560,9 +564,9 @@ export default function ProductDetailClient({
           </h2>
           <dl className="mt-3 space-y-2 text-sm">
             <SpecRow label="Type" value={detail.product.product_type} />
-            <SpecRow label="Category" value={detail.category?.name ?? "—"} />
+            <SpecRow label={t("store.product.category")} value={detail.category?.name ?? "—"} />
             <SpecRow label="SKU" value={selected?.variant.sku ?? "—"} />
-            <SpecRow label="Store" value={detail.store.name} />
+            <SpecRow label={t("store.product.store")} value={detail.store.name} />
             {logisticsRows.map((row) => (
               <SpecRow key={row.label} label={row.label} value={row.value} />
             ))}
@@ -592,7 +596,7 @@ export default function ProductDetailClient({
         {videos.length > 0 ? (
           <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">
             <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-accent)]">
-              Videos featuring this product
+              {t("store.product.videosTitle")}
             </h2>
             <ul className="mt-3 space-y-2">
               {videos.map((video) => (
@@ -614,15 +618,15 @@ export default function ProductDetailClient({
           </section>
         ) : (
           <PlaceholderPanel
-            title="Videos featuring this product"
-            description="No shoppable videos have attached this product yet."
+            title={t("store.product.videosTitle")}
+            description={t("store.product.videosEmpty")}
             tone="fuchsia"
           />
         )}
         {STOREFRONT_FLAGS.SHOW_PDP_REVIEWS_PLACEHOLDER ? (
           <PlaceholderPanel
-            title="Reviews & questions"
-            description="Reviews and Q&A are not available yet — no fabricated ratings are shown."
+            title={t("store.product.reviewsTitle")}
+            description={t("store.product.reviewsEmpty")}
             tone="indigo"
           />
         ) : null}
@@ -631,8 +635,8 @@ export default function ProductDetailClient({
       {related.length > 0 ? (
         <StoreSection
           id="related"
-          eyebrow="More like this"
-          title="Related products"
+          eyebrow={t("store.product.relatedEyebrow")}
+          title={t("store.product.relatedTitle")}
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
@@ -645,8 +649,8 @@ export default function ProductDetailClient({
       {recommended.length > 0 ? (
         <StoreSection
           id="recommended"
-          eyebrow="Explore"
-          title="Recommended products"
+          eyebrow={t("store.product.recommendedEyebrow")}
+          title={t("store.product.recommendedTitle")}
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {recommended.map((item) => (
@@ -661,7 +665,7 @@ export default function ProductDetailClient({
           value={quantity}
           max={maxQty}
           disabled={!selected || !inStock}
-          label="Quantity"
+          label={t("store.product.quantity")}
           onChange={setQuantity}
         />
         <button

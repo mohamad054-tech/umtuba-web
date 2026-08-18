@@ -4,6 +4,8 @@ import StoreEmptyState from "../../components/store/StoreEmptyState";
 import StoreErrorState from "../../components/store/StoreErrorState";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { listWishlist } from "../../../lib/store/wishlist";
 
@@ -19,11 +21,13 @@ export default async function StoreWishlistPage() {
     );
   }
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const { items, error } = await listWishlist(supabase, user.id);
 
   return (
-    <StoreShell title="Favorites" subtitle="Store">
+    <StoreShell title={t("store.wishlist.navTitle")} subtitle={t("store.wishlist.navSubtitle")}>
       {error ? (
         <div className="mt-6">
           <StoreErrorState message={error} />
@@ -31,10 +35,10 @@ export default async function StoreWishlistPage() {
       ) : items.length === 0 ? (
         <div className="mt-6">
           <StoreEmptyState
-            title="No favorites yet"
-            description="Save products from the store to find them here later."
+            title={t("store.wishlist.emptyTitle")}
+            description={t("store.wishlist.emptyDescription")}
             actionHref={APP_ROUTES.store}
-            actionLabel="Browse the Store"
+            actionLabel={t("store.wishlist.browse")}
           />
         </div>
       ) : (

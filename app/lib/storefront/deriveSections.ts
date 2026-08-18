@@ -136,17 +136,7 @@ export function heroSlidesFromCatalog(items: PublicCatalogItem[]): Array<{
   const picks = pickTrending(items, 3).filter((i) => i.coverUrl);
   const fallbackPicks = picks.length > 0 ? picks : pickTrending(items, 3);
   if (fallbackPicks.length === 0) {
-    return [
-      {
-        id: "welcome",
-        title: "Shop UMTUBA",
-        subtitle:
-          "Discover active products from UMTUBA sellers and creators — catalog prices only, no invented deals.",
-        href: "/store/search",
-        imageUrl: null,
-        ctaLabel: "Browse products",
-      },
-    ];
+    return [];
   }
   return fallbackPicks.map((item) => ({
     id: item.product.id,
@@ -158,7 +148,6 @@ export function heroSlidesFromCatalog(items: PublicCatalogItem[]): Array<{
     }`,
     href: `/store/${item.store.slug}/product/${item.product.slug}`,
     imageUrl: item.coverUrl ?? null,
-    ctaLabel: "View product",
   }));
 }
 

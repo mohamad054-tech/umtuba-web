@@ -7,6 +7,8 @@ import {
   pickRecommended,
   pickTrending,
 } from "../../../../lib/storefront/deriveSections";
+import { createTranslator } from "../../../../../lib/i18n";
+import { resolveRequestLocale } from "../../../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import {
   getPublicProductDetail,
@@ -28,6 +30,8 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { storeSlug, productSlug } = await params;
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   const { detail, error } = await getPublicProductDetail(
     supabase,
@@ -37,7 +41,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   if (error) {
     return (
-      <StoreShell title="Product" subtitle="Store" wide={false}>
+      <StoreShell title={t("store.product.navSubtitle")} subtitle={t("store.shell.title")} wide={false}>
         <div className="mt-6">
           <StoreErrorState message={error} />
         </div>
@@ -71,7 +75,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   return (
     <StoreShell
       title={detail.product.title}
-      subtitle="Product"
+      subtitle={t("store.product.navSubtitle")}
       actions={
         <nav aria-label="Breadcrumb" className="hidden text-xs md:block">
           <ol className="flex items-center gap-2 text-white/50">
@@ -80,7 +84,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 href={APP_ROUTES.store}
                 className="watch-focus-ring rounded hover:text-[var(--sf-accent-strong)]"
               >
-                Store
+                {t("store.shell.title")}
               </Link>
             </li>
             <li aria-hidden>/</li>

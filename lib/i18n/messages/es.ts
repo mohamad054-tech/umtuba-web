@@ -1,9 +1,11 @@
 import { enMessages } from "./en";
+import { storeEsMessages } from "./storeCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Spanish: foundation keys localized; App Shell keys inherit English until ES shell pass. */
 export const esMessages: FoundationMessages = {
   ...enMessages,
+  ...storeEsMessages,
   "languages.ar": "Árabe",
   "languages.en": "Inglés",
   "languages.fr": "Francés",

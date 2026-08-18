@@ -1,17 +1,22 @@
+"use client";
+
+import { useTranslation } from "../i18n";
+
 export default function StoreTrustStrip() {
+  const { t } = useTranslation();
   return (
     <ul className="sf-trust">
       <li>
-        <strong>Catalog prices</strong>
-        What you see is the live offer — no invented promotions.
+        <strong>{t("store.trust.catalogPrices")}</strong>
+        {t("store.trust.catalogPricesBody")}
       </li>
       <li>
-        <strong>Quoted at checkout</strong>
-        Tax, delivery, and discounts appear only from a server quote.
+        <strong>{t("store.trust.quotedAtCheckout")}</strong>
+        {t("store.trust.quotedAtCheckoutBody")}
       </li>
       <li>
-        <strong>One seller, one order</strong>
-        Multi-seller bags ship separately. No guessed delivery dates.
+        <strong>{t("store.trust.oneSeller")}</strong>
+        {t("store.trust.oneSellerBody")}
       </li>
     </ul>
   );

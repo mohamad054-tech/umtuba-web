@@ -1,6 +1,7 @@
 import "./storefront.css";
 import { Suspense, type ReactNode } from "react";
 import AppTopNav from "../AppTopNav";
+import StoreSkipLink from "./StoreSkipLink";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import CartIconButton from "./CartIconButton";
 import StoreChrome from "./StoreChrome";
@@ -24,9 +25,7 @@ export default function StoreShell({
     <main
       className={`storefront-premium relative min-h-screen bg-[var(--sf-bg)] text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
-      <a href="#store-main" className="sf-skip-link watch-focus-ring">
-        Skip to store content
-      </a>
+      <StoreSkipLink />
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(214,196,161,0.08),_transparent_55%)]" />
         <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(rgba(255,255,255,0.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.6)_1px,transparent_1px)] [background-size:48px_48px]" />

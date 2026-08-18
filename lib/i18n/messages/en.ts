@@ -1,6 +1,8 @@
+import { storeEnMessages } from "./storeCatalogs";
 import type { FoundationMessages } from "./types";
 
 export const enMessages: FoundationMessages = {
+  ...storeEnMessages,
   "languages.ar": "Arabic",
   "languages.en": "English",
   "languages.fr": "French",
