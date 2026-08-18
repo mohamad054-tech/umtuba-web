@@ -23,6 +23,7 @@ export const SANDBOX_ORDERS: readonly SandboxOrder[] = [
     paymentOutcome: "SUCCESS",
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     shippingLabel: "Sandbox standard · not a promise",
     customerName: "Demo Student 01",
   },
@@ -34,9 +35,10 @@ export const SANDBOX_ORDERS: readonly SandboxOrder[] = [
     amountMinor: listing(1).product.variants[0]?.priceMinor ?? 0,
     currency: "USD",
     status: "FAILED",
-    paymentOutcome: "FAILURE",
+    paymentOutcome: "DECLINED",
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     shippingLabel: "Sandbox standard · not a promise",
     customerName: "Demo Student 02",
   },
@@ -48,9 +50,10 @@ export const SANDBOX_ORDERS: readonly SandboxOrder[] = [
     amountMinor: (listing(2).product.variants[0]?.priceMinor ?? 0) * 2,
     currency: "USD",
     status: "REFUNDED",
-    paymentOutcome: "REFUND",
+    paymentOutcome: "REFUNDED_DEMO",
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     shippingLabel: "Sandbox express · not a promise",
     customerName: "Demo Student 03",
   },
@@ -61,10 +64,11 @@ export const SANDBOX_ORDERS: readonly SandboxOrder[] = [
     quantity: 1,
     amountMinor: listing(3).product.variants[0]?.priceMinor ?? 0,
     currency: "USD",
-    status: "AUTHORIZED",
-    paymentOutcome: "PENDING",
+    status: "PROCESSING",
+    paymentOutcome: "PROCESSING",
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     shippingLabel: "Sandbox standard · not a promise",
     customerName: "Demo Student 04",
   },
@@ -75,10 +79,11 @@ export const SANDBOX_ORDERS: readonly SandboxOrder[] = [
     quantity: 1,
     amountMinor: listing(4).product.variants[0]?.priceMinor ?? 0,
     currency: "USD",
-    status: "CREATED",
-    paymentOutcome: "PENDING",
+    status: "CANCELLED",
+    paymentOutcome: "CANCELLED",
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     shippingLabel: "Sandbox standard · not a promise",
     customerName: "Demo Student 05",
   },
@@ -91,8 +96,10 @@ export const SANDBOX_PAYMENT_FLOWS: readonly {
   label: string;
 }[] = [
   { id: "flow-success", outcome: "SUCCESS", orderId: "sandbox-ord-1001", label: "Payment success (mock)" },
-  { id: "flow-failure", outcome: "FAILURE", orderId: "sandbox-ord-1002", label: "Payment failure (mock)" },
-  { id: "flow-refund", outcome: "REFUND", orderId: "sandbox-ord-1003", label: "Refund (mock)" },
+  { id: "flow-declined", outcome: "DECLINED", orderId: "sandbox-ord-1002", label: "Payment declined (mock)" },
+  { id: "flow-refund", outcome: "REFUNDED_DEMO", orderId: "sandbox-ord-1003", label: "Refund demo (mock)" },
+  { id: "flow-processing", outcome: "PROCESSING", orderId: "sandbox-ord-1004", label: "Payment processing (mock)" },
+  { id: "flow-cancelled", outcome: "CANCELLED", orderId: "sandbox-ord-1005", label: "Payment cancelled (mock)" },
 ];
 
 export { MOCK_PAYMENT_ADAPTER };
@@ -102,6 +109,7 @@ export function simulateSandboxPayment(
 ): {
   paymentMode: "SANDBOX";
   realPayment: false;
+  realProviderCall: false;
   storesCardNumbers: false;
   outcome: PaymentOutcome;
   adapter: typeof MOCK_PAYMENT_ADAPTER;
@@ -109,6 +117,7 @@ export function simulateSandboxPayment(
   return {
     paymentMode: "SANDBOX",
     realPayment: false,
+    realProviderCall: false,
     storesCardNumbers: false,
     outcome,
     adapter: MOCK_PAYMENT_ADAPTER,

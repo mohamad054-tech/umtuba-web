@@ -34,6 +34,7 @@ describe("business sandbox containment", () => {
 
   it("does not graft fixtures onto public store or learning catalogs", () => {
     expect(read("app/store/page.tsx")).not.toMatch(/lib\/sandbox/);
+    expect(read("app/store/page.tsx")).not.toMatch(/sandbox\/store/);
     expect(read("app/learning/page.tsx")).not.toMatch(/lib\/sandbox/);
     expect(read("lib/store/demo/catalog.ts")).not.toMatch(/lib\/sandbox/);
   });
@@ -62,6 +63,13 @@ describe("business sandbox containment", () => {
     for (const locale of ["fr", "es", "de", "pt"] as const) {
       expect(sandboxT(locale, "badge")).toBeTruthy();
     }
+  });
+
+  it("gives the store shopper shell a single sandbox indicator", () => {
+    const shell = read("app/components/sandbox/store/StoreShopperShell.tsx");
+    expect(shell).toMatch(/sx-sandbox-one/);
+    expect(shell.match(/sx-badge/g)?.length).toBe(1);
+    expect(read("app/store/page.tsx")).not.toMatch(/StoreShopperShell/);
   });
 
   it("declares responsive breakpoints in sandbox CSS", () => {

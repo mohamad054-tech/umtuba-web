@@ -153,12 +153,32 @@ export type StoreCommerceMode =
 export type SandboxStoreActor = {
   id: string;
   displayName: string;
-  kind: "supplier" | "marketplace_seller";
+  kind: "platform" | "supplier" | "marketplace_seller";
   synthetic: true;
 };
 
 export type PaymentMode = "SANDBOX";
-export type PaymentOutcome = "SUCCESS" | "FAILURE" | "REFUND" | "PENDING";
+export type PaymentOutcome =
+  | "SUCCESS"
+  | "DECLINED"
+  | "PROCESSING"
+  | "CANCELLED"
+  | "REFUND_PENDING"
+  | "REFUNDED_DEMO"
+  | "FAILURE"
+  | "REFUND"
+  | "PENDING";
+
+export type SandboxOrderStatus =
+  | "CREATED"
+  | "AUTHORIZED"
+  | "CAPTURED"
+  | "FAILED"
+  | "REFUNDED"
+  | "PROCESSING"
+  | "CANCELLED"
+  | "RETURN_PENDING"
+  | "REFUND_PENDING";
 
 export type SandboxOrder = {
   id: string;
@@ -167,10 +187,11 @@ export type SandboxOrder = {
   quantity: number;
   amountMinor: number;
   currency: "USD";
-  status: "CREATED" | "AUTHORIZED" | "CAPTURED" | "FAILED" | "REFUNDED";
+  status: SandboxOrderStatus;
   paymentOutcome: PaymentOutcome;
   paymentMode: PaymentMode;
   realPayment: false;
+  realProviderCall: false;
   shippingLabel: string;
   customerName: string;
 };
@@ -179,7 +200,9 @@ export const MOCK_PAYMENT_ADAPTER = {
   id: "sandbox-mock-adapter",
   paymentMode: "SANDBOX" as const,
   realPayment: false,
+  realProviderCall: false,
+  realChargePossible: false,
   storesCardNumbers: false,
   testValue: "sandbox-method-only",
-  note: "No card field is collected. Outcomes are simulated buttons only.",
+  note: "No card field is collected. Outcomes are simulated buttons only. REAL_PROVIDER_CALL=NO.",
 };

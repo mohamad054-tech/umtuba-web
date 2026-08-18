@@ -3,6 +3,7 @@ import type { DemoProduct } from "../../store/demo/types";
 import type { SandboxStoreActor, StoreCommerceMode } from "./types";
 
 export const SANDBOX_STORE_ACTORS: readonly SandboxStoreActor[] = [
+  { id: "umtuba-owned", displayName: "UMTUBA", kind: "platform", synthetic: true },
   { id: "demo-supplier-a", displayName: "Demo Supplier A", kind: "supplier", synthetic: true },
   { id: "demo-supplier-b", displayName: "Demo Supplier B", kind: "supplier", synthetic: true },
   {
@@ -33,6 +34,7 @@ export type SandboxStoreListing = {
 };
 
 function actorForMode(mode: StoreCommerceMode): string {
+  if (mode === "UMTUBA_OWNED") return "umtuba-owned";
   if (mode === "MARKETPLACE_SELLER") return "demo-marketplace-seller-c";
   if (mode === "DROPSHIP" || mode === "WHOLESALE") return "demo-supplier-b";
   if (mode === "AFFILIATE" || mode === "CATALOG_API" || mode === "RESELLER") {
