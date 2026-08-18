@@ -99,6 +99,7 @@ describe("Secondary Surface Cleanup V1", () => {
     expect(hrefs).not.toContain("/post-journey");
     expect(hrefs).not.toContain("/live/media-lab");
     expect(hrefs).not.toContain("/ai");
+    expect(hrefs).not.toContain("/store/demo-preview");
   });
 
   it("keeps official chrome source files free of secondary surface destinations", () => {
@@ -114,6 +115,7 @@ describe("Secondary Surface Cleanup V1", () => {
       expect(src).not.toMatch(/["']\/live\/media-lab["']/);
       expect(src).not.toMatch(/["']\/ai["']/);
       expect(src).not.toMatch(/["']\/uconnect["']/);
+      expect(src).not.toMatch(/["']\/store\/demo-preview["']/);
       expect(src).not.toMatch(/LivingNavigation|LIVING_NAVIGATION/);
     }
 

@@ -2,62 +2,78 @@
 
 ## Task title
 
-CENTRAL CONDITIONAL GO — INTEGRATE STORE I18N AFTER JA-09
+CENTRAL GO — PRIVATE STORE DEMO PREVIEW ACCESS
 
 ## Identity
 
 - **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
 - **DEVICE_ROLE** = IMPLEMENTATION
-- **TASK_ID** = `CENTRAL_STORE_I18N_INTEGRATE_AFTER_JA09_V1`
+- **TASK_ID** = `CENTRAL_STORE_PRIVATE_DEMO_PREVIEW_ACCESS_V1`
 - **PRIORITY** = HIGH
 
 ## Status
 
-INTEGRATING. JA-09 wave finished (implemented, not deployed). Store fix `46c941f7` is being stacked onto JA-09 tip. SQL `20260929` not applied. Remote `20260930` not authorized by this GO. Mobile SHA `7cf3960` frozen.
+CHERRY_PICK_ONTO_LIVE_A085F667. Access control from `04cb5fae` stacked onto live `a085f667` (JA-09 enroll + Store Arabic). Do not reset production. Do not re-apply `20260930`. Do not apply `20260929`. `STORE_DEMO_PREVIEW` stays unset on public hosts. Anonymous `/store/demo-preview` is DENY. Public `/store` stays empty of demo.
 
 ## Authoritative base
 
-- **JA09_FINAL_BASE_SHA** = `89bc560dda683998528e5875bed04ef30e621095`
-- **STORE_FIX_SHA** = `46c941f72065369971df16b07e1a6e8f57f9ade4`
-- **CURRENT_WEB_AUTHORITY_LIVE** = `e6b23cc388ddb5e452a405d24d714a5f5bc67818`
-- **TASK_BRANCH** = `central/store-i18n-on-ja09-v1`
-- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-i18n-on-ja09-v1`
+- **LIVE_BASE_SHA** = `a085f6675bfd3a657858c17879ae037ac6bdc9f6`
+- **LIVE_RELEASE** = `a085f667-20260818193948`
+- **ROLLBACK_OF_THIS_CUTOVER** = `722ed3e5-20260818185403`
+- **ACCESS_SOURCE_SHA** = `04cb5faeaceb8d8a8ad5aa7fcadeadc5c76ebbe4`
+- **TASK_BRANCH** = `central/store-private-demo-preview-access-on-a085f667-v1`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-private-demo-preview-access-on-a085f667-v1`
 
 ## Allowed scope
 
-Store buyer chrome localization, Arabic RTL, leakage removal, gated demo preview — authorized only from `46c941f7`. Reconcile onto JA-09 tip. Prefer Store-only cherry-pick onto live `e6b23cc` for production if clean.
+Tighten private QA access to the existing 26 DEMO fixtures and `/store/demo-preview` Store UX. Docs for access method (no secrets). Cherry-pick onto live `a085f667` only.
 
 ## Forbidden scope
 
-- SQL `20260929` apply
-- Remote `20260930` apply unless a later GO + DEVELOPMENT_WORKFLOW requires it (this GO does not)
-- Reset production to `2400a378`
-- Force-push / invent git identity / `git config --global`
-- Mobile SHA `7cf3960` / umtuba-mobile
-- Pre-company provider branch wholesale / real partner data
-- JA-09 logic rewrites / unrelated Learning redesign
-- `STORE_DEMO_PREVIEW=1` on production
+- Reset production / deploy onto `722ed3e5` / race a Learning enroll reset
+- Re-apply `20260930` or apply `20260929`
+- `STORE_DEMO_PREVIEW=1` on production public hosts
+- Mobile `7cf3960`
+- Store pre-company wholesale
+- UMTUBA Originals drafts
+- Expose demo on public `/store`, sitemap, or nav
+- Real checkout/payment
+- Force-push / invent git identity
+- Print secret token values
 
-## Next
+---
 
-Finish integrate + tests + tsc + lint + build. If Store-only onto `e6b23cc` is clean, deploy that SHA on the approved Hetzner path. Combined JA-09+Store SHA remains `STORE_INTEGRATION_SHA`. Do not silently apply `20260930`.
+## Prior — JA-09 enroll on live 722ed3e5 (DEPLOYED)
+
+**CENTRAL_LEARNING_JA09_ON_722ED3E5** — `DEPLOYED`  
+Live `a085f6675bfd3a657858c17879ae037ac6bdc9f6`, release `a085f667-20260818193948`. Remote `20260930` **APPLIED**. SQL `20260929` **NOT** applied. Store Arabic from `722ed3e5` is on this SHA. Rollback `722ed3e5-20260818185403`. Do not reset Learning enroll.
+
+---
+
+## Prior — Store-only i18n on live e6b23cc
+
+**CENTRAL_STORE_I18N_INTEGRATE_AFTER_JA09_V1** — `STORE_ONLY_ON_LIVE` (now rollback of JA-09 cutover)
+
+- **LIVE_BASE_SHA** = `e6b23cc388ddb5e452a405d24d714a5f5bc67818`
+- **STORE_FIX_SHA** = `46c941f72065369971df16b07e1a6e8f57f9ade4`
+- **STORE_ONLY_LIVE_SHA** = `722ed3e597d51dbb5091c714777a319ff97bc3cd`
+- **JA09_FINAL_BASE_SHA** = `89bc560dda683998528e5875bed04ef30e621095`
+
+Cherry-pick of `46c941f7` onto `e6b23cc` produced `722ed3e5` (`722ed3e5-20260818185403`).
 
 ---
 
 ## Prior — JA-09 enrollment + Learning chrome localization
 
-**CENTRAL_LEARNING_JA09_ENROLL_LOCALIZATION_V1** — `IMPLEMENTED_NOT_DEPLOYED`  
-Branch `central/learning-ja09-enroll-localization-v1` tip `89bc560dda683998528e5875bed04ef30e621095`. Isolated worktree `D:\umtuba-central\repos\umtuba-web-learning-ja09-enroll-v1` from production SHA `e6b23cc388ddb5e452a405d24d714a5f5bc67818`. Migration `20260930_learning_public_catalog_self_enroll_v1.sql` is in the branch file tree and is **not** applied remotely. Deploy not performed. Do not race a broken enroll cutover.
+**CENTRAL_LEARNING_JA09_ENROLL_LOCALIZATION_V1** — stacked into live `a085f667`  
+Original tip `89bc560dda683998528e5875bed04ef30e621095`. Migration `20260930_learning_public_catalog_self_enroll_v1.sql` is now applied remotely. Do not re-apply.
 
-## Prior — Store live localization + gated demo preview
-
-**CENTRAL_STORE_LIVE_LOCALIZATION_DEMO_PREVIEW_V1** — `IMPLEMENTED_TESTED_NOT_DEPLOYED`  
-Source SHA `46c941f72065369971df16b07e1a6e8f57f9ade4` on `central/store-live-localization-demo-preview-v1` from `2400a378`. Worktree build was blocked by node_modules lock (not a product defect). SQL `20260929` not applied.
+---
 
 ## Prior — Learning lesson 404 review + deploy
 
 **CENTRAL_LEARNING_LESSON_404_REVIEW_DEPLOY_V1** — `DEPLOYED / GUEST_SMOKE_PASS / SIGNED_IN_BLOCKED`  
-Live production `e6b23cc388ddb5e452a405d24d714a5f5bc67818`, release `e6b23cc3-20260818173442`. Rollback `2400a378-20260818165601`. Do not reset production.
+Was live `e6b23cc388ddb5e452a405d24d714a5f5bc67818`, release `e6b23cc3-20260818173442`.
 
 ## Mobile freeze
 
