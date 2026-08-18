@@ -150,6 +150,8 @@ describe("translation catalogs", () => {
     "world.titleHold",
     "world.hold.migrations",
     "world.error.unavailable",
+    "learning.lesson.unavailableTitle",
+    "learning.lesson.returnToCatalog",
   ];
 
   it("provides foundation keys for every supported locale", () => {
@@ -164,6 +166,18 @@ describe("translation catalogs", () => {
   it("translates Arabic actions", () => {
     expect(translate("ar", "actions.save")).toBe("حفظ");
     expect(translate("ar", "actions.cancel")).toBe("إلغاء");
+  });
+
+  it("localizes Learning lesson unavailable chrome including Arabic RTL", () => {
+    expect(translate("en", "learning.lesson.unavailableTitle")).toBe(
+      "Lesson unavailable"
+    );
+    expect(translate("ar", "learning.lesson.unavailableTitle")).toBe(
+      "الدرس غير متاح"
+    );
+    expect(translate("ar", "learning.lesson.returnToCatalog")).toBe(
+      "العودة إلى كتالوج التعلّم"
+    );
   });
 });
 

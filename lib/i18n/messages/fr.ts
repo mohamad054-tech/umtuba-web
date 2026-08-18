@@ -141,4 +141,13 @@ export const frMessages: FoundationMessages = {
     "Les créateurs que vous suivez n’ont pas encore publié de vidéo prête.",
   "following.emptyCta": "Trouver des créateurs sur l’accueil",
   "following.errorTitle": "Impossible de charger les abonnements",
+  "learning.lesson.unavailableTitle": "Leçon indisponible",
+  "learning.lesson.unavailableBody":
+    "Cette leçon n’est pas disponible. Elle peut être non publiée, supprimée ou nécessiter une inscription.",
+  "learning.lesson.errorTitle": "Impossible de charger la leçon",
+  "learning.lesson.errorBody":
+    "Learning n’a pas pu ouvrir cette leçon pour le moment. Réessayez ou revenez au cours.",
+  "learning.lesson.returnToCourse": "Retour au cours",
+  "learning.lesson.returnToLearning": "Retour à Learning",
+  "learning.lesson.returnToCatalog": "Retour au catalogue Learning",
 };

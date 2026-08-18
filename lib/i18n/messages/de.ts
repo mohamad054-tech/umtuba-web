@@ -140,4 +140,13 @@ export const deMessages: FoundationMessages = {
     "Creator, denen du folgst, haben noch kein fertiges Video veröffentlicht.",
   "following.emptyCta": "Creator auf der Startseite finden",
   "following.errorTitle": "Folge ich konnte nicht geladen werden",
+  "learning.lesson.unavailableTitle": "Lektion nicht verfügbar",
+  "learning.lesson.unavailableBody":
+    "Diese Lektion ist nicht verfügbar. Sie ist möglicherweise unveröffentlicht, entfernt oder erfordert eine Einschreibung.",
+  "learning.lesson.errorTitle": "Lektion konnte nicht geladen werden",
+  "learning.lesson.errorBody":
+    "Learning konnte diese Lektion gerade nicht öffnen. Versuche es erneut oder kehre zum Kurs zurück.",
+  "learning.lesson.returnToCourse": "Zurück zum Kurs",
+  "learning.lesson.returnToLearning": "Zurück zu Learning",
+  "learning.lesson.returnToCatalog": "Zurück zum Learning-Katalog",
 };

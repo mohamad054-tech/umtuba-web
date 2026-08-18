@@ -139,4 +139,13 @@ export const esMessages: FoundationMessages = {
     "Los creadores que sigues aún no han publicado un video listo.",
   "following.emptyCta": "Encuentra creadores en Inicio",
   "following.errorTitle": "No se pudo cargar Siguiendo",
+  "learning.lesson.unavailableTitle": "Lección no disponible",
+  "learning.lesson.unavailableBody":
+    "Esta lección no está disponible. Puede estar sin publicar, eliminada o requerir inscripción.",
+  "learning.lesson.errorTitle": "No se pudo cargar la lección",
+  "learning.lesson.errorBody":
+    "Learning no pudo abrir esta lección ahora. Inténtalo de nuevo o vuelve al curso.",
+  "learning.lesson.returnToCourse": "Volver al curso",
+  "learning.lesson.returnToLearning": "Volver a Learning",
+  "learning.lesson.returnToCatalog": "Volver al catálogo de Learning",
 };

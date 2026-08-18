@@ -280,6 +280,14 @@ export type FoundationMessages = {
   "world.place.unavailableTitle": string;
   "world.place.unavailableBody": string;
   "world.backToWorld": string;
+
+  "learning.lesson.unavailableTitle": string;
+  "learning.lesson.unavailableBody": string;
+  "learning.lesson.errorTitle": string;
+  "learning.lesson.errorBody": string;
+  "learning.lesson.returnToCourse": string;
+  "learning.lesson.returnToLearning": string;
+  "learning.lesson.returnToCatalog": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

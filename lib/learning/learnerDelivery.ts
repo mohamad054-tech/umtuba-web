@@ -439,6 +439,24 @@ export function isLearningLessonDeliveryUuid(value: string): boolean {
   return UUID_RE.test(value);
 }
 
+export type LearningLessonDeliveryFailureKind = "unavailable" | "error";
+
+/** Map delivery failure copy to a safe Learning UI — never a raw Next.js 404. */
+export function classifyLessonDeliveryFailure(
+  message: string | null | undefined
+): LearningLessonDeliveryFailureKind {
+  const lower = (message ?? "").trim().toLowerCase();
+  if (
+    lower.includes("failed to load") ||
+    lower.includes("unexpected") ||
+    lower.includes("network") ||
+    lower.includes("timeout")
+  ) {
+    return "error";
+  }
+  return "unavailable";
+}
+
 export function sanitizeLearningLessonCompletionError(
   message: string | undefined
 ): string {

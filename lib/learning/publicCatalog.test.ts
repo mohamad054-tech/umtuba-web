@@ -10,6 +10,7 @@ import {
   mapPublicCurriculum,
   mapPublicPreview,
   resolvePublicIsFree,
+  resolvePublicLessonSafeHref,
   sanitizePublicText,
 } from "./publicCatalog";
 
@@ -282,5 +283,38 @@ describe("Public Catalog Foundation V1 — migration contracts", () => {
     expect(sql).toMatch(/p\.visibility = 'public'/);
     expect(sql).toMatch(/s\.status = 'active'/);
     expect(sql).toMatch(/s\.visibility = 'public'/);
+  });
+});
+
+describe("Public lesson access context", () => {
+  it("sends public lesson traffic to the course landing, never a raw lesson 404", () => {
+    expect(
+      resolvePublicLessonSafeHref({
+        lesson_id: "8934ff00-6661-42bb-92c8-efe559e76ea1",
+        lesson_name: "Lesson M01-L03",
+        lesson_slug: "m01-l03",
+        course_id: "course-ja-09",
+        course_name: "Building AI Applications (Product Patterns)",
+        course_slug: "ja-09",
+      })
+    ).toBe("/learning/catalog/ja-09");
+    expect(resolvePublicLessonSafeHref(null)).toBe("/learning/catalog");
+  });
+
+  it("public lesson lookup stays on published+public titles only", () => {
+    const src = read("lib/learning/publicCatalog.ts");
+    expect(src).toContain("export async function loadPublicLessonAccessContext");
+    expect(src).toMatch(/eq\("status", "published"\)/);
+    expect(src).toMatch(/eq\("visibility", "public"\)/);
+    expect(src).not.toMatch(
+      /from\("learning_lesson_content_blocks"\)[\s\S]{0,80}loadPublicLessonAccessContext/
+    );
+  });
+
+  it("public course landing lists curriculum titles without lesson deep-links", () => {
+    const landing = read("app/learning/catalog/[courseSlug]/page.tsx");
+    expect(landing).toContain("{lesson.name}");
+    expect(landing).not.toMatch(/\/learning\/lessons\//);
+    expect(landing).not.toMatch(/LEARNING_LEARNER_ROUTES\.lesson/);
   });
 });

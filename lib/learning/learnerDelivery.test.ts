@@ -23,6 +23,7 @@ import {
   LEARNING_LEARNER_ROUTES,
   LEARNING_LEARNER_SUBMITTED_MESSAGE,
   attemptStatusMessage,
+  classifyLessonDeliveryFailure,
   completeMyLearningLesson,
   filterPublishedCreatableBlocks,
   isAttemptInputLocked,
@@ -1011,5 +1012,33 @@ describe("Learner Experience V1 — activity type routing", () => {
     expect(gateUi).toMatch(/resolveLearnerActivityTarget/);
     expect(gateUi).toMatch(/redirect\(target\.href\)/);
     expect(gateUi).not.toMatch(/Preview published assessment/);
+  });
+});
+
+describe("Learner lesson access — no raw Next.js 404", () => {
+  it("classifies missing/inaccessible lessons as unavailable, query failures as error", () => {
+    expect(
+      classifyLessonDeliveryFailure("Lesson not found or not accessible")
+    ).toBe("unavailable");
+    expect(
+      classifyLessonDeliveryFailure("Course not found or not accessible")
+    ).toBe("unavailable");
+    expect(classifyLessonDeliveryFailure("Failed to load lesson")).toBe(
+      "error"
+    );
+    expect(
+      classifyLessonDeliveryFailure("Failed to load content blocks")
+    ).toBe("error");
+    expect(classifyLessonDeliveryFailure("")).toBe("unavailable");
+  });
+
+  it("lesson route renders a Learning-safe state instead of notFound()", () => {
+    const src = read("app/learning/lessons/[lessonId]/page.tsx");
+    expect(src).not.toMatch(/notFound\s*\(/);
+    expect(src).toContain("classifyLessonDeliveryFailure");
+    expect(src).toContain("loadPublicLessonAccessContext");
+    expect(src).toContain("learning.lesson.unavailableTitle");
+    expect(src).toContain("learning.lesson.returnToCatalog");
+    expect(src).toContain("resolvePublicLessonSafeHref");
   });
 });

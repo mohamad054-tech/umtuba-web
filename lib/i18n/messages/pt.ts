@@ -139,4 +139,13 @@ export const ptMessages: FoundationMessages = {
     "Os criadores que segue ainda não publicaram um vídeo pronto.",
   "following.emptyCta": "Encontrar criadores no Início",
   "following.errorTitle": "Não foi possível carregar A seguir",
+  "learning.lesson.unavailableTitle": "Lição indisponível",
+  "learning.lesson.unavailableBody":
+    "Esta lição não está disponível. Pode estar por publicar, removida ou exigir inscrição.",
+  "learning.lesson.errorTitle": "Não foi possível carregar a lição",
+  "learning.lesson.errorBody":
+    "O Learning não conseguiu abrir esta lição agora. Tente novamente ou volte ao curso.",
+  "learning.lesson.returnToCourse": "Voltar ao curso",
+  "learning.lesson.returnToLearning": "Voltar ao Learning",
+  "learning.lesson.returnToCatalog": "Voltar ao catálogo de Learning",
 };

@@ -295,4 +295,13 @@ export const arMessages: FoundationMessages = {
   "world.place.unavailableTitle": "ملف المكان غير متاح بعد",
   "world.place.unavailableBody": "هذا المكان قيد التجهيز.",
   "world.backToWorld": "العودة إلى العالم",
+  "learning.lesson.unavailableTitle": "الدرس غير متاح",
+  "learning.lesson.unavailableBody":
+    "هذا الدرس غير متاح. قد يكون غير منشور أو محذوفًا أو يتطلب التسجيل.",
+  "learning.lesson.errorTitle": "تعذر تحميل الدرس",
+  "learning.lesson.errorBody":
+    "تعذر فتح هذا الدرس الآن. أعد المحاولة أو عد إلى الدورة.",
+  "learning.lesson.returnToCourse": "العودة إلى الدورة",
+  "learning.lesson.returnToLearning": "العودة إلى التعلّم",
+  "learning.lesson.returnToCatalog": "العودة إلى كتالوج التعلّم",
 };

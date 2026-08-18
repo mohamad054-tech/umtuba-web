@@ -74,6 +74,16 @@ export type PublicCourseLanding = {
   allow_self_enroll: boolean | null;
 };
 
+/** Public catalog identity for a published+public lesson (no content blocks). */
+export type PublicLessonAccessContext = {
+  lesson_id: string;
+  lesson_name: string;
+  lesson_slug: string;
+  course_id: string;
+  course_name: string;
+  course_slug: string;
+};
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
@@ -549,6 +559,101 @@ export async function loadPublicCourseBySlug(
     preview,
     allow_self_enroll: allowSelfEnroll,
   };
+}
+
+/**
+ * Resolve a published+public lesson to its public course landing.
+ * Titles/slugs only — never content blocks, resources, or package URLs.
+ */
+export async function loadPublicLessonAccessContext(
+  supabase: AnyClient,
+  lessonId: string
+): Promise<PublicLessonAccessContext | null> {
+  const id = asString(lessonId);
+  if (!id) return null;
+
+  const { data: lesson, error: lessonError } = await supabase
+    .from("learning_lessons")
+    .select("id, name, slug, section_id, status, visibility")
+    .eq("id", id)
+    .eq("status", "published")
+    .eq("visibility", "public")
+    .maybeSingle();
+
+  if (lessonError || !lesson) return null;
+  if (
+    asString(lesson.status) !== "published" ||
+    asString(lesson.visibility) !== "public"
+  ) {
+    return null;
+  }
+
+  const sectionId = asString(lesson.section_id);
+  if (!sectionId) return null;
+
+  const { data: section, error: sectionError } = await supabase
+    .from("learning_sections")
+    .select("id, course_id, status, visibility")
+    .eq("id", sectionId)
+    .eq("status", "published")
+    .eq("visibility", "public")
+    .maybeSingle();
+
+  if (sectionError || !section) return null;
+  const courseId = asString(section.course_id);
+  if (!courseId) return null;
+
+  const { data: course, error: courseError } = await supabase
+    .from("learning_courses")
+    .select("id, name, slug, status, visibility")
+    .eq("id", courseId)
+    .eq("status", "published")
+    .eq("visibility", "public")
+    .maybeSingle();
+
+  if (courseError || !course) return null;
+  if (
+    !isPublicCatalogEligible({
+      status: asString(course.status),
+      visibility: asString(course.visibility),
+    })
+  ) {
+    return null;
+  }
+
+  const lessonName = sanitizePublicText(asString(lesson.name));
+  const courseName = sanitizePublicText(asString(course.name));
+  const lessonSlug = asString(lesson.slug);
+  const courseSlug = asString(course.slug);
+  const resolvedLessonId = asString(lesson.id);
+  const resolvedCourseId = asString(course.id);
+  if (
+    !lessonName ||
+    !courseName ||
+    !lessonSlug ||
+    !courseSlug ||
+    !resolvedLessonId ||
+    !resolvedCourseId
+  ) {
+    return null;
+  }
+
+  return {
+    lesson_id: resolvedLessonId,
+    lesson_name: lessonName,
+    lesson_slug: lessonSlug,
+    course_id: resolvedCourseId,
+    course_name: courseName,
+    course_slug: courseSlug,
+  };
+}
+
+/** Public UI must never deep-link a lesson that is not publicly accessible. */
+export function resolvePublicLessonSafeHref(
+  context: PublicLessonAccessContext | null
+): string {
+  if (context) return LEARNING_PUBLIC_ROUTES.course(context.course_slug);
+  return LEARNING_PUBLIC_ROUTES.catalog;
 }
 
 /**

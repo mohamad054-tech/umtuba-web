@@ -305,4 +305,13 @@ export const enMessages: FoundationMessages = {
   "world.place.unavailableTitle": "Place profile is not available yet",
   "world.place.unavailableBody": "This place is being prepared.",
   "world.backToWorld": "Back to World",
+  "learning.lesson.unavailableTitle": "Lesson unavailable",
+  "learning.lesson.unavailableBody":
+    "This lesson is not available. It may be unpublished, removed, or require enrollment.",
+  "learning.lesson.errorTitle": "Lesson could not be loaded",
+  "learning.lesson.errorBody":
+    "Learning could not open this lesson right now. Try again, or return to the course.",
+  "learning.lesson.returnToCourse": "Return to course",
+  "learning.lesson.returnToLearning": "Return to Learning",
+  "learning.lesson.returnToCatalog": "Return to Learning catalog",
 };

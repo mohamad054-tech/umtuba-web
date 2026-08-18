@@ -2,35 +2,33 @@
 
 ## Task title
 
-PC2 Remaining User Findings Implementation V1
+CENTRAL GO — LEARNING LESSON 404 PRODUCTION ROOT-CAUSE FIX
 
 ## Identity
 
-- **DEVICE** = PC2
-- **DEVICE_ROLE** = PLATFORM_USER_FINDINGS_PRIMARY
-- **TASK_ID** = `PC2_REMAINING_USER_FINDINGS_IMPLEMENTATION_V1`
-- **CENTRAL_COORDINATOR** = SERVER
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION
+- **TASK_ID** = `CENTRAL_LEARNING_LESSON_404_PRODUCTION_V1`
 - **PRIORITY** = HIGH
 
 ## Status
 
-COMPLETE / STOP. Implementation on a fresh alpha-based branch. Awaiting Central fetch/review/deploy. Do not start another wave.
+IMPLEMENTING. Dedicated worktree `D:\umtuba-central\repos\umtuba-web-learning-lesson-404-v1` on `central/learning-lesson-404-v1` from `origin/alpha-0.2` @ `2400a378`. Parallel web-defects tree left untouched.
 
 ## Authoritative base
 
-- **AUTHORITATIVE_BASE_SHA** = `4e075f996cdb4b86835b96ab57987aed924d2dc6` (`origin/alpha-0.2` / `origin/HEAD` after `git fetch --all --prune`)
-- **TASK_BRANCH** = `pc2/wp-qa-user-findings-v1`
-- **TASK_WORKTREE** = `worktrees/_pc2_wp_qa_user_findings`
-- **STALE_OFFICE_WORKTREE** = `office/platform-translation-trunk-port-v1` @ `2a146bb` — not used as integration base; SAVE_ALL / visual QA artifacts preserved
+- **AUTHORITATIVE_BASE_SHA** = `2400a37890152a8db9cb14c8a0bb2c0fe64cc2b8` (`origin/alpha-0.2` after `git fetch --prune`)
+- **TASK_BRANCH** = `central/learning-lesson-404-v1`
+- **WORKTREE** = `D:\umtuba-central\repos\umtuba-web-learning-lesson-404-v1`
 
 ## Allowed scope
 
-WP-QA-01 / UAF-07 Explore This City; WP-QA-02 / UAF-09 World destination handoff (no fake hide); WP-QA-13 / UAF-01 Create chooser for supported types; UAF-11 live identity overlay (no bulk username migration). Docs for this TASK_ID.
+Web Learning lesson route / public catalog access context / i18n unavailable UX / tests / reports.
 
 ## Forbidden scope
 
-Merge stale office into alpha. Reimplement UAF-02/03/05/06/08/12, i18n/search, AASA, Store financial, Android/iOS release. Remote migrations. AUTH_ENV fabrication. Push unless Central later requests it. Force-push / reset / clean preserved artifacts.
+`central/web-user-defects-final-v1` working tree. Store/Learning pre-company branch and worktree. SQL 20260929. Partner rights. Mobile `7cf3960`. umtuba-mobile. Remote migrations. Publishing draft UMTUBA Originals.
 
 ## Next
 
-STOP. Central reviews `pc2/wp-qa-user-findings-v1`, fetches when ready, applies World migrations remotely if World runtime should leave the honest empty state, then deploys. PC2 does not self-select another wave.
+Tests + tsc + lint + build. Commit only if repo-local identity is proven. Do not race the parallel language/login/profile deploy.
