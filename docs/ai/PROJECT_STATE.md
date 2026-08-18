@@ -2,19 +2,17 @@
 
 ## Active feature
 
-- **Branch:** `office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-- **Task:** Private AI Deployment & Runtime onto Alpha V1
-- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-
-## Lineage tip chain (awaiting alpha GO)
-
-1. `4690bb7` providers on alpha (merged)
-2. … streaming → private AI → data platform → KA → workflow → lifecycle `6219633`
-3. (this) private AI deployment runtime
+- **Branch:** `central/store-learning-precompany-foundation-v2`
+- **Task:** Store + Learning Pre-Company Foundation V2
+- **Worktree:** `D:\umtuba-central\repos\umtuba-web-store-learning-precompany-foundation-v2`
+- **Base:** `origin/alpha-0.2` @ `198d22249f0f29157b288d9f55d6e96301633eea`
 
 ## Safety
 
-- No live provider / real deployment
-- No alpha merge without GO
-- No Commerce / Learning / Collaboration / Mobile / Guardian
-- Migrations local-only (none new this milestone)
+- MOCK providers/products/courses only
+- No real partnerships ACTIVE
+- No outbound partnership messages
+- No plaintext partner credentials
+- No real payouts / tax collection
+- Local SQL only — do not apply remotely
+- Mobile release train untouched

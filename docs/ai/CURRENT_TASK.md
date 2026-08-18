@@ -2,35 +2,34 @@
 
 ## Task title
 
-PC2 Remaining User Findings Implementation V1
+Store + Learning Pre-Company Foundation V2
 
 ## Identity
 
-- **DEVICE** = PC2
-- **DEVICE_ROLE** = PLATFORM_USER_FINDINGS_PRIMARY
-- **TASK_ID** = `PC2_REMAINING_USER_FINDINGS_IMPLEMENTATION_V1`
-- **CENTRAL_COORDINATOR** = SERVER
+- **DEVICE** = CENTRAL / WIN-MJRKAKK2MEH
+- **DEVICE_ROLE** = SOURCE_AUTHORITY
+- **TASK_ID** = `STORE_LEARNING_PRECOMPANY_FOUNDATION_V2`
 - **PRIORITY** = HIGH
+- **PRODUCT_OWNER_DECISION** = CONTINUE_STORE_AND_LEARNING_DEVELOPMENT_BEFORE_COMPANY_REGISTRATION
 
 ## Status
 
-COMPLETE / STOP. Implementation on a fresh alpha-based branch. Awaiting Central fetch/review/deploy. Do not start another wave.
+COMPLETE — implemented on dedicated alpha worktree. Awaiting Central review. No push / no deploy. This GO superseded PC2 STOP for Store/Learning foundation only.
 
 ## Authoritative base
 
-- **AUTHORITATIVE_BASE_SHA** = `4e075f996cdb4b86835b96ab57987aed924d2dc6` (`origin/alpha-0.2` / `origin/HEAD` after `git fetch --all --prune`)
-- **TASK_BRANCH** = `pc2/wp-qa-user-findings-v1`
-- **TASK_WORKTREE** = `worktrees/_pc2_wp_qa_user_findings`
-- **STALE_OFFICE_WORKTREE** = `office/platform-translation-trunk-port-v1` @ `2a146bb` — not used as integration base; SAVE_ALL / visual QA artifacts preserved
+- **AUTHORITATIVE_BASE_SHA** = `198d22249f0f29157b288d9f55d6e96301633eea` (`origin/alpha-0.2` after `git fetch --prune`)
+- **TASK_BRANCH** = `central/store-learning-precompany-foundation-v2`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-learning-precompany-foundation-v2`
 
 ## Allowed scope
 
-WP-QA-01 / UAF-07 Explore This City; WP-QA-02 / UAF-09 World destination handoff (no fake hide); WP-QA-13 / UAF-01 Create chooser for supported types; UAF-11 live identity overlay (no bulk username migration). Docs for this TASK_ID.
+A1 Store provider engine; A2 Learning provider engine; A3 UMTUBA Originals; A4 partner admin/onboarding; A5 mock E2E QA; local SQL `20260929`; docs/ai handoff for this TASK_ID; `D:\umtuba-central\reports\UMTUBA_CENTRAL_STORE_LEARNING_PRECOMPANY_FOUNDATION_V2.md`.
 
 ## Forbidden scope
 
-Merge stale office into alpha. Reimplement UAF-02/03/05/06/08/12, i18n/search, AASA, Store financial, Android/iOS release. Remote migrations. AUTH_ENV fabrication. Push unless Central later requests it. Force-push / reset / clean preserved artifacts.
+umtuba-mobile, Watch/Retry, Android v17, iOS 16, SHA `7cf3960259f6f9725f7e525ba9d6b83b5d1aaec7`, app.config version stamps, Play, App Store. Unauthorized third-party products/courses. Fake partnerships. Scraping. Real partner credentials. Outbound partnership messages. Real ACTIVE partnerships. Real payouts/tax collection. Remote production migrations. Push unless later requested. Force-push.
 
 ## Next
 
-STOP. Central reviews `pc2/wp-qa-user-findings-v1`, fetches when ready, applies World migrations remotely if World runtime should leave the honest empty state, then deploys. PC2 does not self-select another wave.
+Finish tests/typecheck, write CURSOR_REPORT + Central report, commit on the task branch if clean. No push. No deploy.
