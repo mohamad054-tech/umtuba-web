@@ -6,4 +6,5 @@ export * from "./importPipeline";
 export * from "./checkoutRouting";
 export * from "./mockIsolation";
 export * from "./mockFixtures";
+export * from "./mockProviderA";
 export * from "./runtimeGates";

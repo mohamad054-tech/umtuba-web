@@ -140,6 +140,7 @@ export const FORBIDDEN_THIRD_PARTY_BRAND_TOKENS = [
   "romwe",
   "asos",
   "shopify-partner",
+  "trendyol",
 ] as const;
 
 export const PRECOMPANY_FOUNDATION_MIGRATION =

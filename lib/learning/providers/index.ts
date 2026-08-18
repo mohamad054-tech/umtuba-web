@@ -3,4 +3,5 @@ export * from "./rights";
 export * from "./registry";
 export * from "./importContract";
 export * from "./mockFixtures";
+export * from "./mockProviderB";
 export * from "./runtimeGates";
