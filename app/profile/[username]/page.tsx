@@ -20,6 +20,7 @@ import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
 import { normalizeUsername } from "../../../lib/supabase/validation";
 import ProfileExperience, { ProfileNotFound } from "../ProfileExperience";
 import { getProfileByUsername } from "../data/mockProfiles";
+import { mergeOwnedVideosIntoProfileCards } from "../lib/mergeOwnedVideosIntoProfileCards";
 import { mockProfileToView, profileRowToView } from "../lib/mapProfile";
 import type { ProfileView } from "../types";
 
@@ -135,21 +136,29 @@ async function resolveProfile(username: string): Promise<{
         ])
       );
       const previewSrcBySourceId = Object.fromEntries(
-        videoPage.videos.map((video) => [String(video.postId), video.previewUrl])
+        videoPage.videos.map((video) => [
+          String(video.postId),
+          video.thumbnailUrl,
+        ])
       );
-      const contentCards = mapProjectionsToContentCards(projectionPage.items, {
-        creator: {
-          id: row.id,
-          displayName:
-            row.display_name?.trim() || row.full_name?.trim() || row.username,
-          username: row.username,
-          avatarUrl: row.avatar_url,
-        },
-        layoutVariant: "profile",
-        summaryBySourceId: articleSummaryById,
-        previewSrcBySourceId,
-        durationByPostId,
-      });
+      const creator = {
+        id: row.id,
+        displayName:
+          row.display_name?.trim() || row.full_name?.trim() || row.username,
+        username: row.username,
+        avatarUrl: row.avatar_url,
+      };
+      const contentCards = mergeOwnedVideosIntoProfileCards(
+        mapProjectionsToContentCards(projectionPage.items, {
+          creator,
+          layoutVariant: "profile",
+          summaryBySourceId: articleSummaryById,
+          previewSrcBySourceId,
+          durationByPostId,
+        }),
+        videoPage.videos,
+        creator
+      );
 
       return {
         profile: {

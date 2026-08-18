@@ -9,7 +9,7 @@ type SearchShellProps = {
 export default function SearchShell({ children }: SearchShellProps) {
   return (
     <main
-      className={`relative min-h-screen overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-10%] top-[-12%] h-[26rem] w-[26rem] rounded-full bg-blue-600/20 blur-3xl" />

@@ -104,7 +104,20 @@ describe("shell coherence", () => {
   it("Watch header includes UserMenu for account parity", () => {
     const watch = read("app/watch/WatchExperience.tsx");
     expect(watch).toMatch(/UserMenu/);
+    expect(watch).toMatch(/LanguageSelector/);
+    expect(watch).toMatch(/umtuba-language-watch/);
     expect(watch).not.toMatch(/>Related</);
+  });
+
+  it("keeps the compact language control discoverable on Home and Watch", () => {
+    const top = read("app/components/AppTopNav.tsx");
+    const selector = read("app/components/i18n/LanguageSelector.tsx");
+    const home = read("app/discover/components/DiscoverShell.tsx");
+    expect(top).toMatch(/umtuba-language-shell/);
+    expect(top.indexOf("LanguageSelector")).toBeLessThan(top.indexOf("APP_ROUTES.search"));
+    expect(selector).toMatch(/compactLocaleLabel/);
+    expect(selector).toMatch(/data-locale-code=\{locale\}/);
+    expect(home).not.toMatch(/overflow-x-hidden bg-\[#050510\]/);
   });
 
   it("does not reintroduce dead product routes into shell chrome", () => {

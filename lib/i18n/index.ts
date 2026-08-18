@@ -2,6 +2,7 @@ export {
   DEFAULT_LOCALE,
   LOCALE_DEFINITIONS,
   SUPPORTED_LOCALES,
+  compactLocaleLabel,
   getLocaleDefinition,
   getLocaleDirection,
   isAppLocale,

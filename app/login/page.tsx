@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   AuthAlert,
   AuthField,
@@ -14,6 +14,7 @@ import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { claimPendingReferralAction } from "../actions/referral";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import { signInWithEmail } from "../../lib/supabase/auth";
+import { assignAfterAuthSuccess } from "../../lib/supabase/authNavigation";
 import { FORGOT_PASSWORD_PATH } from "../../lib/supabase/passwordReset";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import { isValidEmail } from "../../lib/supabase/validation";
@@ -24,7 +25,6 @@ type FieldErrors = {
 };
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
   const resetSuccess = searchParams.get("reset") === "success";
@@ -82,15 +82,14 @@ function LoginForm() {
         );
       }
 
-      // LOGIN_SUCCESS → SESSION_READY: navigate straight to the user's Profile
-      // (or an explicit safe `next`). Use replace so the login page is not left
-      // in history — the user must never be stuck on / bounced back to login.
+      // LOGIN_SUCCESS → SESSION_READY: full document navigation so the next
+      // request carries session cookies. Soft replace+refresh can leave the
+      // user on /login while the client session is already valid.
       const nextPath = getSafeRedirectPath(
         searchParams.get("next"),
         APP_ROUTES.profile
       );
-      router.replace(nextPath);
-      router.refresh();
+      assignAfterAuthSuccess(nextPath);
     } catch (error) {
       setFormError(
         toAuthUserFacingMessage(

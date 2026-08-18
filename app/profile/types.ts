@@ -12,6 +12,8 @@ export type ProfileVideo = {
   durationLabel: string | null;
   href?: string;
   previewUrl?: string | null;
+  /** Signed poster image. Never a video playback URL. */
+  thumbnailUrl?: string | null;
   gradient: string;
   accent: string;
 };

@@ -41,9 +41,10 @@ describe("A1 user-reported final blockers V2", () => {
     expect(login).toMatch(
       /getSafeRedirectPath\(\s*searchParams\.get\("next"\),\s*APP_ROUTES\.profile\s*\)/
     );
-    // replace() keeps the login page out of history so back/refresh cannot bounce
-    // an authenticated user back onto login.
-    expect(login).toMatch(/router\.replace\(nextPath\)/);
+    // Full document assign so session cookies ride the next request.
+    // Soft replace+refresh can strand an authenticated user on /login.
+    expect(login).toMatch(/assignAfterAuthSuccess\(nextPath\)/);
+    expect(login).not.toMatch(/router\.replace\(nextPath\)/);
     expect(login).not.toMatch(/router\.push\(nextPath\)/);
     expect(APP_ROUTES.profile).toBe("/profile");
   });

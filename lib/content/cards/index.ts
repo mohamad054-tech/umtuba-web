@@ -17,6 +17,7 @@ export {
   kindLabel,
 } from "./contentCardViewModel";
 export {
+  isImagePreviewSrc,
   mapProjectionToContentCard,
   mapProjectionsToContentCards,
   type MapProjectionOptions,

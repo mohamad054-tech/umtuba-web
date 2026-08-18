@@ -21,7 +21,7 @@ export default function LiveShell({
 }: LiveShellProps) {
   return (
     <main
-      className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${
+      className={`relative flex min-h-screen flex-col bg-[#050510] text-white ${
         immersive ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS
       }`}
     >

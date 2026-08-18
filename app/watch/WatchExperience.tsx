@@ -27,6 +27,7 @@ import {
   INITIAL_LIVING_NAVIGATION_STATE,
   reduceLivingNavigation,
 } from "../components/video/living-navigation/livingNavigationModel";
+import { LanguageSelector } from "../components/i18n";
 import UserMenu from "../components/UserMenu";
 import {
   loadWatchFeedPageAction,
@@ -489,6 +490,11 @@ export default function WatchExperience({
         </p>
 
         <div className="pointer-events-auto flex items-center gap-2 md:gap-3">
+          <LanguageSelector
+            id="umtuba-language-watch"
+            tone="dark"
+            variant="compact"
+          />
           <ActivityTierIndicator compact />
           <WalletBalanceIndicator compact />
           <NotificationBell />

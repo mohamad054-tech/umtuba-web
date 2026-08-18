@@ -130,6 +130,11 @@ export default function AppTopNav({
               {subtitle}
             </p>
           ) : null}
+          <LanguageSelector
+            id="umtuba-language-shell"
+            tone="dark"
+            variant="compact"
+          />
           <Link
             href={APP_ROUTES.search}
             aria-label={t("actions.search")}
@@ -146,14 +151,12 @@ export default function AppTopNav({
                   : "border-white/15 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
             }`}
           >
-            {t("nav.search")}
+            <span className="sm:hidden" aria-hidden>
+              ⌕
+            </span>
+            <span className="hidden sm:inline">{t("nav.search")}</span>
           </Link>
-          <LanguageSelector
-            id="umtuba-language-shell"
-            tone="dark"
-            variant="compact"
-          />
-          <span className={store ? "hidden sm:contents" : undefined}>
+          <span className="hidden sm:contents">
             <ActivityTierIndicator />
             <WalletBalanceIndicator />
           </span>

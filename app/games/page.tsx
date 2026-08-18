@@ -12,7 +12,7 @@ export const metadata = gamesMetadata;
 export default function GamesHubPage() {
   return (
     <main
-      className={`relative min-h-screen overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav title="Games" subtitle="UMTUBA Games hub" sticky />
       <div className="mx-auto max-w-3xl px-5 py-12 md:px-8">

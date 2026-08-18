@@ -56,7 +56,14 @@ export default function ProfileVideoGrid({
               <div
                 className={`relative aspect-[3/4] overflow-hidden bg-gradient-to-br ${video.gradient}`}
               >
-                {video.previewUrl ? (
+                {video.thumbnailUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- signed poster
+                  <img
+                    src={video.thumbnailUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : video.previewUrl ? (
                   <video
                     src={video.previewUrl}
                     className="absolute inset-0 h-full w-full object-cover"
@@ -70,6 +77,12 @@ export default function ProfileVideoGrid({
                     className={`absolute inset-x-6 top-8 h-16 rounded-full blur-2xl ${video.accent}`}
                   />
                 )}
+                <span
+                  aria-hidden
+                  className="absolute start-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white"
+                >
+                  ▶
+                </span>
                 {video.durationLabel ? (
                   <span className="absolute end-2 top-2 rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[10px] font-bold text-white/80 backdrop-blur-sm">
                     {video.durationLabel}

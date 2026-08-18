@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { formatFollowCountLabel } from "./follows";
 import {
   attachPlaybackUrls,
+  createVideoSignedUrl,
   postColumns,
   type VideoPostRow,
 } from "./videoPosts";
@@ -21,11 +22,33 @@ export type ProfileContentVideo = {
   views: number;
   likes: number;
   previewUrl: string | null;
+  /** Signed thumbnail image — never a video playback URL. */
+  thumbnailUrl: string | null;
   href: string;
   createdAt: string;
   /** Null until authoritative media duration is available. */
   durationLabel?: string | null;
 };
+
+export function formatMediaDurationLabel(
+  durationMs: number | null | undefined
+): string | null {
+  if (
+    durationMs == null ||
+    !Number.isFinite(durationMs) ||
+    durationMs <= 0
+  ) {
+    return null;
+  }
+  const totalSeconds = Math.floor(durationMs / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
 
 export type ProfileContentLiveRoom = {
   roomId: string;
@@ -198,16 +221,26 @@ export async function listProfileVideos(
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
   const withUrls = await attachPlaybackUrls(supabase, pageRows);
 
-  const videos: ProfileContentVideo[] = withUrls.map((post) => ({
-    postId: post.id,
-    title: post.content?.trim() || "Untitled video",
-    views: parseNonNegInt(post.views),
-    likes: parseNonNegInt(post.likes),
-    previewUrl: post.video_url,
-    href: `/watch?post=${post.id}`,
-    createdAt: post.created_at,
-    durationLabel: null,
-  }));
+  const videos: ProfileContentVideo[] = await Promise.all(
+    withUrls.map(async (post, index) => {
+      const row = pageRows[index];
+      const thumbnailPath = row?.thumbnail_path?.trim() || "";
+      const thumbnailUrl = thumbnailPath
+        ? await createVideoSignedUrl(supabase, thumbnailPath)
+        : null;
+      return {
+        postId: post.id,
+        title: post.content?.trim() || "Untitled video",
+        views: parseNonNegInt(post.views),
+        likes: parseNonNegInt(post.likes),
+        previewUrl: post.video_url,
+        thumbnailUrl,
+        href: `/watch?post=${post.id}`,
+        createdAt: post.created_at,
+        durationLabel: formatMediaDurationLabel(row?.media_duration_ms),
+      };
+    })
+  );
 
   return { videos, hasMore };
 }
@@ -299,6 +332,7 @@ export function mapContentVideosToProfileVideos(
       durationLabel: video.durationLabel ?? null,
       href: video.href,
       previewUrl: video.previewUrl,
+      thumbnailUrl: video.thumbnailUrl,
       gradient: palette.gradient,
       accent: palette.accent,
     };

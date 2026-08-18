@@ -109,3 +109,11 @@ export function getLocaleDefinition(locale: AppLocale): LocaleDefinition {
 export function listSupportedLocales(): LocaleDefinition[] {
   return SUPPORTED_LOCALES.map((code) => LOCALE_DEFINITIONS[code]);
 }
+
+/**
+ * Compact chrome label (EN / AR / PT). Ready for future tags like zh-CN.
+ * `pt-BR` normalizes to `pt` — the cookie/code stays `pt`.
+ */
+export function compactLocaleLabel(locale: AppLocale): string {
+  return locale.toUpperCase();
+}

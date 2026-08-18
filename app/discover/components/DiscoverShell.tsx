@@ -18,7 +18,7 @@ type DiscoverShellProps = {
 export default function DiscoverShell({ children }: DiscoverShellProps) {
   return (
     <main
-      className={`relative flex min-h-screen flex-col overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`relative flex min-h-screen flex-col bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
@@ -42,7 +42,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
               </Link>
               <Link
                 href={APP_ROUTES.saved}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10"
+                className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
               >
                 Saved
               </Link>
@@ -62,7 +62,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col px-0 md:px-6 md:py-5">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col overflow-x-hidden px-0 md:px-6 md:py-5">
         {children}
       </div>
     </main>

@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   DEFAULT_LOCALE,
   SUPPORTED_LOCALES,
+  compactLocaleLabel,
   getLocaleDirection,
   isAppLocale,
   normalizeToAppLocale,
@@ -45,6 +46,14 @@ describe("locale contract", () => {
       if (code === "ar") continue;
       expect(getLocaleDirection(code)).toBe("ltr");
     }
+  });
+
+  it("exposes compact chrome codes for current locales and pt-BR alias", () => {
+    expect(compactLocaleLabel("en")).toBe("EN");
+    expect(compactLocaleLabel("ar")).toBe("AR");
+    expect(compactLocaleLabel("pt")).toBe("PT");
+    expect(normalizeToAppLocale("pt-BR")).toBe("pt");
+    expect(compactLocaleLabel(normalizeToAppLocale("pt-BR") ?? "en")).toBe("PT");
   });
 });
 

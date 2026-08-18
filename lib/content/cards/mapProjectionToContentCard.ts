@@ -28,6 +28,20 @@ export type MapProjectionOptions = {
   durationByPostId?: Record<string, string | null | undefined>;
 };
 
+/** Image previews only — never put a video playback URL into an <img>. */
+export function isImagePreviewSrc(src: string | null | undefined): boolean {
+  if (!src) return false;
+  const trimmed = src.trim();
+  if (
+    !trimmed.startsWith("http://") &&
+    !trimmed.startsWith("https://")
+  ) {
+    return false;
+  }
+  const path = trimmed.split("?")[0]?.toLowerCase() ?? "";
+  return !/\.(mp4|webm|mov|m4v|m3u8)$/.test(path);
+}
+
 function discoveryModeFor(
   card: ProfileProjectionCard
 ): ContentCardDiscoveryMode {
@@ -81,8 +95,9 @@ export function mapProjectionToContentCard(
   const verb = card.contentKind === "article" ? "read_article" : "watch";
   const summary =
     options.summaryBySourceId?.[card.sourceEntityId] ?? card.summary ?? null;
-  const previewSrc =
+  const rawPreview =
     options.previewSrcBySourceId?.[card.sourceEntityId] ?? null;
+  const previewSrc = isImagePreviewSrc(rawPreview) ? rawPreview : null;
   const durationLabel =
     card.contentKind === "video"
       ? options.durationByPostId?.[card.sourceEntityId] ?? null

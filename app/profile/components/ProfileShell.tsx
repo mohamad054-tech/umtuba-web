@@ -9,7 +9,7 @@ type ProfileShellProps = {
 export default function ProfileShell({ children }: ProfileShellProps) {
   return (
     <main
-      className={`relative flex min-h-screen flex-col overflow-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`relative flex min-h-screen flex-col bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />

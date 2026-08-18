@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import {
   buildLocaleDocumentCookie,
+  compactLocaleLabel,
   getLocaleDirection,
   listSupportedLocales,
   type AppLocale,
@@ -61,10 +62,19 @@ export default function LanguageSelector({
       <label
         className={
           className ??
-          "inline-flex items-center gap-1.5 text-xs font-bold text-white/70"
+          "relative inline-flex h-8 w-11 shrink-0 items-center justify-center"
         }
       >
         <span className="sr-only">{t("settings.language")}</span>
+        <span
+          aria-hidden
+          data-locale-code={locale}
+          className={`pointer-events-none absolute inset-0 z-[1] flex items-center justify-center text-[11px] font-black tracking-wide ${
+            isDark ? "text-white" : "text-zinc-900"
+          }`}
+        >
+          {compactLocaleLabel(locale)}
+        </span>
         <select
           id={id}
           name="locale"
@@ -72,8 +82,8 @@ export default function LanguageSelector({
           aria-label={t("settings.language")}
           className={
             isDark
-              ? "watch-focus-ring max-w-[7.5rem] rounded-full border border-white/15 bg-white/5 px-2 py-1.5 text-[11px] font-bold text-white/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
-              : "watch-focus-ring max-w-[7.5rem] rounded-md border border-zinc-300 bg-white px-2 py-1.5 text-[11px] font-bold text-zinc-900"
+              ? "watch-focus-ring relative z-[2] h-8 w-11 cursor-pointer appearance-none rounded-full border border-white/15 bg-white/5 text-[11px] font-bold text-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
+              : "watch-focus-ring relative z-[2] h-8 w-11 cursor-pointer appearance-none rounded-md border border-zinc-300 bg-white text-[11px] font-bold text-transparent"
           }
           onChange={(event) => handleChange(event.target.value)}
         >

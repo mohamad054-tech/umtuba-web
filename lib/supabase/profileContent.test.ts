@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  formatMediaDurationLabel,
   formatProfileStatLabel,
   mapContentLiveToProfileSessions,
   mapContentVideosToProfileVideos,
@@ -39,6 +40,7 @@ describe("profile content mapping", () => {
         views: 1200,
         likes: 15,
         previewUrl: "https://example.com/v.mp4",
+        thumbnailUrl: "https://example.com/thumb.jpg",
         href: "/watch?post=42",
         createdAt: "2026-07-01T00:00:00.000Z",
       },
@@ -47,6 +49,7 @@ describe("profile content mapping", () => {
     expect(videos).toHaveLength(1);
     expect(videos[0]?.postId).toBe(42);
     expect(videos[0]?.href).toBe("/watch?post=42");
+    expect(videos[0]?.thumbnailUrl).toBe("https://example.com/thumb.jpg");
     expect(videos[0]?.durationLabel).toBeNull();
     expect(videos[0]?.viewsLabel).toBe("1.2K");
   });
@@ -117,6 +120,13 @@ describe("profile content mapping", () => {
     expect(formatProfileStatLabel(0)).toBe("0");
     expect(PROFILE_VIDEO_PAGE_SIZE).toBeLessThanOrEqual(48);
   });
+
+  it("formats authoritative media duration only", () => {
+    expect(formatMediaDurationLabel(null)).toBeNull();
+    expect(formatMediaDurationLabel(0)).toBeNull();
+    expect(formatMediaDurationLabel(72000)).toBe("1:12");
+    expect(formatMediaDurationLabel(3_600_000)).toBe("1:00:00");
+  });
 });
 
 describe("profile content architecture", () => {
@@ -126,6 +136,8 @@ describe("profile content architecture", () => {
     expect(page).toMatch(/listProfileActiveLiveRooms/);
     expect(page).toMatch(/getProfileContentStats/);
     expect(page).toMatch(/getProfileFollowSnapshot/);
+    expect(page).toMatch(/mergeOwnedVideosIntoProfileCards/);
+    expect(page).toMatch(/video\.thumbnailUrl/);
     expect(page).toMatch(/missingProfile/);
   });
 
