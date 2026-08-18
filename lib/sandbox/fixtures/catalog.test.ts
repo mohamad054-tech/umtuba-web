@@ -83,6 +83,15 @@ describe("business sandbox fixtures", () => {
       expect(listing.product.purchasable).toBe(false);
       expect(listing.purchasableInProduction).toBe(false);
       expect(listing.realInventory).toBe(false);
+      if (listing.commerceMode === "UMTUBA_OWNED") {
+        expect(listing.product.conceptKind).toBe("UMTUBA_OWNED_FUTURE");
+        expect(listing.actorId).toBe("umtuba-owned");
+        expect(listing.actorId).not.toBe("demo-supplier-a");
+        expect(listing.ownership.productOwnerActorId).toBe("umtuba-demo-platform");
+      } else {
+        expect(listing.ownership.productOwnerActorId).not.toBe("umtuba-demo-platform");
+        expect(listing.actorId).not.toBe("umtuba-demo-platform");
+      }
     }
   });
 

@@ -1,6 +1,41 @@
 ﻿# Current Task
 
-## CENTRAL GO — COMBINED STORE + LEARNING PRIVATE SANDBOX DEPLOY V1
+## CENTRAL GO — CONSUME DESKTOP STORE CATALOG PRODUCTIZATION V1
+
+**TASK_ID** = `CENTRAL_CONSUME_DESKTOP_STORE_CATALOG_PRODUCTIZATION_V1`
+**PRIORITY** = HIGH
+**SCOPE** = SURGICAL catalog delta onto live combined sandbox `fbb6b364` — authorized demo files only
+**DATE** = 2026-08-18
+**PRODUCT_OWNER_DECISION** = PRESERVE_AND_INTEGRATE_THIS_WORK
+**INPUT_TASK** = `DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1`
+**STATUS** = IMPLEMENTED_LOCAL — `PUSHED=NO` `DEPLOYED=NO`
+
+### Status
+
+Consumed Desktop intake from fallback UNC (requested `D:\UMTUBA-SHARE\FROM-DESKTOP` was Access Denied). Applied 26-SKU catalog delta onto live combined tip `fbb6b364` (Store V2 + Learning V2 already live). Did not overwrite Store V2 checkout/mock pay/orders/seller/admin/Arabic/RTL/containment. Did not wipe Learning V2. Did not race Hetzner. One local Central commit pending SHA after commit.
+
+### Identity
+
+- **DEVICE** = SERVER (WIN-MJRKAKK2MEH)
+- **DEVICE_ROLE** = IMPLEMENTATION
+- **INTEGRATE_ONTO** = `fbb6b3646c91b287942da8aa8b1ce4527bfd8695`
+- **LIVE_RELEASE** = `fbb6b364-20260818222318` (unchanged; this branch is not deployed)
+- **ROLLBACK_RELEASE** = `4b8dcb6d-20260818210857`
+- **TASK_BRANCH** = `central/store-catalog-productization-from-desktop-v1`
+- **TASK_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-store-catalog-productization-from-desktop-v1`
+- **INTAKE_PATH_USED** = `\\192.168.88.11\umtuba-multi-agent-desktop\intake\Desktop\DESKTOP_STORE_DEMO_CATALOG_PRODUCTIZATION_V1\`
+
+### Allowed scope
+
+`lib/store/demo/` (types, catalog, catalogStates, catalog.test, surface, index), `lib/sandbox/fixtures/` (types, store, catalog.test), `app/components/sandbox/SandboxView.tsx`. Docs/ops may be preserved separately.
+
+### Forbidden scope
+
+Overwrite Store V2 with Desktop base `4b8dcb6d`. Wipe Learning V2 or Originals ingest. Race Hetzner. Reset to `8f39277b`. Force-push. `STORE_DEMO_PREVIEW=1`. SQL `20260929`. Mobile. Real products/partners/payments.
+
+---
+
+## Prior — COMBINED STORE + LEARNING PRIVATE SANDBOX DEPLOY V1
 
 **TASK_ID** = `CENTRAL_COMBINED_STORE_LEARNING_SANDBOX_DEPLOY_V1`
 **PRIORITY** = MAXIMUM
