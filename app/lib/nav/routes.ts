@@ -24,6 +24,7 @@ export const APP_ROUTES = {
   profile: "/profile",
   create: "/create",
   createVideo: "/create/video",
+  sounds: "/sounds",
   createPost: "/create/post",
   createArticle: "/create/article",
   postJourney: "/post-journey",
