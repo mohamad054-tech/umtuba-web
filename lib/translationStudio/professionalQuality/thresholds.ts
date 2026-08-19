@@ -264,5 +264,19 @@ export function resolveQualityProfileForDomain(
 export function isSupportedQualityLocale(
   code: string
 ): code is StudioLanguageCode {
-  return ["ar", "en", "fr", "es", "de", "pt"].includes(code);
+  return [
+    "ar",
+    "en",
+    "fr",
+    "es",
+    "de",
+    "pt",
+    "id",
+    "hi",
+    "ru",
+    "tr",
+    "zh-CN",
+    "ja",
+    "ko",
+  ].includes(code);
 }

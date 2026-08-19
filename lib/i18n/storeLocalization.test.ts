@@ -26,7 +26,7 @@ const LEAKED_CHROME_KEYS: Array<keyof StoreMessages> = [
 const ARABIC_LETTER = /[\u0600-\u06FF]/;
 
 describe("Store localization catalogs", () => {
-  it("provides every store key in all six locales", () => {
+  it("provides every store key in all supported locales", () => {
     const keys = Object.keys(storeEnMessages);
     expect(keys.length).toBeGreaterThan(100);
     for (const locale of SUPPORTED_LOCALES) {

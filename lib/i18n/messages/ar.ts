@@ -9,6 +9,13 @@ export const arMessages: FoundationMessages = {
   "languages.es": "الإسبانية",
   "languages.de": "الألمانية",
   "languages.pt": "البرتغالية",
+  "languages.id": "الإندونيسية",
+  "languages.hi": "الهندية",
+  "languages.ru": "الروسية",
+  "languages.tr": "التركية",
+  "languages.zh-CN": "الصينية المبسطة",
+  "languages.ja": "اليابانية",
+  "languages.ko": "الكورية",
 
   "actions.save": "حفظ",
   "actions.cancel": "إلغاء",

@@ -46,4 +46,17 @@ describe("Learning sandbox Arabic chrome", () => {
       sandboxT("en", "authoredSourceLanguage")
     );
   });
+
+  it("localizes commercial and rights chrome for the seven new locales", () => {
+    expect(sandboxT("id", "commercial")).toBe("Model komersial");
+    expect(sandboxT("hi", "rights")).toBe("अधिकार");
+    expect(sandboxT("ru", "commercial")).toBe("Коммерческая модель");
+    expect(sandboxT("tr", "rights")).toBe("Haklar");
+    expect(sandboxT("zh-CN", "commercial")).toBe("商业模式");
+    expect(sandboxT("ja", "rights")).toBe("権利");
+    expect(sandboxT("ko", "commercial")).toBe("상업 모델");
+    expect(sandboxT("id", "authoredSourceLanguage")).not.toBe(
+      sandboxT("en", "authoredSourceLanguage")
+    );
+  });
 });

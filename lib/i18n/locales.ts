@@ -1,11 +1,33 @@
 /**
- * Platform Internationalization Foundation V1 — locale contract.
+ * Platform Internationalization Foundation — locale contract.
  * Supported locales only; unsupported inputs fail closed to the fallback.
+ *
+ * Chinese: Simplified lands as `zh-CN`. Traditional `zh-TW` is reserved
+ * and must not collapse onto Simplified. Portuguese stays `pt` (pt-BR copy).
+ * Korean is South Korea UI (`ko` / ko-KR).
  */
 
-export const SUPPORTED_LOCALES = ["ar", "en", "fr", "es", "de", "pt"] as const;
+export const SUPPORTED_LOCALES = [
+  "ar",
+  "en",
+  "fr",
+  "es",
+  "de",
+  "pt",
+  "id",
+  "hi",
+  "ru",
+  "tr",
+  "zh-CN",
+  "ja",
+  "ko",
+] as const;
 
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
+
+/** Reserved codes — add a catalog later without changing the matcher shape. */
+export const FUTURE_LOCALE_CODES = ["zh-TW"] as const;
+export type FutureAppLocale = (typeof FUTURE_LOCALE_CODES)[number];
 
 export const DEFAULT_LOCALE: AppLocale = "en";
 
@@ -14,7 +36,7 @@ export type TextDirection = "rtl" | "ltr";
 export type LocaleDefinition = {
   code: AppLocale;
   direction: TextDirection;
-  /** BCP 47 language tag used for Intl / html lang (same as code for V1). */
+  /** BCP 47 language tag used for Intl / html lang. */
   bcp47: string;
   /** Native / endonym display name. */
   nativeName: string;
@@ -65,31 +87,115 @@ export const LOCALE_DEFINITIONS: Record<AppLocale, LocaleDefinition> = {
     nativeName: "Português",
     englishName: "Portuguese",
   },
+  id: {
+    code: "id",
+    direction: "ltr",
+    bcp47: "id",
+    nativeName: "Bahasa Indonesia",
+    englishName: "Indonesian",
+  },
+  hi: {
+    code: "hi",
+    direction: "ltr",
+    bcp47: "hi",
+    nativeName: "हिन्दी",
+    englishName: "Hindi",
+  },
+  ru: {
+    code: "ru",
+    direction: "ltr",
+    bcp47: "ru",
+    nativeName: "Русский",
+    englishName: "Russian",
+  },
+  tr: {
+    code: "tr",
+    direction: "ltr",
+    bcp47: "tr",
+    nativeName: "Türkçe",
+    englishName: "Turkish",
+  },
+  "zh-CN": {
+    code: "zh-CN",
+    direction: "ltr",
+    bcp47: "zh-CN",
+    nativeName: "简体中文",
+    englishName: "Chinese (Simplified)",
+  },
+  ja: {
+    code: "ja",
+    direction: "ltr",
+    bcp47: "ja",
+    nativeName: "日本語",
+    englishName: "Japanese",
+  },
+  ko: {
+    code: "ko",
+    direction: "ltr",
+    bcp47: "ko-KR",
+    nativeName: "한국어",
+    englishName: "Korean",
+  },
 };
 
+function canonicalizeTag(raw: string): string {
+  return raw.trim().toLowerCase().replace(/_/g, "-");
+}
+
+/** Case-insensitive match to a landed AppLocale (`zh-cn` → `zh-CN`). */
+export function matchSupportedLocale(value: unknown): AppLocale | null {
+  if (typeof value !== "string") return null;
+  const lower = canonicalizeTag(value);
+  if (!lower) return null;
+  for (const code of SUPPORTED_LOCALES) {
+    if (code.toLowerCase() === lower) return code;
+  }
+  return null;
+}
+
 export function isAppLocale(value: unknown): value is AppLocale {
-  return (
-    typeof value === "string" &&
-    (SUPPORTED_LOCALES as readonly string[]).includes(value)
+  return matchSupportedLocale(value) !== null;
+}
+
+/**
+ * World city-copy reserved Wave 2 slot is `zh` (Simplified).
+ * Traditional stays out until a `zh-TW` catalog exists.
+ */
+export function toWorldCatalogLocaleKey(locale: AppLocale): string {
+  if (locale === "zh-CN") return "zh";
+  return locale;
+}
+
+function normalizeChinese(tag: string): AppLocale | null | undefined {
+  if (tag !== "zh" && !tag.startsWith("zh-")) return undefined;
+  const rest = tag.split("-").slice(1);
+  const traditional = rest.some(
+    (part) => part === "hant" || part === "tw" || part === "hk" || part === "mo"
   );
+  if (traditional) return null;
+  return "zh-CN";
 }
 
 /**
  * Normalize browser / BCP 47 tags to a supported AppLocale.
- * Examples: ar-PS → ar, en-US → en, fr_CA → fr.
- * Returns null when no supported primary language can be resolved.
+ * Examples: ar-PS → ar, en-US → en, fr_CA → fr, zh-Hans → zh-CN, ko-KR → ko.
+ * zh-TW / zh-Hant → null (not Simplified).
  */
-export function normalizeToAppLocale(raw: string | null | undefined): AppLocale | null {
+export function normalizeToAppLocale(
+  raw: string | null | undefined
+): AppLocale | null {
   if (raw == null) return null;
-  const trimmed = raw.trim().toLowerCase().replace(/_/g, "-");
+  const trimmed = canonicalizeTag(raw);
   if (!trimmed) return null;
 
-  if (isAppLocale(trimmed)) return trimmed;
+  const exact = matchSupportedLocale(trimmed);
+  if (exact) return exact;
+
+  const chinese = normalizeChinese(trimmed);
+  if (chinese !== undefined) return chinese;
 
   const primary = trimmed.split("-")[0] ?? "";
-  if (isAppLocale(primary)) return primary;
-
-  return null;
+  return matchSupportedLocale(primary);
 }
 
 export function resolveLocaleOrFallback(
@@ -111,9 +217,10 @@ export function listSupportedLocales(): LocaleDefinition[] {
 }
 
 /**
- * Compact chrome label (EN / AR / PT). Ready for future tags like zh-CN.
- * `pt-BR` normalizes to `pt` — the cookie/code stays `pt`.
+ * Compact chrome label (EN / AR / PT / ZH).
+ * `pt-BR` normalizes to `pt`. `zh-CN` compact is ZH (fits the 11px chip).
  */
 export function compactLocaleLabel(locale: AppLocale): string {
+  if (locale === "zh-CN") return "ZH";
   return locale.toUpperCase();
 }

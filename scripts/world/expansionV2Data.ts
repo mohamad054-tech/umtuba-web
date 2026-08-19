@@ -1338,7 +1338,7 @@ export function buildCityCopyV2Bundle() {
     id: "world-city-copy-v2",
     version: "2.0.0",
     locales: ["ar", "en", "fr", "es", "de", "pt"],
-    reserved_locales: ["tr", "id", "zh", "hi", "ja", "ru"],
+    reserved_locales: ["tr", "id", "zh", "hi", "ja", "ru", "ko"],
     cities: EXPANSION_V2_CITIES.map((city) => ({
       slug: city.slug,
       name_i18n: { en: city.city_name, ...city.name_i18n },

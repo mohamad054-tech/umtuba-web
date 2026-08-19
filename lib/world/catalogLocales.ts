@@ -1,4 +1,4 @@
-import type { AppLocale } from "../i18n/locales";
+import { toWorldCatalogLocaleKey, type AppLocale } from "../i18n/locales";
 
 export const PRODUCT_CATALOG_LOCALES = [
   "ar",
@@ -16,6 +16,7 @@ export const WAVE2_CATALOG_LOCALES = [
   "hi",
   "ja",
   "ru",
+  "ko",
 ] as const;
 
 export type ProductCatalogLocale = (typeof PRODUCT_CATALOG_LOCALES)[number];
@@ -36,7 +37,10 @@ export function resolveCatalogLocaleText(
   localized: CatalogLocaleMap | undefined,
   fallback: string | null | undefined
 ): string | null {
-  const fromLocale = localized?.[locale]?.trim();
+  const catalogKey = toWorldCatalogLocaleKey(locale);
+  const fromExact = localized?.[locale as CatalogLocale]?.trim();
+  if (fromExact) return fromExact;
+  const fromLocale = localized?.[catalogKey as CatalogLocale]?.trim();
   if (fromLocale) return fromLocale;
   const fromEnglish = localized?.en?.trim();
   if (fromEnglish) return fromEnglish;

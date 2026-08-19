@@ -20,8 +20,22 @@ import { MESSAGE_CATALOGS } from "./messages/catalogs";
 import type { TranslationKey } from "./messages/types";
 
 describe("locale contract", () => {
-  it("supports the six platform locales", () => {
-    expect([...SUPPORTED_LOCALES]).toEqual(["ar", "en", "fr", "es", "de", "pt"]);
+  it("supports the thirteen platform locales", () => {
+    expect([...SUPPORTED_LOCALES]).toEqual([
+      "ar",
+      "en",
+      "fr",
+      "es",
+      "de",
+      "pt",
+      "id",
+      "hi",
+      "ru",
+      "tr",
+      "zh-CN",
+      "ja",
+      "ko",
+    ]);
     for (const code of SUPPORTED_LOCALES) {
       expect(isAppLocale(code)).toBe(true);
     }
@@ -29,13 +43,15 @@ describe("locale contract", () => {
 
   it("rejects unsupported locales", () => {
     expect(isAppLocale("zh")).toBe(false);
+    expect(isAppLocale("zh-TW")).toBe(false);
     expect(isAppLocale("en-US")).toBe(false);
     expect(isAppLocale("")).toBe(false);
     expect(isAppLocale(null)).toBe(false);
   });
 
   it("falls back safely for unsupported tags", () => {
-    expect(resolveLocaleOrFallback("zh-CN")).toBe(DEFAULT_LOCALE);
+    expect(resolveLocaleOrFallback("zh-TW")).toBe(DEFAULT_LOCALE);
+    expect(resolveLocaleOrFallback("zh-CN")).toBe("zh-CN");
     expect(resolveLocaleOrFallback("")).toBe("en");
     expect(resolveLocaleOrFallback(undefined)).toBe("en");
   });
@@ -68,8 +84,9 @@ describe("browser language normalization", () => {
   });
 
   it("returns null for unknown primary languages", () => {
-    expect(normalizeToAppLocale("zh-Hans")).toBeNull();
-    expect(normalizeToAppLocale("ja")).toBeNull();
+    expect(normalizeToAppLocale("zh-Hans")).toBe("zh-CN");
+    expect(normalizeToAppLocale("ja")).toBe("ja");
+    expect(normalizeToAppLocale("zh-TW")).toBeNull();
   });
 });
 
@@ -122,7 +139,7 @@ describe("locale resolution order", () => {
       resolveAppLocale({
         browserLanguages: "zh-CN,fr-FR;q=0.8,en;q=0.5",
       })
-    ).toBe("fr");
+    ).toBe("zh-CN");
   });
 
   it("falls back to default when nothing matches", () => {
@@ -130,7 +147,7 @@ describe("locale resolution order", () => {
       resolveAppLocale({
         explicit: "nope",
         cookiePreference: "xx",
-        browserLanguages: "ja,zh",
+        browserLanguages: "xx,yy",
       })
     ).toBe("en");
   });

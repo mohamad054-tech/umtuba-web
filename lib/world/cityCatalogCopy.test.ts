@@ -11,7 +11,15 @@ describe("World city copy v2", () => {
 
   it("covers every expansion and pilot city in product locales", () => {
     expect(bundle.cities.length).toBeGreaterThanOrEqual(50);
-    expect(bundle.reserved_locales).toEqual(["tr", "id", "zh", "hi", "ja", "ru"]);
+    expect(bundle.reserved_locales).toEqual([
+      "tr",
+      "id",
+      "zh",
+      "hi",
+      "ja",
+      "ru",
+      "ko",
+    ]);
     for (const city of bundle.cities) {
       expect(city.overview.length).toBeGreaterThan(20);
       for (const locale of ["ar", "fr", "es", "de", "pt"] as const) {

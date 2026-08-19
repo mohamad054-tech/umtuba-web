@@ -1,5 +1,6 @@
 export {
   DEFAULT_LOCALE,
+  FUTURE_LOCALE_CODES,
   LOCALE_DEFINITIONS,
   SUPPORTED_LOCALES,
   compactLocaleLabel,
@@ -7,8 +8,10 @@ export {
   getLocaleDirection,
   isAppLocale,
   listSupportedLocales,
+  matchSupportedLocale,
   normalizeToAppLocale,
   resolveLocaleOrFallback,
+  toWorldCatalogLocaleKey,
   type AppLocale,
   type LocaleDefinition,
   type TextDirection,

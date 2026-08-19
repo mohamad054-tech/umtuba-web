@@ -37,10 +37,8 @@ describe("unified web locale contract", () => {
   });
 
   it("falls back to English for unsupported device locales", () => {
-    expect(resolveAppLocale({ browserLanguages: "ja,zh-Hans" })).toBe(
-      DEFAULT_LOCALE
-    );
-    expect(resolveSupportedBrowserLocale("ja,zh")).toBeNull();
+    expect(resolveAppLocale({ browserLanguages: "ja,zh-Hans" })).toBe("ja");
+    expect(resolveSupportedBrowserLocale("xx,yy")).toBeNull();
   });
 
   it("keeps manual English on an Arabic device", () => {
@@ -101,7 +99,7 @@ describe("unified web locale contract", () => {
     ).toEqual({ action: "none" });
     expect(
       planDeviceLocaleBridge({
-        deviceLanguages: ["zh-CN"],
+        deviceLanguages: ["zh-TW"],
         serverLocale: "en",
       })
     ).toEqual({ action: "none" });

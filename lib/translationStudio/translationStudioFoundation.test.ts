@@ -23,6 +23,8 @@ describe("Translation Studio languages", () => {
     expect(isStudioLanguageCode("ar")).toBe(true);
     expect(isStudioLanguageCode("en")).toBe(true);
     expect(isStudioLanguageCode("zh")).toBe(false);
+    expect(isStudioLanguageCode("zh-CN")).toBe(true);
+    expect(isStudioLanguageCode("ko")).toBe(true);
     expect(assertStudioLanguage("fr")).toBe("fr");
     expect(() => assertStudioLanguage("xx")).toThrow(/Unsupported/);
   });
@@ -192,6 +194,13 @@ describe("Studio seed", () => {
       "es",
       "de",
       "pt",
+      "id",
+      "hi",
+      "ru",
+      "tr",
+      "zh-CN",
+      "ja",
+      "ko",
     ]);
     expect(snap.namespaces.length).toBeGreaterThan(0);
     expect(snap.keys.length).toBeGreaterThan(10);
