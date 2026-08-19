@@ -1,5 +1,83 @@
 ﻿# Current Task
 
+## CENTRAL GO — REWARDS/REFERRAL SECURITY HARDENING V1
+
+**TASK_ID** = `CENTRAL_REWARDS_REFERRAL_SECURITY_HARDENING_V1`
+**PRIORITY** = HIGH
+**DATE** = 2026-08-20
+**STATUS** = IMPLEMENTED_LOCAL
+**MODE** = IMPLEMENTATION
+**DEVICE** = SERVER / CENTRAL
+**BASE_SHA** = `1c5fda85c57a2fe2b05dfa64c36c052b0d19dc29`
+**REMOTE_REF** = `origin/central/rewards-referral-engine-v1`
+**WORKTREE** = `D:\umtuba-central\repos\umtuba-web-rewards-referral-engine-v1`
+**20260931** = HOLD
+**20260933** = UNAPPLIED_REPLACE_IN_PLACE
+**PRODUCTION_DB_CHANGED** = NO
+**DEPLOYED** = NO
+**MOBILE_DISTURBED** = NO
+
+Close the three production-apply blockers: client mint via `process_reward_event`, `_trustedActor` metadata bypass, unsafe qualify attribution fallback. Replace unapplied `20260933` in place. No production apply. No web deploy. No mobile.
+
+### Allowed scope
+
+- Rewards worktree from `1c5fda85`
+- Unapplied `20260933` rewrite + tests/contracts
+- Local commit + FF-only feature ref
+- Handoff docs + report
+
+### Forbidden scope
+
+- Production SQL apply; web deploy; `20260931`; `20260929`; re-apply `20260930`/`20260932`
+- `umtuba-mobile` / iOS editor P0 (`a9a8b8f`)
+- Fake users/points; force push; `origin/alpha-0.2`; secrets
+
+---
+
+## CENTRAL GO — REWARDS/REFERRAL PRODUCTION ACTIVATION V1
+
+**TASK_ID** = `CENTRAL_REWARDS_REFERRAL_PRODUCTION_ACTIVATION_V1`
+**PRIORITY** = HIGH
+**DATE** = 2026-08-20
+**STATUS** = BLOCKED
+**MODE** = FINAL_MIGRATION_REVIEW
+**DEVICE** = SERVER / CENTRAL
+**ACCEPTED_SOURCE_SHA** = `1c5fda85c57a2fe2b05dfa64c36c052b0d19dc29`
+**REMOTE_REF** = `origin/central/rewards-referral-engine-v1`
+**WORKTREE** = `D:\umtuba-central\repos\umtuba-web-rewards-referral-engine-v1`
+**WEB_PRODUCTION** = `26a0d19379b09cd53f08371358903a84745aa842`
+**LIVE_RELEASE** = `26a0d193-20260819192000` (unchanged)
+**20260931** = HOLD
+**20260933** = REVIEWED_NOT_APPLIED
+**MIGRATION_APPLIED** = NO
+**WEB_DEPLOYED** = NO
+**MOBILE_DISTURBED** = NO
+**REPORT** = `D:\umtuba-central\reports\UMTUBA_CENTRAL_REWARDS_REFERRAL_PRODUCTION_ACTIVATION_V1.md`
+
+Reviewed `20260933` on accepted SHA. Collision NONE. Lineage is FF from live `26a0d193`. **Did not apply.** Client-callable `process_reward_event` can mint launch_v1 amounts; `_trustedActor` metadata bypasses cross-user checks; `qualify_my_referral_signup` can read another visitor’s pending attribution.
+
+### Allowed scope
+
+- Final review of `20260933` + apply only if all eight pre-apply checks pass
+- Targeted production apply (no `db push`) and smallest web deploy from `1c5fda85` if FF-safe
+- Handoff docs + this report
+
+### Forbidden scope
+
+- Apply `20260931`; apply `20260929`; re-apply `20260930`/`20260932`
+- Touch `umtuba-mobile` or the iOS editor P0 stream
+- Fake users / invented points; award on link click alone
+- Restore crash web `0b6d35bd`; rewrite `origin/alpha-0.2`
+- Force push; `git config --global`; print secrets
+
+### Blockers (do not apply until fixed)
+
+1. `process_reward_event` GRANT to authenticated without source verify
+2. Client `_trustedActor` metadata bypass
+3. `qualify_my_referral_signup` cross-user pending attribution fallback
+
+---
+
 ## CENTRAL GO — UMTUBA REWARDS / REFERRAL ENGINE V1
 
 **TASK_ID** = `CENTRAL_UMTUBA_REWARDS_REFERRAL_ENGINE_V1`
@@ -11,6 +89,8 @@
 **WORKTREE** = `D:\umtuba-central\repos\umtuba-web-rewards-referral-engine-v1`
 **BRANCH** = `central/rewards-referral-engine-v1`
 **BASE_SHA** = `f66f1c921c166b9a5fe0a1d103817e2bdf8a6179`
+**FINAL_SHA** = `1c5fda85c57a2fe2b05dfa64c36c052b0d19dc29`
+**REMOTE_REF** = `origin/central/rewards-referral-engine-v1`
 **WEB_PRODUCTION** = `26a0d19379b09cd53f08371358903a84745aa842` (do not FF)
 **MOBILE** = do not modify; P0 owns `f66f15c` editor-exit. `MOBILE_SOURCE_CHANGED=NO`
 **DEPLOYED** = NO

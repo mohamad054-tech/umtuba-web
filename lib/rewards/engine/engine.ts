@@ -131,6 +131,9 @@ export class RewardsEngine {
     if (this.hasClientAmount(input.clientAmount)) {
       return this.deny("unauthorized_client_amount");
     }
+    if (this.hasTrustedMetadata(input.metadata)) {
+      return this.deny("untrusted_actor_metadata");
+    }
 
     const actorUserId = input.actorUserId?.trim();
     const subjectUserId = (input.subjectUserId ?? actorUserId)?.trim();
@@ -649,8 +652,60 @@ export class RewardsEngine {
     return this.flagAbuse(kind, userId, { details });
   }
 
+  processClientEvent(input: ProcessEventInput): ProcessResult {
+    if (this.hasTrustedMetadata(input.metadata)) {
+      return this.deny("untrusted_actor_metadata");
+    }
+    if (this.hasClientAmount(input.clientAmount)) {
+      return this.deny("unauthorized_client_amount");
+    }
+    if (
+      input.eventType === "ACCOUNT_CREATED" ||
+      input.eventType === "REFERRAL_SIGNUP" ||
+      input.eventType === "REFERRAL_QUALIFIED" ||
+      input.eventType === "ADMIN_GRANT" ||
+      input.eventType === "ADMIN_REVERSAL"
+    ) {
+      return this.deny("invalid_event");
+    }
+    if (!input.sourceVerified) {
+      return this.deny("unverified_source");
+    }
+    if (input.subjectUserId && input.subjectUserId !== input.actorUserId) {
+      return this.deny("cross_user_forbidden");
+    }
+    return this.processVerifiedEvent({
+      ...input,
+      subjectUserId: input.actorUserId,
+      actorIsAdmin: false,
+      metadata: this.stripTrustedMetadata(input.metadata),
+    });
+  }
+
   private hasClientAmount(value: unknown): boolean {
     return value !== undefined;
+  }
+
+  private hasTrustedMetadata(metadata?: Record<string, unknown>): boolean {
+    if (!metadata) return false;
+    return (
+      "_trustedActor" in metadata ||
+      "trustedActor" in metadata ||
+      "trusted_actor" in metadata
+    );
+  }
+
+  private stripTrustedMetadata(
+    metadata?: Record<string, unknown>
+  ): Record<string, unknown> {
+    if (!metadata) return {};
+    const next = { ...metadata };
+    delete next._trustedActor;
+    delete next.trustedActor;
+    delete next.trusted_actor;
+    delete next.actorIsAdmin;
+    delete next.actor_is_admin;
+    return next;
   }
 
   private matchRule(eventType: RewardEvent["eventType"], now: string): RewardRule | null {

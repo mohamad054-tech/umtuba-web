@@ -17,6 +17,9 @@
 -- LAUNCH_GROWTH_MODE=3_MONTHS
 -- POINT_VALUES_CONFIGURED=YES
 -- 20260931_NOT_INCLUDED=YES
+-- SECURITY_HARDENED=YES
+-- CLIENT_GRANT_REVOKED=YES
+-- TRUST_NEVER_FROM_METADATA=YES
 
 insert into public.um_points_config (key, value, description)
 values
@@ -700,10 +703,11 @@ revoke all on function public.flag_reward_abuse(text, uuid, uuid, uuid, jsonb)
   from public, anon, authenticated;
 
 -- ---------------------------------------------------------------------------
--- 5) process_reward_event — no client amount parameter
+-- 5) Trusted mint — never reads trust from request metadata
 -- ---------------------------------------------------------------------------
 
-create or replace function public.process_reward_event(
+create or replace function public.process_reward_event_trusted(
+  p_actor_user_id uuid,
   p_event_type text,
   p_idempotency_key text,
   p_source_type text,
@@ -717,7 +721,7 @@ security definer
 set search_path = public
 as $$
 declare
-  v_uid uuid := auth.uid();
+  v_uid uuid := p_actor_user_id;
   v_subject uuid;
   v_event_type text := upper(btrim(coalesce(p_event_type, '')));
   v_key text := nullif(btrim(coalesce(p_idempotency_key, '')), '');
@@ -733,25 +737,29 @@ declare
   v_counterpart text;
   v_credit_count integer := 0;
   v_last_credit timestamptz;
-  v_trusted uuid;
+  v_meta jsonb;
 begin
-  if p_metadata ? '_trustedActor' then
-    begin
-      v_trusted := (p_metadata->>'_trustedActor')::uuid;
-    exception when others then
-      v_trusted := null;
-    end;
-  end if;
-  v_uid := coalesce(v_uid, v_trusted);
+  -- Trust is the p_actor_user_id argument from a revoked DEFINER wrapper only.
+  v_meta := coalesce(p_metadata, '{}'::jsonb)
+    - '_trustedActor'
+    - 'trustedActor'
+    - 'trusted_actor'
+    - 'actorIsAdmin'
+    - 'actor_is_admin';
+
   if v_uid is null then
-    raise exception 'Authentication required';
+    return jsonb_build_object(
+      'accepted', false,
+      'awarded', 0,
+      'denialReason', 'invalid_event'
+    );
   end if;
 
-  if p_metadata ? 'amount'
-     or p_metadata ? 'points'
-     or p_metadata ? 'pointsAmount'
-     or p_metadata ? 'clientAmount'
-     or p_metadata ? 'p_points' then
+  if v_meta ? 'amount'
+     or v_meta ? 'points'
+     or v_meta ? 'pointsAmount'
+     or v_meta ? 'clientAmount'
+     or v_meta ? 'p_points' then
     return jsonb_build_object(
       'accepted', false,
       'awarded', 0,
@@ -760,15 +768,7 @@ begin
   end if;
 
   v_subject := coalesce(p_subject_user_id, v_uid);
-  if v_subject <> v_uid
-     and v_trusted is null
-     and not public.is_platform_admin() then
-    return jsonb_build_object(
-      'accepted', false,
-      'awarded', 0,
-      'denialReason', 'cross_user_forbidden'
-    );
-  end if;
+  p_metadata := v_meta;
 
   if v_key is null or v_event_type !~ '^[A-Z][A-Z0-9_]{2,62}$' then
     return jsonb_build_object(
@@ -1159,13 +1159,106 @@ begin
 end;
 $$;
 
+revoke all on function public.process_reward_event_trusted(uuid, text, text, text, text, uuid, jsonb)
+  from public, anon, authenticated;
+
+comment on function public.process_reward_event_trusted(uuid, text, text, text, text, uuid, jsonb) is
+  'Server-only mint. Actor is a function argument from a revoked wrapper. Never granted to clients.';
+
+create or replace function public.process_reward_event(
+  p_event_type text,
+  p_idempotency_key text,
+  p_source_type text,
+  p_source_id text,
+  p_subject_user_id uuid default null,
+  p_metadata jsonb default '{}'::jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_type text := upper(btrim(coalesce(p_event_type, '')));
+  v_meta jsonb;
+begin
+  if v_uid is null then
+    raise exception 'Authentication required';
+  end if;
+
+  v_meta := coalesce(p_metadata, '{}'::jsonb)
+    - '_trustedActor'
+    - 'trustedActor'
+    - 'trusted_actor'
+    - 'actorIsAdmin'
+    - 'actor_is_admin';
+
+  if v_meta ? 'amount'
+     or v_meta ? 'points'
+     or v_meta ? 'pointsAmount'
+     or v_meta ? 'clientAmount'
+     or v_meta ? 'p_points'
+     or p_metadata ? '_trustedActor'
+     or p_metadata ? 'trustedActor'
+     or p_metadata ? 'trusted_actor' then
+    return jsonb_build_object(
+      'accepted', false,
+      'awarded', 0,
+      'denialReason', case
+        when p_metadata ? '_trustedActor'
+          or p_metadata ? 'trustedActor'
+          or p_metadata ? 'trusted_actor'
+        then 'untrusted_actor_metadata'
+        else 'unauthorized_client_amount'
+      end
+    );
+  end if;
+
+  if p_subject_user_id is not null and p_subject_user_id <> v_uid then
+    return jsonb_build_object(
+      'accepted', false,
+      'awarded', 0,
+      'denialReason', 'cross_user_forbidden'
+    );
+  end if;
+
+  if v_type in (
+    'ACCOUNT_CREATED', 'REFERRAL_SIGNUP', 'REFERRAL_QUALIFIED',
+    'ADMIN_GRANT', 'ADMIN_REVERSAL'
+  ) then
+    return jsonb_build_object(
+      'accepted', false,
+      'awarded', 0,
+      'denialReason', 'invalid_event'
+    );
+  end if;
+
+  if not public.verify_reward_event_source(v_uid, v_type, p_source_id) then
+    return jsonb_build_object(
+      'accepted', false,
+      'awarded', 0,
+      'denialReason', 'unverified_source'
+    );
+  end if;
+
+  return public.process_reward_event_trusted(
+    v_uid,
+    v_type,
+    p_idempotency_key,
+    p_source_type,
+    p_source_id,
+    v_uid,
+    v_meta
+  );
+end;
+$$;
+
 revoke all on function public.process_reward_event(text, text, text, text, uuid, jsonb)
-  from public, anon;
-grant execute on function public.process_reward_event(text, text, text, text, uuid, jsonb)
-  to authenticated;
+  from public, anon, authenticated;
 
 comment on function public.process_reward_event(text, text, text, text, uuid, jsonb) is
-  'Unified rewards event intake. No amount argument. Awards only when an enabled rule has points_amount > 0.';
+  'Not granted to clients. Even if re-granted: verifies source, ignores trusted metadata, no amount argument.';
 
 -- ---------------------------------------------------------------------------
 -- 6) Read contracts
@@ -1810,13 +1903,17 @@ begin
     return jsonb_build_object('accepted', false, 'awarded', 0, 'denialReason', 'invalid_event');
   end if;
 
-  return public.process_reward_event(
+  return public.process_reward_event_trusted(
+    v_uid,
     p_event_type,
     p_idempotency_key,
     p_source_type,
     p_source_id,
     v_subject,
-    coalesce(p_metadata, '{}'::jsonb) || jsonb_build_object('_trustedActor', v_uid)
+    coalesce(p_metadata, '{}'::jsonb)
+      - '_trustedActor'
+      - 'trustedActor'
+      - 'trusted_actor'
   );
 end;
 $$;
@@ -2101,9 +2198,9 @@ declare
   v_uid uuid := auth.uid();
   v_code text;
   v_inviter uuid;
-  v_attr jsonb;
   v_award jsonb;
   v_created timestamptz;
+  v_already uuid;
 begin
   if v_uid is null then
     raise exception 'Authentication required';
@@ -2114,52 +2211,64 @@ begin
     return jsonb_build_object('accepted', false, 'denialReason', 'invalid_event');
   end if;
 
-  v_attr := public.attribute_referral_signup_v2(
-    coalesce(
-      (
-        select referral_code
-        from public.referral_attributions
-        where converted_user_id = v_uid
-           or (
-             anonymous_visitor_id is not null
-             and status in ('pending', 'converted')
-           )
-        order by created_at asc
-        limit 1
-      ),
-      ''
-    )
-  );
-
-  select c.user_id, c.code into v_inviter, v_code
-  from public.referral_codes c
-  join public.referral_attributions a on a.referral_code = c.code
-  where a.converted_user_id = v_uid
-     or exists (
-       select 1 from public.reward_events e
-       where e.idempotency_key = 'referral_signup_v2:' || v_uid::text
-         and e.metadata->>'inviterUserId' = c.user_id::text
-     )
+  -- Bound records for THIS user only. No global pending fallback.
+  select e.metadata->>'referralCode', (e.metadata->>'inviterUserId')::uuid
+    into v_code, v_inviter
+  from public.reward_events e
+  where e.idempotency_key = 'referral_signup_v2:' || v_uid::text
   limit 1;
 
   if v_inviter is null then
-    select user_id, code into v_inviter, v_code
-    from public.referral_codes
-    where code = upper(btrim(coalesce(
-      (select referral_code from public.referral_attributions
-       where converted_user_id is null
-         and status = 'pending'
-       order by created_at desc
-       limit 1),
-      ''
-    )))
+    select a.referral_code, a.referrer_user_id
+      into v_code, v_inviter
+    from public.referral_attributions a
+    where a.converted_user_id = v_uid
+      and a.status in ('pending', 'converted')
+    order by a.created_at asc
     limit 1;
   end if;
 
-  if v_inviter is null or v_inviter = v_uid then
+  if v_inviter is null then
+    select c.referral_code, c.referrer_user_id
+      into v_code, v_inviter
+    from public.referral_conversions c
+    where c.referred_user_id = v_uid
+    limit 1;
+  end if;
+
+  if v_inviter is null or v_code is null then
+    return jsonb_build_object('accepted', false, 'denialReason', 'referral_unknown_code');
+  end if;
+
+  if v_inviter = v_uid then
+    perform public.flag_reward_abuse(
+      'suspicious_referral',
+      v_uid,
+      v_inviter,
+      null,
+      jsonb_build_object('reason', 'self_referral')
+    );
+    return jsonb_build_object('accepted', false, 'denialReason', 'referral_self');
+  end if;
+
+  perform public.attribute_referral_signup_v2(v_code);
+
+  select id into v_already
+  from public.um_points_ledger
+  where user_id = v_inviter
+    and (
+      dedupe_key = 'unified:referral_signup:' || v_uid::text
+      or dedupe_key = 'referral_signup:' || v_uid::text
+    )
+  limit 1;
+
+  if v_already is not null then
     return jsonb_build_object(
-      'accepted', false,
-      'denialReason', case when v_inviter = v_uid then 'referral_self' else 'referral_unknown_code' end
+      'accepted', true,
+      'awarded', 0,
+      'replayed', true,
+      'inviterUserId', v_inviter,
+      'referredExtraPoints', 0
     );
   end if;
 
@@ -2687,6 +2796,11 @@ begin
      or p_metadata ? 'clientAmount' or p_metadata ? 'p_points' then
     return jsonb_build_object('accepted', false, 'awarded', 0, 'denialReason', 'unauthorized_client_amount');
   end if;
+  if p_metadata ? '_trustedActor'
+     or p_metadata ? 'trustedActor'
+     or p_metadata ? 'trusted_actor' then
+    return jsonb_build_object('accepted', false, 'awarded', 0, 'denialReason', 'untrusted_actor_metadata');
+  end if;
   if not public.verify_reward_event_source(v_uid, v_type, p_source_id)
      and v_type not in (
        'COURSE_ENROLLED', 'LESSON_COMPLETED', 'COURSE_COMPLETED', 'QUIZ_PASSED',
@@ -2829,6 +2943,10 @@ revoke all on function public.admin_rewards_launch_analytics() from public, anon
 grant execute on function public.admin_rewards_launch_analytics() to authenticated;
 
 comment on function public.ingest_verified_reward_event(uuid, uuid, text, text, text, text, jsonb) is
-  'Trusted DEFINER intake. Not granted to clients. Amounts come from launch_v1 rules.';
+  'Trusted DEFINER intake. Not granted to clients. Actor is a parameter, not metadata. Amounts come from launch_v1 rules.';
 comment on function public.process_reward_event(text, text, text, text, uuid, jsonb) is
-  'Client-callable intake with no amount argument. Sensitive types denied; source must verify.';
+  'Not granted to clients. Source must verify. Trusted metadata is rejected. No amount argument.';
+comment on function public.process_reward_event_trusted(uuid, text, text, text, text, uuid, jsonb) is
+  'Server-only mint. Not granted to anon or authenticated.';
+comment on function public.qualify_my_referral_signup() is
+  'Qualifies the current user only from records bound to auth.uid(). No cross-user pending fallback.';

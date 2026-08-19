@@ -30,7 +30,9 @@ export const REWARDS_CROSS_PLATFORM_CONTRACT = {
     snapshot: "get_my_rewards_snapshot",
     history: "get_my_rewards_history",
     referral: "get_my_referral_profile",
-    processEvent: "process_reward_event",
+    processEvent: "record_contract_reward_event",
+    processEventInternal: "process_reward_event",
+    processEventTrusted: "process_reward_event_trusted",
     attributeReferral: "attribute_referral_signup_v2",
     qualifyReferral: "qualify_my_referral_signup",
     confirmQualification: "admin_confirm_reward_qualification",
@@ -42,6 +44,7 @@ export const REWARDS_CROSS_PLATFORM_CONTRACT = {
     clientMayGrantPoints: false,
     clientMayDeductPoints: false,
     clientMayAttributeReferralAuthoritatively: false,
+    clientMaySupplyTrustedActor: false,
   },
 } as const;
 
@@ -90,6 +93,17 @@ export function assertNoClientAmount(
   for (const key of forbidden) {
     if (key in payload) {
       return { ok: false, reason: "unauthorized_client_amount" };
+    }
+  }
+  return { ok: true };
+}
+
+export function assertNoTrustedMetadata(
+  payload: Record<string, unknown>
+): { ok: true } | { ok: false; reason: "untrusted_actor_metadata" } {
+  for (const key of ["_trustedActor", "trustedActor", "trusted_actor"]) {
+    if (key in payload) {
+      return { ok: false, reason: "untrusted_actor_metadata" };
     }
   }
   return { ok: true };

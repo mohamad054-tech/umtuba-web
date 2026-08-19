@@ -275,7 +275,9 @@ export type ProcessDenialReason =
   | "referral_duplicate"
   | "referral_loop"
   | "referral_unknown_code"
-  | "invalid_event";
+  | "invalid_event"
+  | "untrusted_actor_metadata"
+  | "unverified_source";
 
 export type ProcessResult = {
   accepted: boolean;
@@ -304,7 +306,10 @@ export type ProcessEventInput = {
   metadata?: Record<string, unknown>;
   /** Any present client amount is rejected. */
   clientAmount?: unknown;
+  /** Server execution context only — never taken from request metadata. */
   actorIsAdmin?: boolean;
+  /** Server verified that the source row exists and belongs to the actor. */
+  sourceVerified?: boolean;
   accountCreatedAt?: string;
   accountVerified?: boolean;
   counterpartUserId?: string;

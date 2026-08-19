@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   assertNoClientAmount,
+  assertNoTrustedMetadata,
   REWARDS_CROSS_PLATFORM_CONTRACT,
   type RewardsEventRequestContract,
 } from "../rewards/engine";
@@ -51,6 +52,10 @@ export async function requestRewardEventRpc(
   const guarded = assertNoClientAmount({ ...request.metadata });
   if (!guarded.ok) {
     return { ok: false as const, reason: guarded.reason, data: null };
+  }
+  const trusted = assertNoTrustedMetadata({ ...request.metadata });
+  if (!trusted.ok) {
+    return { ok: false as const, reason: trusted.reason, data: null };
   }
 
   const { data, error } = await supabase.rpc(

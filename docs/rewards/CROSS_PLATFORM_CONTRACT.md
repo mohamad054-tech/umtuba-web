@@ -35,7 +35,7 @@ Clients must not calculate, grant, deduct, or authoritatively attribute rewards.
 | History | `get_my_rewards_history` | Own rows only |
 | Referral profile | `get_my_referral_profile` | Code + `/join?ref=` |
 | Referral dashboard | `get_my_referral_dashboard` | Success / pending / points |
-| Event request | `process_reward_event` | **No amount argument**; source must verify |
+| Event request | `record_contract_reward_event` | Verifies source; no amount; no trusted metadata. `process_reward_event` / `_trusted` are **not** granted to clients |
 | Qualify referral | `qualify_my_referral_signup` | First-touch + inviter credit |
 | Daily check-in | `claim_daily_engagement` | Once per UTC day |
 | Admin confirm/reject | `admin_confirm_reward_qualification` / `admin_reject_reward_qualification` | Platform admin |

@@ -70,6 +70,7 @@ export { RewardsEngine, createRewardsEngine } from "./engine";
 export {
   REWARDS_CROSS_PLATFORM_CONTRACT,
   assertNoClientAmount,
+  assertNoTrustedMetadata,
   toPlatformSnapshot,
 } from "./contract";
 

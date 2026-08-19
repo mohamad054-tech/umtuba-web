@@ -84,10 +84,28 @@ describe("unified rewards migration contract", () => {
     expect(sql).toMatch(/insert into public\.reward_rules/);
     expect(sql).toMatch(/'capability.video_published'/);
     expect(sql).toMatch(/create or replace function public\.process_reward_event\(/);
+    expect(sql).toMatch(/create or replace function public\.process_reward_event_trusted\(/);
     expect(sql).not.toMatch(/process_reward_event\(\s*[^)]*p_points/);
     expect(sql).toMatch(/unauthorized_client_amount/);
+    expect(sql).toMatch(/untrusted_actor_metadata/);
+    expect(sql).toMatch(/unverified_source/);
     expect(sql).toMatch(/cross_user_forbidden/);
     expect(sql).toMatch(/ingest_verified_reward_event/);
+    expect(sql).toMatch(
+      /revoke all on function public\.process_reward_event\(text, text, text, text, uuid, jsonb\)[\s\S]*from public, anon, authenticated/
+    );
+    expect(sql).toMatch(
+      /revoke all on function public\.process_reward_event_trusted/
+    );
+    expect(sql).not.toMatch(
+      /grant execute on function public\.process_reward_event\(text, text, text, text, uuid, jsonb\)/
+    );
+    expect(sql).not.toMatch(
+      /grant execute on function public\.process_reward_event_trusted/
+    );
+    expect(sql).not.toMatch(
+      /converted_user_id is null\s+and status = 'pending'/
+    );
     expect(sql).toMatch(/admin_confirm_reward_qualification/);
     expect(sql).toMatch(/admin_reject_reward_qualification/);
     for (const eventType of REWARD_EVENT_TYPES) {

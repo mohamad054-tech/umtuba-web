@@ -9,6 +9,7 @@ import {
 } from "../../lib/supabase/rewardsEngine";
 import {
   assertNoClientAmount,
+  assertNoTrustedMetadata,
   createRewardsEngine,
   type RewardsEventRequestContract,
 } from "../../lib/rewards/engine";
@@ -152,6 +153,13 @@ export async function requestRewardEventAction(
   });
   if (!guarded.ok) {
     return { ok: false, message: "Reward amounts are not client-authoritative." };
+  }
+  const trusted = assertNoTrustedMetadata({
+    ...request,
+    ...(request.metadata ?? {}),
+  });
+  if (!trusted.ok) {
+    return { ok: false, message: "Trusted actor cannot be client-supplied." };
   }
 
   const supabase = await createClient();
