@@ -76,7 +76,7 @@ export default function SoundPageClient({
           })
         );
       } catch {
-        if (active) setError(t("status.unavailable"));
+        if (active) setError(t("status.error"));
       }
     }
     void load();
