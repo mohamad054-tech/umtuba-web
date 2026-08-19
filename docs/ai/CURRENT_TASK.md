@@ -1,5 +1,40 @@
 ﻿# Current Task
 
+## CENTRAL GO — UMTUBA REWARDS / REFERRAL ENGINE V1
+
+**TASK_ID** = `CENTRAL_UMTUBA_REWARDS_REFERRAL_ENGINE_V1`
+**PRIORITY** = HIGH
+**DATE** = 2026-08-20
+**STATUS** = IMPLEMENTED_LOCAL
+**MODE** = IMPLEMENTATION
+**DEVICE** = SERVER / CENTRAL
+**WORKTREE** = `D:\umtuba-central\repos\umtuba-web-rewards-referral-engine-v1`
+**BRANCH** = `central/rewards-referral-engine-v1`
+**BASE_SHA** = `f66f1c921c166b9a5fe0a1d103817e2bdf8a6179`
+**WEB_PRODUCTION** = `26a0d19379b09cd53f08371358903a84745aa842` (do not FF)
+**MOBILE** = do not modify; P0 owns `f66f15c` editor-exit. `MOBILE_SOURCE_CHANGED=NO`
+**DEPLOYED** = NO
+**MIGRATION** = `20260933` additive launch_v1 (do not apply `20260931`)
+
+Owner authorized product implementation: one authoritative UM Points + referral engine. Internal points only. Web + SQL + contracts. No mobile/editor edits. No store binaries. No web deploy.
+
+### Allowed scope
+
+- Web worktree from `origin/central/create-editor-sound-library-v1`
+- Additive SQL `20260933+`
+- Rewards/referral contracts, dashboard, `/join?ref=`
+- 13-locale rewards chrome
+- Local commit + FF-only feature ref (not `origin/alpha-0.2`)
+
+### Forbidden scope
+
+- `umtuba-mobile`, iOS/Android `app.json`, editor UI
+- Apply `20260931` blindly; collide `20260929` / `20260930` / `20260932`
+- Force push; `git config --global`; print secrets
+- AAB/IPA; web deploy; `db push`
+
+---
+
 ## CENTRAL GO — 13 LANGUAGE DEEP LINGUISTIC QA FINAL V1
 
 **TASK_ID** = `CENTRAL_13_LANGUAGE_DEEP_LINGUISTIC_QA_FINAL_V1`

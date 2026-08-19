@@ -15,8 +15,8 @@ export const REFERRAL_VISITOR_COOKIE = "umtuba_vid";
 export const REFERRAL_ATTRIBUTION_TTL_SECONDS = 30 * 24 * 60 * 60;
 
 export const UM_POINTS_REFERRAL = {
-  /** Inviter reward on successful referred signup (Growth Mode). */
-  referralSignup: 20,
+  /** Inviter reward on qualified referred signup (launch_v1). */
+  referralSignup: 40,
   attributionTtlDays: 30,
   growthMode: true,
   emergencyDailyCapPerInviter: 100,
@@ -40,6 +40,10 @@ export function buildInvitePath(code: string): string {
   return `/invite/${code}`;
 }
 
+export function buildJoinPath(code: string): string {
+  return `/join?ref=${encodeURIComponent(code)}`;
+}
+
 export function buildSignupRefPath(code: string): string {
   return `/signup?ref=${encodeURIComponent(code)}`;
 }
@@ -49,7 +53,7 @@ export function buildInviteAbsoluteUrl(
   code: string,
   origin?: string | null
 ): string {
-  const path = buildInvitePath(code);
+  const path = buildJoinPath(code);
   if (origin) return `${origin.replace(/\/$/, "")}${path}`;
   if (typeof window !== "undefined" && window.location?.origin) {
     return `${window.location.origin}${path}`;

@@ -1,54 +1,71 @@
-# CURSOR REPORT — CENTRAL_13_LANGUAGE_DEEP_LINGUISTIC_QA_FINAL_V1
+# CURSOR_REPORT — Rewards / Referral Engine V1
+
+```text
+TASK_ID = CENTRAL_UMTUBA_REWARDS_REFERRAL_ENGINE_V1
+STATUS = IMPLEMENTED_LOCAL
+BASE_SHA = f66f1c921c166b9a5fe0a1d103817e2bdf8a6179
+WORKTREE = D:\umtuba-central\repos\umtuba-web-rewards-referral-engine-v1
+BRANCH = central/rewards-referral-engine-v1
+WEB_PRODUCTION = 26a0d19379b09cd53f08371358903a84745aa842 (unchanged)
+20260931 = HOLD_NOT_APPLIED_NOT_COPIED
+MIGRATIONS = 20260933_rewards_referral_launch_v1.sql
+DEPLOYED = NO
+MOBILE_SOURCE_CHANGED = NO
+```
 
 ## Summary
 
-Deep linguistic QA on live `618526c9` (13 locales). Watch is now a translated surface label in all 13 languages (fr Regarder, es Ver, de Ansehen, pt Assistir) — not leftover English. Hello City stays the branded English feature name everywhere. Portuguese is consistently **pt-BR**. Arabic no longer transliterates UMTUBA. Follow/Following wired through dictionaries (never Unfollow). Hardcoded English chrome fixed on Follow, Profile stats, AuthStatus, Search empty states, and Store Watch eyebrow. Landing hero copy that had leaked English in fr/es/de/pt is localized.
+Reconciled the existing unified rewards design (`20260931` HOLD) and shipped additive `20260933` on the sound-library web SHA. One authoritative engine: verified event → launch_v1 policy → anti-abuse/idempotency → ledger → balance → feedback. Canonical invite URL is `/join?ref=<code>`. Mobile source was not touched.
 
 ## Exact files changed
 
-- `lib/i18n/messages/{en,ar,fr,es,de,pt,id,hi,ru,tr,zh-CN,ja,ko}.ts`
-- `lib/i18n/messages/types.ts`, `storeCatalogs.ts`
-- `lib/i18n/linguisticQa.v1.test.ts` (new)
-- `lib/i18n/professional13Catalog.test.ts`, `appShellTranslation.test.ts`
-- `lib/sandbox/i18n.ts`, `lib/sandbox/store/messages.ts`
-- `app/components/social/FollowButton.tsx`, `AuthStatus.tsx`
-- `app/profile/components/ProfileStats.tsx`
-- `app/search/SearchExperience.tsx`, `app/store/page.tsx`
-- `app/components/landing/JoinBetaLink.tsx`, `joinCta.contract.test.ts`
-- `app/lib/nav/userReportedFinalBlockersV2.contract.test.ts`
-- `docs/i18n/TERMINOLOGY.md`, `docs/ai/CURRENT_TASK.md`
+- `supabase/migrations/20260933_rewards_referral_launch_v1.sql`
+- `lib/rewards/engine/*`
+- `lib/supabase/rewardsEngine.ts`
+- `app/actions/rewardsEngine.ts`
+- `app/join/page.tsx`
+- `app/rewards/page.tsx`
+- `app/rewards/components/InviteShareCard.tsx`
+- `lib/referral/config.ts`
+- `lib/supabase/referral.ts`
+- `lib/supabase/middleware.ts`
+- `lib/site/indexing.ts`
+- `lib/i18n/messages/rewardsCatalogs.ts`
+- `docs/rewards/CROSS_PLATFORM_CONTRACT.md`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+`20260933_rewards_referral_launch_v1.sql`. Self-contained. Does not apply or include `20260931`. Collision with `20260929`/`20260930`/`20260932`: none.
 
 ## Security review
 
-No secrets printed or committed. Arabic brand strings now keep Latin UMTUBA. UGC, authored lessons, and seller descriptions untouched. Store/Learning restrictions unchanged. Sandbox still private. Host build must source `/etc/umtuba/production/umtuba.env`. Rollback `618526c9-20260819175541`. Never restore `0b6d35bd-20260819011723`.
+FORCE RLS on engine tables. Clients cannot set balance, choose amounts, or call `ingest_verified_reward_event`. `process_reward_event` has no amount argument. Welcome bonus is single-key. Self-referral and duplicate referral blocked.
 
 ## Tests
 
-`vitest` i18n/registry/completeness/linguistic QA: **70 passed** (9 files).
+65 targeted vitest PASS (`lib/rewards/engine`, award-security, umPointsConfig). `git diff --check` PASS.
 
 ## TypeScript
 
-`tsc --noEmit` **PASS**
+Targeted compile via vitest PASS. Full-project `tsc` in this worktree was blocked by an incomplete local `npm install` (missing Next types), not by rewards source errors.
 
 ## Build
 
-Local `npm run build` **PASS**
+Not run. Next install in the worktree did not finish. UI entry points `/rewards` and `/join` changed; host build should run before any later deploy GO.
 
 ## git diff --check
 
-PASS (no whitespace errors)
+PASS.
 
 ## git status --short
 
-See worktree after commit.
+See commit on `central/rewards-referral-engine-v1`.
 
 ## Open issues
 
-- Search tab labels (`SEARCH_TAB_LABELS`) and notification type chips remain English contract constants.
-- Some Portuguese store long-form sentences still mix *encomenda* / European phrasing; core chrome is pt-BR.
-- AuthStatus error fallbacks can still surface English if a server message is unsanitized.
-- OpenAI/Gemini not available on this Windows process — second pass was human professional review.
+- `20260933` not applied remotely.
+- Learning/Games/Store awards are contract + trusted ingest; some still need domain triggers.
+- Mobile consume RPCs on a later GO after P0 editor-exit SHA.
+- Full `next build` pending worktree deps.

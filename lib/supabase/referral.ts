@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   buildInviteAbsoluteUrl,
   buildInvitePath,
+  buildJoinPath,
   buildSignupRefPath,
   normalizeReferralCode,
   UM_POINTS_REFERRAL,
@@ -10,9 +11,11 @@ import {
 export type ReferralStats = {
   code: string;
   invitePath: string;
+  joinPath: string;
   signupPath: string;
   inviteUrl: string;
   successfulReferrals: number;
+  pendingReferrals: number;
   pointsEarned: number;
   pointsPerSignup: number;
   attributionTtlDays: number;
@@ -52,12 +55,16 @@ export async function getMyReferralStats(
   supabase: SupabaseClient,
   origin?: string | null
 ): Promise<ReferralStats | null> {
-  const { data, error } = await supabase.rpc("get_my_referral_stats");
-  if (error) {
-    console.error("get_my_referral_stats failed:", error);
+  await supabase.rpc("qualify_my_referral_signup");
+  const dashboard = await supabase.rpc("get_my_referral_dashboard");
+  const fallback = dashboard.error
+    ? await supabase.rpc("get_my_referral_stats")
+    : dashboard;
+  if (fallback.error) {
+    console.error("get_my_referral_stats failed:", fallback.error);
     return null;
   }
-  const row = asRecord(data);
+  const row = asRecord(fallback.data);
   const code = typeof row?.code === "string" ? row.code : null;
   if (!code) return null;
 
@@ -67,6 +74,8 @@ export async function getMyReferralStats(
       typeof row?.invitePath === "string"
         ? row.invitePath
         : buildInvitePath(code),
+    joinPath:
+      typeof row?.joinPath === "string" ? row.joinPath : buildJoinPath(code),
     signupPath:
       typeof row?.signupPath === "string"
         ? row.signupPath
@@ -74,6 +83,7 @@ export async function getMyReferralStats(
     inviteUrl: buildInviteAbsoluteUrl(code, origin),
     successfulReferrals:
       Number(row?.successfulReferrals ?? row?.totalRewardedReferrals ?? 0) || 0,
+    pendingReferrals: Number(row?.pendingReferrals ?? 0) || 0,
     pointsEarned: Number(row?.pointsEarned ?? 0) || 0,
     pointsPerSignup:
       Number(

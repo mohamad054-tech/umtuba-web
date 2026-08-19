@@ -11,6 +11,9 @@ import {
 } from "../../lib/supabase/rewards";
 import { getMyReferralStats } from "../../lib/supabase/referral";
 import { nextUmPointsMilestone } from "../../lib/rewards/umPointsConfig";
+import { historyLabelForReason } from "../../lib/rewards/engine";
+import { resolveRequestLocale } from "../../lib/i18n/server";
+import { translateRewards } from "../../lib/i18n/messages/rewardsCatalogs";
 import { formatRelativeTime } from "../notifications/lib/formatRelativeTime";
 import InviteShareCard from "./components/InviteShareCard";
 import RewardsLoadError from "./components/RewardsLoadError";
@@ -23,8 +26,13 @@ export default async function RewardsPage() {
     redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.rewards)}`);
   }
 
+  const { locale } = await resolveRequestLocale();
+  const t = (key: Parameters<typeof translateRewards>[1], values?: Record<string, string | number>) =>
+    translateRewards(locale, key, values);
+
   const supabase = await createClient();
   await claimVerifiedWelcomeBonus(supabase);
+  await supabase.rpc("claim_daily_engagement");
   const summary = await getMyUmPointsSummary(supabase);
 
   const hdrs = await headers();
@@ -38,7 +46,7 @@ export default async function RewardsPage() {
       <main
         className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
       >
-        <AppTopNav title="UM Points" subtitle="Rewards" />
+        <AppTopNav title={t("rewards.title")} subtitle={t("rewards.eyebrow")} />
         <div className="mx-auto flex max-w-3xl justify-center px-4 py-10 md:px-6">
           <RewardsLoadError />
         </div>
@@ -60,22 +68,21 @@ export default async function RewardsPage() {
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
-      <AppTopNav title="UM Points" subtitle="Rewards" />
+      <AppTopNav title={t("rewards.title")} subtitle={t("rewards.eyebrow")} />
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Rewards
+            {t("rewards.eyebrow")}
           </p>
-          <h1 className="mt-1 text-3xl font-black tracking-tight">UM Points</h1>
-          <p className="mt-2 text-sm text-white/50">
-            Earn points for meaningful actions — not unlimited likes or passive
-            watch time.
-          </p>
+          <h1 className="mt-1 text-3xl font-black tracking-tight">
+            {t("rewards.title")}
+          </h1>
+          <p className="mt-2 text-sm text-white/50">{t("rewards.intro")}</p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-violet-400/25 bg-violet-500/10 px-4 py-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-violet-200/70">
-                Balance
+                {t("rewards.balance")}
               </p>
               <p className="mt-1 text-3xl font-black text-violet-50">
                 {balance.toLocaleString()}
@@ -83,7 +90,7 @@ export default async function RewardsPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                Earned today
+                {t("rewards.earnedToday")}
               </p>
               <p className="mt-1 text-2xl font-black">
                 {earnedToday.toLocaleString()}
@@ -95,12 +102,12 @@ export default async function RewardsPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/40">
-                Next milestone
+                {t("rewards.nextMilestone")}
               </p>
               <p className="mt-1 text-2xl font-black">
                 {nextMilestone != null
                   ? nextMilestone.toLocaleString()
-                  : "Maxed"}
+                  : t("rewards.maxed")}
               </p>
             </div>
           </div>
@@ -108,7 +115,7 @@ export default async function RewardsPage() {
           {nextMilestone != null ? (
             <div className="mt-4">
               <div className="mb-1.5 flex justify-between text-[11px] font-bold text-white/40">
-                <span>Milestone progress</span>
+                <span>{t("rewards.progress")}</span>
                 <span>{progress}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-white/10">
@@ -120,14 +127,33 @@ export default async function RewardsPage() {
             </div>
           ) : null}
 
-          {referral ? <InviteShareCard stats={referral} /> : null}
+          {referral ? (
+            <InviteShareCard
+              stats={referral}
+              labels={{
+                title: t("rewards.invite.title"),
+                body: t("rewards.invite.body", {
+                  points: referral.pointsPerSignup,
+                }),
+                copy: t("rewards.invite.copy"),
+                copied: t("rewards.invite.copied"),
+                copyError: t("rewards.invite.copyError"),
+                shareWhatsApp: t("rewards.invite.shareWhatsApp"),
+                code: t("rewards.invite.code"),
+                successful: t("rewards.invite.successful"),
+                pending: t("rewards.invite.pending"),
+                points: t("rewards.invite.points"),
+              }}
+            />
+          ) : null}
 
           <div className="mt-8">
-            <h2 className="text-sm font-black tracking-tight">Recent activity</h2>
+            <h2 className="text-sm font-black tracking-tight">
+              {t("rewards.recent")}
+            </h2>
             {summary.ledger.length === 0 ? (
               <p className="mt-3 rounded-2xl border border-dashed border-white/15 px-4 py-8 text-center text-sm text-white/45">
-                No UM Points yet. Publish, comment thoughtfully, or earn saves
-                and shares.
+                {t("rewards.empty")}
               </p>
             ) : (
               <ul className="mt-3 space-y-2">
@@ -138,7 +164,7 @@ export default async function RewardsPage() {
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-white/90">
-                        {item.reason}
+                        {historyLabelForReason(item.reason)}
                       </p>
                       <p className="mt-0.5 text-[11px] text-white/35">
                         {item.createdAt
@@ -147,7 +173,7 @@ export default async function RewardsPage() {
                       </p>
                     </div>
                     <span className="shrink-0 text-sm font-black text-violet-200">
-                      +{item.points}
+                      {t("rewards.toast", { points: item.points })}
                     </span>
                   </li>
                 ))}

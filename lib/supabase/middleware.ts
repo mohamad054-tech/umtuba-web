@@ -76,7 +76,7 @@ function referralCookieOpts(maxAge = REFERRAL_ATTRIBUTION_TTL_SECONDS) {
 
 /**
  * First-touch referral attribution:
- * - /invite/CODE or ?ref=CODE / ?invite=CODE
+ * - /invite/CODE, /join?ref=CODE, or ?ref=CODE / ?invite=CODE
  * - Do not overwrite an existing valid referral cookie
  */
 function applyReferralAttribution(
