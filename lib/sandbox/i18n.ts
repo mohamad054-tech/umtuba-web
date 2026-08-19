@@ -820,7 +820,7 @@ const pt: Catalog = {
   store: "Loja",
   storeCart: "Carrinho",
   storeCheckout: "Checkout",
-  storeOrders: "Encomendas",
+  storeOrders: "Pedidos",
   storeSeller: "Vendedor",
   storePartners: "Parceiros de comércio",
   commercial: "Modelo comercial",

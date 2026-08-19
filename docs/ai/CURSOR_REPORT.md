@@ -1,24 +1,22 @@
-# CURSOR REPORT — CENTRAL_PROFESSIONAL_13_LANGUAGE_LOCALIZATION_V1
+# CURSOR REPORT — CENTRAL_13_LANGUAGE_DEEP_LINGUISTIC_QA_FINAL_V1
 
 ## Summary
 
-Dedicated worktree from live `f72d625a`. Thirteen-locale registry with **CHINESE_VARIANT = zh-CN** (Simplified; Traditional does not collapse). Seven new locales have professional foundation, **262-key store catalogs**, and full sandbox Learning + Store chrome overlays. Watch stays “Watch” in fr/es/de/pt; new locales use glossary verbs. Authored lessons and product names were not translated. Store/Learning restrictions and sandbox containment unchanged. Mobile not touched.
-
-Local gates: locale/registry/completeness vitest PASS (57), `tsc --noEmit` PASS, changed-file eslint PASS, local `next build` PASS. Full-repo eslint still reports 54 pre-existing errors on the live SHA (not introduced here).
+Deep linguistic QA on live `618526c9` (13 locales). Watch is now a translated surface label in all 13 languages (fr Regarder, es Ver, de Ansehen, pt Assistir) — not leftover English. Hello City stays the branded English feature name everywhere. Portuguese is consistently **pt-BR**. Arabic no longer transliterates UMTUBA. Follow/Following wired through dictionaries (never Unfollow). Hardcoded English chrome fixed on Follow, Profile stats, AuthStatus, Search empty states, and Store Watch eyebrow. Landing hero copy that had leaked English in fr/es/de/pt is localized.
 
 ## Exact files changed
 
-- `lib/i18n/locales.ts`, `lib/i18n/index.ts`, `messages/types.ts`, `messages/catalogs.ts`
-- `lib/i18n/messages/{id,hi,ru,tr,zh-CN,ja,ko}.ts` — foundation + store spread
-- `lib/i18n/messages/storeCatalogs.ts` — seven native 262-key store exports
-- Existing six catalogs: language-name keys only for the seven added locales
-- `lib/i18n/professional13Catalog.test.ts` and foundation/unified/store/studio tests
-- `lib/world/catalogLocales.ts`, `cityCatalogCopy.test.ts`, `data/world/catalog/city-copy-v2.json`, `scripts/world/expansionV2Data.ts`
-- `lib/translationStudio/professionalQuality/styleGuides.ts`, `thresholds.ts`
-- `lib/sandbox/i18n.ts`, `lib/sandbox/store/messages.ts`, `lib/sandbox/learning/i18n.learning.test.ts`
-- `app/globals.css` — CJK/Hindi system font stacks
+- `lib/i18n/messages/{en,ar,fr,es,de,pt,id,hi,ru,tr,zh-CN,ja,ko}.ts`
+- `lib/i18n/messages/types.ts`, `storeCatalogs.ts`
+- `lib/i18n/linguisticQa.v1.test.ts` (new)
+- `lib/i18n/professional13Catalog.test.ts`, `appShellTranslation.test.ts`
+- `lib/sandbox/i18n.ts`, `lib/sandbox/store/messages.ts`
+- `app/components/social/FollowButton.tsx`, `AuthStatus.tsx`
+- `app/profile/components/ProfileStats.tsx`
+- `app/search/SearchExperience.tsx`, `app/store/page.tsx`
+- `app/components/landing/JoinBetaLink.tsx`, `joinCta.contract.test.ts`
+- `app/lib/nav/userReportedFinalBlockersV2.contract.test.ts`
 - `docs/i18n/TERMINOLOGY.md`, `docs/ai/CURRENT_TASK.md`
-- `scripts/i18n/**` — catalog generator (not runtime)
 
 ## Migrations created
 
@@ -26,38 +24,31 @@ None.
 
 ## Security review
 
-No secrets printed or committed. Host build must source `/etc/umtuba/production/umtuba.env` and abort if URL/key missing (lengths only). `STORE_DEMO_PREVIEW` and sandbox token stay unset. No Store/Learning access change. Sandbox remains private. Authored lessons/posts/DMs/seller copy untouched. Rollback target is live `f72d625a-20260819151734`. Never restore `0b6d35bd-20260819011723`.
+No secrets printed or committed. Arabic brand strings now keep Latin UMTUBA. UGC, authored lessons, and seller descriptions untouched. Store/Learning restrictions unchanged. Sandbox still private. Host build must source `/etc/umtuba/production/umtuba.env`. Rollback `618526c9-20260819175541`. Never restore `0b6d35bd-20260819011723`.
 
 ## Tests
 
-`npx vitest run` on locale/registry/completeness files: **57 passed** (6 files).
-
-- `lib/i18n/professional13Catalog.test.ts`
-- `lib/i18n/i18nFoundation.test.ts`
-- `lib/i18n/unifiedLocaleContract.test.ts`
-- `lib/i18n/storeLocalization.test.ts`
-- `lib/sandbox/learning/i18n.learning.test.ts`
-- `lib/translationStudio/translationStudioFoundation.test.ts`
+`vitest` i18n/registry/completeness/linguistic QA: **70 passed** (9 files).
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS
+`tsc --noEmit` **PASS**
 
 ## Build
 
-Local `npm run build` — PASS (Next.js 16.2.10). Host env-sourced build is the deploy gate.
+Local `npm run build` **PASS**
 
 ## git diff --check
 
-Run at commit time.
+PASS (no whitespace errors)
 
 ## git status --short
 
-Worktree dirty on i18n + docs + generator until the product commit.
+See worktree after commit.
 
 ## Open issues
 
-- Authored lesson bodies and synthetic/demo product names remain source-language (intentional).
-- `Hello City` stays Latin in the six LTR locales; new locales use native labels.
-- Full-repo `npm run lint` still has 54 pre-existing errors from live `f72d625a`.
-- Deploy status is recorded after the host cutover.
+- Search tab labels (`SEARCH_TAB_LABELS`) and notification type chips remain English contract constants.
+- Some Portuguese store long-form sentences still mix *encomenda* / European phrasing; core chrome is pt-BR.
+- AuthStatus error fallbacks can still surface English if a server message is unsanitized.
+- OpenAI/Gemini not available on this Windows process — second pass was human professional review.

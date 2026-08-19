@@ -22,7 +22,7 @@ describe("Landing join CTA contract (UAF-06)", () => {
   });
 
   it("serves approved AR join string via i18n key only", () => {
-    expect(translate("ar", "landing.joinCta")).toBe("انضم إلى أم طوبا");
+    expect(translate("ar", "landing.joinCta")).toBe("انضم إلى UMTUBA");
     expect(translate("en", "landing.joinCta")).toBe("Join UMTUBA");
   });
 });

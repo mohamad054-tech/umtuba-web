@@ -1,5 +1,36 @@
 ﻿# Current Task
 
+## CENTRAL GO — 13 LANGUAGE DEEP LINGUISTIC QA FINAL V1
+
+**TASK_ID** = `CENTRAL_13_LANGUAGE_DEEP_LINGUISTIC_QA_FINAL_V1`
+**PRIORITY** = HIGH
+**DATE** = 2026-08-19
+**STATUS** = IN_PROGRESS
+**WORKTREE** = `D:\umtuba-central\repos\umtuba-web-13-language-deep-linguistic-qa-v1`
+**BRANCH** = `central/13-language-deep-linguistic-qa-v1`
+**BASE_SHA** = `618526c96a93f1e602e923c2e6987d0a8d020303`
+**LIVE_RELEASE** = `618526c9-20260819175541`
+**ROLLBACK** = `618526c9-20260819175541`
+**LANGUAGES_TARGET** = `ar,en,fr,es,de,pt,id,hi,ru,tr,zh-CN,ja,ko`
+**PORTUGUESE_VARIANT** = `pt-BR`
+**CHINESE_VARIANT** = `zh-CN`
+**WATCH_TERM_DECISION** = Translate surface label in all 13 locales (glossary). Not English leftover in fr/es/de/pt.
+**HELLO_CITY_TERM_DECISION** = Keep branded English **Hello City** in all 13 locales.
+
+### Allowed scope
+
+Deep linguistic QA + professional polish of user-facing product chrome. Incorrect/unnatural translations, missing chrome, terminology, localization-caused layout, hardcoded English chrome. Tests/tsc/lint/build. Deploy only if gates pass. Host `next build` must source `/etc/umtuba/production/umtuba.env`.
+
+### Forbidden scope
+
+- Do not rebuild localization architecture / registry / auto-detect
+- Do not translate UGC (posts, comments, DMs, captions, authored lessons, seller descriptions)
+- Do not add ur/ms/bn; do not restore crashing `0b6d35bd-20260819011723`
+- Do not redesign, add features, change Store/Learning restrictions, Rewards, Originals, or mobile
+- No force-push; no `git config --global`; no secrets in git
+
+---
+
 ## CENTRAL GO — PROFESSIONAL 13-LANGUAGE LOCALIZATION V1
 
 **TASK_ID** = `CENTRAL_PROFESSIONAL_13_LANGUAGE_LOCALIZATION_V1`

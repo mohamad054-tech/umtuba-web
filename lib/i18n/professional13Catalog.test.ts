@@ -114,15 +114,15 @@ describe("professional 13-language registry", () => {
     expect(translate("ko", "nav.discover")).toBe("탐색");
     expect(translate("ru", "nav.following")).toBe("Подписки");
     expect(translate("id", "menu.create")).toBe("Buat");
-    expect(translate("hi", "nav.search")).toBe("खोजें");
+    expect(translate("hi", "nav.search")).toBe("खोज");
     expect(translate("tr", "nav.discover")).toBe("Keşfet");
   });
 
-  it("keeps UMTUBA Latin and Watch as the six-locale LTR product name", () => {
-    expect(translate("fr", "watch.eyebrow")).toBe("Watch");
-    expect(translate("es", "watch.eyebrow")).toBe("Watch");
-    expect(translate("de", "watch.eyebrow")).toBe("Watch");
-    expect(translate("pt", "watch.eyebrow")).toBe("Watch");
+  it("translates Watch as a surface label and keeps UMTUBA Latin", () => {
+    expect(translate("fr", "watch.eyebrow")).toBe("Regarder");
+    expect(translate("es", "watch.eyebrow")).toBe("Ver");
+    expect(translate("de", "watch.eyebrow")).toBe("Ansehen");
+    expect(translate("pt", "watch.eyebrow")).toBe("Assistir");
     expect(translate("fr", "landing.joinCta")).toContain("UMTUBA");
     expect(translate("ja", "landing.joinCta")).toContain("UMTUBA");
     expect(translate("zh-CN", "landing.joinCta")).toContain("UMTUBA");

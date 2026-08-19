@@ -34,6 +34,46 @@ export const deMessages: FoundationMessages = {
   "landing.joinCta": "UMTUBA beitreten",
   "landing.startExploring": "Entdecken starten",
   "landing.goLive": "Live gehen",
+  "landing.badge": "Alpha 0.2 · Für eine neue Generation",
+  "landing.headline": "Die Welt lebt",
+  "landing.headlineAccent": "hier.",
+  "landing.subhead":
+    "Entdecke authentische Videos, Kulturen, Menschen, Ideen und Chancen aus jedem Winkel der Welt.",
+  "landing.worldsEyebrow": "Die UMTUBA-Welt",
+  "landing.worldsTitle": "Mehr als nur schauen.",
+  "landing.worldsTitleLine2": "Ein Ort zum Wachsen.",
+  "landing.openHomeFeed": "Start-Feed öffnen",
+  "landing.missionEyebrow": "Unsere Mission",
+  "landing.missionTitle":
+    "Die erste soziale Plattform bauen, auf der jedes Talent eine Chance bekommt.",
+  "landing.missionBody":
+    "UMTUBA beginnt mit Spaß, Entdeckung und sozialer Energie — und hilft dann, Ideen, Mitstreiter, Lernwege und echte Chancen zu finden.",
+  "landing.world.videos.title": "Videos",
+  "landing.world.videos.text":
+    "Schnelle, kreative Momente, gemacht zum Entdecken.",
+  "landing.world.challenges.title": "Challenges",
+  "landing.world.challenges.text":
+    "Tägliche Missionen, die dich wiederkommen lassen.",
+  "landing.world.ai.title": "KI-Begleiter",
+  "landing.world.ai.text":
+    "Ein verlässlicher Guide, der jedes Talent wachsen lässt.",
+  "landing.world.ideas.title": "Ideen",
+  "landing.world.ideas.text":
+    "Gedanken in Projekte, Teams und Chancen verwandeln.",
+  "landing.world.global.title": "Global",
+  "landing.world.global.text": "Eine Plattform für Creator ohne Grenzen.",
+  "landing.world.opportunities.title": "Chancen",
+  "landing.world.opportunities.text":
+    "Talent mit echten Möglichkeiten verbinden, voranzukommen.",
+  "landing.focusLivingEarth": "Lebende Erde · Fokus auf {city}",
+  "landing.focusExploring": "Lebende Erde · erkunde {city}",
+  "social.follow": "Folgen",
+  "social.following": "Folge ich",
+  "social.followError":
+    "Folgen konnte nicht aktualisiert werden. Bitte erneut versuchen.",
+  "social.followers": "Follower",
+  "social.likes": "Likes",
+  "social.views": "Aufrufe",
   "auth.login.title": "Willkommen zurück",
   "auth.login.subtitle": "Melde dich an, um bei UMTUBA weiterzumachen.",
   "auth.login.panelTitle": "Deine Welt wartet.",
@@ -260,7 +300,7 @@ export const deMessages: FoundationMessages = {
   "learning.enroll.nextActionCatalog": "Zurück zum Katalog",
   "learning.enroll.enrollAndOpenLesson": "Einschreiben und Lektion öffnen",
 
-  "learning.hub.title": "Learning",
+  "learning.hub.title": "Lernen",
   "learning.hub.subtitle": "Mein Learning",
   "learning.hub.loadError": "Mein Learning konnte nicht geladen werden",
   "learning.hub.startLearning": "Mit dem Lernen beginnen",
@@ -443,14 +483,24 @@ export const deMessages: FoundationMessages = {
   "home.games": "Spiele",
   "search.title": "Suche",
   "search.subtitle": "Finde Menschen, Videos, Stories und Shops",
+  "search.acrossTitle": "UMTUBA durchsuchen",
+  "search.acrossDescription":
+    "Finde Menschen, fertige Videos, aktive Stories von Konten, denen du folgst, Shops und Produkte.",
+  "search.openDiscover": "Entdecken öffnen",
+  "search.browseStore": "Shop durchsuchen",
+  "search.noResultsEyebrow": "Keine Treffer",
+  "search.noResultsTitle": "Keine Treffer für „{query}“",
+  "search.noResultsDescription":
+    "Versuche eine andere Schreibweise oder wechsle den Tab, um die Suche einzugrenzen.",
+  "search.storeSearch": "Shop-Suche",
   "messages.title": "Nachrichten",
   "messages.subtitle": "Direktnachrichten",
   "messages.opening": "UMTUBA-Nachrichten werden geöffnet…",
   "messages.send": "Senden",
   "messages.sending": "Wird gesendet…",
-  "watch.eyebrow": "Watch",
-  "watch.opening": "UMTUBA Watch wird geöffnet…",
-  "watch.unavailableTitle": "Watch ist gerade nicht verfügbar",
+  "watch.eyebrow": "Ansehen",
+  "watch.opening": "Ansehen wird geöffnet…",
+  "watch.unavailableTitle": "Ansehen ist gerade nicht verfügbar",
   "watch.unavailableBody":
     "Videos konnten nicht geladen werden. Versuche Entdecken oder komme gleich wieder.",
   "watch.emptyTitle": "Noch keine Videos zum Ansehen",

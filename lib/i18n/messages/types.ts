@@ -120,6 +120,14 @@ export type FoundationMessages = {
   "following.emptyCta": string;
   "following.errorTitle": string;
 
+  /** Follow CTA vs already-following state. Never Unfollow on the button. */
+  "social.follow": string;
+  "social.following": string;
+  "social.followError": string;
+  "social.followers": string;
+  "social.likes": string;
+  "social.views": string;
+
   /** Landing / welcome join + hero (UAF-03 / UAF-06). */
   "landing.joinCta": string;
   "landing.startExploring": string;
@@ -440,6 +448,14 @@ export type FoundationMessages = {
 
   "search.title": string;
   "search.subtitle": string;
+  "search.acrossTitle": string;
+  "search.acrossDescription": string;
+  "search.openDiscover": string;
+  "search.browseStore": string;
+  "search.noResultsEyebrow": string;
+  "search.noResultsTitle": string;
+  "search.noResultsDescription": string;
+  "search.storeSearch": string;
 
   "messages.title": string;
   "messages.subtitle": string;

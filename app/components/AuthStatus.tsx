@@ -11,9 +11,11 @@ import {
   type UserProfile,
 } from "../../lib/supabase/auth";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
+import { useTranslation } from "./i18n";
 
 export default function AuthStatus() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -90,7 +92,7 @@ export default function AuthStatus() {
   if (isLoading) {
     return (
       <div className="flex h-10 items-center rounded-full border border-white/10 bg-white/5 px-4 text-sm text-white/50">
-        Loading...
+        {t("status.loading")}
       </div>
     );
   }
@@ -108,7 +110,7 @@ export default function AuthStatus() {
           href={APP_ROUTES.login}
           className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10"
         >
-          Sign In
+          {t("menu.signIn")}
         </Link>
       </div>
     );
@@ -128,7 +130,7 @@ export default function AuthStatus() {
         href={APP_ROUTES.settings}
         className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10"
       >
-        Settings
+        {t("menu.settings")}
       </Link>
 
       <button
@@ -137,7 +139,7 @@ export default function AuthStatus() {
         disabled={isSigningOut}
         className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isSigningOut ? "Signing out..." : "Sign out"}
+        {isSigningOut ? t("status.signingOut") : t("menu.signOut")}
       </button>
 
       <Link

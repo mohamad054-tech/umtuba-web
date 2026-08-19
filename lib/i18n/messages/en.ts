@@ -121,6 +121,13 @@ export const enMessages: FoundationMessages = {
   "following.emptyCta": "Find creators on Home",
   "following.errorTitle": "Could not load Following",
 
+  "social.follow": "Follow",
+  "social.following": "Following",
+  "social.followError": "Unable to update follow. Please try again.",
+  "social.followers": "Followers",
+  "social.likes": "Likes",
+  "social.views": "Views",
+
   "landing.joinCta": "Join UMTUBA",
   "landing.startExploring": "Start Exploring",
   "landing.goLive": "Go Live",
@@ -478,6 +485,16 @@ export const enMessages: FoundationMessages = {
 
   "search.title": "Search",
   "search.subtitle": "Find people, videos, stories, and shops",
+  "search.acrossTitle": "Search across UMTUBA",
+  "search.acrossDescription":
+    "Find people, ready videos, active stories from people you follow, stores, and products.",
+  "search.openDiscover": "Open Discover",
+  "search.browseStore": "Browse Store",
+  "search.noResultsEyebrow": "No results",
+  "search.noResultsTitle": "No matches for “{query}”",
+  "search.noResultsDescription":
+    "Try another spelling, or switch tabs to narrow the search.",
+  "search.storeSearch": "Store search",
 
   "messages.title": "Messages",
   "messages.subtitle": "Direct messages",

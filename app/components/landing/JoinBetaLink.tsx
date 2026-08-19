@@ -16,7 +16,7 @@ type JoinUmtubaLinkProps = {
  * Landing join CTA (UAF-06).
  * - Signed out → /signup
  * - Signed in → /discover (already in the product)
- * Label via i18n (`landing.joinCta`); Arabic: انضم إلى أم طوبا.
+ * Label via i18n (`landing.joinCta`); Arabic keeps Latin UMTUBA.
  */
 export default function JoinBetaLink({
   className,

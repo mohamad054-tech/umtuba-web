@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslation } from "../../components/i18n";
+
 type ProfileStatsProps = {
   followersLabel: string;
   followingLabel: string;
@@ -11,11 +15,12 @@ export default function ProfileStats({
   likesLabel,
   viewsLabel,
 }: ProfileStatsProps) {
+  const { t } = useTranslation();
   const items = [
-    { label: "Followers", value: followersLabel },
-    { label: "Following", value: followingLabel },
-    { label: "Likes", value: likesLabel },
-    { label: "Views", value: viewsLabel },
+    { label: t("social.followers"), value: followersLabel },
+    { label: t("nav.following"), value: followingLabel },
+    { label: t("social.likes"), value: likesLabel },
+    { label: t("social.views"), value: viewsLabel },
   ];
 
   return (

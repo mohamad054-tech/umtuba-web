@@ -6,6 +6,7 @@ import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { toggleProfileFollowAction } from "../../actions/follows";
 import { APP_ROUTES, isUuid } from "../../lib/nav";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
+import { useTranslation } from "../i18n";
 
 type FollowButtonProps = {
   targetUserId: string;
@@ -38,6 +39,7 @@ export default function FollowButton({
 }: FollowButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const [following, setFollowing] = useState(Boolean(initialFollowing));
   const [syncedKey, setSyncedKey] = useState(
     () => `${targetUserId}:${Boolean(initialFollowing)}`
@@ -99,7 +101,7 @@ export default function FollowButton({
                 setErrorMessage(
                   sanitizeUserFacingMessage(
                     result.message,
-                    "Unable to update follow. Please try again."
+                    t("social.followError")
                   )
                 );
                 if (result.requiresAuth) {
@@ -120,7 +122,7 @@ export default function FollowButton({
           following ? followingStyles : idleStyles
         } ${className}`}
       >
-        {pending ? "…" : following ? "Following" : "Follow"}
+        {pending ? "…" : following ? t("social.following") : t("social.follow")}
       </button>
       {errorMessage ? (
         <p className="max-w-[14rem] text-[11px] font-medium text-red-200/90">

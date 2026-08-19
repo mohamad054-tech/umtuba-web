@@ -644,7 +644,7 @@ const pt: Catalog = {
   searchPlaceholder: "Pesquisar o catálogo da sandbox",
   cart: "Carrinho",
   checkout: "Checkout",
-  orders: "Encomendas",
+  orders: "Pedidos",
   favorites: "Favoritos",
   returns: "Devoluções",
   seller: "Vendedor",

@@ -170,7 +170,7 @@ export default async function StoreHomePage() {
       {STOREFRONT_FLAGS.SHOW_SHOPPABLE_VIDEO_RAIL ? (
         <StoreSection
           id="shoppable-video"
-          eyebrow="Watch"
+          eyebrow={t("watch.eyebrow")}
           title="Videos you can shop"
         >
           <PlaceholderPanel

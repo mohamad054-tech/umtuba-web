@@ -30,6 +30,7 @@ import {
 import { SEARCH_ERRORS, searchUserMessage } from "../../lib/search/errors";
 import { buildSearchHref } from "../../lib/search/contracts";
 import SearchShell from "./components/SearchShell";
+import { useTranslation } from "../components/i18n";
 
 type SearchExperienceProps = {
   initialQuery?: string;
@@ -76,6 +77,7 @@ export default function SearchExperience({
   initialViewerId = null,
 }: SearchExperienceProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [query, setQuery] = useState(initialQuery);
   const [tab, setTab] = useState<SearchTab>(initialTab);
   const [result, setResult] = useState<GlobalSearchResult | null>(null);
@@ -331,26 +333,26 @@ export default function SearchExperience({
         {!query.trim() && !showRecent && !loading ? (
           <ProductEmptyState
             compact
-            eyebrow="Search"
-            title="Search across UMTUBA"
-            description="Find people, ready videos, active stories from people you follow, stores, and products."
+            eyebrow={t("search.title")}
+            title={t("search.acrossTitle")}
+            description={t("search.acrossDescription")}
             primaryHref={APP_ROUTES.discover}
-            primaryLabel="Open Discover"
+            primaryLabel={t("search.openDiscover")}
             secondaryHref={APP_ROUTES.store}
-            secondaryLabel="Browse Store"
+            secondaryLabel={t("search.browseStore")}
           />
         ) : null}
 
         {showEmpty ? (
           <ProductEmptyState
             compact
-            eyebrow="No results"
-            title={`No matches for “${query.trim()}”`}
-            description="Try another spelling, or switch tabs to narrow the search."
+            eyebrow={t("search.noResultsEyebrow")}
+            title={t("search.noResultsTitle", { values: { query: query.trim() } })}
+            description={t("search.noResultsDescription")}
             primaryHref={APP_ROUTES.discover}
-            primaryLabel="Discover"
+            primaryLabel={t("nav.discover")}
             secondaryHref={APP_ROUTES.storeSearch}
-            secondaryLabel="Store search"
+            secondaryLabel={t("search.storeSearch")}
           />
         ) : null}
 

@@ -34,6 +34,46 @@ export const frMessages: FoundationMessages = {
   "landing.joinCta": "Rejoindre UMTUBA",
   "landing.startExploring": "Commencer à explorer",
   "landing.goLive": "Passer en direct",
+  "landing.badge": "Alpha 0.2 · Conçu pour une nouvelle génération",
+  "landing.headline": "Le monde vit",
+  "landing.headlineAccent": "ici.",
+  "landing.subhead":
+    "Découvrez des vidéos authentiques, des cultures, des personnes, des idées et des opportunités du monde entier.",
+  "landing.worldsEyebrow": "Le monde UMTUBA",
+  "landing.worldsTitle": "Plus que regarder.",
+  "landing.worldsTitleLine2": "Un lieu pour grandir.",
+  "landing.openHomeFeed": "Ouvrir le fil d’accueil",
+  "landing.missionEyebrow": "Notre mission",
+  "landing.missionTitle":
+    "Construire la première plateforme sociale où chaque talent a sa chance.",
+  "landing.missionBody":
+    "UMTUBA commence par le plaisir, la découverte et l’énergie sociale — puis aide progressivement à découvrir des idées, des collaborateurs, des parcours d’apprentissage et de vraies opportunités.",
+  "landing.world.videos.title": "Vidéos",
+  "landing.world.videos.text":
+    "Des moments créatifs et rapides, pensés pour la découverte.",
+  "landing.world.challenges.title": "Défis",
+  "landing.world.challenges.text":
+    "Des missions quotidiennes qui donnent envie de revenir.",
+  "landing.world.ai.title": "Compagnon IA",
+  "landing.world.ai.text":
+    "Un guide de confiance qui aide chaque talent à grandir.",
+  "landing.world.ideas.title": "Idées",
+  "landing.world.ideas.text":
+    "Transformer les pensées en projets, équipes et opportunités.",
+  "landing.world.global.title": "Mondial",
+  "landing.world.global.text": "Une plateforme pour les créateurs sans frontières.",
+  "landing.world.opportunities.title": "Opportunités",
+  "landing.world.opportunities.text":
+    "Relier les talents à de vraies chances d’avancer.",
+  "landing.focusLivingEarth": "Terre vivante · focus sur {city}",
+  "landing.focusExploring": "Terre vivante · exploration de {city}",
+  "social.follow": "Suivre",
+  "social.following": "Abonné",
+  "social.followError":
+    "Impossible de mettre à jour l’abonnement. Réessayez.",
+  "social.followers": "Abonnés",
+  "social.likes": "J’aime",
+  "social.views": "Vues",
   "auth.login.title": "Bon retour",
   "auth.login.subtitle": "Connectez-vous pour continuer sur UMTUBA.",
   "auth.login.panelTitle": "Votre monde vous attend.",
@@ -261,7 +301,7 @@ export const frMessages: FoundationMessages = {
   "learning.enroll.nextActionCatalog": "Retourner au catalogue",
   "learning.enroll.enrollAndOpenLesson": "S’inscrire et ouvrir la leçon",
 
-  "learning.hub.title": "Learning",
+  "learning.hub.title": "Apprentissage",
   "learning.hub.subtitle": "Mon Learning",
   "learning.hub.loadError": "Impossible de charger Mon Learning",
   "learning.hub.startLearning": "Commencer à apprendre",
@@ -444,14 +484,24 @@ export const frMessages: FoundationMessages = {
   "home.games": "Jeux",
   "search.title": "Recherche",
   "search.subtitle": "Trouvez des personnes, des vidéos, des stories et des boutiques",
+  "search.acrossTitle": "Rechercher sur UMTUBA",
+  "search.acrossDescription":
+    "Trouvez des personnes, des vidéos prêtes, des stories de comptes que vous suivez, des boutiques et des produits.",
+  "search.openDiscover": "Ouvrir Découvrir",
+  "search.browseStore": "Parcourir la boutique",
+  "search.noResultsEyebrow": "Aucun résultat",
+  "search.noResultsTitle": "Aucune correspondance pour « {query} »",
+  "search.noResultsDescription":
+    "Essayez une autre orthographe, ou changez d’onglet pour affiner.",
+  "search.storeSearch": "Recherche boutique",
   "messages.title": "Messagerie",
   "messages.subtitle": "Messages directs",
   "messages.opening": "Ouverture des messages UMTUBA…",
   "messages.send": "Envoyer",
   "messages.sending": "Envoi…",
-  "watch.eyebrow": "Watch",
-  "watch.opening": "Ouverture de Watch UMTUBA…",
-  "watch.unavailableTitle": "Watch est indisponible pour le moment",
+  "watch.eyebrow": "Regarder",
+  "watch.opening": "Ouverture de Regarder…",
+  "watch.unavailableTitle": "Regarder est indisponible pour le moment",
   "watch.unavailableBody":
     "Impossible de charger les vidéos. Essayez Découvrir, ou revenez dans un instant.",
   "watch.emptyTitle": "Aucune vidéo à regarder pour le moment",

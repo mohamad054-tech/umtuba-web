@@ -48,13 +48,13 @@ export const arMessages: FoundationMessages = {
   "nav.following": "المتابَعون",
   "nav.primary": "التنقل الرئيسي",
   "nav.primaryMobile": "التنقل الرئيسي للجوّال",
-  "nav.homeAria": "الصفحة الرئيسية لأمتوبة",
+  "nav.homeAria": "الصفحة الرئيسية لـ UMTUBA",
 
   "settings.title": "الإعدادات",
   "settings.subtitle": "الحساب والتفضيلات",
   "settings.sectionsLabel": "أقسام الإعدادات",
   "settings.language": "اللغة",
-  "settings.languageDescription": "اختر اللغة المستخدمة عبر أمتوبة.",
+  "settings.languageDescription": "اختر اللغة المستخدمة عبر UMTUBA.",
   "settings.profile": "الملف الشخصي",
   "settings.profileDescription": "الاسم واسم المستخدم والنبذة والموقع",
   "settings.notifications": "الإشعارات",
@@ -67,9 +67,9 @@ export const arMessages: FoundationMessages = {
   "settings.saveProfile": "حفظ الملف",
   "settings.signOut": "تسجيل الخروج",
   "settings.profileHeading": "الملف الشخصي",
-  "settings.profileIntro": "حدّث كيف تظهر عبر أمتوبة.",
+  "settings.profileIntro": "حدّث كيف تظهر عبر UMTUBA.",
   "settings.notificationsHeading": "الإشعارات",
-  "settings.notificationsIntro": "اختر ما تريد معرفة أخباره عبر أمتوبة.",
+  "settings.notificationsIntro": "اختر ما تريد معرفة أخباره عبر UMTUBA.",
   "settings.accountHeading": "الحساب",
   "settings.accountIntro": "اختصارات وتحكم بالجلسة.",
 
@@ -102,7 +102,7 @@ export const arMessages: FoundationMessages = {
   "dialog.confirmAction": "تأكيد",
 
   "empty.title": "لا يوجد محتوى بعد",
-  "empty.description": "عد لاحقًا أو جرّب مساحة أخرى في أمتوبة.",
+  "empty.description": "عد لاحقًا أو جرّب مساحة أخرى في UMTUBA.",
 
   "error.title": "حدث خطأ ما",
   "error.description": "تعذّر إكمال الطلب. يرجى المحاولة مرة أخرى.",
@@ -121,7 +121,14 @@ export const arMessages: FoundationMessages = {
   "following.emptyCta": "اعثر على صنّاع في الرئيسية",
   "following.errorTitle": "تعذّر تحميل المتابَعين",
 
-  "landing.joinCta": "انضم إلى أم طوبا",
+  "social.follow": "متابعة",
+  "social.following": "تتابع",
+  "social.followError": "تعذّر تحديث المتابعة. يرجى المحاولة مرة أخرى.",
+  "social.followers": "المتابِعون",
+  "social.likes": "الإعجابات",
+  "social.views": "المشاهدات",
+
+  "landing.joinCta": "انضم إلى UMTUBA",
   "landing.startExploring": "ابدأ الاستكشاف",
   "landing.goLive": "البث المباشر",
   "landing.badge": "ألفا 0.2 · مبني لجيل جديد",
@@ -129,7 +136,7 @@ export const arMessages: FoundationMessages = {
   "landing.headlineAccent": "هنا.",
   "landing.subhead":
     "اكتشف فيديوهات وثقافات وأشخاصًا وأفكارًا وفرصًا حقيقية من كل مكان في العالم.",
-  "landing.worldsEyebrow": "عالم أم طوبا",
+  "landing.worldsEyebrow": "عالم UMTUBA",
   "landing.worldsTitle": "أكثر من مشاهدة.",
   "landing.worldsTitleLine2": "مكان للنمو.",
   "landing.openHomeFeed": "افتح الصفحة الرئيسية",
@@ -137,7 +144,7 @@ export const arMessages: FoundationMessages = {
   "landing.missionTitle":
     "ابنِ أول منصة اجتماعية يحصل فيها كل موهبة على فرصتها.",
   "landing.missionBody":
-    "تبدأ أم طوبا بالمتعة والاكتشاف والطاقة الاجتماعية — ثم تساعد المستخدمين تدريجيًا على اكتشاف الأفكار والشركاء ومسارات التعلم والفرص الحقيقية.",
+    "تبدأ UMTUBA بالمتعة والاكتشاف والطاقة الاجتماعية — ثم تساعد المستخدمين تدريجيًا على اكتشاف الأفكار والشركاء ومسارات التعلم والفرص الحقيقية.",
   "landing.world.videos.title": "فيديوهات",
   "landing.world.videos.text": "لحظات سريعة وإبداعية مصممة للاكتشاف.",
   "landing.world.challenges.title": "تحديات",
@@ -156,9 +163,9 @@ export const arMessages: FoundationMessages = {
 
   "auth.shell.panelTitle": "أنشئ. اكتشف. انمُ.",
   "auth.shell.panelBody":
-    "انضم إلى أمتوبة للفيديوهات والاكتشاف المباشر وصنّاع المحتوى حول العالم.",
+    "انضم إلى UMTUBA للفيديوهات والاكتشاف المباشر وصنّاع المحتوى حول العالم.",
   "auth.login.title": "مرحبًا بعودتك",
-  "auth.login.subtitle": "سجّل الدخول للمتابعة إلى أمتوبة.",
+  "auth.login.subtitle": "سجّل الدخول للمتابعة إلى UMTUBA.",
   "auth.login.panelTitle": "عالمك بانتظارك.",
   "auth.login.panelBody": "تابع إلى ملفك، أو إلى حيث توقفت.",
   "auth.login.noAccount": "ليس لديك حساب؟",
@@ -197,7 +204,7 @@ export const arMessages: FoundationMessages = {
   "auth.signup.termsOfUse": "شروط الاستخدام",
   "auth.signup.acceptAnd": "و",
   "auth.signup.privacyPolicy": "سياسة الخصوصية",
-  "auth.signup.acceptAfter": " الخاصة بأمتوبة.",
+  "auth.signup.acceptAfter": " الخاصة بـ UMTUBA.",
   "auth.signup.back": "رجوع",
   "auth.signup.create": "إنشاء حساب",
   "auth.signup.creating": "جارٍ إنشاء الحساب...",
@@ -213,8 +220,8 @@ export const arMessages: FoundationMessages = {
   "auth.signup.editDetails": "تعديل بيانات التسجيل",
   "auth.signup.goToSignIn": "الانتقال لتسجيل الدخول",
   "auth.signup.youreInTitle": "أنت داخل المنصة",
-  "auth.signup.youreInSubtitle": "حساب أمتوبة جاهز.",
-  "auth.signup.welcomePanelTitle": "مرحبًا بك في أمتوبة.",
+  "auth.signup.youreInSubtitle": "حساب UMTUBA جاهز.",
+  "auth.signup.welcomePanelTitle": "مرحبًا بك في UMTUBA.",
   "auth.signup.welcomePanelBody":
     "تم إنشاء ملفك. تابع إلى وجهتك أو افتح ملفك.",
   "auth.signup.preferFeed": "تفضل الخلاصة؟",
@@ -223,14 +230,14 @@ export const arMessages: FoundationMessages = {
   "auth.signup.continueLeftOff": "المتابعة من حيث توقفت",
   "auth.signup.viewProfile": "عرض الملف",
 
-  "world.eyebrow": "عالم أمتوبة",
+  "world.eyebrow": "عالم UMTUBA",
   "world.navTitle": "اكتشاف العالم",
   "world.navSubtitleLive": "أماكن ووجهات",
   "world.navSubtitleHold": "غير متاح بعد",
   "world.titleLive": "استكشف وجهة بطريقتك",
   "world.titleHold": "اكتشاف العالم معلّق",
   "world.introLive":
-    "اكتشف متاجر ومطاعم وفنادق ومقاهي وخدمات محلية عامة معتمدة. الموقع من جهازك واختياري دائمًا؛ أمتوبة لا تخزّن موقعك الدقيق هنا.",
+    "اكتشف متاجر ومطاعم وفنادق ومقاهي وخدمات محلية عامة معتمدة. الموقع من جهازك واختياري دائمًا؛ UMTUBA لا تخزّن موقعك الدقيق هنا.",
   "world.hold.migrations":
     "ترحيلات قاعدة بيانات اكتشاف العالم غير متاحة في هذه البيئة بعد.",
   "world.hold.flagOff":
@@ -266,7 +273,7 @@ export const arMessages: FoundationMessages = {
   "world.empty.unknownDestination":
     "هذه الوجهة ليست في كتالوج العالم بعد: {city}. اختر مدينة مدرجة، أو تصفّح من دون وجهة مسبقة.",
   "world.verified": "موثّق",
-  "world.helloCity": "مرحبًا بالمدينة",
+  "world.helloCity": "Hello City",
   "world.helloCityHelp": "النشر صريح ومراجع وعلى مستوى المدينة فقط.",
   "world.search.navTitle": "بحث العالم",
   "world.search.navSubtitleLive": "مدن وأماكن وفئات",
@@ -465,15 +472,24 @@ export const arMessages: FoundationMessages = {
 
   "search.title": "بحث",
   "search.subtitle": "اعثر على أشخاص وفيديوهات وقصص ومتاجر",
+  "search.acrossTitle": "البحث في UMTUBA",
+  "search.acrossDescription":
+    "اعثر على أشخاص وفيديوهات جاهزة وقصص ممن تتابعهم ومتاجر ومنتجات.",
+  "search.openDiscover": "فتح اكتشف",
+  "search.browseStore": "تصفح المتجر",
+  "search.noResultsEyebrow": "لا نتائج",
+  "search.noResultsTitle": "لا تطابق لـ “{query}”",
+  "search.noResultsDescription": "جرّب إملاءً آخر أو بدّل التبويب لتضييق البحث.",
+  "search.storeSearch": "بحث المتجر",
 
   "messages.title": "الرسائل",
   "messages.subtitle": "رسائل مباشرة",
-  "messages.opening": "جارٍ فتح رسائل أمتوبة…",
+  "messages.opening": "جارٍ فتح رسائل UMTUBA…",
   "messages.send": "إرسال",
   "messages.sending": "جارٍ الإرسال…",
 
   "watch.eyebrow": "المشاهدة",
-  "watch.opening": "جارٍ فتح مشاهدة أمتوبة…",
+  "watch.opening": "جارٍ فتح المشاهدة…",
   "watch.unavailableTitle": "المشاهدة غير متاحة الآن",
   "watch.unavailableBody":
     "تعذّر تحميل الفيديوهات. جرّب الاكتشاف، أو عد بعد قليل.",

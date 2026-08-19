@@ -68,7 +68,7 @@ describe("App Shell translation V1", () => {
 
   it("localizes landing join CTA (UAF-06) without hardcoding Arabic globally", () => {
     expect(translate("en", "landing.joinCta")).toBe("Join UMTUBA");
-    expect(translate("ar", "landing.joinCta")).toBe("انضم إلى أم طوبا");
+    expect(translate("ar", "landing.joinCta")).toBe("انضم إلى UMTUBA");
     expect(translate("fr", "landing.joinCta")).toBe("Rejoindre UMTUBA");
     expect(translate("en", "landing.startExploring")).toBe("Start Exploring");
     expect(translate("ar", "landing.startExploring")).toBe("ابدأ الاستكشاف");
@@ -109,7 +109,7 @@ describe("App Shell translation V1", () => {
     expect(translate("fr", "following.title")).toBe("Abonnements");
     expect(translate("es", "following.title")).toBe("Siguiendo");
     expect(translate("de", "following.title")).toBe("Folge ich");
-    expect(translate("pt", "following.title")).toBe("A seguir");
+    expect(translate("pt", "following.title")).toBe("Seguindo");
   });
 
   it("localizes remaining chrome for all six locales", () => {
@@ -138,9 +138,7 @@ describe("App Shell translation V1", () => {
       const english = translate("en", key);
       for (const locale of ["ar", "fr", "es", "de", "pt"] as const) {
         expect(translate(locale, key).length).toBeGreaterThan(0);
-        if (key !== "watch.eyebrow") {
-          expect(translate(locale, key)).not.toBe(english);
-        }
+        expect(translate(locale, key)).not.toBe(english);
       }
     }
   });

@@ -30,7 +30,9 @@ describe("A1 user-reported final blockers V2", () => {
 
   it("FOLLOW primary label is Following (never Unfollow as primary)", () => {
     const follow = read("app/components/social/FollowButton.tsx");
-    expect(follow).toMatch(/following \? "Following" : "Follow"/);
+    expect(follow).toMatch(
+      /following \? t\("social\.following"\) : t\("social\.follow"\)/
+    );
     // No "Unfollow" primary label anywhere in the control.
     expect(follow).not.toMatch(/"Unfollow"/);
     expect(follow).not.toMatch(/>\s*Unfollow\s*</);
