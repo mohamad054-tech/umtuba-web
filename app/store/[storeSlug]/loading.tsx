@@ -1,9 +1,13 @@
 import StoreShell from "../../components/store/StoreShell";
 import { StoreHomeSkeleton } from "../../components/store/StoreSkeleton";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 
-export default function StoreProfileLoading() {
+export default async function StoreProfileLoading() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   return (
-    <StoreShell title="Store" subtitle="Loading">
+    <StoreShell title={t("store.shell.title")} subtitle={t("store.shell.loading")}>
       <StoreHomeSkeleton />
     </StoreShell>
   );

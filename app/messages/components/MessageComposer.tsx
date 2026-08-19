@@ -8,6 +8,7 @@ import {
   normalizeComposerDraft,
   shouldClearDraftAfterSend,
 } from "../lib/composerPolicy";
+import { useTranslation } from "../../components/i18n";
 import type { Message } from "../types";
 
 const EMOJI_SET = ["😀", "🔥", "✨", "💙", "🌍", "🙌", "😂", "❤️", "🚀", "👍"];
@@ -43,6 +44,7 @@ export default function MessageComposer({
   onCancelEdit,
   onSaveEdit,
 }: MessageComposerProps) {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [pending, setPending] = useState(false);
@@ -216,14 +218,20 @@ export default function MessageComposer({
           aria-label={
             pending
               ? isEditing
-                ? "Saving edit"
-                : "Sending message"
+                ? t("status.saving")
+                : t("messages.sending")
               : isEditing
-                ? "Save edit"
-                : "Send message"
+                ? t("actions.save")
+                : t("messages.send")
           }
         >
-          {pending ? (isEditing ? "Saving…" : "Sending…") : isEditing ? "Save" : "Send"}
+          {pending
+            ? isEditing
+              ? t("status.saving")
+              : t("messages.sending")
+            : isEditing
+              ? t("actions.save")
+              : t("messages.send")}
         </button>
       </div>
       <p className="sr-only">Enter sends. Shift+Enter inserts a new line.</p>

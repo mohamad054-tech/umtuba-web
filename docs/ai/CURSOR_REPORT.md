@@ -1,56 +1,32 @@
-# CURSOR_REPORT — Learning sandbox exercise runtime fix V1
+# CURSOR_REPORT — Resume yesterday localization work V1
+
+Resumed leftover chrome quality after live locale auto-detection `f1fe053c`. Did not restart the locale engine. Six-locale shell pass + store-profile About/Currency + sandbox commercial/rights chrome.
 
 ```text
-TASK_ID = CENTRAL_LEARNING_SANDBOX_EXERCISE_RUNTIME_FIX_V1
-STATUS = IMPLEMENTED
-DEFECT_REPRODUCED = YES
-ROOT_CAUSE = useSyncExternalStore getSnapshot returned a new object on every localStorage read, so the first hydrated Learning action (pe-m1-l1-ex) infinite-looped into the generic page-load error. The exercise ID is valid.
-FAILED_EXERCISE_ID = pe-m1-l1-ex
-TOTAL_LESSON_EXERCISES = 24
-TOTAL_COURSE_EXERCISES = 8
-ALL_EXERCISE_IDS_VALID = YES
-ALL_EXERCISE_ROUTES_VALID = YES
-CONTENT_REWRITTEN = NO
-EXERCISE_RUNTIME = FIXED
-EXERCISE_COMPLETION = FIXED
-PROGRESS_UPDATE = YES
-PLATFORM_ESSENTIALS = PASS
-DIGITAL_SAFETY = PASS
-AI_FUNDAMENTALS = PASS
-TESTS = PASS
+TASK_ID = CENTRAL_RESUME_YESTERDAY_LOCALIZATION_WORK_V1
+YESTERDAY_TASK_ID = CENTRAL_UNIFIED_WEB_LOCALE_AUTO_DETECTION_V1
+YESTERDAY_CHECKPOINT_FOUND = YES
+RESUMED_FROM_EXACT_CHECKPOINT = f1fe053c / CENTRAL_UNIFIED_WEB_LOCALE_AUTO_DETECTION_V1 ENGLISH_LEAKAGE=RESIDUAL
+STATUS = IMPLEMENTED_LOCAL
+PARENT_LIVE = f1fe053c5bdad86409b830626a38e24b6d26e287
+BRANCH = central/resume-yesterday-localization-v1
+WORKTREE = D:\umtuba-central\repos\umtuba-web-resume-yesterday-localization-v1
+LANGUAGES = ar,en,fr,es,de,pt
+TESTS = PASS (83 related)
 TYPECHECK = PASS
-LINT = PASS
+LINT = PASS (0 new errors; pre-existing hooks/img on Watch/Discover/MessageComposer/storeSlug)
 BUILD = PASS
-SOURCE_SHA = (commit pending)
-DEPLOY_PERFORMED = NO
-SANDBOX_SHA_AFTER = (pending)
-PRODUCTION_LEARNING_DISTURBED = NO
-STORE_SANDBOX_DISTURBED = NO
+BUILD_ENV_SOURCED = PENDING_HOST
 MOBILE_DISTURBED = NO
-ANONYMOUS_DENIED = YES
 ```
 
 ## Summary
 
-Fixed the private Learning sandbox exercise crash. `pe-m1-l1-ex` is a real lesson exercise. The generic “This page couldn’t load” came from an unstable `useSyncExternalStore` snapshot, not a missing fixture. Cached the client store, completed lesson→exercise→save→progress→return, audited all 24+8 Originals exercise IDs/routes, and added Learning-specific unavailable UX for missing/invalid IDs without masking real exceptions.
+Yesterday’s locale-resolution engine is already in production. Remaining authorized work was chrome quality for all six locales and residual English leakage (store-profile About/Currency, sandbox commercial/rights, fr/es/de/pt shell inheritance). Authored lessons and synthetic product names were not translated.
 
 ## Exact files changed
 
-- `app/components/sandbox/learning/LearningActions.tsx`
-- `app/components/sandbox/learning/LearningSandbox.tsx`
-- `app/sandbox/business-preview/error.tsx`
-- `lib/sandbox/i18n.ts`
-- `lib/sandbox/learning/clickPath.ts`
-- `lib/sandbox/learning/clientStore.ts`
-- `lib/sandbox/learning/clientStore.test.ts`
-- `lib/sandbox/learning/exerciseRuntime.ts`
-- `lib/sandbox/learning/exercise.runtime.test.ts`
-- `lib/sandbox/learning/exercise.render.test.ts`
-- `lib/sandbox/learning/i18n.learning.test.ts`
-- `lib/sandbox/learning/index.ts`
-- `lib/sandbox/learning/routes.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+See git status on `central/resume-yesterday-localization-v1`.
 
 ## Migrations created
 
@@ -58,16 +34,11 @@ None.
 
 ## Security review
 
-- Sandbox remains AUTH_REQUIRED / private
-- Guest deny unchanged
-- No production `/learning` persistence
-- No secrets printed
-- Store 26-SKU and mobile untouched
-- Rewards / locale branches not mixed
+No auth/RLS change. Sandbox stays private. No secrets printed. Store/Learning restrictions unchanged.
 
 ## Tests
 
-`npx vitest run lib/sandbox` PASS (86). Exercise render tests PASS (`pe-m1-l1-ex` + unavailable).
+`vitest` 83 related PASS.
 
 ## TypeScript
 
@@ -75,17 +46,14 @@ None.
 
 ## Build
 
-`npm run build` PASS in a clean dependency tree (Next 16.2.10). Sandbox routes `/sandbox/business-preview`, `[...section]`, and `/enter` are in the route table.
+Local `npm run build` PASS.
 
 ## git diff --check
 
 PASS.
 
-## git status --short
-
-See live `git status` at commit time.
-
 ## Open issues
 
-- Authorized live browser walkthrough still needs the PO signed-in `platform_admins` session
-- Locale auto-detection waits for `EXERCISE_FINAL_BASE_SHA` after this cutover
+- Authored lessons / synthetic product names remain source-language (intentional)
+- Some landing/world brand labels (Hello City, UMTUBA World) stay mixed
+- Host deploy still required after this local implementation

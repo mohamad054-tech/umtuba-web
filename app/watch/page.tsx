@@ -14,6 +14,8 @@ import {
 } from "../../lib/site/videoSeo";
 import { loadPublicVideoSeoById } from "../../lib/supabase/publicVideoSeo";
 import ProductEmptyState from "../components/product/ProductEmptyState";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { demoVideos } from "../data/videos";
 import { APP_ROUTES } from "../lib/nav";
 import { allowWatchDemoFallback } from "../lib/product/surfaceGates";
@@ -57,7 +59,9 @@ export async function generateMetadata({
   return buildWatchPostMetadata(video);
 }
 
-function WatchFallback() {
+async function WatchFallback() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -65,7 +69,7 @@ function WatchFallback() {
         <div className="absolute right-[-10%] top-[20%] h-96 w-96 rounded-full bg-purple-600/20 blur-3xl" />
       </div>
       <p className="relative rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 backdrop-blur">
-        Opening UMTUBA Watch...
+        {t("watch.opening")}
       </p>
     </main>
   );
@@ -78,10 +82,12 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
   const focus =
     Number.isInteger(focusPostId) && focusPostId > 0 ? focusPostId : null;
 
-  const [result, user] = await Promise.all([
+  const [result, user, localeResult] = await Promise.all([
     getWatchVideosPageServer({ focusPostId: focus }),
     getServerUser().catch(() => null),
+    resolveRequestLocale(),
   ]);
+  const t = createTranslator(localeResult.locale);
   const initialViewerId = user?.id ?? null;
   const demoAllowed = allowWatchDemoFallback();
 
@@ -100,13 +106,13 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
 
     return (
       <ProductEmptyState
-        eyebrow="Watch"
-        title="Watch is unavailable right now"
-        description="We couldn’t load videos. Try Discover, or come back in a moment."
+        eyebrow={t("watch.eyebrow")}
+        title={t("watch.unavailableTitle")}
+        description={t("watch.unavailableBody")}
         primaryHref={APP_ROUTES.discover}
-        primaryLabel="Open Discover"
+        primaryLabel={t("watch.openDiscover")}
         secondaryHref={APP_ROUTES.createVideo}
-        secondaryLabel="Upload a video"
+        secondaryLabel={t("watch.uploadVideo")}
       />
     );
   }
@@ -125,13 +131,13 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
 
     return (
       <ProductEmptyState
-        eyebrow="Watch"
-        title="No videos to watch yet"
-        description="When creators publish videos, they’ll appear here. Explore Discover or upload your first clip."
+        eyebrow={t("watch.eyebrow")}
+        title={t("watch.emptyTitle")}
+        description={t("watch.emptyBody")}
         primaryHref={APP_ROUTES.discover}
-        primaryLabel="Open Discover"
+        primaryLabel={t("watch.openDiscover")}
         secondaryHref={APP_ROUTES.createVideo}
-        secondaryLabel="Upload a video"
+        secondaryLabel={t("watch.uploadVideo")}
       />
     );
   }

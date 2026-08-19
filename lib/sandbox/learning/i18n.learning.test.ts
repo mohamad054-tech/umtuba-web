@@ -34,4 +34,16 @@ describe("Learning sandbox Arabic chrome", () => {
     expect(SANDBOX_MESSAGE_KEYS).toContain("authoredSourceLanguage");
     expect(sandboxT("ar", "authoredSourceLanguage")).toMatch(ARABIC);
   });
+
+  it("localizes commercial and rights chrome for all six locales", () => {
+    expect(sandboxT("en", "commercial")).toBe("Commercial model");
+    expect(sandboxT("ar", "commercial")).toMatch(ARABIC);
+    expect(sandboxT("fr", "commercial")).toBe("Modèle commercial");
+    expect(sandboxT("es", "rights")).toBe("Derechos");
+    expect(sandboxT("de", "rights")).toBe("Rechte");
+    expect(sandboxT("pt", "commercial")).toBe("Modelo comercial");
+    expect(sandboxT("fr", "authoredSourceLanguage")).not.toBe(
+      sandboxT("en", "authoredSourceLanguage")
+    );
+  });
 });

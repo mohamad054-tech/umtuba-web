@@ -27,7 +27,7 @@ import {
   INITIAL_LIVING_NAVIGATION_STATE,
   reduceLivingNavigation,
 } from "../components/video/living-navigation/livingNavigationModel";
-import { LanguageSelector } from "../components/i18n";
+import { LanguageSelector, useTranslation } from "../components/i18n";
 import UserMenu from "../components/UserMenu";
 import {
   loadWatchFeedPageAction,
@@ -107,6 +107,7 @@ export default function WatchExperience({
   usedDemoFallback = false,
   initialViewerId = null,
 }: WatchExperienceProps) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const stageRef = useRef<HTMLDivElement>(null);
   const recordedViewsRef = useRef<Set<number>>(new Set());
@@ -577,7 +578,7 @@ export default function WatchExperience({
                   disabled={isLoadingMore}
                   className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-black disabled:opacity-50"
                 >
-                  {isLoadingMore ? "Loading…" : "Retry"}
+                  {isLoadingMore ? t("status.loading") : t("actions.retry")}
                 </button>
               </div>
             </div>

@@ -60,6 +60,6 @@ describe("Page Assembly V1 — routes", () => {
     expect(circles).toMatch(/APP_ROUTES\.live/);
     const shell = read("app/discover/components/DiscoverShell.tsx");
     expect(shell).toMatch(/HomeSectionCircles/);
-    expect(shell).toMatch(/title="Home"/);
+    expect(shell).toMatch(/title=\{t\("nav\.home"\)\}/);
   });
 });

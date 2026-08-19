@@ -66,35 +66,37 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
 
   const aboutPanel = (
     <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
-      <h2 className="sf-display text-lg font-semibold tracking-tight">About</h2>
+      <h2 className="sf-display text-lg font-semibold tracking-tight">
+        {t("store.profile.about")}
+      </h2>
       <p
         dir="auto"
         className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]"
       >
-        {store.description || "This store has not added an about section yet."}
+        {store.description || t("store.profile.aboutEmpty")}
       </p>
       <dl className="mt-5 grid gap-3 sm:grid-cols-2 text-sm">
         <div className="rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3">
           <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-faint)]">
-            Currency
+            {t("store.profile.currency")}
           </dt>
           <dd className="mt-1 font-semibold">{store.default_currency}</dd>
         </div>
         <div className="rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3">
           <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-faint)]">
-            Country
+            {t("store.profile.country")}
           </dt>
           <dd className="mt-1 font-semibold">{store.country_code ?? "—"}</dd>
         </div>
         <div className="rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3">
           <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-faint)]">
-            City
+            {t("store.profile.city")}
           </dt>
           <dd className="mt-1 font-semibold">{store.city ?? "—"}</dd>
         </div>
         <div className="rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3">
           <dt className="text-[10px] font-bold uppercase tracking-wider text-[var(--sf-faint)]">
-            Contact
+            {t("store.profile.contact")}
           </dt>
           <dd className="mt-1 space-y-0.5 font-semibold">
             {store.public_contact_email || store.public_contact_phone ? (
@@ -153,7 +155,7 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
             <div className="flex items-end gap-4">
               <div
                 className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[22px] border border-[rgba(214,196,161,0.4)] bg-[linear-gradient(145deg,rgba(214,196,161,0.28),rgba(255,255,255,0.06))] text-2xl font-semibold text-[var(--sf-accent-strong)] shadow-lg shadow-black/40"
-                aria-label={`Logo for ${store.name}`}
+                aria-label={t("store.profile.logoFor", { values: { name: store.name } })}
               >
                 {logoUrl ? (
                   <img
@@ -180,7 +182,7 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
                         : "border border-[var(--sf-line)] bg-white/5 text-[var(--sf-faint)]"
                     }`}
                   >
-                    {verified ? "Verified" : "Unverified"}
+                    {verified ? t("store.profile.verified") : t("store.profile.unverified")}
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-[var(--sf-faint)]">@{store.slug}</p>
@@ -191,7 +193,7 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
                 ) : null}
                 {STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB ? (
                   <p className="mt-2 text-xs text-[var(--sf-faint)]">
-                    Ratings not available yet
+                    {t("store.profile.ratingsSoon")}
                   </p>
                 ) : null}
               </div>
@@ -202,10 +204,10 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
                 type="button"
                 disabled
                 aria-disabled="true"
-                title="Follow is not available yet"
+                title={t("store.profile.followSoon")}
                 className="cursor-not-allowed rounded-full border border-[var(--sf-line)] bg-white/5 px-5 py-2.5 text-sm font-semibold text-[var(--sf-faint)]"
               >
-                Follow
+                {t("store.profile.follow")}
               </button>
             ) : null}
           </div>

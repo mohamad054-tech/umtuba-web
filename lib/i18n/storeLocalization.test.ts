@@ -65,6 +65,8 @@ describe("Store English-leakage source scan", () => {
       "app/components/store/StoreTrustStrip.tsx",
       "app/components/store/HeroCarousel.tsx",
       "app/store/page.tsx",
+      "app/store/[storeSlug]/page.tsx",
+      "app/components/store/StoreProfileTabs.tsx",
     ];
     const forbidden = [
       '"Orders"',
@@ -78,6 +80,10 @@ describe("Store English-leakage source scan", () => {
       '"Catalog prices"',
       '"Quoted at checkout"',
       '"One seller, one order"',
+      ">About<",
+      ">Currency<",
+      ">Country<",
+      ">Verified<",
     ];
     const root = resolve(process.cwd());
     for (const file of files) {

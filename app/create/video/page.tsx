@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import AppTopNav from "../../components/AppTopNav";
 import { APP_ROUTES } from "../../lib/nav";
+import { createTranslator } from "../../../lib/i18n";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createVideoMetadata } from "../../../lib/site/routeMetadata";
 import { getServerUser } from "../../../lib/supabase/server";
 import CreateVideoForm from "./CreateVideoForm";
@@ -17,6 +19,8 @@ export default async function CreateVideoPage() {
       `${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.createVideo)}`
     );
   }
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
 
   return (
     <main className="relative min-h-screen bg-[#050510] text-white max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]">
@@ -26,14 +30,14 @@ export default async function CreateVideoPage() {
       </div>
 
       <AppTopNav
-        title="Create"
-        subtitle="Upload to Discover"
+        title={t("create.title")}
+        subtitle={t("create.uploadSubtitle")}
         actions={
           <Link
             href={APP_ROUTES.create}
             className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:bg-white/10 hover:text-white"
           >
-            Back to Create
+            {t("create.backToCreate")}
           </Link>
         }
       />

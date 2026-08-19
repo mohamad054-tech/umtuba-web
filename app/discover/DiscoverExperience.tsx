@@ -23,6 +23,7 @@ import {
 } from "../lib/video/feedPagination";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import StoryRail from "../stories/components/StoryRail";
+import { useTranslation } from "../components/i18n";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
@@ -41,6 +42,7 @@ export default function DiscoverExperience({
   loadError = null,
   initialViewerId = null,
 }: DiscoverExperienceProps) {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const cityParam = searchParams.get("city");
   const postParam = searchParams.get("post");
@@ -241,13 +243,13 @@ export default function DiscoverExperience({
           <div className="flex flex-1 items-center justify-center px-6 py-16">
             <ProductEmptyState
               compact
-              eyebrow="Discover"
-              title="No video posts yet"
-              description="Be the first to publish a clip. Uploads appear here after they are saved securely."
+              eyebrow={t("nav.discover")}
+              title={t("status.empty")}
+              description={t("empty.description")}
               primaryHref={APP_ROUTES.createVideo}
-              primaryLabel="Upload a video"
+              primaryLabel={t("watch.uploadVideo")}
               secondaryHref={APP_ROUTES.live}
-              secondaryLabel="Browse Live"
+              secondaryLabel={t("nav.live")}
             />
           </div>
         </div>
@@ -329,7 +331,7 @@ export default function DiscoverExperience({
                     disabled={isLoadingMore}
                     className="shrink-0 rounded-full bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] text-black disabled:opacity-50"
                   >
-                    {isLoadingMore ? "Loading…" : "Retry"}
+                    {isLoadingMore ? t("status.loading") : t("actions.retry")}
                   </button>
                 </div>
               </div>

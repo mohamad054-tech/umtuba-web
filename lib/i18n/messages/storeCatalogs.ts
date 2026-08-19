@@ -275,6 +275,33 @@ export const storeEnMessages: StoreMessages = {
   "store.demo.deniedTitle": "Demo preview is off",
   "store.demo.deniedBody":
     "This catalog is for authorized QA only and is hidden from ordinary shoppers.",
+  "store.profile.about": "About",
+  "store.profile.aboutEmpty": "This store has not added an about section yet.",
+  "store.profile.currency": "Currency",
+  "store.profile.country": "Country",
+  "store.profile.city": "City",
+  "store.profile.contact": "Contact",
+  "store.profile.verified": "Verified",
+  "store.profile.unverified": "Unverified",
+  "store.profile.logoFor": "Logo for {name}",
+  "store.profile.ratingsSoon": "Ratings not available yet",
+  "store.profile.follow": "Follow",
+  "store.profile.followSoon": "Follow is not available yet",
+  "store.profile.tabsAria": "Store sections",
+  "store.profile.tabProducts": "Products",
+  "store.profile.tabAbout": "About",
+  "store.profile.tabVideos": "Videos",
+  "store.profile.tabLive": "Live",
+  "store.profile.tabRatings": "Ratings",
+  "store.profile.videosTitle": "Store videos",
+  "store.profile.videosBody":
+    "Shoppable videos for this storefront arrive in a later phase.",
+  "store.profile.liveTitle": "Live shopping",
+  "store.profile.liveBody":
+    "Live sessions from this store will appear here when Live Shopping ships.",
+  "store.profile.ratingsTitle": "Ratings",
+  "store.profile.ratingsBody":
+    "Store ratings and reviews are placeholders until the ratings system launches.",
 };
 
 export const storeArMessages: StoreMessages = {
@@ -549,6 +576,33 @@ export const storeArMessages: StoreMessages = {
   "store.demo.deniedTitle": "المعاينة التجريبية متوقفة",
   "store.demo.deniedBody":
     "هذا الكتالوج لمراجعة الجودة المصرّح بها فقط وهو مخفي عن المتسوقين العاديين.",
+  "store.profile.about": "حول المتجر",
+  "store.profile.aboutEmpty": "لم يُضف هذا المتجر قسمًا تعريفيًا بعد.",
+  "store.profile.currency": "العملة",
+  "store.profile.country": "البلد",
+  "store.profile.city": "المدينة",
+  "store.profile.contact": "التواصل",
+  "store.profile.verified": "موثّق",
+  "store.profile.unverified": "غير موثّق",
+  "store.profile.logoFor": "شعار {name}",
+  "store.profile.ratingsSoon": "التقييمات غير متاحة بعد",
+  "store.profile.follow": "متابعة",
+  "store.profile.followSoon": "المتابعة غير متاحة بعد",
+  "store.profile.tabsAria": "أقسام المتجر",
+  "store.profile.tabProducts": "المنتجات",
+  "store.profile.tabAbout": "حول",
+  "store.profile.tabVideos": "فيديوهات",
+  "store.profile.tabLive": "مباشر",
+  "store.profile.tabRatings": "التقييمات",
+  "store.profile.videosTitle": "فيديوهات المتجر",
+  "store.profile.videosBody":
+    "فيديوهات التسوق لهذا المتجر تصل في مرحلة لاحقة.",
+  "store.profile.liveTitle": "التسوق المباشر",
+  "store.profile.liveBody":
+    "الجلسات المباشرة من هذا المتجر ستظهر هنا عند إطلاق التسوق المباشر.",
+  "store.profile.ratingsTitle": "التقييمات",
+  "store.profile.ratingsBody":
+    "تقييمات المتجر ومراجعاته عناصر نائبة حتى إطلاق نظام التقييم.",
 };
 
 export const storeFrMessages: StoreMessages = {
@@ -826,6 +880,33 @@ export const storeFrMessages: StoreMessages = {
   "store.demo.deniedTitle": "Aperçu démo désactivé",
   "store.demo.deniedBody":
     "Ce catalogue est réservé au QA autorisé et caché aux acheteurs ordinaires.",
+  "store.profile.about": "À propos",
+  "store.profile.aboutEmpty": "Cette boutique n’a pas encore ajouté de présentation.",
+  "store.profile.currency": "Devise",
+  "store.profile.country": "Pays",
+  "store.profile.city": "Ville",
+  "store.profile.contact": "Contact",
+  "store.profile.verified": "Vérifiée",
+  "store.profile.unverified": "Non vérifiée",
+  "store.profile.logoFor": "Logo de {name}",
+  "store.profile.ratingsSoon": "Les notes ne sont pas encore disponibles",
+  "store.profile.follow": "Suivre",
+  "store.profile.followSoon": "Le suivi n’est pas encore disponible",
+  "store.profile.tabsAria": "Sections de la boutique",
+  "store.profile.tabProducts": "Produits",
+  "store.profile.tabAbout": "À propos",
+  "store.profile.tabVideos": "Vidéos",
+  "store.profile.tabLive": "Direct",
+  "store.profile.tabRatings": "Notes",
+  "store.profile.videosTitle": "Vidéos de la boutique",
+  "store.profile.videosBody":
+    "Les vidéos achetable de cette vitrine arriveront plus tard.",
+  "store.profile.liveTitle": "Shopping en direct",
+  "store.profile.liveBody":
+    "Les sessions en direct de cette boutique apparaîtront ici quand le shopping en direct sera lancé.",
+  "store.profile.ratingsTitle": "Notes",
+  "store.profile.ratingsBody":
+    "Les notes et avis de la boutique sont des placeholders jusqu’au lancement du système de notes.",
 };
 
 export const storeEsMessages: StoreMessages = {
@@ -1103,6 +1184,33 @@ export const storeEsMessages: StoreMessages = {
   "store.demo.deniedTitle": "La vista previa demo está desactivada",
   "store.demo.deniedBody":
     "Este catálogo es solo para QA autorizado y está oculto a compradores ordinarios.",
+  "store.profile.about": "Acerca de",
+  "store.profile.aboutEmpty": "Esta tienda aún no ha añadido una sección de información.",
+  "store.profile.currency": "Moneda",
+  "store.profile.country": "País",
+  "store.profile.city": "Ciudad",
+  "store.profile.contact": "Contacto",
+  "store.profile.verified": "Verificada",
+  "store.profile.unverified": "No verificada",
+  "store.profile.logoFor": "Logotipo de {name}",
+  "store.profile.ratingsSoon": "Las valoraciones aún no están disponibles",
+  "store.profile.follow": "Seguir",
+  "store.profile.followSoon": "Seguir aún no está disponible",
+  "store.profile.tabsAria": "Secciones de la tienda",
+  "store.profile.tabProducts": "Productos",
+  "store.profile.tabAbout": "Acerca de",
+  "store.profile.tabVideos": "Vídeos",
+  "store.profile.tabLive": "En vivo",
+  "store.profile.tabRatings": "Valoraciones",
+  "store.profile.videosTitle": "Vídeos de la tienda",
+  "store.profile.videosBody":
+    "Los vídeos comprables de esta tienda llegarán en una fase posterior.",
+  "store.profile.liveTitle": "Compras en vivo",
+  "store.profile.liveBody":
+    "Las sesiones en vivo de esta tienda aparecerán aquí cuando se lance Live Shopping.",
+  "store.profile.ratingsTitle": "Valoraciones",
+  "store.profile.ratingsBody":
+    "Las valoraciones y reseñas son marcadores de posición hasta que se lance el sistema de notas.",
 };
 
 export const storeDeMessages: StoreMessages = {
@@ -1380,6 +1488,33 @@ export const storeDeMessages: StoreMessages = {
   "store.demo.deniedTitle": "Demo-Vorschau ist aus",
   "store.demo.deniedBody":
     "Dieser Katalog ist nur für autorisierte QA und vor gewöhnlichen Käufern verborgen.",
+  "store.profile.about": "Über den Shop",
+  "store.profile.aboutEmpty": "Dieser Shop hat noch keinen Über-uns-Text hinzugefügt.",
+  "store.profile.currency": "Währung",
+  "store.profile.country": "Land",
+  "store.profile.city": "Stadt",
+  "store.profile.contact": "Kontakt",
+  "store.profile.verified": "Verifiziert",
+  "store.profile.unverified": "Nicht verifiziert",
+  "store.profile.logoFor": "Logo für {name}",
+  "store.profile.ratingsSoon": "Bewertungen sind noch nicht verfügbar",
+  "store.profile.follow": "Folgen",
+  "store.profile.followSoon": "Folgen ist noch nicht verfügbar",
+  "store.profile.tabsAria": "Shop-Bereiche",
+  "store.profile.tabProducts": "Produkte",
+  "store.profile.tabAbout": "Über uns",
+  "store.profile.tabVideos": "Videos",
+  "store.profile.tabLive": "Live",
+  "store.profile.tabRatings": "Bewertungen",
+  "store.profile.videosTitle": "Shop-Videos",
+  "store.profile.videosBody":
+    "Kaufbare Videos für dieses Schaufenster kommen in einer späteren Phase.",
+  "store.profile.liveTitle": "Live-Shopping",
+  "store.profile.liveBody":
+    "Live-Sitzungen dieses Shops erscheinen hier, wenn Live-Shopping startet.",
+  "store.profile.ratingsTitle": "Bewertungen",
+  "store.profile.ratingsBody":
+    "Shop-Bewertungen und Rezensionen sind Platzhalter, bis das Bewertungssystem startet.",
 };
 
 export const storePtMessages: StoreMessages = {
@@ -1657,4 +1792,31 @@ export const storePtMessages: StoreMessages = {
   "store.demo.deniedTitle": "A pré-visualização demo está desligada",
   "store.demo.deniedBody":
     "Este catálogo é só para QA autorizado e está oculto dos compradores comuns.",
+  "store.profile.about": "Sobre",
+  "store.profile.aboutEmpty": "Esta loja ainda não adicionou uma secção sobre.",
+  "store.profile.currency": "Moeda",
+  "store.profile.country": "País",
+  "store.profile.city": "Cidade",
+  "store.profile.contact": "Contacto",
+  "store.profile.verified": "Verificada",
+  "store.profile.unverified": "Não verificada",
+  "store.profile.logoFor": "Logótipo de {name}",
+  "store.profile.ratingsSoon": "As avaliações ainda não estão disponíveis",
+  "store.profile.follow": "Seguir",
+  "store.profile.followSoon": "Seguir ainda não está disponível",
+  "store.profile.tabsAria": "Secções da loja",
+  "store.profile.tabProducts": "Produtos",
+  "store.profile.tabAbout": "Sobre",
+  "store.profile.tabVideos": "Vídeos",
+  "store.profile.tabLive": "Ao vivo",
+  "store.profile.tabRatings": "Avaliações",
+  "store.profile.videosTitle": "Vídeos da loja",
+  "store.profile.videosBody":
+    "Os vídeos compráveis desta montra chegam numa fase posterior.",
+  "store.profile.liveTitle": "Compras ao vivo",
+  "store.profile.liveBody":
+    "As sessões ao vivo desta loja aparecerão aqui quando o Live Shopping for lançado.",
+  "store.profile.ratingsTitle": "Avaliações",
+  "store.profile.ratingsBody":
+    "As avaliações e opiniões da loja são marcadores até o sistema de notas ser lançado.",
 };

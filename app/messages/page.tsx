@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { messagesMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
@@ -10,7 +12,9 @@ import MessagesExperience from "./MessagesExperience";
 export const metadata = messagesMetadata;
 export const dynamic = "force-dynamic";
 
-function MessagesFallback() {
+async function MessagesFallback() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -18,7 +22,7 @@ function MessagesFallback() {
         <div className="absolute right-[-10%] top-[20%] h-96 w-96 rounded-full bg-cyan-500/15 blur-3xl" />
       </div>
       <p className="relative rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 backdrop-blur">
-        Opening UMTUBA Messages...
+        {t("messages.opening")}
       </p>
     </main>
   );

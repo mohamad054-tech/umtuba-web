@@ -95,7 +95,10 @@ describe("App Shell translation V1", () => {
 
   it("falls back safely for missing keys and unsupported locales", () => {
     expect(resolveAppLocale({ explicit: "nope" })).toBe(DEFAULT_LOCALE);
-    expect(translate("fr", "nav.home")).toBe("Home");
+    expect(translate("fr", "nav.home")).toBe("Accueil");
+    expect(translate("es", "nav.home")).toBe("Inicio");
+    expect(translate("de", "nav.home")).toBe("Start");
+    expect(translate("pt", "nav.home")).toBe("Início");
     expect(userMenuItemLabelKey("settings")).toBe("menu.settings");
     expect(userMenuGroupLabelKey("you")).toBe("menu.you");
     expect(translate("en", userMenuItemLabelKey("seller"))).toBe("Seller hub");
@@ -107,5 +110,38 @@ describe("App Shell translation V1", () => {
     expect(translate("es", "following.title")).toBe("Siguiendo");
     expect(translate("de", "following.title")).toBe("Folge ich");
     expect(translate("pt", "following.title")).toBe("A seguir");
+  });
+
+  it("localizes remaining chrome for all six locales", () => {
+    const chromeKeys = [
+      "nav.home",
+      "nav.messages",
+      "menu.settings",
+      "home.upload",
+      "search.title",
+      "messages.title",
+      "watch.eyebrow",
+      "create.title",
+      "store.profile.about",
+      "store.profile.currency",
+      "auth.login.email",
+    ] as const;
+
+    expect(translate("en", "store.profile.about")).toBe("About");
+    expect(translate("ar", "store.profile.about")).toBe("حول المتجر");
+    expect(translate("fr", "store.profile.currency")).toBe("Devise");
+    expect(translate("es", "create.title")).toBe("Crear");
+    expect(translate("de", "messages.title")).toBe("Nachrichten");
+    expect(translate("pt", "search.title")).toBe("Pesquisar");
+
+    for (const key of chromeKeys) {
+      const english = translate("en", key);
+      for (const locale of ["ar", "fr", "es", "de", "pt"] as const) {
+        expect(translate(locale, key).length).toBeGreaterThan(0);
+        if (key !== "watch.eyebrow") {
+          expect(translate(locale, key)).not.toBe(english);
+        }
+      }
+    }
   });
 });

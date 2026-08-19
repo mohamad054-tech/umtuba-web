@@ -1,9 +1,13 @@
 import StoreShell from "../../../../components/store/StoreShell";
 import { ProductGridSkeleton } from "../../../../components/store/StoreSkeleton";
+import { createTranslator } from "../../../../../lib/i18n";
+import { resolveRequestLocale } from "../../../../../lib/i18n/server";
 
-export default function ProductDetailLoading() {
+export default async function ProductDetailLoading() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   return (
-    <StoreShell title="Product" subtitle="Loading">
+    <StoreShell title={t("store.product.viewTitle")} subtitle={t("store.shell.loading")}>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="aspect-square animate-pulse rounded-[28px] bg-white/5" />
         <div className="space-y-4">

@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
+import { useTranslation } from "../../components/i18n";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 
 type SearchShellProps = {
@@ -7,6 +10,8 @@ type SearchShellProps = {
 };
 
 export default function SearchShell({ children }: SearchShellProps) {
+  const { t } = useTranslation();
+
   return (
     <main
       className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -16,7 +21,7 @@ export default function SearchShell({ children }: SearchShellProps) {
         <div className="absolute right-[-8%] top-[20%] h-[22rem] w-[22rem] rounded-full bg-sky-500/10 blur-3xl" />
       </div>
 
-      <AppTopNav title="Search" subtitle="Find people, videos, stories, and shops" />
+      <AppTopNav title={t("search.title")} subtitle={t("search.subtitle")} />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-5 md:px-6 md:py-8">
         {children}

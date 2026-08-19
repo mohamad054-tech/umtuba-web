@@ -423,6 +423,37 @@ export type FoundationMessages = {
   "learning.difficulty.expert": string;
 
   "learning.chrome.instructorWorkspace": string;
+
+  "home.subtitle": string;
+  "home.welcome": string;
+  "home.saved": string;
+  "home.upload": string;
+  "home.sectionsAria": string;
+  "home.games": string;
+
+  "search.title": string;
+  "search.subtitle": string;
+
+  "messages.title": string;
+  "messages.subtitle": string;
+  "messages.opening": string;
+  "messages.send": string;
+  "messages.sending": string;
+
+  "watch.eyebrow": string;
+  "watch.opening": string;
+  "watch.unavailableTitle": string;
+  "watch.unavailableBody": string;
+  "watch.emptyTitle": string;
+  "watch.emptyBody": string;
+  "watch.openDiscover": string;
+  "watch.uploadVideo": string;
+
+  "create.title": string;
+  "create.subtitle": string;
+  "create.backHome": string;
+  "create.uploadSubtitle": string;
+  "create.backToCreate": string;
 } & StoreMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */
@@ -665,6 +696,30 @@ export type StoreMessages = {
   "store.demo.notReal": string;
   "store.demo.deniedTitle": string;
   "store.demo.deniedBody": string;
+  "store.profile.about": string;
+  "store.profile.aboutEmpty": string;
+  "store.profile.currency": string;
+  "store.profile.country": string;
+  "store.profile.city": string;
+  "store.profile.contact": string;
+  "store.profile.verified": string;
+  "store.profile.unverified": string;
+  "store.profile.logoFor": string;
+  "store.profile.ratingsSoon": string;
+  "store.profile.follow": string;
+  "store.profile.followSoon": string;
+  "store.profile.tabsAria": string;
+  "store.profile.tabProducts": string;
+  "store.profile.tabAbout": string;
+  "store.profile.tabVideos": string;
+  "store.profile.tabLive": string;
+  "store.profile.tabRatings": string;
+  "store.profile.videosTitle": string;
+  "store.profile.videosBody": string;
+  "store.profile.liveTitle": string;
+  "store.profile.liveBody": string;
+  "store.profile.ratingsTitle": string;
+  "store.profile.ratingsBody": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

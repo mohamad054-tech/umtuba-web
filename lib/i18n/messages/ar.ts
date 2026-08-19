@@ -448,4 +448,37 @@ export const arMessages: FoundationMessages = {
   "learning.difficulty.expert": "خبير",
 
   "learning.chrome.instructorWorkspace": "مساحة عمل المدرّس",
+
+  "home.subtitle": "خلاصة الفيديو أولاً",
+  "home.welcome": "مرحباً",
+  "home.saved": "المحفوظات",
+  "home.upload": "رفع",
+  "home.sectionsAria": "اختصارات الأقسام",
+  "home.games": "الألعاب",
+
+  "search.title": "بحث",
+  "search.subtitle": "اعثر على أشخاص وفيديوهات وقصص ومتاجر",
+
+  "messages.title": "الرسائل",
+  "messages.subtitle": "رسائل مباشرة",
+  "messages.opening": "جارٍ فتح رسائل أمتوبة…",
+  "messages.send": "إرسال",
+  "messages.sending": "جارٍ الإرسال…",
+
+  "watch.eyebrow": "المشاهدة",
+  "watch.opening": "جارٍ فتح مشاهدة أمتوبة…",
+  "watch.unavailableTitle": "المشاهدة غير متاحة الآن",
+  "watch.unavailableBody":
+    "تعذّر تحميل الفيديوهات. جرّب الاكتشاف، أو عد بعد قليل.",
+  "watch.emptyTitle": "لا توجد فيديوهات للمشاهدة بعد",
+  "watch.emptyBody":
+    "عندما ينشر الصنّاع فيديوهات ستظهر هنا. استكشف الاكتشاف أو ارفع أول مقطع.",
+  "watch.openDiscover": "فتح الاكتشاف",
+  "watch.uploadVideo": "رفع فيديو",
+
+  "create.title": "إنشاء",
+  "create.subtitle": "اختر ما تريد نشره",
+  "create.backHome": "العودة إلى الرئيسية",
+  "create.uploadSubtitle": "رفع إلى الاكتشاف",
+  "create.backToCreate": "العودة إلى الإنشاء",
 };

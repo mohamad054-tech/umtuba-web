@@ -461,4 +461,37 @@ export const enMessages: FoundationMessages = {
   "learning.difficulty.expert": "Expert",
 
   "learning.chrome.instructorWorkspace": "Instructor workspace",
+
+  "home.subtitle": "Video-first feed",
+  "home.welcome": "Welcome",
+  "home.saved": "Saved",
+  "home.upload": "Upload",
+  "home.sectionsAria": "Section shortcuts",
+  "home.games": "Games",
+
+  "search.title": "Search",
+  "search.subtitle": "Find people, videos, stories, and shops",
+
+  "messages.title": "Messages",
+  "messages.subtitle": "Direct messages",
+  "messages.opening": "Opening UMTUBA Messages…",
+  "messages.send": "Send",
+  "messages.sending": "Sending…",
+
+  "watch.eyebrow": "Watch",
+  "watch.opening": "Opening UMTUBA Watch…",
+  "watch.unavailableTitle": "Watch is unavailable right now",
+  "watch.unavailableBody":
+    "We couldn’t load videos. Try Discover, or come back in a moment.",
+  "watch.emptyTitle": "No videos to watch yet",
+  "watch.emptyBody":
+    "When creators publish videos, they’ll appear here. Explore Discover or upload your first clip.",
+  "watch.openDiscover": "Open Discover",
+  "watch.uploadVideo": "Upload a video",
+
+  "create.title": "Create",
+  "create.subtitle": "Choose what to publish",
+  "create.backHome": "Back to Home",
+  "create.uploadSubtitle": "Upload to Discover",
+  "create.backToCreate": "Back to Create",
 };

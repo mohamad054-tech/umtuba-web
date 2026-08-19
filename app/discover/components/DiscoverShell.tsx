@@ -1,6 +1,9 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
+import { useTranslation } from "../../components/i18n";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import HomeSectionCircles from "./HomeSectionCircles";
 
@@ -16,6 +19,8 @@ type DiscoverShellProps = {
  * so it stays aligned to the video card rather than a page-left rail.
  */
 export default function DiscoverShell({ children }: DiscoverShellProps) {
+  const { t } = useTranslation();
+
   return (
     <main
       className={`relative flex min-h-screen flex-col bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -29,28 +34,28 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
 
       <div className="sticky top-0 z-40">
         <AppTopNav
-          title="Home"
+          title={t("nav.home")}
           sticky={false}
-          subtitle="Video-first feed"
+          subtitle={t("home.subtitle")}
           actions={
             <div className="flex items-center gap-2">
               <Link
                 href={APP_ROUTES.welcome}
                 className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
               >
-                Welcome
+                {t("home.welcome")}
               </Link>
               <Link
                 href={APP_ROUTES.saved}
                 className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
               >
-                Saved
+                {t("home.saved")}
               </Link>
               <Link
                 href={APP_ROUTES.createVideo}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90"
               >
-                Upload
+                {t("home.upload")}
               </Link>
             </div>
           }

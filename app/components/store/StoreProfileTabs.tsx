@@ -3,26 +3,27 @@
 import { useId, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { STOREFRONT_FLAGS } from "../../../lib/store/storefrontFlags";
+import { useTranslation } from "../i18n";
 
 const BASE_TABS = [
-  { id: "products", label: "Products" },
-  { id: "about", label: "About" },
+  { id: "products", labelKey: "store.profile.tabProducts" },
+  { id: "about", labelKey: "store.profile.tabAbout" },
 ] as const;
 
 const OPTIONAL_TABS = [
   {
     id: "videos",
-    label: "Videos",
+    labelKey: "store.profile.tabVideos",
     enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_VIDEOS_TAB,
   },
   {
     id: "live",
-    label: "Live",
+    labelKey: "store.profile.tabLive",
     enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_LIVE_TAB,
   },
   {
     id: "ratings",
-    label: "Ratings",
+    labelKey: "store.profile.tabRatings",
     enabled: STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB,
   },
 ] as const;
@@ -35,12 +36,13 @@ type StoreProfileTabsProps = {
 };
 
 export default function StoreProfileTabs({ products, about }: StoreProfileTabsProps) {
+  const { t } = useTranslation();
   const tabs = useMemo(
     () => [
       ...BASE_TABS,
-      ...OPTIONAL_TABS.filter((tab) => tab.enabled).map(({ id, label }) => ({
+      ...OPTIONAL_TABS.filter((tab) => tab.enabled).map(({ id, labelKey }) => ({
         id,
-        label,
+        labelKey,
       })),
     ],
     []
@@ -53,7 +55,7 @@ export default function StoreProfileTabs({ products, about }: StoreProfileTabsPr
     <div className="mt-8">
       <div
         role="tablist"
-        aria-label="Store sections"
+        aria-label={t("store.profile.tabsAria")}
         className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2"
       >
         {tabs.map((tab) => {
@@ -74,7 +76,7 @@ export default function StoreProfileTabs({ products, about }: StoreProfileTabsPr
                   : "border border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
               }`}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           );
         })}
@@ -90,20 +92,20 @@ export default function StoreProfileTabs({ products, about }: StoreProfileTabsPr
         {activeTab === "about" ? about : null}
         {activeTab === "videos" ? (
           <PlaceholderCopy
-            title="Store videos"
-            body="Shoppable videos for this storefront arrive in a later phase."
+            title={t("store.profile.videosTitle")}
+            body={t("store.profile.videosBody")}
           />
         ) : null}
         {activeTab === "live" ? (
           <PlaceholderCopy
-            title="Live shopping"
-            body="Live sessions from this store will appear here when Live Shopping ships."
+            title={t("store.profile.liveTitle")}
+            body={t("store.profile.liveBody")}
           />
         ) : null}
         {activeTab === "ratings" ? (
           <PlaceholderCopy
-            title="Ratings"
-            body="Store ratings and reviews are placeholders until the ratings system launches."
+            title={t("store.profile.ratingsTitle")}
+            body={t("store.profile.ratingsBody")}
           />
         ) : null}
       </div>
