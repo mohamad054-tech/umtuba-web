@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import {
-  buildLocaleDocumentCookie,
+  applyDocumentLocale,
   compactLocaleLabel,
-  getLocaleDirection,
   listSupportedLocales,
   type AppLocale,
 } from "../../../lib/i18n";
@@ -48,9 +47,7 @@ export default function LanguageSelector({
     }
 
     // Immediate document direction before RSC refresh settles.
-    document.documentElement.lang = selected;
-    document.documentElement.dir = getLocaleDirection(selected);
-    document.cookie = buildLocaleDocumentCookie(selected);
+    applyDocumentLocale(selected, "explicit");
     router.refresh();
   }
 

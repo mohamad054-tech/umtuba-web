@@ -13,6 +13,8 @@ import { isOrderStatus } from "../../../lib/store/orderRules";
 import { listBuyerOrders } from "../../../lib/store/orders";
 import type { OrderStatus } from "../../../lib/store/types";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "My Orders | UMTUBA Store",
   description: "Your UMTUBA Store order history.",

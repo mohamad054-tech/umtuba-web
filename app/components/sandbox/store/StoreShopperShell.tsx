@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { AppLocale } from "../../../../lib/i18n";
+import { LanguageSelector } from "../../i18n";
 import { sandboxDirection } from "../../../../lib/sandbox/i18n";
 import { SANDBOX_PATH, sandboxHref } from "../../../../lib/sandbox/paths";
 import { storeT } from "../../../../lib/sandbox/store/messages";
@@ -44,10 +45,17 @@ export default function StoreShopperShell({ locale, pathname, children }: Props)
             <Link href={sandboxHref("store")} className="sx-shop-brand">
               {t("storeName")}
             </Link>
-            <p className="sx-sandbox-one" role="status">
-              <span className="sx-badge">{t("sandboxPill")}</span>
-              <span>{t("sandboxHint")}</span>
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="sx-sandbox-one" role="status">
+                <span className="sx-badge">{t("sandboxPill")}</span>
+                <span>{t("sandboxHint")}</span>
+              </p>
+              <LanguageSelector
+                id="sandbox-store-language"
+                variant="compact"
+                tone="dark"
+              />
+            </div>
           </div>
           <form className="sx-search" action={sandboxHref("store/catalog")} method="get">
             <label className="sr-only" htmlFor="sandbox-store-q">

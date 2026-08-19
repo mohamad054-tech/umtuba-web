@@ -14,6 +14,8 @@ import {
 } from "../../../lib/store/checkout";
 import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Checkout | UMTUBA Store",
   description: "Secure UMTUBA Store checkout foundation (payment deferred).",

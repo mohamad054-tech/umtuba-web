@@ -7,6 +7,8 @@ import { getStoreListingView } from "../../../../lib/sandbox/store/listings";
 import { sandboxProductTitle, sandboxStoreTitle } from "../../../../lib/sandbox/store/titles";
 import { resolveRequestLocale } from "../../../../lib/i18n/server";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params?: Promise<{ section?: string[] }>;
   searchParams?: Promise<{ sandbox_token?: string; q?: string; category?: string; sort?: string }>;

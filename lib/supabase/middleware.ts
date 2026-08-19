@@ -1,7 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { LOCALE_OVERRIDE_HEADER, LOCALE_QUERY_PARAM } from "../site/hreflang";
-import { normalizeToAppLocale } from "../i18n/locales";
+import {
+  LOCALE_OVERRIDE_HEADER,
+  readLocaleQueryValue,
+} from "../site/hreflang";
 import { createServiceUnavailableResponse } from "../env/serviceUnavailableResponse";
 import {
   decideAuthGate,
@@ -20,8 +22,8 @@ import {
 
 function requestHeadersWithLocaleOverride(request: NextRequest): Headers {
   const headers = new Headers(request.headers);
-  const hl = normalizeToAppLocale(
-    request.nextUrl.searchParams.get(LOCALE_QUERY_PARAM)
+  const hl = readLocaleQueryValue((key) =>
+    request.nextUrl.searchParams.get(key)
   );
   if (hl) {
     headers.set(LOCALE_OVERRIDE_HEADER, hl);
@@ -29,10 +31,27 @@ function requestHeadersWithLocaleOverride(request: NextRequest): Headers {
   return headers;
 }
 
+function withLocaleVary(response: NextResponse): NextResponse {
+  const current = response.headers.get("Vary");
+  const needed = ["Accept-Language", "Cookie"];
+  const existing = current
+    ? current.split(",").map((part) => part.trim()).filter(Boolean)
+    : [];
+  for (const token of needed) {
+    if (!existing.some((item) => item.toLowerCase() === token.toLowerCase())) {
+      existing.push(token);
+    }
+  }
+  response.headers.set("Vary", existing.join(", "));
+  return response;
+}
+
 function nextWithLocale(request: NextRequest): NextResponse {
-  return NextResponse.next({
-    request: { headers: requestHeadersWithLocaleOverride(request) },
-  });
+  return withLocaleVary(
+    NextResponse.next({
+      request: { headers: requestHeadersWithLocaleOverride(request) },
+    })
+  );
 }
 
 function copyCookies(

@@ -1,9 +1,16 @@
-import { SUPPORTED_LOCALES, type AppLocale } from "../i18n/locales";
+import {
+  SUPPORTED_LOCALES,
+  normalizeToAppLocale,
+  type AppLocale,
+} from "../i18n/locales";
 
 /** Query override used by crawlers and share previews. */
 export const LOCALE_QUERY_PARAM = "hl";
 
-/** Request header set by the proxy when `hl` is a supported locale. */
+/** Accepted aliases for the same URL override (does not invent a second system). */
+export const LOCALE_QUERY_ALIASES = [LOCALE_QUERY_PARAM, "locale"] as const;
+
+/** Request header set by the proxy when `hl`/`locale` is a supported locale. */
 export const LOCALE_OVERRIDE_HEADER = "x-umtuba-hl";
 
 /**
@@ -39,4 +46,14 @@ export function stripLocaleQuery(path: string): string {
 
 export function listHreflangLocales(): readonly AppLocale[] {
   return SUPPORTED_LOCALES;
+}
+
+export function readLocaleQueryValue(
+  get: (key: string) => string | null
+): AppLocale | null {
+  for (const key of LOCALE_QUERY_ALIASES) {
+    const normalized = normalizeToAppLocale(get(key));
+    if (normalized) return normalized;
+  }
+  return null;
 }

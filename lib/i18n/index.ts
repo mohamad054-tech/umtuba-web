@@ -17,16 +17,32 @@ export {
 export {
   LOCALE_COOKIE_MAX_AGE_SECONDS,
   LOCALE_COOKIE_NAME,
+  LOCALE_SOURCE_COOKIE_NAME,
   buildLocaleDocumentCookie,
+  buildLocaleSourceDocumentCookie,
   localeCookieOptions,
   parseLocaleCookieValue,
+  persistLocaleDocumentCookies,
+  applyDocumentLocale,
+  readDocumentCookie,
+  readSavedLocaleFromDocument,
+  type LocalePreferenceSource,
 } from "./cookie";
 
 export {
   parseAcceptLanguageHeader,
   resolveAppLocale,
+  resolveSupportedBrowserLocale,
   type LocaleResolutionInput,
 } from "./resolve";
+
+export {
+  collectNavigatorLanguages,
+  planDeviceLocaleBridge,
+  readLocaleFromSearch,
+  type DeviceLocaleBridgeInput,
+  type DeviceLocaleBridgePlan,
+} from "./deviceLocale";
 
 export {
   createTranslator,

@@ -2,6 +2,7 @@ import "./sandbox.css";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { AppLocale } from "../../../lib/i18n";
+import { LanguageSelector } from "../i18n";
 import { sandboxDirection, sandboxT } from "../../../lib/sandbox/i18n";
 import { SANDBOX_PATH, SANDBOX_SECTIONS, sandboxHref } from "../../../lib/sandbox/paths";
 
@@ -46,7 +47,14 @@ export default function SandboxShell({ locale, currentPath, children }: Props) {
           <p className="text-[0.625rem] font-bold uppercase tracking-[0.28em] text-[var(--sx-accent)]">
             {t("synthetic")} · {t("notLive")} · {t("noPayment")}
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">{t("title")}</h1>
+          <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+            <h1 className="text-3xl font-semibold tracking-tight">{t("title")}</h1>
+            <LanguageSelector
+              id="sandbox-language"
+              variant="compact"
+              tone="dark"
+            />
+          </div>
           <p className="mt-2 text-sm text-[var(--sx-muted)]">{t("subtitle")}</p>
         </header>
         <nav className="sx-nav mt-6" aria-label={t("title")}>
