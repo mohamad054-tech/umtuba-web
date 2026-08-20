@@ -93,6 +93,24 @@ describe("UM Life Phase 1 — routes and identity", () => {
     expect(lifeUi).not.toMatch(/from\("posts"\)[\s\S]*insert/);
   });
 
+  it("portals the feed comments sheet to the visual viewport", () => {
+    const bar = read("app/life/LifeEngagementBar.tsx");
+    const card = read("app/life/LifePostCard.tsx");
+    const panel = read("app/components/social/CommentsPanel.tsx");
+    expect(card).toMatch(/commentsVariant=\{focused \? "inline" : "sheet"\}/);
+    expect(bar).toMatch(/createPortal/);
+    expect(bar).toMatch(/data-life-comments-sheet="viewport"/);
+    expect(bar).toMatch(/visualViewport/);
+    expect(bar).toMatch(/document\.body\.style\.overflow/);
+    expect(bar).toMatch(/100dvh/);
+    expect(bar).toMatch(/safe-area-inset-bottom/);
+    expect(bar).not.toMatch(/absolute inset-0 z-20/);
+    expect(bar).not.toMatch(/\b(left|right)\s*:/);
+    expect(bar).not.toMatch(/Fold6|fold6/);
+    expect(panel).toMatch(/min-h-0 flex-1 space-y-3 overflow-y-auto/);
+    expect(panel).toMatch(/overscroll-contain/);
+  });
+
   it("shares like comment share and save on the same post id", () => {
     const bar = read("app/life/LifeEngagementBar.tsx");
     expect(bar).toMatch(/toggleLikeAction\(post\.id\)/);
@@ -197,6 +215,7 @@ describe("UM Life Phase 1 — feed, focused post, RTL, locales", () => {
     const files = [
       "app/life/LifeExperience.tsx",
       "app/life/LifePostCard.tsx",
+      "app/life/LifeEngagementBar.tsx",
       "app/life/compose/page.tsx",
       "app/discover/components/HomeSectionCircles.tsx",
     ];

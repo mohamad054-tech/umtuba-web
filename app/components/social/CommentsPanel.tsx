@@ -241,7 +241,7 @@ export default function CommentsPanel({
         )}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-5 py-4">
         {isLoading ? (
           <p className="text-sm text-white/50" role="status">
             Loading comments…

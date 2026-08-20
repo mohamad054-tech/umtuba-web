@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   recordShareAction,
@@ -20,6 +21,26 @@ import {
 } from "../lib/social/shareAndViews";
 import type { LifePost } from "./lib/lifePosts";
 
+function subscribeToNoop() {
+  return () => {};
+}
+
+function getClientSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function readVisualViewportBox(): { top: number; height: number } {
+  const viewport = window.visualViewport;
+  if (viewport) {
+    return { top: viewport.offsetTop, height: viewport.height };
+  }
+  return { top: 0, height: window.innerHeight };
+}
+
 type LifeEngagementBarProps = {
   post: LifePost;
   commentsVariant?: "sheet" | "inline";
@@ -32,14 +53,53 @@ export default function LifeEngagementBar({
   onChange,
 }: LifeEngagementBarProps) {
   const router = useRouter();
+  const mounted = useSyncExternalStore(
+    subscribeToNoop,
+    getClientSnapshot,
+    getServerSnapshot
+  );
   const [commentsOpen, setCommentsOpen] = useState(commentsVariant === "inline");
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [likePending, setLikePending] = useState(false);
   const [savePending, setSavePending] = useState(false);
   const [sharePending, setSharePending] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
+  const [viewportBox, setViewportBox] = useState({ top: 0, height: 0 });
   const returnPath = buildLifePostHref(post.id);
   const busy = likePending || savePending || sharePending;
+  const sheetOpen = commentsOpen && commentsVariant !== "inline";
+
+  useEffect(() => {
+    if (!sheetOpen) {
+      return;
+    }
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sheetOpen]);
+
+  useEffect(() => {
+    if (!sheetOpen) {
+      return;
+    }
+
+    function syncViewport() {
+      setViewportBox(readVisualViewportBox());
+    }
+
+    syncViewport();
+    const viewport = window.visualViewport;
+    viewport?.addEventListener("resize", syncViewport);
+    viewport?.addEventListener("scroll", syncViewport);
+    window.addEventListener("resize", syncViewport);
+    return () => {
+      viewport?.removeEventListener("resize", syncViewport);
+      viewport?.removeEventListener("scroll", syncViewport);
+      window.removeEventListener("resize", syncViewport);
+    };
+  }, [sheetOpen]);
 
   function redirectToLogin() {
     router.push(
@@ -201,32 +261,49 @@ export default function LifeEngagementBar({
         </button>
       </div>
 
-      {commentsOpen ? (
-        commentsVariant === "inline" ? (
-          <CommentsPanel
-            key={post.id}
-            open={commentsOpen}
-            variant="inline"
-            postId={post.id}
-            commentCount={post.comments}
-            returnPath={returnPath}
-            onClose={() => setCommentsOpen(true)}
-            onCountChange={(count) => onChange(post.id, { comments: count })}
-          />
-        ) : (
-          <div className="absolute inset-0 z-20">
-            <CommentsPanel
-              key={post.id}
-              open={commentsOpen}
-              postId={post.id}
-              commentCount={post.comments}
-              returnPath={returnPath}
-              onClose={() => setCommentsOpen(false)}
-              onCountChange={(count) => onChange(post.id, { comments: count })}
-            />
-          </div>
-        )
+      {commentsOpen && commentsVariant === "inline" ? (
+        <CommentsPanel
+          key={post.id}
+          open={commentsOpen}
+          variant="inline"
+          postId={post.id}
+          commentCount={post.comments}
+          returnPath={returnPath}
+          onClose={() => setCommentsOpen(true)}
+          onCountChange={(count) => onChange(post.id, { comments: count })}
+        />
       ) : null}
+
+      {sheetOpen && mounted
+        ? createPortal(
+            <div
+              className="fixed inset-x-0 z-[80]"
+              data-life-comments-sheet="viewport"
+              style={{
+                top: viewportBox.height > 0 ? viewportBox.top : 0,
+                height:
+                  viewportBox.height > 0 ? viewportBox.height : "100dvh",
+                paddingBottom:
+                  "max(0.75rem, env(safe-area-inset-bottom, 0px))",
+              }}
+            >
+              <div className="relative h-full min-h-0 w-full">
+                <CommentsPanel
+                  key={post.id}
+                  open={commentsOpen}
+                  postId={post.id}
+                  commentCount={post.comments}
+                  returnPath={returnPath}
+                  onClose={() => setCommentsOpen(false)}
+                  onCountChange={(count) =>
+                    onChange(post.id, { comments: count })
+                  }
+                />
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }
