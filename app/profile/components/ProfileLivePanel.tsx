@@ -6,13 +6,16 @@ import {
   LIVE_BUCKET_LABELS,
   type LiveBucketId,
 } from "../lib/profileAboutLiveStructure";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 import ProfileLiveBadge from "./ProfileLiveBadge";
+import ProfilePanelError from "./ProfilePanelError";
 import type { ProfileLivePreview } from "../types";
 
 type ProfileLivePanelProps = {
   sessions: ProfileLivePreview[];
   isLive: boolean;
   loadFailed?: boolean;
+  onRetry?: () => void;
 };
 
 function SessionCard({
@@ -78,18 +81,14 @@ export default function ProfileLivePanel({
   sessions,
   isLive,
   loadFailed = false,
+  onRetry,
 }: ProfileLivePanelProps) {
   if (loadFailed) {
     return (
-      <div
-        role="alert"
-        className="space-y-2 rounded-[24px] border border-red-400/20 bg-red-500/5 px-5 py-10 text-center"
-      >
-        <p className="text-sm font-bold text-red-200">Couldn&apos;t load live status</p>
-        <p className="text-xs text-white/45">
-          Please refresh the page to try again.
-        </p>
-      </div>
+      <ProfilePanelError
+        message={PROFILE_ERROR_STATES_COPY.livePanel}
+        onRetry={onRetry}
+      />
     );
   }
 

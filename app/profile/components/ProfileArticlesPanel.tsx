@@ -1,25 +1,27 @@
 import Link from "next/link";
 import type { ProfileArticle } from "../types";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import ProfilePanelError from "./ProfilePanelError";
 
 type ProfileArticlesPanelProps = {
   articles: ProfileArticle[];
   loadFailed?: boolean;
+  onRetry?: () => void;
   isOwner?: boolean;
 };
 
 export default function ProfileArticlesPanel({
   articles,
   loadFailed = false,
+  onRetry,
   isOwner = false,
 }: ProfileArticlesPanelProps) {
   if (loadFailed) {
     return (
-      <p
-        role="status"
-        className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
-      >
-        Articles couldn&apos;t be loaded right now.
-      </p>
+      <ProfilePanelError
+        message={PROFILE_ERROR_STATES_COPY.articlesPanel}
+        onRetry={onRetry}
+      />
     );
   }
 

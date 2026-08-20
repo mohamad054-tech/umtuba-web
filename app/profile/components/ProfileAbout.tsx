@@ -4,6 +4,7 @@ import {
   getAboutLocationLabel,
   getVisibleAboutSections,
 } from "../lib/profileAboutLiveStructure";
+import { formatAboutJoinedBody } from "../lib/profileJoinedLabel";
 
 type ProfileAboutProps = {
   profile: ProfileView;
@@ -72,6 +73,13 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
           {location ? (
             <p className="text-sm text-white/55">{location}</p>
           ) : null}
+        </section>
+      ) : null}
+
+      {sections.includes("roles") ? (
+        <section>
+          <SectionHeading>Roles</SectionHeading>
+          <ChipList items={profile.about.roles ?? []} />
         </section>
       ) : null}
 
@@ -176,7 +184,7 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
         <section>
           <SectionHeading>Joined</SectionHeading>
           <p className="mt-2 text-sm text-white/80">
-            {profile.about.joinedLabel}
+            {formatAboutJoinedBody(profile.about.joinedLabel)}
           </p>
         </section>
       ) : null}

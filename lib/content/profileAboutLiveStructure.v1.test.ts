@@ -32,9 +32,10 @@ function session(
 }
 
 describe("About / Live Structure V1", () => {
-  it("orders About sections Bio → Experience → Education → Specialties & interests → Achievements → Links → Joined", () => {
+  it("orders About sections Bio → Roles → Experience → Education → Specialties & interests → Achievements → Links → Joined", () => {
     expect([...ABOUT_SECTION_ORDER]).toEqual([
       "bio",
+      "roles",
       "experience",
       "education",
       "specialtiesInterests",
@@ -150,6 +151,7 @@ describe("About / Live Structure V1", () => {
     const structure = read("app/profile/lib/profileAboutLiveStructure.ts");
     const content = read("lib/supabase/profileContent.ts");
 
+    expect(about).toMatch(/Roles/);
     expect(about).toMatch(/Experience/);
     expect(about).toMatch(/Education/);
     expect(about).toMatch(/Specialties/);

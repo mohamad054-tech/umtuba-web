@@ -3,11 +3,19 @@ import type { ProfileVideo } from "../types";
 import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
+import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import {
+  PROFILE_EMPTY_STATES_COPY,
+  shouldShowOwnerEmptyCreateActions,
+} from "../lib/profileEmptyStates";
+import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import ProfilePanelError from "./ProfilePanelError";
 
 type ProfileVideoGridProps = {
   videos: ProfileVideo[];
   hasMore?: boolean;
   loadFailed?: boolean;
+  onRetry?: () => void;
   isOwner?: boolean;
   onVideoDeleted?: (videoId: string, postId: number) => void;
 };
@@ -16,33 +24,43 @@ export default function ProfileVideoGrid({
   videos,
   hasMore = false,
   loadFailed = false,
+  onRetry,
   isOwner = false,
   onVideoDeleted,
 }: ProfileVideoGridProps) {
   if (loadFailed) {
     return (
-      <ProductEmptyState
-        compact
-        eyebrow="Videos"
-        title="Couldn't load videos"
-        description="Something went wrong loading this creator's videos. Please try again."
-        primaryHref={APP_ROUTES.discover}
-        primaryLabel="Open Discover"
+      <ProfilePanelError
+        message={PROFILE_ERROR_STATES_COPY.videosPanel}
+        onRetry={onRetry}
       />
     );
   }
 
   if (videos.length === 0) {
+    const showOwnerActions = shouldShowOwnerEmptyCreateActions(isOwner);
     return (
       <ProductEmptyState
         compact
         eyebrow="Videos"
-        title="No published videos yet"
-        description="Upload a clip to show it on this profile and on Discover."
-        primaryHref={APP_ROUTES.createVideo}
-        primaryLabel="Upload a video"
-        secondaryHref={APP_ROUTES.discover}
-        secondaryLabel="Open Discover"
+        title={PROFILE_EMPTY_STATES_COPY.videosTitle}
+        description={
+          showOwnerActions
+            ? PROFILE_EMPTY_STATES_COPY.videosOwnerDescription
+            : PROFILE_EMPTY_STATES_COPY.videosVisitorDescription
+        }
+        primaryHref={
+          showOwnerActions ? APP_ROUTES.createVideo : APP_ROUTES.discover
+        }
+        primaryLabel={
+          showOwnerActions
+            ? PROFILE_EMPTY_STATES_COPY.uploadVideoCta
+            : PROFILE_EMPTY_STATES_COPY.openDiscoverCta
+        }
+        secondaryHref={showOwnerActions ? APP_ROUTES.discover : undefined}
+        secondaryLabel={
+          showOwnerActions ? PROFILE_EMPTY_STATES_COPY.openDiscoverCta : undefined
+        }
       />
     );
   }
@@ -131,7 +149,7 @@ export default function ProfileVideoGrid({
       </ul>
       {hasMore ? (
         <p className="text-center text-xs text-white/40">
-          Showing the latest videos on this profile. Open any clip to watch it.
+          {CREATOR_SPACE_COPY.videosShowingLatest}
         </p>
       ) : null}
     </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { buildArticleHref } from "../../lib/nav";
+import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 
 type ProfileLinkedArticlePromptProps = {
   articleId: string;
@@ -37,8 +38,7 @@ export default function ProfileLinkedArticlePrompt({
         Linked article
       </p>
       <p className="mt-2 text-sm font-bold text-white">
-        This video is linked to a full article. Open it now, or keep browsing
-        the profile.
+        {CREATOR_SPACE_COPY.browsePrompt}
       </p>
       {articleTitle ? (
         <p className="mt-1 line-clamp-2 text-sm text-white/60">{articleTitle}</p>
@@ -55,7 +55,7 @@ export default function ProfileLinkedArticlePrompt({
           onClick={browseProfile}
           className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10"
         >
-          Browse profile
+          {CREATOR_SPACE_COPY.browseCta}
         </button>
       </div>
     </div>
