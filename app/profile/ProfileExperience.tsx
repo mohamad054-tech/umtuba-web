@@ -15,6 +15,7 @@ import {
   ProfileAllPanel,
   ProfileHeader,
   ProfileLivePanel,
+  ProfilePostsPanel,
   ProfileShell,
   ProfileStats,
   ProfileTabs,
@@ -30,6 +31,7 @@ import type { ProfileView } from "./types";
 import { isUuid } from "../lib/nav";
 import {
   countProfilePhotos,
+  countProfilePosts,
   getVisibleProfileTabs,
   resolveActiveProfileTab,
 } from "./lib/profileTabs";
@@ -62,6 +64,10 @@ export default function ProfileExperience({
     () => countProfilePhotos(profile.posts),
     [profile.posts]
   );
+  const postCount = useMemo(
+    () => countProfilePosts(profile.posts),
+    [profile.posts]
+  );
   /** Courses / Products Structure V1 — counts from view-model previews. */
   const courseCount = countProfileCourses(profile.courses);
   const productCount = countProfileProducts(profile.products);
@@ -75,6 +81,7 @@ export default function ProfileExperience({
         courseCount,
         productCount,
         photoCount,
+        postCount,
         showLiveTab,
       }),
     [
@@ -84,6 +91,7 @@ export default function ProfileExperience({
       courseCount,
       productCount,
       photoCount,
+      postCount,
       showLiveTab,
     ]
   );
@@ -275,6 +283,7 @@ export default function ProfileExperience({
             courseCount={courseCount}
             productCount={productCount}
             photoCount={photoCount}
+            postCount={postCount}
           />
         </div>
 
@@ -296,10 +305,28 @@ export default function ProfileExperience({
           className={`space-y-6 outline-none ${PROFILE_TAB_PANEL_FADE_CLASS}`}
         >
           {activeTab === "all" ? (
-            <ProfileAllPanel
-              cards={visibleContentCards}
-              pinnedCards={profile.pinnedContentCards}
-              loadFailed={Boolean(profile.registryLoadFailed)}
+            <>
+              {visiblePosts.length > 0 || profile.postsLoadFailed ? (
+                <ProfilePostsPanel
+                  posts={visiblePosts}
+                  loadFailed={Boolean(profile.postsLoadFailed)}
+                />
+              ) : null}
+              {visibleContentCards.length > 0 ||
+              profile.registryLoadFailed ||
+              !(visiblePosts.length > 0 || profile.postsLoadFailed) ? (
+                <ProfileAllPanel
+                  cards={visibleContentCards}
+                  pinnedCards={profile.pinnedContentCards}
+                  loadFailed={Boolean(profile.registryLoadFailed)}
+                />
+              ) : null}
+            </>
+          ) : null}
+          {activeTab === "posts" ? (
+            <ProfilePostsPanel
+              posts={visiblePosts}
+              loadFailed={Boolean(profile.postsLoadFailed)}
             />
           ) : null}
           {activeTab === "articles" ? (

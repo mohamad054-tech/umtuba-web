@@ -218,7 +218,7 @@ describe("All Timeline Contract V1 — panel wiring", () => {
     expect(panel).toMatch(/max-w-\[45rem\]/);
     expect(panel).not.toMatch(/sm:grid-cols-2/);
     expect(panel).toMatch(
-      /Articles and independent videos will appear here in one timeline/
+      /Posts, articles, and videos will appear here in one timeline/
     );
     expect(
       existsSync(join(ROOT, "app/profile/lib/profileAllTimelineContract.ts"))

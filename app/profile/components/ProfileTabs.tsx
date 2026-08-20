@@ -17,6 +17,7 @@ type ProfileTabsProps = {
   courseCount?: number;
   productCount?: number;
   photoCount?: number;
+  postCount?: number;
 };
 
 function focusTabButton(tabId: ProfileTabId) {
@@ -40,6 +41,7 @@ export default function ProfileTabs({
   courseCount = 0,
   productCount = 0,
   photoCount = 0,
+  postCount = 0,
 }: ProfileTabsProps) {
   return (
     <div
@@ -88,12 +90,15 @@ export default function ProfileTabs({
                     ? productCount
                     : tabId === "photos"
                       ? photoCount
-                      : null;
+                      : tabId === "posts"
+                        ? postCount
+                        : null;
         const showCount =
           count !== null &&
           (tabId === "videos" ||
             tabId === "articles" ||
             tabId === "live" ||
+            tabId === "posts" ||
             count > 0);
         const panelId = `profile-panel-${tabId}`;
         const buttonId = `profile-tab-${tabId}`;

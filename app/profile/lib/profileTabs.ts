@@ -1,10 +1,11 @@
 /**
- * Creator Hub tab model (Creator Space Experience V1 §5).
- * Deep-link: `?tab=` accepts known ids; legacy `posts` → `photos`; unknown → `all`.
+ * Social profile tab model (Facebook-style recovery on Creator Hub).
+ * Deep-link: `?tab=` accepts known ids including `posts`; unknown → `all`.
  */
 
 export type ProfileTabId =
   | "all"
+  | "posts"
   | "articles"
   | "videos"
   | "courses"
@@ -16,6 +17,7 @@ export type ProfileTabId =
 /** Canonical order. Live is inserted only when visible. */
 export const PROFILE_TAB_ORDER: readonly ProfileTabId[] = [
   "all",
+  "posts",
   "articles",
   "videos",
   "courses",
@@ -27,6 +29,7 @@ export const PROFILE_TAB_ORDER: readonly ProfileTabId[] = [
 
 export const PROFILE_TAB_LABELS: Record<ProfileTabId, string> = {
   all: "All",
+  posts: "Posts",
   articles: "Articles",
   videos: "Videos",
   courses: "Courses",
@@ -47,14 +50,16 @@ export type ProfileTabVisibilityInput = {
   /** Stub readiness — 0 until Products catalog projection exists. */
   productCount: number;
   photoCount: number;
+  /** Text + image social posts (not videos). */
+  postCount: number;
   /** Existing Live conditional (sessions or isLive). */
   showLiveTab: boolean;
 };
 
 /**
- * Visibility (Creator Space §5):
+ * Visibility:
  * - Always: All, About
- * - Articles / Videos / Courses / Products / Photos: count > 0 OR owner
+ * - Posts / Articles / Videos / Courses / Products / Photos: count > 0 OR owner
  * - Live: keep existing conditional (`showLiveTab`)
  */
 export function getVisibleProfileTabs(
@@ -67,6 +72,7 @@ export function getVisibleProfileTabs(
     courseCount,
     productCount,
     photoCount,
+    postCount,
     showLiveTab,
   } = input;
 
@@ -75,6 +81,8 @@ export function getVisibleProfileTabs(
       case "all":
       case "about":
         return true;
+      case "posts":
+        return isOwner || postCount > 0;
       case "articles":
         return isOwner || articleCount > 0;
       case "videos":
@@ -93,11 +101,8 @@ export function getVisibleProfileTabs(
   });
 }
 
-/** Parse `?tab=` — legacy `posts` maps to `photos`; unknown → `all`. */
+/** Parse `?tab=` — `posts` is a first-class social tab; unknown → `all`. */
 export function parseProfileTab(raw: string | null): ProfileTabId {
-  if (raw === "posts") {
-    return "photos";
-  }
   if (raw && KNOWN_TAB_IDS.has(raw)) {
     return raw as ProfileTabId;
   }
@@ -122,4 +127,11 @@ export function countProfilePhotos(
       Boolean(post.imageUrl?.trim()) ||
       post.postType === "image"
   ).length;
+}
+
+/** Text + image social posts (video rows are a separate tab). */
+export function countProfilePosts(
+  posts: readonly { id?: number }[]
+): number {
+  return posts.length;
 }

@@ -82,6 +82,7 @@ describe("Courses / Products Panel Structure V1", () => {
       courseCount: countProfileCourses(courses),
       productCount: countProfileProducts(products),
       photoCount: 0,
+      postCount: 0,
       showLiveTab: false,
     });
     expect(visitor).toEqual(["all", "courses", "products", "about"]);

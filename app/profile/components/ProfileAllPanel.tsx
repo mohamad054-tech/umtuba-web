@@ -58,7 +58,7 @@ export default function ProfileAllPanel({
     return (
       <ContentCardEmptyState
         title="No published content yet"
-        description="Articles and independent videos will appear here in one timeline."
+        description="Posts, articles, and videos will appear here in one timeline."
       />
     );
   }

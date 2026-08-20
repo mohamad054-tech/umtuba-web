@@ -185,6 +185,7 @@ describe("About / Live Structure V1", () => {
     expect(live).not.toMatch(/DiscoverExperience|HomeFeed|WatchPlayer/);
     expect([...PROFILE_TAB_ORDER]).toEqual([
       "all",
+      "posts",
       "articles",
       "videos",
       "courses",

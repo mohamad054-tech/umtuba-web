@@ -16,9 +16,10 @@ function read(rel: string) {
 }
 
 describe("Profile Creator Hub tab readiness V1", () => {
-  it("orders tabs All · Articles · Videos · Courses · Products · Photos · Live · About", () => {
+  it("orders tabs All · Posts · Articles · Videos · Courses · Products · Photos · Live · About", () => {
     expect([...PROFILE_TAB_ORDER]).toEqual([
       "all",
+      "posts",
       "articles",
       "videos",
       "courses",
@@ -37,6 +38,7 @@ describe("Profile Creator Hub tab readiness V1", () => {
       courseCount: 0,
       productCount: 0,
       photoCount: 0,
+      postCount: 0,
       showLiveTab: false,
     });
     expect(visitorEmpty).toEqual(["all", "about"]);
@@ -48,10 +50,12 @@ describe("Profile Creator Hub tab readiness V1", () => {
       courseCount: 0,
       productCount: 3,
       photoCount: 1,
+      postCount: 4,
       showLiveTab: true,
     });
     expect(visitorWithContent).toEqual([
       "all",
+      "posts",
       "articles",
       "videos",
       "products",
@@ -67,10 +71,12 @@ describe("Profile Creator Hub tab readiness V1", () => {
       courseCount: 0,
       productCount: 0,
       photoCount: 0,
+      postCount: 0,
       showLiveTab: false,
     });
     expect(ownerEmpty).toEqual([
       "all",
+      "posts",
       "articles",
       "videos",
       "courses",
@@ -88,15 +94,17 @@ describe("Profile Creator Hub tab readiness V1", () => {
       courseCount: 0,
       productCount: 0,
       photoCount: 0,
+      postCount: 0,
       showLiveTab: false,
     });
     expect(tabs).not.toContain("courses");
     expect(tabs).not.toContain("products");
     expect(tabs).not.toContain("photos");
+    expect(tabs).not.toContain("posts");
   });
 
-  it("maps ?tab=posts → photos; unknown → all; hidden → all", () => {
-    expect(parseProfileTab("posts")).toBe("photos");
+  it("maps ?tab=posts → posts; unknown → all; hidden → all", () => {
+    expect(parseProfileTab("posts")).toBe("posts");
     expect(parseProfileTab("courses")).toBe("courses");
     expect(parseProfileTab("products")).toBe("products");
     expect(parseProfileTab("photos")).toBe("photos");
@@ -110,6 +118,7 @@ describe("Profile Creator Hub tab readiness V1", () => {
       courseCount: 0,
       productCount: 0,
       photoCount: 0,
+      postCount: 0,
       showLiveTab: false,
     });
     expect(resolveActiveProfileTab("posts", visitor)).toBe("all");
@@ -128,15 +137,15 @@ describe("Profile Creator Hub tab readiness V1", () => {
     ).toBe(3);
   });
 
-  it("wires stub panels and does not keep Posts as a public tab", () => {
+  it("wires stub panels and keeps Posts as a social tab", () => {
     const experience = read("app/profile/ProfileExperience.tsx");
     const tabsUi = read("app/profile/components/ProfileTabs.tsx");
     expect(experience).toMatch(/ProfileCoursesPanel/);
     expect(experience).toMatch(/ProfileProductsPanel/);
     expect(experience).toMatch(/ProfilePhotosPanel/);
-    expect(experience).not.toMatch(/ProfilePostsPanel/);
-    expect(experience).not.toMatch(/activeTab === "posts"/);
-    expect(tabsUi).not.toMatch(/"posts"/);
+    expect(experience).toMatch(/ProfilePostsPanel/);
+    expect(experience).toMatch(/activeTab === "posts"/);
+    expect(tabsUi).toMatch(/"posts"/);
     expect(
       existsSync(join(ROOT, "app/profile/components/ProfileCoursesPanel.tsx"))
     ).toBe(true);
