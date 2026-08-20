@@ -1,3 +1,70 @@
+# CURSOR_REPORT — UM Life Phase 1 implementation V1 2026-08-20
+
+```text
+TASK_ID = CENTRAL_UM_LIFE_PHASE1_IMPLEMENTATION_V1
+STATUS = IMPLEMENTED_CANDIDATE
+BASE_SOURCE_SHA = b398dc02d23bba3da4432ea2826f1fb3fa1222e7
+WEB_BRANCH = central/um-life-phase1-v1
+WEB_WORKTREE = D:\umtuba-central\repos\umtuba-web-um-life-phase1-v1
+MIGRATIONS_APPLIED = NO
+SQL_APPLIED = NO
+PRODUCTION_DEPLOYED = NO
+```
+
+## Summary
+
+Implemented UM Life Phase 1 on a dedicated worktree from production `b398dc02`. `/life` is the all-users social feed; `/life?post={posts.id}` is the focused readable post; `/life/compose` is a navigation shell only. Home circle, Profile action, and Watch “Read on UM Life” reuse the same canonical `posts.id` and existing like/comment/share/save RPCs. No SQL. No deploy. No FF of `alpha-0.2`. Full report: `D:\umtuba-central\reports\UMTUBA_CENTRAL_UM_LIFE_PHASE1_IMPLEMENTATION_V1.md`.
+
+## Exact files changed
+
+- `app/life/**` (page, compose shell, feed/focused UI, engagement bar, mapper)
+- `app/lib/nav/routes.ts`, `index.ts`, `platformNavContract.ts` (+ tests)
+- `app/discover/components/HomeSectionCircles.tsx`
+- `app/profile/components/ProfileActions.tsx`
+- `app/components/video/VideoOverlay.tsx`
+- `app/components/social/CommentsPanel.tsx` (inline variant)
+- `app/actions/loadPosts.ts`, `lib/supabase/videoPostsServer.ts`
+- `app/lib/social/shareAndViews.ts` (`life` share surface)
+- `lib/i18n/messages/*` (13 locales + types)
+- `lib/site/routeMetadata.ts`, `vitest.config.ts`
+- Handoff docs
+
+## Migrations created
+
+NONE.
+
+## Security review
+
+No new tables/RLS. Reads existing public `posts` SELECT. Interactions reuse `toggle_post_like`, `toggle_post_save`, `record_post_share`, `post_comments`. Signed video URLs stay server-minted. No secrets printed.
+
+## Tests
+
+`npx vitest run app/life/umLifePhase1.contract.test.ts` + nav/share/i18n contracts: PASS (35). `tsc --noEmit`: PASS. Pre-existing ProfileVideoGrid empty-copy assertion on this SHA remains unrelated.
+
+## TypeScript
+
+`npx tsc --noEmit` PASS.
+
+## Build
+
+`npm run build` PASS. Routes include `/life` and `/life/compose`.
+
+## git diff --check
+
+PASS (CRLF warnings on locale files only).
+
+## git status --short
+
+Candidate dirty then committed on `central/um-life-phase1-v1`.
+
+## Open issues
+
+- Composer is Phase 2 (shell only).
+- No visual screenshots captured — `RESPONSIVE = SOURCE_READY`.
+- Do not deploy. Do not FF `alpha-0.2`.
+
+---
+
 # CURSOR_REPORT — Rewards / Referral security hardening V1
 
 ```text

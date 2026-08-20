@@ -69,7 +69,7 @@ export const HOME_LOCK_RELATED_SHARED_PATHS = [
 export const HOME_LOCK_INVARIANTS = [
   "Home `/` is the Video-First Discovery Layer",
   "`/discover` remains a forever alias to `/` (query preserved)",
-  "Home shell title remains Home; circles are entry ramps only (layout locked)",
+  "Home shell title remains Home; circles are entry ramps only (scoped UM Life destination append only)",
   "Preferred Flow Home → Creator Space → Content is documented, not forced on Home CTAs",
   "No Home feed / swipe / ranking / player / circles / engagement changes without unlock",
 ] as const;

@@ -44,6 +44,13 @@ export type FeedPostsResult =
   | { ok: true; posts: PublicPostDTO[] }
   | { ok: false; message: string };
 
+export type LifePostResult =
+  | { ok: true; post: PublicPostDTO }
+  | { ok: false; message: string; notFound?: boolean };
+
+const LIFE_CANONICAL_POST_TYPES = ["text", "image", "video"] as const;
+const LIFE_FEED_LIMIT = 50;
+
 export type WatchVideosPageResult =
   | { ok: true; page: WatchFeedPage }
   | { ok: false; message: string };
@@ -361,6 +368,136 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
     return {
       ok: false,
       message: "Unable to load posts. Please try again.",
+    };
+  }
+}
+
+function isLifeCanonicalPostType(postType: string): boolean {
+  return (LIFE_CANONICAL_POST_TYPES as readonly string[]).includes(postType);
+}
+
+async function hydrateLifePosts(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string | undefined,
+  rows: VideoPostRow[]
+): Promise<PublicPostDTO[]> {
+  const visible = rows.filter((row) => {
+    if (!isLifeCanonicalPostType(row.post_type)) {
+      return false;
+    }
+    if (row.post_type !== "video") {
+      return true;
+    }
+    return isPubliclyVisibleMedia({
+      postType: row.post_type,
+      mediaStatus: row.media_status,
+      videoPath: row.video_path,
+    });
+  });
+  const withUrls = await attachPlaybackUrls(supabase, visible);
+  const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
+    supabase,
+    withUrls
+  );
+  const withAuthors = await enrichAuthorIdentityFromProfiles(
+    supabase,
+    withAuthorIds
+  );
+  const viewerState = await loadViewerInteractionState(
+    supabase,
+    userId,
+    withAuthors.map((post) => post.id)
+  );
+  return applyViewerStateToPosts(withAuthors, viewerState);
+}
+
+/**
+ * UM Life chronological feed — existing `posts` rows only (text / image / video).
+ * Does not insert rows or copy media.
+ */
+export async function getLifePostsServer(): Promise<FeedPostsResult> {
+  try {
+    const supabase = await createClient();
+    const user = await getServerUser();
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select(postColumns)
+      .in("post_type", [...LIFE_CANONICAL_POST_TYPES])
+      .order("created_at", { ascending: false })
+      .limit(LIFE_FEED_LIMIT);
+
+    if (error) {
+      console.error("Unable to load UM Life posts:", error);
+      return {
+        ok: false,
+        message: "Unable to load posts. Please try again.",
+      };
+    }
+
+    const posts = await hydrateLifePosts(
+      supabase,
+      user?.id,
+      (data ?? []) as VideoPostRow[]
+    );
+    return { ok: true, posts };
+  } catch (error) {
+    console.error("getLifePostsServer failed:", error);
+    return {
+      ok: false,
+      message: "Unable to load posts. Please try again.",
+    };
+  }
+}
+
+/** Focused UM Life post by canonical `posts.id`. */
+export async function getLifePostByIdServer(
+  postId: number
+): Promise<LifePostResult> {
+  try {
+    const supabase = await createClient();
+    const user = await getServerUser();
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select(postColumns)
+      .eq("id", postId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Unable to load UM Life post:", error);
+      return {
+        ok: false,
+        message: "Unable to load this post. Please try again.",
+      };
+    }
+
+    if (!data) {
+      return {
+        ok: false,
+        message: "This post is unavailable.",
+        notFound: true,
+      };
+    }
+
+    const posts = await hydrateLifePosts(supabase, user?.id, [
+      data as VideoPostRow,
+    ]);
+    const post = posts[0];
+    if (!post) {
+      return {
+        ok: false,
+        message: "This post is unavailable.",
+        notFound: true,
+      };
+    }
+
+    return { ok: true, post };
+  } catch (error) {
+    console.error("getLifePostByIdServer failed:", error);
+    return {
+      ok: false,
+      message: "Unable to load this post. Please try again.",
     };
   }
 }

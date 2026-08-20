@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "../i18n";
 import FollowButton from "../social/FollowButton";
 import type { DiscoverStats } from "../../discover/types";
-import { APP_ROUTES, buildCreatorProfileHref } from "../../lib/nav";
+import {
+  APP_ROUTES,
+  buildCreatorProfileHref,
+  buildLifePostHref,
+} from "../../lib/nav";
 import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
 import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
@@ -37,6 +42,7 @@ export default function VideoOverlay({
   onFollowChange,
   onDeleted,
 }: VideoOverlayProps) {
+  const { t } = useTranslation();
   const prototypePanelsAllowed = allowWatchPrototypePanels();
   const peerUserId = video.author.id;
   const profileHref = buildCreatorProfileHref({
@@ -107,6 +113,14 @@ export default function VideoOverlay({
                 {video.caption}
               </p>
             )}
+            {video.postId != null ? (
+              <Link
+                href={buildLifePostHref(video.postId)}
+                className="pointer-events-auto watch-focus-ring mt-2 inline-flex text-sm font-bold text-sky-200 underline-offset-2 hover:text-white hover:underline"
+              >
+                {t("watch.readOnUmLife")}
+              </Link>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">

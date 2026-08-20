@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslation } from "../../components/i18n";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
 import FollowButton from "../../components/social/FollowButton";
 import {
   APP_ROUTES,
   buildCreatorProfileHref,
+  buildLifeHref,
   buildLiveStreamHref,
   isUuid,
 } from "../../lib/nav";
@@ -36,6 +38,7 @@ export default function ProfileActions({
   isFollowing,
   onFollowChange,
 }: ProfileActionsProps) {
+  const { t } = useTranslation();
   const liveHref = profile.liveStreamId
     ? buildLiveStreamHref(profile.liveStreamId)
     : null;
@@ -62,6 +65,15 @@ export default function ProfileActions({
       setShareStatus("error");
     }
   }
+
+  const umLifeButton = (
+    <Link
+      href={buildLifeHref({ from: "profile" })}
+      className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white`}
+    >
+      {t("profile.umLife")}
+    </Link>
+  );
 
   const shareButton = (
     <button
@@ -97,6 +109,7 @@ export default function ProfileActions({
         >
           {CREATOR_SPACE_COPY.editOwnerCta}
         </Link>
+        {umLifeButton}
         {shareButton}
         {shareFeedback}
       </div>
@@ -132,6 +145,7 @@ export default function ProfileActions({
         </Link>
       ) : null}
 
+      {umLifeButton}
       {shareButton}
       {shareFeedback}
     </div>

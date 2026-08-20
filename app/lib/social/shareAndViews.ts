@@ -49,8 +49,8 @@ export type SharePostInput = {
   postId: number;
   title?: string;
   text?: string;
-  /** Canonical player surface for shared links. */
-  surface?: "discover" | "watch";
+  /** Canonical player / social surface for shared links. */
+  surface?: "discover" | "watch" | "life";
 };
 
 export type SharePostOutcome =
@@ -75,9 +75,14 @@ function buildShareCaption(input: SharePostInput): {
 
 export function buildPostShareUrl(
   postId: number,
-  surface: "discover" | "watch" = "discover"
+  surface: "discover" | "watch" | "life" = "discover"
 ): string {
-  const path = surface === "watch" ? "/watch" : "/discover";
+  const path =
+    surface === "watch"
+      ? "/watch"
+      : surface === "life"
+        ? "/life"
+        : "/discover";
 
   if (typeof window === "undefined") {
     return `${path}?post=${postId}`;
@@ -142,7 +147,7 @@ function openExternalUrl(url: string): boolean {
 
 export async function copyPostLink(
   postId: number,
-  surface: "discover" | "watch" = "discover"
+  surface: "discover" | "watch" | "life" = "discover"
 ): Promise<SharePostOutcome> {
   const url = buildPostShareUrl(postId, surface);
 

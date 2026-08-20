@@ -103,18 +103,20 @@ describe("Platform Navigation Contract Sync V1", () => {
         APP_ROUTES.store,
         APP_ROUTES.games,
         APP_ROUTES.live,
+        APP_ROUTES.life,
         APP_ROUTES.worldDiscovery,
         APP_ROUTES.search,
         APP_ROUTES.messages,
         APP_ROUTES.create,
       ]);
       const circles = read("app/discover/components/HomeSectionCircles.tsx");
-      expect(circles).toMatch(/aria-label="Section shortcuts"/);
-      // Order contract via APP_ROUTES keys (layout of HomeSectionCircles stays locked).
+      expect(circles).toMatch(/home\.sectionsAria/);
+      // Order contract via APP_ROUTES keys. UM Life is a scoped destination append after Live.
       const learningIdx = circles.indexOf("APP_ROUTES.learning");
       const storeIdx = circles.indexOf("APP_ROUTES.store");
       const gamesIdx = circles.indexOf("APP_ROUTES.games");
       const liveIdx = circles.indexOf("APP_ROUTES.live");
+      const lifeIdx = circles.indexOf("APP_ROUTES.life");
       const worldIdx = circles.indexOf("APP_ROUTES.worldDiscovery");
       const searchIdx = circles.indexOf("APP_ROUTES.search");
       const messagesIdx = circles.indexOf("APP_ROUTES.messages");
@@ -123,7 +125,8 @@ describe("Platform Navigation Contract Sync V1", () => {
       expect(storeIdx).toBeGreaterThan(learningIdx);
       expect(gamesIdx).toBeGreaterThan(storeIdx);
       expect(liveIdx).toBeGreaterThan(gamesIdx);
-      expect(worldIdx).toBeGreaterThan(liveIdx);
+      expect(lifeIdx).toBeGreaterThan(liveIdx);
+      expect(worldIdx).toBeGreaterThan(lifeIdx);
       expect(searchIdx).toBeGreaterThan(worldIdx);
       expect(messagesIdx).toBeGreaterThan(searchIdx);
       expect(createIdx).toBeGreaterThan(messagesIdx);

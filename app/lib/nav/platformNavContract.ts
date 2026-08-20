@@ -42,13 +42,15 @@ export const MOBILE_PRIMARY_NAV_LABELS = [
 
 /**
  * Home circles destination order — entry ramps only.
- * Layout of HomeSectionCircles remains locked; this list documents href contract.
+ * Layout of HomeSectionCircles remains locked except the scoped UM Life
+ * destination append (after Live, before World). Feed / swipe / player stay locked.
  */
 export const HOME_CIRCLE_ENTRY_HREFS = [
   APP_ROUTES.learning,
   APP_ROUTES.store,
   APP_ROUTES.games,
   APP_ROUTES.live,
+  APP_ROUTES.life,
   APP_ROUTES.worldDiscovery,
   APP_ROUTES.search,
   APP_ROUTES.messages,

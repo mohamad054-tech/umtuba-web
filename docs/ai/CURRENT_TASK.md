@@ -1,5 +1,48 @@
 ﻿# Current Task
 
+## CENTRAL GO — UM LIFE PHASE 1 IMPLEMENTATION
+
+**TASK_ID** = `CENTRAL_UM_LIFE_PHASE1_IMPLEMENTATION_V1`  
+**DATE** = 2026-08-20  
+**DEVICE** = SERVER / CENTRAL / WIN-MJRKAKK2MEH  
+**PRIORITY** = PRODUCT_FEATURE  
+**STATUS** = IMPLEMENTED_CANDIDATE  
+**MODE** = CONTROLLED_IMPLEMENTATION  
+**BASE_SOURCE_SHA** = `b398dc02d23bba3da4432ea2826f1fb3fa1222e7`  
+**WEB_BRANCH** = `central/um-life-phase1-v1`  
+**WEB_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-um-life-phase1-v1`  
+**PRODUCTION_DEPLOYED** = NO  
+**MIGRATIONS_APPLIED** = NO  
+**SQL_APPLIED** = NO  
+**REPORT** = `D:\umtuba-central\reports\UMTUBA_CENTRAL_UM_LIFE_PHASE1_IMPLEMENTATION_V1.md`
+
+Implement UM Life Phase 1 as a first-class social area **inside** UMTUBA. Canonical post = `posts.id`. Do not duplicate video files or like/comment counters. Do not deploy. Do not FF `alpha-0.2`. Do not apply SQL.
+
+### Allowed scope
+
+- Dedicated worktree/branch from production `b398dc02`
+- `/life` feed + `/life?post=` focused post + `/life/compose` shell only
+- Home circle destination append (after Live, before World)
+- Profile UM Life action → `/life` (not author filter)
+- Watch excerpt + localized Read on UM Life CTA
+- Shared like/comment/share/save on the same `posts.id`
+- 13-locale i18n keys, tests, `tsc`, `npm run build`, FF-push of the feature ref
+- Handoff docs + Central report
+
+### Forbidden scope
+
+- Full composer; Home feed restyle; Watch replacement; video Create removal; recovered Profile rewrite
+- Duplicate posts/media; parallel engagement tables; SQL including `20260931`
+- Deploy; FF `alpha-0.2`; mobile; brand/logo/color finalize; force; secrets
+
+### Result
+
+- Candidate on `origin/central/um-life-phase1-v1`
+- `PRODUCTION_DEPLOYED = NO`
+- `NEXT_ACTION` = WAIT_FOR_CENTRAL REVIEW. DO NOT DEPLOY. DO NOT FF `alpha-0.2`.
+
+---
+
 ## CENTRAL GO — REWARDS/REFERRAL SECURITY HARDENING V1
 
 **TASK_ID** = `CENTRAL_REWARDS_REFERRAL_SECURITY_HARDENING_V1`

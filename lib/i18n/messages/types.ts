@@ -43,6 +43,7 @@ export type FoundationMessages = {
   "nav.world": string;
   "nav.learning": string;
   "nav.live": string;
+  "nav.life": string;
   "nav.messages": string;
   "nav.profile": string;
   "nav.search": string;
@@ -471,6 +472,25 @@ export type FoundationMessages = {
   "watch.emptyBody": string;
   "watch.openDiscover": string;
   "watch.uploadVideo": string;
+  "watch.readOnUmLife": string;
+
+  "life.title": string;
+  "life.subtitle": string;
+  "life.opening": string;
+  "life.feedAria": string;
+  "life.focusedAria": string;
+  "life.emptyTitle": string;
+  "life.emptyBody": string;
+  "life.unavailableTitle": string;
+  "life.unavailableBody": string;
+  "life.composeNav": string;
+  "life.composeShellTitle": string;
+  "life.composeShellBody": string;
+  "life.composeComingSoon": string;
+  "life.backToFeed": string;
+  "life.watchVideo": string;
+  "life.authorProfileAria": string;
+  "profile.umLife": string;
 
   "create.title": string;
   "create.subtitle": string;

@@ -86,6 +86,7 @@ describe("Home Readiness Guardrails V1", () => {
       APP_ROUTES.store,
       APP_ROUTES.games,
       APP_ROUTES.live,
+      APP_ROUTES.life,
       APP_ROUTES.worldDiscovery,
       APP_ROUTES.search,
       APP_ROUTES.messages,

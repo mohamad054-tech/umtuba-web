@@ -6,6 +6,8 @@ export const APP_ROUTES = {
   discover: "/discover",
   watch: "/watch",
   live: "/live",
+  life: "/life",
+  lifeCompose: "/life/compose",
   messages: "/messages",
   notifications: "/notifications",
   settings: "/settings",
@@ -178,6 +180,23 @@ export function buildCreatorProfileHref(input: {
   }
   const params = new URLSearchParams({ article: articleId });
   return `${base}?${params.toString()}`;
+}
+
+/** UM Life feed. Optional `from=profile` is analytics-only — never an author filter. */
+export function buildLifeHref(options?: { from?: "profile" | "watch" }): string {
+  if (!options?.from) {
+    return APP_ROUTES.life;
+  }
+  const params = new URLSearchParams({ from: options.from });
+  return `${APP_ROUTES.life}?${params.toString()}`;
+}
+
+/** Focused canonical UM Life post — same `posts.id` as Watch / Profile. */
+export function buildLifePostHref(postId: string | number): string {
+  const params = new URLSearchParams({
+    post: String(postId),
+  });
+  return `${APP_ROUTES.life}?${params.toString()}`;
 }
 
 /** Write Post page; `image: true` emphasizes the optional photo path. */

@@ -27,6 +27,8 @@ const CHROME: TranslationKey[] = [
   "menu.store",
   "menu.learning",
   "watch.eyebrow",
+  "watch.readOnUmLife",
+  "life.composeNav",
   "create.title",
   "search.title",
   "messages.title",

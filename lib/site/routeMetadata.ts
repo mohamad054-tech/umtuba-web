@@ -68,6 +68,20 @@ export const watchMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const lifeMetadata = buildPageMetadata({
+  title: "UM Life",
+  description: `Read and share posts on UM Life inside ${BRAND.name}.`,
+  path: "/life",
+  index: "index",
+});
+
+export const lifeComposeMetadata = buildPageMetadata({
+  title: "UM Life compose",
+  description: `UM Life composer shell on ${BRAND.name}.`,
+  path: "/life/compose",
+  index: "noindex",
+});
+
 export const followingMetadata = buildPageMetadata({
   title: "Following",
   description: `Posts from creators you follow on ${BRAND.name}.`,

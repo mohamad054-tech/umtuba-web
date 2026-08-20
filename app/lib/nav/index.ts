@@ -7,6 +7,8 @@ export {
   buildCreatorProfileHref,
   buildDiscoverCityHref,
   buildHomeCityFocusHref,
+  buildLifeHref,
+  buildLifePostHref,
   buildLiveStreamHref,
   buildMessageCreatorHref,
   buildPostJourneyHref,

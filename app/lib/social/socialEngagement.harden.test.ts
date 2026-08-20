@@ -16,6 +16,7 @@ describe("share surface URLs", () => {
   it("builds watch vs discover share paths", () => {
     expect(buildPostShareUrl(42, "discover")).toContain("/discover?post=42");
     expect(buildPostShareUrl(42, "watch")).toContain("/watch?post=42");
+    expect(buildPostShareUrl(42, "life")).toContain("/life?post=42");
   });
 
   it("clipboard shareViaTarget preserves surface in source", () => {
