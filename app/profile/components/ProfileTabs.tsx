@@ -12,9 +12,9 @@ import {
 import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
 import {
   getProfileTabOverflowEdges,
-  PROFILE_TAB_OVERFLOW_FADE_LEFT_CLASS,
+  PROFILE_TAB_OVERFLOW_FADE_END_CLASS,
   PROFILE_TAB_OVERFLOW_FADE_PX,
-  PROFILE_TAB_OVERFLOW_FADE_RIGHT_CLASS,
+  PROFILE_TAB_OVERFLOW_FADE_START_CLASS,
   type ProfileTabOverflowEdges,
 } from "../lib/profileTabOverflow";
 
@@ -34,8 +34,8 @@ type ProfileTabsProps = {
 };
 
 const INITIAL_OVERFLOW: ProfileTabOverflowEdges = {
-  showLeftFade: false,
-  showRightFade: false,
+  showStartFade: false,
+  showEndFade: false,
 };
 
 function focusTabButton(tabId: ProfileTabId) {
@@ -183,17 +183,17 @@ export default function ProfileTabs({
         })}
       </div>
 
-      {overflow.showLeftFade ? (
+      {overflow.showStartFade ? (
         <div
           aria-hidden
-          className={PROFILE_TAB_OVERFLOW_FADE_LEFT_CLASS}
+          className={PROFILE_TAB_OVERFLOW_FADE_START_CLASS}
           style={{ width: PROFILE_TAB_OVERFLOW_FADE_PX }}
         />
       ) : null}
-      {overflow.showRightFade ? (
+      {overflow.showEndFade ? (
         <div
           aria-hidden
-          className={PROFILE_TAB_OVERFLOW_FADE_RIGHT_CLASS}
+          className={PROFILE_TAB_OVERFLOW_FADE_END_CLASS}
           style={{ width: PROFILE_TAB_OVERFLOW_FADE_PX }}
         />
       ) : null}
