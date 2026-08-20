@@ -1,6 +1,6 @@
 # UMTUBA Sound Library V1 originals
 
-Generate and publish **UMTUBA-owned original** synthetic clips. No third-party samples. No consumer-service scrapes.
+Generate and publish **UMTUBA-owned original** synthetic clips with unique human-readable titles. No third-party samples. No consumer-service scrapes. Encode AAC at 44.1 kHz with loudnorm (~-16 LUFS, no clip).
 
 ```bash
 node scripts/sounds/generateUmtubaOriginals.mjs --phase=all

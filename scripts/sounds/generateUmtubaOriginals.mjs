@@ -17,9 +17,11 @@ import {
   mkdirSync,
   writeFileSync,
   copyFileSync,
+  readdirSync,
 } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { titleForSlug } from "./uniqueTitles.v1.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const OUT_DIR = join(ROOT, "tmp-sound-catalog-v1");
@@ -70,13 +72,10 @@ function buildCatalog() {
       const idx = rows.length;
       const phase = idx < 20 ? 1 : idx < 50 ? 2 : 3;
       const num = pad2(i);
-      const titleNoun =
-        category === "UMTUBA Originals"
-          ? "Original Motif"
-          : category.replace(/\//g, " ");
+      const slug = `umtuba-${prefix}-${num}`;
       rows.push({
-        slug: `umtuba-${prefix}-${num}`,
-        title: `UMTUBA ${titleNoun} ${num}`,
+        slug,
+        title: titleForSlug(slug),
         category,
         prefix,
         kind,
@@ -192,6 +191,26 @@ function normalize(samples, peakDb = -1.5) {
   return samples;
 }
 
+function measureLevels(samples) {
+  let peak = 0;
+  let sumSq = 0;
+  for (const s of samples) {
+    peak = Math.max(peak, Math.abs(s));
+    sumSq += s * s;
+  }
+  const rms = Math.sqrt(sumSq / Math.max(1, samples.length));
+  const win = Math.min(samples.length, 2205);
+  let windowRms = 0;
+  const hop = Math.max(1, Math.floor(win / 2));
+  for (let i = 0; i < samples.length; i += hop) {
+    let acc = 0;
+    const end = Math.min(samples.length, i + win);
+    for (let j = i; j < end; j += 1) acc += samples[j] * samples[j];
+    windowRms = Math.max(windowRms, Math.sqrt(acc / Math.max(1, end - i)));
+  }
+  return { peak, rms, windowRms };
+}
+
 function render(kind, durationMs, seed, sampleRate) {
   const n = Math.round((durationMs / 1000) * sampleRate);
   const samples = new Float64Array(n);
@@ -250,47 +269,53 @@ function render(kind, durationMs, seed, sampleRate) {
       break;
     }
     case "beat": {
-      const bpm = 92 + variant * 4;
+      const bpm = 96 + variant * 4;
       const step = 60 / bpm / 2;
       const bars = durationMs / 1000;
       for (let t = 0; t < bars; t += step) {
         const beat = Math.round(t / step) % 8;
         if (beat % 2 === 0) {
-          writeSine(68 + (beat === 0 ? 6 : 0), 0.85, t, t + 0.18, 16);
-          writeNoise(0.25, t, t + 0.03, 70);
+          writeSine(72 + (beat === 0 ? 8 : 0), 0.95, t, t + 0.2, 12);
+          writeSine(144, 0.35, t, t + 0.12, 18);
+          writeNoise(0.4, t, t + 0.04, 60);
         }
         if (beat === 2 || beat === 6) {
-          writeSine(180, 0.2, t, t + 0.08, 30);
+          writeSine(220, 0.35, t, t + 0.1, 22);
+          writeNoise(0.28, t, t + 0.05, 50);
         }
-        writeSine(7000 + variant * 300, 0.09, t, t + 0.02, 180);
+        writeSine(1800 + variant * 80, 0.12, t, t + 0.03, 80);
+        writeSine(6500 + variant * 200, 0.08, t, t + 0.015, 160);
       }
-      const mixed = lowpass(samples, 4200, sampleRate);
+      const mixed = lowpass(samples, 5200, sampleRate);
       samples.set(mixed);
-      applyFade(samples, sampleRate, 12, 80);
+      applyFade(samples, sampleRate, 8, 60);
       break;
     }
     case "cinematic": {
-      writeSine(46 + variant, 0.35, 0, durationMs / 1000, 0.05);
-      writeSine(69 + variant * 0.5, 0.22, 0.4, durationMs / 1000, 0.04);
-      writeSine(138, 0.08, 1.2, durationMs / 1000, 0.08);
-      writeNoise(0.12, 0, durationMs / 1000, 0);
-      const pad = lowpass(samples, 700, sampleRate);
+      writeSine(55 + variant, 0.45, 0, durationMs / 1000, 0.05);
+      writeSine(110 + variant * 0.5, 0.38, 0.2, durationMs / 1000, 0.04);
+      writeSine(220, 0.28, 0.5, durationMs / 1000, 0.06);
+      writeSine(330 + variant * 2, 0.18, 1.0, durationMs / 1000, 0.08);
+      writeSine(440, 0.1, 1.6, durationMs / 1000, 0.1);
+      writeNoise(0.08, 0, durationMs / 1000, 0);
+      const pad = lowpass(samples, 2400, sampleRate);
       for (let i = 0; i < n; i += 1) {
         const x = i / (n - 1);
-        const swell = 0.25 + 0.75 * Math.sin(Math.PI * x);
+        const swell = 0.35 + 0.65 * Math.sin(Math.PI * x);
         samples[i] = pad[i] * swell;
       }
-      applyFade(samples, sampleRate, 180, 240);
+      applyFade(samples, sampleRate, 140, 200);
       break;
     }
     case "ambient": {
-      const base = 110 + variant * 7;
-      writeSine(base, 0.22, 0, durationMs / 1000);
-      writeSine(base * 1.5, 0.12, 0, durationMs / 1000);
-      writeSine(base * 1.995, 0.08, 0, durationMs / 1000);
-      writeNoise(0.06, 0, durationMs / 1000);
-      samples.set(lowpass(samples, 1400, sampleRate));
-      applyFade(samples, sampleRate, 220, 280);
+      const base = 196 + variant * 7;
+      writeSine(base, 0.42, 0, durationMs / 1000);
+      writeSine(base * 1.5, 0.28, 0, durationMs / 1000);
+      writeSine(base * 2, 0.16, 0, durationMs / 1000);
+      writeSine(base * 2.5, 0.08, 0, durationMs / 1000);
+      writeNoise(0.05, 0, durationMs / 1000);
+      samples.set(lowpass(samples, 2800, sampleRate));
+      applyFade(samples, sampleRate, 180, 220);
       break;
     }
     case "transition": {
@@ -309,73 +334,79 @@ function render(kind, durationMs, seed, sampleRate) {
     case "funny": {
       for (let i = 0; i < n; i += 1) {
         const t = tAt(i);
-        const wobble = 420 + 180 * Math.sin(2 * Math.PI * (3 + variant) * t);
+        const wobble = 380 + 220 * Math.sin(2 * Math.PI * (3 + variant) * t);
         samples[i] =
-          0.35 * Math.sin(2 * Math.PI * wobble * t) +
-          0.12 * Math.sin(2 * Math.PI * wobble * 1.5 * t);
+          0.62 * Math.sin(2 * Math.PI * wobble * t) +
+          0.22 * Math.sin(2 * Math.PI * wobble * 1.5 * t);
       }
-      applyFade(samples, sampleRate, 20, 80);
+      applyFade(samples, sampleRate, 12, 60);
       break;
     }
     case "nature": {
-      writeNoise(0.85, 0, durationMs / 1000);
-      const wind = lowpass(samples, 500 + variant * 40, sampleRate);
+      writeNoise(0.95, 0, durationMs / 1000);
+      const wind = lowpass(samples, 1400 + variant * 80, sampleRate);
       for (let i = 0; i < n; i += 1) {
         const t = tAt(i);
         const drip =
-          variant % 2 === 0 && Math.sin(2 * Math.PI * (0.4 + variant * 0.07) * t) > 0.97
-            ? 0.18 * Math.sin(2 * Math.PI * 1800 * t) * Math.exp(-((t * 8) % 1) * 14)
+          Math.sin(2 * Math.PI * (0.55 + variant * 0.08) * t) > 0.82
+            ? 0.35 * Math.sin(2 * Math.PI * (1400 + variant * 90) * t) *
+              Math.exp(-((t * 7) % 1) * 10)
             : 0;
-        samples[i] = wind[i] * (0.55 + 0.2 * Math.sin(2 * Math.PI * 0.12 * t)) + drip;
+        const birds =
+          0.08 * Math.sin(2 * Math.PI * (880 + variant * 40) * t) *
+          (0.5 + 0.5 * Math.sin(2 * Math.PI * 0.35 * t));
+        samples[i] =
+          wind[i] * (0.7 + 0.25 * Math.sin(2 * Math.PI * 0.14 * t)) + drip + birds;
       }
-      applyFade(samples, sampleRate, 200, 240);
+      applyFade(samples, sampleRate, 160, 200);
       break;
     }
     case "tech": {
       const hops = [440, 660, 880, 1320];
       const hop = hops[variant % hops.length];
-      writeSine(hop, 0.4, 0, 0.12, 18);
-      writeSine(hop * 1.5, 0.2, 0.14, 0.26, 18);
-      writeSine(hop * 0.75, 0.25, 0.28, 0.5, 12);
-      writeNoise(0.08, 0, 0.05, 60);
-      applyFade(samples, sampleRate, 4, 40);
+      writeSine(hop, 0.7, 0, 0.16, 14);
+      writeSine(hop * 1.5, 0.35, 0.14, 0.3, 14);
+      writeSine(hop * 0.75, 0.4, 0.28, 0.62, 10);
+      writeNoise(0.12, 0, 0.05, 50);
+      applyFade(samples, sampleRate, 3, 30);
       break;
     }
     case "sports": {
-      writeSine(1800 + variant * 40, 0.45, 0.05, 0.55, 2.2);
-      writeSine(1900 + variant * 30, 0.2, 0.05, 0.55, 2.2);
-      writeNoise(0.2, 0.6, durationMs / 1000, 1.4);
-      samples.set(lowpass(samples, 3500, sampleRate));
-      applyFade(samples, sampleRate, 10, 80);
+      writeSine(1760 + variant * 40, 0.7, 0.04, 0.7, 1.8);
+      writeSine(1980 + variant * 30, 0.35, 0.04, 0.7, 1.8);
+      writeNoise(0.35, 0.55, durationMs / 1000, 1.2);
+      samples.set(lowpass(samples, 4500, sampleRate));
+      applyFade(samples, sampleRate, 8, 60);
       break;
     }
     case "celebration": {
       const notes = [523.25, 659.25, 783.99, 1046.5];
       notes.forEach((freq, i) => {
         const start = 0.08 * i;
-        writeSine(freq, 0.28, start, start + 0.7, 3.2);
-        writeSine(freq * 2, 0.08, start, start + 0.35, 6);
+        writeSine(freq, 0.48, start, start + 0.8, 2.6);
+        writeSine(freq * 2, 0.16, start, start + 0.4, 5);
       });
-      applyFade(samples, sampleRate, 12, 120);
+      applyFade(samples, sampleRate, 10, 90);
       break;
     }
     case "calm": {
-      const base = 196 + variant * 4;
-      writeSine(base, 0.2, 0, durationMs / 1000);
-      writeSine(base * 1.25, 0.12, 0, durationMs / 1000);
-      writeSine(base * 1.5, 0.08, 0, durationMs / 1000);
+      const base = 220 + variant * 6;
+      writeSine(base, 0.4, 0, durationMs / 1000);
+      writeSine(base * 1.25, 0.26, 0, durationMs / 1000);
+      writeSine(base * 1.5, 0.16, 0, durationMs / 1000);
+      writeSine(base * 2, 0.08, 0, durationMs / 1000);
       writeNoise(0.03, 0, durationMs / 1000);
-      samples.set(lowpass(samples, 1200, sampleRate));
-      applyFade(samples, sampleRate, 300, 350);
+      samples.set(lowpass(samples, 2600, sampleRate));
+      applyFade(samples, sampleRate, 220, 260);
       break;
     }
     case "loop": {
       const bpm = 100;
       const step = 60 / bpm;
       for (let t = 0; t < durationMs / 1000; t += step) {
-        writeSine(98, 0.28, t, t + 0.2, 10);
-        writeSine(196, 0.1, t + step * 0.5, t + step * 0.5 + 0.12, 14);
-        writeSine(392 + variant * 8, 0.06, t + step * 0.75, t + step * 0.75 + 0.06, 30);
+        writeSine(110, 0.45, t, t + 0.22, 8);
+        writeSine(220, 0.22, t + step * 0.5, t + step * 0.5 + 0.14, 12);
+        writeSine(440 + variant * 8, 0.14, t + step * 0.75, t + step * 0.75 + 0.08, 22);
       }
       // Cross-match ends for a short loop.
       applyFade(samples, sampleRate, 8, 8);
@@ -394,13 +425,14 @@ function render(kind, durationMs, seed, sampleRate) {
       const pattern = [0, 2, 4, 2, 3, 1, 0, 4].map((x) => (x + variant) % scale.length);
       const noteDur = 0.28;
       pattern.forEach((idx, i) => {
-        const start = 0.35 + i * noteDur;
-        writeSine(scale[idx], 0.28, start, start + 0.42, 3.5);
-        writeSine(scale[idx] / 2, 0.1, start, start + 0.5, 2.2);
+        const start = 0.2 + i * noteDur;
+        writeSine(scale[idx], 0.55, start, start + 0.46, 2.6);
+        writeSine(scale[idx] * 2, 0.12, start, start + 0.3, 5);
+        writeSine(scale[idx] / 2, 0.22, start, start + 0.52, 1.8);
       });
-      writeSine(65 + variant, 0.16, 0, durationMs / 1000, 0.08);
-      samples.set(lowpass(samples, 2800, sampleRate));
-      applyFade(samples, sampleRate, 80, 160);
+      writeSine(98 + variant, 0.22, 0, durationMs / 1000, 0.06);
+      samples.set(lowpass(samples, 4200, sampleRate));
+      applyFade(samples, sampleRate, 40, 120);
       break;
     }
     default:
@@ -408,7 +440,7 @@ function render(kind, durationMs, seed, sampleRate) {
       applyFade(samples, sampleRate, 20, 40);
   }
 
-  return normalize(samples, -1.8);
+  return normalize(samples, -1.0);
 }
 
 function encodeWav(samples, sampleRate) {
@@ -436,11 +468,20 @@ function encodeWav(samples, sampleRate) {
 
 function findFfmpeg(explicit) {
   if (explicit && existsSync(explicit)) return explicit;
+  const toolsRoot = join("D:", "umtuba-central", "tools", "ffmpeg");
   const candidates = [
-    join("D:", "umtuba-central", "tools", "ffmpeg", "ffmpeg.exe"),
-    join("D:", "umtuba-central", "tools", "ffmpeg", "bin", "ffmpeg.exe"),
+    join(toolsRoot, "ffmpeg.exe"),
+    join(toolsRoot, "bin", "ffmpeg.exe"),
     "ffmpeg",
   ];
+  if (existsSync(toolsRoot)) {
+    for (const entry of readdirSync(toolsRoot, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        candidates.push(join(toolsRoot, entry.name, "bin", "ffmpeg.exe"));
+        candidates.push(join(toolsRoot, entry.name, "ffmpeg.exe"));
+      }
+    }
+  }
   for (const c of candidates) {
     try {
       if (c !== "ffmpeg" && !existsSync(c)) continue;
@@ -459,7 +500,7 @@ function writeRegistry(rows, codec) {
     "",
     "All rows are **UMTUBA-owned original** synthetic clips generated on WIN-MJRKAKK2MEH.",
     "No TikTok / YouTube / Spotify / Instagram / Apple Music / third-party scrapes.",
-    "No commercial-song impersonation. Titles are labeled UMTUBA + category.",
+    "No commercial-song impersonation. Titles are unique human-readable names.",
     "",
     "- LICENSE_TYPE = UMTUBA_OWNED_ORIGINAL",
     "- COMMERCIAL_USE_ALLOWED = YES",
@@ -507,8 +548,14 @@ function main() {
 
   const published = [];
   for (const row of selected) {
-    const sr = row.durationMs <= 2000 ? 44100 : 22050;
+    const sr = 44100;
     const samples = render(row.kind, row.durationMs, row.seed, sr);
+    const levels = measureLevels(samples);
+    if (levels.peak < 0.25 || (levels.rms < 0.03 && levels.windowRms < 0.12)) {
+      throw new Error(
+        `Generated ${row.slug} is too quiet (peak=${levels.peak.toFixed(3)} rms=${levels.rms.toFixed(3)} win=${levels.windowRms.toFixed(3)})`
+      );
+    }
     const wavPath = join(OUT_DIR, `${row.slug}.wav`);
     writeFileSync(wavPath, encodeWav(samples, sr));
     let finalPath = wavPath;
@@ -521,12 +568,16 @@ function main() {
           "-y",
           "-i",
           wavPath,
+          "-af",
+          "loudnorm=I=-16:TP=-1.5:LRA=11,alimiter=limit=0.89:level=disabled",
           "-c:a",
           "aac",
           "-b:a",
-          "128k",
+          "192k",
           "-ac",
           "1",
+          "-ar",
+          "44100",
           "-movflags",
           "+faststart",
           m4aPath,
