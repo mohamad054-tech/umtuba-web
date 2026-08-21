@@ -285,6 +285,26 @@ export const arMessages: FoundationMessages = {
   "auth.signup.continueProfile": "المتابعة إلى الملف",
   "auth.signup.continueLeftOff": "المتابعة من حيث توقفت",
   "auth.signup.viewProfile": "عرض الملف",
+  "auth.signup.emailRequired": "البريد الإلكتروني مطلوب.",
+  "auth.signup.emailInvalid": "أدخل عنوان بريد إلكتروني صالحًا.",
+  "auth.signup.passwordRequired": "كلمة المرور مطلوبة.",
+  "auth.signup.passwordMin": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل.",
+  "auth.signup.confirmRequired": "أكّد كلمة المرور.",
+  "auth.signup.passwordMismatch": "كلمتا المرور غير متطابقتين.",
+  "auth.signup.fullNameRequired": "الاسم الكامل مطلوب.",
+  "auth.signup.usernameRequired": "اسم المستخدم مطلوب.",
+  "auth.signup.usernameHint":
+    "استخدم 3–24 حرفًا: أحرفًا صغيرة وأرقامًا ونقاطًا أو شرطات سفلية.",
+  "auth.signup.usernameTaken": "اسم المستخدم هذا مستخدم بالفعل.",
+  "auth.signup.acceptTerms": "اقبل الشروط للمتابعة.",
+  "auth.signup.fixHighlighted": "يُرجى تصحيح الحقول المظللة.",
+  "auth.signup.unableToCreate": "تعذّر إنشاء حسابك.",
+  "auth.signup.accountReserved":
+    "تم حجز الحساب. أكّد البريد المُرسل إلى {email} ثم سجّل الدخول.",
+  "auth.signup.accountReservedFor":
+    "تم حجز الحساب لـ @{username}. أكّد البريد المُرسل إلى {email} ثم سجّل الدخول.",
+  "auth.signup.accountCreated":
+    "تم إنشاء الحساب لـ @{username}. ابدأ أو افتح ملفك العام.",
 
   "world.eyebrow": "عالم UMTUBA",
   "world.navTitle": "اكتشاف العالم",

@@ -21,8 +21,6 @@ import {
   isValidEmail,
   isValidUsername,
   normalizeUsername,
-  USERNAME_HINT,
-  validatePassword,
 } from "../../lib/supabase/validation";
 
 type FieldErrors = {
@@ -73,20 +71,21 @@ export default function SignupForm({
     const next: FieldErrors = {};
 
     if (!email.trim()) {
-      next.email = "Email is required.";
+      next.email = t("auth.signup.emailRequired");
     } else if (!isValidEmail(email.trim())) {
-      next.email = "Enter a valid email address.";
+      next.email = t("auth.signup.emailInvalid");
     }
 
-    const passwordError = validatePassword(password);
-    if (passwordError) {
-      next.password = passwordError;
+    if (!password) {
+      next.password = t("auth.signup.passwordRequired");
+    } else if (password.length < 6) {
+      next.password = t("auth.signup.passwordMin");
     }
 
     if (!confirmPassword) {
-      next.confirmPassword = "Confirm your password.";
+      next.confirmPassword = t("auth.signup.confirmRequired");
     } else if (confirmPassword !== password) {
-      next.confirmPassword = "Passwords do not match.";
+      next.confirmPassword = t("auth.signup.passwordMismatch");
     }
 
     return next;
@@ -96,18 +95,18 @@ export default function SignupForm({
     const next: FieldErrors = {};
 
     if (!fullName.trim()) {
-      next.fullName = "Full name is required.";
+      next.fullName = t("auth.signup.fullNameRequired");
     }
 
     const cleanedUsername = normalizeUsername(username);
     if (!cleanedUsername) {
-      next.username = "Username is required.";
+      next.username = t("auth.signup.usernameRequired");
     } else if (!isValidUsername(cleanedUsername)) {
-      next.username = USERNAME_HINT;
+      next.username = t("auth.signup.usernameHint");
     }
 
     if (!acceptTerms) {
-      next.acceptTerms = "Accept the terms to continue.";
+      next.acceptTerms = t("auth.signup.acceptTerms");
     }
 
     return next;
@@ -118,7 +117,7 @@ export default function SignupForm({
     const nextErrors = validateCredentials();
     setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
-      setFormError("Please fix the highlighted fields.");
+      setFormError(t("auth.signup.fixHighlighted"));
       return;
     }
     setFormError("");
@@ -135,14 +134,14 @@ export default function SignupForm({
 
     if (Object.keys(credentialErrors).length > 0) {
       setStep(1);
-      setFormError("Please fix the highlighted fields.");
+      setFormError(t("auth.signup.fixHighlighted"));
       setSuccessUsername(null);
       setPendingEmailConfirm(false);
       return;
     }
 
     if (Object.keys(profileErrors).length > 0) {
-      setFormError("Please fix the highlighted fields.");
+      setFormError(t("auth.signup.fixHighlighted"));
       setSuccessUsername(null);
       setPendingEmailConfirm(false);
       return;
@@ -180,7 +179,7 @@ export default function SignupForm({
     } catch (error) {
       const message = toAuthUserFacingMessage(
         error,
-        "Unable to create your account."
+        t("auth.signup.unableToCreate")
       );
 
       if (message.toLowerCase().includes("check your email")) {
@@ -192,8 +191,8 @@ export default function SignupForm({
       }
 
       if (isUsernameTakenError(message)) {
-        setFieldErrors({ username: "That username is already taken." });
-        setFormError("Unable to create your account.");
+        setFieldErrors({ username: t("auth.signup.usernameTaken") });
+        setFormError(t("auth.signup.unableToCreate"));
         return;
       }
 
@@ -229,9 +228,13 @@ export default function SignupForm({
       >
         <div className="space-y-4">
           <AuthAlert tone="info">
-            Account reserved{successUsername ? ` for @${successUsername}` : ""}.
-            Confirm the email sent to{" "}
-            <span className="font-semibold">{email.trim()}</span>, then sign in.
+            {successUsername
+              ? t("auth.signup.accountReservedFor", {
+                  values: { username: successUsername, email: email.trim() },
+                })
+              : t("auth.signup.accountReserved", {
+                  values: { email: email.trim() },
+                })}
           </AuthAlert>
 
           <Link
@@ -277,8 +280,9 @@ export default function SignupForm({
       >
         <div className="space-y-4">
           <AuthAlert tone="success">
-            Account created for @{successUsername}. Jump in or open your public
-            profile.
+            {t("auth.signup.accountCreated", {
+              values: { username: successUsername },
+            })}
           </AuthAlert>
 
           <Link
@@ -439,7 +443,7 @@ export default function SignupForm({
             disabled={isSubmitting}
             placeholder={t("auth.signup.usernamePlaceholder")}
             error={fieldErrors.username}
-            hint={USERNAME_HINT}
+            hint={t("auth.signup.usernameHint")}
             onChange={(event) => {
               setUsername(event.target.value);
               setFieldErrors((prev) => ({ ...prev, username: undefined }));

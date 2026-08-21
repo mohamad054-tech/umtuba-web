@@ -264,6 +264,26 @@ export const hiMessages: FoundationMessages = {
   "auth.signup.continueProfile": "प्रोफ़ाइल पर जारी रखें",
   "auth.signup.continueLeftOff": "जहाँ छोड़ा था वहीं से जारी रखें",
   "auth.signup.viewProfile": "प्रोफ़ाइल देखें",
+  "auth.signup.emailRequired": "ईमेल आवश्यक है।",
+  "auth.signup.emailInvalid": "मान्य ईमेल पता दर्ज करें।",
+  "auth.signup.passwordRequired": "पासवर्ड आवश्यक है।",
+  "auth.signup.passwordMin": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए।",
+  "auth.signup.confirmRequired": "अपना पासवर्ड पुष्टि करें।",
+  "auth.signup.passwordMismatch": "पासवर्ड मेल नहीं खाते।",
+  "auth.signup.fullNameRequired": "पूरा नाम आवश्यक है।",
+  "auth.signup.usernameRequired": "उपयोगकर्ता नाम आवश्यक है।",
+  "auth.signup.usernameHint":
+    "3–24 अक्षर उपयोग करें: छोटे अक्षर, संख्याएँ, बिंदु या अंडरस्कोर।",
+  "auth.signup.usernameTaken": "यह उपयोगकर्ता नाम पहले से लिया गया है।",
+  "auth.signup.acceptTerms": "जारी रखने के लिए शर्तें स्वीकार करें।",
+  "auth.signup.fixHighlighted": "हाइलाइट किए गए फ़ील्ड ठीक करें।",
+  "auth.signup.unableToCreate": "आपका खाता नहीं बनाया जा सका।",
+  "auth.signup.accountReserved":
+    "खाता आरक्षित है। {email} पर भेजे गए ईमेल की पुष्टि करें, फिर साइन इन करें।",
+  "auth.signup.accountReservedFor":
+    "@{username} के लिए खाता आरक्षित है। {email} पर भेजे गए ईमेल की पुष्टि करें, फिर साइन इन करें।",
+  "auth.signup.accountCreated":
+    "@{username} के लिए खाता बनाया गया। आगे बढ़ें या अपनी सार्वजनिक प्रोफ़ाइल खोलें।",
   "world.eyebrow": "UMTUBA विश्व",
   "world.navTitle": "विश्व अन्वेषण",
   "world.navSubtitleLive": "स्थान और गंतव्य",

@@ -263,6 +263,26 @@ export const koMessages: FoundationMessages = {
   "auth.signup.continueProfile": "프로필로 계속",
   "auth.signup.continueLeftOff": "멈춘 곳부터 계속",
   "auth.signup.viewProfile": "프로필 보기",
+  "auth.signup.emailRequired": "이메일은 필수입니다.",
+  "auth.signup.emailInvalid": "유효한 이메일 주소를 입력하세요.",
+  "auth.signup.passwordRequired": "비밀번호는 필수입니다.",
+  "auth.signup.passwordMin": "비밀번호는 6자 이상이어야 합니다.",
+  "auth.signup.confirmRequired": "비밀번호를 확인하세요.",
+  "auth.signup.passwordMismatch": "비밀번호가 일치하지 않습니다.",
+  "auth.signup.fullNameRequired": "이름은 필수입니다.",
+  "auth.signup.usernameRequired": "사용자 이름은 필수입니다.",
+  "auth.signup.usernameHint":
+    "3–24자: 소문자, 숫자, 점 또는 밑줄을 사용하세요.",
+  "auth.signup.usernameTaken": "이미 사용 중인 사용자 이름입니다.",
+  "auth.signup.acceptTerms": "계속하려면 약관에 동의하세요.",
+  "auth.signup.fixHighlighted": "표시된 필드를 수정하세요.",
+  "auth.signup.unableToCreate": "계정을 만들 수 없습니다.",
+  "auth.signup.accountReserved":
+    "계정이 예약되었습니다. {email}로 보낸 메일을 확인한 뒤 로그인하세요.",
+  "auth.signup.accountReservedFor":
+    "@{username} 계정이 예약되었습니다. {email}로 보낸 메일을 확인한 뒤 로그인하세요.",
+  "auth.signup.accountCreated":
+    "@{username} 계정이 만들어졌습니다. 계속하거나 공개 프로필을 여세요.",
   "world.eyebrow": "UMTUBA 월드",
   "world.navTitle": "월드 탐색",
   "world.navSubtitleLive": "장소와 목적지",

@@ -530,6 +530,26 @@ export const esMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Continuar al perfil",
   "auth.signup.continueLeftOff": "Continuar donde lo dejaste",
   "auth.signup.viewProfile": "Ver perfil",
+  "auth.signup.emailRequired": "El correo es obligatorio.",
+  "auth.signup.emailInvalid": "Introduce una dirección de correo válida.",
+  "auth.signup.passwordRequired": "La contraseña es obligatoria.",
+  "auth.signup.passwordMin": "La contraseña debe tener al menos 6 caracteres.",
+  "auth.signup.confirmRequired": "Confirma tu contraseña.",
+  "auth.signup.passwordMismatch": "Las contraseñas no coinciden.",
+  "auth.signup.fullNameRequired": "El nombre completo es obligatorio.",
+  "auth.signup.usernameRequired": "El nombre de usuario es obligatorio.",
+  "auth.signup.usernameHint":
+    "Usa de 3 a 24 caracteres: letras minúsculas, números, puntos o guiones bajos.",
+  "auth.signup.usernameTaken": "Ese nombre de usuario ya está en uso.",
+  "auth.signup.acceptTerms": "Acepta los términos para continuar.",
+  "auth.signup.fixHighlighted": "Corrige los campos resaltados.",
+  "auth.signup.unableToCreate": "No se pudo crear tu cuenta.",
+  "auth.signup.accountReserved":
+    "Cuenta reservada. Confirma el correo enviado a {email} e inicia sesión.",
+  "auth.signup.accountReservedFor":
+    "Cuenta reservada para @{username}. Confirma el correo enviado a {email} e inicia sesión.",
+  "auth.signup.accountCreated":
+    "Cuenta creada para @{username}. Entra o abre tu perfil público.",
   "home.subtitle": "Feed de vídeo primero",
   "home.welcome": "Bienvenida",
   "home.saved": "Guardados",

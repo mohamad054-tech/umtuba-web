@@ -533,6 +533,26 @@ export const deMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Weiter zum Profil",
   "auth.signup.continueLeftOff": "Dort weitermachen, wo du aufgehört hast",
   "auth.signup.viewProfile": "Profil ansehen",
+  "auth.signup.emailRequired": "E-Mail ist erforderlich.",
+  "auth.signup.emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
+  "auth.signup.passwordRequired": "Passwort ist erforderlich.",
+  "auth.signup.passwordMin": "Das Passwort muss mindestens 6 Zeichen haben.",
+  "auth.signup.confirmRequired": "Bestätigen Sie Ihr Passwort.",
+  "auth.signup.passwordMismatch": "Die Passwörter stimmen nicht überein.",
+  "auth.signup.fullNameRequired": "Vollständiger Name ist erforderlich.",
+  "auth.signup.usernameRequired": "Benutzername ist erforderlich.",
+  "auth.signup.usernameHint":
+    "Verwenden Sie 3–24 Zeichen: Kleinbuchstaben, Zahlen, Punkte oder Unterstriche.",
+  "auth.signup.usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+  "auth.signup.acceptTerms": "Akzeptieren Sie die Bedingungen, um fortzufahren.",
+  "auth.signup.fixHighlighted": "Bitte korrigieren Sie die markierten Felder.",
+  "auth.signup.unableToCreate": "Ihr Konto konnte nicht erstellt werden.",
+  "auth.signup.accountReserved":
+    "Konto reserviert. Bestätigen Sie die E-Mail an {email} und melden Sie sich an.",
+  "auth.signup.accountReservedFor":
+    "Konto für @{username} reserviert. Bestätigen Sie die E-Mail an {email} und melden Sie sich an.",
+  "auth.signup.accountCreated":
+    "Konto für @{username} erstellt. Weiter oder öffnen Sie Ihr öffentliches Profil.",
   "home.subtitle": "Video-zuerst-Feed",
   "home.welcome": "Willkommen",
   "home.saved": "Gespeichert",

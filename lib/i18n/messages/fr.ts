@@ -534,6 +534,27 @@ export const frMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Continuer vers le profil",
   "auth.signup.continueLeftOff": "Reprendre là où vous étiez",
   "auth.signup.viewProfile": "Voir le profil",
+  "auth.signup.emailRequired": "L’e-mail est obligatoire.",
+  "auth.signup.emailInvalid": "Saisissez une adresse e-mail valide.",
+  "auth.signup.passwordRequired": "Le mot de passe est obligatoire.",
+  "auth.signup.passwordMin":
+    "Le mot de passe doit contenir au moins 6 caractères.",
+  "auth.signup.confirmRequired": "Confirmez votre mot de passe.",
+  "auth.signup.passwordMismatch": "Les mots de passe ne correspondent pas.",
+  "auth.signup.fullNameRequired": "Le nom complet est obligatoire.",
+  "auth.signup.usernameRequired": "Le nom d’utilisateur est obligatoire.",
+  "auth.signup.usernameHint":
+    "Utilisez 3 à 24 caractères : lettres minuscules, chiffres, points ou traits de soulignement.",
+  "auth.signup.usernameTaken": "Ce nom d’utilisateur est déjà pris.",
+  "auth.signup.acceptTerms": "Acceptez les conditions pour continuer.",
+  "auth.signup.fixHighlighted": "Veuillez corriger les champs indiqués.",
+  "auth.signup.unableToCreate": "Impossible de créer votre compte.",
+  "auth.signup.accountReserved":
+    "Compte réservé. Confirmez l’e-mail envoyé à {email}, puis connectez-vous.",
+  "auth.signup.accountReservedFor":
+    "Compte réservé pour @{username}. Confirmez l’e-mail envoyé à {email}, puis connectez-vous.",
+  "auth.signup.accountCreated":
+    "Compte créé pour @{username}. Continuez ou ouvrez votre profil public.",
   "home.subtitle": "Fil vidéo d’abord",
   "home.welcome": "Bienvenue",
   "home.saved": "Enregistrements",

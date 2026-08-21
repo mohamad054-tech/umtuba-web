@@ -264,6 +264,26 @@ export const idMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Lanjut ke profil",
   "auth.signup.continueLeftOff": "Lanjut dari terakhir kali",
   "auth.signup.viewProfile": "Lihat profil",
+  "auth.signup.emailRequired": "Email wajib diisi.",
+  "auth.signup.emailInvalid": "Masukkan alamat email yang valid.",
+  "auth.signup.passwordRequired": "Kata sandi wajib diisi.",
+  "auth.signup.passwordMin": "Kata sandi harus minimal 6 karakter.",
+  "auth.signup.confirmRequired": "Konfirmasikan kata sandi Anda.",
+  "auth.signup.passwordMismatch": "Kata sandi tidak cocok.",
+  "auth.signup.fullNameRequired": "Nama lengkap wajib diisi.",
+  "auth.signup.usernameRequired": "Nama pengguna wajib diisi.",
+  "auth.signup.usernameHint":
+    "Gunakan 3–24 karakter: huruf kecil, angka, titik, atau garis bawah.",
+  "auth.signup.usernameTaken": "Nama pengguna itu sudah digunakan.",
+  "auth.signup.acceptTerms": "Setujui syarat untuk melanjutkan.",
+  "auth.signup.fixHighlighted": "Perbaiki kolom yang ditandai.",
+  "auth.signup.unableToCreate": "Tidak dapat membuat akun Anda.",
+  "auth.signup.accountReserved":
+    "Akun dicadangkan. Konfirmasikan email yang dikirim ke {email}, lalu masuk.",
+  "auth.signup.accountReservedFor":
+    "Akun dicadangkan untuk @{username}. Konfirmasikan email yang dikirim ke {email}, lalu masuk.",
+  "auth.signup.accountCreated":
+    "Akun dibuat untuk @{username}. Lanjutkan atau buka profil publik Anda.",
   "world.eyebrow": "Dunia UMTUBA",
   "world.navTitle": "Penemuan Dunia",
   "world.navSubtitleLive": "Tempat dan destinasi",

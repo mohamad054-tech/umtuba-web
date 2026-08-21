@@ -263,6 +263,26 @@ export const jaMessages: FoundationMessages = {
   "auth.signup.continueProfile": "プロフィールへ進む",
   "auth.signup.continueLeftOff": "中断したところから続ける",
   "auth.signup.viewProfile": "プロフィールを見る",
+  "auth.signup.emailRequired": "メールアドレスは必須です。",
+  "auth.signup.emailInvalid": "有効なメールアドレスを入力してください。",
+  "auth.signup.passwordRequired": "パスワードは必須です。",
+  "auth.signup.passwordMin": "パスワードは6文字以上にしてください。",
+  "auth.signup.confirmRequired": "パスワードを再入力してください。",
+  "auth.signup.passwordMismatch": "パスワードが一致しません。",
+  "auth.signup.fullNameRequired": "氏名は必須です。",
+  "auth.signup.usernameRequired": "ユーザー名は必須です。",
+  "auth.signup.usernameHint":
+    "3〜24文字で、小文字・数字・ピリオド・アンダースコアを使ってください。",
+  "auth.signup.usernameTaken": "そのユーザー名は既に使われています。",
+  "auth.signup.acceptTerms": "続行するには利用規約に同意してください。",
+  "auth.signup.fixHighlighted": "ハイライトされた項目を修正してください。",
+  "auth.signup.unableToCreate": "アカウントを作成できませんでした。",
+  "auth.signup.accountReserved":
+    "アカウントを予約しました。{email} に送信したメールを確認してからサインインしてください。",
+  "auth.signup.accountReservedFor":
+    "@{username} のアカウントを予約しました。{email} に送信したメールを確認してからサインインしてください。",
+  "auth.signup.accountCreated":
+    "@{username} のアカウントを作成しました。続けるか、公開プロフィールを開いてください。",
   "world.eyebrow": "UMTUBA ワールド",
   "world.navTitle": "ワールド発見",
   "world.navSubtitleLive": "場所と行き先",

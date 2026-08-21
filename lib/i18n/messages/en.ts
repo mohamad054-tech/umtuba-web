@@ -292,6 +292,26 @@ export const enMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Continue to Profile",
   "auth.signup.continueLeftOff": "Continue where you left off",
   "auth.signup.viewProfile": "View profile",
+  "auth.signup.emailRequired": "Email is required.",
+  "auth.signup.emailInvalid": "Enter a valid email address.",
+  "auth.signup.passwordRequired": "Password is required.",
+  "auth.signup.passwordMin": "Password must be at least 6 characters.",
+  "auth.signup.confirmRequired": "Confirm your password.",
+  "auth.signup.passwordMismatch": "Passwords do not match.",
+  "auth.signup.fullNameRequired": "Full name is required.",
+  "auth.signup.usernameRequired": "Username is required.",
+  "auth.signup.usernameHint":
+    "Use 3–24 characters: lowercase letters, numbers, dots, or underscores.",
+  "auth.signup.usernameTaken": "That username is already taken.",
+  "auth.signup.acceptTerms": "Accept the terms to continue.",
+  "auth.signup.fixHighlighted": "Please fix the highlighted fields.",
+  "auth.signup.unableToCreate": "Unable to create your account.",
+  "auth.signup.accountReserved":
+    "Account reserved. Confirm the email sent to {email}, then sign in.",
+  "auth.signup.accountReservedFor":
+    "Account reserved for @{username}. Confirm the email sent to {email}, then sign in.",
+  "auth.signup.accountCreated":
+    "Account created for @{username}. Jump in or open your public profile.",
 
   "world.eyebrow": "UMTUBA World",
   "world.navTitle": "World Discovery",

@@ -264,6 +264,26 @@ export const trMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Profile devam et",
   "auth.signup.continueLeftOff": "Kaldığınız yerden devam edin",
   "auth.signup.viewProfile": "Profili görüntüle",
+  "auth.signup.emailRequired": "E-posta gerekli.",
+  "auth.signup.emailInvalid": "Geçerli bir e-posta adresi girin.",
+  "auth.signup.passwordRequired": "Şifre gerekli.",
+  "auth.signup.passwordMin": "Şifre en az 6 karakter olmalıdır.",
+  "auth.signup.confirmRequired": "Şifrenizi onaylayın.",
+  "auth.signup.passwordMismatch": "Şifreler eşleşmiyor.",
+  "auth.signup.fullNameRequired": "Tam ad gerekli.",
+  "auth.signup.usernameRequired": "Kullanıcı adı gerekli.",
+  "auth.signup.usernameHint":
+    "3–24 karakter kullanın: küçük harfler, sayılar, noktalar veya alt çizgiler.",
+  "auth.signup.usernameTaken": "Bu kullanıcı adı zaten alınmış.",
+  "auth.signup.acceptTerms": "Devam etmek için şartları kabul edin.",
+  "auth.signup.fixHighlighted": "Vurgulanan alanları düzeltin.",
+  "auth.signup.unableToCreate": "Hesabınız oluşturulamadı.",
+  "auth.signup.accountReserved":
+    "Hesap ayrıldı. {email} adresine gönderilen e-postayı onaylayın, ardından giriş yapın.",
+  "auth.signup.accountReservedFor":
+    "@{username} için hesap ayrıldı. {email} adresine gönderilen e-postayı onaylayın, ardından giriş yapın.",
+  "auth.signup.accountCreated":
+    "@{username} için hesap oluşturuldu. Devam edin veya genel profilinizi açın.",
   "world.eyebrow": "UMTUBA Dünya",
   "world.navTitle": "Dünya keşfi",
   "world.navSubtitleLive": "Yerler ve destinasyonlar",

@@ -272,6 +272,22 @@ export type FoundationMessages = {
   "auth.signup.continueProfile": string;
   "auth.signup.continueLeftOff": string;
   "auth.signup.viewProfile": string;
+  "auth.signup.emailRequired": string;
+  "auth.signup.emailInvalid": string;
+  "auth.signup.passwordRequired": string;
+  "auth.signup.passwordMin": string;
+  "auth.signup.confirmRequired": string;
+  "auth.signup.passwordMismatch": string;
+  "auth.signup.fullNameRequired": string;
+  "auth.signup.usernameRequired": string;
+  "auth.signup.usernameHint": string;
+  "auth.signup.usernameTaken": string;
+  "auth.signup.acceptTerms": string;
+  "auth.signup.fixHighlighted": string;
+  "auth.signup.unableToCreate": string;
+  "auth.signup.accountReserved": string;
+  "auth.signup.accountReservedFor": string;
+  "auth.signup.accountCreated": string;
 
   /** World Discovery / Search (hold, empty, error, and primary UI). */
   "world.eyebrow": string;

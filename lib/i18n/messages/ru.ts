@@ -264,6 +264,26 @@ export const ruMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Продолжить в профиль",
   "auth.signup.continueLeftOff": "Продолжить с того места, где остановились",
   "auth.signup.viewProfile": "Смотреть профиль",
+  "auth.signup.emailRequired": "Укажите эл. почту.",
+  "auth.signup.emailInvalid": "Введите действительный адрес эл. почты.",
+  "auth.signup.passwordRequired": "Укажите пароль.",
+  "auth.signup.passwordMin": "Пароль должен содержать не менее 6 символов.",
+  "auth.signup.confirmRequired": "Подтвердите пароль.",
+  "auth.signup.passwordMismatch": "Пароли не совпадают.",
+  "auth.signup.fullNameRequired": "Укажите полное имя.",
+  "auth.signup.usernameRequired": "Укажите имя пользователя.",
+  "auth.signup.usernameHint":
+    "Используйте 3–24 символа: строчные буквы, цифры, точки или подчёркивания.",
+  "auth.signup.usernameTaken": "Это имя пользователя уже занято.",
+  "auth.signup.acceptTerms": "Примите условия, чтобы продолжить.",
+  "auth.signup.fixHighlighted": "Исправьте выделенные поля.",
+  "auth.signup.unableToCreate": "Не удалось создать аккаунт.",
+  "auth.signup.accountReserved":
+    "Аккаунт зарезервирован. Подтвердите письмо на {email} и войдите.",
+  "auth.signup.accountReservedFor":
+    "Аккаунт зарезервирован для @{username}. Подтвердите письмо на {email} и войдите.",
+  "auth.signup.accountCreated":
+    "Аккаунт создан для @{username}. Продолжите или откройте публичный профиль.",
   "world.eyebrow": "Мир UMTUBA",
   "world.navTitle": "Обзор мира",
   "world.navSubtitleLive": "Места и направления",

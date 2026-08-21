@@ -530,6 +530,26 @@ export const ptMessages: FoundationMessages = {
   "auth.signup.continueProfile": "Continuar para o perfil",
   "auth.signup.continueLeftOff": "Continuar de onde parou",
   "auth.signup.viewProfile": "Ver perfil",
+  "auth.signup.emailRequired": "O e-mail é obrigatório.",
+  "auth.signup.emailInvalid": "Digite um endereço de e-mail válido.",
+  "auth.signup.passwordRequired": "A senha é obrigatória.",
+  "auth.signup.passwordMin": "A senha deve ter pelo menos 6 caracteres.",
+  "auth.signup.confirmRequired": "Confirme sua senha.",
+  "auth.signup.passwordMismatch": "As senhas não coincidem.",
+  "auth.signup.fullNameRequired": "O nome completo é obrigatório.",
+  "auth.signup.usernameRequired": "O nome de usuário é obrigatório.",
+  "auth.signup.usernameHint":
+    "Use 3–24 caracteres: letras minúsculas, números, pontos ou sublinhados.",
+  "auth.signup.usernameTaken": "Esse nome de usuário já está em uso.",
+  "auth.signup.acceptTerms": "Aceite os termos para continuar.",
+  "auth.signup.fixHighlighted": "Corrija os campos destacados.",
+  "auth.signup.unableToCreate": "Não foi possível criar sua conta.",
+  "auth.signup.accountReserved":
+    "Conta reservada. Confirme o e-mail enviado para {email} e entre.",
+  "auth.signup.accountReservedFor":
+    "Conta reservada para @{username}. Confirme o e-mail enviado para {email} e entre.",
+  "auth.signup.accountCreated":
+    "Conta criada para @{username}. Continue ou abra seu perfil público.",
   "home.subtitle": "Feed de vídeo primeiro",
   "home.welcome": "Bem-vindo",
   "home.saved": "Salvos",

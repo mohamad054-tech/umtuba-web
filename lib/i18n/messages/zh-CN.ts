@@ -259,6 +259,26 @@ export const zhCNMessages: FoundationMessages = {
   "auth.signup.continueProfile": "继续前往主页",
   "auth.signup.continueLeftOff": "从上次离开的地方继续",
   "auth.signup.viewProfile": "查看主页",
+  "auth.signup.emailRequired": "请填写电子邮箱。",
+  "auth.signup.emailInvalid": "请输入有效的电子邮箱地址。",
+  "auth.signup.passwordRequired": "请填写密码。",
+  "auth.signup.passwordMin": "密码至少需要 6 个字符。",
+  "auth.signup.confirmRequired": "请确认密码。",
+  "auth.signup.passwordMismatch": "两次输入的密码不一致。",
+  "auth.signup.fullNameRequired": "请填写全名。",
+  "auth.signup.usernameRequired": "请填写用户名。",
+  "auth.signup.usernameHint":
+    "使用 3–24 个字符：小写字母、数字、点或下划线。",
+  "auth.signup.usernameTaken": "该用户名已被使用。",
+  "auth.signup.acceptTerms": "请先接受条款以继续。",
+  "auth.signup.fixHighlighted": "请修正标出的字段。",
+  "auth.signup.unableToCreate": "无法创建账户。",
+  "auth.signup.accountReserved":
+    "账户已预留。请确认发送到 {email} 的邮件，然后登录。",
+  "auth.signup.accountReservedFor":
+    "已为 @{username} 预留账户。请确认发送到 {email} 的邮件，然后登录。",
+  "auth.signup.accountCreated":
+    "已为 @{username} 创建账户。继续或打开你的公开主页。",
   "world.eyebrow": "UMTUBA 世界",
   "world.navTitle": "世界发现",
   "world.navSubtitleLive": "地点与目的地",
