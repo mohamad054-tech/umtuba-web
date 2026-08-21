@@ -6,21 +6,22 @@
   /* Set by AppMobileBottomNav while visible on small viewports */
   --app-mobile-bottom-nav-offset: 0px;
   /* App top nav ink — readable on premium dark without redesign */
-  --app-top-nav-ink: #f4f5f8;
+  --app-top-nav-ink: #f7f8fb;
   --app-top-nav-ink-inactive: #e8eaef;
   --app-top-nav-ink-hover: #ffffff;
   --app-top-nav-ink-active: #dbeafe;
-  --app-top-nav-ink-subtitle: #c8ccd8;
+  --app-top-nav-ink-subtitle: #e2e6ef;
   /*
    * Solid app ink (not alpha whites). Semi-transparent text picks up
    * backdrop-blur + glow layers and reads as haze, especially in Arabic.
    * Hierarchy stays: primary > secondary > muted/helper > placeholder.
+   * Secondary/muted were still too dim on navy after the first token pass.
    */
-  --app-ink-primary: #f4f5f8;
-  --app-ink-secondary: #d5dae6;
-  --app-ink-muted: #c2c8d6;
-  --app-ink-helper: #b4bbcc;
-  --app-ink-placeholder: #8b92a3;
+  --app-ink-primary: #f7f8fb;
+  --app-ink-secondary: #e9ecf4;
+  --app-ink-muted: #d7dce8;
+  --app-ink-helper: #c9cfde;
+  --app-ink-placeholder: #9aa3b5;
 }
 
 @media (min-width: 640px) {
@@ -99,8 +100,11 @@ html[lang="ar"] .text-xs {
   line-height: 1.55;
 }
 
-html[lang="ar"] .app-ink-helper {
-  font-weight: 500;
+html[lang="ar"] .app-ink-secondary,
+html[lang="ar"] .app-ink-muted,
+html[lang="ar"] .app-ink-helper,
+html[lang="ar"] .app-top-nav-subtitle {
+  font-weight: 600;
 }
 
 html[lang="ar"] .text-\[11px\],
@@ -133,7 +137,10 @@ html[lang="ar"] .text-white\/45 {
 }
 
 html[lang="ar"] .text-white\/50,
-html[lang="ar"] .text-white\/55 {
+html[lang="ar"] .text-white\/55,
+html[lang="ar"] .text-white\/60,
+html[lang="ar"] .text-white\/65,
+html[lang="ar"] .text-white\/70 {
   color: var(--app-ink-secondary);
 }
 

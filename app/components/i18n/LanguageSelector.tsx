@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import {
   applyDocumentLocale,
@@ -23,13 +24,50 @@ type LanguageSelectorProps = {
   onLocaleChange?: (locale: AppLocale) => void;
 };
 
+type MenuBox = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
+
+const MENU_MIN_WIDTH = 288;
+const MENU_MAX_HEIGHT = 360;
+const VIEWPORT_PAD = 8;
+
+function placeLocaleMenu(anchor: DOMRect): MenuBox {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const width = Math.min(Math.max(anchor.width, MENU_MIN_WIDTH), vw - VIEWPORT_PAD * 2);
+  let left = anchor.left;
+  if (left + width > vw - VIEWPORT_PAD) {
+    left = Math.max(VIEWPORT_PAD, anchor.right - width);
+  }
+  if (left < VIEWPORT_PAD) left = VIEWPORT_PAD;
+
+  const spaceBelow = vh - anchor.bottom - VIEWPORT_PAD - 8;
+  const spaceAbove = anchor.top - VIEWPORT_PAD - 8;
+  const openAbove = spaceBelow < 180 && spaceAbove > spaceBelow;
+  const maxHeight = Math.min(
+    MENU_MAX_HEIGHT,
+    Math.max(160, openAbove ? spaceAbove : spaceBelow)
+  );
+  const top = openAbove
+    ? Math.max(VIEWPORT_PAD, anchor.top - 8 - maxHeight)
+    : anchor.bottom + 8;
+
+  return { top, left, width, maxHeight };
+}
+
 /**
  * Language picker — persists via `umtuba_locale` cookie and refreshes RSC tree
  * so root `html lang` / `dir` update immediately.
  *
- * Uses a custom listbox instead of a native select control. Windows Chromium
- * native selects inside RTL documents paint a large blank white popup and hide
- * non-English option glyphs. The menu is forced LTR so every locale is visible.
+ * Never uses a native select control. Windows Chromium RTL native options paint a
+ * large blank white popup. The previous in-tree listbox still clipped inside
+ * overflow-hidden / backdrop-blur ancestors (auth card, header), so only the
+ * first row (العربية) stayed visible. The menu is portaled to document.body,
+ * forced LTR, and painted with solid fg/bg on every option.
  */
 export default function LanguageSelector({
   id = "umtuba-language",
@@ -42,7 +80,10 @@ export default function LanguageSelector({
   const { locale, t } = useTranslation();
   const options = listSupportedLocales();
   const [open, setOpen] = useState(false);
+  const [box, setBox] = useState<MenuBox | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const listId = useId();
   const isDark = tone === "dark";
   const isCompact = variant === "compact";
@@ -59,13 +100,36 @@ export default function LanguageSelector({
     router.refresh();
   }
 
+  useLayoutEffect(() => {
+    if (!open) {
+      setBox(null);
+      return;
+    }
+
+    function update() {
+      const anchor = triggerRef.current?.getBoundingClientRect();
+      if (!anchor) return;
+      setBox(placeLocaleMenu(anchor));
+    }
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
 
     function onPointerDown(event: PointerEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target) || menuRef.current?.contains(target)) {
+        return;
       }
+      setOpen(false);
     }
 
     function onKey(event: KeyboardEvent) {
@@ -87,17 +151,34 @@ export default function LanguageSelector({
     handleChange(next);
   }
 
-  const menu = (
+  const darkMenu = isDark;
+  const menu = open ? (
     <ul
+      ref={menuRef}
       id={listId}
       role="listbox"
       dir="ltr"
+      data-locale-menu="portaled"
       aria-label={t("settings.language")}
-      className={`absolute z-[80] max-h-72 min-w-[16rem] overflow-y-auto rounded-2xl border py-1 shadow-[0_18px_40px_rgba(0,0,0,0.45)] ${
-        isDark
-          ? "border-white/15 bg-[#0c0c18] text-[#f4f5f8]"
-          : "border-zinc-200 bg-white text-zinc-900"
-      } ${isCompact ? "end-0 top-full mt-2" : "inset-inline-start-0 top-full z-[80] mt-1 w-full"}`}
+      style={{
+        position: "fixed",
+        top: box?.top ?? -9999,
+        left: box?.left ?? -9999,
+        width: box?.width ?? MENU_MIN_WIDTH,
+        maxHeight: box?.maxHeight ?? MENU_MAX_HEIGHT,
+        zIndex: 10000,
+        overflowY: "auto",
+        isolation: "isolate",
+        colorScheme: darkMenu ? "dark" : "light",
+        background: darkMenu ? "#0b0c16" : "#ffffff",
+        color: darkMenu ? "#f7f8fb" : "#18181b",
+        border: darkMenu ? "1px solid rgba(255,255,255,0.22)" : "1px solid #d4d4d8",
+        borderRadius: 16,
+        padding: "6px 0",
+        margin: 0,
+        listStyle: "none",
+        boxShadow: "0 18px 40px rgba(0,0,0,0.45)",
+      }}
     >
       {options.map((entry) => {
         const selected = entry.code === locale;
@@ -108,22 +189,47 @@ export default function LanguageSelector({
               role="option"
               aria-selected={selected}
               data-locale-option={entry.code}
-              className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm transition ${
-                selected
-                  ? isDark
-                    ? "bg-blue-500/20 text-[#dbeafe]"
-                    : "bg-blue-50 text-blue-900"
-                  : isDark
-                    ? "hover:bg-white/10"
-                    : "hover:bg-zinc-100"
-              }`}
+              dir="ltr"
+              style={{
+                display: "flex",
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                padding: "10px 14px",
+                textAlign: "left",
+                fontSize: 15,
+                lineHeight: 1.45,
+                cursor: "pointer",
+                border: 0,
+                background: selected
+                  ? darkMenu
+                    ? "rgba(59,130,246,0.32)"
+                    : "#dbeafe"
+                  : "transparent",
+                color: selected
+                  ? darkMenu
+                    ? "#e8f1ff"
+                    : "#1e3a8a"
+                  : darkMenu
+                    ? "#f7f8fb"
+                    : "#18181b",
+              }}
               onClick={() => pick(entry.code)}
             >
-              <span className="font-semibold">{entry.nativeName}</span>
               <span
-                className={`shrink-0 text-xs ${
-                  isDark ? "app-ink-muted" : "text-zinc-500"
-                }`}
+                dir={entry.direction}
+                style={{ fontWeight: 600, color: "inherit" }}
+              >
+                {entry.nativeName}
+              </span>
+              <span
+                style={{
+                  flexShrink: 0,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: darkMenu ? "#d7dce8" : "#3f3f46",
+                }}
               >
                 {entry.englishName}
               </span>
@@ -132,7 +238,12 @@ export default function LanguageSelector({
         );
       })}
     </ul>
-  );
+  ) : null;
+
+  const portaledMenu =
+    menu && typeof document !== "undefined"
+      ? createPortal(menu, document.body)
+      : menu;
 
   if (isCompact) {
     return (
@@ -144,6 +255,7 @@ export default function LanguageSelector({
         }
       >
         <button
+          ref={triggerRef}
           id={id}
           type="button"
           aria-label={t("settings.language")}
@@ -162,7 +274,7 @@ export default function LanguageSelector({
             {compactLocaleLabel(locale)}
           </span>
         </button>
-        {open ? menu : null}
+        {portaledMenu}
       </div>
     );
   }
@@ -186,6 +298,7 @@ export default function LanguageSelector({
         {t("settings.languageDescription")}
       </span>
       <button
+        ref={triggerRef}
         id={id}
         type="button"
         aria-label={t("settings.language")}
@@ -204,7 +317,7 @@ export default function LanguageSelector({
           ▾
         </span>
       </button>
-      {open ? menu : null}
+      {portaledMenu}
     </div>
   );
 }

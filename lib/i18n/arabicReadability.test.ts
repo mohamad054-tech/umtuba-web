@@ -17,11 +17,11 @@ describe("Arabic readability / accessibility tokens", () => {
   const nav = read("app/components/AppTopNav.tsx");
 
   it("defines solid ink tokens with readable hierarchy (not alpha whites)", () => {
-    expect(css).toContain("--app-ink-primary: #f4f5f8");
-    expect(css).toContain("--app-ink-secondary: #d5dae6");
-    expect(css).toContain("--app-ink-muted: #c2c8d6");
-    expect(css).toContain("--app-ink-helper: #b4bbcc");
-    expect(css).toContain("--app-ink-placeholder: #8b92a3");
+    expect(css).toContain("--app-ink-primary: #f7f8fb");
+    expect(css).toContain("--app-ink-secondary: #e9ecf4");
+    expect(css).toContain("--app-ink-muted: #d7dce8");
+    expect(css).toContain("--app-ink-helper: #c9cfde");
+    expect(css).toContain("--app-ink-placeholder: #9aa3b5");
     expect(css).toContain(".app-ink-primary");
     expect(css).toContain(".app-ink-secondary");
     expect(css).toContain(".app-ink-muted");
@@ -39,6 +39,8 @@ describe("Arabic readability / accessibility tokens", () => {
     expect(css).toMatch(/html\[lang="ar"\] \[class\*="tracking-"\]/);
     expect(css).toContain('html[lang="ar"] .text-xs');
     expect(css).toContain('html[lang="ar"] .text-white\\/45');
+    expect(css).toContain('html[lang="ar"] .text-white\\/70');
+    expect(css).toContain('html[lang="ar"] .app-ink-secondary');
   });
 
   it("keeps Settings chrome on tokens instead of dim white/45", () => {

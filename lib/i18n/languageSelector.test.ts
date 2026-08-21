@@ -20,6 +20,10 @@ describe("LanguageSelector locale menu", () => {
     expect(src).toContain('dir="ltr"');
     expect(src).toContain("nativeName");
     expect(src).toContain("englishName");
+    expect(src).toContain("createPortal");
+    expect(src).toContain("document.body");
+    expect(src).toContain('data-locale-menu="portaled"');
+    expect(src).toContain("position: \"fixed\"");
     expect(src).not.toMatch(/<select[\s>]/);
     expect(src).toContain("applyDocumentLocale");
     expect(src).toContain("compactLocaleLabel");
