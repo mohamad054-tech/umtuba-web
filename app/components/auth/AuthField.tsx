@@ -29,7 +29,7 @@ export default function AuthField({
 
   return (
     <label className="block space-y-2">
-      <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+      <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45 rtl:normal-case rtl:tracking-normal">
         {label}
       </span>
       <span className="relative block">

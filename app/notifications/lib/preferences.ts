@@ -1,3 +1,4 @@
+import type { TranslationKey } from "../../../lib/i18n";
 import type { NotificationPreferences } from "../../../lib/supabase/notifications";
 import { DEFAULT_NOTIFICATION_PREFERENCES } from "../../../lib/supabase/notifications";
 
@@ -11,34 +12,33 @@ export type NotificationPreferenceKey = Exclude<
 
 export const NOTIFICATION_PREFERENCE_FIELDS: {
   key: NotificationPreferenceKey;
-  label: string;
-  description: string;
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
 }[] = [
   {
     key: "socialEnabled",
-    label: "Social",
-    description: "Follows, likes, comments, mentions, and messages.",
+    labelKey: "settings.pref.social",
+    descriptionKey: "settings.pref.socialHint",
   },
   {
     key: "journeyEnabled",
-    label: "Post Journey",
-    description: "Country reach, trending, milestones, and journey summaries.",
+    labelKey: "settings.pref.journey",
+    descriptionKey: "settings.pref.journeyHint",
   },
   {
     key: "rewardsEnabled",
-    label: "Rewards",
-    description: "UM Points earned and reward milestones.",
+    labelKey: "settings.pref.rewards",
+    descriptionKey: "settings.pref.rewardsHint",
   },
   {
     key: "nearbyLiveEnabled",
-    label: "Nearby live",
-    description:
-      "Alert when a live starts in your approximate city. Exact location is never shared.",
+    labelKey: "settings.pref.nearbyLive",
+    descriptionKey: "settings.pref.nearbyLiveHint",
   },
   {
     key: "aiInsightsEnabled",
-    label: "AI insights",
-    description: "Creator performance tips and momentum alerts.",
+    labelKey: "settings.pref.aiInsights",
+    descriptionKey: "settings.pref.aiInsightsHint",
   },
 ];
 

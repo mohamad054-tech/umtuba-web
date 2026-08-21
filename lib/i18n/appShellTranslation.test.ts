@@ -33,6 +33,10 @@ describe("App Shell translation V1", () => {
     expect(translate("ar", "settings.language")).toBe("اللغة");
     expect(translate("en", "settings.signOut")).toBe("Sign out");
     expect(translate("ar", "settings.signOut")).toBe("تسجيل الخروج");
+    expect(translate("en", "settings.displayName")).toBe("Display name");
+    expect(translate("ar", "settings.displayName")).toBe("الاسم الظاهر");
+    expect(translate("en", "settings.avatar")).toBe("Avatar");
+    expect(translate("ar", "settings.avatar")).toBe("الصورة الشخصية");
   });
 
   it("translates generic actions, status, dialogs, and empty/error", () => {

@@ -5,6 +5,12 @@
   --foreground: #171717;
   /* Set by AppMobileBottomNav while visible on small viewports */
   --app-mobile-bottom-nav-offset: 0px;
+  /* App top nav ink — readable on premium dark without redesign */
+  --app-top-nav-ink: #f4f5f8;
+  --app-top-nav-ink-inactive: rgba(244, 245, 248, 0.84);
+  --app-top-nav-ink-hover: #ffffff;
+  --app-top-nav-ink-active: #dbeafe;
+  --app-top-nav-ink-subtitle: rgba(244, 245, 248, 0.72);
 }
 
 @media (min-width: 640px) {
@@ -403,6 +409,40 @@ html[lang="hi"] body {
 .watch-focus-ring:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.85);
   outline-offset: 3px;
+}
+
+.app-top-nav-link {
+  color: var(--app-top-nav-ink-inactive);
+  text-shadow: none;
+  filter: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-top-nav-link:hover,
+.app-top-nav-link:focus-visible {
+  color: var(--app-top-nav-ink-hover);
+}
+
+.app-top-nav-link--active,
+.app-top-nav-link--active:hover,
+.app-top-nav-link--active:focus-visible {
+  color: var(--app-top-nav-ink-active);
+}
+
+.app-top-nav-title {
+  color: var(--app-top-nav-ink);
+  text-shadow: none;
+  filter: none;
+}
+
+.app-top-nav-subtitle {
+  color: var(--app-top-nav-ink-subtitle);
+}
+
+[dir="rtl"] .app-top-nav-link,
+[dir="rtl"] .app-top-nav-title {
+  -webkit-font-smoothing: auto;
+  letter-spacing: 0;
 }
 
 .watch-page-enter {

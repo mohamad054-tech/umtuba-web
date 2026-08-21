@@ -85,7 +85,7 @@ export default function AppTopNav({
               UMTUBA
             </p>
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-black tracking-tight">
+              <h1 className="app-top-nav-title truncate text-lg font-black tracking-tight">
                 {title}
               </h1>
               {badge}
@@ -111,10 +111,10 @@ export default function AppTopNav({
                   active
                     ? store
                       ? "border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)]"
-                      : "border border-blue-400/30 bg-blue-500/15 text-blue-100"
+                      : "app-top-nav-link app-top-nav-link--active border border-blue-400/30 bg-blue-500/15"
                     : store
                       ? "border border-transparent text-white/50 hover:border-[rgba(214,196,161,0.2)] hover:bg-white/5 hover:text-[var(--sf-ink,#f4f1ea)]"
-                      : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
+                      : "app-top-nav-link border border-transparent hover:border-white/10 hover:bg-white/5"
                 }`}
               >
                 {t(desktopNavLabelKey(item.href))}
@@ -126,7 +126,7 @@ export default function AppTopNav({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {actions}
           {subtitle ? (
-            <p className="hidden text-xs font-medium text-white/40 xl:block">
+            <p className="app-top-nav-subtitle hidden text-xs font-medium xl:block">
               {subtitle}
             </p>
           ) : null}

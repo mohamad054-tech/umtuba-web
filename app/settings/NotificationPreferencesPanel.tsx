@@ -11,6 +11,8 @@ import {
   NOTIFICATION_PREFERENCE_FIELDS,
   type NotificationPreferenceKey,
 } from "../notifications/lib/preferences";
+import { useTranslation } from "../components/i18n";
+import { settingsUserFacingKey } from "./settingsUserFacingError";
 
 type NotificationPreferencesPanelProps = {
   /** When true, scroll/highlight this section (settings deep link). */
@@ -20,6 +22,7 @@ type NotificationPreferencesPanelProps = {
 export default function NotificationPreferencesPanel({
   highlighted = false,
 }: NotificationPreferencesPanelProps) {
+  const { t } = useTranslation();
   const [prefs, setPrefs] = useState<NotificationPreferences>(
     DEFAULT_NOTIFICATION_PREFERENCES
   );
@@ -36,7 +39,8 @@ export default function NotificationPreferencesPanel({
       const result = await getNotificationPreferencesAction();
       if (cancelled) return;
       if (!result.ok) {
-        setError(result.message);
+        const messageKey = settingsUserFacingKey(result.message);
+        setError(messageKey ? t(messageKey) : t("settings.notificationsError"));
         setLoading(false);
         return;
       }
@@ -46,7 +50,7 @@ export default function NotificationPreferencesPanel({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   async function toggle(key: NotificationPreferenceKey) {
     const nextValue = !prefs[key];
@@ -63,7 +67,8 @@ export default function NotificationPreferencesPanel({
 
     if (!result.ok) {
       setPrefs(previous);
-      setError(result.message);
+      const messageKey = settingsUserFacingKey(result.message);
+      setError(messageKey ? t(messageKey) : t("settings.notificationsError"));
       return;
     }
 
@@ -83,20 +88,19 @@ export default function NotificationPreferencesPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
-            Notifications
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40 rtl:normal-case rtl:tracking-normal">
+            {t("settings.notificationsEyebrow")}
           </p>
           <h3 className="mt-0.5 text-base font-black tracking-tight text-white">
-            Alert preferences
+            {t("settings.notificationsAlertPrefs")}
           </h3>
           <p className="mt-1 text-xs text-white/45">
-            Nearby live stays off until you opt in. Exact location is never
-            shared.
+            {t("settings.notificationsNearbyNote")}
           </p>
         </div>
         {savedFlash ? (
           <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-            Saved
+            {t("settings.notificationsSavedFlash")}
           </span>
         ) : null}
       </div>
@@ -122,10 +126,10 @@ export default function NotificationPreferencesPanel({
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-white/90">
-                    {field.label}
+                    {t(field.labelKey)}
                   </p>
                   <p className="mt-0.5 text-xs text-white/45">
-                    {field.description}
+                    {t(field.descriptionKey)}
                   </p>
                 </div>
                 <button
