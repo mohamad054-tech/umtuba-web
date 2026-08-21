@@ -88,13 +88,13 @@ export default function NotificationPreferencesPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40 rtl:normal-case rtl:tracking-normal">
+          <p className="app-ink-muted text-[10px] font-bold uppercase tracking-[0.22em] rtl:normal-case rtl:tracking-normal">
             {t("settings.notificationsEyebrow")}
           </p>
-          <h3 className="mt-0.5 text-base font-black tracking-tight text-white">
+          <h3 className="app-ink-primary mt-0.5 text-base font-black tracking-tight">
             {t("settings.notificationsAlertPrefs")}
           </h3>
-          <p className="mt-1 text-xs text-white/45">
+          <p className="app-ink-helper mt-1 text-xs">
             {t("settings.notificationsNearbyNote")}
           </p>
         </div>
@@ -125,10 +125,10 @@ export default function NotificationPreferencesPanel({
                 className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5"
               >
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-white/90">
+                  <p className="app-ink-primary text-sm font-semibold">
                     {t(field.labelKey)}
                   </p>
-                  <p className="mt-0.5 text-xs text-white/45">
+                  <p className="app-ink-helper mt-0.5 text-xs">
                     {t(field.descriptionKey)}
                   </p>
                 </div>

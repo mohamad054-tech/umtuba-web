@@ -20,9 +20,8 @@ describe("App top nav contrast tokens", () => {
     expect(css).toContain("--app-top-nav-ink-inactive");
     expect(css).toContain("--app-top-nav-ink-active");
     expect(css).toContain(".app-top-nav-link--active");
-    expect(css).toMatch(
-      /--app-top-nav-ink-inactive:\s*rgba\(244,\s*245,\s*248,\s*0\.84\)/
-    );
+    expect(css).toMatch(/--app-top-nav-ink-inactive:\s*#e8eaef/);
     expect(css).toContain("--app-top-nav-ink-active: #dbeafe");
+    expect(css).toMatch(/--app-top-nav-ink-subtitle:\s*#c8ccd8/);
   });
 });

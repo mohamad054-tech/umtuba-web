@@ -255,13 +255,13 @@ export default function SettingsExperience({
                 className={`watch-focus-ring shrink-0 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60 ${
                   active
                     ? "border-blue-400/30 bg-blue-500/15 text-blue-50"
-                    : "border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/5 hover:text-white"
+                    : "app-ink-secondary border-white/10 bg-white/[0.03] hover:bg-white/5 hover:text-white"
                 }`}
               >
                 <span className="block text-sm font-black">
                   {t(section.labelKey)}
                 </span>
-                <span className="mt-0.5 hidden text-[11px] text-white/45 lg:block">
+                <span className="app-ink-muted mt-0.5 hidden text-[11px] lg:block">
                   {t(section.descriptionKey)}
                 </span>
               </button>
@@ -276,7 +276,7 @@ export default function SettingsExperience({
                 <h2 className="text-2xl font-black tracking-tight">
                   {t("settings.profileHeading")}
                 </h2>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="app-ink-secondary mt-1 text-sm">
                   {t("settings.profileIntro")}
                 </p>
               </div>
@@ -296,7 +296,7 @@ export default function SettingsExperience({
                 )}
 
                 <div className="min-w-0 flex-1 space-y-2">
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/45 rtl:normal-case rtl:tracking-normal">
+                  <p className="app-ink-muted text-xs font-bold uppercase tracking-[0.16em] rtl:normal-case rtl:tracking-normal">
                     {t("settings.avatar")}
                   </p>
                   <button
@@ -309,7 +309,7 @@ export default function SettingsExperience({
                       ? t("settings.uploading")
                       : t("settings.uploadImage")}
                   </button>
-                  <p className="text-xs text-white/45">
+                  <p className="app-ink-helper text-xs">
                     {t("settings.avatarHint")}
                   </p>
                   {fieldErrors.avatar ? (
@@ -361,7 +361,7 @@ export default function SettingsExperience({
               />
 
               <label className="block space-y-2">
-                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45 rtl:normal-case rtl:tracking-normal">
+                <span className="app-ink-muted text-xs font-bold uppercase tracking-[0.16em] rtl:normal-case rtl:tracking-normal">
                   {t("settings.bio")}
                 </span>
                 <textarea
@@ -371,7 +371,7 @@ export default function SettingsExperience({
                   rows={4}
                   maxLength={280}
                   placeholder={t("settings.bioPlaceholder")}
-                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-[color:var(--app-ink-placeholder)] focus:border-blue-400/40 disabled:opacity-60"
                   onChange={(event) => {
                     setBio(event.target.value);
                     setFormError("");
@@ -436,7 +436,7 @@ export default function SettingsExperience({
                 <h2 className="text-2xl font-black tracking-tight">
                   {t("settings.language")}
                 </h2>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="app-ink-secondary mt-1 text-sm">
                   {t("settings.languageDescription")}
                 </p>
               </div>
@@ -452,7 +452,7 @@ export default function SettingsExperience({
                 <h2 className="text-2xl font-black tracking-tight">
                   {t("settings.notificationsHeading")}
                 </h2>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="app-ink-secondary mt-1 text-sm">
                   {t("settings.notificationsIntro")}
                 </p>
               </div>
@@ -466,7 +466,7 @@ export default function SettingsExperience({
                 <h2 className="text-2xl font-black tracking-tight">
                   {t("settings.accountHeading")}
                 </h2>
-                <p className="mt-1 text-sm text-white/55">
+                <p className="app-ink-secondary mt-1 text-sm">
                   {t("settings.accountIntro")}
                 </p>
               </div>
@@ -477,7 +477,7 @@ export default function SettingsExperience({
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
                   <p className="text-sm font-black">{t("menu.saved")}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.savedHint")}
                   </p>
                 </Link>
@@ -486,7 +486,7 @@ export default function SettingsExperience({
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
                   <p className="text-sm font-black">{t("menu.rewards")}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.rewardsHint")}
                   </p>
                 </Link>
@@ -495,7 +495,7 @@ export default function SettingsExperience({
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
                   <p className="text-sm font-black">{t("settings.publicProfile")}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.publicProfileHint")}
                   </p>
                 </Link>
@@ -504,7 +504,7 @@ export default function SettingsExperience({
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
                   <p className="text-sm font-black">{t("settings.uploadVideo")}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.uploadVideoHint")}
                   </p>
                 </Link>
@@ -513,7 +513,7 @@ export default function SettingsExperience({
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
                   <p className="text-sm font-black">{t("menu.advertise")}</p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.advertiseHint")}
                   </p>
                 </Link>
@@ -524,7 +524,7 @@ export default function SettingsExperience({
                   <p className="text-sm font-black text-red-100">
                     {t("settings.deleteAccount")}
                   </p>
-                  <p className="mt-1 text-xs text-white/45">
+                  <p className="app-ink-helper mt-1 text-xs">
                     {t("settings.deleteAccountHint")}
                   </p>
                 </Link>

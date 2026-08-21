@@ -7,10 +7,20 @@
   --app-mobile-bottom-nav-offset: 0px;
   /* App top nav ink — readable on premium dark without redesign */
   --app-top-nav-ink: #f4f5f8;
-  --app-top-nav-ink-inactive: rgba(244, 245, 248, 0.84);
+  --app-top-nav-ink-inactive: #e8eaef;
   --app-top-nav-ink-hover: #ffffff;
   --app-top-nav-ink-active: #dbeafe;
-  --app-top-nav-ink-subtitle: rgba(244, 245, 248, 0.72);
+  --app-top-nav-ink-subtitle: #c8ccd8;
+  /*
+   * Solid app ink (not alpha whites). Semi-transparent text picks up
+   * backdrop-blur + glow layers and reads as haze, especially in Arabic.
+   * Hierarchy stays: primary > secondary > muted/helper > placeholder.
+   */
+  --app-ink-primary: #f4f5f8;
+  --app-ink-secondary: #d5dae6;
+  --app-ink-muted: #c2c8d6;
+  --app-ink-helper: #b4bbcc;
+  --app-ink-placeholder: #8b92a3;
 }
 
 @media (min-width: 640px) {
@@ -57,6 +67,78 @@ html[lang="ko"] body {
 html[lang="hi"] body {
   font-family: var(--font-geist-sans), "Noto Sans Devanagari", Mangal,
     sans-serif;
+}
+
+/* Local/system Arabic stack — Geist is Latin-only. Do not download fonts. */
+html[lang="ar"] body {
+  font-family: var(--font-geist-sans), "Segoe UI", Tahoma, "Geeza Pro",
+    "Noto Sans Arabic", Arial, sans-serif;
+  line-height: 1.6;
+}
+
+/*
+ * antialiased + letter-spacing make connected Arabic look thin and hazy.
+ * Override the root `antialiased` class for Arabic/RTL only.
+ */
+html[lang="ar"],
+html[lang="ar"].antialiased,
+html.antialiased[lang="ar"],
+[dir="rtl"] {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  letter-spacing: 0;
+}
+
+html[lang="ar"] [class*="tracking-"],
+[dir="rtl"] [class*="tracking-"] {
+  letter-spacing: 0;
+}
+
+html[lang="ar"] .text-xs {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+html[lang="ar"] .app-ink-helper {
+  font-weight: 500;
+}
+
+html[lang="ar"] .text-\[11px\],
+html[lang="ar"] .text-\[10px\] {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.app-ink-primary {
+  color: var(--app-ink-primary);
+}
+
+.app-ink-secondary {
+  color: var(--app-ink-secondary);
+}
+
+.app-ink-muted {
+  color: var(--app-ink-muted);
+}
+
+.app-ink-helper {
+  color: var(--app-ink-helper);
+}
+
+/* Arabic-only remap of the dimmest shared utilities — other locales unchanged. */
+html[lang="ar"] .text-white\/35,
+html[lang="ar"] .text-white\/40,
+html[lang="ar"] .text-white\/45 {
+  color: var(--app-ink-muted);
+}
+
+html[lang="ar"] .text-white\/50,
+html[lang="ar"] .text-white\/55 {
+  color: var(--app-ink-secondary);
+}
+
+html[lang="ar"] .placeholder\:text-white\/30::placeholder {
+  color: var(--app-ink-placeholder);
 }
 
 /* —— Landing hero —— */
