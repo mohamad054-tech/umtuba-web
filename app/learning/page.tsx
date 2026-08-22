@@ -4,10 +4,8 @@ import LearningHub from "../components/learning/LearningHub";
 import { createTranslator } from "../../lib/i18n";
 import { resolveRequestLocale } from "../../lib/i18n/server";
 import { createClient, getServerUser } from "../../lib/supabase/server";
-import {
-  LEARNING_LEARNER_ROUTES,
-  loadMyLearningHub,
-} from "../../lib/learning/learnerDelivery";
+import { loadMyLearningHub } from "../../lib/learning/learnerDelivery";
+import { LEARNING_PUBLIC_ROUTES } from "../../lib/learning/publicCatalog";
 import {
   LEARNING_INSTRUCTOR_ROUTES,
   listInstructorAuthorableCourses,
@@ -24,14 +22,13 @@ export default async function LearningHubPage() {
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
   const user = await getServerUser();
-  if (!user) {
-    redirect(
-      `/login?next=${encodeURIComponent(LEARNING_LEARNER_ROUTES.hub)}`
-    );
+  const viewerId = user?.id ?? "";
+  if (!viewerId) {
+    redirect(LEARNING_PUBLIC_ROUTES.catalog);
   }
 
   const supabase = await createClient();
-  const hub = await loadMyLearningHub(supabase, user.id);
+  const hub = await loadMyLearningHub(supabase, viewerId);
   const authorable = await listInstructorAuthorableCourses(supabase);
   const showInstructor =
     authorable.ok &&

@@ -37,6 +37,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
           title={t("nav.home")}
           sticky={false}
           subtitle={t("home.subtitle")}
+          subtitleHelp={t("home.subtitleHelp")}
           actions={
             <div className="flex items-center gap-2">
               <Link

@@ -174,8 +174,12 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
             return (
               <li
                 key={course.id}
-                className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] md:flex"
+                className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04]"
               >
+                <Link
+                  href={LEARNING_PUBLIC_ROUTES.course(course.slug)}
+                  className="watch-focus-ring block md:flex"
+                >
                 {imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -239,14 +243,12 @@ export default function CatalogBrowser({ courses }: CatalogBrowserProps) {
                     </div>
                   </dl>
                   <p className="mt-4">
-                    <Link
-                      href={LEARNING_PUBLIC_ROUTES.course(course.slug)}
-                      className="watch-focus-ring inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black hover:bg-white/90"
-                    >
+                    <span className="inline-flex min-h-11 items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black">
                       {t("learning.catalog.viewCourse")}
-                    </Link>
+                    </span>
                   </p>
                 </div>
+                </Link>
               </li>
             );
           })}

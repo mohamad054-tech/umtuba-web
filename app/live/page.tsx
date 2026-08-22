@@ -1,10 +1,14 @@
 import { Suspense } from "react";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { liveMetadata } from "../../lib/site/routeMetadata";
 import LiveExperience from "./LiveExperience";
 
 export const metadata = liveMetadata;
 
-function LiveFallback() {
+async function LiveFallback() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#050510] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -13,7 +17,7 @@ function LiveFallback() {
       </div>
       <p className="relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 backdrop-blur">
         <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-        Opening UMTUBA Live...
+        {t("live.opening")}
       </p>
     </main>
   );

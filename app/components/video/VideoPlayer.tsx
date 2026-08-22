@@ -7,6 +7,8 @@ import {
   type KeyboardEvent,
   type MouseEvent,
 } from "react";
+import { useTranslation } from "../i18n";
+import { playActiveVideo } from "../../../lib/video/playActiveVideo";
 import WatchFloatingControls from "./WatchFloatingControls";
 
 export type WatchProgressEvent = {
@@ -23,6 +25,8 @@ type VideoPlayerProps = {
   muted: boolean;
   forcePause?: boolean;
   onToggleMute: () => void;
+  /** Sync parent mute UI when the browser forces muted autoplay. */
+  onAutoplayMuted?: () => void;
   /** Remint signed URL when playback fails (expired / deleted). */
   onPlaybackError?: () => void;
   playbackStatus?: "ok" | "expired" | "deleted" | "error";
@@ -40,6 +44,7 @@ export default function VideoPlayer({
   muted,
   forcePause = false,
   onToggleMute,
+  onAutoplayMuted,
   onPlaybackError,
   playbackStatus = "ok",
   onRetryPlayback,
@@ -47,6 +52,7 @@ export default function VideoPlayer({
   restorePlaybackTimeSeconds = null,
   restorePlaybackToken = 0,
 }: VideoPlayerProps) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [pausedByUser, setPausedByUser] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
@@ -74,8 +80,12 @@ export default function VideoPlayer({
     }
 
     video.muted = muted;
-    void video.play().catch(() => undefined);
-  }, [active, muted, pausedByUser, src, playbackStatus]);
+    void playActiveVideo(video, muted).then((result) => {
+      if (result === "muted_fallback") {
+        onAutoplayMuted?.();
+      }
+    });
+  }, [active, muted, pausedByUser, src, playbackStatus, onAutoplayMuted]);
 
   useEffect(() => {
     if (!forcePause || !active) {
@@ -219,7 +229,11 @@ export default function VideoPlayer({
 
     if (video.paused) {
       setPausedByUser(false);
-      void video.play().catch(() => undefined);
+      void playActiveVideo(video, muted).then((result) => {
+        if (result === "muted_fallback") {
+          onAutoplayMuted?.();
+        }
+      });
       showFlash("play");
       return;
     }
@@ -243,11 +257,11 @@ export default function VideoPlayer({
 
   const statusMessage =
     playbackStatus === "deleted"
-      ? "This video was deleted."
+      ? t("watch.deleted")
       : playbackStatus === "expired"
-        ? "Playback link expired."
+        ? t("watch.linkExpired")
         : playbackStatus === "error"
-          ? "Unable to play this video."
+          ? t("watch.unableToPlay")
           : null;
 
   return (
@@ -279,7 +293,7 @@ export default function VideoPlayer({
               onClick={onRetryPlayback}
               className="watch-focus-ring rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white hover:bg-white/15"
             >
-              Retry playback
+              {t("watch.retryPlayback")}
             </button>
           ) : null}
         </div>
@@ -289,7 +303,7 @@ export default function VideoPlayer({
         role="button"
         tabIndex={0}
         className="sr-only"
-        aria-label={isPaused ? "Play video" : "Pause video"}
+        aria-label={isPaused ? t("watch.playVideo") : t("watch.pauseVideo")}
         onKeyDown={handleSurfaceKeyDown}
         onClick={() => togglePlayback()}
       />
@@ -317,12 +331,17 @@ export default function VideoPlayer({
             role="status"
             aria-live="polite"
           >
-            Loading video…
+            {t("watch.loadingVideo")}
           </p>
         </div>
       ) : null}
 
-      <WatchFloatingControls muted={muted} onToggleMute={onToggleMute} />
+      <WatchFloatingControls
+        muted={muted}
+        onToggleMute={onToggleMute}
+        unmuteLabel={t("watch.unmute")}
+        muteLabel={t("watch.mute")}
+      />
     </div>
   );
 }

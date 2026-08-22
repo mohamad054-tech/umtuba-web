@@ -29,6 +29,7 @@ type VideoSlideProps = {
   shopProductCount?: number;
   shopShelfOpen?: boolean;
   onToggleMute: () => void;
+  onAutoplayMuted?: () => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onPostJourney: (video: WatchVideo) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
@@ -52,6 +53,7 @@ export default function VideoSlide({
   shopProductCount = 0,
   shopShelfOpen = false,
   onToggleMute,
+  onAutoplayMuted,
   onOpenPanel,
   onPostJourney,
   onStatsChange,
@@ -190,6 +192,7 @@ export default function VideoSlide({
         muted={muted}
         forcePause={forcePause && active}
         onToggleMute={onToggleMute}
+        onAutoplayMuted={onAutoplayMuted}
         playbackStatus={playbackStatus}
         onPlaybackError={handlePlaybackError}
         onRetryPlayback={

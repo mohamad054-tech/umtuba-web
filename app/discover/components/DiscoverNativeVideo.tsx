@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../../components/i18n";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
 import {
-  PLAYBACK_DELETED_MESSAGE,
-  PLAYBACK_EXPIRED_MESSAGE,
-  PLAYBACK_UNAVAILABLE_MESSAGE,
   playbackStatusAfterRemintFailure,
   shouldAutoRemintPlayback,
 } from "../../lib/video/signedPlaybackRetry";
@@ -38,6 +36,7 @@ export default function DiscoverNativeVideo({
   onSrcChange,
   onWatchProgress,
 }: DiscoverNativeVideoProps) {
+  const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const loopCountRef = useRef(0);
   const onWatchProgressRef = useRef(onWatchProgress);
@@ -151,11 +150,11 @@ export default function DiscoverNativeVideo({
 
   const statusMessage =
     playbackStatus === "deleted"
-      ? PLAYBACK_DELETED_MESSAGE
+      ? t("watch.deleted")
       : playbackStatus === "expired"
-        ? PLAYBACK_EXPIRED_MESSAGE
+        ? t("watch.linkExpired")
         : playbackStatus === "error"
-          ? PLAYBACK_UNAVAILABLE_MESSAGE
+          ? t("watch.unableToPlay")
           : null;
 
   return (
@@ -183,7 +182,7 @@ export default function DiscoverNativeVideo({
               disabled={retrying}
               className="watch-focus-ring rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold text-white hover:bg-white/15 disabled:opacity-50"
             >
-              {retrying ? "Refreshing…" : "Retry playback"}
+              {retrying ? t("watch.refreshing") : t("watch.retryPlayback")}
             </button>
           ) : null}
         </div>

@@ -150,39 +150,40 @@ export async function loadCanonicalVideoFeedPage(input?: {
       supabase,
       withUrls
     );
-    const withAuthors = await enrichAuthorIdentityFromProfiles(
-      supabase,
-      withAuthorIds
-    );
-    const viewerState = await loadViewerInteractionState(
-      supabase,
-      user?.id,
-      withAuthors.map((post) => post.id)
-    );
-    let posts = applyViewerStateToPosts(withAuthors, viewerState);
-    const articleIds = posts
+    const articleIds = withAuthorIds
       .map((post) => post.article_id)
       .filter((id): id is string => Boolean(id));
-    if (articleIds.length > 0) {
-      const titles = await listArticleTitlesByIds(supabase, articleIds);
+    const creatorIds = withAuthorIds
+      .map((post) => post.user_id)
+      .filter((id): id is string => Boolean(id));
+
+    const [withAuthors, viewerState, titles, followingSet] = await Promise.all([
+      enrichAuthorIdentityFromProfiles(supabase, withAuthorIds),
+      loadViewerInteractionState(
+        supabase,
+        user?.id,
+        withAuthorIds.map((post) => post.id)
+      ),
+      articleIds.length > 0
+        ? listArticleTitlesByIds(supabase, articleIds)
+        : Promise.resolve(new Map<string, string>()),
+      loadViewerFollowingSet(supabase, user?.id, creatorIds),
+    ]);
+
+    let posts = applyViewerStateToPosts(withAuthors, viewerState);
+    if (titles.size > 0) {
       posts = posts.map((post) =>
         post.article_id && titles.has(post.article_id)
           ? { ...post, article_title: titles.get(post.article_id) ?? null }
           : post
       );
     }
-    let videos = posts
-      .map(mapVideoPostToDiscover)
-      .filter((video): video is DiscoverVideo => video !== null);
-
-    const followingSet = await loadViewerFollowingSet(
-      supabase,
-      user?.id,
-      videos
-        .map((video) => video.creator.id)
-        .filter((id): id is string => Boolean(id))
+    const videos = applyFollowingToDiscoverVideos(
+      posts
+        .map(mapVideoPostToDiscover)
+        .filter((video): video is DiscoverVideo => video !== null),
+      followingSet
     );
-    videos = applyFollowingToDiscoverVideos(videos, followingSet);
 
     const lastRow = pageRows[pageRows.length - 1];
     const nextCursor =

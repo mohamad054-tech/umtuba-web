@@ -15,6 +15,7 @@ type AppTopNavProps = {
   title: string;
   badge?: ReactNode;
   subtitle?: string;
+  subtitleHelp?: string;
   actions?: ReactNode;
   /** Sticky chrome (default). Pass false for surfaces that manage their own sticky wrapper. */
   sticky?: boolean;
@@ -31,6 +32,7 @@ export default function AppTopNav({
   title,
   badge,
   subtitle,
+  subtitleHelp,
   actions,
   sticky = true,
   appearance = "default",
@@ -126,7 +128,10 @@ export default function AppTopNav({
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           {actions}
           {subtitle ? (
-            <p className="app-top-nav-subtitle hidden text-xs font-medium xl:block">
+            <p
+              className="app-top-nav-subtitle hidden text-xs font-medium xl:block"
+              title={subtitleHelp}
+            >
               {subtitle}
             </p>
           ) : null}

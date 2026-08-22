@@ -505,13 +505,16 @@ export type FoundationMessages = {
   "learning.chrome.instructorWorkspace": string;
 
   "home.subtitle": string;
+  "home.subtitleHelp": string;
   "home.welcome": string;
   "home.saved": string;
   "home.upload": string;
   "home.sectionsAria": string;
   "home.games": string;
+  "home.opening": string;
 
   "search.title": string;
+  "search.opening": string;
   "search.subtitle": string;
   "search.acrossTitle": string;
   "search.acrossDescription": string;
@@ -537,6 +540,18 @@ export type FoundationMessages = {
   "watch.openDiscover": string;
   "watch.uploadVideo": string;
   "watch.readOnUmLife": string;
+  "watch.loadingVideo": string;
+  "watch.deleted": string;
+  "watch.linkExpired": string;
+  "watch.unableToPlay": string;
+  "watch.retryPlayback": string;
+  "watch.refreshing": string;
+  "watch.playVideo": string;
+  "watch.pauseVideo": string;
+  "watch.unmute": string;
+  "watch.mute": string;
+  "watch.emptyFeed": string;
+  "live.opening": string;
 
   "life.title": string;
   "life.subtitle": string;

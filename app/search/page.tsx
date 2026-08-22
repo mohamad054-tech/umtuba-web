@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { createTranslator } from "../../lib/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { searchMetadata } from "../../lib/site/routeMetadata";
 import { getServerUser } from "../../lib/supabase/server";
 import ProductLoadingState from "../components/product/ProductLoadingState";
@@ -14,8 +16,10 @@ type SearchPageProps = {
     | { q?: string; tab?: string };
 };
 
-function SearchFallback() {
-  return <ProductLoadingState fullPage label="Opening UMTUBA Search…" />;
+async function SearchFallback() {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
+  return <ProductLoadingState fullPage label={t("search.opening")} />;
 }
 
 async function SearchLoader({ searchParams }: SearchPageProps) {

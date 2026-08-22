@@ -470,7 +470,7 @@ export default function WatchExperience({
   const transitionVideo = journeyVideo ?? activeVideo;
   const emptyMessage = loadError
     ? sanitizeUserFacingMessage(loadError)
-    : "No published videos yet. Create one to start the Watch feed.";
+    : t("watch.emptyFeed");
 
   return (
     <main className="watch-page-enter relative min-h-screen overflow-hidden bg-[#050510] text-white md:min-h-screen">

@@ -3,11 +3,15 @@
 type WatchFloatingControlsProps = {
   muted: boolean;
   onToggleMute: () => void;
+  unmuteLabel: string;
+  muteLabel: string;
 };
 
 export default function WatchFloatingControls({
   muted,
   onToggleMute,
+  unmuteLabel,
+  muteLabel,
 }: WatchFloatingControlsProps) {
   return (
     <div className="absolute right-4 top-20 z-30 md:top-4">
@@ -18,7 +22,7 @@ export default function WatchFloatingControls({
           onToggleMute();
         }}
         className="watch-focus-ring watch-rail-btn flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur-md hover:bg-black/60"
-        aria-label={muted ? "Unmute video" : "Mute video"}
+        aria-label={muted ? unmuteLabel : muteLabel}
         aria-pressed={!muted}
       >
         {muted ? (

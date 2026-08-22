@@ -12,6 +12,23 @@ import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoSlide from "./VideoSlide";
 
+/**
+ * Scroll a slide inside the Watch scroller only.
+ * Never use Element.scrollIntoView — it can scroll window/ancestors and
+ * stall desktop wheel so the next video never becomes active.
+ */
+function scrollScrollerToSlide(
+  scroller: HTMLElement,
+  slide: HTMLElement,
+  behavior: ScrollBehavior
+) {
+  const top =
+    slide.getBoundingClientRect().top -
+    scroller.getBoundingClientRect().top +
+    scroller.scrollTop;
+  scroller.scrollTo({ top, behavior });
+}
+
 type VerticalVideoFeedProps = {
   videos: WatchVideo[];
   initialIndex?: number;
@@ -186,8 +203,8 @@ export default function VerticalVideoFeed({
 
     const node = slideNodesRef.current.get(target.id);
 
-    if (node) {
-      node.scrollIntoView({ block: "start" });
+    if (node && scrollerRef.current) {
+      scrollScrollerToSlide(scrollerRef.current, node, "auto");
       setActiveIndex(initialIndex);
     }
   }, [initialIndex, videos]);
@@ -199,9 +216,11 @@ export default function VerticalVideoFeed({
     lastRestoreTokenRef.current = restoreState.token;
     setActiveIndex(index);
     requestAnimationFrame(() => {
-      slideNodesRef.current
-        .get(restoreState.videoId)
-        ?.scrollIntoView({ block: "start" });
+      const node = slideNodesRef.current.get(restoreState.videoId);
+      const scroller = scrollerRef.current;
+      if (node && scroller) {
+        scrollScrollerToSlide(scroller, node, "auto");
+      }
     });
   }, [restoreState, videos]);
 
@@ -239,10 +258,13 @@ export default function VerticalVideoFeed({
         ? slideNodesRef.current.get(nextVideo.id)
         : null;
 
-      node?.scrollIntoView({
-        behavior: prefersReducedMotion ? "auto" : "smooth",
-        block: "start",
-      });
+      if (node && scrollerRef.current) {
+        scrollScrollerToSlide(
+          scrollerRef.current,
+          node,
+          prefersReducedMotion ? "auto" : "smooth"
+        );
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -292,6 +314,7 @@ export default function VerticalVideoFeed({
                 shopProductCount={shopProductCount}
                 shopShelfOpen={shopShelfOpen}
                 onToggleMute={handleToggleMute}
+                onAutoplayMuted={() => setMuted(true)}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
                 onStatsChange={(stats) =>
