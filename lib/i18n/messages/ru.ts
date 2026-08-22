@@ -552,6 +552,7 @@ export const ruMessages: FoundationMessages = {
   "watch.linkedArticle": "Связанная статья",
   "watch.postJourney": "Путь публикации",
   "watch.openingJourney": "Открытие пути...",
+  "watch.aiSummaryBody": "Смотрите, как движется публикация — откройте путь публикации.",
   "live.opening": "Открытие UMTUBA Live…",
   "life.title": "UM Life",
   "life.subtitle": "Общее социальное пространство",

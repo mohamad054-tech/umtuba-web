@@ -552,6 +552,7 @@ export const hiMessages: FoundationMessages = {
   "watch.linkedArticle": "जुड़ा लेख",
   "watch.postJourney": "पोस्ट यात्रा",
   "watch.openingJourney": "यात्रा खोली जा रही है...",
+  "watch.aiSummaryBody": "देखें यह पोस्ट कैसे यात्रा करती है — पोस्ट यात्रा खोलें.",
   "live.opening": "UMTUBA लाइव खोला जा रहा है…",
   "life.title": "UM Life",
   "life.subtitle": "साझा सामाजिक स्थान",

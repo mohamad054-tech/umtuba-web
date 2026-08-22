@@ -551,6 +551,7 @@ export const koMessages: FoundationMessages = {
   "watch.linkedArticle": "연결된 글",
   "watch.postJourney": "게시물 여정",
   "watch.openingJourney": "여정을 여는 중...",
+  "watch.aiSummaryBody": "이 게시물이 어떻게 퍼지는지 보세요 — 게시물 여정을 여세요.",
   "live.opening": "UMTUBA 라이브를 여는 중…",
   "life.title": "UM Life",
   "life.subtitle": "공유 소셜 공간",

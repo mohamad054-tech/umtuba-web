@@ -615,6 +615,7 @@ export const esMessages: FoundationMessages = {
   "watch.linkedArticle": "Artículo vinculado",
   "watch.postJourney": "Recorrido de la publicación",
   "watch.openingJourney": "Abriendo el recorrido...",
+  "watch.aiSummaryBody": "Mira cómo viaja esta publicación — abre el recorrido de la publicación.",
   "live.opening": "Abriendo el directo de UMTUBA…",
   "life.title": "UM Life",
   "life.subtitle": "El espacio social compartido",

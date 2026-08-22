@@ -606,6 +606,7 @@ export const arMessages: FoundationMessages = {
   "watch.linkedArticle": "مقال مرتبط",
   "watch.postJourney": "رحلة المنشور",
   "watch.openingJourney": "جارٍ فتح الرحلة...",
+  "watch.aiSummaryBody": "شاهد كيف ينتقل هذا المنشور — افتح رحلة المنشور لمتابعة الانتشار.",
   "live.opening": "جارٍ فتح البث المباشر…",
   "life.title": "UM Life",
   "life.subtitle": "المساحة الاجتماعية المشتركة",

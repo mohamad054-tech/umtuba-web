@@ -551,6 +551,7 @@ export const jaMessages: FoundationMessages = {
   "watch.linkedArticle": "リンクされた記事",
   "watch.postJourney": "投稿ジャーニー",
   "watch.openingJourney": "ジャーニーを開いています...",
+  "watch.aiSummaryBody": "この投稿の広がりを見る — 投稿ジャーニーを開く。",
   "live.opening": "UMTUBAライブを開いています…",
   "life.title": "UM Life",
   "life.subtitle": "共有ソーシャルスペース",

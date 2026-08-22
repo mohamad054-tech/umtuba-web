@@ -552,6 +552,7 @@ export const trMessages: FoundationMessages = {
   "watch.linkedArticle": "Bağlı makale",
   "watch.postJourney": "Gönderi yolculuğu",
   "watch.openingJourney": "Yolculuk açılıyor...",
+  "watch.aiSummaryBody": "Bu gönderinin yolculuğunu görün — gönderi yolculuğunu açın.",
   "live.opening": "UMTUBA Canlı açılıyor…",
   "life.title": "UM Life",
   "life.subtitle": "Paylaşılan sosyal alan",

@@ -615,6 +615,7 @@ export const ptMessages: FoundationMessages = {
   "watch.linkedArticle": "Artigo associado",
   "watch.postJourney": "Percurso da publicação",
   "watch.openingJourney": "A abrir o percurso...",
+  "watch.aiSummaryBody": "Vê como esta publicação viaja — abre o percurso da publicação.",
   "live.opening": "A abrir o direto do UMTUBA…",
   "life.title": "UM Life",
   "life.subtitle": "O espaço social partilhado",

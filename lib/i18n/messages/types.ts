@@ -568,6 +568,7 @@ export type FoundationMessages = {
   "watch.linkedArticle": string;
   "watch.postJourney": string;
   "watch.openingJourney": string;
+  "watch.aiSummaryBody": string;
   "live.opening": string;
 
   "life.title": string;

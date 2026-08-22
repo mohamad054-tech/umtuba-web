@@ -150,7 +150,12 @@ export default function VideoOverlay({
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-purple-200/80">
                 {t("watch.aiSummary")}
               </p>
-              <p className="text-sm leading-6 text-white/75">{video.aiSummary}</p>
+              <p className="text-sm leading-6 text-white/75">
+                {video.aiSummary ===
+                "Watch how this post travels — open Post Journey for live reach."
+                  ? t("watch.aiSummaryBody")
+                  : video.aiSummary}
+              </p>
               <button
                 type="button"
                 onClick={() => onOpenPanel("ai")}

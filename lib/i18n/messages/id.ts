@@ -552,6 +552,7 @@ export const idMessages: FoundationMessages = {
   "watch.linkedArticle": "Artikel tertaut",
   "watch.postJourney": "Perjalanan pos",
   "watch.openingJourney": "Membuka perjalanan...",
+  "watch.aiSummaryBody": "Lihat bagaimana pos ini berjalan — buka perjalanan pos.",
   "live.opening": "Membuka UMTUBA Live…",
   "life.title": "UM Life",
   "life.subtitle": "Ruang sosial bersama",

@@ -620,6 +620,7 @@ export const frMessages: FoundationMessages = {
   "watch.linkedArticle": "Article lié",
   "watch.postJourney": "Parcours du post",
   "watch.openingJourney": "Ouverture du parcours...",
+  "watch.aiSummaryBody": "Voyez comment cette publication voyage — ouvrez le parcours du post.",
   "live.opening": "Ouverture du direct UMTUBA…",
   "life.title": "UM Life",
   "life.subtitle": "L’espace social partagé",

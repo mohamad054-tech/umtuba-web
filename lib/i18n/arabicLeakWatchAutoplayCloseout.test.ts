@@ -23,6 +23,7 @@ const CLOSEOUT_KEYS: TranslationKey[] = [
   "watch.linkedArticle",
   "watch.postJourney",
   "watch.openingJourney",
+  "watch.aiSummaryBody",
 ];
 
 function readRepo(relativePath: string) {
@@ -58,6 +59,7 @@ describe("Arabic leak + Watch autoplay closeout keys", () => {
     expect(rail).toMatch(/t\("stories.add"\)/);
     expect(rail).not.toMatch(/>\s*Add Story\s*</);
     expect(overlay).toMatch(/t\("watch.aiSummary"\)/);
+    expect(overlay).toMatch(/t\("watch.aiSummaryBody"\)/);
     expect(overlay).not.toMatch(/>\s*AI summary\s*</);
     expect(message).toMatch(/t\("home.message"\)/);
     expect(message).not.toMatch(/label = "Message"/);

@@ -446,5 +446,6 @@
   "watch.openAiPanel": "Open AI panel",
   "watch.linkedArticle": "Linked article",
   "watch.postJourney": "Post Journey",
-  "watch.openingJourney": "Opening journey..."
+  "watch.openingJourney": "Opening journey...",
+  "watch.aiSummaryBody": "Watch how this post travels — open Post Journey for live reach."
 }

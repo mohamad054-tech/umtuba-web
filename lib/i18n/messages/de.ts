@@ -618,6 +618,7 @@ export const deMessages: FoundationMessages = {
   "watch.linkedArticle": "Verknüpfter Artikel",
   "watch.postJourney": "Beitragsreise",
   "watch.openingJourney": "Reise wird geöffnet...",
+  "watch.aiSummaryBody": "Sieh, wie dieser Beitrag reist — öffne die Beitragsreise.",
   "live.opening": "UMTUBA Live wird geöffnet…",
   "life.title": "UM Life",
   "life.subtitle": "Der gemeinsame soziale Bereich",

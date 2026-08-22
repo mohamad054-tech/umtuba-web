@@ -546,6 +546,7 @@ export const zhCNMessages: FoundationMessages = {
   "watch.linkedArticle": "关联文章",
   "watch.postJourney": "帖子旅程",
   "watch.openingJourney": "正在打开旅程...",
+  "watch.aiSummaryBody": "查看这条帖子如何传播 — 打开帖子旅程。",
   "live.opening": "正在打开 UMTUBA 直播…",
   "life.title": "UM Life",
   "life.subtitle": "共享社交空间",

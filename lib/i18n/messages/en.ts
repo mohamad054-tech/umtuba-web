@@ -622,6 +622,7 @@ export const enMessages: FoundationMessages = {
   "watch.linkedArticle": "Linked article",
   "watch.postJourney": "Post Journey",
   "watch.openingJourney": "Opening journey...",
+  "watch.aiSummaryBody": "Watch how this post travels — open Post Journey for live reach.",
   "live.opening": "Opening UMTUBA Live…",
   "life.title": "UM Life",
   "life.subtitle": "The shared social space",

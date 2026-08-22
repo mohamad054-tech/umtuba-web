@@ -4,10 +4,12 @@ import { pauseInactiveVideo, playActiveVideo } from "./playActiveVideo";
 function fakeVideo(options: {
   play: () => Promise<void>;
   muted?: boolean;
+  pause?: () => void;
 }) {
   return {
     muted: options.muted ?? false,
     play: options.play,
+    pause: options.pause ?? vi.fn(),
   };
 }
 
@@ -36,6 +38,21 @@ describe("playActiveVideo", () => {
     pauseInactiveVideo(video);
     expect(video.muted).toBe(true);
     expect(pause).toHaveBeenCalledTimes(1);
+  });
+
+  it("pauses the previously claimed player before the next one plays", async () => {
+    const firstPause = vi.fn();
+    const first = fakeVideo({
+      play: vi.fn().mockResolvedValue(undefined),
+      pause: firstPause,
+      muted: false,
+    });
+    const second = fakeVideo({ play: vi.fn().mockResolvedValue(undefined) });
+    await playActiveVideo(first, false);
+    await playActiveVideo(second, true);
+    expect(firstPause).toHaveBeenCalled();
+    expect(first.muted).toBe(true);
+    expect(second.muted).toBe(true);
   });
 
   it("reports blocked when even muted autoplay fails", async () => {

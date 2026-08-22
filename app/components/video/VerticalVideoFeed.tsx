@@ -288,9 +288,31 @@ export default function VerticalVideoFeed({
     };
   }, [activeIndex, videos]);
 
-  function handleToggleMute() {
+  const handleToggleMute = useCallback(() => {
     setMuted((value) => !value);
-  }
+  }, []);
+
+  const handleAutoplayMuted = useCallback(() => {
+    setMuted(true);
+  }, []);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    const activeId = activeVideo?.id;
+    if (!scroller || !activeId) {
+      return;
+    }
+
+    scroller.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
+      if (slide.dataset.videoId === activeId) {
+        return;
+      }
+      slide.querySelectorAll("video").forEach((video) => {
+        video.muted = true;
+        video.pause();
+      });
+    });
+  }, [activeIndex, activeVideo?.id, videos]);
 
   if (videos.length === 0) {
     return (
@@ -328,7 +350,7 @@ export default function VerticalVideoFeed({
                 shopProductCount={shopProductCount}
                 shopShelfOpen={shopShelfOpen}
                 onToggleMute={handleToggleMute}
-                onAutoplayMuted={() => setMuted(true)}
+                onAutoplayMuted={handleAutoplayMuted}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
                 onStatsChange={(stats) =>
