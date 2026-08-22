@@ -4,6 +4,10 @@ import {
   VIDEO_FEED_PAGE_SIZE,
 } from "../../app/lib/video/feedPolicy";
 import {
+  resolveWatchSignIndexes,
+  type WatchSignPolicy,
+} from "../../app/lib/video/playbackFetchPolicy";
+import {
   decodeWatchFeedCursor,
   discoverVideoToWatchVideo,
   encodeWatchFeedCursor,
@@ -73,6 +77,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
   cursor?: string | null;
   limit?: number;
   focusPostId?: number | null;
+  signPolicy?: WatchSignPolicy;
 }): Promise<
   | { ok: true; page: CanonicalVideoFeedPage }
   | { ok: false; message: string }
@@ -145,7 +150,26 @@ export async function loadCanonicalVideoFeedPage(input?: {
 
     const hasMore = rows.length > limit;
     const pageRows = hasMore ? rows.slice(0, limit) : rows;
-    const withUrls = await attachPlaybackUrls(supabase, pageRows);
+    const focusIndex = (() => {
+      if (input?.focusPostId && input.focusPostId > 0) {
+        const found = pageRows.findIndex((row) => row.id === input.focusPostId);
+        if (found >= 0) return found;
+      }
+      return 0;
+    })();
+    const signIndexes =
+      input?.signPolicy === "active-window"
+        ? new Set(
+            resolveWatchSignIndexes({
+              length: pageRows.length,
+              focusIndex,
+              isContinuationPage: Boolean(cursor),
+            })
+          )
+        : undefined;
+    const withUrls = await attachPlaybackUrls(supabase, pageRows, {
+      signIndexes,
+    });
     const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
       supabase,
       withUrls
@@ -242,6 +266,7 @@ export async function getWatchVideosPageServer(input?: {
     cursor: input?.cursor,
     limit: input?.limit ?? WATCH_FEED_PAGE_SIZE,
     focusPostId: input?.focusPostId,
+    signPolicy: "active-window",
   });
 
   if (!result.ok) {

@@ -474,7 +474,7 @@ export default function WatchExperience({
 
   return (
     <main className="watch-page-enter relative min-h-screen overflow-hidden bg-[#050510] text-white md:min-h-screen">
-      <WatchAmbientBackground video={activeVideo} />
+      <WatchAmbientBackground />
 
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:pointer-events-auto md:relative md:px-8">
         <Link

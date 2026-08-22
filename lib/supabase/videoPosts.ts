@@ -273,19 +273,27 @@ export async function createVideoSignedUrl(
   return data.signedUrl;
 }
 
+export type AttachPlaybackUrlsOptions = {
+  /** When set, only these page indexes receive a signed URL. */
+  signIndexes?: ReadonlySet<number>;
+};
+
 export async function attachPlaybackUrls(
   supabase: SupabaseClient,
-  posts: VideoPostRow[]
+  posts: VideoPostRow[],
+  options?: AttachPlaybackUrlsOptions
 ): Promise<PublicPostDTO[]> {
   return Promise.all(
-    posts.map(async (post) => {
+    posts.map(async (post, index) => {
       let playbackUrl: string | null = null;
+      const allowSign =
+        !options?.signIndexes || options.signIndexes.has(index);
 
       const path = post.video_path?.trim();
 
-      if (path) {
+      if (allowSign && path) {
         playbackUrl = await createVideoSignedUrl(supabase, path);
-      } else {
+      } else if (allowSign) {
         const legacyUrl = post.video_url?.trim();
 
         if (
@@ -474,7 +482,8 @@ export function applyViewerStateToPosts(
 }
 
 export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | null {
-  if (!post.video_url) {
+  const src = post.video_url?.trim() ?? "";
+  if (!src && post.post_type !== "video") {
     return null;
   }
 
@@ -492,7 +501,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
 
   return {
     id: String(post.id),
-    src: post.video_url,
+    src,
     caption: post.content || "Untitled video",
     title: articleTitle ?? (post.content || "Untitled video"),
     hashtags: extractHashtags(post.content),

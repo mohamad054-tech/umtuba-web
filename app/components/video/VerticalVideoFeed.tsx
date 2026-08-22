@@ -9,6 +9,11 @@ import {
 } from "react";
 import type { DiscoverStats } from "../../discover/types";
 import type { WatchVideo } from "../../watch/types";
+import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import {
+  WATCH_PLAYBACK_NEIGHBOR_WINDOW,
+  isPlayableHttpSrc,
+} from "../../lib/video/playbackFetchPolicy";
 import type { WatchPanelId } from "./watchTypes";
 import VideoSlide from "./VideoSlide";
 
@@ -58,7 +63,7 @@ type VerticalVideoFeedProps = {
   loadMoreEpoch?: number;
 };
 
-const NEIGHBOR_WINDOW = 1;
+const NEIGHBOR_WINDOW = WATCH_PLAYBACK_NEIGHBOR_WINDOW;
 
 export default function VerticalVideoFeed({
   videos,
@@ -88,6 +93,7 @@ export default function VerticalVideoFeed({
   const [muted, setMuted] = useState(true);
   const nearEndRequestedRef = useRef(false);
   const lastRestoreTokenRef = useRef<number | null>(null);
+  const signingRef = useRef(new Set<number>());
   const programmaticIndexRef = useRef<number | null>(null);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
@@ -191,6 +197,34 @@ export default function VerticalVideoFeed({
 
     onActiveChange?.(activeVideo, activeIndex);
   }, [activeIndex, activeVideo, onActiveChange]);
+
+  useEffect(() => {
+    const unsigned = videos.filter((video, index) => {
+      return (
+        mountedIndexes.has(index) &&
+        Boolean(video.postId) &&
+        !isPlayableHttpSrc(video.src)
+      );
+    });
+
+    for (const video of unsigned) {
+      const postId = video.postId;
+      if (!postId || signingRef.current.has(postId)) {
+        continue;
+      }
+
+      signingRef.current.add(postId);
+      void refreshWatchPlaybackAction(postId)
+        .then((result) => {
+          if (result.ok) {
+            onVideoPatch?.(video.id, { src: result.src });
+          }
+        })
+        .finally(() => {
+          signingRef.current.delete(postId);
+        });
+    }
+  }, [mountedIndexes, onVideoPatch, videos]);
 
   useEffect(() => {
     nearEndRequestedRef.current = false;

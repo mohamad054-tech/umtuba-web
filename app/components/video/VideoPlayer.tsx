@@ -12,6 +12,10 @@ import {
   pauseInactiveVideo,
   playActiveVideo,
 } from "../../../lib/video/playActiveVideo";
+import {
+  isPlayableHttpSrc,
+  resolveWatchMediaPreload,
+} from "../../lib/video/playbackFetchPolicy";
 import WatchFloatingControls from "./WatchFloatingControls";
 
 export type WatchProgressEvent = {
@@ -275,9 +279,11 @@ export default function VideoPlayer({
           ? t("watch.unableToPlay")
           : null;
 
+  const playable = isPlayableHttpSrc(src) && playbackStatus === "ok";
+
   return (
     <div className="relative h-full w-full bg-black">
-      {playbackStatus === "ok" ? (
+      {playable ? (
         <video
           ref={videoRef}
           className="h-full w-full cursor-pointer object-cover"
@@ -286,7 +292,7 @@ export default function VideoPlayer({
           playsInline
           loop
           muted={muted}
-          preload={active ? "auto" : "metadata"}
+          preload={resolveWatchMediaPreload(active)}
           onClick={handleSurfaceClick}
           onLoadedData={() => setIsReady(true)}
           onWaiting={() => setIsReady(false)}
@@ -295,7 +301,7 @@ export default function VideoPlayer({
           onPause={() => setIsPaused(true)}
           onError={() => onPlaybackError?.()}
         />
-      ) : (
+      ) : playbackStatus !== "ok" ? (
         <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#050510] px-6 text-center">
           <p className="text-sm font-bold text-white/70">{statusMessage}</p>
           {playbackStatus !== "deleted" && onRetryPlayback ? (
@@ -308,7 +314,7 @@ export default function VideoPlayer({
             </button>
           ) : null}
         </div>
-      )}
+      ) : null}
 
       <div
         role="button"
@@ -335,7 +341,8 @@ export default function VideoPlayer({
         </div>
       ) : null}
 
-      {!isReady && active && playbackStatus === "ok" ? (
+      {((!playable && playbackStatus === "ok") ||
+        (!isReady && active && playable)) ? (
         <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/35">
           <p
             className="rounded-full border border-white/15 bg-black/50 px-4 py-2 text-sm font-bold text-white/70 backdrop-blur"
