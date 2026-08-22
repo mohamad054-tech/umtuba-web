@@ -30,7 +30,7 @@ describe("WP-QA-01 Explore This City → World", () => {
   it("Home Explore this city still uses the shared builder", () => {
     const experience = read("app/discover/DiscoverExperience.tsx");
     expect(experience).toMatch(/buildHomeCityFocusHref/);
-    expect(experience).toMatch(/Explore this city/);
+    expect(experience).toMatch(/home.exploreCity/);
   });
 });
 

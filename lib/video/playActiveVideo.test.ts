@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { playActiveVideo } from "./playActiveVideo";
+import { pauseInactiveVideo, playActiveVideo } from "./playActiveVideo";
 
 function fakeVideo(options: {
   play: () => Promise<void>;
@@ -28,6 +28,14 @@ describe("playActiveVideo", () => {
     await expect(playActiveVideo(video, false)).resolves.toBe("muted_fallback");
     expect(video.muted).toBe(true);
     expect(play).toHaveBeenCalledTimes(2);
+  });
+
+  it("mutes and pauses a departing player so stale play cannot stay audible", () => {
+    const pause = vi.fn();
+    const video = { muted: false, pause };
+    pauseInactiveVideo(video);
+    expect(video.muted).toBe(true);
+    expect(pause).toHaveBeenCalledTimes(1);
   });
 
   it("reports blocked when even muted autoplay fails", async () => {

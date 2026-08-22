@@ -106,7 +106,7 @@ export default function VideoOverlay({
             </p>
             {hasLinkedArticle ? (
               <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
-                Linked article
+                {t("watch.linkedArticle")}
               </p>
             ) : (
               <p className="mt-1 line-clamp-3 text-sm leading-6 text-white/80">
@@ -135,7 +135,7 @@ export default function VideoOverlay({
                 disabled={transitionLocked}
                 className="pointer-events-auto watch-focus-ring rounded-full border border-blue-300/25 bg-blue-500/10 px-3 py-1.5 font-bold text-blue-100 hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Explore this city
+                {t("home.exploreCity")}
               </button>
             ) : null}
           </div>
@@ -148,7 +148,7 @@ export default function VideoOverlay({
           {prototypePanelsAllowed ? (
             <div className="space-y-2 rounded-2xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-md">
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-purple-200/80">
-                AI summary
+                {t("watch.aiSummary")}
               </p>
               <p className="text-sm leading-6 text-white/75">{video.aiSummary}</p>
               <button
@@ -157,7 +157,7 @@ export default function VideoOverlay({
                 disabled={transitionLocked}
                 className="pointer-events-auto watch-focus-ring text-left text-xs font-bold text-white/55 underline-offset-2 hover:text-white hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
               >
-                {video.translation} · Open AI panel
+                {t("watch.openAiPanel")}
               </button>
             </div>
           ) : null}
@@ -177,7 +177,7 @@ export default function VideoOverlay({
             className="pointer-events-auto watch-focus-ring inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3.5 text-sm font-black text-black shadow-[0_12px_40px_rgba(255,255,255,0.18)] transition hover:scale-[1.015] hover:bg-white/95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100 md:w-auto md:min-w-[220px]"
           >
             <span aria-hidden>🌍</span>
-            {transitionLocked ? "Opening journey..." : "Post Journey"}
+            {transitionLocked ? t("watch.openingJourney") : t("watch.postJourney")}
           </button>
         </div>
 

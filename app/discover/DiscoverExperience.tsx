@@ -357,7 +357,7 @@ export default function DiscoverExperience({
         <aside className="hidden w-[280px] shrink-0 flex-col justify-center gap-4 xl:flex">
           <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
-              Now playing
+              {t("home.nowPlaying")}
             </p>
             <h2 className="mt-2 text-xl font-black tracking-tight">
               {activeVideo.location.city}
@@ -366,19 +366,19 @@ export default function DiscoverExperience({
               {activeVideo.location.country}
             </p>
             <p className="mt-4 text-sm leading-6 text-white/70">
-              Swipe, scroll, or use ↑ ↓ to explore creators around the world.
+              {t("home.asideHint")}
             </p>
             <Link
               href={exploreHref}
               className="watch-focus-ring mt-5 inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
             >
-              Explore this city
+              {t("home.exploreCity")}
             </Link>
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-300/80">
-              Creator
+              {t("home.creator")}
             </p>
             <Link
               href={profileHref}
@@ -400,6 +400,7 @@ export default function DiscoverExperience({
               <StartDirectMessageButton
                 peerUserId={peerUserId ?? ""}
                 peerName={activeVideo.creator.name}
+                label={t("home.message")}
                 hidden={!canMessageAside}
                 className="watch-focus-ring w-full rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
               />
@@ -413,7 +414,7 @@ export default function DiscoverExperience({
             href={exploreHref}
             className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
           >
-            Explore this city
+            {t("home.exploreCity")}
           </Link>
         </div>
       </div>

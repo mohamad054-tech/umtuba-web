@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition, type ChangeEvent } from "react";
+import { useTranslation } from "../../components/i18n";
 import { createStoryAction } from "../../actions/stories";
 import {
   STORY_ACCEPT_ATTR,
@@ -30,6 +31,7 @@ export default function StoryComposer({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const fileRef = useRef<File | null>(null);
+  const { t } = useTranslation();
 
   if (!open) return null;
 
@@ -127,7 +129,7 @@ export default function StoryComposer({
       className="fixed inset-0 z-[80] flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Add story"
+      aria-label={t("stories.addAria")}
     >
       <button
         type="button"
@@ -137,14 +139,14 @@ export default function StoryComposer({
       />
       <div className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-[#0a0a18] p-5 text-white shadow-2xl">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-black tracking-tight">Add Story</h2>
+          <h2 className="text-lg font-black tracking-tight">{t("stories.add")}</h2>
           <button
             type="button"
             onClick={handleClose}
             disabled={pending}
             className="rounded-full border border-white/15 px-3 py-1 text-xs font-bold text-white/70 hover:bg-white/10 disabled:opacity-50"
           >
-            Close
+            {t("actions.close")}
           </button>
         </div>
 

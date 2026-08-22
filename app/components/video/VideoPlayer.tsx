@@ -8,7 +8,10 @@ import {
   type MouseEvent,
 } from "react";
 import { useTranslation } from "../i18n";
-import { playActiveVideo } from "../../../lib/video/playActiveVideo";
+import {
+  pauseInactiveVideo,
+  playActiveVideo,
+} from "../../../lib/video/playActiveVideo";
 import WatchFloatingControls from "./WatchFloatingControls";
 
 export type WatchProgressEvent = {
@@ -60,6 +63,7 @@ export default function VideoPlayer({
   const [flashIcon, setFlashIcon] = useState<"play" | "pause" | null>(null);
   const flashTimerRef = useRef<number | null>(null);
   const loopCountRef = useRef(0);
+  const playGenerationRef = useRef(0);
   const onWatchProgressRef = useRef(onWatchProgress);
   onWatchProgressRef.current = onWatchProgress;
 
@@ -71,16 +75,23 @@ export default function VideoPlayer({
     }
 
     if (!active || playbackStatus !== "ok") {
-      video.pause();
+      playGenerationRef.current += 1;
+      pauseInactiveVideo(video);
       return;
     }
 
     if (pausedByUser) {
+      playGenerationRef.current += 1;
+      video.pause();
       return;
     }
 
-    video.muted = muted;
+    const generation = playGenerationRef.current + 1;
+    playGenerationRef.current = generation;
     void playActiveVideo(video, muted).then((result) => {
+      if (playGenerationRef.current !== generation) {
+        return;
+      }
       if (result === "muted_fallback") {
         onAutoplayMuted?.();
       }
@@ -98,7 +109,7 @@ export default function VideoPlayer({
       return;
     }
 
-    video.pause();
+    pauseInactiveVideo(video);
 
     const frame = requestAnimationFrame(() => {
       setPausedByUser(true);

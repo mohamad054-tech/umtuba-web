@@ -263,7 +263,7 @@ describe("stories UI + navigation contracts", () => {
 
   it("StoryRail starts with Add Story and opens a fullscreen viewer", () => {
     const rail = readRepoFile("app/stories/components/StoryRail.tsx");
-    expect(rail).toMatch(/Add Story/);
+    expect(rail).toMatch(/t\("stories.add"\)/);
     expect(rail).toMatch(/StoryViewer/);
     expect(rail).toMatch(/StoryComposer/);
     expect(rail).toMatch(/hasUnread/);

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type MouseEvent } from "react";
+import { useTranslation } from "../i18n";
 import { openDirectConversationAction } from "../../actions/messenger";
 import {
   APP_ROUTES,
@@ -27,12 +28,14 @@ export default function StartDirectMessageButton({
   peerUserId,
   peerName,
   className,
-  label = "Message",
+  label,
   hidden = false,
 }: StartDirectMessageButtonProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const buttonLabel = label ?? t("home.message");
 
   // Non-empty non-UUID means a bad DTO stand-in (e.g. post id). Empty = intentionally missing.
   if (
@@ -111,7 +114,7 @@ export default function StartDirectMessageButton({
           "watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
         }
       >
-        {loading ? "Opening…" : label}
+        {loading ? t("home.messageOpening") : buttonLabel}
       </button>
       {error ? (
         <p

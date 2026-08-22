@@ -3,6 +3,17 @@ export type ActiveVideoPlayResult =
   | "muted_fallback"
   | "blocked";
 
+type PauseableVideo = Pick<HTMLVideoElement, "muted" | "pause">;
+
+/**
+ * Stop a departing Watch/Home player immediately, including audio.
+ * Mute first so a stale play() cannot keep the previous clip audible.
+ */
+export function pauseInactiveVideo(video: PauseableVideo): void {
+  video.muted = true;
+  video.pause();
+}
+
 /**
  * Start the newly active video. Respects the caller's mute preference first.
  * If the browser blocks unmuted autoplay, fall back to muted play so A→B

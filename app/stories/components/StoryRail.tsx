@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "../../components/i18n";
 import { APP_ROUTES } from "../../lib/nav";
 import { useStoriesRail } from "../hooks/useStoriesRail";
 import StoryComposer from "./StoryComposer";
@@ -15,9 +16,13 @@ type StoryRailProps = {
 function AvatarRing({
   group,
   onOpen,
+  yourStoryLabel,
+  storyFallbackLabel,
 }: {
   group: StoryRailGroup;
   onOpen: () => void;
+  yourStoryLabel: string;
+  storyFallbackLabel: string;
 }) {
   const ringClass = group.hasUnread
     ? "bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-400"
@@ -46,16 +51,17 @@ function AvatarRing({
       </span>
       <span className="w-full truncate text-center text-[10px] font-bold text-white/75">
         {group.isOwn
-          ? "Your story"
+          ? yourStoryLabel
           : group.owner.username
             ? `@${group.owner.username}`
-            : group.owner.full_name || "Story"}
+            : group.owner.full_name || storyFallbackLabel}
       </span>
     </button>
   );
 }
 
 export default function StoryRail({ viewerId }: StoryRailProps) {
+  const { t } = useTranslation();
   const enabled = Boolean(viewerId);
   const {
     groups,
@@ -72,7 +78,7 @@ export default function StoryRail({ viewerId }: StoryRailProps) {
   return (
     <section
       className="relative z-20 w-full shrink-0 border-b border-white/5 bg-black/20 px-3 py-2.5 backdrop-blur-md md:rounded-2xl md:border md:border-white/10"
-      aria-label="Stories"
+      aria-label={t("stories.railAria")}
     >
       <div className="flex items-center gap-3 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {viewerId ? (
@@ -80,26 +86,26 @@ export default function StoryRail({ viewerId }: StoryRailProps) {
             type="button"
             onClick={() => setComposerOpen(true)}
             className="flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300/70"
-            aria-label="Add story"
+            aria-label={t("stories.addAria")}
           >
             <span className="relative flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full border border-dashed border-white/35 bg-white/5 text-2xl font-black text-sky-300">
               +
             </span>
             <span className="w-full truncate text-center text-[10px] font-bold text-white/75">
-              Add Story
+              {t("stories.add")}
             </span>
           </button>
         ) : (
           <Link
             href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.discover)}`}
             className="flex w-[4.5rem] shrink-0 flex-col items-center gap-1.5"
-            aria-label="Sign in to add a story"
+            aria-label={t("stories.signInAdd")}
           >
             <span className="relative flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full border border-dashed border-white/35 bg-white/5 text-2xl font-black text-sky-300">
               +
             </span>
             <span className="w-full truncate text-center text-[10px] font-bold text-white/75">
-              Add Story
+              {t("stories.add")}
             </span>
           </Link>
         )}
@@ -119,13 +125,15 @@ export default function StoryRail({ viewerId }: StoryRailProps) {
           <AvatarRing
             key={group.ownerId}
             group={group}
+            yourStoryLabel={t("stories.yourStory")}
+            storyFallbackLabel={t("stories.railAria")}
             onOpen={() => setViewerOwnerId(group.ownerId)}
           />
         ))}
 
         {!loading && enabled && groups.length === 0 ? (
           <p className="pl-1 text-xs font-medium text-white/45">
-            Follow creators to see their stories here.
+            {t("stories.emptyFollow")}
           </p>
         ) : null}
       </div>
@@ -138,7 +146,7 @@ export default function StoryRail({ viewerId }: StoryRailProps) {
             onClick={() => void refresh()}
             className="rounded-full bg-white/10 px-2 py-0.5"
           >
-            Retry
+            {t("actions.retry")}
           </button>
         </div>
       ) : null}

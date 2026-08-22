@@ -88,6 +88,7 @@ export default function VerticalVideoFeed({
   const [muted, setMuted] = useState(true);
   const nearEndRequestedRef = useRef(false);
   const lastRestoreTokenRef = useRef<number | null>(null);
+  const programmaticIndexRef = useRef<number | null>(null);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -154,9 +155,19 @@ export default function VerticalVideoFeed({
         const videoId = (topEntry.target as HTMLElement).dataset.videoId;
         const nextIndex = videos.findIndex((video) => video.id === videoId);
 
-        if (nextIndex >= 0) {
-          setActiveIndex(nextIndex);
+        if (nextIndex < 0) {
+          return;
         }
+
+        if (
+          programmaticIndexRef.current !== null &&
+          nextIndex !== programmaticIndexRef.current
+        ) {
+          return;
+        }
+
+        programmaticIndexRef.current = null;
+        setActiveIndex(nextIndex);
       },
       {
         root: scroller,
@@ -257,6 +268,9 @@ export default function VerticalVideoFeed({
       const node = nextVideo
         ? slideNodesRef.current.get(nextVideo.id)
         : null;
+
+      programmaticIndexRef.current = nextIndex;
+      setActiveIndex(nextIndex);
 
       if (node && scrollerRef.current) {
         scrollScrollerToSlide(

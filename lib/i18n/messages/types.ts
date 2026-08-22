@@ -512,6 +512,18 @@ export type FoundationMessages = {
   "home.sectionsAria": string;
   "home.games": string;
   "home.opening": string;
+  "home.nowPlaying": string;
+  "home.asideHint": string;
+  "home.exploreCity": string;
+  "home.creator": string;
+  "home.message": string;
+  "home.messageOpening": string;
+  "stories.add": string;
+  "stories.yourStory": string;
+  "stories.railAria": string;
+  "stories.emptyFollow": string;
+  "stories.addAria": string;
+  "stories.signInAdd": string;
 
   "search.title": string;
   "search.opening": string;
@@ -551,6 +563,11 @@ export type FoundationMessages = {
   "watch.unmute": string;
   "watch.mute": string;
   "watch.emptyFeed": string;
+  "watch.aiSummary": string;
+  "watch.openAiPanel": string;
+  "watch.linkedArticle": string;
+  "watch.postJourney": string;
+  "watch.openingJourney": string;
   "live.opening": string;
 
   "life.title": string;
