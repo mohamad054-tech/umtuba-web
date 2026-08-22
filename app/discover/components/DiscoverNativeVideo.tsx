@@ -5,6 +5,11 @@ import { useTranslation } from "../../components/i18n";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
 import {
+  isPlayableHttpSrc,
+  resolveHomeDiscoverMediaPreload,
+  shouldAttachHomeDiscoverMediaSrc,
+} from "../../lib/video/playbackFetchPolicy";
+import {
   playbackStatusAfterRemintFailure,
   shouldAutoRemintPlayback,
 } from "../../lib/video/signedPlaybackRetry";
@@ -23,8 +28,8 @@ type DiscoverNativeVideoProps = {
 type PlaybackStatus = "ok" | "expired" | "deleted" | "error";
 
 /**
- * Discover playback: native controls, metadata preload only, playsInline.
- * Full media is only requested for mounted neighbors (see DiscoverFeed).
+ * Discover/Home playback: attach media only for the active card.
+ * Inactive neighbors stay poster/placeholder — no metadata or media preload.
  * Expired signed URLs remint once, then show a clear retry error.
  */
 export default function DiscoverNativeVideo({
@@ -157,9 +162,14 @@ export default function DiscoverNativeVideo({
           ? t("watch.unableToPlay")
           : null;
 
+  const attachMedia =
+    playbackStatus === "ok" &&
+    shouldAttachHomeDiscoverMediaSrc(active) &&
+    isPlayableHttpSrc(playbackSrc);
+
   return (
     <div className="relative h-full w-full bg-black">
-      {playbackStatus === "ok" ? (
+      {attachMedia ? (
         <video
           key={playbackSrc}
           ref={videoRef}
@@ -168,10 +178,25 @@ export default function DiscoverNativeVideo({
           poster={poster}
           controls
           playsInline
-          preload="metadata"
+          preload={resolveHomeDiscoverMediaPreload(active)}
           aria-label={label}
           onError={handlePlaybackError}
         />
+      ) : playbackStatus === "ok" ? (
+        <div className="flex h-full w-full items-center justify-center bg-[#050510]">
+          {poster ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={poster}
+              alt=""
+              className="h-full w-full object-cover opacity-80"
+            />
+          ) : (
+            <p className="px-6 text-center text-sm font-bold text-white/40">
+              {label}
+            </p>
+          )}
+        </div>
       ) : (
         <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-[#050510] px-6 text-center">
           <p className="text-sm font-bold text-white/70">{statusMessage}</p>

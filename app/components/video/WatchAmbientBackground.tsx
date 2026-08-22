@@ -1,34 +1,16 @@
 "use client";
 
-import type { WatchVideo } from "../../watch/types";
-
-type WatchAmbientBackgroundProps = {
-  video: WatchVideo | null;
-};
-
-export default function WatchAmbientBackground({
-  video,
-}: WatchAmbientBackgroundProps) {
+/**
+ * Decorative Watch backdrop only. Must never attach a second media
+ * element (that duplicated the active clip's signed object).
+ */
+export default function WatchAmbientBackground() {
   return (
     <div
       className="pointer-events-none fixed inset-0 overflow-hidden bg-[#050510]"
       aria-hidden
     >
       <div className="absolute inset-0 bg-[#050510]" />
-
-      {video ? (
-        <video
-          key={video.id}
-          className="absolute inset-0 h-full w-full scale-125 object-cover opacity-40 blur-3xl saturate-150"
-          src={video.src}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="metadata"
-        />
-      ) : null}
-
       <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/55 via-[#050510]/75 to-[#050510]" />
       <div className="absolute left-[-12%] top-[-12%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
       <div className="absolute right-[-10%] top-[18%] h-[26rem] w-[26rem] rounded-full bg-purple-600/22 blur-3xl" />

@@ -289,7 +289,7 @@ export default function ContentCard({
             src={post.video}
             controls
             playsInline
-            preload="metadata"
+            preload="none"
             className="max-h-96 w-full bg-black"
             aria-label={post.content || "Video post"}
           />
