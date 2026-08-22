@@ -40,7 +40,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="flex min-h-full min-h-dvh flex-col bg-[#050510]" suppressHydrationWarning>
         <JsonLd data={buildSiteGraphJsonLd()} />
         <I18nProvider locale={locale}>
           <AppMotionRoot>

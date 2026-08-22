@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Always the UMTUBA canvas — never the browser default white. */
+  --background: #050510;
+  --foreground: #ededed;
+  color-scheme: dark;
   /* Set by AppMobileBottomNav while visible on small viewports */
   --app-mobile-bottom-nav-offset: 0px;
   /* App top nav ink — readable on premium dark without redesign */
@@ -37,11 +39,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--background);
+  min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
