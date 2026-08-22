@@ -24,7 +24,7 @@ import {
   ProfileVideoGrid,
   type ProfileTabId,
 } from "./components";
-import { CREATOR_SPACE_COPY } from "./lib/profileCreatorSpaceIa";
+import { useTranslation } from "../components/i18n";
 import {
   PROFILE_ERROR_SOFT_BANNER_CLASS,
   PROFILE_ERROR_STATES_COPY,
@@ -64,6 +64,7 @@ export default function ProfileExperience({
   isOwner,
   viewerId = null,
 }: ProfileExperienceProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const retrySecondaryFetch = useCallback(() => {
@@ -192,7 +193,7 @@ export default function ProfileExperience({
             role="status"
             className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
-            {CREATOR_SPACE_COPY.mockBanner}
+            {t("profile.mockBanner")}
           </p>
         ) : null}
 
@@ -405,30 +406,31 @@ export default function ProfileExperience({
 }
 
 export function ProfileNotFound({ username }: { username: string }) {
+  const { t } = useTranslation();
   return (
     <ProfileShell>
       <div className="flex flex-1 flex-col items-center justify-center rounded-[28px] border border-white/10 bg-[#080816]/70 px-6 py-16 text-center backdrop-blur-xl">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
-          {CREATOR_SPACE_COPY.notFoundEyebrow}
+          {t("profile.notFoundEyebrow")}
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-tight">
-          @{username} not found
+          {t("profile.notFoundTitle", { values: { username } })}
         </h2>
         <p className="mt-3 max-w-md text-sm text-white/55">
-          {CREATOR_SPACE_COPY.notFoundBody}
+          {t("profile.notFoundBody")}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           <Link
             href={APP_ROUTES.home}
             className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
           >
-            Open Home
+            {t("profile.openHome")}
           </Link>
           <Link
             href={APP_ROUTES.live}
             className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold transition hover:bg-white/10"
           >
-            Open Live
+            {t("profile.openLive")}
           </Link>
         </div>
       </div>

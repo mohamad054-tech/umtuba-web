@@ -1,26 +1,31 @@
-# CURSOR_REPORT — Google SEO full optimization V1 2026-08-22
+# CURSOR_REPORT — 13-locale runtime certification V1 2026-08-22
 
 ```text
-TASK_ID = CENTRAL_UMTUBA_GOOGLE_SEO_FULL_OPTIMIZATION_V1
-STATUS = VERIFIED_PENDING_DEPLOY
-START_PRODUCTION_SHA = 9f937e2ff7cd13c8cba5cebf94ea4e9f48dae3fc
-START_LIVE_RELEASE = 9f937e2f-20260821213212
-WEB_BRANCH = central/web-google-seo-full-optimization-v1
-WEB_WORKTREE = D:\umtuba-central\repos\umtuba-web-google-seo-full-optimization-v1
+TASK_ID = CENTRAL_WEB_13_LOCALE_RUNTIME_CERTIFICATION_AND_COMPLETION_V1
+STATUS = CANDIDATE_READY_NOT_DEPLOYED
+BASE_SHA = 57de1988fc546f5c4f0acdd5e207c48aba1d82ef
+WEB_BRANCH = central/web-13-locale-runtime-certification-v1
+WEB_WORKTREE = D:\umtuba-central\repos\umtuba-web-13-locale-runtime-certification-v1
 TYPECHECK = PASS
 TESTS = PASS
 BUILD = PASS
 GIT_DIFF_CHECK = PASS
-MOBILE_SOURCE_CHANGED = NO
+13_LOCALE_MATRIX_COMPLETE = YES
+AR_PROFILE_ENGLISH_LEAK_FIXED = CANDIDATE_YES_PRODUCTION_NO
+RUNTIME_VERIFIED = CANDIDATE_LOCAL_HTML_YES
+DEPLOYED = NO
+READY_FOR_CENTRAL_DEPLOY_DECISION = YES
 ```
 
 ## Summary
 
-Audited live `9f937e2f-20260821213212`. Production already had brand metadata, `?hl=` hreflang, Watch VideoObject, and a static sitemap that omitted Life / Learning / Store. Implemented public sitemap expansion, truthful JSON-LD, localized titles/descriptions for 13 locales, unique per-page metadata, and noindex for cart/checkout/account surfaces. No ranking claims.
+Previous closeout treated catalog keys as proof and never rendered `/profile`. Live Arabic `/profile/marenapost` still showed product English. This candidate wires profile shell/header/tabs/actions/tier/loading chrome to 13-locale catalogs, formats joined dates per locale, and certifies rendered HTML. Production is unchanged.
+
+Candidate `http://127.0.0.1:3013/profile/marenapost?hl=ar` has none of the observed leak phrases. Production `https://umtuba.com/profile/marenapost?hl=ar` still FAILs those phrases because this branch is not deployed.
 
 ## Exact files changed
 
-See Central report. No mobile files. No SQL.
+Profile chrome, activity-tier chrome, 13 message catalogs, `lib/i18n/profileChrome.ts`, runtime cert tests, locale matrix script. See Central report for the full list. No mobile files. No SQL.
 
 ## Migrations created
 
@@ -28,28 +33,30 @@ None.
 
 ## Security review
 
-No auth/session/secret change. Public metadata uses safe fields only. Signed image URLs rejected. Sandbox catalog excluded from sitemap/Product URLs. Cart/checkout/orders/wishlist noindex.
+No auth/session/secret change. Locale is existing `hl` / translator path. Settings remains auth-gated (production 307 BLOCKED_AUTH). No new public data exposure.
 
 ## Tests
 
-Targeted SEO + metadata + video + legal + sandbox + UM Life contract PASS.
+`runtimeLocaleCertification`, profile IA/joined/about/identity/loading, arabic leak closeout: PASS (27).
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS.
+`node node_modules/typescript/bin/tsc --noEmit` PASS.
 
 ## Build
 
-`npm run build` PASS. `/sitemap.xml` is dynamic.
+`npm run build` PASS (Next 16.2.10). Prior sibling-`node_modules` prerender failure did not reproduce with a local install.
 
 ## git diff --check
 
-PASS.
+PASS (CRLF warnings only).
 
 ## git status --short
 
-Feature files staged for commit on `central/web-google-seo-full-optimization-v1`.
+Candidate files on `central/web-13-locale-runtime-certification-v1` (commit + push this closeout).
 
 ## Open issues
 
-Google Search Console verification token is not present and was not invented. Operator must add the token in GSC if they want property verification.
+- Production still shows the English leak set until Central deploys this candidate.
+- Remaining hardcoded English (not in the observed marenapost leak set): linked-article prompt, empty/error panel constants, some aria-labels, IA English contracts, mock UGC.
+- `/settings` stays BLOCKED_AUTH on production.

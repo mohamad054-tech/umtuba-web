@@ -14,7 +14,12 @@ import {
   shouldShowHeroWebsite,
   toExternalHref,
 } from "../lib/profileHeroSocialLinks";
-import { formatHeroJoinedLine } from "../lib/profileJoinedLabel";
+import { useTranslation } from "../../components/i18n";
+import {
+  activityTierTitleKey,
+  formatLocalizedJoinedLine,
+} from "../../../lib/i18n/profileChrome";
+import { formatNumber } from "../../../lib/i18n";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import type { ProfileView } from "../types";
 
@@ -36,6 +41,7 @@ export default function ProfileHeader({
   showTierProgress = true,
   isCollapsed = false,
 }: ProfileHeaderProps) {
+  const { locale, t } = useTranslation();
   const tierProgress = profile.activityTier ?? null;
   const specialtyChips = normalizeSpecialtyChips(profile.about.specialties);
   const bioText = profile.bio.trim();
@@ -48,7 +54,10 @@ export default function ProfileHeader({
     !isCollapsed && shouldShowHeroWebsite(profile.about.website);
   const showSocial =
     !isCollapsed && shouldShowHeroSocialLinks(profile.about.links);
-  const joinedLine = formatHeroJoinedLine(profile.about.joinedLabel);
+  const joinedLine = formatLocalizedJoinedLine(locale, t, {
+    joinedAt: profile.joinedAt,
+    joinedLabel: profile.about.joinedLabel,
+  });
 
   return (
     <div className="space-y-5">
@@ -72,7 +81,9 @@ export default function ProfileHeader({
             // eslint-disable-next-line @next/next/no-img-element -- remote Supabase storage URLs
             <img
               src={profile.avatarUrl}
-              alt={`${profile.displayName} avatar`}
+              alt={t("profile.avatarAlt", {
+                values: { name: profile.displayName },
+              })}
               className={`rounded-full object-cover ring-4 ring-[#080816] transition-[width,height] duration-200 motion-reduce:transition-none ${
                 isCollapsed
                   ? "h-16 w-16 sm:h-20 sm:w-20"
@@ -115,7 +126,7 @@ export default function ProfileHeader({
           {specialtyChips.length > 0 ? (
             <ul
               className="flex flex-wrap gap-2"
-              aria-label="Creator specialties"
+              aria-label={t("profile.specialtiesAria")}
             >
               {specialtyChips.map((label) => (
                 <li
@@ -131,19 +142,23 @@ export default function ProfileHeader({
           {tierProgress && showTierProgress ? (
             <div className="max-w-md space-y-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
-                Activity tier
+                {t("profile.activityTier")}
               </p>
               <p className="text-sm text-white/70">
-                {tierProgress.tier.displayTitle}
+                {t(activityTierTitleKey(tierProgress.tier.id))}
                 <span className="text-white/40">
                   {" "}
-                  · {tierProgress.score.toLocaleString()} activity score
+                  ·{" "}
+                  {t("profile.activityScore", {
+                    values: {
+                      score: formatNumber(locale, tierProgress.score),
+                    },
+                  })}
                 </span>
               </p>
               <ActivityTierProgressBar progress={tierProgress} />
               <p className="text-[11px] leading-5 text-white/40">
-                Ranked by authentic contributions — not wallet balance or
-                passive watch time.
+                {t("profile.progressExplanation")}
               </p>
             </div>
           ) : null}
@@ -164,7 +179,7 @@ export default function ProfileHeader({
                   aria-expanded={bioExpanded}
                   onClick={() => setBioExpanded((open) => !open)}
                 >
-                  {bioExpanded ? "less" : "more"}
+                  {bioExpanded ? t("profile.less") : t("profile.more")}
                 </button>
               ) : null}
             </div>
@@ -190,7 +205,7 @@ export default function ProfileHeader({
           {showSocial ? (
             <ul
               className="flex flex-wrap items-center gap-2"
-              aria-label="Creator links"
+              aria-label={t("profile.linksAria")}
             >
               {socialLinks.map((link) => (
                 <li key={link.href}>

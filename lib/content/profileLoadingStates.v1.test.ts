@@ -39,6 +39,9 @@ describe("Creator Space Loading States V1 — wiring", () => {
     expect(skeleton).toMatch(/PROFILE_LOADING_PULSE_CLASS/);
     expect(skeleton).toMatch(/ProfileShell/);
     expect(skeleton).toMatch(/aria-busy/);
+    expect(skeleton).toMatch(/t\("profile.loadingAria"\)/);
+    expect(skeleton).toMatch(/t\("profile.openingStatus"\)/);
+    expect(skeleton).not.toMatch(/PROFILE_LOADING_COPY/);
     expect(skeleton).toMatch(/PROFILE_LOADING_STATS_CELL_COUNT/);
     expect(skeleton).toMatch(/PROFILE_LOADING_TIMELINE_SKELETON_COUNT/);
     expect(loading).toMatch(/ProfileLoadingSkeleton/);

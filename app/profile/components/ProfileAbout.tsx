@@ -1,10 +1,13 @@
+"use client";
+
 import type { ReactNode } from "react";
 import type { ProfileView } from "../types";
+import { useTranslation } from "../../components/i18n";
+import { formatLocalizedJoinedBody } from "../../../lib/i18n/profileChrome";
 import {
   getAboutLocationLabel,
   getVisibleAboutSections,
 } from "../lib/profileAboutLiveStructure";
-import { formatAboutJoinedBody } from "../lib/profileJoinedLabel";
 
 type ProfileAboutProps = {
   profile: ProfileView;
@@ -38,6 +41,7 @@ function ChipList({ items }: { items: readonly string[] }) {
  * Empty sections omit entirely. No owner "Add …" placeholders in this phase.
  */
 export default function ProfileAbout({ profile }: ProfileAboutProps) {
+  const { locale, t } = useTranslation();
   const location = getAboutLocationLabel(profile);
   const sections = getVisibleAboutSections({
     bio: profile.bio,
@@ -48,10 +52,8 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
   if (sections.length === 0) {
     return (
       <div className="space-y-2 rounded-[24px] border border-white/10 bg-white/[0.03] px-5 py-10 text-center">
-        <p className="text-sm text-white/50">No About details yet.</p>
-        <p className="text-xs text-white/35">
-          Bio, experience, and links will appear here when available.
-        </p>
+        <p className="text-sm text-white/50">{t("profile.emptyAbout")}</p>
+        <p className="text-xs text-white/35">{t("profile.emptyAboutHint")}</p>
       </div>
     );
   }
@@ -60,13 +62,13 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
     <div className="space-y-6 rounded-[24px] border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm sm:p-6">
       <div>
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-300/80">
-          About
+          {t("profile.about")}
         </p>
       </div>
 
       {sections.includes("bio") ? (
         <section className="space-y-3">
-          <SectionHeading>Bio</SectionHeading>
+          <SectionHeading>{t("profile.bio")}</SectionHeading>
           {profile.bio ? (
             <p className="text-sm leading-6 text-white/70">{profile.bio}</p>
           ) : null}
@@ -78,14 +80,14 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
 
       {sections.includes("roles") ? (
         <section>
-          <SectionHeading>Roles</SectionHeading>
+          <SectionHeading>{t("profile.roles")}</SectionHeading>
           <ChipList items={profile.about.roles ?? []} />
         </section>
       ) : null}
 
       {sections.includes("experience") ? (
         <section>
-          <SectionHeading>Experience</SectionHeading>
+          <SectionHeading>{t("profile.experience")}</SectionHeading>
           <ul className="mt-3 space-y-3">
             {(profile.about.experience ?? []).map((item) => (
               <li key={`${item.title}-${item.detail ?? ""}`}>
@@ -103,7 +105,7 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
 
       {sections.includes("education") ? (
         <section>
-          <SectionHeading>Education</SectionHeading>
+          <SectionHeading>{t("profile.education")}</SectionHeading>
           <ul className="mt-3 space-y-3">
             {(profile.about.education ?? []).map((item) => (
               <li key={`${item.title}-${item.detail ?? ""}`}>
@@ -121,16 +123,20 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
 
       {sections.includes("specialtiesInterests") ? (
         <section className="space-y-4">
-          <SectionHeading>Specialties &amp; interests</SectionHeading>
+          <SectionHeading>{t("profile.specialtiesInterests")}</SectionHeading>
           {(profile.about.specialties?.length ?? 0) > 0 ? (
             <div>
-              <p className="text-xs font-semibold text-white/45">Specialties</p>
+              <p className="text-xs font-semibold text-white/45">
+                {t("profile.specialties")}
+              </p>
               <ChipList items={profile.about.specialties ?? []} />
             </div>
           ) : null}
           {(profile.about.interests?.length ?? 0) > 0 ? (
             <div>
-              <p className="text-xs font-semibold text-white/45">Interests</p>
+              <p className="text-xs font-semibold text-white/45">
+                {t("profile.interests")}
+              </p>
               <ChipList items={profile.about.interests} />
             </div>
           ) : null}
@@ -139,14 +145,14 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
 
       {sections.includes("achievements") ? (
         <section>
-          <SectionHeading>Achievements</SectionHeading>
+          <SectionHeading>{t("profile.achievements")}</SectionHeading>
           <ChipList items={profile.about.achievements ?? []} />
         </section>
       ) : null}
 
       {sections.includes("links") ? (
         <section>
-          <SectionHeading>Links</SectionHeading>
+          <SectionHeading>{t("profile.links")}</SectionHeading>
           <ul className="mt-3 space-y-2">
             {profile.about.website ? (
               <li>
@@ -182,9 +188,12 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
 
       {sections.includes("joined") ? (
         <section>
-          <SectionHeading>Joined</SectionHeading>
+          <SectionHeading>{t("profile.joined")}</SectionHeading>
           <p className="mt-2 text-sm text-white/80">
-            {formatAboutJoinedBody(profile.about.joinedLabel)}
+            {formatLocalizedJoinedBody(locale, t, {
+              joinedAt: profile.joinedAt,
+              joinedLabel: profile.about.joinedLabel,
+            })}
           </p>
         </section>
       ) : null}

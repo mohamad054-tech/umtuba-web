@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { buildArticleHref } from "../../lib/nav";
-import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import { useTranslation } from "../../components/i18n";
 
 type ProfileLinkedArticlePromptProps = {
   articleId: string;
@@ -20,6 +20,7 @@ export default function ProfileLinkedArticlePrompt({
   articleTitle = null,
   username,
 }: ProfileLinkedArticlePromptProps) {
+  const { t } = useTranslation();
   const router = useRouter();
 
   function browseProfile() {
@@ -38,7 +39,7 @@ export default function ProfileLinkedArticlePrompt({
         Linked article
       </p>
       <p className="mt-2 text-sm font-bold text-white">
-        {CREATOR_SPACE_COPY.browsePrompt}
+        {t("profile.browsePrompt")}
       </p>
       {articleTitle ? (
         <p className="mt-1 line-clamp-2 text-sm text-white/60">{articleTitle}</p>
@@ -55,7 +56,7 @@ export default function ProfileLinkedArticlePrompt({
           onClick={browseProfile}
           className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10"
         >
-          {CREATOR_SPACE_COPY.browseCta}
+          {t("profile.browseCta")}
         </button>
       </div>
     </div>

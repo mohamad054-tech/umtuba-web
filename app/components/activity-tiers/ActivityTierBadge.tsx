@@ -4,6 +4,11 @@ import {
   activityTierAccentClasses,
   type ActivityTierDefinition,
 } from "../../../lib/activity-tiers";
+import { useTranslation } from "../i18n";
+import {
+  activityTierLabelKey,
+  activityTierTitleKey,
+} from "../../../lib/i18n/profileChrome";
 
 type ActivityTierBadgeProps = {
   tier: ActivityTierDefinition;
@@ -18,6 +23,9 @@ export default function ActivityTierBadge({
   showLabel = true,
   className = "",
 }: ActivityTierBadgeProps) {
+  const { t } = useTranslation();
+  const label = t(activityTierLabelKey(tier.id));
+  const title = t(activityTierTitleKey(tier.id));
   const accent = activityTierAccentClasses(tier.accent);
   const sizeClass =
     size === "sm"
@@ -29,15 +37,15 @@ export default function ActivityTierBadge({
   return (
     <span
       className={`inline-flex max-w-full items-center rounded-full border font-bold ${accent.border} ${accent.bg} ${accent.text} ${sizeClass} ${className}`}
-      title={`${tier.displayTitle} — ${tier.description}`}
+      title={title}
     >
       <span aria-hidden className="shrink-0 opacity-90">
         {tier.icon}
       </span>
       {showLabel ? (
-        <span className="truncate">{tier.displayLabel}</span>
+        <span className="truncate">{label}</span>
       ) : (
-        <span className="sr-only">{tier.displayLabel}</span>
+        <span className="sr-only">{label}</span>
       )}
     </span>
   );

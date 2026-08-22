@@ -1,4 +1,7 @@
+"use client";
+
 import type { ProfilePost } from "../types";
+import { useTranslation } from "../../components/i18n";
 
 type ProfilePostsPanelProps = {
   posts: ProfilePost[];
@@ -9,6 +12,7 @@ export default function ProfilePostsPanel({
   posts,
   loadFailed = false,
 }: ProfilePostsPanelProps) {
+  const { t } = useTranslation();
   if (loadFailed) {
     return (
       <p
@@ -23,7 +27,7 @@ export default function ProfilePostsPanel({
   if (posts.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
-        <p className="text-base font-bold text-white/80">No posts yet</p>
+        <p className="text-base font-bold text-white/80">{t("profile.emptyPosts")}</p>
         <p className="mt-2 text-sm text-white/45">
           Text and image posts from this creator will appear here.
         </p>

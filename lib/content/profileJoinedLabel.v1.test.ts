@@ -38,9 +38,9 @@ describe("Hero Joined Label V1 — wiring", () => {
 
     expect(helper).toMatch(/export function formatHeroJoinedLine/);
     expect(helper).toMatch(/export function formatAboutJoinedBody/);
-    expect(header).toMatch(/formatHeroJoinedLine/);
+    expect(header).toMatch(/formatLocalizedJoinedLine/);
     expect(header).not.toMatch(/Joined \{profile\.about\.joinedLabel\}/);
-    expect(about).toMatch(/formatAboutJoinedBody/);
+    expect(about).toMatch(/formatLocalizedJoinedBody/);
     expect(experience).toMatch(/ProfileIdentityStrip/);
     expect(experience).toMatch(/ProfileIdentityAchievements/);
     expect(`${header}\n${helper}`).not.toMatch(/\bverified\b/i);

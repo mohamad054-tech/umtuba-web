@@ -20,8 +20,8 @@ describe("Creator Space IA Rename V1 — copy contract", () => {
     expect(CREATOR_SPACE_COPY.editOwnerCta).toBe("Edit Creator Space");
 
     const shell = read("app/profile/components/ProfileShell.tsx");
-    expect(shell).toMatch(/title="Creator Space"/);
-    expect(shell).toMatch(/subtitle="Creator hub"/);
+    expect(shell).toMatch(/t\("profile.creatorSpace"\)/);
+    expect(shell).toMatch(/t\("profile.creatorHub"\)/);
 
     // Route path stays /profile — no rename GO in this phase.
     const prompt = read("app/profile/components/ProfileLinkedArticlePrompt.tsx");
@@ -39,14 +39,14 @@ describe("Creator Space IA Rename V1 — copy contract", () => {
     const experience = read("app/profile/ProfileExperience.tsx");
     const videos = read("app/profile/components/ProfileVideoGrid.tsx");
 
-    expect(tabs).toMatch(/CREATOR_SPACE_COPY\.tablistAriaLabel/);
-    expect(actions).toMatch(/CREATOR_SPACE_COPY\.editOwnerCta/);
-    expect(actions).toMatch(/CREATOR_SPACE_COPY\.shareAriaLabel/);
-    expect(prompt).toMatch(/CREATOR_SPACE_COPY\.browseCta/);
-    expect(prompt).toMatch(/CREATOR_SPACE_COPY\.browsePrompt/);
-    expect(experience).toMatch(/CREATOR_SPACE_COPY\.notFoundEyebrow/);
-    expect(experience).toMatch(/CREATOR_SPACE_COPY\.mockBanner/);
-    expect(videos).toMatch(/CREATOR_SPACE_COPY\.videosShowingLatest/);
+    expect(tabs).toMatch(/t\("profile.tablistAria"\)/);
+    expect(actions).toMatch(/t\("profile.editOwnerCta"\)/);
+    expect(actions).toMatch(/t\("profile.shareAria"\)/);
+    expect(prompt).toMatch(/t\("profile.browseCta"\)/);
+    expect(prompt).toMatch(/t\("profile.browsePrompt"\)/);
+    expect(experience).toMatch(/t\("profile.notFoundEyebrow"\)/);
+    expect(experience).toMatch(/t\("profile.mockBanner"\)/);
+    expect(videos).toMatch(/t\("profile.videosShowingLatest"\)/);
     expect(videos).toMatch(/PROFILE_EMPTY_STATES_COPY/);
 
     // Preserve identity stack order from prior closed tasks.

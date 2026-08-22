@@ -1,6 +1,8 @@
+"use client";
+
+import { useTranslation } from "../../components/i18n";
 import ProfileShell from "./ProfileShell";
 import {
-  PROFILE_LOADING_COPY,
   PROFILE_LOADING_PULSE_CLASS,
   PROFILE_LOADING_STATS_CELL_COUNT,
   PROFILE_LOADING_TAB_CHIP_COUNT,
@@ -12,15 +14,17 @@ import {
  * Used by route `loading.tsx` and Suspense fallback (partial hydration shell).
  */
 export default function ProfileLoadingSkeleton() {
+  const { t } = useTranslation();
+
   return (
     <ProfileShell>
       <div
         role="status"
         aria-busy="true"
-        aria-label={PROFILE_LOADING_COPY.ariaLabel}
+        aria-label={t("profile.loadingAria")}
         className="space-y-5"
       >
-        <span className="sr-only">{PROFILE_LOADING_COPY.fallbackStatus}</span>
+        <span className="sr-only">{t("profile.openingStatus")}</span>
 
         {/* Hero: cover + avatar + text lines */}
         <div className="space-y-5">

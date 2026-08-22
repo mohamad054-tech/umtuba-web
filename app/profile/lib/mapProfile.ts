@@ -128,6 +128,7 @@ export function profileRowToView(
     articlesLoadFailed: Boolean(content?.articlesFailed),
     statsLoadFailed: statsFailed || followFailed,
     liveLoadFailed: Boolean(content?.liveFailed),
+    joinedAt: row.created_at ?? null,
     about: {
       joinedLabel: formatJoinedLabel(row.created_at),
       interests: [],

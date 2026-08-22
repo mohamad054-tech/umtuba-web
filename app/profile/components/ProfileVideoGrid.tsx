@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import type { ProfileVideo } from "../types";
 import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
-import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import { useTranslation } from "../../components/i18n";
 import {
   PROFILE_EMPTY_STATES_COPY,
   shouldShowOwnerEmptyCreateActions,
@@ -28,6 +30,7 @@ export default function ProfileVideoGrid({
   isOwner = false,
   onVideoDeleted,
 }: ProfileVideoGridProps) {
+  const { t } = useTranslation();
   if (loadFailed) {
     return (
       <ProfilePanelError
@@ -42,7 +45,7 @@ export default function ProfileVideoGrid({
     return (
       <ProductEmptyState
         compact
-        eyebrow="Videos"
+        eyebrow={t("profile.videos")}
         title={PROFILE_EMPTY_STATES_COPY.videosTitle}
         description={
           showOwnerActions
@@ -149,7 +152,7 @@ export default function ProfileVideoGrid({
       </ul>
       {hasMore ? (
         <p className="text-center text-xs text-white/40">
-          {CREATOR_SPACE_COPY.videosShowingLatest}
+          {t("profile.videosShowingLatest")}
         </p>
       ) : null}
     </div>

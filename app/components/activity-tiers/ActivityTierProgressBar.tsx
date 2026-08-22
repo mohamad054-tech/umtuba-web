@@ -1,6 +1,9 @@
 "use client";
 
 import type { ActivityTierProgress } from "../../../lib/activity-tiers";
+import { useTranslation } from "../i18n";
+import { activityTierTitleKey } from "../../../lib/i18n/profileChrome";
+import { formatNumber } from "../../../lib/i18n";
 
 type ActivityTierProgressBarProps = {
   progress: ActivityTierProgress;
@@ -14,7 +17,10 @@ export default function ActivityTierProgressBar({
   className = "",
   showDetails = true,
 }: ActivityTierProgressBarProps) {
+  const { locale, t } = useTranslation();
   const { tier, nextTier, progressPercent, pointsToNext, score } = progress;
+  const currentTitle = t(activityTierTitleKey(tier.id));
+  const nextTitle = nextTier ? t(activityTierTitleKey(nextTier.id)) : "";
 
   return (
     <div className={className}>
@@ -22,13 +28,20 @@ export default function ActivityTierProgressBar({
         <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-2 text-[11px] font-bold text-white/45">
           <span>
             {nextTier
-              ? `Progress to ${nextTier.displayTitle}`
-              : `${tier.displayTitle} — max tier`}
+              ? t("profile.progressTo", { values: { tier: nextTitle } })
+              : t("profile.maxTier", { values: { tier: currentTitle } })}
           </span>
           <span className="tabular-nums text-white/55">
             {nextTier
-              ? `${pointsToNext.toLocaleString()} to go · ${progressPercent}%`
-              : `${score.toLocaleString()} score`}
+              ? t("profile.pointsToGo", {
+                  values: {
+                    count: formatNumber(locale, pointsToNext),
+                    percent: formatNumber(locale, progressPercent),
+                  },
+                })
+              : t("profile.scoreOnly", {
+                  values: { score: formatNumber(locale, score) },
+                })}
           </span>
         </div>
       ) : null}
@@ -40,8 +53,13 @@ export default function ActivityTierProgressBar({
         aria-valuenow={progressPercent}
         aria-label={
           nextTier
-            ? `${progressPercent}% toward ${nextTier.displayTitle}`
-            : `${tier.displayTitle} tier complete`
+            ? t("profile.progressAria", {
+                values: {
+                  percent: formatNumber(locale, progressPercent),
+                  tier: nextTitle,
+                },
+              })
+            : t("profile.tierCompleteAria", { values: { tier: currentTitle } })
         }
       >
         <div

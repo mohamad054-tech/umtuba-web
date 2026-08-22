@@ -6,6 +6,7 @@ import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 import ProfilePanelError from "./ProfilePanelError";
 import ProfilePhotosLightbox from "./ProfilePhotosLightbox";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
+import { useTranslation } from "../../components/i18n";
 
 type ProfilePhotosPanelProps = {
   posts: ProfilePost[];
@@ -31,6 +32,7 @@ export default function ProfilePhotosPanel({
   isOwner = false,
   onPostDeleted,
 }: ProfilePhotosPanelProps) {
+  const { t } = useTranslation();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const closeLightbox = useCallback(() => {
@@ -51,11 +53,11 @@ export default function ProfilePhotosPanel({
   if (photos.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
-        <p className="text-base font-bold text-white/80">No photos yet</p>
+        <p className="text-base font-bold text-white/80">{t("profile.emptyPhotos")}</p>
         <p className="mt-2 text-sm text-white/45">
           {isOwner
-            ? "Image posts will appear here in a grid. Text-only posts stay out of Photos."
-            : "This creator has not shared photos yet."}
+            ? t("profile.emptyPhotosOwner")
+            : t("profile.emptyPhotosVisitor")}
         </p>
       </div>
     );

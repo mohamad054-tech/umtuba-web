@@ -20,8 +20,6 @@ import {
   PROFILE_A11Y_MESSAGE_BUTTON_CLASS,
   PROFILE_A11Y_TOUCH_TARGET_CLASS,
 } from "../lib/profileAccessibility";
-import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 
 type ProfileActionsProps = {
   profile: ProfileView;
@@ -80,9 +78,9 @@ export default function ProfileActions({
       type="button"
       onClick={() => void shareProfile()}
       className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white`}
-      aria-label={CREATOR_SPACE_COPY.shareAriaLabel}
+      aria-label={t("profile.shareAria")}
     >
-      {shareStatus === "copied" ? "Copied" : "Share"}
+      {shareStatus === "copied" ? t("profile.copied") : t("profile.share")}
     </button>
   );
 
@@ -90,13 +88,13 @@ export default function ProfileActions({
     shareStatus === "error" ? (
       <p className="basis-full text-xs text-red-300" role="alert">
         {sanitizeUserFacingMessage(
-          PROFILE_ERROR_STATES_COPY.shareError,
-          PROFILE_ERROR_STATES_COPY.shareError
+          t("profile.shareError"),
+          t("profile.shareError")
         )}
       </p>
     ) : (
       <span className="sr-only" aria-live="polite">
-        {shareStatus === "copied" ? CREATOR_SPACE_COPY.shareCopiedSr : ""}
+        {shareStatus === "copied" ? t("profile.shareCopiedSr") : ""}
       </span>
     );
 
@@ -107,7 +105,7 @@ export default function ProfileActions({
           href={APP_ROUTES.settings}
           className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90`}
         >
-          {CREATOR_SPACE_COPY.editOwnerCta}
+          {t("profile.editOwnerCta")}
         </Link>
         {umLifeButton}
         {shareButton}
@@ -141,7 +139,7 @@ export default function ProfileActions({
           href={liveHref}
           className={`${PROFILE_A11Y_FOCUS_RING_CLASS} ${PROFILE_A11Y_TOUCH_TARGET_CLASS} inline-flex items-center rounded-full border border-red-400/35 bg-red-500/15 px-5 py-2.5 text-sm font-bold text-red-100 transition hover:bg-red-500/25`}
         >
-          Watch live
+          {t("profile.watchLive")}
         </Link>
       ) : null}
 

@@ -1,15 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  PROFILE_TAB_LABELS,
-  type ProfileTabId,
-} from "../lib/profileTabs";
+import { type ProfileTabId } from "../lib/profileTabs";
 import {
   PROFILE_A11Y_FOCUS_RING_CLASS,
   PROFILE_A11Y_TOUCH_TARGET_CLASS,
 } from "../lib/profileAccessibility";
-import { CREATOR_SPACE_COPY } from "../lib/profileCreatorSpaceIa";
+import { useTranslation } from "../../components/i18n";
+import { PROFILE_TAB_I18N_KEYS } from "../../../lib/i18n/profileChrome";
 import {
   getProfileTabOverflowEdges,
   PROFILE_TAB_OVERFLOW_FADE_END_CLASS,
@@ -62,6 +60,7 @@ export default function ProfileTabs({
   photoCount = 0,
   postCount = 0,
 }: ProfileTabsProps) {
+  const { t } = useTranslation();
   const railRef = useRef<HTMLDivElement | null>(null);
   const [overflow, setOverflow] =
     useState<ProfileTabOverflowEdges>(INITIAL_OVERFLOW);
@@ -99,7 +98,7 @@ export default function ProfileTabs({
       <div
         ref={railRef}
         role="tablist"
-        aria-label={CREATOR_SPACE_COPY.tablistAriaLabel}
+        aria-label={t("profile.tablistAria")}
         aria-orientation="horizontal"
         className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         onScroll={updateOverflow}
@@ -172,7 +171,7 @@ export default function ProfileTabs({
                   : "text-white/50 hover:bg-white/5 hover:text-white/80"
               }`}
             >
-              {PROFILE_TAB_LABELS[tabId]}
+              {t(PROFILE_TAB_I18N_KEYS[tabId])}
               {showCount ? (
                 <span className="ml-1.5 text-xs font-medium opacity-70">
                   {count}

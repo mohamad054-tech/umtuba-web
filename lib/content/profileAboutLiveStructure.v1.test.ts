@@ -151,13 +151,13 @@ describe("About / Live Structure V1", () => {
     const structure = read("app/profile/lib/profileAboutLiveStructure.ts");
     const content = read("lib/supabase/profileContent.ts");
 
-    expect(about).toMatch(/Roles/);
-    expect(about).toMatch(/Experience/);
-    expect(about).toMatch(/Education/);
-    expect(about).toMatch(/Specialties/);
-    expect(about).toMatch(/Achievements/);
-    expect(about).toMatch(/Links/);
-    expect(about).toMatch(/Joined/);
+    expect(about).toMatch(/t\("profile.roles"\)/);
+    expect(about).toMatch(/t\("profile.experience"\)/);
+    expect(about).toMatch(/t\("profile.education"\)/);
+    expect(about).toMatch(/t\("profile.specialtiesInterests"\)/);
+    expect(about).toMatch(/t\("profile.achievements"\)/);
+    expect(about).toMatch(/t\("profile.links"\)/);
+    expect(about).toMatch(/t\("profile.joined"\)/);
     expect(about).toMatch(/getVisibleAboutSections/);
 
     expect(live).toMatch(/Live Now/);

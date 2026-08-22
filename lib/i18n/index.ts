@@ -69,3 +69,12 @@ export {
   userMenuGroupLabelKey,
   userMenuItemLabelKey,
 } from "./shellLabels";
+
+export {
+  PROFILE_CERT_KEYS,
+  PROFILE_TAB_I18N_KEYS,
+  activityTierLabelKey,
+  activityTierTitleKey,
+  formatLocalizedJoinedBody,
+  formatLocalizedJoinedLine,
+} from "./profileChrome";

@@ -2,25 +2,19 @@
 
 ## Last freeze
 
-- **2026-08-22** — Google SEO full optimization on `origin/central/web-google-seo-full-optimization-v1` from live `9f937e2f`. Public sitemap, localized metadata, truthful JSON-LD. Mobile unchanged. No `20260931`. No Phase 2. Report: `D:\umtuba-central\reports\UMTUBA_CENTRAL_GOOGLE_SEO_FULL_OPTIMIZATION_V1.md`.
-- **2026-08-20** — UM Life Phase 1 candidate on `central/um-life-phase1-v1` from production `b398dc02`. Routes `/life` and `/life?post=`. No SQL. No deploy. No FF of `alpha-0.2`. Report: `D:\umtuba-central\reports\UMTUBA_CENTRAL_UM_LIFE_PHASE1_IMPLEMENTATION_V1.md`.
-- Live web remains `9f937e2f-20260821213212` / SHA `9f937e2f` until this SEO candidate is cut over. `20260931` HOLD.
+- **2026-08-22** — 13-locale runtime certification candidate on `central/web-13-locale-runtime-certification-v1` from live `57de1988`. Profile chrome wired; candidate local HTML LIVE_PASS for the observed leak set. Production unchanged (`DEPLOYED = NO`). Report: `D:\umtuba-central\reports\UMTUBA_CENTRAL_WEB_13_LOCALE_RUNTIME_CERTIFICATION_AND_COMPLETION_V1.md`.
+- **2026-08-22** — Watch one-player + default AI summary on live `57de1988`.
+- **2026-08-20** — UM Life Phase 1 candidate on `central/um-life-phase1-v1`. No deploy. `20260931` HOLD.
 
 ## Active feature
 
-- **Branch:** `office/ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-- **Task:** Private AI Deployment & Runtime onto Alpha V1
-- **Worktree:** `D:\umtuba-central\repos\umtuba-web-ai-core-private-ai-deployment-runtime-onto-alpha-v1`
-
-## Lineage tip chain (awaiting alpha GO)
-
-1. `4690bb7` providers on alpha (merged)
-2. … streaming → private AI → data platform → KA → workflow → lifecycle `6219633`
-3. (this) private AI deployment runtime
+- **Branch:** `central/web-13-locale-runtime-certification-v1`
+- **Task:** 13-locale runtime certification and completion V1
+- **Worktree:** `D:\umtuba-central\repos\umtuba-web-13-locale-runtime-certification-v1`
+- **Live web:** `57de1988` until Central deploys this candidate
 
 ## Safety
 
-- No live provider / real deployment
-- No alpha merge without GO
-- No Commerce / Learning / Collaboration / Mobile / Guardian
-- Migrations local-only (none new this milestone)
+- No production deploy from this GO
+- No FF of `origin/alpha-0.2`
+- No mobile / Security P1 / `20260931` / UM Life Phase 2

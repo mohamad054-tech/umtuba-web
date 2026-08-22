@@ -7,6 +7,8 @@ import { getProfileForUser } from "../../../lib/supabase/auth";
 import { tryCreateClient } from "../../../lib/supabase/client";
 import { APP_ROUTES, buildCreatorProfileHref } from "../../lib/nav";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
+import { useTranslation } from "../i18n";
+import { activityTierTitleKey } from "../../../lib/i18n/profileChrome";
 import ActivityTierBadge from "./ActivityTierBadge";
 import { useActivityTier } from "./useActivityTier";
 
@@ -23,6 +25,7 @@ export default function ActivityTierIndicator({
   compact = false,
   className = "",
 }: ActivityTierIndicatorProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const { status, progress, errorMessage, refresh } = useActivityTier();
   const [profileHref, setProfileHref] = useState<string | null>(null);
@@ -67,7 +70,7 @@ export default function ActivityTierIndicator({
       <span
         className={`${baseClass} border-white/10 bg-white/5 text-white/40 ${className}`}
         aria-busy="true"
-        aria-label="Loading activity tier"
+        aria-label={t("profile.loadingTier")}
       >
         <span className="h-3 w-3 animate-pulse rounded-full bg-sky-400/40" />
         <span className="ml-1.5 hidden sm:inline">…</span>
@@ -80,10 +83,10 @@ export default function ActivityTierIndicator({
       <Link
         href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.rewards)}`}
         className={`${baseClass} border-white/10 bg-white/5 text-white/45 hover:bg-white/10 hover:text-white/70 ${className}`}
-        aria-label="Sign in to view your activity tier"
+        aria-label={t("profile.signInTier")}
       >
         <span aria-hidden>◇</span>
-        <span className="ml-1 truncate sm:ml-1.5">Tier</span>
+        <span className="ml-1 truncate sm:ml-1.5">{t("profile.activityTier")}</span>
       </Link>
     );
   }
@@ -94,18 +97,20 @@ export default function ActivityTierIndicator({
         type="button"
         onClick={() => void refresh()}
         className={`${baseClass} border-red-400/30 bg-red-500/10 text-red-100 hover:bg-red-500/15 ${className}`}
-        aria-label="Activity tier unavailable. Retry."
+        aria-label={t("profile.tierUnavailable")}
         title={sanitizeUserFacingMessage(
           errorMessage,
-          "Unable to load activity tier"
+          t("profile.tierUnavailable")
         )}
       >
-        <span className="truncate">Retry</span>
+        <span className="truncate">{t("profile.tierRetry")}</span>
       </button>
     );
   }
 
   const { tier, nextTier, progressPercent } = progress;
+  const currentTitle = t(activityTierTitleKey(tier.id));
+  const nextTitle = nextTier ? t(activityTierTitleKey(nextTier.id)) : "";
 
   return (
     <button
@@ -119,13 +124,17 @@ export default function ActivityTierIndicator({
         })();
       }}
       className={`${baseClass} border-sky-400/25 bg-sky-500/10 text-sky-50 hover:border-sky-400/40 hover:bg-sky-500/20 ${className}`}
-      aria-label={`${tier.displayTitle} tier${
-        nextTier ? `, ${progressPercent}% to ${nextTier.displayTitle}` : ""
-      }. Open profile.`}
+      aria-label={
+        nextTier
+          ? t("profile.progressAria", {
+              values: { percent: String(progressPercent), tier: nextTitle },
+            })
+          : t("profile.tierCompleteAria", { values: { tier: currentTitle } })
+      }
       title={
         nextTier
-          ? `${tier.displayTitle} · ${progressPercent}% to ${nextTier.displayTitle}`
-          : `${tier.displayTitle} · max tier`
+          ? t("profile.progressTo", { values: { tier: nextTitle } })
+          : t("profile.maxTier", { values: { tier: currentTitle } })
       }
     >
       <ActivityTierBadge
@@ -139,7 +148,7 @@ export default function ActivityTierIndicator({
         }
       />
       {compact ? (
-        <span className="sr-only">{tier.displayLabel}</span>
+        <span className="sr-only">{t(activityTierTitleKey(tier.id))}</span>
       ) : null}
     </button>
   );

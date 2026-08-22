@@ -1,5 +1,8 @@
+"use client";
+
 import type { ReactNode } from "react";
 import AppTopNav from "../../components/AppTopNav";
+import { useTranslation } from "../../components/i18n";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 
 type ProfileShellProps = {
@@ -7,6 +10,8 @@ type ProfileShellProps = {
 };
 
 export default function ProfileShell({ children }: ProfileShellProps) {
+  const { t } = useTranslation();
+
   return (
     <main
       className={`relative flex min-h-screen flex-col bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -17,7 +22,10 @@ export default function ProfileShell({ children }: ProfileShellProps) {
         <div className="absolute bottom-[-15%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-cyan-500/10 blur-3xl" />
       </div>
 
-      <AppTopNav title="Creator Space" subtitle="Creator hub" />
+      <AppTopNav
+        title={t("profile.creatorSpace")}
+        subtitle={t("profile.creatorHub")}
+      />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[1100px] flex-1 flex-col px-3 py-3 md:px-6 md:py-6">
         {children}

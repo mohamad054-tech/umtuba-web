@@ -86,7 +86,7 @@ describe("Identity Strip V1 — wiring", () => {
     const aboutUi = read("app/profile/components/ProfileAbout.tsx");
     const aboutLib = read("app/profile/lib/profileAboutLiveStructure.ts");
     expect(aboutLib).toMatch(/"roles"/);
-    expect(aboutUi).toMatch(/>Roles</);
+    expect(aboutUi).toMatch(/t\("profile.roles"\)/);
   });
 
   it("keeps specialties in Hero Completeness and Stats/Actions outside the strip", () => {
