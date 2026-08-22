@@ -17,6 +17,34 @@ export const PROFILE_TAB_I18N_KEYS: Record<ProfileTabId, TranslationKey> = {
   about: "profile.about",
 };
 
+export const LIVE_BUCKET_I18N_KEYS = {
+  now: "profile.liveNow",
+  upcoming: "profile.liveUpcoming",
+  past: "profile.livePast",
+} as const;
+
+export const CARD_KIND_I18N_KEYS = {
+  article: "card.kind.article",
+  video: "card.kind.video",
+  course: "card.kind.course",
+  product: "card.kind.product",
+  live: "card.kind.live",
+  photo: "card.kind.photo",
+} as const;
+
+export const CARD_BADGE_I18N_KEYS = {
+  linked_article: "card.badge.linked_article",
+  generated_teaser: "card.badge.generated_teaser",
+  independent_video: "card.badge.independent_video",
+  live: "card.badge.live",
+  new: "card.badge.new",
+  featured: "card.badge.featured",
+  updated: "card.badge.updated",
+  draft: "card.badge.draft",
+  premium: "card.badge.premium",
+  pinned: "card.badge.pinned",
+} as const;
+
 export const PROFILE_CERT_KEYS = [
   "profile.creatorSpace",
   "profile.creatorHub",

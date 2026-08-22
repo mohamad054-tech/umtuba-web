@@ -1,8 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../../components/i18n";
 import { APP_ROUTES } from "../../lib/nav";
-import {
-  normalizeProfileCourses,
-} from "../lib/profileCoursesProductsStructure";
+import { normalizeProfileCourses } from "../lib/profileCoursesProductsStructure";
 import type { ProfileCoursePreview } from "../types";
 
 type ProfileCoursesPanelProps = {
@@ -18,26 +19,29 @@ export default function ProfileCoursesPanel({
   courses = [],
   isOwner = false,
 }: ProfileCoursesPanelProps) {
+  const { t } = useTranslation();
   const items = normalizeProfileCourses(courses);
 
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/35">
-          Courses
+          {t("profile.courses")}
         </p>
-        <p className="mt-3 text-base font-bold text-white/80">No courses yet</p>
+        <p className="mt-3 text-base font-bold text-white/80">
+          {t("profile.emptyCourses")}
+        </p>
         <p className="mt-2 text-sm text-white/45">
           {isOwner
-            ? "Published courses will appear here. Open Learning to manage instructor content."
-            : "This creator has not published courses yet."}
+            ? t("profile.emptyCoursesOwner")
+            : t("profile.emptyCoursesVisitor")}
         </p>
         {isOwner ? (
           <Link
             href={APP_ROUTES.learning}
             className="watch-focus-ring mt-5 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold transition hover:bg-white/10"
           >
-            Open Learning
+            {t("profile.openLearning")}
           </Link>
         ) : null}
       </div>
@@ -47,7 +51,7 @@ export default function ProfileCoursesPanel({
   return (
     <div className="space-y-4">
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">
-        Courses
+        {t("profile.courses")}
       </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {items.map((course) => (
@@ -73,13 +77,15 @@ export default function ProfileCoursesPanel({
                   {course.title}
                 </p>
                 <p className="text-sm text-white/50">
-                  {course.levelLabel}
+                  {course.levelLabel === "Course"
+                    ? t("profile.courseFallback")
+                    : course.levelLabel}
                   {course.lessonCountLabel
                     ? ` · ${course.lessonCountLabel}`
                     : ""}
                 </p>
                 <p className="mt-auto pt-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-200/80">
-                  View course
+                  {t("profile.viewCourse")}
                 </p>
               </div>
             </Link>

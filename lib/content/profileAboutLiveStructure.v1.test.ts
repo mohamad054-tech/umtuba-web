@@ -160,9 +160,8 @@ describe("About / Live Structure V1", () => {
     expect(about).toMatch(/t\("profile.joined"\)/);
     expect(about).toMatch(/getVisibleAboutSections/);
 
-    expect(live).toMatch(/Live Now/);
-    expect(live).toMatch(/Upcoming/);
-    expect(live).toMatch(/Past/);
+    expect(live).toMatch(/LIVE_BUCKET_I18N_KEYS/);
+    expect(live).toMatch(/t\("profile.liveNow"\)/);
     expect(live).toMatch(/bucketProfileLiveSessions/);
     expect(live).toMatch(/getVisibleLiveBuckets/);
 

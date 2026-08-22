@@ -71,6 +71,9 @@ export {
 } from "./shellLabels";
 
 export {
+  CARD_BADGE_I18N_KEYS,
+  CARD_KIND_I18N_KEYS,
+  LIVE_BUCKET_I18N_KEYS,
   PROFILE_CERT_KEYS,
   PROFILE_TAB_I18N_KEYS,
   activityTierLabelKey,

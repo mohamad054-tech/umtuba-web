@@ -42,19 +42,19 @@ describe("Creator Space Error States V1 — wiring", () => {
     expect(helper).toMatch(/PROFILE_ERROR_STATES_COPY/);
     expect(helper).toMatch(/shouldShowProfileErrorRetry/);
     expect(panelError).toMatch(/shouldShowProfileErrorRetry/);
-    expect(experience).toMatch(/PROFILE_ERROR_STATES_COPY\.statsSoftBanner/);
+    expect(experience).toMatch(/t\("profile.errorStats"\)/);
     expect(experience).toMatch(/router\.refresh/);
     expect(experience).toMatch(/onRetry=\{retrySecondaryFetch\}/);
     expect(experience).toMatch(/ProfileNotFound/);
     expect(all).toMatch(/ProfilePanelError/);
-    expect(all).toMatch(/PROFILE_ERROR_STATES_COPY\.allPanel/);
+    expect(all).toMatch(/t\("profile.errorAll"\)/);
     expect(articles).toMatch(/ProfilePanelError/);
     expect(videos).toMatch(/ProfilePanelError/);
     expect(photos).toMatch(/ProfilePanelError/);
     expect(live).toMatch(/ProfilePanelError/);
-    expect(actions).toMatch(/PROFILE_ERROR_STATES_COPY\.shareError/);
+    expect(actions).toMatch(/t\("profile.shareError"\)/);
     expect(actions).toMatch(/role="alert"/);
-    expect(experience).toMatch(/not found/);
+    expect(experience).toMatch(/profile.notFoundTitle|ProfileNotFound/);
     expect(
       `${helper}\n${experience}\n${all}\n${videos}\n${actions}`
     ).not.toMatch(

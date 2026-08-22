@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "../../components/i18n";
 import {
   normalizeInterestTeasers,
   normalizeRoleChips,
@@ -24,6 +25,7 @@ export default function ProfileIdentityStrip({
   isCollapsed = false,
   onOpenAbout,
 }: ProfileIdentityStripProps) {
+  const { t } = useTranslation();
   const roles = normalizeRoleChips(profile.about.roles);
   const interestTeasers = normalizeInterestTeasers(profile.about.interests);
 
@@ -42,7 +44,7 @@ export default function ProfileIdentityStrip({
       {roles.visible.length > 0 ? (
         <ul
           className="flex flex-wrap items-center gap-2"
-          aria-label="Creator roles"
+          aria-label={t("profile.rolesAria")}
         >
           {roles.visible.map((label) => (
             <li
@@ -59,7 +61,9 @@ export default function ProfileIdentityStrip({
                   type="button"
                   onClick={onOpenAbout}
                   className="watch-focus-ring rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-bold text-white/55"
-                  aria-label={`Show ${roles.overflowCount} more roles on About`}
+                  aria-label={t("profile.moreRolesAria", {
+                    values: { count: String(roles.overflowCount) },
+                  })}
                 >
                   +{roles.overflowCount}
                 </button>
@@ -76,7 +80,7 @@ export default function ProfileIdentityStrip({
       {interestTeasers.length > 0 ? (
         <ul
           className="flex flex-wrap items-center gap-2"
-          aria-label="Interest teasers"
+          aria-label={t("profile.interestsAria")}
         >
           {interestTeasers.map((label) => (
             <li

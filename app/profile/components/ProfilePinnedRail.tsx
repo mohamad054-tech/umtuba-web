@@ -1,4 +1,7 @@
+"use client";
+
 import { ContentCard } from "../../components/content-cards";
+import { useTranslation } from "../../components/i18n";
 import type { ContentCardViewModel } from "../../../lib/content/cards";
 
 type ProfilePinnedRailProps = {
@@ -10,14 +13,15 @@ type ProfilePinnedRailProps = {
  * Caller must omit this component when cards are empty — no empty header.
  */
 export default function ProfilePinnedRail({ cards }: ProfilePinnedRailProps) {
+  const { t } = useTranslation();
   if (cards.length === 0) {
     return null;
   }
 
   return (
-    <section className="space-y-3" aria-label="Pinned content">
+    <section className="space-y-3" aria-label={t("profile.pinnedAria")}>
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">
-        Pinned
+        {t("profile.pinned")}
       </p>
       <ul className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {cards.map((card) => (

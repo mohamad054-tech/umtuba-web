@@ -32,11 +32,11 @@ export default function ProfileLinkedArticlePrompt({
   return (
     <div
       role="dialog"
-      aria-label="Linked article"
+      aria-label={t("profile.linkedArticle")}
       className="rounded-2xl border border-sky-300/25 bg-sky-500/10 px-4 py-4 backdrop-blur-sm"
     >
       <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-sky-200/80">
-        Linked article
+        {t("profile.linkedArticle")}
       </p>
       <p className="mt-2 text-sm font-bold text-white">
         {t("profile.browsePrompt")}
@@ -49,7 +49,7 @@ export default function ProfileLinkedArticlePrompt({
           href={buildArticleHref(articleId)}
           className="watch-focus-ring rounded-full bg-white px-4 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
         >
-          Read article now
+          {t("profile.readArticleNow")}
         </Link>
         <button
           type="button"

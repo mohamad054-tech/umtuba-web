@@ -6,11 +6,7 @@ import { APP_ROUTES } from "../../lib/nav";
 import ProductEmptyState from "../../components/product/ProductEmptyState";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
 import { useTranslation } from "../../components/i18n";
-import {
-  PROFILE_EMPTY_STATES_COPY,
-  shouldShowOwnerEmptyCreateActions,
-} from "../lib/profileEmptyStates";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import { shouldShowOwnerEmptyCreateActions } from "../lib/profileEmptyStates";
 import ProfilePanelError from "./ProfilePanelError";
 
 type ProfileVideoGridProps = {
@@ -33,10 +29,7 @@ export default function ProfileVideoGrid({
   const { t } = useTranslation();
   if (loadFailed) {
     return (
-      <ProfilePanelError
-        message={PROFILE_ERROR_STATES_COPY.videosPanel}
-        onRetry={onRetry}
-      />
+      <ProfilePanelError message={t("profile.errorVideos")} onRetry={onRetry} />
     );
   }
 
@@ -46,23 +39,23 @@ export default function ProfileVideoGrid({
       <ProductEmptyState
         compact
         eyebrow={t("profile.videos")}
-        title={PROFILE_EMPTY_STATES_COPY.videosTitle}
+        title={t("profile.emptyVideos")}
         description={
           showOwnerActions
-            ? PROFILE_EMPTY_STATES_COPY.videosOwnerDescription
-            : PROFILE_EMPTY_STATES_COPY.videosVisitorDescription
+            ? t("profile.emptyVideosOwner")
+            : t("profile.emptyVideosVisitor")
         }
         primaryHref={
           showOwnerActions ? APP_ROUTES.createVideo : APP_ROUTES.discover
         }
         primaryLabel={
           showOwnerActions
-            ? PROFILE_EMPTY_STATES_COPY.uploadVideoCta
-            : PROFILE_EMPTY_STATES_COPY.openDiscoverCta
+            ? t("profile.uploadVideoCta")
+            : t("profile.openDiscoverCta")
         }
         secondaryHref={showOwnerActions ? APP_ROUTES.discover : undefined}
         secondaryLabel={
-          showOwnerActions ? PROFILE_EMPTY_STATES_COPY.openDiscoverCta : undefined
+          showOwnerActions ? t("profile.openDiscoverCta") : undefined
         }
       />
     );
@@ -114,8 +107,10 @@ export default function ProfileVideoGrid({
                     {video.title}
                   </p>
                   <p className="mt-1 text-[11px] text-white/55">
-                    {video.viewsLabel} views
-                    {video.likesLabel ? ` · ${video.likesLabel} likes` : ""}
+                    {t("profile.viewsCount", { values: { count: video.viewsLabel } })}
+                    {video.likesLabel
+                      ? ` · ${t("profile.likesCount", { values: { count: video.likesLabel } })}`
+                      : ""}
                   </p>
                 </div>
               </div>
@@ -128,7 +123,7 @@ export default function ProfileVideoGrid({
                 <Link
                   href={video.href}
                   className="watch-focus-ring block rounded-[22px]"
-                  aria-label={`Watch ${video.title}`}
+                  aria-label={t("profile.watchTitle", { values: { title: video.title } })}
                 >
                   {card}
                 </Link>

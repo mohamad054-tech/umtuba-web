@@ -3,12 +3,18 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import {
-  badgeLabel,
   detectTextDir,
-  kindLabel,
   type ContentCardBadgeId,
+  type ContentCardCtaVerb,
   type ContentCardViewModel,
 } from "../../../lib/content/cards";
+import { useTranslation } from "../i18n";
+import { formatDate } from "../../../lib/i18n/format";
+import {
+  CARD_BADGE_I18N_KEYS,
+  CARD_KIND_I18N_KEYS,
+} from "../../../lib/i18n/profileChrome";
+import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import { buildCreatorProfileHref } from "../../lib/nav";
 
 type ContentCardProps = {
@@ -16,11 +22,33 @@ type ContentCardProps = {
   showCreator?: boolean;
 };
 
-function formatRelativeTime(iso: string | null, dir: "rtl" | "ltr"): string {
+function cardCtaKey(verb: ContentCardCtaVerb): TranslationKey {
+  switch (verb) {
+    case "watch":
+      return "profile.watch";
+    case "read_article":
+      return "profile.readArticleNow";
+    case "start_course":
+      return "profile.viewCourse";
+    case "view_product":
+      return "profile.viewProduct";
+    case "join_live":
+      return "profile.joinLive";
+    case "view_photo":
+      return "profile.photo";
+    case "edit":
+      return "profile.edit";
+    default:
+      return "profile.watch";
+  }
+}
+
+function formatRelativeTime(
+  iso: string | null,
+  locale: Parameters<typeof formatDate>[0]
+): string {
   if (!iso) return "";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString(dir === "rtl" ? "ar" : undefined, {
+  return formatDate(locale, iso, {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -29,14 +57,14 @@ function formatRelativeTime(iso: string | null, dir: "rtl" | "ltr"): string {
 
 function BadgeChip({
   badge,
-  dir,
 }: {
   badge: ContentCardBadgeId;
-  dir: "rtl" | "ltr";
+  dir?: "rtl" | "ltr";
 }) {
+  const { t } = useTranslation();
   return (
     <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/70">
-      {badgeLabel(badge, dir)}
+      {t(CARD_BADGE_I18N_KEYS[badge])}
     </span>
   );
 }
@@ -48,10 +76,11 @@ export function ContentCardBadges({
   badges: ContentCardBadgeId[];
   dir: "rtl" | "ltr";
 }) {
+  const { t } = useTranslation();
   if (!badges.length) return null;
   const shown = badges.slice(0, 3);
   return (
-    <div className="flex flex-wrap gap-1.5" aria-label="Status badges">
+    <div className="flex flex-wrap gap-1.5" aria-label={t("profile.statusBadgesAria")}>
       {shown.map((badge) => (
         <BadgeChip key={badge} badge={badge} dir={dir} />
       ))}
@@ -66,6 +95,9 @@ export function ContentCardPreview({
   card: ContentCardViewModel;
   dir: "rtl" | "ltr";
 }) {
+  const { t } = useTranslation();
+  const kindKey =
+    CARD_KIND_I18N_KEYS[card.kind as keyof typeof CARD_KIND_I18N_KEYS];
   const aspect =
     card.preview.aspect === "9:16"
       ? "aspect-[9/16] max-h-56"
@@ -89,7 +121,7 @@ export function ContentCardPreview({
       ) : (
         <div className="flex h-full w-full items-end p-4">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">
-            {kindLabel(String(card.kind), dir)}
+            {kindKey ? t(kindKey) : String(card.kind)}
           </p>
         </div>
       )}
@@ -111,16 +143,19 @@ export function ContentCardHeader({
   dir: "rtl" | "ltr";
   showCreator: boolean;
 }) {
+  const { t, locale } = useTranslation();
+  const kindKey =
+    CARD_KIND_I18N_KEYS[card.kind as keyof typeof CARD_KIND_I18N_KEYS];
   const profileHref = buildCreatorProfileHref({
     username: card.creator.username,
   });
-  const time = formatRelativeTime(card.publishedAt, dir);
+  const time = formatRelativeTime(card.publishedAt, locale);
 
   return (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0 space-y-1">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
-          {kindLabel(String(card.kind), dir)}
+          {kindKey ? t(kindKey) : String(card.kind)}
         </p>
         {showCreator ? (
           <Link
@@ -143,7 +178,7 @@ export function ContentCardHeader({
             <span className="truncate text-sm font-bold text-white/85 group-hover:text-white">
               {card.creator.displayName}
               {card.creator.verified ? (
-                <span className="ms-1 text-sky-300" aria-label="Verified">
+                <span className="ms-1 text-sky-300" aria-label={t("profile.verifiedAria")}>
                   ✓
                 </span>
               ) : null}
@@ -178,9 +213,10 @@ export function ContentCardCTA({
 }: {
   card: ContentCardViewModel;
 }) {
+  const { t } = useTranslation();
   return (
     <span className="inline-flex items-center rounded-full border border-sky-300/30 bg-sky-500/15 px-3.5 py-1.5 text-xs font-bold text-sky-100 transition group-hover:bg-sky-500/25">
-      {card.cta.label}
+      {t(cardCtaKey(card.cta.verb))}
     </span>
   );
 }
@@ -224,8 +260,12 @@ export default function ContentCard({
   card,
   showCreator = true,
 }: ContentCardProps) {
+  const { t } = useTranslation();
   const dir = detectTextDir(card.title);
-  const ariaName = `${kindLabel(String(card.kind), dir)}: ${card.title} by ${card.creator.displayName}`;
+  const kindKey =
+    CARD_KIND_I18N_KEYS[card.kind as keyof typeof CARD_KIND_I18N_KEYS];
+  const kind = kindKey ? t(kindKey) : String(card.kind);
+  const ariaName = `${kind}: ${card.title} · ${card.creator.displayName}`;
 
   return (
     <article dir={dir} className="group">

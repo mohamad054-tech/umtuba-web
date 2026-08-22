@@ -31,12 +31,12 @@ describe("Creator Space Empty States V1 — wiring", () => {
 
     expect(helper).toMatch(/PROFILE_EMPTY_STATES_COPY/);
     expect(all).toMatch(/isOwner/);
-    expect(all).toMatch(/PROFILE_EMPTY_STATES_COPY/);
+    expect(all).toMatch(/t\("profile.emptyAllTitle"\)/);
     expect(all).toMatch(/shouldShowOwnerEmptyCreateActions/);
     expect(all).toMatch(/APP_ROUTES\.createArticle/);
     expect(all).toMatch(/APP_ROUTES\.createVideo/);
     expect(videos).toMatch(/isOwner/);
-    expect(videos).toMatch(/PROFILE_EMPTY_STATES_COPY/);
+    expect(videos).toMatch(/t\("profile.emptyVideos"\)/);
     expect(experience).toMatch(/<ProfileAllPanel[\s\S]*isOwner=\{isOwner\}/);
     expect(experience).toMatch(/<ProfileVideoGrid[\s\S]*isOwner=\{isOwner\}/);
     expect(`${all}\n${videos}\n${experience}`).not.toMatch(

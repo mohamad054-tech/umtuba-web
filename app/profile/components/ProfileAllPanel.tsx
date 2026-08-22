@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ContentCard,
@@ -6,12 +8,9 @@ import {
 } from "../../components/content-cards";
 import type { ContentCardViewModel } from "../../../lib/content/cards";
 import { APP_ROUTES } from "../../lib/nav";
+import { useTranslation } from "../../components/i18n";
 import { applyProfileAllTimelineContract } from "../lib/profileAllTimelineContract";
-import {
-  PROFILE_EMPTY_STATES_COPY,
-  shouldShowOwnerEmptyCreateActions,
-} from "../lib/profileEmptyStates";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
+import { shouldShowOwnerEmptyCreateActions } from "../lib/profileEmptyStates";
 import ProfilePanelError from "./ProfilePanelError";
 import ProfilePinnedRail from "./ProfilePinnedRail";
 
@@ -35,13 +34,9 @@ export default function ProfileAllPanel({
   onRetry,
   isOwner = false,
 }: ProfileAllPanelProps) {
+  const { t } = useTranslation();
   if (loadFailed) {
-    return (
-      <ProfilePanelError
-        message={PROFILE_ERROR_STATES_COPY.allPanel}
-        onRetry={onRetry}
-      />
-    );
+    return <ProfilePanelError message={t("profile.errorAll")} onRetry={onRetry} />;
   }
 
   const { pinned, chronology, showPinnedRail } = applyProfileAllTimelineContract(
@@ -55,11 +50,11 @@ export default function ProfileAllPanel({
     const showOwnerActions = shouldShowOwnerEmptyCreateActions(isOwner);
     return (
       <ContentCardEmptyState
-        title={PROFILE_EMPTY_STATES_COPY.allTitle}
+        title={t("profile.emptyAllTitle")}
         description={
           showOwnerActions
-            ? PROFILE_EMPTY_STATES_COPY.allOwnerDescription
-            : PROFILE_EMPTY_STATES_COPY.allVisitorDescription
+            ? t("profile.emptyAllOwner")
+            : t("profile.emptyAllVisitor")
         }
         action={
           showOwnerActions ? (
@@ -68,13 +63,13 @@ export default function ProfileAllPanel({
                 href={APP_ROUTES.createArticle}
                 className="watch-focus-ring rounded-full bg-white px-4 py-2 text-sm font-black text-black transition hover:bg-white/90"
               >
-                {PROFILE_EMPTY_STATES_COPY.writeArticleCta}
+                {t("profile.writeArticleCta")}
               </Link>
               <Link
                 href={APP_ROUTES.createVideo}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white/85 transition hover:bg-white/10"
               >
-                {PROFILE_EMPTY_STATES_COPY.uploadVideoCta}
+                {t("profile.uploadVideoCta")}
               </Link>
             </div>
           ) : undefined
@@ -89,7 +84,7 @@ export default function ProfileAllPanel({
       {chronology.length > 0 ? (
         <ul
           className="mx-auto grid max-w-[45rem] gap-3"
-          aria-label="All content"
+          aria-label={t("profile.allContentAria")}
         >
           {chronology.map((card) => (
             <li key={card.registryId}>

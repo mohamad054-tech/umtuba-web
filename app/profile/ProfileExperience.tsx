@@ -25,10 +25,7 @@ import {
   type ProfileTabId,
 } from "./components";
 import { useTranslation } from "../components/i18n";
-import {
-  PROFILE_ERROR_SOFT_BANNER_CLASS,
-  PROFILE_ERROR_STATES_COPY,
-} from "./lib/profileErrorStates";
+import { PROFILE_ERROR_SOFT_BANNER_CLASS } from "./lib/profileErrorStates";
 import { PROFILE_A11Y_TOUCH_TARGET_CLASS } from "./lib/profileAccessibility";
 import ProfileArticlesPanel from "./components/ProfileArticlesPanel";
 import ProfileCoursesPanel from "./components/ProfileCoursesPanel";
@@ -312,7 +309,7 @@ export default function ProfileExperience({
 
         {profile.statsLoadFailed ? (
           <p role="status" className={PROFILE_ERROR_SOFT_BANNER_CLASS}>
-            {PROFILE_ERROR_STATES_COPY.statsSoftBanner}
+            {t("profile.errorStats")}
           </p>
         ) : null}
 

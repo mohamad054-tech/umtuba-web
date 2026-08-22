@@ -43,7 +43,7 @@ describe("Creator Space Accessibility Contract V1 — wiring", () => {
     expect(actions).toMatch(/className=\{PROFILE_A11Y_TOUCH_TARGET_CLASS\}/);
     expect(experience).toMatch(/PROFILE_A11Y_TOUCH_TARGET_CLASS/);
     expect(header).toMatch(/aria-hidden/);
-    expect(header).toMatch(/alt=\{`\$\{profile\.displayName\} avatar`\}/);
+    expect(header).toMatch(/t\("profile.avatarAlt"/);
     expect(tabs).toMatch(/PROFILE_A11Y_TOUCH_TARGET_CLASS/);
     expect(tabs).toMatch(/PROFILE_A11Y_FOCUS_RING_CLASS/);
     expect(tabs).toMatch(/aria-selected/);
@@ -51,7 +51,7 @@ describe("Creator Space Accessibility Contract V1 — wiring", () => {
     expect(tabs).toMatch(/min-h-\[44px\]|PROFILE_A11Y_TOUCH_TARGET_CLASS/);
     expect(tabs).toMatch(/watch-focus-ring|PROFILE_A11Y_FOCUS_RING_CLASS/);
     expect(badge).toMatch(/aria-live="polite"/);
-    expect(contentCard).toMatch(/kindLabel/);
+    expect(contentCard).toMatch(/CARD_KIND_I18N_KEYS/);
     expect(`${helper}\n${actions}\n${experience}`).not.toMatch(
       /DiscoverExperience|HomeFeed|shouldMountHomeCircularArc|HomeCircularArc/
     );

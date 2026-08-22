@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "../../components/i18n";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { nextIndex, prevIndex } from "../lib/profilePhotosLightbox";
 import type { ProfilePost } from "../types";
@@ -23,6 +24,7 @@ export default function ProfilePhotosLightbox({
   onClose,
   onIndexChange,
 }: ProfilePhotosLightboxProps) {
+  const { t } = useTranslation();
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -85,7 +87,9 @@ export default function ProfilePhotosLightbox({
     return null;
   }
 
-  const positionLabel = `${openIndex + 1} of ${count}`;
+  const positionLabel = t("profile.photoOf", {
+    values: { current: String(openIndex + 1), total: String(count) },
+  });
   const caption = photo.content.trim();
 
   function goNext() {
@@ -111,7 +115,7 @@ export default function ProfilePhotosLightbox({
         type="button"
         tabIndex={-1}
         className="absolute inset-0 cursor-default bg-black/75 backdrop-blur-[2px] motion-safe:transition-opacity motion-reduce:transition-none"
-        aria-label="Close photo lightbox"
+        aria-label={t("profile.lightboxClose")}
         onClick={onClose}
       />
 
@@ -129,7 +133,7 @@ export default function ProfilePhotosLightbox({
               id={titleId}
               className="truncate text-sm font-bold text-white/90"
             >
-              Photo {positionLabel}
+              {positionLabel}
             </p>
             {caption ? (
               <p className="mt-0.5 truncate text-xs text-white/50">{caption}</p>
@@ -140,7 +144,7 @@ export default function ProfilePhotosLightbox({
             type="button"
             onClick={onClose}
             className="watch-focus-ring flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-lg text-white hover:bg-white/10"
-            aria-label="Close photo lightbox"
+            aria-label={t("profile.lightboxClose")}
           >
             ×
           </button>
@@ -157,7 +161,7 @@ export default function ProfilePhotosLightbox({
                 type="button"
                 onClick={goPrev}
                 className="watch-focus-ring flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/50 text-xl text-white transition-colors hover:border-white/30 hover:bg-black/80 motion-reduce:transition-none"
-                aria-label="Previous photo"
+                aria-label={t("profile.lightboxPrev")}
               >
                 ‹
               </button>
@@ -167,7 +171,12 @@ export default function ProfilePhotosLightbox({
               // eslint-disable-next-line @next/next/no-img-element -- public post image
               <img
                 src={photo.imageUrl}
-                alt={caption || `Photo ${openIndex + 1}`}
+                alt={
+                  caption ||
+                  t("profile.photoOf", {
+                    values: { current: String(openIndex + 1), total: String(count) },
+                  })
+                }
                 className={`h-auto w-auto max-h-[min(85vh,900px)] object-contain ${
                   canNavigate
                     ? "max-w-[min(100%,calc(100vw-11rem))]"
@@ -178,9 +187,9 @@ export default function ProfilePhotosLightbox({
               <div
                 className="flex aspect-square h-auto w-auto max-h-[min(85vh,900px)] max-w-md items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] px-4 text-center text-sm font-bold uppercase tracking-wider text-white/40"
                 role="img"
-                aria-label="Photo placeholder"
+                aria-label={t("profile.lightboxPlaceholder")}
               >
-                Photo
+                {t("profile.photo")}
               </div>
             )}
 
@@ -189,7 +198,7 @@ export default function ProfilePhotosLightbox({
                 type="button"
                 onClick={goNext}
                 className="watch-focus-ring flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/50 text-xl text-white transition-colors hover:border-white/30 hover:bg-black/80 motion-reduce:transition-none"
-                aria-label="Next photo"
+                aria-label={t("profile.lightboxNext")}
               >
                 ›
               </button>

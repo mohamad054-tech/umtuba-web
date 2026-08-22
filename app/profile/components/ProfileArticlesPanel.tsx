@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../../components/i18n";
 import type { ProfileArticle } from "../types";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 import ProfilePanelError from "./ProfilePanelError";
 
 type ProfileArticlesPanelProps = {
@@ -16,23 +18,21 @@ export default function ProfileArticlesPanel({
   onRetry,
   isOwner = false,
 }: ProfileArticlesPanelProps) {
+  const { t } = useTranslation();
   if (loadFailed) {
     return (
-      <ProfilePanelError
-        message={PROFILE_ERROR_STATES_COPY.articlesPanel}
-        onRetry={onRetry}
-      />
+      <ProfilePanelError message={t("profile.errorArticles")} onRetry={onRetry} />
     );
   }
 
   if (articles.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
-        <p className="text-base font-bold text-white/80">No articles yet</p>
+        <p className="text-base font-bold text-white/80">{t("profile.emptyArticles")}</p>
         <p className="mt-2 text-sm text-white/45">
           {isOwner
-            ? "Publish an article to show it here. You can attach a short teaser video for the Home feed."
-            : "This creator has not published articles yet."}
+            ? t("profile.emptyArticlesOwner")
+            : t("profile.emptyArticlesVisitor")}
         </p>
       </div>
     );

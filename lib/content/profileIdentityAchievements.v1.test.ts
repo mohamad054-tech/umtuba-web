@@ -58,7 +58,7 @@ describe("Identity Achievements V1 — wiring", () => {
     const about = read("app/profile/components/ProfileAbout.tsx");
 
     expect(helper).toMatch(/export function normalizeAchievementMedals/);
-    expect(medals).toMatch(/Creator achievements/);
+    expect(medals).toMatch(/t\("profile.achievementsAria"\)/);
     expect(medals).toMatch(/isCollapsed/);
     expect(medals).toMatch(/onOpenAbout/);
     expect(experience).toMatch(/ProfileIdentityAchievements/);
@@ -75,7 +75,7 @@ describe("Identity Achievements V1 — wiring", () => {
     expect(medalsIdx).toBeGreaterThan(stripIdx);
     expect(statsIdx).toBeGreaterThan(medalsIdx);
     expect(header).not.toMatch(/about\.achievements/);
-    expect(about).toMatch(/Achievements/);
+    expect(about).toMatch(/t\("profile.achievements"\)/);
     expect(`${medals}\n${helper}`).not.toMatch(/\bverified\b/i);
     expect(`${medals}\n${helper}`).not.toMatch(/cover_url|coverUrl/);
     expect(`${medals}\n${helper}\n${experience}`).not.toMatch(

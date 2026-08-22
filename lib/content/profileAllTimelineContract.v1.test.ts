@@ -217,8 +217,8 @@ describe("All Timeline Contract V1 — panel wiring", () => {
     expect(panel).toMatch(/applyProfileAllTimelineContract/);
     expect(panel).toMatch(/max-w-\[45rem\]/);
     expect(panel).not.toMatch(/sm:grid-cols-2/);
-    expect(panel).toMatch(/PROFILE_EMPTY_STATES_COPY/);
-    expect(panel).toMatch(/allVisitorDescription|allOwnerDescription/);
+    expect(panel).toMatch(/t\("profile.emptyAllTitle"\)/);
+    expect(panel).toMatch(/emptyAllVisitor|emptyAllOwner/);
     expect(
       existsSync(join(ROOT, "app/profile/lib/profileAllTimelineContract.ts"))
     ).toBe(true);

@@ -309,7 +309,7 @@ export async function listProfileActiveLiveRooms(
       .filter((row) => typeof row.id === "string" && row.status === "live")
       .map((row) => ({
         roomId: row.id as string,
-        title: (row.title as string)?.trim() || "Live now",
+        title: (row.title as string)?.trim() || "",
         viewerCount: parseNonNegInt(row.viewer_count),
         city: (row.city as string)?.trim() || "",
         country: (row.country as string)?.trim() || "",

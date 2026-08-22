@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../../components/i18n";
+import { LIVE_BUCKET_I18N_KEYS } from "../../../lib/i18n/profileChrome";
 import { buildLiveStreamHref } from "../../lib/nav";
 import {
   bucketProfileLiveSessions,
   getVisibleLiveBuckets,
-  LIVE_BUCKET_LABELS,
   type LiveBucketId,
 } from "../lib/profileAboutLiveStructure";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import ProfilePanelError from "./ProfilePanelError";
 import type { ProfileLivePreview } from "../types";
@@ -25,16 +27,17 @@ function SessionCard({
   session: ProfileLivePreview;
   bucket: LiveBucketId;
 }) {
+  const { t } = useTranslation();
   const showLive = bucket === "now";
   const metaParts = [
-    [session.city, session.country].filter(Boolean).join(", ") || "Live",
+    [session.city, session.country].filter(Boolean).join(", ") || t("profile.live"),
     bucket === "now"
-      ? `${session.viewersLabel} watching`
+      ? t("profile.watching", { values: { count: session.viewersLabel } })
       : bucket === "upcoming"
-        ? session.scheduledLabel || "Scheduled"
+        ? session.scheduledLabel || t("profile.scheduled")
         : session.viewersLabel
-          ? `${session.viewersLabel} watched`
-          : "Ended",
+          ? t("profile.watched", { values: { count: session.viewersLabel } })
+          : t("profile.ended"),
   ];
 
   return (
@@ -57,15 +60,15 @@ function SessionCard({
       </div>
       <div className="flex flex-1 flex-col justify-center gap-2 p-4 sm:p-5">
         <p className="text-base font-black tracking-tight group-hover:text-white">
-          {session.title}
+          {session.title || t("profile.liveNow")}
         </p>
         <p className="text-sm text-white/50">{metaParts.join(" · ")}</p>
         <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-200/80">
           {bucket === "now"
-            ? "Join live"
+            ? t("profile.joinLive")
             : bucket === "upcoming"
-              ? "View lobby"
-              : "Open session"}
+              ? t("profile.viewLobby")
+              : t("profile.openSession")}
         </p>
       </div>
     </Link>
@@ -83,13 +86,9 @@ export default function ProfileLivePanel({
   loadFailed = false,
   onRetry,
 }: ProfileLivePanelProps) {
+  const { t } = useTranslation();
   if (loadFailed) {
-    return (
-      <ProfilePanelError
-        message={PROFILE_ERROR_STATES_COPY.livePanel}
-        onRetry={onRetry}
-      />
-    );
+    return <ProfilePanelError message={t("profile.errorLive")} onRetry={onRetry} />;
   }
 
   const buckets = bucketProfileLiveSessions(sessions, isLive);
@@ -98,10 +97,8 @@ export default function ProfileLivePanel({
   if (visible.length === 0) {
     return (
       <div className="space-y-2 rounded-[24px] border border-white/10 bg-white/[0.03] px-5 py-10 text-center">
-        <p className="text-sm text-white/50">No live sessions yet.</p>
-        <p className="text-xs text-white/35">
-          Live Now, Upcoming, and Past will appear here when available.
-        </p>
+        <p className="text-sm text-white/50">{t("profile.emptyLive")}</p>
+        <p className="text-xs text-white/35">{t("profile.emptyLiveHint")}</p>
       </div>
     );
   }
@@ -112,7 +109,7 @@ export default function ProfileLivePanel({
         <section key={bucketId} className="space-y-3">
           <div className="flex items-center gap-2">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">
-              {LIVE_BUCKET_LABELS[bucketId]}
+              {t(LIVE_BUCKET_I18N_KEYS[bucketId])}
             </p>
             {bucketId === "now" ? <ProfileLiveBadge /> : null}
           </div>

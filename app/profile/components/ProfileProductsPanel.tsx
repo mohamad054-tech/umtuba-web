@@ -1,8 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "../../components/i18n";
 import { APP_ROUTES } from "../../lib/nav";
-import {
-  normalizeProfileProducts,
-} from "../lib/profileCoursesProductsStructure";
+import { normalizeProfileProducts } from "../lib/profileCoursesProductsStructure";
 import type { ProfileProductPreview } from "../types";
 
 type ProfileProductsPanelProps = {
@@ -18,26 +19,29 @@ export default function ProfileProductsPanel({
   products = [],
   isOwner = false,
 }: ProfileProductsPanelProps) {
+  const { t } = useTranslation();
   const items = normalizeProfileProducts(products);
 
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/35">
-          Products
+          {t("profile.products")}
         </p>
-        <p className="mt-3 text-base font-bold text-white/80">No products yet</p>
+        <p className="mt-3 text-base font-bold text-white/80">
+          {t("profile.emptyProducts")}
+        </p>
         <p className="mt-2 text-sm text-white/45">
           {isOwner
-            ? "Listed products will appear here. Open Seller products when your shop is ready."
-            : "This creator has not listed products yet."}
+            ? t("profile.emptyProductsOwner")
+            : t("profile.emptyProductsVisitor")}
         </p>
         {isOwner ? (
           <Link
             href={APP_ROUTES.sellerProducts}
             className="watch-focus-ring mt-5 inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold transition hover:bg-white/10"
           >
-            Seller products
+            {t("profile.sellerProducts")}
           </Link>
         ) : null}
       </div>
@@ -47,7 +51,7 @@ export default function ProfileProductsPanel({
   return (
     <div className="space-y-4">
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">
-        Products
+        {t("profile.products")}
       </p>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {items.map((product) => (
@@ -69,7 +73,9 @@ export default function ProfileProductsPanel({
                 ) : null}
                 {product.storeBadge ? (
                   <span className="absolute left-2 top-2 rounded-full border border-white/15 bg-black/50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white/80">
-                    {product.storeBadge}
+                    {product.storeBadge === "Store"
+                      ? t("profile.storeBadge")
+                      : product.storeBadge}
                   </span>
                 ) : null}
               </div>
@@ -81,7 +87,7 @@ export default function ProfileProductsPanel({
                   {product.priceLabel}
                 </p>
                 <p className="mt-auto pt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-blue-200/80 sm:text-xs">
-                  View product
+                  {t("profile.viewProduct")}
                 </p>
               </div>
             </Link>

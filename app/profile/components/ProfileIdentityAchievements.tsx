@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "../../components/i18n";
 import {
   normalizeAchievementMedals,
   shouldShowIdentityAchievements,
@@ -23,6 +24,7 @@ export default function ProfileIdentityAchievements({
   isCollapsed = false,
   onOpenAbout,
 }: ProfileIdentityAchievementsProps) {
+  const { t } = useTranslation();
   const medals = normalizeAchievementMedals(profile.about.achievements);
 
   if (
@@ -35,7 +37,7 @@ export default function ProfileIdentityAchievements({
   return (
     <ul
       className="flex flex-wrap items-center gap-2"
-      aria-label="Creator achievements"
+      aria-label={t("profile.achievementsAria")}
     >
       {medals.visible.map((label) => (
         <li
@@ -52,7 +54,9 @@ export default function ProfileIdentityAchievements({
               type="button"
               onClick={onOpenAbout}
               className="watch-focus-ring rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-[11px] font-bold text-white/55"
-              aria-label={`Show ${medals.overflowCount} more achievements on About`}
+              aria-label={t("profile.moreAchievementsAria", {
+                values: { count: String(medals.overflowCount) },
+              })}
             >
               +{medals.overflowCount}
             </button>

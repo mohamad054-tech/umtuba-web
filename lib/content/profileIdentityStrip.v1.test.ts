@@ -65,8 +65,8 @@ describe("Identity Strip V1 — wiring", () => {
     expect(helper).toMatch(/export function normalizeRoleChips/);
     expect(helper).toMatch(/export function normalizeInterestTeasers/);
     expect(types).toMatch(/roles\?:/);
-    expect(strip).toMatch(/Creator roles/);
-    expect(strip).toMatch(/Interest teasers/);
+    expect(strip).toMatch(/t\("profile.rolesAria"\)/);
+    expect(strip).toMatch(/t\("profile.interestsAria"\)/);
     expect(strip).toMatch(/isCollapsed/);
     expect(strip).toMatch(/onOpenAbout/);
     expect(experience).toMatch(/ProfileIdentityStrip/);

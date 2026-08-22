@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from "react";
 import type { ProfilePost } from "../types";
-import { PROFILE_ERROR_STATES_COPY } from "../lib/profileErrorStates";
 import ProfilePanelError from "./ProfilePanelError";
 import ProfilePhotosLightbox from "./ProfilePhotosLightbox";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
@@ -42,7 +41,7 @@ export default function ProfilePhotosPanel({
   if (loadFailed) {
     return (
       <ProfilePanelError
-        message={PROFILE_ERROR_STATES_COPY.photosPanel}
+        message={t("profile.errorPhotos")}
         onRetry={onRetry}
       />
     );
@@ -74,7 +73,9 @@ export default function ProfilePhotosPanel({
             <button
               type="button"
               className="watch-focus-ring block w-full overflow-hidden rounded-xl text-left"
-              aria-label={`Open photo ${index + 1} of ${photos.length}`}
+              aria-label={t("profile.openPhoto", {
+                values: { current: String(index + 1), total: String(photos.length) },
+              })}
               onClick={() => setOpenIndex(index)}
             >
               {post.imageUrl ? (
@@ -86,7 +87,7 @@ export default function ProfilePhotosPanel({
                 />
               ) : (
                 <div className="flex aspect-square items-center justify-center px-2 text-center text-[10px] font-bold uppercase tracking-wider text-white/35">
-                  Photo
+                  {t("profile.photo")}
                 </div>
               )}
             </button>

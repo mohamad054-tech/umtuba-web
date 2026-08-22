@@ -47,17 +47,17 @@ describe("Photos Lightbox V1 — wiring & a11y contract", () => {
     expect(lightbox).toMatch(/role="dialog"/);
     expect(lightbox).toMatch(/aria-modal="true"/);
     expect(lightbox).toMatch(/ArrowLeft|ArrowRight/);
-    expect(lightbox).toMatch(/Close photo lightbox/);
-    expect(lightbox).toMatch(/Previous photo/);
-    expect(lightbox).toMatch(/Next photo/);
+    expect(lightbox).toMatch(/t\("profile.lightboxClose"\)/);
+    expect(lightbox).toMatch(/t\("profile.lightboxPrev"\)/);
+    expect(lightbox).toMatch(/t\("profile.lightboxNext"\)/);
     expect(lightbox).toMatch(/document\.body\.style\.overflow/);
-    expect(lightbox).toMatch(/Photo placeholder/);
+    expect(lightbox).toMatch(/t\("profile.lightboxPlaceholder"\)/);
     expect(lightbox).toMatch(/min-h-\[44px\]/);
     expect(lightbox).toMatch(/motion-reduce/);
     expect(lightbox).toMatch(/createPortal/);
     expect(panel).toMatch(/ProfilePhotosLightbox/);
     expect(panel).toMatch(/setOpenIndex/);
-    expect(panel).toMatch(/Open photo/);
+    expect(panel).toMatch(/t\("profile.openPhoto"/);
     expect(panel).toMatch(/"use client"/);
     expect(
       existsSync(join(ROOT, "app/profile/components/ProfilePhotosLightbox.tsx"))

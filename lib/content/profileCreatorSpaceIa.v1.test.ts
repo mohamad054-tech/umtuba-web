@@ -47,7 +47,7 @@ describe("Creator Space IA Rename V1 — copy contract", () => {
     expect(experience).toMatch(/t\("profile.notFoundEyebrow"\)/);
     expect(experience).toMatch(/t\("profile.mockBanner"\)/);
     expect(videos).toMatch(/t\("profile.videosShowingLatest"\)/);
-    expect(videos).toMatch(/PROFILE_EMPTY_STATES_COPY/);
+    expect(videos).toMatch(/t\("profile.emptyVideos"\)/);
 
     // Preserve identity stack order from prior closed tasks.
     expect(experience).toMatch(/ProfileIdentityStrip/);

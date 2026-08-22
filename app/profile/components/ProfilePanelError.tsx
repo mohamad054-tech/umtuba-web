@@ -1,6 +1,8 @@
+"use client";
+
+import { useTranslation } from "../../components/i18n";
 import {
   PROFILE_ERROR_SOFT_BANNER_CLASS,
-  PROFILE_ERROR_STATES_COPY,
   shouldShowProfileErrorRetry,
 } from "../lib/profileErrorStates";
 
@@ -16,6 +18,7 @@ export default function ProfilePanelError({
   message,
   onRetry,
 }: ProfilePanelErrorProps) {
+  const { t } = useTranslation();
   const showRetry = shouldShowProfileErrorRetry(onRetry);
 
   return (
@@ -29,7 +32,7 @@ export default function ProfilePanelError({
           onClick={onRetry}
           className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold text-white/80 transition hover:bg-white/10"
         >
-          {PROFILE_ERROR_STATES_COPY.retryCta}
+          {t("profile.retry")}
         </button>
       ) : null}
     </div>

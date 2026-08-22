@@ -19,7 +19,7 @@ export default function ProfilePostsPanel({
         role="status"
         className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
       >
-        Posts couldn&apos;t be loaded right now.
+        {t("profile.errorPosts")}
       </p>
     );
   }
@@ -29,7 +29,7 @@ export default function ProfilePostsPanel({
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-8 text-center">
         <p className="text-base font-bold text-white/80">{t("profile.emptyPosts")}</p>
         <p className="mt-2 text-sm text-white/45">
-          Text and image posts from this creator will appear here.
+          {t("profile.emptyPostsHint")}
         </p>
       </div>
     );
@@ -43,7 +43,11 @@ export default function ProfilePostsPanel({
           className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4"
         >
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
-            {post.postType}
+            {post.postType === "image"
+              ? t("profile.photo")
+              : post.postType === "video"
+                ? t("profile.videos")
+                : t("profile.posts")}
           </p>
           {post.content ? (
             <p className="mt-2 whitespace-pre-wrap text-sm text-white/80">
