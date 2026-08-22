@@ -29,6 +29,7 @@ export {
   emptyActivityTierProgress,
   getNextActivityTier,
   resolveTierFromScore,
+  sanitizeActivityTierProgressForClient,
 } from "./progress";
 
 export {

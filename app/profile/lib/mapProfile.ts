@@ -16,20 +16,10 @@ import type { MockProfile, ProfileView } from "../types";
 const DEFAULT_AVATAR_GRADIENT = "from-blue-400 to-indigo-600";
 
 function formatJoinedLabel(isoDate: string | null | undefined): string {
-  if (!isoDate) {
-    return "Joined recently";
-  }
-
-  const date = new Date(isoDate);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Joined recently";
-  }
-
-  return `Joined ${date.toLocaleString("en-US", {
-    month: "long",
-    year: "numeric",
-  })}`;
+  // Keep the English "Joined …" contract out of the serialized profile HTML.
+  // Header / About format from `joinedAt` via formatLocalizedJoinedLine.
+  void isoDate;
+  return "";
 }
 
 export type ProfileContentBundle = {

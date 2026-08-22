@@ -46,6 +46,7 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
   const sections = getVisibleAboutSections({
     bio: profile.bio,
     location,
+    joinedAt: profile.joinedAt,
     about: profile.about,
   });
 

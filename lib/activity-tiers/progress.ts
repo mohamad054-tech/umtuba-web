@@ -94,6 +94,30 @@ export function emptyActivityTierProgress(): ActivityTierProgress {
   });
 }
 
+function stripActivityTierCopy(
+  tier: ActivityTierDefinition
+): ActivityTierDefinition {
+  return {
+    ...tier,
+    displayLabel: "",
+    displayTitle: "",
+    description: "",
+  };
+}
+
+/** Drop English catalog copy before the progress object is serialized to HTML. */
+export function sanitizeActivityTierProgressForClient(
+  progress: ActivityTierProgress
+): ActivityTierProgress {
+  return {
+    ...progress,
+    tier: stripActivityTierCopy(progress.tier),
+    nextTier: progress.nextTier
+      ? stripActivityTierCopy(progress.nextTier)
+      : null,
+  };
+}
+
 /** Accent classes for badge chrome — keep in sync with ActivityTierAccent. */
 export function activityTierAccentClasses(accent: ActivityTierDefinition["accent"]): {
   border: string;

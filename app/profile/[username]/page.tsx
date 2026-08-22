@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { loadProfileActivityTier } from "../../actions/activityTiers";
-import { buildActivityTierProgress } from "../../../lib/activity-tiers";
+import {
+  buildActivityTierProgress,
+  sanitizeActivityTierProgressForClient,
+} from "../../../lib/activity-tiers";
 import { buildPublicProfileMetadata } from "../../../lib/site/metadata";
 import { getProfileFollowSnapshot } from "../../../lib/supabase/follows";
 import { listPublishedArticlesForUser } from "../../../lib/articles/articlesFoundation";
@@ -177,7 +180,7 @@ async function resolveProfile(username: string): Promise<{
             liveRooms: liveResult.rooms,
             liveFailed: Boolean(liveResult.failed),
           }),
-          activityTier,
+          activityTier: sanitizeActivityTierProgressForClient(activityTier),
         },
         isOwner: Boolean(viewerId && viewerId === row.id),
         viewerId,
@@ -195,7 +198,9 @@ async function resolveProfile(username: string): Promise<{
       return {
         profile: {
           ...mockProfileToView(mock),
-          activityTier: buildActivityTierProgress({ score: 420 }),
+          activityTier: sanitizeActivityTierProgressForClient(
+            buildActivityTierProgress({ score: 420 })
+          ),
         },
         isOwner: false,
         viewerId,

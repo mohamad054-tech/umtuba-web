@@ -9,6 +9,7 @@ import {
   evaluateActivityScoreAward,
   getNextActivityTier,
   resolveTierFromScore,
+  sanitizeActivityTierProgressForClient,
   suggestedPointsForCategory,
 } from "./index";
 
@@ -52,6 +53,18 @@ describe("progress toward next tier", () => {
     expect(progress.nextTier).toBeNull();
     expect(progress.progressPercent).toBe(100);
     expect(getNextActivityTier("icon")).toBeNull();
+  });
+
+  it("strips English catalog copy before client serialization", () => {
+    const progress = sanitizeActivityTierProgressForClient(
+      buildActivityTierProgress({ score: 517 })
+    );
+    const serialized = JSON.stringify(progress);
+    expect(progress.tierId).toBe("rising");
+    expect(serialized).not.toContain("Rising Creator");
+    expect(serialized).not.toContain("Building authentic");
+    expect(progress.tier.displayTitle).toBe("");
+    expect(progress.nextTier?.displayTitle).toBe("");
   });
 });
 

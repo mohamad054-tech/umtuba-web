@@ -93,7 +93,8 @@ describe("profile content mapping", () => {
     expect(view.liveSessions).toEqual([]);
     expect(view.isLive).toBe(false);
     expect(view.likesLabel).not.toBe("—");
-    expect(view.about.joinedLabel).toMatch(/Joined/);
+    expect(view.about.joinedLabel).toBe("");
+    expect(view.joinedAt).toBeTruthy();
   });
 
   it("marks live when an active room exists for the host", () => {
@@ -171,16 +172,16 @@ describe("profile content architecture", () => {
       "app/profile/components/ProfileLivePanel.tsx"
     );
     const content = readRepoFile("lib/supabase/profileContent.ts");
-    expect(livePanel).toMatch(/Live Now/);
-    expect(livePanel).toMatch(/Upcoming/);
-    expect(livePanel).toMatch(/Past/);
+    expect(livePanel).toMatch(/LIVE_BUCKET_I18N_KEYS/);
+    expect(livePanel).toMatch(/profile\.joinLive/);
+    expect(livePanel).toMatch(/profile\.liveNow/);
     expect(content).toMatch(/\.eq\("status", "live"\)/);
     expect(content).not.toMatch(/status", "ended"/);
   });
 
   it("video grid links to Watch and shows honest empty copy", () => {
     const grid = readRepoFile("app/profile/components/ProfileVideoGrid.tsx");
-    expect(grid).toMatch(/No published videos yet/);
+    expect(grid).toMatch(/profile\.emptyVideos/);
     expect(grid).toMatch(/video\.href/);
     expect(grid).toMatch(/<video/);
   });

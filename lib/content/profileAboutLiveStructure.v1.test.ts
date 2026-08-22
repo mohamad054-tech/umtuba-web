@@ -63,6 +63,15 @@ describe("About / Live Structure V1", () => {
 
     expect(
       getVisibleAboutSections({
+        bio: "",
+        location: "",
+        joinedAt: "2026-08-12T08:21:14.001329+00:00",
+        about: { joinedLabel: "", interests: [] },
+      })
+    ).toEqual(["joined"]);
+
+    expect(
+      getVisibleAboutSections({
         bio: "Hello",
         location: "Cairo, Egypt",
         about: {

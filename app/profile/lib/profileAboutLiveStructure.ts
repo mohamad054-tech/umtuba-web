@@ -38,6 +38,7 @@ export type ProfileLiveBuckets = Record<LiveBucketId, ProfileLivePreview[]>;
 export type AboutSectionVisibilityInput = {
   bio?: string | null;
   location?: string | null;
+  joinedAt?: string | null;
   about: ProfileAbout;
 };
 
@@ -103,7 +104,7 @@ function hasItems(value: readonly unknown[] | null | undefined): boolean {
 
 /**
  * About sections that have content (empty sections omit entirely).
- * Joined is always present when joinedLabel exists.
+ * Joined is present when joinedLabel or joinedAt exists.
  */
 export function getVisibleAboutSections(
   input: AboutSectionVisibilityInput
@@ -130,7 +131,7 @@ export function getVisibleAboutSections(
       case "links":
         return hasLinks;
       case "joined":
-        return hasText(about.joinedLabel);
+        return hasText(about.joinedLabel) || hasText(input.joinedAt);
       default:
         return false;
     }
