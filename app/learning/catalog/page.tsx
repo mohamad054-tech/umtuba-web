@@ -4,15 +4,29 @@ import CatalogBrowser from "../../components/learning/CatalogBrowser";
 import { createTranslator } from "../../../lib/i18n";
 import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
-import { listPublicCatalogCourses } from "../../../lib/learning/publicCatalog";
+import {
+  LEARNING_PUBLIC_ROUTES,
+  listPublicCatalogCourses,
+} from "../../../lib/learning/publicCatalog";
 import { LEARNING_LEARNER_ROUTES } from "../../../lib/learning/learnerDelivery";
 import { APP_ROUTES } from "../../lib/nav/routes";
-
-import { learningCatalogMetadata } from "../../../lib/site/routeMetadata";
-
-export const metadata = learningCatalogMetadata;
+import JsonLd from "../../components/JsonLd";
+import {
+  buildBreadcrumbListJsonLd,
+  buildItemListJsonLd,
+} from "../../../lib/site/jsonLd";
+import { buildLocalizedRouteMetadata } from "../../../lib/site/localizedSeo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata() {
+  const { locale } = await resolveRequestLocale();
+  return buildLocalizedRouteMetadata({
+    key: "learningCatalog",
+    path: LEARNING_PUBLIC_ROUTES.catalog,
+    locale,
+  });
+}
 
 export default async function LearningPublicCatalogPage() {
   const { locale } = await resolveRequestLocale();
@@ -22,6 +36,22 @@ export default async function LearningPublicCatalogPage() {
   const courses = await listPublicCatalogCourses(supabase);
 
   return (
+    <>
+    <JsonLd
+      data={buildBreadcrumbListJsonLd([
+        { name: "UMTUBA", path: "/" },
+        { name: t("learning.catalog.title"), path: LEARNING_PUBLIC_ROUTES.catalog },
+      ])}
+    />
+    <JsonLd
+      data={buildItemListJsonLd({
+        name: t("learning.catalog.title"),
+        items: courses.map((course) => ({
+          name: course.name,
+          path: LEARNING_PUBLIC_ROUTES.course(course.slug),
+        })),
+      })}
+    />
     <LearningShell
       title={t("learning.catalog.title")}
       subtitle={t("learning.catalog.subtitle")}
@@ -59,5 +89,6 @@ export default async function LearningPublicCatalogPage() {
 
       <CatalogBrowser courses={courses} />
     </LearningShell>
+    </>
   );
 }

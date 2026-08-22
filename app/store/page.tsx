@@ -29,11 +29,20 @@ import {
 } from "../../lib/store/catalogQueries";
 import { STOREFRONT_FLAGS } from "../../lib/store/storefrontFlags";
 
-import { storeMetadata } from "../../lib/site/routeMetadata";
-
-export const metadata = storeMetadata;
+import JsonLd from "../components/JsonLd";
+import { buildBreadcrumbListJsonLd, buildItemListJsonLd } from "../../lib/site/jsonLd";
+import { buildLocalizedRouteMetadata } from "../../lib/site/localizedSeo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata() {
+  const { locale } = await resolveRequestLocale();
+  return buildLocalizedRouteMetadata({
+    key: "store",
+    path: "/store",
+    locale,
+  });
+}
 
 export default async function StoreHomePage() {
   const [{ locale }, supabase] = await Promise.all([
@@ -72,6 +81,22 @@ export default async function StoreHomePage() {
   const catalogEmpty = !catalog.error && items.length === 0;
 
   return (
+    <>
+    <JsonLd
+      data={buildBreadcrumbListJsonLd([
+        { name: "UMTUBA", path: "/" },
+        { name: t("store.shell.title"), path: "/store" },
+      ])}
+    />
+    <JsonLd
+      data={buildItemListJsonLd({
+        name: t("store.shell.title"),
+        items: items.slice(0, 24).map((item) => ({
+          name: item.product.title,
+          path: `/store/${item.store.slug}/product/${item.product.slug}`,
+        })),
+      })}
+    />
     <StoreShell title={t("store.shell.title")} subtitle={t("store.shell.subtitle")}>
       <HeroCarousel slides={heroSlides} />
       <StoreTrustStrip />
@@ -266,5 +291,6 @@ export default async function StoreHomePage() {
         </div>
       </div>
     </StoreShell>
+    </>
   );
 }

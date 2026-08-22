@@ -1,30 +1,32 @@
 ﻿# Current Task
 
-## CENTRAL GO — SURGICAL LIVE WEB DEFECTS
+## CENTRAL GO — GOOGLE SEO FULL OPTIMIZATION
 
-**TASK_ID** = `CENTRAL_WEB_VISIBLE_REGRESSIONS_AND_SOCIAL_RECOVERY_SURGICAL_V1`  
+**TASK_ID** = `CENTRAL_UMTUBA_GOOGLE_SEO_FULL_OPTIMIZATION_V1`  
 **DATE** = 2026-08-22  
-**DEVICE** = SERVER / CENTRAL / WIN-MJRKAKK2MEH  
-**STATUS** = SOURCE_READY_PENDING_DEPLOY  
-**MODE** = SURGICAL_FIX_AND_LIVE_PROOF  
-**START_PRODUCTION_SHA** = `71f289cba6212c50db9f0f237ac1e145b2936dcc`  
-**START_LIVE_RELEASE** = `71f289cb-20260821235319`  
-**WEB_BRANCH** = `central/web-visible-regressions-surgical-v1`  
-**WEB_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-visible-regressions-surgical-v1`  
-**REPORT** = `D:\umtuba-central\reports\UMTUBA_CENTRAL_WEB_VISIBLE_REGRESSIONS_AND_SOCIAL_RECOVERY_SURGICAL_V1.md`
+**STATUS** = VERIFIED_PENDING_DEPLOY  
+**MODE** = AUDIT_IMPLEMENT_VERIFY_DEPLOY  
+**START_PRODUCTION_SHA** = `9f937e2ff7cd13c8cba5cebf94ea4e9f48dae3fc`  
+**START_LIVE_RELEASE** = `9f937e2f-20260821213212`  
+**WEB_BRANCH** = `central/web-google-seo-full-optimization-v1`  
+**WEB_WORKTREE** = `D:\umtuba-central\repos\umtuba-web-google-seo-full-optimization-v1`  
+**REPORT** = `D:\umtuba-central\reports\UMTUBA_CENTRAL_GOOGLE_SEO_FULL_OPTIMIZATION_V1.md`
 
-User evidence contradicted the previous FIXED_AND_DEPLOYED claims. Dedicated worktree from live `71f289cb`. Portal the locale listbox; raise Arabic secondary ink. Do not replace Home. Do not touch mobile. No `20260931`. No UM Life Phase 2.
+Maximize legitimate organic discoverability on current production. Dedicated worktree from live `9f937e2f`. Do not touch mobile. No `20260931`. No UM Life Phase 2. No Home redesign.
 
 ### Allowed scope
 
-- Language selector visibility (portal + solid option paint)
-- Restore missing locale registrations if found (none missing)
-- Arabic secondary/helper readability
-- Social lineage report only unless destination unambiguous (Profile already live; Home preserved)
-- Gates + commit + push + Central production deploy + live proof
+- Public indexability, robots, sitemap, canonicals, localized metadata, truthful JSON-LD
+- Profile / UM Life / Learning catalog / Store / Watch public SEO
+- Cookie/`hl` international SEO (no fake `/ar` `/en` path prefixes)
+- Targeted tests + `tsc` + `npm run build` + `git diff --check`
+- Production deploy via Central path after gates
+- Handoff docs + Central report
 
 ### Forbidden scope
 
-- Mobile; `20260931`; restore `0b6d35bd`; UM Life Phase 2
-- Replace current Home with Facebook-like page
-- Whole-platform rewrite; force; `git config --global`; print secrets
+- Mobile source; `origin/central/android-watch-playback-p1-v2`
+- Keyword spam, doorway pages, fake reviews, hidden text
+- Apply `20260931`; restore `0b6d35bd`; UM Life Phase 2
+- Invent Search Console verification tokens
+- Force; `git config --global`; print secrets

@@ -15,10 +15,9 @@ import type { OrderStatus } from "../../../lib/store/types";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "My Orders | UMTUBA Store",
-  description: "Your UMTUBA Store order history.",
-};
+import { storeOrdersMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = storeOrdersMetadata;
 
 type PageProps = {
   searchParams?:

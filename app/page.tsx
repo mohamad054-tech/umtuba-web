@@ -1,12 +1,23 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { homeFeedMetadata } from "../lib/site/routeMetadata";
+import { resolveRequestLocale } from "../lib/i18n/server";
+import { buildLocalizedRouteMetadata } from "../lib/site/localizedSeo";
 import { buildHomeCityFocusHref } from "./lib/nav";
 import ProductLoadingState from "./components/product/ProductLoadingState";
 import HomeFeedLoader from "./components/home/HomeFeedLoader";
 
-export const metadata = homeFeedMetadata;
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await resolveRequestLocale();
+  return buildLocalizedRouteMetadata({
+    key: "home",
+    path: "/",
+    locale,
+    absoluteTitle: true,
+  });
+}
 
 type HomePageProps = {
   searchParams?:

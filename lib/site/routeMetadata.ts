@@ -19,12 +19,15 @@ export const welcomeMetadata: Metadata = {
 export const landingMetadata = welcomeMetadata;
 
 /** Video-First Home Feed at `/`. */
-export const homeFeedMetadata = buildPageMetadata({
-  title: "Home",
-  description: `Watch short videos from creators on ${BRAND.name}. ${BRAND.tagline}.`,
-  path: "/",
-  index: "index",
-});
+export const homeFeedMetadata: Metadata = {
+  ...buildPageMetadata({
+    title: DEFAULT_TITLE,
+    description: `Watch short videos from creators on ${BRAND.name}. ${BRAND.tagline}. ${BRAND.mission}`,
+    path: "/",
+    index: "index",
+  }),
+  title: { absolute: DEFAULT_TITLE },
+};
 
 export const discoverMetadata = buildPageMetadata({
   title: "Discover",
@@ -70,7 +73,7 @@ export const watchMetadata = buildPageMetadata({
 
 export const lifeMetadata = buildPageMetadata({
   title: "UM Life",
-  description: `Read and share posts on UM Life inside ${BRAND.name}.`,
+  description: `Read public posts from the ${BRAND.name} community on UM Life. ${BRAND.tagline}.`,
   path: "/life",
   index: "index",
 });
@@ -91,9 +94,44 @@ export const followingMetadata = buildPageMetadata({
 
 export const storeMetadata = buildPageMetadata({
   title: "Store",
-  description: `Premium ${BRAND.name} storefront — discover products, collections, and creators.`,
+  description: `Browse the public ${BRAND.name} storefront for active products and creator shops.`,
   path: "/store",
   index: "index",
+});
+
+export const storeSearchMetadata = buildPageMetadata({
+  title: "Store search",
+  description: `Search active ${BRAND.name} store products.`,
+  path: "/store/search",
+  index: "noindex",
+});
+
+export const storeCartMetadata = buildPageMetadata({
+  title: "Cart",
+  description: `Your ${BRAND.name} Store cart.`,
+  path: "/store/cart",
+  index: "noindex",
+});
+
+export const storeCheckoutMetadata = buildPageMetadata({
+  title: "Checkout",
+  description: `Secure ${BRAND.name} Store checkout.`,
+  path: "/store/checkout",
+  index: "noindex",
+});
+
+export const storeWishlistMetadata = buildPageMetadata({
+  title: "Favorites",
+  description: `Your ${BRAND.name} Store favorites.`,
+  path: "/store/wishlist",
+  index: "noindex",
+});
+
+export const storeOrdersMetadata = buildPageMetadata({
+  title: "Orders",
+  description: `Your ${BRAND.name} Store orders.`,
+  path: "/store/orders",
+  index: "noindex",
 });
 
 export const learningHubMetadata = buildPageMetadata({

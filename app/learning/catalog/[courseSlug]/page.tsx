@@ -20,6 +20,11 @@ import {
 } from "../../../../lib/learning/publicCatalogSelfEnroll";
 import { APP_ROUTES } from "../../../lib/nav/routes";
 import { enrollInPublicCourseAction } from "../actions";
+import JsonLd from "../../../components/JsonLd";
+import {
+  buildBreadcrumbListJsonLd,
+  buildCourseJsonLd,
+} from "../../../../lib/site/jsonLd";
 import { buildPageMetadata } from "../../../../lib/site/metadata";
 import { BRAND } from "../../../../lib/site/brand";
 
@@ -43,6 +48,7 @@ function difficultyKey(
 }
 
 export async function generateMetadata({ params }: PageProps) {
+  const { locale } = await resolveRequestLocale();
   const { courseSlug } = await Promise.resolve(params);
   const supabase = await createClient();
   const landing = await loadPublicCourseBySlug(supabase, courseSlug);
@@ -53,6 +59,7 @@ export async function generateMetadata({ params }: PageProps) {
       description: `A ${BRAND.name} Learning course.`,
       path,
       index: "noindex",
+      locale,
     });
   }
   return buildPageMetadata({
@@ -62,6 +69,9 @@ export async function generateMetadata({ params }: PageProps) {
       `A public course on ${BRAND.name} Learning.`,
     path,
     index: "index",
+    locale,
+    imageUrl: landing.course.cover_url ?? landing.course.thumbnail_url,
+    imageAlt: landing.course.name,
   });
 }
 
@@ -113,6 +123,22 @@ export default async function LearningPublicCourseLandingPage({
   const errorKey = query.error ? enrollErrorKey(query.error) : null;
 
   return (
+    <>
+    <JsonLd
+      data={buildBreadcrumbListJsonLd([
+        { name: "UMTUBA", path: "/" },
+        { name: t("learning.course.catalogBack"), path: LEARNING_PUBLIC_ROUTES.catalog },
+        { name: course.name, path: LEARNING_PUBLIC_ROUTES.course(course.slug) },
+      ])}
+    />
+    <JsonLd
+      data={buildCourseJsonLd({
+        name: course.name,
+        description: course.description,
+        path: LEARNING_PUBLIC_ROUTES.course(course.slug),
+        isFree: course.is_free,
+      })}
+    />
     <LearningShell
       title={t("learning.course.title")}
       subtitle={course.name}
@@ -132,7 +158,9 @@ export default async function LearningPublicCourseLandingPage({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageUrl}
-          alt=""
+          alt={course.name}
+          width={1200}
+          height={440}
           className="mt-6 h-44 w-full rounded-2xl object-cover"
         />
       ) : null}
@@ -335,5 +363,6 @@ export default async function LearningPublicCourseLandingPage({
         ) : null}
       </section>
     </LearningShell>
+    </>
   );
 }

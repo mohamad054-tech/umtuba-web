@@ -15,6 +15,8 @@ import {
 } from "../../../lib/store/catalogQueries";
 import { isSafeStoreBrandingUrl } from "../../../lib/store/storeBranding";
 import { STOREFRONT_FLAGS } from "../../../lib/store/storefrontFlags";
+import { BRAND } from "../../../lib/site/brand";
+import { buildPageMetadata } from "../../../lib/site/metadata";
 
 type StoreProfilePageProps = {
   params: Promise<{ storeSlug: string }>;
@@ -22,9 +24,29 @@ type StoreProfilePageProps = {
 
 export async function generateMetadata({ params }: StoreProfilePageProps) {
   const { storeSlug } = await params;
-  return {
-    title: `${storeSlug} | UMTUBA Store`,
-  };
+  const { locale } = await resolveRequestLocale();
+  const supabase = await createClient();
+  const store = await getPublicStoreBySlug(supabase, storeSlug);
+  const path = `/store/${storeSlug}`;
+  if (!store) {
+    return buildPageMetadata({
+      title: "Store",
+      description: `A ${BRAND.name} store.`,
+      path,
+      index: "noindex",
+      locale,
+    });
+  }
+  return buildPageMetadata({
+    title: store.name,
+    description:
+      store.tagline?.trim() ||
+      store.description?.trim() ||
+      `${store.name} on ${BRAND.name} Store.`,
+    path,
+    index: "index",
+    locale,
+  });
 }
 
 export const dynamic = "force-dynamic";

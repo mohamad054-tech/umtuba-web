@@ -13,10 +13,9 @@ import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQuerie
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Cart | UMTUBA Store",
-  description: "Your UMTUBA Store cart.",
-};
+import { storeCartMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = storeCartMetadata;
 
 export default async function StoreCartPage() {
   const user = await getServerUser();

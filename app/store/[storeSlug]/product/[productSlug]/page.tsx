@@ -18,14 +18,55 @@ import { listPublicVideosForProduct } from "../../../../../lib/store/videoCommer
 import { isProductWishlisted } from "../../../../../lib/store/wishlist";
 import type { PublicCatalogItem } from "../../../../../lib/store/types";
 import ProductDetailClient from "./ProductDetailClient";
+import JsonLd from "../../../../components/JsonLd";
+import {
+  buildBreadcrumbListJsonLd,
+  buildProductJsonLd,
+} from "../../../../../lib/site/jsonLd";
+import { buildPageMetadata } from "../../../../../lib/site/metadata";
+import { BRAND } from "../../../../../lib/site/brand";
+import { isSafePublicShareImageUrl } from "../../../../../lib/site/metadata";
 
 type ProductPageProps = {
   params: Promise<{ storeSlug: string; productSlug: string }>;
 };
 
 export async function generateMetadata({ params }: ProductPageProps) {
-  const { productSlug } = await params;
-  return { title: `${productSlug} | UMTUBA Store` };
+  const { storeSlug, productSlug } = await params;
+  const { locale } = await resolveRequestLocale();
+  const supabase = await createClient();
+  const { detail } = await getPublicProductDetail(
+    supabase,
+    storeSlug,
+    productSlug
+  );
+  const path = `/store/${storeSlug}/product/${productSlug}`;
+  if (!detail) {
+    return buildPageMetadata({
+      title: "Product",
+      description: `A ${BRAND.name} Store product.`,
+      path,
+      index: "noindex",
+      locale,
+    });
+  }
+  const title = detail.displayTitle?.trim() || detail.product.title;
+  const description =
+    detail.product.short_description?.trim() ||
+    detail.product.description?.trim() ||
+    `${title} at ${detail.store.name} on ${BRAND.name} Store.`;
+  const image = detail.media
+    .map((item) => item.mediaUrl)
+    .find((url) => isSafePublicShareImageUrl(url));
+  return buildPageMetadata({
+    title,
+    description,
+    path,
+    index: "index",
+    locale,
+    imageUrl: image,
+    imageAlt: title,
+  });
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {
@@ -71,8 +112,36 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     user?.id,
     detail.product.id
   );
+  const priced = detail.variants.find((row) => row.price);
+  const image = detail.media
+    .map((item) => item.mediaUrl)
+    .find((url) => isSafePublicShareImageUrl(url));
+  const productPath = `/store/${detail.store.slug}/product/${detail.product.slug}`;
 
   return (
+    <>
+    <JsonLd
+      data={buildBreadcrumbListJsonLd([
+        { name: "UMTUBA", path: "/" },
+        { name: t("store.shell.title"), path: APP_ROUTES.store },
+        { name: detail.store.name, path: `/store/${detail.store.slug}` },
+        { name: detail.product.title, path: productPath },
+      ])}
+    />
+    <JsonLd
+      data={buildProductJsonLd({
+        name: detail.displayTitle?.trim() || detail.product.title,
+        description:
+          detail.product.short_description || detail.product.description,
+        path: productPath,
+        imageUrl: image,
+        priceMinor: priced?.price?.amount_minor ?? null,
+        currency: priced?.price?.currency ?? null,
+        available: priced?.available ?? null,
+        sellerName: detail.store.name,
+        forSale: detail.purchaseAllowed !== false,
+      })}
+    />
     <StoreShell
       title={detail.product.title}
       subtitle={t("store.product.navSubtitle")}
@@ -108,5 +177,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         initialWishlisted={wishlisted}
       />
     </StoreShell>
+    </>
   );
 }

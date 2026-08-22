@@ -11,9 +11,9 @@ import { listWishlist } from "../../../lib/store/wishlist";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Favorites | UMTUBA Store",
-};
+import { storeWishlistMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = storeWishlistMetadata;
 
 export default async function StoreWishlistPage() {
   const user = await getServerUser();

@@ -16,10 +16,9 @@ import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQuerie
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Checkout | UMTUBA Store",
-  description: "Secure UMTUBA Store checkout foundation (payment deferred).",
-};
+import { storeCheckoutMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = storeCheckoutMetadata;
 
 export default async function StoreCheckoutPage() {
   const user = await getServerUser();

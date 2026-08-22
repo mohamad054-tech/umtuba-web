@@ -30,10 +30,9 @@ type SearchPageProps = {
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  title: "Search Store | UMTUBA",
-  description: "Search active UMTUBA store products.",
-};
+import { storeSearchMetadata } from "../../../lib/site/routeMetadata";
+
+export const metadata = storeSearchMetadata;
 
 export default async function StoreSearchPage({ searchParams }: SearchPageProps) {
   const params = (await searchParams) ?? {};

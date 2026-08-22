@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { buildSiteGraphJsonLd } from "../lib/site/jsonLd";
 import { buildRootMetadata } from "../lib/site/metadata";
 import { resolveRequestLocale } from "../lib/i18n/server";
 import AppChrome from "./components/AppChrome";
+import JsonLd from "./components/JsonLd";
 import { I18nProvider } from "./components/i18n";
 import AppMotionRoot from "./components/motion/AppMotionRoot";
 import ExactContextResume from "./components/world/ExactContextResume";
@@ -39,6 +41,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <JsonLd data={buildSiteGraphJsonLd()} />
         <I18nProvider locale={locale}>
           <AppMotionRoot>
             <ExactContextResume />

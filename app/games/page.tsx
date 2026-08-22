@@ -1,9 +1,17 @@
 import Link from "next/link";
 import AppTopNav from "../components/AppTopNav";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
-import { gamesMetadata } from "../../lib/site/routeMetadata";
+import { resolveRequestLocale } from "../../lib/i18n/server";
+import { buildLocalizedRouteMetadata } from "../../lib/site/localizedSeo";
 
-export const metadata = gamesMetadata;
+export async function generateMetadata() {
+  const { locale } = await resolveRequestLocale();
+  return buildLocalizedRouteMetadata({
+    key: "games",
+    path: "/games",
+    locale,
+  });
+}
 
 /**
  * Public Games entry for Home section circles.

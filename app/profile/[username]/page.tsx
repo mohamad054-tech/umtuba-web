@@ -18,6 +18,8 @@ import {
 import { getServerUser, createClient } from "../../../lib/supabase/server";
 import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
 import { normalizeUsername } from "../../../lib/supabase/validation";
+import JsonLd from "../../components/JsonLd";
+import { buildProfilePageJsonLd } from "../../../lib/site/jsonLd";
 import ProfileExperience, { ProfileNotFound } from "../ProfileExperience";
 import ProfileLoadingSkeleton from "../components/ProfileLoadingSkeleton";
 import { getProfileByUsername } from "../data/mockProfiles";
@@ -212,11 +214,21 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   return (
     <Suspense fallback={<ProfileLoadingSkeleton />}>
       {profile ? (
-        <ProfileExperience
-          profile={profile}
-          isOwner={isOwner}
-          viewerId={viewerId}
-        />
+        <>
+          <JsonLd
+            data={buildProfilePageJsonLd({
+              username: profile.username,
+              displayName: profile.displayName,
+              bio: profile.bio,
+              avatarUrl: profile.avatarUrl,
+            })}
+          />
+          <ProfileExperience
+            profile={profile}
+            isOwner={isOwner}
+            viewerId={viewerId}
+          />
+        </>
       ) : (
         <ProfileNotFound username={username || "unknown"} />
       )}

@@ -119,7 +119,17 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/city") ||
           path.startsWith("/live/media-lab") ||
           path.startsWith("/sandbox") ||
-          path.startsWith("/store/demo-preview")
+          path.startsWith("/store/demo-preview") ||
+          path.startsWith("/store/cart") ||
+          path.startsWith("/store/checkout") ||
+          path.startsWith("/store/orders") ||
+          path.startsWith("/store/wishlist") ||
+          path.startsWith("/life/compose") ||
+          path.startsWith("/learning/instructor") ||
+          path.startsWith("/learning/attempts") ||
+          path.startsWith("/admin") ||
+          path.startsWith("/seller") ||
+          path.startsWith("/advertise/dashboard")
       ).toBe(true);
     }
   });
@@ -127,9 +137,13 @@ describe("route robots / sitemap policy", () => {
   it("sitemap includes only public static routes", () => {
     expect([...SITEMAP_STATIC_ROUTES]).toEqual([
       "/",
-      "/discover",
       "/live",
       "/watch",
+      "/life",
+      "/learning/catalog",
+      "/store",
+      "/games",
+      "/welcome",
       "/post-journey",
       "/terms",
       "/privacy",
@@ -137,6 +151,9 @@ describe("route robots / sitemap policy", () => {
       "/support",
     ]);
     expect(SITEMAP_STATIC_ROUTES).not.toContain("/following");
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/discover");
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/learning");
+    expect(SITEMAP_STATIC_ROUTES).not.toContain("/profile");
     const blocked = [
       "/login",
       "/messages",
@@ -147,8 +164,9 @@ describe("route robots / sitemap policy", () => {
       "/rewards",
       "/live/media-lab",
       "/store/demo-preview",
-      "/store",
       "/sandbox",
+      "/store/cart",
+      "/life/compose",
     ];
     for (const path of blocked) {
       expect(SITEMAP_STATIC_ROUTES).not.toContain(path);

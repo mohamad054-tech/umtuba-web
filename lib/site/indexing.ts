@@ -2,12 +2,16 @@
  * Route indexing policy for robots.txt and page-level robots metadata.
  *
  * Index (public marketing / discovery / profiles):
- * - /, /discover, /live, /watch, /post-journey, /terms, /privacy, /account-deletion, /support, /profile/*, /invite/*, /join
+ * - /, /discover, /live, /watch, /life, /learning/catalog, /store, /games,
+ *   /welcome, /post-journey, /terms, /privacy, /account-deletion, /support,
+ *   /profile/[username], /invite/*
  *
  * Noindex (auth, account, private, gated labs):
  * - login, signup, register, password reset, auth callbacks
  * - settings, messages, notifications, create, saved, rewards, creator
+ * - /learning (My Learning hub), /life/compose, cart/checkout/orders/wishlist
  * - feed, journey-pro, city, live/media-lab, sandbox, store/demo-preview
+ * - admin, seller, instructor, attempts
  *
  * Dynamic live rooms (/live/[roomId]) are allowlisted for crawling when linked
  * but are not enumerated in the sitemap.
@@ -34,6 +38,16 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/live/media-lab",
   "/sandbox",
   "/store/demo-preview",
+  "/store/cart",
+  "/store/checkout",
+  "/store/orders",
+  "/store/wishlist",
+  "/life/compose",
+  "/learning/instructor",
+  "/learning/attempts",
+  "/admin",
+  "/seller",
+  "/advertise/dashboard",
 ] as const;
 
 /**
@@ -42,9 +56,13 @@ export const ROBOTS_DISALLOW_PATHS = [
  */
 export const SITEMAP_STATIC_ROUTES = [
   "/",
-  "/discover",
   "/live",
   "/watch",
+  "/life",
+  "/learning/catalog",
+  "/store",
+  "/games",
+  "/welcome",
   "/post-journey",
   "/terms",
   "/privacy",

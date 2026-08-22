@@ -1,47 +1,46 @@
-# CURSOR_REPORT — Surgical live web defects V1 2026-08-22
+# CURSOR_REPORT — Google SEO full optimization V1 2026-08-22
 
 ```text
-TASK_ID = CENTRAL_WEB_VISIBLE_REGRESSIONS_AND_SOCIAL_RECOVERY_SURGICAL_V1
-STATUS = SOURCE_READY_PENDING_DEPLOY
-START_PRODUCTION_SHA = 71f289cba6212c50db9f0f237ac1e145b2936dcc
-START_LIVE_RELEASE = 71f289cb-20260821235319
-WEB_BRANCH = central/web-visible-regressions-surgical-v1
-WEB_WORKTREE = D:\umtuba-central\repos\umtuba-web-visible-regressions-surgical-v1
+TASK_ID = CENTRAL_UMTUBA_GOOGLE_SEO_FULL_OPTIMIZATION_V1
+STATUS = VERIFIED_PENDING_DEPLOY
+START_PRODUCTION_SHA = 9f937e2ff7cd13c8cba5cebf94ea4e9f48dae3fc
+START_LIVE_RELEASE = 9f937e2f-20260821213212
+WEB_BRANCH = central/web-google-seo-full-optimization-v1
+WEB_WORKTREE = D:\umtuba-central\repos\umtuba-web-google-seo-full-optimization-v1
+TYPECHECK = PASS
+TESTS = PASS
+BUILD = PASS
+GIT_DIFF_CHECK = PASS
 MOBILE_SOURCE_CHANGED = NO
 ```
 
 ## Summary
 
-Live `BUILD_ID=rCelyWLoOrXaSjv2MWSne` matches `71f289cb`. The 13-locale listbox was deployed, but it stayed inside overflow-hidden / backdrop-blur ancestors so RTL users still saw العربية plus a blank sheet. Menu is now portaled to `document.body` with solid option colors. Arabic secondary ink raised (`#e9ecf4`) with weight 600. Facebook-style Profile is already live at `/profile` (`9ffc49d1` ancestor of production). Home not replaced. Full report: `D:\umtuba-central\reports\UMTUBA_CENTRAL_WEB_VISIBLE_REGRESSIONS_AND_SOCIAL_RECOVERY_SURGICAL_V1.md`.
+Audited live `9f937e2f-20260821213212`. Production already had brand metadata, `?hl=` hreflang, Watch VideoObject, and a static sitemap that omitted Life / Learning / Store. Implemented public sitemap expansion, truthful JSON-LD, localized titles/descriptions for 13 locales, unique per-page metadata, and noindex for cart/checkout/account surfaces. No ranking claims.
 
 ## Exact files changed
 
-- `app/components/i18n/LanguageSelector.tsx`
-- `app/globals.css`
-- `lib/i18n/languageSelector.test.ts`
-- `lib/i18n/arabicReadability.test.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+See Central report. No mobile files. No SQL.
 
 ## Migrations created
 
-NONE.
+None.
 
 ## Security review
 
-No schema, RLS, or secret changes. Locale cookie persist path unchanged.
+No auth/session/secret change. Public metadata uses safe fields only. Signed image URLs rejected. Sandbox catalog excluded from sitemap/Product URLs. Cart/checkout/orders/wishlist noindex.
 
 ## Tests
 
-40 targeted PASS (`languageSelector`, `arabicReadability`, `i18nFoundation`, `shellCoherence`).
+Targeted SEO + metadata + video + legal + sandbox + UM Life contract PASS.
 
 ## TypeScript
 
-PASS (`tsc --noEmit` via build).
+`npx tsc --noEmit` PASS.
 
 ## Build
 
-PASS. Local `BUILD_ID=YPFjoWRPhzG10dO9LH1XS`.
+`npm run build` PASS. `/sitemap.xml` is dynamic.
 
 ## git diff --check
 
@@ -49,8 +48,8 @@ PASS.
 
 ## git status --short
 
-See commit.
+Feature files staged for commit on `central/web-google-seo-full-optimization-v1`.
 
 ## Open issues
 
-Live proof + production cutover still required after this source commit. Browser MCP tabs vanish on this host.
+Google Search Console verification token is not present and was not invented. Operator must add the token in GSC if they want property verification.

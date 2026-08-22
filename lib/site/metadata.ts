@@ -6,7 +6,9 @@ import {
   DEFAULT_TITLE,
   TITLE_TEMPLATE,
 } from "./brand";
+import type { AppLocale } from "../i18n/locales";
 import { buildHreflangLanguages } from "./hreflang";
+import { ogLocaleFor } from "./ogLocale";
 import { getSiteUrl } from "./siteUrl";
 
 const OG_IMAGE_PATH = "/opengraph-image.png";
@@ -29,6 +31,8 @@ export type BuildPageMetadataInput = {
   imageAlt?: string;
   /** When false, skip hreflang (private / noindex surfaces). Default: index pages only. */
   hreflang?: boolean;
+  /** Request locale for og:locale. Cookie/`hl` architecture — not a path prefix. */
+  locale?: AppLocale;
 };
 
 function normalizePath(path: string): string {
@@ -88,7 +92,7 @@ export function buildPageMetadata(input: BuildPageMetadataInput): Metadata {
     robots: robotsFor(index),
     openGraph: {
       type: ogType,
-      locale: "en_US",
+      locale: input.locale ? ogLocaleFor(input.locale) : "en_US",
       url: path,
       siteName: BRAND.name,
       title: input.title,
