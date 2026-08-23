@@ -23,8 +23,10 @@ export default async function AdminStoreOverviewPage() {
           Moderation queue overview
         </h2>
         <p className="mt-2 text-sm text-white/50">
-          Internal console for seller applications and product review. Checkout,
-          payments, and shipping remain outside this slice.
+          This is the platform-admin Seller Approval path. Open Seller
+          applications to approve, reject, or suspend. Checkout, payments, and
+          shipping remain outside this slice. Ordinary sellers cannot use this
+          console.
         </p>
       </section>
 

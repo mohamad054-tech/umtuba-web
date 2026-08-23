@@ -54,7 +54,7 @@ export function assertSellerApplicationAction(
   action: "approve" | "reject" | "suspend"
 ): { ok: true } | { ok: false; message: string } {
   if (action === "approve" || action === "reject") {
-    if (status !== "pending") {
+    if (status !== "pending" && status !== "pending_review") {
       return { ok: false, message: "Seller application is not pending." };
     }
     return { ok: true };
@@ -62,7 +62,11 @@ export function assertSellerApplicationAction(
   if (status === "suspended") {
     return { ok: false, message: "Seller application is already suspended." };
   }
-  if (status !== "pending" && status !== "approved") {
+  if (
+    status !== "pending" &&
+    status !== "pending_review" &&
+    status !== "approved"
+  ) {
     return {
       ok: false,
       message: "Only pending or approved seller applications can be suspended.",

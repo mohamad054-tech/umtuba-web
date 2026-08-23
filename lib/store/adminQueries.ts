@@ -20,6 +20,8 @@ export type AdminSellerApplicationRow = {
   created_at: string;
   updated_at: string;
   reviewed_at: string | null;
+  reviewed_by: string | null;
+  review_action: string | null;
 };
 
 export type AdminStoreProductModerationRow = {

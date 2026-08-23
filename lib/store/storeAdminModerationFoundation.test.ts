@@ -70,6 +70,9 @@ describe("store admin permissions", () => {
 describe("store admin workflow contracts", () => {
   it("allows approve/reject only from pending seller applications", () => {
     expect(assertSellerApplicationAction("pending", "approve").ok).toBe(true);
+    expect(assertSellerApplicationAction("pending_review", "approve").ok).toBe(
+      true
+    );
     expect(assertSellerApplicationAction("pending", "reject").ok).toBe(true);
     expect(assertSellerApplicationAction("approved", "approve").ok).toBe(false);
     expect(assertSellerApplicationAction("rejected", "reject").ok).toBe(false);
@@ -249,6 +252,22 @@ describe("store admin migration + route protection", () => {
     expect(gate).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
     expect(menu).not.toMatch(/adminStore/);
     expect(top).not.toMatch(/adminStore/);
+  });
+
+  it("ships local reviewer-audit migration without remote apply", () => {
+    const audit =
+      "supabase/migrations/20260935_store_seller_approval_reviewer_audit_v1.sql";
+    expect(existsSync(join(ROOT, audit))).toBe(true);
+    const sql = read(audit);
+    expect(sql).toMatch(/reviewed_by = reviewer/);
+    expect(sql).toMatch(/seller_application_review_events/);
+    expect(sql).toMatch(/Reviewer identity required/);
+    expect(sql).toMatch(/require_platform_admin/);
+    expect(sql).not.toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+    const actions = read("app/admin/store/SellerReviewActions.tsx");
+    expect(actions).toMatch(/pending_review/);
+    const sellers = read("app/admin/store/sellers/page.tsx");
+    expect(sellers).toMatch(/reviewed_by/);
   });
 
   it("documents reject reason requirement in the reject seller action", () => {

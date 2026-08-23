@@ -16,8 +16,11 @@ export default function SellerReviewActions({
   status,
   returnTo,
 }: Props) {
-  const pending = status === "pending";
-  const canSuspend = status === "pending" || status === "approved";
+  const pending = status === "pending" || status === "pending_review";
+  const canSuspend =
+    status === "pending" ||
+    status === "pending_review" ||
+    status === "approved";
 
   return (
     <div className="mt-4 space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">

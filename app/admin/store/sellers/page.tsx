@@ -204,6 +204,18 @@ export default async function AdminStoreSellersPage({ searchParams }: PageProps)
                 </div>
               </dl>
 
+              {selected.reviewed_at || selected.reviewed_by ? (
+                <p className="mt-4 text-sm text-white/60">
+                  Last review
+                  {selected.review_action ? ` (${selected.review_action})` : ""}
+                  {selected.reviewed_at ? ` at ${formatWhen(selected.reviewed_at)}` : ""}
+                  {selected.reviewed_by
+                    ? ` by admin ${selected.reviewed_by}`
+                    : ""}
+                  .
+                </p>
+              ) : null}
+
               {selected.review_note ? (
                 <p className="mt-4 rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-sm text-white/70">
                   <span className="font-bold text-white/50">Review note: </span>
