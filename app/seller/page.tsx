@@ -5,6 +5,7 @@ import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { getOwnedOrMemberStore } from "../../lib/store/sellerStore";
 import { getLatestSellerApplication } from "../../lib/store/sellerApplications";
+import { resolveSellerStoreAccess } from "../../lib/store/sellerStoreAccess";
 
 export const metadata = {
   title: "Seller | UMTUBA",
@@ -18,6 +19,10 @@ const STATUS_COPY: Record<string, { title: string; body: string }> = {
   pending: {
     title: "Store setup under review",
     body: "An operator is reviewing your store setup. This usually takes a short while — check back soon.",
+  },
+  pending_review: {
+    title: "Store setup under review",
+    body: "An operator is reviewing your store setup. Seller Center unlocks after platform approval. This usually takes a short while — check back soon.",
   },
   rejected: {
     title: "Store setup not approved",
@@ -47,6 +52,8 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
     getOwnedOrMemberStore(supabase, user.id),
     getLatestSellerApplication(supabase, user.id),
   ]);
+  const access = resolveSellerStoreAccess({ membership, application });
+  const statusCopy = STATUS_COPY[access] ?? STATUS_COPY[application?.status ?? ""];
 
   return (
     <main
@@ -64,7 +71,7 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
           </p>
         ) : null}
 
-        {membership ? (
+        {access === "approved" && membership ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               @{membership.store.slug}
@@ -103,23 +110,23 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
               </Link>
             </div>
           </section>
-        ) : application && STATUS_COPY[application.status] ? (
+        ) : statusCopy ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-              @{application.proposed_store_slug}
+              @{application?.proposed_store_slug || membership?.store.slug || "seller"}
             </p>
             <h1 className="mt-1 text-2xl font-black tracking-tight">
-              {STATUS_COPY[application.status].title}
+              {statusCopy.title}
             </h1>
             <p className="mt-2 text-sm text-white/50">
-              {STATUS_COPY[application.status].body}
+              {statusCopy.body}
             </p>
-            {application.review_note ? (
+            {application?.review_note ? (
               <p className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/60">
                 Reviewer note: {application.review_note}
               </p>
             ) : null}
-            {application.status === "draft" ? (
+            {application?.status === "draft" || access === "setup" ? (
               <Link
                 href={APP_ROUTES.sellerSetup}
                 className="watch-focus-ring mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
@@ -127,7 +134,7 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
                 Resume store setup
               </Link>
             ) : null}
-            {application.status === "rejected" ? (
+            {application?.status === "rejected" || access === "rejected" ? (
               <Link
                 href={APP_ROUTES.sellerSetup}
                 className="watch-focus-ring mt-6 inline-block rounded-full bg-white px-5 py-2.5 text-sm font-black text-black"
