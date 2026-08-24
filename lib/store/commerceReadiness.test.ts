@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   COMMISSION_POLICY_ARCHITECTURE,
@@ -43,7 +43,7 @@ import { createDraftProduct } from "./sellerStore";
 import { applyToBecomeSeller } from "./sellerApplications";
 
 const ROOT = process.cwd();
-const MIGRATION =
+const FORBIDDEN_STORE_20260934 =
   "supabase/migrations/20260934_store_seller_center_commerce_readiness_v1.sql";
 const SELLER_RLS =
   "supabase/migrations/20260810_store_seller_self_service_v1.sql";
@@ -342,21 +342,31 @@ describe("seller isolation / RLS contracts", () => {
     expect(sql).toMatch(/store_members|owner_user_id|auth\.uid\(\)/);
   });
 
-  it("ships fail-closed return/review/commission SQL without payout execution", () => {
-    expect(existsSync(join(ROOT, MIGRATION))).toBe(true);
-    const sql = read(MIGRATION);
-    expect(sql).toMatch(/return_requested/);
-    expect(sql).toMatch(/returned/);
-    expect(sql).toMatch(/force row level security/);
-    expect(sql).toMatch(/request_store_order_return/);
-    expect(sql).toMatch(/confirm_store_order_returned/);
-    expect(sql).toMatch(/submit_store_product_review/);
-    expect(sql).toMatch(/Only the buyer can request a return/);
-    expect(sql).toMatch(/Sellers cannot review their own products/);
-    expect(sql).toMatch(/status in \('draft', 'inactive'\)/);
-    expect(sql).not.toMatch(/create table if not exists public\.(stripe|paypal)/i);
-    expect(sql).not.toMatch(/rate_bps integer not null default/);
-    expect(sql).toMatch(/refund_executed', false/);
-    expect(sql).toMatch(/payout_executed', false/);
+  it("does not ship Store 20260934 SQL and keeps capture/payout fail-closed in source", () => {
+    expect(existsSync(join(ROOT, FORBIDDEN_STORE_20260934))).toBe(false);
+    const migrationNames = readdirSync(join(ROOT, "supabase/migrations"));
+    expect(
+      migrationNames.some((name) =>
+        name.startsWith("20260934_store_seller_center")
+      )
+    ).toBe(false);
+    expect(migrationNames.some((name) => name.startsWith("20260931"))).toBe(false);
+    expect(migrationNames.some((name) => name.startsWith("20260929"))).toBe(false);
+
+    const readiness = read("lib/store/commerceReadiness.ts");
+    expect(readiness).toMatch(/REAL_PAYMENT_CAPTURE = "DISABLED"/);
+    expect(readiness).toMatch(/REAL_SELLER_PAYOUT = "DISABLED"/);
+    expect(readiness).toMatch(/PAYMENT_PROVIDER_CONNECTED = "NO"/);
+    expect(readiness).not.toMatch(/create table if not exists public\.(stripe|paypal)/i);
+    expect(readiness).not.toMatch(/rate_bps integer not null default/);
+    expect(canExecuteRealPaymentCapture()).toBe(false);
+    expect(canExecuteRealSellerPayout()).toBe(false);
+    expect(canExecuteRealRefund()).toBe(false);
+    expect(currentCommissionRateBps()).toBeNull();
+    expect(assertRefundExecutionBlocked()).toEqual({
+      ok: false,
+      message:
+        "Real refund execution is disabled. Return state may be recorded; money is not moved.",
+    });
   });
 });
