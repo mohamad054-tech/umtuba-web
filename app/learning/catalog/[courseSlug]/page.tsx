@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
 import { resolveRequestLocale } from "../../../../lib/i18n/server";
-import { createClient } from "../../../../lib/supabase/server";
-import { loadPublicCourseBySlug } from "../../../../lib/learning/publicCatalog";
 import { buildPageMetadata } from "../../../../lib/site/metadata";
 import { BRAND } from "../../../../lib/site/brand";
 import {
   loadLearningCourseSurface,
   shouldPreferLiveLearningData,
 } from "../../../../lib/learning/productization";
+import { getCachedPublicCourseBySlug } from "../../../../lib/learning/productization/requestCache";
 import CourseDetailView from "../../../components/learning/visual/CourseDetailView";
 
 export const dynamic = "force-dynamic";
@@ -28,8 +27,7 @@ export async function generateMetadata({ params }: PageProps) {
       locale,
     });
   }
-  const supabase = await createClient();
-  const landing = await loadPublicCourseBySlug(supabase, courseSlug);
+  const landing = await getCachedPublicCourseBySlug(courseSlug);
   const path = `/learning/catalog/${courseSlug}`;
   if (!landing) {
     return buildPageMetadata({
