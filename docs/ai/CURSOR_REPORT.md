@@ -1,58 +1,86 @@
-# CURSOR_REPORT — 13-locale final closeout V1 2026-08-22
-
-```text
-TASK_ID = CENTRAL_WEB_13_LOCALE_RUNTIME_CERTIFICATION_AND_COMPLETION_V1
-STATUS = CLOSEOUT_GATES_PASS
-BASE_SHA = 57de1988fc546f5c4f0acdd5e207c48aba1d82ef
-WEB_BRANCH = central/web-13-locale-runtime-certification-v1
-TYPECHECK = PASS
-TESTS = PASS
-BUILD = PASS
-13_LOCALE_MATRIX_COMPLETE = YES
-AR_PROFILE_ENGLISH_LEAK_FIXED = CANDIDATE_YES
-UNINTENDED_USER_VISIBLE_PRODUCT_ENGLISH_REMAINING = NO
-RUNTIME_VERIFIED_LOCAL = YES
-READY_FOR_PRODUCTION_DEPLOY = YES
-```
+# CURSOR_REPORT — DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
 
 ## Summary
 
-9fb03888 was blocked because leftover user-visible English remained. This closeout wired linked-article, empty/error panels, live buckets, photo lightbox, identity aria, pinned rail, posts/articles/courses/products chrome, and content-card kind/badge/CTA labels. Candidate local `/profile/marenapost?hl=ar` stays clean. IA contracts, mock UGC, brands, and creator-entered text were left untranslated.
+Central-accepted Learning productization is preserved. The worktree `node_modules` junction was replaced with a real local `npm ci` install (Next 16.2.11). No product code was changed to make the build pass. `npx tsc --noEmit`, 25 targeted Learning tests, and `npm run build` all passed. A clean local commit is created on `desktop/learning-approved-design-productization-v1`. Not pushed. Parent public Supabase keys were used (names only; values not printed) and public Learning surfaces now render the live catalog banner. Historical `e7c84c66` remains unavailable and non-blocking.
+
+```
+TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+STATUS = FINAL COMPLETE
+CANDIDATE_PRESERVED = YES
+PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
+NODE_MODULES_JUNCTION_FIXED = YES
+TYPECHECK = PASS
+TARGETED_TESTS = PASS_25
+PRODUCTION_BUILD = PASS
+LOCAL_SMOKE = PASS
+OWNER_APPROVED_DESIGN_PRESERVED = YES
+ARABIC_RTL = PASS
+DESKTOP_RESPONSIVE = PASS
+MOBILE_WEB_RESPONSIVE = PASS
+REAL_DATA_CONNECTED = YES_PUBLIC_READ
+SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
+HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
+BRANCH = desktop/learning-approved-design-productization-v1
+WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
+COMMIT_CREATED = YES
+PUSHED = NO
+DEPLOYED = NO
+NEW_MIGRATION = NO
+MIGRATION_20260934_APPLIED = NO
+MOBILE_NATIVE_TOUCHED = NO
+```
 
 ## Exact files changed
 
-Profile panels, ContentCard, 13 catalogs, closeout splice scripts, targeted wiring tests. No mobile. No SQL.
+Authorized Learning productization only (this worktree/branch):
+
+- Learning pages and visual/teacher components
+- `lib/learning/productization/**` plus teacher/review/welcome/visualDemo modules
+- i18n teacher catalogs + locale message wiring
+- Labeled `public/demo/learning` fixtures
+- Unapplied `supabase/migrations/20260934_learning_teacher_student_platform_v1.sql`
+- Packets under `docs/ops/learning-approved-design-productization-v1/` and `docs/ops/learning-final-engineering-gates-v1/`
+- This report / current-task handoff
+
+Not changed for the build fix: `next.config.ts`, `package-lock.json`. Not committed: `.env.local`, parent profile-hero dirt, android/store docs, other worktrees.
 
 ## Migrations created
 
-None.
+None. Inherited `20260934_learning_teacher_student_platform_v1.sql` is present and was **not** applied.
 
 ## Security review
 
-No auth/session/secret change. Host env must be sourced without printing values.
+- Parent `.env.local` inspected for key **names** only. Values never printed.
+- Copied only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` into the gitignored worktree `.env.local`.
+- Service-role, Livekit, and Twilio secrets were not copied.
+- Demo flags remain `0`. Teacher approval not faked. Payments remain disabled.
+- `_port_extract` not touched. Windows Desktop not used as an artifact destination.
+- `umtuba-mobile` not touched.
 
 ## Tests
 
-54 targeted tests PASS.
+PASS — 25 targeted vitest (`productization`, `visualDemo`, teacher catalogs/platform/studio/reviews/welcome/earnings).
 
 ## TypeScript
 
-`tsc --noEmit` PASS.
+PASS — `npx tsc --noEmit` after removing stale junction/webpack `.next` types.
 
 ## Build
 
-`npm run build` PASS.
+PASS — `npm run build` (Next 16.2.11 Turbopack).
 
 ## git diff --check
 
-PASS (CRLF warnings only).
+PASS (productization worktree, committed paths).
 
 ## git status --short
 
-Closeout files on `central/web-13-locale-runtime-certification-v1`.
+Recorded after the authorized local commit. Parent office/profile-hero working tree remains dirty and untouched by this commit.
 
 ## Open issues
 
-- Production still on `57de1988` until this closeout SHA is cut over.
-- IA English constants remain in source by design.
-- Mock profile UGC remains English (not production UI).
+- `e7c84c668c251ca6b386a60b2b3c01a89eeb7e1b` still not fetchable (`not our ref`).
+- `20260934` not applied. Authenticated writes / RLS persistence not exercised.
+- Turbopack warns that the parent lockfile can be inferred as workspace root. Build still passed without adding `turbopack.root`.
+- PUSHED = NO. Deploy not authorized.

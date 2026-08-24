@@ -1,9 +1,11 @@
 import { storeZhCNMessages } from "./storeCatalogs";
+import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const zhCNMessages: FoundationMessages = {
   ...storeZhCNMessages,
+  ...teacherEnMessages,
   "languages.ar": "阿拉伯语",
   "languages.en": "英语",
   "languages.fr": "法语",
