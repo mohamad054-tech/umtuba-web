@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import "../../../components/store/storefront.css";
 import AppTopNav from "../../../components/AppTopNav";
 import ShippingAdminClient from "../../../components/store/ShippingAdminClient";
 import StoreErrorState from "../../../components/store/StoreErrorState";
@@ -52,7 +53,7 @@ export default async function SellerStoreShippingPage() {
   if (!providersResult.ok) {
     return (
       <main
-        className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+        className={`storefront-premium min-h-screen text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
       >
         <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
           <AppTopNav title="Shipping" subtitle={membership.store.name} />
@@ -67,7 +68,7 @@ export default async function SellerStoreShippingPage() {
   if (!zonesResult.ok) {
     return (
       <main
-        className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+        className={`storefront-premium min-h-screen text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
       >
         <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
           <AppTopNav title="Shipping" subtitle={membership.store.name} />
@@ -87,7 +88,7 @@ export default async function SellerStoreShippingPage() {
 
   return (
     <main
-      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`storefront-premium min-h-screen text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
         <AppTopNav title="Shipping" subtitle={membership.store.name} />

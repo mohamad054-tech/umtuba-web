@@ -77,7 +77,7 @@ export default async function SellerProductsPage() {
           {canManage ? (
             <Link
               href="/seller/store/products/new"
-              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712]"
+              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-white"
             >
               New draft
             </Link>

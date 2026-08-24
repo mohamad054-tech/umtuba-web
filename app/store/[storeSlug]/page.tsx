@@ -166,7 +166,7 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
               aria-hidden
               style={{
                 backgroundImage:
-                  "linear-gradient(135deg, #12121a 0%, #0a0a10 48%, #1a1712 100%), radial-gradient(circle at 78% 22%, rgba(214,196,161,0.22), transparent 42%)",
+                  "linear-gradient(135deg, #0b1a33 0%, #06101f 48%, #12224a 100%), radial-gradient(circle at 78% 22%, rgba(106,76,255,0.28), transparent 42%)",
               }}
             />
           )}
@@ -176,7 +176,7 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
           <div className="-mt-10 flex flex-wrap items-end justify-between gap-4">
             <div className="flex items-end gap-4">
               <div
-                className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[22px] border border-[rgba(214,196,161,0.4)] bg-[linear-gradient(145deg,rgba(214,196,161,0.28),rgba(255,255,255,0.06))] text-2xl font-semibold text-[var(--sf-accent-strong)] shadow-lg shadow-black/40"
+                className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-[22px] border border-[rgba(106,76,255,0.4)] bg-[linear-gradient(145deg,rgba(106,76,255,0.28),rgba(255,255,255,0.06))] text-2xl font-semibold text-[var(--sf-accent-strong)] shadow-lg shadow-black/40"
                 aria-label={t("store.profile.logoFor", { values: { name: store.name } })}
               >
                 {logoUrl ? (

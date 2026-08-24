@@ -152,7 +152,7 @@ export default function CartView({
         {multiNotice ? (
           <p
             role="note"
-            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[rgba(214,196,161,0.06)] px-4 py-3 text-sm leading-relaxed text-[var(--sf-muted)]"
+            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[rgba(106,76,255),0.06)] px-4 py-3 text-sm leading-relaxed text-[var(--sf-muted)]"
           >
             {multiNotice}
           </p>

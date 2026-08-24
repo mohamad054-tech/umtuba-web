@@ -430,7 +430,7 @@ export default function CheckoutClient({
                     <span
                       className={`mx-1 h-px w-6 ${
                         done || current
-                          ? "bg-[rgba(214,196,161,0.45)]"
+                          ? "bg-[rgba(106,76,255),0.45)]"
                           : "bg-[var(--sf-line)]"
                       }`}
                       aria-hidden
@@ -439,7 +439,7 @@ export default function CheckoutClient({
                   <span
                     className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] ${
                       current
-                        ? "border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong)]"
+                        ? "border-[rgba(106,76,255),0.45)] bg-[rgba(106,76,255),0.12)] text-[var(--sf-accent-strong)]"
                         : done
                           ? "border-[rgba(159,214,184,0.35)] text-[var(--sf-ok)]"
                           : "border-transparent text-[var(--sf-faint)]"
@@ -449,7 +449,7 @@ export default function CheckoutClient({
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] ${
                         current
-                          ? "bg-[var(--sf-accent)] text-[#1a1712]"
+                          ? "bg-[var(--sf-accent)] text-white"
                           : done
                             ? "bg-[rgba(159,214,184,0.25)]"
                             : "bg-white/5"
@@ -484,7 +484,7 @@ export default function CheckoutClient({
         {multiNotice ? (
           <p
             role="note"
-            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[rgba(214,196,161,0.06)] px-4 py-3 text-sm leading-relaxed text-[var(--sf-muted)]"
+            className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[rgba(106,76,255),0.06)] px-4 py-3 text-sm leading-relaxed text-[var(--sf-muted)]"
           >
             {multiNotice}
           </p>
@@ -582,7 +582,7 @@ export default function CheckoutClient({
                   key={a.id}
                   className={`flex cursor-pointer gap-3 rounded-xl border p-3 transition ${
                     selectedAddressId === a.id
-                      ? "border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.08)]"
+                      ? "border-[rgba(106,76,255),0.45)] bg-[rgba(106,76,255),0.08)]"
                       : "border-[var(--sf-line)]"
                   }`}
                 >
@@ -706,8 +706,8 @@ export default function CheckoutClient({
           <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
             Live payment collection is not enabled. Placing an order only records
             it as pending payment and creates a deferred payment attempt — no
-            card, wallet, or gateway charge runs here. Live PSP options are
-            hidden until a provider is explicitly enabled.
+            card, wallet, or gateway charge runs here. Card and wallet methods
+            stay visible as not connected until a provider is explicitly enabled.
           </p>
           <fieldset className="mt-4 space-y-2" disabled={busy}>
             <legend className="sr-only">Payment method</legend>
@@ -716,7 +716,7 @@ export default function CheckoutClient({
             ).map((option) => (
               <label
                 key={option.provider}
-                className="flex items-center gap-3 rounded-xl border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.08)] px-3 py-2 text-sm"
+                className="flex items-center gap-3 rounded-xl border border-[rgba(156,180,255,0.35)] bg-[rgba(106,76,255,0.12)] px-3 py-2 text-sm"
               >
                 <input
                   type="radio"
@@ -729,6 +729,24 @@ export default function CheckoutClient({
               </label>
             ))}
           </fieldset>
+          <ul className="mt-4 space-y-2" aria-label="Future payment methods">
+            {[
+              "Visa / Mastercard",
+              "Apple Pay",
+              "Google Pay",
+              "PayPal",
+            ].map((label) => (
+              <li
+                key={label}
+                className="flex items-center justify-between rounded-xl border border-[var(--sf-line)] px-3 py-2 text-sm text-[var(--sf-muted)]"
+              >
+                <span>{label}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--sf-faint)]">
+                  Not connected
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5">

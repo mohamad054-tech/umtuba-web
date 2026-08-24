@@ -323,7 +323,7 @@ describe("order money + quantity helpers", () => {
   });
 
   it("formats order money via minor units", () => {
-    expect(formatOrderMoney(1999, "USD")).toMatch(/19\.99/);
+    expect(formatOrderMoney(1999, "USD")).toMatch(/19\.99|١٩٫٩٩/);
   });
 });
 

@@ -1,25 +1,34 @@
-/* Premium Storefront — shared tokens and primitives (buyer Store surfaces) */
+/* Premium Storefront — owner-approved Night Market tokens (navy / violet / blue) */
 .storefront-premium {
-  --sf-bg: #07070c;
-  --sf-surface: rgba(14, 14, 22, 0.92);
-  --sf-surface-2: rgba(20, 20, 32, 0.88);
-  --sf-ink: #f4f1ea;
-  --sf-muted: rgba(244, 241, 234, 0.58);
-  --sf-faint: rgba(244, 241, 234, 0.38);
-  --sf-line: rgba(244, 241, 234, 0.1);
-  --sf-accent: #d6c4a1;
-  --sf-accent-strong: #e8d7b5;
-  --sf-danger: #f0a8a8;
-  --sf-ok: #9fd6b8;
-  --sf-warn: #e6c98a;
+  --sf-bg: #06101f;
+  --sf-bg-2: #0b1a33;
+  --sf-surface: rgba(10, 20, 42, 0.78);
+  --sf-surface-2: rgba(12, 24, 48, 0.88);
+  --sf-ink: #eef3ff;
+  --sf-muted: rgba(238, 243, 255, 0.62);
+  --sf-faint: rgba(238, 243, 255, 0.4);
+  --sf-line: rgba(140, 170, 255, 0.16);
+  --sf-accent: #9b7cff;
+  --sf-accent-strong: #c4b4ff;
+  --sf-purple: #6a4cff;
+  --sf-blue: #2f7bff;
+  --sf-cyan: #4cc4ff;
+  --sf-price: #d7c08a;
+  --sf-danger: #ff8fa0;
+  --sf-ok: #7ee0b0;
+  --sf-warn: #f0c36b;
   --sf-radius: 1.5rem;
   --sf-radius-lg: 2rem;
   --sf-radius-sm: 0.85rem;
-  --sf-shadow: 0 24px 60px -36px rgba(0, 0, 0, 0.85);
-  --sf-focus: rgba(232, 215, 181, 0.7);
+  --sf-shadow: 0 18px 40px -24px rgba(106, 76, 255, 0.9);
+  --sf-focus: rgba(156, 180, 255, 0.75);
   --sf-control-h: 2.75rem;
   color: var(--sf-ink);
   overflow-x: clip;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(106, 76, 255, 0.22), transparent 55%),
+    radial-gradient(900px 500px at 110% 0%, rgba(47, 123, 255, 0.18), transparent 50%),
+    linear-gradient(180deg, var(--sf-bg), #040814 42%, var(--sf-bg-2));
 }
 
 .storefront-premium .sf-display {
@@ -46,8 +55,8 @@
   top: -4rem;
   z-index: 80;
   border-radius: 9999px;
-  background: var(--sf-accent-strong);
-  color: #14110c;
+  background: linear-gradient(135deg, var(--sf-purple), var(--sf-blue));
+  color: #fff;
   padding: 0.5rem 1rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -59,7 +68,7 @@
 
 .storefront-premium .sf-masthead {
   border-bottom: 1px solid var(--sf-line);
-  background: rgba(7, 7, 12, 0.92);
+  background: rgba(6, 16, 31, 0.88);
   backdrop-filter: blur(18px);
   overflow-x: clip;
 }
@@ -93,8 +102,8 @@
 }
 
 .storefront-premium .sf-btn-primary {
-  background: var(--sf-accent);
-  color: #1a1712;
+  background: linear-gradient(135deg, var(--sf-purple), var(--sf-blue));
+  color: #fff;
 }
 
 .storefront-premium .sf-btn-primary:hover:not(:disabled) {
@@ -108,7 +117,7 @@
 }
 
 .storefront-premium .sf-btn-secondary:hover:not(:disabled) {
-  border-color: rgba(214, 196, 161, 0.35);
+  border-color: rgba(156, 180, 255, 0.45);
   background: rgba(255, 255, 255, 0.09);
 }
 
@@ -119,7 +128,7 @@
 }
 
 .storefront-premium .sf-btn-ghost:hover:not(:disabled) {
-  background: rgba(214, 196, 161, 0.1);
+  background: rgba(106, 76, 255, 0.16);
 }
 
 .storefront-premium .sf-btn-danger {
@@ -145,7 +154,7 @@
 .storefront-premium .sf-input:focus,
 .storefront-premium .sf-select:focus,
 .storefront-premium .sf-textarea:focus {
-  border-color: rgba(214, 196, 161, 0.45);
+  border-color: rgba(156, 180, 255, 0.5);
 }
 
 .storefront-premium .sf-chip {
@@ -172,8 +181,8 @@
 .storefront-premium .sf-chip[aria-current="page"],
 .storefront-premium .sf-chip.is-active {
   border-color: transparent;
-  background: var(--sf-accent);
-  color: #1a1712;
+  background: linear-gradient(135deg, var(--sf-purple), var(--sf-blue));
+  color: #fff;
 }
 
 .storefront-premium .sf-card {
@@ -283,7 +292,7 @@
 .storefront-premium .sf-trust li {
   border-radius: 1.1rem;
   border: 1px solid var(--sf-line);
-  background: rgba(214, 196, 161, 0.05);
+  background: rgba(106, 76, 255, 0.08);
   padding: 0.9rem 1rem;
   font-size: 0.75rem;
   line-height: 1.45;
@@ -381,7 +390,7 @@
   background-image: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0.04) 0%,
-    rgba(214, 196, 161, 0.12) 50%,
+    rgba(106, 76, 255, 0.16) 50%,
     rgba(255, 255, 255, 0.04) 100%
   );
   background-size: 200% 100%;

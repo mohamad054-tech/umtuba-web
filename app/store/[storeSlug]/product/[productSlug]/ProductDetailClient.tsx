@@ -238,7 +238,7 @@ export default function ProductDetailClient({
                   aria-hidden
                   style={{
                     backgroundImage:
-                      "linear-gradient(160deg, rgba(214,196,161,0.18), transparent 45%), radial-gradient(circle at 70% 75%, rgba(255,255,255,0.06), transparent 50%)",
+                      "linear-gradient(160deg, rgba(106,76,255),0.18), transparent 45%), radial-gradient(circle at 70% 75%, rgba(255,255,255,0.06), transparent 50%)",
                   }}
                 />
               )}
@@ -293,8 +293,8 @@ export default function ProductDetailClient({
                     onClick={() => setMediaIndex(i)}
                     className={`watch-focus-ring relative h-16 w-16 overflow-hidden rounded-xl border transition ${
                       i === mediaIndex
-                        ? "border-[rgba(214,196,161,0.55)]"
-                        : "border-[var(--sf-line)] bg-white/5 hover:border-[rgba(214,196,161,0.35)]"
+                        ? "border-[rgba(106,76,255),0.55)]"
+                        : "border-[var(--sf-line)] bg-white/5 hover:border-[rgba(106,76,255),0.35)]"
                     }`}
                   >
                     {thumbUrl ? (
@@ -319,10 +319,10 @@ export default function ProductDetailClient({
         <section className="rounded-[var(--sf-radius-lg)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 backdrop-blur-xl md:p-7">
           <Link
             href={`/store/${detail.store.slug}`}
-            className="watch-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:bg-[rgba(214,196,161,0.16)]"
+            className="watch-focus-ring inline-flex items-center gap-2 rounded-full border border-[rgba(106,76,255),0.28)] bg-[rgba(106,76,255),0.08)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition hover:bg-[rgba(106,76,255),0.16)]"
           >
             <span
-              className="flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(214,196,161,0.22)] text-[10px] font-black"
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(106,76,255),0.22)] text-[10px] font-black"
               aria-hidden
             >
               {(detail.store.name[0] ?? "U").toUpperCase()}
@@ -344,7 +344,7 @@ export default function ProductDetailClient({
           {detail.marketplaceSourceType === "supplier_listing" ? (
             <p
               role="status"
-              className="mt-3 rounded-2xl border border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] px-3 py-2 text-xs leading-relaxed text-[var(--sf-accent-strong)]"
+              className="mt-3 rounded-2xl border border-[rgba(106,76,255),0.28)] bg-[rgba(106,76,255),0.08)] px-3 py-2 text-xs leading-relaxed text-[var(--sf-accent-strong)]"
             >
               Sold by {detail.store.name}. Product supplied by{" "}
               {detail.supplierStoreName ?? "a verified supplier"}. Inventory and
@@ -603,7 +603,7 @@ export default function ProductDetailClient({
                 <li key={video.postId}>
                   <Link
                     href={video.href}
-                    className="watch-focus-ring flex items-center justify-between gap-3 rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3 text-sm transition hover:border-[rgba(214,196,161,0.35)]"
+                    className="watch-focus-ring flex items-center justify-between gap-3 rounded-2xl border border-[var(--sf-line)] bg-white/[0.03] px-4 py-3 text-sm transition hover:border-[rgba(106,76,255),0.35)]"
                   >
                     <span className="truncate text-[var(--sf-muted)]">
                       {video.caption || `@${video.authorUsername ?? "creator"}`}

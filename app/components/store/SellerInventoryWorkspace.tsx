@@ -80,7 +80,7 @@ export default function SellerInventoryWorkspace({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Product, SKU, variant, location"
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           <label className="block space-y-2 md:w-52">
@@ -92,7 +92,7 @@ export default function SellerInventoryWorkspace({
               onChange={(event) =>
                 setSort(event.target.value as SellerInventorySortKey)
               }
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             >
               <option value="attention">Attention first</option>
               <option value="available_asc">Available · low to high</option>
@@ -115,8 +115,8 @@ export default function SellerInventoryWorkspace({
               onClick={() => setBucket(filter.id)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 bucket === filter.id
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
-                  : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(214,196,161,0.35)]"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
+                  : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(106,76,255),0.35)]"
               }`}
             >
               {filter.label}

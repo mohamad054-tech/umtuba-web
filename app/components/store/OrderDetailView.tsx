@@ -9,9 +9,11 @@ import type { OrderDetailBundle } from "../../../lib/store/orders";
 import { APP_ROUTES, buildStoreOrderHref } from "../../lib/nav";
 import BuyerCancelOrderButton from "./BuyerCancelOrderButton";
 import BuyerDeferredPaymentRecoveryButton from "./BuyerDeferredPaymentRecoveryButton";
+import BuyerReturnRequestForm from "./BuyerReturnRequestForm";
 import { OrderStatusCluster } from "./OrderStatusBadges";
 import OrderTimeline from "./OrderTimeline";
 import SellerOrderStatusForm from "./SellerOrderStatusForm";
+import SellerReturnConfirmForm from "./SellerReturnConfirmForm";
 
 type OrderDetailViewProps = {
   bundle: OrderDetailBundle;
@@ -137,6 +139,20 @@ export default function OrderDetailView({
             Cancellation unavailable: {cancelAction.reason}
           </p>
         ) : null}
+        {mode === "buyer" && order.status === "delivered" ? (
+          <div className="mt-5">
+            <BuyerReturnRequestForm
+              orderId={order.id}
+              cta="Request a return"
+              hint="Describe why you are returning this order. This records a return request only — no refund is executed."
+            />
+          </div>
+        ) : null}
+        {mode === "buyer" && order.status === "return_requested" ? (
+          <p role="status" className="mt-4 text-sm text-[var(--sf-muted)]">
+            A return has been requested. No refund was executed.
+          </p>
+        ) : null}
       </section>
 
       {mode === "buyer" && siblings.length > 0 ? (
@@ -153,7 +169,7 @@ export default function OrderDetailView({
               <li key={sibling.id}>
                 <Link
                   href={buildStoreOrderHref(sibling.id)}
-                  className="watch-focus-ring flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--sf-line)] px-4 py-3 text-sm transition hover:border-[rgba(214,196,161,0.35)]"
+                  className="watch-focus-ring flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--sf-line)] px-4 py-3 text-sm transition hover:border-[rgba(106,76,255),0.35)]"
                 >
                   <span>
                     <span className="font-semibold">{sibling.storeName}</span>
@@ -327,6 +343,11 @@ export default function OrderDetailView({
                 canUpdate={bundle.canUpdate}
               />
             </div>
+            {order.status === "return_requested" && bundle.canUpdate ? (
+              <div className="mt-4">
+                <SellerReturnConfirmForm orderId={order.id} />
+              </div>
+            ) : null}
           </section>
         ) : (
           <section className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">

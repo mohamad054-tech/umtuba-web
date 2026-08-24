@@ -45,6 +45,7 @@ export const FULFILLMENT_TO_ORDER_STATUS: Partial<
   out_for_delivery: "shipped",
   delivered: "delivered",
   cancelled: "cancelled",
+  returned: "returned",
   refunded: "refunded",
 };
 

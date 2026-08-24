@@ -21,6 +21,8 @@ const ORDER_TONE: Record<OrderStatus, Tone> = {
   shipped: "good",
   delivered: "good",
   cancelled: "bad",
+  return_requested: "warn",
+  returned: "info",
   refunded: "bad",
 };
 
@@ -41,7 +43,7 @@ const FULFILLMENT_TONE: Record<FulfillmentStatus, Tone> = {
 const TONE_CLASS: Record<Tone, string> = {
   neutral:
     "border-[var(--sf-line)] bg-white/5 text-[var(--sf-muted)]",
-  info: "border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.1)] text-[var(--sf-accent-strong)]",
+  info: "border-[rgba(106,76,255),0.35)] bg-[rgba(106,76,255),0.1)] text-[var(--sf-accent-strong)]",
   warn: "border-amber-400/25 bg-amber-500/10 text-amber-100",
   good: "border-[rgba(159,214,184,0.35)] bg-[rgba(159,214,184,0.1)] text-[var(--sf-ok)]",
   bad: "border-[rgba(240,168,168,0.35)] bg-[rgba(240,168,168,0.1)] text-[var(--sf-danger)]",

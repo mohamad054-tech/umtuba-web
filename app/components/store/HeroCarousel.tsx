@@ -77,7 +77,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
             aria-hidden
             style={{
               backgroundImage:
-                "linear-gradient(135deg, #12121a 0%, #0a0a10 48%, #1a1712 100%), radial-gradient(circle at 78% 22%, rgba(214,196,161,0.22), transparent 42%)",
+                "linear-gradient(135deg, #0b1a33 0%, #06101f 48%, #12224a 100%), radial-gradient(circle at 78% 22%, rgba(106,76,255,0.28), transparent 42%)",
             }}
           />
         )}

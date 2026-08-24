@@ -51,7 +51,7 @@ export default function SellerOrderList({ orders }: SellerOrderListProps) {
           <li key={order.id}>
             <Link
               href={buildSellerOrderHref(order.id)}
-              className="watch-focus-ring group block rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)] md:p-5"
+              className="watch-focus-ring group block rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(106,76,255),0.35)] md:p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">

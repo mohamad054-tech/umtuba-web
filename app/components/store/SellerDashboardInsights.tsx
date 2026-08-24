@@ -84,7 +84,7 @@ export default function SellerDashboardInsightsView(props: Props) {
               href={`${APP_ROUTES.sellerStore}?period=${key}`}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
                 periodKey === key
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
                   : "border-[var(--sf-line)] text-[var(--sf-muted)]"
               }`}
             >
@@ -95,7 +95,7 @@ export default function SellerDashboardInsightsView(props: Props) {
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href="/seller/store/products"
-            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712]"
+            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-white"
           >
             Products
           </Link>
@@ -287,7 +287,7 @@ export default function SellerDashboardInsightsView(props: Props) {
                   <li key={order.id}>
                     <Link
                       href={`${APP_ROUTES.sellerOrders}/${order.id}`}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--sf-line)] px-3 py-2 text-sm hover:border-[rgba(214,196,161,0.35)]"
+                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--sf-line)] px-3 py-2 text-sm hover:border-[rgba(106,76,255),0.35)]"
                     >
                       <span>
                         {order.orderNumber} · {order.status} ·{" "}
@@ -324,7 +324,7 @@ export default function SellerDashboardInsightsView(props: Props) {
                   card,
                   APP_ROUTES.sellerOrders
                 )}
-                className="rounded-xl border border-[var(--sf-line)] bg-black/20 px-3 py-2 hover:border-[rgba(214,196,161,0.35)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/20 px-3 py-2 hover:border-[rgba(106,76,255),0.35)]"
               >
                 <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-faint)]">
                   {card.label}

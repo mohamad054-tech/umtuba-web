@@ -200,6 +200,8 @@ export const ORDER_STATUSES = [
   "shipped",
   "delivered",
   "cancelled",
+  "return_requested",
+  "returned",
   "refunded",
 ] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];

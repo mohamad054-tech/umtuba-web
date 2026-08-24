@@ -279,12 +279,18 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           Hidden/archived listing counts stay on the seller Marketplace page.
           Enabling participation does not mark every product eligible.
         </p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-4">
           <Link
             href={APP_ROUTES.sellerMarketplace}
             className="text-sm font-semibold text-[var(--sf-accent-strong)] hover:underline"
           >
             Open marketplace workspace
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerEarnings}
+            className="text-sm font-semibold text-[var(--sf-accent-strong)] hover:underline"
+          >
+            Earnings architecture
           </Link>
         </div>
       </section>
@@ -306,7 +312,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
               name="name"
               required
               defaultValue={membership.store.name}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           <label className="block space-y-2">
@@ -317,7 +323,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
               name="description"
               rows={4}
               defaultValue={membership.store.description ?? ""}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           <label className="block space-y-2">
@@ -328,7 +334,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
               name="city"
               defaultValue={membership.store.city ?? ""}
               maxLength={80}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -341,7 +347,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
                 type="email"
                 defaultValue={membership.store.public_contact_email ?? ""}
                 maxLength={160}
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
               />
             </label>
             <label className="block space-y-2">
@@ -352,7 +358,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
                 name="publicContactPhone"
                 defaultValue={membership.store.public_contact_phone ?? ""}
                 maxLength={40}
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
               />
             </label>
           </div>
@@ -365,7 +371,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
               placeholder="https://…"
               defaultValue={membership.store.public_contact_url ?? ""}
               maxLength={300}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           {canManage ? (
@@ -391,7 +397,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           <button
             type="submit"
             disabled={!canManage}
-            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712] disabled:opacity-40"
+            className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-white disabled:opacity-40"
           >
             Save changes
           </button>

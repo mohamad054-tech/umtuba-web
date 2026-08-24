@@ -50,6 +50,12 @@ export type BuyerOrderAction =
       label: string;
       enabled: boolean;
       reason?: string;
+    }
+  | {
+      id: "request_return";
+      label: string;
+      enabled: boolean;
+      reason?: string;
     };
 
 export type ConfirmedTimelineEvent = {
@@ -67,6 +73,8 @@ const ORDER_BUYER_LABELS: Record<OrderStatus, string> = {
   shipped: "Handed to shipping",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  return_requested: "Return requested",
+  returned: "Returned",
   refunded: "Refunded",
 };
 
@@ -268,7 +276,12 @@ export function canBuyerCancelUnpaidOrder(input: {
       reason: "Only unpaid pending-payment orders can be cancelled here.",
     };
   }
-  if (input.status === "cancelled" || input.status === "refunded") {
+  if (
+    input.status === "cancelled" ||
+    input.status === "refunded" ||
+    input.status === "return_requested" ||
+    input.status === "returned"
+  ) {
     return { ok: false, reason: "Order is already closed." };
   }
   if (input.status === "shipped" || input.status === "delivered") {
@@ -381,6 +394,24 @@ export function deriveBuyerOrderActions(input: {
           label: "Record deferred payment attempt",
           enabled: false,
           reason: retry.reason,
+        }
+  );
+
+  actions.push(
+    input.status === "delivered"
+      ? {
+          id: "request_return",
+          label: "Request a return",
+          enabled: true,
+        }
+      : {
+          id: "request_return",
+          label: "Request a return",
+          enabled: false,
+          reason:
+            input.status === "return_requested"
+              ? "A return has already been requested."
+              : "Returns can be requested only after delivery.",
         }
   );
 

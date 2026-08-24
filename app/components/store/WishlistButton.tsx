@@ -87,7 +87,7 @@ function HeartIcon({ filled }: { filled: boolean }) {
     <svg
       viewBox="0 0 24 24"
       className={`h-5 w-5 ${
-        filled ? "text-[var(--sf-accent-strong,#e8d7b5)]" : "text-current"
+        filled ? "text-[var(--sf-accent-strong,#c4b4ff)]" : "text-current"
       }`}
       fill={filled ? "currentColor" : "none"}
       stroke="currentColor"

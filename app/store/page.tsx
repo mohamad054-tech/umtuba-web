@@ -11,6 +11,7 @@ import StoreErrorState from "../components/store/StoreErrorState";
 import StoreSection from "../components/store/StoreSection";
 import StoreShell from "../components/store/StoreShell";
 import StoreTrustStrip from "../components/store/StoreTrustStrip";
+import BecomeASellerHook from "../components/store/BecomeASellerHook";
 import { APP_ROUTES } from "../lib/nav";
 import {
   deriveCuratedCollections,
@@ -45,15 +46,22 @@ export async function generateMetadata() {
 }
 
 export default async function StoreHomePage() {
-  const [{ locale }, supabase] = await Promise.all([
-    resolveRequestLocale(),
-    createClient(),
-  ]);
+  const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
-  const [categories, catalog] = await Promise.all([
-    listActiveCategories(supabase),
-    listPublicCatalog(supabase, { limit: 48 }),
-  ]);
+  let categories: Awaited<ReturnType<typeof listActiveCategories>> = [];
+  let catalog: Awaited<ReturnType<typeof listPublicCatalog>> = {
+    items: [],
+    error: null,
+  };
+  try {
+    const supabase = await createClient();
+    [categories, catalog] = await Promise.all([
+      listActiveCategories(supabase),
+      listPublicCatalog(supabase, { limit: 48 }),
+    ]);
+  } catch {
+    catalog = { items: [], error: "Unable to load catalog." };
+  }
 
   const items = catalog.items;
   const trending = pickTrending(items, 8);
@@ -100,6 +108,14 @@ export default async function StoreHomePage() {
     <StoreShell title={t("store.shell.title")} subtitle={t("store.shell.subtitle")}>
       <HeroCarousel slides={heroSlides} />
       <StoreTrustStrip />
+      <div className="mt-8">
+        <BecomeASellerHook
+          eyebrow={t("store.home.becomeSellerEyebrow")}
+          title={t("store.home.becomeSellerTitle")}
+          body={t("store.home.becomeSellerBody")}
+          cta={t("store.home.becomeSellerCta")}
+        />
+      </div>
 
       {catalog.error ? (
         <div className="mt-6">

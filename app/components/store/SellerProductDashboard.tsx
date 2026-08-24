@@ -115,7 +115,7 @@ export default function SellerProductDashboard({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Title, slug, or status"
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
           <label className="block space-y-2 md:w-48">
@@ -127,7 +127,7 @@ export default function SellerProductDashboard({
               onChange={(event) =>
                 setSort(event.target.value as SellerCatalogSortKey)
               }
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 px-4 py-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             >
               <option value="updated_desc">Updated · newest</option>
               <option value="updated_asc">Updated · oldest</option>
@@ -151,8 +151,8 @@ export default function SellerProductDashboard({
               onClick={() => setBucket(filter.id)}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                 bucket === filter.id
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
-                  : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(214,196,161,0.35)]"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
+                  : "border-[var(--sf-line)] text-[var(--sf-muted)] hover:border-[rgba(106,76,255),0.35)]"
               }`}
             >
               {filter.label}
@@ -216,7 +216,7 @@ export default function SellerProductDashboard({
         <ul className="space-y-3">
           {filtered.map((product) => (
             <li key={product.id}>
-              <div className="group flex gap-3 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(214,196,161,0.35)] md:p-5">
+              <div className="group flex gap-3 rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 transition hover:border-[rgba(106,76,255),0.35)] md:p-5">
                 {canManage ? (
                   <input
                     type="checkbox"
@@ -244,7 +244,7 @@ export default function SellerProductDashboard({
                     </div>
                     <Link
                       href={`/seller/store/products/${product.id}/edit`}
-                      className="shrink-0 rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition group-hover:border-[rgba(214,196,161,0.45)]"
+                      className="shrink-0 rounded-full border border-[var(--sf-line)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] transition group-hover:border-[rgba(106,76,255),0.45)]"
                     >
                       Open workspace →
                     </Link>
