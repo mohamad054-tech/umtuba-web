@@ -7,10 +7,14 @@ import {
 import {
   LEARNING_PUBLIC_ROUTES,
   isUserEnrolledInCourse,
-  listPublicCatalogCourses,
-  loadPublicCourseBySlug,
+  listRelatedPublicCourses,
   type PublicCourseLanding,
 } from "../publicCatalog";
+import {
+  getCachedLearningViewer,
+  getCachedPublicCatalog,
+  getCachedPublicCourseBySlug,
+} from "./requestCache";
 import { canUserSelfEnrollInCourse } from "../publicCatalogSelfEnroll";
 import { loadTeacherCenterContext } from "../teacherCenterAccess";
 import {
@@ -130,10 +134,12 @@ export async function loadLearningHomeSurface(
   }
 
   try {
-    const { createClient, getServerUser } = await import("../../supabase/server");
-    const user = await getServerUser();
+    const { createClient } = await import("../../supabase/server");
     const supabase = await createClient();
-    const catalog = await listPublicCatalogCourses(supabase);
+    const [user, catalog] = await Promise.all([
+      getCachedLearningViewer(),
+      getCachedPublicCatalog(),
+    ]);
     const courses = catalog.map(mapPublicCardToVisual);
     let enrollments: LearningHomeSurface["enrollments"] = [];
     if (user) {
@@ -205,13 +211,20 @@ export async function loadLearningCourseSurface(
   }
 
   try {
-    const { createClient, getServerUser } = await import("../../supabase/server");
+    const { createClient } = await import("../../supabase/server");
     const supabase = await createClient();
-    const landing = await loadPublicCourseBySlug(supabase, slug);
+    const landing = await getCachedPublicCourseBySlug(slug);
     if (!landing) {
       return null;
     }
-    const user = await getServerUser();
+    const [user, reviews, relatedCards] = await Promise.all([
+      getCachedLearningViewer(),
+      loadPublicCourseReviews(supabase, landing.course.id).catch(() => ({
+        ok: false as const,
+        message: "reviews_unavailable",
+      })),
+      listRelatedPublicCourses(supabase, landing.course.id, 3),
+    ]);
     const enrolled = user
       ? await isUserEnrolledInCourse(supabase, landing.course.id, user.id)
       : false;
@@ -220,24 +233,17 @@ export async function loadLearningCourseSurface(
         ? await canUserSelfEnrollInCourse(supabase, landing.course.id)
         : false;
     const course = mapPublicLandingToVisual(landing);
-    try {
-      const reviews = await loadPublicCourseReviews(supabase, landing.course.id);
-      if (reviews.ok) {
-        course.reviews = reviews.data.map((review) => ({
-          id: review.id,
-          studentId: review.id,
-          rating: review.rating,
-          comment: { en: review.comment ?? "", ar: review.comment ?? "" },
-        }));
-      }
-    } catch {
+    if (reviews.ok) {
+      course.reviews = reviews.data.map((review) => ({
+        id: review.id,
+        studentId: review.id,
+        rating: review.rating,
+        comment: { en: review.comment ?? "", ar: review.comment ?? "" },
+      }));
+    } else {
       course.reviews = [];
     }
-    const catalog = await listPublicCatalogCourses(supabase);
-    const related = catalog
-      .filter((item) => item.id !== landing.course.id)
-      .slice(0, 3)
-      .map(mapPublicCardToVisual);
+    const related = relatedCards.map(mapPublicCardToVisual);
 
     return {
       source: "live",

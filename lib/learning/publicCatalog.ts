@@ -369,47 +369,116 @@ export async function listPublicCatalogCourses(
   const courseIds = eligible
     .map((r) => asString(r.id))
     .filter((id): id is string => Boolean(id));
+  const { moduleCounts, lessonCounts } = await loadPublicModuleLessonCounts(
+    supabase,
+    courseIds
+  );
+  return mapEligibleCourseRowsToCards(eligible, moduleCounts, lessonCounts);
+}
 
+/**
+ * Cheap related-rail fetch: a few other public courses, not the full catalog
+ * plus every published section/lesson count.
+ */
+export async function listRelatedPublicCourses(
+  supabase: AnyClient,
+  excludeCourseId: string,
+  limit = 3
+): Promise<PublicCourseCard[]> {
+  const excluded = asString(excludeCourseId);
+  const take = Number.isFinite(limit) ? Math.max(1, Math.min(6, Math.trunc(limit))) : 3;
+  let query = supabase
+    .from("learning_courses")
+    .select(
+      "id, name, slug, description, difficulty, estimated_duration_minutes, marketplace_ready, branding_metadata, ai_metadata, status, visibility, position"
+    )
+    .eq("status", "published")
+    .eq("visibility", "public")
+    .order("position", { ascending: true })
+    .limit(take + (excluded ? 1 : 0));
+  if (excluded) {
+    query = query.neq("id", excluded);
+  }
+  const { data, error } = await query;
+  if (error || !data?.length) return [];
+
+  const eligible = data
+    .filter((row) =>
+      isPublicCatalogEligible({
+        status: asString(row.status),
+        visibility: asString(row.visibility),
+      })
+    )
+    .filter((row) => !excluded || asString(row.id) !== excluded)
+    .slice(0, take);
+  if (eligible.length === 0) return [];
+
+  const courseIds = eligible
+    .map((r) => asString(r.id))
+    .filter((id): id is string => Boolean(id));
+  const { moduleCounts, lessonCounts } = await loadPublicModuleLessonCounts(
+    supabase,
+    courseIds
+  );
+  return mapEligibleCourseRowsToCards(eligible, moduleCounts, lessonCounts);
+}
+
+async function loadPublicModuleLessonCounts(
+  supabase: AnyClient,
+  courseIds: string[]
+): Promise<{
+  moduleCounts: Map<string, number>;
+  lessonCounts: Map<string, number>;
+}> {
   const moduleCounts = new Map<string, number>();
   const lessonCounts = new Map<string, number>();
+  if (courseIds.length === 0) {
+    return { moduleCounts, lessonCounts };
+  }
 
-  if (courseIds.length > 0) {
-    const { data: sections } = await supabase
-      .from("learning_sections")
-      .select("id, course_id")
-      .in("course_id", courseIds)
+  const { data: sections } = await supabase
+    .from("learning_sections")
+    .select("id, course_id")
+    .in("course_id", courseIds)
+    .eq("status", "published")
+    .eq("visibility", "public");
+
+  const sectionIds: string[] = [];
+  const sectionCourse = new Map<string, string>();
+  for (const sec of sections ?? []) {
+    const sid = asString(sec.id);
+    const cid = asString(sec.course_id);
+    if (!sid || !cid) continue;
+    sectionIds.push(sid);
+    sectionCourse.set(sid, cid);
+    moduleCounts.set(cid, (moduleCounts.get(cid) ?? 0) + 1);
+  }
+
+  if (sectionIds.length > 0) {
+    const { data: lessons } = await supabase
+      .from("learning_lessons")
+      .select("id, section_id")
+      .in("section_id", sectionIds)
       .eq("status", "published")
       .eq("visibility", "public");
 
-    const sectionIds: string[] = [];
-    const sectionCourse = new Map<string, string>();
-    for (const sec of sections ?? []) {
-      const sid = asString(sec.id);
-      const cid = asString(sec.course_id);
-      if (!sid || !cid) continue;
-      sectionIds.push(sid);
-      sectionCourse.set(sid, cid);
-      moduleCounts.set(cid, (moduleCounts.get(cid) ?? 0) + 1);
-    }
-
-    if (sectionIds.length > 0) {
-      const { data: lessons } = await supabase
-        .from("learning_lessons")
-        .select("id, section_id")
-        .in("section_id", sectionIds)
-        .eq("status", "published")
-        .eq("visibility", "public");
-
-      for (const les of lessons ?? []) {
-        const sectionId = asString(les.section_id);
-        if (!sectionId) continue;
-        const cid = sectionCourse.get(sectionId);
-        if (!cid) continue;
-        lessonCounts.set(cid, (lessonCounts.get(cid) ?? 0) + 1);
-      }
+    for (const les of lessons ?? []) {
+      const sectionId = asString(les.section_id);
+      if (!sectionId) continue;
+      const cid = sectionCourse.get(sectionId);
+      if (!cid) continue;
+      lessonCounts.set(cid, (lessonCounts.get(cid) ?? 0) + 1);
     }
   }
 
+  return { moduleCounts, lessonCounts };
+}
+
+function mapEligibleCourseRowsToCards(
+  eligible: Array<Record<string, unknown>>,
+  moduleCounts: Map<string, number>,
+  lessonCounts: Map<string, number>
+): PublicCourseCard[] {
   const cards: PublicCourseCard[] = [];
   for (const row of eligible) {
     const id = asString(row.id);
@@ -464,25 +533,28 @@ export async function loadPublicCourseBySlug(
   const courseId = asString(courseRow.id);
   if (!courseId) return null;
 
+  const [settingsResult, sectionsResult, preview] = await Promise.all([
+    supabase
+      .from("learning_course_settings")
+      .select("allow_self_enroll")
+      .eq("course_id", courseId)
+      .maybeSingle(),
+    supabase
+      .from("learning_sections")
+      .select("id, name, slug, position")
+      .eq("course_id", courseId)
+      .eq("status", "published")
+      .eq("visibility", "public")
+      .order("position", { ascending: true }),
+    loadPublicCoursePreview(supabase, courseId),
+  ]);
+
   let allowSelfEnroll: boolean | null = null;
-  const { data: settings } = await supabase
-    .from("learning_course_settings")
-    .select("allow_self_enroll")
-    .eq("course_id", courseId)
-    .maybeSingle();
-  if (settings) {
-    allowSelfEnroll = asBooleanOrNull(settings.allow_self_enroll);
+  if (settingsResult.data) {
+    allowSelfEnroll = asBooleanOrNull(settingsResult.data.allow_self_enroll);
   }
 
-  const { data: sections } = await supabase
-    .from("learning_sections")
-    .select("id, name, slug, position")
-    .eq("course_id", courseId)
-    .eq("status", "published")
-    .eq("visibility", "public")
-    .order("position", { ascending: true });
-
-  const sectionRows = sections ?? [];
+  const sectionRows = sectionsResult.data ?? [];
   const sectionIds = sectionRows
     .map((s) => asString(s.id))
     .filter((id): id is string => Boolean(id));
@@ -550,8 +622,6 @@ export async function loadPublicCourseBySlug(
     lesson_count: curriculum.reduce((n, m) => n + m.lessons.length, 0),
   });
   if (!card) return null;
-
-  const preview = await loadPublicCoursePreview(supabase, courseId);
 
   return {
     course: card,

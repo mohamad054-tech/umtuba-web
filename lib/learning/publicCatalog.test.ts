@@ -6,6 +6,7 @@ import {
   LEARNING_PUBLIC_PREVIEW_RPCS,
   LEARNING_PUBLIC_ROUTES,
   isPublicCatalogEligible,
+  listRelatedPublicCourses,
   mapPublicCourseCard,
   mapPublicCurriculum,
   mapPublicPreview,
@@ -28,6 +29,13 @@ describe("Public Catalog Foundation V1 — routes & files", () => {
       "/learning/catalog/ai-applications-master-course"
     );
     expect(LEARNING_PUBLIC_ROUTES.catalog).not.toBe("/learning");
+    expect(typeof listRelatedPublicCourses).toBe("function");
+  });
+
+  it("loads related courses without scanning the full catalog counts first", () => {
+    const source = read("lib/learning/publicCatalog.ts");
+    expect(source).toMatch(/export async function listRelatedPublicCourses/);
+    expect(source).toMatch(/\.limit\(take/);
   });
 
   it("ships migration after 20260865", () => {
