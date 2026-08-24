@@ -21,10 +21,10 @@ export default function StoreEmptyState({
   return (
     <div
       role="status"
-      className="rounded-[var(--sf-radius)] border border-dashed border-[var(--sf-line)] bg-[rgba(214,196,161,0.04)] px-5 py-12 text-center"
+      className="rounded-[var(--sf-radius)] border border-dashed border-[var(--sf-line)] bg-[rgba(106,76,255),0.04)] px-5 py-12 text-center"
     >
       <div
-        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] text-[var(--sf-accent)]"
+        className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(106,76,255),0.28)] bg-[rgba(106,76,255),0.08)] text-[var(--sf-accent)]"
         aria-hidden
       >
         <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">

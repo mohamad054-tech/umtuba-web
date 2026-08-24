@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import "../components/store/storefront.css";
 import AppTopNav from "../components/AppTopNav";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { getOwnedOrMemberStore } from "../../lib/store/sellerStore";
-import { getLatestSellerApplication } from "../../lib/store/sellerApplications";
+import {
+  getLatestSellerApplication,
+  sellerApplicationLifecycle,
+} from "../../lib/store/sellerApplications";
+import { SELLER_LIFECYCLE_STATES } from "../../lib/store/commerceReadiness";
 
 export const metadata = {
   title: "Seller | UMTUBA",
@@ -50,7 +55,7 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
 
   return (
     <main
-      className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`storefront-premium min-h-screen text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">
         <AppTopNav title="Seller" subtitle="UMTUBA Marketplace" />
@@ -67,6 +72,9 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
         {membership ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Seller lifecycle · {SELLER_LIFECYCLE_STATES[2]}
+            </p>
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               @{membership.store.slug}
             </p>
             <h1 className="mt-1 text-3xl font-black tracking-tight">
@@ -96,6 +104,12 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
                 Orders
               </Link>
               <Link
+                href={APP_ROUTES.sellerEarnings}
+                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
+              >
+                Earnings
+              </Link>
+              <Link
                 href={`/store/${membership.store.slug}`}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80"
               >
@@ -106,6 +120,9 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
         ) : application && STATUS_COPY[application.status] ? (
           <section className="mt-6 rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 backdrop-blur-xl md:p-7">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+              Seller lifecycle · {sellerApplicationLifecycle(application.status) ?? "DRAFT"}
+            </p>
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
               @{application.proposed_store_slug}
             </p>
             <h1 className="mt-1 text-2xl font-black tracking-tight">

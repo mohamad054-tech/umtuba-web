@@ -49,7 +49,7 @@ export default function ProductCard({
   const productType = item.product.product_type;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)] hover:shadow-[var(--sf-shadow)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(156,180,255,0.45)] hover:shadow-[var(--sf-shadow)]">
       <Link href={href} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
         <span className="sr-only">
           {t("store.product.viewTitle", { values: { title: item.product.title } })}
@@ -70,7 +70,7 @@ export default function ProductCard({
             aria-hidden
             style={{
               backgroundImage:
-                "linear-gradient(160deg, rgba(214,196,161,0.16), transparent 42%), radial-gradient(circle at 70% 80%, rgba(255,255,255,0.06), transparent 50%)",
+                "linear-gradient(160deg, rgba(106,76,255,0.28), transparent 42%), radial-gradient(circle at 70% 80%, rgba(47,123,255,0.18), transparent 50%)",
             }}
           />
         )}
@@ -83,12 +83,12 @@ export default function ProductCard({
             </span>
           ) : null}
           {badge ? (
-            <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
+            <span className="rounded-full border border-[rgba(106,76,255,0.4)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
               {badge}
             </span>
           ) : null}
           {item.marketplaceSourceType === "supplier_listing" ? (
-            <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
+            <span className="rounded-full border border-[rgba(106,76,255,0.4)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
               {t("store.product.marketplace")}
             </span>
           ) : null}
@@ -147,7 +147,7 @@ export default function ProductCard({
           <div className="min-w-0">
             {price ? (
               <div className="flex flex-wrap items-baseline gap-2">
-                <span className="text-base font-semibold tracking-tight text-[var(--sf-accent-strong)]">
+                <span className="text-base font-semibold tracking-tight text-[var(--sf-price)]">
                   {price}
                 </span>
                 {compareAt ? (

@@ -192,7 +192,7 @@ export default async function EditSellerProductPage({
               key={step.id}
               className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold ${
                 step.state === "current"
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
                   : step.state === "done"
                     ? "border-[var(--sf-line)] text-[var(--sf-ok)]"
                     : "border-[var(--sf-line)] text-[var(--sf-faint)]"
@@ -230,7 +230,7 @@ export default async function EditSellerProductPage({
               required
               defaultValue={bundle.product.title}
               disabled={!canEditFields}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
             />
           </label>
           <label className="block space-y-2">
@@ -241,7 +241,7 @@ export default async function EditSellerProductPage({
               name="slug"
               defaultValue={bundle.product.slug}
               disabled={!canEditFields}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
             />
           </label>
           <label className="block space-y-2">
@@ -252,7 +252,7 @@ export default async function EditSellerProductPage({
               name="shortDescription"
               defaultValue={bundle.product.short_description ?? ""}
               disabled={!canEditFields}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
             />
           </label>
           <label className="block space-y-2">
@@ -264,7 +264,7 @@ export default async function EditSellerProductPage({
               rows={6}
               defaultValue={bundle.product.description ?? ""}
               disabled={!canEditFields}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -276,7 +276,7 @@ export default async function EditSellerProductPage({
                 name="productType"
                 defaultValue={bundle.product.product_type}
                 disabled={!canEditFields}
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
               >
                 {PRODUCT_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -293,7 +293,7 @@ export default async function EditSellerProductPage({
                 name="categoryId"
                 defaultValue={bundle.product.primary_category_id ?? ""}
                 disabled={!canEditFields}
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)] disabled:opacity-50"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)] disabled:opacity-50"
               >
                 <option value="">Select…</option>
                 {categories.map((c) => (
@@ -308,7 +308,7 @@ export default async function EditSellerProductPage({
             <div className="sticky bottom-3 z-10 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)]/95 p-3 backdrop-blur-md">
               <button
                 type="submit"
-                className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+                className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-white"
               >
                 Save product
               </button>
@@ -369,7 +369,7 @@ export default async function EditSellerProductPage({
             </label>
             <button
               type="submit"
-              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-white"
             >
               Save eligibility
             </button>
@@ -489,7 +489,7 @@ export default async function EditSellerProductPage({
                         name="sku"
                         required
                         defaultValue={variant.sku}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <label className="block space-y-1">
@@ -499,7 +499,7 @@ export default async function EditSellerProductPage({
                       <input
                         name="variantTitle"
                         defaultValue={variant.title}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                   </div>
@@ -511,7 +511,7 @@ export default async function EditSellerProductPage({
                       <input
                         name="optionColor"
                         defaultValue={variant.option_values.Color ?? ""}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <label className="block space-y-1">
@@ -521,7 +521,7 @@ export default async function EditSellerProductPage({
                       <input
                         name="optionSize"
                         defaultValue={variant.option_values.Size ?? ""}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <label className="block space-y-1">
@@ -531,7 +531,7 @@ export default async function EditSellerProductPage({
                       <input
                         name="optionCapacity"
                         defaultValue={variant.option_values.Capacity ?? ""}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                   </div>
@@ -550,7 +550,7 @@ export default async function EditSellerProductPage({
                             ? (variant.price.amount_minor / 100).toFixed(2)
                             : "0"
                         }
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <label className="block space-y-1">
@@ -569,7 +569,7 @@ export default async function EditSellerProductPage({
                               ).toFixed(2)
                             : ""
                         }
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <label className="block space-y-1">
@@ -581,7 +581,7 @@ export default async function EditSellerProductPage({
                         type="number"
                         min="0"
                         defaultValue={variant.inventory?.on_hand ?? 0}
-                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                        className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                       />
                     </label>
                     <div className="block space-y-1">
@@ -602,7 +602,7 @@ export default async function EditSellerProductPage({
                       type="number"
                       min="0"
                       defaultValue={variant.inventory?.safety_stock ?? 0}
-                      className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                      className="w-full rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
                     />
                   </label>
                   <label className="flex items-center gap-2 text-sm text-[var(--sf-muted)]">
@@ -615,7 +615,7 @@ export default async function EditSellerProductPage({
                   </label>
                   <button
                     type="submit"
-                    className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-[#1a1712]"
+                    className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-4 py-2 text-sm font-bold text-white"
                   >
                     Save variant
                   </button>
@@ -650,29 +650,29 @@ export default async function EditSellerProductPage({
                 name="sku"
                 required
                 placeholder="SKU"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
               <input
                 name="variantTitle"
                 placeholder="Variant title"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               <input
                 name="optionColor"
                 placeholder="Color"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
               <input
                 name="optionSize"
                 placeholder="Size"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
               <input
                 name="optionCapacity"
                 placeholder="Capacity"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -683,7 +683,7 @@ export default async function EditSellerProductPage({
                 min="0"
                 defaultValue="0"
                 placeholder="Price"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
               <input
                 name="compareAtMajor"
@@ -691,7 +691,7 @@ export default async function EditSellerProductPage({
                 step="0.01"
                 min="0"
                 placeholder="Compare-at"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
               <input
                 name="onHand"
@@ -699,7 +699,7 @@ export default async function EditSellerProductPage({
                 min="0"
                 defaultValue="0"
                 placeholder="On hand"
-                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="rounded-xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </div>
             <button
@@ -733,7 +733,7 @@ export default async function EditSellerProductPage({
               <input type="hidden" name="productId" value={bundle.product.id} />
               <button
                 type="submit"
-                className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+                className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-white"
               >
                 Submit for review
               </button>

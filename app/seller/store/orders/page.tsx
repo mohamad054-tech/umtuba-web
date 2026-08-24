@@ -90,7 +90,7 @@ export default async function SellerStoreOrdersPage({
             href={APP_ROUTES.sellerOrders}
             className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
               statusFilter === "all"
-                ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
                 : "border-[var(--sf-line)] text-[var(--sf-muted)]"
             }`}
           >
@@ -102,7 +102,7 @@ export default async function SellerStoreOrdersPage({
               href={`${APP_ROUTES.sellerOrders}?status=${status}`}
               className={`rounded-full border px-3 py-1.5 text-xs font-semibold capitalize ${
                 statusFilter === status
-                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-[#1a1712]"
+                  ? "border-[var(--sf-accent)] bg-[var(--sf-accent)] text-white"
                   : "border-[var(--sf-line)] text-[var(--sf-muted)]"
               }`}
             >

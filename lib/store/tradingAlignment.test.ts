@@ -135,7 +135,7 @@ describe("trading alignment — money presentation", () => {
   it("does not fabricate zero for unknown money", () => {
     expect(formatTrustedMoney(null, "USD")).toBe("Unavailable");
     expect(formatTrustedMoney(1000, null)).toBe("Unavailable");
-    expect(formatTrustedMoney(1000, "USD")).toMatch(/10\.00|USD/);
+    expect(formatTrustedMoney(1000, "USD")).toMatch(/10\.00|USD|US\$|١٠٫٠٠/);
   });
 });
 

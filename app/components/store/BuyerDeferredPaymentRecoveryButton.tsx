@@ -33,7 +33,7 @@ export default function BuyerDeferredPaymentRecoveryButton({
       <button
         type="button"
         disabled={pending}
-        className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.1)] px-4 py-2 text-sm font-semibold text-[var(--sf-accent-strong)] disabled:opacity-50"
+        className="watch-focus-ring rounded-full border border-[rgba(106,76,255),0.35)] bg-[rgba(106,76,255),0.1)] px-4 py-2 text-sm font-semibold text-[var(--sf-accent-strong)] disabled:opacity-50"
         onClick={() => {
           if (pending) return;
           setError(null);

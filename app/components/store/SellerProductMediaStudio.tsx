@@ -216,7 +216,7 @@ export default function SellerProductMediaStudio({
       <form
         className={`space-y-4 rounded-2xl border border-dashed p-4 transition ${
           draggingFile
-            ? "border-[var(--sf-accent)] bg-[rgba(214,196,161,0.08)]"
+            ? "border-[var(--sf-accent)] bg-[rgba(106,76,255),0.08)]"
             : "border-[var(--sf-line)] bg-black/20"
         }`}
         onDragEnter={(event) => {
@@ -267,7 +267,7 @@ export default function SellerProductMediaStudio({
             accept={STORE_PRODUCT_MEDIA_ACCEPT_ATTR}
             required
             disabled={pending}
-            className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[var(--sf-accent)] file:px-3 file:py-1 file:text-xs file:font-bold file:text-[#1a1712]"
+            className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-[var(--sf-accent)] file:px-3 file:py-1 file:text-xs file:font-bold file:text-white"
           />
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -279,7 +279,7 @@ export default function SellerProductMediaStudio({
               name="role"
               defaultValue={items.length === 0 ? "cover" : "gallery"}
               disabled={pending}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             >
               <option value="cover">Cover</option>
               <option value="gallery">Gallery</option>
@@ -294,14 +294,14 @@ export default function SellerProductMediaStudio({
             <input
               name="altText"
               disabled={pending}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-3 text-sm outline-none focus:border-[rgba(106,76,255),0.45)]"
             />
           </label>
         </div>
         <button
           type="submit"
           disabled={pending}
-          className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-[#1a1712] disabled:opacity-50"
+          className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
         >
           {phase || (pending ? "Working…" : "Upload image")}
         </button>

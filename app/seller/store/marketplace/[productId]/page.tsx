@@ -119,7 +119,7 @@ export default async function SellerMarketplaceProductPage({ params }: PageProps
               <input type="hidden" name="source_product_id" value={item.productId} />
               <button
                 type="submit"
-                className="watch-focus-ring w-full rounded-full border border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.12)] px-5 py-3 text-sm font-bold text-[var(--sf-accent-strong)]"
+                className="watch-focus-ring w-full rounded-full border border-[rgba(106,76,255,0.45)] bg-[rgba(106,76,255,0.12)] px-5 py-3 text-sm font-bold text-[var(--sf-accent-strong)]"
               >
                 {item.existingListingId
                   ? "Activate listing in My Store"

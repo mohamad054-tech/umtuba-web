@@ -218,7 +218,7 @@ export default function SellerMarketplaceClient({
                         type="button"
                         disabled={pending}
                         onClick={() => addToStore(item.productId)}
-                        className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.45)] bg-[rgba(214,196,161,0.12)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] disabled:opacity-50"
+                        className="watch-focus-ring rounded-full border border-[rgba(106,76,255),0.45)] bg-[rgba(106,76,255),0.12)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)] disabled:opacity-50"
                       >
                         {item.existingListingId
                           ? "Activate in My Store"
@@ -331,7 +331,7 @@ export default function SellerMarketplaceClient({
                       {listing.buyerPdpPath ? (
                         <Link
                           href={listing.buyerPdpPath}
-                          className="watch-focus-ring rounded-full border border-[rgba(214,196,161,0.35)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)]"
+                          className="watch-focus-ring rounded-full border border-[rgba(106,76,255),0.35)] px-3 py-1.5 text-xs font-semibold text-[var(--sf-accent-strong)]"
                         >
                           Live PDP
                         </Link>

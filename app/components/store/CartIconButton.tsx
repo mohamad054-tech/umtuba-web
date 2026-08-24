@@ -85,7 +85,7 @@ export default function CartIconButton() {
           ? t("store.cart.ariaWithCount", { values: { count } })
           : t("store.cart.aria")
       }
-      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)] transition hover:bg-[rgba(214,196,161,0.22)]"
+      className="watch-focus-ring relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(106,76,255),0.35)] bg-[rgba(106,76,255),0.12)] text-[var(--sf-accent-strong,#c4b4ff)] transition hover:bg-[rgba(106,76,255),0.22)]"
     >
       <svg
         viewBox="0 0 24 24"

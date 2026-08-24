@@ -10,7 +10,7 @@ export default function PlaceholderPanel({
 }: PlaceholderPanelProps) {
   return (
     <div
-      className="rounded-[var(--sf-radius)] border border-dashed border-[var(--sf-line)] bg-[rgba(214,196,161,0.04)] px-5 py-8 text-center"
+      className="rounded-[var(--sf-radius)] border border-dashed border-[var(--sf-line)] bg-[rgba(106,76,255),0.04)] px-5 py-8 text-center"
       aria-label={`${title} — coming soon`}
     >
       <p className="sf-display text-sm font-semibold tracking-tight text-[var(--sf-ink)]">

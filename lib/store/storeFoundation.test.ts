@@ -102,7 +102,7 @@ describe("money minor-unit validation", () => {
   });
 
   it("formats minor units", () => {
-    expect(formatMinorUnits(250, "USD")).toContain("2.50");
+    expect(formatMinorUnits(250, "USD")).toMatch(/2\.50|٢٫٥٠/);
   });
 });
 

@@ -56,6 +56,7 @@ export const APP_ROUTES = {
   sellerPromotions: "/seller/store/promotions",
   sellerShipping: "/seller/store/shipping",
   sellerAnalytics: "/seller/store/analytics",
+  sellerEarnings: "/seller/store/earnings",
   advertise: "/advertise",
   advertiseApply: "/advertise/apply",
   advertiseDashboard: "/advertise/dashboard",

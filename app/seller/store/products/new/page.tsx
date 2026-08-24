@@ -87,7 +87,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
               name="title"
               required
               minLength={2}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
             />
           </label>
           <label className="block space-y-2">
@@ -97,7 +97,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
             <input
               name="slug"
               placeholder="optional"
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
             />
           </label>
           <label className="block space-y-2">
@@ -107,7 +107,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
             <input
               name="shortDescription"
               maxLength={280}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
             />
           </label>
           <label className="block space-y-2">
@@ -117,7 +117,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
             <textarea
               name="description"
               rows={5}
-              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+              className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -128,7 +128,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
               <select
                 name="productType"
                 defaultValue="physical"
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
               >
                 {PRODUCT_TYPES.map((t) => (
                   <option key={t} value={t}>
@@ -143,7 +143,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
               </span>
               <select
                 name="categoryId"
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
               >
                 <option value="">Select…</option>
                 {categories.map((c) => (
@@ -162,7 +162,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
               <input
                 name="sku"
                 placeholder="AUTO"
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </label>
             <label className="block space-y-2">
@@ -175,7 +175,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
                 step="0.01"
                 min="0"
                 defaultValue="0"
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </label>
             <label className="block space-y-2">
@@ -187,7 +187,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
                 type="number"
                 min="0"
                 defaultValue="0"
-                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(214,196,161,0.45)]"
+                className="w-full rounded-2xl border border-[var(--sf-line)] bg-black/40 p-4 outline-none focus:border-[rgba(106,76,255,0.55)]"
               />
             </label>
           </div>
@@ -199,7 +199,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
           <div className="sticky bottom-3 z-10 rounded-2xl border border-[var(--sf-line)] bg-[var(--sf-surface-2)]/95 p-3 backdrop-blur-md">
             <button
               type="submit"
-              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-[#1a1712]"
+              className="watch-focus-ring rounded-full bg-[var(--sf-accent)] px-5 py-3 text-sm font-bold text-white"
             >
               Create draft
             </button>
