@@ -24,6 +24,9 @@ const CLOSEOUT_KEYS: TranslationKey[] = [
   "watch.postJourney",
   "watch.openingJourney",
   "watch.aiSummaryBody",
+  "discover.nowExploring",
+  "discover.worldwide",
+  "video.untitled",
 ];
 
 function readRepo(relativePath: string) {
@@ -46,6 +49,11 @@ describe("Arabic leak + Watch autoplay closeout keys", () => {
     expect(translate("ar", "watch.aiSummary")).toBe("خلاصة الذكاء الاصطناعي");
     expect(translate("ar", "watch.postJourney")).toBe("رحلة المنشور");
     expect(translate("en", "home.nowPlaying")).toBe("Now playing");
+    expect(translate("ar", "discover.nowExploring")).toBe("تستكشف الآن");
+    expect(translate("ar", "discover.worldwide")).toBe("حول العالم");
+    expect(translate("ar", "video.untitled")).toBe("فيديو بدون عنوان");
+    expect(translate("en", "discover.nowExploring")).toBe("Now exploring");
+    expect(translate("en", "video.untitled")).toBe("Untitled video");
   });
 
   it("wires Home aside, Story rail, and Watch overlay to i18n keys", () => {
@@ -63,6 +71,13 @@ describe("Arabic leak + Watch autoplay closeout keys", () => {
     expect(overlay).not.toMatch(/>\s*AI summary\s*</);
     expect(message).toMatch(/t\("home.message"\)/);
     expect(message).not.toMatch(/label = "Message"/);
+
+    const banner = readRepo("app/discover/components/DiscoverLocationBanner.tsx");
+    const caption = readRepo("app/discover/components/DiscoverCaption.tsx");
+    expect(banner).toMatch(/t\("discover.nowExploring"\)/);
+    expect(banner).not.toMatch(/Now exploring/);
+    expect(caption).toMatch(/t\("video.untitled"\)/);
+    expect(overlay).toMatch(/t\("video.untitled"\)/);
   });
 
   it("pauses the previous Watch player immediately on keyboard advance", () => {

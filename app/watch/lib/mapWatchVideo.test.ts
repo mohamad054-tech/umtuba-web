@@ -5,6 +5,9 @@ import {
   discoverVideoToWatchVideo,
   encodeWatchFeedCursor,
   findWatchVideoIndex,
+  isUntitledVideoFallback,
+  localizedLocationCountry,
+  localizedVideoTitle,
 } from "./mapWatchVideo";
 import type { DiscoverVideo } from "../../discover/types";
 import type { DemoVideo } from "../../data/videos";
@@ -63,6 +66,21 @@ describe("mapWatchVideo", () => {
     const videos = [discoverVideoToWatchVideo(discoverSample)];
     expect(findWatchVideoIndex(videos, "42")).toBe(0);
     expect(findWatchVideoIndex(videos, "99")).toBe(0);
+  });
+
+  it("localizes untitled and worldwide fallbacks without inventing captions", () => {
+    expect(isUntitledVideoFallback("")).toBe(true);
+    expect(isUntitledVideoFallback("Untitled video")).toBe(true);
+    expect(isUntitledVideoFallback("First line")).toBe(false);
+    expect(localizedVideoTitle("Untitled video", "فيديو بدون عنوان")).toBe(
+      "فيديو بدون عنوان"
+    );
+    expect(localizedLocationCountry("Worldwide", "حول العالم")).toBe(
+      "حول العالم"
+    );
+    expect(localizedLocationCountry("Palestine", "حول العالم")).toBe(
+      "Palestine"
+    );
   });
 
   it("round-trips feed cursors", () => {

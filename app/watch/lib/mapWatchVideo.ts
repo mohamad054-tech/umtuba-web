@@ -2,9 +2,36 @@ import type { DiscoverVideo } from "../../discover/types";
 import type { DemoVideo } from "../../data/videos";
 import type { WatchVideo } from "../types";
 
+export const UNTITLED_VIDEO_FALLBACK = "Untitled video";
+export const WORLDWIDE_LOCATION_FALLBACK = "Worldwide";
+
+export function isUntitledVideoFallback(
+  value: string | null | undefined
+): boolean {
+  return !value?.trim() || value.trim() === UNTITLED_VIDEO_FALLBACK;
+}
+
+export function localizedVideoTitle(
+  title: string | null | undefined,
+  untitledLabel: string
+): string {
+  return isUntitledVideoFallback(title) ? untitledLabel : String(title).trim();
+}
+
+export function localizedLocationCountry(
+  country: string | null | undefined,
+  worldwideLabel: string
+): string {
+  const value = country?.trim() ?? "";
+  if (!value || value === WORLDWIDE_LOCATION_FALLBACK) {
+    return worldwideLabel;
+  }
+  return value;
+}
+
 function titleFromCaption(caption: string): string {
   const line = caption.trim().split(/\r?\n/)[0] ?? "";
-  if (!line) return "Untitled video";
+  if (!line) return UNTITLED_VIDEO_FALLBACK;
   return line.length > 72 ? `${line.slice(0, 69)}…` : line;
 }
 

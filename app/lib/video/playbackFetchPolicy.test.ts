@@ -93,6 +93,7 @@ describe("video egress source contracts", () => {
     const discover = read("app/discover/components/DiscoverNativeVideo.tsx");
     expect(discover).toMatch(/shouldAttachHomeDiscoverMediaSrc/);
     expect(discover).toMatch(/resolveHomeDiscoverMediaPreload/);
+    expect(discover).toMatch(/playActiveVideo/);
     expect(discover).not.toMatch(/preload="metadata"/);
 
     const card = read("app/components/ContentCard.tsx");

@@ -13,6 +13,8 @@ import {
   playbackStatusAfterRemintFailure,
   shouldAutoRemintPlayback,
 } from "../../lib/video/signedPlaybackRetry";
+import { pauseInactiveVideo, playActiveVideo } from "../../../lib/video/playActiveVideo";
+import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
 
 type DiscoverNativeVideoProps = {
   src: string;
@@ -69,8 +71,11 @@ export default function DiscoverNativeVideo({
     }
 
     if (!active || playbackStatus !== "ok") {
-      video.pause();
+      pauseInactiveVideo(video);
+      return;
     }
+
+    void playActiveVideo(video, true);
   }, [active, playbackSrc, playbackStatus]);
 
   useEffect(() => {
@@ -166,6 +171,7 @@ export default function DiscoverNativeVideo({
     playbackStatus === "ok" &&
     shouldAttachHomeDiscoverMediaSrc(active) &&
     isPlayableHttpSrc(playbackSrc);
+  const displayLabel = localizedVideoTitle(label, t("video.untitled"));
 
   return (
     <div className="relative h-full w-full bg-black">
@@ -178,8 +184,9 @@ export default function DiscoverNativeVideo({
           poster={poster}
           controls
           playsInline
+          muted
           preload={resolveHomeDiscoverMediaPreload(active)}
-          aria-label={label}
+          aria-label={displayLabel}
           onError={handlePlaybackError}
         />
       ) : playbackStatus === "ok" ? (
@@ -193,7 +200,7 @@ export default function DiscoverNativeVideo({
             />
           ) : (
             <p className="px-6 text-center text-sm font-bold text-white/40">
-              {label}
+              {displayLabel}
             </p>
           )}
         </div>

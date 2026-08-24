@@ -515,6 +515,9 @@ export type FoundationMessages = {
   "home.nowPlaying": string;
   "home.asideHint": string;
   "home.exploreCity": string;
+  "discover.nowExploring": string;
+  "discover.worldwide": string;
+  "video.untitled": string;
   "home.creator": string;
   "home.message": string;
   "home.messageOpening": string;

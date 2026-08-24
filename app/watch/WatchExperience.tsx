@@ -48,7 +48,7 @@ import {
   saveWatchExactContextDeparture,
   type ExactReturnContext,
 } from "../../lib/world/exactContext";
-import { findWatchVideoIndex } from "./lib/mapWatchVideo";
+import { findWatchVideoIndex, localizedVideoTitle } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 
 const PRODUCTION_WATCH_PANELS = new Set<Exclude<WatchPanelId, null>>([
@@ -486,7 +486,7 @@ export default function WatchExperience({
 
         <p className="hidden max-w-md truncate text-sm text-white/50 md:block">
           {activeVideo
-            ? `${activeVideo.location.city} · ${activeVideo.title}`
+            ? `${activeVideo.location.city} · ${localizedVideoTitle(activeVideo.title, t("video.untitled"))}`
             : "Discover the world"}
         </p>
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "../../components/i18n";
+import { localizedLocationCountry } from "../../watch/lib/mapWatchVideo";
 import type { DiscoverLocation } from "../types";
 
 type DiscoverLocationBannerProps = {
@@ -14,8 +16,13 @@ type DiscoverLocationBannerProps = {
 export default function DiscoverLocationBanner({
   location,
 }: DiscoverLocationBannerProps) {
+  const { t } = useTranslation();
   const [hidden, setHidden] = useState(false);
-  const label = `${location.city}, ${location.country}`;
+  const country = localizedLocationCountry(
+    location.country,
+    t("discover.worldwide")
+  );
+  const label = `${location.city}, ${country}`;
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -49,7 +56,7 @@ export default function DiscoverLocationBanner({
           aria-hidden
         />
         <span className="truncate">
-          Now exploring{" "}
+          {t("discover.nowExploring")}{" "}
           <span className="text-sky-100">{label}</span>
         </span>
       </div>

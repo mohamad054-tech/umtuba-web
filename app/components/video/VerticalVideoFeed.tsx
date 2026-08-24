@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 import type { DiscoverStats } from "../../discover/types";
+import { useTranslation } from "../i18n";
+import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
 import type { WatchVideo } from "../../watch/types";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
 import {
@@ -85,6 +87,7 @@ export default function VerticalVideoFeed({
   restoreState = null,
   loadMoreEpoch = 0,
 }: VerticalVideoFeedProps) {
+  const { t } = useTranslation();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
   const [activeIndex, setActiveIndex] = useState(() =>
@@ -417,7 +420,9 @@ export default function VerticalVideoFeed({
                 data-video-id={video.id}
                 className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40"
               >
-                <p className="text-sm font-bold">{video.title}</p>
+                <p className="text-sm font-bold">
+                  {localizedVideoTitle(video.title, t("video.untitled"))}
+                </p>
               </div>
             )}
           </div>
