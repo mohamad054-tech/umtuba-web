@@ -238,6 +238,50 @@ export const arMessages: FoundationMessages = {
   "auth.login.loading": "جارٍ تحميل تسجيل الدخول...",
   "auth.login.resetSuccess":
     "تم تحديث كلمة المرور. سجّل الدخول بكلمة المرور الجديدة.",
+  "auth.forgot.title": "إعادة تعيين كلمة المرور",
+  "auth.forgot.subtitle":
+    "أدخل البريد الإلكتروني لحسابك وسنرسل رابط إعادة تعيين آمن.",
+  "auth.forgot.panelTitle": "استعد الوصول.",
+  "auth.forgot.panelBody":
+    "سنرسل رابطًا لمرة واحدة لاختيار كلمة مرور جديدة. ينتهي الرابط لحماية حسابك.",
+  "auth.forgot.remembered": "تذكرتها؟",
+  "auth.forgot.backToSignIn": "العودة لتسجيل الدخول",
+  "auth.forgot.submit": "إرسال رابط إعادة التعيين",
+  "auth.forgot.submitting": "جارٍ إرسال الرابط...",
+  "auth.forgot.sent": "تم إرسال الرابط",
+  "auth.forgot.loading": "جارٍ التحميل...",
+  "auth.forgot.emailRequired": "البريد الإلكتروني مطلوب.",
+  "auth.forgot.emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا.",
+  "auth.forgot.sendFailed":
+    "تعذر إرسال رسالة إعادة التعيين. حاول مرة أخرى.",
+  "auth.updatePassword.title": "اختر كلمة مرور جديدة",
+  "auth.updatePassword.subtitle":
+    "أدخل كلمة مرور جديدة لحسابك على UMTUBA.",
+  "auth.updatePassword.panelTitle": "إعادة تعيين آمنة.",
+  "auth.updatePassword.panelBody":
+    "بعد الحفظ ستسجّل الدخول مجددًا بكلمة المرور الجديدة.",
+  "auth.updatePassword.verifying": "جارٍ التحقق من رابط إعادة التعيين...",
+  "auth.updatePassword.checkingSession": "جارٍ التحقق من الجلسة...",
+  "auth.updatePassword.invalidTitle": "الرابط غير صالح أو منتهٍ",
+  "auth.updatePassword.invalidSubtitle":
+    "رابط إعادة تعيين كلمة المرور لم يعد صالحًا.",
+  "auth.updatePassword.invalidBody":
+    "تنتهي الروابط لحماية حسابك. اطلب رابطًا جديدًا في أي وقت.",
+  "auth.updatePassword.requestNew": "طلب رابط إعادة تعيين جديد",
+  "auth.updatePassword.signIn": "تسجيل الدخول",
+  "auth.updatePassword.invalidAlert":
+    "هذا الرابط غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا.",
+  "auth.updatePassword.newPassword": "كلمة المرور الجديدة",
+  "auth.updatePassword.confirmPassword": "تأكيد كلمة المرور",
+  "auth.updatePassword.passwordPlaceholder": "6 أحرف على الأقل",
+  "auth.updatePassword.confirmPlaceholder": "أعد إدخال كلمة المرور الجديدة",
+  "auth.updatePassword.submit": "تحديث كلمة المرور",
+  "auth.updatePassword.submitting": "جارٍ الحفظ...",
+  "auth.updatePassword.fixHighlighted": "يرجى تصحيح الحقول المحددة.",
+  "auth.updatePassword.updateFailed":
+    "تعذر تحديث كلمة المرور. اطلب رابط إعادة تعيين جديد.",
+  "auth.field.showPassword": "إظهار",
+  "auth.field.hidePassword": "إخفاء",
   "auth.signup.title": "إنشاء حساب",
   "auth.signup.subtitle": "خطوتان سريعتان — بيانات الدخول أولًا ثم ملفك.",
   "auth.signup.haveAccount": "لديك حساب بالفعل؟",

@@ -483,6 +483,50 @@ export const esMessages: FoundationMessages = {
   "auth.login.loading": "Cargando inicio de sesión…",
   "auth.login.resetSuccess":
     "Contraseña actualizada. Entra con la nueva contraseña.",
+  "auth.forgot.title": "Restablece tu contraseña",
+  "auth.forgot.subtitle":
+    "Introduce el correo de tu cuenta y te enviaremos un enlace seguro.",
+  "auth.forgot.panelTitle": "Recupera el acceso.",
+  "auth.forgot.panelBody":
+    "Te enviaremos un enlace de un solo uso para elegir una contraseña nueva. El enlace caduca por tu seguridad.",
+  "auth.forgot.remembered": "¿La recuerdas?",
+  "auth.forgot.backToSignIn": "Volver a iniciar sesión",
+  "auth.forgot.submit": "Enviar enlace",
+  "auth.forgot.submitting": "Enviando enlace…",
+  "auth.forgot.sent": "Enlace enviado",
+  "auth.forgot.loading": "Cargando…",
+  "auth.forgot.emailRequired": "El correo es obligatorio.",
+  "auth.forgot.emailInvalid": "Introduce un correo válido.",
+  "auth.forgot.sendFailed":
+    "No se pudo enviar el correo de restablecimiento. Inténtalo de nuevo.",
+  "auth.updatePassword.title": "Elige una contraseña nueva",
+  "auth.updatePassword.subtitle":
+    "Introduce una contraseña nueva para tu cuenta de UMTUBA.",
+  "auth.updatePassword.panelTitle": "Restablecimiento seguro.",
+  "auth.updatePassword.panelBody":
+    "Después de guardar, inicia sesión de nuevo con la nueva contraseña.",
+  "auth.updatePassword.verifying": "Verificando el enlace…",
+  "auth.updatePassword.checkingSession": "Comprobando la sesión…",
+  "auth.updatePassword.invalidTitle": "Enlace no válido o caducado",
+  "auth.updatePassword.invalidSubtitle":
+    "Este enlace de restablecimiento ya no es válido.",
+  "auth.updatePassword.invalidBody":
+    "Los enlaces caducan por tu seguridad. Solicita uno nuevo cuando quieras.",
+  "auth.updatePassword.requestNew": "Solicitar un enlace nuevo",
+  "auth.updatePassword.signIn": "Iniciar sesión",
+  "auth.updatePassword.invalidAlert":
+    "Este enlace no es válido o ha caducado. Solicita uno nuevo.",
+  "auth.updatePassword.newPassword": "Contraseña nueva",
+  "auth.updatePassword.confirmPassword": "Confirmar contraseña",
+  "auth.updatePassword.passwordPlaceholder": "Al menos 6 caracteres",
+  "auth.updatePassword.confirmPlaceholder": "Vuelve a introducir la contraseña",
+  "auth.updatePassword.submit": "Actualizar contraseña",
+  "auth.updatePassword.submitting": "Guardando…",
+  "auth.updatePassword.fixHighlighted": "Corrige los campos destacados.",
+  "auth.updatePassword.updateFailed":
+    "No se pudo actualizar la contraseña. Solicita un enlace nuevo.",
+  "auth.field.showPassword": "Mostrar",
+  "auth.field.hidePassword": "Ocultar",
   "auth.signup.haveAccount": "¿Ya tienes una cuenta?",
   "auth.signup.stepAccount": "1 · Cuenta",
   "auth.signup.stepProfile": "2 · Perfil",

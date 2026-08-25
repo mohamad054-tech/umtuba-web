@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from "react";
+import { useTranslation } from "../i18n";
 
 type AuthFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -20,6 +21,7 @@ export default function AuthField({
   type = "text",
   ...props
 }: AuthFieldProps) {
+  const { t } = useTranslation();
   const generatedId = useId();
   const fieldId = id ?? props.name ?? generatedId;
   const [revealed, setRevealed] = useState(false);
@@ -56,9 +58,13 @@ export default function AuthField({
             className="app-ink-secondary watch-focus-ring absolute end-3 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold uppercase tracking-wide transition hover:text-white"
             onClick={() => setRevealed((prev) => !prev)}
             aria-pressed={revealed}
-            aria-label={revealed ? "Hide password" : "Show password"}
+            aria-label={
+              revealed
+                ? t("auth.field.hidePassword")
+                : t("auth.field.showPassword")
+            }
           >
-            {revealed ? "Hide" : "Show"}
+            {revealed ? t("auth.field.hidePassword") : t("auth.field.showPassword")}
           </button>
         ) : null}
       </span>

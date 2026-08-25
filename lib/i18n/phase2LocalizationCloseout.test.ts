@@ -92,6 +92,33 @@ describe("Phase 2 localization closeout", () => {
     expect(watch).not.toMatch(/"Exit Fullscreen"/);
   });
 
+  it("localizes forgot-password and update-password chrome in all 13 locales", () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      if (locale === "en") continue;
+      expect(translate(locale, "auth.forgot.title")).not.toBe(
+        "Reset your password"
+      );
+      expect(translate(locale, "auth.forgot.submit")).not.toBe(
+        "Send reset link"
+      );
+      expect(translate(locale, "auth.updatePassword.invalidTitle")).not.toBe(
+        "Link invalid or expired"
+      );
+      expect(translate(locale, "auth.field.showPassword")).not.toBe("Show");
+    }
+    expect(translate("ar", "auth.forgot.title")).toBe("إعادة تعيين كلمة المرور");
+    expect(translate("ar", "auth.forgot.submit")).toContain("رابط");
+    const forgot = readRepo("app/forgot-password/page.tsx");
+    expect(forgot).toMatch(/t\("auth.forgot.title"\)/);
+    expect(forgot).not.toMatch(/"Reset your password"/);
+    const update = readRepo("app/auth/update-password/page.tsx");
+    expect(update).toMatch(/t\("auth.updatePassword.title"\)/);
+    expect(update).not.toMatch(/"Choose a new password"/);
+    const field = readRepo("app/components/auth/AuthField.tsx");
+    expect(field).toMatch(/t\("auth.field.showPassword"\)/);
+    expect(field).not.toMatch(/>Show</);
+  });
+
   it("preserves hl and locale cookie on auth-gate login redirects", () => {
     const middleware = readRepo("lib/supabase/middleware.ts");
     expect(middleware).toMatch(/resolveLocaleFromQueryAndCookie/);

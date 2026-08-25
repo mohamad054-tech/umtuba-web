@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthAlert, AuthField, AuthShell } from "../../components/auth";
+import { useTranslation } from "../../components/i18n";
 import { APP_ROUTES } from "../../lib/nav";
 import { toAuthUserFacingMessage } from "../../../lib/supabase/authMessages";
 import { tryCreateClient } from "../../../lib/supabase/client";
@@ -24,6 +25,7 @@ type FieldErrors = {
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -87,7 +89,7 @@ export default function UpdatePasswordPage() {
     setFieldErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
-      setFormError("Please fix the highlighted fields.");
+      setFormError(t("auth.updatePassword.fixHighlighted"));
       return;
     }
 
@@ -101,10 +103,7 @@ export default function UpdatePasswordPage() {
       router.refresh();
     } catch (error) {
       setFormError(
-        toAuthUserFacingMessage(
-          error,
-          "Unable to update your password. Request a new reset link."
-        )
+        toAuthUserFacingMessage(error, t("auth.updatePassword.updateFailed"))
       );
     } finally {
       setIsSubmitting(false);
@@ -114,12 +113,14 @@ export default function UpdatePasswordPage() {
   if (!sessionChecked) {
     return (
       <AuthShell
-        title="Choose a new password"
-        subtitle="Verifying your reset link..."
-        panelTitle="Secure reset."
-        panelBody="Set a new password to get back into UMTUBA."
+        title={t("auth.updatePassword.title")}
+        subtitle={t("auth.updatePassword.verifying")}
+        panelTitle={t("auth.updatePassword.panelTitle")}
+        panelBody={t("auth.updatePassword.panelBody")}
       >
-        <p className="text-sm text-white/55">Checking your session...</p>
+        <p className="text-sm text-white/55">
+          {t("auth.updatePassword.checkingSession")}
+        </p>
       </AuthShell>
     );
   }
@@ -127,30 +128,30 @@ export default function UpdatePasswordPage() {
   if (!hasSession) {
     return (
       <AuthShell
-        title="Link invalid or expired"
-        subtitle="This password reset link is no longer valid."
-        panelTitle="Secure reset."
-        panelBody="Reset links expire for your security. Request a fresh one anytime."
+        title={t("auth.updatePassword.invalidTitle")}
+        subtitle={t("auth.updatePassword.invalidSubtitle")}
+        panelTitle={t("auth.updatePassword.panelTitle")}
+        panelBody={t("auth.updatePassword.invalidBody")}
         footer={
           <p className="text-center text-sm text-white/50">
             <Link
               href={FORGOT_PASSWORD_PATH}
               className="font-bold text-blue-200 transition hover:text-blue-100"
             >
-              Request a new reset link
+              {t("auth.updatePassword.requestNew")}
             </Link>
             {" · "}
             <Link
               href={APP_ROUTES.login}
               className="font-bold text-blue-200 transition hover:text-blue-100"
             >
-              Sign in
+              {t("auth.updatePassword.signIn")}
             </Link>
           </p>
         }
       >
         <AuthAlert tone="error">
-          This reset link is invalid or has expired. Request a new one.
+          {t("auth.updatePassword.invalidAlert")}
         </AuthAlert>
       </AuthShell>
     );
@@ -158,30 +159,30 @@ export default function UpdatePasswordPage() {
 
   return (
     <AuthShell
-      title="Choose a new password"
-      subtitle="Enter a new password for your UMTUBA account."
-      panelTitle="Secure reset."
-      panelBody="After you save, you’ll sign in again with your new password."
+      title={t("auth.updatePassword.title")}
+      subtitle={t("auth.updatePassword.subtitle")}
+      panelTitle={t("auth.updatePassword.panelTitle")}
+      panelBody={t("auth.updatePassword.panelBody")}
       footer={
         <p className="text-center text-sm text-white/50">
           <Link
             href={APP_ROUTES.login}
             className="font-bold text-blue-200 transition hover:text-blue-100"
           >
-            Back to sign in
+            {t("auth.forgot.backToSignIn")}
           </Link>
         </p>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         <AuthField
-          label="New password"
+          label={t("auth.updatePassword.newPassword")}
           name="password"
           type="password"
           autoComplete="new-password"
           value={password}
           disabled={isSubmitting}
-          placeholder="At least 6 characters"
+          placeholder={t("auth.updatePassword.passwordPlaceholder")}
           error={fieldErrors.password}
           onChange={(event) => {
             setPassword(event.target.value);
@@ -191,13 +192,13 @@ export default function UpdatePasswordPage() {
         />
 
         <AuthField
-          label="Confirm password"
+          label={t("auth.updatePassword.confirmPassword")}
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
           value={confirmPassword}
           disabled={isSubmitting}
-          placeholder="Re-enter your new password"
+          placeholder={t("auth.updatePassword.confirmPlaceholder")}
           error={fieldErrors.confirmPassword}
           onChange={(event) => {
             setConfirmPassword(event.target.value);
@@ -217,7 +218,9 @@ export default function UpdatePasswordPage() {
           aria-busy={isSubmitting}
           className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? "Saving..." : "Update password"}
+          {isSubmitting
+            ? t("auth.updatePassword.submitting")
+            : t("auth.updatePassword.submit")}
         </button>
       </form>
     </AuthShell>

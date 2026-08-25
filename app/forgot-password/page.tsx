@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AuthAlert, AuthField, AuthShell } from "../components/auth";
+import { useTranslation } from "../components/i18n";
 import { APP_ROUTES } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import {
@@ -15,6 +16,7 @@ import { isValidEmail } from "../../lib/supabase/validation";
 
 function ForgotPasswordForm() {
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const linkError = sanitizeUserFacingMessage(
     searchParams.get("error"),
     ""
@@ -33,11 +35,11 @@ function ForgotPasswordForm() {
 
     const trimmed = email.trim();
     if (!trimmed) {
-      setEmailError("Email is required.");
+      setEmailError(t("auth.forgot.emailRequired"));
       return;
     }
     if (!isValidEmail(trimmed)) {
-      setEmailError("Enter a valid email address.");
+      setEmailError(t("auth.forgot.emailInvalid"));
       return;
     }
 
@@ -49,10 +51,7 @@ function ForgotPasswordForm() {
       setSuccessMessage(result.message || PASSWORD_RESET_REQUEST_SUCCESS);
     } catch (error) {
       setFormError(
-        toAuthUserFacingMessage(
-          error,
-          "Unable to send reset email. Please try again."
-        )
+        toAuthUserFacingMessage(error, t("auth.forgot.sendFailed"))
       );
     } finally {
       setIsSubmitting(false);
@@ -61,31 +60,31 @@ function ForgotPasswordForm() {
 
   return (
     <AuthShell
-      title="Reset your password"
-      subtitle="Enter the email on your account and we’ll send a secure reset link."
-      panelTitle="Recover access."
-      panelBody="We’ll email you a one-time link to choose a new password. The link expires for your security."
+      title={t("auth.forgot.title")}
+      subtitle={t("auth.forgot.subtitle")}
+      panelTitle={t("auth.forgot.panelTitle")}
+      panelBody={t("auth.forgot.panelBody")}
       footer={
         <p className="text-center text-sm text-white/50">
-          Remembered it?{" "}
+          {t("auth.forgot.remembered")}{" "}
           <Link
             href={APP_ROUTES.login}
             className="font-bold text-blue-200 transition hover:text-blue-100"
           >
-            Back to sign in
+            {t("auth.forgot.backToSignIn")}
           </Link>
         </p>
       }
     >
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         <AuthField
-          label="Email"
+          label={t("auth.login.email")}
           name="email"
           type="email"
           autoComplete="email"
           value={email}
           disabled={isSubmitting || Boolean(successMessage)}
-          placeholder="you@email.com"
+          placeholder={t("auth.login.emailPlaceholder")}
           error={emailError || undefined}
           onChange={(event) => {
             setEmail(event.target.value);
@@ -107,10 +106,10 @@ function ForgotPasswordForm() {
           className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting
-            ? "Sending link..."
+            ? t("auth.forgot.submitting")
             : successMessage
-              ? "Link sent"
-              : "Send reset link"}
+              ? t("auth.forgot.sent")
+              : t("auth.forgot.submit")}
         </button>
       </form>
     </AuthShell>
@@ -118,14 +117,15 @@ function ForgotPasswordForm() {
 }
 
 function ForgotPasswordFallback() {
+  const { t } = useTranslation();
   return (
     <AuthShell
-      title="Reset your password"
-      subtitle="Enter the email on your account and we’ll send a secure reset link."
-      panelTitle="Recover access."
-      panelBody="We’ll email you a one-time link to choose a new password."
+      title={t("auth.forgot.title")}
+      subtitle={t("auth.forgot.subtitle")}
+      panelTitle={t("auth.forgot.panelTitle")}
+      panelBody={t("auth.forgot.panelBody")}
     >
-      <p className="text-sm text-white/55">Loading...</p>
+      <p className="text-sm text-white/55">{t("auth.forgot.loading")}</p>
     </AuthShell>
   );
 }

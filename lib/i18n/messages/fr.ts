@@ -487,6 +487,50 @@ export const frMessages: FoundationMessages = {
   "auth.login.loading": "Chargement de la connexion…",
   "auth.login.resetSuccess":
     "Mot de passe mis à jour. Connectez-vous avec le nouveau.",
+  "auth.forgot.title": "Réinitialisez votre mot de passe",
+  "auth.forgot.subtitle":
+    "Saisissez l’e-mail de votre compte : nous enverrons un lien sécurisé.",
+  "auth.forgot.panelTitle": "Récupérer l’accès.",
+  "auth.forgot.panelBody":
+    "Nous vous enverrons un lien unique pour choisir un nouveau mot de passe. Le lien expire pour votre sécurité.",
+  "auth.forgot.remembered": "Vous vous en souvenez ?",
+  "auth.forgot.backToSignIn": "Retour à la connexion",
+  "auth.forgot.submit": "Envoyer le lien",
+  "auth.forgot.submitting": "Envoi du lien…",
+  "auth.forgot.sent": "Lien envoyé",
+  "auth.forgot.loading": "Chargement…",
+  "auth.forgot.emailRequired": "L’e-mail est requis.",
+  "auth.forgot.emailInvalid": "Saisissez une adresse e-mail valide.",
+  "auth.forgot.sendFailed":
+    "Impossible d’envoyer l’e-mail de réinitialisation. Réessayez.",
+  "auth.updatePassword.title": "Choisissez un nouveau mot de passe",
+  "auth.updatePassword.subtitle":
+    "Saisissez un nouveau mot de passe pour votre compte UMTUBA.",
+  "auth.updatePassword.panelTitle": "Réinitialisation sécurisée.",
+  "auth.updatePassword.panelBody":
+    "Après l’enregistrement, reconnectez-vous avec le nouveau mot de passe.",
+  "auth.updatePassword.verifying": "Vérification du lien…",
+  "auth.updatePassword.checkingSession": "Vérification de la session…",
+  "auth.updatePassword.invalidTitle": "Lien invalide ou expiré",
+  "auth.updatePassword.invalidSubtitle":
+    "Ce lien de réinitialisation n’est plus valable.",
+  "auth.updatePassword.invalidBody":
+    "Les liens expirent pour votre sécurité. Demandez-en un nouveau à tout moment.",
+  "auth.updatePassword.requestNew": "Demander un nouveau lien",
+  "auth.updatePassword.signIn": "Connexion",
+  "auth.updatePassword.invalidAlert":
+    "Ce lien est invalide ou a expiré. Demandez-en un nouveau.",
+  "auth.updatePassword.newPassword": "Nouveau mot de passe",
+  "auth.updatePassword.confirmPassword": "Confirmer le mot de passe",
+  "auth.updatePassword.passwordPlaceholder": "Au moins 6 caractères",
+  "auth.updatePassword.confirmPlaceholder": "Saisissez à nouveau le mot de passe",
+  "auth.updatePassword.submit": "Mettre à jour le mot de passe",
+  "auth.updatePassword.submitting": "Enregistrement…",
+  "auth.updatePassword.fixHighlighted": "Corrigez les champs indiqués.",
+  "auth.updatePassword.updateFailed":
+    "Impossible de mettre à jour le mot de passe. Demandez un nouveau lien.",
+  "auth.field.showPassword": "Afficher",
+  "auth.field.hidePassword": "Masquer",
   "auth.signup.haveAccount": "Vous avez déjà un compte ?",
   "auth.signup.stepAccount": "1 · Compte",
   "auth.signup.stepProfile": "2 · Profil",

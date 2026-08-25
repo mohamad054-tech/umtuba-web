@@ -486,6 +486,51 @@ export const deMessages: FoundationMessages = {
   "auth.login.loading": "Anmeldung wird geladen…",
   "auth.login.resetSuccess":
     "Passwort aktualisiert. Melde dich mit dem neuen Passwort an.",
+  "auth.forgot.title": "Passwort zurücksetzen",
+  "auth.forgot.subtitle":
+    "Gib die E-Mail deines Kontos ein. Wir senden einen sicheren Link.",
+  "auth.forgot.panelTitle": "Zugang wiederherstellen.",
+  "auth.forgot.panelBody":
+    "Wir senden einen einmaligen Link für ein neues Passwort. Der Link läuft aus Sicherheitsgründen ab.",
+  "auth.forgot.remembered": "Wieder eingefallen?",
+  "auth.forgot.backToSignIn": "Zurück zur Anmeldung",
+  "auth.forgot.submit": "Link senden",
+  "auth.forgot.submitting": "Link wird gesendet…",
+  "auth.forgot.sent": "Link gesendet",
+  "auth.forgot.loading": "Wird geladen…",
+  "auth.forgot.emailRequired": "E-Mail ist erforderlich.",
+  "auth.forgot.emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
+  "auth.forgot.sendFailed":
+    "Reset-E-Mail konnte nicht gesendet werden. Bitte erneut versuchen.",
+  "auth.updatePassword.title": "Neues Passwort wählen",
+  "auth.updatePassword.subtitle":
+    "Gib ein neues Passwort für dein UMTUBA-Konto ein.",
+  "auth.updatePassword.panelTitle": "Sicherer Reset.",
+  "auth.updatePassword.panelBody":
+    "Nach dem Speichern meldest du dich mit dem neuen Passwort an.",
+  "auth.updatePassword.verifying": "Reset-Link wird geprüft…",
+  "auth.updatePassword.checkingSession": "Sitzung wird geprüft…",
+  "auth.updatePassword.invalidTitle": "Link ungültig oder abgelaufen",
+  "auth.updatePassword.invalidSubtitle":
+    "Dieser Reset-Link ist nicht mehr gültig.",
+  "auth.updatePassword.invalidBody":
+    "Links laufen aus Sicherheitsgründen ab. Fordere jederzeit einen neuen an.",
+  "auth.updatePassword.requestNew": "Neuen Reset-Link anfordern",
+  "auth.updatePassword.signIn": "Anmelden",
+  "auth.updatePassword.invalidAlert":
+    "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an.",
+  "auth.updatePassword.newPassword": "Neues Passwort",
+  "auth.updatePassword.confirmPassword": "Passwort bestätigen",
+  "auth.updatePassword.passwordPlaceholder": "Mindestens 6 Zeichen",
+  "auth.updatePassword.confirmPlaceholder": "Neues Passwort erneut eingeben",
+  "auth.updatePassword.submit": "Passwort aktualisieren",
+  "auth.updatePassword.submitting": "Wird gespeichert…",
+  "auth.updatePassword.fixHighlighted":
+    "Bitte die markierten Felder korrigieren.",
+  "auth.updatePassword.updateFailed":
+    "Passwort konnte nicht aktualisiert werden. Fordere einen neuen Link an.",
+  "auth.field.showPassword": "Anzeigen",
+  "auth.field.hidePassword": "Ausblenden",
   "auth.signup.haveAccount": "Hast du schon ein Konto?",
   "auth.signup.stepAccount": "1 · Konto",
   "auth.signup.stepProfile": "2 · Profil",

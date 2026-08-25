@@ -242,6 +242,49 @@ export const enMessages: FoundationMessages = {
   "auth.login.loading": "Loading sign-in...",
   "auth.login.resetSuccess":
     "Password updated. Sign in with your new password.",
+  "auth.forgot.title": "Reset your password",
+  "auth.forgot.subtitle":
+    "Enter the email on your account and we'll send a secure reset link.",
+  "auth.forgot.panelTitle": "Recover access.",
+  "auth.forgot.panelBody":
+    "We'll email you a one-time link to choose a new password. The link expires for your security.",
+  "auth.forgot.remembered": "Remembered it?",
+  "auth.forgot.backToSignIn": "Back to sign in",
+  "auth.forgot.submit": "Send reset link",
+  "auth.forgot.submitting": "Sending link...",
+  "auth.forgot.sent": "Link sent",
+  "auth.forgot.loading": "Loading...",
+  "auth.forgot.emailRequired": "Email is required.",
+  "auth.forgot.emailInvalid": "Enter a valid email address.",
+  "auth.forgot.sendFailed": "Unable to send reset email. Please try again.",
+  "auth.updatePassword.title": "Choose a new password",
+  "auth.updatePassword.subtitle":
+    "Enter a new password for your UMTUBA account.",
+  "auth.updatePassword.panelTitle": "Secure reset.",
+  "auth.updatePassword.panelBody":
+    "After you save, you'll sign in again with your new password.",
+  "auth.updatePassword.verifying": "Verifying your reset link...",
+  "auth.updatePassword.checkingSession": "Checking your session...",
+  "auth.updatePassword.invalidTitle": "Link invalid or expired",
+  "auth.updatePassword.invalidSubtitle":
+    "This password reset link is no longer valid.",
+  "auth.updatePassword.invalidBody":
+    "Reset links expire for your security. Request a fresh one anytime.",
+  "auth.updatePassword.requestNew": "Request a new reset link",
+  "auth.updatePassword.signIn": "Sign in",
+  "auth.updatePassword.invalidAlert":
+    "This reset link is invalid or has expired. Request a new one.",
+  "auth.updatePassword.newPassword": "New password",
+  "auth.updatePassword.confirmPassword": "Confirm password",
+  "auth.updatePassword.passwordPlaceholder": "At least 6 characters",
+  "auth.updatePassword.confirmPlaceholder": "Re-enter your new password",
+  "auth.updatePassword.submit": "Update password",
+  "auth.updatePassword.submitting": "Saving...",
+  "auth.updatePassword.fixHighlighted": "Please fix the highlighted fields.",
+  "auth.updatePassword.updateFailed":
+    "Unable to update your password. Request a new reset link.",
+  "auth.field.showPassword": "Show",
+  "auth.field.hidePassword": "Hide",
   "auth.signup.title": "Create account",
   "auth.signup.subtitle":
     "Two quick steps — credentials first, then your profile.",

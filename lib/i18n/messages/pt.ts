@@ -483,6 +483,51 @@ export const ptMessages: FoundationMessages = {
   "auth.login.loading": "Carregando o início de sessão…",
   "auth.login.resetSuccess":
     "Palavra-passe atualizada. Entre com a nova palavra-passe.",
+  "auth.forgot.title": "Redefinir a palavra-passe",
+  "auth.forgot.subtitle":
+    "Introduza o e-mail da conta e enviaremos uma ligação segura.",
+  "auth.forgot.panelTitle": "Recuperar o acesso.",
+  "auth.forgot.panelBody":
+    "Enviamos uma ligação de utilização única para escolher uma nova palavra-passe. A ligação expira por segurança.",
+  "auth.forgot.remembered": "Já se lembrou?",
+  "auth.forgot.backToSignIn": "Voltar ao início de sessão",
+  "auth.forgot.submit": "Enviar ligação",
+  "auth.forgot.submitting": "A enviar ligação…",
+  "auth.forgot.sent": "Ligação enviada",
+  "auth.forgot.loading": "A carregar…",
+  "auth.forgot.emailRequired": "O e-mail é obrigatório.",
+  "auth.forgot.emailInvalid": "Introduza um e-mail válido.",
+  "auth.forgot.sendFailed":
+    "Não foi possível enviar o e-mail de redefinição. Tente novamente.",
+  "auth.updatePassword.title": "Escolha uma nova palavra-passe",
+  "auth.updatePassword.subtitle":
+    "Introduza uma nova palavra-passe para a sua conta UMTUBA.",
+  "auth.updatePassword.panelTitle": "Redefinição segura.",
+  "auth.updatePassword.panelBody":
+    "Depois de guardar, entre novamente com a nova palavra-passe.",
+  "auth.updatePassword.verifying": "A verificar a ligação…",
+  "auth.updatePassword.checkingSession": "A verificar a sessão…",
+  "auth.updatePassword.invalidTitle": "Ligação inválida ou expirada",
+  "auth.updatePassword.invalidSubtitle":
+    "Esta ligação de redefinição já não é válida.",
+  "auth.updatePassword.invalidBody":
+    "As ligações expiram por segurança. Peça uma nova a qualquer momento.",
+  "auth.updatePassword.requestNew": "Pedir nova ligação",
+  "auth.updatePassword.signIn": "Entrar",
+  "auth.updatePassword.invalidAlert":
+    "Esta ligação é inválida ou expirou. Peça uma nova.",
+  "auth.updatePassword.newPassword": "Nova palavra-passe",
+  "auth.updatePassword.confirmPassword": "Confirmar palavra-passe",
+  "auth.updatePassword.passwordPlaceholder": "Pelo menos 6 caracteres",
+  "auth.updatePassword.confirmPlaceholder":
+    "Volte a introduzir a nova palavra-passe",
+  "auth.updatePassword.submit": "Atualizar palavra-passe",
+  "auth.updatePassword.submitting": "A guardar…",
+  "auth.updatePassword.fixHighlighted": "Corrija os campos assinalados.",
+  "auth.updatePassword.updateFailed":
+    "Não foi possível atualizar a palavra-passe. Peça uma nova ligação.",
+  "auth.field.showPassword": "Mostrar",
+  "auth.field.hidePassword": "Ocultar",
   "auth.signup.haveAccount": "Já tem uma conta?",
   "auth.signup.stepAccount": "1 · Conta",
   "auth.signup.stepProfile": "2 · Perfil",
