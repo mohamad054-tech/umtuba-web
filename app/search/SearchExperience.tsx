@@ -20,13 +20,13 @@ import ProductErrorState from "../components/product/ProductErrorState";
 import ProductLoadingState from "../components/product/ProductLoadingState";
 import { APP_ROUTES } from "../lib/nav";
 import {
-  SEARCH_TAB_LABELS,
   SEARCH_TABS,
   type GlobalSearchResult,
   type RecentSearchItem,
   type SearchResultItem,
   type SearchTab,
 } from "../../lib/search";
+import type { TranslationKey } from "../../lib/i18n/messages/types";
 import { SEARCH_ERRORS, searchUserMessage } from "../../lib/search/errors";
 import { buildSearchHref } from "../../lib/search/contracts";
 import SearchShell from "./components/SearchShell";
@@ -36,6 +36,15 @@ type SearchExperienceProps = {
   initialQuery?: string;
   initialTab?: SearchTab;
   initialViewerId?: string | null;
+};
+
+const SEARCH_TAB_KEYS: Record<SearchTab, TranslationKey> = {
+  all: "search.tab.all",
+  people: "search.tab.people",
+  videos: "search.tab.videos",
+  stories: "search.tab.stories",
+  stores: "search.tab.stores",
+  products: "search.tab.products",
 };
 
 const SUGGEST_DEBOUNCE_MS = 280;
@@ -215,7 +224,7 @@ export default function SearchExperience({
         }}
       >
         <label className="block">
-          <span className="sr-only">Search UMTUBA</span>
+          <span className="sr-only">{t("search.srLabel")}</span>
           <div className="flex items-center gap-2 rounded-2xl border border-white/15 bg-black/40 px-3 py-2.5 shadow-[0_0_0_1px_rgba(255,255,255,0.02)] focus-within:border-sky-400/40">
             <span className="text-sm font-black text-sky-300/80" aria-hidden>
               ⌕
@@ -227,7 +236,7 @@ export default function SearchExperience({
                 setQuery(value);
                 scheduleSuggest(value, tab);
               }}
-              placeholder="Search people, videos, stories, stores…"
+              placeholder={t("search.placeholder")}
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
@@ -244,7 +253,7 @@ export default function SearchExperience({
                 }}
                 className="rounded-full px-2 py-1 text-[11px] font-bold text-white/50 hover:bg-white/10 hover:text-white"
               >
-                Clear
+                {t("search.clear")}
               </button>
             ) : null}
           </div>
@@ -253,7 +262,7 @@ export default function SearchExperience({
         <div
           className="flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           role="tablist"
-          aria-label="Search categories"
+          aria-label={t("search.categoriesAria")}
         >
           {SEARCH_TABS.map((item) => {
             const active = tab === item;
@@ -270,7 +279,7 @@ export default function SearchExperience({
                     : "border border-white/10 bg-white/5 text-white/55 hover:text-white"
                 }`}
               >
-                {SEARCH_TAB_LABELS[item]}
+                {t(SEARCH_TAB_KEYS[item])}
               </button>
             );
           })}
@@ -280,21 +289,21 @@ export default function SearchExperience({
       <div className="mt-6 space-y-6">
         {error ? (
           <ProductErrorState
-            title="Search unavailable"
+            title={t("search.unavailable")}
             message={error}
             onRetry={() => commitSearch(query, tab)}
           />
         ) : null}
 
         {(loading || pending) && !result ? (
-          <ProductLoadingState label="Searching UMTUBA…" />
+          <ProductLoadingState label={t("search.searching")} />
         ) : null}
 
         {showRecent ? (
-          <section aria-label="Recent searches">
+          <section aria-label={t("search.recent")}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-xs font-black uppercase tracking-[0.16em] text-white/45">
-                Recent
+                {t("search.recent")}
               </h2>
               {initialViewerId ? (
                 <button
@@ -303,7 +312,7 @@ export default function SearchExperience({
                   disabled={pending}
                   className="text-[11px] font-bold text-white/45 hover:text-white"
                 >
-                  Clear all
+                  {t("search.clearAll")}
                 </button>
               ) : null}
             </div>
@@ -321,7 +330,7 @@ export default function SearchExperience({
                   >
                     <span className="truncate">{item.query}</span>
                     <span className="shrink-0 text-[10px] uppercase tracking-[0.12em] text-white/35">
-                      {SEARCH_TAB_LABELS[item.tab]}
+                      {t(SEARCH_TAB_KEYS[item.tab])}
                     </span>
                   </button>
                 </li>
@@ -362,17 +371,20 @@ export default function SearchExperience({
               {result.groups
                 .filter((g) => g.items.length > 0)
                 .map((group) => (
-                  <section key={group.tab} aria-label={group.label}>
+                  <section
+                    key={group.tab}
+                    aria-label={t(SEARCH_TAB_KEYS[group.tab])}
+                  >
                     <div className="mb-2 flex items-center justify-between">
                       <h2 className="text-xs font-black uppercase tracking-[0.16em] text-white/45">
-                        {group.label}
+                        {t(SEARCH_TAB_KEYS[group.tab])}
                       </h2>
                       <button
                         type="button"
                         onClick={() => onTabChange(group.tab)}
                         className="text-[11px] font-bold text-sky-300/80 hover:text-sky-200"
                       >
-                        See all
+                        {t("search.seeAll")}
                       </button>
                     </div>
                     <div className="space-y-2">
@@ -394,7 +406,7 @@ export default function SearchExperience({
 
         {(loading || pending) && result ? (
           <p className="text-center text-[11px] font-bold text-white/40">
-            Updating results…
+            {t("search.updating")}
           </p>
         ) : null}
       </div>

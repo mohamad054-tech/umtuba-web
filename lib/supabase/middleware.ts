@@ -1,8 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { LOCALE_COOKIE_NAME } from "../i18n/cookie";
 import {
   LOCALE_OVERRIDE_HEADER,
+  LOCALE_QUERY_PARAM,
   readLocaleQueryValue,
+  resolveLocaleFromQueryAndCookie,
 } from "../site/hreflang";
 import { createServiceUnavailableResponse } from "../env/serviceUnavailableResponse";
 import {
@@ -190,6 +193,13 @@ export async function updateSession(request: NextRequest) {
     loginUrl.pathname = "/login";
     loginUrl.search = "";
     loginUrl.searchParams.set("next", `${pathname}${search}`);
+    const loginLocale = resolveLocaleFromQueryAndCookie(
+      (key) => request.nextUrl.searchParams.get(key),
+      request.cookies.get(LOCALE_COOKIE_NAME)?.value
+    );
+    if (loginLocale) {
+      loginUrl.searchParams.set(LOCALE_QUERY_PARAM, loginLocale);
+    }
     return applyReferralAttribution(
       request,
       copyCookies(supabaseResponse, NextResponse.redirect(loginUrl))

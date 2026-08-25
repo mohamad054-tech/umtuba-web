@@ -57,3 +57,15 @@ export function readLocaleQueryValue(
   }
   return null;
 }
+
+/**
+ * Locale for auth-gate redirects: explicit `?hl=` / `?locale=` first,
+ * then the persisted preference cookie. Used so /create?hl=ar does not
+ * land on an English login wall.
+ */
+export function resolveLocaleFromQueryAndCookie(
+  queryGet: (key: string) => string | null,
+  cookieValue: string | null | undefined
+): AppLocale | null {
+  return readLocaleQueryValue(queryGet) ?? normalizeToAppLocale(cookieValue);
+}

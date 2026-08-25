@@ -539,6 +539,22 @@ export type FoundationMessages = {
   "search.noResultsTitle": string;
   "search.noResultsDescription": string;
   "search.storeSearch": string;
+  "search.placeholder": string;
+  "search.clear": string;
+  "search.srLabel": string;
+  "search.categoriesAria": string;
+  "search.tab.all": string;
+  "search.tab.people": string;
+  "search.tab.videos": string;
+  "search.tab.stories": string;
+  "search.tab.stores": string;
+  "search.tab.products": string;
+  "search.unavailable": string;
+  "search.searching": string;
+  "search.recent": string;
+  "search.clearAll": string;
+  "search.seeAll": string;
+  "search.updating": string;
 
   "messages.title": string;
   "messages.subtitle": string;
@@ -572,6 +588,9 @@ export type FoundationMessages = {
   "watch.postJourney": string;
   "watch.openingJourney": string;
   "watch.aiSummaryBody": string;
+  "watch.discoverWorld": string;
+  "watch.fullscreen": string;
+  "watch.exitFullscreen": string;
   "live.opening": string;
 
   "life.title": string;

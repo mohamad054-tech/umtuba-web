@@ -487,7 +487,7 @@ export default function WatchExperience({
         <p className="hidden max-w-md truncate text-sm text-white/50 md:block">
           {activeVideo
             ? `${activeVideo.location.city} · ${localizedVideoTitle(activeVideo.title, t("video.untitled"))}`
-            : "Discover the world"}
+            : t("watch.discoverWorld")}
         </p>
 
         <div className="pointer-events-auto flex items-center gap-2 md:gap-3">
@@ -505,17 +505,19 @@ export default function WatchExperience({
             href={APP_ROUTES.discover}
             className="watch-focus-ring rounded-full border border-white/15 bg-black/35 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 md:bg-white/5"
           >
-            Discover
+            {t("nav.discover")}
           </Link>
 
           <button
             type="button"
             onClick={handleToggleFullscreen}
             disabled={journeyTransitionActive}
-            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            aria-label={
+              isFullscreen ? t("watch.exitFullscreen") : t("watch.fullscreen")
+            }
             className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold backdrop-blur hover:bg-white/10 disabled:opacity-50 md:inline-flex"
           >
-            {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+            {isFullscreen ? t("watch.exitFullscreen") : t("watch.fullscreen")}
           </button>
         </div>
       </header>
