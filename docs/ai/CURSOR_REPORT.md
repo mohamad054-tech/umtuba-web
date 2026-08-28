@@ -1,86 +1,86 @@
-# CURSOR_REPORT — DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+# CURSOR_REPORT — DESKTOP_UMTUBA_OFFICIAL_BRAND_IMPLEMENTATION_PHASE2_V1
 
 ## Summary
 
-Central-accepted Learning productization is preserved. The worktree `node_modules` junction was replaced with a real local `npm ci` install (Next 16.2.11). No product code was changed to make the build pass. `npx tsc --noEmit`, 25 targeted Learning tests, and `npm run build` all passed. A clean local commit is created on `desktop/learning-approved-design-productization-v1`. Not pushed. Parent public Supabase keys were used (names only; values not printed) and public Learning surfaces now render the live catalog banner. Historical `e7c84c66` remains unavailable and non-blocking.
+Isolated Phase 2 brand implementation on `desktop/umtuba-official-brand-phase2-v1` from authorized `origin/alpha-0.2` @ `b2c0bbd`. Exact V3 stacked masters copied into `brand/official-v3/` and served from `public/brand/official-v3/`. Shared `UmtubaBrandMark` replaces text UMTUBA marks in compact (symbol) and primary (stacked) placements. Favicon/PWA icons use approved symbol assets. No deploy. No merge. No push. Parent dirty office checkout unchanged.
 
 ```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
+TASK_ID = DESKTOP_UMTUBA_OFFICIAL_BRAND_IMPLEMENTATION_PHASE2_V1
+STATUS = COMPLETE_LOCAL_CANDIDATE
+AUTHORIZED_BASE_REF = origin/alpha-0.2
+AUTHORIZED_BASE_SHA = b2c0bbd1aeb423c4f5aa7410c48c407989f30d1c
+WORKTREE = C:\Users\1\Desktop\umtuba\worktrees\UMTUBA-OFFICIAL-BRAND-PHASE2-V1
+BRANCH = desktop/umtuba-official-brand-phase2-v1
+PACKAGE_VALIDATED = YES
+MASTER_ASSETS_USED_EXACTLY = YES
 TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-BRANCH = desktop/learning-approved-design-productization-v1
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-COMMIT_CREATED = YES
+BUILD = PASS
 PUSHED = NO
 DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
 ```
 
 ## Exact files changed
 
-Authorized Learning productization only (this worktree/branch):
+See git status on the isolated branch. Product/source:
 
-- Learning pages and visual/teacher components
-- `lib/learning/productization/**` plus teacher/review/welcome/visualDemo modules
-- i18n teacher catalogs + locale message wiring
-- Labeled `public/demo/learning` fixtures
-- Unapplied `supabase/migrations/20260934_learning_teacher_student_platform_v1.sql`
-- Packets under `docs/ops/learning-approved-design-productization-v1/` and `docs/ops/learning-final-engineering-gates-v1/`
-- This report / current-task handoff
-
-Not changed for the build fix: `next.config.ts`, `package-lock.json`. Not committed: `.env.local`, parent profile-hero dirt, android/store docs, other worktrees.
+- `lib/site/brand.ts`
+- `lib/site/brandAssets.ts`
+- `lib/site/brand.test.ts`
+- `lib/site/jsonLd.ts`
+- `app/components/brand/UmtubaBrandMark.tsx`
+- `app/components/AppTopNav.tsx`
+- `app/components/auth/AuthShell.tsx`
+- `app/components/landing/LandingHero.tsx`
+- `app/components/legal/LegalDocumentPage.tsx`
+- `app/components/product/ProductLoadingState.tsx`
+- `app/welcome/page.tsx`
+- `app/support/page.tsx`
+- `app/feed/page.tsx`
+- `app/watch/WatchExperience.tsx`
+- `app/manifest.ts`
+- `app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`
+- `public/favicon.ico`
+- `public/brand/official-v3/**` (exact runtime copies)
+- `brand/official-v3/**` (exact masters including video/audio)
+- worktree handoff docs
 
 ## Migrations created
 
-None. Inherited `20260934_learning_teacher_student_platform_v1.sql` is present and was **not** applied.
+None.
 
 ## Security review
 
-- Parent `.env.local` inspected for key **names** only. Values never printed.
-- Copied only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` into the gitignored worktree `.env.local`.
-- Service-role, Livekit, and Twilio secrets were not copied.
-- Demo flags remain `0`. Teacher approval not faked. Payments remain disabled.
-- `_port_extract` not touched. Windows Desktop not used as an artifact destination.
-- `umtuba-mobile` not touched.
+- Exact approved assets only. No AI-regenerated artwork.
+- Favicon ICO wraps exact PNG payloads (16/32/48). No pixel redraw.
+- No `.env` read or printed. No secrets.
+- No database, payments, Stripe, entitlements, or migrations.
+- Parent `office/profile-hero-completeness-v1` @ `380a366` not modified.
 
 ## Tests
 
-PASS — 25 targeted vitest (`productization`, `visualDemo`, teacher catalogs/platform/studio/reviews/welcome/earnings).
+Brand-owned: `lib/site/brand.test.ts` + `lib/site/metadata.test.ts` PASS.
+
+Full `vitest run`: 4505 passed, 24 failed, 1 skipped. Failed files are pre-existing on `b2c0bbd` (Learning/content/i18n/wallet/media-foundation/nav contrast) and were not introduced by this brand diff. Untouched `app/globals.css` and `DiscoverShell.tsx` still fail the same contrast/overflow contracts.
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit` after removing stale junction/webpack `.next` types.
+`npx tsc --noEmit` PASS.
 
 ## Build
 
-PASS — `npm run build` (Next 16.2.11 Turbopack).
+`npm run build` PASS. Manifest and icon routes generated.
 
 ## git diff --check
 
-PASS (productization worktree, committed paths).
+PASS.
 
 ## git status --short
 
-Recorded after the authorized local commit. Parent office/profile-hero working tree remains dirty and untouched by this commit.
+Isolated worktree dirty with brand files until local commit. Parent remains `office/profile-hero-completeness-v1` @ `380a366` with prior unrelated dirt.
 
 ## Open issues
 
-- `e7c84c668c251ca6b386a60b2b3c01a89eeb7e1b` still not fetchable (`not our ref`).
-- `20260934` not applied. Authenticated writes / RLS persistence not exercised.
-- Turbopack warns that the parent lockfile can be inferred as workspace root. Build still passed without adding `turbopack.root`.
-- PUSHED = NO. Deploy not authorized.
+- Android/iOS native sources not in this repo.
+- Watermark / end-tag 9:16 / 16:9 / audio sting: no existing product integration; masters stored only.
+- Auth login preview fail-closed without local AUTH env — AuthShell stacked mark not screenshotable in this preview.
+- Compact headers correctly use symbol-only (stacked lockup would be unreadable). Existing page title text "UMTUBA" beside the symbol is product chrome, not a new horizontal lockup.

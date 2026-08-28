@@ -1,12 +1,10 @@
 import type { MetadataRoute } from "next";
 import { BRAND, BRAND_COLORS, DEFAULT_DESCRIPTION } from "../lib/site/brand";
+import { BRAND_ASSETS } from "../lib/site/brandAssets";
 
 /**
  * Web app manifest.
- *
- * Icons: only `app/favicon.ico` is present in the repo.
- * Missing dedicated PWA sizes (192×192, 512×512) and apple-touch-icon —
- * do not fabricate unreviewed logo assets; favicon is referenced as `any`.
+ * Icons are exact approved V3 symbol assets.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -21,9 +19,21 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["social", "entertainment"],
     icons: [
       {
-        src: "/favicon.ico",
-        sizes: "any",
-        type: "image/x-icon",
+        src: BRAND_ASSETS.icon192,
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: BRAND_ASSETS.icon512,
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: BRAND_ASSETS.appIcon1024,
+        sizes: "1024x1024",
+        type: "image/png",
         purpose: "any",
       },
     ],

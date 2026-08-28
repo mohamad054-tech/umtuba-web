@@ -1,4 +1,5 @@
 import { BRAND } from "./brand";
+import { BRAND_ASSETS } from "./brandAssets";
 import { isSafePublicShareImageUrl, truncateForMeta } from "./metadata";
 import { getSiteUrl } from "./siteUrl";
 
@@ -21,7 +22,7 @@ export function buildOrganizationJsonLd(
     name: BRAND.name,
     url: `${origin}/`,
     slogan: BRAND.tagline,
-    logo: `${origin}/favicon.ico`,
+    logo: `${origin}${BRAND_ASSETS.lockupStackedTransparentPng}`,
   };
 }
 

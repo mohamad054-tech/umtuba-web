@@ -1,4 +1,5 @@
 import Link from "next/link";
+import UmtubaBrandMark from "../components/brand/UmtubaBrandMark";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../lib/nav";
 import { supportMetadata } from "../../lib/site/routeMetadata";
 import {
@@ -28,9 +29,9 @@ export default function SupportPage() {
         <nav className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/55">
           <Link
             href={APP_ROUTES.home}
-            className="watch-focus-ring rounded-full font-black tracking-tight text-white transition hover:text-white/85"
+            className="watch-focus-ring inline-flex h-8 w-8 items-center justify-center rounded-full"
           >
-            UMTUBA
+            <UmtubaBrandMark placement="symbol" className="h-8 w-8" />
           </Link>
           <span aria-hidden="true" className="text-white/25">
             /

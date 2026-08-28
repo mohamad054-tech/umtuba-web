@@ -1,0 +1,25 @@
+{
+  "brand": "UMTUBA",
+  "status": "OWNER_APPROVED",
+  "primary_lockup": "stacked_only",
+  "symbol_position": "above_wordmark",
+  "tagline": "LEARN \u00b7 CREATE \u00b7 SHARE",
+  "colors": {
+    "gold_primary": "#D4AF37",
+    "gold_light": "#FFD86A",
+    "gold_dark": "#B8860B",
+    "black": "#000000",
+    "dark": "#111111",
+    "white": "#FFFFFF"
+  },
+  "typography": {
+    "primary": "Montserrat",
+    "fallback": "Arial, sans-serif"
+  },
+  "usage": {
+    "primary": "stacked_only",
+    "symbol_above_wordmark": true,
+    "side_by_side_logo": false
+  },
+  "horizontal_lockup": "forbidden"
+}

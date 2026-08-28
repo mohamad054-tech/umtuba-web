@@ -15,6 +15,7 @@ import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
 import WatchPanel from "../components/video/WatchPanel";
 import type { WatchPanelId } from "../components/video/watchTypes";
 import JourneyTransitionDirector from "../components/journey-transition/JourneyTransitionDirector";
+import UmtubaBrandMark from "../components/brand/UmtubaBrandMark";
 import ActivityTierIndicator from "../components/activity-tiers/ActivityTierIndicator";
 import WalletBalanceIndicator from "../components/wallet/WalletBalanceIndicator";
 import NotificationBell from "../components/NotificationBell";
@@ -479,9 +480,9 @@ export default function WatchExperience({
       <header className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:pointer-events-auto md:relative md:px-8">
         <Link
           href="/"
-          className="watch-focus-ring pointer-events-auto rounded-full bg-black/25 px-3 py-1 text-2xl font-black tracking-tight backdrop-blur-md md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
+          className="watch-focus-ring pointer-events-auto inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/25 p-1.5 backdrop-blur-md md:bg-transparent md:p-0 md:backdrop-blur-none"
         >
-          UMTUBA
+          <UmtubaBrandMark placement="symbol" className="h-8 w-8" />
         </Link>
 
         <p className="hidden max-w-md truncate text-sm text-white/50 md:block">
