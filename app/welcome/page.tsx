@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { welcomeMetadata } from "../../lib/site/routeMetadata";
 import { APP_ROUTES } from "../lib/nav";
+import UmtubaStackedLogo from "../components/brand/UmtubaStackedLogo";
 import JoinBetaLink from "../components/landing/JoinBetaLink";
 import LandingHero from "../components/landing/LandingHero";
 
@@ -84,7 +85,9 @@ export default function WelcomePage() {
       </section>
 
       <footer className="relative z-10 border-t border-white/10 px-6 py-10 text-center text-sm text-white/45 md:px-12">
-        <p className="font-black tracking-tight text-white/70">UMTUBA</p>
+        <div className="flex justify-center">
+          <UmtubaStackedLogo size="footer" />
+        </div>
         <p className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link
             href={APP_ROUTES.terms}

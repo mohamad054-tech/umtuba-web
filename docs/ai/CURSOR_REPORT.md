@@ -1,41 +1,63 @@
-# CURSOR_REPORT — PC2 SAVE_ALL closeout 2026-08-14
+# CURSOR_REPORT — PC2 official logo from approved video V1
 
 ```text
-SOURCE_DEVICE = PC2
-DEVICE_ROLE = PLATFORM_SOCIAL_CONTENT_OWNER
-TASK_ID = PC2_SAVE_ALL_2026-08-14
-PARENT_TASK = PC2_UAF12_SOURCE_DELIVERY_V1
-CENTRAL_COORDINATOR = SERVER
-REPORT_TYPE = SAVE_ALL
-TIMESTAMP_LOCAL = 2026-08-14 ~00:39 +03
-SECRET_VALUES_PRINTED = NO
-FORCE_PUSH = NO
+TASK_ID = PC2_UMTUBA_OFFICIAL_LOGO_WEB_IMPLEMENTATION_FROM_APPROVED_VIDEO_V1
+STATUS = IMPLEMENTED_LOCAL_PREVIEW
+APPROVED_PACKAGE_VERIFIED = YES
+AUTHORITATIVE_REPO = C:/Users/Giga store/Desktop/umtuba/umtuba-web-translation-trunk-port-v1
+AUTHORIZED_BASE = office/platform-translation-trunk-port-v1
+BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+WORKTREE = C:/Users/Giga store/Desktop/umtuba/umtuba-web-official-logo-approved-video-v1
+BRANCH = pc2/official-logo-from-approved-video-v1
+STACKED_LOGO_IMPLEMENTED = YES
+LOCAL_PREVIEW = http://localhost:3010/welcome
 PUSH = NO
-PRODUCTION_MUTATED = NO
-SECRETS_EXPOSED = NO
-REMOTE_MIGRATION_APPLIED = NO
-SAVE_ALL_SHA = 81857788f511b5b98b09c37e6516a56190d0e4b2
+MERGED = NO
+DEPLOYED = NO
+PRODUCT_FUNCTIONALITY_CHANGED = NO
+DATABASE_TOUCHED = NO
+PAYMENTS_TOUCHED = NO
 ```
 
 ## Summary
 
-SAVE_ALL on PC2 committed leftover valid docs and operator reports locally so shutdown does not drop them. UAF-12 source `72190b6`, Store `dad5eb5`/`8204c0c`, and iOS `3b33561`/`db7f927` were already pushed and were not rewritten. **PUSH = NO.** Mobile `umtuba-mobile` was already clean on `origin/master`. No new feature wave.
-
-Web SAVE_ALL commit: `81857788f511b5b98b09c37e6516a56190d0e4b2` on `office/platform-translation-trunk-port-v1`, plus this SHA-stamp docs commit. Local is ahead of origin; **PUSH = NO**.
+Integrated the owner-approved End Tag video logo package (`UMTUBA_LOGO_FROM_APPROVED_VIDEO_V1.zip`) into shared web brand chrome on an isolated worktree. Primary lockup is the extracted stacked PNG (symbol above UMTUBA). Dirty primary checkout was not used. V2/V3/V4 artwork was not used. No deploy, merge, or push.
 
 ## Exact files changed
 
-Web repo `office/platform-translation-trunk-port-v1`:
+Modified:
 
-- `docs/ai/CURRENT_TASK.md` — UAF-12 delivery remains COMPLETE; SAVE_ALL stamp added
-- `docs/ai/CURSOR_REPORT.md` — this closeout report
-- `worktrees/PC2_UAF12_SOURCE_DELIVERY_V1_REPORT.md`
-- `worktrees/PC2_IOS_APP_STORE_OPERATOR_MODE_V1_REPORT.md`
-- `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md`
-- `worktrees/PC2_IOS_READINESS_CHANGES_PRESERVE_HANDOFF_V1_REPORT.md`
-- `worktrees/PC2_STORE_PREMIUM_COMMIT_DEPOSIT_V1_REPORT.md`
+- `app/components/AppTopNav.tsx`
+- `app/components/auth/AuthShell.tsx`
+- `app/components/landing/LandingHero.tsx`
+- `app/components/legal/LegalDocumentPage.tsx`
+- `app/components/product/ProductLoadingState.tsx`
+- `app/favicon.ico` (packed from approved 16/32/48 PNGs)
+- `app/feed/page.tsx` (legacy experimental header mark)
+- `app/layout.tsx`
+- `app/manifest.ts`
+- `app/opengraph-image.tsx` (comment only; OG stays generated typography)
+- `app/welcome/page.tsx`
+- `docs/ai/CURRENT_TASK.md`
+- `lib/site/brand.ts`
+- `lib/site/metadata.ts`
+- `lib/site/metadata.test.ts`
 
-Mobile repo: none (working tree already clean at `db7f927`).
+Added:
+
+- `app/components/brand/UmtubaStackedLogo.tsx`
+- `app/components/brand/BrandJsonLd.tsx`
+- `app/icon.png` (approved 32×32)
+- `app/apple-icon.png` (approved 180×180)
+- `public/brand/*` (stacked lockup, symbol, 1024 icon, 16–512 icons)
+- `public/favicon-16x16.png`
+- `public/favicon-32x32.png`
+- `public/favicon.ico`
+- `lib/site/brandAssets.test.ts`
+- `scripts/pack-approved-favicon.mjs`
+- `docs/ai/pc2-official-logo-from-approved-video-v1/package/` (full zip evidence)
+- `docs/ai/PC2_UMTUBA_OFFICIAL_LOGO_WEB_IMPLEMENTATION_FROM_APPROVED_VIDEO_V1.md`
+- this report
 
 ## Migrations created
 
@@ -43,54 +65,67 @@ None. None applied remotely.
 
 ## Security review
 
-- New local commits only. No push, no force, no amend.
-- No secrets, `.env`, credentials, or Apple keys committed.
-- Vitest logs and Store visual QA artifacts left uncommitted on purpose.
-- Already-pushed source SHAs were not rewritten.
+- Branding chrome only. No auth logic, payments, Store, Learning, Globe, or DB changes.
+- No secrets, `.env`, or service-role keys read or written.
+- JSON-LD logo URL is a public asset path on the site origin.
+- Isolated worktree; dirty primary tree left untouched.
 
 ## Tests
 
-Not re-run. Docs/reports only; no source change in this closeout.
+`npx vitest run lib/site/brandAssets.test.ts lib/site/metadata.test.ts lib/site/siteUrl.test.ts`
+
+PASS — 3 files, 28 tests.
 
 ## TypeScript
 
-Not re-run (docs-only).
+`npx tsc --noEmit` — PASS.
 
 ## Build
 
-Not re-run (docs-only).
+`npx next build` — PASS (Next.js 16.2.10). `/icon.png`, `/apple-icon.png`, and `/manifest.webmanifest` prerendered.
+
+Limitation: embedding the stacked PNG inside `ImageResponse` failed on this host (`lookupType: 5 - substFormat: 3`). OG remains generated typography. UI/favicon/PWA/JSON-LD use the approved rasters.
 
 ## git diff --check
 
-PASS after stripping leftover trailing whitespace in `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md` (content unchanged).
+PASS.
 
 ## git status --short
 
-After SAVE_ALL + SHA stamp (local ahead of origin; uncommitted leftovers only):
-
 ```text
-## office/platform-translation-trunk-port-v1...origin/office/platform-translation-trunk-port-v1 [ahead 2]
-?? _a2_inventory_vitest.log
-?? _d1_money_locale_vitest.log
-?? _pc2_a1_d1_money_locale_v2.log
-?? _pc2_a1_d2_media_foundation_v2.log
-?? worktrees/_store_visual_qa/
-?? worktrees/_store_visual_qa_pdp.cjs
-?? worktrees/_store_visual_qa_recheck.cjs
-?? worktrees/_store_visual_qa_run.cjs
-?? worktrees/_store_visual_qa_run.mjs
+ M app/components/AppTopNav.tsx
+ M app/components/auth/AuthShell.tsx
+ M app/components/landing/LandingHero.tsx
+ M app/components/legal/LegalDocumentPage.tsx
+ M app/components/product/ProductLoadingState.tsx
+ M app/favicon.ico
+ M app/feed/page.tsx
+ M app/layout.tsx
+ M app/manifest.ts
+ M app/opengraph-image.tsx
+ M app/welcome/page.tsx
+ M docs/ai/CURRENT_TASK.md
+ M lib/site/brand.ts
+ M lib/site/metadata.test.ts
+ M lib/site/metadata.ts
+?? app/apple-icon.png
+?? app/components/brand/
+?? app/icon.png
+?? docs/ai/PC2_UMTUBA_OFFICIAL_LOGO_WEB_IMPLEMENTATION_FROM_APPROVED_VIDEO_V1.md
+?? docs/ai/pc2-official-logo-from-approved-video-v1/
+?? lib/site/brandAssets.test.ts
+?? public/brand/
+?? public/favicon-16x16.png
+?? public/favicon-32x32.png
+?? public/favicon.ico
+?? scripts/pack-approved-favicon.mjs
 ```
 
-Mobile:
-
-```text
-## master...origin/master
-```
-
-(clean)
+Plus this `docs/ai/CURSOR_REPORT.md` rewrite (uncommitted until isolated commit).
 
 ## Open issues
 
-- Owner live persistence QA from UAF-12 remains PARTIAL (no seeded login).
-- Store visual QA scripts/artifacts and pre-existing vitest logs remain uncommitted by design.
-- **PUSH = NO.** Central already has UAF-12 `72190b6` and mobile `db7f927`. Do not start a new feature wave.
+- Owner visual review required on `http://localhost:3010/welcome` (also `/login`, any AppTopNav page).
+- Stacked PNG is a video-frame extract with a black background, not a transparent vector master.
+- OG share image does not yet render the extracted stacked PNG (host ImageResponse limitation).
+- Not pushed, not merged, not deployed.

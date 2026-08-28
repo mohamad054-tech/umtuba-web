@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
 import {
   LEGAL_BETA_NOTICE,
   LEGAL_EFFECTIVE_DATE,
@@ -28,9 +29,10 @@ export default function LegalDocumentPage({
         <nav className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/55">
           <Link
             href={APP_ROUTES.home}
-            className="watch-focus-ring rounded-full font-black tracking-tight text-white transition hover:text-white/85"
+            aria-label="UMTUBA"
+            className="watch-focus-ring rounded-md"
           >
-            UMTUBA
+            <UmtubaStackedLogo size="legal" />
           </Link>
           <span aria-hidden="true" className="text-white/25">
             /

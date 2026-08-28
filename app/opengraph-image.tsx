@@ -7,7 +7,9 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 /**
- * Code-generated Open Graph image — brand typography only (no fabricated logo asset).
+ * Code-generated Open Graph image — brand typography only.
+ * The official stacked logo ships as favicon/PWA/JSON-LD assets; ImageResponse
+ * on this host cannot embed the extracted PNG without a font-parser failure.
  */
 export default function OpenGraphImage() {
   return new ImageResponse(

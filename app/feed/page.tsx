@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import AuthStatus from "../components/AuthStatus";
+import UmtubaStackedLogo from "../components/brand/UmtubaStackedLogo";
 import CreatePostButton from "../components/CreatePostButton";
 import FeedContent from "../components/FeedContent";
 import { isExperimentalRouteAvailable } from "../lib/product/surfaceGates";
@@ -18,8 +19,8 @@ export default function FeedPage() {
     <main className="min-h-screen bg-[#050510] text-white">
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#050510]/90 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-          <Link href="/" className="text-3xl font-black">
-            UMTUBA
+          <Link href="/" aria-label="UMTUBA" className="watch-focus-ring rounded-md">
+            <UmtubaStackedLogo size="nav" priority />
           </Link>
 
           <p className="hidden text-xs font-bold uppercase tracking-[0.2em] text-amber-200/80 md:block">

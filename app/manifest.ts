@@ -1,12 +1,11 @@
 import type { MetadataRoute } from "next";
-import { BRAND, BRAND_COLORS, DEFAULT_DESCRIPTION } from "../lib/site/brand";
+import { BRAND, BRAND_ASSETS, BRAND_COLORS, DEFAULT_DESCRIPTION } from "../lib/site/brand";
 
 /**
  * Web app manifest.
  *
- * Icons: only `app/favicon.ico` is present in the repo.
- * Missing dedicated PWA sizes (192×192, 512×512) and apple-touch-icon —
- * do not fabricate unreviewed logo assets; favicon is referenced as `any`.
+ * Icons are the extracted sizes from UMTUBA_LOGO_FROM_APPROVED_VIDEO_V1.
+ * Do not substitute V2/V3/V4 artwork.
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -21,9 +20,21 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["social", "entertainment"],
     icons: [
       {
-        src: "/favicon.ico",
-        sizes: "any",
-        type: "image/x-icon",
+        src: BRAND_ASSETS.icon192,
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: BRAND_ASSETS.icon512,
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: BRAND_ASSETS.icon180,
+        sizes: "180x180",
+        type: "image/png",
         purpose: "any",
       },
     ],
