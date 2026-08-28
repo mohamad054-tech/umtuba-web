@@ -6,7 +6,7 @@ DESKTOP_UMTUBA_OFFICIAL_BRAND_IMPLEMENTATION_PHASE2_V1
 
 ## Status
 
-**COMPLETE_LOCAL_CANDIDATE.** Isolated worktree from `origin/alpha-0.2` @ `b2c0bbd`. Approved V3 stacked identity integrated. No deploy. No merge. No push. Parent dirty `office/profile-hero-completeness-v1` checkout not modified.
+**COMPLETE_LOCAL_CANDIDATE.** Isolated worktree from `origin/alpha-0.2` @ `b2c0bbd`. Approved V3 stacked identity integrated. Fidelity follow-up: on-page marks serve exact PNG masters (package SVGs were simplified companions; artwork not modified). No deploy. No merge. No push. Parent dirty `office/profile-hero-completeness-v1` checkout not modified.
 
 ```
 TASK_ID = DESKTOP_UMTUBA_OFFICIAL_BRAND_IMPLEMENTATION_PHASE2_V1

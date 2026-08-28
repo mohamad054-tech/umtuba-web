@@ -18,12 +18,20 @@ describe("official V3 brand identity", () => {
 
   it("serves exact stacked masters and never a horizontal lockup", () => {
     expect(brandMarkSrc("stacked", "dark")).toBe(
-      BRAND_ASSETS.lockupStackedTransparentSvg
+      BRAND_ASSETS.lockupStackedTransparentPng
     );
     expect(brandMarkSrc("stacked", "light")).toBe(
-      BRAND_ASSETS.lockupStackedLightSvg
+      BRAND_ASSETS.lockupStackedLightPng
     );
-    expect(brandMarkSrc("symbol")).toBe(BRAND_ASSETS.symbolMasterSvg);
+    expect(brandMarkSrc("symbol")).toBe(BRAND_ASSETS.symbolMasterPng);
+    expect(brandMarkSrc("stacked", "dark")).not.toMatch(/\.svg$/);
+    expect(brandMarkSrc("stacked", "light")).not.toMatch(/\.svg$/);
+    expect(brandMarkSrc("symbol")).not.toMatch(/\.svg$/);
+
+    const stackedPng = readFileSync(
+      join(ROOT, "public/brand/official-v3/png/logo_stacked_transparent.png")
+    );
+    expect(stackedPng.length).toBeGreaterThan(200_000);
 
     const stacked = readFileSync(
       join(ROOT, "brand/official-v3/svg/logo_stacked_transparent.svg"),

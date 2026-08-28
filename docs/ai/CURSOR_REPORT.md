@@ -2,47 +2,39 @@
 
 ## Summary
 
-Isolated Phase 2 brand implementation on `desktop/umtuba-official-brand-phase2-v1` from authorized `origin/alpha-0.2` @ `b2c0bbd`. Exact V3 stacked masters copied into `brand/official-v3/` and served from `public/brand/official-v3/`. Shared `UmtubaBrandMark` replaces text UMTUBA marks in compact (symbol) and primary (stacked) placements. Favicon/PWA icons use approved symbol assets. No deploy. No merge. No push. Parent dirty office checkout unchanged.
+Central visual fail on `http://127.0.0.1:3028/welcome`: stacked placement was correct, but the mark looked flatter than the Brand Board. Investigation only — no redesign, no trace, no replacement artwork, no page-design change.
+
+The V3 **PNG stacked masters** match the premium board (3D tubular U, orbit over/behind bars, clear star). The V3 **SVG companions** are simplified stroke reconstructions (~1.8 KB) and do not. `/welcome` was faithfully rendering the SVG. CSS was not clipping or filtering the mark (`filter: none`, `clip-path: none`, `object-fit: contain`).
+
+Fix: `brandMarkSrc()` now returns the exact PNG masters. Artwork files were not edited. Live page after rebuild serves `logo_stacked_transparent.png` (2400×3000, SHA256 match to disk) at the existing hero size 179×224.
 
 ```
-TASK_ID = DESKTOP_UMTUBA_OFFICIAL_BRAND_IMPLEMENTATION_PHASE2_V1
-STATUS = COMPLETE_LOCAL_CANDIDATE
-AUTHORIZED_BASE_REF = origin/alpha-0.2
-AUTHORIZED_BASE_SHA = b2c0bbd1aeb423c4f5aa7410c48c407989f30d1c
-WORKTREE = C:\Users\1\Desktop\umtuba\worktrees\UMTUBA-OFFICIAL-BRAND-PHASE2-V1
-BRANCH = desktop/umtuba-official-brand-phase2-v1
-PACKAGE_VALIDATED = YES
-MASTER_ASSETS_USED_EXACTLY = YES
-TYPECHECK = PASS
-BUILD = PASS
-PUSHED = NO
+SOURCE_MASTER_VISUALLY_MATCHES_APPROVED_BOARD = YES
+WEB_RENDER_MATCHES_SOURCE_MASTER = YES
+ROOT_CAUSE = WEB_RENDERING
+FIX_APPLIED = serve exact PNG masters for on-page marks; SVGs left unmodified
+VISUAL_REVIEW_READY = YES
 DEPLOYED = NO
+MERGED = NO
+PUSHED = NO
 ```
+
+Parent `office/profile-hero-completeness-v1` @ `380a366` not modified.
 
 ## Exact files changed
 
-See git status on the isolated branch. Product/source:
+Fidelity follow-up (this pass):
 
-- `lib/site/brand.ts`
 - `lib/site/brandAssets.ts`
 - `lib/site/brand.test.ts`
-- `lib/site/jsonLd.ts`
 - `app/components/brand/UmtubaBrandMark.tsx`
-- `app/components/AppTopNav.tsx`
-- `app/components/auth/AuthShell.tsx`
-- `app/components/landing/LandingHero.tsx`
-- `app/components/legal/LegalDocumentPage.tsx`
-- `app/components/product/ProductLoadingState.tsx`
-- `app/welcome/page.tsx`
-- `app/support/page.tsx`
-- `app/feed/page.tsx`
-- `app/watch/WatchExperience.tsx`
-- `app/manifest.ts`
-- `app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`
-- `public/favicon.ico`
-- `public/brand/official-v3/**` (exact runtime copies)
-- `brand/official-v3/**` (exact masters including video/audio)
-- worktree handoff docs
+- `public/brand/official-v3/png/logo_stacked_dark.png` (exact copy)
+- `public/brand/official-v3/png/logo_stacked_light.png` (exact copy)
+- `docs/ops/official-brand-phase2-v1/FIDELITY_INVESTIGATION.md`
+- `docs/ops/official-brand-phase2-v1/VISUAL_REVIEW.md`
+- worktree `docs/ai/*`
+
+Page layout, hero classes, and artwork binaries in `brand/official-v3/` were not redesigned.
 
 ## Migrations created
 
@@ -50,37 +42,34 @@ None.
 
 ## Security review
 
-- Exact approved assets only. No AI-regenerated artwork.
-- Favicon ICO wraps exact PNG payloads (16/32/48). No pixel redraw.
+- Exact approved PNG bytes only. No generated/traced artwork.
 - No `.env` read or printed. No secrets.
 - No database, payments, Stripe, entitlements, or migrations.
-- Parent `office/profile-hero-completeness-v1` @ `380a366` not modified.
+- Parent dirty office checkout not touched.
 
 ## Tests
 
-Brand-owned: `lib/site/brand.test.ts` + `lib/site/metadata.test.ts` PASS.
-
-Full `vitest run`: 4505 passed, 24 failed, 1 skipped. Failed files are pre-existing on `b2c0bbd` (Learning/content/i18n/wallet/media-foundation/nav contrast) and were not introduced by this brand diff. Untouched `app/globals.css` and `DiscoverShell.tsx` still fail the same contrast/overflow contracts.
+`npx vitest run lib/site/brand.test.ts lib/site/metadata.test.ts` — 12 passed.
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS.
+`npx tsc --noEmit` PASS (standalone). `next build` Finished TypeScript in 10.7min.
 
 ## Build
 
-`npm run build` PASS. Manifest and icon routes generated.
+`npm run build` PASS.
 
 ## git diff --check
 
-PASS.
+Recorded at commit time.
 
 ## git status --short
 
-Isolated worktree dirty with brand files until local commit. Parent remains `office/profile-hero-completeness-v1` @ `380a366` with prior unrelated dirt.
+Recorded at commit time.
 
 ## Open issues
 
+- Package SVGs remain simplified reconstructions. They are stored but no longer used for on-page marks. Do not redraw them.
+- At the existing hero size (`h-[min(14rem,42vw)]` = 224px), the 2400×3000 PNG is scaled down. Detail is the master at that size, not a crop.
 - Android/iOS native sources not in this repo.
-- Watermark / end-tag 9:16 / 16:9 / audio sting: no existing product integration; masters stored only.
-- Auth login preview fail-closed without local AUTH env — AuthShell stacked mark not screenshotable in this preview.
-- Compact headers correctly use symbol-only (stacked lockup would be unreadable). Existing page title text "UMTUBA" beside the symbol is product chrome, not a new horizontal lockup.
+- Watermark / end-tag / audio sting: no existing product integration; masters stored only.

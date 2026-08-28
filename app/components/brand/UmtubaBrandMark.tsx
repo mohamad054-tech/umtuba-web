@@ -32,13 +32,14 @@ export default function UmtubaBrandMark({
       : BRAND.name);
 
   return (
-    // Exact master SVG from /public/brand/official-v3 — do not inline/redraw.
+    // Exact approved PNG master from /public/brand/official-v3 — do not inline/redraw.
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={resolvedAlt}
       className={className}
       draggable={false}
+      style={{ objectFit: "contain", overflow: "visible" }}
     />
   );
 }

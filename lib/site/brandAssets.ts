@@ -9,6 +9,8 @@ export const BRAND_ASSETS = {
   lockupStackedTransparentSvg:
     "/brand/official-v3/svg/logo_stacked_transparent.svg",
   symbolMasterSvg: "/brand/official-v3/svg/symbol_master.svg",
+  lockupStackedDarkPng: "/brand/official-v3/png/logo_stacked_dark.png",
+  lockupStackedLightPng: "/brand/official-v3/png/logo_stacked_light.png",
   lockupStackedTransparentPng:
     "/brand/official-v3/png/logo_stacked_transparent.png",
   symbolMasterPng: "/brand/official-v3/png/symbol_master.png",
@@ -31,10 +33,13 @@ export function brandMarkSrc(
   placement: BrandMarkPlacement,
   surface: BrandMarkSurface = "dark"
 ): string {
+  // Serve the approved high-resolution PNG masters for on-page marks.
+  // The package SVGs are simplified line reconstructions of the same lockup
+  // and lose the star/orbit fidelity of the PNG masters at web size.
   if (placement === "symbol") {
-    return BRAND_ASSETS.symbolMasterSvg;
+    return BRAND_ASSETS.symbolMasterPng;
   }
   return surface === "light"
-    ? BRAND_ASSETS.lockupStackedLightSvg
-    : BRAND_ASSETS.lockupStackedTransparentSvg;
+    ? BRAND_ASSETS.lockupStackedLightPng
+    : BRAND_ASSETS.lockupStackedTransparentPng;
 }
