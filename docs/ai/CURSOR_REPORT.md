@@ -1,32 +1,25 @@
-# CURSOR_REPORT — Welcome beta label cleanup V1
+# CURSOR_REPORT — Official brand release candidate V1
 
 ```text
-TASK_ID = PC2_UMTUBA_WELCOME_BETA_LABEL_CLEANUP_V1
-STATUS = IMPLEMENTED_LOCAL_PREVIEW
-BASE_COMMIT = 3dc06aacc2cbc12509144f7c1310f74c235a42ee
-WORKTREE = C:/Users/Giga store/Desktop/umtuba/umtuba-web-official-logo-approved-video-v1
+TASK_ID = PC2_UMTUBA_OFFICIAL_BRAND_RELEASE_CANDIDATE_V1
+STATUS = READY_FOR_CENTRAL_RELEASE
+OWNER_VISUAL_APPROVAL = YES
+APPROVED_COMMIT = 1c6b3fc5312d1c3ef0029785a39d5121de17b9e4
+FINAL_SHA = 1c6b3fc5312d1c3ef0029785a39d5121de17b9e4
 BRANCH = pc2/official-logo-from-approved-video-v1
-LOCAL_PREVIEW = http://localhost:3010/welcome
-PUSH = NO
+REMOTE_BRANCH = origin/pc2/official-logo-from-approved-video-v1
+PUSHED = YES
 MERGED = NO
 DEPLOYED = NO
-LOGO_CHANGED = NO
-GLOBE_CHANGED = NO
-PRODUCT_FUNCTIONALITY_CHANGED = NO
 ```
 
 ## Summary
 
-Removed the visible Welcome beta/trial labels only: the Alpha 0.2 badge and Join Beta / Join the Beta CTAs. Logo, globe, and nav routes are unchanged. No replacement wording.
+Verified and pushed the owner-approved brand commit `1c6b3fc` on isolated branch `pc2/official-logo-from-approved-video-v1`. Central should take that SHA. No merge. No deploy. No product-code change in this task.
 
 ## Exact files changed
 
-- `app/components/landing/LandingHero.tsx` — removed Alpha badge and Join Beta nav chip; nav links stay centered via `flex-1 justify-center`
-- `app/welcome/page.tsx` — removed Join the Beta CTA
-- `lib/site/welcomeBetaLabels.test.ts` — source assertions
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PC2_UMTUBA_WELCOME_BETA_LABEL_CLEANUP_V1.md`
-- this report
+This task: RC docs only (`CURRENT_TASK.md`, this report, `PC2_UMTUBA_OFFICIAL_BRAND_RELEASE_CANDIDATE_V1.md`). Product tree unchanged from `1c6b3fc`.
 
 ## Migrations created
 
@@ -34,22 +27,20 @@ None.
 
 ## Security review
 
-- Copy-only Welcome chrome. No auth logic change. `JoinBetaLink.tsx` left unused (not deleted) so harden tests still see `tryCreateClient`.
-- No secrets. Isolated worktree only.
+- Isolated brand branch only. No force push. No other branches pushed.
+- No secrets. No remote migrations. No production deploy.
 
 ## Tests
 
-`npx vitest run lib/site/welcomeBetaLabels.test.ts lib/site/brandAssets.test.ts lib/site/metadata.test.ts`
-
-PASS — 3 files, 18 tests.
+PASS — 18 (brandAssets, metadata, welcomeBetaLabels) on `1c6b3fc`.
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS.
+`npx tsc --noEmit` — PASS on `1c6b3fc`.
 
 ## Build
 
-`npx next build` — PASS.
+`npx next build` — PASS on `1c6b3fc`.
 
 ## git diff --check
 
@@ -57,10 +48,9 @@ PASS.
 
 ## git status --short
 
-Brand/Welcome/docs only at handoff (before isolated commit).
+Clean at push of `1c6b3fc`. Docs written after push.
 
 ## Open issues
 
-- `JoinBetaLink.tsx` is unused after Welcome CTA removal (intentionally kept).
-- `Beta Mission` heading remains (not in the owner remove list).
-- Not pushed, not merged, not deployed.
+- Central intake only. Do not merge or deploy from this report.
+- Any local RC-docs commit after push is not the intake SHA.
