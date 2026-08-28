@@ -1,5 +1,6 @@
 "use client";
 
+import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
 import { useTranslation } from "../i18n";
 
 type ProductLoadingStateProps = {
@@ -39,7 +40,10 @@ export default function ProductLoadingState({
         <div className="absolute left-[-10%] top-[-10%] h-96 w-96 rounded-full bg-blue-600/25 blur-3xl" />
         <div className="absolute right-[-10%] top-[20%] h-96 w-96 rounded-full bg-sky-500/15 blur-3xl" />
       </div>
-      <div className="relative z-10">{pill}</div>
+      <div className="relative z-10 flex flex-col items-center gap-6">
+        <UmtubaStackedLogo size="loading" priority />
+        {pill}
+      </div>
     </main>
   );
 }

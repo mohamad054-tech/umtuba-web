@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {
   BRAND,
+  BRAND_ASSETS,
   BRAND_KEYWORDS,
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
@@ -159,6 +160,16 @@ export function buildRootMetadata(
           width: image.width,
           height: image.height,
         },
+      ],
+    },
+    icons: {
+      icon: [
+        { url: BRAND_ASSETS.favicon16, sizes: "16x16", type: "image/png" },
+        { url: BRAND_ASSETS.favicon32, sizes: "32x32", type: "image/png" },
+        { url: BRAND_ASSETS.icon192, sizes: "192x192", type: "image/png" },
+      ],
+      apple: [
+        { url: BRAND_ASSETS.icon180, sizes: "180x180", type: "image/png" },
       ],
     },
     formatDetection: {

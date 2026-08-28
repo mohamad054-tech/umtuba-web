@@ -4,6 +4,7 @@ import { buildSiteGraphJsonLd } from "../lib/site/jsonLd";
 import { buildRootMetadata } from "../lib/site/metadata";
 import { resolveRequestLocale } from "../lib/i18n/server";
 import AppChrome from "./components/AppChrome";
+import BrandJsonLd from "./components/brand/BrandJsonLd";
 import JsonLd from "./components/JsonLd";
 import { I18nProvider } from "./components/i18n";
 import AppMotionRoot from "./components/motion/AppMotionRoot";
@@ -42,6 +43,7 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full min-h-dvh flex-col bg-[#050510]" suppressHydrationWarning>
         <JsonLd data={buildSiteGraphJsonLd()} />
+        <BrandJsonLd />
         <I18nProvider locale={locale}>
           <AppMotionRoot>
             <ExactContextResume />

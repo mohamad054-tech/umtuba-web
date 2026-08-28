@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
 import { LanguageSelector, useTranslation } from "../i18n";
 
 type AuthShellProps = {
@@ -41,9 +42,10 @@ export default function AuthShell({
           <section className="hidden bg-gradient-to-br from-blue-900/40 via-[#0b0b18]/60 to-cyan-900/20 p-10 lg:block">
             <Link
               href={APP_ROUTES.home}
-              className="watch-focus-ring inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-black tracking-tight transition hover:bg-white/10"
+              aria-label="UMTUBA"
+              className="watch-focus-ring inline-flex rounded-md"
             >
-              UMTUBA
+              <UmtubaStackedLogo size="auth" priority />
             </Link>
 
             <div className="mt-24">
@@ -60,9 +62,10 @@ export default function AuthShell({
             <div className="mb-8 flex items-center justify-between gap-3">
               <Link
                 href={APP_ROUTES.home}
-                className="inline-block text-xl font-black tracking-tight lg:hidden"
+                aria-label="UMTUBA"
+                className="inline-flex lg:hidden"
               >
-                UMTUBA
+                <UmtubaStackedLogo size="nav" />
               </Link>
               <div className="ms-auto">
                 <LanguageSelector

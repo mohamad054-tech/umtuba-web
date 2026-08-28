@@ -7,6 +7,7 @@ import { desktopNavLabelKey } from "../../../lib/i18n/shellLabels";
 import { APP_NAV_ITEMS, APP_ROUTES, citiesMatch, isNavActive } from "../../lib/nav";
 import { useTranslation } from "../i18n";
 import { LIVING_CITIES } from "./living-earth/livingEarthData";
+import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
 import HeroCTAButton from "./HeroCTAButton";
 import JoinBetaLink from "./JoinBetaLink";
 
@@ -45,9 +46,10 @@ export default function LandingHero() {
       <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-12 md:py-7">
         <Link
           href={APP_ROUTES.home}
-          className="text-lg font-semibold tracking-[0.18em] text-white md:text-xl"
+          aria-label="UMTUBA"
+          className="watch-focus-ring rounded-md"
         >
-          UMTUBA
+          <UmtubaStackedLogo size="nav" priority />
         </Link>
 
         <div className="landing-nav-links hidden items-center gap-9 text-[15px] font-medium tracking-wide text-white/55 sm:flex">
@@ -93,9 +95,9 @@ export default function LandingHero() {
             {t("landing.badge")}
           </div>
 
-          <p className="landing-hero-brand mb-5 text-[clamp(2.75rem,7vw,5.5rem)] font-semibold leading-[0.92] tracking-[-0.04em] text-white">
-            UMTUBA
-          </p>
+          <div className="landing-hero-brand mb-5">
+            <UmtubaStackedLogo size="hero" priority />
+          </div>
 
           <h1 className="max-w-[14ch] text-[clamp(2.1rem,4.6vw,3.75rem)] font-medium leading-[1.08] tracking-[-0.03em] text-white/92">
             {t("landing.headline")}{" "}

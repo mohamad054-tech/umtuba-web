@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { desktopNavLabelKey } from "../../lib/i18n";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
 import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
+import UmtubaStackedLogo from "./brand/UmtubaStackedLogo";
 import { LanguageSelector, useTranslation } from "./i18n";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
@@ -70,13 +71,9 @@ export default function AppTopNav({
           <Link
             href={APP_ROUTES.home}
             aria-label={t("nav.homeAria")}
-            className={`watch-focus-ring shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${focusRing} ${
-              store
-                ? "border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] text-[var(--sf-accent-strong,#e8d7b5)] hover:bg-[rgba(214,196,161,0.16)]"
-                : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
-            }`}
+            className={`watch-focus-ring shrink-0 rounded-md ${focusRing}`}
           >
-            UMTUBA
+            <UmtubaStackedLogo size="nav" priority />
           </Link>
           <div className={`min-w-0 ${store ? "hidden sm:block" : ""}`}>
             <p
