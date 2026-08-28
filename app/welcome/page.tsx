@@ -5,7 +5,6 @@ import { resolveRequestLocale } from "../../lib/i18n/server";
 import { welcomeMetadata } from "../../lib/site/routeMetadata";
 import { APP_ROUTES } from "../lib/nav";
 import UmtubaStackedLogo from "../components/brand/UmtubaStackedLogo";
-import JoinBetaLink from "../components/landing/JoinBetaLink";
 import LandingHero from "../components/landing/LandingHero";
 import BecomeASellerHook from "../components/store/BecomeASellerHook";
 
@@ -115,7 +114,6 @@ export default async function WelcomePage() {
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-white/60">
             {t("landing.missionBody")}
           </p>
-          <JoinBetaLink className="mt-10 inline-flex rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]" />
         </div>
       </section>
 

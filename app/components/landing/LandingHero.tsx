@@ -9,7 +9,6 @@ import { useTranslation } from "../i18n";
 import { LIVING_CITIES } from "./living-earth/livingEarthData";
 import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
 import HeroCTAButton from "./HeroCTAButton";
-import JoinBetaLink from "./JoinBetaLink";
 
 const LandingHeroGlobe = dynamic(() => import("./LandingHeroGlobe"), {
   ssr: false,
@@ -43,7 +42,7 @@ export default function LandingHero() {
         <div className="landing-hero-vignette" />
       </div>
 
-      <nav className="relative z-20 mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-12 md:py-7">
+      <nav className="relative z-20 mx-auto flex max-w-7xl items-center px-6 py-6 md:px-12 md:py-7">
         <Link
           href={APP_ROUTES.home}
           aria-label="UMTUBA"
@@ -52,7 +51,7 @@ export default function LandingHero() {
           <UmtubaStackedLogo size="nav" priority />
         </Link>
 
-        <div className="landing-nav-links hidden items-center gap-9 text-[15px] font-medium tracking-wide text-white/55 sm:flex">
+        <div className="landing-nav-links hidden flex-1 items-center justify-center gap-9 text-[15px] font-medium tracking-wide text-white/55 sm:flex">
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
 
@@ -70,8 +69,6 @@ export default function LandingHero() {
             );
           })}
         </div>
-
-        <JoinBetaLink className="landing-nav-chip rounded-full border border-white/15 bg-white/[0.06] px-5 py-2 text-sm font-medium text-white/90 backdrop-blur-xl transition-all duration-300 hover:border-white/30 hover:bg-white/[0.12] hover:text-white" />
       </nav>
 
       {focusParam ? (
@@ -90,11 +87,6 @@ export default function LandingHero() {
 
       <section className="relative z-10 mx-auto grid min-h-[calc(100svh-5.75rem)] max-w-7xl items-center gap-10 px-6 pb-20 pt-6 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] md:gap-8 md:px-12 md:pb-24 lg:gap-12">
         <div className="landing-hero-copy relative z-10 max-w-xl lg:max-w-2xl">
-          <div className="landing-hero-badge mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-[12px] font-medium tracking-wide text-white/70 backdrop-blur-xl md:mb-10">
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.9)]" />
-            {t("landing.badge")}
-          </div>
-
           <div className="landing-hero-brand mb-6 max-w-full">
             <UmtubaStackedLogo size="hero" priority />
           </div>
