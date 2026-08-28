@@ -1,50 +1,47 @@
-# CURSOR_REPORT — PC2 official logo visual correction V2
+# CURSOR_REPORT — Welcome beta label cleanup V1
 
 ```text
-TASK_ID = PC2_UMTUBA_OFFICIAL_LOGO_WEB_VISUAL_CORRECTION_V2
+TASK_ID = PC2_UMTUBA_WELCOME_BETA_LABEL_CLEANUP_V1
 STATUS = IMPLEMENTED_LOCAL_PREVIEW
-BASE_COMMIT = d0858b093b73c9655c273855eed01b198d9eb201
+BASE_COMMIT = 3dc06aacc2cbc12509144f7c1310f74c235a42ee
 WORKTREE = C:/Users/Giga store/Desktop/umtuba/umtuba-web-official-logo-approved-video-v1
 BRANCH = pc2/official-logo-from-approved-video-v1
 LOCAL_PREVIEW = http://localhost:3010/welcome
 PUSH = NO
 MERGED = NO
 DEPLOYED = NO
+LOGO_CHANGED = NO
+GLOBE_CHANGED = NO
 PRODUCT_FUNCTIONALITY_CHANGED = NO
-DATABASE_TOUCHED = NO
-PAYMENTS_TOUCHED = NO
 ```
 
 ## Summary
 
-Corrected presentation of the already-approved video-derived logo. Header/legal/compact auth now use the official symbol at a readable 48–56px. Welcome hero keeps the full stacked lockup, rendered larger (320–448px) without stretching or exceeding the 788×776 source. No new artwork. No V2/V3/V4 assets.
+Removed the visible Welcome beta/trial labels only: the Alpha 0.2 badge and Join Beta / Join the Beta CTAs. Logo, globe, and nav routes are unchanged. No replacement wording.
 
 ## Exact files changed
 
-- `lib/site/brand.ts` — symbol dimensions + `BRAND_MARK_PRESETS` (display caps vs source)
-- `app/components/brand/UmtubaStackedLogo.tsx` — mark selection, `object-contain`, `sizes`, quality
-- `app/components/auth/AuthShell.tsx` — compact mobile mark uses `authCompact` (symbol)
-- `app/components/landing/LandingHero.tsx` — hero wrapper spacing only
-- `lib/site/brandAssets.test.ts` — compact vs spacious + no-upscale audit
+- `app/components/landing/LandingHero.tsx` — removed Alpha badge and Join Beta nav chip; nav links stay centered via `flex-1 justify-center`
+- `app/welcome/page.tsx` — removed Join the Beta CTA
+- `lib/site/welcomeBetaLabels.test.ts` — source assertions
 - `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PC2_UMTUBA_OFFICIAL_LOGO_WEB_VISUAL_CORRECTION_V2.md`
+- `docs/ai/PC2_UMTUBA_WELCOME_BETA_LABEL_CLEANUP_V1.md`
 - this report
 
 ## Migrations created
 
-None. None applied remotely.
+None.
 
 ## Security review
 
-- Presentation-only. No auth logic, payments, Store, Learning, Globe, or DB changes.
-- No secrets or `.env` reads/writes.
-- Isolated worktree only.
+- Copy-only Welcome chrome. No auth logic change. `JoinBetaLink.tsx` left unused (not deleted) so harden tests still see `tryCreateClient`.
+- No secrets. Isolated worktree only.
 
 ## Tests
 
-`npx vitest run lib/site/brandAssets.test.ts lib/site/metadata.test.ts`
+`npx vitest run lib/site/welcomeBetaLabels.test.ts lib/site/brandAssets.test.ts lib/site/metadata.test.ts`
 
-PASS — 2 files, 16 tests (includes raster upscale audit).
+PASS — 3 files, 18 tests.
 
 ## TypeScript
 
@@ -60,10 +57,10 @@ PASS.
 
 ## git status --short
 
-Recorded at handoff time before isolated commit (brand/docs only).
+Brand/Welcome/docs only at handoff (before isolated commit).
 
 ## Open issues
 
-- Auth routes still 503 in this worktree without `.env` (secrets not copied). Auth chrome code is updated.
-- Owner visual review on `http://localhost:3010/welcome` and `/terms`.
+- `JoinBetaLink.tsx` is unused after Welcome CTA removal (intentionally kept).
+- `Beta Mission` heading remains (not in the owner remove list).
 - Not pushed, not merged, not deployed.

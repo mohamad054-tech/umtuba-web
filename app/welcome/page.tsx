@@ -3,7 +3,6 @@ import Link from "next/link";
 import { welcomeMetadata } from "../../lib/site/routeMetadata";
 import { APP_ROUTES } from "../lib/nav";
 import UmtubaStackedLogo from "../components/brand/UmtubaStackedLogo";
-import JoinBetaLink from "../components/landing/JoinBetaLink";
 import LandingHero from "../components/landing/LandingHero";
 
 export const metadata = welcomeMetadata;
@@ -78,9 +77,6 @@ export default function WelcomePage() {
             helps users discover ideas, collaborators, learning paths, and real
             opportunities.
           </p>
-          <JoinBetaLink className="mt-10 inline-flex rounded-full bg-white px-10 py-4 font-black text-black transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgba(59,130,246,0.28)] active:scale-[0.98]">
-            Join the Beta
-          </JoinBetaLink>
         </div>
       </section>
 

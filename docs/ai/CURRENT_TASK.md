@@ -1,16 +1,14 @@
 ﻿# Current Task
 
-> **PC2 — Official UMTUBA logo web visual correction V2. Presentation only. Isolated worktree.**
+> **PC2 — Welcome beta label cleanup V1. Isolated worktree. Logo presentation is accepted — do not change it.**
 
 ## Result (2026-08-28)
 
 ```text
-TASK_ID = PC2_UMTUBA_OFFICIAL_LOGO_WEB_VISUAL_CORRECTION_V2
+TASK_ID = PC2_UMTUBA_WELCOME_BETA_LABEL_CLEANUP_V1
 STATUS = IMPLEMENTED_LOCAL_PREVIEW
-BASE_COMMIT = d0858b093b73c9655c273855eed01b198d9eb201
+BASE_COMMIT = 3dc06aacc2cbc12509144f7c1310f74c235a42ee
 BRANCH = pc2/official-logo-from-approved-video-v1
-PRIMARY_LOCKUP = STACKED (hero / spacious)
-COMPACT_MARK = SYMBOL-ONLY (header / legal / auth compact)
 LOCAL_PREVIEW = http://localhost:3010/welcome
 PUSH = NO
 DEPLOYED = NO
@@ -19,17 +17,13 @@ MERGED = NO
 
 ## Allowed scope
 
-- Presentation of already-approved `UMTUBA_LOGO_FROM_APPROVED_VIDEO_V1` assets
-- Shared brand chrome: header/nav mark, Welcome hero lockup, footer, legal, auth chrome, loading
-- CSS sizing, `object-fit`, `sizes`, raster source choice (stacked vs symbol / 1024 icon)
-- Isolated worktree docs: `CURRENT_TASK.md`, `CURSOR_REPORT.md`, `PC2_UMTUBA_OFFICIAL_LOGO_WEB_VISUAL_CORRECTION_V2.md`
+- Remove only the visible Welcome strings: `Alpha 0.2 · Built for a new generation` and `Join Beta` / Welcome Join Beta CTA
+- Preserve Welcome spacing after removal
+- Isolated worktree docs for this task
 
 ## Forbidden scope
 
-- Redesign or replace approved video-derived artwork
-- V2 / V3 / V4 logo packages
-- Side-by-side primary lockup
-- Globe, posts/videos, Learning, Store
-- Auth behavior, database, migrations, payments
-- Alpha 0.2 / Join Beta copy
+- Logo, globe, layout redesign, animation, navigation behavior
+- Replacing removed labels with beta/trial/preview/coming soon/early access wording
+- Posts/videos, Learning, Store, auth behavior, database, migrations, payments
 - Deploy, merge, push, remote migrations
