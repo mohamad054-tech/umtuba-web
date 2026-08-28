@@ -1,7 +1,13 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { BRAND, BRAND_ASSETS } from "./brand";
+import {
+  BRAND,
+  BRAND_ASSETS,
+  BRAND_MARK_PRESETS,
+  brandMarkSource,
+  brandMarkSourceHeight,
+} from "./brand";
 
 const ROOT = process.cwd();
 
@@ -33,7 +39,29 @@ describe("approved video logo assets", () => {
     );
     expect(BRAND_ASSETS.stackedLogoWidth).toBe(788);
     expect(BRAND_ASSETS.stackedLogoHeight).toBe(776);
+    expect(BRAND_ASSETS.symbolWidth).toBe(487);
+    expect(BRAND_ASSETS.symbolHeight).toBe(450);
     expect(BRAND.name).toBe("UMTUBA");
+  });
+
+  it("uses symbol-only marks in compact chrome and stacked lockup in spacious surfaces", () => {
+    expect(BRAND_MARK_PRESETS.nav.mark).toBe("symbol");
+    expect(BRAND_MARK_PRESETS.legal.mark).toBe("symbol");
+    expect(BRAND_MARK_PRESETS.authCompact.mark).toBe("symbol");
+    expect(BRAND_MARK_PRESETS.hero.mark).toBe("stacked");
+    expect(BRAND_MARK_PRESETS.auth.mark).toBe("stacked");
+    expect(BRAND_MARK_PRESETS.footer.mark).toBe("stacked");
+    expect(BRAND_MARK_PRESETS.loading.mark).toBe("stacked");
+    expect(brandMarkSource("symbol")).toBe(BRAND_ASSETS.symbol);
+    expect(brandMarkSource("stacked")).toBe(BRAND_ASSETS.stackedLogo);
+  });
+
+  it("never presents a display height larger than the source raster", () => {
+    for (const preset of Object.values(BRAND_MARK_PRESETS)) {
+      expect(preset.maxDisplayPx).toBeLessThanOrEqual(
+        brandMarkSourceHeight(preset.mark)
+      );
+    }
   });
 
   it("ships every referenced public brand file", () => {

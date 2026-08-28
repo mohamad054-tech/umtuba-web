@@ -57,7 +57,7 @@ export default function AuthShell({
               aria-label="UMTUBA"
               className="mb-8 inline-flex lg:hidden"
             >
-              <UmtubaStackedLogo size="nav" />
+              <UmtubaStackedLogo size="authCompact" />
             </Link>
 
             <h2 className="text-3xl font-black tracking-tight sm:text-4xl">

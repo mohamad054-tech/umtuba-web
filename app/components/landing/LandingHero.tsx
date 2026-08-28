@@ -90,7 +90,7 @@ export default function LandingHero() {
             Alpha 0.2 · Built for a new generation
           </div>
 
-          <div className="landing-hero-brand mb-5">
+          <div className="landing-hero-brand mb-6 max-w-full">
             <UmtubaStackedLogo size="hero" priority />
           </div>
 
