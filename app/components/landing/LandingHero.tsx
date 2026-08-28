@@ -95,7 +95,7 @@ export default function LandingHero() {
             {t("landing.badge")}
           </div>
 
-          <div className="landing-hero-brand mb-5">
+          <div className="landing-hero-brand mb-6 max-w-full">
             <UmtubaStackedLogo size="hero" priority />
           </div>
 

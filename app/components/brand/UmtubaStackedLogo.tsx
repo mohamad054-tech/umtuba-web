@@ -1,22 +1,14 @@
 import Image from "next/image";
-import { BRAND, BRAND_ASSETS } from "../../../lib/site/brand";
+import {
+  BRAND,
+  BRAND_ASSETS,
+  BRAND_MARK_PRESETS,
+  brandMarkSource,
+  type BrandMarkKind,
+  type BrandMarkPresetId,
+} from "../../../lib/site/brand";
 
-export type UmtubaStackedLogoSize =
-  | "nav"
-  | "hero"
-  | "auth"
-  | "footer"
-  | "legal"
-  | "loading";
-
-const SIZE_CLASS: Record<UmtubaStackedLogoSize, string> = {
-  nav: "h-11 w-auto",
-  hero: "h-[clamp(8.5rem,22vw,14rem)] w-auto",
-  auth: "h-20 w-auto sm:h-24",
-  footer: "h-16 w-auto",
-  legal: "h-10 w-auto",
-  loading: "h-28 w-auto",
-};
+export type UmtubaStackedLogoSize = BrandMarkPresetId;
 
 type UmtubaStackedLogoProps = {
   size?: UmtubaStackedLogoSize;
@@ -24,23 +16,35 @@ type UmtubaStackedLogoProps = {
   priority?: boolean;
 };
 
+const FRAME_CLASS =
+  "max-w-full object-contain object-center [image-rendering:auto]";
+
 /**
- * Primary official lockup: symbol above UMTUBA, from the approved End Tag video.
- * Do not substitute a horizontal lockup or regenerated artwork.
+ * Official approved-video mark. Compact chrome uses the symbol only;
+ * spacious surfaces use the stacked lockup. Never a horizontal lockup.
  */
 export default function UmtubaStackedLogo({
   size = "nav",
   className = "",
   priority = false,
 }: UmtubaStackedLogoProps) {
+  const preset = BRAND_MARK_PRESETS[size];
+  const mark: BrandMarkKind = preset.mark;
+  const stacked = mark === "stacked";
+
   return (
     <Image
-      src={BRAND_ASSETS.stackedLogo}
+      src={brandMarkSource(mark)}
       alt={BRAND.name}
-      width={BRAND_ASSETS.stackedLogoWidth}
-      height={BRAND_ASSETS.stackedLogoHeight}
-      className={`${SIZE_CLASS[size]} ${className}`.trim()}
+      width={stacked ? BRAND_ASSETS.stackedLogoWidth : BRAND_ASSETS.symbolWidth}
+      height={
+        stacked ? BRAND_ASSETS.stackedLogoHeight : BRAND_ASSETS.symbolHeight
+      }
+      sizes={preset.sizes}
+      quality={90}
+      className={`${preset.className} ${FRAME_CLASS} ${className}`.trim()}
       priority={priority}
+      draggable={false}
     />
   );
 }

@@ -65,7 +65,7 @@ export default function AuthShell({
                 aria-label="UMTUBA"
                 className="inline-flex lg:hidden"
               >
-                <UmtubaStackedLogo size="nav" />
+                <UmtubaStackedLogo size="authCompact" />
               </Link>
               <div className="ms-auto">
                 <LanguageSelector
