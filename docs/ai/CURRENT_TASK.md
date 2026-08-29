@@ -55,4 +55,4 @@ Creator edits own post/video before and after publish. Same Post ID, public URL,
 
 ## Residual
 
-Packet: `docs/ai/CURSOR_REPORT.md`. Owner QA: sign in as the post owner → More → Edit → change caption/trim → Preview → Cancel (live unchanged) → Save → same `/watch?post={id}`.
+Packet: `docs/ai/CURSOR_REPORT.md`. Owner QA: sign in as the post owner → own video on Home or `/watch?post={id}` → right-rail **Edit** (same slot as the old red X) → change caption/trim → Preview → Cancel (live unchanged) → Save → same `/watch?post={id}`. Delete is only inside `/edit/post/{id}` (confirm dialog). Guests see no rail control.

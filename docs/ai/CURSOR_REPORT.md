@@ -1,5 +1,21 @@
 # CURSOR_REPORT — DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
 
+## Owner QA follow-up — DESKTOP_UMTUBA_POST_EDIT_REPLACES_DELETE_X_V1
+
+```
+TASK_ID = DESKTOP_UMTUBA_POST_EDIT_REPLACES_DELETE_X_V1
+STATUS = COMPLETE_CANDIDATE
+COMMIT = 322a42e60553ddef82fcb92a126eb19a25e39d05
+PREVIEW_URL = http://127.0.0.1:3032
+DELETE_MOVED_INTO_EDIT = YES
+RED_X_REMOVED_FROM_WATCH = YES
+BLOCKERS = none
+```
+
+Owner Edit occupies the old Watch/Home right-rail delete slot (`watch-rail-btn` 12×12). Guests still see nothing (`viewerMaySeeDeleteControl`). Standalone on-screen delete is gone from Watch/Home. `/edit/post/[id]` has Delete + confirm dialog via existing `deletePostAction` / owner RLS. Auth not weakened. Watch layout not redesigned.
+
+Preview: detached `next dev -p 3032 -H 0.0.0.0` (production `.next` rebuild was blocked by disk; C: later recovered). Verified `GET /` → 200, `GET /edit/post/542` guest → 307 `/login?next=/edit/post/542`.
+
 ## Summary
 
 Owners can edit their own draft and published posts on the same Post ID. Caption, hashtags, article body, single-slot image/video replace, cover, and video IN/OUT trim are editable. Failed media revisions abort before any `posts` update so the live path stays intact. Cancel never writes. No migration. Isolated worktree only; not pushed; not deployed.
@@ -112,4 +128,4 @@ Recorded after the authorized local commit on `desktop/umtuba-post-publish-editi
 
 ## Owner QA candidate
 
-Sign in as the post owner → open own post → More → Edit → change caption and/or IN/OUT → Preview → Cancel (confirm `/watch?post={id}` unchanged) → Edit again → Save → same URL, same comments/likes/views, subtle Edited stamp.
+Sign in as the post owner → own video on Home or `/watch?post={id}` → right-rail **Edit** (same slot as the old red X) → change caption and/or IN/OUT → Preview → Cancel (confirm `/watch?post={id}` unchanged) → Edit again → Save → same URL, same comments/likes/views, subtle Edited stamp. Delete lives only on `/edit/post/{id}` behind a confirm dialog.
