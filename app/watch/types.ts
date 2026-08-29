@@ -36,6 +36,8 @@ export type WatchVideo = {
   articleId?: string | null;
   articleTitle?: string | null;
   articleHref?: string | null;
+  trim?: { inMs: number; outMs: number } | null;
+  editedAt?: string | null;
 };
 
 export type WatchFeedCursor = {

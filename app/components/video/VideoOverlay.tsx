@@ -115,6 +115,11 @@ export default function VideoOverlay({
             <p className="text-sm font-black text-white md:text-[15px]">
               {displayTitle}
             </p>
+            {video.editedAt ? (
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                Edited
+              </p>
+            ) : null}
             {hasLinkedArticle ? (
               <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
                 {t("watch.linkedArticle")}

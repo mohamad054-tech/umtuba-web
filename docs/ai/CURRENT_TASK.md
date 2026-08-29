@@ -2,60 +2,57 @@
 
 ## Task title
 
-DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
 
 ## Status
 
-**FINAL COMPLETE.** Central-accepted Learning productization is preserved in a clean local commit. Production build passes. Do not push. Do not deploy. Do not apply `20260934`. Do not redesign.
+**COMPLETE_CANDIDATE.** Isolated worktree only. No deploy. No remote migration apply. No push. Local commit authorized after checks.
 
 ```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-DATE = 2026-08-24
+TASK_ID = DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
+STATUS = COMPLETE_CANDIDATE
+DATE = 2026-08-29
 MACHINE = DESKTOP
-OPERATOR = DESKTOP / WEB LEARNING
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
-TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-BRANCH = desktop/learning-approved-design-productization-v1
-COMMIT_CREATED = YES
-PUSHED = NO
+OPERATOR = DESKTOP / WEB POST + VIDEO EDITING
+AUTHORITATIVE_REPO = C:\Users\1\Desktop\umtuba\umtuba-web
+PARENT_PRESERVED = YES
+PARENT_BRANCH = office/profile-hero-completeness-v1
+PARENT_HEAD = 380a36646d4de8a37c39a56ac3ccd449f6d8b20d
+BASE_REF = origin/alpha-0.2
+BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+WORKTREE = C:\Users\1\Desktop\umtuba\worktrees\DESKTOP-UMTUBA-POST-PUBLISH-EDITING-V1
+BRANCH = desktop/umtuba-post-publish-editing-v1
 DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
-LOCAL_PREVIEW_URL = http://localhost:3018/learning
+MIGRATION_APPLIED = NO
+READY_FOR_OWNER_QA = YES
 ```
 
 ## Allowed scope
 
-Closed. Next work requires a new Central GO.
+Owner edit of existing posts/videos (draft + published) on this isolated branch: caption/title/article/hashtags, single-slot media add/remove/replace, video IN/OUT trim + cover, ownership/RLS-preserving save, Edited indicator, tests, local preview.
 
 ## Forbidden scope
 
-- Do not push unless explicitly authorized.
-- Do not deploy. Do not apply `20260934`. Do not create a new migration.
-- Do not redesign. Do not touch `umtuba-mobile`.
-- Do not write to the Windows Desktop. `_port_extract` protected.
+- Do not reset/clean/stash/alter the dirty parent `office/profile-hero-completeness-v1` @ `380a366`.
+- Do not push, deploy, or apply remote/production Supabase migrations.
+- Do not touch Android Watch V3, playback/cache worktrees, Globe, feed/recommendation ordering, Learning, Store, payments/Stripe, unrelated auth, branding, `_port_extract`, Windows Desktop artifacts.
+- Do not bypass RLS or weaken ownership.
+- Do not invent multi-item media reorder or spatial crop (not in this schema/pipeline).
+- Do not invent server transcoding; reuse `media_pipeline` + atomic media-path switch.
 
-## Prior completed tasks (history — do not delete artifacts)
+## Owner / Central ask
 
-- `DESKTOP_UMTUBA_LEARNING_APPROVED_DESIGN_PRODUCTIZATION_V1` COMPLETE_CANDIDATE / ACCEPTED_BY_CENTRAL.
-- `DESKTOP_UMTUBA_LEARNING_WORLD_CLASS_VISUAL_DESIGN_V1` APPROVED_BY_OWNER.
-- `DESKTOP_UMTUBA_LEARNING_TEACHER_STUDENT_PLATFORM_V1` HANDOFF_DEPOSITED.
+Creator edits own post/video before and after publish. Same Post ID, public URL, comments, likes, views, saves. Failed media edit leaves the live post unchanged. Cancel leaves the live post unchanged.
+
+## Mandatory scenarios
+
+- **A** Draft edit — same row, no duplicate post. Implemented (`media_status = draft` updates the same `posts.id`).
+- **B** Published text — caption/hashtags/article add-remove-edit. Implemented. Posts have no `title` column; article title is the title surface.
+- **C** Media — add/remove/replace single image or video; cover/thumbnail. Reorder is **not** implemented (schema is one image + one video).
+- **D** Published video trim — editor-style IN/OUT, preview, cancel (no live change), save.
+- **E** Failed media revision — live `video_path` / `image_url` unchanged.
+- **F** Owner auth + engagement stays on the same Post ID.
 
 ## Residual
 
-Authenticated writes / RLS not exercised. `20260934` not applied. `e7c84c66` still not fetchable. Push not authorized.
+Packet: `docs/ai/CURSOR_REPORT.md`. Owner QA: sign in as the post owner → More → Edit → change caption/trim → Preview → Cancel (live unchanged) → Save → same `/watch?post={id}`.

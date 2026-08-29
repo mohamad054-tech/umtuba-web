@@ -30,6 +30,7 @@ export type Post = {
   likedByMe: boolean;
   savedByMe: boolean;
   createdAt: string;
+  editedAt?: string | null;
 };
 
 export type DatabasePost = {

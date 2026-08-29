@@ -32,6 +32,7 @@ export {
   type AppRouteHref,
   buildArticleHref,
   buildCreatePostHref,
+  buildEditPostHref,
   buildProfileArticlesHref,
 } from "./routes";
 

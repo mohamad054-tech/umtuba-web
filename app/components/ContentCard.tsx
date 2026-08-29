@@ -254,6 +254,7 @@ export default function ContentCard({
             <p className="truncate font-black">{post.author.name}</p>
             <p className="truncate text-sm text-white/50">
               {post.author.username} · {post.createdAt}
+              {post.editedAt ? " · Edited" : ""}
             </p>
           </div>
 

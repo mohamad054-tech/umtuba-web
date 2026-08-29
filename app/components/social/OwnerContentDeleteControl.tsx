@@ -2,7 +2,9 @@
 
 import { useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { deletePostAction } from "../../actions/deletePost";
+import { buildEditPostHref } from "../../lib/nav";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { viewerMaySeeDeleteControl } from "../../../lib/supabase/deleteOwnedPostShared";
@@ -25,6 +27,7 @@ function copyForKind(kind: OwnerContentDeleteKind) {
   if (kind === "video") {
     return {
       moreLabel: "More actions",
+      editLabel: "Edit video",
       deleteLabel: "Delete video",
       title: "Delete this video?",
       body: "This permanently removes the video from Watch, Discover, your profile, and search. This cannot be undone.",
@@ -35,6 +38,7 @@ function copyForKind(kind: OwnerContentDeleteKind) {
 
   return {
     moreLabel: "More actions",
+    editLabel: "Edit post",
     deleteLabel: "Delete post",
     title: "Delete this post?",
     body: "This permanently removes the post from your profile and feeds. This cannot be undone.",
@@ -63,7 +67,7 @@ export default function OwnerContentDeleteControl({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const confirmRef = useRef<HTMLButtonElement | null>(null);
-  const firstMenuRef = useRef<HTMLButtonElement | null>(null);
+  const firstMenuRef = useRef<HTMLAnchorElement | null>(null);
   const [menuBox, setMenuBox] = useState<{
     top: number;
     left: number;
@@ -223,8 +227,19 @@ export default function OwnerContentDeleteControl({
                 }
                 className="fixed z-[131] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
               >
-                <button
+                <Link
                   ref={firstMenuRef}
+                  href={buildEditPostHref(postId)}
+                  role="menuitem"
+                  className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-start text-sm font-bold text-white transition hover:bg-white/10"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setMenuOpen(false);
+                  }}
+                >
+                  {copy.editLabel}
+                </Link>
+                <button
                   type="button"
                   role="menuitem"
                   className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-start text-sm font-bold text-red-200 transition hover:bg-red-500/15"

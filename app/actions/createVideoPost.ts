@@ -9,6 +9,7 @@ import {
 } from "../../lib/supabase/videoPosts";
 import type { MediaMetadata } from "../../lib/media/pipelineTypes";
 import type { VideoOverlayElement } from "../../lib/media/videoOverlays";
+import type { VideoTrimRange } from "../../lib/media/videoTrim";
 
 export type CreateVideoPostActionResult =
   | { ok: true; postId: number }
@@ -27,6 +28,7 @@ export type CreateVideoPostActionInput = {
   metadata?: Partial<MediaMetadata> | null;
   /** Pre-publish overlay composition (text + stickers). Sanitized server-side. */
   overlays?: VideoOverlayElement[] | null;
+  trim?: VideoTrimRange | null;
   uploadStartedAt?: string | null;
 };
 
@@ -89,6 +91,7 @@ export async function createVideoPostAction(
           : 0,
       metadata: input.metadata ?? null,
       overlays: input.overlays ?? null,
+      trim: input.trim ?? null,
       uploadStartedAt: input.uploadStartedAt ?? null,
     };
 

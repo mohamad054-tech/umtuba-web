@@ -205,6 +205,8 @@ export default function VideoSlide({
         }
         restorePlaybackTimeSeconds={restorePlaybackTimeSeconds}
         restorePlaybackToken={restorePlaybackToken}
+        trimInMs={video.trim?.inMs ?? null}
+        trimOutMs={video.trim?.outMs ?? null}
       />
       <VideoOverlayLayer elements={video.overlays} />
       <VideoOverlay

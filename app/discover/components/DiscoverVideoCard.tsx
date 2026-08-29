@@ -179,6 +179,8 @@ export default function DiscoverVideoCard({
         active={active}
         label={video.caption}
         postId={Number.isInteger(postId) && postId > 0 ? postId : null}
+        trimInMs={video.trim?.inMs ?? null}
+        trimOutMs={video.trim?.outMs ?? null}
         onSrcChange={onSrcChange}
         onWatchProgress={
           Number.isInteger(postId) && postId > 0

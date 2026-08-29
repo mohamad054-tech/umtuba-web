@@ -16,6 +16,13 @@ import {
   type VideoOverlayElement,
 } from "../media/videoOverlays";
 import {
+  coverUrlFromMediaPipeline,
+  editedAtFromMediaPipeline,
+  mergeMediaPipelineEdit,
+  playbackEditFromMediaPipeline,
+  type VideoTrimRange,
+} from "../media/videoTrim";
+import {
   isOwnedVideoPath,
   POST_VIDEOS_BUCKET,
   validateCaption,
@@ -147,6 +154,9 @@ export type PublicPostDTO = {
   article_title?: string | null;
   /** Pre-publish overlays (text + stickers) to render over playback. */
   overlays?: VideoOverlayElement[];
+  trim?: VideoTrimRange | null;
+  editedAt?: string | null;
+  poster?: string | null;
   likes: number;
   comments: number;
   shares: number;
@@ -166,6 +176,8 @@ export type CreateVideoPostInput = {
   metadata?: Partial<MediaMetadata> | null;
   /** Pre-publish overlays (text + stickers); server sanitizes and caps. */
   overlays?: VideoOverlayElement[] | null;
+  /** Optional IN/OUT trim stored on media_pipeline.playback. */
+  trim?: VideoTrimRange | null;
   uploadStartedAt?: string | null;
 };
 
@@ -320,6 +332,12 @@ export async function attachPlaybackUrls(
             : null,
         article_title: null,
         overlays: overlaysFromMediaPipeline(post.media_pipeline),
+        trim: playbackEditFromMediaPipeline(post.media_pipeline),
+        editedAt: editedAtFromMediaPipeline(post.media_pipeline),
+        poster:
+          coverUrlFromMediaPipeline(post.media_pipeline) ||
+          post.image_url ||
+          null,
         likes: post.likes,
         comments: post.comments,
         shares: post.shares,
@@ -520,6 +538,9 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     articleTitle,
     articleHref: articleId ? `/articles/${articleId}` : null,
     overlays: post.overlays ?? [],
+    poster: post.poster ?? undefined,
+    trim: post.trim ?? null,
+    editedAt: post.editedAt ?? null,
     stats: {
       likes: post.likes,
       comments: post.comments,
@@ -606,13 +627,16 @@ export async function insertVideoPostForUser(
   const thumbnailPath = buildMockThumbnailPath(userId, thumbAssetId);
 
   const sanitizedOverlays = sanitizeOverlayElements(input.overlays);
-  const mediaPipeline =
+  const basePipeline =
     sanitizedOverlays.length > 0
       ? {
           ...EMPTY_MEDIA_PIPELINE_EXTENSIONS,
           overlays: serializeOverlays(sanitizedOverlays),
         }
-      : EMPTY_MEDIA_PIPELINE_EXTENSIONS;
+      : { ...EMPTY_MEDIA_PIPELINE_EXTENSIONS };
+  const mediaPipeline = input.trim
+    ? mergeMediaPipelineEdit(basePipeline, { trim: input.trim })
+    : basePipeline;
 
   const { data: queued, error: insertError } = await supabase
     .from("posts")

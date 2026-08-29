@@ -5,6 +5,7 @@ import {
   APP_ROUTES,
   MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS,
   buildCreatorProfileHref,
+  buildEditPostHref,
 } from "../../lib/nav";
 import {
   getArticleTeaserJobForOwner,
@@ -58,6 +59,15 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
     isOwner && ownerJob && ownerJob.status !== "ready" && ownerJob.status !== "not_required"
       ? await listEligibleTeaserVideos(supabase, article.user_id)
       : [];
+  const linkedPostRows = isOwner
+    ? await supabase
+        .from("posts")
+        .select("id")
+        .eq("article_id", articleId)
+        .eq("user_id", article.user_id)
+        .limit(1)
+    : { data: [] as { id: number }[] };
+  const linkedPostId = linkedPostRows.data?.[0]?.id ?? null;
 
   return (
     <main
@@ -84,6 +94,21 @@ export default async function ArticlePage({ params, searchParams }: PageProps) {
             <time dateTime={article.published_at}>
               {new Date(article.published_at).toLocaleDateString()}
             </time>
+          ) : null}
+          {article.updated_at &&
+          article.published_at &&
+          article.updated_at !== article.published_at ? (
+            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/40">
+              Edited
+            </span>
+          ) : null}
+          {isOwner && linkedPostId ? (
+            <Link
+              href={buildEditPostHref(linkedPostId)}
+              className="font-bold text-white underline underline-offset-2"
+            >
+              Edit
+            </Link>
           ) : null}
         </div>
 

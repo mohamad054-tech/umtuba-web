@@ -38,6 +38,8 @@ export type DiscoverVideo = {
   articleId?: string | null;
   articleTitle?: string | null;
   articleHref?: string | null;
+  trim?: { inMs: number; outMs: number } | null;
+  editedAt?: string | null;
   stats: DiscoverStats;
   likedByMe: boolean;
   savedByMe: boolean;

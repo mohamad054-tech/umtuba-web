@@ -42,6 +42,8 @@ type VideoPlayerProps = {
   onWatchProgress?: (event: WatchProgressEvent) => void;
   restorePlaybackTimeSeconds?: number | null;
   restorePlaybackToken?: number;
+  trimInMs?: number | null;
+  trimOutMs?: number | null;
 };
 
 export default function VideoPlayer({
@@ -58,6 +60,8 @@ export default function VideoPlayer({
   onWatchProgress,
   restorePlaybackTimeSeconds = null,
   restorePlaybackToken = 0,
+  trimInMs = null,
+  trimOutMs = null,
 }: VideoPlayerProps) {
   const { t } = useTranslation();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -146,6 +150,43 @@ export default function VideoPlayer({
   useEffect(() => {
     loopCountRef.current = 0;
   }, [src]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || trimInMs == null || trimOutMs == null) {
+      return;
+    }
+    const startSec = trimInMs / 1000;
+    const endSec = trimOutMs / 1000;
+    if (!Number.isFinite(startSec) || !Number.isFinite(endSec) || endSec <= startSec) {
+      return;
+    }
+
+    const applyIn = () => {
+      if (video.currentTime < startSec) {
+        video.currentTime = startSec;
+      }
+    };
+    const onTime = () => {
+      if (video.currentTime < startSec - 0.05) {
+        video.currentTime = startSec;
+      }
+      if (video.currentTime >= endSec) {
+        video.currentTime = startSec;
+        loopCountRef.current += 1;
+        if (video.paused) return;
+        void video.play().catch(() => undefined);
+      }
+    };
+
+    video.addEventListener("loadedmetadata", applyIn);
+    video.addEventListener("timeupdate", onTime);
+    if (video.readyState >= 1) applyIn();
+    return () => {
+      video.removeEventListener("loadedmetadata", applyIn);
+      video.removeEventListener("timeupdate", onTime);
+    };
+  }, [src, trimInMs, trimOutMs]);
 
   useEffect(() => {
     const video = videoRef.current;

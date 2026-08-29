@@ -29,6 +29,7 @@ export const APP_ROUTES = {
   sounds: "/sounds",
   createPost: "/create/post",
   createArticle: "/create/article",
+  editPost: "/edit/post",
   postJourney: "/post-journey",
   worldDiscovery: "/world",
   worldSearch: "/world/search",
@@ -205,6 +206,11 @@ export function buildCreatePostHref(options?: { image?: boolean }): string {
   return options?.image
     ? `${APP_ROUTES.createPost}?image=1`
     : APP_ROUTES.createPost;
+}
+
+/** Owner edit workspace for an existing post (draft or published). */
+export function buildEditPostHref(postId: string | number): string {
+  return `${APP_ROUTES.editPost}/${Number(postId)}`;
 }
 
 /** Full article page (public). */
