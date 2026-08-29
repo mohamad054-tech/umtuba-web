@@ -1,25 +1,29 @@
-# CURSOR_REPORT — Official brand release candidate V1
+# CURSOR_REPORT — Official brand shutdown preserve V1
 
 ```text
-TASK_ID = PC2_UMTUBA_OFFICIAL_BRAND_RELEASE_CANDIDATE_V1
-STATUS = READY_FOR_CENTRAL_RELEASE
-OWNER_VISUAL_APPROVAL = YES
+TASK_ID = PC2_SHUTDOWN_PRESERVE_OFFICIAL_BRAND_V1
+STATUS = PRESERVED_AND_PUSHED
 APPROVED_COMMIT = 1c6b3fc5312d1c3ef0029785a39d5121de17b9e4
-FINAL_SHA = 1c6b3fc5312d1c3ef0029785a39d5121de17b9e4
 BRANCH = pc2/official-logo-from-approved-video-v1
-REMOTE_BRANCH = origin/pc2/official-logo-from-approved-video-v1
-PUSHED = YES
+WORKTREE = C:/Users/Giga store/Desktop/umtuba/umtuba-web-official-logo-approved-video-v1
+UNCOMMITTED_SAVED = YES
+ISOLATED_BRANCH_PUSHED = YES
+PRIMARY_DIRTY_LEFT_ON_DISK = YES
 MERGED = NO
 DEPLOYED = NO
 ```
 
 ## Summary
 
-Verified and pushed the owner-approved brand commit `1c6b3fc` on isolated branch `pc2/official-logo-from-approved-video-v1`. Central should take that SHA. No merge. No deploy. No product-code change in this task.
+Owner asked to save everything before shutting the PC down. Isolated brand worktree was clean and **ahead of origin by 1** (`f455d90` RC docs). This task wrote the shutdown preserve doc, committed it on the isolated branch, and pushed that branch only so leftover docs survive disk loss. Central intake SHA remains `1c6b3fc`. Primary dirty checkout left untouched.
 
 ## Exact files changed
 
-This task: RC docs only (`CURRENT_TASK.md`, this report, `PC2_UMTUBA_OFFICIAL_BRAND_RELEASE_CANDIDATE_V1.md`). Product tree unchanged from `1c6b3fc`.
+- `docs/ai/PC2_SHUTDOWN_PRESERVE_2026_08_28_OFFICIAL_BRAND.md` (new)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
+
+Product tree unchanged from `1c6b3fc`.
 
 ## Migrations created
 
@@ -28,29 +32,31 @@ None.
 ## Security review
 
 - Isolated brand branch only. No force push. No other branches pushed.
-- No secrets. No remote migrations. No production deploy.
+- No secrets. No `.env`. No remote migrations. No production deploy.
+- Primary dirty tree not committed and not pushed.
 
 ## Tests
 
-PASS — 18 (brandAssets, metadata, welcomeBetaLabels) on `1c6b3fc`.
+Not re-run. Prior RC: 18 PASS on `1c6b3fc`.
 
 ## TypeScript
 
-`npx tsc --noEmit` — PASS on `1c6b3fc`.
+Not re-run. Prior RC: `npx tsc --noEmit` PASS on `1c6b3fc`.
 
 ## Build
 
-`npx next build` — PASS on `1c6b3fc`.
+Not re-run. Prior RC: `npx next build` PASS on `1c6b3fc`.
 
 ## git diff --check
 
-PASS.
+PASS on preserve docs.
 
 ## git status --short
 
-Clean at push of `1c6b3fc`. Docs written after push.
+Preserve docs committed and pushed on isolated branch. Primary checkout left dirty on disk (~162 short lines).
 
 ## Open issues
 
-- Central intake only. Do not merge or deploy from this report.
-- Any local RC-docs commit after push is not the intake SHA.
+- Central intake only at `1c6b3fc`. Do not merge or deploy from this report.
+- Primary dirty tree remains local-only by design.
+- localhost:3010 was running at shutdown; process dies with the PC.
