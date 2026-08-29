@@ -6,7 +6,7 @@ DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
 
 ## Status
 
-**COMPLETE_CANDIDATE.** Isolated worktree only. No deploy. No remote migration apply. No push. Owner Edit is now a visible rail/header control (not only More).
+**COMPLETE_CANDIDATE.** Isolated worktree only. No deploy. No remote migration apply. No push. Owner Edit occupies the old Watch/Home delete slot. Delete is inside `/edit/post/[id]`.
 
 ```
 TASK_ID = DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1

@@ -196,14 +196,19 @@ describe("own content delete — contracts", () => {
     expect(lib).toMatch(/deleteOwnedVideoObject|isOwnedVideoPath/);
   });
 
-  it("wires owner Delete into video and post surfaces with confirmation", () => {
+  it("wires owner Edit into Watch/Home rails and delete confirmation into Edit", () => {
     const control = read("app/components/social/OwnerContentDeleteControl.tsx");
-    expect(control).toMatch(/deletePostAction/);
-    expect(control).toMatch(/This cannot be undone/);
-    expect(control).toMatch(/Deleting…/);
-    expect(control).toMatch(/if \(pending\)/);
-    expect(control).toMatch(/role="dialog"/);
-    expect(control).toMatch(/min-h-\[44px\]/);
+    expect(control).toMatch(/buildEditPostHref/);
+    expect(control).toMatch(/aria-label=\{copy\.editLabel\}/);
+    expect(control).not.toMatch(/deletePostAction/);
+
+    const edit = read("app/edit/post/EditPostWorkspace.tsx");
+    expect(edit).toMatch(/deletePostAction/);
+    expect(edit).toMatch(/This cannot be undone/);
+    expect(edit).toMatch(/Deleting…/);
+    expect(edit).toMatch(/if \(pending\)/);
+    expect(edit).toMatch(/role="dialog"/);
+    expect(edit).toMatch(/min-h-\[44px\]/);
 
     const discover = read("app/discover/components/DiscoverActionRail.tsx");
     expect(discover).toMatch(/OwnerContentDeleteControl/);

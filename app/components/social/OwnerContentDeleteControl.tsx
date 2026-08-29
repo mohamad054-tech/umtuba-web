@@ -1,14 +1,8 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import Link from "next/link";
-import { deletePostAction } from "../../actions/deletePost";
 import { buildEditPostHref } from "../../lib/nav";
-import { useDialogA11y } from "../../lib/product/useDialogA11y";
-import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { viewerMaySeeDeleteControl } from "../../../lib/supabase/deleteOwnedPostShared";
-import { clampDeleteMenuBox } from "./clampDeleteMenuBox";
 
 export type OwnerContentDeleteKind = "video" | "post";
 
@@ -25,28 +19,15 @@ type OwnerContentDeleteControlProps = {
 
 function copyForKind(kind: OwnerContentDeleteKind) {
   if (kind === "video") {
-    return {
-      moreLabel: "More actions",
-      editLabel: "Edit video",
-      deleteLabel: "Delete video",
-      title: "Delete this video?",
-      body: "This permanently removes the video from Watch, Discover, your profile, and search. This cannot be undone.",
-      confirm: "Delete video",
-      success: "Video deleted.",
-    };
+    return { editLabel: "Edit video" };
   }
-
-  return {
-    moreLabel: "More actions",
-    editLabel: "Edit post",
-    deleteLabel: "Delete post",
-    title: "Delete this post?",
-    body: "This permanently removes the post from your profile and feeds. This cannot be undone.",
-    confirm: "Delete post",
-    success: "Post deleted.",
-  };
+  return { editLabel: "Edit post" };
 }
 
+/**
+ * Owner-only Edit in the Watch/Home rail slot that used to be delete.
+ * Destructive delete is only on the owner edit workspace (same auth/RLS).
+ */
 export default function OwnerContentDeleteControl({
   postId,
   kind,
@@ -54,120 +35,13 @@ export default function OwnerContentDeleteControl({
   ownerUserId = null,
   isOwner,
   variant = "overlay",
-  onDeleted,
 }: OwnerContentDeleteControlProps) {
   const copy = copyForKind(kind);
-  const titleId = useId();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pending, setPending] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
-  const dialogRef = useRef<HTMLDivElement | null>(null);
-  const confirmRef = useRef<HTMLButtonElement | null>(null);
-  const firstMenuRef = useRef<HTMLAnchorElement | null>(null);
-  const [menuBox, setMenuBox] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  } | null>(null);
-
   const ownerVisible =
     isOwner === true || viewerMaySeeDeleteControl(viewerId, ownerUserId);
 
-  useDialogA11y({
-    open: menuOpen,
-    onClose: () => {
-      if (!pending) {
-        setMenuOpen(false);
-      }
-    },
-    containerRef: menuRef,
-    initialFocusRef: firstMenuRef,
-  });
-
-  useDialogA11y({
-    open: confirmOpen,
-    onClose: () => {
-      if (!pending) {
-        setConfirmOpen(false);
-      }
-    },
-    containerRef: dialogRef,
-    initialFocusRef: confirmRef,
-  });
-
-  useLayoutEffect(() => {
-    if (!menuOpen) {
-      setMenuBox(null);
-      return;
-    }
-
-    function syncMenuBox() {
-      const trigger = triggerRef.current;
-      if (!trigger) {
-        return;
-      }
-      const rect = trigger.getBoundingClientRect();
-      const dir =
-        document.documentElement.dir === "rtl" ? "rtl" : "ltr";
-      setMenuBox(
-        clampDeleteMenuBox({
-          trigger: {
-            top: rect.top,
-            left: rect.left,
-            right: rect.right,
-            bottom: rect.bottom,
-          },
-          viewport: { width: window.innerWidth, height: window.innerHeight },
-          dir,
-        })
-      );
-    }
-
-    syncMenuBox();
-    window.addEventListener("resize", syncMenuBox);
-    window.addEventListener("scroll", syncMenuBox, true);
-    return () => {
-      window.removeEventListener("resize", syncMenuBox);
-      window.removeEventListener("scroll", syncMenuBox, true);
-    };
-  }, [menuOpen]);
-
   if (!ownerVisible || !Number.isInteger(postId) || postId <= 0) {
     return null;
-  }
-
-  function openConfirm() {
-    setMenuOpen(false);
-    setErrorMessage(null);
-    setConfirmOpen(true);
-  }
-
-  async function handleConfirmDelete() {
-    if (pending) {
-      return;
-    }
-
-    setPending(true);
-    setErrorMessage(null);
-
-    const result = await deletePostAction(postId);
-
-    if (!result.ok) {
-      setPending(false);
-      setErrorMessage(
-        sanitizeUserFacingMessage(result.message, "Unable to delete this. Please try again.")
-      );
-      return;
-    }
-
-    setConfirmOpen(false);
-    setPending(false);
-    setStatusMessage(copy.success);
-    onDeleted?.(postId);
   }
 
   const triggerClass =
@@ -175,183 +49,29 @@ export default function OwnerContentDeleteControl({
       ? "watch-focus-ring flex flex-col items-center gap-1"
       : "watch-focus-ring flex h-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/15 bg-black/55 text-white backdrop-blur-md hover:bg-black/70";
 
-  const editHref = buildEditPostHref(postId);
-  const editLinkClass =
-    variant === "rail"
-      ? "watch-focus-ring flex flex-col items-center gap-1"
-      : "watch-focus-ring inline-flex h-11 min-h-[44px] items-center rounded-full border border-sky-300/35 bg-sky-500/20 px-3 text-xs font-black text-sky-50 hover:bg-sky-500/30";
-
   return (
-    <div
-      className={
-        variant === "rail"
-          ? "relative flex flex-col items-center gap-4"
-          : "relative z-10 flex items-center gap-1.5"
-      }
-    >
+    <div className={variant === "rail" ? "relative" : "relative z-10"}>
       <Link
-        href={editHref}
+        href={buildEditPostHref(postId)}
         aria-label={copy.editLabel}
-        className={editLinkClass}
-        onClick={(event) => {
-          event.stopPropagation();
-        }}
-      >
-        {variant === "rail" ? (
-          <>
-            <span className="watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-sky-300/35 bg-sky-500/25 text-sky-50 backdrop-blur-md">
-              <EditIcon />
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-wide text-sky-100">
-              Edit
-            </span>
-          </>
-        ) : (
-          copy.editLabel
-        )}
-      </Link>
-      <button
-        ref={triggerRef}
-        type="button"
         className={triggerClass}
-        aria-label={copy.moreLabel}
-        aria-haspopup="menu"
-        aria-expanded={menuOpen}
         onClick={(event) => {
-          event.preventDefault();
           event.stopPropagation();
-          setMenuOpen((open) => !open);
         }}
       >
         {variant === "rail" ? (
           <>
             <span className="watch-rail-btn flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur-md">
-              <MoreIcon />
+              <EditIcon />
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wide text-white/55">
-              More
+              Edit
             </span>
           </>
         ) : (
-          <MoreIcon />
+          <EditIcon />
         )}
-      </button>
-
-      {menuOpen && typeof document !== "undefined"
-        ? createPortal(
-            <>
-              <button
-                type="button"
-                className="fixed inset-0 z-[130] cursor-default bg-transparent"
-                aria-label="Close actions menu"
-                onClick={() => setMenuOpen(false)}
-              />
-              <div
-                ref={menuRef}
-                role="menu"
-                style={
-                  menuBox
-                    ? {
-                        top: menuBox.top,
-                        left: menuBox.left,
-                        width: menuBox.width,
-                      }
-                    : { visibility: "hidden" }
-                }
-                className="fixed z-[131] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
-              >
-                <Link
-                  ref={firstMenuRef}
-                  href={buildEditPostHref(postId)}
-                  role="menuitem"
-                  className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-start text-sm font-bold text-white transition hover:bg-white/10"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setMenuOpen(false);
-                  }}
-                >
-                  {copy.editLabel}
-                </Link>
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="flex min-h-[44px] w-full items-center rounded-xl px-3 py-2.5 text-start text-sm font-bold text-red-200 transition hover:bg-red-500/15"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    openConfirm();
-                  }}
-                >
-                  {copy.deleteLabel}
-                </button>
-              </div>
-            </>,
-            document.body
-          )
-        : null}
-
-      {statusMessage ? (
-        <p className="sr-only" role="status">
-          {statusMessage}
-        </p>
-      ) : null}
-
-      {confirmOpen && typeof document !== "undefined"
-        ? createPortal(
-            <div className="fixed inset-0 z-[140] flex items-end justify-center p-3 sm:items-center sm:p-6">
-              <button
-                type="button"
-                tabIndex={-1}
-                className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-[2px]"
-                aria-label="Cancel delete"
-                disabled={pending}
-                onClick={() => {
-                  if (!pending) {
-                    setConfirmOpen(false);
-                  }
-                }}
-              />
-              <div
-                ref={dialogRef}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={titleId}
-                className="relative z-10 w-full max-w-md overflow-hidden rounded-t-[28px] border border-white/15 bg-[#0b0b18] p-5 text-white shadow-2xl sm:rounded-[28px]"
-              >
-                <h2 id={titleId} className="text-lg font-black">
-                  {copy.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-white/70">{copy.body}</p>
-                {errorMessage ? (
-                  <p role="alert" className="mt-3 text-sm font-bold text-red-200">
-                    {errorMessage}
-                  </p>
-                ) : null}
-                <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                  <button
-                    type="button"
-                    disabled={pending}
-                    className="watch-focus-ring min-h-[44px] rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/80 hover:bg-white/10 disabled:opacity-50"
-                    onClick={() => setConfirmOpen(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    ref={confirmRef}
-                    type="button"
-                    disabled={pending}
-                    aria-busy={pending}
-                    className="watch-focus-ring min-h-[44px] rounded-full border border-red-400/40 bg-red-500/90 px-4 py-2.5 text-sm font-black text-white hover:bg-red-500 disabled:cursor-wait disabled:opacity-60"
-                    onClick={() => void handleConfirmDelete()}
-                  >
-                    {pending ? "Deleting…" : copy.confirm}
-                  </button>
-                </div>
-              </div>
-            </div>,
-            document.body
-          )
-        : null}
+      </Link>
     </div>
   );
 }
@@ -371,16 +91,6 @@ function EditIcon() {
         strokeWidth="1.7"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function MoreIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-      <circle cx="12" cy="5" r="1.8" />
-      <circle cx="12" cy="12" r="1.8" />
-      <circle cx="12" cy="19" r="1.8" />
     </svg>
   );
 }

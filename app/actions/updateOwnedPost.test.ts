@@ -24,12 +24,15 @@ describe("updateOwnedPostAction contract", () => {
     expect(src).toMatch(/eq\("user_id", userId\)/);
   });
 
-  it("shows a direct owner Edit control on Watch/Home chrome, not only More", () => {
+  it("puts owner Edit in the Watch/Home rail slot and keeps delete off that chrome", () => {
     const src = read("app/components/social/OwnerContentDeleteControl.tsx");
     expect(src).toMatch(/aria-label=\{copy\.editLabel\}/);
-    expect(src).toMatch(/href=\{editHref\}/);
+    expect(src).toMatch(/buildEditPostHref/);
     expect(src).toMatch(/>\s*Edit\s*</);
     expect(src).toMatch(/viewerMaySeeDeleteControl/);
+    expect(src).not.toMatch(/deletePostAction/);
     expect(src).not.toMatch(/createServiceRole|service_role|bypass/i);
+    const edit = read("app/edit/post/EditPostWorkspace.tsx");
+    expect(edit).toMatch(/deletePostAction/);
   });
 });

@@ -79,16 +79,18 @@ describe("A1 user-reported final blockers V2", () => {
     expect(APP_ROUTES.discover).toBe("/discover");
   });
 
-  it("VIDEO DELETE menu is edge-safe and RTL/LTR safe", () => {
+  it("VIDEO DELETE is inside Edit, not a Watch/Home red X", () => {
     const control = read("app/components/social/OwnerContentDeleteControl.tsx");
-    // Portaled + viewport-clamped so overflow-hidden parents cannot clip it.
-    expect(control).toMatch(/clampDeleteMenuBox/);
-    expect(control).toMatch(/createPortal/);
+    expect(control).toMatch(/buildEditPostHref/);
+    expect(control).toMatch(/aria-label=\{copy\.editLabel\}/);
+    expect(control).not.toMatch(/deletePostAction/);
     expect(control).not.toMatch(/\bright-0\b/);
-    // Never exceed the viewport on 360/390/430 widths.
-    expect(control).toMatch(/max-w-\[calc\(100vw-1\.5rem\)\]/);
-    // Destructive action keeps a full 44px touch target (not clipped/tiny).
-    expect(control).toMatch(/min-h-\[44px\][^]*?Delete/);
+    const edit = read("app/edit/post/EditPostWorkspace.tsx");
+    expect(edit).toMatch(/deletePostAction/);
+    expect(edit).toMatch(/createPortal/);
+    expect(edit).toMatch(/max-w-\[calc\(100vw-1\.5rem\)\]/);
+    expect(edit).toMatch(/min-h-\[44px\][^]*?Delete/);
+    expect(edit).not.toMatch(/createServiceRole|service_role|bypass/i);
     const videos = read("app/profile/components/ProfileVideoGrid.tsx");
     const photos = read("app/profile/components/ProfilePhotosPanel.tsx");
     expect(videos).toMatch(/absolute end-2 top-2/);

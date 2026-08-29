@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import { deletePostAction } from "../../actions/deletePost";
 import { updateOwnedPostAction } from "../../actions/updateOwnedPost";
 import VideoTrimTimeline from "../../create/video/VideoTrimTimeline";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   uploadPostImage,
@@ -57,8 +60,11 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
   const titleId = useId();
   const bodyId = useId();
   const errorId = useId();
+  const deleteTitleId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  const deleteDialogRef = useRef<HTMLDivElement | null>(null);
+  const deleteConfirmRef = useRef<HTMLButtonElement | null>(null);
 
   const [content, setContent] = useState(model.content);
   const [hashtags, setHashtags] = useState(extractHashtagTokens(model.content));
@@ -79,11 +85,36 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
   const [clearCover, setClearCover] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [pending, setPending] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
 
   const isVideo = model.postType === "video" || Boolean(model.videoUrl || pendingVideoFile);
   const isImage = model.postType === "image" || Boolean(imagePreview);
+  const deleteCopy = isVideo
+    ? {
+        label: "Delete video",
+        title: "Delete this video?",
+        body: "This permanently removes the video from Watch, Discover, your profile, and search. This cannot be undone.",
+        confirm: "Delete video",
+      }
+    : {
+        label: "Delete post",
+        title: "Delete this post?",
+        body: "This permanently removes the post from your profile and feeds. This cannot be undone.",
+        confirm: "Delete post",
+      };
+
+  useDialogA11y({
+    open: deleteOpen,
+    onClose: () => {
+      if (!pending) {
+        setDeleteOpen(false);
+      }
+    },
+    containerRef: deleteDialogRef,
+    initialFocusRef: deleteConfirmRef,
+  });
 
   useEffect(() => {
     return () => {
@@ -129,6 +160,24 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
 
   function handleCancel() {
     router.push(model.publicUrl);
+  }
+
+  async function handleConfirmDelete() {
+    if (pending) {
+      return;
+    }
+    setPending(true);
+    setErrorMessage("");
+    const result = await deletePostAction(model.postId);
+    if (!result.ok) {
+      setPending(false);
+      setErrorMessage(
+        sanitizeUserFacingMessage(result.message, "Unable to delete this. Please try again.")
+      );
+      return;
+    }
+    router.push(APP_ROUTES.home);
+    router.refresh();
   }
 
   async function handleSave() {
@@ -453,7 +502,83 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
             {pending ? "Saving…" : "Save"}
           </button>
         </div>
+
+        <div className="mt-8 border-t border-white/10 pt-5">
+          <p className="text-sm font-bold text-white/70">Delete</p>
+          <p className="mt-1 text-xs text-white/45">
+            Delete is only available here. It uses the same owner check as
+            before and does not reset other posts.
+          </p>
+          <button
+            type="button"
+            disabled={pending}
+            className="mt-3 min-h-[44px] rounded-full border border-red-400/40 bg-red-500/15 px-4 py-2.5 text-sm font-black text-red-100 hover:bg-red-500/25 disabled:opacity-50"
+            onClick={() => {
+              setErrorMessage("");
+              setDeleteOpen(true);
+            }}
+          >
+            {deleteCopy.label}
+          </button>
+        </div>
       </div>
+
+      {deleteOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="fixed inset-0 z-[140] flex items-end justify-center p-3 sm:items-center sm:p-6">
+              <button
+                type="button"
+                tabIndex={-1}
+                className="absolute inset-0 cursor-default bg-black/70 backdrop-blur-[2px]"
+                aria-label="Cancel delete"
+                disabled={pending}
+                onClick={() => {
+                  if (!pending) {
+                    setDeleteOpen(false);
+                  }
+                }}
+              />
+              <div
+                ref={deleteDialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={deleteTitleId}
+                className="relative z-10 w-full max-w-md max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-t-[28px] border border-white/15 bg-[#0b0b18] p-5 text-white shadow-2xl sm:rounded-[28px]"
+              >
+                <h2 id={deleteTitleId} className="text-lg font-black">
+                  {deleteCopy.title}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-white/70">{deleteCopy.body}</p>
+                {errorMessage ? (
+                  <p role="alert" className="mt-3 text-sm font-bold text-red-200">
+                    {errorMessage}
+                  </p>
+                ) : null}
+                <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button
+                    type="button"
+                    disabled={pending}
+                    className="watch-focus-ring min-h-[44px] rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/80 hover:bg-white/10 disabled:opacity-50"
+                    onClick={() => setDeleteOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    ref={deleteConfirmRef}
+                    type="button"
+                    disabled={pending}
+                    aria-busy={pending}
+                    className="watch-focus-ring min-h-[44px] rounded-full border border-red-400/40 bg-red-500/90 px-4 py-2.5 text-sm font-black text-white hover:bg-red-500 disabled:cursor-wait disabled:opacity-60"
+                    onClick={() => void handleConfirmDelete()}
+                  >
+                    {pending ? "Deleting…" : deleteCopy.confirm}
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
 
       {previewing ? (
         <div className="rounded-[28px] border border-white/10 bg-black/40 p-5">
