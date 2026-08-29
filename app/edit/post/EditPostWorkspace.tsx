@@ -99,6 +99,25 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
     };
   }, [coverPreview, imagePreview, videoPreview]);
 
+  useEffect(() => {
+    if (!isVideo || !videoPreview || durationMs > 0) {
+      return;
+    }
+    const probe = document.createElement("video");
+    probe.preload = "metadata";
+    probe.src = videoPreview;
+    probe.onloadedmetadata = () => {
+      const nextDuration = Math.round((probe.duration || 0) * 1000);
+      if (nextDuration < 250) {
+        return;
+      }
+      setDurationMs(nextDuration);
+      setTrim((prev) =>
+        prev.outMs > prev.inMs ? prev : { inMs: 0, outMs: nextDuration }
+      );
+    };
+  }, [durationMs, isVideo, videoPreview]);
+
   const hashtagList = useMemo(
     () =>
       hashtags
@@ -320,7 +339,11 @@ export default function EditPostWorkspace({ model }: EditPostWorkspaceProps) {
 
           {isVideo ? (
             <div className="space-y-3">
-              <p className="text-sm font-bold text-white/80">Video</p>
+              <p className="text-sm font-bold text-white/80">Trim video (IN / OUT)</p>
+              <p className="text-xs text-white/50">
+                Drag the in and out points and preview here. The live post does
+                not change until you save.
+              </p>
               <p className="text-xs text-white/40">{VIDEO_FILE_HINT}</p>
               <input
                 type="file"

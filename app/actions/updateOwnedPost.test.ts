@@ -23,4 +23,13 @@ describe("updateOwnedPostAction contract", () => {
     expect(src).toMatch(/Refusing to reset engagement counters/);
     expect(src).toMatch(/eq\("user_id", userId\)/);
   });
+
+  it("shows a direct owner Edit control on Watch/Home chrome, not only More", () => {
+    const src = read("app/components/social/OwnerContentDeleteControl.tsx");
+    expect(src).toMatch(/aria-label=\{copy\.editLabel\}/);
+    expect(src).toMatch(/href=\{editHref\}/);
+    expect(src).toMatch(/>\s*Edit\s*</);
+    expect(src).toMatch(/viewerMaySeeDeleteControl/);
+    expect(src).not.toMatch(/createServiceRole|service_role|bypass/i);
+  });
 });

@@ -6,7 +6,7 @@ DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
 
 ## Status
 
-**COMPLETE_CANDIDATE.** Isolated worktree only. No deploy. No remote migration apply. No push. Local commit authorized after checks.
+**COMPLETE_CANDIDATE.** Isolated worktree only. No deploy. No remote migration apply. No push. Owner Edit is now a visible rail/header control (not only More).
 
 ```
 TASK_ID = DESKTOP_UMTUBA_POST_PUBLISH_EDITING_V1
