@@ -19,6 +19,7 @@ import {
   effectivePhoneFind,
 } from "../comms/privacyContract";
 import { renderContactQrSvg } from "../comms/qrSvg";
+import { discoveryNotFoundMessage } from "../comms/discoveryNotFound";
 
 const ROOT = process.cwd();
 
@@ -76,6 +77,18 @@ describe("contact QR payload", () => {
   });
 });
 
+describe("discovery not-found copy", () => {
+  it("keeps the generic lookup message off the server-action module", () => {
+    expect(discoveryNotFoundMessage()).toBe(
+      "No UMTUBA account is available to message with this lookup."
+    );
+    expect(read("app/actions/communications.ts")).toMatch(/^"use server";/);
+    expect(read("lib/comms/discoveryNotFound.ts")).not.toMatch(
+      /^["']use server["']/
+    );
+  });
+});
+
 describe("communications migration and reuse", () => {
   it("keeps phone/email off public.profiles and reuses get_or_create", () => {
     const migration = read(
@@ -110,6 +123,13 @@ describe("communications migration and reuse", () => {
 
     expect(messenger).toMatch(/get_or_create_direct_conversation/);
     expect(start).toMatch(/DiscoveredIdentityCard|discoverByUsernameAction/);
+    expect(start).toMatch(/lib\/comms\/discoveryNotFound/);
+    expect(start).not.toMatch(
+      /discoveryNotFoundMessage,\s*\n\s*\} from ["'].*actions\/communications/
+    );
+    expect(read("app/actions/communications.ts")).not.toMatch(
+      /export function discoveryNotFoundMessage/
+    );
     expect(foundCard).toMatch(/StartDirectMessageButton/);
     expect(profileActions).toMatch(/StartDirectMessageButton/);
     expect(read("app/components/messaging/StartDirectMessageButton.tsx")).toMatch(

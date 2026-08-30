@@ -7,9 +7,9 @@ import {
   discoverByEmailAction,
   discoverByPhoneAction,
   discoverByUsernameAction,
-  discoveryNotFoundMessage,
 } from "../../actions/communications";
 import { buildPersonalContactUrl } from "../../../lib/comms/contactLink";
+import { discoveryNotFoundMessage } from "../../../lib/comms/discoveryNotFound";
 import type { DiscoveredIdentity } from "../../../lib/comms/privacyContract";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import DiscoveredIdentityCard from "./DiscoveredIdentityCard";

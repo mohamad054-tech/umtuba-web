@@ -36,8 +36,6 @@ import {
 } from "../../lib/supabase/communicationsDiscovery";
 import type { ActionResult } from "../../lib/supabase/messenger";
 
-const GENERIC_NOT_FOUND = "No UMTUBA account is available to message with this lookup.";
-
 async function requireUser(): Promise<
   ActionResult<{ userId: string }>
 > {
@@ -226,8 +224,4 @@ export async function setContactSyncPermissionAction(
   if (!auth.ok) return auth;
   const supabase = await createClient();
   return setOwnContactSyncPermission(supabase, granted);
-}
-
-export function discoveryNotFoundMessage(): string {
-  return GENERIC_NOT_FOUND;
 }
