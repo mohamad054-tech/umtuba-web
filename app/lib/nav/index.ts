@@ -1,6 +1,7 @@
 export {
   APP_NAV_ITEMS,
   APP_ROUTES,
+  isSocialHomePath,
   advertiseCampaignDetail,
   buildAiInsightHref,
   buildConversationHref,
@@ -65,10 +66,12 @@ export {
   DISCOVER_ALIAS_QUERY_KEYS,
   DISCOVER_ALIAS_TARGET_PATH,
   DISCOVER_HOME_ALIAS_PATH,
+  LIFE_HOME_ALIAS_PATH,
   PROFILE_INDEX_LOGIN_NEXT_PATH,
   PROFILE_INDEX_RESOLVER_PATH,
   buildPostFocusDeepLink,
   isDiscoverHomeAliasPath,
+  isLifeHomeAliasPath,
 } from "./deepLinkAliasContract";
 
 export {
@@ -113,6 +116,7 @@ export {
   DESKTOP_PRIMARY_NAV_HREFS,
   DESKTOP_PRIMARY_NAV_LABELS,
   DISCOVER_HOME_ALIAS,
+  LIFE_HOME_ALIAS,
   HOME_CIRCLE_ENTRY_HREFS,
   MOBILE_PRIMARY_NAV_IDS,
   MOBILE_PRIMARY_NAV_LABELS,
@@ -125,3 +129,16 @@ export {
   assertUserMenuContract,
   expectedUserMenuLabels,
 } from "./platformNavContract";
+
+export {
+  UM_LIFE_ALIAS_PATH,
+  UM_LIFE_BADGE_CAPABILITY,
+  UM_LIFE_BADGE_LIVE_DATA,
+  UM_LIFE_DESTINATION_HREF,
+  UM_LIFE_ENTRY_LABEL,
+  assertUmLifePrimaryEntry,
+  isUmLifeNavDestination,
+  resolveUmLifeActivityBadge,
+  resolveUmLifeActivityBadgeCount,
+  type UmLifeActivityBadge,
+} from "./umLifeHomeEntry";

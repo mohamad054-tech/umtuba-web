@@ -34,7 +34,8 @@ describe("Page Assembly V1 — routes", () => {
     expect(isNavActive("/", APP_ROUTES.home)).toBe(true);
     expect(isNavActive("/discover", APP_ROUTES.home)).toBe(true);
     expect(isNavActive("/discover", APP_ROUTES.discover)).toBe(false);
-    expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
+    expect(isMobilePrimaryNavActive("/discover", "umLife")).toBe(true);
+    expect(isMobilePrimaryNavActive("/life", "umLife")).toBe(true);
   });
 
   it("ships welcome, games, home feed, discover redirect pages", () => {

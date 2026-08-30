@@ -8,36 +8,38 @@ import {
 
 /** Desktop primary labels (Discover is intentionally absent). */
 export const DESKTOP_PRIMARY_NAV_LABELS = [
-  "Home",
-  "World",
+  "Watch",
+  "UM Life",
+  "Create",
   "Learning",
-  "Live",
-  "Messages",
+  "Store",
 ] as const;
 
 /** Desktop primary hrefs in lockstep with labels. */
 export const DESKTOP_PRIMARY_NAV_HREFS = [
+  APP_ROUTES.watch,
   APP_ROUTES.home,
-  APP_ROUTES.worldDiscovery,
+  APP_ROUTES.createVideo,
   APP_ROUTES.learning,
-  APP_ROUTES.live,
-  APP_ROUTES.messages,
+  APP_ROUTES.store,
 ] as const;
 
 /** Mobile primary ids (no Discover tab). */
 export const MOBILE_PRIMARY_NAV_IDS = [
-  "home",
-  "live",
-  "messages",
-  "profile",
+  "watch",
+  "umLife",
+  "create",
+  "learning",
+  "store",
 ] as const;
 
 /** Mobile primary labels in order. */
 export const MOBILE_PRIMARY_NAV_LABELS = [
-  "Home",
-  "Live",
-  "Messages",
-  "Profile",
+  "Watch",
+  "UM Life",
+  "Create",
+  "Learning",
+  "Store",
 ] as const;
 
 /**
@@ -61,6 +63,8 @@ export const USER_MENU_GROUP_IDS = ["you", "account"] as const;
 /**
  * Signed-in baseline labels (Create + Advertise on; Instructor/Seller/Admin off).
  * Capability Links V1 — optional labels appear only when capabilities allow.
+ * Messages stays here so it remains one tap from the account menu after
+ * UM Life Home Entry V1 moved it off primary chrome.
  */
 export const USER_MENU_BASE_ITEM_LABELS = [
   "Profile",
@@ -69,6 +73,7 @@ export const USER_MENU_BASE_ITEM_LABELS = [
   "Learning",
   "Rewards",
   "Notifications",
+  "Messages",
   "Settings",
   "Store",
   "Wishlist",
@@ -80,6 +85,9 @@ export const USER_MENU_ITEM_LABELS = USER_MENU_BASE_ITEM_LABELS;
 
 /** Forever Home alias path (not a primary chrome label). */
 export const DISCOVER_HOME_ALIAS = APP_ROUTES.discover;
+
+/** Branded UM Life alias path (same Home experience, not a primary href). */
+export const LIFE_HOME_ALIAS = APP_ROUTES.life;
 
 /**
  * Auth post-login default next path.

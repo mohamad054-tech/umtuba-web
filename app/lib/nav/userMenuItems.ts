@@ -62,7 +62,8 @@ export function buildUserMenuGroups(
       id: "notifications",
       label: "Notifications",
       href: APP_ROUTES.notifications,
-    }
+    },
+    { id: "messages", label: "Messages", href: APP_ROUTES.messages }
   );
 
   const accountItems: UserMenuLinkItem[] = [

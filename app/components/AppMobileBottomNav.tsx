@@ -1,31 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import { createClient } from "../../lib/supabase/client";
-import { getProfileForUser } from "../../lib/supabase/auth";
 import {
   MOBILE_BOTTOM_NAV_MAX_CLASS,
   MOBILE_BOTTOM_NAV_OFFSET_VAR,
   MOBILE_PRIMARY_NAV_ITEMS,
   isMobilePrimaryNavActive,
-  resolveMobileProfileHref,
   shouldShowMobileBottomNav,
   type MobilePrimaryNavId,
 } from "../lib/nav/mobileNav";
+import {
+  resolveUmLifeActivityBadge,
+} from "../lib/nav/umLifeHomeEntry";
 import { mobileNavLabelKey } from "../../lib/i18n";
 import { useTranslation } from "./i18n";
+import UmLifeIcon from "./nav/UmLifeIcon";
 
-function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
-  const stroke = active ? "currentColor" : "currentColor";
+function NavIcon({ id }: { id: MobilePrimaryNavId; active: boolean }) {
   const common = {
     width: 22,
     height: 22,
     viewBox: "0 0 24 24",
     fill: "none",
-    stroke,
+    stroke: "currentColor",
     strokeWidth: 1.8,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
@@ -33,30 +32,35 @@ function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
   };
 
   switch (id) {
-    case "home":
+    case "watch":
       return (
         <svg {...common}>
-          <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" />
+          <rect x="3.5" y="5.5" width="17" height="13" rx="3" />
+          <path d="M10 9.2 16 12l-6 2.8V9.2Z" />
         </svg>
       );
-    case "live":
+    case "umLife":
+      return <UmLifeIcon />;
+    case "create":
       return (
         <svg {...common}>
-          <rect x="3" y="6" width="14" height="12" rx="2" />
-          <path d="m17 10 4-2v8l-4-2v-4Z" />
+          <circle cx="12" cy="12" r="8.2" />
+          <path d="M12 8v8M8 12h8" />
         </svg>
       );
-    case "messages":
+    case "learning":
       return (
         <svg {...common}>
-          <path d="M4 6h16v10H8l-4 3V6Z" />
+          <path d="M4.5 7.5 12 5l7.5 2.5v8.2L12 18.5 4.5 15.7V7.5Z" />
+          <path d="M12 5v13.5" />
+          <path d="M8 10.2c1.2.6 2.6.9 4 .9s2.8-.3 4-.9" />
         </svg>
       );
-    case "profile":
+    case "store":
       return (
         <svg {...common}>
-          <circle cx="12" cy="9" r="3.5" />
-          <path d="M5.5 19.5a6.5 6.5 0 0 1 13 0" />
+          <path d="M6.2 9.2 7.4 19h9.2l1.2-9.8H6.2Z" />
+          <path d="M9 9.2V7.6a3 3 0 0 1 6 0v1.6" />
         </svg>
       );
     default:
@@ -68,8 +72,7 @@ export default function AppMobileBottomNav() {
   const pathname = usePathname() || "/";
   const visible = shouldShowMobileBottomNav(pathname);
   const { t } = useTranslation();
-  const [profileUsername, setProfileUsername] = useState<string | null>(null);
-  const [signedIn, setSignedIn] = useState(false);
+  const umLifeBadge = resolveUmLifeActivityBadge();
 
   useEffect(() => {
     if (!visible) {
@@ -90,47 +93,6 @@ export default function AppMobileBottomNav() {
     };
   }, [visible]);
 
-  useEffect(() => {
-    let active = true;
-    let subscription: { unsubscribe: () => void } | null = null;
-
-    async function applyUser(user: User | null) {
-      if (!active) return;
-      if (!user) {
-        setSignedIn(false);
-        setProfileUsername(null);
-        return;
-      }
-      setSignedIn(true);
-      try {
-        const profile = await getProfileForUser(user);
-        if (!active) return;
-        setProfileUsername(profile.username);
-      } catch {
-        if (!active) return;
-        setProfileUsername(null);
-      }
-    }
-
-    try {
-      const supabase = createClient();
-      void supabase.auth.getUser().then(({ data }) => {
-        void applyUser(data.user ?? null);
-      });
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-        void applyUser(session?.user ?? null);
-      });
-      subscription = data.subscription;
-    } catch {
-      // Config/auth unavailable — Profile tab keeps login fallback href.
-    }
-
-    return () => {
-      active = false;
-      subscription?.unsubscribe();
-    };
-  }, []);
-
   if (!visible) {
     return null;
   }
@@ -140,35 +102,44 @@ export default function AppMobileBottomNav() {
       aria-label={t("nav.primaryMobile")}
       className={`fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
     >
-      <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-1 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
+      <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0 px-0.5 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
         {MOBILE_PRIMARY_NAV_ITEMS.map((item) => {
-          const href =
-            item.id === "profile"
-              ? resolveMobileProfileHref(profileUsername, { signedIn })
-              : item.href;
           const active = isMobilePrimaryNavActive(pathname, item.id);
-          const label = t(mobileNavLabelKey(item.id));
+          const label =
+            item.id === "umLife" ? t("nav.umLife") : t(mobileNavLabelKey(item.id));
+          const ariaLabel =
+            item.id === "umLife" ? t("nav.umLifeAria") : label;
+          const badgeCount =
+            item.id === "umLife" ? umLifeBadge.count : null;
 
           return (
             <li key={item.id} className="min-w-0 flex-1">
               <Link
-                href={href}
+                href={item.href}
                 aria-current={active ? "page" : undefined}
-                aria-label={label}
-                className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${
+                aria-label={ariaLabel}
+                className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-0.5 py-1 text-[10px] font-bold transition ${
                   active
                     ? "text-blue-100"
                     : "text-white/45 hover:text-white/80"
                 }`}
               >
                 <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full ${
+                  className={`relative flex h-7 w-7 items-center justify-center rounded-full ${
                     active ? "bg-blue-500/20 text-blue-100" : "text-white/55"
                   }`}
                 >
                   <NavIcon id={item.id} active={active} />
+                  {badgeCount != null ? (
+                    <span
+                      className="absolute -end-1 -top-1 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-blue-500 px-1 text-[9px] font-black text-white"
+                      aria-hidden
+                    >
+                      {badgeCount > 99 ? "99+" : badgeCount}
+                    </span>
+                  ) : null}
                 </span>
-                <span className="truncate">{label}</span>
+                <span className="max-w-full truncate">{label}</span>
               </Link>
             </li>
           );

@@ -1,13 +1,13 @@
-import { APP_ROUTES, buildCreatorProfileHref } from "./routes";
+import { APP_ROUTES, buildCreatorProfileHref, isSocialHomePath } from "./routes";
 
 /**
  * Mobile primary destinations (bottom nav).
- * Platform Navigation Contract Sync V1: Home, Live, Messages, Profile.
- * Discover is not a mobile tab — `/discover` aliases Home active state only.
+ * UM Life Home Entry V1: Watch, UM Life, Create, Learning, Store.
+ * UM Life lands on `/` — the same social Home as DiscoverExperience.
+ * `/discover` and `/life` alias that Home active state only.
  *
- * Mobile World Affordance Decision V1: World stays on Desktop primary only.
- * Mobile users reach World via Home circles / direct `/world` links — do **not**
- * add World (or Store/Watch) to this list without a separate Product GO.
+ * World / Live / Messages / Profile stay reachable via circles, UserMenu,
+ * and direct routes — they are not hidden product surfaces.
  *
  * Visible below the `sm` breakpoint (max-width: 639px), matching AppTopNav
  * which reveals its primary links from `sm` upward — avoids duplicate bars.
@@ -24,10 +24,11 @@ export const MOBILE_BOTTOM_NAV_BAR_REM = 3.75;
 export const MOBILE_BOTTOM_NAV_OFFSET_VAR = "--app-mobile-bottom-nav-offset";
 
 export type MobilePrimaryNavId =
-  | "home"
-  | "live"
-  | "messages"
-  | "profile";
+  | "watch"
+  | "umLife"
+  | "create"
+  | "learning"
+  | "store";
 
 export type MobilePrimaryNavItem = {
   id: MobilePrimaryNavId;
@@ -37,10 +38,11 @@ export type MobilePrimaryNavItem = {
 };
 
 export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] = [
-  { id: "home", label: "Home", href: APP_ROUTES.home },
-  { id: "live", label: "Live", href: APP_ROUTES.live },
-  { id: "messages", label: "Messages", href: APP_ROUTES.messages },
-  { id: "profile", label: "Profile", href: APP_ROUTES.profile },
+  { id: "watch", label: "Watch", href: APP_ROUTES.watch },
+  { id: "umLife", label: "UM Life", href: APP_ROUTES.home },
+  { id: "create", label: "Create", href: APP_ROUTES.createVideo },
+  { id: "learning", label: "Learning", href: APP_ROUTES.learning },
+  { id: "store", label: "Store", href: APP_ROUTES.store },
 ];
 
 const LIVE_ROOM_PATH_RE = /^\/live\/(?!media-lab(?:\/|$))[^/]+/;
@@ -84,24 +86,19 @@ export function isMobilePrimaryNavActive(
   const path = pathname.split("?")[0] || "/";
 
   switch (id) {
-    case "home":
-      // `/discover` aliases Home feed — keep Home highlighted for deeplinks.
+    case "umLife":
+      return isSocialHomePath(path);
+    case "watch":
+      return path === APP_ROUTES.watch || path.startsWith(`${APP_ROUTES.watch}/`);
+    case "create":
+      return path === APP_ROUTES.createVideo || path.startsWith("/create/");
+    case "learning":
       return (
-        path === APP_ROUTES.home ||
-        path === APP_ROUTES.discover ||
-        path.startsWith(`${APP_ROUTES.discover}/`)
+        path === APP_ROUTES.learning ||
+        path.startsWith(`${APP_ROUTES.learning}/`)
       );
-    case "live":
-      return path === APP_ROUTES.live || path.startsWith(`${APP_ROUTES.live}/`);
-    case "messages":
-      return path === APP_ROUTES.messages || path.startsWith(`${APP_ROUTES.messages}/`);
-    case "profile":
-      return (
-        path === APP_ROUTES.settings ||
-        path.startsWith(`${APP_ROUTES.settings}/`) ||
-        path === APP_ROUTES.profile ||
-        path.startsWith(`${APP_ROUTES.profile}/`)
-      );
+    case "store":
+      return path === APP_ROUTES.store || path.startsWith(`${APP_ROUTES.store}/`);
     default:
       return false;
   }

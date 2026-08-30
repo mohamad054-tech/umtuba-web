@@ -38,7 +38,7 @@ function read(rel: string) {
 
 describe("Platform Navigation Contract Sync V1", () => {
   describe("desktop primary navigation", () => {
-    it("freezes Home World Learning Live Messages without Discover label", () => {
+    it("freezes Watch UM Life Create Learning Store without Discover label", () => {
       expect(APP_NAV_ITEMS.map((item) => item.label)).toEqual([
         ...DESKTOP_PRIMARY_NAV_LABELS,
       ]);
@@ -56,7 +56,7 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("mobile primary navigation", () => {
-    it("freezes Home Live Messages Profile without Discover", () => {
+    it("freezes Watch UM Life Create Learning Store without Discover", () => {
       expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
         ...MOBILE_PRIMARY_NAV_IDS,
       ]);
@@ -139,7 +139,8 @@ describe("Platform Navigation Contract Sync V1", () => {
       expect(discoverPage).toMatch(/APP_ROUTES\.home/);
       expect(isNavActive("/discover", APP_ROUTES.home)).toBe(true);
       expect(isNavActive("/discover", APP_ROUTES.discover)).toBe(false);
-      expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
+      expect(isMobilePrimaryNavActive("/discover", "umLife")).toBe(true);
+      expect(isMobilePrimaryNavActive("/life", "umLife")).toBe(true);
       expect(buildPostNotificationHref({ postId: "42" })).toBe(
         "/discover?post=42"
       );
@@ -172,17 +173,15 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("shell coherence boundary", () => {
-    it("does not place Store Domain or Admin into primary chrome contracts", () => {
-      expect(DESKTOP_PRIMARY_NAV_HREFS).not.toContain(APP_ROUTES.store);
+    it("does not place Seller Domain or Admin into primary chrome contracts", () => {
+      expect(DESKTOP_PRIMARY_NAV_HREFS).toContain(APP_ROUTES.store);
       expect(DESKTOP_PRIMARY_NAV_HREFS).not.toContain(APP_ROUTES.seller);
-      expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.href)).not.toContain(
+      expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.href)).toContain(
         APP_ROUTES.store
       );
       const topNav = read("app/components/AppTopNav.tsx");
       const mobileNav = read("app/components/AppMobileBottomNav.tsx");
-      expect(topNav).not.toMatch(/APP_ROUTES\.store/);
       expect(topNav).not.toMatch(/admin\/store/);
-      expect(mobileNav).not.toMatch(/APP_ROUTES\.store/);
       expect(mobileNav).not.toMatch(/admin\/store/);
     });
   });

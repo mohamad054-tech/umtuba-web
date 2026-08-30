@@ -18,6 +18,9 @@ import { APP_ROUTES, buildPostNotificationHref } from "./routes";
 /** Forever Discover → Home alias path (not a primary chrome label). */
 export const DISCOVER_HOME_ALIAS_PATH = APP_ROUTES.discover;
 
+/** Forever UM Life → Home alias path (same experience, not a second feed). */
+export const LIFE_HOME_ALIAS_PATH = APP_ROUTES.life;
+
 /** Canonical Home path that `/discover` resolves to. */
 export const DISCOVER_ALIAS_TARGET_PATH = APP_ROUTES.home;
 
@@ -60,5 +63,12 @@ export function isDiscoverHomeAliasPath(pathname: string): boolean {
   return (
     path === DISCOVER_HOME_ALIAS_PATH ||
     path.startsWith(`${DISCOVER_HOME_ALIAS_PATH}/`)
+  );
+}
+
+export function isLifeHomeAliasPath(pathname: string): boolean {
+  const path = pathname.split("?")[0] || "/";
+  return (
+    path === LIFE_HOME_ALIAS_PATH || path.startsWith(`${LIFE_HOME_ALIAS_PATH}/`)
   );
 }

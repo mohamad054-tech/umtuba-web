@@ -34,7 +34,12 @@ export type FoundationMessages = {
   "nav.home": string;
   "nav.discover": string;
   "nav.world": string;
+  "nav.watch": string;
+  "nav.umLife": string;
+  "nav.umLifeAria": string;
+  "nav.create": string;
   "nav.learning": string;
+  "nav.store": string;
   "nav.live": string;
   "nav.messages": string;
   "nav.profile": string;
@@ -77,6 +82,7 @@ export type FoundationMessages = {
   "menu.instructor": string;
   "menu.rewards": string;
   "menu.notifications": string;
+  "menu.messages": string;
   "menu.settings": string;
   "menu.store": string;
   "menu.seller": string;

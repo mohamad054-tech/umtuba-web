@@ -20,8 +20,12 @@ describe("App Shell translation V1", () => {
     expect(translate("ar", "nav.home")).toBe("الرئيسية");
     expect(translate("en", "nav.messages")).toBe("Messages");
     expect(translate("ar", "nav.messages")).toBe("الرسائل");
-    expect(translate("en", desktopNavLabelKey("/world"))).toBe("World");
-    expect(translate("ar", desktopNavLabelKey("/world"))).toBe("العالم");
+    expect(translate("en", desktopNavLabelKey("/"))).toBe("UM Life");
+    expect(translate("ar", desktopNavLabelKey("/"))).toBe("UM Life");
+    expect(translate("en", desktopNavLabelKey("/watch"))).toBe("Watch");
+    expect(translate("ar", desktopNavLabelKey("/watch"))).toBe("شاهد");
+    expect(translate("en", mobileNavLabelKey("umLife"))).toBe("UM Life");
+    expect(translate("ar", mobileNavLabelKey("umLife"))).toBe("UM Life");
     expect(translate("en", mobileNavLabelKey("profile"))).toBe("Profile");
     expect(translate("ar", mobileNavLabelKey("profile"))).toBe("الملف");
   });

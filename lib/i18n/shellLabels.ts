@@ -2,16 +2,25 @@ import type { TranslationKey } from "./messages/types";
 
 /** Stable path → label key map (mirrors APP_ROUTES; no app-layer import). */
 const DESKTOP_NAV_KEYS: Record<string, TranslationKey> = {
-  "/": "nav.home",
+  "/": "nav.umLife",
   "/discover": "nav.discover",
+  "/life": "nav.umLife",
+  "/watch": "nav.watch",
+  "/create/video": "nav.create",
   "/world": "nav.world",
   "/learning": "nav.learning",
+  "/store": "nav.store",
   "/live": "nav.live",
   "/messages": "nav.messages",
 };
 
 const MOBILE_NAV_KEYS: Record<string, TranslationKey> = {
   home: "nav.home",
+  umLife: "nav.umLife",
+  watch: "nav.watch",
+  create: "nav.create",
+  learning: "nav.learning",
+  store: "nav.store",
   discover: "nav.discover",
   live: "nav.live",
   messages: "nav.messages",
@@ -26,6 +35,7 @@ const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
   instructor: "menu.instructor",
   rewards: "menu.rewards",
   notifications: "menu.notifications",
+  messages: "menu.messages",
   settings: "menu.settings",
   store: "menu.store",
   seller: "menu.seller",

@@ -4,6 +4,8 @@ export const APP_ROUTES = {
   home: "/",
   welcome: "/welcome",
   discover: "/discover",
+  /** Forever alias to Home — branded UM Life entry, not a second feed. */
+  life: "/life",
   watch: "/watch",
   live: "/live",
   messages: "/messages",
@@ -74,10 +76,14 @@ export function advertiseCampaignDetail(campaignId: string): string {
 export type AppRouteHref =
   | (typeof APP_ROUTES)["home"]
   | (typeof APP_ROUTES)["discover"]
+  | (typeof APP_ROUTES)["life"]
+  | (typeof APP_ROUTES)["watch"]
   | (typeof APP_ROUTES)["live"]
   | (typeof APP_ROUTES)["messages"]
   | (typeof APP_ROUTES)["worldDiscovery"]
-  | (typeof APP_ROUTES)["learning"];
+  | (typeof APP_ROUTES)["learning"]
+  | (typeof APP_ROUTES)["createVideo"]
+  | (typeof APP_ROUTES)["store"];
 
 export type AppNavItem = {
   label: string;
@@ -85,30 +91,38 @@ export type AppNavItem = {
 };
 
 /**
- * Desktop primary chrome — Platform Navigation Contract Sync V1.
- * Home is the Discovery Layer label. `/discover` is a forever alias to `/`
- * and must not appear here as a separate primary destination.
- * Mobile World Affordance Decision V1: World is desktop-primary only (not mobile bottom nav).
+ * Desktop primary chrome — UM Life Home Entry V1.
+ * UM Life is the Discovery Layer label and lands on `/` (same HomeFeedLoader /
+ * DiscoverExperience). `/discover` and `/life` are forever aliases to `/`
+ * and must not appear here as separate primary destinations.
+ * World / Live / Messages stay reachable via circles, UserMenu, and direct routes.
  */
 export const APP_NAV_ITEMS: AppNavItem[] = [
-  { label: "Home", href: APP_ROUTES.home },
-  { label: "World", href: APP_ROUTES.worldDiscovery },
+  { label: "Watch", href: APP_ROUTES.watch },
+  { label: "UM Life", href: APP_ROUTES.home },
+  { label: "Create", href: APP_ROUTES.createVideo },
   { label: "Learning", href: APP_ROUTES.learning },
-  { label: "Live", href: APP_ROUTES.live },
-  { label: "Messages", href: APP_ROUTES.messages },
+  { label: "Store", href: APP_ROUTES.store },
 ];
+
+export function isSocialHomePath(pathname: string): boolean {
+  const path = pathname.split("?")[0] || "/";
+  return (
+    path === APP_ROUTES.home ||
+    path === APP_ROUTES.discover ||
+    path.startsWith(`${APP_ROUTES.discover}/`) ||
+    path === APP_ROUTES.life ||
+    path.startsWith(`${APP_ROUTES.life}/`)
+  );
+}
 
 export function isNavActive(pathname: string, href: AppRouteHref): boolean {
   if (href === APP_ROUTES.home) {
-    // `/discover` aliases Home feed — keep Home highlighted after redirect targets.
-    return (
-      pathname === APP_ROUTES.home ||
-      pathname === APP_ROUTES.discover ||
-      pathname.startsWith(`${APP_ROUTES.discover}/`)
-    );
+    // `/discover` and `/life` alias the same social Home — keep UM Life highlighted.
+    return isSocialHomePath(pathname);
   }
 
-  if (href === APP_ROUTES.discover) {
+  if (href === APP_ROUTES.discover || href === APP_ROUTES.life) {
     return false;
   }
 

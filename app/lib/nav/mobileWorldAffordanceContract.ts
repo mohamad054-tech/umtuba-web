@@ -1,14 +1,14 @@
 /**
- * Platform Navigation Mobile World Affordance Decision V1
+ * Platform Navigation Mobile World Affordance Decision V2
  *
- * Product decision (frozen):
- * - World remains in Desktop primary (`APP_NAV_ITEMS`).
- * - World is **not** in Mobile bottom primary (`MOBILE_PRIMARY_NAV_ITEMS`).
- * - Mobile reachability stays via Home circles + direct `/world` links.
- * - Store / Watch are also **not** added to Mobile primary in this phase.
+ * UM Life Home Entry V1 Product GO:
+ * - Primary chrome (desktop + mobile-web) is Watch | UM Life | Create | Learning | Store.
+ * - World remains reachable via Home circles + direct `/world` links.
+ * - World is **not** in Mobile bottom primary.
+ * - Store / Watch **are** primary tabs under this GO.
  *
- * Revisiting this decision requires a **separate Product GO** — do not add
- * World/Store/Watch to mobile bottom nav without that GO.
+ * World is no longer required on desktop primary — five first-class destinations
+ * must stay visible without overflow on narrow devices.
  *
  * @see docs/architecture/PLATFORM_NAVIGATION_ARCHITECTURE_V1.md §2.2 / §2.7
  */
@@ -23,40 +23,43 @@ import {
   MOBILE_PRIMARY_NAV_LABELS,
 } from "./platformNavContract";
 
-/** Desktop primary includes World at this label/href. */
+/** World remains a named desktop-reachable destination (circles + `/world`). */
 export const MOBILE_WORLD_DESKTOP_LABEL = "World" as const;
 export const MOBILE_WORLD_DESKTOP_HREF = APP_ROUTES.worldDiscovery;
 
-/** Mobile primary stays four items — World intentionally absent. */
+/** Mobile primary stays five first-class items — World intentionally absent. */
 export const MOBILE_PRIMARY_WITHOUT_WORLD_LABELS = [
-  "Home",
-  "Live",
-  "Messages",
-  "Profile",
+  "Watch",
+  "UM Life",
+  "Create",
+  "Learning",
+  "Store",
 ] as const;
 
 /** Paths that must not be mobile primary tabs under this decision. */
 export const MOBILE_PRIMARY_EXCLUDED_DOMAIN_HREFS = [
   APP_ROUTES.worldDiscovery,
-  APP_ROUTES.store,
-  APP_ROUTES.watch,
 ] as const;
 
 export function assertMobileWorldAffordanceDecision(): void {
-  if (!DESKTOP_PRIMARY_NAV_LABELS.includes(MOBILE_WORLD_DESKTOP_LABEL)) {
-    throw new Error("World missing from desktop primary labels contract");
+  if (DESKTOP_PRIMARY_NAV_LABELS.includes(MOBILE_WORLD_DESKTOP_LABEL as never)) {
+    throw new Error(
+      "World must not occupy desktop primary under UM Life Home Entry V1"
+    );
   }
-  if (!DESKTOP_PRIMARY_NAV_HREFS.includes(MOBILE_WORLD_DESKTOP_HREF)) {
-    throw new Error("World missing from desktop primary hrefs contract");
+  if (DESKTOP_PRIMARY_NAV_HREFS.includes(MOBILE_WORLD_DESKTOP_HREF as never)) {
+    throw new Error(
+      "World must not occupy desktop primary hrefs under UM Life Home Entry V1"
+    );
   }
   if (
-    !APP_NAV_ITEMS.some(
+    APP_NAV_ITEMS.some(
       (item) =>
-        item.label === MOBILE_WORLD_DESKTOP_LABEL &&
+        item.label === MOBILE_WORLD_DESKTOP_LABEL ||
         item.href === MOBILE_WORLD_DESKTOP_HREF
     )
   ) {
-    throw new Error("World missing from live APP_NAV_ITEMS");
+    throw new Error("World must not appear in live APP_NAV_ITEMS under V2");
   }
 
   const mobileLabels = MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label);

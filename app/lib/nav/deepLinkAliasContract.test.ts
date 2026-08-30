@@ -54,7 +54,8 @@ describe("Deep-link & Alias Clarity V1", () => {
       expect(isDiscoverHomeAliasPath("/")).toBe(false);
       expect(isNavActive("/discover", APP_ROUTES.home)).toBe(true);
       expect(isNavActive("/discover", APP_ROUTES.discover)).toBe(false);
-      expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
+      expect(isMobilePrimaryNavActive("/discover", "umLife")).toBe(true);
+      expect(isMobilePrimaryNavActive("/life", "umLife")).toBe(true);
     });
   });
 

@@ -12,11 +12,11 @@ function read(rel: string) {
 describe("shell coherence", () => {
   it("keeps a single primary desktop nav contract", () => {
     expect(APP_NAV_ITEMS.map((i) => i.label)).toEqual([
-      "Home",
-      "World",
+      "Watch",
+      "UM Life",
+      "Create",
       "Learning",
-      "Live",
-      "Messages",
+      "Store",
     ]);
     // Contract Sync V1: Discover is a Home alias route, not a primary label.
     expect(APP_NAV_ITEMS.some((i) => i.label === "Discover")).toBe(false);

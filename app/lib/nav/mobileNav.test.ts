@@ -12,39 +12,43 @@ import {
 import { APP_NAV_ITEMS, APP_ROUTES } from "./routes";
 
 describe("MOBILE_PRIMARY_NAV_ITEMS", () => {
-  it("renders the four primary destinations in order", () => {
+  it("renders the five first-class destinations in order", () => {
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
-      "home",
-      "live",
-      "messages",
-      "profile",
+      "watch",
+      "umLife",
+      "create",
+      "learning",
+      "store",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
-      "Home",
-      "Live",
-      "Messages",
-      "Profile",
+      "Watch",
+      "UM Life",
+      "Create",
+      "Learning",
+      "Store",
     ]);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[0]?.href).toBe(APP_ROUTES.home);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.live);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.messages);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.profile);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[0]?.href).toBe(APP_ROUTES.watch);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.home);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.createVideo);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.learning);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[4]?.href).toBe(APP_ROUTES.store);
   });
 });
 
 describe("isMobilePrimaryNavActive", () => {
-  it("handles nested live and profile routes", () => {
-    expect(isMobilePrimaryNavActive("/live", "live")).toBe(true);
-    expect(
-      isMobilePrimaryNavActive("/live/db60a16b-ae73-4923-a00f-da075a41821a", "live")
-    ).toBe(true);
-    expect(isMobilePrimaryNavActive("/profile/creator_one", "profile")).toBe(
-      true
-    );
-    expect(isMobilePrimaryNavActive("/settings", "profile")).toBe(true);
-    expect(isMobilePrimaryNavActive("/messages", "messages")).toBe(true);
-    expect(isMobilePrimaryNavActive("/", "home")).toBe(true);
-    expect(isMobilePrimaryNavActive("/discover", "home")).toBe(true);
+  it("handles nested watch, create, learning, and store routes", () => {
+    expect(isMobilePrimaryNavActive("/watch", "watch")).toBe(true);
+    expect(isMobilePrimaryNavActive("/watch?post=1", "watch")).toBe(true);
+    expect(isMobilePrimaryNavActive("/create/video", "create")).toBe(true);
+    expect(isMobilePrimaryNavActive("/create/article", "create")).toBe(true);
+    expect(isMobilePrimaryNavActive("/learning", "learning")).toBe(true);
+    expect(isMobilePrimaryNavActive("/learning/courses", "learning")).toBe(true);
+    expect(isMobilePrimaryNavActive("/store", "store")).toBe(true);
+    expect(isMobilePrimaryNavActive("/store/cart", "store")).toBe(true);
+    expect(isMobilePrimaryNavActive("/", "umLife")).toBe(true);
+    expect(isMobilePrimaryNavActive("/discover", "umLife")).toBe(true);
+    expect(isMobilePrimaryNavActive("/life", "umLife")).toBe(true);
+    expect(isMobilePrimaryNavActive("/watch", "umLife")).toBe(false);
   });
 });
 
@@ -72,16 +76,16 @@ describe("shouldShowMobileBottomNav", () => {
 describe("desktop vs mobile nav contracts", () => {
   it("keeps desktop primary links available via AppTopNav items", () => {
     expect(APP_NAV_ITEMS.map((item) => item.href)).toEqual([
+      APP_ROUTES.watch,
       APP_ROUTES.home,
-      APP_ROUTES.worldDiscovery,
+      APP_ROUTES.createVideo,
       APP_ROUTES.learning,
-      APP_ROUTES.live,
-      APP_ROUTES.messages,
+      APP_ROUTES.store,
     ]);
   });
 
-  it("keeps World on desktop only (Mobile World Affordance Decision V1)", () => {
-    expect(APP_NAV_ITEMS.some((item) => item.label === "World")).toBe(true);
+  it("keeps World off primary chrome (UM Life Home Entry V1)", () => {
+    expect(APP_NAV_ITEMS.some((item) => item.label === "World")).toBe(false);
     expect(
       MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.label === "World")
     ).toBe(false);
@@ -92,10 +96,10 @@ describe("desktop vs mobile nav contracts", () => {
     ).toBe(false);
     expect(
       MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.href === APP_ROUTES.store)
-    ).toBe(false);
+    ).toBe(true);
     expect(
       MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.href === APP_ROUTES.watch)
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("scopes mobile bottom nav to below-sm via class contract", () => {
@@ -142,10 +146,10 @@ describe("dead future routes", () => {
     }
   });
 
-  it("uses profile route for the Profile tab config href", () => {
-    const profileItem = MOBILE_PRIMARY_NAV_ITEMS.find(
-      (item) => item.id === "profile"
-    );
-    expect(profileItem?.href).toBe(APP_ROUTES.profile);
+  it("keeps profile resolver for account chrome even without a Profile tab", () => {
+    expect(resolveMobileProfileHref("Creator_One")).toBe("/profile/creator_one");
+    expect(
+      MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.id === ("profile" as never))
+    ).toBe(false);
   });
 });

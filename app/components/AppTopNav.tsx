@@ -95,19 +95,23 @@ export default function AppTopNav({
 
         <nav
           aria-label={t("nav.primary")}
-          className={`hidden items-center gap-1 ${
-            store ? "lg:flex lg:gap-2" : "sm:flex sm:gap-2"
+          className={`hidden min-w-0 items-center gap-0.5 ${
+            store ? "lg:flex lg:gap-1.5" : "sm:flex md:gap-1.5"
           }`}
         >
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
+            const label = t(desktopNavLabelKey(item.href));
+            const ariaLabel =
+              item.href === APP_ROUTES.home ? t("nav.umLifeAria") : label;
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}:${item.href}`}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs ${focusRing} ${
+                aria-label={ariaLabel}
+                className={`watch-focus-ring whitespace-nowrap rounded-full px-1.5 py-1.5 text-[10px] font-bold transition sm:px-2 sm:text-[11px] md:px-2.5 md:text-xs ${focusRing} ${
                   active
                     ? store
                       ? "border border-[rgba(214,196,161,0.35)] bg-[rgba(214,196,161,0.12)] text-[var(--sf-accent-strong,#e8d7b5)]"
@@ -117,7 +121,7 @@ export default function AppTopNav({
                       : "border border-transparent text-white/45 hover:border-white/10 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                {t(desktopNavLabelKey(item.href))}
+                {label}
               </Link>
             );
           })}

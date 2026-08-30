@@ -9,40 +9,40 @@ import {
 import { APP_NAV_ITEMS, APP_ROUTES } from "./routes";
 import { MOBILE_PRIMARY_NAV_ITEMS } from "./mobileNav";
 import {
-  DESKTOP_PRIMARY_NAV_HREFS,
-  DESKTOP_PRIMARY_NAV_LABELS,
   HOME_CIRCLE_ENTRY_HREFS,
   MOBILE_PRIMARY_NAV_IDS,
   MOBILE_PRIMARY_NAV_LABELS,
 } from "./platformNavContract";
 
-describe("Mobile World Affordance Decision V1", () => {
-  it("keeps World on desktop primary only", () => {
-    expect(DESKTOP_PRIMARY_NAV_LABELS).toContain(MOBILE_WORLD_DESKTOP_LABEL);
-    expect(DESKTOP_PRIMARY_NAV_HREFS).toContain(MOBILE_WORLD_DESKTOP_HREF);
+describe("Mobile World Affordance Decision V2", () => {
+  it("keeps World off desktop primary under UM Life Home Entry V1", () => {
     expect(
       APP_NAV_ITEMS.some(
         (item) =>
-          item.label === "World" && item.href === APP_ROUTES.worldDiscovery
+          item.label === MOBILE_WORLD_DESKTOP_LABEL ||
+          item.href === APP_ROUTES.worldDiscovery
       )
-    ).toBe(true);
+    ).toBe(false);
+    expect(MOBILE_WORLD_DESKTOP_HREF).toBe(APP_ROUTES.worldDiscovery);
   });
 
-  it("keeps Mobile primary as Home Live Messages Profile without World", () => {
+  it("keeps Mobile primary as Watch UM Life Create Learning Store without World", () => {
     expect(MOBILE_PRIMARY_NAV_IDS).toEqual([
-      "home",
-      "live",
-      "messages",
-      "profile",
+      "watch",
+      "umLife",
+      "create",
+      "learning",
+      "store",
     ]);
     expect(MOBILE_PRIMARY_NAV_LABELS).toEqual([
       ...MOBILE_PRIMARY_WITHOUT_WORLD_LABELS,
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
-      "Home",
-      "Live",
-      "Messages",
-      "Profile",
+      "Watch",
+      "UM Life",
+      "Create",
+      "Learning",
+      "Store",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.label === "World")).toBe(
       false
@@ -54,13 +54,13 @@ describe("Mobile World Affordance Decision V1", () => {
     ).toBe(false);
   });
 
-  it("does not add Store or Watch to Mobile primary under this decision", () => {
+  it("allows Store and Watch on Mobile primary under this GO", () => {
     const hrefs = MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.href);
     for (const excluded of MOBILE_PRIMARY_EXCLUDED_DOMAIN_HREFS) {
       expect(hrefs).not.toContain(excluded);
     }
-    expect(hrefs).not.toContain(APP_ROUTES.store);
-    expect(hrefs).not.toContain(APP_ROUTES.watch);
+    expect(hrefs).toContain(APP_ROUTES.store);
+    expect(hrefs).toContain(APP_ROUTES.watch);
   });
 
   it("documents mobile World reachability via Home circles (layout unchanged)", () => {
