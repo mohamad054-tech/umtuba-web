@@ -64,6 +64,8 @@ describe("Hero Completeness V1 — header wiring", () => {
     expect(header).toMatch(/line-clamp-3/);
     expect(header).toMatch(/more|less/);
     expect(header).toMatch(/Creator specialties/);
+    expect(header).toMatch(/dir="auto"/);
+    expect(header).toMatch(/profile\.hero\.more/);
     expect(header).not.toMatch(/about\.interests/);
     expect(header).not.toMatch(/\bprofession\b/i);
     expect(header).not.toMatch(/\bverified\b/i);

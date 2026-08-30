@@ -42,6 +42,9 @@ import {
   PROFILE_PAGE_ENTER_CLASS,
   PROFILE_TAB_PANEL_FADE_CLASS,
 } from "./lib/profileMotionA11y";
+import { resolveProfileIdentityRoles } from "./lib/profileIdentity";
+import ProfileWhoSummary from "./components/ProfileWhoSummary";
+import { useTranslation } from "../components/i18n";
 
 type ProfileExperienceProps = {
   profile: ProfileView;
@@ -56,6 +59,7 @@ export default function ProfileExperience({
 }: ProfileExperienceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const showLiveTab =
     profile.liveSessions.length > 0 || Boolean(profile.isLive);
   const photoCount = useMemo(
@@ -85,6 +89,27 @@ export default function ProfileExperience({
       productCount,
       photoCount,
       showLiveTab,
+    ]
+  );
+  const identityRoles = useMemo(
+    () =>
+      resolveProfileIdentityRoles({
+        videoCount: profile.videoTotalCount,
+        articleCount: profile.articles.length,
+        photoCount,
+        postCount: profile.posts.length,
+        courseCount,
+        productCount,
+        isLive: profile.isLive,
+      }),
+    [
+      profile.videoTotalCount,
+      profile.articles.length,
+      photoCount,
+      profile.posts.length,
+      courseCount,
+      productCount,
+      profile.isLive,
     ]
   );
 
@@ -173,7 +198,7 @@ export default function ProfileExperience({
             role="status"
             className="rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
-            Development mock profile — not a production Supabase record.
+            {t("profile.mockBanner")}
           </p>
         ) : null}
 
@@ -188,7 +213,12 @@ export default function ProfileExperience({
         <section
           className={`space-y-5 rounded-[28px] border border-white/10 bg-[#080816]/70 p-5 backdrop-blur-xl md:rounded-[32px] md:p-7 ${PROFILE_PAGE_ENTER_CLASS}`}
         >
-          <ProfileHeader profile={profile} isCollapsed={isHeroCollapsed} />
+          <ProfileHeader
+            profile={profile}
+            isCollapsed={isHeroCollapsed}
+            roles={identityRoles}
+          />
+          <ProfileWhoSummary profile={profile} />
           <ProfileStats
             followersLabel={followersLabel}
             followingLabel={followingLabel}
@@ -208,13 +238,13 @@ export default function ProfileExperience({
                 href={APP_ROUTES.createArticle}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
               >
-                Write article
+                {t("profile.owner.writeArticle")}
               </Link>
               <Link
                 href={APP_ROUTES.createVideo}
                 className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold"
               >
-                Upload video
+                {t("profile.owner.uploadVideo")}
               </Link>
             </div>
           ) : null}
@@ -277,7 +307,7 @@ export default function ProfileExperience({
             role="status"
             className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
           >
-            Some profile stats couldn&apos;t be loaded. Counts may be incomplete.
+            {t("profile.statsIncomplete")}
           </p>
         ) : null}
 
@@ -347,31 +377,31 @@ export default function ProfileExperience({
 }
 
 export function ProfileNotFound({ username }: { username: string }) {
+  const { t } = useTranslation();
   return (
     <ProfileShell>
       <div className="flex flex-1 flex-col items-center justify-center rounded-[28px] border border-white/10 bg-[#080816]/70 px-6 py-16 text-center backdrop-blur-xl">
         <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
-          Profile
+          {t("profile.notFound.eyebrow")}
         </p>
-        <h2 className="mt-3 text-2xl font-black tracking-tight">
-          @{username} not found
+        <h2 className="mt-3 text-2xl font-black tracking-tight" dir="auto">
+          {t("profile.notFound.title", { values: { username } })}
         </h2>
         <p className="mt-3 max-w-md text-sm text-white/55">
-          This profile is not in UMTUBA yet. Try Home or Live, or create an
-          account to claim your username.
+          {t("profile.notFound.body")}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
           <Link
             href={APP_ROUTES.home}
             className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
           >
-            Open Home
+            {t("profile.notFound.home")}
           </Link>
           <Link
             href={APP_ROUTES.live}
             className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold transition hover:bg-white/10"
           >
-            Open Live
+            {t("profile.notFound.live")}
           </Link>
         </div>
       </div>

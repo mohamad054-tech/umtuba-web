@@ -16,7 +16,6 @@ import {
   getErrorMessage,
   isValidUsername,
   normalizeUsername,
-  USERNAME_HINT,
 } from "../../lib/supabase/validation";
 import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
 import SettingsShell from "./SettingsShell";
@@ -125,14 +124,14 @@ export default function SettingsExperience({
     const next: FieldErrors = {};
 
     if (!displayName.trim()) {
-      next.displayName = "Display name is required.";
+      next.displayName = t("settings.displayNameRequired");
     }
 
     const cleanedUsername = normalizeUsername(username);
     if (!cleanedUsername) {
-      next.username = "Username is required.";
+      next.username = t("settings.usernameRequired");
     } else if (!isValidUsername(cleanedUsername)) {
-      next.username = USERNAME_HINT;
+      next.username = t("settings.usernameHint");
     }
 
     return next;
@@ -145,7 +144,7 @@ export default function SettingsExperience({
     setFieldErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
-      setFormError("Please fix the highlighted fields.");
+      setFormError(t("settings.fixFields"));
       setSuccessMessage("");
       return;
     }
@@ -169,7 +168,7 @@ export default function SettingsExperience({
       setCity(updated.city || "");
       setCountry(updated.country || "");
       setAvatarInitial(updated.avatar_initial);
-      setSuccessMessage("Profile saved.");
+      setSuccessMessage(t("settings.profileSaved"));
       router.refresh();
     } catch (error) {
       setFormError(
@@ -197,7 +196,7 @@ export default function SettingsExperience({
       const publicUrl = await uploadAvatar(file);
       const updated = await updateOwnAvatarUrl(publicUrl);
       setAvatarUrl(updated.avatar_url);
-      setSuccessMessage("Avatar updated.");
+      setSuccessMessage(t("settings.avatarUpdated"));
       router.refresh();
     } catch (error) {
       const message = getErrorMessage(error, "Unable to upload avatar.");
@@ -273,6 +272,15 @@ export default function SettingsExperience({
                 <p className="mt-1 text-sm text-white/55">
                   {t("settings.profileIntro")}
                 </p>
+                <p className="mt-2 text-xs leading-5 text-white/40">
+                  {t("settings.profilePublicHint")}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-sm font-black tracking-tight text-white/80">
+                  {t("settings.profilePersonalHeading")}
+                </h3>
               </div>
 
               <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/30 p-4">
@@ -280,7 +288,7 @@ export default function SettingsExperience({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={avatarUrl}
-                    alt="Your avatar"
+                    alt={t("settings.avatarAlt")}
                     className="h-16 w-16 rounded-full object-cover ring-2 ring-white/15"
                   />
                 ) : (
@@ -291,7 +299,7 @@ export default function SettingsExperience({
 
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                    Avatar
+                    {t("settings.avatar")}
                   </p>
                   <button
                     type="button"
@@ -299,10 +307,12 @@ export default function SettingsExperience({
                     onClick={() => fileInputRef.current?.click()}
                     className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold transition hover:bg-white/10 disabled:opacity-50"
                   >
-                    {isUploadingAvatar ? "Uploading..." : "Upload image"}
+                    {isUploadingAvatar
+                      ? t("settings.uploading")
+                      : t("settings.uploadImage")}
                   </button>
                   <p className="text-xs text-white/45">
-                    JPEG, PNG, WebP, or GIF. Max 2 MB.
+                    {t("settings.avatarHint")}
                   </p>
                   {fieldErrors.avatar ? (
                     <p role="alert" className="text-sm text-red-300">
@@ -320,7 +330,7 @@ export default function SettingsExperience({
               </div>
 
               <AuthField
-                label="Display name"
+                label={t("settings.displayName")}
                 name="displayName"
                 type="text"
                 autoComplete="name"
@@ -336,14 +346,14 @@ export default function SettingsExperience({
               />
 
               <AuthField
-                label="Username"
+                label={t("settings.username")}
                 name="username"
                 type="text"
                 autoComplete="username"
                 value={username}
                 disabled={isSaving}
                 error={fieldErrors.username}
-                hint={USERNAME_HINT}
+                hint={t("settings.usernameHint")}
                 onChange={(event) => {
                   setUsername(event.target.value);
                   setFieldErrors((prev) => ({ ...prev, username: undefined }));
@@ -354,7 +364,7 @@ export default function SettingsExperience({
 
               <label className="block space-y-2">
                 <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
-                  Bio
+                  {t("settings.bio")}
                 </span>
                 <textarea
                   name="bio"
@@ -362,7 +372,8 @@ export default function SettingsExperience({
                   disabled={isSaving}
                   rows={4}
                   maxLength={280}
-                  placeholder="A short intro"
+                  dir="auto"
+                  placeholder={t("settings.bioPlaceholder")}
                   className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60"
                   onChange={(event) => {
                     setBio(event.target.value);
@@ -372,9 +383,18 @@ export default function SettingsExperience({
                 />
               </label>
 
+              <div className="space-y-2 pt-2">
+                <h3 className="text-sm font-black tracking-tight text-white/80">
+                  {t("settings.profilePlacesHeading")}
+                </h3>
+                <p className="text-xs leading-5 text-white/40">
+                  {t("settings.profilePlacesHint")}
+                </p>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <AuthField
-                  label="City"
+                  label={t("settings.city")}
                   name="city"
                   type="text"
                   autoComplete="address-level2"
@@ -387,7 +407,7 @@ export default function SettingsExperience({
                   }}
                 />
                 <AuthField
-                  label="Country"
+                  label={t("settings.country")}
                   name="country"
                   type="text"
                   autoComplete="country-name"
@@ -468,37 +488,45 @@ export default function SettingsExperience({
                   href={APP_ROUTES.saved}
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
-                  <p className="text-sm font-black">Saved</p>
-                  <p className="mt-1 text-xs text-white/45">Your bookmarks</p>
+                  <p className="text-sm font-black">{t("settings.savedBookmarks")}</p>
+                  <p className="mt-1 text-xs text-white/45">
+                    {t("settings.savedBookmarksHint")}
+                  </p>
                 </Link>
                 <Link
                   href={APP_ROUTES.rewards}
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
-                  <p className="text-sm font-black">Rewards</p>
-                  <p className="mt-1 text-xs text-white/45">UM Points & invites</p>
+                  <p className="text-sm font-black">{t("menu.rewards")}</p>
+                  <p className="mt-1 text-xs text-white/45">
+                    {t("settings.rewardsHint")}
+                  </p>
                 </Link>
                 <Link
                   href={profileHref}
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
-                  <p className="text-sm font-black">Public profile</p>
-                  <p className="mt-1 text-xs text-white/45">See how others view you</p>
+                  <p className="text-sm font-black">{t("settings.publicProfile")}</p>
+                  <p className="mt-1 text-xs text-white/45">
+                    {t("settings.publicProfileHint")}
+                  </p>
                 </Link>
                 <Link
                   href={APP_ROUTES.createVideo}
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
-                  <p className="text-sm font-black">Upload video</p>
-                  <p className="mt-1 text-xs text-white/45">Publish to Discover</p>
+                  <p className="text-sm font-black">{t("settings.uploadVideo")}</p>
+                  <p className="mt-1 text-xs text-white/45">
+                    {t("settings.uploadVideoHint")}
+                  </p>
                 </Link>
                 <Link
                   href={APP_ROUTES.advertise}
                   className="watch-focus-ring rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:bg-white/5"
                 >
-                  <p className="text-sm font-black">Advertise</p>
+                  <p className="text-sm font-black">{t("settings.advertise")}</p>
                   <p className="mt-1 text-xs text-white/45">
-                    Reach audiences on UMTUBA
+                    {t("settings.advertiseHint")}
                   </p>
                 </Link>
               </div>

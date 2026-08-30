@@ -52,9 +52,10 @@ export type ProfileTabVisibilityInput = {
 };
 
 /**
- * Visibility (Creator Space §5):
+ * Visibility (Creator Space §5 + personal-profile empty-state suppression):
  * - Always: All, About
- * - Articles / Videos / Courses / Products / Photos: count > 0 OR owner
+ * - Articles / Videos / Photos: count > 0 OR owner
+ * - Courses / Products: count > 0 only (hide empty Teacher/Seller)
  * - Live: keep existing conditional (`showLiveTab`)
  */
 export function getVisibleProfileTabs(
@@ -80,9 +81,9 @@ export function getVisibleProfileTabs(
       case "videos":
         return isOwner || videoCount > 0;
       case "courses":
-        return isOwner || courseCount > 0;
+        return courseCount > 0;
       case "products":
-        return isOwner || productCount > 0;
+        return productCount > 0;
       case "photos":
         return isOwner || photoCount > 0;
       case "live":

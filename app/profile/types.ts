@@ -152,9 +152,11 @@ export type ProfileView = {
   articles: ProfileArticle[];
   liveSessions: ProfileLivePreview[];
   about: ProfileAbout;
+  /** ISO created_at when known — client formats with locale. */
+  joinedAt?: string | null;
   /**
    * Courses / Products Panel Structure V1 — optional previews (no catalog backend).
-   * Empty → owner still sees tab; visitors rely on tab visibility counts.
+   * Empty counts hide Teacher/Seller tabs for everyone, including the owner.
    */
   courses?: ProfileCoursePreview[];
   products?: ProfileProductPreview[];

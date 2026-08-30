@@ -52,9 +52,9 @@ export default function DiscoverCreatorInfo({
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={profileHref}
-            className="truncate text-base font-black tracking-tight transition hover:text-white/85"
+            className="min-w-0 truncate text-base font-black tracking-tight transition hover:text-white/85"
           >
-            {creator.username}
+            <span dir="auto">{creator.name || creator.username}</span>
           </Link>
           {peerUserId ? (
             <FollowButton
@@ -77,8 +77,10 @@ export default function DiscoverCreatorInfo({
             className="watch-focus-ring pointer-events-auto shrink-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-white/90 transition hover:bg-white/15 disabled:cursor-wait disabled:opacity-60"
           />
         </div>
-        <p className="truncate text-sm text-white/55">
-          {location.city}, {location.country}
+        <p className="truncate text-sm text-white/55" dir="auto">
+          {[creator.username ? `@${creator.username.replace(/^@/, "")}` : "", location.city, location.country]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
       </div>
     </div>

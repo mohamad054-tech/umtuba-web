@@ -132,6 +132,7 @@ export function profileRowToView(
       joinedLabel: formatJoinedLabel(row.created_at),
       interests: [],
     },
+    joinedAt: row.created_at ?? null,
   };
 }
 

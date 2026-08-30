@@ -139,6 +139,9 @@ describe("translation catalogs", () => {
     "social.composer.prompt",
     "social.like",
     "social.shareMessages",
+    "profile.who.eyebrow",
+    "profile.about.overview",
+    "settings.profilePersonalHeading",
   ];
 
   it("provides foundation keys for every supported locale", () => {

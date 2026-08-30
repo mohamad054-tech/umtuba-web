@@ -11,6 +11,7 @@ import {
   isUuid,
 } from "../../lib/nav";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
+import { useTranslation } from "../../components/i18n";
 import type { FollowSnapshot } from "../../../lib/supabase/follows";
 import type { ProfileView } from "../types";
 
@@ -37,6 +38,7 @@ export default function ProfileActions({
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
   const canFollow =
     !isOwner && profile.source === "supabase" && isUuid(profile.id);
+  const { t } = useTranslation();
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "error">(
     "idle"
   );
@@ -61,23 +63,23 @@ export default function ProfileActions({
       type="button"
       onClick={() => void shareProfile()}
       className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:bg-white/10 hover:text-white"
-      aria-label="Copy profile link"
+      aria-label={t("profile.actions.copyAria")}
     >
-      {shareStatus === "copied" ? "Copied" : "Share"}
+      {shareStatus === "copied"
+        ? t("profile.actions.copied")
+        : t("profile.actions.share")}
     </button>
   );
 
+  const copyError = t("profile.actions.copyError");
   const shareFeedback =
     shareStatus === "error" ? (
       <p className="basis-full text-xs text-red-300" role="alert">
-        {sanitizeUserFacingMessage(
-          "Couldn't copy the profile link.",
-          "Couldn't copy the profile link."
-        )}
+        {sanitizeUserFacingMessage(copyError, copyError)}
       </p>
     ) : (
       <span className="sr-only" aria-live="polite">
-        {shareStatus === "copied" ? "Profile link copied" : ""}
+        {shareStatus === "copied" ? t("profile.actions.copiedAria") : ""}
       </span>
     );
 
@@ -88,7 +90,7 @@ export default function ProfileActions({
           href={APP_ROUTES.settings}
           className="watch-focus-ring rounded-full bg-white px-5 py-2.5 text-sm font-black text-black transition hover:bg-white/90"
         >
-          Edit profile
+          {t("profile.actions.edit")}
         </Link>
         {shareButton}
         {shareFeedback}
@@ -119,7 +121,7 @@ export default function ProfileActions({
           href={liveHref}
           className="watch-focus-ring rounded-full border border-red-400/35 bg-red-500/15 px-5 py-2.5 text-sm font-bold text-red-100 transition hover:bg-red-500/25"
         >
-          Watch live
+          {t("profile.actions.watchLive")}
         </Link>
       ) : null}
 

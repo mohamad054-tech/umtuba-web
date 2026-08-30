@@ -73,8 +73,6 @@ describe("Profile Creator Hub tab readiness V1", () => {
       "all",
       "articles",
       "videos",
-      "courses",
-      "products",
       "photos",
       "about",
     ]);

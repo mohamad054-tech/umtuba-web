@@ -1,9 +1,19 @@
 "use client";
 
-import {
-  PROFILE_TAB_LABELS,
-  type ProfileTabId,
-} from "../lib/profileTabs";
+import { useTranslation } from "../../components/i18n";
+import type { TranslationKey } from "../../../lib/i18n/messages/types";
+import { type ProfileTabId } from "../lib/profileTabs";
+
+const PROFILE_TAB_I18N: Record<ProfileTabId, TranslationKey> = {
+  all: "profile.tabs.all",
+  articles: "profile.tabs.articles",
+  videos: "profile.tabs.videos",
+  courses: "profile.tabs.courses",
+  products: "profile.tabs.products",
+  photos: "profile.tabs.photos",
+  live: "profile.tabs.live",
+  about: "profile.tabs.about",
+};
 
 export type { ProfileTabId };
 
@@ -41,10 +51,11 @@ export default function ProfileTabs({
   productCount = 0,
   photoCount = 0,
 }: ProfileTabsProps) {
+  const { t } = useTranslation();
   return (
     <div
       role="tablist"
-      aria-label="Profile sections"
+      aria-label={t("profile.tabs.aria")}
       aria-orientation="horizontal"
       className="flex gap-1 overflow-x-auto rounded-2xl border border-white/10 bg-[#080816]/80 p-1 backdrop-blur"
       onKeyDown={(event) => {
@@ -114,7 +125,7 @@ export default function ProfileTabs({
                 : "text-white/50 hover:bg-white/5 hover:text-white/80"
             }`}
           >
-            {PROFILE_TAB_LABELS[tabId]}
+            {t(PROFILE_TAB_I18N[tabId])}
             {showCount ? (
               <span className="ml-1.5 text-xs font-medium opacity-70">
                 {count}

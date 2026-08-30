@@ -3,10 +3,17 @@
 import { useState } from "react";
 import ActivityTierBadge from "../../components/activity-tiers/ActivityTierBadge";
 import ActivityTierProgressBar from "../../components/activity-tiers/ActivityTierProgressBar";
+import { formatDate } from "../../../lib/i18n/format";
+import { useTranslation } from "../../components/i18n";
 import {
   bioNeedsExpandToggle,
   normalizeSpecialtyChips,
 } from "../lib/profileHeroCompleteness";
+import {
+  getProfilePlaces,
+  PROFILE_ROLE_LABEL_KEY,
+  type ProfileIdentityRole,
+} from "../lib/profileIdentity";
 import ProfileLiveBadge from "./ProfileLiveBadge";
 import type { ProfileView } from "../types";
 
@@ -16,6 +23,8 @@ type ProfileHeaderProps = {
   showTierProgress?: boolean;
   /** Sticky collapse state — compress cover / avatar (Motion / A11y Pass). */
   isCollapsed?: boolean;
+  /** One-identity role chips from existing public activity only. */
+  roles?: readonly ProfileIdentityRole[];
 };
 
 /**
@@ -27,12 +36,19 @@ export default function ProfileHeader({
   profile,
   showTierProgress = true,
   isCollapsed = false,
+  roles = [],
 }: ProfileHeaderProps) {
+  const { t, locale } = useTranslation();
   const tierProgress = profile.activityTier ?? null;
   const specialtyChips = normalizeSpecialtyChips(profile.about.specialties);
   const bioText = profile.bio.trim();
   const canExpandBio = bioNeedsExpandToggle(bioText);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const places = getProfilePlaces(profile);
+  const locationLabel = [places.city, places.country].filter(Boolean).join(", ");
+  const joinedDate = profile.joinedAt
+    ? formatDate(locale, profile.joinedAt, { month: "long", year: "numeric" })
+    : "";
 
   return (
     <div className="space-y-5">
@@ -84,17 +100,33 @@ export default function ProfileHeader({
         <div className="min-w-0 flex-1 space-y-3 pb-1">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h2 className="text-2xl font-black tracking-tight sm:text-3xl">
+              <h2
+                className="text-2xl font-black tracking-tight sm:text-3xl"
+                dir="auto"
+              >
                 {profile.displayName}
               </h2>
               {tierProgress ? (
                 <ActivityTierBadge tier={tierProgress.tier} size="lg" />
               ) : null}
             </div>
-            <p className="text-sm font-medium text-white/45">
+            <p className="text-sm font-medium text-white/45" dir="auto">
               @{profile.username}
             </p>
           </div>
+
+          {roles.length > 0 ? (
+            <ul className="flex flex-wrap gap-2">
+              {roles.map((role) => (
+                <li
+                  key={role}
+                  className="rounded-full border border-amber-300/25 bg-amber-400/10 px-3 py-1 text-[11px] font-bold tracking-wide text-amber-100"
+                >
+                  {t(PROFILE_ROLE_LABEL_KEY[role])}
+                </li>
+              ))}
+            </ul>
+          ) : null}
 
           {specialtyChips.length > 0 ? (
             <ul
@@ -105,6 +137,7 @@ export default function ProfileHeader({
                 <li
                   key={label.toLowerCase()}
                   className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-xs font-bold text-white/75"
+                  dir="auto"
                 >
                   {label}
                 </li>
@@ -115,19 +148,22 @@ export default function ProfileHeader({
           {tierProgress && showTierProgress ? (
             <div className="max-w-md space-y-1.5 rounded-2xl border border-white/10 bg-white/[0.03] px-3.5 py-3">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
-                Activity tier
+                {t("profile.hero.activityTier")}
               </p>
               <p className="text-sm text-white/70">
                 {tierProgress.tier.displayTitle}
                 <span className="text-white/40">
                   {" "}
-                  · {tierProgress.score.toLocaleString()} activity score
+                  {t("profile.hero.activityScore", {
+                    values: {
+                      score: tierProgress.score.toLocaleString(),
+                    },
+                  })}
                 </span>
               </p>
               <ActivityTierProgressBar progress={tierProgress} />
               <p className="text-[11px] leading-5 text-white/40">
-                Ranked by authentic contributions — not wallet balance or
-                passive watch time.
+                {t("profile.hero.activityHint")}
               </p>
             </div>
           ) : null}
@@ -135,6 +171,7 @@ export default function ProfileHeader({
           {bioText ? (
             <div className="max-w-2xl space-y-1.5">
               <p
+                dir="auto"
                 className={`text-sm leading-6 text-white/70 sm:text-base ${
                   canExpandBio && !bioExpanded ? "line-clamp-3" : ""
                 }`}
@@ -148,15 +185,15 @@ export default function ProfileHeader({
                   aria-expanded={bioExpanded}
                   onClick={() => setBioExpanded((open) => !open)}
                 >
-                  {bioExpanded ? "less" : "more"}
+                  {bioExpanded ? t("profile.hero.less") : t("profile.hero.more")}
                 </button>
               ) : null}
             </div>
           ) : null}
 
-          {profile.city || profile.country ? (
-            <p className="text-sm text-white/50">
-              {[profile.city, profile.country].filter(Boolean).join(", ")}
+          {locationLabel ? (
+            <p className="text-sm text-white/50" dir="auto">
+              {locationLabel}
             </p>
           ) : null}
 
@@ -171,10 +208,12 @@ export default function ProfileHeader({
             </a>
           ) : null}
 
-          {profile.about.joinedLabel ? (
+          {joinedDate ? (
             <p className="text-xs text-white/40">
-              Joined {profile.about.joinedLabel}
+              {t("profile.who.joined", { values: { date: joinedDate } })}
             </p>
+          ) : profile.about.joinedLabel ? (
+            <p className="text-xs text-white/40">{profile.about.joinedLabel}</p>
           ) : null}
         </div>
       </div>

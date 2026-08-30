@@ -133,7 +133,7 @@ describe("profile content architecture", () => {
     const actions = readRepoFile("app/profile/components/ProfileActions.tsx");
     expect(actions).toMatch(/FollowButton/);
     expect(actions).toMatch(/!isOwner/);
-    expect(actions).toMatch(/Edit profile/);
+    expect(actions).toMatch(/profile\.actions\.edit/);
   });
 
   it("scopes video query to user_id and live query to host_id + live/public", () => {

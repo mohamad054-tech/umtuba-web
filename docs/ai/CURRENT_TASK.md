@@ -1,37 +1,40 @@
 ﻿# Current Task
 
-> **PC2 UM Life social experience V1 — PART 1B-A OWNER REVIEW GATE. Candidate preserved locally. Preview live. PART 1B-B not authorized.**
+> **PC2 UM Life rich personal profile V1 — PART 2A complete (no commit). Schema designed, not migrated. PART 1B-A preserved. PART 1B-B not started.**
 
 ## Task
 
 ```text
-TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A_OWNER_REVIEW_GATE
-ROLE = OWNER REVIEW GATE — PRESERVE CANDIDATE, LOCAL PREVIEW, AUTHENTICATED UI CHECK
-STATUS = OWNER_REVIEW_UI_READY
+TASK_ID = PC2_UMTUBA_UM_LIFE_RICH_PERSONAL_PROFILE_V1_PART2A
+ROLE = SOURCE_FIRST + PROFILE_PRODUCTIZATION + SCHEMA_DESIGN + IMPLEMENT_WHAT_REQUIRES_NO_MIGRATION
+STATUS = IMPLEMENTED_UNCOMMITTED
+MODE = SOURCE_FIRST + PROFILE_PRODUCTIZATION + SCHEMA_DESIGN + IMPLEMENT_WHAT_REQUIRES_NO_MIGRATION
 SOURCE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
 BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
-CANDIDATE_BRANCH = pc2/um-life-part1b-a-social-home-candidate
+CANDIDATE_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
+IMPLEMENTATION_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
+FINAL_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
+PART1B_A_BRANCH = pc2/um-life-part1b-a-social-home-candidate
+PART2A_BRANCH = pc2/um-life-rich-personal-profile-v1-part2a
 NO_DATABASE_MIGRATIONS = YES
 DEPLOYED = NO
 DATABASE_CHANGED = NO
 MIGRATIONS_CREATED = NO
 PART1B_B = NOT_AUTHORIZED
-READY_FOR_OWNER_VISUAL_REVIEW = YES
-READY_FOR_PART1B_B_AUTHORIZATION = NO
 ```
 
 ## Product / goal
 
-PART 1B-A candidate is committed on a local branch. Home `/` is live for the owner at http://localhost:3000/. Authenticated publish/like/comment/mention/save/share/send checks could not be completed in this gate because the browser MCP could not keep a tab and no existing signed-in session was available to this agent. Do not start PART 1B-B until the owner finishes the live review.
+One UMTUBA identity (Person + Social + Creator + Teacher + Seller). Visitors can understand who a person is from existing public fields. Repeatable life data (education, work, places beyond city/country, milestones, skills, cover, social links, field privacy) is designed only — no migration this part.
 
-## Allowed scope (this gate)
+## Allowed scope (done)
 
-Preserve/commit the PART 1B-A candidate. Local preview. Authenticated UI check if a real session exists. Document feed-position remainder. Update CURRENT_TASK.md and CURSOR_REPORT.md.
+Inspected actual profile routes, components, settings, migrations (read-only), RLS, post→profile navigation. Implemented no-migration UX. Designed minimum proposed schema. Tests + tsc + git diff --check. Public profile verified via local HTTP (browser MCP tab could not be kept).
 
-## Forbidden scope
+## Forbidden scope (held)
 
-Still in force: no PART 1B-B; no migrations; no deploy; no Central merge; no discard/reset of the candidate; no push (local branch only).
+No migrations. No production DB. No deploy. No PART 1B-B. No commit. PART 1B-A candidate branch left intact at `8ab99fba`.
 
 ## Next
 
-Owner opens http://localhost:3000/ while signed in and completes the visual + functional checklist. PART 1B-B remains a separate GO.
+Owner visual review of `/profile/mohamad` and `/profile/lina.creates`. Separate GO required for rich-profile schema/migrations. PART 1B-B remains a separate GO.
