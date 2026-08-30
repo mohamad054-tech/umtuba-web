@@ -7,13 +7,14 @@
 ```text
 TASK_ID = PC2_UMTUBA_RICH_PERSONAL_PROFILE_V1_PART2B
 ROLE = RICH_PROFILE_SCHEMA + RLS + EDITOR + PUBLIC_RENDER
-STATUS = AUTHORIZED
+STATUS = IMPLEMENTED
 MODE = IMPLEMENT
 SOURCE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
 BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
 PART1B_A_CANDIDATE_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
 PART1B_A_IMPLEMENTATION_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
 PART2A_COMMIT_SHA = c4f0fbfc810eb39bfd48b13e933a41374df2df93
+PART2B_CANDIDATE_SHA = 3d6ed0eb982f59b43df4a86ab1cecf3c86f9612e
 PART2A_BRANCH = pc2/um-life-rich-personal-profile-v1-part2a
 PART2B_BRANCH = pc2/um-life-rich-personal-profile-v1-part2b
 AUTHORIZED_MIGRATION_SCOPE = RICH_PROFILE_ONLY
@@ -45,4 +46,4 @@ Minimum real database foundation for a rich personal UMTUBA profile: keep `publi
 
 ## Next
 
-Implement Part 2B on top of the Part 2A commit. Do not start Part 1B-B.
+Owner review of rich profile schema + Settings editor + public render. Local/dev migration apply is a separate authorized step. PART 1B-B remains a separate GO.
