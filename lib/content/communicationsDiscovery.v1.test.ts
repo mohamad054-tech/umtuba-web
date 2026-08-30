@@ -130,6 +130,17 @@ describe("communications migration and reuse", () => {
     expect(migration).toMatch(
       /grant execute on function public\.discover_user_by_email/
     );
+    expect(migration).toMatch(
+      /revoke insert, update, delete on table public\.communication_phone_identities/
+    );
+    expect(migration).toMatch(
+      /revoke insert, update, delete on table public\.communication_contact_sync_state/
+    );
+    expect(migration).toMatch(/comms_phone_identity_guard/);
+    expect(migration).toMatch(/NEW\.phone_verified_at := null/);
+    expect(migration).not.toMatch(
+      /grant select, insert, update, delete on table public\.communication_phone_identities/
+    );
   });
 
   it("wires start conversation and settings privacy without a second messenger", () => {

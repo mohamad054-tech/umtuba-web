@@ -138,8 +138,11 @@ create policy communication_phone_identities_owner_all
   with check (user_id = (select auth.uid()));
 
 revoke all on table public.communication_phone_identities from public, anon;
-grant select, insert, update, delete on table public.communication_phone_identities
-  to authenticated;
+-- Owner reads own row via RLS. Mutations go through bind/unbind RPCs only.
+-- Direct INSERT/UPDATE would let a client set phone_verified_at without OTP.
+revoke insert, update, delete on table public.communication_phone_identities
+  from authenticated;
+grant select on table public.communication_phone_identities to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 3. Discovery privacy + prepared (unenforced) comms prefs
@@ -224,8 +227,10 @@ create policy communication_contact_sync_state_owner_all
   with check (user_id = (select auth.uid()));
 
 revoke all on table public.communication_contact_sync_state from public, anon;
-grant select, insert, update, delete on table public.communication_contact_sync_state
-  to authenticated;
+-- Permission/revoke only via RPCs. Clients must not flip sync_enabled.
+revoke insert, update, delete on table public.communication_contact_sync_state
+  from authenticated;
+grant select on table public.communication_contact_sync_state to authenticated;
 
 -- ---------------------------------------------------------------------------
 -- 5. Helpers: own privacy row, public identity
@@ -337,7 +342,7 @@ returns table (
   avatar_url text
 )
 language plpgsql
-stable
+volatile
 security definer
 set search_path = public
 as $$
@@ -400,7 +405,7 @@ returns table (
   avatar_url text
 )
 language plpgsql
-stable
+volatile
 security definer
 set search_path = public
 as $$
@@ -731,3 +736,40 @@ comment on function public.set_own_contact_sync_permission(boolean) is
 
 revoke all on function public.set_own_contact_sync_permission(boolean) from public;
 grant execute on function public.set_own_contact_sync_permission(boolean) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 8. Defense in depth: clients cannot self-verify a phone
+-- ---------------------------------------------------------------------------
+
+create or replace function public.comms_phone_identity_guard()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  -- Future OTP bind may set app.comms_allow_phone_verify = 'on' inside a
+  -- privileged DEFINER function. This part never sets that flag.
+  if coalesce(current_setting('app.comms_allow_phone_verify', true), '') <> 'on' then
+    if TG_OP = 'INSERT' then
+      NEW.phone_verified_at := null;
+    elsif TG_OP = 'UPDATE' then
+      NEW.phone_verified_at := OLD.phone_verified_at;
+    end if;
+  end if;
+  return NEW;
+end;
+$$;
+
+comment on function public.comms_phone_identity_guard() is
+  'Blocks client self-verify of phone_verified_at. OTP is not in this part.';
+
+revoke all on function public.comms_phone_identity_guard() from public;
+revoke all on function public.comms_phone_identity_guard() from anon, authenticated;
+
+drop trigger if exists comms_phone_identity_guard_trg
+  on public.communication_phone_identities;
+create trigger comms_phone_identity_guard_trg
+  before insert or update on public.communication_phone_identities
+  for each row
+  execute function public.comms_phone_identity_guard();
