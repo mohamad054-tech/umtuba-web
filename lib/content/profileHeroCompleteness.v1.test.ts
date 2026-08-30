@@ -69,7 +69,7 @@ describe("Hero Completeness V1 — header wiring", () => {
     expect(header).not.toMatch(/about\.interests/);
     expect(header).not.toMatch(/\bprofession\b/i);
     expect(header).not.toMatch(/\bverified\b/i);
-    expect(header).not.toMatch(/cover_url|coverUrl/);
+    expect(header).toMatch(/coverUrl/);
     expect(helper).not.toMatch(/cover_url|coverUrl/);
     expect(helper).toMatch(/normalizeSpecialtyChips/);
     expect(

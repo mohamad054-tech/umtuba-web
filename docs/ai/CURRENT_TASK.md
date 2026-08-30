@@ -1,40 +1,48 @@
 ﻿# Current Task
 
-> **PC2 UM Life rich personal profile V1 — PART 2A complete (no commit). Schema designed, not migrated. PART 1B-A preserved. PART 1B-B not started.**
+> **PC2 UM Life rich personal profile V1 — PART 2B AUTHORIZED. Schema + real data + editor. PART 1B-A preserved. PART 1B-B not started.**
 
 ## Task
 
 ```text
-TASK_ID = PC2_UMTUBA_UM_LIFE_RICH_PERSONAL_PROFILE_V1_PART2A
-ROLE = SOURCE_FIRST + PROFILE_PRODUCTIZATION + SCHEMA_DESIGN + IMPLEMENT_WHAT_REQUIRES_NO_MIGRATION
-STATUS = IMPLEMENTED_UNCOMMITTED
-MODE = SOURCE_FIRST + PROFILE_PRODUCTIZATION + SCHEMA_DESIGN + IMPLEMENT_WHAT_REQUIRES_NO_MIGRATION
+TASK_ID = PC2_UMTUBA_RICH_PERSONAL_PROFILE_V1_PART2B
+ROLE = RICH_PROFILE_SCHEMA + RLS + EDITOR + PUBLIC_RENDER
+STATUS = AUTHORIZED
+MODE = IMPLEMENT
 SOURCE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
 BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
-CANDIDATE_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
-IMPLEMENTATION_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
-FINAL_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
-PART1B_A_BRANCH = pc2/um-life-part1b-a-social-home-candidate
+PART1B_A_CANDIDATE_SHA = 8ab99fba6c02267c7efc576dd6ff79d131b52b5f
+PART1B_A_IMPLEMENTATION_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
+PART2A_COMMIT_SHA = c4f0fbfc810eb39bfd48b13e933a41374df2df93
 PART2A_BRANCH = pc2/um-life-rich-personal-profile-v1-part2a
-NO_DATABASE_MIGRATIONS = YES
+PART2B_BRANCH = pc2/um-life-rich-personal-profile-v1-part2b
+AUTHORIZED_MIGRATION_SCOPE = RICH_PROFILE_ONLY
 DEPLOYED = NO
 DATABASE_CHANGED = NO
-MIGRATIONS_CREATED = NO
 PART1B_B = NOT_AUTHORIZED
 ```
 
 ## Product / goal
 
-One UMTUBA identity (Person + Social + Creator + Teacher + Seller). Visitors can understand who a person is from existing public fields. Repeatable life data (education, work, places beyond city/country, milestones, skills, cover, social links, field privacy) is designed only — no migration this part.
+Minimum real database foundation for a rich personal UMTUBA profile: keep `public.profiles`, add `bio_long` / `cover_url` / `website_url`, plus six normalized tables with visibility + RLS. Wire Settings editor CRUD and public `/profile/[username]` render from real data.
 
-## Allowed scope (done)
+## Allowed scope
 
-Inspected actual profile routes, components, settings, migrations (read-only), RLS, post→profile navigation. Implemented no-migration UX. Designed minimum proposed schema. Tests + tsc + git diff --check. Public profile verified via local HTTP (browser MCP tab could not be kept).
+- Additive profile schema only (profiles scalars + 6 tables + indexes/checks/RLS + cover storage)
+- Settings editor inside existing `/settings`
+- Public profile render of real rich-profile data
+- Tests, i18n (EN/AR required; preserve other locales), docs
+- Local/dev migration only — never remote production
 
-## Forbidden scope (held)
+## Forbidden scope
 
-No migrations. No production DB. No deploy. No PART 1B-B. No commit. PART 1B-A candidate branch left intact at `8ab99fba`.
+- No PART 1B-B
+- No Store / Learning backends, Watch architecture, Stories DB, Android/iOS, payments
+- No production apply, no deploy, no Central merge
+- Do not replace `public.profiles`
+- Do not collect phone, private email, street address, government ID, financial, live location, pronouns
+- Do not reuse `user_interest_profiles`
 
 ## Next
 
-Owner visual review of `/profile/mohamad` and `/profile/lina.creates`. Separate GO required for rich-profile schema/migrations. PART 1B-B remains a separate GO.
+Implement Part 2B on top of the Part 2A commit. Do not start Part 1B-B.

@@ -54,17 +54,20 @@ export function resolveProfileIdentityRoles(
   return roles;
 }
 
-export function getProfilePlaces(profile: Pick<ProfileView, "city" | "country">): {
+export function getProfilePlaces(
+  profile: Pick<ProfileView, "city" | "country" | "rich">
+): {
   city: string;
   country: string;
   hasPlaces: boolean;
 } {
   const city = profile.city.trim();
   const country = profile.country.trim();
+  const richPlaces = profile.rich?.places ?? [];
   return {
     city,
     country,
-    hasPlaces: Boolean(city || country),
+    hasPlaces: Boolean(city || country || richPlaces.length > 0),
   };
 }
 
@@ -74,11 +77,12 @@ export function stripJoinedPrefix(label: string | null | undefined): string {
 }
 
 export function hasPersonalIntroContent(
-  profile: Pick<ProfileView, "bio" | "city" | "country" | "about">
+  profile: Pick<ProfileView, "bio" | "bioLong" | "city" | "country" | "about" | "rich">
 ): boolean {
   const places = getProfilePlaces(profile);
   return Boolean(
     profile.bio.trim() ||
+      profile.bioLong?.trim() ||
       places.hasPlaces ||
       stripJoinedPrefix(profile.about.joinedLabel)
   );
@@ -91,6 +95,7 @@ export type AboutInternalNavId =
   | "education"
   | "specialtiesInterests"
   | "achievements"
+  | "milestones"
   | "links";
 
 export const ABOUT_INTERNAL_NAV_ORDER: readonly AboutInternalNavId[] = [
@@ -100,6 +105,7 @@ export const ABOUT_INTERNAL_NAV_ORDER: readonly AboutInternalNavId[] = [
   "education",
   "specialtiesInterests",
   "achievements",
+  "milestones",
   "links",
 ] as const;
 
@@ -111,6 +117,7 @@ export const ABOUT_INTERNAL_NAV_KEY: Record<AboutInternalNavId, TranslationKey> 
     education: "profile.about.education",
     specialtiesInterests: "profile.about.specialties",
     achievements: "profile.about.achievements",
+    milestones: "profile.about.milestones",
     links: "profile.about.links",
   };
 
@@ -125,8 +132,13 @@ export function getAboutInternalNav(
 ): AboutInternalNavId[] {
   const places = getProfilePlaces(profile);
   const about = profile.about;
+  const rich = profile.rich;
   const showAchievements =
-    hasItems(about.achievements) || Boolean(options?.includeUmtubaAchievement);
+    hasItems(about.achievements) ||
+    Boolean(options?.includeUmtubaAchievement) ||
+    Boolean(rich?.milestones.some((item) => item.category === "achievement"));
+  const otherMilestones =
+    rich?.milestones.filter((item) => item.category !== "achievement") ?? [];
 
   return ABOUT_INTERNAL_NAV_ORDER.filter((id) => {
     switch (id) {
@@ -135,15 +147,17 @@ export function getAboutInternalNav(
       case "places":
         return places.hasPlaces;
       case "experience":
-        return hasItems(about.experience);
+        return hasItems(about.experience) || hasItems(rich?.work);
       case "education":
-        return hasItems(about.education);
+        return hasItems(about.education) || hasItems(rich?.education);
       case "specialtiesInterests":
-        return hasItems(about.specialties) || hasItems(about.interests);
+        return hasItems(about.specialties) || hasItems(about.interests) || hasItems(rich?.tags);
       case "achievements":
         return showAchievements;
+      case "milestones":
+        return otherMilestones.length > 0;
       case "links":
-        return Boolean(about.website?.trim()) || hasItems(about.links);
+        return Boolean(about.website?.trim()) || hasItems(about.links) || hasItems(rich?.links);
       default:
         return false;
     }

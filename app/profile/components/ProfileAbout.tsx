@@ -14,10 +14,17 @@ import {
   stripJoinedPrefix,
   type AboutInternalNavId,
 } from "../lib/profileIdentity";
+import { APP_ROUTES } from "../../lib/nav";
+import {
+  formatPlaceLine,
+  formatYearRange,
+} from "../../../lib/supabase/richProfile";
 import type { ProfileView } from "../types";
+import Link from "next/link";
 
 type ProfileAboutProps = {
   profile: ProfileView;
+  isOwner?: boolean;
 };
 
 function SectionHeading({ children }: { children: ReactNode }) {
@@ -54,11 +61,25 @@ function scrollToAboutSection(id: AboutInternalNavId) {
  * Empty sections omit entirely. No owner "Add …" placeholders in this phase.
  * Personal intro is one About surface with internal Overview/Places cards.
  */
-export default function ProfileAbout({ profile }: ProfileAboutProps) {
+export default function ProfileAbout({
+  profile,
+  isOwner = false,
+}: ProfileAboutProps) {
   const { t, locale } = useTranslation();
   const location = getAboutLocationLabel(profile);
   const places = getProfilePlaces(profile);
   const umtubaAchievement = Boolean(profile.activityTier);
+  const richPlaces = profile.rich?.places ?? [];
+  const otherMilestones =
+    profile.rich?.milestones.filter((item) => item.category !== "achievement") ??
+    [];
+  const languages =
+    profile.rich?.tags.filter((tag) => tag.kind === "language").map((tag) => tag.label) ??
+    [];
+  const hobbies =
+    profile.rich?.tags.filter((tag) => tag.kind === "hobby").map((tag) => tag.label) ??
+    [];
+  const longBio = profile.bioLong?.trim() || "";
   const sections = getVisibleAboutSections({
     bio: profile.bio,
     location,
@@ -111,16 +132,42 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
         <p className="text-sm text-white/45" dir="auto">
           @{profile.username}
         </p>
-        {profile.bio ? (
+        {longBio ? (
+          <p className="text-sm leading-6 text-white/70" dir="auto">
+            {longBio}
+          </p>
+        ) : profile.bio ? (
           <p className="text-sm leading-6 text-white/70" dir="auto">
             {profile.bio}
           </p>
+        ) : null}
+        {isOwner ? (
+          <Link
+            href={APP_ROUTES.settings}
+            className="inline-flex text-xs font-bold text-sky-300 underline-offset-2 hover:underline"
+          >
+            {t("profile.owner.addAbout")}
+          </Link>
         ) : null}
       </section>
 
       {places.hasPlaces ? (
         <section id="about-places" className="space-y-3">
           <SectionHeading>{t("profile.about.places")}</SectionHeading>
+          {richPlaces.length > 0 ? (
+            <ul className="space-y-3">
+              {richPlaces.map((place) => (
+                <li key={place.id}>
+                  <p className="text-sm font-bold text-white/85" dir="auto">
+                    {place.label}
+                  </p>
+                  <p className="mt-1 text-sm text-white/55" dir="auto">
+                    {formatPlaceLine(place)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
           <dl className="space-y-2">
             {places.city ? (
               <div>
@@ -143,6 +190,7 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
               </div>
             ) : null}
           </dl>
+          )}
         </section>
       ) : null}
 
@@ -214,6 +262,22 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
               <ChipList items={profile.about.interests} />
             </div>
           ) : null}
+          {languages.length > 0 ? (
+            <div>
+              <p className="text-xs font-semibold text-white/45">
+                {t("profile.about.languages")}
+              </p>
+              <ChipList items={languages} />
+            </div>
+          ) : null}
+          {hobbies.length > 0 ? (
+            <div>
+              <p className="text-xs font-semibold text-white/45">
+                {t("profile.about.hobbies")}
+              </p>
+              <ChipList items={hobbies} />
+            </div>
+          ) : null}
         </section>
       ) : null}
 
@@ -238,6 +302,39 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
               <ChipList items={profile.about.achievements ?? []} />
             </div>
           ) : null}
+        </section>
+      ) : null}
+
+      {otherMilestones.length > 0 ? (
+        <section id="about-milestones">
+          <SectionHeading>{t("profile.about.milestones")}</SectionHeading>
+          <ul className="mt-3 space-y-3">
+            {otherMilestones.map((item) => (
+              <li key={item.id}>
+                <p className="text-sm font-bold text-white/85" dir="auto">
+                  {item.title}
+                </p>
+                <p className="mt-1 text-xs text-white/45">
+                  {[
+                    formatYearRange(
+                      item.occurred_year,
+                      null,
+                      false,
+                      t("profile.about.present")
+                    ),
+                    item.location_label,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+                {item.description ? (
+                  <p className="mt-1 text-sm leading-6 text-white/55" dir="auto">
+                    {item.description}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 

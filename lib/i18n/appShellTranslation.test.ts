@@ -61,6 +61,8 @@ describe("App Shell translation V1", () => {
       "error.title",
       "social.composer.prompt",
       "social.like",
+      "settings.longBio",
+      "profile.about.milestones",
     ] as const) {
       expect(translate("en", key).length).toBeGreaterThan(0);
       expect(translate("ar", key).length).toBeGreaterThan(0);

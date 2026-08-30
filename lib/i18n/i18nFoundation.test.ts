@@ -142,6 +142,9 @@ describe("translation catalogs", () => {
     "profile.who.eyebrow",
     "profile.about.overview",
     "settings.profilePersonalHeading",
+    "settings.longBio",
+    "profile.about.milestones",
+    "settings.visibility.onlyMe",
   ];
 
   it("provides foundation keys for every supported locale", () => {

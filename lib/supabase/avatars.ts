@@ -1,6 +1,7 @@
 import { createClient } from "./client";
 import { getAuthenticatedUser } from "./auth";
 import type { ProfileRow } from "./database.types";
+import { sanitizeHttpsUrl, validateBioLong } from "../profile/richProfileContract";
 import {
   getErrorMessage,
   isUsernameTakenError,
@@ -20,6 +21,8 @@ const ALLOWED_AVATAR_TYPES = new Set([
 
 const PROFILE_COLUMNS =
   "id, username, display_name, full_name, bio, city, country, avatar_url, avatar_initial, created_at, updated_at";
+const PROFILE_RICH_COLUMNS =
+  "id, username, display_name, full_name, bio, bio_long, city, country, avatar_url, cover_url, website_url, avatar_initial, created_at, updated_at";
 
 export type ProfileUpdateInput = {
   displayName: string;
@@ -27,6 +30,8 @@ export type ProfileUpdateInput = {
   bio: string;
   city: string;
   country: string;
+  bioLong?: string;
+  websiteUrl?: string;
 };
 
 export async function uploadAvatar(file: File): Promise<string> {
@@ -95,6 +100,51 @@ export async function updateOwnProfile(
   }
 
   const avatarInitial = displayName.charAt(0).toUpperCase() || "U";
+  const websiteUrl =
+    input.websiteUrl === undefined
+      ? undefined
+      : input.websiteUrl.trim()
+        ? sanitizeHttpsUrl(input.websiteUrl)
+        : null;
+
+  if (input.websiteUrl?.trim() && websiteUrl === null) {
+    throw new Error("Enter a valid https:// website.");
+  }
+
+  const bioLong =
+    input.bioLong === undefined ? undefined : validateBioLong(input.bioLong);
+
+  if (input.bioLong && input.bioLong.trim() && bioLong === null) {
+    throw new Error("The longer bio is too long.");
+  }
+
+  const payload: Record<string, unknown> = {
+    display_name: displayName,
+    full_name: displayName,
+    username,
+    bio: bio || null,
+    city: city || null,
+    country: country || null,
+    avatar_initial: avatarInitial,
+  };
+
+  if (bioLong !== undefined) {
+    payload.bio_long = bioLong;
+  }
+  if (websiteUrl !== undefined) {
+    payload.website_url = websiteUrl;
+  }
+
+  const rich = await supabase
+    .from("profiles")
+    .update(payload)
+    .eq("id", user.id)
+    .select(PROFILE_RICH_COLUMNS)
+    .single();
+
+  if (!rich.error) {
+    return rich.data as ProfileRow;
+  }
 
   const { data, error } = await supabase
     .from("profiles")

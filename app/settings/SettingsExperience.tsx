@@ -10,6 +10,12 @@ import {
   updateOwnProfile,
   uploadAvatar,
 } from "../../lib/supabase/avatars";
+import {
+  updateOwnCoverUrl,
+  uploadProfileCover,
+} from "../../lib/supabase/profileCovers";
+import type { RichProfileBundle } from "../../lib/supabase/richProfile";
+import RichProfileEditor from "./RichProfileEditor";
 import { signOut } from "../../lib/supabase/auth";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
 import {
@@ -27,16 +33,22 @@ export type SettingsProfile = {
   username: string;
   displayName: string;
   bio: string;
+  bioLong: string;
+  websiteUrl: string;
   city: string;
   country: string;
   avatarUrl: string | null;
+  coverUrl: string | null;
   avatarInitial: string;
+  rich: RichProfileBundle;
 };
 
 type FieldErrors = {
   displayName?: string;
   username?: string;
   avatar?: string;
+  cover?: string;
+  website?: string;
 };
 
 type SettingsSection = "profile" | "notifications" | "account" | "language";
@@ -92,18 +104,23 @@ export default function SettingsExperience({
   const { t } = useTranslation();
   const activeSection = resolveSection(searchParams.get("section"));
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState(profile.displayName);
   const [username, setUsername] = useState(profile.username);
   const [bio, setBio] = useState(profile.bio);
+  const [bioLong, setBioLong] = useState(profile.bioLong);
+  const [websiteUrl, setWebsiteUrl] = useState(profile.websiteUrl);
   const [city, setCity] = useState(profile.city);
   const [country, setCountry] = useState(profile.country);
   const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
+  const [coverUrl, setCoverUrl] = useState(profile.coverUrl);
   const [avatarInitial, setAvatarInitial] = useState(profile.avatarInitial);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   function setSection(section: SettingsSection) {
@@ -160,11 +177,16 @@ export default function SettingsExperience({
         bio,
         city,
         country,
+        bioLong,
+        websiteUrl,
       });
 
       setUsername(updated.username);
       setDisplayName(updated.display_name || updated.full_name);
       setBio(updated.bio || "");
+      setBioLong(updated.bio_long || "");
+      setWebsiteUrl(updated.website_url || "");
+      setCoverUrl(updated.cover_url || null);
       setCity(updated.city || "");
       setCountry(updated.country || "");
       setAvatarInitial(updated.avatar_initial);
@@ -203,6 +225,33 @@ export default function SettingsExperience({
       setFieldErrors((prev) => ({ ...prev, avatar: message }));
     } finally {
       setIsUploadingAvatar(false);
+    }
+  }
+
+  async function handleCoverChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setIsUploadingCover(true);
+    setFieldErrors((prev) => ({ ...prev, cover: undefined }));
+    setFormError("");
+    setSuccessMessage("");
+
+    try {
+      const publicUrl = await uploadProfileCover(file);
+      const updated = await updateOwnCoverUrl(publicUrl);
+      setCoverUrl(updated.cover_url ?? publicUrl);
+      setSuccessMessage(t("settings.coverUpdated"));
+      router.refresh();
+    } catch (error) {
+      const message = getErrorMessage(error, "Unable to upload cover.");
+      setFieldErrors((prev) => ({ ...prev, cover: message }));
+    } finally {
+      setIsUploadingCover(false);
     }
   }
 
@@ -329,6 +378,49 @@ export default function SettingsExperience({
                 </div>
               </div>
 
+              <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/30 p-4">
+                {coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={coverUrl}
+                    alt=""
+                    className="h-16 w-28 rounded-xl object-cover ring-2 ring-white/15"
+                  />
+                ) : (
+                  <div className="h-16 w-28 rounded-xl bg-white/10" />
+                )}
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                    {t("settings.cover")}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={isUploadingCover || isSaving}
+                    onClick={() => coverInputRef.current?.click()}
+                    className="watch-focus-ring rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-bold transition hover:bg-white/10 disabled:opacity-50"
+                  >
+                    {isUploadingCover
+                      ? t("settings.uploading")
+                      : t("settings.uploadImage")}
+                  </button>
+                  <p className="text-xs text-white/45">
+                    {t("settings.coverHint")}
+                  </p>
+                  {fieldErrors.cover ? (
+                    <p role="alert" className="text-sm text-red-300">
+                      {fieldErrors.cover}
+                    </p>
+                  ) : null}
+                  <input
+                    ref={coverInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={handleCoverChange}
+                  />
+                </div>
+              </div>
+
               <AuthField
                 label={t("settings.displayName")}
                 name="displayName"
@@ -383,6 +475,43 @@ export default function SettingsExperience({
                 />
               </label>
 
+              <label className="block space-y-2">
+                <span className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
+                  {t("settings.longBio")}
+                </span>
+                <textarea
+                  name="bioLong"
+                  value={bioLong}
+                  disabled={isSaving}
+                  rows={5}
+                  maxLength={4000}
+                  dir="auto"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60"
+                  onChange={(event) => {
+                    setBioLong(event.target.value);
+                    setFormError("");
+                    setSuccessMessage("");
+                  }}
+                />
+                <p className="text-xs text-white/40">{t("settings.longBioHint")}</p>
+              </label>
+
+              <AuthField
+                label={t("settings.website")}
+                name="websiteUrl"
+                type="url"
+                value={websiteUrl}
+                disabled={isSaving}
+                hint={t("settings.websiteHint")}
+                error={fieldErrors.website}
+                onChange={(event) => {
+                  setWebsiteUrl(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, website: undefined }));
+                  setFormError("");
+                  setSuccessMessage("");
+                }}
+              />
+
               <div className="space-y-2 pt-2">
                 <h3 className="text-sm font-black tracking-tight text-white/80">
                   {t("settings.profilePlacesHeading")}
@@ -433,12 +562,14 @@ export default function SettingsExperience({
 
               <button
                 type="submit"
-                disabled={isSaving || isUploadingAvatar}
+                disabled={isSaving || isUploadingAvatar || isUploadingCover}
                 aria-busy={isSaving}
                 className="watch-focus-ring w-full rounded-2xl bg-white py-4 font-black text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSaving ? t("status.saving") : t("settings.saveProfile")}
               </button>
+
+              <RichProfileEditor initial={profile.rich} />
             </form>
           ) : null}
 

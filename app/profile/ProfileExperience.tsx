@@ -369,7 +369,9 @@ export default function ProfileExperience({
               loadFailed={Boolean(profile.liveLoadFailed)}
             />
           ) : null}
-          {activeTab === "about" ? <ProfileAbout profile={profile} /> : null}
+          {activeTab === "about" ? (
+            <ProfileAbout profile={profile} isOwner={isOwner} />
+          ) : null}
         </section>
       </div>
     </ProfileShell>

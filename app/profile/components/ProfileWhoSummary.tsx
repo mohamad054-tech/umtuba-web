@@ -2,6 +2,7 @@
 
 import { formatDate } from "../../../lib/i18n/format";
 import { useTranslation } from "../../components/i18n";
+import { compactLocationFromRich, currentWorkTitle } from "../../../lib/supabase/richProfile";
 import { getProfilePlaces, stripJoinedPrefix } from "../lib/profileIdentity";
 import type { ProfileView } from "../types";
 
@@ -21,19 +22,39 @@ export default function ProfileWhoSummary({ profile }: ProfileWhoSummaryProps) {
     ? formatDate(locale, profile.joinedAt, { month: "long", year: "numeric" })
     : stripJoinedPrefix(profile.about.joinedLabel);
 
+  const compactLocation = compactLocationFromRich({
+    city: places.city,
+    country: places.country,
+    places: profile.rich?.places,
+  });
+  const workTitle = currentWorkTitle(profile.rich?.work ?? []);
+
   const facts: { key: string; label: string; value: string }[] = [];
-  if (places.city) {
+  if (compactLocation) {
+    facts.push({
+      key: "location",
+      label: t("profile.who.currentCity"),
+      value: compactLocation,
+    });
+  } else if (places.city) {
     facts.push({
       key: "city",
       label: t("profile.who.homeCity"),
       value: places.city,
     });
   }
-  if (places.country) {
+  if (places.country && !compactLocation.includes(places.country)) {
     facts.push({
       key: "country",
       label: t("profile.who.country"),
       value: places.country,
+    });
+  }
+  if (workTitle) {
+    facts.push({
+      key: "work",
+      label: t("profile.who.work"),
+      value: workTitle,
     });
   }
   if (joinedDate) {

@@ -1,5 +1,6 @@
 import type { ActivityTierProgress } from "../../lib/activity-tiers";
 import type { ContentCardViewModel } from "../../lib/content/cards";
+import type { RichProfileBundle } from "../../lib/supabase/richProfile";
 
 export type ProfileVideo = {
   id: string;
@@ -133,11 +134,14 @@ export type ProfileView = {
   username: string;
   displayName: string;
   bio: string;
+  bioLong?: string;
   city: string;
   country: string;
   avatarInitial: string;
   avatarUrl: string | null;
+  coverUrl?: string | null;
   avatarGradient: string;
+  rich?: RichProfileBundle;
   followersLabel: string;
   followingLabel: string;
   likesLabel: string;

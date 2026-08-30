@@ -58,7 +58,16 @@ export default function ProfileHeader({
         } ${profile.avatarGradient}`}
         aria-hidden
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(56,189,248,0.25),transparent_40%)]" />
+        {profile.coverUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- remote Supabase storage URLs
+          <img
+            src={profile.coverUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(56,189,248,0.25),transparent_40%)]" />
+        )}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#080816] to-transparent" />
       </div>
 

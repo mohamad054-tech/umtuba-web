@@ -11,6 +11,8 @@ import {
   type ProfileContentStats,
   type ProfileContentVideo,
 } from "../../../lib/supabase/profileContent";
+import type { RichProfileBundle } from "../../../lib/supabase/richProfile";
+import { formatYearRange } from "../../../lib/supabase/richProfile";
 import type { MockProfile, ProfileView } from "../types";
 
 const DEFAULT_AVATAR_GRADIENT = "from-blue-400 to-indigo-600";
@@ -52,6 +54,7 @@ export type ProfileContentBundle = {
   registryFailed?: boolean;
   liveRooms?: ProfileContentLiveRoom[];
   liveFailed?: boolean;
+  rich?: RichProfileBundle | null;
 };
 
 export function profileRowToView(
@@ -76,17 +79,60 @@ export function profileRowToView(
     ? stats.videoCount
     : Math.max(videos.length, 0);
 
+  const rich = content?.rich ?? null;
+  const website = row.website_url?.trim() || "";
+  const skillTags =
+    rich?.tags.filter((tag) => tag.kind === "skill").map((tag) => tag.label) ??
+    [];
+  const interestTags =
+    rich?.tags
+      .filter((tag) => tag.kind === "interest" || tag.kind === "hobby")
+      .map((tag) => tag.label) ?? [];
+  const languageTags =
+    rich?.tags
+      .filter((tag) => tag.kind === "language")
+      .map((tag) => tag.label) ?? [];
+  const workItems =
+    rich?.work.map((item) => ({
+      title: item.organization
+        ? `${item.title} · ${item.organization}`
+        : item.title,
+      detail: [
+        formatYearRange(item.start_year, item.end_year, item.is_current, "Present"),
+        item.location_label,
+        item.description,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    })) ?? [];
+  const educationItems =
+    rich?.education.map((item) => ({
+      title: item.institution,
+      detail: [item.credential, item.field_of_study, item.location_label]
+        .filter(Boolean)
+        .join(" · "),
+    })) ?? [];
+  const achievementTitles =
+    rich?.milestones
+      .filter((item) => item.category === "achievement")
+      .map((item) => item.title) ?? [];
+  const linkItems =
+    rich?.links.map((item) => ({ label: item.label, href: item.url })) ?? [];
+
   return {
     source: "supabase",
     id: row.id,
     username: row.username,
     displayName,
     bio: row.bio?.trim() || "",
+    bioLong: row.bio_long?.trim() || "",
     city: row.city?.trim() || "",
     country: row.country?.trim() || "",
     avatarInitial:
       row.avatar_initial || displayName.charAt(0).toUpperCase() || "U",
     avatarUrl: row.avatar_url,
+    coverUrl: row.cover_url ?? null,
+    rich: rich ?? undefined,
     avatarGradient: DEFAULT_AVATAR_GRADIENT,
     followersLabel: follow
       ? formatFollowCountLabel(follow.followersCount)
@@ -130,7 +176,13 @@ export function profileRowToView(
     liveLoadFailed: Boolean(content?.liveFailed),
     about: {
       joinedLabel: formatJoinedLabel(row.created_at),
-      interests: [],
+      website: website || undefined,
+      interests: interestTags,
+      specialties: [...skillTags, ...languageTags],
+      experience: workItems.length > 0 ? workItems : undefined,
+      education: educationItems.length > 0 ? educationItems : undefined,
+      achievements: achievementTitles.length > 0 ? achievementTitles : undefined,
+      links: linkItems.length > 0 ? linkItems : undefined,
     },
     joinedAt: row.created_at ?? null,
   };
@@ -143,10 +195,12 @@ export function mockProfileToView(profile: MockProfile): ProfileView {
     username: profile.username,
     displayName: profile.displayName,
     bio: profile.bio,
+    bioLong: "",
     city: profile.city,
     country: profile.country,
     avatarInitial: profile.avatarInitial,
     avatarUrl: null,
+    coverUrl: null,
     avatarGradient: profile.avatarGradient,
     followersLabel: profile.followersLabel,
     followingLabel: profile.followingLabel,

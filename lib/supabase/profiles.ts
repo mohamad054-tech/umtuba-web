@@ -2,6 +2,10 @@ import { createClient } from "./server";
 import type { ProfileRow } from "./database.types";
 import { getErrorMessage, normalizeUsername } from "./validation";
 
+/** Rich personal profile projection (Part 2B). Falls back if columns are missing. */
+export const PROFILE_SELECT_RICH_COLUMNS =
+  "id, username, display_name, full_name, bio, bio_long, city, country, avatar_url, cover_url, website_url, avatar_initial, created_at, updated_at";
+
 /** Full Foundation V1 profile projection. */
 export const PROFILE_SELECT_COLUMNS =
   "id, username, display_name, full_name, bio, city, country, avatar_url, avatar_initial, created_at, updated_at";
@@ -40,6 +44,9 @@ function normalizeProfileRow(row: Partial<ProfileRow> & { id: string }): Profile
     city: row.city ?? null,
     country: row.country ?? null,
     avatar_url: row.avatar_url ?? null,
+    cover_url: row.cover_url ?? null,
+    website_url: row.website_url ?? null,
+    bio_long: row.bio_long ?? null,
     avatar_initial: row.avatar_initial || "U",
     created_at: row.created_at ?? new Date(0).toISOString(),
     updated_at: row.updated_at ?? row.created_at ?? new Date(0).toISOString(),
@@ -51,6 +58,18 @@ async function selectProfile(
     columns: string
   ) => PromiseLike<{ data: unknown; error: unknown }>
 ): Promise<ProfileRow | null> {
+  const rich = await query(PROFILE_SELECT_RICH_COLUMNS);
+
+  if (!rich.error) {
+    return rich.data
+      ? normalizeProfileRow(rich.data as Partial<ProfileRow> & { id: string })
+      : null;
+  }
+
+  if (!isMissingColumnError(rich.error)) {
+    throw new Error(getErrorMessage(rich.error, "Unable to load profile."));
+  }
+
   const extended = await query(PROFILE_SELECT_COLUMNS);
 
   if (!extended.error) {
