@@ -12,6 +12,8 @@ type ConversationListProps = {
   error?: string | null;
   onRetry?: () => void;
   emptyHint?: string;
+  startConversationLabel?: string;
+  onStartConversation?: () => void;
 };
 
 export default function ConversationList({
@@ -24,13 +26,26 @@ export default function ConversationList({
   error = null,
   onRetry,
   emptyHint = "Message a creator from their profile or Discover to begin.",
+  startConversationLabel,
+  onStartConversation,
 }: ConversationListProps) {
   return (
     <aside className="flex h-full min-h-0 flex-col rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
       <div className="border-b border-white/10 p-4">
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.28em] text-cyan-300">
-          Inbox
-        </p>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-cyan-300">
+            Inbox
+          </p>
+          {onStartConversation && startConversationLabel ? (
+            <button
+              type="button"
+              onClick={onStartConversation}
+              className="watch-focus-ring rounded-full bg-white px-3 py-1.5 text-[11px] font-black text-black"
+            >
+              {startConversationLabel}
+            </button>
+          ) : null}
+        </div>
         <ConversationSearch value={searchQuery} onChange={onSearchChange} />
       </div>
 

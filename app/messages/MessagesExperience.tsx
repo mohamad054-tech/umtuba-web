@@ -21,6 +21,8 @@ import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import ConversationList from "./components/ConversationList";
 import ChatWindow from "./components/ChatWindow";
 import MessagesShell from "./components/MessagesShell";
+import StartConversationPanel from "./components/StartConversationPanel";
+import { useTranslation } from "../components/i18n";
 import { useMessengerRealtime } from "./hooks/useMessengerRealtime";
 import { applyReactionToggle } from "./lib/reactionState";
 import {
@@ -52,15 +54,18 @@ type MessagesExperienceProps = {
   initialUserId: string;
   initialConversations: Conversation[];
   initialError?: string | null;
+  ownUsername?: string | null;
 };
 
 export default function MessagesExperience({
   initialUserId,
   initialConversations,
   initialError = null,
+  ownUsername = null,
 }: MessagesExperienceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const conversationParam = searchParams.get("conversation");
   const messageParam = searchParams.get("message");
   const creatorId = searchParams.get("creatorId");
@@ -87,6 +92,9 @@ export default function MessagesExperience({
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [mutePending, setMutePending] = useState(false);
   const [muteError, setMuteError] = useState<string | null>(null);
+  const [startOpen, setStartOpen] = useState(
+    () => searchParams.get("start") === "1"
+  );
   const typingTimerRef = useRef<number | null>(null);
   const typingActiveRef = useRef(false);
   const openedPeerRef = useRef<string | null>(null);
@@ -908,6 +916,8 @@ export default function MessagesExperience({
             loading={listLoading}
             error={listError}
             onRetry={() => void loadInbox()}
+            startConversationLabel={t("comms.startConversation")}
+            onStartConversation={() => setStartOpen(true)}
             emptyHint={
               creatorName
                 ? `Start chatting with ${creatorName}`
@@ -983,6 +993,13 @@ export default function MessagesExperience({
           />
         </div>
       </div>
+      {startOpen ? (
+        <StartConversationPanel
+          currentUserId={currentUserId}
+          ownUsername={ownUsername}
+          onClose={() => setStartOpen(false)}
+        />
+      ) : null}
     </MessagesShell>
   );
 }

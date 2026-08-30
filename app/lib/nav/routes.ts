@@ -9,6 +9,7 @@ export const APP_ROUTES = {
   messages: "/messages",
   notifications: "/notifications",
   settings: "/settings",
+  contact: "/u",
   saved: "/saved",
   search: "/search",
   login: "/login",
@@ -147,6 +148,15 @@ export function buildHomeCityFocusHref(city: string): string {
 /** Normalize a creator handle/username for `/profile/[username]`. */
 export function normalizeProfileUsername(username: string): string {
   return username.trim().replace(/^@+/, "").toLowerCase();
+}
+
+/** Personal communications link used by QR and share. No private ids. */
+export function buildPersonalContactHref(username: string): string {
+  return `${APP_ROUTES.contact}/${normalizeProfileUsername(username)}`;
+}
+
+export function buildPersonalAtHref(username: string): string {
+  return `/@${normalizeProfileUsername(username)}`;
 }
 
 const UUID_RE =

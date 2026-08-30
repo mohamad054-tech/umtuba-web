@@ -9,6 +9,8 @@ export {
   buildHomeCityFocusHref,
   buildLiveStreamHref,
   buildMessageCreatorHref,
+  buildPersonalAtHref,
+  buildPersonalContactHref,
   buildPostJourneyHref,
   buildPostNotificationHref,
   buildRewardsHref,

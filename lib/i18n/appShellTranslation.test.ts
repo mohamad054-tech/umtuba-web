@@ -38,6 +38,10 @@ describe("App Shell translation V1", () => {
     expect(translate("en", "settings.profilePlacesHint").length).toBeGreaterThan(
       0
     );
+    expect(translate("en", "settings.communications")).toBe("Communications");
+    expect(translate("ar", "settings.communications")).toBe("التواصل");
+    expect(translate("en", "comms.startConversation")).toBe("Start conversation");
+    expect(translate("ar", "comms.startConversation")).toBe("بدء محادثة");
   });
 
   it("translates generic actions, status, dialogs, and empty/error", () => {

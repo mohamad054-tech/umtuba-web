@@ -24,6 +24,7 @@ import {
   normalizeUsername,
 } from "../../lib/supabase/validation";
 import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
+import CommunicationsPrivacyPanel from "./CommunicationsPrivacyPanel";
 import SettingsShell from "./SettingsShell";
 import { LanguageSelector, useTranslation } from "../components/i18n";
 import type { TranslationKey } from "../../lib/i18n";
@@ -51,7 +52,12 @@ type FieldErrors = {
   website?: string;
 };
 
-type SettingsSection = "profile" | "notifications" | "account" | "language";
+type SettingsSection =
+  | "profile"
+  | "notifications"
+  | "account"
+  | "language"
+  | "communications";
 
 type SettingsExperienceProps = {
   profile: SettingsProfile;
@@ -78,6 +84,11 @@ const SECTIONS: {
     descriptionKey: "settings.languageNavDescription",
   },
   {
+    id: "communications",
+    labelKey: "settings.communications",
+    descriptionKey: "settings.communicationsDescription",
+  },
+  {
     id: "account",
     labelKey: "settings.account",
     descriptionKey: "settings.accountDescription",
@@ -89,7 +100,8 @@ function resolveSection(raw: string | null): SettingsSection {
     raw === "notifications" ||
     raw === "account" ||
     raw === "profile" ||
-    raw === "language"
+    raw === "language" ||
+    raw === "communications"
   ) {
     return raw;
   }
@@ -586,6 +598,20 @@ export default function SettingsExperience({
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
                 <LanguageSelector tone="dark" />
               </div>
+            </div>
+          ) : null}
+
+          {activeSection === "communications" ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">
+                  {t("settings.communicationsHeading")}
+                </h2>
+                <p className="mt-1 text-sm text-white/55">
+                  {t("settings.communicationsIntro")}
+                </p>
+              </div>
+              <CommunicationsPrivacyPanel username={username} />
             </div>
           ) : null}
 

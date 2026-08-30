@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { messagesMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
+import { getProfileByIdFromDb } from "../../lib/supabase/profiles";
 import { getSafeRedirectPath } from "../../lib/supabase/redirect";
 import { APP_ROUTES, isUuid } from "../lib/nav";
 import MessagesExperience from "./MessagesExperience";
@@ -97,6 +98,7 @@ export default async function MessagesPage({
 
   const supabase = await createClient();
   const inbox = await listConversationsForUser(supabase, userId);
+  const profile = await getProfileByIdFromDb(userId);
 
   return (
     <Suspense fallback={<MessagesFallback />}>
@@ -104,6 +106,7 @@ export default async function MessagesPage({
         initialUserId={userId}
         initialConversations={inbox.ok ? inbox.conversations : []}
         initialError={inbox.ok ? null : inbox.message}
+        ownUsername={profile?.username ?? null}
       />
     </Suspense>
   );

@@ -145,6 +145,9 @@ describe("translation catalogs", () => {
     "settings.longBio",
     "profile.about.milestones",
     "settings.visibility.onlyMe",
+    "settings.communications",
+    "comms.startConversation",
+    "comms.notFound",
   ];
 
   it("provides foundation keys for every supported locale", () => {

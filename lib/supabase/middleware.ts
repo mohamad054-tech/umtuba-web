@@ -87,7 +87,22 @@ function applyReferralAttribution(
   return response;
 }
 
+function rewritePersonalAtLink(request: NextRequest): NextResponse | null {
+  const match = request.nextUrl.pathname.match(/^\/@([A-Za-z0-9._]{3,24})\/?$/);
+  if (!match?.[1]) {
+    return null;
+  }
+  const url = request.nextUrl.clone();
+  url.pathname = `/u/${match[1].toLowerCase()}`;
+  return NextResponse.rewrite(url);
+}
+
 export async function updateSession(request: NextRequest) {
+  const atRewrite = rewritePersonalAtLink(request);
+  if (atRewrite) {
+    return applyReferralAttribution(request, atRewrite);
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });

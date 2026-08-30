@@ -830,6 +830,105 @@ export type Database = {
         };
         Returns: boolean;
       };
+      discover_user_by_username: {
+        Args: { p_username: string };
+        Returns: Array<{
+          user_id: string;
+          username: string;
+          display_name: string;
+          avatar_url: string | null;
+        }>;
+      };
+      discover_user_by_email: {
+        Args: { p_email: string };
+        Returns: Array<{
+          user_id: string;
+          username: string;
+          display_name: string;
+          avatar_url: string | null;
+        }>;
+      };
+      discover_user_by_phone: {
+        Args: { p_phone: string };
+        Returns: Array<{
+          user_id: string;
+          username: string;
+          display_name: string;
+          avatar_url: string | null;
+        }>;
+      };
+      get_own_communication_privacy: {
+        Args: Record<string, never>;
+        Returns: {
+          user_id: string;
+          find_by_phone: string;
+          find_by_email: string;
+          who_can_message: string;
+          who_can_call: string;
+          read_receipts_enabled: boolean;
+          last_seen_visible: string;
+        };
+      };
+      set_own_communication_privacy: {
+        Args: {
+          p_find_by_phone?: string | null;
+          p_find_by_email?: string | null;
+          p_who_can_message?: string | null;
+          p_who_can_call?: string | null;
+          p_read_receipts_enabled?: boolean | null;
+          p_last_seen_visible?: string | null;
+        };
+        Returns: {
+          user_id: string;
+          find_by_phone: string;
+          find_by_email: string;
+          who_can_message: string;
+          who_can_call: string;
+          read_receipts_enabled: boolean;
+          last_seen_visible: string;
+        };
+      };
+      get_own_phone_identity: {
+        Args: Record<string, never>;
+        Returns: Array<{
+          phone_e164: string;
+          phone_country_code: string;
+          phone_verified_at: string | null;
+          created_at: string;
+        }>;
+      };
+      bind_own_phone: {
+        Args: { p_phone_e164: string; p_country_code: string };
+        Returns: Array<{
+          phone_e164: string;
+          phone_country_code: string;
+          phone_verified_at: string | null;
+        }>;
+      };
+      unbind_own_phone: {
+        Args: Record<string, never>;
+        Returns: undefined;
+      };
+      get_own_contact_sync_state: {
+        Args: Record<string, never>;
+        Returns: {
+          user_id: string;
+          permission_granted_at: string | null;
+          sync_enabled: boolean;
+          last_sync_at: string | null;
+          revoked_at: string | null;
+        };
+      };
+      set_own_contact_sync_permission: {
+        Args: { p_granted: boolean };
+        Returns: {
+          user_id: string;
+          permission_granted_at: string | null;
+          sync_enabled: boolean;
+          last_sync_at: string | null;
+          revoked_at: string | null;
+        };
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
