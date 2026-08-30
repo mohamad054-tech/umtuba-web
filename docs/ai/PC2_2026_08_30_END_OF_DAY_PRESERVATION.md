@@ -65,7 +65,8 @@ Already complete today (resume from these SHAs; do not re-audit or re-implement)
 | UM Life web (build PASS) | `09155b158228df7b5523d2388a53a02481f98726` | `pc2/umtuba-um-life-home-entry-v1` |
 | UM Life web branch tip (docs after PASS) | `ab3f7b03dcafe8bc70d96b4641e4cdc3188b5bcf` | same |
 | UM Life mobile | `4d07bd6c0eca5514a2e4df139203d929c9943b68` | `pc2/umtuba-um-life-home-entry-v1` |
-| Communications web | `866749ed76ac1975deeceeb73dfa42c333ed05bd` | `pc2/umtuba-communications-v1-part1b-identity-discovery` |
+| Communications web (product) | `866749ed76ac1975deeceeb73dfa42c333ed05bd` | `pc2/umtuba-communications-v1-part1b-identity-discovery` |
+| Communications web branch tip (EOD docs) | `05b100f034ba4e0542ecd1f378d9f8c0d22b4be3` | same |
 | Communications mobile | `a660e196bb7f1c1276f8a94f69783632c32d3658` | `pc2/umtuba-communications-v1-part1b-mobile-entry` |
 | Authorized mobile base | `09e94f80775855d7e2036fa7d83d63b9202fb8a4` | `pc2/a3-android-unused-permissions-v2` (also UM Life mobile parent) |
 | Part 1B-A social feat | `4d4953d8` | `pc2/um-life-part1b-a-social-home-candidate~1` |
@@ -134,7 +135,7 @@ Full environment report: `docs/ai/PC2_UMTUBA_LOCAL_SUPABASE_RUNTIME_ENVIRONMENT_
 | Repo / branch | Commit | What |
 | --- | --- | --- |
 | web `pc2/umtuba-um-life-home-entry-v1` | `ab3f7b03` | Build-gate report + PageProps SHA stamp |
-| web `pc2/umtuba-communications-v1-part1b-identity-discovery` | this EOD docs commit | Checkpoint + CURRENT_TASK + CURSOR_REPORT + local Supabase env doc |
+| web `pc2/umtuba-communications-v1-part1b-identity-discovery` | `05b100f0` | Checkpoint + CURRENT_TASK + CURSOR_REPORT + local Supabase env doc |
 
 ---
 
@@ -162,10 +163,24 @@ Full environment report: `docs/ai/PC2_UMTUBA_LOCAL_SUPABASE_RUNTIME_ENVIRONMENT_
 
 ## Push record
 
-Filled after `git push -u origin <branch>` (normal push only). See `CURSOR_REPORT.md` if this section is updated in the same commit vs post-push note.
+Normal `git push -u origin <branch>` only. No force. No merge to Central / `alpha-0.2`.
 
-Intended backup remotes (`origin` = `https://github.com/mohamad054-tech/umtuba-web.git` / `umtuba-mobile.git`):
+**Web** `origin` = `https://github.com/mohamad054-tech/umtuba-web.git`
 
-**Web:** `pc2/umtuba-um-life-home-entry-v1`, `pc2/umtuba-communications-v1-part1b-identity-discovery`, `pc2/um-life-rich-personal-profile-v1-part2b`, `pc2/um-life-part1b-a-social-home-candidate`, `pc2/um-life-rich-personal-profile-v1-part2a`
+| Branch | Pushed SHA | Result |
+| --- | --- | --- |
+| `pc2/umtuba-um-life-home-entry-v1` | `ab3f7b03` | NEW remote branch |
+| `pc2/umtuba-communications-v1-part1b-identity-discovery` | `05b100f0` | NEW remote branch |
+| `pc2/um-life-rich-personal-profile-v1-part2b` | `455fdca8` | NEW remote branch |
+| `pc2/um-life-part1b-a-social-home-candidate` | `8ab99fba` | NEW remote branch |
+| `pc2/um-life-rich-personal-profile-v1-part2a` | `c4f0fbfc` | NEW remote branch |
 
-**Mobile:** `pc2/umtuba-um-life-home-entry-v1`, `pc2/umtuba-communications-v1-part1b-mobile-entry`, `pc2/eas-preview-config-v1` (already on remote at `77e9e287`)
+**Mobile** `origin` = `https://github.com/mohamad054-tech/umtuba-mobile.git`
+
+| Branch | Pushed SHA | Result |
+| --- | --- | --- |
+| `pc2/umtuba-um-life-home-entry-v1` | `4d07bd6` | NEW remote branch |
+| `pc2/umtuba-communications-v1-part1b-mobile-entry` | `a660e19` | NEW remote branch |
+| `pc2/eas-preview-config-v1` | `77e9e287` | already on remote (up to date) |
+
+Local-only tonight: none of the required today-task branches. Historical `office/*` worktrees and unattributed dirty files remain local on disk.

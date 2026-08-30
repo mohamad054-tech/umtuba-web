@@ -62,7 +62,7 @@ Authorized docs: exit 0.
 
 ## git status --short
 
-After this commit, comms branch still has pre-existing unattributed dirty/untracked files (historical PC2 docs, sandbox/android leftovers, `.env.example`, `vitest.config.ts`). UM Life worktree clean at `ab3f7b03`. Mobile UM Life and comms worktrees clean. Mobile primary `77e9e287` still has leftover CURSOR_REPORT / screenshot / worktrees dirt.
+Comms branch `05b100f0` (plus a follow-up push-record docs commit if present) still has pre-existing unattributed dirty/untracked files (historical PC2 docs, sandbox/android leftovers, `.env.example`, `vitest.config.ts`). UM Life worktree clean at `ab3f7b03` and pushed. Mobile UM Life `4d07bd6` and comms `a660e19` clean and pushed. Mobile primary `77e9e287` already on remote; leftover CURSOR_REPORT / screenshot / worktrees dirt left on disk.
 
 ## Open issues
 
