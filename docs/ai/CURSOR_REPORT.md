@@ -2,56 +2,74 @@
 
 ## Summary
 
-Implemented PART 1B-A of UM Life social experience on existing Home architecture. Video-first Home `/` is preserved. The existing `CreatePostModal` / `createPost` / `post-images` composer is now mounted on production Home via `DiscoverShell` with original UMTUBA language (“Share on UM”), not Facebook chrome.
+PART 1B-A owner review gate completed without starting PART 1B-B. The existing social Home candidate was preserved and committed on a dedicated local branch. The already-running Next.js server was reused. Home `/` serves the new UI (Share on UM + video-first stage).
 
-**Text/image presentation choice:** Home remains video-only (`getDiscoverVideosServer`). After publish, a compact **Your latest post** overlay (`HomeLatestPostLayer`) shows the current user’s just-published text/image post with like / comment / save / share, plus a profile deep link (`?tab=all` or `?tab=photos`). This is not a second Home feed and does not revive `/feed`.
+Authenticated functional steps (publish text/image, like, comment, mention, save, share, send-in-messages, profile return) could not be executed in a real signed-in session: cursor-ide-browser MCP created tabs that vanished immediately (same failure as the prior PART 1B-A report), Playwright Chromium is not installed in this environment, and signed-out curl shows `/saved`, `/messages`, and `/notifications` redirect to login. No fake users were created. No `.env` was read. The local preview was left running for the owner.
 
-Like stays binary (`toggle_post_like`) with optimistic + realtime counts. Comments keep the existing flat model; mention typeahead uses `globalSearchAction` (`tab=people`, `remember=false`); `@username` in comment/post text is clickable to `/profile/[username]`. Share menu adds **Send in Messages** via existing messenger actions. Save remains on the action rail and Home chrome.
+Feed position remains **PARTIAL**. Overlay close (comments / share / save / send-in-messages) stays in-page so the video feed does not remount. Profile and Home-tab navigation remount `/` without a stored index or playback time. A sessionStorage restore was considered and **not** applied: it would not close paginated/off-first-page or playback-time cases, and it could not be retested in a real browser this gate.
 
 ```text
-TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A
-STATUS = IMPLEMENTATION_COMPLETE_UNCOMMITTED
+TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A_OWNER_REVIEW_GATE
+STATUS = OWNER_REVIEW_UI_READY
 BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
-FINAL_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
-BRANCH = office/platform-translation-trunk-port-v1
+IMPLEMENTATION_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
+BRANCH = pc2/um-life-part1b-a-social-home-candidate
+LOCAL_PREVIEW_URL = http://localhost:3000/
 IMPLEMENTED = YES
 DEPLOYED = NO
 DATABASE_CHANGED = NO
 MIGRATIONS_CREATED = NO
+PART1B_B_STARTED = NO
 ```
 
 ## Exact files changed
 
+Implementation commit `4d4953d8` `feat(um-life): part 1b-a social home candidate` (28 files):
+
 New:
 
-- `app/components/home/HomeSocialComposer.tsx`
 - `app/components/home/HomeLatestPostLayer.tsx`
 - `app/components/home/HomeSocialComposer.test.ts`
+- `app/components/home/HomeSocialComposer.tsx`
 - `app/components/social/MentionedText.tsx`
 - `app/components/social/ShareToMessagesPanel.tsx`
 - `app/discover/components/DiscoverShellActions.tsx`
-- `app/lib/social/mentions.ts`
-- `app/lib/social/mentions.test.ts`
 - `app/lib/social/homeSocialPost.ts`
+- `app/lib/social/mentions.test.ts`
+- `app/lib/social/mentions.ts`
 
 Modified:
 
-- `app/discover/components/DiscoverShell.tsx` — mount composer + localized shell actions
-- `app/components/CreatePostModal.tsx` — i18n, dirty discard, Home event + post payload, `dir="auto"`
-- `app/components/social/CommentsPanel.tsx` — mentions, typeahead, profile taps, mobile sheet, i18n
-- `app/components/social/ShareMenu.tsx` — Send in Messages + i18n
-- `app/discover/components/DiscoverActionRail.tsx` — share-to-messages, i18n labels
-- `app/discover/components/DiscoverCaption.tsx` — `dir="auto"`, timestamp deep link
-- `app/discover/components/DiscoverVideoCard.tsx` — pass post id / createdAt
-- `app/discover/types.ts` — optional `createdAt`
-- `lib/supabase/videoPosts.ts` — map `created_at`
-- `app/actions/search.ts` — remove `export type { SearchTab }` from `"use server"` (runtime crash when Home imported search)
-- `lib/i18n/messages/types.ts`, `en.ts`, `ar.ts` — social keys (fr/es/de/pt inherit via `...enMessages`)
-- `lib/i18n/i18nFoundation.test.ts`, `lib/i18n/appShellTranslation.test.ts`
+- `app/actions/search.ts`
+- `app/components/CreatePostModal.tsx`
 - `app/components/social/CommentsPanel.test.ts`
+- `app/components/social/CommentsPanel.tsx`
+- `app/components/social/ShareMenu.tsx`
+- `app/discover/components/DiscoverActionRail.tsx`
+- `app/discover/components/DiscoverCaption.tsx`
+- `app/discover/components/DiscoverShell.tsx`
+- `app/discover/components/DiscoverVideoCard.tsx`
+- `app/discover/types.ts`
 - `app/lib/social/socialEngagement.harden.test.ts`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `lib/i18n/appShellTranslation.test.ts`
+- `lib/i18n/i18nFoundation.test.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/types.ts`
+- `lib/supabase/videoPosts.ts`
+
+After that commit, this gate updated only:
+
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
+
+Left unstaged (unrelated to PART 1B-A):
+
+- `.env.example` (Android App Links comments)
+- `vitest.config.ts` (android/sandbox test globs)
+- Prior-task logs, sandbox, PC2 docs, worktrees, `app.json`, `app/.well-known/assetlinks.json/`
 
 ## Migrations created
 
@@ -59,12 +77,12 @@ None.
 
 ## Security review
 
-- No secrets, `.env`, or service-role usage added.
-- Composer and comments still require authenticated session for write; login `?next=` now returns to Home `/`.
-- Mention typeahead uses existing public people search with `remember: false` (does not pollute recent searches).
-- Send-in-Messages reuses existing messenger RPCs (`listConversations`, `getOrCreateDirectConversation`, `sendTextMessage`) and records share via existing ledger.
-- Removed type re-export from a `"use server"` module that crashed Home when search was imported.
-- Still no social block/report (Part 2 risk from the audit). Opening composer at scale without safety primitives remains a known gap.
+- No secrets, `.env`, or service-role usage added or printed.
+- No Auth/RLS bypass. No fake users. No password reset.
+- Mention typeahead still uses public people search with `remember: false`.
+- Send-in-Messages still reuses existing messenger actions and the share ledger.
+- Composer/comments/share writes still require a real session.
+- Known gap unchanged: no social block/report before composer scale (Part 2).
 
 ## Tests
 
@@ -83,11 +101,11 @@ None.
 
 ## TypeScript
 
-`npx tsc --noEmit` — exit 0.
+Not re-run this gate. No TypeScript implementation changes after `4d4953d8`. Prior PART 1B-A `npx tsc --noEmit` was exit 0.
 
 ## Build
 
-Not run. UI entry chrome changed (`DiscoverShell`), but `tsc` + targeted tests + live Home HTML verification were used instead of a full `npm run build` (long). Dev server served Home successfully after the SearchTab fix.
+Not run. Dev server already serving Home (`GET / 200`).
 
 ## git diff --check
 
@@ -95,50 +113,116 @@ Exit 0.
 
 ## git status --short
 
-This task (uncommitted):
-
-```text
- M app/actions/search.ts
- M app/components/CreatePostModal.tsx
- M app/components/social/CommentsPanel.test.ts
- M app/components/social/CommentsPanel.tsx
- M app/components/social/ShareMenu.tsx
- M app/discover/components/DiscoverActionRail.tsx
- M app/discover/components/DiscoverCaption.tsx
- M app/discover/components/DiscoverShell.tsx
- M app/discover/components/DiscoverVideoCard.tsx
- M app/discover/types.ts
- M app/lib/social/socialEngagement.harden.test.ts
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/i18n/appShellTranslation.test.ts
- M lib/i18n/i18nFoundation.test.ts
- M lib/i18n/messages/ar.ts
- M lib/i18n/messages/en.ts
- M lib/i18n/messages/types.ts
- M lib/supabase/videoPosts.ts
-?? app/components/home/HomeLatestPostLayer.tsx
-?? app/components/home/HomeSocialComposer.test.ts
-?? app/components/home/HomeSocialComposer.tsx
-?? app/components/social/MentionedText.tsx
-?? app/components/social/ShareToMessagesPanel.tsx
-?? app/discover/components/DiscoverShellActions.tsx
-?? app/lib/social/homeSocialPost.ts
-?? app/lib/social/mentions.test.ts
-?? app/lib/social/mentions.ts
-```
-
-Workspace already had a large unrelated dirty tree (docs, sandbox, worktrees). Those were not part of this task.
+Candidate files are committed. Worktree is **not** clean because of unrelated dirty/untracked files from other tasks (see left-unstaged list). PART 1B-A implementation is not among them after `4d4953d8`.
 
 ## Open issues
 
-1. **Owner login required** to verify live text/image publish, discard-if-dirty, mention typeahead against real people, and Send in Messages. Signed-out Home was verified: composer strip, video stage, like/comment/save/share rails, timestamp `/?post=`, profile links.
-2. **Browser MCP** could not keep a tab (navigate/lock failed). Verification used `curl` + Next.js HTML for `/` (200), `/discover` (307 → `/`), and `umtuba_locale=ar` (`lang="ar"` `dir="rtl"` + Arabic composer/rail).
-3. **Mobile native-share shortcut** now opens the share menu first so Send in Messages is reachable. Native share remains a menu item.
-4. **Watch** share rail was not given Send in Messages (Watch architecture out of scope except Home).
-5. **No block/report** before composer scale (Part 2).
-6. Nested replies / comment edit / post reactions / albums / audience still require schema — not implemented, as specified.
+1. **Owner must finish authenticated review** at http://localhost:3000/ while signed in. This agent could not keep a browser MCP tab and had no existing session.
+2. **FEED_POSITION = PARTIAL** (details below). Not fixed this gate: a small sessionStorage restore would not close pagination or playback-time, and could not be retested live.
+3. **StoryRail** still has pre-existing English copy (`Your story`, empty-state sentence). Not PART 1B-A scope.
+4. **DiscoverExperience** aside/empty/error strings remain English (pre-existing). Touched social chrome is translated.
+5. **Latest-post card** lives in the sticky Home header under the composer. A tall image post can compress the video stage on mobile. Dismiss exists.
+6. **Watch** share rail still has no Send in Messages (Watch out of scope).
+7. **No block/report** before composer scale (Part 2).
+8. Nested replies / comment edit / reactions / albums / audience still require schema — not started.
 
 ---
 
-# STRUCTURED PART 1B-A OUTPUT
+## Owner visual review targets
+
+A. **Share on UM premium/native?** Composer strip uses black/gold amber border, UM mark, and UMTUBA language (“Share on UM” / “شارك في أُم”). Not Facebook chrome. Owner should judge taste live.
+
+B. **Composer familiar without Facebook clone?** Prompt field + Write + Photo, modal title “New UM post”. Familiar posting pattern, original copy.
+
+C. **Video-first Home preserved?** Yes in HTML and architecture: `video-watch-stage` remains the body; `/discover` 307 → `/`; no second Home feed; `/feed` not revived.
+
+D. **Your latest post natural vs obstructing video?** Card sits under the composer in the sticky header, not over the video stage. Dismissible. Image posts use `max-h-56`. Risk: sticky header growth on mobile can shrink the stage.
+
+E. **Like/Comment/Share/Save immediately understandable?** Rail + latest-post chips use those labels (EN/AR). Present in signed-out Home HTML.
+
+F. **Send in Messages feels UMTUBA not Messenger?** `ShareToMessagesPanel` is a black/gold bottom sheet (`#0b0b18`, amber tracking). Not Messenger blue. Not exercised with a real inbox this gate.
+
+G. **Arabic RTL, no stray English, UGC dir=auto** Signed-out `umtuba_locale=ar` Home: `lang="ar"` `dir="rtl"`, Arabic composer prompt/photo/like, no English “Share on UM”. `dir="auto"` is on captions and share/comment UGC fields. Pre-existing StoryRail/aside English remains.
+
+H. **Mobile collision** Not screenshot-verified (Playwright browsers missing; MCP tab failed). Code: sticky top (nav + composer + optional latest post) + StoryRail + video stage + bottom nav. Latest-post image is the main collision risk.
+
+---
+
+## Feed position
+
+**FEED_POSITION = PARTIAL**
+
+What already stays in place (implementation, not live-authenticated):
+
+- Home → comments → close: `CommentsPanel` is an overlay; `DiscoverFeed` stays mounted.
+- Home → save / share menu: in-page; feed stays.
+- Home → Send in Messages → close: portal overlay; send success calls `onClose()` and does **not** route into `/messages`.
+
+What remains partial:
+
+- Home → author profile → back / Home tab: profile is a real `Link` to `/profile/[username]`. Return to `/` remounts `DiscoverExperience` at `initialIndex` 0 unless `?post=` is in the URL **and** that video is still in the currently loaded list.
+- `/?post=` restore does not include playback time (Watch has `restoreState`; Home `DiscoverFeed` does not).
+- Videos reached only after load-more are not in `initialVideos`, so `findIndexByPostId` misses them (`showDeepLinkMiss`).
+- Latest-post “view profile” uses `buildHomeSocialProfileHref` (no return `?post=` for the **video** under the overlay).
+- Soft back *may* keep client state if the App Router cache keeps Home mounted; that was not observed this gate.
+
+No schema or architecture change was made. A first-page-only sessionStorage restore was judged insufficient to close the issue.
+
+---
+
+## Regression check
+
+Live HTTP against the reused dev server:
+
+- `/` 200 — Share on UM + `video-watch-stage`
+- `/discover` 307 → `/`
+- `/watch` 200
+- `/saved` 307 → `/login?next=%2Fsaved` (signed out)
+- `/messages` 307 → `/login?next=%2Fmessages` (signed out)
+- `/notifications` 307 → `/login?next=%2Fnotifications` (signed out)
+- `/profile/umtuba` 200
+
+LTR Home: `lang="en"` `dir="ltr"`. RTL Home cookie: `lang="ar"` `dir="rtl"`. No duplicate Home feed in the candidate. Latest-post card only mounts after a client `umtuba:home-social-posted` event (not duplicated in SSR HTML). Dev logs previously showed `recordViewAction` on Home videos after the SearchTab fix.
+
+---
+
+# STRUCTURED PART 1B-A OWNER REVIEW GATE OUTPUT
+
+```text
+TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A_OWNER_REVIEW_GATE
+STATUS = OWNER_REVIEW_UI_READY
+BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+CANDIDATE_SHA = 4d4953d8314d8cbcb5b2e173786198fe7586d13e
+BRANCH = pc2/um-life-part1b-a-social-home-candidate
+WORKTREE_CLEAN = NO
+LOCAL_PREVIEW_URL = http://localhost:3000/
+HOME_VIDEO_FIRST = PASS
+OWNER_REVIEW_UI_READY = YES
+TEXT_POST_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+IMAGE_POST_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+LIKE_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+COMMENT_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+DELETE_COMMENT_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+MENTION_TYPEAHEAD_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+SAVE_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+SHARE_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+SEND_IN_MESSAGES_REAL_UI = NOT_TESTED_REAL_DATA_UNAVAILABLE
+PROFILE_RETURN = NOT_TESTED_REAL_DATA_UNAVAILABLE
+FEED_POSITION = PARTIAL
+FEED_POSITION_DETAILS = Overlays (comments/share/save/send-in-messages) keep DiscoverFeed mounted. Profile or Home-tab remount resets to first video unless ?post= matches a still-loaded item. Playback time is not restored. Paginated videos cannot be restored from the first page alone. No architecture change this gate.
+VIDEO_PLAYBACK = PASS
+STORIES = PASS
+RTL = PASS
+LTR = PASS
+MOBILE_WEB = NOT_TESTED_REAL_DATA_UNAVAILABLE
+DESKTOP_WEB = PASS
+REGRESSIONS_FOUND = None observed on signed-out route/HTML checks. Authenticated social actions not executed. Browser MCP could not keep a tab. Playwright Chromium not installed.
+FILES_CHANGED_AFTER_INITIAL_PART1B_A = docs/ai/CURRENT_TASK.md; docs/ai/CURSOR_REPORT.md
+TESTS_RUN = npx vitest run (10 files / 62 tests, pass); git diff --check (exit 0)
+DATABASE_CHANGED = NO
+MIGRATIONS_CREATED = NO
+DEPLOYED = NO
+PART1B_B_STARTED = NO
+READY_FOR_OWNER_VISUAL_REVIEW = YES
+READY_FOR_PART1B_B_AUTHORIZATION = NO
+```
