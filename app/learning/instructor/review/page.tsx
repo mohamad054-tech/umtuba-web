@@ -13,14 +13,13 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   searchParams?:
-    | Promise<{ course?: string; status?: string; q?: string }>
-    | { course?: string; status?: string; q?: string };
+ Promise<{ course?: string; status?: string; q?: string }>;
 };
 
 export default async function InstructorReviewQueuePage({
   searchParams,
 }: PageProps) {
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

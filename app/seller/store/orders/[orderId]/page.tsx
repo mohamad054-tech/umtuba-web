@@ -24,7 +24,7 @@ export const metadata = {
 };
 
 type PageProps = {
-  params: Promise<{ orderId: string }> | { orderId: string };
+  params: Promise<{ orderId: string }>;
 };
 
 export default async function SellerStoreOrderDetailPage({

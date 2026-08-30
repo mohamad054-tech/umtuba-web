@@ -15,8 +15,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<Record<string, string | string[] | undefined>>
-    | Record<string, string | string[] | undefined>;
+ Promise<Record<string, string | string[] | undefined>>;
 };
 
 function firstParam(
@@ -30,7 +29,7 @@ export default async function AdminStoreReservationsPage({
   searchParams,
 }: PageProps) {
   const { supabase } = await requireAdminStoreSession();
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const status = firstParam(params.status) ?? "active";
   const storeId = firstParam(params.store_id)?.trim() || null;
   const stuckOnly = status === "stuck";

@@ -23,7 +23,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{
+ Promise<{
         status?: string;
         objective?: string;
         q?: string;
@@ -33,25 +33,14 @@ type PageProps = {
         rejected?: string;
         paused?: string;
         restored?: string;
-      }>
-    | {
-        status?: string;
-        objective?: string;
-        q?: string;
-        id?: string;
-        error?: string;
-        approved?: string;
-        rejected?: string;
-        paused?: string;
-        restored?: string;
-      };
+      }>;
 };
 
 export default async function AdminAdsCampaignsPage({
   searchParams,
 }: PageProps) {
   const { supabase } = await requireAdminAdsSession();
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const status = params.status || "pending_review";
   const list = await adminListCampaigns(supabase, {
     status: status === "all" ? null : status,

@@ -17,8 +17,8 @@ import { createProgramBootstrapAction } from "../../../../bootstrapActions";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ spaceId: string }> | { spaceId: string };
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  params: Promise<{ spaceId: string }>;
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function NewInstructorProgramPage({
@@ -26,7 +26,7 @@ export default async function NewInstructorProgramPage({
   searchParams,
 }: PageProps) {
   const { spaceId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

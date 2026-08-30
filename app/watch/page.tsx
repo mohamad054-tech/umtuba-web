@@ -30,11 +30,11 @@ function WatchFallback() {
 }
 
 type WatchPageProps = {
-  searchParams?: Promise<{ post?: string; id?: string }> | { post?: string; id?: string };
+  searchParams?: Promise<{ post?: string; id?: string }>;
 };
 
 async function WatchLoader({ searchParams }: WatchPageProps) {
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const focusRaw = params.post ?? params.id ?? null;
   const focusPostId = focusRaw ? Number(focusRaw) : NaN;
   const focus =

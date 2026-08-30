@@ -14,7 +14,7 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function NewSellerProductPage({ searchParams }: PageProps) {
@@ -33,7 +33,7 @@ export default async function NewSellerProductPage({ searchParams }: PageProps) 
   }
 
   const categories = await listActiveCategories(supabase);
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const error =
     typeof params.error === "string" && params.error.trim()
       ? params.error.trim()

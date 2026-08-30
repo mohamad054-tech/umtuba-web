@@ -12,16 +12,11 @@ export const metadata = {
 
 type SetupPageProps = {
   searchParams?:
-    | Promise<{
+ Promise<{
         step?: string;
         error?: string;
         saved?: string;
-      }>
-    | {
-        step?: string;
-        error?: string;
-        saved?: string;
-      };
+      }>;
 };
 
 export default async function SellerSetupPage({ searchParams }: SetupPageProps) {
@@ -32,7 +27,7 @@ export default async function SellerSetupPage({ searchParams }: SetupPageProps) 
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const membership = await getOwnedOrMemberStore(supabase, user.id);
   if (membership) {

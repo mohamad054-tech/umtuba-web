@@ -16,8 +16,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ error?: string; saved?: string; member?: string }>
-    | { error?: string; saved?: string; member?: string };
+ Promise<{ error?: string; saved?: string; member?: string }>;
 };
 
 export default async function AdvertiseSettingsPage({
@@ -30,7 +29,7 @@ export default async function AdvertiseSettingsPage({
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const primary = await resolvePrimaryAdvertiserAccount(supabase, user.id);
   if (!primary.ok || !primary.account) {

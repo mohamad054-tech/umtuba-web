@@ -12,10 +12,9 @@ import { LEARNING_INSTRUCTOR_ROUTES } from "../../../../../../lib/learning/instr
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
   searchParams?:
-    | Promise<{ status?: string; q?: string }>
-    | { status?: string; q?: string };
+ Promise<{ status?: string; q?: string }>;
 };
 
 export default async function InstructorProjectQueuePage({
@@ -23,7 +22,7 @@ export default async function InstructorProjectQueuePage({
   searchParams,
 }: PageProps) {
   const { courseId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const status = query.status?.trim() || "pending";
   const search = query.q?.trim() || null;
 

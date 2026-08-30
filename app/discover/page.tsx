@@ -5,8 +5,7 @@ export const dynamic = "force-dynamic";
 
 type DiscoverPageProps = {
   searchParams?:
-    | Promise<{ post?: string; city?: string; comment?: string; country?: string }>
-    | { post?: string; city?: string; comment?: string; country?: string };
+ Promise<{ post?: string; city?: string; comment?: string; country?: string }>;
 };
 
 /**
@@ -15,7 +14,7 @@ type DiscoverPageProps = {
 export default async function DiscoverAliasPage({
   searchParams,
 }: DiscoverPageProps) {
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const qs = new URLSearchParams();
   if (params.post?.trim()) qs.set("post", params.post.trim());
   if (params.city?.trim()) qs.set("city", params.city.trim());

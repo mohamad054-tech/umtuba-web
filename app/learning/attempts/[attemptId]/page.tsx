@@ -11,7 +11,7 @@ import { getMyLearningAttemptResultView } from "../../../../lib/learning/learner
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ attemptId: string }> | { attemptId: string };
+  params: Promise<{ attemptId: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {

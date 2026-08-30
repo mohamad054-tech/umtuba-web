@@ -14,7 +14,7 @@ import { createSpaceBootstrapAction } from "../../bootstrapActions";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function NewInstructorSpacePage({
@@ -27,7 +27,7 @@ export default async function NewInstructorSpacePage({
     );
   }
 
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const error = query.error?.trim() || null;
 
   return (

@@ -15,8 +15,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ error?: string; created?: string; submitted?: string }>
-    | { error?: string; created?: string; submitted?: string };
+ Promise<{ error?: string; created?: string; submitted?: string }>;
 };
 
 export default async function AdvertiseDashboardPage({
@@ -29,7 +28,7 @@ export default async function AdvertiseDashboardPage({
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const data = await loadAdvertiserDashboard(supabase, user.id);
 

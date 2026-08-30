@@ -11,10 +11,9 @@ import { startOrResumeAttemptAction } from "../../actions";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ activityId: string }> | { activityId: string };
+  params: Promise<{ activityId: string }>;
   searchParams?:
-    | Promise<{ error?: string }>
-    | { error?: string };
+ Promise<{ error?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -28,7 +27,7 @@ export default async function LearningActivityPage({
   searchParams,
 }: PageProps) {
   const { activityId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

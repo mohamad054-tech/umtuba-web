@@ -12,10 +12,9 @@ import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ lessonId: string }> | { lessonId: string };
+  params: Promise<{ lessonId: string }>;
   searchParams?:
-    | Promise<{ error?: string; completed?: string; unlocked?: string }>
-    | { error?: string; completed?: string; unlocked?: string };
+ Promise<{ error?: string; completed?: string; unlocked?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -29,7 +28,7 @@ export default async function LearningLessonPage({
   searchParams,
 }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     // Guests: send to public catalog (not login with lesson deep-link).

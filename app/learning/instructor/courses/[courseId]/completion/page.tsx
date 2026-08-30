@@ -11,7 +11,7 @@ import { LEARNING_ASSESSMENT_MANUAL_REVIEW_ROUTES } from "../../../../../../lib/
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
 };
 
 function labelOf(row: Record<string, unknown>): string {

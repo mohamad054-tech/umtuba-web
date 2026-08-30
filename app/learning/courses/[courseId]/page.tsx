@@ -10,7 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {

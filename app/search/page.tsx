@@ -10,8 +10,7 @@ export const dynamic = "force-dynamic";
 
 type SearchPageProps = {
   searchParams?:
-    | Promise<{ q?: string; tab?: string }>
-    | { q?: string; tab?: string };
+ Promise<{ q?: string; tab?: string }>;
 };
 
 function SearchFallback() {
@@ -19,7 +18,7 @@ function SearchFallback() {
 }
 
 async function SearchLoader({ searchParams }: SearchPageProps) {
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const initialQuery =
     typeof params.q === "string" ? params.q.trim().slice(0, 80) : "";
   const initialTab = parseSearchTab(params.tab);

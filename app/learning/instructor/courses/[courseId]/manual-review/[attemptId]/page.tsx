@@ -12,11 +12,9 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   params:
-    | Promise<{ courseId: string; attemptId: string }>
-    | { courseId: string; attemptId: string };
+ Promise<{ courseId: string; attemptId: string }>;
   searchParams?:
-    | Promise<{ error?: string; reviewed?: string }>
-    | { error?: string; reviewed?: string };
+ Promise<{ error?: string; reviewed?: string }>;
 };
 
 export default async function ManualReviewAttemptPage({
@@ -24,7 +22,7 @@ export default async function ManualReviewAttemptPage({
   searchParams,
 }: PageProps) {
   const { courseId, attemptId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

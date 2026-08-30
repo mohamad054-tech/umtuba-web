@@ -16,11 +16,9 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   params:
-    | Promise<{ courseId: string; activityId: string }>
-    | { courseId: string; activityId: string };
+ Promise<{ courseId: string; activityId: string }>;
   searchParams?:
-    | Promise<{ error?: string; saved?: string; resources?: string }>
-    | { error?: string; saved?: string; resources?: string };
+ Promise<{ error?: string; saved?: string; resources?: string }>;
 };
 
 export default async function InstructorAssignmentAuthorPage({
@@ -28,7 +26,7 @@ export default async function InstructorAssignmentAuthorPage({
   searchParams,
 }: PageProps) {
   const { courseId, activityId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

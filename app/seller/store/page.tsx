@@ -51,7 +51,7 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams?: Promise<{ period?: string }> | { period?: string };
+  searchParams?: Promise<{ period?: string }>;
 };
 
 export default async function SellerStorePage({ searchParams }: PageProps) {
@@ -72,7 +72,7 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
     redirect(APP_ROUTES.seller);
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const periodKey = resolveAnalyticsPeriod(params.period) as AnalyticsPeriodKey;
   const periodPreset =
     ANALYTICS_PERIOD_PRESETS.find((p) => p.key === periodKey) ??

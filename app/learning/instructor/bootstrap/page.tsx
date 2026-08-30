@@ -11,7 +11,7 @@ import { LEARNING_INSTRUCTOR_ROUTES } from "../../../../lib/learning/instructorA
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function InstructorBootstrapHubPage({
@@ -24,7 +24,7 @@ export default async function InstructorBootstrapHubPage({
     );
   }
 
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const error = query.error?.trim() || null;
   const supabase = await createClient();
   const spaces = await listMyInstructorSpaces(supabase);

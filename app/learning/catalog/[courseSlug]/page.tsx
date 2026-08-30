@@ -14,10 +14,9 @@ import { enrollInPublicCourseAction } from "../actions";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseSlug: string }> | { courseSlug: string };
+  params: Promise<{ courseSlug: string }>;
   searchParams?:
-    | Promise<{ error?: string }>
-    | { error?: string };
+ Promise<{ error?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -38,7 +37,7 @@ export default async function LearningPublicCourseLandingPage({
   searchParams,
 }: PageProps) {
   const { courseSlug } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   const supabase = await createClient();
   const landing = await loadPublicCourseBySlug(supabase, courseSlug);

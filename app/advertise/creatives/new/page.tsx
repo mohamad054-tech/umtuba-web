@@ -13,8 +13,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ error?: string; campaignId?: string }>
-    | { error?: string; campaignId?: string };
+ Promise<{ error?: string; campaignId?: string }>;
 };
 
 export default async function NewCreativePage({ searchParams }: PageProps) {
@@ -25,7 +24,7 @@ export default async function NewCreativePage({ searchParams }: PageProps) {
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const primary = await resolvePrimaryAdvertiserAccount(supabase, user.id);
   if (!primary.ok || !primary.account) {

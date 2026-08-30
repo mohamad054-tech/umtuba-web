@@ -8,7 +8,7 @@ import { loadMyLearningCourseProgressBundle } from "../../../../../lib/learning/
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
 };
 
 export default async function CourseProgressPage({ params }: PageProps) {

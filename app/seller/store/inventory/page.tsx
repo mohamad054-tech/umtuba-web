@@ -17,8 +17,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ variant?: string }>
-    | { variant?: string };
+ Promise<{ variant?: string }>;
 };
 
 export default async function SellerStoreInventoryPage({
@@ -47,7 +46,7 @@ export default async function SellerStoreInventoryPage({
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const selectedVariantId =
     typeof params.variant === "string" && params.variant.trim()
       ? params.variant.trim()

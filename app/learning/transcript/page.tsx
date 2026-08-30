@@ -12,14 +12,13 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   searchParams?:
-    | Promise<{ error?: string; issued?: string }>
-    | { error?: string; issued?: string };
+ Promise<{ error?: string; issued?: string }>;
 };
 
 export default async function LearningTranscriptPage({
   searchParams,
 }: PageProps) {
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

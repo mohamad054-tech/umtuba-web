@@ -11,10 +11,9 @@ import {
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
   searchParams?:
-    | Promise<{ bucket?: string; q?: string }>
-    | { bucket?: string; q?: string };
+ Promise<{ bucket?: string; q?: string }>;
 };
 
 export default async function InstructorLearnersPage({
@@ -22,7 +21,7 @@ export default async function InstructorLearnersPage({
   searchParams,
 }: PageProps) {
   const { courseId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const bucket = query.bucket?.trim() || null;
   const search = query.q?.trim() || null;
 

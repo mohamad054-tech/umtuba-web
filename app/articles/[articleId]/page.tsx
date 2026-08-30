@@ -19,10 +19,9 @@ import ArticleTeaserOwnerPanel from "./ArticleTeaserOwnerPanel";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ articleId: string }> | { articleId: string };
+  params: Promise<{ articleId: string }>;
   searchParams?:
-    | Promise<{ teaserError?: string }>
-    | { teaserError?: string };
+ Promise<{ teaserError?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -37,7 +36,7 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function ArticlePage({ params, searchParams }: PageProps) {
   const { articleId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const supabase = await createClient();
   const loaded = await getPublishedArticle(supabase, articleId);
   if (!loaded.ok) {

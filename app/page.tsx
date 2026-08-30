@@ -7,9 +7,7 @@ export const metadata = homeFeedMetadata;
 export const dynamic = "force-dynamic";
 
 type HomePageProps = {
-  searchParams?:
-    | Promise<{ post?: string; city?: string; comment?: string }>
-    | { post?: string; city?: string; comment?: string };
+  searchParams?: Promise<{ post?: string; city?: string; comment?: string }>;
 };
 
 function HomeFallback() {
@@ -17,7 +15,7 @@ function HomeFallback() {
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   return (
     <Suspense fallback={<HomeFallback />}>
       <HomeFeedLoader searchParams={params} />

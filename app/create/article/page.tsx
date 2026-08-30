@@ -12,12 +12,11 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   searchParams?:
-    | Promise<{ error?: string }>
-    | { error?: string };
+ Promise<{ error?: string }>;
 };
 
 export default async function CreateArticlePage({ searchParams }: PageProps) {
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

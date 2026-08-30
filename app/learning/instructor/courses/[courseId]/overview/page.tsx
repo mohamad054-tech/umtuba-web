@@ -11,7 +11,7 @@ import { LEARNING_INSTRUCTOR_ROUTES } from "../../../../../../lib/learning/instr
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
+  params: Promise<{ courseId: string }>;
 };
 
 export default async function InstructorCourseOverviewPage({

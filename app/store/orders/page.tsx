@@ -17,8 +17,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ status?: string }>
-    | { status?: string };
+ Promise<{ status?: string }>;
 };
 
 const FILTERS = [
@@ -39,7 +38,7 @@ export default async function StoreOrdersPage({ searchParams }: PageProps) {
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const statusFilter =
     params.status && isOrderStatus(params.status)
       ? (params.status as OrderStatus)

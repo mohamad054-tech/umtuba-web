@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 type ApplyPageProps = {
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function AdvertiseApplyPage({
@@ -23,7 +23,7 @@ export default async function AdvertiseApplyPage({
     );
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const accounts = await listMyAdvertiserAccounts(supabase, user.id);
   if (accounts.ok && accounts.accounts.length > 0) {

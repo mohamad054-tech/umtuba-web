@@ -25,9 +25,9 @@ export const metadata = {
 };
 
 type PageProps = {
-  params: Promise<{ campaignId: string }> | { campaignId: string };
+  params: Promise<{ campaignId: string }>;
   searchParams?:
-    | Promise<{
+ Promise<{
         error?: string;
         created?: string;
         submitted?: string;
@@ -35,16 +35,7 @@ type PageProps = {
         activated?: string;
         bound?: string;
         paused?: string;
-      }>
-    | {
-        error?: string;
-        created?: string;
-        submitted?: string;
-        targeting?: string;
-        activated?: string;
-        bound?: string;
-        paused?: string;
-      };
+      }>;
 };
 
 export default async function CampaignDetailPage({
@@ -59,7 +50,7 @@ export default async function CampaignDetailPage({
   }
 
   const { campaignId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const supabase = await createClient();
   const workspace = await loadCampaignWorkspace(supabase, campaignId);
 

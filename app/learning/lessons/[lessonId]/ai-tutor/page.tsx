@@ -21,15 +21,14 @@ import { isAiProductExperienceEnabled } from "../../../../../lib/ai/betaProductS
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ lessonId: string }> | { lessonId: string };
+  params: Promise<{ lessonId: string }>;
   searchParams?:
-    | Promise<{ error?: string; thread?: string }>
-    | { error?: string; thread?: string };
+ Promise<{ error?: string; thread?: string }>;
 };
 
 export default async function AiTutorPage({ params, searchParams }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

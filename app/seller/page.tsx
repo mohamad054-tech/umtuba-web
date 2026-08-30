@@ -31,8 +31,7 @@ const STATUS_COPY: Record<string, { title: string; body: string }> = {
 
 type SellerHubPageProps = {
   searchParams?:
-    | Promise<{ submitted?: string; applied?: string }>
-    | { submitted?: string; applied?: string };
+ Promise<{ submitted?: string; applied?: string }>;
 };
 
 export default async function SellerHubPage({ searchParams }: SellerHubPageProps) {
@@ -41,7 +40,7 @@ export default async function SellerHubPage({ searchParams }: SellerHubPageProps
     redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.seller)}`);
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const supabase = await createClient();
   const [membership, application] = await Promise.all([
     getOwnedOrMemberStore(supabase, user.id),

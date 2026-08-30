@@ -8,23 +8,17 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{
+ Promise<{
         entityType?: string;
         action?: string;
         reviewer?: string;
         error?: string;
-      }>
-    | {
-        entityType?: string;
-        action?: string;
-        reviewer?: string;
-        error?: string;
-      };
+      }>;
 };
 
 export default async function AdminAdsReviewsPage({ searchParams }: PageProps) {
   const { supabase } = await requireAdminAdsSession();
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const events = await adminListReviewEvents(supabase, {
     entityType: params.entityType || null,
     action: params.action || null,

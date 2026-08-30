@@ -20,8 +20,7 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{ period?: string }>
-    | { period?: string };
+ Promise<{ period?: string }>;
 };
 
 export default async function SellerStoreAnalyticsPage({
@@ -43,7 +42,7 @@ export default async function SellerStoreAnalyticsPage({
     redirect(APP_ROUTES.sellerStore);
   }
 
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const periodKey = resolveAnalyticsPeriod(params.period);
   const range = buildAnalyticsDateRange(periodKey);
   const result = await getSellerAnalyticsBundle(

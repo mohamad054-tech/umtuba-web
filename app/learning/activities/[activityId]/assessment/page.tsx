@@ -14,10 +14,9 @@ import { startAssessmentAttemptAction } from "../../../assessmentAttemptActions"
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ activityId: string }> | { activityId: string };
+  params: Promise<{ activityId: string }>;
   searchParams?:
-    | Promise<{ error?: string; cancelled?: string }>
-    | { error?: string; cancelled?: string };
+ Promise<{ error?: string; cancelled?: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
@@ -31,7 +30,7 @@ export default async function LearningAssessmentDeliveryPage({
   searchParams,
 }: PageProps) {
   const { activityId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

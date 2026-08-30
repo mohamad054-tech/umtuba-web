@@ -14,22 +14,14 @@ export const metadata = {
 
 type PageProps = {
   searchParams?:
-    | Promise<{
+ Promise<{
         status?: string;
         id?: string;
         error?: string;
         approved?: string;
         rejected?: string;
         returned?: string;
-      }>
-    | {
-        status?: string;
-        id?: string;
-        error?: string;
-        approved?: string;
-        rejected?: string;
-        returned?: string;
-      };
+      }>;
 };
 
 function formatWhen(value: string | null | undefined) {
@@ -46,7 +38,7 @@ function formatWhen(value: string | null | undefined) {
 
 export default async function AdminStoreProductsPage({ searchParams }: PageProps) {
   const { supabase, user } = await requireAdminStoreSession();
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const status = params.status || "pending";
   const list = await adminListStoreProductsForModeration(supabase, {
     status: status === "all" ? "all" : status,

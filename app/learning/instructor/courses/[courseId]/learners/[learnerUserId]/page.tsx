@@ -12,8 +12,7 @@ export const dynamic = "force-dynamic";
 
 type PageProps = {
   params:
-    | Promise<{ courseId: string; learnerUserId: string }>
-    | { courseId: string; learnerUserId: string };
+ Promise<{ courseId: string; learnerUserId: string }>;
 };
 
 export default async function InstructorLearnerDetailPage({

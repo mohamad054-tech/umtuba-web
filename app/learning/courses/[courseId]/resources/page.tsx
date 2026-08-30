@@ -11,8 +11,8 @@ import { trackCourseResourceDownloadAction } from "../../../firstCourseActions";
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ courseId: string }> | { courseId: string };
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  params: Promise<{ courseId: string }>;
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function CourseResourcesPage({
@@ -20,7 +20,7 @@ export default async function CourseResourcesPage({
   searchParams,
 }: PageProps) {
   const { courseId } = await Promise.resolve(params);
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const user = await getServerUser();
   if (!user) {
     redirect(

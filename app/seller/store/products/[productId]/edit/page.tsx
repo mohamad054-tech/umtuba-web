@@ -36,7 +36,7 @@ import { countActiveListingsForProduct } from "../../../../../../lib/store/marke
 
 type EditPageProps = {
   params: Promise<{ productId: string }>;
-  searchParams?: Promise<{ error?: string }> | { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export const metadata = {
@@ -117,7 +117,7 @@ export default async function EditSellerProductPage({
     slug: bundle.product.slug,
   });
   const inventoryAlignment = productEditorInventoryAlignmentCopy();
-  const query = await Promise.resolve(searchParams ?? {});
+  const query = (await searchParams) ?? {};
   const error =
     typeof query.error === "string" && query.error.trim()
       ? query.error.trim()

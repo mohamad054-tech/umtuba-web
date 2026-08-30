@@ -22,13 +22,13 @@ function PostJourneyGlobeFallback() {
 }
 
 type PostJourneyPageProps = {
-  searchParams?: Promise<{ postId?: string }> | { postId?: string };
+  searchParams?: Promise<{ postId?: string }>;
 };
 
 export default async function PostJourneyPage({
   searchParams,
 }: PostJourneyPageProps) {
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const postIdRaw = params.postId;
   const postId = postIdRaw ? Number(postIdRaw) : NaN;
   const hasPost = Number.isInteger(postId) && postId > 0;

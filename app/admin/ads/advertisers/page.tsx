@@ -20,36 +20,24 @@ export const metadata = {
 };
 
 type PageProps = {
-  searchParams?:
-    | Promise<{
-        status?: string;
-        country?: string;
-        q?: string;
-        id?: string;
-        error?: string;
-        approved?: string;
-        rejected?: string;
-        suspended?: string;
-        restored?: string;
-      }>
-    | {
-        status?: string;
-        country?: string;
-        q?: string;
-        id?: string;
-        error?: string;
-        approved?: string;
-        rejected?: string;
-        suspended?: string;
-        restored?: string;
-      };
+  searchParams?: Promise<{
+    status?: string;
+    country?: string;
+    q?: string;
+    id?: string;
+    error?: string;
+    approved?: string;
+    rejected?: string;
+    suspended?: string;
+    restored?: string;
+  }>;
 };
 
 export default async function AdminAdsAdvertisersPage({
   searchParams,
 }: PageProps) {
   const { supabase } = await requireAdminAdsSession();
-  const params = await Promise.resolve(searchParams ?? {});
+  const params = (await searchParams) ?? {};
   const status = params.status || "pending_review";
   const list = await adminListAdvertisers(supabase, {
     status: status === "all" ? null : status,
