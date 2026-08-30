@@ -1,96 +1,144 @@
-# CURSOR_REPORT — PC2 SAVE_ALL closeout 2026-08-14
-
-```text
-SOURCE_DEVICE = PC2
-DEVICE_ROLE = PLATFORM_SOCIAL_CONTENT_OWNER
-TASK_ID = PC2_SAVE_ALL_2026-08-14
-PARENT_TASK = PC2_UAF12_SOURCE_DELIVERY_V1
-CENTRAL_COORDINATOR = SERVER
-REPORT_TYPE = SAVE_ALL
-TIMESTAMP_LOCAL = 2026-08-14 ~00:39 +03
-SECRET_VALUES_PRINTED = NO
-FORCE_PUSH = NO
-PUSH = NO
-PRODUCTION_MUTATED = NO
-SECRETS_EXPOSED = NO
-REMOTE_MIGRATION_APPLIED = NO
-SAVE_ALL_SHA = 81857788f511b5b98b09c37e6516a56190d0e4b2
-```
+# CURSOR_REPORT
 
 ## Summary
 
-SAVE_ALL on PC2 committed leftover valid docs and operator reports locally so shutdown does not drop them. UAF-12 source `72190b6`, Store `dad5eb5`/`8204c0c`, and iOS `3b33561`/`db7f927` were already pushed and were not rewritten. **PUSH = NO.** Mobile `umtuba-mobile` was already clean on `origin/master`. No new feature wave.
+Implemented PART 1B-A of UM Life social experience on existing Home architecture. Video-first Home `/` is preserved. The existing `CreatePostModal` / `createPost` / `post-images` composer is now mounted on production Home via `DiscoverShell` with original UMTUBA language (“Share on UM”), not Facebook chrome.
 
-Web SAVE_ALL commit: `81857788f511b5b98b09c37e6516a56190d0e4b2` on `office/platform-translation-trunk-port-v1`, plus this SHA-stamp docs commit. Local is ahead of origin; **PUSH = NO**.
+**Text/image presentation choice:** Home remains video-only (`getDiscoverVideosServer`). After publish, a compact **Your latest post** overlay (`HomeLatestPostLayer`) shows the current user’s just-published text/image post with like / comment / save / share, plus a profile deep link (`?tab=all` or `?tab=photos`). This is not a second Home feed and does not revive `/feed`.
+
+Like stays binary (`toggle_post_like`) with optimistic + realtime counts. Comments keep the existing flat model; mention typeahead uses `globalSearchAction` (`tab=people`, `remember=false`); `@username` in comment/post text is clickable to `/profile/[username]`. Share menu adds **Send in Messages** via existing messenger actions. Save remains on the action rail and Home chrome.
+
+```text
+TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A
+STATUS = IMPLEMENTATION_COMPLETE_UNCOMMITTED
+BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+FINAL_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+BRANCH = office/platform-translation-trunk-port-v1
+IMPLEMENTED = YES
+DEPLOYED = NO
+DATABASE_CHANGED = NO
+MIGRATIONS_CREATED = NO
+```
 
 ## Exact files changed
 
-Web repo `office/platform-translation-trunk-port-v1`:
+New:
 
-- `docs/ai/CURRENT_TASK.md` — UAF-12 delivery remains COMPLETE; SAVE_ALL stamp added
-- `docs/ai/CURSOR_REPORT.md` — this closeout report
-- `worktrees/PC2_UAF12_SOURCE_DELIVERY_V1_REPORT.md`
-- `worktrees/PC2_IOS_APP_STORE_OPERATOR_MODE_V1_REPORT.md`
-- `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md`
-- `worktrees/PC2_IOS_READINESS_CHANGES_PRESERVE_HANDOFF_V1_REPORT.md`
-- `worktrees/PC2_STORE_PREMIUM_COMMIT_DEPOSIT_V1_REPORT.md`
+- `app/components/home/HomeSocialComposer.tsx`
+- `app/components/home/HomeLatestPostLayer.tsx`
+- `app/components/home/HomeSocialComposer.test.ts`
+- `app/components/social/MentionedText.tsx`
+- `app/components/social/ShareToMessagesPanel.tsx`
+- `app/discover/components/DiscoverShellActions.tsx`
+- `app/lib/social/mentions.ts`
+- `app/lib/social/mentions.test.ts`
+- `app/lib/social/homeSocialPost.ts`
 
-Mobile repo: none (working tree already clean at `db7f927`).
+Modified:
+
+- `app/discover/components/DiscoverShell.tsx` — mount composer + localized shell actions
+- `app/components/CreatePostModal.tsx` — i18n, dirty discard, Home event + post payload, `dir="auto"`
+- `app/components/social/CommentsPanel.tsx` — mentions, typeahead, profile taps, mobile sheet, i18n
+- `app/components/social/ShareMenu.tsx` — Send in Messages + i18n
+- `app/discover/components/DiscoverActionRail.tsx` — share-to-messages, i18n labels
+- `app/discover/components/DiscoverCaption.tsx` — `dir="auto"`, timestamp deep link
+- `app/discover/components/DiscoverVideoCard.tsx` — pass post id / createdAt
+- `app/discover/types.ts` — optional `createdAt`
+- `lib/supabase/videoPosts.ts` — map `created_at`
+- `app/actions/search.ts` — remove `export type { SearchTab }` from `"use server"` (runtime crash when Home imported search)
+- `lib/i18n/messages/types.ts`, `en.ts`, `ar.ts` — social keys (fr/es/de/pt inherit via `...enMessages`)
+- `lib/i18n/i18nFoundation.test.ts`, `lib/i18n/appShellTranslation.test.ts`
+- `app/components/social/CommentsPanel.test.ts`
+- `app/lib/social/socialEngagement.harden.test.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None. None applied remotely.
+None.
 
 ## Security review
 
-- New local commits only. No push, no force, no amend.
-- No secrets, `.env`, credentials, or Apple keys committed.
-- Vitest logs and Store visual QA artifacts left uncommitted on purpose.
-- Already-pushed source SHAs were not rewritten.
+- No secrets, `.env`, or service-role usage added.
+- Composer and comments still require authenticated session for write; login `?next=` now returns to Home `/`.
+- Mention typeahead uses existing public people search with `remember: false` (does not pollute recent searches).
+- Send-in-Messages reuses existing messenger RPCs (`listConversations`, `getOrCreateDirectConversation`, `sendTextMessage`) and records share via existing ledger.
+- Removed type re-export from a `"use server"` module that crashed Home when search was imported.
+- Still no social block/report (Part 2 risk from the audit). Opening composer at scale without safety primitives remains a known gap.
 
 ## Tests
 
-Not re-run. Docs/reports only; no source change in this closeout.
+`npx vitest run` targeted (62 tests, all passed):
+
+- `app/lib/social/mentions.test.ts`
+- `app/components/social/CommentsPanel.test.ts`
+- `app/components/home/HomeSocialComposer.test.ts`
+- `app/lib/social/commentDraft.test.ts`
+- `app/lib/social/socialEngagement.harden.test.ts`
+- `lib/i18n/i18nFoundation.test.ts`
+- `lib/i18n/appShellTranslation.test.ts`
+- `app/lib/nav/homeReadinessGuardrails.test.ts`
+- `app/lib/nav/pageAssembly.test.ts`
+- `app/lib/video/feedUnification.test.ts`
 
 ## TypeScript
 
-Not re-run (docs-only).
+`npx tsc --noEmit` — exit 0.
 
 ## Build
 
-Not re-run (docs-only).
+Not run. UI entry chrome changed (`DiscoverShell`), but `tsc` + targeted tests + live Home HTML verification were used instead of a full `npm run build` (long). Dev server served Home successfully after the SearchTab fix.
 
 ## git diff --check
 
-PASS after stripping leftover trailing whitespace in `worktrees/PC2_IOS_APP_STORE_RELEASE_READINESS_PREPARATION_V1_REPORT.md` (content unchanged).
+Exit 0.
 
 ## git status --short
 
-After SAVE_ALL + SHA stamp (local ahead of origin; uncommitted leftovers only):
+This task (uncommitted):
 
 ```text
-## office/platform-translation-trunk-port-v1...origin/office/platform-translation-trunk-port-v1 [ahead 2]
-?? _a2_inventory_vitest.log
-?? _d1_money_locale_vitest.log
-?? _pc2_a1_d1_money_locale_v2.log
-?? _pc2_a1_d2_media_foundation_v2.log
-?? worktrees/_store_visual_qa/
-?? worktrees/_store_visual_qa_pdp.cjs
-?? worktrees/_store_visual_qa_recheck.cjs
-?? worktrees/_store_visual_qa_run.cjs
-?? worktrees/_store_visual_qa_run.mjs
+ M app/actions/search.ts
+ M app/components/CreatePostModal.tsx
+ M app/components/social/CommentsPanel.test.ts
+ M app/components/social/CommentsPanel.tsx
+ M app/components/social/ShareMenu.tsx
+ M app/discover/components/DiscoverActionRail.tsx
+ M app/discover/components/DiscoverCaption.tsx
+ M app/discover/components/DiscoverShell.tsx
+ M app/discover/components/DiscoverVideoCard.tsx
+ M app/discover/types.ts
+ M app/lib/social/socialEngagement.harden.test.ts
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+ M lib/i18n/appShellTranslation.test.ts
+ M lib/i18n/i18nFoundation.test.ts
+ M lib/i18n/messages/ar.ts
+ M lib/i18n/messages/en.ts
+ M lib/i18n/messages/types.ts
+ M lib/supabase/videoPosts.ts
+?? app/components/home/HomeLatestPostLayer.tsx
+?? app/components/home/HomeSocialComposer.test.ts
+?? app/components/home/HomeSocialComposer.tsx
+?? app/components/social/MentionedText.tsx
+?? app/components/social/ShareToMessagesPanel.tsx
+?? app/discover/components/DiscoverShellActions.tsx
+?? app/lib/social/homeSocialPost.ts
+?? app/lib/social/mentions.test.ts
+?? app/lib/social/mentions.ts
 ```
 
-Mobile:
-
-```text
-## master...origin/master
-```
-
-(clean)
+Workspace already had a large unrelated dirty tree (docs, sandbox, worktrees). Those were not part of this task.
 
 ## Open issues
 
-- Owner live persistence QA from UAF-12 remains PARTIAL (no seeded login).
-- Store visual QA scripts/artifacts and pre-existing vitest logs remain uncommitted by design.
-- **PUSH = NO.** Central already has UAF-12 `72190b6` and mobile `db7f927`. Do not start a new feature wave.
+1. **Owner login required** to verify live text/image publish, discard-if-dirty, mention typeahead against real people, and Send in Messages. Signed-out Home was verified: composer strip, video stage, like/comment/save/share rails, timestamp `/?post=`, profile links.
+2. **Browser MCP** could not keep a tab (navigate/lock failed). Verification used `curl` + Next.js HTML for `/` (200), `/discover` (307 → `/`), and `umtuba_locale=ar` (`lang="ar"` `dir="rtl"` + Arabic composer/rail).
+3. **Mobile native-share shortcut** now opens the share menu first so Send in Messages is reachable. Native share remains a menu item.
+4. **Watch** share rail was not given Send in Messages (Watch architecture out of scope except Home).
+5. **No block/report** before composer scale (Part 2).
+6. Nested replies / comment edit / post reactions / albums / audience still require schema — not implemented, as specified.
+
+---
+
+# STRUCTURED PART 1B-A OUTPUT

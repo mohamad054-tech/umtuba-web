@@ -75,5 +75,3 @@ export async function clearRecentSearchesAction(): Promise<ClearRecentSearchesAc
   const supabase = await createClient();
   return clearRecentSearches(supabase, user.id);
 }
-
-export type { SearchTab };

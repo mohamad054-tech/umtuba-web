@@ -54,6 +54,8 @@ describe("App Shell translation V1", () => {
       "dialog.confirmTitle",
       "empty.title",
       "error.title",
+      "social.composer.prompt",
+      "social.like",
     ] as const) {
       expect(translate("en", key).length).toBeGreaterThan(0);
       expect(translate("ar", key).length).toBeGreaterThan(0);

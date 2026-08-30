@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
-import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import HomeSocialComposer from "../../components/home/HomeSocialComposer";
+import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import DiscoverShellActions from "./DiscoverShellActions";
 import HomeSectionCircles from "./HomeSectionCircles";
 
 type DiscoverShellProps = {
@@ -32,32 +33,12 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
           title="Home"
           sticky={false}
           subtitle="Video-first feed"
-          actions={
-            <div className="flex items-center gap-2">
-              <Link
-                href={APP_ROUTES.welcome}
-                className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
-              >
-                Welcome
-              </Link>
-              <Link
-                href={APP_ROUTES.saved}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10"
-              >
-                Saved
-              </Link>
-              <Link
-                href={APP_ROUTES.createVideo}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90"
-              >
-                Upload
-              </Link>
-            </div>
-          }
+          actions={<DiscoverShellActions />}
         />
         <div className="border-b border-white/5 bg-[#050510]/80 backdrop-blur-md">
           <div className="mx-auto w-full max-w-[1400px]">
             <HomeSectionCircles />
+            <HomeSocialComposer />
           </div>
         </div>
       </div>

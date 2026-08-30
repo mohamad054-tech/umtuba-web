@@ -427,6 +427,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     },
     likedByMe: post.likedByMe,
     savedByMe: post.savedByMe,
+    createdAt: post.created_at,
   };
 }
 

@@ -37,4 +37,6 @@ export type DiscoverVideo = {
   stats: DiscoverStats;
   likedByMe: boolean;
   savedByMe: boolean;
+  /** ISO created_at for timestamp deep-link; optional for demo/watch maps. */
+  createdAt?: string | null;
 };

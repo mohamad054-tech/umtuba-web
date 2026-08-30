@@ -56,7 +56,7 @@ describe("social engagement harden contracts", () => {
   it("comments support load retry and focus deep links", () => {
     const panel = read("app/components/social/CommentsPanel.tsx");
     expect(panel).toMatch(/loadEpoch/);
-    expect(panel).toMatch(/Try again/);
+    expect(panel).toMatch(/social\.comments\.retry|Try again/);
     expect(panel).toMatch(/focusCommentId/);
     expect(panel).toMatch(/comment-\$\{comment\.id\}/);
   });

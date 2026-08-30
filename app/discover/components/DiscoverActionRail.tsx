@@ -9,14 +9,14 @@ import {
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../../components/social/ShareMenu";
+import ShareToMessagesPanel from "../../components/social/ShareToMessagesPanel";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
 import { APP_ROUTES } from "../../lib/nav";
+import { useTranslation } from "../../components/i18n";
 import {
   formatInteractionCount,
   getOrCreateViewerKey,
-  shouldUseMobileNativeShare,
   shareViaTarget,
-  shareWithNative,
   type SharePostOutcome,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
@@ -58,9 +58,11 @@ export default function DiscoverActionRail({
   onDeleted,
 }: DiscoverActionRailProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [sharedPulse, setSharedPulse] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [messagesOpen, setMessagesOpen] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [likePending, setLikePending] = useState(false);
   const [savePending, setSavePending] = useState(false);
@@ -148,7 +150,7 @@ export default function DiscoverActionRail({
 
   function showCopiedSuccess() {
     setLinkCopied(true);
-    showHint("Link copied");
+    showHint(t("social.shareCopied"));
 
     if (copiedTimerRef.current != null) {
       window.clearTimeout(copiedTimerRef.current);
@@ -187,9 +189,9 @@ export default function DiscoverActionRail({
     if (outcome.method === "clipboard") {
       showCopiedSuccess();
     } else if (outcome.method === "whatsapp") {
-      showHint("Opening WhatsApp");
+      showHint(t("social.shareOpeningWhatsApp"));
     } else {
-      showHint("Shared");
+      showHint(t("social.shareShared"));
     }
 
     // Authoritative count from server — dedupe window prevents inflation.
@@ -202,14 +204,6 @@ export default function DiscoverActionRail({
 
   async function handleShareButtonClick() {
     if (sharePending) {
-      return;
-    }
-
-    if (shouldUseMobileNativeShare()) {
-      setSharePending(true);
-      const outcome = await shareWithNative(shareInput());
-      await recordShareAfterSuccess(outcome);
-      setSharePending(false);
       return;
     }
 
@@ -310,12 +304,12 @@ export default function DiscoverActionRail({
           }`}
           role="status"
         >
-          {linkCopied ? "✓ Link copied" : hint}
+          {linkCopied ? t("social.shareCopied") : hint}
         </p>
       ) : null}
 
       <ActionButton
-        label="Like"
+        label={t("social.like")}
         count={formatInteractionCount(stats.likes)}
         active={likedByMe}
         busy={likePending}
@@ -329,7 +323,7 @@ export default function DiscoverActionRail({
       />
 
       <ActionButton
-        label="Comment"
+        label={t("social.comment")}
         count={formatInteractionCount(stats.comments)}
         onClick={() => onComment?.()}
         icon={
@@ -345,7 +339,7 @@ export default function DiscoverActionRail({
       />
 
       <ActionButton
-        label="Save"
+        label={t("social.save")}
         count={formatInteractionCount(stats.saves)}
         active={savedByMe}
         busy={savePending}
@@ -360,7 +354,7 @@ export default function DiscoverActionRail({
 
       <div className="relative">
         <ActionButton
-          label="Share"
+          label={t("social.share")}
           count={formatInteractionCount(stats.shares)}
           active={sharedPulse || shareMenuOpen || linkCopied}
           onClick={() => void handleShareButtonClick()}
@@ -394,8 +388,28 @@ export default function DiscoverActionRail({
           disabled={sharePending}
           onClose={() => setShareMenuOpen(false)}
           onSelect={(target) => void handleShareTarget(target)}
+          onSendInMessages={() => {
+            setShareMenuOpen(false);
+            setMessagesOpen(true);
+          }}
         />
       </div>
+
+      <ShareToMessagesPanel
+        open={messagesOpen}
+        postId={postId}
+        caption={caption}
+        returnPath={returnPath}
+        onClose={() => setMessagesOpen(false)}
+        onSent={(nextShares) => {
+          setSharedPulse(true);
+          window.setTimeout(() => setSharedPulse(false), 420);
+          showHint(t("social.shareSent"));
+          if (typeof nextShares === "number") {
+            onStatsChange?.({ shares: nextShares });
+          }
+        }}
+      />
 
       <OwnerContentDeleteControl
         postId={postId}

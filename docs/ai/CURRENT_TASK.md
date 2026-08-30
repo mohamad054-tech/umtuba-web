@@ -1,46 +1,46 @@
 ﻿# Current Task
 
-## Task title
+> **PC2 UM Life social experience V1 — PART 1B-A OWNER REVIEW GATE. Preserve candidate. No migrate/deploy. PART 1B-B not authorized.**
 
-PC2 UAF-12 Source Delivery V1
+## Task
 
-## Identity
+```text
+TASK_ID = PC2_UMTUBA_UM_LIFE_SOCIAL_EXPERIENCE_V1_PART1B_A_OWNER_REVIEW_GATE
+ROLE = OWNER REVIEW GATE — PRESERVE CANDIDATE, LOCAL PREVIEW, AUTHENTICATED UI CHECK
+STATUS = GO
+SOURCE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+BASE_SHA = b3c05d8d8d5d5ac0b397fe468a3160b952e1cfb2
+AUTHORITATIVE_SOURCE = this workspace office/platform-translation-trunk-port-v1
+CANDIDATE_BRANCH = pc2/um-life-part1b-a-social-home-candidate
+NO_DATABASE_MIGRATIONS = YES
+DEPLOYED = NO
+DATABASE_CHANGED = NO
+MIGRATIONS_CREATED = NO
+PART1B_B = NOT_AUTHORIZED
+```
 
-- **DEVICE** = PC2
-- **DEVICE_ROLE** = PLATFORM_SOCIAL_CONTENT_OWNER
-- **TASK_ID** = `PC2_UAF12_SOURCE_DELIVERY_V1`
-- **SOURCE_TASK** = `PC2_USER_OWN_CONTENT_DELETE_FIX_VERIFICATION_V1`
-- **PARENT_FINDING** = UAF-12
-- **CENTRAL_COORDINATOR** = SERVER
-- **PRIORITY** = HIGH
+## Product / goal
 
-## Status
+Preserve the PART 1B-A social Home candidate (Share on UM, latest-post overlay, comments/mentions, share-to-messages, save). Run a local preview so the owner can review Home `/` live. Perform an authenticated functional check. Do not start PART 1B-B.
 
-COMPLETE. Exact source `72190b6` verified and pushed. Origin tip is the same SHA. CENTRAL_FETCH_READY = YES. STOP.
+## Allowed scope (PART 1B-A owner review gate)
 
-## Delivered SHA
-
-- **SOURCE_SHA** = `72190b62149a7bcc03356dab8f9f84ab5379a59d`
-- **SOURCE_BRANCH** = `office/platform-translation-trunk-port-v1`
-- **PUSHED** = YES (normal, non-force)
-- **CENTRAL_FETCH_READY** = YES
-
-## Allowed scope
-
-Verify, normal push of exact UAF-12 commit, remote verify, reports. No amend.
+- Commit the existing PART 1B-A implementation on a dedicated local candidate branch.
+- Start or reuse the local Next.js preview for Home `/`.
+- Authenticated UI checks (publish, like, comment, mention, save, share, send-in-messages, profile return, feed position).
+- Small implementation-only feed-position fix if it is safe and in PART 1B-A (no schema).
+- Update CURRENT_TASK.md and CURSOR_REPORT.md for this gate.
 
 ## Forbidden scope
 
-Force-push, amend, squash, rebase, recreate commit. Deploy, migrations, Store, Android, iOS release. Secrets. Another Social wave.
+- Do not start PART 1B-B.
+- Do not create migrations or change the database.
+- Do not deploy.
+- Do not merge to Central.
+- Do not reset/discard the current implementation.
+- Do not push unless the only way to preserve the candidate (default: local only).
+- No parent_id, nested replies, comment edit schema, post_reactions, visibility, post_intent, Learning/Store/Event linking schema.
 
 ## Next
 
-STOP. Central can fetch `72190b6`. Do not start another Social wave.
-
-## SAVE_ALL closeout (2026-08-14)
-
-Local preservation of leftover operator reports and AI handoff docs.
-
-- **SAVE_ALL_SHA** = `81857788f511b5b98b09c37e6516a56190d0e4b2`
-- **PUSH** = NO
-- Do not start a new feature wave.
+Owner visual + functional review on LOCAL_PREVIEW_URL. PART 1B-B remains a separate GO.

@@ -6,11 +6,13 @@ import {
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
+import { useTranslation } from "../i18n";
 
 type ShareMenuProps = {
   open: boolean;
   onClose: () => void;
   onSelect: (target: ShareTarget) => void;
+  onSendInMessages?: () => void;
   disabled?: boolean;
   align?: "left" | "right" | "center";
 };
@@ -19,9 +21,11 @@ export default function ShareMenu({
   open,
   onClose,
   onSelect,
+  onSendInMessages,
   disabled = false,
   align = "right",
 }: ShareMenuProps) {
+  const { t } = useTranslation();
   const titleId = useId();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const firstButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -50,7 +54,7 @@ export default function ShareMenu({
       <button
         type="button"
         className="fixed inset-0 z-40 cursor-default bg-transparent"
-        aria-label="Close share menu"
+        aria-label={t("social.shareClose")}
         onClick={onClose}
       />
 
@@ -58,17 +62,43 @@ export default function ShareMenu({
         ref={menuRef}
         role="menu"
         aria-labelledby={titleId}
-        className={`absolute bottom-[calc(100%+0.75rem)] z-50 w-52 overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${alignClass}`}
+        className={`absolute bottom-[calc(100%+0.75rem)] z-50 w-56 overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl ${alignClass}`}
       >
         <p
           id={titleId}
           className="px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.22em] text-white/45"
         >
-          Share to
+          {t("social.shareTo")}
         </p>
 
+        {onSendInMessages ? (
+          <button
+            ref={firstButtonRef}
+            type="button"
+            role="menuitem"
+            disabled={disabled}
+            onClick={onSendInMessages}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-white transition hover:bg-white/10 disabled:opacity-45"
+          >
+            <MenuIcon>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M5 6.5A2.5 2.5 0 017.5 4h9A2.5 2.5 0 0119 6.5v7A2.5 2.5 0 0116.5 16H10l-4.5 3.2V16H7.5A2.5 2.5 0 015 13.5v-7z"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </MenuIcon>
+            <MenuCopy
+              label={t("social.shareMessages")}
+              description={t("social.shareMessagesHint")}
+            />
+          </button>
+        ) : null}
+
         <button
-          ref={firstButtonRef}
+          ref={onSendInMessages ? undefined : firstButtonRef}
           type="button"
           role="menuitem"
           disabled={disabled}
@@ -80,7 +110,10 @@ export default function ShareMenu({
               <path d="M12.04 2c-5.5 0-9.96 4.45-9.96 9.93 0 1.75.46 3.45 1.34 4.95L2 22l5.27-1.38a10 10 0 004.77 1.21h.01c5.5 0 9.96-4.45 9.96-9.93S17.54 2 12.04 2zm5.8 14.24c-.24.68-1.42 1.25-1.96 1.33-.5.07-1.14.1-1.84-.12-.42-.13-.97-.28-1.67-.55-2.94-1.27-4.86-4.23-5.01-4.43-.15-.2-1.22-1.62-1.22-3.09 0-1.47.77-2.19 1.04-2.49.27-.3.59-.37.79-.37h.57c.18 0 .42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.03 1.12 1 2.07 1.31 2.36 1.46.3.15.47.12.64-.07.18-.2.75-.87.95-1.17.2-.3.4-.25.66-.15.27.1 1.7.8 1.99.95.3.15.49.22.56.34.08.13.08.74-.16 1.42z" />
             </svg>
           </MenuIcon>
-          <MenuCopy label="WhatsApp" description="Open WhatsApp Web" />
+          <MenuCopy
+            label={t("social.shareWhatsApp")}
+            description={t("social.shareWhatsAppHint")}
+          />
         </button>
 
         <button
@@ -100,7 +133,10 @@ export default function ShareMenu({
               />
             </svg>
           </MenuIcon>
-          <MenuCopy label="Copy link" description="Copy post URL" />
+          <MenuCopy
+            label={t("social.shareCopy")}
+            description={t("social.shareCopyHint")}
+          />
         </button>
 
         {nativeAvailable ? (
@@ -122,7 +158,10 @@ export default function ShareMenu({
                 />
               </svg>
             </MenuIcon>
-            <MenuCopy label="More…" description="System share" />
+            <MenuCopy
+              label={t("social.shareMore")}
+              description={t("social.shareMoreHint")}
+            />
           </button>
         ) : null}
       </div>

@@ -136,6 +136,9 @@ describe("translation catalogs", () => {
     "languages.ar",
     "nav.home",
     "settings.title",
+    "social.composer.prompt",
+    "social.like",
+    "social.shareMessages",
   ];
 
   it("provides foundation keys for every supported locale", () => {

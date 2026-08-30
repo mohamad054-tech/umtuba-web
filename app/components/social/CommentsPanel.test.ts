@@ -18,6 +18,10 @@ describe("CommentsPanel auth behavior", () => {
     expect(source).toMatch(/COMMENT_AUTH_PROMPT/);
     expect(source).toMatch(/loadEpoch/);
     expect(source).toMatch(/focusCommentId/);
+    expect(source).toMatch(/globalSearchAction/);
+    expect(source).toMatch(/getActiveMentionQuery/);
+    expect(source).toMatch(/MentionedText/);
+    expect(source).toMatch(/dir="auto"/);
     expect(source).not.toMatch(/next=\/discover"/);
   });
 

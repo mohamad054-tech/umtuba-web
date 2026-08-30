@@ -15,10 +15,13 @@ import {
   uploadPostImage,
 } from "../../lib/supabase/posts";
 import { APP_ROUTES } from "../lib/nav";
+import { dispatchHomeSocialPosted } from "../lib/social/homeSocialPost";
+import { useTranslation } from "./i18n";
 
 type CreatePostModalProps = {
   open: boolean;
   onClose: () => void;
+  preferImagePicker?: boolean;
 };
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -38,7 +41,9 @@ function getServerSnapshot() {
 export default function CreatePostModal({
   open,
   onClose,
+  preferImagePicker = false,
 }: CreatePostModalProps) {
+  const { t } = useTranslation();
   const mounted = useSyncExternalStore(
     subscribeToNoop,
     getClientSnapshot,
@@ -52,8 +57,10 @@ export default function CreatePostModal({
   const [isCheckingAuth, setIsCheckingAuth] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [discardOpen, setDiscardOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shouldOpenPicker = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -65,8 +72,12 @@ export default function CreatePostModal({
 
   useEffect(() => {
     if (!open) {
+      shouldOpenPicker.current = false;
+      setDiscardOpen(false);
       return;
     }
+
+    shouldOpenPicker.current = preferImagePicker;
 
     let isActive = true;
 
@@ -83,11 +94,15 @@ export default function CreatePostModal({
 
         if (!user) {
           setIsAuthenticated(false);
-          setErrorMessage("Please sign in to publish a post.");
+          setErrorMessage(t("social.composer.signInNeeded"));
           return;
         }
 
         setIsAuthenticated(true);
+        if (shouldOpenPicker.current) {
+          window.setTimeout(() => fileInputRef.current?.click(), 80);
+          shouldOpenPicker.current = false;
+        }
       } catch (error) {
         console.error(error);
 
@@ -96,7 +111,7 @@ export default function CreatePostModal({
           setErrorMessage(
             error instanceof Error
               ? error.message
-              : "Please sign in to publish a post."
+              : t("social.composer.signInNeeded")
           );
         }
       } finally {
@@ -111,12 +126,15 @@ export default function CreatePostModal({
     return () => {
       isActive = false;
     };
-  }, [open]);
+  }, [open, preferImagePicker, t]);
+
+  const isDirty = Boolean(content.trim() || selectedImage);
 
   function resetForm() {
     setContent("");
     setSelectedImage(null);
     setErrorMessage("");
+    setDiscardOpen(false);
 
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
@@ -141,13 +159,13 @@ export default function CreatePostModal({
     setErrorMessage("");
 
     if (!file.type.startsWith("image/")) {
-      setErrorMessage("Please select a valid image file.");
+      setErrorMessage(t("social.composer.invalidImage"));
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
-      setErrorMessage("The image must be smaller than 5 MB.");
+      setErrorMessage(t("social.composer.imageTooLarge"));
       event.target.value = "";
       return;
     }
@@ -175,16 +193,14 @@ export default function CreatePostModal({
 
   async function handlePublish() {
     if (!isAuthenticated) {
-      setErrorMessage("Please sign in to publish a post.");
+      setErrorMessage(t("social.composer.signInNeeded"));
       return;
     }
 
     const trimmedContent = content.trim();
 
     if (!trimmedContent && !selectedImage) {
-      setErrorMessage(
-        "Please write something or choose an image before publishing."
-      );
+      setErrorMessage(t("social.composer.emptyError"));
       return;
     }
 
@@ -198,12 +214,8 @@ export default function CreatePostModal({
         imageUrl = await uploadPostImage(selectedImage);
       }
 
-      await createPost(trimmedContent, imageUrl);
-
-      window.dispatchEvent(
-        new Event("umtuba:post-created")
-      );
-
+      const created = await createPost(trimmedContent, imageUrl);
+      dispatchHomeSocialPosted(created);
       resetForm();
       onClose();
     } catch (error) {
@@ -212,22 +224,29 @@ export default function CreatePostModal({
       const message =
         error instanceof Error
           ? error.message
-          : "The post could not be published.";
+          : t("social.composer.publishError");
 
-      setErrorMessage(
-        message ||
-          "The post could not be published. Please try again."
-      );
+      setErrorMessage(message || t("social.composer.publishError"));
     } finally {
       setIsPublishing(false);
     }
   }
 
-  function handleClose() {
+  function requestClose() {
     if (isPublishing) {
       return;
     }
 
+    if (isDirty) {
+      setDiscardOpen(true);
+      return;
+    }
+
+    resetForm();
+    onClose();
+  }
+
+  function confirmDiscard() {
     resetForm();
     onClose();
   }
@@ -241,20 +260,22 @@ export default function CreatePostModal({
     !isCheckingAuth &&
     (Boolean(content.trim()) || Boolean(selectedImage));
 
+  const loginNext = encodeURIComponent(APP_ROUTES.home);
+
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/80 p-4">
-      <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-[#0b0b18] p-6 text-white shadow-2xl">
+      <div className="w-full max-w-xl rounded-3xl border border-amber-400/20 bg-[#0b0b18] p-6 text-white shadow-2xl">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-black">
-            Create Post
+            {t("social.composer.title")}
           </h2>
 
           <button
             type="button"
-            onClick={handleClose}
+            onClick={requestClose}
             disabled={isPublishing}
             className="rounded-full bg-white/10 px-3 py-2 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label="Close create-post window"
+            aria-label={t("social.composer.closeAria")}
           >
             ✕
           </button>
@@ -262,28 +283,31 @@ export default function CreatePostModal({
 
         {isCheckingAuth ? (
           <p className="mt-6 text-sm text-white/50">
-            Checking your session...
+            {t("social.composer.checkingSession")}
           </p>
         ) : null}
 
         {!isCheckingAuth && !isAuthenticated ? (
           <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
             <p>
-              You need an account to publish.{" "}
+              {t("social.composer.needAccount")}{" "}
               <Link
-                href={`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.discover)}`}
-                className="font-bold text-white underline"
+                href={`${APP_ROUTES.login}?next=${loginNext}`}
+                className="font-bold text-amber-100 underline"
               >
-                Sign in
+                {t("social.composer.signIn")}
               </Link>{" "}
-              or{" "}
-              <Link
-                href={`${APP_ROUTES.signup}?next=${encodeURIComponent(APP_ROUTES.discover)}`}
-                className="font-bold text-white underline"
-              >
-                create an account
-              </Link>
-              .
+              {t("social.composer.createAccount") ? (
+                <>
+                  <Link
+                    href={`${APP_ROUTES.signup}?next=${loginNext}`}
+                    className="font-bold text-amber-100 underline"
+                  >
+                    {t("social.composer.createAccount")}
+                  </Link>
+                  .
+                </>
+              ) : null}
             </p>
           </div>
         ) : null}
@@ -294,11 +318,12 @@ export default function CreatePostModal({
             setContent(event.target.value);
             setErrorMessage("");
           }}
-          placeholder="What's happening today?"
+          placeholder={t("social.composer.placeholder")}
           maxLength={1000}
           autoFocus
+          dir="auto"
           disabled={isPublishing || !isAuthenticated || isCheckingAuth}
-          className="mt-6 h-40 w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-base outline-none focus:border-white/30 disabled:opacity-60"
+          className="mt-6 h-40 w-full resize-none rounded-2xl border border-white/10 bg-white/5 p-4 text-base outline-none focus:border-amber-300/40 disabled:opacity-60"
         />
 
         <input
@@ -315,13 +340,13 @@ export default function CreatePostModal({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isPublishing || !isAuthenticated || isCheckingAuth}
-            className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-bold hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-2xl border border-amber-300/25 bg-amber-400/10 px-4 py-3 font-bold text-amber-50 hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            📷 Add Image
+            {t("social.composer.addImage")}
           </button>
 
           <p className="mt-2 text-xs text-white/40">
-            JPG, PNG, WEBP or GIF — maximum 5 MB
+            {t("social.composer.imageHint")}
           </p>
         </div>
 
@@ -329,7 +354,7 @@ export default function CreatePostModal({
           <div className="relative mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
             <img
               src={imagePreview}
-              alt="Selected image preview"
+              alt={t("social.composer.previewAlt")}
               className="max-h-80 w-full object-contain"
             />
 
@@ -339,7 +364,7 @@ export default function CreatePostModal({
               disabled={isPublishing}
               className="absolute right-3 top-3 rounded-full bg-black/75 px-3 py-2 font-bold hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Remove
+              {t("social.composer.removeImage")}
             </button>
           </div>
         ) : null}
@@ -357,27 +382,61 @@ export default function CreatePostModal({
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
-            onClick={handleClose}
+            onClick={requestClose}
             disabled={isPublishing}
             className="rounded-2xl border border-white/10 px-5 py-3 font-bold hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Cancel
+            {t("actions.cancel")}
           </button>
 
           <button
             type="button"
             onClick={handlePublish}
             disabled={isPublishing || !canPublish}
-            className="rounded-2xl bg-white px-5 py-3 font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-2xl bg-amber-300 px-5 py-3 font-black text-black disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPublishing
               ? selectedImage
-                ? "Uploading..."
-                : "Publishing..."
-              : "Publish"}
+                ? t("social.composer.uploading")
+                : t("social.composer.publishing")
+              : t("social.composer.publish")}
           </button>
         </div>
       </div>
+
+      {discardOpen ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="discard-post-title"
+            className="w-full max-w-sm rounded-2xl border border-white/15 bg-[#12121f] p-5"
+          >
+            <h3 id="discard-post-title" className="text-lg font-black">
+              {t("social.composer.discardTitle")}
+            </h3>
+            <p className="mt-2 text-sm text-white/65">
+              {t("social.composer.discardBody")}
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDiscardOpen(false)}
+                className="rounded-full border border-white/15 px-4 py-2 text-sm font-bold hover:bg-white/10"
+              >
+                {t("social.composer.keepEditing")}
+              </button>
+              <button
+                type="button"
+                onClick={confirmDiscard}
+                className="rounded-full bg-white px-4 py-2 text-sm font-black text-black"
+              >
+                {t("social.composer.discardConfirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>,
     document.body
   );

@@ -234,6 +234,8 @@ export default function DiscoverVideoCard({
               hashtags={video.hashtags}
               articleHref={video.articleHref}
               articleTitle={video.articleTitle}
+              postId={video.id}
+              createdAt={video.createdAt}
             />
             {video.articleHref ? (
               <button
