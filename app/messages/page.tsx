@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { I18nProvider } from "../components/i18n";
+import { resolveRequestLocale } from "../../lib/i18n/server";
 import { messagesMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { listConversationsForUser } from "../../lib/supabase/messenger";
@@ -99,15 +101,18 @@ export default async function MessagesPage({
   const supabase = await createClient();
   const inbox = await listConversationsForUser(supabase, userId);
   const profile = await getProfileByIdFromDb(userId);
+  const { locale } = await resolveRequestLocale();
 
   return (
     <Suspense fallback={<MessagesFallback />}>
-      <MessagesExperience
-        initialUserId={userId}
-        initialConversations={inbox.ok ? inbox.conversations : []}
-        initialError={inbox.ok ? null : inbox.message}
-        ownUsername={profile?.username ?? null}
-      />
+      <I18nProvider locale={locale}>
+        <MessagesExperience
+          initialUserId={userId}
+          initialConversations={inbox.ok ? inbox.conversations : []}
+          initialError={inbox.ok ? null : inbox.message}
+          ownUsername={profile?.username ?? null}
+        />
+      </I18nProvider>
     </Suspense>
   );
 }
