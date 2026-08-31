@@ -137,5 +137,9 @@ describe("UM Life Home Entry V1", () => {
     const top = read("app/components/AppTopNav.tsx");
     expect(top).toMatch(/watch-focus-ring/);
     expect(top).toMatch(/nav\.umLifeAria/);
+    const landing = read("app/components/landing/LandingHero.tsx");
+    expect(landing).toMatch(/\$\{item\.label\}:\$\{item\.href\}/);
+    expect(landing).toMatch(/nav\.umLifeAria/);
+    expect(landing).toMatch(/nav\.umLife/);
   });
 });

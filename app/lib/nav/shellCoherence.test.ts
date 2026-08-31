@@ -13,6 +13,7 @@ describe("shell coherence", () => {
   it("keeps a single primary desktop nav contract", () => {
     expect(APP_NAV_ITEMS.map((i) => i.label)).toEqual([
       "Home",
+      "UM Life",
       "World",
       "Learning",
       "Live",

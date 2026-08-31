@@ -54,17 +54,19 @@ export default function LandingHero() {
         <div className="landing-nav-links hidden flex-1 items-center justify-center gap-9 text-[15px] font-medium tracking-wide text-white/55 sm:flex">
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
+            const umLife = item.label === "UM Life";
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}:${item.href}`}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
+                aria-label={umLife ? t("nav.umLifeAria") : undefined}
                 className={`landing-nav-link ${
                   active ? "text-white" : ""
                 }`}
               >
-                {t(desktopNavLabelKey(item.href))}
+                {umLife ? t("nav.umLife") : t(desktopNavLabelKey(item.href))}
               </Link>
             );
           })}
