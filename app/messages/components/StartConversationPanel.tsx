@@ -7,7 +7,6 @@ import {
   discoverByEmailAction,
   discoverByPhoneAction,
   discoverByUsernameAction,
-  discoveryNotFoundMessage,
 } from "../../actions/communications";
 import { buildPersonalContactUrl } from "../../../lib/comms/contactLink";
 import type { DiscoveredIdentity } from "../../../lib/comms/privacyContract";
@@ -207,7 +206,7 @@ export default function StartConversationPanel({
           </div>
         ) : null}
 
-        <p className="sr-only">{discoveryNotFoundMessage()}</p>
+        <p className="sr-only">{t("comms.notFound")}</p>
       </div>
     </div>
   );
