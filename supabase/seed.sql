@@ -1,0 +1,3 @@
+-- Local bootstrap seed placeholder.
+-- config.toml [db.seed] points here. No product rows, no production data.
+-- TEST_USER_A / TEST_USER_B are created by the local RLS gate after start, not here.

@@ -252,7 +252,7 @@ begin
 
   insert into public.communication_privacy_settings (user_id)
   values (v_uid)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_privacy_settings_pkey do nothing;
 
   select * into v_row
   from public.communication_privacy_settings
@@ -374,7 +374,7 @@ begin
 
   insert into public.communication_privacy_settings (user_id)
   values (v_target)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_privacy_settings_pkey do nothing;
 
   select s.find_by_email into v_find
   from public.communication_privacy_settings s
@@ -439,7 +439,7 @@ begin
 
   insert into public.communication_privacy_settings (user_id)
   values (v_target)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_privacy_settings_pkey do nothing;
 
   select s.find_by_phone into v_find
   from public.communication_privacy_settings s
@@ -618,7 +618,7 @@ begin
     phone_verified_at
   )
   values (v_uid, v_e164, v_hash, v_cc, null)
-  on conflict (user_id) do update
+  on conflict on constraint communication_phone_identities_pkey do update
     set
       phone_e164 = excluded.phone_e164,
       phone_e164_hash = excluded.phone_e164_hash,
@@ -676,7 +676,7 @@ begin
 
   insert into public.communication_contact_sync_state (user_id)
   values (v_uid)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_contact_sync_state_pkey do nothing;
 
   select * into v_row
   from public.communication_contact_sync_state
@@ -705,7 +705,7 @@ begin
 
   insert into public.communication_contact_sync_state (user_id)
   values (v_uid)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_contact_sync_state_pkey do nothing;
 
   if p_granted then
     update public.communication_contact_sync_state

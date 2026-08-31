@@ -2,16 +2,37 @@
 
 ```text
 TASK_ID = PC2_UMTUBA_LOCAL_SUPABASE_RUNTIME_ENVIRONMENT_V1
-STATUS = FIRMWARE_VTX_DISABLED
+STATUS = LOCAL_STACK_RECOVERED
 PRIMARY_TARGET = LOCAL
 PRODUCTION_TOUCHED = NO
-REBOOT_REQUIRED = YES
-REBOOT_INITIATED = NO
+REBOOT_REQUIRED = NO
 CURRENT_WORK_PRESERVED = YES
 HP_MODEL = HP Z440 Workstation
+LAST_RESUME = 2026-08-31
+LOCAL_API = http://127.0.0.1:54321
+LOCAL_DB = 127.0.0.1:54322
+LOCAL_STUDIO = http://127.0.0.1:54323
 ```
 
-Do not treat this as PASS. Firmware Intel VT-x is disabled and cannot be changed from Windows. Docker, local Supabase, migrations, test users, and runtime gates were **not** started. Production was not used as a workaround.
+## 2026-08-31 local recovery (this pass)
+
+VTx / WSL2 / Docker Engine were already working (do not redo BIOS/WSL/Docker install). `npx supabase start` inside Ubuntu user `giga_store` from this comms checkout now succeeds.
+
+**Root cause:** `20260712_auth_profiles_posts_rls.sql` ALTERs `public.posts` that was created in the hosted SQL Editor / dashboard, never in git. No dump and no `CREATE TABLE public.posts` exist in repo history or sibling web checkouts.
+
+**Authoritative posts source:** P0 commit `523117c7` — `supabase/README.md` (adds `posts.user_id` only), `lib/supabase/posts.ts` column list, `app/data/types/post.ts` `DatabasePost`, plus `20260713` bigint FKs / assumed `post_type` / `likes|comments|shares`.
+
+**Local bootstrap fix:**
+
+1. Precursor `20260711_local_bootstrap_posts_table_precursor_v1.sql` (pre-`user_id` columns only).
+2. Unique short-date filenames so CLI 2.116.0 `schema_migrations.version` PK does not collide. SQL bodies unchanged. Kept remote-matching `20260728` store_product and `20260729` store_cart.
+3. Ads platform renamed to `20260805000001` so it applies before ads admin review `20260806`.
+4. Comment-only `supabase/seed.sql` for `[db.seed]`.
+5. `20260916` `ON CONFLICT` uses named PKs (RETURNS TABLE `user_id` was ambiguous).
+
+Local gates: Communications RLS PASS; Rich Profile RLS PASS. Production untouched. CLI remains linked to hosted `umtuba` — do not `db push` / `--linked`.
+
+`npx supabase status -o env` may stop imgproxy/pooler; API/Auth/DB/Studio still served the gates.
 
 ---
 
@@ -19,7 +40,7 @@ Do not treat this as PASS. Firmware Intel VT-x is disabled and cannot be changed
 
 ```text
 TASK_ID = PC2_UMTUBA_LOCAL_SUPABASE_RUNTIME_ENVIRONMENT_V1
-STATUS = FIRMWARE_VTX_DISABLED
+STATUS = LOCAL_STACK_RECOVERED
 PRIMARY_TARGET = LOCAL
 PRODUCTION = STRICTLY_FORBIDDEN
 PRODUCTION_DATABASE_CHANGED = NO
@@ -27,39 +48,30 @@ PRODUCTION_DATA_CHANGED = NO
 WEB_PRODUCTION_CHANGED = NO
 PLAY_UPLOAD = NO
 APP_STORE_UPLOAD = NO
-REBOOT_REQUIRED = YES
-REBOOT_INITIATED = NO
+REBOOT_REQUIRED = NO
 CURRENT_WORK_PRESERVED = YES
-WSL_INSTALLED_BEFORE = NO
-WSL_FEATURES_ENABLED = YES
-WSL_RUNTIME_READY = NO
-VIRTUALIZATION_FIRMWARE_ENABLED = NO
-HYPERVISOR_PRESENT = NO
-HYPER_V_FEATURE_ENABLED = YES
-CONTAINERS_FEATURE_ENABLED = YES
-DOCKER_DESKTOP = NOT_INSTALLED
-DOCKER_ENGINE_RUNNING = NO
-LOCAL_SUPABASE_STARTED = NO
-TARGET_CONFIRMED_LOCAL = NOT_STARTED
-DATABASE_HISTORY_APPLIED = NOT_STARTED
-COMMUNICATIONS_MIGRATION_APPLIED = NO
-RICH_PROFILE_MIGRATION_APPLIED = NO
-TEST_USERS_CREATED = NO
-COMMS_1B_RUNTIME_AUTHENTICATED = NOT_TESTED
+WSL_RUNTIME_READY = YES
+VIRTUALIZATION_FIRMWARE_ENABLED = YES
+DOCKER_DESKTOP = INSTALLED
+DOCKER_ENGINE_RUNNING = YES
+LOCAL_SUPABASE_STARTED = YES
+TARGET_CONFIRMED_LOCAL = http://127.0.0.1:54321
+DATABASE_HISTORY_APPLIED = YES_LOCAL
+COMMUNICATIONS_MIGRATION_APPLIED = YES_LOCAL
+RICH_PROFILE_MIGRATION_APPLIED = YES_LOCAL
+TEST_USERS_CREATED = YES_LOCAL
+COMMS_1B_RUNTIME_AUTHENTICATED = PASS
 PHONE_VERIFICATION_RUNTIME = FOUNDATION_ONLY
-UNVERIFIED_PHONE_DISCOVERY_BLOCKED = NOT_TESTED
-RICH_PROFILE_CRUD_RLS = NOT_TESTED
+UNVERIFIED_PHONE_DISCOVERY_BLOCKED = PASS
+RICH_PROFILE_CRUD_RLS = PASS
 WEB_AGAINST_LOCAL = NOT_STARTED
-EXISTING_NPM_RUN_DEV_LEFT_RUNNING = YES
 MOBILE_SOURCE_CHANGED = NO
 MOBILE_09E94F8_PRESERVED = YES
 MOBILE_A660E19_PRESERVED = YES
 UM_LIFE_NAV_WORKTREE_UNTOUCHED = YES
-PRODUCT_SOURCE_CHANGED = NO
+PRODUCT_SOURCE_CHANGED = LOCAL_BOOTSTRAP_ONLY
 HP_MODEL = HP Z440 Workstation
-BIOS_MENU_PATH = F10 Computer Setup → Security → System Security → Virtualization Technology (VTx)
-OWNER_PHYSICAL_ACTIONS_ONLY = Restart the PC. At the HP screen tap F10. Open Security → System Security. Set Virtualization Technology (VTx) to Enabled. Press F10 to save and leave setup. If VTx is greyed out: Security → System Security → restore security to factory defaults, then set VTx to Enabled and F10 save.
-BLOCKER_IF_ANY = Intel VT-x disabled in HP Z440 firmware (Win32_Processor.VirtualizationFirmwareEnabled=False; systeminfo Virtualization Enabled In Firmware=No). Cannot be enabled from Windows. WSL2/Docker/local Supabase cannot start until VTx is Enabled. Reboot not initiated: UM Life nav uncommitted; npm run dev still on :3000.
+BLOCKER_IF_ANY = none for local start/gates. Do not db push. CLI still linked to hosted umtuba. imgproxy/pooler may have been stopped by status -o env.
 READY_FOR_COMMUNICATIONS_PART2_AUTHORIZATION = NO
 READY_FOR_RICH_PROFILE_PRODUCTION_GATE = NO
 ```
