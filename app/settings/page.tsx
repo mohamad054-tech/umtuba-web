@@ -3,8 +3,12 @@ import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import ProductLoadingState from "../components/product/ProductLoadingState";
 import { settingsMetadata } from "../../lib/site/routeMetadata";
-import { getServerUser } from "../../lib/supabase/server";
+import { createClient, getServerUser } from "../../lib/supabase/server";
 import { getProfileByIdFromDb } from "../../lib/supabase/profiles";
+import {
+  EMPTY_RICH_PROFILE_BUNDLE,
+  loadRichProfileBundle,
+} from "../../lib/supabase/richProfile";
 import { normalizeUsername } from "../../lib/supabase/validation";
 import { APP_ROUTES } from "../lib/nav";
 import SettingsExperience from "./SettingsExperience";
@@ -33,6 +37,7 @@ function profileFromAuthUser(user: User) {
     country: "",
     avatarUrl: null as string | null,
     avatarInitial: fullName.charAt(0).toUpperCase() || "U",
+    rich: EMPTY_RICH_PROFILE_BUNDLE,
   };
 }
 
@@ -52,6 +57,10 @@ export default async function SettingsPage() {
   }
 
   const row = await getProfileByIdFromDb(user.id);
+  const supabase = await createClient();
+  const rich = row
+    ? await loadRichProfileBundle(supabase, row.id)
+    : EMPTY_RICH_PROFILE_BUNDLE;
 
   const profile = row
     ? {
@@ -75,6 +84,7 @@ export default async function SettingsPage() {
             .charAt(0)
             .toUpperCase() ||
           "U",
+        rich,
       }
     : profileFromAuthUser(user);
 

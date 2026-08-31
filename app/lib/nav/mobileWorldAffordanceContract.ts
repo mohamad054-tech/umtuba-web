@@ -27,9 +27,10 @@ import {
 export const MOBILE_WORLD_DESKTOP_LABEL = "World" as const;
 export const MOBILE_WORLD_DESKTOP_HREF = APP_ROUTES.worldDiscovery;
 
-/** Mobile primary stays four items — World intentionally absent. */
+/** Mobile primary stays without World. UM Life is the social-home entry. */
 export const MOBILE_PRIMARY_WITHOUT_WORLD_LABELS = [
   "Home",
+  "UM Life",
   "Live",
   "Messages",
   "Profile",

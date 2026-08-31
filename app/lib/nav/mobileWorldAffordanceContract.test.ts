@@ -31,6 +31,7 @@ describe("Mobile World Affordance Decision V1", () => {
   it("keeps Mobile primary as Home Live Messages Profile without World", () => {
     expect(MOBILE_PRIMARY_NAV_IDS).toEqual([
       "home",
+      "umLife",
       "live",
       "messages",
       "profile",
@@ -40,6 +41,7 @@ describe("Mobile World Affordance Decision V1", () => {
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
       "Home",
+      "UM Life",
       "Live",
       "Messages",
       "Profile",

@@ -25,6 +25,7 @@ export {
   findIndexByCity,
   findIndexByPostId,
   isNavActive,
+  isSocialHomePath,
   isUuid,
   normalizeCityKey,
   normalizeProfileUsername,
@@ -108,6 +109,16 @@ export {
   assertHomeReadinessGuardrails,
   type HomeLockedSurface,
 } from "./homeReadinessGuardrails";
+
+export {
+  UM_LIFE_ALIAS_PATH,
+  UM_LIFE_DESTINATION_HREF,
+  UM_LIFE_ENTRY_LABEL,
+  assertUmLifePrimaryEntry,
+  isUmLifeNavDestination,
+  resolveUmLifeActivityBadge,
+  resolveUmLifeActivityBadgeCount,
+} from "./umLifeHomeEntry";
 
 export {
   AUTH_DEFAULT_NEXT_PATH,

@@ -4,6 +4,7 @@ import type { TranslationKey } from "./messages/types";
 const DESKTOP_NAV_KEYS: Record<string, TranslationKey> = {
   "/": "nav.home",
   "/discover": "nav.discover",
+  "/life": "nav.life",
   "/world": "nav.world",
   "/learning": "nav.learning",
   "/live": "nav.live",
@@ -12,6 +13,7 @@ const DESKTOP_NAV_KEYS: Record<string, TranslationKey> = {
 
 const MOBILE_NAV_KEYS: Record<string, TranslationKey> = {
   home: "nav.home",
+  umLife: "nav.umLife",
   discover: "nav.discover",
   live: "nav.live",
   messages: "nav.messages",

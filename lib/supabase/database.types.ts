@@ -4,9 +4,12 @@ export type ProfileRow = {
   display_name: string | null;
   full_name: string;
   bio: string | null;
+  bio_long?: string | null;
   city: string | null;
   country: string | null;
   avatar_url: string | null;
+  cover_url?: string | null;
+  website_url?: string | null;
   avatar_initial: string;
   created_at: string;
   updated_at: string;

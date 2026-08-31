@@ -8,6 +8,7 @@ export const APP_ROUTES = {
   live: "/live",
   life: "/life",
   lifeCompose: "/life/compose",
+  contact: "/u",
   messages: "/messages",
   notifications: "/notifications",
   settings: "/settings",
@@ -102,20 +103,28 @@ export type AppNavItem = {
  */
 export const APP_NAV_ITEMS: AppNavItem[] = [
   { label: "Home", href: APP_ROUTES.home },
+  { label: "UM Life", href: APP_ROUTES.home },
   { label: "World", href: APP_ROUTES.worldDiscovery },
   { label: "Learning", href: APP_ROUTES.learning },
   { label: "Live", href: APP_ROUTES.live },
   { label: "Messages", href: APP_ROUTES.messages },
 ];
 
+export function isSocialHomePath(pathname: string): boolean {
+  const path = pathname.split("?")[0] || "/";
+  return (
+    path === APP_ROUTES.home ||
+    path === APP_ROUTES.discover ||
+    path.startsWith(`${APP_ROUTES.discover}/`) ||
+    path === APP_ROUTES.life ||
+    path.startsWith(`${APP_ROUTES.life}/`)
+  );
+}
+
 export function isNavActive(pathname: string, href: AppRouteHref): boolean {
   if (href === APP_ROUTES.home) {
-    // `/discover` aliases Home feed — keep Home highlighted after redirect targets.
-    return (
-      pathname === APP_ROUTES.home ||
-      pathname === APP_ROUTES.discover ||
-      pathname.startsWith(`${APP_ROUTES.discover}/`)
-    );
+    // `/discover` and `/life` alias the same social Home.
+    return isSocialHomePath(pathname);
   }
 
   if (href === APP_ROUTES.discover) {

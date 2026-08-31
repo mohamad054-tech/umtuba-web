@@ -9,6 +9,7 @@ import {
 /** Desktop primary labels (Discover is intentionally absent). */
 export const DESKTOP_PRIMARY_NAV_LABELS = [
   "Home",
+  "UM Life",
   "World",
   "Learning",
   "Live",
@@ -17,6 +18,7 @@ export const DESKTOP_PRIMARY_NAV_LABELS = [
 
 /** Desktop primary hrefs in lockstep with labels. */
 export const DESKTOP_PRIMARY_NAV_HREFS = [
+  APP_ROUTES.home,
   APP_ROUTES.home,
   APP_ROUTES.worldDiscovery,
   APP_ROUTES.learning,
@@ -27,6 +29,7 @@ export const DESKTOP_PRIMARY_NAV_HREFS = [
 /** Mobile primary ids (no Discover tab). */
 export const MOBILE_PRIMARY_NAV_IDS = [
   "home",
+  "umLife",
   "live",
   "messages",
   "profile",
@@ -35,6 +38,7 @@ export const MOBILE_PRIMARY_NAV_IDS = [
 /** Mobile primary labels in order. */
 export const MOBILE_PRIMARY_NAV_LABELS = [
   "Home",
+  "UM Life",
   "Live",
   "Messages",
   "Profile",

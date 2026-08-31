@@ -100,12 +100,14 @@ export default function AppTopNav({
         >
           {APP_NAV_ITEMS.map((item) => {
             const active = isNavActive(pathname, item.href);
+            const umLife = item.label === "UM Life";
 
             return (
               <Link
-                key={item.href}
+                key={`${item.label}:${item.href}`}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
+                aria-label={umLife ? t("nav.umLifeAria") : undefined}
                 className={`watch-focus-ring rounded-full px-2.5 py-1.5 text-[11px] font-bold transition sm:px-3 sm:text-xs ${focusRing} ${
                   active
                     ? store
@@ -116,7 +118,7 @@ export default function AppTopNav({
                       : "app-top-nav-link border border-transparent hover:border-white/10 hover:bg-white/5"
                 }`}
               >
-                {t(desktopNavLabelKey(item.href))}
+                {umLife ? t("nav.umLife") : t(desktopNavLabelKey(item.href))}
               </Link>
             );
           })}

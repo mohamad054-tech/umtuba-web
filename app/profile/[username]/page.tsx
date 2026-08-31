@@ -20,6 +20,7 @@ import {
 } from "../../../lib/supabase/profileContent";
 import { getServerUser, createClient } from "../../../lib/supabase/server";
 import { getProfileByUsernameFromDb } from "../../../lib/supabase/profiles";
+import { loadRichProfileBundle } from "../../../lib/supabase/richProfile";
 import { normalizeUsername } from "../../../lib/supabase/validation";
 import JsonLd from "../../components/JsonLd";
 import { buildProfilePageJsonLd } from "../../../lib/site/jsonLd";
@@ -100,6 +101,7 @@ async function resolveProfile(username: string): Promise<{
         articlesPage,
         liveResult,
         projectionPage,
+        rich,
       ] = await Promise.all([
         loadProfileActivityTier(row.id),
         getProfileFollowSnapshot(supabase, row.id),
@@ -111,6 +113,7 @@ async function resolveProfile(username: string): Promise<{
         listPublishedArticlesForUser(supabase, row.id),
         listProfileActiveLiveRooms(supabase, row.id),
         listProfileProjections(supabase, row.id, { viewerId }),
+        loadRichProfileBundle(supabase, row.id),
       ]);
 
       if (followResult.ok && followResult.missingProfile) {
@@ -179,6 +182,7 @@ async function resolveProfile(username: string): Promise<{
             registryFailed: Boolean(projectionPage.failed),
             liveRooms: liveResult.rooms,
             liveFailed: Boolean(liveResult.failed),
+            rich,
           }),
           activityTier: sanitizeActivityTierProgressForClient(activityTier),
         },

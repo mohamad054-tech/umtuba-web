@@ -4,7 +4,7 @@ import { getErrorMessage, normalizeUsername } from "./validation";
 
 /** Full Foundation V1 profile projection. */
 export const PROFILE_SELECT_COLUMNS =
-  "id, username, display_name, full_name, bio, city, country, avatar_url, avatar_initial, created_at, updated_at";
+  "id, username, display_name, full_name, bio, bio_long, city, country, avatar_url, cover_url, website_url, avatar_initial, created_at, updated_at";
 
 /**
  * P0 / pre-foundation columns only. Used when the remote DB has not applied
@@ -37,9 +37,12 @@ function normalizeProfileRow(row: Partial<ProfileRow> & { id: string }): Profile
     display_name: row.display_name ?? null,
     full_name: row.full_name ?? "",
     bio: row.bio ?? null,
+    bio_long: row.bio_long ?? null,
     city: row.city ?? null,
     country: row.country ?? null,
     avatar_url: row.avatar_url ?? null,
+    cover_url: row.cover_url ?? null,
+    website_url: row.website_url ?? null,
     avatar_initial: row.avatar_initial || "U",
     created_at: row.created_at ?? new Date(0).toISOString(),
     updated_at: row.updated_at ?? row.created_at ?? new Date(0).toISOString(),

@@ -18,10 +18,14 @@ import {
   normalizeUsername,
 } from "../../lib/supabase/validation";
 import NotificationPreferencesPanel from "./NotificationPreferencesPanel";
+import CommunicationsPrivacyPanel from "./CommunicationsPrivacyPanel";
+import RichProfileEditor from "./RichProfileEditor";
 import SettingsShell from "./SettingsShell";
 import { settingsUserFacingKey } from "./settingsUserFacingError";
 import { LanguageSelector, useTranslation } from "../components/i18n";
 import type { TranslationKey } from "../../lib/i18n";
+import type { RichProfileBundle } from "../../lib/supabase/richProfile";
+import { EMPTY_RICH_PROFILE_BUNDLE } from "../../lib/supabase/richProfile";
 
 export type SettingsProfile = {
   id: string;
@@ -32,6 +36,7 @@ export type SettingsProfile = {
   country: string;
   avatarUrl: string | null;
   avatarInitial: string;
+  rich?: RichProfileBundle;
 };
 
 type FieldErrors = {
@@ -40,7 +45,12 @@ type FieldErrors = {
   avatar?: string;
 };
 
-type SettingsSection = "profile" | "notifications" | "account" | "language";
+type SettingsSection =
+  | "profile"
+  | "notifications"
+  | "account"
+  | "language"
+  | "communications";
 
 type SettingsExperienceProps = {
   profile: SettingsProfile;
@@ -55,6 +65,11 @@ const SECTIONS: {
     id: "profile",
     labelKey: "settings.profile",
     descriptionKey: "settings.profileDescription",
+  },
+  {
+    id: "communications",
+    labelKey: "settings.communications",
+    descriptionKey: "settings.communicationsDescription",
   },
   {
     id: "notifications",
@@ -78,7 +93,8 @@ function resolveSection(raw: string | null): SettingsSection {
     raw === "notifications" ||
     raw === "account" ||
     raw === "profile" ||
-    raw === "language"
+    raw === "language" ||
+    raw === "communications"
   ) {
     return raw;
   }
@@ -427,7 +443,25 @@ export default function SettingsExperience({
               >
                 {isSaving ? t("status.saving") : t("settings.saveProfile")}
               </button>
+
+              <RichProfileEditor
+                initial={profile.rich ?? EMPTY_RICH_PROFILE_BUNDLE}
+              />
             </form>
+          ) : null}
+
+          {activeSection === "communications" ? (
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-2xl font-black tracking-tight">
+                  {t("settings.communicationsHeading")}
+                </h2>
+                <p className="app-ink-secondary mt-1 text-sm">
+                  {t("settings.communicationsIntro")}
+                </p>
+              </div>
+              <CommunicationsPrivacyPanel username={username} />
+            </div>
           ) : null}
 
           {activeSection === "language" ? (

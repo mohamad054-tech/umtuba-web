@@ -15,8 +15,10 @@ import {
   shouldShowMobileBottomNav,
   type MobilePrimaryNavId,
 } from "../lib/nav/mobileNav";
+import { resolveUmLifeActivityBadge } from "../lib/nav/umLifeHomeEntry";
 import { mobileNavLabelKey } from "../../lib/i18n";
 import { useTranslation } from "./i18n";
+import UmLifeIcon from "./nav/UmLifeIcon";
 
 function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
   const stroke = active ? "currentColor" : "currentColor";
@@ -39,6 +41,8 @@ function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
           <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" />
         </svg>
       );
+    case "umLife":
+      return <UmLifeIcon className="h-[22px] w-[22px]" />;
     case "live":
       return (
         <svg {...common}>
@@ -148,13 +152,18 @@ export default function AppMobileBottomNav() {
               : item.href;
           const active = isMobilePrimaryNavActive(pathname, item.id);
           const label = t(mobileNavLabelKey(item.id));
+          const umLifeBadge =
+            item.id === "umLife" ? resolveUmLifeActivityBadge() : null;
 
           return (
             <li key={item.id} className="min-w-0 flex-1">
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                aria-label={label}
+                aria-label={item.id === "umLife" ? t("nav.umLifeAria") : label}
+                data-um-life-badge={
+                  umLifeBadge ? umLifeBadge.capability : undefined
+                }
                 className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${
                   active
                     ? "text-blue-100"

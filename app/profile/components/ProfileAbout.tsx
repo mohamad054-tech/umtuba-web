@@ -79,6 +79,26 @@ export default function ProfileAbout({ profile }: ProfileAboutProps) {
         </section>
       ) : null}
 
+      {(profile.rich?.places.length ?? 0) > 0 ? (
+        <section>
+          <SectionHeading>{t("profile.about.places")}</SectionHeading>
+          <ul className="mt-3 space-y-3">
+            {(profile.rich?.places ?? []).map((place) => (
+              <li key={place.id}>
+                <p className="text-sm font-bold text-white/85" dir="auto">
+                  {place.label}
+                </p>
+                <p className="mt-1 text-sm text-white/55" dir="auto">
+                  {[place.city, place.region, place.country]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {sections.includes("roles") ? (
         <section>
           <SectionHeading>{t("profile.roles")}</SectionHeading>
