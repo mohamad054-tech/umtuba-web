@@ -36,6 +36,8 @@ type ChatWindowProps = {
   onMute?: (option: MuteOption) => void;
   mutePending?: boolean;
   muteError?: string | null;
+  onOpenCamera?: () => void;
+  onOpenVisual?: (message: Message) => void;
 };
 
 export default function ChatWindow({
@@ -67,6 +69,8 @@ export default function ChatWindow({
   onMute,
   mutePending,
   muteError,
+  onOpenCamera,
+  onOpenVisual,
 }: ChatWindowProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -184,6 +188,7 @@ export default function ChatWindow({
               onDeleteForEveryone={onDeleteForEveryone}
               onToggleReaction={onToggleReaction}
               onReplyPreviewClick={scrollToMessage}
+              onOpenVisual={onOpenVisual}
             />
           ))
         )}
@@ -224,6 +229,7 @@ export default function ChatWindow({
         editingMessage={editingMessage}
         onCancelEdit={onCancelEdit}
         onSaveEdit={onSaveEdit}
+        onOpenCamera={onOpenCamera}
       />
     </section>
   );

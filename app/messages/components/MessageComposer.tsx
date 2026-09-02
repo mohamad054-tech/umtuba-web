@@ -25,11 +25,12 @@ type MessageComposerProps = {
   editingMessage?: Message | null;
   onCancelEdit?: () => void;
   onSaveEdit?: (text: string) => boolean | Promise<boolean>;
+  onOpenCamera?: () => void;
 };
 
 /**
- * Production composer: text field + emoji helper + Send only.
- * Attachment / voice controls are not rendered (no unfinished affordances).
+ * Production composer: text, official camera entry, emoji helper, and Send.
+ * File-attach / voice controls are not rendered.
  *
  * Keyboard: Enter sends; Shift+Enter inserts a newline.
  */
@@ -43,6 +44,7 @@ export default function MessageComposer({
   editingMessage = null,
   onCancelEdit,
   onSaveEdit,
+  onOpenCamera,
 }: MessageComposerProps) {
   const { t } = useTranslation();
   const [draft, setDraft] = useState("");
@@ -158,6 +160,17 @@ export default function MessageComposer({
       ) : null}
 
       <div className="flex items-end gap-2">
+        {onOpenCamera && !isEditing ? (
+          <button
+            type="button"
+            onClick={onOpenCamera}
+            disabled={disabled || pending}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-400/10 text-lg text-amber-200 transition hover:bg-amber-400/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200 disabled:opacity-50"
+            aria-label={t("umStreak.camera")}
+          >
+            <span aria-hidden="true">📷</span>
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setShowEmoji((open) => !open)}

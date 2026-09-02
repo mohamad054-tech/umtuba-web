@@ -6,6 +6,7 @@ import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import type { Conversation, MuteOption } from "../types";
 import { MUTE_OPTION_LABELS, MUTE_OPTIONS } from "../lib/muteOptions";
 import OnlineStatusDot from "./OnlineStatusDot";
+import UmStreakStatus from "./UmStreakStatus";
 
 type ChatHeaderProps = {
   conversation: Conversation;
@@ -92,9 +93,14 @@ export default function ChatHeader({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-black text-white">
-          {conversation.peerName}
-        </p>
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="truncate text-sm font-black text-white">
+            {conversation.peerName}
+          </p>
+          {conversation.umStreak ? (
+            <UmStreakStatus streak={conversation.umStreak} compact />
+          ) : null}
+        </div>
         {subtitle ? (
           <p className="truncate text-xs text-white/45" aria-live="polite">
             {subtitle}

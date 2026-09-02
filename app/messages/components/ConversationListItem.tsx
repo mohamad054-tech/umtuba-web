@@ -2,6 +2,7 @@ import { allowMessengerPreviewChrome } from "../../lib/product/surfaceGates";
 import { formatMessageTime, type Conversation } from "../types";
 import OnlineStatusDot from "./OnlineStatusDot";
 import UnreadBadge from "./UnreadBadge";
+import UmStreakStatus from "./UmStreakStatus";
 
 type ConversationListItemProps = {
   conversation: Conversation;
@@ -55,8 +56,11 @@ export default function ConversationListItem({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm font-bold text-white">
-            {conversation.peerName}
+          <p className="flex min-w-0 items-center gap-2 truncate text-sm font-bold text-white">
+            <span className="truncate">{conversation.peerName}</span>
+            {conversation.umStreak && conversation.umStreak.currentStreak > 0 ? (
+              <UmStreakStatus streak={conversation.umStreak} compact />
+            ) : null}
             {conversation.isMuted ? (
               <span className="ml-1 text-[10px] font-bold uppercase tracking-wide text-white/35">
                 Muted

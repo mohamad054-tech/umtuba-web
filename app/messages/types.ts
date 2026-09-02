@@ -21,6 +21,33 @@ export type MessageReplyPreview = {
   unavailable: boolean;
 };
 
+export type VisualMessageView = {
+  mediaType: "image" | "video";
+  caption: string | null;
+  viewed: boolean;
+  openedAt: string | null;
+  expirationPolicy: "view_once" | "disappear_after_view";
+  previewUrl?: string | null;
+  demoOnly?: boolean;
+};
+
+export type UmStreakViewerView = {
+  state:
+    | "none"
+    | "started"
+    | "active_today"
+    | "waiting_for_friend"
+    | "you_need_to_reply"
+    | "at_risk";
+  currentStreak: number;
+  longestStreak: number;
+  badges: Array<{
+    days: 3 | 7 | 30 | 100 | 365;
+    earned: boolean;
+    earnedAt: string | null;
+  }>;
+};
+
 export type Message = {
   id: string;
   conversationId: string;
@@ -41,6 +68,7 @@ export type Message = {
   deletedAt?: string | null;
   isDeleted?: boolean;
   reactions?: MessageReactionSummary[];
+  visual?: VisualMessageView | null;
 };
 
 export type MuteOption = "1h" | "8h" | "1w" | "forever" | "off";
@@ -65,6 +93,7 @@ export type Conversation = {
   mutedUntil?: string | null;
   /** Peer's last_read_at — used for Delivered/Seen on own messages */
   peerLastReadAt?: string | null;
+  umStreak?: UmStreakViewerView | null;
 };
 
 export function initialsFromName(name: string) {

@@ -14,6 +14,9 @@ export type MessengerMessageRow = {
   edited_at?: string | null;
   reply_to_message_id?: string | null;
   client_id: string | null;
+  visual_opened_at?: string | null;
+  visual_expires_at?: string | null;
+  visual_expiration_policy?: string | null;
 };
 
 export function mapMessengerMessageRow(
@@ -74,6 +77,20 @@ export function mapMessengerMessageRow(
     deletedAt: row.deleted_at,
     isDeleted,
     reactions: options?.reactions,
+    visual:
+      row.message_type === "image" || row.message_type === "video"
+        ? {
+            mediaType: row.message_type,
+            caption: isDeleted ? null : row.body,
+            viewed: Boolean(row.visual_opened_at),
+            openedAt: row.visual_opened_at ?? null,
+            expirationPolicy:
+              row.visual_expiration_policy === "disappear_after_view"
+                ? "disappear_after_view"
+                : "view_once",
+            previewUrl: null,
+          }
+        : null,
     receiptStatus: computeReceiptStatus({
       isMine,
       sentAt: row.created_at,

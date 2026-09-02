@@ -25,6 +25,7 @@ type MessageBubbleProps = {
   onDeleteForEveryone?: (message: Message) => void;
   onToggleReaction?: (message: Message, emoji: MessageReactionEmoji) => void;
   onReplyPreviewClick?: (messageId: string) => void;
+  onOpenVisual?: (message: Message) => void;
 };
 
 function receiptLabel(message: Message): string | null {
@@ -46,6 +47,7 @@ export default function MessageBubble({
   onDeleteForEveryone,
   onToggleReaction,
   onReplyPreviewClick,
+  onOpenVisual,
 }: MessageBubbleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [reactOpen, setReactOpen] = useState(false);
@@ -123,9 +125,52 @@ export default function MessageBubble({
             </button>
           ) : null}
 
-          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed [overflow-wrap:anywhere]">
-            {message.text}
-          </p>
+          {message.visual && !message.isDeleted ? (
+            <div className="mb-2 space-y-2">
+              {message.visual.previewUrl ? (
+                message.visual.mediaType === "video" ? (
+                  <video
+                    src={message.visual.previewUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="max-h-72 w-full rounded-2xl bg-black"
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element -- signed or local preview
+                  <img
+                    src={message.visual.previewUrl}
+                    alt=""
+                    className="max-h-72 w-full rounded-2xl object-cover"
+                  />
+                )
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onOpenVisual?.(message)}
+                  className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-amber-300/30 bg-black/30 px-3 py-6 text-sm font-bold text-amber-100"
+                  aria-label={
+                    message.visual.viewed && !message.isMine
+                      ? "Opened visual message"
+                      : "Open visual message"
+                  }
+                >
+                  {message.visual.viewed && !message.isMine
+                    ? "Opened · view once"
+                    : "View once"}
+                </button>
+              )}
+              {message.visual.caption ? (
+                <p className="whitespace-pre-wrap break-words text-sm leading-relaxed [overflow-wrap:anywhere]">
+                  {message.visual.caption}
+                </p>
+              ) : null}
+            </div>
+          ) : (
+            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed [overflow-wrap:anywhere]">
+              {message.text}
+            </p>
+          )}
 
           <div
             className={`mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] font-medium ${

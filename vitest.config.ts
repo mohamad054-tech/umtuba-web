@@ -41,6 +41,7 @@ export default defineConfig({
       "lib/aiDataPlatform/**/*.test.ts",
       "lib/knowledgeAcquisition/**/*.test.ts",
       "lib/i18n/**/*.test.ts",
+      "lib/umStreak/**/*.test.ts",
       "lib/video/**/*.test.ts",
       "app/learning/**/*.test.ts",
       "lib/translationStudio/**/*.test.ts",

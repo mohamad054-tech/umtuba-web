@@ -47,11 +47,12 @@ describe("messenger preview gate", () => {
 });
 
 describe("messenger production UI contracts", () => {
-  it("production composer exposes text + send only (no attach/voice)", () => {
+  it("production composer exposes text, camera, and send (no attach/voice)", () => {
     const composer = read("app/messages/components/MessageComposer.tsx");
-    expect(composer).toMatch(/Send message/);
     expect(composer).toMatch(/messenger-composer-input/);
     expect(composer).toMatch(/Enter sends/);
+    expect(composer).toMatch(/onOpenCamera/);
+    expect(composer).toMatch(/umStreak.camera/);
     expect(composer).not.toMatch(/Attachments coming soon/i);
     expect(composer).not.toMatch(/Voice messages coming soon/i);
     expect(composer).not.toMatch(/aria-label="Attach file"/);

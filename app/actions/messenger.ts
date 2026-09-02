@@ -17,7 +17,17 @@ import {
   type ActionResult,
   type MessagesPageDTO,
 } from "../../lib/supabase/messenger";
-import type { Conversation, Message, MuteOption } from "../messages/types";
+import {
+  getConversationUmStreak,
+  openVisualMessage,
+  sendVisualMessage,
+} from "../../lib/supabase/umStreakMessenger";
+import type {
+  Conversation,
+  Message,
+  MuteOption,
+  UmStreakViewerView,
+} from "../messages/types";
 import { isMuteOption } from "../messages/lib/muteOptions";
 import { isMessageReactionEmoji } from "../messages/types";
 
@@ -358,4 +368,76 @@ export async function getCurrentUserIdAction(): Promise<
   }
 
   return { ok: true, userId: user.id };
+}
+
+export async function sendVisualMessageAction(input: {
+  conversationId: string;
+  storagePath: string;
+  mimeType: string;
+  mediaType: "image" | "video";
+  caption?: string | null;
+  clientId?: string | null;
+  byteSize?: number | null;
+}): Promise<ActionResult<{ message: Message }>> {
+  const parsed = parseUuid(input.conversationId, "conversation");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: "Please sign in to send a visual message.",
+      requiresAuth: true,
+    };
+  }
+
+  const supabase = await createClient();
+  return sendVisualMessage(supabase, user.id, {
+    ...input,
+    conversationId: parsed.id,
+  });
+}
+
+export async function openVisualMessageAction(
+  messageId: string
+): Promise<ActionResult<{ message: Message; signedUrl: string | null }>> {
+  const parsed = parseUuid(messageId, "message");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: "Please sign in.",
+      requiresAuth: true,
+    };
+  }
+
+  const supabase = await createClient();
+  return openVisualMessage(supabase, user.id, parsed.id);
+}
+
+export async function getConversationUmStreakAction(
+  conversationId: string
+): Promise<ActionResult<{ streak: UmStreakViewerView | null }>> {
+  const parsed = parseUuid(conversationId, "conversation");
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const user = await getServerUser();
+  if (!user) {
+    return {
+      ok: false,
+      message: "Please sign in.",
+      requiresAuth: true,
+    };
+  }
+
+  const supabase = await createClient();
+  return getConversationUmStreak(supabase, user.id, parsed.id);
 }

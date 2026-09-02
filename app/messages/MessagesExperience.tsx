@@ -12,10 +12,18 @@ import {
   markConversationReadAction,
   openDirectConversationAction,
   sendMessageAction,
+  sendVisualMessageAction,
+  openVisualMessageAction,
+  getConversationUmStreakAction,
   setConversationMuteAction,
   setTypingAction,
   toggleReactionAction,
 } from "../actions/messenger";
+import { uploadPrivateVisualMedia } from "../../lib/umStreak/upload";
+import QuickSocialCamera, {
+  type CapturedVisual,
+} from "./components/QuickSocialCamera";
+import { useTranslation } from "../components/i18n";
 import { buildConversationHref, isUuid } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import ConversationList from "./components/ConversationList";
@@ -87,6 +95,9 @@ export default function MessagesExperience({
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const [mutePending, setMutePending] = useState(false);
   const [muteError, setMuteError] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraPending, setCameraPending] = useState(false);
+  const { t } = useTranslation();
   const typingTimerRef = useRef<number | null>(null);
   const typingActiveRef = useRef(false);
   const openedPeerRef = useRef<string | null>(null);
@@ -239,6 +250,18 @@ export default function MessagesExperience({
 
     const latest = result.messages[result.messages.length - 1];
     void markConversationReadAction(conversationId, latest?.id ?? null);
+    void getConversationUmStreakAction(conversationId).then((streakResult) => {
+      if (!streakResult.ok) {
+        return;
+      }
+      setConversations((prev) =>
+        prev.map((conversation) =>
+          conversation.id === conversationId
+            ? { ...conversation, umStreak: streakResult.streak }
+            : conversation
+        )
+      );
+    });
     setThreadLoading(false);
     return true;
   }
@@ -873,6 +896,94 @@ export default function MessagesExperience({
     );
   }
 
+  async function handleSendVisual(captured: CapturedVisual): Promise<void> {
+    if (cameraPending) {
+      return;
+    }
+    setCameraPending(true);
+    setSendError(null);
+
+    try {
+      for (const conversationId of captured.conversationIds) {
+        const uploaded = await uploadPrivateVisualMedia({
+          file: captured.blob,
+          conversationId,
+          mimeType: captured.mimeType,
+        });
+        if (!uploaded.ok) {
+          setSendError(sanitizeUserFacingMessage(uploaded.message));
+          return;
+        }
+
+        const clientId = createClientId();
+        const result = await sendVisualMessageAction({
+          conversationId,
+          storagePath: uploaded.path,
+          mimeType: captured.mimeType,
+          mediaType: captured.mediaType,
+          caption: captured.caption,
+          clientId,
+          byteSize: uploaded.byteSize,
+        });
+        if (!result.ok) {
+          setSendError(sanitizeUserFacingMessage(result.message));
+          return;
+        }
+
+        setConversations((prev) =>
+          prev.map((conversation) =>
+            conversation.id === conversationId
+              ? {
+                  ...conversation,
+                  lastMessagePreview: result.message.text || captured.caption,
+                  lastMessageAt: result.message.sentAt,
+                  messages: [...conversation.messages, result.message],
+                }
+              : conversation
+          )
+        );
+        void getConversationUmStreakAction(conversationId).then((streakResult) => {
+          if (!streakResult.ok) {
+            return;
+          }
+          setConversations((prev) =>
+            prev.map((conversation) =>
+              conversation.id === conversationId
+                ? { ...conversation, umStreak: streakResult.streak }
+                : conversation
+            )
+          );
+        });
+      }
+      setCameraOpen(false);
+    } finally {
+      setCameraPending(false);
+    }
+  }
+
+  async function handleOpenVisual(message: Message) {
+    if (message.visual?.demoOnly) {
+      return;
+    }
+    const result = await openVisualMessageAction(message.id);
+    if (!result.ok) {
+      setSendError(sanitizeUserFacingMessage(result.message));
+      return;
+    }
+    setConversations((prev) =>
+      prev.map((conversation) =>
+        conversation.id === message.conversationId
+          ? {
+              ...conversation,
+              messages: conversation.messages.map((item) =>
+                item.id === message.id ? result.message : item
+              ),
+            }
+          : conversation
+      )
+    );
+  }
+
   function handleComposerTyping() {
     if (!selectedId || sending || editingMessage) {
       return;
@@ -913,6 +1024,8 @@ export default function MessagesExperience({
                 ? `Start chatting with ${creatorName}`
                 : "Message a creator from their profile or Discover to begin."
             }
+            onOpenCamera={() => setCameraOpen(true)}
+            cameraLabel={t("umStreak.camera")}
           />
         </div>
 
@@ -980,9 +1093,20 @@ export default function MessagesExperience({
             onMute={(option) => void handleMute(option)}
             mutePending={mutePending}
             muteError={muteError}
+            onOpenCamera={() => setCameraOpen(true)}
+            onOpenVisual={(message) => void handleOpenVisual(message)}
           />
         </div>
       </div>
+      <QuickSocialCamera
+        open={cameraOpen}
+        conversations={conversations}
+        defaultConversationId={selectedId}
+        onClose={() => setCameraOpen(false)}
+        onCapture={(captured) => void handleSendVisual(captured)}
+        pending={cameraPending}
+        statusMessage={sendError}
+      />
     </MessagesShell>
   );
 }

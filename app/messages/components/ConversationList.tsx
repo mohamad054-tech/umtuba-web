@@ -12,6 +12,8 @@ type ConversationListProps = {
   error?: string | null;
   onRetry?: () => void;
   emptyHint?: string;
+  onOpenCamera?: () => void;
+  cameraLabel?: string;
 };
 
 export default function ConversationList({
@@ -24,6 +26,8 @@ export default function ConversationList({
   error = null,
   onRetry,
   emptyHint = "Message a creator from their profile or Discover to begin.",
+  onOpenCamera,
+  cameraLabel = "Camera",
 }: ConversationListProps) {
   return (
     <aside className="flex h-full min-h-0 flex-col rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
@@ -32,6 +36,15 @@ export default function ConversationList({
           Inbox
         </p>
         <ConversationSearch value={searchQuery} onChange={onSearchChange} />
+        {onOpenCamera ? (
+          <button
+            type="button"
+            onClick={onOpenCamera}
+            className="mt-3 flex min-h-11 w-full items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-400/10 text-sm font-black text-amber-100"
+          >
+            {cameraLabel}
+          </button>
+        ) : null}
       </div>
 
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
@@ -63,7 +76,7 @@ export default function ConversationList({
             </p>
             {!searchQuery.trim() ? (
               <p className="mt-2 text-xs text-white/35">
-                Text text messaging only — no attachments or voice yet.
+                Send a private visual from the camera. It stays in Messages, not UM Life.
               </p>
             ) : null}
           </div>
