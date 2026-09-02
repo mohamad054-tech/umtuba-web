@@ -1,6 +1,6 @@
 -- UMTUBA Communications V1 Part 1B — Identity + Discovery + Privacy
 -- AUTHORIZED_MIGRATION_SCOPE = COMMUNICATIONS_IDENTITY_DISCOVERY_ONLY
--- Additive only. Separate from 20260915_rich_personal_profile_foundation_v1.sql.
+-- Additive only. Separate from 20260935_rich_personal_profile_foundation_v1.sql.
 -- Does NOT add phone/email to public.profiles.
 -- Does NOT create groups, calls, RTC, message-media, friends, or communities.
 -- Does NOT copy auth.users.email to any public table.

@@ -92,10 +92,10 @@ describe("discovery not-found copy", () => {
 describe("communications migration and reuse", () => {
   it("keeps phone/email off public.profiles and reuses get_or_create", () => {
     const migration = read(
-      "supabase/migrations/20260916_communications_identity_discovery_v1.sql"
+      "supabase/migrations/20260936_communications_identity_discovery_v1.sql"
     );
     const profileMigration = read(
-      "supabase/migrations/20260915_rich_personal_profile_foundation_v1.sql"
+      "supabase/migrations/20260935_rich_personal_profile_foundation_v1.sql"
     );
     const messenger = read("lib/supabase/messenger.ts");
     const start = read("app/messages/components/StartConversationPanel.tsx");
@@ -114,6 +114,8 @@ describe("communications migration and reuse", () => {
     expect(migration).toMatch(/phone_verified_at is not null/);
     expect(migration).toMatch(/find_by_email in \('nobody', 'everyone'\)/);
     expect(migration).toMatch(/default 'nobody'/);
+    expect(migration).toMatch(/on conflict \(user_id\)/);
+    expect(migration).not.toMatch(/on conflict on constraint/i);
     expect(migration).toMatch(/MUTE != BLOCK/);
     expect(migration).toMatch(/CONTACT_SYNC foundation/);
     expect(migration).not.toMatch(/alter table public\.profiles/);
@@ -139,7 +141,7 @@ describe("communications migration and reuse", () => {
 
   it("does not grant digest or public identity helpers to clients", () => {
     const migration = read(
-      "supabase/migrations/20260916_communications_identity_discovery_v1.sql"
+      "supabase/migrations/20260936_communications_identity_discovery_v1.sql"
     );
     expect(migration).toMatch(
       /revoke all on function public\.comms_identity_digest/

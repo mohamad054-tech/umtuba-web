@@ -104,7 +104,7 @@ function discoveryError(error: { message?: string; code?: string }): ActionResul
     return {
       ok: false,
       message:
-        "Communications discovery is not set up on this project yet. Apply 20260916_communications_identity_discovery_v1.sql locally.",
+        "Communications discovery is not set up on this project yet. Apply 20260936_communications_identity_discovery_v1.sql locally.",
     };
   }
   return { ok: false, message: error.message || "Unable to look up this person." };

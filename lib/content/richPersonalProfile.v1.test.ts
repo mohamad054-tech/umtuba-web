@@ -9,7 +9,7 @@ import { EMPTY_RICH_PROFILE_BUNDLE } from "../supabase/richProfile";
 
 const ROOT = process.cwd();
 const MIGRATION =
-  "supabase/migrations/20260915_rich_personal_profile_foundation_v1.sql";
+  "supabase/migrations/20260935_rich_personal_profile_foundation_v1.sql";
 
 function read(rel: string) {
   return readFileSync(join(ROOT, rel), "utf8");

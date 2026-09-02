@@ -1,61 +1,64 @@
 ﻿# Current Task
 
-## Task title
+> 2026-09-02 PC2. Owner GO: SOCIAL + COMMUNICATIONS + RICH PROFILE — MIGRATION RENUMBER AND SOURCE INTEGRATION V1.
 
-DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+**Authoritative stop before this GO:** `docs/ai/PC2_2026_08_31_END_OF_DAY_PRESERVATION.md` (SOURCE_PASS_MIGRATION_HOLD).
 
-## Status
+**This worktree only.** Isolated from the dirty primary checkout and from UM Streak.
 
-**FINAL COMPLETE.** Central-accepted Learning productization is preserved in a clean local commit. Production build passes. Do not push. Do not deploy. Do not apply `20260934`. Do not redesign.
-
-```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-DATE = 2026-08-24
-MACHINE = DESKTOP
-OPERATOR = DESKTOP / WEB LEARNING
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
-TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-BRANCH = desktop/learning-approved-design-productization-v1
-COMMIT_CREATED = YES
-PUSHED = NO
-DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
-LOCAL_PREVIEW_URL = http://localhost:3018/learning
+```text
+TASK_ID = PC2_SOCIAL_COMM_RICH_PROFILE_RENUMBER_INTEGRATE_V1
+STATUS = SOURCE_INTEGRATED_RENUMBERED_LOCAL_ONLY
+PRIMARY_TARGET = LOCAL_INTEGRATION_BRANCH
+PRODUCTION = STRICTLY_FORBIDDEN
+DEVICE = PC2
+AUTHORITATIVE_BASE_REF = origin/alpha-0.2
+AUTHORITATIVE_BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+BASE_MOVED = NO
+CANDIDATE_SHA = 75b3896c6a3852258f4e303c4cb54c17d1da5836
+PC2_CANDIDATE_PRODUCT_SHA = 814226776ced7325b174665f773906e163efcb2d
+LOCAL_REVIEW_FIX_INCLUDED = YES
+INTEGRATION_BRANCH = pc2/social-comm-rich-profile-renumber-integrate-v1
+INTEGRATION_WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-web-social-comm-rich-profile-renumber-integrate-v1
+RICH_PROFILE_MIGRATION = 20260935
+COMMUNICATIONS_MIGRATION = 20260936
+OLD_RICH_PROFILE = 20260915_rich_personal_profile_foundation_v1.sql
+NEW_RICH_PROFILE = 20260935_rich_personal_profile_foundation_v1.sql
+OLD_COMMUNICATIONS = 20260916_communications_identity_discovery_v1.sql
+NEW_COMMUNICATIONS = 20260936_communications_identity_discovery_v1.sql
+SQL_SEMANTICS_CHANGED = NO
+ON_CONFLICT_USER_ID_PRESERVED = YES
+UM_STREAK_20260937_INCLUDED = NO
+PRODUCTION_DB_TOUCHED = NO
+PRODUCTION_DEPLOYED = NO
+ORIGIN_ALPHA_PUSHED = NO
+FORCE_PUSH = NO
+PUSH = NO
+MERGE_TO_ALPHA = NO
+READY_FOR_MIGRATION_APPLICATION = NO
+READY_FOR_PRODUCTION_DEPLOY = NO
+NEXT_REQUIRED_GATE = TARGETED_MIGRATION_APPLY_GO
 ```
 
 ## Allowed scope
 
-Closed. Next work requires a new Central GO.
+- Isolated worktree/branch from `origin/alpha-0.2`
+- Source-merge candidate `75b3896c` (includes product `81422677` + welcome-nav fix)
+- Renumber `20260915` → `20260935` and `20260916` → `20260936`
+- Filename reference updates
+- Local typecheck / tests / build / commit on this branch only
 
 ## Forbidden scope
 
-- Do not push unless explicitly authorized.
-- Do not deploy. Do not apply `20260934`. Do not create a new migration.
-- Do not redesign. Do not touch `umtuba-mobile`.
-- Do not write to the Windows Desktop. `_port_extract` protected.
+- Apply `20260935` / `20260936` to production
+- `db push` / `--linked` write / any hosted SQL write
+- Deploy
+- Force push
+- Push or fast-forward `origin/alpha-0.2`
+- Include UM Streak `20260937`
+- Reset / clean the dirty primary checkout
+- Expose secrets
 
-## Prior completed tasks (history — do not delete artifacts)
+## STOP
 
-- `DESKTOP_UMTUBA_LEARNING_APPROVED_DESIGN_PRODUCTIZATION_V1` COMPLETE_CANDIDATE / ACCEPTED_BY_CENTRAL.
-- `DESKTOP_UMTUBA_LEARNING_WORLD_CLASS_VISUAL_DESIGN_V1` APPROVED_BY_OWNER.
-- `DESKTOP_UMTUBA_LEARNING_TEACHER_STUDENT_PLATFORM_V1` HANDOFF_DEPOSITED.
-
-## Residual
-
-Authenticated writes / RLS not exercised. `20260934` not applied. `e7c84c66` still not fetchable. Push not authorized.
+Live DB apply and deploy need separate GOs. Do not start them.
