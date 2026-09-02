@@ -154,7 +154,7 @@ describe("communications migration and reuse", () => {
       "supabase/migrations/20260936_communications_identity_discovery_v1.sql"
     );
     expect(migration).toMatch(
-      /revoke all on function public\.comms_identity_digest/
+      /revoke all on function public\.comms_identity_digest\(text\) from anon, authenticated, service_role/
     );
     expect(migration).toMatch(
       /revoke all on function public\.comms_public_identity/
@@ -173,6 +173,49 @@ describe("communications migration and reuse", () => {
     expect(migration).not.toMatch(
       /grant select, insert, update, delete on table public\.communication_phone_identities/
     );
+  });
+
+  it("reads the named Vault pepper and fails closed with no public fallback", () => {
+    const migration = read(
+      "supabase/migrations/20260936_communications_identity_discovery_v1.sql"
+    );
+    const digest = migration.slice(
+      migration.indexOf("create or replace function public.comms_identity_digest"),
+      migration.indexOf("create or replace function public.comms_normalize_email")
+    );
+
+    expect(digest).toMatch(/vault\.decrypted_secrets/);
+    expect(digest).toMatch(/communications_identity_pepper/);
+    expect(digest).toMatch(/if v_uid is null then/);
+    expect(digest).toMatch(/Communications identity pepper is not configured/);
+    expect(digest).toMatch(/set search_path = public, extensions/);
+    expect(digest).not.toMatch(/umtuba-comms-identity-v1/);
+    expect(digest).not.toMatch(/app\.settings\.comms_identity_pepper/);
+    expect(digest).not.toMatch(/current_setting\(/);
+    expect(migration).not.toMatch(
+      /ALTER DATABASE postgres SET app\.settings\.comms_identity_pepper/
+    );
+    expect(migration).not.toMatch(/select vault\.create_secret\(/);
+    expect(migration).not.toMatch(/perform vault\.create_secret\(/);
+    expect(migration).toMatch(
+      /revoke all on function vault\.create_secret\(text, text, text\) from public, anon, authenticated/
+    );
+    expect(migration).toMatch(
+      /revoke usage on schema vault from public, anon, authenticated/
+    );
+    expect(migration).toMatch(
+      /revoke all on table vault\.decrypted_secrets from public, anon, authenticated/
+    );
+    expect(migration).toMatch(/ugc_users_are_blocked/);
+
+    const phoneRpc = migration.slice(
+      migration.indexOf("create or replace function public.discover_user_by_phone"),
+      migration.indexOf("create or replace function public.get_own_communication_privacy")
+    );
+    expect(phoneRpc).toMatch(
+      /on conflict on constraint communication_privacy_settings_pkey do nothing/
+    );
+    expect(phoneRpc).not.toMatch(/on conflict \(user_id\)/);
   });
 
   it("wires start conversation and settings privacy without a second messenger", () => {

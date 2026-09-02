@@ -6,55 +6,109 @@
 -- Does NOT copy auth.users.email to any public table.
 -- Local/dev apply only — never remote production from this task.
 --
--- BLOCK HOOK (not created): MUTE != BLOCK. Future public.user_blocks
--- (blocker_id, blocked_id, created_at) should fail-closed inside
--- get_or_create_direct_conversation and message send. Discovery defaults
--- (email nobody, phone nobody, unverified phones never match) are enough
--- to ship this part without a fake block product.
+-- MUTE != BLOCK. Phone discovery fail-closes via existing
+-- public.ugc_users_are_blocked (generic not-found). Email discovery is
+-- unchanged. Message send still uses the 20260928 block trigger.
 --
 -- CONTACT_SYNC = FOUNDATION_ONLY. State + revoke only. No raw address book.
 -- PHONE_VERIFICATION_RUNTIME = FOUNDATION_ONLY. phone_verified_at stays null
 -- until a real OTP bind exists. Do not mark verified from this migration.
 --
--- Hash pepper: optional Postgres setting app.settings.comms_identity_pepper.
--- Do not commit the production pepper. If unset, a documented domain
--- separator is used (not a secret). Set the pepper on the database before
--- first production apply:
---   ALTER DATABASE postgres SET app.settings.comms_identity_pepper = '...';
+-- Hash pepper: required Vault secret named communications_identity_pepper.
+-- Read only inside SECURITY DEFINER helpers via vault.decrypted_secrets.
+-- This migration never inserts a pepper value. Operators create the named
+-- secret out-of-band. If the secret is missing or empty, phone hash and
+-- phone discovery fail closed and write no hash. There is no public
+-- domain-separator fallback and no app.settings.comms_identity_pepper /
+-- ALTER DATABASE pepper.
 
 -- ---------------------------------------------------------------------------
 -- 1. Internal digest (never granted to clients)
 -- ---------------------------------------------------------------------------
 
+-- Vault is INTERNAL only. Clients must never read secrets.
+-- Do not revoke pgsodium/vault internals (permission denied on some hosts).
+do $$
+begin
+  if to_regnamespace('vault') is null then
+    raise exception 'vault schema is required for communications identity pepper';
+  end if;
+
+  revoke usage on schema vault from public, anon, authenticated;
+  grant usage on schema vault to current_user;
+
+  if to_regclass('vault.decrypted_secrets') is not null then
+    execute 'revoke all on table vault.decrypted_secrets from public, anon, authenticated';
+    execute 'grant select on table vault.decrypted_secrets to current_user';
+  end if;
+  if to_regclass('vault.secrets') is not null then
+    execute 'revoke all on table vault.secrets from public, anon, authenticated';
+  end if;
+
+  begin
+    execute 'revoke all on function vault.create_secret(text, text, text) from public, anon, authenticated';
+  exception
+    when undefined_function then
+      null;
+  end;
+  begin
+    execute 'revoke all on function vault.create_secret(text, text, text, uuid) from public, anon, authenticated';
+  exception
+    when undefined_function then
+      null;
+  end;
+  begin
+    execute 'revoke all on function vault.update_secret(uuid, text, text, text) from public, anon, authenticated';
+  exception
+    when undefined_function then
+      null;
+  end;
+end;
+$$;
+
 create or replace function public.comms_identity_digest(p_normalized text)
 returns text
-language sql
-immutable
+language plpgsql
+stable
 security definer
 set search_path = public, extensions
 as $$
-  select encode(
+declare
+  v_uid uuid := auth.uid();
+  v_pepper text;
+  v_hash text;
+begin
+  if v_uid is null then
+    raise exception 'Authentication required';
+  end if;
+
+  select ds.decrypted_secret
+    into v_pepper
+  from vault.decrypted_secrets as ds
+  where ds.name = 'communications_identity_pepper'
+  limit 1;
+
+  if v_pepper is null or btrim(v_pepper) = '' then
+    raise exception 'Communications identity pepper is not configured';
+  end if;
+
+  v_hash := encode(
     extensions.digest(
-      convert_to(
-        coalesce(
-          nullif(current_setting('app.settings.comms_identity_pepper', true), ''),
-          'umtuba-comms-identity-v1'
-        )
-        || chr(31)
-        || p_normalized,
-        'UTF8'
-      ),
+      convert_to(v_pepper || chr(31) || p_normalized, 'UTF8'),
       'sha256'
     ),
     'hex'
   );
+  v_pepper := null;
+  return v_hash;
+end;
 $$;
 
 comment on function public.comms_identity_digest(text) is
-  'Internal peppered SHA-256. Domain separator if app.settings.comms_identity_pepper is unset. Never expose to clients.';
+  'Internal Vault-peppered SHA-256. Reads named secret communications_identity_pepper from vault.decrypted_secrets. Fails closed if missing. Never expose to clients. Never returns the secret.';
 
 revoke all on function public.comms_identity_digest(text) from public;
-revoke all on function public.comms_identity_digest(text) from anon, authenticated;
+revoke all on function public.comms_identity_digest(text) from anon, authenticated, service_role;
 
 create or replace function public.comms_normalize_email(p_email text)
 returns text
@@ -437,9 +491,13 @@ begin
     return;
   end if;
 
+  if public.ugc_users_are_blocked(v_uid, v_target) then
+    return;
+  end if;
+
   insert into public.communication_privacy_settings (user_id)
   values (v_target)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_privacy_settings_pkey do nothing;
 
   select s.find_by_phone into v_find
   from public.communication_privacy_settings s
@@ -457,7 +515,7 @@ end;
 $$;
 
 comment on function public.discover_user_by_phone(text) is
-  'Verified + everyone-privacy phone lookup. Never returns the number. Unverified and contacts-mode are not-found.';
+  'Verified + everyone-privacy phone lookup. Vault pepper required. Never returns the number. Unverified, contacts-mode, missing pepper, and blocked pairs are not-found / fail-closed.';
 
 revoke all on function public.discover_user_by_phone(text) from public;
 grant execute on function public.discover_user_by_phone(text) to authenticated;

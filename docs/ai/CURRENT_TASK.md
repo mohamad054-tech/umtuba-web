@@ -1,64 +1,48 @@
 ﻿# Current Task
 
-> 2026-09-02 PC2. Owner GO: SOCIAL + COMMUNICATIONS + RICH PROFILE — MIGRATION RENUMBER AND SOURCE INTEGRATION V1.
+> 2026-09-02 PC2. Owner GO: COMMUNICATIONS IDENTITY PEPPER VAULT ADAPTATION V1.
 
-**Authoritative stop before this GO:** `docs/ai/PC2_2026_08_31_END_OF_DAY_PRESERVATION.md` (SOURCE_PASS_MIGRATION_HOLD).
-
-**This worktree only.** Isolated from the dirty primary checkout and from UM Streak.
+**This worktree only.** Isolated from the dirty primary checkout. LOCAL ONLY. STOP after the report. No production Vault, SQL, or apply.
 
 ```text
-TASK_ID = PC2_SOCIAL_COMM_RICH_PROFILE_RENUMBER_INTEGRATE_V1
-STATUS = SOURCE_INTEGRATED_RENUMBERED_LOCAL_ONLY
-PRIMARY_TARGET = LOCAL_INTEGRATION_BRANCH
-PRODUCTION = STRICTLY_FORBIDDEN
+TASK_ID = COMMUNICATIONS_IDENTITY_PEPPER_VAULT_ADAPTATION_V1
+STATUS = COMPLETE
 DEVICE = PC2
-AUTHORITATIVE_BASE_REF = origin/alpha-0.2
-AUTHORITATIVE_BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
-BASE_MOVED = NO
-CANDIDATE_SHA = 75b3896c6a3852258f4e303c4cb54c17d1da5836
-PC2_CANDIDATE_PRODUCT_SHA = 814226776ced7325b174665f773906e163efcb2d
-LOCAL_REVIEW_FIX_INCLUDED = YES
 INTEGRATION_BRANCH = pc2/social-comm-rich-profile-renumber-integrate-v1
 INTEGRATION_WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-web-social-comm-rich-profile-renumber-integrate-v1
-RICH_PROFILE_MIGRATION = 20260935
-COMMUNICATIONS_MIGRATION = 20260936
-OLD_RICH_PROFILE = 20260915_rich_personal_profile_foundation_v1.sql
-NEW_RICH_PROFILE = 20260935_rich_personal_profile_foundation_v1.sql
-OLD_COMMUNICATIONS = 20260916_communications_identity_discovery_v1.sql
-NEW_COMMUNICATIONS = 20260936_communications_identity_discovery_v1.sql
-SQL_SEMANTICS_CHANGED = NO
-ON_CONFLICT_USER_ID_PRESERVED = YES
-UM_STREAK_20260937_INCLUDED = NO
-PRODUCTION_DB_TOUCHED = NO
-PRODUCTION_DEPLOYED = NO
-ORIGIN_ALPHA_PUSHED = NO
-FORCE_PUSH = NO
-PUSH = NO
-MERGE_TO_ALPHA = NO
-READY_FOR_MIGRATION_APPLICATION = NO
-READY_FOR_PRODUCTION_DEPLOY = NO
-NEXT_REQUIRED_GATE = TARGETED_MIGRATION_APPLY_GO
+BASE_SHA = 4eb8e91aff6310d243547790d867690663a6827d
+VAULT_METHOD = vault.decrypted_secrets
+SECRET_NAME = communications_identity_pepper
+MISSING_SECRET_FAIL_CLOSED = PASS
+PUBLIC_VAULT_ACCESS = DENIED
+SECRET_EXPOSED = NO
+PRODUCTION_CHANGED = NO
+MIGRATION_20260934_EDITED = NO
+MIGRATION_20260935_EDITED = NO
+MIGRATION_20260937_EDITED = NO
 ```
 
 ## Allowed scope
 
-- Isolated worktree/branch from `origin/alpha-0.2`
-- Source-merge candidate `75b3896c` (includes product `81422677` + welcome-nav fix)
-- Renumber `20260915` → `20260935` and `20260916` → `20260936`
-- Filename reference updates
-- Local typecheck / tests / build / commit on this branch only
+- `supabase/migrations/20260936_communications_identity_discovery_v1.sql` and related SQL functions only
+- Isolated-worktree docs + contract tests for the Vault / fail-closed pepper rules
+- Local-only disposable Vault secret for PASS then delete for fail-closed
+- Local supabase only (reused existing stack; no `--linked`, no `db push`)
 
 ## Forbidden scope
 
-- Apply `20260935` / `20260936` to production
-- `db push` / `--linked` write / any hosted SQL write
-- Deploy
+- Production Vault / production SQL / hosted apply of `20260935` / `20260936`
+- `db push` / `--linked` apply
+- Edit `20260934` or `20260937`
+- Edit `20260935` unless strictly required (untouched)
+- Reset the dirty primary checkout
+- Touch the UM Streak worktree
+- Deploy or merge alpha
+- Log or display the secret value
 - Force push
-- Push or fast-forward `origin/alpha-0.2`
-- Include UM Streak `20260937`
-- Reset / clean the dirty primary checkout
-- Expose secrets
+- Expose `.env`
+- Put a pepper VALUE in a migration, Git, or source
 
 ## STOP
 
-Live DB apply and deploy need separate GOs. Do not start them.
+Candidate SQL is adapted to Vault. Local gates passed. Do **not** create a production Vault secret or apply `20260935` / `20260936` until a separate Owner GO.
