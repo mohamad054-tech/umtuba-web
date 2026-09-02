@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslation } from "../../components/i18n";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import {
   formatBubbleTime,
@@ -49,6 +50,7 @@ export default function MessageBubble({
   onReplyPreviewClick,
   onOpenVisual,
 }: MessageBubbleProps) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [reactOpen, setReactOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -151,13 +153,13 @@ export default function MessageBubble({
                   className="flex min-h-11 w-full items-center justify-center rounded-2xl border border-amber-300/30 bg-black/30 px-3 py-6 text-sm font-bold text-amber-100"
                   aria-label={
                     message.visual.viewed && !message.isMine
-                      ? "Opened visual message"
-                      : "Open visual message"
+                      ? t("umStreak.opened")
+                      : t("umStreak.viewOnce")
                   }
                 >
                   {message.visual.viewed && !message.isMine
-                    ? "Opened · view once"
-                    : "View once"}
+                    ? t("umStreak.opened")
+                    : t("umStreak.viewOnce")}
                 </button>
               )}
               {message.visual.caption ? (

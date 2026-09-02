@@ -7,12 +7,33 @@ export const UM_STREAK_DEMO_LABEL = "DEMO ONLY";
 
 const USER_A = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
 const USER_B = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
-const CONVERSATION_ID = "cccccccc-cccc-cccc-cccc-cccccccccccc";
+const USER_C = "cccccccc-cccc-cccc-cccc-cccccccccc01";
+const USER_D = "cccccccc-cccc-cccc-cccc-cccccccccc02";
+const USER_E = "cccccccc-cccc-cccc-cccc-cccccccccc03";
+const USER_F = "cccccccc-cccc-cccc-cccc-cccccccccc04";
 
-function message(partial: Partial<Message> & Pick<Message, "id" | "text" | "isMine">): Message {
+const CONV_ACTIVE = "c1111111-1111-1111-1111-111111111111";
+const CONV_WAITING = "c2222222-2222-2222-2222-222222222222";
+const CONV_REPLY = "c3333333-3333-3333-3333-333333333333";
+const CONV_AT_RISK = "c4444444-4444-4444-4444-444444444444";
+const CONV_STARTED = "c5555555-5555-5555-5555-555555555555";
+const CONV_MILESTONE = "c6666666-6666-6666-6666-666666666666";
+
+type Peer = {
+  id: string;
+  name: string;
+  initials: string;
+  gradient: string;
+};
+
+function message(
+  conversationId: string,
+  senderId: string,
+  partial: Partial<Message> & Pick<Message, "id" | "text" | "isMine">
+): Message {
   return {
-    conversationId: CONVERSATION_ID,
-    senderId: partial.isMine ? USER_A : USER_B,
+    conversationId,
+    senderId,
     sentAt: "2026-09-02T15:00:00.000Z",
     messageType: "text",
     ...partial,
@@ -20,16 +41,18 @@ function message(partial: Partial<Message> & Pick<Message, "id" | "text" | "isMi
 }
 
 function conversation(
+  id: string,
+  peer: Peer,
   messages: Message[],
   streak?: UmStreakViewerStatus
 ): Conversation {
   const last = messages[messages.length - 1];
   return {
-    id: CONVERSATION_ID,
-    peerId: USER_B,
-    peerName: "Lina",
-    peerInitials: "LI",
-    peerAvatarGradient: "from-amber-500 to-orange-400",
+    id,
+    peerId: peer.id,
+    peerName: peer.name,
+    peerInitials: peer.initials,
+    peerAvatarGradient: peer.gradient,
     status: "offline",
     lastSeenLabel: "",
     unreadCount: 0,
@@ -65,8 +88,8 @@ export function demoVisual(partial: Partial<VisualMessageRecord> = {}): VisualMe
     id: "dddddddd-dddd-dddd-dddd-dddddddddddd",
     senderId: USER_B,
     recipientId: USER_A,
-    conversationId: CONVERSATION_ID,
-    mediaRef: `${USER_B}/${CONVERSATION_ID}/demo.jpg`,
+    conversationId: CONV_ACTIVE,
+    mediaRef: `${USER_B}/${CONV_ACTIVE}/demo.jpg`,
     mediaType: "image",
     createdAt: "2026-09-02T14:58:00.000Z",
     openedAt: null,
@@ -80,7 +103,7 @@ export function demoVisual(partial: Partial<VisualMessageRecord> = {}): VisualMe
 
 export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") {
   const today = utcDayKey(nowIso);
-  const visualUnopened = message({
+  const visualUnopened = message(CONV_ACTIVE, USER_B, {
     id: "visual-unopened",
     text: "Good morning",
     isMine: false,
@@ -95,7 +118,7 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
       demoOnly: true,
     },
   });
-  const visualOpened = message({
+  const visualOpened = message(CONV_ACTIVE, USER_B, {
     id: "visual-opened",
     text: "",
     isMine: false,
@@ -125,6 +148,8 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
   );
   const waiting = viewerStatus(
     demoStreakRecord({
+      userHighId: USER_C,
+      pairKey: `${USER_A}:${USER_C}`,
       currentStreak: 7,
       longestStreak: 7,
       lastQualifyingDayLow: today,
@@ -135,14 +160,44 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
     USER_A,
     today
   );
+  const youNeedToReply = viewerStatus(
+    demoStreakRecord({
+      userHighId: USER_D,
+      pairKey: `${USER_A}:${USER_D}`,
+      currentStreak: 4,
+      longestStreak: 4,
+      lastQualifyingDayLow: null,
+      lastQualifyingDayHigh: today,
+      lastCompletedStreakDay: "2026-09-01",
+      streakState: "waiting_for_friend",
+    }),
+    USER_A,
+    today
+  );
   const atRisk = viewerStatus(
     demoStreakRecord({
+      userHighId: USER_E,
+      pairKey: `${USER_A}:${USER_E}`,
       currentStreak: 7,
       longestStreak: 7,
       lastQualifyingDayLow: null,
       lastQualifyingDayHigh: null,
       lastCompletedStreakDay: "2026-09-01",
       streakState: "at_risk",
+    }),
+    USER_A,
+    today
+  );
+  const started = viewerStatus(
+    demoStreakRecord({
+      userHighId: USER_F,
+      pairKey: `${USER_A}:${USER_F}`,
+      currentStreak: 1,
+      longestStreak: 1,
+      lastQualifyingDayLow: today,
+      lastQualifyingDayHigh: today,
+      lastCompletedStreakDay: today,
+      streakState: "started",
     }),
     USER_A,
     today
@@ -160,20 +215,68 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
     today
   );
 
+  const conversationActive = conversation(
+    CONV_ACTIVE,
+    { id: USER_B, name: "Lina", initials: "LI", gradient: "from-amber-500 to-orange-400" },
+    [visualUnopened],
+    active
+  );
+  const conversationWaiting = conversation(
+    CONV_WAITING,
+    { id: USER_C, name: "Omar", initials: "OM", gradient: "from-violet-500 to-fuchsia-400" },
+    [message(CONV_WAITING, USER_A, { id: "wait-1", text: "Sent a visual today", isMine: true })],
+    waiting
+  );
+  const conversationReply = conversation(
+    CONV_REPLY,
+    { id: USER_D, name: "Nour", initials: "NO", gradient: "from-emerald-500 to-teal-400" },
+    [message(CONV_REPLY, USER_D, { id: "reply-1", text: "Your friend sent a visual", isMine: false })],
+    youNeedToReply
+  );
+  const conversationAtRisk = conversation(
+    CONV_AT_RISK,
+    { id: USER_E, name: "Sami", initials: "SA", gradient: "from-rose-500 to-pink-400" },
+    [message(CONV_AT_RISK, USER_A, { id: "risk-1", text: "Yesterday’s streak", isMine: true })],
+    atRisk
+  );
+  const conversationStarted = conversation(
+    CONV_STARTED,
+    { id: USER_F, name: "Hana", initials: "HA", gradient: "from-indigo-500 to-sky-400" },
+    [message(CONV_STARTED, USER_A, { id: "start-1", text: "First UM Streak day", isMine: true })],
+    started
+  );
+  const conversationMilestone = conversation(
+    CONV_MILESTONE,
+    { id: USER_B, name: "Lina", initials: "LI", gradient: "from-amber-500 to-orange-400" },
+    [visualUnopened],
+    milestone
+  );
+
   return {
     demoOnly: true as const,
     currentUserId: USER_A,
-    conversation: conversation([visualUnopened, visualOpened], active),
+    conversation: conversationActive,
     cameraOpen: true,
     receivedUnopened: visualUnopened,
     receivedOpened: visualOpened,
     active,
     waiting,
+    youNeedToReply,
     atRisk,
+    started,
     milestone,
-    conversationActive: conversation([visualUnopened], active),
-    conversationWaiting: conversation([visualUnopened], waiting),
-    conversationAtRisk: conversation([visualUnopened], atRisk),
-    conversationMilestone: conversation([visualUnopened], milestone),
+    conversationActive,
+    conversationWaiting,
+    conversationReply,
+    conversationAtRisk,
+    conversationStarted,
+    conversationMilestone,
+    inbox: [
+      conversationActive,
+      conversationWaiting,
+      conversationReply,
+      conversationAtRisk,
+      conversationStarted,
+    ],
   };
 }

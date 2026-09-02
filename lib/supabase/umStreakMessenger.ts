@@ -63,6 +63,28 @@ export async function openVisualMessage(
   currentUserId: string,
   messageId: string
 ): Promise<ActionResult<{ message: Message; signedUrl: string | null }>> {
+  const { data: existing } = await supabase
+    .from("messages")
+    .select(
+      "id, conversation_id, sender_id, body, message_type, created_at, deleted_at, deleted_for, edited_at, reply_to_message_id, client_id, visual_opened_at, visual_expires_at, visual_expiration_policy"
+    )
+    .eq("id", messageId)
+    .maybeSingle();
+
+  if (
+    existing?.visual_opened_at &&
+    existing.sender_id !== currentUserId
+  ) {
+    const mapped = mapMessengerMessageRow(
+      existing as Parameters<typeof mapMessengerMessageRow>[0],
+      currentUserId
+    );
+    if (!mapped) {
+      return { ok: false, message: "Unable to open visual message." };
+    }
+    return { ok: true, message: mapped, signedUrl: null };
+  }
+
   const { data: attachment } = await supabase
     .from("message_attachments")
     .select("storage_bucket, storage_path")

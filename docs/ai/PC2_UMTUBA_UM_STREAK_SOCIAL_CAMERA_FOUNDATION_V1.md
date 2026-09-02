@@ -30,6 +30,20 @@ The primary PC2 worktree stayed dirty and untouched. This candidate is a new git
 - Highest migration on this worktree / origin/alpha-0.2: `20260934`.
 - Reserved: hosted tip `20260933`, git max `20260934`, proposed `20260935`/`20260936` for a later identity GO.
 
+## Continuation (same day)
+
+Resumed from leftover owner-preview gaps on `70b51f77`. Did not restart the foundation.
+
+Closed now:
+
+- Unique inbox conversations and working selection
+- Started + your-turn states in the owner preview
+- Language selector for Arabic RTL
+- Demo-labeled capture/send/open (no backend claim)
+- Localized view-once / opened labels
+- Already-opened recipients do not get a new signed URL
+- Playwright + HTTP verification of `/um-streak-preview`
+
 ## What shipped
 
 1. Quick social camera in existing composer + inbox (`QuickSocialCamera`, getUserMedia + library fallback).
@@ -53,11 +67,12 @@ Authoritative streak day = UTC calendar date of the qualifying visual send. Disp
 
 ## Verification
 
-- `npx vitest run` scoped: streak engine 11/11, messenger contracts, i18n.
+- `npx vitest run` scoped: streak engine 12/12, messenger contracts, i18n.
 - `npx tsc --noEmit` pass.
 - `npm run build` pass. Route `/um-streak-preview` present.
 - `git diff --check` pass.
-- HTTP `200` on `http://localhost:3017/um-streak-preview` with preview copy present.
+- HTTP `200` on `http://localhost:3018/um-streak-preview`.
+- Playwright (system Chrome): conversation switch, camera dialog, badges, Arabic RTL, 390px camera still visible.
 - `/messages` remains fail-closed 503 without Supabase public env (existing gate). Live camera send needs local env + this migration applied locally.
 
 ## Next

@@ -350,3 +350,20 @@ describe("view-once visual messages", () => {
     expect(opened.opened).toBe(false);
   });
 });
+
+describe("UM Streak owner preview fixtures", () => {
+  it("exposes unique conversations for every required streak state", async () => {
+    const { buildUmStreakPreviewStates } = await import("./fixtures");
+    const states = buildUmStreakPreviewStates();
+    const ids = states.inbox.map((conversation) => conversation.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(states.started.state).toBe("started");
+    expect(states.active.state).toBe("active_today");
+    expect(states.waiting.state).toBe("waiting_for_friend");
+    expect(states.youNeedToReply.state).toBe("you_need_to_reply");
+    expect(states.atRisk.state).toBe("at_risk");
+    expect(states.milestone.badges.find((badge) => badge.days === 30)?.earned).toBe(
+      true
+    );
+  });
+});
