@@ -374,7 +374,7 @@ begin
 
   insert into public.communication_privacy_settings (user_id)
   values (v_target)
-  on conflict (user_id) do nothing;
+  on conflict on constraint communication_privacy_settings_pkey do nothing;
 
   select s.find_by_email into v_find
   from public.communication_privacy_settings s

@@ -115,7 +115,17 @@ describe("communications migration and reuse", () => {
     expect(migration).toMatch(/find_by_email in \('nobody', 'everyone'\)/);
     expect(migration).toMatch(/default 'nobody'/);
     expect(migration).toMatch(/on conflict \(user_id\)/);
-    expect(migration).not.toMatch(/on conflict on constraint/i);
+    expect(migration).toMatch(
+      /on conflict on constraint communication_privacy_settings_pkey do nothing/
+    );
+    const emailRpc = migration.slice(
+      migration.indexOf("create or replace function public.discover_user_by_email"),
+      migration.indexOf("create or replace function public.discover_user_by_phone")
+    );
+    expect(emailRpc).toMatch(
+      /on conflict on constraint communication_privacy_settings_pkey do nothing/
+    );
+    expect(emailRpc).not.toMatch(/on conflict \(user_id\)/);
     expect(migration).toMatch(/MUTE != BLOCK/);
     expect(migration).toMatch(/CONTACT_SYNC foundation/);
     expect(migration).not.toMatch(/alter table public\.profiles/);
