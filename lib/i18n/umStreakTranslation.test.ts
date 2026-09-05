@@ -16,5 +16,9 @@ describe("UM Streak localization", () => {
     expect(translate("ar", "umStreak.camera")).not.toBe(
       translate("en", "umStreak.camera")
     );
+    expect(translate("ar", "umStreak.broken")).toBe("انتهى التتابع");
+    expect(translate("ar", "umStreak.broken")).not.toBe(
+      translate("en", "umStreak.broken")
+    );
   });
 });

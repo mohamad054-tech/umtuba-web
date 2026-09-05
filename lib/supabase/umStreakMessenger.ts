@@ -105,8 +105,20 @@ export async function openVisualMessage(
 
   if (error) {
     const text = (error.message || "").toLowerCase();
-    if (text.includes("blocked")) {
+    if (text.includes("blocked") || text.includes("not a participant")) {
       return { ok: false, message: "This visual message is not available." };
+    }
+    if (text.includes("already opened")) {
+      const mapped = existing
+        ? mapMessengerMessageRow(
+            existing as Parameters<typeof mapMessengerMessageRow>[0],
+            currentUserId
+          )
+        : null;
+      if (!mapped) {
+        return { ok: false, message: "This visual message is not available." };
+      }
+      return { ok: true, message: mapped, signedUrl: null };
     }
     if (text.includes("could not find") || text.includes("does not exist")) {
       return {
@@ -126,14 +138,24 @@ export async function openVisualMessage(
     return { ok: false, message: "Unable to open visual message." };
   }
 
-  if (mapped.visual?.viewed && mapped.senderId !== currentUserId) {
+  const firstOpen =
+    !existing?.visual_opened_at &&
+    Boolean(mapped.visual?.viewed || mapped.visual?.openedAt) &&
+    mapped.senderId !== currentUserId;
+  const senderPreview = mapped.senderId === currentUserId;
+
+  if ((firstOpen || senderPreview) && mapped.visual) {
     mapped.visual = {
       ...mapped.visual,
       previewUrl: signedUrl,
     };
   }
 
-  return { ok: true, message: mapped, signedUrl };
+  return {
+    ok: true,
+    message: mapped,
+    signedUrl: firstOpen || senderPreview ? signedUrl : null,
+  };
 }
 
 export async function getConversationUmStreak(

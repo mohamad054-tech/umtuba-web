@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "../../components/i18n";
+import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import type { Conversation } from "../types";
 
 export type CapturedVisual = {
@@ -33,6 +34,8 @@ export default function QuickSocialCamera({
   statusMessage = null,
 }: QuickSocialCameraProps) {
   const { t } = useTranslation();
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -49,24 +52,45 @@ export default function QuickSocialCamera({
   const [selectedIds, setSelectedIds] = useState<string[]>(
     defaultConversationId ? [defaultConversationId] : []
   );
-  const [cameraError, setCameraError] = useState<string | null>(null);
-
-  useEffect(() => {
+  const selectionKey = `${open}:${defaultConversationId ?? ""}`;
+  const [selectionSyncKey, setSelectionSyncKey] = useState(selectionKey);
+  if (selectionKey !== selectionSyncKey) {
+    setSelectionSyncKey(selectionKey);
     if (defaultConversationId) {
       setSelectedIds([defaultConversationId]);
     }
-  }, [defaultConversationId, open]);
+  }
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+  useDialogA11y({
+    open,
+    onClose,
+    containerRef: dialogRef,
+    initialFocusRef: closeRef,
+  });
+
+  function stopMediaTracks() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+  }
+
+  if (!open && recording) {
+    setRecording(false);
+  }
 
   useEffect(() => {
     if (!open) {
-      stopStream();
+      stopMediaTracks();
       return;
     }
 
     let cancelled = false;
 
     async function startCamera() {
-      stopStream();
+      stopMediaTracks();
       setCameraError(null);
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraError(t("umStreak.cameraUnavailable"));
@@ -99,21 +123,12 @@ export default function QuickSocialCamera({
 
   useEffect(() => {
     return () => {
-      stopStream();
+      stopMediaTracks();
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
     };
   }, [previewUrl]);
-
-  function stopStream() {
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      recorderRef.current.stop();
-    }
-    setRecording(false);
-  }
 
   function setPreview(blob: Blob, mimeType: string, mediaType: "image" | "video") {
     if (previewUrl) {
@@ -215,10 +230,14 @@ export default function QuickSocialCamera({
       aria-modal="true"
       aria-label={t("umStreak.camera")}
     >
-      <div className="flex h-[100dvh] w-full max-w-md flex-col bg-[#050510] text-white md:h-[min(92dvh,48rem)] md:rounded-3xl md:border md:border-amber-300/20">
+      <div
+        ref={dialogRef}
+        className="flex h-[100dvh] w-full max-w-md flex-col bg-[#050510] text-white md:h-[min(92dvh,48rem)] md:rounded-3xl md:border md:border-amber-300/20"
+      >
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <p className="text-sm font-black text-amber-200">{t("umStreak.camera")}</p>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             className="min-h-11 min-w-11 rounded-2xl border border-white/15 px-3 text-sm font-bold"
@@ -236,10 +255,15 @@ export default function QuickSocialCamera({
                 controls
                 playsInline
                 className="h-full w-full object-contain"
+                aria-label={caption.trim() || t("umStreak.capturedVideo")}
               />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element -- local object URL preview
-              <img src={previewUrl} alt="" className="h-full w-full object-contain" />
+              <img
+                src={previewUrl}
+                alt={caption.trim() || t("umStreak.capturedPhoto")}
+                className="h-full w-full object-contain"
+              />
             )
           ) : (
             <video
@@ -248,6 +272,7 @@ export default function QuickSocialCamera({
               playsInline
               autoPlay
               className="h-full w-full object-cover"
+              aria-label={t("umStreak.livePreview")}
             />
           )}
         </div>

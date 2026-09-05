@@ -38,7 +38,8 @@ export type UmStreakViewerView = {
     | "active_today"
     | "waiting_for_friend"
     | "you_need_to_reply"
-    | "at_risk";
+    | "at_risk"
+    | "broken";
   currentStreak: number;
   longestStreak: number;
   badges: Array<{

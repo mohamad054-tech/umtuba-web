@@ -238,6 +238,13 @@ export default function UmStreakPreviewClient() {
           </div>
           <div className="rounded-3xl border border-white/10 p-4">
             <h2 className="mb-2 text-sm font-black text-amber-200">
+              9b. Streak ended
+            </h2>
+            <ChatHeader conversation={states.conversationBroken} />
+            <UmStreakStatus streak={states.broken} />
+          </div>
+          <div className="rounded-3xl border border-white/10 p-4">
+            <h2 className="mb-2 text-sm font-black text-amber-200">
               10. Milestone badges
             </h2>
             <UmStreakStatus streak={states.milestone} />

@@ -626,6 +626,10 @@ export type FoundationMessages = {
   "umStreak.cameraUnavailable": string;
   "umStreak.stopRecording": string;
   "umStreak.longest": string;
+  "umStreak.broken": string;
+  "umStreak.livePreview": string;
+  "umStreak.capturedPhoto": string;
+  "umStreak.capturedVideo": string;
 
   "watch.eyebrow": string;
   "watch.opening": string;

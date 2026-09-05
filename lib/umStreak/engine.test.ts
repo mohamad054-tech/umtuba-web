@@ -6,7 +6,7 @@ import {
   viewerStatus,
 } from "./engine";
 import { markVisualOpened, visualMediaAccessible } from "./visualMessage";
-import { canSendPrivateVisual } from "./privacy";
+import { canOpenPrivateVisual, canSendPrivateVisual } from "./privacy";
 import type { QualifyingVisualEvent, UmStreakRecord } from "./types";
 
 const USER_A = "11111111-1111-1111-1111-111111111111";
@@ -161,7 +161,8 @@ describe("UM Streak engine", () => {
 
     const missed = viewerStatus(dayTwo.record, USER_A, "2026-09-04");
     expect(missed.currentStreak).toBe(0);
-    expect(missed.state).toBe("none");
+    expect(missed.state).toBe("broken");
+    expect(missed.longestStreak).toBe(2);
   });
 
   it("tracks longest streak after a reset", () => {
@@ -280,6 +281,52 @@ describe("UM Streak engine", () => {
     expect(afterMidnight.record.lastCompletedStreakDay).toBe("2026-09-01");
   });
 
+  it("continues the next UTC day only after both users qualify again", () => {
+    let record = emptyStreakRecord(USER_A, USER_B, "2026-09-01T10:00:00.000Z")!;
+    record = apply(
+      record,
+      event({
+        eventId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa5a",
+        occurredAt: "2026-09-01T10:00:00.000Z",
+      })
+    ).record;
+    record = apply(
+      record,
+      event({
+        eventId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa5b",
+        senderId: USER_B,
+        recipientId: USER_A,
+        occurredAt: "2026-09-01T11:00:00.000Z",
+      })
+    ).record;
+    expect(record.currentStreak).toBe(1);
+
+    const onlyANextDay = apply(
+      record,
+      event({
+        eventId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa5c",
+        occurredAt: "2026-09-02T08:00:00.000Z",
+      })
+    );
+    expect(onlyANextDay.incremented).toBe(false);
+    expect(onlyANextDay.reason).toBe("one_sided");
+
+    const bothNextDay = apply(
+      onlyANextDay.record,
+      event({
+        eventId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaa5d",
+        senderId: USER_B,
+        recipientId: USER_A,
+        occurredAt: "2026-09-02T09:00:00.000Z",
+      })
+    );
+    expect(bothNextDay.incremented).toBe(true);
+    expect(bothNextDay.record.currentStreak).toBe(2);
+    expect(viewerStatus(bothNextDay.record, USER_A, "2026-09-02").state).toBe(
+      "active_today"
+    );
+  });
+
   it("exposes at-risk when yesterday completed and nobody sent today", () => {
     const record = emptyStreakRecord(USER_A, USER_B, "2026-09-01T10:00:00.000Z")!;
     const active = {
@@ -326,6 +373,79 @@ describe("view-once visual messages", () => {
     );
   });
 
+  it("does not let a stranger open or replay private media", () => {
+    const record = {
+      id: "dddddddd-dddd-dddd-dddd-dddddddddddf",
+      senderId: USER_A,
+      recipientId: USER_B,
+      conversationId: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      mediaRef: `${USER_A}/cccccccc-cccc-cccc-cccc-cccccccccccc/x.jpg`,
+      mediaType: "image" as const,
+      createdAt: "2026-09-02T10:00:00.000Z",
+      openedAt: null,
+      expiresAt: null,
+      expirationPolicy: "view_once" as const,
+      caption: null,
+      viewed: false,
+    };
+    const stranger = "33333333-3333-3333-3333-333333333333";
+    expect(
+      canOpenPrivateVisual({
+        viewerId: stranger,
+        senderId: record.senderId,
+        recipientId: record.recipientId,
+        blocked: false,
+        viewed: false,
+        expiresAt: null,
+        nowIso: "2026-09-02T10:05:00.000Z",
+      }).reason
+    ).toBe("not_participant");
+
+    const opened = markVisualOpened(
+      record,
+      stranger,
+      "2026-09-02T10:05:00.000Z",
+      false
+    );
+    expect(opened.reason).toBe("not_participant");
+    expect(opened.opened).toBe(false);
+    expect(visualMediaAccessible(record, "2026-09-02T10:05:00.000Z")).toBe(true);
+  });
+
+  it("keeps media revoked after the first recipient open", () => {
+    const first = markVisualOpened(
+      {
+        id: "dddddddd-dddd-dddd-dddd-ddddddddddd0",
+        senderId: USER_A,
+        recipientId: USER_B,
+        conversationId: "cccccccc-cccc-cccc-cccc-cccccccccccc",
+        mediaRef: `${USER_A}/cccccccc-cccc-cccc-cccc-cccccccccccc/x.jpg`,
+        mediaType: "image",
+        createdAt: "2026-09-02T10:00:00.000Z",
+        openedAt: null,
+        expiresAt: null,
+        expirationPolicy: "view_once",
+        caption: null,
+        viewed: false,
+      },
+      USER_B,
+      "2026-09-02T10:05:00.000Z",
+      false
+    );
+    const replay = markVisualOpened(
+      first.record,
+      USER_B,
+      "2026-09-02T10:06:00.000Z",
+      false
+    );
+    expect(["already_viewed", "expired"]).toContain(replay.reason);
+    expect(replay.opened).toBe(false);
+    expect(replay.mediaRevoked).toBe(true);
+    expect(
+      visualMediaAccessible(first.record, "2026-09-02T10:06:00.000Z")
+    ).toBe(false);
+  });
+
   it("does not let a blocked viewer open private media", () => {
     const opened = markVisualOpened(
       {
@@ -362,6 +482,7 @@ describe("UM Streak owner preview fixtures", () => {
     expect(states.waiting.state).toBe("waiting_for_friend");
     expect(states.youNeedToReply.state).toBe("you_need_to_reply");
     expect(states.atRisk.state).toBe("at_risk");
+    expect(states.broken.state).toBe("broken");
     expect(states.milestone.badges.find((badge) => badge.days === 30)?.earned).toBe(
       true
     );

@@ -11,6 +11,7 @@ const USER_C = "cccccccc-cccc-cccc-cccc-cccccccccc01";
 const USER_D = "cccccccc-cccc-cccc-cccc-cccccccccc02";
 const USER_E = "cccccccc-cccc-cccc-cccc-cccccccccc03";
 const USER_F = "cccccccc-cccc-cccc-cccc-cccccccccc04";
+const USER_G = "cccccccc-cccc-cccc-cccc-cccccccccc05";
 
 const CONV_ACTIVE = "c1111111-1111-1111-1111-111111111111";
 const CONV_WAITING = "c2222222-2222-2222-2222-222222222222";
@@ -18,6 +19,7 @@ const CONV_REPLY = "c3333333-3333-3333-3333-333333333333";
 const CONV_AT_RISK = "c4444444-4444-4444-4444-444444444444";
 const CONV_STARTED = "c5555555-5555-5555-5555-555555555555";
 const CONV_MILESTONE = "c6666666-6666-6666-6666-666666666666";
+const CONV_BROKEN = "c7777777-7777-7777-7777-777777777777";
 
 type Peer = {
   id: string;
@@ -188,6 +190,20 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
     USER_A,
     today
   );
+  const broken = viewerStatus(
+    demoStreakRecord({
+      userHighId: USER_G,
+      pairKey: `${USER_A}:${USER_G}`,
+      currentStreak: 0,
+      longestStreak: 12,
+      lastQualifyingDayLow: "2026-08-28",
+      lastQualifyingDayHigh: "2026-08-28",
+      lastCompletedStreakDay: "2026-08-28",
+      streakState: "broken",
+    }),
+    USER_A,
+    today
+  );
   const started = viewerStatus(
     demoStreakRecord({
       userHighId: USER_F,
@@ -245,6 +261,12 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
     [message(CONV_STARTED, USER_A, { id: "start-1", text: "First UM Streak day", isMine: true })],
     started
   );
+  const conversationBroken = conversation(
+    CONV_BROKEN,
+    { id: USER_G, name: "Rami", initials: "RA", gradient: "from-slate-500 to-zinc-400" },
+    [message(CONV_BROKEN, USER_A, { id: "broken-1", text: "Last visual before the miss", isMine: true })],
+    broken
+  );
   const conversationMilestone = conversation(
     CONV_MILESTONE,
     { id: USER_B, name: "Lina", initials: "LI", gradient: "from-amber-500 to-orange-400" },
@@ -263,12 +285,14 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
     waiting,
     youNeedToReply,
     atRisk,
+    broken,
     started,
     milestone,
     conversationActive,
     conversationWaiting,
     conversationReply,
     conversationAtRisk,
+    conversationBroken,
     conversationStarted,
     conversationMilestone,
     inbox: [
@@ -276,6 +300,7 @@ export function buildUmStreakPreviewStates(nowIso = "2026-09-02T15:00:00.000Z") 
       conversationWaiting,
       conversationReply,
       conversationAtRisk,
+      conversationBroken,
       conversationStarted,
     ],
   };

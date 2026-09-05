@@ -1,74 +1,150 @@
-# CURSOR_REPORT — PC2_UMTUBA_UM_STREAK_SOCIAL_CAMERA_FOUNDATION_V1
+# CURSOR_REPORT — PC2_UMTUBA_UM_STREAK_FINAL_COMPLETION_V1
 
 ## Summary
 
-PC2 continued the isolated UM Streak candidate from `70b51f77` (first foundation commit). Leftover owner-preview gaps were closed: unique conversations, all streak states, Arabic locale control, demo capture/send/open, i18n view-once labels, and one-shot signed-URL hardening. Existing Communications was extended; no parallel messenger. Candidate migration `20260937` remains unapplied. Owner preview is `/um-streak-preview` (demo-labeled). Primary dirty worktree was not touched.
+Finished the existing UM Streak candidate instead of restarting it. The dirty Communications worktree (`pc2/umtuba-communications-v1-part1b-identity-discovery` @ `196a0358`) was left exactly as found. Isolated completion branch `pc2/um-streak-final-completion-v1` was created from preserved SHA `b0146a71` in a new worktree. Alpha (`origin/alpha-0.2` @ `b5fbeff2`) had no newer commits after the candidate, so no merge/cherry-pick was required.
 
-Already done at `70b51f77`: quick camera, private visual RPC, view-once columns, streak engine + SQL, badges 3/7/30/100/365, Communications wiring, catalogs.
+Completed leftover gaps on the existing Communications-native loop: NULL-safe SQL streak state, explicit `broken` / ended state, first-open signed-URL hardening, localized broken/a11y strings, camera dialog a11y, and the required engine tests. Candidate migration `20260938` only. Production, remote DB, EAS, and Fold6 were not touched.
 
-Finished now: preview completeness, conversation switching, started / your-turn states, RTL language control, demo send/open, Arabic view-once labels, skip re-sign after open.
+```text
+TASK_ID = PC2_UMTUBA_UM_STREAK_FINAL_COMPLETION_V1
+STATUS = CANDIDATE_COMPLETE_LOCAL
+STARTING_HEAD = 196a035801ea8cc992693f261052ee83b9390780
+STARTING_BRANCH = pc2/umtuba-communications-v1-part1b-identity-discovery
+WORKTREE_STATE = DIRTY_UNRELATED_PRESERVED
+AUTHORITATIVE_BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+PRESERVED_STREAK_SHA = b0146a71fea108f0aeb2319f17b605c586069fac
+COMPLETION_BRANCH = pc2/um-streak-final-completion-v1
+COMPLETION_SHA = PENDING_THIS_COMMIT
+COMMUNICATIONS_REUSED = YES
+PARALLEL_MESSAGING_SYSTEM_CREATED = NO
+QUICK_CAMERA = YES
+PHOTO_CAPTURE = YES
+VIDEO_CAPTURE = YES
+PRIVATE_VISUAL_SEND = YES
+VIEW_ONCE = YES
+SERVER_AUTHORITATIVE_EXPIRATION = YES
+UM_STREAK_ENGINE = YES
+SERVER_VALIDATION = YES
+DUPLICATE_INCREMENT_PROTECTION = YES
+TIMEZONE_POLICY = utc_calendar_day
+BLOCKING_ENFORCED = YES
+STREAK_UI = YES
+BADGES = YES
+ARABIC_RTL = YES
+ACCESSIBILITY = YES
+DB_CHANGE_REQUIRED = YES
+MIGRATION_CREATED = YES
+MIGRATION_FILE = supabase/migrations/20260938_um_streak_final_completion_v1.sql
+PRODUCTION_DB_TOUCHED = NO
+TESTS = PASS (27 scoped)
+TYPECHECK = PASS
+WEB_BUILD = PASS
+MOBILE_CHECK = PASS (eslint + tsc on shared UM Streak / messages paths; no EAS)
+PRODUCTION_TOUCHED = NO
+DEPLOYED = NO
+PLAY_TOUCHED = NO
+EAS_RUN = NO
+FORCE_PUSH = NO
+READY_FOR_FOLD6_OWNER_GATE = NO
+BLOCKERS = 20260938 not applied locally; live two-account send still needs local env + 20260937/20260938
+NEXT_ACTION = Owner local-only apply of 20260938 after 20260937 on a disposable DB, then a separate Fold6 GO
+```
 
 ## Exact files changed
 
-This continuation (after `70b51f77`):
+Isolated completion worktree only:
 
-- `app/um-streak-preview/UmStreakPreviewClient.tsx`
-- `app/messages/components/MessageBubble.tsx`
-- `lib/umStreak/fixtures.ts`
-- `lib/umStreak/engine.test.ts`
-- `lib/i18n/umStreakTranslation.test.ts`
-- `lib/supabase/umStreakMessenger.ts`
 - `docs/ai/CURRENT_TASK.md`
-- `docs/ai/PC2_UMTUBA_UM_STREAK_SOCIAL_CAMERA_FOUNDATION_V1.md`
 - `docs/ai/CURSOR_REPORT.md`
+- `lib/umStreak/types.ts`
+- `lib/umStreak/engine.ts`
+- `lib/umStreak/engine.test.ts`
+- `lib/umStreak/fixtures.ts`
+- `lib/supabase/umStreakMessenger.ts`
+- `lib/i18n/messages/types.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/de.ts`
+- `lib/i18n/messages/es.ts`
+- `lib/i18n/messages/fr.ts`
+- `lib/i18n/messages/hi.ts`
+- `lib/i18n/messages/id.ts`
+- `lib/i18n/messages/ja.ts`
+- `lib/i18n/messages/ko.ts`
+- `lib/i18n/messages/pt.ts`
+- `lib/i18n/messages/ru.ts`
+- `lib/i18n/messages/tr.ts`
+- `lib/i18n/messages/zh-CN.ts`
+- `lib/i18n/umStreakTranslation.test.ts`
+- `app/messages/types.ts`
+- `app/messages/components/UmStreakStatus.tsx`
+- `app/messages/components/QuickSocialCamera.tsx`
+- `app/messages/components/MessageBubble.tsx`
+- `app/um-streak-preview/UmStreakPreviewClient.tsx`
+- `supabase/migrations/20260938_um_streak_final_completion_v1.sql`
 
-Prior candidate (already in `70b51f77`): Communications camera/streak UI, domain, migration `20260937`, locale catalogs, preview route.
+Preserved untouched:
+
+- Dirty Communications worktree files
+- Existing foundation SHA `b0146a71` and worktree docs leftovers
+- `20260935` / `20260936`
 
 ## Migrations created
 
-- `supabase/migrations/20260937_um_streak_social_camera_foundation_v1.sql`
-- Not applied locally to a hosted/production project
-- Does not reuse `20260935` / `20260936`
+`supabase/migrations/20260938_um_streak_final_completion_v1.sql` — candidate only.
+
+- NULL-safe one-sided `waiting_for_friend` (`IS DISTINCT FROM`)
+- Live `broken` state after a missed day
+- Read-time streak resolve in `get_um_streak_for_conversation`
+- Recipient replay of `open_um_visual_message` raises `Visual message already opened`
+
+Not applied locally in this session. Not applied to production. Does not steal `20260935` / `20260936`. Does not overwrite `20260937`.
 
 ## Security review
 
-- Private `message-media` bucket; no public URLs
-- Storage SELECT gated by `can_read_message_media` (participant, not blocked, not opened/expired except sender)
-- Attachment INSERT is RPC-only (`send_um_visual_message` SECURITY DEFINER, `search_path = public`)
-- Block check via `ugc_users_are_blocked` before send and streak apply
-- Streak increment is server-side; clients cannot submit a streak count
-- View-once open is server-recorded; already-opened recipients no longer receive a new signed URL
-- Event idempotency: `um_streak_events.event_id` PK + unique `(pair_key, sender_id, qualifying_day)`
-- Preview send/open is local DEMO ONLY and does not call production
-- No secrets committed
+- No secrets printed. No `.env` read/written.
+- Private visual media stays in `message-media` (not public UM Life `posts`).
+- Send/open RPCs remain SECURITY DEFINER with `search_path = public`.
+- Blocked pairs still rejected by `ugc_users_are_blocked` before streak apply.
+- Strangers / non-participants cannot open visual media in the domain layer.
+- Already-opened recipients do not receive a new signed URL.
+- First-open signed URL is issued only when the pre-open row was unopened; replay RPC is fail-closed.
+- Residual race: two concurrent first-opens may both request a short-lived signed URL before the row lock wins; the loser gets no URL back. Storage RLS still requires `can_read_message_media`.
+- Deleted users cascade off streak tables via `ON DELETE CASCADE`.
+- Reporting continues to use existing UGC safety hooks; no parallel report system was invented.
 
 ## Tests
 
-- `lib/umStreak/engine.test.ts` — 12 passed (prior 11 plus unique preview states: started / active / waiting / your turn / at risk / badges)
-- Messenger production contracts — passed
-- `lib/i18n/umStreakTranslation.test.ts` — passed (Arabic view-once / opened)
+```text
+npx vitest run lib/umStreak/engine.test.ts lib/i18n/umStreakTranslation.test.ts app/messages/messengerProduction.test.ts
+```
+
+27 passed / 0 failed.
+
+Covered: same-day duplicate, one-sided, both qualify, duplicate/retry event, next-day continuation, missed day → broken, longest streak, blocked user, UTC midnight boundary, unauthorized stranger access, view-once open + replay revoke, Arabic streak strings, messenger production contracts.
+
+Local two-account SQL gate for `20260938` was not re-run in this session.
 
 ## TypeScript
 
-- `npx tsc --noEmit` — PASS (stale `.next` cache referencing a non-existent `/messages/um-streak` route was removed first)
+`npx tsc --noEmit` — PASS.
 
 ## Build
 
-- `npm run build` — PASS (Next 16.2.11). Route `/um-streak-preview` present.
+`npm run build` — PASS. Routes `/messages` and `/um-streak-preview` present.
 
 ## git diff --check
 
-- PASS
+PASS (no whitespace errors).
 
 ## git status --short
 
-Recorded after the isolated-branch continuation commit. Primary dirty worktree was not committed.
+Recorded before commit on isolated branch `pc2/um-streak-final-completion-v1`. After commit this should be clean except ignored `node_modules` / `.next`.
 
 ## Open issues
 
-- Live two-user send still needs local `.env.local` + local apply of `20260937` (not done; production apply forbidden)
-- `/messages` remains 503 without Supabase public env (existing fail-closed gate)
-- cursor-ide-browser MCP could not attach; preview verified via HTTP 200 + Playwright against system Chrome on `http://localhost:3018/um-streak-preview`
-- No native iOS/Android camera UI in this worktree; shared domain is `lib/umStreak`
-- Profile/identity renumber (`20260935`/`20260936`) remains a separate later GO
-- Dedicated message-report table was not added; existing Communications mute/block/delete paths remain the enforcement
+- `READY_FOR_FOLD6_OWNER_GATE = NO`: source + typecheck + scoped tests + web build passed, but `20260938` is not applied on a local DB in this session, and live camera send still needs local Supabase env + both candidate migrations.
+- Do not ask for Fold6 until that local runtime gate exists.
+- Do not merge to alpha / push without a later Central GO.
+- Communications identity/discovery dirty work remains isolated and uncommitted in the original worktree.

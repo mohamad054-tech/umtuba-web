@@ -673,6 +673,10 @@ export const arMessages: FoundationMessages = {
   "umStreak.cameraUnavailable": "الكاميرا غير متاحة. استخدم المكتبة.",
   "umStreak.stopRecording": "إيقاف التسجيل",
   "umStreak.longest": "الأطول",
+  "umStreak.broken": "انتهى التتابع",
+  "umStreak.livePreview": "معاينة الكاميرا المباشرة",
+  "umStreak.capturedPhoto": "صورة ملتقطة",
+  "umStreak.capturedVideo": "فيديو ملتقط",
 
   "watch.eyebrow": "المشاهدة",
   "watch.opening": "جارٍ فتح المشاهدة…",

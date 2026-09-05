@@ -18,6 +18,7 @@ export const UM_STREAK_STATES = [
   "waiting_for_friend",
   "you_need_to_reply",
   "at_risk",
+  "broken",
 ] as const;
 export type UmStreakState = (typeof UM_STREAK_STATES)[number];
 

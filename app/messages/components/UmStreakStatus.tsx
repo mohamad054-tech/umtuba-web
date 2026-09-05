@@ -24,7 +24,9 @@ export default function UmStreakStatus({
             ? t("umStreak.youStillNeedToReply")
             : streak.state === "at_risk"
               ? t("umStreak.atRisk")
-              : t("umStreak.title");
+              : streak.state === "broken"
+                ? t("umStreak.broken")
+                : t("umStreak.title");
 
   if (streak.currentStreak <= 0 && streak.state === "none") {
     return null;

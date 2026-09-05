@@ -688,6 +688,10 @@ export const enMessages: FoundationMessages = {
   "umStreak.cameraUnavailable": "Camera is not available. Use the library instead.",
   "umStreak.stopRecording": "Stop recording",
   "umStreak.longest": "Longest",
+  "umStreak.broken": "Streak ended",
+  "umStreak.livePreview": "Live camera preview",
+  "umStreak.capturedPhoto": "Captured photo",
+  "umStreak.capturedVideo": "Captured video",
 
   "watch.eyebrow": "Watch",
   "watch.opening": "Opening UMTUBA Watch…",

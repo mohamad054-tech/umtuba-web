@@ -202,6 +202,10 @@ export function derivePairState(record: UmStreakRecord, today: string): UmStreak
     return "at_risk";
   }
 
+  if (record.longestStreak > 0 && record.currentStreak === 0) {
+    return "broken";
+  }
+
   return "none";
 }
 

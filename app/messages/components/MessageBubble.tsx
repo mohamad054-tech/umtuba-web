@@ -137,12 +137,15 @@ export default function MessageBubble({
                     playsInline
                     preload="metadata"
                     className="max-h-72 w-full rounded-2xl bg-black"
+                    aria-label={
+                      message.visual.caption || t("umStreak.capturedVideo")
+                    }
                   />
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element -- signed or local preview
                   <img
                     src={message.visual.previewUrl}
-                    alt=""
+                    alt={message.visual.caption || t("umStreak.capturedPhoto")}
                     className="max-h-72 w-full rounded-2xl object-cover"
                   />
                 )
