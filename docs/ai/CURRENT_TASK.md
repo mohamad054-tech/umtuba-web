@@ -15,6 +15,7 @@ AUTHORITATIVE_BASE_REF = origin/alpha-0.2
 AUTHORITATIVE_BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
 PRESERVED_STREAK_SHA = b0146a71fea108f0aeb2319f17b605c586069fac
 COMPLETION_BRANCH = pc2/um-streak-final-completion-v1
+COMPLETION_SHA = 7d5003d1b1a7efa27b37205c48d5323b5401e783
 COMPLETION_WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-um-streak-final-completion-v1
 FOUNDATION_BRANCH = pc2/umtuba-um-streak-social-camera-foundation-v1
 FOUNDATION_WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-web-um-streak-social-camera-v1
