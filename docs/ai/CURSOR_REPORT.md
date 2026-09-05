@@ -1,118 +1,95 @@
-# CURSOR_REPORT — PC2_UMTUBA_UM_STREAK_FINAL_COMPLETION_V1
+# CURSOR_REPORT — PC2_UMTUBA_UM_STREAK_LOCAL_DB_TWO_ACCOUNT_GATE_V1
 
 ## Summary
 
-Finished the existing UM Streak candidate instead of restarting it. The dirty Communications worktree (`pc2/umtuba-communications-v1-part1b-identity-discovery` @ `196a0358`) was left exactly as found. Isolated completion branch `pc2/um-streak-final-completion-v1` was created from preserved SHA `b0146a71` in a new worktree. Alpha (`origin/alpha-0.2` @ `b5fbeff2`) had no newer commits after the candidate, so no merge/cherry-pick was required.
+Owned the full Phase 0–6 local DB + two-account runtime gate on the isolated UM Streak completion worktree only. The Communications checkout was left exactly as found (`pc2/umtuba-communications-v1-part1b-identity-discovery` @ `196a0358`). Product SHA `7d5003d1` is an ancestor of `091095d6`. Local Supabase on `127.0.0.1:54321` / `127.0.0.1:54322` was started after Docker Desktop; `PRODUCTION_DB_TARGETED = NO`.
 
-Completed leftover gaps on the existing Communications-native loop: NULL-safe SQL streak state, explicit `broken` / ended state, first-open signed-URL hardening, localized broken/a11y strings, camera dialog a11y, and the required engine tests. Candidate migration `20260938` only. Production, remote DB, EAS, and Fold6 were not touched.
+Candidate migrations `20260937` then `20260938` were applied to the disposable local DB only (SQL file apply + `npx supabase migration repair --local`). A 34/34 local authenticated RPC/API contract gate passed against the same functions the app uses (`send_um_visual_message`, `open_um_visual_message`, `get_um_streak_for_conversation`, storage signed URLs, `block_ugc_user`). Playwright then logged two disposable local users into `/messages`, opened UM Streak camera, sent via the library picker (not physical camera), and showed USER_B the view-once control. Regression: 27 scoped tests, `tsc`, web build, and eslint on UM Streak / messages paths all PASS. No product defect was found, so no source fix commit was required.
 
 ```text
-TASK_ID = PC2_UMTUBA_UM_STREAK_FINAL_COMPLETION_V1
-STATUS = CANDIDATE_COMPLETE_LOCAL
-STARTING_HEAD = 196a035801ea8cc992693f261052ee83b9390780
-STARTING_BRANCH = pc2/umtuba-communications-v1-part1b-identity-discovery
-WORKTREE_STATE = DIRTY_UNRELATED_PRESERVED
-AUTHORITATIVE_BASE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
-PRESERVED_STREAK_SHA = b0146a71fea108f0aeb2319f17b605c586069fac
-COMPLETION_BRANCH = pc2/um-streak-final-completion-v1
-COMPLETION_SHA = 7d5003d1b1a7efa27b37205c48d5323b5401e783
-COMMUNICATIONS_REUSED = YES
-PARALLEL_MESSAGING_SYSTEM_CREATED = NO
-QUICK_CAMERA = YES
-PHOTO_CAPTURE = YES
-VIDEO_CAPTURE = YES
-PRIVATE_VISUAL_SEND = YES
-VIEW_ONCE = YES
-SERVER_AUTHORITATIVE_EXPIRATION = YES
-UM_STREAK_ENGINE = YES
-SERVER_VALIDATION = YES
-DUPLICATE_INCREMENT_PROTECTION = YES
-TIMEZONE_POLICY = utc_calendar_day
-BLOCKING_ENFORCED = YES
-STREAK_UI = YES
-BADGES = YES
-ARABIC_RTL = YES
-ACCESSIBILITY = YES
-DB_CHANGE_REQUIRED = YES
-MIGRATION_CREATED = YES
-MIGRATION_FILE = supabase/migrations/20260938_um_streak_final_completion_v1.sql
+TASK_ID = PC2_UMTUBA_UM_STREAK_LOCAL_DB_TWO_ACCOUNT_GATE_V1
+STATUS = LOCAL_GATE_COMPLETE
+WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-um-streak-final-completion-v1
+BRANCH = pc2/um-streak-final-completion-v1
+STARTING_SHA = 091095d64c797b92fce7d0b4831cdae54ceb7019
+PRODUCT_SHA = 7d5003d1b1a7efa27b37205c48d5323b5401e783
+LOCAL_SUPABASE = UP
+LOCAL_DB_URL = postgresql://postgres@127.0.0.1:54322/postgres
+PRODUCTION_DB_TARGETED = NO
 PRODUCTION_DB_TOUCHED = NO
-TESTS = PASS (27 scoped)
+MIGRATION_20260937 = APPLIED_LOCAL
+MIGRATION_20260938 = APPLIED_LOCAL
+MIGRATION_ORDER = 20260937_THEN_20260938
+TWO_LOCAL_USERS = YES
+PRIVATE_VISUAL_SEND = PASS
+RECIPIENT_RECEIVE = PASS
+VIEW_ONCE_OPEN = PASS
+VIEW_ONCE_REPLAY_BLOCKED = PASS
+ONE_SIDED_NO_INCREMENT = PASS
+BILATERAL_INCREMENT = PASS
+DUPLICATE_INCREMENT_BLOCKED = PASS
+BROKEN_STATE = PASS
+LONGEST_STREAK = PASS
+TIMEZONE_POLICY = utc_calendar_day
+BLOCKING_ENFORCED = PASS
+PRIVATE_MEDIA_ACCESS = PASS
+UM_STREAK_TESTS = PASS (27)
 TYPECHECK = PASS
 WEB_BUILD = PASS
-MOBILE_CHECK = PASS (eslint + tsc on shared UM Streak / messages paths; no EAS)
-PRODUCTION_TOUCHED = NO
-DEPLOYED = NO
-PLAY_TOUCHED = NO
+MOBILE_CHECK = PASS
+PHYSICAL_CAMERA_TESTED = NO
 EAS_RUN = NO
-FORCE_PUSH = NO
-READY_FOR_FOLD6_OWNER_GATE = NO
-BLOCKERS = 20260938 not applied locally; live two-account send still needs local env + 20260937/20260938
-NEXT_ACTION = Owner local-only apply of 20260938 after 20260937 on a disposable DB, then a separate Fold6 GO
+DEPLOYED = NO
+PUSHED = NO
+PLAY_TOUCHED = NO
+READY_FOR_FOLD6_OWNER_GATE = YES
 ```
 
 ## Exact files changed
 
-Isolated completion worktree only:
+Isolated completion worktree only (docs / local-gate runners; no product source change):
 
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `lib/umStreak/types.ts`
-- `lib/umStreak/engine.ts`
-- `lib/umStreak/engine.test.ts`
-- `lib/umStreak/fixtures.ts`
-- `lib/supabase/umStreakMessenger.ts`
-- `lib/i18n/messages/types.ts`
-- `lib/i18n/messages/en.ts`
-- `lib/i18n/messages/ar.ts`
-- `lib/i18n/messages/de.ts`
-- `lib/i18n/messages/es.ts`
-- `lib/i18n/messages/fr.ts`
-- `lib/i18n/messages/hi.ts`
-- `lib/i18n/messages/id.ts`
-- `lib/i18n/messages/ja.ts`
-- `lib/i18n/messages/ko.ts`
-- `lib/i18n/messages/pt.ts`
-- `lib/i18n/messages/ru.ts`
-- `lib/i18n/messages/tr.ts`
-- `lib/i18n/messages/zh-CN.ts`
-- `lib/i18n/umStreakTranslation.test.ts`
-- `app/messages/types.ts`
-- `app/messages/components/UmStreakStatus.tsx`
-- `app/messages/components/QuickSocialCamera.tsx`
-- `app/messages/components/MessageBubble.tsx`
-- `app/um-streak-preview/UmStreakPreviewClient.tsx`
-- `supabase/migrations/20260938_um_streak_final_completion_v1.sql`
+- `docs/ai/pc2-um-streak-local-gate/run-local-gate.mjs`
+- `docs/ai/pc2-um-streak-local-gate/create-ui-users.mjs`
+- `docs/ai/pc2-um-streak-local-gate/write-local-env.mjs`
+- `docs/ai/pc2-um-streak-local-gate/run-ui-loop.mjs`
+- `docs/ai/pc2-um-streak-local-gate/inspect-messages.mjs`
+
+Gitignored local-only (not committed):
+
+- `.env.local` pointing at `127.0.0.1:54321`
+- generated `docs/ai/pc2-um-streak-local-gate/local-test.png`
 
 Preserved untouched:
 
-- Dirty Communications worktree files
-- Existing foundation SHA `b0146a71` and worktree docs leftovers
-- `20260935` / `20260936`
+- Dirty Communications worktree
+- Product SHA `7d5003d1` / UM Streak source
+- Production / remote Supabase
 
 ## Migrations created
 
-`supabase/migrations/20260938_um_streak_final_completion_v1.sql` — candidate only.
+None in this gate. Existing candidate files were applied locally only:
 
-- NULL-safe one-sided `waiting_for_friend` (`IS DISTINCT FROM`)
-- Live `broken` state after a missed day
-- Read-time streak resolve in `get_um_streak_for_conversation`
-- Recipient replay of `open_um_visual_message` raises `Visual message already opened`
+- `supabase/migrations/20260937_um_streak_social_camera_foundation_v1.sql`
+- `supabase/migrations/20260938_um_streak_final_completion_v1.sql`
 
-Not applied locally in this session. Not applied to production. Does not steal `20260935` / `20260936`. Does not overwrite `20260937`.
+Local history before this gate already contained `20260935` / `20260936` from the shared disposable `umtuba-web` volume. Those files are not in this worktree. Two older worktree files (`20260714_live_media_v2_host_stage_fix`, `20260806_ads_admin_review_foundation_v1`) were also pending in this tree; they were **not** applied. Only `20260937` then `20260938` were applied, then registered with `npx supabase migration repair --local --status applied`.
+
+`npx supabase migration list` without `--local` correctly refused (not linked). Never used `--linked`. Never ran remote `db push`.
 
 ## Security review
 
-- No secrets printed. No `.env` read/written.
-- Private visual media stays in `message-media` (not public UM Life `posts`).
-- Send/open RPCs remain SECURITY DEFINER with `search_path = public`.
-- Blocked pairs still rejected by `ugc_users_are_blocked` before streak apply.
-- Strangers / non-participants cannot open visual media in the domain layer.
-- Already-opened recipients do not receive a new signed URL.
-- First-open signed URL is issued only when the pre-open row was unopened; replay RPC is fail-closed.
-- Residual race: two concurrent first-opens may both request a short-lived signed URL before the row lock wins; the loser gets no URL back. Storage RLS still requires `can_read_message_media`.
-- Deleted users cascade off streak tables via `ON DELETE CASCADE`.
-- Reporting continues to use existing UGC safety hooks; no parallel report system was invented.
+- Local Docker/Supabase only. API `127.0.0.1:54321`, DB `127.0.0.1:54322`, Studio `127.0.0.1:54323`. `linked_project = null`.
+- No secrets printed. Service-role used only against the local URL. `.env.local` is gitignored.
+- `message-media` bucket `public = false`.
+- Stranger cannot list the A/B conversation (`Not a participant`) and cannot obtain a signed URL (`Object not found`).
+- Anon cannot read the private message row.
+- Recipient first-open signed URL issued; replay RPC raises `Visual message already opened`; replay signed URL denied.
+- Sender can still sign after recipient open (`can_read_message_media` sender exception).
+- `block_ugc_user` then `send_um_visual_message` returns `Cannot message a blocked user`.
+- Disposable local users only (`@local.test`). No fake production data.
 
 ## Tests
 
@@ -122,9 +99,15 @@ npx vitest run lib/umStreak/engine.test.ts lib/i18n/umStreakTranslation.test.ts 
 
 27 passed / 0 failed.
 
-Covered: same-day duplicate, one-sided, both qualify, duplicate/retry event, next-day continuation, missed day → broken, longest streak, blocked user, UTC midnight boundary, unauthorized stranger access, view-once open + replay revoke, Arabic streak strings, messenger production contracts.
+Local contract gate `docs/ai/pc2-um-streak-local-gate/run-local-gate.mjs`: **34/34 PASS** on authenticated local users, including one-sided no increment (`waiting_for_friend`, current=0), bilateral increment to 1 / `started` / completed `2026-09-05`, duplicate same-day no second increment, client_id idempotency, missed-day reset keeping longest=2, read-time `broken`, UTC day split `2026-08-25` vs `2026-08-26`, blocking, and private media access.
 
-Local two-account SQL gate for `20260938` was not re-run in this session.
+Playwright UI (library picker, not physical camera), local Next at `http://127.0.0.1:3000`:
+
+- USER_A login → `/messages` PASS
+- Camera entry PASS
+- Library send PASS
+- USER_B login + view-once control visible PASS
+- Post-open "Opened" label and streak badge **not visually confirmed** (first open shows media preview; default locale was Arabic). Those contracts were proven by RPC.
 
 ## TypeScript
 
@@ -132,19 +115,74 @@ Local two-account SQL gate for `20260938` was not re-run in this session.
 
 ## Build
 
-`npm run build` — PASS. Routes `/messages` and `/um-streak-preview` present.
+`npm run build` — PASS. Routes `/messages` and `/um-streak-preview` present. Unrelated Turbopack NFT warning on translation-studio import trace; build still succeeded.
 
 ## git diff --check
 
-PASS (no whitespace errors).
+PASS after docs write (no whitespace errors).
 
 ## git status --short
 
-Recorded before commit on isolated branch `pc2/um-streak-final-completion-v1`. After commit this should be clean except ignored `node_modules` / `.next`.
+Recorded after docs write, before optional docs commit:
+
+```text
+ M docs/ai/CURRENT_TASK.md
+ M docs/ai/CURSOR_REPORT.md
+?? docs/ai/pc2-um-streak-local-gate/
+```
+
+`.env.local` remains gitignored.
 
 ## Open issues
 
-- `READY_FOR_FOLD6_OWNER_GATE = NO`: source + typecheck + scoped tests + web build passed, but `20260938` is not applied on a local DB in this session, and live camera send still needs local Supabase env + both candidate migrations.
-- Do not ask for Fold6 until that local runtime gate exists.
-- Do not merge to alpha / push without a later Central GO.
-- Communications identity/discovery dirty work remains isolated and uncommitted in the original worktree.
+- Physical camera hardware was not tested. Fold6 owner gate still owns device camera / send on the phone.
+- `cursor-ide-browser` MCP could not keep a tab (`No browser tab available`). Playwright against local Next was used instead.
+- Playwright did not visually confirm the opened-state label or streak badge after first open. Authoritative RPC/API checks passed.
+- Local migration history still has two unrelated pending files in this worktree that were not applied. Do not `migration up --local` blindly.
+- Do not merge / push / apply remotely without a later Central GO.
+
+---
+
+## FINAL REPORT
+
+```text
+TASK_ID = PC2_UMTUBA_UM_STREAK_LOCAL_DB_TWO_ACCOUNT_GATE_V1
+STATUS = LOCAL_GATE_COMPLETE
+WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-um-streak-final-completion-v1
+BRANCH = pc2/um-streak-final-completion-v1
+STARTING_SHA = 091095d64c797b92fce7d0b4831cdae54ceb7019
+FINAL_SHA = 091095d64c797b92fce7d0b4831cdae54ceb7019
+WORKTREE_CLEAN = NO
+LOCAL_SUPABASE = UP
+LOCAL_DB_URL = postgresql://postgres@127.0.0.1:54322/postgres
+PRODUCTION_DB_TARGETED = NO
+PRODUCTION_DB_TOUCHED = NO
+MIGRATION_20260937 = APPLIED_LOCAL
+MIGRATION_20260938 = APPLIED_LOCAL
+MIGRATION_ORDER = 20260937_THEN_20260938
+TWO_LOCAL_USERS = YES
+PRIVATE_VISUAL_SEND = PASS
+RECIPIENT_RECEIVE = PASS
+VIEW_ONCE_OPEN = PASS
+VIEW_ONCE_REPLAY_BLOCKED = PASS
+ONE_SIDED_NO_INCREMENT = PASS
+BILATERAL_INCREMENT = PASS
+DUPLICATE_INCREMENT_BLOCKED = PASS
+BROKEN_STATE = PASS
+LONGEST_STREAK = PASS
+TIMEZONE_POLICY = utc_calendar_day
+BLOCKING_ENFORCED = PASS
+PRIVATE_MEDIA_ACCESS = PASS
+UM_STREAK_TESTS = PASS
+TYPECHECK = PASS
+WEB_BUILD = PASS
+MOBILE_CHECK = PASS
+PHYSICAL_CAMERA_TESTED = NO
+EAS_RUN = NO
+DEPLOYED = NO
+PUSHED = NO
+PLAY_TOUCHED = NO
+READY_FOR_FOLD6_OWNER_GATE = YES
+BLOCKERS = Physical camera / Fold6 device QA still required. Playwright UI did not visually confirm opened-label + streak badge after first open (RPC proved both). cursor-ide-browser MCP could not attach.
+NEXT_ACTION = Owner Fold6 physical-camera + device QA GO. Do not push or apply remotely.
+```
