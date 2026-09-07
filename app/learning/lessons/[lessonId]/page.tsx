@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { loadLearningLessonSurface } from "../../../../lib/learning/productization";
 import { LEARNING_PUBLIC_ROUTES } from "../../../../lib/learning/publicCatalog";
+import { buildLearningLessonMetadata } from "../../../../lib/site/learningSeo";
 import LessonView from "../../../components/learning/visual/LessonView";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +12,24 @@ type PageProps = {
 
 export async function generateMetadata({ params }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
-  void lessonId;
-  return { title: `Lesson · Learning | UMTUBA` };
+  const loaded = await loadLearningLessonSurface(lessonId);
+  if (loaded.kind !== "ready") {
+    return buildLearningLessonMetadata({ lessonId, indexable: false });
+  }
+  const title =
+    loaded.surface.lesson.title.en?.trim() ||
+    loaded.surface.lesson.title.ar?.trim() ||
+    null;
+  const description =
+    loaded.surface.course.description.en?.trim() ||
+    loaded.surface.course.description.ar?.trim() ||
+    null;
+  return buildLearningLessonMetadata({
+    lessonId,
+    title,
+    description,
+    indexable: true,
+  });
 }
 
 export default async function LearningLessonPage({ params }: PageProps) {

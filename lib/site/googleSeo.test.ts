@@ -2,7 +2,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SUPPORTED_LOCALES } from "../i18n/locales";
-import { ROBOTS_DISALLOW_PATHS, SITEMAP_STATIC_ROUTES } from "./indexing";
+import {
+  ROBOTS_ALLOW_PATHS,
+  ROBOTS_DISALLOW_PATHS,
+  SITEMAP_STATIC_ROUTES,
+} from "./indexing";
 import {
   buildBreadcrumbListJsonLd,
   buildCourseJsonLd,
@@ -58,6 +62,8 @@ describe("Google SEO full optimization V1", () => {
     expect(ROBOTS_DISALLOW_PATHS).not.toContain("/life");
     expect(ROBOTS_DISALLOW_PATHS).not.toContain("/store");
     expect(ROBOTS_DISALLOW_PATHS).not.toContain("/learning/catalog");
+    expect(ROBOTS_ALLOW_PATHS).toContain("/learning/lessons");
+    expect(ROBOTS_ALLOW_PATHS).toContain("/learning/catalog");
   });
 
   it("does not invent path-prefix locale alternates", () => {

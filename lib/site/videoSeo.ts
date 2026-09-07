@@ -108,6 +108,17 @@ export function truthfulVideoDescription(input: PublicVideoSeoInput): string {
   return truncateForMeta(`A video on ${BRAND.name}.`, 160);
 }
 
+/** Ineligible / unpublished / unreadable Watch URLs stay noindex with a self canonical. */
+export function buildWatchUnavailableMetadata(postId: number): Metadata {
+  return buildPageMetadata({
+    title: "Watch",
+    description: `This video is unavailable on ${BRAND.name}.`,
+    path: buildWatchPostPath(postId),
+    index: "noindex",
+    hreflang: false,
+  });
+}
+
 export function buildWatchPostMetadata(input: PublicVideoSeoInput): Metadata {
   const path = buildWatchPostPath(input.id);
   const title = truthfulVideoTitle(input);

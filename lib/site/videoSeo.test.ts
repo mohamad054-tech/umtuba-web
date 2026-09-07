@@ -131,6 +131,7 @@ describe("video SEO V1", () => {
     const watch = readFileSync(join(ROOT, "app/watch/page.tsx"), "utf8");
     expect(watch).toMatch(/export async function generateMetadata/);
     expect(watch).toMatch(/buildWatchPostMetadata/);
+    expect(watch).toMatch(/buildWatchUnavailableMetadata/);
     expect(watch).toMatch(/VideoObjectJsonLdScript/);
     expect(watch).not.toMatch(/export const metadata = watchMetadata/);
   });

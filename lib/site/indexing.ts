@@ -17,6 +17,16 @@
  * but are not enumerated in the sitemap.
  */
 
+/**
+ * Explicit Allow prefixes (longest-match). Public Learning catalog/lessons
+ * must stay crawlable even when sibling /learning/instructor is disallowed.
+ * Do not add a bare `/learning` Disallow — that would block lessons.
+ */
+export const ROBOTS_ALLOW_PATHS = [
+  "/learning/lessons",
+  "/learning/catalog",
+] as const;
+
 /** Path prefixes disallowed in robots.txt (trailing slash means prefix match). */
 export const ROBOTS_DISALLOW_PATHS = [
   "/login",

@@ -10,6 +10,7 @@ import { getSiteUrl } from "../../lib/site/siteUrl";
 import {
   buildVideoObjectJsonLd,
   buildWatchPostMetadata,
+  buildWatchUnavailableMetadata,
   parsePublicPostId,
 } from "../../lib/site/videoSeo";
 import { loadPublicVideoSeoById } from "../../lib/supabase/publicVideoSeo";
@@ -46,14 +47,7 @@ export async function generateMetadata({
 
   const video = await loadPublicVideoSeoById(postId);
   if (!video) {
-    return {
-      ...watchMetadata,
-      robots: {
-        index: false,
-        follow: false,
-        googleBot: { index: false, follow: false },
-      },
-    };
+    return buildWatchUnavailableMetadata(postId);
   }
 
   return buildWatchPostMetadata(video);
