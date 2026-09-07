@@ -21,7 +21,9 @@ const FRAME_CLASS =
 
 /**
  * Official approved-video mark. Compact chrome uses the symbol only;
- * spacious surfaces use the stacked lockup. Never a horizontal lockup.
+ * spacious surfaces use the stacked lockup. Header crops the same stacked
+ * raster to U + official wordmark (no LEARN-CREATE-SHARE, no UI text).
+ * Never a horizontal lockup and never a generated substitute.
  */
 export default function UmtubaStackedLogo({
   size = "nav",
@@ -31,8 +33,9 @@ export default function UmtubaStackedLogo({
   const preset = BRAND_MARK_PRESETS[size];
   const mark: BrandMarkKind = preset.mark;
   const stacked = mark === "stacked";
+  const headerLockup = size === "header";
 
-  return (
+  const image = (
     <Image
       src={brandMarkSource(mark)}
       alt={BRAND.name}
@@ -42,9 +45,20 @@ export default function UmtubaStackedLogo({
       }
       sizes={preset.sizes}
       quality={90}
-      className={`${preset.className} ${FRAME_CLASS} ${className}`.trim()}
+      className={`${preset.className} ${headerLockup ? "" : FRAME_CLASS} ${className}`.trim()}
+      style={
+        headerLockup
+          ? { width: "8.5rem", height: "auto", maxHeight: "none" }
+          : undefined
+      }
       priority={priority}
       draggable={false}
     />
   );
+
+  if (headerLockup) {
+    return <span className="umtuba-header-lockup">{image}</span>;
+  }
+
+  return image;
 }

@@ -45,12 +45,21 @@ export type BrandMarkKind = "stacked" | "symbol";
 
 export type BrandMarkPresetId =
   | "nav"
+  | "header"
   | "hero"
   | "auth"
   | "authCompact"
   | "footer"
   | "legal"
   | "loading";
+
+/**
+ * Header shows the approved stacked raster (U + official UMTUBA wordmark)
+ * and crops only the LEARN-CREATE-SHARE line. Same file, no new artwork.
+ * On the 776px source the gold wordmark occupies ~571–708 and the tagline
+ * starts ~742. 0.93 keeps the full wordmark and hides the tagline.
+ */
+export const HEADER_STACKED_VISIBLE_RATIO = 0.93;
 
 /**
  * Presentation-only sizes. Display height stays at or below the source raster
@@ -62,6 +71,12 @@ export const BRAND_MARK_PRESETS = {
     maxDisplayPx: 56,
     className: "h-14 w-auto",
     sizes: "56px",
+  },
+  header: {
+    mark: "stacked" as const,
+    maxDisplayPx: 136,
+    className: "umtuba-header-lockup__image",
+    sizes: "136px",
   },
   legal: {
     mark: "symbol" as const,

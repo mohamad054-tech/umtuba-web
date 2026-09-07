@@ -5,6 +5,7 @@ import {
   BRAND,
   BRAND_ASSETS,
   BRAND_MARK_PRESETS,
+  HEADER_STACKED_VISIBLE_RATIO,
   brandMarkSource,
   brandMarkSourceHeight,
 } from "./brand";
@@ -48,12 +49,30 @@ describe("approved video logo assets", () => {
     expect(BRAND_MARK_PRESETS.nav.mark).toBe("symbol");
     expect(BRAND_MARK_PRESETS.legal.mark).toBe("symbol");
     expect(BRAND_MARK_PRESETS.authCompact.mark).toBe("symbol");
+    expect(BRAND_MARK_PRESETS.header.mark).toBe("stacked");
     expect(BRAND_MARK_PRESETS.hero.mark).toBe("stacked");
     expect(BRAND_MARK_PRESETS.auth.mark).toBe("stacked");
     expect(BRAND_MARK_PRESETS.footer.mark).toBe("stacked");
     expect(BRAND_MARK_PRESETS.loading.mark).toBe("stacked");
     expect(brandMarkSource("symbol")).toBe(BRAND_ASSETS.symbol);
     expect(brandMarkSource("stacked")).toBe(BRAND_ASSETS.stackedLogo);
+  });
+
+  it("crops the header stacked lockup from the same approved raster", () => {
+    expect(BRAND_MARK_PRESETS.header.className).toBe(
+      "umtuba-header-lockup__image"
+    );
+    expect(HEADER_STACKED_VISIBLE_RATIO).toBe(0.93);
+    expect(BRAND_ASSETS.stackedLogo).toBe(
+      "/brand/umtuba_logo_stacked_from_approved_video.png"
+    );
+    const navSrc = readFileSync(join(ROOT, "app/components/AppTopNav.tsx"), "utf8");
+    expect(navSrc).toContain('size="header"');
+    expect(navSrc).toContain('className="sr-only"');
+    expect(navSrc).not.toMatch(/app-top-nav-title/);
+    expect(navSrc).not.toMatch(
+      /tracking-\[0\.3em\][\s\S]{0,80}UMTUBA/
+    );
   });
 
   it("never presents a display height larger than the source raster", () => {

@@ -59,37 +59,28 @@ export default function AppTopNav({
       } ${sticky ? "sticky top-0" : ""}`}
     >
       <div
-        className={`flex min-h-16 items-center justify-between gap-2 md:gap-4 ${
-          store ? "h-auto min-h-16 py-1.5" : "h-16"
+        className={`flex min-h-[7.25rem] items-center justify-between gap-2 overflow-visible md:gap-4 ${
+          store ? "h-auto py-1.5" : "py-1"
         } ${
           embedded
             ? "w-full min-w-0 px-0"
             : "mx-auto max-w-[1400px] px-3 md:px-6"
         }`}
       >
-        <div className="flex min-w-0 items-center gap-2 md:gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <Link
             href={APP_ROUTES.home}
             aria-label={t("nav.homeAria")}
-            className={`watch-focus-ring shrink-0 rounded-md ${focusRing}`}
+            className={`watch-focus-ring shrink-0 overflow-visible rounded-md ${focusRing}`}
           >
-            <UmtubaStackedLogo size="nav" priority />
+            <UmtubaStackedLogo size="header" priority />
           </Link>
-          <div className={`min-w-0 ${store ? "hidden sm:block" : ""}`}>
-            <p
-              className={`text-[10px] font-bold uppercase tracking-[0.3em] ${
-                store ? "text-[var(--sf-accent,#d6c4a1)]" : "text-blue-300"
-              }`}
-            >
-              UMTUBA
-            </p>
-            <div className="flex items-center gap-2">
-              <h1 className="app-top-nav-title truncate text-lg font-black tracking-tight">
-                {title}
-              </h1>
+          <h1 className="sr-only">{title}</h1>
+          {badge ? (
+            <div className={`min-w-0 ${store ? "hidden sm:block" : ""}`}>
               {badge}
             </div>
-          </div>
+          ) : null}
         </div>
 
         <nav

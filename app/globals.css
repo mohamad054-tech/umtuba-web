@@ -525,6 +525,28 @@ html[lang="ar"] .placeholder\:text-white\/30::placeholder {
   filter: none;
 }
 
+/* Header lockup: same approved stacked PNG, bottom tagline cropped only.
+   Size the image by width at the full stacked aspect, then clip the
+   container — never fit the whole raster into the short crop box. */
+.umtuba-header-lockup {
+  display: block;
+  width: 8.5rem;
+  height: calc(8.5rem * 776 / 788 * 0.93);
+  overflow: hidden;
+  line-height: 0;
+  flex-shrink: 0;
+}
+
+.umtuba-header-lockup__image {
+  display: block !important;
+  width: 8.5rem !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: unset;
+  object-position: top center;
+}
+
 .app-top-nav-subtitle {
   color: var(--app-top-nav-ink-subtitle);
 }
