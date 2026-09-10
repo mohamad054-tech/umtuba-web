@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useTranslation } from "../../i18n";
 import type { TranslationKey } from "../../../../lib/i18n/messages/types";
@@ -25,8 +25,10 @@ const LEVEL_KEY: Record<string, TranslationKey> = {
 
 export default function LearningHomeView({
   home,
+  headerExtra,
 }: {
   home: LearningHomeSurface;
+  headerExtra?: ReactNode;
 }) {
   const { t, locale } = useTranslation();
   const hrefs = demoHref();
@@ -64,6 +66,7 @@ export default function LearningHomeView({
       title={t("learning.hub.title")}
       subtitle={t("learning.hub.subtitle")}
       source={home.source}
+      headerExtra={headerExtra}
     >
       <div className="mb-6 flex flex-wrap gap-2">
         <button

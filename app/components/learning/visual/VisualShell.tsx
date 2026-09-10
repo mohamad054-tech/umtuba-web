@@ -13,6 +13,7 @@ type VisualShellProps = {
   children: React.ReactNode;
   wide?: boolean;
   source?: LearningDataSource;
+  headerExtra?: React.ReactNode;
 };
 
 export default function VisualShell({
@@ -21,6 +22,7 @@ export default function VisualShell({
   children,
   wide = true,
   source = "demo_fallback",
+  headerExtra,
 }: VisualShellProps) {
   const { t } = useTranslation();
   const hrefs = demoHref();
@@ -69,6 +71,7 @@ export default function VisualShell({
               {t("learning.hub.teacherCenter")}
             </Link>
           </nav>
+          {headerExtra}
           {children}
         </div>
       </div>
