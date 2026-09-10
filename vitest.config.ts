@@ -30,6 +30,7 @@ export default defineConfig({
       "lib/supabase/**/*.test.ts",
       "app/actions/**/*.test.ts",
       "lib/store/**/*.test.ts",
+      "lib/services/cj/expansionCatalog.test.ts",
       "lib/sandbox/**/*.test.ts",
       "lib/stories/**/*.test.ts",
       "lib/search/**/*.test.ts",
