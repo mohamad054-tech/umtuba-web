@@ -1,0 +1,50 @@
+{
+  "task_id": "UMTUBA_LEARNING_HUB_SAFE_INTEGRATION_V1",
+  "owner_goal": "Integrate the approved Learning Hub candidate into /learning as a central composer of existing Learning surfaces, add payment-disabled 1-to-1 booking, and preserve enrollment/progress/assessments/live/partner marketplace. Isolated worktree only. No production deploy or production DB mutation.",
+  "base_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "product_area": "learning",
+  "allowed_files": [
+    "docs/ai/tasks/CURRENT_TASK_MANIFEST.json",
+    "docs/ai/tasks/UMTUBA_LEARNING_HUB_SAFE_INTEGRATION_V1.json",
+    "lib/learning/learningHub.ts",
+    "lib/learning/learningHub.test.ts",
+    "lib/learning/oneToOne.ts",
+    "lib/learning/oneToOne.test.ts",
+    "app/components/learning/hub/**",
+    "app/components/learning/visual/VisualShell.tsx",
+    "app/components/learning/visual/LearningHomeView.tsx",
+    "app/learning/page.tsx",
+    "app/learning/oneToOneActions.ts",
+    "app/learning/learningGuestCatalogEntry.test.ts",
+    "lib/i18n/messages/types.ts",
+    "lib/i18n/messages/teacherCatalogs.ts",
+    "supabase/migrations/*learning_one_to_one_booking_v1.sql"
+  ],
+  "allowed_modules": ["learning"],
+  "forbidden_modules": ["store", "communications", "um_points", "watch"],
+  "protected_contracts": [
+    "EXISTING_LEARNING_ENROLLMENT",
+    "EXISTING_LEARNING_PROGRESS",
+    "EXISTING_LEARNING_ASSESSMENTS",
+    "EXISTING_LEARNING_LIVE",
+    "PARTNER_MARKETPLACE_AS_IS",
+    "LEARNING_PAYMENTS_DISABLED",
+    "LEARNING_NEXUS_UX"
+  ],
+  "required_tests": [
+    "lib/learning/learningHub.test.ts",
+    "lib/learning/oneToOne.test.ts",
+    "npx tsc --noEmit",
+    "git diff --check"
+  ],
+  "required_device_gates": [],
+  "eas_allowed": false,
+  "play_allowed": false,
+  "production_allowed": false,
+  "push_allowed": false,
+  "max_eas_builds": 0,
+  "authorized_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "owner_status_claim": "NONE",
+  "device_evidence": null,
+  "notes": "Candidate zip is a proposal only. Do not flatten LearningHomeView Nexus UX. Do not apply supabase migrations to production. Do not enable payments."
+}

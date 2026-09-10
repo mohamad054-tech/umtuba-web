@@ -1,0 +1,10 @@
+{
+  "task_id": "UMTUBA_LEARNING_HUB_SAFE_INTEGRATION_V1",
+  "status": "IN_PROGRESS",
+  "base_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "worktree": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\LEARNING-HUB-SAFE-INTEGRATION-V1",
+  "branch": "desktop/learning-hub-safe-integration-v1",
+  "candidate_zip": "C:\\Users\\1\\Desktop\\umtuba-learning-hub-candidate.zip",
+  "candidate_sha256": "021EA759DB5EEA3019AF796AE9DA3EE5158CA604EE0195DDD7F03481F5FD6EF8",
+  "notes": "Authoritative Learning+Partners tip is 61e779a. Dirty umtuba-web checkout was not modified."
+}
