@@ -9,36 +9,31 @@ import {
 } from "../../../../lib/learning/learningHub";
 import VisualShell from "../visual/VisualShell";
 import type { LearningDataSource } from "../../../../lib/learning/productization";
-import { LearningHubNav } from "./LearningHubNav";
 
 export function LearningHubShell({
   isTeacher,
   initialSection = "home",
-  surface,
   source = "demo_fallback",
   homePanel,
   panels,
 }: {
   isTeacher: boolean;
   initialSection?: LearningHubSectionId | string;
-  surface?: "discover" | "library";
   source?: LearningDataSource;
   homePanel: ReactNode;
   panels: Partial<Record<Exclude<LearningHubSectionId, "home">, ReactNode>>;
 }) {
   const { t } = useTranslation();
-  const visible = getVisibleLearningHubSections({ isTeacher }).map(
-    (section) => section.id
+  const visible = new Set(
+    [
+      ...getVisibleLearningHubSections({ isTeacher, primaryOnly: false }).map(
+        (section) => section.id
+      ),
+      "assessments" as const,
+    ]
   );
   const requested = parseLearningHubSection(initialSection);
-  const activeSection = visible.includes(requested) ? requested : "home";
-  const nav = (
-    <LearningHubNav
-      activeSection={activeSection}
-      isTeacher={isTeacher}
-      surface={surface}
-    />
-  );
+  const activeSection = visible.has(requested) ? requested : "home";
 
   if (activeSection === "home") {
     return <>{homePanel}</>;
@@ -49,7 +44,7 @@ export function LearningHubShell({
       title={t("learning.hub.title")}
       subtitle={t("learning.hub.subtitle")}
       source={source}
-      headerExtra={nav}
+      learningNav={{ isTeacher, activeSection }}
     >
       <div
         aria-live="polite"

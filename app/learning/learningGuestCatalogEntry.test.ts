@@ -14,6 +14,7 @@ describe("Learning guest course entry", () => {
   it("keeps /learning as the guest-accessible hub and catalog at /learning/catalog", () => {
     const hub = read("app/learning/page.tsx");
     expect(hub).toMatch(/loadLearningHomeSurface/);
+    expect(hub).toMatch(/LearningDashboardView/);
     expect(hub).toMatch(/LearningHomeView/);
     expect(hub).toMatch(/LearningHubShell/);
     expect(hub).not.toMatch(/redirect\(\s*LEARNING_PUBLIC_ROUTES\.catalog/);

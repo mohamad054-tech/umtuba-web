@@ -4,7 +4,8 @@ import {
   loadLearningTeacherCenterSurface,
   shouldPreferLiveLearningData,
 } from "../../lib/learning/productization";
-import { parseLearningHubSection } from "../../lib/learning/learningHub";
+import { resolveLearningHubSection } from "../../lib/learning/learningHub";
+import { parseDiscoverCategory } from "../../lib/learning/learningDashboard";
 import {
   emptyOneToOneHubData,
   loadOneToOneHubData,
@@ -14,11 +15,10 @@ import { listLearningPartnerCourses } from "../../lib/learning/partners/catalog"
 import { learningPartnerHref } from "../../lib/learning/partners/sandboxLinks";
 import { resolveRequestLocale } from "../../lib/i18n/server";
 import LearningHomeView from "../components/learning/visual/LearningHomeView";
-import { LearningHubNav } from "../components/learning/hub/LearningHubNav";
+import MyLearningView from "../components/learning/visual/MyLearningView";
 import { LearningHubShell } from "../components/learning/hub/LearningHubShell";
 import {
   AssessmentsHubPanel,
-  CoursesHubPanel,
   LiveHubPanel,
   MarketplaceHubPanel,
   ProgressHubPanel,
@@ -26,6 +26,7 @@ import {
 } from "../components/learning/hub/LearningHubPanels";
 import { OneToOnePanel } from "../components/learning/hub/OneToOnePanel";
 import { TeacherAvailabilityPanel } from "../components/learning/hub/TeacherAvailabilityPanel";
+import { LearningDashboardView } from "../components/learning/home/LearningDashboardView";
 import PartnerCourseCard from "../components/learning/partners/PartnerCourseCard";
 
 export const metadata = learningHubMetadata;
@@ -38,24 +39,26 @@ type PageProps = {
         surface?: string;
         hub?: string;
         teacher?: string;
+        category?: string;
       }>
     | {
         surface?: string;
         hub?: string;
         teacher?: string;
+        category?: string;
       };
 };
 
 export default async function LearningHubPage({ searchParams }: PageProps) {
   const query = await Promise.resolve(searchParams ?? {});
-  const surface = query.surface === "library" ? "library" : "discover";
   const { locale } = await resolveRequestLocale();
-  const home = await loadLearningHomeSurface(surface);
+  const home = await loadLearningHomeSurface("discover");
   const teacherLoaded = await loadLearningTeacherCenterSurface();
   const teacherSurface =
     teacherLoaded.kind === "ready" ? teacherLoaded.surface : null;
   const isTeacher = Boolean(teacherSurface?.canOperate);
-  const initialSection = parseLearningHubSection(query.hub);
+  const initialSection = resolveLearningHubSection(query);
+  const initialCategory = parseDiscoverCategory(query.category);
   const teachers = home.teachers.map((teacher) => ({
     id: teacher.id,
     name: loc(teacher.name, locale),
@@ -82,28 +85,31 @@ export default async function LearningHubPage({ searchParams }: PageProps) {
   }
 
   const partnerLocale = locale === "ar" ? "ar" : "en";
-  const partnerCourses = listLearningPartnerCourses().slice(0, 6);
+  const partnerCourses = listLearningPartnerCourses();
 
   return (
     <LearningHubShell
       isTeacher={isTeacher}
       initialSection={initialSection}
-      surface={surface}
       source={home.source}
       homePanel={
-        <LearningHomeView
+        <LearningDashboardView
           home={home}
-          headerExtra={
-            <LearningHubNav
-              activeSection="home"
-              isTeacher={isTeacher}
-              surface={surface}
-            />
-          }
+          oneToOne={oneToOne}
+          isTeacher={isTeacher}
+          partnerCourses={partnerCourses}
         />
       }
       panels={{
-        courses: <CoursesHubPanel home={home} />,
+        myLearning: <MyLearningView embedded home={home} />,
+        discover: (
+          <LearningHomeView
+            home={home}
+            embedded
+            initialCategory={initialCategory}
+            isTeacher={isTeacher}
+          />
+        ),
         progress: <ProgressHubPanel home={home} />,
         live: <LiveHubPanel home={home} />,
         assessments: <AssessmentsHubPanel home={home} />,

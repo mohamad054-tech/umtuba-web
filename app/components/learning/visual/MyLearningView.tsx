@@ -104,7 +104,11 @@ export default function MyLearningView({
 
   if (embedded) return body;
   return (
-    <VisualShell title={t("learning.catalog.myLearning")} source={home.source}>
+    <VisualShell
+      title={t("learning.catalog.myLearning")}
+      source={home.source}
+      learningNav={{ isTeacher: false, activeSection: "myLearning" }}
+    >
       {body}
     </VisualShell>
   );

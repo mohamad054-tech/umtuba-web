@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import AppTopNav from "../../AppTopNav";
 import { useTranslation } from "../../i18n";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../../lib/nav";
-import { demoHref } from "../../../../lib/learning/visualDemo";
+import type { LearningHubSectionId } from "../../../../lib/learning/learningHub";
 import type { LearningDataSource } from "../../../../lib/learning/productization";
+import { LearningHubNav } from "../hub/LearningHubNav";
 
 type VisualShellProps = {
   title: string;
@@ -14,6 +14,10 @@ type VisualShellProps = {
   wide?: boolean;
   source?: LearningDataSource;
   headerExtra?: React.ReactNode;
+  learningNav?: {
+    isTeacher: boolean;
+    activeSection?: LearningHubSectionId | null;
+  };
 };
 
 export default function VisualShell({
@@ -23,9 +27,9 @@ export default function VisualShell({
   wide = true,
   source = "demo_fallback",
   headerExtra,
+  learningNav,
 }: VisualShellProps) {
   const { t } = useTranslation();
-  const hrefs = demoHref();
   const bannerKey =
     source === "live"
       ? "learning.visual.liveBanner"
@@ -45,32 +49,12 @@ export default function VisualShell({
         <div
           className={`mx-auto w-full px-4 py-6 md:px-6 ${wide ? "max-w-7xl" : "max-w-3xl"}`}
         >
-          <nav className="mb-6 flex flex-wrap gap-2" aria-label={t("nav.learning")}>
-            <Link
-              href={hrefs.home}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 hover:border-white/40"
-            >
-              {t("learning.hub.title")}
-            </Link>
-            <Link
-              href={hrefs.library}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 hover:border-white/40"
-            >
-              {t("learning.catalog.myLearning")}
-            </Link>
-            <Link
-              href={hrefs.become}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 hover:border-white/40"
-            >
-              {t("learning.hub.becomeTeacher")}
-            </Link>
-            <Link
-              href={hrefs.center}
-              className="watch-focus-ring rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 hover:border-white/40"
-            >
-              {t("learning.hub.teacherCenter")}
-            </Link>
-          </nav>
+          {learningNav ? (
+            <LearningHubNav
+              activeSection={learningNav.activeSection ?? null}
+              isTeacher={learningNav.isTeacher}
+            />
+          ) : null}
           {headerExtra}
           {children}
         </div>

@@ -50,6 +50,7 @@ describe("Learning Hub route and payment regression", () => {
   it("composes the Nexus home instead of flattening it", () => {
     const page = read("app/learning/page.tsx");
     expect(page).toMatch(/loadLearningHomeSurface/);
+    expect(page).toMatch(/LearningDashboardView/);
     expect(page).toMatch(/LearningHomeView/);
     expect(page).toMatch(/LearningHubShell/);
     expect(page).toMatch(/OneToOnePanel/);

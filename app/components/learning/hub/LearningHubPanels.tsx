@@ -90,7 +90,7 @@ export function ProgressHubPanel({ home }: { home: LearningHomeSurface }) {
           {t("learning.hub.progress.certificates")}
         </Link>
         <Link
-          href={learningHubHref("progress", { surface: "library" })}
+          href={learningHubHref("myLearning")}
           className="watch-focus-ring rounded-full border border-white/15 px-4 py-2 text-sm font-bold text-white/80"
         >
           {t("learning.catalog.myLearning")}
