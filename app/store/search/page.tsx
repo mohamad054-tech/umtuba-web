@@ -1,103 +1,53 @@
-import { Suspense } from "react";
-import ProductCard from "../../components/store/ProductCard";
-import SearchFilters from "../../components/store/SearchFilters";
-import StoreEmptyState from "../../components/store/StoreEmptyState";
-import StoreErrorState from "../../components/store/StoreErrorState";
-import StorePageHeader from "../../components/store/StorePageHeader";
+import ApprovedCatalogListing from "../../components/store/ApprovedCatalogListing";
 import StoreShell from "../../components/store/StoreShell";
-import { ProductGridSkeleton } from "../../components/store/StoreSkeleton";
 import { APP_ROUTES } from "../../lib/nav";
-import {
-  filterCatalogByAvailability,
-  sortCatalogItems,
-} from "../../lib/storefront/deriveSections";
 import { createTranslator } from "../../../lib/i18n";
 import { resolveRequestLocale } from "../../../lib/i18n/server";
-import { createClient } from "../../../lib/supabase/server";
-import {
-  listActiveCategories,
-  listPublicCatalog,
-} from "../../../lib/store/catalogQueries";
-
-type SearchPageProps = {
-  searchParams?: Promise<{
-    q?: string;
-    category?: string;
-    sort?: string;
-    availability?: string;
-  }>;
-};
+import { storeSearchMetadata } from "../../../lib/site/routeMetadata";
+import { loadApprovedCustomerStorefront } from "../../../lib/store/approvedCatalog/loadCustomerStorefront";
+import { resolveStoreProductLocale } from "../../../lib/store/productLocalization/resolveStoreProductLocale";
 
 export const dynamic = "force-dynamic";
 
-import { storeSearchMetadata } from "../../../lib/site/routeMetadata";
-
 export const metadata = storeSearchMetadata;
 
+type SearchPageProps = {
+  searchParams?:
+    | Promise<{
+        q?: string;
+        category?: string;
+        dept?: string;
+        sub?: string;
+        rail?: string;
+      }>
+    | {
+        q?: string;
+        category?: string;
+        dept?: string;
+        sub?: string;
+        rail?: string;
+      };
+};
+
 export default async function StoreSearchPage({ searchParams }: SearchPageProps) {
-  const params = (await searchParams) ?? {};
-  const search = typeof params.q === "string" ? params.q : "";
-  const categoryId =
-    typeof params.category === "string" ? params.category : undefined;
-  const sort = typeof params.sort === "string" ? params.sort : "newest";
-  const availability =
-    typeof params.availability === "string" ? params.availability : "";
-
-  const { locale } = await resolveRequestLocale();
+  const params = await Promise.resolve(searchParams ?? {});
+  const { locale, direction } = await resolveRequestLocale();
+  const productLocale = resolveStoreProductLocale({ requestLocale: locale });
   const t = createTranslator(locale);
-  const supabase = await createClient();
-  const [categories, catalog] = await Promise.all([
-    listActiveCategories(supabase),
-    listPublicCatalog(supabase, {
-      search,
-      categoryId,
-      limit: 100,
-    }),
-  ]);
-
-  const items = sortCatalogItems(
-    filterCatalogByAvailability(catalog.items, availability),
-    sort
-  );
+  const storefront = loadApprovedCustomerStorefront(productLocale);
 
   return (
-    <StoreShell title={t("store.search.navTitle")} subtitle={t("store.search.navSubtitle")}>
-      <StorePageHeader
-        eyebrow={t("store.search.eyebrow")}
-        title={t("store.search.title")}
-        description={t("store.search.description")}
-      />
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[260px_1fr]">
-        <Suspense
-          fallback={
-            <div className="h-64 animate-pulse rounded-[24px] bg-white/5" />
-          }
-        >
-          <SearchFilters categories={categories} resultCount={items.length} />
-        </Suspense>
-
-        <div>
-          {catalog.error ? (
-            <StoreErrorState message={catalog.error} />
-          ) : items.length === 0 ? (
-            <StoreEmptyState
-              title={t("store.search.noMatchesTitle")}
-              description={t("store.search.noMatchesDescription")}
-              actionHref={APP_ROUTES.storeSearch}
-              actionLabel={t("store.search.clear")}
-            />
-          ) : (
-            <Suspense fallback={<ProductGridSkeleton />}>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {items.map((item) => (
-                  <ProductCard key={item.product.id} item={item} />
-                ))}
-              </div>
-            </Suspense>
-          )}
-        </div>
-      </div>
-    </StoreShell>
+    <div dir={direction}>
+      <StoreShell title={t("store.search.navTitle")} subtitle={t("store.search.navSubtitle")}>
+        <ApprovedCatalogListing
+          items={storefront.items}
+          visibleCount={storefront.visibleCount}
+          locale={locale}
+          productLocale={productLocale}
+          params={params}
+          formAction={APP_ROUTES.storeSearch}
+        />
+      </StoreShell>
+    </div>
   );
 }

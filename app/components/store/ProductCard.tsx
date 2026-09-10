@@ -12,6 +12,7 @@ type ProductCardProps = {
   badge?: string;
   showWishlist?: boolean;
   initialWishlisted?: boolean;
+  href?: string;
 };
 
 export default function ProductCard({
@@ -19,6 +20,7 @@ export default function ProductCard({
   badge,
   showWishlist = true,
   initialWishlisted = false,
+  href,
 }: ProductCardProps) {
   const { t } = useTranslation();
   const availability =
@@ -32,7 +34,7 @@ export default function ProductCard({
               tone: "low" as const,
             }
           : { text: t("store.product.inStock"), tone: "ok" as const };
-  const href = `/store/${item.store.slug}/product/${item.product.slug}`;
+  const resolvedHref = href ?? `/store/${item.store.slug}/product/${item.product.slug}`;
   const price =
     item.priceMinor != null && item.currency
       ? formatMinorUnits(item.priceMinor, item.currency)
@@ -50,7 +52,7 @@ export default function ProductCard({
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(156,180,255,0.45)] hover:shadow-[var(--sf-shadow)]">
-      <Link href={href} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
+      <Link href={resolvedHref} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
         <span className="sr-only">
           {t("store.product.viewTitle", { values: { title: item.product.title } })}
         </span>
@@ -104,7 +106,7 @@ export default function ProductCard({
             <WishlistButton
               productId={item.product.id}
               initialWishlisted={initialWishlisted}
-              nextHref={href}
+              nextHref={resolvedHref}
               className="watch-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40 text-base text-white backdrop-blur-sm transition hover:bg-black/55"
             />
           </div>

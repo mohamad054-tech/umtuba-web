@@ -17,6 +17,7 @@ export {
   buildSellerOrderHref,
   buildSellerProductHref,
   buildStoreOrderHref,
+  buildApprovedStoreItemHref,
   buildStoreProductIdHref,
   buildStoreShopIdHref,
   buildWorldCityHref,
