@@ -2,7 +2,9 @@ import type { LearningHubMessages } from "./types";
 
 export const learningHubEnMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Learning sections",
-  "learning.hub.section.home": "Overview",
+  "learning.hub.section.home": "Home",
+  "learning.hub.section.myLearning": "My Learning",
+  "learning.hub.section.discover": "Discover",
   "learning.hub.section.courses": "Courses & lessons",
   "learning.hub.section.progress": "Progress",
   "learning.hub.section.live": "Live",
@@ -77,11 +79,33 @@ export const learningHubEnMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "The session request was confirmed.",
   "learning.oneToOne.success.availability": "Availability was updated.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Your courses, progress, and next session — in one place.",
+  "learning.home.viewAll": "View all",
+  "learning.home.snapshot.courses": "My courses",
+  "learning.home.snapshot.progress": "Progress",
+  "learning.home.snapshot.nextSession": "Next session",
+  "learning.home.snapshot.certificates": "Certificates",
+  "learning.home.snapshot.emptySession": "None scheduled",
+  "learning.home.continueEmpty":
+    "You are not in a course yet. Discover a course to start.",
+  "learning.home.continueEmptyCta": "Discover courses",
+  "learning.home.nextLesson": "Next lesson",
+  "learning.home.dueTitle": "Action due",
+  "learning.home.dueBody":
+    "Continue your course to complete the next required activity.",
+  "learning.home.dueCta": "Open course",
+  "learning.home.oneToOneBlocked":
+    "1-to-1 booking is preview-only until the local database is available.",
+  "learning.home.partnerPreview": "Partner courses",
+  "learning.home.morePartners": "View marketplace",
 };
 
 export const learningHubArMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "أقسام التعلّم",
-  "learning.hub.section.home": "نظرة عامة",
+  "learning.hub.section.home": "الرئيسية",
+  "learning.hub.section.myLearning": "تعلّمي",
+  "learning.hub.section.discover": "اكتشف",
   "learning.hub.section.courses": "الدورات والدروس",
   "learning.hub.section.progress": "التقدّم",
   "learning.hub.section.live": "حصص مباشرة",
@@ -156,11 +180,30 @@ export const learningHubArMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "تم تأكيد طلب الحصة.",
   "learning.oneToOne.success.availability": "تم تحديث التفرّغ.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle": "دوراتك وتقدّمك وحصتك القادمة — في مكان واحد.",
+  "learning.home.viewAll": "عرض الكل",
+  "learning.home.snapshot.courses": "دوراتي",
+  "learning.home.snapshot.progress": "التقدّم",
+  "learning.home.snapshot.nextSession": "الحصة القادمة",
+  "learning.home.snapshot.certificates": "الشهادات",
+  "learning.home.snapshot.emptySession": "لا توجد حصة مجدولة",
+  "learning.home.continueEmpty": "لست مسجّلاً في دورة بعد. اكتشف دورة للبدء.",
+  "learning.home.continueEmptyCta": "اكتشف الدورات",
+  "learning.home.nextLesson": "الدرس التالي",
+  "learning.home.dueTitle": "إجراء مستحق",
+  "learning.home.dueBody": "تابع دورتك لإكمال النشاط المطلوب التالي.",
+  "learning.home.dueCta": "فتح الدورة",
+  "learning.home.oneToOneBlocked":
+    "حجز الحصة الفردية للمعاينة فقط إلى أن تتوفر قاعدة البيانات المحلية.",
+  "learning.home.partnerPreview": "دورات الشركاء",
+  "learning.home.morePartners": "عرض السوق",
 };
 
 export const learningHubFrMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Sections d’apprentissage",
-  "learning.hub.section.home": "Vue d’ensemble",
+  "learning.hub.section.home": "Accueil",
+  "learning.hub.section.myLearning": "Mon apprentissage",
+  "learning.hub.section.discover": "Découvrir",
   "learning.hub.section.courses": "Cours et leçons",
   "learning.hub.section.progress": "Progression",
   "learning.hub.section.live": "En direct",
@@ -238,11 +281,33 @@ export const learningHubFrMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "La demande de séance a été confirmée.",
   "learning.oneToOne.success.availability": "Les disponibilités ont été mises à jour.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Vos cours, votre progression et votre prochaine séance — au même endroit.",
+  "learning.home.viewAll": "Tout voir",
+  "learning.home.snapshot.courses": "Mes cours",
+  "learning.home.snapshot.progress": "Progression",
+  "learning.home.snapshot.nextSession": "Prochaine séance",
+  "learning.home.snapshot.certificates": "Certificats",
+  "learning.home.snapshot.emptySession": "Rien de prévu",
+  "learning.home.continueEmpty":
+    "Vous n’êtes pas encore inscrit à un cours. Découvrez un cours pour commencer.",
+  "learning.home.continueEmptyCta": "Découvrir les cours",
+  "learning.home.nextLesson": "Leçon suivante",
+  "learning.home.dueTitle": "Action à faire",
+  "learning.home.dueBody":
+    "Continuez votre cours pour terminer la prochaine activité requise.",
+  "learning.home.dueCta": "Ouvrir le cours",
+  "learning.home.oneToOneBlocked":
+    "La réservation individuelle est en aperçu tant que la base locale n’est pas disponible.",
+  "learning.home.partnerPreview": "Cours partenaires",
+  "learning.home.morePartners": "Voir la place de marché",
 };
 
 export const learningHubEsMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Secciones de aprendizaje",
-  "learning.hub.section.home": "Resumen",
+  "learning.hub.section.home": "Inicio",
+  "learning.hub.section.myLearning": "Mi aprendizaje",
+  "learning.hub.section.discover": "Descubrir",
   "learning.hub.section.courses": "Cursos y lecciones",
   "learning.hub.section.progress": "Progreso",
   "learning.hub.section.live": "En vivo",
@@ -320,11 +385,33 @@ export const learningHubEsMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "Se confirmó la solicitud de sesión.",
   "learning.oneToOne.success.availability": "Se actualizó la disponibilidad.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Tus cursos, tu progreso y tu próxima sesión — en un solo lugar.",
+  "learning.home.viewAll": "Ver todo",
+  "learning.home.snapshot.courses": "Mis cursos",
+  "learning.home.snapshot.progress": "Progreso",
+  "learning.home.snapshot.nextSession": "Próxima sesión",
+  "learning.home.snapshot.certificates": "Certificados",
+  "learning.home.snapshot.emptySession": "Nada programado",
+  "learning.home.continueEmpty":
+    "Aún no estás en un curso. Descubre un curso para empezar.",
+  "learning.home.continueEmptyCta": "Descubrir cursos",
+  "learning.home.nextLesson": "Siguiente lección",
+  "learning.home.dueTitle": "Acción pendiente",
+  "learning.home.dueBody":
+    "Continúa tu curso para completar la siguiente actividad requerida.",
+  "learning.home.dueCta": "Abrir curso",
+  "learning.home.oneToOneBlocked":
+    "La reserva individual es solo una vista previa hasta que la base local esté disponible.",
+  "learning.home.partnerPreview": "Cursos de socios",
+  "learning.home.morePartners": "Ver el mercado",
 };
 
 export const learningHubDeMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Lernbereiche",
-  "learning.hub.section.home": "Überblick",
+  "learning.hub.section.home": "Startseite",
+  "learning.hub.section.myLearning": "Mein Lernen",
+  "learning.hub.section.discover": "Entdecken",
   "learning.hub.section.courses": "Kurse und Lektionen",
   "learning.hub.section.progress": "Fortschritt",
   "learning.hub.section.live": "Live",
@@ -402,11 +489,33 @@ export const learningHubDeMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "Die Sitzungsanfrage wurde bestätigt.",
   "learning.oneToOne.success.availability": "Die Verfügbarkeit wurde aktualisiert.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Deine Kurse, dein Fortschritt und die nächste Sitzung — an einem Ort.",
+  "learning.home.viewAll": "Alle ansehen",
+  "learning.home.snapshot.courses": "Meine Kurse",
+  "learning.home.snapshot.progress": "Fortschritt",
+  "learning.home.snapshot.nextSession": "Nächste Sitzung",
+  "learning.home.snapshot.certificates": "Zertifikate",
+  "learning.home.snapshot.emptySession": "Nichts geplant",
+  "learning.home.continueEmpty":
+    "Du bist noch in keinem Kurs. Entdecke einen Kurs, um zu starten.",
+  "learning.home.continueEmptyCta": "Kurse entdecken",
+  "learning.home.nextLesson": "Nächste Lektion",
+  "learning.home.dueTitle": "Offene Aufgabe",
+  "learning.home.dueBody":
+    "Setze deinen Kurs fort, um die nächste erforderliche Aktivität abzuschließen.",
+  "learning.home.dueCta": "Kurs öffnen",
+  "learning.home.oneToOneBlocked":
+    "Einzelbuchungen sind nur eine Vorschau, bis die lokale Datenbank verfügbar ist.",
+  "learning.home.partnerPreview": "Partnerkurse",
+  "learning.home.morePartners": "Marktplatz öffnen",
 };
 
 export const learningHubPtMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Seções de aprendizagem",
-  "learning.hub.section.home": "Visão geral",
+  "learning.hub.section.home": "Início",
+  "learning.hub.section.myLearning": "Meu aprendizado",
+  "learning.hub.section.discover": "Descobrir",
   "learning.hub.section.courses": "Cursos e aulas",
   "learning.hub.section.progress": "Progresso",
   "learning.hub.section.live": "Ao vivo",
@@ -484,11 +593,33 @@ export const learningHubPtMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "O pedido de sessão foi confirmado.",
   "learning.oneToOne.success.availability": "A disponibilidade foi atualizada.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Seus cursos, seu progresso e a próxima sessão — em um só lugar.",
+  "learning.home.viewAll": "Ver tudo",
+  "learning.home.snapshot.courses": "Meus cursos",
+  "learning.home.snapshot.progress": "Progresso",
+  "learning.home.snapshot.nextSession": "Próxima sessão",
+  "learning.home.snapshot.certificates": "Certificados",
+  "learning.home.snapshot.emptySession": "Nada agendado",
+  "learning.home.continueEmpty":
+    "Você ainda não está em um curso. Descubra um curso para começar.",
+  "learning.home.continueEmptyCta": "Descobrir cursos",
+  "learning.home.nextLesson": "Próxima aula",
+  "learning.home.dueTitle": "Ação pendente",
+  "learning.home.dueBody":
+    "Continue o curso para concluir a próxima atividade obrigatória.",
+  "learning.home.dueCta": "Abrir curso",
+  "learning.home.oneToOneBlocked":
+    "A reserva individual é só pré-visualização até a base local estar disponível.",
+  "learning.home.partnerPreview": "Cursos de parceiros",
+  "learning.home.morePartners": "Ver o marketplace",
 };
 
 export const learningHubIdMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Bagian pembelajaran",
-  "learning.hub.section.home": "Ringkasan",
+  "learning.hub.section.home": "Beranda",
+  "learning.hub.section.myLearning": "Pembelajaran saya",
+  "learning.hub.section.discover": "Temukan",
   "learning.hub.section.courses": "Kursus & pelajaran",
   "learning.hub.section.progress": "Progres",
   "learning.hub.section.live": "Langsung",
@@ -565,11 +696,33 @@ export const learningHubIdMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "Permintaan sesi dikonfirmasi.",
   "learning.oneToOne.success.availability": "Ketersediaan diperbarui.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Kursus, progres, dan sesi berikutnya — di satu tempat.",
+  "learning.home.viewAll": "Lihat semua",
+  "learning.home.snapshot.courses": "Kursus saya",
+  "learning.home.snapshot.progress": "Progres",
+  "learning.home.snapshot.nextSession": "Sesi berikutnya",
+  "learning.home.snapshot.certificates": "Sertifikat",
+  "learning.home.snapshot.emptySession": "Belum ada jadwal",
+  "learning.home.continueEmpty":
+    "Anda belum mengikuti kursus. Temukan kursus untuk mulai.",
+  "learning.home.continueEmptyCta": "Temukan kursus",
+  "learning.home.nextLesson": "Pelajaran berikutnya",
+  "learning.home.dueTitle": "Tindakan jatuh tempo",
+  "learning.home.dueBody":
+    "Lanjutkan kursus untuk menyelesaikan aktivitas wajib berikutnya.",
+  "learning.home.dueCta": "Buka kursus",
+  "learning.home.oneToOneBlocked":
+    "Pemesanan 1-ke-1 hanya pratinjau hingga basis data lokal tersedia.",
+  "learning.home.partnerPreview": "Kursus mitra",
+  "learning.home.morePartners": "Lihat marketplace",
 };
 
 export const learningHubHiMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "सीखने के अनुभाग",
-  "learning.hub.section.home": "सारांश",
+  "learning.hub.section.home": "होम",
+  "learning.hub.section.myLearning": "मेरी पढ़ाई",
+  "learning.hub.section.discover": "खोजें",
   "learning.hub.section.courses": "पाठ्यक्रम और पाठ",
   "learning.hub.section.progress": "प्रगति",
   "learning.hub.section.live": "लाइव",
@@ -645,11 +798,32 @@ export const learningHubHiMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "सत्र अनुरोध की पुष्टि हो गई।",
   "learning.oneToOne.success.availability": "उपलब्धता अद्यतन हो गई।",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle": "आपके पाठ्यक्रम, प्रगति और अगला सत्र — एक जगह।",
+  "learning.home.viewAll": "सभी देखें",
+  "learning.home.snapshot.courses": "मेरे पाठ्यक्रम",
+  "learning.home.snapshot.progress": "प्रगति",
+  "learning.home.snapshot.nextSession": "अगला सत्र",
+  "learning.home.snapshot.certificates": "प्रमाणपत्र",
+  "learning.home.snapshot.emptySession": "कोई सत्र निर्धारित नहीं",
+  "learning.home.continueEmpty":
+    "आप अभी किसी पाठ्यक्रम में नहीं हैं। शुरू करने के लिए पाठ्यक्रम खोजें।",
+  "learning.home.continueEmptyCta": "पाठ्यक्रम खोजें",
+  "learning.home.nextLesson": "अगला पाठ",
+  "learning.home.dueTitle": "लंबित कार्य",
+  "learning.home.dueBody":
+    "अगली आवश्यक गतिविधि पूरी करने के लिए अपना पाठ्यक्रम जारी रखें।",
+  "learning.home.dueCta": "पाठ्यक्रम खोलें",
+  "learning.home.oneToOneBlocked":
+    "स्थानीय डेटाबेस उपलब्ध होने तक एक-से-एक बुकिंग केवल पूर्वावलोकन है।",
+  "learning.home.partnerPreview": "साझेदार पाठ्यक्रम",
+  "learning.home.morePartners": "बाज़ार देखें",
 };
 
 export const learningHubRuMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Разделы обучения",
-  "learning.hub.section.home": "Обзор",
+  "learning.hub.section.home": "Главная",
+  "learning.hub.section.myLearning": "Моё обучение",
+  "learning.hub.section.discover": "Обзор курсов",
   "learning.hub.section.courses": "Курсы и уроки",
   "learning.hub.section.progress": "Прогресс",
   "learning.hub.section.live": "Эфир",
@@ -727,11 +901,33 @@ export const learningHubRuMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "Запрос на занятие подтверждён.",
   "learning.oneToOne.success.availability": "Доступность обновлена.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Ваши курсы, прогресс и ближайшее занятие — в одном месте.",
+  "learning.home.viewAll": "Смотреть все",
+  "learning.home.snapshot.courses": "Мои курсы",
+  "learning.home.snapshot.progress": "Прогресс",
+  "learning.home.snapshot.nextSession": "Ближайшее занятие",
+  "learning.home.snapshot.certificates": "Сертификаты",
+  "learning.home.snapshot.emptySession": "Ничего не запланировано",
+  "learning.home.continueEmpty":
+    "Вы ещё не на курсе. Найдите курс, чтобы начать.",
+  "learning.home.continueEmptyCta": "Найти курсы",
+  "learning.home.nextLesson": "Следующий урок",
+  "learning.home.dueTitle": "Нужное действие",
+  "learning.home.dueBody":
+    "Продолжите курс, чтобы выполнить следующее обязательное задание.",
+  "learning.home.dueCta": "Открыть курс",
+  "learning.home.oneToOneBlocked":
+    "Индивидуальная запись доступна только для предпросмотра, пока локальная база недоступна.",
+  "learning.home.partnerPreview": "Курсы партнёров",
+  "learning.home.morePartners": "Открыть витрину",
 };
 
 export const learningHubTrMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "Öğrenme bölümleri",
-  "learning.hub.section.home": "Genel bakış",
+  "learning.hub.section.home": "Ana sayfa",
+  "learning.hub.section.myLearning": "Öğrenmem",
+  "learning.hub.section.discover": "Keşfet",
   "learning.hub.section.courses": "Kurslar ve dersler",
   "learning.hub.section.progress": "İlerleme",
   "learning.hub.section.live": "Canlı",
@@ -807,11 +1003,33 @@ export const learningHubTrMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "Oturum isteği onaylandı.",
   "learning.oneToOne.success.availability": "Müsaitlik güncellendi.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "Kursların, ilerlemen ve sonraki oturumun — tek yerde.",
+  "learning.home.viewAll": "Tümünü gör",
+  "learning.home.snapshot.courses": "Kurslarım",
+  "learning.home.snapshot.progress": "İlerleme",
+  "learning.home.snapshot.nextSession": "Sonraki oturum",
+  "learning.home.snapshot.certificates": "Sertifikalar",
+  "learning.home.snapshot.emptySession": "Planlanmış oturum yok",
+  "learning.home.continueEmpty":
+    "Henüz bir kursta değilsiniz. Başlamak için bir kurs keşfedin.",
+  "learning.home.continueEmptyCta": "Kursları keşfet",
+  "learning.home.nextLesson": "Sonraki ders",
+  "learning.home.dueTitle": "Yapılacak işlem",
+  "learning.home.dueBody":
+    "Sonraki zorunlu etkinliği tamamlamak için kursunuza devam edin.",
+  "learning.home.dueCta": "Kursu aç",
+  "learning.home.oneToOneBlocked":
+    "Yerel veritabanı hazır olana kadar bire bir rezervasyon yalnızca önizlemedir.",
+  "learning.home.partnerPreview": "İş ortağı kursları",
+  "learning.home.morePartners": "Pazaryerini aç",
 };
 
 export const learningHubZhCNMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "学习分区",
-  "learning.hub.section.home": "总览",
+  "learning.hub.section.home": "首页",
+  "learning.hub.section.myLearning": "我的学习",
+  "learning.hub.section.discover": "发现",
   "learning.hub.section.courses": "课程与课时",
   "learning.hub.section.progress": "进度",
   "learning.hub.section.live": "直播",
@@ -886,11 +1104,29 @@ export const learningHubZhCNMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "课时申请已确认。",
   "learning.oneToOne.success.availability": "可约时间已更新。",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle": "你的课程、进度和下一次课 —— 都在这里。",
+  "learning.home.viewAll": "查看全部",
+  "learning.home.snapshot.courses": "我的课程",
+  "learning.home.snapshot.progress": "进度",
+  "learning.home.snapshot.nextSession": "下一次课",
+  "learning.home.snapshot.certificates": "证书",
+  "learning.home.snapshot.emptySession": "暂无安排",
+  "learning.home.continueEmpty": "你还没有在学的课程。发现一门课开始学习。",
+  "learning.home.continueEmptyCta": "发现课程",
+  "learning.home.nextLesson": "下一课时",
+  "learning.home.dueTitle": "待完成事项",
+  "learning.home.dueBody": "继续课程以完成下一项必做活动。",
+  "learning.home.dueCta": "打开课程",
+  "learning.home.oneToOneBlocked": "本地数据库可用之前，一对一预约仅供预览。",
+  "learning.home.partnerPreview": "合作课程",
+  "learning.home.morePartners": "查看市场",
 };
 
 export const learningHubJaMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "学習セクション",
-  "learning.hub.section.home": "概要",
+  "learning.hub.section.home": "ホーム",
+  "learning.hub.section.myLearning": "マイラーニング",
+  "learning.hub.section.discover": "見つける",
   "learning.hub.section.courses": "コースとレッスン",
   "learning.hub.section.progress": "進捗",
   "learning.hub.section.live": "ライブ",
@@ -966,11 +1202,32 @@ export const learningHubJaMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "セッションの依頼を確定しました。",
   "learning.oneToOne.success.availability": "空き時間を更新しました。",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle":
+    "受講中のコース、進捗、次のセッションをひとつに。",
+  "learning.home.viewAll": "すべて見る",
+  "learning.home.snapshot.courses": "受講コース",
+  "learning.home.snapshot.progress": "進捗",
+  "learning.home.snapshot.nextSession": "次のセッション",
+  "learning.home.snapshot.certificates": "修了証",
+  "learning.home.snapshot.emptySession": "予定なし",
+  "learning.home.continueEmpty":
+    "まだ受講中のコースはありません。コースを見つけて始めましょう。",
+  "learning.home.continueEmptyCta": "コースを見つける",
+  "learning.home.nextLesson": "次のレッスン",
+  "learning.home.dueTitle": "未完了の課題",
+  "learning.home.dueBody": "次の必須アクティビティを終えるにはコースを続けてください。",
+  "learning.home.dueCta": "コースを開く",
+  "learning.home.oneToOneBlocked":
+    "ローカルデータベースが使えるまで、1対1の予約はプレビューのみです。",
+  "learning.home.partnerPreview": "パートナーコース",
+  "learning.home.morePartners": "マーケットを見る",
 };
 
 export const learningHubKoMessages: LearningHubMessages = {
   "learning.hub.sectionsAria": "학습 섹션",
-  "learning.hub.section.home": "개요",
+  "learning.hub.section.home": "홈",
+  "learning.hub.section.myLearning": "내 학습",
+  "learning.hub.section.discover": "탐색",
   "learning.hub.section.courses": "코스와 레슨",
   "learning.hub.section.progress": "진행",
   "learning.hub.section.live": "라이브",
@@ -1046,6 +1303,24 @@ export const learningHubKoMessages: LearningHubMessages = {
   "learning.oneToOne.success.confirmed": "세션 요청이 확정되었습니다.",
   "learning.oneToOne.success.availability": "가능 시간이 업데이트되었습니다.",
   "learning.oneToOne.range": "{start} – {end}",
+  "learning.home.subtitle": "내 코스, 진행 상황, 다음 세션을 한곳에서.",
+  "learning.home.viewAll": "모두 보기",
+  "learning.home.snapshot.courses": "내 코스",
+  "learning.home.snapshot.progress": "진행",
+  "learning.home.snapshot.nextSession": "다음 세션",
+  "learning.home.snapshot.certificates": "수료증",
+  "learning.home.snapshot.emptySession": "예정 없음",
+  "learning.home.continueEmpty":
+    "아직 수강 중인 코스가 없습니다. 코스를 찾아 시작하세요.",
+  "learning.home.continueEmptyCta": "코스 탐색",
+  "learning.home.nextLesson": "다음 레슨",
+  "learning.home.dueTitle": "할 일",
+  "learning.home.dueBody": "다음 필수 활동을 마치려면 코스를 이어가세요.",
+  "learning.home.dueCta": "코스 열기",
+  "learning.home.oneToOneBlocked":
+    "로컬 데이터베이스를 사용할 수 있을 때까지 1:1 예약은 미리보기만 가능합니다.",
+  "learning.home.partnerPreview": "파트너 코스",
+  "learning.home.morePartners": "마켓플레이스 보기",
 };
 
 export const LEARNING_HUB_MESSAGE_KEYS = Object.keys(

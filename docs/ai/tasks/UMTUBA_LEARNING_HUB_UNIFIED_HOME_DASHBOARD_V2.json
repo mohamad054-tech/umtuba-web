@@ -1,0 +1,9 @@
+{
+  "task_id": "UMTUBA_LEARNING_HUB_UNIFIED_HOME_DASHBOARD_V2",
+  "status": "IMPLEMENTATION_COMPLETE_PENDING_OWNER",
+  "base_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "continue_from_sha": "c9f791cbe919dac2d08cc6b25db64af2b78e5fcf",
+  "worktree": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\LEARNING-HUB-SAFE-INTEGRATION-V1",
+  "branch": "desktop/learning-hub-safe-integration-v1",
+  "notes": "Owner requested a unified Learning dashboard. Prior hub commits stay. Dirty umtuba-web checkout is not modified."
+}

@@ -1273,6 +1273,8 @@ export type TeacherMessages = {
 export type LearningHubMessages = {
   "learning.hub.sectionsAria": string;
   "learning.hub.section.home": string;
+  "learning.hub.section.myLearning": string;
+  "learning.hub.section.discover": string;
   "learning.hub.section.courses": string;
   "learning.hub.section.progress": string;
   "learning.hub.section.live": string;
@@ -1340,6 +1342,22 @@ export type LearningHubMessages = {
   "learning.oneToOne.success.confirmed": string;
   "learning.oneToOne.success.availability": string;
   "learning.oneToOne.range": string;
+  "learning.home.subtitle": string;
+  "learning.home.viewAll": string;
+  "learning.home.snapshot.courses": string;
+  "learning.home.snapshot.progress": string;
+  "learning.home.snapshot.nextSession": string;
+  "learning.home.snapshot.certificates": string;
+  "learning.home.snapshot.emptySession": string;
+  "learning.home.continueEmpty": string;
+  "learning.home.continueEmptyCta": string;
+  "learning.home.nextLesson": string;
+  "learning.home.dueTitle": string;
+  "learning.home.dueBody": string;
+  "learning.home.dueCta": string;
+  "learning.home.oneToOneBlocked": string;
+  "learning.home.partnerPreview": string;
+  "learning.home.morePartners": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

@@ -22,9 +22,10 @@ const ARABIC_LETTER = /[\u0600-\u06FF]/;
 
 const LEAK_KEYS: Array<keyof LearningHubMessages> = [
   "learning.hub.section.home",
-  "learning.hub.section.courses",
+  "learning.hub.section.myLearning",
+  "learning.hub.section.discover",
   "learning.hub.section.oneToOne",
-  "learning.hub.section.marketplace",
+  "learning.home.continueEmptyCta",
   "learning.oneToOne.book",
   "learning.oneToOne.noTimes",
   "learning.oneToOne.paymentDisabled",
@@ -36,6 +37,10 @@ const HUB_SOURCES = [
   "app/components/learning/hub/LearningHubPanels.tsx",
   "app/components/learning/hub/OneToOnePanel.tsx",
   "app/components/learning/hub/TeacherAvailabilityPanel.tsx",
+  "app/components/learning/home/LearningDashboardView.tsx",
+  "app/components/learning/home/LearningGreeting.tsx",
+  "app/components/learning/home/ContinueLearningCard.tsx",
+  "app/components/learning/home/OneToOnePreview.tsx",
   "app/learning/page.tsx",
 ];
 
@@ -48,6 +53,7 @@ const FORBIDDEN_LITERALS = [
   '"Find a teacher"',
   '"Teacher availability"',
   '"Available times"',
+  '"Discover courses"',
 ];
 
 function placeholders(value: string): string[] {
@@ -112,6 +118,7 @@ describe("Learning Hub i18n completeness", () => {
     }
     expect(translate("ar", "learning.hub.section.home")).toMatch(ARABIC_LETTER);
     expect(translate("ar", "learning.oneToOne.book")).toMatch(ARABIC_LETTER);
+    expect(translate("fr", "learning.hub.section.home")).toBe("Accueil");
     expect(translate("fr", "learning.hub.section.courses")).toBe(
       "Cours et leçons"
     );

@@ -1,22 +1,30 @@
 {
-  "task_id": "UMTUBA_LEARNING_HUB_SAFE_INTEGRATION_V1",
-  "owner_goal": "Integrate the approved Learning Hub candidate into /learning as a central composer of existing Learning surfaces, add payment-disabled 1-to-1 booking, and preserve enrollment/progress/assessments/live/partner marketplace. Isolated worktree only. No production deploy or production DB mutation.",
+  "task_id": "UMTUBA_LEARNING_HUB_UNIFIED_HOME_DASHBOARD_V2",
+  "owner_goal": "Recompose the existing Learning Hub into one unified /learning dashboard. Home is not a full catalog. Preserve enrollment/progress/assessments/live/marketplace/1-to-1. Isolated worktree only. No production deploy or production DB mutation.",
   "base_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
   "product_area": "learning",
   "allowed_files": [
     "docs/ai/tasks/CURRENT_TASK_MANIFEST.json",
     "docs/ai/tasks/UMTUBA_LEARNING_HUB_SAFE_INTEGRATION_V1.json",
+    "docs/ai/tasks/UMTUBA_LEARNING_HUB_UNIFIED_HOME_DASHBOARD_V2.json",
     "lib/learning/learningHub.ts",
     "lib/learning/learningHub.test.ts",
+    "lib/learning/learningDashboard.ts",
+    "lib/learning/learningDashboard.test.ts",
+    "lib/learning/learningHub.i18n.test.ts",
     "lib/learning/oneToOne.ts",
     "lib/learning/oneToOne.test.ts",
     "app/components/learning/hub/**",
+    "app/components/learning/home/**",
     "app/components/learning/visual/VisualShell.tsx",
     "app/components/learning/visual/LearningHomeView.tsx",
+    "app/components/learning/visual/MyLearningView.tsx",
+    "app/components/learning/visual/TeacherCenterView.tsx",
     "app/learning/page.tsx",
     "app/learning/oneToOneActions.ts",
     "app/learning/learningGuestCatalogEntry.test.ts",
     "lib/i18n/messages/types.ts",
+    "lib/i18n/messages/learningHubCatalogs.ts",
     "lib/i18n/messages/teacherCatalogs.ts",
     "supabase/migrations/*learning_one_to_one_booking_v1.sql"
   ],
@@ -29,10 +37,12 @@
     "EXISTING_LEARNING_LIVE",
     "PARTNER_MARKETPLACE_AS_IS",
     "LEARNING_PAYMENTS_DISABLED",
-    "LEARNING_NEXUS_UX"
+    "LEARNING_NEXUS_UX",
+    "UNIFIED_LEARNING_HOME_DASHBOARD"
   ],
   "required_tests": [
     "lib/learning/learningHub.test.ts",
+    "lib/learning/learningDashboard.test.ts",
     "lib/learning/oneToOne.test.ts",
     "npx tsc --noEmit",
     "git diff --check"
@@ -43,8 +53,8 @@
   "production_allowed": false,
   "push_allowed": false,
   "max_eas_builds": 0,
-  "authorized_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "authorized_sha": "c9f791cbe919dac2d08cc6b25db64af2b78e5fcf",
   "owner_status_claim": "NONE",
   "device_evidence": null,
-  "notes": "Candidate zip is a proposal only. Do not flatten LearningHomeView Nexus UX. Do not apply supabase migrations to production. Do not enable payments."
+  "notes": "Continue from existing hub worktree. Do not flatten Discover catalog; move it under Discover. Do not apply supabase migrations to production. Do not enable payments."
 }

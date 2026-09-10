@@ -5,31 +5,44 @@ import { LEARNING_TEACHER_ROUTES } from "./teacherPlatform";
 import {
   LEARNING_HUB_DEEP_LINKS,
   LEARNING_HUB_SECTIONS,
+  getSecondaryLearningHubSections,
   getVisibleLearningHubSections,
   isLearningHubPaymentEnabled,
   learningHubHref,
   parseLearningHubSection,
+  resolveLearningHubSection,
 } from "./learningHub";
 
 describe("learning hub section model", () => {
-  it("shows the learner sections without teacher tools", () => {
+  it("shows the unified learner navigation without teacher tools", () => {
     expect(
       getVisibleLearningHubSections({ isTeacher: false }).map((s) => s.id)
     ).toEqual([
       "home",
-      "courses",
-      "progress",
+      "myLearning",
+      "discover",
       "live",
-      "assessments",
       "oneToOne",
-      "marketplace",
+      "progress",
     ]);
   });
 
-  it("adds teacher tools for teachers", () => {
+  it("adds Teacher Center only for teachers", () => {
     expect(
       getVisibleLearningHubSections({ isTeacher: true }).map((s) => s.id)
     ).toContain("teacher");
+    expect(
+      getVisibleLearningHubSections({ isTeacher: false }).map((s) => s.id)
+    ).not.toContain("teacher");
+  });
+
+  it("keeps marketplace off the primary nav", () => {
+    expect(
+      getVisibleLearningHubSections({ isTeacher: false }).map((s) => s.id)
+    ).not.toContain("marketplace");
+    expect(getSecondaryLearningHubSections().map((s) => s.id)).toEqual([
+      "marketplace",
+    ]);
   });
 
   it("does not expose payment as a hub section", () => {
@@ -37,11 +50,17 @@ describe("learning hub section model", () => {
     expect(isLearningHubPaymentEnabled()).toBe(false);
   });
 
-  it("parses hub query values and falls back to home", () => {
+  it("parses hub query values, aliases, and falls back to home", () => {
     expect(parseLearningHubSection("oneToOne")).toBe("oneToOne");
+    expect(parseLearningHubSection("courses")).toBe("discover");
+    expect(parseLearningHubSection("library")).toBe("myLearning");
     expect(parseLearningHubSection(["marketplace"])).toBe("marketplace");
     expect(parseLearningHubSection("payment")).toBe("home");
     expect(parseLearningHubSection(undefined)).toBe("home");
+    expect(resolveLearningHubSection({ surface: "library" })).toBe("myLearning");
+    expect(resolveLearningHubSection({ hub: "live", surface: "library" })).toBe(
+      "live"
+    );
   });
 
   it("preserves existing Learning deep links", () => {
@@ -70,13 +89,12 @@ describe("learning hub section model", () => {
     expect(LEARNING_PUBLIC_ROUTES.catalog).toBe("/learning/catalog");
   });
 
-  it("keeps surface=library when switching hub sections", () => {
+  it("builds dashboard deep links without the old library surface flag", () => {
     expect(learningHubHref("home")).toBe("/learning");
-    expect(learningHubHref("progress", { surface: "library" })).toBe(
-      "/learning?hub=progress&surface=library"
-    );
-    expect(learningHubHref("home", { surface: "library" })).toBe(
-      "/learning?surface=library"
+    expect(learningHubHref("progress")).toBe("/learning?hub=progress");
+    expect(learningHubHref("myLearning")).toBe("/learning?hub=myLearning");
+    expect(learningHubHref("discover", { category: "ai" })).toBe(
+      "/learning?hub=discover&category=ai"
     );
   });
 });
