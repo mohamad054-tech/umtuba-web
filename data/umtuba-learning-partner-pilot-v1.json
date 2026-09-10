@@ -1,0 +1,1361 @@
+{
+  "task_id": "UMTUBA_LEARNING_PARTNER_MARKETPLACE_FOUNDATION_V1",
+  "generated_at": "2026-09-09",
+  "catalog_mode": "LOCAL_QA_SAMPLE",
+  "live_feed_imported": false,
+  "affiliate_applications_submitted": false,
+  "umtuba_hosts_partner_content": false,
+  "umtuba_issues_partner_certificates": false,
+  "sample_honesty_notes": "Automated provider feeds are unavailable before affiliate approval. This file is a small factual QA sample of well-known official public course/program landing URLs. Ratings and exact prices are not invented. Duration tables were not copied. Skillshare has zero individual class rows because stable class metadata was not legitimately sourced without scraping. Teacher Development has no sample row. Do not treat this as a live catalog.",
+  "providers": ["coursera", "edx", "skillshare", "udemy"],
+  "courses": [
+    {
+      "id": "coursera-ml-specialization",
+      "slug": "coursera-machine-learning-specialization",
+      "original_title": "Machine Learning Specialization",
+      "title_en": "Machine Learning Specialization",
+      "title_ar": "تخصص تعلم الآلة",
+      "provider": "coursera",
+      "institution": "DeepLearning.AI / Stanford Online",
+      "instructor": "Andrew Ng",
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/specializations/machine-learning-introduction",
+      "affiliate_tracking_url": null,
+      "department": "artificial_intelligence",
+      "subcategory": "machine_learning",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Coursera paid enrollment or Coursera Plus. Exact price is not recorded in this sample.",
+          "ar": "تسجيل مدفوع عبر Coursera أو اشتراك Coursera Plus. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "DeepLearning.AI / Stanford Online via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Coursera issues a specialization certificate naming the institution partners. This is not a Stanford degree and is not a formal qualification.",
+          "ar": "تُصدر Coursera شهادة تخصص باسم المؤسسات الشريكة. ليست درجة من Stanford وليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Title and URL from the official Coursera specialization page. Not an UMTUBA course.",
+        "ar": "العنوان والرابط من صفحة التخصص الرسمية على Coursera. ليست دورة من أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/specializations/machine-learning-introduction",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-google-data-analytics",
+      "slug": "coursera-google-data-analytics",
+      "original_title": "Google Data Analytics Professional Certificate",
+      "title_en": "Google Data Analytics Professional Certificate",
+      "title_ar": "شهادة Google المهنية في تحليل البيانات",
+      "provider": "coursera",
+      "institution": "Google",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/google-data-analytics",
+      "affiliate_tracking_url": null,
+      "department": "data_science",
+      "subcategory": "data_analysis",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Google via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Google’s name. Not treated as academic credit in this sample.",
+          "ar": "شهادة مهنية على Coursera باسم Google. لا تُعامل في هذه العينة كساعات أكاديمية أو مؤهل رسمي."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/google-data-analytics",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-google-it-support",
+      "slug": "coursera-google-it-support",
+      "original_title": "Google IT Support Professional Certificate",
+      "title_en": "Google IT Support Professional Certificate",
+      "title_ar": "شهادة Google المهنية في دعم تقنية المعلومات",
+      "provider": "coursera",
+      "institution": "Google",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/google-it-support",
+      "affiliate_tracking_url": null,
+      "department": "career_development",
+      "subcategory": "professional_skills",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Google via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Google’s name. Not a formal qualification.",
+          "ar": "شهادة مهنية على Coursera باسم Google. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/google-it-support",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-ibm-data-science",
+      "slug": "coursera-ibm-data-science",
+      "original_title": "IBM Data Science Professional Certificate",
+      "title_en": "IBM Data Science Professional Certificate",
+      "title_ar": "شهادة IBM المهنية في علم البيانات",
+      "provider": "coursera",
+      "institution": "IBM",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/ibm-data-science",
+      "affiliate_tracking_url": null,
+      "department": "data_science",
+      "subcategory": "data_analysis",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "IBM via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in IBM’s name. Not recorded as academic credit.",
+          "ar": "شهادة مهنية على Coursera باسم IBM. غير مسجّلة كساعات أكاديمية."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/ibm-data-science",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-python-for-everybody",
+      "slug": "coursera-python-for-everybody",
+      "original_title": "Python for Everybody Specialization",
+      "title_en": "Python for Everybody Specialization",
+      "title_ar": "تخصص بايثون للجميع",
+      "provider": "coursera",
+      "institution": "University of Michigan",
+      "instructor": "Charles Severance",
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/specializations/python",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "python_programming",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit or paid Coursera track. Exact price is not recorded in this sample.",
+          "ar": "مشاهدة أو مسار مدفوع على Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "University of Michigan via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "University of Michigan is named on the Coursera specialization certificate. This sample does not record academic credit.",
+          "ar": "يظهر اسم University of Michigan على شهادة التخصص في Coursera. هذه العينة لا تسجّل ساعات أكاديمية."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Coursera specialization page. Not created by UMTUBA.",
+        "ar": "صفحة التخصص الرسمية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/specializations/python",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-google-project-management",
+      "slug": "coursera-google-project-management",
+      "original_title": "Google Project Management Professional Certificate",
+      "title_en": "Google Project Management Professional Certificate",
+      "title_ar": "شهادة Google المهنية في إدارة المشاريع",
+      "provider": "coursera",
+      "institution": "Google",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/google-project-management",
+      "affiliate_tracking_url": null,
+      "department": "business_management",
+      "subcategory": "project_management",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Google via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Google’s name. Not a formal qualification.",
+          "ar": "شهادة مهنية على Coursera باسم Google. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/google-project-management",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-meta-front-end",
+      "slug": "coursera-meta-front-end-developer",
+      "original_title": "Meta Front-End Developer Professional Certificate",
+      "title_en": "Meta Front-End Developer Professional Certificate",
+      "title_ar": "شهادة Meta المهنية لمطوّر الواجهات الأمامية",
+      "provider": "coursera",
+      "institution": "Meta",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/meta-front-end-developer",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "web_development",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Meta via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Meta’s name. Not a formal qualification.",
+          "ar": "شهادة مهنية على Coursera باسم Meta. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/meta-front-end-developer",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-google-ux-design",
+      "slug": "coursera-google-ux-design",
+      "original_title": "Google UX Design Professional Certificate",
+      "title_en": "Google UX Design Professional Certificate",
+      "title_ar": "شهادة Google المهنية في تصميم تجربة المستخدم",
+      "provider": "coursera",
+      "institution": "Google",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/google-ux-design",
+      "affiliate_tracking_url": null,
+      "department": "design",
+      "subcategory": "ux_ui",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Google via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Google’s name. Not a formal qualification.",
+          "ar": "شهادة مهنية على Coursera باسم Google. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/google-ux-design",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-financial-markets-yale",
+      "slug": "coursera-financial-markets-yale",
+      "original_title": "Financial Markets",
+      "title_en": "Financial Markets",
+      "title_ar": "الأسواق المالية",
+      "provider": "coursera",
+      "institution": "Yale University",
+      "instructor": "Robert Shiller",
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/learn/financial-markets-global",
+      "affiliate_tracking_url": null,
+      "department": "finance_investing",
+      "subcategory": "financial_markets",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit or paid Coursera track. Exact price is not recorded in this sample.",
+          "ar": "مشاهدة أو مسار مدفوع على Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Yale University via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Yale University is named on the Coursera course certificate. This is not a Yale degree.",
+          "ar": "يظهر اسم Yale University على شهادة الدورة في Coursera. ليست درجة من Yale."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Coursera course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/learn/financial-markets-global",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-learning-how-to-learn",
+      "slug": "coursera-learning-how-to-learn",
+      "original_title": "Learning How to Learn",
+      "title_en": "Learning How to Learn",
+      "title_ar": "تعلّم كيف تتعلّم",
+      "provider": "coursera",
+      "institution": "McMaster University / University of California San Diego",
+      "instructor": "Barbara Oakley / Terrence Sejnowski",
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/learn/learning-how-to-learn",
+      "affiliate_tracking_url": null,
+      "department": "personal_development",
+      "subcategory": "learning_skills",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit or paid Coursera track. Exact price is not recorded in this sample.",
+          "ar": "مشاهدة أو مسار مدفوع على Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "McMaster University / UC San Diego via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Institution names appear on the Coursera certificate. Not recorded as academic credit.",
+          "ar": "تظهر أسماء المؤسسات على شهادة Coursera. غير مسجّلة كساعات أكاديمية."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Coursera course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/learn/learning-how-to-learn",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-google-cybersecurity",
+      "slug": "coursera-google-cybersecurity",
+      "original_title": "Google Cybersecurity Professional Certificate",
+      "title_en": "Google Cybersecurity Professional Certificate",
+      "title_ar": "شهادة Google المهنية في الأمن السيبراني",
+      "provider": "coursera",
+      "institution": "Google",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/professional-certificates/google-cybersecurity",
+      "affiliate_tracking_url": null,
+      "department": "cybersecurity",
+      "subcategory": "security_fundamentals",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "SUBSCRIPTION",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Typically offered through Coursera subscription. Exact price is not recorded in this sample.",
+          "ar": "تُعرض عادة عبر اشتراك Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "PROFESSIONAL",
+        "certificate_issuer": "Google via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Professional certificate issued on Coursera in Google’s name. Not a formal qualification.",
+          "ar": "شهادة مهنية على Coursera باسم Google. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "CAREER_FOCUSED"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera professional certificate page. Not created by UMTUBA.",
+        "ar": "الصفحة الرسمية للشهادة المهنية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/professional-certificates/google-cybersecurity",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-science-of-well-being",
+      "slug": "coursera-science-of-well-being",
+      "original_title": "The Science of Well-Being",
+      "title_en": "The Science of Well-Being",
+      "title_ar": "علم العافية",
+      "provider": "coursera",
+      "institution": "Yale University",
+      "instructor": "Laurie Santos",
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/learn/the-science-of-well-being",
+      "affiliate_tracking_url": null,
+      "department": "health_fitness",
+      "subcategory": "wellness",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit or paid Coursera track. Exact price is not recorded in this sample.",
+          "ar": "مشاهدة أو مسار مدفوع على Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Yale University via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Yale University is named on the Coursera course certificate. This is not a Yale degree.",
+          "ar": "يظهر اسم Yale University على شهادة الدورة في Coursera. ليست درجة من Yale."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Coursera course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/learn/the-science-of-well-being",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "coursera-wharton-business-foundations",
+      "slug": "coursera-wharton-business-foundations",
+      "original_title": "Business Foundations Specialization",
+      "title_en": "Wharton Business Foundations Specialization",
+      "title_ar": "تخصص أساسيات الأعمال من Wharton",
+      "provider": "coursera",
+      "institution": "University of Pennsylvania (Wharton)",
+      "instructor": null,
+      "source_platform": "coursera",
+      "original_course_url": "https://www.coursera.org/specializations/wharton-business-foundations",
+      "affiliate_tracking_url": null,
+      "department": "entrepreneurship",
+      "subcategory": "business_planning",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Coursera page for the current schedule.",
+        "ar": "راجع صفحة Coursera الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit or paid Coursera track. Exact price is not recorded in this sample.",
+          "ar": "مشاهدة أو مسار مدفوع على Coursera. السعر الدقيق غير مسجّل في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "University of Pennsylvania (Wharton) via Coursera",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Wharton / University of Pennsylvania is named on the Coursera specialization certificate. Not a Wharton degree.",
+          "ar": "يظهر اسم Wharton / University of Pennsylvania على شهادة التخصص. ليست درجة من Wharton."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Coursera specialization page. Not created by UMTUBA.",
+        "ar": "صفحة التخصص الرسمية على Coursera. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.coursera.org/specializations/wharton-business-foundations",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "edx-cs50-introduction",
+      "slug": "edx-cs50-introduction-to-computer-science",
+      "original_title": "CS50's Introduction to Computer Science",
+      "title_en": "CS50's Introduction to Computer Science",
+      "title_ar": "مقدمة CS50 في علوم الحاسوب",
+      "provider": "edx",
+      "institution": "Harvard University",
+      "instructor": "David J. Malan",
+      "source_platform": "edx",
+      "original_course_url": "https://www.edx.org/learn/computer-science/harvard-university-cs50-s-introduction-to-computer-science",
+      "affiliate_tracking_url": null,
+      "department": "school_university",
+      "subcategory": "cs_foundations",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "Semester-length introductory computer science course. Confirm current dates on the official edX page.",
+        "ar": "مقرر تمهيدي بطول فصل دراسي في علوم الحاسوب. أكّد التواريخ الحالية من صفحة edX الرسمية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit is typically free. A paid verified certificate is optional. Exact price is not recorded.",
+          "ar": "المشاهدة مجانية عادة. الشهادة الموثّقة اختيارية ومدفوعة. السعر الدقيق غير مسجّل."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Harvard University via edX",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "The standard CS50x verified certificate is issued through edX / CS50. It is not recorded here as Harvard degree credit. A separate for-credit path, if any, must be verified on Harvard’s own pages.",
+          "ar": "شهادة CS50x الموثّقة القياسية تُصدر عبر edX / CS50. لا تُسجَّل هنا كساعات لدرجة Harvard. أي مسار منفصل مقابل ساعات يجب التحقق منه من صفحات Harvard نفسها."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official edX / HarvardX CS50 listing. Not created by UMTUBA.",
+        "ar": "قائمة CS50 الرسمية على edX / HarvardX. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.edx.org/learn/computer-science/harvard-university-cs50-s-introduction-to-computer-science",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "edx-cs50-ai",
+      "slug": "edx-cs50-ai-with-python",
+      "original_title": "CS50's Introduction to Artificial Intelligence with Python",
+      "title_en": "CS50's Introduction to Artificial Intelligence with Python",
+      "title_ar": "مقدمة CS50 في الذكاء الاصطناعي باستخدام بايثون",
+      "provider": "edx",
+      "institution": "Harvard University",
+      "instructor": "David J. Malan",
+      "source_platform": "edx",
+      "original_course_url": "https://www.edx.org/learn/artificial-intelligence/harvard-university-cs50-s-introduction-to-artificial-intelligence-with-python",
+      "affiliate_tracking_url": null,
+      "department": "artificial_intelligence",
+      "subcategory": "machine_learning",
+      "level": "INTERMEDIATE",
+      "duration_notes": {
+        "en": "See the official edX page for the current schedule.",
+        "ar": "راجع صفحة edX الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit is typically free. A paid verified certificate is optional. Exact price is not recorded.",
+          "ar": "المشاهدة مجانية عادة. الشهادة الموثّقة اختيارية ومدفوعة. السعر الدقيق غير مسجّل."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Harvard University via edX",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Verified certificate through edX / CS50. Not recorded as Harvard degree credit.",
+          "ar": "شهادة موثّقة عبر edX / CS50. غير مسجّلة كساعات لدرجة Harvard."
+        }
+      },
+      "recommendation_labels": ["BEST_VALUE"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official edX / HarvardX listing. Not created by UMTUBA.",
+        "ar": "القائمة الرسمية على edX / HarvardX. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.edx.org/learn/artificial-intelligence/harvard-university-cs50-s-introduction-to-artificial-intelligence-with-python",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "edx-mit-python",
+      "slug": "edx-mit-introduction-to-cs-python",
+      "original_title": "Introduction to Computer Science and Programming Using Python",
+      "title_en": "Introduction to Computer Science and Programming Using Python",
+      "title_ar": "مقدمة في علوم الحاسوب والبرمجة باستخدام بايثون",
+      "provider": "edx",
+      "institution": "Massachusetts Institute of Technology",
+      "instructor": null,
+      "source_platform": "edx",
+      "original_course_url": "https://www.edx.org/learn/computer-science/massachusetts-institute-of-technology-introduction-to-computer-science-and-programming-using-python",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "python_programming",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official edX page for the current schedule.",
+        "ar": "راجع صفحة edX الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit is typically free. A paid verified certificate is optional. Exact price is not recorded.",
+          "ar": "المشاهدة مجانية عادة. الشهادة الموثّقة اختيارية ومدفوعة. السعر الدقيق غير مسجّل."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Massachusetts Institute of Technology via edX",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "MITx verified certificate through edX. Not recorded as MIT degree credit.",
+          "ar": "شهادة MITx الموثّقة عبر edX. غير مسجّلة كساعات لدرجة MIT."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official edX / MITx listing. Not created by UMTUBA.",
+        "ar": "القائمة الرسمية على edX / MITx. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.edx.org/learn/computer-science/massachusetts-institute-of-technology-introduction-to-computer-science-and-programming-using-python",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "edx-harvard-r-basics",
+      "slug": "edx-harvard-data-science-r-basics",
+      "original_title": "Data Science: R Basics",
+      "title_en": "Data Science: R Basics",
+      "title_ar": "علم البيانات: أساسيات R",
+      "provider": "edx",
+      "institution": "Harvard University",
+      "instructor": null,
+      "source_platform": "edx",
+      "original_course_url": "https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics",
+      "affiliate_tracking_url": null,
+      "department": "data_science",
+      "subcategory": "statistics",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official edX page for the current schedule.",
+        "ar": "راجع صفحة edX الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit is typically free. A paid verified certificate is optional. Exact price is not recorded.",
+          "ar": "المشاهدة مجانية عادة. الشهادة الموثّقة اختيارية ومدفوعة. السعر الدقيق غير مسجّل."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "UNIVERSITY_PROVIDER",
+        "certificate_issuer": "Harvard University via edX",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "HarvardX verified certificate through edX. Not recorded as Harvard degree credit.",
+          "ar": "شهادة HarvardX الموثّقة عبر edX. غير مسجّلة كساعات لدرجة Harvard."
+        }
+      },
+      "recommendation_labels": ["BEGINNER", "BEST_VALUE"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official edX / HarvardX listing. Not created by UMTUBA.",
+        "ar": "القائمة الرسمية على edX / HarvardX. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.edx.org/learn/r-programming/harvard-university-data-science-r-basics",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "edx-uq-ielts",
+      "slug": "edx-ielts-academic-test-preparation",
+      "original_title": "IELTS Academic Test Preparation",
+      "title_en": "IELTS Academic Test Preparation",
+      "title_ar": "التحضير لاختبار IELTS الأكاديمي",
+      "provider": "edx",
+      "institution": "The University of Queensland",
+      "instructor": null,
+      "source_platform": "edx",
+      "original_course_url": "https://www.edx.org/learn/ielts/university-of-queensland-ielts-academic-test-preparation",
+      "affiliate_tracking_url": null,
+      "department": "languages",
+      "subcategory": "english",
+      "level": "MIXED",
+      "duration_notes": {
+        "en": "See the official edX page for the current schedule.",
+        "ar": "راجع صفحة edX الرسمية للجدول الحالي."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "FREEMIUM",
+        "amount": null,
+        "currency": null,
+        "notes": {
+          "en": "Audit is typically free. A paid verified certificate is optional. Exact price is not recorded.",
+          "ar": "المشاهدة مجانية عادة. الشهادة الموثّقة اختيارية ومدفوعة. السعر الدقيق غير مسجّل."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "VERIFIED",
+        "certificate_issuer": "The University of Queensland via edX",
+        "verification_available": true,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "An edX verified certificate is not an IELTS test result and is not an official language qualification.",
+          "ar": "شهادة edX الموثّقة ليست نتيجة اختبار IELTS وليست مؤهلاً لغوياً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEST_VALUE"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official edX listing. Not created by UMTUBA.",
+        "ar": "القائمة الرسمية على edX. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.edx.org/learn/ielts/university-of-queensland-ielts-academic-test-preparation",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "udemy-complete-web-bootcamp",
+      "slug": "udemy-complete-web-development-bootcamp",
+      "original_title": "The Complete Web Development Bootcamp",
+      "title_en": "The Complete Web Development Bootcamp",
+      "title_ar": "معسكر تطوير الويب الشامل",
+      "provider": "udemy",
+      "institution": null,
+      "instructor": "Dr. Angela Yu",
+      "source_platform": "udemy",
+      "original_course_url": "https://www.udemy.com/course/the-complete-web-development-bootcamp/",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "web_development",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Udemy page for current length.",
+        "ar": "راجع صفحة Udemy الرسمية للمدة الحالية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "PAID",
+        "amount": null,
+        "currency": "USD",
+        "notes": {
+          "en": "Individual Udemy purchase. Prices change and are not recorded in this sample.",
+          "ar": "شراء فردي من Udemy. الأسعار تتغيّر وغير مسجّلة في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "COMPLETION",
+        "certificate_issuer": "Udemy",
+        "verification_available": null,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Udemy completion certificate. Not a university credential and not a formal qualification.",
+          "ar": "شهادة إتمام من Udemy. ليست وثيقة جامعية وليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Udemy course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Udemy. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.udemy.com/course/the-complete-web-development-bootcamp/",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "udemy-complete-python-bootcamp",
+      "slug": "udemy-complete-python-bootcamp",
+      "original_title": "Complete Python Bootcamp",
+      "title_en": "Complete Python Bootcamp",
+      "title_ar": "معسكر بايثون الشامل",
+      "provider": "udemy",
+      "institution": null,
+      "instructor": "Jose Portilla",
+      "source_platform": "udemy",
+      "original_course_url": "https://www.udemy.com/course/complete-python-bootcamp/",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "python_programming",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Udemy page for current length.",
+        "ar": "راجع صفحة Udemy الرسمية للمدة الحالية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "PAID",
+        "amount": null,
+        "currency": "USD",
+        "notes": {
+          "en": "Individual Udemy purchase. Prices change and are not recorded in this sample.",
+          "ar": "شراء فردي من Udemy. الأسعار تتغيّر وغير مسجّلة في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "COMPLETION",
+        "certificate_issuer": "Udemy",
+        "verification_available": null,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Udemy completion certificate. Not a formal qualification.",
+          "ar": "شهادة إتمام من Udemy. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Udemy course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Udemy. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.udemy.com/course/complete-python-bootcamp/",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "udemy-web-developer-bootcamp",
+      "slug": "udemy-web-developer-bootcamp",
+      "original_title": "The Web Developer Bootcamp",
+      "title_en": "The Web Developer Bootcamp",
+      "title_ar": "معسكر مطوّر الويب",
+      "provider": "udemy",
+      "institution": null,
+      "instructor": "Colt Steele",
+      "source_platform": "udemy",
+      "original_course_url": "https://www.udemy.com/course/the-web-developer-bootcamp/",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "web_development",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Udemy page for current length.",
+        "ar": "راجع صفحة Udemy الرسمية للمدة الحالية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "PAID",
+        "amount": null,
+        "currency": "USD",
+        "notes": {
+          "en": "Individual Udemy purchase. Prices change and are not recorded in this sample.",
+          "ar": "شراء فردي من Udemy. الأسعار تتغيّر وغير مسجّلة في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "COMPLETION",
+        "certificate_issuer": "Udemy",
+        "verification_available": null,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Udemy completion certificate. Not a formal qualification.",
+          "ar": "شهادة إتمام من Udemy. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER"],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Udemy course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Udemy. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.udemy.com/course/the-web-developer-bootcamp/",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "udemy-react-complete-guide",
+      "slug": "udemy-react-the-complete-guide",
+      "original_title": "React - The Complete Guide",
+      "title_en": "React — The Complete Guide",
+      "title_ar": "React — الدليل الشامل",
+      "provider": "udemy",
+      "institution": null,
+      "instructor": "Maximilian Schwarzmüller",
+      "source_platform": "udemy",
+      "original_course_url": "https://www.udemy.com/course/react-the-complete-guide-incl-redux/",
+      "affiliate_tracking_url": null,
+      "department": "programming_development",
+      "subcategory": "web_development",
+      "level": "MIXED",
+      "duration_notes": {
+        "en": "See the official Udemy page for current length.",
+        "ar": "راجع صفحة Udemy الرسمية للمدة الحالية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "PAID",
+        "amount": null,
+        "currency": "USD",
+        "notes": {
+          "en": "Individual Udemy purchase. Prices change and are not recorded in this sample.",
+          "ar": "شراء فردي من Udemy. الأسعار تتغيّر وغير مسجّلة في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "COMPLETION",
+        "certificate_issuer": "Udemy",
+        "verification_available": null,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Udemy completion certificate. Not a formal qualification.",
+          "ar": "شهادة إتمام من Udemy. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": [],
+      "career_focused": true,
+      "source_attribution": {
+        "en": "Official Udemy course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Udemy. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.udemy.com/course/react-the-complete-guide-incl-redux/",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    },
+    {
+      "id": "udemy-photography-masterclass",
+      "slug": "udemy-photography-masterclass",
+      "original_title": "Photography Masterclass: A Complete Guide to Photography",
+      "title_en": "Photography Masterclass: A Complete Guide to Photography",
+      "title_ar": "فصل التصوير الفوتوغرافي: دليل شامل",
+      "provider": "udemy",
+      "institution": null,
+      "instructor": "Phil Ebiner",
+      "source_platform": "udemy",
+      "original_course_url": "https://www.udemy.com/course/photography-masterclass-complete-guide-to-photography/",
+      "affiliate_tracking_url": null,
+      "department": "photography_video",
+      "subcategory": "photography",
+      "level": "BEGINNER",
+      "duration_notes": {
+        "en": "See the official Udemy page for current length.",
+        "ar": "راجع صفحة Udemy الرسمية للمدة الحالية."
+      },
+      "language": "en",
+      "languages_available": ["en"],
+      "pricing": {
+        "model": "PAID",
+        "amount": null,
+        "currency": "USD",
+        "notes": {
+          "en": "Individual Udemy purchase. Prices change and are not recorded in this sample.",
+          "ar": "شراء فردي من Udemy. الأسعار تتغيّر وغير مسجّلة في هذه العينة."
+        }
+      },
+      "rating": { "value": null, "scale": 5, "source": null },
+      "image_url": null,
+      "certificate": {
+        "certificate_available": true,
+        "certificate_type": "COMPLETION",
+        "certificate_issuer": "Udemy",
+        "verification_available": null,
+        "academic_credit": false,
+        "accreditation_claim": false,
+        "accreditation_source": null,
+        "accreditation_verified": false,
+        "certificate_notes": {
+          "en": "Udemy completion certificate. Not a formal qualification.",
+          "ar": "شهادة إتمام من Udemy. ليست مؤهلاً رسمياً."
+        }
+      },
+      "recommendation_labels": ["BEGINNER"],
+      "career_focused": false,
+      "source_attribution": {
+        "en": "Official Udemy course page. Not created by UMTUBA.",
+        "ar": "صفحة الدورة الرسمية على Udemy. ليست من إنشاء أمتوبا."
+      },
+      "source_citation_url": "https://www.udemy.com/course/photography-masterclass-complete-guide-to-photography/",
+      "facts_last_verified_at": "2026-09-09",
+      "umtuba_created": false,
+      "record_kind": "COURSE"
+    }
+  ],
+  "learning_paths": [
+    {
+      "id": "path-python-foundations",
+      "title": {
+        "en": "Python foundations",
+        "ar": "أساسيات بايثون"
+      },
+      "summary": {
+        "en": "UMTUBA discovery grouping of Python offerings across Coursera, edX, and Udemy. Not an official joint program.",
+        "ar": "تجميع اكتشاف من أمتوبا لعروض بايثون عبر Coursera وedX وUdemy. ليس برنامجاً رسمياً مشتركاً."
+      },
+      "course_ids": [
+        "coursera-python-for-everybody",
+        "edx-mit-python",
+        "udemy-complete-python-bootcamp",
+        "edx-cs50-introduction"
+      ],
+      "official_combined_certificate": false
+    },
+    {
+      "id": "path-career-data",
+      "title": {
+        "en": "Career-oriented data starting points",
+        "ar": "بدايات مهنية في البيانات"
+      },
+      "summary": {
+        "en": "UMTUBA discovery grouping only. Each certificate stays with its issuer.",
+        "ar": "تجميع اكتشاف من أمتوبا فقط. تبقى كل شهادة لدى جهتها المصدرة."
+      },
+      "course_ids": [
+        "coursera-google-data-analytics",
+        "coursera-ibm-data-science",
+        "edx-harvard-r-basics"
+      ],
+      "official_combined_certificate": false
+    }
+  ]
+}
