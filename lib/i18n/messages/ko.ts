@@ -1,11 +1,13 @@
 import { storeKoMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubKoMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const koMessages: FoundationMessages = {
   ...storeKoMessages,
   ...teacherEnMessages,
+  ...learningHubKoMessages,
   "languages.ar": "아랍어",
   "languages.en": "영어",
   "languages.fr": "프랑스어",

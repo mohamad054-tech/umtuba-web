@@ -1,11 +1,13 @@
 import { storeRuMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubRuMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const ruMessages: FoundationMessages = {
   ...storeRuMessages,
   ...teacherEnMessages,
+  ...learningHubRuMessages,
   "languages.ar": "Арабский",
   "languages.en": "Английский",
   "languages.fr": "Французский",

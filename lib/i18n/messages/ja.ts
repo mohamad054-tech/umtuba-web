@@ -1,11 +1,13 @@
 import { storeJaMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubJaMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const jaMessages: FoundationMessages = {
   ...storeJaMessages,
   ...teacherEnMessages,
+  ...learningHubJaMessages,
   "languages.ar": "アラビア語",
   "languages.en": "英語",
   "languages.fr": "フランス語",

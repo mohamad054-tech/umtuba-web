@@ -1,10 +1,12 @@
 import { storeEnMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubEnMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 export const enMessages: FoundationMessages = {
   ...storeEnMessages,
   ...teacherEnMessages,
+  ...learningHubEnMessages,
   "languages.ar": "Arabic",
   "languages.en": "English",
   "languages.fr": "French",

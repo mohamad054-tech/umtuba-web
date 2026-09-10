@@ -1,11 +1,13 @@
 import { enMessages } from "./en";
 import { storePtMessages } from "./storeCatalogs";
+import { learningHubPtMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Portuguese: foundation + App Shell chrome localized. */
 export const ptMessages: FoundationMessages = {
   ...enMessages,
   ...storePtMessages,
+  ...learningHubPtMessages,
   "languages.ar": "Árabe",
   "languages.en": "Inglês",
   "languages.fr": "Francês",
