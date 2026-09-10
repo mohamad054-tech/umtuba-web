@@ -11,12 +11,12 @@ function read(rel: string) {
 }
 
 describe("Learning guest course entry", () => {
-  it("sends guests from My Learning hub to the public catalog, not login", () => {
+  it("keeps /learning as the guest-accessible hub and catalog at /learning/catalog", () => {
     const hub = read("app/learning/page.tsx");
-    expect(hub).toMatch(/LEARNING_PUBLIC_ROUTES\.catalog/);
-    expect(hub).toMatch(/if \(!viewerId\)/);
-    expect(hub).toMatch(/redirect\(\s*LEARNING_PUBLIC_ROUTES\.catalog/);
-    expect(hub).not.toMatch(/login\?next=/);
+    expect(hub).toMatch(/loadLearningHomeSurface/);
+    expect(hub).toMatch(/LearningHomeView/);
+    expect(hub).toMatch(/LearningHubShell/);
+    expect(hub).not.toMatch(/redirect\(\s*LEARNING_PUBLIC_ROUTES\.catalog/);
     expect(LEARNING_PUBLIC_ROUTES.catalog).toBe("/learning/catalog");
     expect(APP_ROUTES.learning).toBe("/learning");
   });
