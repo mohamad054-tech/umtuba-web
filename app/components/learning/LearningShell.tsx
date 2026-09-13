@@ -10,6 +10,8 @@ type LearningShellProps = {
   backLabel?: string;
   /** Entitled staff only — never show to learners without access. */
   instructorHref?: string;
+  /** Optional stable hook for Learning browser E2E (instructor/learner). */
+  testId?: string;
 };
 
 export default function LearningShell({
@@ -19,9 +21,11 @@ export default function LearningShell({
   backHref,
   backLabel = "Back",
   instructorHref,
+  testId,
 }: LearningShellProps) {
   return (
     <main
+      data-testid={testId}
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <div className="mx-auto max-w-2xl px-4 py-6 md:px-6">

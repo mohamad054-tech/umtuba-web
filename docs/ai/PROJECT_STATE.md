@@ -82,6 +82,8 @@ Paused phases must not auto-resume. Still ask before: destructive data loss, des
 - Always synchronize with origin before starting work.
 - Learning curriculum packages: Bootcamp / Jinn Wave path + dist importers (see Learning V1 final doc).
 - Learner runtime state: UMTUBA Learning DB.
+- **Learning SoT tip (2026-08-06):** `origin/office/learning-resume-accessible-target-hardening-v1` @ `525c046`.
+- **Active Learning milestone:** Instructor Browser E2E Foundation V1 on `office/learning-instructor-browser-e2e-foundation-v1` (see `docs/ai/CURRENT_TASK.md`).
 
 ## Machines
 

@@ -6,9 +6,10 @@
 /**
  * @param {import('playwright').Page} page
  * @param {{ baseUrl: string, email: string, password: string }} config
+ * @param {string} [nextPath="/learning"]
  */
-export async function loginLearningE2eUser(page, config) {
-  const next = encodeURIComponent("/learning");
+export async function loginLearningE2eUser(page, config, nextPath = "/learning") {
+  const next = encodeURIComponent(nextPath);
   await page.goto(`${config.baseUrl}/login?next=${next}`, {
     waitUntil: "domcontentloaded",
   });

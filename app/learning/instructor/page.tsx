@@ -29,17 +29,23 @@ export default async function InstructorDashboardPage() {
       subtitle="Dashboard"
       backHref={LEARNING_LEARNER_ROUTES.hub}
       backLabel="Learner hub"
+      testId="learning-instructor-dashboard"
     >
-      <nav className="mt-4 flex flex-wrap gap-3 text-sm">
+      <nav
+        className="mt-4 flex flex-wrap gap-3 text-sm"
+        data-testid="learning-instructor-dashboard-nav"
+      >
         <Link
           href={LEARNING_INSTRUCTOR_BOOTSTRAP_ROUTES.hub}
           className="font-bold text-white underline underline-offset-2"
+          data-testid="learning-instructor-nav-bootstrap"
         >
           Create catalog
         </Link>
         <Link
           href={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.reviewQueue}
           className="font-bold text-white underline underline-offset-2"
+          data-testid="learning-instructor-nav-review"
         >
           Review queue
         </Link>

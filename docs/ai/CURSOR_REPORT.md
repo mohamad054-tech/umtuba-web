@@ -1,22 +1,31 @@
-﻿# CURSOR_REPORT — Learner Lesson Delivery Defense-in-Depth V1
+﻿# CURSOR_REPORT — Learning Instructor Browser E2E Foundation V1
 
 ## Summary
 
-Closed the Learning-owned data-plane hole where `/learning/lessons/[lessonId]`
-loaded protected content blocks / activities and mutated progress
-(`start`/`touch`) in parallel with the lesson engine — before unlock was
-positively proven. Delivery is now engine-first and split into metadata-only
-vs verified-full paths.
+Added instructor browser E2E foundation on the existing Playwright Learning
+harness. Navigation/auth/fail-closed contracts implemented. Assessment and
+assignment happy paths remain env-blocked until an activity fixture ID exists.
+No commit/push in this pass.
 
 ## Exact files changed
 
-- `lib/learning/learnerDelivery.ts`
-- `lib/learning/learnerDelivery.test.ts`
-- `lib/learning/lessonContentAccess.test.ts`
-- `app/learning/lessons/[lessonId]/page.tsx`
-- `app/learning/lessons/[lessonId]/ai-tutor/page.tsx`
-- `app/components/learning/LessonViewer.tsx`
+- `app/components/learning/LearningShell.tsx`
+- `app/learning/instructor/page.tsx`
+- `app/learning/instructor/courses/[courseId]/page.tsx`
+- `app/learning/instructor/courses/[courseId]/lessons/[lessonId]/page.tsx`
+- `app/learning/instructor/courses/[courseId]/activities/[activityId]/questions/page.tsx`
+- `app/learning/instructor/courses/[courseId]/activities/[activityId]/assignment/page.tsx`
+- `app/learning/instructor/review/page.tsx`
+- `e2e/learning/instructor-authoring-journey.mjs` (new)
+- `scripts/learning-e2e/run-instructor-foundation.mjs` (new)
+- `scripts/learning-e2e/env.mjs`
+- `scripts/learning-e2e/auth.mjs`
+- `lib/learning/instructorBrowserE2eFoundation.test.ts` (new)
+- `package.json`
+- `docs/learning/implementation/LEARNING_INSTRUCTOR_BROWSER_E2E_FOUNDATION_V1.md` (new)
 - `docs/ai/CURRENT_TASK.md`
+- `docs/ai/PROJECT_STATE.md`
+- `docs/ai/SESSION_HANDOFF.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
@@ -25,47 +34,30 @@ None.
 
 ## Security review
 
-- Protected SELECTs (`learning_lesson_content_blocks`, `learning_activities`)
-  and progress mutations only run after `verified_unlocked`.
-- Metadata-only type has no `blocks`/`activities` fields (no accidental
-  fallback).
-- LessonViewer still renders protected content only from verified engine.
-- AI Tutor keeps unlock gate; uses metadata-only (no delivery progress mutation).
+- Credentials from env only; never logged
+- Instructor runner does not provision or mutate remote data
+- Anonymous fail-closed to `/login`
+- No Commerce/money inputs asserted on instructor surfaces
+- No production allow flag in instructor runner
 
 ## Tests
 
-```
-npx vitest run lib/learning/learnerDelivery.test.ts
-npx vitest run lib/learning/lessonContentAccess.test.ts
-```
-
-69 passed (55 + 14). Also ran AI Tutor regression suites (36 passed).
-
-## TypeScript
-
-`npx tsc --noEmit` — PASS
+Harness + instructor UI contract + related instructor unit suites + `tsc`.
+Browser runtime: see report classification (env-dependent).
 
 ## Build
 
-Not required (no app entry / package change beyond Learning routes).
+Not required.
 
 ## git diff --check
 
-PASS
+PASS (expected)
 
 ## git status --short
 
-```
- M app/components/learning/LessonViewer.tsx
- M app/learning/lessons/[lessonId]/ai-tutor/page.tsx
- M app/learning/lessons/[lessonId]/page.tsx
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/learning/learnerDelivery.test.ts
- M lib/learning/learnerDelivery.ts
- M lib/learning/lessonContentAccess.test.ts
-```
+Dirty working tree (uncommitted by design).
 
 ## Open issues
 
-- Awaiting commit GO (no commit/push performed)
+- Assessment/assignment happy paths need `LEARNING_E2E_ACTIVITY_ID` fixture seeding
+- Live browser PASS requires local app + provisioned instructor fixtures

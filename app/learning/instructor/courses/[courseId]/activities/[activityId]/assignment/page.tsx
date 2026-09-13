@@ -55,6 +55,11 @@ export default async function InstructorAssignmentAuthorPage({
       subtitle="Assignment instructions, due date, resources"
       backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
       backLabel="Course"
+      testId={
+        loaded.ok
+          ? "learning-instructor-assignment-author"
+          : "learning-instructor-assignment-unavailable"
+      }
     >
       <p className="mt-3 text-sm">
         <Link

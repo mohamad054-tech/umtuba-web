@@ -99,3 +99,81 @@ export function resolveLearningE2eEnv() {
     },
   };
 }
+
+export const LEARNING_INSTRUCTOR_E2E_REQUIRED = [
+  "LEARNING_E2E_BASE_URL",
+  "LEARNING_E2E_INSTRUCTOR_EMAIL",
+  "LEARNING_E2E_INSTRUCTOR_PASSWORD",
+  "LEARNING_E2E_COURSE_ID",
+  "LEARNING_E2E_LESSON_ID",
+];
+
+/**
+ * Instructor browser E2E env gate.
+ * Instructor credentials may fall back to LEARNING_E2E_EMAIL/PASSWORD when
+ * explicit instructor vars are unset (matches provisioner defaults).
+ * Optional LEARNING_E2E_ACTIVITY_ID enables assessment/assignment scenarios.
+ *
+ * @returns {{ ok: true, config: object } | { ok: false, reason: "SKIPPED_ENV", missing: string[] }}
+ */
+export function resolveInstructorLearningE2eEnv() {
+  loadDotEnvLocal();
+  const missing = [];
+
+  const baseUrl = readTrimmed("LEARNING_E2E_BASE_URL");
+  const instructorEmail =
+    readTrimmed("LEARNING_E2E_INSTRUCTOR_EMAIL") ||
+    readTrimmed("LEARNING_E2E_EMAIL");
+  const instructorPassword =
+    readTrimmed("LEARNING_E2E_INSTRUCTOR_PASSWORD") ||
+    readTrimmed("LEARNING_E2E_PASSWORD");
+  const courseId = readTrimmed("LEARNING_E2E_COURSE_ID");
+  const lessonId = readTrimmed("LEARNING_E2E_LESSON_ID");
+  const activityId = readTrimmed("LEARNING_E2E_ACTIVITY_ID");
+  const learnerEmail = readTrimmed("LEARNING_E2E_EMAIL");
+  const learnerPassword = readTrimmed("LEARNING_E2E_PASSWORD");
+
+  if (!baseUrl) missing.push("LEARNING_E2E_BASE_URL");
+  else if (!/^https?:\/\//i.test(baseUrl)) {
+    missing.push("LEARNING_E2E_BASE_URL (must be http(s) URL)");
+  }
+  if (!instructorEmail) {
+    missing.push(
+      "LEARNING_E2E_INSTRUCTOR_EMAIL|LEARNING_E2E_EMAIL"
+    );
+  }
+  if (!instructorPassword) {
+    missing.push(
+      "LEARNING_E2E_INSTRUCTOR_PASSWORD|LEARNING_E2E_PASSWORD"
+    );
+  }
+  if (!courseId) missing.push("LEARNING_E2E_COURSE_ID");
+  else if (!UUID_RE.test(courseId)) {
+    missing.push("LEARNING_E2E_COURSE_ID (must be UUID)");
+  }
+  if (!lessonId) missing.push("LEARNING_E2E_LESSON_ID");
+  else if (!UUID_RE.test(lessonId)) {
+    missing.push("LEARNING_E2E_LESSON_ID (must be UUID)");
+  }
+  if (activityId && !UUID_RE.test(activityId)) {
+    missing.push("LEARNING_E2E_ACTIVITY_ID (must be UUID when set)");
+  }
+
+  if (missing.length > 0) {
+    return { ok: false, reason: "SKIPPED_ENV", missing };
+  }
+
+  return {
+    ok: true,
+    config: {
+      baseUrl: baseUrl.replace(/\/$/, ""),
+      email: instructorEmail,
+      password: instructorPassword,
+      courseId,
+      lessonId,
+      activityId: activityId || null,
+      learnerEmail: learnerEmail || null,
+      learnerPassword: learnerPassword || null,
+    },
+  };
+}

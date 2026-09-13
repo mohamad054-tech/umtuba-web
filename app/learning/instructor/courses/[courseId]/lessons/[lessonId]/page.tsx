@@ -44,8 +44,13 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
         title="Lesson unavailable"
         backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
         backLabel="Back to course"
+        testId="learning-instructor-lesson-unavailable"
       >
-        <p className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100">
+        <p
+          role="alert"
+          data-testid="learning-instructor-lesson-error"
+          className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100"
+        >
           {blocksResult.message}
         </p>
       </LearningShell>
@@ -61,8 +66,13 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
         title="Lesson unavailable"
         backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
         backLabel="Back to course"
+        testId="learning-instructor-lesson-unavailable"
       >
-        <p className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100">
+        <p
+          role="alert"
+          data-testid="learning-instructor-lesson-error"
+          className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100"
+        >
           Lesson not found or unavailable.
         </p>
       </LearningShell>
@@ -82,6 +92,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
       subtitle={`Content blocks · ${lesson.status}`}
       backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
       backLabel="Back to course"
+      testId="learning-instructor-lesson-blocks"
     >
       <p className="mt-3 text-sm text-white/60">
         Basic text/heading blocks only in this minimal slice. Media pipelines and
@@ -162,6 +173,7 @@ export default async function InstructorLessonBlocksPage({ params }: PageProps) 
           <select
             name="blockType"
             defaultValue="rich_text"
+            data-testid="learning-instructor-block-type"
             className="w-full rounded-lg border border-white/15 bg-black/40 px-3 py-2 text-sm"
           >
             <option value="rich_text">rich_text</option>

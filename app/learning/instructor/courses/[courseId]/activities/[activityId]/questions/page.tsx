@@ -271,10 +271,12 @@ export default async function AssessmentQuestionsPage({ params }: PageProps) {
         subtitle="Assessment authoring"
         backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
         instructorHref={LEARNING_INSTRUCTOR_ROUTES.hub}
+        testId="learning-instructor-assessment-unavailable"
       >
         <div
           className="rounded-xl border border-rose-400/30 bg-rose-500/10 p-4 text-sm text-rose-100"
           role="alert"
+          data-testid="learning-instructor-assessment-error"
         >
           {loaded.message}
         </div>
@@ -293,6 +295,7 @@ export default async function AssessmentQuestionsPage({ params }: PageProps) {
       subtitle="Question & assessment authoring"
       backHref={LEARNING_INSTRUCTOR_ROUTES.course(courseId)}
       instructorHref={LEARNING_INSTRUCTOR_ROUTES.hub}
+      testId="learning-instructor-assessment-questions"
     >
       <div className="space-y-6 text-white">
         <p className="text-sm text-white/70">

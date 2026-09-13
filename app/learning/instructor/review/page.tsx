@@ -48,10 +48,12 @@ export default async function InstructorReviewQueuePage({
       subtitle="Pending and filtered review work"
       backHref={LEARNING_INSTRUCTOR_EXPERIENCE_ROUTES.hub}
       backLabel="Dashboard"
+      testId="learning-instructor-review-queue"
     >
       <form
         method="get"
         className="mt-6 grid gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-3"
+        data-testid="learning-instructor-review-filters"
       >
         <label className="text-sm text-white/70">
           Course

@@ -63,8 +63,13 @@ export default async function InstructorCourseAuthoringPage({
         title="Course unavailable"
         backHref={LEARNING_INSTRUCTOR_ROUTES.hub}
         backLabel="Instructor workspace"
+        testId="learning-instructor-course-unavailable"
       >
-        <p className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100">
+        <p
+          role="alert"
+          data-testid="learning-instructor-course-error"
+          className="mt-6 rounded-lg border border-rose-400/40 bg-rose-500/10 p-4 text-sm text-rose-100"
+        >
           {loaded.message}
         </p>
       </LearningShell>
@@ -88,6 +93,7 @@ export default async function InstructorCourseAuthoringPage({
       subtitle={`Authoring · ${courseStatusLabel}`}
       backHref={LEARNING_INSTRUCTOR_ROUTES.hub}
       backLabel="Instructor workspace"
+      testId="learning-instructor-course-tree"
     >
       <p className="mt-3 text-sm text-white/60">
         Lifecycle controls call existing publish/archive RPCs. Double-publish of
