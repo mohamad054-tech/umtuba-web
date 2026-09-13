@@ -1,61 +1,38 @@
 ﻿# Current Task
 
-## Task title
+> **CENTRAL — sync official git ref `origin/alpha-0.2` to live brand release `b5fbeff`.**
 
-DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+## Result (2026-08-29)
 
-## Status
-
-**FINAL COMPLETE.** Central-accepted Learning productization is preserved in a clean local commit. Production build passes. Do not push. Do not deploy. Do not apply `20260934`. Do not redesign.
-
+```text
+TASK_ID = CENTRAL_SYNC_OFFICIAL_GIT_REF_TO_LIVE_BRAND_RELEASE_V1
+STATUS = COMPLETE
+PREVIOUS_REMOTE_ALPHA_SHA = b2c0bbd1aeb423c4f5aa7410c48c407989f30d1c
+TARGET_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+FAST_FORWARD_VERIFIED = YES
+BRAND_ONLY_SCOPE_REVERIFIED = YES
+REMOTE_CHANGED_SINCE_GATE = NO
+PUSHED = YES
+FORCE_PUSH_USED = NO
+FINAL_ORIGIN_ALPHA_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+PRODUCTION_DEPLOYED = NO
+PRODUCTION_RESTARTED = NO
+LIVE_SOURCE_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+LIVE_HEALTH = PASS
+ORIGINAL_DIRTY_CHECKOUT_PRESERVED = YES
+BLOCKERS = NONE
 ```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-DATE = 2026-08-24
-MACHINE = DESKTOP
-OPERATOR = DESKTOP / WEB LEARNING
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
-TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-BRANCH = desktop/learning-approved-design-productization-v1
-COMMIT_CREATED = YES
-PUSHED = NO
-DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
-LOCAL_PREVIEW_URL = http://localhost:3018/learning
-```
+
+Note: `docs/ops/central-umtuba-brand-rebase-deploy-v1/OFFICIAL_GIT_REF_SYNC_V1.md`.
 
 ## Allowed scope
 
-Closed. Next work requires a new Central GO.
+- Fetch, verify ancestry + brand-only range, fast-forward push exact SHA to `refs/heads/alpha-0.2`
+- Read-only live healthz / welcome check
+- Isolated worktree docs only
 
 ## Forbidden scope
 
-- Do not push unless explicitly authorized.
-- Do not deploy. Do not apply `20260934`. Do not create a new migration.
-- Do not redesign. Do not touch `umtuba-mobile`.
-- Do not write to the Windows Desktop. `_port_extract` protected.
-
-## Prior completed tasks (history — do not delete artifacts)
-
-- `DESKTOP_UMTUBA_LEARNING_APPROVED_DESIGN_PRODUCTIZATION_V1` COMPLETE_CANDIDATE / ACCEPTED_BY_CENTRAL.
-- `DESKTOP_UMTUBA_LEARNING_WORLD_CLASS_VISUAL_DESIGN_V1` APPROVED_BY_OWNER.
-- `DESKTOP_UMTUBA_LEARNING_TEACHER_STUDENT_PLATFORM_V1` HANDOFF_DEPOSITED.
-
-## Residual
-
-Authenticated writes / RLS not exercised. `20260934` not applied. `e7c84c66` still not fetchable. Push not authorized.
+- Force / reset / rebase / new commits / code changes
+- Production deploy or restart
+- Dirty-parent mutation of `office/profile-hero-completeness-v1` @ `380a366`

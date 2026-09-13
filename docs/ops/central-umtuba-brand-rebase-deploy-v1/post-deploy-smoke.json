@@ -1,0 +1,320 @@
+[
+  {
+    "name": "home",
+    "url": "https://umtuba.com/",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": false,
+      "hasSymbol": true,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [],
+      "symbolSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_symbol_from_approved_video.png&w=3840&q=75"
+      ],
+      "bodyTextHead": "UMTUBA\n\nHome\nHome\nWorld\nLearning\nLive\nMessages\nWelcome\nSaved\nUpload\n\nVideo feed\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n📚\nLearning\n🛍️\nStore\n🎮\nGames\n🔴\nLive\nUM Life\n🌍\nWorld\n🔎\nSearch\n💬\nMessages\n➕\nCreate\n+\nAdd Story\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUntitled video\n\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nNOW PLAYING\n\nUMTUBA\n\nWor"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\home.png"
+  },
+  {
+    "name": "home-hl-en",
+    "url": "https://umtuba.com/?hl=en",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/?hl=en",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": false,
+      "hasSymbol": true,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [],
+      "symbolSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_symbol_from_approved_video.png&w=3840&q=75"
+      ],
+      "bodyTextHead": "UMTUBA\n\nHome\nHome\nWorld\nLearning\nLive\nMessages\nWelcome\nSaved\nUpload\n\nVideo feed\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n📚\nLearning\n🛍️\nStore\n🎮\nGames\n🔴\nLive\nUM Life\n🌍\nWorld\n🔎\nSearch\n💬\nMessages\n➕\nCreate\n+\nAdd Story\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUntitled video\n\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nUMTUBA, Worldwide\n\nNOW PLAYING\n\nUMTUBA\n\nWor"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\home-hl-en.png"
+  },
+  {
+    "name": "watch",
+    "url": "https://umtuba.com/watch",
+    "status": 200,
+    "snapshot": {
+      "title": "Watch | UMTUBA",
+      "url": "https://umtuba.com/watch",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": false,
+      "hasSymbol": false,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [],
+      "symbolSrcs": [],
+      "bodyTextHead": "UMTUBA\n\nUMTUBA · Untitled video\n\nLanguage\nEN\n◇\nActivity tier\nUM —\nSign in\nDiscover\nFullscreen\nM\nmohamad abu tair\nFOLLOW\n\n@mohamad\n\nUntitled video\n\nRead on UM Life\n📍\nUMTUBA, Worldwide\nExplore this city\n\n♪\nOriginal sound · UMTUBA\n\nAI SUMMARY\n\nWatch how this post travels — open Post Journey for live reach.\n\nOpen AI panel\n🌍\nPost Journey\n0\n0\n0\n0\nUCONNECT\nM\nmohamad abu tair\nFOLLOW\n\n@mohamad\n\nUntitled video\n\nRead on UM Life\n📍\nUMTUBA, Worldwide\nExplore this city\n\n♪\nOriginal sound · UMTUBA\n\nAI SUMMARY\n\nWatch how this post travels — open Post Journey for live reach.\n\nOpen AI panel\n🌍\nPost Journey\n0\n0"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "stackHead": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at rY (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:40207)\n    at iu (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:91248)\n    at sd (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:131938)\n    at https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:126824\n    at se (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:126925)\n    at sH (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:153489)\n    at MessagePort._ (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:1647)"
+      }
+    ],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\watch.png"
+  },
+  {
+    "name": "welcome",
+    "url": "https://umtuba.com/welcome",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/welcome",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": true,
+      "hasSymbol": true,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_logo_stacked_from_approved_video.png&w=3840&q=75",
+        "/_next/image?url=%2Fbrand%2Fumtuba_logo_stacked_from_approved_video.png&w=3840&q=75"
+      ],
+      "symbolSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_symbol_from_approved_video.png&w=3840&q=75"
+      ],
+      "bodyTextHead": "Home\nWorld\nLearning\nLive\nMessages\nThe World Lives Here.\n\nDiscover authentic videos, cultures, people, ideas, and opportunities from every corner of the world.\n\nStart Exploring\nGo Live\n\nTHE UMTUBA WORLD\n\nMore than watching.\nA place to grow.\nOpen Home Feed\n🎬\nVideos\n\nFast, creative moments built for discovery.\n\n🔥\nChallenges\n\nDaily missions that make users come back.\n\n🤖\nAI Companion\n\nA trusted guide that helps every talent grow.\n\n💡\nIdeas\n\nTurn thoughts into projects, teams, and opportunities.\n\n🌍\nGlobal\n\nA platform for creators without borders.\n\n🚀\nOpportunities\n\nConnect talent with real chanc"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\welcome.png"
+  },
+  {
+    "name": "learning",
+    "url": "https://umtuba.com/learning",
+    "status": 200,
+    "snapshot": {
+      "title": "My Learning | UMTUBA",
+      "url": "https://umtuba.com/learning",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": false,
+      "hasSymbol": true,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [],
+      "symbolSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_symbol_from_approved_video.png&w=3840&q=75"
+      ],
+      "bodyTextHead": "UMTUBA\n\nLearning\nHome\nWorld\nLearning\nLive\nMessages\n\nMy Learning\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n\nUMTUBA Learning — live product catalog and routes.\n\nLearning\nMy Learning\nBecome a Teacher\nTeacher Center\nDiscover\nMy library\n\nLEARNING\n\nWelcome back, Guest\n\nStart learning\n\nSearch\nAll\nAI\nMobile Development\nUI/UX\nPhotography\nLanguages\nBusiness\nMathematics\nDigital Marketing\nProgramming\nRecommended for you\nFREE\nJA-01 — AI Foundations for Builders\n\nJinn AI Academy JA-01. Source locale en. Normalized from LEARNING_IMPORT pilot. Hours≈8.\n\n0.0\n·\n0\n·\nBeginner\n·\nLessons 16\nFREE\nAI Foundatio"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\learning.png"
+  },
+  {
+    "name": "store",
+    "url": "https://umtuba.com/store",
+    "status": 200,
+    "snapshot": {
+      "title": "Store — UMTUBA",
+      "url": "https://umtuba.com/store",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "hasStackedLogo": false,
+      "hasSymbol": true,
+      "hasLearnCreateShare": false,
+      "hasAlpha02": false,
+      "hasJoinBeta": false,
+      "iconHrefs": [
+        {
+          "rel": "manifest",
+          "href": "/manifest.webmanifest"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon.ico?favicon.3kmlbmt-zqr-l.ico"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-16x16.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicon-32x32.png"
+        },
+        {
+          "rel": "icon",
+          "href": "/brand/umtuba_icon_192.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/brand/umtuba_icon_180.png"
+        }
+      ],
+      "stackedSrcs": [],
+      "symbolSrcs": [
+        "/_next/image?url=%2Fbrand%2Fumtuba_symbol_from_approved_video.png&w=3840&q=75"
+      ],
+      "bodyTextHead": "Skip to store content\n\nUMTUBA\n\nStore\nHome\nWorld\nLearning\nLive\nMessages\n\nUMTUBA\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\nSearch the store\nSearch\nShop\nCatalog\nFavorites\nOrders\n\nUMTUBA STORE\n\nShop UMTUBA\n\nDiscover active products from UMTUBA sellers and creators — catalog prices only, no invented deals.\n\nBrowse products\nBrowse catalog\nCATALOG PRICES\nWhat you see is the live offer — no invented promotions.\nQUOTED AT CHECKOUT\nTax, delivery, and discounts appear only from a server quote.\nONE SELLER, ONE ORDER\nMulti-seller bags ship separately. No guessed delivery dates.\n\nSELL\n\nBecome a Selle"
+    },
+    "supabaseThrow": false,
+    "discoverThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\CENTRAL-UMTUBA-BRAND-REBASE-SAFETY-V1\\docs\\ops\\central-umtuba-brand-rebase-deploy-v1\\screenshots-live\\store.png"
+  }
+]
