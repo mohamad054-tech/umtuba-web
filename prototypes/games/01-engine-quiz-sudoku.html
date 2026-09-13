@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA — محرك الألعاب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723;
+  --surface:#14352F;
+  --raise:#1B443C;
+  --line:#255A50;
+  --ink:#EAF2EE;
+  --muted:#8FB3AA;
+  --gold:#F0A93B;
+  --gold-dim:#9A6E22;
+  --clay:#D46A5E;
+  --mint:#5FCBA4;
+  --r:14px;
+  --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--field);
+  color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  font-weight:400;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  padding:var(--pad);
+  display:flex;justify-content:center;
+}
+.app{width:100%;max-width:760px}
+
+/* ---------- shell ---------- */
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 20px}
+
+.surfaces{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.surf{
+  background:transparent;border:1px solid var(--line);color:var(--muted);
+  font:inherit;font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;
+  cursor:pointer;transition:color .15s,border-color .15s,background .15s;
+}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:12px 0 20px}
+.where b{color:var(--ink);font-weight:600}
+
+/* ---------- shared game chrome ---------- */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0;transition:width .25s linear}
+.strand i.tight{background:var(--clay)}
+.body{padding:clamp(16px,4vw,24px)}
+
+button.btn{
+  font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink);
+  transition:background .15s,border-color .15s;
+}
+button.btn:hover{border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover{background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* ---------- quiz ---------- */
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(17px,3.6vw,21px);font-weight:600;line-height:1.5;margin-bottom:18px}
+.choices{display:flex;flex-direction:column;gap:9px}
+.choice{
+  font:inherit;font-size:15px;text-align:start;cursor:pointer;
+  background:var(--raise);border:1px solid var(--line);color:var(--ink);
+  border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:12px;
+  transition:border-color .15s,background .15s;
+}
+.choice:hover:not(:disabled){border-color:var(--gold-dim)}
+.choice:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.choice .tag{
+  width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface);
+  border:1px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted)
+}
+.choice.right{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.choice.right .tag{background:var(--mint);color:#0C2723;border-color:var(--mint)}
+.choice.wrong{border-color:var(--clay);background:rgba(212,106,94,.13)}
+.choice.wrong .tag{background:var(--clay);color:#2A1614;border-color:var(--clay)}
+.choice:disabled{cursor:default}
+.why{
+  margin-top:16px;padding:14px 16px;border-radius:11px;
+  background:var(--field);border:1px solid var(--line);font-size:14.5px;line-height:1.7
+}
+.why .lead{font-weight:600;display:block;margin-bottom:3px}
+.why.ok .lead{color:var(--mint)}
+.why.no .lead{color:var(--clay)}
+
+/* ---------- sudoku ---------- */
+.board{
+  display:grid;grid-template-columns:repeat(9,1fr);
+  gap:1px;background:var(--line);border:2px solid var(--line);border-radius:8px;
+  max-width:430px;margin:0 auto;aspect-ratio:1;overflow:hidden
+}
+.cell{
+  background:var(--raise);border:0;font:inherit;color:var(--ink);
+  font-size:clamp(15px,4.2vw,21px);font-weight:500;font-variant-numeric:tabular-nums;
+  display:grid;place-items:center;cursor:pointer;position:relative;
+  transition:background .12s
+}
+.cell:focus-visible{outline:2px solid var(--mint);outline-offset:-2px;z-index:2}
+.cell.fixed{color:var(--muted);font-weight:600;cursor:default;background:var(--surface)}
+.cell.peer{background:#1F4A42}
+.cell.sel{background:var(--gold-dim)}
+.cell.same{color:var(--gold)}
+.cell.bad{color:var(--clay)}
+.cell.br{border-inline-end:2px solid var(--line)}
+.cell.bb{border-block-end:2px solid var(--line)}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:430px;margin:18px auto 0}
+.key{
+  font:inherit;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;
+  background:var(--raise);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:12px 0;cursor:pointer;transition:border-color .15s
+}
+.key:hover{border-color:var(--gold-dim)}
+.key:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.key.done{opacity:.3}
+.key.erase{color:var(--clay);font-size:15px}
+
+/* ---------- result ---------- */
+.result{text-align:center;padding:26px 0 8px}
+.score{font-size:clamp(40px,11vw,60px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:22px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you{color:var(--gold)}
+.board-list .li.you .rk{color:var(--gold)}
+
+/* ---------- misc ---------- */
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:26px;line-height:1.8}
+.note code{background:var(--surface);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--gold)}
+.hidden{display:none !important}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> — الألعاب</div>
+    <div class="sub">محرك واحد، كل لعبة بمكانها</div>
+  </header>
+
+  <div class="rule"></div>
+
+  <div class="surfaces" role="tablist" aria-label="أقسام المنصة">
+    <button class="surf" role="tab" aria-selected="true" data-surface="learning">التعليم</button>
+    <button class="surf" role="tab" aria-selected="false" data-surface="games">الألعاب</button>
+  </div>
+  <p class="where" id="where"></p>
+
+  <main id="stage"></main>
+
+  <p class="note">
+    اللعبتين فوق مبنيتين على نفس الأساس: النقاط، المؤقّت، لوحة المتصدّرين، الترجمة، واتجاه النص.
+    إضافة لعبة جديدة معناها ملف صغير واحد، مش نسخة كاملة من كل شي.
+    جرّب لوحة المفاتيح كمان — الأسهم و<code>١-٩</code> بتشتغل في سودوكو.
+  </p>
+
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════
+   UM.Engine — الأساس المشترك لكل ألعاب المنصة
+   ═══════════════════════════════════════════════════════════ */
+const UM = (() => {
+
+  /* --- تخزين: في الذاكرة الآن، يُستبدل بـ Supabase عند الدمج --- */
+  const memory = new Map();
+  const store = {
+    async get(k){ return memory.has(k) ? memory.get(k) : null; },
+    async set(k,v){ memory.set(k,v); return v; }
+  };
+
+  /* --- الترجمة: مفتاح واحد لكل نص، 13 لغة تُضاف هنا فقط --- */
+  const strings = {
+    ar:{
+      score:"النقاط", time:"الوقت", streak:"متتالية", mistakes:"أخطاء",
+      question:"سؤال", of:"من", start:"ابدأ", again:"العب مرة ثانية",
+      next:"التالي", results:"النتيجة", correct:"إجابة صحيحة",
+      wrong:"إجابة خاطئة", timeout:"انتهى الوقت", point:"نقطة",
+      leaders:"المتصدّرون", you:"أنت", hint:"تلميح", newGame:"لعبة جديدة",
+      solved:"انحلّت", perfect:"علامة كاملة", good:"شغل ممتاز",
+      okay:"نتيجة مقبولة", weak:"محتاج مراجعة", left:"باقي"
+    },
+    en:{
+      score:"Score", time:"Time", streak:"Streak", mistakes:"Mistakes",
+      question:"Question", of:"of", start:"Start", again:"Play again",
+      next:"Next", results:"Results", correct:"Correct",
+      wrong:"Incorrect", timeout:"Time's up", point:"pt",
+      leaders:"Leaderboard", you:"You", hint:"Hint", newGame:"New game",
+      solved:"Solved", perfect:"Perfect score", good:"Well done",
+      okay:"Decent result", weak:"Needs review", left:"left"
+    }
+  };
+  let lang = "ar";
+  const t = k => (strings[lang] && strings[lang][k]) || strings.ar[k] || k;
+  const rtl = () => ["ar","fa","ur","he"].includes(lang);
+
+  /* --- أرقام حسب اللغة --- */
+  const num = n => lang === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n);
+  const clock = s => num(Math.floor(s/60)) + ":" + num(String(s%60).padStart(2,"0"));
+
+  /* --- صوت بسيط، بدون ملفات --- */
+  let ac = null;
+  function tone(freq, ms, type="sine", vol=.06){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + ms/1000);
+      o.connect(g); g.connect(ac.destination);
+      o.start(); o.stop(ac.currentTime + ms/1000);
+    }catch(e){}
+  }
+  const sfx = {
+    ok:   () => { tone(660,90); setTimeout(()=>tone(880,130),75); },
+    no:   () => tone(180,200,"square",.05),
+    tick: () => tone(440,40,"triangle",.03),
+    win:  () => [0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+
+  /* --- لوحة المتصدّرين --- */
+  async function submit(gameId, points){
+    const key = "lb:" + gameId;
+    const rows = (await store.get(key)) || seedBoard(gameId);
+    const mine = rows.find(r => r.me);
+    if (mine) mine.points = Math.max(mine.points, points);
+    else rows.push({ name: t("you"), points, me: true });
+    rows.sort((a,b) => b.points - a.points);
+    await store.set(key, rows);
+    return rows.slice(0, 5);
+  }
+  function seedBoard(id){
+    const pool = ["ليان","مهند","سلمى","يوسف","رنا","كرم","دانا","باسل"];
+    const base = id === "sudoku" ? 700 : 480;
+    return pool.slice(0,5).map((n,i) => ({ name:n, points: base - i*(37+i*9) }));
+  }
+
+  /* --- المؤقّت --- */
+  function timer(seconds, onTick, onEnd){
+    let left = seconds, id = null;
+    const step = () => {
+      left--; onTick(left);
+      if (left <= 0){ stop(); onEnd(); }
+    };
+    const start = () => { stop(); onTick(left); id = setInterval(step, 1000); };
+    const stop  = () => { if (id) clearInterval(id); id = null; };
+    return { start, stop, get left(){ return left; }, set left(v){ left = v; } };
+  }
+
+  /* --- عدّاد تصاعدي --- */
+  function stopwatch(onTick){
+    let s = 0, id = null;
+    return {
+      start(){ this.stop(); id = setInterval(()=>{ s++; onTick(s); },1000); },
+      stop(){ if(id) clearInterval(id); id = null; },
+      get elapsed(){ return s; }
+    };
+  }
+
+  /* --- بناء عناصر --- */
+  function el(tag, cls, html){
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  /* --- سجلّ الألعاب --- */
+  const registry = new Map();
+  const register = (id, def) => registry.set(id, def);
+  const get = id => registry.get(id);
+  const bySurface = s => [...registry.values()].filter(g => g.surface === s);
+
+  return { store, t, num, clock, sfx, submit, timer, stopwatch, el,
+           register, get, bySurface, rtl,
+           get lang(){ return lang; }, set lang(v){ lang = v; } };
+})();
+
+
+/* ═══════════════════════════════════════════════════════════
+   لعبة ١ — اختبار الدرس  ·  مكانها: التعليم
+   ═══════════════════════════════════════════════════════════ */
+UM.register("lesson-quiz", {
+  surface: "learning",
+  title: "اختبار الدرس",
+  blurb: "بيظهر بعد كل درس. سؤال بوقت محدد، والتفسير بيطلع فوراً.",
+
+  bank: [
+    { q:"شو الفرق الأساسي بين نموذج اللغة الكبير والبرنامج العادي؟",
+      a:["النموذج بيتعلّم من أمثلة بدل ما ينفّذ قواعد مكتوبة",
+         "النموذج أسرع في التنفيذ",
+         "النموذج ما بيحتاج إنترنت",
+         "البرنامج العادي ما بيقدر يتعامل مع نصوص"],
+      c:0,
+      why:"البرنامج العادي بينفّذ خطوات كتبها مبرمج. النموذج بيستنتج الأنماط من كمية ضخمة من الأمثلة، وعشان هيك بيقدر يتعامل مع حالات ما حدا كتبها له." },
+    { q:"إيش المقصود بـ«توكن» عند التعامل مع النماذج؟",
+      a:["كلمة مرور للوصول للخدمة",
+         "قطعة صغيرة من النص، أصغر من الكلمة غالباً",
+         "وحدة قياس السرعة",
+         "نوع من أنواع الملفات"],
+      c:1,
+      why:"النموذج ما بيقرأ كلمات كاملة، بيقسّم النص لقطع صغيرة اسمها توكن. الفاتورة والحد الأقصى للنص بينحسبوا بالتوكن مش بالكلمات." },
+    { q:"ليش بيُنصح تكون التعليمات للنموذج محددة ومفصّلة؟",
+      a:["لأن التعليمات الطويلة أرخص",
+         "لأن النموذج بيرفض التعليمات القصيرة",
+         "لأن الغموض بيخلي النموذج يختار تفسيراً قد لا يكون المقصود",
+         "لأن هيك بتشتغل كل البرامج"],
+      c:2,
+      why:"لما يكون الطلب غامض، النموذج بيملأ الفراغ باحتمال معقول — بس مش بالضرورة اللي بدك إياه. التحديد بيقلّل هالمساحة." },
+    { q:"شو أول شي لازم تتأكد منه قبل ما تنشر تطبيقاً مبنياً على نموذج؟",
+      a:["إنه التصميم جذاب",
+         "إنه في آلية للتعامل مع المخرجات الخاطئة",
+         "إنه بيدعم كل اللغات",
+         "إنه أسرع من المنافسين"],
+      c:1,
+      why:"النموذج بيغلط أحياناً، وهاد متوقع. التطبيق الجاهز للنشر هو اللي فيه تحقق ومراجعة وطريقة للمستخدم يبلّغ، مش اللي بيفترض إنه الجواب دايماً صح." },
+    { q:"إيش معنى إنه النموذج «ما بيتذكّر» المحادثات السابقة افتراضياً؟",
+      a:["إنه بينسى كل شي بعد كل كلمة",
+         "إنه لازم توصله السياق المطلوب مع كل طلب",
+         "إنه ما بيقدر يشتغل أكثر من مرة",
+         "إنه بيحتاج إعادة تدريب كل يوم"],
+      c:1,
+      why:"كل طلب بينوصل للنموذج لحاله. لو بدّه يعرف شو صار قبل، لازم تبعت له السياق ضمن الطلب نفسه." },
+    { q:"متى يكون استخدام النموذج خياراً غير مناسب؟",
+      a:["لما تكون المهمة إبداعية",
+         "لما يكون المطلوب نتيجة دقيقة ومحددة يقدر يحسبها برنامج عادي",
+         "لما يكون النص طويلاً",
+         "لما يكون المستخدم مبتدئاً"],
+      c:1,
+      why:"حساب فاتورة أو تحويل عملة برنامج عادي بيعملهم بدقة كاملة وتكلفة صفر. النموذج بينفع لما تكون المهمة فيها فهم أو لغة أو غموض." }
+  ],
+
+  mount(root){
+    const G = this;
+    const QS = 20;                        // ثانية لكل سؤال
+    let i = 0, score = 0, streak = 0, best = 0, right = 0, locked = false;
+
+    const panel = UM.el("div","panel");
+    const bar   = UM.el("div","bar");
+    const sc    = stat(UM.t("score"), "0");
+    const st    = stat(UM.t("streak"), "0");
+    const tm    = stat(UM.t("time"), UM.num(QS));
+    bar.append(sc.node, st.node, UM.el("div","grow"), tm.node);
+    const strand = UM.el("div","strand"); const fill = UM.el("i"); strand.append(fill);
+    const body = UM.el("div","body");
+    panel.append(bar, strand, body);
+    root.append(panel);
+
+    const clock = UM.timer(QS,
+      left => {
+        tm.set(UM.num(Math.max(left,0)));
+        const pct = (left / QS) * 100;
+        fill.style.width = pct + "%";
+        fill.classList.toggle("tight", left <= 5);
+        if (left <= 5 && left > 0) UM.sfx.tick();
+        if (left <= 5) tm.node.querySelector(".v").classList.add("warn");
+        else tm.node.querySelector(".v").classList.remove("warn");
+      },
+      () => answer(-1)
+    );
+
+    function stat(k,v){
+      const n = UM.el("div","stat");
+      n.append(UM.el("span","k",k), UM.el("span","v",v));
+      return { node:n, set:x => n.querySelector(".v").textContent = x };
+    }
+
+    function draw(){
+      locked = false;
+      const q = G.bank[i];
+      body.innerHTML = "";
+      body.append(
+        UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(G.bank.length)}`),
+        UM.el("div","qtext", q.q)
+      );
+      const list = UM.el("div","choices");
+      q.a.forEach((text,k) => {
+        const b = UM.el("button","choice");
+        b.append(UM.el("span","tag", ["أ","ب","ج","د"][k]), UM.el("span","",text));
+        b.onclick = () => answer(k);
+        list.append(b);
+      });
+      body.append(list);
+      clock.left = QS;
+      clock.start();
+    }
+
+    function answer(pick){
+      if (locked) return;
+      locked = true;
+      clock.stop();
+      const q = G.bank[i];
+      const hit = pick === q.c;
+      const btns = [...body.querySelectorAll(".choice")];
+      btns.forEach((b,k) => {
+        b.disabled = true;
+        if (k === q.c) b.classList.add("right");
+        else if (k === pick) b.classList.add("wrong");
+      });
+
+      if (hit){
+        right++; streak++; best = Math.max(best,streak);
+        const bonus = Math.min(streak - 1, 4) * 10;
+        const speed = Math.round(clock.left * 2);
+        score += 50 + bonus + speed;
+        UM.sfx.ok();
+      } else {
+        streak = 0;
+        UM.sfx.no();
+      }
+      sc.set(UM.num(score)); st.set(UM.num(streak));
+
+      const why = UM.el("div", "why " + (hit ? "ok" : "no"));
+      why.append(
+        UM.el("span","lead", pick === -1 ? UM.t("timeout") : hit ? UM.t("correct") : UM.t("wrong")),
+        UM.el("span","", q.why)
+      );
+      body.append(why);
+
+      const row = UM.el("div","row");
+      const next = UM.el("button","btn go", i + 1 < G.bank.length ? UM.t("next") : UM.t("results"));
+      next.onclick = () => { i++; i < G.bank.length ? draw() : finish(); };
+      row.append(next); body.append(row);
+      next.focus();
+    }
+
+    async function finish(){
+      clock.stop();
+      fill.style.width = "100%"; fill.classList.remove("tight");
+      const pct = Math.round(right / G.bank.length * 100);
+      const verdict = pct === 100 ? UM.t("perfect") : pct >= 75 ? UM.t("good")
+                    : pct >= 50 ? UM.t("okay") : UM.t("weak");
+      if (pct >= 75) UM.sfx.win();
+
+      body.innerHTML = "";
+      const res = UM.el("div","result");
+      res.append(
+        UM.el("div","score", `${UM.num(score)}<small> ${UM.t("point")}</small>`),
+        UM.el("div","verdict", verdict),
+        UM.el("div","detail",
+          `${UM.num(right)} ${UM.t("of")} ${UM.num(G.bank.length)} · ${UM.t("streak")} ${UM.num(best)}`)
+      );
+      body.append(res);
+      body.append(await board("lesson-quiz", score));
+
+      const row = UM.el("div","row"); row.style.justifyContent = "center";
+      const again = UM.el("button","btn go", UM.t("again"));
+      again.onclick = () => { i=0;score=0;streak=0;best=0;right=0;
+                              sc.set(UM.num(0)); st.set(UM.num(0)); draw(); };
+      row.append(again); body.append(row);
+    }
+
+    draw();
+    return () => clock.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   لعبة ٢ — سودوكو  ·  مكانها: الألعاب
+   ═══════════════════════════════════════════════════════════ */
+UM.register("sudoku", {
+  surface: "games",
+  title: "سودوكو",
+  blurb: "لعبة عامة. أرقام عربية، لوحة مفاتيح كاملة، وحلّ واحد مضمون.",
+
+  mount(root){
+    const HOLES = 44;                     // متوسط
+    let puzzle, solution, given, sel = null, mistakes = 0, done = false;
+
+    /* --- توليد --- */
+    const rowOf = i => (i/9)|0, colOf = i => i%9;
+    function fits(g,i,v){
+      const r = rowOf(i), c = colOf(i), br = r-r%3, bc = c-c%3;
+      for (let k=0;k<9;k++){
+        if (g[r*9+k] === v || g[k*9+c] === v) return false;
+        if (g[(br+((k/3)|0))*9 + bc + k%3] === v) return false;
+      }
+      return true;
+    }
+    function fill(g,i=0){
+      if (i === 81) return true;
+      const order = [1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-.5);
+      for (const v of order){
+        if (fits(g,i,v)){ g[i]=v; if (fill(g,i+1)) return true; g[i]=0; }
+      }
+      return false;
+    }
+    function count(g,i=0,found=0){
+      if (found > 1) return found;
+      while (i < 81 && g[i]) i++;
+      if (i === 81) return found + 1;
+      for (let v=1;v<=9;v++){
+        if (fits(g,i,v)){ g[i]=v; found = count(g,i+1,found); g[i]=0; if (found>1) break; }
+      }
+      return found;
+    }
+    function make(){
+      solution = new Array(81).fill(0); fill(solution);
+      puzzle = solution.slice();
+      const idx = [...Array(81).keys()].sort(()=>Math.random()-.5);
+      let removed = 0;
+      for (const i of idx){
+        if (removed >= HOLES) break;
+        const keep = puzzle[i]; puzzle[i] = 0;
+        if (count(puzzle.slice()) !== 1){ puzzle[i] = keep; }
+        else removed++;
+      }
+      given = puzzle.map(v => v !== 0);
+    }
+
+    /* --- الواجهة --- */
+    const panel = UM.el("div","panel");
+    const bar   = UM.el("div","bar");
+    const tmN   = mk(UM.t("time"), UM.clock(0));
+    const msN   = mk(UM.t("mistakes"), UM.num(0));
+    const lfN   = mk(UM.t("left"), UM.num(0));
+    bar.append(tmN.node, msN.node, UM.el("div","grow"), lfN.node);
+    const body  = UM.el("div","body");
+    panel.append(bar, UM.el("div","strand"), body);
+    root.append(panel);
+
+    function mk(k,v){
+      const n = UM.el("div","stat");
+      n.append(UM.el("span","k",k), UM.el("span","v",v));
+      return { node:n, set:x => n.querySelector(".v").textContent = x,
+               warn:on => n.querySelector(".v").classList.toggle("warn",on) };
+    }
+
+    const watch = UM.stopwatch(s => tmN.set(UM.clock(s)));
+    const grid = UM.el("div","board"); grid.setAttribute("role","grid");
+    const pad  = UM.el("div","pad");
+    body.append(grid, pad);
+
+    const cells = [];
+    for (let i=0;i<81;i++){
+      const b = UM.el("button","cell");
+      if (colOf(i)%3 === 2 && colOf(i) !== 8) b.classList.add("br");
+      if (rowOf(i)%3 === 2 && rowOf(i) !== 8) b.classList.add("bb");
+      b.onclick = () => select(i);
+      grid.append(b); cells.push(b);
+    }
+    for (let v=1;v<=9;v++){
+      const k = UM.el("button","key", UM.num(v));
+      k.dataset.v = v;
+      k.onclick = () => place(v);
+      pad.append(k);
+    }
+    const er = UM.el("button","key erase","مسح");
+    er.onclick = () => place(0);
+    pad.append(er);
+
+    const row = UM.el("div","row"); row.style.justifyContent="center";
+    const hintB = UM.el("button","btn", UM.t("hint"));
+    const newB  = UM.el("button","btn", UM.t("newGame"));
+    hintB.onclick = hint; newB.onclick = reset;
+    row.append(hintB, newB); body.append(row);
+
+    function select(i){
+      if (done) return;
+      sel = i; paint(); cells[i].focus();
+    }
+    function place(v){
+      if (done || sel === null || given[sel]) return;
+      puzzle[sel] = v;
+      if (v && v !== solution[sel]){
+        mistakes++; msN.set(UM.num(mistakes)); msN.warn(mistakes >= 3); UM.sfx.no();
+      } else if (v){ UM.sfx.ok(); }
+      paint(); check();
+    }
+    function hint(){
+      if (done) return;
+      const blanks = puzzle.map((v,i)=>v?null:i).filter(i=>i!==null);
+      if (!blanks.length) return;
+      const i = blanks[(Math.random()*blanks.length)|0];
+      puzzle[i] = solution[i]; given[i] = true;
+      sel = i; UM.sfx.ok(); paint(); check();
+    }
+    function paint(){
+      const sv = sel !== null ? puzzle[sel] : 0;
+      const sr = sel !== null ? rowOf(sel) : -1, sc2 = sel !== null ? colOf(sel) : -1;
+      const sb = sel !== null ? ((sr/3|0)*3 + (sc2/3|0)) : -1;
+      let left = 0;
+      cells.forEach((b,i) => {
+        const v = puzzle[i];
+        b.textContent = v ? UM.num(v) : "";
+        b.className = "cell"
+          + (colOf(i)%3===2 && colOf(i)!==8 ? " br" : "")
+          + (rowOf(i)%3===2 && rowOf(i)!==8 ? " bb" : "")
+          + (given[i] ? " fixed" : "");
+        const bi = (rowOf(i)/3|0)*3 + (colOf(i)/3|0);
+        if (i === sel) b.classList.add("sel");
+        else if (rowOf(i)===sr || colOf(i)===sc2 || bi===sb) b.classList.add("peer");
+        if (v && sv && v === sv && i !== sel) b.classList.add("same");
+        if (v && v !== solution[i]) b.classList.add("bad");
+        if (!v) left++;
+      });
+      lfN.set(UM.num(left));
+      [...pad.querySelectorAll(".key[data-v]")].forEach(k => {
+        const v = +k.dataset.v;
+        k.classList.toggle("done", puzzle.filter(x=>x===v).length >= 9);
+      });
+    }
+    async function check(){
+      if (puzzle.some((v,i) => v !== solution[i])) return;
+      done = true; watch.stop(); UM.sfx.win();
+      const pts = Math.max(120, 1000 - watch.elapsed*2 - mistakes*60);
+      const res = UM.el("div","result");
+      res.append(
+        UM.el("div","score", `${UM.num(pts)}<small> ${UM.t("point")}</small>`),
+        UM.el("div","verdict", UM.t("solved")),
+        UM.el("div","detail",
+          `${UM.t("time")} ${UM.clock(watch.elapsed)} · ${UM.t("mistakes")} ${UM.num(mistakes)}`)
+      );
+      body.innerHTML = ""; body.append(res);
+      body.append(await board("sudoku", pts));
+      const r = UM.el("div","row"); r.style.justifyContent="center";
+      const again = UM.el("button","btn go", UM.t("again"));
+      again.onclick = () => { body.innerHTML=""; body.append(grid,pad,row); reset(); };
+      r.append(again); body.append(r);
+    }
+    function reset(){
+      make(); sel=null; mistakes=0; done=false;
+      msN.set(UM.num(0)); msN.warn(false);
+      watch.stop(); watch.start(); tmN.set(UM.clock(0));
+      paint();
+    }
+
+    function keys(e){
+      if (done || sel === null) return;
+      const k = e.key;
+      if (/^[1-9]$/.test(k)){ place(+k); e.preventDefault(); return; }
+      if (/^[١-٩]$/.test(k)){ place("١٢٣٤٥٦٧٨٩".indexOf(k)+1); e.preventDefault(); return; }
+      if (k === "Backspace" || k === "Delete" || k === "0"){ place(0); e.preventDefault(); return; }
+      const step = { ArrowUp:-9, ArrowDown:9,
+                     ArrowRight: UM.rtl() ? -1 : 1,
+                     ArrowLeft:  UM.rtl() ? 1 : -1 }[k];
+      if (step !== undefined){
+        const n = sel + step;
+        if (n >= 0 && n < 81 && !(Math.abs(step)===1 && rowOf(n)!==rowOf(sel))) select(n);
+        e.preventDefault();
+      }
+    }
+    document.addEventListener("keydown", keys);
+
+    reset();
+    return () => { watch.stop(); document.removeEventListener("keydown", keys); };
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   لوحة المتصدّرين — مشتركة
+   ═══════════════════════════════════════════════════════════ */
+async function board(gameId, points){
+  const rows = await UM.submit(gameId, points);
+  const wrap = UM.el("div","board-list");
+  wrap.append(Object.assign(UM.el("div","qnum", UM.t("leaders")),
+              { style:"padding-top:10px" }));
+  rows.forEach((r,i) => {
+    const li = UM.el("div","li" + (r.me ? " you" : ""));
+    li.append(UM.el("span","rk", UM.num(i+1)),
+              UM.el("span","nm", r.name),
+              UM.el("span","pt", UM.num(r.points)));
+    wrap.append(li);
+  });
+  return wrap;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   التبديل بين الأقسام
+   ═══════════════════════════════════════════════════════════ */
+(() => {
+  const stage = document.getElementById("stage");
+  const where = document.getElementById("where");
+  const tabs  = [...document.querySelectorAll(".surf")];
+  let teardown = null;
+
+  function open(surface){
+    if (teardown) teardown();
+    stage.innerHTML = "";
+    const g = UM.bySurface(surface)[0];
+    where.innerHTML = `<b>${g.title}</b> — ${g.blurb}`;
+    teardown = g.mount(stage) || null;
+    tabs.forEach(b => b.setAttribute("aria-selected", b.dataset.surface === surface));
+  }
+  tabs.forEach(b => b.onclick = () => open(b.dataset.surface));
+  open("learning");
+})();
+</script>
+</body>
+</html>

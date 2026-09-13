@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA — ألعاب المتجر والألعاب العامة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723; --surface:#14352F; --raise:#1B443C; --line:#255A50;
+  --ink:#EAF2EE; --muted:#8FB3AA; --gold:#F0A93B; --gold-dim:#9A6E22;
+  --clay:#D46A5E; --mint:#5FCBA4; --r:14px; --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--field);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding:var(--pad);display:flex;justify-content:center}
+.app{width:100%;max-width:760px}
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 16px}
+.grouplabel{font-size:12px;color:var(--muted);font-weight:300;margin:0 0 8px}
+.surfaces{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.surf{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;
+  font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:4px 0 20px}
+.where b{color:var(--ink);font-weight:600}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0;transition:width .25s linear}
+.strand i.tight{background:var(--clay)}
+.body{padding:clamp(16px,4vw,24px)}
+
+button.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink);
+  transition:background .15s,border-color .15s}
+button.btn:hover:not(:disabled){border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover:not(:disabled){background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(16px,3.4vw,19px);font-weight:600;line-height:1.5;margin:16px 0 14px}
+.why{margin-top:15px;padding:13px 15px;border-radius:11px;background:var(--field);
+  border:1px solid var(--line);font-size:14.5px;line-height:1.7}
+.why .lead{font-weight:600;display:block;margin-bottom:3px}
+.why.ok .lead{color:var(--mint)}
+.why.no .lead{color:var(--clay)}
+
+/* ---- بطاقات المنتج ---- */
+.prod{display:flex;gap:14px;align-items:center;background:var(--raise);
+  border:1px solid var(--line);border-radius:12px;padding:14px}
+.thumb{width:76px;height:76px;flex:none;border-radius:10px;overflow:hidden;background:var(--field)}
+.thumb svg{display:block;width:100%;height:100%}
+.pmeta{flex:1;min-width:0}
+.pname{font-weight:600;font-size:16px}
+.pcat{color:var(--muted);font-size:13px;font-weight:300}
+.priceline{display:flex;align-items:baseline;gap:10px;margin-top:14px;font-variant-numeric:tabular-nums}
+.priceline .big{font-size:clamp(26px,7vw,36px);font-weight:700}
+.priceline .cur{font-size:14px;color:var(--muted);font-weight:400}
+
+.slider{width:100%;margin:18px 0 6px;accent-color:var(--gold);height:26px}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;
+  font-weight:300;font-variant-numeric:tabular-nums}
+
+/* ---- عجلة الخصم ---- */
+.wheelwrap{display:grid;place-items:center;padding:6px 0 2px;position:relative}
+.wheelwrap svg{max-width:290px;width:100%;height:auto}
+.wheel{transition:transform 3.6s cubic-bezier(.16,.86,.2,1)}
+.needle{position:absolute;top:-2px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-inline:9px solid transparent;border-top:16px solid var(--gold)}
+.prize{margin-top:20px;text-align:center}
+.prize .amt{font-size:clamp(34px,9vw,48px);font-weight:700;color:var(--gold);line-height:1}
+.prize .lbl{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.code{display:inline-block;margin-top:14px;font-family:ui-monospace,monospace;
+  font-size:17px;letter-spacing:.16em;background:var(--field);border:1px dashed var(--gold-dim);
+  color:var(--gold);border-radius:9px;padding:9px 18px}
+
+/* ---- السلة ---- */
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin-top:14px}
+.item{background:var(--raise);border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+  cursor:pointer;text-align:start;font:inherit;color:var(--ink);transition:border-color .15s,background .15s}
+.item:hover{border-color:var(--gold-dim)}
+.item:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.item.in{border-color:var(--gold);background:rgba(240,169,59,.12)}
+.item .n{font-size:14px;font-weight:500;display:block}
+.item .p{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.item.in .p{color:var(--gold)}
+.budget{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums;margin-top:4px}
+.budget .now{font-size:26px;font-weight:700}
+.budget .now.over{color:var(--clay)}
+.budget .cap{color:var(--muted);font-size:14px;font-weight:300}
+
+/* ---- الذاكرة ---- */
+.memgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:400px;margin:0 auto}
+.card{aspect-ratio:1;border:0;background:transparent;cursor:pointer;perspective:600px;padding:0}
+.card:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:11px}
+.card .inner{position:relative;width:100%;height:100%;transition:transform .4s;transform-style:preserve-3d}
+.card.up .inner,.card.done .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:11px;display:grid;place-items:center;
+  backface-visibility:hidden;border:1px solid var(--line)}
+.back{background:var(--raise)}
+.back::after{content:"";width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
+.front{background:var(--surface);transform:rotateY(180deg);font-size:28px}
+.card.done .front{border-color:var(--mint);background:rgba(95,203,164,.13)}
+
+/* ---- XO ---- */
+.xo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:0 auto}
+.sq{aspect-ratio:1;background:var(--raise);border:1px solid var(--line);border-radius:12px;
+  font:inherit;font-size:38px;font-weight:700;color:var(--ink);cursor:pointer;
+  display:grid;place-items:center;transition:border-color .15s}
+.sq:hover:not(:disabled){border-color:var(--gold-dim)}
+.sq:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.sq.x{color:var(--gold)}
+.sq.o{color:var(--mint)}
+.sq.win{background:rgba(240,169,59,.16);border-color:var(--gold)}
+.sq:disabled{cursor:default}
+.turn{text-align:center;font-size:15px;color:var(--muted);font-weight:300;margin-bottom:14px}
+.turn b{color:var(--ink);font-weight:600}
+
+/* ---- كلمة السر ---- */
+.word{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:8px 0 18px}
+.slot{width:34px;height:44px;border-bottom:2px solid var(--line);display:grid;place-items:center;
+  font-size:23px;font-weight:600}
+.slot.on{border-bottom-color:var(--gold)}
+.letters{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:7px;margin-top:6px}
+.ltr{font:inherit;font-size:17px;font-weight:600;background:var(--raise);border:1px solid var(--line);
+  color:var(--ink);border-radius:9px;padding:9px 0;cursor:pointer;transition:all .15s}
+.ltr:hover:not(:disabled){border-color:var(--gold-dim)}
+.ltr:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.ltr.hit{background:rgba(95,203,164,.16);border-color:var(--mint);color:var(--mint)}
+.ltr.miss{opacity:.28;cursor:not-allowed}
+.lives{display:flex;gap:5px}
+.heart{width:11px;height:11px;border-radius:50%;background:var(--gold)}
+.heart.gone{background:var(--line)}
+
+.result{text-align:center;padding:24px 0 6px}
+.score{font-size:clamp(38px,10vw,56px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:20px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;
+  border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you,.board-list .li.you .rk{color:var(--gold)}
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:26px;line-height:1.8}
+.note code{background:var(--surface);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--gold)}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> — الدفعة الثانية</div>
+    <div class="sub">ألعاب المتجر والألعاب العامة</div>
+  </header>
+  <div class="rule"></div>
+
+  <p class="grouplabel">المتجر</p>
+  <div class="surfaces" role="tablist" aria-label="ألعاب المتجر">
+    <button class="surf" role="tab" aria-selected="true" data-g="price">خمّن السعر</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="wheel">عجلة الخصم</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="basket">تحدّي السلة</button>
+  </div>
+
+  <p class="grouplabel">الألعاب</p>
+  <div class="surfaces" role="tablist" aria-label="الألعاب العامة">
+    <button class="surf" role="tab" aria-selected="false" data-g="memory">الذاكرة</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="xo">إكس أو</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="hangword">كلمة السر</button>
+  </div>
+
+  <p class="where" id="where"></p>
+  <main id="stage"></main>
+
+  <p class="note">
+    ست ألعاب على نفس المحرك تبع الدفعة الأولى — نفس النقاط، نفس المؤقّت، نفس لوحة المتصدّرين.
+    ألعاب المتجر مصمّمة بجوائز <b>مضمونة ومعروفة</b>، مش «ممكن تربح وممكن لأ» —
+    هيك بتتجنّب تصنيفها كقمار في أي دولة.
+  </p>
+
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════
+   UM.Engine — نفس الأساس
+   ═══════════════════════════════════════════════════════════ */
+const UM = (() => {
+  const memory=new Map();
+  const store={ async get(k){return memory.has(k)?memory.get(k):null;},
+                async set(k,v){memory.set(k,v);return v;} };
+  const strings={
+    ar:{ score:"النقاط", time:"الوقت", streak:"متتالية", round:"جولة", of:"من",
+         again:"العب مرة ثانية", next:"التالي", results:"النتيجة", correct:"صح",
+         wrong:"غلط", timeout:"انتهى الوقت", point:"نقطة", leaders:"المتصدّرون",
+         you:"أنت", perfect:"علامة كاملة", good:"شغل ممتاز", okay:"نتيجة مقبولة",
+         weak:"جرّب مرة ثانية", moves:"حركات", pairs:"أزواج", left:"باقي" },
+    en:{ score:"Score", time:"Time", streak:"Streak", round:"Round", of:"of",
+         again:"Play again", next:"Next", results:"Results", correct:"Correct",
+         wrong:"Wrong", timeout:"Time's up", point:"pt", leaders:"Leaderboard",
+         you:"You", perfect:"Perfect", good:"Well done", okay:"Decent",
+         weak:"Try again", moves:"Moves", pairs:"Pairs", left:"left" }
+  };
+  let lang="ar";
+  const t=k=>(strings[lang]&&strings[lang][k])||strings.ar[k]||k;
+  const num=n=>lang==="ar"?String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]):String(n);
+  const clock=s=>num(Math.floor(s/60))+":"+num(String(s%60).padStart(2,"0"));
+  const money=n=>num(n.toLocaleString("en-US"));
+
+  let ac=null;
+  function tone(f,ms,type="sine",vol=.06){
+    try{
+      ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type=type;o.frequency.value=f;
+      g.gain.setValueAtTime(vol,ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+ms/1000);
+      o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+ms/1000);
+    }catch(e){}
+  }
+  const sfx={
+    ok:()=>{tone(660,90);setTimeout(()=>tone(880,130),75);},
+    no:()=>tone(180,200,"square",.05),
+    tick:()=>tone(440,40,"triangle",.03),
+    flip:()=>tone(520,55,"triangle",.04),
+    win:()=>[0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+  async function submit(id,points){
+    const key="lb:"+id, rows=(await store.get(key))||seed(id);
+    const mine=rows.find(r=>r.me);
+    if(mine) mine.points=Math.max(mine.points,points);
+    else rows.push({name:t("you"),points,me:true});
+    rows.sort((a,b)=>b.points-a.points);
+    await store.set(key,rows);
+    return rows.slice(0,5);
+  }
+  const seed=id=>["ليان","مهند","سلمى","يوسف","رنا"]
+    .map((n,i)=>({name:n,points:640-i*(43+i*10)}));
+  function timer(sec,onTick,onEnd){
+    let left=sec,id=null;
+    const stop=()=>{if(id)clearInterval(id);id=null;};
+    return { start(){stop();onTick(left);id=setInterval(()=>{left--;onTick(left);
+             if(left<=0){stop();onEnd();}},1000);},
+             stop, get left(){return left;}, set left(v){left=v;} };
+  }
+  function stopwatch(onTick){
+    let s=0,id=null;
+    return { start(){this.stop();id=setInterval(()=>{s++;onTick(s);},1000);},
+             stop(){if(id)clearInterval(id);id=null;}, get elapsed(){return s;} };
+  }
+  function el(tag,cls,html){
+    const n=document.createElement(tag);
+    if(cls)n.className=cls; if(html!=null)n.innerHTML=html; return n;
+  }
+  const reg=new Map();
+  return { store,t,num,clock,money,sfx,submit,timer,stopwatch,el,
+           register:(id,d)=>reg.set(id,d), get:id=>reg.get(id) };
+})();
+
+function stat(k,v){
+  const n=UM.el("div","stat");
+  n.append(UM.el("span","k",k),UM.el("span","v",v));
+  return { node:n, set:x=>n.querySelector(".v").textContent=x,
+           warn:on=>n.querySelector(".v").classList.toggle("warn",on) };
+}
+async function board(id,pts){
+  const rows=await UM.submit(id,pts), w=UM.el("div","board-list");
+  const h=UM.el("div","qnum",UM.t("leaders")); h.style.paddingTop="10px"; w.append(h);
+  rows.forEach((r,i)=>{
+    const li=UM.el("div","li"+(r.me?" you":""));
+    li.append(UM.el("span","rk",UM.num(i+1)),UM.el("span","nm",r.name),
+              UM.el("span","pt",UM.num(r.points)));
+    w.append(li);
+  });
+  return w;
+}
+function outcome(body,id,pts,verdict,detail,onAgain){
+  const res=UM.el("div","result");
+  res.append(UM.el("div","score",`${UM.num(pts)}<small> ${UM.t("point")}</small>`),
+             UM.el("div","verdict",verdict),
+             UM.el("div","detail",detail));
+  body.innerHTML=""; body.append(res);
+  board(id,pts).then(b=>{
+    body.append(b);
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const ag=UM.el("button","btn go",UM.t("again"));
+    ag.onclick=onAgain; r.append(ag); body.append(r);
+  });
+}
+const shuffle=a=>a.slice().sort(()=>Math.random()-.5);
+
+/* رسوم منتجات — مكانها صورة المنتج الحقيقية عند الربط */
+function pic(kind){
+  const g="#F0A93B",s="#2C6257",d="#1A4038",m="#8FB3AA";
+  const art={
+    bag:`<path d="M18 26 h28 l5 34 h-38Z" fill="${s}"/><path d="M25 26 a7 7 0 0 1 14 0" stroke="${g}" stroke-width="2.4" fill="none"/>`,
+    phone:`<rect x="20" y="12" width="24" height="42" rx="4" fill="${s}"/><rect x="23" y="17" width="18" height="30" fill="${d}"/><circle cx="32" cy="51" r="1.8" fill="${g}"/>`,
+    cup:`<path d="M18 22 h26 l-3 30 h-20Z" fill="${s}"/><path d="M44 27 a6 6 0 0 1 0 12" stroke="${g}" stroke-width="2.4" fill="none"/><rect x="18" y="22" width="26" height="4" fill="${g}"/>`,
+    book:`<rect x="17" y="14" width="28" height="38" rx="2" fill="${s}"/><rect x="17" y="14" width="6" height="38" fill="${g}"/><g fill="${m}" opacity=".5"><rect x="27" y="24" width="14" height="2"/><rect x="27" y="30" width="14" height="2"/><rect x="27" y="36" width="9" height="2"/></g>`,
+    shoe:`<path d="M12 44 h30 l10 -8 v10 h-40Z" fill="${s}"/><path d="M12 44 h40 v3 h-40Z" fill="${g}"/><path d="M24 38 l6 4 M30 35 l6 4" stroke="${m}" stroke-width="1.6"/>`,
+    lamp:`<path d="M20 20 h24 l-6 14 h-12Z" fill="${g}"/><rect x="31" y="34" width="2" height="18" fill="${s}"/><rect x="24" y="52" width="16" height="3" rx="1.5" fill="${s}"/>`,
+    watch:`<rect x="26" y="10" width="12" height="12" fill="${s}"/><rect x="26" y="44" width="12" height="12" fill="${s}"/><circle cx="32" cy="33" r="13" fill="${d}" stroke="${g}" stroke-width="2"/><path d="M32 33 v-6 M32 33 h5" stroke="${g}" stroke-width="1.8"/>`,
+    plant:`<path d="M24 52 h16 l-2 8 h-12Z" fill="${s}"/><path d="M32 52 v-16" stroke="${g}" stroke-width="2"/><ellipse cx="24" cy="34" rx="9" ry="5" fill="${s}"/><ellipse cx="40" cy="28" rx="9" ry="5" fill="${s}"/>`
+  };
+  return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="صورة تجريبية"><rect width="64" height="64" fill="#14352F"/>${art[kind]||art.bag}</svg>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   ١ — خمّن السعر  ·  المتجر
+   ═══════════════════════════════════════════════════════════ */
+UM.register("price",{
+  title:"خمّن السعر",
+  blurb:"منتج من الكتالوج، والمستخدم بيحرّك المؤشّر. كل ما قرّبت زادت نقاطك.",
+  catalog:[
+    {n:"حقيبة جلد يدوية",   c:"أزياء",        p:340, k:"bag"},
+    {n:"سمّاعات لاسلكية",   c:"إلكترونيات",   p:520, k:"phone"},
+    {n:"طقم فناجين فخّار",  c:"البيت",        p:130, k:"cup"},
+    {n:"كورس تصوير كامل",   c:"تعليم",        p:260, k:"book"},
+    {n:"حذاء رياضي",        c:"رياضة",        p:410, k:"shoe"},
+    {n:"مصباح طاولة خشب",   c:"البيت",        p:185, k:"lamp"},
+    {n:"ساعة كلاسيكية",     c:"أزياء",        p:760, k:"watch"},
+    {n:"نبتة داخلية كبيرة", c:"البيت",        p:95,  k:"plant"}
+  ],
+  mount(root){
+    const G=this, R=5;
+    let deck=shuffle(G.catalog).slice(0,R), i=0, score=0, best=0;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sc=stat(UM.t("score"),"٠"), rd=stat(UM.t("round"),`١ / ${UM.num(R)}`);
+    bar.append(sc.node,UM.el("div","grow"),rd.node);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    function draw(){
+      const p=deck[i];
+      const min=Math.max(20,Math.round(p.p*0.2/10)*10), max=Math.round(p.p*2.2/10)*10;
+      body.innerHTML="";
+      rd.set(`${UM.num(i+1)} / ${UM.num(R)}`);
+
+      const card=UM.el("div","prod");
+      const th=UM.el("div","thumb"); th.innerHTML=pic(p.k);
+      const meta=UM.el("div","pmeta");
+      meta.append(UM.el("div","pname",p.n),UM.el("div","pcat",p.c));
+      card.append(th,meta); body.append(card);
+
+      body.append(UM.el("div","qtext","شو سعر هالمنتج برأيك؟"));
+      const line=UM.el("div","priceline");
+      const big=UM.el("span","big",UM.money(Math.round((min+max)/2)));
+      line.append(big,UM.el("span","cur","شيكل")); body.append(line);
+
+      const sl=document.createElement("input");
+      sl.type="range"; sl.className="slider";
+      sl.min=min; sl.max=max; sl.step=5; sl.value=Math.round((min+max)/2);
+      sl.setAttribute("aria-label","السعر المتوقّع");
+      sl.oninput=()=>big.textContent=UM.money(+sl.value);
+      body.append(sl);
+      const scale=UM.el("div","scale");
+      scale.append(UM.el("span","",UM.money(min)),UM.el("span","",UM.money(max)));
+      body.append(scale);
+
+      const r=UM.el("div","row");
+      const go=UM.el("button","btn go","ثبّت التخمين");
+      go.onclick=()=>lock(+sl.value,p,sl,go);
+      r.append(go); body.append(r);
+    }
+
+    function lock(guess,p,sl,go){
+      sl.disabled=true; go.disabled=true;
+      const off=Math.abs(guess-p.p), rel=off/p.p;
+      const pts=rel<=.03?200:rel<=.08?150:rel<=.15?100:rel<=.30?55:rel<=.5?20:0;
+      score+=pts; best=Math.max(best,pts); sc.set(UM.num(score));
+      pts>=100?UM.sfx.ok():UM.sfx.no();
+
+      const w=UM.el("div","why "+(pts>=100?"ok":"no"));
+      const verdict=rel<=.03?"إصابة شبه دقيقة":rel<=.08?"قريب كتير":
+                    rel<=.15?"قريب":rel<=.30?"بعيد شوي":"بعيد";
+      w.append(UM.el("span","lead",`${verdict} · +${UM.num(pts)}`),
+               UM.el("span","",`السعر الحقيقي ${UM.money(p.p)} شيكل. فرق ${UM.money(off)}.`));
+      body.append(w);
+
+      const r=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<R?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i++; i<R?draw():done(); };
+      r.append(nx); body.append(r); nx.focus();
+    }
+
+    function done(){
+      const v=score>=750?UM.t("perfect"):score>=500?UM.t("good"):
+              score>=250?UM.t("okay"):UM.t("weak");
+      if(score>=500) UM.sfx.win();
+      outcome(body,"price",score,v,
+        `${UM.num(R)} ${UM.t("round")} · أفضل جولة ${UM.num(best)}`,
+        ()=>{ deck=shuffle(G.catalog).slice(0,R); i=0;score=0;best=0;
+              sc.set("٠"); body.innerHTML=""; draw(); });
+    }
+    draw();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ٢ — عجلة الخصم  ·  المتجر
+   ═══════════════════════════════════════════════════════════ */
+UM.register("wheel",{
+  title:"عجلة الخصم",
+  blurb:"كل لفّة بتعطي خصماً مضموناً — النسبة بتختلف، بس ما في خسارة. مكانها: بعد أول شراء.",
+  slices:[5,10,15,20,25,30],
+  mount(root){
+    const G=this;
+    let angle=0, spinning=false, spins=0, total=0;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sp=stat("لفّات","٠"), tt=stat("مجموع الخصم","٠٪");
+    bar.append(sp.node,UM.el("div","grow"),tt.node);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    body.append(UM.el("div","qnum","كل لفّة بتعطي خصماً — ما في نتيجة فاضية"));
+    const wrap=UM.el("div","wheelwrap");
+    const n=G.slices.length, step=360/n;
+    const paths=G.slices.map((v,k)=>{
+      const a0=(k*step-90)*Math.PI/180, a1=((k+1)*step-90)*Math.PI/180;
+      const x0=50+46*Math.cos(a0), y0=50+46*Math.sin(a0);
+      const x1=50+46*Math.cos(a1), y1=50+46*Math.sin(a1);
+      const mid=((k+.5)*step-90)*Math.PI/180;
+      const tx=50+30*Math.cos(mid), ty=50+30*Math.sin(mid);
+      const fillc=k%2?"#1B443C":"#2C6257";
+      return `<path d="M50 50 L${x0} ${y0} A46 46 0 0 1 ${x1} ${y1}Z" fill="${fillc}" stroke="#255A50" stroke-width=".6"/>
+              <text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle"
+                    fill="#F0A93B" font-size="9" font-weight="700">${UM.num(v)}٪</text>`;
+    }).join("");
+    wrap.innerHTML=`<div class="needle"></div>
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="عجلة الخصم">
+        <g class="wheel" style="transform-origin:50px 50px">${paths}</g>
+        <circle cx="50" cy="50" r="6" fill="#F0A93B"/>
+      </svg>`;
+    body.append(wrap);
+    const out=UM.el("div","prize"); body.append(out);
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const btn=UM.el("button","btn go","لُفّ العجلة");
+    r.append(btn); body.append(r);
+    const disc=wrap.querySelector(".wheel");
+
+    btn.onclick=()=>{
+      if(spinning) return;
+      spinning=true; btn.disabled=true; out.innerHTML="";
+      const pick=(Math.random()*n)|0;
+      const target=360*5 - (pick*step + step/2);
+      angle=target;
+      disc.style.transform=`rotate(${angle}deg)`;
+      UM.sfx.tick();
+      setTimeout(()=>{
+        const val=G.slices[pick];
+        spins++; total+=val;
+        sp.set(UM.num(spins)); tt.set(UM.num(total)+"٪");
+        UM.sfx.win();
+        out.innerHTML="";
+        out.append(UM.el("div","amt",UM.num(val)+"٪"),
+                   UM.el("div","lbl","خصم مضمون على طلبك الجاي"),
+                   UM.el("div","code","UM"+UM.num(val)+"-"+
+                     Math.random().toString(36).slice(2,6).toUpperCase()));
+        spinning=false; btn.disabled=false; btn.textContent="لُفّ مرة ثانية";
+      },3700);
+    };
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ٣ — تحدّي السلة  ·  المتجر
+   ═══════════════════════════════════════════════════════════ */
+UM.register("basket",{
+  title:"تحدّي السلة",
+  blurb:"ميزانية محددة ومهمة محددة. بيخلّي المستخدم يتصفّح الكتالوج كله بدل ما يطلع.",
+  mount(root){
+    const CAP=900, NEED=4, T=60;
+    const items=[
+      {n:"حقيبة جلد",     p:340,k:"bag"},   {n:"سمّاعات",      p:520,k:"phone"},
+      {n:"طقم فناجين",    p:130,k:"cup"},   {n:"كورس تصوير",   p:260,k:"book"},
+      {n:"حذاء رياضي",    p:410,k:"shoe"},  {n:"مصباح خشب",    p:185,k:"lamp"},
+      {n:"ساعة كلاسيك",   p:760,k:"watch"}, {n:"نبتة كبيرة",   p:95, k:"plant"},
+      {n:"وشاح صوف",      p:120,k:"bag"},   {n:"دفتر جلد",     p:75, k:"book"},
+      {n:"كوب معزول",     p:145,k:"cup"},   {n:"حزام جلد",     p:210,k:"shoe"}
+    ];
+    let picked=new Set(), ended=false;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const cnt=stat("مختار",`٠ / ${UM.num(NEED)}`), tm=stat(UM.t("time"),UM.clock(T));
+    bar.append(cnt.node,UM.el("div","grow"),tm.node);
+    const strand=UM.el("div","strand"), fill=UM.el("i");
+    fill.style.width="100%"; strand.append(fill);
+    const body=UM.el("div","body");
+    panel.append(bar,strand,body); root.append(panel);
+
+    const clock=UM.timer(T,left=>{
+      tm.set(UM.clock(Math.max(left,0)));
+      fill.style.width=(left/T*100)+"%";
+      fill.classList.toggle("tight",left<=10); tm.warn(left<=10);
+      if(left<=5&&left>0) UM.sfx.tick();
+    },()=>finish(false));
+
+    body.append(UM.el("div","qnum",
+      `اختار ${UM.num(NEED)} منتجات، والمجموع لازم يكون أقرب ما يمكن للميزانية بدون ما يتجاوزها`));
+    const bud=UM.el("div","budget");
+    const now=UM.el("span","now","٠"), cap=UM.el("span","cap",`/ ${UM.money(CAP)} شيكل`);
+    bud.append(now,cap); body.append(bud);
+
+    const shelf=UM.el("div","shelf"); body.append(shelf);
+    items.forEach((it,idx)=>{
+      const b=UM.el("button","item");
+      b.append(UM.el("span","n",it.n),UM.el("span","p",UM.money(it.p)+" شيكل"));
+      b.onclick=()=>toggle(idx,b);
+      shelf.append(b);
+    });
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const go=UM.el("button","btn go","خلّصت"); go.disabled=true;
+    go.onclick=()=>finish(true); r.append(go); body.append(r);
+
+    const sum=()=>[...picked].reduce((a,i)=>a+items[i].p,0);
+    function toggle(idx,b){
+      if(ended) return;
+      if(picked.has(idx)) picked.delete(idx);
+      else { if(picked.size>=NEED) return; picked.add(idx); }
+      b.classList.toggle("in",picked.has(idx));
+      const s=sum();
+      now.textContent=UM.money(s);
+      now.classList.toggle("over",s>CAP);
+      cnt.set(`${UM.num(picked.size)} / ${UM.num(NEED)}`);
+      go.disabled=picked.size!==NEED;
+      UM.sfx.flip();
+    }
+    function finish(manual){
+      if(ended) return;
+      ended=true; clock.stop();
+      const s=sum(), over=s>CAP;
+      let pts=0, verdict;
+      if(picked.size<NEED){ pts=0; verdict="ما كمّلت السلة"; }
+      else if(over){ pts=40; verdict="تجاوزت الميزانية"; }
+      else {
+        const gap=CAP-s;
+        pts=gap<=30?800:gap<=80?600:gap<=160?420:gap<=300?250:130;
+        verdict=gap<=30?UM.t("perfect"):gap<=160?UM.t("good"):UM.t("okay");
+        UM.sfx.win();
+      }
+      outcome(body,"basket",pts,verdict,
+        `المجموع ${UM.money(s)} من ${UM.money(CAP)} شيكل`,
+        ()=>{ root.innerHTML=""; UM.get("basket").mount(root); });
+    }
+    clock.start();
+    return ()=>clock.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ٤ — الذاكرة  ·  الألعاب
+   ═══════════════════════════════════════════════════════════ */
+UM.register("memory",{
+  title:"الذاكرة",
+  blurb:"ثمانية أزواج. أقل حركات وأقصر وقت = نقاط أعلى.",
+  mount(root){
+    const faces=["🌿","🕌","🏔️","🌊","🪁","🎻","🫖","🧭"];
+    let deck=shuffle([...faces,...faces]), up=[], moves=0, found=0, lock=false;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const mv=stat(UM.t("moves"),"٠"), pr=stat(UM.t("pairs"),`٠ / ${UM.num(8)}`);
+    const tw=stat(UM.t("time"),UM.clock(0));
+    bar.append(mv.node,pr.node,UM.el("div","grow"),tw.node);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    const watch=UM.stopwatch(s=>tw.set(UM.clock(s)));
+    const grid=UM.el("div","memgrid"); body.append(grid);
+
+    deck.forEach((f,i)=>{
+      const c=UM.el("button","card");
+      c.setAttribute("aria-label","بطاقة مقلوبة");
+      c.innerHTML=`<span class="inner"><span class="face back"></span>
+                   <span class="face front">${f}</span></span>`;
+      c.dataset.f=f; c.dataset.i=i;
+      c.onclick=()=>flip(c);
+      grid.append(c);
+    });
+
+    function flip(c){
+      if(lock||c.classList.contains("up")||c.classList.contains("done")) return;
+      c.classList.add("up"); UM.sfx.flip(); up.push(c);
+      if(up.length<2) return;
+      moves++; mv.set(UM.num(moves)); lock=true;
+      const [a,b]=up;
+      if(a.dataset.f===b.dataset.f){
+        setTimeout(()=>{
+          a.classList.add("done"); b.classList.add("done");
+          a.classList.remove("up"); b.classList.remove("up");
+          found++; pr.set(`${UM.num(found)} / ${UM.num(8)}`);
+          UM.sfx.ok(); up=[]; lock=false;
+          if(found===8) finish();
+        },340);
+      } else {
+        setTimeout(()=>{
+          a.classList.remove("up"); b.classList.remove("up");
+          UM.sfx.no(); up=[]; lock=false;
+        },740);
+      }
+    }
+    function finish(){
+      watch.stop(); UM.sfx.win();
+      const pts=Math.max(120,1000-(moves-8)*35-watch.elapsed*4);
+      const v=moves<=11?UM.t("perfect"):moves<=15?UM.t("good"):
+              moves<=22?UM.t("okay"):UM.t("weak");
+      outcome(body,"memory",pts,v,
+        `${UM.num(moves)} ${UM.t("moves")} · ${UM.clock(watch.elapsed)}`,
+        ()=>{ root.innerHTML=""; UM.get("memory").mount(root); });
+    }
+    watch.start();
+    return ()=>watch.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ٥ — إكس أو  ·  الألعاب
+   ═══════════════════════════════════════════════════════════ */
+UM.register("xo",{
+  title:"إكس أو",
+  blurb:"ضدّ الجهاز، بخصم ما بيغلط. الفوز عليه صعب — والتعادل إنجاز.",
+  mount(root){
+    const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    let b=Array(9).fill(""), over=false, wins=0, draws=0, losses=0, score=0;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sc=stat(UM.t("score"),"٠"), rec=stat("فوز · تعادل · خسارة","٠ · ٠ · ٠");
+    bar.append(sc.node,UM.el("div","grow"),rec.node);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    const turn=UM.el("div","turn"); body.append(turn);
+    const grid=UM.el("div","xo"); body.append(grid);
+    const cells=[];
+    for(let i=0;i<9;i++){
+      const s=UM.el("button","sq");
+      s.setAttribute("aria-label","خانة فارغة");
+      s.onclick=()=>play(i);
+      grid.append(s); cells.push(s);
+    }
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const ng=UM.el("button","btn","جولة جديدة");
+    ng.onclick=reset; r.append(ng); body.append(r);
+
+    const winner=g=>{
+      for(const L of LINES) if(g[L[0]]&&g[L[0]]===g[L[1]]&&g[L[1]]===g[L[2]]) return {p:g[L[0]],L};
+      return g.every(x=>x)?{p:"draw"}:null;
+    };
+    function best(g,me,depth=0){
+      const w=winner(g);
+      if(w) return w.p==="O"?{s:10-depth}:w.p==="X"?{s:depth-10}:{s:0};
+      let bs=me==="O"?-99:99, bi=-1;
+      g.forEach((v,i)=>{
+        if(v) return;
+        g[i]=me;
+        const s=best(g,me==="O"?"X":"O",depth+1).s;
+        g[i]="";
+        if(me==="O"?s>bs:s<bs){ bs=s; bi=i; }
+      });
+      return {s:bs,i:bi};
+    }
+    function play(i){
+      if(over||b[i]) return;
+      b[i]="X"; paint(); UM.sfx.flip();
+      if(check()) return;
+      const m=best(b.slice(),"O").i;
+      if(m>=0){ b[m]="O"; paint(); }
+      check();
+    }
+    function check(){
+      const w=winner(b);
+      if(!w) { turn.innerHTML=`الدور عليك — <b>✕</b>`; return false; }
+      over=true;
+      if(w.L) w.L.forEach(k=>cells[k].classList.add("win"));
+      if(w.p==="X"){ wins++; score+=300; UM.sfx.win(); turn.innerHTML="<b>فزت!</b>"; }
+      else if(w.p==="O"){ losses++; UM.sfx.no(); turn.innerHTML="<b>خسرت الجولة</b>"; }
+      else { draws++; score+=100; UM.sfx.ok(); turn.innerHTML="<b>تعادل</b>"; }
+      sc.set(UM.num(score));
+      rec.set(`${UM.num(wins)} · ${UM.num(draws)} · ${UM.num(losses)}`);
+      cells.forEach(c=>c.disabled=true);
+      if(wins+draws+losses>=5) setTimeout(finish,900);
+      return true;
+    }
+    function paint(){
+      b.forEach((v,i)=>{
+        cells[i].textContent=v==="X"?"✕":v==="O"?"◯":"";
+        cells[i].className="sq"+(v==="X"?" x":v==="O"?" o":"");
+        cells[i].disabled=!!v||over;
+        cells[i].setAttribute("aria-label",v?`خانة ${v==="X"?"إكس":"أو"}`:"خانة فارغة");
+      });
+    }
+    function reset(){
+      b=Array(9).fill(""); over=false; paint();
+      turn.innerHTML=`الدور عليك — <b>✕</b>`;
+    }
+    function finish(){
+      const v=wins>=2?UM.t("perfect"):wins>=1?UM.t("good"):
+              draws>=3?UM.t("okay"):UM.t("weak");
+      outcome(body,"xo",score,v,
+        `${UM.num(wins)} فوز · ${UM.num(draws)} تعادل · ${UM.num(losses)} خسارة`,
+        ()=>{ root.innerHTML=""; UM.get("xo").mount(root); });
+    }
+    reset();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ٦ — كلمة السر  ·  الألعاب
+   ═══════════════════════════════════════════════════════════ */
+UM.register("hangword",{
+  title:"كلمة السر",
+  blurb:"حروف عربية كاملة. كل كلمة معها تلميح، وستّ محاولات خاطئة بس.",
+  words:[
+    {w:"القدس",   h:"مدينة فلسطينية فيها قبّة ذهبية"},
+    {w:"زيتون",   h:"شجرة معمّرة، ورمز فلسطيني"},
+    {w:"بحر",     h:"ماء مالح واسع"},
+    {w:"كتاب",    h:"بتقرأه صفحة صفحة"},
+    {w:"قمر",     h:"بيضوي بالليل وبيدور حوالينا"},
+    {w:"مدرسة",   h:"مكان التعلّم الأول"},
+    {w:"خريطة",   h:"بتوريك الطريق والأماكن"},
+    {w:"نجمة",    h:"نقطة ضوء بعيدة بالسما"},
+    {w:"شجرة",    h:"جذع وأغصان وورق"},
+    {w:"صحراء",   h:"رمال ومساحة بلا ماء"}
+  ],
+  mount(root){
+    const ALPHA="ابتثجحخدذرزسشصضطظعغفقكلمنهوي".split("");
+    const ROUNDS=4, LIVES=6;
+    let deck=shuffle(this.words).slice(0,ROUNDS), i=0, score=0, solved=0;
+    let target="", hint="", found=new Set(), used=new Set(), lives=LIVES, done=false;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sc=stat(UM.t("score"),"٠"), rd=stat(UM.t("round"),`١ / ${UM.num(ROUNDS)}`);
+    const lv=UM.el("div","stat");
+    lv.append(UM.el("span","k","محاولات"),UM.el("span","v",""));
+    const hearts=UM.el("div","lives"); lv.querySelector(".v").append(hearts);
+    bar.append(sc.node,rd.node,UM.el("div","grow"),lv);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    /* تطبيع: الهمزات والألف المقصورة والتاء المربوطة تُقبل كحرفها الأساسي */
+    const norm=ch=>({"أ":"ا","إ":"ا","آ":"ا","ء":"ا","ؤ":"و","ئ":"ي","ى":"ي","ة":"ه"}[ch]||ch);
+
+    function draw(){
+      const it=deck[i];
+      target=it.w; hint=it.h; found=new Set(); used=new Set(); lives=LIVES; done=false;
+      rd.set(`${UM.num(i+1)} / ${UM.num(ROUNDS)}`);
+      body.innerHTML="";
+      body.append(UM.el("div","qnum","تلميح: "+hint));
+      const word=UM.el("div","word"); body.append(word);
+      const pad=UM.el("div","letters"); body.append(pad);
+      ALPHA.forEach(ch=>{
+        const b=UM.el("button","ltr",ch);
+        b.dataset.ch=ch;
+        b.onclick=()=>guess(ch,b);
+        pad.append(b);
+      });
+      paint();
+    }
+    function paint(){
+      const word=body.querySelector(".word");
+      word.innerHTML="";
+      [...target].forEach(ch=>{
+        const n=norm(ch);
+        const s=UM.el("div","slot"+(found.has(n)?" on":""), found.has(n)?ch:"");
+        word.append(s);
+      });
+      hearts.innerHTML="";
+      for(let k=0;k<LIVES;k++) hearts.append(UM.el("span","heart"+(k<lives?"":" gone")));
+    }
+    function guess(ch,btn){
+      if(done||used.has(ch)) return;
+      used.add(ch); btn.disabled=true;
+      const hit=[...target].some(c=>norm(c)===ch);
+      if(hit){ found.add(ch); btn.classList.add("hit"); UM.sfx.ok(); }
+      else { lives--; btn.classList.add("miss"); UM.sfx.no(); }
+      paint();
+      const win=[...target].every(c=>found.has(norm(c)));
+      if(win) end(true);
+      else if(lives<=0) end(false);
+    }
+    function end(won){
+      done=true;
+      body.querySelectorAll(".ltr").forEach(b=>b.disabled=true);
+      if(won){ solved++; score+=120+lives*30; UM.sfx.ok(); }
+      sc.set(UM.num(score));
+      const w=UM.el("div","why "+(won?"ok":"no"));
+      w.append(UM.el("span","lead",won?`${UM.t("correct")} · +${UM.num(120+lives*30)}`:"انتهت المحاولات"),
+               UM.el("span","",`الكلمة: ${target} — ${hint}.`));
+      body.append(w);
+      const r=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i++; i<ROUNDS?draw():finish(); };
+      r.append(nx); body.append(r); nx.focus();
+    }
+    function finish(){
+      const v=solved===ROUNDS?UM.t("perfect"):solved>=3?UM.t("good"):
+              solved>=2?UM.t("okay"):UM.t("weak");
+      if(solved>=3) UM.sfx.win();
+      outcome(body,"hangword",score,v,
+        `${UM.num(solved)} ${UM.t("of")} ${UM.num(ROUNDS)} كلمات`,
+        ()=>{ deck=shuffle(UM.get("hangword").words).slice(0,ROUNDS);
+              i=0;score=0;solved=0; sc.set("٠"); draw(); });
+    }
+    draw();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   التبديل
+   ═══════════════════════════════════════════════════════════ */
+(()=>{
+  const stage=document.getElementById("stage"), where=document.getElementById("where");
+  const tabs=[...document.querySelectorAll(".surf")];
+  let teardown=null;
+  function open(id){
+    if(teardown) teardown();
+    stage.innerHTML="";
+    const g=UM.get(id);
+    where.innerHTML=`<b>${g.title}</b> — ${g.blurb}`;
+    teardown=g.mount(stage)||null;
+    tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.g===id));
+  }
+  tabs.forEach(b=>b.onclick=()=>open(b.dataset.g));
+  open("price");
+})();
+</script>
+</body>
+</html>

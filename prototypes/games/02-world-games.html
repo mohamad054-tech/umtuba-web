@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA World — الألعاب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723; --surface:#14352F; --raise:#1B443C; --line:#255A50;
+  --ink:#EAF2EE; --muted:#8FB3AA; --gold:#F0A93B; --gold-dim:#9A6E22;
+  --clay:#D46A5E; --mint:#5FCBA4; --sea:#0A211E; --land:#1E4A42;
+  --r:14px; --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--field);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding:var(--pad);display:flex;justify-content:center;
+}
+.app{width:100%;max-width:760px}
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 20px}
+.surfaces{display:flex;gap:8px;flex-wrap:wrap}
+.surf{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;
+  font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:12px 0 20px}
+.where b{color:var(--ink);font-weight:600}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0;transition:width .25s linear}
+.strand i.tight{background:var(--clay)}
+.body{padding:clamp(16px,4vw,24px)}
+
+button.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink);
+  transition:background .15s,border-color .15s}
+button.btn:hover{border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover{background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+/* ---- الوسائط ---- */
+.stagewrap{position:relative;border-radius:11px;overflow:hidden;background:var(--field);
+  border:1px solid var(--line);aspect-ratio:16/10;display:grid;place-items:center}
+.clipart{width:100%;height:100%;display:block}
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(16px,3.4vw,19px);font-weight:600;line-height:1.5;margin:16px 0 14px}
+
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px}
+.choice{font:inherit;font-size:15px;text-align:start;cursor:pointer;background:var(--raise);
+  border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:12px 14px;
+  display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s}
+.choice:hover:not(:disabled){border-color:var(--gold-dim)}
+.choice:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.choice .flagdot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.choice.right{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.choice.right .flagdot{background:var(--mint)}
+.choice.wrong{border-color:var(--clay);background:rgba(212,106,94,.13)}
+.choice.wrong .flagdot{background:var(--clay)}
+.choice:disabled{cursor:default}
+.why{margin-top:15px;padding:13px 15px;border-radius:11px;background:var(--field);
+  border:1px solid var(--line);font-size:14.5px;line-height:1.7}
+.why .lead{font-weight:600;display:block;margin-bottom:3px}
+.why.ok .lead{color:var(--mint)}
+.why.no .lead{color:var(--clay)}
+
+/* ---- الخريطة ---- */
+.mapwrap{background:var(--sea);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.mapwrap svg{display:block;width:100%;height:auto}
+.landmass{fill:var(--land);stroke:#2C6257;stroke-width:.6}
+.pin{cursor:pointer;transition:r .15s}
+.pin circle.halo{fill:none;stroke:var(--gold);stroke-width:1.2;opacity:0}
+.pin.got circle.halo{opacity:.85}
+.pin circle.dot{fill:#3A6C63;transition:fill .2s}
+.pin.got circle.dot{fill:var(--gold)}
+.pin.target circle.dot{fill:var(--clay)}
+.pin:hover circle.dot{fill:var(--mint)}
+.pin text{fill:var(--muted);font-size:3.4px;font-weight:500;pointer-events:none}
+.pin.got text{fill:var(--gold)}
+
+.tray{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}
+.chip{font:inherit;font-size:13px;font-weight:500;background:var(--raise);border:1px solid var(--line);
+  color:var(--muted);border-radius:999px;padding:6px 13px;cursor:pointer;transition:all .15s}
+.chip:hover{border-color:var(--gold-dim);color:var(--ink)}
+.chip.got{background:var(--gold-dim);border-color:var(--gold-dim);color:var(--ink);cursor:default}
+.chip:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+
+.result{text-align:center;padding:24px 0 6px}
+.score{font-size:clamp(38px,10vw,56px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:20px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;
+  border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you,.board-list .li.you .rk{color:var(--gold)}
+
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:26px;line-height:1.8}
+.note code{background:var(--surface);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--gold)}
+.demo{display:inline-block;font-size:11px;font-weight:600;color:#14261C;background:var(--gold);
+  padding:2px 9px;border-radius:999px;margin-inline-start:8px;vertical-align:middle}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> World — الألعاب</div>
+    <div class="sub">ثلاث ألعاب على نفس المحرك</div>
+  </header>
+  <div class="rule"></div>
+
+  <div class="surfaces" role="tablist" aria-label="ألعاب World">
+    <button class="surf" role="tab" aria-selected="true" data-g="guess-city">خمّن المدينة</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="landmark">تحدّي المعالم</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="collector">جامع المدن</button>
+  </div>
+  <p class="where" id="where"></p>
+
+  <main id="stage"></main>
+
+  <p class="note">
+    الألعاب الثلاثة بتقرأ من نفس المصدر: قائمة المدن والفيديوهات.
+    لما تربطها بمنصتك، كل فيديو جديد بموقع حقيقي بيصير سؤالاً تلقائياً — بدون شغل إضافي.
+    الفيديوهات هون <b>رسومات تجريبية</b> لأن كل فيديو عندك اليوم مدينته <code>UMTUBA</code>.
+  </p>
+
+</div>
+
+<script>
+"use strict";
+
+/* ═══════════════════════════════════════════════════════════
+   UM.Engine — نفس الأساس المشترك
+   ═══════════════════════════════════════════════════════════ */
+const UM = (() => {
+  const memory = new Map();
+  const store = {
+    async get(k){ return memory.has(k) ? memory.get(k) : null; },
+    async set(k,v){ memory.set(k,v); return v; }
+  };
+  const strings = {
+    ar:{ score:"النقاط", time:"الوقت", streak:"متتالية", round:"جولة", of:"من",
+         again:"العب مرة ثانية", next:"التالي", results:"النتيجة",
+         correct:"صح", wrong:"غلط", timeout:"انتهى الوقت", point:"نقطة",
+         leaders:"المتصدّرون", you:"أنت", perfect:"علامة كاملة", good:"شغل ممتاز",
+         okay:"نتيجة مقبولة", weak:"محتاج تتفرّج أكتر", found:"مدينة", left:"باقي",
+         collected:"جمعت", city:"المدينة", country:"الدولة", landmark:"المعلم" },
+    en:{ score:"Score", time:"Time", streak:"Streak", round:"Round", of:"of",
+         again:"Play again", next:"Next", results:"Results",
+         correct:"Correct", wrong:"Wrong", timeout:"Time's up", point:"pt",
+         leaders:"Leaderboard", you:"You", perfect:"Perfect", good:"Well done",
+         okay:"Decent", weak:"Watch more", found:"cities", left:"left",
+         collected:"Collected", city:"City", country:"Country", landmark:"Landmark" }
+  };
+  let lang = "ar";
+  const t = k => (strings[lang]&&strings[lang][k]) || strings.ar[k] || k;
+  const num = n => lang==="ar" ? String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]) : String(n);
+  const clock = s => num(Math.floor(s/60))+":"+num(String(s%60).padStart(2,"0"));
+
+  let ac=null;
+  function tone(f,ms,type="sine",vol=.06){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type=type; o.frequency.value=f;
+      g.gain.setValueAtTime(vol,ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+ms/1000);
+      o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+ms/1000);
+    }catch(e){}
+  }
+  const sfx={
+    ok:()=>{tone(660,90);setTimeout(()=>tone(880,130),75);},
+    no:()=>tone(180,200,"square",.05),
+    tick:()=>tone(440,40,"triangle",.03),
+    win:()=>[0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+
+  async function submit(gameId, points){
+    const key="lb:"+gameId;
+    const rows=(await store.get(key)) || seed(gameId);
+    const mine=rows.find(r=>r.me);
+    if(mine) mine.points=Math.max(mine.points,points);
+    else rows.push({name:t("you"),points,me:true});
+    rows.sort((a,b)=>b.points-a.points);
+    await store.set(key,rows);
+    return rows.slice(0,5);
+  }
+  const seed = id => ["ليان","مهند","سلمى","يوسف","رنا"]
+    .map((n,i)=>({name:n, points:(id==="collector"?900:620)-i*(41+i*11)}));
+
+  function timer(seconds,onTick,onEnd){
+    let left=seconds,id=null;
+    const stop=()=>{ if(id) clearInterval(id); id=null; };
+    return {
+      start(){ stop(); onTick(left); id=setInterval(()=>{ left--; onTick(left);
+               if(left<=0){ stop(); onEnd(); } },1000); },
+      stop, get left(){return left;}, set left(v){left=v;}
+    };
+  }
+  function stopwatch(onTick){
+    let s=0,id=null;
+    return { start(){this.stop(); id=setInterval(()=>{s++;onTick(s);},1000);},
+             stop(){ if(id) clearInterval(id); id=null; }, get elapsed(){return s;} };
+  }
+  function el(tag,cls,html){
+    const n=document.createElement(tag);
+    if(cls) n.className=cls;
+    if(html!=null) n.innerHTML=html;
+    return n;
+  }
+  const registry=new Map();
+  return { store,t,num,clock,sfx,submit,timer,stopwatch,el,
+           register:(id,d)=>registry.set(id,d), get:id=>registry.get(id),
+           get lang(){return lang;}, set lang(v){lang=v;} };
+})();
+
+
+/* ═══════════════════════════════════════════════════════════
+   مصدر البيانات — يُستبدل باستعلام من قاعدة بياناتك
+   ═══════════════════════════════════════════════════════════ */
+const WORLD = {
+  /* x,y = إحداثيات على خريطة عرضها 360 وارتفاعها 180 (إسقاط بسيط) */
+  cities: [
+    { id:"jerusalem", city:"القدس",      country:"فلسطين",   x:215.2, y:58.3,  scene:"dome",     hint:"قبّة ذهبية فوق مدينة قديمة بأسوار حجرية" },
+    { id:"cairo",     city:"القاهرة",    country:"مصر",      x:211.3, y:60.0,  scene:"pyramid",  hint:"أهرامات على حافة صحراء، ونهر بيشقّ المدينة" },
+    { id:"istanbul",  city:"إسطنبول",    country:"تركيا",    x:209.0, y:49.0,  scene:"minarets", hint:"مضيق بيفصل قارّتين، ومآذن على التلال" },
+    { id:"dubai",     city:"دبي",        country:"الإمارات", x:235.2, y:64.5,  scene:"tower",    hint:"برج أطول من أي شي حواليه، وصحرا وبحر" },
+    { id:"paris",     city:"باريس",      country:"فرنسا",    x:182.3, y:42.5,  scene:"lattice",  hint:"برج حديدي مشبّك، ونهر بيمرّ تحت جسور حجرية" },
+    { id:"tokyo",     city:"طوكيو",      country:"اليابان",  x:319.7, y:54.5,  scene:"neon",     hint:"لافتات مضيئة بالليل، وجبل مخروطي بالبعيد" },
+    { id:"newyork",   city:"نيويورك",    country:"أمريكا",   x:105.9, y:49.3,  scene:"skyline",  hint:"ناطحات سحاب متراصّة وتمثال على جزيرة" },
+    { id:"marrakesh", city:"مراكش",      country:"المغرب",   x:172.0, y:58.5,  scene:"souq",     hint:"أسواق بأقواس، وجبال مثلّجة ورا مدينة حمرا" },
+    { id:"amman",     city:"عمّان",      country:"الأردن",   x:215.9, y:58.0,  scene:"hills",    hint:"مدينة على تلال، وبيوت بيضا متدرّجة" },
+    { id:"riyadh",    city:"الرياض",     country:"السعودية", x:226.7, y:65.3,  scene:"tower",    hint:"أبراج وسط صحرا مفتوحة" },
+    { id:"rome",      city:"روما",       country:"إيطاليا",  x:192.5, y:48.2,  scene:"arena",    hint:"مدرّج دائري قديم وأعمدة رخام" },
+    { id:"nairobi",   city:"نيروبي",     country:"كينيا",    x:216.8, y:91.3,  scene:"savanna",  hint:"سهول مفتوحة وأشجار مسطّحة القمة" }
+  ],
+  landmarks: [
+    { id:"dome",    name:"قبة الصخرة",      city:"jerusalem", scene:"dome",     fact:"من أقدم المباني الإسلامية الباقية، وقبّتها الذهبية علامة القدس." },
+    { id:"pyramid", name:"أهرامات الجيزة",  city:"cairo",     scene:"pyramid",  fact:"الهرم الأكبر ضلّ أطول بناء من صنع الإنسان حوالي ٣٨٠٠ سنة." },
+    { id:"lattice", name:"برج إيفل",        city:"paris",     scene:"lattice",  fact:"انبنى كمدخل لمعرض مؤقت، وكان مفروض ينهدم بعد عشرين سنة." },
+    { id:"arena",   name:"الكولوسيوم",      city:"rome",      scene:"arena",    fact:"كان بيستوعب عشرات الآلاف، وفيه نظام ممرّات تحت الأرض." },
+    { id:"tower",   name:"برج خليفة",       city:"dubai",     scene:"tower",    fact:"أطول مبنى في العالم، وبيتمايل قليلاً مع الريح بالتصميم." },
+    { id:"neon",    name:"تقاطع شيبويا",    city:"tokyo",     scene:"neon",     fact:"من أزحم تقاطعات المشاة بالعالم، بيعبره آلاف بالدقيقة الواحدة." }
+  ]
+};
+
+/* ═══════════════════════════════════════════════════════════
+   مشاهد تجريبية — مكانها الفيديو الحقيقي عند الربط
+   ═══════════════════════════════════════════════════════════ */
+function scene(kind){
+  const sky = `<defs><linearGradient id="s${kind}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#123B48"/><stop offset="1" stop-color="#2C5B52"/>
+    </linearGradient></defs><rect width="320" height="200" fill="url(#s${kind})"/>`;
+  const g = "#F0A93B", d = "#0C2723", m = "#8FB3AA", l = "#1E4A42";
+  const art = {
+    dome:`<rect y="150" width="320" height="50" fill="${l}"/>
+      <rect x="60" y="112" width="200" height="40" fill="#2C6257"/>
+      <path d="M130 112 Q160 62 190 112Z" fill="${g}"/>
+      <rect x="158" y="50" width="4" height="16" fill="${g}"/>
+      <g fill="#2C6257">${[70,95,205,235].map(x=>`<rect x="${x}" y="126" width="18" height="26"/>`).join("")}</g>
+      <g fill="${d}" opacity=".5">${[75,100,210,240].map(x=>`<rect x="${x}" y="134" width="8" height="18"/>`).join("")}</g>`,
+    pyramid:`<rect y="150" width="320" height="50" fill="#3E6B52"/>
+      <path d="M40 150 L100 62 L160 150Z" fill="#2C6257"/>
+      <path d="M100 62 L160 150 L130 150Z" fill="#23524A"/>
+      <path d="M150 150 L195 88 L240 150Z" fill="#2C6257"/>
+      <path d="M195 88 L240 150 L218 150Z" fill="#23524A"/>
+      <circle cx="262" cy="52" r="15" fill="${g}"/>
+      <path d="M0 168 Q80 160 160 170 T320 166 L320 200 L0 200Z" fill="#123B48"/>`,
+    minarets:`<path d="M0 150 Q80 138 160 150 T320 146 L320 200 L0 200Z" fill="#123B48"/>
+      <rect x="90" y="108" width="140" height="44" fill="#2C6257"/>
+      <path d="M118 108 Q160 66 202 108Z" fill="#3A7A6D"/>
+      <g fill="${m}">${[82,104,216,238].map(x=>`<rect x="${x}" y="60" width="5" height="92"/>
+        <path d="M${x-2} 60 L${x+2.5} 46 L${x+7} 60Z"/>`).join("")}</g>`,
+    tower:`<rect y="156" width="320" height="44" fill="#3E6B52"/>
+      <path d="M148 156 L155 40 L160 22 L165 40 L172 156Z" fill="#3A7A6D"/>
+      <path d="M160 22 L165 40 L172 156 L160 156Z" fill="#2C6257"/>
+      <g fill="${g}" opacity=".55">${Array.from({length:9},(_,i)=>
+        `<rect x="153" y="${56+i*11}" width="14" height="3"/>`).join("")}</g>
+      <g fill="#2C6257">${[40,66,232,262].map((x,i)=>
+        `<rect x="${x}" y="${112+i%2*16}" width="22" height="44"/>`).join("")}</g>`,
+    lattice:`<rect y="156" width="320" height="44" fill="#2C6257"/>
+      <path d="M120 156 L150 58 L160 40 L170 58 L200 156 L182 156 L160 74 L138 156Z" fill="#3A7A6D"/>
+      <rect x="134" y="108" width="52" height="4" fill="#3A7A6D"/>
+      <rect x="126" y="130" width="68" height="4" fill="#3A7A6D"/>
+      <circle cx="160" cy="34" r="3" fill="${g}"/>
+      <path d="M0 172 Q160 164 320 174 L320 200 L0 200Z" fill="#123B48"/>`,
+    neon:`<rect y="160" width="320" height="40" fill="#0F2F2A"/>
+      <g fill="#23524A">${[24,66,112,168,214,260].map((x,i)=>
+        `<rect x="${x}" y="${58+i%3*20}" width="34" height="${102-i%3*20}"/>`).join("")}</g>
+      <g fill="${g}">${[[30,74],[72,96],[118,84],[174,108],[220,92],[266,80]].map(([x,y])=>
+        `<rect x="${x}" y="${y}" width="22" height="5"/>`).join("")}</g>
+      <g fill="#5FCBA4" opacity=".8">${[[30,90],[118,100],[220,108]].map(([x,y])=>
+        `<rect x="${x}" y="${y}" width="14" height="4"/>`).join("")}</g>
+      <path d="M226 58 L252 20 L278 58Z" fill="#2C6257" opacity=".6"/>`,
+    skyline:`<rect y="164" width="320" height="36" fill="#123B48"/>
+      <g fill="#2C6257">${[18,48,80,116,150,192,228,266].map((x,i)=>
+        `<rect x="${x}" y="${54+((i*37)%58)}" width="26" height="${110-((i*37)%58)}"/>`).join("")}</g>
+      <g fill="${g}" opacity=".45">${[18,48,80,116,150,192,228,266].map((x,i)=>
+        `<rect x="${x+6}" y="${68+((i*37)%58)}" width="5" height="5"/>
+         <rect x="${x+15}" y="${82+((i*37)%58)}" width="5" height="5"/>`).join("")}</g>
+      <rect x="152" y="30" width="4" height="26" fill="${m}"/>`,
+    souq:`<rect y="152" width="320" height="48" fill="#3E6B52"/>
+      <path d="M0 88 L60 52 L120 88 L180 52 L240 88 L300 52 L320 66 L320 88Z" fill="#23524A" opacity=".7"/>
+      <rect x="46" y="102" width="228" height="50" fill="#2C6257"/>
+      <g fill="${d}" opacity=".55">${[62,104,146,188,230].map(x=>
+        `<path d="M${x} 152 L${x} 122 Q${x+13} 108 ${x+26} 122 L${x+26} 152Z"/>`).join("")}</g>
+      <g fill="${g}">${[70,154,238].map(x=>`<rect x="${x}" y="96" width="16" height="4"/>`).join("")}</g>`,
+    hills:`<path d="M0 200 L0 122 Q80 92 160 116 T320 104 L320 200Z" fill="#2C6257"/>
+      <g fill="#EAF2EE" opacity=".82">${Array.from({length:26},(_,i)=>
+        `<rect x="${10+(i*23)%300}" y="${118+((i*31)%54)}" width="15" height="12"/>`).join("")}</g>
+      <circle cx="272" cy="44" r="13" fill="${g}" opacity=".85"/>`,
+    arena:`<rect y="154" width="320" height="46" fill="#3E6B52"/>
+      <ellipse cx="160" cy="110" rx="88" ry="54" fill="#2C6257"/>
+      <ellipse cx="160" cy="110" rx="62" ry="36" fill="#1A4038"/>
+      <g fill="${d}" opacity=".5">${Array.from({length:11},(_,i)=>
+        `<rect x="${78+i*15}" y="${88}" width="7" height="18" rx="3"/>`).join("")}</g>
+      <g fill="${d}" opacity=".35">${Array.from({length:11},(_,i)=>
+        `<rect x="${78+i*15}" y="${116}" width="7" height="16" rx="3"/>`).join("")}</g>`,
+    savanna:`<rect y="138" width="320" height="62" fill="#3E6B52"/>
+      <circle cx="258" cy="46" r="17" fill="${g}"/>
+      <g fill="#23524A">${[52,140,226].map((x,i)=>
+        `<rect x="${x+11}" y="${100-i*6}" width="4" height="${40+i*6}"/>
+         <ellipse cx="${x+13}" cy="${98-i*6}" rx="26" ry="7"/>`).join("")}</g>
+      <path d="M0 138 Q80 130 160 140 T320 134" stroke="#2C6257" stroke-width="3" fill="none"/>`
+  };
+  return `<svg class="clipart" viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="مشهد تجريبي">${sky}${art[kind]||art.hills}</svg>`;
+}
+
+/* خريطة العالم — أشكال قارّات مبسّطة، بدون أي مزوّد خارجي */
+const LANDMASS = [
+  "M46 34 L98 28 L128 40 L120 62 L96 74 L72 100 L58 96 L44 66Z",
+  "M96 104 L118 98 L126 116 L118 150 L104 168 L92 142 L88 118Z",
+  "M164 32 L206 26 L216 42 L200 56 L178 58 L162 48Z",
+  "M168 62 L206 58 L226 74 L218 106 L196 126 L176 112 L166 84Z",
+  "M214 40 L268 30 L310 44 L322 72 L296 96 L262 88 L230 66Z",
+  "M282 108 L312 104 L320 124 L302 136 L284 126Z"
+];
+
+/* ═══════════════════════════════════════════════════════════
+   أدوات مشتركة
+   ═══════════════════════════════════════════════════════════ */
+function stat(k,v){
+  const n=UM.el("div","stat");
+  n.append(UM.el("span","k",k),UM.el("span","v",v));
+  return { node:n, set:x=>n.querySelector(".v").textContent=x,
+           warn:on=>n.querySelector(".v").classList.toggle("warn",on) };
+}
+async function board(id,points){
+  const rows=await UM.submit(id,points);
+  const w=UM.el("div","board-list");
+  const h=UM.el("div","qnum",UM.t("leaders")); h.style.paddingTop="10px"; w.append(h);
+  rows.forEach((r,i)=>{
+    const li=UM.el("div","li"+(r.me?" you":""));
+    li.append(UM.el("span","rk",UM.num(i+1)),UM.el("span","nm",r.name),
+              UM.el("span","pt",UM.num(r.points)));
+    w.append(li);
+  });
+  return w;
+}
+const shuffle = a => a.slice().sort(()=>Math.random()-.5);
+
+
+/* ═══════════════════════════════════════════════════════════
+   لعبة ٣ — خمّن المدينة من الفيديو
+   ═══════════════════════════════════════════════════════════ */
+UM.register("guess-city",{
+  title:"خمّن المدينة",
+  blurb:"بيشغّل فيديو من المنصة، والمستخدم بيخمّن وين انتصوّر. كل فيديو جديد بيصير سؤال.",
+  mount(root){
+    const ROUNDS=6, QS=15;
+    let deck=shuffle(WORLD.cities).slice(0,ROUNDS), i=0,
+        score=0, streak=0, best=0, right=0, locked=false, hinted=false;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sc=stat(UM.t("score"),"٠"), st=stat(UM.t("streak"),"٠"), tm=stat(UM.t("time"),UM.num(QS));
+    bar.append(sc.node,st.node,UM.el("div","grow"),tm.node);
+    const strand=UM.el("div","strand"), fill=UM.el("i"); strand.append(fill);
+    const body=UM.el("div","body");
+    panel.append(bar,strand,body); root.append(panel);
+
+    const clock=UM.timer(QS,left=>{
+      tm.set(UM.num(Math.max(left,0)));
+      fill.style.width=(left/QS*100)+"%";
+      fill.classList.toggle("tight",left<=4);
+      tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    },()=>answer(null));
+
+    function draw(){
+      locked=false; hinted=false;
+      const c=deck[i];
+      body.innerHTML="";
+      body.append(UM.el("div","qnum",
+        `${UM.t("round")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}<span class="demo">مشهد تجريبي</span>`));
+      const sw=UM.el("div","stagewrap"); sw.innerHTML=scene(c.scene); body.append(sw);
+      body.append(UM.el("div","qtext","وين انتصوّر هالمقطع؟"));
+
+      const wrong=shuffle(WORLD.cities.filter(x=>x.id!==c.id)).slice(0,3);
+      const opts=shuffle([c,...wrong]);
+      const list=UM.el("div","choices");
+      opts.forEach(o=>{
+        const b=UM.el("button","choice");
+        b.dataset.id=o.id;
+        b.append(UM.el("span","flagdot"),UM.el("span","",`${o.city} · ${o.country}`));
+        b.onclick=()=>answer(o.id);
+        list.append(b);
+      });
+      body.append(list);
+
+      const r=UM.el("div","row");
+      const hb=UM.el("button","btn","تلميح (−٢٠)");
+      hb.onclick=()=>{
+        if(hinted||locked) return;
+        hinted=true; score=Math.max(0,score-20); sc.set(UM.num(score)); hb.disabled=true;
+        const n=UM.el("div","why"); n.append(UM.el("span","lead","تلميح"),UM.el("span","",c.hint));
+        body.insertBefore(n,list);
+      };
+      r.append(hb); body.append(r);
+
+      clock.left=QS; clock.start();
+    }
+
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const c=deck[i], hit=pick===c.id;
+      [...body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(b.dataset.id===c.id) b.classList.add("right");
+        else if(b.dataset.id===pick) b.classList.add("wrong");
+      });
+      if(hit){
+        right++; streak++; best=Math.max(best,streak);
+        score+=60+Math.min(streak-1,4)*12+Math.round(clock.left*3);
+        UM.sfx.ok();
+      } else { streak=0; UM.sfx.no(); }
+      sc.set(UM.num(score)); st.set(UM.num(streak));
+
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead",pick===null?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","",`${c.city} — ${c.country}. ${c.hint}.`));
+      body.append(w);
+
+      const r=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i++; i<ROUNDS?draw():finish(); };
+      r.append(nx); body.append(r); nx.focus();
+    }
+
+    async function finish(){
+      clock.stop(); fill.style.width="100%"; fill.classList.remove("tight");
+      const pct=Math.round(right/ROUNDS*100);
+      const v=pct===100?UM.t("perfect"):pct>=67?UM.t("good"):pct>=34?UM.t("okay"):UM.t("weak");
+      if(pct>=67) UM.sfx.win();
+      body.innerHTML="";
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",
+                   `${UM.num(right)} ${UM.t("of")} ${UM.num(ROUNDS)} · ${UM.t("streak")} ${UM.num(best)}`));
+      body.append(res); body.append(await board("guess-city",score));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ deck=shuffle(WORLD.cities).slice(0,ROUNDS);
+        i=0;score=0;streak=0;best=0;right=0; sc.set("٠"); st.set("٠"); draw(); };
+      r.append(ag); body.append(r);
+    }
+
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   لعبة ٤ — تحدّي المعالم
+   ═══════════════════════════════════════════════════════════ */
+UM.register("landmark",{
+  title:"تحدّي المعالم",
+  blurb:"معلم مشهور، ومين بيعرفه أسرع. الوقت مستمر عبر كل الجولات — السرعة هي اللعبة.",
+  mount(root){
+    const TOTAL=45;
+    let deck=shuffle(WORLD.landmarks), i=0, score=0, right=0, streak=0, best=0,
+        locked=false, over=false;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const sc=stat(UM.t("score"),"٠"), st=stat(UM.t("streak"),"٠"), tm=stat(UM.t("time"),UM.clock(TOTAL));
+    bar.append(sc.node,st.node,UM.el("div","grow"),tm.node);
+    const strand=UM.el("div","strand"), fill=UM.el("i");
+    fill.style.width="100%"; strand.append(fill);
+    const body=UM.el("div","body");
+    panel.append(bar,strand,body); root.append(panel);
+
+    const clock=UM.timer(TOTAL,left=>{
+      tm.set(UM.clock(Math.max(left,0)));
+      fill.style.width=(left/TOTAL*100)+"%";
+      fill.classList.toggle("tight",left<=8);
+      tm.warn(left<=8);
+      if(left<=5&&left>0) UM.sfx.tick();
+    },()=>{ over=true; finish(); });
+
+    function draw(){
+      if(over) return;
+      locked=false;
+      const L=deck[i%deck.length];
+      body.innerHTML="";
+      body.append(UM.el("div","qnum",
+        `${UM.t("round")} ${UM.num(i+1)}<span class="demo">مشهد تجريبي</span>`));
+      const sw=UM.el("div","stagewrap"); sw.innerHTML=scene(L.scene); body.append(sw);
+      body.append(UM.el("div","qtext","شو هالمَعلم؟"));
+      const wrong=shuffle(WORLD.landmarks.filter(x=>x.id!==L.id)).slice(0,3);
+      const list=UM.el("div","choices");
+      shuffle([L,...wrong]).forEach(o=>{
+        const b=UM.el("button","choice"); b.dataset.id=o.id;
+        b.append(UM.el("span","flagdot"),UM.el("span","",o.name));
+        b.onclick=()=>answer(o.id);
+        list.append(b);
+      });
+      body.append(list);
+    }
+
+    function answer(pick){
+      if(locked||over) return;
+      locked=true;
+      const L=deck[i%deck.length], hit=pick===L.id;
+      [...body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(b.dataset.id===L.id) b.classList.add("right");
+        else if(b.dataset.id===pick) b.classList.add("wrong");
+      });
+      if(hit){
+        right++; streak++; best=Math.max(best,streak);
+        score+=70+Math.min(streak-1,5)*15;
+        clock.left=Math.min(TOTAL,clock.left+3);   // صح = وقت إضافي
+        UM.sfx.ok();
+      } else {
+        streak=0; clock.left=Math.max(1,clock.left-4);
+        UM.sfx.no();
+      }
+      sc.set(UM.num(score)); st.set(UM.num(streak));
+      const city=WORLD.cities.find(c=>c.id===L.city);
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead",hit?UM.t("correct")+" · +٣ ثواني":UM.t("wrong")+" · −٤ ثواني"),
+               UM.el("span","",`${L.name} — ${city?city.city:""}. ${L.fact}`));
+      body.append(w);
+      const r=UM.el("div","row");
+      const nx=UM.el("button","btn go",UM.t("next"));
+      nx.onclick=()=>{ i++; draw(); };
+      r.append(nx); body.append(r); nx.focus();
+    }
+
+    async function finish(){
+      clock.stop();
+      const v=score>=500?UM.t("perfect"):score>=300?UM.t("good"):score>=150?UM.t("okay"):UM.t("weak");
+      if(score>=300) UM.sfx.win();
+      body.innerHTML="";
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",
+                   `${UM.num(right)} ${UM.t("correct")} · ${UM.t("streak")} ${UM.num(best)}`));
+      body.append(res); body.append(await board("landmark",score));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ deck=shuffle(WORLD.landmarks); i=0;score=0;right=0;streak=0;best=0;
+        over=false; sc.set("٠"); st.set("٠"); clock.left=TOTAL; clock.start(); draw(); };
+      r.append(ag); body.append(r);
+    }
+
+    clock.start(); draw();
+    return ()=>clock.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   لعبة ٥ — جامع المدن
+   ═══════════════════════════════════════════════════════════ */
+UM.register("collector",{
+  title:"جامع المدن",
+  blurb:"خريطة شخصية بتمتلي كل ما شفت فيديو من مدينة جديدة. حطّ الاسم على مكانه الصح.",
+  mount(root){
+    let pool=shuffle(WORLD.cities), got=new Set(), misses=0;
+
+    const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+    const cn=stat(UM.t("collected"),`٠ / ${UM.num(WORLD.cities.length)}`);
+    const ms=stat("محاولات خاطئة","٠");
+    const tw=stat(UM.t("time"),UM.clock(0));
+    bar.append(cn.node,ms.node,UM.el("div","grow"),tw.node);
+    const body=UM.el("div","body");
+    panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+
+    const watch=UM.stopwatch(s=>tw.set(UM.clock(s)));
+
+    const mapwrap=UM.el("div","mapwrap");
+    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","30 15 310 120");
+    svg.setAttribute("role","img");
+    svg.setAttribute("aria-label","خريطة العالم");
+    LANDMASS.forEach(d=>{
+      const p=document.createElementNS("http://www.w3.org/2000/svg","path");
+      p.setAttribute("d",d); p.setAttribute("class","landmass"); svg.append(p);
+    });
+    const pins=new Map();
+    WORLD.cities.forEach(c=>{
+      const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("class","pin"); g.setAttribute("tabindex","0");
+      g.setAttribute("role","button");
+      g.setAttribute("aria-label",`موقع على الخريطة`);
+      g.innerHTML=`<circle class="halo" cx="${c.x}" cy="${c.y}" r="6"/>
+                   <circle class="dot" cx="${c.x}" cy="${c.y}" r="2.6"/>
+                   <text x="${c.x}" y="${c.y-5}" text-anchor="middle"></text>`;
+      g.onclick=()=>drop(c.id);
+      g.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); drop(c.id);} };
+      svg.append(g); pins.set(c.id,g);
+    });
+    mapwrap.append(svg);
+    body.append(mapwrap);
+
+    const label=UM.el("div","qtext","");
+    const tray=UM.el("div","tray");
+    body.append(label,tray);
+
+    let current=null;
+    function nextCard(){
+      const rest=pool.filter(c=>!got.has(c.id));
+      if(!rest.length){ finish(); return; }
+      current=rest[0];
+      label.textContent=`وين مكان ${current.city}؟ اضغط على النقطة الصح بالخريطة.`;
+      paintTray();
+    }
+    function paintTray(){
+      tray.innerHTML="";
+      pool.forEach(c=>{
+        const ch=UM.el("button","chip"+(got.has(c.id)?" got":""),c.city);
+        if(!got.has(c.id)){
+          ch.onclick=()=>{ current=c;
+            label.textContent=`وين مكان ${c.city}؟ اضغط على النقطة الصح بالخريطة.`; };
+        } else ch.disabled=true;
+        tray.append(ch);
+      });
+    }
+    function drop(pinId){
+      if(!current) return;
+      const pin=pins.get(pinId);
+      if(pinId===current.id){
+        got.add(current.id);
+        pin.classList.add("got");
+        pin.querySelector("text").textContent=current.city;
+        UM.sfx.ok();
+        cn.set(`${UM.num(got.size)} / ${UM.num(WORLD.cities.length)}`);
+        nextCard();
+      } else {
+        misses++; ms.set(UM.num(misses)); ms.warn(misses>=5); UM.sfx.no();
+        pin.classList.add("target");
+        setTimeout(()=>pin.classList.remove("target"),380);
+      }
+    }
+    async function finish(){
+      watch.stop(); UM.sfx.win();
+      const pts=Math.max(150,1200-watch.elapsed*3-misses*45);
+      const v=misses===0?UM.t("perfect"):misses<=4?UM.t("good"):misses<=10?UM.t("okay"):UM.t("weak");
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(pts)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",
+                   `${UM.num(WORLD.cities.length)} ${UM.t("found")} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`));
+      label.remove(); tray.remove();
+      body.append(res); body.append(await board("collector",pts));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ root.innerHTML=""; UM.get("collector").mount(root); };
+      r.append(ag); body.append(r);
+    }
+
+    watch.start(); nextCard();
+    return ()=>watch.stop();
+  }
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   التبديل
+   ═══════════════════════════════════════════════════════════ */
+(()=>{
+  const stage=document.getElementById("stage"), where=document.getElementById("where");
+  const tabs=[...document.querySelectorAll(".surf")];
+  let teardown=null;
+  function open(id){
+    if(teardown) teardown();
+    stage.innerHTML="";
+    const g=UM.get(id);
+    where.innerHTML=`<b>${g.title}</b> — ${g.blurb}`;
+    teardown=g.mount(stage)||null;
+    tabs.forEach(b=>b.setAttribute("aria-selected",b.dataset.g===id));
+  }
+  tabs.forEach(b=>b.onclick=()=>open(b.dataset.g));
+  open("guess-city");
+})();
+</script>
+</body>
+</html>
