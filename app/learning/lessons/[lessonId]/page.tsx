@@ -20,6 +20,8 @@ import {
 import { canUserSelfEnrollInCourse } from "../../../../lib/learning/publicCatalogSelfEnroll";
 import { enrollInPublicCourseAction } from "../../catalog/actions";
 import { redirect } from "next/navigation";
+import { isLearningVisualDemoMode } from "../../../../lib/learning/visualDemo";
+import LessonView from "../../../components/learning/visual/LessonView";
 
 export const dynamic = "force-dynamic";
 
@@ -138,6 +140,9 @@ export default async function LearningLessonPage({
   searchParams,
 }: PageProps) {
   const { lessonId } = await Promise.resolve(params);
+  if (isLearningVisualDemoMode()) {
+    return <LessonView lessonId={lessonId} />;
+  }
   const query = await Promise.resolve(searchParams ?? {});
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);

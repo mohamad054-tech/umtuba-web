@@ -1,9 +1,11 @@
 import { storeIdMessages } from "./storeCatalogs";
+import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const idMessages: FoundationMessages = {
   ...storeIdMessages,
+  ...teacherEnMessages,
   "languages.ar": "Arab",
   "languages.en": "Inggris",
   "languages.fr": "Prancis",

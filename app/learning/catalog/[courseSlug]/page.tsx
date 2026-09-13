@@ -20,6 +20,8 @@ import {
 } from "../../../../lib/learning/publicCatalogSelfEnroll";
 import { APP_ROUTES } from "../../../lib/nav/routes";
 import { enrollInPublicCourseAction } from "../actions";
+import CourseReviewForm from "../../../components/learning/CourseReviewForm";
+import { loadPublicCourseReviews } from "../../../../lib/learning/courseReviews";
 import JsonLd from "../../../components/JsonLd";
 import {
   buildBreadcrumbListJsonLd,
@@ -27,6 +29,8 @@ import {
 } from "../../../../lib/site/jsonLd";
 import { buildPageMetadata } from "../../../../lib/site/metadata";
 import { BRAND } from "../../../../lib/site/brand";
+import { isLearningVisualDemoMode } from "../../../../lib/learning/visualDemo";
+import CourseDetailView from "../../../components/learning/visual/CourseDetailView";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +54,15 @@ function difficultyKey(
 export async function generateMetadata({ params }: PageProps) {
   const { locale } = await resolveRequestLocale();
   const { courseSlug } = await Promise.resolve(params);
+  if (isLearningVisualDemoMode()) {
+    return buildPageMetadata({
+      title: "Course",
+      description: `A ${BRAND.name} Learning course.`,
+      path: `/learning/catalog/${courseSlug}`,
+      index: "noindex",
+      locale,
+    });
+  }
   const supabase = await createClient();
   const landing = await loadPublicCourseBySlug(supabase, courseSlug);
   const path = `/learning/catalog/${courseSlug}`;
@@ -80,6 +93,9 @@ export default async function LearningPublicCourseLandingPage({
   searchParams,
 }: PageProps) {
   const { courseSlug } = await Promise.resolve(params);
+  if (isLearningVisualDemoMode()) {
+    return <CourseDetailView slug={courseSlug} />;
+  }
   const query = await Promise.resolve(searchParams ?? {});
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
@@ -121,6 +137,8 @@ export default async function LearningPublicCourseLandingPage({
       : null;
   const levelKey = course.difficulty ? difficultyKey(course.difficulty) : null;
   const errorKey = query.error ? enrollErrorKey(query.error) : null;
+  const reviewsLoaded = await loadPublicCourseReviews(supabase, course.id);
+  const reviews = reviewsLoaded.ok ? reviewsLoaded.data : [];
 
   return (
     <>
@@ -360,6 +378,36 @@ export default async function LearningPublicCourseLandingPage({
               {t("learning.course.myLearning")}
             </Link>
           </p>
+        ) : null}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-base font-bold text-white">
+          {t("learning.review.title")}
+        </h2>
+        {(reviews ?? []).length === 0 ? (
+          <p className="mt-2 text-sm text-white/55">{t("learning.review.empty")}</p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {(reviews ?? []).map((review) => (
+              <li
+                key={review.id}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm"
+              >
+                <p className="font-bold">{review.rating}/5</p>
+                {review.comment ? (
+                  <p className="mt-1 text-white/70">{review.comment}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+        {user && enrolled ? (
+          <CourseReviewForm
+            t={t}
+            courseId={course.id}
+            returnTo={LEARNING_PUBLIC_ROUTES.course(course.slug)}
+          />
         ) : null}
       </section>
     </LearningShell>
