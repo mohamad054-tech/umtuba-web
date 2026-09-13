@@ -1,0 +1,9 @@
+V6_SOURCE_SHA=f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604
+EAS_PREVIEW_BUILD_ID=6a948536-7d5e-4406-8670-304bf7a1ff98
+PROFILE=preview
+PLATFORM=android
+ARTIFACT=apk
+KEYSTORE=existing remote p6De1DDtE_ (same as production)
+BUILD_URL=https://expo.dev/accounts/umtuba/projects/umtuba-mobile/builds/6a948536-7d5e-4406-8670-304bf7a1ff98
+PURPOSE=Fold6 sideload QA (same SHA/keystore as production AAB)
+STATUS=IN_PROGRESS

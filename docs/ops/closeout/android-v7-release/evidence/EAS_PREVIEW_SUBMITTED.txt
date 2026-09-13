@@ -1,0 +1,12 @@
+V7_SOURCE_SHA=320424717cd02646a9e586754f41649b9ac55cd7
+FIX_SHA=7841b7263ae9b30a096bfdb147c1fa67dfcb491b
+EAS_BUILD_ID=0b160aac-67e1-449e-8aed-efcca378a7d3
+PROFILE=preview
+PLATFORM=android
+VERSION_CODE_INCREMENT=NONE (remote already 7 after production)
+KEYSTORE=existing remote p6De1DDtE_ (default)
+BUILD_URL=https://expo.dev/accounts/umtuba/projects/umtuba-mobile/builds/0b160aac-67e1-449e-8aed-efcca378a7d3
+STATUS=IN_PROGRESS
+SUBMITTED_AT=2026-08-16T08:14:00Z
+PLAY_UPLOAD=NO
+FOLD6_INSTALL=NOT_THIS_SESSION

@@ -1,0 +1,546 @@
+diff --git a/app/(tabs)/watch.tsx b/app/(tabs)/watch.tsx
+index f1489a6..3c88e74 100644
+--- a/app/(tabs)/watch.tsx
++++ b/app/(tabs)/watch.tsx
+@@ -22,6 +22,9 @@ import { IdentityHeader } from "@/components/IdentityHeader";
+ import { WatchVideoCard } from "@/components/WatchVideoCard";
+ import type { WatchFeedCursor, WatchVideo } from "@/src/contracts/watch";
+ import { getErrorMessage } from "@/src/contracts/validation";
++import {
++  buildWatchProfileHref,
++} from "@/src/lib/profile/profileTarget";
+ import {
+   fetchWatchFeedPage,
+   refreshPlaybackUrl,
+@@ -410,9 +413,9 @@ export default function WatchScreen() {
+         onToggleLike={() => void onToggleLike(item)}
+         onToggleSave={() => void onToggleSave(item)}
+         onOpenProfile={() => {
+-          const username = item.author.username.replace(/^@/, "");
+-          if (username) {
+-            router.push(`/profile?u=${encodeURIComponent(username)}` as never);
++          const href = buildWatchProfileHref(item.author);
++          if (href) {
++            router.push(href as never);
+           }
+         }}
+         onRefreshSrc={() => refreshSrcFor(item)}
+diff --git a/app/profile/index.tsx b/app/profile/index.tsx
+index 8217b52..0184083 100644
+--- a/app/profile/index.tsx
++++ b/app/profile/index.tsx
+@@ -1,5 +1,5 @@
+-import { Link, useRouter } from "expo-router";
+-import { useCallback, useState } from "react";
++import { Link, useLocalSearchParams, useRouter } from "expo-router";
++import { useCallback, useEffect, useState } from "react";
+ import {
+   ActivityIndicator,
+   Image,
+@@ -12,10 +12,178 @@ import {
+ import { SafeAreaView } from "react-native-safe-area-context";
+ 
+ import { useAuth } from "@/src/lib/auth/AuthContext";
+-import { buildProfilePresentation } from "@/src/lib/profile";
++import { getPublicProfileByIdentity } from "@/src/lib/auth/profile";
++import type { UserProfile } from "@/src/lib/auth/types";
++import {
++  buildProfilePresentation,
++  resolveProfileScreenIdentity,
++} from "@/src/lib/profile";
++import { getSupabase } from "@/src/lib/supabase/client";
+ import { colors } from "@/src/theme/colors";
+ 
+ export default function ProfileScreen() {
++  const { profile, user } = useAuth();
++  const params = useLocalSearchParams<{ u?: string; uid?: string }>();
++
++  const identity = resolveProfileScreenIdentity({
++    paramUserId: typeof params.uid === "string" ? params.uid : null,
++    paramUsername: typeof params.u === "string" ? params.u : null,
++    viewerId: user?.id ?? null,
++    viewerUsername: profile?.username ?? null,
++  });
++
++  if (identity.mode === "other") {
++    return (
++      <PublicProfileView
++        userId={identity.userId}
++        username={identity.username}
++      />
++    );
++  }
++
++  return <OwnProfileView />;
++}
++
++function PublicProfileView({
++  userId,
++  username,
++}: {
++  userId: string | null;
++  username: string | null;
++}) {
++  const [profile, setProfile] = useState<UserProfile | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [notFound, setNotFound] = useState(false);
++
++  const load = useCallback(async () => {
++    setLoading(true);
++    setNotFound(false);
++    try {
++      const result = await getPublicProfileByIdentity(getSupabase(), {
++        userId,
++        username,
++      });
++      setProfile(result);
++      setNotFound(result == null);
++    } catch {
++      setProfile(null);
++      setNotFound(true);
++    } finally {
++      setLoading(false);
++    }
++  }, [userId, username]);
++
++  useEffect(() => {
++    let cancelled = false;
++    void (async () => {
++      setLoading(true);
++      setNotFound(false);
++      try {
++        const result = await getPublicProfileByIdentity(getSupabase(), {
++          userId,
++          username,
++        });
++        if (cancelled) return;
++        setProfile(result);
++        setNotFound(result == null);
++      } catch {
++        if (cancelled) return;
++        setProfile(null);
++        setNotFound(true);
++      } finally {
++        if (!cancelled) setLoading(false);
++      }
++    })();
++    return () => {
++      cancelled = true;
++    };
++  }, [userId, username]);
++
++  const view = buildProfilePresentation(profile, null);
++
++  if (loading) {
++    return (
++      <SafeAreaView style={styles.root} edges={["bottom"]}>
++        <View
++          style={styles.center}
++          accessibilityLabel="Loading profile"
++          accessibilityRole="progressbar"
++        >
++          <ActivityIndicator color={colors.accentCyan} size="large" />
++          <Text style={styles.muted}>Loading profileظخ</Text>
++        </View>
++      </SafeAreaView>
++    );
++  }
++
++  if (notFound || !profile) {
++    return (
++      <SafeAreaView style={styles.root} edges={["bottom"]}>
++        <View style={styles.center}>
++          <Text style={styles.emptyTitle} accessibilityRole="header">
++            Profile unavailable
++          </Text>
++          <Text style={styles.muted}>
++            {username
++              ? `We couldnظآt load @${username.replace(/^@/, "")}.`
++              : "We couldnظآt load this profile."}
++          </Text>
++          <Pressable
++            style={styles.secondaryBtn}
++            onPress={() => void load()}
++            accessibilityRole="button"
++            accessibilityLabel="Retry loading profile"
++          >
++            <Text style={styles.secondaryBtnText}>Retry</Text>
++          </Pressable>
++        </View>
++      </SafeAreaView>
++    );
++  }
++
++  return (
++    <SafeAreaView style={styles.root} edges={["bottom"]}>
++      <ScrollView
++        contentContainerStyle={styles.scroll}
++        keyboardShouldPersistTaps="handled"
++      >
++        <View
++          style={styles.avatar}
++          accessibilityLabel={
++            view.hasReliableIdentity
++              ? `Avatar for ${view.displayName || view.username || "user"}`
++              : "Profile avatar placeholder"
++          }
++        >
++          {view.avatarUrl ? (
++            <Image
++              source={{ uri: view.avatarUrl }}
++              style={styles.avatarImage}
++              accessibilityIgnoresInvertColors
++            />
++          ) : (
++            <Text style={styles.avatarText} accessible={false}>
++              {view.avatarInitial}
++            </Text>
++          )}
++        </View>
++
++        <Text style={styles.name} accessibilityRole="header">
++          {view.displayName || view.username || "Account"}
++        </Text>
++        {view.username ? (
++          <Text style={styles.username}>@{view.username}</Text>
++        ) : null}
++        {view.bio ? <Text style={styles.bio}>{view.bio}</Text> : null}
++        {view.locationLine ? (
++          <Text style={styles.meta}>{view.locationLine}</Text>
++        ) : null}
++      </ScrollView>
++    </SafeAreaView>
++  );
++}
++
++function OwnProfileView() {
+   const { profile, user, loading, error, restore, clearError } = useAuth();
+   const router = useRouter();
+   const [refreshing, setRefreshing] = useState(false);
+diff --git a/src/lib/auth/profile.ts b/src/lib/auth/profile.ts
+index 8bc3ae7..aa578f0 100644
+--- a/src/lib/auth/profile.ts
++++ b/src/lib/auth/profile.ts
+@@ -1,4 +1,4 @@
+-import type { User } from "@supabase/supabase-js";
++import type { SupabaseClient, User } from "@supabase/supabase-js";
+ 
+ import { normalizeUsername } from "@/src/contracts/validation";
+ import type { UserProfile } from "@/src/lib/auth/types";
+@@ -76,3 +76,38 @@ export async function getProfileForUser(user: User): Promise<UserProfile> {
+     avatar_initial: fullName.charAt(0).toUpperCase() || "U",
+   };
+ }
++
++/**
++ * Load another user's public profile by stable id (preferred) or username.
++ * Used when opening a content owner's profile from Watch. Returns null when the
++ * profile cannot be found or read.
++ */
++export async function getPublicProfileByIdentity(
++  supabase: SupabaseClient,
++  identity: { userId?: string | null; username?: string | null }
++): Promise<UserProfile | null> {
++  const userId =
++    typeof identity.userId === "string" ? identity.userId.trim() : "";
++  const username =
++    typeof identity.username === "string"
++      ? identity.username.trim().replace(/^@+/, "")
++      : "";
++
++  if (!userId && !username) {
++    return null;
++  }
++
++  let query = supabase.from("profiles").select(PROFILE_COLUMNS);
++  query = userId ? query.eq("id", userId) : query.eq("username", username);
++
++  const { data, error } = await query.maybeSingle();
++
++  if (error) {
++    console.error("Unable to load public profile:", error);
++    return null;
++  }
++  if (!data) {
++    return null;
++  }
++  return mapProfileRow(data as Parameters<typeof mapProfileRow>[0]);
++}
+diff --git a/src/lib/profile/index.ts b/src/lib/profile/index.ts
+index 29d9fc9..72e4782 100644
+--- a/src/lib/profile/index.ts
++++ b/src/lib/profile/index.ts
+@@ -2,3 +2,14 @@ export {
+   buildProfilePresentation,
+   type ProfilePresentation,
+ } from "@/src/lib/profile/presentation";
++export {
++  buildWatchProfileHref,
++  normalizeProfileUsername,
++  resolveProfileScreenIdentity,
++  resolveWatchProfileNavParams,
++  resolveWatchSafetyTarget,
++  type ProfileNavParams,
++  type ProfileScreenIdentity,
++  type WatchProfileOwner,
++  type WatchSafetyTarget,
++} from "@/src/lib/profile/profileTarget";
+diff --git a/src/lib/profile/profileTarget.test.ts b/src/lib/profile/profileTarget.test.ts
+new file mode 100644
+index 0000000..6926cd5
+--- /dev/null
++++ b/src/lib/profile/profileTarget.test.ts
+@@ -0,0 +1,119 @@
++import { describe, expect, it } from "vitest";
++
++import {
++  buildWatchProfileHref,
++  resolveProfileScreenIdentity,
++  resolveWatchProfileNavParams,
++  resolveWatchSafetyTarget,
++} from "@/src/lib/profile/profileTarget";
++
++const VIEWER_ID = "11111111-1111-1111-1111-111111111111";
++const OWNER_ID = "22222222-2222-2222-2222-222222222222";
++
++describe("Watch ظْ content owner profile navigation", () => {
++  describe("resolveWatchProfileNavParams", () => {
++    it("uses the owner id and username, not the viewer", () => {
++      const params = resolveWatchProfileNavParams({
++        id: OWNER_ID,
++        username: "@creator",
++      });
++      expect(params.uid).toBe(OWNER_ID);
++      expect(params.u).toBe("creator");
++    });
++
++    it("omits missing identity fields (demo content)", () => {
++      expect(resolveWatchProfileNavParams({ id: null, username: "" })).toEqual(
++        {}
++      );
++    });
++  });
++
++  describe("buildWatchProfileHref", () => {
++    it("targets the content owner id ظ¤ bug regression", () => {
++      const href = buildWatchProfileHref({ id: OWNER_ID, username: "@creator" });
++      expect(href).toBe(`/profile?uid=${OWNER_ID}&u=creator`);
++      // The signed-in viewer id must never appear in the target route.
++      expect(href).not.toContain(VIEWER_ID);
++    });
++
++    it("falls back to username-only when the owner id is unknown", () => {
++      expect(buildWatchProfileHref({ id: null, username: "creator" })).toBe(
++        "/profile?u=creator"
++      );
++    });
++
++    it("returns null when the owner has no usable identity", () => {
++      expect(buildWatchProfileHref({ id: null, username: "" })).toBeNull();
++    });
++  });
++
++  describe("resolveProfileScreenIdentity", () => {
++    it("other-user content opens the OWNER's public profile (not own)", () => {
++      const identity = resolveProfileScreenIdentity({
++        paramUserId: OWNER_ID,
++        paramUsername: "creator",
++        viewerId: VIEWER_ID,
++        viewerUsername: "me",
++      });
++      expect(identity).toEqual({
++        mode: "other",
++        userId: OWNER_ID,
++        username: "creator",
++      });
++    });
++
++    it("owner id is authoritative even if a username collides with the viewer", () => {
++      const identity = resolveProfileScreenIdentity({
++        paramUserId: OWNER_ID,
++        paramUsername: "me",
++        viewerId: VIEWER_ID,
++        viewerUsername: "me",
++      });
++      expect(identity.mode).toBe("other");
++    });
++
++    it("own content opens the viewer's own profile (by id)", () => {
++      const identity = resolveProfileScreenIdentity({
++        paramUserId: VIEWER_ID,
++        paramUsername: "me",
++        viewerId: VIEWER_ID,
++        viewerUsername: "me",
++      });
++      expect(identity).toEqual({ mode: "self" });
++    });
++
++    it("own content opens own profile when matched by username only", () => {
++      const identity = resolveProfileScreenIdentity({
++        paramUserId: null,
++        paramUsername: "@me",
++        viewerId: VIEWER_ID,
++        viewerUsername: "me",
++      });
++      expect(identity).toEqual({ mode: "self" });
++    });
++
++    it("no route params ظْ own profile", () => {
++      expect(
++        resolveProfileScreenIdentity({
++          viewerId: VIEWER_ID,
++          viewerUsername: "me",
++        })
++      ).toEqual({ mode: "self" });
++    });
++  });
++
++  describe("resolveWatchSafetyTarget", () => {
++    it("Report/Block targets the selected content owner, not the viewer", () => {
++      const target = resolveWatchSafetyTarget({
++        postId: 42,
++        author: { id: OWNER_ID, username: "@creator" },
++      });
++      expect(target).toEqual({
++        postId: 42,
++        userId: OWNER_ID,
++        displayName: "@creator",
++      });
++      expect(target.userId).not.toBe(VIEWER_ID);
++    });
++  });
++});
+diff --git a/src/lib/profile/profileTarget.ts b/src/lib/profile/profileTarget.ts
+new file mode 100644
+index 0000000..a447004
+--- /dev/null
++++ b/src/lib/profile/profileTarget.ts
+@@ -0,0 +1,128 @@
++/**
++ * Pure navigation-target resolvers for opening a content owner's profile from
++ * Watch (and honoring that identity on the profile screen).
++ *
++ * The Watch feed can show content owned by another user. Tapping the owner's
++ * name/avatar must open THAT owner's public profile, never the signed-in
++ * viewer's own profile. These helpers keep the identity binding explicit and
++ * unit-testable, independent of React Native / expo-router.
++ */
++
++export type WatchProfileOwner = {
++  /** Stable owner user id (profiles.id). Null for demo content. */
++  id: string | null;
++  /** Owner username, may include a leading "@". */
++  username: string;
++};
++
++export type ProfileNavParams = {
++  /** Owner username without leading "@". Omitted when unavailable. */
++  u?: string;
++  /** Stable owner user id. Omitted when unavailable. */
++  uid?: string;
++};
++
++export type ProfileScreenIdentity =
++  | { mode: "self" }
++  | { mode: "other"; userId: string | null; username: string | null };
++
++export type WatchSafetyTarget = {
++  postId: number | null;
++  userId: string | null;
++  displayName: string | null;
++};
++
++export function normalizeProfileUsername(
++  username: string | null | undefined
++): string {
++  if (typeof username !== "string") return "";
++  return username.trim().replace(/^@+/, "").trim();
++}
++
++function cleanId(value: string | null | undefined): string {
++  return typeof value === "string" ? value.trim() : "";
++}
++
++/**
++ * Build the query params used to open a content owner's profile. Prefers the
++ * stable owner id (`uid`) and includes the username (`u`) for display.
++ */
++export function resolveWatchProfileNavParams(
++  owner: WatchProfileOwner
++): ProfileNavParams {
++  const params: ProfileNavParams = {};
++  const uid = cleanId(owner.id);
++  if (uid) params.uid = uid;
++  const username = normalizeProfileUsername(owner.username);
++  if (username) params.u = username;
++  return params;
++}
++
++/**
++ * Build an expo-router href for a content owner's profile, or null when the
++ * owner has no usable identity (e.g. demo content with no id/username).
++ */
++export function buildWatchProfileHref(owner: WatchProfileOwner): string | null {
++  const params = resolveWatchProfileNavParams(owner);
++  const parts: string[] = [];
++  if (params.uid) parts.push(`uid=${encodeURIComponent(params.uid)}`);
++  if (params.u) parts.push(`u=${encodeURIComponent(params.u)}`);
++  if (parts.length === 0) return null;
++  return `/profile?${parts.join("&")}`;
++}
++
++/**
++ * Decide whether the profile screen should show the signed-in viewer's own
++ * profile or another user's public profile, from the incoming route params.
++ *
++ * The owner id (`uid`) is authoritative: if it is present and differs from the
++ * viewer id, the target is another user even when a username collides.
++ */
++export function resolveProfileScreenIdentity(input: {
++  paramUserId?: string | null;
++  paramUsername?: string | null;
++  viewerId?: string | null;
++  viewerUsername?: string | null;
++}): ProfileScreenIdentity {
++  const paramId = cleanId(input.paramUserId);
++  const paramUsername = normalizeProfileUsername(input.paramUsername);
++
++  // No target in the route ظْ the viewer's own profile.
++  if (!paramId && !paramUsername) {
++    return { mode: "self" };
++  }
++
++  const viewerId = cleanId(input.viewerId);
++  const viewerUsername = normalizeProfileUsername(input.viewerUsername);
++
++  if (paramId) {
++    if (viewerId && paramId === viewerId) {
++      return { mode: "self" };
++    }
++    return { mode: "other", userId: paramId, username: paramUsername || null };
++  }
++
++  // Username-only target: treat as self only when it matches the viewer.
++  if (
++    viewerUsername &&
++    paramUsername.toLowerCase() === viewerUsername.toLowerCase()
++  ) {
++    return { mode: "self" };
++  }
++  return { mode: "other", userId: null, username: paramUsername };
++}
++
++/**
++ * Resolve the Report/Block safety target for a Watch item. The target is always
++ * the content owner (author), never the signed-in viewer.
++ */
++export function resolveWatchSafetyTarget(video: {
++  postId: number | null;
++  author: { id: string | null; username: string };
++}): WatchSafetyTarget {
++  return {
++    postId: video.postId,
++    userId: video.author.id,
++    displayName: video.author.username,
++  };
++}

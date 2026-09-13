@@ -1,0 +1,121 @@
+﻿C:/Users/1/Desktop/umtuba/umtuba-web                                                                   7ed9159 [office/profile-hero-completeness-v1]
+C:/Users/1/AppData/Local/Temp/umtuba-staging-deploy-e84475a                                            e84475a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-anthropic-adapter-v1                                           fe07a1c [office/ai-core-anthropic-adapter-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-audit-readonly                                                 9e90448 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-capability-catalog-service-registry-v1                         493e17c [office/platform-ai-capability-catalog-service-registry-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-core-gemini-adapter-recovery-v1                                919dc75 [office/ai-core-gemini-adapter-recovery-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-creator-studio-foundation-v1                                   aaccac3 [office/platform-ai-creator-studio-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-data-platform-foundation-v1                                    b33054f [office/platform-ai-data-platform-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-data-platform-workflow-v1                                      2344c1b [office/platform-ai-data-platform-workflow-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-gemini-adapter-v1                                              2867a5e [office/ai-core-gemini-adapter-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-local-adapter-v1                                               a462c88 [office/ai-core-local-adapter-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-policy-governance-foundation-v1                                2477bd9 [office/platform-ai-policy-governance-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-provider-foundation-v1                                         01f23d9 [office/ai-core-provider-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-service-orchestration-foundation-v1                            f5a2613 [office/platform-ai-service-orchestration-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-streaming-port-to-creator-v1                                   337ba84 [office/platform-ai-streaming-port-to-creator-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-tutor-provider-reconciliation-v1                               3d6dd6d [office/ai-tutor-provider-reconciliation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-unified-capability-execution-v1                                1c504ff [office/platform-ai-unified-capability-execution-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-ai-usage-quotas-billing-foundation-v1                             70dbc5f (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-learning-link-unlink-local-e2e-v1                   be5d836 [office/collaboration-learning-link-unlink-local-e2e-desktop-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-login-nav-reverif-v1                                188423d [office/collaboration-local-link-unlink-fixture-rpc-browser-e2e-followup-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-settings-lifecycle-ui-v1                            f5ab724 [office/collaboration-settings-lifecycle-ui-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-workspace-ui-foundation-v1                          b002402 [office/collaboration-workspace-ui-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-catalog-category-taxonomy-seed-v1                        29f0f6b [office/commerce-catalog-category-taxonomy-seed-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-chain-migration-apply-readiness-v1                       3552241 [office/commerce-chain-migration-apply-readiness-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-chain-migration-apply-readiness-v1-current               c473630 [office/commerce-chain-migration-apply-readiness-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-chain-remote-preflight-recheck-v1                        9fb7a05 [office/commerce-chain-remote-preflight-recheck-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-commission-decomposition-bridge-apply-v1                 7d90a05 [office/commerce-commission-decomposition-bridge-apply-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-commission-decomposition-bridge-apply-v1-current         1746bc7 [office/commerce-commission-decomposition-bridge-apply-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-commission-policy-activation-v1                          be87fb3 [office/commerce-commission-policy-activation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-commission-policy-activation-v1-current                  c9f9458 [office/commerce-commission-policy-activation-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-completion-audit-v1                                      ca157d7 [office/commerce-completion-audit-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1                  306a023 [office/commerce-digital-entitlement-revoke-on-refund-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1-current          0ccdb63 [office/commerce-digital-entitlement-revoke-on-refund-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-live-payment-production-gate-v1                          f376d5e [office/commerce-live-payment-production-gate-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-live-payment-production-gate-v1-current                  05e0043 [office/commerce-live-payment-production-gate-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-marketplace-foundation-v1                                6fac440 [office/commerce-marketplace-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-migration-history-drift-verification-v1                  904c8bb [office/commerce-migration-history-drift-verification-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-migration-history-repair-apply-v1                        9fb7a05 [office/commerce-migration-history-repair-apply-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-committed-reservation-compensation-v1     b8be334 [office/commerce-partial-refund-committed-reservation-compensation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1        556f82a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1                 6a332c4 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-ledger-service-adapter-v1                 6a2420e (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-path-v1                                   c902eb9 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-provider-money-execution-v1               4291bdb [office/commerce-partial-refund-provider-money-execution-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1    1919241 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-actions-wiring-v1             5d4bf18 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-stuck-committing-recovery-v1  8e16c8c (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1             078e264 [office/commerce-partial-refund-rpc-remote-apply-readiness-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-product-production-readiness-audit-v1                    4fc166c [office/commerce-product-production-readiness-audit-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-production-integration-preparation-v1                    88d45f3 [office/commerce-production-integration-preparation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-production-readiness-docs-gate-v1                        e4d9a8d [office/commerce-production-readiness-docs-gate-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-refund-operations-surface-v1                             100c98e [office/commerce-refund-operations-surface-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-refund-operations-surface-v1-current                     a933624 [office/commerce-refund-operations-surface-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-remote-migration-blocker-remediation-v1                  6aa7a84 [office/commerce-remote-migration-blocker-remediation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-remote-migration-preflight-v1                            5166c95 [office/commerce-remote-migration-preflight-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-remote-migration-preflight-v1-current                    2dc6dfd [office/commerce-remote-migration-preflight-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1                   6b1dc29 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-live-payout-provider-v1                           3ebe184 [office/commerce-seller-live-payout-provider-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-live-payout-provider-v1-sot                       8e16c8c [office/commerce-seller-live-payout-provider-v1-sot]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-payout-rails-v1                                   9a93fc9 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-payout-rails-v1-current                           b6a3bf6 [office/commerce-seller-payout-rails-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-settlement-migration-remote-apply-v1                     9fb7a05 [office/commerce-settlement-migration-remote-apply-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-sot-unification-stock-drift-v1                           e4d9a8d [office/commerce-sot-unification-stock-drift-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-stripe-production-gate-readiness-v2                      e4d9a8d [office/commerce-stripe-production-gate-readiness-v2]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-supplier-listing-create-hardening-v1                     82b3606 [office/commerce-supplier-listing-create-hardening-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-transactional-notifications-v1                           674b4d1 [office/commerce-transactional-notifications-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-commerce-transactional-notifications-v1-current                   2c11852 [office/commerce-transactional-notifications-v1-current]
+C:/Users/1/Desktop/umtuba/umtuba-web-gemini-live-provider-v1                                           30bda6a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-alpha-beta-productization-v1                          71dfec2 [integration/alpha-beta-productization-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-w1-revenue                                            a1bde1f [integration/w1-revenue]
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-w2-commerce                                           0824cb4 [integration/w2-commerce]
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-w3-ai                                                 d4bbddc [integration/w3-ai]
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-w3-alpha-final                                        6061a6a [integration/w3-alpha-final]
+C:/Users/1/Desktop/umtuba/umtuba-web-integration-w4-alpha-stabilization                                7c0946b [integration/w4-alpha-stabilization]
+C:/Users/1/Desktop/umtuba/umtuba-web-knowledge-acquisition-foundation-v1                               4484144 [office/platform-knowledge-acquisition-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-smoke-e2e-readiness-v1                     616d4f7 [office/learning-collaboration-smoke-e2e-readiness-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1  9478258 [office/learning-collaboration-workspace-activity-timeline-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-workspace-attachments-foundation-v1        67cf30f [office/learning-collaboration-workspace-attachments-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-workspace-spine-foundation-v1              70e00e3 [office/learning-collaboration-workspace-spine-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-instructor-browser-e2e-foundation-v1                     525c046 [office/learning-instructor-browser-e2e-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-learning-instructor-ui-contract-suite-v1                          525c046 [office/learning-instructor-ui-contract-suite-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-live-v1                                                           e3fa502 [feature/live-streaming-v1-foundation]
+C:/Users/1/Desktop/umtuba/umtuba-web-messenger-v1                                                      7492f95 [feature/messenger-v1-foundation]
+C:/Users/1/Desktop/umtuba/umtuba-web-platform-app-shell-translation-v1                                 0d18160 [office/platform-app-shell-translation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-platform-i18n-foundation-v1                                       6528202 [office/platform-internationalization-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-deployment-runtime-v1                                  cf3de8d (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-foundation-v1                                          6fd2230 [office/platform-private-ai-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-inference-execution-boundary-v1                        14ce7fd (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-inference-invocation-orchestration-v1                  16bbaa4 [office/platform-private-ai-inference-invocation-orchestration-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-inference-request-contracts-v1                         ba0cca4 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-provider-adapter-boundary-v1                           855b240 [office/platform-private-ai-provider-adapter-boundary-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-provider-routing-policy-v1                             53637d8 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-runtime-operations-failover-v1                         517cff5 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-workflow-lifecycle-v1                                  db6f52a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-workflow-lifecycle-v1-final                            eb9e743 (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-accessibility-v1                                          54f4120 [office/profile-accessibility-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-creator-space-ia-rename-v1                                4436fad [office/profile-creator-space-ia-rename-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-empty-states-v1                                           7b321ee [office/profile-empty-states-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-error-states-v1                                           529783b [office/profile-error-states-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-hero-joined-label-v1                                      f9bbf2a [office/profile-hero-joined-label-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-hero-social-links-v1                                      549018d [office/profile-hero-social-links-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-identity-achievements-v1                                  8ca12b7 [office/profile-identity-achievements-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-identity-strip-v1                                         f574eba [office/profile-identity-strip-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-loading-states-v1                                         34cd4fd [office/profile-loading-states-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-profile-tab-overflow-fade-v1                                      851a1d7 [office/profile-tab-overflow-fade-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-revenue-platform-foundation-v1                                    a1bde1f [office/unified-revenue-platform-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1                                  db6f52a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1-clean                            db6f52a (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1-final                            b0655bb (detached HEAD)
+C:/Users/1/Desktop/umtuba/umtuba-web-translation-intelligence-foundation-v1                            7296ac3 [office/platform-translation-intelligence-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-translation-learning-foundation-v1                                6a3cb3d [office/platform-translation-learning-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-translation-studio-app-shell-ingestion-v1                         e12cd6d [office/platform-translation-studio-app-shell-ingestion-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-translation-studio-foundation-v1                                  aced43c [office/platform-translation-studio-foundation-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web-translation-studio-persistence-workflow-v1                        189ec08 [office/platform-translation-studio-persistence-workflow-v1]
+C:/Users/1/Desktop/umtuba/umtuba-web/worktrees/DESKTOP-A2                                              9227cc3 [office/commerce-buyer-cart-wishlist-search-a11y-ui-contract-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A1                                                         d4beda5 [office/desktop-a1-jinn-video-pilot-ingest-precheck-automation-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A1-AI-SHARED-CORE-VALIDATION-V1                            540494a [office/desktop-a1-ai-shared-core-branch-validation-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A2                                                         ee457c4 [office/desktop-a2-games-hub-safe-components-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A2-REGRESSION                                              df47668 [office/desktop-a2-stripe-test-fixture-pack-regression-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A3                                                         9227cc3 [office/desktop-a3-commerce-seller-ops-filter-status-a11y-contract-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-GAMES-PAGE-COMPOSITION-V1                                  b07ada0 [office/desktop-games-page-composition-implementation-v1]

@@ -1,0 +1,10 @@
+SCREEN/PATH = Play Console → Grow → Store presence → Main store listing → Short description
+EXACT TEXT TO PASTE =
+Watch, create, and message on UMTUBA. Social video for talent 13+.
+
+CHAR_COUNT = 66 / 80
+SAFE_TO_SAVE_NOW = YES
+FINALIZED = YES
+TASK_ID = DESKTOP_A2_GOOGLE_PLAY_REAL_ASSET_OUTPUT_V1
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Mention Safety, report, block, Terms-before-publish, or in-app delete. Those are not in the Play binary (v3).

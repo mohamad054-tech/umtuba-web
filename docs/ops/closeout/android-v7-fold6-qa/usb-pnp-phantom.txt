@@ -1,0 +1,95 @@
+﻿
+
+Status             : Unknown
+Class              : AndroidUsbDeviceClass
+FriendlyName       : SAMSUNG Android ADB Interface
+InstanceId         : USB\VID_04E8&PID_6860&ADB\6&3699CC6F&0&0001
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : AndroidUsbDeviceClass
+FriendlyName       : SAMSUNG Android ADB Interface
+InstanceId         : USB\VID_04E8&PID_6860&ADB\6&3699CC6F&0&0003
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : WPD
+FriendlyName       : Galaxy Z Fold6
+InstanceId         : USB\VID_04E8&PID_6860&MS_COMP_MTP&SAMSUNG_ANDROID\6&3699CC6F&0&0000
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : AndroidUsbDeviceClass
+FriendlyName       : SAMSUNG Android ADB Interface
+InstanceId         : USB\VID_04E8&PID_6864&ADB\6&368994BD&0&0002
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : USB
+FriendlyName       : SAMSUNG Mobile USB Composite Device 
+InstanceId         : USB\VID_04E8&PID_6860\RFCX718LVHK
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : USB
+FriendlyName       : SAMSUNG Mobile USB Composite Device 
+InstanceId         : USB\VID_04E8&PID_6864\RFCX718LVHK
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : Net
+FriendlyName       : SAMSUNG Mobile USB Remote NDIS Network Device
+InstanceId         : USB\VID_04E8&PID_6864&RNDIS\6&368994BD&0&0000
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : Modem
+FriendlyName       : SAMSUNG Mobile USB Modem
+InstanceId         : USB\VID_04E8&PID_6860&MODEM\6&3699CC6F&0&0001
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : USB
+FriendlyName       : SAMSUNG Mobile USB Composite Device 
+InstanceId         : USB\VID_04E8&PID_6863\RFCX718LVHK
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+Status             : Unknown
+Class              : Net
+FriendlyName       : Remote NDIS based Internet Sharing Device
+InstanceId         : USB\VID_04E8&PID_6863&RNDIS\6&1B40BC72&0&0000
+Problem            : CM_PROB_PHANTOM
+ProblemDescription : Currently, this hardware device is not connected to the computer. (Code 45).
+                     
+                     To fix this problem, reconnect this hardware device to the computer.
+
+
+
+

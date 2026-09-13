@@ -1,0 +1,106 @@
+﻿[
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web",
+        "branch":  "office/profile-hero-completeness-v1",
+        "head":  "7ed9159f62d6",
+        "status_lines":  6,
+        "port":  "NO",
+        "sample":  " M docs/ai/CURRENT_TASK.md |  M docs/ai/CURSOR_REPORT.md |  M docs/ai/PROJECT_STATE.md"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-learning-link-unlink-local-e2e-v1",
+        "branch":  "office/collaboration-learning-link-unlink-local-e2e-desktop-v1",
+        "head":  "be5d836aae26",
+        "status_lines":  117,
+        "port":  "NO",
+        "sample":  " M .gitignore |  M app/actions/collaboration.ts |  M e2e/collaboration/smoke/learning-link-unlink.spec.ts"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-login-nav-reverif-v1",
+        "branch":  "office/collaboration-local-link-unlink-fixture-rpc-browser-e2e-followup-v1",
+        "head":  "188423d6e449",
+        "status_lines":  2,
+        "port":  "NO",
+        "sample":  " M docs/ai/CURSOR_REPORT.md | ?? test-results/"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-provider-money-execution-v1",
+        "branch":  "office/commerce-partial-refund-provider-money-execution-v1",
+        "head":  "4291bdbfb395",
+        "status_lines":  3,
+        "port":  "YES",
+        "sample":  "A  _port_extract/streaming-feature.patch | A  _port_extract/streaming.test.ts | A  _port_extract/streaming.ts"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-smoke-e2e-readiness-v1",
+        "branch":  "office/learning-collaboration-smoke-e2e-readiness-v1",
+        "head":  "616d4f7710e9",
+        "status_lines":  1,
+        "port":  "NO",
+        "sample":  " M .gitignore"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1",
+        "branch":  "office/learning-collaboration-workspace-activity-timeline-foundation-v1",
+        "head":  "9478258874ba",
+        "status_lines":  8,
+        "port":  "NO",
+        "sample":  "?? lib/learning/contentBlockRenderSmoke.test.ts | ?? lib/learning/contentBlockSmokeFixtures.ts | ?? lib/learning/learningProductionSmokeGate.test.ts"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-learning-collaboration-workspace-attachments-foundation-v1",
+        "branch":  "office/learning-collaboration-workspace-attachments-foundation-v1",
+        "head":  "67cf30ff9c6e",
+        "status_lines":  2,
+        "port":  "NO",
+        "sample":  "?? \"pace attachments foundation v1\\357\\200\\242\" | ?? \"tatus -sb\""
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-learning-instructor-browser-e2e-foundation-v1",
+        "branch":  "office/learning-instructor-browser-e2e-foundation-v1",
+        "head":  "525c046661c4",
+        "status_lines":  18,
+        "port":  "NO",
+        "sample":  " M app/components/learning/LearningShell.tsx |  M app/learning/instructor/courses/[courseId]/activities/[activityId]/assignment/page.tsx |  M app/learning/instructor/courses/[courseId]/activities/[activityId]/questions/page.tsx"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-workflow-lifecycle-v1",
+        "branch":  "(detached)",
+        "head":  "db6f52a8bd54",
+        "status_lines":  19,
+        "port":  "NO",
+        "sample":  "M  app/admin/private-ai/PrivateAiShell.tsx | A  app/admin/private-ai/lifecycle/actions.ts | M  app/admin/private-ai/lifecycle/page.tsx"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1",
+        "branch":  "(detached)",
+        "head":  "db6f52a8bd54",
+        "status_lines":  28,
+        "port":  "NO",
+        "sample":  "M  .env.example | M  app/actions/translationStudio.ts | M  app/admin/private-ai/PrivateAiShell.tsx"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1-clean",
+        "branch":  "(detached)",
+        "head":  "db6f52a8bd54",
+        "status_lines":  28,
+        "port":  "NO",
+        "sample":  "M  .env.example | M  app/actions/translationStudio.ts | M  app/admin/private-ai/PrivateAiShell.tsx"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web/worktrees/DESKTOP-A2",
+        "branch":  "office/commerce-buyer-cart-wishlist-search-a11y-ui-contract-v1",
+        "head":  "9227cc3bd6fc",
+        "status_lines":  6,
+        "port":  "NO",
+        "sample":  " M app/components/store/CartView.tsx |  M app/components/store/SearchFilters.tsx |  M app/components/store/WishlistButton.tsx"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A3",
+        "branch":  "office/desktop-a3-commerce-seller-ops-filter-status-a11y-contract-v1",
+        "head":  "9227cc3bd6fc",
+        "status_lines":  9,
+        "port":  "NO",
+        "sample":  " M app/components/store/SellerInventoryWorkspace.tsx |  M app/components/store/SellerOpsShell.tsx |  M app/components/store/SellerOrderList.tsx"
+    }
+]

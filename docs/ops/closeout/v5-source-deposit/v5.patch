@@ -1,0 +1,2271 @@
+diff --git a/app/(auth)/signup.tsx b/app/(auth)/signup.tsx
+index eaf6432..d436f75 100644
+--- a/app/(auth)/signup.tsx
++++ b/app/(auth)/signup.tsx
+@@ -2,10 +2,12 @@ import { Link, Redirect, useLocalSearchParams, useRouter } from "expo-router";
+ import { useEffect, useState } from "react";
+ import {
+   ActivityIndicator,
++  Linking,
+   Pressable,
+   StyleSheet,
+   Text,
+   TextInput,
++  View,
+ } from "react-native";
+ 
+ import { AuthScreen } from "@/components/AuthScreen";
+@@ -15,6 +17,11 @@ import {
+   getReferralAttribution,
+   saveReferralAttribution,
+ } from "@/src/lib/auth/referralAttribution";
++import {
++  UGC_COMMUNITY_POLICY_URL,
++  UGC_SIGNUP_TERMS_LABEL,
++  canAcceptTerms,
++} from "@/src/lib/safety/ugcPolicy";
+ import { colors } from "@/src/theme/colors";
+ 
+ export default function SignupScreen() {
+@@ -28,6 +35,7 @@ export default function SignupScreen() {
+   const [referralCode, setReferralCode] = useState("");
+   const [busy, setBusy] = useState(false);
+   const [error, setError] = useState<string | null>(null);
++  const [acceptTerms, setAcceptTerms] = useState(false);
+ 
+   useEffect(() => {
+     const fromParam = normalizeReferralCode(
+@@ -52,6 +60,10 @@ export default function SignupScreen() {
+   }
+ 
+   const onSubmit = async () => {
++    if (!canAcceptTerms(acceptTerms)) {
++      setError("Accept the UMTUBA Terms and community rules to create an account.");
++      return;
++    }
+     setBusy(true);
+     setError(null);
+     try {
+@@ -146,17 +158,46 @@ export default function SignupScreen() {
+         onChangeText={setReferralCode}
+         accessibilityLabel="Referral code, optional"
+       />
++      <Pressable
++        style={styles.ackRow}
++        onPress={() => setAcceptTerms((value) => !value)}
++        accessibilityRole="checkbox"
++        accessibilityState={{ checked: acceptTerms }}
++        accessibilityLabel={UGC_SIGNUP_TERMS_LABEL}
++      >
++        <View
++          style={[styles.checkbox, acceptTerms && styles.checkboxChecked]}
++          accessible={false}
++        >
++          {acceptTerms ? <Text style={styles.checkboxMark}>✓</Text> : null}
++        </View>
++        <Text style={styles.ackText}>{UGC_SIGNUP_TERMS_LABEL}</Text>
++      </Pressable>
++      <Pressable
++        onPress={() => void Linking.openURL(UGC_COMMUNITY_POLICY_URL)}
++        accessibilityRole="link"
++        accessibilityLabel="Open UMTUBA Terms"
++      >
++        <Text style={styles.termsLink}>Read Terms</Text>
++      </Pressable>
+       {error ? (
+         <Text style={styles.error} accessibilityRole="alert">
+           {error}
+         </Text>
+       ) : null}
+       <Pressable
+-        style={[styles.button, busy && styles.buttonDisabled]}
++        style={[
++          styles.button,
++          (busy || !canAcceptTerms(acceptTerms)) && styles.buttonDisabled,
++        ]}
+         onPress={() => void onSubmit()}
+-        disabled={busy}
++        disabled={busy || !canAcceptTerms(acceptTerms)}
+         accessibilityRole="button"
+         accessibilityLabel="Create account"
++        accessibilityState={{
++          disabled: busy || !canAcceptTerms(acceptTerms),
++          busy,
++        }}
+       >
+         {busy ? (
+           <ActivityIndicator color={colors.bg} />
+@@ -207,4 +248,41 @@ const styles = StyleSheet.create({
+     color: colors.accentCyan,
+     fontWeight: "700",
+   },
++  ackRow: {
++    flexDirection: "row",
++    alignItems: "flex-start",
++    gap: 10,
++    marginTop: 4,
++  },
++  checkbox: {
++    width: 22,
++    height: 22,
++    borderRadius: 6,
++    borderWidth: 1,
++    borderColor: colors.border,
++    backgroundColor: colors.surface,
++    alignItems: "center",
++    justifyContent: "center",
++    marginTop: 2,
++  },
++  checkboxChecked: {
++    backgroundColor: colors.accentCyan,
++    borderColor: colors.accentCyan,
++  },
++  checkboxMark: {
++    color: colors.bg,
++    fontSize: 14,
++    fontWeight: "800",
++    lineHeight: 16,
++  },
++  ackText: {
++    flex: 1,
++    color: colors.textMuted,
++    fontSize: 14,
++    lineHeight: 20,
++  },
++  termsLink: {
++    color: colors.accentCyan,
++    fontWeight: "600",
++  },
+ });
+diff --git a/app/(tabs)/watch.tsx b/app/(tabs)/watch.tsx
+index f1489a6..9a054ae 100644
+--- a/app/(tabs)/watch.tsx
++++ b/app/(tabs)/watch.tsx
+@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
+ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+ import {
+   ActivityIndicator,
++  Alert,
+   AppState,
+   BackHandler,
+   Dimensions,
+@@ -19,13 +20,23 @@ import {
+ import { useSafeAreaInsets } from "react-native-safe-area-context";
+ 
+ import { IdentityHeader } from "@/components/IdentityHeader";
++import { UgcSafetySheet, type UgcSafetyTarget } from "@/components/UgcSafetySheet";
+ import { WatchVideoCard } from "@/components/WatchVideoCard";
+ import type { WatchFeedCursor, WatchVideo } from "@/src/contracts/watch";
+ import { getErrorMessage } from "@/src/contracts/validation";
++import { useAuth } from "@/src/lib/auth/AuthContext";
+ import {
+   fetchWatchFeedPage,
+   refreshPlaybackUrl,
+ } from "@/src/lib/feed/watchFeed";
++import { blockUgcUser } from "@/src/lib/safety/blocks";
++import { reportUgcContent, reportUgcUser } from "@/src/lib/safety/reports";
++import { filterVideosByBlockedAuthors } from "@/src/lib/safety/ugcPolicy";
++import {
++  applySuccessfulDeleteToList,
++  deletePostForOwner,
++  viewerMaySeeDeleteControl,
++} from "@/src/lib/social/deleteOwnedPost";
+ import {
+   togglePostLike,
+   togglePostSave,
+@@ -65,6 +76,7 @@ function toLifecycleState(state: AppStateStatus): AppLifecycleState {
+ export default function WatchScreen() {
+   const insets = useSafeAreaInsets();
+   const router = useRouter();
++  const { user } = useAuth();
+   const listRef = useRef<FlatList<WatchVideo>>(null);
+   const params = useLocalSearchParams<{ post?: string }>();
+   const focusPostId =
+@@ -89,6 +101,12 @@ export default function WatchScreen() {
+   );
+   const [itemHeight, setItemHeight] = useState(WINDOW_HEIGHT);
+   const [listScrollEnabled, setListScrollEnabled] = useState(true);
++  const [safetyTarget, setSafetyTarget] = useState<UgcSafetyTarget | null>(null);
++  const [safetyBusy, setSafetyBusy] = useState(false);
++  const [safetyError, setSafetyError] = useState<string | null>(null);
++  const [safetyConfirmation, setSafetyConfirmation] = useState<string | null>(
++    null
++  );
+ 
+   const initialInFlight = useRef(false);
+   const moreInFlight = useRef(false);
+@@ -274,6 +292,76 @@ export default function WatchScreen() {
+     [patchVideo]
+   );
+ 
++  const closeSafety = useCallback(() => {
++    setSafetyTarget(null);
++    setSafetyError(null);
++    setSafetyConfirmation(null);
++    setSafetyBusy(false);
++  }, []);
++
++  const onReportContent = useCallback(
++    async (reason: string, detail: string | null) => {
++      if (!safetyTarget?.postId) return;
++      setSafetyBusy(true);
++      setSafetyError(null);
++      const result = await reportUgcContent(getSupabase(), {
++        postId: safetyTarget.postId,
++        reasonCode: reason,
++        detail,
++      });
++      setSafetyBusy(false);
++      if (!result.ok) {
++        setSafetyError(result.message);
++        return;
++      }
++      setSafetyConfirmation(
++        "Thanks. We received your report and will review this video."
++      );
++    },
++    [safetyTarget]
++  );
++
++  const onReportUser = useCallback(
++    async (reason: string, detail: string | null) => {
++      if (!safetyTarget?.userId) return;
++      setSafetyBusy(true);
++      setSafetyError(null);
++      const result = await reportUgcUser(getSupabase(), {
++        userId: safetyTarget.userId,
++        reasonCode: reason,
++        detail,
++      });
++      setSafetyBusy(false);
++      if (!result.ok) {
++        setSafetyError(result.message);
++        return;
++      }
++      setSafetyConfirmation(
++        "Thanks. We received your report and will review this account."
++      );
++    },
++    [safetyTarget]
++  );
++
++  const onBlockUser = useCallback(async () => {
++    if (!safetyTarget?.userId) return;
++    setSafetyBusy(true);
++    setSafetyError(null);
++    const result = await blockUgcUser(getSupabase(), user?.id, safetyTarget.userId);
++    setSafetyBusy(false);
++    if (!result.ok) {
++      setSafetyError(result.message);
++      return;
++    }
++    const blockedId = safetyTarget.userId;
++    setVideos((prev) =>
++      filterVideosByBlockedAuthors(prev, new Set([blockedId]))
++    );
++    setSafetyConfirmation(
++      "Account blocked. You will no longer see their videos or messages."
++    );
++  }, [safetyTarget, user?.id]);
++
+   const onToggleSave = useCallback(
+     async (video: WatchVideo) => {
+       if (!video.postId) return;
+@@ -288,6 +376,45 @@ export default function WatchScreen() {
+     [patchVideo]
+   );
+ 
++  const onDeleteOwn = useCallback(
++    (video: WatchVideo) => {
++      if (!video.postId || !user?.id) return;
++      if (!viewerMaySeeDeleteControl(user.id, video.author.id)) return;
++      Alert.alert(
++        "Delete video",
++        "This removes your video from Watch. This cannot be undone.",
++        [
++          { text: "Cancel", style: "cancel" },
++          {
++            text: "Delete",
++            style: "destructive",
++            onPress: () => {
++              void (async () => {
++                const result = await deletePostForOwner(
++                  getSupabase(),
++                  user.id,
++                  video.postId as number
++                );
++                if (!result.ok) {
++                  Alert.alert("Delete failed", result.message);
++                  return;
++                }
++                setVideos((prev) =>
++                  applySuccessfulDeleteToList(
++                    prev,
++                    (row) => row.id === video.id,
++                    true
++                  )
++                );
++              })();
++            },
++          },
++        ]
++      );
++    },
++    [user?.id]
++  );
++
+   const onToggleMute = useCallback(() => {
+     setMuted((m) => {
+       const next = !m;
+@@ -409,6 +536,20 @@ export default function WatchScreen() {
+         onEnded={index === activeIndex ? onActiveEnded : undefined}
+         onToggleLike={() => void onToggleLike(item)}
+         onToggleSave={() => void onToggleSave(item)}
++        onDeleteOwn={
++          viewerMaySeeDeleteControl(user?.id, item.author.id)
++            ? () => onDeleteOwn(item)
++            : undefined
++        }
++        onOpenSafety={() => {
++          setSafetyError(null);
++          setSafetyConfirmation(null);
++          setSafetyTarget({
++            postId: item.postId,
++            userId: item.author.id,
++            displayName: item.author.username,
++          });
++        }}
+         onOpenProfile={() => {
+           const username = item.author.username.replace(/^@/, "");
+           if (username) {
+@@ -435,6 +576,8 @@ export default function WatchScreen() {
+       onToggleLike,
+       onToggleMute,
+       onToggleSave,
++      onDeleteOwn,
++      user?.id,
+       onVolumeChange,
+       refreshSrcFor,
+       router,
+@@ -582,6 +725,18 @@ export default function WatchScreen() {
+           }, 100);
+         }}
+       />
++      <UgcSafetySheet
++        visible={safetyTarget != null}
++        viewerId={user?.id}
++        target={safetyTarget}
++        busy={safetyBusy}
++        error={safetyError}
++        confirmation={safetyConfirmation}
++        onClose={closeSafety}
++        onReportContent={(reason, detail) => void onReportContent(reason, detail)}
++        onReportUser={(reason, detail) => void onReportUser(reason, detail)}
++        onBlockUser={() => void onBlockUser()}
++      />
+     </View>
+   );
+ }
+diff --git a/app/_layout.tsx b/app/_layout.tsx
+index 5ef04a9..db3bfd1 100644
+--- a/app/_layout.tsx
++++ b/app/_layout.tsx
+@@ -207,6 +207,10 @@ export default function RootLayout() {
+               <Stack.Screen name="rewards" options={{ title: "Rewards" }} />
+               <Stack.Screen name="world" options={{ title: "World" }} />
+               <Stack.Screen name="settings" options={{ title: "Settings" }} />
++              <Stack.Screen
++                name="blocked-users"
++                options={{ title: "Blocked users" }}
++              />
+               <Stack.Screen
+                 name="change-password"
+                 options={{ title: "Change password" }}
+diff --git a/app/blocked-users.tsx b/app/blocked-users.tsx
+new file mode 100644
+index 0000000..f1f3957
+--- /dev/null
++++ b/app/blocked-users.tsx
+@@ -0,0 +1,152 @@
++import { useCallback, useState } from "react";
++import { useFocusEffect } from "expo-router";
++import {
++  ActivityIndicator,
++  Pressable,
++  ScrollView,
++  StyleSheet,
++  Text,
++  View,
++} from "react-native";
++import { SafeAreaView } from "react-native-safe-area-context";
++
++import { useAuth } from "@/src/lib/auth/AuthContext";
++import {
++  listMyBlockedUsers,
++  unblockUgcUser,
++  type BlockedUser,
++} from "@/src/lib/safety/blocks";
++import { getSupabase } from "@/src/lib/supabase/client";
++import { colors } from "@/src/theme/colors";
++
++export default function BlockedUsersScreen() {
++  const { user, session } = useAuth();
++  const [users, setUsers] = useState<BlockedUser[]>([]);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++  const [busyId, setBusyId] = useState<string | null>(null);
++
++  const load = useCallback(async () => {
++    setLoading(true);
++    setError(null);
++    const result = await listMyBlockedUsers(getSupabase());
++    if (!result.ok) {
++      setUsers([]);
++      setError(result.message);
++      setLoading(false);
++      return;
++    }
++    setUsers(result.users);
++    setLoading(false);
++  }, []);
++
++  useFocusEffect(
++    useCallback(() => {
++      void load();
++    }, [load])
++  );
++
++  const onUnblock = useCallback(async (userId: string) => {
++    setBusyId(userId);
++    const result = await unblockUgcUser(getSupabase(), userId);
++    setBusyId(null);
++    if (!result.ok) {
++      setError(result.message);
++      return;
++    }
++    setUsers((prev) => prev.filter((item) => item.userId !== userId));
++  }, []);
++
++  if (!session || !user) {
++    return (
++      <SafeAreaView style={styles.center} edges={["bottom"]}>
++        <Text style={styles.body}>Sign in to manage blocked accounts.</Text>
++      </SafeAreaView>
++    );
++  }
++
++  return (
++    <SafeAreaView style={styles.root} edges={["bottom"]}>
++      <ScrollView contentContainerStyle={styles.scroll}>
++        <Text style={styles.body}>
++          Blocked accounts cannot message you. Their videos are hidden from
++          Watch and Discover.
++        </Text>
++        {loading ? (
++          <ActivityIndicator color={colors.accentCyan} />
++        ) : error ? (
++          <View style={styles.errorBox} accessibilityRole="alert">
++            <Text style={styles.error}>{error}</Text>
++            <Pressable
++              onPress={() => void load()}
++              accessibilityRole="button"
++              accessibilityLabel="Retry loading blocked accounts"
++            >
++              <Text style={styles.link}>Retry</Text>
++            </Pressable>
++          </View>
++        ) : users.length === 0 ? (
++          <Text style={styles.empty}>No blocked accounts.</Text>
++        ) : (
++          users.map((item) => (
++            <View key={item.userId} style={styles.row}>
++              <View style={styles.rowText}>
++                <Text style={styles.name}>
++                  {item.displayName || item.username || "UMTUBA user"}
++                </Text>
++                {item.username ? (
++                  <Text style={styles.meta}>@{item.username}</Text>
++                ) : null}
++              </View>
++              <Pressable
++                onPress={() => void onUnblock(item.userId)}
++                disabled={busyId === item.userId}
++                accessibilityRole="button"
++                accessibilityLabel={`Unblock ${item.displayName || item.username || "user"}`}
++              >
++                {busyId === item.userId ? (
++                  <ActivityIndicator color={colors.accentCyan} />
++                ) : (
++                  <Text style={styles.link}>Unblock</Text>
++                )}
++              </Pressable>
++            </View>
++          ))
++        )}
++      </ScrollView>
++    </SafeAreaView>
++  );
++}
++
++const styles = StyleSheet.create({
++  root: { flex: 1, backgroundColor: colors.bg },
++  scroll: { padding: 20, gap: 12 },
++  center: {
++    flex: 1,
++    backgroundColor: colors.bg,
++    alignItems: "center",
++    justifyContent: "center",
++    padding: 24,
++  },
++  body: { color: colors.textMuted, lineHeight: 20 },
++  empty: { color: colors.textMuted, marginTop: 12 },
++  errorBox: { gap: 8 },
++  error: { color: colors.danger },
++  row: {
++    minHeight: 56,
++    borderWidth: 1,
++    borderColor: colors.border,
++    backgroundColor: colors.surface,
++    borderRadius: 12,
++    paddingHorizontal: 14,
++    paddingVertical: 10,
++    flexDirection: "row",
++    alignItems: "center",
++    justifyContent: "space-between",
++    gap: 12,
++  },
++  rowText: { flex: 1, gap: 2 },
++  name: { color: colors.text, fontWeight: "700", fontSize: 16 },
++  meta: { color: colors.textSubtle, fontSize: 13 },
++  link: { color: colors.accentCyan, fontWeight: "700" },
++});
+diff --git a/app/messages/[id].tsx b/app/messages/[id].tsx
+index 44c1a07..6092d94 100644
+--- a/app/messages/[id].tsx
++++ b/app/messages/[id].tsx
+@@ -16,9 +16,11 @@ import {
+ } from "react-native";
+ import { useSafeAreaInsets } from "react-native-safe-area-context";
+ 
++import { UgcSafetySheet, type UgcSafetyTarget } from "@/components/UgcSafetySheet";
+ import { useAuth } from "@/src/lib/auth/AuthContext";
+ import {
+   assertConversationMembership,
++  getConversationPeerId,
+   getConversationPeerState,
+   listMessagesForConversation,
+   markConversationRead,
+@@ -27,6 +29,8 @@ import {
+   setConversationTyping,
+   subscribeMessengerRealtime,
+ } from "@/src/lib/messenger/api";
++import { blockUgcUser } from "@/src/lib/safety/blocks";
++import { reportUgcUser } from "@/src/lib/safety/reports";
+ import { clearDraft, loadDraft, saveDraft } from "@/src/lib/messenger/drafts";
+ import { mapMessengerMessageRow } from "@/src/lib/messenger/mapMessage";
+ import {
+@@ -77,6 +81,13 @@ export default function ConversationThreadScreen() {
+   const [peerLastReadAt, setPeerLastReadAt] = useState<string | null>(null);
+   const [sending, setSending] = useState(false);
+   const [appActive, setAppActive] = useState(true);
++  const [peerId, setPeerId] = useState<string | null>(null);
++  const [safetyOpen, setSafetyOpen] = useState(false);
++  const [safetyBusy, setSafetyBusy] = useState(false);
++  const [safetyError, setSafetyError] = useState<string | null>(null);
++  const [safetyConfirmation, setSafetyConfirmation] = useState<string | null>(
++    null
++  );
+ 
+   const scrollToEnd = useCallback((animated = true) => {
+     requestAnimationFrame(() => {
+@@ -103,10 +114,11 @@ export default function ConversationThreadScreen() {
+         return;
+       }
+ 
+-      const peer = await getConversationPeerState(
+-        getSupabase(),
+-        conversationId
+-      );
++      const [peer, loadedPeerId] = await Promise.all([
++        getConversationPeerState(getSupabase(), conversationId),
++        getConversationPeerId(getSupabase(), conversationId),
++      ]);
++      if (loadedPeerId) setPeerId(loadedPeerId);
+       const peerRead = peer.ok ? peer.peerLastReadAt : null;
+       if (peer.ok) {
+         setPeerTyping(peer.isTyping);
+@@ -333,6 +345,10 @@ export default function ConversationThreadScreen() {
+     [conversationId, draft, scrollToEnd, sending, user]
+   );
+ 
++  const safetyTarget: UgcSafetyTarget | null = peerId
++    ? { userId: peerId, displayName: "This conversation" }
++    : null;
++
+   if (loading) {
+     return (
+       <View style={styles.center}>
+@@ -379,6 +395,20 @@ export default function ConversationThreadScreen() {
+       keyboardVerticalOffset={Platform.OS === "android" ? 24 : 0}
+     >
+       <View style={styles.root}>
++        {peerId ? (
++          <Pressable
++            style={styles.safetyBar}
++            onPress={() => {
++              setSafetyError(null);
++              setSafetyConfirmation(null);
++              setSafetyOpen(true);
++            }}
++            accessibilityRole="button"
++            accessibilityLabel="Report or block this account"
++          >
++            <Text style={styles.safetyBarText}>Report or block</Text>
++          </Pressable>
++        ) : null}
+         {peerTyping ? (
+           <Text
+             style={styles.typing}
+@@ -518,6 +548,55 @@ export default function ConversationThreadScreen() {
+           Text only — attachments, voice notes, stickers, groups, and calls are
+           not available yet.
+         </Text>
++        <UgcSafetySheet
++          visible={safetyOpen}
++          viewerId={user?.id}
++          target={safetyTarget}
++          busy={safetyBusy}
++          error={safetyError}
++          confirmation={safetyConfirmation}
++          onClose={() => setSafetyOpen(false)}
++          onReportContent={() => undefined}
++          onReportUser={(reason, detail) => {
++            if (!peerId) return;
++            void (async () => {
++              setSafetyBusy(true);
++              setSafetyError(null);
++              const result = await reportUgcUser(getSupabase(), {
++                userId: peerId,
++                reasonCode: reason,
++                detail,
++              });
++              setSafetyBusy(false);
++              if (!result.ok) {
++                setSafetyError(result.message);
++                return;
++              }
++              setSafetyConfirmation(
++                "Thanks. We received your report and will review this account."
++              );
++            })();
++          }}
++          onBlockUser={() => {
++            if (!peerId) return;
++            void (async () => {
++              setSafetyBusy(true);
++              setSafetyError(null);
++              const result = await blockUgcUser(getSupabase(), user?.id, peerId);
++              setSafetyBusy(false);
++              if (!result.ok) {
++                setSafetyError(result.message);
++                return;
++              }
++              setSafetyConfirmation(
++                "Account blocked. You will no longer see their messages."
++              );
++              setTimeout(() => {
++                router.replace("/(tabs)/messages");
++              }, 600);
++            })();
++          }}
++        />
+       </View>
+     </KeyboardAvoidingView>
+   );
+@@ -525,6 +604,17 @@ export default function ConversationThreadScreen() {
+ 
+ const styles = StyleSheet.create({
+   root: { flex: 1, backgroundColor: colors.bg },
++  safetyBar: {
++    minHeight: 44,
++    alignItems: "center",
++    justifyContent: "center",
++    borderBottomWidth: StyleSheet.hairlineWidth,
++    borderBottomColor: colors.border,
++  },
++  safetyBarText: {
++    color: colors.accentCyan,
++    fontWeight: "700",
++  },
+   center: {
+     flex: 1,
+     backgroundColor: colors.bg,
+diff --git a/app/settings.tsx b/app/settings.tsx
+index 7fff5fd..88677d9 100644
+--- a/app/settings.tsx
++++ b/app/settings.tsx
+@@ -283,13 +283,9 @@ export default function SettingsScreen() {
+     {
+       id: "blocked-users",
+       label: "Blocked users",
+-      kind: "unavailable",
+-      value: "Not available yet",
+-      onPress: () =>
+-        showUnavailable(
+-          "Blocked users",
+-          "Blocking is not available in this version."
+-        ),
++      kind: "link",
++      href: "/blocked-users" as Href,
++      accessibilityHint: "Review and unblock accounts you blocked",
+     },
+   ];
+ 
+diff --git a/components/UgcSafetySheet.tsx b/components/UgcSafetySheet.tsx
+new file mode 100644
+index 0000000..963e572
+--- /dev/null
++++ b/components/UgcSafetySheet.tsx
+@@ -0,0 +1,321 @@
++import { useCallback, useEffect, useMemo, useState } from "react";
++import {
++  ActivityIndicator,
++  Modal,
++  Pressable,
++  ScrollView,
++  StyleSheet,
++  Text,
++  TextInput,
++  View,
++} from "react-native";
++
++import {
++  UGC_REASON_CODES,
++  UGC_REASON_LABELS,
++  canBlockUser,
++  type UgcReasonCode,
++} from "@/src/lib/safety/ugcPolicy";
++import { colors } from "@/src/theme/colors";
++
++export type UgcSafetyTarget = {
++  postId?: number | null;
++  userId?: string | null;
++  displayName?: string | null;
++};
++
++export type UgcSafetyMode = "menu" | "report-content" | "report-user" | "block";
++
++type Props = {
++  visible: boolean;
++  viewerId?: string | null;
++  target: UgcSafetyTarget | null;
++  busy?: boolean;
++  error?: string | null;
++  confirmation?: string | null;
++  onClose: () => void;
++  onReportContent: (reason: UgcReasonCode, detail: string | null) => void;
++  onReportUser: (reason: UgcReasonCode, detail: string | null) => void;
++  onBlockUser: () => void;
++};
++
++export function UgcSafetySheet({
++  visible,
++  viewerId,
++  target,
++  busy = false,
++  error,
++  confirmation,
++  onClose,
++  onReportContent,
++  onReportUser,
++  onBlockUser,
++}: Props) {
++  const [mode, setMode] = useState<UgcSafetyMode>("menu");
++  const [reason, setReason] = useState<UgcReasonCode | null>(null);
++  const [detail, setDetail] = useState("");
++
++  const canReportVideo = Boolean(target?.postId);
++  const canReportAccount = Boolean(target?.userId);
++  const canBlock = canBlockUser(viewerId, target?.userId);
++
++  const reset = useCallback(() => {
++    setMode("menu");
++    setReason(null);
++    setDetail("");
++  }, []);
++
++  useEffect(() => {
++    if (visible && !confirmation) {
++      reset();
++    }
++  }, [confirmation, reset, visible]);
++
++  const close = useCallback(() => {
++    reset();
++    onClose();
++  }, [onClose, reset]);
++
++  const title = useMemo(() => {
++    if (confirmation) return "Thanks";
++    if (mode === "report-content") return "Report video";
++    if (mode === "report-user") return "Report account";
++    if (mode === "block") return "Block account";
++    return "Safety";
++  }, [confirmation, mode]);
++
++  const submitReport = useCallback(() => {
++    if (!reason) return;
++    const trimmed = detail.trim() || null;
++    if (mode === "report-content") {
++      onReportContent(reason, trimmed);
++      return;
++    }
++    onReportUser(reason, trimmed);
++  }, [detail, mode, onReportContent, onReportUser, reason]);
++
++  return (
++    <Modal
++      visible={visible}
++      transparent
++      animationType="fade"
++      onRequestClose={close}
++    >
++      <View style={styles.backdrop}>
++        <View
++          style={styles.sheet}
++          accessibilityViewIsModal
++          accessibilityLabel={title}
++        >
++          <Text style={styles.title} accessibilityRole="header">
++            {title}
++          </Text>
++          {target?.displayName ? (
++            <Text style={styles.subtitle}>{target.displayName}</Text>
++          ) : null}
++
++          {confirmation ? (
++            <Text style={styles.success} accessibilityRole="text">
++              {confirmation}
++            </Text>
++          ) : mode === "menu" ? (
++            <View style={styles.stack}>
++              {canReportVideo ? (
++                <Pressable
++                  style={styles.row}
++                  onPress={() => setMode("report-content")}
++                  accessibilityRole="button"
++                  accessibilityLabel="Report this video"
++                >
++                  <Text style={styles.rowText}>Report video</Text>
++                </Pressable>
++              ) : null}
++              {canReportAccount ? (
++                <Pressable
++                  style={styles.row}
++                  onPress={() => setMode("report-user")}
++                  accessibilityRole="button"
++                  accessibilityLabel="Report this account"
++                >
++                  <Text style={styles.rowText}>Report account</Text>
++                </Pressable>
++              ) : null}
++              {canBlock ? (
++                <Pressable
++                  style={styles.row}
++                  onPress={() => setMode("block")}
++                  accessibilityRole="button"
++                  accessibilityLabel="Block this account"
++                >
++                  <Text style={[styles.rowText, styles.danger]}>Block account</Text>
++                </Pressable>
++              ) : null}
++            </View>
++          ) : mode === "block" ? (
++            <View style={styles.stack}>
++              <Text style={styles.body}>
++                You will no longer see this account in Watch, Discover, or
++                Messages. They will not be able to message you.
++              </Text>
++              <Pressable
++                style={[styles.primary, busy && styles.disabled]}
++                onPress={onBlockUser}
++                disabled={busy}
++                accessibilityRole="button"
++                accessibilityLabel="Confirm block"
++                accessibilityState={{ disabled: busy, busy }}
++              >
++                {busy ? (
++                  <ActivityIndicator color={colors.bg} />
++                ) : (
++                  <Text style={styles.primaryText}>Block</Text>
++                )}
++              </Pressable>
++            </View>
++          ) : (
++            <ScrollView style={styles.reasons} keyboardShouldPersistTaps="handled">
++              {UGC_REASON_CODES.map((code) => (
++                <Pressable
++                  key={code}
++                  style={[styles.reason, reason === code && styles.reasonOn]}
++                  onPress={() => setReason(code)}
++                  accessibilityRole="radio"
++                  accessibilityState={{ selected: reason === code }}
++                  accessibilityLabel={UGC_REASON_LABELS[code]}
++                >
++                  <Text style={styles.reasonText}>{UGC_REASON_LABELS[code]}</Text>
++                </Pressable>
++              ))}
++              <TextInput
++                style={styles.input}
++                value={detail}
++                onChangeText={setDetail}
++                placeholder="Optional details"
++                placeholderTextColor={colors.textSubtle}
++                maxLength={1000}
++                multiline
++                accessibilityLabel="Optional report details"
++              />
++              <Pressable
++                style={[styles.primary, (!reason || busy) && styles.disabled]}
++                onPress={submitReport}
++                disabled={!reason || busy}
++                accessibilityRole="button"
++                accessibilityLabel="Submit report"
++                accessibilityState={{ disabled: !reason || busy, busy }}
++              >
++                {busy ? (
++                  <ActivityIndicator color={colors.bg} />
++                ) : (
++                  <Text style={styles.primaryText}>Submit report</Text>
++                )}
++              </Pressable>
++            </ScrollView>
++          )}
++
++          {error ? (
++            <Text style={styles.error} accessibilityRole="alert">
++              {error}
++            </Text>
++          ) : null}
++
++          <Pressable
++            onPress={close}
++            accessibilityRole="button"
++            accessibilityLabel="Close safety options"
++            style={styles.close}
++          >
++            <Text style={styles.closeText}>{confirmation ? "Done" : "Cancel"}</Text>
++          </Pressable>
++        </View>
++      </View>
++    </Modal>
++  );
++}
++
++const styles = StyleSheet.create({
++  backdrop: {
++    flex: 1,
++    backgroundColor: "rgba(0,0,0,0.62)",
++    justifyContent: "flex-end",
++  },
++  sheet: {
++    backgroundColor: colors.surface,
++    borderTopLeftRadius: 18,
++    borderTopRightRadius: 18,
++    borderWidth: 1,
++    borderColor: colors.border,
++    paddingHorizontal: 18,
++    paddingTop: 16,
++    paddingBottom: 20,
++    maxHeight: "86%",
++    gap: 10,
++  },
++  title: {
++    color: colors.text,
++    fontSize: 20,
++    fontWeight: "800",
++  },
++  subtitle: {
++    color: colors.textMuted,
++    fontSize: 14,
++  },
++  body: {
++    color: colors.textMuted,
++    lineHeight: 20,
++  },
++  stack: { gap: 8 },
++  row: {
++    minHeight: 48,
++    borderRadius: 12,
++    borderWidth: 1,
++    borderColor: colors.border,
++    backgroundColor: colors.bg,
++    justifyContent: "center",
++    paddingHorizontal: 14,
++  },
++  rowText: {
++    color: colors.text,
++    fontWeight: "600",
++    fontSize: 16,
++  },
++  danger: { color: colors.danger },
++  reasons: { maxHeight: 420 },
++  reason: {
++    minHeight: 44,
++    borderRadius: 10,
++    paddingHorizontal: 12,
++    justifyContent: "center",
++    marginBottom: 6,
++    backgroundColor: colors.bg,
++  },
++  reasonOn: {
++    borderWidth: 1,
++    borderColor: colors.accentCyan,
++  },
++  reasonText: { color: colors.text, fontSize: 15 },
++  input: {
++    minHeight: 72,
++    borderWidth: 1,
++    borderColor: colors.border,
++    borderRadius: 10,
++    padding: 10,
++    color: colors.text,
++    marginTop: 8,
++    marginBottom: 12,
++    textAlignVertical: "top",
++  },
++  primary: {
++    backgroundColor: colors.text,
++    borderRadius: 12,
++    minHeight: 48,
++    alignItems: "center",
++    justifyContent: "center",
++  },
++  primaryText: { color: colors.bg, fontWeight: "700", fontSize: 16 },
++  disabled: { opacity: 0.55 },
++  error: { color: colors.danger, lineHeight: 20 },
++  success: { color: colors.success, lineHeight: 22, fontWeight: "600" },
++  close: { minHeight: 44, justifyContent: "center", alignItems: "center" },
++  closeText: { color: colors.accentCyan, fontWeight: "700" },
++});
+diff --git a/components/WatchVideoCard.tsx b/components/WatchVideoCard.tsx
+index 00d2ad4..3073a5c 100644
+--- a/components/WatchVideoCard.tsx
++++ b/components/WatchVideoCard.tsx
+@@ -65,6 +65,9 @@ export type WatchVideoCardProps = {
+   onEnded?: () => void;
+   onToggleLike: () => void;
+   onToggleSave: () => void;
++  /** Owner-only. Hidden unless the viewer owns this post (UAF-12). */
++  onDeleteOwn?: () => void;
++  onOpenSafety?: () => void;
+   onOpenProfile?: () => void;
+   onRefreshSrc?: () => Promise<string | null>;
+   style?: StyleProp<ViewStyle>;
+@@ -423,6 +426,8 @@ function WatchVideoCardComponent({
+   onEnded,
+   onToggleLike,
+   onToggleSave,
++  onDeleteOwn,
++  onOpenSafety,
+   onOpenProfile,
+   onRefreshSrc,
+   style,
+@@ -722,6 +727,29 @@ function WatchVideoCardComponent({
+             <Text style={[styles.actionIcon, styles.disabledIcon]}>↗</Text>
+             <Text style={styles.actionCount}>{video.stats.shares}</Text>
+           </Pressable>
++          <Pressable
++            style={styles.action}
++            onPress={onOpenSafety}
++            disabled={!onOpenSafety}
++            accessibilityRole="button"
++            accessibilityLabel="Report or block"
++            accessibilityHint="Report this video or account, or block the creator"
++            accessibilityState={{ disabled: !onOpenSafety }}
++          >
++            <Text style={styles.actionIcon}>⚑</Text>
++            <Text style={styles.actionCount}>Report</Text>
++          </Pressable>
++          {onDeleteOwn ? (
++            <Pressable
++              style={styles.action}
++              onPress={onDeleteOwn}
++              accessibilityRole="button"
++              accessibilityLabel="Delete your video"
++            >
++              <Text style={[styles.actionIcon, styles.deleteIcon]}>⌫</Text>
++              <Text style={styles.actionCount}>Delete</Text>
++            </Pressable>
++          ) : null}
+         </View>
+ 
+         {/*
+@@ -913,6 +941,9 @@ const styles = StyleSheet.create({
+   disabledIcon: {
+     opacity: 0.45,
+   },
++  deleteIcon: {
++    color: colors.danger,
++  },
+   on: {
+     color: colors.accentViolet,
+   },
+diff --git a/src/lib/feed/watchFeed.ts b/src/lib/feed/watchFeed.ts
+index 744e2d0..ef28517 100644
+--- a/src/lib/feed/watchFeed.ts
++++ b/src/lib/feed/watchFeed.ts
+@@ -10,6 +10,8 @@ import {
+   type WatchFeedPage,
+   type WatchVideo,
+ } from "@/src/contracts/watch";
++import { listUgcBlockIds, toBlockedIdSet } from "@/src/lib/safety/blocks";
++import { filterVideosByBlockedAuthors } from "@/src/lib/safety/ugcPolicy";
+ import { loadViewerInteractionState } from "@/src/lib/social/interactions";
+ 
+ export type VideoPostRow = {
+@@ -196,15 +198,23 @@ export async function fetchWatchFeedPage(
+     data: { user },
+   } = await supabase.auth.getUser();
+ 
++  const blocked = user
++    ? await listUgcBlockIds(supabase)
++    : { ok: true as const, ids: [] as string[] };
++  const blockedIds = toBlockedIdSet(blocked.ok ? blocked.ids : []);
++  const visibleRows = pageRows.filter(
++    (row) => !row.user_id || !blockedIds.has(row.user_id)
++  );
++
+   const viewerState = await loadViewerInteractionState(
+     supabase,
+     user?.id,
+-    pageRows.map((row) => row.id)
++    visibleRows.map((row) => row.id)
+   );
+ 
+   const videos: WatchVideo[] = [];
+ 
+-  for (const row of pageRows) {
++  for (const row of visibleRows) {
+     const playbackUrl = await resolvePlaybackUrl(supabase, row);
+     if (!playbackUrl) continue;
+     const state = viewerState.get(row.id);
+@@ -218,6 +228,8 @@ export async function fetchWatchFeedPage(
+     );
+   }
+ 
++  const filtered = filterVideosByBlockedAuthors(videos, blockedIds);
++
+   const lastRow = pageRows[pageRows.length - 1];
+   const nextCursor: WatchFeedCursor | null =
+     hasMore && lastRow
+@@ -225,7 +237,7 @@ export async function fetchWatchFeedPage(
+       : null;
+ 
+   return {
+-    videos,
++    videos: filtered,
+     nextCursor,
+     usedDemoFallback: false,
+   };
+diff --git a/src/lib/messenger/api.ts b/src/lib/messenger/api.ts
+index e77a95b..39e9e13 100644
+--- a/src/lib/messenger/api.ts
++++ b/src/lib/messenger/api.ts
+@@ -1,6 +1,11 @@
+ import type { SupabaseClient, RealtimeChannel } from "@supabase/supabase-js";
+ 
+ import { getErrorMessage } from "@/src/contracts/validation";
++import { listUgcBlockIds, toBlockedIdSet } from "@/src/lib/safety/blocks";
++import {
++  filterConversationsByBlockedPeers,
++  mapUgcRpcError,
++} from "@/src/lib/safety/ugcPolicy";
+ import { isMessengerBackendMissing } from "@/src/lib/messenger/backend";
+ import { parseConversation } from "@/src/lib/messenger/conversationParse";
+ import {
+@@ -258,7 +263,13 @@ export async function listConversationsForUser(
+       return bTime - aTime;
+     });
+ 
+-  return { ok: true, conversations };
++  const blocked = await listUgcBlockIds(supabase);
++  const blockedIds = toBlockedIdSet(blocked.ok ? blocked.ids : []);
++
++  return {
++    ok: true,
++    conversations: filterConversationsByBlockedPeers(conversations, blockedIds),
++  };
+ }
+ 
+ export async function listMessagesForConversation(
+@@ -322,6 +333,14 @@ export async function getOrCreateDirectConversation(
+   supabase: SupabaseClient,
+   otherUserId: string
+ ): Promise<ActionResult<{ conversationId: string }>> {
++  const blocked = await listUgcBlockIds(supabase);
++  if (blocked.ok && blocked.ids.includes(otherUserId)) {
++    return {
++      ok: false,
++      message: "You cannot message this account because one of you blocked the other.",
++    };
++  }
++
+   const { data, error } = await supabase.rpc(
+     "get_or_create_direct_conversation",
+     { p_other_user_id: otherUserId }
+@@ -343,6 +362,9 @@ export async function getOrCreateDirectConversation(
+     if (message.includes("invalid conversation peer")) {
+       return { ok: false, message: "You cannot message this account." };
+     }
++    if (message.includes("blocked")) {
++      return mapUgcRpcError(error.message, "You cannot message this account.");
++    }
+     return {
+       ok: false,
+       message: getErrorMessage(
+@@ -425,6 +447,12 @@ export async function sendTextMessage(
+     }
+ 
+     console.error("sendTextMessage failed:", error);
++    if ((error.message || "").toLowerCase().includes("blocked")) {
++      return mapUgcRpcError(
++        error.message,
++        "You cannot message this account because one of you blocked the other."
++      );
++    }
+     return {
+       ok: false,
+       message: getErrorMessage(
+@@ -480,6 +508,19 @@ export async function setConversationTyping(
+   return { ok: true, done: true };
+ }
+ 
++export async function getConversationPeerId(
++  supabase: SupabaseClient,
++  conversationId: string
++): Promise<string | null> {
++  const { data, error } = await supabase.rpc("list_conversation_peers", {
++    p_conversation_ids: [conversationId],
++  });
++  if (error) return null;
++  const peers = (data ?? []) as Array<{ conversation_id: string; user_id?: string }>;
++  const peer = peers.find((row) => row.conversation_id === conversationId);
++  return peer?.user_id ?? null;
++}
++
+ export async function getConversationPeerState(
+   supabase: SupabaseClient,
+   conversationId: string
+diff --git a/src/lib/safety/blocks.test.ts b/src/lib/safety/blocks.test.ts
+new file mode 100644
+index 0000000..f76c734
+--- /dev/null
++++ b/src/lib/safety/blocks.test.ts
+@@ -0,0 +1,71 @@
++import { describe, expect, it, vi } from "vitest";
++
++import {
++  blockUgcUser,
++  listMyBlockedUsers,
++  listUgcBlockIds,
++  toBlockedIdSet,
++  unblockUgcUser,
++} from "./blocks";
++
++function mockClient(rpcImpl: (name: string, args?: Record<string, unknown>) => Promise<{
++  data: unknown;
++  error: { message: string } | null;
++}>) {
++  return {
++    rpc: vi.fn(rpcImpl),
++  } as never;
++}
++
++describe("blocks", () => {
++  it("lists interaction block ids and own blocked users", async () => {
++    const supabase = mockClient(async (name) => {
++      if (name === "list_ugc_block_ids") {
++        return { data: ["a", "b"], error: null };
++      }
++      return {
++        data: [
++          {
++            user_id: "a",
++            username: "ada",
++            display_name: "Ada",
++            created_at: "2026-08-13T00:00:00Z",
++          },
++        ],
++        error: null,
++      };
++    });
++
++    const ids = await listUgcBlockIds(supabase);
++    expect(ids).toEqual({ ok: true, ids: ["a", "b"] });
++    const users = await listMyBlockedUsers(supabase);
++    expect(users.ok).toBe(true);
++    if (users.ok) {
++      expect(users.users[0]?.username).toBe("ada");
++    }
++    expect(toBlockedIdSet(["a", ""])).toEqual(new Set(["a"]));
++  });
++
++  it("blocks and unblocks through the RPC contract", async () => {
++    const supabase = mockClient(async (name, args) => {
++      if (name === "block_ugc_user") {
++        expect(args?.p_user_id).toBe("user-9");
++        return { data: "block-1", error: null };
++      }
++      expect(name).toBe("unblock_ugc_user");
++      return { data: true, error: null };
++    });
++
++    const blocked = await blockUgcUser(supabase, "me", "user-9");
++    expect(blocked).toEqual({ ok: true, blockId: "block-1" });
++    const unblocked = await unblockUgcUser(supabase, "user-9");
++    expect(unblocked).toEqual({ ok: true, unblocked: true });
++  });
++
++  it("refuses self-block before calling the backend", async () => {
++    const supabase = mockClient(async () => ({ data: null, error: null }));
++    const result = await blockUgcUser(supabase, "same", "same");
++    expect(result.ok).toBe(false);
++    expect((supabase as { rpc: ReturnType<typeof vi.fn> }).rpc).not.toHaveBeenCalled();
++  });
++});
+diff --git a/src/lib/safety/blocks.ts b/src/lib/safety/blocks.ts
+new file mode 100644
+index 0000000..e4b8fa3
+--- /dev/null
++++ b/src/lib/safety/blocks.ts
+@@ -0,0 +1,98 @@
++import type { SupabaseClient } from "@supabase/supabase-js";
++
++import { canBlockUser, mapUgcRpcError } from "@/src/lib/safety/ugcPolicy";
++import type { SafetyActionResult } from "@/src/lib/safety/reports";
++
++export type BlockedUser = {
++  userId: string;
++  username: string | null;
++  displayName: string | null;
++  createdAt: string;
++};
++
++export async function listUgcBlockIds(
++  supabase: SupabaseClient
++): Promise<SafetyActionResult<{ ids: string[] }>> {
++  const { data, error } = await supabase.rpc("list_ugc_block_ids");
++  if (error) {
++    return mapUgcRpcError(error.message, "Unable to load blocked accounts.");
++  }
++  const ids = Array.isArray(data)
++    ? data.filter((value): value is string => typeof value === "string" && value.length > 0)
++    : [];
++  return { ok: true, ids };
++}
++
++export async function listMyBlockedUsers(
++  supabase: SupabaseClient
++): Promise<SafetyActionResult<{ users: BlockedUser[] }>> {
++  const { data, error } = await supabase.rpc("list_my_blocked_users");
++  if (error) {
++    return mapUgcRpcError(error.message, "Unable to load blocked accounts.");
++  }
++
++  const users: BlockedUser[] = [];
++  for (const row of (data ?? []) as Array<Record<string, unknown>>) {
++    const userId = typeof row.user_id === "string" ? row.user_id : "";
++    if (!userId) continue;
++    users.push({
++      userId,
++      username: typeof row.username === "string" ? row.username : null,
++      displayName: typeof row.display_name === "string" ? row.display_name : null,
++      createdAt: typeof row.created_at === "string" ? row.created_at : "",
++    });
++  }
++  return { ok: true, users };
++}
++
++export async function blockUgcUser(
++  supabase: SupabaseClient,
++  viewerId: string | null | undefined,
++  userId: string
++): Promise<SafetyActionResult<{ blockId: string }>> {
++  const target = userId.trim();
++  if (!canBlockUser(viewerId, target)) {
++    return { ok: false, message: "You cannot block this account." };
++  }
++
++  const { data, error } = await supabase.rpc("block_ugc_user", {
++    p_user_id: target,
++  });
++
++  if (error) {
++    return mapUgcRpcError(error.message, "Unable to block this account. Please try again.");
++  }
++
++  const blockId = typeof data === "string" ? data : data != null ? String(data) : "";
++  if (!blockId) {
++    return { ok: false, message: "Unable to block this account. Please try again." };
++  }
++  return { ok: true, blockId };
++}
++
++export async function unblockUgcUser(
++  supabase: SupabaseClient,
++  userId: string
++): Promise<SafetyActionResult<{ unblocked: boolean }>> {
++  const target = userId.trim();
++  if (!target) {
++    return { ok: false, message: "That account cannot be unblocked." };
++  }
++
++  const { data, error } = await supabase.rpc("unblock_ugc_user", {
++    p_user_id: target,
++  });
++
++  if (error) {
++    return mapUgcRpcError(
++      error.message,
++      "Unable to unblock this account. Please try again."
++    );
++  }
++
++  return { ok: true, unblocked: data === true };
++}
++
++export function toBlockedIdSet(ids: string[] | null | undefined): Set<string> {
++  return new Set((ids ?? []).filter((id) => id.length > 0));
++}
+diff --git a/src/lib/safety/index.ts b/src/lib/safety/index.ts
+new file mode 100644
+index 0000000..70a79f8
+--- /dev/null
++++ b/src/lib/safety/index.ts
+@@ -0,0 +1,31 @@
++export {
++  UGC_ACCOUNT_DELETION_URL,
++  UGC_COMMUNITY_POLICY_URL,
++  UGC_REASON_CODES,
++  UGC_REASON_LABELS,
++  UGC_SIGNUP_TERMS_LABEL,
++  canAcceptTerms,
++  canBlockUser,
++  canReportOwnTarget,
++  filterConversationsByBlockedPeers,
++  filterVideosByBlockedAuthors,
++  isUgcReasonCode,
++  mapUgcRpcError,
++  normalizeReportDetail,
++  shouldHideByBlock,
++  validateReportInput,
++  type UgcReasonCode,
++} from "@/src/lib/safety/ugcPolicy";
++export {
++  reportUgcContent,
++  reportUgcUser,
++  type SafetyActionResult,
++} from "@/src/lib/safety/reports";
++export {
++  blockUgcUser,
++  listMyBlockedUsers,
++  listUgcBlockIds,
++  toBlockedIdSet,
++  unblockUgcUser,
++  type BlockedUser,
++} from "@/src/lib/safety/blocks";
+diff --git a/src/lib/safety/reports.test.ts b/src/lib/safety/reports.test.ts
+new file mode 100644
+index 0000000..148906c
+--- /dev/null
++++ b/src/lib/safety/reports.test.ts
+@@ -0,0 +1,78 @@
++import { describe, expect, it, vi } from "vitest";
++
++import { reportUgcContent, reportUgcUser } from "./reports";
++
++function mockClient(rpcImpl: (name: string, args: Record<string, unknown>) => Promise<{
++  data: unknown;
++  error: { message: string } | null;
++}>) {
++  return {
++    rpc: vi.fn(rpcImpl),
++  } as never;
++}
++
++describe("reportUgcContent", () => {
++  it("rejects invalid post ids and reasons before RPC", async () => {
++    const supabase = mockClient(async () => ({ data: null, error: null }));
++    const badId = await reportUgcContent(supabase, {
++      postId: 0,
++      reasonCode: "spam",
++    });
++    expect(badId.ok).toBe(false);
++    const badReason = await reportUgcContent(supabase, {
++      postId: 12,
++      reasonCode: "nope",
++    });
++    expect(badReason.ok).toBe(false);
++    expect((supabase as { rpc: ReturnType<typeof vi.fn> }).rpc).not.toHaveBeenCalled();
++  });
++
++  it("submits a content report through the existing RPC contract", async () => {
++    const supabase = mockClient(async (name, args) => {
++      expect(name).toBe("report_ugc_content");
++      expect(args).toEqual({
++        p_post_id: 44,
++        p_reason_code: "harassment",
++        p_reason_detail: "mean comments",
++      });
++      return { data: "rep-1", error: null };
++    });
++    const result = await reportUgcContent(supabase, {
++      postId: 44,
++      reasonCode: "harassment",
++      detail: "mean comments",
++    });
++    expect(result).toEqual({ ok: true, reportId: "rep-1" });
++  });
++
++  it("treats duplicate reports as a confirmation, not a crash", async () => {
++    const supabase = mockClient(async () => ({
++      data: null,
++      error: { message: "Already reported" },
++    }));
++    const result = await reportUgcContent(supabase, {
++      postId: 9,
++      reasonCode: "spam",
++    });
++    expect(result.ok).toBe(false);
++    if (!result.ok) {
++      expect(result.duplicate).toBe(true);
++    }
++  });
++});
++
++describe("reportUgcUser", () => {
++  it("submits a user report through the existing RPC contract", async () => {
++    const supabase = mockClient(async (name, args) => {
++      expect(name).toBe("report_ugc_user");
++      expect(args.p_user_id).toBe("user-2");
++      expect(args.p_reason_code).toBe("spam");
++      return { data: "rep-user", error: null };
++    });
++    const result = await reportUgcUser(supabase, {
++      userId: "user-2",
++      reasonCode: "spam",
++    });
++    expect(result).toEqual({ ok: true, reportId: "rep-user" });
++  });
++});
+diff --git a/src/lib/safety/reports.ts b/src/lib/safety/reports.ts
+new file mode 100644
+index 0000000..c124af5
+--- /dev/null
++++ b/src/lib/safety/reports.ts
+@@ -0,0 +1,93 @@
++import type { SupabaseClient } from "@supabase/supabase-js";
++
++import {
++  mapUgcRpcError,
++  validateReportInput,
++  type UgcReasonCode,
++} from "@/src/lib/safety/ugcPolicy";
++
++export type SafetyActionResult<T = Record<string, never>> =
++  | ({ ok: true } & T)
++  | {
++      ok: false;
++      message: string;
++      requiresAuth?: boolean;
++      duplicate?: boolean;
++    };
++
++export async function reportUgcContent(
++  supabase: SupabaseClient,
++  input: {
++    postId: number;
++    reasonCode: UgcReasonCode | string;
++    detail?: string | null;
++  }
++): Promise<SafetyActionResult<{ reportId: string }>> {
++  if (!Number.isFinite(input.postId) || input.postId <= 0) {
++    return { ok: false, message: "That video cannot be reported." };
++  }
++
++  const validated = validateReportInput({
++    reasonCode: input.reasonCode,
++    detail: input.detail,
++  });
++  if (!validated.ok) return validated;
++
++  const { data, error } = await supabase.rpc("report_ugc_content", {
++    p_post_id: input.postId,
++    p_reason_code: validated.reasonCode,
++    p_reason_detail: validated.detail,
++  });
++
++  if (error) {
++    return mapUgcRpcError(
++      error.message,
++      "Unable to send this report. Please try again."
++    );
++  }
++
++  const reportId = typeof data === "string" ? data : data != null ? String(data) : "";
++  if (!reportId) {
++    return { ok: false, message: "Unable to send this report. Please try again." };
++  }
++  return { ok: true, reportId };
++}
++
++export async function reportUgcUser(
++  supabase: SupabaseClient,
++  input: {
++    userId: string;
++    reasonCode: UgcReasonCode | string;
++    detail?: string | null;
++  }
++): Promise<SafetyActionResult<{ reportId: string }>> {
++  const userId = input.userId?.trim();
++  if (!userId) {
++    return { ok: false, message: "That account cannot be reported." };
++  }
++
++  const validated = validateReportInput({
++    reasonCode: input.reasonCode,
++    detail: input.detail,
++  });
++  if (!validated.ok) return validated;
++
++  const { data, error } = await supabase.rpc("report_ugc_user", {
++    p_user_id: userId,
++    p_reason_code: validated.reasonCode,
++    p_reason_detail: validated.detail,
++  });
++
++  if (error) {
++    return mapUgcRpcError(
++      error.message,
++      "Unable to send this report. Please try again."
++    );
++  }
++
++  const reportId = typeof data === "string" ? data : data != null ? String(data) : "";
++  if (!reportId) {
++    return { ok: false, message: "Unable to send this report. Please try again." };
++  }
++  return { ok: true, reportId };
++}
+diff --git a/src/lib/safety/ugcPolicy.test.ts b/src/lib/safety/ugcPolicy.test.ts
+new file mode 100644
+index 0000000..a4f77f3
+--- /dev/null
++++ b/src/lib/safety/ugcPolicy.test.ts
+@@ -0,0 +1,87 @@
++import { describe, expect, it } from "vitest";
++
++import {
++  UGC_ACCOUNT_DELETION_URL,
++  UGC_COMMUNITY_POLICY_URL,
++  UGC_REASON_CODES,
++  UGC_SIGNUP_TERMS_LABEL,
++  canAcceptTerms,
++  canBlockUser,
++  canReportOwnTarget,
++  filterConversationsByBlockedPeers,
++  filterVideosByBlockedAuthors,
++  mapUgcRpcError,
++  shouldHideByBlock,
++  validateReportInput,
++} from "./ugcPolicy";
++
++describe("ugcPolicy", () => {
++  it("requires explicit terms acceptance", () => {
++    expect(canAcceptTerms(false)).toBe(false);
++    expect(canAcceptTerms(true)).toBe(true);
++    expect(UGC_SIGNUP_TERMS_LABEL).toMatch(/Terms/);
++    expect(UGC_COMMUNITY_POLICY_URL).toBe("https://umtuba.com/terms");
++    expect(UGC_ACCOUNT_DELETION_URL).toBe("https://umtuba.com/account-deletion");
++  });
++
++  it("validates report reasons and trims detail", () => {
++    expect(validateReportInput({ reasonCode: null }).ok).toBe(false);
++    expect(validateReportInput({ reasonCode: "not-a-reason" }).ok).toBe(false);
++    const ok = validateReportInput({
++      reasonCode: "spam",
++      detail: "  too many ads  ",
++    });
++    expect(ok).toEqual({
++      ok: true,
++      reasonCode: "spam",
++      detail: "too many ads",
++    });
++    expect(UGC_REASON_CODES).toContain("harassment");
++  });
++
++  it("forbids self-report and self-block", () => {
++    expect(canReportOwnTarget("a", "a")).toBe(false);
++    expect(canReportOwnTarget("a", "b")).toBe(true);
++    expect(canBlockUser("a", "a")).toBe(false);
++    expect(canBlockUser("a", "b")).toBe(true);
++    expect(canBlockUser(null, "b")).toBe(false);
++  });
++
++  it("hides blocked authors and conversation peers", () => {
++    const blocked = new Set(["blocked-1"]);
++    expect(shouldHideByBlock("blocked-1", blocked)).toBe(true);
++    expect(shouldHideByBlock("safe", blocked)).toBe(false);
++    expect(shouldHideByBlock(null, blocked)).toBe(false);
++
++    const videos = filterVideosByBlockedAuthors(
++      [
++        { id: "1", author: { id: "blocked-1" } },
++        { id: "2", author: { id: "safe" } },
++        { id: "3", author: { id: null } },
++      ],
++      blocked
++    );
++    expect(videos.map((v) => v.id)).toEqual(["2", "3"]);
++
++    const conversations = filterConversationsByBlockedPeers(
++      [
++        { id: "c1", peerId: "blocked-1" },
++        { id: "c2", peerId: "safe" },
++      ],
++      blocked
++    );
++    expect(conversations.map((c) => c.id)).toEqual(["c2"]);
++  });
++
++  it("maps backend report/block errors for confirmation UX", () => {
++    expect(mapUgcRpcError("Already reported", "x")).toMatchObject({
++      ok: false,
++      duplicate: true,
++    });
++    expect(mapUgcRpcError("Authentication required", "x").requiresAuth).toBe(true);
++    expect(mapUgcRpcError("Too many reports", "x").message).toMatch(/later/i);
++    expect(mapUgcRpcError("Cannot message a blocked user", "x").message).toMatch(
++      /blocked/
++    );
++  });
++});
+diff --git a/src/lib/safety/ugcPolicy.ts b/src/lib/safety/ugcPolicy.ts
+new file mode 100644
+index 0000000..0b92783
+--- /dev/null
++++ b/src/lib/safety/ugcPolicy.ts
+@@ -0,0 +1,145 @@
++import { SUPPORT_LINKS } from "@/src/lib/settings/supportLinks";
++
++export const UGC_REASON_CODES = [
++  "spam",
++  "harassment",
++  "hate",
++  "sexual",
++  "violence",
++  "illegal",
++  "impersonation",
++  "other",
++] as const;
++
++export type UgcReasonCode = (typeof UGC_REASON_CODES)[number];
++
++export const UGC_REASON_LABELS: Record<UgcReasonCode, string> = {
++  spam: "Spam or misleading",
++  harassment: "Harassment or bullying",
++  hate: "Hate or discrimination",
++  sexual: "Sexual content or exploitation",
++  violence: "Violence or threats",
++  illegal: "Illegal activity",
++  impersonation: "Impersonation",
++  other: "Something else",
++};
++
++export const UGC_COMMUNITY_POLICY_URL = SUPPORT_LINKS.terms;
++export const UGC_ACCOUNT_DELETION_URL = SUPPORT_LINKS.accountDeletion;
++
++export const UGC_SIGNUP_TERMS_LABEL =
++  "I agree to the UMTUBA Terms and community rules.";
++
++export const MAX_REPORT_DETAIL_LENGTH = 1000;
++
++export function isUgcReasonCode(value: string | null | undefined): value is UgcReasonCode {
++  return (
++    typeof value === "string" &&
++    (UGC_REASON_CODES as readonly string[]).includes(value)
++  );
++}
++
++export function canAcceptTerms(acknowledged: boolean): boolean {
++  return acknowledged === true;
++}
++
++export function normalizeReportDetail(
++  raw: string | null | undefined
++): string | null {
++  if (raw == null) return null;
++  const trimmed = raw.trim();
++  if (!trimmed) return null;
++  return trimmed.slice(0, MAX_REPORT_DETAIL_LENGTH);
++}
++
++export function validateReportInput(input: {
++  reasonCode: string | null | undefined;
++  detail?: string | null;
++}): { ok: true; reasonCode: UgcReasonCode; detail: string | null } | { ok: false; message: string } {
++  if (!isUgcReasonCode(input.reasonCode)) {
++    return { ok: false, message: "Choose a reason for this report." };
++  }
++  const detail = normalizeReportDetail(input.detail);
++  if (detail && detail.length > MAX_REPORT_DETAIL_LENGTH) {
++    return { ok: false, message: "Report details are too long." };
++  }
++  return { ok: true, reasonCode: input.reasonCode, detail };
++}
++
++export function canReportOwnTarget(viewerId: string | null | undefined, targetUserId: string | null | undefined): boolean {
++  if (!viewerId || !targetUserId) return true;
++  return viewerId !== targetUserId;
++}
++
++export function canBlockUser(viewerId: string | null | undefined, targetUserId: string | null | undefined): boolean {
++  if (!viewerId || !targetUserId) return false;
++  return viewerId !== targetUserId;
++}
++
++export function shouldHideByBlock(
++  actorId: string | null | undefined,
++  blockedIds: ReadonlySet<string>
++): boolean {
++  if (!actorId) return false;
++  return blockedIds.has(actorId);
++}
++
++export function filterVideosByBlockedAuthors<T extends { author: { id: string | null } }>(
++  videos: T[],
++  blockedIds: ReadonlySet<string>
++): T[] {
++  if (blockedIds.size === 0) return videos;
++  return videos.filter((video) => !shouldHideByBlock(video.author.id, blockedIds));
++}
++
++export function filterConversationsByBlockedPeers<T extends { peerId: string }>(
++  conversations: T[],
++  blockedIds: ReadonlySet<string>
++): T[] {
++  if (blockedIds.size === 0) return conversations;
++  return conversations.filter((conversation) => !blockedIds.has(conversation.peerId));
++}
++
++export function mapUgcRpcError(message: string | null | undefined, fallback: string): {
++  ok: false;
++  message: string;
++  requiresAuth?: boolean;
++  duplicate?: boolean;
++} {
++  const lower = (message || "").toLowerCase();
++  if (lower.includes("authentication required")) {
++    return { ok: false, message: "Please sign in to continue.", requiresAuth: true };
++  }
++  if (lower.includes("already reported")) {
++    return {
++      ok: false,
++      message: "You already reported this. Thanks — we will review it.",
++      duplicate: true,
++    };
++  }
++  if (lower.includes("already blocked") || lower.includes("duplicate key")) {
++    return { ok: false, message: "This account is already blocked." };
++  }
++  if (lower.includes("cannot report your own") || lower.includes("cannot report yourself")) {
++    return { ok: false, message: "You cannot report your own account or content." };
++  }
++  if (lower.includes("cannot block yourself")) {
++    return { ok: false, message: "You cannot block your own account." };
++  }
++  if (lower.includes("cannot message a blocked user")) {
++    return {
++      ok: false,
++      message: "You cannot message this account because one of you blocked the other.",
++    };
++  }
++  if (lower.includes("content not found") || lower.includes("user not found")) {
++    return { ok: false, message: "That content or account is no longer available." };
++  }
++  if (lower.includes("too many reports")) {
++    return { ok: false, message: "Too many reports in a short time. Try again later." };
++  }
++  if (lower.includes("invalid reason") || lower.includes("reason detail")) {
++    return { ok: false, message: "Choose a valid report reason." };
++  }
++  return { ok: false, message: fallback };
++}
+diff --git a/src/lib/social/deleteOwnedPost.test.ts b/src/lib/social/deleteOwnedPost.test.ts
+new file mode 100644
+index 0000000..099380a
+--- /dev/null
++++ b/src/lib/social/deleteOwnedPost.test.ts
+@@ -0,0 +1,143 @@
++import { describe, expect, it, vi, beforeEach } from "vitest";
++
++import { deleteOwnedVideoObject } from "@/src/lib/video/deleteOwnedVideo";
++
++import { deletePostForOwner } from "./deleteOwnedPost";
++import {
++  applySuccessfulDeleteToList,
++  OWN_CONTENT_DELETE_ERRORS,
++  viewerMaySeeDeleteControl,
++} from "./deleteOwnedPostShared";
++
++const OWNER = "11111111-1111-4111-8111-111111111111";
++const OTHER = "22222222-2222-4222-8222-222222222222";
++
++vi.mock("@/src/lib/video/deleteOwnedVideo", () => ({
++  deleteOwnedVideoObject: vi.fn(async () => undefined),
++}));
++
++function createSupabaseMock(options: {
++  load: { data: unknown; error: unknown };
++  deleted?: { data: unknown; error: unknown };
++}) {
++  let postsCalls = 0;
++  const from = vi.fn(() => {
++    postsCalls += 1;
++    if (postsCalls === 1) {
++      return {
++        select: vi.fn().mockReturnValue({
++          eq: vi.fn().mockReturnValue({
++            maybeSingle: vi.fn(async () => options.load),
++          }),
++        }),
++      };
++    }
++    return {
++      delete: vi.fn().mockReturnValue({
++        eq: vi.fn().mockReturnValue({
++          eq: vi.fn().mockReturnValue({
++            select: vi.fn(async () =>
++              options.deleted ?? { data: [{ id: 42 }], error: null }
++            ),
++          }),
++        }),
++      }),
++    };
++  });
++
++  return { from };
++}
++
++describe("UAF-12 own content delete — mobile consume", () => {
++  beforeEach(() => {
++    vi.clearAllMocks();
++  });
++
++  it("shows the delete control only to the owner", () => {
++    expect(viewerMaySeeDeleteControl(OWNER, OWNER)).toBe(true);
++    expect(viewerMaySeeDeleteControl(OTHER, OWNER)).toBe(false);
++    expect(viewerMaySeeDeleteControl(null, OWNER)).toBe(false);
++    expect(viewerMaySeeDeleteControl(undefined, OWNER)).toBe(false);
++    expect(viewerMaySeeDeleteControl("", OWNER)).toBe(false);
++  });
++
++  it("rejects anonymous or invalid viewer ids before load", async () => {
++    const supabase = createSupabaseMock({
++      load: { data: null, error: null },
++    });
++    const anonymous = await deletePostForOwner(supabase as never, "", 42);
++    expect(anonymous).toEqual({
++      ok: false,
++      code: "auth_required",
++      message: OWN_CONTENT_DELETE_ERRORS.authRequired,
++    });
++    const invalid = await deletePostForOwner(
++      supabase as never,
++      "not-a-uuid",
++      42
++    );
++    expect(invalid).toEqual({
++      ok: false,
++      code: "auth_required",
++      message: OWN_CONTENT_DELETE_ERRORS.authRequired,
++    });
++    expect(supabase.from).not.toHaveBeenCalled();
++  });
++
++  it("rejects a non-owner after load", async () => {
++    const supabase = createSupabaseMock({
++      load: {
++        data: {
++          id: 42,
++          user_id: OWNER,
++          post_type: "video",
++          video_path: `${OWNER}/clip.mp4`,
++          thumbnail_path: null,
++        },
++        error: null,
++      },
++    });
++    const result = await deletePostForOwner(supabase as never, OTHER, 42);
++    expect(result).toEqual({
++      ok: false,
++      code: "not_owner",
++      message: OWN_CONTENT_DELETE_ERRORS.notOwner,
++    });
++  });
++
++  it("deletes when the signed-in user owns the post", async () => {
++    const supabase = createSupabaseMock({
++      load: {
++        data: {
++          id: 42,
++          user_id: OWNER,
++          post_type: "video",
++          video_path: `${OWNER}/clip.mp4`,
++          thumbnail_path: null,
++        },
++        error: null,
++      },
++    });
++    const result = await deletePostForOwner(supabase as never, OWNER, 42);
++    expect(result).toEqual({
++      ok: true,
++      postId: 42,
++      postType: "video",
++    });
++    expect(deleteOwnedVideoObject).toHaveBeenCalledWith(
++      supabase,
++      OWNER,
++      `${OWNER}/clip.mp4`
++    );
++  });
++
++  it("removes the item from a list only after success", () => {
++    const items = [{ id: 1 }, { id: 2 }];
++    expect(
++      applySuccessfulDeleteToList(items, (row) => row.id === 1, false)
++    ).toEqual(items);
++    expect(
++      applySuccessfulDeleteToList(items, (row) => row.id === 1, true)
++    ).toEqual([{ id: 2 }]);
++  });
++});
+diff --git a/src/lib/social/deleteOwnedPost.ts b/src/lib/social/deleteOwnedPost.ts
+new file mode 100644
+index 0000000..e868e52
+--- /dev/null
++++ b/src/lib/social/deleteOwnedPost.ts
+@@ -0,0 +1,123 @@
++/**
++ * Owner-only delete for published Watch posts.
++ * Same posts table + ownership filter as web UAF-12. No new backend.
++ */
++
++import type { SupabaseClient } from "@supabase/supabase-js";
++
++import { deleteOwnedVideoObject } from "@/src/lib/video/deleteOwnedVideo";
++import {
++  OWN_CONTENT_DELETE_ERRORS,
++  isUuid,
++  type DeleteOwnedPostResult,
++} from "@/src/lib/social/deleteOwnedPostShared";
++
++export {
++  applySuccessfulDeleteToList,
++  OWN_CONTENT_DELETE_ERRORS,
++  viewerMaySeeDeleteControl,
++  type DeleteOwnedPostCode,
++  type DeleteOwnedPostResult,
++} from "@/src/lib/social/deleteOwnedPostShared";
++
++type LoadedPost = {
++  id: number;
++  user_id: string | null;
++  post_type: string | null;
++  video_path: string | null;
++  thumbnail_path: string | null;
++};
++
++export async function deletePostForOwner(
++  supabase: SupabaseClient,
++  userId: string,
++  postId: number
++): Promise<DeleteOwnedPostResult> {
++  if (!isUuid(userId)) {
++    return {
++      ok: false,
++      code: "auth_required",
++      message: OWN_CONTENT_DELETE_ERRORS.authRequired,
++    };
++  }
++
++  if (!Number.isInteger(postId) || postId <= 0) {
++    return {
++      ok: false,
++      code: "invalid",
++      message: OWN_CONTENT_DELETE_ERRORS.invalid,
++    };
++  }
++
++  const { data: existing, error: loadError } = await supabase
++    .from("posts")
++    .select("id, user_id, post_type, video_path, thumbnail_path")
++    .eq("id", postId)
++    .maybeSingle();
++
++  if (loadError) {
++    console.error("deletePostForOwner load error:", loadError.message);
++    return {
++      ok: false,
++      code: "delete_failed",
++      message: OWN_CONTENT_DELETE_ERRORS.deleteFailed,
++    };
++  }
++
++  if (!existing) {
++    return {
++      ok: false,
++      code: "not_found",
++      message: OWN_CONTENT_DELETE_ERRORS.notFound,
++    };
++  }
++
++  const post = existing as LoadedPost;
++
++  if (post.user_id !== userId) {
++    return {
++      ok: false,
++      code: "not_owner",
++      message: OWN_CONTENT_DELETE_ERRORS.notOwner,
++    };
++  }
++
++  const { data: removed, error: deleteError } = await supabase
++    .from("posts")
++    .delete()
++    .eq("id", postId)
++    .eq("user_id", userId)
++    .select("id");
++
++  if (deleteError) {
++    console.error("deletePostForOwner delete error:", deleteError.message);
++    return {
++      ok: false,
++      code: "delete_failed",
++      message: OWN_CONTENT_DELETE_ERRORS.deleteFailed,
++    };
++  }
++
++  if (!Array.isArray(removed) || removed.length === 0) {
++    return {
++      ok: false,
++      code: "delete_failed",
++      message: OWN_CONTENT_DELETE_ERRORS.deleteFailed,
++    };
++  }
++
++  const videoPath = post.video_path?.trim() || "";
++  if (videoPath) {
++    await deleteOwnedVideoObject(supabase, userId, videoPath);
++  }
++  const thumbnailPath = post.thumbnail_path?.trim() || "";
++  if (thumbnailPath && thumbnailPath !== videoPath) {
++    await deleteOwnedVideoObject(supabase, userId, thumbnailPath);
++  }
++
++  return {
++    ok: true,
++    postId,
++    postType: (post.post_type || "text").trim() || "text",
++  };
++}
+diff --git a/src/lib/social/deleteOwnedPostShared.ts b/src/lib/social/deleteOwnedPostShared.ts
+new file mode 100644
+index 0000000..2d9737c
+--- /dev/null
++++ b/src/lib/social/deleteOwnedPostShared.ts
+@@ -0,0 +1,52 @@
++/**
++ * Shared UAF-12 own-content delete contract (consumed from web, not a second backend).
++ * Server/RLS remain the authorization source. UI hiding is not sufficient.
++ */
++
++const UUID_RE =
++  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
++
++export function isUuid(value: string | null | undefined): value is string {
++  return typeof value === "string" && UUID_RE.test(value);
++}
++
++export const OWN_CONTENT_DELETE_ERRORS = {
++  authRequired: "Please sign in to delete this.",
++  notOwner: "You can only delete your own content.",
++  notFound: "This content is no longer available.",
++  deleteFailed: "Unable to delete this. Please try again.",
++  invalid: "Invalid content.",
++} as const;
++
++export type DeleteOwnedPostCode =
++  | "auth_required"
++  | "not_owner"
++  | "not_found"
++  | "delete_failed"
++  | "invalid";
++
++export type DeleteOwnedPostResult =
++  | { ok: true; postId: number; postType: string }
++  | { ok: false; message: string; code: DeleteOwnedPostCode };
++
++/** UI-only visibility. Server/RLS remain the authorization source. */
++export function viewerMaySeeDeleteControl(
++  viewerId: string | null | undefined,
++  ownerUserId: string | null | undefined
++): boolean {
++  if (!isUuid(viewerId) || !isUuid(ownerUserId)) {
++    return false;
++  }
++  return viewerId === ownerUserId;
++}
++
++export function applySuccessfulDeleteToList<T>(
++  items: T[],
++  shouldRemove: (item: T) => boolean,
++  succeeded: boolean
++): T[] {
++  if (!succeeded) {
++    return items;
++  }
++  return items.filter((item) => !shouldRemove(item));
++}
+diff --git a/src/lib/video/ugcSafety.test.ts b/src/lib/video/ugcSafety.test.ts
+index 3c9f1b1..d395645 100644
+--- a/src/lib/video/ugcSafety.test.ts
++++ b/src/lib/video/ugcSafety.test.ts
+@@ -12,5 +12,6 @@ describe("ugcSafety", () => {
+     expect(canPublishWithUgcAck(true)).toBe(true);
+     expect(UGC_TERMS_URL).toBe("https://umtuba.com/terms");
+     expect(UGC_PUBLISH_ACK_LABEL).toMatch(/Terms/);
++    expect(UGC_PUBLISH_ACK_LABEL).toMatch(/community rules/);
+   });
+ });
+diff --git a/src/lib/video/ugcSafety.ts b/src/lib/video/ugcSafety.ts
+index 42ecdd9..27132de 100644
+--- a/src/lib/video/ugcSafety.ts
++++ b/src/lib/video/ugcSafety.ts
+@@ -1,11 +1,12 @@
+ import { SUPPORT_LINKS } from "@/src/lib/settings/supportLinks";
++import { canAcceptTerms } from "@/src/lib/safety/ugcPolicy";
+ 
+-/** Required App Store UGC acknowledgment before a first publish. */
++/** Required App Store / Play UGC acknowledgment before a first publish. */
+ export const UGC_PUBLISH_ACK_LABEL =
+-  "I confirm this video follows UMTUBA Terms and does not include objectionable content.";
++  "I confirm this video follows UMTUBA Terms and community rules and does not include objectionable content.";
+ 
+ export const UGC_TERMS_URL = SUPPORT_LINKS.terms;
+ 
+ export function canPublishWithUgcAck(acknowledged: boolean): boolean {
+-  return acknowledged === true;
++  return canAcceptTerms(acknowledged);
+ }

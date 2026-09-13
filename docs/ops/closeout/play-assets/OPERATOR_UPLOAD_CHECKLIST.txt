@@ -1,0 +1,50 @@
+OPERATOR UPLOAD CHECKLIST — no AAB, no Apply for production
+Play binary on store = versionCode 3. Do not claim Safety / report / block / Terms-before-publish / in-app delete.
+
+LOCAL PACKAGE = docs/ops/closeout/play-assets/  (web repo; not Windows Desktop)
+
+UPLOAD NOW (files exist locally; not uploaded this session)
+  [ ] Hi-res icon = icon-512x512.png
+      512x512 PNG + alpha, 78796 bytes
+      SHA256 9e3d0315a33c6799de601dd34cd8bf8cc3a8d16f3bf75592baec2ceb7240b391
+      Do NOT upload umtuba-mobile/assets/images/icon.png (1024 construction-grid).
+  [ ] Feature graphic = feature-graphic-1024x500.png
+      1024x500 24-bit PNG no alpha, 86710 bytes
+      SHA256 bc380a16ca86a883530db0a0fc3efa669866a2f89866146f0ba988ac5ac6c1da
+
+CAPTURE THEN UPLOAD (files do not exist; do not fabricate)
+  [ ] >=2 real-device Internal Testing v3 phone screenshots (recommended 4 portrait 1080x1920)
+      Watch / Discover / Create / Messages
+      Like/Save only. No Report. No Block. No Terms checkbox. No in-app Delete.
+      JPEG or 24-bit PNG. Each side 320-3840. Longest <= 2x shortest.
+      No youthful cartoon. No Play badges. Edit notification bar (no carrier name).
+      Drop as phone-01-watch.png … phone-04-messages.png then upload.
+  [ ] Tablet 7-inch / 10-inch ONLY if Console marks those slots required. Do not invent.
+
+SAVE PASTE-READY CARDS (text is in this folder; not saved to Play this session)
+  [ ] Short description = PASTE_SHORT_DESCRIPTION.txt (66/80). No Safety sentence.
+  [ ] Full description = PASTE_FULL_DESCRIPTION.txt. Do not paste mobile v4 MAIN_STORE_LISTING.txt.
+  [ ] Ads = PASTE_ADS.txt → No, my app does not contain ads
+  [ ] IARC = PASTE_IARC.txt → honest v3; moderation NO
+  [ ] UGC = PASTE_UGC.txt → honest NO for report/block/terms
+  [ ] Account deletion URL = PASTE_ACCOUNT_DELETION.txt → https://umtuba.com/account-deletion
+      Skip if Publishing overview already shows Account deletion complete.
+      Do not paste /privacy or /.
+  [ ] Category Social + website https://umtuba.com + existing developer contact = PASTE_SUPPORT_CONTACT.txt
+      Do not invent support@. Do not use the Play reviewer mailbox.
+  [ ] Countries = PASTE_COUNTRIES.txt → confirm Closed Testing all-available
+  [ ] News/COVID/Government/Financial/Health = PASTE_CONTENT_DECLARATIONS.txt → all NO
+  [ ] Target audience remainder = PASTE_TARGET_AUDIENCE_REMAINDER.txt
+      Do not change ages 13-15 / 16-17 / 18+.
+
+OCR ONLY (do not generate a new upload key)
+  [ ] App signing = PASTE_APP_SIGNING.txt → Test and release → Setup → App signing
+
+DO NOT
+  [ ] Upload versionCode 4 AAB
+  [ ] Upload versionCode 5 AAB (does not exist)
+  [ ] Apply for production
+  [ ] Reopen Data Safety, App Access, or the three target-age boxes
+  [ ] Paste mobile release-artifacts/store-listing/ v4 YES packets
+  [ ] Mock Safety / Report / Block / Terms / Delete-account screenshots
+  [ ] Change https://umtuba.com/privacy (already live HTTP 200)

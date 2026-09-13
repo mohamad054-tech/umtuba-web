@@ -1,0 +1,1217 @@
+[
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\sanitation-backups\\phase3-shared-ai-surface-clean-files-20260805-153058\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\sanitation-backups\\phase3-shared-ai-surface-files-20260805-153058\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  2,
+        "shas":  "71dfec204dd06a0058918831aac1e937108f4de8,3b88b01036269b60410d41830fd24b2af85af091"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web\\worktrees\\DESKTOP-A2\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-anthropic-adapter-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-audit-readonly\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-capability-catalog-service-registry-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-core-gemini-adapter-recovery-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-creator-studio-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-data-platform-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-data-platform-workflow-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-gemini-adapter-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-local-adapter-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-policy-governance-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-provider-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-service-orchestration-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-streaming-port-to-creator-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-tutor-provider-reconciliation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  3,
+        "shas":  "62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3,9e90448ce8e4566fd369476a2571844378b0950c,01f23d9a584d7b970788fd71444faf6979f25330"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-unified-capability-execution-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-usage-quotas-billing-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-learning-link-unlink-local-e2e-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-login-nav-reverif-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-settings-lifecycle-ui-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "cfd8a2889edab7a1767fba8716cce975ffe75def"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-workspace-ui-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "cfd8a2889edab7a1767fba8716cce975ffe75def"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-catalog-category-taxonomy-seed-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-migration-apply-readiness-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-migration-apply-readiness-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-remote-preflight-recheck-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-decomposition-bridge-apply-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-decomposition-bridge-apply-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-policy-activation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-policy-activation-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-completion-audit-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-live-payment-production-gate-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-live-payment-production-gate-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-marketplace-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "302e32f98bef66b7b04b732d1dbf587073a5aca6"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-migration-history-drift-verification-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-migration-history-repair-apply-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-committed-reservation-compensation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-ledger-service-adapter-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-path-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-provider-money-execution-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-actions-wiring-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-stuck-committing-recovery-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-product-production-readiness-audit-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-production-integration-preparation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-production-readiness-docs-gate-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-refund-operations-surface-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-refund-operations-surface-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-blocker-remediation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-preflight-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-preflight-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-provider-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-provider-v1-sot\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-payout-rails-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-payout-rails-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-settlement-migration-remote-apply-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-sot-unification-stock-drift-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-stripe-production-gate-readiness-v2\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-supplier-listing-create-hardening-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-transactional-notifications-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-transactional-notifications-v1-current\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-gemini-live-provider-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-alpha-beta-productization-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w1-revenue\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "6fac4409f217b6e7d28b2ff4c0a2dab453f45427"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w2-commerce\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "6fac4409f217b6e7d28b2ff4c0a2dab453f45427"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w3-ai\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "6fac4409f217b6e7d28b2ff4c0a2dab453f45427"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w3-alpha-final\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w4-alpha-stabilization\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-knowledge-acquisition-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-smoke-e2e-readiness-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "cfd8a2889edab7a1767fba8716cce975ffe75def"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-attachments-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-spine-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-instructor-browser-e2e-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-instructor-ui-contract-suite-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-platform-app-shell-translation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-platform-i18n-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-deployment-runtime-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-execution-boundary-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-invocation-orchestration-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-request-contracts-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-provider-adapter-boundary-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-provider-routing-policy-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-runtime-operations-failover-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-workflow-lifecycle-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-workflow-lifecycle-v1-final\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-accessibility-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "529783b7309fe43b166c6cd95a850ff2ae89851b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-creator-space-ia-rename-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "549018dcadbf9ceea319428da48a6dba117de162"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-empty-states-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "f9bbf2a13f418170db0448495a713460514574b3"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-error-states-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "34cd4fd713e255dca31b21fde0d965c1361cb55f"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-hero-joined-label-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "4436fad2b07554aa528057d9ad4abe77647e4963"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-hero-social-links-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  2,
+        "shas":  "03fe5e7e78cf4239317551671c7c33206523def7,8ca12b7c1d783ec079274fb61721f9c00c17c421"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-identity-achievements-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  2,
+        "shas":  "03fe5e7e78cf4239317551671c7c33206523def7,f574eba902ee424d944bf85d913fad80108dc83b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-identity-strip-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  2,
+        "shas":  "03fe5e7e78cf4239317551671c7c33206523def7"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-loading-states-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "7b321eefaa354e993c4ef5cb746bf3aaefc299db"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-tab-overflow-fade-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "54f4120bf7fdd2bdb364a448497c6072d8e1a464"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-revenue-platform-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "6fac4409f217b6e7d28b2ff4c0a2dab453f45427"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1-clean\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1-final\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-intelligence-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-learning-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-app-shell-ingestion-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-foundation-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-persistence-workflow-v1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "aced43c844d93e0bae6cbb6a53cae25698c3cdad"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A1-AI-SHARED-CORE-VALIDATION-V1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A2\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A2-REGRESSION\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A3\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-GAMES-PAGE-COMPOSITION-V1\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\_backup-shared-ai-mixed-20260731-141004\\docs\\ai\\PROJECT_STATE.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\sanitation-backups\\phase3-private-ai-workflow-lifecycle-files-20260805-153058\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\sanitation-backups\\phase3-shared-ai-surface-clean-files-20260805-153058\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\sanitation-backups\\phase3-shared-ai-surface-files-20260805-153058\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  4,
+        "shas":  "434ee28f0e094b33f83bf1a94e135a2f48596e5b,3b88b01036269b60410d41830fd24b2af85af091,6061a6ae22eb8a323e51af63ecdcf9b655177d37"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web\\worktrees\\DESKTOP-A2\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-anthropic-adapter-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "2867a5e90119aa152cbec5dd868207b38d1d474b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-audit-readonly\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "daeb4408a8f9794feb1fc8a6967ecdfa082aea53"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-capability-catalog-service-registry-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-core-gemini-adapter-recovery-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "3d6dd6dafccb8e75dcc4f788546421e0695eb633"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-creator-studio-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-data-platform-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-data-platform-workflow-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-gemini-adapter-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "3d6dd6dafccb8e75dcc4f788546421e0695eb633"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-local-adapter-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "fe07a1cde0bd90761c21eda4c9277b1077767e0c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-policy-governance-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-provider-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6cbe0f68f418141ac887c99bf40e21eb1d0d27de"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-service-orchestration-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-streaming-port-to-creator-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  2,
+        "shas":  "aaccac3fd445de1c92e2e916dc081eeeddd7370b,0a04d59600dfe8e7296a47068ff23f09fdfbadd8"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-tutor-provider-reconciliation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  5,
+        "shas":  "62cd3eb2d4edfc624d3ac02c0ee3229d3330a6d3,9e90448ce8e4566fd369476a2571844378b0950c,01f23d9a584d7b970788fd71444faf6979f25330,a8010c5f578ce3aa1af50613b0144c8b220cd63c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-unified-capability-execution-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-ai-usage-quotas-billing-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-learning-link-unlink-local-e2e-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "50fc34e8e0270f7e2ee46e0b710f670d51a044ae"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-login-nav-reverif-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "47e8251b61819574ac640c2047d6996f9539951b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-settings-lifecycle-ui-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "616d4f7710e9b2c3db7b9dc1384111f4887a0fce"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-collaboration-workspace-ui-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  5,
+        "shas":  "cfd8a2889edab7a1767fba8716cce975ffe75def,c3168eff3a324979efa5cab694e294c4daeeb4da,321e7e8de95d81efecfa423b7c515d36afa84a75,c3bf87e7f6ec2cbcb0b8e1812c0cac58b20594af"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-catalog-category-taxonomy-seed-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-migration-apply-readiness-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  2,
+        "shas":  "be87fb30c2c7ba15d66f8540e5e6c57e181649f6,6875847eddc1e832b542135babce50eb036bd4ca"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-migration-apply-readiness-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-chain-remote-preflight-recheck-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-decomposition-bridge-apply-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "306a023c0aee59437b001c849b464c67f7491dc7"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-decomposition-bridge-apply-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-policy-activation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "7d90a0569e49f789f26159565125ad78b4ffd992"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-commission-policy-activation-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-completion-audit-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "100c98ea1412599535c2bb25e69b19bfa71790f8"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-digital-entitlement-revoke-on-refund-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-live-payment-production-gate-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "ca157d716348ba107f546e453602eae7c48ec989"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-live-payment-production-gate-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-marketplace-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-migration-history-drift-verification-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-migration-history-repair-apply-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-committed-reservation-compensation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "ddfc0130d12323d2549eca01527cc0d309c30bd6"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "c902eb9934633d7ca31db8f3eea1b4766668c4a4"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-ledger-service-adapter-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "078e26441ef8a33b9481f28d1d6d685a52c60776"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-path-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6b1dc297ba80c362fda7d97820390baf925b7c84"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-provider-money-execution-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "5d4bf186efc3eff55431127965a0666e4c4ff512"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-actions-wiring-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6a2420e829280aa951f4f87150c820d6b6c45e04"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-reservation-stuck-committing-recovery-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "191924178723f1ee9d3f5e42dba966451e735a0e"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-partial-refund-rpc-remote-apply-readiness-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "79f15131d6defebe950d942a189ee05b35306082"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-product-production-readiness-audit-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-production-integration-preparation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-production-readiness-docs-gate-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-refund-operations-surface-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-refund-operations-surface-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-blocker-remediation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-preflight-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6875847eddc1e832b542135babce50eb036bd4ca"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-remote-migration-preflight-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "3ebe1841ee04db9cc9d58f15b1080965854fd7fe"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-provider-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-live-payout-provider-v1-sot\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "191924178723f1ee9d3f5e42dba966451e735a0e"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-payout-rails-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-seller-payout-rails-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-settlement-migration-remote-apply-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-sot-unification-stock-drift-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-stripe-production-gate-readiness-v2\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "91e90e456971f498b7b8f9382dda9b609da7ef3d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-supplier-listing-create-hardening-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-transactional-notifications-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "ca157d716348ba107f546e453602eae7c48ec989"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-commerce-transactional-notifications-v1-current\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-gemini-live-provider-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-alpha-beta-productization-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "7c0946b1eecf3c16d4aa6c6fca40f9eb1304dc9d"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w1-revenue\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w2-commerce\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w3-ai\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w3-alpha-final\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-integration-w4-alpha-stabilization\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6061a6ae22eb8a323e51af63ecdcf9b655177d37"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-knowledge-acquisition-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-smoke-e2e-readiness-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "b00240226b274c479dddd081da2332fd1f956145"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-activity-timeline-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-attachments-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "70e00e3f188338b47770ffe8bd368f611d3efd43"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-collaboration-workspace-spine-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "c3168eff3a324979efa5cab694e294c4daeeb4da"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-instructor-browser-e2e-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-learning-instructor-ui-contract-suite-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-platform-app-shell-translation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "6528202c349e6a5a41040a7d9287e4c7f97c1873"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-platform-i18n-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "a462c88bd446c794f7b81f2e8219f3e4b866e971"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-deployment-runtime-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-execution-boundary-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-invocation-orchestration-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-inference-request-contracts-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-provider-adapter-boundary-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-provider-routing-policy-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-runtime-operations-failover-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-workflow-lifecycle-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-private-ai-workflow-lifecycle-v1-final\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-accessibility-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "529783b7309fe43b166c6cd95a850ff2ae89851b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-creator-space-ia-rename-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "549018dcadbf9ceea319428da48a6dba117de162"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-empty-states-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "f9bbf2a13f418170db0448495a713460514574b3"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-error-states-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "34cd4fd713e255dca31b21fde0d965c1361cb55f"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-hero-joined-label-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "4436fad2b07554aa528057d9ad4abe77647e4963"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-hero-social-links-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "8ca12b7c1d783ec079274fb61721f9c00c17c421"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-identity-achievements-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  2,
+        "shas":  "95e33bfb99beed4b6b9dd88ee3891e060fe6fb60,f574eba902ee424d944bf85d913fad80108dc83b"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-identity-strip-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  2,
+        "shas":  "03fe5e7e78cf4239317551671c7c33206523def7"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-loading-states-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "7b321eefaa354e993c4ef5cb746bf3aaefc299db"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-profile-tab-overflow-fade-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "54f4120bf7fdd2bdb364a448497c6072d8e1a464"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-revenue-platform-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1-clean\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-shared-ai-surface-integration-v1-final\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-intelligence-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-learning-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-app-shell-ingestion-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-foundation-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "0d181604e4caa474d6d29fc44d96c8c9fad0d7dd"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\umtuba-web-translation-studio-persistence-workflow-v1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "aced43c844d93e0bae6cbb6a53cae25698c3cdad"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "0d66bb92efb83d954dacbe770ef5f3e169f40c50"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A1-AI-SHARED-CORE-VALIDATION-V1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "0d66bb92efb83d954dacbe770ef5f3e169f40c50"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A2\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "0d66bb92efb83d954dacbe770ef5f3e169f40c50"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A2-REGRESSION\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-A3\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "8c6a53e710a3d75814f1cfb5830eeb204a0c4a9c"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-GAMES-PAGE-COMPOSITION-V1\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  1,
+        "shas":  "0d66bb92efb83d954dacbe770ef5f3e169f40c50"
+    },
+    {
+        "path":  "C:\\Users\\1\\Desktop\\umtuba\\_backup-shared-ai-mixed-20260731-141004\\docs\\ai\\CURRENT_TASK.md",
+        "sha40_count":  0,
+        "shas":  ""
+    }
+]

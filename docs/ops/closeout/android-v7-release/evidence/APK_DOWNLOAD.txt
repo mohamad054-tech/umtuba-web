@@ -1,0 +1,7 @@
+﻿APK_PATH=C:\Users\1\Desktop\umtuba\umtuba-web\docs\ops\closeout\android-v7-release\apk\umtuba-android-preview-0b160aac.apk
+APK_BYTES=171486168
+APK_SHA256=AE94E1E7191211AA25C6964562ABC7046CA5B6956615F789042B4E568F8818B7
+EAS_BUILD_ID=0b160aac-67e1-449e-8aed-efcca378a7d3
+ARTIFACT_URL=https://expo.dev/artifacts/eas/awAWxtgN2vprzflbkjuVeDn9aYiLkJu6UtkgQdddGpY.apk
+DOWNLOADED_AT=2026-08-16T11:33:17.5524270+03:00
+PLAY_UPLOAD=NO

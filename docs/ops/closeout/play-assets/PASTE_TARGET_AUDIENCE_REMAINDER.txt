@@ -1,0 +1,18 @@
+SCREEN/PATH = Play Console → Policy → App content → Target audience and content
+AGES ALREADY SET = 13–15 / 16–17 / 18+
+DO_NOT_CHANGE_AGES = YES
+DO_NOT = Select under-13. Do not switch to 18+ only. Do not reopen the three age boxes.
+
+REMAINING STEPS (unconfirmed / not OCR'd) =
+  App details (not designed for children; social UGC + messages; listing is creator/social, not kids)
+  Ads (this app does not contain ads — same as PASTE_ADS.txt)
+  Store presence
+  Summary
+
+EXACT OPTION TO SELECT on remainder =
+  Designed primarily for children = NO
+  Appeals to children = NO (geometric chevron; no youthful cartoon characters)
+  Ads in the app = NO
+SAFE_TO_SAVE_NOW = YES for remainder only. Ages stay 13–15 / 16–17 / 18+.
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Reopen Data Safety or App Access.

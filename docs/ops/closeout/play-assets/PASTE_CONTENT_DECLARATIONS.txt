@@ -1,0 +1,12 @@
+SCREEN/PATH = Play Console → Policy → App content → News / COVID-19 / Government / Financial features / Health
+EXACT OPTION TO SELECT =
+  News app = NO
+  COVID-19 contact tracing / status = NO
+  Government app = NO
+  Financial features / banking = NO
+    (UM Points are internal loyalty units; Android versionCode 3 has no payments SDK)
+  Health = NO
+EXACT TEXT TO PASTE = (none)
+SAFE_TO_SAVE_NOW = YES if those cards are still shown
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Claim payments, banking, news, government, health, or COVID features. Do not reopen Data Safety from these cards.

@@ -1,0 +1,7 @@
+01:22:53.745 opened followers
+01:24:18.713 opened member from followers
+01:24:25.195 HW back from member
+01:26:42.953 HW back from followers list
+01:26:49.994 HW back from originating profile
+01:27:10.734 extra HW back on Watch after followers chain
+01:27:18.349 second isolated HW back after 2s

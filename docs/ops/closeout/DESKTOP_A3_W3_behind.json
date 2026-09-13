@@ -1,0 +1,50 @@
+﻿[
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-learning-link-unlink-local-e2e-v1",
+        "branch":  "office/collaboration-learning-link-unlink-local-e2e-desktop-v1",
+        "head":  "be5d836aae26",
+        "head_full":  "be5d836aae2697790432bfec7b5e799802ac2498",
+        "staged":  0,
+        "unstaged":  106,
+        "untracked":  119,
+        "dirty":  true,
+        "port":  "NO",
+        "upstream":  "origin/office/collaboration-workspace-settings-lifecycle-ui-v1",
+        "ahead":  "0",
+        "behind":  "16",
+        "detached":  false,
+        "locked":  "NO"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-completion-audit-v1",
+        "branch":  "office/commerce-completion-audit-v1",
+        "head":  "ca157d716348",
+        "head_full":  "ca157d716348ba107f546e453602eae7c48ec989",
+        "staged":  0,
+        "unstaged":  0,
+        "untracked":  0,
+        "dirty":  false,
+        "port":  "NO",
+        "upstream":  "origin/office/commerce-marketplace-supplier-listing-create-hardening-v1",
+        "ahead":  "0",
+        "behind":  "1",
+        "detached":  false,
+        "locked":  "NO"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-provider-money-execution-v1",
+        "branch":  "office/commerce-partial-refund-provider-money-execution-v1",
+        "head":  "4291bdbfb395",
+        "head_full":  "4291bdbfb395b00a9c9cc5aa0d05d560a1e672ab",
+        "staged":  3,
+        "unstaged":  0,
+        "untracked":  0,
+        "dirty":  true,
+        "port":  "YES",
+        "upstream":  "origin/office/commerce-partial-refund-provider-money-execution-v1",
+        "ahead":  "0",
+        "behind":  "17",
+        "detached":  false,
+        "locked":  "NO"
+    }
+]

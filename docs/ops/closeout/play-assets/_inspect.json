@@ -1,0 +1,70 @@
+{
+  "taskId": "DESKTOP_A2_GOOGLE_PLAY_REAL_ASSET_OUTPUT_V1",
+  "waveId": "DESKTOP_RESULT_ONLY_ANDROID_V1",
+  "verifiedAt": "2026-08-14T20:56+03:00",
+  "startedFrom": "DESKTOP_A2_PLAY_ASSETS_FINAL_PRODUCTION_PACKAGE_V2",
+  "packageDir": "docs/ops/closeout/play-assets/",
+  "icon": {
+    "file": "icon-512x512.png",
+    "width": 512,
+    "height": 512,
+    "format": "png",
+    "colorType": 6,
+    "channels": 4,
+    "hasAlpha": true,
+    "bytes": 78796,
+    "sha256": "9e3d0315a33c6799de601dd34cd8bf8cc3a8d16f3bf75592baec2ceb7240b391",
+    "source": "umtuba-mobile/assets/images/android-icon-foreground.png (byte-identical)",
+    "playSpec": true,
+    "remeasuredThisSession": true,
+    "bytesUnchangedVsV2": true,
+    "uploadedToPlay": false
+  },
+  "feature": {
+    "file": "feature-graphic-1024x500.png",
+    "width": 1024,
+    "height": 500,
+    "format": "png",
+    "colorType": 2,
+    "channels": 3,
+    "hasAlpha": false,
+    "bytes": 86710,
+    "sha256": "bc380a16ca86a883530db0a0fc3efa669866a2f89866146f0ba988ac5ac6c1da",
+    "cornerSampleRgb": "5,5,16",
+    "flattenBackground": "#050510",
+    "playSpec": true,
+    "remeasuredThisSession": true,
+    "bytesUnchangedVsV2": true,
+    "uploadedToPlay": false
+  },
+  "shortDescription": {
+    "file": "PASTE_SHORT_DESCRIPTION.txt",
+    "chars": 66,
+    "max": 80,
+    "playSpec": true,
+    "finalized": true,
+    "savedToPlay": false
+  },
+  "fullDescription": {
+    "file": "PASTE_FULL_DESCRIPTION.txt",
+    "chars": 785,
+    "max": 4000,
+    "playSpec": true,
+    "finalized": true,
+    "savedToPlay": false
+  },
+  "assetManifest": "ASSET_MANIFEST.md",
+  "phoneScreenshots": { "ready": false, "fabricated": false, "files": [] },
+  "tabletScreenshots": { "ready": false, "fabricated": false, "files": [] },
+  "filesReadyForPlayUpload": [
+    "icon-512x512.png",
+    "feature-graphic-1024x500.png",
+    "PASTE_SHORT_DESCRIPTION.txt",
+    "PASTE_FULL_DESCRIPTION.txt"
+  ],
+  "consoleWritableThisSession": false,
+  "anyCardSavedThisSession": false,
+  "anyGraphicUploadedThisSession": false,
+  "aabUploadedThisSession": false,
+  "applyForProduction": false
+}

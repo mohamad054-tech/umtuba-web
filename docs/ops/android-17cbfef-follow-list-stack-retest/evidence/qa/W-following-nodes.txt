@@ -1,0 +1,7 @@
+﻿true |  | Back | [811,110][926,226]
+false | ‹ |  | [854,112][883,217]
+false | Following |  | [0,132][811,203]
+true |  | mohamad abu tair @mohamad | [0,263][968,431]
+false | M |  | [92,318][129,375]
+false | mohamad abu tair |  | [200,292][916,349]
+false | @mohamad |  | [200,354][916,401]

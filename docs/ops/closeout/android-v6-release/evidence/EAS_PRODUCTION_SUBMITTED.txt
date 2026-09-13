@@ -1,0 +1,9 @@
+V6_SOURCE_SHA=f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604
+EAS_BUILD_ID=5c3493cb-ae5f-4065-ad61-3605a9887bd2
+PROFILE=production
+PLATFORM=android
+VERSION_CODE_INCREMENT=5_to_6
+KEYSTORE=existing remote p6De1DDtE_ (default)
+BUILD_URL=https://expo.dev/accounts/umtuba/projects/umtuba-mobile/builds/5c3493cb-ae5f-4065-ad61-3605a9887bd2
+STATUS=IN_PROGRESS
+SUBMITTED_AT=2026-08-15T17:01:40Z

@@ -1,0 +1,8 @@
+﻿package=com.umtuba.app
+versionName=1.0.0
+versionCode=6
+device=SM-F956B
+serial=RFCX718LVHK
+source_sha_installed=f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604
+fix_sha=7841b7263ae9b30a096bfdb147c1fa67dfcb491b
+note=Installed binary is v6 f1dbd1cc. Open routing fix is source-only; not in this binary.

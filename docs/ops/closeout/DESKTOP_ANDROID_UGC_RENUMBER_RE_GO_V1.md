@@ -118,7 +118,7 @@ Does **not** weaken RLS. Does **not** expose service-role to clients. Does **not
 
 Focused commit only: migration rename + admin helper + this closeout. Unrelated `docs/ai/*` and other closeouts **not** included. Normal push, no force.
 
-See DESKTOP REPORT after push for `COMMIT_SHA` / `REMOTE_SHA`.
+`COMMIT_SHA` = `REMOTE_SHA` = `380a36646d4de8a37c39a56ac3ccd449f6d8b20d` on `office/profile-hero-completeness-v1`. Normal push (no force). `CENTRAL_FETCH_READY = YES`.
 
 ---
 
@@ -161,10 +161,10 @@ MIGRATION_TARGETED_APPLY_READY = YES
 EXISTING_V4_AAB_STILL_VALID = YES
 NEW_AAB_REQUIRED = NO
 BRANCH = office/profile-hero-completeness-v1
-COMMIT_SHA = (filled after push)
-PUSH_PERFORMED = (filled after push)
-REMOTE_SHA = (filled after push)
-CENTRAL_FETCH_READY = (filled after push)
+COMMIT_SHA = 380a36646d4de8a37c39a56ac3ccd449f6d8b20d
+PUSH_PERFORMED = YES
+REMOTE_SHA = 380a36646d4de8a37c39a56ac3ccd449f6d8b20d
+CENTRAL_FETCH_READY = YES
 GOOGLE_PLAY_MUTATED = NO
 PRODUCTION_MUTATED = NO
 CENTRAL_ACTION_REQUIRED = fetch SHA; targeted-apply ONLY 20260928_ugc_safety_reports_blocks_v1.sql; never db push; never 20260873/20260922 as UGC; then BACKEND_POLICY_READY / GOOGLE_PLAY_V4_UPLOAD_SAFE

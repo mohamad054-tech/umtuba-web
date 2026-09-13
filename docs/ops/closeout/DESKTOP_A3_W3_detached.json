@@ -1,0 +1,186 @@
+﻿[
+    {
+        "path":  "C:/Users/1/AppData/Local/Temp/umtuba-staging-deploy-e84475a",
+        "head":  "e84475a",
+        "head_full":  "e84475a769c731bb7e1ad511b3543ee714d2feea",
+        "on_alpha":  "YES",
+        "dirty_lines":  0,
+        "subject":  "merge(ai): reconcile shared AI core catalog+metering onto alpha Games tip"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-ai-audit-readonly",
+        "head":  "9e90448",
+        "head_full":  "9e90448ce8e4566fd369476a2571844378b0950c",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add learning tutor thread metadata read"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-ai-usage-quotas-billing-foundation-v1",
+        "head":  "70dbc5f",
+        "head_full":  "70dbc5f638449b54be1e995723ad6edef0f169d3",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add AI usage quotas and billing foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-in-flight-committing-visibility-v1",
+        "head":  "556f82a",
+        "head_full":  "556f82a7499d15174016bfca4357882b649744a2",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "docs(commerce): close 20260905 committing visibility apply handoff"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-ledger-commit-boundary-v1",
+        "head":  "6a332c4",
+        "head_full":  "6a332c4969f681ef46e9b4c44f15a75a64ea265c",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add partial refund durable ledger foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-ledger-service-adapter-v1",
+        "head":  "6a2420e",
+        "head_full":  "6a2420e829280aa951f4f87150c820d6b6c45e04",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add partial refund reservation service adapter v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-path-v1",
+        "head":  "c902eb9",
+        "head_full":  "c902eb9934633d7ca31db8f3eea1b4766668c4a4",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add partial refund calculation foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-accounting-audit-review-v1",
+        "head":  "1919241",
+        "head_full":  "191924178723f1ee9d3f5e42dba966451e735a0e",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add partial refund accounting review surface v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-actions-wiring-v1",
+        "head":  "5d4bf18",
+        "head_full":  "5d4bf186efc3eff55431127965a0666e4c4ff512",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add partial refund reservation actions wiring v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-reservation-stuck-committing-recovery-v1",
+        "head":  "8e16c8c",
+        "head_full":  "8e16c8c108d418457ccdcbeb2ed542cca4d30472",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add stuck committing refund recovery v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-live-payout-manual-ops-drill-v1",
+        "head":  "6b1dc29",
+        "head_full":  "6b1dc297ba80c362fda7d97820390baf925b7c84",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "docs(commerce): prepare controlled payout drill readiness"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-seller-payout-rails-v1",
+        "head":  "9a93fc9",
+        "head_full":  "9a93fc95cd928730ad7e2bfa59560e47da4a5d2b",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(commerce): add seller payout rails v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-gemini-live-provider-v1",
+        "head":  "30bda6a",
+        "head_full":  "30bda6a66248841ed4dd0b64984e4b5d81e40712",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): harden Gemini live provider v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-deployment-runtime-v1",
+        "head":  "cf3de8d",
+        "head_full":  "cf3de8dd36cb19fe03cd9139d0ea48a8fb3d4705",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI deployment runtime v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-inference-execution-boundary-v1",
+        "head":  "14ce7fd",
+        "head_full":  "14ce7fd664c29a6c28eaf18d9f916c04053b013b",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI inference execution boundary v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-inference-request-contracts-v1",
+        "head":  "ba0cca4",
+        "head_full":  "ba0cca404b85b43c3e3dd25ba411818908d27319",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI inference request contracts v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-provider-routing-policy-v1",
+        "head":  "53637d8",
+        "head_full":  "53637d8bd7c4b9b49e80dfbe429d884a969ca545",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI provider routing policy v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-runtime-operations-failover-v1",
+        "head":  "517cff5",
+        "head_full":  "517cff5c1e3bfdf68ed39e4aa58b94909c56590c",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI runtime operations failover v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-workflow-lifecycle-v1",
+        "head":  "db6f52a",
+        "head_full":  "db6f52a8bd54e22ef33ca19b0a072cea5f3846e1",
+        "on_alpha":  "NO",
+        "dirty_lines":  19,
+        "subject":  "feat(platform): add private AI foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-private-ai-workflow-lifecycle-v1-final",
+        "head":  "eb9e743",
+        "head_full":  "eb9e743dffcf453b52b91261eba2a241166ad115",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): add private AI workflow lifecycle v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1",
+        "head":  "db6f52a",
+        "head_full":  "db6f52a8bd54e22ef33ca19b0a072cea5f3846e1",
+        "on_alpha":  "NO",
+        "dirty_lines":  28,
+        "subject":  "feat(platform): add private AI foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1-clean",
+        "head":  "db6f52a",
+        "head_full":  "db6f52a8bd54e22ef33ca19b0a072cea5f3846e1",
+        "on_alpha":  "NO",
+        "dirty_lines":  28,
+        "subject":  "feat(platform): add private AI foundation v1"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-shared-ai-surface-integration-v1-final",
+        "head":  "b0655bb",
+        "head_full":  "b0655bb7b699daa0c40e518fbbadc7397d2f10e4",
+        "on_alpha":  "NO",
+        "dirty_lines":  0,
+        "subject":  "feat(ai): integrate shared AI surfaces v1"
+    }
+]

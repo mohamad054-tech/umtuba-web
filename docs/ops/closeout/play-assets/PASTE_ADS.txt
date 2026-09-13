@@ -1,0 +1,7 @@
+SCREEN/PATH = Play Console → Policy → App content → Ads
+EXACT OPTION TO SELECT = No, my app does not contain ads
+EXACT TEXT TO PASTE = (none)
+WHY = umtuba-mobile/package.json has no AdMob / react-native-google-mobile-ads / Audience Network / Unity Ads / AppLovin / ironSource dependency. v3 on Play does not serve ads.
+SAFE_TO_SAVE_NOW = YES
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Claim ads exist. Do not upload an AAB from this card.

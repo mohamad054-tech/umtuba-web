@@ -1,0 +1,13 @@
+SCREEN/PATH = Play Console → Policy → App content → Account deletion
+  (separate from Data safety — do not reopen Data safety)
+EXACT OPTION TO SELECT =
+  App allows account creation = YES
+  Users can request deletion = YES via web resource
+  In-app deletion in the current Play binary (v3) = NO
+EXACT TEXT TO PASTE = https://umtuba.com/account-deletion
+DO NOT PASTE = https://umtuba.com/privacy
+DO NOT PASTE = https://umtuba.com
+WHY = Public page live this session (HTTP 200). Title: Delete your UMTUBA account. Sign-in required to submit. Queues a request. Not immediate deleteUser. Play User Data (13327111) accepts a functional web deletion resource.
+SAFE_TO_SAVE_NOW = YES if the card is still open. Skip if Publishing overview already shows Account deletion complete.
+SAVED_TO_PLAY_THIS_SESSION = NO
+IN_APP_DELETE_IN_V3 = NO

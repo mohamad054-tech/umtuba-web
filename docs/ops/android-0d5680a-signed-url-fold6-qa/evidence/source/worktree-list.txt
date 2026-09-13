@@ -1,0 +1,18 @@
+C:/Users/1/Desktop/umtuba/umtuba-mobile                                    3b33561 [master]
+C:/Users/1/Desktop/umtuba/umtuba-mobile-v5-build                           822d893 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-A1-ANDROID-V6                  3204247 [office/android-v6-minimal-source-fix-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-0D5680A-SIGNED-URL-QA  0d5680a (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-AUTH-PASSWORD-QA       d989e66 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-PLAYBACK-P1-DD86A3E    dd86a3e (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-SOCIAL-PROFILE-QA      1e708f9 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V11                    7b33bae (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V12                    4d329e1 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V14                    700ddda (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V16                    abf8af9 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V17                    7cf3960 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V18                    f66f15c (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V19                    3ceb90b (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V20                    af10b1c (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V8-LOC                 c48b4b2 (detached HEAD)
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-V9-LOC                 9e04a97 [office/android-v10-clean-candidate-v1]
+C:/Users/1/Desktop/umtuba/worktrees/DESKTOP-ANDROID-WATCH-SIGNUP-QA        15d9aec (detached HEAD)

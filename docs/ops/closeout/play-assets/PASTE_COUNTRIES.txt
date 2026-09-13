@@ -1,0 +1,7 @@
+SCREEN/PATH = Play Console → Closed testing (already configured) and, when Production countries appear, Store settings / release countries
+EXACT OPTION TO SELECT = Confirm all available countries/regions remain selected (operator 2026-08-13 for Closed Testing). Do not invent a restricted set.
+EXACT TEXT TO PASTE = (none — confirm the existing all-available set)
+WHY = Closed Testing countries were selected all-available by the operator on 2026-08-13. Production countries were never OCR'd. Do not create a Production track from this card.
+SAFE_TO_SAVE_NOW = YES to confirm Closed Testing remains all-available. N/A for Production until that field appears; then confirm the same all-available set.
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Invent a country allow-list. Do not Apply for production. Do not create a Production track from this card.

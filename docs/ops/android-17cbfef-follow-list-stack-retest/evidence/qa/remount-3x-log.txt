@@ -1,0 +1,26 @@
+01:30:10.356 c1 before
+01:31:07.445 on profile, HW back to watch
+01:31:14.457 c1 before
+01:31:17.403 c1 before
+01:31:20.088 c1 profile ok=True
+01:31:20.248 c1 HW back
+01:31:24.765 c1 return delay=4663ms watch=False prof=true |  | Open followers | [53,1430][326,1601]
+01:31:28.216 c2 before
+01:31:30.922 c1 profile ok=True
+01:31:31.046 c1 HW back
+01:31:35.533 c1 return delay=4598ms watch=False prof=true |  | Open followers | [53,1430][326,1601]
+01:31:38.685 c2 before
+01:31:41.435 c2 profile ok=True
+01:31:41.587 c2 HEADER back 868,168
+01:31:46.145 c2 return delay=4705ms watch=False prof=true |  | Open followers | [53,1430][326,1601]
+01:31:49.641 c3 before
+01:31:52.445 c2 profile ok=True
+01:31:52.558 c2 HEADER back 868,168
+01:31:57.056 c2 return delay=4607ms watch=False prof=true |  | Open followers | [53,1430][326,1601]
+01:32:00.537 c3 before
+01:32:03.244 c3 profile ok=True
+01:32:03.359 c3 HW back
+01:32:07.848 c3 return delay=4600ms watch=False prof=true |  | Open followers | [53,1430][326,1601]
+01:32:15.011 c3 profile ok=True
+01:32:15.193 c3 HW back
+01:32:30.254 c3 return delay=15239ms watch=False prof=true |  | Open followers | [53,1430][326,1601]

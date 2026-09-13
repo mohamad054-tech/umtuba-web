@@ -1,0 +1,11 @@
+SCREEN/PATH = Play Console → Grow → Store presence → Store settings
+EXACT OPTION TO SELECT = App category = Social
+EXACT TEXT TO PASTE =
+  Website = https://umtuba.com
+  Privacy policy = https://umtuba.com/privacy   (already set — do not change)
+  Email = the Play developer-account contact email you already use
+    Do not invent support@.
+    Do not use google-play-review@umtuba.com
+  Phone = leave blank unless required
+SAFE_TO_SAVE_NOW = YES for category + website + existing contact email
+SAVED_TO_PLAY_THIS_SESSION = NO

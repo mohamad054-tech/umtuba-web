@@ -1,0 +1,4350 @@
+{
+  "taskId": "DESKTOP_A3_SHARED_RUNTIME_FINAL_QA_V1",
+  "startedAt": "2026-08-15T14:35:06.178Z",
+  "base": "https://umtuba.com",
+  "expectedSha": "b3fd0d0508eaa0bf0e4a2c5f0b0c08ce4eb64089",
+  "expectedRelease": "b3fd0d0-20260815122211",
+  "browserMcp": "UNAVAILABLE_TAB_VANISH",
+  "authUsed": {
+    "account": "store-qa@umtuba.com",
+    "username": "storeqa",
+    "passwordPrinted": false
+  },
+  "pages": {
+    "home": {
+      "status": 200,
+      "elapsedMs": 1682,
+      "finalUrl": "https://umtuba.com/",
+      "title": "Home",
+      "url": "https://umtuba.com/",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-shell",
+          "name": "locale",
+          "labelled": true
+        }
+      ],
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Home"
+        },
+        {
+          "tag": "h2",
+          "text": "UMTUBA"
+        }
+      ],
+      "images": [],
+      "videos": 2,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA UMTUBA Home Home World Learning Live Messages Welcome Saved Upload Video-first feed Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in 📚 Learning 🛍️ Store 🎮 Games 🔴 Live 🌍 World 🔎 Search 💬 Messages ➕ Create + Add Story Now exploring UMTUBA, Worldwide م @marenapost FOLLOW MESSAGE UMTUBA, Worldwide Untitled video 1 0 1 0 M @mohamad FOLLOW MESSAGE UMT",
+      "perf": {
+        "ttfb": 458,
+        "dcl": 549,
+        "load": 969,
+        "fcp": 660,
+        "resourceCount": 29,
+        "transferKB": 3
+      }
+    },
+    "login": {
+      "status": 200,
+      "elapsedMs": 1286,
+      "finalUrl": "https://umtuba.com/login",
+      "title": "Log in | UMTUBA",
+      "url": "https://umtuba.com/login",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Your world is waiting."
+        },
+        {
+          "tag": "h2",
+          "text": "Welcome back"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Your world is waiting. Continue to your Profile, or wherever you left off. Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one",
+      "perf": {
+        "ttfb": 108,
+        "dcl": 169,
+        "load": 252,
+        "fcp": 407,
+        "resourceCount": 18,
+        "transferKB": 4
+      }
+    },
+    "signup": {
+      "status": 200,
+      "elapsedMs": 1310,
+      "finalUrl": "https://umtuba.com/signup",
+      "title": "Sign up | UMTUBA",
+      "url": "https://umtuba.com/signup",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "confirmPassword",
+          "name": "confirmPassword",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Create. Discover. Grow."
+        },
+        {
+          "tag": "h2",
+          "text": "Create account"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Create. Discover. Grow. Join UMTUBA for videos, live discovery, and creators around the world. Language العربية English Français Español Deutsch Português Create account Two quick steps — credentials first, then your profile. 1 · ACCOUNT → 2 · PROFILE EMAIL We'll send a confirmation link if required. PASSWORD SHOW Use at least 6 characters. You'll confirm it next. CONFIRM PASSWORD SHOW Cont",
+      "perf": {
+        "ttfb": 126,
+        "dcl": 174,
+        "load": 236,
+        "fcp": 237,
+        "resourceCount": 22,
+        "transferKB": 9
+      }
+    },
+    "search": {
+      "status": 200,
+      "elapsedMs": 1309,
+      "finalUrl": "https://umtuba.com/search",
+      "title": "Search | UMTUBA",
+      "url": "https://umtuba.com/search",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-shell",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": null,
+          "id": null,
+          "name": null,
+          "labelled": true
+        }
+      ],
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Search"
+        },
+        {
+          "tag": "h2",
+          "text": "Search across UMTUBA"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA UMTUBA Search Home World Learning Live Messages Find people, videos, stories, and shops Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in Search UMTUBA ⌕ All People Videos Stories Stores Products SEARCH Search across UMTUBA Find people, ready videos, active stories from people you follow, stores, and products. Open Discover Browse Store",
+      "perf": {
+        "ttfb": 147,
+        "dcl": 190,
+        "load": 250,
+        "fcp": 217,
+        "resourceCount": 45,
+        "transferKB": 36
+      }
+    },
+    "welcome": {
+      "status": 200,
+      "elapsedMs": 1390,
+      "finalUrl": "https://umtuba.com/welcome",
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/welcome",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 164,
+      "headerHeight": 982,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [],
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "The World Lives Here."
+        },
+        {
+          "tag": "h2",
+          "text": "More than watching.A place to grow."
+        },
+        {
+          "tag": "h3",
+          "text": "Videos"
+        },
+        {
+          "tag": "h3",
+          "text": "Challenges"
+        },
+        {
+          "tag": "h3",
+          "text": "AI Companion"
+        },
+        {
+          "tag": "h3",
+          "text": "Ideas"
+        },
+        {
+          "tag": "h3",
+          "text": "Global"
+        },
+        {
+          "tag": "h3",
+          "text": "Opportunities"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": "1",
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Home World Learning Live Messages Join UMTUBA Alpha 0.2 · Built for a new generation UMTUBA The World Lives Here. Discover authentic videos, cultures, people, ideas, and opportunities from every corner of the world. Start Exploring Go Live THE UMTUBA WORLD More than watching. A place to grow. Open Home Feed 🎬 Videos Fast, creative moments built for discovery. 🔥 Challenges Daily missions t",
+      "perf": {
+        "ttfb": 106,
+        "dcl": 183,
+        "load": 328,
+        "fcp": 363,
+        "resourceCount": 35,
+        "transferKB": 508
+      }
+    },
+    "watch": {
+      "status": 200,
+      "elapsedMs": 2293,
+      "finalUrl": "https://umtuba.com/watch",
+      "title": "Watch | UMTUBA",
+      "url": "https://umtuba.com/watch",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 70,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [],
+      "navs": [
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [],
+      "images": [],
+      "videos": 3,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA UMTUBA · Untitled video … … Discover Fullscreen Loading video… م مارينا بوست FOLLOW @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide ♪ Original sound · UMTUBA 🌍 Post Journey 1 0 0 1 M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worldwide ♪ Original sound · UMTUBA 🌍 Post Journey 1 1 1 0 Untitled video مارينا بوست هي منصة إعلامية رقمية متنوعة، فلس",
+      "perf": {
+        "ttfb": 1065,
+        "dcl": 1168,
+        "load": 0,
+        "fcp": 1440,
+        "resourceCount": 21,
+        "transferKB": 1
+      }
+    },
+    "discover": {
+      "status": 200,
+      "elapsedMs": 4082,
+      "finalUrl": "https://umtuba.com/",
+      "title": "Home",
+      "url": "https://umtuba.com/",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-shell",
+          "name": "locale",
+          "labelled": true
+        }
+      ],
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Home"
+        },
+        {
+          "tag": "h2",
+          "text": "UMTUBA"
+        }
+      ],
+      "images": [],
+      "videos": 2,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA UMTUBA Home Home World Learning Live Messages Welcome Saved Upload Video-first feed Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in 📚 Learning 🛍️ Store 🎮 Games 🔴 Live 🌍 World 🔎 Search 💬 Messages ➕ Create + Add Story Now exploring UMTUBA, Worldwide م @marenapost FOLLOW MESSAGE UMTUBA, Worldwide Untitled video 1 0 1 0 M @mohamad FOLLOW MESSAGE UMT",
+      "perf": {
+        "ttfb": 2875,
+        "dcl": 2941,
+        "load": 2998,
+        "fcp": 3042,
+        "resourceCount": 27,
+        "transferKB": 3
+      }
+    },
+    "support": {
+      "status": 200,
+      "elapsedMs": 1261,
+      "finalUrl": "https://umtuba.com/support",
+      "title": "Support | UMTUBA",
+      "url": "https://umtuba.com/support",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 186,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [],
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "UMTUBA",
+            "Terms",
+            "Privacy",
+            "Delete account"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Support"
+        },
+        {
+          "tag": "h2",
+          "text": "Contact UMTUBA"
+        },
+        {
+          "tag": "h2",
+          "text": "Safety and reporting"
+        },
+        {
+          "tag": "h2",
+          "text": "App Store Support URL"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA / Support Terms Privacy Delete account HELP · PUBLIC Support Get help with your UMTUBA account, privacy requests, safety reports, and product questions. UMTUBA Support is the public contact surface for the UMTUBA apps and website. Use the pathways below — they are live production links, not placeholders. Contact UMTUBA For account, privacy, and data requests, use the signed-in account delet",
+      "perf": {
+        "ttfb": 111,
+        "dcl": 137,
+        "load": 139,
+        "fcp": 168,
+        "resourceCount": 27,
+        "transferKB": 10
+      }
+    },
+    "create_guest": {
+      "status": 200,
+      "elapsedMs": 1357,
+      "finalUrl": "https://umtuba.com/login?next=%2Fcreate",
+      "title": "Log in | UMTUBA",
+      "url": "https://umtuba.com/login?next=%2Fcreate",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Your world is waiting."
+        },
+        {
+          "tag": "h2",
+          "text": "Welcome back"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Your world is waiting. Continue to your Profile, or wherever you left off. Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one",
+      "perf": {
+        "ttfb": 186,
+        "dcl": 224,
+        "load": 224,
+        "fcp": 282,
+        "resourceCount": 25,
+        "transferKB": 7
+      }
+    },
+    "messages_guest": {
+      "status": 200,
+      "elapsedMs": 1360,
+      "finalUrl": "https://umtuba.com/login?next=%2Fmessages",
+      "title": "Log in | UMTUBA",
+      "url": "https://umtuba.com/login?next=%2Fmessages",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Your world is waiting."
+        },
+        {
+          "tag": "h2",
+          "text": "Welcome back"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Your world is waiting. Continue to your Profile, or wherever you left off. Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one",
+      "perf": {
+        "ttfb": 194,
+        "dcl": 238,
+        "load": 238,
+        "fcp": 285,
+        "resourceCount": 25,
+        "transferKB": 7
+      }
+    },
+    "profile_guest": {
+      "status": 200,
+      "elapsedMs": 2194,
+      "finalUrl": "https://umtuba.com/login?next=%2Fprofile",
+      "title": "Log in | UMTUBA",
+      "url": "https://umtuba.com/login?next=%2Fprofile",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Your world is waiting."
+        },
+        {
+          "tag": "h2",
+          "text": "Welcome back"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA Your world is waiting. Continue to your Profile, or wherever you left off. Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one",
+      "perf": {
+        "ttfb": 1047,
+        "dcl": 1075,
+        "load": 1075,
+        "fcp": 1120,
+        "resourceCount": 25,
+        "transferKB": 7
+      }
+    },
+    "not_found": {
+      "status": 404,
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/this-route-does-not-exist-a3-final-qa",
+      "lang": "en",
+      "dir": "ltr",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [],
+      "navs": [
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "404"
+        },
+        {
+          "tag": "h2",
+          "text": "This page could not be found."
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "404 This page could not be found."
+    }
+  },
+  "responsive": [
+    {
+      "path": "/",
+      "w": 360,
+      "h": 800,
+      "overflowX": 0,
+      "headerOverflow": 217,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 360,
+      "h": 800,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 360,
+      "h": 800,
+      "overflowX": 0,
+      "headerOverflow": 71,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 360,
+      "h": 800,
+      "overflowX": 0,
+      "headerOverflow": 102,
+      "headerHeight": 72,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 360,
+      "h": 800,
+      "overflowX": 0,
+      "headerOverflow": 150,
+      "headerHeight": 1019,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    },
+    {
+      "path": "/",
+      "w": 390,
+      "h": 844,
+      "overflowX": 0,
+      "headerOverflow": 187,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 390,
+      "h": 844,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 390,
+      "h": 844,
+      "overflowX": 0,
+      "headerOverflow": 41,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 390,
+      "h": 844,
+      "overflowX": 0,
+      "headerOverflow": 72,
+      "headerHeight": 72,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 390,
+      "h": 844,
+      "overflowX": 0,
+      "headerOverflow": 125,
+      "headerHeight": 985,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    },
+    {
+      "path": "/",
+      "w": 430,
+      "h": 932,
+      "overflowX": 0,
+      "headerOverflow": 147,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 430,
+      "h": 932,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 430,
+      "h": 932,
+      "overflowX": 0,
+      "headerOverflow": 1,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 430,
+      "h": 932,
+      "overflowX": 0,
+      "headerOverflow": 32,
+      "headerHeight": 72,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 430,
+      "h": 932,
+      "overflowX": 0,
+      "headerOverflow": 103,
+      "headerHeight": 1025,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    },
+    {
+      "path": "/",
+      "w": 768,
+      "h": 1024,
+      "overflowX": 0,
+      "headerOverflow": 335,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 768,
+      "h": 1024,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 768,
+      "h": 1024,
+      "overflowX": 0,
+      "headerOverflow": 98,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 768,
+      "h": 1024,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 70,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 768,
+      "h": 1024,
+      "overflowX": 0,
+      "headerOverflow": 97,
+      "headerHeight": 1026,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    },
+    {
+      "path": "/",
+      "w": 1024,
+      "h": 768,
+      "overflowX": 0,
+      "headerOverflow": 79,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 1024,
+      "h": 768,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 1024,
+      "h": 768,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 1024,
+      "h": 768,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 70,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 1024,
+      "h": 768,
+      "overflowX": 0,
+      "headerOverflow": 122,
+      "headerHeight": 874,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    },
+    {
+      "path": "/",
+      "w": 1440,
+      "h": 900,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 2,
+      "betaHits": [],
+      "title": "Home",
+      "finalUrl": "https://umtuba.com/"
+    },
+    {
+      "path": "/login",
+      "w": 1440,
+      "h": 900,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Log in | UMTUBA",
+      "finalUrl": "https://umtuba.com/login"
+    },
+    {
+      "path": "/search",
+      "w": 1440,
+      "h": 900,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 65,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Primary",
+          "visible": true,
+          "itemCount": 5,
+          "texts": [
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [],
+      "title": "Search | UMTUBA",
+      "finalUrl": "https://umtuba.com/search"
+    },
+    {
+      "path": "/watch",
+      "w": 1440,
+      "h": 900,
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": 70,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": "Living video navigation",
+          "visible": true,
+          "itemCount": 6,
+          "texts": [
+            "World",
+            "Store",
+            "Journey",
+            "AI",
+            "Wallet",
+            "Hello City · unavailable"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 3,
+      "betaHits": [],
+      "title": "Watch | UMTUBA",
+      "finalUrl": "https://umtuba.com/watch"
+    },
+    {
+      "path": "/welcome",
+      "w": 1440,
+      "h": 900,
+      "overflowX": 0,
+      "headerOverflow": 164,
+      "headerHeight": 982,
+      "lang": "en",
+      "dir": "ltr",
+      "skipLink": false,
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "Home",
+            "World",
+            "Learning",
+            "Live",
+            "Messages",
+            "Join UMTUBA"
+          ]
+        },
+        {
+          "label": "Primary mobile",
+          "visible": false,
+          "itemCount": 4,
+          "texts": [
+            "Home",
+            "Live",
+            "Messages",
+            "Profile"
+          ]
+        }
+      ],
+      "unlabeledCount": 0,
+      "missingAlt": 0,
+      "videos": 0,
+      "betaHits": [
+        "Alpha 0.2"
+      ],
+      "title": "UMTUBA — Ideas Without Borders",
+      "finalUrl": "https://umtuba.com/welcome"
+    }
+  ],
+  "rtl": {
+    "home390": {
+      "title": "Home",
+      "url": "https://umtuba.com/",
+      "lang": "ar",
+      "dir": "rtl",
+      "overflowX": 0,
+      "headerOverflow": 180,
+      "headerHeight": 65,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-shell",
+          "name": "locale",
+          "labelled": true
+        }
+      ],
+      "navs": [
+        {
+          "label": "التنقل الرئيسي",
+          "visible": false,
+          "itemCount": 5,
+          "texts": [
+            "الرئيسية",
+            "العالم",
+            "التعلّم",
+            "مباشر",
+            "الرسائل"
+          ]
+        },
+        {
+          "label": "Section shortcuts",
+          "visible": true,
+          "itemCount": 8,
+          "texts": [
+            "📚Learning",
+            "🛍️Store",
+            "🎮Games",
+            "🔴Live",
+            "🌍World",
+            "🔎Search",
+            "💬Messages",
+            "➕Create"
+          ]
+        },
+        {
+          "label": "التنقل الرئيسي للجوّال",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "الرئيسية",
+            "مباشر",
+            "الرسائل",
+            "الملف"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "Home"
+        },
+        {
+          "tag": "h2",
+          "text": "UMTUBA"
+        }
+      ],
+      "images": [],
+      "videos": 2,
+      "bodyMobileNav": "1",
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA UMTUBA Home Saved Upload بحث اللغة العربية English Français Español Deutsch Português ◇ Tier UM تسجيل الدخول 📚 Learning 🛍️ Store 🎮 Games 🔴 Live 🌍 World 🔎 Search 💬 Messages ➕ Create + Add Story Now exploring UMTUBA, Worldwide م @marenapost FOLLOW MESSAGE UMTUBA, Worldwide Untitled video 1 0 1 0 M @mohamad FOLLOW MESSAGE UMTUBA, Worldwide Untitled video 1 1 0 1 UMTUBA, Worldwide UMTUBA"
+    },
+    "login390": {
+      "title": "Log in | UMTUBA",
+      "url": "https://umtuba.com/login",
+      "lang": "ar",
+      "dir": "rtl",
+      "overflowX": 0,
+      "headerOverflow": 0,
+      "headerHeight": null,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [
+        {
+          "tag": "select",
+          "type": null,
+          "id": "umtuba-language-auth",
+          "name": "locale",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "id": "email",
+          "name": "email",
+          "labelled": true
+        },
+        {
+          "tag": "input",
+          "type": "password",
+          "id": "password",
+          "name": "password",
+          "labelled": true
+        }
+      ],
+      "navs": [],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "عالمك بانتظارك."
+        },
+        {
+          "tag": "h2",
+          "text": "مرحبًا بعودتك"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": null,
+      "betaHits": [],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA اللغة العربية English Français Español Deutsch Português مرحبًا بعودتك سجّل الدخول للمتابعة إلى أمتوبة. البريد الإلكتروني كلمة المرور نسيت كلمة المرور؟ تسجيل الدخول ليس لديك حساب؟ أنشئ حسابًا"
+    },
+    "welcome390": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/welcome",
+      "lang": "ar",
+      "dir": "rtl",
+      "overflowX": 0,
+      "headerOverflow": 103,
+      "headerHeight": 985,
+      "skipLink": false,
+      "unlabeled": [],
+      "inputs": [],
+      "navs": [
+        {
+          "label": null,
+          "visible": true,
+          "itemCount": 7,
+          "texts": [
+            "UMTUBA",
+            "الرئيسية",
+            "العالم",
+            "التعلّم",
+            "مباشر",
+            "الرسائل",
+            "انضم إلى أم طوبا"
+          ]
+        },
+        {
+          "label": "التنقل الرئيسي للجوّال",
+          "visible": true,
+          "itemCount": 4,
+          "texts": [
+            "الرئيسية",
+            "مباشر",
+            "الرسائل",
+            "الملف"
+          ]
+        }
+      ],
+      "headings": [
+        {
+          "tag": "h1",
+          "text": "العالم يعيش هنا."
+        },
+        {
+          "tag": "h2",
+          "text": "أكثر من مشاهدة.مكان للنمو."
+        },
+        {
+          "tag": "h3",
+          "text": "فيديوهات"
+        },
+        {
+          "tag": "h3",
+          "text": "تحديات"
+        },
+        {
+          "tag": "h3",
+          "text": "رفيق الذكاء الاصطناعي"
+        },
+        {
+          "tag": "h3",
+          "text": "أفكار"
+        },
+        {
+          "tag": "h3",
+          "text": "عالمي"
+        },
+        {
+          "tag": "h3",
+          "text": "فرص"
+        }
+      ],
+      "images": [],
+      "videos": 0,
+      "bodyMobileNav": "1",
+      "betaHits": [
+        "ألفا 0.2"
+      ],
+      "shaHits": [],
+      "visibleTextSample": "UMTUBA انضم إلى أم طوبا ألفا 0.2 · مبني لجيل جديد UMTUBA العالم يعيش هنا. اكتشف فيديوهات وثقافات وأشخاصًا وأفكارًا وفرصًا حقيقية من كل مكان في العالم. ابدأ الاستكشاف البث المباشر عالم أم طوبا أكثر من مشاهدة. مكان للنمو. افتح الصفحة الرئيسية 🎬 فيديوهات لحظات سريعة وإبداعية مصممة للاكتشاف. 🔥 تحديات مهام يومية تجعل المستخدمين يعودون. 🤖 رفيق الذكاء الاصطناعي دليل موثوق يساعد كل موهبة على النمو. 💡 "
+    }
+  },
+  "keyboard": {
+    "login390": [
+      {
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "text": "UMTUBA",
+        "outlineWidth": "1px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "select",
+        "id": "umtuba-language-auth",
+        "name": "locale",
+        "text": "العربيةEnglishFrançaisEspañolDeutschPort",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "input",
+        "id": "email",
+        "name": "email",
+        "text": "",
+        "outlineWidth": "0px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "input",
+        "id": "password",
+        "name": "password",
+        "text": "",
+        "outlineWidth": "0px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "text": "Forgot password?",
+        "outlineWidth": "1px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "button",
+        "id": null,
+        "name": null,
+        "text": "Sign in",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "text": "Create one",
+        "outlineWidth": "1px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "body",
+        "id": null,
+        "name": null,
+        "text": "UMTUBAYour world is waiting.Continue to ",
+        "outlineWidth": "0px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "id": null,
+        "name": null,
+        "text": "UMTUBA",
+        "outlineWidth": "1px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "select",
+        "id": "umtuba-language-auth",
+        "name": "locale",
+        "text": "العربيةEnglishFrançaisEspañolDeutschPort",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      }
+    ],
+    "home1440": [
+      {
+        "tag": "a",
+        "aria": "UMTUBA home",
+        "text": "UMTUBA",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Home",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "World",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Learning",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Live",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Messages",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Welcome",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      },
+      {
+        "tag": "a",
+        "aria": null,
+        "text": "Saved",
+        "outlineWidth": "2px",
+        "boxShadow": "none"
+      }
+    ]
+  },
+  "performance": {
+    "home": {
+      "ttfb": 458,
+      "dcl": 549,
+      "load": 969,
+      "fcp": 660,
+      "resourceCount": 29,
+      "transferKB": 3
+    },
+    "login": {
+      "ttfb": 108,
+      "dcl": 169,
+      "load": 252,
+      "fcp": 407,
+      "resourceCount": 18,
+      "transferKB": 4
+    },
+    "signup": {
+      "ttfb": 126,
+      "dcl": 174,
+      "load": 236,
+      "fcp": 237,
+      "resourceCount": 22,
+      "transferKB": 9
+    },
+    "search": {
+      "ttfb": 147,
+      "dcl": 190,
+      "load": 250,
+      "fcp": 217,
+      "resourceCount": 45,
+      "transferKB": 36
+    },
+    "welcome": {
+      "ttfb": 106,
+      "dcl": 183,
+      "load": 328,
+      "fcp": 363,
+      "resourceCount": 35,
+      "transferKB": 508
+    },
+    "watch": {
+      "ttfb": 1065,
+      "dcl": 1168,
+      "load": 0,
+      "fcp": 1440,
+      "resourceCount": 21,
+      "transferKB": 1
+    },
+    "discover": {
+      "ttfb": 2875,
+      "dcl": 2941,
+      "load": 2998,
+      "fcp": 3042,
+      "resourceCount": 27,
+      "transferKB": 3
+    },
+    "support": {
+      "ttfb": 111,
+      "dcl": 137,
+      "load": 139,
+      "fcp": 168,
+      "resourceCount": 27,
+      "transferKB": 10
+    },
+    "create_guest": {
+      "ttfb": 186,
+      "dcl": 224,
+      "load": 224,
+      "fcp": 282,
+      "resourceCount": 25,
+      "transferKB": 7
+    },
+    "messages_guest": {
+      "ttfb": 194,
+      "dcl": 238,
+      "load": 238,
+      "fcp": 285,
+      "resourceCount": 25,
+      "transferKB": 7
+    },
+    "profile_guest": {
+      "ttfb": 1047,
+      "dcl": 1075,
+      "load": 1075,
+      "fcp": 1120,
+      "resourceCount": 25,
+      "transferKB": 7
+    }
+  },
+  "regressions": {
+    "startExploring": {
+      "attempted": true,
+      "locale": "ar",
+      "from": "https://umtuba.com/welcome",
+      "clicked": {
+        "clicked": "ابدأ الاستكشاف",
+        "role": "button"
+      },
+      "finalUrl": "https://umtuba.com/watch",
+      "landedDiscover": false,
+      "metrics": {
+        "title": "Watch | UMTUBA",
+        "url": "https://umtuba.com/watch",
+        "lang": "ar",
+        "dir": "rtl",
+        "overflowX": 0,
+        "headerOverflow": 84,
+        "headerHeight": 72,
+        "skipLink": false,
+        "unlabeled": [],
+        "inputs": [],
+        "navs": [
+          {
+            "label": "Living video navigation",
+            "visible": true,
+            "itemCount": 6,
+            "texts": [
+              "World",
+              "Store",
+              "Journey",
+              "AI",
+              "Wallet",
+              "Hello City · unavailable"
+            ]
+          },
+          {
+            "label": "التنقل الرئيسي للجوّال",
+            "visible": true,
+            "itemCount": 4,
+            "texts": [
+              "الرئيسية",
+              "مباشر",
+              "الرسائل",
+              "الملف"
+            ]
+          }
+        ],
+        "headings": [],
+        "images": [],
+        "videos": 3,
+        "bodyMobileNav": "1",
+        "betaHits": [],
+        "shaHits": [],
+        "visibleTextSample": "UMTUBA ◇ Tier UM تسجيل الدخول Discover Loading video… م مارينا بوست FOLLOW @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 0 0 1 UCONNECT M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worl"
+      }
+    },
+    "betaWording": {
+      "/": {
+        "url": "https://umtuba.com/",
+        "lang": "ar",
+        "dir": "rtl",
+        "betaHits": []
+      },
+      "/welcome": {
+        "url": "https://umtuba.com/welcome",
+        "lang": "ar",
+        "dir": "rtl",
+        "betaHits": [
+          "ألفا 0.2"
+        ]
+      },
+      "/login": {
+        "url": "https://umtuba.com/login",
+        "lang": "ar",
+        "dir": "rtl",
+        "betaHits": []
+      },
+      "/discover": {
+        "url": "https://umtuba.com/",
+        "lang": "ar",
+        "dir": "rtl",
+        "betaHits": []
+      },
+      "/watch": {
+        "url": "https://umtuba.com/watch",
+        "lang": "ar",
+        "dir": "rtl",
+        "betaHits": []
+      }
+    },
+    "loginRedirect": {
+      "attempted": true,
+      "expectedDestination": "/profile",
+      "beforeUrl": "https://umtuba.com/login",
+      "afterUrl": "https://umtuba.com/login",
+      "leftLogin": false,
+      "landedProfile": false,
+      "pathname": "/login",
+      "metrics": {
+        "title": "Log in | UMTUBA",
+        "url": "https://umtuba.com/login",
+        "lang": "en",
+        "dir": "ltr",
+        "overflowX": 0,
+        "headerOverflow": 0,
+        "headerHeight": null,
+        "skipLink": false,
+        "unlabeled": [],
+        "inputs": [
+          {
+            "tag": "select",
+            "type": null,
+            "id": "umtuba-language-auth",
+            "name": "locale",
+            "labelled": true
+          },
+          {
+            "tag": "input",
+            "type": "email",
+            "id": "email",
+            "name": "email",
+            "labelled": true
+          },
+          {
+            "tag": "input",
+            "type": "password",
+            "id": "password",
+            "name": "password",
+            "labelled": true
+          }
+        ],
+        "navs": [],
+        "headings": [
+          {
+            "tag": "h1",
+            "text": "Your world is waiting."
+          },
+          {
+            "tag": "h2",
+            "text": "Welcome back"
+          }
+        ],
+        "images": [],
+        "videos": 0,
+        "bodyMobileNav": null,
+        "betaHits": [],
+        "shaHits": [],
+        "visibleTextSample": "UMTUBA Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one"
+      }
+    }
+  },
+  "surfaces": {},
+  "runtime": {
+    "console": [
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0A03600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[.WebGL-0x44ac05192900]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[.WebGL-0x44ac05192900]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[.WebGL-0x44ac05192900]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[.WebGL-0x44ac05192900]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "https://umtuba.com/this-route-does-not-exist-a3-final-qa"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0703600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0D03600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0D03600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0A03600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0703600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "warning",
+        "text": "WebSocket connection to 'wss://tgucwnjwoyeqoxqaxmew.supabase.co/realtime/v1/websocket?apikey=sb_publishable_WfPDsM-jVvzGpisXPnZznw_VvCryXS0&vsn=2.0.0' failed: WebSocket is closed before the connection is established.",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/search"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0703600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0A03600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "warning",
+        "text": "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "warning",
+        "text": "[GroupMarkerNotSet(crbug.com/242999)!:A0703600B4230000]Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.",
+        "url": "https://umtuba.com/welcome"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/"
+      },
+      {
+        "type": "error",
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      }
+    ],
+    "pageErrors": [
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      },
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "url": "https://umtuba.com/watch"
+      }
+    ],
+    "failed": [
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fcreate",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/welcome?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fcreate&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?_rsc=x75wzsg_NPcEQdn1",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/discover?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fsearch&_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/discover?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fsaved",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?next=%2Fmessages&_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?next=%2Fprofile&_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=OXEfaXsCQr9qpu4a",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/create/video?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=YnwfCr00hjwHFtrO",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fsearch&_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fwatch&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fcreate%2Fvideo",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fsaved",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/messages?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fwatch&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/discover?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fcreate%2Fvideo",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=u9rLggu6SL8_7uIe",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/discover?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fwatch&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fwatch&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=u9rLggu6SL8_7uIe",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5xLyNz63TY2pmv9F",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=EFt9gpRR9LD1Jj4R",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=6grVij_EUBxTWnLP",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=YnwfCr00hjwHFtrO",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=MnWTrh3l-09yAlSG",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2F&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fcreate",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/saved?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/create/video?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=nFUR-5Bouy9F47TM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=tXyZJ52UQVBCVsD3",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/saved?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/create/video?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/search?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/learning?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/signup?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fmessages&_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=mTKC2E8SPw2wpibM",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?_rsc=vy-S7OgYf3YVsc9g",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fprofile&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/live?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?city=umtuba&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fdiscover&_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/world?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/games?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/store?_rsc=5CB68i4pnAekjehf",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/e41f7a2f-9541-4ac2-929b-97a3bd52c18d/u-1786616106914-lqss8cll.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVkLTRlMmEtOGRm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/storage/v1/object/sign/post-videos/2bb21fbb-4809-43e4-aa52-c10b5b300fef/a497878c-2a65-485f-90f1-b5119262e60b.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV84MTFhZGMwYi04ZTVk",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Frewards&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/discover?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/login?next=%2Fnotifications&_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/profile/marenapost?_rsc=8jqJS-cgH3yyLzMX",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/watch",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/forgot-password?_rsc=_H_fFy2_Q06N8BA7",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://umtuba.com/?_rsc=sW2A7HEmFQnSVIMx",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  "productionProof": {
+    "homeStatus": 200,
+    "headers": {
+      "cache-control": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "server": "nginx",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "SAMEORIGIN"
+    },
+    "shaHits": []
+  },
+  "finishedAt": "2026-08-15T14:37:32.054Z"
+}

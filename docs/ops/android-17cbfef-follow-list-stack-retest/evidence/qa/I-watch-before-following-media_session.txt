@@ -1,0 +1,116 @@
+﻿MEDIA SESSION SERVICE (dumpsys media_session)
+
+11 sessions listeners.
+Global priority session is com.android.server.telecom/HeadsetMediaButton/1 (userId=0)
+  HeadsetMediaButton com.android.server.telecom/HeadsetMediaButton/1 (userId=0)
+    ownerPid=5447, ownerUid=1000, userId=0
+    package=com.android.server.telecom
+    launchIntent=null
+    mediaButtonReceiver=null
+    active=false
+    flags=65537
+    rating type=0
+    controllers: 0
+    state=null
+    audioAttrs=AudioAttributes: usage=USAGE_VOICE_COMMUNICATION content=CONTENT_TYPE_SPEECH flags=0x800(FLAG_MUTE_HAPTIC)  tags= bundle=null
+    volumeType=LOCAL, controlType=ABSOLUTE, max=0, current=0, volumeControlId=null
+    metadata: null
+    queueTitle=null, size=0
+User Records:
+Record for full_user=0
+  Volume key long-press listener: null
+  Volume key long-press listener package: 
+  Media key listener: null
+  Media key listener package: 
+  OnMediaKeyEventDispatchedListener: added 0 listener(s)
+  OnMediaKeyEventSessionChangedListener: added 2 listener(s)
+    from com.samsung.android.app.routines
+    from com.samsung.android.knox.app.networkfilter
+  Last MediaButtonReceiver: MBR {pi=null, componentName=ComponentInfo{org.telegram.messenger/org.telegram.messenger.voip.VoIPMediaButtonReceiver}, type=1, pkg=org.telegram.messenger}
+  High priority mediakey receiver: null
+  Volume key long-press receiver: null
+  Media button session is com.umtuba.app/androidx.media3.session.id.ExpoVideoBasicMediaSession_53647980/350 (userId=0)
+  Sessions Stack - have 3 sessions:
+    androidx.media3.session.id.ExpoVideoBasicMediaSession_53647980 com.umtuba.app/androidx.media3.session.id.ExpoVideoBasicMediaSession_53647980/350 (userId=0)
+      ownerPid=23468, ownerUid=10529, userId=0
+      package=com.umtuba.app
+      launchIntent=null
+      mediaButtonReceiver=null
+      active=true
+      flags=7
+      rating type=0
+      controllers: 6
+      state=PlaybackState {state=PLAYING(3), position=48137, buffered position=100449, speed=1.0, updated=487020026, actions=7339995, custom actions=[], active item id=0, error=null}
+      audioAttrs=AudioAttributes: usage=USAGE_MEDIA content=CONTENT_TYPE_UNKNOWN flags=0x800(FLAG_MUTE_HAPTIC)  tags= bundle=null
+      volumeType=LOCAL, controlType=ABSOLUTE, max=0, current=0, volumeControlId=null
+      metadata: size=2, description=null, null, null
+      queueTitle=null, size=1
+    TAG com.skype.raider/TAG/6 (userId=0)
+      ownerPid=19402, ownerUid=10404, userId=0
+      package=com.skype.raider
+      launchIntent=null
+      mediaButtonReceiver=MBR {pi=PendingIntent{4645db1: PendingIntentRecord{b2e0296 com.skype.raider broadcastIntent}}, componentName=null, type=0, pkg=com.skype.raider}
+      active=true
+      flags=3
+      rating type=0
+      controllers: 7
+      state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=1.0, updated=426714320, actions=0, custom actions=[], active item id=-1, error=null}
+      audioAttrs=AudioAttributes: usage=USAGE_MEDIA content=CONTENT_TYPE_UNKNOWN flags=0x800(FLAG_MUTE_HAPTIC)  tags= bundle=null
+      volumeType=LOCAL, controlType=ABSOLUTE, max=0, current=0, volumeControlId=null
+      metadata: null
+      queueTitle=null, size=0
+    play_movies_media com.google.android.videos/play_movies_media/271 (userId=0)
+      ownerPid=2862, ownerUid=10345, userId=0
+      package=com.google.android.videos
+      launchIntent=null
+      mediaButtonReceiver=null
+      active=false
+      flags=3
+      rating type=0
+      controllers: 0
+      state=null
+      audioAttrs=AudioAttributes: usage=USAGE_MEDIA content=CONTENT_TYPE_UNKNOWN flags=0x800(FLAG_MUTE_HAPTIC)  tags= bundle=null
+      volumeType=LOCAL, controlType=ABSOLUTE, max=0, current=0, volumeControlId=null
+      metadata: null
+      queueTitle=null, size=0
+isAppCastingOn:false
+isMultiSoundOn:false
+Events log: MediaSession events
+08-22 03:45:28:333 registerRemoteVolumeController uid : 10051, pid : 6277, rvc : android.media.IRemoteSessionCallback$Stub$Proxy@dc59626
+08-22 09:59:59:107 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:349 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:396 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:448 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:498 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:549 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:599 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:651 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:699 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:755 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_DOWN,stream=-2147483648,musicOnly=false
+08-22 09:59:59:783 VolKeyEvt, pkg=com.umtuba.app,opPkg=com.umtuba.app,pid=3545,uid=10529,asSystem=true,code=KEYCODE_VOLUME_UP,act:ACTION_UP,stream=-2147483648,musicOnly=false
+
+isSupportMediaDataPlatform:true
+Events log: MediaSessionDataPlatform logger
+08-22 22:39:24:768 getMediaType for uid: 10295 Video
+08-22 22:39:32:278 Do not send data because playing time too short 7509ms
+08-22 22:40:51:559 getMediaType for uid: 10295 Video
+08-22 22:40:55:589 Do not send data because playing time too short 4030ms
+08-22 22:41:10:806 getMediaType for uid: 10295 Video
+08-22 22:41:17:999 Do not send data because playing time too short 7193ms
+08-22 22:41:37:411 getMediaType for uid: 10295 Video
+08-22 22:41:39:450 getMediaType for uid: 10295 Video
+08-22 22:42:07:113 Do not send data because playing time too short 29702ms
+08-22 22:42:22:729 getMediaType for uid: 10295 Video
+08-22 22:42:27:612 Do not send data because playing time too short 4883ms
+08-22 22:42:31:380 getMediaType for uid: 10295 Video
+08-22 22:42:53:541 Do not send data because playing time too short 22161ms
+08-22 22:43:16:414 getMediaType for uid: 10295 Video
+08-22 22:43:23:530 Do not send data because playing time too short 7116ms
+
+Audio playback (lastly played comes first)
+  uid=10529 packages=com.umtuba.app 
+Media session config:
+  media_button_receiver_fgs_allowlist_duration_ms: [cur: 10000, def: 10000]
+  media_session_calback_fgs_allowlist_duration_ms: [cur: 10000, def: 10000]
+  media_session_callback_fgs_while_in_use_temp_allow_duration_ms: [cur: 10000, def: 10000]
+  media_session_temp_user_engaged_duration_ms: [cur: 600000, def: 600000]

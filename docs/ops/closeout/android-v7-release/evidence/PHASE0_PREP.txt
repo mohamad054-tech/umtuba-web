@@ -1,0 +1,34 @@
+﻿DESKTOP_A1_ANDROID_V7_BUILD_EVIDENCE_V1 — PHASE 0 PREP
+DATE=2026-08-16
+DEVICE=DESKTOP-A1
+THIS_SESSION=AUTHORIZED_V7_BUILD_VALIDATE_EVIDENCE
+PLAY_CONSOLE=FORBIDDEN
+FOLD6_INSTALL=NOT_THIS_SESSION
+PRODUCTION_SUBMISSION=NO
+
+A1_WT=C:\Users\1\Desktop\umtuba\worktrees\DESKTOP-A1-ANDROID-V6
+A1_BRANCH=office/android-v6-minimal-source-fix-v1
+A1_HEAD=320424717cd02646a9e586754f41649b9ac55cd7
+A1_FIX_SHA=7841b7263ae9b30a096bfdb147c1fa67dfcb491b
+A1_WORKING_TREE=CLEAN
+A1_UPSTREAM=NONE
+PUSHED=NO
+WEB_HEAD=380a36646d4de8a37c39a56ac3ccd449f6d8b20d
+WEB_AHEAD_BEHIND=0 0 (no FF)
+
+versionName=1.0.0
+app.config.ts versionCode=7
+EAS_REMOTE_ANDROID_VERSIONCODE_BEFORE=6
+PACKAGE=com.umtuba.app
+EAS_PROJECT=@umtuba/umtuba-mobile
+EAS_PROJECT_ID=d2593b45-8f18-4c57-9d71-0419193cfd77
+EAS_WHOAMI=mohamadabutair (umtuba Owner)
+KEYSTORE=existing remote Build Credentials p6De1DDtE_ (do not rotate)
+APPROVED_PRODUCTION_CMD=npx eas-cli build --platform android --profile production --non-interactive
+APPROVED_DEVICE_APK_CMD=npx eas-cli build --platform android --profile preview --non-interactive
+STALE_SHA_DO_NOT_BUILD=822d893c78505d7db99e892190510cf202cbbc6d
+V6_AAB=5c3493cb-ae5f-4065-ad61-3605a9887bd2
+V6_APK=6a948536-7d5e-4406-8670-304bf7a1ff98
+STAGING_AAB=docs/ops/closeout/android-v7-release/aab/
+STAGING_APK=docs/ops/closeout/android-v7-release/apk/
+STAGING_EVIDENCE=docs/ops/closeout/android-v7-release/evidence/

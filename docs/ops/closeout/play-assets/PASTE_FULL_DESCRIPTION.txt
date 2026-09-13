@@ -1,0 +1,25 @@
+SCREEN/PATH = Play Console → Grow → Store presence → Main store listing → Full description
+EXACT TEXT TO PASTE =
+UMTUBA is a social video app for people 13 and older. Watch short videos from creators, publish your own clips, discover new talent, and send 1:1 messages.
+
+What you can do in this Android release:
+• Watch — public creator videos
+• Discover — browse trending and latest videos
+• Create — upload a video from your gallery with a caption
+• Messages — 1:1 text conversations
+• Account — sign in with email and password
+
+Live is not available in this Android release.
+
+UMTUBA is not directed at children under 13. If you are under the age of digital consent or majority where you live, use UMTUBA only with a parent or guardian’s permission.
+
+Privacy: https://umtuba.com/privacy
+Terms: https://umtuba.com/terms
+Delete your account: https://umtuba.com/account-deletion
+
+CHAR_COUNT = 785 / 4000
+SAFE_TO_SAVE_NOW = YES for text
+FINALIZED = YES
+TASK_ID = DESKTOP_A2_GOOGLE_PLAY_REAL_ASSET_OUTPUT_V1
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Paste umtuba-mobile/release-artifacts/store-listing/MAIN_STORE_LISTING.txt (contains a Safety / report / block bullet written for v4). Do not claim Live, Store, Learning, Games, AI Companion, or in-app Safety tools.

@@ -1,0 +1,80 @@
+[
+  {
+    "name": "01-store-home-desktop-en.png",
+    "url": "https://umtuba.com/store?hl=en",
+    "status": 200,
+    "title": "Store — UMTUBA",
+    "dir": "ltr",
+    "lang": "en",
+    "productLinks": 0,
+    "hasComing": true,
+    "hasNothingForSale": true,
+    "hasZeroResults": false,
+    "pathname": "/store"
+  },
+  {
+    "name": "02-store-search-desktop-en.png",
+    "url": "https://umtuba.com/store/search?hl=en",
+    "status": 200,
+    "title": "Store search | UMTUBA",
+    "dir": "ltr",
+    "lang": "en",
+    "productLinks": 0,
+    "hasComing": false,
+    "hasNothingForSale": false,
+    "hasZeroResults": true,
+    "pathname": "/store/search"
+  },
+  {
+    "name": "03-store-home-mobile-en.png",
+    "url": "https://umtuba.com/store?hl=en",
+    "status": 200,
+    "title": "Store — UMTUBA",
+    "dir": "ltr",
+    "lang": "en",
+    "productLinks": 0,
+    "hasComing": true,
+    "hasNothingForSale": true,
+    "hasZeroResults": false,
+    "pathname": "/store"
+  },
+  {
+    "name": "04-store-home-desktop-ar.png",
+    "url": "https://umtuba.com/store?hl=ar",
+    "status": 200,
+    "title": "المتجر — UMTUBA",
+    "dir": "rtl",
+    "lang": "ar",
+    "productLinks": 0,
+    "hasComing": true,
+    "hasNothingForSale": true,
+    "hasZeroResults": false,
+    "pathname": "/store"
+  },
+  {
+    "name": "05-store-search-desktop-ar.png",
+    "url": "https://umtuba.com/store/search?hl=ar",
+    "status": 200,
+    "title": "Store search | UMTUBA",
+    "dir": "rtl",
+    "lang": "ar",
+    "productLinks": 0,
+    "hasComing": false,
+    "hasNothingForSale": false,
+    "hasZeroResults": false,
+    "pathname": "/store/search"
+  },
+  {
+    "name": "06-store-cart-desktop-en.png",
+    "url": "https://umtuba.com/store/cart?hl=en",
+    "status": 200,
+    "title": "Log in | UMTUBA",
+    "dir": "ltr",
+    "lang": "en",
+    "productLinks": 0,
+    "hasComing": false,
+    "hasNothingForSale": false,
+    "hasZeroResults": false,
+    "pathname": "/login"
+  }
+]

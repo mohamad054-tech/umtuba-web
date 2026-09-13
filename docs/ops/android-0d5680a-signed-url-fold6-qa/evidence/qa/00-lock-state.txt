@@ -1,0 +1,7 @@
+      Window #13: WindowStateAnimator{1c9890 Bouncer}
+  mCurrentFocus=null
+    mShowingDream=false mDreamingLockscreen=false
+  mCurrentFocus=Window{57124d6 u0 com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity}
+    mShowingDream=false mDreamingLockscreen=false
+  Window #4 Window{e6fd98 u0 Bouncer}:
+    WindowStateAnimator{1c9890 Bouncer}:

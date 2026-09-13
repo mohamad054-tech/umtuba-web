@@ -1,0 +1,45 @@
+﻿{
+  "id": "fa041da6-e121-47f8-aee8-98f52ea343bc",
+  "status": "FINISHED",
+  "platform": "ANDROID",
+  "artifacts": {
+    "buildUrl": "https://expo.dev/artifacts/eas/NoPNvZaxZq9-Ej5MQ-lu6YIIyfP_8ZwVw7tIS2N76z0.apk",
+    "applicationArchiveUrl": "https://expo.dev/artifacts/eas/NoPNvZaxZq9-Ej5MQ-lu6YIIyfP_8ZwVw7tIS2N76z0.apk"
+  },
+  "initiatingActor": {
+    "id": "b272aed1-369f-4528-b362-e55c5a622af2",
+    "displayName": "mohamadabutair"
+  },
+  "logFiles": [
+    "https://storage.googleapis.com/eas-workflows-production/logs/d2593b45-8f18-4c57-9d71-0419193cfd77/fa041da6-e121-47f8-aee8-98f52ea343bc/2026-08-22T10%3A06%3A57Z-5b5f6ed2-ee72-4ce6-bd06-a44a39c0feff.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260822%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260822T103104Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=906566ce8f32e11ed26b57471965d53092ce5bc5e5f0b2708ed43f6a3f56d63ad2d830fc9e4c54b151596c5d01bf8ede8ed933bfcc4f6e021ce642bad5008a110cd826fbca0ae8dbefa4b1db72bec8f79fea22b669e8708fe8a55daeaa399b9b48f33f6ed25c4304cc6de3bec2ca62b8aed316cf06726962f7b3ba128ca41ee53b3ea63a984008d5699e477fdb67cde17e72adc8d9efdda1db64a51b33ad33e8ba29429052e48f8c8ac15e2cca40f7a0e2e105face58cb09a1ccee35427f3f0da686ca95717d74a9619ed96c80a23d5f194dc9170e26879ab8121795813f384d420811335b187ab7aa99f8ac333dc93fa10345f7e89d447e1c588eac581e6413"
+  ],
+  "app": {
+    "id": "d2593b45-8f18-4c57-9d71-0419193cfd77",
+    "name": "UMTUBA",
+    "slug": "umtuba-mobile",
+    "ownerAccount": {
+      "id": "313f9686-6fce-4a77-a7c2-9d3e3aca0410",
+      "name": "umtuba"
+    }
+  },
+  "distribution": "INTERNAL",
+  "buildProfile": "preview",
+  "appIdentifier": "com.umtuba.app",
+  "sdkVersion": "57.0.0",
+  "appVersion": "1.0.0",
+  "appBuildVersion": "20",
+  "gitCommitHash": "0d5680ad05fbbb988a59de86c2ee2e87f733f970",
+  "gitCommitMessage": "fix(mobile): sign the active Watch URL before the rest of the feed page.\n\nCo-authored-by: Cursor <cursoragent@cursor.com>",
+  "priority": "HIGH",
+  "createdAt": "2026-08-22T10:06:52.217Z",
+  "updatedAt": "2026-08-22T10:28:08.465Z",
+  "message": "DESKTOP_ANDROID_0D5680A_SIGNED_URL_REGRESSION_QA_V1 preview APK no Play submit SHA 0d5680ad05fbbb988a59de86c2ee2e87f733f970",
+  "completedAt": "2026-08-22T10:28:08.300Z",
+  "expirationDate": "2026-11-20T10:06:52.239Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 4841,
+    "buildQueueTime": 4649,
+    "buildDuration": 1266593
+  }
+}

@@ -1,0 +1,8 @@
+﻿origin/alpha-0.2=e84475a769c731bb7e1ad511b3543ee714d2feea
+office/profile-hero=7ed9159f62d6a82d1999b19ef9d1df9a63c09de9
+origin/partial-refund-tip=9227cc3bd6fc293561f60e87b3d6af204c640947
+origin/sot=e4d9a8d3ca89a3c41f8a9c3be727a7f8a62ccbaf
+origin/stripe-regression=df4766803cb28af541ca6af13301e8faeb51db44
+origin/rc-pack=ab0d9eb61e906d3cb7cc48716660aa30c3ba1245
+origin/live-gate=05e0043080f82779a3d97b810303b8c0e804d14a
+fetch_time=2026-08-12T12:06:06.9342624+03:00

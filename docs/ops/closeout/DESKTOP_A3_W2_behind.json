@@ -1,0 +1,23 @@
+﻿[
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-collaboration-learning-link-unlink-local-e2e-v1",
+        "branch":  "office/collaboration-learning-link-unlink-local-e2e-desktop-v1",
+        "ahead":  "0",
+        "behind":  "16",
+        "head":  "be5d836aae2697790432bfec7b5e799802ac2498"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-completion-audit-v1",
+        "branch":  "office/commerce-completion-audit-v1",
+        "ahead":  "0",
+        "behind":  "1",
+        "head":  "ca157d716348ba107f546e453602eae7c48ec989"
+    },
+    {
+        "path":  "C:/Users/1/Desktop/umtuba/umtuba-web-commerce-partial-refund-provider-money-execution-v1",
+        "branch":  "office/commerce-partial-refund-provider-money-execution-v1",
+        "ahead":  "0",
+        "behind":  "17",
+        "head":  "4291bdbfb395b00a9c9cc5aa0d05d560a1e672ab"
+    }
+]

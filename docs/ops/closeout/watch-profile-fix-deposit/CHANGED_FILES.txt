@@ -1,0 +1,6 @@
+app/(tabs)/watch.tsx
+app/profile/index.tsx
+src/lib/auth/profile.ts
+src/lib/profile/index.ts
+src/lib/profile/profileTarget.ts
+src/lib/profile/profileTarget.test.ts

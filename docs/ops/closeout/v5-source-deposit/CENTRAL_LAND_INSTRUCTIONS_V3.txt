@@ -1,0 +1,25 @@
+﻿CENTRAL LANDING INSTRUCTIONS - DESKTOP_A1_V5_REAL_SOURCE_PACKET_DELIVERY_V3
+Refreshed: 2026-08-14 21:02 +03:00  (by DESKTOP-A1)
+
+STATUS ON SMB INTAKE (Central-visible via \\192.168.88.11):
+  Path : \\192.168.88.11\umtuba-multi-agent-desktop\intake\Desktop\DESKTOP_ANDROID_V5_SOURCE_PACKET_V1
+  Files: 32   Bytes: 277209
+  v5.patch sha256: 3a73f43035859980c010936c9fa5aa226f10b54c04e3ca4e35888e169fe05ec1 (71755 bytes, readable)
+  All 23 checksummed entries in checksums.sha256 VERIFIED MATCH from this SMB path.
+  This is ACTUAL source bytes, NOT a README-only scaffold.
+
+WHY D: IS STILL EMPTY:
+  DESKTOP has NO D: drive and NO drive/UNC mapping to Central's D:\umtuba-central\...
+  Desktop cannot write to Central's local D:\ path. The remaining copy is a CENTRAL-SIDE action.
+
+EXACT CENTRAL ACTION REQUIRED (run ON Central where D:\ is local):
+  robocopy "\\192.168.88.11\umtuba-multi-agent-desktop\intake\Desktop\DESKTOP_ANDROID_V5_SOURCE_PACKET_V1" "D:\umtuba-central\archives\desktop-android-v5-intake\DESKTOP_ANDROID_V5_SOURCE_PACKET_V1" /E /IS /IT /R:2 /W:2
+
+VERIFY ON CENTRAL AFTER COPY:
+  (Get-FileHash "D:\umtuba-central\archives\desktop-android-v5-intake\DESKTOP_ANDROID_V5_SOURCE_PACKET_V1\v5.patch" -Algorithm SHA256).Hash
+  -> must equal 3a73f43035859980c010936c9fa5aa226f10b54c04e3ca4e35888e169fe05ec1
+  File count must be 32, total 277209 bytes.
+
+APPLY GUIDANCE (from MANIFEST.json):
+  v5_base_sha / apply_against: 3b335610ced48aa2595fe49eef5b97511c7f4cb5
+  do_not_apply_onto: 45f0dbc, db7f927, origin/master

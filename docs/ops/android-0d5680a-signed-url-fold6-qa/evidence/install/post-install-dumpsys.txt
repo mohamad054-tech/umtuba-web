@@ -1,0 +1,5 @@
+﻿    pkg=Package{e26ca97 com.umtuba.app}
+    codePath=/data/app/~~oEwtqrDB2B2NKvVIGfIz4g==/com.umtuba.app-uO8aZNTWO438843kD40UJg==
+    versionCode=20 minSdk=24 targetSdk=36
+    versionName=1.0.0
+    lastUpdateTime=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ت┘ت ┘ة┘ث:┘ث┘ج:┘ت┘ة

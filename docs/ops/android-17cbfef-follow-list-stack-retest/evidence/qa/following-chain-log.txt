@@ -1,0 +1,8 @@
+01:28:23.447 start following chain from Watch @mohamad 2:15
+01:28:29.506 opened profile
+01:28:29.564 following btn 485,1516
+01:28:35.511 opened following
+01:28:52.851 opened following member
+01:28:58.806 HW back from member
+01:29:04.912 HW back from following list
+01:29:20.810 HW back from originating profile

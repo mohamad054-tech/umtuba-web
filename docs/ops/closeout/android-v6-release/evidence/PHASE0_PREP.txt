@@ -1,0 +1,27 @@
+DESKTOP_ANDROID_V6_RELEASE_EXECUTION_V1 — PHASE 0 PREP
+DATE=2026-08-15
+DEVICE=DESKTOP-A3
+FOLD6_ADB=RFCX718LVHK device product:q6qxxx model:SM_F956B
+FOLD6_STATE=device (USB debugging authorized)
+INSTALLED_NOW=com.umtuba.app versionName=1.0.0 versionCode=5 targetSdk=36
+STALE_SHA_DO_NOT_BUILD=822d893c78505d7db99e892190510cf202cbbc6d
+
+EAS_PROJECT=@umtuba/umtuba-mobile
+EAS_PROJECT_ID=d2593b45-8f18-4c57-9d71-0419193cfd77
+EAS_WHOAMI=mohamadabutair (umtuba Owner)
+APPROVED_PRODUCTION_CMD=npx eas-cli build --platform android --profile production --non-interactive
+APPROVED_DEVICE_APK_CMD=npx eas-cli build --platform android --profile preview --non-interactive
+V5_PRODUCTION_AAB=a930e3f4-407b-4c5c-a919-b890be5203aa STORE production versionCode 5 SHA 822d893
+V5_DEVICE_APK=7ddb4e2a-807f-463c-9924-60b169c81a83 INTERNAL preview versionCode 5 SHA 822d893
+KEYSTORE=existing remote Build Credentials p6De1DDtE_ (do not rotate)
+TOOLCHAIN=docs/ops/closeout/android-device-toolchain/env.ps1
+STAGING_AAB=docs/ops/closeout/android-v6-release/aab/
+STAGING_EVIDENCE=docs/ops/closeout/android-v6-release/evidence/
+STAGING_QA=docs/ops/closeout/a3-v6-device-qa/
+
+A1_WT=C:\Users\1\Desktop\umtuba\worktrees\DESKTOP-A1-ANDROID-V6
+A1_BRANCH=office/android-v6-minimal-source-fix-v1
+A1_HEAD_AT_PREP=822d893c78505d7db99e892190510cf202cbbc6d
+A1_COMMIT=NOT_YET
+A1_CLOSEOUT=docs/ops/closeout/DESKTOP_ANDROID_V6_MINIMAL_SOURCE_FIX_V1.md ABSENT
+DO_NOT_BUILD_UNTIL=A1 STATUS=PASS and V6_SOURCE_SHA != 822d893 with versionCode 6

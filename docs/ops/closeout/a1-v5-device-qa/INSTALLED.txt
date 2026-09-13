@@ -1,0 +1,11 @@
+package=com.umtuba.app
+versionName=1.0.0
+versionCode=5
+minSdk=24
+targetSdk=36
+device=SM-F956B
+serial=RFCX718LVHK
+adb=device
+cover=968x2376
+inner=1856x2160 OFF (folded)
+dumpsys=dumpsys-package.txt

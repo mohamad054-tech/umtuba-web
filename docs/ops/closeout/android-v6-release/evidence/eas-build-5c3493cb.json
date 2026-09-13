@@ -1,0 +1,20 @@
+{
+  "buildId": "5c3493cb-ae5f-4065-ad61-3605a9887bd2",
+  "platform": "android",
+  "status": "finished",
+  "profile": "production",
+  "distribution": "store",
+  "versionName": "1.0.0",
+  "versionCode": 6,
+  "package": "com.umtuba.app",
+  "gitCommitHash": "f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604",
+  "logsUrl": "https://expo.dev/accounts/umtuba/projects/umtuba-mobile/builds/5c3493cb-ae5f-4065-ad61-3605a9887bd2",
+  "localPath": "docs/ops/closeout/android-v6-release/aab/umtuba-android-production-5c3493cb.aab",
+  "sha256": "17775D73434A16243496EEDCAB724C9960106DB73BF89134AB9B7CF00E652E67",
+  "bytes": 102265891,
+  "playUpload": false,
+  "playUploadReason": "Cursor Play Console tab vanished; operator must upload to Closed Testing Alpha",
+  "keystore": "Build Credentials p6De1DDtE_ (default)",
+  "signingChanged": false,
+  "manualAabModification": false
+}

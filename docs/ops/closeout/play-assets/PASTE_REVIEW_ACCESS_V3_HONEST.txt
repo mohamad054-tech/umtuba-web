@@ -1,0 +1,21 @@
+SCREEN/PATH = Play Console → Policy → App content → App access
+STATUS = ALREADY ENTERED (operator + DESKTOP_GOOGLE_PLAY_REVIEW_ACCOUNT_PROVISION_V1). Do not reopen unless Console asks.
+REVIEWER USERNAME = google-play-review@umtuba.com
+PASSWORD = operator-local only (umtuba-mobile/.env.play-review.local). Do not paste the password into chat, tickets, or this file.
+
+HONEST INSTRUCTIONS FOR THE CURRENT PLAY BINARY (versionCode 3)
+  1. Install the Internal testing build for com.umtuba.app (v3). Closed Testing may still be draft — do not upload a new AAB to create it.
+  2. Sign in with google-play-review@umtuba.com
+  3. Watch — play a public video. Like / Save only. There is no Report or Block control in this binary.
+  4. Discover — browse cards.
+  5. Create — pick a gallery video and publish a caption. There is no mandatory Terms checkbox in this binary.
+  6. Messages — open a 1:1 thread. There is no Report or Block control in this binary.
+  7. Settings — Edit profile is unavailable; Change password; Sign out. There is no in-app Delete account row in this binary.
+  8. Account deletion is on the web: https://umtuba.com/account-deletion (sign-in required; queues a request).
+  9. Live is intentionally unavailable.
+
+DO_NOT = Paste umtuba-mobile/release-artifacts/store-listing/REVIEWER_INSTRUCTIONS.txt.
+  That file describes Report / Block / Terms-before-publish / Settings Delete account, which exist in local v4/v5 source only and are NOT in the Play binary.
+DO_NOT = Use this account for Store QA (store-qa@umtuba.com is separate).
+SAFE_TO_SAVE_NOW = N/A if App access is already complete. YES only if Console asks to refresh instructions — paste the v3-honest list above, never the mobile v4 YES file.
+SAVED_TO_PLAY_THIS_SESSION = NO

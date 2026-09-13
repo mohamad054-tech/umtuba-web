@@ -1,0 +1,17 @@
+SCREEN/PATH = Play Console → Policy → App content → Content ratings → Start
+EXACT OPTION TO SELECT =
+  Category = Social Networking (or Social / Communication — not Game, not Utility)
+  IARC email = existing Play developer-account email only
+  Designed first-party content: violence / sexual / strong language / drugs / gambling / horror as featured product = NO
+  Users can interact / communicate = YES
+  Users can share videos / text = YES
+  Users can share location = NO
+  Digital purchases / IAP = NO
+  Unrestricted internet / user-shared media others can see = YES
+  Shares user’s personal info with other users = YES (username / public profile)
+  UGC present = YES
+  In-app moderation tools (report / block) = NO for the current Play binary (versionCode 3)
+EXACT TEXT TO PASTE = (radio buttons; do not invent a mailbox)
+SAFE_TO_SAVE_NOW = YES (honest questionnaire for v3). Do not start Production review from this page.
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Paste umtuba-mobile/release-artifacts/store-listing/CONTENT_RATING_IARC.txt (v4 moderation YES). Do not retake to force Everyone.

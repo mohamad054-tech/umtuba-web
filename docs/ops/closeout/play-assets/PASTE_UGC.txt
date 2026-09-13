@@ -1,0 +1,14 @@
+SCREEN/PATH = Play Console → Policy → App content → User-generated content
+EXACT OPTION TO SELECT =
+  App contains UGC = YES
+  Publicly accessible UGC = YES
+  1:1 user interaction = YES
+  In-app report content = NO
+  In-app report users = NO
+  In-app block users = NO
+  Users must accept Terms before create/upload in this Android binary = NO
+EXACT TEXT TO PASTE = (none — do not write that report/block exist)
+WHY = Play binary is still versionCode 3. Internal Testing CORE on v3 has Watch / Discover / Create / Messages. Report / block / Terms-before-publish are not in that binary. v4 AAB is local only and not a final candidate. v5 is not built.
+SAFE_TO_SAVE_NOW = YES only if the form lets you save honest NO answers. NO if completing the card requires claiming report/block exist.
+SAVED_TO_PLAY_THIS_SESSION = NO
+DO_NOT = Paste umtuba-mobile/release-artifacts/store-listing/UGC_DECLARATION.txt (v4 YES). Do not submit for review from this card.

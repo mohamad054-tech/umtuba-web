@@ -1,0 +1,572 @@
+﻿Activity Resolver Table:
+  Schemes:
+      umtuba:
+        c96defb com.umtuba.app/.MainActivity filter b68971
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.DEFAULT"
+          Category: "android.intent.category.BROWSABLE"
+          Scheme: "umtuba"
+        c96defb com.umtuba.app/.MainActivity filter 9ff2356
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.BROWSABLE"
+          Category: "android.intent.category.DEFAULT"
+          Scheme: "https"
+          Scheme: "umtuba"
+          Authority: "umtuba.com": -1
+          Authority: "www.umtuba.com": -1
+          Path: "PatternMatcher{PREFIX: /}"
+          Path: "PatternMatcher{PREFIX: /}"
+          AutoVerify=true
+      https:
+        c96defb com.umtuba.app/.MainActivity filter 9ff2356
+          Action: "android.intent.action.VIEW"
+          Category: "android.intent.category.BROWSABLE"
+          Category: "android.intent.category.DEFAULT"
+          Scheme: "https"
+          Scheme: "umtuba"
+          Authority: "umtuba.com": -1
+          Authority: "www.umtuba.com": -1
+          Path: "PatternMatcher{PREFIX: /}"
+          Path: "PatternMatcher{PREFIX: /}"
+          AutoVerify=true
+
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        c96defb com.umtuba.app/.MainActivity filter 54f9b18
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Receiver Resolver Table:
+  Non-Data Actions:
+      android.intent.action.QUICKBOOT_POWERON:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      com.htc.intent.action.QUICKBOOT_POWERON:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      androidx.profileinstaller.action.SAVE_PROFILE:
+        c7c3273 com.umtuba.app/androidx.profileinstaller.ProfileInstallReceiver filter 207472e
+          Action: "androidx.profileinstaller.action.SAVE_PROFILE"
+      expo.modules.notifications.NOTIFICATION_EVENT:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      androidx.profileinstaller.action.INSTALL_PROFILE:
+        c7c3273 com.umtuba.app/androidx.profileinstaller.ProfileInstallReceiver filter 32b530
+          Action: "androidx.profileinstaller.action.INSTALL_PROFILE"
+      com.google.android.c2dm.intent.RECEIVE:
+        7594bad com.umtuba.app/com.google.firebase.iid.FirebaseInstanceIdReceiver filter ae21ee2
+          Action: "com.google.android.c2dm.intent.RECEIVE"
+      androidx.profileinstaller.action.SKIP_FILE:
+        c7c3273 com.umtuba.app/androidx.profileinstaller.ProfileInstallReceiver filter bebf5a9
+          Action: "androidx.profileinstaller.action.SKIP_FILE"
+      androidx.profileinstaller.action.BENCHMARK_OPERATION:
+        c7c3273 com.umtuba.app/androidx.profileinstaller.ProfileInstallReceiver filter 5d82cf
+          Action: "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+      android.intent.action.BOOT_COMPLETED:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      android.intent.action.MY_PACKAGE_REPLACED:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      android.intent.action.REBOOT:
+        8ea6fd7 com.umtuba.app/expo.modules.notifications.service.NotificationsService filter 12f50c4
+          Action: "android.intent.action.QUICKBOOT_POWERON"
+          Action: "com.htc.intent.action.QUICKBOOT_POWERON"
+          Action: "expo.modules.notifications.NOTIFICATION_EVENT"
+          Action: "android.intent.action.BOOT_COMPLETED"
+          Action: "android.intent.action.MY_PACKAGE_REPLACED"
+          Action: "android.intent.action.REBOOT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+
+Service Resolver Table:
+  Non-Data Actions:
+      com.google.firebase.MESSAGING_EVENT:
+        444a83a com.umtuba.app/expo.modules.notifications.service.ExpoFirebaseMessagingService filter 3597ceb
+          Action: "com.google.firebase.MESSAGING_EVENT"
+          mPriority=-1, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+        9ebfa48 com.umtuba.app/com.google.firebase.messaging.FirebaseMessagingService filter b6bb0e1
+          Action: "com.google.firebase.MESSAGING_EVENT"
+          mPriority=-500, mOrder=0, mHasStaticPartialTypes=false, mHasDynamicPartialTypes=false
+      com.google.android.gms.metadata.MODULE_DEPENDENCIES:
+        c5f45c com.umtuba.app/com.google.android.gms.metadata.ModuleDependencies filter fe54365
+          Action: "com.google.android.gms.metadata.MODULE_DEPENDENCIES"
+
+Domain verification status:
+    User all:
+      Verification link handling allowed: true
+      Selection state:
+        Disabled:
+          umtuba.com
+          www.umtuba.com
+
+Permissions:
+  Permission [com.umtuba.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (9c78637):
+    sourcePackage=com.umtuba.app
+    uid=10428 gids=[] type=0 prot=signature
+    perm=PermissionInfo{cb7ffaf com.umtuba.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+    flags=0x0
+
+Registered ContentProviders:
+  com.umtuba.app/com.google.mlkit.common.internal.MlKitInitProvider:
+    Provider{a995fbc com.umtuba.app/com.google.mlkit.common.internal.MlKitInitProvider}
+  com.umtuba.app/expo.modules.filesystem.FileSystemFileProvider:
+    Provider{5e13b45 com.umtuba.app/expo.modules.filesystem.FileSystemFileProvider}
+  com.umtuba.app/com.google.firebase.provider.FirebaseInitProvider:
+    Provider{d53729a com.umtuba.app/com.google.firebase.provider.FirebaseInitProvider}
+  com.umtuba.app/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider:
+    Provider{68ee7cb com.umtuba.app/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider}
+  com.umtuba.app/com.canhub.cropper.CropFileProvider:
+    Provider{77abba8 com.umtuba.app/com.canhub.cropper.CropFileProvider}
+  com.umtuba.app/androidx.startup.InitializationProvider:
+    Provider{5f46c1 com.umtuba.app/androidx.startup.InitializationProvider}
+
+ContentProvider Authorities:
+  [com.umtuba.app.firebaseinitprovider]:
+    Provider{d53729a com.umtuba.app/com.google.firebase.provider.FirebaseInitProvider}
+      applicationInfo=ApplicationInfo{a6317a4 com.umtuba.app}
+  [com.umtuba.app.androidx-startup]:
+    Provider{5f46c1 com.umtuba.app/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{a3d390d com.umtuba.app}
+  [com.umtuba.app.cropper.fileprovider]:
+    Provider{77abba8 com.umtuba.app/com.canhub.cropper.CropFileProvider}
+      applicationInfo=ApplicationInfo{8170c2 com.umtuba.app}
+  [com.umtuba.app.mlkitinitprovider]:
+    Provider{a995fbc com.umtuba.app/com.google.mlkit.common.internal.MlKitInitProvider}
+      applicationInfo=ApplicationInfo{f844ed3 com.umtuba.app}
+  [com.umtuba.app.ImagePickerFileProvider]:
+    Provider{68ee7cb com.umtuba.app/expo.modules.imagepicker.fileprovider.ImagePickerFileProvider}
+      applicationInfo=ApplicationInfo{58c0a10 com.umtuba.app}
+  [com.umtuba.app.FileSystemFileProvider]:
+    Provider{5e13b45 com.umtuba.app/expo.modules.filesystem.FileSystemFileProvider}
+      applicationInfo=ApplicationInfo{115909 com.umtuba.app}
+
+Key Set Manager:
+  [com.umtuba.app]
+      Signing KeySets: 298
+
+Packages:
+  Package [com.umtuba.app] (2a9a9ce):
+    appId=10428
+    pkg=Package{56f57c0 com.umtuba.app}
+    codePath=/data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==
+    resourcePath=/data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==
+    legacyNativeLibraryDir=/data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==/lib
+    extractNativeLibs=false
+    primaryCpuAbi=arm64-v8a
+    secondaryCpuAbi=null
+    cpuAbiOverride=null
+    versionCode=7 minSdk=24 targetSdk=36
+    minExtensionVersions=[]
+    versionName=1.0.0
+    hiddenApiEnforcementPolicy=2
+    usesNonSdkApi=false
+    splits=[base]
+    apkSigningVersion=2
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP KILL_AFTER_RESTORE ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_REQUEST_LEGACY_EXTERNAL_STORAGE HAS_DOMAIN_URLS PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    forceQueryable=false
+    pageSizeCompat=0
+    queriesIntents=[Intent { act=android.intent.action.VIEW cat=[android.intent.category.BROWSABLE] dat=https:/... }, Intent { act=android.intent.action.OPEN_DOCUMENT_TREE }, Intent { act=android.media.action.IMAGE_CAPTURE }, Intent { act=android.media.action.ACTION_VIDEO_CAPTURE }, Intent { act=androidx.camera.extensions.action.VENDOR_ACTION }, Intent { act=android.intent.action.GET_CONTENT cat=[android.intent.category.OPENABLE] dat=content://*/... typ=*/* }, Intent { act=android.support.customtabs.action.CustomTabsService }]
+    scannedAsStoppedSystemApp=false
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    usesOptionalLibraries:
+      androidx.camera.extensions.impl
+      androidx.window.extensions
+      androidx.window.sidecar
+    usesLibraryFiles:
+      /system/framework/sec_camerax_impl.jar
+      /system_ext/framework/androidx.window.extensions.jar
+      /system_ext/framework/androidx.window.sidecar.jar
+    timeStamp=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ة┘خ ┘ة┘ث:┘ح┘ج:┘ة┘ت
+    lastUpdateTime=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ة┘خ ┘ة┘ث:┘ح┘ج:┘ة┘ر
+    installerPackageName=null
+    installerPackageUid=-1
+    initiatingPackageName=com.android.shell
+    originatingPackageName=null
+    category=manifest: -1, override: -1, by user: -1
+    packageSource=1
+    appMetadataFilePath=null
+    appMetadataSource=0
+    signatures=PackageSignatures{ba50cf9 version:2, signatures:[2da8c4f0], past signatures:[]}
+    installPermissionsFixed=false
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP KILL_AFTER_RESTORE ]
+    privatePkgFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE PRIVATE_FLAG_REQUEST_LEGACY_EXTERNAL_STORAGE HAS_DOMAIN_URLS PARTIALLY_DIRECT_BOOT_AWARE PRIVATE_FLAG_ALLOW_NATIVE_HEAP_POINTER_TAGGING ]
+    apexModuleName=null
+    componentsDeclared=23
+    declared permissions:
+      com.umtuba.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature
+    requested permissions:
+      com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE
+      com.sonyericsson.home.permission.BROADCAST_BADGE
+      android.permission.POST_NOTIFICATIONS
+      com.google.android.c2dm.permission.RECEIVE
+      android.permission.ACCESS_FINE_LOCATION
+      android.permission.SYSTEM_ALERT_WINDOW
+      com.oppo.launcher.permission.WRITE_SETTINGS
+      me.everything.badger.permission.BADGE_COUNT_READ
+      com.anddoes.launcher.permission.UPDATE_COUNT
+      com.sec.android.provider.badge.permission.READ
+      me.everything.badger.permission.BADGE_COUNT_WRITE
+      android.permission.READ_MEDIA_VISUAL_USER_SELECTED
+      com.huawei.android.launcher.permission.WRITE_SETTINGS
+      android.permission.RECEIVE_BOOT_COMPLETED
+      android.permission.INTERNET
+      android.permission.ACCESS_COARSE_LOCATION
+      android.permission.READ_APP_BADGE
+      android.permission.READ_MEDIA_IMAGES
+      com.majeur.launcher.permission.UPDATE_BADGE
+      android.permission.ACCESS_NETWORK_STATE
+      com.oppo.launcher.permission.READ_SETTINGS
+      android.permission.CAMERA
+      com.sonymobile.home.permission.PROVIDER_INSERT_BADGE
+      com.huawei.android.launcher.permission.READ_SETTINGS
+      android.permission.READ_MEDIA_AUDIO
+      android.permission.READ_MEDIA_VIDEO
+      android.permission.USE_FINGERPRINT
+      com.sec.android.provider.badge.permission.WRITE
+      android.permission.VIBRATE
+      com.huawei.android.launcher.permission.CHANGE_BADGE
+      com.umtuba.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+      android.permission.ACCESS_WIFI_STATE
+      android.permission.USE_BIOMETRIC
+      com.htc.launcher.permission.UPDATE_SHORTCUT
+      android.permission.RECORD_AUDIO
+      com.htc.launcher.permission.READ_SETTINGS
+      android.permission.WAKE_LOCK
+    install permissions:
+      com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE: granted=true
+      com.google.android.c2dm.permission.RECEIVE: granted=true
+      com.sec.android.provider.badge.permission.READ: granted=true
+      android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+      android.permission.INTERNET: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.USE_FINGERPRINT: granted=true
+      android.permission.VIBRATE: granted=true
+      com.umtuba.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.ACCESS_WIFI_STATE: granted=true
+      android.permission.USE_BIOMETRIC: granted=true
+      android.permission.WAKE_LOCK: granted=true
+    User 0: ceDataInode=1601357 deDataInode=1600289 installed=true hidden=false suspended=false distractionFlags=0 stopped=false notLaunched=false enabled=0 instant=false virtual=false quarantined=false
+      installReason=0
+      dataDir=/data/user/0/com.umtuba.app
+      firstInstallTime=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ة┘ح ┘ب┘ب:┘ح┘د:┘ة┘ذ
+      uninstallReason=0
+      overlay paths:
+        /product/overlay/NavigationBarMode3Button/NavigationBarMode3ButtonOverlay.apk
+      legacy overlay paths:
+        /product/overlay/NavigationBarMode3Button/NavigationBarMode3ButtonOverlay.apk
+      gids=[3003]
+      runtime permissions:
+        android.permission.POST_NOTIFICATIONS: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_FINE_LOCATION: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_MEDIA_VISUAL_USER_SELECTED: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.ACCESS_COARSE_LOCATION: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_MEDIA_IMAGES: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.CAMERA: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_MEDIA_AUDIO: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.READ_MEDIA_VIDEO: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.RECORD_AUDIO: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+Queries:
+  system apps queryable: false
+  queries via forceQueryable:
+  queries via package name:
+  queries via component:
+    com.screw3d.match.nuts.bolts.pin.jam.away.puzzle:
+      com.umtuba.app
+    atlantis.invaders.subnautica.space.shooter:
+      com.umtuba.app
+    com.connect.enduser:
+      com.umtuba.app
+    com.samsung.android.bixby.agent:
+      com.umtuba.app
+    com.qrcodescanner.barcodescanner.qrcodegenerator.scan:
+      com.umtuba.app
+    com.android.settings.intelligence:
+      com.umtuba.app
+    com.nfo.me.android:
+      com.umtuba.app
+    com.fiogonia.hearts:
+      com.umtuba.app
+    io.esimo.androidapp:
+      com.umtuba.app
+    com.jawaker.tarneeb:
+      com.umtuba.app
+    com.scanbarcode.qrscanner.readqr.generatecode:
+      com.umtuba.app
+    com.google.android.apps.accessibility.voiceaccess:
+      com.umtuba.app
+    com.google.android.as:
+      com.umtuba.app
+    com.google.android.as.oss:
+      com.umtuba.app
+    com.google.android.apps.messaging:
+      com.umtuba.app
+    com.deadpixel.colorblockjam:
+      com.umtuba.app
+    com.zuma.deluxe.marble.puzzle:
+      com.umtuba.app
+    com.samsung.android.spay:
+      com.umtuba.app
+    com.microsoft.office.outlook:
+      com.umtuba.app
+    com.facebook.katana:
+      com.umtuba.app
+    com.whatsapp:
+      com.umtuba.app
+    com.samsung.android.email.provider:
+      com.umtuba.app
+    com.truecaller:
+      com.umtuba.app
+    com.zm.crossmath:
+      com.umtuba.app
+    com.whatsapp.w4b:
+      com.umtuba.app
+    com.imo.android.imoim:
+      com.umtuba.app
+    com.microdose.balljam:
+      com.umtuba.app
+    com.abi.woodout.screw.bar:
+      com.umtuba.app
+    com.taptapgames.unpuzzle:
+      com.umtuba.app
+    com.instagram.android:
+      com.umtuba.app
+    tangle3d.twistedrope.untie.untangle:
+      com.umtuba.app
+    com.zhiliaoapp.musically:
+      com.umtuba.app
+    com.funfinity.knitzy.thread:
+      com.umtuba.app
+    com.sort.fridge.puzzle:
+      com.umtuba.app
+    com.alibaba.intl.android.apps.poseidon:
+      com.umtuba.app
+    com.highcore.hoopstars:
+      com.umtuba.app
+    com.photograph.paint:
+      com.umtuba.app
+    us.zoom.videomeetings:
+      com.umtuba.app
+    com.gstarmc.android:
+      com.umtuba.app
+    com.facebook.pages.app:
+      com.umtuba.app
+    com.lemon.lvoverseas:
+      com.umtuba.app
+    com.umtuba.app:
+      com.google.android.documentsui
+      com.microsoft.skydrive
+      com.google.android.googlequicksearchbox
+      com.android.chrome
+      com.google.android.setupwizard
+      com.sec.android.app.sbrowser
+      com.google.android.apps.docs
+      com.google.android.apps.photos
+      com.google.earth
+      com.dropbox.android
+      com.sec.android.app.music
+      com.google.android.photopicker
+    com.intsig.camscanner:
+      com.umtuba.app
+    im.thebot.messenger:
+      com.umtuba.app
+    com.solitaire.fish.klondike.card.aquarium:
+      com.umtuba.app
+    com.unicell.pangoandroid:
+      com.umtuba.app
+    leumit.mobile:
+      com.umtuba.app
+    com.ig.wood.block.puzzle:
+      com.umtuba.app
+    com.block.color.escape:
+      com.umtuba.app
+    com.stoneaxe.mechshooter.android:
+      com.umtuba.app
+    com.tencent.mm:
+      com.umtuba.app
+    ch.protonvpn.android:
+      com.umtuba.app
+    com.samsung.android.mocca:
+      com.umtuba.app
+    com.instagram.barcelona:
+      com.umtuba.app
+    com.boundless.jawaker:
+      com.umtuba.app
+    com.ecffri.arrows:
+      com.umtuba.app
+    com.sportbrain.jewelpuzzle:
+      com.umtuba.app
+  queryable via interaction:
+    User 0:
+      [com.samsung.android.smartface,com.android.server.telecom,com.sec.bcservice,com.samsung.android.app.omcagent,com.samsung.android.lool,com.samsung.android.app.dressroom,com.samsung.android.knox.pushmanager,com.samsung.android.wifi.ai,com.wssyncmldm,com.samsung.android.hdmapp,com.sem.factoryapp,com.samsung.android.messageguardsync,com.samsung.android.emergency,com.sec.android.app.personalization,com.samsung.android.cameraxservice,com.android.dynsystem,com.samsung.android.providers.factory,com.sec.imsservice,com.samsung.android.fmm,com.sec.android.smartfpsadjuster,com.sec.epdg,android,com.samsung.android.knox.attestation,com.samsung.android.provider.filterprovider,com.samsung.android.brightnessbackupservice,com.samsung.android.dqagent,com.samsung.android.stickercenter,com.samsung.SMT,com.samsung.android.vexfwk.service,com.qualcomm.qti.services.systemhelper,com.samsung.android.smartswitchassistant,com.qti.snapdragon.qdcm_ff,com.sec.modem.settings,com.samsung.android.dck.timesync,com.android.inputdevices,com.android.localtransport,com.samsung.android.knox.mpos,com.samsung.sait.sohservice,com.samsung.oda.service,com.sec.factory.camera,com.sec.usbsettings,com.sec.android.sdhms,com.samsung.android.bbc.bbcagent,com.sec.android.app.wlantest,com.sec.android.iaft,com.sec.imslogger,com.sec.app.RilErrorNotifier,com.sec.android.app.factorykeystring,com.sec.sve,com.sec.android.app.parser,com.samsung.android.aircommandmanager,com.samsung.android.da.daagent,com.sec.android.diagmonagent,com.samsung.android.camerasdkservice,com.samsung.android.svcagent,com.samsung.android.mdecservice,com.android.providers.settings,com.samsung.accessibility,com.samsung.android.app.esimkeystring,com.samsung.android.globalpostprocmgr,com.samsung.android.qmdservice,com.sec.android.app.servicemodeapp,com.samsung.android.bixby.wakeup,com.skms.android.agent,com.sec.android.app.uwbtest,com.sec.android.emergencylauncher,com.sec.automation,com.sec.android.soagent,com.samsung.android.themecenter,com.sec.mhs.smarttethering,com.sec.android.app.SecSetupWizard,com.samsung.aasaservice,com.samsung.android.vtcamerasettings,com.sec.android.app.hwmoduletest,com.samsung.android.ese,com.samsung.gpuwatchapp,com.android.settings,com.samsung.android.knox.zt.framework,com.sec.android.app.quicktool,com.sec.android.CcInfo,com.samsung.euicc,com.android.location.fused,com.samsung.unifiedtp,com.samsung.android.wifi.intelligence,com.samsung.android.photoremasterservice,com.samsung.android.biometrics.app.setting,com.samsung.android.motionphoto.app,com.android.keychain,com.samsung.android.forest,com.sec.facatfunction,com.sec.android.app.RilPhoneNumberService]:
+        com.umtuba.app
+      com.samsung.android.honeyboard:
+        com.umtuba.app
+      [com.google.android.gsf,com.google.android.gms]:
+        com.umtuba.app
+      com.umtuba.app:
+        com.google.android.webview
+  queryable via uses-library:
+
+Dexopt state:
+  [com.umtuba.app]
+    path: /data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==/base.apk
+      arm64: [status=speed-profile] [reason=install-spqr] [primary-abi]
+        [location is /data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==/oat/arm64/base.odex]
+
+SPEG state:
+  Event #2: ┘ة┘ح-┘ب┘ذ-┘ت┘ب┘ت┘خ ┘ب┘ب:┘ح┘د:┘ت┘ت.┘ذ┘ح┘ت Success com.umtuba.app took 2463 ms
+  Event #1: ┘ت┘ح-┘ب┘د-┘ت┘ب┘ت┘خ ┘ة┘ح:┘ب┘ث:┘ت┘د.┘ر┘ر┘ت Success com.umtuba.app took 2446 ms
+  Event #0: ┘ب┘خ-┘ب┘ة-┘ت┘ب┘ت┘خ ┘ة┘ر:┘ت┘ة:┘ت┘ح.┘ح┘ذ┘ج Success com.instagram.barcelona took 2368 ms
+
+Profile utilization state:
+  Current state:
+    Version: 2.1.2
+    Start reason: boot-no-update
+    Start time: not started
+    Finish time: not finished
+    PU_StatusWatcher:
+      Initial thermal status: 0
+      Thermal status: 0
+      Screen off: false
+      Low battery: true
+    PU_DexoptTrigger:
+      Dexopt concurrency: 4
+      Dexopting: false
+    PU_Storage:
+      Stored apps:
+        com.whatsapp 12
+        com.openai.chatgpt 38
+        com.truecaller 71
+        com.google.android.gm 82
+        com.samsung.android.game.gamehome 84
+        com.google.android.googlequicksearchbox 87
+        com.google.android.apps.photos 114
+        io.wio.sme 121
+        com.spotify.music 130
+        com.samsung.android.dialer 132
+        com.skype.raider 134
+        com.sec.android.app.shealth 140
+        com.sec.android.app.sbrowser 144
+        com.sec.android.app.music 148
+        com.samsung.android.samsungpass 152
+        com.duolingo 154
+        com.samsung.android.oneconnect 156
+        com.abi.woodout.screw.bar 160
+        com.google.android.apps.messaging 160
+        com.samsung.android.messaging 160
+        com.samsung.android.email.provider 165
+        com.android.vending 166
+        com.samsung.android.app.contacts 171
+        com.samsung.android.bixby.agent 171
+        com.google.android.apps.tachyon 173
+        com.samsung.android.app.watchmanager 175
+        com.android.settings 177
+        com.samsung.android.app.reminder 179
+        com.samsung.android.app.notes 183
+        org.roki.tech.newbildqibla 185
+        com.samsung.android.app.interpreter 187
+        com.einnovation.temu 194
+        com.sec.android.easyMover 196
+        com.google.android.calendar 199
+        com.samsung.android.app.find 207
+        com.movestar.hijricalendar 208
+        com.google.android.apps.tasks 209
+        com.google.android.apps.googleassistant 211
+        com.free.vpn.super.hotspot.open 215
+        com.bkapps.callrecord 240
+        com.codeway.aitutor 240
+        com.microsoft.office.outlook 240
+    Stored PU state:
+      Service:
+        Version: 2.1.2
+        Start reason: boot-after-ota
+        Start time: Wed Jul 29 14:54:18 GMT+03:00 2026 ts=1785326058041
+        Finish time: Wed Jul 29 15:10:51 GMT+03:00 2026 ts=1785327051356
+        Took time 993sec
+      Watcher:
+        Initial thermal status: 0
+        Thermal status: 0
+        Screen off: true
+        Low battery: false
+      Trigger:
+        Dexopt concurrency: 4
+        Dexopting: false
+        Hot apps list:
+          com.whatsapp, w=12, s=OPTIMIZED, optTimeMs=1785326996708, cancelCount=2, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=10426, filter=speed-profile]
+          com.openai.chatgpt, w=38, s=OPTIMIZED, optTimeMs=1785326994447, cancelCount=2, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=8122, filter=speed-profile]
+          com.truecaller, w=71, s=OPTIMIZED, optTimeMs=1785326997482, cancelCount=2, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=10996, filter=speed-profile], [primaryDex=true, reason=vdex-dm, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify]
+          com.google.android.gm, w=82, s=OPTIMIZED, optTimeMs=1785326996773, cancelCount=2, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=10478, filter=speed-profile]
+          com.samsung.android.game.gamehome, w=84, s=OPTIMIZED, optTimeMs=1785326997062, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=2404, filter=speed-profile]
+          com.google.android.googlequicksearchbox, w=87, s=OPTIMIZED, optTimeMs=1785327043220, cancelCount=1, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=7418, filter=speed-profile]
+          com.google.android.apps.photos, w=114, s=OPTIMIZED, optTimeMs=1785327002379, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=5292, filter=speed-profile]
+          io.wio.sme, w=121, s=OPTIMIZED, optTimeMs=1785326998995, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=1849, filter=speed-profile]
+          com.spotify.music, w=130, s=OPTIMIZED, optTimeMs=1785327041945, cancelCount=1, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=5709, filter=speed-profile], [primaryDex=true, reason=vdex-dm, dex2oatTimeMs=0, filter=verify], [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=224, filter=speed-profile]
+          com.samsung.android.dialer, w=132, s=OPTIMIZED, optTimeMs=1785326999075, cancelCount=0, dexopt=SKIPPED, [primaryDex=true, reason=boot-after-ota, dex2oatTimeMs=0, filter=speed-profile]
+          com.skype.raider, w=134, s=OPTIMIZED, optTimeMs=1785327001686, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=2426, filter=speed-profile]
+          com.sec.android.app.shealth, w=140, s=OPTIMIZED, optTimeMs=1785327040534, cancelCount=1, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=4791, filter=speed-profile]
+          com.sec.android.app.sbrowser, w=144, s=OPTIMIZED, optTimeMs=1785327004112, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=1611, filter=speed-profile]
+          com.sec.android.app.music, w=148, s=OPTIMIZED, optTimeMs=1785327035691, cancelCount=1, dexopt=SKIPPED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=0, filter=speed-profile]
+          com.samsung.android.samsungpass, w=152, s=OPTIMIZED, optTimeMs=1785327038046, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=2136, filter=speed-profile]
+          com.duolingo, w=154, s=OPTIMIZED, optTimeMs=1785327045324, cancelCount=0, dexopt=FAILED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=6904, filter=speed-profile], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify]
+          com.samsung.android.oneconnect, w=156, s=OPTIMIZED, optTimeMs=1785327046034, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=5293, filter=speed-profile]
+          com.abi.woodout.screw.bar, w=160, s=OPTIMIZED, optTimeMs=1785327046014, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=3482, filter=speed-profile], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify]
+          com.google.android.apps.messaging, w=160, s=OPTIMIZED, optTimeMs=1785327049428, cancelCount=0, dexopt=FAILED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=5660, filter=speed-profile], [primaryDex=false, reason=profile-utilization, dex2oatTimeMs=141, filter=verify], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify]
+          com.samsung.android.messaging, w=160, s=OPTIMIZED, optTimeMs=1785327045435, cancelCount=0, dexopt=SKIPPED, [primaryDex=true, reason=boot-after-ota, dex2oatTimeMs=0, filter=speed-profile]
+          com.samsung.android.email.provider, w=165, s=OPTIMIZED, optTimeMs=1785327047628, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=2009, filter=speed-profile]
+          com.android.vending, w=166, s=OPTIMIZED, optTimeMs=1785327051354, cancelCount=0, dexopt=FAILED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=5107, filter=speed-profile], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=error, dex2oatTimeMs=0, filter=verify], [primaryDex=false, reason=vdex, dex2oatTimeMs=0, filter=verify]
+          com.samsung.android.app.contacts, w=171, s=OPTIMIZED, optTimeMs=1785327047701, cancelCount=0, dexopt=PERFORMED, [primaryDex=true, reason=profile-utilization, dex2oatTimeMs=1493, filter=speed-profile]
+    Stored SCPM state:
+      packages-9a07:
+        [                                            ]
+      disable-2bb4:
+        [                                            ]
+
+HeimdAllFS state:
+  [com.umtuba.app]
+    path: /data/app/~~n7TzvAdXEXCDJkB3pj13Mw==/com.umtuba.app-WtgFTTptCRnvu5MDecm5GA==/base.apk
+    Compressed? False
+  [ Summary ]
+    # of packages: 1 / # of packages in DATA: 1 (1)
+    Compressed apks info - sum of orig size: 41910 / sum of compr size : 41910
+  [Lfo status]
+    packageName: com.samsung.android.offline.languagemodel
+    Path: /data/app/~~7EuVz4D_95rAiQC51KVLKw==/com.samsung.android.offline.languagemodel-QEZXhp5XUyGdQ44JQe8IsQ==/base.apk
+    Fragmented: 1
+    Extent Count: 185
+    Version: 0
+    Flag: 0
+    Level: 0
+    Count: 0
+    

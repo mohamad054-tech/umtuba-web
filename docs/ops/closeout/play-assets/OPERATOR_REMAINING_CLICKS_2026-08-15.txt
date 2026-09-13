@@ -1,0 +1,91 @@
+OPERATOR REMAINING CLICKS — 2026-08-15 (DESKTOP_GOOGLE_PLAY_FINAL_PREP_V2)
+TASK_ID = DESKTOP_GOOGLE_PLAY_FINAL_PREP_V2
+Play binary on Alpha (uploaded, HOLD) = versionCode 5 / source 822d893. Do NOT roll out v5. Do NOT put v3 back. Do NOT upload v6 (A3 after device PASS only).
+GOOGLE_PLAY_MUTATED = NO (Cursor MCP browser cannot hold a Console tab; navigate + lock-first retry failed).
+Human path: Chrome or Edge as the Play developer. URL = https://play.google.com/console
+Do NOT Apply/submit Production. Do NOT upload/rebuild any AAB.
+
+ACCOUNT DELETION / PRIVACY (already live)
+  https://umtuba.com/account-deletion
+  https://umtuba.com/privacy
+  https://umtuba.com/terms
+  Skip Play Account deletion card if Publishing overview already complete.
+
+CLOSED TESTING
+  Track = Alpha / Closed testing
+  List = UMTUBA Closed Testers
+  Configured = 25 (listed ≠ opted-in ≠ qualifying)
+  Opted-in = UNKNOWN
+  14-day eligibility = NO unless Play confirms
+  CURRENT_V5_ALPHA_ROLLOUT = FORBIDDEN / HOLD
+
+1) FULL DESCRIPTION (required) — PASTE_FULL_DESCRIPTION.txt
+  PATH = Grow → Store presence → Main store listing → Full description
+  PASTE the file as written (785/4000). Optional: PASTE_SHORT_DESCRIPTION.txt if empty.
+  Graphics if empty: icon-512x512.png + feature-graphic-1024x500.png
+  Phone screenshots still MISSING — do not fabricate.
+
+2) AI-GENERATED IMAGE/VIDEO DECLARATION — HUMAN ONLY. AGENT WILL NOT ANSWER.
+  PATH = Grow → Store presence → Main store listing → AI-generated image/video declaration
+  This form is about STORE LISTING images/videos. In-app Jinn/UGC does not answer it.
+  Official preview-assets help (9866151) does not print the question. OCR the real radios before clicking.
+  WHY_HUMAN = Chevron origin undocumented (copy of android-icon-foreground + flatten of construction-grid feature).
+  ACTION = Answer from who made the original mark. Yes only if generative AI produced/substantially generated a listing asset. No only if you know it did not.
+  If the card you open is instead App content “does this app generate content using AI” (policy 14094294): current Android v5 is a social UGC host with no in-app generator — that would be NO. Do not use that answer on the listing form.
+
+3) ADS — PASTE_ADS.txt
+  PATH = Policy → App content → Ads
+  SELECT = No, my app does not contain ads
+  package.json has no ads SDK. Skip if already complete.
+
+4) UGC — DO NOT USE play-assets/PASTE_UGC.txt (v3 NO)
+  PATH = Policy → App content → User-generated content
+  USE = umtuba-mobile/release-artifacts/store-listing/UGC_DECLARATION.txt
+  Honest for CURRENT Play binary v5 (822d893): UGC/public/1:1/report/block/Terms = YES.
+  v6 is not required to declare these. Do not wait. Do not false-declare NO.
+
+5) IARC / CONTENT RATING — DO NOT USE play-assets/PASTE_IARC.txt (v3 moderation NO)
+  PATH = Policy → App content → Content ratings
+  USE = umtuba-mobile/release-artifacts/store-listing/CONTENT_RATING_IARC.txt
+  Moderation tools = YES on v5. Category Social Networking. Do not retake to force Everyone.
+
+6) TARGET AUDIENCE REMAINDER — PASTE_TARGET_AUDIENCE_REMAINDER.txt
+  Ages already 13–15 / 16–17 / 18+. Do not change. Not for children. No Teacher Approved.
+
+7) CONTENT DECLARATIONS — PASTE_CONTENT_DECLARATIONS.txt
+  News / COVID / Government / Financial / Health = all NO.
+
+8) STORE SETTINGS — PASTE_SUPPORT_CONTACT.txt
+  Category Social. Website https://umtuba.com. Privacy https://umtuba.com/privacy (do not change).
+  Existing Play developer email only. Do not invent support@. Do not use google-play-review@umtuba.com.
+
+9) ACCOUNT DELETION — PASTE_ACCOUNT_DELETION.txt (only if overview still open)
+  URL = https://umtuba.com/account-deletion
+  v5 Settings → Delete account opens this URL. Do not paste /privacy or /.
+
+10) REVIEW ACCESS — already entered. Do not reopen unless Console asks.
+  If Console forces a refresh: umtuba-mobile/release-artifacts/store-listing/REVIEWER_INSTRUCTIONS.txt
+  Do NOT paste PASTE_REVIEW_ACCESS_V3_HONEST.txt (describes missing Report/Block/Terms — false for v5).
+  Password stays in umtuba-mobile/.env.play-review.local. Do not paste it.
+
+11) DATA SAFETY — already complete. Do not reopen unless Console requires.
+
+12) DASHBOARD leftover
+  PATH = Dashboard / Publishing overview
+  Complete only cards still marked required after 1–11.
+
+13) APP SIGNING — PASTE_APP_SIGNING.txt (OCR only). Do not generate a new upload key.
+
+14) COUNTRIES — PASTE_COUNTRIES.txt
+  Confirm Closed Testing all-available. Do not create a Production track.
+
+DO NOT
+  Roll out the current v5 Alpha release
+  Apply / submit Production
+  Upload any AAB (v5 or v6)
+  Rebuild Android
+  Guess Yes/No on the listing AI-media form
+  Paste PASTE_UGC.txt / PASTE_IARC.txt / PASTE_REVIEW_ACCESS_V3_HONEST.txt against v5
+  Report 25 configured emails as opted-in / qualifying testers
+  Retry Cursor MCP browser for Play Console (failed twice this session)
+  Fabricate phone screenshots

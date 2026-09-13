@@ -1,0 +1,7 @@
+01:38:48.243 discover-card Watch then Profile @mohamad
+01:38:53.497 tapped Follow
+01:38:59.102 followers from discover-watch profile
+01:39:04.746 member
+01:39:10.054 back list
+01:39:15.446 back profile
+01:39:21.321 back origin

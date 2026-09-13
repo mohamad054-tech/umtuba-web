@@ -1,0 +1,47 @@
+PHONE_SCREENSHOTS_READY = NO
+TABLET_SCREENSHOTS_READY = NO
+FABRICATED = NO
+MOCK_SAFETY_UI = DO_NOT
+
+No real-device screenshot PNG/JPEG exists under:
+  umtuba-mobile/release-artifacts
+  umtuba-web/docs/ops/closeout
+Internal Testing v3 device QA was PASS; screenshot files were never stored.
+
+Do not invent screenshots. Do not mock Report / Block / Terms checkbox / in-app Delete account.
+Those controls are NOT in the Play binary (versionCode 3).
+Do not use umtuba-mobile/release-artifacts/store-listing/GRAPHICS_STATUS.txt capture list
+(Watch with Report visible / Create Terms checkbox) — that is a v4 list.
+
+CAPTURE ONLY from Internal Testing v3 on a real device (the published Play binary):
+
+  1. Watch — public video card. Like / Save only. No Report control.
+  2. Discover — trending / latest.
+  3. Create — gallery upload + caption. No Terms checkbox.
+  4. Messages — 1:1 thread. No Report / Block.
+
+Official Play rules (support.google.com/googleplay/android-developer/answer/9866151):
+  JPEG or 24-bit PNG (no alpha)
+  Each side 320–3840 px; longest side ≤ 2× shortest
+  Minimum 2 screenshots to publish a listing
+  Up to 8 per device type
+  Recommended: ≥4 portrait shots at ≥1080 px (min 1080 × 1920) given orientation portrait
+  No youthful cartoon characters
+  No Play ranking badges
+  Device frames not required
+  Edit the notification bar (no carrier name)
+
+TABLET 7-inch / 10-inch:
+  Official text is “you can add” — not a hard publish requirement unless Console marks those slots required.
+  App is not Wear / TV / Auto / XR.
+  Do not invent tablet shots. Capture from v3 on a tablet ONLY if Console marks required.
+
+PROMO VIDEO = NONE. Optional. Do not invent a YouTube URL.
+
+After capture, drop files into this folder as:
+  phone-01-watch.png
+  phone-02-discover.png
+  phone-03-create.png
+  phone-04-messages.png
+Then upload in Play Console → Grow → Store presence → Main store listing → Graphics.
+Do not upload v4 or v5. Do not Apply for production.

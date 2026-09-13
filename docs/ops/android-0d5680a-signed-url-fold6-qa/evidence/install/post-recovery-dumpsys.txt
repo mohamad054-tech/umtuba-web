@@ -1,0 +1,10 @@
+﻿RECOVERY_CONFIRM 2026-08-22T14:58:06.5494707+03:00
+WORKTREE_HEAD=0d5680ad05fbbb988a59de86c2ee2e87f733f970
+ADB:
+List of devices attached RFCX718LVHK            device product:q6qxxx model:SM_F956B device:q6q transport_id:2 
+PACKAGE:
+    versionCode=20 minSdk=24 targetSdk=36     versionName=1.0.0     lastUpdateTime=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ت┘ت ┘ة┘ث:┘ث┘ج:┘ت┘ة
+FOCUS:
+  mCurrentFocus=null   mFocusedApp=null     mShowingDream=false mDreamingLockscreen=false   mCurrentFocus=Window{60b267e u0 com.umtuba.app/com.umtuba.app.MainActivity}   mFocusedApp=ActivityRecord{36062122 u0 com.umtuba.app/.MainActivity t27991}     mShowingDream=false mDreamingLockscreen=false
+MEDIA:
+      package=com.umtuba.app       active=true       state=PlaybackState {state=PAUSED(2), position=66160, buffered position=117098, speed=0.0, updated=445344958, actions=7339997, custom actions=[], active item id=0, error=null}       package=com.umtuba.app       active=true       state=PlaybackState {state=PAUSED(2), position=80023, buffered position=120720, speed=0.0, updated=445253818, actions=7339997, custom actions=[], active item id=0, error=null}       package=com.umtuba.app       active=true       state=PlaybackState {state=PAUSED(2), position=44200, buffered position=68000, speed=0.0, updated=445140665, actions=7339997, custom actions=[], active item id=0, error=null}       active=true       state=PlaybackState {state=NONE(0), position=0, buffered position=0, speed=1.0, updated=426714320, actions=0, custom actions=[], active item id=-1, error=null}

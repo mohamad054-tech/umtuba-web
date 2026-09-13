@@ -1,0 +1,17 @@
+package=com.umtuba.app
+versionName=1.0.0
+versionCode=6
+minSdk=24
+targetSdk=36
+device=SM-F956B
+serial=RFCX718LVHK
+adb=device
+install=adb install -r preview APK 6a948536
+apk_sha256=69E059CE129C46D9DACACE6219E93CDC327AAC0FEA0A0344830892CDB0912D66
+aab_sha256=17775D73434A16243496EEDCAB724C9960106DB73BF89134AB9B7CF00E652E67
+eas_production=5c3493cb-ae5f-4065-ad61-3605a9887bd2
+eas_preview=6a948536-7d5e-4406-8670-304bf7a1ff98
+source_sha=f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604
+bundletool_aab_versionCode=6
+bundletool_aab_versionName=1.0.0
+dumpsys=dumpsys-package.txt

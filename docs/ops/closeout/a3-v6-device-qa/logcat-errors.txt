@@ -1,0 +1,4 @@
+﻿--------- beginning of main
+08-15 21:02:23.827 14786 15221 E SSS@search user 0: (FsmDataManager) getAllHits: No hits
+08-15 21:02:23.834 14786 15221 E SSS@search user 0: (VideoFrameFetcher) fetch: No results found.
+08-15 21:02:24.111  2189  4265 E NativeCustomFrequencyManager: [NativeCFMS] BpCustomFrequencyManager::acquire()

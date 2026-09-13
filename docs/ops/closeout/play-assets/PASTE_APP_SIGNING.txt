@@ -1,0 +1,8 @@
+SCREEN/PATH = Play Console → Test and release → Setup → App signing
+EXACT OPTION TO SELECT = Confirm Play App Signing is enrolled for com.umtuba.app (Google-held signing key; existing upload keystore already used for the versionCode 3 AAB)
+EXACT TEXT TO PASTE = (none)
+WHY = versionCode 3 used the existing EAS upload keystore (SIGNING_CREDENTIALS_CHANGED = NO). Remote EAS credential id p6De1DDtE_ (default). Enrollment itself was never OCR'd locally. EAS SIGNING_READY is not Play App Signing OCR.
+SAFE_TO_SAVE_NOW = N/A (read-only confirm). Do not generate a new upload key. Do not rotate. Do not create credentials.json. Do not open eas credentials.
+SAVED_TO_PLAY_THIS_SESSION = NO
+OCR_THIS_SESSION = NO
+DO_NOT = Generate a second upload identity. Do not upload v4 or v5 from this card.

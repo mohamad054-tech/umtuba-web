@@ -1,0 +1,18 @@
+{
+  "buildId": "6a948536-7d5e-4406-8670-304bf7a1ff98",
+  "platform": "android",
+  "status": "finished",
+  "profile": "preview",
+  "distribution": "internal",
+  "versionName": "1.0.0",
+  "versionCode": 6,
+  "package": "com.umtuba.app",
+  "gitCommitHash": "f1dbd1cc84fcb96d4784c9e664bf417ee4ad8604",
+  "logsUrl": "https://expo.dev/accounts/umtuba/projects/umtuba-mobile/builds/6a948536-7d5e-4406-8670-304bf7a1ff98",
+  "localPath": "docs/ops/closeout/android-v6-release/apk/umtuba-android-preview-6a948536.apk",
+  "sha256": "69E059CE129C46D9DACACE6219E93CDC327AAC0FEA0A0344830892CDB0912D66",
+  "bytes": 171485284,
+  "purpose": "Fold6 sideload QA; same SHA and remote keystore as production AAB",
+  "playUpload": false,
+  "keystore": "Build Credentials p6De1DDtE_ (default)"
+}

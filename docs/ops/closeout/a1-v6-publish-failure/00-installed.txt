@@ -1,0 +1,6 @@
+﻿
+    versionCode=6 minSdk=24 targetSdk=36
+    versionName=1.0.0
+    lastUpdateTime=┘ت┘ب┘ت┘خ-┘ب┘ذ-┘ة┘ح ┘ت┘ب:┘ث┘ج:┘ب┘خ
+
+
