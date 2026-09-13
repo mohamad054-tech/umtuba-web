@@ -1,0 +1,11 @@
+{
+  "task_id": "UMTUBA_LEARNING_HUB_OWNER_PASS_FREEZE_AND_RUNTIME_V1",
+  "status": "IN_PROGRESS",
+  "owner_pass_source_sha": "ec119f12d9e321f090941ddc241a693f63572525",
+  "base_sha": "61e779a0272a39ae79b23a9f4ec05e2fa1ce1d37",
+  "worktree": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\LEARNING-HUB-SAFE-INTEGRATION-V1",
+  "branch": "desktop/learning-hub-safe-integration-v1",
+  "freeze_tag": "learning-hub-v2-owner-pass-ec119f12",
+  "freeze_branch": "desktop/learning-hub-v2-owner-pass-freeze-v1",
+  "notes": "OWNER_PASS UI frozen. Runtime work must not redesign the dashboard. No production DB."
+}

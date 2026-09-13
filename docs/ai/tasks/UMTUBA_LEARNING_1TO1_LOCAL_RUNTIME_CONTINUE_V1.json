@@ -1,0 +1,11 @@
+{
+  "task_id": "UMTUBA_LEARNING_1TO1_LOCAL_RUNTIME_CONTINUE_V1",
+  "status": "RUNTIME_GREEN_BUILD_BLOCKED_ENOSPC",
+  "owner_pass_source_sha": "ec119f12d9e321f090941ddc241a693f63572525",
+  "base_sha": "ec119f12d9e321f090941ddc241a693f63572525",
+  "worktree": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\LEARNING-HUB-SAFE-INTEGRATION-V1",
+  "branch": "desktop/learning-hub-safe-integration-v1",
+  "freeze_tag": "learning-hub-v2-owner-pass-ec119f12",
+  "freeze_branch": "desktop/learning-hub-v2-owner-pass-freeze-v1",
+  "notes": "Continue local 1-to-1 runtime. OWNER_PASS UI frozen. No production DB."
+}
