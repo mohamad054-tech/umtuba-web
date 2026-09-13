@@ -1,0 +1,26 @@
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:3: trailing whitespace.
+[32m+[m[32mCapability: `learning.collaboration.workspace_attachments_foundation_v1`[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:4: trailing whitespace.
+[32m+[m[32mBranch: `office/learning-collaboration-workspace-attachments-foundation-v1`[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:5: trailing whitespace.
+[32m+[m[32mBase: `origin/office/learning-collaboration-workspace-spine-foundation-v1`[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:12: trailing whitespace.
+[32m+[m[32m1. Community[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:13: trailing whitespace.
+[32m+[m[32m2. Assignments / Projects[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:14: trailing whitespace.
+[32m+[m[32m3. AI Tutor[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:15: trailing whitespace.
+[32m+[m[32m4. Live[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:56: trailing whitespace.
+[32m+[m[32m- Realtime chat / presence / websockets[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:57: trailing whitespace.
+[32m+[m[32m- Shared documents / whiteboards[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:58: trailing whitespace.
+[32m+[m[32m- Shared AI Tutor memory across learners[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:59: trailing whitespace.
+[32m+[m[32m- Assignment storage-bucket reuse beyond existing learner surfaces[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:60: trailing whitespace.
+[32m+[m[32m- Commerce / Stripe / payouts / refunds[m[41m  [m
+docs/learning/implementation/COLLABORATION_WORKSPACE_ATTACHMENTS_FOUNDATION_V1.md:61: trailing whitespace.
+[32m+[m[32m- Live Studio mock collaboration panel[m[41m  [m
