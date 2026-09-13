@@ -41,7 +41,8 @@ export default function AuthShell({
           <section className="hidden bg-gradient-to-br from-blue-900/40 via-[#0b0b18]/60 to-cyan-900/20 p-10 lg:block">
             <Link
               href={APP_ROUTES.home}
-              className="watch-focus-ring inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-black tracking-tight transition hover:bg-white/10"
+              aria-label={t("nav.homeAria")}
+              className="watch-focus-ring inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-black tracking-tight transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
             >
               UMTUBA
             </Link>
@@ -60,7 +61,8 @@ export default function AuthShell({
             <div className="mb-8 flex items-center justify-between gap-3">
               <Link
                 href={APP_ROUTES.home}
-                className="inline-block text-xl font-black tracking-tight lg:hidden"
+                aria-label={t("nav.homeAria")}
+                className="watch-focus-ring inline-block rounded-lg text-xl font-black tracking-tight lg:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300/60"
               >
                 UMTUBA
               </Link>

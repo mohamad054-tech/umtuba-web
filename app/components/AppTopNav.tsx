@@ -112,8 +112,10 @@ export default function AppTopNav({
             tone="dark"
             variant="compact"
           />
-          <ActivityTierIndicator />
-          <WalletBalanceIndicator />
+          <span className="hidden sm:contents">
+            <ActivityTierIndicator />
+            <WalletBalanceIndicator />
+          </span>
           <NotificationBell />
           <UserMenu />
         </div>

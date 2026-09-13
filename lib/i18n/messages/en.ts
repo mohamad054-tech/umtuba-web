@@ -39,6 +39,7 @@ export const enMessages: FoundationMessages = {
   "nav.primary": "Primary",
   "nav.primaryMobile": "Primary mobile",
   "nav.homeAria": "UMTUBA home",
+  "nav.skipToContent": "Skip to content",
 
   "settings.title": "Settings",
   "settings.subtitle": "Account & preferences",

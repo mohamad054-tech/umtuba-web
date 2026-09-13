@@ -215,7 +215,7 @@ export default function SignupForm({
             {t("auth.signup.wrongEmail")}{" "}
             <button
               type="button"
-              className="font-bold text-blue-200 transition hover:text-blue-100"
+              className="watch-focus-ring rounded font-bold text-blue-200 transition hover:text-blue-100"
               onClick={() => {
                 setPendingEmailConfirm(false);
                 setSuccessUsername(null);
@@ -268,7 +268,7 @@ export default function SignupForm({
             {t("auth.signup.preferFeed")}{" "}
             <Link
               href={APP_ROUTES.discover}
-              className="font-bold text-blue-200 transition hover:text-blue-100"
+              className="watch-focus-ring rounded font-bold text-blue-200 transition hover:text-blue-100"
             >
               {t("auth.signup.openHome")}
             </Link>
@@ -313,7 +313,7 @@ export default function SignupForm({
           {t("auth.signup.haveAccount")}{" "}
           <Link
             href={loginHref}
-            className="font-bold text-blue-200 transition hover:text-blue-100"
+            className="watch-focus-ring rounded font-bold text-blue-200 transition hover:text-blue-100"
           >
             {t("auth.signup.signIn")}
           </Link>

@@ -42,6 +42,7 @@ export type FoundationMessages = {
   "nav.primary": string;
   "nav.primaryMobile": string;
   "nav.homeAria": string;
+  "nav.skipToContent": string;
 
   "settings.title": string;
   "settings.subtitle": string;

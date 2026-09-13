@@ -40,7 +40,7 @@ export default function AuthField({
           aria-describedby={
             error ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined
           }
-          className={`w-full rounded-2xl border bg-black/40 p-4 outline-none transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60 ${
+          className={`watch-focus-ring w-full rounded-2xl border bg-black/40 p-4 transition placeholder:text-white/30 focus:border-blue-400/40 disabled:opacity-60 ${
             showReveal ? "pe-20" : ""
           } ${
             error

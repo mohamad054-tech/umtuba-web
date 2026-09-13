@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import AppMobileBottomNav from "./AppMobileBottomNav";
+import { useTranslation } from "./i18n";
 import ReferralClaimBootstrap from "./ReferralClaimBootstrap";
 
 /**
@@ -9,10 +10,17 @@ import ReferralClaimBootstrap from "./ReferralClaimBootstrap";
  * AppTopNav's desktop primary links.
  */
 export default function AppChrome({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
+
   return (
     <>
+      <a href="#main-content" className="skip-link watch-focus-ring">
+        {t("nav.skipToContent")}
+      </a>
       <ReferralClaimBootstrap />
-      {children}
+      <div id="main-content" tabIndex={-1}>
+        {children}
+      </div>
       <AppMobileBottomNav />
     </>
   );

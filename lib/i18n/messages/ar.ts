@@ -39,6 +39,7 @@ export const arMessages: FoundationMessages = {
   "nav.primary": "التنقل الرئيسي",
   "nav.primaryMobile": "التنقل الرئيسي للجوّال",
   "nav.homeAria": "الصفحة الرئيسية لأمتوبة",
+  "nav.skipToContent": "تخطي إلى المحتوى",
 
   "settings.title": "الإعدادات",
   "settings.subtitle": "الحساب والتفضيلات",

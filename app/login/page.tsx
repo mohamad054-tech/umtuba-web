@@ -117,7 +117,7 @@ function LoginForm() {
                   )}`
                 : APP_ROUTES.signup
             }
-            className="font-bold text-blue-200 transition hover:text-blue-100"
+            className="watch-focus-ring rounded font-bold text-blue-200 transition hover:text-blue-100"
           >
             {t("auth.login.createOne")}
           </Link>
@@ -160,7 +160,7 @@ function LoginForm() {
         <div className="flex flex-wrap items-center justify-end gap-3">
           <Link
             href={FORGOT_PASSWORD_PATH}
-            className="text-sm font-bold text-blue-200 transition hover:text-blue-100"
+            className="watch-focus-ring rounded text-sm font-bold text-blue-200 transition hover:text-blue-100"
           >
             {t("auth.login.forgotPassword")}
           </Link>

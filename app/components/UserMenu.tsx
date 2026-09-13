@@ -127,7 +127,7 @@ export default function UserMenu() {
 
     void supabase.auth.getUser().then(({ data, error }) => {
       if (!isActive) return;
-      if (error) {
+      if (error && !/auth session missing/i.test(error.message)) {
         console.error("[UserMenu] getUser failed:", error.message);
       }
       void applyUser(data.user ?? null);

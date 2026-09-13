@@ -25,7 +25,10 @@ export default function SupportPage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_top,_rgba(37,99,235,0.22),_transparent_65%)]" />
 
       <div className="relative mx-auto max-w-3xl px-5 py-10 sm:px-8 sm:py-14">
-        <nav className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/55">
+        <nav
+          aria-label="Support"
+          className="mb-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/55"
+        >
           <Link
             href={APP_ROUTES.home}
             className="watch-focus-ring rounded-full font-black tracking-tight text-white transition hover:text-white/85"

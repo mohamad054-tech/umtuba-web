@@ -385,6 +385,27 @@ body {
   outline-offset: 3px;
 }
 
+.skip-link {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  top: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  background: #0b0b18;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+
 .watch-page-enter {
   animation: watch-fade-rise 520ms ease-out both;
 }

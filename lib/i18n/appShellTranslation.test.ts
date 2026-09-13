@@ -18,6 +18,8 @@ describe("App Shell translation V1", () => {
   it("translates primary navigation for Arabic and English", () => {
     expect(translate("en", "nav.home")).toBe("Home");
     expect(translate("ar", "nav.home")).toBe("الرئيسية");
+    expect(translate("en", "nav.skipToContent")).toBe("Skip to content");
+    expect(translate("ar", "nav.skipToContent")).toBe("تخطي إلى المحتوى");
     expect(translate("en", "nav.messages")).toBe("Messages");
     expect(translate("ar", "nav.messages")).toBe("الرسائل");
     expect(translate("en", desktopNavLabelKey("/world"))).toBe("World");
