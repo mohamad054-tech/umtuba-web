@@ -1,15 +1,10 @@
 import LegalDocumentPage from "../components/legal/LegalDocumentPage";
-import { PRIVACY_SECTIONS } from "../../lib/legal/legalDocuments";
+import { loadLegalPageProps } from "../../lib/legal/loadLegalPage";
 import { privacyMetadata } from "../../lib/site/routeMetadata";
 
 export const metadata = privacyMetadata;
 
-export default function PrivacyPage() {
-  return (
-    <LegalDocumentPage
-      title="Privacy Policy"
-      description="How UMTUBA processes account, content, usage, and device information — and the choices available to you."
-      sections={PRIVACY_SECTIONS}
-    />
-  );
+export default async function PrivacyPage() {
+  const props = await loadLegalPageProps("privacy");
+  return <LegalDocumentPage {...props} />;
 }

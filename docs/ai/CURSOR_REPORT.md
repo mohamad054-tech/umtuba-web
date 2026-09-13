@@ -1,86 +1,158 @@
-# CURSOR_REPORT — DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+# Cursor report — legal public surfaces
 
 ## Summary
 
-Central-accepted Learning productization is preserved. The worktree `node_modules` junction was replaced with a real local `npm ci` install (Next 16.2.11). No product code was changed to make the build pass. `npx tsc --noEmit`, 25 targeted Learning tests, and `npm run build` all passed. A clean local commit is created on `desktop/learning-approved-design-productization-v1`. Not pushed. Parent public Supabase keys were used (names only; values not printed) and public Learning surfaces now render the live catalog banner. Historical `e7c84c66` remains unavailable and non-blocking.
+Implemented the nine public legal surfaces on `fix/legal-public-surfaces` from `origin/alpha-0.2` (`9080b79c`) in worktree `C:/Users/Giga store/Desktop/umtuba/umtuba-legal`. Existing `/privacy`, `/terms`, `/account-deletion`, and `/support` were replaced. New routes: `/cookies`, `/community-guidelines`, `/copyright`, `/about`, `/data-export`. No `/legal/*` routes. No commit, push, or `supabase db push`. Not deployed.
 
-```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
-TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-BRANCH = desktop/learning-approved-design-productization-v1
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-COMMIT_CREATED = YES
-PUSHED = NO
-DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
-```
+**Source files:** `legal-en.md` and `legal-ar.md` were not found at repo root, Desktop, Downloads, docs/, or the worktree. Body copy is a conservative draft from owner-stated facts only (`UMTUBA Limited (in registration, Republic of Ireland)`, `/support`, queued delete/export). Replace `lib/i18n/messages/legalCatalogs.ts` when the owner drops the markdown files.
 
 ## Exact files changed
 
-Authorized Learning productization only (this worktree/branch):
+Created:
 
-- Learning pages and visual/teacher components
-- `lib/learning/productization/**` plus teacher/review/welcome/visualDemo modules
-- i18n teacher catalogs + locale message wiring
-- Labeled `public/demo/learning` fixtures
-- Unapplied `supabase/migrations/20260934_learning_teacher_student_platform_v1.sql`
-- Packets under `docs/ops/learning-approved-design-productization-v1/` and `docs/ops/learning-final-engineering-gates-v1/`
-- This report / current-task handoff
+- `lib/legal/company.ts`
+- `lib/legal/loadLegalPage.ts`
+- `lib/i18n/messages/legalCatalogs.ts`
+- `lib/dataExport/requestDataExport.ts`
+- `lib/dataExport/dataExportStore.ts`
+- `lib/dataExport/dataExportFoundation.test.ts`
+- `app/components/legal/AppFooter.tsx`
+- `app/components/legal/LegalDraftBanner.tsx`
+- `app/components/legal/LegalTranslationDisclaimer.tsx`
+- `app/components/legal/legalBody.tsx`
+- `app/about/page.tsx`
+- `app/cookies/page.tsx`
+- `app/community-guidelines/page.tsx`
+- `app/copyright/page.tsx`
+- `app/data-export/page.tsx`
+- `app/data-export/DataExportExperience.tsx`
+- `app/actions/dataExport.ts`
+- `supabase/migrations/20260940_data_export_requests_v1.sql`
 
-Not changed for the build fix: `next.config.ts`, `package-lock.json`. Not committed: `.env.local`, parent profile-hero dirt, android/store docs, other worktrees.
+Changed:
+
+- `lib/legal/legalDocuments.ts` (Beta copy removed)
+- `app/components/legal/LegalDocumentPage.tsx`
+- `app/components/AppChrome.tsx`
+- `app/privacy/page.tsx`
+- `app/terms/page.tsx`
+- `app/support/page.tsx`
+- `app/account-deletion/page.tsx`
+- `app/account-deletion/AccountDeletionExperience.tsx`
+- `app/lib/nav/routes.ts`
+- `lib/site/indexing.ts`
+- `lib/site/routeMetadata.ts`
+- `lib/site/legalPages.test.ts`
+- `lib/site/metadata.test.ts`
+- `lib/accountDeletion/accountDeletionFoundation.test.ts`
+- `lib/i18n/messages/types.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/fr.ts`
+- `lib/i18n/messages/es.ts`
+- `lib/i18n/messages/de.ts`
+- `lib/i18n/messages/pt.ts`
+- `lib/i18n/messages/id.ts`
+- `lib/i18n/messages/hi.ts`
+- `lib/i18n/messages/ru.ts`
+- `lib/i18n/messages/tr.ts`
+- `lib/i18n/messages/zh-CN.ts`
+- `lib/i18n/messages/ja.ts`
+- `lib/i18n/messages/ko.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None. Inherited `20260934_learning_teacher_student_platform_v1.sql` is present and was **not** applied.
+- `supabase/migrations/20260940_data_export_requests_v1.sql` — additive `data_export_requests` (same shape/RLS as `account_deletion_requests`). **Not applied.** `20260939` is not on this branch; file is numbered `20260940` as instructed.
 
 ## Security review
 
-- Parent `.env.local` inspected for key **names** only. Values never printed.
-- Copied only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` into the gitignored worktree `.env.local`.
-- Service-role, Livekit, and Twilio secrets were not copied.
-- Demo flags remain `0`. Teacher approval not faked. Payments remain disabled.
-- `_port_extract` not touched. Windows Desktop not used as an artifact destination.
-- `umtuba-mobile` not touched.
+- Anon: no SELECT/INSERT/UPDATE/DELETE on `data_export_requests`.
+- Authenticated: SELECT/INSERT own rows only; trigger forces `user_id = auth.uid()` and `status = pending`.
+- No authenticated UPDATE/DELETE policies.
+- UI queues PENDING only. No export generation.
+- Address and CRN stay `[[REGISTERED ADDRESS]]` / `[[CRN]]` in `lib/legal/company.ts` only.
+- No secrets printed. No production DB connection.
 
 ## Tests
 
-PASS — 25 targeted vitest (`productization`, `visualDemo`, teacher catalogs/platform/studio/reviews/welcome/earnings).
+- `lib/site/legalPages.test.ts` — pass
+- `lib/dataExport/dataExportFoundation.test.ts` — pass
+- `lib/accountDeletion/accountDeletionFoundation.test.ts` — pass
+- `lib/site/metadata.test.ts` — pass
+- `lib/i18n/professional13Catalog.test.ts` + `lib/i18n/i18nFoundation.test.ts` — pass (30)
+
+HTTP smoke on `http://127.0.0.1:3010` (dev server in this worktree):
+
+| Route | Status | Draft | Company | Placeholders | Beta text |
+|---|---|---|---|---|---|
+| `/privacy` | 200 | yes | yes | yes | no |
+| `/terms` | 200 | yes | yes | yes | no |
+| `/cookies` | 200 | yes | yes | yes | no |
+| `/privacy?hl=ar` | 200 | AR draft | yes | yes | no; RTL; EN disclaimer hidden, AR disclaimer shown |
+| `/community-guidelines` | 200 | yes | yes | yes | no |
+| `/copyright` | 200 | yes | yes | yes | no |
+| `/about` | 200 | no | yes | yes | no |
+| `/support` | 200 | no | yes | yes | no |
+| `/account-deletion` | 200 | no | yes | yes | no |
+| `/data-export` | 200 | no | yes | yes | no |
+
+Browser MCP tabs were unavailable; verification was HTTP + HTML, not click-through.
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit` after removing stale junction/webpack `.next` types.
+`npx tsc --noEmit` — **PASS** (exit 0)
 
 ## Build
 
-PASS — `npm run build` (Next 16.2.11 Turbopack).
+`npm run build` — **PASS** (exit 0). All nine legal routes present. They are dynamic (`ƒ`) because root layout is `force-dynamic` and locale uses cookies/`?hl=`. Indexable via existing `buildPageMetadata` + sitemap.
 
 ## git diff --check
 
-PASS (productization worktree, committed paths).
+**PASS** (exit 0)
 
 ## git status --short
 
-Recorded after the authorized local commit. Parent office/profile-hero working tree remains dirty and untouched by this commit.
+Uncommitted on `fix/legal-public-surfaces`. See files above. `node_modules` installed in the worktree for build (not staged).
+
+## i18n keys added
+
+**58** new keys (`LegalMessages` in `types.ts`, present in all 13 catalogs).
+
+- `en`: English draft (source markdown missing)
+- `ar`: Arabic draft (source markdown missing)
+- fr, es, de, pt, id, hi, ru, tr, zh-CN, ja, ko: English placeholders
+
+Existing keys were not renamed or changed in meaning.
+
+## Placeholders
+
+| Token | Where |
+|---|---|
+| `[[REGISTERED ADDRESS]]` | `lib/legal/company.ts` → interpolated as `{registeredAddress}` |
+| `[[CRN]]` | `lib/legal/company.ts` → interpolated as `{crn}` |
+| `[[TO BE PROVIDED]]` | `LEGAL_EFFECTIVE_DATE` and `LEGAL_LAST_UPDATED` in `lib/legal/company.ts` |
+
+No other `[[TO BE PROVIDED]]` in page bodies.
+
+Draft banner switch: `LEGAL_DRAFT_BANNER_ENABLED` in `lib/legal/company.ts`.
 
 ## Open issues
 
-- `e7c84c668c251ca6b386a60b2b3c01a89eeb7e1b` still not fetchable (`not our ref`).
-- `20260934` not applied. Authenticated writes / RLS persistence not exercised.
-- Turbopack warns that the parent lockfile can be inferred as workspace root. Build still passed without adding `turbopack.root`.
-- PUSHED = NO. Deploy not authorized.
+- Owner `legal-en.md` / `legal-ar.md` were not on disk; replace catalog bodies when supplied.
+- 11 locales still English placeholders (owner will supply translations).
+- Draft banner still on; not binding.
+- Address / CRN / dates still placeholders.
+- Migration not applied to any database.
+- Full-repo `npm run lint` fails on **pre-existing** alpha-0.2 issues (57 errors). Scoped eslint on legal files: **PASS**.
+- Browser MCP could not open a tab; pages verified over HTTP.
+
+## NEXT_ACTION
+
+1. Drop `legal-en.md` and `legal-ar.md` if they differ from this draft, then replace `legalCatalogs.ts` bodies.
+2. Supply translations for the 11 non-en/ar locales.
+3. Legal review; then set `LEGAL_DRAFT_BANNER_ENABLED = false` when counsel says so.
+4. Fill `[[REGISTERED ADDRESS]]` and `[[CRN]]` in `lib/legal/company.ts` only — do not invent them.
+5. Commit / push only when the owner says so.
+6. Apply `20260940` only when the owner authorizes a migration (not `supabase db push` unless they say so).

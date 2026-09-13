@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import AppFooter from "./legal/AppFooter";
 import AppMobileBottomNav from "./AppMobileBottomNav";
 import ReferralClaimBootstrap from "./ReferralClaimBootstrap";
 
@@ -13,6 +14,7 @@ export default function AppChrome({ children }: { children: ReactNode }) {
     <>
       <ReferralClaimBootstrap />
       {children}
+      <AppFooter />
       <AppMobileBottomNav />
     </>
   );

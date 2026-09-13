@@ -4,6 +4,7 @@
  * Index (public marketing / discovery / profiles):
  * - /, /discover, /live, /watch, /life, /learning/catalog, /store, /games,
  *   /welcome, /post-journey, /terms, /privacy, /account-deletion, /support,
+ *   /cookies, /community-guidelines, /copyright, /about, /data-export,
  *   /profile/[username], /invite/*
  *
  * Noindex (auth, account, private, gated labs):
@@ -68,4 +69,9 @@ export const SITEMAP_STATIC_ROUTES = [
   "/privacy",
   "/account-deletion",
   "/support",
+  "/cookies",
+  "/community-guidelines",
+  "/copyright",
+  "/about",
+  "/data-export",
 ] as const;

@@ -816,7 +816,7 @@ export type FoundationMessages = {
   "create.backHome": string;
   "create.uploadSubtitle": string;
   "create.backToCreate": string;
-} & StoreMessages & TeacherMessages;
+} & StoreMessages & TeacherMessages & LegalMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */
 export type StoreMessages = {
@@ -1267,6 +1267,67 @@ export type TeacherMessages = {
   "learning.visual.stepSubjects": string;
   "learning.visual.stepExperience": string;
   "learning.visual.stepReview": string;
+};
+
+export type LegalMessages = {
+  "legal.disclaimer.translation": string;
+  "legal.draft.banner": string;
+  "legal.company.line": string;
+  "legal.nav.privacy": string;
+  "legal.nav.terms": string;
+  "legal.nav.cookies": string;
+  "legal.nav.guidelines": string;
+  "legal.nav.copyright": string;
+  "legal.nav.contact": string;
+  "legal.nav.about": string;
+  "legal.nav.deleteAccount": string;
+  "legal.nav.dataExport": string;
+  "legal.privacy.title": string;
+  "legal.privacy.description": string;
+  "legal.privacy.body": string;
+  "legal.terms.title": string;
+  "legal.terms.description": string;
+  "legal.terms.body": string;
+  "legal.cookies.title": string;
+  "legal.cookies.description": string;
+  "legal.cookies.body": string;
+  "legal.guidelines.title": string;
+  "legal.guidelines.description": string;
+  "legal.guidelines.body": string;
+  "legal.copyright.title": string;
+  "legal.copyright.description": string;
+  "legal.copyright.body": string;
+  "legal.contact.title": string;
+  "legal.contact.description": string;
+  "legal.contact.body": string;
+  "legal.about.title": string;
+  "legal.about.description": string;
+  "legal.about.body": string;
+  "legal.delete.title": string;
+  "legal.delete.description": string;
+  "legal.delete.body": string;
+  "legal.export.title": string;
+  "legal.export.description": string;
+  "legal.export.body": string;
+  "legal.delete.signInPrompt": string;
+  "legal.delete.signInAction": string;
+  "legal.delete.submit": string;
+  "legal.delete.submitting": string;
+  "legal.delete.pending": string;
+  "legal.delete.ack": string;
+  "legal.delete.confirmLabel": string;
+  "legal.delete.signedInAs": string;
+  "legal.delete.error": string;
+  "legal.export.signInPrompt": string;
+  "legal.export.signInAction": string;
+  "legal.export.submit": string;
+  "legal.export.submitting": string;
+  "legal.export.pending": string;
+  "legal.export.ack": string;
+  "legal.export.signedInAs": string;
+  "legal.export.error": string;
+  "legal.meta.effectiveLabel": string;
+  "legal.meta.updatedLabel": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

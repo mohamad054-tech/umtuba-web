@@ -1,4 +1,5 @@
 import { enMessages } from "./en";
+import { legalEnMessages } from "./legalCatalogs";
 import { storePtMessages } from "./storeCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -6,6 +7,7 @@ import type { FoundationMessages } from "./types";
 export const ptMessages: FoundationMessages = {
   ...enMessages,
   ...storePtMessages,
+  ...legalEnMessages,
   "languages.ar": "Árabe",
   "languages.en": "Inglês",
   "languages.fr": "Francês",

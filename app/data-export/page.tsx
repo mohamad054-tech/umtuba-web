@@ -1,16 +1,16 @@
 import type { User } from "@supabase/supabase-js";
-import { createAccountDeletionStore } from "../../lib/accountDeletion/accountDeletionStore";
-import type { AccountDeletionRequestRecord } from "../../lib/accountDeletion/requestAccountDeletion";
+import { createDataExportStore } from "../../lib/dataExport/dataExportStore";
+import type { DataExportRequestRecord } from "../../lib/dataExport/requestDataExport";
 import { loadLegalPageProps } from "../../lib/legal/loadLegalPage";
-import { accountDeletionMetadata } from "../../lib/site/routeMetadata";
+import { dataExportMetadata } from "../../lib/site/routeMetadata";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import LegalDocumentPage from "../components/legal/LegalDocumentPage";
-import AccountDeletionExperience from "./AccountDeletionExperience";
+import DataExportExperience from "./DataExportExperience";
 
-export const metadata = accountDeletionMetadata;
+export const metadata = dataExportMetadata;
 
-export default async function AccountDeletionPage() {
-  const page = await loadLegalPageProps("delete");
+export default async function DataExportPage() {
+  const page = await loadLegalPageProps("export");
   let user: User | null = null;
 
   try {
@@ -19,12 +19,12 @@ export default async function AccountDeletionPage() {
     user = null;
   }
 
-  let existingRequest: AccountDeletionRequestRecord | null = null;
+  let existingRequest: DataExportRequestRecord | null = null;
 
   if (user) {
     try {
       const supabase = await createClient();
-      existingRequest = await createAccountDeletionStore(supabase).findOpenRequest(
+      existingRequest = await createDataExportStore(supabase).findOpenRequest(
         user.id
       );
     } catch {
@@ -34,7 +34,7 @@ export default async function AccountDeletionPage() {
 
   return (
     <LegalDocumentPage {...page}>
-      <AccountDeletionExperience
+      <DataExportExperience
         signedIn={Boolean(user)}
         email={user?.email ?? null}
         existingRequest={existingRequest}

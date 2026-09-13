@@ -254,8 +254,8 @@ export const updatePasswordMetadata = buildPageMetadata({
 });
 
 export const termsMetadata = buildPageMetadata({
-  title: "Terms of Use",
-  description: `${BRAND.name} Terms of Use — accounts, content, community rules, and service limits.`,
+  title: "Terms of Service",
+  description: `${BRAND.name} Terms of Service — accounts, content, community rules, and service limits.`,
   path: "/terms",
   index: "index",
 });
@@ -267,16 +267,51 @@ export const privacyMetadata = buildPageMetadata({
   index: "index",
 });
 
+export const cookiesMetadata = buildPageMetadata({
+  title: "Cookies",
+  description: `How ${BRAND.name} uses cookies and similar technologies.`,
+  path: "/cookies",
+  index: "index",
+});
+
+export const communityGuidelinesMetadata = buildPageMetadata({
+  title: "Community Guidelines",
+  description: `Rules for how people use ${BRAND.name} together.`,
+  path: "/community-guidelines",
+  index: "index",
+});
+
+export const copyrightMetadata = buildPageMetadata({
+  title: "Copyright",
+  description: `How to report copyright infringement on ${BRAND.name}.`,
+  path: "/copyright",
+  index: "index",
+});
+
+export const aboutMetadata = buildPageMetadata({
+  title: "About",
+  description: `Who operates ${BRAND.name}.`,
+  path: "/about",
+  index: "index",
+});
+
+export const dataExportMetadata = buildPageMetadata({
+  title: "Data Export",
+  description: `Request a copy of your ${BRAND.name} data. Sign in is required. Export is queued, not immediate.`,
+  path: "/data-export",
+  index: "index",
+});
+
 export const accountDeletionMetadata = buildPageMetadata({
-  title: "Delete your UMTUBA account",
+  title: "Delete Your Account",
   description: `Request deletion of your ${BRAND.name} account and associated personal data on the web. Sign in is required. Deletion is queued, not immediate.`,
   path: "/account-deletion",
   index: "index",
 });
 
 export const supportMetadata = buildPageMetadata({
-  title: "Support",
-  description: `Contact ${BRAND.name} for account help, privacy requests, and product support. Public Support URL for the UMTUBA apps and website.`,
+  title: "Contact",
+  description: `Contact ${BRAND.name} for account help, privacy requests, and product support.`,
   path: "/support",
   index: "index",
 });

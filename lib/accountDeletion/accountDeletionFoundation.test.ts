@@ -122,9 +122,11 @@ describe("account deletion disclosure honesty", () => {
     const page = readRepo(
       "app/account-deletion/AccountDeletionExperience.tsx"
     );
-    expect(page).toMatch(/Delete your UMTUBA account/);
-    expect(page).toMatch(/not\s+immediate/i);
-    expect(page).toMatch(/queues a request/i);
+    const catalog = readRepo("lib/i18n/messages/legalCatalogs.ts");
+    expect(catalog).toMatch(/Delete Your Account/);
+    expect(catalog).toMatch(/not immediate/);
+    expect(catalog).toMatch(/queues a pending deletion request/i);
+    expect(page).toMatch(/legal\.delete\.pending/);
     expect(ACCOUNT_DELETION_DATA_DELETED.length).toBeGreaterThan(3);
     expect(ACCOUNT_DELETION_DATA_ANONYMIZED.length).toBeGreaterThan(0);
     expect(ACCOUNT_DELETION_DATA_RETAINED.join(" ")).toMatch(/orders/i);

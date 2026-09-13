@@ -1,3 +1,4 @@
+import { legalEnMessages } from "./legalCatalogs";
 import { storeJaMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
@@ -6,6 +7,7 @@ import type { FoundationMessages } from "./types";
 export const jaMessages: FoundationMessages = {
   ...storeJaMessages,
   ...teacherEnMessages,
+  ...legalEnMessages,
   "languages.ar": "アラビア語",
   "languages.en": "英語",
   "languages.fr": "フランス語",

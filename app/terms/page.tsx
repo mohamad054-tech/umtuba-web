@@ -1,15 +1,10 @@
 import LegalDocumentPage from "../components/legal/LegalDocumentPage";
-import { TERMS_SECTIONS } from "../../lib/legal/legalDocuments";
+import { loadLegalPageProps } from "../../lib/legal/loadLegalPage";
 import { termsMetadata } from "../../lib/site/routeMetadata";
 
 export const metadata = termsMetadata;
 
-export default function TermsPage() {
-  return (
-    <LegalDocumentPage
-      title="Terms of Use"
-      description="The rules for using UMTUBA — accounts, content, community conduct, rewards, and service limits."
-      sections={TERMS_SECTIONS}
-    />
-  );
+export default async function TermsPage() {
+  const props = await loadLegalPageProps("terms");
+  return <LegalDocumentPage {...props} />;
 }
