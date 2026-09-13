@@ -1,3 +1,4 @@
+import { legalEnMessages } from "./legalCatalogs";
 import { storeZhCNMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
@@ -6,6 +7,7 @@ import type { FoundationMessages } from "./types";
 export const zhCNMessages: FoundationMessages = {
   ...storeZhCNMessages,
   ...teacherEnMessages,
+  ...legalEnMessages,
   "languages.ar": "阿拉伯语",
   "languages.en": "英语",
   "languages.fr": "法语",

@@ -150,6 +150,11 @@ describe("route robots / sitemap policy", () => {
       "/privacy",
       "/account-deletion",
       "/support",
+      "/cookies",
+      "/community-guidelines",
+      "/copyright",
+      "/about",
+      "/data-export",
     ]);
     expect(SITEMAP_STATIC_ROUTES).not.toContain("/following");
     expect(SITEMAP_STATIC_ROUTES).not.toContain("/discover");

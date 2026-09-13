@@ -3,6 +3,10 @@
  * Keys are stable; expand carefully — do not rename without migration.
  */
 
+import type { LegalMessages } from "./legalCatalogs";
+
+export type { LegalMessages };
+
 export type FoundationMessages = {
   "languages.ar": string;
   "languages.en": string;
@@ -816,7 +820,7 @@ export type FoundationMessages = {
   "create.backHome": string;
   "create.uploadSubtitle": string;
   "create.backToCreate": string;
-} & StoreMessages & TeacherMessages;
+} & StoreMessages & TeacherMessages & LegalMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */
 export type StoreMessages = {

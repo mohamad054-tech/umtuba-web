@@ -1,10 +1,12 @@
 import { enMessages } from "./en";
+import { legalEnMessages } from "./legalCatalogs";
 import { storeFrMessages } from "./storeCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** French: foundation + App Shell chrome localized. */
 export const frMessages: FoundationMessages = {
   ...enMessages,
+  ...legalEnMessages,
   ...storeFrMessages,
   "languages.ar": "Arabe",
   "languages.en": "Anglais",

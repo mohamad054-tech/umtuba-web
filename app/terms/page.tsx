@@ -1,15 +1,15 @@
 import LegalDocumentPage from "../components/legal/LegalDocumentPage";
-import { TERMS_SECTIONS } from "../../lib/legal/legalDocuments";
-import { termsMetadata } from "../../lib/site/routeMetadata";
+import { legalPageMetadata } from "../../lib/legal/legalMetadata";
+import { TERMS_PAGE } from "../../lib/legal/pageSpecs";
 
-export const metadata = termsMetadata;
+export async function generateMetadata() {
+  return legalPageMetadata({
+    titleKey: "legal.meta.termsTitle",
+    descriptionKey: "legal.meta.termsDescription",
+    path: TERMS_PAGE.path,
+  });
+}
 
 export default function TermsPage() {
-  return (
-    <LegalDocumentPage
-      title="Terms of Use"
-      description="The rules for using UMTUBA — accounts, content, community conduct, rewards, and service limits."
-      sections={TERMS_SECTIONS}
-    />
-  );
+  return <LegalDocumentPage spec={TERMS_PAGE} />;
 }

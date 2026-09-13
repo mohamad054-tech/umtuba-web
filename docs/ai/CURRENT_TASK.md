@@ -2,36 +2,34 @@
 
 ## Task title
 
-CENTRAL_UMTUBA_MODERATION_FOUNDATION_V1
+CENTRAL_UMTUBA_LEGAL_PAGES_V1
 
 ## Status
 
-**LOCAL FILE ONLY.** Additive migration written. Not applied. Not pushed. No app code changed.
+**LOCAL COMPLETE.** Routes replaced/created. Migration written, not applied.
 
 ```
-TASK_ID = CENTRAL_UMTUBA_MODERATION_FOUNDATION_V1
-STATUS = MIGRATION_WRITTEN_NOT_APPLIED
+TASK_ID = CENTRAL_UMTUBA_LEGAL_PAGES_V1
+STATUS = LOCAL_COMPLETE
 DATE = 2026-09-13
-FILE = supabase/migrations/20260939_moderation_foundation_v1.sql
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
-COMMIT = USER_REQUESTED_REPORT_AND_MIGRATION_DOCS
-PUSH = USER_REQUESTED_SAME_BRANCH
-APP_CODE = UNTOUCHED
+MIGRATION = supabase/migrations/20260940_data_export_requests_v1.sql
+COMMIT = FORBIDDEN_UNLESS_USER_ASKS
+LEGAL_I18N_KEYS = 322
 ```
 
 ## Allowed scope
 
-- Additive-only migration `20260939_moderation_foundation_v1.sql`.
-- No revoke, no policy drop/alter, no access restriction.
+- Legal i18n keys (types + all 13 catalogs).
+- Replace `/privacy`, `/terms`, `/account-deletion`, `/support` content.
+- Create `/cookies`, `/community-guidelines`, `/copyright`, `/about`, `/data-export`.
+- Shared public footer via AppChrome.
+- Additive migration `20260940` only (not applied).
 
 ## Forbidden scope
 
-- Do not connect to the production database.
-- Do not run `supabase db push`.
-- Do not commit or push.
-- Do not modify application code in this task.
-
-## Residual
-
-Live already has 20260935–20260938 (not in this branch). This file is 20260939 so it will not collide when applied. Signup still queries `profiles` directly until a later GO.
+- Do not create `/legal/*`.
+- Do not invent address, CRN, or legal prose.
+- Do not connect to production or run `supabase db push`.
+- Do not change existing i18n key meanings.

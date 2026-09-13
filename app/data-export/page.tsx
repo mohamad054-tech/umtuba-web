@@ -1,21 +1,21 @@
 import type { User } from "@supabase/supabase-js";
-import { createAccountDeletionStore } from "../../lib/accountDeletion/accountDeletionStore";
-import type { AccountDeletionRequestRecord } from "../../lib/accountDeletion/requestAccountDeletion";
+import { createDataExportStore } from "../../lib/dataExport/dataExportStore";
+import type { DataExportRequestRecord } from "../../lib/dataExport/requestDataExport";
 import { legalPageMetadata } from "../../lib/legal/legalMetadata";
-import { DELETE_PAGE } from "../../lib/legal/pageSpecs";
+import { EXPORT_PAGE } from "../../lib/legal/pageSpecs";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import LegalDocumentPage from "../components/legal/LegalDocumentPage";
-import AccountDeletionExperience from "./AccountDeletionExperience";
+import DataExportExperience from "./DataExportExperience";
 
 export async function generateMetadata() {
   return legalPageMetadata({
-    titleKey: "legal.meta.deleteTitle",
-    descriptionKey: "legal.meta.deleteDescription",
-    path: DELETE_PAGE.path,
+    titleKey: "legal.meta.exportTitle",
+    descriptionKey: "legal.meta.exportDescription",
+    path: EXPORT_PAGE.path,
   });
 }
 
-export default async function AccountDeletionPage() {
+export default async function DataExportPage() {
   let user: User | null = null;
 
   try {
@@ -24,12 +24,12 @@ export default async function AccountDeletionPage() {
     user = null;
   }
 
-  let existingRequest: AccountDeletionRequestRecord | null = null;
+  let existingRequest: DataExportRequestRecord | null = null;
 
   if (user) {
     try {
       const supabase = await createClient();
-      existingRequest = await createAccountDeletionStore(supabase).findOpenRequest(
+      existingRequest = await createDataExportStore(supabase).findOpenRequest(
         user.id
       );
     } catch {
@@ -38,8 +38,8 @@ export default async function AccountDeletionPage() {
   }
 
   return (
-    <LegalDocumentPage spec={DELETE_PAGE}>
-      <AccountDeletionExperience
+    <LegalDocumentPage spec={EXPORT_PAGE}>
+      <DataExportExperience
         signedIn={Boolean(user)}
         email={user?.email ?? null}
         existingRequest={existingRequest}

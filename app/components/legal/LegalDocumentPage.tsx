@@ -1,24 +1,27 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { createTranslator } from "../../../lib/i18n/translate";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
+import { COMPANY_PLACEHOLDER_VALUES } from "../../../lib/legal/company";
+import type { LegalPageSpec } from "../../../lib/legal/pageSpecs";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
-import {
-  LEGAL_BETA_NOTICE,
-  LEGAL_EFFECTIVE_DATE,
-  LEGAL_LAST_UPDATED,
-  type LegalSection,
-} from "../../../lib/legal/legalDocuments";
+import LegalDraftBanner from "./LegalDraftBanner";
+import LegalRichText from "./LegalRichText";
 
 type LegalDocumentPageProps = {
-  title: string;
-  description: string;
-  sections: LegalSection[];
+  spec: LegalPageSpec;
+  children?: ReactNode;
 };
 
-export default function LegalDocumentPage({
-  title,
-  description,
-  sections,
+export default async function LegalDocumentPage({
+  spec,
+  children,
 }: LegalDocumentPageProps) {
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
+  const values = COMPANY_PLACEHOLDER_VALUES;
+
   return (
     <main
       className={`min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
@@ -34,120 +37,123 @@ export default function LegalDocumentPage({
           >
             <UmtubaStackedLogo size="legal" />
           </Link>
-          <span aria-hidden="true" className="text-white/25">
-            /
-          </span>
-          <Link
-            href={APP_ROUTES.terms}
-            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
-          >
-            Terms
-          </Link>
-          <Link
-            href={APP_ROUTES.privacy}
-            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
-          >
-            Privacy
-          </Link>
-          <Link
-            href={APP_ROUTES.accountDeletion}
-            className="watch-focus-ring rounded underline-offset-4 transition hover:text-white hover:underline"
-          >
-            Delete account
-          </Link>
         </nav>
 
         <header className="space-y-4 border-b border-white/10 pb-8">
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-blue-300/90">
-            Legal
+            {t("legal.eyebrow")}
           </p>
           <h1 className="font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-            {title}
+            {t(spec.titleKey)}
           </h1>
-          <p className="max-w-2xl text-base leading-7 text-white/65">
-            {description}
-          </p>
           <dl className="grid gap-2 text-sm text-white/50 sm:grid-cols-2">
             <div>
-              <dt className="inline text-white/35">Effective date: </dt>
-              <dd className="inline text-white/70">{LEGAL_EFFECTIVE_DATE}</dd>
+              <dt className="inline text-white/35">
+                {t("legal.lastUpdatedLabel")}{" "}
+              </dt>
+              <dd className="inline text-white/70">
+                {t("legal.lastUpdatedValue")}
+              </dd>
             </div>
-            <div>
-              <dt className="inline text-white/35">Last updated: </dt>
-              <dd className="inline text-white/70">{LEGAL_LAST_UPDATED}</dd>
-            </div>
+            {spec.showEffective ? (
+              <div>
+                <dt className="inline text-white/35">
+                  {t("legal.effectiveLabel")}{" "}
+                </dt>
+                <dd className="inline text-white/70">
+                  {t("legal.effectiveValue")}
+                </dd>
+              </div>
+            ) : null}
           </dl>
         </header>
 
-        <aside
-          className="mt-8 rounded-2xl border border-amber-300/25 bg-amber-400/[0.07] px-4 py-4 text-sm leading-6 text-amber-50/90"
-          role="note"
-        >
-          {LEGAL_BETA_NOTICE}
-        </aside>
+        {spec.showDraftBanner ? (
+          <LegalDraftBanner message={t("legal.draftBanner")} />
+        ) : null}
+
+        {locale !== "en" ? (
+          <p className="mt-6 text-sm leading-6 text-white/50">
+            {t("legal.translationDisclaimer")}
+          </p>
+        ) : null}
 
         <div className="mt-10 space-y-10">
-          {sections.map((section) => (
-            <section
-              key={section.id}
-              id={section.id}
-              className="scroll-mt-24 space-y-3"
-            >
-              <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl">
-                {section.title}
-              </h2>
-              {section.paragraphs.map((paragraph, index) => (
-                <p
-                  key={`${section.id}-p-${index}`}
-                  className="text-[15px] leading-7 text-white/70"
+          {spec.blocks.map((block, index) => {
+            if (block.type === "h2") {
+              return (
+                <h2
+                  key={`${block.id}-${index}`}
+                  id={block.id}
+                  className="scroll-mt-24 text-xl font-black tracking-tight text-white sm:text-2xl"
                 >
-                  {paragraph}
+                  {t(block.key)}
+                </h2>
+              );
+            }
+            if (block.type === "p" || block.type === "lead") {
+              return (
+                <p
+                  key={`${block.key}-${index}`}
+                  className={
+                    block.type === "lead"
+                      ? "text-[15px] font-semibold leading-7 text-white/80"
+                      : "text-[15px] leading-7 text-white/70"
+                  }
+                >
+                  <LegalRichText text={t(block.key, { values })} />
                 </p>
-              ))}
-              {section.bullets && section.bullets.length > 0 ? (
-                <ul className="list-disc space-y-2 pl-5 text-[15px] leading-7 text-white/70">
-                  {section.bullets.map((item, index) => (
-                    <li key={`${section.id}-b-${index}`}>{item}</li>
+              );
+            }
+            if (block.type === "list") {
+              return (
+                <ul
+                  key={`list-${index}`}
+                  className="list-disc space-y-2 ps-5 text-[15px] leading-7 text-white/70"
+                >
+                  {block.keys.map((key) => (
+                    <li key={key}>
+                      <LegalRichText text={t(key, { values })} />
+                    </li>
                   ))}
                 </ul>
-              ) : null}
-              {section.closingParagraphs?.map((paragraph, index) => (
-                <p
-                  key={`${section.id}-c-${index}`}
-                  className="text-[15px] leading-7 text-white/70"
-                >
-                  {paragraph}
-                </p>
-              ))}
-            </section>
-          ))}
+              );
+            }
+            return (
+              <div key={`table-${index}`} className="overflow-x-auto">
+                <table className="w-full min-w-[28rem] border-collapse text-start text-sm text-white/70">
+                  <thead>
+                    <tr className="border-b border-white/15 text-white/80">
+                      <th className="px-3 py-2 font-semibold">
+                        {t(block.table.headers[0])}
+                      </th>
+                      <th className="px-3 py-2 font-semibold">
+                        {t(block.table.headers[1])}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {block.table.rows.map((row, rowIndex) => (
+                      <tr
+                        key={`${row[0]}-${rowIndex}`}
+                        className="border-b border-white/10"
+                      >
+                        <td className="px-3 py-2 align-top">
+                          <LegalRichText text={t(row[0], { values })} />
+                        </td>
+                        <td className="px-3 py-2 align-top">
+                          <LegalRichText text={t(row[1], { values })} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
         </div>
 
-        <footer className="mt-14 border-t border-white/10 pt-8 text-sm text-white/45">
-          <p>
-            Related:{" "}
-            <Link
-              href={APP_ROUTES.terms}
-              className="watch-focus-ring rounded text-white/75 underline-offset-4 hover:underline"
-            >
-              Terms of Use
-            </Link>
-            {" · "}
-            <Link
-              href={APP_ROUTES.privacy}
-              className="watch-focus-ring rounded text-white/75 underline-offset-4 hover:underline"
-            >
-              Privacy Policy
-            </Link>
-            {" · "}
-            <Link
-              href={APP_ROUTES.accountDeletion}
-              className="watch-focus-ring rounded text-white/75 underline-offset-4 hover:underline"
-            >
-              Delete your account
-            </Link>
-          </p>
-        </footer>
+        {children}
       </div>
     </main>
   );

@@ -254,29 +254,68 @@ export const updatePasswordMetadata = buildPageMetadata({
 });
 
 export const termsMetadata = buildPageMetadata({
-  title: "Terms of Use",
-  description: `${BRAND.name} Terms of Use — accounts, content, community rules, and service limits.`,
+  title: "Terms of Service",
+  description: `These terms form a binding agreement between you and ${BRAND.name} Limited (in registration, Republic of Ireland).`,
   path: "/terms",
   index: "index",
 });
 
 export const privacyMetadata = buildPageMetadata({
   title: "Privacy Policy",
-  description: `${BRAND.name} Privacy Policy — how we process account, content, and usage information.`,
+  description: `${BRAND.name} Limited (in registration, Republic of Ireland) operates umtuba.com and the UMTUBA mobile applications. We are the data controller for personal data described in this policy.`,
   path: "/privacy",
   index: "index",
 });
 
+export const cookiesMetadata = buildPageMetadata({
+  title: "Cookie Policy",
+  description:
+    "Cookies are small files stored on your device. We also use similar technologies such as local storage and device identifiers.",
+  path: "/cookies",
+  index: "index",
+});
+
+export const communityGuidelinesMetadata = buildPageMetadata({
+  title: "Community Guidelines",
+  description:
+    "UMTUBA exists so ideas can cross borders. That only works if people are safe here.",
+  path: "/community-guidelines",
+  index: "index",
+});
+
+export const copyrightMetadata = buildPageMetadata({
+  title: "Copyright and DMCA Policy",
+  description:
+    "UMTUBA Limited respects intellectual property and expects its users to do the same.",
+  path: "/copyright",
+  index: "index",
+});
+
+export const aboutMetadata = buildPageMetadata({
+  title: "About UMTUBA",
+  description: "UMTUBA is a platform for sharing ideas across borders.",
+  path: "/about",
+  index: "index",
+});
+
 export const accountDeletionMetadata = buildPageMetadata({
-  title: "Delete your UMTUBA account",
-  description: `Request deletion of your ${BRAND.name} account and associated personal data on the web. Sign in is required. Deletion is queued, not immediate.`,
+  title: "Delete Your Account",
+  description: "You can request deletion of your UMTUBA account at any time.",
   path: "/account-deletion",
   index: "index",
 });
 
+export const dataExportMetadata = buildPageMetadata({
+  title: "Export Your Data",
+  description:
+    "You have the right to receive a copy of the personal data we hold about you, in a structured, machine-readable format (GDPR Article 20).",
+  path: "/data-export",
+  index: "index",
+});
+
 export const supportMetadata = buildPageMetadata({
-  title: "Support",
-  description: `Contact ${BRAND.name} for account help, privacy requests, and product support. Public Support URL for the UMTUBA apps and website.`,
+  title: "Contact",
+  description: `Support and general enquiries: support@umtuba.com. Privacy and data requests: privacy@umtuba.com.`,
   path: "/support",
   index: "index",
 });

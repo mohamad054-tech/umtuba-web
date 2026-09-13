@@ -118,13 +118,14 @@ describe("account deletion client/server secret hygiene", () => {
 });
 
 describe("account deletion disclosure honesty", () => {
-  it("describes queued processing and retention", () => {
+  it("keeps queued request UI and source legal copy", () => {
     const page = readRepo(
       "app/account-deletion/AccountDeletionExperience.tsx"
     );
-    expect(page).toMatch(/Delete your UMTUBA account/);
-    expect(page).toMatch(/not\s+immediate/i);
-    expect(page).toMatch(/queues a request/i);
+    const legal = readRepo("lib/i18n/messages/legalCatalogs.ts");
+    expect(page).toMatch(/legal\.request\.deleteHeading/);
+    expect(legal).toMatch(/queues a deletion request/);
+    expect(legal).toMatch(/Delete Your Account/);
     expect(ACCOUNT_DELETION_DATA_DELETED.length).toBeGreaterThan(3);
     expect(ACCOUNT_DELETION_DATA_ANONYMIZED.length).toBeGreaterThan(0);
     expect(ACCOUNT_DELETION_DATA_RETAINED.join(" ")).toMatch(/orders/i);
