@@ -1,0 +1,103 @@
+[
+  {
+    "name": "home",
+    "url": "https://umtuba.com/",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "UMTUBA\n\nUMTUBA\n\nHome\nHome\nWorld\nLearning\nLive\nMessages\nWelcome\nSaved\nUpload\n\nVideo feed\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n📚\nLearning\n🛍️\nStore\n🎮\nGames\n🔴\nLive\nUM Life\n🌍\nWorld\n🔎\nSearch\n💬\nMessages\n➕\nCreate\n+\nAdd Story\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUntitled video\n\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUMTUBA"
+    },
+    "supabaseThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\home.png"
+  },
+  {
+    "name": "home-hl-en",
+    "url": "https://umtuba.com/?hl=en",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/?hl=en",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "UMTUBA\n\nUMTUBA\n\nHome\nHome\nWorld\nLearning\nLive\nMessages\nWelcome\nSaved\nUpload\n\nVideo feed\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n📚\nLearning\n🛍️\nStore\n🎮\nGames\n🔴\nLive\nUM Life\n🌍\nWorld\n🔎\nSearch\n💬\nMessages\n➕\nCreate\n+\nAdd Story\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUntitled video\n\nM\n@mohamad\nFOLLOW\nMESSAGE\n\nUMTUBA, Worldwide\n\nUntitled video\n\n0\n0\n0\n0\n\nUMTUBA"
+    },
+    "supabaseThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\home-hl-en.png"
+  },
+  {
+    "name": "watch",
+    "url": "https://umtuba.com/watch",
+    "status": 200,
+    "snapshot": {
+      "title": "Watch | UMTUBA",
+      "url": "https://umtuba.com/watch",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "UMTUBA\n\nUMTUBA · Untitled video\n\nLanguage\nEN\n◇\nActivity tier\nUM —\nSign in\nDiscover\nFullscreen\nM\nmohamad abu tair\nFOLLOW\n\n@mohamad\n\nUntitled video\n\nRead on UM Life\n📍\nUMTUBA, Worldwide\nExplore this city\n\n♪\nOriginal sound · UMTUBA\n\nAI SUMMARY\n\nWatch how this post travels — open Post Journey for live reach.\n\nOpen AI panel\n🌍\nPost Journey\n0\n0\n0\n0\nUCONNECT\nM\nmohamad abu tair\nFOLLOW\n\n@mohamad\n\nUntitled "
+    },
+    "supabaseThrow": false,
+    "pageErrors": [
+      {
+        "message": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+        "stackHead": "Error: Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.\n    at rY (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:40207)\n    at iu (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:91248)\n    at sd (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:131938)\n    at https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:126824\n    at se (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:126925)\n    at sH (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:153489)\n    at MessagePort._ (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:1647)"
+      }
+    ],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\watch.png"
+  },
+  {
+    "name": "welcome",
+    "url": "https://umtuba.com/welcome",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/welcome",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "UMTUBA\nHome\nWorld\nLearning\nLive\nMessages\nJoin UMTUBA\nAlpha 0.2 · Built for a new generation\n\nUMTUBA\n\nThe World Lives Here.\n\nDiscover authentic videos, cultures, people, ideas, and opportunities from every corner of the world.\n\nStart Exploring\nGo Live\n\nTHE UMTUBA WORLD\n\nMore than watching.\nA place to grow.\nOpen Home Feed\n🎬\nVideos\n\nFast, creative moments built for discovery.\n\n🔥\nChallenges\n\nDaily m"
+    },
+    "supabaseThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\welcome.png"
+  },
+  {
+    "name": "learning",
+    "url": "https://umtuba.com/learning",
+    "status": 200,
+    "snapshot": {
+      "title": "My Learning | UMTUBA",
+      "url": "https://umtuba.com/learning",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "UMTUBA\n\nUMTUBA\n\nLearning\nHome\nWorld\nLearning\nLive\nMessages\n\nMy Learning\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\n\nUMTUBA Learning — live product catalog and routes.\n\nLearning\nMy Learning\nBecome a Teacher\nTeacher Center\nDiscover\nMy library\n\nLEARNING\n\nWelcome back, Guest\n\nStart learning\n\nSearch\nAll\nAI\nMobile Development\nUI/UX\nPhotography\nLanguages\nBusiness\nMathematics\nDigital Marketing\nProgr"
+    },
+    "supabaseThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\learning.png"
+  },
+  {
+    "name": "store",
+    "url": "https://umtuba.com/store",
+    "status": 200,
+    "snapshot": {
+      "title": "Store — UMTUBA",
+      "url": "https://umtuba.com/store",
+      "hasNextErrorId": false,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false,
+      "bodyTextHead": "Skip to store content\nUMTUBA\n\nUMTUBA\n\nStore\nHome\nWorld\nLearning\nLive\nMessages\n\nUMTUBA\n\nLanguage\nEN\nSearch\n◇\nActivity tier\nUM —\nSign in\nSearch the store\nSearch\nShop\nCatalog\nFavorites\nOrders\n\nUMTUBA STORE\n\nShop UMTUBA\n\nDiscover active products from UMTUBA sellers and creators — catalog prices only, no invented deals.\n\nBrowse products\nBrowse catalog\nCATALOG PRICES\nWhat you see is the live offer — no "
+    },
+    "supabaseThrow": false,
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots-post-deploy\\store.png"
+  }
+]

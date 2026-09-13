@@ -1,0 +1,81 @@
+[
+  {
+    "name": "home",
+    "url": "https://umtuba.com/",
+    "status": 200,
+    "snapshot": {
+      "title": "",
+      "url": "https://umtuba.com/",
+      "hasNextErrorId": true,
+      "bodyTextHead": "This page couldn’t load\n\nReload to try again, or go back.\n\nReload\nBack",
+      "digest": null,
+      "htmlHasNextError": true,
+      "htmlHasCouldntLoad": true
+    },
+    "pageErrors": [
+      {
+        "message": "Supabase URL is not configured.",
+        "stackHead": "Error: Supabase URL is not configured.\n    at sa (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66134)\n    at so (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66206)\n    at https://umtuba.com/_next/static/chunks/14r5yx8u_5qpq.js:1:16049\n    at iv (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:95963)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121125)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)"
+      }
+    ],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots\\home.png"
+  },
+  {
+    "name": "welcome",
+    "url": "https://umtuba.com/welcome",
+    "status": 200,
+    "snapshot": {
+      "title": "UMTUBA — Ideas Without Borders",
+      "url": "https://umtuba.com/welcome",
+      "hasNextErrorId": false,
+      "bodyTextHead": "UMTUBA\nHome\nWorld\nLearning\nLive\nMessages\nJoin UMTUBA\nAlpha 0.2 · Built for a new generation\n\nUMTUBA\n\nThe World Lives Here.\n\nDiscover authentic videos, cultures, people, ideas, and opportunities from every corner of the world.\n\nStart Exploring\nGo Live\n\nTHE UMTUBA WORLD\n\nMore than watching.\nA place to grow.\nOpen Home Feed\n🎬\nVideos\n\nFast, creative moments built for discovery.\n\n🔥\nChallenges\n\nDaily missions that make users come back.\n\n🤖\nAI Companion\n\nA trusted guide that helps every talent grow.\n\n💡\nIdeas\n\nTurn thoughts into projects, teams, and opportunities.\n\n🌍\nGlobal\n\nA platform for creators",
+      "digest": null,
+      "htmlHasNextError": false,
+      "htmlHasCouldntLoad": false
+    },
+    "pageErrors": [],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots\\welcome.png"
+  },
+  {
+    "name": "home-hl-en",
+    "url": "https://umtuba.com/?hl=en",
+    "status": 200,
+    "snapshot": {
+      "title": "",
+      "url": "https://umtuba.com/?hl=en",
+      "hasNextErrorId": true,
+      "bodyTextHead": "This page couldn’t load\n\nReload to try again, or go back.\n\nReload\nBack",
+      "digest": null,
+      "htmlHasNextError": true,
+      "htmlHasCouldntLoad": true
+    },
+    "pageErrors": [
+      {
+        "message": "Supabase URL is not configured.",
+        "stackHead": "Error: Supabase URL is not configured.\n    at sa (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66134)\n    at so (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66206)\n    at https://umtuba.com/_next/static/chunks/14r5yx8u_5qpq.js:1:16049\n    at iv (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:95963)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121125)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)"
+      }
+    ],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots\\home-hl-en.png"
+  },
+  {
+    "name": "home-hl-ar",
+    "url": "https://umtuba.com/?hl=ar",
+    "status": 200,
+    "snapshot": {
+      "title": "",
+      "url": "https://umtuba.com/?hl=ar",
+      "hasNextErrorId": true,
+      "bodyTextHead": "This page couldn’t load\n\nReload to try again, or go back.\n\nReload\nBack",
+      "digest": null,
+      "htmlHasNextError": true,
+      "htmlHasCouldntLoad": true
+    },
+    "pageErrors": [
+      {
+        "message": "Supabase URL is not configured.",
+        "stackHead": "Error: Supabase URL is not configured.\n    at sa (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66134)\n    at so (https://umtuba.com/_next/static/chunks/0ztghknfw-iyv.js:24:66206)\n    at https://umtuba.com/_next/static/chunks/14r5yx8u_5qpq.js:1:16049\n    at iv (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:95963)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121125)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)\n    at e (https://umtuba.com/_next/static/chunks/2ejk_26znfoeu.js:1:121370)"
+      }
+    ],
+    "screenshot": "C:\\Users\\1\\Desktop\\umtuba\\worktrees\\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1\\docs\\ops\\production-home-supabase-env-p0-v1\\screenshots\\home-hl-ar.png"
+  }
+]

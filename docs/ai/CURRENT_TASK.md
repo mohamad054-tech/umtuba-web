@@ -2,60 +2,56 @@
 
 ## Task title
 
-DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+DESKTOP_UMTUBA_PRODUCTION_HOME_SUPABASE_ENV_P0_RELEASE_V1
 
 ## Status
 
-**FINAL COMPLETE.** Central-accepted Learning productization is preserved in a clean local commit. Production build passes. Do not push. Do not deploy. Do not apply `20260934`. Do not redesign.
+**COMPLETE.** Central-authorized same-SHA production rebuild and switch. Home no longer throws after hydration. Brand candidate not deployed. Parent dirty checkout preserved.
 
 ```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-DATE = 2026-08-24
-MACHINE = DESKTOP
-OPERATOR = DESKTOP / WEB LEARNING
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
-TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-BRANCH = desktop/learning-approved-design-productization-v1
-COMMIT_CREATED = YES
+TASK_ID = DESKTOP_UMTUBA_PRODUCTION_HOME_SUPABASE_ENV_P0_RELEASE_V1
+STATUS = COMPLETE
+DATE = 2026-08-29
+SOURCE_SHA = b2c0bbd1aeb423c4f5aa7410c48c407989f30d1c
+SOURCE_SHA_VERIFIED = YES
+PRODUCTION_PUBLIC_ENV_PRESENT_AT_BUILD = YES
+PUBLIC_URL_INLINED_IN_CLIENT_BUNDLE = YES
+BUILD = PASS
+PRODUCTION_DEPLOYED = YES
+LIVE_RELEASE = /opt/umtuba/production/releases/b2c0bbd1-20260829074010
+LIVE_SOURCE_SHA = b2c0bbd1aeb423c4f5aa7410c48c407989f30d1c
+POST_DEPLOY_HOME = PASS
+NEXT_ERROR_GONE = YES
+WATCH_SMOKE = PASS
+WELCOME_SMOKE = PASS
+LEARNING_SMOKE = PASS
+STORE_SMOKE = PASS
+BRAND_CANDIDATE_DEPLOYED = NO
+BRAND_CANDIDATE_UNCHANGED = YES
+CODE_CHANGED = NO
+COMMIT = NO
 PUSHED = NO
-DEPLOYED = NO
-NEW_MIGRATION = NO
-MIGRATION_20260934_APPLIED = NO
-MOBILE_NATIVE_TOUCHED = NO
-LOCAL_PREVIEW_URL = http://localhost:3018/learning
+WORKTREE = C:\Users\1\Desktop\umtuba\worktrees\DESKTOP-UMTUBA-PRODUCTION-HOME-SUPABASE-ENV-P0-V1
+BRANCH = desktop/umtuba-production-home-supabase-env-p0-v1
+PARENT_PRESERVED = YES
+PARENT_BRANCH = office/profile-hero-completeness-v1
+PARENT_HEAD = 380a36646d4de8a37c39a56ac3ccd449f6d8b20d
 ```
 
 ## Allowed scope
 
-Closed. Next work requires a new Central GO.
+Same-SHA rebuild/redeploy of live `b2c0bbd` with public env present at `next build`. Docs/report in this worktree only.
 
 ## Forbidden scope
 
-- Do not push unless explicitly authorized.
-- Do not deploy. Do not apply `20260934`. Do not create a new migration.
-- Do not redesign. Do not touch `umtuba-mobile`.
-- Do not write to the Windows Desktop. `_port_extract` protected.
+- Do not deploy brand `b5fbeff`.
+- Do not modify product source.
+- Do not rotate credentials.
+- Do not print env values.
+- Do not touch DB/migrations/payments.
+- Do not reset/clean/stash the dirty parent.
+- Do not write artifacts to the Windows Desktop. `_port_extract` protected.
 
-## Prior completed tasks (history — do not delete artifacts)
+## Owner / Central ask
 
-- `DESKTOP_UMTUBA_LEARNING_APPROVED_DESIGN_PRODUCTIZATION_V1` COMPLETE_CANDIDATE / ACCEPTED_BY_CENTRAL.
-- `DESKTOP_UMTUBA_LEARNING_WORLD_CLASS_VISUAL_DESIGN_V1` APPROVED_BY_OWNER.
-- `DESKTOP_UMTUBA_LEARNING_TEACHER_STUDENT_PLATFORM_V1` HANDOFF_DEPOSITED.
-
-## Residual
-
-Authenticated writes / RLS not exercised. `20260934` not applied. `e7c84c66` still not fetchable. Push not authorized.
+None. Rollback target remains `/opt/umtuba/production/releases/b2c0bbd1-20260825100900`.

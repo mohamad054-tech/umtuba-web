@@ -1,0 +1,16 @@
+{
+  "envChunkBytes": 223741,
+  "callerChunkBytes": 33280,
+  "supabaseUrlMessageCount": 1,
+  "nextPublicUrlNameCount": 3,
+  "nextPublicPublishableNameCount": 3,
+  "nextPublicAnonNameCount": 3,
+  "httpsSupabaseHostLiteralCount": 0,
+  "bareSupabaseCoCount": 3,
+  "INLINED_NEXT_PUBLIC_SUPABASE_URL": "NO",
+  "INLINED_NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "NO",
+  "INLINED_NEXT_PUBLIC_SUPABASE_ANON_KEY": "NO",
+  "PROCESS_ENV_RUNTIME_SHAPE": "YES",
+  "CALLER_HAS_POST_COUNTERS": "YES",
+  "CALLER_HAS_HTTPS_SUPABASE_HOST": "NO"
+}
