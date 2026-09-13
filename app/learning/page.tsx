@@ -13,12 +13,34 @@ import {
 } from "../../lib/learning/instructorAuthoring";
 
 import { learningHubMetadata } from "../../lib/site/routeMetadata";
+import WelcomeVideoHook from "../components/learning/WelcomeVideoHook";
+import { buildWelcomeVideoHook } from "../../lib/learning/welcomeVideoHook";
+import {
+  LEARNING_TEACHER_ROUTES,
+  canTeacherUseCenter,
+  loadMyTeacherProfile,
+} from "../../lib/learning/teacherPlatform";
+import { isLearningVisualDemoMode } from "../../lib/learning/visualDemo";
+import LearningHomeView from "../components/learning/visual/LearningHomeView";
 
 export const metadata = learningHubMetadata;
 
 export const dynamic = "force-dynamic";
 
-export default async function LearningHubPage() {
+type PageProps = {
+  searchParams?: Promise<{ surface?: string }> | { surface?: string };
+};
+
+export default async function LearningHubPage({ searchParams }: PageProps) {
+  if (isLearningVisualDemoMode()) {
+    const query = await Promise.resolve(searchParams ?? {});
+    return (
+      <LearningHomeView
+        surface={query.surface === "library" ? "library" : "discover"}
+      />
+    );
+  }
+
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
   const user = await getServerUser();
@@ -33,15 +55,24 @@ export default async function LearningHubPage() {
   const showInstructor =
     authorable.ok &&
     (authorable.data as InstructorAuthorableCourse[]).length > 0;
+  const teacher = await loadMyTeacherProfile(supabase);
+  const teacherHref = canTeacherUseCenter(teacher.ok ? teacher.data?.status : null)
+    ? LEARNING_TEACHER_ROUTES.center
+    : LEARNING_INSTRUCTOR_ROUTES.hub;
+  const welcomeHook = buildWelcomeVideoHook(
+    process.env,
+    LEARNING_PUBLIC_ROUTES.catalog
+  );
 
   return (
     <LearningShell
       title={t("learning.hub.title")}
       subtitle={t("learning.hub.subtitle")}
-      instructorHref={
-        showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
-      }
+      instructorHref={showInstructor ? teacherHref : undefined}
     >
+      <div className="mt-6">
+        <WelcomeVideoHook hook={welcomeHook} />
+      </div>
       {hub.ok ? (
         <LearningHub hub={hub.data} />
       ) : (

@@ -16,6 +16,8 @@ import {
   buildItemListJsonLd,
 } from "../../../lib/site/jsonLd";
 import { buildLocalizedRouteMetadata } from "../../../lib/site/localizedSeo";
+import { isLearningVisualDemoMode } from "../../../lib/learning/visualDemo";
+import LearningHomeView from "../../components/learning/visual/LearningHomeView";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,9 @@ export async function generateMetadata() {
 }
 
 export default async function LearningPublicCatalogPage() {
+  if (isLearningVisualDemoMode()) {
+    return <LearningHomeView />;
+  }
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
   const user = await getServerUser();
