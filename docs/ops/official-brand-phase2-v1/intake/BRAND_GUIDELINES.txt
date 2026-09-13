@@ -1,0 +1,36 @@
+UMTUBA OFFICIAL BRAND GUIDELINES — V3
+OWNER APPROVED — STACKED ONLY
+
+PRIMARY MARK
+Gold U symbol with diagonal gold orbit terminating in a gold star.
+
+MANDATORY LOCKUP
+[ U + ORBIT + STAR ]
+        UMTUBA
+ LEARN · CREATE · SHARE
+
+HARD RULE
+The U symbol MUST ALWAYS be ABOVE UMTUBA in the official logo lockup.
+No side-by-side / horizontal logo lockup is allowed.
+Do not create, export, ship, or integrate a version where the symbol is beside UMTUBA.
+
+WORDMARK
+UMTUBA
+
+TAGLINE
+LEARN · CREATE · SHARE
+
+PRIMARY COLORS
+Gold #D4AF37
+Gold Light #FFD86A
+Gold Dark #B8860B
+Black #000000
+Dark #111111
+White #FFFFFF
+
+PRODUCTION RULES
+1. Stacked-only official logo.
+2. App icon may use the symbol alone.
+3. Watermark must use the stacked official lockup unless symbol-only is explicitly required by the surface.
+4. End tags use the stacked official lockup.
+5. Do not alter the orbit, star, wordmark, or tagline.
