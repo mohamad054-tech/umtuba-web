@@ -1,51 +1,43 @@
-# Cursor Report — Approved web header production deploy V1
+# Cursor Report — Moderation foundation V1 (local file only)
 
 ## Summary
 
-Owner GO used. The accepted stacked header is live on production.
-
-`HEADER_COMMIT_SHA` = `e95ed58d2b1180b2d016ee01bd3416eef8bbc85a`  
-`BUILD_ID_AFTER` = `-UrnnYvUzUBs1URdHu5I1`  
-`WEB_HEADER_PRODUCTION_INSTALLED` = YES  
-
-Full return fields are in `D:\umtuba-central\reports\UMTUBA_CENTRAL_APPROVED_HEADER_PRODUCTION_DEPLOY_V1.md`.
+Wrote additive migration `supabase/migrations/20260939_moderation_foundation_v1.sql`. Branch check: `posts.deleted_at`, `posts.visibility`, `profiles.moderation_status`, `profiles.privacy_settings`, and `is_username_available` do not exist here. Number 20260935 skipped because live already applied 20260935–20260938. Not applied remotely. App code not changed.
 
 ## Exact files changed
 
-- `app/components/AppTopNav.tsx`
-- `app/components/brand/UmtubaStackedLogo.tsx`
-- `app/globals.css`
-- `lib/site/brand.ts`
-- `lib/site/brandAssets.test.ts`
+- `supabase/migrations/20260939_moderation_foundation_v1.sql` (created)
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+`20260939_moderation_foundation_v1.sql` — not applied.
 
 ## Security review
 
-Presentation-only. Host env sourced for `NEXT_PUBLIC` inlining; values not printed.
+Additions only: new columns with safe defaults, new check constraints on those columns, partial index, data flag on `user_id IS NULL` posts (no DELETE), new SECURITY DEFINER read helper + GRANT EXECUTE. No REVOKE, no policy DDL, no RLS change.
 
 ## Tests
 
-`lib/site/brandAssets.test.ts` 7/7 PASS.
+Not run (SQL file only; local Supabase unavailable).
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS.
+Not required (no TS edits).
 
 ## Build
 
-Host `npx next build` PASS.
+Not required.
 
 ## git diff --check
 
-Not re-run after commit.
+Not run.
 
 ## git status --short
 
-Pushed `origin/central/approved-header-production-deploy-v1`. Unrelated local dirt not deployed.
+Not recorded.
 
 ## Open issues
 
-Stale-client Server Action ID mismatches after cutover. No first-party Home crash.
+Do not apply to production until Central GO. Signup still uses direct `profiles` select.
