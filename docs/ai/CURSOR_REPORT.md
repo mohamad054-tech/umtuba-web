@@ -1,42 +1,41 @@
-# CURSOR_REPORT — Login Client Navigation Fix V1
+# CURSOR_REPORT — COLLABORATION_LOCAL_LINK_UNLINK_FIXTURE_RPC_BROWSER_E2E_FOLLOWUP_V1
 
 ## Summary
 
-**DESKTOP_LOCAL_RUNTIME_REVERIFICATION_REQUIRED** — Product login no longer awaits
-referral claim before full-document navigation after successful sign-in. Matches
-Desktop evidence: session/cookie healthy while URL remained `/login`.
+Official Playwright learning link/unlink smoke is **2/2 PASS** on Desktop LOCAL.
+
+- Login navigation SHA `0a3f318` preserved (no login redesign).
+- Peer/owner login flakes: React controlled AuthField + Playwright `fill()` race → empty submit validation. Fixed in `e2e/collaboration/helpers/loginAs.ts`.
+- Owner LINK failure: server action POST **500** because `app/actions/collaboration.ts` exported a string from a `"use server"` module (Next invalid-use-server-value). Removed export. Direct RPC had already been healthy.
+- Corrective commit: `188423d6e449b6123340ff14df052e429164933b` on `office/collaboration-local-link-unlink-fixture-rpc-browser-e2e-followup-v1`.
 
 ## Exact files changed
 
-- `app/login/page.tsx`
-- `lib/supabase/authSession.harden.test.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
+- `app/actions/collaboration.ts`
+- `e2e/collaboration/helpers/loginAs.ts`
+- `e2e/collaboration/playwright.config.ts`
 
 ## Migrations created
 
-NO
+None.
 
 ## Security review
 
-- Still real `signInWithEmail` + `getSafeRedirectPath`
-- No auth bypass / no storageState / no privileged test branch
-- Middleware/auth guards unchanged
-- Referral claim still attempted (non-blocking) + ReferralClaimBootstrap
+LOCAL-only. No production project touch. No secrets committed. Peer deny path still enforced by RPC/UI.
 
 ## Tests
 
-- Focused auth/harden + referral + Collaboration Vitest: **49/49 PASS**
-- Credentialed Playwright: **NOT RUN on laptop**
+- Official Playwright `learning-link-unlink.spec.ts`: **2/2 PASS** (~12.9s)
+- Focused Vitest (auth harden + collab gate/binding/provisioning/ui): **42/42 PASS**
+- Login markers on `app/login/page.tsx` unchanged vs `0a3f318`
 
 ## TypeScript
 
-- `npx tsc --noEmit` → PASS
+`npx tsc --noEmit` — PASS
 
 ## Build
 
-N/A
+Not required (no app UI entry redesign; server-action export fix + e2e harness).
 
 ## git diff --check
 
@@ -44,8 +43,8 @@ PASS
 
 ## git status --short
 
-(see closeout)
+Clean tracked tree after commit; local untracked diagnostics/`test-results` only.
 
 ## Open issues
 
-Desktop must re-verify Playwright learning-link-unlink smoke leaves `/login`.
+None for this milestone. Central SoT integration review of `188423d` recommended (do not auto-merge).
