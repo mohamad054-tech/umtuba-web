@@ -1,0 +1,95 @@
+{
+  "startedAt": "2026-08-15T14:43:54.608Z",
+  "authUsed": {
+    "email": "store-qa@umtuba.com",
+    "username": "storeqa",
+    "passwordPrinted": false
+  },
+  "startExploring": {
+    "before": {
+      "url": "https://umtuba.com/welcome",
+      "title": "UMTUBA — Ideas Without Borders",
+      "lang": "ar",
+      "dir": "rtl",
+      "alerts": [],
+      "body": "UMTUBA انضم إلى أم طوبا ألفا 0.2 · مبني لجيل جديد UMTUBA العالم يعيش هنا. اكتشف فيديوهات وثقافات وأشخاصًا وأفكارًا وفرصًا حقيقية من كل مكان في العالم. ابدأ الاستكشاف البث المباشر عالم أم طوبا أكثر من مشاهدة. مكان للنمو. افتح الصفحة الرئيسية 🎬 فيديوهات لحظات سريعة وإبداعية مصممة للاكتشاف. 🔥 تحديات مهام يومية تجعل المستخدمين يعودون. 🤖 رفيق الذكاء الاصطناعي دليل موثوق يساعد كل موهبة على النمو. 💡 أفكار حوّل الأفكار إلى مشاريع وفرق وفرص. 🌍 عالمي منصة لصنّاع المحتوى بلا حدود. 🚀 فرص اربط المواهب بفرص حقيقية للمضي قدمًا. مهمتنا ابنِ أول منصة اجتماعية يحصل فيها كل موهبة على فرصتها. تبدأ أم طوبا ب"
+    },
+    "ctaCount": 1,
+    "after": {
+      "url": "https://umtuba.com/watch",
+      "title": "Watch | UMTUBA",
+      "lang": "ar",
+      "dir": "rtl",
+      "alerts": [],
+      "body": "UMTUBA ◇ Tier UM تسجيل الدخول Discover Loading video… م مارينا بوست FOLLOW @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 0 0 1 UCONNECT M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 1 1 0 UCONNECT Untitled vid"
+    },
+    "navHops": [
+      "https://umtuba.com/welcome",
+      "https://umtuba.com/welcome",
+      "https://umtuba.com/watch"
+    ]
+  },
+  "login": {
+    "before": {
+      "url": "https://umtuba.com/login",
+      "title": "Log in | UMTUBA",
+      "lang": "en",
+      "dir": "ltr",
+      "alerts": [],
+      "body": "UMTUBA Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one"
+    },
+    "filled": {
+      "emailLen": 19,
+      "passwordLen": 28,
+      "emailLooksLike": true
+    },
+    "submitCount": 1,
+    "submitTextBefore": "Sign in",
+    "submitTextAfterEnter": "Sign in",
+    "submitTextFinal": "Sign in",
+    "after": {
+      "url": "https://umtuba.com/login",
+      "title": "Log in | UMTUBA",
+      "lang": "en",
+      "dir": "ltr",
+      "alerts": [],
+      "body": "UMTUBA Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one"
+    },
+    "navHops": [
+      "https://umtuba.com/login",
+      "https://umtuba.com/login"
+    ],
+    "authCalls": [
+      {
+        "status": 200,
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/auth/v1/token"
+      },
+      {
+        "status": 200,
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/auth/v1/user"
+      },
+      {
+        "status": 200,
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/auth/v1/token"
+      },
+      {
+        "status": 200,
+        "url": "https://tgucwnjwoyeqoxqaxmew.supabase.co/auth/v1/user"
+      }
+    ],
+    "leftLogin": false,
+    "pathname": "/login",
+    "landedProfile": false
+  },
+  "authed": {},
+  "runtime": {
+    "pageErrors": [],
+    "consoleErrors": [
+      {
+        "text": "[UserMenu] getUser failed: Auth session missing!",
+        "url": "https://umtuba.com/watch"
+      }
+    ]
+  },
+  "finishedAt": "2026-08-15T14:44:24.339Z"
+}

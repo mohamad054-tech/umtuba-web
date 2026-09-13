@@ -1,0 +1,116 @@
+{
+  "startedAt": "2026-08-15T14:47:13.027Z",
+  "hops": [
+    "https://umtuba.com/login",
+    "https://umtuba.com/login",
+    "https://umtuba.com/settings",
+    "https://umtuba.com/settings",
+    "https://umtuba.com/watch",
+    "https://umtuba.com/watch",
+    "https://umtuba.com/create",
+    "https://umtuba.com/create",
+    "https://umtuba.com/messages",
+    "https://umtuba.com/messages",
+    "https://umtuba.com/saved",
+    "https://umtuba.com/saved",
+    "https://umtuba.com/search",
+    "https://umtuba.com/search",
+    "https://umtuba.com/watch",
+    "https://umtuba.com/watch",
+    "https://umtuba.com/saved",
+    "https://umtuba.com/saved"
+  ],
+  "surfaces": {
+    "/profile": {
+      "url": "https://umtuba.com/settings",
+      "title": "Settings | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Settings Search Language العربية English Français Español Deutsch Português UM U Profile Notifications Language Account Profile Update how you appear across UMTUBA. U AVATAR Upload image JPEG, PNG, WebP, or GIF. Max 2 MB. DISPLAY NAME USERNAME Use 3–24 characters: lowercase letters, numbers, dots, or underscores. BIO CITY COUNTRY Save profile Home Live Messages Profile"
+    },
+    "/watch": {
+      "url": "https://umtuba.com/watch",
+      "title": "Watch | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [
+        "Follow",
+        "Follow"
+      ],
+      "body": "UMTUBA UM Discover Loading video… م مارينا بوست FOLLOW @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide ♪ Original sound · UMTUBA 🌍 Post Journey 1 0 0 1 M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worldwide ♪ Original sound · UMTUBA 🌍 Post Journey 1 1 1 0 Untitled video مارينا بوست هي منصة إعلامية رقمية متنوعة، فلسطينية الهوى، عربية الامتداد، دولية الرؤية، تنطلق من قلب الواقع الفلسطيني لتعكس نبض الإنسان وقضايا الثقافة والمجتمع والتكنولوجيا والإعلام، في سياق يتجاوز الحدود الجغرافية نحو فضاء معرفي مفتوح. نسعى إلى إنتاج محتوى متنوع يجمع بين المهنية الصحفية، والعمق الثقافي، والوعي النقدي، مستندين إلى قيم الحقيقة والعدالة والحرية. في مارينا بوست نؤم"
+    },
+    "/create": {
+      "url": "https://umtuba.com/create",
+      "title": "Create | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Create Back to Home Search Language العربية English Français Español Deutsch Português UM U What do you want to create? Video, Write Post, and article are supported — Write Post handles text or image. Pick one to continue. Video Upload a clip to Home and Watch. Article Write a long-form article with an optional teaser. Write Post Text or image — share a quick update with an optional photo. Home Live Messages Profile"
+    },
+    "/messages": {
+      "url": "https://umtuba.com/messages",
+      "title": "Messages | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Messages Search Language العربية English Français Español Deutsch Português ◇ Spark 0 INBOX ⌕ Message a creator from their profile or Discover to begin. Text text messaging only — no attachments or voice yet. Home Live Messages Profile"
+    },
+    "/saved": {
+      "url": "https://umtuba.com/saved",
+      "title": "Saved | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Saved Discover Search Language العربية English Français Español Deutsch Português UM U YOUR COLLECTION Saved posts Posts you bookmark appear here. Unsave anytime from the post card. SAVED No saved posts yet Tap Save on Discover or Watch posts to build your collection. Go to Discover Home Live Messages Profile"
+    },
+    "/search": {
+      "url": "https://umtuba.com/search",
+      "title": "Search | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Search Search Language العربية English Français Español Deutsch Português UM U Search UMTUBA ⌕ All People Videos Stories Stores Products SEARCH Search across UMTUBA Find people, ready videos, active stories from people you follow, stores, and products. Open Discover Browse Store Home Live Messages Profile"
+    }
+  },
+  "follow": {
+    "visible": 1,
+    "afterUrl": "https://umtuba.com/watch",
+    "after": {
+      "url": "https://umtuba.com/watch",
+      "title": "Watch | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [
+        "Follow"
+      ],
+      "body": "UMTUBA UM U Discover Loading video… م مارينا بوست … @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 0 0 1 UCONNECT M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 1 1 0 UCONNECT Untitled video مارينا بوست هي منصة إعلامية رقمية متنوعة، فلسطينية الهوى، عربية الامتداد، دولية الرؤية، تنطلق من قلب الواقع الفلسطيني لت"
+    }
+  },
+  "saved": {
+    "visible": 1,
+    "afterUrl": "https://umtuba.com/watch",
+    "after": {
+      "url": "https://umtuba.com/watch",
+      "title": "Watch | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [
+        "Follow"
+      ],
+      "body": "UMTUBA UM U Discover Loading video… م مارينا بوست … @marenapost Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 0 0 2 UCONNECT Playback link expired. Retry playback M mohamad abu tair FOLLOW @mohamad Untitled video Untitled video 📍 UMTUBA, Worldwide Explore this city ♪ Original sound · UMTUBA AI SUMMARY Watch how this post travels — open Post Journey for live reach. Open AI panel · Open AI panel 🌍 Post Journey 1 1 1 0 UCONNECT Untitled video مارينا بوست هي منصة إعلامية رقمية متنوعة، فلسطينية الهوى، عربية الامتداد، دولية ال"
+    },
+    "savedPage": {
+      "url": "https://umtuba.com/saved",
+      "title": "Saved | UMTUBA",
+      "signInVisible": false,
+      "followBtns": [],
+      "body": "UMTUBA UMTUBA Saved Discover Search Language العربية English Français Español Deutsch Português UM U YOUR COLLECTION Saved posts Posts you bookmark appear here. Unsave anytime from the post card. SAVED No saved posts yet Tap Save on Discover or Watch posts to build your collection. Go to Discover Home Live Messages Profile"
+    }
+  },
+  "create": {},
+  "messages": {},
+  "deleteMenu": {
+    "more": 0
+  },
+  "afterSubmit": {
+    "url": "https://umtuba.com/login",
+    "title": "Log in | UMTUBA",
+    "signInVisible": true,
+    "followBtns": [],
+    "body": "UMTUBA Language العربية English Français Español Deutsch Português Welcome back Sign in to continue to UMTUBA. EMAIL PASSWORD Forgot password? Sign in Don't have an account? Create one"
+  },
+  "finishedAt": "2026-08-15T14:47:43.539Z"
+}
