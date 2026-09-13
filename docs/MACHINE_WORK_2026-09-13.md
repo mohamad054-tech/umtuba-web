@@ -69,12 +69,14 @@
 
 ---
 
-## 6) هجرة الإشراف — ملف محلي فقط
+## 6) هجرة الإشراف
 
 - الملف: `supabase/migrations/20260939_moderation_foundation_v1.sql`
 - الرقم 20260935 متروك لأن الإنتاج فيه 20260935–202608 أصلاً (20260935–20260938).
 - إضافات فقط: `posts.deleted_at` / `posts.visibility` / `profiles.moderation_status` / `profiles.privacy_settings` + `is_username_available`.
-- **لم تُطبَّق على قاعدة الإنتاج.** لا revoke ولا سياسات RLS.
+- طُبِّقت على الإنتاج في 2026-09-13 عبر Supabase SQL Editor (يدوياً).
+- سُجِّلت في `schema_migrations` كإصدار `20260939`.
+- عدد الهجرات المطبَّقة على قاعدة الإنتاج الحيّة الآن 115.
 
 ---
 
