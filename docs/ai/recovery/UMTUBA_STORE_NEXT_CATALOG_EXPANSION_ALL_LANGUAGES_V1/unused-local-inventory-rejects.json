@@ -1,0 +1,24 @@
+{
+  "task_id": "UMTUBA_STORE_NEXT_CATALOG_EXPANSION_ALL_LANGUAGES_V1",
+  "note": "All unused IDs from profit-gate / launch-mix / pilot / expansion-300 rejected_sample failed commercial reuse. None were sent to Gemini.",
+  "sources_checked": [
+    "data/cj-catalog-expansion-300-v1.json",
+    "data/cj-store-launch-approved-59.json",
+    "data/cj-store-launch-candidate-v1.json",
+    "data/cj-store-launch-mix-v1.json",
+    "data/cj-pilot-100.json",
+    "data/cj-profit-gate-v2.json"
+  ],
+  "unused_vs_532": {
+    "profit_gate_and_pilot": 58,
+    "expansion_rejected_sample": 38,
+    "unused_complete_paid_or_organic": 27
+  },
+  "reject_reason_counts": {
+    "profit_rejected": 31,
+    "missing_price_or_landed": 31,
+    "launch_hold": 58,
+    "family_cap": 46
+  },
+  "decision": "Do not reuse leftover phone cases, bowls, ice trays, jewellery, or makeup-brush SKUs already at family cap. Discover a coherent next batch from live CJ expansion in underrepresented departments."
+}

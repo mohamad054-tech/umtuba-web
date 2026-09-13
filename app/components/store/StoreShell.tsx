@@ -1,5 +1,7 @@
 import "./storefront.css";
 import { Suspense, type ReactNode } from "react";
+import type { AppLocale } from "../../../lib/i18n/locales";
+import { createTranslator } from "../../../lib/i18n/translate";
 import AppTopNav from "../AppTopNav";
 import { MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import CartIconButton from "./CartIconButton";
@@ -11,6 +13,7 @@ type StoreShellProps = {
   actions?: ReactNode;
   children: ReactNode;
   wide?: boolean;
+  locale?: AppLocale;
 };
 
 export default function StoreShell({
@@ -19,13 +22,15 @@ export default function StoreShell({
   actions,
   children,
   wide = true,
+  locale,
 }: StoreShellProps) {
+  const t = createTranslator(locale ?? "en");
   return (
     <main
       className={`storefront-premium relative min-h-screen bg-[var(--sf-bg)] text-[var(--sf-ink)] ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <a href="#store-main" className="sf-skip-link watch-focus-ring">
-        Skip to store content
+        {t("store.chrome.skipToContent")}
       </a>
       <div className="pointer-events-none absolute inset-0" aria-hidden>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(214,196,161,0.08),_transparent_55%)]" />
@@ -57,7 +62,7 @@ export default function StoreShell({
             }
           >
             <div className="pb-2">
-              <StoreChrome />
+              <StoreChrome locale={locale} />
             </div>
           </Suspense>
         </div>

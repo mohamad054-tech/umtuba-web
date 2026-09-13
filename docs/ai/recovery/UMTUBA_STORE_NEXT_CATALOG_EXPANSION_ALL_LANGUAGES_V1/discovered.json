@@ -1,0 +1,95 @@
+{
+  "task_id": "UMTUBA_STORE_NEXT_CATALOG_EXPANSION_ALL_LANGUAGES_V1",
+  "source": "data/cj-catalog-next-expansion-all-locales-v1.json",
+  "discovered": 30,
+  "accepted_for_gemini": [
+    {
+      "cj_product_id": "2412210206111611700",
+      "sku": "CJYD224962001AZ",
+      "title": "Laptop Black Audio Cable Connection Monitor",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 1699,
+      "landed_cost_minor": 668,
+      "gross_margin": 0.6068275456150677
+    },
+    {
+      "cj_product_id": "2409240350571624600",
+      "sku": "CJYD214563007GT",
+      "title": "7-inch Car Monitor Desktop Reversing Monitor Display",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 7999,
+      "landed_cost_minor": 4391,
+      "gross_margin": 0.45105638204775594
+    },
+    {
+      "cj_product_id": "2D644825-4547-4EA6-9C8D-22E3DC3CFFE8",
+      "sku": "CJQCQCQC00899-Blue",
+      "title": "Tire pressure gauge",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 1799,
+      "landed_cost_minor": 793,
+      "gross_margin": 0.5591995553085047
+    },
+    {
+      "cj_product_id": "DCB495CC-80F8-4ED9-B5BD-26E39B751776",
+      "sku": "CJJSBGBG00898-Black-280x280x25.5mm",
+      "title": "New Laptop Stand Multifunctional Folding Lift Portable Laptop Stand Monitor Increase Rack Aluminum Alloy Base",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 5299,
+      "landed_cost_minor": 2904,
+      "gross_margin": 0.45197207020192487
+    },
+    {
+      "cj_product_id": "1380094536965033984",
+      "sku": "CJQC107124501AZ",
+      "title": "Head-up Display Gps High-definition Speed Water Temperature Turbine Monitoring",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 6599,
+      "landed_cost_minor": 3576,
+      "gross_margin": 0.45809971207758754
+    },
+    {
+      "cj_product_id": "1607997452471250944",
+      "sku": "CJQC165142101AZ",
+      "title": "Driving Data Recorder Power Line Step-down Line",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "subcategory": "Desk Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 2499,
+      "landed_cost_minor": 1357,
+      "gross_margin": 0.4569827931172469
+    },
+    {
+      "cj_product_id": "38396C3B-40FA-4EE3-9FE2-60FE32A2DE24",
+      "sku": "CJYDYYST00098-3 Style-150x150",
+      "title": "Non shedding microfiber round beach towel",
+      "department": "SPORTS & FITNESS",
+      "subcategory": "Workout Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 2899,
+      "landed_cost_minor": 1580,
+      "gross_margin": 0.45498447740600206
+    },
+    {
+      "cj_product_id": "2508140725141623900",
+      "sku": "CJYD245614307GT",
+      "title": "Quick-drying Microfiber Magnet Beach Towel Outdoor Multi-purpose Bath Towel",
+      "department": "SPORTS & FITNESS",
+      "subcategory": "Workout Accessories",
+      "classification": "PAID_AD_READY",
+      "retail_price_minor": 2599,
+      "landed_cost_minor": 1425,
+      "gross_margin": 0.4517121969988457
+    }
+  ]
+}

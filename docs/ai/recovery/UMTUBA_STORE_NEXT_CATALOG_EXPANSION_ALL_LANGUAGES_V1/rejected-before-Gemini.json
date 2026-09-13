@@ -1,0 +1,199 @@
+{
+  "task_id": "UMTUBA_STORE_NEXT_CATALOG_EXPANSION_ALL_LANGUAGES_V1",
+  "unused_local_inventory": {
+    "task_id": "UMTUBA_STORE_NEXT_CATALOG_EXPANSION_ALL_LANGUAGES_V1",
+    "note": "All unused IDs from profit-gate / launch-mix / pilot / expansion-300 rejected_sample failed commercial reuse. None were sent to Gemini.",
+    "sources_checked": [
+      "data/cj-catalog-expansion-300-v1.json",
+      "data/cj-store-launch-approved-59.json",
+      "data/cj-store-launch-candidate-v1.json",
+      "data/cj-store-launch-mix-v1.json",
+      "data/cj-pilot-100.json",
+      "data/cj-profit-gate-v2.json"
+    ],
+    "unused_vs_532": {
+      "profit_gate_and_pilot": 58,
+      "expansion_rejected_sample": 38,
+      "unused_complete_paid_or_organic": 27
+    },
+    "reject_reason_counts": {
+      "profit_rejected": 31,
+      "missing_price_or_landed": 31,
+      "launch_hold": 58,
+      "family_cap": 46
+    },
+    "decision": "Do not reuse leftover phone cases, bowls, ice trays, jewellery, or makeup-brush SKUs already at family cap. Discover a coherent next batch from live CJ expansion in underrepresented departments."
+  },
+  "live_expansion_rejected": [
+    {
+      "cj_product_id": "2508191508231628700",
+      "title": "Elegant Hair Clip High Ponytail Clip Half Tie Clip",
+      "reasons": [
+        "category_mismatch_electronics",
+        "family_cap:hair_clip:6>=6",
+        "PRODUCT_DATA_REVIEW:Electronics listing title may be IP-restricted or a fashion clip."
+      ]
+    },
+    {
+      "cj_product_id": "0C0F1112-AA16-4AF9-83A9-69B607179034",
+      "title": "Sports Towel Physical Cooling Microfiber Instant Cool Ice Face Towels For Gym Swimming Yoga Running Cycling Quick Drying Towel",
+      "reasons": [
+        "incomplete_or_keyword_stuffed_title",
+        "PRODUCT_DATA_REVIEW:Supplier title is keyword-stuffed or unreadable."
+      ]
+    },
+    {
+      "cj_product_id": "E0AD6392-671E-4521-8B04-268406F5CB34",
+      "title": "Rhinestone mobile phone holder",
+      "reasons": [
+        "family_cap:phone_holder:15>=8"
+      ]
+    },
+    {
+      "cj_product_id": "2508160852071628900",
+      "title": "US Solar Camera Low Power Monitor Dual Lens Monitor",
+      "reasons": [
+        "surveillance_or_restricted_camera"
+      ]
+    },
+    {
+      "cj_product_id": "1390510911118249984",
+      "title": "3D Jewelry Coin Display Stand Case Rack Collections Storage Box For Earring Gems Ring Doll Coin Badge Medal Holder",
+      "reasons": [
+        "category_mismatch_electronics",
+        "incomplete_or_keyword_stuffed_title",
+        "family_cap:jewellery:9>=5",
+        "PRODUCT_DATA_REVIEW:Supplier title is keyword-stuffed or unreadable."
+      ]
+    },
+    {
+      "cj_product_id": "1382546390286209024",
+      "title": "Hair Clip  Female Hair Clip",
+      "reasons": [
+        "category_mismatch_electronics",
+        "family_cap:hair_clip:6>=6"
+      ]
+    },
+    {
+      "cj_product_id": "1745710303368716288",
+      "title": "Dogs And Cats Ring Holder Dish Jewelry Holder Gift For Women",
+      "reasons": [
+        "category_mismatch_electronics",
+        "family_cap:jewellery:9>=5"
+      ]
+    },
+    {
+      "cj_product_id": "1734143220638035968",
+      "title": "Car Phone Holder Vent Dashboard",
+      "reasons": [
+        "family_cap:phone_holder:15>=8"
+      ]
+    },
+    {
+      "cj_product_id": "1419918805240516608",
+      "title": "Foldable Mobile Phone Holder Ring Buckle Retractable Desktop CellPhone Stand Car Magnetic Bracket Office Accessories",
+      "reasons": [
+        "family_cap:jewellery:9>=5"
+      ]
+    },
+    {
+      "cj_product_id": "1708382152414466048",
+      "title": "Solid Color Printed Microfiber Pet Towel",
+      "reasons": [
+        "category_mismatch_sports"
+      ]
+    },
+    {
+      "cj_product_id": "1F8D1B20-6FE8-4E7F-AAD8-0BA01F9E8FB0",
+      "title": "New Original Podofo A1 Mini Car DVR Camera DASH CAM Full HD 1080P Video Recorder G-Night Vision Sensor DASH CAM",
+      "reasons": [
+        "ip_brand_risk",
+        "surveillance_or_restricted_camera",
+        "incomplete_or_keyword_stuffed_title",
+        "PRODUCT_DATA_REVIEW:Supplier title is keyword-stuffed or unreadable."
+      ]
+    },
+    {
+      "cj_product_id": "1404643700709134336",
+      "title": "Auto And Motorcycle Mini HD USB Recorder",
+      "reasons": [
+        "surveillance_or_restricted_camera"
+      ]
+    },
+    {
+      "cj_product_id": "2410280609461610500",
+      "title": "Portable Car Stereo Wireless CarPlay & Android Auto, Car Radio 7inches Touchscreen, Bluetooth5.0, Mirror Link, Maps Navigation, Voice Control, AUX Cable Vehicles",
+      "reasons": [
+        "incomplete_or_keyword_stuffed_title",
+        "PRODUCT_DATA_REVIEW:Supplier title is keyword-stuffed or unreadable."
+      ]
+    },
+    {
+      "cj_product_id": "1379631083783589888",
+      "title": "Ring Bone Ear Hook Without Pierced Ear Clip",
+      "reasons": [
+        "category_mismatch_electronics",
+        "family_cap:jewellery:9>=5"
+      ]
+    },
+    {
+      "cj_product_id": "31B5E81A-C727-4188-ABD0-39430675EA63",
+      "title": "Motorcycle mobile phone holder",
+      "reasons": [
+        "family_cap:phone_holder:15>=8"
+      ]
+    },
+    {
+      "cj_product_id": "E4AC51EE-5E9E-4B98-8DBE-46AD674BA088",
+      "title": "Infrared four lights rear view of car reversing camera",
+      "reasons": [
+        "surveillance_or_restricted_camera"
+      ]
+    },
+    {
+      "cj_product_id": "1387613072763523072",
+      "title": "Network Monitor Wifi Wireless Camera",
+      "reasons": [
+        "surveillance_or_restricted_camera"
+      ]
+    },
+    {
+      "cj_product_id": "1694937902045736960",
+      "title": "360 Rotary Multifunctional Collapsible Mobile Phone Holder",
+      "reasons": [
+        "family_cap:phone_holder:15>=8"
+      ]
+    },
+    {
+      "cj_product_id": "1785496227132485632",
+      "title": "Folding Live Bedside Lazy Phone Holder",
+      "reasons": [
+        "family_cap:phone_holder:15>=8"
+      ]
+    },
+    {
+      "cj_product_id": "1628206877685329920",
+      "title": "H198 HD Six-light Infrared Night Vision Recorder Classic Popular Aircraft Nose Traffic Recorder",
+      "reasons": [
+        "surveillance_or_restricted_camera"
+      ]
+    },
+    {
+      "cj_product_id": "1392029096455835648",
+      "title": "Video Conference 4 Inch Fill Light Computer Live Photography Light  LED Selfie Light USB Powered Round Camera Lamp Dimmable LED Ring Light With Phone Holder",
+      "reasons": [
+        "incomplete_or_keyword_stuffed_title",
+        "family_cap:jewellery:9>=5",
+        "PRODUCT_DATA_REVIEW:Supplier title is keyword-stuffed or unreadable."
+      ]
+    },
+    {
+      "cj_product_id": "1694238538633588736",
+      "title": "Spaghetti Strap Shorts Jumpsuit Sports Yoga Workout Tight Romper Women Fashion Fitness Sportwear",
+      "reasons": [
+        "near_duplicate_title_vs_532",
+        "apparel_return_risk"
+      ]
+    }
+  ]
+}

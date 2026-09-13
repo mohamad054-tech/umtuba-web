@@ -1,3 +1,4 @@
+import type { AppLocale } from "../../../lib/i18n/locales";
 import ProductCard from "./ProductCard";
 import StoreEmptyState from "./StoreEmptyState";
 import type { PublicCatalogItem } from "../../../lib/store/types";
@@ -7,6 +8,7 @@ type ProductRailProps = {
   emptyTitle?: string;
   emptyDescription?: string;
   badge?: string;
+  locale?: AppLocale;
 };
 
 export default function ProductRail({
@@ -14,6 +16,7 @@ export default function ProductRail({
   emptyTitle = "Nothing here yet",
   emptyDescription = "Active products will appear when stores publish approved listings.",
   badge,
+  locale,
 }: ProductRailProps) {
   if (items.length === 0) {
     return (
@@ -28,7 +31,7 @@ export default function ProductRail({
           key={item.product.id}
           className="w-[220px] shrink-0 snap-start sm:w-[240px] md:w-[260px]"
         >
-          <ProductCard item={item} badge={badge} />
+          <ProductCard item={item} badge={badge} locale={locale} />
         </div>
       ))}
     </div>

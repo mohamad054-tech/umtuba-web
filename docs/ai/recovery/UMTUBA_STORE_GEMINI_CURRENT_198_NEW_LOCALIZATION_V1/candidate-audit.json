@@ -1,0 +1,22 @@
+{
+  "task_id": "UMTUBA_STORE_GEMINI_CURRENT_198_NEW_LOCALIZATION_V1",
+  "candidate_path": "C:\\Users\\Giga store\\Desktop\\umtuba\\umtuba-web-translation-trunk-port-v1\\data\\cj-catalog-532-localized-final-v1.GEMINI_198_CANDIDATE.json",
+  "candidate_sha256": "c07179cddf978093acc9e188293bd269942db1657cab3b12cec828d56eeb3168",
+  "total_products": 532,
+  "localized_total": 510,
+  "localization_review": 22,
+  "manual_review_required": 22,
+  "publishable": 364,
+  "held": 168,
+  "avg_publishable_margin": 0.5321108359600335,
+  "integrity": {
+    "product_ids_changed": 0,
+    "prices_changed": 0,
+    "costs_changed": 0,
+    "margins_changed": 0,
+    "commercial_flags_changed": 0,
+    "ip_flags_changed": 0
+  },
+  "canonical_sha256_after": "0c554bd3bc43c152fc4188e7439fd73046e44622d0a92483aeac6859e26bb9eb",
+  "canonical_unchanged": true
+}

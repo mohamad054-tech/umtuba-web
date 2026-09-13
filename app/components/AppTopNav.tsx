@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { desktopNavLabelKey } from "../../lib/i18n";
 import { APP_NAV_ITEMS, APP_ROUTES, isNavActive } from "../lib/nav";
 import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
+import UmtubaStackedLogo from "./brand/UmtubaStackedLogo";
 import { useTranslation } from "./i18n";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
@@ -49,32 +50,28 @@ export default function AppTopNav({
 
   return (
     <header
-      className={`relative z-50 border-b backdrop-blur-xl ${
+      className={`relative z-50 overflow-visible border-b backdrop-blur-xl ${
         store
           ? "border-b-0 bg-transparent"
           : "border-white/10 bg-[#050510]/90"
       } ${sticky ? "sticky top-0" : ""}`}
     >
       <div
-        className={`flex min-h-16 items-center justify-between gap-2 md:gap-4 ${
-          store ? "h-auto min-h-16 py-1.5" : "h-16"
+        className={`flex min-h-16 items-center justify-between gap-2 overflow-visible py-1.5 md:gap-4 ${
+          store ? "h-auto" : "h-auto min-h-[4.75rem]"
         } ${
           embedded
             ? "w-full min-w-0 px-0"
             : "mx-auto max-w-[1400px] px-3 md:px-6"
         }`}
       >
-        <div className="flex min-w-0 items-center gap-2 md:gap-3">
+        <div className="flex min-w-0 items-center gap-2 overflow-visible md:gap-3">
           <Link
             href={APP_ROUTES.home}
             aria-label={t("nav.homeAria")}
-            className={`watch-focus-ring shrink-0 rounded-full border px-3 py-1.5 text-xs font-bold transition ${focusRing} ${
-              store
-                ? "border-[rgba(214,196,161,0.28)] bg-[rgba(214,196,161,0.08)] text-[var(--sf-accent-strong,#e8d7b5)] hover:bg-[rgba(214,196,161,0.16)]"
-                : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white"
-            }`}
+            className={`watch-focus-ring inline-flex shrink-0 overflow-visible rounded-md ${focusRing}`}
           >
-            UMTUBA
+            <UmtubaStackedLogo size="nav" priority />
           </Link>
           <div className={`min-w-0 ${store ? "hidden sm:block" : ""}`}>
             <p

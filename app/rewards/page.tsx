@@ -10,6 +10,8 @@ import {
   getMyUmPointsSummary,
 } from "../../lib/supabase/rewards";
 import { getMyReferralStats } from "../../lib/supabase/referral";
+import { resolveRequestLocale } from "../../lib/i18n/server";
+import { createTranslator } from "../../lib/i18n/translate";
 import { nextUmPointsMilestone } from "../../lib/rewards/umPointsConfig";
 import { formatRelativeTime } from "../notifications/lib/formatRelativeTime";
 import InviteShareCard from "./components/InviteShareCard";
@@ -23,6 +25,8 @@ export default async function RewardsPage() {
     redirect(`${APP_ROUTES.login}?next=${encodeURIComponent(APP_ROUTES.rewards)}`);
   }
 
+  const { locale } = await resolveRequestLocale();
+  const t = createTranslator(locale);
   const supabase = await createClient();
   await claimVerifiedWelcomeBonus(supabase);
   const summary = await getMyUmPointsSummary(supabase);
@@ -70,6 +74,9 @@ export default async function RewardsPage() {
           <p className="mt-2 text-sm text-white/50">
             Earn points for meaningful actions — not unlimited likes or passive
             watch time.
+          </p>
+          <p className="mt-3 rounded-2xl border border-violet-400/20 bg-violet-500/10 px-4 py-3 text-sm text-violet-50/90">
+            {t("store.umPoints.rule")}. {t("store.umPoints.disclosure")}
           </p>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-3">

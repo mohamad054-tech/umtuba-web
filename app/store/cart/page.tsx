@@ -5,6 +5,7 @@ import StoreErrorState from "../../components/store/StoreErrorState";
 import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { APP_ROUTES } from "../../lib/nav";
+import { resolveRequestLocale } from "../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { getCartSummary } from "../../../lib/store/cart";
 import { loadCommerceConfirmGate } from "../../../lib/store/commerceSafetyQueries";
@@ -22,6 +23,7 @@ export default async function StoreCartPage() {
     );
   }
 
+  const { locale } = await resolveRequestLocale();
   const supabase = await createClient();
   const result = await getCartSummary(supabase, user.id);
   const commerceGate = await loadCommerceConfirmGate(supabase);
@@ -56,6 +58,7 @@ export default async function StoreCartPage() {
       ) : (
         <CartView
           initialSummary={result.data}
+          locale={locale}
           purchasesAvailable={commerceGate.purchasesAvailable}
           purchasesUnavailableMessage={commerceGate.message}
         />

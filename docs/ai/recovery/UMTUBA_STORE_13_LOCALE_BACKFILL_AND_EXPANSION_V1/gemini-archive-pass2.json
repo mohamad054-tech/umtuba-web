@@ -1,0 +1,2038 @@
+[
+  {
+    "batchIndex": 0,
+    "productIds": [
+      "2406290637071622300",
+      "1366573785234411520"
+    ],
+    "missingLocales": [
+      [
+        "id"
+      ],
+      [
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "id",
+        "ru",
+        "tr"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "id",
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "ru",
+        "tr"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "id"
+          ],
+          "title_en": "8-Piece Makeup Brush Set",
+          "description_en": "An 8-piece makeup brush set. The supplier listing describes diamond-embedded handles. Brush materials are not supplied.",
+          "specifications_en": [
+            "Quantity: 8 pieces",
+            "Listed detail: diamond-embedded",
+            "Bristle material: not supplied"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "fr",
+            "es",
+            "de",
+            "pt",
+            "id",
+            "ru",
+            "tr"
+          ],
+          "title_en": "1.5L Floating Pet Water Bowl",
+          "description_en": "A 1.5L floating water bowl for cats and dogs. Use it as a carried slow-water feeder and dispenser. Listed as anti-overflow and floating. Materials: ABS and PP.",
+          "specifications_en": [
+            "Capacity: 1.5L",
+            "Materials: ABS and PP",
+            "Form: floating / carried slow-water feeder",
+            "Listed feature: anti-overflow"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "id": {
+            "title": "Set Kuas Rias 8 Pcs",
+            "description": "Set kuas rias isi 8 buah untuk rutinitas kecantikan Anda. Dilengkapi dengan gagang beraksen hiasan permata berkilau sesuai deskripsi produk. Material bulu kuas tidak dicantumkan.",
+            "specifications": [
+              "Jumlah: 8 buah",
+              "Detail tertera: berhias aksen permata",
+              "Bahan bulu: tidak dicantumkan"
+            ],
+            "search_keywords": [
+              "set kuas rias",
+              "kuas makeup 8 pcs",
+              "kuas permata",
+              "perlengkapan kosmetik"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "fr": {
+            "title": "Gamelle d'eau flottante pour animaux 1,5 L",
+            "description": "Gamelle d'eau flottante de 1,5 L pour chats et chiens. Conçue pour une distribution d'eau lente et pratique, avec système anti-débordement et disque flottant. Fabriquée en ABS et PP.",
+            "specifications": [
+              "Capacité : 1,5 L",
+              "Matériaux : ABS et PP",
+              "Format : abreuvoir lent flottant et transportable",
+              "Caractéristique indiquée : anti-débordement"
+            ],
+            "search_keywords": [
+              "gamelle flottante",
+              "abreuvoir anti debordement",
+              "bol eau chien chat",
+              "distributeur eau 1.5L"
+            ]
+          },
+          "es": {
+            "title": "Bebedero flotante para mascotas de 1,5 L",
+            "description": "Bebedero flotante de 1,5 L para perros y gatos. Funciona como dispensador portátil para un consumo de agua lento y controlado. Cuenta con diseño flotante y sistema antiderrame. Fabricado en ABS y PP.",
+            "specifications": [
+              "Capacidad: 1,5 L",
+              "Materiales: ABS y PP",
+              "Formato: bebedero flotante portátil de consumo lento",
+              "Característica indicada: antiderrame"
+            ],
+            "search_keywords": [
+              "bebedero flotante",
+              "cuenco agua antiderrame",
+              "plato agua perros gatos",
+              "dispensador agua 1.5L"
+            ]
+          },
+          "de": {
+            "title": "Schwimmender Haustier-Wassernapf 1,5 L",
+            "description": "Schwimmender Wassernapf mit 1,5 L Fassungsvermögen für Hunde und Katzen. Ideal als tragbarer Napf für verlangsamte Wasseraufnahme. Ausgestattet mit Überlaufschutz und Schwimmelement. Hergestellt aus ABS und PP.",
+            "specifications": [
+              "Fassungsvermögen: 1,5 L",
+              "Materialien: ABS und PP",
+              "Form: schwimmender, tragbarer Napf zur langsamen Wasseraufnahme",
+              "Angegebene Eigenschaft: Überlaufschutz"
+            ],
+            "search_keywords": [
+              "schwimmender wassernapf",
+              "anti klecker napf",
+              "hundetränke katzen",
+              "wassernapf 1.5L"
+            ]
+          },
+          "pt": {
+            "title": "Tigela flutuante de água para animais de estimação 1,5 L",
+            "description": "Tigela de água flutuante de 1,5 L para cães e gatos. Desenvolvida como bebedouro portátil de fluxo lento, com recurso antiderramamento e design flutuante. Fabricada em ABS e PP.",
+            "specifications": [
+              "Capacidade: 1,5 L",
+              "Materiais: ABS e PP",
+              "Formato: bebedouro portátil flutuante de fluxo lento",
+              "Recurso indicado: antiderramamento"
+            ],
+            "search_keywords": [
+              "bebedouro flutuante",
+              "tigela agua antiderramamento",
+              "pote de agua pet",
+              "bebedouro lento 1.5L"
+            ]
+          },
+          "id": {
+            "title": "Mangkuk Air Hewan Mengapung 1,5 L",
+            "description": "Mangkuk air mengapung berkapasitas 1,5 L untuk anjing dan kucing. Berfungsi sebagai wadah minum portabel yang memperlambat konsumsi air hewan peliharaan. Dilengkapi fitur anti-tumpah dan pelat apung. Terbuat dari material ABS dan PP.",
+            "specifications": [
+              "Kapasitas: 1,5 L",
+              "Bahan: ABS dan PP",
+              "Bentuk: tempat minum apung portabel perlambat minum",
+              "Fitur tertera: anti-tumpah"
+            ],
+            "search_keywords": [
+              "mangkuk air apung",
+              "tempat minum anjing kucing",
+              "wadah air anti tumpah",
+              "dispenser air 1.5L"
+            ]
+          },
+          "ru": {
+            "title": "Плавающая миска-поилка для животных 1,5 л",
+            "description": "Плавающая поилка объемом 1,5 л для собак и кошек. Подходит для использования в качестве портативной поилки с замедленной подачей воды. Оснащена защитой от переливания и плавающей пластиной. Изготовлена из АБС-пластика и полипропилена (PP).",
+            "specifications": [
+              "Объем: 1,5 л",
+              "Материалы: АБС-пластик и полипропилен (PP)",
+              "Тип: плавающая переносная поилка с медленной подачей воды",
+              "Указанная особенность: защита от переливания"
+            ],
+            "search_keywords": [
+              "плавающая миска поилка",
+              "миска непроливайка",
+              "поилка для собак и кошек",
+              "автопоилка 1.5 л"
+            ]
+          },
+          "tr": {
+            "title": "Yüzen Evcil Hayvan Su Kabı 1,5 L",
+            "description": "Kedi ve köpekler için 1,5 L kapasiteli yüzen su kabı. Taşınabilir ve yavaş su tüketimi sağlayan dağıtıcı olarak kullanılır. Taşma önleyici ve yüzer disk tasarımına sahiptir. ABS ve PP malzemeden üretilmiştir.",
+            "specifications": [
+              "Kapasite: 1,5 L",
+              "Malzemeler: ABS ve PP",
+              "Form: taşınabilir yüzen yavaş su tüketim kabı",
+              "Belirtilen özellik: taşma önleyici"
+            ],
+            "search_keywords": [
+              "yüzen su kabı",
+              "dökülmez su kabı kedi köpek",
+              "taşma önleyici suluk",
+              "evcil hayvan suluk 1.5L"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 1,
+    "productIds": [
+      "1837374073727766528",
+      "1798583255286026240"
+    ],
+    "missingLocales": [
+      [
+        "ko"
+      ],
+      [
+        "fr"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "ko",
+        "fr"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "ko"
+          ],
+          "title_en": "Double Stainless Steel Non-Slip Pet Bowl",
+          "description_en": "A double, thickened stainless steel pet food bowl. Listed with floor suction and as non-slip. Capacity is not supplied.",
+          "specifications_en": [
+            "Material: stainless steel",
+            "Form: double bowl",
+            "Listed features: thickened, floor suction, non-slip"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "fr"
+          ],
+          "title_en": "Multi-Section Sealed Aluminum Alloy Storage Case",
+          "description_en": "A multi-section sealed storage cylinder crafted from aluminum alloy. Designed for storing pills, medicine, or toothpicks securely during travel.",
+          "specifications_en": [
+            "Material: aluminum alloy",
+            "Structure: multi-section compartments",
+            "Feature: sealed closure",
+            "Listed use: pills, medicine, or toothpicks storage"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ko": {
+            "title": "논슬립 스테인리스 2구 반려동물 식기",
+            "description": "두껍게 제작된 스테인리스 스틸 소재의 2구 반려동물 사료 그릇입니다. 바닥 흡착 기능이 적용되어 쉽게 밀리지 않는 논슬립 구조를 제공합니다. (용량 정보 미제공)",
+            "specifications": [
+              "소재: 스테인리스 스틸",
+              "형태: 2구 식기",
+              "주요 특징: 도톰한 두께, 바닥 흡착판, 논슬립 설계"
+            ],
+            "search_keywords": [
+              "스테인리스 강아지 밥그릇",
+              "고양이 2구 식기",
+              "미끄럼방지 반려동물 그릇",
+              "흡착식 애견 식기",
+              "반려동물 사료 물그릇"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "fr": {
+            "title": "Boîte de rangement étanche multi-compartiments en alliage d'aluminium",
+            "description": "Étui cylindrique étanche à plusieurs compartiments, conçu en alliage d'aluminium. Idéal pour ranger et transporter en toute sécurité des pilules, des médicaments ou des cure-dents en voyage.",
+            "specifications": [
+              "Matériau : alliage d'aluminium",
+              "Structure : compartiments multiples",
+              "Caractéristique : fermeture hermétique étanche",
+              "Utilisation indiquée : pilules, médicaments ou cure-dents"
+            ],
+            "search_keywords": [
+              "pilulier aluminium étanche",
+              "boîte à pilules de voyage",
+              "étui cylindrique compartimenté",
+              "porte cure-dents étanche",
+              "boîte rangement médicaments de poche"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 2,
+    "productIds": [
+      "1738455450183536640",
+      "1742531778096664576"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Storage Tray",
+          "description_en": "Storage Tray. Use it for organizing small items. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: organizing small items"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Cable",
+          "description_en": "Cable. Use it for connecting or charging. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: connecting or charging",
+            "Numbers listed in the supplier title: 30"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Ablageschale",
+            "description": "Praktische Ablageschale zur übersichtlichen Aufbewahrung von Kleinigkeiten. Die Angaben basieren ausschließlich auf der Produktbezeichnung des Lieferanten; es wurden keine zusätzlichen Maße, Modellangaben oder Leistungsmerkmale ergänzt.",
+            "specifications": [
+              "Material: Keine Angaben über den Produkttitel hinaus",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Organisation von Kleinigkeiten"
+            ],
+            "search_keywords": [
+              "Ablageschale",
+              "Aufbewahrungsschale",
+              "Organizer Schale",
+              "Ablage",
+              "Kleinteileaufbewahrung"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Kabel",
+            "description": "Kabel zum Anschließen oder Aufladen. Die Angaben basieren ausschließlich auf der Produktbezeichnung des Lieferanten; es wurden keine zusätzlichen Maße, Modellangaben oder Leistungsmerkmale ergänzt.",
+            "specifications": [
+              "Material: Keine Angaben über den Produkttitel hinaus",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Verbinden oder Laden",
+              "Im Lieferantentitel aufgeführte Zahlen: 30"
+            ],
+            "search_keywords": [
+              "Kabel",
+              "Ladekabel",
+              "Verbindungskabel",
+              "Anschlusskabel",
+              "30"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 3,
+    "productIds": [
+      "2507260550361613500",
+      "2508280143101620300"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Silicone Watch Strap",
+          "description_en": "Silicone Watch Strap. Use it for replacing a watch band. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Silicone",
+            "Quantity: not supplied",
+            "Listed use: replacing a watch band"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Folding Glasses Case",
+          "description_en": "Folding Glasses Case. Use it for protecting glasses. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Leather",
+            "Quantity: not supplied",
+            "Listed use: protecting glasses"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Silikon-Uhrenarmband",
+            "description": "Silikon-Uhrenarmband zum Ersetzen Ihres bestehenden Uhrenbandes.",
+            "specifications": [
+              "Material: Silikon",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Ersetzen eines Uhrenarmbands"
+            ],
+            "search_keywords": [
+              "Silikon Uhrenarmband",
+              "Uhrenarmband Ersatz",
+              "Ersatzarmband Silikon",
+              "Armband für Uhr"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Faltbares Brillenetui",
+            "description": "Faltbares Brillenetui zum Schutz von Brillen.",
+            "specifications": [
+              "Material: Leder",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Schutz von Brillen"
+            ],
+            "search_keywords": [
+              "Faltbares Brillenetui",
+              "Brillenetui Leder",
+              "Brillenschutz",
+              "Brillentasche zusammenklappbar"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 4,
+    "productIds": [
+      "2504230235091625400",
+      "1447901045861781504"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "id",
+        "ru",
+        "tr",
+        "zh-CN",
+        "ja",
+        "ko"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de",
+        "fr",
+        "es",
+        "pt",
+        "id",
+        "ru",
+        "tr",
+        "zh-CN",
+        "ja",
+        "ko"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Cable",
+          "description_en": "Cable. Use it for connecting or charging. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: connecting or charging",
+            "Numbers listed in the supplier title: 35"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "fr",
+            "es",
+            "de",
+            "pt",
+            "id",
+            "ru",
+            "tr",
+            "zh-CN",
+            "ja",
+            "ko"
+          ],
+          "title_en": "Five-Piece 280mL Standard Mouth PP Bottle Set",
+          "description_en": "A five-piece PP baby bottle set. Each listed bottle is 280mL with a standard mouth.",
+          "specifications_en": [
+            "Quantity listed: five-piece",
+            "Capacity: 280mL",
+            "Material: PP",
+            "Mouth: standard"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Kabel",
+            "description": "Kabel zum Verbinden oder Laden. Die Angaben basieren ausschließlich auf der Herstellerbezeichnung ohne zusätzliche Modell- oder Leistungsangaben.",
+            "specifications": [
+              "Material: Gemäß Titelangabe nicht näher spezifiziert",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Verbinden oder Laden",
+              "Im Herstellertitel genannte Zahl: 35"
+            ],
+            "search_keywords": [
+              "kabel",
+              "ladekabel",
+              "verbindungskabel",
+              "kabel 35"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "fr": {
+            "title": "Lot de 5 biberons en PP 280 ml à col standard",
+            "description": "Ensemble de cinq biberons pour bébé en polypropylène (PP). Chaque biberon dispose d'une contenance de 280 ml et d'un col standard.",
+            "specifications": [
+              "Quantité : Lot de 5 pièces",
+              "Contenance : 280 ml",
+              "Matériau : PP (polypropylène)",
+              "Col : Standard"
+            ],
+            "search_keywords": [
+              "biberon 280 ml",
+              "lot biberons pp",
+              "biberon col standard",
+              "biberon bébé 5 pièces"
+            ]
+          },
+          "es": {
+            "title": "Juego de 5 biberones de PP de 280 ml con cuello estándar",
+            "description": "Juego de cinco biberones para bebé fabricados en PP. Cada biberon incluido tiene una capacidad de 280 ml y cuello estándar.",
+            "specifications": [
+              "Cantidad: Juego de 5 piezas",
+              "Capacidad: 280 ml",
+              "Material: PP",
+              "Cuello: Estándar"
+            ],
+            "search_keywords": [
+              "biberones 280 ml",
+              "set biberones pp",
+              "biberón cuello estándar",
+              "pack 5 biberones"
+            ]
+          },
+          "de": {
+            "title": "5-teiliges Babyflaschen-Set aus PP, 280 ml, Standardöffnung",
+            "description": "Fünfteiliges Babyflaschen-Set aus PP. Jede der enthaltenen Flaschen bietet 280 ml Fassungsvermögen und eine Standardöffnung.",
+            "specifications": [
+              "Menge: 5-teiliges Set",
+              "Fassungsvermögen: 280 ml",
+              "Material: PP",
+              "Öffnung: Standard"
+            ],
+            "search_keywords": [
+              "babyflaschen 5er set",
+              "fläschchen 280 ml",
+              "pp babyflasche standard",
+              "trinkflasche baby"
+            ]
+          },
+          "pt": {
+            "title": "Conjunto com 5 mamadeiras em PP de 280 ml com bico padrão",
+            "description": "Conjunto com cinco mamadeiras infantis em polipropileno (PP). Cada mamadeira possui capacidade de 280 ml e gargalo padrão.",
+            "specifications": [
+              "Quantidade: Conjunto de 5 peças",
+              "Capacidade: 280 ml",
+              "Material: PP",
+              "Gargalo: Padrão"
+            ],
+            "search_keywords": [
+              "kit mamadeiras 280 ml",
+              "mamadeira pp",
+              "mamadeira bico padrao",
+              "conjunto 5 mamadeiras"
+            ]
+          },
+          "id": {
+            "title": "Set 5 Botol Susu Bayi PP 280 ml Leher Standar",
+            "description": "Set isi lima botol susu bayi berbahan PP. Setiap botol memiliki kapasitas 280 ml dengan leher standar.",
+            "specifications": [
+              "Jumlah: Set isi 5 buah",
+              "Kapasitas: 280 ml",
+              "Bahan: PP",
+              "Leher botol: Standar"
+            ],
+            "search_keywords": [
+              "botol susu 280 ml",
+              "set botol susu pp",
+              "botol susu leher standar",
+              "botol bayi 5 pcs"
+            ]
+          },
+          "ru": {
+            "title": "Набор из 5 детских бутылочек из ПП по 280 мл со стандартным горлышком",
+            "description": "Набор детских бутылочек для кормления из полипропилена (ПП), состоящий из пяти штук. Объем каждой бутылочки составляет 280 мл, горлышко стандартное.",
+            "specifications": [
+              "Количество: 5 штук в наборе",
+              "Объем: 280 мл",
+              "Материал: ПП (полипропилен)",
+              "Горлышко: Стандартное"
+            ],
+            "search_keywords": [
+              "детские бутылочки 280 мл",
+              "набор бутылочек для кормления",
+              "бутылочка пп",
+              "бутылочка со стандартным горлышком"
+            ]
+          },
+          "tr": {
+            "title": "5 Parça 280 ml Standart Ağızlı PP Biberon Seti",
+            "description": "PP malzemeden üretilmiş beş parçalı bebek biberon seti. Her bir biberon 280 ml kapasiteye ve standart ağız yapısına sahiptir.",
+            "specifications": [
+              "Miktar: 5 parça set",
+              "Kapasite: 280 ml",
+              "Malzeme: PP",
+              "Ağız yapısı: Standart"
+            ],
+            "search_keywords": [
+              "biberon seti 5 parca",
+              "280 ml biberon",
+              "pp bebek biberonu",
+              "standart agizli biberon"
+            ]
+          },
+          "zh-CN": {
+            "title": "5只装 280mL 标准口径 PP 材质奶瓶套装",
+            "description": "5只装 PP 材质婴儿奶瓶套装。每只奶瓶容量均为 280mL，采用标准口径设计。",
+            "specifications": [
+              "数量：5只装",
+              "容量：280mL",
+              "材质：PP",
+              "口径：标准口径"
+            ],
+            "search_keywords": [
+              "PP奶瓶",
+              "标准口奶瓶",
+              "280ml奶瓶",
+              "婴儿奶瓶套装",
+              "5只装奶瓶"
+            ]
+          },
+          "ja": {
+            "title": "PP製 280mL スタンダードマウス 哺乳瓶 5本セット",
+            "description": "ポリプロピレン（PP）製の哺乳瓶5本セット。各ボトルの容量は280mLで、標準的なスタンダードマウス仕様です。",
+            "specifications": [
+              "数量：5本セット",
+              "容量：280mL",
+              "素材：PP",
+              "飲み口形状：スタンダード"
+            ],
+            "search_keywords": [
+              "哺乳瓶 5本",
+              "280ml 哺乳瓶",
+              "PP製 哺乳瓶",
+              "標準口 哺乳瓶"
+            ]
+          },
+          "ko": {
+            "title": "PP 소재 280mL 표준형 입구 젖병 5개 세트",
+            "description": "PP 소재의 5개입 아기 젖병 세트입니다. 각 젖병의 용량은 280mL이며 표준형 입구로 제작되었습니다.",
+            "specifications": [
+              "수량: 5개 세트",
+              "용량: 280mL",
+              "소재: PP",
+              "입구: 표준형"
+            ],
+            "search_keywords": [
+              "젖병 5개 세트",
+              "280ml 젖병",
+              "PP 젖병",
+              "표준구경 젖병"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 5,
+    "productIds": [
+      "2503030457411602100",
+      "1467092240978546688"
+    ],
+    "missingLocales": [
+      [
+        "ja",
+        "ko"
+      ],
+      [
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "id",
+        "hi",
+        "ru",
+        "tr",
+        "zh-CN",
+        "ja",
+        "ko"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "ja",
+        "ko",
+        "fr",
+        "es",
+        "de",
+        "pt",
+        "id",
+        "hi",
+        "ru",
+        "tr",
+        "zh-CN"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "ja",
+            "ko"
+          ],
+          "title_en": "Double-Layer Wooden Bead Bag Chain Strap with Letter Accent",
+          "description_en": "A decorative bag chain featuring a double-layered layout made with smooth wooden beads and letter detailing. Ideal for use as an accessory strap or replacement handle for handbags and shoulder bags.",
+          "specifications_en": [
+            "Product: bag chain / handle strap",
+            "Layering: double layer",
+            "Material: wooden beads",
+            "Detailing: letter accents",
+            "Seasonal style: Autumn and Winter"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "fr",
+            "es",
+            "de",
+            "pt",
+            "id",
+            "hi",
+            "ru",
+            "tr",
+            "zh-CN",
+            "ja",
+            "ko"
+          ],
+          "title_en": "Seven-Piece Clip-In Hair Set",
+          "description_en": "A seven-piece clip-in hair set. Materials, length, and color are not supplied beyond the title.",
+          "specifications_en": [
+            "Quantity listed: seven-piece",
+            "Attachment: clip"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ja": {
+            "title": "レターアクセント付き 2連ウッドビーズ バッグチェインストラップ",
+            "description": "なめらかなウッドビーズとアルファベットのアクセントをあしらった、2連仕様の装飾用バッグチェーンです。ハンドバッグやショルダーバッグのアクセサリーストラップや交換用ハンドルとしてお使いいただけます。",
+            "specifications": [
+              "商品分類: バッグチェーン / ハンドルストラップ",
+              "構造: 2連レイヤー",
+              "素材: ウッドビーズ",
+              "ディテール: レターアクセント",
+              "シーズン: 秋冬スタイル"
+            ],
+            "search_keywords": [
+              "ウッドビーズ バッグストラップ",
+              "バッグチェーン 2連",
+              "バッグ持ち手 交換",
+              "バッグチャーム アルファベット"
+            ]
+          },
+          "ko": {
+            "title": "레터링 포인트 더블 레이어 우드 비즈 가방 체인 스트랩",
+            "description": "매끄러운 우드 비즈와 레터링 디테일로 구성된 더블 레이어 장식용 가방 체인입니다. 핸드백이나 숄더백의 액세서리 스트랩 또는 교체용 핸들로 활용하기 좋습니다.",
+            "specifications": [
+              "제품: 가방 체인 / 핸들 스트랩",
+              "구성: 더블 레이어",
+              "소재: 우드 비즈",
+              "디테일: 레터링 장식",
+              "시즌 스타일: 가을 및 겨울"
+            ],
+            "search_keywords": [
+              "우드 비즈 스트랩",
+              "가방 체인 스트랩",
+              "가방 손잡이 교체",
+              "더블 레이어 가방끈"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "fr": {
+            "title": "Ensemble d'extensions capillaires à clips 7 pièces",
+            "description": "Ensemble d'extensions capillaires de sept pièces avec fixation à clips. La matière, la longueur et la couleur ne sont pas spécifiées au-delà de l'intitulé.",
+            "specifications": [
+              "Quantité: lot de sept pièces",
+              "Fixation: clips"
+            ],
+            "search_keywords": [
+              "extensions à clips 7 pièces",
+              "rajouts cheveux clips",
+              "set extensions capillaires"
+            ]
+          },
+          "es": {
+            "title": "Juego de extensiones de cabello con clip de 7 piezas",
+            "description": "Juego de extensiones de cabello de siete piezas con ajuste por clips. El material, la longitud y el color no se detallan más allá del título.",
+            "specifications": [
+              "Cantidad indicada: juego de siete piezas",
+              "Fijación: clip"
+            ],
+            "search_keywords": [
+              "extensiones de clip 7 piezas",
+              "extensiones pelo clip",
+              "set extensiones cabello"
+            ]
+          },
+          "de": {
+            "title": "7-teiliges Clip-In-Haarset",
+            "description": "Ein siebenteiliges Haarverlängerungs-Set mit Clip-Befestigung. Material, Länge und Farbe sind über die Titelangabe hinaus nicht spezifiziert.",
+            "specifications": [
+              "Angegebene Menge: 7-teiliges Set",
+              "Befestigung: Clip"
+            ],
+            "search_keywords": [
+              "Clip In Extensions 7 teilig",
+              "Haarverlängerung Clips",
+              "Haarteile Clip"
+            ]
+          },
+          "pt": {
+            "title": "Conjunto de apliques de cabelo com presilha de 7 peças",
+            "description": "Conjunto de apliques de cabelo de sete peças com fixação por presilha (clip). Material, comprimento e cor não são especificados além do título.",
+            "specifications": [
+              "Quantidade: conjunto de sete peças",
+              "Fixação: presilha (clip)"
+            ],
+            "search_keywords": [
+              "mega hair tic tac 7 pecas",
+              "aplique de cabelo presilha",
+              "extensoes cabelo clip"
+            ]
+          },
+          "id": {
+            "title": "Set Rambut Sambung Jepit 7 Bagian",
+            "description": "Satu set rambut sambung model jepit (clip-in) isi tujuh bagian. Bahan, panjang, dan warna tidak dicantumkan di luar informasi judul.",
+            "specifications": [
+              "Jumlah: set 7 bagian",
+              "Pemasangan: jepit (clip)"
+            ],
+            "search_keywords": [
+              "hair extension clip 7 pcs",
+              "rambut sambungan jepit",
+              "set hair clip"
+            ]
+          },
+          "hi": {
+            "title": "सात-पीस क्लिप-इन हेयर सेट",
+            "description": "सात-पीस क्लिप-इन हेयर सेट। शीर्षक के अलावा सामग्री, लंबाई और रंग की जानकारी उपलब्ध नहीं है।",
+            "specifications": [
+              "मात्रा: सात-पीस सेट",
+              "लगाने का तरीका: क्लिप"
+            ],
+            "search_keywords": [
+              "क्लिप इन हेयर एक्सटेंशन",
+              "7 पीस हेयर सेट",
+              "हेयर एक्सटेंशन क्लिप"
+            ]
+          },
+          "ru": {
+            "title": "Набор накладных волос на клипсах из 7 предметов",
+            "description": "Комплект накладных прядей волос на клипсах из семи предметов. Материал, длина и цвет не указаны дополнительно к названию.",
+            "specifications": [
+              "Количество: набор из семи предметов",
+              "Тип крепления: клипсы"
+            ],
+            "search_keywords": [
+              "пряди на клипсах 7 шт",
+              "накладные волосы на заколках",
+              "набор волос на клипсах"
+            ]
+          },
+          "tr": {
+            "title": "7 Parça Çıtçıtlı Saç Seti",
+            "description": "Yedi parçadan oluşan çıtçıtlı saç seti. Başlık haricinde malzeme, uzunluk ve renk bilgisi belirtilmemiştir.",
+            "specifications": [
+              "Miktar: yedi parçalı set",
+              "Tutturma: çıtçıt"
+            ],
+            "search_keywords": [
+              "çıtçıt saç 7 parça",
+              "klipsli saç seti",
+              "çıtçıtlı kaynak saç"
+            ]
+          },
+          "zh-CN": {
+            "title": "7件套夹扣式假发片",
+            "description": "七件套夹扣式假发片组。除标题外，未提供材质、长度及颜色等其他详细信息。",
+            "specifications": [
+              "包含数量: 7件套",
+              "固定方式: 夹扣"
+            ],
+            "search_keywords": [
+              "假发片 7件套",
+              "夹扣式假发片",
+              "接发发片"
+            ]
+          },
+          "ja": {
+            "title": "クリップ式ヘアエクステ 7点セット",
+            "description": "クリップで固定する7点セットのヘアエクステです。商品タイトル以外の素材、長さ、カラーに関する詳細は記載されていません。",
+            "specifications": [
+              "入数: 7点セット",
+              "装着方法: クリップ固定"
+            ],
+            "search_keywords": [
+              "ヘアエクステ クリップ 7点",
+              "ワンタッチ エクステ",
+              "つけ毛 クリップ式"
+            ]
+          },
+          "ko": {
+            "title": "클립형 헤어 피스 7종 세트",
+            "description": "클립으로 고정하는 7개 구성의 헤어 피스 세트입니다. 제품명 외에 소재, 길이, 색상에 대한 추가 정보는 제공되지 않습니다.",
+            "specifications": [
+              "수량: 7종 세트",
+              "고정 방식: 클립"
+            ],
+            "search_keywords": [
+              "클립형 헤어피스",
+              "붙임머리 7피스",
+              "똑딱이 가발 피스"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 6,
+    "productIds": [
+      "A7D54724-81D4-444D-B278-1C1610559045",
+      "1739938184483577856"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Car Seat Cover",
+          "description_en": "Car Seat Cover. Use it for covering a car seat. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: covering a car seat"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Autositzbezug",
+            "description": "Autositzbezug zum Abdecken eines Autositzes. Die Produktangaben basieren ausschließlich auf dem Titel des Lieferanten; es wurden keine zusätzlichen Angaben zu Maßen, Modellen oder Eigenschaften hinzugefügt.",
+            "specifications": [
+              "Material: Keine Angabe über den Titel hinaus",
+              "Menge: Nicht angegeben",
+              "Vorgesehene Verwendung: Abdecken eines Autositzes"
+            ],
+            "search_keywords": [
+              "Autositzbezug",
+              "Sitzbezug Auto",
+              "Autozubehör",
+              "Schonbezug"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Reisetasche",
+            "description": "Reisetasche zum Transportieren von Kleidung auf Reisen. Die Produktangaben basieren ausschließlich auf dem Titel des Lieferanten; es wurden keine zusätzlichen Angaben zu Maßen, Modellen oder Eigenschaften hinzugefügt.",
+            "specifications": [
+              "Material: Keine Angabe über den Titel hinaus",
+              "Menge: Nicht angegeben",
+              "Vorgesehene Verwendung: Transport von Kleidung auf Reisen"
+            ],
+            "search_keywords": [
+              "Reisetasche",
+              "Gepäck",
+              "Wochenendtasche",
+              "Reisegepäck"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 7,
+    "productIds": [
+      "F25DF9B2-5E6B-42C9-85FD-B34D55E39822",
+      "1796839396830883840"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Satin Pillowcase",
+          "description_en": "Satin Pillowcase. Use it for covering a pillow. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Satin",
+            "Quantity: not supplied",
+            "Listed use: covering a pillow"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Leather",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Satin-Kissenbezug",
+            "description": "Kissenbezug aus Satin zum stilvollen und schonenden Beziehen Ihres Kopfkissens.",
+            "specifications": [
+              "Material: Satin",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Zum Beziehen eines Kissens"
+            ],
+            "search_keywords": []
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Reisetasche aus Leder",
+            "description": "Klassische Reisetasche aus Leder, ideal zum praktischen Transportieren von Kleidung auf Reisen.",
+            "specifications": [
+              "Material: Leder",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Transport von Kleidung auf Reisen"
+            ],
+            "search_keywords": []
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 8,
+    "productIds": [
+      "1796775026633478144",
+      "2508250243451613901"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Stackable Small Stool",
+          "description_en": "Stackable Small Stool. Use it for sitting or stepping. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: sitting or stepping"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Alloy Watch Strap",
+          "description_en": "Alloy Watch Strap. Use it for replacing a watch band. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Alloy",
+            "Quantity: not supplied",
+            "Listed use: replacing a watch band"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Stapelbarer kleiner Hocker",
+            "description": "Stapelbarer kleiner Hocker. Geeignet zum Sitzen oder als Trittstufe. Die Angaben basieren ausschließlich auf dem Produkttitel des Herstellers. Es wurden keine zusätzlichen Angaben zu Größe, Modell oder Leistung hinzugefügt.",
+            "specifications": [
+              "Material: Keine Angabe über den Produkttitel hinaus",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Zum Sitzen oder als Trittstufe"
+            ],
+            "search_keywords": [
+              "stapelbarer hocker",
+              "kleiner hocker",
+              "tritthocker",
+              "stapelhocker",
+              "sitzhocker"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Uhrenarmband aus Legierung",
+            "description": "Uhrenarmband aus Legierung. Zum Ersetzen eines Uhrenarmbands. Die Angaben basieren ausschließlich auf dem Produkttitel des Herstellers. Es wurden keine zusätzlichen Angaben zu Größe, Modell oder Leistung hinzugefügt.",
+            "specifications": [
+              "Material: Legierung",
+              "Menge: Nicht angegeben",
+              "Angegebene Verwendung: Ersatz für ein Uhrenarmband"
+            ],
+            "search_keywords": [
+              "uhrenarmband legierung",
+              "metall uhrenarmband",
+              "ersatzarmband uhr",
+              "uhrband legierung",
+              "uhrenzubehör"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 9,
+    "productIds": [
+      "1777221795481915392",
+      "1763402968205897728"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Car Seat Cover",
+          "description_en": "Car Seat Cover. Use it for covering a car seat. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: covering a car seat"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Cable Management Clip",
+          "description_en": "Cable Management Clip. Use it for holding cables in place. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Magnetic",
+            "Quantity: not supplied",
+            "Listed use: holding cables in place"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Autositzbezug",
+            "description": "Schützen Sie Ihren Fahrzeugsitz mit diesem praktischen Autositzbezug. Konzipiert zum einfachen Abdecken und Schonen des Autositzes.",
+            "specifications": [
+              "Material: Keine Herstellerangabe über den Titel hinaus",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Abdecken eines Autositzes"
+            ],
+            "search_keywords": [
+              "autositzbezug",
+              "sitzbezug auto",
+              "schonbezug autositz",
+              "autositz abdeckung"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Kabel-Management-Clip",
+            "description": "Praktischer magnetischer Clip zur geordneten Kabelführung. Hält Kabel zuverlässig an ihrem Platz und sorgt für Ordnung am Arbeitsplatz oder zu Hause.",
+            "specifications": [
+              "Material: Magnetisch",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Fixieren und Halten von Kabeln"
+            ],
+            "search_keywords": [
+              "kabel management clip",
+              "kabelhalter magnetisch",
+              "kabelclip",
+              "kabelführung"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 10,
+    "productIds": [
+      "1703585130859737088",
+      "1408359595130359808"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Watch Strap",
+          "description_en": "Watch Strap. Use it for replacing a watch band. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: replacing a watch band"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Reisetasche",
+            "description": "Reisetasche zum Transportieren von Kleidung auf Reisen. Die Angaben basieren ausschließlich auf den Angaben des Herstellertitels; zusätzliche Maße, Modelle oder Leistungsmerkmale liegen nicht vor.",
+            "specifications": [
+              "Material: Außerhalb der Titelbezeichnung keine Angabe",
+              "Menge: Keine Angabe",
+              "Angegebene Verwendung: Transport von Kleidung auf Reisen"
+            ],
+            "search_keywords": [
+              "Reisetasche",
+              "Kleidungstasche",
+              "Reisegepäck",
+              "Tasche für Kleidung"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Uhrenarmband",
+            "description": "Uhrenarmband als Ersatz für Ihr bisheriges Uhrenband. Die Angaben basieren ausschließlich auf den Angaben des Herstellertitels; zusätzliche Maße, Modelle oder Leistungsmerkmale liegen nicht vor.",
+            "specifications": [
+              "Material: Außerhalb der Titelbezeichnung keine Angabe",
+              "Menge: Keine Angabe",
+              "Angegebene Verwendung: Ersatz eines Uhrenarmbands"
+            ],
+            "search_keywords": [
+              "Uhrenarmband",
+              "Ersatzarmband",
+              "Uhrenband",
+              "Ersatzband Uhr"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 11,
+    "productIds": [
+      "1408303589167861760",
+      "1424994967243329536"
+    ],
+    "missingLocales": [
+      [
+        "de",
+        "ja"
+      ],
+      [
+        "zh-CN"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de",
+        "ja",
+        "zh-CN"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de",
+            "ja"
+          ],
+          "title_en": "Women's Mid-Length Casual Loose Two-Button Blazer Coat",
+          "description_en": "A women's casual mid-length suit coat featuring a relaxed, loose fit and a two-button front closure. Designed as a versatile outerwear layer for everyday wear.",
+          "specifications_en": [
+            "Product type: casual suit jacket / coat",
+            "Target: women",
+            "Fit: loose fit",
+            "Length: mid-length",
+            "Closure: two buttons"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "zh-CN"
+          ],
+          "title_en": "Men's 6-Pin Talking Quartz Wristwatch",
+          "description_en": "A men's quartz wristwatch featuring a 6-pin dial configuration with running seconds and a talking voice time-announcement feature.",
+          "specifications_en": [
+            "Target: men's",
+            "Movement: quartz",
+            "Dial: 6-pin with running seconds",
+            "Feature: talking voice function"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Lässiger mittellanger Damen-Blazermantel mit lockerer Passform und 2 Knöpfen",
+            "description": "Ein lässiger, mittellanger Damen-Blazermantel mit lockerer Passform und klassischer 2-Knopf-Leiste. Ein vielseitiger Begleiter für unkomplizierte Alltags-Outfits.",
+            "specifications": [
+              "Produkttyp: Lässige Blazerjacke / Mantel",
+              "Zielgruppe: Damen",
+              "Passform: Lockere Passform (Loose Fit)",
+              "Länge: Mittellang",
+              "Verschluss: 2 Knöpfe"
+            ],
+            "search_keywords": [
+              "Damenblazer",
+              "Blazermantel Damen",
+              "mittellanger Blazer",
+              "Casual Blazer",
+              "lockere Passform",
+              "Übergangsjacke Damen"
+            ]
+          },
+          "ja": {
+            "title": "レディース ミドル丈 カジュアル ルーズフィット 2つボタン テーラードジャケット コート",
+            "description": "ゆったりとしたルーズフィットとフロントの2つボタンが特徴の、レディース向けミドル丈カジュアルジャケットコート。デイリーに羽織れる汎用性の高いアウターです。",
+            "specifications": [
+              "製品タイプ：カジュアルジャケット／コート",
+              "対象：レディース",
+              "フィット：ルーズフィット",
+              "丈：ミドル丈",
+              "留め具：2つボタン"
+            ],
+            "search_keywords": [
+              "レディース テーラードジャケット",
+              "ミドル丈 コート",
+              "ルーズフィット ジャケット",
+              "カジュアル アウター",
+              "2つボタン ブレザー"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "zh-CN": {
+            "title": "男士6针语音报时石英腕表",
+            "description": "一款男士石英腕表，采用带走时秒针的6针表盘设计，并配备语音报时功能，读时轻松便捷。",
+            "specifications": [
+              "适用对象：男士",
+              "机芯：石英机芯",
+              "表盘：6针设计（含走时秒针）",
+              "功能：语音报时功能"
+            ],
+            "search_keywords": [
+              "男士石英表",
+              "语音报时手表",
+              "6针手表",
+              "男士腕表",
+              "报时石英表"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 12,
+    "productIds": [
+      "10E8A834-1137-4BDA-BA2C-1A19071E4E41",
+      "F31D3BD0-4F5E-4D97-93B3-2ACC2FB9E200"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "pt"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "pt"
+          ],
+          "title_en": "Backpack",
+          "description_en": "Backpack. Use it for carrying items. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: Nylon",
+            "Quantity: not supplied",
+            "Listed use: carrying items"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Reisetasche",
+            "description": "Praktische Reisetasche für den Transport von Kleidung auf Reisen. Bietet einfachen Stauraum für Ihre Reisebekleidung.",
+            "specifications": [
+              "Material: Nicht näher angegeben",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Transport von Kleidung auf Reisen"
+            ],
+            "search_keywords": []
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "pt": {
+            "title": "Mochila",
+            "description": "Mochila em nylon prática e funcional para transportar os seus pertences no dia a dia.",
+            "specifications": [
+              "Material: Nylon",
+              "Quantidade: Não especificada",
+              "Uso indicado: Transporte de itens"
+            ],
+            "search_keywords": []
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 13,
+    "productIds": [
+      "1382159261194391552",
+      "1824032070243864576"
+    ],
+    "missingLocales": [
+      [
+        "zh-CN"
+      ],
+      [
+        "de"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "zh-CN",
+        "de"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "zh-CN"
+          ],
+          "title_en": "3-Hand Calendar Wristwatch with Strap",
+          "description_en": "An analog wristwatch featuring a 3-hand display, strap band, and an integrated calendar date window.",
+          "specifications_en": [
+            "Display: 3-hand analog",
+            "Features: calendar / date display",
+            "Attachment: strap / belt band"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Toiletry Bag",
+          "description_en": "Travel Toiletry Bag. Use it for carrying toiletries. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying toiletries"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "zh-CN": {
+            "title": "带表带三针日历腕表",
+            "description": "经典指针式腕表，采用三针时间显示，配备舒适表带与集成日历视窗，方便日常掌握日期。",
+            "specifications": [
+              "显示方式：三针模拟指针",
+              "功能：日历 / 日期显示",
+              "佩戴方式：表带"
+            ],
+            "search_keywords": [
+              "三针腕表",
+              "日历手表",
+              "指针手表",
+              "皮带表",
+              "日常手表"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "de": {
+            "title": "Reise-Kulturtasche",
+            "description": "Reise-Kulturtasche zur praktischen Aufbewahrung und zum Transport von Toilettenartikeln auf Reisen.",
+            "specifications": [
+              "Material: Keine Angabe über den Titel hinaus",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Transport von Toilettenartikeln"
+            ],
+            "search_keywords": [
+              "Kulturtasche",
+              "Kulturbeutel",
+              "Reisetasche",
+              "Kosmetiktasche",
+              "Toilettenbeutel"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 14,
+    "productIds": [
+      "1380804688772993024",
+      "1765631148681596928"
+    ],
+    "missingLocales": [
+      [
+        "de"
+      ],
+      [
+        "pt"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "de"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "pt"
+          ],
+          "title_en": "Travel Bag",
+          "description_en": "Travel Bag. Use it for carrying clothes while traveling. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying clothes while traveling"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "de": {
+            "title": "Reisetasche",
+            "description": "Reisetasche für den bequemen Transport von Kleidung auf Reisen. Angaben basieren ausschließlich auf den vorhandenen Produktdetails.",
+            "specifications": [
+              "Material: Nicht näher spezifiziert",
+              "Menge: Nicht angegeben",
+              "Verwendungszweck: Transport von Kleidung auf Reisen"
+            ],
+            "search_keywords": [
+              "reisetasche",
+              "kleidertasche",
+              "gepäck",
+              "tasche für reisen"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "pt": {
+            "title": "Bolsa de Viagem",
+            "description": "Bolsa de viagem para transportar roupas durante suas viagens. Informações baseadas exclusivamente nos dados fornecidos pelo fabricante.",
+            "specifications": [
+              "Material: Não especificado",
+              "Quantidade: Não especificada",
+              "Uso indicado: Transporte de roupas em viagens"
+            ],
+            "search_keywords": [
+              "bolsa de viagem",
+              "mala de mão",
+              "transporte de roupas",
+              "bagagem de viagem"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 15,
+    "productIds": [
+      "1714860142182801408",
+      "AEAD6C15-A7D6-4ED9-A63A-8050318CD7A2"
+    ],
+    "missingLocales": [
+      [
+        "pt"
+      ],
+      [
+        "ja",
+        "ko"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "pt",
+        "ja",
+        "ko"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "pt"
+          ],
+          "title_en": "Backpack",
+          "description_en": "Backpack. Use it for carrying items. Facts are taken only from the supplier title. No extra size, model, or performance detail was added.",
+          "specifications_en": [
+            "Material: not supplied beyond the title wording",
+            "Quantity: not supplied",
+            "Listed use: carrying items"
+          ]
+        },
+        {
+          "i": 2,
+          "missing_locales": [
+            "ja",
+            "ko"
+          ],
+          "title_en": "Nordic Style Round Hanging Hammock Chair for Kids",
+          "description_en": "A Nordic-style round hanging swing chair suitable for children. Designed for single-child use and gentle swinging, suitable for mounting indoors in bedrooms and dormitories or in outdoor spaces.",
+          "specifications_en": [
+            "Type: hanging hammock swing chair",
+            "Shape: round",
+            "Style: Nordic",
+            "Capacity: single child",
+            "Listed locations: bedroom, dormitory, indoor, outdoor"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "pt": {
+            "title": "Mochila",
+            "description": "Mochila básica indicada para transporte e organização de itens no dia a dia.",
+            "specifications": [
+              "Material: não especificado além do termo do título",
+              "Quantidade: não especificada",
+              "Uso indicado: transportar itens"
+            ],
+            "search_keywords": [
+              "mochila",
+              "mochila para transporte",
+              "bolsa de costas"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "ja": {
+            "title": "北欧風 キッズ用 ラウンド ハンモックチェア",
+            "description": "お子様向けの北欧風ラウンド型ハンギングスイングチェア。お子様1人での使用を想定しており、寝室や寮などの室内から屋外スペースまで設置して穏やかな揺れを楽しめます。",
+            "specifications": [
+              "タイプ：吊り下げ式ハンモックチェア",
+              "形状：円形",
+              "スタイル：北欧風",
+              "定員：子ども1名",
+              "設置場所：寝室、寮、室内、屋外"
+            ],
+            "search_keywords": [
+              "ハンモックチェア",
+              "キッズブランコ",
+              "子ども用スイング",
+              "北欧風",
+              "吊り下げ椅子"
+            ]
+          },
+          "ko": {
+            "title": "북유럽 스타일 키즈 라운드 해먹 의자",
+            "description": "어린이를 위한 북유럽 스타일의 원형 행잉 그네 의자입니다. 아이 1인용으로 설계되었으며, 침실이나 기숙사 등의 실내 공간 및 야외에 설치하여 부드럽게 흔들리는 휴식을 즐기기에 적합합니다.",
+            "specifications": [
+              "유형: 행잉 해먹 그네 의자",
+              "형태: 원형",
+              "스타일: 북유럽",
+              "수용 인원: 어린이 1인",
+              "설치 장소: 침실, 기숙사, 실내, 실외"
+            ],
+            "search_keywords": [
+              "해먹 의자",
+              "키즈 그네",
+              "어린이 해먹",
+              "행잉 체어",
+              "북유럽풍 인테리어"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 16,
+    "productIds": [
+      "2408180305501614500"
+    ],
+    "missingLocales": [
+      [
+        "ja"
+      ]
+    ],
+    "userPayload": {
+      "locales": [
+        "ja"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "missing_locales": [
+            "ja"
+          ],
+          "title_en": "Men's Modal and Ice Silk Short-Sleeved Top and Pants Set",
+          "description_en": "A men's two-piece loungewear set consisting of a short-sleeved top and pants. Made from a modal and ice silk fabric blend.",
+          "specifications_en": [
+            "Target gender: men",
+            "Set includes: short-sleeved top, pants",
+            "Material: ice silk, modal"
+          ]
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ja": {
+            "title": "メンズ モダール＆アイスシルク 半袖トップス＆パンツセット",
+            "description": "半袖トップスとパンツが揃ったメンズ用ルームウェア上下セット。モダールとアイスシルクをブレンドした、なめらかで快適な生地を使用しています。",
+            "specifications": [
+              "対象：メンズ",
+              "セット内容：半袖トップス、パンツ",
+              "素材：アイスシルク、モダール"
+            ],
+            "search_keywords": [
+              "メンズ ルームウェア",
+              "パジャマ 上下セット",
+              "半袖 部屋着",
+              "アイスシルク",
+              "モダール パジャマ"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  }
+]

@@ -1,0 +1,295 @@
+# PC2_BUILD25_PLAYBACK_STABILITY_REGRESSION_LOCK_V1
+
+QA + evidence only. No shared/product fix. No local patch. No Build 26. No commit / push / reset. No Add for Review. No App Store production. Do not close P1 from one warm run. Do not treat operator “current session feels correct” as a 30-video / four-cycle lock.
+
+```text
+TASK_ID = PC2_BUILD25_PLAYBACK_STABILITY_REGRESSION_LOCK_V1
+STATUS = BUILD25_VERIFIED_PARTIAL_LOCK_OPERATOR_CYCLES_REQUIRED
+DATE = 2026-08-22
+DEVICE = PC2
+DEVICE_ROLE = IOS_TESTFLIGHT_IPHONE13_VALIDATOR
+CENTRAL_COORDINATOR = SERVER
+BUILD = UMTUBA 1.0.0 (25)
+AUTHORITATIVE_MOBILE_SHA = 21ec0311a1f0c4075b6192d512ca17c864da82a8
+BUILD25_INSTALLED = YES
+BUILD25_30_VIDEO_STRESS = PARTIAL_PC2_11_NOT_30
+FIRST_COLD_CYCLE = OPERATOR_REQUIRED
+WATCH_REENTRY_CYCLE = OPERATOR_REQUIRED
+BACKGROUND_FOREGROUND_CYCLE = OPERATOR_REQUIRED
+SECOND_COLD_CYCLE = OPERATOR_REQUIRED
+VIDEO_STARTUP_PROMPT = YES_ON_INSTRUMENTED_SESSION
+PROLONGED_LOADING = NO_ON_INSTRUMENTED_SESSION
+57S_REGRESSION = NOT_REPRODUCED
+12_TO_20S_REGRESSION = NOT_REPRODUCED
+AUDIO_OVERLAP_REGRESSION = NO_ON_OPERATOR_PLUS_MAX1_PLAYING_YES
+ACTIVE_AUDIBLE_PLAYER_COUNT = 1_ON_PLAYING_YES_PER_SECOND
+PROGRESSIVE_SLOWDOWN = NO_ON_INSTRUMENTED_SESSION
+SIGNED_URL_FIX_PRESERVED = YES_ON_INSTRUMENTED_SESSION
+PLAYER_LIFECYCLE_FIX_STABLE = YES_ON_THIS_SESSION_NOT_CYCLE_LOCKED
+NESTED_PROFILE_BACK_X3 = OPERATOR_REQUIRED
+WATCH_CONTEXT_PRESERVED = OPERATOR_REQUIRED
+BUILD23_REGRESSION_LOCK = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+BUILD24_STALL_REGRESSION_LOCK = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+BUILD24_AUDIO_REGRESSION_LOCK = HELD_ON_OPERATOR_PLUS_MAX1_NOT_30_CYCLE_LOCKED
+BUILD25_SYSLOG_CAPTURE_STATUS = PARTIAL_VALID_CAPTURE_THEN_EBUSY
+SYSLOG_CAPTURE_DURATION = ~15_MINUTES
+SYSLOG_FAILURE_REASON = LIVE_LOG_FILE_EBUSY_LOCK
+APPLICATION_CRASH_CAUSED_CAPTURE_END = NO
+VALID_TIMING_EVIDENCE_BEFORE_FAILURE = YES
+SAME_SECOND_WATCH_TRANSITIONS_CAPTURED = 11
+TIMING_EVIDENCE_USED_IN_REGRESSION_LOCK = YES
+EBUSY_IS_QA_INFRA_LIMITATION = YES
+EBUSY_IS_PRODUCT_DEFECT = NO
+EBUSY_IS_PLAYBACK_FAILURE = NO
+DO_NOT_INVALIDATE_EXISTING_BUILD25_PLAYBACK_EVIDENCE = YES
+DO_NOT_REPEAT_CAPTURE_ONLY_TO_CHASE_LOGGING_EBUSY = YES
+SOURCE_CHANGED_BY_PC2 = NO
+LOCAL_FIX_ATTEMPTED = NO
+BUILD26_CREATED = NO
+APP_STORE_REVIEW_SUBMITTED = NO
+APP_STORE_PRODUCTION_SUBMISSION = NO
+IOS_PLAYBACK_P1_CLOSED = NO
+PLAYBACK_REGRESSION_LOCK = INCOMPLETE
+NESTED_PROFILE_BACK_GATE = OPERATOR_REQUIRED
+IOS_FINAL_DEVICE_GATE = NOT_CLOSED
+READY_FOR_CENTRAL_FINAL_DECISION = YES
+NEW_DEFECTS = FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+PROFILE_SANITY = FAIL_FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+FOLLOW_SANITY = FAIL_LISTS_NOT_OPENING
+BLOCKERS = OPERATOR_REQUIRED_30_VIDEO_AND_CYCLES_A_E_AND_EMAN_BACK_X3
+NEXT_ACTION = RETURN_DEFECT_AND_INCOMPLETE_LOCK_TO_CENTRAL
+```
+
+---
+
+## Official return fields
+
+```text
+TASK_ID = PC2_BUILD25_PLAYBACK_STABILITY_REGRESSION_LOCK_V1
+BUILD25_INSTALLED = YES
+BUILD25_30_VIDEO_STRESS = PARTIAL_PC2_11_NOT_30
+FIRST_COLD_CYCLE = OPERATOR_REQUIRED
+WATCH_REENTRY_CYCLE = OPERATOR_REQUIRED
+BACKGROUND_FOREGROUND_CYCLE = OPERATOR_REQUIRED
+SECOND_COLD_CYCLE = OPERATOR_REQUIRED
+VIDEO_STARTUP_PROMPT = YES_ON_INSTRUMENTED_SESSION
+PROLONGED_LOADING = NO_ON_INSTRUMENTED_SESSION
+57S_REGRESSION = NOT_REPRODUCED
+12_TO_20S_REGRESSION = NOT_REPRODUCED
+AUDIO_OVERLAP_REGRESSION = NO_ON_OPERATOR_PLUS_MAX1_PLAYING_YES
+ACTIVE_AUDIBLE_PLAYER_COUNT = 1_ON_PLAYING_YES_PER_SECOND
+PROGRESSIVE_SLOWDOWN = NO_ON_INSTRUMENTED_SESSION
+SIGNED_URL_FIX_PRESERVED = YES_ON_INSTRUMENTED_SESSION
+PLAYER_LIFECYCLE_FIX_STABLE = YES_ON_THIS_SESSION_NOT_CYCLE_LOCKED
+NESTED_PROFILE_BACK_X3 = OPERATOR_REQUIRED
+WATCH_CONTEXT_PRESERVED = OPERATOR_REQUIRED
+BUILD23_REGRESSION_LOCK = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+BUILD24_STALL_REGRESSION_LOCK = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+BUILD24_AUDIO_REGRESSION_LOCK = HELD_ON_OPERATOR_PLUS_MAX1_NOT_30_CYCLE_LOCKED
+BUILD25_SYSLOG_CAPTURE_STATUS = PARTIAL_VALID_CAPTURE_THEN_EBUSY
+SYSLOG_CAPTURE_DURATION = ~15_MINUTES
+SYSLOG_FAILURE_REASON = LIVE_LOG_FILE_EBUSY_LOCK
+APPLICATION_CRASH_CAUSED_CAPTURE_END = NO
+VALID_TIMING_EVIDENCE_BEFORE_FAILURE = YES
+SAME_SECOND_WATCH_TRANSITIONS_CAPTURED = 11
+TIMING_EVIDENCE_USED_IN_REGRESSION_LOCK = YES
+EBUSY_IS_QA_INFRA_LIMITATION = YES
+EBUSY_IS_PRODUCT_DEFECT = NO
+EBUSY_IS_PLAYBACK_FAILURE = NO
+DO_NOT_INVALIDATE_EXISTING_BUILD25_PLAYBACK_EVIDENCE = YES
+DO_NOT_REPEAT_CAPTURE_ONLY_TO_CHASE_LOGGING_EBUSY = YES
+SOURCE_CHANGED_BY_PC2 = NO
+LOCAL_FIX_ATTEMPTED = NO
+BUILD26_CREATED = NO
+APP_STORE_REVIEW_SUBMITTED = NO
+IOS_PLAYBACK_P1_CLOSED = NO
+PLAYBACK_REGRESSION_LOCK = INCOMPLETE
+NESTED_PROFILE_BACK_GATE = OPERATOR_REQUIRED
+IOS_FINAL_DEVICE_GATE = NOT_CLOSED
+READY_FOR_CENTRAL_FINAL_DECISION = YES
+NEW_DEFECTS = FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+PROFILE_SANITY = FAIL_FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+FOLLOW_SANITY = FAIL_LISTS_NOT_OPENING
+BLOCKERS = OPERATOR_REQUIRED_30_VIDEO_AND_CYCLES_A_E_AND_EMAN_BACK_X3
+NEXT_ACTION = RETURN_DEFECT_AND_INCOMPLETE_LOCK_TO_CENTRAL
+```
+
+---
+
+## Evidence classes (do not mix)
+
+| Class | What it is |
+| --- | --- |
+| **PC2 USB** | `installation_proxy` Lookup on UDID `00008110-000A10123AF9801E` |
+| **PC2 syslog** | `com.apple.syslog_relay` after DeviceID retarget 1→2 |
+| **Operator-observed** | Central GO text: startup fast, no prolonged loading, no previous-video audio, “playback currently behaves correctly” |
+
+Windows cannot tap TestFlight / Watch / Profile. TAP / XCUITest / WDA absent. Cycles A–E and @eman Back ×3 were **not** driven by PC2.
+
+---
+
+## 1 — USB install (gate)
+
+DeviceID changed to **2** after reconnect. Lookup with DeviceID 1 failed (`usbmux Number=2`). DeviceID 2 succeeded. Stale Build 24 plist was **not** used as proof.
+
+```text
+LOOKUP_AT = 2026-08-22T13:02:09Z and 2026-08-22T16:16+03:00 recheck
+CFBundleShortVersionString = 1.0.0
+CFBundleVersion = 25
+SignerIdentity = TestFlight Beta Distribution
+BUNDLE_PATH = /private/var/containers/Bundle/Application/E217B62A-061F-47AF-BA0F-DC9E9811F16B/UMTUBA.app
+PREVIOUS_BUILD24_PATH = /private/var/containers/Bundle/Application/C7C41B9A-46B9-408F-B248-A53B0304A477/UMTUBA.app
+PHONE_ON_24 = NO
+BUILD26_CREATED = NO
+```
+
+---
+
+## 2 — Instrumented Watch session (pid 6096)
+
+Capture `2026-08-22T13:02:29Z` → snap `16:16` local. Single UMTUBA pid **6096** (Build 24 was 5816). No process-launch / second pid → **not** a proven cold launch.
+
+`UMTUBA(AVKit) New asset: ExpoVideo.VideoAsset` (hosts / tokens not copied):
+
+| # | Asset | `PrerollingWillPlay -> Playing` | Gap |
+| --- | --- | --- | --- |
+| 1 | 16:03:22 | 16:03:22 | **0 s** |
+| 2 | 16:04:03 | 16:04:03 | **0 s** |
+| 3 | 16:05:27 | 16:05:27 | **0 s** |
+| 4 | 16:06:12 | 16:06:12 | **0 s** |
+| 5 | 16:11:45 (+ 16:11:46 ×2 next-item assets) | 16:11:45 / 16:11:47 | **0–2 s** |
+| 6 | 16:13:20 | 16:13:20 | **0 s** |
+| 7 | 16:13:50 | 16:13:49 | **0–1 s** |
+| 8 | 16:14:08 | 16:14:08 | **0 s** |
+| 9 | 16:14:38 | 16:14:37 | **0–1 s** |
+| 10 | 16:15:54 | 16:15:53 | **0–1 s** |
+| 11 | 16:16:12 | 16:16:11 | **0–1 s** |
+
+```text
+PC2_DISTINCT_WATCH_ACTIVATIONS = 11
+PC2_30_VIDEO_STRESS = NO
+VIDEO_STARTUP_PROMPT = YES (same-second play on instrumented items)
+OLD_57S_STALL = NOT_REPRODUCED
+BUILD24_12_20S_STALL = NOT_REPRODUCED
+PRE_VIDEOASSET_54S_GAP = NOT_SEEN
+HTTP_403 = 0
+HTTP_206 = 32_PLUS
+MAX_PLAYING_YES_PER_SECOND = 1
+CRASH_IN_CAPTURE = NO
+PIDS = 6096_ONLY
+```
+
+16:06:12 → 16:11:45 is a **~5.5 min** gap (one long clip or leave-Watch). Not counted as a proven cycle B.
+
+---
+
+## 2b — Syslog EBUSY (infra only)
+
+Build 25 syslog ran ~15 minutes (`2026-08-22T13:02:29Z` → `13:17:23Z`, exit 1) and then terminated because the live log file became locked with **EBUSY**, matching the known snapshot-copy locking behavior. Valid Watch timing evidence had already been captured before the logging failure, including **11** same-second transitions. Treat EBUSY as a PC2 logging-infrastructure limitation, not an iOS playback regression.
+
+```text
+BUILD25_SYSLOG_CAPTURE_STATUS = PARTIAL_VALID_CAPTURE_THEN_EBUSY
+SYSLOG_CAPTURE_DURATION = ~15_MINUTES
+SYSLOG_FAILURE_REASON = LIVE_LOG_FILE_EBUSY_LOCK
+APPLICATION_CRASH_CAUSED_CAPTURE_END = NO
+VALID_TIMING_EVIDENCE_BEFORE_FAILURE = YES
+SAME_SECOND_WATCH_TRANSITIONS_CAPTURED = 11
+TIMING_EVIDENCE_USED_IN_REGRESSION_LOCK = YES
+EBUSY_IS_QA_INFRA_LIMITATION = YES
+EBUSY_IS_PRODUCT_DEFECT = NO
+EBUSY_IS_PLAYBACK_FAILURE = NO
+DO_NOT_INVALIDATE_EXISTING_BUILD25_PLAYBACK_EVIDENCE = YES
+DO_NOT_REPEAT_CAPTURE_ONLY_TO_CHASE_LOGGING_EBUSY = YES
+```
+
+EBUSY does **not** change 57s / 12–20s / 403 / same-second verdicts to FAIL. It also does **not** complete the 30-video or cycle locks.
+
+---
+
+## 3 — Suites vs requirement
+
+| Suite | Result | Source |
+| --- | --- | --- |
+| 30 sequential Watch videos | **PARTIAL** (11 instrumented) | PC2 syslog |
+| Rapid transition / old audio stops | Operator: NO overlap. PC2: max 1 `Playing=YES` / sec | Both |
+| Cycle A force-quit → cold → 10 videos | **OPERATOR_REQUIRED** | No second pid |
+| Cycle B leave Watch → tab → return → 10 | **OPERATOR_REQUIRED** | Not isolated |
+| Cycle C background → foreground | **OPERATOR_REQUIRED** | Not isolated |
+| Cycle D second cold launch | **OPERATOR_REQUIRED** | Same pid |
+| Cycle E repeated Watch entry/exit | **OPERATOR_REQUIRED** | Not isolated |
+| Player invariant count=1 | **YES on Playing=YES/sec**; not a full player-object census | PC2 syslog |
+| Signed URL / no 403 / next-item prep | **YES on this session** (16:11:46 dual extra assets) | PC2 syslog |
+| Watch → @eman → Back ×3 | **OPERATOR_REQUIRED** | No reliable @eman signal; Windows cannot tap |
+
+---
+
+## 4 — Permanent regression locks (do not mark obsolete)
+
+These locks stay on the board even if this session looked good.
+
+```text
+BUILD23_REGRESSION = 57s startup / pre-VideoAsset signed-URL stall / blocking 403
+BUILD23_THIS_SESSION = NOT_REPRODUCED
+BUILD23_LOCK_STATUS = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+
+BUILD24_REGRESSION = intermittent 12-20s post-asset stall
+BUILD24_THIS_SESSION = NOT_REPRODUCED
+BUILD24_STALL_LOCK_STATUS = HELD_ON_THIS_SESSION_NOT_30_CYCLE_LOCKED
+
+BUILD24_AUDIO_REGRESSION = previous-video audio continuing into current video
+BUILD24_AUDIO_THIS_SESSION = OPERATOR_NO + MAX_PLAYING_YES_PER_SEC=1
+BUILD24_AUDIO_LOCK_STATUS = HELD_ON_OPERATOR_PLUS_MAX1_NOT_30_CYCLE_LOCKED
+```
+
+---
+
+## 5 — Why P1 / final gate stay open
+
+- A single warm pid-6096 run is **not** the required lock.
+- 30-video stress not completed.
+- Cycles A–E not proven.
+- Nested Profile Back ×3 not run by PC2 and not operator-attested on this GO.
+- Operator current-session observation is recorded, not substituted for those suites.
+- Syslog EBUSY is infra only. It does not FAIL playback and does not complete those suites.
+
+```text
+IOS_PLAYBACK_P1_CLOSED = NO
+PLAYBACK_REGRESSION_LOCK = INCOMPLETE
+IOS_FINAL_DEVICE_GATE = NOT_CLOSED
+```
+
+---
+
+## New defect (does not close or fail the playback lock)
+
+Operator: Profile Followers / Following counts do not open lists. See `docs/ai/PC2_BUILD25_FOLLOWERS_FOLLOWING_LIST_NOT_OPENING_V1.md`.
+
+```text
+NEW_DEFECTS = FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+PROFILE_SANITY = FAIL_FOLLOWERS_FOLLOWING_LIST_NOT_OPENING
+FOLLOW_SANITY = FAIL_LISTS_NOT_OPENING
+LIKELY_SHARED_DEFECT = YES
+IOS_ONLY_DEFECT = NO
+PLAYBACK_REGRESSION_LOCK = INCOMPLETE
+```
+
+---
+
+## Safety
+
+- No product / shared source edit. No Build 26. Temporary USB helpers only (DeviceID 2).
+- No commit, push, reset, stash, force.
+- No Add for Review. No production submit.
+- No signed URLs / tokens / pairing secrets printed.
+
+---
+
+## Operator next (same Build 25 — do not install 26)
+
+1. Force-quit → cold launch → Watch → **10** videos (cycle A).
+2. Leave Watch → other tab → return → **10** videos (cycle B).
+3. Home background → foreground → Watch (cycle C).
+4. Force-quit again → cold Watch (cycle D).
+5. Continue to **30** sequential if not already done across those cycles.
+6. Watch → **@eman** → Back → Watch, **three times**.
+7. Stay on Build 25. Do not rebuild. Do not recapture syslog only to chase EBUSY.

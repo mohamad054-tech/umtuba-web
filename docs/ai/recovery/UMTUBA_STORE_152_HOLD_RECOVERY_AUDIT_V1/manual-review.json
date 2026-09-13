@@ -1,0 +1,2543 @@
+{
+  "task_id": "UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1",
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "generated_at": "2026-09-10T11:10:46.475Z",
+  "definition": "isPublishableBrowseRow + stored catalog_qa on the FINAL_22 canonical (same 380/152 split)",
+  "applied_fixes": false,
+  "count": 129,
+  "products": [
+    {
+      "id": "1425724052902907904",
+      "source": "approved_59",
+      "department": "TRAVEL",
+      "source_title": "Fish Tank Activated Carbon Carbon Cube Water Purification Fish Tank Filter",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4638472032742155,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2503300742111628100",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car 25-inch Led Headlight",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Car listing may be decorative lighting or unrelated hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6747967479674797,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "2412020311111623500",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Packing Bag Aquarium Fish Tank Filter Angle Material Bacterium Cultivation Zipper Net",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6931287525016678,
+      "retail_price_minor": 1499
+    },
+    {
+      "id": "2505280326151619300",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Wooden Dog Scratch Board Nail File Board Drawable",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6535334584115072,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1382895068624588800",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Golf Scribing Clip Transparent Self Scribing Clip",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Electronics listing title may be IP-restricted or a fashion clip.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Likely misclassified electronics vs fashion/golf accessory. Recategorization needs human judgment."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6697798532354903,
+      "retail_price_minor": 1499
+    },
+    {
+      "id": "1962E668-6C44-4EC2-A686-066F5378E98A",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Mini mobile phone microphone mobile phone recording sing small microphone small microphone",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6535334584115072,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1630036408272433152",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "IPhone6s Power Cable Power Cable Power Button Power Cable",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6397881106533255,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "0E1276FE-CA3E-410B-B78E-6C806DF0CAF9",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "New national wind zero wallet canvas stamp coin package for lady elephant small wallet wholesale",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6622889305816135,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "2505120644341625400",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Fashion Copper Clip Men's Note Tie Clip",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Electronics listing title may be IP-restricted or a fashion clip.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Likely misclassified electronics vs fashion/golf accessory. Recategorization needs human judgment."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6829268292682927,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "2411240930111626400",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Led Light Pet Waste Bag Dispenser For Dogs Cats Dog Poop Scooper Bags Waste Bags Holder Dispensers Pet Clean Accessories",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6504065040650406,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "2406090134181602700",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Cactus Sink Drain Strainer Press Automatic Dumping Basket Multi-functional Use Filter Net For Tub Kitchen Waste Collector Kitchen Gadgets",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6497811131957474,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1709416099537752064",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Little Pillow For Cats Fashion Neck Protector Deep Sleep Puppy U-Shaped Pillow Pets Pillow Kitten Headrest Dog Sleeping Pillow Pet Products",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6421424367274867,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1816050786745864192",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Catnip Toys Self Adhesive Carrot Shape Cat Catnip Balls Toy For Indoor Cat Cat Wall-mounted Mint Balls For Cat Teeth Cleaning Blue",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6403766921718658,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "2505030316271611300",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Diy Bag Bamboo Joint Handle Bamboo Product Accessories",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Pet listing title describes bag hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6341463414634146,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Parrot nibble toy",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6274278987639789,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "2508300300041621100",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Pet Sleeping Mat Neck Protection U-shaped Pillow",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.631019387116948,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1829082292334514176",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Interactive Cat Toy Feather Wand With Bell Refills Bells And Feathers Attention And Stimulate Harmless Durable And Unbreakable",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6397748592870544,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1771372464438775808",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Solid Color Sports Compression Stockings Fitness Running Stockings",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6174220129487934,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1369878225664217088",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Compatible With Tempered Glass Screen Protector For   11 Pro Max 12 Mini 11Pro 12Pro XS X XR 7 8 Plus 6 6S SE 5S Protection Film",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6622889305816135,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1820302141425602560",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Cat Toy Set Cat Noise Toy With Built In Catnip Striped Pattern Cat Pillow",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Fashion listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6244849911712772,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1837025392407236608",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Pet Food Spoon Dog Cat Food Spoon With Clip Hygienic Feeding For Dogs And Cats Universal Cat Food Spoon Cross-border",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6233078281341966,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1728693595147866112",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Small Yellow Duck Small Night Lamp Bedside Lamp Unplugged Table Lamp Ambience Light",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6253908692933083,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "1410451269214146560",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Electrocardiogram Car Sticker Creative Personality",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Car listing may be decorative lighting or unrelated hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.607416127133608,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "2408150612121603200",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "OBD To 6 Pin For DELPHI Motorcycle",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5997776542523624,
+      "retail_price_minor": 1799
+    },
+    {
+      "id": "2503030457411602100",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Autumn And Winter Wooden Bead Bag Chain Letter Double Layer",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Pet listing title describes bag hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6062389640965273,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1796518153233633280",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Smart Inductive Ashbin T1T1ST AirT3 Household Thickened Automatic Packing Garbage Bag",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6056503825779871,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "DD6320BA-2D4A-487E-B26B-5697E7589947",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Waterproof Black Eyeliner Liquid Eye Liner Pen Pencil Gel Beauty Makeup Cosmetic Eyelashes Waterproof Eye Liner Makeup Tool",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6062389640965273,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1734109927863496704",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Modification LED Work Lights",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Car listing may be decorative lighting or unrelated hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5881045025013897,
+      "retail_price_minor": 1799
+    },
+    {
+      "id": "1564876306230693888",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Creative Fidget Spinner Toy Keychain Hand Spinner Anti-Anxiety Toy Relieves Stress Finger Spinner Keychain Bottle Opener Kids Toy",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.6038846380223661,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1830432988615036928",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "PHOFAY Plump Eye Black Set",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Fashion listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4605021432945499,
+      "retail_price_minor": 4899
+    },
+    {
+      "id": "1837773406780411904",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Cat Laser Toy Pointer Cat Collar Automatic Interactive Cat Toy For Kittens Dogs Game USB Charging Electric Training Pet Items",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5938787522071807,
+      "retail_price_minor": 1699
+    },
+    {
+      "id": "1EE0FB3D-B0AD-455B-881B-E24DC8D3A143",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car side awning",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Car listing may be decorative lighting or unrelated hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4590278996315143,
+      "retail_price_minor": 5699
+    },
+    {
+      "id": "1384070437234937856",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "XHORSE HDS Cable OBD2 Diagnostic Cable",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45881069285324605,
+      "retail_price_minor": 5499
+    },
+    {
+      "id": "2503110520101626100",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Extension Strap Wash Canvas Bag Strap Accessories",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Pet listing title describes bag hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4570673712021136,
+      "retail_price_minor": 5299
+    },
+    {
+      "id": "1468440297624178688",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Small Night Light Small Wax Lamp Creative Decoration",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4564466266593926,
+      "retail_price_minor": 5499
+    },
+    {
+      "id": "1722102821731971072",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Office Handbag Portable Briefcase File Bag",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4555759293215536,
+      "retail_price_minor": 5999
+    },
+    {
+      "id": "F25DF9B2-5E6B-42C9-85FD-B34D55E39822",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Pillowcase Satin Solid Color Simulation Silk Single Pillowcase Ice Silk Pillowcase",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Fashion listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5671406003159558,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1356602786053230592",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Dog Foot Artifact Machine Electric Pet Cat Foot Cleaner Cup",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4542237267271888,
+      "retail_price_minor": 6499
+    },
+    {
+      "id": "1796775026633478144",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Small Stool Household Stackable Dice Small Bench",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45901282887584255,
+      "retail_price_minor": 4599
+    },
+    {
+      "id": "2508250243451613901",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Alloy Strap With Card Buckle Fine Mesh Watch Strap",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Sports listing title is not a workout accessory.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5634544497103738,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1388771672785555456",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Ins Nordic Cute Cloud Carpet Floor Mat Baby Game Crawling Mat Anti-Fall Mat Home Soft Carpet Floor Mat",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4598874765576162,
+      "retail_price_minor": 4799
+    },
+    {
+      "id": "1837399142315216896",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Pet Bowl Tilted Cat Double Bowls Protect Cervical Dog Drinker Food Bowl Dish Adjustable Spill-Proof Cat Feeder Pet Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45829165833166635,
+      "retail_price_minor": 4999
+    },
+    {
+      "id": "1385525750660206592",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Office Leg And Foot Hammock Long-Distance Travel Foot Fatigue Relief Tool Airplane Travel Foot Hammock",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5742078932740411,
+      "retail_price_minor": 1799
+    },
+    {
+      "id": "ECAC663E-87ED-4D84-B320-A8E7FD76AE41",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Non-Stick Silicone Pyramid Cooking Mat Baking Mat With Grid Versatile Oven BBQ Cooking Mat Heat-Resistant Mat Kitchen Tools Kitchen Gadgets",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5681937862032649,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "2406130639021623700",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Multi Functional Cotton Baby Waist Stool And Shoulder Strap",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Sports listing title is not a workout accessory.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4558228149559419,
+      "retail_price_minor": 4199
+    },
+    {
+      "id": "1674968997453897728",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Long Pop-Up Sink Drains Filter Bathroom Press Bounce Basin Plug Stopper Wash Basin Hair Catcher Sink Strainer Kitchen Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4549148304422566,
+      "retail_price_minor": 6399
+    },
+    {
+      "id": "A31316CE-BB52-4E2D-B9A7-94BBD96681F8",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Watch strap stainless steel strap",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Sports listing title is not a workout accessory.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5534491837809373,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1520605348707708928",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Electric Clippers Accessories Include Oil Head Shear Parts",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5477738869434717,
+      "retail_price_minor": 1999
+    },
+    {
+      "id": "2504270351581616600",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Soft Memory Foam Travel Neck Pillow U Shape Adjustable Support Comfortably Sleeping On Plane Car Office Noon Break",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45066427825048516,
+      "retail_price_minor": 6699
+    },
+    {
+      "id": "2505180840591620300",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Magnetic Silicone Sensory Balls Worry Balls Autism Calming Fidgeting Toy Fidget Toy Kid Adults Anxiety Relief Stress Sensory Toy",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.569246972090574,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "D48478AD-25F2-467B-816D-F05F9A894E3F",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Travel Bag brand men 2 in 1 Garment Bag High-capacity Multi-function Foldable nylon duffle bags suit Busines Trip shoulder bag",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4524307978599674,
+      "retail_price_minor": 4299
+    },
+    {
+      "id": "1408359595130359808",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Fashion Watch Strap",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Sports listing title is not a workout accessory.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5730961645358532,
+      "retail_price_minor": 1799
+    },
+    {
+      "id": "1496403300390670336",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Makeup Storage Organizer Set",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4552798615118292,
+      "retail_price_minor": 5199
+    },
+    {
+      "id": "1639442493622202368",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Strap Long Loose Slim Denim Strap Skirt",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Sports listing title is not a workout accessory.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4527071102413568,
+      "retail_price_minor": 4599
+    },
+    {
+      "id": "2504230533491607600",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Ingenious Handmade Workshop Tote Bag Shoulder Strap",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Pet listing title describes bag hardware.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4569623585153988,
+      "retail_price_minor": 3799
+    },
+    {
+      "id": "1508743249077481472",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Casual Men's Horizontal Zipper Buckle Wallet",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5581885202738284,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1753982835490304000",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Food Dispensing Dog Toy Tumbler Leaky Food Ball Puzzle Toys Interactive Slowly Feeding Protect Stomach Increase Intelligence Pets Toy Pet Products",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5402701350675337,
+      "retail_price_minor": 1999
+    },
+    {
+      "id": "1751492909284724736",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Medieval Small Retro Small Golden Watch Oval Light Luxury Artistic Fashion Quartz",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Garden listing title does not describe a garden tool.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4545707140872465,
+      "retail_price_minor": 3599
+    },
+    {
+      "id": "1837382329598627840",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "PU Nylon Toy For Dog Chewing Gum Seahorse Tuna Puppy Combination Set",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Fashion listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5302790942601369,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1881601881203437570",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Dog Small Pillow, Pet Mat, Neck Pillow For Sleeping, Cat Winter Dog Kennel, Cat Cervical Vertebra Protection, Hypnotic Pet Pillow.",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5323854660347551,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1754434236339195904",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Electric Foot Callus Remover Foot Care File Heels Dead Skin Pedicure Tool Electronic Foot Grinder And Replacement Sandpaper",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4625644134586238,
+      "retail_price_minor": 3299
+    },
+    {
+      "id": "1390641446410915840",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Storage Bag Handbag Holder Car Seat Storage Organizer Handbag Holder Auto Interior Stowing Tidying Car Middle Organizer",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.51975987993997,
+      "retail_price_minor": 1999
+    },
+    {
+      "id": "1424994967243329536",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Men's 6-pin Quartz Second Running Talking Watch",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46484260076493084,
+      "retail_price_minor": 3399
+    },
+    {
+      "id": "1839507288605216768",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Cat Litter Shovel Plastic Cats Poop Scoop Pet Cleanning Tool Cat Toilet Products Durable Litter Box Cleaner Shovel",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5147573786893447,
+      "retail_price_minor": 1999
+    },
+    {
+      "id": "1785940589914107904",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Ice Cube Mold Household Ice Maker Food Grade Press Ice Tray Ice Cube Maker Ice Tray Mold With Storage Box Kitchen Gadget",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.5069080514530729,
+      "retail_price_minor": 2099
+    },
+    {
+      "id": "1536194736414011392",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Dog Pets Puzzle Toys Slow Feeder Interactive Increase Puppy IQ Food Dispenser Slowly Eating NonSlip Bowl Pet Dogs Training Game Pet Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4566048837893498,
+      "retail_price_minor": 3399
+    },
+    {
+      "id": "5735615B-F049-4B1A-A409-A79B5A61A67D",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "7-inch car radio",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.3585422660638444,
+      "retail_price_minor": 7299
+    },
+    {
+      "id": "2503100745591603200",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Audio Modification Front Door Speaker",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.356494275562574,
+      "retail_price_minor": 7599
+    },
+    {
+      "id": "1837800790103576576",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Seat Storage, New Upgraded Car Seat Storage Box With Cup Holder, Seat Gap Storage Box, Cup Holder Gap Bag For Car, Adjustable Car Seat Storage Box",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4671557185728576,
+      "retail_price_minor": 2999
+    },
+    {
+      "id": "1714855823715225600",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Environmentally Friendly Biodegradable Pet Litter Bags Dog Waste Bags With Dog Poop Bag Dispenser Dog Poop Bags Thickened Poop Bags Leak-Proof Dog Waste Bags For Pet Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4671557185728576,
+      "retail_price_minor": 2999
+    },
+    {
+      "id": "1430051292188905472",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Network Cable Computer Jumper Finished Network Cable",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.353672088089706,
+      "retail_price_minor": 9899
+    },
+    {
+      "id": "1421757169656795136",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Conference Camera Cable, Electronic Whiteboard Extension Cable",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.3521515988945914,
+      "retail_price_minor": 7599
+    },
+    {
+      "id": "1824032070243864576",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Travel Hanging Toiletry Bag Travel Kit Shaving Bag Waterproof Large Makeup Bag Wash Bag Makeup Organizer Cosmetic Case Puffy Makeup Cosmetic Bag Organizer, Carry-on Travel Accessories",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4658219406468823,
+      "retail_price_minor": 2999
+    },
+    {
+      "id": "1392067844971302912",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Dog Training Leash Waist Bag Hands-Free Outdoor Pet Running Walking Leash Portable Dog Food Water Cup Storage Bags",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.49642686993806573,
+      "retail_price_minor": 2099
+    },
+    {
+      "id": "1472445095834947584",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "360 Rotating Electric Plane Airplane Toys For Kids Bump And Go Action Toddler Toy Plane With LED Flashing Light Sound For Boys",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4648088603072526,
+      "retail_price_minor": 2799
+    },
+    {
+      "id": "1706598570998108160",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Kitchen Dumpling Mold Stainless Steel Dumpling Machine Pressing Home Baking Tool Skin Press Tool Dumpling Noodle Manual Kitchen Gadgets",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4906775807185084,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "1429317075750490112",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Foldable Storage Pet Dog Stairs",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.354926696215479,
+      "retail_price_minor": 8799
+    },
+    {
+      "id": "1650738895232962560",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Ringer Plush Winter Car Seat Cushion",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35486527826803155,
+      "retail_price_minor": 8499
+    },
+    {
+      "id": "1817152201652326400",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Snake Cat Teasing Stick Cat Toy Cat Teasing Artifact Cat Cat Supplies Self-hi To Relieve Boredom Feather Long Pole",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4694113120430935,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "2503100740281610000",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Audio Modification 65-inch Subwoofer",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35414254132013895,
+      "retail_price_minor": 9499
+    },
+    {
+      "id": "1387639463303319552",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Spot Pet Mat, Waterproof And Easy To Clean Silicone Dog Mat, Cat Mat, Square Pet Placemat, Pet Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4916626965221534,
+      "retail_price_minor": 2099
+    },
+    {
+      "id": "1389761927684689920",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Four Seasons Universal Cat  Recliner Cat Bed",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35300582481591386,
+      "retail_price_minor": 9099
+    },
+    {
+      "id": "2506150709491629300",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Pet Bed Travel Car Seat Cushion",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35136202131859456,
+      "retail_price_minor": 7599
+    },
+    {
+      "id": "1714578924623515648",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Portable Dog Poop Scooper, Sanitary Dog Waste Picker Upper With Bag Dispenser, Convenient Pet Waste Cleaner For Dog Walkers, Attachable To Dog Leash, Harness Or Waist",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4533720555017748,
+      "retail_price_minor": 3099
+    },
+    {
+      "id": "1646726512265547776",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Electronics Organizer Travel Cable Organizer Bag Waterproof Portable Digital Storage Bag Electronic Accessories Case Cable Charger Organizer Case Multifunctional Waterproof Storage Bag",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4533720555017748,
+      "retail_price_minor": 3099
+    },
+    {
+      "id": "283FD3A6-ADBB-44F2-845F-4E71ADAC2AB9",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Household Car Washing High Pressure Water Sprayer Washer Water Jet Garden Washer Hose Wand Nozzle Sprayer Car Cleaning Tools",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.483856298317417,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2607270123311610200",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Smart Remote Control Fighting Robot Toy  Interactive Battle RC Vehicle For Kids",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35284704627283636,
+      "retail_price_minor": 7499
+    },
+    {
+      "id": "1741091255373156352",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Cat Teaser Stick, Retractable Cat Wand With Replacement Head, Cat Feather Toy, Cat Interactive Toy For Indoor Cats For Relief Boredom And Exercise",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4648088603072526,
+      "retail_price_minor": 2799
+    },
+    {
+      "id": "1430088145361309696",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Playable And Sleepy Cat New Product Grinding Claw Toy Scratching Post",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35203520352035206,
+      "retail_price_minor": 9999
+    },
+    {
+      "id": "2509040640281624500",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Portable Cat Punching Bag Toy Interactive Indoor Cats Kitten Toy With Gloves Cat Toy For Kitten Pet Cat Supplies Pets Products",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.48249204183719874,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2410150955481604000",
+      "source": "expansion",
+      "department": "SPORTS & FITNESS",
+      "source_title": "Ankle Strap Resistance Bands Hip Leg Strength Pull Rope Fitness Elastic Training Home Yoga Pilate Crossfit Workout Gym Equipment",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4758590691605046,
+      "retail_price_minor": 2299
+    },
+    {
+      "id": "1706498083409899520",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Panda Night Lights For Kids Cute Animal Silicone Timing Rechargeable Lamp Cartoon Panda Bedroom Decoration Kids Boys Girls Gift",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46133128126202383,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "1772587372312940544",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Pet Gravity Shrimp Plush Toy USB Charging Simulate Lobster Electric Jumping Cat Toys, Simulation Lobster Dog Toy, USB Charging With Catnip Plush Cat Toy, Pet Dog Cats Stuffed Interactive Toy",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46052161486245086,
+      "retail_price_minor": 2799
+    },
+    {
+      "id": "0FF9A708-21DC-4DB7-AC31-5C89DA48CD7A",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Cars Pass Through Big Adventure Parking Lot Rail Car Toy Car Track Kids Toy",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35754469308663583,
+      "retail_price_minor": 7999
+    },
+    {
+      "id": "0E4A0041-1919-44EB-9164-6EAA48765DEE",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Infant Safe Seat Mat Portable Baby Safety Seat Children's Chairs Updated Version Thickening Sponge Kids Car Stroller Seats Pad",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46567781993790963,
+      "retail_price_minor": 2899
+    },
+    {
+      "id": "2508161113241628300",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Wear-resistant Waterproof Tactical Men's Backpack Backpack",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.356409923366671,
+      "retail_price_minor": 7699
+    },
+    {
+      "id": "AEAD6C15-A7D6-4ED9-A63A-8050318CD7A2",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Nordic Style Round Hammock Outdoor Indoor Dormitory Bedroom Hanging Chair For Child Swinging Single Safety Hammock",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.354446957971187,
+      "retail_price_minor": 8399
+    },
+    {
+      "id": "1691277822914351104",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Deer Jewelry Display Stand Earrings Necklace Ring Jewelry Display Tray Jewelr Crystal Handle Antlers Jewelry Display Stand With Storage Drawer And Tray, Tree Tower Rack Hanging Organizer",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46938775510204084,
+      "retail_price_minor": 2499
+    },
+    {
+      "id": "1822604799771561984",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Universal Gravity Phone Holder Car Air Vent Mount Metal Mobile Stand GPS Support For Smartphone Air Vent Stand Cradle For Mobile Cell Phone",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46938775510204084,
+      "retail_price_minor": 2499
+    },
+    {
+      "id": "1750132340162449408",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "3PCS Cat Toy Balls, Interactive Pet Play Balls Sisal Rope Scratching Chew Ball Toy With Rustling Sound Pea Pod Storage For Indoor Kitten Training Hunting",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46938775510204084,
+      "retail_price_minor": 2499
+    },
+    {
+      "id": "08E33F3F-21A8-4121-BEB3-FFE1A4CDBCCA",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "FORUDESIGNS Cat Backpack Cute 3D Animal Denim Backpacks for Children Boys Girls Casual Kids School Bag Mochila Travel Backpack",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4535012967765839,
+      "retail_price_minor": 2699
+    },
+    {
+      "id": "ED00EBB4-5955-4BC3-9577-A9EF22E85498",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Silk suspender nightdress",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35434865172806684,
+      "retail_price_minor": 7899
+    },
+    {
+      "id": "1746499062574501888",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Burlap Fish Catnip Cat Toy, Throw Pillow, Teething Cat Toy, Fancy Cat Toy, Tough Bite, Sturdy Cat Toys Catnip Crinkle Sound Toys Soft And Durable, Interactive Cat Kicker Toys For Indoor Kitten",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4806730331969077,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "1443752641808175104",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Ems Foot Massager Mat Tens Fisioterapia Electric Foot Cushion Blood Circulation Acupunctur Pad Foot Health Care Relaxation Pain",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.46628969117007396,
+      "retail_price_minor": 2299
+    },
+    {
+      "id": "1536288274728366080",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "2-in-1 Pumpkin Ice Cube Maker Silicone Multi-functional Ice Bucket Portable Ice Cube Tray For Chilling Bar Cocktail Whiskey",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4569827931172469,
+      "retail_price_minor": 2499
+    },
+    {
+      "id": "0E4ECE1C-DD7D-4B10-93A9-2BA930375BF9",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "New Windmill Cat Toys Cute Rotating Interactive Cat Toy - Indoor Windmill Cat Toy With Suction Cup Catnip & Jagged Teeth Middle Ball, Smart Kitten Rotating Spinner Exercise Toy, Toothbrush & Massager",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45609484994442384,
+      "retail_price_minor": 2699
+    },
+    {
+      "id": "1419174980897345536",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Baby Learning Educational Toy Smart Egg Toy Games Shape Matching Sorters Toys Montessori Eggs Toys For Kids Children",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4574836475567526,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "D21D7980-0486-4A61-87EE-52E2FDD589B0",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "File bag felt briefcase",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Beauty listing title is misclassified or unsafe.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45,
+      "retail_price_minor": 2300
+    },
+    {
+      "id": "1660579557290168320",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Creative Cloud Sink Drain Rack Kitchen Sink Garbage Filter Sink Disposable Filter Mesh Bag Anti-Blocking Strainer Kitchen Gadget",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4544055405925356,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "1710221612786012160",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Dual Foot Massager Roller, Wooden Foot Massager For Plantar Fasciitis Pain Relief Heal Spur Deep Tissue Acupressure Foot & Heel Massager Washable Foot Roller, Relieve Foot Pressure And Clear Fatigue",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4544055405925356,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "2606170908561602100",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Dog Silicone Licking Pad Pet Licking Mat Silicone Smelling Mat Multifunctional Food Bowl Pets Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "AUTO_RECOVERABLE",
+          "notes": "Authoritative sibling department already differs and would not trigger this category-mismatch rule."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Near-duplicate title group (2): dog silicone licking pad pet",
+          "bucket": "duplicate",
+          "extra_buckets": [],
+          "recoverability": "AUTO_RECOVERABLE",
+          "notes": "Deterministic canonical relationship. No data loss. Weaker listing stays HOLD."
+        }
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Home listing title is a cable, diagnostic, or pet item.",
+          "proposed_correction": "Set department to existing sibling department \"PET\" (current \"HOME\"). Title stays \"Dog Silicone Licking Pad Pet Licking Mat Silicone Smelling Mat Multifunctional Food Bowl Pets Supplies\".",
+          "source_citations": [
+            "data/cj-profit-gate-v2.json products[cj_product_id=2606170908561602100].category=Pet → PET"
+          ]
+        },
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Near-duplicate title group (2): dog silicone licking pad pet",
+          "proposed_correction": "Remove this PRODUCT_DATA_REVIEW near-duplicate finding from 2606170908561602100 only. commercialHoldAudit.duplicateScore ranks it the canonical listing of group \"dog silicone licking pad pet\" over 1665981331156774912. Do not delete any row.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id in [\"1665981331156774912\",\"2606170908561602100\"]].source_title",
+            "lib/store/productLocalization/commercialHoldAudit.ts duplicateScore ranks: {\"2606170908561602100\":93.72359051293041,\"1665981331156774912\":91.88074644093882}",
+            "Winner 2606170908561602100; retain weaker 1665981331156774912 as HOLD"
+          ]
+        }
+      ],
+      "margin": 0.3513359051293042,
+      "retail_price_minor": 6999
+    },
+    {
+      "id": "1711605389739315200",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "New Dog Leash And Harness Set Pet Dog Harness And Leash Set Adjustable Puppy Cat Harness Vest Reflective Walking No Pull Lead Leash For Small Dogs Chihuahua",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4648088603072526,
+      "retail_price_minor": 2799
+    },
+    {
+      "id": "22C5CECD-7FF7-4F84-885A-8C9C0F13862F",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Men's Travel Bag Laptop Backpack Anti-theft Waterproof School Backpacks USB Charging Men Business Travel Bag Backpack New Design",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35233160621761656,
+      "retail_price_minor": 8299
+    },
+    {
+      "id": "1776520631639609344",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Sprinkler Outdoor Water Spray Toy Garden Water Toys Summer Yard Cartoon Splash Sprinkler Baby Bath Toy For Kids",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4531054606085869,
+      "retail_price_minor": 2399
+    },
+    {
+      "id": "1368832521093124096",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Car Cleaning Brush Ice Scraper Detachable Snow Shovel Brush Dust Remove Brush Auto Windshield Extendable Snow Brush Foam Handle",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45541539799913006,
+      "retail_price_minor": 2299
+    },
+    {
+      "id": "1785950682676211712",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "4 Layers Slow Feeder Puzzle Dog Bowls Assemble Slow Eating Bowl For Dogs Non-slip Interactive Dog Puzzle Game Slow Bowl Pet Products",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4579354251932697,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "1400751666202021888",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Hooded Travel Pillow H Shaped Inflatable Neck Pillow Folding Lightweight Nap Car Seat Office Airplane Sleeping Cushion Pillows",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.451935624184428,
+      "retail_price_minor": 2299
+    },
+    {
+      "id": "3F8F4862-6CFA-4947-9CE7-EA1936C96840",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Dog Cooling Mat Cooling Pad For Pets Chilly Pad For Kennels, Crates, Cars, Indoor & Outdoor Ice Silk Mat Cooling Blanket Cushion Non-Toxic Breathable Sleep Bed Beach",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4621008080030781,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "1524212426772852736",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Double-sided Silk Eye Mask Pillowcase Hair Tie Four-piece Set",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Fashion listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.4665757162346521,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2506240929441620200",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Small Stand Collar Loose Plus Size Small Woolen Easy Matching Coat",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.3502582701395758,
+      "retail_price_minor": 9099
+    },
+    {
+      "id": "1357659198464331776",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Easter Kids DIY Felt Bunny Pendants Toy with Detachable Alphabet Easter Ornament Kids Easter Gift for Home Door Wall Decoration",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.45475216007276037,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2501170602361619800",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Men's And Women's Kids' Sweater Loose Long Sleeve",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.461118690313779,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "5BC022FA-17CB-4C5A-8188-AFB724694036",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Kitchen cutter chopper",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.351486524034454,
+      "retail_price_minor": 3599
+    },
+    {
+      "id": "396F0F7F-D016-43BA-9763-A7B894778628",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Forged Small Kitchen  Boning Knife",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.36529837875129356,
+      "retail_price_minor": 2899
+    },
+    {
+      "id": "1782621495156547584",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Cat Interactive Toy Funny Tumbler Toy Kitten Exercise Catching Leaky Food Ball Teaser Feather Wand Toys For Cat Accessories Pet Products",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.36598582742809505,
+      "retail_price_minor": 2399
+    },
+    {
+      "id": "2505130610351622700",
+      "source": "expansion",
+      "department": "CAR",
+      "source_title": "Touch Car Solar Strobe Light Multi-mode",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35834470213733516,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "2406130922041616000",
+      "source": "expansion",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Peach Cleansing Water Eyes And Lips Gentle Cleaning Press Makeup Remover",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.3530637765735723,
+      "retail_price_minor": 2399
+    },
+    {
+      "id": "2501080655431624400",
+      "source": "expansion",
+      "department": "GARDEN & OUTDOOR",
+      "source_title": "Portable Garden Labor-saving Garden Scissors Tools",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.3542519326966803,
+      "retail_price_minor": 2199
+    },
+    {
+      "id": "1761573015550169088",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Kitchen Multi-function Bottle Opener Kitchen Auxiliary Scissors",
+      "reasons": [
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "proposed_corrections": [],
+      "margin": 0.35279399499582986,
+      "retail_price_minor": 1199
+    }
+  ]
+}

@@ -15,18 +15,23 @@ import {
   cartMediaDisplayUrl,
   multiSellerCheckoutNotice,
 } from "../../../lib/store/cartCheckoutPresentation";
+import type { AppLocale } from "../../../lib/i18n/locales";
+import { estimateEarnablePointsFromRetail } from "../../../lib/store/umPointsPurchaseRewards";
 import { APP_ROUTES } from "../../lib/nav";
 import StoreEmptyState from "./StoreEmptyState";
 import StoreErrorState from "./StoreErrorState";
+import StoreUmPointsCartEstimate from "./StoreUmPointsCartEstimate";
 
 type CartViewProps = {
   initialSummary: CartSummary;
+  locale?: AppLocale;
   purchasesAvailable?: boolean;
   purchasesUnavailableMessage?: string | null;
 };
 
 export default function CartView({
   initialSummary,
+  locale = "en",
   purchasesAvailable = true,
   purchasesUnavailableMessage = null,
 }: CartViewProps) {
@@ -133,6 +138,10 @@ export default function CartView({
   }
 
   const currency = summary.currency ?? "USD";
+  const estimatedPoints = estimateEarnablePointsFromRetail({
+    amountMinor: summary.subtotalMinor,
+    currency,
+  });
   const proceed = canProceedFromCart(summary);
   const multiNotice = multiSellerCheckoutNotice(summary.groups.length);
 
@@ -180,7 +189,7 @@ export default function CartView({
             </div>
             <p className="mt-1 text-xs text-[var(--sf-faint)]">
               Seller subtotal{" "}
-              {formatMinorUnits(group.storeSubtotalMinor, currency)} · fulfilled
+              {formatMinorUnits(group.storeSubtotalMinor, currency, locale)} · fulfilled
               separately
             </p>
 
@@ -217,14 +226,15 @@ export default function CartView({
                         </p>
                         <div className="mt-2 flex flex-wrap items-baseline gap-2">
                           <p className="text-sm font-semibold text-[var(--sf-accent-strong)]">
-                            {formatMinorUnits(item.unitPriceMinor, item.currency)}
+                            {formatMinorUnits(item.unitPriceMinor, item.currency, locale)}
                           </p>
                           {item.priceChanged && item.liveUnitPriceMinor != null ? (
                             <p className="text-xs text-[var(--sf-danger)]">
                               Live price now{" "}
                               {formatMinorUnits(
                                 item.liveUnitPriceMinor,
-                                item.currency
+                                item.currency,
+                                locale
                               )}
                             </p>
                           ) : null}
@@ -312,7 +322,7 @@ export default function CartView({
                         </button>
                         <p className="text-xs text-[var(--sf-faint)]">
                           Line{" "}
-                          {formatMinorUnits(item.lineTotalMinor, item.currency)}
+                          {formatMinorUnits(item.lineTotalMinor, item.currency, locale)}
                         </p>
                       </div>
                     </div>
@@ -347,9 +357,18 @@ export default function CartView({
           <div className="flex justify-between gap-3 border-t border-[var(--sf-line)] pt-3">
             <dt className="text-[var(--sf-faint)]">Item subtotal</dt>
             <dd className="text-lg font-semibold text-[var(--sf-accent-strong)]">
-              {formatMinorUnits(summary.subtotalMinor, currency)}
+              {formatMinorUnits(summary.subtotalMinor, currency, locale)}
             </dd>
           </div>
+          {estimatedPoints != null ? (
+            <div className="pt-3">
+              <StoreUmPointsCartEstimate
+                locale={locale}
+                points={estimatedPoints}
+                compact
+              />
+            </div>
+          ) : null}
           <div className="flex justify-between gap-3 text-xs">
             <dt className="text-[var(--sf-faint)]">Discount</dt>
             <dd className="text-[var(--sf-faint)]">Calculated at checkout</dd>

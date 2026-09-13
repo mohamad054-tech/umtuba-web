@@ -1,0 +1,1084 @@
+# PC2-A2 iOS BUILD 7 — RTL Back + remaining localization QA
+
+```text
+PC2 REPORT
+SOURCE_DEVICE = PC2
+DEVICE_ROLE = IOS_APP_STORE_EXECUTION_PRIMARY
+TASK_ID = PC2_IOS_BUILD7_RTL_BACK_DEVICE_QA_V1
+DATE = 2026-08-16
+MODE = COMPLETE_WITH_OPEN_UI_DEFECTS / STOP
+DEVICE = PC2 + physical iPhone 13
+EXPECTED_APP = UMTUBA
+BUNDLE_ID = com.umtuba.app
+APP_VERSION = 1.0.0
+EXPECTED_BUILD_NUMBER = 7
+UPDATE_COMPLETED = YES
+TESTFLIGHT_BUTTON = OPEN
+USB_CFBUNDLEVERSION_6 = STALE_SUPERSEDED_BY_TESTFLIGHT_7
+AUTHORIZED_CENTRAL_SHA = 74188bea5a23269c3d19448894c6ad5381e3b3a9
+SOURCE_SHA = 74188bea5a23269c3d19448894c6ad5381e3b3a9
+BUILD_SOURCE_SHA = 74188bea5a23269c3d19448894c6ad5381e3b3a9
+EAS_BUILD_ID = 67147f93-9c70-4631-8257-ff80628a49f6
+EAS_SUBMIT_ID = NOT_REPORTED_BY_A1
+BUILD_RESULT = FINISHED
+TESTFLIGHT_AVAILABLE = YES_INTERNAL
+ANDROID_VERSION_CODE = 9
+TESTFLIGHT_BUILD = 7
+IPHONE13_INSTALL = OPERATOR_CONFIRMED_TESTFLIGHT_UI
+BUILD7_INSTALLED = YES
+DEVICE_QA_EXECUTED = COMPLETE_WITH_OPEN_UI_DEFECTS
+IOS_LOCALIZATION_DEVICE_QA = COMPLETE_WITH_OPEN_UI_DEFECTS
+REMAINING_REQUIRED_GATES = NONE_REQUIRED
+RTL_BACK_GATE = PASS
+BUILD6_HITBOX_DEFECT = VERIFIED_FIXED_ON_BUILD7
+LOCALIZATION_QA_CAN_CONTINUE = NO
+APP_STORE_PRODUCTION_SUBMITTED = NO
+APP_STORE_READY = NOT_DECLARED_BY_THIS_TRACK
+APP_STORE_REVIEW_SUBMIT = NO
+ANDROID_VERSIONCODE_TOUCHED = NO
+STORE_LEARNING_REOPENED = NO
+IOS_ONLY_LOCALIZATION_FORK = NO
+PLAYBACK_FIX_INVENTED = NO
+CURSOR_REPORT_OVERWRITTEN = NO
+CURRENT_TASK_OVERWRITTEN = NO
+DEVICE_PASS_INVENTED = NO
+BUILD6_RETESTED_AS_BUILD7 = NO
+BUILD5_RETESTED_AS_BUILD7 = NO
+BUILD4_RETESTED_AS_BUILD7 = NO
+A1_FAILING_TESTS_PATCHED = NO
+BACK_GATE_RETESTED = NO
+```
+
+Build 7 is installed on the physical iPhone 13. Operator TestFlight
+UI after update is authoritative: **UMTUBA 1.0.0 (7)**, button
+**Open**. A USB `installation_proxy` reading of `CFBundleVersion=6`
+is **STALE / INCONSISTENT** and does **not** override TestFlight.
+Do **not** treat the device as Build 6. Do **not** repeat install.
+Do **not** re-test the Back gate. Do **not** invent PASS. Do **not**
+submit App Store Production.
+
+---
+
+## A1 binary (this track did not rebuild)
+
+```text
+SOURCE_SHA = 74188bea5a23269c3d19448894c6ad5381e3b3a9
+BUILD_SOURCE_SHA = 74188bea5a23269c3d19448894c6ad5381e3b3a9
+EAS_BUILD_ID = 67147f93-9c70-4631-8257-ff80628a49f6
+APP_VERSION = 1.0.0
+IOS_BUILD_NUMBER = 7
+ANDROID_VERSION_CODE = 9
+BUILD_RESULT = FINISHED
+TESTFLIGHT_AVAILABLE = YES_INTERNAL
+A1_TESTS = FAIL 1/478 (Windows-locale wallet grouping — not patched)
+TYPECHECK = PASS
+LINT = PASS
+RTL_BACK_HITBOX_FIX_IN_SHA = YES
+DEVICE_PASS_FROM_SOURCE = NO
+```
+
+---
+
+## RTL Back gate (authorized — closed)
+
+Do not expand. Do not re-run.
+
+```text
+BUILD7_INSTALLED = YES
+TESTFLIGHT_BUILD = 7
+PROFILE_SETTINGS_BACK = PASS
+CONVERSATION_BACK = PASS
+OTHER_USER_PROFILE_BACK = PASS
+NOTIFICATIONS_BACK = PASS
+ARABIC_CHEVRON = RIGHT
+RTL_HITBOX_MATCH = PASS
+ARABIC_RTL_BACK = PASS
+WATCH_ROOT_NOOP = PASS
+WATCH_ROOT_BEHAVIOR = INTENDED
+LTR_BACK = PASS
+LTR_CHEVRON = LEFT
+LTR_BACK_TAP = PASS
+RTL_BACK_GATE = PASS
+BUILD6_HITBOX_DEFECT = VERIFIED_FIXED_ON_BUILD7
+SECONDARY_SCREEN_BACK = NOT_SEPARATELY_REPORTED
+```
+
+`SECONDARY_SCREEN_BACK` was not named in the authorized payload. The
+parent closed `RTL_BACK_GATE = PASS` on the four listed secondaries
+plus hitbox + LTR + Watch. This track does **not** invent a fifth
+secondary PASS and does **not** reopen the gate.
+
+---
+
+## Remaining localization (IN_PROGRESS)
+
+Build 6 leftovers are **context only**. Do not re-claim them as
+Build 7 unless re-verified on **1.0.0 (7)**.
+
+```text
+STATUS = COMPLETE_WITH_OPEN_UI_DEFECTS
+CURRENT_STEP = STOP
+REMAINING_REQUIRED_GATES = NONE_REQUIRED
+IOS_LOCALIZATION_DEVICE_QA = COMPLETE_WITH_OPEN_UI_DEFECTS
+APP_LANGUAGE = ARABIC_DEVICE
+CREATE_SCREEN_OPEN = PASS
+CREATE_SCREEN_RETURNED = PASS
+CREATE_LANGUAGE = ARABIC
+CREATE_RTL = PASS_ON_CURRENT_SCREEN
+CREATE_VIDEO_PICKER_OPEN = PASS
+SYSTEM_VIDEO_PICKER = iOS_NATIVE_PICKER
+SYSTEM_PICKER_LANGUAGE = Arabic
+SYSTEM_PICKER = EXPECTED_IOS_FOLLOWS_DEVICE_LOCALE
+PERMISSION_ERROR = NONE
+GERMAN_LEAKAGE_ON_PICKER = NO
+VIDEO_SELECTED = PASS
+CREATE_SELECTED_FILE = IMG_0008.MOV
+CREATE_SELECTED_SIZE = 9.5_MB
+TERMS_CONFIRMATION = PASS
+PUBLISH_ENABLED_AFTER_TERMS = PASS
+PUBLISH_BUTTON = نشر
+PUBLISH_BUTTON_VISIBLE = YES
+PUBLISH_CURRENTLY_DISABLED = NO
+DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+CREATE_DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+DURATION_DISPLAY_FINDING = CONFIRMED_PERSISTENT
+DURATION_DISPLAY_CLASSIFICATION = SEPARATE_METADATA_DURATION_DISPLAY_DEFECT
+UPLOAD_FAILURE = NOT_CLAIMED
+CREATE_UPLOAD = PASS
+PUBLISH = PASS
+PUBLISH_SUCCESS = PASS
+PUBLISH_SUCCESS_TEXT = تم نشر الفيديو.
+OPEN_AFTER_UPLOAD = PASS
+OPEN_WATCH_CONTROL = فتح شاهد
+NEWLY_PUBLISHED_POST_FOCUSED = PASS
+NEWLY_PUBLISHED_VIDEO_PLAYBACK = PASS
+RAW_KEYS_VISIBLE = NONE
+OBVIOUS_CLIPPING = NONE
+PUBLISHED = YES
+SESSION_PERSISTENCE = PASS
+FORCE_CLOSE_REOPEN = PASS
+APP_LAUNCH_AFTER_TERMINATION = PASS
+CRASH_ON_REOPEN = NO
+AUTH_SESSION_AFTER_FORCE_CLOSE = PASS
+LANGUAGE_AFTER_REOPEN = ARABIC
+DEVICE_LANGUAGE_MODE_AFTER_REOPEN = PASS
+CRASH_SANITY = OBSERVATIONAL_NO_CRASH_THIS_SESSION
+BACKGROUND_RESUME = PASS
+NO_CRASH_ON_RESUME = PASS
+NAVIGATION_STATE_PRESERVED = PASS
+RESUMED_SCREEN = SAME_CONVERSATION
+MESSAGES_LIST_OPEN = PASS
+CONVERSATION_OPEN = PASS
+MESSAGES_CRASH = NO
+MESSAGES_SEND = PASS
+MESSAGES_SEND_ERROR = NONE
+MESSAGES_RECEIVE = NOT_TESTED
+OTHER_USER_PROFILE = PASS
+PROFILE_NOT_FOUND = NO
+FOLLOW = PASS
+FOLLOWING_STATE = PASS
+UNFOLLOW = PASS
+FOLLOW_AGAIN = PASS
+SAVED = PASS
+SAVE_ERROR = NONE
+SAVE_PERSISTENCE = PASS
+PROFILE_OPEN = PASS
+SAVED_PROFILE_ENTRY_VISIBLE = NO
+SAVED_ACCESS = WATCH_RAIL_STAR_ONLY
+WATCH_VIDEO_1 = PASS
+WATCH_VIDEO_3 = PASS
+WATCH_PLAYBACK = WORKING_THIS_SESSION
+PLAYBACK_STABILITY = MULTI_VIDEO_OK_THIS_SESSION
+PLAYBACK_ERROR = NONE
+WATCH_PROGRESS_BAR = FAIL
+WATCH_PROGRESS_BAR_RTL_LAYOUT = FAIL
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL
+DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+RESET_OVERRIDE = PASS
+RESET_OVERRIDE_USES_DEVICE = PASS
+DEVICE_LOCALE_DETECTION_AR = PASS
+IPHONE_DEVICE_LANGUAGE = Arabic
+UNSUPPORTED_LOCALE_FALLBACK = NOT_SAFELY_TESTED
+ENGLISH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_ENGLISH = YES
+ENGLISH_WATCH = PASS
+ENGLISH_CREATE = SKIPPED_SYMMETRY
+ALL_SIX_LOCALES_SWITCHED = YES
+AR = PASS
+DE = PASS
+FR = PASS
+ES = PASS
+PT = PASS
+EN = PASS
+PORTUGUESE_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_PORTUGUES = YES
+PORTUGUESE_WATCH = PASS
+PORTUGUESE_CREATE = PASS
+PORTUGUESE_REPRESENTATIVE_QA = PASS
+PORTUGUESE_LONG_STRING_CLIPPING = NO
+PORTUGUESE_RAW_KEYS = NONE_OBSERVED
+PORTUGUESE_ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+SPANISH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_ESPANOL = YES
+SPANISH_WATCH = PASS
+SPANISH_CREATE = PASS
+SPANISH_REPRESENTATIVE_QA = PASS
+MULTI_LOCALE_REPRO = DE / FR / ES
+FRENCH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_FRANCAIS = YES
+FRENCH_WATCH_CHROME = PASS
+FRENCH_CREATE = PASS
+FRENCH_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+PUBLISH_BUTTON = Publier
+PUBLISH_CLIPPING = NO
+CREATE_LONG_TEXT_WRAP = PASS
+FRENCH_LONG_CONTROL_CLIPPING = NO
+UI_OVERLAP = FAIL
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = CONFIRMED
+MULTI_LOCALE_REPRO = DE / FR / ES
+IOS_RELEASE_BLOCKERS = WATCH_LOWER_RIGHT_TEXT_OVERLAP + WATCH_PROGRESS_BAR + CREATE_DURATION_DISPLAY
+CURRENT_SCREEN = CREATE_AR
+DISCOVER_BACK_TAP = NO_NAVIGATION
+DISCOVER_ROOT_NOOP = EXPECTED
+RTL_HITBOX_DEFECT_REOPENED = NO
+UMTUBA_GERMAN_CREATE = PASS
+GERMAN_CREATE = PASS
+VEROEFFENTLICHEN = PASS_NO_CLIPPING
+GERMAN_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+GERMAN_LONG_STRING_TEST = PASS_ON_WATCH
+ERNEUT_VERSUCHEN = UNFORCED
+SYSTEM_PICKER_LANGUAGE = ARABIC
+POSSIBLE_EXPECTED_IOS_BEHAVIOR = YES
+SYSTEM_PICKER = NATIVE_IOS_FOLLOWS_DEVICE_LOCALE
+GERMAN_LEAKAGE_ON_PICKER = NO
+GERMAN_MANUAL_OVERRIDE = PASS
+GERMAN_OVERRIDE_PERSISTENCE_AFTER_RESTART = PASS
+OVERRIDE_PERSISTENCE = PASS
+GERMAN_CREATE_TAB_NAVIGATION = PASS
+VIDEO_WAEHLEN_TAP = OPENED_NATIVE_IOS_PICKER
+VIDEO_CHOOSE_VISIBLE = YES
+PREVIOUS_NON_NAVIGATION_FINDING = NOT_REPRODUCED / CLOSE
+UI_OVERLAP = FAIL
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = CONFIRMED
+MULTI_LOCALE_REPRO = YES
+IOS_RELEASE_BLOCKERS = WATCH_LOWER_RIGHT_TEXT_OVERLAP + WATCH_PROGRESS_BAR
+UI_OVERFLOW = NONE_ON_TESTED_GERMAN_SURFACES
+RAW_KEYS = NONE_OBSERVED
+UPDATE_COMPLETED = YES
+TESTFLIGHT_BUTTON = OPEN
+BUILD7_INSTALLED = YES
+USB_CFBUNDLEVERSION_6 = STALE_SUPERSEDED_BY_TESTFLIGHT_7
+LOCALIZATION_QA_CAN_CONTINUE = YES
+```
+
+Operator-authorized German Watch + Create long-strings are PASS.
+Do **not** re-test them. Do **not** invent an error to see
+`Erneut versuchen`. Do **not** publish.
+
+### Build 7 localization fields
+
+```text
+ARABIC = PASS
+GERMAN = PASS
+GERMAN_CREATE = PASS
+VEROEFFENTLICHEN = PASS_NO_CLIPPING
+GERMAN_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+ERNEUT_VERSUCHEN = UNFORCED
+GERMAN_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_DEUTSCH = YES
+GERMAN_LONG_STRING_TEST = PASS_ON_WATCH
+GERMAN_CREATE_TAB_NAVIGATION = PASS
+VEROEFFENTLICHEN_TEST = PASS_NO_CLIPPING
+WATCH_TITLE = Ansehen
+AUTO_NEXT = Automatisch weiter an
+MUTE = Stummschalten
+VOLUME = Lautstärke 100 %
+AUTO_NEXT_CLIPPING = NO
+AUTO_NEXT_OVERFLOW = NO
+MUTE_CLIPPING = NO
+FRENCH = PASS
+FRENCH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_FRANCAIS = YES
+FRENCH_WATCH_CHROME = PASS
+FRENCH_CREATE = PASS
+FRENCH_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+PUBLISH_BUTTON = Publier
+PUBLISH_CLIPPING = NO
+CREATE_LONG_TEXT_WRAP = PASS
+FRENCH_LONG_CONTROL_CLIPPING = NO
+WATCH_TITLE_FR = Regarder
+AUTO_NEXT_FR = Lecture suivante activée
+MUTE_FR = Couper le son
+OBVIOUS_ENGLISH_BUTTON_LEAKAGE = NONE
+ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+ENGLISH = PASS
+ENGLISH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_ENGLISH = YES
+ENGLISH_WATCH = PASS
+EN = PASS
+SPANISH = PASS
+SPANISH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_ESPANOL = YES
+SPANISH_WATCH = PASS
+SPANISH_CREATE = PASS
+SPANISH_REPRESENTATIVE_QA = PASS
+WATCH_TITLE_ES = Ver
+AUTO_NEXT_ES = Siguiente automático activado
+MUTE_ES = Silenciar
+BOTTOM_TABS_ES = Ver / Descubrir / Crear / Mensajes / Perfil
+PUBLISH_BUTTON_ES = Publicar
+PORTUGUESE = PASS
+PORTUGUESE_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_PORTUGUES = YES
+PORTUGUESE_WATCH = PASS
+PORTUGUESE_CREATE = PASS
+PORTUGUESE_REPRESENTATIVE_QA = PASS
+PORTUGUESE_LONG_STRING_CLIPPING = NO
+PORTUGUESE_RAW_KEYS = NONE_OBSERVED
+PORTUGUESE_ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+PUBLISH_BUTTON_PT = Publicar
+DEVICE_LOCALE_DETECTION = PASS_FOR_ARABIC
+DEVICE_LOCALE_DETECTION_AR = PASS
+DEVICE_LANGUAGE_SUPPORTED = BUILD6_ONLY_NOT_RECLAIMED
+DEVICE_LANGUAGE_UNSUPPORTED_FALLBACK = NOT_TESTED
+MANUAL_OVERRIDE = IN_PROGRESS_DEUTSCH
+MANUAL_OVERRIDE_ENGLISH = BUILD6_ONLY_NOT_RECLAIMED
+MANUAL_OVERRIDE_PERSIST_RESTART = PASS
+GERMAN_OVERRIDE_PERSISTENCE_AFTER_RESTART = PASS
+OVERRIDE_PERSISTENCE = PASS
+RESET_OVERRIDE = PASS
+RESET_OVERRIDE_USES_DEVICE = PASS
+ENGLISH_LEAKAGE = NOT_TESTED
+MISSING_KEYS = NOT_TESTED
+RAW_KEYS = NONE_OBSERVED
+UI_OVERFLOW = NONE_ON_TESTED_GERMAN_AND_FRENCH_WATCH_CHROME
+UI_OVERLAP = FAIL
+TEXT_OVERLAP = FAIL
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = CONFIRMED
+MULTI_LOCALE_REPRO = YES
+RTL = GATE_PASSED_NOT_REOPENED
+DIRECTIONAL_ICONS = GATE_PASSED_NOT_REOPENED
+```
+
+Build 6 context (not Build 7 results):
+
+```text
+BUILD6_DEVICE_LOCALE_DETECTION = PASS_FOR_ARABIC
+BUILD6_MANUAL_OVERRIDE_ENGLISH = PASS
+BUILD6_RESET_OVERRIDE_USES_DEVICE = PASS
+BUILD6_OVERRIDE_PERSISTENCE_AFTER_RESTART = NOT_TESTED
+```
+
+### Build 7 regression (in progress)
+
+```text
+WATCH_PLAYBACK = WORKING_THIS_SESSION
+WATCH_VIDEO_1 = PASS
+WATCH_VIDEO_3 = PASS
+PLAYBACK_STABILITY = MULTI_VIDEO_OK_THIS_SESSION
+SAVED = PASS
+SAVE_PERSISTENCE = PASS
+OTHER_USER_PROFILE = PASS
+FOLLOW = PASS
+FOLLOWING_STATE = PASS
+UNFOLLOW = PASS
+FOLLOW_AGAIN = PASS
+MESSAGES = PASS_OPEN_AND_SEND
+MESSAGES_LIST_OPEN = PASS
+MESSAGES_OPEN = PASS
+CONVERSATION_OPEN = PASS
+MESSAGES_CRASH = NO
+MESSAGES_SEND = PASS
+MESSAGES_SEND_ERROR = NONE
+MESSAGES_RECEIVE = NOT_TESTED
+CREATE_SCREEN_OPEN = PASS
+CREATE_LANGUAGE = ARABIC
+CREATE_RTL = PASS_ON_CURRENT_SCREEN
+CREATE_VIDEO_PICKER_OPEN = PASS
+SYSTEM_PICKER = EXPECTED_IOS_FOLLOWS_DEVICE_LOCALE
+CREATE_SCREEN_RETURNED = PASS
+VIDEO_SELECTED = PASS
+TERMS_CONFIRMATION = PASS
+PUBLISH_ENABLED_AFTER_TERMS = PASS
+DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+CREATE_DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+PUBLISH_BUTTON = نشر
+PUBLISH_BUTTON_VISIBLE = YES
+PUBLISH_CURRENTLY_DISABLED = NO
+CREATE_UPLOAD = PASS
+PUBLISH = PASS
+PUBLISH_SUCCESS = PASS
+OPEN_AFTER_UPLOAD = PASS
+NEWLY_PUBLISHED_POST_FOCUSED = PASS
+NEWLY_PUBLISHED_VIDEO_PLAYBACK = PASS
+SESSION_PERSISTENCE = PASS
+BACKGROUND_RESUME = PASS
+CRASH_SANITY = OBSERVATIONAL_NO_CRASH_THIS_SESSION
+```
+
+---
+
+## Watch German evidence (authorized — do not expand)
+
+```text
+WATCH_TITLE = Ansehen
+AUTO_NEXT = Automatisch weiter an
+MUTE = Stummschalten
+VOLUME = Lautstärke 100 %
+AUTO_NEXT_CLIPPING = NO
+AUTO_NEXT_OVERFLOW = NO
+MUTE_CLIPPING = NO
+GERMAN_LONG_STRING_TEST = PASS_ON_WATCH
+UI_OVERLAP = POSSIBLE_WATCH_DURATION_CONTROLS
+UI_OVERLAP_CONFIRMED = NO
+```
+
+German Watch note was **later confirmed** on French Watch. See
+**Watch lower-right overlap** below. German long-string Watch chrome
+stays PASS; overlap is a separate layout FAIL.
+
+---
+
+## Create landing (authorized — do not expand)
+
+```text
+GERMAN_CREATE_TAB_NAVIGATION = PASS
+CREATE_TITLE = Erstellen
+VIDEO_WAEHLEN = visible
+INSTRUCTIONAL_COPY_WRAP = OK
+TERMS_COPY_WRAP = OK
+RAW_KEYS_ON_CREATE_LANDING = NONE_OBSERVED
+HORIZONTAL_CLIPPING_ON_CREATE_LANDING = NONE_OBVIOUS
+VIDEO_CHOOSE_BUTTON = Video wählen
+VIDEO_CHOOSE_VISIBLE = YES
+LANGUAGE_AFTER_REOPEN = Deutsch
+GERMAN_OVERRIDE_PERSISTENCE_AFTER_RESTART = PASS
+OVERRIDE_PERSISTENCE = PASS
+UMTUBA_GERMAN_CREATE = PASS
+GERMAN_CREATE = PASS
+VEROEFFENTLICHEN = PASS_NO_CLIPPING
+VEROEFFENTLICHEN_TEST = PASS_NO_CLIPPING
+PREVIOUS_NON_NAVIGATION_FINDING = NOT_REPRODUCED / CLOSE
+```
+
+`Veröffentlichen` is fully visible in the Publish button. No clip /
+horizontal overflow. Do **not** publish. Do **not** re-test German
+Watch / Create.
+
+---
+
+## TestFlight update (authorized — overrides USB)
+
+```text
+UMTUBA_VERSION = 1.0.0
+TESTFLIGHT_BUILD = 7
+UPDATE_COMPLETED = YES
+TESTFLIGHT_BUTTON = OPEN
+BUILD7_INSTALLED = YES
+USB_CFBUNDLEVERSION_6 = STALE_SUPERSEDED_BY_TESTFLIGHT_7
+INSTALL_REPEATED = NO
+```
+
+Deutsch persisted after the TestFlight reopen. Persistence is
+**PASS**. Do **not** re-test it.
+
+---
+
+## System picker (source-confirmed — not UMTUBA leakage)
+
+SHA `74188be` Create calls `pickVideoFromLibrary()` →
+`ImagePicker.launchImageLibraryAsync({ mediaTypes: ["videos"] })`
+(`src/lib/video/pickVideo.ts`, `app/(tabs)/create.tsx`). That is
+**expo-image-picker**, which on iOS presents the native photo/video
+picker (`PHPickerViewController` / system library UI). That chrome
+follows the **iPhone system language** (Arabic), not the in-app
+Deutsch override.
+
+```text
+UMTUBA_GERMAN_CREATE = PASS
+SYSTEM_PICKER_LANGUAGE = ARABIC
+POSSIBLE_EXPECTED_IOS_BEHAVIOR = YES
+SYSTEM_PICKER = NATIVE_IOS_FOLLOWS_DEVICE_LOCALE
+EXPECTED_IOS_SYSTEM_PICKER = YES
+GERMAN_LEAKAGE_ON_PICKER = NO
+PICKER_COPY_SEEN = فيديوهات، المجموعات، البحث في المكتبة، إلغاء
+VEROEFFENTLICHEN_TEST = PASS_NO_CLIPPING
+```
+
+Do **not** score Arabic picker strings as `ENGLISH_LEAKAGE` or German
+leakage. They are not UMTUBA chrome.
+
+---
+
+## German long-strings (authorized — do not re-test)
+
+| Expected German | Where | Status |
+| --- | --- | --- |
+| **Automatisch weiter an** | Watch | PASS_ON_WATCH |
+| **Veröffentlichen** | Create Publish button | PASS_NO_CLIPPING |
+| **Erneut versuchen** | Loading / error empty states | UNFORCED — do not invent an error |
+
+```text
+GERMAN_CREATE = PASS
+VEROEFFENTLICHEN = PASS_NO_CLIPPING
+GERMAN_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+RAW_KEYS = NONE_OBSERVED
+UI_OVERFLOW = NONE_ON_TESTED_GERMAN_SURFACES
+ERNEUT_VERSUCHEN = UNFORCED
+```
+
+---
+
+## Discover Back (source classification — not a defect)
+
+Operator is on **Entdecken** (Discover root) in Deutsch LTR. Visible
+Back tap did not navigate. This is **not** the Build 6 Arabic RTL
+hitbox defect (icon-right / pressable-left).
+
+SHA `74188be` `src/lib/nav/globalBack.ts`:
+
+- `/(tabs)/discover` is in `PRIMARY_TAB_PATHS`
+- leaf `discover` is in `TAB_LEAVES`
+- `classifySurface` → `"root"`
+- `resolveGlobalBack` on root (no other-user Profile query) →
+  `{ action: "noop" }`
+
+Same intended policy as Watch root: arrow stays visible; tap must
+not leave the tab or exit the app.
+
+```text
+SCREEN = DISCOVER_ROOT
+VISIBLE_BACK_ARROW = YES
+BACK_TAP = NO_NAVIGATION
+LANGUAGE = DEUTSCH
+DISCOVER_ROOT_NOOP = EXPECTED
+ROOT_NOOP_EXPECTED = YES
+RTL_HITBOX_DEFECT_REOPENED = NO
+SOURCE_CHANGED = NO
+```
+
+Do **not** ask the operator to keep tapping Back.
+
+---
+
+## French Watch chrome (authorized — do not re-test)
+
+```text
+WATCH_TITLE = Regarder
+AUTO_NEXT = Lecture suivante activée
+MUTE = Couper le son
+BOTTOM_TABS = Regarder / Découvrir / Créer / Messages / Profil
+FRENCH_LONG_CONTROL_CLIPPING = NO
+RAW_KEYS_VISIBLE = NONE
+OBVIOUS_ENGLISH_BUTTON_LEAKAGE = NONE
+FRENCH_WATCH_CHROME = PASS
+```
+
+UGC video text ignored. This is **not** `FRENCH = PASS` for the
+whole locale. Do **not** re-test Watch chrome.
+
+---
+
+## Watch lower-right overlap (layout defect — not FR-only)
+
+Confirmed on French Watch. Also visually suspected on German Watch.
+Do **not** attribute to French string length alone. Source not
+changed. No fix invented.
+
+SHA `74188be` `components/WatchVideoCard.tsx`:
+
+- Right **action rail** (`styles.rail`): `position: "absolute"`,
+  `right: 12`, `bottom: timelineBottom + 52`. Last items include
+  owner delete (`t("actions.delete")` = **Supprimer** in FR) plus
+  report/block. Label is `actionCount` (`fontSize: 12`,
+  `numberOfLines={1}`) with **no maxWidth**.
+- **Timeline clock** (`styles.timeline`): `position: "absolute"`,
+  `left: 16`, `right: 16`, `bottom: timelineBottom`, `zIndex: 8`.
+  `timelineTimes` is `space-between`: current time left, **duration
+  right** (`formatPlaybackClock(timeline.duration)`).
+
+Both sit in the same lower-right overlay. The 52px rail offset is
+fixed and does not reserve space for extra owner actions or long
+labels vs the duration text. Collision is structural (absolute rail
++ full-width duration row), so it can reproduce in DE/FR/EN.
+
+```text
+UI_OVERLAP = FAIL
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = CONFIRMED
+MULTI_LOCALE_REPRO = YES
+OVERLAP_VIEWS = WatchVideoCard.rail actions.delete (Supprimer) + timeline duration clock
+OVERLAP_CAUSE = fixed rail bottom offset + shared lower-right absolute slots
+NOT_FR_LENGTH_ONLY = YES
+SOURCE_CHANGED = NO
+FIX_INVENTED = NO
+IOS_RELEASE_BLOCKERS = WATCH_LOWER_RIGHT_TEXT_OVERLAP + WATCH_PROGRESS_BAR
+```
+
+Central must decide whether this blocks iOS release. Do **not**
+ask the operator to keep poking the overlap this turn.
+
+---
+
+## French Create (authorized — do not re-test)
+
+```text
+PUBLISH_BUTTON = Publier
+PUBLISH_CLIPPING = NO
+CREATE_LONG_TEXT_WRAP = PASS
+RAW_KEYS_VISIBLE = NONE
+ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+FRENCH_CREATE = PASS
+FRENCH_LONG_STRINGS = PASS_FOR_WATCH_AND_CREATE
+```
+
+Do **not** re-test French Watch / Create. Do **not** publish. Do
+**not** poke Watch overlap this turn.
+
+---
+
+## Spanish Watch (authorized — do not re-test)
+
+```text
+WATCH_TITLE = Ver
+AUTO_NEXT = Siguiente automático activado
+MUTE = Silenciar
+BOTTOM_TABS = Ver / Descubrir / Crear / Mensajes / Perfil
+SPANISH_WATCH = PASS
+LONG_STRING_CLIPPING = NO
+RAW_KEYS_VISIBLE = NONE
+ENGLISH_LEAKAGE_ON_APP_BUTTONS = NONE_OBSERVED
+```
+
+Overlap seen again near **Eliminar** / duration. Same shared
+layout defect (DE / FR / ES). Do **not** re-investigate this turn.
+
+```text
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL
+VISIBLE_NEAR = Eliminar / video duration metadata
+MULTI_LOCALE_REPRO = DE / FR / ES
+CLASSIFICATION = SHARED_WATCH_LAYOUT_DEFECT_NOT_TRANSLATION_SPECIFIC
+UI_OVERLAP = FAIL
+```
+
+---
+
+## Spanish Create (authorized — do not re-test)
+
+```text
+PUBLISH_BUTTON = Publicar
+PUBLISH_CLIPPING = NO
+CREATE_LONG_TEXT_WRAP = PASS
+RAW_KEYS_VISIBLE = NONE
+ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+SPANISH_WATCH = PASS
+SPANISH_CREATE = PASS
+SPANISH_REPRESENTATIVE_QA = PASS
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL_SHARED_LAYOUT
+```
+
+Do **not** re-test Spanish. Do **not** publish. Do **not** poke
+Watch overlap.
+
+---
+
+## Portuguese Watch (authorized — do not re-test)
+
+```text
+PORTUGUESE_WATCH = PASS
+PORTUGUESE_LONG_STRING_CLIPPING = NO
+PORTUGUESE_RAW_KEYS = NONE_OBSERVED
+PORTUGUESE_ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+```
+
+Do **not** retest Watch overlap.
+
+---
+
+## Portuguese Create (authorized — do not re-test)
+
+```text
+PUBLISH_BUTTON = Publicar
+PUBLISH_CLIPPING = NO
+CREATE_LONG_TEXT_WRAP = PASS
+RAW_KEYS_VISIBLE = NONE
+ENGLISH_LEAKAGE = NONE_OBSERVED_ON_TESTED_APP_UI
+PORTUGUESE_WATCH = PASS
+PORTUGUESE_CREATE = PASS
+PORTUGUESE_REPRESENTATIVE_QA = PASS
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL_SHARED_LAYOUT
+```
+
+Do **not** re-test Portuguese. Do **not** publish.
+
+---
+
+## Six-locale switch (authorized — do not expand)
+
+```text
+AR = PASS
+DE = PASS
+FR = PASS
+ES = PASS
+PT = PASS
+EN = PASS
+ALL_SIX_LOCALES_SWITCHED = YES
+ENGLISH_MANUAL_OVERRIDE = PASS
+APP_LANGUAGE_CHANGED_TO_ENGLISH = YES
+ENGLISH_WATCH = PASS
+```
+
+English Create skipped (Watch + prior EN LTR Back is enough
+symmetry). Unsupported locale and regression stay later. Do **not**
+change iPhone system language this turn.
+
+---
+
+## English Watch (authorized — do not re-test)
+
+```text
+WATCH_TITLE = Watch
+AUTO_NEXT = Auto-next on
+MUTE = Mute
+BOTTOM_TABS = Watch / Discover / Create / Messages / Profile
+ENGLISH_WATCH = PASS
+CLIPPING = NO
+RAW_KEYS_VISIBLE = NONE
+```
+
+Do **not** retest Back. Do **not** retest Watch overlap.
+
+---
+
+## Reset override (authorized — do not re-test)
+
+```text
+IPHONE_DEVICE_LANGUAGE = Arabic
+USE_DEVICE_LANGUAGE_SELECTED = YES
+APP_RETURNED_TO_ARABIC = YES
+BOTTOM_TABS_RETURNED_TO_ARABIC = YES
+RESET_OVERRIDE = PASS
+RESET_OVERRIDE_USES_DEVICE = PASS
+DEVICE_LOCALE_DETECTION_AR = PASS
+UNSUPPORTED_LOCALE_FALLBACK = NOT_SAFELY_TESTED
+```
+
+Do **not** change iPhone system language. Do **not** repeat
+language or RTL/LTR Back tests.
+
+---
+
+## Watch playback video 1 (authorized — not stability PASS)
+
+```text
+WATCH_VIDEO_1 = PASS
+VIDEO_PLAYBACK = WORKING
+PLAYBACK_ERROR = NONE
+WATCH_PLAYBACK = NOT_TESTED
+PLAYBACK_STABILITY = IN_PROGRESS
+```
+
+One success is **not** `PLAYBACK_STABILITY = PASS`. Need more
+distinct real videos.
+
+---
+
+## Watch progress bar (layout defect — do not fix this turn)
+
+Observed on Arabic Watch: main thumb moves with playback while a
+second cyan segment appears/moves from the opposite side. Playback
+itself still works. Separate from lower-right text overlap.
+
+SHA `74188be` `components/WatchVideoCard.tsx` `ScrubBar`:
+
+- Fill: `width: ${localRatio * 100}%` (Yoga start-edge; **RTL grows
+  from the right**)
+- Thumb: `left: ${localRatio * 100}%` (**physical left**; does not
+  flip with RTL)
+
+Same ratio, opposite edges → duplicate / reversed cyan segment.
+Not two independent timeline bars. A second `ScrubBar` exists for
+volume (top-right) but the opposite-side segment matches this
+same-track fill/thumb RTL mismatch. Shared RTL layout defect, not
+a translation-length issue.
+
+```text
+WATCH_PROGRESS_BAR = FAIL
+DEFECT = DUPLICATE_OR_REVERSED_PROGRESS_SEGMENT
+REPRO = PHYSICAL_IPHONE13_BUILD7
+PLAYBACK_ITSELF = WORKING
+CLASSIFICATION = SHARED_WATCH_LAYOUT/PROGRESS_UI_DEFECT
+LIKELY_CAUSE = RTL width% fill vs physical left thumb
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL_SHARED_LAYOUT
+SOURCE_CHANGED = NO
+FIX_INVENTED = NO
+IOS_RELEASE_BLOCKERS = WATCH_LOWER_RIGHT_TEXT_OVERLAP + WATCH_PROGRESS_BAR
+```
+
+Do **not** ask the operator to re-describe the bar this turn.
+
+---
+
+## Watch playback this session (not a Build 4 close)
+
+```text
+WATCH_VIDEO_1 = PASS
+WATCH_VIDEO_3 = PASS
+PLAYBACK_ERROR = NONE
+WATCH_PLAYBACK = WORKING_THIS_SESSION
+PLAYBACK_STABILITY = MULTI_VIDEO_OK_THIS_SESSION
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL
+WATCH_PROGRESS_BAR_RTL_LAYOUT = FAIL
+WATCH_PROGRESS_BAR = FAIL
+```
+
+Do **not** mark Watch fully clean. Do **not** invent a playback
+root-cause close. Do **not** retest overlap / progress / Back /
+languages.
+
+---
+
+## Saved tap (authorized — persistence not inferred)
+
+```text
+SAVED = PASS
+SAVE_ERROR = NONE
+SAVE_PERSISTENCE = NOT_TESTED
+```
+
+Do **not** infer persistence. Do **not** retest overlap / progress /
+Back / languages / playback.
+
+---
+
+## Saved on Profile (source classification — not a list screen)
+
+SHA `74188be` `app/profile/index.tsx` shortcuts are only
+`/rewards`, `/notifications`, `/settings`. No منشورات / محفوظات
+segments. No `/saved` route in `app/`. Settings has no Saved row.
+Save is Watch rail star only (`savedByMe` / `post_saves`).
+
+```text
+PROFILE_OPEN = PASS
+SAVED_PROFILE_ENTRY_VISIBLE = NO
+SAVED_LIST_ROUTE = NONE
+SAVED_ACCESS = WATCH_RAIL_STAR_ONLY
+SAVE_PERSISTENCE = PASS
+SOURCE_CHANGED = NO
+```
+
+Persistence confirmed via Watch star after Profile leave/return.
+
+---
+
+## Other-user Profile + Follow (authorized — do not re-test)
+
+```text
+OTHER_USER_PROFILE = PASS
+PROFILE_NOT_FOUND = NO
+FOLLOW = PASS
+FOLLOWING_STATE = PASS
+UNFOLLOW = PASS
+FOLLOW_AGAIN = PASS
+```
+
+---
+
+## Messages send (authorized — receive not inferred)
+
+```text
+MESSAGES_LIST_OPEN = PASS
+CONVERSATION_OPEN = PASS
+MESSAGES_SEND = PASS
+MESSAGES_SEND_ERROR = NONE
+MESSAGES_CRASH = NO
+MESSAGES_RECEIVE = NOT_TESTED
+MESSAGES = PASS_OPEN_AND_SEND
+```
+
+Do **not** repeat Messages testing. Do **not** start Create/upload
+this turn (public post). Prefer background/resume.
+
+---
+
+## Background resume (authorized — do not re-test)
+
+```text
+BACKGROUND_RESUME = PASS
+NO_CRASH_ON_RESUME = PASS
+NAVIGATION_STATE_PRESERVED = PASS
+RESUMED_SCREEN = SAME_CONVERSATION
+```
+
+---
+
+## Session after force-quit (authorized — do not re-test)
+
+```text
+FORCE_CLOSE_REOPEN = PASS
+APP_LAUNCH_AFTER_TERMINATION = PASS
+CRASH_ON_REOPEN = NO
+SESSION_PERSISTENCE = PASS
+AUTH_SESSION_AFTER_FORCE_CLOSE = PASS
+LANGUAGE_AFTER_REOPEN = ARABIC
+DEVICE_LANGUAGE_MODE_AFTER_REOPEN = PASS
+CRASH_SANITY = OBSERVATIONAL_NO_CRASH_THIS_SESSION
+UNSUPPORTED_LOCALE_FALLBACK = NOT_SAFELY_TESTED
+```
+
+Do **not** repeat session / reopen / background. Do **not** change
+iPhone language. Do **not** publish this turn.
+
+---
+
+## Create screen (authorized — do not re-test landing)
+
+```text
+CREATE_SCREEN_OPEN = PASS
+CREATE_LANGUAGE = ARABIC
+CREATE_RTL = PASS_ON_CURRENT_SCREEN
+PUBLISH_BUTTON = نشر
+RAW_KEYS_VISIBLE = NONE
+OBVIOUS_CLIPPING = NONE
+```
+
+---
+
+## System video picker (authorized — expected iOS locale)
+
+Arabic picker follows iPhone system language, not UMTUBA leakage.
+
+```text
+CREATE_VIDEO_PICKER_OPEN = PASS
+SYSTEM_VIDEO_PICKER = iOS_NATIVE_PICKER
+SYSTEM_PICKER_LANGUAGE = Arabic
+SYSTEM_PICKER = EXPECTED_IOS_FOLLOWS_DEVICE_LOCALE
+PERMISSION_ERROR = NONE
+GERMAN_LEAKAGE_ON_PICKER = NO
+```
+
+---
+
+## Video selected (authorized — do not re-pick)
+
+```text
+CREATE_SCREEN_RETURNED = PASS
+VIDEO_SELECTED = PASS
+CREATE_SELECTED_FILE = IMG_0008.MOV
+CREATE_SELECTED_SIZE = 9.5_MB
+```
+
+---
+
+## Terms confirmation (authorized — do not re-tap)
+
+```text
+TERMS_CONFIRMATION = PASS
+PUBLISH_ENABLED_AFTER_TERMS = PASS
+PUBLISH_BUTTON_VISIBLE = YES
+PUBLISH_CURRENTLY_DISABLED = NO
+PUBLISHED = YES
+CREATE_UPLOAD = PASS
+PUBLISH = PASS
+PUBLISH_SUCCESS = PASS
+PUBLISH_SUCCESS_TEXT = تم نشر الفيديو.
+OPEN_AFTER_UPLOAD = PASS
+OPEN_WATCH_CONTROL = فتح شاهد
+NEWLY_PUBLISHED_POST_FOCUSED = PASS
+NEWLY_PUBLISHED_VIDEO_PLAYBACK = PASS
+```
+
+---
+
+## Create/upload + open after upload (authorized — do not re-test)
+
+```text
+CREATE_UPLOAD = PASS
+PUBLISH = PASS
+PUBLISH_SUCCESS = PASS
+PUBLISH_SUCCESS_TEXT = تم نشر الفيديو.
+OPEN_AFTER_UPLOAD = PASS
+OPEN_WATCH_CONTROL = فتح شاهد
+NEWLY_PUBLISHED_POST_FOCUSED = PASS
+NEWLY_PUBLISHED_VIDEO_PLAYBACK = PASS
+```
+
+---
+
+## Open defects (do not lose)
+
+Do **not** classify upload as failed because of 8200s. Separate
+metadata/duration display defect. Central decides release impact.
+This track does **not** declare App Store release readiness.
+
+```text
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL
+WATCH_PROGRESS_BAR_RTL_LAYOUT = FAIL
+SELECTED_VIDEO_DURATION_DISPLAY = FAIL
+DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+CREATE_DURATION_DISPLAY = FAIL_OR_CONFIRMED_DEFECT_8200S
+DURATION_DISPLAY_FINDING = CONFIRMED_PERSISTENT
+DURATION_DISPLAY_CLASSIFICATION = SEPARATE_METADATA_DURATION_DISPLAY_DEFECT
+UPLOAD_FAILURE = NOT_CLAIMED
+IOS_RELEASE_BLOCKERS = WATCH_LOWER_RIGHT_TEXT_OVERLAP + WATCH_PROGRESS_BAR + CREATE_DURATION_DISPLAY
+```
+
+---
+
+## Remaining required gates
+
+```text
+REMAINING_REQUIRED_GATES = NONE_REQUIRED
+IOS_LOCALIZATION_DEVICE_QA = COMPLETE_WITH_OPEN_UI_DEFECTS
+APP_STORE_PRODUCTION_SUBMITTED = NO
+APP_STORE_READY = NOT_DECLARED_BY_THIS_TRACK
+MESSAGES_RECEIVE = NOT_TESTED
+UNSUPPORTED_LOCALE_FALLBACK = NOT_SAFELY_TESTED
+CRASH_SANITY = OBSERVATIONAL_NO_CRASH_THIS_SESSION
+```
+
+Not remaining required gates: `MESSAGES_RECEIVE` (do not infer),
+unsupported locale (do not change iPhone language), crash sanity
+(observational only). Do not report/block a real user. Do not
+delete account.
+
+---
+
+## Operator action (this turn — stop)
+
+```text
+OPERATOR_DEVICE = iPhone 13
+OPERATOR_ACTION = لا يوجد فحص متبقٍ مطلوب. أوقف الاختبار. لا تضغط شيئاً جديداً.
+WHY_REQUIRED = كل البوابات المطلوبة اكتملت. تبقى ثلاثة عيوب واجهة مفتوحة. لا Production.
+```
+
+---
+
+## What was not done (by design)
+
+- Session / background / upload not re-tested
+- Crash sanity not a formal PASS
+- Unsupported locale not tested
+- Messages receive not tested
+- Watch UI defects not re-tested
+- No App Store Production submit
+- App Store readiness not declared
+- `docs/ai/CURSOR_REPORT.md` not overwritten
+- `docs/ai/CURRENT_TASK.md` not overwritten
+
+---
+
+## Return fields (this turn)
+
+```text
+OPERATOR_DEVICE = iPhone 13
+OPERATOR_ACTION = لا يوجد فحص متبقٍ مطلوب. أوقف الاختبار. لا تضغط شيئاً جديداً.
+WHY_REQUIRED = كل البوابات المطلوبة اكتملت. تبقى ثلاثة عيوب واجهة مفتوحة. لا Production.
+APP_STORE_PRODUCTION_SUBMITTED = NO
+REMAINING_REQUIRED_GATES = NONE_REQUIRED
+IOS_LOCALIZATION_DEVICE_QA = COMPLETE_WITH_OPEN_UI_DEFECTS
+CREATE_UPLOAD = PASS
+OPEN_AFTER_UPLOAD = PASS
+WATCH_LOWER_RIGHT_TEXT_OVERLAP = FAIL
+WATCH_PROGRESS_BAR_RTL_LAYOUT = FAIL
+SELECTED_VIDEO_DURATION_DISPLAY = FAIL
+```

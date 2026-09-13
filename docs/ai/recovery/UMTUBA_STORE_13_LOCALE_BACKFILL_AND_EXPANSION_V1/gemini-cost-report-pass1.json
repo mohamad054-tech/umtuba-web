@@ -1,0 +1,10 @@
+{
+  "actual_usd": 0.5637,
+  "model": "gemini-flash-latest",
+  "input_tokens": 142439,
+  "output_tokens": 903961,
+  "gemini_input_translations": 5908,
+  "http429_count": 0,
+  "last_error": null,
+  "quota_exhausted": false
+}

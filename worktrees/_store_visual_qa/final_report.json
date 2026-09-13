@@ -1,0 +1,932 @@
+[
+  {
+    "vp": "360",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 800,
+        "top": 736.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "360",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 800,
+        "top": 736.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "360",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 660.84375,
+      "bottom": 728,
+      "height": 67.15625
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 800,
+        "top": 736.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "360",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 800,
+        "top": 736.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "390",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 844,
+        "top": 780.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 844
+  },
+  {
+    "vp": "390",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 844,
+        "top": 780.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 844
+  },
+  {
+    "vp": "390",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 704.84375,
+      "bottom": 772,
+      "height": 67.15625
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 844,
+        "top": 780.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 844
+  },
+  {
+    "vp": "390",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 844,
+        "top": 780.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 844
+  },
+  {
+    "vp": "430",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 932,
+        "top": 868.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 932
+  },
+  {
+    "vp": "430",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 932,
+        "top": 868.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 932
+  },
+  {
+    "vp": "430",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 792.84375,
+      "bottom": 860,
+      "height": 67.15625
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 932,
+        "top": 868.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 932
+  },
+  {
+    "vp": "430",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 172.96875,
+        "top": 140.1875,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 932,
+        "top": 868.40625,
+        "height": 63.59375
+      }
+    ],
+    "vh": 932
+  },
+  {
+    "vp": "768",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 1024
+  },
+  {
+    "vp": "768",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 1024
+  },
+  {
+    "vp": "768",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 884.84375,
+      "bottom": 952,
+      "height": 67.15625
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 40,
+        "top": 24,
+        "height": 16
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 1024
+  },
+  {
+    "vp": "768",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 1024
+  },
+  {
+    "vp": "1280",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "1280",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "1280",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 0,
+      "bottom": 0,
+      "height": 0
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 40,
+        "top": 24,
+        "height": 16
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "1280",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 800
+  },
+  {
+    "vp": "1440",
+    "route": "/store",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 900
+  },
+  {
+    "vp": "1440",
+    "route": "/store/search",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 900
+  },
+  {
+    "vp": "1440",
+    "route": "/store/umtuba-e2e-20260721/product/e2e-simple-mug",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": {
+      "top": 0,
+      "bottom": 0,
+      "height": 0
+    },
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Breadcrumb",
+        "cls": "hidden text-xs md:block",
+        "bottom": 40,
+        "top": 24,
+        "height": 16
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 900
+  },
+  {
+    "vp": "1440",
+    "route": "/store/umtuba-e2e-20260721",
+    "status": 200,
+    "overflowX": 0,
+    "headerColor": "rgb(232, 215, 181)",
+    "looksBlue": false,
+    "skip": 1,
+    "chrome": 1,
+    "sticky": null,
+    "offset": "calc(3.75rem + 0px)",
+    "navs": [
+      {
+        "label": "Primary",
+        "cls": "hidden items-center gap-1 lg:flex lg:gap-2",
+        "bottom": 47,
+        "top": 17,
+        "height": 30
+      },
+      {
+        "label": "Store",
+        "cls": "sf-chrome__nav",
+        "bottom": 124.1875,
+        "top": 91.40625,
+        "height": 32.78125
+      },
+      {
+        "label": "Primary mobile",
+        "cls": "fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl sm:hidden",
+        "bottom": 0,
+        "top": 0,
+        "height": 0
+      }
+    ],
+    "vh": 900
+  }
+]

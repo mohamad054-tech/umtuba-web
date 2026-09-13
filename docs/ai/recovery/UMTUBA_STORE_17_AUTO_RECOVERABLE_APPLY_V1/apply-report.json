@@ -1,0 +1,654 @@
+{
+  "task_id": "UMTUBA_STORE_17_AUTO_RECOVERABLE_APPLY_V1",
+  "generated_at": "2026-09-10T11:23:19.238Z",
+  "canonical_path": "C:\\Users\\Giga store\\Desktop\\umtuba\\umtuba-web-translation-trunk-port-v1\\data\\cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256_before": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "canonical_sha256_after": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "canonical_replaced": false,
+  "backup_path": "C:\\Users\\Giga store\\Desktop\\umtuba\\umtuba-web-translation-trunk-port-v1\\data\\cj-catalog-532-localized-final-v1.HOLD17-2026-09-10T11-23-19.backup.json",
+  "backup_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "backup_matches_canonical": true,
+  "auto_recovery_manifest": "C:\\Users\\Giga store\\Desktop\\umtuba\\umtuba-web-translation-trunk-port-v1\\docs\\ai\\recovery\\UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1\\auto-recoverable.json",
+  "auto_recovery_manifest_count": 17,
+  "auto_ids": [
+    "1839920197651025920",
+    "1836327158076559360",
+    "7C59DE5B-A511-4920-88A8-C808B21476EE",
+    "1734125879543992320",
+    "1366573785234411520",
+    "1809888855471312896",
+    "1727252231541501952",
+    "A30259A1-6996-42EF-99A8-8FC5B96D833F",
+    "1587815807701635072",
+    "1600068074185699328",
+    "1837374073727766528",
+    "2606150702051624000",
+    "1642738075405537280",
+    "1609410194650845184",
+    "2503201353261621900",
+    "2409200948111604800",
+    "1776504080140087296"
+  ],
+  "overlap_hard_hold": [],
+  "overlap_manual_review": [],
+  "already_publishable": [],
+  "candidate_path": "C:\\Users\\Giga store\\Desktop\\umtuba\\umtuba-web-translation-trunk-port-v1\\data\\cj-catalog-532-localized-final-v1.HOLD17_CANDIDATE.json",
+  "candidate_sha256": "92775bcb72f894a13663a3c4a3c87007ca5d747a8ebc3f83e461306c10d63f52",
+  "baseline": {
+    "publishable": 380,
+    "held": 152,
+    "avgMargin": 0.5306495931108619,
+    "avgDeliveryDays": 9.063157894736841
+  },
+  "after": {
+    "publishable": 397,
+    "held": 135,
+    "avgMargin": 0.52931782699604,
+    "avgDeliveryDays": 9.07808564231738
+  },
+  "publishable_gain": 17,
+  "localization": {
+    "localized_after": 532,
+    "localization_review_after": 0,
+    "manual_review_required_after": 0,
+    "metrics_localization_review": 0
+  },
+  "manual_review_remaining": 129,
+  "hard_hold_remaining": 6,
+  "products_added": 0,
+  "products_deleted": 0,
+  "added_ids": [],
+  "deleted_ids": [],
+  "fixed_products": [
+    {
+      "id": "1839920197651025920",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Cute Expression Pet Bowl Oblique Ceramic Bowl Tall Cat Bowl Cat Food Bowl Dog Basin Cat Food Basin Cervical Spine Protection",
+      "source_title_after": "Slanted Ceramic Cat Bowl",
+      "title_en_clean": "Slanted Ceramic Cat Bowl",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Slanted Ceramic Cat Bowl\" in place of source_title \"Cute Expression Pet Bowl Oblique Ceramic Bowl Tall Cat Bowl Cat Food Bowl Dog Basin Cat Food Basin Cervical Spine Protection\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1836327158076559360",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Ceramic Cat Bowl Cat Plate Snack Bowl Rice Bowl Dinner Plate Cat Food Bowl Pet Plate Shallow Mouth Bowl",
+      "source_title_after": "Shallow Ceramic Cat Plate",
+      "title_en_clean": "Shallow Ceramic Cat Plate",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Shallow Ceramic Cat Plate\" in place of source_title \"Ceramic Cat Bowl Cat Plate Snack Bowl Rice Bowl Dinner Plate Cat Food Bowl Pet Plate Shallow Mouth Bowl\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "7C59DE5B-A511-4920-88A8-C808B21476EE",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "Windshield Car Phone Holder Universal in Car Cellphone Holder Stand Adjustable Phone Suction Cup Holder Car Mount Phone Stand",
+      "source_title_after": "Adjustable Windshield Suction-Cup Phone Mount",
+      "title_en_clean": "Adjustable Windshield Suction-Cup Phone Mount",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Adjustable Windshield Suction-Cup Phone Mount\" in place of source_title \"Windshield Car Phone Holder Universal in Car Cellphone Holder Stand Adjustable Phone Suction Cup Holder Car Mount Phone Stand\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1734125879543992320",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Slow Food Bowl Anti Choking Cat Bowl Dog Basin Puzzle Feeder Healthy Pet Rotating Game Board Pet Products",
+      "source_title_after": "Slow-Feeder Puzzle Pet Bowl",
+      "title_en_clean": "Slow-Feeder Puzzle Pet Bowl",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Slow-Feeder Puzzle Pet Bowl\" in place of source_title \"Slow Food Bowl Anti Choking Cat Bowl Dog Basin Puzzle Feeder Healthy Pet Rotating Game Board Pet Products\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1366573785234411520",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow Water Feeder Dispenser Pet Fountain ABS&PP Dog Supplies",
+      "source_title_after": "1.5L Floating Pet Water Bowl",
+      "title_en_clean": "1.5L Floating Pet Water Bowl",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"1.5L Floating Pet Water Bowl\" in place of source_title \"1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow Water Feeder Dispenser Pet Fountain ABS&PP Dog Supplies\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1809888855471312896",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount Magnetic Stainless Steel Car Phone Holder - Dashboard Mount, Water-resistant, Rotatable",
+      "source_title_after": "Magnetic Stainless Steel Dashboard Phone Holder",
+      "title_en_clean": "Magnetic Stainless Steel Dashboard Phone Holder",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Magnetic Stainless Steel Dashboard Phone Holder\" in place of source_title \"Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount Magnetic Stainless Steel Car Phone Holder - Dashboard Mount, Water-resistant, Rotatable\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1727252231541501952",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Universal Car Phone Holder Anti-Slip Pad Mat Phone Holder Dashboard Upgraded Reusable Silicone Phone Mount For Car Dash",
+      "source_title_after": "Reusable Silicone Dashboard Phone Pad",
+      "title_en_clean": "Reusable Silicone Dashboard Phone Pad",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Reusable Silicone Dashboard Phone Pad\" in place of source_title \"Universal Car Phone Holder Anti-Slip Pad Mat Phone Holder Dashboard Upgraded Reusable Silicone Phone Mount For Car Dash\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "A30259A1-6996-42EF-99A8-8FC5B96D833F",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "Large Ice Cube Maker Silicone Mold 6 Cell Big Sphere Ice Ball Tray Whiskey Wine Cocktail Party Bar Accessories Kitchen Gadgets",
+      "source_title_after": "6-Cell Silicone Sphere Ice Ball Tray",
+      "title_en_clean": "6-Cell Silicone Sphere Ice Ball Tray",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"6-Cell Silicone Sphere Ice Ball Tray\" in place of source_title \"Large Ice Cube Maker Silicone Mold 6 Cell Big Sphere Ice Ball Tray Whiskey Wine Cocktail Party Bar Accessories Kitchen Gadgets\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1587815807701635072",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Car Magnet Magnetic Air Vent Mount Holder Magnetic Car Phone Holder Stand 360 Metal Car Air Vent Magnet Stand In Car GPS Mount Holder",
+      "source_title_after": "360° Magnetic Air-Vent Phone Holder",
+      "title_en_clean": "360° Magnetic Air-Vent Phone Holder",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"360° Magnetic Air-Vent Phone Holder\" in place of source_title \"Car Magnet Magnetic Air Vent Mount Holder Magnetic Car Phone Holder Stand 360 Metal Car Air Vent Magnet Stand In Car GPS Mount Holder\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1600068074185699328",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "13Pcs Makeup Brush Set Make Up Concealer Brush Blush Powder Brush Eye Shadow Highlighter Foundation Brush Cosmetic Beauty Tools",
+      "source_title_after": "13-Piece Makeup Brush Set",
+      "title_en_clean": "13-Piece Makeup Brush Set",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"13-Piece Makeup Brush Set\" in place of source_title \"13Pcs Makeup Brush Set Make Up Concealer Brush Blush Powder Brush Eye Shadow Highlighter Foundation Brush Cosmetic Beauty Tools\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1837374073727766528",
+      "source": "approved_59",
+      "status": "local_pass",
+      "source_title_before": "Pet Food Bowl Stainless Steel Pet Bowl New Double Thickened Floor Suction Dog Bowl Scandinavian Style Non-Slip Pet Bowl",
+      "source_title_after": "Double Stainless Steel Non-Slip Pet Bowl",
+      "title_en_clean": "Double Stainless Steel Non-Slip Pet Bowl",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Double Stainless Steel Non-Slip Pet Bowl\" in place of source_title \"Pet Food Bowl Stainless Steel Pet Bowl New Double Thickened Floor Suction Dog Bowl Scandinavian Style Non-Slip Pet Bowl\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "2606150702051624000",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "Travel Baby Bottle Brush Set - Newborn Safe Silicone Cleaning Brushes With Storage Box For Bottles, Nipples & Accessories",
+      "source_title_after": "Travel Silicone Baby Bottle Brush Set with Storage Box",
+      "title_en_clean": "Travel Silicone Baby Bottle Brush Set with Storage Box",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Travel Silicone Baby Bottle Brush Set with Storage Box\" in place of source_title \"Travel Baby Bottle Brush Set - Newborn Safe Silicone Cleaning Brushes With Storage Box For Bottles, Nipples & Accessories\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1642738075405537280",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "6Pcs Food Silicone Cover Fresh-keeping Dish Stretchy Lid Cap Reusable Wrap Organization Storage Tool Kitchen Accessories 6PCS Silicone Stretch Lids",
+      "source_title_after": "6-Piece Reusable Silicone Food Cover Set",
+      "title_en_clean": "6-Piece Reusable Silicone Food Cover Set",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"6-Piece Reusable Silicone Food Cover Set\" in place of source_title \"6Pcs Food Silicone Cover Fresh-keeping Dish Stretchy Lid Cap Reusable Wrap Organization Storage Tool Kitchen Accessories 6PCS Silicone Stretch Lids\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1609410194650845184",
+      "source": "approved_59",
+      "status": "gold_standard",
+      "source_title_before": "3PCS Silicone Starfish-shaped Sink Drain Filter Bathtub Hair Catcher Stopper Drain Hole Filter Strainer For Bathroom Kitchen Toilet",
+      "source_title_after": "3-Piece Starfish Silicone Drain Hair Catcher",
+      "title_en_clean": "3-Piece Starfish Silicone Drain Hair Catcher",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"3-Piece Starfish Silicone Drain Hair Catcher\" in place of source_title \"3PCS Silicone Starfish-shaped Sink Drain Filter Bathtub Hair Catcher Stopper Drain Hole Filter Strainer For Bathroom Kitchen Toilet\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "2503201353261621900",
+      "source": "expansion",
+      "status": "gold_standard",
+      "source_title_before": "Press-type Convenient Outdoor Portable Ice Tray Large Capacity Ice Bucket 48 Extra-Large Ice Maker Food Grade Plastic Storage Tray Essential Kitchen Gadget",
+      "source_title_after": "Portable 48-Cube Food-Grade Ice Bucket",
+      "title_en_clean": "Portable 48-Cube Food-Grade Ice Bucket",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Portable 48-Cube Food-Grade Ice Bucket\" in place of source_title \"Press-type Convenient Outdoor Portable Ice Tray Large Capacity Ice Bucket 48 Extra-Large Ice Maker Food Grade Plastic Storage Tray Essential Kitchen Gadget\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "2409200948111604800",
+      "source": "expansion",
+      "status": "gold_standard",
+      "source_title_before": "Mini Burger Press Slider Patty Wood Handle Hamburger Press Burger Press Maker Grill BBQ Party Maker Meat Press Kitchen Gadgets",
+      "source_title_after": "Mini Burger Press with Wood Handle",
+      "title_en_clean": "Mini Burger Press with Wood Handle",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Mini Burger Press with Wood Handle\" in place of source_title \"Mini Burger Press Slider Patty Wood Handle Hamburger Press Burger Press Maker Grill BBQ Party Maker Meat Press Kitchen Gadgets\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    },
+    {
+      "id": "1776504080140087296",
+      "source": "expansion",
+      "status": "gold_standard",
+      "source_title_before": "Cookie Press Gun And Icing Set Alloy Churro Maker Cookie Maker With 10 Discs 20 Discs 4 Pastry Tip Biscuit Mold Kitchen Accessories",
+      "source_title_after": "Cookie Press and Icing Set",
+      "title_en_clean": "Cookie Press and Icing Set",
+      "documented_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Cookie Press and Icing Set\" in place of source_title \"Cookie Press Gun And Icing Set Alloy Churro Maker Cookie Maker With 10 Discs 20 Discs 4 Pastry Tip Biscuit Mold Kitchen Accessories\". Do not invent a new title.",
+      "catalog_qa_before": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable."
+        }
+      ],
+      "catalog_qa_after": [],
+      "title_ar_unchanged": true
+    }
+  ],
+  "failed_to_fix": [],
+  "unrelated_products_changed": [],
+  "product_field_diffs": [
+    {
+      "id": "1839920197651025920",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Cute Expression Pet Bowl Oblique Ceramic Bowl Tall Cat Bowl Cat Food Bowl Dog Basin Cat Food Basin Cervical Spine Protection",
+          "after": "Slanted Ceramic Cat Bowl"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1836327158076559360",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Ceramic Cat Bowl Cat Plate Snack Bowl Rice Bowl Dinner Plate Cat Food Bowl Pet Plate Shallow Mouth Bowl",
+          "after": "Shallow Ceramic Cat Plate"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "7C59DE5B-A511-4920-88A8-C808B21476EE",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Windshield Car Phone Holder Universal in Car Cellphone Holder Stand Adjustable Phone Suction Cup Holder Car Mount Phone Stand",
+          "after": "Adjustable Windshield Suction-Cup Phone Mount"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1734125879543992320",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Slow Food Bowl Anti Choking Cat Bowl Dog Basin Puzzle Feeder Healthy Pet Rotating Game Board Pet Products",
+          "after": "Slow-Feeder Puzzle Pet Bowl"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1366573785234411520",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow Water Feeder Dispenser Pet Fountain ABS&PP Dog Supplies",
+          "after": "1.5L Floating Pet Water Bowl"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1809888855471312896",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount Magnetic Stainless Steel Car Phone Holder - Dashboard Mount, Water-resistant, Rotatable",
+          "after": "Magnetic Stainless Steel Dashboard Phone Holder"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1727252231541501952",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Universal Car Phone Holder Anti-Slip Pad Mat Phone Holder Dashboard Upgraded Reusable Silicone Phone Mount For Car Dash",
+          "after": "Reusable Silicone Dashboard Phone Pad"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "A30259A1-6996-42EF-99A8-8FC5B96D833F",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Large Ice Cube Maker Silicone Mold 6 Cell Big Sphere Ice Ball Tray Whiskey Wine Cocktail Party Bar Accessories Kitchen Gadgets",
+          "after": "6-Cell Silicone Sphere Ice Ball Tray"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1587815807701635072",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Car Magnet Magnetic Air Vent Mount Holder Magnetic Car Phone Holder Stand 360 Metal Car Air Vent Magnet Stand In Car GPS Mount Holder",
+          "after": "360° Magnetic Air-Vent Phone Holder"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1600068074185699328",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "13Pcs Makeup Brush Set Make Up Concealer Brush Blush Powder Brush Eye Shadow Highlighter Foundation Brush Cosmetic Beauty Tools",
+          "after": "13-Piece Makeup Brush Set"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1837374073727766528",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Pet Food Bowl Stainless Steel Pet Bowl New Double Thickened Floor Suction Dog Bowl Scandinavian Style Non-Slip Pet Bowl",
+          "after": "Double Stainless Steel Non-Slip Pet Bowl"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "2606150702051624000",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Travel Baby Bottle Brush Set - Newborn Safe Silicone Cleaning Brushes With Storage Box For Bottles, Nipples & Accessories",
+          "after": "Travel Silicone Baby Bottle Brush Set with Storage Box"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1642738075405537280",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "6Pcs Food Silicone Cover Fresh-keeping Dish Stretchy Lid Cap Reusable Wrap Organization Storage Tool Kitchen Accessories 6PCS Silicone Stretch Lids",
+          "after": "6-Piece Reusable Silicone Food Cover Set"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1609410194650845184",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "3PCS Silicone Starfish-shaped Sink Drain Filter Bathtub Hair Catcher Stopper Drain Hole Filter Strainer For Bathroom Kitchen Toilet",
+          "after": "3-Piece Starfish Silicone Drain Hair Catcher"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "2503201353261621900",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Press-type Convenient Outdoor Portable Ice Tray Large Capacity Ice Bucket 48 Extra-Large Ice Maker Food Grade Plastic Storage Tray Essential Kitchen Gadget",
+          "after": "Portable 48-Cube Food-Grade Ice Bucket"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "2409200948111604800",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Mini Burger Press Slider Patty Wood Handle Hamburger Press Burger Press Maker Grill BBQ Party Maker Meat Press Kitchen Gadgets",
+          "after": "Mini Burger Press with Wood Handle"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    },
+    {
+      "id": "1776504080140087296",
+      "fields": [
+        {
+          "path": "source_title",
+          "before": "Cookie Press Gun And Icing Set Alloy Churro Maker Cookie Maker With 10 Discs 20 Discs 4 Pastry Tip Biscuit Mold Kitchen Accessories",
+          "after": "Cookie Press and Icing Set"
+        },
+        {
+          "path": "catalog_qa[0]",
+          "before": {
+            "flag": "PRODUCT_DATA_REVIEW",
+            "reason": "Supplier title is keyword-stuffed or unreadable."
+          }
+        }
+      ]
+    }
+  ],
+  "top_level_non_product_diff": [],
+  "metrics_diff": [
+    {
+      "path": "product_data_review",
+      "before": 129,
+      "after": 112
+    }
+  ]
+}

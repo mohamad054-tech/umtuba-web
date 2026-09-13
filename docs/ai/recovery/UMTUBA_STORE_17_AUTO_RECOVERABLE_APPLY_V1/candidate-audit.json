@@ -1,0 +1,60 @@
+{
+  "task_id": "UMTUBA_STORE_17_AUTO_RECOVERABLE_APPLY_V1",
+  "generated_at": "2026-09-10T11:23:19.238Z",
+  "definition": "isPublishableBrowseRow + stored catalog_qa (same as UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1)",
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "canonical_audit": {
+    "total_products": 532,
+    "localized_not_manual": 532,
+    "localization_review": 0,
+    "publishable": 380,
+    "held": 152
+  },
+  "candidate_path": "data/cj-catalog-532-localized-final-v1.HOLD17_CANDIDATE.json",
+  "candidate_sha256": "92775bcb72f894a13663a3c4a3c87007ca5d747a8ebc3f83e461306c10d63f52",
+  "candidate_audit": {
+    "total_products": 532,
+    "localized_not_manual": 532,
+    "manual_review": 0,
+    "localization_review": 0,
+    "publishable": 397,
+    "held": 135,
+    "held_detail_rows": 135,
+    "avg_margin": 0.52931782699604,
+    "avg_delivery_days": 9.07808564231738,
+    "ip_review": 3,
+    "price_review": 25,
+    "product_data_review": 112,
+    "duplicates_flagged": 2,
+    "shipping_review": 0,
+    "unavailable": 0,
+    "flag_counts": {
+      "PRODUCT_DATA_REVIEW": 117,
+      "IP_REVIEW": 3,
+      "PRICE_REVIEW": 25
+    },
+    "reason_counts": {
+      "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.": 62,
+      "PRICE_REVIEW: Price safety: margin_below_40.": 25,
+      "PRODUCT_DATA_REVIEW: Travel listing title describes a different product family.": 7,
+      "PRODUCT_DATA_REVIEW: Beauty listing title is misclassified or unsafe.": 7,
+      "PRODUCT_DATA_REVIEW: Garden listing title does not describe a garden tool.": 6,
+      "PRODUCT_DATA_REVIEW: Kids listing title describes adult or unrelated goods.": 6,
+      "PRODUCT_DATA_REVIEW: Fashion listing title describes a different product family.": 5,
+      "PRODUCT_DATA_REVIEW: Sports listing title is not a workout accessory.": 5,
+      "PRODUCT_DATA_REVIEW: Car listing may be decorative lighting or unrelated hardware.": 4,
+      "PRODUCT_DATA_REVIEW: Home listing title is a cable, diagnostic, or pet item.": 4,
+      "PRODUCT_DATA_REVIEW: Pet listing title describes bag hardware.": 4,
+      "IP_REVIEW: Title mentions a restricted brand, platform mark, or model family.": 3,
+      "PRODUCT_DATA_REVIEW: Electronics listing title may be IP-restricted or a fashion clip.": 3,
+      "PRODUCT_DATA_REVIEW: Near-duplicate title group (2): dog silicone licking pad pet": 2,
+      "PRODUCT_DATA_REVIEW: Supplier title is empty, numeric-only, or garbled.": 2
+    }
+  },
+  "keyword_stuffed_before": 79,
+  "keyword_stuffed_after": 62,
+  "keyword_stuffed_cleared": 17,
+  "new_hold_reasons_introduced": false,
+  "localization_changed": false
+}

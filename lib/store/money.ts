@@ -1,3 +1,6 @@
+import { formatCurrency } from "../i18n/format";
+import { DEFAULT_LOCALE, type AppLocale } from "../i18n/locales";
+
 const CURRENCY_RE = /^[A-Z]{3}$/;
 
 export type MoneyValidationResult =
@@ -50,13 +53,14 @@ export function validateAmountMinor(
   return { ok: true, amountMinor: value, currency: normalizedCurrency };
 }
 
-export function formatMinorUnits(amountMinor: number, currency: string): string {
+export function formatMinorUnits(
+  amountMinor: number,
+  currency: string,
+  locale: AppLocale = DEFAULT_LOCALE
+): string {
   const code = normalizeCurrencyCode(currency);
   try {
-    return new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency: code,
-    }).format(amountMinor / 100);
+    return formatCurrency(locale, amountMinor / 100, code);
   } catch {
     return `${(amountMinor / 100).toFixed(2)} ${code}`;
   }

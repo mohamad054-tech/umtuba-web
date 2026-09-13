@@ -51,6 +51,12 @@ next-env.d.ts
 # Translation Studio local durable store (runtime V1; never commit)
 /data/translation-studio/
 
+# CJ dropship local token cache (never commit access/refresh tokens)
+.local/cj/
+
+# Local Next.js HTML dumps — Tailwind v4 must not scan Flight/error payloads
+.local/*.html
+
 # store remote E2E local Auth UUID config (never commit real user ids)
 scripts/store-e2e/config.local.sql
 scripts/store-e2e/_tmp*

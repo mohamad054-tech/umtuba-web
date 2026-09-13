@@ -1,0 +1,802 @@
+{
+  "task_id": "UMTUBA_STORE_FINAL_22_LOCALIZATION_REVIEW_V1",
+  "method": "surgical_local_edit",
+  "additional_gemini_cost_usd": 0,
+  "input_ids": [
+    "1359044603478675456",
+    "1360080266508505088",
+    "1376513937130000384",
+    "1392067844971302912",
+    "1404623861760266240",
+    "1405434203297943552",
+    "1429317075750490112",
+    "1447901045861781504",
+    "1467092240978546688",
+    "1594961358263693312",
+    "1753982835490304000",
+    "1796518153233633280",
+    "19583873-3C62-48C5-BE3E-B01791CC71E2",
+    "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+    "2406180737491620300",
+    "2408150612121603200",
+    "52022F6B-104F-453E-A1E6-73797FF89B87",
+    "6393DCAD-3885-42D4-B6BC-ADF846AB8CB2",
+    "8800BE41-B655-4594-8BFD-6BF53003231F",
+    "C0080972-C4DC-47BD-BDA5-B6F0B4484C42",
+    "C9052A90-6D89-419A-8A7C-BC34FA08B426",
+    "EE1DC650-D8A1-477D-83D5-A5EFEA81FEB2"
+  ],
+  "success_ids": [
+    "EE1DC650-D8A1-477D-83D5-A5EFEA81FEB2",
+    "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+    "1447901045861781504",
+    "2408150612121603200",
+    "1796518153233633280",
+    "1467092240978546688",
+    "6393DCAD-3885-42D4-B6BC-ADF846AB8CB2",
+    "C9052A90-6D89-419A-8A7C-BC34FA08B426",
+    "C0080972-C4DC-47BD-BDA5-B6F0B4484C42",
+    "1753982835490304000",
+    "1405434203297943552",
+    "1594961358263693312",
+    "8800BE41-B655-4594-8BFD-6BF53003231F",
+    "1404623861760266240",
+    "1376513937130000384",
+    "2406180737491620300",
+    "1392067844971302912",
+    "1429317075750490112",
+    "52022F6B-104F-453E-A1E6-73797FF89B87",
+    "19583873-3C62-48C5-BE3E-B01791CC71E2",
+    "1360080266508505088",
+    "1359044603478675456"
+  ],
+  "remaining_review_ids": [],
+  "bucket_fixed": {
+    "unsupported_claim": 15,
+    "changed_numeric_value": 4,
+    "suspicious_mt_artifact": 2,
+    "title_spam": 1
+  },
+  "bucket_still_review": {
+    "unsupported_claim": 0,
+    "changed_numeric_value": 0,
+    "suspicious_mt_artifact": 0,
+    "title_spam": 0
+  },
+  "applied": [
+    {
+      "cj_product_id": "1359044603478675456",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Makeup Brush Set",
+        "title_ar": "طقم فرش مكياج",
+        "description_en_clean": "A makeup brush set listed as a full set of makeup tools. Brush materials and piece count are not supplied.",
+        "description_ar": "طقم فرش مكياج مذكور كمجموعة كاملة من أدوات المكياج. عدد القطع وخامات الفرش غير مذكورة في عنوان المورّد.",
+        "specifications_en": [
+          "Product: makeup brush set",
+          "Listed as: full set of makeup tools",
+          "Piece count: not supplied"
+        ],
+        "specifications_ar": [
+          "المنتج: طقم فرش مكياج",
+          "الوصف المذكور: مجموعة كاملة من أدوات المكياج",
+          "عدد القطع: غير مذكور"
+        ],
+        "search_keywords_en": [
+          "makeup brush set",
+          "makeup tools"
+        ],
+        "search_keywords_ar": [
+          "طقم فرش مكياج",
+          "أدوات مكياج"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1360080266508505088",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Clip-In False Bang Hair Piece",
+        "title_ar": "خصلة غرة شعر مستعارة بمشبك",
+        "description_en_clean": "A clip-in false bang hair piece. Listed color options are black, brown, and auburn red. The supplier title includes the word Natural as a style label only.",
+        "description_ar": "خصلة غرة شعر مستعارة تُثبَّت بمشبك. الألوان المذكورة هي الأسود والبني والأحمر الكستنائي. يظهر في عنوان المورّد وصف Natural كنعت للمظهر فقط.",
+        "specifications_en": [
+          "Attachment: clip-in",
+          "Style: false bangs",
+          "Colors listed: black, brown, auburn red"
+        ],
+        "specifications_ar": [
+          "التثبيت: مشبك",
+          "النمط: غرة مستعارة",
+          "الألوان المذكورة: أسود، بني، أحمر كستنائي"
+        ],
+        "search_keywords_en": [
+          "clip in false bangs",
+          "false hair bang"
+        ],
+        "search_keywords_ar": [
+          "غرة شعر مستعارة",
+          "خصلة بمشبك"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1376513937130000384",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Bite-Resistant Slow Food Leakage Ball",
+        "title_ar": "كرة تسريب طعام بطيء مقاومة للعض",
+        "description_en_clean": "A bite-resistant food leakage ball for dogs and cats. Listed as a slow pet food toy that releases food during play.",
+        "description_ar": "كرة تسريب طعام مقاومة للعض للكلاب والقطط. مذكورة كلعبة طعام بطيء تُخرج الطعام أثناء اللعب.",
+        "specifications_en": [
+          "Type: food leakage ball",
+          "Listed as: bite resistant, slow",
+          "For: dogs and cats"
+        ],
+        "specifications_ar": [
+          "النوع: كرة تسريب طعام",
+          "المذكور: مقاومة للعض وبطيئة",
+          "للكلاب والقطط"
+        ],
+        "search_keywords_en": [
+          "food leakage ball",
+          "slow feeding dog toy"
+        ],
+        "search_keywords_ar": [
+          "كرة تسريب طعام",
+          "لعبة كلاب بطيئة"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1392067844971302912",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Hands-Free Dog Leash with Waist Bag",
+        "title_ar": "حبل مشي للكلاب مع حقيبة خصر",
+        "description_en_clean": "A hands-free dog training leash with a waist bag for outdoor walking and running. Storage is listed for dog food, a water cup, and bags.",
+        "description_ar": "حبل تدريب للكلاب يُستخدم دون اليدين مع حقيبة خصر للمشي والجري في الخارج. التخزين المذكور يشمل طعام الكلب وكوب الماء والأكياس.",
+        "specifications_en": [
+          "Type: hands-free leash with waist bag",
+          "Listed use: training, walking, running",
+          "Storage listed: dog food, water cup, bags"
+        ],
+        "specifications_ar": [
+          "النوع: حبل مشي مع حقيبة خصر",
+          "الاستخدام المذكور: تدريب ومشي وجري",
+          "التخزين المذكور: طعام الكلب وكوب ماء وأكياس"
+        ],
+        "search_keywords_en": [
+          "hands free dog leash",
+          "dog waist bag"
+        ],
+        "search_keywords_ar": [
+          "حبل مشي للكلاب",
+          "حقيبة خصر للكلاب"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1404623861760266240",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Small Pet Carrier",
+        "title_ar": "حقيبة نقل حيوانات أليفة صغيرة",
+        "description_en_clean": "A small-size pet carrier. Other dimensions, materials, and uses are not supplied beyond the title.",
+        "description_ar": "حقيبة نقل للحيوانات الأليفة بمقاس صغير. الأبعاد والخامات والاستخدامات الأخرى غير مذكورة بما يتجاوز عنوان المورّد.",
+        "specifications_en": [
+          "Product: pet carrier",
+          "Size listed: small"
+        ],
+        "specifications_ar": [
+          "المنتج: حقيبة نقل حيوانات أليفة",
+          "المقاس المذكور: صغير"
+        ],
+        "search_keywords_en": [
+          "small pet carrier",
+          "pet carrier bag"
+        ],
+        "search_keywords_ar": [
+          "حقيبة نقل حيوانات",
+          "حقيبة صغيرة للحيوانات"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1405434203297943552",
+      "bucket": "changed_numeric_value",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "KW310 Car Diagnostic Scanner",
+        "title_ar": "جهاز فحص سيارات KW310",
+        "description_en_clean": "A KW310 car diagnostic scanner listed as a barcode reader tool. No extra connector type is supplied in the title.",
+        "description_ar": "جهاز فحص سيارات طراز KW310 مذكور أيضاً كأداة قراءة باركود. نوع الموصل الإضافي غير مذكور في عنوان المورّد.",
+        "specifications_en": [
+          "Model: KW310",
+          "Type: car diagnostic scanner",
+          "Also listed: barcode reader tool"
+        ],
+        "specifications_ar": [
+          "الطراز: KW310",
+          "النوع: جهاز فحص سيارات",
+          "أيضاً: أداة قراءة باركود"
+        ],
+        "search_keywords_en": [
+          "KW310 scanner",
+          "car diagnostic scanner"
+        ],
+        "search_keywords_ar": [
+          "جهاز فحص KW310",
+          "ماسح سيارات"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1429317075750490112",
+      "bucket": "suspicious_mt_artifact",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Foldable Storage Pet Dog Stairs",
+        "title_ar": "درج قابل للطي للكلاب مع تخزين",
+        "description_en_clean": "Foldable pet dog stairs with storage. The listing does not add height, step count, or extra uses beyond the supplier title.",
+        "description_ar": "درج قابل للطي للكلاب مع مساحة تخزين. لا تضيف هذه البطاقة ارتفاعاً أو عدد درجات أو استخدامات غير مذكورة في عنوان المورّد.",
+        "specifications_en": [
+          "Product: pet dog stairs",
+          "Design listed: foldable storage"
+        ],
+        "specifications_ar": [
+          "المنتج: درج للكلاب",
+          "التصميم المذكور: قابل للطي مع تخزين"
+        ],
+        "search_keywords_en": [
+          "foldable pet stairs",
+          "dog stairs storage"
+        ],
+        "search_keywords_ar": [
+          "درج كلاب قابل للطي",
+          "درج حيوانات مع تخزين"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1447901045861781504",
+      "bucket": "changed_numeric_value",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Five-Piece 280mL Standard Mouth PP Bottle Set",
+        "title_ar": "طقم رضّاعات فم قياسي بسعة 280 مل",
+        "description_en_clean": "A five-piece PP baby bottle set. Each listed bottle is 280mL with a standard mouth.",
+        "description_ar": "طقم رضّاعات أطفال من البولي بروبيلين مكوّن من خمس قطع. السعة المذكورة 280 مل بفم قياسي.",
+        "specifications_en": [
+          "Quantity listed: five-piece",
+          "Capacity: 280mL",
+          "Material: PP",
+          "Mouth: standard"
+        ],
+        "specifications_ar": [
+          "الكمية المذكورة: خمس قطع",
+          "السعة: 280 مل",
+          "الخامة: بولي بروبيلين PP",
+          "الفم: قياسي"
+        ],
+        "search_keywords_en": [
+          "280ml baby bottle set",
+          "standard mouth PP bottles"
+        ],
+        "search_keywords_ar": [
+          "طقم رضاعات 280 مل",
+          "رضاعات فم قياسي"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1467092240978546688",
+      "bucket": "changed_numeric_value",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Seven-Piece Clip-In Hair Set",
+        "title_ar": "طقم وصلات شعر بمشابك من سبع قطع",
+        "description_en_clean": "A seven-piece clip-in hair set. Materials, length, and color are not supplied beyond the title.",
+        "description_ar": "طقم وصلات شعر بمشابك مكوّن من سبع قطع. الخامة والطول واللون غير مذكورة بما يتجاوز عنوان المورّد.",
+        "specifications_en": [
+          "Quantity listed: seven-piece",
+          "Attachment: clip"
+        ],
+        "specifications_ar": [
+          "الكمية المذكورة: سبع قطع",
+          "التثبيت: مشابك"
+        ],
+        "search_keywords_en": [
+          "clip in hair set",
+          "seven piece hair clips"
+        ],
+        "search_keywords_ar": [
+          "طقم وصلات شعر",
+          "مشابك شعر"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1594961358263693312",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "14-Piece Wooden Handle Makeup Brush Set",
+        "title_ar": "طقم فرش مكياج بمقابض خشبية – 14 قطعة",
+        "description_en_clean": "A 14-piece makeup brush set with wooden handles. Brush bristle materials are not supplied.",
+        "description_ar": "طقم فرش مكياج من 14 قطعة بمقابض خشبية. خامات الشعيرات غير مذكورة في عنوان المورّد.",
+        "specifications_en": [
+          "Quantity: 14 pieces",
+          "Handle material: wood",
+          "Type: makeup brush set"
+        ],
+        "specifications_ar": [
+          "الكمية: 14 قطعة",
+          "خامة المقبض: خشب",
+          "النوع: طقم فرش مكياج"
+        ],
+        "search_keywords_en": [
+          "14 piece makeup brushes",
+          "wooden handle brushes"
+        ],
+        "search_keywords_ar": [
+          "طقم فرش مكياج 14",
+          "فرش بمقبض خشبي"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1753982835490304000",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Interactive Tumbler Slow Food Dog Toy",
+        "title_ar": "لعبة بهلوان لتوزيع طعام الكلاب ببطء",
+        "description_en_clean": "An interactive tumbler and leaky food ball for dogs. Listed as a puzzle toy for slower feeding. Health or intelligence claims from the supplier title are omitted.",
+        "description_ar": "لعبة بهلوان وكرة تسريب طعام تفاعلية للكلاب. مذكورة كلعبة أحجية لتناول الطعام ببطء. لم تُنقل عبارات صحية أو ذهنية من عنوان المورّد.",
+        "specifications_en": [
+          "Type: tumbler leaky food ball",
+          "Listed as: interactive puzzle, slow feeding",
+          "For: dogs and pets"
+        ],
+        "specifications_ar": [
+          "النوع: كرة بهلوان لتسريب الطعام",
+          "المذكور: أحجية تفاعلية وتغذية بطيئة",
+          "للكلاب والحيوانات الأليفة"
+        ],
+        "search_keywords_en": [
+          "dog tumbler food toy",
+          "slow food puzzle ball"
+        ],
+        "search_keywords_ar": [
+          "لعبة توزيع طعام الكلاب",
+          "كرة طعام بطيئة"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "1796518153233633280",
+      "bucket": "title_spam",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Thickened Automatic Packing Garbage Bags",
+        "title_ar": "أكياس نفايات سميكة بتعبئة تلقائية",
+        "description_en_clean": "Household thickened garbage bags listed for smart inductive ashbin packing. Model codes on the title are T1T1ST and AirT3.",
+        "description_ar": "أكياس نفايات منزلية سميكة مذكورة لتعبئة سلة مهملات ذكية حساسة. رموز الطراز في العنوان هي T1T1ST و AirT3.",
+        "specifications_en": [
+          "Type: thickened automatic packing garbage bag",
+          "Listed context: household smart inductive ashbin",
+          "Model codes listed: T1T1ST, AirT3"
+        ],
+        "specifications_ar": [
+          "النوع: كيس نفايات سميك بتعبئة تلقائية",
+          "السياق المذكور: سلة منزلية ذكية حساسة",
+          "رموز الطراز: T1T1ST و AirT3"
+        ],
+        "search_keywords_en": [
+          "automatic packing garbage bags",
+          "T1T1ST AirT3 bags"
+        ],
+        "search_keywords_ar": [
+          "أكياس نفايات سميكة",
+          "أكياس تعبئة تلقائية"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "19583873-3C62-48C5-BE3E-B01791CC71E2",
+      "bucket": "suspicious_mt_artifact",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Glossy Black 5D Carbon Fiber Vinyl Wrap",
+        "title_ar": "فيلم فينيل ألياف كربون 5D أسود لامع",
+        "description_en_clean": "A glossy black 5D carbon fiber vinyl film listed for car wrap. No length or width is supplied in the title.",
+        "description_ar": "فيلم فينيل بنمط ألياف الكربون 5D باللون الأسود اللامع، مذكور لتغليف السيارات. الطول والعرض غير مذكورين في عنوان المورّد.",
+        "specifications_en": [
+          "Pattern: 5D carbon fiber",
+          "Finish: glossy black",
+          "Type: vinyl wrap film"
+        ],
+        "specifications_ar": [
+          "النمط: ألياف كربون 5D",
+          "المظهر: أسود لامع",
+          "النوع: فيلم فينيل للتغليف"
+        ],
+        "search_keywords_en": [
+          "5D carbon fiber vinyl",
+          "glossy black wrap film"
+        ],
+        "search_keywords_ar": [
+          "فينيل ألياف كربون",
+          "تغليف سيارات أسود لامع"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Parrot Nibble Toy",
+        "title_ar": "لعبة نقر للببغاء",
+        "description_en_clean": "A nibble toy listed for parrots. Materials and size are not supplied beyond the title.",
+        "description_ar": "لعبة نقر مذكورة للببغاء. الخامة والمقاس غير مذكورين بما يتجاوز عنوان المورّد.",
+        "specifications_en": [
+          "Product: nibble toy",
+          "Listed for: parrots"
+        ],
+        "specifications_ar": [
+          "المنتج: لعبة نقر",
+          "المذكور: للببغاء"
+        ],
+        "search_keywords_en": [
+          "parrot nibble toy",
+          "parrot chew toy"
+        ],
+        "search_keywords_ar": [
+          "لعبة ببغاء",
+          "لعبة نقر للطيور"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "2406180737491620300",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Children Doctor Play Set with Stethoscope",
+        "title_ar": "طقم لعب دكتور للأطفال مع سماعة",
+        "description_en_clean": "A children's play-house doctor toy suit with a toy stethoscope. Listed as an educational play set.",
+        "description_ar": "طقم لعب منزل الأطفال على هيئة دكتور مع سماعة لعب. مذكور كطقم تعليمي للأطفال.",
+        "specifications_en": [
+          "Type: children doctor play suit",
+          "Includes listed: toy stethoscope",
+          "Listed as: educational play house toy"
+        ],
+        "specifications_ar": [
+          "النوع: طقم لعب دكتور للأطفال",
+          "يشمل المذكور: سماعة لعب",
+          "المذكور: لعبة منزل أطفال تعليمية"
+        ],
+        "search_keywords_en": [
+          "children doctor play set",
+          "toy stethoscope"
+        ],
+        "search_keywords_ar": [
+          "طقم لعب دكتور",
+          "سماعة لعب للأطفال"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "2408150612121603200",
+      "bucket": "changed_numeric_value",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "OBD to 6 Pin Delphi Motorcycle Cable",
+        "title_ar": "كابل OBD إلى 6 أسنان للدراجات",
+        "description_en_clean": "An OBD to 6 pin cable listed for Delphi motorcycle use. No extra pin count is supplied.",
+        "description_ar": "كابل من منفذ OBD إلى 6 أسنان مذكور لدراجات دلفي. لا يُذكر عدد أسنان إضافي في العنوان.",
+        "specifications_en": [
+          "Connector listed: OBD to 6 pin",
+          "Listed for: Delphi motorcycle"
+        ],
+        "specifications_ar": [
+          "الموصل المذكور: OBD إلى 6 أسنان",
+          "المذكور: دراجة دلفي"
+        ],
+        "search_keywords_en": [
+          "OBD 6 pin motorcycle",
+          "Delphi motorcycle cable"
+        ],
+        "search_keywords_ar": [
+          "كابل OBD دراجة",
+          "محول 6 أسنان"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "52022F6B-104F-453E-A1E6-73797FF89B87",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "12-Piece Makeup Brush Set",
+        "title_ar": "طقم فرش مكياج – 12 قطعة",
+        "description_en_clean": "A 12-piece makeup brush set. Brush materials and individual brush types are not supplied beyond the title.",
+        "description_ar": "طقم فرش مكياج من 12 قطعة. خامات الفرش وأنواعها التفصيلية غير مذكورة بما يتجاوز عنوان المورّد.",
+        "specifications_en": [
+          "Quantity: 12 pieces",
+          "Type: makeup brush set"
+        ],
+        "specifications_ar": [
+          "الكمية: 12 قطعة",
+          "النوع: طقم فرش مكياج"
+        ],
+        "search_keywords_en": [
+          "12 piece makeup brushes",
+          "makeup brush set"
+        ],
+        "search_keywords_ar": [
+          "طقم فرش مكياج",
+          "فرش مكياج 12"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "6393DCAD-3885-42D4-B6BC-ADF846AB8CB2",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Pet Casino Treasure Hunt Food Puzzle",
+        "title_ar": "لعبة أحجية كنز كازينو لتوزيع الطعام",
+        "description_en_clean": "A pet casino treasure-hunt puzzle toy that spills food. No extra size or mechanism is supplied beyond the title.",
+        "description_ar": "لعبة أحجية للحيوانات الأليفة بطابع كنز الكازينو لتسريب الطعام. المقاس والآلية الإضافية غير مذكورين بما يتجاوز عنوان المورّد.",
+        "specifications_en": [
+          "Type: food spill puzzle toy",
+          "Theme listed: casino treasure hunt",
+          "For: pets"
+        ],
+        "specifications_ar": [
+          "النوع: لعبة أحجية تسريب طعام",
+          "الثيمة المذكورة: كنز كازينو",
+          "لحيوانات أليفة"
+        ],
+        "search_keywords_en": [
+          "pet food puzzle",
+          "casino treasure hunt toy"
+        ],
+        "search_keywords_ar": [
+          "لعبة أحجية طعام",
+          "لعبة كنز للحيوانات"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "8800BE41-B655-4594-8BFD-6BF53003231F",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Makeup Box Set",
+        "title_ar": "طقم مكياج مع علبة",
+        "description_en_clean": "A makeup box make-up set. Piece count, shades, and volume are not supplied in the title.",
+        "description_ar": "طقم مكياج مع علبة. عدد القطع والدرجات والحجم غير مذكورة في عنوان المورّد.",
+        "specifications_en": [
+          "Product: makeup box set",
+          "Volume and piece count: not supplied"
+        ],
+        "specifications_ar": [
+          "المنتج: طقم مكياج مع علبة",
+          "الحجم وعدد القطع: غير مذكور"
+        ],
+        "search_keywords_en": [
+          "makeup box set",
+          "makeup set"
+        ],
+        "search_keywords_ar": [
+          "طقم مكياج",
+          "علبة مكياج"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "C0080972-C4DC-47BD-BDA5-B6F0B4484C42",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Lamped Manicure Pedicure Support Plate",
+        "title_ar": "لوح إسناد مانيكير وباديكير مع ضوء",
+        "description_en_clean": "A lamped manicure support plate also listed as a professional pedicure nail plate. No size is supplied.",
+        "description_ar": "لوح إسناد للمانيكير مع ضوء، مذكور أيضاً كلوح أظافر للباديكير الاحترافي. المقاس غير مذكور.",
+        "specifications_en": [
+          "Type: lamped manicure support plate",
+          "Also listed: professional pedicure nail plate"
+        ],
+        "specifications_ar": [
+          "النوع: لوح إسناد مانيكير مع ضوء",
+          "أيضاً: لوح باديكير احترافي"
+        ],
+        "search_keywords_en": [
+          "manicure support plate",
+          "lamped pedicure plate"
+        ],
+        "search_keywords_ar": [
+          "لوح مانيكير",
+          "لوح باديكير مع ضوء"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "C9052A90-6D89-419A-8A7C-BC34FA08B426",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "12-Piece Makeup Brush Set with Eye Brush",
+        "title_ar": "طقم فرش مكياج مع فرشاة عيون – 12 قطعة",
+        "description_en_clean": "A 12-piece makeup brush set that includes an eye brush. Other brush types and materials are not supplied.",
+        "description_ar": "طقم فرش مكياج من 12 قطعة يشمل فرشاة للعيون. باقي أنواع الفرش والخامات غير مذكورة.",
+        "specifications_en": [
+          "Quantity: 12 pieces",
+          "Includes listed: eye brush",
+          "Type: makeup brush set"
+        ],
+        "specifications_ar": [
+          "الكمية: 12 قطعة",
+          "يشمل المذكور: فرشاة عيون",
+          "النوع: طقم فرش مكياج"
+        ],
+        "search_keywords_en": [
+          "12 piece makeup brushes",
+          "eye brush set"
+        ],
+        "search_keywords_ar": [
+          "طقم فرش مكياج 12",
+          "فرشاة عيون"
+        ]
+      }
+    },
+    {
+      "cj_product_id": "EE1DC650-D8A1-477D-83D5-A5EFEA81FEB2",
+      "bucket": "unsupported_claim",
+      "method": "surgical_local_edit",
+      "status": "local_pass",
+      "review_reason": null,
+      "gold_standard_gaps": [],
+      "quality_findings": [],
+      "draft": {
+        "i": 1,
+        "title_en_clean": "Rubber Mint Feeding Ball with Food Bin",
+        "title_ar": "كرة تغذية مطاطية بالنعناع مع حجيرة طعام",
+        "description_en_clean": "A rubber mint feeding ball with a built-in food storage bin. Size and color are not supplied in the title.",
+        "description_ar": "كرة تغذية مطاطية برائحة النعناع مع حجيرة مدمجة لتخزين الطعام. المقاس واللون غير مذكورين في عنوان المورّد.",
+        "specifications_en": [
+          "Material: rubber",
+          "Scent listed: mint",
+          "Design: built-in food storage bin"
+        ],
+        "specifications_ar": [
+          "الخامة: مطاط",
+          "الرائحة المذكورة: نعناع",
+          "التصميم: حجيرة طعام مدمجة"
+        ],
+        "search_keywords_en": [
+          "rubber mint feeding ball",
+          "food storage ball"
+        ],
+        "search_keywords_ar": [
+          "كرة تغذية مطاطية",
+          "كرة طعام بالنعناع"
+        ]
+      }
+    }
+  ]
+}

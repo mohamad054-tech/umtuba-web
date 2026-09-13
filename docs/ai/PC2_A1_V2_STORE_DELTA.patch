@@ -1,0 +1,805 @@
+diff --git a/app/components/store/CartIconButton.tsx b/app/components/store/CartIconButton.tsx
+index ffb9bef..ea61f55 100644
+--- a/app/components/store/CartIconButton.tsx
++++ b/app/components/store/CartIconButton.tsx
+@@ -97,7 +97,7 @@ export default function CartIconButton() {
+           d="M3 3h2l.4 2M7 13h10l3-8H6.4M7 13l-1.2 6h12.4M7 13l-.6-3M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+         />
+       </svg>
+-      <span className="absolute -right-1 -top-1">
++      <span className="absolute -end-1 -top-1">
+         <UnreadBadge count={count} />
+       </span>
+     </Link>
+diff --git a/app/components/store/HeroCarousel.tsx b/app/components/store/HeroCarousel.tsx
+index dff635b..cc92ab0 100644
+--- a/app/components/store/HeroCarousel.tsx
++++ b/app/components/store/HeroCarousel.tsx
+@@ -79,15 +79,21 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
+             }}
+           />
+         )}
+-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20" />
++        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/45 to-black/20 rtl:bg-gradient-to-l" />
+         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+ 
+         <div className="relative z-10 flex min-h-[280px] flex-col justify-end p-6 md:min-h-[420px] md:p-10 lg:min-h-[480px] lg:p-14">
+           <p className="sf-eyebrow">UMTUBA Store</p>
+-          <h1 className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl">
++          <h1
++            dir="auto"
++            className="sf-display mt-3 max-w-2xl text-3xl font-semibold leading-[1.05] break-words md:text-5xl lg:text-6xl"
++          >
+             {slide.title}
+           </h1>
+-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">
++          <p
++            dir="auto"
++            className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base"
++          >
+             {slide.subtitle}
+           </p>
+           <div className="mt-7 flex flex-wrap items-center gap-3">
+@@ -105,7 +111,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
+         <>
+           <button
+             type="button"
+-            className="sf-gallery-nav watch-focus-ring left-3 md:left-5"
++            className="sf-gallery-nav watch-focus-ring start-3 md:start-5"
+             aria-label="Previous featured slide"
+             onClick={() => go(index - 1)}
+           >
+@@ -113,14 +119,14 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
+           </button>
+           <button
+             type="button"
+-            className="sf-gallery-nav watch-focus-ring right-3 md:right-5"
++            className="sf-gallery-nav watch-focus-ring end-3 md:end-5"
+             aria-label="Next featured slide"
+             onClick={() => go(index + 1)}
+           >
+             ›
+           </button>
+           <div
+-            className="absolute bottom-4 right-4 z-20 flex items-center gap-2 md:bottom-6 md:right-6"
++            className="absolute bottom-4 end-4 z-20 flex items-center gap-2 md:bottom-6 md:end-6"
+             role="tablist"
+             aria-label="Featured slides"
+           >
+@@ -141,7 +147,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
+             ))}
+             <button
+               type="button"
+-              className="watch-focus-ring ml-1 rounded-full border border-white/20 bg-black/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80"
++              className="watch-focus-ring ms-1 rounded-full border border-white/20 bg-black/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80"
+               aria-pressed={paused}
+               onClick={() => setPaused((v) => !v)}
+             >
+diff --git a/app/components/store/ProductCard.tsx b/app/components/store/ProductCard.tsx
+index 42d9e44..c88a879 100644
+--- a/app/components/store/ProductCard.tsx
++++ b/app/components/store/ProductCard.tsx
+@@ -70,7 +70,7 @@ export default function ProductCard({
+         )}
+         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
+ 
+-        <div className="absolute left-3 top-3 z-20 flex flex-wrap gap-2">
++        <div className="absolute start-3 top-3 z-20 flex flex-wrap gap-2">
+           {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
+           {badge ? (
+             <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
+@@ -90,7 +90,7 @@ export default function ProductCard({
+         </div>
+ 
+         {showWishlist ? (
+-          <div className="pointer-events-auto absolute right-3 top-3 z-20">
++          <div className="pointer-events-auto absolute end-3 top-3 z-20">
+             <WishlistButton
+               productId={item.product.id}
+               initialWishlisted={initialWishlisted}
+@@ -112,14 +112,23 @@ export default function ProductCard({
+       </div>
+ 
+       <div className="relative z-20 flex flex-1 flex-col gap-2 p-4 pointer-events-none">
+-        <p className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--sf-faint)]">
++        <p
++          dir="auto"
++          className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--sf-faint)]"
++        >
+           {item.store.name}
+         </p>
+-        <h3 className="sf-display text-base font-semibold leading-snug text-[var(--sf-ink)] md:text-[1.05rem]">
++        <h3
++          dir="auto"
++          className="sf-display text-base font-semibold leading-snug text-[var(--sf-ink)] md:text-[1.05rem]"
++        >
+           {item.product.title}
+         </h3>
+         {item.product.short_description ? (
+-          <p className="line-clamp-2 text-sm leading-relaxed text-[var(--sf-muted)]">
++          <p
++            dir="auto"
++            className="line-clamp-2 text-sm leading-relaxed text-[var(--sf-muted)]"
++          >
+             {item.product.short_description}
+           </p>
+         ) : null}
+diff --git a/app/components/store/SearchFilters.tsx b/app/components/store/SearchFilters.tsx
+index 5094a09..a12fc6d 100644
+--- a/app/components/store/SearchFilters.tsx
++++ b/app/components/store/SearchFilters.tsx
+@@ -22,16 +22,20 @@ export default function SearchFilters({
+   const q = params.get("q") ?? "";
+   const category = params.get("category") ?? "";
+   const sort = params.get("sort") ?? "newest";
++  const availability = params.get("availability") ?? "";
+ 
+   const queryString = useMemo(() => {
+     const next = new URLSearchParams();
+     if (q.trim()) next.set("q", q.trim());
+     if (category) next.set("category", category);
+     if (sort && sort !== "newest") next.set("sort", sort);
++    if (availability === "in_stock") next.set("availability", "in_stock");
+     return next.toString();
+-  }, [q, category, sort]);
++  }, [q, category, sort, availability]);
+ 
+-  const hasFilters = Boolean(q.trim() || category || (sort && sort !== "newest"));
++  const hasFilters = Boolean(
++    q.trim() || category || (sort && sort !== "newest") || availability === "in_stock"
++  );
+ 
+   function push(updates: Record<string, string>) {
+     const next = new URLSearchParams(queryString);
+@@ -75,6 +79,24 @@ export default function SearchFilters({
+         </div>
+       </fieldset>
+ 
++      <fieldset>
++        <legend className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--sf-faint)]">
++          Availability
++        </legend>
++        <div className="mt-2 flex flex-wrap gap-1.5">
++          <FilterChip
++            label="All"
++            selected={availability !== "in_stock"}
++            onClick={() => push({ availability: "" })}
++          />
++          <FilterChip
++            label="In stock"
++            selected={availability === "in_stock"}
++            onClick={() => push({ availability: "in_stock" })}
++          />
++        </div>
++      </fieldset>
++
+       <div>
+         <label
+           htmlFor="store-sort"
+@@ -119,6 +141,7 @@ export default function SearchFilters({
+           type="button"
+           className="sf-btn sf-btn-ghost"
+           aria-expanded={mobileOpen}
++          aria-controls="store-search-filters"
+           onClick={() => setMobileOpen((v) => !v)}
+         >
+           {mobileOpen ? "Hide filters" : "Filters"}
+@@ -126,6 +149,7 @@ export default function SearchFilters({
+       </div>
+ 
+       <div
++        id="store-search-filters"
+         className={`rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-4 backdrop-blur-xl ${
+           mobileOpen ? "block" : "hidden lg:block"
+         }`}
+diff --git a/app/components/store/StoreCard.tsx b/app/components/store/StoreCard.tsx
+index 2b47f21..68dceee 100644
+--- a/app/components/store/StoreCard.tsx
++++ b/app/components/store/StoreCard.tsx
+@@ -14,7 +14,10 @@ export default function StoreCard({ store }: StoreCardProps) {
+       <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[rgba(214,196,161,0.28)] bg-[linear-gradient(145deg,rgba(214,196,161,0.22),rgba(255,255,255,0.04))] text-lg font-semibold text-[var(--sf-accent-strong)]">
+         {(store.name[0] ?? "U").toUpperCase()}
+       </div>
+-      <p className="sf-display mt-4 text-base font-semibold tracking-tight group-hover:text-[var(--sf-accent-strong)]">
++      <p
++        dir="auto"
++        className="sf-display mt-4 text-base font-semibold tracking-tight group-hover:text-[var(--sf-accent-strong)]"
++      >
+         {store.name}
+       </p>
+       <p className="mt-1 text-xs text-[var(--sf-faint)]">@{store.slug}</p>
+diff --git a/app/components/store/WishlistButton.tsx b/app/components/store/WishlistButton.tsx
+index 863ecad..6667a6a 100644
+--- a/app/components/store/WishlistButton.tsx
++++ b/app/components/store/WishlistButton.tsx
+@@ -69,12 +69,7 @@ export default function WishlistButton({
+         }}
+         className={className ?? DEFAULT_CLASS}
+       >
+-        <span
+-          aria-hidden
+-          className={wishlisted ? "text-[var(--sf-accent-strong,#e8d7b5)]" : undefined}
+-        >
+-          {wishlisted ? "♥" : "♡"}
+-        </span>
++        <HeartIcon filled={wishlisted} />
+       </button>
+       {error ? (
+         <p role="alert" className="mt-2 text-xs text-red-300">
+@@ -84,3 +79,24 @@ export default function WishlistButton({
+     </div>
+   );
+ }
++
++function HeartIcon({ filled }: { filled: boolean }) {
++  return (
++    <svg
++      viewBox="0 0 24 24"
++      className={`h-5 w-5 ${
++        filled ? "text-[var(--sf-accent-strong,#e8d7b5)]" : "text-current"
++      }`}
++      fill={filled ? "currentColor" : "none"}
++      stroke="currentColor"
++      strokeWidth="1.8"
++      aria-hidden
++    >
++      <path
++        strokeLinecap="round"
++        strokeLinejoin="round"
++        d="M12 20s-7.15-4.28-9.28-8.08C1.18 9.22 2.12 6.28 4.9 5.28c1.72-.62 3.56.08 4.66 1.5L12 9.28l2.44-2.5c1.1-1.42 2.94-2.12 4.66-1.5 2.78 1 3.72 3.94 2.18 6.64C19.15 15.72 12 20 12 20Z"
++      />
++    </svg>
++  );
++}
+diff --git a/app/components/store/storefront.css b/app/components/store/storefront.css
+index 38aeb7b..f1feb13 100644
+--- a/app/components/store/storefront.css
++++ b/app/components/store/storefront.css
+@@ -42,7 +42,7 @@
+ 
+ .storefront-premium .sf-skip-link {
+   position: absolute;
+-  left: 1rem;
++  inset-inline-start: 1rem;
+   top: -4rem;
+   z-index: 80;
+   border-radius: 9999px;
+diff --git a/app/lib/storefront/deriveSections.ts b/app/lib/storefront/deriveSections.ts
+index 351e32b..5c46844 100644
+--- a/app/lib/storefront/deriveSections.ts
++++ b/app/lib/storefront/deriveSections.ts
+@@ -89,6 +89,16 @@ export function deriveCuratedCollections(
+     .slice(0, limit);
+ }
+ 
++export function filterCatalogByAvailability(
++  items: PublicCatalogItem[],
++  availability: string
++): PublicCatalogItem[] {
++  if (availability === "in_stock") {
++    return items.filter((item) => (item.available ?? 0) > 0);
++  }
++  return items;
++}
++
+ export function sortCatalogItems(
+   items: PublicCatalogItem[],
+   sort: string
+diff --git a/app/store/[storeSlug]/page.tsx b/app/store/[storeSlug]/page.tsx
+index 4569e9b..bb6460b 100644
+--- a/app/store/[storeSlug]/page.tsx
++++ b/app/store/[storeSlug]/page.tsx
+@@ -61,7 +61,10 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
+   const aboutPanel = (
+     <div className="rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] p-5 md:p-7">
+       <h2 className="sf-display text-lg font-semibold tracking-tight">About</h2>
+-      <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]">
++      <p
++        dir="auto"
++        className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[var(--sf-muted)]"
++      >
+         {store.description || "This store has not added an about section yet."}
+       </p>
+       <dl className="mt-5 grid gap-3 sm:grid-cols-2 text-sm">
+@@ -158,7 +161,10 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
+               </div>
+               <div className="pb-1">
+                 <div className="flex flex-wrap items-center gap-2">
+-                  <h1 className="sf-display text-2xl font-semibold tracking-tight md:text-3xl">
++                  <h1
++                    dir="auto"
++                    className="sf-display text-2xl font-semibold tracking-tight md:text-3xl"
++                  >
+                     {store.name}
+                   </h1>
+                   <span
+@@ -173,7 +179,9 @@ export default async function StoreProfilePage({ params }: StoreProfilePageProps
+                 </div>
+                 <p className="mt-1 text-sm text-[var(--sf-faint)]">@{store.slug}</p>
+                 {store.tagline ? (
+-                  <p className="mt-2 text-sm text-[var(--sf-muted)]">{store.tagline}</p>
++                  <p dir="auto" className="mt-2 text-sm text-[var(--sf-muted)]">
++                    {store.tagline}
++                  </p>
+                 ) : null}
+                 {STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB ? (
+                   <p className="mt-2 text-xs text-[var(--sf-faint)]">
+diff --git a/app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx b/app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx
+index b128f2b..f0f28a3 100644
+--- a/app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx
++++ b/app/store/[storeSlug]/product/[productSlug]/ProductDetailClient.tsx
+@@ -244,7 +244,7 @@ export default function ProductDetailClient({
+                 <>
+                   <button
+                     type="button"
+-                    className="sf-gallery-nav watch-focus-ring left-3"
++                    className="sf-gallery-nav watch-focus-ring start-3"
+                     aria-label="Previous image"
+                     onClick={() => stepMedia(-1)}
+                   >
+@@ -252,7 +252,7 @@ export default function ProductDetailClient({
+                   </button>
+                   <button
+                     type="button"
+-                    className="sf-gallery-nav watch-focus-ring right-3"
++                    className="sf-gallery-nav watch-focus-ring end-3"
+                     aria-label="Next image"
+                     onClick={() => stepMedia(1)}
+                   >
+@@ -333,7 +333,10 @@ export default function ProductDetailClient({
+             ) : null}
+           </Link>
+ 
+-          <h1 className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
++          <h1
++            dir="auto"
++            className="sf-display mt-4 text-3xl font-semibold tracking-tight md:text-4xl"
++          >
+             {detail.displayTitle?.trim() || detail.product.title}
+           </h1>
+           {detail.marketplaceSourceType === "supplier_listing" ? (
+@@ -348,7 +351,10 @@ export default function ProductDetailClient({
+             </p>
+           ) : null}
+           {detail.product.short_description ? (
+-            <p className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]">
++            <p
++              dir="auto"
++              className="mt-2 text-sm leading-relaxed text-[var(--sf-muted)]"
++            >
+               {detail.product.short_description}
+             </p>
+           ) : null}
+diff --git a/app/store/search/page.tsx b/app/store/search/page.tsx
+index 48cc64f..7b7a0d3 100644
+--- a/app/store/search/page.tsx
++++ b/app/store/search/page.tsx
+@@ -7,7 +7,10 @@ import StorePageHeader from "../../components/store/StorePageHeader";
+ import StoreShell from "../../components/store/StoreShell";
+ import { ProductGridSkeleton } from "../../components/store/StoreSkeleton";
+ import { APP_ROUTES } from "../../lib/nav";
+-import { sortCatalogItems } from "../../lib/storefront/deriveSections";
++import {
++  filterCatalogByAvailability,
++  sortCatalogItems,
++} from "../../lib/storefront/deriveSections";
+ import { createClient } from "../../../lib/supabase/server";
+ import {
+   listActiveCategories,
+@@ -19,6 +22,7 @@ type SearchPageProps = {
+     q?: string;
+     category?: string;
+     sort?: string;
++    availability?: string;
+   }>;
+ };
+ 
+@@ -33,6 +37,8 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
+   const categoryId =
+     typeof params.category === "string" ? params.category : undefined;
+   const sort = typeof params.sort === "string" ? params.sort : "newest";
++  const availability =
++    typeof params.availability === "string" ? params.availability : "";
+ 
+   const supabase = await createClient();
+   const [categories, catalog] = await Promise.all([
+@@ -44,7 +50,10 @@ export default async function StoreSearchPage({ searchParams }: SearchPageProps)
+     }),
+   ]);
+ 
+-  const items = sortCatalogItems(catalog.items, sort);
++  const items = sortCatalogItems(
++    filterCatalogByAvailability(catalog.items, availability),
++    sort
++  );
+ 
+   return (
+     <StoreShell title="Search" subtitle="Store">
+diff --git a/lib/store/catalogQueries.ts b/lib/store/catalogQueries.ts
+index 916ffe5..976f2e6 100644
+--- a/lib/store/catalogQueries.ts
++++ b/lib/store/catalogQueries.ts
+@@ -2,6 +2,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
+ import { availableUnits } from "./inventory";
+ import { isPubliclyVisibleProduct } from "./permissions";
+ import { createAuthorizedProductMediaSignedUrl } from "./productMediaUrl";
++import {
++  isSandboxCategoryIdentity,
++  isSandboxProductIdentity,
++  isSandboxStoreIdentity,
++  shouldHideSandboxFromStorefront,
++} from "./sandboxCatalog";
+ import { isLegitimateCompareAt } from "./tradingContracts";
+ import type {
+   ProductCategoryRow,
+@@ -26,7 +32,9 @@ export async function listActiveCategories(
+     .eq("status", "active")
+     .order("sort_order", { ascending: true })
+     .order("name", { ascending: true });
+-  return (data ?? []) as ProductCategoryRow[];
++  const rows = (data ?? []) as ProductCategoryRow[];
++  if (!shouldHideSandboxFromStorefront()) return rows;
++  return rows.filter((category) => !isSandboxCategoryIdentity(category));
+ }
+ 
+ /**
+@@ -192,6 +200,13 @@ export async function listPublicCatalog(
+       continue;
+     }
+ 
++    if (
++      shouldHideSandboxFromStorefront() &&
++      (isSandboxStoreIdentity(row.stores) || isSandboxProductIdentity(row))
++    ) {
++      continue;
++    }
++
+     items.push(await enrichPublicCatalogRow(supabase, row));
+   }
+ 
+@@ -220,6 +235,13 @@ export async function listPublicCatalog(
+           .eq("moderation_status", "approved")
+           .maybeSingle();
+         if (!product) continue;
++        if (
++          shouldHideSandboxFromStorefront() &&
++          (isSandboxStoreIdentity(sellerStore) ||
++            isSandboxProductIdentity(product as StoreProductRow))
++        ) {
++          continue;
++        }
+ 
+         const { data: allowed } = await supabase.rpc(
+           "store_listing_allows_seller_sale",
+@@ -269,7 +291,15 @@ export async function getPublicStoreBySlug(
+     .eq("slug", storeSlug.toLowerCase())
+     .eq("status", "active")
+     .maybeSingle();
+-  return (data as StoreRow | null) ?? null;
++  const store = (data as StoreRow | null) ?? null;
++  if (
++    store &&
++    shouldHideSandboxFromStorefront() &&
++    isSandboxStoreIdentity(store)
++  ) {
++    return null;
++  }
++  return store;
+ }
+ 
+ export async function getPublicProductDetail(
+@@ -310,6 +340,12 @@ export async function getPublicProductDetail(
+     ) {
+       return { detail: null, error: null };
+     }
++    if (
++      shouldHideSandboxFromStorefront() &&
++      isSandboxProductIdentity(productRow)
++    ) {
++      return { detail: null, error: null };
++    }
+     return buildPublicProductDetail(supabase, {
+       store,
+       productRow,
+@@ -355,6 +391,12 @@ export async function getPublicProductDetail(
+       .eq("moderation_status", "approved")
+       .maybeSingle();
+     if (!source) continue;
++    if (
++      shouldHideSandboxFromStorefront() &&
++      isSandboxProductIdentity(source as StoreProductRow)
++    ) {
++      continue;
++    }
+ 
+     const { data: supplier } = await supabase
+       .from("stores")
+@@ -566,6 +608,17 @@ export async function getPublicProductById(
+     return null;
+   }
+ 
++  if (
++    shouldHideSandboxFromStorefront() &&
++    (isSandboxStoreIdentity(store) ||
++      isSandboxProductIdentity({
++        id: data.id as string,
++        slug: data.slug as string,
++      }))
++  ) {
++    return null;
++  }
++
+   return { storeSlug: store.slug, productSlug: data.slug as string };
+ }
+ 
+@@ -579,11 +632,20 @@ export async function getPublicStoreById(
+ ): Promise<{ storeSlug: string } | null> {
+   const { data } = await supabase
+     .from("stores")
+-    .select("slug, status")
++    .select("id, slug, status")
+     .eq("id", storeId)
+     .eq("status", "active")
+     .maybeSingle();
+ 
+   if (!data) return null;
++  if (
++    shouldHideSandboxFromStorefront() &&
++    isSandboxStoreIdentity({
++      id: data.id as string,
++      slug: data.slug as string,
++    })
++  ) {
++    return null;
++  }
+   return { storeSlug: data.slug as string };
+ }
+diff --git a/lib/store/sandboxCatalog.test.ts b/lib/store/sandboxCatalog.test.ts
+new file mode 100644
+index 0000000..91b1f80
+--- /dev/null
++++ b/lib/store/sandboxCatalog.test.ts
+@@ -0,0 +1,95 @@
++import { afterEach, describe, expect, it } from "vitest";
++import {
++  STORE_E2E_SANDBOX_NAMESPACE,
++  STORE_E2E_SANDBOX_STORE_ID,
++  STORE_E2E_SANDBOX_STORE_SLUG,
++  isSandboxCatalogMarker,
++  isSandboxCategoryIdentity,
++  isSandboxProductIdentity,
++  isSandboxStoreIdentity,
++  shouldExposeSandboxCatalog,
++  shouldHideSandboxFromStorefront,
++} from "./sandboxCatalog";
++
++describe("sandbox catalog containment", () => {
++  const previous = process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG;
++
++  afterEach(() => {
++    if (previous === undefined) {
++      delete process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG;
++    } else {
++      process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG = previous;
++    }
++  });
++
++  it("recognizes namespace, slug, and fixed sandbox ids", () => {
++    expect(isSandboxCatalogMarker(STORE_E2E_SANDBOX_NAMESPACE)).toBe(true);
++    expect(isSandboxCatalogMarker(STORE_E2E_SANDBOX_STORE_SLUG)).toBe(true);
++    expect(isSandboxCatalogMarker(STORE_E2E_SANDBOX_STORE_ID)).toBe(true);
++    expect(isSandboxCatalogMarker("UMTUBA_E2E_20260721 Simple Mug")).toBe(true);
++    expect(isSandboxCatalogMarker("atelier-a")).toBe(false);
++    expect(isSandboxCatalogMarker("Genuine Mug")).toBe(false);
++  });
++
++  it("identifies the seeded sandbox store and products", () => {
++    expect(
++      isSandboxStoreIdentity({
++        id: STORE_E2E_SANDBOX_STORE_ID,
++        slug: STORE_E2E_SANDBOX_STORE_SLUG,
++        name: `${STORE_E2E_SANDBOX_NAMESPACE} Sandbox`,
++      })
++    ).toBe(true);
++    expect(
++      isSandboxStoreIdentity({
++        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
++        slug: "atelier-a",
++        name: "Atelier A",
++      })
++    ).toBe(false);
++
++    expect(
++      isSandboxProductIdentity({
++        id: "e2e02107-2026-4001-8000-000000000011",
++        slug: "e2e-simple-mug",
++        title: `${STORE_E2E_SANDBOX_NAMESPACE} Simple Mug`,
++        sku: `${STORE_E2E_SANDBOX_NAMESPACE}-MUG`,
++      })
++    ).toBe(true);
++    expect(
++      isSandboxProductIdentity({
++        slug: "e2e-variant-tee",
++        title: "Variant Tee",
++      })
++    ).toBe(true);
++    expect(
++      isSandboxProductIdentity({
++        id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
++        slug: "ceramic-mug",
++        title: "Ceramic mug",
++      })
++    ).toBe(false);
++  });
++
++  it("identifies the seeded sandbox category", () => {
++    expect(
++      isSandboxCategoryIdentity({
++        id: "e2e02107-2026-4001-8000-000000000050",
++        slug: STORE_E2E_SANDBOX_STORE_SLUG,
++        name: `${STORE_E2E_SANDBOX_NAMESPACE} Category`,
++      })
++    ).toBe(true);
++  });
++
++  it("hides sandbox from storefront unless explicitly opted in", () => {
++    delete process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG;
++    expect(shouldExposeSandboxCatalog()).toBe(false);
++    expect(shouldHideSandboxFromStorefront()).toBe(true);
++
++    process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG = "0";
++    expect(shouldHideSandboxFromStorefront()).toBe(true);
++
++    process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG = "1";
++    expect(shouldExposeSandboxCatalog()).toBe(true);
++    expect(shouldHideSandboxFromStorefront()).toBe(false);
++  });
++});
+diff --git a/lib/store/sandboxCatalog.ts b/lib/store/sandboxCatalog.ts
+new file mode 100644
+index 0000000..a4c1856
+--- /dev/null
++++ b/lib/store/sandboxCatalog.ts
+@@ -0,0 +1,78 @@
++/**
++ * Remote E2E sandbox markers (UMTUBA_E2E_20260721).
++ * Public merchandising hides these unless explicitly opted in so demo
++ * catalog rows cannot reach production storefront surfaces by accident.
++ */
++
++export const STORE_E2E_SANDBOX_NAMESPACE = "UMTUBA_E2E_20260721";
++export const STORE_E2E_SANDBOX_STORE_ID =
++  "e2e02107-2026-4001-8000-000000000001";
++export const STORE_E2E_SANDBOX_STORE_SLUG = "umtuba-e2e-20260721";
++export const STORE_E2E_SANDBOX_ID_PREFIX = "e2e02107-2026-4001-8000-";
++
++export const STORE_E2E_SANDBOX_PRODUCT_SLUGS = [
++  "e2e-simple-mug",
++  "e2e-variant-tee",
++  "e2e-low-stock",
++] as const;
++
++function normalize(value: string): string {
++  return value.trim().toLowerCase();
++}
++
++export function isSandboxCatalogMarker(
++  value: string | null | undefined
++): boolean {
++  if (!value) return false;
++  const v = normalize(value);
++  return (
++    v.includes("umtuba_e2e_") ||
++    v.includes("umtuba-e2e-") ||
++    v.startsWith(STORE_E2E_SANDBOX_ID_PREFIX)
++  );
++}
++
++export function isSandboxStoreIdentity(input: {
++  id?: string | null;
++  slug?: string | null;
++  name?: string | null;
++}): boolean {
++  return (
++    isSandboxCatalogMarker(input.id) ||
++    isSandboxCatalogMarker(input.slug) ||
++    isSandboxCatalogMarker(input.name)
++  );
++}
++
++export function isSandboxProductIdentity(input: {
++  id?: string | null;
++  slug?: string | null;
++  title?: string | null;
++  sku?: string | null;
++}): boolean {
++  const slug = input.slug ? normalize(input.slug) : "";
++  return (
++    isSandboxCatalogMarker(input.id) ||
++    isSandboxCatalogMarker(input.slug) ||
++    isSandboxCatalogMarker(input.title) ||
++    isSandboxCatalogMarker(input.sku) ||
++    (STORE_E2E_SANDBOX_PRODUCT_SLUGS as readonly string[]).includes(slug)
++  );
++}
++
++export function isSandboxCategoryIdentity(input: {
++  id?: string | null;
++  slug?: string | null;
++  name?: string | null;
++}): boolean {
++  return isSandboxStoreIdentity(input);
++}
++
++/** Opt-in only. Default is hide — production builds must not merchandize sandbox. */
++export function shouldExposeSandboxCatalog(): boolean {
++  return process.env.NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG === "1";
++}
++
++export function shouldHideSandboxFromStorefront(): boolean {
++  return !shouldExposeSandboxCatalog();
++}
+diff --git a/lib/store/storeHardeningFoundation.test.ts b/lib/store/storeHardeningFoundation.test.ts
+index 41b70fc..fe29273 100644
+--- a/lib/store/storeHardeningFoundation.test.ts
++++ b/lib/store/storeHardeningFoundation.test.ts
+@@ -279,6 +279,7 @@ describe("store hardening domain contracts", () => {
+     expect(STOREFRONT_FLAGS.SHOW_STORE_PROFILE_RATINGS_TAB).toBe(false);
+     expect(STOREFRONT_FLAGS.SHOW_PDP_REVIEWS_PLACEHOLDER).toBe(false);
+     expect(STOREFRONT_FLAGS.SHOW_STORE_FOLLOW_UI).toBe(false);
++    expect(STOREFRONT_FLAGS.SHOW_SANDBOX_CATALOG).toBe(false);
+   });
+ 
+   it("wires hardening RPCs into admin review registry and actions", () => {
+diff --git a/lib/store/storefrontDeriveSections.test.ts b/lib/store/storefrontDeriveSections.test.ts
+index 362e081..ce12ec4 100644
+--- a/lib/store/storefrontDeriveSections.test.ts
++++ b/lib/store/storefrontDeriveSections.test.ts
+@@ -4,6 +4,7 @@ import {
+   compareAtSavePercent,
+   deriveCuratedCollections,
+   deriveFeaturedStores,
++  filterCatalogByAvailability,
+   hasLegitimateCompareAt,
+   heroSlidesFromCatalog,
+   pickNewArrivals,
+@@ -225,6 +226,25 @@ describe("storefront deriveSections", () => {
+     expect(slides[0]?.title).toBe("Shop UMTUBA");
+   });
+ 
++  it("filters in-stock catalog items without inventing availability", () => {
++    const items = [
++      item({ product: product({ id: "in", title: "In" }), available: 2 }),
++      item({ product: product({ id: "out", title: "Out" }), available: 0 }),
++      item({
++        product: product({ id: "unknown", title: "Unknown" }),
++        available: null,
++      }),
++    ];
++    expect(
++      filterCatalogByAvailability(items, "in_stock").map((i) => i.product.id)
++    ).toEqual(["in"]);
++    expect(filterCatalogByAvailability(items, "").map((i) => i.product.id)).toEqual([
++      "in",
++      "out",
++      "unknown",
++    ]);
++  });
++
+   it("sorts catalog by price and title without inventing prices", () => {
+     const items = [
+       item({
+diff --git a/lib/store/storefrontFlags.ts b/lib/store/storefrontFlags.ts
+index 56be600..4bc4399 100644
+--- a/lib/store/storefrontFlags.ts
++++ b/lib/store/storefrontFlags.ts
+@@ -25,4 +25,9 @@ export const STOREFRONT_FLAGS = {
+   ),
+   /** Follow / follower social chrome — unfinished for this stage. */
+   SHOW_STORE_FOLLOW_UI: envFlag("NEXT_PUBLIC_STORE_SHOW_FOLLOW_UI"),
++  /**
++   * Show remote E2E sandbox catalog (UMTUBA_E2E_*) on public storefront.
++   * Default off so demo products cannot merchandize in production.
++   */
++  SHOW_SANDBOX_CATALOG: envFlag("NEXT_PUBLIC_STORE_SHOW_SANDBOX_CATALOG"),
+ } as const;

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Local Next.js HTML dumps contain Flight/error payloads. Tailwind must not scan them. */
+@source not "../.local";
 
 :root {
   --background: #ffffff;
@@ -596,5 +598,80 @@ body {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* Official approved-video brand mark — sizing/overflow only, no artwork change.
+   Folded phone <640px; inner/unfolded Fold6-class widths use 768px (md). */
+.umtuba-brand-frame {
+  display: inline-flex;
+  overflow: visible;
+  max-width: 100%;
+  flex: 0 0 auto;
+  line-height: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.umtuba-brand-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center center;
+  overflow: visible;
+}
+
+.umtuba-brand-frame--nav {
+  box-sizing: content-box;
+  height: 2.75rem;
+  width: auto;
+  padding: 0.2rem;
+}
+
+.umtuba-brand-frame--legal {
+  height: 3rem;
+  width: auto;
+}
+
+.umtuba-brand-frame--hero {
+  height: clamp(20rem, 60vw, 28rem);
+  width: auto;
+  max-height: 28rem;
+}
+
+.umtuba-brand-frame--auth {
+  height: 10rem;
+  width: auto;
+}
+
+.umtuba-brand-frame--footer {
+  height: 9rem;
+  width: auto;
+}
+
+.umtuba-brand-frame--loading {
+  height: 12rem;
+  width: auto;
+}
+
+@media (min-width: 640px) {
+  .umtuba-brand-frame--nav {
+    height: 3rem;
+  }
+
+  .umtuba-brand-frame--auth {
+    height: 12rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .umtuba-brand-frame--nav {
+    height: 3.25rem;
+  }
+
+  .umtuba-brand-frame--footer {
+    height: 11rem;
   }
 }

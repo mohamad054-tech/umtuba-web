@@ -1,0 +1,141 @@
+{
+  "task_id": "UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1",
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "generated_at": "2026-09-10T11:10:46.475Z",
+  "definition": "isPublishableBrowseRow + stored catalog_qa on the FINAL_22 canonical (same 380/152 split)",
+  "applied_fixes": false,
+  "count": 6,
+  "products": [
+    {
+      "id": "1665981331156774912",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "Dog Silicone Licking Pad Pet Licking Mat Silicone Smelling Mat Multifunctional Food Bowl Pets Supplies",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Near-duplicate title group (2): dog silicone licking pad pet",
+          "bucket": "duplicate",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "Do not auto-delete. Publishing a weaker duplicate would bypass the duplicate gate."
+        }
+      ],
+      "margin": 0.45940746440938823,
+      "retail_price_minor": 2599
+    },
+    {
+      "id": "2412180936151612700",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Applicable To AirTag Silicone Pet Tracker Collar Protective Cover",
+      "reasons": [
+        {
+          "flag": "IP_REVIEW",
+          "reason": "Title mentions a restricted brand, platform mark, or model family.",
+          "bucket": "ip_brand",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "IP/brand gate. No authorization field is present on the row or in approved-59 / expansion / profit-gate. Must not be bypassed."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Electronics listing title may be IP-restricted or a fashion clip.",
+          "bucket": "ip_brand",
+          "extra_buckets": [
+            "product_data"
+          ],
+          "recoverability": "HARD_HOLD",
+          "notes": "Electronics QA reason is IP-restricted on this title. No authorization in dataset."
+        }
+      ],
+      "margin": 0.6729205753595997,
+      "retail_price_minor": 1599
+    },
+    {
+      "id": "2505300639441617700",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Applicable To 15promax HD Rear Film TPU Screen Protector",
+      "reasons": [
+        {
+          "flag": "IP_REVIEW",
+          "reason": "Title mentions a restricted brand, platform mark, or model family.",
+          "bucket": "ip_brand",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "IP/brand gate. No authorization field is present on the row or in approved-59 / expansion / profit-gate. Must not be bypassed."
+        }
+      ],
+      "margin": 0.6917945296864576,
+      "retail_price_minor": 1499
+    },
+    {
+      "id": "1779806073667461120",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "4 In 1 Rotatable Colorful Lighting Wireless Charger Stand For Phone 15 14 13 12 Pro Max 8 7 Holder Magnetic Fast Charging Station",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "IP_REVIEW",
+          "reason": "Title mentions a restricted brand, platform mark, or model family.",
+          "bucket": "ip_brand",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "IP/brand gate. No authorization field is present on the row or in approved-59 / expansion / profit-gate. Must not be bypassed."
+        }
+      ],
+      "margin": 0.451619917373342,
+      "retail_price_minor": 4599
+    },
+    {
+      "id": "1644401904111325184",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "12",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is empty, numeric-only, or garbled.",
+          "bucket": "product_data",
+          "extra_buckets": [
+            "supplier_source"
+          ],
+          "recoverability": "HARD_HOLD",
+          "notes": "No usable sibling title. Product identity is unverifiable from authoritative sources. Must not invent a product name."
+        }
+      ],
+      "margin": 0.5444971037388099,
+      "retail_price_minor": 1899
+    },
+    {
+      "id": "1402123238414356480",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Tinker-bell-kids",
+      "reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is empty, numeric-only, or garbled.",
+          "bucket": "product_data",
+          "extra_buckets": [
+            "supplier_source"
+          ],
+          "recoverability": "HARD_HOLD",
+          "notes": "No usable sibling title. Current title is unverifiable and IP-adjacent. Must not invent a product name."
+        }
+      ],
+      "margin": 0.5178656503096712,
+      "retail_price_minor": 2099
+    }
+  ]
+}

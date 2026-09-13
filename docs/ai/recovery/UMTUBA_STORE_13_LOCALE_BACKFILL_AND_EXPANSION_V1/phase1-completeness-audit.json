@@ -1,0 +1,31 @@
+{
+  "task_id": "UMTUBA_STORE_13_LOCALE_BACKFILL_AND_EXPANSION_V1",
+  "source": "data/cj-catalog-532-plus-expansion-ALL_LOCALES-CANDIDATE.json",
+  "source_sha256": "e3f87d7bfceb8a0d46d1d7a75666214d8f6db244a5c7f9adbac3bccf9d233e83",
+  "source_sha_ok": true,
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "92775bcb72f894a13663a3c4a3c87007ca5d747a8ebc3f83e461306c10d63f52",
+  "canonical_sha_ok": true,
+  "required_locales": [
+    "ar",
+    "en",
+    "fr",
+    "es",
+    "de",
+    "pt",
+    "id",
+    "hi",
+    "ru",
+    "tr",
+    "zh-CN",
+    "ja",
+    "ko"
+  ],
+  "required_locale_count": 13,
+  "total_products": 540,
+  "original_532": 532,
+  "new_8": 8,
+  "product_locale_pairs_missing": 5908,
+  "expected_pairs": 5908,
+  "gemini_input_pairs": 5908
+}

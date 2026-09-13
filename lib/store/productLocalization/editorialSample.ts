@@ -1,0 +1,494 @@
+import type { LocalizedProductCopy } from "./types";
+
+/**
+ * Human-authored first-pass localizations for the frozen 20-product QA sample.
+ * Facts only from supplier titles. No invented specs, sizes, or claims.
+ */
+export const EDITORIAL_SAMPLE_COPY: Record<string, LocalizedProductCopy> = {
+  "1642738075405537280": {
+    title_en_clean: "6-Piece Reusable Silicone Food Cover Set",
+    title_ar: "طقم أغطية سيليكون قابلة لإعادة الاستخدام – 6 قطع",
+    description_en_clean:
+      "A set of stretchy silicone covers for dishes. Use them to cover bowls and plates and keep food covered during storage. Listed as reusable, stretchy lids. The set includes 6 pieces. Material: silicone.",
+    description_ar:
+      "طقم أغطية سيليكون مطّاطية للأطباق. تُستخدم لتغطية الأوعية والأطباق وإبقاء الطعام مغطى أثناء التخزين. مذكورة كأغطية قابلة للمدّ وإعادة الاستخدام. يضم الطقم 6 قطع. الخامة: سيليكون.",
+    specifications_en: [
+      "Quantity: 6 pieces",
+      "Material: silicone",
+      "Form: stretchy food covers / lids",
+      "Listed use: covering dishes for storage",
+    ],
+    specifications_ar: [
+      "الكمية: 6 قطع",
+      "الخامة: سيليكون",
+      "الشكل: أغطية طعام مطّاطية",
+      "الاستخدام المذكور: تغطية الأطباق للتخزين",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["silicone food covers", "reusable lids", "6-piece set", "dish covers"],
+    search_keywords_ar: ["أغطية سيليكون", "أغطية طعام", "طقم 6 قطع", "أغطية أطباق"],
+  },
+  "1609410194650845184": {
+    title_en_clean: "3-Piece Starfish Silicone Drain Hair Catcher",
+    title_ar: "مصفاة تصريف سيليكون على شكل نجمة البحر – 3 قطع",
+    description_en_clean:
+      "Starfish-shaped silicone drain filters for catching hair at the drain hole. Listed for bathtub, bathroom, kitchen, and toilet drains. The set includes 3 pieces. Material: silicone.",
+    description_ar:
+      "مصافٍ سيليكون على شكل نجمة البحر لالتقاط الشعر عند فتحة التصريف. مذكورة للاستخدام في حوض الاستحمام والحمّام والمطبخ والمرحاض. يضم الطقم 3 قطع. الخامة: سيليكون.",
+    specifications_en: [
+      "Quantity: 3 pieces",
+      "Material: silicone",
+      "Shape: starfish",
+      "Listed locations: bathtub, bathroom, kitchen, toilet",
+    ],
+    specifications_ar: [
+      "الكمية: 3 قطع",
+      "الخامة: سيليكون",
+      "الشكل: نجمة البحر",
+      "الأماكن المذكورة: حوض الاستحمام، الحمّام، المطبخ، المرحاض",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Bathroom",
+    subcategory_ar: "الحمّام",
+    search_keywords_en: ["drain hair catcher", "silicone strainer", "3-piece set", "starfish drain"],
+    search_keywords_ar: ["مصفاة تصريف", "ملتقط شعر", "سيليكون", "3 قطع"],
+  },
+  "A30259A1-6996-42EF-99A8-8FC5B96D833F": {
+    title_en_clean: "6-Cell Silicone Sphere Ice Ball Tray",
+    title_ar: "قالب سيليكون لكرات الثلج – 6 تجاويف",
+    description_en_clean:
+      "A silicone mold that forms large sphere ice balls. Use it to freeze round ice for drinks. The tray has 6 cells. Material: silicone. Listed for whiskey, wine, and cocktail service.",
+    description_ar:
+      "قالب سيليكون لتشكيل كرات ثلج كبيرة كروية. يُستخدم لتجميد ثلج دائري للمشروبات. يضم القالب 6 تجاويف. الخامة: سيليكون. مذكور لاستخدام الويسكي والنبيذ والكوكتيلا.",
+    specifications_en: [
+      "Cells: 6",
+      "Material: silicone",
+      "Shape: large sphere / ice ball",
+      "Listed use: whiskey, wine, cocktail",
+    ],
+    specifications_ar: [
+      "التجاويف: 6",
+      "الخامة: سيليكون",
+      "الشكل: كرة ثلج كبيرة",
+      "الاستخدام المذكور: ويسكي، نبيذ، كوكتيل",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["ice ball tray", "silicone ice mold", "6-cell", "sphere ice"],
+    search_keywords_ar: ["قالب ثلج", "كرات ثلج", "سيليكون", "6 تجاويف"],
+  },
+  "1387692476927709184": {
+    title_en_clean: "One-Piece Knife-Shaped Silicone Baking Spatula",
+    title_ar: "ملعقة سيليكون للخَبز بشكل سكين – قطعة واحدة",
+    description_en_clean:
+      "A one-piece silicone spatula shaped like a knife. Use it for cake cream and jam during baking. Listed as high-temperature baking silicone. Material: silicone.",
+    description_ar:
+      "ملعقة سيليكون قطعة واحدة بشكل سكين. تُستخدم لكريمة الكيك والمربى أثناء الخَبز. مذكورة كسيليكون خَبز يتحمل الحرارة العالية. الخامة: سيليكون.",
+    specifications_en: [
+      "Construction: one-piece",
+      "Shape: knife-shaped",
+      "Material: silicone",
+      "Listed use: cake cream and jam",
+      "Listed attribute: high-temperature baking silicone",
+    ],
+    specifications_ar: [
+      "البناء: قطعة واحدة",
+      "الشكل: بشكل سكين",
+      "الخامة: سيليكون",
+      "الاستخدام المذكور: كريمة الكيك والمربى",
+      "الصفة المذكورة: سيليكون خَبز يتحمل الحرارة العالية",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Baking",
+    subcategory_ar: "الخَبز",
+    search_keywords_en: ["silicone spatula", "baking spatula", "cake cream", "one-piece"],
+    search_keywords_ar: ["ملعقة سيليكون", "خَبز", "كريمة كيك", "قطعة واحدة"],
+  },
+  "2407250234081608100": {
+    title_en_clean: "Silicone Cup Drainboard",
+    title_ar: "رف تجفيف أكواب من السيليكون",
+    description_en_clean:
+      "A silicone drainboard and storage rack for cups. Use it in the kitchen to hold cups while they drain. Material: silicone.",
+    description_ar:
+      "رف تجفيف وتخزين أكواب من السيليكون. يُستخدم في المطبخ لإسناد الأكواب أثناء التصريف. الخامة: سيليكون.",
+    specifications_en: ["Material: silicone", "Form: cup drainboard / storage rack", "Listed use: kitchen cups"],
+    specifications_ar: ["الخامة: سيليكون", "الشكل: رف تجفيف وتخزين أكواب", "الاستخدام المذكور: أكواب المطبخ"],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["cup drainboard", "silicone drying rack", "cup rack"],
+    search_keywords_ar: ["رف أكواب", "تجفيف سيليكون", "مطبخ"],
+  },
+  "1687032314666168320": {
+    title_en_clean: "Stainless Steel Floating Pet Water Bowl",
+    title_ar: "وعاء ماء عائم للحيوانات الأليفة من الستانلس ستيل",
+    description_en_clean:
+      "A floating pet water bowl in stainless steel. Use it as a drinking bowl for pets. Listed as large capacity and floating. Material: stainless steel.",
+    description_ar:
+      "وعاء ماء عائم للحيوانات الأليفة من الستانلس ستيل. يُستخدم كوعاء شرب. مذكور بسعة كبيرة وتصميم عائم. الخامة: ستانلس ستيل.",
+    specifications_en: [
+      "Material: stainless steel",
+      "Form: floating water bowl",
+      "Listed capacity: large (no litre value supplied)",
+    ],
+    specifications_ar: [
+      "الخامة: ستانلس ستيل",
+      "الشكل: وعاء ماء عائم",
+      "السعة المذكورة: كبيرة (لا توجد قيمة باللتر في المصدر)",
+    ],
+    department_en: "Pet",
+    department_ar: "الحيوانات الأليفة",
+    subcategory_en: "Bowls & Feeding",
+    subcategory_ar: "الأوعية والتغذية",
+    search_keywords_en: ["pet water bowl", "stainless steel bowl", "floating bowl"],
+    search_keywords_ar: ["وعاء ماء", "حيوانات أليفة", "ستانلس ستيل"],
+  },
+  "1366573785234411520": {
+    title_en_clean: "1.5L Floating Pet Water Bowl",
+    title_ar: "وعاء ماء عائم للقطط والكلاب – 1.5 لتر",
+    description_en_clean:
+      "A 1.5L floating water bowl for cats and dogs. Use it as a carried slow-water feeder and dispenser. Listed as anti-overflow and floating. Materials: ABS and PP.",
+    description_ar:
+      "وعاء ماء عائم للقطط والكلاب بسعة 1.5 لتر. يُستخدم كمغذّي ماء بطيء محمول. مذكور بأنه عائم ومضاد للفيضان. الخامات: ABS و PP.",
+    specifications_en: [
+      "Capacity: 1.5L",
+      "Materials: ABS and PP",
+      "Form: floating / carried slow-water feeder",
+      "Listed feature: anti-overflow",
+    ],
+    specifications_ar: [
+      "السعة: 1.5 لتر",
+      "الخامات: ABS و PP",
+      "الشكل: وعاء عائم / مغذّي ماء بطيء محمول",
+      "الميزة المذكورة: مضاد للفيضان",
+    ],
+    department_en: "Pet",
+    department_ar: "الحيوانات الأليفة",
+    subcategory_en: "Bowls & Feeding",
+    subcategory_ar: "الأوعية والتغذية",
+    search_keywords_en: ["1.5L pet bowl", "floating water bowl", "ABS PP", "cat dog bowl"],
+    search_keywords_ar: ["وعاء ماء 1.5 لتر", "وعاء عائم", "قطط وكلاب", "ABS"],
+  },
+  "2502230435271605900": {
+    title_en_clean: "Folding Travel Bowl for Dogs",
+    title_ar: "وعاء سفر قابل للطي للكلاب",
+    description_en_clean:
+      "A folding bowl for dogs while traveling. Use it as a portable feeding or drinking bowl on the go. No material, size, or capacity is supplied in the source listing.",
+    description_ar:
+      "وعاء قابل للطي للكلاب أثناء السفر. يُستخدم كوعاء محمول للطعام أو الماء في التنقل. لم تُذكر في المصدر الخامة أو المقاس أو السعة.",
+    specifications_en: ["Form: folding bowl", "Listed use: pet dog traveling", "Material / size: not supplied"],
+    specifications_ar: ["الشكل: وعاء قابل للطي", "الاستخدام المذكور: سفر الكلاب", "الخامة / المقاس: غير مذكورين"],
+    department_en: "Pet",
+    department_ar: "الحيوانات الأليفة",
+    subcategory_en: "Travel",
+    subcategory_ar: "السفر",
+    search_keywords_en: ["folding dog bowl", "travel pet bowl", "portable bowl"],
+    search_keywords_ar: ["وعاء سفر", "وعاء قابل للطي", "كلاب"],
+  },
+  "1698602629309411328": {
+    title_en_clean: "Portable Double Silicone Pet Travel Bowls",
+    title_ar: "أوعية سفر مزدوجة من السيليكون للحيوانات الأليفة",
+    description_en_clean:
+      "Portable double silicone bowls for dogs and cats. Use them as foldable, non-slip travel bowls outdoors. Listed as an anti-choking feeding bowl. Material: silicone.",
+    description_ar:
+      "أوعية سيليكون مزدوجة محمولة للكلاب والقطط. تُستخدم كأوعية سفر قابلة للطي ومقاومة للانزلاق في الخارج. مذكورة في قائمة المورّد كوعاء تغذية مضاد للاختناق. الخامة: سيليكون.",
+    specifications_en: [
+      "Form: portable double bowls",
+      "Material: silicone",
+      "Listed features: foldable, non-slip",
+      "Listed use: pet travel / outdoor",
+      "Supplier listing: anti-choking feeding bowl",
+    ],
+    specifications_ar: [
+      "الشكل: أوعية مزدوجة محمولة",
+      "الخامة: سيليكون",
+      "الميزات المذكورة: قابلة للطي، مقاومة للانزلاق",
+      "الاستخدام المذكور: سفر / استخدام خارجي",
+      "قائمة المورّد: وعاء تغذية مضاد للاختناق",
+    ],
+    department_en: "Pet",
+    department_ar: "الحيوانات الأليفة",
+    subcategory_en: "Travel",
+    subcategory_ar: "السفر",
+    search_keywords_en: ["silicone pet bowls", "travel dog bowls", "foldable bowls", "double bowls"],
+    search_keywords_ar: ["أوعية سيليكون", "سفر الحيوانات", "قابلة للطي", "أوعية مزدوجة"],
+  },
+  "EB17DDD6-0A86-431B-95D0-BE4D7D4957F2": {
+    title_en_clean: "Foldable Car Cup and Bottle Holder",
+    title_ar: "حامل أكواب وزجاجات قابل للطي للسيارة",
+    description_en_clean:
+      "A foldable in-car holder for cups and drinking bottles. Use it as a cup stand in the vehicle. Also listed as an organizer for sunglasses and a phone.",
+    description_ar:
+      "حامل قابل للطي داخل السيارة للأكواب وزجاجات الشرب. يُستخدم كحامل أكواب في المركبة. مذكور أيضاً كمنظّم للنظارات الشمسية والهاتف.",
+    specifications_en: [
+      "Form: foldable cup / bottle holder",
+      "Listed extras: sunglasses and phone organizer",
+      "Listed use: in-car",
+    ],
+    specifications_ar: [
+      "الشكل: حامل أكواب / زجاجات قابل للطي",
+      "الإضافات المذكورة: منظّم نظارات شمسية وهاتف",
+      "الاستخدام المذكور: داخل السيارة",
+    ],
+    department_en: "Car",
+    department_ar: "السيارة",
+    subcategory_en: "Interior Organization",
+    subcategory_ar: "تنظيم المقصورة",
+    search_keywords_en: ["car cup holder", "foldable bottle holder", "car organizer"],
+    search_keywords_ar: ["حامل أكواب سيارة", "حامل زجاجات", "قابل للطي"],
+  },
+  "7C59DE5B-A511-4920-88A8-C808B21476EE": {
+    title_en_clean: "Adjustable Windshield Suction-Cup Phone Mount",
+    title_ar: "حامل هاتف للزجاج الأمامي بكأس شفط قابل للتعديل",
+    description_en_clean:
+      "A car phone holder for the windshield. Use it as an in-car cellphone stand. Listed as a universal, adjustable suction-cup mount. Compatible phone sizes are not supplied.",
+    description_ar:
+      "حامل هاتف للزجاج الأمامي في السيارة. يُستخدم كحامل للهاتف داخل المركبة. مذكور كحامل عام قابل للتعديل بكأس شفط. مقاسات الهواتف المتوافقة غير مذكورة.",
+    specifications_en: [
+      "Mount: windshield suction cup",
+      "Listed attributes: universal, adjustable",
+      "Phone sizes: not supplied",
+    ],
+    specifications_ar: [
+      "التثبيت: كأس شفط على الزجاج الأمامي",
+      "الصفات المذكورة: عام، قابل للتعديل",
+      "مقاسات الهاتف: غير مذكورة",
+    ],
+    department_en: "Car",
+    department_ar: "السيارة",
+    subcategory_en: "Phone Holders",
+    subcategory_ar: "حاملات الهاتف",
+    search_keywords_en: ["windshield phone holder", "suction cup mount", "car phone stand"],
+    search_keywords_ar: ["حامل هاتف سيارة", "كأس شفط", "زجاج أمامي"],
+  },
+  "1809888855471312896": {
+    title_en_clean: "Magnetic Stainless Steel Dashboard Phone Holder",
+    title_ar: "حامل هاتف مغناطيسي للوحة القيادة من الستانلس ستيل",
+    description_en_clean:
+      "A magnetic car phone holder for the dashboard. Use it to mount a phone on the dash. Material: stainless steel. Listed as water-resistant and rotatable.",
+    description_ar:
+      "حامل هاتف مغناطيسي للوحة قيادة السيارة. يُستخدم لتثبيت الهاتف على اللوحة. الخامة: ستانلس ستيل. مذكور بأنه مقاوم للماء وقابل للدوران.",
+    specifications_en: [
+      "Mount: dashboard, magnetic",
+      "Material: stainless steel",
+      "Listed attributes: water-resistant, rotatable",
+    ],
+    specifications_ar: [
+      "التثبيت: لوحة القيادة، مغناطيسي",
+      "الخامة: ستانلس ستيل",
+      "الصفات المذكورة: مقاوم للماء، قابل للدوران",
+    ],
+    department_en: "Car",
+    department_ar: "السيارة",
+    subcategory_en: "Phone Holders",
+    subcategory_ar: "حاملات الهاتف",
+    search_keywords_en: ["magnetic car holder", "dashboard phone mount", "stainless steel"],
+    search_keywords_ar: ["حامل مغناطيسي", "لوحة القيادة", "ستانلس ستيل"],
+  },
+  "0B3CAEBF-EDEF-4A34-BBA1-73335846D77E": {
+    title_en_clean: "12-Piece Makeup Brush Set",
+    title_ar: "طقم فرش مكياج – 12 قطعة",
+    description_en_clean:
+      "A 12-piece makeup brush set. Use the brushes for blush, eyeshadow, eyelash, and highlighter application as listed. Brush materials are not supplied.",
+    description_ar:
+      "طقم فرش مكياج من 12 قطعة. تُستخدم حسب القائمة للأحمر والظلال والرموش والهايلايتر. خامات الفرش غير مذكورة.",
+    specifications_en: [
+      "Quantity: 12 pieces",
+      "Listed uses: blush, eyeshadow, eyelash, highlighter",
+      "Bristle material: not supplied",
+    ],
+    specifications_ar: [
+      "الكمية: 12 قطعة",
+      "الاستخدامات المذكورة: أحمر خدود، ظلال، رموش، هايلايتر",
+      "خامة الشعيرات: غير مذكورة",
+    ],
+    department_en: "Beauty & Personal",
+    department_ar: "الجمال والعناية الشخصية",
+    subcategory_en: "Makeup Tools",
+    subcategory_ar: "أدوات المكياج",
+    search_keywords_en: ["makeup brush set", "12-piece brushes", "blush brush"],
+    search_keywords_ar: ["طقم فرش مكياج", "12 قطعة", "هايلايتر"],
+  },
+  "1600068074185699328": {
+    title_en_clean: "13-Piece Makeup Brush Set",
+    title_ar: "طقم فرش مكياج – 13 قطعة",
+    description_en_clean:
+      "A 13-piece makeup brush set. Use the listed brushes for concealer, blush, powder, eye shadow, highlighter, and foundation. Brush materials are not supplied.",
+    description_ar:
+      "طقم فرش مكياج من 13 قطعة. تُستخدم حسب القائمة خافي العيوب وأحمر الخدود والبودرة وظلال العيون والهايلايتر وكريم الأساس. خامات الفرش غير مذكورة.",
+    specifications_en: [
+      "Quantity: 13 pieces",
+      "Listed uses: concealer, blush, powder, eye shadow, highlighter, foundation",
+      "Bristle material: not supplied",
+    ],
+    specifications_ar: [
+      "الكمية: 13 قطعة",
+      "الاستخدامات المذكورة: خافي عيوب، أحمر خدود، بودرة، ظلال عيون، هايلايتر، كريم أساس",
+      "خامة الشعيرات: غير مذكورة",
+    ],
+    department_en: "Beauty & Personal",
+    department_ar: "الجمال والعناية الشخصية",
+    subcategory_en: "Makeup Tools",
+    subcategory_ar: "أدوات المكياج",
+    search_keywords_en: ["13-piece makeup brushes", "foundation brush", "concealer brush"],
+    search_keywords_ar: ["طقم فرش مكياج", "13 قطعة", "كريم أساس"],
+  },
+  "2606150702051624000": {
+    title_en_clean: "Travel Silicone Baby Bottle Brush Set with Storage Box",
+    title_ar: "طقم فرش سيليكون لتنظيف رضّاعات الأطفال مع علبة تخزين",
+    description_en_clean:
+      "A travel brush set for cleaning baby bottles. Use the silicone brushes on bottles, nipples, and accessories. Includes a storage box. Material: silicone. The supplier title includes the phrase newborn-safe; this listing does not add a certification.",
+    description_ar:
+      "طقم فرش سفر لتنظيف رضّاعات الأطفال. تُستخدم فرش السيليكون على الرضّاعات والحلمات والإكسسوارات. يتضمن علبة تخزين. الخامة: سيليكون. يظهر في عنوان المورّد تعبير newborn-safe؛ ولا تضيف هذه البطاقة أي شهادة.",
+    specifications_en: [
+      "Material: silicone",
+      "Includes: storage box",
+      "Listed use: bottles, nipples, and accessories",
+      "Listed context: travel",
+    ],
+    specifications_ar: [
+      "الخامة: سيليكون",
+      "يتضمن: علبة تخزين",
+      "الاستخدام المذكور: رضّاعات، حلمات، وإكسسوارات",
+      "السياق المذكور: السفر",
+    ],
+    department_en: "Beauty & Personal",
+    department_ar: "الجمال والعناية الشخصية",
+    subcategory_en: "Personal Care Tools",
+    subcategory_ar: "أدوات العناية الشخصية",
+    search_keywords_en: ["baby bottle brush", "silicone cleaning brushes", "travel bottle set"],
+    search_keywords_ar: ["فرشاة رضّاعة", "سيليكون", "علبة تخزين"],
+  },
+  "EFE5F48E-B94F-4BE3-9CF8-E690A0BDFC9F": {
+    title_en_clean: "Soft-Bristle Bamboo Toothbrush Set",
+    title_ar: "طقم فرشاة أسنان من الخيزران بشعيرات ناعمة",
+    description_en_clean:
+      "A bamboo toothbrush set with a wooden handle. Use it as an everyday toothbrush. Listed with soft bristles, bamboo fibre, a bamboo tube, and a charcoal set. Piece count is not supplied.",
+    description_ar:
+      "طقم فرشاة أسنان من الخيزران بمقبض خشبي. تُستخدم كفرشاة يومية. مذكورة بشعيرات ناعمة وألياف خيزران وأنبوب خيزران وطقم فحم. عدد القطع غير مذكور.",
+    specifications_en: [
+      "Handle: wooden / bamboo",
+      "Bristles: soft; bamboo fibre listed",
+      "Listed extras: bamboo tube, charcoal set",
+      "Piece count: not supplied",
+    ],
+    specifications_ar: [
+      "المقبض: خشبي / خيزران",
+      "الشعيرات: ناعمة؛ ألياف خيزران مذكورة",
+      "الإضافات المذكورة: أنبوب خيزران، طقم فحم",
+      "عدد القطع: غير مذكور",
+    ],
+    department_en: "Beauty & Personal",
+    department_ar: "الجمال والعناية الشخصية",
+    subcategory_en: "Personal Care Tools",
+    subcategory_ar: "أدوات العناية الشخصية",
+    search_keywords_en: ["bamboo toothbrush", "soft bristle", "wooden handle"],
+    search_keywords_ar: ["فرشاة خيزران", "شعيرات ناعمة", "مقبض خشبي"],
+  },
+  "2406270303281629300": {
+    title_en_clean: "Food-Grade Circular Ice Hockey Mold",
+    title_ar: "قالب ثلج دائري صالح لملامسة الطعام",
+    description_en_clean:
+      "A circular ice mold listed as food grade. Use it to freeze hockey-puck-shaped or circular ice cubes. Material grade is listed as food grade; exact polymer is not supplied.",
+    description_ar:
+      "قالب ثلج دائري مذكور بأنه صالح لملامسة الطعام. يُستخدم لتجميد مكعبات ثلج دائرية أو بشكل قرص. الصلاحية للطعام مذكورة؛ ونوع الخامة الدقيق غير مذكور.",
+    specifications_en: ["Shape: circular / ice hockey", "Listed grade: food grade", "Exact material: not supplied"],
+    specifications_ar: ["الشكل: دائري / هوكي ثلج", "الدرجة المذكورة: صالح لملامسة الطعام", "الخامة الدقيقة: غير مذكورة"],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["ice hockey mold", "circular ice cube", "food grade ice"],
+    search_keywords_ar: ["قالب ثلج", "ثلج دائري", "صالح للطعام"],
+  },
+  "1776504080140087296": {
+    title_en_clean: "Cookie Press and Icing Set",
+    title_ar: "مكبس كوكيز مع طقم تزيين",
+    description_en_clean:
+      "A cookie press gun and icing set, also listed as a churro and cookie maker. Use it to press biscuit shapes. Material: alloy. The supplier listing includes 10 discs, 20 discs, and 4 pastry tips.",
+    description_ar:
+      "مكبس كوكيز مع طقم تزيين، ومذكور أيضاً كصانع تشورو وكوكيز. يُستخدم لكبس أشكال البسكويت. الخامة: سبيكة (alloy). تذكر قائمة المورّد 10 أقراص و 20 قرصاً و 4 رؤوس تزيين.",
+    specifications_en: [
+      "Material: alloy",
+      "Listed discs: 10 discs and 20 discs",
+      "Pastry tips: 4",
+      "Listed use: cookie / churro / icing / biscuit mold",
+    ],
+    specifications_ar: [
+      "الخامة: سبيكة (alloy)",
+      "الأقراص المذكورة: 10 أقراص و 20 قرصاً",
+      "رؤوس التزيين: 4",
+      "الاستخدام المذكور: كوكيز / تشورو / تزيين / قالب بسكويت",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Baking",
+    subcategory_ar: "الخَبز",
+    search_keywords_en: ["cookie press", "icing set", "churro maker", "pastry tips"],
+    search_keywords_ar: ["مكبس كوكيز", "تزيين", "تشورو", "أقراص"],
+  },
+  "2409200948111604800": {
+    title_en_clean: "Mini Burger Press with Wood Handle",
+    title_ar: "مكبس برغر صغير بمقبض خشبي",
+    description_en_clean:
+      "A mini burger press for slider or hamburger patties. Use it to shape meat patties for grilling or a barbecue. Handle material: wood. Patty diameter is not supplied.",
+    description_ar:
+      "مكبس برغر صغير لقطع السلايدر أو الهامبرغر. يُستخدم لتشكيل قطع اللحم للشواء. الخامة المذكورة للمقبض: خشب. قطر القطعة غير مذكور.",
+    specifications_en: [
+      "Form: mini burger / slider patty press",
+      "Handle: wood",
+      "Listed use: grill / barbecue / meat press",
+      "Patty size: not supplied",
+    ],
+    specifications_ar: [
+      "الشكل: مكبس برغر / سلايدر صغير",
+      "المقبض: خشب",
+      "الاستخدام المذكور: شواء / مكبس لحم",
+      "مقاس القطعة: غير مذكور",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["mini burger press", "slider press", "wood handle"],
+    search_keywords_ar: ["مكبس برغر", "سلايدر", "مقبض خشبي"],
+  },
+  "2503201353261621900": {
+    title_en_clean: "Portable 48-Cube Food-Grade Ice Bucket",
+    title_ar: "دلو ثلج محمول صالح لملامسة الطعام – 48 مكعباً",
+    description_en_clean:
+      "A portable press-type ice tray and ice bucket. Use it outdoors or at home to make and store ice. Listed capacity: 48 extra-large cubes. Material: food-grade plastic. Includes a storage tray.",
+    description_ar:
+      "صينية ودلو ثلج محمول بالضغط. يُستخدم في الخارج أو في المنزل لصنع الثلج وتخزينه. السعة المذكورة: 48 مكعباً كبير الحجم. الخامة: بلاستيك صالح لملامسة الطعام. يتضمن صينية تخزين.",
+    specifications_en: [
+      "Cube count: 48 extra-large",
+      "Material: food-grade plastic",
+      "Form: press-type portable ice tray / bucket",
+      "Includes: storage tray",
+    ],
+    specifications_ar: [
+      "عدد المكعبات: 48 كبير الحجم",
+      "الخامة: بلاستيك صالح لملامسة الطعام",
+      "الشكل: صينية / دلو ثلج محمول بالضغط",
+      "يتضمن: صينية تخزين",
+    ],
+    department_en: "Home",
+    department_ar: "المنزل",
+    subcategory_en: "Kitchen",
+    subcategory_ar: "المطبخ",
+    search_keywords_en: ["ice bucket", "48 cube ice tray", "food grade plastic", "portable ice"],
+    search_keywords_ar: ["دلو ثلج", "48 مكعباً", "بلاستيك غذائي", "محمول"],
+  },
+};
+
+export function editorialCopyFor(cjProductId: string): LocalizedProductCopy | null {
+  return EDITORIAL_SAMPLE_COPY[cjProductId] ?? null;
+}

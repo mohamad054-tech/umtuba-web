@@ -1,0 +1,97 @@
+{
+  "task_id": "UMTUBA_CJ_8_SYNC_ERROR_RESOLUTION_V1",
+  "generated_at": "2026-09-09T10:24:57.580Z",
+  "input": 8,
+  "resolved": 8,
+  "unresolved": 0,
+  "items": [
+    {
+      "slug": "stainless-steel-large-capacity-pet-non-slip-spla-56fd50de",
+      "title": "Stainless Steel Large Capacity Pet Non-slip Splash-proof Water Bowl",
+      "category": "Pet",
+      "sku": "CJYD238671501AZ",
+      "input_kind": "product_query_failure",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "light-luxury-diamond-embedded-makeup-brush-set-8-fce263d3",
+      "title": "Light Luxury Diamond-embedded Makeup Brush Set 8 High-end Makeup…",
+      "category": "Beauty / Personal",
+      "sku": "CJYD207147302BY",
+      "input_kind": "product_query_failure",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "foldable-car-cup-holder-drinking-bottle-holder-c-2ab000a6",
+      "title": "Foldable Car Cup Holder Drinking Bottle Holder Cup Stand Bracket…",
+      "category": "Car",
+      "sku": "CJQCWBQT00326-default",
+      "input_kind": "freight_missing",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "1-5l-cat-dog-water-bowl-carried-floating-bowl-an-0b6a59ae",
+      "title": "1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow…",
+      "category": "Pet",
+      "sku": "CJGY102545401AZ",
+      "input_kind": "freight_missing",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "pet-supplies-cat-bowl-protects-spine-0cefd409",
+      "title": "Pet Supplies Cat Bowl Protects Spine",
+      "category": "Pet",
+      "sku": "CJMY148616802BY",
+      "input_kind": "product_query_failure",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "magnetic-phone-holder-for-car-dashboard-car-phon-3020c72a",
+      "title": "Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount…",
+      "category": "Car",
+      "sku": "CJSJ207789801AZ",
+      "input_kind": "freight_missing",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "nylon-cleaning-brush-set-stainless-steel-aa6eeb5c",
+      "title": "Nylon Cleaning Brush Set Stainless Steel",
+      "category": "Beauty / Personal",
+      "sku": "CJYD225892803CX",
+      "input_kind": "freight_missing",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    },
+    {
+      "slug": "folding-bowl-for-pet-dog-traveling-63221eed",
+      "title": "Folding Bowl For Pet Dog Traveling",
+      "category": "Pet",
+      "sku": "CJYD230339601AZ",
+      "input_kind": "freight_missing",
+      "resolved": true,
+      "failure_kind": null,
+      "sync_status": "HEALTHY",
+      "replacement_candidates": []
+    }
+  ]
+}

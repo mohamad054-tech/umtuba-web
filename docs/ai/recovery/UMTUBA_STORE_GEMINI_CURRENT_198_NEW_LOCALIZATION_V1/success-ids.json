@@ -1,0 +1,1062 @@
+{
+  "task_id": "UMTUBA_STORE_GEMINI_CURRENT_198_NEW_LOCALIZATION_V1",
+  "count": 176,
+  "products": [
+    {
+      "id": "0387FDE8-F90D-4496-854A-B393B5D2244E",
+      "cj_product_id": "0387FDE8-F90D-4496-854A-B393B5D2244E",
+      "sku": "CJQCWBQC00003-XL",
+      "review_reason": null
+    },
+    {
+      "id": "05C7A18B-A4AC-4432-843C-383ED65BEC03",
+      "cj_product_id": "05C7A18B-A4AC-4432-843C-383ED65BEC03",
+      "sku": "CJQCQCQC00228-Silver",
+      "review_reason": null
+    },
+    {
+      "id": "0E4A0041-1919-44EB-9164-6EAA48765DEE",
+      "cj_product_id": "0E4A0041-1919-44EB-9164-6EAA48765DEE",
+      "sku": "CJWJYEYE00605-Blue large",
+      "review_reason": null
+    },
+    {
+      "id": "0F2AD6CE-482B-4955-9E47-86118F08ABE4",
+      "cj_product_id": "0F2AD6CE-482B-4955-9E47-86118F08ABE4",
+      "sku": "CJJZGJJC00033-Silver 4pcs",
+      "review_reason": null
+    },
+    {
+      "id": "0FF9A708-21DC-4DB7-AC31-5C89DA48CD7A",
+      "cj_product_id": "0FF9A708-21DC-4DB7-AC31-5C89DA48CD7A",
+      "sku": "CJWJWJYZ08656-Blue3PC",
+      "review_reason": null
+    },
+    {
+      "id": "1355445273438064640",
+      "cj_product_id": "1355445273438064640",
+      "sku": "CJQC100158901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1356602786053230592",
+      "cj_product_id": "1356602786053230592",
+      "sku": "CJGY100450101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1357659198464331776",
+      "cj_product_id": "1357659198464331776",
+      "sku": "CJJT100770301AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1359670736125562880",
+      "cj_product_id": "1359670736125562880",
+      "sku": "CJQC101111901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1366555884762828800",
+      "cj_product_id": "1366555884762828800",
+      "sku": "CJQC102533601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1368137962436562944",
+      "cj_product_id": "1368137962436562944",
+      "sku": "CJMY103251801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1371061603327414272",
+      "cj_product_id": "1371061603327414272",
+      "sku": "CJMY104168401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1381818965579403264",
+      "cj_product_id": "1381818965579403264",
+      "sku": "CJMR107731001AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1382159261194391552",
+      "cj_product_id": "1382159261194391552",
+      "sku": "CJSZ107910401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1382895068624588800",
+      "cj_product_id": "1382895068624588800",
+      "sku": "CJGE108244901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1384070437234937856",
+      "cj_product_id": "1384070437234937856",
+      "sku": "CJJY108734601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1384097806993723392",
+      "cj_product_id": "1384097806993723392",
+      "sku": "CJNS108758301AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1385525750660206592",
+      "cj_product_id": "1385525750660206592",
+      "sku": "CJKD109560601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1389761927684689920",
+      "cj_product_id": "1389761927684689920",
+      "sku": "CJMY111278603CX",
+      "review_reason": null
+    },
+    {
+      "id": "1389843535561363456",
+      "cj_product_id": "1389843535561363456",
+      "sku": "CJXC111351701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1390893511196413952",
+      "cj_product_id": "1390893511196413952",
+      "sku": "CJGD111805601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1392765219972976640",
+      "cj_product_id": "1392765219972976640",
+      "sku": "CJDD112741407GT",
+      "review_reason": null
+    },
+    {
+      "id": "1393102099860033536",
+      "cj_product_id": "1393102099860033536",
+      "sku": "CJQC112864701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1393139839469228032",
+      "cj_product_id": "1393139839469228032",
+      "sku": "CJNS112898701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1394259132042842112",
+      "cj_product_id": "1394259132042842112",
+      "sku": "CJNT113313136JQ",
+      "review_reason": null
+    },
+    {
+      "id": "1398474038757691392",
+      "cj_product_id": "1398474038757691392",
+      "sku": "CJMY114961701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1398838276323938304",
+      "cj_product_id": "1398838276323938304",
+      "sku": "CJGD115087718RI",
+      "review_reason": null
+    },
+    {
+      "id": "1400023052972068864",
+      "cj_product_id": "1400023052972068864",
+      "sku": "CJQC115608801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1402123238414356480",
+      "cj_product_id": "1402123238414356480",
+      "sku": "CJNT116445701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1402848847901888512",
+      "cj_product_id": "1402848847901888512",
+      "sku": "CJFY116825801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1407627726256476160",
+      "cj_product_id": "1407627726256476160",
+      "sku": "CJYE118824401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1408264147317166080",
+      "cj_product_id": "1408264147317166080",
+      "sku": "CJSJ119074602BY",
+      "review_reason": null
+    },
+    {
+      "id": "1408303589167861760",
+      "cj_product_id": "1408303589167861760",
+      "sku": "CJQB119106009IR",
+      "review_reason": null
+    },
+    {
+      "id": "1409687715645100032",
+      "cj_product_id": "1409687715645100032",
+      "sku": "CJQC119500401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1410451269214146560",
+      "cj_product_id": "1410451269214146560",
+      "sku": "CJQC119801203CX",
+      "review_reason": null
+    },
+    {
+      "id": "1411532807548833792",
+      "cj_product_id": "1411532807548833792",
+      "sku": "CJDY120113101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1413028527527301120",
+      "cj_product_id": "1413028527527301120",
+      "sku": "CJHL120577801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1417017927399510016",
+      "cj_product_id": "1417017927399510016",
+      "sku": "CJCC121952202BY",
+      "review_reason": null
+    },
+    {
+      "id": "1419174980897345536",
+      "cj_product_id": "1419174980897345536",
+      "sku": "CJYZ122681902BY",
+      "review_reason": null
+    },
+    {
+      "id": "1424605259422109696",
+      "cj_product_id": "1424605259422109696",
+      "sku": "CJGD124485810JQ",
+      "review_reason": null
+    },
+    {
+      "id": "1424994967243329536",
+      "cj_product_id": "1424994967243329536",
+      "sku": "CJLX124650803CX",
+      "review_reason": null
+    },
+    {
+      "id": "1430088145361309696",
+      "cj_product_id": "1430088145361309696",
+      "sku": "CJMY126224802BY",
+      "review_reason": null
+    },
+    {
+      "id": "1432944437675298816",
+      "cj_product_id": "1432944437675298816",
+      "sku": "CJQC127150307GT",
+      "review_reason": null
+    },
+    {
+      "id": "1443752641808175104",
+      "cj_product_id": "1443752641808175104",
+      "sku": "CJJT130520103CX",
+      "review_reason": null
+    },
+    {
+      "id": "1444590980706734080",
+      "cj_product_id": "1444590980706734080",
+      "sku": "CJMP130749301AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1454280646267637760",
+      "cj_product_id": "1454280646267637760",
+      "sku": "CJTF133542503CX",
+      "review_reason": null
+    },
+    {
+      "id": "1472445095834947584",
+      "cj_product_id": "1472445095834947584",
+      "sku": "CJYZ138392302BY",
+      "review_reason": null
+    },
+    {
+      "id": "1473344346978914304",
+      "cj_product_id": "1473344346978914304",
+      "sku": "CJYH138530002BY",
+      "review_reason": null
+    },
+    {
+      "id": "1478986441760575488",
+      "cj_product_id": "1478986441760575488",
+      "sku": "CJNT139503902BY",
+      "review_reason": null
+    },
+    {
+      "id": "1482630874972426240",
+      "cj_product_id": "1482630874972426240",
+      "sku": "CJNS140120108HS",
+      "review_reason": null
+    },
+    {
+      "id": "1491610010227183616",
+      "cj_product_id": "1491610010227183616",
+      "sku": "CJJT141160012LO",
+      "review_reason": null
+    },
+    {
+      "id": "1520605348707708928",
+      "cj_product_id": "1520605348707708928",
+      "sku": "CJJT147431802BY",
+      "review_reason": null
+    },
+    {
+      "id": "1564876306230693888",
+      "cj_product_id": "1564876306230693888",
+      "sku": "CJKY1553485-White-1pc",
+      "review_reason": null
+    },
+    {
+      "id": "1606859683179016192",
+      "cj_product_id": "1606859683179016192",
+      "sku": "CJMY164841303CX",
+      "review_reason": null
+    },
+    {
+      "id": "1630036408272433152",
+      "cj_product_id": "1630036408272433152",
+      "sku": "CJSI169369001AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1639442493622202368",
+      "cj_product_id": "1639442493622202368",
+      "sku": "CJLY171560806FU",
+      "review_reason": null
+    },
+    {
+      "id": "1641648915567087616",
+      "cj_product_id": "1641648915567087616",
+      "sku": "CJET172083209IR",
+      "review_reason": null
+    },
+    {
+      "id": "1644401904111325184",
+      "cj_product_id": "1644401904111325184",
+      "sku": "CJET172797317QJ",
+      "review_reason": null
+    },
+    {
+      "id": "1646726512265547776",
+      "cj_product_id": "1646726512265547776",
+      "sku": "CJGJ1734054-Gray",
+      "review_reason": null
+    },
+    {
+      "id": "1649350318456582144",
+      "cj_product_id": "1649350318456582144",
+      "sku": "CJST174058104DW",
+      "review_reason": null
+    },
+    {
+      "id": "1675765978426249216",
+      "cj_product_id": "1675765978426249216",
+      "sku": "CJDK179211702BY",
+      "review_reason": null
+    },
+    {
+      "id": "16AA3ACB-D920-41AE-8AF5-F9140FBBD5C0",
+      "cj_product_id": "16AA3ACB-D920-41AE-8AF5-F9140FBBD5C0",
+      "sku": "CJQCWBQC00194-Black-30x100cm",
+      "review_reason": null
+    },
+    {
+      "id": "1709408670565539840",
+      "cj_product_id": "1709408670565539840",
+      "sku": "CJYD186186901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1709416099537752064",
+      "cj_product_id": "1709416099537752064",
+      "sku": "CJYD186189401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1710221612786012160",
+      "cj_product_id": "1710221612786012160",
+      "sku": "CJYS186389401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1711605389739315200",
+      "cj_product_id": "1711605389739315200",
+      "sku": "CJGY186687604DW",
+      "review_reason": null
+    },
+    {
+      "id": "1714578924623515648",
+      "cj_product_id": "1714578924623515648",
+      "sku": "CJGY187402401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1721719330141904896",
+      "cj_product_id": "1721719330141904896",
+      "sku": "CJYD189043606FU",
+      "review_reason": null
+    },
+    {
+      "id": "1722102821731971072",
+      "cj_product_id": "1722102821731971072",
+      "sku": "CJYD189145101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1734109927863496704",
+      "cj_product_id": "1734109927863496704",
+      "sku": "CJQC191837402BY",
+      "review_reason": null
+    },
+    {
+      "id": "1751492909284724736",
+      "cj_product_id": "1751492909284724736",
+      "sku": "CJNS195860901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1752227453390557184",
+      "cj_product_id": "1752227453390557184",
+      "sku": "CJYD196018502BY",
+      "review_reason": null
+    },
+    {
+      "id": "1754434236339195904",
+      "cj_product_id": "1754434236339195904",
+      "sku": "CJYD196463930DW",
+      "review_reason": null
+    },
+    {
+      "id": "1768205411733221376",
+      "cj_product_id": "1768205411733221376",
+      "sku": "CJYD198853204DW",
+      "review_reason": null
+    },
+    {
+      "id": "1771372464438775808",
+      "cj_product_id": "1771372464438775808",
+      "sku": "CJYD199409113MN",
+      "review_reason": null
+    },
+    {
+      "id": "1776520631639609344",
+      "cj_product_id": "1776520631639609344",
+      "sku": "CJYD200453322VE",
+      "review_reason": null
+    },
+    {
+      "id": "1776805816704700416",
+      "cj_product_id": "1776805816704700416",
+      "sku": "CJJT200496602BY",
+      "review_reason": null
+    },
+    {
+      "id": "1790192432496259072",
+      "cj_product_id": "1790192432496259072",
+      "sku": "CJGY203473101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1793964800112861184",
+      "cj_product_id": "1793964800112861184",
+      "sku": "CJST204478905EV",
+      "review_reason": null
+    },
+    {
+      "id": "1794551525029715968",
+      "cj_product_id": "1794551525029715968",
+      "sku": "CJYD204595702BY",
+      "review_reason": null
+    },
+    {
+      "id": "1797181183009230848",
+      "cj_product_id": "1797181183009230848",
+      "sku": "CJYD205195202BY",
+      "review_reason": null
+    },
+    {
+      "id": "1797805228046159872",
+      "cj_product_id": "1797805228046159872",
+      "sku": "CJYD205278701AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1798583255286026240",
+      "cj_product_id": "1798583255286026240",
+      "sku": "CJYD205449703CX",
+      "review_reason": null
+    },
+    {
+      "id": "1830432988615036928",
+      "cj_product_id": "1830432988615036928",
+      "sku": "CJCZ212587603CX",
+      "review_reason": null
+    },
+    {
+      "id": "1833794770880581632",
+      "cj_product_id": "1833794770880581632",
+      "sku": "CJYE213482205EV",
+      "review_reason": null
+    },
+    {
+      "id": "1836591112623378432",
+      "cj_product_id": "1836591112623378432",
+      "sku": "CJMY214103901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1837382329598627840",
+      "cj_product_id": "1837382329598627840",
+      "sku": "CJGY214342601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "1839507288605216768",
+      "cj_product_id": "1839507288605216768",
+      "sku": "CJMY214805903CX",
+      "review_reason": null
+    },
+    {
+      "id": "1962E668-6C44-4EC2-A686-066F5378E98A",
+      "cj_product_id": "1962E668-6C44-4EC2-A686-066F5378E98A",
+      "sku": "CJXFBXMK00004-Blue",
+      "review_reason": null
+    },
+    {
+      "id": "19E78D7E-3FFB-4C71-AEF2-437748198D26",
+      "cj_product_id": "19E78D7E-3FFB-4C71-AEF2-437748198D26",
+      "sku": "CJYDYDYD01073-Black-S",
+      "review_reason": null
+    },
+    {
+      "id": "1AF1D7B9-5D0B-4AD4-B811-F3E658599657",
+      "cj_product_id": "1AF1D7B9-5D0B-4AD4-B811-F3E658599657",
+      "sku": "CJYDYDHW00004-M-Silver",
+      "review_reason": null
+    },
+    {
+      "id": "1D4C1B55-15AA-4E81-88CB-5162D1B0B5AC",
+      "cj_product_id": "1D4C1B55-15AA-4E81-88CB-5162D1B0B5AC",
+      "sku": "CJYDYDYD01238-Blue",
+      "review_reason": null
+    },
+    {
+      "id": "1D8CD0B6-C83C-4001-A178-6EFA3613CA63",
+      "cj_product_id": "1D8CD0B6-C83C-4001-A178-6EFA3613CA63",
+      "sku": "CJXFXJSY00078-Black",
+      "review_reason": null
+    },
+    {
+      "id": "1EE0FB3D-B0AD-455B-881B-E24DC8D3A143",
+      "cj_product_id": "1EE0FB3D-B0AD-455B-881B-E24DC8D3A143",
+      "sku": "CJQCWBQC00133-ArmyGreen-300x150cm",
+      "review_reason": null
+    },
+    {
+      "id": "226608F9-E69E-46CE-8C98-E8BF6719908C",
+      "cj_product_id": "226608F9-E69E-46CE-8C98-E8BF6719908C",
+      "sku": "CJYDYDYD00170-Green Shirt-M",
+      "review_reason": null
+    },
+    {
+      "id": "2406090735501617400",
+      "cj_product_id": "2406090735501617400",
+      "sku": "CJYE205668101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2406090846551603500",
+      "cj_product_id": "2406090846551603500",
+      "sku": "CJYD205675224XC",
+      "review_reason": null
+    },
+    {
+      "id": "2406110244201607100",
+      "cj_product_id": "2406110244201607100",
+      "sku": "CJYE205755904DW",
+      "review_reason": null
+    },
+    {
+      "id": "2406110844131624300",
+      "cj_product_id": "2406110844131624300",
+      "sku": "CJYD205803305EV",
+      "review_reason": null
+    },
+    {
+      "id": "2406130230181619000",
+      "cj_product_id": "2406130230181619000",
+      "sku": "CJQT205920608HS",
+      "review_reason": null
+    },
+    {
+      "id": "2406130639021623700",
+      "cj_product_id": "2406130639021623700",
+      "sku": "CJYE205947202BY",
+      "review_reason": null
+    },
+    {
+      "id": "2406130922041616000",
+      "cj_product_id": "2406130922041616000",
+      "sku": "CJYD205970001AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2406150741191612300",
+      "cj_product_id": "2406150741191612300",
+      "sku": "CJYD206110403CX",
+      "review_reason": null
+    },
+    {
+      "id": "2406150807561628300",
+      "cj_product_id": "2406150807561628300",
+      "sku": "CJYD206114507GT",
+      "review_reason": null
+    },
+    {
+      "id": "2406150912131610600",
+      "cj_product_id": "2406150912131610600",
+      "sku": "CJYD206123104DW",
+      "review_reason": null
+    },
+    {
+      "id": "2406170735351603000",
+      "cj_product_id": "2406170735351603000",
+      "sku": "CJYD206229305EV",
+      "review_reason": null
+    },
+    {
+      "id": "2407020848151629800",
+      "cj_product_id": "2407020848151629800",
+      "sku": "CJYD207376201AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2407170610431615300",
+      "cj_product_id": "2407170610431615300",
+      "sku": "CJET208608801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2408150224331613800",
+      "cj_product_id": "2408150224331613800",
+      "sku": "CJGY211085901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2408180305501614500",
+      "cj_product_id": "2408180305501614500",
+      "sku": "CJYD211338919SH",
+      "review_reason": null
+    },
+    {
+      "id": "2410100314011622400",
+      "cj_product_id": "2410100314011622400",
+      "sku": "CJDK215589434HS",
+      "review_reason": null
+    },
+    {
+      "id": "2410110911281610600",
+      "cj_product_id": "2410110911281610600",
+      "sku": "CJGD215726804DW",
+      "review_reason": null
+    },
+    {
+      "id": "2410150955481604000",
+      "cj_product_id": "2410150955481604000",
+      "sku": "CJYD216065703CX",
+      "review_reason": null
+    },
+    {
+      "id": "2410210819061608500",
+      "cj_product_id": "2410210819061608500",
+      "sku": "CJYD216664301AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2411080406391620000",
+      "cj_product_id": "2411080406391620000",
+      "sku": "CJYD218677603CX",
+      "review_reason": null
+    },
+    {
+      "id": "2411230644421628200",
+      "cj_product_id": "2411230644421628200",
+      "sku": "CJYD222179105EV",
+      "review_reason": null
+    },
+    {
+      "id": "2412020311111623500",
+      "cj_product_id": "2412020311111623500",
+      "sku": "CJYD222988025YB",
+      "review_reason": null
+    },
+    {
+      "id": "2412051129591618500",
+      "cj_product_id": "2412051129591618500",
+      "sku": "CJYD223427312LO",
+      "review_reason": null
+    },
+    {
+      "id": "2412180936151612700",
+      "cj_product_id": "2412180936151612700",
+      "sku": "CJYD224733902BY",
+      "review_reason": null
+    },
+    {
+      "id": "2412230812581622200",
+      "cj_product_id": "2412230812581622200",
+      "sku": "CJYD225149602BY",
+      "review_reason": null
+    },
+    {
+      "id": "2501080655431624400",
+      "cj_product_id": "2501080655431624400",
+      "sku": "CJYD226472006FU",
+      "review_reason": null
+    },
+    {
+      "id": "2501170602361619800",
+      "cj_product_id": "2501170602361619800",
+      "sku": "CJYD227315814NM",
+      "review_reason": null
+    },
+    {
+      "id": "2503030457411602100",
+      "cj_product_id": "2503030457411602100",
+      "sku": "CJYD231372004DW",
+      "review_reason": null
+    },
+    {
+      "id": "2503100740281610000",
+      "cj_product_id": "2503100740281610000",
+      "sku": "CJYD232124001AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2503100745591603200",
+      "cj_product_id": "2503100745591603200",
+      "sku": "CJYD232124401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2503110520101626100",
+      "cj_product_id": "2503110520101626100",
+      "sku": "CJYP232378604DW",
+      "review_reason": null
+    },
+    {
+      "id": "2503120329541602500",
+      "cj_product_id": "2503120329541602500",
+      "sku": "CJYD232476904DW",
+      "review_reason": null
+    },
+    {
+      "id": "2503240922481616900",
+      "cj_product_id": "2503240922481616900",
+      "sku": "CJYD233599955CX",
+      "review_reason": null
+    },
+    {
+      "id": "2503300742111628100",
+      "cj_product_id": "2503300742111628100",
+      "sku": "CJYD234099601AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2504091024511602300",
+      "cj_product_id": "2504091024511602300",
+      "sku": "CJYD234988507GT",
+      "review_reason": null
+    },
+    {
+      "id": "2504230533491607600",
+      "cj_product_id": "2504230533491607600",
+      "sku": "CJYD236053606FU",
+      "review_reason": null
+    },
+    {
+      "id": "2504230555131605000",
+      "cj_product_id": "2504230555131605000",
+      "sku": "CJYD236055506FU",
+      "review_reason": null
+    },
+    {
+      "id": "2504250534371628400",
+      "cj_product_id": "2504250534371628400",
+      "sku": "CJYD236230602BY",
+      "review_reason": null
+    },
+    {
+      "id": "2504280855031629300",
+      "cj_product_id": "2504280855031629300",
+      "sku": "CJYD236466501AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2504300202371603300",
+      "cj_product_id": "2504300202371603300",
+      "sku": "CJYD236580703CX",
+      "review_reason": null
+    },
+    {
+      "id": "2505030316271611300",
+      "cj_product_id": "2505030316271611300",
+      "sku": "CJYD236751702BY",
+      "review_reason": null
+    },
+    {
+      "id": "2505130610351622700",
+      "cj_product_id": "2505130610351622700",
+      "sku": "CJYD237507801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2505140542021607400",
+      "cj_product_id": "2505140542021607400",
+      "sku": "CJYE237594801AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2505171708511617800",
+      "cj_product_id": "2505171708511617800",
+      "sku": "CJYD237932901AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2505180840591620300",
+      "cj_product_id": "2505180840591620300",
+      "sku": "CJYZ237959904DW",
+      "review_reason": null
+    },
+    {
+      "id": "2505260603311606600",
+      "cj_product_id": "2505260603311606600",
+      "sku": "CJYE238575304DW",
+      "review_reason": null
+    },
+    {
+      "id": "2505280326151619300",
+      "cj_product_id": "2505280326151619300",
+      "sku": "CJYD238732402BY",
+      "review_reason": null
+    },
+    {
+      "id": "2505290340311616200",
+      "cj_product_id": "2505290340311616200",
+      "sku": "CJYD238830126ZA",
+      "review_reason": null
+    },
+    {
+      "id": "2506010849411614900",
+      "cj_product_id": "2506010849411614900",
+      "sku": "CJYD239063401AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2506060644241611000",
+      "cj_product_id": "2506060644241611000",
+      "sku": "CJQT239426101AZ",
+      "review_reason": null
+    },
+    {
+      "id": "2506240929441620200",
+      "cj_product_id": "2506240929441620200",
+      "sku": "CJQB241019809IR",
+      "review_reason": null
+    },
+    {
+      "id": "2507110125031615300",
+      "cj_product_id": "2507110125031615300",
+      "sku": "CJYD242720503CX",
+      "review_reason": null
+    },
+    {
+      "id": "2508300300041621100",
+      "cj_product_id": "2508300300041621100",
+      "sku": "CJYD247287011KP",
+      "review_reason": null
+    },
+    {
+      "id": "2508310626441600600",
+      "cj_product_id": "2508310626441600600",
+      "sku": "CJYD247378205EV",
+      "review_reason": null
+    },
+    {
+      "id": "2601190731451602300",
+      "cj_product_id": "2601190731451602300",
+      "sku": "CJYD273484502BY",
+      "review_reason": null
+    },
+    {
+      "id": "2607270123311610200",
+      "cj_product_id": "2607270123311610200",
+      "sku": "CJYD300976002BY",
+      "review_reason": null
+    },
+    {
+      "id": "283FD3A6-ADBB-44F2-845F-4E71ADAC2AB9",
+      "cj_product_id": "283FD3A6-ADBB-44F2-845F-4E71ADAC2AB9",
+      "sku": "CJJZGJYL00008-Green B",
+      "review_reason": null
+    },
+    {
+      "id": "3F8F4862-6CFA-4947-9CE7-EA1936C96840",
+      "cj_product_id": "3F8F4862-6CFA-4947-9CE7-EA1936C96840",
+      "sku": "CJJJCWGY04458-Blue-S",
+      "review_reason": null
+    },
+    {
+      "id": "4A61C545-27BA-46BF-934A-43C70451E7AF",
+      "cj_product_id": "4A61C545-27BA-46BF-934A-43C70451E7AF",
+      "sku": "CJQCWBQC00145-Rear Cover-1pc",
+      "review_reason": null
+    },
+    {
+      "id": "4F5CC0F9-07C4-488B-AE30-66E77CA22636",
+      "cj_product_id": "4F5CC0F9-07C4-488B-AE30-66E77CA22636",
+      "sku": "CJBHNSNS21255-Coffee",
+      "review_reason": null
+    },
+    {
+      "id": "5735615B-F049-4B1A-A409-A79B5A61A67D",
+      "cj_product_id": "5735615B-F049-4B1A-A409-A79B5A61A67D",
+      "sku": "CJQCQCQC00723-A set",
+      "review_reason": null
+    },
+    {
+      "id": "58639C7A-AD61-4919-A659-294DDE0C5F03",
+      "cj_product_id": "58639C7A-AD61-4919-A659-294DDE0C5F03",
+      "sku": "CJNSXZYD00015-Blue-XL-Clothes",
+      "review_reason": null
+    },
+    {
+      "id": "6293C455-B12C-464B-9594-59B6897CCC11",
+      "cj_product_id": "6293C455-B12C-464B-9594-59B6897CCC11",
+      "sku": "CJYDYYET00032-Pink-XL",
+      "review_reason": null
+    },
+    {
+      "id": "757F4197-4A6A-4EF6-959C-088459E2763E",
+      "cj_product_id": "757F4197-4A6A-4EF6-959C-088459E2763E",
+      "sku": "CJJZGJHJ00018-Standard",
+      "review_reason": null
+    },
+    {
+      "id": "817E999F-7748-49BD-A1E8-335DBBC2C02A",
+      "cj_product_id": "817E999F-7748-49BD-A1E8-335DBBC2C02A",
+      "sku": "CJJJJTJT10158-Creamy white",
+      "review_reason": null
+    },
+    {
+      "id": "86C0C93B-C05C-43AF-B1EC-152ED47D9545",
+      "cj_product_id": "86C0C93B-C05C-43AF-B1EC-152ED47D9545",
+      "sku": "CJZBLXLX11576-Small daisies",
+      "review_reason": null
+    },
+    {
+      "id": "879D752D-DFBA-4592-A1EC-699DAC9B9C85",
+      "cj_product_id": "879D752D-DFBA-4592-A1EC-699DAC9B9C85",
+      "sku": "CJWJXDYE00037-Red",
+      "review_reason": null
+    },
+    {
+      "id": "893260BE-C812-48EB-9973-DCC55FEBE7FD",
+      "cj_product_id": "893260BE-C812-48EB-9973-DCC55FEBE7FD",
+      "sku": "CJNSXZDK00402-Army green camouflage-L",
+      "review_reason": null
+    },
+    {
+      "id": "A4982E4C-3A8D-4C2F-83F2-76B6764E6767",
+      "cj_product_id": "A4982E4C-3A8D-4C2F-83F2-76B6764E6767",
+      "sku": "CJJZGJSD00444-Pink",
+      "review_reason": null
+    },
+    {
+      "id": "AEAD6C15-A7D6-4ED9-A63A-8050318CD7A2",
+      "cj_product_id": "AEAD6C15-A7D6-4ED9-A63A-8050318CD7A2",
+      "sku": "CJWJYEYE00673-Black",
+      "review_reason": null
+    },
+    {
+      "id": "B4403114-70DE-4EEC-9340-A8B6524BC4ED",
+      "cj_product_id": "B4403114-70DE-4EEC-9340-A8B6524BC4ED",
+      "sku": "CJNSTXDS00413-Yellow-M",
+      "review_reason": null
+    },
+    {
+      "id": "BD861EC1-4B98-4948-BFDB-8BFA83ED3D70",
+      "cj_product_id": "BD861EC1-4B98-4948-BFDB-8BFA83ED3D70",
+      "sku": "CJQCQCQC00341-Black",
+      "review_reason": null
+    },
+    {
+      "id": "C133D503-73FF-4EBD-864C-A2F914663416",
+      "cj_product_id": "C133D503-73FF-4EBD-864C-A2F914663416",
+      "sku": "CJZBLXST03684-Blue yellow",
+      "review_reason": null
+    },
+    {
+      "id": "D21D7980-0486-4A61-87EE-52E2FDD589B0",
+      "cj_product_id": "D21D7980-0486-4A61-87EE-52E2FDD589B0",
+      "sku": "CJXFLPSM00145-Dark Grey",
+      "review_reason": null
+    },
+    {
+      "id": "D2F07B87-18E8-422F-A5E2-7B118B50614B",
+      "cj_product_id": "D2F07B87-18E8-422F-A5E2-7B118B50614B",
+      "sku": "CJJZGJYL00024-default",
+      "review_reason": null
+    },
+    {
+      "id": "E357B9C1-E4B7-48FB-8586-C20DFC560BE0",
+      "cj_product_id": "E357B9C1-E4B7-48FB-8586-C20DFC560BE0",
+      "sku": "CJQCNBQC00050-Beige",
+      "review_reason": null
+    },
+    {
+      "id": "E581FACC-4880-43FD-88DB-FA1F1EACD93B",
+      "cj_product_id": "E581FACC-4880-43FD-88DB-FA1F1EACD93B",
+      "sku": "CJWJYEYE02674-Thick coffee color-S",
+      "review_reason": null
+    },
+    {
+      "id": "E6899B60-5008-4778-9809-0E015F4DAD5C",
+      "cj_product_id": "E6899B60-5008-4778-9809-0E015F4DAD5C",
+      "sku": "CJQCQCQC02293-Black",
+      "review_reason": null
+    },
+    {
+      "id": "F4784EF1-D030-441B-8E33-67D590DE35FF",
+      "cj_product_id": "F4784EF1-D030-441B-8E33-67D590DE35FF",
+      "sku": "CJJJCWGY00675-Tiffany Blue-520ml",
+      "review_reason": null
+    },
+    {
+      "id": "F736A182-83D9-4C42-9916-26EE530D03E5",
+      "cj_product_id": "F736A182-83D9-4C42-9916-26EE530D03E5",
+      "sku": "CJJJJTJT07713-White",
+      "review_reason": null
+    },
+    {
+      "id": "F9384AE4-43F2-4DBE-B6BE-68C6712ECA22",
+      "cj_product_id": "F9384AE4-43F2-4DBE-B6BE-68C6712ECA22",
+      "sku": "CJBJHZCZ00171-Banana",
+      "review_reason": null
+    }
+  ]
+}

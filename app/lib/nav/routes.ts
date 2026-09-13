@@ -299,6 +299,12 @@ export function buildStoreProductIdHref(productId: string): string {
   return `${APP_ROUTES.store}/products/${sanitizeIdSegment(productId)}`;
 }
 
+/** Approved 540-catalog customer PDP on the live /store route. */
+export function buildApprovedStoreItemHref(slug: string): string {
+  const safe = slug.trim().replace(/[^a-zA-Z0-9_-]/g, "");
+  return `${APP_ROUTES.store}/p/${safe}`;
+}
+
 /**
  * Id-based store link — resolves server-side to the canonical slug store
  * profile page.

@@ -7,6 +7,7 @@ import {
   pickRecommended,
   pickTrending,
 } from "../../../../lib/storefront/deriveSections";
+import { resolveRequestLocale } from "../../../../../lib/i18n/server";
 import { createClient, getServerUser } from "../../../../../lib/supabase/server";
 import {
   getPublicProductDetail,
@@ -47,7 +48,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   if (!detail) notFound();
 
-  const [user, catalog, videos] = await Promise.all([
+  const [{ locale }, user, catalog, videos] = await Promise.all([
+    resolveRequestLocale(),
     getServerUser(),
     listPublicCatalog(supabase, { limit: 24 }),
     listPublicVideosForProduct(supabase, detail.product.id),
@@ -102,6 +104,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         recommended={recommended}
         videos={videos.items}
         initialWishlisted={wishlisted}
+        locale={locale}
       />
     </StoreShell>
   );

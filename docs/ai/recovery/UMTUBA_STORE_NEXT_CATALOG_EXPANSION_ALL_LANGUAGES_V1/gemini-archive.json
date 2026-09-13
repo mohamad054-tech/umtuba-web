@@ -1,0 +1,931 @@
+[
+  {
+    "batchIndex": 0,
+    "productIds": [
+      "2412210206111611700",
+      "2409240350571624600"
+    ],
+    "userPayload": {
+      "locales": [
+        "ar",
+        "en",
+        "fr",
+        "es",
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "title": "Laptop Black Audio Cable Connection Monitor",
+          "description": "Laptop Black Audio Cable Connection Monitor Laptop Black Audio Cable Connection Monitor. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        },
+        {
+          "i": 2,
+          "title": "7-inch Car Monitor Desktop Reversing Monitor Display",
+          "description": "7-inch Car Monitor Desktop Reversing Monitor Display 7-inch Car Monitor Desktop Reversing Monitor Display. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ar": {
+            "title": "كابل صوت أسود لتوصيل اللابتوب بالشاشة",
+            "description": "كابل صوت مخصص لتوصيل أجهزة الكمبيوتر المحمول بالشاشات أو أجهزة الصوت المتوافقة، بتصميم عملي ومتين باللون الأسود لنقل صوتي واضح ومستقر.",
+            "specifications": [
+              "النوع: كابل صوت",
+              "اللون: أسود",
+              "التوافق: توصيل اللابتوب بالشاشة وأنظمة الصوت"
+            ],
+            "search_keywords": [
+              "كابل صوت",
+              "توصيل لابتوب بشاشة",
+              "سلك صوت اسود",
+              "ملحقات لابتوب",
+              "كابل صوت للشاشة"
+            ]
+          },
+          "en": {
+            "title": "Black Audio Connection Cable for Laptop and Monitor",
+            "description": "Reliable black audio connection cable designed to connect laptops to monitors or external audio systems, delivering clear sound transmission for desktop setups.",
+            "specifications": [
+              "Type: Audio connection cable",
+              "Color: Black",
+              "Compatibility: Laptop to monitor / audio display"
+            ],
+            "search_keywords": [
+              "laptop audio cable",
+              "monitor audio lead",
+              "black audio wire",
+              "laptop monitor connection",
+              "desk audio cord"
+            ]
+          },
+          "fr": {
+            "title": "Câble audio noir pour connexion ordinateur portable et moniteur",
+            "description": "Câble audio noir conçu pour relier facilement un ordinateur portable à un écran ou un système audio compatible, assurant une transmission sonore fluide et stable.",
+            "specifications": [
+              "Type : Câble de connexion audio",
+              "Couleur : Noir",
+              "Compatibilité : Connexion ordinateur portable vers moniteur"
+            ],
+            "search_keywords": [
+              "cable audio pc portable",
+              "cable son moniteur",
+              "cable jack noir",
+              "connexion audio ecran",
+              "accessoire bureau son"
+            ]
+          },
+          "es": {
+            "title": "Cable de audio negro para conexión de portátil y monitor",
+            "description": "Cable de conexión de audio en color negro diseñado para vincular portátiles con monitores o dispositivos compatibles, proporcionando una transmisión de sonido limpia y fiable.",
+            "specifications": [
+              "Tipo: Cable de conexión de audio",
+              "Color: Negro",
+              "Compatibilidad: Conexión de ordenador portátil a monitor"
+            ],
+            "search_keywords": [
+              "cable audio portatil",
+              "cable monitor pc",
+              "cable sonido negro",
+              "cable auxiliar monitor",
+              "accesorios de escritorio"
+            ]
+          },
+          "de": {
+            "title": "Schwarzes Audiokabel zur Verbindung von Laptop und Monitor",
+            "description": "Praktisches schwarzes Audiokabel zur zuverlässigen Verbindung von Laptops mit Monitoren oder Audiogeräten für eine saubere Tonübertragung am Arbeitsplatz.",
+            "specifications": [
+              "Typ: Audio-Verbindungskabel",
+              "Farbe: Schwarz",
+              "Kompatibilität: Laptop-zu-Monitor-Verbindung"
+            ],
+            "search_keywords": [
+              "audiokabel laptop",
+              "monitor audiokabel",
+              "klinkenkabel schwarz",
+              "tonkabel bildschirm",
+              "pc audio verbindung"
+            ]
+          },
+          "pt": {
+            "title": "Cabo de áudio preto para conexão entre portátil e monitor",
+            "description": "Cabo de áudio preto projetado para conectar computadores portáteis a monitores ou dispositivos de som compatíveis, garantindo transmissão de áudio clara e estável.",
+            "specifications": [
+              "Tipo: Cabo de áudio",
+              "Cor: Preto",
+              "Compatibilidade: Conexão de portátil para monitor"
+            ],
+            "search_keywords": [
+              "cabo audio notebook",
+              "cabo de som monitor",
+              "cabo de audio preto",
+              "conexao audio pc tela",
+              "acessorio para mesa"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "ar": {
+            "title": "شاشة عرض 7 بوصة للسيارة والمكتب مع دعم الرجوع للخلف",
+            "description": "شاشة عرض مدمجة بحجم 7 بوصة متعددة الاستخدامات، مناسبة للاستخدام في السيارات كشاشة كاميرا الرجوع للخلف أو على سطح المكتب، توفر رؤية واضحة ومريحة.",
+            "specifications": [
+              "حجم الشاشة: 7 بوصة",
+              "الاستخدام: شاشة سيارة / شاشة مكتبية",
+              "الوظيفة: شاشة عرض للرجوع للخلف ومراقبة الفيديو"
+            ],
+            "search_keywords": [
+              "شاشة سيارة 7 بوصة",
+              "شاشة كاميرا رجوع",
+              "شاشة مكتبية صغيرة",
+              "شاشة عرض سيارات",
+              "شاشة 7 انش"
+            ]
+          },
+          "en": {
+            "title": "7-Inch Car and Desktop Reversing Monitor Display",
+            "description": "Compact 7-inch display screen designed for dual versatility, ideal for vehicle reversing systems as well as desktop video monitoring setups.",
+            "specifications": [
+              "Screen Size: 7 inches",
+              "Application: Car reversing monitor and desktop display",
+              "Function: Video display and backup monitoring"
+            ],
+            "search_keywords": [
+              "7 inch car monitor",
+              "reversing screen display",
+              "desktop monitor 7 inch",
+              "backup camera screen",
+              "vehicle video display"
+            ]
+          },
+          "fr": {
+            "title": "Écran d'affichage 7 pouces pour voiture et bureau avec caméra de recul",
+            "description": "Moniteur compact de 7 pouces polyvalent, adapté pour l'affichage de caméra de recul en voiture ou pour une utilisation sur bureau comme écran d'appoint.",
+            "specifications": [
+              "Taille de l'écran : 7 pouces",
+              "Usage : Écran de recul pour voiture et moniteur de bureau",
+              "Fonction : Affichage vidéo et surveillance de recul"
+            ],
+            "search_keywords": [
+              "ecran 7 pouces voiture",
+              "moniteur camera de recul",
+              "ecran de bureau 7 pouces",
+              "afficheur video voiture",
+              "ecran d appoint compact"
+            ]
+          },
+          "es": {
+            "title": "Monitor de 7 pulgadas para coche y escritorio con función de marcha atrás",
+            "description": "Pantalla compacta de 7 pulgadas versátil, ideal para sistemas de marcha atrás en vehículos o como monitor secundario para escritorio.",
+            "specifications": [
+              "Tamaño de pantalla: 7 pulgadas",
+              "Uso: Monitor para coche y soporte de escritorio",
+              "Función: Pantalla de visualización para marcha atrás y vídeo"
+            ],
+            "search_keywords": [
+              "pantalla 7 pulgadas coche",
+              "monitor marcha atras",
+              "pantalla escritorio 7 pulgadas",
+              "monitor camara trasera",
+              "pantalla de video para coche"
+            ]
+          },
+          "de": {
+            "title": "7-Zoll-Monitor für Auto und Schreibtisch mit Rückfahrkamera-Funktion",
+            "description": "Kompakter 7-Zoll-Bildschirm für den vielseitigen Einsatz im Fahrzeug als Rückfahrmonitor oder auf dem Schreibtisch als kompaktes Anzeigegerät.",
+            "specifications": [
+              "Bildschirmgröße: 7 Zoll",
+              "Verwendung: Kfz-Rückfahrmonitor und Desktop-Display",
+              "Funktion: Videoanzeige und Rückfahrüberwachung"
+            ],
+            "search_keywords": [
+              "7 zoll auto monitor",
+              "rueckfahrkamera bildschirm",
+              "mini monitor 7 zoll",
+              "desktop display klein",
+              "kfz video anzeige"
+            ]
+          },
+          "pt": {
+            "title": "Monitor de 7 polegadas para carro e mesa com suporte a marcha-atrás",
+            "description": "Tela compacta de 7 polegadas versátil, indicada tanto para monitoramento de marcha-atrás veicular quanto para visualização de vídeo sobre a mesa de trabalho.",
+            "specifications": [
+              "Tamanho do ecrã: 7 polegadas",
+              "Uso: Monitor para carro e mesa",
+              "Função: Exibição de vídeo e monitoramento de marcha-atrás"
+            ],
+            "search_keywords": [
+              "monitor 7 polegadas veicular",
+              "tela marcha atras carro",
+              "monitor de mesa 7 polegadas",
+              "display para camera de ré",
+              "tela video automotiva"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 1,
+    "productIds": [
+      "2D644825-4547-4EA6-9C8D-22E3DC3CFFE8",
+      "DCB495CC-80F8-4ED9-B5BD-26E39B751776"
+    ],
+    "userPayload": {
+      "locales": [
+        "ar",
+        "en",
+        "fr",
+        "es",
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "title": "Tire pressure gauge",
+          "description": "Tire pressure gauge Tire pressure gauge. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        },
+        {
+          "i": 2,
+          "title": "New Laptop Stand Multifunctional Folding Lift Portable Laptop Stand Monitor Increase Rack Aluminum Alloy Base",
+          "description": "New Laptop Stand Multifunctional Folding Lift Portable Laptop Stand Monitor Increase Rack Aluminum Alloy Base New Laptop Stand Multifunctional Folding Lift Portable Laptop Stand Monitor Increase Rack Aluminum Alloy Base. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ar": {
+            "title": "مقياس ضغط الإطارات",
+            "description": "أداة قياس ضغط الإطارات مصممة لقراءة مستوى ضغط الهواء في الإطارات بدقة وسهولة، مما يساعد في الحفاظ على أداء القيادة وسلامة الإطارات.",
+            "specifications": [
+              "النوع: مقياس ضغط الإطارات",
+              "التصميم: مدمج وسهل الحمل والتشغيل"
+            ],
+            "search_keywords": [
+              "مقياس ضغط الاطارات",
+              "فاحص هواء الكفرات",
+              "قياس ضغط العجلات",
+              "ملحقات السيارات"
+            ]
+          },
+          "en": {
+            "title": "Tire Pressure Gauge",
+            "description": "A dependable tire pressure gauge designed to deliver quick, clear readings to help maintain proper tire inflation and driving safety.",
+            "specifications": [
+              "Product Type: Tire pressure gauge",
+              "Design: Compact and portable for easy storage"
+            ],
+            "search_keywords": [
+              "tire pressure gauge",
+              "air pressure checker",
+              "tire gauge",
+              "vehicle maintenance tool"
+            ]
+          },
+          "fr": {
+            "title": "Manomètre de pression des pneus",
+            "description": "Un manomètre de pression précis et compact, idéal pour vérifier régulièrement la pression de vos pneus et rouler en toute sécurité.",
+            "specifications": [
+              "Type de produit : Manomètre de pression des pneus",
+              "Format : Compact et facilement transportable"
+            ],
+            "search_keywords": [
+              "manomètre de pression",
+              "testeur pression pneus",
+              "contrôleur gonflage pneu",
+              "accessoire pneumatique"
+            ]
+          },
+          "es": {
+            "title": "Manómetro medidor de presión de neumáticos",
+            "description": "Herramienta práctica y compacta para medir la presión del aire de los neumáticos de manera rápida y fiable, ayudando a optimizar el rendimiento del vehículo.",
+            "specifications": [
+              "Tipo de producto: Medidor de presión de neumáticos",
+              "Diseño: Compacto y fácil de guardar"
+            ],
+            "search_keywords": [
+              "medidor presion neumaticos",
+              "manometro para llantas",
+              "calibrador de aire ruedas",
+              "accesorio vehiculo"
+            ]
+          },
+          "de": {
+            "title": "Reifendruckprüfer",
+            "description": "Zuverlässiger Reifendruckprüfer zur schnellen und unkomplizierten Überprüfung des Luftdrucks, für optimale Fahrsicherheit und Reifenhaltbarkeit.",
+            "specifications": [
+              "Produkttyp: Reifendruckprüfer",
+              "Design: Kompakt und leicht zu verstauen"
+            ],
+            "search_keywords": [
+              "reifendruckprüfer",
+              "luftdruckprüfer reifen",
+              "reifendruck messgerät",
+              "kfz zubehör"
+            ]
+          },
+          "pt": {
+            "title": "Medidor de pressão de pneus",
+            "description": "Medidor prático e confiável para verificar a pressão dos pneus com agilidade, garantindo maior segurança e conservação do veículo.",
+            "specifications": [
+              "Tipo de produto: Medidor de pressão de pneus",
+              "Design: Compacto e fácil de transportar"
+            ],
+            "search_keywords": [
+              "medidor de pressao pneus",
+              "calibrador de pneus",
+              "manometro para carro",
+              "acessorio automotivo"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "ar": {
+            "title": "حامل لابتوب وشاشة متعدد الوظائف قابل للطي بقاعدة من سبائك الألومنيوم",
+            "description": "حامل لابتوب وشاشة متعدد الوظائف يتميز بقابلية الطي وتعديل الارتفاع لتوفير زاوية رؤية مريحة أثناء العمل. مزود بقاعدة متينة مصنوعة من سبائك الألومنيوم لحمل الأجهزة بثبات وتسهيل حمله والتنقل به.",
+            "specifications": [
+              "نوع المنتج: حامل لابتوب ورفع شاشة متعدد الوظائف",
+              "مادة القاعدة: سبائك الألومنيوم",
+              "التصميم: قابل للطي والتعديل ومحمول"
+            ],
+            "search_keywords": [
+              "حامل لابتوب",
+              "قاعدة لابتوب المنيوم",
+              "حامل شاشة مكتبي",
+              "حامل حاسوب محمول قابل للطي"
+            ]
+          },
+          "en": {
+            "title": "Multifunctional Folding Laptop Stand & Monitor Riser with Aluminum Alloy Base",
+            "description": "Elevate your workspace ergonomics with this versatile folding laptop stand and monitor riser. Built with a sturdy aluminum alloy base, it offers adjustable lift and a portable, space-saving design ideal for desk setups on the move.",
+            "specifications": [
+              "Product Type: Multifunctional laptop stand & monitor riser",
+              "Base Material: Aluminum alloy",
+              "Design: Folding, height-lifting, and portable"
+            ],
+            "search_keywords": [
+              "laptop stand",
+              "aluminum monitor riser",
+              "folding laptop riser",
+              "portable desk stand",
+              "adjustable notebook holder"
+            ]
+          },
+          "fr": {
+            "title": "Support pour ordinateur portable et réhausseur d'écran pliable multifonction avec base en alliage d'aluminium",
+            "description": "Ce support multifonction pliable pour ordinateur portable et écran surélève votre équipement à une hauteur confortable. Sa base robuste en alliage d'aluminium assure une excellente stabilité tout en restant pliable et facile à transporter.",
+            "specifications": [
+              "Type de produit : Support multifonction pour ordinateur portable et moniteur",
+              "Matériau de la base : Alliage d'aluminium",
+              "Conception : Pliable, réglable en hauteur et portable"
+            ],
+            "search_keywords": [
+              "support ordinateur portable",
+              "rehausseur ecran aluminium",
+              "support pc pliable",
+              "support bureau portable"
+            ]
+          },
+          "es": {
+            "title": "Soporte multifuncional plegable para portátil y elevador de monitor con base de aleación de aluminio",
+            "description": "Optimiza la postura de trabajo con este soporte elevador multifuncional para ordenador portátil y monitor. Diseñado con una sólida base de aleación de aluminio, es totalmente plegable y fácil de transportar donde lo necesites.",
+            "specifications": [
+              "Tipo de producto: Soporte multifuncional para portátil y monitor",
+              "Material de la base: Aleación de aluminio",
+              "Características: Plegable, elevable y portátil"
+            ],
+            "search_keywords": [
+              "soporte para portatil",
+              "elevador de monitor",
+              "soporte plegable aluminio",
+              "base para notebook"
+            ]
+          },
+          "de": {
+            "title": "Multifunktionaler faltbarer Laptop-Ständer und Monitor-Erhöher mit Aluminiumlegierungs-Basis",
+            "description": "Verbessern Sie Ihre Arbeitsplatz-Ergonomie mit diesem vielseitigen, klappbaren Laptop- und Monitorständer. Die stabile Basis aus Aluminiumlegierung sorgt für zuverlässigen Halt, während das faltbare Format ideal für den flexiblen Transport ist.",
+            "specifications": [
+              "Produkttyp: Multifunktionaler Laptop- und Monitor-Ständer",
+              "Basismaterial: Aluminiumlegierung",
+              "Eigenschaften: Faltbar, höhenverstellbar und mobil"
+            ],
+            "search_keywords": [
+              "laptop ständer",
+              "monitor erhöhung aluminium",
+              "faltbarer notebookhalter",
+              "schreibtisch laptopständer"
+            ]
+          },
+          "pt": {
+            "title": "Suporte multifuncional dobrável para notebook e monitor com base em liga de alumínio",
+            "description": "Melhore a ergonomia da sua mesa de trabalho com este suporte multifuncional e elevador de monitor. Conta com estrutura dobrável e base resistente em liga de alumínio, facilitando o transporte e oferecendo firmeza no uso diário.",
+            "specifications": [
+              "Tipo de produto: Suporte multifuncional para notebook e monitor",
+              "Material da base: Liga de alumínio",
+              "Características: Dobrável, com elevação e portátil"
+            ],
+            "search_keywords": [
+              "suporte para notebook",
+              "elevador de monitor",
+              "base aluminio para laptop",
+              "suporte articulado portatil"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 2,
+    "productIds": [
+      "1380094536965033984",
+      "1607997452471250944"
+    ],
+    "userPayload": {
+      "locales": [
+        "ar",
+        "en",
+        "fr",
+        "es",
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "title": "Head-up Display Gps High-definition Speed Water Temperature Turbine Monitoring",
+          "description": "Head-up Display Gps High-definition Speed Water Temperature Turbine Monitoring Head-up Display Gps High-definition Speed Water Temperature Turbine Monitoring. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        },
+        {
+          "i": 2,
+          "title": "Driving Data Recorder Power Line Step-down Line",
+          "description": "Driving Data Recorder Power Line Step-down Line Driving Data Recorder Power Line Step-down Line. ELECTRONICS & ACCESSORIES / Desk Accessories. .",
+          "department": "ELECTRONICS & ACCESSORIES",
+          "subcategory": "Desk Accessories"
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ar": {
+            "title": "شاشة عرض على الزجاج الأمامي للسيارة (HUD) مع نظام GPS ومراقبة السرعة وحرارة الماء والتوربو",
+            "description": "شاشة عرض أمامية رقمية عالية الدقة مزودة بنظام تحديد المواقع GPS، مصممة لمراقبة معايير القيادة الحيوية مثل السرعة في الوقت الفعلي، ودرجة حرارة سائل التبريد، وضغط التوربين، مما يوفر رؤية واضحة ومباشرة دون تشتيت الانتباه أثناء القيادة.",
+            "specifications": [
+              "نوع العرض: شاشة عرض على الزجاج الأمامي (HUD) عالية الدقة",
+              "النظام المدمج: وحدة GPS مدمجة",
+              "المؤشرات المعروضة: السرعة في الوقت الفعلي، درجة حرارة الماء، مراقبة التوربو",
+              "طريقة التركيب: لوحة القيادة"
+            ],
+            "search_keywords": [
+              "شاشة عرض امامية للسيارة",
+              "شاشة هيد اب ديسبلاي",
+              "عداد سرعة جي بي اس",
+              "مقياس حرارة الماء والتوربو",
+              "ملحقات قيادة ذكية"
+            ]
+          },
+          "en": {
+            "title": "High-Definition GPS Head-Up Display with Speed, Water Temperature & Turbo Monitoring",
+            "description": "Keep essential driving metrics directly in your line of sight with this high-definition GPS head-up display. Engineered to deliver clear, real-time readouts for vehicle speed, engine coolant temperature, and turbo pressure monitoring to enhance driving awareness.",
+            "specifications": [
+              "Display Type: High-Definition Head-Up Display (HUD)",
+              "Positioning System: Integrated GPS module",
+              "Monitored Parameters: Real-time speed, coolant water temperature, turbo boost",
+              "Placement: Dashboard mount"
+            ],
+            "search_keywords": [
+              "GPS HUD display",
+              "car head up display",
+              "digital speedometer",
+              "water temp monitor",
+              "turbo boost gauge HUD"
+            ]
+          },
+          "fr": {
+            "title": "Affichage Tête Haute GPS Haute Définition avec Surveillance Vitesse, Température d'Eau et Turbo",
+            "description": "Gardez les données de conduite essentielles sous les yeux grâce à cet affichage tête haute GPS haute définition. Conçu pour retransmettre en temps réel la vitesse de votre véhicule, la température du liquide de refroidissement et la pression du turbo pour une conduite plus sereine.",
+            "specifications": [
+              "Type d'affichage : Affichage tête haute (HUD) haute définition",
+              "Système : Module GPS intégré",
+              "Données surveillées : Vitesse en temps réel, température d'eau, pression turbo",
+              "Emplacement : Montage sur tableau de bord"
+            ],
+            "search_keywords": [
+              "affichage tete haute voiture",
+              "compteur vitesse GPS HUD",
+              "indicateur temperature eau",
+              "manometre turbo digital",
+              "accessoire tableau de bord"
+            ]
+          },
+          "es": {
+            "title": "Pantalla Head-Up Display GPS de Alta Definición con Monitor de Velocidad, Temperatura de Agua y Turbo",
+            "description": "Visualice los datos clave del vehículo sin apartar la vista del camino con esta pantalla head-up display GPS de alta definición. Monitorea en tiempo real la velocidad de marcha, la temperatura del refrigerante y la presión del turbo con total claridad.",
+            "specifications": [
+              "Tipo de pantalla: Head-Up Display (HUD) de alta definición",
+              "Sistema: Módulo GPS integrado",
+              "Parámetros monitorizados: Velocidad en tiempo real, temperatura de agua, presión de turbina",
+              "Instalación: Sobre el tablero"
+            ],
+            "search_keywords": [
+              "pantalla HUD para auto",
+              "head up display GPS",
+              "velocimetro digital coche",
+              "medidor temperatura agua",
+              "indicador presion turbo"
+            ]
+          },
+          "de": {
+            "title": "HD GPS Head-Up-Display mit Geschwindigkeits-, Wassertemperatur- und Turbo-Überwachung",
+            "description": "Behalten Sie wichtige Fahrdaten direkt im Blickfeld mit diesem hochauflösenden GPS Head-Up-Display. Zeigt zuverlässig und in Echtzeit Fahrzeuggeschwindigkeit, Kühlmitteltemperatur sowie Ladedruckdaten an – für mehr Übersicht und Komfort am Steuer.",
+            "specifications": [
+              "Display-Typ: Hochauflösendes Head-Up-Display (HUD)",
+              "System: Integriertes GPS-Modul",
+              "Angezeigte Parameter: Echtzeit-Geschwindigkeit, Wassertemperatur, Ladedruck/Turbomonitoring",
+              "Montage: Armaturenbrett"
+            ],
+            "search_keywords": [
+              "Head Up Display Auto",
+              "GPS Tacho HUD",
+              "Wassertemperatur Anzeige",
+              "Ladedruckanzeige digital",
+              "Armaturenbrett Display"
+            ]
+          },
+          "pt": {
+            "title": "Head-Up Display GPS em Alta Definição com Monitoramento de Velocidade, Temperatura da Água e Turbo",
+            "description": "Acompanhe as principais informações de condução sem desviar o olhar da pista com este head-up display GPS de alta definição. Apresenta leituras nítidas e em tempo real da velocidade do veículo, temperatura do líquido de arrefecimento e pressão da turbina.",
+            "specifications": [
+              "Tipo de tela: Head-Up Display (HUD) de alta definição",
+              "Sistema: Módulo GPS integrado",
+              "Parâmetros monitorados: Velocidade em tempo real, temperatura da água, pressão de turbo",
+              "Instalação: Painel automotivo"
+            ],
+            "search_keywords": [
+              "head up display automotivo",
+              "HUD GPS carro",
+              "velocimetro digital HUD",
+              "medidor temperatura agua",
+              "monitor de turbo veicular"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "ar": {
+            "title": "كابل محول خافض للجهد ومصدر طاقة لكاميرا تسجيل القيادة (Dash Cam)",
+            "description": "كابل توصيل مخصص لمسجلات القيادة وكاميرات السيارات (Dash Cam)، مزود بوحدة مدمجة لخفض الجهد تضمن إمداداً كهربائياً مستقراً وآمناً للجهاز مباشرة من مصدر طاقة المركبة.",
+            "specifications": [
+              "نوع المنتج: كابل تغذية ومحول خافض للجهد (Step-down Line)",
+              "الاستخدام المتوافق: مسجلات قيادة السيارات وكاميرات Dash Cam",
+              "الوظيفة: تحويل وتثبيت التيار الكهربائي لتشغيل الجهاز"
+            ],
+            "search_keywords": [
+              "كابل كاميرا سيارة",
+              "سلك خافض جهد داش كام",
+              "كابل طاقة مسجل قيادة",
+              "محول جهد كهربائي للسيارة"
+            ]
+          },
+          "en": {
+            "title": "Dash Cam Hardwire Power Cable with Step-Down Converter",
+            "description": "Dedicated power supply and voltage step-down cable designed for driving data recorders and dash cameras. Delivers a stable, converted power feed directly from your vehicle's electrical circuit for consistent camera operation.",
+            "specifications": [
+              "Product Type: Power supply cable with step-down voltage module",
+              "Compatibility: Driving data recorders, dash cams",
+              "Function: Voltage step-down and direct power connectivity"
+            ],
+            "search_keywords": [
+              "dash cam hardwire kit",
+              "step down power cable",
+              "driving recorder power cord",
+              "car camera hardwire cable"
+            ]
+          },
+          "fr": {
+            "title": "Câble d'Alimentation Réducteur de Tension pour Caméra Embarquée Dashcam",
+            "description": "Câble d'alimentation avec module abaisseur de tension intégré, conçu pour le raccordement direct des caméras embarquées et enregistreurs de conduite au circuit électrique du véhicule pour une alimentation stable.",
+            "specifications": [
+              "Type de produit : Câble d'alimentation avec abaisseur de tension (step-down)",
+              "Compatibilité : Enregistreurs de conduite, caméras embarquées (dashcams)",
+              "Fonction : Abaissement de tension et alimentation électrique continue"
+            ],
+            "search_keywords": [
+              "cable alimentation dashcam",
+              "kit hardwire camera voiture",
+              "cable abaisseur de tension",
+              "alimentation enregistreur conduite"
+            ]
+          },
+          "es": {
+            "title": "Cable de Alimentación Reductor de Voltaje para Cámara de Conducción Dash Cam",
+            "description": "Cable reductor de voltaje para grabadores de conducción y cámaras dash cam. Permite conectar el dispositivo al sistema eléctrico del vehículo garantizando una alimentación estable y un voltaje adecuado para su funcionamiento.",
+            "specifications": [
+              "Tipo de producto: Cable de alimentación con reductor de voltaje (step-down)",
+              "Compatibilidad: Grabadores de datos de conducción y cámaras para coche (dash cams)",
+              "Función: Conversión y regulación de voltaje para alimentación continua"
+            ],
+            "search_keywords": [
+              "cable reductor voltaje dashcam",
+              "kit instalacion camara auto",
+              "cable alimentacion grabador conduccion",
+              "cable step down coche"
+            ]
+          },
+          "de": {
+            "title": "Dashcam-Stromkabel mit integriertem Spannungsabwärtswandler",
+            "description": "Spezielles Strom- und Spannungswandlerkabel für Dashcams und Fahrdaten-Rekorder. Gewährleistet eine zuverlässige, herabgesetzte Stromversorgung direkt aus dem Bordnetz für den kontinuierlichen Betrieb des Aufzeichnungsgeräts.",
+            "specifications": [
+              "Produkttyp: Stromversorgungskabel mit Step-Down-Spannungswandler",
+              "Kompatibilität: Fahrdatenrekorder, Autokameras (Dashcams)",
+              "Funktion: Spannungsreduzierung und dauerhafte Stromversorgung"
+            ],
+            "search_keywords": [
+              "Dashcam Hardwire Kit",
+              "Spannungswandler Kabel Auto",
+              "Step Down Kabel Dashcam",
+              "Stromkabel Fahrtenrekorder"
+            ]
+          },
+          "pt": {
+            "title": "Cabo de Alimentação Rebaixador de Tensão para Câmera Veicular Dash Cam",
+            "description": "Cabo conversor e rebaixador de tensão projetado para câmeras automotivas e gravadores de condução. Proporciona fornecimento elétrico estável e seguro diretamente do circuito do veículo para alimentação contínua do aparelho.",
+            "specifications": [
+              "Tipo de produto: Cabo de alimentação com módulo step-down",
+              "Compatibilidade: Gravadores de dados veiculares e dash cams",
+              "Função: Redução de voltagem e conexão de energia contínua"
+            ],
+            "search_keywords": [
+              "cabo hardwire dashcam",
+              "cabo rebaixador tensao veicular",
+              "alimentador camera automotiva",
+              "cabo step down gravador veiculo"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  },
+  {
+    "batchIndex": 3,
+    "productIds": [
+      "38396C3B-40FA-4EE3-9FE2-60FE32A2DE24",
+      "2508140725141623900"
+    ],
+    "userPayload": {
+      "locales": [
+        "ar",
+        "en",
+        "fr",
+        "es",
+        "de",
+        "pt"
+      ],
+      "products": [
+        {
+          "i": 1,
+          "title": "Non shedding microfiber round beach towel",
+          "description": "Non shedding microfiber round beach towel Non shedding microfiber round beach towel. SPORTS & FITNESS / Workout Accessories. .",
+          "department": "SPORTS & FITNESS",
+          "subcategory": "Workout Accessories"
+        },
+        {
+          "i": 2,
+          "title": "Quick-drying Microfiber Magnet Beach Towel Outdoor Multi-purpose Bath Towel",
+          "description": "Quick-drying Microfiber Magnet Beach Towel Outdoor Multi-purpose Bath Towel Quick-drying Microfiber Magnet Beach Towel Outdoor Multi-purpose Bath Towel. SPORTS & FITNESS / Workout Accessories. .",
+          "department": "SPORTS & FITNESS",
+          "subcategory": "Workout Accessories"
+        }
+      ]
+    },
+    "parsed": [
+      {
+        "i": 1,
+        "locales": {
+          "ar": {
+            "title": "منشفة شاطئ دائرية من المايكروفايبر غير المتساقط",
+            "description": "منشفة شاطئ دائرية مصنوعة من ألياف المايكروفايبر المقاومة للتساقط والوبر. توفر امتصاصاً عملياً وملمساً ناعماً، ومناسبة للاستخدام على الشاطئ والأنشطة الرياضية والخارجية.",
+            "specifications": [
+              "الشكل: دائري",
+              "الخامة: مايكروفايبر (ألياف دقيقة)",
+              "الخاصية: مقاومة لتساقط الوبر والألياف",
+              "الاستخدام: الشاطئ والرياضة والأنشطة الخارجية"
+            ],
+            "search_keywords": [
+              "منشفة شاطئ دائرية",
+              "منشفة مايكروفايبر",
+              "منشفة خالية من الوبر",
+              "منشفة رياضية"
+            ]
+          },
+          "en": {
+            "title": "Non-Shedding Microfiber Round Beach Towel",
+            "description": "Crafted from durable microfiber that resists shedding, this round beach towel delivers reliable absorbency and a soft feel for beach trips, outdoor leisure, and workout routines.",
+            "specifications": [
+              "Shape: Round",
+              "Material: Microfiber",
+              "Key Feature: Non-shedding / lint-free",
+              "Use: Beach, fitness, and outdoor activities"
+            ],
+            "search_keywords": [
+              "round beach towel",
+              "microfiber beach towel",
+              "non shedding towel",
+              "outdoor fitness towel"
+            ]
+          },
+          "fr": {
+            "title": "Serviette de plage ronde en microfibre sans peluche",
+            "description": "Cette serviette de plage ronde en microfibre de qualité est conçue pour ne pas pelucher. Douce et absorbante, elle convient parfaitement pour les sorties à la plage, les séances de sport et les loisirs en plein air.",
+            "specifications": [
+              "Forme : Ronde",
+              "Matière : Microfibre",
+              "Caractéristique : Ne peluche pas",
+              "Utilisation : Plage, sport et activités extérieures"
+            ],
+            "search_keywords": [
+              "serviette de plage ronde",
+              "drap de plage microfibre",
+              "serviette sans peluche",
+              "serviette de sport"
+            ]
+          },
+          "es": {
+            "title": "Toalla de playa redonda de microfibra sin desprendimiento de pelusa",
+            "description": "Toalla de playa redonda confeccionada en microfibra que no desprende pelusas. Ofrece un tacto suave y gran capacidad de absorción, ideal para la playa, entrenamientos y actividades al aire libre.",
+            "specifications": [
+              "Forma: Redonda",
+              "Material: Microfibra",
+              "Característica: No desprende pelusa",
+              "Uso: Playa, fitness y actividades al aire libre"
+            ],
+            "search_keywords": [
+              "toalla de playa redonda",
+              "toalla microfibra",
+              "toalla sin pelusa",
+              "toalla de deporte"
+            ]
+          },
+          "de": {
+            "title": "Rundes Strandtuch aus fusselfreier Mikrofaser",
+            "description": "Dieses runde Strandtuch besteht aus robuster Mikrofaser, die nicht fusselt. Es bietet eine weiche Haptik sowie gute Saugleistung für Strandbesuche, Fitness und Freizeitaktivitäten im Freien.",
+            "specifications": [
+              "Form: Rund",
+              "Material: Mikrofaser",
+              "Eigenschaft: Fusselfrei / verliert keine Fasern",
+              "Verwendung: Strand, Fitness und Outdoor-Aktivitäten"
+            ],
+            "search_keywords": [
+              "rundes Strandtuch",
+              "Mikrofaser Strandtuch",
+              "fusselfreies Handtuch",
+              "Fitness Handtuch"
+            ]
+          },
+          "pt": {
+            "title": "Toalha de praia redonda de microfibra que não solta pelos",
+            "description": "Toalha de praia em formato redondo confeccionada em microfibra resistente que não solta pelos. Macia e absorvente, é ideal para uso na praia, em treinos e em momentos de lazer ao ar livre.",
+            "specifications": [
+              "Formato: Redondo",
+              "Material: Microfibra",
+              "Característica: Não solta fiapos ou pelos",
+              "Uso: Praia, academia e atividades ao ar livre"
+            ],
+            "search_keywords": [
+              "toalha de praia redonda",
+              "toalha de microfibra",
+              "toalha sem fiapos",
+              "toalha fitness"
+            ]
+          }
+        }
+      },
+      {
+        "i": 2,
+        "locales": {
+          "ar": {
+            "title": "منشفة شاطئ وحمام متعددة الأغراض سريعة الجفاف من المايكروفايبر مزودة بمغناطيس",
+            "description": "منشفة شاطئ وحمام متعددة الاستخدامات مصنوعة من المايكروفايبر سريع الجفاف ومزودة بمغناطيس لسهولة التثبيت والتعليق. عملية للغاية للأنشطة الخارجية والتمارين الرياضية والاستحمام.",
+            "specifications": [
+              "الخامة: مايكروفايبر (ألياف دقيقة)",
+              "الميزات: سريعة الجفاف، مدمجة بمغناطيس",
+              "الاستخدام: منشفة شاطئ، حمام، رياضية وخارجية متعددة الأغراض"
+            ],
+            "search_keywords": [
+              "منشفة مايكروفايبر بمغناطيس",
+              "منشفة سريعة الجفاف",
+              "منشفة شاطئ متعددة الأغراض",
+              "منشفة رياضية خارجية"
+            ]
+          },
+          "en": {
+            "title": "Quick-Drying Microfiber Magnetic Beach and Multi-Purpose Outdoor Bath Towel",
+            "description": "Designed for active outdoor use and travel, this multi-purpose microfiber towel features quick-drying fabric and an integrated magnet for convenient hanging and positioning during workouts or beach trips.",
+            "specifications": [
+              "Material: Microfiber",
+              "Key Features: Quick-drying, integrated magnet",
+              "Use: Beach, bath, fitness, and multi-purpose outdoor activities"
+            ],
+            "search_keywords": [
+              "magnetic beach towel",
+              "quick dry microfiber towel",
+              "outdoor bath towel",
+              "magnetic fitness towel"
+            ]
+          },
+          "fr": {
+            "title": "Serviette de plage et de bain magnétique en microfibre à séchage rapide",
+            "description": "Polyvalente et pratique, cette serviette en microfibre à séchage rapide intègre un aimant pour une fixation aisée. Parfaite pour la plage, le bain, les entraînements sportifs et les activités de plein air.",
+            "specifications": [
+              "Matière : Microfibre",
+              "Caractéristiques : Séchage rapide, fixation magnétique intégrée",
+              "Utilisation : Plage, bain, sport et extérieur multi-usage"
+            ],
+            "search_keywords": [
+              "serviette magnétique",
+              "serviette microfibre séchage rapide",
+              "drap de plage aimanté",
+              "serviette de bain extérieure"
+            ]
+          },
+          "es": {
+            "title": "Toalla magnética multiusos de microfibra de secado rápido para playa y baño",
+            "description": "Toalla versátil de microfibra de secado rápido equipada con un imán integrado para colgarla y fijarla con facilidad. Adecuada para la playa, el baño, entrenamientos y actividades al aire libre.",
+            "specifications": [
+              "Material: Microfibra",
+              "Características: Secado rápido, imán integrado",
+              "Uso: Playa, baño, gimnasio y actividades exteriores multiusos"
+            ],
+            "search_keywords": [
+              "toalla magnética",
+              "toalla microfibra secado rápido",
+              "toalla de playa multiusos",
+              "toalla deportiva exterior"
+            ]
+          },
+          "de": {
+            "title": "Schnelltrocknendes Mikrofaser-Strandtuch mit Magnet für Outdoor und Bad",
+            "description": "Dieses vielseitige Mikrofaser-Tuch trocknet schnell und verfügt über einen integrierten Magneten zum unkomplizierten Aufhängen und Befestigen. Optimal für den Strand, das Bad, Fitnesstraining und Outdoor-Aktivitäten.",
+            "specifications": [
+              "Material: Mikrofaser",
+              "Eigenschaften: Schnelltrocknend, integrierter Magnet",
+              "Verwendung: Strandtuch, Badetuch, Fitness und Outdoor-Einsatz"
+            ],
+            "search_keywords": [
+              "magnetisches Handtuch",
+              "Mikrofaser Handtuch schnelltrocknend",
+              "Strandtuch mit Magnet",
+              "Outdoor Badetuch"
+            ]
+          },
+          "pt": {
+            "title": "Toalha magnética de microfibra de secagem rápida para praia e banho",
+            "description": "Toalha multiúso em microfibra com secagem rápida e ímã integrado para pendurar e fixar com facilidade. Excelente escolha para a praia, banho, treinos de ginástica e atividades ao ar livre.",
+            "specifications": [
+              "Material: Microfibra",
+              "Características: Secagem rápida, ímã integrado",
+              "Uso: Praia, banho, treino e atividades externas multiúso"
+            ],
+            "search_keywords": [
+              "toalha magnética",
+              "toalha microfibra secagem rápida",
+              "toalha de praia multiuso",
+              "toalha de academia com ímã"
+            ]
+          }
+        }
+      }
+    ],
+    "error": null
+  }
+]

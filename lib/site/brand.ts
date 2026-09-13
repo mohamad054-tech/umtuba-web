@@ -14,6 +14,119 @@ export const BRAND = {
   developmentOrigin: "http://localhost:3000",
 } as const;
 
+/**
+ * Official web brand assets extracted from the owner-approved End Tag video
+ * (UMTUBA_LOGO_FROM_APPROVED_VIDEO_V1). Stacked lockup is primary: symbol above UMTUBA.
+ * Do not regenerate or replace with V2/V3/V4 artwork.
+ */
+export const BRAND_ASSETS = {
+  stackedLogo: "/brand/umtuba_logo_stacked_from_approved_video.png",
+  stackedLogoWidth: 788,
+  stackedLogoHeight: 776,
+  symbol: "/brand/umtuba_symbol_from_approved_video.png",
+  symbolWidth: 487,
+  symbolHeight: 450,
+  appIcon1024: "/brand/umtuba_app_icon_1024.png",
+  appIcon1024Size: 1024,
+  icon16: "/brand/umtuba_icon_16.png",
+  icon32: "/brand/umtuba_icon_32.png",
+  icon48: "/brand/umtuba_icon_48.png",
+  icon64: "/brand/umtuba_icon_64.png",
+  icon96: "/brand/umtuba_icon_96.png",
+  icon144: "/brand/umtuba_icon_144.png",
+  icon180: "/brand/umtuba_icon_180.png",
+  icon192: "/brand/umtuba_icon_192.png",
+  icon512: "/brand/umtuba_icon_512.png",
+  favicon16: "/favicon-16x16.png",
+  favicon32: "/favicon-32x32.png",
+} as const;
+
+export type BrandMarkKind = "stacked" | "symbol";
+
+export type BrandMarkPresetId =
+  | "nav"
+  | "hero"
+  | "auth"
+  | "authCompact"
+  | "footer"
+  | "legal"
+  | "loading";
+
+/**
+ * Presentation-only sizes. Display height stays at or below the source raster
+ * so the approved video extract is never upscaled.
+ *
+ * Compact chrome uses the symbol only. The stacked lockup must not be forced
+ * into a 64px header — that is the cropping/compression regression.
+ */
+export const BRAND_MARK_PRESETS = {
+  nav: {
+    mark: "symbol" as const,
+    maxDisplayPx: 52,
+    className: "umtuba-brand-mark umtuba-brand-mark--nav",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--nav",
+    sizes: "(min-width: 768px) 128px, (min-width: 640px) 96px, 80px",
+  },
+  legal: {
+    mark: "symbol" as const,
+    maxDisplayPx: 48,
+    className: "umtuba-brand-mark umtuba-brand-mark--legal",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--legal",
+    sizes: "96px",
+  },
+  authCompact: {
+    mark: "symbol" as const,
+    maxDisplayPx: 52,
+    className: "umtuba-brand-mark umtuba-brand-mark--nav",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--nav",
+    sizes: "96px",
+  },
+  hero: {
+    mark: "stacked" as const,
+    maxDisplayPx: 448,
+    className: "umtuba-brand-mark umtuba-brand-mark--hero",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--hero",
+    sizes: "(min-width: 768px) 448px, 320px",
+  },
+  auth: {
+    mark: "stacked" as const,
+    maxDisplayPx: 192,
+    className: "umtuba-brand-mark umtuba-brand-mark--auth",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--auth",
+    sizes: "(min-width: 640px) 192px, 160px",
+  },
+  footer: {
+    mark: "stacked" as const,
+    maxDisplayPx: 176,
+    className: "umtuba-brand-mark umtuba-brand-mark--footer",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--footer",
+    sizes: "(min-width: 768px) 176px, 144px",
+  },
+  loading: {
+    mark: "stacked" as const,
+    maxDisplayPx: 192,
+    className: "umtuba-brand-mark umtuba-brand-mark--loading",
+    frameClassName: "umtuba-brand-frame umtuba-brand-frame--loading",
+    sizes: "192px",
+  },
+} as const;
+
+export function brandMarkSourceHeight(mark: BrandMarkKind): number {
+  return mark === "symbol"
+    ? BRAND_ASSETS.symbolHeight
+    : BRAND_ASSETS.stackedLogoHeight;
+}
+
+export function brandMarkSourceWidth(mark: BrandMarkKind): number {
+  return mark === "symbol"
+    ? BRAND_ASSETS.symbolWidth
+    : BRAND_ASSETS.stackedLogoWidth;
+}
+
+export function brandMarkSource(mark: BrandMarkKind): string {
+  return mark === "symbol" ? BRAND_ASSETS.symbol : BRAND_ASSETS.stackedLogo;
+}
+
 /** Default document title (also used when a route omits a title). */
 export const DEFAULT_TITLE = `${BRAND.name} — ${BRAND.tagline}`;
 

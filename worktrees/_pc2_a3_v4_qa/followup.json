@@ -1,0 +1,43 @@
+{
+  "enStore": {
+    "url": "https://umtuba.com/store",
+    "dir": "ltr",
+    "lang": "en",
+    "overflowX": 0,
+    "cartBadge": [
+      {
+        "href": "/login?next=%2Fstore%2Fcart",
+        "text": ""
+      },
+      {
+        "href": "/store/cart",
+        "text": "Cart"
+      }
+    ],
+    "bodyPreview": "UMTUBA UMTUBA Store Home World Learning Live Messages Browse Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in UMTUBA STORE Presence Commerce Discover active products from UMTUBA sellers and creators — no fabricated claims, only catalog truth. Browse products Browse catalog Catalog "
+  },
+  "afterLangClick": {
+    "url": "https://umtuba.com/store",
+    "dir": "ltr",
+    "lang": "en",
+    "overflowX": 0,
+    "h1": "Store"
+  },
+  "digital": {
+    "url": "https://umtuba.com/store/search?category=digital-products",
+    "sandboxVisible": true,
+    "empty": true,
+    "productHrefs": [],
+    "preview": "UMTUBA UMTUBA Search Home World Learning Live Messages Home Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in BROWSE Search & categories Filter active catalog products by keyword, category, and sort. Search uses the existing store catalog cont"
+  },
+  "e2eCategoryFilter": {
+    "url": "https://umtuba.com/store/search?category=umtuba-e2e-20260721",
+    "sandboxVisible": true,
+    "productHrefs": [],
+    "preview": "UMTUBA UMTUBA Search Home World Learning Live Messages Home Search Language العربية English Français Español Deutsch Português ◇ Tier UM — Sign in BROWSE Search & categories Filter active catalog products by keyword, category, and sort. Search uses the existing store catalog cont"
+  },
+  "guestCart": {
+    "url": "https://umtuba.com/login?next=%2Fstore%2Fcart",
+    "title": "Log in | UMTUBA"
+  }
+}

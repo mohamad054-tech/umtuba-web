@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { addToCartAction } from "../../../../actions/storeCart";
 import ProductCard from "../../../../components/store/ProductCard";
+import StoreUmPointsEarnHint from "../../../../components/store/StoreUmPointsEarnHint";
 import PlaceholderPanel from "../../../../components/store/PlaceholderPanel";
 import StoreSection from "../../../../components/store/StoreSection";
 import StoreQtyStepper from "../../../../components/store/StoreQtyStepper";
 import WishlistButton from "../../../../components/store/WishlistButton";
 import { APP_ROUTES } from "../../../../lib/nav";
 import { compareAtSavePercent } from "../../../../lib/storefront/deriveSections";
+import type { AppLocale } from "../../../../../lib/i18n/locales";
 import { formatMinorUnits } from "../../../../../lib/store/money";
+import { estimateEarnablePointsFromRetail } from "../../../../../lib/store/umPointsPurchaseRewards";
 import { STOREFRONT_FLAGS } from "../../../../../lib/store/storefrontFlags";
 import type { PublicProductVideoItem } from "../../../../../lib/store/videoCommerceQueries";
 import type {
@@ -25,6 +28,7 @@ type ProductDetailClientProps = {
   recommended: PublicCatalogItem[];
   videos: PublicProductVideoItem[];
   initialWishlisted: boolean;
+  locale?: AppLocale;
 };
 
 export default function ProductDetailClient({
@@ -33,6 +37,7 @@ export default function ProductDetailClient({
   recommended,
   videos,
   initialWishlisted,
+  locale = "en",
 }: ProductDetailClientProps) {
   const router = useRouter();
   const [variantId, setVariantId] = useState(
@@ -55,7 +60,8 @@ export default function ProductDetailClient({
     selected?.price != null
       ? formatMinorUnits(
           Number(selected.price.amount_minor),
-          selected.price.currency
+          selected.price.currency,
+          locale
         )
       : null;
 
@@ -66,7 +72,8 @@ export default function ProductDetailClient({
       Number(selected.price.amount_minor)
       ? formatMinorUnits(
           Number(selected.price.compare_at_amount_minor),
-          selected.price.currency
+          selected.price.currency,
+          locale
         )
       : null;
   const savePct =
@@ -77,6 +84,14 @@ export default function ProductDetailClient({
             ? Number(selected.price.compare_at_amount_minor)
             : null
         )
+      : null;
+  const earnablePoints =
+    selected?.price != null
+      ? estimateEarnablePointsFromRetail({
+          amountMinor: Number(selected.price.amount_minor),
+          currency: selected.price.currency,
+          quantity,
+        })
       : null;
 
   const optionKeys = useMemo(() => {
@@ -379,6 +394,13 @@ export default function ProductDetailClient({
             ) : null}
             {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
           </div>
+          {earnablePoints != null ? (
+            <StoreUmPointsEarnHint
+              locale={locale}
+              points={earnablePoints}
+              variant="product"
+            />
+          ) : null}
           <p
             className={`mt-1 text-sm ${
               inStock ? "text-[var(--sf-ok)]" : "text-[var(--sf-faint)]"
@@ -636,7 +658,7 @@ export default function ProductDetailClient({
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {related.map((item) => (
-              <ProductCard key={item.product.id} item={item} />
+              <ProductCard key={item.product.id} item={item} locale={locale} />
             ))}
           </div>
         </StoreSection>
@@ -650,7 +672,7 @@ export default function ProductDetailClient({
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {recommended.map((item) => (
-              <ProductCard key={item.product.id} item={item} />
+              <ProductCard key={item.product.id} item={item} locale={locale} />
             ))}
           </div>
         </StoreSection>

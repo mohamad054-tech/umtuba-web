@@ -1,0 +1,19 @@
+# PC2_UMTUBA_STORE_SELLER_A_HOSTED_AUTH_PASSWORD_RESET_V1
+
+Central GO accepted. Reset not performed.
+
+```text
+STATUS = BLOCKED_NO_AUTH_ADMIN
+AUTH_USER_EXISTS = YES
+PASSWORD_RESET_PERFORMED = NO
+LOCAL_CREDENTIAL_FILE_UPDATED = NO
+COMMITTED = NO
+PASSWORD_REVEALED = NO
+LOGIN_VERIFIED = NO
+SELLER_STORE_OPENS = NOT_REACHED
+SELLER_A_APPROVED_STATE = NOT_RECHECKED
+PRODUCT_CREATED = NO
+NEXT = STOPPED_BEFORE_PRODUCT
+```
+
+`SUPABASE_SERVICE_ROLE_KEY` is absent from functional, productization (`:3030`), and main-checkout `.env.local` / `.env.example`. Forgot-password was not used. Gitignored credential file left unchanged.

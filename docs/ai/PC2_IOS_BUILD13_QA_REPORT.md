@@ -1,0 +1,178 @@
+# PC2 iOS BUILD 13 — Watch audio ownership QA (blocked at launch / Watch init)
+
+```text
+PC2 REPORT
+SOURCE_DEVICE = PC2
+DEVICE_ROLE = IOS_APP_STORE_EXECUTION_PRIMARY
+TASK_ID = PC2_IOS_BUILD13_WATCH_AUDIO_OWNERSHIP_QA_V1
+DATE = 2026-08-17
+PHASE = P1 BLOCKED AT LAUNCH / WATCH INIT
+MODE = RECORD_ONLY
+DEVICE = physical iPhone 13
+EXPECTED_APP = UMTUBA
+BUNDLE_ID = com.umtuba.app
+APP_VERSION = 1.0.0
+EXPECTED_BUILD_NUMBER = 13
+AUTHORIZED_SOURCE_SHA = 700dddae332067d2182b143d4328492a22219a66
+SOURCE_SHA = 700dddae332067d2182b143d4328492a22219a66
+BUILD_SOURCE_SHA = 700dddae332067d2182b143d4328492a22219a66
+IOS_BUILD_NUMBER = 13
+EAS_BUILD_ID = db467f4d-5fce-430b-98f7-60c74d8c1ed8
+EAS_SUBMIT_ID = 0b58c218-95d1-49c3-b377-e50145f7c703
+BUILD_RESULT = FINISHED
+TESTFLIGHT_AVAILABLE = YES_INTERNAL
+BUILD13_TESTFLIGHT_AVAILABLE = YES_INTERNAL
+TESTFLIGHT_BUILD = 13
+BUILD13_INSTALLED = YES
+DEVICE_QA_EXECUTED = YES
+COLD_LAUNCH = FAIL
+WATCH_INITIALIZATION = FAIL
+EXPO_SHARED_OBJECT_ERROR = YES
+AUDIO_STILL_AUDIBLE_DURING_ERROR = YES
+SLOW_SWIPE_AUDIO = NOT_TESTED
+FAST_SWIPE_AUDIO = NOT_TESTED
+A_TO_B_TO_C = NOT_TESTED
+BACK_SWIPE_AUDIO = NOT_TESTED
+PARTIAL_SWIPE = NOT_TESTED
+BACKGROUND_RESUME_AUDIO = NOT_TESTED
+ONLY_ACTIVE_AUDIO = NOT_TESTED
+PRELOADED_PLAYERS_SILENT = NOT_TESTED
+WATCH = FAIL
+WATCH_PLAYBACK = NOT_TESTED
+WATCH_AUDIO_OWNERSHIP = NOT_TESTED
+PREVIOUS_VIDEO_AUDIO_STOPS_ON_NEXT_VIDEO = NOT_TESTED
+AUDIO_OVERLAP = NOT_TESTED
+DEVICE_QA_RESULT = FAIL_AT_LAUNCH/WATCH_INIT
+APP_STORE_PRODUCTION_SUBMITTED = NO
+APP_STORE_REVIEW_SUBMIT = NO
+ANDROID_VERSIONCODE_TOUCHED = NO
+STORE_LEARNING_REOPENED = NO
+CURSOR_REPORT_OVERWRITTEN = NO
+DEVICE_PASS_INVENTED = NO
+BUILD12_RETESTED_AS_BUILD13 = NO
+SHARED_DEFECT_PATCHED_HERE = NO
+OPERATOR_SWIPE_ASKED = NO
+EXPO_MEDIA_LIBRARY = 57.0.3
+SECRET_VALUES_PRINTED = NO
+CRASH_SIGNATURE = NOT_INVENTED
+BLOCKERS = COLD_LAUNCH_FAIL; WATCH_INITIALIZATION_FAIL; EXPO_SHARED_OBJECT_ERROR; AUDIO_STILL_AUDIBLE_DURING_ERROR; SWIPE_AUDIO_OWNERSHIP_GATES_NOT_STARTED; APP_STORE_REVIEW_NOT_SUBMITTED; NO_PRODUCT_PASS
+CENTRAL_ACTION_REQUIRED = FIX_WATCH_INIT_SHAREDOBJECT_USE_AFTER_RELEASE; NEW_SHA_THEN_NEW_IOS_BINARY
+```
+
+Inspected detached worktree
+`C:/Users/Giga store/Desktop/umtuba/umtuba-mobile-pc2-ios-build13-watch-audio-qa-v1`
+at SHA `700dddae332067d2182b143d4328492a22219a66` only. Main checkout
+`umtuba-mobile` at `77e9e28` was **not** reset.
+
+Do **not** ask the operator to swipe. Do **not** rerun Build 12
+session QA. Do **not** Submit for Review / Production. Do **not**
+convert swipe fields to FAIL or PASS.
+
+Detail: `docs/ai/PC2_IOS_BUILD13_WATCH_INIT_FAIL_REPORT.md`.
+
+---
+
+## Official P1 result (authoritative — do not retest)
+
+Operator evidence on physical iPhone 13 / TestFlight **1.0.0 (13)**.
+
+```text
+COLD_LAUNCH = FAIL
+WATCH_INITIALIZATION = FAIL
+EXPO_SHARED_OBJECT_ERROR = YES
+AUDIO_STILL_AUDIBLE_DURING_ERROR = YES
+DEVICE_QA_RESULT = FAIL_AT_LAUNCH/WATCH_INIT
+APP_STORE_PRODUCTION_SUBMITTED = NO
+```
+
+Watch swipe audio-ownership was the intended first product gate.
+The app failed before that gate. Swipe fields remain `NOT_TESTED`.
+
+---
+
+## Swipe / ownership gates (not started)
+
+```text
+SLOW_SWIPE_AUDIO = NOT_TESTED
+FAST_SWIPE_AUDIO = NOT_TESTED
+A_TO_B_TO_C = NOT_TESTED
+BACK_SWIPE_AUDIO = NOT_TESTED
+PARTIAL_SWIPE = NOT_TESTED
+BACKGROUND_RESUME_AUDIO = NOT_TESTED
+ONLY_ACTIVE_AUDIO = NOT_TESTED
+PRELOADED_PLAYERS_SILENT = NOT_TESTED
+WATCH_AUDIO_OWNERSHIP = NOT_TESTED
+PREVIOUS_VIDEO_AUDIO_STOPS_ON_NEXT_VIDEO = NOT_TESTED
+AUDIO_OVERLAP = NOT_TESTED
+WATCH_PLAYBACK = NOT_TESTED
+```
+
+`WATCH = FAIL` is the init/SharedObject failure only. It is **not**
+a swipe-overlap FAIL.
+
+`AUDIO_STILL_AUDIBLE_DURING_ERROR` is observed audio during the
+error UI. It is **not** a completed A→B overlap test and does
+**not** prove or disprove the Build 12 defect.
+
+---
+
+## Other smoke (not invented)
+
+```text
+SHARE = NOT_TESTED
+CREATE = NOT_TESTED
+RTL_BACK = NOT_TESTED
+CRASH_SANITY = NOT_TESTED
+SESSION_PERSIST_COLD = NOT_TESTED
+PLAINTEXT_PASSWORD = NO
+```
+
+`CRASH_SANITY` stays `NOT_TESTED`. Operator reported an Expo
+SharedObject **error**, not a confirmed native crash log.
+
+---
+
+## Read-only source note (SHA 700dddae — no patch)
+
+Build 13 vs Build 12 `7638487d` is the Watch audio-ownership fix:
+generation bump on active-index change, mute+pause+disable-loop
+teardown, ignore stale play / playToEnd. Adjacent expo-video
+players stay mounted. Product code still does **not** call
+`player.release()`.
+
+`useVideoPlayer` auto-releases the native `SharedObject` on player
+swap / pane unmount. Build 13 then writes mute/pause/loop on that
+object from layout, events, and a new unmount cleanup. Likely
+use-after-release at Watch init. Exact on-device stack
+**UNCONFIRMED** (EAS compile logs have no SharedObject line; ASC
+device crash log not fetched). Do not invent a crash signature.
+Do not patch.
+
+---
+
+## Return
+
+```text
+COLD_LAUNCH = FAIL
+WATCH_INITIALIZATION = FAIL
+EXPO_SHARED_OBJECT_ERROR = YES
+AUDIO_STILL_AUDIBLE_DURING_ERROR = YES
+ONLY_ACTIVE_AUDIO = NOT_TESTED
+DEVICE_QA_RESULT = FAIL_AT_LAUNCH/WATCH_INIT
+APP_STORE_PRODUCTION_SUBMITTED = NO
+BLOCKERS = COLD_LAUNCH_FAIL; WATCH_INITIALIZATION_FAIL; EXPO_SHARED_OBJECT_ERROR; AUDIO_STILL_AUDIBLE_DURING_ERROR; SWIPE_AUDIO_OWNERSHIP_GATES_NOT_STARTED; APP_STORE_REVIEW_NOT_SUBMITTED; NO_PRODUCT_PASS
+CENTRAL_ACTION_REQUIRED = FIX_WATCH_INIT_SHAREDOBJECT_USE_AFTER_RELEASE; NEW_SHA_THEN_NEW_IOS_BINARY
+```
+
+---
+
+## Safety
+
+- Swipe gates left `NOT_TESTED`.
+- Operator not asked to swipe or reopen for logs.
+- Build 12 session not retested or downgraded.
+- No Production / App Review submit.
+- No local product patch / rebuild / EAS.
+- Main mobile `77e9e28` not reset.
+- `CURSOR_REPORT.md` not overwritten.
+- No secrets in this report.

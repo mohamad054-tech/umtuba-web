@@ -1,7 +1,11 @@
 import Link from "next/link";
+import type { AppLocale } from "../../../lib/i18n/locales";
+import { createTranslator } from "../../../lib/i18n/translate";
 import { compareAtSavePercent } from "../../lib/storefront/deriveSections";
 import { formatMinorUnits } from "../../../lib/store/money";
+import { estimateEarnablePointsFromRetail } from "../../../lib/store/umPointsPurchaseRewards";
 import type { PublicCatalogItem } from "../../../lib/store/types";
+import StoreUmPointsEarnHint from "./StoreUmPointsEarnHint";
 import WishlistButton from "./WishlistButton";
 
 type ProductCardProps = {
@@ -9,16 +13,24 @@ type ProductCardProps = {
   badge?: string;
   showWishlist?: boolean;
   initialWishlisted?: boolean;
+  /** Optional isolated preview href. Defaults to the live Store PDP. */
+  href?: string;
+  locale?: AppLocale;
 };
 
-function availabilityLabel(available: number | null): {
+function availabilityLabel(
+  available: number | null,
+  t: ReturnType<typeof createTranslator>
+): {
   text: string;
   tone: "ok" | "low" | "out" | "unknown";
 } {
-  if (available == null) return { text: "Availability on request", tone: "unknown" };
-  if (available <= 0) return { text: "Unavailable", tone: "out" };
-  if (available <= 3) return { text: `${available} left`, tone: "low" };
-  return { text: "In stock", tone: "ok" };
+  if (available == null) return { text: t("store.card.availabilityOnRequest"), tone: "unknown" };
+  if (available <= 0) return { text: t("store.card.unavailable"), tone: "out" };
+  if (available <= 3) {
+    return { text: t("store.card.left", { values: { count: available } }), tone: "low" };
+  }
+  return { text: t("store.card.inStock"), tone: "ok" };
 }
 
 export default function ProductCard({
@@ -26,28 +38,37 @@ export default function ProductCard({
   badge,
   showWishlist = true,
   initialWishlisted = false,
+  href,
+  locale = "en",
 }: ProductCardProps) {
-  const href = `/store/${item.store.slug}/product/${item.product.slug}`;
+  const t = createTranslator(locale);
+  const resolvedHref = href ?? `/store/${item.store.slug}/product/${item.product.slug}`;
   const price =
     item.priceMinor != null && item.currency
-      ? formatMinorUnits(item.priceMinor, item.currency)
+      ? formatMinorUnits(item.priceMinor, item.currency, locale)
       : null;
   const compareAt =
     item.compareAtMinor != null &&
     item.priceMinor != null &&
     item.currency &&
     item.compareAtMinor > item.priceMinor
-      ? formatMinorUnits(item.compareAtMinor, item.currency)
+      ? formatMinorUnits(item.compareAtMinor, item.currency, locale)
       : null;
   const savePct = compareAtSavePercent(item.priceMinor, item.compareAtMinor);
   const coverUrl = item.coverUrl ?? null;
-  const availability = availabilityLabel(item.available);
+  const availability = availabilityLabel(item.available, t);
   const productType = item.product.product_type;
+  const earnablePoints = estimateEarnablePointsFromRetail({
+    amountMinor: item.priceMinor,
+    currency: item.currency,
+  });
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-[var(--sf-radius)] border border-[var(--sf-line)] bg-[var(--sf-surface)] transition duration-300 hover:-translate-y-0.5 hover:border-[rgba(214,196,161,0.35)] hover:shadow-[var(--sf-shadow)]">
-      <Link href={href} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
-        <span className="sr-only">View {item.product.title}</span>
+      <Link href={resolvedHref} className="watch-focus-ring absolute inset-0 z-10 rounded-[var(--sf-radius)]" aria-label={item.product.title}>
+        <span className="sr-only">
+          {t("store.card.viewNamed", { values: { title: item.product.title } })}
+        </span>
       </Link>
 
       <div className="relative aspect-[4/5] overflow-hidden bg-[var(--sf-surface-2)]">
@@ -71,7 +92,11 @@ export default function ProductCard({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/55 to-transparent" />
 
         <div className="absolute start-3 top-3 z-20 flex flex-wrap gap-2">
-          {savePct ? <span className="sf-save-badge">Save {savePct}%</span> : null}
+          {savePct ? (
+            <span className="sf-save-badge">
+              {t("store.card.savePercent", { values: { percent: savePct } })}
+            </span>
+          ) : null}
           {badge ? (
             <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
               {badge}
@@ -79,7 +104,7 @@ export default function ProductCard({
           ) : null}
           {item.marketplaceSourceType === "supplier_listing" ? (
             <span className="rounded-full border border-[rgba(214,196,161,0.35)] bg-black/45 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--sf-accent-strong)] backdrop-blur-sm">
-              Marketplace
+              {t("store.card.marketplace")}
             </span>
           ) : null}
           {productType && productType !== "physical" ? (
@@ -94,7 +119,7 @@ export default function ProductCard({
             <WishlistButton
               productId={item.product.id}
               initialWishlisted={initialWishlisted}
-              nextHref={href}
+              nextHref={resolvedHref}
               className="watch-focus-ring flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-black/40 text-base text-white backdrop-blur-sm transition hover:bg-black/55"
             />
           </div>
@@ -102,11 +127,11 @@ export default function ProductCard({
 
         {!coverUrl ? (
           <p className="absolute inset-x-3 bottom-3 z-10 truncate rounded-full border border-white/10 bg-black/45 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/65 backdrop-blur-sm">
-            Media coming soon
+            {t("store.card.mediaSoon")}
           </p>
         ) : (
           <p className="pointer-events-none absolute inset-x-3 bottom-3 z-10 translate-y-2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-white/0 opacity-0 backdrop-blur-sm transition group-hover:translate-y-0 group-hover:text-white/80 group-hover:opacity-100">
-            View product
+            {t("store.card.viewProduct")}
           </p>
         )}
       </div>
@@ -147,8 +172,17 @@ export default function ProductCard({
                 ) : null}
               </div>
             ) : (
-              <span className="text-sm text-[var(--sf-faint)]">Price unavailable</span>
+              <span className="text-sm text-[var(--sf-faint)]">
+                {t("store.card.priceUnavailable")}
+              </span>
             )}
+            {earnablePoints != null ? (
+              <StoreUmPointsEarnHint
+                locale={locale}
+                points={earnablePoints}
+                variant="card"
+              />
+            ) : null}
           </div>
           <span
             className={`shrink-0 text-[11px] font-semibold uppercase tracking-[0.08em] ${

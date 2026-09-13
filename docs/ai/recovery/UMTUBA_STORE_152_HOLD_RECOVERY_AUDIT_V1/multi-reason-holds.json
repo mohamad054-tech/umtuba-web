@@ -1,0 +1,272 @@
+{
+  "task_id": "UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1",
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "generated_at": "2026-09-10T11:10:46.475Z",
+  "definition": "isPublishableBrowseRow + stored catalog_qa on the FINAL_22 canonical (same 380/152 split)",
+  "applied_fixes": false,
+  "count": 9,
+  "products": [
+    {
+      "id": "2412180936151612700",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "Applicable To AirTag Silicone Pet Tracker Collar Protective Cover",
+      "exact_hold_reasons": [
+        {
+          "flag": "IP_REVIEW",
+          "reason": "Title mentions a restricted brand, platform mark, or model family.",
+          "bucket": "ip_brand",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "IP/brand gate. No authorization field is present on the row or in approved-59 / expansion / profit-gate. Must not be bypassed."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Electronics listing title may be IP-restricted or a fashion clip.",
+          "bucket": "ip_brand",
+          "extra_buckets": [
+            "product_data"
+          ],
+          "recoverability": "HARD_HOLD",
+          "notes": "Electronics QA reason is IP-restricted on this title. No authorization in dataset."
+        }
+      ],
+      "recoverability": "HARD_HOLD",
+      "proposed_corrections": []
+    },
+    {
+      "id": "1709416099537752064",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Little Pillow For Cats Fashion Neck Protector Deep Sleep Puppy U-Shaped Pillow Pets Pillow Kitten Headrest Dog Sleeping Pillow Pet Products",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    },
+    {
+      "id": "D48478AD-25F2-467B-816D-F05F9A894E3F",
+      "source": "expansion",
+      "department": "KIDS & TOYS",
+      "source_title": "Travel Bag brand men 2 in 1 Garment Bag High-capacity Multi-function Foldable nylon duffle bags suit Busines Trip shoulder bag",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Kids listing title describes adult or unrelated goods.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    },
+    {
+      "id": "1779806073667461120",
+      "source": "expansion",
+      "department": "ELECTRONICS & ACCESSORIES",
+      "source_title": "4 In 1 Rotatable Colorful Lighting Wireless Charger Stand For Phone 15 14 13 12 Pro Max 8 7 Holder Magnetic Fast Charging Station",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "IP_REVIEW",
+          "reason": "Title mentions a restricted brand, platform mark, or model family.",
+          "bucket": "ip_brand",
+          "extra_buckets": [],
+          "recoverability": "HARD_HOLD",
+          "notes": "IP/brand gate. No authorization field is present on the row or in approved-59 / expansion / profit-gate. Must not be bypassed."
+        }
+      ],
+      "recoverability": "HARD_HOLD",
+      "proposed_corrections": []
+    },
+    {
+      "id": "1881601881203437570",
+      "source": "expansion",
+      "department": "TRAVEL",
+      "source_title": "Dog Small Pillow, Pet Mat, Neck Pillow For Sleeping, Cat Winter Dog Kennel, Cat Cervical Vertebra Protection, Hypnotic Pet Pillow.",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Travel listing title describes a different product family.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    },
+    {
+      "id": "1387639463303319552",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Spot Pet Mat, Waterproof And Easy To Clean Silicone Dog Mat, Cat Mat, Square Pet Placemat, Pet Supplies",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "All trusted sources agree on the current department, or the sibling department would still mismatch. Recategorization is a human taxonomy decision. Do not invent a new department."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    },
+    {
+      "id": "2606170908561602100",
+      "source": "expansion",
+      "department": "HOME",
+      "source_title": "Dog Silicone Licking Pad Pet Licking Mat Silicone Smelling Mat Multifunctional Food Bowl Pets Supplies",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Home listing title is a cable, diagnostic, or pet item.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "AUTO_RECOVERABLE",
+          "notes": "Authoritative sibling department already differs and would not trigger this category-mismatch rule."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        },
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Near-duplicate title group (2): dog silicone licking pad pet",
+          "bucket": "duplicate",
+          "extra_buckets": [],
+          "recoverability": "AUTO_RECOVERABLE",
+          "notes": "Deterministic canonical relationship. No data loss. Weaker listing stays HOLD."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Home listing title is a cable, diagnostic, or pet item.",
+          "proposed_correction": "Set department to existing sibling department \"PET\" (current \"HOME\"). Title stays \"Dog Silicone Licking Pad Pet Licking Mat Silicone Smelling Mat Multifunctional Food Bowl Pets Supplies\".",
+          "source_citations": [
+            "data/cj-profit-gate-v2.json products[cj_product_id=2606170908561602100].category=Pet → PET"
+          ]
+        },
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Near-duplicate title group (2): dog silicone licking pad pet",
+          "proposed_correction": "Remove this PRODUCT_DATA_REVIEW near-duplicate finding from 2606170908561602100 only. commercialHoldAudit.duplicateScore ranks it the canonical listing of group \"dog silicone licking pad pet\" over 1665981331156774912. Do not delete any row.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id in [\"1665981331156774912\",\"2606170908561602100\"]].source_title",
+            "lib/store/productLocalization/commercialHoldAudit.ts duplicateScore ranks: {\"2606170908561602100\":93.72359051293041,\"1665981331156774912\":91.88074644093882}",
+            "Winner 2606170908561602100; retain weaker 1665981331156774912 as HOLD"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "22C5CECD-7FF7-4F84-885A-8C9C0F13862F",
+      "source": "expansion",
+      "department": "FASHION",
+      "source_title": "Men's Travel Bag Laptop Backpack Anti-theft Waterproof School Backpacks USB Charging Men Business Travel Bag Backpack New Design",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    },
+    {
+      "id": "1782621495156547584",
+      "source": "expansion",
+      "department": "PET",
+      "source_title": "Cat Interactive Toy Funny Tumbler Toy Kitten Exercise Catching Leaky Food Ball Teaser Feather Wand Toys For Cat Accessories Pet Products",
+      "exact_hold_reasons": [
+        {
+          "flag": "PRODUCT_DATA_REVIEW",
+          "reason": "Supplier title is keyword-stuffed or unreadable.",
+          "bucket": "product_data",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Expansion/local title cleanup is not an authoritative supplier or approved-59 field. Human must accept any commercial title substitution. Do not guess a shorter supplier title."
+        },
+        {
+          "flag": "PRICE_REVIEW",
+          "reason": "Price safety: margin_below_40.",
+          "bucket": "pricing_margin",
+          "extra_buckets": [],
+          "recoverability": "MANUAL_REVIEW",
+          "notes": "Sibling retails match or remain unsafe (current evaluatePriceSafety=margin_below_40). Raising retail to clear the 40% floor would invent a price. Human pricing review only. v1_retail_minor is audit-only and must not be reused."
+        }
+      ],
+      "recoverability": "MANUAL_REVIEW",
+      "proposed_corrections": []
+    }
+  ]
+}

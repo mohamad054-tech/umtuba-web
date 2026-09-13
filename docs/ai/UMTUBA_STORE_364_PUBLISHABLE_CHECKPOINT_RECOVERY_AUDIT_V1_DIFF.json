@@ -1,0 +1,156 @@
+{
+  "task_id": "UMTUBA_STORE_364_PUBLISHABLE_CHECKPOINT_RECOVERY_AUDIT_V1",
+  "generated_at": "2026-09-10T07:00:00Z",
+  "note": "Read-only comparison artifact. No data/cj-*.json was written.",
+  "previous_checkpoint_file_found": false,
+  "previous_checkpoint_dataset_sha256": null,
+  "strongest_previous_evidence": [
+    {
+      "path": "C:/Users/Giga store/.cursor/projects/c-Users-Giga-store-Desktop-umtuba-umtuba-web-translation-trunk-port-v1/terminals/233977.txt",
+      "ended_at": "2026-09-09T17:21:47.364Z",
+      "command": "npx tsx scripts/store/runGemini198Localization.ts",
+      "counts": {
+        "completed": 180,
+        "failed": 18,
+        "titles_complete": 514,
+        "descriptions_complete": 514,
+        "manual_review_required": 18,
+        "actual_cost_usd": 0.0513,
+        "model": "gemini-flash-latest",
+        "ip_review": 3,
+        "price_review": 25,
+        "product_data_review": 129,
+        "duplicates_flagged": 2
+      }
+    },
+    {
+      "path": "C:/Users/Giga store/.cursor/projects/c-Users-Giga-store-Desktop-umtuba-umtuba-web-translation-trunk-port-v1/terminals/233979.txt",
+      "ended_at": "2026-09-09T17:40:38.266Z",
+      "command": "npx tsx scripts/store/runFinal18RepairAndHolds.ts",
+      "counts": {
+        "repaired": 0,
+        "remaining": 18,
+        "titles": 514,
+        "descriptions": 514,
+        "publishable": 364,
+        "held": 168,
+        "avg_margin": 0.5311879434439389,
+        "ip_review": 3,
+        "price_review": 25,
+        "product_data_review": 129,
+        "duplicates_flagged": 1,
+        "sync_errors": 0,
+        "additional_cost": 0.0164,
+        "total_cost": 0.0677
+      }
+    }
+  ],
+  "current_live_files": {
+    "paths": [
+      "data/cj-catalog-532-localized-final-v1.json",
+      "data/cj-localization-catalog-v1.json"
+    ],
+    "byte_identical": true,
+    "size": 1052747,
+    "sha256": "0c554bd3bc43c152fc4188e7439fd73046e44622d0a92483aeac6859e26bb9eb",
+    "mtime_utc": "2026-09-09T17:59:43.199Z",
+    "generated_at": "2026-09-09T17:59:43.193Z",
+    "task_id": "UMTUBA_STORE_GEMINI_198_LOCALIZATION_RETRY_V2",
+    "paid_ai_estimate_note": "Actual Gemini spend $0.0000. Model gemini-2.5-flash. Cap $5.",
+    "paid_ai_estimate_products": 198
+  },
+  "source_catalogs": {
+    "approved_59": {
+      "path": "data/cj-store-launch-approved-59.json",
+      "sha256": "ef716f4b9a1d8b787fa0a0568a575e46fc165557fd284eb07a8305a4b7392832",
+      "mtime_utc": "2026-09-09T08:17:05.444Z",
+      "count": 59
+    },
+    "expansion": {
+      "path": "data/cj-catalog-expansion-300-v1.json",
+      "sha256": "f6ff0401e5f8f086a0597324fbdc1e073ceb53fe71ee5768d952e49fc1d380db",
+      "mtime_utc": "2026-09-09T12:40:15.359Z",
+      "count": 473
+    },
+    "candidate": {
+      "path": "data/cj-store-launch-candidate-v1.json",
+      "sha256": "1ad3a2344750189e95f626158cc1d44473c07daa9c2f49aaa09ae8c40205e011",
+      "mtime_utc": "2026-09-09T10:24:57.000Z",
+      "count": 59
+    }
+  },
+  "identity": {
+    "same_input_dataset_bytes": false,
+    "previous_sha256": "UNKNOWN_OVERWRITTEN",
+    "same_product_set_vs_17_40_file": false,
+    "same_product_set_vs_source_union": true,
+    "catalog_ids": 532,
+    "unique_ids": 532,
+    "approved_overlap": 59,
+    "expansion_overlap": 473,
+    "missing_from_sources": 0,
+    "extra_vs_sources": 0,
+    "sku_mismatch_vs_browse": 0,
+    "price_mismatch_vs_browse": 0
+  },
+  "current_classification": {
+    "publishable": 249,
+    "held": 283,
+    "avg_margin": 0.5365994089521336,
+    "gold_standard": 20,
+    "local_pass": 314,
+    "manual_review_required": 198,
+    "localization_review": 198,
+    "product_data_review": 129,
+    "ip_review": 3,
+    "price_review": 25,
+    "shipping_review": 0,
+    "unavailable": 0,
+    "duplicates_flagged": 2
+  },
+  "localization_regression": {
+    "manual_empty_ar_title": 198,
+    "manual_empty_ar_desc": 198,
+    "manual_empty_en_title": 198,
+    "manual_has_ar_title": 0,
+    "empty_copy_manual": 198,
+    "review_reason_counts": {
+      "No gold-standard local template matched this supplier title.": 176,
+      "Local compose failed gold-standard gate: unsupported_claim": 5,
+      "Source title needs paid-AI / human review (medicine bottle|medicine can|urine pad|physiological pants).": 3,
+      "Source title needs paid-AI / human review (talking watch|electrocardiogram|magic array).": 3,
+      "Source title needs paid-AI / human review (heal spur|plantar|acupunct|ems foot|fisioterapia|blood circulation|callus remover|dead skin).": 3,
+      "Source title needs paid-AI / human review (xhorse|obd to 6 pin|delphi motorcycle|hds cable).": 2,
+      "Source title needs paid-AI / human review (autism|anti-anxiety|anxiety relief|relieves stress).": 2,
+      "Source title needs paid-AI / human review (aliexpress|taobao|foreign trade|artifact artifact).": 2,
+      "Source title needs paid-AI / human review (tattoo makeup).": 1,
+      "Source title needs paid-AI / human review (foot warmer artifact|gaobang).": 1
+    }
+  },
+  "classification_delta_reconstruction": {
+    "previously_publishable_now_hold_ids": "UNAVAILABLE_NO_PREVIOUS_PRODUCT_LIST",
+    "previously_hold_now_publishable_ids": "UNAVAILABLE_NO_PREVIOUS_PRODUCT_LIST",
+    "publishable_both_ids": "UNAVAILABLE_NO_PREVIOUS_PRODUCT_LIST",
+    "hold_both_ids": "UNAVAILABLE_NO_PREVIOUS_PRODUCT_LIST",
+    "inferred": {
+      "localization_review_delta": 180,
+      "publishable_delta": -115,
+      "held_delta": 115,
+      "wiped_rows_that_were_already_commercially_held": 65,
+      "wiped_rows_that_account_for_publishable_loss": 115,
+      "current_loc_only_holds": 131,
+      "current_loc_plus_commercial": 67,
+      "current_commercial_only": 85,
+      "note": "131 current localization-only HOLDs include the original ~16 localization-only leftovers from the 18 plus the 115 newly un-localized publishable rows. Do not treat 131 as the 364→249 flip set."
+    }
+  },
+  "audit_rules": {
+    "changed_after_17_40_run": false,
+    "publishable_ts_mtime_utc": "2026-09-09T17:31:52.974Z",
+    "catalog_qa_ts_mtime_utc": "2026-09-09T12:52:21.342Z",
+    "run_gemini_ts_mtime_utc": "2026-09-09T17:06:57.992Z",
+    "run_final18_ts_mtime_utc": "2026-09-09T17:41:13.980Z",
+    "audit_hold_recovery_ts_mtime_utc": "2026-09-10T06:14:08.084Z",
+    "scripts_untracked_no_git_baseline": true
+  }
+}

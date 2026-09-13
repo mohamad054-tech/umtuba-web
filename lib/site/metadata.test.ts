@@ -51,6 +51,7 @@ describe("global brand metadata", () => {
     });
     expect(root.description).toBe(DEFAULT_DESCRIPTION);
     expect(root.applicationName).toBe(BRAND.name);
+    expect(root.icons).toBeDefined();
     expect(root.metadataBase?.toString()).toBe("https://umtuba.com/");
     expect(DEFAULT_DESCRIPTION).toContain(BRAND.tagline);
     expect(DEFAULT_DESCRIPTION).toContain(BRAND.taglineAr);

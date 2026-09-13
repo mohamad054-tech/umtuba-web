@@ -194,8 +194,13 @@ describe("formatters", () => {
 
   it("formats currency without changing the numeric value", () => {
     const usd = formatCurrency("en", 10, "USD");
-    expect(usd).toMatch(/10/);
-    expect(usd).toMatch(/\$|USD/);
+    expect(usd).toBe("$10.00");
+  });
+
+  it("formats Arabic USD with Western digits and a US$ suffix", () => {
+    expect(formatCurrency("ar", 49.99, "USD")).toBe("49.99 US$");
+    expect(formatCurrency("ar", 49.99, "USD")).not.toMatch(/\$US/);
+    expect(formatCurrency("ar", 49.99, "USD")).not.toMatch(/[٠-٩۰-۹]/);
   });
 
   it("formats dates for Arabic and English", () => {

@@ -1,0 +1,27 @@
+{
+  "actual_usd": 0.5711,
+  "gemini_input_translations": 5969,
+  "passes": {
+    "pass1": {
+      "actual_usd": 0.5637,
+      "model": "gemini-flash-latest",
+      "input_tokens": 142439,
+      "output_tokens": 903961,
+      "gemini_input_translations": 5908,
+      "http429_count": 0,
+      "last_error": null,
+      "quota_exhausted": false
+    },
+    "pass2": {
+      "actual_usd": 0.0074,
+      "model": "gemini-flash-latest",
+      "input_tokens": 7642,
+      "output_tokens": 10409,
+      "gemini_input_translations": 61,
+      "http429_count": 0,
+      "last_error": null,
+      "quota_exhausted": false
+    }
+  },
+  "note": "Sum of paid Gemini passes. Archive reapply added no extra spend."
+}

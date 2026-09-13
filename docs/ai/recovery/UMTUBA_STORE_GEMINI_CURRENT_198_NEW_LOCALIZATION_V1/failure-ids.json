@@ -1,0 +1,206 @@
+{
+  "task_id": "UMTUBA_STORE_GEMINI_CURRENT_198_NEW_LOCALIZATION_V1",
+  "count": 22,
+  "products": [
+    {
+      "id": "1359044603478675456",
+      "cj_product_id": "1359044603478675456",
+      "sku": "CJHZ101031801AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1360080266508505088",
+      "cj_product_id": "1360080266508505088",
+      "sku": "CJZR101156501AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1376513937130000384",
+      "cj_product_id": "1376513937130000384",
+      "sku": "CJGY105926301AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1392067844971302912",
+      "cj_product_id": "1392067844971302912",
+      "sku": "CJGY112387101AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1404623861760266240",
+      "cj_product_id": "1404623861760266240",
+      "sku": "CJMY117423901AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1405434203297943552",
+      "cj_product_id": "1405434203297943552",
+      "sku": "CJQC117858301AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: changed_numeric_value",
+      "gold_standard_gaps": [
+        "changed_numeric_value"
+      ]
+    },
+    {
+      "id": "1429317075750490112",
+      "cj_product_id": "1429317075750490112",
+      "sku": "CJGY125979801AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: suspicious_mt_artifact",
+      "gold_standard_gaps": [
+        "suspicious_mt_artifact"
+      ]
+    },
+    {
+      "id": "1447901045861781504",
+      "cj_product_id": "1447901045861781504",
+      "sku": "CJYE131669201AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: changed_numeric_value",
+      "gold_standard_gaps": [
+        "changed_numeric_value"
+      ]
+    },
+    {
+      "id": "1467092240978546688",
+      "cj_product_id": "1467092240978546688",
+      "sku": "CJRT137153201AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: changed_numeric_value",
+      "gold_standard_gaps": [
+        "changed_numeric_value"
+      ]
+    },
+    {
+      "id": "1594961358263693312",
+      "cj_product_id": "1594961358263693312",
+      "sku": "CJHZ161854703CX",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1753982835490304000",
+      "cj_product_id": "1753982835490304000",
+      "sku": "CJYD196344902BY",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "1796518153233633280",
+      "cj_product_id": "1796518153233633280",
+      "sku": "CJYD205093101AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: untranslated_supplier_spam, en_title_too_long, en_title_stuffed",
+      "gold_standard_gaps": [
+        "untranslated_supplier_spam",
+        "en_title_too_long",
+        "en_title_stuffed"
+      ]
+    },
+    {
+      "id": "19583873-3C62-48C5-BE3E-B01791CC71E2",
+      "cj_product_id": "19583873-3C62-48C5-BE3E-B01791CC71E2",
+      "sku": "CJQCWBQC00076-200cm x 50cm",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: suspicious_mt_artifact",
+      "gold_standard_gaps": [
+        "suspicious_mt_artifact"
+      ]
+    },
+    {
+      "id": "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+      "cj_product_id": "20B24E49-68D5-4A7E-A17A-C4580004C59F",
+      "sku": "CJJJCWNY00052-5style",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "2406180737491620300",
+      "cj_product_id": "2406180737491620300",
+      "sku": "CJYD206305002BY",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "2408150612121603200",
+      "cj_product_id": "2408150612121603200",
+      "sku": "CJYD211114301AZ",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: changed_numeric_value",
+      "gold_standard_gaps": [
+        "changed_numeric_value"
+      ]
+    },
+    {
+      "id": "52022F6B-104F-453E-A1E6-73797FF89B87",
+      "cj_product_id": "52022F6B-104F-453E-A1E6-73797FF89B87",
+      "sku": "CJBJHZHZ00263-Red",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "6393DCAD-3885-42D4-B6BC-ADF846AB8CB2",
+      "cj_product_id": "6393DCAD-3885-42D4-B6BC-ADF846AB8CB2",
+      "sku": "CJJJCWGY00551-Blue",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "8800BE41-B655-4594-8BFD-6BF53003231F",
+      "cj_product_id": "8800BE41-B655-4594-8BFD-6BF53003231F",
+      "sku": "CJBJHZCZ00186-50ml",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "C0080972-C4DC-47BD-BDA5-B6F0B4484C42",
+      "cj_product_id": "C0080972-C4DC-47BD-BDA5-B6F0B4484C42",
+      "sku": "CJJJJTJT01168-default",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "C9052A90-6D89-419A-8A7C-BC34FA08B426",
+      "cj_product_id": "C9052A90-6D89-419A-8A7C-BC34FA08B426",
+      "sku": "CJBJHZHZ00566-Brown",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    },
+    {
+      "id": "EE1DC650-D8A1-477D-83D5-A5EFEA81FEB2",
+      "cj_product_id": "EE1DC650-D8A1-477D-83D5-A5EFEA81FEB2",
+      "sku": "CJJJCWGY00400-5cm Yellow",
+      "review_reason": "MANUAL_LOCALIZATION_REVIEW: unsupported_claim",
+      "gold_standard_gaps": [
+        "unsupported_claim"
+      ]
+    }
+  ]
+}

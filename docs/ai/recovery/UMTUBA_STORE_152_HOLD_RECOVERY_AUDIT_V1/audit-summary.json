@@ -1,0 +1,270 @@
+{
+  "task_id": "UMTUBA_STORE_152_HOLD_RECOVERY_AUDIT_V1",
+  "canonical": "data/cj-catalog-532-localized-final-v1.json",
+  "canonical_sha256": "bee64499b82a957777020ebdb5e5e7626dc0b73f16ff8861abce2b9eb84d47c1",
+  "generated_at": "2026-09-10T11:10:46.475Z",
+  "definition": "isPublishableBrowseRow + stored catalog_qa on the FINAL_22 canonical (same 380/152 split)",
+  "applied_fixes": false,
+  "preflight": {
+    "canonical_sha256_verified": true,
+    "total_products": 532,
+    "localized_total": 532,
+    "localization_review": 0,
+    "publishable": 380,
+    "held": 152,
+    "avg_publishable_margin": 0.5306495931108619
+  },
+  "hold_ids_identified": 152,
+  "single_reason_holds": 143,
+  "multi_reason_holds": 9,
+  "hold_reason_counts": {
+    "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.": 79,
+    "PRICE_REVIEW: Price safety: margin_below_40.": 25,
+    "PRODUCT_DATA_REVIEW: Travel listing title describes a different product family.": 7,
+    "PRODUCT_DATA_REVIEW: Beauty listing title is misclassified or unsafe.": 7,
+    "PRODUCT_DATA_REVIEW: Garden listing title does not describe a garden tool.": 6,
+    "PRODUCT_DATA_REVIEW: Kids listing title describes adult or unrelated goods.": 6,
+    "PRODUCT_DATA_REVIEW: Fashion listing title describes a different product family.": 5,
+    "PRODUCT_DATA_REVIEW: Sports listing title is not a workout accessory.": 5,
+    "PRODUCT_DATA_REVIEW: Car listing may be decorative lighting or unrelated hardware.": 4,
+    "PRODUCT_DATA_REVIEW: Home listing title is a cable, diagnostic, or pet item.": 4,
+    "PRODUCT_DATA_REVIEW: Pet listing title describes bag hardware.": 4,
+    "IP_REVIEW: Title mentions a restricted brand, platform mark, or model family.": 3,
+    "PRODUCT_DATA_REVIEW: Electronics listing title may be IP-restricted or a fashion clip.": 3,
+    "PRODUCT_DATA_REVIEW: Near-duplicate title group (2): dog silicone licking pad pet": 2,
+    "PRODUCT_DATA_REVIEW: Supplier title is empty, numeric-only, or garbled.": 2
+  },
+  "bucket_product_counts": {
+    "product_data": 128,
+    "pricing_margin": 25,
+    "ip_brand": 3,
+    "duplicate": 2,
+    "supplier_source": 2,
+    "missing_invalid_images": 0,
+    "shipping_availability": 0,
+    "other": 0
+  },
+  "auto_recoverable": 17,
+  "manual_review": 129,
+  "hard_hold": 6,
+  "auto_recoverable_single_gate": 17,
+  "expected_publishable_after_safe_recovery": 397,
+  "top_auto_single_gate_examples": [
+    {
+      "id": "1839920197651025920",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "Cute Expression Pet Bowl Oblique Ceramic Bowl Tall Cat Bowl Cat Food Bowl Dog Basin Cat Food Basin Cervical Spine Protection",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Slanted Ceramic Cat Bowl\" in place of source_title \"Cute Expression Pet Bowl Oblique Ceramic Bowl Tall Cat Bowl Cat Food Bowl Dog Basin Cat Food Basin Cervical Spine Protection\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1839920197651025920].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1836327158076559360",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "Ceramic Cat Bowl Cat Plate Snack Bowl Rice Bowl Dinner Plate Cat Food Bowl Pet Plate Shallow Mouth Bowl",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Shallow Ceramic Cat Plate\" in place of source_title \"Ceramic Cat Bowl Cat Plate Snack Bowl Rice Bowl Dinner Plate Cat Food Bowl Pet Plate Shallow Mouth Bowl\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1836327158076559360].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7C59DE5B-A511-4920-88A8-C808B21476EE",
+      "source": "approved_59",
+      "department": "CAR",
+      "source_title": "Windshield Car Phone Holder Universal in Car Cellphone Holder Stand Adjustable Phone Suction Cup Holder Car Mount Phone Stand",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Adjustable Windshield Suction-Cup Phone Mount\" in place of source_title \"Windshield Car Phone Holder Universal in Car Cellphone Holder Stand Adjustable Phone Suction Cup Holder Car Mount Phone Stand\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=7C59DE5B-A511-4920-88A8-C808B21476EE].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1734125879543992320",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "Slow Food Bowl Anti Choking Cat Bowl Dog Basin Puzzle Feeder Healthy Pet Rotating Game Board Pet Products",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Slow-Feeder Puzzle Pet Bowl\" in place of source_title \"Slow Food Bowl Anti Choking Cat Bowl Dog Basin Puzzle Feeder Healthy Pet Rotating Game Board Pet Products\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1734125879543992320].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1366573785234411520",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow Water Feeder Dispenser Pet Fountain ABS&PP Dog Supplies",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"1.5L Floating Pet Water Bowl\" in place of source_title \"1.5L Cat Dog Water Bowl Carried Floating Bowl Anti-Overflow Slow Water Feeder Dispenser Pet Fountain ABS&PP Dog Supplies\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1366573785234411520].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1809888855471312896",
+      "source": "approved_59",
+      "department": "CAR",
+      "source_title": "Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount Magnetic Stainless Steel Car Phone Holder - Dashboard Mount, Water-resistant, Rotatable",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Magnetic Stainless Steel Dashboard Phone Holder\" in place of source_title \"Magnetic Phone Holder For Car, Dashboard Car Phone Holder Mount Magnetic Stainless Steel Car Phone Holder - Dashboard Mount, Water-resistant, Rotatable\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1809888855471312896].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1727252231541501952",
+      "source": "approved_59",
+      "department": "CAR",
+      "source_title": "Universal Car Phone Holder Anti-Slip Pad Mat Phone Holder Dashboard Upgraded Reusable Silicone Phone Mount For Car Dash",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Reusable Silicone Dashboard Phone Pad\" in place of source_title \"Universal Car Phone Holder Anti-Slip Pad Mat Phone Holder Dashboard Upgraded Reusable Silicone Phone Mount For Car Dash\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1727252231541501952].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A30259A1-6996-42EF-99A8-8FC5B96D833F",
+      "source": "approved_59",
+      "department": "HOME",
+      "source_title": "Large Ice Cube Maker Silicone Mold 6 Cell Big Sphere Ice Ball Tray Whiskey Wine Cocktail Party Bar Accessories Kitchen Gadgets",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"6-Cell Silicone Sphere Ice Ball Tray\" in place of source_title \"Large Ice Cube Maker Silicone Mold 6 Cell Big Sphere Ice Ball Tray Whiskey Wine Cocktail Party Bar Accessories Kitchen Gadgets\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=A30259A1-6996-42EF-99A8-8FC5B96D833F].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1587815807701635072",
+      "source": "approved_59",
+      "department": "CAR",
+      "source_title": "Car Magnet Magnetic Air Vent Mount Holder Magnetic Car Phone Holder Stand 360 Metal Car Air Vent Magnet Stand In Car GPS Mount Holder",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"360° Magnetic Air-Vent Phone Holder\" in place of source_title \"Car Magnet Magnetic Air Vent Mount Holder Magnetic Car Phone Holder Stand 360 Metal Car Air Vent Magnet Stand In Car GPS Mount Holder\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1587815807701635072].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1600068074185699328",
+      "source": "approved_59",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "13Pcs Makeup Brush Set Make Up Concealer Brush Blush Powder Brush Eye Shadow Highlighter Foundation Brush Cosmetic Beauty Tools",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"13-Piece Makeup Brush Set\" in place of source_title \"13Pcs Makeup Brush Set Make Up Concealer Brush Blush Powder Brush Eye Shadow Highlighter Foundation Brush Cosmetic Beauty Tools\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1600068074185699328].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1837374073727766528",
+      "source": "approved_59",
+      "department": "PET",
+      "source_title": "Pet Food Bowl Stainless Steel Pet Bowl New Double Thickened Floor Suction Dog Bowl Scandinavian Style Non-Slip Pet Bowl",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Double Stainless Steel Non-Slip Pet Bowl\" in place of source_title \"Pet Food Bowl Stainless Steel Pet Bowl New Double Thickened Floor Suction Dog Bowl Scandinavian Style Non-Slip Pet Bowl\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=1837374073727766528].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=local_pass)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2606150702051624000",
+      "source": "approved_59",
+      "department": "BEAUTY & PERSONAL",
+      "source_title": "Travel Baby Bottle Brush Set - Newborn Safe Silicone Cleaning Brushes With Storage Box For Bottles, Nipples & Accessories",
+      "reasons": [
+        "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable."
+      ],
+      "proposed_corrections": [
+        {
+          "reason": "PRODUCT_DATA_REVIEW: Supplier title is keyword-stuffed or unreadable.",
+          "proposed_correction": "For catalog QA title-length evaluation, use existing owner-approved English title \"Travel Silicone Baby Bottle Brush Set with Storage Box\" in place of source_title \"Travel Baby Bottle Brush Set - Newborn Safe Silicone Cleaning Brushes With Storage Box For Bottles, Nipples & Accessories\". Do not invent a new title.",
+          "source_citations": [
+            "data/cj-catalog-532-localized-final-v1.json products[cj_product_id=2606150702051624000].localized.title_en_clean (owner-approved gold/editorial English title on the same row; source=approved_59 status=gold_standard)"
+          ]
+        }
+      ]
+    }
+  ]
+}
