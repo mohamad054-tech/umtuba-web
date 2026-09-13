@@ -42,6 +42,10 @@ tmp-*
 !.env.example
 .seller-runtime-gate.local.json
 
+# Cursor local config (never commit MCP secrets)
+.cursor/
+.cursor/mcp.json
+
 # vercel
 .vercel
 
