@@ -32,6 +32,12 @@ import {
 import { resolvePostJourneyArrivalTransitionId } from "../motion/transitions/post-journey-arrival";
 import { resolveMotionProfile } from "../lib/motion/profiles";
 import type { GlobeToCityPhase } from "./globe-to-city/globeToCityMotion";
+import {
+  resolveGlobeReachMarkers,
+  type GlobeReachCountry,
+  type ResolvedGlobeReachMarker,
+} from "../../lib/geo/isoCountryCenters";
+import { formatInteractionCount } from "../lib/social/shareAndViews";
 
 /** 2048×1024 — full 4096 marble uploads were losing WebGL on remount. */
 const EARTH_TEXTURE_URL = "/textures/earth-blue-marble-2048.jpg";
@@ -107,6 +113,101 @@ function canPauseAutoRotateOnHover(runtime: ArrivalRuntime) {
   }
 
   return runtime.phase === "idle" || runtime.phase === "complete";
+}
+
+const REACH_MARKER_COLORS = [
+  "#67e8f9",
+  "#a78bfa",
+  "#34d399",
+  "#fbbf24",
+  "#f472b6",
+] as const;
+
+function CountryReachMarker({
+  marker,
+  color,
+}: {
+  marker: ResolvedGlobeReachMarker;
+  color: string;
+}) {
+  const [highlighted, setHighlighted] = useState(false);
+  const tooltipId = `globe-country-tooltip-${marker.countryCode.toLowerCase()}`;
+  const position = useMemo(
+    () => latLngToVector3(marker.lat, marker.lng, 2.035),
+    [marker.lat, marker.lng]
+  );
+  const show = useCallback(() => setHighlighted(true), []);
+  const hide = useCallback(() => setHighlighted(false), []);
+  const viewsLabel = `${formatInteractionCount(marker.viewCount)} views`;
+
+  return (
+    <group position={position}>
+      <mesh
+        scale={highlighted ? 1.35 : 1}
+        onPointerOver={(event) => {
+          event.stopPropagation();
+          show();
+        }}
+        onPointerOut={hide}
+      >
+        <sphereGeometry args={[marker.radius, 16, 16]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      <mesh scale={highlighted ? 2.6 : 2}>
+        <sphereGeometry args={[marker.radius, 16, 16]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={highlighted ? 0.38 : 0.16}
+          toneMapped={false}
+        />
+      </mesh>
+      <Html
+        position={[0, marker.radius + 0.12, 0]}
+        center
+        distanceFactor={10}
+        zIndexRange={[50, 0]}
+        style={{ pointerEvents: "auto" }}
+      >
+        <div className="relative flex flex-col items-center">
+          <button
+            type="button"
+            tabIndex={0}
+            aria-label={`${marker.displayName}, ${viewsLabel}`}
+            aria-describedby={highlighted ? tooltipId : undefined}
+            onFocus={show}
+            onBlur={hide}
+            onPointerEnter={show}
+            onPointerLeave={hide}
+            className={`rounded-full border-2 bg-black/20 outline-none transition focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#050510] ${
+              highlighted ? "scale-125" : "scale-100 opacity-80"
+            }`}
+            style={{
+              width: 14,
+              height: 14,
+              borderColor: color,
+              boxShadow: highlighted ? `0 0 14px ${color}` : `0 0 6px ${color}66`,
+            }}
+          />
+          {highlighted ? (
+            <div
+              id={tooltipId}
+              role="tooltip"
+              className="pointer-events-none absolute top-full z-10 mt-2 w-max max-w-[200px] rounded-xl border border-white/15 bg-[#0b0b18]/95 px-3 py-2 text-left text-white shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md"
+            >
+              <p className="text-sm font-black leading-tight">
+                {marker.displayName}
+              </p>
+              <p className="mt-1 text-[11px] font-semibold tracking-wide text-cyan-200/90">
+                {viewsLabel}
+                {marker.isTrending ? " · Trending" : ""}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </Html>
+    </group>
+  );
 }
 
 function CityMarker({ city }: { city: GlobeCity }) {
@@ -585,12 +686,16 @@ function Earth({
   destination,
   cinematic,
   cityEntryActive,
+  showDemoNetwork,
+  reachMarkers,
 }: {
   runtimeRef: MutableRefObject<ArrivalRuntime>;
   highlightRoute: Route | null;
   destination: GlobeCity;
   cinematic: boolean;
   cityEntryActive: boolean;
+  showDemoNetwork: boolean;
+  reachMarkers: ResolvedGlobeReachMarker[];
 }) {
   const earthTexture = useLoader(THREE.TextureLoader, EARTH_TEXTURE_URL);
 
@@ -625,30 +730,40 @@ function Earth({
         />
       </mesh>
 
-      {routes.map((route, index) => {
-        const isHighlight =
-          highlightRoute &&
-          route.from.name === highlightRoute.from.name &&
-          route.to.name === highlightRoute.to.name;
+      {showDemoNetwork
+        ? routes.map((route, index) => {
+            const isHighlight =
+              highlightRoute &&
+              route.from.name === highlightRoute.from.name &&
+              route.to.name === highlightRoute.to.name;
 
-        return (
-          <JourneyRoute
-            key={`${route.from.name}-${route.to.name}-${index}`}
-            route={route}
-            dimmed={Boolean(cinematic && highlightRoute && !isHighlight)}
-          />
-        );
-      })}
+            return (
+              <JourneyRoute
+                key={`${route.from.name}-${route.to.name}-${index}`}
+                route={route}
+                dimmed={Boolean(cinematic && highlightRoute && !isHighlight)}
+              />
+            );
+          })
+        : null}
 
-      {cinematic && highlightRoute ? (
+      {showDemoNetwork && cinematic && highlightRoute ? (
         <TravelPathReveal route={highlightRoute} runtimeRef={runtimeRef} />
       ) : null}
 
-      {GLOBE_CITIES.map((city) => (
-        <CityMarker key={city.name} city={city} />
-      ))}
+      {showDemoNetwork
+        ? GLOBE_CITIES.map((city) => (
+            <CityMarker key={city.name} city={city} />
+          ))
+        : reachMarkers.map((marker, index) => (
+            <CountryReachMarker
+              key={marker.countryCode}
+              marker={marker}
+              color={REACH_MARKER_COLORS[index % REACH_MARKER_COLORS.length]}
+            />
+          ))}
 
-      {cinematic ? (
+      {showDemoNetwork && cinematic ? (
         <DestinationPulse city={destination} runtimeRef={runtimeRef} />
       ) : null}
 
@@ -665,6 +780,9 @@ type JourneyGlobeProps = {
   onArrivalComplete?: () => void;
   cityEntryPhase?: GlobeToCityPhase;
   cityEntryReducedMotion?: boolean;
+  /** When true, a specific post is selected (?postId=). Demo cities stay off. */
+  hasPost?: boolean;
+  countries?: readonly GlobeReachCountry[];
 };
 
 function JourneyGlobeComponent({
@@ -673,9 +791,16 @@ function JourneyGlobeComponent({
   onArrivalComplete,
   cityEntryPhase = "idle",
   cityEntryReducedMotion = false,
+  hasPost = false,
+  countries = [],
 }: JourneyGlobeProps) {
   const { startTransition, subscribe } = useMotionApi();
   const cinematic = Boolean(handoff);
+  const showDemoNetwork = !hasPost;
+  const reachMarkers = useMemo(
+    () => (hasPost ? resolveGlobeReachMarkers(countries) : []),
+    [hasPost, countries]
+  );
   const [contextLost, setContextLost] = useState(false);
 
   const destinationInfo = useMemo(
@@ -1014,6 +1139,8 @@ function JourneyGlobeComponent({
               destination={destination}
               cinematic={cinematic}
               cityEntryActive={cityEntryActive}
+              showDemoNetwork={showDemoNetwork}
+              reachMarkers={reachMarkers}
             />
           </Suspense>
 

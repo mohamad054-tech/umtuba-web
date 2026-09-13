@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "../../components/i18n";
-import { localizedLocationCountry } from "../../watch/lib/mapWatchVideo";
+import {
+  formatDiscoverLocationLabel,
+  hasDiscoverLocation,
+} from "../../../lib/geo/postOrigin";
 import type { DiscoverLocation } from "../types";
 
 type DiscoverLocationBannerProps = {
-  location: DiscoverLocation;
+  location?: DiscoverLocation | null;
 };
 
 /**
@@ -18,11 +21,7 @@ export default function DiscoverLocationBanner({
 }: DiscoverLocationBannerProps) {
   const { t } = useTranslation();
   const [hidden, setHidden] = useState(false);
-  const country = localizedLocationCountry(
-    location.country,
-    t("discover.worldwide")
-  );
-  const label = `${location.city}, ${country}`;
+  const label = formatDiscoverLocationLabel(location);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -40,7 +39,7 @@ export default function DiscoverLocationBanner({
     return () => window.clearTimeout(timer);
   }, []);
 
-  if (hidden) {
+  if (hidden || !hasDiscoverLocation(location)) {
     return null;
   }
 

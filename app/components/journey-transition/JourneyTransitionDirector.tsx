@@ -43,7 +43,9 @@ export default function JourneyTransitionDirector({
   const { startTransition, subscribe, cancel: cancelMotion } = useMotionApi();
   const [phase, setPhase] = useState<JourneyTransitionPhase>("idle");
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [cityLabel, setCityLabel] = useState(video.location.city);
+  const [cityLabel, setCityLabel] = useState(
+    video.location?.city || video.location?.country || ""
+  );
   const navigatedRef = useRef(false);
   const runIdRef = useRef<string | null>(null);
   const hardFallbackTimerRef = useRef<number | null>(null);
@@ -77,7 +79,9 @@ export default function JourneyTransitionDirector({
       }
 
       setReducedMotion(isReduced);
-      setCityLabel(handoff.location.city);
+      setCityLabel(
+        handoff.location?.city || handoff.location?.country || ""
+      );
     });
 
     function clearHardFallback() {

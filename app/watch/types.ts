@@ -21,7 +21,7 @@ export type WatchVideo = {
   poster?: string;
   title: string;
   caption: string;
-  location: { city: string; country: string };
+  location?: { city: string; country: string; countryCode?: string } | null;
   music: string;
   aiSummary: string;
   translation: string;

@@ -1,94 +1,97 @@
-# Cursor Report — Legal pages V1
+# Cursor report
 
 ## Summary
 
-Replaced the live Beta legal copy on `/privacy`, `/terms`, `/account-deletion`, and `/support` with the owner-supplied English/Arabic documents. Added `/cookies`, `/community-guidelines`, `/copyright`, `/about`, and `/data-export`. No `/legal/*` routes. Shared public footer via `AppChrome`. Additive `data_export_requests` migration written and not applied.
+Added optional post origin (ISO-2 country + free-text city) on both create forms. Coordinates are stored only when the typed city matches `world_cities` for that country. Hardcoded UMTUBA / Worldwide is gone; missing origin hides location UI. Migration `20260942` written, not applied.
 
 ## Exact files changed
 
-Created:
-
-- `legal-en.md`, `legal-ar.md` (copied from Desktop)
-- `lib/legal/company.ts`
-- `lib/legal/draftBanner.ts`
-- `lib/legal/pageSpecs.ts`
-- `lib/legal/legalMetadata.ts`
-- `lib/i18n/messages/legalCatalogs.ts`
-- `lib/i18n/legalCatalogs.test.ts`
-- `lib/dataExport/requestDataExport.ts`
-- `lib/dataExport/dataExportStore.ts`
-- `lib/site/dataExportFoundation.test.ts`
-- `app/components/legal/LegalDraftBanner.tsx`
-- `app/components/legal/LegalRichText.tsx`
-- `app/components/site/SiteFooter.tsx`
-- `app/cookies/page.tsx`
-- `app/community-guidelines/page.tsx`
-- `app/copyright/page.tsx`
-- `app/about/page.tsx`
-- `app/data-export/page.tsx`
-- `app/data-export/DataExportExperience.tsx`
-- `app/actions/dataExport.ts`
-- `supabase/migrations/20260940_data_export_requests_v1.sql`
-- `docs/ai/CURRENT_TASK.md` (task overlay)
-- `docs/ai/CURSOR_REPORT.md`
-
-Modified:
-
-- `app/privacy/page.tsx`, `app/terms/page.tsx`, `app/support/page.tsx`
-- `app/account-deletion/page.tsx`, `app/account-deletion/AccountDeletionExperience.tsx`
-- `app/components/legal/LegalDocumentPage.tsx`
-- `app/components/AppChrome.tsx`
+- `supabase/migrations/20260942_posts_origin_location_v1.sql` (added, not applied)
+- `lib/site/postsOriginLocationMigration.test.ts` (added)
+- `lib/geo/isoCountryCenters.ts`
+- `lib/geo/postOrigin.ts` (added)
+- `lib/geo/postOrigin.test.ts` (added)
+- `lib/geo/resolveWorldCityCenter.ts` (added)
+- `lib/geo/resolveWorldCityCenter.test.ts` (added)
+- `app/create/PostOriginPicker.tsx` (added)
+- `app/create/postOriginPicker.wiring.test.ts` (added)
+- `app/create/post/CreatePostForm.tsx`
+- `app/create/video/CreateVideoForm.tsx`
+- `app/actions/createVideoPost.ts`
+- `lib/supabase/videoPosts.ts`
+- `lib/supabase/posts.ts`
+- `lib/supabase/videoPostsServer.ts`
+- `lib/supabase/followingFeed.ts`
+- `lib/supabase/profileContent.ts`
+- `app/actions/socialInteractions.ts`
+- `app/discover/types.ts`
+- `app/discover/DiscoverExperience.tsx`
+- `app/discover/components/DiscoverLocationBanner.tsx`
+- `app/discover/components/DiscoverCreatorInfo.tsx`
+- `app/discover/components/DiscoverFeed.tsx`
+- `app/discover/components/DiscoverVideoCard.tsx`
+- `app/watch/types.ts`
+- `app/watch/lib/mapWatchVideo.ts`
+- `app/watch/lib/mapWatchVideo.test.ts`
+- `app/watch/WatchExperience.tsx`
+- `app/components/video/VideoOverlay.tsx`
+- `app/lib/journey/handoff.ts`
+- `app/lib/journey/resolveLocation.ts`
 - `app/lib/nav/routes.ts`
-- `lib/legal/legalDocuments.ts` (old Beta sections removed)
-- `lib/i18n/messages/types.ts` and all 13 catalogs (`en`, `ar`, `fr`, `es`, `de`, `pt`, `id`, `hi`, `ru`, `tr`, `zh-CN`, `ja`, `ko`)
-- `lib/site/indexing.ts`, `lib/site/routeMetadata.ts`
-- `lib/site/legalPages.test.ts`, `lib/site/metadata.test.ts`
-- `lib/accountDeletion/accountDeletionFoundation.test.ts`
+- `app/components/journey/handoffArrival.ts`
+- `app/components/journey/handoffArrival.test.ts`
+- `app/components/journey-transition/JourneyHandoffArrival.tsx`
+- `app/components/journey-transition/JourneyTransitionDirector.tsx`
+- `app/components/journey-transition/WatchToJourneyOverlay.tsx`
+- `lib/i18n/messages/types.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/fr.ts`
+- `lib/i18n/messages/es.ts`
+- `lib/i18n/messages/de.ts`
+- `lib/i18n/messages/pt.ts`
+- `lib/i18n/messages/id.ts`
+- `lib/i18n/messages/hi.ts`
+- `lib/i18n/messages/ru.ts`
+- `lib/i18n/messages/tr.ts`
+- `lib/i18n/messages/zh-CN.ts`
+- `lib/i18n/messages/ja.ts`
+- `lib/i18n/messages/ko.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-`supabase/migrations/20260940_data_export_requests_v1.sql` — **not applied**. Additive queue table `data_export_requests` with the same RLS shape as `account_deletion_requests`.
+`supabase/migrations/20260942_posts_origin_location_v1.sql` — additive nullable origin columns + checks + index. Not applied. No `supabase db push`.
 
 ## Security review
 
-- Placeholders `[[REGISTERED ADDRESS]]` and `[[CRN]]` only; no invented company number or address.
-- Export table: anon revoked; authenticated select/insert own rows; no update/delete for authenticated; trigger binds `user_id` to `auth.uid()` and forces `pending`.
-- Export UI queues a pending row only. It does not generate archives or email files.
-- Deletion flow still uses the existing authenticated queue. Service-role keys are not referenced.
+Location is opt-in only. No IP/GPS. Did not read `profiles.city` / `profiles.country`. Client cannot send lat/lng; inserts compute coords from `world_cities` or leave them NULL. Inserts/selects tolerate missing origin columns until the migration is applied. Country centroid is never written.
 
 ## Tests
 
-Focused suites PASS: legal pages, sitemap metadata, legal catalogs, data-export foundation, account-deletion foundation, i18n foundation, professional13, runtime locale certification, user-reported blockers.
+Focused vitest PASS (origin helpers, mapper, picker wiring, i18n catalogs, journey handoff).
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS.
+`npx tsc --noEmit` PASS
 
 ## Build
 
-`npm run build` PASS (Next.js 16.2.11). Routes present: `/privacy`, `/terms`, `/cookies`, `/community-guidelines`, `/copyright`, `/about`, `/support`, `/account-deletion`, `/data-export`. They render as dynamic (ƒ) because the root layout is already `force-dynamic` and locale is resolved from cookies/headers.
-
-## Lint
-
-`npm run lint` fails with **pre-existing** repo errors (56). None reported in the legal files touched by this task.
+`npm run build` PASS (Next 16.2.11)
 
 ## git diff --check
 
-PASS (no whitespace errors).
+PASS
 
 ## git status --short
 
-Uncommitted legal-page work as listed above. Not committed.
+Uncommitted local work. Commit forbidden unless user asks.
 
 ## Open issues
 
-- `20260940` is not applied to production.
-- 11 locales use English legal placeholders until translations are supplied.
-- Draft banner is on (`LEGAL_DRAFT_BANNER_ENABLED = true` in `lib/legal/draftBanner.ts`).
-- `/data-export` does not produce a file; it only queues a request.
-- Root layout remains dynamic, so these pages are not statically prerendered.
-- Full-app lint baseline is already red; this task did not clean it.
-
-## i18n key count
-
-**322** new keys (`legal.*`), added to `types.ts` and all 13 catalogs. English from `legal-en.md`, Arabic from `legal-ar.md`, other 11 = English placeholders.
+- `20260942` not applied — origin writes retry without columns until it is.
+- Article teaser insert path has no origin picker (out of this GO).
+- `discover.worldwide` remains in all 13 catalogs and is now unused.
+- Full-repo `npm run lint` historically fails on pre-existing errors; changed origin files lint clean (one pre-existing `<img>` warning on CreatePostForm).
+- Did not click a signed-in publish in the browser (create routes require auth).

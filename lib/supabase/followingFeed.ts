@@ -19,10 +19,8 @@ import {
   attachPlaybackUrls,
   enrichAuthorIdentityFromProfiles,
   enrichAuthorUserIdsFromProfiles,
-  isMissingArticleIdColumnError,
   mapVideoPostToDiscover,
-  postColumns,
-  postColumnsWithoutArticle,
+  queryWithPostColumnFallback,
   type VideoPostRow,
 } from "./videoPosts";
 
@@ -120,10 +118,9 @@ export async function loadFollowingVideoFeedPage(input?: {
       return query;
     };
 
-    let { data, error } = await buildFeedQuery(postColumns);
-    if (error && isMissingArticleIdColumnError(error)) {
-      ({ data, error } = await buildFeedQuery(postColumnsWithoutArticle));
-    }
+    const { data, error } = await queryWithPostColumnFallback((columns) =>
+      buildFeedQuery(columns)
+    );
 
     if (error) {
       console.error("Unable to load following feed:", error);

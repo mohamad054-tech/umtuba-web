@@ -72,10 +72,15 @@ export function resolveGlobeDestination(
     };
   }
 
-  const resolved = resolveJourneyLocation({
-    city: handoff.location.city,
-    country: handoff.location.country,
-  });
+  const resolved = resolveJourneyLocation(handoff.location);
+  if (!resolved) {
+    return {
+      city: fallback,
+      index: 0,
+      matched: false,
+      usedFallback: true,
+    };
+  }
 
   const index = GLOBE_CITIES.findIndex(
     (city) => normalizeCityName(city.name) === normalizeCityName(resolved.city)

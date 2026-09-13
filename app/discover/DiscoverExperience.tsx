@@ -26,6 +26,10 @@ import StoryRail from "../stories/components/StoryRail";
 import { useTranslation } from "../components/i18n";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
+import {
+  formatDiscoverLocationLabel,
+  hasDiscoverLocation,
+} from "../../lib/geo/postOrigin";
 import type { DiscoverStats, DiscoverVideo } from "./types";
 
 type DiscoverExperienceProps = {
@@ -257,7 +261,10 @@ export default function DiscoverExperience({
     );
   }
 
-  const exploreHref = buildHomeCityFocusHref(activeVideo.location.city);
+  const locationLabel = formatDiscoverLocationLabel(activeVideo.location);
+  const exploreHref = activeVideo.location?.city
+    ? buildHomeCityFocusHref(activeVideo.location.city)
+    : null;
   const profileHref = buildCreatorProfileHref({
     username: activeVideo.creator.username,
     articleId: activeVideo.articleId,
@@ -359,21 +366,22 @@ export default function DiscoverExperience({
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
               {t("home.nowPlaying")}
             </p>
-            <h2 className="mt-2 text-xl font-black tracking-tight">
-              {activeVideo.location.city}
-            </h2>
-            <p className="mt-1 text-sm text-white/55">
-              {activeVideo.location.country}
-            </p>
+            {hasDiscoverLocation(activeVideo.location) ? (
+              <h2 className="mt-2 text-xl font-black tracking-tight">
+                {locationLabel}
+              </h2>
+            ) : null}
             <p className="mt-4 text-sm leading-6 text-white/70">
               {t("home.asideHint")}
             </p>
-            <Link
-              href={exploreHref}
-              className="watch-focus-ring mt-5 inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
-            >
-              {t("home.exploreCity")}
-            </Link>
+            {exploreHref ? (
+              <Link
+                href={exploreHref}
+                className="watch-focus-ring mt-5 inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
+              >
+                {t("home.exploreCity")}
+              </Link>
+            ) : null}
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
@@ -409,14 +417,16 @@ export default function DiscoverExperience({
         </aside>
         </div>
 
-        <div className="flex justify-center px-4 pb-4 xl:hidden">
-          <Link
-            href={exploreHref}
-            className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
-          >
-            {t("home.exploreCity")}
-          </Link>
-        </div>
+        {exploreHref ? (
+          <div className="flex justify-center px-4 pb-4 xl:hidden">
+            <Link
+              href={exploreHref}
+              className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
+            >
+              {t("home.exploreCity")}
+            </Link>
+          </div>
+        ) : null}
       </div>
     </DiscoverShell>
   );

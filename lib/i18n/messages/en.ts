@@ -881,4 +881,13 @@ export const enMessages: FoundationMessages = {
   "create.backHome": "Back to Home",
   "create.uploadSubtitle": "Upload to Discover",
   "create.backToCreate": "Back to Create",
+  "create.origin.countryLabel": "Country",
+  "create.origin.cityLabel": "City",
+  "create.origin.optional": "optional",
+  "create.origin.countryNone": "No country",
+  "create.origin.cityPlaceholder": "City name",
+  "create.origin.cityDisabledHint": "Choose a country first.",
+  "create.origin.clear": "Clear location",
+  "create.origin.hint":
+    "Optional. Where this post was made — not detected from your device.",
 };

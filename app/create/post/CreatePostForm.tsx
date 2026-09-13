@@ -14,6 +14,11 @@ import {
   uploadPostImage,
 } from "../../../lib/supabase/posts";
 import { APP_ROUTES } from "../../lib/nav";
+import PostOriginPicker from "../PostOriginPicker";
+import {
+  emptyPostOriginDraft,
+  type PostOriginDraft,
+} from "../../../lib/geo/postOrigin";
 
 type CreatePostFormProps = {
   variant: "modal" | "page";
@@ -37,6 +42,7 @@ export default function CreatePostForm({
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [origin, setOrigin] = useState<PostOriginDraft>(emptyPostOriginDraft);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -97,6 +103,7 @@ export default function CreatePostForm({
   function resetForm() {
     setContent("");
     setSelectedImage(null);
+    setOrigin(emptyPostOriginDraft());
     setErrorMessage("");
 
     if (imagePreview) {
@@ -179,7 +186,10 @@ export default function CreatePostForm({
         imageUrl = await uploadPostImage(selectedImage);
       }
 
-      await createPost(trimmedContent, imageUrl);
+      await createPost(trimmedContent, imageUrl, {
+        countryCode: origin.countryCode,
+        city: origin.city,
+      });
 
       window.dispatchEvent(new Event("umtuba:post-created"));
 
@@ -325,6 +335,12 @@ export default function CreatePostForm({
           JPG, PNG, WEBP or GIF — maximum 5 MB
         </p>
       </div>
+
+      <PostOriginPicker
+        value={origin}
+        onChange={setOrigin}
+        disabled={isPublishing || !isAuthenticated || isCheckingAuth}
+      />
 
       {imagePreview ? (
         <div className="relative mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black">

@@ -4,6 +4,12 @@ import { getAuthenticatedUser, getCurrentProfile } from "./auth";
 import { requireSupabasePublicEnv } from "../env/supabasePublic";
 import { getErrorMessage } from "./validation";
 import {
+  isMissingOriginColumnError,
+  originWriteFields,
+  sanitizePostOrigin,
+} from "../geo/postOrigin";
+import { resolveWorldCityCenter } from "../geo/resolveWorldCityCenter";
+import {
   isOwnedVideoPath,
   POST_VIDEOS_BUCKET,
   validateVideoFile,
@@ -294,7 +300,8 @@ export async function deleteUploadedPostVideo(path: string): Promise<void> {
 
 export async function createPost(
   content: string,
-  imageUrl: string | null = null
+  imageUrl: string | null = null,
+  origin?: { countryCode?: string | null; city?: string | null }
 ): Promise<DatabasePost> {
   const supabase = createClient();
   const user = await getAuthenticatedUser();
@@ -319,28 +326,57 @@ export async function createPost(
     ? profile.username
     : `@${profile.username}`;
 
-  const { data, error } = await supabase
+  const sanitized = sanitizePostOrigin({
+    countryCode: origin?.countryCode,
+    city: origin?.city,
+  });
+  const coords =
+    sanitized.countryCode && sanitized.city
+      ? await resolveWorldCityCenter(
+          supabase,
+          sanitized.countryCode,
+          sanitized.city
+        )
+      : null;
+  const originFields = originWriteFields(sanitized, coords);
+  const insertRow = {
+    user_id: user.id,
+    content: trimmedContent,
+    post_type: imageUrl ? "image" : "text",
+    author_name: profile.full_name,
+    author_username: authorUsername,
+    author_avatar: profile.avatar_initial,
+    image_url: imageUrl,
+    video_url: null,
+    video_path: null,
+    video_mime_type: null,
+    video_byte_size: null,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    saves: 0,
+    views: 0,
+    ...(originFields ?? {}),
+  };
+
+  let { data, error } = await supabase
     .from("posts")
-    .insert({
-      user_id: user.id,
-      content: trimmedContent,
-      post_type: imageUrl ? "image" : "text",
-      author_name: profile.full_name,
-      author_username: authorUsername,
-      author_avatar: profile.avatar_initial,
-      image_url: imageUrl,
-      video_url: null,
-      video_path: null,
-      video_mime_type: null,
-      video_byte_size: null,
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      saves: 0,
-      views: 0,
-    })
+    .insert(insertRow)
     .select(postColumns)
     .single();
+
+  if (error && originFields && isMissingOriginColumnError(error)) {
+    const withoutOrigin = { ...insertRow };
+    delete withoutOrigin.origin_country_code;
+    delete withoutOrigin.origin_city;
+    delete withoutOrigin.origin_lat;
+    delete withoutOrigin.origin_lng;
+    ({ data, error } = await supabase
+      .from("posts")
+      .insert(withoutOrigin)
+      .select(postColumns)
+      .single());
+  }
 
   if (error) {
     console.error("Unable to create post:", error);

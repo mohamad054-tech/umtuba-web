@@ -27,12 +27,13 @@ function JourneyHandoffArrivalInner() {
       <p className="mt-2 text-lg font-black text-white">
         {handoff.title}
       </p>
-      <p className="mt-1 text-sm text-cyan-50/70">
-        {handoff.authorName} · {handoff.location.city}, {handoff.location.country}
-        {!handoff.location.matchedJourneyCity
-          ? " · mapped to nearest journey city"
-          : ""}
-      </p>
+      {handoff.location ? (
+        <p className="mt-1 text-sm text-cyan-50/70">
+          {handoff.authorName} · {handoff.location.city}, {handoff.location.country}
+        </p>
+      ) : (
+        <p className="mt-1 text-sm text-cyan-50/70">{handoff.authorName}</p>
+      )}
       <p className="mt-3 text-xs text-white/45">
         Globe orientation / path / pulse polish will build on this handoff in a
         later slice. Existing globe is unchanged.

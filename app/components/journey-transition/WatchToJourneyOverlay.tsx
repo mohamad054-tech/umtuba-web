@@ -63,9 +63,11 @@ export default function WatchToJourneyOverlay({
           Post Journey
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-tight">{videoTitle}</h2>
-        <p className="mt-3 text-sm text-white/60">
-          Leaving Watch · Opening the globe near {cityLabel}
-        </p>
+        {cityLabel ? (
+          <p className="mt-3 text-sm text-white/60">
+            Leaving Watch · Opening the globe near {cityLabel}
+          </p>
+        ) : null}
         <div className="mt-6 h-1 overflow-hidden rounded-full bg-white/10">
           <div
             className={`h-full rounded-full bg-gradient-to-r from-blue-400 to-purple-400 ${

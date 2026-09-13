@@ -23,7 +23,7 @@ import {
 import {
   applyViewerStateToPosts,
   attachPlaybackUrls,
-  postColumns,
+  queryWithPostColumnFallback,
   type PublicPostDTO,
   type VideoPostRow,
 } from "../../lib/supabase/videoPosts";
@@ -319,10 +319,9 @@ export async function loadSavedPostsAction(): Promise<SavedPostsResult> {
       return { ok: true, posts: [] };
     }
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .in("id", postIds);
+    const { data, error } = await queryWithPostColumnFallback((columns) =>
+      supabase.from("posts").select(columns).in("id", postIds)
+    );
 
     if (error) {
       console.error("Unable to load saved posts:", error);

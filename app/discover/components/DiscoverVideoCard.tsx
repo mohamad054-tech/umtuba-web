@@ -187,7 +187,7 @@ export default function DiscoverVideoCard({
         }
       />
 
-      {active ? (
+      {active && video.location ? (
         <DiscoverLocationBanner
           key={video.id}
           location={video.location}

@@ -307,9 +307,13 @@ export default function DiscoverFeed({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">
-                <p className="text-sm font-bold">
-                  {video.location.city}, {video.location.country}
-                </p>
+                {video.location?.city || video.location?.country ? (
+                  <p className="text-sm font-bold">
+                    {[video.location.city, video.location.country]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>

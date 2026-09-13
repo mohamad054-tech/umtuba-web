@@ -866,4 +866,13 @@ export const arMessages: FoundationMessages = {
   "create.backHome": "العودة إلى الرئيسية",
   "create.uploadSubtitle": "رفع إلى الاكتشاف",
   "create.backToCreate": "العودة إلى الإنشاء",
+  "create.origin.countryLabel": "البلد",
+  "create.origin.cityLabel": "المدينة",
+  "create.origin.optional": "اختياري",
+  "create.origin.countryNone": "بدون بلد",
+  "create.origin.cityPlaceholder": "اسم المدينة",
+  "create.origin.cityDisabledHint": "اختر بلداً أولاً.",
+  "create.origin.clear": "مسح الموقع",
+  "create.origin.hint":
+    "اختياري. مكان إنشاء هذا المنشور — لا يُستنتج من جهازك.",
 };

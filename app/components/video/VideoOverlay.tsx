@@ -10,10 +10,11 @@ import {
   buildLifePostHref,
 } from "../../lib/nav";
 import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
+import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
 import {
-  localizedLocationCountry,
-  localizedVideoTitle,
-} from "../../watch/lib/mapWatchVideo";
+  formatDiscoverLocationLabel,
+  hasDiscoverLocation,
+} from "../../../lib/geo/postOrigin";
 import type { WatchVideo } from "../../watch/types";
 import type { WatchPanelId } from "./watchTypes";
 import VideoActionRail from "./VideoActionRail";
@@ -61,10 +62,7 @@ export default function VideoOverlay({
   const untitled = t("video.untitled");
   const displayTitle = localizedVideoTitle(video.title, untitled);
   const displayCaption = localizedVideoTitle(video.caption, untitled);
-  const displayCountry = localizedLocationCountry(
-    video.location.country,
-    t("discover.worldwide")
-  );
+  const locationLabel = formatDiscoverLocationLabel(video.location);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
@@ -135,11 +133,13 @@ export default function VideoOverlay({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-white/70">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur">
-              <span aria-hidden>📍</span>
-              {video.location.city}, {displayCountry}
-            </span>
-            {prototypePanelsAllowed ? (
+            {hasDiscoverLocation(video.location) ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur">
+                <span aria-hidden>📍</span>
+                {locationLabel}
+              </span>
+            ) : null}
+            {prototypePanelsAllowed && video.location?.city ? (
               <button
                 type="button"
                 onClick={() => onOpenPanel("explore-city")}

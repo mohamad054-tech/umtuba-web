@@ -820,6 +820,14 @@ export type FoundationMessages = {
   "create.backHome": string;
   "create.uploadSubtitle": string;
   "create.backToCreate": string;
+  "create.origin.countryLabel": string;
+  "create.origin.cityLabel": string;
+  "create.origin.optional": string;
+  "create.origin.countryNone": string;
+  "create.origin.cityPlaceholder": string;
+  "create.origin.cityDisabledHint": string;
+  "create.origin.clear": string;
+  "create.origin.hint": string;
 } & StoreMessages & TeacherMessages & LegalMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */

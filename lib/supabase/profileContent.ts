@@ -3,7 +3,7 @@ import { formatFollowCountLabel } from "./follows";
 import {
   attachPlaybackUrls,
   createVideoSignedUrl,
-  postColumns,
+  queryWithPostColumnFallback,
   type VideoPostRow,
 } from "./videoPosts";
 
@@ -200,16 +200,18 @@ export async function listProfileVideos(
     48
   );
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select(postColumns)
-    .eq("user_id", userId)
-    .eq("post_type", "video")
-    .eq("media_status", "ready")
-    .not("video_path", "is", null)
-    .order("created_at", { ascending: false })
-    .order("id", { ascending: false })
-    .limit(limit + 1);
+  const { data, error } = await queryWithPostColumnFallback((columns) =>
+    supabase
+      .from("posts")
+      .select(columns)
+      .eq("user_id", userId)
+      .eq("post_type", "video")
+      .eq("media_status", "ready")
+      .not("video_path", "is", null)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(limit + 1)
+  );
 
   if (error) {
     console.error("listProfileVideos failed:", error);

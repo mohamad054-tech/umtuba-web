@@ -10,6 +10,8 @@ export type DiscoverCreator = {
 export type DiscoverLocation = {
   city: string;
   country: string;
+  /** ISO-2 when the location came from a real post origin. */
+  countryCode?: string;
 };
 
 export type DiscoverStats = {
@@ -32,7 +34,7 @@ export type DiscoverVideo = {
   title: string;
   caption: string;
   hashtags: string[];
-  location: DiscoverLocation;
+  location?: DiscoverLocation | null;
   creator: DiscoverCreator;
   /** Set when this clip is an Article Teaser. */
   articleId?: string | null;

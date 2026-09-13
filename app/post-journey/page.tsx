@@ -8,6 +8,7 @@ import { getPostJourney } from "../../lib/supabase/rewards";
 import { APP_ROUTES, buildPostNotificationHref } from "../lib/nav";
 import { countryCodeToFlag } from "../notifications/lib/notificationMeta";
 import { formatInteractionCount } from "../lib/social/shareAndViews";
+import { isoCountryDisplayName } from "../../lib/geo/isoCountryCenters";
 
 export const metadata = postJourneyMetadata;
 
@@ -123,7 +124,10 @@ export default async function PostJourneyPage({
 
           <div className="mt-6">
             <Suspense fallback={<PostJourneyGlobeFallback />}>
-              <PostJourneyGlobeSection />
+              <PostJourneyGlobeSection
+                hasPost={hasPost}
+                countries={journey?.countries ?? []}
+              />
             </Suspense>
           </div>
 
@@ -151,7 +155,8 @@ export default async function PostJourneyPage({
                     <div>
                       <p className="text-sm font-semibold">
                         {countryCodeToFlag(country.countryCode) ?? ""}{" "}
-                        {country.countryName}
+                        {isoCountryDisplayName(country.countryCode) ||
+                          country.countryName}
                         {country.isTrending ? (
                           <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-amber-200">
                             Trending

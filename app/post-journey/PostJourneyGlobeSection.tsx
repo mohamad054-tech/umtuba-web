@@ -16,8 +16,17 @@ import {
   type GlobeToCityPhase,
 } from "../components/globe-to-city/globeToCityMotion";
 import type { CityHandoffPayload } from "../lib/city/handoff";
+import type { GlobeReachCountry } from "../../lib/geo/isoCountryCenters";
 
-export default function PostJourneyGlobeSection() {
+type PostJourneyGlobeSectionProps = {
+  hasPost?: boolean;
+  countries?: readonly GlobeReachCountry[];
+};
+
+export default function PostJourneyGlobeSection({
+  hasPost = false,
+  countries = [],
+}: PostJourneyGlobeSectionProps) {
   const { ready, fromWatch, handoff } = useJourneyHandoffArrival();
   const [arrivalPhase, setArrivalPhase] =
     useState<PostJourneyArrivalPhase>("idle");
@@ -144,6 +153,8 @@ export default function PostJourneyGlobeSection() {
             onArrivalPhaseChange={handlePhaseChange}
             cityEntryPhase={cityEntryPhase}
             cityEntryReducedMotion={cityEntryReducedMotion}
+            hasPost={hasPost}
+            countries={countries}
           />
 
           {showCard && handoff ? (

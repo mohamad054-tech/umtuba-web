@@ -23,6 +23,13 @@ import {
   VIDEO_SIGNED_URL_TTL_SECONDS,
 } from "./videoPostsShared";
 import { normalizeUsername } from "./validation";
+import {
+  discoverLocationFromOrigin,
+  isMissingOriginColumnError,
+  originWriteFields,
+  sanitizePostOrigin,
+} from "../geo/postOrigin";
+import { resolveWorldCityCenter } from "../geo/resolveWorldCityCenter";
 
 /**
  * Auth user id for messaging. Never use post id / username as a stand-in.
@@ -81,11 +88,70 @@ const postColumns = `
   shares,
   saves,
   views,
+  origin_country_code,
+  origin_city,
+  origin_lat,
+  origin_lng,
   created_at
 `;
 
+export function stripOriginColumns(columns: string): string {
+  return columns
+    .replace(/\n\s*origin_country_code,/, "")
+    .replace(/\n\s*origin_city,/, "")
+    .replace(/\n\s*origin_lat,/, "")
+    .replace(/\n\s*origin_lng,/, "");
+}
+
 /** Pre-migration select when `posts.article_id` is not applied yet. */
 const postColumnsWithoutArticle = postColumns.replace(/\n\s*article_id,/, "");
+
+export const POST_COLUMN_FALLBACKS = [
+  postColumns,
+  stripOriginColumns(postColumns),
+  postColumnsWithoutArticle,
+  stripOriginColumns(postColumnsWithoutArticle),
+];
+
+export async function queryWithPostColumnFallback(
+  run: (
+    columns: string
+  ) => PromiseLike<{
+    data: unknown;
+    error: { message?: string; code?: string } | null;
+  }>
+): Promise<{
+  data: unknown;
+  error: { message?: string; code?: string } | null;
+  columns: string;
+}> {
+  const seen = new Set<string>();
+  let last: {
+    data: unknown;
+    error: { message?: string; code?: string } | null;
+    columns: string;
+  } = { data: null, error: null, columns: postColumns };
+
+  for (const columns of POST_COLUMN_FALLBACKS) {
+    if (seen.has(columns)) continue;
+    seen.add(columns);
+    const result = await run(columns);
+    last = {
+      data: result.data ?? null,
+      error: result.error,
+      columns,
+    };
+    if (!result.error) return last;
+    if (
+      !isMissingArticleIdColumnError(result.error) &&
+      !isMissingOriginColumnError(result.error)
+    ) {
+      return last;
+    }
+  }
+
+  return last;
+}
 
 export function isMissingArticleIdColumnError(
   error: { message?: string; code?: string } | null | undefined
@@ -129,6 +195,10 @@ export type VideoPostRow = DatabasePost & {
   media_aspect_ratio?: string | null;
   thumbnail_path?: string | null;
   media_pipeline?: Record<string, unknown> | null;
+  origin_country_code?: string | null;
+  origin_city?: string | null;
+  origin_lat?: number | null;
+  origin_lng?: number | null;
 };
 
 /** Client-safe post: playback URL only — never includes storage paths. */
@@ -155,6 +225,8 @@ export type PublicPostDTO = {
   likedByMe: boolean;
   savedByMe: boolean;
   created_at: string;
+  origin_country_code?: string | null;
+  origin_city?: string | null;
 };
 
 export type CreateVideoPostInput = {
@@ -167,6 +239,8 @@ export type CreateVideoPostInput = {
   /** Pre-publish overlays (text + stickers); server sanitizes and caps. */
   overlays?: VideoOverlayElement[] | null;
   uploadStartedAt?: string | null;
+  originCountryCode?: string | null;
+  originCity?: string | null;
 };
 
 function sanitizeMetadata(
@@ -328,6 +402,8 @@ export async function attachPlaybackUrls(
         likedByMe: false,
         savedByMe: false,
         created_at: post.created_at,
+        origin_country_code: post.origin_country_code ?? null,
+        origin_city: post.origin_city ?? null,
       };
     })
   );
@@ -505,10 +581,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     caption: post.content || "Untitled video",
     title: articleTitle ?? (post.content || "Untitled video"),
     hashtags: extractHashtags(post.content),
-    location: {
-      city: "UMTUBA",
-      country: "Worldwide",
-    },
+    location: discoverLocationFromOrigin(post),
     creator: {
       // Auth UUID only — never post.id / username stand-ins.
       id: isUuid(post.user_id) ? post.user_id!.trim() : null,
@@ -530,6 +603,21 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     likedByMe: post.likedByMe,
     savedByMe: post.savedByMe,
   };
+}
+
+async function resolveOriginWrite(
+  supabase: SupabaseClient,
+  input: { originCountryCode?: string | null; originCity?: string | null }
+) {
+  const origin = sanitizePostOrigin({
+    countryCode: input.originCountryCode,
+    city: input.originCity,
+  });
+  if (!origin.countryCode) return null;
+  const coords = origin.city
+    ? await resolveWorldCityCenter(supabase, origin.countryCode, origin.city)
+    : null;
+  return originWriteFields(origin, coords);
 }
 
 /**
@@ -614,45 +702,62 @@ export async function insertVideoPostForUser(
         }
       : EMPTY_MEDIA_PIPELINE_EXTENSIONS;
 
-  const { data: queued, error: insertError } = await supabase
+  const originFields = await resolveOriginWrite(supabase, input);
+  const insertRow = {
+    user_id: userId,
+    content: caption,
+    post_type: "video",
+    author_name: profile.full_name,
+    author_username: authorUsername,
+    author_avatar: profile.avatar_initial,
+    image_url: null,
+    video_url: null,
+    video_path: videoPath,
+    video_mime_type: resolvedMimeType,
+    video_byte_size: input.byteSize,
+    media_status: "queued",
+    upload_started_at: uploadStartedAt,
+    upload_completed_at: now,
+    processing_started_at: null,
+    processing_completed_at: null,
+    processing_error: null,
+    processing_progress: 0,
+    media_duration_ms: meta.durationMs,
+    media_width: meta.width,
+    media_height: meta.height,
+    media_fps: meta.fps,
+    media_codec: meta.codec,
+    media_bitrate: meta.bitrate,
+    media_file_size: meta.fileSize,
+    media_aspect_ratio: meta.aspectRatio,
+    thumbnail_path: thumbnailPath,
+    media_pipeline: mediaPipeline,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    saves: 0,
+    views: 0,
+    ...(originFields ?? {}),
+  };
+
+  let { data: queued, error: insertError } = await supabase
     .from("posts")
-    .insert({
-      user_id: userId,
-      content: caption,
-      post_type: "video",
-      author_name: profile.full_name,
-      author_username: authorUsername,
-      author_avatar: profile.avatar_initial,
-      image_url: null,
-      video_url: null,
-      video_path: videoPath,
-      video_mime_type: resolvedMimeType,
-      video_byte_size: input.byteSize,
-      media_status: "queued",
-      upload_started_at: uploadStartedAt,
-      upload_completed_at: now,
-      processing_started_at: null,
-      processing_completed_at: null,
-      processing_error: null,
-      processing_progress: 0,
-      media_duration_ms: meta.durationMs,
-      media_width: meta.width,
-      media_height: meta.height,
-      media_fps: meta.fps,
-      media_codec: meta.codec,
-      media_bitrate: meta.bitrate,
-      media_file_size: meta.fileSize,
-      media_aspect_ratio: meta.aspectRatio,
-      thumbnail_path: thumbnailPath,
-      media_pipeline: mediaPipeline,
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      saves: 0,
-      views: 0,
-    })
+    .insert(insertRow)
     .select(postColumns)
     .single();
+
+  if (insertError && originFields && isMissingOriginColumnError(insertError)) {
+    const withoutOrigin = { ...insertRow };
+    delete withoutOrigin.origin_country_code;
+    delete withoutOrigin.origin_city;
+    delete withoutOrigin.origin_lat;
+    delete withoutOrigin.origin_lng;
+    ({ data: queued, error: insertError } = await supabase
+      .from("posts")
+      .insert(withoutOrigin)
+      .select(stripOriginColumns(postColumns))
+      .single());
+  }
 
   if (insertError || !queued) {
     console.error("Unable to create video post row:", insertError);
@@ -747,26 +852,30 @@ async function insertVideoPostLegacy(
     ? profile.username
     : `@${profile.username}`;
 
-  const { data, error } = await supabase
+  const originFields = await resolveOriginWrite(supabase, input);
+  const insertRow = {
+    user_id: userId,
+    content: caption,
+    post_type: "video",
+    author_name: profile.full_name,
+    author_username: authorUsername,
+    author_avatar: profile.avatar_initial,
+    image_url: null,
+    video_url: null,
+    video_path: videoPath,
+    video_mime_type: input.mimeType,
+    video_byte_size: input.byteSize,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    saves: 0,
+    views: 0,
+    ...(originFields ?? {}),
+  };
+
+  let { data, error } = await supabase
     .from("posts")
-    .insert({
-      user_id: userId,
-      content: caption,
-      post_type: "video",
-      author_name: profile.full_name,
-      author_username: authorUsername,
-      author_avatar: profile.avatar_initial,
-      image_url: null,
-      video_url: null,
-      video_path: videoPath,
-      video_mime_type: input.mimeType,
-      video_byte_size: input.byteSize,
-      likes: 0,
-      comments: 0,
-      shares: 0,
-      saves: 0,
-      views: 0,
-    })
+    .insert(insertRow)
     .select(
       `
       id,
@@ -790,6 +899,40 @@ async function insertVideoPostLegacy(
     `
     )
     .single();
+
+  if (error && originFields && isMissingOriginColumnError(error)) {
+    const withoutOrigin = { ...insertRow };
+    delete withoutOrigin.origin_country_code;
+    delete withoutOrigin.origin_city;
+    delete withoutOrigin.origin_lat;
+    delete withoutOrigin.origin_lng;
+    ({ data, error } = await supabase
+      .from("posts")
+      .insert(withoutOrigin)
+      .select(
+        `
+      id,
+      user_id,
+      content,
+      post_type,
+      author_name,
+      author_username,
+      author_avatar,
+      image_url,
+      video_url,
+      video_path,
+      video_mime_type,
+      video_byte_size,
+      likes,
+      comments,
+      shares,
+      saves,
+      views,
+      created_at
+    `
+      )
+      .single());
+  }
 
   if (error || !data) {
     console.error("Unable to create video post row (legacy):", error);

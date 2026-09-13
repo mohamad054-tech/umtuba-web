@@ -17,6 +17,7 @@ import {
   resolvePostJourneyArrivalTransitionId,
 } from "../../motion/transitions/post-journey-arrival";
 import type { JourneyHandoffPayload } from "../../lib/journey/handoff";
+import { resolveJourneyLocation } from "../../lib/journey/resolveLocation";
 
 function makeHandoff(
   city: string,
@@ -42,6 +43,33 @@ function makeHandoff(
   };
 }
 
+describe("resolveJourneyLocation", () => {
+  it("returns null when origin is missing", () => {
+    expect(resolveJourneyLocation(null)).toBeNull();
+    expect(resolveJourneyLocation({})).toBeNull();
+  });
+
+  it("matches a known journey city", () => {
+    const resolved = resolveJourneyLocation({
+      city: "Jerusalem",
+      country: "Palestine",
+    });
+    expect(resolved?.matchedJourneyCity).toBe(true);
+    expect(resolved?.city).toBe("Jerusalem");
+  });
+
+  it("uses a display-time country center when only ISO-2 is known", () => {
+    const resolved = resolveJourneyLocation({
+      city: "",
+      country: "Portugal",
+      countryCode: "PT",
+    });
+    expect(resolved?.matchedJourneyCity).toBe(false);
+    expect(resolved?.lat).toBeCloseTo(38.72, 1);
+    expect(resolved?.lng).toBeCloseTo(-9.14, 1);
+  });
+});
+
 describe("handoffArrival destination resolution", () => {
   it("maps known globe cities", () => {
     const result = resolveGlobeDestination(
@@ -65,6 +93,12 @@ describe("handoffArrival destination resolution", () => {
   it("falls back safely for null/invalid handoff", () => {
     expect(resolveGlobeDestination(null).city.name).toBe("Jerusalem");
     expect(resolveGlobeDestination(undefined).usedFallback).toBe(true);
+    expect(
+      resolveGlobeDestination({
+        ...makeHandoff("Jerusalem", "Palestine"),
+        location: null,
+      }).usedFallback
+    ).toBe(true);
   });
 });
 

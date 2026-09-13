@@ -4,11 +4,15 @@ import Link from "next/link";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
 import FollowButton from "../../components/social/FollowButton";
 import { APP_ROUTES, buildCreatorProfileHref, isUuid } from "../../lib/nav";
+import {
+  formatDiscoverLocationLabel,
+  hasDiscoverLocation,
+} from "../../../lib/geo/postOrigin";
 import type { DiscoverCreator, DiscoverLocation } from "../types";
 
 type DiscoverCreatorInfoProps = {
   creator: DiscoverCreator;
-  location: DiscoverLocation;
+  location?: DiscoverLocation | null;
   /** Session viewer id from the Discover page (null if signed out). */
   viewerId?: string | null;
   /** Post id for auth return deep-link (`/discover?post=`). */
@@ -77,9 +81,11 @@ export default function DiscoverCreatorInfo({
             className="watch-focus-ring pointer-events-auto shrink-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-white/90 transition hover:bg-white/15 disabled:cursor-wait disabled:opacity-60"
           />
         </div>
-        <p className="truncate text-sm text-white/55">
-          {location.city}, {location.country}
-        </p>
+        {hasDiscoverLocation(location) ? (
+          <p className="truncate text-sm text-white/55">
+            {formatDiscoverLocationLabel(location)}
+          </p>
+        ) : null}
       </div>
     </div>
   );

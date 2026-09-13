@@ -35,6 +35,11 @@ import type {
 } from "../../../lib/media/pipelineTypes";
 import type { VideoOverlayElement } from "../../../lib/media/videoOverlays";
 import VideoOverlayEditor from "./VideoOverlayEditor";
+import PostOriginPicker from "../PostOriginPicker";
+import {
+  emptyPostOriginDraft,
+  type PostOriginDraft,
+} from "../../../lib/geo/postOrigin";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   CREATE_PROCESSING_MESSAGE,
@@ -155,6 +160,7 @@ export default function CreateVideoForm() {
   );
   const [probedMeta, setProbedMeta] = useState<MediaMetadata | null>(null);
   const [overlays, setOverlays] = useState<VideoOverlayElement[]>([]);
+  const [origin, setOrigin] = useState<PostOriginDraft>(emptyPostOriginDraft);
 
   useEffect(() => {
     let active = true;
@@ -365,6 +371,8 @@ export default function CreateVideoForm() {
         metadata: probedMeta,
         overlays,
         uploadStartedAt,
+        originCountryCode: origin.countryCode,
+        originCity: origin.city,
       });
 
       if (!result.ok) {
@@ -581,6 +589,12 @@ export default function CreateVideoForm() {
           {caption.length}/{MAX_CAPTION_LENGTH}
         </p>
       </div>
+
+      <PostOriginPicker
+        value={origin}
+        onChange={setOrigin}
+        disabled={!isAuthenticated || busy || phase === "checking-auth"}
+      />
 
       {phase === "uploading" ? (
         <div className="mt-4">

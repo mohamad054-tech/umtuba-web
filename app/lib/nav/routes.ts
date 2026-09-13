@@ -369,7 +369,9 @@ export function findIndexByPostId<T extends { id: string | number }>(
   return index;
 }
 
-export function findIndexByCity<T extends { location: { city: string } }>(
+export function findIndexByCity<
+  T extends { location?: { city?: string } | null },
+>(
   items: T[],
   cityParam: string | null | undefined
 ): number {
@@ -378,7 +380,7 @@ export function findIndexByCity<T extends { location: { city: string } }>(
   }
 
   const index = items.findIndex((item) =>
-    citiesMatch(item.location.city, cityParam)
+    citiesMatch(item.location?.city ?? "", cityParam)
   );
 
   return index >= 0 ? index : 0;

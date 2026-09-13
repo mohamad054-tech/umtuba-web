@@ -28,6 +28,8 @@ export type CreateVideoPostActionInput = {
   /** Pre-publish overlay composition (text + stickers). Sanitized server-side. */
   overlays?: VideoOverlayElement[] | null;
   uploadStartedAt?: string | null;
+  originCountryCode?: string | null;
+  originCity?: string | null;
 };
 
 /**
@@ -90,6 +92,11 @@ export async function createVideoPostAction(
       metadata: input.metadata ?? null,
       overlays: input.overlays ?? null,
       uploadStartedAt: input.uploadStartedAt ?? null,
+      originCountryCode:
+        typeof input.originCountryCode === "string"
+          ? input.originCountryCode
+          : null,
+      originCity: typeof input.originCity === "string" ? input.originCity : null,
     };
 
     const post = await insertVideoPostForUser(

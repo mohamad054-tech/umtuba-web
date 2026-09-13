@@ -27,10 +27,8 @@ import {
   createVideoSignedUrl,
   enrichAuthorIdentityFromProfiles,
   enrichAuthorUserIdsFromProfiles,
-  isMissingArticleIdColumnError,
   mapVideoPostToDiscover,
-  postColumns,
-  postColumnsWithoutArticle,
+  queryWithPostColumnFallback,
   type PublicPostDTO,
   type VideoPostRow,
 } from "./videoPosts";
@@ -109,14 +107,10 @@ export async function loadCanonicalVideoFeedPage(input?: {
       return query;
     };
 
-    let { data, error } = await buildFeedQuery(postColumns);
-    let useArticleColumn = true;
-
-    // Home feed stays up before articles migration is applied (Git-only until GO).
-    if (error && isMissingArticleIdColumnError(error)) {
-      useArticleColumn = false;
-      ({ data, error } = await buildFeedQuery(postColumnsWithoutArticle));
-    }
+    const feedResult = await queryWithPostColumnFallback((columns) =>
+      buildFeedQuery(columns)
+    );
+    const { data, error } = feedResult;
 
     if (error) {
       console.error("Unable to load video feed:", error);
@@ -131,9 +125,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
     if (!cursor && input?.focusPostId && input.focusPostId > 0) {
       const focusedInPage = rows.some((row) => row.id === input.focusPostId);
       if (!focusedInPage) {
-        const focusSelect = useArticleColumn
-          ? postColumns
-          : postColumnsWithoutArticle;
+        const focusSelect = feedResult.columns;
         const { data: focused } = await supabase
           .from("posts")
           .select(focusSelect)
@@ -349,10 +341,9 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
     const supabase = await createClient();
     const user = await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .order("created_at", { ascending: false });
+    const { data, error } = await queryWithPostColumnFallback((columns) =>
+      supabase.from("posts").select(columns).order("created_at", { ascending: false })
+    );
 
     if (error) {
       console.error("Unable to load feed posts:", error);
@@ -446,12 +437,14 @@ export async function getLifePostsServer(): Promise<FeedPostsResult> {
     const supabase = await createClient();
     const user = await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .in("post_type", [...LIFE_CANONICAL_POST_TYPES])
-      .order("created_at", { ascending: false })
-      .limit(LIFE_FEED_LIMIT);
+    const { data, error } = await queryWithPostColumnFallback((columns) =>
+      supabase
+        .from("posts")
+        .select(columns)
+        .in("post_type", [...LIFE_CANONICAL_POST_TYPES])
+        .order("created_at", { ascending: false })
+        .limit(LIFE_FEED_LIMIT)
+    );
 
     if (error) {
       console.error("Unable to load UM Life posts:", error);
@@ -484,11 +477,9 @@ export async function getLifePostByIdServer(
     const supabase = await createClient();
     const user = await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .eq("id", postId)
-      .maybeSingle();
+    const { data, error } = await queryWithPostColumnFallback((columns) =>
+      supabase.from("posts").select(columns).eq("id", postId).maybeSingle()
+    );
 
     if (error) {
       console.error("Unable to load UM Life post:", error);

@@ -22,7 +22,7 @@ export type JourneyHandoffPayload = {
   videoId: string;
   title: string;
   authorName: string;
-  location: JourneyHandoffLocation;
+  location: JourneyHandoffLocation | null;
   originRect: JourneyHandoffOriginRect | null;
   startedAt: number;
   expiresAt: number;
@@ -72,24 +72,26 @@ export function isValidJourneyHandoff(
 
   const location = payload.location;
 
-  if (!location || typeof location !== "object") {
-    return false;
-  }
+  if (location !== null) {
+    if (!location || typeof location !== "object") {
+      return false;
+    }
 
-  const loc = location as Record<string, unknown>;
+    const loc = location as Record<string, unknown>;
 
-  if (
-    !isNonEmptyString(loc.city) ||
-    !isNonEmptyString(loc.country) ||
-    !isFiniteNumber(loc.lat) ||
-    !isFiniteNumber(loc.lng) ||
-    typeof loc.matchedJourneyCity !== "boolean"
-  ) {
-    return false;
-  }
+    if (
+      !isNonEmptyString(loc.city) ||
+      !isNonEmptyString(loc.country) ||
+      !isFiniteNumber(loc.lat) ||
+      !isFiniteNumber(loc.lng) ||
+      typeof loc.matchedJourneyCity !== "boolean"
+    ) {
+      return false;
+    }
 
-  if (loc.lat < -90 || loc.lat > 90 || loc.lng < -180 || loc.lng > 180) {
-    return false;
+    if (loc.lat < -90 || loc.lat > 90 || loc.lng < -180 || loc.lng > 180) {
+      return false;
+    }
   }
 
   if (payload.originRect !== null) {
@@ -204,8 +206,10 @@ export function buildJourneyHandoffQuery(payload: JourneyHandoffPayload) {
   const params = new URLSearchParams({
     from: "watch",
     vid: payload.videoId,
-    city: slugifyCity(payload.location.city),
   });
+  if (payload.location?.city) {
+    params.set("city", slugifyCity(payload.location.city));
+  }
 
   if (/^\d+$/.test(payload.videoId)) {
     params.set("postId", payload.videoId);
@@ -258,7 +262,7 @@ export function createJourneyHandoff(input: {
   videoId: string;
   title: string;
   authorName: string;
-  location: JourneyHandoffLocation;
+  location: JourneyHandoffLocation | null;
   originRect: JourneyHandoffOriginRect | null;
 }): JourneyHandoffPayload {
   const startedAt = Date.now();

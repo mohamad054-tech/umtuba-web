@@ -3,7 +3,6 @@ import type { DemoVideo } from "../../data/videos";
 import type { WatchVideo } from "../types";
 
 export const UNTITLED_VIDEO_FALLBACK = "Untitled video";
-export const WORLDWIDE_LOCATION_FALLBACK = "Worldwide";
 
 export function isUntitledVideoFallback(
   value: string | null | undefined
@@ -16,17 +15,6 @@ export function localizedVideoTitle(
   untitledLabel: string
 ): string {
   return isUntitledVideoFallback(title) ? untitledLabel : String(title).trim();
-}
-
-export function localizedLocationCountry(
-  country: string | null | undefined,
-  worldwideLabel: string
-): string {
-  const value = country?.trim() ?? "";
-  if (!value || value === WORLDWIDE_LOCATION_FALLBACK) {
-    return worldwideLabel;
-  }
-  return value;
 }
 
 function titleFromCaption(caption: string): string {
@@ -44,7 +32,7 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
     poster: video.poster,
     title: video.title || titleFromCaption(video.caption),
     caption: video.caption,
-    location: video.location,
+    location: video.location ?? null,
     music: "Original sound · UMTUBA",
     aiSummary: "Watch how this post travels — open Post Journey for live reach.",
     translation: "Open AI panel",
@@ -74,7 +62,7 @@ export function demoVideoToWatchVideo(video: DemoVideo): WatchVideo {
     poster: video.poster,
     title: video.title,
     caption: video.caption,
-    location: video.location,
+    location: video.location ?? null,
     music: video.music,
     aiSummary: video.aiSummary,
     translation: video.translation,
