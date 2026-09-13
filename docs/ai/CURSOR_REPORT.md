@@ -1,86 +1,86 @@
-# CURSOR_REPORT — DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
+# CURSOR_REPORT — DESKTOP_LEARNING_INTERMITTENT_BLANK_LOADING_V1
 
 ## Summary
 
-Central-accepted Learning productization is preserved. The worktree `node_modules` junction was replaced with a real local `npm ci` install (Next 16.2.11). No product code was changed to make the build pass. `npx tsc --noEmit`, 25 targeted Learning tests, and `npm run build` all passed. A clean local commit is created on `desktop/learning-approved-design-productization-v1`. Not pushed. Parent public Supabase keys were used (names only; values not printed) and public Learning surfaces now render the live catalog banner. Historical `e7c84c66` remains unavailable and non-blocking.
+Production Learning no longer sits on a featureless dark screen while public catalog/course RSC waterfalls finish. Root cause was **DATA_FETCH_LATENCY** (full-catalog recount on every course page, sequential Supabase reads, guest `getUser()`, async `loading.tsx`). Fix cherry-picked onto live Store tip `6d1a2b4` and deployed as `db1b6bad-20260824171946`. Live `ja-18` TTFB dropped from 1.5–2.3s to typically 0.36–0.78s. Navy Learning design preserved. `20260934` not applied. Mobile untouched. Parent dirt not committed.
 
 ```
-TASK_ID = DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1
-STATUS = FINAL COMPLETE
-CANDIDATE_PRESERVED = YES
-PRODUCT_CODE_CHANGED_FOR_BUILD_FIX = NO
-NODE_MODULES_JUNCTION_FIXED = YES
+TASK_ID = DESKTOP_LEARNING_INTERMITTENT_BLANK_LOADING_V1
+STATUS = COMPLETE
+ROOT_CAUSE = DATA_FETCH_LATENCY
+REPRODUCED = YES
+FIX = YES
+SOURCE_SHA = db1b6bad924b7f654537dbdc182fce067ef8f298
+TESTS = PASS
 TYPECHECK = PASS
-TARGETED_TESTS = PASS_25
-PRODUCTION_BUILD = PASS
-LOCAL_SMOKE = PASS
-OWNER_APPROVED_DESIGN_PRESERVED = YES
-ARABIC_RTL = PASS
-DESKTOP_RESPONSIVE = PASS
-MOBILE_WEB_RESPONSIVE = PASS
-REAL_DATA_CONNECTED = YES_PUBLIC_READ
-SUPABASE_ENV_STATUS = AUTHORIZED_PARENT_PUBLIC_KEYS_USED
-HISTORICAL_E7C84C66 = UNAVAILABLE_NON_BLOCKING
-BRANCH = desktop/learning-approved-design-productization-v1
-WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-APPROVED-DESIGN-PRODUCTIZATION-V1
-COMMIT_CREATED = YES
-PUSHED = NO
-DEPLOYED = NO
-NEW_MIGRATION = NO
+BUILD = PASS
+REPEATED_NAVIGATION = PASS
+LIVE_DEPLOYED = YES
+LIVE_RELEASE = /opt/umtuba/production/releases/db1b6bad-20260824171946
+LIVE_RETEST = PASS
+FINAL_STATUS = PASS
+LIVE_LEARNING_URL = https://umtuba.com/learning
+WORKTREE = C:\Users\1\Desktop\umtuba\umtuba-web\worktrees\DESKTOP-LEARNING-INTERMITTENT-BLANK-LOADING-V1
+BRANCH = desktop/learning-intermittent-blank-loading-v1-live
 MIGRATION_20260934_APPLIED = NO
 MOBILE_NATIVE_TOUCHED = NO
 ```
 
 ## Exact files changed
 
-Authorized Learning productization only (this worktree/branch):
+Isolated commit `db1b6ba` (cherry-pick of `99bb02c` onto `6d1a2b4`):
 
-- Learning pages and visual/teacher components
-- `lib/learning/productization/**` plus teacher/review/welcome/visualDemo modules
-- i18n teacher catalogs + locale message wiring
-- Labeled `public/demo/learning` fixtures
-- Unapplied `supabase/migrations/20260934_learning_teacher_student_platform_v1.sql`
-- Packets under `docs/ops/learning-approved-design-productization-v1/` and `docs/ops/learning-final-engineering-gates-v1/`
-- This report / current-task handoff
+- `app/learning/loading.tsx`
+- `app/components/learning/visual/LearningRouteLoading.tsx`
+- `app/learning/catalog/[courseSlug]/page.tsx`
+- `lib/learning/productization/loadSurfaces.ts`
+- `lib/learning/productization/requestCache.ts`
+- `lib/learning/publicCatalog.ts`
+- `lib/learning/publicCatalog.test.ts`
+- `lib/learning/learningViewer.ts`
+- `lib/learning/learningViewer.test.ts`
+- `lib/learning/publicSupabase.ts`
+- `lib/learning/productization/loadingFix.test.ts`
+- `docs/ops/learning-intermittent-blank-loading-v1/` host + nav scripts
 
-Not changed for the build fix: `next.config.ts`, `package-lock.json`. Not committed: `.env.local`, parent profile-hero dirt, android/store docs, other worktrees.
+Parent working tree: docs/ai + packet copy only. Not committed.
 
 ## Migrations created
 
-None. Inherited `20260934_learning_teacher_student_platform_v1.sql` is present and was **not** applied.
+None. `20260934` not applied.
 
 ## Security review
 
-- Parent `.env.local` inspected for key **names** only. Values never printed.
-- Copied only `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` into the gitignored worktree `.env.local`.
-- Service-role, Livekit, and Twilio secrets were not copied.
-- Demo flags remain `0`. Teacher approval not faked. Payments remain disabled.
-- `_port_extract` not touched. Windows Desktop not used as an artifact destination.
-- `umtuba-mobile` not touched.
+- Guest Auth skip is cookie-absence only. Session cookies still validate with `getUser()`.
+- Public catalog cache uses the publishable anon client, no service role.
+- No auth/RLS weakening. No `.env` printed.
+- Isolated branch push only. No force-push.
 
 ## Tests
 
-PASS — 25 targeted vitest (`productization`, `visualDemo`, teacher catalogs/platform/studio/reviews/welcome/earnings).
+PASS — targeted Learning vitest (productization / viewer / loading-fix / visual / teacher set). 10/10 on the live-based SHA after cherry-pick.
 
 ## TypeScript
 
-PASS — `npx tsc --noEmit` after removing stale junction/webpack `.next` types.
+PASS — `npx tsc --noEmit`
 
 ## Build
 
-PASS — `npm run build` (Next 16.2.11 Turbopack).
+PASS — local `npm run build`. Host `npm ci --include=dev` + `npm run build` → `BUILD_ID=0sv3vdbmI1RYKfZ55P0Nn`.
 
 ## git diff --check
 
-PASS (productization worktree, committed paths).
+Clean on the isolated commit.
 
 ## git status --short
 
-Recorded after the authorized local commit. Parent office/profile-hero working tree remains dirty and untouched by this commit.
+Isolated worktree: untracked packet/screenshots/REL/upload helper after deploy. Source commit is clean.
+
+Parent: remains dirty with unrelated docs/ops/worktrees plus this GO's docs updates.
 
 ## Open issues
 
-- `e7c84c668c251ca6b386a60b2b3c01a89eeb7e1b` still not fetchable (`not our ref`).
-- `20260934` not applied. Authenticated writes / RLS persistence not exercised.
-- Turbopack warns that the parent lockfile can be inferred as workspace root. Build still passed without adding `turbopack.root`.
-- PUSHED = NO. Deploy not authorized.
+- Occasional 3s live DCL still possible on a cold/spike request; the navy shell/content now stay on screen.
+- Guest lesson / teacher-write routes still require login.
+- `20260934` still unapplied.
+- Production had already moved from `a29a329` to `6d1a2b4` (Store). This fix is on that tip. Rollback is `6d1a2b45-20260824115820`.
