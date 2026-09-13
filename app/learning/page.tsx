@@ -13,6 +13,13 @@ import {
 } from "../../lib/learning/instructorAuthoring";
 
 import { learningHubMetadata } from "../../lib/site/routeMetadata";
+import WelcomeVideoHook from "../components/learning/WelcomeVideoHook";
+import { buildWelcomeVideoHook } from "../../lib/learning/welcomeVideoHook";
+import {
+  LEARNING_TEACHER_ROUTES,
+  canTeacherUseCenter,
+  loadMyTeacherProfile,
+} from "../../lib/learning/teacherPlatform";
 
 export const metadata = learningHubMetadata;
 
@@ -33,15 +40,24 @@ export default async function LearningHubPage() {
   const showInstructor =
     authorable.ok &&
     (authorable.data as InstructorAuthorableCourse[]).length > 0;
+  const teacher = await loadMyTeacherProfile(supabase);
+  const teacherHref = canTeacherUseCenter(teacher.ok ? teacher.data?.status : null)
+    ? LEARNING_TEACHER_ROUTES.center
+    : LEARNING_INSTRUCTOR_ROUTES.hub;
+  const welcomeHook = buildWelcomeVideoHook(
+    process.env,
+    LEARNING_PUBLIC_ROUTES.catalog
+  );
 
   return (
     <LearningShell
       title={t("learning.hub.title")}
       subtitle={t("learning.hub.subtitle")}
-      instructorHref={
-        showInstructor ? LEARNING_INSTRUCTOR_ROUTES.hub : undefined
-      }
+      instructorHref={showInstructor ? teacherHref : undefined}
     >
+      <div className="mt-6">
+        <WelcomeVideoHook hook={welcomeHook} />
+      </div>
       {hub.ok ? (
         <LearningHub hub={hub.data} />
       ) : (

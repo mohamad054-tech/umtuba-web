@@ -20,6 +20,8 @@ import {
 } from "../../../../lib/learning/publicCatalogSelfEnroll";
 import { APP_ROUTES } from "../../../lib/nav/routes";
 import { enrollInPublicCourseAction } from "../actions";
+import CourseReviewForm from "../../../components/learning/CourseReviewForm";
+import { loadPublicCourseReviews } from "../../../../lib/learning/courseReviews";
 import JsonLd from "../../../components/JsonLd";
 import {
   buildBreadcrumbListJsonLd,
@@ -121,6 +123,8 @@ export default async function LearningPublicCourseLandingPage({
       : null;
   const levelKey = course.difficulty ? difficultyKey(course.difficulty) : null;
   const errorKey = query.error ? enrollErrorKey(query.error) : null;
+  const reviewsLoaded = await loadPublicCourseReviews(supabase, course.id);
+  const reviews = reviewsLoaded.ok ? reviewsLoaded.data : [];
 
   return (
     <>
@@ -360,6 +364,36 @@ export default async function LearningPublicCourseLandingPage({
               {t("learning.course.myLearning")}
             </Link>
           </p>
+        ) : null}
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-base font-bold text-white">
+          {t("learning.review.title")}
+        </h2>
+        {(reviews ?? []).length === 0 ? (
+          <p className="mt-2 text-sm text-white/55">{t("learning.review.empty")}</p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {(reviews ?? []).map((review) => (
+              <li
+                key={review.id}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm"
+              >
+                <p className="font-bold">{review.rating}/5</p>
+                {review.comment ? (
+                  <p className="mt-1 text-white/70">{review.comment}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+        {user && enrolled ? (
+          <CourseReviewForm
+            t={t}
+            courseId={course.id}
+            returnTo={LEARNING_PUBLIC_ROUTES.course(course.slug)}
+          />
         ) : null}
       </section>
     </LearningShell>

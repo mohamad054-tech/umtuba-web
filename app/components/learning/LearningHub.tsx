@@ -9,6 +9,7 @@ import {
   type LearningLearnerHubCourse,
 } from "../../../lib/learning/learnerDelivery";
 import { LEARNING_PUBLIC_ROUTES } from "../../../lib/learning/publicCatalog";
+import { LEARNING_TEACHER_ROUTES } from "../../../lib/learning/teacherPlatform";
 import {
   LearningProgressBar,
   LearningStatePanel,
@@ -95,6 +96,18 @@ export default function LearningHub({ hub }: LearningHubProps) {
             className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
           >
             {t("learning.hub.transcript")}
+          </Link>
+          <Link
+            href={LEARNING_TEACHER_ROUTES.become}
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
+          >
+            {t("learning.hub.becomeTeacher")}
+          </Link>
+          <Link
+            href={LEARNING_TEACHER_ROUTES.center}
+            className="watch-focus-ring inline-flex min-h-11 items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-bold text-white/80 hover:border-white/40"
+          >
+            {t("learning.hub.teacherCenter")}
           </Link>
         </div>
       </section>
