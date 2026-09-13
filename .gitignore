@@ -57,3 +57,10 @@ scripts/store-e2e/*.local.*
 scripts/collaboration-e2e/config.local.sql
 scripts/collaboration-e2e/_tmp*
 scripts/collaboration-e2e/*.local.*
+
+# Local E2E provisioning (Desktop takeover)
+scripts/collaboration-e2e/.provision.local.env
+scripts/collaboration-e2e/config.local.sql
+scripts/collaboration-e2e/_seed_run.local.sql
+LOCAL_E2E_HARNESS_CHANGES.md
+

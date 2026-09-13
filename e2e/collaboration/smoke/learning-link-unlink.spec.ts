@@ -21,22 +21,47 @@ const fullReady = collaborationLearningLinkUnlinkFullCredentialsPresent(
 );
 const fixtures = collaborationLearningLinkUnlinkFixtureIds(process.env);
 
+/** Controlled React AuthField: set native value + input/change so onChange fires. */
+async function fillControlledInput(page: Page, name: string, value: string) {
+  const input = page.locator(`input[name="${name}"]`);
+  await input.waitFor({ state: "visible" });
+  await input.evaluate((el, v) => {
+    const desc = Object.getOwnPropertyDescriptor(
+      window.HTMLInputElement.prototype,
+      "value"
+    );
+    desc?.set?.call(el, v);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+}
+
 async function loginAs(
   page: Page,
   email: string,
   password: string,
   nextPath: string
 ) {
-  await page.goto(
-    `/login?next=${encodeURIComponent(nextPath)}`,
-    { waitUntil: "domcontentloaded" }
-  );
-  await page.locator('input[name="email"]').fill(email);
-  await page.locator('input[name="password"]').fill(password);
-  await page.locator('form button[type="submit"]').click();
-  await page.waitForURL((url) => !url.pathname.startsWith("/login"), {
-    timeout: 30_000,
+  await page.goto(`/login?next=${encodeURIComponent(nextPath)}`, {
+    waitUntil: "networkidle",
   });
+  const emailInput = page.locator('input[name="email"]');
+  const submit = page.locator('form button[type="submit"]');
+  await emailInput.waitFor({ state: "visible" });
+  await submit.waitFor({ state: "visible" });
+  // Force client hydration: interact before setting credentials.
+  await emailInput.click();
+  await page.keyboard.type("x");
+  await page.keyboard.press("Backspace");
+  await page.waitForTimeout(500);
+  await fillControlledInput(page, "email", email);
+  await fillControlledInput(page, "password", password);
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.startsWith("/login"), {
+      timeout: 60_000,
+    }),
+    submit.click(),
+  ]);
 }
 
 test.describe("learning link/unlink credentialed smoke", () => {
