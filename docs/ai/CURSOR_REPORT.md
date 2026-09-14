@@ -1,51 +1,50 @@
-# Cursor report — DESKTOP-NJOEHQB GitHub sync 2026-09-13
+# Cursor report — owner save-everything local commits 2026-09-14
 
 ## Summary
 
-Computer 2 (`DESKTOP-NJOEHQB`) primary checkout `pc2/umtuba-communications-v1-part1b-identity-discovery` was already clean at `7d3c180d` (WIP snapshot) and already matched origin. No new commit was created. `fix/rls` worktree was also clean. Pushed eight local branches that had commits not present on any origin ref. Did not force-push, did not `--no-verify`, did not drop stashes. Did not print secrets.
+Owner said «احفظ كلشي» (save everything). Committed meaningful uncommitted work locally across dirty UMTUBA worktrees. Did **not** push. Did **not** deploy. Did **not** force-push, merge, reset, or apply remote migrations. Primary checkout `prototypes/games-engine-v1` saved at `3e073aa3` (`docs/PROJECT_STATE.md` + this handoff family). `fix/legal-public-surfaces` and `fix/rls` were already clean.
 
 ## Exact files changed
 
-- `docs/ai/CURSOR_REPORT.md` — this handoff report only
+This worktree this session:
 
-No application source committed or staged.
+- `docs/PROJECT_STATE.md` — new owner Arabic project-state map
+- `docs/ai/CURSOR_REPORT.md` — this handoff
+
+Other worktrees: see the save table in the chat reply. Application source was committed only where those trees already had store/mobile feature work sitting uncommitted.
 
 ## Migrations created
 
-None.
+None in this worktree. Existing uncommitted `20260934_store_seller_center_commerce_readiness_v1.sql` was committed only in the store productization / seller-center / visual-design worktrees (local only).
 
 ## Security review
 
-- Primary `git status --short` count: 0. Secret-name filter (`.env|secret|credential|key`): 0 hits.
-- `.gitignore` covers `.env*` with `!.env.example` (so `.env` and `.env.local` are ignored).
-- `.cursor/mcp.json` is **not** listed in `.gitignore`. File does not exist and is not tracked.
-- Unique commits pushed: docs/handoff reports plus `pc2/um-streak-final-completion-v1` feature/docs. No `.env` / credential / private-key / `mcp.json` filenames in those commits.
-- Other dirty worktrees were **not** staged. Filename matches for "secret/credential/key" there were docs (`pkey`, `nonsecret`, seller-login investigation), not real secret files.
+- Refused: `.env` / credential files, `supabase/.temp/linked-project.json`, APKs, nested `worktrees/`, duplicate App Store screenshot `(1)` dump, raw QA/build logs, Fold6 device logcats.
+- Pepper/vault docs committed only where they record name/UUID/status and explicitly `SECRET_VALUE_EXPOSED = NO`.
+- Seller-login investigation docs record `PASSWORD_REVEALED = NO`. Runtime credential JSON remains gitignored (`.seller-runtime-gate.local.json`).
 
 ## Tests
 
-Not run (push/sync only).
+Not run (save/commit only).
 
 ## TypeScript
 
-Not run (no TypeScript source change in this task).
+Not run (this worktree: docs only).
 
 ## Build
 
-Not run (no app UI/entry change in this task).
+Not run.
 
 ## git diff --check
 
-Not applicable: no commit created. Primary working tree clean.
+Not re-run after the multi-tree commits.
 
 ## git status --short
 
-Primary: empty (0 lines). `fix/rls`: empty (0 lines).
+Primary `prototypes/games-engine-v1`: clean after the docs commit (this file will be committed as a follow-up if dirty).
 
 ## Open issues
 
-- One stash remains: `stash@{0}: On office/pc2-a3-ready: pc2-a3-pre-audit-temp` (not dropped, not pushed as a branch).
-- 31 local branch names have no same-name origin ref, but their tips are already on origin under other names — not pushed as new names.
-- 18 other worktrees still have uncommitted files (not committed: user scoped commit to primary current branch + `fix/rls` if dirty). Largest dirty trees: store seller-center / world-class visual design / social-comm rich-profile.
-- `alpha-0.2` local tip `0999fc1d` is behind `origin/alpha-0.2` by 145; not force-updated.
-- Detached-HEAD worktrees were not pushed.
+- Several leftover uncommitted files were **intentionally skipped** (junk logs, APKs, screenshot duplicate, supabase temp, nested worktrees).
+- New local save branches for previously detached trees: `save/pc2-a3-whole-project-launch-scoreboard-v7`, `save/pc2-a3-alpha-d1-money-locale-release-defect-v1`, `save/pc2-a1-final-learning-release-impact-review-v2`, `save/pc2-ios-localization-build6-global-back-v1`.
+- Nothing pushed. Owner did not say ادفع.
