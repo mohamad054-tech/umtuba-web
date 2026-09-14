@@ -835,6 +835,17 @@ export type StoreMessages = {
   "store.home.favorites": string;
   "store.home.cart": string;
   "store.home.sellOnUmtuba": string;
+  "store.home.becomeSellerEyebrow": string;
+  "store.home.becomeSellerTitle": string;
+  "store.home.becomeSellerBody": string;
+  "store.home.becomeSellerCta": string;
+  "store.welcome.hookEyebrow": string;
+  "store.welcome.hookTitle": string;
+  "store.welcome.hookBody": string;
+  "store.welcome.hookCta": string;
+  "store.reviews.write": string;
+  "store.reviews.submit": string;
+  "store.reviews.deliveredOnly": string;
   "store.search.navTitle": string;
   "store.search.navSubtitle": string;
   "store.search.eyebrow": string;

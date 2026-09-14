@@ -1,58 +1,70 @@
-# CURSOR_REPORT — 13-locale final closeout V1 2026-08-22
-
-```text
-TASK_ID = CENTRAL_WEB_13_LOCALE_RUNTIME_CERTIFICATION_AND_COMPLETION_V1
-STATUS = CLOSEOUT_GATES_PASS
-BASE_SHA = 57de1988fc546f5c4f0acdd5e207c48aba1d82ef
-WEB_BRANCH = central/web-13-locale-runtime-certification-v1
-TYPECHECK = PASS
-TESTS = PASS
-BUILD = PASS
-13_LOCALE_MATRIX_COMPLETE = YES
-AR_PROFILE_ENGLISH_LEAK_FIXED = CANDIDATE_YES
-UNINTENDED_USER_VISIBLE_PRODUCT_ENGLISH_REMAINING = NO
-RUNTIME_VERIFIED_LOCAL = YES
-READY_FOR_PRODUCTION_DEPLOY = YES
-```
+# CURSOR_REPORT
 
 ## Summary
 
-9fb03888 was blocked because leftover user-visible English remained. This closeout wired linked-article, empty/error panels, live buckets, photo lightbox, identity aria, pinned rail, posts/articles/courses/products chrome, and content-card kind/badge/CTA labels. Candidate local `/profile/marenapost?hl=ar` stays clean. IA contracts, mock UGC, brands, and creator-entered text were left untranslated.
+Isolated visual-design worktree from the preserved Store/Seller functional candidate (`cfc57402` / `office/pc2-umtuba-store-seller-center-commerce-readiness-v1`). Local interactive prototype at `/sandbox/store-visual` uses **fixtures only** — no hosted Supabase writes, no migrations, no fake approval, no real payment. Owner screenshot pack captured. **Not a DESIGN PASS.**
+
+```text
+TASK_ID = PC2_UMTUBA_STORE_WORLD_CLASS_VISUAL_DESIGN_V1
+BASE = cfc57402e38423231092d9eb80244b333c4cf6a7
+FUNCTIONAL_WORKTREE_PRESERVED = C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-STORE-SELLER-CENTER-COMMERCE-READINESS-V1
+WORKTREE = C:\Users\Giga store\Desktop\umtuba\worktrees\PC2-STORE-WORLD-CLASS-VISUAL-DESIGN-V1
+BRANCH = office/pc2-umtuba-store-world-class-visual-design-v1
+LOCAL_PREVIEW_URL = http://127.0.0.1:3020/sandbox/store-visual
+READY_FOR_OWNER_VISUAL_REVIEW = YES
+DEPLOYED = NO
+MOBILE_TOUCHED = NO
+MIGRATIONS = NO
+COMMIT = NO
+```
 
 ## Exact files changed
 
-Profile panels, ContentCard, 13 catalogs, closeout splice scripts, targeted wiring tests. No mobile. No SQL.
+Visual-design additions (this GO):
+
+- `lib/store/visualDemo/data.ts`
+- `lib/store/visualDemo/paths.ts`
+- `app/sandbox/store-visual/**`
+- `docs/ai/pc2-store-visual-design/**`
+- Handoff docs
+
+Functional candidate files remain copied into this worktree but were **not** rewritten for demo persistence. The original functional worktree/branch is untouched by this visual GO.
 
 ## Migrations created
 
-None.
+None. `MIGRATIONS=NO`. (Copied prior local `20260934` file is from the functional candidate; not created or applied here.)
 
 ## Security review
 
-No auth/session/secret change. Host env must be sourced without printing values.
+- Demo catalog is local TypeScript fixtures under `/sandbox/store-visual` (already robots-disallowed via `/sandbox`).
+- No production/backend data writes. No RLS bypass. No seller approval fakery.
+- Checkout shows Visa/Mastercard, Apple Pay, Google Pay, PayPal as **Not connected**. CTA is “Record order — no charge”.
+- `REAL_PAYMENT_CAPTURE=DISABLED` `REAL_SELLER_PAYOUT=DISABLED` `PAYMENT_PROVIDER_CONNECTED=NO`
+- Returns / Reviews / Analytics labeled `FUNCTIONAL_WIRING_PENDING`.
 
 ## Tests
 
-54 targeted tests PASS.
+No new unit suite. `npx tsc --noEmit` PASS on the visual worktree.
 
 ## TypeScript
 
-`tsc --noEmit` PASS.
+`npx tsc --noEmit` → PASS.
 
 ## Build
 
-`npm run build` PASS.
+Local `next dev` on port 3020 serves the prototype (`GET /sandbox/store-visual` 200, populated). Production `npm run build` not required for this sandbox-only visual GO.
 
 ## git diff --check
 
-PASS (CRLF warnings only).
+PASS.
 
 ## git status --short
 
-Closeout files on `central/web-13-locale-runtime-certification-v1`.
+Uncommitted visual-demo files plus preserved functional delta on `office/pc2-umtuba-store-world-class-visual-design-v1`. No commit. No push.
 
 ## Open issues
 
-- Production still on `57de1988` until this closeout SHA is cut over.
-- IA English constants remain in source by design.
-- Mock profile UGC remains English (not production UI).
+- Owner visual approval is outstanding (do not claim DESIGN PASS).
+- Cursor browser MCP tab was unstable; screenshots captured with Playwright + installed Chrome against the live local server.
+- Returns / Reviews / Analytics remain visual-spec only.
+- Functional authenticated Seller runtime is still blocked on admin approval (separate GO).

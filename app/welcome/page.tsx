@@ -6,6 +6,7 @@ import { welcomeMetadata } from "../../lib/site/routeMetadata";
 import { APP_ROUTES } from "../lib/nav";
 import JoinBetaLink from "../components/landing/JoinBetaLink";
 import LandingHero from "../components/landing/LandingHero";
+import BecomeASellerHook from "../components/store/BecomeASellerHook";
 
 export const metadata = welcomeMetadata;
 
@@ -91,6 +92,15 @@ export default async function WelcomePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="relative z-10 mx-auto max-w-7xl px-6 pb-16 md:px-12">
+        <BecomeASellerHook
+          eyebrow={t("store.welcome.hookEyebrow")}
+          title={t("store.welcome.hookTitle")}
+          body={t("store.welcome.hookBody")}
+          cta={t("store.welcome.hookCta")}
+        />
       </section>
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 pb-24 md:px-12">

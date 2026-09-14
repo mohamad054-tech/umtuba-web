@@ -1,5 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { StoreMemberRole } from "./types";
+import {
+  type SellerLifecycleState,
+  toSellerLifecycleState,
+} from "./commerceReadiness";
 import { canManageCatalog } from "./permissions";
 
 type AnyClient = SupabaseClient;
@@ -94,6 +98,12 @@ export async function getLatestSellerApplication(
  * `catalog_editor` **and** the store has been verified by an operator.
  * Mirrors the `enforce_verified_store_for_products` DB trigger.
  */
+export function sellerApplicationLifecycle(
+  status: SellerApplicationStatus | string | null | undefined
+): SellerLifecycleState | null {
+  return toSellerLifecycleState(status);
+}
+
 export function canManageSellerCatalog(input: {
   role: StoreMemberRole | null | undefined;
   storeVerificationStatus: string | null | undefined;

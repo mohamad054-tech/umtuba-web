@@ -71,6 +71,7 @@ const ORDER_ACTION_LABELS: Partial<Record<OrderStatus, string>> = {
   shipped: "Hand to shipping",
   delivered: "Confirm delivered",
   cancelled: "Cancel order",
+  returned: "Confirm returned",
 };
 
 const FULFILLMENT_ACTION_LABELS: Record<FulfillmentStatus, string> = {
@@ -148,6 +149,18 @@ export function deriveSellerOrderAttention(input: {
   }
   if (input.status === "cancelled" || input.status === "refunded") {
     return { level: "info", message: "Order is closed." };
+  }
+  if (input.status === "return_requested") {
+    return {
+      level: "warn",
+      message: "Buyer requested a return. Confirm receipt of the goods — refunds stay disabled.",
+    };
+  }
+  if (input.status === "returned") {
+    return {
+      level: "info",
+      message: "Return received. Real refund execution remains disabled.",
+    };
   }
   if (input.paymentStatus === "pending" && input.status === "packed") {
     return {

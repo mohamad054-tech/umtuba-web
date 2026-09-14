@@ -1,0 +1,20 @@
+{
+  "email": "pc2.store.seller.c.20260823@example.com",
+  "hasSession": true,
+  "userIdPresent": true,
+  "signupError": null,
+  "storeMembers": {
+    "count": 0,
+    "error": null
+  },
+  "stores": {
+    "count": 0,
+    "error": null
+  },
+  "applications": {
+    "count": 0,
+    "statuses": [],
+    "slugs": [],
+    "error": null
+  }
+}

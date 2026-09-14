@@ -29,6 +29,8 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   shipped: "Shipped",
   delivered: "Delivered",
   cancelled: "Cancelled",
+  return_requested: "Return requested",
+  returned: "Returned",
   refunded: "Refunded",
 };
 
@@ -59,8 +61,10 @@ export const ORDER_STATUS_TRANSITIONS: Record<
   processing: ["packed", "cancelled"],
   packed: ["shipped", "cancelled"],
   shipped: ["delivered"],
-  delivered: ["refunded"],
+  delivered: ["return_requested", "refunded"],
   cancelled: [],
+  return_requested: ["returned", "refunded"],
+  returned: ["refunded"],
   refunded: [],
 };
 
@@ -79,6 +83,8 @@ export const SELLER_ORDER_STATUS_TRANSITIONS: Record<
   shipped: ["delivered"],
   delivered: [],
   cancelled: [],
+  return_requested: ["returned"],
+  returned: [],
   refunded: [],
 };
 
@@ -298,7 +304,8 @@ export function isSellerTerminalOrderStatus(status: OrderStatus): boolean {
   return (
     status === "cancelled" ||
     status === "refunded" ||
-    status === "delivered"
+    status === "delivered" ||
+    status === "returned"
   );
 }
 
