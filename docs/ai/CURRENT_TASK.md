@@ -1,48 +1,52 @@
 ﻿# Current Task
 
-> 2026-09-02 PC2. Owner GO: COMMUNICATIONS IDENTITY PEPPER VAULT ADAPTATION V1.
+> 2026-09-02 PC2. Owner GO: SOCIAL COMMUNICATIONS RICH PROFILE SOURCE PROMOTION + WEB DEPLOY V1.
 
-**This worktree only.** Isolated from the dirty primary checkout. LOCAL ONLY. STOP after the report. No production Vault, SQL, or apply.
+**Isolated worktree docs.** Candidate `3ccc164f` is FF-safe from current `origin/alpha-0.2` `b5fbeff2`. Typecheck and production build passed. Relevant candidate tests passed. Live DB tip is still `20260936`. **Stopped before push/deploy** because PC2 has no authorized rollback-capable web-release mechanism. Main dirty checkout was not reset. UM Streak was not touched.
 
 ```text
-TASK_ID = COMMUNICATIONS_IDENTITY_PEPPER_VAULT_ADAPTATION_V1
-STATUS = COMPLETE
+TASK_ID = SOCIAL_COMMUNICATIONS_RICH_PROFILE_SOURCE_PROMOTION_WEB_DEPLOY_V1
+STATUS = BLOCKED
 DEVICE = PC2
-INTEGRATION_BRANCH = pc2/social-comm-rich-profile-renumber-integrate-v1
-INTEGRATION_WORKTREE = C:\Users\Giga store\Desktop\umtuba\umtuba-web-social-comm-rich-profile-renumber-integrate-v1
-BASE_SHA = 4eb8e91aff6310d243547790d867690663a6827d
-VAULT_METHOD = vault.decrypted_secrets
-SECRET_NAME = communications_identity_pepper
-MISSING_SECRET_FAIL_CLOSED = PASS
-PUBLIC_VAULT_ACCESS = DENIED
-SECRET_EXPOSED = NO
-PRODUCTION_CHANGED = NO
-MIGRATION_20260934_EDITED = NO
-MIGRATION_20260935_EDITED = NO
-MIGRATION_20260937_EDITED = NO
+CANDIDATE_SHA = 3ccc164f02ccb8e54cb978bc3620d907038e64a4
+PREVIOUS_ALPHA_SHA = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+FAST_FORWARD_VERIFIED = YES
+UM_STREAK_INCLUDED = NO
+TYPECHECK = PASS
+TESTS = PASS_RELEVANT_CANDIDATE
+PRODUCTION_BUILD = PASS
+PUBLIC_SUPABASE_ENV_INCLUDED = YES_EXISTING_ENV_LOCAL
+ORIGIN_ALPHA_SHA_AFTER = b5fbeff29cb0f308481b38c06500c572cd44a9c4
+DEPLOYED = NO
+ORIGIN_ALPHA_PUSHED = NO
+DATABASE_CHANGED_DURING_DEPLOY = NO
+MIGRATION_20260934_APPLIED = NO
+MIGRATION_20260937_APPLIED = NO
+PLAY_TOUCHED = NO
+APP_STORE_TOUCHED = NO
+ROLLBACK_REQUIRED = NO
+BLOCKERS = NO_AUTHORIZED_ROLLBACK_CAPABLE_WEB_DEPLOY_MECHANISM_ON_PC2; PREVIOUS_LIVE_RELEASE_SHA_UNPROVEN
+NEXT_RECOMMENDED_STEP = CENTRAL_PROVIDE_EXISTING_NGINX_NEXT_RELEASE_PATH_THEN_FF_ALPHA_AND_CUTOVER
 ```
 
 ## Allowed scope
 
-- `supabase/migrations/20260936_communications_identity_discovery_v1.sql` and related SQL functions only
-- Isolated-worktree docs + contract tests for the Vault / fail-closed pepper rules
-- Local-only disposable Vault secret for PASS then delete for fail-closed
-- Local supabase only (reused existing stack; no `--linked`, no `db push`)
+- `git fetch --prune`
+- Prove alpha SHA / FF-safety / final diff / no UM Streak
+- Read-only live `schema_migrations`
+- Typecheck, relevant tests, production build from exact `3ccc164f`
+- Include `NEXT_PUBLIC` via existing `.env.local` (do not print values)
+- Fast-forward `origin/alpha-0.2` only if all pre-deploy gates pass
+- New rollback-capable web release only via the existing documented mechanism
+- Isolated-worktree docs
 
 ## Forbidden scope
 
-- Production Vault / production SQL / hosted apply of `20260935` / `20260936`
-- `db push` / `--linked` apply
-- Edit `20260934` or `20260937`
-- Edit `20260935` unless strictly required (untouched)
-- Reset the dirty primary checkout
-- Touch the UM Streak worktree
-- Deploy or merge alpha
-- Log or display the secret value
 - Force push
-- Expose `.env`
-- Put a pepper VALUE in a migration, Git, or source
-
-## STOP
-
-Candidate SQL is adapted to Vault. Local gates passed. Do **not** create a production Vault secret or apply `20260935` / `20260936` until a separate Owner GO.
+- `db push` / apply migrations / apply `20260934` or `20260937`
+- Merge UM Streak
+- Play Store or App Store / TestFlight
+- Invent Vercel / SSH / a new env method
+- Delete the current live release before smoke
+- Reset the dirty primary checkout
+- Print secrets / `.env` values
